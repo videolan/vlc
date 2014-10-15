@@ -607,9 +607,9 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         sys->is_on_top = is_on_top;
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN: {   /* const vout_display_cfg_t *p_cfg */
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        if (CommonControlSetFullscreen(vd, cfg->is_fullscreen))
+    case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
+        bool fs = va_arg(args, int);
+        if (CommonControlSetFullscreen(vd, fs))
             return VLC_EGENERIC;
         UpdateRects(vd, NULL, NULL, false);
         return VLC_SUCCESS;

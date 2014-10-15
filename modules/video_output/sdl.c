@@ -494,24 +494,17 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
-        vout_display_cfg_t cfg = *va_arg(args, const vout_display_cfg_t *);
+        bool fs = va_arg(args, int);
 
         /* Fix flags */
         sys->display_flags &= ~(SDL_FULLSCREEN | SDL_RESIZABLE);
-        sys->display_flags |= cfg.is_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE;
+        sys->display_flags |= fs ? SDL_FULLSCREEN : SDL_RESIZABLE;
 
-        if (cfg.is_fullscreen) {
-            cfg.display.width = sys->desktop_width;
-            cfg.display.height = sys->desktop_height;
-        }
-
-        if (sys->overlay) {
-            sys->display = SDL_SetVideoMode(cfg.display.width, cfg.display.height,
+        if (sys->overlay)
+            sys->display = SDL_SetVideoMode(sys->desktop_width, sys->desktop_height,
                                             sys->display_bpp, sys->display_flags);
 
-            vout_display_PlacePicture(&sys->place, &vd->source, &cfg, !sys->overlay);
-        }
-        vout_display_SendEventDisplaySize(vd, cfg.display.width, cfg.display.height);
+        vout_display_SendEventDisplaySize(vd, sys->desktop_width, sys->desktop_height);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_ZOOM:

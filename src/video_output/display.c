@@ -858,13 +858,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
         /* */
         if (ch_fullscreen) {
-            vout_display_cfg_t cfg = osys->cfg;
-
-            cfg.is_fullscreen  = is_fullscreen;
-            cfg.display.width  = cfg.is_fullscreen ? 0 : osys->width_saved;
-            cfg.display.height = cfg.is_fullscreen ? 0 : osys->height_saved;
-
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN, &cfg) == VLC_SUCCESS) {
+            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
+                                     is_fullscreen) == VLC_SUCCESS) {
                 osys->cfg.is_fullscreen = is_fullscreen;
 
                 if (!is_fullscreen)
