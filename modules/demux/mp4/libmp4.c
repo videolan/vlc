@@ -4098,15 +4098,13 @@ static void MP4_BoxDumpStructure_Internal( stream_t *s,
                                     MP4_Box_t *p_box, unsigned int i_level )
 {
     MP4_Box_t *p_child;
+    uint32_t i_displayedtype = p_box->i_type;
+    if( ! MP4_BOX_TYPE_ASCII() ) ((char*)&i_displayedtype)[0] = 'c';
 
     if( !i_level )
     {
-        if MP4_BOX_TYPE_ASCII()
-            msg_Dbg( s, "dumping root Box \"%4.4s\"",
-                              (char*)&p_box->i_type );
-        else
-            msg_Dbg( s, "dumping root Box \"c%3.3s\"",
-                              (char*)&p_box->i_type+1 );
+        msg_Dbg( s, "dumping root Box \"%4.4s\"",
+                          (char*)&i_displayedtype );
     }
     else
     {
@@ -4119,18 +4117,12 @@ static void MP4_BoxDumpStructure_Internal( stream_t *s,
         {
             str[i*4] = '|';
         }
-        if( MP4_BOX_TYPE_ASCII() )
-            snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
-                      "+ %4.4s size %"PRIu64" offset %ju%s",
-                      (char*)&p_box->i_type, p_box->i_size,
-                      (uintmax_t)p_box->i_pos,
-                    p_box->e_flags & BOX_FLAG_INCOMPLETE ? " (\?\?\?\?)" : "" );
-        else
-            snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
-                      "+ c%3.3s size %"PRIu64" offset %ju%s",
-                        (char*)&p_box->i_type+1, p_box->i_size,
-                      (uintmax_t)p_box->i_pos,
-                    p_box->e_flags & BOX_FLAG_INCOMPLETE ? " (\?\?\?\?)" : "" );
+
+        snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
+                  "+ %4.4s size %"PRIu64" offset %ju%s",
+                    (char*)&i_displayedtype, p_box->i_size,
+                  (uintmax_t)p_box->i_pos,
+                p_box->e_flags & BOX_FLAG_INCOMPLETE ? " (\?\?\?\?)" : "" );
         msg_Dbg( s, "%s", str );
     }
     p_child = p_box->p_first;
