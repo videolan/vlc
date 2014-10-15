@@ -1446,6 +1446,7 @@ struct MP4_Box_s
     uint32_t     i_type;
     uint32_t     i_shortsize;
     uint32_t     i_handler;  /**/
+    uint32_t     i_index;    /* indexed list (ilst) */
 
     enum
     {
