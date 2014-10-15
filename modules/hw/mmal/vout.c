@@ -96,19 +96,19 @@ struct vout_display_sys_t {
     vlc_mutex_t buffer_mutex;
     vlc_mutex_t manage_mutex;
 
-    plane_t planes[3];
-    picture_t **pictures;
+    plane_t planes[3]; /* Depending on video format up to 3 planes are used */
+    picture_t **pictures; /* Actual list of alloced pictures passed into picture_pool */
     picture_pool_t *picture_pool;
 
     MMAL_COMPONENT_T *component;
     MMAL_PORT_T *input;
-    MMAL_POOL_T *pool;
+    MMAL_POOL_T *pool; /* mmal buffer headers, used for pushing pictures to component*/
     struct dmx_region_t *dmx_region;
-    int i_planes;
+    int i_planes; /* Number of actually used planes, 1 for opaque, 3 for i420 */
 
-    uint32_t buffer_size;
-    int buffers_in_transit;
-    unsigned num_buffers;
+    uint32_t buffer_size; /* size of actual mmal buffers */
+    int buffers_in_transit; /* number of buffers currently pushed to mmal component */
+    unsigned num_buffers; /* number of buffers allocated at mmal port */
 
     DISPMANX_DISPLAY_HANDLE_T dmx_handle;
     DISPMANX_ELEMENT_HANDLE_T bkg_element;
@@ -116,19 +116,19 @@ struct vout_display_sys_t {
     unsigned display_width;
     unsigned display_height;
 
-    int i_frame_rate_base;
+    int i_frame_rate_base; /* cached framerate to detect changes for rate adjustment */
     int i_frame_rate;
 
-    int next_phase_check;
-    int phase_offset;
-    int layer;
+    int next_phase_check; /* lowpass for phase check frequency */
+    int phase_offset; /* currently applied offset to presentation time in ns */
+    int layer; /* the dispman layer (z-index) used for video rendering */
 
-    bool need_configure_display;
+    bool need_configure_display; /* indicates a required display reconfigure to main thread */
     bool adjust_refresh_rate;
     bool native_interlaced;
-    bool b_top_field_first;
+    bool b_top_field_first; /* cached interlaced settings to detect changes for native mode */
     bool b_progressive;
-    bool opaque;
+    bool opaque; /* indicated use of opaque picture format (zerocopy) */
 };
 
 static const vlc_fourcc_t subpicture_chromas[] = {
