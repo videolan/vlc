@@ -606,13 +606,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             ret = VLC_SUCCESS;
             break;
 
-        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-            tmp_cfg = va_arg(args, const vout_display_cfg_t *);
-            vout_display_SendEventDisplaySize(vd, sys->display_width,
-                            sys->display_height);
-            ret = VLC_SUCCESS;
-            break;
-
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
             tmp_cfg = va_arg(args, const vout_display_cfg_t *);
             if (tmp_cfg->display.width == sys->display_width &&
@@ -632,6 +625,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
                 ret = VLC_SUCCESS;
             break;
 
+        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_RESET_PICTURES:
             msg_Warn(vd, "Unsupported control query %d", query);
