@@ -1333,6 +1333,14 @@ static int MP4_frg_Seek( demux_t *p_demux, double f )
     }
 }
 
+static bool imageTypeCompatible( const MP4_Box_data_data_t *p_data )
+{
+    return p_data && (
+    p_data->e_wellknowntype == DATA_WKT_PNG ||
+    p_data->e_wellknowntype == DATA_WKT_JPEG ||
+    p_data->e_wellknowntype == DATA_WKT_BMP );
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -1342,6 +1350,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     double f, *pf;
     int64_t i64, *pi64;
+
+    const char *psz_roots[] = { "/moov/udta/meta/ilst",
+                                "/moov/meta/ilst",
+                                "/moov/udta/meta",
+                                "/moov/udta",
+                                "/meta/ilst",
+                                "/udta",
+                                NULL };
 
     switch( i_query )
     {
@@ -1411,15 +1427,24 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             input_attachment_t ***ppp_attach = va_arg( args, input_attachment_t*** );
             int *pi_int = va_arg( args, int * );
 
-            MP4_Box_t  *p_covr = MP4_BoxGet( p_sys->p_root, "/moov/udta/meta/ilst/covr" );
-            if ( !p_covr ) return VLC_EGENERIC;
-            MP4_Box_t  *p_box;
-            int i_count = 0;
+            MP4_Box_t *p_data = NULL;
+            MP4_Box_t *p_udta = NULL;
+            size_t i_count = 0;
+            int i_index = 0;
 
-            for( p_box = p_covr->p_first; p_box != NULL; p_box = p_box->p_next )
+            for( ; psz_roots[i_index] && !p_udta; i_index++ )
             {
-                if ( p_box->i_type == ATOM_data && p_box->data.p_data->i_blob >= 16 )
-                    i_count++;
+                p_udta = MP4_BoxGet( p_sys->p_root, psz_roots[i_index] );
+                if (p_udta)
+                {
+                    p_data = MP4_BoxGet( p_udta, "covr/data" );
+                    for( ; p_data; p_data = p_data->p_next )
+                    {
+                        if ( p_data->i_type == ATOM_data &&
+                             imageTypeCompatible( BOXDATA(p_data) ) )
+                            i_count++;
+                    }
+                }
             }
 
             if ( i_count == 0 )
@@ -1431,30 +1456,32 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             char *psz_mime;
             char *psz_filename;
             i_count = 0;
-            for( p_box = p_covr->p_first; p_box != NULL; p_box = p_box->p_next )
+            p_data = MP4_BoxGet( p_udta, "covr/data" );
+            for( ; p_data; p_data = p_data->p_next )
             {
-                if ( p_box->i_type != ATOM_data || p_box->data.p_data->i_blob < 16 )
+                if ( p_data->i_type != ATOM_data || !imageTypeCompatible( BOXDATA(p_data) ) )
                     continue;
 
-                if ( !memcmp( p_box->data.p_data->p_blob,
-                              "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A", 8 ) )
+                switch( BOXDATA(p_data)->e_wellknowntype )
                 {
+                case DATA_WKT_PNG:
                     psz_mime = strdup( "image/png" );
-                }
-                else if ( !memcmp( p_box->data.p_data->p_blob, "\xFF\xD8", 2 ) )
-                {
+                    break;
+                case DATA_WKT_JPEG:
                     psz_mime = strdup( "image/jpeg" );
-                }
-                else
-                {
+                    break;
+                case DATA_WKT_BMP:
+                    psz_mime = strdup( "image/bmp" );
+                    break;
+                default:
                     continue;
                 }
 
-                if ( asprintf( &psz_filename, "picture%u", i_count ) >= 0 )
+                if ( asprintf( &psz_filename, "%s/covr/data[%"PRIu64"]", psz_roots[i_index - 1], i_count ) >= 0 )
                 {
                     (*ppp_attach)[i_count++] =
                         vlc_input_attachment_New( psz_filename, psz_mime, NULL,
-                            p_box->data.p_data->p_blob, p_box->data.p_data->i_blob );
+                            BOXDATA(p_data)->p_blob, BOXDATA(p_data)->i_blob );
                     free( psz_filename );
                 }
 
@@ -1476,36 +1503,36 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t*);
 
-            const char *psz_roots[] = { "/moov/udta/meta/ilst",
-                                        "/moov/meta/ilst",
-                                        "/moov/udta/meta",
-                                        "/moov/udta",
-                                        "/meta/ilst",
-                                        "/udta",
-                                        NULL };
-
-            const MP4_Box_t *p_covr = NULL;
-            const MP4_Box_t *p_udta = NULL;
+            MP4_Box_t *p_data = NULL;
+            MP4_Box_t *p_udta = NULL;
 
             for( int i_index = 0; psz_roots[i_index] && !p_udta; i_index++ )
             {
                 p_udta = MP4_BoxGet( p_sys->p_root, psz_roots[i_index] );
                 if ( p_udta )
                 {
-                    p_covr = MP4_BoxGet( p_sys->p_root, "covr/data[0]" );
-                    if ( p_covr )
-                        vlc_meta_SetArtURL( p_meta, "attachment://picture0" );
+                    p_data = MP4_BoxGet( p_udta, "covr/data" );
+                    if ( p_data && imageTypeCompatible( BOXDATA(p_data) ) )
+                    {
+                        char *psz_attachment;
+                        if ( -1 != asprintf( &psz_attachment, "attachment://%s/covr/data[0]",
+                                             psz_roots[i_index] ) )
+                        {
+                            vlc_meta_SetArtURL( p_meta, psz_attachment );
+                            free( psz_attachment );
+                        }
+                    }
                 }
             }
 
-            if( p_udta == NULL && p_covr == NULL )
+            if( p_udta == NULL && p_data == NULL )
                 return VLC_EGENERIC;
 
             for( const MP4_Box_t * p_string = p_udta->p_first; p_string != NULL;
                  p_string = p_string->p_next )
             {
 
-                if( !p_string || !BOXDATA(p_string) )
+                if( !p_string || !BOXDATA(p_string) ) /* !WARN could be data atoms ! */
                     continue;
 
                 /* FIXME FIXME: should convert from whatever the character
