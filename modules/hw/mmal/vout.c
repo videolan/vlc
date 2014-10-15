@@ -53,6 +53,11 @@
 #define MMAL_ADJUST_REFRESHRATE_TEXT N_("Adjust HDMI refresh rate to the video.")
 #define MMAL_ADJUST_REFRESHRATE_LONGTEXT N_("Adjust HDMI refresh rate to the video.")
 
+#define MMAL_NATIVE_INTERLACED "mmal-native-interlaced"
+#define MMAL_NATIVE_INTERLACE_TEXT N_("Force interlaced video mode.")
+#define MMAL_NATIVE_INTERLACE_LONGTEXT N_("Force the HDMI output into an " \
+        "interlaced video mode for interlaced video content.")
+
 /* Ideal rendering phase target is at rough 25% of frame duration */
 #define PHASE_OFFSET_TARGET ((double)0.25)
 #define PHASE_CHECK_INTERVAL 100
@@ -68,6 +73,8 @@ vlc_module_begin()
     add_integer(MMAL_LAYER_NAME, 1, MMAL_LAYER_TEXT, MMAL_LAYER_LONGTEXT, false)
     add_bool(MMAL_ADJUST_REFRESHRATE_NAME, false, MMAL_ADJUST_REFRESHRATE_TEXT,
                     MMAL_ADJUST_REFRESHRATE_LONGTEXT, false)
+    add_bool(MMAL_NATIVE_INTERLACED, false, MMAL_NATIVE_INTERLACE_TEXT,
+                    MMAL_NATIVE_INTERLACE_LONGTEXT, false)
     set_callbacks(Open, Close)
 vlc_module_end()
 
@@ -115,6 +122,9 @@ struct vout_display_sys_t {
 
     bool need_configure_display;
     bool adjust_refresh_rate;
+    bool native_interlaced;
+    bool b_top_field_first;
+    bool b_progressive;
     bool opaque;
 };
 
@@ -312,6 +322,7 @@ static void Close(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
+    char response[20]; /* answer is hvs_update_fields=%1d */
     unsigned i;
 
     vc_tv_unregister_callback_full(tvservice_cb, vd);
@@ -344,6 +355,12 @@ static void Close(vlc_object_t *object)
     vlc_mutex_destroy(&sys->buffer_mutex);
     vlc_cond_destroy(&sys->buffer_cond);
     vlc_mutex_destroy(&sys->manage_mutex);
+
+    if (sys->native_interlaced) {
+        if (vc_gencmd(response, sizeof(response), "hvs_update_fields 0") < 0 ||
+                response[18] != '0')
+            msg_Warn(vd, "Could not reset hvs field mode");
+    }
 
     free(sys->pictures);
     free(sys);
@@ -412,6 +429,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     show_background(vd, cfg->is_fullscreen);
     sys->adjust_refresh_rate = var_InheritBool(vd, MMAL_ADJUST_REFRESHRATE_NAME);
+    sys->native_interlaced = var_InheritBool(vd, MMAL_NATIVE_INTERLACED);
     if (sys->adjust_refresh_rate) {
         adjust_refresh_rate(vd, fmt);
         set_latency_target(vd, true);
@@ -532,7 +550,11 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
     MMAL_STATUS_T status;
 
     if (picture->format.i_frame_rate != vd->fmt.i_frame_rate ||
-        picture->format.i_frame_rate_base != vd->fmt.i_frame_rate_base) {
+        picture->format.i_frame_rate_base != vd->fmt.i_frame_rate_base ||
+        picture->b_progressive != sys->b_progressive ||
+        picture->b_top_field_first != sys->b_top_field_first) {
+        sys->b_top_field_first = picture->b_top_field_first;
+        sys->b_progressive = picture->b_progressive;
         configure_display(vd, NULL, &picture->format);
     }
 
@@ -762,8 +784,10 @@ static int set_latency_target(vout_display_t *vd, bool enable)
 
 static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt)
 {
+    vout_display_sys_t *sys = vd->sys;
     TV_DISPLAY_STATE_T display_state;
     TV_SUPPORTED_MODE_NEW_T supported_modes[VC_TV_MAX_MODE_IDS];
+    char response[20]; /* answer is hvs_update_fields=%1d */
     int num_modes;
     double frame_rate = (double)fmt->i_frame_rate / fmt->i_frame_rate_base;
     int best_id = -1;
@@ -775,11 +799,20 @@ static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt)
         num_modes = vc_tv_hdmi_get_supported_modes_new(display_state.display.hdmi.group,
                         supported_modes, VC_TV_MAX_MODE_IDS, NULL, NULL);
 
-        for(i = 0; i < num_modes; ++i) {
-            if(supported_modes[i].width != display_state.display.hdmi.width ||
-                            supported_modes[i].height != display_state.display.hdmi.height ||
-                            supported_modes[i].scan_mode != display_state.display.hdmi.scan_mode)
-                continue;
+        for (i = 0; i < num_modes; ++i) {
+            TV_SUPPORTED_MODE_NEW_T *mode = &supported_modes[i];
+            if (!sys->native_interlaced) {
+                if (mode->width != display_state.display.hdmi.width ||
+                                mode->height != display_state.display.hdmi.height ||
+                                mode->scan_mode == HDMI_INTERLACED)
+                    continue;
+            } else {
+                if (mode->width != vd->fmt.i_visible_width ||
+                        mode->height != vd->fmt.i_visible_height)
+                    continue;
+                if (mode->scan_mode != sys->b_progressive ? HDMI_NONINTERLACED : HDMI_INTERLACED)
+                    continue;
+            }
 
             score = fmod(supported_modes[i].frame_rate, frame_rate);
             if((best_id < 0) || (score < best_score)) {
@@ -788,12 +821,23 @@ static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt)
             }
         }
 
-        if((best_id >= 0) && (display_state.display.hdmi.frame_rate != supported_modes[best_id].frame_rate)) {
+        if((best_id >= 0) && (display_state.display.hdmi.mode != supported_modes[best_id].code)) {
             msg_Info(vd, "Setting HDMI refresh rate to %"PRIu32,
                             supported_modes[best_id].frame_rate);
             vc_tv_hdmi_power_on_explicit_new(HDMI_MODE_HDMI,
                             supported_modes[best_id].group,
                             supported_modes[best_id].code);
+        }
+
+        if (sys->native_interlaced &&
+                supported_modes[best_id].scan_mode == HDMI_INTERLACED) {
+            char hvs_mode = sys->b_top_field_first ? '1' : '2';
+            if (vc_gencmd(response, sizeof(response), "hvs_update_fields %c",
+                    hvs_mode) != 0 || response[18] != hvs_mode)
+                msg_Warn(vd, "Could not set hvs field mode");
+            else
+                msg_Info(vd, "Configured hvs field mode for interlaced %s playback",
+                        sys->b_top_field_first ? "tff" : "bff");
         }
     }
 }
