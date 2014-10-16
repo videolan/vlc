@@ -3524,6 +3524,10 @@ static const struct
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_stsd },
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_mp4a }, /* some quicktime mp4a/wave/mp4a.. */
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_WMA2 }, /* flip4mac */
+    { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_in24 },
+    { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_in32 },
+    { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_fl32 },
+    { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_fl64 },
     { ATOM_ilst,    MP4_ReadBox_ilst,         MP4_FreeBox_Common, ATOM_meta },
     { ATOM_mvex,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_moov },
     { ATOM_mvex,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_ftyp },

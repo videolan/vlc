@@ -524,19 +524,19 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
         }
 
-        case VLC_FOURCC('i','n','2','4'):
+        case ATOM_in24:
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
                                     VLC_FOURCC('4','2','n','i') : VLC_FOURCC('i','n','2','4');
             break;
-        case VLC_FOURCC('i','n','3','2'):
+        case ATOM_in32:
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
                                     VLC_CODEC_S32L : VLC_CODEC_S32B;
             break;
-        case VLC_FOURCC('f','l','3','2'):
+        case ATOM_fl32:
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
                                     VLC_CODEC_F32L : VLC_CODEC_F32B;
             break;
-        case VLC_FOURCC('f','l','6','4'):
+        case ATOM_fl64:
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
                                     VLC_CODEC_F64L : VLC_CODEC_F64B;
             break;

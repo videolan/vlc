@@ -152,6 +152,10 @@
 #define ATOM_gnre VLC_FOURCC( 'g', 'n', 'r', 'e' )
 #define ATOM_trkn VLC_FOURCC( 't', 'r', 'k', 'n' )
 #define ATOM_chan VLC_FOURCC( 'c', 'h', 'a', 'n' )
+#define ATOM_in24 VLC_FOURCC( 'i', 'n', '2', '4' )
+#define ATOM_in32 VLC_FOURCC( 'i', 'n', '3', '2' )
+#define ATOM_fl32 VLC_FOURCC( 'f', 'l', '3', '2' )
+#define ATOM_fl64 VLC_FOURCC( 'f', 'l', '6', '4' )
 
 #define ATOM_zlib VLC_FOURCC( 'z', 'l', 'i', 'b' )
 #define ATOM_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
