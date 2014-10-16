@@ -89,6 +89,7 @@ static const struct
     { ATOM_0xa9thx, N_("Thanks") },
     { ATOM_0xa9xpd, N_("Executive Producer") },
     { ATOM_aART,    N_("Album Artist") },
+    { ATOM_flvr,    N_("Encoding Params") },
     { ATOM_vndr,    N_("Vendor") },
     { ATOM_xid_,    N_("Catalog Number") },
     { 0, "" },

@@ -3716,6 +3716,7 @@ static const struct
     { ATOM_cnID,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst }, /* iTunes */
     { ATOM_covr,    MP4_ReadBoxContainer,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_disk,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_flvr,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_gnre,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_rtng,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_trkn,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
