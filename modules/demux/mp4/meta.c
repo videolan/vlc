@@ -292,6 +292,27 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
         }
         break;
     }
+    case ATOM_rtng:
+    {
+        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 1 )
+        {
+            const char *psz_rating;
+            switch( *BOXDATA(p_data)->p_blob )
+            {
+            case 0x4:
+                psz_rating = N_("Explicit");
+                break;
+            case 0x2:
+                psz_rating = N_("Clean");
+                break;
+            default:
+            case 0x0:
+                psz_rating = N_("None");
+                break;
+            }
+            vlc_meta_AddExtra( p_meta, N_("Rating"), psz_rating );
+        }
+    }
     case ATOM_trkn:
     {
         if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 4 &&
