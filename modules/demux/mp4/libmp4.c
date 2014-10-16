@@ -1774,37 +1774,6 @@ static int MP4_ReadBox_enda( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-static int MP4_ReadBox_gnre( stream_t *p_stream, MP4_Box_t *p_box )
-{
-    MP4_Box_data_gnre_t *p_gnre;
-    MP4_READBOX_ENTER( MP4_Box_data_gnre_t );
-
-    p_gnre = p_box->data.p_gnre;
-
-    uint32_t i_data_len;
-    uint32_t i_data_tag;
-
-    MP4_GET4BYTES( i_data_len );
-    MP4_GETFOURCC( i_data_tag );
-    if( i_data_len < 10 || i_data_tag != ATOM_data )
-        MP4_READBOX_EXIT( 0 );
-
-    uint32_t i_version;
-    VLC_UNUSED(i_version);
-    uint32_t i_reserved;
-    VLC_UNUSED(i_reserved);
-    MP4_GET4BYTES( i_version );
-    MP4_GET4BYTES( i_reserved );
-    MP4_GET2BYTES( p_gnre->i_genre );
-    if( p_gnre->i_genre == 0 )
-        MP4_READBOX_EXIT( 0 );
-#ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"gnre\" genre=%i", p_gnre->i_genre );
-#endif
-
-    MP4_READBOX_EXIT( 1 );
-}
-
 static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 {
     p_box->i_handler = ATOM_soun;
@@ -3743,7 +3712,7 @@ static const struct
     { ATOM_0xa9wrt, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
     { ATOM_chpl,    MP4_ReadBox_chpl,         MP4_FreeBox_chpl,    ATOM_ilst },
     { ATOM_covr,    MP4_ReadBoxContainer,     MP4_FreeBox_Common,  ATOM_ilst },
-    { ATOM_gnre,    MP4_ReadBox_gnre,         MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_gnre,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_trkn,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
 
     /* udta */

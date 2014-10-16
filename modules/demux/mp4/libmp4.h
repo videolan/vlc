@@ -1191,12 +1191,6 @@ typedef struct
 
 typedef struct
 {
-    uint16_t i_genre;
-
-} MP4_Box_data_gnre_t;
-
-typedef struct
-{
     uint32_t i_entry_count;
     struct
     {
@@ -1377,7 +1371,6 @@ typedef union MP4_Box_data_s
     MP4_Box_data_chan_t *p_chan;
     MP4_Box_data_enda_t *p_enda;
     MP4_Box_data_keys_t *p_keys;
-    MP4_Box_data_gnre_t *p_gnre;
     MP4_Box_data_iods_t *p_iods;
     MP4_Box_data_pasp_t *p_pasp;
     MP4_Box_data_trex_t *p_trex;

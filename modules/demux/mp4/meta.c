@@ -243,9 +243,17 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     switch( p_box->i_type )
     {
     case ATOM_gnre:
-        if( p_box->data.p_gnre && p_box->data.p_gnre->i_genre <= NUM_GENRES )
-            vlc_meta_SetGenre( p_meta, ppsz_genres[p_box->data.p_gnre->i_genre - 1] );
+    {
+        const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
+        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 2 &&
+             BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
+        {
+            const uint16_t i_genre = GetWBE(BOXDATA(p_data)->p_blob);
+            if( i_genre && i_genre <= NUM_GENRES )
+                vlc_meta_SetGenre( p_meta, ppsz_genres[i_genre - 1] );
+        }
         break;
+    }
     case ATOM_trkn:
     {
         const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
