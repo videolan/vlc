@@ -34,12 +34,9 @@
 
 #include <vlc_demux.h>
 #include <vlc_charset.h>                           /* EnsureUTF8 */
-#include <vlc_meta.h>                              /* vlc_meta_t, vlc_meta_ */
 #include <vlc_input.h>
 #include <vlc_aout.h>
 #include <assert.h>
-
-#include "id3genres.h"                             /* for ATOM_gnre */
 
 /*****************************************************************************
  * Module descriptor
@@ -1528,149 +1525,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_udta == NULL && p_data == NULL )
                 return VLC_EGENERIC;
 
-            for( const MP4_Box_t * p_string = p_udta->p_first; p_string != NULL;
-                 p_string = p_string->p_next )
-            {
+            SetupMeta( p_meta, p_udta );
 
-                if( !p_string || !BOXDATA(p_string) ) /* !WARN could be data atoms ! */
-                    continue;
-
-                /* FIXME FIXME: should convert from whatever the character
-                 * encoding of MP4 meta data is to UTF-8. */
-#define SET(fct) do { char *psz_utf = strdup( BOXDATA(p_string)->psz_text ? BOXDATA(p_string)->psz_text : "" ); \
-    if( psz_utf ) { EnsureUTF8( psz_utf );  \
-                    fct( p_meta, psz_utf ); free( psz_utf ); } } while(0)
-
-                /* XXX Becarefull p_udta can have box that are not 0xa9xx */
-                switch( p_string->i_type )
-                {
-                case ATOM_0xa9nam: /* Full name */
-                    SET( vlc_meta_SetTitle );
-                    break;
-                case ATOM_0xa9aut:
-                    SET( vlc_meta_SetArtist );
-                    break;
-                case ATOM_0xa9ART:
-                    SET( vlc_meta_SetArtist );
-                    break;
-                case ATOM_0xa9cpy:
-                    SET( vlc_meta_SetCopyright );
-                    break;
-                case ATOM_0xa9day: /* Creation Date */
-                    SET( vlc_meta_SetDate );
-                    break;
-                case ATOM_0xa9des: /* Description */
-                    SET( vlc_meta_SetDescription );
-                    break;
-                case ATOM_0xa9gen: /* Genre */
-                    SET( vlc_meta_SetGenre );
-                    break;
-
-                case ATOM_gnre:
-                    if( p_string->data.p_gnre->i_genre <= NUM_GENRES )
-                        vlc_meta_SetGenre( p_meta, ppsz_genres[p_string->data.p_gnre->i_genre - 1] );
-                    break;
-
-                case ATOM_0xa9alb: /* Album */
-                    SET( vlc_meta_SetAlbum );
-                    break;
-
-                case ATOM_0xa9trk: /* Track */
-                    SET( vlc_meta_SetTrackNum );
-                    break;
-                case ATOM_trkn:
-                {
-                    char psz_trck[11];
-                    snprintf( psz_trck, sizeof( psz_trck ), "%i",
-                              p_string->data.p_trkn->i_track_number );
-                    vlc_meta_SetTrackNum( p_meta, psz_trck );
-                    if( p_string->data.p_trkn->i_track_total > 0 )
-                    {
-                        snprintf( psz_trck, sizeof( psz_trck ), "%i",
-                                  p_string->data.p_trkn->i_track_total );
-                        vlc_meta_Set( p_meta, vlc_meta_TrackTotal, psz_trck );
-                    }
-                    break;
-                }
-                case ATOM_0xa9cmt: /* Commment */
-                    SET( vlc_meta_SetDescription );
-                    break;
-
-                case ATOM_0xa9url: /* URL */
-                    SET( vlc_meta_SetURL );
-                    break;
-
-                case ATOM_0xa9too: /* Encoder Tool */
-                case ATOM_0xa9enc: /* Encoded By */
-                    SET( vlc_meta_SetEncodedBy );
-                    break;
-
-                case ATOM_0xa9pub:
-                    SET( vlc_meta_SetPublisher );
-                    break;
-
-                case ATOM_0xa9dir:
-                    SET( vlc_meta_SetDirector );
-                    break;
-
-                default:
-                    break;
-                }
-#undef SET
-                static const struct { uint32_t xa9_type; char metadata[25]; } xa9typetoextrameta[] =
-                {
-                    { ATOM_0xa9wrt, N_("Writer") },
-                    { ATOM_0xa9com, N_("Composer") },
-                    { ATOM_0xa9prd, N_("Producer") },
-                    { ATOM_0xa9inf, N_("Information") },
-                    { ATOM_0xa9dis, N_("Disclaimer") },
-                    { ATOM_0xa9req, N_("Requirements") },
-                    { ATOM_0xa9fmt, N_("Original Format") },
-                    { ATOM_0xa9dsa, N_("Display Source As") },
-                    { ATOM_0xa9hst, N_("Host Computer") },
-                    { ATOM_0xa9prf, N_("Performers") },
-                    { ATOM_0xa9ope, N_("Original Performer") },
-                    { ATOM_0xa9src, N_("Providers Source Content") },
-                    { ATOM_0xa9wrn, N_("Warning") },
-                    { ATOM_0xa9swr, N_("Software") },
-                    { ATOM_0xa9lyr, N_("Lyrics") },
-                    { ATOM_0xa9mak, N_("Record Company") },
-                    { ATOM_0xa9mod, N_("Model") },
-                    { ATOM_0xa9PRD, N_("Product") },
-                    { ATOM_0xa9grp, N_("Grouping") },
-                    { ATOM_0xa9gen, N_("Genre") },
-                    { ATOM_0xa9st3, N_("Sub-Title") },
-                    { ATOM_0xa9arg, N_("Arranger") },
-                    { ATOM_0xa9ard, N_("Art Director") },
-                    { ATOM_0xa9cak, N_("Copyright Acknowledgement") },
-                    { ATOM_0xa9con, N_("Conductor") },
-                    { ATOM_0xa9des, N_("Song Description") },
-                    { ATOM_0xa9lnt, N_("Liner Notes") },
-                    { ATOM_0xa9phg, N_("Phonogram Rights") },
-                    { ATOM_0xa9pub, N_("Publisher") },
-                    { ATOM_0xa9sne, N_("Sound Engineer") },
-                    { ATOM_0xa9sol, N_("Soloist") },
-                    { ATOM_0xa9thx, N_("Thanks") },
-                    { ATOM_0xa9xpd, N_("Executive Producer") },
-                    { ATOM_vndr,    N_("Vendor") },
-                    { 0, "" },
-                };
-                for( unsigned i = 0; xa9typetoextrameta[i].xa9_type; i++ )
-                {
-                    if( p_string->i_type == xa9typetoextrameta[i].xa9_type )
-                    {
-                        assert( BOXDATA(p_string) );
-                        char *psz_utf = strdup( BOXDATA(p_string)->psz_text ? BOXDATA(p_string)->psz_text : "" );
-                        if( psz_utf )
-                        {
-                             EnsureUTF8( psz_utf );
-                             vlc_meta_AddExtra( p_meta, _(xa9typetoextrameta[i].metadata), psz_utf );
-                             free( psz_utf );
-                        }
-                        break;
-                    }
-                }
-            }
             return VLC_SUCCESS;
         }
 

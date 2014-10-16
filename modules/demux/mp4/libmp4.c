@@ -2967,89 +2967,62 @@ static void MP4_FreeBox_data( MP4_Box_t *p_box )
     free( p_box->data.p_data->p_blob );
 }
 
+static int MP4_ReadBox_Metadata( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    const uint8_t *p_peek;
+    if ( stream_Peek( p_stream, &p_peek, 16 ) < 16 )
+        return 0;
+    if ( stream_Read( p_stream, NULL, 8 ) < 8 )
+        return 0;
+    return MP4_ReadBoxContainerChildren( p_stream, p_box, ATOM_data );
+}
+
 static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    uint16_t i16;
+    return MP4_ReadBox_Metadata( p_stream, p_box );
 
-    MP4_READBOX_ENTER( MP4_Box_data_string_t );
+/* FIXME: find out what was that 2 bytes sized atom and its own handler */
+//    if ( GetWBE( &p_peek[8] ) > 0 )
+//        uint16_t i16;
 
-    p_box->data.p_string->psz_text = NULL;
+//    MP4_READBOX_ENTER( MP4_Box_data_string_t );
 
-    MP4_GET2BYTES( i16 );
+//    p_box->data.p_string->psz_text = NULL;
 
-    if( i16 > 0 )
-    {
-        int i_length = i16;
+//    MP4_GET2BYTES( i16 );
 
-        MP4_GET2BYTES( i16 );
-        if( i_length >= i_read ) i_length = i_read + 1;
+//    if( i16 > 0 )
+//    {
+//        int i_length = i16;
 
-        p_box->data.p_string->psz_text = malloc( i_length );
-        if( p_box->data.p_string->psz_text == NULL )
-            MP4_READBOX_EXIT( 0 );
+//        MP4_GET2BYTES( i16 );
+//        if( i_length >= i_read ) i_length = i_read + 1;
 
-        i_length--;
-        memcpy( p_box->data.p_string->psz_text,
-                p_peek, i_length );
-        p_box->data.p_string->psz_text[i_length] = '\0';
+//        p_box->data.p_string->psz_text = malloc( i_length );
+//        if( p_box->data.p_string->psz_text == NULL )
+//            MP4_READBOX_EXIT( 0 );
 
-#ifdef MP4_VERBOSE
-        msg_Dbg( p_stream,
-                 "read box: \"c%3.3s\" text=`%s'",
-                 ((char*)&p_box->i_type + 1),
-                 p_box->data.p_string->psz_text );
-#endif
-    }
-    else
-    {
-        /* try iTune/Quicktime format, rewind to start */
-        p_peek -= 2; i_read += 2;
-        // we are expecting a 'data' box
-        uint32_t i_data_len;
-        uint32_t i_data_tag;
+//        i_length--;
+//        memcpy( p_box->data.p_string->psz_text,
+//                p_peek, i_length );
+//        p_box->data.p_string->psz_text[i_length] = '\0';
 
-        MP4_GET4BYTES( i_data_len );
-        if( i_data_len > i_read ) i_data_len = i_read;
-        MP4_GETFOURCC( i_data_tag );
-        if( (i_data_len > 0) && (i_data_tag == ATOM_data) )
-        {
-            /* data box contains a version/flags field */
-            uint32_t i_version;
-            uint32_t i_reserved;
-            VLC_UNUSED(i_reserved);
-            MP4_GET4BYTES( i_version );
-            MP4_GET4BYTES( i_reserved );
-            // version should be 0, flags should be 1 for text, 0 for data
-            if( ( i_version == 0x00000001 ) && (i_data_len >= 12 ) )
-            {
-                // the rest is the text
-                i_data_len -= 12;
-                p_box->data.p_string->psz_text = malloc( i_data_len + 1 );
-                if( p_box->data.p_string->psz_text == NULL )
-                    MP4_READBOX_EXIT( 0 );
+//#ifdef MP4_VERBOSE
+//        msg_Dbg( p_stream,
+//                 "read box: \"c%3.3s\" text=`%s'",
+//                 ((char*)&p_box->i_type + 1),
+//                 p_box->data.p_string->psz_text );
+//#endif
+//    }
+//    else
 
-                memcpy( p_box->data.p_string->psz_text,
-                        p_peek, i_data_len );
-                p_box->data.p_string->psz_text[i_data_len] = '\0';
-#ifdef MP4_VERBOSE
-        msg_Dbg( p_stream,
-                 "read box: \"c%3.3s\" text=`%s'",
-                 ((char*)&p_box->i_type+1),
-                 p_box->data.p_string->psz_text );
-#endif
-            }
-            else
-            {
-                // TODO: handle data values for ID3 tag values, track num or cover art,etc...
-            }
-        }
-    }
-
-    MP4_READBOX_EXIT( 1 );
+//    MP4_READBOX_EXIT( 1 );
 }
 static void MP4_FreeBox_0xa9xxx( MP4_Box_t *p_box )
 {
-    FREENULL( p_box->data.p_string->psz_text );
+    /* If Meta, that box should be empty /common */
+    if( p_box->data.p_string )
+        FREENULL( p_box->data.p_string->psz_text );
 }
 
 /* Chapter support */
