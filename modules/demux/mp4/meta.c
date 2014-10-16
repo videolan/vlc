@@ -88,6 +88,7 @@ static const struct
     { ATOM_0xa9sol, N_("Soloist") },
     { ATOM_0xa9thx, N_("Thanks") },
     { ATOM_0xa9xpd, N_("Executive Producer") },
+    { ATOM_aART,    N_("Album Artist") },
     { ATOM_vndr,    N_("Vendor") },
     { 0, "" },
 };
@@ -239,12 +240,36 @@ static bool Matchcom_apple_quicktime( vlc_meta_t *p_meta, const char *psz_naming
 static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
 {
     bool b_matched = true;
+    const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
     /* XXX Becarefull p_udta can have box that are not 0xa9xx */
     switch( p_box->i_type )
     {
+    case ATOM_atID:
+    {
+        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 4 &&
+             BOXDATA(p_data)->e_wellknowntype == DATA_WKT_BE_SIGNED )
+        {
+            char psz_utf[11];
+            snprintf( psz_utf, sizeof( psz_utf ), "%"PRId32,
+                      GetDWBE(BOXDATA(p_data)->p_blob) );
+            vlc_meta_AddExtra( p_meta, N_("iTunes Account ID"), psz_utf );
+        }
+        break;
+    }
+    case ATOM_cnID:
+    {
+        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 4 &&
+             BOXDATA(p_data)->e_wellknowntype == DATA_WKT_BE_SIGNED )
+        {
+            char psz_utf[11];
+            snprintf( psz_utf, sizeof( psz_utf ), "%"PRId32,
+                      GetDWBE(BOXDATA(p_data)->p_blob) );
+            vlc_meta_AddExtra( p_meta, N_("iTunes Catalog ID"), psz_utf );
+        }
+        break;
+    }
     case ATOM_disk:
     {
-        const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
         if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 6 &&
              BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
         {
@@ -258,7 +283,6 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
     case ATOM_gnre:
     {
-        const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
         if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 2 &&
              BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
         {
@@ -270,7 +294,6 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     }
     case ATOM_trkn:
     {
-        const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
         if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 4 &&
              BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
         {
