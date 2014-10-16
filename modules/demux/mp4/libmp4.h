@@ -279,6 +279,7 @@
 #define ATOM_0xa9xpd VLC_FOURCC( 0xa9, 'x', 'p', 'd' )
 #define ATOM_0xa9xyz VLC_FOURCC( 0xa9, 'x', 'y', 'z' )
 #define ATOM_chpl VLC_FOURCC( 'c', 'h', 'p', 'l' )
+#define ATOM_disk VLC_FOURCC( 'd', 'i', 's', 'k' )
 #define ATOM_WLOC VLC_FOURCC( 'W', 'L', 'O', 'C' )
 
 #define ATOM_meta VLC_FOURCC( 'm', 'e', 't', 'a' )

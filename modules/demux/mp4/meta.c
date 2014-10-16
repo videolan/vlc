@@ -242,6 +242,20 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
     /* XXX Becarefull p_udta can have box that are not 0xa9xx */
     switch( p_box->i_type )
     {
+    case ATOM_disk:
+    {
+        const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
+        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 6 &&
+             BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
+        {
+            char psz_utf[5 + 5 + 4];
+            snprintf( psz_utf, sizeof( psz_utf ), "%"PRIu16" / %"PRIu16,
+                      GetWBE(&BOXDATA(p_data)->p_blob[2]),
+                      GetWBE(&BOXDATA(p_data)->p_blob[4]) );
+            vlc_meta_AddExtra( p_meta, N_("Disc"), psz_utf );
+        }
+        break;
+    }
     case ATOM_gnre:
     {
         const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
