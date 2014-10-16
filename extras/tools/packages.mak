@@ -1,5 +1,5 @@
 GNU=http://ftp.gnu.org/gnu
-APACHE=http://mirror.csclub.uwaterloo.ca/apache
+APACHE=http://mir2.ovh.net/ftp.apache.org/dist
 SF= http://downloads.sourceforge.net/project
 VIDEOLAN=http://downloads.videolan.org/pub/contrib
 
