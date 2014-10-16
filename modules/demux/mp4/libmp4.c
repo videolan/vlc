@@ -3719,6 +3719,7 @@ static const struct
     { ATOM_gnre,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_rtng,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_trkn,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_xid_,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
 
     /* udta */
     { ATOM_0xa9ART, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_udta },

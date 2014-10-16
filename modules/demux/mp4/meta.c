@@ -90,6 +90,7 @@ static const struct
     { ATOM_0xa9xpd, N_("Executive Producer") },
     { ATOM_aART,    N_("Album Artist") },
     { ATOM_vndr,    N_("Vendor") },
+    { ATOM_xid_,    N_("Catalog Number") },
     { 0, "" },
 };
 
