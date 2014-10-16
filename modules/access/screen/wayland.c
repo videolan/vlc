@@ -145,27 +145,12 @@ static void output_mode_cb(void *data, struct wl_output *output,
     (void) output;
 }
 
-static void output_done_cb(void *data, struct wl_output *output)
-{
-    demux_t *demux = data;
-
-    (void) demux; (void) output;
-}
-
-static void output_scale_cb(void *data, struct wl_output *output,
-                            int32_t factor)
-{
-    demux_t *demux = data;
-
-    (void) demux; (void) output; (void) factor;
-}
-
 const struct wl_output_listener output_cbs =
 {
     output_geometry_cb,
     output_mode_cb,
-    output_done_cb,
-    output_scale_cb,
+    NULL,
+    NULL,
 };
 
 static void screenshooter_done_cb(void *data,
