@@ -248,16 +248,16 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
         break;
     case ATOM_trkn:
     {
-        if ( p_box->data.p_trkn )
+        const MP4_Box_t *p_data = MP4_BoxGet( p_box, "data" );
+        if ( p_data && BOXDATA(p_data) && BOXDATA(p_data)->i_blob >= 4 &&
+             BOXDATA(p_data)->e_wellknowntype == DATA_WKT_RESERVED )
         {
-            char psz_trck[11];
-            snprintf( psz_trck, sizeof( psz_trck ), "%i",
-                      p_box->data.p_trkn->i_track_number );
+            char psz_trck[6];
+            snprintf( psz_trck, sizeof( psz_trck ), "%"PRIu16, GetWBE(&BOXDATA(p_data)->p_blob[2]) );
             vlc_meta_SetTrackNum( p_meta, psz_trck );
-            if( p_box->data.p_trkn->i_track_total > 0 )
+            if( BOXDATA(p_data)->i_blob >= 8 )
             {
-                snprintf( psz_trck, sizeof( psz_trck ), "%i",
-                          p_box->data.p_trkn->i_track_total );
+                snprintf( psz_trck, sizeof( psz_trck ), "%"PRIu16, GetWBE(&BOXDATA(p_data)->p_blob[4]) );
                 vlc_meta_Set( p_meta, vlc_meta_TrackTotal, psz_trck );
             }
         }

@@ -1207,13 +1207,6 @@ typedef struct
 
 typedef struct
 {
-    uint32_t i_track_number;
-    uint32_t i_track_total;
-
-} MP4_Box_data_trkn_t;
-
-typedef struct
-{
     uint8_t  i_version;
     uint32_t i_flags;
 
@@ -1385,7 +1378,6 @@ typedef union MP4_Box_data_s
     MP4_Box_data_enda_t *p_enda;
     MP4_Box_data_keys_t *p_keys;
     MP4_Box_data_gnre_t *p_gnre;
-    MP4_Box_data_trkn_t *p_trkn;
     MP4_Box_data_iods_t *p_iods;
     MP4_Box_data_pasp_t *p_pasp;
     MP4_Box_data_trex_t *p_trex;
