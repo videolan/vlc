@@ -323,7 +323,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
             char psz_trck[6];
             snprintf( psz_trck, sizeof( psz_trck ), "%"PRIu16, GetWBE(&BOXDATA(p_data)->p_blob[2]) );
             vlc_meta_SetTrackNum( p_meta, psz_trck );
-            if( BOXDATA(p_data)->i_blob >= 8 )
+            if( BOXDATA(p_data)->i_blob >= 8 && GetWBE(&BOXDATA(p_data)->p_blob[4]) )
             {
                 snprintf( psz_trck, sizeof( psz_trck ), "%"PRIu16, GetWBE(&BOXDATA(p_data)->p_blob[4]) );
                 vlc_meta_Set( p_meta, vlc_meta_TrackTotal, psz_trck );
