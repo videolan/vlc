@@ -300,7 +300,8 @@ static void Close(vout_window_t *wnd)
     wl_shell_surface_destroy(sys->shell_surface);
     wl_surface_destroy(wnd->handle.wl);
     wl_shell_destroy(sys->shell);
-    wl_output_destroy(sys->output);
+    if (sys->output != NULL)
+        wl_output_destroy(sys->output);
     wl_compositor_destroy(sys->compositor);
     wl_display_disconnect(wnd->display.wl);
     free(sys);
