@@ -389,6 +389,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_buffer == 0 )
     {   /* Done with this buffer */
         block_Release( p_block );
+        p_block = NULL;
         *pp_block = NULL;
     }
 
@@ -476,7 +477,8 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 end:
     *pp_block = NULL;
 drop:
-    block_Release(p_block);
+    if( p_block != NULL )
+        block_Release(p_block);
     return NULL;
 }
 
