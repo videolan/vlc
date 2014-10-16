@@ -40,7 +40,6 @@
 #include <assert.h>
 
 #include "id3genres.h"                             /* for ATOM_gnre */
-#include "essetup.h"
 
 /*****************************************************************************
  * Module descriptor

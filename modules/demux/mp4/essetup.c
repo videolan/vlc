@@ -25,7 +25,6 @@
 #endif
 
 #include "mp4.h"
-#include "essetup.h"
 
 #include <vlc_demux.h>
 #include <vlc_aout.h>

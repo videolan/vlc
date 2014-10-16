@@ -152,4 +152,7 @@ struct mp4_fragment_t
     mp4_fragment_t *p_next;
 };
 
+int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
+int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
+int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
 #endif
