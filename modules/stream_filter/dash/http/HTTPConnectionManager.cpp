@@ -35,7 +35,7 @@ const size_t    HTTPConnectionManager::PIPELINE               = 80;
 const size_t    HTTPConnectionManager::PIPELINELENGTH         = 2;
 const uint64_t  HTTPConnectionManager::CHUNKDEFAULTBITRATE    = 1;
 
-HTTPConnectionManager::HTTPConnectionManager    (logic::IAdaptationLogic *adaptationLogic, stream_t *stream) :
+HTTPConnectionManager::HTTPConnectionManager    (IAdaptationLogic *adaptationLogic, stream_t *stream) :
                        adaptationLogic          (adaptationLogic),
                        stream                   (stream),
                        chunkCount               (0),
