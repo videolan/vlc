@@ -28,6 +28,14 @@
 
 #define BLOCK16x16 (1<<16)
 
+#define MAJOR_3gp4 VLC_FOURCC( '3', 'g', 'p', '4' )
+#define MAJOR_3gp5 VLC_FOURCC( '3', 'g', 'p', '5' )
+#define MAJOR_3gp6 VLC_FOURCC( '3', 'g', 'p', '6' )
+#define MAJOR_3gp7 VLC_FOURCC( '3', 'g', 'p', '7' )
+#define MAJOR_isml VLC_FOURCC( 'i', 's', 'm', 'l' )
+#define MAJOR_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
+#define MAJOR_qt__ VLC_FOURCC( 'q', 't', ' ', ' ' )
+
 #define ATOM_root VLC_FOURCC( 'r', 'o', 'o', 't' )
 #define ATOM_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )
 
@@ -111,8 +119,6 @@
 #define ATOM_hnti VLC_FOURCC( 'h', 'n', 't', 'i' )
 #define ATOM_rtp  VLC_FOURCC( 'r', 't', 'p', ' ' )
 
-#define ATOM_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
-#define ATOM_3gp4 VLC_FOURCC( '3', 'g', 'p', '4' )
 #define ATOM_esds VLC_FOURCC( 'e', 's', 'd', 's' )
 
 #define ATOM_lpcm VLC_FOURCC( 'l', 'p', 'c', 'm' )

@@ -632,15 +632,15 @@ static int Open( vlc_object_t * p_this )
     {
         switch( BOXDATA(p_ftyp)->i_major_brand )
         {
-            case( ATOM_isom ):
+            case MAJOR_isom:
                 msg_Dbg( p_demux,
                          "ISO Media file (isom) version %d.",
                          BOXDATA(p_ftyp)->i_minor_version );
                 break;
-            case( ATOM_3gp4 ):
-            case( VLC_FOURCC( '3', 'g', 'p', '5' ) ):
-            case( VLC_FOURCC( '3', 'g', 'p', '6' ) ):
-            case( VLC_FOURCC( '3', 'g', 'p', '7' ) ):
+            case MAJOR_3gp4:
+            case MAJOR_3gp5:
+            case MAJOR_3gp6:
+            case MAJOR_3gp7:
                 msg_Dbg( p_demux, "3GPP Media file Release: %c",
 #ifdef WORDS_BIGENDIAN
                         BOXDATA(p_ftyp)->i_major_brand
@@ -649,10 +649,10 @@ static int Open( vlc_object_t * p_this )
 #endif
                         );
                 break;
-            case( VLC_FOURCC( 'q', 't', ' ', ' ') ):
+            case MAJOR_qt__:
                 msg_Dbg( p_demux, "Apple QuickTime file" );
                 break;
-            case( VLC_FOURCC( 'i', 's', 'm', 'l') ):
+            case MAJOR_isml:
                 msg_Dbg( p_demux, "PIFF (= isml = fMP4) file" );
                 break;
             default:
