@@ -37,6 +37,7 @@
 #include <vlc_aout.h>
 #include <vlc_vout_window.h>
 #include <vlc_opengl.h>
+#include <vlc_filter.h>
 
 // vsxu manager include
 #include <vsx_manager.h>
