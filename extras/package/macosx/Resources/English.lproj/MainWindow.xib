@@ -23,7 +23,7 @@
       <bool key="EncodedWithXMLCoder">YES</bool>
       <integer value="5260"/>
       <integer value="5605"/>
-      <integer value="4682"/>
+      <integer value="5608"/>
       <integer value="4850"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
@@ -793,11 +793,10 @@
                         <reference key="NSControlView" ref="474770834"/>
                         <int key="NSButtonFlags">141819904</int>
                         <int key="NSButtonFlags2">2</int>
-                        <object class="NSCustomResource" key="NSNormalImage" id="267511931">
+                        <object class="NSCustomResource" key="NSNormalImage">
                           <string key="NSClassName">NSImage</string>
                           <string key="NSResourceName">volume-high</string>
                         </object>
-                        <reference key="NSAlternateImage" ref="267511931"/>
                         <string key="NSAlternateContents"/>
                         <object class="NSMutableString" key="NSKeyEquivalent">
                           <characters key="NS.bytes"/>
@@ -845,11 +844,10 @@
                         <reference key="NSControlView" ref="963106097"/>
                         <int key="NSButtonFlags">141819904</int>
                         <int key="NSButtonFlags2">2</int>
-                        <object class="NSCustomResource" key="NSNormalImage" id="112655283">
+                        <object class="NSCustomResource" key="NSNormalImage">
                           <string key="NSClassName">NSImage</string>
                           <string key="NSResourceName">volume-low</string>
                         </object>
-                        <reference key="NSAlternateImage" ref="112655283"/>
                         <string key="NSAlternateContents"/>
                         <object class="NSMutableString" key="NSKeyEquivalent">
                           <characters key="NS.bytes"/>
