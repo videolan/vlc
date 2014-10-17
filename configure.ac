@@ -413,10 +413,10 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
 AC_SUBST(CONTRIB_DIR)
 
 dnl Add extras/tools to the PATH
-TOOLS_DIR="${srcdir}/extras/tools/build"
+TOOLS_DIR="${srcdir}/extras/tools/build/bin"
 AS_IF([test -d "${TOOLS_DIR}"], [
     TOOLS_DIR=`cd "${TOOLS_DIR}" && pwd`
-    export PATH="${TOOLS_DIR}/bin":$PATH
+    export PATH="${TOOLS_DIR}":$PATH
 ])
 
 dnl
