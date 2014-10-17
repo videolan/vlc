@@ -3741,9 +3741,10 @@ dnl
 dnl  Chromecast streaming support
 dnl
 m4_pushdef([protobuf_lite_version], 2.5.0)
+AC_ARG_VAR(PROTOC, [protobuf compiler])
+AC_PATH_PROGS(PROTOC, protoc, no )
 PKG_WITH_MODULES([CHROMECAST],[protobuf-lite >= protobuf_lite_version], [
-    AC_CHECK_PROGS(PROTOC, protoc)
-    AS_IF([test "${PROTOC}" = "protoc"], [
+    AS_IF([test "x${PROTOC}" != "xno"], [
         VLC_ADD_PLUGIN([stream_out_chromecast])
         VLC_ADD_CXXFLAGS([stream_out_chromecast],[${CHROMECAST_CFLAGS}] [-I./chromecast])
         VLC_ADD_LIBS([stream_out_chromecast],[${CHROMECAST_LIBS}])
