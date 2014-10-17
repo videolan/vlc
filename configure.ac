@@ -77,7 +77,7 @@ AM_PROG_AS
 
 AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [Validator for desktop entry files])
 AC_CHECK_PROGS(DESKTOP_FILE_VALIDATE, [${DESKTOP_FILE_VALIDATE} desktop-file-validate], :)
-AC_CHECK_PROGS(YASM, yasm)
+AC_PATH_PROG(YASM, yasm)
 
 dnl Check for compiler properties
 AC_C_CONST
