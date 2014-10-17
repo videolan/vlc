@@ -37,6 +37,7 @@
 #include <vlc_input.h>
 #include <vlc_aout.h>
 #include <assert.h>
+#include <limits.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -2679,6 +2680,29 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                   p_track->i_track_ID );
         p_track->b_enable = true;
         p_track->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
+    }
+    else
+    {
+        const MP4_Box_t *p_tsel = MP4_BoxGet( p_box_trak, "udta/tsel" );
+        if ( p_tsel && BOXDATA(p_tsel) && BOXDATA(p_tsel)->i_switch_group )
+        {
+            p_track->i_switch_group = BOXDATA(p_tsel)->i_switch_group;
+            int i_priority = ES_PRIORITY_SELECTABLE_MIN;
+            for ( unsigned int i = 0; i < p_sys->i_tracks; i++ )
+            {
+                const mp4_track_t *p_other = &p_sys->track[i];
+                if( p_other && p_other != p_track &&
+                    p_other->fmt.i_cat == p_track->fmt.i_cat &&
+                    p_track->i_switch_group == p_other->i_switch_group )
+                        i_priority = __MAX( i_priority, p_other->fmt.i_priority + 1 );
+            }
+            /* VLC only support ES priority for AUDIO_ES and SPU_ES.
+               If there's another VIDEO_ES in the same group, we need to unselect it then */
+            if ( p_track->fmt.i_cat == VIDEO_ES && i_priority > ES_PRIORITY_SELECTABLE_MIN )
+                p_track->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+            else
+                p_track->fmt.i_priority = i_priority;
+        }
     }
 
     p_track->p_es = NULL;
