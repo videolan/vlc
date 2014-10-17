@@ -259,8 +259,8 @@ ant: apache-ant-$(ANT_VERSION).tar.bz2
 	$(MOVE)
 
 .ant: ant
-	mkdir -p $(PREFIX)/bin
-	(cp $</bin/* $(PREFIX)/bin/ && cp $</lib/* $(PREFIX)/lib/)
+	(mkdir -p $(PREFIX)/bin && cp $</bin/* $(PREFIX)/bin/)
+	(mkdir -p $(PREFIX)/lib && cp $</lib/* $(PREFIX)/lib/)
 	touch $@
 
 CLEAN_PKG += ant
