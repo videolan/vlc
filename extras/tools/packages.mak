@@ -22,7 +22,7 @@ AUTOMAKE_URL=$(GNU)/automake/automake-$(AUTOMAKE_VERSION).tar.gz
 M4_VERSION=1.4.16
 M4_URL=$(GNU)/m4/m4-$(M4_VERSION).tar.gz
 
-PKGCFG_VERSION=0.27.1-1
+PKGCFG_VERSION=0.28-1
 #PKGCFG_URL=http://downloads.videolan.org/pub/videolan/testing/contrib/pkg-config-$(PKGCFG_VERSION).tar.gz
 PKGCFG_URL=$(SF)/pkgconfiglite/$(PKGCFG_VERSION)/pkg-config-lite-$(PKGCFG_VERSION).tar.gz
 
