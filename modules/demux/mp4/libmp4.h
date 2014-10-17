@@ -300,6 +300,7 @@
 #define ATOM_covr VLC_FOURCC( 'c', 'o', 'v', 'r' )
 #define ATOM_flvr VLC_FOURCC( 'f', 'l', 'v', 'r' )
 #define ATOM_rtng VLC_FOURCC( 'r', 't', 'n', 'g' )
+#define ATOM_tsel VLC_FOURCC( 't', 's', 'e', 'l' )
 #define ATOM_xid_ VLC_FOURCC( 'x', 'i', 'd', ' ' )
 
 #define ATOM_chap VLC_FOURCC( 'c', 'h', 'a', 'p' )
@@ -1266,6 +1267,11 @@ typedef struct
 
 typedef struct
 {
+    uint32_t i_switch_group;
+} MP4_Box_data_tsel_t;
+
+typedef struct
+{
     uint8_t  i_version;
     uint32_t i_flags;
 
@@ -1393,6 +1399,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_trex_t *p_trex;
     MP4_Box_data_mehd_t *p_mehd;
     MP4_Box_data_sdtp_t *p_sdtp;
+    MP4_Box_data_tsel_t *p_tsel;
 
     MP4_Box_data_tfra_t *p_tfra;
     MP4_Box_data_mfro_t *p_mfro;

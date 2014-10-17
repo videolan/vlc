@@ -3276,6 +3276,18 @@ static void MP4_FreeBox_sdtp( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_sdtp->p_sample_table );
 }
 
+static int MP4_ReadBox_tsel( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_tsel_t );
+    uint32_t i_version;
+    MP4_GET4BYTES( i_version );
+    if ( i_version != 0 || i_read < 4 )
+        MP4_READBOX_EXIT( 0 );
+    MP4_GET4BYTES( p_box->data.p_tsel->i_switch_group );
+    /* ignore list of attributes as es are present before switch */
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_mfro( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_mfro_t );
@@ -3778,6 +3790,9 @@ static const struct
     { ATOM_name,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_vndr,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_SDLN,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
+
+    /* udta, non meta */
+    { ATOM_tsel,    MP4_ReadBox_tsel,         MP4_FreeBox_Common,  ATOM_udta },
 
     /* iTunes/Quicktime meta info */
     { ATOM_meta,    MP4_ReadBox_meta,         MP4_FreeBox_Common,  0 },
