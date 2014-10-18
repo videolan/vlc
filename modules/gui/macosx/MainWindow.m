@@ -453,9 +453,15 @@ static VLCMainWindow *_o_sharedInstance = nil;
     dropzoneboxRect.origin.x = (plrect.size.width - dropzoneboxRect.size.width) / 2;
     dropzoneboxRect.origin.y = (plrect.size.height - dropzoneboxRect.size.height) / 2;
 
-    [o_playlist_table setFrame: plrect];
     [o_dropzone_view setFrame: plrect];
     [o_dropzone_box setFrame: dropzoneboxRect];
+
+    if (b_podcastView_displayed) {
+        plrect.size.height -= [o_podcast_view frame].size.height;
+        plrect.origin.y = [o_podcast_view frame].size.height;
+    }
+    [o_playlist_table setFrame: plrect];
+
     [o_dropzone_view setNeedsDisplay: YES];
     [o_playlist_table setNeedsDisplay: YES];
 }
