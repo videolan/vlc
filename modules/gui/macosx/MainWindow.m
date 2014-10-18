@@ -54,6 +54,7 @@
 - (void)hidePodcastControls;
 @end
 
+static const float f_min_window_height = 307.;
 
 @implementation VLCMainWindow
 
@@ -201,9 +202,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setAcceptsMouseMovedEvents: YES];
     // Set that here as IB seems to be buggy
     if (b_dark_interface)
-        [self setContentMinSize:NSMakeSize(604., 288. + [o_titlebar_view frame].size.height)];
+        [self setContentMinSize:NSMakeSize(604., f_min_window_height + [o_titlebar_view frame].size.height)];
     else
-        [self setContentMinSize:NSMakeSize(604., 288.)];
+        [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
 
     [self setTitle: _NS("VLC media player")];
 
@@ -441,28 +442,30 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)resizePlaylistAfterCollapse
 {
     // no animation here since we might be in the middle of another resize animation
-    NSRect plrect;
-    plrect = [o_playlist_table frame];
-    plrect.size.height = [o_split_view frame].size.height - 20.0; // actual pl top bar height, which differs from its frame
-    [o_playlist_table setFrame: plrect];
-    [o_playlist_table setNeedsDisplay: YES];
+    NSRect rightSplitRect = [o_right_split_view frame];
 
-    NSRect rightSplitRect;
-    rightSplitRect = [o_right_split_view frame];
-    plrect = [o_dropzone_box frame];
-    plrect.origin.x = (rightSplitRect.size.width - plrect.size.width) / 2;
-    plrect.origin.y = (rightSplitRect.size.height - plrect.size.height) / 2;
-    [o_dropzone_view setFrame: [o_playlist_table frame]];
-    [o_dropzone_box setFrame: plrect];
+    NSRect plrect;
+    plrect.size.height = rightSplitRect.size.height - 20.0; // actual pl top bar height, which differs from its frame
+    plrect.size.width = rightSplitRect.size.width;
+    plrect.origin.x = plrect.origin.y = 0.;
+
+    NSRect dropzoneboxRect = [o_dropzone_box frame];
+    dropzoneboxRect.origin.x = (plrect.size.width - dropzoneboxRect.size.width) / 2;
+    dropzoneboxRect.origin.y = (plrect.size.height - dropzoneboxRect.size.height) / 2;
+
+    [o_playlist_table setFrame: plrect];
+    [o_dropzone_view setFrame: plrect];
+    [o_dropzone_box setFrame: dropzoneboxRect];
     [o_dropzone_view setNeedsDisplay: YES];
+    [o_playlist_table setNeedsDisplay: YES];
 }
 
 - (void)makeSplitViewVisible
 {
     if (b_dark_interface)
-        [self setContentMinSize: NSMakeSize(604., 288. + [o_titlebar_view frame].size.height)];
+        [self setContentMinSize: NSMakeSize(604., f_min_window_height + [o_titlebar_view frame].size.height)];
     else
-        [self setContentMinSize: NSMakeSize(604., 288.)];
+        [self setContentMinSize: NSMakeSize(604., f_min_window_height)];
 
     NSRect old_frame = [self frame];
     CGFloat newHeight = [self minSize].height;
@@ -630,6 +633,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)hideSplitView:(BOOL)b_with_resize
 {
+    // cancel pending pl resizes, in case of fast toggle between both modes
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resizePlaylistAfterCollapse) object:nil];
+
     if (b_with_resize) {
         NSRect winrect = [self frame];
         f_lastSplitViewHeight = [o_split_view frame].size.height;
@@ -638,7 +644,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self setFrame: winrect display: YES animate: YES];
     }
 
-    [self performSelector:@selector(hideDropZone) withObject:nil afterDelay:0.1];
     if (b_dark_interface) {
         [self setContentMinSize: NSMakeSize(604., [o_controls_bar height] + [o_titlebar_view frame].size.height)];
         [self setContentMaxSize: NSMakeSize(FLT_MAX, [o_controls_bar height] + [o_titlebar_view frame].size.height)];
@@ -654,9 +659,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     [self updateWindow];
     if (b_dark_interface)
-        [self setContentMinSize:NSMakeSize(604., 288. + [o_titlebar_view frame].size.height)];
+        [self setContentMinSize:NSMakeSize(604., f_min_window_height + [o_titlebar_view frame].size.height)];
     else
-        [self setContentMinSize:NSMakeSize(604., 288.)];
+        [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
     [self setContentMaxSize: NSMakeSize(FLT_MAX, FLT_MAX)];
 
     if (b_with_resize) {
@@ -667,6 +672,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self setFrame: winrect display: YES animate: YES];
     }
 
+    // cancel pending pl resizes, in case of fast toggle between both modes
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resizePlaylistAfterCollapse) object:nil];
     [self performSelector:@selector(resizePlaylistAfterCollapse) withObject: nil afterDelay:0.75];
 
     b_splitview_removed = NO;

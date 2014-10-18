@@ -21,9 +21,11 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="5260"/>
+      <integer value="5305"/>
       <integer value="5605"/>
-      <integer value="5608"/>
+      <integer value="4756"/>
+      <integer value="5265"/>
+      <integer value="5260"/>
       <integer value="4850"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
@@ -1328,7 +1330,7 @@
                     <reference key="NSSuperview" ref="83235998"/>
                   </object>
                 </object>
-                <string key="NSFrame">{{50, 35}, {300, 230}}</string>
+                <string key="NSFrame">{{10, 10}, {300, 230}}</string>
                 <reference key="NSSuperview" ref="108902636"/>
                 <string key="NSOffsets">{0, 0}</string>
                 <object class="NSTextFieldCell" key="NSTitleCell">
@@ -1350,7 +1352,7 @@
                 <bool key="NSFullyTransparent">YES</bool>
               </object>
             </object>
-            <string key="NSFrameSize">{400, 300}</string>
+            <string key="NSFrameSize">{320, 250}</string>
             <reference key="NSSuperview" ref="256817023"/>
             <string key="NSReuseIdentifierKey">_NS:1109</string>
             <string key="NSClassName">VLCDragDropView</string>
@@ -1370,7 +1372,7 @@
                 <string>NeXT TIFF v4.0 pasteboard type</string>
               </object>
             </object>
-            <string key="NSFrameSize">{400, 300}</string>
+            <string key="NSFrameSize">{320, 250}</string>
             <reference key="NSSuperview" ref="256817023"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSImageCell" key="NSCell" id="1064809555">
@@ -1389,7 +1391,7 @@
             <bool key="NSEditable">YES</bool>
           </object>
         </object>
-        <string key="NSFrameSize">{400, 300}</string>
+        <string key="NSFrameSize">{320, 250}</string>
         <reference key="NSSuperview"/>
         <object class="CIDarkenBlendMode" key="NSViewCompositeFilter">
           <bool key="CIEnabled">YES</bool>
@@ -1404,7 +1406,7 @@
           <object class="NSButton" id="545072553">
             <reference key="NSNextResponder" ref="115834448"/>
             <int key="NSvFlags">265</int>
-            <string key="NSFrame">{{298, 1}, {101, 17}}</string>
+            <string key="NSFrame">{{298, -1}, {101, 17}}</string>
             <reference key="NSSuperview" ref="115834448"/>
             <string key="NSReuseIdentifierKey">_NS:125</string>
             <bool key="NSEnabled">YES</bool>
@@ -1430,7 +1432,7 @@
           <object class="NSButton" id="882473348">
             <reference key="NSNextResponder" ref="115834448"/>
             <int key="NSvFlags">268</int>
-            <string key="NSFrame">{{5, 1}, {101, 17}}</string>
+            <string key="NSFrame">{{5, -1}, {101, 17}}</string>
             <reference key="NSSuperview" ref="115834448"/>
             <string key="NSReuseIdentifierKey">_NS:125</string>
             <bool key="NSEnabled">YES</bool>
@@ -1455,7 +1457,7 @@
           </object>
           <object class="NSImageView" id="157740914">
             <reference key="NSNextResponder" ref="115834448"/>
-            <int key="NSvFlags">266</int>
+            <int key="NSvFlags">314</int>
             <object class="NSMutableSet" key="NSDragTypes">
               <bool key="EncodedWithXMLCoder">YES</bool>
               <object class="NSArray" key="set.sortedObjects">
@@ -1468,7 +1470,7 @@
                 <string>NeXT TIFF v4.0 pasteboard type</string>
               </object>
             </object>
-            <string key="NSFrame">{{0, -2}, {403, 23}}</string>
+            <string key="NSFrame">{{0, -6}, {403, 25}}</string>
             <reference key="NSSuperview" ref="115834448"/>
             <bool key="NSEnabled">YES</bool>
             <object class="NSImageCell" key="NSCell" id="816225529">
@@ -1484,7 +1486,7 @@
             <bool key="NSEditable">YES</bool>
           </object>
         </object>
-        <string key="NSFrameSize">{403, 21}</string>
+        <string key="NSFrameSize">{403, 19}</string>
         <reference key="NSSuperview"/>
         <string key="NSReuseIdentifierKey">_NS:1109</string>
         <string key="NSClassName">NSView</string>
@@ -1503,7 +1505,7 @@
         <string key="NSWindowContentMaxSize">{612, 159}</string>
         <string key="NSWindowContentMinSize">{612, 159}</string>
         <object class="NSView" key="NSWindowView" id="383192078">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1619,6 +1621,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{612, 159}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
         <string key="NSMinSize">{612, 181}</string>
@@ -1639,7 +1642,7 @@
         <string key="NSWindowContentMaxSize">{612, 159}</string>
         <string key="NSWindowContentMinSize">{612, 159}</string>
         <object class="NSView" key="NSWindowView" id="306630988">
-          <nil key="NSNextResponder"/>
+          <reference key="NSNextResponder"/>
           <int key="NSvFlags">256</int>
           <object class="NSMutableArray" key="NSSubviews">
             <bool key="EncodedWithXMLCoder">YES</bool>
@@ -1800,6 +1803,7 @@
             </object>
           </object>
           <string key="NSFrameSize">{612, 159}</string>
+          <reference key="NSSuperview"/>
         </object>
         <string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
         <string key="NSMinSize">{612, 181}</string>
@@ -3931,7 +3935,7 @@
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-          <string>{{566, 376}, {400, 300}}</string>
+          <string>{{566, 426}, {320, 250}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform"/>
           <string>VLCDropDisabledImageView</string>
@@ -4006,7 +4010,7 @@
           <object class="NSAffineTransform">
             <bytes key="NSTransformStruct">AUNbAABBIAAAA</bytes>
           </object>
-          <string>{{565, 246}, {403, 21}}</string>
+          <string>{{565, 248}, {403, 19}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <object class="NSAffineTransform">
