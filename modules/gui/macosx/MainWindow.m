@@ -1145,17 +1145,18 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [[[VLCMain sharedInstance] playlist] setPlaylistRoot: pl_item];
     }
 
+    // Note the order: first hide the podcast controls, then show the drop zone
+    if ([[item identifier] isEqualToString:@"podcast{longname=\"Podcasts\"}"])
+        [self showPodcastControls];
+    else
+        [self hidePodcastControls];
+
     PL_LOCK;
     if ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot] != p_playlist->p_local_category || p_playlist->p_local_category->i_children > 0)
         [self hideDropZone];
     else
         [self showDropZone];
     PL_UNLOCK;
-
-    if ([[item identifier] isEqualToString:@"podcast{longname=\"Podcasts\"}"])
-        [self showPodcastControls];
-    else
-        [self hidePodcastControls];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
                                                         object: nil
