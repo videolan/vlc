@@ -246,6 +246,8 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input,
         psz_type = ".jpg";
     else if( !strcmp( p_attachment->psz_mime, "image/png" ) )
         psz_type = ".png";
+    else if( !strcmp( p_attachment->psz_mime, "image/x-pict" ) )
+        psz_type = ".pct";
 
     playlist_SaveArt( VLC_OBJECT(p_input), p_item,
                       p_attachment->p_data, p_attachment->i_data, psz_type );
