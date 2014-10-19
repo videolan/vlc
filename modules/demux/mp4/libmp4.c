@@ -2909,54 +2909,6 @@ static int MP4_ReadBox_Metadata( stream_t *p_stream, MP4_Box_t *p_box )
     return MP4_ReadBoxContainerChildren( p_stream, p_box, ATOM_data );
 }
 
-static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
-{
-    return MP4_ReadBox_Metadata( p_stream, p_box );
-
-/* FIXME: find out what was that 2 bytes sized atom and its own handler */
-//    if ( GetWBE( &p_peek[8] ) > 0 )
-//        uint16_t i16;
-
-//    MP4_READBOX_ENTER( MP4_Box_data_string_t );
-
-//    p_box->data.p_string->psz_text = NULL;
-
-//    MP4_GET2BYTES( i16 );
-
-//    if( i16 > 0 )
-//    {
-//        int i_length = i16;
-
-//        MP4_GET2BYTES( i16 );
-//        if( i_length >= i_read ) i_length = i_read + 1;
-
-//        p_box->data.p_string->psz_text = malloc( i_length );
-//        if( p_box->data.p_string->psz_text == NULL )
-//            MP4_READBOX_EXIT( 0 );
-
-//        i_length--;
-//        memcpy( p_box->data.p_string->psz_text,
-//                p_peek, i_length );
-//        p_box->data.p_string->psz_text[i_length] = '\0';
-
-//#ifdef MP4_VERBOSE
-//        msg_Dbg( p_stream,
-//                 "read box: \"c%3.3s\" text=`%s'",
-//                 ((char*)&p_box->i_type + 1),
-//                 p_box->data.p_string->psz_text );
-//#endif
-//    }
-//    else
-
-//    MP4_READBOX_EXIT( 1 );
-}
-static void MP4_FreeBox_0xa9xxx( MP4_Box_t *p_box )
-{
-    /* If Meta, that box should be empty /common */
-    if( p_box->data.p_string )
-        FREENULL( p_box->data.p_string->psz_text );
-}
-
 /* Chapter support */
 static void MP4_FreeBox_chpl( MP4_Box_t *p_box )
 {
@@ -3712,20 +3664,20 @@ static const struct
     { ATOM_skcr,    MP4_ReadBox_skcr,         MP4_FreeBox_Common, 0 },
 
     /* ilst meta tags */
-    { ATOM_0xa9ART, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9alb, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9cmt, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9com, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9day, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9des, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9enc, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9gen, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9grp, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9lyr, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9nam, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9too, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9trk, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
-    { ATOM_0xa9wrt, MP4_ReadBox_0xa9xxx,      MP4_FreeBox_0xa9xxx, ATOM_ilst },
+    { ATOM_0xa9ART, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9alb, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9cmt, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9com, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9day, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9des, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9enc, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9gen, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9grp, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9lyr, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9nam, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9too, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9trk, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
+    { ATOM_0xa9wrt, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_aART,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_atID,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst }, /* iTunes */
     { ATOM_chpl,    MP4_ReadBox_chpl,         MP4_FreeBox_chpl,    ATOM_ilst },

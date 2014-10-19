@@ -1020,13 +1020,6 @@ typedef struct MP4_Box_data_trun_s
 
 } MP4_Box_data_trun_t;
 
-
-typedef struct
-{
-    char *psz_text;
-
-} MP4_Box_data_0xa9xxx_t;
-
 typedef struct
 {
     char *psz_text;
