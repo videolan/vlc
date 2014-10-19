@@ -187,6 +187,9 @@ void vout_display_window_Attach(vout_window_t *window, vout_display_t *vd)
 {
     vout_display_window_t *state = window->owner.sys;
 
+    vout_window_SetSize(window,
+                        vd->cfg->display.width, vd->cfg->display.height);
+
     vlc_mutex_lock(&state->lock);
     state->vd = vd;
 

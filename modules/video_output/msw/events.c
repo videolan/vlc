@@ -685,14 +685,8 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     if( !p_event->use_desktop )
     #endif
     {
-        vout_window_cfg_t wnd_cfg = {
-            .type = VOUT_WINDOW_TYPE_HWND,
-            .width = p_event->width,
-            .height = p_event->height,
-        };
-
         /* If an external window was specified, we'll draw in it. */
-        p_event->parent_window = vout_display_NewWindow(vd, &wnd_cfg );
+        p_event->parent_window = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_HWND);
         if( p_event->parent_window )
             p_event->hparent = p_event->parent_window->handle.hwnd;
         else

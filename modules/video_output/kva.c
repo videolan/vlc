@@ -175,18 +175,9 @@ static void PMThread( void *arg )
     sys->b_fixt23 = var_CreateGetBool( vd, "kva-fixt23");
 
     if( !sys->b_fixt23 )
-    {
-        vout_window_cfg_t wnd_cfg;
-
-        wnd_cfg.is_standalone = false;
-        wnd_cfg.type          = VOUT_WINDOW_TYPE_HWND;
-        wnd_cfg.width         = vd->cfg->display.width;
-        wnd_cfg.height        = vd->cfg->display.height;
-
         /* If an external window was specified, we'll draw in it. */
         sys->parent_window =
-            vout_display_NewWindow( vd, &wnd_cfg );
-    }
+            vout_display_NewWindow( vd, VOUT_WINDOW_TYPE_HWND );
 
     if( sys->parent_window )
     {

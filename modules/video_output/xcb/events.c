@@ -128,13 +128,7 @@ vout_window_t *XCB_parent_Create (vout_display_t *vd,
                                   xcb_connection_t **restrict pconn,
                                   const xcb_screen_t **restrict pscreen)
 {
-    vout_window_cfg_t cfg = {
-        .type = VOUT_WINDOW_TYPE_XID,
-        .width  = vd->cfg->display.width,
-        .height = vd->cfg->display.height,
-    };
-
-    vout_window_t *wnd = vout_display_NewWindow (vd, &cfg);
+    vout_window_t *wnd = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_XID);
     if (wnd == NULL)
     {
         msg_Err (vd, "window not available");

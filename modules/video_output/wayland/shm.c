@@ -396,12 +396,7 @@ static int Open(vlc_object_t *obj)
     sys->use_buffer_transform = false;
 
     /* Get window */
-    vout_window_cfg_t wcfg = {
-        .type = VOUT_WINDOW_TYPE_WAYLAND,
-        .width  = vd->cfg->display.width,
-        .height = vd->cfg->display.height,
-    };
-    sys->embed = vout_display_NewWindow(vd, &wcfg);
+    sys->embed = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_WAYLAND);
     if (sys->embed == NULL)
         goto error;
 

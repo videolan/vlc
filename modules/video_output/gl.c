@@ -106,13 +106,7 @@ static int Open (vlc_object_t *obj)
     sys->gl = NULL;
     sys->pool = NULL;
 
-    vout_window_cfg_t cfg = {
-        .type = VOUT_WINDOW_TYPE_INVALID, /* any */
-        .width = vd->cfg->display.width,
-        .height = vd->cfg->display.height,
-    };
-
-    vout_window_t *surface = vout_display_NewWindow (vd, &cfg);
+    vout_window_t *surface = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_INVALID);
     if (surface == NULL)
     {
         msg_Err (vd, "parent window not available");
@@ -123,7 +117,7 @@ static int Open (vlc_object_t *obj)
     if (sys->gl == NULL)
         goto error;
 
-    vlc_gl_Resize (sys->gl, cfg.width, cfg.height);
+    vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
 
     /* Initialize video display */
     const vlc_fourcc_t *spu_chromas;

@@ -156,16 +156,7 @@ static int Open (vlc_object_t *this)
     if (container)
         vout_display_DeleteWindow (vd, NULL);
     else {
-        vout_window_cfg_t wnd_cfg;
-
-        memset (&wnd_cfg, 0, sizeof (wnd_cfg));
-        wnd_cfg.type = VOUT_WINDOW_TYPE_NSOBJECT;
-        wnd_cfg.x = var_InheritInteger (vd, "video-x");
-        wnd_cfg.y = var_InheritInteger (vd, "video-y");
-        wnd_cfg.width  = vd->cfg->display.width;
-        wnd_cfg.height = vd->cfg->display.height;
-
-        sys->embed = vout_display_NewWindow (vd, &wnd_cfg);
+        sys->embed = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_NSOBJECT);
         if (sys->embed)
             container = sys->embed->handle.nsobject;
 

@@ -716,10 +716,10 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     }
 }
 
-static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, const vout_window_cfg_t *cfg)
+static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, unsigned type)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
-    vout_window_t *window = vout_NewDisplayWindow(osys->vout, cfg);
+    vout_window_t *window = vout_NewDisplayWindow(osys->vout, type);
     if (window != NULL)
         vout_display_window_Attach(window, vd);
     return window;
@@ -1342,13 +1342,16 @@ struct video_splitter_owner_t {
     vout_display_t *wrapper;
 };
 
-static vout_window_t *SplitterNewWindow(vout_display_t *vd, const vout_window_cfg_t *cfg_ptr)
+static vout_window_t *SplitterNewWindow(vout_display_t *vd, unsigned type)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
     vout_window_t *window;
-
-    vout_window_cfg_t cfg = *cfg_ptr;
-    cfg.is_standalone = true;
+    vout_window_cfg_t cfg = {
+        .type = type,
+        .width = vd->cfg->display.width,
+        .height = vd->cfg->display.height,
+        .is_standalone = true,
+    };
 
     window = vout_display_window_New(osys->vout, &cfg);
     if (window != NULL)

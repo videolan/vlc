@@ -235,7 +235,7 @@ struct vout_display_owner_t {
      * These functions are set prior to the module instantiation and must not
      * be overwritten nor used directly (use the vout_display_*Window
      * wrapper */
-    vout_window_t *(*window_new)(vout_display_t *, const vout_window_cfg_t *);
+    vout_window_t *(*window_new)(vout_display_t *, unsigned type);
     void           (*window_del)(vout_display_t *, vout_window_t *);
 };
 
@@ -388,13 +388,11 @@ static inline void vout_display_SendEventMouseDoubleClick(vout_display_t *vd)
 }
 
 /**
- * Asks for a new window with the given configuration as hint.
- *
- * b_standalone/i_x/i_y may be overwritten by the core
+ * Asks for a new window of a given type.
  */
-static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, const vout_window_cfg_t *cfg)
+static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, unsigned type)
 {
-    return vd->owner.window_new(vd, cfg);
+    return vd->owner.window_new(vd, type);
 }
 /**
  * Deletes a window created by vout_display_NewWindow if window is non NULL
@@ -408,18 +406,7 @@ static inline void vout_display_DeleteWindow(vout_display_t *vd,
 
 static inline bool vout_display_IsWindowed(vout_display_t *vd)
 {
-#ifndef __cplusplus
-    vout_window_cfg_t cfg = {
-        .width = vd->cfg->display.width,
-        .height = vd->cfg->display.height,
-    };
-#else
-    vout_window_cfg_t cfg;
-    memset(&cfg, 0, sizeof (cfg));
-    cfg.width = vd->cfg->display.width;
-    cfg.height = vd->cfg->display.height;
-#endif
-    vout_window_t *window = vout_display_NewWindow(vd, &cfg);
+    vout_window_t *window = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_INVALID);
     if (window != NULL)
         vout_display_DeleteWindow(vd, window);
     return window != NULL;
