@@ -54,6 +54,11 @@
 #define ATOM_wide VLC_FOURCC( 'w', 'i', 'd', 'e' )
 #define ATOM_binm VLC_FOURCC( 0x82, 0x82, 0x7f, 0x7d ) /* binary Computer Graphics Metafile */
 
+/* Quicktime preview */
+#define ATOM_pnot VLC_FOURCC( 'p', 'n', 'o', 't' )
+#define ATOM_pict VLC_FOURCC( 'p', 'i', 'c', 't' )
+#define ATOM_PICT VLC_FOURCC( 'P', 'I', 'C', 'T' )
+
 #define ATOM_data VLC_FOURCC( 'd', 'a', 't', 'a' )
 
 #define ATOM_trak VLC_FOURCC( 't', 'r', 'a', 'k' )
@@ -1022,6 +1027,13 @@ typedef struct MP4_Box_data_trun_s
 
 typedef struct
 {
+    uint32_t i_date;
+    uint32_t i_type;
+    uint16_t i_index;
+} MP4_Box_data_pnot_t;
+
+typedef struct
+{
     char *psz_text;
 
 } MP4_Box_data_string_t;
@@ -1429,6 +1441,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_rmqu_t *p_rmqu;
     MP4_Box_data_rmvc_t *p_rmvc;
 
+    MP4_Box_data_pnot_t *p_pnot;
     MP4_Box_data_chpl_t *p_chpl;
     MP4_Box_data_tref_generic_t *p_tref_generic;
 

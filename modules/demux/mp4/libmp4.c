@@ -3429,6 +3429,20 @@ static void MP4_FreeBox_tfra( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_tfra->p_sample_number );
 }
 
+static int MP4_ReadBox_pnot( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    if ( p_box->i_size != 20 )
+        return 0;
+    MP4_READBOX_ENTER( MP4_Box_data_pnot_t );
+    MP4_GET4BYTES( p_box->data.p_pnot->i_date );
+    uint16_t i_version;
+    MP4_GET2BYTES( i_version );
+    if ( i_version != 0 )
+        MP4_READBOX_EXIT( 0 );
+    MP4_GETFOURCC( p_box->data.p_pnot->i_type );
+    MP4_GET2BYTES( p_box->data.p_pnot->i_index );
+    MP4_READBOX_EXIT( 1 );
+}
 
 /* For generic */
 static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
@@ -3566,6 +3580,11 @@ static const struct
     { ATOM_iods,    MP4_ReadBox_iods,         MP4_FreeBox_Common, 0 },
     { ATOM_pasp,    MP4_ReadBox_pasp,         MP4_FreeBox_Common, 0 },
     { ATOM_keys,    MP4_ReadBox_keys,         MP4_FreeBox_keys,   ATOM_meta },
+
+    /* Quicktime preview atoms, all at root */
+    { ATOM_pnot,    MP4_ReadBox_pnot,         MP4_FreeBox_Common, 0 },
+    { ATOM_pict,    MP4_ReadBox_Binary,       MP4_FreeBox_Binary, 0 },
+    { ATOM_PICT,    MP4_ReadBox_Binary,       MP4_FreeBox_Binary, 0 },
 
     /* Nothing to do with this box */
     { ATOM_mdat,    MP4_ReadBoxSkip,          MP4_FreeBox_Common, 0 },
