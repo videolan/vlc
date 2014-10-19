@@ -1476,6 +1476,30 @@
     [o_arrayToSave release];
 }
 
+- (BOOL)isValidResumeItem:(input_item_t *)p_item
+{
+    char *psz_url = input_item_GetURI(p_item);
+    NSString *o_url_string = toNSStr(psz_url);
+    free(psz_url);
+
+    if ([o_url_string isEqualToString:@""])
+        return NO;
+
+    NSURL *o_url = [NSURL URLWithString:o_url_string];
+
+    if (![o_url isFileURL])
+        return NO;
+
+    BOOL isDir = false;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[o_url path] isDirectory:&isDir])
+        return NO;
+
+    if (isDir)
+        return NO;
+
+    return YES;
+}
+
 - (void)continuePlaybackWhereYouLeftOff:(input_thread_t *)p_input_thread
 {
     NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"recentlyPlayedMedia"];
@@ -1491,16 +1515,15 @@
             return;
         }
 
+        /* check for file existance before resuming */
+        if (![self isValidResumeItem:p_item])
+            return;
+
         char *psz_url = decode_URI(input_item_GetURI(p_item));
         if (!psz_url)
             return;
-
-        NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
+        NSString *url = toNSStr(psz_url);
         free(psz_url);
-
-        /* check for file existance before resuming */
-        if (![[NSFileManager defaultManager] fileExistsAtPath:[[NSURL URLWithString:[NSString stringWithUTF8String:input_item_GetURI(p_item)]] path]])
-            return;
 
         NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
         if (lastPosition && lastPosition.intValue > 0) {
@@ -1543,15 +1566,14 @@
     if (!p_item)
         return;
 
+    if (![self isValidResumeItem:p_item])
+        return;
+
     char *psz_url = decode_URI(input_item_GetURI(p_item));
-    NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
+    if (!psz_url)
+        return;
+    NSString *url = toNSStr(psz_url);
     free(psz_url);
-
-    if (url.length < 1)
-        return;
-
-    if ([url rangeOfString:@"file://" options:NSCaseInsensitiveSearch].location != 0)
-        return;
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
