@@ -2929,6 +2929,9 @@ static int MP4_ReadBox_chpl( stream_t *p_stream, MP4_Box_t *p_box )
 
     MP4_GETVERSIONFLAGS( p_chpl );
 
+    if ( i_read < 5 || p_chpl->i_version != 0x1 )
+        MP4_READBOX_EXIT( 0 );
+
     MP4_GET4BYTES( i_dummy );
 
     MP4_GET1BYTE( p_chpl->i_chapter );
@@ -3680,7 +3683,6 @@ static const struct
     { ATOM_0xa9wrt, MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_aART,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_atID,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst }, /* iTunes */
-    { ATOM_chpl,    MP4_ReadBox_chpl,         MP4_FreeBox_chpl,    ATOM_ilst },
     { ATOM_cnID,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst }, /* iTunes */
     { ATOM_covr,    MP4_ReadBoxContainer,     MP4_FreeBox_Common,  ATOM_ilst },
     { ATOM_disk,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
@@ -3740,6 +3742,7 @@ static const struct
     { ATOM_0xa9wrn, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_0xa9xpd, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_0xa9xyz, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
+    { ATOM_chpl,    MP4_ReadBox_chpl,         MP4_FreeBox_chpl,    ATOM_udta }, /* nero unlabeled chapters list */
     { ATOM_name,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_vndr,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_SDLN,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
