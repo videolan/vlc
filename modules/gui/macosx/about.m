@@ -132,7 +132,14 @@ static VLAboutBox *_o_sharedInstance = nil;
                                                             "DVDs, network streams, capture cards and other media formats!</p><p><a href="
                                                             "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
                                                             "underline; color:#0057ae;\">Help and join us!</span></a>")];
-        NSAttributedString *joinus_readytorender = [[NSAttributedString alloc] initWithHTML:[joinus dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES] options:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:NSUTF8StringEncoding] forKey:NSCharacterEncodingDocumentOption] documentAttributes:NULL];
+        NSString *fontfamily;
+        if (OSX_YOSEMITE)
+            fontfamily = @"Helvetica Neue";
+        else
+            fontfamily = @"Lucida Grande";
+        NSString *joinUsWithStyle = [NSString stringWithFormat:@"<div style=\"text-align:left;font-family:%@;\">%@</div>",
+                                     fontfamily, joinus];
+        NSAttributedString *joinus_readytorender = [[NSAttributedString alloc] initWithHTML:[joinUsWithStyle dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES] options:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:NSUTF8StringEncoding] forKey:NSCharacterEncodingDocumentOption] documentAttributes:NULL];
         [o_joinus_txt setAllowsEditingTextAttributes: YES];
         [o_joinus_txt setSelectable: YES];
         [o_joinus_txt setAttributedStringValue:joinus_readytorender];
