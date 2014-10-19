@@ -78,7 +78,8 @@ SUFFIXES += .proto .pb.cc
 
 SOURCES_stream_out_chromecast = chromecast/cast_channel.proto chromecast/cast.cpp \
                                 ../misc/webservices/json.h ../misc/webservices/json.c
-nodist_libstream_out_chromecast_plugin_la_SOURCES = chromecast/cast_channel.pb.cc chromecast/cast_channel.pb.h
+nodist_libstream_out_chromecast_plugin_la_SOURCES = chromecast/cast_channel.pb.cc
+CLEANFILES += $(nodist_libstream_out_chromecast_plugin_la_SOURCES)
 
 if BUILD_CHROMECAST
 BUILT_SOURCES += chromecast/cast_channel.pb.h
