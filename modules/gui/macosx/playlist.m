@@ -1562,6 +1562,9 @@
 
 - (void)storePlaybackPositionForItem:(input_thread_t *)p_input_thread
 {
+    if (!var_InheritBool(VLCIntf, "macosx-recentitems"))
+        return;
+
     input_item_t *p_item = input_GetItem(p_input_thread);
     if (!p_item)
         return;
