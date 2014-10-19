@@ -1356,6 +1356,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                 "/meta/ilst",
                                 "/udta",
                                 NULL };
+    const uint32_t rgi_pict_atoms[2] = { ATOM_PICT, ATOM_pict };
 
     switch( i_query )
     {
@@ -1425,24 +1426,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             input_attachment_t ***ppp_attach = va_arg( args, input_attachment_t*** );
             int *pi_int = va_arg( args, int * );
 
-            MP4_Box_t *p_data = NULL;
             MP4_Box_t *p_udta = NULL;
             size_t i_count = 0;
             int i_index = 0;
 
+            /* Count number of total attachments */
             for( ; psz_roots[i_index] && !p_udta; i_index++ )
             {
                 p_udta = MP4_BoxGet( p_sys->p_root, psz_roots[i_index] );
-                if (p_udta)
-                {
-                    p_data = MP4_BoxGet( p_udta, "covr/data" );
-                    for( ; p_data; p_data = p_data->p_next )
-                    {
-                        if ( p_data->i_type == ATOM_data &&
-                             imageTypeCompatible( BOXDATA(p_data) ) )
-                            i_count++;
-                    }
-                }
+                if ( p_udta )
+                    i_count += MP4_BoxCount( p_udta, "covr/data" );
+            }
+
+            for ( size_t i=0; i< ARRAY_SIZE(rgi_pict_atoms); i++ )
+            {
+                char rgsz_path[5];
+                snprintf( rgsz_path, 5, "%4.4s", (char*)&rgi_pict_atoms[i] );
+                i_count += MP4_BoxCount( p_sys->p_root, rgsz_path );
             }
 
             if ( i_count == 0 )
@@ -1451,39 +1451,71 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *ppp_attach = (input_attachment_t**)
                     malloc( sizeof(input_attachment_t*) * i_count );
             if( !(*ppp_attach) ) return VLC_ENOMEM;
-            char *psz_mime;
-            char *psz_filename;
+
+            /* First add cover attachments */
             i_count = 0;
-            p_data = MP4_BoxGet( p_udta, "covr/data" );
-            for( ; p_data; p_data = p_data->p_next )
+            size_t i_box_count = 0;
+            if ( p_udta )
             {
-                if ( p_data->i_type != ATOM_data || !imageTypeCompatible( BOXDATA(p_data) ) )
-                    continue;
-
-                switch( BOXDATA(p_data)->e_wellknowntype )
+                const MP4_Box_t *p_data = MP4_BoxGet( p_udta, "covr/data" );
+                for( ; p_data; p_data = p_data->p_next )
                 {
-                case DATA_WKT_PNG:
-                    psz_mime = strdup( "image/png" );
-                    break;
-                case DATA_WKT_JPEG:
-                    psz_mime = strdup( "image/jpeg" );
-                    break;
-                case DATA_WKT_BMP:
-                    psz_mime = strdup( "image/bmp" );
-                    break;
-                default:
-                    continue;
-                }
+                    char *psz_mime;
+                    char *psz_filename;
+                    i_box_count++;
 
-                if ( asprintf( &psz_filename, "%s/covr/data[%"PRIu64"]", psz_roots[i_index - 1], i_count ) >= 0 )
+                    if ( p_data->i_type != ATOM_data || !imageTypeCompatible( BOXDATA(p_data) ) )
+                        continue;
+
+                    switch( BOXDATA(p_data)->e_wellknowntype )
+                    {
+                    case DATA_WKT_PNG:
+                        psz_mime = strdup( "image/png" );
+                        break;
+                    case DATA_WKT_JPEG:
+                        psz_mime = strdup( "image/jpeg" );
+                        break;
+                    case DATA_WKT_BMP:
+                        psz_mime = strdup( "image/bmp" );
+                        break;
+                    default:
+                        continue;
+                    }
+
+                    if ( asprintf( &psz_filename, "%s/covr/data[%"PRIu64"]", psz_roots[i_index - 1],
+                                   i_box_count - 1 ) >= 0 )
+                    {
+                        (*ppp_attach)[i_count++] =
+                            vlc_input_attachment_New( psz_filename, psz_mime, "Cover picture",
+                                BOXDATA(p_data)->p_blob, BOXDATA(p_data)->i_blob );
+                        msg_Dbg( p_demux, "adding attachment %s", psz_filename );
+                        free( psz_filename );
+                    }
+
+                    free( psz_mime );
+                }
+            }
+
+            /* Then quickdraw pict ones */
+            for ( size_t i=0; i< ARRAY_SIZE(rgi_pict_atoms); i++ )
+            {
+                char rgsz_path[5];
+                snprintf( rgsz_path, 5, "%4.4s", (char*)&rgi_pict_atoms[i] );
+                const MP4_Box_t *p_pict = MP4_BoxGet( p_sys->p_root, rgsz_path );
+                i_box_count = 0;
+                for( ; p_pict; p_pict = p_pict->p_next )
                 {
-                    (*ppp_attach)[i_count++] =
-                        vlc_input_attachment_New( psz_filename, psz_mime, NULL,
-                            BOXDATA(p_data)->p_blob, BOXDATA(p_data)->i_blob );
-                    free( psz_filename );
+                    if ( i_box_count++ == UINT16_MAX ) /* pnot only handles 2^16 */
+                        break;
+                    if ( p_pict->i_type != rgi_pict_atoms[i] )
+                        continue;
+                    char rgsz_location[12];
+                    snprintf( rgsz_location, 12, "%4.4s[%"PRIu16"]", (char*)&rgi_pict_atoms[i],
+                              (uint16_t) i_box_count - 1 );
+                    (*ppp_attach)[i_count++] = vlc_input_attachment_New( rgsz_location, "image/x-pict",
+                        "Quickdraw image", p_pict->data.p_binary->p_blob, p_pict->data.p_binary->i_blob );
+                    msg_Dbg( p_demux, "adding attachment %s", rgsz_location );
                 }
-
-                free( psz_mime );
             }
 
             if ( i_count == 0 )
@@ -1503,6 +1535,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             MP4_Box_t *p_data = NULL;
             MP4_Box_t *p_udta = NULL;
+            bool b_attachment_set = false;
 
             for( int i_index = 0; psz_roots[i_index] && !p_udta; i_index++ )
             {
@@ -1517,13 +1550,30 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                              psz_roots[i_index] ) )
                         {
                             vlc_meta_SetArtURL( p_meta, psz_attachment );
+                            b_attachment_set = true;
                             free( psz_attachment );
                         }
                     }
                 }
             }
 
-            if( p_udta == NULL && p_data == NULL )
+            const MP4_Box_t *p_pnot;
+            if ( !b_attachment_set && (p_pnot = MP4_BoxGet( p_sys->p_root, "pnot" )) )
+            {
+                for ( size_t i=0; i< ARRAY_SIZE(rgi_pict_atoms) && !b_attachment_set; i++ )
+                {
+                    if ( rgi_pict_atoms[i] == BOXDATA(p_pnot)->i_type )
+                    {
+                        char rgsz_path[26];
+                        snprintf( rgsz_path, 26, "attachment://%4.4s[%"PRIu16"]",
+                                  (char*)&rgi_pict_atoms[i], BOXDATA(p_pnot)->i_index - 1 );
+                        vlc_meta_SetArtURL( p_meta, rgsz_path );
+                        b_attachment_set = true;
+                    }
+                }
+            }
+
+            if( p_udta == NULL && !b_attachment_set )
                 return VLC_EGENERIC;
 
             SetupMeta( p_meta, p_udta );
