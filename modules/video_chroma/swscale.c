@@ -340,6 +340,8 @@ static int GetParameters( ScalerConfiguration *p_cfg,
         p_cfg->b_has_a = b_has_ai && b_has_ao;
         p_cfg->b_add_a = (!b_has_ai) && b_has_ao;
         p_cfg->b_copy = i_fmti == i_fmto &&
+                        p_fmti->i_width == p_fmto->i_width &&
+                        p_fmti->i_height == p_fmto->i_height &&
                         p_fmti->i_visible_width == p_fmto->i_visible_width &&
                         p_fmti->i_visible_height == p_fmto->i_visible_height;
         p_cfg->b_swap_uvi = b_swap_uvi;
@@ -387,21 +389,40 @@ static int Init( filter_t *p_filter )
         return VLC_EGENERIC;
     }
 
+    unsigned iwidth = (p_fmti->i_visible_width * p_fmto->i_width)
+                      / p_fmto->i_visible_width;
+    unsigned iheight = (p_fmti->i_visible_height * p_fmto->i_height)
+                       / p_fmto->i_visible_height;
+    unsigned owidth = (p_fmto->i_visible_width * p_fmti->i_width)
+                      / p_fmti->i_visible_width;
+    unsigned oheight = (p_fmto->i_visible_height * p_fmti->i_height)
+                       / p_fmti->i_visible_height;
+
+    if( owidth > p_fmto->i_width )
+        owidth = p_fmto->i_width;
+    else
+        iwidth = p_fmti->i_width;
+    if( oheight > p_fmto->i_height )
+        oheight = p_fmto->i_height;
+    else
+        iheight = p_fmti->i_height;
+
     /* swscale does not like too small width */
     p_sys->i_extend_factor = 1;
-    while( __MIN( p_fmti->i_visible_width, p_fmto->i_visible_width ) * p_sys->i_extend_factor < MINIMUM_WIDTH)
+    while( __MIN( p_fmti->i_width, p_fmto->i_width ) * p_sys->i_extend_factor < MINIMUM_WIDTH)
         p_sys->i_extend_factor++;
 
-    const unsigned i_fmti_visible_width = p_fmti->i_visible_width * p_sys->i_extend_factor;
-    const unsigned i_fmto_visible_width = p_fmto->i_visible_width * p_sys->i_extend_factor;
+    iwidth *= p_sys->i_extend_factor;
+    owidth *= p_sys->i_extend_factor;
+
     for( int n = 0; n < (cfg.b_has_a ? 2 : 1); n++ )
     {
         const int i_fmti = n == 0 ? cfg.i_fmti : PIX_FMT_GRAY8;
         const int i_fmto = n == 0 ? cfg.i_fmto : PIX_FMT_GRAY8;
         struct SwsContext *ctx;
 
-        ctx = sws_getContext( i_fmti_visible_width, p_fmti->i_visible_height, i_fmti,
-                              i_fmto_visible_width, p_fmto->i_visible_height, i_fmto,
+        ctx = sws_getContext( iwidth, iheight, i_fmti,
+                              owidth, oheight, i_fmto,
                               cfg.i_sws_flags | p_sys->i_cpu_mask,
                               p_sys->p_src_filter, p_sys->p_dst_filter, 0 );
         if( n == 0 )
@@ -411,13 +432,13 @@ static int Init( filter_t *p_filter )
     }
     if( p_sys->ctxA )
     {
-        p_sys->p_src_a = picture_New( VLC_CODEC_GREY, i_fmti_visible_width, p_fmti->i_visible_height, 0, 1 );
-        p_sys->p_dst_a = picture_New( VLC_CODEC_GREY, i_fmto_visible_width, p_fmto->i_visible_height, 0, 1 );
+        p_sys->p_src_a = picture_New( VLC_CODEC_GREY, iwidth, iheight, 0, 1 );
+        p_sys->p_dst_a = picture_New( VLC_CODEC_GREY, owidth, oheight, 0, 1 );
     }
     if( p_sys->i_extend_factor != 1 )
     {
-        p_sys->p_src_e = picture_New( p_fmti->i_chroma, i_fmti_visible_width, p_fmti->i_visible_height, 0, 1 );
-        p_sys->p_dst_e = picture_New( p_fmto->i_chroma, i_fmto_visible_width, p_fmto->i_visible_height, 0, 1 );
+        p_sys->p_src_e = picture_New( p_fmti->i_chroma, iwidth, iheight, 0, 1 );
+        p_sys->p_dst_e = picture_New( p_fmto->i_chroma, owidth, oheight, 0, 1 );
 
         if( p_sys->p_src_e )
             memset( p_sys->p_src_e->p[0].p_pixels, 0, p_sys->p_src_e->p[0].i_pitch * p_sys->p_src_e->p[0].i_lines );
@@ -643,7 +664,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     else if( p_sys->b_copy )
         SwapUV( p_dst, p_src );
     else
-        Convert( p_filter, p_sys->ctx, p_dst, p_src, p_fmti->i_visible_height,
+        Convert( p_filter, p_sys->ctx, p_dst, p_src, p_fmti->i_height,
                  3, p_sys->b_swap_uvi, p_sys->b_swap_uvo );
     if( p_sys->ctxA )
     {
@@ -656,7 +677,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
 
         Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a,
-                 p_fmti->i_visible_height, 1, false, false );
+                 p_fmti->i_height, 1, false, false );
         if( p_fmto->i_chroma == VLC_CODEC_RGBA || p_fmto->i_chroma == VLC_CODEC_BGRA )
             InjectA( p_dst, p_sys->p_dst_a, OFFSET_A );
         else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
