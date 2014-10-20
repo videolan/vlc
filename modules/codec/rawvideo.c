@@ -40,8 +40,6 @@ struct decoder_sys_t
     /*
      * Input properties
      */
-    bool b_invert;
-
     size_t size;
     unsigned pitches[PICTURE_PLANE_MAX];
     unsigned lines[PICTURE_PLANE_MAX];
@@ -97,13 +95,6 @@ static int OpenCommon( decoder_t *p_dec )
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
-    if( (int)p_dec->fmt_in.video.i_height < 0 )
-    {
-        /* Frames are coded from bottom to top */
-        p_dec->fmt_in.video.i_height =
-            (unsigned int)(-(int)p_dec->fmt_in.video.i_height);
-        p_sys->b_invert = true;
-    }
     if( !p_dec->fmt_in.video.i_visible_width )
         p_dec->fmt_in.video.i_visible_width = p_dec->fmt_in.video.i_width;
     if( !p_dec->fmt_in.video.i_visible_height )
@@ -195,37 +186,20 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
     decoder_sys_t *p_sys = p_dec->p_sys;
     const uint8_t *p_src = p_block->p_buffer;
 
-    if( p_sys->b_invert )
-        for( int i = 0; i < p_pic->i_planes; i++ )
+    for( int i = 0; i < p_pic->i_planes; i++ )
+    {
+        uint8_t *p_dst = p_pic->p[i].p_pixels;
+
+        for( int x = 0; x < p_pic->p[i].i_visible_lines; x++ )
         {
-            uint8_t *p_dst = p_pic->p[i].p_pixels
-                         + (p_pic->p[i].i_pitch * p_pic->p[i].i_visible_lines);
-
-            for( int x = 0; x < p_pic->p[i].i_visible_lines; x++ )
-            {
-                p_dst -= p_pic->p[i].i_pitch;
-                memcpy( p_dst, p_src, p_pic->p[i].i_visible_pitch );
-                p_src += p_sys->pitches[i];
-            }
-
-            p_src += p_sys->pitches[i]
-                   * (p_sys->lines[i] - p_pic->p[i].i_visible_lines);
+            memcpy( p_dst, p_src, p_pic->p[i].i_visible_pitch );
+            p_src += p_sys->pitches[i];
+            p_dst += p_pic->p[i].i_pitch;
         }
-    else
-        for( int i = 0; i < p_pic->i_planes; i++ )
-        {
-            uint8_t *p_dst = p_pic->p[i].p_pixels;
 
-            for( int x = 0; x < p_pic->p[i].i_visible_lines; x++ )
-            {
-                memcpy( p_dst, p_src, p_pic->p[i].i_visible_pitch );
-                p_src += p_sys->pitches[i];
-                p_dst += p_pic->p[i].i_pitch;
-            }
-
-            p_src += p_sys->pitches[i]
-                   * (p_sys->lines[i] - p_pic->p[i].i_visible_lines);
-        }
+        p_src += p_sys->pitches[i]
+               * (p_sys->lines[i] - p_pic->p[i].i_visible_lines);
+    }
 }
 
 /*****************************************************************************
@@ -293,35 +267,6 @@ static block_t *SendFrame( decoder_t *p_dec, block_t **pp_block )
     /* Date management: 1 frame per packet */
     p_block->i_dts = p_block->i_pts = date_Get( &p_sys->pts );
     date_Increment( &p_sys->pts, 1 );
-
-    if( p_sys->b_invert )
-    {
-        block_t *out = block_Alloc( p_block->i_buffer );
-        if( likely(out != NULL) )
-        {
-            block_CopyProperties( out, p_block );
-
-            const uint8_t *p_src = p_block->p_buffer;
-            uint8_t *p_pixels = out->p_buffer;
-
-            for( unsigned i = 0; i < PICTURE_PLANE_MAX; i++ )
-            {
-                unsigned pitch = p_sys->pitches[i];
-                unsigned lines = p_sys->lines[i];
-                uint8_t *p_dst = p_pixels + (pitch * lines);
-
-                for( unsigned x = 0; x < lines; x++ )
-                {
-                    p_dst -= p_sys->pitches[i];
-                    memcpy( p_dst, p_src, p_sys->pitches[i] );
-                    p_src += p_sys->pitches[i];
-                }
-            }
-        }
-        block_Release( p_block );
-        p_block = out;
-    }
-
     return p_block;
 }
 
