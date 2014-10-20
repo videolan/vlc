@@ -115,6 +115,7 @@ typedef struct
     uint64_t     i_first_dts;    /* i_first_dts value
                                                    of the next chunk */
 
+    MP4_Box_t *p_track;
     MP4_Box_t *p_stbl;  /* will contain all timing information */
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
     MP4_Box_t *p_sample;/* point on actual sdsd */

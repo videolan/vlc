@@ -1612,11 +1612,24 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             return Seek( p_demux, p_sys->p_title->seekpoint[i_seekpoint]->i_time_offset );
         }
-
+        case DEMUX_GET_PTS_DELAY:
+        {
+            for( unsigned int i = 0; i < p_sys->i_tracks; i++ )
+            {
+                const MP4_Box_t *p_load;
+                if ( (p_load = MP4_BoxGet( p_sys->track[i].p_track, "load" )) &&
+                     BOXDATA(p_load)->i_duration > 0 )
+                {
+                    *va_arg(args, int64_t *) = BOXDATA(p_load)->i_duration *
+                            CLOCK_FREQ / p_sys->track[i].i_timescale;
+                    return VLC_SUCCESS;
+                }
+            }
+            return VLC_EGENERIC;
+        }
         case DEMUX_SET_NEXT_DEMUX_TIME:
         case DEMUX_SET_GROUP:
         case DEMUX_HAS_UNSUPPORTED_META:
-        case DEMUX_GET_PTS_DELAY:
         case DEMUX_CAN_RECORD:
             return VLC_EGENERIC;
 
@@ -2539,6 +2552,8 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                              bool b_force_enable )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_track->p_track = p_box_trak;
 
     MP4_Box_t *p_tkhd = MP4_BoxGet( p_box_trak, "tkhd" );
     MP4_Box_t *p_tref = MP4_BoxGet( p_box_trak, "tref" );
