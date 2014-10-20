@@ -65,6 +65,7 @@
 #define ATOM_mvhd VLC_FOURCC( 'm', 'v', 'h', 'd' )
 #define ATOM_tkhd VLC_FOURCC( 't', 'k', 'h', 'd' )
 #define ATOM_tref VLC_FOURCC( 't', 'r', 'e', 'f' )
+#define ATOM_load VLC_FOURCC( 'l', 'o', 'a', 'd' )
 #define ATOM_mdia VLC_FOURCC( 'm', 'd', 'i', 'a' )
 #define ATOM_mdhd VLC_FOURCC( 'm', 'd', 'h', 'd' )
 #define ATOM_hdlr VLC_FOURCC( 'h', 'd', 'l', 'r' )
@@ -416,6 +417,14 @@ typedef struct MP4_Box_data_tkhd_s
     float    f_rotation;
 
 } MP4_Box_data_tkhd_t;
+
+typedef struct
+{
+    uint32_t i_start_time;
+    int32_t  i_duration;
+    uint32_t i_flags;
+    uint32_t i_hints;
+} MP4_Box_data_load_t;
 
 typedef struct MP4_Box_data_mdhd_s
 {
@@ -1411,6 +1420,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_mehd_t *p_mehd;
     MP4_Box_data_sdtp_t *p_sdtp;
     MP4_Box_data_tsel_t *p_tsel;
+    MP4_Box_data_load_t *p_load;
 
     MP4_Box_data_tfra_t *p_tfra;
     MP4_Box_data_mfro_t *p_mfro;
