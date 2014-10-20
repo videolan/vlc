@@ -217,7 +217,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
                 return 0;
             i_index = GetDWBE(&read[4]);
         }
-        if( ( p_box = MP4_ReadBox( p_stream, p_container ) ) == NULL ) break;
+        if( ( p_box = MP4_ReadBox( p_stream, p_container ) ) == NULL ) continue;
         p_box->i_index = i_index;
 
         /* chain this box with the father and the other at same level */
@@ -3871,7 +3871,9 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
 
     if( !(MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box ) )
     {
+        off_t i_end = p_box->i_pos + p_box->i_size;
         MP4_BoxFree( p_stream, p_box );
+        stream_Seek( p_stream, i_end ); /* Skip the failed box */
         return NULL;
     }
 
