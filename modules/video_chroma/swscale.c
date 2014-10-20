@@ -499,17 +499,16 @@ static void Clean( filter_t *p_filter )
 }
 
 static void GetPixels( uint8_t *pp_pixel[4], int pi_pitch[4],
-                       const picture_t *p_picture,
-                       int i_plane_start, int i_plane_count,
+                       const picture_t *p_picture, int i_plane_count,
                        bool b_swap_uv )
 {
     assert( !b_swap_uv || i_plane_count >= 3 );
     int n;
-    for( n = 0; n < __MIN(i_plane_count, p_picture->i_planes-i_plane_start ); n++ )
+    for( n = 0; n < __MIN(i_plane_count, p_picture->i_planes); n++ )
     {
         const int nd = ( b_swap_uv && n >= 1 && n <= 2 ) ? (3 - n) : n;
-        pp_pixel[nd] = p_picture->p[i_plane_start+n].p_pixels;
-        pi_pitch[nd] = p_picture->p[i_plane_start+n].i_pitch;
+        pp_pixel[nd] = p_picture->p[n].p_pixels;
+        pi_pitch[nd] = p_picture->p[n].i_pitch;
     }
     for( ; n < 4; n++ )
     {
@@ -572,15 +571,15 @@ static void SwapUV( picture_t *p_dst, const picture_t *p_src )
     picture_CopyPixels( p_dst, &tmp );
 }
 static void Convert( filter_t *p_filter, struct SwsContext *ctx,
-                     picture_t *p_dst, picture_t *p_src, int i_height, int i_plane_start, int i_plane_count,
-                     bool b_swap_uvi, bool b_swap_uvo )
+                     picture_t *p_dst, picture_t *p_src, int i_height,
+                     int i_plane_count, bool b_swap_uvi, bool b_swap_uvo )
 {
     uint8_t palette[AVPALETTE_SIZE];
 
     uint8_t *src[4]; int src_stride[4];
     uint8_t *dst[4]; int dst_stride[4];
 
-    GetPixels( src, src_stride, p_src, i_plane_start, i_plane_count, b_swap_uvi );
+    GetPixels( src, src_stride, p_src, i_plane_count, b_swap_uvi );
     if( p_filter->fmt_in.video.i_chroma == VLC_CODEC_RGBP )
     {
         video_palette_t *src_pal =
@@ -595,7 +594,7 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
         src_stride[1] = 4;
     }
 
-    GetPixels( dst, dst_stride, p_dst, i_plane_start, i_plane_count, b_swap_uvo );
+    GetPixels( dst, dst_stride, p_dst, i_plane_count, b_swap_uvo );
 
 #if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
     sws_scale( ctx, src, src_stride, 0, i_height,
@@ -649,8 +648,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     else if( p_sys->b_copy )
         SwapUV( p_dst, p_src );
     else
-        Convert( p_filter, p_sys->ctx, p_dst, p_src, p_fmti->i_visible_height, 0, 3,
-                 p_sys->b_swap_uvi, p_sys->b_swap_uvo );
+        Convert( p_filter, p_sys->ctx, p_dst, p_src, p_fmti->i_visible_height,
+                 3, p_sys->b_swap_uvi, p_sys->b_swap_uvo );
     if( p_sys->ctxA )
     {
         /* We extract the A plane to rescale it, and then we reinject it. */
@@ -661,7 +660,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         else
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
 
-        Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_visible_height, 0, 1, false, false );
+        Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a,
+                 p_fmti->i_visible_height, 1, false, false );
         if( p_fmto->i_chroma == VLC_CODEC_RGBA || p_fmto->i_chroma == VLC_CODEC_BGRA )
             InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_visible_width * p_sys->i_extend_factor, p_fmto->i_visible_height, OFFSET_A );
         else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
