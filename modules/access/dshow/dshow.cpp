@@ -732,7 +732,7 @@ static int DemuxOpen( vlc_object_t *p_this )
             if( !p_stream->header.video.bmiHeader.biCompression )
             {
                 /* RGB DIB are coded from bottom to top */
-                fmt.video.i_height = (unsigned int)(-(int)fmt.video.i_height);
+                fmt.video.orientation = ORIENT_BOTTOM_LEFT;
             }
 
             /* Setup rgb mask for RGB formats */
