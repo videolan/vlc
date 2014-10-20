@@ -2737,6 +2737,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         }
     }
 
+    const MP4_Box_t *p_tsel;
     /* now create es */
     if( b_force_enable &&
         ( p_track->fmt.i_cat == VIDEO_ES || p_track->fmt.i_cat == AUDIO_ES ) )
@@ -2746,10 +2747,9 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         p_track->b_enable = true;
         p_track->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
     }
-    else
+    else if ( (p_tsel = MP4_BoxGet( p_box_trak, "udta/tsel" )) )
     {
-        const MP4_Box_t *p_tsel = MP4_BoxGet( p_box_trak, "udta/tsel" );
-        if ( p_tsel && BOXDATA(p_tsel) && BOXDATA(p_tsel)->i_switch_group )
+        if ( BOXDATA(p_tsel) && BOXDATA(p_tsel)->i_switch_group )
         {
             p_track->i_switch_group = BOXDATA(p_tsel)->i_switch_group;
             int i_priority = ES_PRIORITY_SELECTABLE_MIN;
@@ -2767,6 +2767,23 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                 p_track->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
             else
                 p_track->fmt.i_priority = i_priority;
+        }
+    }
+    /* If there's no tsel, try to enable the track coming first in edit list */
+    else if ( p_track->p_elst && p_track->fmt.i_priority == ES_PRIORITY_SELECTABLE_MIN )
+    {
+#define MAX_SELECTABLE (INT_MAX - ES_PRIORITY_SELECTABLE_MIN)
+        for ( uint32_t i=0; i<p_track->BOXDATA(p_elst)->i_entry_count; i++ )
+        {
+            if ( p_track->BOXDATA(p_elst)->i_media_time[i] >= 0 &&
+                 p_track->BOXDATA(p_elst)->i_segment_duration[i] )
+            {
+                /* We do selection by inverting start time into priority.
+                   The track with earliest edit will have the highest prio */
+                const int i_time = __MIN( MAX_SELECTABLE, p_track->BOXDATA(p_elst)->i_media_time[i] );
+                p_track->fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN + MAX_SELECTABLE - i_time;
+                break;
+            }
         }
     }
 
