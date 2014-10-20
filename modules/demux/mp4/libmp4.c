@@ -3531,6 +3531,8 @@ static const struct
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_in32 },
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_fl32 },
     { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_fl64 },
+    { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_QDMC },
+    { ATOM_wave,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_QDM2 },
     { ATOM_ilst,    MP4_ReadBox_ilst,         MP4_FreeBox_Common, ATOM_meta },
     { ATOM_mvex,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_moov },
     { ATOM_mvex,    MP4_ReadBoxContainer,     MP4_FreeBox_Common, ATOM_ftyp },
