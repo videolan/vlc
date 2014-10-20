@@ -518,24 +518,24 @@ static void GetPixels( uint8_t *pp_pixel[4], int pi_pitch[4],
 }
 
 static void ExtractA( picture_t *p_dst, const picture_t *restrict p_src,
-                      unsigned i_width, unsigned i_height, unsigned offset )
+                      unsigned offset )
 {
     plane_t *d = &p_dst->p[0];
     const plane_t *s = &p_src->p[0];
 
-    for( unsigned y = 0; y < i_height; y++ )
-        for( unsigned x = 0; x < i_width; x++ )
+    for( unsigned y = 0; y < p_dst->format.i_height; y++ )
+        for( unsigned x = 0; x < p_dst->format.i_width; x++ )
             d->p_pixels[y*d->i_pitch+x] = s->p_pixels[y*s->i_pitch+4*x+offset];
 }
 
 static void InjectA( picture_t *p_dst, const picture_t *restrict p_src,
-                     unsigned i_width, unsigned i_height, unsigned offset )
+                     unsigned offset )
 {
     plane_t *d = &p_dst->p[0];
     const plane_t *s = &p_src->p[0];
 
-    for( unsigned y = 0; y < i_height; y++ )
-        for( unsigned x = 0; x < i_width; x++ )
+    for( unsigned y = 0; y < p_src->format.i_height; y++ )
+        for( unsigned x = 0; x < p_src->format.i_width; x++ )
             d->p_pixels[y*d->i_pitch+4*x+offset] = s->p_pixels[y*s->i_pitch+x];
 }
 
@@ -654,18 +654,18 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     {
         /* We extract the A plane to rescale it, and then we reinject it. */
         if( p_fmti->i_chroma == VLC_CODEC_RGBA || p_fmti->i_chroma == VLC_CODEC_BGRA )
-            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_visible_width * p_sys->i_extend_factor, p_fmti->i_visible_height, OFFSET_A );
+            ExtractA( p_sys->p_src_a, p_src, OFFSET_A );
         else if( p_fmti->i_chroma == VLC_CODEC_ARGB )
-            ExtractA( p_sys->p_src_a, p_src, p_fmti->i_visible_width * p_sys->i_extend_factor, p_fmti->i_visible_height, 0 );
+            ExtractA( p_sys->p_src_a, p_src, 0 );
         else
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
 
         Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a,
                  p_fmti->i_visible_height, 1, false, false );
         if( p_fmto->i_chroma == VLC_CODEC_RGBA || p_fmto->i_chroma == VLC_CODEC_BGRA )
-            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_visible_width * p_sys->i_extend_factor, p_fmto->i_visible_height, OFFSET_A );
+            InjectA( p_dst, p_sys->p_dst_a, OFFSET_A );
         else if( p_fmto->i_chroma == VLC_CODEC_ARGB )
-            InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_visible_width * p_sys->i_extend_factor, p_fmto->i_visible_height, 0 );
+            InjectA( p_dst, p_sys->p_dst_a, 0 );
         else
             plane_CopyPixels( p_dst->p+A_PLANE, p_sys->p_dst_a->p );
     }
