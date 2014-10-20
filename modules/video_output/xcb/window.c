@@ -340,11 +340,11 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
-    if ((p_sys->keys != NULL)
-     && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
-        XCB_keyHandler_Destroy (p_sys->keys);
-        p_sys->keys = NULL;
+        if (p_sys->keys != NULL)
+            XCB_keyHandler_Destroy (p_sys->keys);
+        goto error;
     }
 
     xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
@@ -366,12 +366,10 @@ static void Close (vout_window_t *wnd)
     vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;
 
-    if (p_sys->keys)
-    {
-        vlc_cancel (p_sys->thread);
-        vlc_join (p_sys->thread, NULL);
+    vlc_cancel (p_sys->thread);
+    vlc_join (p_sys->thread, NULL);
+    if (p_sys->keys != NULL)
         XCB_keyHandler_Destroy (p_sys->keys);
-    }
     xcb_disconnect (conn);
     free (wnd->display.x11);
     free (p_sys);
@@ -606,7 +604,6 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
 
     p_sys->embedded = true;
-    p_sys->keys = NULL;
     wnd->type = VOUT_WINDOW_TYPE_XID;
     wnd->display.x11 = NULL;
     wnd->handle.xid = window;
@@ -640,16 +637,18 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         if (p_sys->keys != NULL)
             value |= XCB_EVENT_MASK_KEY_PRESS;
     }
+    else
+        p_sys->keys = NULL;
 
     if (value & ~XCB_EVENT_MASK_STRUCTURE_NOTIFY)
         xcb_change_window_attributes (conn, window, mask, &value);
 
     CacheAtoms (p_sys);
-    if ((p_sys->keys != NULL)
-     && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
-        XCB_keyHandler_Destroy (p_sys->keys);
-        p_sys->keys = NULL;
+        if (p_sys->keys != NULL)
+            XCB_keyHandler_Destroy (p_sys->keys);
+        goto error;
     }
 
     xcb_flush (conn);
