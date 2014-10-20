@@ -3748,6 +3748,8 @@ static const struct
     { ATOM_xid_,    MP4_ReadBox_Metadata,     MP4_FreeBox_Common,  ATOM_ilst },
 
     /* udta */
+    { ATOM_0x40PRM, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
+    { ATOM_0x40PRQ, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_0xa9ART, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_0xa9alb, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_0xa9ard, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
@@ -3798,6 +3800,7 @@ static const struct
     { ATOM_0xa9xpd, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_0xa9xyz, MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_chpl,    MP4_ReadBox_chpl,         MP4_FreeBox_chpl,    ATOM_udta }, /* nero unlabeled chapters list */
+    { ATOM_MCPS,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_name,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_vndr,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },
     { ATOM_SDLN,    MP4_ReadBox_String,       MP4_FreeBox_String,  ATOM_udta },

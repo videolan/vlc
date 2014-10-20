@@ -309,7 +309,10 @@
 #define ATOM_tsel VLC_FOURCC( 't', 's', 'e', 'l' )
 #define ATOM_xid_ VLC_FOURCC( 'x', 'i', 'd', ' ' )
 
+#define ATOM_0x40PRM VLC_FOURCC( '@', 'P', 'R', 'M' )
+#define ATOM_0x40PRQ VLC_FOURCC( '@', 'P', 'R', 'Q' )
 #define ATOM_chap VLC_FOURCC( 'c', 'h', 'a', 'p' )
+#define ATOM_MCPS VLC_FOURCC( 'M', 'C', 'P', 'S' )
 #define ATOM_SDLN VLC_FOURCC( 'S', 'D', 'L', 'N' )
 #define ATOM_vndr VLC_FOURCC( 'v', 'n', 'd', 'r' )
 

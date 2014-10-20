@@ -32,6 +32,8 @@ static const struct
     const uint32_t xa9_type;
     const vlc_meta_type_t meta_type;
 } xa9typetometa[] = {
+    { ATOM_0x40PRM, vlc_meta_EncodedBy }, /* Adobe Premiere */
+    { ATOM_0x40PRQ, vlc_meta_EncodedBy }, /* Adobe Qt */
     { ATOM_0xa9nam, vlc_meta_Title }, /* Full name */
     { ATOM_0xa9aut, vlc_meta_Artist },
     { ATOM_0xa9ART, vlc_meta_Artist },
@@ -47,6 +49,7 @@ static const struct
     { ATOM_0xa9enc, vlc_meta_EncodedBy }, /* Encoded By */
     { ATOM_0xa9pub, vlc_meta_Publisher },
     { ATOM_0xa9dir, vlc_meta_Director },
+    { ATOM_MCPS,    vlc_meta_EncodedBy }, /* Cleaner Pro */
     { 0, 0 },
 };
 
