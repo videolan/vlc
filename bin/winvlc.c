@@ -356,6 +356,9 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
             GetModuleFileName( mbi.AllocationBase, module, 256 );
             fwprintf( fd, L"%p|%ls\n", caller, module );
 
+            if( IsBadReadPtr( pBase, 2 * sizeof( void* ) ) )
+                break;
+
             /*The last BP points to NULL!*/
             caller = *(pBase + 1);
             if( !caller )
