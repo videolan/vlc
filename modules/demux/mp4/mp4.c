@@ -4280,6 +4280,12 @@ static mp4_fragment_t * GetFragmentByTime( demux_t *p_demux, const mtime_t i_tim
     mtime_t i_base_time = 0;
     while ( p_fragment )
     {
+        if ( p_fragment == &p_demux->p_sys->moovfragment &&
+             p_fragment->i_chunk_range_max_offset == 0 )
+        {
+            p_fragment = p_fragment->p_next;
+            continue;
+        }
         mtime_t i_length = CLOCK_FREQ * p_fragment->i_duration / p_demux->p_sys->i_timescale;
         if ( i_time >= i_base_time &&
              i_time <= i_base_time + i_length )
