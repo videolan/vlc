@@ -170,7 +170,7 @@ static int Setup( vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *pi_chroma )
     vlc_va_vda_t *p_vda = vlc_va_vda_Get( va );
 
     if( p_vda->hw_ctx.width == avctx->coded_width
-       && p_vda->hw_ctx.height == avctx->codec_height
+       && p_vda->hw_ctx.height == avctx->coded_height
        && p_vda->hw_ctx.decoder )
     {
         avctx->hwaccel_context = &p_vda->hw_ctx;
