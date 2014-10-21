@@ -307,6 +307,7 @@ typedef struct
 
 struct demux_sys_t
 {
+    stream_t   *stream;
     vlc_mutex_t     csa_lock;
 
     /* TS packet size (188, 192, 204) */
@@ -334,6 +335,7 @@ struct demux_sys_t
 #ifdef HAVE_ARIBB24
         arib_instance_t *p_instance;
 #endif
+        stream_t     *b25stream;
     } arib;
 
     /* All pid */
@@ -620,6 +622,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_dvb_start = 0;
     p_sys->i_dvb_length = 0;
 
+    p_sys->arib.b25stream = NULL;
+    p_sys->stream = p_demux->s;
+
     p_sys->b_broken_charset = false;
 
     for( int i = 0; i < 8192; i++ )
@@ -807,7 +812,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     bool can_seek = false;
-    stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &can_seek );
+    stream_Control( p_sys->stream, STREAM_CAN_FASTSEEK, &can_seek );
     if( can_seek  )
     {
         GetFirstPCR( p_demux );
@@ -913,6 +918,12 @@ static void Close( vlc_object_t *p_this )
         arib_instance_destroy( p_sys->arib.p_instance );
 #endif
 
+    if ( p_sys->arib.b25stream )
+    {
+        p_sys->arib.b25stream->p_source = NULL; /* don't chain kill demuxer's source */
+        stream_Delete( p_sys->arib.b25stream );
+    }
+
     vlc_mutex_destroy( &p_sys->csa_lock );
     free( p_sys );
 }
@@ -960,7 +971,7 @@ static int Demux( demux_t *p_demux )
         if( p_sys->b_start_record )
         {
             /* Enable recording once synchronized */
-            stream_Control( p_demux->s, STREAM_SET_RECORD_STATE, true, "ts" );
+            stream_Control( p_sys->stream, STREAM_SET_RECORD_STATE, true, "ts" );
             p_sys->b_start_record = false;
         }
 
@@ -1059,9 +1070,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             int64_t i_time, i_length;
             if( !DVBEventInformation( p_demux, &i_time, &i_length ) && i_length > 0 )
                 *pf = (double)i_time/(double)i_length;
-            else if( (i64 = stream_Size( p_demux->s) ) > 0 )
+            else if( (i64 = stream_Size( p_sys->stream) ) > 0 )
             {
-                int64_t offset = stream_Tell( p_demux->s );
+                int64_t offset = stream_Tell( p_sys->stream );
 
                 *pf = (double)offset / (double)i64;
             }
@@ -1081,8 +1092,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             (p_sys->b_dvb_meta && p_sys->b_access_control) ||
             p_sys->i_last_pcr - p_sys->i_first_pcr <= 0 )
         {
-            i64 = stream_Size( p_demux->s );
-            if( stream_Seek( p_demux->s, (int64_t)(i64 * f) ) )
+            i64 = stream_Size( p_sys->stream );
+            if( stream_Seek( p_sys->stream, (int64_t)(i64 * f) ) )
                 return VLC_EGENERIC;
         }
         else
@@ -1188,17 +1199,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         *va_arg( args, int* ) = 0; /* Title offset */
         *va_arg( args, int* ) = 0; /* Chapter offset */
-        return stream_Control( p_demux->s, STREAM_GET_TITLE_INFO, v, c );
+        return stream_Control( p_sys->stream, STREAM_GET_TITLE_INFO, v, c );
     }
 
     case DEMUX_SET_TITLE:
-        return stream_vaControl( p_demux->s, STREAM_SET_TITLE, args );
+        return stream_vaControl( p_sys->stream, STREAM_SET_TITLE, args );
 
     case DEMUX_SET_SEEKPOINT:
-        return stream_vaControl( p_demux->s, STREAM_SET_SEEKPOINT, args );
+        return stream_vaControl( p_sys->stream, STREAM_SET_SEEKPOINT, args );
 
     case DEMUX_GET_META:
-        return stream_vaControl( p_demux->s, STREAM_GET_META, args );
+        return stream_vaControl( p_sys->stream, STREAM_GET_META, args );
 
     case DEMUX_CAN_RECORD:
         pb_bool = (bool*)va_arg( args, bool * );
@@ -1209,12 +1220,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         b_bool = (bool)va_arg( args, int );
 
         if( !b_bool )
-            stream_Control( p_demux->s, STREAM_SET_RECORD_STATE, false );
+            stream_Control( p_sys->stream, STREAM_SET_RECORD_STATE, false );
         p_sys->b_start_record = b_bool;
         return VLC_SUCCESS;
 
     case DEMUX_GET_SIGNAL:
-        return stream_vaControl( p_demux->s, STREAM_GET_SIGNAL, args );
+        return stream_vaControl( p_sys->stream, STREAM_GET_SIGNAL, args );
 
     default:
         return VLC_EGENERIC;
@@ -1371,7 +1382,7 @@ static int SetPIDFilter( demux_t *p_demux, int i_pid, bool b_selected )
     if( !p_sys->b_access_control )
         return VLC_EGENERIC;
 
-    return stream_Control( p_demux->s, STREAM_SET_PRIVATE_ID_STATE,
+    return stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_STATE,
                            i_pid, b_selected );
 }
 
@@ -1989,7 +2000,7 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     block_t     *p_pkt;
 
     /* Get a new TS packet */
-    if( !( p_pkt = stream_Block( p_demux->s, p_sys->i_packet_size ) ) )
+    if( !( p_pkt = stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
     {
         msg_Dbg( p_demux, "eof ?" );
         return NULL;
@@ -2012,7 +2023,7 @@ static block_t* ReadTSPacket( demux_t *p_demux )
             const uint8_t *p_peek;
             int i_peek, i_skip = 0;
 
-            i_peek = stream_Peek( p_demux->s, &p_peek,
+            i_peek = stream_Peek( p_sys->stream, &p_peek,
                     p_sys->i_packet_size * 10 );
             if( i_peek < p_sys->i_packet_size + 1 )
             {
@@ -2030,14 +2041,14 @@ static block_t* ReadTSPacket( demux_t *p_demux )
                 i_skip++;
             }
             msg_Dbg( p_demux, "skipping %d bytes of garbage", i_skip );
-            stream_Read( p_demux->s, NULL, i_skip );
+            stream_Read( p_sys->stream, NULL, i_skip );
 
             if( i_skip < i_peek - p_sys->i_packet_size )
             {
                 break;
             }
         }
-        if( !( p_pkt = stream_Block( p_demux->s, p_sys->i_packet_size ) ) )
+        if( !( p_pkt = stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
         {
             msg_Dbg( p_demux, "eof ?" );
             return NULL;
@@ -2054,7 +2065,7 @@ static mtime_t AdjustPCRWrapAround( demux_t *p_demux, mtime_t i_pcr )
      * So, need to add 0x1FFFFFFFF, for calculating duration or current position.
      */
     mtime_t i_adjust = 0;
-    int64_t i_pos = stream_Tell( p_demux->s );
+    int64_t i_pos = stream_Tell( p_sys->stream );
     int i;
     for( i = 1; i < p_sys->i_pcrs_num && p_sys->p_pos[i] <= i_pos; ++i )
     {
@@ -2092,16 +2103,16 @@ static int SeekToPCR( demux_t *p_demux, int64_t i_pos )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     mtime_t i_pcr = -1;
-    const int64_t i_initial_pos = stream_Tell( p_demux->s );
+    const int64_t i_initial_pos = stream_Tell( p_sys->stream );
 
     if( i_pos < 0 )
         return VLC_EGENERIC;
 
-    int64_t i_last_pos = stream_Size( p_demux->s ) - p_sys->i_packet_size;
+    int64_t i_last_pos = stream_Size( p_sys->stream ) - p_sys->i_packet_size;
     if( i_pos > i_last_pos )
         i_pos = i_last_pos;
 
-    if( stream_Seek( p_demux->s, i_pos ) )
+    if( stream_Seek( p_sys->stream, i_pos ) )
         return VLC_EGENERIC;
 
     while( vlc_object_alive( p_demux ) )
@@ -2119,13 +2130,13 @@ static int SeekToPCR( demux_t *p_demux, int64_t i_pos )
         block_Release( p_pkt );
         if( i_pcr >= 0 )
             break;
-        if( stream_Tell( p_demux->s ) >= i_last_pos )
+        if( stream_Tell( p_sys->stream ) >= i_last_pos )
             break;
     }
     if( i_pcr < 0 )
     {
-        stream_Seek( p_demux->s, i_initial_pos );
-        assert( i_initial_pos == stream_Tell( p_demux->s ) );
+        stream_Seek( p_sys->stream, i_initial_pos );
+        assert( i_initial_pos == stream_Tell( p_sys->stream ) );
         return VLC_EGENERIC;
     }
 
@@ -2137,7 +2148,7 @@ static int Seek( demux_t *p_demux, double f_percent )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    int64_t i_initial_pos = stream_Tell( p_demux->s );
+    int64_t i_initial_pos = stream_Tell( p_sys->stream );
     mtime_t i_initial_pcr = p_sys->i_current_pcr;
 
     /*
@@ -2158,7 +2169,7 @@ static int Seek( demux_t *p_demux, double f_percent )
                 break;
         }
         i_head_pos = p_sys->p_pos[i-1];
-        i_tail_pos = ( i < p_sys->i_pcrs_num ) ?  p_sys->p_pos[i] : stream_Size( p_demux->s );
+        i_tail_pos = ( i < p_sys->i_pcrs_num ) ?  p_sys->p_pos[i] : stream_Size( p_sys->stream );
     }
     msg_Dbg( p_demux, "Seek():i_head_pos:%"PRId64", i_tail_pos:%"PRId64, i_head_pos, i_tail_pos);
 
@@ -2193,7 +2204,7 @@ static int Seek( demux_t *p_demux, double f_percent )
     if( !b_found )
     {
         msg_Dbg( p_demux, "Seek():cannot find a time position. i_cnt:%d", i_cnt );
-        stream_Seek( p_demux->s, i_initial_pos );
+        stream_Seek( p_sys->stream, i_initial_pos );
         p_sys->i_current_pcr = i_initial_pcr;
         return VLC_EGENERIC;
     }
@@ -2208,9 +2219,9 @@ static void GetFirstPCR( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    int64_t i_initial_pos = stream_Tell( p_demux->s );
+    int64_t i_initial_pos = stream_Tell( p_sys->stream );
 
-    if( stream_Seek( p_demux->s, 0 ) )
+    if( stream_Seek( p_sys->stream, 0 ) )
         return;
 
     while( vlc_object_alive (p_demux) )
@@ -2232,17 +2243,17 @@ static void GetFirstPCR( demux_t *p_demux )
         if( p_sys->i_first_pcr >= 0 )
             break;
     }
-    stream_Seek( p_demux->s, i_initial_pos );
+    stream_Seek( p_sys->stream, i_initial_pos );
 }
 
 static void GetLastPCR( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    const int64_t i_initial_pos = stream_Tell( p_demux->s );
+    const int64_t i_initial_pos = stream_Tell( p_sys->stream );
     mtime_t i_initial_pcr = p_sys->i_current_pcr;
 
-    int64_t i_stream_size = stream_Size( p_demux->s );
+    int64_t i_stream_size = stream_Size( p_sys->stream );
     int64_t i_last_pos = i_stream_size - p_sys->i_packet_size;
     /* Round i_pos to a multiple of p_sys->i_packet_size */
     int64_t i_pos = i_last_pos - p_sys->i_packet_size * 4500; /* FIXME if the value is not reasonable, please change it. */
@@ -2259,12 +2270,12 @@ static void GetLastPCR( demux_t *p_demux )
         if( SeekToPCR( p_demux, i_pos ) )
             break;
         p_sys->i_last_pcr = AdjustPCRWrapAround( p_demux, p_sys->i_current_pcr );
-        if( ( i_pos = stream_Tell( p_demux->s ) ) >= i_last_pos )
+        if( ( i_pos = stream_Tell( p_sys->stream ) ) >= i_last_pos )
             break;
     }
     if( p_sys->i_last_pcr >= 0 )
     {
-        int64_t i_size = stream_Size( p_demux->s );
+        int64_t i_size = stream_Size( p_sys->stream );
         mtime_t i_duration_msec = ( p_sys->i_last_pcr - p_sys->i_first_pcr ) * 100 / 9 / 1000;
         int64_t i_rate = ( i_size < 0 || i_duration_msec <= 0 ) ? 0 : i_size * 1000 * 8 / i_duration_msec;
         const int64_t TS_SUPPOSED_MAXRATE = 55 * 1000 * 1000; //FIXME I think it's enough.
@@ -2276,8 +2287,8 @@ static void GetLastPCR( demux_t *p_demux )
             p_sys->i_last_pcr = -1;
         }
     }
-    stream_Seek( p_demux->s, i_initial_pos );
-    assert( i_initial_pos == stream_Tell( p_demux->s ) );
+    stream_Seek( p_sys->stream, i_initial_pos );
+    assert( i_initial_pos == stream_Tell( p_sys->stream ) );
     p_sys->i_current_pcr = i_initial_pcr;
 }
 
@@ -2285,10 +2296,10 @@ static void CheckPCR( demux_t *p_demux )
 {
     demux_sys_t   *p_sys = p_demux->p_sys;
 
-    int64_t i_initial_pos = stream_Tell( p_demux->s );
+    int64_t i_initial_pos = stream_Tell( p_sys->stream );
     mtime_t i_initial_pcr = p_sys->i_current_pcr;
 
-    int64_t i_size = stream_Size( p_demux->s );
+    int64_t i_size = stream_Size( p_sys->stream );
 
     int i = 0;
     p_sys->p_pcrs[0] = p_sys->i_first_pcr;
@@ -2303,7 +2314,7 @@ static void CheckPCR( demux_t *p_demux )
         if( SeekToPCR( p_demux, i_pos ) )
             break;
         p_sys->p_pcrs[i] = p_sys->i_current_pcr;
-        p_sys->p_pos[i] = stream_Tell( p_demux->s );
+        p_sys->p_pos[i] = stream_Tell( p_sys->stream );
         if( p_sys->p_pcrs[i-1] > p_sys->p_pcrs[i] )
         {
             msg_Dbg( p_demux, "PCR Wrap Around found between %d%% and %d%% (pcr:%"PRId64"(0x%09"PRIx64") pcr:%"PRId64"(0x%09"PRIx64"))",
@@ -2316,7 +2327,7 @@ static void CheckPCR( demux_t *p_demux )
         p_sys->b_force_seek_per_percent = true;
     }
 
-    stream_Seek( p_demux->s, i_initial_pos );
+    stream_Seek( p_sys->stream, i_initial_pos );
     p_sys->i_current_pcr = i_initial_pcr;
 }
 
@@ -4769,10 +4780,21 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
     }
 
     /* Set CAM descrambling */
-    if( !ProgramIsSelected( p_demux, prg->i_number )
-     || stream_Control( p_demux->s, STREAM_SET_PRIVATE_ID_CA,
-                        p_pmt ) != VLC_SUCCESS )
+    if( !ProgramIsSelected( p_demux, prg->i_number ) )
+    {
         dvbpsi_DeletePMT( p_pmt );
+    }
+    else if( stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
+                             p_pmt ) != VLC_SUCCESS )
+    {
+        if ( p_sys->arib.e_mode == ARIBMODE_ENABLED )
+        {
+            p_sys->arib.b25stream = stream_FilterNew( p_demux->s, "aribcam" );
+            p_sys->stream = ( p_sys->arib.b25stream ) ? p_sys->arib.b25stream : p_demux->s;
+            if (!p_sys->arib.b25stream)
+                dvbpsi_DeletePMT( p_pmt );
+        } else dvbpsi_DeletePMT( p_pmt );
+    }
 
     for( int i = 0; i < i_clean; i++ )
     {
