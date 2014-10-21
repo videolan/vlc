@@ -335,6 +335,7 @@ static int Open( vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt )
     msg_Dbg( va, "VDA decoder Open success!");
 
     (void) fmt;
+    (void) avctx;
 
     return VLC_SUCCESS;
 }
