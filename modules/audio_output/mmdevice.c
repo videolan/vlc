@@ -283,7 +283,7 @@ vlc_AudioSessionEvents_OnIconPathChanged(IAudioSessionEvents *this,
 
 static STDMETHODIMP
 vlc_AudioSessionEvents_OnSimpleVolumeChanged(IAudioSessionEvents *this,
-                                             float vol, WINBOOL mute,
+                                             float vol, BOOL mute,
                                              LPCGUID ctx)
 {
     aout_sys_t *sys = vlc_AudioSessionEvents_sys(this);
