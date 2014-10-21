@@ -3402,28 +3402,30 @@ static int MP4_ReadBox_tfra( stream_t *p_stream, MP4_Box_t *p_box )
     if ( i < i_number_of_entries )
         i_number_of_entries = i;
 
+#ifdef MP4_ULTRA_VERBOSE
+    for( i = 0; i < i_number_of_entries; i++ )
+    {
+        if( p_tfra->i_version == 0 )
+        {
+            msg_Dbg( p_stream, "tfra[%"PRIu32"] time[%"PRIu32"]: %"PRIu32", "
+                               "moof_offset[%"PRIu32"]: %"PRIu32"",
+                     p_tfra->i_track_ID,
+                     i, p_tfra->p_time[i],
+                     i, p_tfra->p_moof_offset[i] );
+        }
+        else
+        {
+            msg_Dbg( p_stream, "tfra[%"PRIu32"] time[%"PRIu32"]: %"PRIu64", "
+                               "moof_offset[%"PRIu32"]: %"PRIu64"",
+                     p_tfra->i_track_ID,
+                     i, ((uint64_t *)(p_tfra->p_time))[i],
+                     i, ((uint64_t *)(p_tfra->p_moof_offset))[i] );
+        }
+    }
+#endif
 #ifdef MP4_VERBOSE
-    if( p_tfra->i_version == 0 )
-    {
-        msg_Dbg( p_stream, "time[0]: %"PRIu32", moof_offset[0]: %"PRIx32"",
-                         p_tfra->p_time[0], p_tfra->p_moof_offset[0] );
-
-        msg_Dbg( p_stream, "time[1]: %"PRIu32", moof_offset[1]: %"PRIx32"",
-                         p_tfra->p_time[1], p_tfra->p_moof_offset[1] );
-    }
-    else
-    {
-        msg_Dbg( p_stream, "time[0]: %"PRIu64", moof_offset[0]: %"PRIx64"",
-                ((uint64_t *)(p_tfra->p_time))[0],
-                ((uint64_t *)(p_tfra->p_moof_offset))[0] );
-
-        msg_Dbg( p_stream, "time[1]: %"PRIu64", moof_offset[1]: %"PRIx64"",
-                ((uint64_t *)(p_tfra->p_time))[1],
-                ((uint64_t *)(p_tfra->p_moof_offset))[1] );
-    }
-
-    msg_Dbg( p_stream, "number_of_entries is %"PRIu32"", i_number_of_entries );
-    msg_Dbg( p_stream, "track ID is: %"PRIu32"", p_tfra->i_track_ID );
+    msg_Dbg( p_stream, "tfra[%"PRIu32"] %"PRIu32" entries",
+             p_tfra->i_track_ID, i_number_of_entries );
 #endif
 
     MP4_READBOX_EXIT( 1 );
