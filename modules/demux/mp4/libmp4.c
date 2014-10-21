@@ -783,7 +783,7 @@ static int MP4_ReadBox_trun(  stream_t *p_stream, MP4_Box_t *p_box )
             MP4_GET4BYTES( p_sample->i_composition_time_offset );
     }
 
-#ifdef MP4_VERBOSE
+#ifdef MP4_ULTRA_VERBOSE
     msg_Dbg( p_stream, "read box: \"trun\" version %u flags 0x%x sample count %u",
                   p_box->data.p_trun->i_version,
                   p_box->data.p_trun->i_flags,
