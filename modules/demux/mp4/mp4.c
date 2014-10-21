@@ -4311,7 +4311,9 @@ static mtime_t LeafGetFragmentTimeOffset( demux_t *p_demux, mp4_fragment_t *p_fr
     mp4_fragment_t *p_current = &p_demux->p_sys->moovfragment;
     while ( p_current != p_fragment )
     {
-        i_base_scaledtime += p_current->i_duration;
+        if ( p_current != &p_demux->p_sys->moovfragment ||
+             p_current->i_chunk_range_max_offset )
+            i_base_scaledtime += p_current->i_duration;
         p_current = p_current->p_next;
     }
     return i_base_scaledtime;
