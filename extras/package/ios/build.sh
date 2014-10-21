@@ -3,6 +3,7 @@ set -e
 
 PLATFORM=OS
 VERBOSE=no
+DEBUG=no
 SDK_VERSION=7.0
 SDK_MIN=6.1
 SIXTYFOURBIT_SDK_MIN=7.0
@@ -11,12 +12,14 @@ ARCH=armv7
 usage()
 {
 cat << EOF
-usage: $0 [-s] [-k sdk]
+usage: $0 [-s] [-d] [-v] [-k sdk]
 
 OPTIONS
    -k <sdk version>      Specify which sdk to use ('xcodebuild -showsdks', current: ${SDK_VERSION})
    -s            Build for simulator
    -a <arch>     Specify which arch to use (current: ${ARCH})
+   -d            Enable debug
+   -v            Enable verbose command-line output
 EOF
 }
 
@@ -37,7 +40,7 @@ info()
     echo "[${blue}info${normal}] $1"
 }
 
-while getopts "hvsk:a:" OPTION
+while getopts "hvdsk:a:" OPTION
 do
      case $OPTION in
          h)
@@ -49,6 +52,9 @@ do
              ;;
          s)
              PLATFORM=Simulator
+             ;;
+         d)
+             DEBUG=yes
              ;;
          k)
              SDK_VERSION=$OPTARG
@@ -78,9 +84,13 @@ info "Building libvlc for iOS"
 
 if [ "$PLATFORM" = "Simulator" ]; then
     TARGET="${ARCH}-apple-darwin11"
-    OPTIM="-O3 -g"
 else
     TARGET="arm-apple-darwin11"
+fi
+
+if [ "$DEBUG" = "yes" ]; then
+    OPTIM="-O0 -g"
+else
     OPTIM="-O3 -g"
 fi
 
@@ -210,7 +220,7 @@ else
     export ASCPP="xcrun as"
 fi
 
-../bootstrap --build=x86_64-apple-darwin11 --host=${TARGET} --prefix=${VLCROOT}/contrib/${TARGET}-${ARCH} --disable-gpl \
+../bootstrap --build=x86_64-apple-darwin11 --host=${TARGET} --prefix=${VLCROOT}/contrib/${TARGET}-${ARCH} --arch=${ARCH} --disable-gpl \
     --disable-disc --disable-sout \
     --disable-sdl \
     --disable-SDL_image \
@@ -270,6 +280,12 @@ spushd ${BUILDDIR}
 
 info ">> --prefix=${PREFIX} --host=${TARGET}"
 
+if [ "$DEBUG" = "yes" ]; then
+    DEBUGFLAG="--enable-debug"
+else
+    DEBUGFLAG="--disable-debug"
+fi
+
 # Run configure only upon changes.
 if [ "${VLCROOT}/configure" -nt config.log -o \
      "${THIS_SCRIPT_PATH}" -nt config.log ]; then
@@ -277,8 +293,8 @@ ${VLCROOT}/configure \
     --prefix="${PREFIX}" \
     --host="${TARGET}" \
     --with-contrib="${VLCROOT}/contrib/${TARGET}-${ARCH}" \
-    --disable-debug \
     --enable-static \
+    ${DEBUGFLAG} \
     --disable-macosx \
     --disable-macosx-dialog-provider \
     --disable-macosx-qtkit \
