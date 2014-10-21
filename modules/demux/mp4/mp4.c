@@ -873,14 +873,21 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
+#ifdef MP4_VERBOSE
+    mtime_t i_total_duration = 0;
     mp4_fragment_t *p_fragment = &p_sys->moovfragment;
     while ( p_fragment )
     {
-        msg_Dbg( p_demux, "fragment offset %"PRId64", data %"PRIu64"<->%"PRIu64", duration %"PRId64,
+        if ( p_fragment != &p_sys->moovfragment || p_fragment->i_chunk_range_max_offset )
+            i_total_duration += CLOCK_FREQ * p_fragment->i_duration / p_sys->i_timescale;
+        msg_Dbg( p_demux, "fragment offset %"PRId64", data %"PRIu64"<->%"PRIu64", "
+                 "duration %"PRId64" @%"PRId64,
                  p_fragment->p_moox->i_pos, p_fragment->i_chunk_range_min_offset,
-                 p_fragment->i_chunk_range_max_offset, CLOCK_FREQ * p_fragment->i_duration / p_sys->i_timescale );
+                 p_fragment->i_chunk_range_max_offset,
+                 CLOCK_FREQ * p_fragment->i_duration / p_sys->i_timescale, i_total_duration );
         p_fragment = p_fragment->p_next;
     }
+#endif
 
     /* */
     LoadChapter( p_demux );
