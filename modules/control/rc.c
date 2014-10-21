@@ -482,7 +482,7 @@ static void *Run( void *data )
     if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
     {
         msg_Err( p_intf, "couldn't find user input handle" );
-        return;
+        return NULL;
     }
 #endif
 
