@@ -3298,7 +3298,8 @@ static int MP4_ReadBox_tfra( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_ENTER( MP4_Box_data_tfra_t );
     MP4_Box_data_tfra_t *p_tfra = p_box->data.p_tfra;
     MP4_GETVERSIONFLAGS( p_box->data.p_tfra );
-
+    if ( p_tfra->i_version > 1 )
+        MP4_READBOX_EXIT( 0 );
     MP4_GET4BYTES( p_tfra->i_track_ID );
     uint32_t i_lengths = 0;
     MP4_GET4BYTES( i_lengths );
