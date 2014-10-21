@@ -3033,6 +3033,11 @@ AS_IF( [test "${enable_aribsub}" != "no" ],[
 AM_CONDITIONAL([HAVE_ARIBB24], [test x"${have_aribb24}" = x"yes"])
 
 dnl
+dnl ARIB B25
+dnl
+PKG_ENABLE_MODULES_VLC([ARIBB25], [aribcam], [aribb25 >= 0.2.6], [ARIB STD-B25], [auto])
+
+dnl
 dnl  kate decoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([KATE], [], [kate >= 0.3.0], [kate codec], [auto])

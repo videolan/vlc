@@ -29,6 +29,9 @@ Demuxers:
  * Support WMV and WMAV in MP4/mov, aka Flip4Mac files
  * Support bitmap audio channel reordering in MP4/mov
 
+Stream filter:
+ * Added ARIB STD-B25 TS streams decoder
+
 Video ouput:
  * Wayland shell surface window provider
  * Wayland shared memory video output
