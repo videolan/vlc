@@ -69,6 +69,9 @@ public:
     virtual void setOriginalWidth( int width ) { original_width = width; }
     virtual void setOriginalHeight( int height ) { original_height = height; }
 
+    /// Resize the window
+    virtual void resize( int width, int height );
+
     virtual string getType() const { return "Vout"; }
 
 private:

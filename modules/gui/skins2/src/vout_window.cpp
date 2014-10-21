@@ -77,6 +77,7 @@ void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
         setParent( pCtrlVideo->getWindow(), x, y, w, h );
         m_pParentWindow = pCtrlVideo->getWindow();
 
+        resize( w, h );
         show();
     }
     else
@@ -89,10 +90,21 @@ void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
                    0, 0, w, h );
         m_pParentWindow =
                   VoutManager::instance( getIntf() )->getVoutMainWindow();
+
+        resize( w, h );
         show();
     }
 
     m_pCtrlVideo = pCtrlVideo;
+}
+
+
+void VoutWindow::resize( int width, int height )
+{
+    GenericWindow::resize( width, height );
+
+    if( m_pWnd )
+        vout_window_ReportSize( m_pWnd, width, height );
 }
 
 
