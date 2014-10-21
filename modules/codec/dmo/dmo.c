@@ -386,7 +386,8 @@ static int DecOpen( decoder_t *p_dec )
 
         dmo_input_type.majortype  = MEDIATYPE_Audio;
         dmo_input_type.subtype    = dmo_input_type.majortype;
-        dmo_input_type.subtype.Data1 = p_dec->fmt_in.i_original_fourcc ?: p_dec->fmt_in.i_codec;
+        dmo_input_type.subtype.Data1 = p_dec->fmt_in.i_original_fourcc ?
+                                p_dec->fmt_in.i_original_fourcc : p_dec->fmt_in.i_codec;
         fourcc_to_wf_tag( p_dec->fmt_in.i_codec, &i_tag );
         if( i_tag ) dmo_input_type.subtype.Data1 = i_tag;
 
@@ -417,7 +418,8 @@ static int DecOpen( decoder_t *p_dec )
             memcpy( &p_vih[1], p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
 
         p_bih = &p_vih->bmiHeader;
-        p_bih->biCompression = p_dec->fmt_in.i_original_fourcc ?: p_dec->fmt_in.i_codec;
+        p_bih->biCompression = p_dec->fmt_in.i_original_fourcc ?
+                            p_dec->fmt_in.i_original_fourcc : p_dec->fmt_in.i_codec;
         p_bih->biWidth = p_dec->fmt_in.video.i_width;
         p_bih->biHeight = p_dec->fmt_in.video.i_height;
         p_bih->biBitCount = p_dec->fmt_in.video.i_bits_per_pixel;
@@ -432,7 +434,8 @@ static int DecOpen( decoder_t *p_dec )
 
         dmo_input_type.majortype  = MEDIATYPE_Video;
         dmo_input_type.subtype    = dmo_input_type.majortype;
-        dmo_input_type.subtype.Data1 = p_dec->fmt_in.i_original_fourcc ?: p_dec->fmt_in.i_codec;
+        dmo_input_type.subtype.Data1 = p_dec->fmt_in.i_original_fourcc ?
+                                p_dec->fmt_in.i_original_fourcc: p_dec->fmt_in.i_codec;
         dmo_input_type.formattype = FORMAT_VideoInfo;
         dmo_input_type.bFixedSizeSamples = 0;
         dmo_input_type.bTemporalCompression = 1;
@@ -672,7 +675,8 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
         uint16_t i_tag;
         dmo_partial_type.type = MEDIATYPE_Audio;
         dmo_partial_type.subtype = dmo_partial_type.type;
-        dmo_partial_type.subtype.Data1 = p_fmt->i_original_fourcc ?: p_fmt->i_codec;
+        dmo_partial_type.subtype.Data1 = p_fmt->i_original_fourcc ?
+                                        p_fmt->i_original_fourcc : p_fmt->i_codec;
         fourcc_to_wf_tag( p_fmt->i_codec, &i_tag );
         if( i_tag ) dmo_partial_type.subtype.Data1 = i_tag;
     }
@@ -680,7 +684,8 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     {
         dmo_partial_type.type = MEDIATYPE_Video;
         dmo_partial_type.subtype = dmo_partial_type.type;
-        dmo_partial_type.subtype.Data1 = p_fmt->i_original_fourcc ?: p_fmt->i_codec;
+        dmo_partial_type.subtype.Data1 = p_fmt->i_original_fourcc ?
+                                        p_fmt->i_original_fourcc : p_fmt->i_codec;
     }
 
     /* Load msdmo DLL */
