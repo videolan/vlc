@@ -111,7 +111,7 @@ typedef struct
 #define VORBIS_HEADER_SETUP          3
 #define VORBIS_HEADER_TO_FLAG(i)     (1 << (i - 1))
 #define VORBIS_HEADERS_VALID(p_stream) \
-    ((p_stream->special.vorbis.i_headers_flags & 0b111) == 0b111)
+    ((p_stream->special.vorbis.i_headers_flags & 0x07) == 0x07) // 0b111
 
 /*****************************************************************************
  * Local prototypes

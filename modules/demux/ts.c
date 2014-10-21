@@ -4497,7 +4497,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
                 break;
             }
         }
-        if ( i_arib_flags == 0b111 )
+        if ( i_arib_flags == 0x07 ) //0b111
             p_sys->arib.e_mode = ARIBMODE_ENABLED;
     }
 

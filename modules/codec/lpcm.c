@@ -1012,10 +1012,10 @@ static int WidiHeader( unsigned *pi_rate,
 
     switch( ( p_header[3] & 0x38 ) >> 3 )
     {
-    case 0b001:
+    case 0x01: //0b001
         *pi_rate = 44100;
         break;
-    case 0b010:
+    case 0x02: //0b010
         *pi_rate = 48000;
         break;
     default:
