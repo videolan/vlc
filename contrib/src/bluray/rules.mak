@@ -13,7 +13,6 @@ endif
 DEPS_bluray = libxml2 $(DEPS_libxml2) freetype2 $(DEPS_freetype2)
 
 BLURAY_CONF = --disable-examples  \
-              --disable-debug     \
               --with-libxml2      \
               --enable-bdjava
 
