@@ -44,8 +44,7 @@
 #include "../libs.h"
 #include "../extension.h"
 
-static const luaL_Reg vlclua_input_reg[];
-static const luaL_Reg vlclua_input_item_reg[];
+extern const luaL_Reg vlclua_input_item_reg[];
 
 static input_item_t* vlclua_input_item_get_internal( lua_State *L );
 
