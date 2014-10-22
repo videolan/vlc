@@ -3023,8 +3023,8 @@ AS_IF( [test "${enable_aribsub}" != "no" ],[
       AC_MSG_WARN(Library [aribb24] needed for [aribsub] was not found)
       have_aribb24="no"
   ])
-  AM_CONDITIONAL([HAVE_ARIBB24], [test "${have_aribb24}" = "yes"])
 ])
+AM_CONDITIONAL([HAVE_ARIBB24], [test x"${have_aribb24}" = x"yes"])
 
 dnl
 dnl  kate decoder plugin
