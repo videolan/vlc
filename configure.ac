@@ -609,6 +609,7 @@ AC_CHECK_TYPES([struct pollfd],,,
 #if HAVE_POLL
 # include <poll.h>
 #elif defined (_WIN32)
+# define _WIN32_WINNT 0x502
 # include <winsock2.h>
 #endif
 ])
