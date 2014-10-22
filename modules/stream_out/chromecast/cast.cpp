@@ -73,7 +73,8 @@ enum
 struct sout_stream_sys_t
 {
     sout_stream_sys_t()
-        : p_tls(NULL), i_status(CHROMECAST_DISCONNECTED), p_out(NULL)
+        : p_tls(NULL), i_requestId(0),
+          i_status(CHROMECAST_DISCONNECTED), p_out(NULL)
     {
         atomic_init(&ab_error, false);
     }
