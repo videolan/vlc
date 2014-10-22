@@ -14,7 +14,7 @@ DEPS_bluray = libxml2 $(DEPS_libxml2) freetype2 $(DEPS_freetype2)
 
 BLURAY_CONF = --disable-examples  \
               --disable-debug     \
-              --enable-libxml2    \
+              --with-libxml2      \
               --enable-bdjava
 
 $(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.bz2:
