@@ -163,6 +163,8 @@ ifeq ($(call need_pkg,"libavcodec >= 54.25.0 libavformat >= 53.21.0 libswscale")
 PKGS_FOUND += ffmpeg
 endif
 
+FFMPEGCONF += --nm="$(NM)" --ar="$(AR)"
+
 $(TARBALLS)/ffmpeg-$(HASH).tar.gz:
 	$(call download,$(FFMPEG_SNAPURL))
 
