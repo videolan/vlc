@@ -1311,9 +1311,9 @@ static bool f_appExit = false;
 
     [o_playlist updateRowSelection];
     [o_mainwindow updateWindow];
+    [o_mainwindow updateName];
     [self updateDelays];
     [self updateMainMenu];
-    [self playlistUpdated];
 
     /*
      * Due to constraints within NSAttributedString's main loop runtime handling
