@@ -90,13 +90,13 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         BOOL (WINAPI * mySetDllDirectoryA)(const char* lpPathName);
 # define PROCESS_DEP_ENABLE 1
 
-        mySetProcessDEPPolicy = (BOOL WINAPI (*)(DWORD))
+        mySetProcessDEPPolicy = (BOOL (WINAPI *)(DWORD))
                             GetProcAddress(h_Kernel32, "SetProcessDEPPolicy");
         if(mySetProcessDEPPolicy)
             mySetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
         /* Do NOT load any library from cwd. */
-        mySetDllDirectoryA = (BOOL WINAPI (*)(const char*))
+        mySetDllDirectoryA = (BOOL (WINAPI *)(const char*))
                             GetProcAddress(h_Kernel32, "SetDllDirectoryA");
         if(mySetDllDirectoryA)
             mySetDllDirectoryA("");
