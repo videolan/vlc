@@ -561,14 +561,16 @@ static int CropCallback( vlc_object_t *object, char const *cmd,
 static int CropBorderCallback(vlc_object_t *object, char const *cmd,
                               vlc_value_t oldval, vlc_value_t newval, void *data)
 {
-    vout_thread_t *vout = (vout_thread_t *)object;
-    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data); VLC_UNUSED(newval);
+    char buf[4 * 21];
 
-    vout_ControlChangeCropBorder(vout,
-                                 var_GetInteger(object, "crop-left"),
-                                 var_GetInteger(object, "crop-top"),
-                                 var_GetInteger(object, "crop-right"),
-                                 var_GetInteger(object, "crop-bottom"));
+    snprintf(buf, sizeof (buf), "%"PRIu64"+%"PRIu64"+%"PRIu64"+%"PRIu64,
+             var_GetInteger(object, "crop-left"),
+             var_GetInteger(object, "crop-top"),
+             var_GetInteger(object, "crop-right"),
+             var_GetInteger(object, "crop-bottom"));
+    var_SetString(object, "crop", buf);
+
+    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data); VLC_UNUSED(newval);
     return VLC_SUCCESS;
 }
 
