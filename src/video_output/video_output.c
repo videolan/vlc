@@ -541,6 +541,14 @@ void vout_ControlChangeWindowState(vout_thread_t *vout, unsigned st)
     vlc_mutex_unlock(&vout->p->window_lock);
 }
 
+static void vout_ControlUpdateWindowSize(vout_thread_t *vout)
+{
+    vlc_mutex_lock(&vout->p->window_lock);
+    if (vout->p->window != NULL)
+        vout_display_window_UpdateSize(vout->p->window, &vout->p->original);
+    vlc_mutex_unlock(&vout->p->window_lock);
+}
+
 void vout_ControlChangeDisplaySize(vout_thread_t *vout,
                                    unsigned width, unsigned height)
 {
@@ -558,47 +566,60 @@ void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
     vout_control_PushBool(&vout->p->control, VOUT_CONTROL_DISPLAY_FILLED,
                           is_filled);
 }
+
 void vout_ControlChangeZoom(vout_thread_t *vout, int num, int den)
 {
+    vout_ControlUpdateWindowSize(vout);
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ZOOM,
                           num, den);
 }
+
 void vout_ControlChangeSampleAspectRatio(vout_thread_t *vout,
                                          unsigned num, unsigned den)
 {
+    vout_ControlUpdateWindowSize(vout);
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ASPECT_RATIO,
                           num, den);
 }
+
 void vout_ControlChangeCropRatio(vout_thread_t *vout,
                                  unsigned num, unsigned den)
 {
+    vout_ControlUpdateWindowSize(vout);
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_CROP_RATIO,
                           num, den);
 }
+
 void vout_ControlChangeCropWindow(vout_thread_t *vout,
                                   int x, int y, int width, int height)
 {
     vout_control_cmd_t cmd;
+
+    vout_ControlUpdateWindowSize(vout);
+
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_WINDOW);
     cmd.window.x      = __MAX(x, 0);
     cmd.window.y      = __MAX(y, 0);
     cmd.window.width  = __MAX(width, 0);
     cmd.window.height = __MAX(height, 0);
-
     vout_control_Push(&vout->p->control, &cmd);
 }
+
 void vout_ControlChangeCropBorder(vout_thread_t *vout,
                                   int left, int top, int right, int bottom)
 {
     vout_control_cmd_t cmd;
+
+    vout_ControlUpdateWindowSize(vout);
+
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_BORDER);
     cmd.border.left   = __MAX(left, 0);
     cmd.border.top    = __MAX(top, 0);
     cmd.border.right  = __MAX(right, 0);
     cmd.border.bottom = __MAX(bottom, 0);
-
     vout_control_Push(&vout->p->control, &cmd);
 }
+
 void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
 {
     vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_FILTERS,

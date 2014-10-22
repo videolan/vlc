@@ -289,6 +289,11 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
     return window;
 }
 
+void vout_display_window_UpdateSize(vout_window_t *window,
+                                    const video_format_t *restrict fmt)
+{
+}
+
 /**
  * Destroys a video window.
  * \note The window must be detached.
