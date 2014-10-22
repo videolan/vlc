@@ -284,20 +284,21 @@ static int Open(vlc_object_t *p_this)
 
     // Lock the sout thread until we have sent the media loading command to the Chromecast.
     int i_ret = 0;
+    const mtime_t deadline = mdate() + 6 * CLOCK_FREQ;
+    vlc_mutex_lock(&p_sys->lock);
+    while (p_sys->i_status != CHROMECAST_MEDIA_LOAD_SENT)
     {
-        const mtime_t deadline = mdate() + 6 * CLOCK_FREQ;
-        vlc_mutex_locker locker(&p_sys->lock);
-        while (p_sys->i_status != CHROMECAST_MEDIA_LOAD_SENT)
-            i_ret = vlc_cond_timedwait(&p_sys->loadCommandCond, &p_sys->lock, deadline);
+        i_ret = vlc_cond_timedwait(&p_sys->loadCommandCond, &p_sys->lock, deadline);
+        if (i_ret == ETIMEDOUT)
+        {
+            msg_Err(p_stream, "Timeout reached before sending the media loading command");
+            vlc_mutex_unlock(&p_sys->lock);
+            vlc_cancel(p_sys->chromecastThread);
+            Clean(p_stream);
+            return VLC_EGENERIC;
+        }
     }
-    if (i_ret == ETIMEDOUT)
-    {
-        msg_Err(p_stream, "Timeout reached before sending the media loading command");
-        vlc_cancel(p_sys->chromecastThread);
-        vlc_join(p_sys->chromecastThread, NULL);
-        Clean(p_stream);
-        return VLC_EGENERIC;
-    }
+    vlc_mutex_unlock(&p_sys->lock);
 
     /* Even uglier: sleep more to let to the Chromecast initiate the connection
      * to the http server. */
