@@ -150,11 +150,7 @@ else
 export CFLAGS="${CFLAGS} -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
 fi
 else
-if [ "$ARCH" != "x86_64" ]; then
-export CFLAGS="${CFLAGS} -miphoneos-version-min=${SDK_MIN}"
-else
 export CFLAGS="${CFLAGS} -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
-fi
 fi
 
 export CXXFLAGS="${CFLAGS} -stdlib=libstdc++"
@@ -189,15 +185,9 @@ fi
 else
     EXTRA_CFLAGS="-arch ${ARCH}"
     EXTRA_LDFLAGS="-arch ${ARCH}"
-if [ "$ARCH" != "x86_64" ]; then
-    EXTRA_CFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
-    EXTRA_LDFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
-    export LDFLAGS="${LDFLAGS} -miphoneos-version-min=${SDK_MIN}"
-else
     EXTRA_CFLAGS+=" -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
     EXTRA_LDFLAGS+=" -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
     export LDFLAGS="${LDFLAGS} -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
-fi
 fi
 
 
