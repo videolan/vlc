@@ -149,7 +149,7 @@ static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
 
 void vout_IntfInit( vout_thread_t *p_vout )
 {
-    vlc_value_t val, text, old_val;
+    vlc_value_t val, text;
     char *psz_buf;
 
     /* Create a few object variables we'll need later on */
@@ -182,19 +182,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     text.psz_string = _("Zoom");
     var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, &text, NULL );
-    old_val.f_float = var_GetFloat( p_vout, "zoom" );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_zoom_values); i++ )
     {
         val.f_float = p_zoom_values[i].f_value;
         text.psz_string = vlc_gettext( p_zoom_values[i].psz_label );
-        /* FIXME: This DELCHOICE hack corrupts the the "zoom" variable value
-         * for a short time window. Same for "crop" and "aspect-ratio". */
-        if( old_val.f_float == val.f_float )
-            var_Change( p_vout, "zoom", VLC_VAR_DELCHOICE, &old_val, NULL );
         var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
-        if( old_val.f_float == val.f_float )
-            var_Change( p_vout, "zoom", VLC_VAR_SETVALUE, &old_val, NULL );
     }
 
     var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
@@ -216,9 +209,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     text.psz_string = _("Crop");
     var_Change( p_vout, "crop", VLC_VAR_SETTEXT, &text, NULL );
-
-    val.psz_string = (char*)"";
-    var_Change( p_vout, "crop", VLC_VAR_DELCHOICE, &val, 0 );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_crop_values); i++ )
     {
@@ -246,9 +236,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     text.psz_string = _("Aspect ratio");
     var_Change( p_vout, "aspect-ratio", VLC_VAR_SETTEXT, &text, NULL );
-
-    val.psz_string = (char*)"";
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_DELCHOICE, &val, 0 );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_aspect_ratio_values); i++ )
     {
