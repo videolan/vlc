@@ -1569,8 +1569,7 @@ vlc_module_begin ()
         change_safe ()
     add_bool( "autoscale", true, AUTOSCALE_TEXT, AUTOSCALE_LONGTEXT, false )
         change_safe ()
-    add_float( "scale", 1.0, SCALEFACTOR_TEXT, SCALEFACTOR_LONGTEXT, false )
-        change_safe ()
+    add_obsolete_float( "scale" ) /* since 3.0.0 */
     add_string( "monitor-par", NULL,
                 MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, true )
     add_string( "custom-aspect-ratios", NULL, CUSTOM_ASPECT_RATIOS_TEXT,
@@ -1583,6 +1582,7 @@ vlc_module_begin ()
     add_integer( "align", 0, ALIGN_TEXT, ALIGN_LONGTEXT, true )
         change_integer_list( pi_align_values, ppsz_align_descriptions )
     add_float( "zoom", 1., ZOOM_TEXT, ZOOM_LONGTEXT, true )
+        change_safe()
     add_integer( "deinterlace", 0,
                  DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
         change_integer_list( pi_deinterlace, ppsz_deinterlace_text )

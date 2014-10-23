@@ -55,8 +55,6 @@ static int AspectCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int AutoScaleCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
-static int ScaleCallback( vlc_object_t *, char const *,
-                          vlc_value_t, vlc_value_t, void * );
 static int ZoomCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static int AboveCallback( vlc_object_t *, char const *,
@@ -170,13 +168,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "autoscale", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "autoscale", AutoScaleCallback, NULL );
 
-    var_Create( p_vout, "scale", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT
-                | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Scale factor");
-    var_Change( p_vout, "scale", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_vout, "scale", ScaleCallback, NULL );
-
-    /* Zoom object var */
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
                 VLC_VAR_DOINHERIT );
 
@@ -599,21 +590,14 @@ static int AutoScaleCallback( vlc_object_t *obj, char const *name,
     return VLC_SUCCESS;
 }
 
-static int ScaleCallback( vlc_object_t *obj, char const *name,
-                          vlc_value_t prev, vlc_value_t cur, void *data )
+static int ZoomCallback( vlc_object_t *obj, char const *name,
+                         vlc_value_t prev, vlc_value_t cur, void *data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)obj;
 
     (void) name; (void) prev; (void) data;
     vout_ControlChangeZoom( p_vout, 1000 * cur.f_float, 1000 );
     return VLC_SUCCESS;
-}
-
-static int ZoomCallback( vlc_object_t *obj, char const *name,
-                         vlc_value_t prev, vlc_value_t cur, void *data )
-{
-    (void) name; (void) prev; (void) data;
-    return var_SetFloat( obj, "scale", cur.f_float );
 }
 
 static int AboveCallback( vlc_object_t *obj, char const *name,

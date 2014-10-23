@@ -616,7 +616,7 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     cfg->display.sar.num = msar_num;
     cfg->display.sar.den = msar_den;
     unsigned zoom_den = 1000;
-    unsigned zoom_num = zoom_den * var_CreateGetFloat(vout, "scale");
+    unsigned zoom_num = zoom_den * var_CreateGetFloat(vout, "zoom");
     vlc_ureduce(&zoom_num, &zoom_den, zoom_num, zoom_den, 0);
     cfg->zoom.num = zoom_num;
     cfg->zoom.den = zoom_den;
