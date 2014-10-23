@@ -98,26 +98,6 @@ static void DupString( vlc_value_t *p_val )
 static void FreeDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
 static void FreeString( vlc_value_t *p_val ) { free( p_val->psz_string ); }
 
-static void FreeList( vlc_value_t *p_val )
-{
-    int i;
-    for( i = 0; i < p_val->p_list->i_count; i++ )
-    {
-        switch( p_val->p_list->i_type & VLC_VAR_CLASS )
-        {
-        case VLC_VAR_STRING:
-            FreeString( &p_val->p_list->p_values[i] );
-            break;
-        default:
-            break;
-        }
-    }
-
-    if( p_val->p_list->i_count )
-        free( p_val->p_list->p_values );
-    free( p_val->p_list );
-}
-
 static const struct variable_ops_t
 void_ops   = { NULL,       DupDummy,  FreeDummy,  },
 addr_ops   = { CmpAddress, DupDummy,  FreeDummy,  },
@@ -552,22 +532,16 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_GETCHOICES:
         case VLC_VAR_GETLIST:
-            p_val->p_list = malloc( sizeof(vlc_list_t) );
-            if( p_val2 ) p_val2->p_list = malloc( sizeof(vlc_list_t) );
-            if( p_var->choices.i_count )
-            {
-                p_val->p_list->p_values = malloc( p_var->choices.i_count
-                                                  * sizeof(vlc_value_t) );
-                if( p_val2 )
-                {
-                    p_val2->p_list->p_values =
-                        malloc( p_var->choices.i_count * sizeof(vlc_value_t) );
-                }
-            }
+            p_val->p_list = xmalloc( sizeof(vlc_list_t) );
+            p_val->p_list->p_values =
+                xmalloc( p_var->choices.i_count * sizeof(vlc_value_t) );
             p_val->p_list->i_type = p_var->i_type;
             p_val->p_list->i_count = p_var->choices.i_count;
             if( p_val2 )
             {
+                p_val2->p_list = xmalloc( sizeof(vlc_list_t) );
+                p_val2->p_list->p_values =
+                    xmalloc( p_var->choices.i_count * sizeof(vlc_value_t) );
                 p_val2->p_list->i_type = VLC_VAR_STRING;
                 p_val2->p_list->i_count = p_var->choices.i_count;
             }
@@ -1435,13 +1409,25 @@ static int TriggerListCallback( vlc_object_t *p_this, variable_t *p_var,
  */
 void var_FreeList( vlc_value_t *p_val, vlc_value_t *p_val2 )
 {
-    FreeList( p_val );
-    if( p_val2 && p_val2->p_list )
+    switch( p_val->p_list->i_type & VLC_VAR_CLASS )
     {
+        case VLC_VAR_STRING:
+            for( int i = 0; i < p_val->p_list->i_count; i++ )
+                free( p_val->p_list->p_values[i].psz_string );
+            break;
+    }
+
+    free( p_val->p_list->p_values );
+    free( p_val->p_list );
+
+    if( p_val2 != NULL )
+    {
+        assert( p_val2->p_list != NULL );
+        assert( p_val2->p_list->i_type == VLC_VAR_STRING );
+
         for( int i = 0; i < p_val2->p_list->i_count; i++ )
             free( p_val2->p_list->p_values[i].psz_string );
-        if( p_val2->p_list->i_count )
-            free( p_val2->p_list->p_values );
+        free( p_val2->p_list->p_values );
         free( p_val2->p_list );
     }
 }
