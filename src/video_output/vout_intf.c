@@ -178,7 +178,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     /* Zoom object var */
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
-                VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
+                VLC_VAR_DOINHERIT );
 
     text.psz_string = _("Zoom");
     var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, &text, NULL );
@@ -212,7 +212,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     /* Crop object var */
     var_Create( p_vout, "crop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
-                VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
+                VLC_VAR_DOINHERIT );
 
     text.psz_string = _("Crop");
     var_Change( p_vout, "crop", VLC_VAR_SETTEXT, &text, NULL );
@@ -242,7 +242,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     /* Aspect-ratio object var */
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
-                VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT );
+                VLC_VAR_DOINHERIT );
 
     text.psz_string = _("Aspect ratio");
     var_Change( p_vout, "aspect-ratio", VLC_VAR_SETTEXT, &text, NULL );
