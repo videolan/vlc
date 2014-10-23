@@ -1430,7 +1430,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         return;
     }
 
-    if (var_Change(p_object, psz_variable, VLC_VAR_GETLIST,
+    if (var_Change(p_object, psz_variable, VLC_VAR_GETCHOICES,
                    &val_list, &text_list) < 0) {
         if ((i_type & VLC_VAR_TYPE) == VLC_VAR_STRING) free(val.psz_string);
         return;

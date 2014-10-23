@@ -1127,7 +1127,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             i_value = val.i_int;
 
             if ( var_Change( p_input, psz_variable,
-                             VLC_VAR_GETLIST, &val, &text ) < 0 )
+                             VLC_VAR_GETCHOICES, &val, &text ) < 0 )
                 goto out;
 
             msg_rc( "+----[ %s ]", val_name.psz_string );
@@ -1584,7 +1584,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         if ( var_Change( p_vout, psz_variable,
-                         VLC_VAR_GETLIST, &val, &text ) < 0 )
+                         VLC_VAR_GETCHOICES, &val, &text ) < 0 )
         {
             vlc_object_release( p_vout );
             free( psz_value );
@@ -1689,7 +1689,7 @@ static int AudioChannel( vlc_object_t *obj, char const *cmd,
         /* Retrieve all registered ***. */
         vlc_value_t val, text;
         if ( var_Change( p_aout, "stereo-mode",
-                         VLC_VAR_GETLIST, &val, &text ) < 0 )
+                         VLC_VAR_GETCHOICES, &val, &text ) < 0 )
         {
             ret = VLC_ENOVAR;
             goto out;

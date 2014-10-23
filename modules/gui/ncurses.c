@@ -1567,7 +1567,7 @@ static void CycleESTrack(intf_sys_t *sys, const char *var)
         return;
 
     vlc_value_t val;
-    if (var_Change(input, var, VLC_VAR_GETLIST, &val, NULL) < 0)
+    if (var_Change(input, var, VLC_VAR_GETCHOICES, &val, NULL) < 0)
         return;
 
     vlc_list_t *list = val.p_list;

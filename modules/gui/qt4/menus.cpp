@@ -1243,7 +1243,7 @@ static bool IsMenuEmpty( const char *psz_var,
     }
 
     /* Check children variables in case of VLC_VAR_VARIABLE */
-    if( var_Change( p_object, psz_var, VLC_VAR_GETLIST, &val_list, NULL ) < 0 )
+    if( var_Change( p_object, psz_var, VLC_VAR_GETCHOICES, &val_list, NULL ) < 0 )
     {
         return true;
     }
@@ -1428,7 +1428,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
             return VLC_EGENERIC;
     }
 
-    if( var_Change( p_object, psz_var, VLC_VAR_GETLIST,
+    if( var_Change( p_object, psz_var, VLC_VAR_GETCHOICES,
                     &val_list, &text_list ) < 0 )
     {
         return VLC_EGENERIC;

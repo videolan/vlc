@@ -828,7 +828,7 @@ void InputManager::sectionMenu()
     {
         vlc_value_t val, text;
 
-        if( var_Change( p_input, "title  0", VLC_VAR_GETLIST, &val, &text ) < 0 )
+        if( var_Change( p_input, "title  0", VLC_VAR_GETCHOICES, &val, &text ) < 0 )
             return;
 
         /* XXX is it "Root" or "Title" we want here ?" (set 0 by default) */
@@ -877,7 +877,7 @@ void InputManager::activateTeletext( bool b_enable )
 {
     vlc_value_t list;
     vlc_value_t text;
-    if( hasInput() && !var_Change( p_input, "teletext-es", VLC_VAR_GETLIST, &list, &text ) )
+    if( hasInput() && !var_Change( p_input, "teletext-es", VLC_VAR_GETCHOICES, &list, &text ) )
     {
         if( list.p_list->i_count > 0 )
         {

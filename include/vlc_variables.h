@@ -121,7 +121,7 @@
 #define VLC_VAR_CLEARCHOICES        0x0022
 #define VLC_VAR_SETDEFAULT          0x0023
 #define VLC_VAR_GETCHOICES          0x0024
-#define VLC_VAR_GETLIST             0x0025
+
 #define VLC_VAR_CHOICESCOUNT        0x0026
 
 /**@}*/

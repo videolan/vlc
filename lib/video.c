@@ -495,7 +495,7 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi )
     else
     {
         vlc_value_t list;
-        if( !var_Change( p_input_thread, "teletext-es", VLC_VAR_GETLIST, &list, NULL ) )
+        if( !var_Change( p_input_thread, "teletext-es", VLC_VAR_GETCHOICES, &list, NULL ) )
         {
             if( list.p_list->i_count > 0 )
                 var_SetInteger( p_input_thread, "spu-es", list.p_list->p_values[0].i_int );

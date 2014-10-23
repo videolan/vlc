@@ -531,7 +531,6 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             p_var->ops->pf_free( &oldval );
             break;
         case VLC_VAR_GETCHOICES:
-        case VLC_VAR_GETLIST:
             p_val->p_list = xmalloc( sizeof(vlc_list_t) );
             p_val->p_list->p_values =
                 xmalloc( p_var->choices.i_count * sizeof(vlc_value_t) );

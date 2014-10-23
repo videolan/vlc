@@ -3014,7 +3014,7 @@ static void input_SubtitleAdd( input_thread_t *p_input,
     /* Select the ES */
     vlc_value_t list;
 
-    if( var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
+    if( var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES, &list, NULL ) )
         return;
     if( count.i_int == 0 )
         count.i_int++;

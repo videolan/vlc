@@ -805,7 +805,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "aspect-ratio", &val );
-                if( var_Change( p_vout, "aspect-ratio", VLC_VAR_GETLIST,
+                if( var_Change( p_vout, "aspect-ratio", VLC_VAR_GETCHOICES,
                                 &val_list, &text_list ) >= 0 )
                 {
                     int i;
@@ -835,7 +835,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "crop", &val );
-                if( var_Change( p_vout, "crop", VLC_VAR_GETLIST,
+                if( var_Change( p_vout, "crop", VLC_VAR_GETCHOICES,
                                 &val_list, &text_list ) >= 0 )
                 {
                     int i;
@@ -957,7 +957,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "zoom", &val );
-                if( var_Change( p_vout, "zoom", VLC_VAR_GETLIST,
+                if( var_Change( p_vout, "zoom", VLC_VAR_GETCHOICES,
                                 &val_list, &text_list ) >= 0 )
                 {
                     int i;

@@ -1466,7 +1466,7 @@ libvlc_track_description_t *
         return NULL;
 
     vlc_value_t val_list, text_list;
-    int i_ret = var_Change( p_input, psz_variable, VLC_VAR_GETLIST, &val_list, &text_list );
+    int i_ret = var_Change( p_input, psz_variable, VLC_VAR_GETCHOICES, &val_list, &text_list );
     if( i_ret != VLC_SUCCESS )
         return NULL;
 

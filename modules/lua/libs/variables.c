@@ -218,7 +218,7 @@ static int vlclua_var_get_list( lua_State *L )
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
 
-    int i_ret = var_Change( *pp_obj, psz_var, VLC_VAR_GETLIST, &val, &text );
+    int i_ret = var_Change( *pp_obj, psz_var, VLC_VAR_GETCHOICES, &val, &text );
     if( i_ret < 0 )
         return vlclua_push_ret( L, i_ret );
 
