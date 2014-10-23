@@ -672,8 +672,11 @@ int var_Type( vlc_object_t *p_this, const char *psz_name )
 
     p_var = Lookup( p_this, psz_name );
     if( p_var != NULL )
+    {
         i_type = p_var->i_type;
-
+        if( p_var->choices.i_count > 0 )
+            i_type |= VLC_VAR_HASCHOICE;
+    }
     vlc_mutex_unlock( &p_priv->var_lock );
 
     return i_type;
