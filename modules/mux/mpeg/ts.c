@@ -2371,6 +2371,9 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                 p_input->p_fmt->audio.i_channels
             };
             dvbpsi_PMTESAddDescriptor( p_es, 0x7f, 2, data );
+            uint8_t format[4] = { 'O', 'p', 'u', 's'};
+            /* "registration" descriptor : "Opus" */
+            dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, format );
         }
         else if( p_stream->i_codec == VLC_CODEC_TELETEXT )
         {

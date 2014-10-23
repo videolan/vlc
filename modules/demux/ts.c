@@ -4025,7 +4025,7 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
         p_fmt->i_codec = VLC_CODEC_A52;
     }
     else if( (desc = PMTEsFindDescriptor( p_es, 0x7f ) ) && desc->i_length >= 2 &&
-              desc->p_data[0] == 0x80)
+              PMTEsHasRegistration(p_demux, p_es, "Opus"))
     {
         OpusSetup(p_demux, desc->p_data, desc->i_length, p_fmt);
     }
