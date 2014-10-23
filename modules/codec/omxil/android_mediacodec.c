@@ -947,6 +947,8 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
         if (index < 0) {
             GetOutput(p_dec, env, &p_pic, timeout);
+            if (p_sys->error_state)
+                break;
             if (p_pic) {
                 /* If we couldn't get an available input buffer but a
                  * decoded frame is available, we return the frame
@@ -1013,6 +1015,12 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         }
         p_sys->decoded = true;
         break;
+    }
+    if (p_sys->error_state) {
+        if (p_pic)
+            decoder_DeletePicture(p_dec, p_pic);
+        jni_detach_thread();
+        return NULL;
     }
     if (!p_pic)
         GetOutput(p_dec, env, &p_pic, 0);
