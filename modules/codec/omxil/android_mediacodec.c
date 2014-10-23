@@ -842,8 +842,14 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                     sar_den = p_dec->fmt_in.video.i_sar_den;
                 }
                 jni_SetAndroidSurfaceSizeEnv(env, width, height, width, height, sar_num, sar_den);
-            } else
-                GetVlcChromaFormat(p_sys->pixel_format, &p_dec->fmt_out.i_codec, &name);
+            } else {
+                if (!GetVlcChromaFormat(p_sys->pixel_format,
+                                        &p_dec->fmt_out.i_codec, &name)) {
+                    msg_Err(p_dec, "color-format not recognized");
+                    p_sys->error_state = true;
+                    return;
+                }
+            }
 
             msg_Dbg(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
                     p_sys->pixel_format, name, width, height, p_sys->stride, p_sys->slice_height,
