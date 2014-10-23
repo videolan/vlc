@@ -870,8 +870,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
                 msg_Err(vd, "Failed to set fullscreen");
             }
-
-            vout_SendEventFullscreen(osys->vout, osys->cfg.is_fullscreen);
         }
 
         /* */
@@ -900,8 +898,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             }
             osys->cfg.is_display_filled = osys->is_display_filled;
             osys->ch_display_filled = false;
-
-            vout_SendEventDisplayFilled(osys->vout, osys->cfg.is_display_filled);
         }
         /* */
         if (osys->ch_zoom) {
@@ -929,8 +925,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->cfg.zoom.num = osys->zoom.num;
             osys->cfg.zoom.den = osys->zoom.den;
             osys->ch_zoom = false;
-
-            vout_SendEventZoom(osys->vout, osys->cfg.zoom.num, osys->cfg.zoom.den);
         }
 #if defined(_WIN32) || defined(__OS2__)
         /* */
@@ -940,9 +934,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 wm_state = osys->wm_state;
             }
             osys->wm_state_initial = wm_state;
-
-            /* */
-            vout_SendEventOnTop(osys->vout, osys->wm_state_initial);
         }
 #endif
         /* */
@@ -973,21 +964,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->sar.den = source.i_sar_den;
             osys->ch_sar  = false;
 
-            /* */
-            if (osys->sar.num == osys->source.i_sar_num &&
-                osys->sar.den == osys->source.i_sar_den)
-            {
-                vout_SendEventSourceAspect(osys->vout, 0, 0);
-            }
-            else
-            {
-                unsigned dar_num, dar_den;
-                vlc_ureduce( &dar_num, &dar_den,
-                             osys->sar.num * vd->source.i_visible_width,
-                             osys->sar.den * vd->source.i_visible_height,
-                             65536);
-                vout_SendEventSourceAspect(osys->vout, dar_num, dar_den);
-            }
             /* If a crop ratio is requested, recompute the parameters */
             if (osys->crop.num > 0 && osys->crop.den > 0)
                 osys->ch_crop = true;
@@ -1053,11 +1029,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->crop.num    = crop_num;
             osys->crop.den    = crop_den;
             osys->ch_crop = false;
-
-            vout_SendEventSourceCrop(osys->vout,
-                                     osys->crop.num, osys->crop.den,
-                                     osys->crop.left, osys->crop.top,
-                                     -osys->crop.right, -osys->crop.bottom);
         }
 
         /* */
