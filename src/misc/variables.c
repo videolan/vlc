@@ -103,7 +103,7 @@ static void FreeList( vlc_value_t *p_val )
     int i;
     for( i = 0; i < p_val->p_list->i_count; i++ )
     {
-        switch( p_val->p_list->pi_types[i] & VLC_VAR_CLASS )
+        switch( p_val->p_list->i_type & VLC_VAR_CLASS )
         {
         case VLC_VAR_STRING:
             FreeString( &p_val->p_list->p_values[i] );
@@ -114,10 +114,7 @@ static void FreeList( vlc_value_t *p_val )
     }
 
     if( p_val->p_list->i_count )
-    {
         free( p_val->p_list->p_values );
-        free( p_val->p_list->pi_types );
-    }
     free( p_val->p_list );
 }
 
@@ -561,29 +558,28 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
             {
                 p_val->p_list->p_values = malloc( p_var->choices.i_count
                                                   * sizeof(vlc_value_t) );
-                p_val->p_list->pi_types = malloc( p_var->choices.i_count
-                                                  * sizeof(int) );
                 if( p_val2 )
                 {
                     p_val2->p_list->p_values =
                         malloc( p_var->choices.i_count * sizeof(vlc_value_t) );
-                    p_val2->p_list->pi_types =
-                        malloc( p_var->choices.i_count * sizeof(int) );
                 }
             }
+            p_val->p_list->i_type = p_var->i_type;
             p_val->p_list->i_count = p_var->choices.i_count;
-            if( p_val2 ) p_val2->p_list->i_count = p_var->choices.i_count;
+            if( p_val2 )
+            {
+                p_val2->p_list->i_type = VLC_VAR_STRING;
+                p_val2->p_list->i_count = p_var->choices.i_count;
+            }
             for( int i = 0 ; i < p_var->choices.i_count ; i++ )
             {
                 p_val->p_list->p_values[i] = p_var->choices.p_values[i];
-                p_val->p_list->pi_types[i] = p_var->i_type;
                 p_var->ops->pf_dup( &p_val->p_list->p_values[i] );
                 if( p_val2 )
                 {
                     p_val2->p_list->p_values[i].psz_string =
                         p_var->choices_text.p_values[i].psz_string ?
                     strdup(p_var->choices_text.p_values[i].psz_string) : NULL;
-                    p_val2->p_list->pi_types[i] = VLC_VAR_STRING;
                 }
             }
             break;
@@ -1445,10 +1441,7 @@ void var_FreeList( vlc_value_t *p_val, vlc_value_t *p_val2 )
         for( int i = 0; i < p_val2->p_list->i_count; i++ )
             free( p_val2->p_list->p_values[i].psz_string );
         if( p_val2->p_list->i_count )
-        {
             free( p_val2->p_list->p_values );
-            free( p_val2->p_list->pi_types );
-        }
         free( p_val2->p_list );
     }
 }

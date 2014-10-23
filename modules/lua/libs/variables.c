@@ -85,8 +85,7 @@ static int vlclua_pushlist( lua_State *L, vlc_list_t *p_list )
     for( int i = 0; i < i_count; i++ )
     {
         lua_pushinteger( L, i+1 );
-        if( !vlclua_pushvalue( L, p_list->pi_types[i],
-                               p_list->p_values[i], true ) )
+        if( !vlclua_pushvalue( L, p_list->i_type, p_list->p_values[i], true ) )
              lua_pushnil( L );
         lua_settable( L, -3 );
     }

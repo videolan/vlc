@@ -362,10 +362,9 @@ typedef union
  */
 struct vlc_list_t
 {
-    int             i_count;
-    vlc_value_t *   p_values;
-    int *           pi_types;
-
+    int          i_type;
+    int          i_count;
+    vlc_value_t *p_values;
 };
 
 /*****************************************************************************
