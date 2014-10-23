@@ -895,10 +895,10 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
          case ACTIONID_TOGGLE_AUTOSCALE:
             if( p_vout )
             {
-                float f_scalefactor = var_GetFloat( p_vout, "scale" );
+                float f_scalefactor = var_GetFloat( p_vout, "zoom" );
                 if ( f_scalefactor != 1.f )
                 {
-                    var_SetFloat( p_vout, "scale", 1.f );
+                    var_SetFloat( p_vout, "zoom", 1.f );
                     DisplayMessage( p_vout, _("Zooming reset") );
                 }
                 else
@@ -915,21 +915,21 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_SCALE_UP:
             if( p_vout )
             {
-               float f_scalefactor = var_GetFloat( p_vout, "scale" );
+               float f_scalefactor = var_GetFloat( p_vout, "zoom" );
 
                if( f_scalefactor < 10.f )
                    f_scalefactor += .1f;
-               var_SetFloat( p_vout, "scale", f_scalefactor );
+               var_SetFloat( p_vout, "zoom", f_scalefactor );
             }
             break;
         case ACTIONID_SCALE_DOWN:
             if( p_vout )
             {
-               float f_scalefactor = var_GetFloat( p_vout, "scale" );
+               float f_scalefactor = var_GetFloat( p_vout, "zoom" );
 
                if( f_scalefactor > .3f )
                    f_scalefactor -= .1f;
-               var_SetFloat( p_vout, "scale", f_scalefactor );
+               var_SetFloat( p_vout, "zoom", f_scalefactor );
             }
             break;
 
