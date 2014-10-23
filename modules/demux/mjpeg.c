@@ -462,7 +462,8 @@ static int MimeDemux( demux_t *p_demux )
 
     if( i_size > 0 )
     {
-        stream_Read( p_demux->s, NULL, i_size );
+        if( stream_Read( p_demux->s, NULL, i_size ) != i_size )
+            return 0;
     }
     else if( i_size < 0 )
     {
