@@ -230,16 +230,16 @@ unsigned libvlc_media_player_has_vout( libvlc_media_player_t *p_mi )
 
 float libvlc_video_get_scale( libvlc_media_player_t *mp )
 {
-    float f_scale = var_GetFloat (mp, "scale");
+    float f_scale = var_GetFloat (mp, "zoom");
     if (var_GetBool (mp, "autoscale"))
-        f_scale = 0.;
+        f_scale = 0.f;
     return f_scale;
 }
 
 void libvlc_video_set_scale( libvlc_media_player_t *p_mp, float f_scale )
 {
     if (isfinite(f_scale) && f_scale != 0.f)
-        var_SetFloat (p_mp, "scale", f_scale);
+        var_SetFloat (p_mp, "zoom", f_scale);
     var_SetBool (p_mp, "autoscale", f_scale == 0.f);
 
     /* Apply to current video outputs (if any) */
@@ -250,7 +250,7 @@ void libvlc_video_set_scale( libvlc_media_player_t *p_mp, float f_scale )
         vout_thread_t *p_vout = pp_vouts[i];
 
         if (isfinite(f_scale) && f_scale != 0.f)
-            var_SetFloat (p_vout, "scale", f_scale);
+            var_SetFloat (p_vout, "zoom", f_scale);
         var_SetBool (p_vout, "autoscale", f_scale == 0.f);
         vlc_object_release (p_vout);
     }
