@@ -84,6 +84,8 @@ int ANativeWindowPriv_connect( void *window )
         return -EINVAL;
     }
 #endif
+
+    return 0;
 }
 
 int ANativeWindowPriv_disconnect( void *window )
