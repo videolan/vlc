@@ -11,8 +11,6 @@ $(TARBALLS)/Sparkle-$(SPARKLE_VERSION).zip:
 	$(call download,$(SPARKLE_URL))
 
 .sum-sparkle: Sparkle-$(SPARKLE_VERSION).zip
-	$(warning $@ not implemented)
-	touch $@
 
 sparkle: Sparkle-$(SPARKLE_VERSION).zip .sum-sparkle
 	$(UNPACK)
