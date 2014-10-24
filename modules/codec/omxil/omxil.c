@@ -480,7 +480,8 @@ static OMX_ERRORTYPE AllocateBuffers(decoder_t *p_dec, OmxPort *p_port)
                                p_port->i_port_index, 0,
                                p_port->definition.nBufferSize, (void*)1);
             OMX_DBG( "OMX_UseBuffer(%d) %p, %p", def->eDir,
-                     p_port->pp_buffers[i], p_port->pp_buffers[i]->pBuffer );
+                     p_port->pp_buffers[i], p_port->pp_buffers[i] ?
+                     p_port->pp_buffers[i]->pBuffer : NULL );
         }
         else
         {
@@ -489,7 +490,8 @@ static OMX_ERRORTYPE AllocateBuffers(decoder_t *p_dec, OmxPort *p_port)
                                     p_port->i_port_index, 0,
                                     p_port->definition.nBufferSize);
             OMX_DBG( "OMX_AllocateBuffer(%d) %p, %p", def->eDir,
-                     p_port->pp_buffers[i], p_port->pp_buffers[i]->pBuffer );
+                     p_port->pp_buffers[i], p_port->pp_buffers[i] ? 
+                     p_port->pp_buffers[i]->pBuffer : NULL );
         }
 
         if(omx_error != OMX_ErrorNone)
