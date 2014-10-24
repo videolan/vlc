@@ -2106,7 +2106,12 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
         msg_Warn( p_dec, "winFromSurface failed" );
         goto error;
     }
-    p_port->p_hwbuf->anwpriv.connect( p_port->p_hwbuf->window );
+    if( p_port->p_hwbuf->anwpriv.connect( p_port->p_hwbuf->window ) != 0 ) {
+        msg_Warn( p_dec, "connect failed" );
+        p_port->p_hwbuf->native_window.winRelease( p_port->p_hwbuf->window );
+        p_port->p_hwbuf->window = NULL;
+        goto error;
+    }
 
     omx_error = pf_enable_graphic_buffers( p_port->omx_handle,
                                            p_port->i_port_index, OMX_TRUE );
