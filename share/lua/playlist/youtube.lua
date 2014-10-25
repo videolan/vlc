@@ -215,6 +215,7 @@ function probe()
     return (  string.match( vlc.path, "/watch%?" ) -- the html page
             or string.match( vlc.path, "/get_video_info%?" ) -- info API
             or string.match( vlc.path, "/v/" ) -- video in swf player
+            or string.match( vlc.path, "/embed/" ) -- embedded player iframe
             or string.match( vlc.path, "/player2.swf" ) ) -- another player url
 end
 
@@ -372,6 +373,9 @@ function parse()
         video_id = get_url_param( vlc.path, "video_id" )
         if not video_id then
             _,_,video_id = string.find( vlc.path, "/v/([^?]*)" )
+        end
+        if not video_id then
+            video_id = string.match( vlc.path, "/embed/([^?]*)" )
         end
         if not video_id then
             vlc.msg.err( "Couldn't extract youtube video URL" )
