@@ -175,14 +175,21 @@
 #define VLC_CODEC_DFA             VLC_FOURCC('D','F','I','A')
 #define VLC_CODEC_HNM4_VIDEO      VLC_FOURCC('H','N','M','4')
 
+/***********
+ * Chromas
+ ***********/
+
+/* Planar YUV */
+
 /* Planar YUV 4:1:0 Y:V:U */
 #define VLC_CODEC_YV9             VLC_FOURCC('Y','V','U','9')
-/* Planar YUV 4:2:0 Y:V:U */
-#define VLC_CODEC_YV12            VLC_FOURCC('Y','V','1','2')
 /* Planar YUV 4:1:0 Y:U:V */
 #define VLC_CODEC_I410            VLC_FOURCC('I','4','1','0')
 /* Planar YUV 4:1:1 Y:U:V */
 #define VLC_CODEC_I411            VLC_FOURCC('I','4','1','1')
+
+/* Planar YUV 4:2:0 Y:V:U */
+#define VLC_CODEC_YV12            VLC_FOURCC('Y','V','1','2')
 /* Planar YUV 4:2:0 Y:U:V 8-bit */
 #define VLC_CODEC_I420            VLC_FOURCC('I','4','2','0')
 /* Planar YUV 4:2:0 Y:U:V  9-bit stored on 16 bits */
@@ -191,6 +198,7 @@
 /* Planar YUV 4:2:0 Y:U:V 10-bit stored on 16 bits */
 #define VLC_CODEC_I420_10L        VLC_FOURCC('I','0','A','L')
 #define VLC_CODEC_I420_10B        VLC_FOURCC('I','0','A','B')
+
 /* Planar YUV 4:2:2 Y:U:V 8-bit */
 #define VLC_CODEC_I422            VLC_FOURCC('I','4','2','2')
 /* Planar YUV 4:2:2 Y:U:V  9-bit stored on 16 bits */
@@ -199,6 +207,7 @@
 /* Planar YUV 4:2:2 Y:U:V 10-bit stored on 16 bits */
 #define VLC_CODEC_I422_10L        VLC_FOURCC('I','2','A','L')
 #define VLC_CODEC_I422_10B        VLC_FOURCC('I','2','A','B')
+
 /* Planar YUV 4:4:0 Y:U:V */
 #define VLC_CODEC_I440            VLC_FOURCC('I','4','4','0')
 /* Planar YUV 4:4:4 Y:U:V 8-bit */
@@ -212,6 +221,7 @@
 /* Planar YUV 4:4:4 Y:U:V 16-bit */
 #define VLC_CODEC_I444_16L        VLC_FOURCC('I','4','F','L')
 #define VLC_CODEC_I444_16B        VLC_FOURCC('I','4','F','B')
+
 /* Planar YUV 4:2:0 Y:U:V full scale */
 #define VLC_CODEC_J420            VLC_FOURCC('J','4','2','0')
 /* Planar YUV 4:2:2 Y:U:V full scale */
@@ -222,12 +232,48 @@
 #define VLC_CODEC_J444            VLC_FOURCC('J','4','4','4')
 /* Palettized YUV with palette element Y:U:V:A */
 #define VLC_CODEC_YUVP            VLC_FOURCC('Y','U','V','P')
+
 /* Planar YUV 4:4:4 Y:U:V:A */
 #define VLC_CODEC_YUVA            VLC_FOURCC('Y','U','V','A')
 /* Planar YUV 4:2:2 Y:U:V:A */
 #define VLC_CODEC_YUV422A         VLC_FOURCC('I','4','2','A')
 /* Planar YUV 4:2:0 Y:U:V:A */
 #define VLC_CODEC_YUV420A         VLC_FOURCC('I','4','0','A')
+
+/* Semi-planar Y/UV */
+
+/* 2 planes Y/UV 4:2:0 */
+#define VLC_CODEC_NV12            VLC_FOURCC('N','V','1','2')
+/* 2 planes Y/VU 4:2:0 */
+#define VLC_CODEC_NV21            VLC_FOURCC('N','V','2','1')
+/* 2 planes Y/UV 4:2:2 */
+#define VLC_CODEC_NV16            VLC_FOURCC('N','V','1','6')
+/* 2 planes Y/VU 4:2:2 */
+#define VLC_CODEC_NV61            VLC_FOURCC('N','V','6','1')
+/* 2 planes Y/UV 4:4:4 */
+#define VLC_CODEC_NV24            VLC_FOURCC('N','V','2','4')
+/* 2 planes Y/VU 4:4:4 */
+#define VLC_CODEC_NV42            VLC_FOURCC('N','V','4','2')
+
+/* Packed YUV */
+
+/* Packed YUV 4:2:2, U:Y:V:Y */
+#define VLC_CODEC_UYVY            VLC_FOURCC('U','Y','V','Y')
+/* Packed YUV 4:2:2, V:Y:U:Y */
+#define VLC_CODEC_VYUY            VLC_FOURCC('V','Y','U','Y')
+/* Packed YUV 4:2:2, Y:U:Y:V */
+#define VLC_CODEC_YUYV            VLC_FOURCC('Y','U','Y','2')
+/* Packed YUV 4:2:2, Y:V:Y:U */
+#define VLC_CODEC_YVYU            VLC_FOURCC('Y','V','Y','U')
+/* Packed YUV 2:1:1, Y:U:Y:V */
+#define VLC_CODEC_Y211            VLC_FOURCC('Y','2','1','1')
+/* Packed YUV 4:2:2, U:Y:V:Y, reverted */
+#define VLC_CODEC_CYUV            VLC_FOURCC('c','y','u','v')
+/* 10-bit 4:2:2 Component YCbCr */
+#define VLC_CODEC_V210            VLC_FOURCC('v','2','1','0')
+
+
+/* RGB */
 
 /* Palettized RGB with palette element R:G:B */
 #define VLC_CODEC_RGBP            VLC_FOURCC('R','G','B','P')
@@ -261,32 +307,6 @@
 
 /* 8 bits grey */
 #define VLC_CODEC_GREY            VLC_FOURCC('G','R','E','Y')
-/* Packed YUV 4:2:2, U:Y:V:Y */
-#define VLC_CODEC_UYVY            VLC_FOURCC('U','Y','V','Y')
-/* Packed YUV 4:2:2, V:Y:U:Y */
-#define VLC_CODEC_VYUY            VLC_FOURCC('V','Y','U','Y')
-/* Packed YUV 4:2:2, Y:U:Y:V */
-#define VLC_CODEC_YUYV            VLC_FOURCC('Y','U','Y','2')
-/* Packed YUV 4:2:2, Y:V:Y:U */
-#define VLC_CODEC_YVYU            VLC_FOURCC('Y','V','Y','U')
-/* Packed YUV 2:1:1, Y:U:Y:V */
-#define VLC_CODEC_Y211            VLC_FOURCC('Y','2','1','1')
-/* Packed YUV 4:2:2, U:Y:V:Y, reverted */
-#define VLC_CODEC_CYUV            VLC_FOURCC('c','y','u','v')
-/* 10-bit 4:2:2 Component YCbCr */
-#define VLC_CODEC_V210            VLC_FOURCC('v','2','1','0')
-/* 2 planes Y/UV 4:2:0 */
-#define VLC_CODEC_NV12            VLC_FOURCC('N','V','1','2')
-/* 2 planes Y/VU 4:2:0 */
-#define VLC_CODEC_NV21            VLC_FOURCC('N','V','2','1')
-/* 2 planes Y/UV 4:2:2 */
-#define VLC_CODEC_NV16            VLC_FOURCC('N','V','1','6')
-/* 2 planes Y/VU 4:2:2 */
-#define VLC_CODEC_NV61            VLC_FOURCC('N','V','6','1')
-/* 2 planes Y/UV 4:4:4 */
-#define VLC_CODEC_NV24            VLC_FOURCC('N','V','2','4')
-/* 2 planes Y/VU 4:4:4 */
-#define VLC_CODEC_NV42            VLC_FOURCC('N','V','4','2')
 
 /* VDPAU video surface YCbCr 4:2:0 */
 #define VLC_CODEC_VDPAU_VIDEO_420 VLC_FOURCC('V','D','V','0')
