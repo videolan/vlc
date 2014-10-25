@@ -152,8 +152,6 @@ static int OpenScaler( vlc_object_t *p_this )
                        &p_filter->fmt_out.video, 0 ) )
         return VLC_EGENERIC;
 
-    /* */
-    p_filter->pf_video_filter = Filter;
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_filter->p_sys = p_sys = calloc(1, sizeof(filter_sys_t)) ) == NULL )
         return VLC_ENOMEM;
@@ -190,6 +188,9 @@ static int OpenScaler( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
+
+    /* */
+    p_filter->pf_video_filter = Filter;
 
     msg_Dbg( p_filter, "%ix%i (%ix%i) chroma: %4.4s -> %ix%i (%ix%i) chroma: %4.4s with scaling using %s",
              p_filter->fmt_in.video.i_visible_width, p_filter->fmt_in.video.i_visible_height,
