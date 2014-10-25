@@ -792,6 +792,8 @@ static const staticentry_t p_list_video[] = {
         A("I40A"),
     B(VLC_CODEC_YUV422A, "Planar YUV 4:2:2 Y:U:V:A"),
         A("I42A"),
+    B(VLC_CODEC_YUVA_444_10L, "Planar YUV 4:4:4 Y:U:V:A 10bits"),
+        A("YUVA"),
 
     B(VLC_CODEC_RGBP, "Palettized RGB with palette element R:G:B"),
         A("RGBP"),
@@ -2146,6 +2148,8 @@ static const struct
         VLC_CODEC_I444_9B },                   PLANAR_16(3, 1, 1,  9) },
     { { VLC_CODEC_I444_16L,
         VLC_CODEC_I444_16B },                  PLANAR_16(3, 1, 1, 16) },
+    { { VLC_CODEC_YUVA_444_10L,
+        VLC_CODEC_YUVA_444_10B },              PLANAR_16(4, 1, 1, 10) },
 
     { { VLC_CODEC_YUV_PACKED },                PACKED_FMT(2, 16) },
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,

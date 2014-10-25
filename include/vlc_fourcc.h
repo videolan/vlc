@@ -240,6 +240,10 @@
 /* Planar YUV 4:2:0 Y:U:V:A */
 #define VLC_CODEC_YUV420A         VLC_FOURCC('I','4','0','A')
 
+/* Planar Y:U:V:A 4:4:4 10bits */
+#define VLC_CODEC_YUVA_444_10L    VLC_FOURCC('Y','A','0','L')
+#define VLC_CODEC_YUVA_444_10B    VLC_FOURCC('Y','A','0','B')
+
 /* Semi-planar Y/UV */
 
 /* 2 planes Y/UV 4:2:0 */
