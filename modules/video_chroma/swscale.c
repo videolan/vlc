@@ -155,7 +155,7 @@ static int OpenScaler( vlc_object_t *p_this )
     /* */
     p_filter->pf_video_filter = Filter;
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_filter->p_sys = p_sys = malloc(sizeof(filter_sys_t)) ) == NULL )
+    if( ( p_filter->p_sys = p_sys = calloc(1, sizeof(filter_sys_t)) ) == NULL )
         return VLC_ENOMEM;
 
     /* Set CPU capabilities */
@@ -179,16 +179,7 @@ static int OpenScaler( vlc_object_t *p_this )
     default: p_sys->i_sws_flags = SWS_BICUBIC; i_sws_mode = 2; break;
     }
 
-    p_sys->p_src_filter = NULL;
-    p_sys->p_dst_filter = NULL;
-
     /* Misc init */
-    p_sys->ctx = NULL;
-    p_sys->ctxA = NULL;
-    p_sys->p_src_a = NULL;
-    p_sys->p_dst_a = NULL;
-    p_sys->p_src_e = NULL;
-    p_sys->p_dst_e = NULL;
     memset( &p_sys->fmt_in,  0, sizeof(p_sys->fmt_in) );
     memset( &p_sys->fmt_out, 0, sizeof(p_sys->fmt_out) );
 
