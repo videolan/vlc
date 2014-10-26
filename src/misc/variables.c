@@ -32,6 +32,7 @@
 # include <search.h>
 #endif
 #include <assert.h>
+#include <float.h>
 #include <math.h>
 #include <limits.h>
 #ifdef __GLIBC__
@@ -1307,19 +1308,25 @@ int (var_InheritURational)(vlc_object_t *object,
     unsigned d = strtol(*next ? &next[1] : "0", NULL, 0);
 
     if (*next == '.') {
-        /* Interpret as a float number */
-        double r = us_atof(tmp);
-        double c = ceil(r);
-        if (c >= UINT_MAX)
-            goto error;
-        unsigned m = c;
-        if (m > 0) {
-            d = UINT_MAX / m;
-            n = r * d;
-        } else {
-            n = 0;
-            d = 0;
-        }
+        /* Interpret as a (finite positive) float number */
+        const int ubits = CHAR_BIT * sizeof (unsigned);
+        int exp;
+        double f = frexp(us_atof(tmp), &exp);
+
+        if (!isgreaterequal(f, 0.))
+            goto error; /* negative or not a number */
+
+        if (exp <= 1 - ubits) {
+            n = 0; /* too small */
+            d = 1;
+        } else if (exp <= 0) {
+            n = floor(scalbn(f, ubits - 1 + exp));
+            d = 1u << (ubits - 1);
+        } else if (exp <= ubits) {
+            n = floor(scalbn(f, ubits));
+            d = 1u << (ubits - exp);
+        } else
+            goto error; /* too big */
     } else if ( *next == '\0' ) {
         /* plain integer given */
         *num = n;
