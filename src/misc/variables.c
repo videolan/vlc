@@ -1321,6 +1321,9 @@ int (var_InheritURational)(vlc_object_t *object,
             d = 1;
         } else if (exp <= 0) {
             n = floor(scalbn(f, ubits - 1 + exp));
+#if (FLT_RADIX != 2)
+# error Floating point configuration not supported.
+#endif
             d = 1u << (ubits - 1);
         } else if (exp <= ubits) {
             n = floor(scalbn(f, ubits));
