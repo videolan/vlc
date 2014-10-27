@@ -38,6 +38,8 @@
  *
  *****************************************************************************/
 struct picture_gc_sys_t {
+    picture_pool_t *pool;
+
     /* Saved release */
     void (*destroy)(picture_t *);
     void *destroy_sys;
@@ -59,11 +61,50 @@ struct picture_pool_t {
     int            picture_count;
     picture_t      **picture;
     bool           *picture_reserved;
+
+    unsigned    refs;
+    vlc_mutex_t lock;
 };
 
-static void Destroy(picture_t *);
 static int  Lock(picture_t *);
 static void Unlock(picture_t *);
+
+static void Release(picture_pool_t *pool)
+{
+    bool destroy;
+
+    vlc_mutex_lock(&pool->lock);
+    assert(pool->refs > 0);
+    destroy = !--pool->refs;
+    vlc_mutex_unlock(&pool->lock);
+
+    if (!destroy)
+        return;
+
+    vlc_mutex_destroy(&pool->lock);
+    free(pool->picture_reserved);
+    free(pool->picture);
+    free(pool);
+}
+
+static void DestroyPicture(picture_t *picture)
+{
+    picture_gc_sys_t *gc_sys = picture->gc.p_sys;
+    picture_pool_t *pool = gc_sys->pool;
+
+    Unlock(picture);
+
+    if (!atomic_load(&gc_sys->zombie))
+        return;
+
+    /* Picture from an already destroyed pool */
+    picture->gc.pf_destroy = gc_sys->destroy;
+    picture->gc.p_sys      = gc_sys->destroy_sys;
+    free(gc_sys);
+
+    picture->gc.pf_destroy(picture);
+    Release(pool);
+}
 
 static picture_pool_t *Create(picture_pool_t *master, int picture_count)
 {
@@ -82,6 +123,8 @@ static picture_pool_t *Create(picture_pool_t *master, int picture_count)
         free(pool);
         return NULL;
     }
+    pool->refs = 1;
+    vlc_mutex_init(&pool->lock);
     return pool;
 }
 
@@ -114,6 +157,7 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
         picture_gc_sys_t *gc_sys = malloc(sizeof(*gc_sys));
         if (unlikely(gc_sys == NULL))
             abort();
+        gc_sys->pool        = pool;
         gc_sys->destroy     = picture->gc.pf_destroy;
         gc_sys->destroy_sys = picture->gc.p_sys;
         gc_sys->lock        = cfg->lock;
@@ -124,12 +168,13 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
         /* Override the garbage collector */
         assert(atomic_load(&picture->gc.refcount) == 1);
         atomic_init(&picture->gc.refcount, 0);
-        picture->gc.pf_destroy = Destroy;
+        picture->gc.pf_destroy = DestroyPicture;
         picture->gc.p_sys      = gc_sys;
 
         /* */
         pool->picture[i] = picture;
         pool->picture_reserved[i] = false;
+        pool->refs++;
     }
     return pool;
 
@@ -219,9 +264,7 @@ void picture_pool_Delete(picture_pool_t *pool)
             picture_Release(picture);
         }
     }
-    free(pool->picture_reserved);
-    free(pool->picture);
-    free(pool);
+    Release(pool);
 }
 
 picture_t *picture_pool_Get(picture_pool_t *pool)
@@ -274,22 +317,6 @@ void picture_pool_NonEmpty(picture_pool_t *pool, bool reset)
 int picture_pool_GetSize(picture_pool_t *pool)
 {
     return pool->picture_count;
-}
-
-static void Destroy(picture_t *picture)
-{
-    picture_gc_sys_t *gc_sys = picture->gc.p_sys;
-
-    Unlock(picture);
-
-    if (atomic_load(&gc_sys->zombie))
-    {   /* Picture from an already destroyed pool */
-        picture->gc.pf_destroy = gc_sys->destroy;
-        picture->gc.p_sys      = gc_sys->destroy_sys;
-        free(gc_sys);
-
-        picture->gc.pf_destroy(picture);
-    }
 }
 
 static int Lock(picture_t *picture)
