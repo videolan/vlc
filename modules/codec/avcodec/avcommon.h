@@ -39,6 +39,7 @@
 #ifdef HAVE_LIBAVUTIL_AVUTIL_H
 # include <libavutil/avutil.h>
 # include <libavutil/dict.h>
+# include <libavutil/cpu.h>
 # include <libavutil/log.h>
 
 #define AV_OPTIONS_TEXT     "Advanced options"
