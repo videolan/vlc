@@ -34,6 +34,9 @@ ifeq ($(ARCH),arm)
 SPEEX_CONF += --enable-arm5e-asm
 endif
 endif
+ifeq ($(ARCH),aarch64)
+SPEEX_CONF += --disable-neon
+endif
 
 .speex: speex
 	mkdir -p $</m4 && $(RECONF)
