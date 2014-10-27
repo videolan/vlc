@@ -78,6 +78,10 @@ VPX_CONF := \
 	--disable-install-bins \
 	--disable-install-docs
 
+ifndef BUILD_ENCODERS
+	VPX_CONF += --disable-vp8-encoder --disable-vp9-encoder
+endif
+
 ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
 endif
