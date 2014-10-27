@@ -520,6 +520,7 @@ check_PROGRAMS = \
 	test_dictionary \
 	test_i18n_atof \
 	test_md5 \
+	test_picture_pool \
 	test_timer \
 	test_url \
 	test_utf8 \
@@ -535,6 +536,7 @@ test_block_DEPENDENCIES =
 test_dictionary_SOURCES = test/dictionary.c
 test_i18n_atof_SOURCES = test/i18n_atof.c
 test_md5_SOURCES = test/md5.c
+test_picture_pool_SOURCES = test/picture_pool.c
 test_timer_SOURCES = test/timer.c
 test_url_SOURCES = test/url.c
 test_utf8_SOURCES = test/utf8.c
