@@ -557,7 +557,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
         goto error;
 
     IMFMediaBuffer *input_media_buffer = NULL;
-    hr = IMFSample_GetBufferByIndex(input_sample, stream_id, &input_media_buffer);
+    hr = IMFSample_GetBufferByIndex(input_sample, 0, &input_media_buffer);
     if (FAILED(hr))
         goto error;
 
