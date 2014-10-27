@@ -276,7 +276,8 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
     return CLOCK_FREQ * i_dts / p_track->i_timescale;
 }
 
-static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track )
+static inline bool MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track,
+                                         int64_t *pi_delta )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     mp4_chunk_t *ck;
@@ -289,16 +290,20 @@ static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_tra
     unsigned int i_sample = p_track->i_sample - ck->i_sample_first;
 
     if( ck->p_sample_count_pts == NULL || ck->p_sample_offset_pts == NULL )
-        return -1;
+        return false;
 
     for( i_index = 0;; i_index++ )
     {
         if( i_sample < ck->p_sample_count_pts[i_index] )
-            return ck->p_sample_offset_pts[i_index] * CLOCK_FREQ /
-                   (int64_t)p_track->i_timescale;
+        {
+            *pi_delta = ck->p_sample_offset_pts[i_index] * CLOCK_FREQ /
+                        (int64_t)p_track->i_timescale;
+            return true;
+        }
 
         i_sample -= ck->p_sample_count_pts[i_index];
     }
+    return false;
 }
 
 static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
@@ -1092,8 +1097,7 @@ static int Demux( demux_t *p_demux )
         /* dts */
         p_block->i_dts = VLC_TS_0 + MP4_TrackGetDTS( p_demux, tk );
         /* pts */
-        i_delta = MP4_TrackGetPTSDelta( p_demux, tk );
-        if( i_delta != -1 )
+        if( MP4_TrackGetPTSDelta( p_demux, tk, &i_delta ) )
             p_block->i_pts = p_block->i_dts + i_delta;
         else if( tk->fmt.i_cat != VIDEO_ES )
             p_block->i_pts = p_block->i_dts;
@@ -1731,7 +1735,8 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
     for( tk->i_sample = 0; tk->i_sample < tk->i_sample_count; tk->i_sample++ )
     {
         const int64_t i_dts = MP4_TrackGetDTS( p_demux, tk );
-        const int64_t i_pts_delta = MP4_TrackGetPTSDelta( p_demux, tk );
+        int64_t i_pts_delta = 0;
+        MP4_TrackGetPTSDelta( p_demux, tk, &i_pts_delta );
         uint32_t i_nb_samples = 0;
         const uint32_t i_size = MP4_TrackGetReadSize( tk, &i_nb_samples );
 
@@ -3436,8 +3441,7 @@ static void FlushChunk( demux_t *p_demux, mp4_track_t *tk )
         /* dts */
         p_block->i_dts = VLC_TS_0 + MP4_TrackGetDTS( p_demux, tk );
         /* pts */
-        i_delta = MP4_TrackGetPTSDelta( p_demux, tk );
-        if( i_delta != -1 )
+        if( MP4_TrackGetPTSDelta( p_demux, tk, &i_delta ) )
             p_block->i_pts = p_block->i_dts + i_delta;
         else if( tk->fmt.i_cat != VIDEO_ES )
             p_block->i_pts = p_block->i_dts;
@@ -3900,8 +3904,7 @@ int DemuxFrg( demux_t *p_demux )
             /* dts */
             p_block->i_dts = VLC_TS_0 + MP4_TrackGetDTS( p_demux, tk );
             /* pts */
-            i_delta = MP4_TrackGetPTSDelta( p_demux, tk );
-            if( i_delta != -1 )
+            if( MP4_TrackGetPTSDelta( p_demux, tk, &i_delta ) )
                 p_block->i_pts = p_block->i_dts + i_delta;
             else if( tk->fmt.i_cat != VIDEO_ES )
                 p_block->i_pts = p_block->i_dts;
@@ -4692,8 +4695,8 @@ static int LeafParseMDATwithMOOV( demux_t *p_demux )
                 p_block->i_dts = VLC_TS_0 + CLOCK_FREQ * i_time / p_track->i_timescale;
 
                 /* pts */
-                int64_t i_delta = MP4_TrackGetPTSDelta( p_demux, p_track );
-                if( i_delta != -1 )
+                int64_t i_delta;
+                if( MP4_TrackGetPTSDelta( p_demux, p_track, &i_delta ) )
                     p_block->i_pts = p_block->i_dts + i_delta;
                 else if( p_track->fmt.i_cat != VIDEO_ES )
                     p_block->i_pts = p_block->i_dts;
