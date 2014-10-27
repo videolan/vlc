@@ -39,15 +39,9 @@
  *****************************************************************************/
 struct picture_gc_sys_t {
     picture_pool_t *pool;
-
     /* Saved release */
     void (*destroy)(picture_t *);
     void *destroy_sys;
-
-    /* */
-    int  (*lock)(picture_t *);
-    void (*unlock)(picture_t *);
-
     /* */
     atomic_bool zombie;
     int64_t tick;
@@ -62,12 +56,11 @@ struct picture_pool_t {
     picture_t      **picture;
     bool           *picture_reserved;
 
+    int       (*pic_lock)(picture_t *);
+    void      (*pic_unlock)(picture_t *);
     unsigned    refs;
     vlc_mutex_t lock;
 };
-
-static int  Lock(picture_t *);
-static void Unlock(picture_t *);
 
 static void Release(picture_pool_t *pool)
 {
@@ -92,7 +85,8 @@ static void DestroyPicture(picture_t *picture)
     picture_gc_sys_t *gc_sys = picture->gc.p_sys;
     picture_pool_t *pool = gc_sys->pool;
 
-    Unlock(picture);
+    if (pool->pic_unlock != NULL)
+        pool->pic_unlock(picture);
 
     if (!atomic_load(&gc_sys->zombie))
         return;
@@ -134,6 +128,9 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     if (!pool)
         return NULL;
 
+    pool->pic_lock   = cfg->lock;
+    pool->pic_unlock = cfg->unlock;
+
     /*
      * NOTE: When a pooled picture is released, it must be returned to the list
      * of available pictures from its pool, rather than destroyed.
@@ -160,8 +157,6 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
         gc_sys->pool        = pool;
         gc_sys->destroy     = picture->gc.pf_destroy;
         gc_sys->destroy_sys = picture->gc.p_sys;
-        gc_sys->lock        = cfg->lock;
-        gc_sys->unlock      = cfg->unlock;
         atomic_init(&gc_sys->zombie, false);
         gc_sys->tick        = 0;
 
@@ -221,6 +216,9 @@ picture_pool_t *picture_pool_Reserve(picture_pool_t *master, int count)
     if (!pool)
         return NULL;
 
+    pool->pic_lock   = master->pic_lock;
+    pool->pic_unlock = master->pic_unlock;
+
     int found = 0;
     for (int i = 0; i < master->picture_count && found < count; i++) {
         if (master->picture_reserved[i])
@@ -277,7 +275,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
         if (atomic_load(&picture->gc.refcount) > 0)
             continue;
 
-        if (Lock(picture))
+        if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0)
             continue;
 
         /* */
@@ -296,8 +294,10 @@ void picture_pool_Reset(picture_pool_t *pool)
             continue;
 
         picture_t *picture = pool->picture[i];
-        if (atomic_load(&picture->gc.refcount) > 0)
-            Unlock(picture);
+        if (atomic_load(&picture->gc.refcount) > 0) {
+            if (pool->pic_unlock != NULL)
+                pool->pic_unlock(picture);
+        }
         atomic_store(&picture->gc.refcount, 0);
     }
 }
@@ -321,27 +321,14 @@ void picture_pool_NonEmpty(picture_pool_t *pool)
     if (oldest == NULL)
         return; /* Cannot fix! */
 
-    if (atomic_load(&oldest->gc.refcount) > 0)
-        Unlock(oldest);
+    if (atomic_load(&oldest->gc.refcount) > 0) {
+        if (pool->pic_unlock != NULL)
+            pool->pic_unlock(oldest);
+    }
     atomic_store(&oldest->gc.refcount, 0);
 }
 
 int picture_pool_GetSize(picture_pool_t *pool)
 {
     return pool->picture_count;
-}
-
-static int Lock(picture_t *picture)
-{
-    picture_gc_sys_t *gc_sys = picture->gc.p_sys;
-    if (gc_sys->lock)
-        return gc_sys->lock(picture);
-    return VLC_SUCCESS;
-}
-
-static void Unlock(picture_t *picture)
-{
-    picture_gc_sys_t *gc_sys = picture->gc.p_sys;
-    if (gc_sys->unlock)
-        gc_sys->unlock(picture);
 }
