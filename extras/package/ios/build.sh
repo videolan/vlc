@@ -8,6 +8,7 @@ SDK_VERSION=7.0
 SDK_MIN=6.1
 SIXTYFOURBIT_SDK_MIN=7.0
 ARCH=armv7
+SCARY=yes
 
 usage()
 {
@@ -20,6 +21,7 @@ OPTIONS
    -a <arch>     Specify which arch to use (current: ${ARCH})
    -d            Enable debug
    -v            Enable verbose command-line output
+   -w            Build a limited stack of non-scary libraries only
 EOF
 }
 
@@ -40,7 +42,7 @@ info()
     echo "[${blue}info${normal}] $1"
 }
 
-while getopts "hvdsk:a:" OPTION
+while getopts "hvwdsk:a:" OPTION
 do
      case $OPTION in
          h)
@@ -55,6 +57,9 @@ do
              ;;
          d)
              DEBUG=yes
+             ;;
+         w)
+             SCARY=no
              ;;
          k)
              SDK_VERSION=$OPTARG
@@ -276,6 +281,12 @@ else
     DEBUGFLAG="--disable-debug"
 fi
 
+if [ "$SCARY" = "yes" ]; then
+	SCARYFLAG="--enable-dvbpsi --enable-avcodec"
+else
+	SCARYFLAG="--disable-dca --disable-dvbpsi --disable-avcodec --disable-avformat --disable-zvbi"
+fi
+
 # Run configure only upon changes.
 if [ "${VLCROOT}/configure" -nt config.log -o \
      "${THIS_SCRIPT_PATH}" -nt config.log ]; then
@@ -285,6 +296,7 @@ ${VLCROOT}/configure \
     --with-contrib="${VLCROOT}/contrib/${TARGET}-${ARCH}" \
     --enable-static \
     ${DEBUGFLAG} \
+    ${SCARYFLAG} \
     --disable-macosx \
     --disable-macosx-dialog-provider \
     --disable-macosx-qtkit \
@@ -294,7 +306,6 @@ ${VLCROOT}/configure \
     --disable-audioqueue \
     --disable-shared \
     --enable-macosx-quartztext \
-    --enable-avcodec \
     --enable-mkv \
     --enable-opus \
     --disable-sout \
@@ -314,7 +325,6 @@ ${VLCROOT}/configure \
     --disable-notify \
     --enable-live555 \
     --enable-realrtsp \
-    --enable-dvbpsi \
     --enable-swscale \
     --disable-projectm \
     --enable-libass \
@@ -423,7 +433,36 @@ colorthres
 antiflicker
 anaglyph
 remap
+oldmovie
+vhs
+demuxdump
+fingerprinter
 "
+
+if [ "$SCARY" = "no" ]; then
+blacklist="${blacklist}
+dts
+dvbsub
+svcd
+hevc
+packetizer_mlp
+a52
+vc1
+uleaddvaudio
+librar
+libvoc
+avio
+chorus_flanger
+smooth
+cvdsub
+libmod
+libdash
+libmpgv
+dolby_surround
+mpeg_audio"
+fi
+
+echo ${blacklist}
 
 for i in ${blacklist}
 do
