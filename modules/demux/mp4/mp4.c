@@ -142,7 +142,7 @@ static mp4_fragment_t *GetFragmentByTime( demux_t *p_demux, const mtime_t i_time
 
 static int LeafIndexGetMoofPosByTime( demux_t *p_demux, const mtime_t i_target_time,
                                       uint64_t *pi_pos, mtime_t *pi_mooftime );
-static mtime_t LeafGetFragmentTimeOffset( demux_t *p_demux, mp4_fragment_t * );
+static mtime_t LeafGetTrackFragmentTimeOffset( demux_t *p_demux, mp4_fragment_t *, unsigned int );
 static int LeafGetTrackAndChunkByMOOVPos( demux_t *p_demux, uint64_t *pi_pos,
                                       mp4_track_t **pp_tk, unsigned int *pi_chunk );
 static int LeafMapTrafTrunContextes( demux_t *p_demux, MP4_Box_t *p_moof );
@@ -179,6 +179,17 @@ static bool MP4_stream_Tell( stream_t *s, uint64_t *pi_pos )
         *pi_pos = (uint64_t) i_pos;
         return true;
     }
+}
+
+static mtime_t GetTrackDurationInFragment( const mp4_fragment_t *p_fragment,
+                                           unsigned int i_track_ID )
+{
+    for( unsigned int i=0; i<p_fragment->i_durations; i++ )
+    {
+        if( i_track_ID == p_fragment->p_durations[i].i_track_ID )
+            return p_fragment->p_durations[i].i_duration;
+    }
+    return 0;
 }
 
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id )
@@ -793,7 +804,14 @@ static int Open( vlc_object_t * p_this )
         if ( p_mehd && p_mehd->data.p_mehd )
             p_sys->i_overall_duration = p_mehd->data.p_mehd->i_fragment_duration;
         else
-            p_sys->i_overall_duration = p_sys->moovfragment.i_duration;
+        {
+            for( i = 0; i < p_sys->i_tracks; i++ )
+            {
+                mtime_t i_duration = GetTrackDurationInFragment( &p_sys->moovfragment,
+                                                                 p_sys->track[i].i_track_ID );
+                p_sys->i_overall_duration = __MAX( p_sys->i_overall_duration, (uint64_t)i_duration );
+            }
+        }
     }
 
     if( !( p_sys->i_tracks = MP4_BoxCount( p_sys->p_root, "/moov/trak" ) ) )
@@ -876,15 +894,17 @@ static int Open( vlc_object_t * p_this )
 #ifdef MP4_VERBOSE
     mtime_t i_total_duration = 0;
     mp4_fragment_t *p_fragment = &p_sys->moovfragment;
-    while ( p_fragment )
+    while ( p_fragment && p_sys->i_tracks )
     {
-        if ( p_fragment != &p_sys->moovfragment || p_fragment->i_chunk_range_max_offset )
-            i_total_duration += CLOCK_FREQ * p_fragment->i_duration / p_sys->i_timescale;
+        if ( (p_fragment != &p_sys->moovfragment || p_fragment->i_chunk_range_max_offset) &&
+             p_fragment->i_durations && p_fragment->p_durations[0].i_track_ID == p_sys->track[0].i_track_ID )
+            i_total_duration += CLOCK_FREQ * p_fragment->p_durations[0].i_duration / p_sys->i_timescale;
         msg_Dbg( p_demux, "fragment offset %"PRId64", data %"PRIu64"<->%"PRIu64", "
                  "duration %"PRId64" @%"PRId64,
                  p_fragment->p_moox->i_pos, p_fragment->i_chunk_range_min_offset,
                  p_fragment->i_chunk_range_max_offset,
-                 CLOCK_FREQ * p_fragment->i_duration / p_sys->i_timescale, i_total_duration );
+                 ( p_fragment->i_durations && p_fragment->p_durations[0].i_track_ID == p_sys->track[0].i_track_ID )?
+                 CLOCK_FREQ * p_fragment->p_durations[0].i_duration / p_sys->i_timescale : 0, i_total_duration );
         p_fragment = p_fragment->p_next;
     }
 #endif
@@ -961,7 +981,7 @@ static int Demux( demux_t *p_demux )
         if( p_sys->i_timescale > 0 )
         {
             int64_t i_length = CLOCK_FREQ *
-                               (mtime_t)p_sys->moovfragment.i_duration /
+                               (mtime_t)p_sys->i_overall_duration /
                                (mtime_t)p_sys->i_timescale;
             if( MP4_GetMoviePTS( p_sys ) >= i_length )
                 return 0;
@@ -1201,10 +1221,13 @@ static int LeafSeekIntoFragment( demux_t *p_demux, mp4_fragment_t *p_fragment )
     LeafMapTrafTrunContextes( p_demux, p_fragment->p_moox );
     p_sys->context.i_mdatbytesleft = p_fragment->i_chunk_range_max_offset - i64;
 
-    mtime_t i_time_base = LeafGetFragmentTimeOffset( p_demux, p_fragment );
+    mtime_t i_time_base = 0;
     for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
-        p_sys->track[i_track].i_time = i_time_base * p_sys->track[i_track].i_timescale / p_sys->i_timescale;
+        mtime_t i_tracktime = LeafGetTrackFragmentTimeOffset( p_demux, p_fragment,
+                                p_sys->track[i_track].i_track_ID );
+        p_sys->track[i_track].i_time = i_tracktime *  p_sys->track[i_track].i_timescale / p_sys->i_timescale;
+        i_time_base = __MIN( i_time_base, i_tracktime );
     }
     p_sys->i_time = i_time_base;
     p_sys->i_pcr  = VLC_TS_INVALID;
@@ -1316,7 +1339,7 @@ static int MP4_frg_Seek( demux_t *p_demux, double f )
     else
     {
         /* update global time */
-        p_sys->i_time = (uint64_t)(f * (double)p_sys->moovfragment.i_duration);
+        p_sys->i_time = (uint64_t)(f * (double)p_sys->i_overall_duration);
         p_sys->i_pcr  = MP4_GetMoviePTS( p_sys );
 
         for( unsigned i_track = 0; i_track < p_sys->i_tracks; i_track++ )
@@ -1670,9 +1693,11 @@ static void Close ( vlc_object_t * p_this )
     while( p_sys->moovfragment.p_next )
     {
         mp4_fragment_t *p_fragment = p_sys->moovfragment.p_next->p_next;
+        free( p_sys->moovfragment.p_next->p_durations );
         free( p_sys->moovfragment.p_next );
         p_sys->moovfragment.p_next = p_fragment;
     }
+    free( p_sys->moovfragment.p_durations );
 
     free( p_sys );
 }
@@ -3812,7 +3837,7 @@ int DemuxFrg( demux_t *p_demux )
         if( p_sys->i_timescale > 0 )
         {
             int64_t i_length = CLOCK_FREQ *
-                               (mtime_t)p_sys->moovfragment.i_duration /
+                               (mtime_t)p_sys->i_overall_duration /
                                (mtime_t)p_sys->i_timescale;
             if( MP4_GetMoviePTS( p_sys ) >= i_length )
                 return 0;
@@ -3927,6 +3952,27 @@ static bool BoxExistsInRootTree( MP4_Box_t *p_root, uint32_t i_type, off_t i_pos
     return (p_root != NULL);
 }
 
+static mtime_t SumFragmentsDurations( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    mtime_t i_max_duration = 0;
+
+    for ( unsigned int i=0; i<p_sys->i_tracks; i++ )
+    {
+        mtime_t i_duration = 0;
+        const mp4_fragment_t *p_fragment = &p_sys->moovfragment;
+        while ( p_fragment && p_fragment->p_durations )
+        {
+            i_duration += GetTrackDurationInFragment( p_fragment,
+                                                      p_sys->track[i].i_track_ID );
+            p_fragment = p_fragment->p_next;
+        }
+        i_max_duration = __MAX( i_duration, i_max_duration );
+    }
+
+    return i_max_duration;
+}
+
 /* Keeps an ordered chain of all fragments */
 static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
 {
@@ -3949,15 +3995,20 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
 
             if ( MP4_BoxCount( p_moox, "mvex" ) || !p_mvhd )
             { /* duration might be wrong an be set to whole duration :/ */
-               p_sys->moovfragment.i_duration = 0;
                MP4_Box_t *p_tkhd;
                MP4_Box_t *p_trak = MP4_BoxGet( p_moox, "trak" );
+               unsigned int i_trakcount = MP4_BoxCount( p_moox, "trak" );
+               p_sys->moovfragment.p_durations = calloc( i_trakcount, sizeof(*p_sys->moovfragment.p_durations) );
+               if ( i_trakcount && !p_sys->moovfragment.p_durations )
+                   return 0;
+               p_sys->moovfragment.i_durations = i_trakcount;
+               i_trakcount = 0;
                while( p_trak )
                {
                    if ( p_trak->i_type == ATOM_trak && (p_tkhd = MP4_BoxGet( p_trak, "tkhd" )) )
                    {
-                       if ( BOXDATA(p_tkhd)->i_duration > p_sys->moovfragment.i_duration )
-                           p_sys->moovfragment.i_duration = BOXDATA(p_tkhd)->i_duration;
+                       p_sys->moovfragment.p_durations[i_trakcount].i_duration = BOXDATA(p_tkhd)->i_duration;
+                       p_sys->moovfragment.p_durations[i_trakcount++].i_track_ID = BOXDATA(p_tkhd)->i_track_ID;
                    }
                    p_trak = p_trak->p_next;
                }
@@ -3991,7 +4042,13 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
     mp4_fragment_t *p_new = malloc(sizeof(mp4_fragment_t));
     if ( !p_new ) return false;
     p_new->p_moox = p_moox;
-    p_new->i_duration = 0;
+    p_new->i_durations = MP4_BoxCount( p_new->p_moox, "traf" );
+    p_new->p_durations = calloc( p_new->i_durations, sizeof(*p_new->p_durations) );
+    if ( p_new->i_durations && !p_new->p_durations )
+    {
+        free( p_new );
+        return false;
+    }
     p_new->p_next = p_base_fragment->p_next;
     p_base_fragment->p_next = p_new;
     msg_Dbg( p_demux, "added fragment %4.4s", (char*) &p_moox->i_type );
@@ -4004,6 +4061,7 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
     uint32_t i_trafs_total_size = 0;
 
     MP4_Box_t *p_traf = MP4_BoxGet( p_new->p_moox, "traf" );
+    unsigned int i_durationindex = 0;
     while ( p_traf )
     {
         if ( p_traf->i_type != ATOM_traf )
@@ -4136,7 +4194,9 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
         }
 
         i_trafs_total_size += i_traf_total_size;
-        p_new->i_duration = __MAX( p_new->i_duration, i_traf_duration * p_sys->i_timescale / i_track_timescale );
+
+        p_new->p_durations[i_durationindex].i_track_ID = BOXDATA(p_tfhd)->i_track_ID;
+        p_new->p_durations[i_durationindex++].i_duration = i_traf_duration * p_sys->i_timescale / i_track_timescale;
 
         p_traf = p_traf->p_next;
         i_traf++;
@@ -4151,21 +4211,13 @@ static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox )
     MP4_Box_t *p_mehd = MP4_BoxGet( p_sys->moovfragment.p_moox, "mvex/mehd");
     if ( !p_mehd )
     {
-        p_sys->i_overall_duration = 0;
         if ( p_sys->b_fragments_probed )
-        {
-            p_new = &p_sys->moovfragment;
-            while ( p_new )
-            {
-                p_sys->i_overall_duration += p_new->i_duration;
-                p_new = p_new->p_next;
-            }
-        }
+           p_sys->i_overall_duration = SumFragmentsDurations( p_demux );
     }
     else
         p_sys->i_overall_duration = BOXDATA(p_mehd)->i_fragment_duration;
 
-    msg_Dbg( p_demux, "total fragments duration %"PRId64, CLOCK_FREQ * p_sys->i_overall_duration / p_sys->i_timescale);
+    msg_Dbg( p_demux, "total fragments duration %"PRId64, CLOCK_FREQ * p_sys->i_overall_duration / p_sys->i_timescale );
     return true;
 }
 
@@ -4283,17 +4335,29 @@ static mp4_fragment_t * GetFragmentByPos( demux_t *p_demux, uint64_t i_pos, bool
 /* Get a matching fragment data start by clock time */
 static mp4_fragment_t * GetFragmentByTime( demux_t *p_demux, const mtime_t i_time )
 {
-    mp4_fragment_t *p_fragment = &p_demux->p_sys->moovfragment;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    mp4_fragment_t *p_fragment = &p_sys->moovfragment;
     mtime_t i_base_time = 0;
-    while ( p_fragment )
+    mtime_t *pi_tracks_duration_total = calloc( p_sys->i_tracks, sizeof(mtime_t) );
+    while ( p_fragment && pi_tracks_duration_total )
     {
-        if ( p_fragment == &p_demux->p_sys->moovfragment &&
+        if ( p_fragment == &p_sys->moovfragment &&
              p_fragment->i_chunk_range_max_offset == 0 )
         {
             p_fragment = p_fragment->p_next;
             continue;
         }
-        mtime_t i_length = CLOCK_FREQ * p_fragment->i_duration / p_demux->p_sys->i_timescale;
+
+        mtime_t i_length = 0;
+        for( unsigned int i=0; i<p_sys->i_tracks; i++ )
+        {
+            mtime_t i_track_duration = GetTrackDurationInFragment( p_fragment,
+                                                                   p_sys->track[i].i_track_ID );
+            pi_tracks_duration_total[i] += i_track_duration;
+            i_length = __MAX(i_length, i_track_duration);
+        }
+
+        i_length = i_length * CLOCK_FREQ / p_demux->p_sys->i_timescale; /* movie scale to time */
         if ( i_time >= i_base_time &&
              i_time <= i_base_time + i_length )
         {
@@ -4306,13 +4370,15 @@ static mp4_fragment_t * GetFragmentByTime( demux_t *p_demux, const mtime_t i_tim
         }
 
         if ( !p_demux->p_sys->b_fragments_probed )
-            return NULL; /* We have no way to guess missing fragments time */
+            break; /* We have no way to guess missing fragments time */
     }
+    free( pi_tracks_duration_total );
     return NULL;
 }
 
 /* Returns fragment scaled time offset */
-static mtime_t LeafGetFragmentTimeOffset( demux_t *p_demux, mp4_fragment_t *p_fragment )
+static mtime_t LeafGetTrackFragmentTimeOffset( demux_t *p_demux, mp4_fragment_t *p_fragment,
+                                               unsigned int i_track_ID )
 {
     mtime_t i_base_scaledtime = 0;
     mp4_fragment_t *p_current = &p_demux->p_sys->moovfragment;
@@ -4320,7 +4386,9 @@ static mtime_t LeafGetFragmentTimeOffset( demux_t *p_demux, mp4_fragment_t *p_fr
     {
         if ( p_current != &p_demux->p_sys->moovfragment ||
              p_current->i_chunk_range_max_offset )
-            i_base_scaledtime += p_current->i_duration;
+        {
+            i_base_scaledtime += GetTrackDurationInFragment( p_current, i_track_ID );
+        }
         p_current = p_current->p_next;
     }
     return i_base_scaledtime;

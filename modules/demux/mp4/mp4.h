@@ -126,7 +126,7 @@ typedef struct
     void      *p_drms;
     MP4_Box_t *p_skcr;
 
-    mtime_t i_time;
+    mtime_t i_time; // track scaled
 
     struct
     {
@@ -149,7 +149,12 @@ struct mp4_fragment_t
 {
     uint64_t i_chunk_range_min_offset;
     uint64_t i_chunk_range_max_offset;
-    uint64_t i_duration;
+    struct
+    {
+        unsigned int i_track_ID;
+        uint64_t i_duration; // movie scaled
+    } *p_durations;
+    unsigned int i_durations;
     MP4_Box_t *p_moox;
     mp4_fragment_t *p_next;
 };
