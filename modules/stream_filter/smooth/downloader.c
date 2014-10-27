@@ -149,8 +149,10 @@ static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
 
 #ifdef DISABLE_BANDWIDTH_ADAPTATION
 static unsigned BandwidthAdaptation( stream_t *s,
-        sms_stream_t *sms, uint64_t *bandwidth )
+        sms_stream_t *sms, uint64_t bandwidth )
 {
+    VLC_UNUSED(bandwidth);
+    VLC_UNUSED(s);
     return sms->download_qlvl;
 }
 #else
