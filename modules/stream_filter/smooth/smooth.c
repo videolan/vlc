@@ -589,10 +589,10 @@ static chunk_t *get_chunk( stream_t *s, const bool wait )
     return chunk;
 }
 
-static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
+static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
-    int copied = 0;
+    unsigned int copied = 0;
     chunk_t *chunk = NULL;
 
     do
@@ -601,7 +601,7 @@ static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
         if( !chunk )
             return copied;
 
-        if( chunk->read_pos >= (int)chunk->size )
+        if( chunk->read_pos >= chunk->size )
         {
             if( chunk->type == VIDEO_ES ||
                 ( !SMS_GET_SELECTED_ST( VIDEO_ES ) && chunk->type == AUDIO_ES ) )
@@ -638,7 +638,7 @@ static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
             assert( type == ATOM_moof || type == ATOM_uuid );
         }
 
-        int len = -1;
+        uint64_t len = 0;
         uint8_t *src = chunk->data + chunk->read_pos;
         if( i_read <= chunk->size - chunk->read_pos )
             len = i_read;
@@ -664,12 +664,13 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     int length = 0;
+    i_read = __MIN(INT_MAX, i_read);
 
     if( p_sys->b_error )
         return 0;
 
     length = sms_Read( s, (uint8_t*) buffer, i_read );
-    if( length < 0 )
+    if( length == 0 )
         return 0;
 
     /* This call to sms_Read will increment p_sys->playback.index
@@ -677,8 +678,8 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
     sms_Read( s, NULL, 0 );
 
     p_sys->playback.boffset += length;
-    if( (unsigned)length < i_read )
-        msg_Warn( s, "could not read %i bytes, only %i!", i_read, length );
+    if( length < (int)i_read )
+        msg_Warn( s, "could not read %u bytes, only %u !", i_read, length );
 
     return length;
 }

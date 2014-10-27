@@ -35,18 +35,18 @@ typedef struct item_s
 
 typedef struct sms_queue_s
 {
-    int length;
+    unsigned length;
     item_t *first;
 } sms_queue_t;
 
 typedef struct chunk_s
 {
-    int64_t     duration;   /* chunk duration (seconds / TimeScale) */
-    int64_t     start_time; /* PTS (seconds / TimeScale) */
-    int         size;       /* chunk size in bytes */
+    uint64_t    duration;   /* chunk duration (seconds / TimeScale) */
+    uint64_t    start_time; /* PTS (seconds / TimeScale) */
+    uint64_t    size;       /* chunk size in bytes */
     unsigned    sequence;   /* unique sequence number */
     uint64_t    offset;     /* offset in the media */
-    int         read_pos;   /* position in the chunk */
+    uint64_t    read_pos;   /* position in the chunk */
     int         type;       /* video, audio, or subtitles */
 
     uint8_t     *data;
@@ -96,7 +96,7 @@ struct stream_sys_t
     unsigned     i_tracks;     /* Total number of tracks in the Manifest */
     sms_queue_t  *bws;         /* Measured bandwidths of the N last chunks */
     uint64_t     vod_duration; /* total duration of the VOD media */
-    int64_t      time_pos;
+    uint64_t     time_pos;
     unsigned     timescale;
 
     /* Download */
@@ -167,7 +167,7 @@ struct stream_sys_t
     no_more_chunks( p_sys->download.ck_index, p_sys->selected_st ) )
 
 void sms_queue_free( sms_queue_t* );
-sms_queue_t *sms_queue_init( const int );
+sms_queue_t *sms_queue_init( const unsigned int );
 int sms_queue_put( sms_queue_t *, const uint64_t );
 uint64_t sms_queue_avg( sms_queue_t *);
 quality_level_t *get_qlevel( sms_stream_t *, const unsigned );

@@ -158,7 +158,7 @@ quality_level_t *get_qlevel( sms_stream_t *sms, const unsigned qid )
     return NULL;
 }
 
-sms_queue_t *sms_queue_init( const int length )
+sms_queue_t *sms_queue_init( const unsigned length )
 {
     sms_queue_t *ret = malloc( sizeof( sms_queue_t ) );
     if( unlikely( !ret ) )
@@ -184,7 +184,7 @@ int sms_queue_put( sms_queue_t *queue, const uint64_t value )
 {
     /* Remove the last (and oldest) item */
     item_t *item, *prev = NULL;
-    int count = 0;
+    unsigned int count = 0;
     for( item = queue->first; item != NULL; item = item->next )
     {
         count++;
@@ -216,7 +216,7 @@ uint64_t sms_queue_avg( sms_queue_t *queue )
     if( last == NULL )
         return 0;
     uint64_t sum = queue->first->value;
-    for( int i = 0; i < queue->length - 1; i++ )
+    for( unsigned int i = 0; queue->length && i < queue->length - 1; i++ )
     {
         if( last )
         {

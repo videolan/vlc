@@ -56,7 +56,7 @@ static char *ConstructUrl( const char *template, const char *base_url,
     return url;
 }
 
-static chunk_t * chunk_Get( sms_stream_t *sms, const int64_t start_time )
+static chunk_t * chunk_Get( sms_stream_t *sms, const uint64_t start_time )
 {
     int len = vlc_array_count( sms->chunks );
     for( int i = 0; i < len; i++ )
@@ -116,8 +116,10 @@ static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
         return VLC_EGENERIC;
 
     int64_t size = stream_Size( p_ts );
+    if ( size < 0 )
+        return VLC_EGENERIC;
 
-    chunk->size = size;
+    chunk->size = (uint64_t) size;
     chunk->offset = p_sys->download.next_chunk_offset;
     p_sys->download.next_chunk_offset += chunk->size;
 
@@ -255,8 +257,8 @@ static int get_new_chunks( stream_t *s, chunk_t *ck )
 
     for( uint8_t i = 0; i < fragment_count; i++ )
     {
-        int64_t dur = tfrf_df[i].i_fragment_duration;
-        int64_t stime = tfrf_df[i].i_fragment_abs_time;
+        uint64_t dur = tfrf_df[i].i_fragment_duration;
+        uint64_t stime = tfrf_df[i].i_fragment_abs_time;
         msg_Dbg( s, "\"tfrf\" fragment duration %"PRIu64", "\
                     "fragment abs time %"PRIu64, dur, stime);
 
@@ -388,7 +390,7 @@ static int Download( stream_t *s, sms_stream_t *sms )
         msg_Err( s, "invalid stream type" );
         return VLC_EGENERIC;
     }
-    int64_t start_time = p_sys->download.lead[index];
+    uint64_t start_time = p_sys->download.lead[index];
 
     quality_level_t *qlevel = get_qlevel( sms, sms->download_qlvl );
     if( unlikely( !qlevel ) )
@@ -529,12 +531,12 @@ static int Download( stream_t *s, sms_stream_t *sms )
     return VLC_SUCCESS;
 }
 
-static inline int64_t get_lead( stream_t *s )
+static inline uint64_t get_lead( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
-    int64_t lead = 0;
-    int64_t alead = p_sys->download.lead[es_cat_to_index( AUDIO_ES )];
-    int64_t vlead = p_sys->download.lead[es_cat_to_index( VIDEO_ES )];
+    uint64_t lead = 0;
+    uint64_t alead = p_sys->download.lead[es_cat_to_index( AUDIO_ES )];
+    uint64_t vlead = p_sys->download.lead[es_cat_to_index( VIDEO_ES )];
     bool video = SMS_GET_SELECTED_ST( VIDEO_ES ) ? true : false;
     bool audio = SMS_GET_SELECTED_ST( AUDIO_ES ) ? true : false;
 
@@ -545,7 +547,10 @@ static inline int64_t get_lead( stream_t *s )
     else
         lead = alead;
 
-    lead -= p_sys->playback.toffset;
+    if( p_sys->playback.toffset > lead )
+        lead -= p_sys->playback.toffset;
+    else
+        lead = 0;
     return lead;
 }
 
@@ -598,7 +603,7 @@ void* sms_Thread( void *p_this )
      * and for some reason the n^th advertised video fragment is related to
      * the n+1^th advertised audio chunk or vice versa */
 
-    int64_t start_time = 0, lead = 0;
+    uint64_t start_time = 0, lead = 0;
 
     for( int i = 0; i < 3; i++ )
     {
