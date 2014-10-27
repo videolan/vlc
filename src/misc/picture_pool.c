@@ -209,16 +209,12 @@ void picture_pool_Delete(picture_pool_t *pool)
 
             assert(!pool->picture_reserved[i]);
 
-            /* Restore the original garbage collector */
-            if (atomic_fetch_add(&picture->gc.refcount, 1) == 0)
-            {   /* Simple case: the picture is not locked, destroy it now. */
-                picture->gc.pf_destroy = gc_sys->destroy;
-                picture->gc.p_sys      = gc_sys->destroy_sys;
-                free(gc_sys);
-            }
-            else /* Intricate case: the picture is still locked and the gc
-                    cannot be modified (w/o memory synchronization). */
-                atomic_store(&gc_sys->zombie, true);
+            /* Restore the initial reference that was cloberred in
+             * picture_pool_NewExtended(). */
+            atomic_fetch_add(&picture->gc.refcount, 1);
+            /* The picture might still locked and then the G.C. state cannot be
+             * modified (w/o memory synchronization). */
+            atomic_store(&gc_sys->zombie, true);
 
             picture_Release(picture);
         }
