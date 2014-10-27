@@ -282,7 +282,7 @@ static int ReadBlockHeader( demux_t *p_demux )
             /* read subsequent block 1 */
             if( stream_Read( p_demux->s, buf, 4 ) < 4 )
                 return VLC_EGENERIC; /* EOF */
- 
+
             i_block_size = GetDWLE( buf ) >> 8;
             msg_Dbg( p_demux, "new block: type: %u, size: %u",
                     (unsigned)*buf, i_block_size );
