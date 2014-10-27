@@ -72,10 +72,11 @@ endif
 
 VPX_CONF := \
 	--enable-runtime-cpu-detect \
-	--disable-install-bins \
-	--disable-install-docs \
+	--disable-docs \
 	--disable-examples \
-	--disable-unit-tests
+	--disable-unit-tests \
+	--disable-install-bins \
+	--disable-install-docs
 
 ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
