@@ -2499,6 +2499,7 @@ then
       CPPFLAGS="${CPPFLAGS} ${SWSCALE_CFLAGS}"
       CFLAGS="${CFLAGS} ${SWSCALE_CFLAGS}"
       AC_CHECK_HEADERS(libswscale/swscale.h)
+      AC_CHECK_HEADERS(libavutil/avutil.h)
       VLC_ADD_PLUGIN([swscale])
       VLC_ADD_LIBS([swscale],[$SWSCALE_LIBS])
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
