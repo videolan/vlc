@@ -75,8 +75,8 @@ VPX_CONF := \
 	--disable-install-bins \
 	--disable-install-docs \
 	--disable-examples \
-	--disable-unit-tests \
-	--disable-vp8-decoder
+	--disable-unit-tests
+
 ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
 endif
