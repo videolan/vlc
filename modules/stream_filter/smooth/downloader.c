@@ -547,7 +547,7 @@ static inline uint64_t get_lead( stream_t *s )
     else
         lead = alead;
 
-    if( p_sys->playback.toffset > lead )
+    if( p_sys->playback.toffset < lead )
         lead -= p_sys->playback.toffset;
     else
         lead = 0;
