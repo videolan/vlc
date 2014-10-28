@@ -604,6 +604,7 @@ void* sms_Thread( void *p_this )
      * the n+1^th advertised audio chunk or vice versa */
 
     uint64_t start_time = 0, lead = 0;
+    int64_t i_pts_delay;
 
     for( int i = 0; i < 3; i++ )
     {
@@ -634,7 +635,13 @@ void* sms_Thread( void *p_this )
 
         lead = get_lead( s );
 
-        while( lead > 10 * p_sys->timescale + start_time || NO_MORE_CHUNKS )
+        if ( stream_Control( s, STREAM_GET_PTS_DELAY, &i_pts_delay ) != VLC_SUCCESS ||
+             i_pts_delay < 1 )
+        {
+            i_pts_delay = 10 * p_sys->timescale + start_time;
+        }
+
+        while( lead > (uint64_t) i_pts_delay || NO_MORE_CHUNKS )
         {
             vlc_cond_wait( &p_sys->download.wait, &p_sys->download.lock_wait );
             lead = get_lead( s );

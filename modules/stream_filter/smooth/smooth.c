@@ -773,9 +773,9 @@ static int Control( stream_t *s, int i_query, va_list args )
             *(va_arg( args, bool * )) = true;
             break;
         case STREAM_CAN_FASTSEEK:
-        case STREAM_CAN_PAUSE: /* TODO */
             *(va_arg( args, bool * )) = false;
             break;
+        case STREAM_CAN_PAUSE: /* TODO */
         case STREAM_CAN_CONTROL_PACE:
             *(va_arg( args, bool * )) = !p_sys->b_live;
             break;
@@ -798,6 +798,9 @@ static int Control( stream_t *s, int i_query, va_list args )
             *va_arg (args, int64_t *) = INT64_C(1000) *
                 var_InheritInteger(s, "network-caching");
              break;
+        case STREAM_SET_PAUSE_STATE:
+            return (p_sys->b_live) ? VLC_EGENERIC : VLC_SUCCESS;
+            break;
         default:
             return VLC_EGENERIC;
     }
