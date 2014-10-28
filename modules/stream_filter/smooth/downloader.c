@@ -443,8 +443,8 @@ static int Download( stream_t *s, sms_stream_t *sms )
     mtime_t start = mdate();
     if( sms_Download( s, chunk, url ) != VLC_SUCCESS )
     {
-        msg_Err( s, "downloaded chunk %u from stream %s at quality\
-            %u failed", chunk->sequence, sms->name, qlevel->Bitrate );
+        msg_Err( s, "downloaded chunk %u from stream %s at quality"
+            " %u *failed*", chunk->sequence, sms->name, qlevel->Bitrate );
         return VLC_EGENERIC;
     }
     mtime_t duration = mdate() - start;
