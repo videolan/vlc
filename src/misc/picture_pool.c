@@ -272,7 +272,9 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
             continue;
 
         picture_t *picture = pool->picture[i];
-        if (atomic_load(&picture->gc.refcount) > 0)
+        uintptr_t refs = 0;
+
+        if (!atomic_compare_exchange_strong(&picture->gc.refcount, &refs, 1))
             continue;
 
         if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0)
@@ -281,7 +283,6 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
         /* */
         picture->p_next = NULL;
         picture->gc.p_sys->tick = pool->tick++;
-        picture_Hold(picture);
         return picture;
     }
     return NULL;
