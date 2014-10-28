@@ -70,12 +70,14 @@ quality_level_t * ql_New( void )
     if( unlikely( !ql ) ) return NULL;
 
     ql->Index = -1;
+    ARRAY_INIT(ql->custom_attrs);
     return ql;
 }
 
 void ql_Free( quality_level_t *qlevel )
 {
     free( qlevel->CodecPrivateData );
+    ARRAY_RESET(qlevel->custom_attrs);
     free( qlevel );
     qlevel = NULL;
 }

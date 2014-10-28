@@ -145,6 +145,7 @@ static int parse_Manifest( stream_t *s )
     uint8_t *WaveFormatEx;
     sms_stream_t *sms = NULL;
     quality_level_t *ql = NULL;
+    custom_attrs_t *cp = NULL;
     int64_t start_time = 0, duration = 0;
     int64_t computed_start_time = 0, computed_duration = 0;
     unsigned next_track_id = 1;
@@ -228,6 +229,25 @@ static int parse_Manifest( stream_t *s )
                             sms->name = strdup( "audio" );
                         else if( sms->type == SPU_ES )
                             sms->name = strdup( "text" );
+                    }
+                }
+                else if ( !strcmp( node, "CustomAttributes" ) )
+                {
+                    if (!sms || !ql || cp)
+                        break;
+                    cp = (custom_attrs_t *) calloc( 1, sizeof(*cp) );
+                }
+                else if ( !strcmp( node, "Attribute" ) )
+                {
+                    if (!sms || !ql || !cp)
+                        break;
+                    while( (name = xml_ReaderNextAttr( vlc_reader, &value )) )
+                    {
+                        if( !strcmp( name, "Name" ) && !cp->psz_key )
+                            cp->psz_key = strdup( value );
+                        else
+                        if( !strcmp( name, "Value" ) && !cp->psz_value )
+                            cp->psz_value = strdup( value );
                     }
                 }
                 else if( !strcmp( node, "QualityLevel" ) )
@@ -355,10 +375,26 @@ static int parse_Manifest( stream_t *s )
                 break;
 
             case XML_READER_ENDELEM:
-                if( strcmp( node, "StreamIndex" ) )
+                if ( !strcmp( node, "CustomAttributes" ) )
+                {
+                    if ( cp )
+                    {
+                        ARRAY_APPEND(ql->custom_attrs, cp);
+                        cp = NULL;
+                    }
+                }
+                else if ( !strcmp( node, "Attribute" ) )
+                {
+                    if( !cp->psz_key || !cp->psz_value )
+                    {
+                        free( cp->psz_key );
+                        free( cp->psz_value );
+                        FREENULL( cp );
+                    }
+                }
+                else if( strcmp( node, "StreamIndex" ) )
                     break;
-
-                if ( sms )
+                else if ( sms )
                 {
                     vlc_array_append( p_sys->sms_streams, sms );
 

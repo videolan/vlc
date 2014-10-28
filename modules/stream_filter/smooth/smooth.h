@@ -52,6 +52,12 @@ typedef struct chunk_s
     uint8_t     *data;
 } chunk_t;
 
+typedef struct
+{
+    char *psz_key;
+    char *psz_value;
+} custom_attrs_t;
+
 typedef struct quality_level_s
 {
     int             Index;
@@ -66,6 +72,7 @@ typedef struct quality_level_s
     unsigned        nBlockAlign;
     unsigned        id;
     char            *CodecPrivateData; /* hex encoded string */
+    DECL_ARRAY(custom_attrs_t *) custom_attrs;
 
 } quality_level_t;
 
