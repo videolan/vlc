@@ -28,32 +28,99 @@
 #include <assert.h>
 #include <vlc_stream.h>
 #include <vlc_es.h>
+#include <vlc_charset.h>
 
 #include "smooth.h"
 #include "../../demux/mp4/libmp4.h"
 
-static char *ConstructUrl( const char *template, const char *base_url,
-        const uint64_t bandwidth, const uint64_t start_time )
+static bool Replace( char **ppsz_string, off_t off, const char *psz_old,
+                     const char *psz_new )
 {
-    char *frag, *end, *qual;
-    char *url_template = strdup( template );
-    char *saveptr = NULL;
+    const size_t i_oldlen = strlen( psz_old );
+    const size_t i_newlen = strlen( psz_new );
+    size_t i_stringlen = strlen( *ppsz_string );
 
-    qual = strtok_r( url_template, "{", &saveptr );
-    strtok_r( NULL, "}", &saveptr );
-    frag = strtok_r( NULL, "{", &saveptr );
-    strtok_r( NULL, "}", &saveptr );
-    end = strtok_r( NULL, "", &saveptr );
-    char *url = NULL;
-
-    if( asprintf( &url, "%s/%s%"PRIu64"%s%"PRIu64"%s", base_url, qual,
-                bandwidth, frag, start_time, end) < 0 )
+    if ( i_newlen > i_oldlen )
     {
-       return NULL;
+        i_stringlen += i_newlen - i_oldlen;
+        char *psz_realloc = realloc( *ppsz_string, i_stringlen + 1 );
+        if( !psz_realloc )
+            return false;
+        *ppsz_string = psz_realloc;
+    }
+    memmove( *ppsz_string + off + i_newlen,
+             *ppsz_string + off + i_oldlen,
+             i_stringlen - off - i_newlen );
+    strncpy( *ppsz_string + off, psz_new, i_newlen );
+
+    return true;
+}
+
+static char *ConstructUrl( const char *psz_template, const char *psz_base_url,
+                           const quality_level_t *p_qlevel, const uint64_t i_start_time )
+{
+    char *psz_path = strdup( psz_template );
+    if ( !psz_path )
+        return NULL;
+
+    char *psz_start;
+    while( true )
+    {
+        if ( (psz_start = strstr( psz_path, "{bitrate}" )) )
+        {
+            char *psz_bitrate = NULL;
+            if ( us_asprintf( &psz_bitrate, "%u", p_qlevel->Bitrate ) < 0 ||
+                 ! Replace( &psz_path, psz_start - psz_path, "{bitrate}", psz_bitrate ) )
+            {
+                free( psz_bitrate );
+                free( psz_path );
+                return false;
+            }
+            free( psz_bitrate );
+        }
+        else if ( (psz_start = strstr( psz_path, "{start time}" )) )
+        {
+            char *psz_starttime = NULL;
+            if ( us_asprintf( &psz_starttime, "%"PRIu64, i_start_time ) < 0 ||
+                 ! Replace( &psz_path, psz_start - psz_path, "{start time}", psz_starttime ) )
+            {
+                free( psz_starttime );
+                free( psz_path );
+                return false;
+            }
+            free( psz_starttime );
+        }
+        else if ( (psz_start = strstr( psz_path, "{CustomAttributes}" )) )
+        {
+            char *psz_attributes = NULL;
+            FOREACH_ARRAY( const custom_attrs_t *p_attrs, p_qlevel->custom_attrs )
+            if ( asprintf( &psz_attributes,
+                           psz_attributes ? "%s,%s=%s" : "%s%s=%s",
+                           psz_attributes ? psz_attributes : "",
+                           p_attrs->psz_key, p_attrs->psz_value ) < 0 )
+                    break;
+            FOREACH_END()
+            if ( !psz_attributes ||
+                 ! Replace( &psz_path, psz_start - psz_path, "{CustomAttributes}", psz_attributes ) )
+            {
+                free( psz_attributes );
+                free( psz_path );
+                return false;
+            }
+            free( psz_attributes );
+        }
+        else
+            break;
     }
 
-    free( url_template );
-    return url;
+    char *psz_url;
+    if( asprintf( &psz_url, "%s/%s", psz_base_url, psz_path ) < 0 )
+    {
+        free( psz_path );
+        return NULL;
+    }
+    free( psz_path );
+    return psz_url;
 }
 
 static chunk_t * chunk_Get( sms_stream_t *sms, const uint64_t start_time )
@@ -417,7 +484,7 @@ static int Download( stream_t *s, sms_stream_t *sms )
     chunk->type = sms->type;
 
     char *url = ConstructUrl( sms->url_template, p_sys->base_url,
-                                  qlevel->Bitrate, chunk->start_time );
+                              qlevel, chunk->start_time );
     if( !url )
     {
         msg_Err( s, "ConstructUrl returned NULL" );
