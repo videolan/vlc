@@ -77,6 +77,10 @@ quality_level_t * ql_New( void )
 void ql_Free( quality_level_t *qlevel )
 {
     free( qlevel->CodecPrivateData );
+    FOREACH_ARRAY( custom_attrs_t *p_attrs, qlevel->custom_attrs )
+        free( p_attrs->psz_key );
+        free( p_attrs->psz_value );
+    FOREACH_END()
     ARRAY_RESET(qlevel->custom_attrs);
     free( qlevel );
     qlevel = NULL;
