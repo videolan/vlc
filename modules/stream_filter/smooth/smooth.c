@@ -167,7 +167,7 @@ static int parse_Manifest( stream_t *s )
                         if( !strcmp( name, "Duration" ) )
                             p_sys->vod_duration = strtoull( value, NULL, 10 );
                         else if( !strcmp( name, "TimeScale" ) )
-                            p_sys->timescale = strtoull( value, NULL, 10 );
+                            p_sys->timescale = strtoul( value, NULL, 10 );
                         else if ( !strcmp( name, "LookAheadFragmentCount" ) )
                             p_sys->lookahead_count = strtoul( value, NULL, 10 );
                     }
@@ -209,7 +209,7 @@ static int parse_Manifest( stream_t *s )
 
                         else if( !strcmp( name, "Chunks" ) )
                         {
-                            sms->vod_chunks_nb = strtol( value, NULL, 10 );
+                            sms->vod_chunks_nb = strtoul( value, NULL, 10 );
                             if( sms->vod_chunks_nb == 0 ) /* live */
                                 sms->vod_chunks_nb = UINT32_MAX;
                         }
@@ -272,9 +272,9 @@ static int parse_Manifest( stream_t *s )
                         if( !strcmp( name, "Index" ) )
                             ql->Index = strtol( value, NULL, 10 );
                         else if( !strcmp( name, "Bitrate" ) )
-                            ql->Bitrate = strtoull( value, NULL, 10 );
+                            ql->Bitrate = strtoul( value, NULL, 10 );
                         else if( !strcmp( name, "PacketSize" ) )
-                            ql->nBlockAlign = strtoull( value, NULL, 10 );
+                            ql->nBlockAlign = strtoul( value, NULL, 10 );
                         else if( !strcmp( name, "FourCC" ) )
                             ql->FourCC = VLC_FOURCC( value[0], value[1],
                                                      value[2], value[3] );
@@ -324,9 +324,9 @@ static int parse_Manifest( stream_t *s )
                     while( (name = xml_ReaderNextAttr( vlc_reader, &value )) )
                     {
                         if( !strcmp( name, "t" ) )
-                            start_time = strtoull( value, NULL, 10 );
+                            start_time = strtoll( value, NULL, 10 );
                         if( !strcmp( name, "d" ) )
-                            duration = strtoull( value, NULL, 10 );
+                            duration = strtoll( value, NULL, 10 );
                     }
                     if( start_time == -1 )
                     {
