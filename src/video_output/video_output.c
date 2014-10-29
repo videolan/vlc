@@ -335,27 +335,6 @@ bool vout_IsEmpty(vout_thread_t *vout)
     return !picture;
 }
 
-void vout_FixLeaks( vout_thread_t *vout )
-{
-    picture_t *picture = picture_fifo_Peek(vout->p->decoder_fifo);
-    if (picture != NULL) {
-        picture_Release(picture);
-        return; /* Not all pictures has been displayed yet */
-
-    }
-
-    picture = picture_pool_Get(vout->p->decoder_pool);
-
-    if (picture != NULL)
-        picture_Release(picture); /* Not all pictures are referenced */
-    else {
-        /* There are no reasons that no pictures are available, force one
-         * from the pool, be careful with it though */
-        msg_Err(vout, "pictures leaked, trying to workaround");
-        picture_pool_NonEmpty(vout->p->decoder_pool);
-    }
-}
-
 void vout_NextPicture(vout_thread_t *vout, mtime_t *duration)
 {
     vout_control_cmd_t cmd;

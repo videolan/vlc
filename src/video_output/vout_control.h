@@ -47,14 +47,6 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_l
  */
 void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
 
-/**
- * This function will try to detect if pictures are being leaked. If so it
- * will release them.
- *
- * XXX This function is there to workaround bugs in decoder
- */
-void vout_FixLeaks( vout_thread_t *p_vout );
-
 /*
  * Reset the states of the vout.
  */

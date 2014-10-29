@@ -443,9 +443,6 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         }
         vlc_mutex_unlock( &p_owner->lock );
 
-        /* Check the decoder doesn't leak pictures */
-        vout_FixLeaks( p_owner->p_vout );
-
         /* FIXME add a vout_WaitPictureAvailable (timedwait) */
         msleep( VOUT_OUTMEM_SLEEP );
     }
