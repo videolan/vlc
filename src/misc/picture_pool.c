@@ -289,40 +289,6 @@ retry:
     return ret;
 }
 
-void picture_pool_NonEmpty(picture_pool_t *pool)
-{
-    picture_t *oldest = NULL;
-    uint64_t tick = 0;
-
-    vlc_mutex_lock(&pool->lock);
-    assert(pool->refs > 0);
-
-    for (unsigned i = 0; i < pool->picture_count; i++) {
-        picture_t *picture = pool->picture[i];
-        picture_gc_sys_t *sys = picture->gc.p_sys;
-
-        if (!sys->in_use) {
-            vlc_mutex_unlock(&pool->lock);
-            return; /* Nothing to do */
-        }
-
-        if (picture->gc.p_sys->tick < tick) {
-            oldest = picture;
-            tick = picture->gc.p_sys->tick;
-        }
-    }
-
-    if (oldest != NULL) {
-        while (oldest->gc.p_sys->in_use) {
-            vlc_mutex_unlock(&pool->lock);
-            picture_Release(oldest);
-            vlc_mutex_lock(&pool->lock);
-        }
-    }
-
-    vlc_mutex_unlock(&pool->lock);
-}
-
 unsigned picture_pool_GetSize(const picture_pool_t *pool)
 {
     return pool->picture_count;

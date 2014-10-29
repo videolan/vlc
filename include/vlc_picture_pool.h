@@ -146,17 +146,6 @@ VLC_API void picture_pool_Enum( picture_pool_t *,
 unsigned picture_pool_Reset( picture_pool_t * );
 
 /**
- * Forcefully marks one picture free if all pictures in the pool are allocated.
- *
- * @warning This is intrinsically race-prone. If the freed picture is still
- * used, video will be corrupt, and the process will likely crash.
- *
- * @bug Do not use this function. It will never work properly.
- * Fix the decoder bugs instead.
- */
-void picture_pool_NonEmpty( picture_pool_t * );
-
-/**
  * Reserves pictures from a pool and creates a new pool with those.
  *
  * When the new pool is released, pictures are returned to the master pool.
