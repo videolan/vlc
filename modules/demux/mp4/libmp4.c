@@ -150,7 +150,8 @@ static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( !p_box )
     {
-        MP4_ReadBoxCommon( p_stream, &box );
+        if ( !MP4_ReadBoxCommon( p_stream, &box ) )
+            return 0;
         p_box = &box;
     }
 
