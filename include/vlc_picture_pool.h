@@ -111,7 +111,7 @@ void picture_pool_Reset( picture_pool_t * );
  * XXX it should be used with great care, the only reason you may need
  * it is to workaround a bug.
  */
-VLC_API void picture_pool_NonEmpty( picture_pool_t * );
+void picture_pool_NonEmpty( picture_pool_t * );
 
 /**
  * It reserves picture_count pictures from the given pool and returns
