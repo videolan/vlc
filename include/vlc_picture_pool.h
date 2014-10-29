@@ -94,17 +94,24 @@ VLC_API void picture_pool_Delete( picture_pool_t * );
 VLC_API picture_t * picture_pool_Get( picture_pool_t * ) VLC_USED;
 
 /**
+ * Forcefully return all pictures in the pool to free/unallocated state.
+ *
+ * @warning This can only be called when it is known that all pending
+ * references to the picture pool are stale, e.g. a decoder failed to
+ * release pictures properly when it terminated.
+ */
+void picture_pool_Reset( picture_pool_t * );
+
+/**
  * It forces the next picture_pool_Get to return a picture even if no
  * pictures are free.
- *
- * If b_reset is true, all pictures will be marked as free.
  *
  * It does it by releasing itself the oldest used picture if none is
  * available.
  * XXX it should be used with great care, the only reason you may need
  * it is to workaround a bug.
  */
-VLC_API void picture_pool_NonEmpty( picture_pool_t *, bool reset );
+VLC_API void picture_pool_NonEmpty( picture_pool_t * );
 
 /**
  * It reserves picture_count pictures from the given pool and returns

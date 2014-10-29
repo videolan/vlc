@@ -289,31 +289,43 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
     return NULL;
 }
 
-void picture_pool_NonEmpty(picture_pool_t *pool, bool reset)
+void picture_pool_Reset(picture_pool_t *pool)
 {
-    picture_t *old = NULL;
+    for (int i = 0; i < pool->picture_count; i++) {
+        if (pool->picture_reserved[i])
+            continue;
+
+        picture_t *picture = pool->picture[i];
+        if (atomic_load(&picture->gc.refcount) > 0)
+            Unlock(picture);
+        atomic_store(&picture->gc.refcount, 0);
+    }
+}
+
+void picture_pool_NonEmpty(picture_pool_t *pool)
+{
+    picture_t *oldest = NULL;
 
     for (int i = 0; i < pool->picture_count; i++) {
         if (pool->picture_reserved[i])
             continue;
 
         picture_t *picture = pool->picture[i];
-        if (reset) {
-            if (atomic_load(&picture->gc.refcount) > 0)
-                Unlock(picture);
-            atomic_store(&picture->gc.refcount, 0);
-        } else if (atomic_load(&picture->gc.refcount) == 0) {
-            return;
-        } else if (!old || picture->gc.p_sys->tick < old->gc.p_sys->tick) {
-            old = picture;
-        }
+        if (atomic_load(&picture->gc.refcount) == 0)
+            return; /* Nothing to do */
+
+        if (oldest == NULL || picture->gc.p_sys->tick < oldest->gc.p_sys->tick)
+            oldest = picture;
     }
-    if (!reset && old) {
-        if (atomic_load(&old->gc.refcount) > 0)
-            Unlock(old);
-        atomic_store(&old->gc.refcount, 0);
-    }
+
+    if (oldest == NULL)
+        return; /* Cannot fix! */
+
+    if (atomic_load(&oldest->gc.refcount) > 0)
+        Unlock(oldest);
+    atomic_store(&oldest->gc.refcount, 0);
 }
+
 int picture_pool_GetSize(picture_pool_t *pool)
 {
     return pool->picture_count;
