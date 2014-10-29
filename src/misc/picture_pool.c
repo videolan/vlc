@@ -274,8 +274,9 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
     return NULL;
 }
 
-void picture_pool_Reset(picture_pool_t *pool)
+unsigned picture_pool_Reset(picture_pool_t *pool)
 {
+    unsigned ret = 0;
 retry:
     vlc_mutex_lock(&pool->lock);
     assert(pool->refs > 0);
@@ -287,11 +288,13 @@ retry:
         if (sys->in_use) {
             vlc_mutex_unlock(&pool->lock);
             picture_Release(picture);
-
+            ret++;
             goto retry;
         }
     }
     vlc_mutex_unlock(&pool->lock);
+
+    return ret;
 }
 
 void picture_pool_NonEmpty(picture_pool_t *pool)

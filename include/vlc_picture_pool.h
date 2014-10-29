@@ -101,8 +101,10 @@ VLC_API picture_t * picture_pool_Get( picture_pool_t * ) VLC_USED;
  * @warning This can only be called when it is known that all pending
  * references to the picture pool are stale, e.g. a decoder failed to
  * release pictures properly when it terminated.
+ /
+ * @return the number of picture references that were freed
  */
-void picture_pool_Reset( picture_pool_t * );
+unsigned picture_pool_Reset( picture_pool_t * );
 
 /**
  * It forces the next picture_pool_Get to return a picture even if no
