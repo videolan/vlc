@@ -168,6 +168,8 @@ static int parse_Manifest( stream_t *s )
                             p_sys->vod_duration = strtoull( value, NULL, 10 );
                         else if( !strcmp( name, "TimeScale" ) )
                             p_sys->timescale = strtoull( value, NULL, 10 );
+                        else if ( !strcmp( name, "LookAheadFragmentCount" ) )
+                            p_sys->lookahead_count = strtoul( value, NULL, 10 );
                     }
                     if( !p_sys->timescale )
                         p_sys->timescale = TIMESCALE;

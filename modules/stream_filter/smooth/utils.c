@@ -293,3 +293,12 @@ bool no_more_chunks( unsigned *indexes, vlc_array_t *streams )
     }
     return true;
 }
+
+unsigned int ahead_chunks_count( stream_sys_t *p_sys, sms_stream_t *sms )
+{
+    int ind = es_cat_to_index( sms->type );
+    if ( p_sys->download.ck_index[ind] > vlc_array_count( p_sys->download.chunks ) )
+        return p_sys->download.ck_index[ind] - vlc_array_count( p_sys->download.chunks );
+    else
+        return 0;
+}

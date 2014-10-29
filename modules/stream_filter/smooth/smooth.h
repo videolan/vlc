@@ -103,6 +103,7 @@ struct stream_sys_t
     unsigned     i_tracks;     /* Total number of tracks in the Manifest */
     sms_queue_t  *bws;         /* Measured bandwidths of the N last chunks */
     uint64_t     vod_duration; /* total duration of the VOD media */
+    unsigned     lookahead_count;/* max number of fragments ahead on server on live streaming */
     uint64_t     time_pos;
     unsigned     timescale;
 
@@ -188,6 +189,7 @@ void sms_Free( sms_stream_t *);
 uint8_t *decode_string_hex_to_binary( const char * );
 sms_stream_t * sms_get_stream_by_cat( vlc_array_t *, int );
 bool no_more_chunks( unsigned[], vlc_array_t *);
+unsigned int ahead_chunks_count( stream_sys_t *, sms_stream_t * );
 int index_to_es_cat( int );
 int es_cat_to_index( int );
 

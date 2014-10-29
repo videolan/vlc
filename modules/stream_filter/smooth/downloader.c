@@ -760,7 +760,13 @@ void* sms_Thread( void *p_this )
         vlc_mutex_unlock( &p_sys->download.lock_wait );
 
         sms = SMS_GET_SELECTED_ST( next_track( s ) );
-        if ( vlc_array_count( sms->chunks ) )
+
+        vlc_mutex_lock( &p_sys->download.lock_wait );
+        unsigned i_ahead = ahead_chunks_count( p_sys, sms );
+        vlc_mutex_unlock( &p_sys->download.lock_wait );
+
+        if ( vlc_array_count( sms->chunks ) &&
+             ( !p_sys->b_live || i_ahead < p_sys->lookahead_count ) )
         {
             if( Download( s, sms ) != VLC_SUCCESS )
                 goto cancel;
