@@ -152,6 +152,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
 
 - (void)PlaylistItemChanged;
+- (void)plItemUpdated;
 - (void)playbackStatusUpdated;
 - (void)sendDistributedNotificationWithUpdatedPlaybackStatus;
 - (void)playbackModeUpdated;
