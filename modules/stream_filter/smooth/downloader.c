@@ -52,6 +52,7 @@ static bool Replace( char **ppsz_string, off_t off, const char *psz_old,
              *ppsz_string + off + i_oldlen,
              i_stringlen - off - i_newlen );
     strncpy( *ppsz_string + off, psz_new, i_newlen );
+    (*ppsz_string)[i_stringlen] = 0;
 
     return true;
 }
