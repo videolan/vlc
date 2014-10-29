@@ -82,13 +82,14 @@ typedef struct hds_stream_s
     uint64_t       download_leadtime;
 
     /* in timescale units */
-    uint32_t       total_duration;
-
     uint32_t       afrt_timescale;
 
     /* these two values come from the abst */
     uint32_t       timescale;
     uint64_t       live_current_time;
+
+    /* kilobits per second */
+    uint32_t       bitrate;
 
     vlc_mutex_t    abst_lock;
 
@@ -120,6 +121,8 @@ typedef struct hds_stream_s
 /* this is effectively just a sanity check  mechanism */
 #define MAX_REQUEST_SIZE (50*1024*1024)
 
+#define BITRATE_AS_BYTES_PER_SECOND 1024/8
+
 struct stream_sys_t
 {
     char         *base_url;    /* URL common part for chunks */
@@ -134,6 +137,7 @@ struct stream_sys_t
 
     uint32_t     flv_header_bytes_sent;
     uint64_t     duration_seconds;
+    uint64_t     playback_offset;
 
     bool         live;
     bool         closed;
@@ -148,9 +152,10 @@ typedef struct _bootstrap_info {
 } bootstrap_info;
 
 typedef struct _media_info {
-    char* stream_id;
-    char* media_url;
-    char* bootstrap_id;
+    char*    stream_id;
+    char*    media_url;
+    char*    bootstrap_id;
+    uint32_t bitrate;
 } media_info;
 
 #define MAX_BOOTSTRAP_INFO 10
@@ -217,6 +222,25 @@ static bool isHDS( stream_t *s )
     bool ret = strstr( str, "<manifest" ) != NULL;
     free( str );
     return ret;
+}
+
+static uint64_t get_stream_size( stream_t* s )
+{
+    stream_sys_t *p_sys = s->p_sys;
+
+    if ( p_sys->live )
+        return 0;
+
+    if ( vlc_array_count( p_sys->hds_streams ) == 0 )
+        return 0;
+
+    hds_stream_t* hds_stream = p_sys->hds_streams->pp_elems[0];
+
+    if ( hds_stream->bitrate == 0 )
+        return 0;
+
+    return p_sys->duration_seconds *
+        hds_stream->bitrate * BITRATE_AS_BYTES_PER_SECOND;
 }
 
 static uint8_t* parse_asrt( vlc_object_t* p_this,
@@ -1267,6 +1291,10 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                     if( !( medias[media_idx].bootstrap_id = strdup( attr_value ) ) )
                         return VLC_ENOMEM;
                 }
+                else if( !strcmp(attr_name, "bitrate" ) )
+                {
+                    medias[media_idx].bitrate = (uint32_t) atoi( attr_value );
+                }
             }
 
             media_idx++;
@@ -1399,10 +1427,12 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                     }
                 }
 
+                new_stream->bitrate = medias[i].bitrate;
+
                 vlc_array_append( sys->hds_streams, new_stream );
 
-                msg_Info( (vlc_object_t*)s, "New track with quality_segment(%s), timescale(%u), movie_id(%s), segment_run_count(%d), fragment_run_count(%u)",
-                          new_stream->quality_segment_modifier?"":new_stream->quality_segment_modifier, new_stream->timescale,
+                msg_Info( (vlc_object_t*)s, "New track with quality_segment(%s), bitrate(%u), timescale(%u), movie_id(%s), segment_run_count(%d), fragment_run_count(%u)",
+                          new_stream->quality_segment_modifier?new_stream->quality_segment_modifier:"", new_stream->bitrate, new_stream->timescale,
                           new_stream->movie_id, new_stream->segment_run_count, new_stream->fragment_run_count );
 
             }
@@ -1707,6 +1737,7 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
         buffer_uint8 += tmp_length;
         i_read -= tmp_length;
         length += tmp_length;
+        p_sys->playback_offset += tmp_length;
     }
 
     return length;
@@ -1765,6 +1796,12 @@ static int Control( stream_t *s, int i_query, va_list args )
             *va_arg (args, int64_t *) = INT64_C(1000) *
                 var_InheritInteger(s, "network-caching");
              break;
+        case STREAM_GET_POSITION:
+            *(va_arg (args, uint64_t *)) = s->p_sys->playback_offset;
+            break;
+        case STREAM_GET_SIZE:
+            *(va_arg (args, uint64_t *)) = get_stream_size(s);
+            break;
         default:
             return VLC_EGENERIC;
     }
