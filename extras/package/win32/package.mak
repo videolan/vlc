@@ -46,6 +46,9 @@ package-win-common: package-win-install build-npapi
 	cp -r $(prefix)/lib/vlc/plugins $(win32_destdir)
 	-cp -r $(prefix)/share/locale $(win32_destdir)
 
+# BD-J JAR
+	-cp $(CONTRIB_DIR)/share/java/*.jar $(win32_destdir)/plugins/access/
+
 if BUILD_LUA
 	mkdir -p $(win32_destdir)/lua/
 	cp -r $(prefix)/lib/vlc/lua/* $(prefix)/share/vlc/lua/* $(win32_destdir)/lua/
