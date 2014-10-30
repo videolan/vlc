@@ -136,11 +136,6 @@ static picture_t *video_new( filter_t *p_filter )
     return filter_NewPicture( p_filter->owner.sys );
 }
 
-static void video_del( filter_t *p_filter, picture_t *p_pic )
-{
-    return filter_DeletePicture( p_filter->owner.sys, p_pic );
-}
-
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -239,7 +234,6 @@ static int Activate( vlc_object_t *p_this )
         .sys = p_filter,
         .video = {
             .buffer_new = video_new,
-            .buffer_del = video_del,
         },
     };
 

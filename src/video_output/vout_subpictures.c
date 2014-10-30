@@ -170,12 +170,6 @@ static picture_t *spu_new_video_buffer(filter_t *filter)
     return picture_NewFromFormat(fmt);
 }
 
-static void spu_del_video_buffer(filter_t *filter, picture_t *picture)
-{
-    VLC_UNUSED(filter);
-    picture_Release(picture);
-}
-
 static int spu_get_attachments(filter_t *filter,
                                input_attachment_t ***attachment_ptr,
                                int *attachment_count)
@@ -241,7 +235,6 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     scale->fmt_out.video.i_visible_height = require_resize ? 16 : 32;
 
     scale->owner.video.buffer_new = spu_new_video_buffer;
-    scale->owner.video.buffer_del = spu_del_video_buffer;
 
     scale->p_module = module_need(scale, "video filter2", NULL, false);
 

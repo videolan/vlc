@@ -84,12 +84,6 @@ static picture_t *transcode_video_filter_buffer_new( filter_t *p_filter )
     return picture_NewFromFormat( &p_filter->fmt_out.video );
 }
 
-static void transcode_video_filter_buffer_del( filter_t *p_filter, picture_t *p_pic )
-{
-    VLC_UNUSED(p_filter);
-    picture_Release( p_pic );
-}
-
 static void* EncoderThread( void *obj )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t*)obj;
@@ -296,7 +290,6 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
         .sys = p_stream->p_sys,
         .video = {
             .buffer_new = transcode_video_filter_buffer_new,
-            .buffer_del = transcode_video_filter_buffer_del,
         },
     };
     es_format_t *p_fmt_out = &id->p_decoder->fmt_out;

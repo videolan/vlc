@@ -83,13 +83,6 @@ static picture_t *BufferNew( filter_t *p_filter )
     return filter_NewPicture( p_parent );
 }
 
-static void BufferDel( filter_t *p_filter, picture_t *p_pic )
-{
-    filter_t *p_parent = p_filter->owner.sys;
-
-    filter_DeletePicture( p_parent, p_pic );
-}
-
 #define CHAIN_LEVEL_MAX 1
 
 /*****************************************************************************
@@ -119,7 +112,6 @@ static int Activate( vlc_object_t *p_this )
         .sys = p_filter,
         .video = {
             .buffer_new = BufferNew,
-            .buffer_del = BufferDel,
         },
     };
 

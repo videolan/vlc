@@ -63,12 +63,6 @@ static picture_t *VideoBufferNew(filter_t *filter)
     return picture_pool_Get(pool);
 }
 
-static void VideoBufferDelete(filter_t *filter, picture_t *picture)
-{
-    VLC_UNUSED(filter);
-    picture_Release(picture);
-}
-
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -447,7 +441,6 @@ static void VoutDisplayCreateRender(vout_display_t *vd)
         .sys = vd,
         .video = {
             .buffer_new = VideoBufferNew,
-            .buffer_del = VideoBufferDelete,
         },
     };
 

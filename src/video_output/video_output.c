@@ -696,12 +696,6 @@ static picture_t *VoutVideoFilterStaticNewPicture(filter_t *filter)
     return picture_NewFromFormat(&filter->fmt_out.video);
 }
 
-static void VoutVideoFilterDelPicture(filter_t *filter, picture_t *picture)
-{
-    VLC_UNUSED(filter);
-    picture_Release(picture);
-}
-
 static void ThreadFilterFlush(vout_thread_t *vout, bool is_locked)
 {
     if (vout->p->displayed.current)
@@ -1345,7 +1339,6 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
         .sys = vout,
         .video = {
             .buffer_new = VoutVideoFilterStaticNewPicture,
-            .buffer_del = VoutVideoFilterDelPicture,
         },
     };
     vout->p->filter.chain_static =

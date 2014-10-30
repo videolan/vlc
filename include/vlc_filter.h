@@ -46,7 +46,6 @@ typedef struct filter_owner_t
         struct
         {
             picture_t * (*buffer_new)( filter_t * );
-            void        (*buffer_del)( filter_t *, picture_t * );
         } video;
         struct
         {
@@ -156,7 +155,7 @@ struct filter_t
 
 /**
  * This function will return a new picture usable by p_filter as an output
- * buffer. You have to release it using filter_DeletePicture or by returning
+ * buffer. You have to release it using picture_Release or by returning
  * it to the caller as a pf_video_filter return value.
  * Provided for convenience.
  *
@@ -169,18 +168,6 @@ static inline picture_t *filter_NewPicture( filter_t *p_filter )
     if( pic == NULL )
         msg_Warn( p_filter, "can't get output picture" );
     return pic;
-}
-
-/**
- * This function will release a picture create by filter_NewPicture.
- * Provided for convenience.
- *
- * \param p_filter filter_t object
- * \param p_picture picture to be deleted
- */
-static inline void filter_DeletePicture( filter_t *p_filter, picture_t *pic )
-{
-    p_filter->owner.video.buffer_del( p_filter, pic );
 }
 
 /**

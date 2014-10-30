@@ -65,7 +65,7 @@ struct filter_chain_t
 /**
  * Local prototypes
  */
-static void FilterDeletePictures( filter_t *, picture_t * );
+static void FilterDeletePictures( picture_t * );
 
 static filter_chain_t *filter_chain_NewInner( const filter_owner_t *callbacks,
     const char *cap, bool fmt_out_change, const filter_owner_t *owner )
@@ -127,18 +127,6 @@ static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
     }
 }
 
-static void filter_chain_VideoBufferDelete( filter_t *filter, picture_t *pic )
-{
-    if( chained(filter)->next != NULL )
-        picture_Release( pic );
-    else
-    {
-        filter_chain_t *chain = filter->owner.sys;
-
-        chain->owner.video.buffer_del( filter, pic );
-    }
-}
-
 #undef filter_chain_NewVideo
 filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
                                        const filter_owner_t *restrict owner )
@@ -147,7 +135,6 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
         .sys = obj,
         .video = {
             .buffer_new = filter_chain_VideoBufferNew,
-            .buffer_del = filter_chain_VideoBufferDelete,
         },
     };
 
@@ -295,7 +282,7 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
     module_unneed( filter, filter->p_module );
 
     msg_Dbg( obj, "Filter %p removed from chain", filter );
-    FilterDeletePictures( &chained->filter, chained->pending );
+    FilterDeletePictures( chained->pending );
 
     free( chained->mouse );
     es_format_Clean( &filter->fmt_out );
@@ -390,7 +377,7 @@ static picture_t *FilterChainVideoFilter( chained_filter_t *f, picture_t *p_pic 
         if( f->pending )
         {
             msg_Warn( p_filter, "dropping pictures" );
-            FilterDeletePictures( p_filter, f->pending );
+            FilterDeletePictures( f->pending );
         }
         f->pending = p_pic->p_next;
         p_pic->p_next = NULL;
@@ -427,7 +414,7 @@ void filter_chain_VideoFlush( filter_chain_t *p_chain )
     {
         filter_t *p_filter = &f->filter;
 
-        FilterDeletePictures( p_filter, f->pending );
+        FilterDeletePictures( f->pending );
         f->pending = NULL;
 
         filter_FlushPictures( p_filter );
@@ -520,12 +507,12 @@ int filter_chain_MouseEvent( filter_chain_t *p_chain,
 }
 
 /* Helpers */
-static void FilterDeletePictures( filter_t *filter, picture_t *picture )
+static void FilterDeletePictures( picture_t *picture )
 {
     while( picture )
     {
         picture_t *next = picture->p_next;
-        filter_DeletePicture( filter, picture );
+        picture_Release( picture );
         picture = next;
     }
 }

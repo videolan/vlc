@@ -78,7 +78,6 @@ static int               Del ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
 inline static void video_del_buffer_decoder( decoder_t *, picture_t * );
-inline static void video_del_buffer_filter( filter_t *, picture_t * );
 
 inline static int video_update_format_decoder( decoder_t *p_dec );
 inline static picture_t *video_new_buffer_decoder( decoder_t * );
@@ -398,7 +397,6 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             .sys = p_sys->p_decoder->p_owner,
             .video = {
                 .buffer_new = video_new_buffer_filter,
-                .buffer_del = video_del_buffer_filter,
             },
         };
 
@@ -661,13 +659,6 @@ static int video_update_format( vlc_object_t *p_this,
 
 inline static void video_del_buffer_decoder( decoder_t *p_this,
                                              picture_t *p_pic )
-{
-    VLC_UNUSED(p_this);
-    picture_Release( p_pic );
-}
-
-inline static void video_del_buffer_filter( filter_t *p_this,
-                                            picture_t *p_pic )
 {
     VLC_UNUSED(p_this);
     picture_Release( p_pic );

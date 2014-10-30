@@ -346,7 +346,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         {
             p_block = p_image->p_enc->pf_encode_video( p_image->p_enc,
                                                        p_tmp_pic );
-            filter_DeletePicture(p_image->p_filter, p_tmp_pic );
+            picture_Release( p_tmp_pic );
         }
         else
             p_block = NULL;
@@ -752,8 +752,6 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
     p_filter = vlc_custom_create( p_this, sizeof(filter_t), "filter" );
     p_filter->owner.video.buffer_new =
         (picture_t *(*)(filter_t *))video_new_buffer;
-    p_filter->owner.video.buffer_del =
-        (void (*)(filter_t *, picture_t *))video_del_buffer;
 
     p_filter->fmt_in = *p_fmt_in;
     p_filter->fmt_out = *p_fmt_in;
