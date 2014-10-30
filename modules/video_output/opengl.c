@@ -772,11 +772,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
         return NULL;
 
     /* Wrap the pictures into a pool */
-    picture_pool_configuration_t cfg;
-    memset(&cfg, 0, sizeof(cfg));
-    cfg.picture_count = count;
-    cfg.picture       = picture;
-    vgl->pool = picture_pool_NewExtended(&cfg);
+    vgl->pool = picture_pool_New(count, picture);
     if (!vgl->pool)
         goto error;
 
