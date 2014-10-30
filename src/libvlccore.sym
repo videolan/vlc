@@ -77,7 +77,6 @@ decoder_DeleteSubpicture
 decoder_GetDisplayDate
 decoder_GetDisplayRate
 decoder_GetInputAttachments
-decoder_LinkPicture
 decoder_NewAudioBuffer
 decoder_NewPicture
 decoder_NewSubpicture

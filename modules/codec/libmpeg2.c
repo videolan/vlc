@@ -831,7 +831,7 @@ static picture_t *DpbNewPicture( decoder_t *p_dec )
     p->p_picture = GetNewPicture( p_dec );
     if( p->p_picture )
     {
-        decoder_LinkPicture( p_dec, p->p_picture );
+        picture_Hold( p->p_picture );
         p->b_linked = true;
         p->b_displayed = false;
 

@@ -173,10 +173,6 @@ void decoder_DeletePicture( decoder_t *p_decoder, picture_t *p_picture )
 {
     p_decoder->pf_vout_buffer_del( p_decoder, p_picture );
 }
-void decoder_LinkPicture( decoder_t *p_decoder, picture_t *p_picture )
-{
-    p_decoder->pf_picture_link( p_decoder, p_picture );
-}
 void decoder_UnlinkPicture( decoder_t *p_decoder, picture_t *p_picture )
 {
     p_decoder->pf_picture_unlink( p_decoder, p_picture );
@@ -785,7 +781,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_vout_format_update = vout_update_format;
     p_dec->pf_vout_buffer_new = vout_new_buffer;
     p_dec->pf_vout_buffer_del = vout_del_buffer;
-    p_dec->pf_picture_link    = vout_link_picture;
     p_dec->pf_picture_unlink  = vout_unlink_picture;
     p_dec->pf_spu_buffer_new  = spu_new_buffer;
     p_dec->pf_spu_buffer_del  = spu_del_buffer;
@@ -2194,11 +2189,6 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 static void vout_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 {
     vout_ReleasePicture( p_dec->p_owner->p_vout, p_pic );
-}
-
-static void vout_link_picture( decoder_t *p_dec, picture_t *p_pic )
-{
-    picture_Hold( p_pic );
 }
 
 static void vout_unlink_picture( decoder_t *p_dec, picture_t *p_pic )

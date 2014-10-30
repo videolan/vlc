@@ -96,11 +96,10 @@ struct decoder_t
 
     /* Video output callbacks
      * XXX use decoder_NewPicture/decoder_DeletePicture
-     * and decoder_LinkPicture/decoder_UnlinkPicture */
+     * and decoder_UnlinkPicture */
     int             (*pf_vout_format_update)( decoder_t * );
     picture_t      *(*pf_vout_buffer_new)( decoder_t * );
     void            (*pf_vout_buffer_del)( decoder_t *, picture_t * );
-    void            (*pf_picture_link)   ( decoder_t *, picture_t * );
     void            (*pf_picture_unlink) ( decoder_t *, picture_t * );
 
     /**
@@ -204,12 +203,6 @@ VLC_API picture_t * decoder_NewPicture( decoder_t * ) VLC_USED;
  * This function will release a picture create by decoder_NewPicture.
  */
 VLC_API void decoder_DeletePicture( decoder_t *, picture_t *p_picture );
-
-/**
- * This function will increase the picture reference count.
- * (picture_Hold is not usable.)
- */
-VLC_API void decoder_LinkPicture( decoder_t *, picture_t * );
 
 /**
  * This function will decrease the picture reference count.

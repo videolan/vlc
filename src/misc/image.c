@@ -602,12 +602,6 @@ static void video_del_buffer( decoder_t *p_dec, picture_t *p_pic )
     picture_Release( p_pic );
 }
 
-static void video_link_picture( decoder_t *p_dec, picture_t *p_pic )
-{
-    (void)p_dec;
-    picture_Hold( p_pic );
-}
-
 static void video_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
 {
     (void)p_dec;
@@ -631,7 +625,6 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
     p_dec->pf_vout_format_update = video_update_format;
     p_dec->pf_vout_buffer_new = video_new_buffer;
     p_dec->pf_vout_buffer_del = video_del_buffer;
-    p_dec->pf_picture_link    = video_link_picture;
     p_dec->pf_picture_unlink  = video_unlink_picture;
 
     /* Find a suitable decoder module */

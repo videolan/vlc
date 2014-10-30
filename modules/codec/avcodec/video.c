@@ -755,7 +755,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         else
         {
             p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
-            decoder_LinkPicture( p_dec, p_pic );
+            picture_Hold( p_pic );
         }
 
         if( !p_dec->fmt_in.video.i_sar_num || !p_dec->fmt_in.video.i_sar_den )
@@ -1067,7 +1067,7 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
             goto error;
         ref->decoder = dec;
         ref->picture = pic;
-        decoder_LinkPicture(dec, pic);
+        picture_Hold(pic);
 
         uint8_t *data = pic->p[i].p_pixels;
         int size = pic->p[i].i_pitch * pic->p[i].i_lines;

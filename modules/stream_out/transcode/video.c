@@ -49,12 +49,6 @@ static void video_del_buffer_decoder( decoder_t *p_decoder, picture_t *p_pic )
     picture_Release( p_pic );
 }
 
-static void video_link_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
-{
-    VLC_UNUSED(p_dec);
-    picture_Hold( p_pic );
-}
-
 static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 {
     VLC_UNUSED(p_dec);
@@ -167,7 +161,6 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     id->p_decoder->pf_vout_format_update = video_update_format_decoder;
     id->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
     id->p_decoder->pf_vout_buffer_del = video_del_buffer_decoder;
-    id->p_decoder->pf_picture_link    = video_link_picture_decoder;
     id->p_decoder->pf_picture_unlink  = video_unlink_picture_decoder;
     id->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
     if( !id->p_decoder->p_owner )

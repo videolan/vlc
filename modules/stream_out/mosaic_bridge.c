@@ -85,7 +85,6 @@ inline static picture_t *video_new_buffer_filter( filter_t * );
 static int video_update_format( vlc_object_t *, decoder_owner_sys_t *,
                                 es_format_t * );
 
-static void video_link_picture_decoder( decoder_t *, picture_t * );
 static void video_unlink_picture_decoder( decoder_t *, picture_t * );
 
 static int HeightCallback( vlc_object_t *, char const *,
@@ -299,7 +298,6 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_sys->p_decoder->pf_vout_format_update = video_update_format_decoder;
     p_sys->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
     p_sys->p_decoder->pf_vout_buffer_del = video_del_buffer_decoder;
-    p_sys->p_decoder->pf_picture_link    = video_link_picture_decoder;
     p_sys->p_decoder->pf_picture_unlink  = video_unlink_picture_decoder;
     p_sys->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
     if( !p_sys->p_decoder->p_owner )
@@ -662,12 +660,6 @@ inline static void video_del_buffer_decoder( decoder_t *p_this,
 {
     VLC_UNUSED(p_this);
     picture_Release( p_pic );
-}
-
-static void video_link_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
-{
-    VLC_UNUSED(p_dec);
-    picture_Hold( p_pic );
 }
 
 static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
