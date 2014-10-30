@@ -97,6 +97,7 @@ struct decoder_t
     /* Video output callbacks
      * XXX use decoder_NewPicture/decoder_DeletePicture
      * and decoder_LinkPicture/decoder_UnlinkPicture */
+    int             (*pf_vout_format_update)( decoder_t * );
     picture_t      *(*pf_vout_buffer_new)( decoder_t * );
     void            (*pf_vout_buffer_del)( decoder_t *, picture_t * );
     void            (*pf_picture_link)   ( decoder_t *, picture_t * );
@@ -178,6 +179,19 @@ struct encoder_t
  * @}
  */
 
+
+/**
+ * This function notifies the video output pipeline of a new video output
+ * format (fmt_out.video). If there is currently no video output or if the
+ * video output format has changed, a new audio video will be set up.
+ * @return 0 if the video output is working, -1 if not. */
+static inline int decoder_UpdateVideoFormat( decoder_t *dec )
+{
+    if( dec->pf_vout_format_update != NULL )
+        return dec->pf_vout_format_update( dec );
+    else
+        return -1;
+}
 
 /**
  * This function will return a new picture usable by a decoder as an output

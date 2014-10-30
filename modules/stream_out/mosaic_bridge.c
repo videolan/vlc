@@ -80,10 +80,11 @@ static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t 
 inline static void video_del_buffer_decoder( decoder_t *, picture_t * );
 inline static void video_del_buffer_filter( filter_t *, picture_t * );
 
+inline static int video_update_format_decoder( decoder_t *p_dec );
 inline static picture_t *video_new_buffer_decoder( decoder_t * );
 inline static picture_t *video_new_buffer_filter( filter_t * );
-static picture_t *video_new_buffer( vlc_object_t *, decoder_owner_sys_t *,
-                                    es_format_t * );
+static int video_update_format( vlc_object_t *, decoder_owner_sys_t *,
+                                es_format_t * );
 
 static void video_link_picture_decoder( decoder_t *, picture_t * );
 static void video_unlink_picture_decoder( decoder_t *, picture_t * );
@@ -296,6 +297,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_sys->p_decoder->fmt_out.i_extra = 0;
     p_sys->p_decoder->fmt_out.p_extra = 0;
     p_sys->p_decoder->pf_decode_video = 0;
+    p_sys->p_decoder->pf_vout_format_update = video_update_format_decoder;
     p_sys->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
     p_sys->p_decoder->pf_vout_buffer_del = video_del_buffer_decoder;
     p_sys->p_decoder->pf_picture_link    = video_link_picture_decoder;
@@ -602,21 +604,30 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     return VLC_SUCCESS;
 }
 
+inline static int video_update_format_decoder( decoder_t *p_dec )
+{
+    return video_update_format( VLC_OBJECT( p_dec ),
+                                (decoder_owner_sys_t *)p_dec->p_owner,
+                                &p_dec->fmt_out );
+}
+
 inline static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
 {
-    return video_new_buffer( VLC_OBJECT( p_dec ),
-                             (decoder_owner_sys_t *)p_dec->p_owner,
-                             &p_dec->fmt_out );
+    return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
 inline static picture_t *video_new_buffer_filter( filter_t *p_filter )
 {
-    return video_new_buffer( VLC_OBJECT( p_filter ),
+    if( video_update_format( VLC_OBJECT( p_filter ),
                              (decoder_owner_sys_t *)p_filter->owner.sys,
-                             &p_filter->fmt_out );
+                             &p_filter->fmt_out ) ) {
+        msg_Warn( p_filter, "can't get output picture" );
+        return NULL;
+    }
+    return picture_NewFromFormat( &p_filter->fmt_out.video );
 }
 
-static picture_t *video_new_buffer( vlc_object_t *p_this,
+static int video_update_format( vlc_object_t *p_this,
                                     decoder_owner_sys_t *p_sys,
                                     es_format_t *fmt_out )
 {
@@ -645,8 +656,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this,
 
     /* */
     fmt_out->video.i_chroma = fmt_out->i_codec;
-
-    return picture_NewFromFormat( &fmt_out->video );
+    return 0;
 }
 
 inline static void video_del_buffer_decoder( decoder_t *p_this,

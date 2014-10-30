@@ -66,6 +66,7 @@ static void       DecoderSignalWait( decoder_t *, bool );
 static void       DecoderUnsupportedCodec( decoder_t *, vlc_fourcc_t );
 
 /* Buffers allocation callbacks for the decoders */
+static int vout_update_format( decoder_t * );
 static picture_t *vout_new_buffer( decoder_t * );
 static void vout_del_buffer( decoder_t *, picture_t * );
 static void vout_link_picture( decoder_t *, picture_t * );
@@ -160,6 +161,9 @@ struct decoder_owner_sys_t
  *****************************************************************************/
 picture_t *decoder_NewPicture( decoder_t *p_decoder )
 {
+    if( decoder_UpdateVideoFormat( p_decoder ) )
+        return NULL;
+
     picture_t *p_picture = p_decoder->pf_vout_buffer_new( p_decoder );
     if( !p_picture )
         msg_Warn( p_decoder, "can't get output picture" );
@@ -778,6 +782,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
 
     /* Set buffers allocation callbacks for the decoders */
     p_dec->pf_aout_format_update = aout_update_format;
+    p_dec->pf_vout_format_update = vout_update_format;
     p_dec->pf_vout_buffer_new = vout_new_buffer;
     p_dec->pf_vout_buffer_del = vout_del_buffer;
     p_dec->pf_picture_link    = vout_link_picture;
@@ -2027,7 +2032,7 @@ static int aout_update_format( decoder_t *p_dec )
     return 0;
 }
 
-static picture_t *vout_new_buffer( decoder_t *p_dec )
+static int vout_update_format( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
@@ -2049,7 +2054,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             !p_dec->fmt_out.video.i_height )
         {
             /* Can't create a new vout without display size */
-            return NULL;
+            return -1;
         }
 
         video_format_t fmt = p_dec->fmt_out.video;
@@ -2153,12 +2158,16 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         {
             msg_Err( p_dec, "failed to create video output" );
             p_dec->b_error = true;
-            return NULL;
+            return -1;
         }
     }
+    return 0;
+}
 
-    /* Get a new picture
-     */
+static picture_t *vout_new_buffer( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
     for( ;; )
     {
         if( DecoderIsExitRequested( p_dec ) || p_dec->b_error )

@@ -585,10 +585,14 @@ vlc_fourcc_t image_Mime2Fourcc( const char *psz_mime )
     return 0;
 }
 
+static int video_update_format( decoder_t *p_dec )
+{
+    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
+    return 0;
+}
 
 static picture_t *video_new_buffer( decoder_t *p_dec )
 {
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
@@ -624,6 +628,7 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
     p_dec->fmt_in.video = *fmt;
     p_dec->b_pace_control = true;
 
+    p_dec->pf_vout_format_update = video_update_format;
     p_dec->pf_vout_buffer_new = video_new_buffer;
     p_dec->pf_vout_buffer_del = video_del_buffer;
     p_dec->pf_picture_link    = video_link_picture;

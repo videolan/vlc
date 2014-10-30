@@ -61,9 +61,14 @@ static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
     picture_Release( p_pic );
 }
 
-static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
+static int video_update_format_decoder( decoder_t *p_dec )
 {
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
+    return 0;
+}
+
+static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
+{
     return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
@@ -165,6 +170,7 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     id->p_decoder->pf_decode_video = NULL;
     id->p_decoder->pf_get_cc = NULL;
     id->p_decoder->pf_get_cc = 0;
+    id->p_decoder->pf_vout_format_update = video_update_format_decoder;
     id->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
     id->p_decoder->pf_vout_buffer_del = video_del_buffer_decoder;
     id->p_decoder->pf_picture_link    = video_link_picture_decoder;
