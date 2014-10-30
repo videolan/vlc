@@ -572,7 +572,8 @@ void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
                                  void *opaque );
 
 /**
- * Set callbacks and private data for decoded audio.
+ * Set callbacks and private data for decoded audio. This only works in
+ * combination with libvlc_audio_set_callbacks().
  * Use libvlc_audio_set_format() or libvlc_audio_set_format_callbacks()
  * to configure the decoded audio format.
  *
