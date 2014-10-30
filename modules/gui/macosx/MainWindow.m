@@ -353,16 +353,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
         switch (*p_category) {
             case SD_CAT_INTERNET:
                 [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                if (!strncmp(*ppsz_name, "podcast", 7))
-                    [[internetItems lastObject] setIcon: imageFromRes(@"sidebar-podcast")];
-                else
-                    [[internetItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                [[internetItems lastObject] setIcon: imageFromRes(@"sidebar-podcast")];
                 [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
                 [[internetItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
                 break;
             case SD_CAT_DEVICES:
                 [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                [[devicesItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
+                [[devicesItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
                 [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
                 [[devicesItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
                 break;
