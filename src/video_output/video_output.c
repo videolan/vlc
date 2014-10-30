@@ -407,7 +407,7 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
  *
  * You MUST call vout_PutPicture or vout_ReleasePicture on it.
  *
- * You may use vout_HoldPicture(paired with vout_ReleasePicture) to keep a
+ * You may use picture_Hold() (paired with vout_ReleasePicture()) to keep a
  * read-only reference.
  */
 picture_t *vout_GetPicture(vout_thread_t *vout)
@@ -450,15 +450,6 @@ void vout_ReleasePicture(vout_thread_t *vout, picture_t *picture)
     picture_Release(picture);
 
     vlc_mutex_unlock(&vout->p->picture_lock);
-}
-
-/**
- * It increment the reference counter of a picture retreived by
- * vout_GetPicture.
- */
-void vout_HoldPicture(vout_thread_t *vout, picture_t *picture)
-{
-    picture_Hold(picture);
 }
 
 /* */
