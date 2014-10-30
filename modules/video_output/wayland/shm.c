@@ -67,6 +67,7 @@ static void PictureDestroy(picture_t *pic)
 
     munmap(pic->p[0].p_pixels, (picsize + pagemask) & ~pagemask);
     wl_buffer_destroy(buf); /* XXX: what if wl_display is already gone? */
+    free(pic);
 }
 
 static void buffer_release_cb(void *data, struct wl_buffer *buffer)
