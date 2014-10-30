@@ -18,7 +18,6 @@ aribb25: aribb25-$(ARIBB25_VERSION).tar.gz .sum-aribb25
 	$(MOVE)
 
 .aribb25: aribb25
-	cd $< && ./bootstrap
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
