@@ -330,43 +330,36 @@ void vout_Reset(vout_thread_t *vout)
 
 bool vout_IsEmpty(vout_thread_t *vout)
 {
-    vlc_mutex_lock(&vout->p->picture_lock);
-
     picture_t *picture = picture_fifo_Peek(vout->p->decoder_fifo);
     if (picture)
         picture_Release(picture);
-
-    vlc_mutex_unlock(&vout->p->picture_lock);
 
     return !picture;
 }
 
 void vout_FixLeaks( vout_thread_t *vout )
 {
-    vlc_mutex_lock(&vout->p->picture_lock);
-
     picture_t *picture = picture_fifo_Peek(vout->p->decoder_fifo);
-    if (!picture) {
-        picture = picture_pool_Get(vout->p->decoder_pool);
-    }
-
-    if (picture) {
+    if (picture != NULL) {
         picture_Release(picture);
-        /* Not all pictures has been displayed yet or some are
-         * free */
-        vlc_mutex_unlock(&vout->p->picture_lock);
-        return;
+        return; /* Not all pictures has been displayed yet */
+
     }
 
-    /* There is no reason that no pictures are available, force one
-     * from the pool, becarefull with it though */
-    msg_Err(vout, "pictures leaked, trying to workaround");
+    vlc_mutex_lock(&vout->p->picture_lock);
+    picture = picture_pool_Get(vout->p->decoder_pool);
 
-    /* */
-    picture_pool_NonEmpty(vout->p->decoder_pool);
-
+    if (picture != NULL)
+        picture_Release(picture); /* Not all pictures are referenced */
+    else {
+        /* There are no reasons that no pictures are available, force one
+         * from the pool, be careful with it though */
+        msg_Err(vout, "pictures leaked, trying to workaround");
+        picture_pool_NonEmpty(vout->p->decoder_pool);
+    }
     vlc_mutex_unlock(&vout->p->picture_lock);
 }
+
 void vout_NextPicture(vout_thread_t *vout, mtime_t *duration)
 {
     vout_control_cmd_t cmd;
@@ -441,12 +434,8 @@ picture_t *vout_GetPicture(vout_thread_t *vout)
  */
 void vout_PutPicture(vout_thread_t *vout, picture_t *picture)
 {
-    vlc_mutex_lock(&vout->p->picture_lock);
-
     picture->p_next = NULL;
     picture_fifo_Push(vout->p->decoder_fifo, picture);
-
-    vlc_mutex_unlock(&vout->p->picture_lock);
 
     vout_control_Wake(&vout->p->control);
 }
