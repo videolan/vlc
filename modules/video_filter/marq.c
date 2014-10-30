@@ -303,7 +303,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->p_region = subpicture_region_New( &fmt );
     if( !p_spu->p_region )
     {
-        filter_DeleteSubpicture( p_filter, p_spu );
+        subpicture_Delete( p_spu );
         p_spu = NULL;
         goto out;
     }

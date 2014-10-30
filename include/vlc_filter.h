@@ -50,7 +50,6 @@ typedef struct filter_owner_t
         struct
         {
             subpicture_t * (*buffer_new)( filter_t * );
-            void           (*buffer_del)( filter_t *, subpicture_t * );
         } sub;
     };
 } filter_owner_t;
@@ -181,8 +180,8 @@ static inline void filter_FlushPictures( filter_t *p_filter )
 
 /**
  * This function will return a new subpicture usable by p_filter as an output
- * buffer. You have to release it using filter_DeleteSubpicture or by returning
- * it to the caller as a pf_sub_source return value.
+ * buffer. You have to release it using subpicture_Delete or by returning it to
+ * the caller as a pf_sub_source return value.
  * Provided for convenience.
  *
  * \param p_filter filter_t object
@@ -194,19 +193,6 @@ static inline subpicture_t *filter_NewSubpicture( filter_t *p_filter )
     if( subpic == NULL )
         msg_Warn( p_filter, "can't get output subpicture" );
     return subpic;
-}
-
-/**
- * This function will release a subpicture create by filter_NewSubicture.
- * Provided for convenience.
- *
- * \param p_filter filter_t object
- * \param p_subpicture to be released
- */
-static inline void filter_DeleteSubpicture( filter_t *p_filter,
-                                            subpicture_t *subpic )
-{
-    p_filter->owner.sub.buffer_del( p_filter, subpic );
 }
 
 /**

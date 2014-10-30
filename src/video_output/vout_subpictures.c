@@ -1155,12 +1155,6 @@ static subpicture_t *sub_new_buffer(filter_t *filter)
     return subpicture;
 }
 
-static void sub_del_buffer(filter_t *filter, subpicture_t *subpic)
-{
-    VLC_UNUSED(filter);
-    subpicture_Delete(subpic);
-}
-
 static int SubSourceInit(filter_t *filter, void *data)
 {
     spu_t *spu = data;
@@ -1168,7 +1162,6 @@ static int SubSourceInit(filter_t *filter, void *data)
 
     filter->owner.sys = (void *)(intptr_t)channel;
     filter->owner.sub.buffer_new = sub_new_buffer;
-    filter->owner.sub.buffer_del = sub_del_buffer;
     return VLC_SUCCESS;
 }
 
