@@ -195,7 +195,9 @@ static int Open(vlc_object_t *p_this)
     video_format_t subpicture_format = sys->fmt;
     subpicture_format.i_chroma = VLC_CODEC_RGBA;
     /* Create a RGBA picture for rendering subtitles. */
-    sys->subtitles_picture = picture_NewFromFormat(&subpicture_format);
+    picture_resource_t rsc;
+    memset(&rsc, 0, sizeof(rsc));
+    sys->subtitles_picture = picture_NewFromResource(&subpicture_format, &rsc);
 
     /* Export the subpicture capability of this vout. */
     vd->info.subpicture_chromas = subpicture_chromas;
