@@ -1,0 +1,78 @@
+diff -ru libvpx/build/make/configure.sh libvpx/build/make/configure.sh
+--- libvpx/build/make/configure.sh	2014-11-04 21:34:04.000000000 +0100
++++ libvpx/build/make/configure.sh	2014-11-04 21:36:12.000000000 +0100
+@@ -714,59 +714,6 @@
+     # PIC is probably what we want when building shared libs
+     enabled shared && soft_enable pic
+ 
+-    # Handle darwin variants. Newer SDKs allow targeting older
+-    # platforms, so find the newest SDK available.
+-    case ${toolchain} in
+-        *-darwin*)
+-            if [ -z "${DEVELOPER_DIR}" ]; then
+-                DEVELOPER_DIR=`xcode-select -print-path 2> /dev/null`
+-                [ $? -ne 0 ] && OSX_SKIP_DIR_CHECK=1
+-            fi
+-            if [ -z "${OSX_SKIP_DIR_CHECK}" ]; then
+-                OSX_SDK_ROOTS="${DEVELOPER_DIR}/SDKs"
+-                OSX_SDK_VERSIONS="MacOSX10.4u.sdk MacOSX10.5.sdk MacOSX10.6.sdk"
+-                OSX_SDK_VERSIONS="${OSX_SDK_VERSIONS} MacOSX10.7.sdk"
+-                for v in ${OSX_SDK_VERSIONS}; do
+-                    if [ -d "${OSX_SDK_ROOTS}/${v}" ]; then
+-                        osx_sdk_dir="${OSX_SDK_ROOTS}/${v}"
+-                    fi
+-                done
+-            fi
+-            ;;
+-    esac
+-
+-    if [ -d "${osx_sdk_dir}" ]; then
+-        add_cflags  "-isysroot ${osx_sdk_dir}"
+-        add_ldflags "-isysroot ${osx_sdk_dir}"
+-    fi
+-
+-    case ${toolchain} in
+-        *-darwin8-*)
+-            add_cflags  "-mmacosx-version-min=10.4"
+-            add_ldflags "-mmacosx-version-min=10.4"
+-            ;;
+-        *-darwin9-*)
+-            add_cflags  "-mmacosx-version-min=10.5"
+-            add_ldflags "-mmacosx-version-min=10.5"
+-            ;;
+-        *-darwin10-*)
+-            add_cflags  "-mmacosx-version-min=10.6"
+-            add_ldflags "-mmacosx-version-min=10.6"
+-            ;;
+-        *-darwin11-*)
+-            add_cflags  "-mmacosx-version-min=10.7"
+-            add_ldflags "-mmacosx-version-min=10.7"
+-            ;;
+-        *-darwin12-*)
+-            add_cflags  "-mmacosx-version-min=10.8"
+-            add_ldflags "-mmacosx-version-min=10.8"
+-            ;;
+-        *-darwin13-*)
+-            add_cflags  "-mmacosx-version-min=10.9"
+-            add_ldflags "-mmacosx-version-min=10.9"
+-            ;;
+-    esac
+-
+     # Handle Solaris variants. Solaris 10 needs -lposix4
+     case ${toolchain} in
+         sparc-solaris-*)
+@@ -1070,7 +1017,13 @@
+             ;;
+             gcc*)
+                 add_cflags -m${bits}
+-                add_ldflags -m${bits}
++                case ${tgt_os} in
++                    darwin*)
++                    ;;
++                    *)
++                    add_ldflags -m${bits}
++                    ;;
++                esac
+                 link_with_cc=gcc
+                 tune_cflags="-march="
+                 setup_gnu_toolchain
