@@ -305,13 +305,13 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         display_callback(p_picsys);
 
     if (subpicture)
-	sys->b_has_subpictures = true;
+        sys->b_has_subpictures = true;
     /* As long as no subpicture was received, do not call
        DisplaySubpicture since JNI calls and clearing the subtitles
        surface are expensive operations. */
     if (sys->b_has_subpictures)
     {
-	DisplaySubpicture(vd, subpicture);
+        DisplaySubpicture(vd, subpicture);
         if (!subpicture)
         {
             /* The surface has been cleared and there is no new
