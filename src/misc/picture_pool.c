@@ -277,8 +277,10 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
         if (!atomic_compare_exchange_strong(&picture->gc.refcount, &refs, 1))
             continue;
 
-        if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0)
+        if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0) {
+            atomic_store(&picture->gc.refcount, 0);
             continue;
+        }
 
         /* */
         picture->p_next = NULL;
