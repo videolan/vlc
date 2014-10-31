@@ -265,7 +265,8 @@ static void Close(vlc_object_t *p_this)
     if (sys->window)
         sys->native_window.winRelease(sys->window);
     dlclose(sys->p_library);
-    picture_Release(sys->subtitles_picture);
+    if (sys->subtitles_picture)
+        picture_Release(sys->subtitles_picture);
     if (sys->p_spu_blend)
         filter_DeleteBlend(sys->p_spu_blend);
     free(sys);
@@ -304,7 +305,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if (display_callback)
         display_callback(p_picsys);
 
-    if (subpicture)
+    if (subpicture && sys->subtitles_picture)
         sys->b_has_subpictures = true;
     /* As long as no subpicture was received, do not call
        DisplaySubpicture since JNI calls and clearing the subtitles
