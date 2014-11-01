@@ -133,8 +133,8 @@ int vout_InitWrapper(vout_thread_t *vout)
     picture_pool_t *display_pool =
         vout_display_Pool(vd, allow_dr ? __MAX(VOUT_MAX_PICTURES,
                                                reserved_picture + decoder_picture) : 3);
-    if (allow_dr &&
-        picture_pool_GetSize(display_pool) >= reserved_picture + decoder_picture) {
+    if (allow_dr && !picture_pool_NeedsLocking(display_pool)
+     && picture_pool_GetSize(display_pool) >= reserved_picture + decoder_picture) {
         sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture;
         sys->decoder_pool = display_pool;
         sys->display_pool = display_pool;

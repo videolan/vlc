@@ -208,6 +208,8 @@ error:
 
 picture_pool_t *picture_pool_Reserve(picture_pool_t *master, unsigned count)
 {
+    assert(master->pic_unlock == NULL);
+
     picture_t *picture[count ? count : 1];
     unsigned i;
 
@@ -221,8 +223,6 @@ picture_pool_t *picture_pool_Reserve(picture_pool_t *master, unsigned count)
     if (!pool)
         goto error;
 
-    pool->pic_lock   = master->pic_lock;
-    pool->pic_unlock = master->pic_unlock;
     return pool;
 
 error:
@@ -329,4 +329,9 @@ void picture_pool_NonEmpty(picture_pool_t *pool)
 unsigned picture_pool_GetSize(const picture_pool_t *pool)
 {
     return pool->picture_count;
+}
+
+bool picture_pool_NeedsLocking(const picture_pool_t *pool)
+{
+    return pool->pic_lock != NULL || pool->pic_unlock != NULL;
 }
