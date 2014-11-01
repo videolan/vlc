@@ -38,8 +38,6 @@
 #endif
 
 #include <assert.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -51,7 +49,6 @@
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
-#include <vlc_url.h>
 #include <vlc_vout.h>
 #include <vlc_dialog.h>
 #include <vlc_iso_lang.h>
