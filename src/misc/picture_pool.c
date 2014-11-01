@@ -326,7 +326,7 @@ void picture_pool_NonEmpty(picture_pool_t *pool)
     vlc_mutex_unlock(&pool->lock);
 }
 
-int picture_pool_GetSize(picture_pool_t *pool)
+unsigned picture_pool_GetSize(const picture_pool_t *pool)
 {
     return pool->picture_count;
 }

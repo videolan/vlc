@@ -131,7 +131,7 @@ VLC_USED;
 /**
  * It returns the size of the given pool.
  */
-VLC_API int picture_pool_GetSize(picture_pool_t *);
+VLC_API unsigned picture_pool_GetSize(const picture_pool_t *);
 
 
 #endif /* VLC_PICTURE_POOL_H */
