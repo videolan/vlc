@@ -45,11 +45,6 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
     return p_subpicture;
 }
 
-static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
-{
-    VLC_UNUSED( p_dec );
-    subpicture_Delete( p_subpic );
-}
 int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -61,7 +56,6 @@ int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     /* Initialization of decoder structures */
     id->p_decoder->pf_decode_sub = NULL;
     id->p_decoder->pf_spu_buffer_new = spu_new_buffer;
-    id->p_decoder->pf_spu_buffer_del = spu_del_buffer;
     id->p_decoder->p_owner = (decoder_owner_sys_t *)p_stream;
     /* id->p_decoder->p_cfg = p_sys->p_spu_cfg; */
 
@@ -151,7 +145,7 @@ int transcode_spu_process( sout_stream_t *p_stream,
         block_t *p_block;
 
         p_block = id->p_encoder->pf_encode_sub( id->p_encoder, p_subpic );
-        spu_del_buffer( id->p_decoder, p_subpic );
+        subpicture_Delete( p_subpic );
         if( p_block )
         {
             block_ChainAppend( out, p_block );

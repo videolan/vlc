@@ -523,7 +523,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     if( p_spu->p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         return NULL;
     }
 

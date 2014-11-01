@@ -722,7 +722,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 error:
     if ( p_spu != NULL )
     {
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         p_spu = NULL;
     }
 

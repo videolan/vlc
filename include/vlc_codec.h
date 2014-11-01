@@ -109,9 +109,8 @@ struct decoder_t
     int             (*pf_aout_format_update)( decoder_t * );
 
     /* SPU output callbacks
-     * XXX use decoder_NewSubpicture and decoder_DeleteSubpicture */
+     * XXX use decoder_NewSubpicture */
     subpicture_t   *(*pf_spu_buffer_new)( decoder_t *, const subpicture_updater_t * );
-    void            (*pf_spu_buffer_del)( decoder_t *, subpicture_t * );
 
     /* Input attachments
      * XXX use decoder_GetInputAttachments */
@@ -218,15 +217,10 @@ VLC_API block_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) VLC_USED;
 
 /**
  * This function will return a new subpicture usable by a decoder as an output
- * buffer. You have to release it using decoder_DeleteSubpicture or by returning
+ * buffer. You have to release it using subpicture_Delete() or by returning
  * it to the caller as a pf_decode_sub return value.
  */
 VLC_API subpicture_t * decoder_NewSubpicture( decoder_t *, const subpicture_updater_t * ) VLC_USED;
-
-/**
- * This function will release a subpicture created by decoder_NewSubicture.
- */
-VLC_API void decoder_DeleteSubpicture( decoder_t *, subpicture_t *p_subpicture );
 
 /**
  * This function gives all input attachments at once.

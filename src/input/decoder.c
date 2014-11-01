@@ -70,7 +70,6 @@ static int vout_update_format( decoder_t * );
 static picture_t *vout_new_buffer( decoder_t * );
 static int aout_update_format( decoder_t * );
 static subpicture_t *spu_new_buffer( decoder_t *, const subpicture_updater_t * );
-static void spu_del_buffer( decoder_t *, subpicture_t * );
 
 struct decoder_owner_sys_t
 {
@@ -190,11 +189,6 @@ subpicture_t *decoder_NewSubpicture( decoder_t *p_decoder,
     if( !p_subpicture )
         msg_Warn( p_decoder, "can't get output subpicture" );
     return p_subpicture;
-}
-
-void decoder_DeleteSubpicture( decoder_t *p_decoder, subpicture_t *p_subpicture )
-{
-    p_decoder->pf_spu_buffer_del( p_decoder, p_subpicture );
 }
 
 /* decoder_GetInputAttachments:
@@ -770,7 +764,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_vout_format_update = vout_update_format;
     p_dec->pf_vout_buffer_new = vout_new_buffer;
     p_dec->pf_spu_buffer_new  = spu_new_buffer;
-    p_dec->pf_spu_buffer_del  = spu_del_buffer;
     /* */
     p_dec->pf_get_attachments  = DecoderGetInputAttachments;
     p_dec->pf_get_display_date = DecoderGetDisplayDate;
@@ -2217,23 +2210,4 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
     vlc_object_release( p_vout );
 
     return p_subpic;
-}
-
-static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    vout_thread_t *p_vout = NULL;
-
-    p_vout = input_resource_HoldVout( p_owner->p_resource );
-    if( !p_vout || p_owner->p_spu_vout != p_vout )
-    {
-        if( p_vout )
-            vlc_object_release( p_vout );
-        msg_Warn( p_dec, "no vout found, leaking subpicture" );
-        return;
-    }
-
-    subpicture_Delete( p_subpic );
-
-    vlc_object_release( p_vout );
 }

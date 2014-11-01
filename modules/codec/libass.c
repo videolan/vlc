@@ -350,7 +350,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu_sys->i_pts = p_block->i_pts;
     if( !p_spu_sys->p_subs_data )
     {
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         block_Release( p_block );
         return NULL;
     }

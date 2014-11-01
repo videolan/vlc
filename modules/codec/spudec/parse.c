@@ -113,7 +113,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     if( ParseControlSeq( p_dec, p_spu, &spu_data, &spu_properties, p_sys->i_pts ) )
     {
         /* There was a parse error, delete the subpicture */
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         return NULL;
     }
 
@@ -131,7 +131,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     if( ParseRLE( p_dec, &spu_data, &spu_properties ) )
     {
         /* There was a parse error, delete the subpicture */
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         free( spu_data.p_data );
         return NULL;
     }
