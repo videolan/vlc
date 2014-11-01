@@ -39,10 +39,7 @@
  *****************************************************************************/
 struct picture_gc_sys_t {
     picture_pool_t *pool;
-    /* Saved release */
-    void (*destroy)(picture_t *);
-    void *destroy_sys;
-    /* */
+    picture_t *picture;
     atomic_bool zombie;
     int64_t tick;
 };
@@ -80,24 +77,55 @@ static void Release(picture_pool_t *pool)
     free(pool);
 }
 
-static void DestroyPicture(picture_t *picture)
+static void picture_pool_ReleasePicture(picture_t *picture)
 {
-    picture_gc_sys_t *gc_sys = picture->gc.p_sys;
-    picture_pool_t *pool = gc_sys->pool;
+    picture_gc_sys_t *sys = picture->gc.p_sys;
+    picture_pool_t *pool = sys->pool;
 
     if (pool->pic_unlock != NULL)
         pool->pic_unlock(picture);
 
-    if (!atomic_load(&gc_sys->zombie))
+    if (!atomic_load(&sys->zombie))
         return;
 
     /* Picture from an already destroyed pool */
-    picture->gc.pf_destroy = gc_sys->destroy;
-    picture->gc.p_sys      = gc_sys->destroy_sys;
-    free(gc_sys);
+    picture_Release(sys->picture);
+    free(sys);
+    free(picture);
 
-    picture->gc.pf_destroy(picture);
     Release(pool);
+}
+
+static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
+                                            picture_t *picture)
+{
+    picture_gc_sys_t *sys = malloc(sizeof(*sys));
+    if (unlikely(sys == NULL))
+        return NULL;
+
+    sys->pool = pool;
+    sys->picture = picture;
+    atomic_init(&sys->zombie, false);
+    sys->tick = 0;
+
+    picture_resource_t res = {
+        .p_sys = picture->p_sys,
+        .pf_destroy = picture_pool_ReleasePicture,
+    };
+
+    for (int i = 0; i < picture->i_planes; i++) {
+        res.p[i].p_pixels = picture->p[i].p_pixels;
+        res.p[i].i_lines = picture->p[i].i_lines;
+        res.p[i].i_pitch = picture->p[i].i_pitch;
+    }
+
+    picture_t *clone = picture_NewFromResource(&picture->format, &res);
+    if (likely(clone != NULL))
+        clone->gc.p_sys = sys;
+    else
+        free(sys);
+
+    return clone;
 }
 
 static picture_pool_t *Create(picture_pool_t *master, int picture_count)
@@ -131,42 +159,13 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     pool->pic_lock   = cfg->lock;
     pool->pic_unlock = cfg->unlock;
 
-    /*
-     * NOTE: When a pooled picture is released, it must be returned to the list
-     * of available pictures from its pool, rather than destroyed.
-     * This requires a dedicated release callback, a pointer to the pool and a
-     * reference count. For simplicity, rather than allocate a whole new
-     * picture_t structure, the pool overrides gc.pf_destroy and gc.p_sys when
-     * created, and restores them when destroyed.
-     * There are some implications to keep in mind:
-     *  - The original creator of the picture (e.g. video output display) must
-     *    not manipulate the gc parameters while the picture is pooled.
-     *  - The picture cannot be pooled more than once, in other words, pools
-     *    cannot be stacked/layered.
-     *  - The picture must be available and its reference count equal to one
-     *    when it gets pooled.
-     *  - Picture plane pointers and sizes must not be mangled in any case.
-     */
     for (unsigned i = 0; i < cfg->picture_count; i++) {
-        picture_t *picture = cfg->picture[i];
-
-        /* Save the original garbage collector */
-        picture_gc_sys_t *gc_sys = malloc(sizeof(*gc_sys));
-        if (unlikely(gc_sys == NULL))
+        picture_t *picture = picture_pool_ClonePicture(pool, cfg->picture[i]);
+        if (unlikely(picture == NULL))
             abort();
-        gc_sys->pool        = pool;
-        gc_sys->destroy     = picture->gc.pf_destroy;
-        gc_sys->destroy_sys = picture->gc.p_sys;
-        atomic_init(&gc_sys->zombie, false);
-        gc_sys->tick        = 0;
 
-        /* Override the garbage collector */
-        assert(atomic_load(&picture->gc.refcount) == 1);
         atomic_init(&picture->gc.refcount, 0);
-        picture->gc.pf_destroy = DestroyPicture;
-        picture->gc.p_sys      = gc_sys;
 
-        /* */
         pool->picture[i] = picture;
         pool->picture_reserved[i] = false;
         pool->refs++;
