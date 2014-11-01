@@ -988,18 +988,11 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
     return 0;
 }
 
-typedef struct
-{
-    decoder_t *decoder;
-    picture_t *picture;
-} lavc_pic_ref_t;
-
 static void lavc_dr_ReleaseFrame(void *opaque, uint8_t *data)
 {
-    lavc_pic_ref_t *ref = opaque;
+    picture_t *picture = opaque;
 
-    picture_Release(ref->picture);
-    free(ref);
+    picture_Release(picture);
     (void) data;
 }
 
@@ -1062,21 +1055,14 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
     /* Allocate buffer references */
     for (int i = 0; i < pic->i_planes; i++)
     {
-        lavc_pic_ref_t *ref = malloc(sizeof (*ref));
-        if (ref == NULL)
-            goto error;
-        ref->decoder = dec;
-        ref->picture = pic;
-        picture_Hold(pic);
-
         uint8_t *data = pic->p[i].p_pixels;
         int size = pic->p[i].i_pitch * pic->p[i].i_lines;
 
         frame->buf[i] = av_buffer_create(data, size, lavc_dr_ReleaseFrame,
-                                         ref, 0);
+                                         picture_Hold(pic), 0);
         if (unlikely(frame->buf[i] == NULL))
         {
-            lavc_dr_ReleaseFrame(ref, data);
+            lavc_dr_ReleaseFrame(pic, data);
             goto error;
         }
     }
