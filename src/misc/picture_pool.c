@@ -45,13 +45,10 @@ struct picture_gc_sys_t {
 };
 
 struct picture_pool_t {
-    /* */
-    picture_pool_t *master;
     int64_t        tick;
     /* */
     unsigned       picture_count;
     picture_t      **picture;
-    bool           *picture_reserved;
 
     int       (*pic_lock)(picture_t *);
     void      (*pic_unlock)(picture_t *);
@@ -72,7 +69,6 @@ static void Release(picture_pool_t *pool)
         return;
 
     vlc_mutex_destroy(&pool->lock);
-    free(pool->picture_reserved);
     free(pool->picture);
     free(pool);
 }
@@ -128,20 +124,17 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
     return clone;
 }
 
-static picture_pool_t *Create(picture_pool_t *master, int picture_count)
+static picture_pool_t *Create(int picture_count)
 {
     picture_pool_t *pool = calloc(1, sizeof(*pool));
     if (!pool)
         return NULL;
 
-    pool->master = master;
-    pool->tick = master ? master->tick : 1;
+    pool->tick = 1;
     pool->picture_count = picture_count;
     pool->picture = calloc(pool->picture_count, sizeof(*pool->picture));
-    pool->picture_reserved = calloc(pool->picture_count, sizeof(*pool->picture_reserved));
-    if (!pool->picture || !pool->picture_reserved) {
+    if (!pool->picture) {
         free(pool->picture);
-        free(pool->picture_reserved);
         free(pool);
         return NULL;
     }
@@ -152,7 +145,7 @@ static picture_pool_t *Create(picture_pool_t *master, int picture_count)
 
 picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
 {
-    picture_pool_t *pool = Create(NULL, cfg->picture_count);
+    picture_pool_t *pool = Create(cfg->picture_count);
     if (!pool)
         return NULL;
 
@@ -167,7 +160,6 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
         atomic_init(&picture->gc.refcount, 0);
 
         pool->picture[i] = picture;
-        pool->picture_reserved[i] = false;
         pool->refs++;
     }
     return pool;
@@ -211,55 +203,41 @@ error:
 
 picture_pool_t *picture_pool_Reserve(picture_pool_t *master, unsigned count)
 {
-    picture_pool_t *pool = Create(master, count);
+    picture_t *picture[count ? count : 1];
+    unsigned i;
+
+    for (i = 0; i < count; i++) {
+        picture[i] = picture_pool_Get(master);
+        if (picture[i] == NULL)
+            goto error;
+    }
+
+    picture_pool_t *pool = picture_pool_New(count, picture);
     if (!pool)
-        return NULL;
+        goto error;
 
     pool->pic_lock   = master->pic_lock;
     pool->pic_unlock = master->pic_unlock;
-
-    unsigned found = 0;
-    for (unsigned i = 0; i < master->picture_count && found < count; i++) {
-        if (master->picture_reserved[i])
-            continue;
-
-        assert(atomic_load(&master->picture[i]->gc.refcount) == 0);
-        master->picture_reserved[i] = true;
-
-        pool->picture[found]          = master->picture[i];
-        pool->picture_reserved[found] = false;
-        found++;
-    }
-    if (found < count) {
-        picture_pool_Delete(pool);
-        return NULL;
-    }
     return pool;
+
+error:
+    while (i > 0)
+        picture_Release(picture[--i]);
+    return NULL;
 }
 
 void picture_pool_Delete(picture_pool_t *pool)
 {
     for (unsigned i = 0; i < pool->picture_count; i++) {
         picture_t *picture = pool->picture[i];
-        if (pool->master) {
-            for (unsigned j = 0; j < pool->master->picture_count; j++) {
-                if (pool->master->picture[j] == picture)
-                    pool->master->picture_reserved[j] = false;
-            }
-        } else {
-            picture_gc_sys_t *gc_sys = picture->gc.p_sys;
 
-            assert(!pool->picture_reserved[i]);
-
-            /* Restore the initial reference that was cloberred in
-             * picture_pool_NewExtended(). */
-            atomic_fetch_add(&picture->gc.refcount, 1);
-            /* The picture might still locked and then the G.C. state cannot be
-             * modified (w/o memory synchronization). */
-            atomic_store(&gc_sys->zombie, true);
-
-            picture_Release(picture);
-        }
+        /* Restore the initial reference that was cloberred in
+         * picture_pool_NewExtended(). */
+        atomic_fetch_add(&picture->gc.refcount, 1);
+        /* The picture might still locked and then the G.C. state cannot be
+         * modified (w/o memory synchronization). */
+        atomic_store(&picture->gc.p_sys->zombie, true);
+        picture_Release(picture);
     }
     Release(pool);
 }
@@ -267,9 +245,6 @@ void picture_pool_Delete(picture_pool_t *pool)
 picture_t *picture_pool_Get(picture_pool_t *pool)
 {
     for (unsigned i = 0; i < pool->picture_count; i++) {
-        if (pool->picture_reserved[i])
-            continue;
-
         picture_t *picture = pool->picture[i];
         uintptr_t refs = 0;
 
@@ -292,9 +267,6 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
 void picture_pool_Reset(picture_pool_t *pool)
 {
     for (unsigned i = 0; i < pool->picture_count; i++) {
-        if (pool->picture_reserved[i])
-            continue;
-
         picture_t *picture = pool->picture[i];
         if (atomic_load(&picture->gc.refcount) > 0) {
             if (pool->pic_unlock != NULL)
@@ -309,9 +281,6 @@ void picture_pool_NonEmpty(picture_pool_t *pool)
     picture_t *oldest = NULL;
 
     for (unsigned i = 0; i < pool->picture_count; i++) {
-        if (pool->picture_reserved[i])
-            continue;
-
         picture_t *picture = pool->picture[i];
         if (atomic_load(&picture->gc.refcount) == 0)
             return; /* Nothing to do */
