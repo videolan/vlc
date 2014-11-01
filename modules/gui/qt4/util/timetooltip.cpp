@@ -36,7 +36,11 @@ TimeTooltip::TimeTooltip( QWidget *parent ) :
     setWindowFlags( Qt::Window                  |
                     Qt::WindowStaysOnTopHint    |
                     Qt::FramelessWindowHint     |
-                    Qt::X11BypassWindowManagerHint );
+                    Qt::X11BypassWindowManagerHint
+#if HAS_QT5
+                    | Qt::WindowDoesNotAcceptFocus
+#endif
+                    );
 
     // Tell Qt that it doesn't need to erase the background before
     // a paintEvent occurs. This should save some CPU cycles.
