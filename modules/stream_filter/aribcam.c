@@ -29,10 +29,10 @@
 #include <inttypes.h>
 #include <assert.h>
 
-#include <arib-std-b25/arib_std_b25.h>
-#include <arib-std-b25/arib_std_b25_error_code.h>
-#include <arib-std-b25/b_cas_card.h>
-#include <arib-std-b25/b_cas_card_error_code.h>
+#include <aribb25/arib_std_b25.h>
+#include <aribb25/arib_std_b25_error_code.h>
+#include <aribb25/b_cas_card.h>
+#include <aribb25/b_cas_card_error_code.h>
 
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *);
