@@ -37,6 +37,7 @@ class IDVBCLocator;
 class IDVBSLocator;
 class IDVBSTuningSpace;
 class IDVBTLocator;
+class IDVBTLocator2;
 class IDVBTuneRequest;
 class IDVBTuningSpace;
 class IDVBTuningSpace2;
@@ -517,6 +518,13 @@ public:
         VARIANT_BOOL OtherFrequencyInUseVal )=0;
 };
 
+class IDVBTLocator2 : public IDVBTLocator
+{
+public:
+    virtual HRESULT __stdcall get_PhysicalLayerPipeId( long* pl_plp )=0;
+    virtual HRESULT __stdcall put_PhysicalLayerPipeId( long l_plp )=0;
+};
+
 class ITuningSpace : public IDispatch
 {
 public:
@@ -990,6 +998,10 @@ extern const CLSID CLSID_DVBSNetworkProvider;
 extern const CLSID CLSID_DVBSTuningSpace;
 extern const CLSID CLSID_DVBTuningSpace;
 extern const CLSID CLSID_DVBTLocator;
+/* Following symbol does not exist in library
+extern const CLSID CLSID_DVBTLocator2; */
+const CLSID CLSID_DVBTLocator2 =
+    {0xEFE3FA02,0x45D7,0x4920,{0xBE,0x96,0x53,0xFA,0x7F,0x35,0xB0,0xE6}};
 extern const CLSID CLSID_DVBTNetworkProvider;
 extern const CLSID CLSID_FilterGraph;
 extern const CLSID CLSID_InfTee;
@@ -1011,6 +1023,10 @@ const IID IID_IBDA_Topology =
     {0x79B56888,0x7FEA,0x4690,{0xB4,0x5D,0x38,0xFD,0x3C,0x78,0x49,0xBE}};
 extern const IID IID_ICreateDevEnum;
 extern const IID IID_IDVBTLocator;
+/* Following symbol does not exist in library
+extern const IID IID_IDVBTLocator2; */
+const IID IID_IDVBTLocator2 =
+    {0x448A2EDF,0xAE95,0x4b43,{0xA3,0xCC,0x74,0x78,0x43,0xC4,0x53,0xD4}};
 extern const IID IID_IDVBCLocator;
 extern const IID IID_IDVBSLocator;
 extern const IID IID_IDVBSTuningSpace;
