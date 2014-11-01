@@ -1527,14 +1527,6 @@
 
         NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
         if (lastPosition && lastPosition.intValue > 0) {
-            vlc_value_t pos;
-            var_Get(p_input_thread, "position", &pos);
-            float f_current_pos = 100. * pos.f_float;
-            long long int dur = input_item_GetDuration(p_item) / 1000000;
-            int current_pos_in_sec = (f_current_pos * dur) / 100;
-
-            if (current_pos_in_sec >= lastPosition.intValue)
-                return;
 
             int settingValue = config_GetInt(VLCIntf, "macosx-continue-playback");
             NSInteger returnValue = NSAlertErrorReturn;
@@ -1550,9 +1542,9 @@
             if (returnValue == NSAlertAlternateReturn || settingValue == 2)
                 lastPosition = [NSNumber numberWithInt:0];
 
-            pos.f_float = (float)lastPosition.intValue / (float)dur;
-            msg_Dbg(VLCIntf, "continuing playback at %2.2f", pos.f_float);
-            var_Set(p_input_thread, "position", pos);
+            mtime_t lastPos = (mtime_t)lastPosition.intValue * 1000000;
+            msg_Dbg(VLCIntf, "continuing playback at %lld", lastPos);
+            var_SetTime(p_input_thread, "time", lastPos);
 
             if (returnValue == NSAlertOtherReturn)
                 config_PutInt(VLCIntf, "macosx-continue-playback", 1);
@@ -1581,15 +1573,14 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
 
-    vlc_value_t pos;
-    var_Get(p_input_thread, "position", &pos);
-    float f_current_pos = 100. * pos.f_float;
-    long long int dur = input_item_GetDuration(p_item) / 1000000;
-    int current_pos_in_sec = (f_current_pos * dur) / 100;
+    float relativePos = var_GetFloat(p_input_thread, "position");
+    mtime_t pos = var_GetTime(p_input_thread, "time") / 1000000;
+    mtime_t dur = input_item_GetDuration(p_item) / 1000000;
+
     NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];
 
-    if (pos.f_float > .05 && pos.f_float < .95 && dur > 180) {
-        [mutDict setObject:[NSNumber numberWithInt:current_pos_in_sec] forKey:url];
+    if (relativePos > .05 && relativePos < .95 && dur > 180) {
+        [mutDict setObject:[NSNumber numberWithInt:pos] forKey:url];
 
         [mediaList removeObject:url];
         [mediaList addObject:url];
