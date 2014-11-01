@@ -189,13 +189,15 @@ picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
 picture_pool_t *picture_pool_NewFromFormat(const video_format_t *fmt,
                                            unsigned count)
 {
-    picture_t *picture[count];
+    picture_t *picture[count ? count : 1];
+    unsigned i;
 
-    for (unsigned i = 0; i < count; i++) {
+    for (i = 0; i < count; i++) {
         picture[i] = picture_NewFromFormat(fmt);
-        if (!picture[i])
+        if (picture[i] == NULL)
             goto error;
     }
+
     picture_pool_t *pool = picture_pool_New(count, picture);
     if (!pool)
         goto error;
@@ -203,11 +205,8 @@ picture_pool_t *picture_pool_NewFromFormat(const video_format_t *fmt,
     return pool;
 
 error:
-    for (unsigned i = 0; i < count; i++) {
-        if (!picture[i])
-            break;
-        picture_Release(picture[i]);
-    }
+    while (i > 0)
+        picture_Release(picture[--i]);
     return NULL;
 }
 
