@@ -1199,8 +1199,21 @@ static void ThreadFlush(vout_thread_t *vout, bool below, mtime_t date)
 static void ThreadReset(vout_thread_t *vout)
 {
     ThreadFlush(vout, true, INT64_MAX);
-    if (vout->p->decoder_pool)
+    if (vout->p->decoder_pool) {
+        unsigned count;
+
+        if (vout->p->private_pool != NULL) {
+            count = picture_pool_GetSize(vout->p->private_pool);
+            picture_pool_Delete(vout->p->private_pool);
+        }
         picture_pool_Reset(vout->p->decoder_pool);
+        if (vout->p->private_pool != NULL) {
+            vout->p->private_pool = picture_pool_Reserve(vout->p->decoder_pool,
+                                                         count);
+            if (vout->p->private_pool == NULL)
+                abort();
+        }
+    }
     vout->p->pause.is_on = false;
     vout->p->pause.date  = mdate();
 }
