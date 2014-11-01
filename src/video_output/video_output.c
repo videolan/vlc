@@ -140,7 +140,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout_snapshot_Init(&vout->p->snapshot);
 
     /* Initialize locks */
-    vlc_mutex_init(&vout->p->picture_lock);
     vlc_mutex_init(&vout->p->filter.lock);
     vlc_mutex_init(&vout->p->spu_lock);
 
@@ -286,7 +285,6 @@ static void VoutDestructor(vlc_object_t *object)
 
     /* Destroy the locks */
     vlc_mutex_destroy(&vout->p->spu_lock);
-    vlc_mutex_destroy(&vout->p->picture_lock);
     vlc_mutex_destroy(&vout->p->filter.lock);
     vout_control_Clean(&vout->p->control);
 
@@ -346,7 +344,6 @@ void vout_FixLeaks( vout_thread_t *vout )
 
     }
 
-    vlc_mutex_lock(&vout->p->picture_lock);
     picture = picture_pool_Get(vout->p->decoder_pool);
 
     if (picture != NULL)
@@ -357,7 +354,6 @@ void vout_FixLeaks( vout_thread_t *vout )
         msg_Err(vout, "pictures leaked, trying to workaround");
         picture_pool_NonEmpty(vout->p->decoder_pool);
     }
-    vlc_mutex_unlock(&vout->p->picture_lock);
 }
 
 void vout_NextPicture(vout_thread_t *vout, mtime_t *duration)
@@ -412,14 +408,11 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
  */
 picture_t *vout_GetPicture(vout_thread_t *vout)
 {
-    /* Get lock */
-    vlc_mutex_lock(&vout->p->picture_lock);
     picture_t *picture = picture_pool_Get(vout->p->decoder_pool);
     if (picture) {
         picture_Reset(picture);
         VideoFormatCopyCropAr(&picture->format, &vout->p->original);
     }
-    vlc_mutex_unlock(&vout->p->picture_lock);
 
     return picture;
 }
@@ -445,11 +438,7 @@ void vout_PutPicture(vout_thread_t *vout, picture_t *picture)
  */
 void vout_ReleasePicture(vout_thread_t *vout, picture_t *picture)
 {
-    vlc_mutex_lock(&vout->p->picture_lock);
-
     picture_Release(picture);
-
-    vlc_mutex_unlock(&vout->p->picture_lock);
 }
 
 /* */
@@ -1578,15 +1567,11 @@ static void *Thread(void *object)
             if (ThreadControl(vout, cmd))
                 return NULL;
 
-        vlc_mutex_lock(&sys->picture_lock);
-
         deadline = VLC_TS_INVALID;
         while (!ThreadDisplayPicture(vout, &deadline))
             ;
 
         const bool picture_interlaced = sys->displayed.is_interlaced;
-
-        vlc_mutex_unlock(&sys->picture_lock);
 
         vout_SetInterlacingState(vout, &interlacing, picture_interlaced);
         vout_ManageWrapper(vout);

@@ -126,7 +126,6 @@ struct vout_thread_sys_t
     vlc_mouse_t     mouse;
 
     /* */
-    vlc_mutex_t     picture_lock;                 /**< picture heap lock */
     picture_pool_t  *private_pool;
     picture_pool_t  *display_pool;
     picture_pool_t  *decoder_pool;
