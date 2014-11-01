@@ -69,7 +69,6 @@ static void       DecoderUnsupportedCodec( decoder_t *, vlc_fourcc_t );
 static int vout_update_format( decoder_t * );
 static picture_t *vout_new_buffer( decoder_t * );
 static void vout_del_buffer( decoder_t *, picture_t * );
-static void vout_link_picture( decoder_t *, picture_t * );
 static void vout_unlink_picture( decoder_t *, picture_t * );
 static int aout_update_format( decoder_t * );
 static subpicture_t *spu_new_buffer( decoder_t *, const subpicture_updater_t * );
