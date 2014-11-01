@@ -40,6 +40,7 @@
 struct picture_gc_sys_t {
     picture_pool_t *pool;
     picture_t *picture;
+    bool in_use;
     int64_t tick;
 };
 
@@ -89,6 +90,11 @@ static void picture_pool_ReleasePicture(picture_t *picture)
     if (pool->pic_unlock != NULL)
         pool->pic_unlock(picture);
 
+    vlc_mutex_lock(&pool->lock);
+    assert(sys->in_use);
+    sys->in_use = false;
+    vlc_mutex_unlock(&pool->lock);
+
     picture_pool_Release(pool);
 }
 
@@ -101,6 +107,7 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
 
     sys->pool = pool;
     sys->picture = picture;
+    sys->in_use = false;
     sys->tick = 0;
 
     picture_resource_t res = {
@@ -231,62 +238,94 @@ void picture_pool_Delete(picture_pool_t *pool)
 
 picture_t *picture_pool_Get(picture_pool_t *pool)
 {
+    vlc_mutex_lock(&pool->lock);
+    assert(pool->refs > 0);
+
     for (unsigned i = 0; i < pool->picture_count; i++) {
         picture_t *picture = pool->picture[i];
-        uintptr_t refs = 0;
+        picture_gc_sys_t *sys = picture->gc.p_sys;
+        uint64_t tick;
 
-        if (!atomic_compare_exchange_strong(&picture->gc.refcount, &refs, 1))
+        if (sys->in_use)
             continue;
 
+        pool->refs++;
+        tick = ++pool->tick;
+        sys->in_use = true;
+        vlc_mutex_unlock(&pool->lock);
+
         if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0) {
-            atomic_store(&picture->gc.refcount, 0);
+            vlc_mutex_lock(&pool->lock);
+            sys->in_use = false;
+            pool->refs--;
+            vlc_mutex_unlock(&pool->lock);
             continue;
         }
 
-        vlc_mutex_lock(&pool->lock);
-        pool->refs++;
-        picture->gc.p_sys->tick = pool->tick++;
-        vlc_mutex_unlock(&pool->lock);
+        sys->tick = tick;
 
+        assert(atomic_load(&picture->gc.refcount) == 0);
+        atomic_init(&picture->gc.refcount, 1);
         picture->p_next = NULL;
         return picture;
     }
+
+    vlc_mutex_unlock(&pool->lock);
     return NULL;
 }
 
 void picture_pool_Reset(picture_pool_t *pool)
 {
+retry:
+    vlc_mutex_lock(&pool->lock);
+    assert(pool->refs > 0);
+
     for (unsigned i = 0; i < pool->picture_count; i++) {
         picture_t *picture = pool->picture[i];
-        if (atomic_load(&picture->gc.refcount) > 0) {
-            if (pool->pic_unlock != NULL)
-                pool->pic_unlock(picture);
+        picture_gc_sys_t *sys = picture->gc.p_sys;
+
+        if (sys->in_use) {
+            vlc_mutex_unlock(&pool->lock);
+            picture_Release(picture);
+
+            goto retry;
         }
-        atomic_store(&picture->gc.refcount, 0);
     }
+    vlc_mutex_unlock(&pool->lock);
 }
 
 void picture_pool_NonEmpty(picture_pool_t *pool)
 {
     picture_t *oldest = NULL;
+    uint64_t tick = 0;
+
+    vlc_mutex_lock(&pool->lock);
+    assert(pool->refs > 0);
 
     for (unsigned i = 0; i < pool->picture_count; i++) {
         picture_t *picture = pool->picture[i];
-        if (atomic_load(&picture->gc.refcount) == 0)
+        picture_gc_sys_t *sys = picture->gc.p_sys;
+
+        if (!sys->in_use) {
+            vlc_mutex_unlock(&pool->lock);
             return; /* Nothing to do */
+        }
 
-        if (oldest == NULL || picture->gc.p_sys->tick < oldest->gc.p_sys->tick)
+        if (picture->gc.p_sys->tick < tick) {
             oldest = picture;
+            tick = picture->gc.p_sys->tick;
+        }
     }
 
-    if (oldest == NULL)
-        return; /* Cannot fix! */
-
-    if (atomic_load(&oldest->gc.refcount) > 0) {
-        if (pool->pic_unlock != NULL)
-            pool->pic_unlock(oldest);
+    if (oldest != NULL) {
+        while (oldest->gc.p_sys->in_use) {
+            vlc_mutex_unlock(&pool->lock);
+            picture_Release(oldest);
+            vlc_mutex_lock(&pool->lock);
+        }
     }
-    atomic_store(&oldest->gc.refcount, 0);
+
+    vlc_mutex_unlock(&pool->lock);
 }
 
 int picture_pool_GetSize(picture_pool_t *pool)
