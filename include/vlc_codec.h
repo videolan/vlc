@@ -95,12 +95,9 @@ struct decoder_t
      */
 
     /* Video output callbacks
-     * XXX use decoder_NewPicture/decoder_DeletePicture
-     * and decoder_UnlinkPicture */
+     * XXX use decoder_NewPicture */
     int             (*pf_vout_format_update)( decoder_t * );
     picture_t      *(*pf_vout_buffer_new)( decoder_t * );
-    void            (*pf_vout_buffer_del)( decoder_t *, picture_t * );
-    void            (*pf_picture_unlink) ( decoder_t *, picture_t * );
 
     /**
      * Number of extra (ie in addition to the DPB) picture buffers
@@ -194,21 +191,10 @@ static inline int decoder_UpdateVideoFormat( decoder_t *dec )
 
 /**
  * This function will return a new picture usable by a decoder as an output
- * buffer. You have to release it using decoder_DeletePicture or by returning
+ * buffer. You have to release it using picture_Release() or by returning
  * it to the caller as a pf_decode_video return value.
  */
 VLC_API picture_t * decoder_NewPicture( decoder_t * ) VLC_USED;
-
-/**
- * This function will release a picture create by decoder_NewPicture.
- */
-VLC_API void decoder_DeletePicture( decoder_t *, picture_t *p_picture );
-
-/**
- * This function will decrease the picture reference count.
- * (picture_Release is not usable.)
- */
-VLC_API void decoder_UnlinkPicture( decoder_t *, picture_t * );
 
 /**
  * This function notifies the audio output pipeline of a new audio output

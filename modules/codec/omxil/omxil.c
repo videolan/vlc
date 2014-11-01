@@ -553,7 +553,7 @@ static OMX_ERRORTYPE FreeBuffers(decoder_t *p_dec, OmxPort *p_port)
         if( p_buffer )
         {
             if (p_buffer->pAppPrivate != NULL)
-                decoder_DeletePicture( p_dec, p_buffer->pAppPrivate );
+                picture_Release( p_buffer->pAppPrivate );
 
             omx_error = OMX_FreeBuffer( p_port->omx_handle,
                                         p_port->i_port_index, p_buffer );

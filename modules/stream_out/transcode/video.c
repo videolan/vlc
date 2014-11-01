@@ -43,18 +43,6 @@ struct decoder_owner_sys_t
     sout_stream_sys_t *p_sys;
 };
 
-static void video_del_buffer_decoder( decoder_t *p_decoder, picture_t *p_pic )
-{
-    VLC_UNUSED(p_decoder);
-    picture_Release( p_pic );
-}
-
-static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
-{
-    VLC_UNUSED(p_dec);
-    picture_Release( p_pic );
-}
-
 static int video_update_format_decoder( decoder_t *p_dec )
 {
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
@@ -160,8 +148,6 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     id->p_decoder->pf_get_cc = 0;
     id->p_decoder->pf_vout_format_update = video_update_format_decoder;
     id->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
-    id->p_decoder->pf_vout_buffer_del = video_del_buffer_decoder;
-    id->p_decoder->pf_picture_unlink  = video_unlink_picture_decoder;
     id->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
     if( !id->p_decoder->p_owner )
         return VLC_EGENERIC;

@@ -799,9 +799,9 @@ static void DpbClean( decoder_t *p_dec )
         if( !p->p_picture )
             continue;
         if( p->b_linked )
-            decoder_UnlinkPicture( p_dec, p->p_picture );
+            picture_Release( p->p_picture );
         if( !p->b_displayed )
-            decoder_DeletePicture( p_dec, p->p_picture );
+            picture_Release( p->p_picture );
 
         p->p_picture = NULL;
     }
@@ -868,11 +868,11 @@ static void DpbUnlinkPicture( decoder_t *p_dec, picture_t *p_picture )
 
     assert( p && p->b_linked );
 
-    decoder_UnlinkPicture( p_dec, p->p_picture );
+    picture_Release( p->p_picture );
     p->b_linked = false;
 
     if( !p->b_displayed )
-        decoder_DeletePicture( p_dec, p->p_picture );
+        picture_Release( p->p_picture );
     p->p_picture = NULL;
 }
 /**

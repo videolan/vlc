@@ -68,8 +68,6 @@ static void       DecoderUnsupportedCodec( decoder_t *, vlc_fourcc_t );
 /* Buffers allocation callbacks for the decoders */
 static int vout_update_format( decoder_t * );
 static picture_t *vout_new_buffer( decoder_t * );
-static void vout_del_buffer( decoder_t *, picture_t * );
-static void vout_unlink_picture( decoder_t *, picture_t * );
 static int aout_update_format( decoder_t * );
 static subpicture_t *spu_new_buffer( decoder_t *, const subpicture_updater_t * );
 static void spu_del_buffer( decoder_t *, subpicture_t * );
@@ -167,14 +165,6 @@ picture_t *decoder_NewPicture( decoder_t *p_decoder )
     if( !p_picture )
         msg_Warn( p_decoder, "can't get output picture" );
     return p_picture;
-}
-void decoder_DeletePicture( decoder_t *p_decoder, picture_t *p_picture )
-{
-    p_decoder->pf_vout_buffer_del( p_decoder, p_picture );
-}
-void decoder_UnlinkPicture( decoder_t *p_decoder, picture_t *p_picture )
-{
-    p_decoder->pf_picture_unlink( p_decoder, p_picture );
 }
 
 block_t *decoder_NewAudioBuffer( decoder_t *dec, int samples )
@@ -779,8 +769,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_aout_format_update = aout_update_format;
     p_dec->pf_vout_format_update = vout_update_format;
     p_dec->pf_vout_buffer_new = vout_new_buffer;
-    p_dec->pf_vout_buffer_del = vout_del_buffer;
-    p_dec->pf_picture_unlink  = vout_unlink_picture;
     p_dec->pf_spu_buffer_new  = spu_new_buffer;
     p_dec->pf_spu_buffer_del  = spu_del_buffer;
     /* */
@@ -2183,16 +2171,6 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         /* FIXME add a vout_WaitPictureAvailable (timedwait) */
         msleep( VOUT_OUTMEM_SLEEP );
     }
-}
-
-static void vout_del_buffer( decoder_t *p_dec, picture_t *p_pic )
-{
-    picture_Release( p_pic );
-}
-
-static void vout_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
-{
-    picture_Release( p_pic );
 }
 
 static subpicture_t *spu_new_buffer( decoder_t *p_dec,

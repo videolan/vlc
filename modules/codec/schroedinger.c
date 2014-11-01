@@ -36,7 +36,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_codec.h>                              /* decoder_DeletePicture */
+#include <vlc_codec.h>
 
 #include <schroedinger/schro.h>
 
@@ -646,7 +646,7 @@ static void SchroFrameFree( SchroFrame *frame, void *priv)
     if( !p_free )
         return;
 
-    decoder_DeletePicture( p_free->p_dec, p_free->p_pic );
+    picture_Release( p_free->p_pic );
     free(p_free);
     (void)frame;
 }

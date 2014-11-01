@@ -433,7 +433,7 @@ static int send_output_buffer(decoder_t *dec)
         msg_Err(dec, "Failed to send buffer to output port (status=%"PRIx32" %s)",
                 status, mmal_status_to_string(status));
         mmal_buffer_header_release(buffer);
-        decoder_DeletePicture(dec, picture);
+        picture_Release(picture);
         ret = -1;
         goto out;
     }
@@ -608,7 +608,7 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
             fill_output_port(dec);
         } else {
             picture = (picture_t *)buffer->user_data;
-            decoder_DeletePicture(dec, picture);
+            picture_Release(picture);
             buffer->user_data = NULL;
             buffer->alloc_size = 0;
             buffer->data = NULL;

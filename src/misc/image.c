@@ -596,18 +596,6 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
     return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
-static void video_del_buffer( decoder_t *p_dec, picture_t *p_pic )
-{
-    (void)p_dec;
-    picture_Release( p_pic );
-}
-
-static void video_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
-{
-    (void)p_dec;
-    picture_Release( p_pic );
-}
-
 static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
 {
     decoder_t *p_dec;
@@ -624,8 +612,6 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
 
     p_dec->pf_vout_format_update = video_update_format;
     p_dec->pf_vout_buffer_new = video_new_buffer;
-    p_dec->pf_vout_buffer_del = video_del_buffer;
-    p_dec->pf_picture_unlink  = video_unlink_picture;
 
     /* Find a suitable decoder module */
     p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );

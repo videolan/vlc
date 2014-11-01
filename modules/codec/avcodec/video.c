@@ -793,7 +793,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
         else
         {
-            decoder_DeletePicture( p_dec, p_pic );
+            picture_Release( p_pic );
         }
     }
 
@@ -998,7 +998,7 @@ static void lavc_dr_ReleaseFrame(void *opaque, uint8_t *data)
 {
     lavc_pic_ref_t *ref = opaque;
 
-    decoder_UnlinkPicture(ref->decoder, ref->picture);
+    picture_Release(ref->picture);
     free(ref);
     (void) data;
 }
@@ -1080,14 +1080,14 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
             goto error;
         }
     }
-    decoder_UnlinkPicture(dec, pic);
+    picture_Release(pic);
     (void) flags;
     return pic;
 error:
     for (unsigned i = 0; frame->buf[i] != NULL; i++)
         av_buffer_unref(&frame->buf[i]);
 no_dr:
-    decoder_DeletePicture(dec, pic);
+    picture_Release(pic);
     return NULL;
 }
 
@@ -1231,7 +1231,7 @@ static picture_t *ffmpeg_dr_GetFrameBuf(struct AVCodecContext *p_context)
 
 no_dr:
     if (p_pic)
-        decoder_DeletePicture( p_dec, p_pic );
+        picture_Release( p_pic );
 
     return NULL;
 }
@@ -1302,7 +1302,7 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     if( p_sys->p_va )
         vlc_va_Release( p_sys->p_va, p_ff_pic->opaque, p_ff_pic->data[0] );
     else if( p_ff_pic->opaque )
-        decoder_UnlinkPicture( p_dec, (picture_t*)p_ff_pic->opaque);
+        picture_Release( (picture_t*)p_ff_pic->opaque);
     else if( p_ff_pic->type == FF_BUFFER_TYPE_INTERNAL )
         /* We can end up here without the AVFrame being allocated by
          * avcodec_default_get_buffer() if VA is used and the frame is

@@ -72,7 +72,6 @@ date_Increment
 date_Init
 date_Move
 date_Set
-decoder_DeletePicture
 decoder_DeleteSubpicture
 decoder_GetDisplayDate
 decoder_GetDisplayRate
@@ -89,7 +88,6 @@ decoder_SynchroNewPicture
 decoder_SynchroRelease
 decoder_SynchroReset
 decoder_SynchroTrash
-decoder_UnlinkPicture
 decode_URI
 decode_URI_duplicate
 demux_GetParentInput

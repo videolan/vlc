@@ -1024,7 +1024,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     }
     if (p_sys->error_state) {
         if (p_pic)
-            decoder_DeletePicture(p_dec, p_pic);
+            picture_Release(p_pic);
         jni_detach_thread();
         return NULL;
     }

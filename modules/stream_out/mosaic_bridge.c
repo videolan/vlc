@@ -77,15 +77,11 @@ static sout_stream_id_sys_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
-inline static void video_del_buffer_decoder( decoder_t *, picture_t * );
-
 inline static int video_update_format_decoder( decoder_t *p_dec );
 inline static picture_t *video_new_buffer_decoder( decoder_t * );
 inline static picture_t *video_new_buffer_filter( filter_t * );
 static int video_update_format( vlc_object_t *, decoder_owner_sys_t *,
                                 es_format_t * );
-
-static void video_unlink_picture_decoder( decoder_t *, picture_t * );
 
 static int HeightCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -297,8 +293,6 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_sys->p_decoder->pf_decode_video = 0;
     p_sys->p_decoder->pf_vout_format_update = video_update_format_decoder;
     p_sys->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
-    p_sys->p_decoder->pf_vout_buffer_del = video_del_buffer_decoder;
-    p_sys->p_decoder->pf_picture_unlink  = video_unlink_picture_decoder;
     p_sys->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
     if( !p_sys->p_decoder->p_owner )
     {
@@ -654,20 +648,6 @@ static int video_update_format( vlc_object_t *p_this,
     fmt_out->video.i_chroma = fmt_out->i_codec;
     return 0;
 }
-
-inline static void video_del_buffer_decoder( decoder_t *p_this,
-                                             picture_t *p_pic )
-{
-    VLC_UNUSED(p_this);
-    picture_Release( p_pic );
-}
-
-static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
-{
-    VLC_UNUSED(p_dec);
-    picture_Release( p_pic );
-}
-
 
 /**********************************************************************
  * Callback to update (some) params on the fly
