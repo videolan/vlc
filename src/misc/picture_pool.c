@@ -41,11 +41,11 @@ struct picture_gc_sys_t {
     picture_pool_t *pool;
     picture_t *picture;
     bool in_use;
-    int64_t tick;
+    uint64_t tick;
 };
 
 struct picture_pool_t {
-    int64_t        tick;
+    uint64_t       tick;
     /* */
     unsigned       picture_count;
     picture_t      **picture;
