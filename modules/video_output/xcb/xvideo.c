@@ -605,7 +605,7 @@ static void Close (vlc_object_t *obj)
     vout_display_sys_t *p_sys = vd->sys;
 
     if (p_sys->pool)
-        picture_pool_Delete (p_sys->pool);
+        picture_pool_Release (p_sys->pool);
 
     /* show the default cursor */
     xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid, XCB_CW_CURSOR,

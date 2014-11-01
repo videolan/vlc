@@ -326,7 +326,7 @@ static void Close(filter_t *filter)
         mmal_component_release(sys->component);
 
     if (sys->picture_pool)
-        picture_pool_Delete(sys->picture_pool);
+        picture_pool_Release(sys->picture_pool);
 
     vlc_mutex_destroy(&sys->mutex);
     free(sys->pictures);

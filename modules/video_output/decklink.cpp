@@ -765,7 +765,7 @@ static void CloseVideo(vlc_object_t *p_this)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
 
     if (sys->pic_nosignal)
         picture_Release(sys->pic_nosignal);

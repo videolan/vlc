@@ -1273,7 +1273,7 @@ static void DirectXDestroyPool(vout_display_t *vd)
 
     if (sys->pool) {
         DirectXDestroyPictureResource(vd);
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     }
     sys->pool = NULL;
 }

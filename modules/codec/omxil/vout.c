@@ -374,7 +374,7 @@ static void Close(vlc_object_t *p_this)
     }
 
     if (p_sys->pool)
-        picture_pool_Delete(p_sys->pool);
+        picture_pool_Release(p_sys->pool);
     free(p_sys);
     DeinitOmxCore();
 }

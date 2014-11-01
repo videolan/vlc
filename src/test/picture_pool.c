@@ -85,8 +85,8 @@ static void test(bool zombie)
         for (unsigned i = 0; i < PICTURES; i++)
             picture_Release(pics[i]);
 
-    picture_pool_Delete(reserve);
-    picture_pool_Delete(pool);
+    picture_pool_Release(reserve);
+    picture_pool_Release(pool);
 
     if (zombie)
         for (unsigned i = 0; i < PICTURES; i++)
@@ -104,8 +104,8 @@ int main(void)
     reserve = picture_pool_Reserve(pool, PICTURES / 2);
     assert(reserve != NULL);
 
-    picture_pool_Delete(reserve);
-    picture_pool_Delete(pool);
+    picture_pool_Release(reserve);
+    picture_pool_Release(pool);
 
     test(false);
     test(true);

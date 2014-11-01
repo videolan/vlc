@@ -173,7 +173,7 @@ static void Close(vlc_object_t *object)
     D2D_DestroyRenderTarget(vd);
 
     if (vd->sys->pool)
-        picture_pool_Delete(vd->sys->pool);
+        picture_pool_Release(vd->sys->pool);
 
     CommonClean(vd);
 

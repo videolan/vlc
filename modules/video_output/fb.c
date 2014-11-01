@@ -330,7 +330,7 @@ static void Close(vlc_object_t *object)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     if (!sys->is_hw_accel && sys->picture)
         picture_Release(sys->picture);
 

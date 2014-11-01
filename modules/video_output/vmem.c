@@ -240,7 +240,7 @@ static void Close(vlc_object_t *object)
 
     if (sys->cleanup)
         sys->cleanup(sys->opaque);
-    picture_pool_Delete(sys->pool);
+    picture_pool_Release(sys->pool);
     free(sys);
 }
 

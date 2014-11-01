@@ -544,6 +544,6 @@ static void ResetPictures (vout_display_t *vd)
         for (unsigned i = 0; i < MAX_PICTURES; i++)
             xcb_shm_detach (sys->conn, sys->seg_base + i);
 
-    picture_pool_Delete (sys->pool);
+    picture_pool_Release (sys->pool);
     sys->pool = NULL;
 }

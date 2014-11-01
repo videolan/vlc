@@ -359,7 +359,7 @@ static void Close ( vlc_object_t *object )
     DosWaitThread( &sys->tid, DCWW_WAIT );
 
     if( sys->pool )
-        picture_pool_Delete( sys->pool );
+        picture_pool_Release( sys->pool );
 
     DosCloseEventSem( sys->ack_event );
 

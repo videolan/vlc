@@ -1032,7 +1032,7 @@ static void Direct3DDestroyPool(vout_display_t *vd)
         IDirect3DSurface9_Release(picsys->surface);
         if (picsys->fallback)
             picture_Release(picsys->fallback);
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     }
     sys->pool = NULL;
 }

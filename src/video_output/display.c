@@ -1482,7 +1482,7 @@ static void SplitterClose(vout_display_t *vd)
     video_splitter_Delete(splitter);
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
 
     /* */
     for (int i = 0; i < sys->count; i++)

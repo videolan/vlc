@@ -750,7 +750,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
         vlc_gl_Unlock(vgl->gl);
     }
     if (vgl->pool)
-        picture_pool_Delete(vgl->pool);
+        picture_pool_Release(vgl->pool);
     free(vgl);
 }
 

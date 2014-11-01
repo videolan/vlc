@@ -207,7 +207,7 @@ static int Open(vlc_object_t *object)
 error:
     if (sys) {
         if (sys->pool)
-            picture_pool_Delete(sys->pool);
+            picture_pool_Release(sys->pool);
         if (sys->dither)
             cucul_free_dither(sys->dither);
         if (sys->dp)
@@ -232,7 +232,7 @@ static void Close(vlc_object_t *object)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     if (sys->dither)
         cucul_free_dither(sys->dither);
     caca_free_display(sys->dp);

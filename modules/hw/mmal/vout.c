@@ -348,7 +348,7 @@ static void Close(vlc_object_t *object)
         mmal_component_release(sys->component);
 
     if (sys->picture_pool)
-        picture_pool_Delete(sys->picture_pool);
+        picture_pool_Release(sys->picture_pool);
     else
         for (i = 0; i < sys->num_buffers; ++i)
             if (sys->pictures[i])

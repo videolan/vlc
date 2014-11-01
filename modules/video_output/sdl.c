@@ -371,7 +371,7 @@ static void Close(vlc_object_t *object)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
 
     if (sys->overlay) {
         SDL_LockYUVOverlay(sys->overlay);
@@ -537,7 +537,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
         /* */
         if (sys->pool)
-            picture_pool_Delete(sys->pool);
+            picture_pool_Release(sys->pool);
         sys->pool = NULL;
 
         vout_display_PlacePicture(&sys->place, &vd->source, vd->cfg, !sys->overlay);

@@ -86,7 +86,7 @@ VLC_API picture_pool_t * picture_pool_NewFromFormat(const video_format_t *,
  * All pictures must already be released to the pool. The pool will then
  * released them.
  */
-VLC_API void picture_pool_Delete( picture_pool_t * );
+VLC_API void picture_pool_Release( picture_pool_t * );
 
 /**
  * It retreives a picture_t from a pool.

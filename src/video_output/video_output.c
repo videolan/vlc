@@ -1185,7 +1185,7 @@ static void ThreadReset(vout_thread_t *vout)
 
         if (vout->p->private_pool != NULL) {
             count = picture_pool_GetSize(vout->p->private_pool);
-            picture_pool_Delete(vout->p->private_pool);
+            picture_pool_Release(vout->p->private_pool);
         }
 
         leaks = picture_pool_Reset(vout->p->decoder_pool);

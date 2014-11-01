@@ -159,7 +159,7 @@ static void Close(vlc_object_t *object)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     aa_close(sys->aa_context);
     free(sys);
 }
@@ -242,7 +242,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     case VOUT_DISPLAY_RESET_PICTURES:
         if (sys->pool)
-            picture_pool_Delete(sys->pool);
+            picture_pool_Release(sys->pool);
         sys->pool = NULL;
 
         vd->fmt.i_width  = aa_imgwidth(sys->aa_context);

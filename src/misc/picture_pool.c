@@ -56,7 +56,7 @@ struct picture_pool_t {
     vlc_mutex_t lock;
 };
 
-static void picture_pool_Release(picture_pool_t *pool)
+void picture_pool_Release(picture_pool_t *pool)
 {
     bool destroy;
 
@@ -229,11 +229,6 @@ error:
     while (i > 0)
         picture_Release(picture[--i]);
     return NULL;
-}
-
-void picture_pool_Delete(picture_pool_t *pool)
-{
-    picture_pool_Release(pool);
 }
 
 picture_t *picture_pool_Get(picture_pool_t *pool)

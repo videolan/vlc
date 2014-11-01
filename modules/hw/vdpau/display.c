@@ -153,7 +153,7 @@ static void PoolFree(vout_display_t *vd, picture_pool_t *pool)
 
     if (sys->current != NULL)
         picture_Release(sys->current);
-    picture_pool_Delete(pool);
+    picture_pool_Release(pool);
 }
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
