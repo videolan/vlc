@@ -211,8 +211,8 @@ static inline int decoder_UpdateAudioFormat( decoder_t *dec )
 
 /**
  * This function will return a new audio buffer usable by a decoder as an
- * output buffer. You have to release it using decoder_DeleteAudioBuffer
- * or by returning it to the caller as a pf_decode_audio return value.
+ * output buffer. It must be released with block_Release() or returned it to
+ * the caller as a pf_decode_audio return value.
  */
 VLC_API block_t * decoder_NewAudioBuffer( decoder_t *, int i_size ) VLC_USED;
 
