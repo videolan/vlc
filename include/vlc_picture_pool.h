@@ -43,8 +43,8 @@ typedef struct picture_pool_t picture_pool_t;
  * Picture pool configuration
  */
 typedef struct {
-    int       picture_count;
-    picture_t **picture;
+    unsigned  picture_count;
+    picture_t *const *picture;
 
     int       (*lock)(picture_t *);
     void      (*unlock)(picture_t *);
@@ -69,14 +69,16 @@ VLC_API picture_pool_t * picture_pool_NewExtended( const picture_pool_configurat
  *
  * It is provided as convenience.
  */
-VLC_API picture_pool_t * picture_pool_New( int picture_count, picture_t *picture[] ) VLC_USED;
+VLC_API picture_pool_t * picture_pool_New(unsigned count,
+                                          picture_t *const *tab) VLC_USED;
 
 /**
  * It creates a picture_pool_t creating images using the given format.
  *
  * Provided for convenience.
  */
-VLC_API picture_pool_t * picture_pool_NewFromFormat( const video_format_t *, int picture_count ) VLC_USED;
+VLC_API picture_pool_t * picture_pool_NewFromFormat(const video_format_t *,
+                                                    unsigned count) VLC_USED;
 
 /**
  * It destroys a pool created by picture_pool_New.
@@ -121,7 +123,8 @@ void picture_pool_NonEmpty( picture_pool_t * );
  * The returned pool must be deleted before the master pool.
  * When deleted, all pictures return to the master pool.
  */
-VLC_API picture_pool_t * picture_pool_Reserve(picture_pool_t *, int picture_count) VLC_USED;
+VLC_API picture_pool_t * picture_pool_Reserve(picture_pool_t *, unsigned count)
+VLC_USED;
 
 /**
  * It returns the size of the given pool.

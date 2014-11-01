@@ -52,7 +52,7 @@ struct picture_pool_t {
     picture_pool_t *master;
     int64_t        tick;
     /* */
-    int            picture_count;
+    unsigned       picture_count;
     picture_t      **picture;
     bool           *picture_reserved;
 
@@ -147,7 +147,7 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
      *    when it gets pooled.
      *  - Picture plane pointers and sizes must not be mangled in any case.
      */
-    for (int i = 0; i < cfg->picture_count; i++) {
+    for (unsigned i = 0; i < cfg->picture_count; i++) {
         picture_t *picture = cfg->picture[i];
 
         /* Save the original garbage collector */
@@ -175,34 +175,35 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
 
 }
 
-picture_pool_t *picture_pool_New(int picture_count, picture_t *picture[])
+picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
 {
     picture_pool_configuration_t cfg;
 
     memset(&cfg, 0, sizeof(cfg));
-    cfg.picture_count = picture_count;
-    cfg.picture       = picture;
+    cfg.picture_count = count;
+    cfg.picture       = tab;
 
     return picture_pool_NewExtended(&cfg);
 }
 
-picture_pool_t *picture_pool_NewFromFormat(const video_format_t *fmt, int picture_count)
+picture_pool_t *picture_pool_NewFromFormat(const video_format_t *fmt,
+                                           unsigned count)
 {
-    picture_t *picture[picture_count];
+    picture_t *picture[count];
 
-    for (int i = 0; i < picture_count; i++) {
+    for (unsigned i = 0; i < count; i++) {
         picture[i] = picture_NewFromFormat(fmt);
         if (!picture[i])
             goto error;
     }
-    picture_pool_t *pool = picture_pool_New(picture_count, picture);
+    picture_pool_t *pool = picture_pool_New(count, picture);
     if (!pool)
         goto error;
 
     return pool;
 
 error:
-    for (int i = 0; i < picture_count; i++) {
+    for (unsigned i = 0; i < count; i++) {
         if (!picture[i])
             break;
         picture_Release(picture[i]);
@@ -210,7 +211,7 @@ error:
     return NULL;
 }
 
-picture_pool_t *picture_pool_Reserve(picture_pool_t *master, int count)
+picture_pool_t *picture_pool_Reserve(picture_pool_t *master, unsigned count)
 {
     picture_pool_t *pool = Create(master, count);
     if (!pool)
@@ -219,8 +220,8 @@ picture_pool_t *picture_pool_Reserve(picture_pool_t *master, int count)
     pool->pic_lock   = master->pic_lock;
     pool->pic_unlock = master->pic_unlock;
 
-    int found = 0;
-    for (int i = 0; i < master->picture_count && found < count; i++) {
+    unsigned found = 0;
+    for (unsigned i = 0; i < master->picture_count && found < count; i++) {
         if (master->picture_reserved[i])
             continue;
 
@@ -240,10 +241,10 @@ picture_pool_t *picture_pool_Reserve(picture_pool_t *master, int count)
 
 void picture_pool_Delete(picture_pool_t *pool)
 {
-    for (int i = 0; i < pool->picture_count; i++) {
+    for (unsigned i = 0; i < pool->picture_count; i++) {
         picture_t *picture = pool->picture[i];
         if (pool->master) {
-            for (int j = 0; j < pool->master->picture_count; j++) {
+            for (unsigned j = 0; j < pool->master->picture_count; j++) {
                 if (pool->master->picture[j] == picture)
                     pool->master->picture_reserved[j] = false;
             }
@@ -267,7 +268,7 @@ void picture_pool_Delete(picture_pool_t *pool)
 
 picture_t *picture_pool_Get(picture_pool_t *pool)
 {
-    for (int i = 0; i < pool->picture_count; i++) {
+    for (unsigned i = 0; i < pool->picture_count; i++) {
         if (pool->picture_reserved[i])
             continue;
 
@@ -292,7 +293,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
 
 void picture_pool_Reset(picture_pool_t *pool)
 {
-    for (int i = 0; i < pool->picture_count; i++) {
+    for (unsigned i = 0; i < pool->picture_count; i++) {
         if (pool->picture_reserved[i])
             continue;
 
@@ -309,7 +310,7 @@ void picture_pool_NonEmpty(picture_pool_t *pool)
 {
     picture_t *oldest = NULL;
 
-    for (int i = 0; i < pool->picture_count; i++) {
+    for (unsigned i = 0; i < pool->picture_count; i++) {
         if (pool->picture_reserved[i])
             continue;
 
