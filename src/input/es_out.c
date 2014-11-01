@@ -597,7 +597,6 @@ static void EsOutChangePosition( es_out_t *out )
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 {
     es_out_sys_t *p_sys = out->p_sys;
-    int i_ret;
 
     mtime_t i_stream_start;
     mtime_t i_system_start;
