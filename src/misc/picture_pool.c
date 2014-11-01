@@ -40,7 +40,6 @@
 struct picture_gc_sys_t {
     picture_pool_t *pool;
     picture_t *picture;
-    atomic_bool zombie;
     int64_t tick;
 };
 
@@ -56,17 +55,26 @@ struct picture_pool_t {
     vlc_mutex_t lock;
 };
 
-static void Release(picture_pool_t *pool)
+static void picture_pool_Release(picture_pool_t *pool)
 {
     bool destroy;
 
     vlc_mutex_lock(&pool->lock);
     assert(pool->refs > 0);
-    destroy = !--pool->refs;
+    destroy = --pool->refs == 0;
     vlc_mutex_unlock(&pool->lock);
 
-    if (!destroy)
+    if (likely(!destroy))
         return;
+
+    for (unsigned i = 0; i < pool->picture_count; i++) {
+        picture_t *picture = pool->picture[i];
+        picture_gc_sys_t *sys = picture->gc.p_sys;
+
+        picture_Release(sys->picture);
+        free(sys);
+        free(picture);
+    }
 
     vlc_mutex_destroy(&pool->lock);
     free(pool->picture);
@@ -81,15 +89,7 @@ static void picture_pool_ReleasePicture(picture_t *picture)
     if (pool->pic_unlock != NULL)
         pool->pic_unlock(picture);
 
-    if (!atomic_load(&sys->zombie))
-        return;
-
-    /* Picture from an already destroyed pool */
-    picture_Release(sys->picture);
-    free(sys);
-    free(picture);
-
-    Release(pool);
+    picture_pool_Release(pool);
 }
 
 static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
@@ -101,7 +101,6 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
 
     sys->pool = pool;
     sys->picture = picture;
-    atomic_init(&sys->zombie, false);
     sys->tick = 0;
 
     picture_resource_t res = {
@@ -160,7 +159,6 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
         atomic_init(&picture->gc.refcount, 0);
 
         pool->picture[i] = picture;
-        pool->refs++;
     }
     return pool;
 
@@ -228,18 +226,7 @@ error:
 
 void picture_pool_Delete(picture_pool_t *pool)
 {
-    for (unsigned i = 0; i < pool->picture_count; i++) {
-        picture_t *picture = pool->picture[i];
-
-        /* Restore the initial reference that was cloberred in
-         * picture_pool_NewExtended(). */
-        atomic_fetch_add(&picture->gc.refcount, 1);
-        /* The picture might still locked and then the G.C. state cannot be
-         * modified (w/o memory synchronization). */
-        atomic_store(&picture->gc.p_sys->zombie, true);
-        picture_Release(picture);
-    }
-    Release(pool);
+    picture_pool_Release(pool);
 }
 
 picture_t *picture_pool_Get(picture_pool_t *pool)
@@ -256,9 +243,12 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
             continue;
         }
 
-        /* */
-        picture->p_next = NULL;
+        vlc_mutex_lock(&pool->lock);
+        pool->refs++;
         picture->gc.p_sys->tick = pool->tick++;
+        vlc_mutex_unlock(&pool->lock);
+
+        picture->p_next = NULL;
         return picture;
     }
     return NULL;
