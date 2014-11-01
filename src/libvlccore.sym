@@ -614,7 +614,6 @@ vout_ChangeAspectRatio
 vout_Close
 vout_GetPicture
 vout_PutPicture
-vout_ReleasePicture
 vout_PutSubpicture
 vout_RegisterSubpictureChannel
 vout_FlushSubpictureChannel

@@ -1296,7 +1296,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     {
         msg_Warn( p_dec, "non-dated video buffer received" );
         *pi_lost_sum += 1;
-        vout_ReleasePicture( p_vout, p_picture );
+        picture_Release( p_picture );
         return;
     }
 
@@ -1349,7 +1349,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
             msg_Warn( p_dec, "non-dated video buffer received" );
 
         *pi_lost_sum += 1;
-        vout_ReleasePicture( p_vout, p_picture );
+        picture_Release( p_picture );
     }
     int i_tmp_display;
     int i_tmp_lost;
@@ -1373,7 +1373,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
         if( DecoderIsExitRequested( p_dec ) )
         {
             /* It prevent freezing VLC in case of broken decoder */
-            vout_ReleasePicture( p_vout, p_pic );
+            picture_Release( p_pic );
             if( p_block )
                 block_Release( p_block );
             break;
@@ -1383,7 +1383,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         if( p_owner->i_preroll_end > VLC_TS_INVALID && p_pic->date < p_owner->i_preroll_end )
         {
-            vout_ReleasePicture( p_vout, p_pic );
+            picture_Release( p_pic );
             continue;
         }
 
@@ -2187,12 +2187,12 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
 static void vout_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 {
-    vout_ReleasePicture( p_dec->p_owner->p_vout, p_pic );
+    picture_Release( p_pic );
 }
 
 static void vout_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
 {
-    vout_ReleasePicture( p_dec->p_owner->p_vout, p_pic );
+    picture_Release( p_pic );
 }
 
 static subpicture_t *spu_new_buffer( decoder_t *p_dec,
