@@ -610,6 +610,7 @@ static int SetPlayItem( demux_t *p_demux, int i_mpls, int i_play_item )
         if( p_sys->pp_clpi[i_clpi]->i_id == p_mpls_clpi->i_id )
             p_clpi = p_sys->pp_clpi[i_clpi];
     }
+    assert(p_clpi);
 
     const bool b_same_clpi = b_same_mpls && p_sys->p_clpi->i_id == p_clpi->i_id;
     stream_t *p_m2ts = NULL;
