@@ -185,45 +185,64 @@ static block_t *ReverseStereo( filter_t *p_filter, block_t *p_buf )
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    block_t *(*func)(filter_t *, block_t *) = NULL;
+    const audio_format_t *infmt = &p_filter->fmt_in.audio;
+    const audio_format_t *outfmt = &p_filter->fmt_out.audio;
 
-    if( p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
-     || p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate
-     || p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 )
+    if( infmt->i_format != outfmt->i_format
+     || infmt->i_rate != outfmt->i_rate
+     || infmt->i_format != VLC_CODEC_FL32 )
         return VLC_EGENERIC;
-    if( p_filter->fmt_in.audio.i_physical_channels
-           == p_filter->fmt_out.audio.i_physical_channels
-     && p_filter->fmt_in.audio.i_original_channels
-           == p_filter->fmt_out.audio.i_original_channels )
+    if( infmt->i_physical_channels == outfmt->i_physical_channels
+     && infmt->i_original_channels == outfmt->i_original_channels )
         return VLC_EGENERIC;
 
-    const bool b_reverse_stereo = p_filter->fmt_out.audio.i_original_channels & AOUT_CHAN_REVERSESTEREO;
-    bool b_dualmono2stereo = (p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_DUALMONO );
-    b_dualmono2stereo &= (p_filter->fmt_out.audio.i_physical_channels & ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT ));
-    b_dualmono2stereo &= ((p_filter->fmt_out.audio.i_physical_channels & AOUT_CHAN_PHYSMASK) != (p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_PHYSMASK));
-
-    if( likely( !b_reverse_stereo && ! b_dualmono2stereo ) )
+    if( outfmt->i_physical_channels == AOUT_CHANS_STEREO )
     {
-        if( aout_FormatNbChannels( &p_filter->fmt_out.audio )
-            > aout_FormatNbChannels( &p_filter->fmt_in.audio ) )
-            func = Upmix;
-        else
-            func = Downmix;
-    }
-    /* Special case from dual mono to stereo */
-    else if( b_dualmono2stereo )
-    {
-        bool right = !(p_filter->fmt_out.audio.i_original_channels & AOUT_CHAN_LEFT);
-        if( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
-            /* Mono mode */
-            func = right ? ExtractRight : ExtractLeft;
-        else
-            /* Fake-stereo mode */
-            func = right ? CopyRight : CopyLeft;
-    }
-    else /* b_reverse_stereo */
-        func = ReverseStereo;
+        bool swap = (outfmt->i_original_channels & AOUT_CHAN_REVERSESTEREO)
+                  != (infmt->i_original_channels & AOUT_CHAN_REVERSESTEREO);
 
-    p_filter->pf_audio_filter = func;
+        if( (outfmt->i_original_channels & AOUT_CHAN_PHYSMASK)
+                                                            == AOUT_CHAN_LEFT )
+        {
+            p_filter->pf_audio_filter = swap ? CopyRight : CopyLeft;
+            return VLC_SUCCESS;
+        }
+
+        if( (outfmt->i_original_channels & AOUT_CHAN_PHYSMASK)
+                                                           == AOUT_CHAN_RIGHT )
+        {
+            p_filter->pf_audio_filter = swap ? CopyLeft : CopyRight;
+            return VLC_SUCCESS;
+        }
+
+        if( swap )
+        {
+            p_filter->pf_audio_filter = ReverseStereo;
+            return VLC_SUCCESS;
+        }
+    }
+
+    if ( aout_FormatNbChannels( outfmt ) == 1 )
+    {
+        bool mono = !!(infmt->i_original_channels & AOUT_CHAN_DUALMONO);
+
+        if( mono && (infmt->i_original_channels & AOUT_CHAN_LEFT) )
+        {
+            p_filter->pf_audio_filter = ExtractLeft;
+            return VLC_SUCCESS;
+        }
+
+        if( mono && (infmt->i_original_channels & AOUT_CHAN_RIGHT) )
+        {
+            p_filter->pf_audio_filter = ExtractRight;
+            return VLC_SUCCESS;
+        }
+    }
+
+    if( aout_FormatNbChannels( outfmt ) > aout_FormatNbChannels( infmt ) )
+        p_filter->pf_audio_filter = Upmix;
+    else
+        p_filter->pf_audio_filter = Downmix;
+
     return VLC_SUCCESS;
 }
