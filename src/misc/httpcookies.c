@@ -332,10 +332,16 @@ static bool cookie_domain_matches( const http_cookie_t * cookie, const char *hos
 
     size_t host_len = strlen(host);
     size_t cookie_domain_len = strlen(cookie->psz_domain);
-    int i = host_len - cookie_domain_len;
-    bool is_suffix = ( i > 0 ) &&
-        vlc_ascii_strcasecmp( &host[i], cookie->psz_domain ) == 0;
-    bool has_dot_before_suffix = host[i-1] == '.';
+    bool is_suffix = false, has_dot_before_suffix = false;
+
+    if( host_len > cookie_domain_len )
+    {
+        size_t i = host_len - cookie_domain_len;
+
+        is_suffix = vlc_ascii_strcasecmp( &host[i], cookie->psz_domain ) == 0;
+        has_dot_before_suffix = host[i-1] == '.';
+    }
+
     bool host_is_ipv4 = strspn(host, "0123456789.") == host_len;
     bool host_is_ipv6 = strchr(host, ':') != NULL;
     return is_suffix && has_dot_before_suffix &&
