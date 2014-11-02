@@ -21,15 +21,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-#include <vlc_common.h>
+#include "smooth.h"
+
 #include <vlc_es.h>
 #include <vlc_block.h>
 #include <assert.h>
-
-#include "smooth.h"
 
 static int hex_digit( const char c )
 {
@@ -86,8 +82,8 @@ void ql_Free( quality_level_t *qlevel )
     qlevel = NULL;
 }
 
-chunk_t *chunk_New( sms_stream_t* sms, uint64_t duration,\
-        uint64_t start_time )
+chunk_t *chunk_AppendNew( sms_stream_t* sms, uint64_t duration,
+                          uint64_t start_time )
 {
     chunk_t *chunk = calloc( 1, sizeof( chunk_t ) );
     if( unlikely( chunk == NULL ) )
@@ -96,8 +92,21 @@ chunk_t *chunk_New( sms_stream_t* sms, uint64_t duration,\
     chunk->duration = duration;
     chunk->start_time = start_time;
     chunk->type = UNKNOWN_ES;
-    chunk->sequence = vlc_array_count( sms->chunks );
-    vlc_array_append( sms->chunks, chunk );
+    if ( sms->p_lastchunk )
+    {
+        assert(sms->p_chunks);
+        sms->p_lastchunk->p_next = chunk;
+    }
+    else
+    {
+        assert(!sms->p_chunks);
+        sms->p_chunks = chunk;
+        /* Everything starts from first chunk */
+        sms->p_nextdownload = chunk;
+        sms->p_playback = chunk;
+    }
+    sms->p_lastchunk = chunk;
+
     return chunk;
 }
 
@@ -112,14 +121,9 @@ sms_stream_t * sms_New( void )
     sms_stream_t *sms = calloc( 1, sizeof( sms_stream_t ) );
     if( unlikely( !sms ) ) return NULL;
 
-    sms->qlevels = vlc_array_new();
-    sms->chunks = vlc_array_new();
-    if ( unlikely(!sms->qlevels || !sms->chunks) )
-    {
-        sms_Free( sms );
-        return NULL;
-    }
+    ARRAY_INIT( sms->qlevels );
     sms->type = UNKNOWN_ES;
+    vlc_mutex_init( &sms->chunks_lock );
     return sms;
 }
 
@@ -127,41 +131,25 @@ void sms_Free( sms_stream_t *sms )
 {
     if ( !sms )
         return;
-    if( sms->qlevels )
-    {
-        for( int n = 0; n < vlc_array_count( sms->qlevels ); n++ )
-        {
-            quality_level_t *qlevel = vlc_array_item_at_index( sms->qlevels, n );
-            if( qlevel ) ql_Free( qlevel );
-        }
-        vlc_array_destroy( sms->qlevels );
-    }
+    FOREACH_ARRAY( quality_level_t *qlevel, sms->qlevels );
+    if( qlevel )
+        ql_Free( qlevel );
+    FOREACH_END();
+    ARRAY_RESET( sms->qlevels );
 
-    if( sms->chunks )
+    vlc_mutex_lock( &sms->chunks_lock );
+    while( sms->p_chunks )
     {
-        for( int n = 0; n < vlc_array_count( sms->chunks ); n++ )
-        {
-            chunk_t *chunk = vlc_array_item_at_index( sms->chunks, n );
-            if( chunk) chunk_Free( chunk );
-        }
-        vlc_array_destroy( sms->chunks );
+        chunk_t *p_chunk = sms->p_chunks;
+        sms->p_chunks = sms->p_chunks->p_next;
+        chunk_Free( p_chunk );
     }
+    vlc_mutex_unlock( &sms->chunks_lock );
 
+    vlc_mutex_destroy( &sms->chunks_lock );
     free( sms->name );
     free( sms->url_template );
     free( sms );
-}
-
-quality_level_t *get_qlevel( sms_stream_t *sms, const unsigned qid )
-{
-    quality_level_t *qlevel = NULL;
-    for( unsigned i = 0; i < sms->qlevel_nb; i++ )
-    {
-        qlevel = vlc_array_item_at_index( sms->qlevels, i );
-        if( qlevel->id == qid )
-            return qlevel;
-    }
-    return NULL;
 }
 
 sms_queue_t *sms_queue_init( const unsigned length )
@@ -234,18 +222,13 @@ uint64_t sms_queue_avg( sms_queue_t *queue )
     return sum / queue->length;
 }
 
-sms_stream_t * sms_get_stream_by_cat( vlc_array_t *streams, int i_cat )
+sms_stream_t * sms_get_stream_by_cat( stream_sys_t *p_sys, int i_cat )
 {
-    sms_stream_t *ret = NULL;
-    int count = vlc_array_count( streams );
-    assert( count >= 0 && count <= 3 );
-
-    for( int i = 0; i < count; i++ )
-    {
-        ret = vlc_array_item_at_index( streams, i );
-        if( ret->type == i_cat )
-            return ret;
-    }
+    assert( p_sys->sms_selected.i_size >= 0 && p_sys->sms_selected.i_size <= 3 );
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    if( sms->type == i_cat )
+        return sms;
+    FOREACH_END();
     return NULL;
 }
 
@@ -279,26 +262,34 @@ int index_to_es_cat( int index )
     }
 }
 
-bool no_more_chunks( unsigned *indexes, vlc_array_t *streams )
+bool no_more_chunks( stream_sys_t *p_sys )
 {
-    sms_stream_t *sms = NULL;
-    int count = vlc_array_count( streams );
-    unsigned ck_index;
-    for( int i = 0; i < count; i++ )
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    if ( sms->p_playback )
     {
-        sms = vlc_array_item_at_index( streams, i );
-        ck_index = indexes[es_cat_to_index( sms->type )];
-        if( ck_index < sms->vod_chunks_nb - 1 )
-            return false;
+        return false;
     }
+    FOREACH_END();
     return true;
 }
 
-unsigned int ahead_chunks_count( stream_sys_t *p_sys, sms_stream_t *sms )
+void resetChunksState( stream_sys_t *p_sys )
 {
-    int ind = es_cat_to_index( sms->type );
-    if ( p_sys->download.ck_index[ind] > vlc_array_count( p_sys->download.chunks ) )
-        return p_sys->download.ck_index[ind] - vlc_array_count( p_sys->download.chunks );
-    else
-        return 0;
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    vlc_mutex_lock( &sms->chunks_lock );
+    chunk_t *p_chunk = sms->p_playback;
+    while( p_chunk )
+    {
+        FREENULL( p_chunk->data );
+        p_chunk->offset = CHUNK_OFFSET_UNSET;
+        p_chunk->size = 0;
+        p_chunk->read_pos = 0;
+        if ( p_chunk == sms->p_nextdownload )
+            break;
+        p_chunk = p_chunk->p_next;
+    }
+    sms->p_playback = NULL;
+    sms->p_nextdownload = NULL;
+    vlc_mutex_unlock( &sms->chunks_lock );
+    FOREACH_END();
 }

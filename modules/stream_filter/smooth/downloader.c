@@ -21,16 +21,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-#include <vlc_common.h>
+#include "smooth.h"
+
 #include <assert.h>
 #include <vlc_stream.h>
-#include <vlc_es.h>
 #include <vlc_charset.h>
 
-#include "smooth.h"
 #include "../../demux/mp4/libmp4.h"
 
 static bool Replace( char **ppsz_string, off_t off, const char *psz_old,
@@ -128,25 +124,21 @@ static char *ConstructUrl( const char *psz_template, const char *psz_base_url,
 
 static chunk_t * chunk_Get( sms_stream_t *sms, const uint64_t start_time )
 {
-    int len = vlc_array_count( sms->chunks );
-    for( int i = 0; i < len; i++ )
+    chunk_t *p_chunk = sms->p_chunks;
+    while( p_chunk )
     {
-        chunk_t * chunk = vlc_array_item_at_index( sms->chunks, i );
-        if( !chunk ) return NULL;
-
-        if( chunk->start_time <= start_time &&
-                chunk->start_time + chunk->duration > start_time )
-        {
-            return chunk;
-        }
+        if( p_chunk->start_time <= start_time &&
+                p_chunk->start_time + p_chunk->duration > start_time )
+            break;
+        p_chunk = p_chunk->p_next;
     }
-    return NULL;
+    return p_chunk;
 }
 
 static unsigned set_track_id( chunk_t *chunk, const unsigned tid )
 {
     uint32_t size, type;
-    if( !chunk->data )
+    if( !chunk->data || chunk->size < 32 )
         return 0;
     uint8_t *slice = chunk->data;
     if( !slice )
@@ -178,8 +170,6 @@ static unsigned set_track_id( chunk_t *chunk, const unsigned tid )
 
 static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     stream_t *p_ts = stream_UrlNew( s, url );
     free( url );
     if( p_ts == NULL )
@@ -187,74 +177,67 @@ static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
 
     int64_t size = stream_Size( p_ts );
     if ( size < 0 )
+    {
+        stream_Delete( p_ts );
         return VLC_EGENERIC;
+    }
 
-    chunk->size = (uint64_t) size;
-    chunk->offset = p_sys->download.next_chunk_offset;
-    p_sys->download.next_chunk_offset += chunk->size;
-
-    chunk->data = malloc( size );
-
-    if( chunk->data == NULL )
+    uint8_t *p_data = malloc( size );
+    if( p_data == NULL )
     {
         stream_Delete( p_ts );
         return VLC_ENOMEM;
     }
 
-    int read = stream_Read( p_ts, chunk->data, size );
-    if( read < size )
+    int read = stream_Read( p_ts, p_data, size );
+    if( read < size && read > 0 )
     {
         msg_Warn( s, "sms_Download: I requested %"PRIi64" bytes, "\
                 "but I got only %i", size, read );
-        chunk->data = realloc( chunk->data, read );
+        p_data = realloc( p_data, read );
     }
 
-    stream_Delete( p_ts );
+    chunk->data = p_data;
+    chunk->size = (uint64_t) (read > 0 ? read : 0);
 
-    vlc_mutex_lock( &p_sys->download.lock_wait );
-    int index = es_cat_to_index( chunk->type );
-    p_sys->download.lead[index] += chunk->duration;
-    vlc_mutex_unlock( &p_sys->download.lock_wait );
+    stream_Delete( p_ts );
 
     return VLC_SUCCESS;
 }
 
 #ifdef DISABLE_BANDWIDTH_ADAPTATION
-static unsigned BandwidthAdaptation( stream_t *s,
-        sms_stream_t *sms, uint64_t bandwidth )
+static const quality_level_t *
+BandwidthAdaptation( stream_t *s, sms_stream_t *sms, uint64_t bandwidth )
 {
     VLC_UNUSED(bandwidth);
     VLC_UNUSED(s);
-    return sms->download_qlvl;
+    return sms->current_qlvl;
 }
 #else
 
-static unsigned BandwidthAdaptation( stream_t *s,
-        sms_stream_t *sms, uint64_t bandwidth )
+static const quality_level_t *
+BandwidthAdaptation( stream_t *s, sms_stream_t *sms, uint64_t bandwidth )
 {
     if( sms->type != VIDEO_ES )
-        return sms->download_qlvl;
+        return sms->current_qlvl;
 
     uint64_t bw_candidate = 0;
-    quality_level_t *qlevel;
-    unsigned ret = sms->download_qlvl;
+    const quality_level_t *ret = sms->current_qlvl;
 
-    for( unsigned i = 0; i < sms->qlevel_nb; i++ )
+    FOREACH_ARRAY( const quality_level_t *qlevel, sms->qlevels );
+    if( unlikely( !qlevel ) )
     {
-        qlevel = vlc_array_item_at_index( sms->qlevels, i );
-        if( unlikely( !qlevel ) )
-        {
-            msg_Err( s, "Could no get %uth quality level", i );
-            return 0;
-        }
-
-        if( qlevel->Bitrate < (bandwidth - bandwidth / 3) &&
-                qlevel->Bitrate > bw_candidate )
-        {
-            bw_candidate = qlevel->Bitrate;
-            ret = qlevel->id;
-        }
+        msg_Err( s, "Could no get %uth quality level", fe_idx );
+        return ret;
     }
+
+    if( qlevel->Bitrate < (bandwidth - bandwidth / 3) &&
+            qlevel->Bitrate > bw_candidate )
+    {
+        bw_candidate = qlevel->Bitrate;
+        ret = qlevel;
+    }
+    FOREACH_END();
 
     return ret;
 }
@@ -333,7 +316,7 @@ static int get_new_chunks( stream_t *s, chunk_t *ck )
                     "fragment abs time %"PRIu64, dur, stime);
 
         if( !chunk_Get( sms, stime + dur ) )
-            chunk_New( sms, dur, stime );
+            chunk_AppendNew( sms, dur, stime );
     }
     free( tfrf_df );
 
@@ -400,7 +383,7 @@ static int build_smoo_box( stream_t *s, uint8_t *smoo_box )
         ((uint32_t *)stra_box)[13] = bswap32( sms->timescale );
         ((uint64_t *)stra_box)[7] = bswap64( p_sys->vod_duration );
 
-        quality_level_t * qlvl = get_qlevel( sms, sms->download_qlvl );
+        const quality_level_t * qlvl = sms->current_qlvl;
 
         if ( qlvl )
         {
@@ -455,27 +438,21 @@ static int Download( stream_t *s, sms_stream_t *sms )
 {
     stream_sys_t *p_sys = s->p_sys;
 
+    assert( sms->p_nextdownload );
+    assert( sms->p_nextdownload->data == NULL );
+    assert( sms->current_qlvl );
+
     int index = es_cat_to_index( sms->type );
     if ( unlikely( index == -1 ) )
     {
         msg_Err( s, "invalid stream type" );
         return VLC_EGENERIC;
     }
-    uint64_t start_time = p_sys->download.lead[index];
 
-    quality_level_t *qlevel = get_qlevel( sms, sms->download_qlvl );
-    if( unlikely( !qlevel ) )
-    {
-        msg_Err( s, "Could not get quality level id %u", sms->download_qlvl );
-        return VLC_EGENERIC;
-    }
-
-
-    chunk_t *chunk = chunk_Get( sms, start_time );
+    chunk_t *chunk = sms->p_nextdownload;
     if( !chunk )
     {
-        msg_Warn( s, "Could not find a chunk for stream %s, "\
-                "start time = %"PRIu64"", sms->name, start_time );
+        msg_Warn( s, "Could not find a chunk for stream %s", sms->name );
         return VLC_EGENERIC;
     }
     if( chunk->data != NULL )
@@ -487,8 +464,8 @@ static int Download( stream_t *s, sms_stream_t *sms )
 
     chunk->type = sms->type;
 
-    char *url = ConstructUrl( sms->url_template, p_sys->base_url,
-                              qlevel, chunk->start_time );
+    char *url = ConstructUrl( sms->url_template, p_sys->download.base_url,
+                              sms->current_qlvl, chunk->start_time );
     if( !url )
     {
         msg_Err( s, "ConstructUrl returned NULL" );
@@ -496,29 +473,29 @@ static int Download( stream_t *s, sms_stream_t *sms )
     }
 
     /* sanity check - can we download this chunk on time? */
-    uint64_t avg_bw = sms_queue_avg( p_sys->bws );
-    if( (avg_bw > 0) && (qlevel->Bitrate > 0) )
+    uint64_t avg_bw = sms_queue_avg( p_sys->download.bws );
+    if( (avg_bw > 0) && (sms->current_qlvl->Bitrate > 0) )
     {
         /* duration in ms */
         unsigned chunk_duration = chunk->duration * 1000 / sms->timescale;
-        uint64_t size = chunk_duration * qlevel->Bitrate / 1000; /* bits */
+        uint64_t size = chunk_duration * sms->current_qlvl->Bitrate / 1000; /* bits */
         unsigned estimated = size * 1000 / avg_bw;
         if( estimated > chunk_duration )
         {
-            msg_Warn( s,"downloading of chunk %d would take %d ms, "\
-                    "which is longer than its playback (%d ms)",
-                        chunk->sequence, estimated, chunk_duration );
+            msg_Warn( s,"downloading of chunk @%"PRIu64" would take %d ms, "
+                        "which is longer than its playback (%d ms)",
+                        chunk->start_time, estimated, chunk_duration );
         }
     }
 
-    mtime_t start = mdate();
+    mtime_t duration = mdate();
     if( sms_Download( s, chunk, url ) != VLC_SUCCESS )
     {
-        msg_Err( s, "downloaded chunk %u from stream %s at quality"
-            " %u *failed*", chunk->sequence, sms->name, qlevel->Bitrate );
+        msg_Err( s, "downloaded chunk @%"PRIu64" from stream %s at quality"
+                    " %u *failed*", chunk->start_time, sms->name, sms->current_qlvl->Bitrate );
         return VLC_EGENERIC;
     }
-    mtime_t duration = mdate() - start;
+    duration = mdate() - duration;
 
     unsigned real_id = set_track_id( chunk, sms->id );
     if( real_id == 0)
@@ -527,259 +504,228 @@ static int Download( stream_t *s, sms_stream_t *sms )
         return VLC_EGENERIC;
     }
 
-    //msg_Dbg( s, "chunk ID was %i and is now %i", real_id, sms->id );
-
     if( p_sys->b_live )
-        get_new_chunks( s, chunk );
-
-    vlc_mutex_lock( &p_sys->download.lock_wait );
-    vlc_array_append( p_sys->download.chunks, chunk );
-    vlc_cond_signal( &p_sys->download.wait );
-    vlc_mutex_unlock( &p_sys->download.lock_wait );
-
-    msg_Info( s, "downloaded chunk %d from stream %s at quality %u",
-                chunk->sequence, sms->name, qlevel->Bitrate );
-
-    uint64_t actual_lead = chunk->start_time + chunk->duration;
-    int ind = es_cat_to_index( sms->type );
-    p_sys->download.ck_index[ind] = chunk->sequence;
-    p_sys->download.lead[ind] = __MIN( p_sys->download.lead[ind], actual_lead );
-
-    if( sms->type == VIDEO_ES ||
-            ( !SMS_GET_SELECTED_ST( VIDEO_ES ) && sms->type == AUDIO_ES ) )
     {
-        p_sys->playback.toffset = __MIN( p_sys->playback.toffset,
-                                            (uint64_t)chunk->start_time );
+        get_new_chunks( s, chunk );
     }
+
+    msg_Info( s, "downloaded chunk @%"PRIu64" from stream %s at quality %u",
+                 chunk->start_time, sms->name, sms->current_qlvl->Bitrate );
 
     unsigned dur_ms = __MAX( 1, duration / 1000 );
     uint64_t bw = chunk->size * 8 * 1000 / dur_ms; /* bits / s */
-    if( sms_queue_put( p_sys->bws, bw ) != VLC_SUCCESS )
+    if( sms_queue_put( p_sys->download.bws, bw ) != VLC_SUCCESS )
         return VLC_EGENERIC;
-    avg_bw = sms_queue_avg( p_sys->bws );
+    avg_bw = sms_queue_avg( p_sys->download.bws );
 
-    if( sms->type != VIDEO_ES )
+    if( sms->type != VIDEO_ES ) /* FIXME: hanle adaptation for audio */
         return VLC_SUCCESS;
 
-    /* Track could get disabled in mp4 demux if we trigger adaption too soon. */
-    if( chunk->sequence <= 1 )
+    /* Track could get disabled in mp4 demux if we trigger adaption too soon.
+       And we don't need adaptation on last chunk */
+    if( sms->p_chunks == NULL || sms->p_chunks == sms->p_lastchunk )
         return VLC_SUCCESS;
 
-    unsigned new_qlevel_id = BandwidthAdaptation( s, sms, avg_bw );
-    quality_level_t *new_qlevel = get_qlevel( sms, new_qlevel_id );
-    if( unlikely( !new_qlevel ) )
-    {
-        msg_Err( s, "Could not get quality level id %u", new_qlevel_id );
-        return VLC_EGENERIC;
-    }
+    const quality_level_t *new_qlevel = BandwidthAdaptation( s, sms, avg_bw );
+    assert(new_qlevel);
 
-    if( new_qlevel->Bitrate != qlevel->Bitrate )
+    vlc_mutex_lock( &p_sys->playback.lock );
+    if ( p_sys->playback.init.p_datachunk == NULL ) /* Don't chain/nest reinits */
     {
-        msg_Warn( s, "detected %s bandwidth (%u) stream",
-                 (new_qlevel->Bitrate >= qlevel->Bitrate) ? "faster" : "lower",
-                 new_qlevel->Bitrate );
-
-        sms->download_qlvl = new_qlevel_id;
-    }
-
-    if( new_qlevel->MaxWidth != qlevel->MaxWidth ||
-        new_qlevel->MaxHeight != qlevel->MaxHeight )
-    {
-        chunk_t *new_init_ck = build_init_chunk( s );
-        if( !new_init_ck )
+        const quality_level_t *prev_qlevel = sms->current_qlvl;
+        if( new_qlevel->Bitrate != sms->current_qlvl->Bitrate )
         {
-            return VLC_EGENERIC;
+            msg_Warn( s, "detected %s bandwidth (%u) stream",
+                     (new_qlevel->Bitrate >= sms->current_qlvl->Bitrate) ? "faster" : "lower",
+                     new_qlevel->Bitrate );
+            sms->current_qlvl = new_qlevel;
         }
 
-        new_init_ck->offset = p_sys->download.next_chunk_offset;
-        p_sys->download.next_chunk_offset += new_init_ck->size;
+        /* FIXME: Why no reinit/new extra bytes with different qlevel ???
+                  Probably broken with some codecs */
 
-        vlc_mutex_lock( &p_sys->download.lock_wait );
-        vlc_array_append( p_sys->download.chunks, new_init_ck );
-        vlc_array_append( p_sys->init_chunks, new_init_ck );
-        vlc_mutex_unlock( &p_sys->download.lock_wait );
+        if( new_qlevel->MaxWidth != prev_qlevel->MaxWidth ||
+            new_qlevel->MaxHeight != prev_qlevel->MaxHeight )
+        {
+            chunk_t *new_init_ck = build_init_chunk( s );
+            if( new_init_ck )
+            {
+                p_sys->playback.init.p_datachunk = new_init_ck;
+                p_sys->playback.init.p_startchunk = chunk->p_next; /* to send before that one */
+                assert( chunk->p_next && chunk != sms->p_lastchunk );
+            }
+        }
     }
+    vlc_mutex_unlock( &p_sys->playback.lock );
+
     return VLC_SUCCESS;
 }
 
-static inline uint64_t get_lead( stream_t *s )
+static inline bool reached_download_limit( sms_stream_t *sms, unsigned int i_max_chunks,
+                                           uint64_t i_max_time )
 {
-    stream_sys_t *p_sys = s->p_sys;
-    uint64_t lead = 0;
-    uint64_t alead = p_sys->download.lead[es_cat_to_index( AUDIO_ES )];
-    uint64_t vlead = p_sys->download.lead[es_cat_to_index( VIDEO_ES )];
-    bool video = SMS_GET_SELECTED_ST( VIDEO_ES ) ? true : false;
-    bool audio = SMS_GET_SELECTED_ST( AUDIO_ES ) ? true : false;
+    if ( !sms->p_nextdownload )
+        return true;
 
-    if( video && audio )
-        lead = __MIN( vlead, alead );
-    else if( video )
-        lead = vlead;
-    else
-        lead = alead;
+    if ( sms->p_playback == sms->p_nextdownload ) /* chunk can be > max_time */
+        return false;
 
-    if( p_sys->playback.toffset < lead )
-        lead -= p_sys->playback.toffset;
-    else
-        lead = 0;
-    return lead;
+    const chunk_t *p_head = sms->p_playback;
+    if ( !p_head )
+        return true;
+
+    unsigned int i_chunk_count = 0;
+    uint64_t i_total_time = 0;
+    const chunk_t *p_tail = sms->p_nextdownload;
+    while( p_head )
+    {
+        i_total_time += p_head->duration * CLOCK_FREQ / sms->timescale;
+        if ( i_max_time && i_total_time >= i_max_time )
+        {
+            return true;
+        }
+        else if ( i_max_chunks && i_chunk_count >= i_max_chunks )
+        {
+            return true;
+        }
+
+        if ( p_head == p_tail )
+            break;
+
+        p_head = p_head->p_next;
+        i_chunk_count += 1;
+    }
+
+    return false;
 }
 
-static int next_track( stream_t *s )
+static bool all_reached_download_limit( stream_sys_t *p_sys, unsigned int i_max_chunks,
+                                        uint64_t i_max_time )
 {
-    stream_sys_t *p_sys = s->p_sys;
-    uint64_t tmp, min = 0;
-    int cat, ret = UNKNOWN_ES;
-    for( int i = 0; i < 3; i++ )
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    vlc_mutex_lock( &sms->chunks_lock );
+    bool b_ret = reached_download_limit( sms, i_max_chunks, i_max_time );
+    vlc_mutex_unlock( &sms->chunks_lock );
+    if ( ! b_ret )
+        return false;
+    FOREACH_END();
+    return true;
+}
+
+/* Returns the first download chunk by time in the download queue */
+static sms_stream_t *next_download_stream( stream_sys_t *p_sys )
+{
+    sms_stream_t *p_candidate = NULL;
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    vlc_mutex_lock( &sms->chunks_lock );
+    if ( !sms->p_nextdownload )
     {
-        tmp = p_sys->download.lead[i];
-        cat = index_to_es_cat( i );
-        if( (!min || tmp < min) && SMS_GET_SELECTED_ST( cat ) )
-        {
-            min = tmp;
-            ret = cat;
-        }
+        vlc_mutex_unlock( &sms->chunks_lock );
+        continue;
     }
-    return ret;
+    if ( p_candidate == NULL ||
+         sms->p_nextdownload->start_time < p_candidate->p_nextdownload->start_time )
+        p_candidate = sms;
+    vlc_mutex_unlock( &sms->chunks_lock );
+    FOREACH_END();
+    return p_candidate;
 }
 
 void* sms_Thread( void *p_this )
 {
     stream_t *s = (stream_t *)p_this;
     stream_sys_t *p_sys = s->p_sys;
-    sms_stream_t *sms = NULL;
-    chunk_t *chunk;
 
     int canc = vlc_savecancel();
 
     /* We compute the average bandwidth of the 4 last downloaded
      * chunks, but feel free to replace '4' by whatever you wish */
-    p_sys->bws = sms_queue_init( 4 );
-    if( !p_sys->bws )
+    p_sys->download.bws = sms_queue_init( 4 );
+    if( !p_sys->download.bws )
         goto cancel;
 
     chunk_t *init_ck = build_init_chunk( s );
     if( !init_ck )
         goto cancel;
 
-    vlc_mutex_lock( &p_sys->download.lock_wait );
-    vlc_array_append( p_sys->download.chunks, init_ck );
-    vlc_array_append( p_sys->init_chunks, init_ck );
-    vlc_mutex_unlock( &p_sys->download.lock_wait );
+    vlc_mutex_lock( &p_sys->playback.lock );
+    p_sys->playback.init.p_datachunk = init_ck;
+    p_sys->playback.init.p_startchunk = NULL; /* before any */
+    vlc_mutex_unlock( &p_sys->playback.lock );
+    vlc_cond_signal( &p_sys->playback.wait ); /* demuxer in Open() can start reading */
 
-    p_sys->download.next_chunk_offset = init_ck->size;
+    int64_t i_pts_delay = 0;
 
-    /* XXX Sometimes, the video stream is cut into pieces of one exact length,
-     * while the audio stream fragments can't be made to match exactly,
-     * and for some reason the n^th advertised video fragment is related to
-     * the n+1^th advertised audio chunk or vice versa */
-
-    uint64_t start_time = 0, lead = 0;
-    int64_t i_pts_delay;
-
-    for( int i = 0; i < 3; i++ )
+    /* Buffer up first chunks */
+    int i_initial_buffering = p_sys->download.lookahead_count;
+    if ( !i_initial_buffering )
+        i_initial_buffering = 3;
+    for( int i = 0; i < i_initial_buffering; i++ )
     {
-        sms = SMS_GET_SELECTED_ST( index_to_es_cat( i ) );
-        if( sms && vlc_array_count( sms->chunks ) )
+        FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+        vlc_mutex_lock( &sms->chunks_lock );
+        if ( sms->p_nextdownload )
         {
-            chunk = vlc_array_item_at_index( sms->chunks, 0 );
-            p_sys->download.lead[i] = chunk->start_time + p_sys->timescale / 1000;
-            if( !start_time )
-                start_time = chunk->start_time;
-
             if( Download( s, sms ) != VLC_SUCCESS )
+            {
+                vlc_mutex_unlock( &sms->chunks_lock );
                 goto cancel;
+            }
+            sms->p_nextdownload = sms->p_nextdownload->p_next;
         }
+        vlc_mutex_unlock( &sms->chunks_lock );
+        FOREACH_END();
     }
+    vlc_cond_signal( &p_sys->playback.wait );
 
-    while( 1 )
+    while( !p_sys->b_close )
     {
-        /* XXX replace magic number 10 by a value depending on
-         * LookAheadFragmentCount and DVRWindowLength */
-        vlc_mutex_lock( &p_sys->download.lock_wait );
+        if ( !p_sys->b_live || !p_sys->download.lookahead_count )
+            stream_Control( s, STREAM_GET_PTS_DELAY, &i_pts_delay );
 
-        if( p_sys->b_close )
+        vlc_mutex_lock( &p_sys->lock );
+        while( all_reached_download_limit( p_sys,
+                                           p_sys->download.lookahead_count,
+                                           i_pts_delay ) )
         {
-            vlc_mutex_unlock( &p_sys->download.lock_wait );
-            break;
-        }
-
-        lead = get_lead( s );
-
-        if ( stream_Control( s, STREAM_GET_PTS_DELAY, &i_pts_delay ) != VLC_SUCCESS ||
-             i_pts_delay < 1 )
-        {
-            i_pts_delay = 10 * p_sys->timescale + start_time;
-        }
-
-        while( !p_sys->b_live && ( lead > (uint64_t) i_pts_delay || NO_MORE_CHUNKS ) )
-        {
-            vlc_cond_wait( &p_sys->download.wait, &p_sys->download.lock_wait );
-            lead = get_lead( s );
-
+            vlc_cond_wait( &p_sys->download.wait, &p_sys->lock );
             if( p_sys->b_close )
                 break;
         }
 
-        if( p_sys->b_tseek )
+        if( p_sys->b_close )
         {
-            int count = vlc_array_count( p_sys->download.chunks );
-            chunk_t *ck = NULL;
-            for( int i = 0; i < count; i++ )
-            {
-                ck = vlc_array_item_at_index( p_sys->download.chunks, i );
-                if( unlikely( !ck ) )
-                    goto cancel;
-                ck->read_pos = 0;
-                if( ck->data == NULL )
-                    continue;
-                FREENULL( ck->data );
-            }
-
-            vlc_array_destroy( p_sys->download.chunks );
-            p_sys->download.chunks = vlc_array_new();
-
-            p_sys->playback.toffset = p_sys->time_pos;
-            for( int i = 0; i < 3; i++ )
-            {
-                p_sys->download.lead[i] = p_sys->time_pos;
-                p_sys->download.ck_index[i] = 0;
-            }
-            p_sys->download.next_chunk_offset = 0;
-
-            p_sys->playback.boffset = 0;
-            p_sys->playback.index = 0;
-
-            chunk_t *new_init_ck = build_init_chunk( s );
-            if( !new_init_ck )
-                goto cancel;
-
-            new_init_ck->offset = p_sys->download.next_chunk_offset;
-            p_sys->download.next_chunk_offset += new_init_ck->size;
-
-            vlc_array_append( p_sys->download.chunks, new_init_ck );
-            vlc_array_append( p_sys->init_chunks, new_init_ck );
-            p_sys->b_tseek = false;
+            vlc_mutex_unlock( &p_sys->lock );
+            break;
         }
-        vlc_mutex_unlock( &p_sys->download.lock_wait );
 
-        sms = SMS_GET_SELECTED_ST( next_track( s ) );
-
-        vlc_mutex_lock( &p_sys->download.lock_wait );
-        unsigned i_ahead = ahead_chunks_count( p_sys, sms );
-        vlc_mutex_unlock( &p_sys->download.lock_wait );
-
-        if ( vlc_array_count( sms->chunks ) &&
-             ( !p_sys->b_live || i_ahead < p_sys->lookahead_count ) )
+        sms_stream_t *sms = next_download_stream( p_sys );
+        if ( sms )
         {
+            vlc_mutex_lock( &sms->chunks_lock );
+            vlc_mutex_unlock( &p_sys->lock );
+
             if( Download( s, sms ) != VLC_SUCCESS )
-                goto cancel;
+            {
+                vlc_mutex_unlock( &sms->chunks_lock );
+                break;
+            }
+            vlc_cond_signal( &p_sys->playback.wait );
+
+            if ( sms->p_nextdownload ) /* could have been modified by seek */
+                sms->p_nextdownload = sms->p_nextdownload->p_next;
+
+            vlc_mutex_unlock( &sms->chunks_lock );
         }
+        else
+            vlc_mutex_unlock( &p_sys->lock );
+
+        vlc_testcancel();
     }
 
 cancel:
     p_sys->b_error = true;
-    msg_Warn(s, "Canceling download thread!");
+    msg_Dbg(s, "Canceling download thread!");
     vlc_restorecancel( canc );
     return NULL;
 }
