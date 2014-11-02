@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
@@ -44,6 +46,8 @@ vlc_module_begin ()
     set_callbacks( Create, NULL )
 vlc_module_end ()
 
+typedef void (*mix_func_t)(float *, const float *, size_t, unsigned, unsigned);
+
 /**
  * Trivially down-mixes or up-mixes a buffer
  */
@@ -57,6 +61,80 @@ static void SparseCopy( float *p_dest, const float *p_src, size_t i_len,
 
         p_src += i_input_stride;
         p_dest += i_output_stride;
+    }
+}
+
+static void CopyLeft( float *p_dest, const float *p_src, size_t i_len,
+                      unsigned i_output_stride, unsigned i_input_stride )
+{
+    assert( i_output_stride == 2 );
+    assert( i_input_stride == 2 );
+
+    for( unsigned i = 0; i < i_len; i++ )
+    {
+        *(p_dest++) = *p_src;
+        *(p_dest++) = *p_src;
+        p_src += 2;
+    }
+}
+
+static void CopyRight( float *p_dest, const float *p_src, size_t i_len,
+                        unsigned i_output_stride, unsigned i_input_stride )
+{
+    assert( i_output_stride == 2 );
+    assert( i_input_stride == 2 );
+
+    for( unsigned i = 0; i < i_len; i++ )
+    {
+        p_src++;
+        *(p_dest++) = *p_src;
+        *(p_dest++) = *p_src;
+        p_src++;
+    }
+}
+
+static void ExtractLeft( float *p_dest, const float *p_src, size_t i_len,
+                         unsigned i_output_stride, unsigned i_input_stride )
+{
+    assert( i_output_stride == 1 );
+    assert( i_input_stride == 2 );
+
+    for( unsigned i = 0; i < i_len; i++ )
+    {
+        *(p_dest++) = *p_src;
+        p_src += 2;
+    }
+}
+
+static void ExtractRight( float *p_dest, const float *p_src, size_t i_len,
+                          unsigned i_output_stride, unsigned i_input_stride )
+{
+    assert( i_output_stride == 1 );
+    assert( i_input_stride == 2 );
+
+    for( unsigned i = 0; i < i_len; i++ )
+    {
+        p_src++;
+        *(p_dest++) = *(p_src++);
+    }
+}
+
+static void ReverseStereo( float *p_dest, const float *p_src, size_t i_len,
+                           unsigned i_output_stride, unsigned i_input_stride )
+{
+    assert( i_output_stride == 2 );
+    assert( i_input_stride == 2 );
+
+    /* Reverse-stereo mode */
+    for( unsigned i = 0; i < i_len; i++ )
+    {
+        float i_tmp = p_src[0];
+
+        p_dest[0] = p_src[1];
+        p_dest[1] = i_tmp;
+
+        p_dest += 2;
+        p_src += 2;
     }
 }
 
@@ -96,53 +174,11 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     b_dualmono2stereo &= (p_filter->fmt_out.audio.i_physical_channels & ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT ));
     b_dualmono2stereo &= ((p_filter->fmt_out.audio.i_physical_channels & AOUT_CHAN_PHYSMASK) != (p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_PHYSMASK));
 
-    if( likely( !b_reverse_stereo && ! b_dualmono2stereo ) )
-    {
-        SparseCopy( p_dest, p_src, p_in_buf->i_nb_samples, i_output_nb,
-                    i_input_nb );
-    }
-    /* Special case from dual mono to stereo */
-    else if( b_dualmono2stereo )
-    {
-        /* This is a bit special. */
-        if( !(p_filter->fmt_out.audio.i_original_channels & AOUT_CHAN_LEFT) )
-        {
-            p_src++;
-        }
-        if( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
-        {   /* Mono mode */
-            for( unsigned i = 0; i < p_in_buf->i_nb_samples; i++ )
-            {
-                *p_dest = *p_src;
-                p_dest++;
-                p_src += 2;
-            }
-        }
-        else
-        {   /* Fake-stereo mode */
-            for( unsigned i = 0; i < p_in_buf->i_nb_samples; i++ )
-            {
-                *p_dest = *p_src;
-                p_dest++;
-                *p_dest = *p_src;
-                p_dest++;
-                p_src += 2;
-            }
-        }
-    }
-    else if( b_reverse_stereo )
-    {
-        /* Reverse-stereo mode */
-        for ( unsigned i = 0; i < p_in_buf->i_nb_samples; i++ )
-        {
-            float i_tmp = p_src[0];
-            p_dest[0] = p_src[1];
-            p_dest[1] = i_tmp;
+    mix_func_t func = p_filter->p_sys;
 
-            p_dest += 2;
-            p_src += 2;
-        }
-    }
+    if( func != NULL )
+        func( p_dest, p_src, p_in_buf->i_nb_samples, i_output_nb, i_input_nb );
+
 out:
     if( p_in_buf != p_out_buf )
         block_Release( p_in_buf );
@@ -155,6 +191,7 @@ out:
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    mix_func_t func = NULL;
 
     if( p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
      || p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate
@@ -165,8 +202,29 @@ static int Create( vlc_object_t *p_this )
      && p_filter->fmt_in.audio.i_original_channels
            == p_filter->fmt_out.audio.i_original_channels )
         return VLC_EGENERIC;
+
+    const bool b_reverse_stereo = p_filter->fmt_out.audio.i_original_channels & AOUT_CHAN_REVERSESTEREO;
+    bool b_dualmono2stereo = (p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_DUALMONO );
+    b_dualmono2stereo &= (p_filter->fmt_out.audio.i_physical_channels & ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT ));
+    b_dualmono2stereo &= ((p_filter->fmt_out.audio.i_physical_channels & AOUT_CHAN_PHYSMASK) != (p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_PHYSMASK));
+
+    if( likely( !b_reverse_stereo && ! b_dualmono2stereo ) )
+        func = SparseCopy;
+    /* Special case from dual mono to stereo */
+    else if( b_dualmono2stereo )
+    {
+        bool right = !(p_filter->fmt_out.audio.i_original_channels & AOUT_CHAN_LEFT);
+        if( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
+            /* Mono mode */
+            func = right ? ExtractRight : ExtractLeft;
+        else
+            /* Fake-stereo mode */
+            func = right ? CopyRight : CopyLeft;
     }
+    else /* b_reverse_stereo */
+        func = ReverseStereo;
 
     p_filter->pf_audio_filter = DoWork;
+    p_filter->p_sys = (void *)func;
     return VLC_SUCCESS;
 }
