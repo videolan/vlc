@@ -1533,8 +1533,9 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 
             p_stream->b_eof = AVI_TrackSeek( p_demux, i_stream, i_date ) != 0;
         }
-        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
         p_sys->i_time = i_date;
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + p_sys->i_time );
         msg_Dbg( p_demux, "seek: %"PRId64" seconds", p_sys->i_time /CLOCK_FREQ );
         return VLC_SUCCESS;
 
