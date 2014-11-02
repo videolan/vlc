@@ -380,8 +380,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
     if( p_dec->fmt_out.audio.i_rate != (unsigned int)ctx->sample_rate )
         date_Init( &p_sys->end_date, ctx->sample_rate, 1 );
 
-    if( p_block->i_pts > VLC_TS_INVALID &&
-        p_block->i_pts > date_Get( &p_sys->end_date ) )
+    if( p_block->i_pts > date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
