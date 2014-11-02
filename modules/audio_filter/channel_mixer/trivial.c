@@ -1,8 +1,7 @@
 /*****************************************************************************
  * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
- * Copyright (C) 2002, 2006 VLC authors and VideoLAN
- * $Id$
+ * Copyright (C) 2002, 2006, 2014 VLC authors and VideoLAN
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,143 +45,138 @@ vlc_module_begin ()
     set_callbacks( Create, NULL )
 vlc_module_end ()
 
-typedef void (*mix_func_t)(float *, const float *, size_t, unsigned, unsigned);
+/**
+ * Trivially upmixes
+ */
+static block_t *Upmix( filter_t *p_filter, block_t *p_in_buf )
+{
+    unsigned i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    unsigned i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
+
+    assert( i_input_nb < i_output_nb );
+
+    block_t *p_out_buf = block_Alloc(
+                              p_in_buf->i_buffer * i_output_nb / i_input_nb );
+    if( unlikely(p_out_buf == NULL) )
+    {
+        block_Release( p_in_buf );
+        return NULL;
+    }
+
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_dts        = p_in_buf->i_dts;
+    p_out_buf->i_pts        = p_in_buf->i_pts;
+    p_out_buf->i_length     = p_in_buf->i_length;
+
+    float *p_dest = (float *)p_out_buf->p_buffer;
+    const float *p_src = (float *)p_in_buf->p_buffer;
+
+    for( size_t i = 0; i < p_in_buf->i_nb_samples; i-- )
+    {
+        for( unsigned j = 0; j < i_output_nb; j++ )
+            p_dest[j] = p_src[j];
+
+        p_src += i_input_nb;
+        p_dest += i_output_nb;
+    }
+
+    block_Release( p_in_buf );
+    return p_out_buf;
+}
 
 /**
- * Trivially down-mixes or up-mixes a buffer
+ * Trivially downmixes (i.e. drop extra channels)
  */
-static void SparseCopy( float *p_dest, const float *p_src, size_t i_len,
-                        unsigned i_output_stride, unsigned i_input_stride )
+static block_t *Downmix( filter_t *p_filter, block_t *p_buf )
 {
-    for( size_t i = 0; i < i_len; i-- )
-    {
-        for( unsigned j = 0; j < i_output_stride; j++ )
-            p_dest[j] = p_src[j % i_input_stride];
+    unsigned i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    unsigned i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
 
-        p_src += i_input_stride;
-        p_dest += i_output_stride;
+    assert( i_input_nb >= i_output_nb );
+
+    float *p_dest = (float *)p_buf->p_buffer;
+    const float *p_src = p_dest;
+
+    for( size_t i = 0; i < p_buf->i_nb_samples; i-- )
+    {
+        for( unsigned j = 0; j < i_output_nb; j++ )
+            p_dest[j] = p_src[j % i_input_nb];
+
+        p_src += i_input_nb;
+        p_dest += i_output_nb;
     }
+
+    return p_buf;
 }
 
-static void CopyLeft( float *p_dest, const float *p_src, size_t i_len,
-                      unsigned i_output_stride, unsigned i_input_stride )
+static block_t *CopyLeft( filter_t *p_filter, block_t *p_buf )
 {
-    assert( i_output_stride == 2 );
-    assert( i_input_stride == 2 );
+    float *p = (float *)p_buf->p_buffer;
 
-    for( unsigned i = 0; i < i_len; i++ )
+    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
     {
-        *(p_dest++) = *p_src;
+        p[1] = p[0];
+        p += 2;
+    }
+    (void) p_filter;
+    return p_buf;
+}
+
+static block_t *CopyRight( filter_t *p_filter, block_t *p_buf )
+{
+    float *p = (float *)p_buf->p_buffer;
+
+    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
+    {
+        p[0] = p[1];
+        p += 2;
+    }
+    (void) p_filter;
+    return p_buf;
+}
+
+static block_t *ExtractLeft( filter_t *p_filter, block_t *p_buf )
+{
+    float *p_dest = (float *)p_buf->p_buffer;
+    const float *p_src = p_dest;
+
+    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
+    {
         *(p_dest++) = *p_src;
         p_src += 2;
     }
+    (void) p_filter;
+    return p_buf;
 }
 
-static void CopyRight( float *p_dest, const float *p_src, size_t i_len,
-                        unsigned i_output_stride, unsigned i_input_stride )
+static block_t *ExtractRight( filter_t *p_filter, block_t *p_buf )
 {
-    assert( i_output_stride == 2 );
-    assert( i_input_stride == 2 );
+    float *p_dest = (float *)p_buf->p_buffer;
+    const float *p_src = p_dest;
 
-    for( unsigned i = 0; i < i_len; i++ )
-    {
-        p_src++;
-        *(p_dest++) = *p_src;
-        *(p_dest++) = *p_src;
-        p_src++;
-    }
-}
-
-static void ExtractLeft( float *p_dest, const float *p_src, size_t i_len,
-                         unsigned i_output_stride, unsigned i_input_stride )
-{
-    assert( i_output_stride == 1 );
-    assert( i_input_stride == 2 );
-
-    for( unsigned i = 0; i < i_len; i++ )
-    {
-        *(p_dest++) = *p_src;
-        p_src += 2;
-    }
-}
-
-static void ExtractRight( float *p_dest, const float *p_src, size_t i_len,
-                          unsigned i_output_stride, unsigned i_input_stride )
-{
-    assert( i_output_stride == 1 );
-    assert( i_input_stride == 2 );
-
-    for( unsigned i = 0; i < i_len; i++ )
+    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
     {
         p_src++;
         *(p_dest++) = *(p_src++);
     }
+    (void) p_filter;
+    return p_buf;
 }
 
-static void ReverseStereo( float *p_dest, const float *p_src, size_t i_len,
-                           unsigned i_output_stride, unsigned i_input_stride )
+static block_t *ReverseStereo( filter_t *p_filter, block_t *p_buf )
 {
-    assert( i_output_stride == 2 );
-    assert( i_input_stride == 2 );
+    float *p = (float *)p_buf->p_buffer;
 
     /* Reverse-stereo mode */
-    for( unsigned i = 0; i < i_len; i++ )
+    for( unsigned i = 0; i < p_buf->i_nb_samples; i++ )
     {
-        float i_tmp = p_src[0];
-
-        p_dest[0] = p_src[1];
-        p_dest[1] = i_tmp;
-
-        p_dest += 2;
-        p_src += 2;
+        float f = p[0];
+        p[0] = p[1];
+        p[1] = f;
+        p += 2;
     }
-}
-
-/**
- * Mixes a buffer
- */
-static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
-{
-    int i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
-    int i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
-    block_t *p_out_buf;
-
-    if( i_input_nb >= i_output_nb )
-    {
-        p_out_buf = p_in_buf; /* mix in place */
-        p_out_buf->i_buffer = p_in_buf->i_buffer * i_output_nb / i_input_nb;
-    }
-    else
-    {
-        p_out_buf = block_Alloc(
-                              p_in_buf->i_buffer * i_output_nb / i_input_nb );
-        if( !p_out_buf )
-            goto out;
-
-        /* on upmixing case, zero out buffer */
-        memset( p_out_buf->p_buffer, 0, p_out_buf->i_buffer );
-        p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-        p_out_buf->i_dts        = p_in_buf->i_dts;
-        p_out_buf->i_pts        = p_in_buf->i_pts;
-        p_out_buf->i_length     = p_in_buf->i_length;
-    }
-
-    float *p_dest = (float *)p_out_buf->p_buffer;
-    const float *p_src = (float *)p_in_buf->p_buffer;
-    const bool b_reverse_stereo = p_filter->fmt_out.audio.i_original_channels & AOUT_CHAN_REVERSESTEREO;
-    bool b_dualmono2stereo = (p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_DUALMONO );
-    b_dualmono2stereo &= (p_filter->fmt_out.audio.i_physical_channels & ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT ));
-    b_dualmono2stereo &= ((p_filter->fmt_out.audio.i_physical_channels & AOUT_CHAN_PHYSMASK) != (p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_PHYSMASK));
-
-    mix_func_t func = p_filter->p_sys;
-
-    if( func != NULL )
-        func( p_dest, p_src, p_in_buf->i_nb_samples, i_output_nb, i_input_nb );
-
-out:
-    if( p_in_buf != p_out_buf )
-        block_Release( p_in_buf );
-    return p_out_buf;
+    (void) p_filter;
+    return p_buf;
 }
 
 /**
@@ -191,7 +185,7 @@ out:
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    mix_func_t func = NULL;
+    block_t *(*func)(filter_t *, block_t *) = NULL;
 
     if( p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
      || p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate
@@ -209,7 +203,13 @@ static int Create( vlc_object_t *p_this )
     b_dualmono2stereo &= ((p_filter->fmt_out.audio.i_physical_channels & AOUT_CHAN_PHYSMASK) != (p_filter->fmt_in.audio.i_physical_channels & AOUT_CHAN_PHYSMASK));
 
     if( likely( !b_reverse_stereo && ! b_dualmono2stereo ) )
-        func = SparseCopy;
+    {
+        if( aout_FormatNbChannels( &p_filter->fmt_out.audio )
+            > aout_FormatNbChannels( &p_filter->fmt_in.audio ) )
+            func = Upmix;
+        else
+            func = Downmix;
+    }
     /* Special case from dual mono to stereo */
     else if( b_dualmono2stereo )
     {
@@ -224,7 +224,6 @@ static int Create( vlc_object_t *p_this )
     else /* b_reverse_stereo */
         func = ReverseStereo;
 
-    p_filter->pf_audio_filter = DoWork;
-    p_filter->p_sys = (void *)func;
+    p_filter->pf_audio_filter = func;
     return VLC_SUCCESS;
 }
