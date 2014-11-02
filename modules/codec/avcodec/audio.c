@@ -276,7 +276,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* Try to set as much information as possible but do not trust it */
     SetupOutputFormat( p_dec, false );
 
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
     if( p_dec->fmt_out.audio.i_rate )
         date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
     else if( p_dec->fmt_in.audio.i_rate )
@@ -311,7 +311,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
         avcodec_flush_buffers( ctx );
-        date_Set( &p_sys->end_date, 0 );
+        date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
         if( ctx->codec_id == AV_CODEC_ID_MP2 ||
             ctx->codec_id == AV_CODEC_ID_MP3 )
