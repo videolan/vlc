@@ -1612,6 +1612,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     {
                         msg_Dbg( p_demux, "found invalid Daala header" );
                         Ogg_LogicalStreamDelete( p_demux, p_stream );
+                        p_stream = NULL;
                         p_ogg->i_streams--;
                     }
                 }
