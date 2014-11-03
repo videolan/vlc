@@ -105,11 +105,37 @@ typedef unsigned (*vlc_format_cb)(void **, char *, unsigned *, unsigned *,
                                   unsigned *, unsigned *);
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
+static void           Prepare(vout_display_t *, picture_t *, subpicture_t *);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *);
 static int            Control(vout_display_t *, int, va_list);
 
-static int            Lock(picture_t *);
-static void           Unlock(picture_t *);
+static void Lock(void *data, picture_t *pic)
+{
+    vout_display_sys_t *sys = data;
+    picture_sys_t *picsys = pic->p_sys;
+    void *planes[PICTURE_PLANE_MAX];
+
+    picsys->id = sys->lock(sys->opaque, planes);
+
+    for (int i = 0; i < pic->i_planes; i++)
+        pic->p[i].p_pixels = planes[i];
+}
+
+static void Unlock(void *data, picture_t *pic)
+{
+    vout_display_sys_t *sys = data;
+    picture_sys_t *picsys = pic->p_sys;
+    void *planes[PICTURE_PLANE_MAX];
+
+    assert(!picture_IsReferenced(pic));
+
+    for (int i = 0; i < pic->i_planes; i++)
+        planes[i] = pic->p[i].p_pixels;
+
+    if (sys->unlock != NULL)
+        sys->unlock(sys->opaque, picsys->id, planes);
+
+}
 
 /*****************************************************************************
  * Open: allocates video thread
@@ -221,7 +247,7 @@ static int Open(vlc_object_t *object)
     vd->fmt     = fmt;
     vd->info    = info;
     vd->pool    = Pool;
-    vd->prepare = NULL;
+    vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
     vd->manage  = NULL;
@@ -240,11 +266,12 @@ static void Close(vlc_object_t *object)
 
     if (sys->cleanup)
         sys->cleanup(sys->opaque);
+
+    picture_pool_Enum(sys->pool, Unlock, sys);
     picture_pool_Release(sys->pool);
     free(sys);
 }
 
-/* */
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -285,65 +312,37 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     }
 
     /* */
-    picture_pool_configuration_t pool;
-    memset(&pool, 0, sizeof(pool));
-    pool.picture_count = count;
-    pool.picture       = pictures;
-    pool.lock          = Lock;
-    pool.unlock        = Unlock;
-    sys->pool = picture_pool_NewExtended(&pool);
+    sys->pool = picture_pool_New(count, pictures);
     if (!sys->pool) {
         for (unsigned i = 0; i < count; i++)
             picture_Release(pictures[i]);
     }
 
+    picture_pool_Enum(sys->pool, Lock, sys);
     return sys->pool;
 }
 
-static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
+{
+    Unlock(vd->sys, pic);
+    VLC_UNUSED(subpic);
+}
+
+
+static void Display(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
 {
     vout_display_sys_t *sys = vd->sys;
-    void *id = picture->p_sys->id;
-
-    assert(!picture_IsReferenced(picture));
-    picture_Release(picture);
 
     if (sys->display != NULL)
-        sys->display(sys->opaque, id);
-    VLC_UNUSED(subpicture);
+        sys->display(sys->opaque, pic->p_sys->id);
+
+    Lock(sys, pic);
+    picture_Release(pic);
+    VLC_UNUSED(subpic);
 }
 
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     (void) vd; (void) query; (void) args;
     return VLC_EGENERIC;
-}
-
-/* */
-static int Lock(picture_t *picture)
-{
-    picture_sys_t *picsys = picture->p_sys;
-    vout_display_sys_t *sys = picsys->sys;
-    void *planes[PICTURE_PLANE_MAX];
-
-    picsys->id = sys->lock(sys->opaque, planes);
-
-    for (int i = 0; i < picture->i_planes; i++)
-        picture->p[i].p_pixels = planes[i];
-
-    return VLC_SUCCESS;
-}
-
-static void Unlock(picture_t *picture)
-{
-    picture_sys_t *picsys = picture->p_sys;
-    vout_display_sys_t *sys = picsys->sys;
-
-    void *planes[PICTURE_PLANE_MAX];
-
-    for (int i = 0; i < picture->i_planes; i++)
-        planes[i] = picture->p[i].p_pixels;
-
-    if (sys->unlock != NULL)
-        sys->unlock(sys->opaque, picsys->id, planes);
 }
