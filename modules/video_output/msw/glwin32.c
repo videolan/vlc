@@ -204,8 +204,6 @@ static int Open(vlc_object_t *object)
 #endif
 
     /* */
-    sys->gl.lock = NULL;
-    sys->gl.unlock = NULL;
     sys->gl.swap = Swap;
     sys->gl.getProcAddress = OurGetProcAddress;
     sys->gl.sys = vd;

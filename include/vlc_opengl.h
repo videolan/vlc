@@ -49,8 +49,10 @@ struct vlc_gl_t
     void (*releaseCurrent)(vlc_gl_t *);
     void (*resize)(vlc_gl_t *, unsigned, unsigned);
     void (*swap)(vlc_gl_t *);
+#ifdef __APPLE__
     int  (*lock)(vlc_gl_t *);
     void (*unlock)(vlc_gl_t *);
+#endif
     void*(*getProcAddress)(vlc_gl_t *, const char *);
 };
 
@@ -75,13 +77,21 @@ static inline void vlc_gl_ReleaseCurrent(vlc_gl_t *gl)
 
 static inline int vlc_gl_Lock(vlc_gl_t *gl)
 {
+#ifdef __APPLE__
     return (gl->lock != NULL) ? gl->lock(gl) : VLC_SUCCESS;
+#else
+    (void) gl; return VLC_SUCCESS;
+#endif
 }
 
 static inline void vlc_gl_Unlock(vlc_gl_t *gl)
 {
+#ifdef __APPLE__
     if (gl->unlock != NULL)
         gl->unlock(gl);
+#else
+    (void) gl;
+#endif
 }
 
 static inline void vlc_gl_Resize(vlc_gl_t *gl, unsigned w, unsigned h)

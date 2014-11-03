@@ -208,8 +208,6 @@ static int Open (vlc_object_t *obj)
     gl->resize = NULL;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
-    gl->lock = NULL;
-    gl->unlock = NULL;
 
 #ifdef GLX_ARB_get_proc_address
     bool is_swap_interval_set = false;

@@ -359,8 +359,6 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     gl->resize = Resize;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
-    gl->lock = NULL;
-    gl->unlock = NULL;
     return VLC_SUCCESS;
 
 error:
