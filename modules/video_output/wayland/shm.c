@@ -61,12 +61,10 @@ struct vout_display_sys_t
 
 static void PictureDestroy(picture_t *pic)
 {
-    struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
     const long pagemask = sysconf(_SC_PAGE_SIZE) - 1;
     size_t picsize = pic->p[0].i_pitch * pic->p[0].i_lines;
 
     munmap(pic->p[0].p_pixels, (picsize + pagemask) & ~pagemask);
-    wl_buffer_destroy(buf); /* XXX: what if wl_display is already gone? */
     free(pic);
 }
 
@@ -82,6 +80,22 @@ static const struct wl_buffer_listener buffer_cbs =
 {
     buffer_release_cb,
 };
+
+static void PictureAttach(void *data, picture_t *pic)
+{
+    struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
+
+    wl_buffer_add_listener(buf, &buffer_cbs, pic);
+    (void) data;
+}
+
+static void PictureDetach(void *data, picture_t *pic)
+{
+    struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
+
+    wl_buffer_destroy(buf);
+    (void) data;
+}
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
 {
@@ -175,7 +189,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
             break;
         }
 
-        wl_buffer_add_listener(buf, &buffer_cbs, pic);
         pics[count++] = pic;
     }
 
@@ -194,6 +207,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
             picture_Release(pics[--count]);
         return NULL;
     }
+
+    picture_pool_Enum(sys->pool, PictureAttach, NULL);
     return sys->pool;
 }
 
@@ -234,6 +249,7 @@ static void ResetPictures(vout_display_t *vd)
     if (sys->pool == NULL)
         return;
 
+    picture_pool_Enum(sys->pool, PictureDetach, NULL);
     picture_pool_Release(sys->pool);
     sys->pool = NULL;
 }
