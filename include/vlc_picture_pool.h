@@ -96,6 +96,19 @@ VLC_API void picture_pool_Release( picture_pool_t * );
 VLC_API picture_t * picture_pool_Get( picture_pool_t * ) VLC_USED;
 
 /**
+ * Enumerates all pictures in a pool, both free and allocated.
+ *
+ * @param cb callback to invoke once for each picture
+ * @param data opaque data parameter for the callback (first argument)
+ *
+ * @note Allocated pictures may be accessed asynchronously by other threads.
+ * Therefore, only read-only picture parameters can be read by the callback,
+ * typically picture_t.p_sys.
+ */
+VLC_API void picture_pool_Enum( picture_pool_t *,
+                                void (*cb)(void *, picture_t *), void *data );
+
+/**
  * Forcefully return all pictures in the pool to free/unallocated state.
  *
  * @warning This can only be called when it is known that all pending
