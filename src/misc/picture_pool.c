@@ -208,8 +208,6 @@ error:
 
 picture_pool_t *picture_pool_Reserve(picture_pool_t *master, unsigned count)
 {
-    assert(master->pic_unlock == NULL);
-
     picture_t *picture[count ? count : 1];
     unsigned i;
 
@@ -328,11 +326,6 @@ void picture_pool_NonEmpty(picture_pool_t *pool)
 unsigned picture_pool_GetSize(const picture_pool_t *pool)
 {
     return pool->picture_count;
-}
-
-bool picture_pool_NeedsLocking(const picture_pool_t *pool)
-{
-    return pool->pic_lock != NULL || pool->pic_unlock != NULL;
 }
 
 void picture_pool_Enum(picture_pool_t *pool, void (*cb)(void *, picture_t *),
