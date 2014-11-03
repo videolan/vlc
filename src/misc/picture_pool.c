@@ -253,7 +253,6 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
             vlc_mutex_lock(&pool->lock);
             sys->in_use = false;
             pool->refs--;
-            vlc_mutex_unlock(&pool->lock);
             continue;
         }
 
