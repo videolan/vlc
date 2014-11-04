@@ -74,7 +74,7 @@ static block_t *Upmix( filter_t *p_filter, block_t *p_in_buf )
     for( size_t i = 0; i < p_in_buf->i_nb_samples; i++ )
     {
         for( unsigned j = 0; j < i_output_nb; j++ )
-            p_dest[j] = p_src[j];
+            p_dest[j] = p_src[j % i_input_nb];
 
         p_src += i_input_nb;
         p_dest += i_output_nb;
@@ -100,7 +100,7 @@ static block_t *Downmix( filter_t *p_filter, block_t *p_buf )
     for( size_t i = 0; i < p_buf->i_nb_samples; i++ )
     {
         for( unsigned j = 0; j < i_output_nb; j++ )
-            p_dest[j] = p_src[j % i_input_nb];
+            p_dest[j] = p_src[j];
 
         p_src += i_input_nb;
         p_dest += i_output_nb;
