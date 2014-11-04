@@ -176,23 +176,22 @@ export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH} -isysroot ${SDKROOT}"
 
 if [ "$PLATFORM" = "OS" ]; then
     EXTRA_CFLAGS="-arch ${ARCH}"
+    EXTRA_LDFLAGS="-arch ${ARCH}"
 if [ "$ARCH" != "arm64" ]; then
     EXTRA_CFLAGS+=" -mcpu=cortex-a8"
     EXTRA_CFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
-    EXTRA_LDFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
-    export LDFLAGS="${LDFLAGS} -miphoneos-version-min=${SDK_MIN}"
+    EXTRA_LDFLAGS+=" -Wl,-ios_version_min,${SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -Wl,-ios_version_min,${SDK_MIN}"
 else
     EXTRA_CFLAGS+=" -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
-    EXTRA_LDFLAGS+=" -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
-    export LDFLAGS="${LDFLAGS} -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
+    EXTRA_LDFLAGS+=" -Wl,-ios_version_min,${SIXTYFOURBIT_SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -Wl,-ios_version_min,${SIXTYFOURBIT_SDK_MIN}"
 fi
-    EXTRA_LDFLAGS="-arch ${ARCH}"
 else
     EXTRA_CFLAGS="-arch ${ARCH}"
-    EXTRA_LDFLAGS="-arch ${ARCH}"
     EXTRA_CFLAGS+=" -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
-    EXTRA_LDFLAGS+=" -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
-    export LDFLAGS="${LDFLAGS} -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
+    EXTRA_LDFLAGS=" -Wl,-ios_version_min,${SIXTYFOURBIT_SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -Wl-ios_version_min,${SIXTYFOURBIT_SDK_MIN}"
 fi
 
 
@@ -245,6 +244,7 @@ fi
     --disable-fontconfig \
     --disable-gpg-error \
     --disable-lua \
+    --enable-vpx \
     --enable-taglib > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
@@ -284,7 +284,7 @@ fi
 if [ "$SCARY" = "yes" ]; then
 	SCARYFLAG="--enable-dvbpsi --enable-avcodec"
 else
-	SCARYFLAG="--disable-dca --disable-dvbpsi --disable-avcodec --disable-avformat --disable-zvbi"
+	SCARYFLAG="--disable-dca --disable-dvbpsi --disable-avcodec --disable-avformat --disable-zvbi --enable-vpx"
 fi
 
 # Run configure only upon changes.
