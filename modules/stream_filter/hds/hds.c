@@ -1247,7 +1247,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
 
             break;
         case XML_READER_ENDELEM:
-            if( ! strcmp( current_element, "bootstrapInfo") ) {
+            if( current_element && ! strcmp( current_element, "bootstrapInfo") ) {
                 if( bootstrap_idx + 1 == MAX_BOOTSTRAP_INFO ) {
                     msg_Warn( (vlc_object_t*) s, "Too many bootstraps, ignoring" );
                 } else {
@@ -1256,6 +1256,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
             }
 
             free( current_element );
+            current_element = NULL;
             element_stack[current_element_idx--] = 0;
             break;
         }
