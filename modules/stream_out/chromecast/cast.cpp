@@ -679,9 +679,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
                 case CHROMECAST_MEDIA_LOAD_SENT:
                     msg_Warn(p_stream, "app is no longer present. closing");
                     msgClose(p_stream, p_sys->appTransportId);
-                    vlc_mutex_lock(&p_sys->lock);
                     p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
-                    vlc_mutex_unlock(&p_sys->lock);
                     // ft
                 default:
                     break;
