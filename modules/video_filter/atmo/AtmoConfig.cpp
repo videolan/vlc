@@ -63,7 +63,7 @@ CAtmoConfig::~CAtmoConfig() {
    {
      for(int zone=0; zone<m_AtmoZoneDefCount; zone++)
          delete m_ZoneDefinitions[zone];
-     delete m_ZoneDefinitions;
+     delete[] m_ZoneDefinitions;
      m_ZoneDefinitions = NULL;
    }
 
@@ -392,7 +392,7 @@ void CAtmoConfig::UpdateZoneDefinitionCount()
       {
         for(int zone=0; zone<m_AtmoZoneDefCount; zone++)
             delete m_ZoneDefinitions[zone];
-        delete m_ZoneDefinitions;
+        delete[] m_ZoneDefinitions;
         m_ZoneDefinitions = NULL;
       }
       m_AtmoZoneDefCount = getZoneCount();
