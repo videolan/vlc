@@ -80,15 +80,16 @@ static inline void cc_Flush( cc_data_t *c )
     c->i_data = 0;
 }
 
-static inline void cc_AppendData( cc_data_t *c, int i_field, const uint8_t cc[2] )
+static inline void cc_AppendData( cc_data_t *c, uint8_t cc_preamble, const uint8_t cc[2] )
 {
+    uint8_t i_field = cc_preamble & 0x03;
     if( i_field == 0 || i_field == 1 )
     {
         c->pb_present[2*i_field+0] =
         c->pb_present[2*i_field+1] = true;
     }
 
-    c->p_data[c->i_data++] = i_field;
+    c->p_data[c->i_data++] = cc_preamble;
     c->p_data[c->i_data++] = cc[0];
     c->p_data[c->i_data++] = cc[1];
 }
@@ -198,7 +199,7 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
 
         for( i = 0; i < i_count_cc; i++, cc += 3 )
         {
-            int i_field = cc[0] & 0x03;
+            uint8_t i_field = cc[0] & 0x03;
             if( ( cc[0] & 0xfc ) != 0xfc )
                 continue;
             if( i_field != 0 && i_field != 1 )
@@ -206,7 +207,7 @@ static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8
             if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                 continue;
 
-            cc_AppendData( c, i_field, &cc[1] );
+            cc_AppendData( c, cc[0], &cc[1] );
         }
         c->b_reorder = true;
     }
