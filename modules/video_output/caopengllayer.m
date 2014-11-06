@@ -306,7 +306,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             /* we always use our current frame here */
             vout_display_cfg_t cfg_tmp = *cfg;
             [CATransaction lock];
-            CGRect bounds = [sys->cgLayer bounds];
+            CGRect bounds = [sys->cgLayer visibleRect];
             [CATransaction unlock];
             cfg_tmp.display.width = bounds.size.width;
             cfg_tmp.display.height = bounds.size.height;
@@ -395,7 +395,8 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     self = [super init];
     if (self) {
         [CATransaction lock];
-        [self setAutoresizingMask: kCALayerWidthSizable | kCALayerHeightSizable];
+        self.needsDisplayOnBoundsChange = YES;
+        self.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
         self.asynchronous = NO;
         [CATransaction unlock];
     }
@@ -412,7 +413,8 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 {
     [super resizeWithOldSuperlayerSize: size];
 
-    CGSize boundsSize = self.bounds.size;
+    CGSize boundsSize = self.visibleRect.size;
+
     if (_vd)
         vout_display_SendEventDisplaySize(_vd, boundsSize.width, boundsSize.height);
 }
@@ -435,7 +437,8 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     if (!sys->vgl)
         return;
 
-    CGRect bounds = [self bounds];
+    CGRect bounds = [self visibleRect];
+
     // x / y are top left corner, but we need the lower left one
     glViewport (sys->place.x, bounds.size.height - (sys->place.y + sys->place.height), sys->place.width, sys->place.height);
 
