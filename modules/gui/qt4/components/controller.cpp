@@ -100,9 +100,12 @@ void AbstractController::setupButton( QAbstractButton *aButton )
     sizePolicy.setHorizontalStretch( 0 );
     sizePolicy.setVerticalStretch( 0 );
 
+    qreal scalingFactorX = static_cast<qreal>(aButton->logicalDpiX()) / DPI_REF_VALUE;
+    qreal scalingFactorY = static_cast<qreal>(aButton->logicalDpiY()) / DPI_REF_VALUE;
+
     aButton->setSizePolicy( sizePolicy );
-    aButton->setFixedSize( QSize( 26, 26 ) );
-    aButton->setIconSize( QSize( 20, 20 ) );
+    aButton->setFixedSize( QSize( 26.0*scalingFactorX, 26.0*scalingFactorY ) );
+    aButton->setIconSize( QSize( 20.0*scalingFactorX, 20.0*scalingFactorY ) );
     aButton->setFocusPolicy( Qt::NoFocus );
 }
 
@@ -516,8 +519,12 @@ void AbstractController::applyAttributes( QToolButton *tmpButton, bool b_flat, b
             tmpButton->setAutoRaise( b_flat );
         if( b_big )
         {
-            tmpButton->setFixedSize( QSize( 32, 32 ) );
-            tmpButton->setIconSize( QSize( 26, 26 ) );
+
+            qreal scalingFactorX = static_cast<qreal>(tmpButton->logicalDpiX()) / DPI_REF_VALUE;
+            qreal scalingFactorY = static_cast<qreal>(tmpButton->logicalDpiY()) / DPI_REF_VALUE;
+
+            tmpButton->setFixedSize( QSize( 32.0*scalingFactorX, 32.0*scalingFactorY ) );
+            tmpButton->setIconSize( QSize( 26.0*scalingFactorX, 26.0*scalingFactorY ) );
         }
     }
 }

@@ -67,6 +67,8 @@ enum{
     NOTIFICATION_ALWAYS = 2,
 };
 
+#define DPI_REF_VALUE 96.0
+
 class QVLCApp;
 class MainInterface;
 class QSettings;

@@ -47,6 +47,7 @@
 #include <QPoint>
 #include <QPropertyAnimation>
 #include <QApplication>
+#include <QDebug>
 
 #define MINIMUM 0
 #define MAXIMUM 1000
@@ -479,14 +480,20 @@ void SeekSlider::hideHandle()
     - Mark Kretschmann
     - Gábor Lehel
    */
-#define WLENGTH   80 // px
-#define WHEIGHT   22  // px
+#define WLENGTH_BASE   80 // px
+#define WHEIGHT_BASE   22  // px
 #define SOUNDMIN  0   // %
 
 SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
                           char *psz_colors, int max )
                         : QAbstractSlider( _parent )
 {
+    qreal scalingFactorX = static_cast<qreal>(logicalDpiX()) / DPI_REF_VALUE;
+    qreal scalingFactorY = static_cast<qreal>(logicalDpiY()) / DPI_REF_VALUE;
+
+    wlength = WLENGTH_BASE * scalingFactorX;
+    wheight = WHEIGHT_BASE * scalingFactorY;
+
     f_step = (float)(_i_step * 10000)
            / (float)((max - SOUNDMIN) * AOUT_VOLUME_DEFAULT);
     setRange( SOUNDMIN, max);
@@ -495,9 +502,20 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
     b_mouseOutside = true;
     b_isMuted = false;
 
-    pixOutside = QPixmap( ":/toolbar/volslide-outside" );
+    const QPixmap pixOutsideRaw( ":/toolbar/volslide-outside" );
+    const QSize pixOutsideSize(
+                static_cast<qreal>(pixOutsideRaw.width()) * scalingFactorX,
+                static_cast<qreal>(pixOutsideRaw.height()) * scalingFactorY
+            );
+    pixOutside = pixOutsideRaw.scaled(pixOutsideSize);
 
-    const QPixmap temp( ":/toolbar/volslide-inside" );
+    const QPixmap tempRaw( ":/toolbar/volslide-inside" );
+    const QSize tempSize(
+                    static_cast<qreal>(tempRaw.width()) * scalingFactorX,
+                    static_cast<qreal>(tempRaw.height()) * scalingFactorY
+            );
+    const QPixmap temp = tempRaw.scaled(tempSize);
+
     const QBitmap mask( temp.createHeuristicMask() );
 
     setFixedSize( pixOutside.size() );
@@ -506,8 +524,8 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
     pixGradient2 = QPixmap( mask.size() );
 
     /* Gradient building from the preferences */
-    QLinearGradient gradient( paddingL, 2, WLENGTH + paddingL , 2 );
-    QLinearGradient gradient2( paddingL, 2, WLENGTH + paddingL , 2 );
+    QLinearGradient gradient( paddingL, 2, wlength + paddingL , 2 );
+    QLinearGradient gradient2( paddingL, 2, wlength + paddingL , 2 );
 
     QStringList colorList = qfu( psz_colors ).split( ";" );
     free( psz_colors );
@@ -523,8 +541,8 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
                     ( background.saturation() + foreground.saturation() ) / 2,
                     ( background.value() + foreground.value() ) / 2 );
 
-    textfont.setPixelSize( 9 );
-    textrect.setRect( 0, 0, 34, 15 );
+    textfont.setPointSize( 9 );
+    textrect.setRect( 0, 0, 34.0*scalingFactorX, 15.0*scalingFactorY );
 
     /* Regular colors */
 #define c(i) colorList.at(i).toInt()
@@ -615,7 +633,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
     if( isSliding )
     {
         QRect rect( paddingL - 15,    -1,
-                    WLENGTH + 15 * 2 , WHEIGHT + 5 );
+                    wlength + 15 * 2 , wheight + 5 );
         if( !rect.contains( event->pos() ) )
         { /* We are outside */
             if ( !b_mouseOutside )
@@ -631,7 +649,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
     }
     else
     {
-        int i = ( ( event->x() - paddingL ) * maximum() + 40 ) / WLENGTH;
+        int i = ( ( event->x() - paddingL ) * maximum() + 40 ) / wlength;
         i = __MIN( __MAX( 0, i ), maximum() );
         setToolTip( QString("%1  %" ).arg( i ) );
     }
@@ -639,7 +657,7 @@ void SoundSlider::mouseMoveEvent( QMouseEvent *event )
 
 void SoundSlider::changeValue( int x )
 {
-    setValue( (x * maximum() + 40 ) / WLENGTH );
+    setValue( (x * maximum() + 40 ) / wlength );
 }
 
 void SoundSlider::setMuted( bool m )
@@ -658,7 +676,7 @@ void SoundSlider::paintEvent( QPaintEvent *e )
 
     painter.begin( this );
 
-    const int offset = int( ( WLENGTH * value() + 100 ) / maximum() ) + paddingL;
+    const int offset = int( ( wlength * value() + 100 ) / maximum() ) + paddingL;
 
     const QRectF boundsG( 0, 0, offset , paintGradient->height() );
     painter.drawPixmap( boundsG, *paintGradient, boundsG );
