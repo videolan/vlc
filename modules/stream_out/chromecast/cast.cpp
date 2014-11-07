@@ -932,7 +932,11 @@ static void* chromecastThread(void* p_data)
         canc = vlc_savecancel();
         // Not cancellation-safe part.
 
+#if defined(_WIN32)
+        if ((i_ret < 0 && WSAGetLastError() != WSAEWOULDBLOCK) || (i_ret == 0))
+#else
         if ((i_ret < 0 && errno != EAGAIN) || i_ret == 0)
+#endif
         {
             msg_Err(p_stream, "The connection to the Chromecast died.");
             vlc_mutex_locker locker(&p_sys->lock);
@@ -958,7 +962,11 @@ static void* chromecastThread(void* p_data)
         if (!p_sys->messagesToSend.empty())
         {
             i_ret = sendMessages(p_stream);
+#if defined(_WIN32)
+            if ((i_ret < 0 && WSAGetLastError() != WSAEWOULDBLOCK) || (i_ret == 0))
+#else
             if ((i_ret < 0 && errno != EAGAIN) || i_ret == 0)
+#endif
             {
                 msg_Err(p_stream, "The connection to the Chromecast died.");
                 vlc_mutex_locker locker(&p_sys->lock);
