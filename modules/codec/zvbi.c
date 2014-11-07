@@ -503,10 +503,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
         return NULL;
     }
 
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = b_text ? VLC_CODEC_TEXT : VLC_CODEC_RGBA;
-    fmt.i_sar_num = 0;
-    fmt.i_sar_den = 1;
+    video_format_Init(&fmt, b_text ? VLC_CODEC_TEXT : VLC_CODEC_RGBA);
     if( b_text )
     {
         fmt.i_bits_per_pixel = 0;
