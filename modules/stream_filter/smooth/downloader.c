@@ -79,8 +79,10 @@ static char *ConstructUrl( const char *psz_template, const char *psz_base_url,
             }
             free( psz_bitrate );
         }
-        else if ( (psz_start = strstr( psz_path, "{start time}" )) )
+        else if ( (psz_start = strstr( psz_path, "{start time}" )) ||
+                  (psz_start = strstr( psz_path, "{start_time}" )) )
         {
+            psz_start[6] = ' ';
             char *psz_starttime = NULL;
             if ( us_asprintf( &psz_starttime, "%"PRIu64, i_start_time ) < 0 ||
                  ! Replace( &psz_path, psz_start - psz_path, "{start time}", psz_starttime ) )
