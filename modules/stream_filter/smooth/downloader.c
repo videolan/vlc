@@ -206,38 +206,90 @@ static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
 }
 
 #ifdef DISABLE_BANDWIDTH_ADAPTATION
-static const quality_level_t *
-BandwidthAdaptation( stream_t *s, sms_stream_t *sms, uint64_t bandwidth )
+static quality_level_t *
+BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
+                     uint64_t obw, uint64_t i_duration,
+                     bool b_starved )
 {
-    VLC_UNUSED(bandwidth);
+    VLC_UNUSED(obw);
     VLC_UNUSED(s);
+    VLC_UNUSED(i_duration);
+    VLC_UNUSED(b_starved);
     return sms->current_qlvl;
 }
 #else
 
-static const quality_level_t *
-BandwidthAdaptation( stream_t *s, sms_stream_t *sms, uint64_t bandwidth )
+static quality_level_t *
+BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
+                     uint64_t obw, uint64_t i_duration,
+                     bool b_starved )
 {
-    if( sms->type != VIDEO_ES )
-        return sms->current_qlvl;
+    quality_level_t *ret = NULL;
 
-    uint64_t bw_candidate = 0;
-    const quality_level_t *ret = sms->current_qlvl;
+    assert( sms->current_qlvl );
+    if ( sms->qlevels.i_size < 2 )
+        return sms->qlevels.p_elems[0];
 
-    FOREACH_ARRAY( const quality_level_t *qlevel, sms->qlevels );
-    if( unlikely( !qlevel ) )
+    if ( b_starved )
     {
-        msg_Err( s, "Could no get %uth quality level", fe_idx );
-        return ret;
+        //TODO: do something on starvation post first buffering
+        //   s->p_sys->i_probe_length *= 2;
     }
 
-    if( qlevel->Bitrate < (bandwidth - bandwidth / 3) &&
-            qlevel->Bitrate > bw_candidate )
+    /* PASS 1 */
+    quality_level_t *lowest = sms->qlevels.p_elems[0];
+    FOREACH_ARRAY( quality_level_t *qlevel, sms->qlevels );
+    if ( qlevel->Bitrate >= obw )
     {
-        bw_candidate = qlevel->Bitrate;
+        qlevel->i_validation_length -= i_duration;
+        qlevel->i_validation_length = __MAX(qlevel->i_validation_length, - s->p_sys->i_probe_length);
+    }
+    else
+    {
+        qlevel->i_validation_length += i_duration;
+        qlevel->i_validation_length = __MIN(qlevel->i_validation_length, s->p_sys->i_probe_length);
+    }
+    if ( qlevel->Bitrate < lowest->Bitrate )
+        lowest = qlevel;
+    FOREACH_END();
+
+    /* PASS 2 */
+    if ( sms->current_qlvl->i_validation_length == s->p_sys->i_probe_length )
+    {
+        /* might upgrade */
+        ret = sms->current_qlvl;
+    }
+    else if ( sms->current_qlvl->i_validation_length >= 0 )
+    {
+        /* do nothing */
+        ret = sms->current_qlvl;
+        msg_Dbg( s, "bw current:%uKB/s avg:%"PRIu64"KB/s qualified %"PRId64"%%",
+                (ret->Bitrate) / (8 * 1024),
+                 obw / (8 * 1024),
+                 ( ret->i_validation_length*1000 / s->p_sys->i_probe_length ) /10 );
+        return ret;
+    }
+    else
+    {
+        /* downgrading */
+        ret = lowest;
+    }
+
+    /* might upgrade */
+    FOREACH_ARRAY( quality_level_t *qlevel, sms->qlevels );
+    if( qlevel->Bitrate <= obw &&
+            ret->Bitrate <= qlevel->Bitrate &&
+            qlevel->i_validation_length >= 0 &&
+            qlevel->i_validation_length >= ret->i_validation_length )
+    {
         ret = qlevel;
     }
     FOREACH_END();
+
+    msg_Dbg( s, "bw reselected:%uKB/s avg:%"PRIu64"KB/s qualified %"PRId64"%%",
+            (ret->Bitrate) / (8 * 1024),
+             obw / (8 * 1024),
+             ( ret->i_validation_length*1000 / s->p_sys->i_probe_length ) /10 );
 
     return ret;
 }
@@ -383,8 +435,7 @@ static int build_smoo_box( stream_t *s, uint8_t *smoo_box )
         ((uint32_t *)stra_box)[13] = bswap32( sms->timescale );
         ((uint64_t *)stra_box)[7] = bswap64( p_sys->vod_duration );
 
-        const quality_level_t * qlvl = sms->current_qlvl;
-
+        const quality_level_t *qlvl = sms->current_qlvl;
         if ( qlvl )
         {
             FourCC = qlvl->FourCC ? qlvl->FourCC : sms->default_FourCC;
@@ -473,13 +524,12 @@ static int Download( stream_t *s, sms_stream_t *sms )
     }
 
     /* sanity check - can we download this chunk on time? */
-    uint64_t avg_bw = sms_queue_avg( p_sys->download.bws );
-    if( (avg_bw > 0) && (sms->current_qlvl->Bitrate > 0) )
+    if( (sms->i_obw > 0) && (sms->current_qlvl->Bitrate > 0) )
     {
         /* duration in ms */
         unsigned chunk_duration = chunk->duration * 1000 / sms->timescale;
         uint64_t size = chunk_duration * sms->current_qlvl->Bitrate / 1000; /* bits */
-        unsigned estimated = size * 1000 / avg_bw;
+        unsigned estimated = size * 1000 / sms->i_obw;
         if( estimated > chunk_duration )
         {
             msg_Warn( s,"downloading of chunk @%"PRIu64" would take %d ms, "
@@ -512,49 +562,53 @@ static int Download( stream_t *s, sms_stream_t *sms )
     msg_Info( s, "downloaded chunk @%"PRIu64" from stream %s at quality %u",
                  chunk->start_time, sms->name, sms->current_qlvl->Bitrate );
 
-    unsigned dur_ms = __MAX( 1, duration / 1000 );
-    uint64_t bw = chunk->size * 8 * 1000 / dur_ms; /* bits / s */
-    if( sms_queue_put( p_sys->download.bws, bw ) != VLC_SUCCESS )
-        return VLC_EGENERIC;
-    avg_bw = sms_queue_avg( p_sys->download.bws );
-
-    if( sms->type != VIDEO_ES ) /* FIXME: hanle adaptation for audio */
-        return VLC_SUCCESS;
+    if (likely( duration ))
+        bw_stats_put( sms, chunk->size * 8 * CLOCK_FREQ / duration ); /* bits / s */
 
     /* Track could get disabled in mp4 demux if we trigger adaption too soon.
        And we don't need adaptation on last chunk */
     if( sms->p_chunks == NULL || sms->p_chunks == sms->p_lastchunk )
         return VLC_SUCCESS;
 
-    const quality_level_t *new_qlevel = BandwidthAdaptation( s, sms, avg_bw );
+    bool b_starved = false;
+    vlc_mutex_lock( &p_sys->playback.lock );
+    if ( &p_sys->playback.b_underrun )
+    {
+        p_sys->playback.b_underrun = false;
+        bw_stats_underrun( sms );
+        b_starved = true;
+    }
+    vlc_mutex_unlock( &p_sys->playback.lock );
+
+    quality_level_t *new_qlevel = BandwidthAdaptation( s, sms, sms->i_obw,
+                                                       duration, b_starved );
     assert(new_qlevel);
 
-    vlc_mutex_lock( &p_sys->playback.lock );
-    if ( p_sys->playback.init.p_datachunk == NULL ) /* Don't chain/nest reinits */
+    if( sms->qlevels.i_size < 2 )
     {
-        const quality_level_t *prev_qlevel = sms->current_qlvl;
-        if( new_qlevel->Bitrate != sms->current_qlvl->Bitrate )
-        {
-            msg_Warn( s, "detected %s bandwidth (%u) stream",
-                     (new_qlevel->Bitrate >= sms->current_qlvl->Bitrate) ? "faster" : "lower",
-                     new_qlevel->Bitrate );
-            sms->current_qlvl = new_qlevel;
-        }
+        assert(new_qlevel == sms->current_qlvl);
+        return VLC_SUCCESS;
+    }
 
-        /* FIXME: Why no reinit/new extra bytes with different qlevel ???
-                  Probably broken with some codecs */
+    vlc_mutex_lock( &p_sys->playback.lock );
+    if ( p_sys->playback.init.p_datachunk == NULL && /* Don't chain/nest reinits */
+         new_qlevel != sms->current_qlvl )
+    {
+        msg_Warn( s, "detected %s bandwidth (%u) stream",
+                  (new_qlevel->Bitrate >= sms->current_qlvl->Bitrate) ? "faster" : "lower",
+                  new_qlevel->Bitrate );
 
-        if( new_qlevel->MaxWidth != prev_qlevel->MaxWidth ||
-            new_qlevel->MaxHeight != prev_qlevel->MaxHeight )
+        quality_level_t *qlvl_backup = sms->current_qlvl;
+        sms->current_qlvl = new_qlevel;
+        chunk_t *new_init_ck = build_init_chunk( s );
+        if( new_init_ck )
         {
-            chunk_t *new_init_ck = build_init_chunk( s );
-            if( new_init_ck )
-            {
-                p_sys->playback.init.p_datachunk = new_init_ck;
-                p_sys->playback.init.p_startchunk = chunk->p_next; /* to send before that one */
-                assert( chunk->p_next && chunk != sms->p_lastchunk );
-            }
+            p_sys->playback.init.p_datachunk = new_init_ck;
+            p_sys->playback.init.p_startchunk = chunk->p_next; /* to send before that one */
+            assert( chunk->p_next && chunk != sms->p_lastchunk );
         }
+        else
+            sms->current_qlvl = qlvl_backup;
     }
     vlc_mutex_unlock( &p_sys->playback.lock );
 
@@ -638,12 +692,6 @@ void* sms_Thread( void *p_this )
 
     int canc = vlc_savecancel();
 
-    /* We compute the average bandwidth of the 4 last downloaded
-     * chunks, but feel free to replace '4' by whatever you wish */
-    p_sys->download.bws = sms_queue_init( 4 );
-    if( !p_sys->download.bws )
-        goto cancel;
-
     chunk_t *init_ck = build_init_chunk( s );
     if( !init_ck )
         goto cancel;
@@ -666,11 +714,15 @@ void* sms_Thread( void *p_this )
         vlc_mutex_lock( &sms->chunks_lock );
         if ( sms->p_nextdownload )
         {
+            mtime_t duration = mdate();
             if( Download( s, sms ) != VLC_SUCCESS )
             {
                 vlc_mutex_unlock( &sms->chunks_lock );
                 goto cancel;
             }
+            duration = mdate() - duration;
+            if (likely( duration ))
+                bw_stats_put( sms, sms->p_nextdownload->size * 8 * CLOCK_FREQ / duration ); /* bits / s */
             sms->p_nextdownload = sms->p_nextdownload->p_next;
         }
         vlc_mutex_unlock( &sms->chunks_lock );

@@ -33,21 +33,10 @@
 
 //#define DISABLE_BANDWIDTH_ADAPTATION
 
-typedef struct item_s
-{
-    uint64_t value;
-    struct item_s *next;
-
-} item_t;
-
-typedef struct sms_queue_s
-{
-    unsigned length;
-    item_t *first;
-} sms_queue_t;
-
 #define CHUNK_OFFSET_UNSET 0
 #define CHUNK_OFFSET_0     1
+#define SMS_BW_SHORTSTATS  4
+#define SMS_PROBE_LENGTH   (CLOCK_FREQ * 2)
 
 typedef struct chunk_s chunk_t;
 struct chunk_s
@@ -83,7 +72,7 @@ typedef struct quality_level_s
     unsigned        nBlockAlign;
     char            *CodecPrivateData; /* hex encoded string */
     DECL_ARRAY(custom_attrs_t *) custom_attrs;
-
+    int64_t         i_validation_length; /* how long did we experience that bitrate */
 } quality_level_t;
 
 typedef struct sms_stream_s
@@ -102,7 +91,10 @@ typedef struct sms_stream_s
     char           *name;
     char           *url_template;
     int            type;
-    const quality_level_t *current_qlvl; /* current quality level for Download() */
+    quality_level_t *current_qlvl; /* current quality level for Download() */
+    uint64_t       rgi_bw[SMS_BW_SHORTSTATS]; /* Measured bandwidths of the N last chunks */
+    uint64_t       i_obw;          /* Overwall bandwidth average */
+    unsigned int   i_obw_samples;  /* used to compute overall incrementally */
 } sms_stream_t;
 
 struct stream_sys_t
@@ -113,6 +105,7 @@ struct stream_sys_t
     uint64_t     vod_duration; /* total duration of the VOD media (seconds / TimeScale) */
     uint64_t     time_pos;
     unsigned     timescale;
+    int64_t      i_probe_length; /* min duration before upgrading resolution */
 
     /* Download */
     struct
@@ -120,7 +113,6 @@ struct stream_sys_t
         char        *base_url;    /* URL common part for chunks */
         unsigned     lookahead_count;/* max number of fragments ahead on server on live streaming */
         vlc_thread_t thread;      /* SMS chunk download thread */
-        sms_queue_t *bws;         /* Measured bandwidths of the N last chunks */
         vlc_cond_t   wait;        /* some condition to wait on */
     } download;
 
@@ -140,6 +132,7 @@ struct stream_sys_t
         } init;
         vlc_mutex_t lock;
         vlc_cond_t  wait;         /* some condition to wait on */
+        bool        b_underrun;   /* did we ran out of data recently */
     } playback;
 
     /* state */
@@ -182,10 +175,9 @@ struct stream_sys_t
 #define SMS_GET_SELECTED_ST( cat ) \
     sms_get_stream_by_cat( p_sys, cat )
 
-void sms_queue_free( sms_queue_t* );
-sms_queue_t *sms_queue_init( const unsigned int );
-int sms_queue_put( sms_queue_t *, const uint64_t );
-uint64_t sms_queue_avg( sms_queue_t *);
+void bw_stats_put( sms_stream_t *, const uint64_t );
+uint64_t bw_stats_avg( sms_stream_t * );
+void bw_stats_underrun( sms_stream_t * );
 void* sms_Thread( void *);
 quality_level_t * ql_New( void );
 void ql_Free( quality_level_t *);

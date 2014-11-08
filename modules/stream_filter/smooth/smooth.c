@@ -442,7 +442,6 @@ static void SysCleanup( stream_sys_t *p_sys )
     ARRAY_RESET( p_sys->sms_selected );
     if ( p_sys->playback.init.p_datachunk )
         chunk_Free( p_sys->playback.init.p_datachunk );
-    sms_queue_free( p_sys->download.bws );
     free( p_sys->download.base_url );
 }
 
@@ -532,6 +531,7 @@ static int Open( vlc_object_t *p_this )
     }
     p_sys->playback.toffset = p_sys->p_current_stream->p_playback->start_time;
     p_sys->playback.next_chunk_offset = CHUNK_OFFSET_UNSET;
+    p_sys->i_probe_length = SMS_PROBE_LENGTH;
 
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->download.wait );
@@ -693,6 +693,9 @@ static chunk_t *get_chunk( stream_t *s, const bool wait, bool *pb_isinit )
         }
 
         msg_Dbg( s, "get_chunk is waiting for chunk %ld !!!", p_chunk->start_time );
+        vlc_mutex_lock( &p_sys->playback.lock );
+        p_sys->playback.b_underrun = true;
+        vlc_mutex_unlock( &p_sys->playback.lock );
         vlc_cond_timedwait( &p_sys->playback.wait,
                 &p_sys->p_current_stream->chunks_lock, mdate() + CLOCK_FREQ/2 );
     }

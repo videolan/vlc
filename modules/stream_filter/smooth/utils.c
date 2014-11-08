@@ -152,74 +152,42 @@ void sms_Free( sms_stream_t *sms )
     free( sms );
 }
 
-sms_queue_t *sms_queue_init( const unsigned length )
+void bw_stats_put( sms_stream_t *sms, const uint64_t bw )
 {
-    sms_queue_t *ret = malloc( sizeof( sms_queue_t ) );
-    if( unlikely( !ret ) )
-        return NULL;
-    ret->length = length;
-    ret->first = NULL;
-    return ret;
+    /* overall bw update */
+    if ( bw >= sms->i_obw )
+        sms->i_obw = sms->i_obw + ( bw - sms->i_obw ) /
+                    (sms->i_obw_samples + 1);
+    else
+        sms->i_obw = sms->i_obw - ( sms->i_obw - bw ) /
+                    (sms->i_obw_samples + 1);
+    sms->i_obw_samples++;
+    /* limited history bw stats update */
+    if ( sms->rgi_bw[0] == 0 )
+    { /* first stats */
+        for( int i=0; i<SMS_BW_SHORTSTATS; i++ )
+            sms->rgi_bw[i] = bw;
+    }
+    else
+    {
+        memmove( sms->rgi_bw, &sms->rgi_bw[1],
+                sizeof(sms->rgi_bw[0]) * (SMS_BW_SHORTSTATS - 1) );
+        sms->rgi_bw[SMS_BW_SHORTSTATS - 1] = bw;
+    }
 }
 
-void sms_queue_free( sms_queue_t* queue )
+uint64_t bw_stats_avg( sms_stream_t *sms )
 {
-    item_t *item = queue->first, *next = NULL;
-    while( item )
-    {
-        next = item->next;
-        free( item );
-        item = next;
-    }
-    free( queue );
+    uint64_t sum = sms->rgi_bw[0];
+    for( int i=1; i<SMS_BW_SHORTSTATS; i++ )
+        sum += sms->rgi_bw[i];
+    return sum / SMS_BW_SHORTSTATS;
 }
 
-int sms_queue_put( sms_queue_t *queue, const uint64_t value )
+void bw_stats_underrun( sms_stream_t *sms )
 {
-    /* Remove the last (and oldest) item */
-    item_t *item, *prev = NULL;
-    unsigned int count = 0;
-    for( item = queue->first; item != NULL; item = item->next )
-    {
-        count++;
-        if( count == queue->length )
-        {
-            FREENULL( item );
-            if( prev ) prev->next = NULL;
-            break;
-        }
-        else
-            prev = item;
-    }
-
-    /* Now insert the new item */
-    item_t *new = malloc( sizeof( item_t ) );
-    if( unlikely( !new ) )
-        return VLC_ENOMEM;
-
-    new->value = value;
-    new->next = queue->first;
-    queue->first = new;
-
-    return VLC_SUCCESS;
-}
-
-uint64_t sms_queue_avg( sms_queue_t *queue )
-{
-    item_t *last = queue->first;
-    if( last == NULL )
-        return 0;
-    uint64_t sum = queue->first->value;
-    for( unsigned int i = 0; queue->length && i < queue->length - 1; i++ )
-    {
-        if( last )
-        {
-            last = last->next;
-            if( last )
-                sum += last->value;
-        }
-    }
-    return sum / queue->length;
+    sms->i_obw = bw_stats_avg( sms );
+    sms->i_obw_samples = SMS_BW_SHORTSTATS;
 }
 
 sms_stream_t * sms_get_stream_by_cat( stream_sys_t *p_sys, int i_cat )
