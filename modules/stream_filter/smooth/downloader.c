@@ -482,13 +482,6 @@ static int Download( stream_t *s, sms_stream_t *sms )
     assert( sms->p_nextdownload->data == NULL );
     assert( sms->current_qlvl );
 
-    int index = es_cat_to_index( sms->type );
-    if ( unlikely( index == -1 ) )
-    {
-        msg_Err( s, "invalid stream type" );
-        return VLC_EGENERIC;
-    }
-
     chunk_t *chunk = sms->p_nextdownload;
     if( !chunk )
     {

@@ -200,36 +200,6 @@ sms_stream_t * sms_get_stream_by_cat( stream_sys_t *p_sys, int i_cat )
     return NULL;
 }
 
-int es_cat_to_index( int i_cat )
-{
-    switch( i_cat )
-    {
-        case VIDEO_ES:
-            return 0;
-        case AUDIO_ES:
-            return 1;
-        case SPU_ES:
-            return 2;
-        default:
-            return -1;
-    }
-}
-
-int index_to_es_cat( int index )
-{
-    switch( index )
-    {
-        case 0:
-            return VIDEO_ES;
-        case 1:
-            return AUDIO_ES;
-        case 2:
-            return SPU_ES;
-        default:
-            return -1;
-    }
-}
-
 bool no_more_chunks( stream_sys_t *p_sys )
 {
     FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );

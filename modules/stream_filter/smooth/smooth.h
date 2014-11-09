@@ -188,7 +188,5 @@ void sms_Free( sms_stream_t *);
 uint8_t *decode_string_hex_to_binary( const char * );
 sms_stream_t * sms_get_stream_by_cat( stream_sys_t *, int );
 bool no_more_chunks( stream_sys_t * );
-int index_to_es_cat( int );
-int es_cat_to_index( int );
 void resetChunksState( stream_sys_t * );
 #endif
