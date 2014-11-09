@@ -202,9 +202,15 @@ void resolve_xml_special_chars( char *psz_value )
         if( *psz_value == '&' )
         {
             if( psz_value[1] == '#' )
-            {   /* &#xxx; Unicode code point */
+            {   /* &#DDD; or &#xHHHH; Unicode code point */
                 char *psz_end;
-                unsigned long cp = strtoul( psz_value+2, &psz_end, 10 );
+                unsigned long cp;
+
+                if( psz_value[2] == 'x' ) /* The x must be lower-case. */
+                    cp = strtoul( psz_value + 3, &psz_end, 16 );
+                else
+                    cp = strtoul( psz_value + 2, &psz_end, 10 );
+
                 if( *psz_end == ';' )
                 {
                     psz_value = psz_end + 1;
