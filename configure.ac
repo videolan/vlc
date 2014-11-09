@@ -955,33 +955,20 @@ AC_ARG_ENABLE(optimizations,
 dnl Check for various optimization flags
 AS_IF([test "${enable_optimizations}" != "no"], [
 
-  dnl -O4 and -O3 only in production builds
+  dnl -O3 only in production builds
   AS_IF([test "${enable_debug}" = "no"], [
     VLC_SAVE_FLAGS
-    CFLAGS="${CFLAGS} -O4"
-    CXXFLAGS="${CXXFLAGS} -O4"
-    OBJCFLAGS="${OBJCFLAGS} -O4"
-    AC_CACHE_CHECK([if $CC accepts -O4], [ac_cv_c_o4], [
+    CFLAGS="${CFLAGS} -O3"
+    CXXFLAGS="${CXXFLAGS} -O3"
+    OBJCFLAGS="${OBJCFLAGS} -O3"
+    AC_CACHE_CHECK([if $CC accepts -O3],  [ac_cv_c_o3], [
       AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
-        ac_cv_c_o4=yes
+        ac_cv_c_o3=yes
       ], [
-        ac_cv_c_o4=no
+        ac_cv_c_o3=no
       ])
     ])
-    AS_IF([test "${ac_cv_c_o4}" = "no"], [
-      VLC_RESTORE_FLAGS
-      CFLAGS="${CFLAGS} -O3"
-      CXXFLAGS="${CXXFLAGS} -O3"
-      OBJCFLAGS="${OBJCFLAGS} -O3"
-      AC_CACHE_CHECK([if $CC accepts -O3],  [ac_cv_c_o3], [
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM()], [
-          ac_cv_c_o3=yes
-        ], [
-          ac_cv_c_o3=no
-        ])
-      ])
-      AS_IF([test "${ac_cv_c_o3}" = "no"], [VLC_RESTORE_FLAGS])
-    ])
+    AS_IF([test "${ac_cv_c_o3}" = "no"], [VLC_RESTORE_FLAGS])
   ])
 
   dnl Check for -ffast-math
