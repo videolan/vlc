@@ -416,8 +416,9 @@ static int build_smoo_box( stream_t *s, uint8_t *smoo_box )
             if( !qlvl->CodecPrivateData )
                 continue;
             stra_box[98] = stra_box[99] = stra_box[100] = 0; /* reserved */
-            assert( strlen( qlvl->CodecPrivateData ) < 512 );
             stra_box[101] = strlen( qlvl->CodecPrivateData ) / 2;
+            if ( stra_box[101] > STRA_SIZE - 102 )
+                stra_box[101] = STRA_SIZE - 102;
             uint8_t *binary_cpd = decode_string_hex_to_binary( qlvl->CodecPrivateData );
             memcpy( stra_box + 102, binary_cpd, stra_box[101] );
             free( binary_cpd );
