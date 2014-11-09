@@ -373,21 +373,27 @@ static int get_new_chunks( stream_t *s, chunk_t *ck, sms_stream_t *sms )
 }
 
 #define STRA_SIZE 334
-#define SMOO_SIZE (STRA_SIZE * 3 + 24) /* 1026 */
+//#define SMOO_SIZE (STRA_SIZE * 3 + 24) /* 1026 */
 
 /* SmooBox is a very simple MP4 box, used only to pass information
  * to the demux layer. As this box is not aimed to travel accross networks,
  * simplicity of the design is better than compactness */
-static int build_smoo_box( stream_t *s, uint8_t *smoo_box )
+static int build_smoo_box( stream_t *s, chunk_t *p_chunk )
 {
     stream_sys_t *p_sys = s->p_sys;
-    sms_stream_t *sms = NULL;
     uint32_t FourCC;
 
     /* smoo */
-    memset( smoo_box, 0, SMOO_SIZE );
-    smoo_box[2] = (SMOO_SIZE & 0xff00)>>8;
-    smoo_box[3] = SMOO_SIZE & 0xff;
+    assert(p_sys->sms_selected.i_size);
+    size_t i_size = p_sys->sms_selected.i_size * STRA_SIZE + 24;
+    p_chunk->data = calloc( 1, i_size );
+    if ( !p_chunk->data )
+        return VLC_EGENERIC;
+    p_chunk->size = i_size;
+    uint8_t *smoo_box = p_chunk->data;
+
+    smoo_box[2] = (i_size & 0xff00)>>8;
+    smoo_box[3] = i_size & 0xff;
     smoo_box[4] = 'u';
     smoo_box[5] = 'u';
     smoo_box[6] = 'i';
@@ -399,64 +405,56 @@ static int build_smoo_box( stream_t *s, uint8_t *smoo_box )
     ((uint32_t *)smoo_box)[4] = bswap32( 0xa6a51b57 );
     ((uint32_t *)smoo_box)[5] = bswap32( 0x59a1a92c );
 
-    uint8_t *stra_box;
-    for( int i = 0; i < 3; i++ )
+    int i = 0;
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    uint8_t *stra_box = smoo_box + i++ * STRA_SIZE;
+
+    stra_box[26] = (STRA_SIZE & 0xff00)>>8;
+    stra_box[27] = STRA_SIZE & 0xff;
+    stra_box[28] = 'u';
+    stra_box[29] = 'u';
+    stra_box[30] = 'i';
+    stra_box[31] = 'd';
+
+    /* UUID is b03ef770-33bd-4bac-96c7-bf25f97e2447 */
+    ((uint32_t *)stra_box)[8] = bswap32( 0xb03ef770 );
+    ((uint32_t *)stra_box)[9] = bswap32( 0x33bd4bac );
+    ((uint32_t *)stra_box)[10] = bswap32( 0x96c7bf25 );
+    ((uint32_t *)stra_box)[11] = bswap32( 0xf97e2447 );
+
+    stra_box[48] = sms->type;
+    stra_box[49] = 0; /* reserved */
+    stra_box[50] = (sms->id & 0xff00)>>8;
+    stra_box[51] = sms->id & 0xff;
+
+    ((uint32_t *)stra_box)[13] = bswap32( sms->timescale );
+    ((uint64_t *)stra_box)[7] = bswap64( p_sys->vod_duration );
+
+    const quality_level_t *qlvl = sms->current_qlvl;
+    if ( qlvl )
     {
-        sms = NULL;
-        int cat = UNKNOWN_ES;
-        stra_box = smoo_box + i * STRA_SIZE;
+        FourCC = qlvl->FourCC ? qlvl->FourCC : sms->default_FourCC;
+        ((uint32_t *)stra_box)[16] = bswap32( FourCC );
+        ((uint32_t *)stra_box)[17] = bswap32( qlvl->Bitrate );
+        ((uint32_t *)stra_box)[18] = bswap32( qlvl->MaxWidth );
+        ((uint32_t *)stra_box)[19] = bswap32( qlvl->MaxHeight );
+        ((uint32_t *)stra_box)[20] = bswap32( qlvl->SamplingRate );
+        ((uint32_t *)stra_box)[21] = bswap32( qlvl->Channels );
+        ((uint32_t *)stra_box)[22] = bswap32( qlvl->BitsPerSample );
+        ((uint32_t *)stra_box)[23] = bswap32( qlvl->AudioTag );
+        ((uint16_t *)stra_box)[48] = bswap16( qlvl->nBlockAlign );
 
-        stra_box[26] = (STRA_SIZE & 0xff00)>>8;
-        stra_box[27] = STRA_SIZE & 0xff;
-        stra_box[28] = 'u';
-        stra_box[29] = 'u';
-        stra_box[30] = 'i';
-        stra_box[31] = 'd';
-
-        /* UUID is b03ef770-33bd-4bac-96c7-bf25f97e2447 */
-        ((uint32_t *)stra_box)[8] = bswap32( 0xb03ef770 );
-        ((uint32_t *)stra_box)[9] = bswap32( 0x33bd4bac );
-        ((uint32_t *)stra_box)[10] = bswap32( 0x96c7bf25 );
-        ((uint32_t *)stra_box)[11] = bswap32( 0xf97e2447 );
-
-        cat = index_to_es_cat( i );
-        stra_box[48] = cat;
-        sms = SMS_GET_SELECTED_ST( cat );
-
-        stra_box[49] = 0; /* reserved */
-        if( sms == NULL )
+        if( !qlvl->CodecPrivateData )
             continue;
-        stra_box[50] = (sms->id & 0xff00)>>8;
-        stra_box[51] = sms->id & 0xff;
-
-        ((uint32_t *)stra_box)[13] = bswap32( sms->timescale );
-        ((uint64_t *)stra_box)[7] = bswap64( p_sys->vod_duration );
-
-        const quality_level_t *qlvl = sms->current_qlvl;
-        if ( qlvl )
-        {
-            FourCC = qlvl->FourCC ? qlvl->FourCC : sms->default_FourCC;
-            ((uint32_t *)stra_box)[16] = bswap32( FourCC );
-            ((uint32_t *)stra_box)[17] = bswap32( qlvl->Bitrate );
-            ((uint32_t *)stra_box)[18] = bswap32( qlvl->MaxWidth );
-            ((uint32_t *)stra_box)[19] = bswap32( qlvl->MaxHeight );
-            ((uint32_t *)stra_box)[20] = bswap32( qlvl->SamplingRate );
-            ((uint32_t *)stra_box)[21] = bswap32( qlvl->Channels );
-            ((uint32_t *)stra_box)[22] = bswap32( qlvl->BitsPerSample );
-            ((uint32_t *)stra_box)[23] = bswap32( qlvl->AudioTag );
-            ((uint16_t *)stra_box)[48] = bswap16( qlvl->nBlockAlign );
-
-            if( !qlvl->CodecPrivateData )
-                continue;
-            stra_box[98] = stra_box[99] = stra_box[100] = 0; /* reserved */
-            stra_box[101] = strlen( qlvl->CodecPrivateData ) / 2;
-            if ( stra_box[101] > STRA_SIZE - 102 )
-                stra_box[101] = STRA_SIZE - 102;
-            uint8_t *binary_cpd = decode_string_hex_to_binary( qlvl->CodecPrivateData );
-            memcpy( stra_box + 102, binary_cpd, stra_box[101] );
-            free( binary_cpd );
-        }
+        stra_box[98] = stra_box[99] = stra_box[100] = 0; /* reserved */
+        stra_box[101] = strlen( qlvl->CodecPrivateData ) / 2;
+        if ( stra_box[101] > STRA_SIZE - 102 )
+            stra_box[101] = STRA_SIZE - 102;
+        uint8_t *binary_cpd = decode_string_hex_to_binary( qlvl->CodecPrivateData );
+        memcpy( stra_box + 102, binary_cpd, stra_box[101] );
+        free( binary_cpd );
     }
+    FOREACH_END();
 
     return VLC_SUCCESS;
 }
@@ -467,15 +465,9 @@ static chunk_t *build_init_chunk( stream_t *s )
     if( unlikely( ret == NULL ) )
         goto build_init_chunk_error;
 
-    ret->size = SMOO_SIZE;
-    ret->data = malloc( SMOO_SIZE );
-    if( !ret->data )
-        goto build_init_chunk_error;
-
-    if( build_smoo_box( s, ret->data ) == VLC_SUCCESS)
+    if( build_smoo_box( s, ret ) == VLC_SUCCESS )
         return ret;
 
-    free( ret->data );
 build_init_chunk_error:
     free( ret );
     msg_Err( s, "build_init_chunk failed" );
