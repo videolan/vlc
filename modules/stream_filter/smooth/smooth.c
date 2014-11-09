@@ -761,12 +761,6 @@ static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read 
             const char *verb = p_read == NULL ? "skipping" : "reading";
             msg_Dbg( s, "%s chunk time %"PRIu64" (%u bytes), type %i",
                         verb, chunk->start_time, i_read, chunk->type );
-            /* check integrity */
-            uint32_t type;
-            uint8_t *slice = chunk->data;
-            SMS_GET4BYTES( type );
-            SMS_GETFOURCC( type );
-            assert( type == ATOM_moof || type == ATOM_uuid );
         }
 
         uint64_t len = 0;

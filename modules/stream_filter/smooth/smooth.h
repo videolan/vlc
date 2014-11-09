@@ -141,37 +141,6 @@ struct stream_sys_t
     bool        b_close;     /* set by Close() */
 };
 
-#define SMS_GET4BYTES( dst ) do { \
-    dst = U32_AT( slice ); \
-    slice += 4; \
-  } while(0)
-
-#define SMS_GET1BYTE( dst ) do { \
-    dst = *slice; \
-    slice += 1; \
-  } while(0)
-
-#define SMS_GET3BYTES( dst ) do { \
-    dst = Get24bBE( slice ); \
-    slice += 3; \
-  } while(0)
-
-#define SMS_GET8BYTES( dst ) do { \
-    dst = U64_AT( slice ); \
-    slice += 8; \
-  } while(0)
-
-#define SMS_GET4or8BYTES( dst ) \
-    if( (version) == 0 ) \
-        SMS_GET4BYTES( dst ); \
-    else \
-        SMS_GET8BYTES( dst ); \
-
-#define SMS_GETFOURCC( dst ) do { \
-    memcpy( &dst, slice, 4 ); \
-    slice += 4; \
-  } while(0)
-
 #define SMS_GET_SELECTED_ST( cat ) \
     sms_get_stream_by_cat( p_sys, cat )
 

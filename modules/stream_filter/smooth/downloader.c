@@ -135,39 +135,6 @@ static chunk_t * chunk_Get( sms_stream_t *sms, const uint64_t start_time )
     return p_chunk;
 }
 
-static unsigned set_track_id( chunk_t *chunk, const unsigned tid )
-{
-    uint32_t size, type;
-    if( !chunk->data || chunk->size < 32 )
-        return 0;
-    uint8_t *slice = chunk->data;
-    if( !slice )
-        return 0;
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_moof );
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_mfhd );
-    slice += size - 8;
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_traf );
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    if( type != ATOM_tfhd )
-        return 0;
-
-    unsigned ret = bswap32( ((uint32_t *)slice)[1] );
-    ((uint32_t *)slice)[1] = bswap32( tid );
-
-    return ret;
-}
-
 static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
 {
     stream_t *p_ts = stream_UrlNew( s, url );
@@ -295,7 +262,7 @@ BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
 }
 #endif
 
-static int get_new_chunks( stream_t *s, chunk_t *ck, sms_stream_t *sms )
+static int parse_chunk( stream_t *s, chunk_t *ck, sms_stream_t *sms )
 {
     if( ck->size < 24 )
         return VLC_EGENERIC;
@@ -316,25 +283,33 @@ static int get_new_chunks( stream_t *s, chunk_t *ck, sms_stream_t *sms )
     MP4_BoxDumpStructure( ck_s, &root_box );
 #endif
 
-    const MP4_Box_t *uuid_box = MP4_BoxGet( &root_box, "moof/traf/uuid" );
-    while( uuid_box && uuid_box->i_type == ATOM_uuid )
-    {
-        if ( !CmpUUID( &uuid_box->i_uuid, &TfrfBoxUUID ) )
-            break;
-        uuid_box = uuid_box->p_next;
-    }
+    /* Do track ID fixup */
+    const MP4_Box_t *tfhd_box = MP4_BoxGet( &root_box, "moof/traf/tfhd" );
+    if ( tfhd_box )
+        SetDWBE( &ck->data[tfhd_box->i_pos + 8 + 4], sms->id );
 
-    if ( uuid_box )
+    if ( s->p_sys->b_live )
     {
-        const MP4_Box_data_tfrf_t *p_tfrfdata = uuid_box->data.p_tfrf;
-        for ( uint8_t i=0; i<p_tfrfdata->i_fragment_count; i++ )
+        const MP4_Box_t *uuid_box = MP4_BoxGet( &root_box, "moof/traf/uuid" );
+        while( uuid_box && uuid_box->i_type == ATOM_uuid )
         {
-            uint64_t dur = p_tfrfdata->p_tfrf_data_fields[i].i_fragment_duration;
-            uint64_t stime = p_tfrfdata->p_tfrf_data_fields[i].i_fragment_abs_time;
-            msg_Dbg( s, "\"tfrf\" fragment duration %"PRIu64", "
-                        "fragment abs time %"PRIu64, dur, stime );
-            if( !chunk_Get( sms, stime + dur ) )
-                chunk_AppendNew( sms, dur, stime );
+            if ( !CmpUUID( &uuid_box->i_uuid, &TfrfBoxUUID ) )
+                break;
+            uuid_box = uuid_box->p_next;
+        }
+
+        if ( uuid_box )
+        {
+            const MP4_Box_data_tfrf_t *p_tfrfdata = uuid_box->data.p_tfrf;
+            for ( uint8_t i=0; i<p_tfrfdata->i_fragment_count; i++ )
+            {
+                uint64_t dur = p_tfrfdata->p_tfrf_data_fields[i].i_fragment_duration;
+                uint64_t stime = p_tfrfdata->p_tfrf_data_fields[i].i_fragment_abs_time;
+                msg_Dbg( s, "\"tfrf\" fragment duration %"PRIu64", "
+                            "fragment abs time %"PRIu64, dur, stime );
+                if( !chunk_Get( sms, stime + dur ) )
+                    chunk_AppendNew( sms, dur, stime );
+            }
         }
     }
 
@@ -506,17 +481,7 @@ static int Download( stream_t *s, sms_stream_t *sms )
     }
     duration = mdate() - duration;
 
-    unsigned real_id = set_track_id( chunk, sms->id );
-    if( real_id == 0)
-    {
-        msg_Err( s, "tfhd box not found or invalid chunk" );
-        return VLC_EGENERIC;
-    }
-
-    if( p_sys->b_live )
-    {
-        get_new_chunks( s, chunk, sms );
-    }
+    parse_chunk( s, chunk, sms );
 
     msg_Info( s, "downloaded chunk @%"PRIu64" from stream %s at quality %u",
                  chunk->start_time, sms->name, sms->current_qlvl->Bitrate );
