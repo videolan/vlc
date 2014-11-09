@@ -295,7 +295,7 @@ BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
 }
 #endif
 
-static int get_new_chunks( stream_t *s, chunk_t *ck )
+static int get_new_chunks( stream_t *s, chunk_t *ck, sms_stream_t *sms )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -304,11 +304,8 @@ static int get_new_chunks( stream_t *s, chunk_t *ck )
         return VLC_EGENERIC;
     uint8_t version, fragment_count;
     uint32_t size, type, flags;
-    sms_stream_t *sms;
     UUID_t uuid;
     TfrfBoxDataFields_t *tfrf_df;
-
-    sms = SMS_GET_SELECTED_ST( ck->type );
 
     SMS_GET4BYTES( size );
     SMS_GETFOURCC( type );
@@ -556,7 +553,7 @@ static int Download( stream_t *s, sms_stream_t *sms )
 
     if( p_sys->b_live )
     {
-        get_new_chunks( s, chunk );
+        get_new_chunks( s, chunk, sms );
     }
 
     msg_Info( s, "downloaded chunk @%"PRIu64" from stream %s at quality %u",
