@@ -297,77 +297,54 @@ BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
 
 static int get_new_chunks( stream_t *s, chunk_t *ck, sms_stream_t *sms )
 {
-    stream_sys_t *p_sys = s->p_sys;
-
-    uint8_t *slice = ck->data;
-    if( !slice )
-        return VLC_EGENERIC;
-    uint8_t version, fragment_count;
-    uint32_t size, type, flags;
-    UUID_t uuid;
-    TfrfBoxDataFields_t *tfrf_df;
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_moof );
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_mfhd );
-    slice += size - 8;
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_traf );
-
-    for(;;)
-    {
-        SMS_GET4BYTES( size );
-        assert( size > 1 );
-        SMS_GETFOURCC( type );
-        if( type == ATOM_mdat )
-        {
-            msg_Err( s, "No uuid box found :-(" );
-            return VLC_EGENERIC;
-        }
-        else if( type == ATOM_uuid )
-        {
-            GetUUID( &uuid, slice);
-            if( !CmpUUID( &uuid, &TfrfBoxUUID ) )
-                break;
-        }
-        slice += size - 8;
-    }
-
-    slice += 16;
-    SMS_GET1BYTE( version );
-    SMS_GET3BYTES( flags );
-    SMS_GET1BYTE( fragment_count );
-
-    tfrf_df = calloc( fragment_count, sizeof( TfrfBoxDataFields_t ) );
-    if( unlikely( tfrf_df == NULL ) )
+    if( ck->size < 24 )
         return VLC_EGENERIC;
 
-    for( uint8_t i = 0; i < fragment_count; i++ )
+    stream_t *ck_s = stream_MemoryNew( s, ck->data, ck->size, true );
+    if ( !ck_s )
+        return VLC_EGENERIC;
+
+    MP4_Box_t root_box = { 0 };
+    root_box.i_type = ATOM_root;
+    root_box.i_size = ck->size;
+    if ( MP4_ReadBoxContainerChildren( ck_s, &root_box, 0 ) != 1 )
     {
-        SMS_GET4or8BYTES( tfrf_df[i].i_fragment_abs_time );
-        SMS_GET4or8BYTES( tfrf_df[i].i_fragment_duration );
+        stream_Delete( ck_s );
+        return VLC_EGENERIC;
+    }
+#ifndef NDEBUG
+    MP4_BoxDumpStructure( ck_s, &root_box );
+#endif
+
+    const MP4_Box_t *uuid_box = MP4_BoxGet( &root_box, "moof/traf/uuid" );
+    while( uuid_box && uuid_box->i_type == ATOM_uuid )
+    {
+        if ( !CmpUUID( &uuid_box->i_uuid, &TfrfBoxUUID ) )
+            break;
+        uuid_box = uuid_box->p_next;
     }
 
-    msg_Dbg( s, "read box: \"tfrf\" version %d, flags 0x%x, "\
-            "fragment count %"PRIu8, version, flags, fragment_count );
-
-    for( uint8_t i = 0; i < fragment_count; i++ )
+    if ( uuid_box )
     {
-        uint64_t dur = tfrf_df[i].i_fragment_duration;
-        uint64_t stime = tfrf_df[i].i_fragment_abs_time;
-        msg_Dbg( s, "\"tfrf\" fragment duration %"PRIu64", "\
-                    "fragment abs time %"PRIu64, dur, stime);
-
-        if( !chunk_Get( sms, stime + dur ) )
-            chunk_AppendNew( sms, dur, stime );
+        const MP4_Box_data_tfrf_t *p_tfrfdata = uuid_box->data.p_tfrf;
+        for ( uint8_t i=0; i<p_tfrfdata->i_fragment_count; i++ )
+        {
+            uint64_t dur = p_tfrfdata->p_tfrf_data_fields[i].i_fragment_duration;
+            uint64_t stime = p_tfrfdata->p_tfrf_data_fields[i].i_fragment_abs_time;
+            msg_Dbg( s, "\"tfrf\" fragment duration %"PRIu64", "
+                        "fragment abs time %"PRIu64, dur, stime );
+            if( !chunk_Get( sms, stime + dur ) )
+                chunk_AppendNew( sms, dur, stime );
+        }
     }
-    free( tfrf_df );
+
+    MP4_Box_t *p_box = root_box.p_first;
+    while( p_box )
+    {
+        MP4_BoxFree( ck_s, p_box );
+        p_box = p_box->p_next;
+    }
+    stream_Delete( ck_s );
 
     return VLC_SUCCESS;
 }
