@@ -187,6 +187,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     fmt_out = p_filter->fmt_out.video;
     fmt_out.i_width = p_filter->fmt_out.video.i_width*p_filter->p_sys->scale/150;
     fmt_out.i_height = p_filter->fmt_out.video.i_height*p_filter->p_sys->scale/150;
+    fmt_out.i_visible_width = fmt_out.i_width;
+    fmt_out.i_visible_height = fmt_out.i_height;
     p_converted = image_Convert( p_filter->p_sys->p_image, p_pic,
                                  &(p_pic->format), &fmt_out );
 
