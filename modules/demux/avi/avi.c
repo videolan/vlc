@@ -395,9 +395,9 @@ static int Open( vlc_object_t * p_this )
         tk->b_activated = true;
 
         p_vids = (avi_chunk_strf_vids_t*)AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0 );
-        p_auds = (avi_chunk_strf_auds_t*)AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0 );
+        p_auds = (avi_chunk_strf_auds_t*)p_vids;
 
-        if( p_strl == NULL || p_strh == NULL || p_auds == NULL || p_vids == NULL )
+        if( p_strl == NULL || p_strh == NULL || p_vids == NULL )
         {
             msg_Warn( p_demux, "stream[%d] incomplete", i );
             free( tk );
