@@ -1,0 +1,22 @@
+--- cddb/include/cddb/cddb_log.h.orig	2005-03-11 16:29:29.000000000 -0500
++++ cddb/include/cddb/cddb_log.h	2014-11-10 12:45:12.000000000 -0500
+@@ -19,7 +19,7 @@
+     Boston, MA  02111-1307, USA.
+ */
+ 
+-#ifndef CDDB_LOH_H
++#ifndef CDDB_LOG_H
+ #define CDDB_LOG_H
+ 
+ #ifdef __cplusplus
+--- cddb/include/cddb/cddb_log_ni.h.orig	2005-03-11 16:29:29.000000000 -0500
++++ cddb/include/cddb/cddb_log_ni.h	2014-11-10 12:45:32.000000000 -0500
+@@ -19,7 +19,7 @@
+     Boston, MA  02111-1307, USA.
+ */
+ 
+-#ifndef CDDB_LOH_NI_H
++#ifndef CDDB_LOG_NI_H
+ #define CDDB_LOG_NI_H
+ 
+ #ifdef __cplusplus
