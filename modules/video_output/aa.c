@@ -119,6 +119,8 @@ static int Open(vlc_object_t *object)
     fmt.i_chroma = VLC_CODEC_RGB8;
     fmt.i_width  = aa_imgwidth(sys->aa_context);
     fmt.i_height = aa_imgheight(sys->aa_context);
+    fmt.i_visible_width = fmt.i_width;
+    fmt.i_visible_height = fmt.i_height;
 
     /* */
     vout_display_info_t info = vd->info;
