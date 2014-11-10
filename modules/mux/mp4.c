@@ -2450,7 +2450,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
             }
         }
 
-        uint16_t i_tfhd_flags = 0x0;
+        uint32_t i_tfhd_flags = 0x0;
         if (p_stream->read.p_first)
         {
             /* Current segment have all same duration value, different than trex's default */
@@ -2493,7 +2493,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
         /* *** add /moof/traf/trun *** */
         if (p_stream->read.p_first)
         {
-            uint16_t i_trun_flags = 0x0;
+            uint32_t i_trun_flags = 0x0;
 
             if (p_stream->b_hasiframes && !(p_stream->read.p_first->p_block->i_flags & BLOCK_FLAG_TYPE_I))
                 i_trun_flags |= MP4_TRUN_FIRST_FLAGS;
