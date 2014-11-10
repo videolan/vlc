@@ -110,6 +110,16 @@ static void print_chunk( stream_t *s, chunk_t *ck )
 }
 #endif
 
+static void cleanup_attributes(custom_attrs_t **cp)
+{
+    if( !*cp )
+        return;
+
+    free( (*cp)->psz_key );
+    free( (*cp)->psz_value );
+    FREENULL( *cp );
+}
+
 static int parse_Manifest( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -145,6 +155,7 @@ static int parse_Manifest( stream_t *s )
     unsigned next_track_id = 1;
     int loop_count = 0;
     bool b_weird = false;
+    int ret = VLC_SUCCESS;
 
 #define TIMESCALE 10000000
     while( (type = xml_ReaderNextNode( vlc_reader, &node )) > 0 )
@@ -173,9 +184,8 @@ static int parse_Manifest( stream_t *s )
                     sms = sms_New();
                     if( unlikely( !sms ) )
                     {
-                        xml_ReaderDelete( vlc_reader );
-                        xml_Delete( vlc_xml );
-                        return VLC_ENOMEM;
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
                     }
                     sms->id = next_track_id;
                     next_track_id++;
@@ -231,6 +241,11 @@ static int parse_Manifest( stream_t *s )
                     if (!sms || !ql || cp)
                         break;
                     cp = (custom_attrs_t *) calloc( 1, sizeof(*cp) );
+                    if( unlikely( !cp ) )
+                    {
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
+                    }
                 }
                 else if ( !strcmp( node, "Attribute" ) )
                 {
@@ -253,10 +268,8 @@ static int parse_Manifest( stream_t *s )
                     ql = ql_New();
                     if( !ql )
                     {
-                        sms_Free( sms );
-                        xml_ReaderDelete( vlc_reader );
-                        xml_Delete( vlc_xml );
-                        return VLC_ENOMEM;
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
                     }
 
                     while( (name = xml_ReaderNextAttr( vlc_reader, &value )) )
@@ -358,10 +371,8 @@ static int parse_Manifest( stream_t *s )
                     if( unlikely( chunk_AppendNew( sms, computed_duration,
                                         computed_start_time ) == NULL ) )
                     {
-                        sms_Free( sms );
-                        xml_ReaderDelete( vlc_reader );
-                        xml_Delete( vlc_xml );
-                        return VLC_ENOMEM;
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
                     }
                     if( b_weird && start_time != -1 )
                         computed_start_time = start_time;
@@ -381,9 +392,7 @@ static int parse_Manifest( stream_t *s )
                 {
                     if( !cp->psz_key || !cp->psz_value )
                     {
-                        free( cp->psz_key );
-                        free( cp->psz_value );
-                        FREENULL( cp );
+                        cleanup_attributes( &cp );
                     }
                 }
                 else if( strcmp( node, "StreamIndex" ) )
@@ -397,10 +406,8 @@ static int parse_Manifest( stream_t *s )
                     loop_count = 0;
                     if( b_weird && !chunk_AppendNew( sms, computed_duration, computed_start_time ) )
                     {
-                        sms_Free( sms );
-                        xml_ReaderDelete( vlc_reader );
-                        xml_Delete( vlc_xml );
-                        return VLC_ENOMEM;
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
                     }
 
                     b_weird = false;
@@ -415,19 +422,19 @@ static int parse_Manifest( stream_t *s )
             case XML_READER_TEXT:
                 break;
             default:
-                sms_Free( sms );
-                xml_ReaderDelete( vlc_reader );
-                xml_Delete( vlc_xml );
-                return VLC_EGENERIC;
+                ret = VLC_EGENERIC;
+                goto cleanup;
         }
     }
 #undef TIMESCALE
 
+cleanup:
+    cleanup_attributes( &cp );
     sms_Free( sms );
     xml_ReaderDelete( vlc_reader );
     xml_Delete( vlc_xml );
 
-    return VLC_SUCCESS;
+    return ret;
 }
 
 static void SysCleanup( stream_sys_t *p_sys )
