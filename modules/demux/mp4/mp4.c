@@ -1735,8 +1735,9 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
     for( tk->i_sample = 0; tk->i_sample < tk->i_sample_count; tk->i_sample++ )
     {
         const int64_t i_dts = MP4_TrackGetDTS( p_demux, tk );
-        int64_t i_pts_delta = 0;
-        MP4_TrackGetPTSDelta( p_demux, tk, &i_pts_delta );
+        int64_t i_pts_delta;
+        if ( !MP4_TrackGetPTSDelta( p_demux, tk, &i_pts_delta ) )
+            i_pts_delta = 0;
         uint32_t i_nb_samples = 0;
         const uint32_t i_size = MP4_TrackGetReadSize( tk, &i_nb_samples );
 
