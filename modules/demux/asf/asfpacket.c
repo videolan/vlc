@@ -201,8 +201,6 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
 
     bool b_packet_keyframe = pkt->p_peek[pkt->i_skip] >> 7;
     uint8_t i_stream_number = pkt->p_peek[pkt->i_skip++] & 0x7f;
-    if ( i_stream_number > ASF_MAX_STREAMNUMBER )
-        goto skip;
 
     uint32_t i_media_object_number = 0;
     if (GetValue2b(&i_media_object_number, pkt->p_peek, &pkt->i_skip, pkt->left - pkt->i_skip, pkt->property >> 4) < 0)
