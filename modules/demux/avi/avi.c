@@ -446,6 +446,11 @@ static int Open( vlc_object_t * p_this )
                     tk->i_blocksize = 0; /* fix vorbis VBR decoding */
                 }
 
+                if ( tk->i_codec == VLC_CODEC_MP4A )
+                {
+                    tk->i_samplesize = 0; /* ADTS/AAC VBR */
+                }
+
                 es_format_Init( &fmt, AUDIO_ES, tk->i_codec );
 
                 fmt.audio.i_channels        = p_auds->p_wf->nChannels;
