@@ -83,7 +83,7 @@ check_sed
 check protoc
 check ant
 
-[ -n "$NEEDED" ] && mkdir -p build/
+[ -n "$NEEDED" ] && mkdir -p build/ && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
 
 CPUS=
 CC=
