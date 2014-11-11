@@ -961,8 +961,12 @@
 {
     int i_count;
     NSIndexSet *o_selected_indexes;
-    playlist_t * p_playlist;
     intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = pl_Get(p_intf);
+
+    // check if deletion is allowed
+    if ([self currentPlaylistRoot] != p_playlist->p_local_category && [self currentPlaylistRoot] != p_playlist->p_ml_category)
+        return;
 
     o_selected_indexes = [o_outline_view selectedRowIndexes];
     i_count = [o_selected_indexes count];
@@ -970,7 +974,6 @@
     if (retainedRowSelection == NSNotFound)
         retainedRowSelection = 0;
 
-    p_playlist = pl_Get(p_intf);
 
     NSUInteger indexes[i_count];
     if (i_count == [o_outline_view numberOfRows]) {
@@ -1313,8 +1316,11 @@
     b_item_sel = (row != -1 && [o_outline_view selectedRow] != -1);
     b_rows = [o_outline_view numberOfRows] != 0;
 
+    playlist_t *p_playlist = pl_Get(VLCIntf);
+    bool b_del_allowed = [self currentPlaylistRoot] == p_playlist->p_local_category || [self currentPlaylistRoot] == p_playlist->p_ml_category;
+
     [o_mi_play setEnabled: b_item_sel];
-    [o_mi_delete setEnabled: b_item_sel];
+    [o_mi_delete setEnabled: b_item_sel && b_del_allowed];
     [o_mi_selectall setEnabled: b_rows];
     [o_mi_info setEnabled: b_item_sel];
     [o_mi_preparse setEnabled: b_item_sel];
