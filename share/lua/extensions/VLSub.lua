@@ -95,13 +95,13 @@ local options = {
       Download subtitles from 
       <a href='http://www.opensubtitles.org/'>
       opensubtitles.org
-      </a> and display them while watching a video.<br>"..
+      </a> and display them while watching a video.<br>
       <br>
       <b><u>Usage:</u></b><br>
       <br>
-      VLSub is meant to be used while you are watching the video, 
-      so start it first (if nothing is playing you will get a link
-      to download the subtitles in your browser).<br>
+      Start your video. If you use Vlsub witout playing a video 
+      you will get a link to download the subtitles in your browser 
+      but the subtitles won't be saved and loaded automatically.<br>
       <br>
       Choose the language for your subtitles and click on the 
       button corresponding to one of the two research methods 
@@ -326,8 +326,8 @@ local select_conf = {} -- Drop down widget / option table association
 
 function descriptor()
   return { 
-    title = "VLsub 0.9.12",
-    version = "0.9.12",
+    title = "VLsub 0.9.13",
+    version = "0.9.13",
     author = "exebetche",
     url = 'http://www.opensubtitles.org/',
     shortdesc = "VLsub";
@@ -1667,7 +1667,8 @@ function download_subtitles()
   
   local item = openSub.itemStore[index]
   
-  if openSub.option.downloadBehaviour == 'manual' then
+  if openSub.option.downloadBehaviour == 'manual' 
+  or not subfileName then
     local link = "<span style='color:#181'>"
     link = link.."<b>"..lang["mess_dowload_link"]..":</b>"
     link = link.."</span> &nbsp;"
@@ -1866,34 +1867,50 @@ function http_req(host, port, request)
   vlc.net.send(fd, request)
   vlc.net.poll(pollfds)
   
-  local response = vlc.net.recv(fd, 2048)
-  local headerStr, body = string.match(response, "(.-\r?\n)\r?\n(.*)")
-  local header = parse_header(headerStr)
-  local contentLength = tonumber(header["Content-Length"])
-  local TransferEncoding = header["Transfer-Encoding"]
-  local status = tonumber(header["statuscode"])
-  local bodyLenght = string.len(body)
+  local chunk = vlc.net.recv(fd, 2048)
+  local response = ""
+  local headerStr, header, body
+  local contentLength, status
   local pct = 0
   
-  --~ if status ~= 200 then return status end
-  
-  while contentLength and bodyLenght < contentLength do
-    vlc.net.poll(pollfds)
-    response = vlc.net.recv(fd, 1024)
-
-    if response then
-      body = body..response
-    else
-      vlc.net.close(fd)
-      return false
+  while chunk do
+    response = response..chunk
+    if not header then
+        headerStr, body = response:match("(.-\r?\n)\r?\n(.*)")
+        if headerStr then
+            response = body
+            header = parse_header(headerStr)
+            contentLength = tonumber(header["Content-Length"])
+            status = tonumber(header["statuscode"])
+        end
     end
-    bodyLenght = string.len(body)
-    pct = bodyLenght / contentLength * 100
-    setMessage(openSub.actionLabel..": "..progressBarContent(pct))
+
+    if contentLength then
+        bodyLenght = #response
+        pct = bodyLenght / contentLength * 100
+        setMessage(openSub.actionLabel..": "..progressBarContent(pct))
+      if bodyLenght >= contentLength then
+        break
+      end
+    end
+
+    vlc.net.poll(pollfds)
+    chunk = vlc.net.recv(fd, 1024)
   end
+
   vlc.net.close(fd)
   
-  return status, body
+  if status == 301 
+  and header["Location"] then
+    local host, path = parse_url(trim(header["Location"]))
+    request = request
+    :gsub("^([^%s]+ )([^%s]+)", "%1"..path)
+    :gsub("(Host: )([^\n]*)", "%1"..host)
+    
+    return http_req(host, port, request)
+  end
+
+  return status, response
 end
 
 function parse_header(data)
