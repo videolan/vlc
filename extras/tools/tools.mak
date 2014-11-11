@@ -279,6 +279,7 @@ protobuf: protobuf-$(PROTOBUF_VERSION).tar.bz2
 
 .protoc: protobuf
 	(cd $< && ./configure --prefix="$(PREFIX)" --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
+	(find $(PREFIX) -name 'protobuf*.pc' -exec rm -f {} \;)
 	touch $@
 
 CLEAN_PKG += protobuf
