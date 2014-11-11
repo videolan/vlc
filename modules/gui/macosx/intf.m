@@ -1842,18 +1842,23 @@ static const int kCurrentPreferencesVersion = 3;
 - (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
 {
     b_mediaKeySupport = var_InheritBool(VLCIntf, "macosx-mediakeys");
-    if (b_mediaKeySupport) {
-        if (!o_mediaKeyController)
-            o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
+    if (b_mediaKeySupport && !o_mediaKeyController)
+        o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
 
-        if ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot]->i_children > 0 ||
-            p_current_input)
+    if (b_mediaKeySupport && ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot]->i_children > 0 ||
+                              p_current_input)) {
+        if (!b_mediaKeyTrapEnabled) {
+            b_mediaKeyTrapEnabled = YES;
+            msg_Dbg(p_intf, "Enable media key support");
             [o_mediaKeyController startWatchingMediaKeys];
-        else
+        }
+    } else {
+        if (b_mediaKeyTrapEnabled) {
+            b_mediaKeyTrapEnabled = NO;
+            msg_Dbg(p_intf, "Disable media key support");
             [o_mediaKeyController stopWatchingMediaKeys];
+        }
     }
-    else if (!b_mediaKeySupport && o_mediaKeyController)
-        [o_mediaKeyController stopWatchingMediaKeys];
 }
 
 @end

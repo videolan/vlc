@@ -105,6 +105,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
     BOOL b_mediaKeySupport;
     BOOL b_mediakeyJustJumped;
     SPMediaKeyTap * o_mediaKeyController;
+    BOOL b_mediaKeyTrapEnabled;
 
     NSArray *o_usedHotkeys;
 
