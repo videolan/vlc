@@ -949,14 +949,13 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     playlist_t * p_playlist = pl_Get(VLCIntf);
     PL_LOCK;
-    playlist_item_t * currentPlaylistRoot = [[[VLCMain sharedInstance] playlist] currentPlaylistRoot];
+    playlist_item_t *currentPlaylistRoot = [[[VLCMain sharedInstance] playlist] currentPlaylistRoot];
     PL_UNLOCK;
-    if (currentPlaylistRoot == p_playlist->p_local_category || currentPlaylistRoot == p_playlist->p_ml_category) {
-        if (currentPlaylistRoot == p_playlist->p_local_category)
-            [o_chosen_category_lbl setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_local_category]]];
-        else
-            [o_chosen_category_lbl setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_ml_category]]];
-    }
+
+    if (currentPlaylistRoot == p_playlist->p_local_category)
+        [o_chosen_category_lbl setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_local_category]]];
+    else if (currentPlaylistRoot == p_playlist->p_ml_category)
+        [o_chosen_category_lbl setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_ml_category]]];
 }
 
 - (NSString *)_playbackDurationOfNode:(playlist_item_t*)node
