@@ -689,20 +689,22 @@ void DialogsProvider::saveRecentsToPlaylist()
  ****************************************************************************/
 
 void DialogsProvider::streamingDialog( QWidget *parent,
-                                       const QString& mrl,
+                                       const QStringList& mrls,
                                        bool b_transcode_only,
                                        QStringList options )
 {
-    QString soutoption;
+    QStringList outputMRLs;
 
     /* Stream */
+    // Does streaming multiple files make sense?  I suppose so, just stream one
+    // after the other, but not at the moment.
     if( !b_transcode_only )
     {
-        SoutDialog *s = new SoutDialog( parent, p_intf, mrl );
+        SoutDialog *s = new SoutDialog( parent, p_intf, mrls[0] );
         s->setAttribute( Qt::WA_QuitOnClose, false ); // See #4883
         if( s->exec() == QDialog::Accepted )
         {
-            soutoption = s->getMrl();
+            outputMRLs.append(s->getMrl());
             delete s;
         }
         else
@@ -711,11 +713,15 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         }
     } else {
     /* Convert */
-        ConvertDialog *s = new ConvertDialog( parent, p_intf, mrl );
+        ConvertDialog *s = new ConvertDialog( parent, p_intf, mrls );
         s->setAttribute( Qt::WA_QuitOnClose, false ); // See #4883
         if( s->exec() == QDialog::Accepted )
         {
-            soutoption = s->getMrl();
+            /* Clear the playlist.  This is because we're going to be populating
+               it */
+            playlist_Clear( THEPL, pl_Unlocked );
+
+            outputMRLs = s->getMrls();
             delete s;
         }
         else
@@ -724,12 +730,30 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         }
     }
 
-    /* Get SoutMRL */
-    if( !soutoption.isEmpty() )
+    /* Get SoutMRL(s) */
+    if( !outputMRLs.isEmpty() )
     {
-        options += soutoption.split( " :");
+        /* For all of our MRLs */
+        for(int i = 0; i < outputMRLs.length(); i++)
+        {
 
-        Open::openMRLwithOptions( p_intf, mrl, &options, true, true, _("Streaming") );
+            /* Duplicate the options list.  This is because we need to have a
+             copy for every file we add to the playlist.*/
+            QStringList optionsCopy;
+            for(int j = 0; j < options.length(); j++)
+            {
+                optionsCopy.append(options[j]);
+            }
+
+            optionsCopy+= outputMRLs[i].split( " :");
+            QString title = "Converting " + mrls[i];
+
+            /* Add each file to convert to our playlist, making sure to not attempt to start playing it.*/
+            Open::openMRLwithOptions( p_intf, mrls[i], &optionsCopy, false, true, _(title.toStdString().c_str()) );
+        }
+
+        /* Start the playlist from the beginning */
+        playlist_Control(THEPL,PLAYLIST_PLAY,pl_Unlocked);
     }
 }
 

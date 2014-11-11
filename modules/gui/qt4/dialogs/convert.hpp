@@ -36,19 +36,23 @@ class ConvertDialog : public QVLCDialog
 {
     Q_OBJECT
 public:
-    ConvertDialog( QWidget *, intf_thread_t *, const QString& );
+    ConvertDialog( QWidget *, intf_thread_t *, const QStringList& );
     virtual ~ConvertDialog(){}
 
-    QString getMrl() {return mrl;}
+    QStringList getMrls() {return mrls;}
 
 private:
     QLineEdit *fileLine;
 
-    QCheckBox *displayBox, *deinterBox;
+    QCheckBox *displayBox, *deinterBox, *appendBox;
     QRadioButton *dumpRadio;
     QPushButton *okButton;
     VLCProfileSelector *profile;
-    QString mrl;
+
+    const QStringList *incomingMRLs;
+    bool singleFileSelected;
+    QStringList mrls;
+
 private slots:
     void close() Q_DECL_OVERRIDE;
     void cancel() Q_DECL_OVERRIDE;

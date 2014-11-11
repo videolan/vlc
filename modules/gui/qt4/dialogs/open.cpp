@@ -392,13 +392,24 @@ void OpenDialog::transcode()
 
 void OpenDialog::stream( bool b_transcode_only )
 {
-    QString soutMRL = getMRL( false );
-    if( soutMRL.isEmpty() ) return;
+//    QString soutMRL = getMRL( false );
+//    if( soutMRL.isEmpty() ) return;
+
+    QStringList soutMRLS = getMRLs(false);
+    if(soutMRLS.empty())
+    {
+        return;
+    }
+
     toggleVisible();
 
     /* Dbg and send :D */
-    msg_Dbg( p_intf, "MRL passed to the Sout: %s", qtu( soutMRL ) );
-    THEDP->streamingDialog( this, soutMRL, b_transcode_only,
+    msg_Dbg( p_intf, "MRL(s) passed to the Sout: %i", soutMRLS.length() );
+    for(int i = 0; i < soutMRLS.length(); i++)
+    {
+        msg_Dbg( p_intf, "MRL(s) passed to the Sout: %s", qtu( soutMRLS[i] ) );
+    }
+    THEDP->streamingDialog( this, soutMRLS, b_transcode_only,
                             getOptions().split( " :" ) );
 }
 
