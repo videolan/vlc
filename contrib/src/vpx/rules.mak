@@ -91,7 +91,7 @@ VPX_CONF += --sdk-path=$(MACOSX_SDK)
 endif
 ifdef HAVE_IOS
 VPX_CONF += --sdk-path=$(IOS_SDK) --enable-vp8-decoder --disable-vp8-encoder --disable-vp9-encoder
-VPX_LDFLAGS := "-L$(IOS_SDK)/usr/lib -arch $(ARCH) -syslibroot $(IOS_SDK) -ios_version_min 6.1"
+VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -arch $(ARCH) -syslibroot $(IOS_SDK) -ios_version_min 6.1
 endif
 ifdef HAVE_ANDROID
 # vpx configure.sh overrides our sysroot and it looks for it itself, and
