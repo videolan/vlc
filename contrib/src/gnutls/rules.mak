@@ -1,6 +1,6 @@
 # GnuTLS
 
-GNUTLS_VERSION := 3.2.17
+GNUTLS_VERSION := 3.2.18
 GNUTLS_URL := ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-$(GNUTLS_VERSION).tar.xz
 
 ifdef BUILD_NETWORK
