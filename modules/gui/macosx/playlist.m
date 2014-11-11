@@ -159,15 +159,6 @@
     [o_outline_view setAllowsEmptySelection: NO];
     [o_outline_view expandItem: [o_outline_view itemAtRow:0]];
 
-    [o_outline_view_other setTarget: self];
-    [o_outline_view_other setDelegate: self];
-    [o_outline_view_other setDataSource: self];
-    [o_outline_view_other setAllowsEmptySelection: NO];
-
-    [[o_tc_name_other headerCell] setStringValue:_NS("Name")];
-    [[o_tc_author_other headerCell] setStringValue:_NS("Author")];
-    [[o_tc_duration_other headerCell] setStringValue:_NS("Duration")];
-
     [self reloadStyles];
 }
 
@@ -175,7 +166,6 @@
 {
     p_current_root_item = root_item;
     [o_outline_view reloadData];
-    [o_outline_view_other reloadData];
 }
 
 - (playlist_item_t *)currentPlaylistRoot
@@ -211,12 +201,6 @@
     for (NSUInteger x = 0; x < count; x++)
         [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
     [o_outline_view setRowHeight:rowHeight];
-
-    columns = [o_outline_view_other tableColumns];
-    count = columns.count;
-    for (NSUInteger x = 0; x < count; x++)
-        [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
-    [o_outline_view_other setRowHeight:rowHeight];
 }
 
 - (void)dealloc {
@@ -525,13 +509,9 @@
     [self initStrings];
 
     [o_outline_view setDoubleAction: @selector(playItem:)];
-    [o_outline_view_other setDoubleAction: @selector(playItem:)];
 
     [o_outline_view registerForDraggedTypes: [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
     [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
-
-    [o_outline_view_other registerForDraggedTypes: [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
-    [o_outline_view_other setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
     /* This uses a private API, but works fine on all current OSX releases.
      * Radar ID 11739459 request a public API for this. However, it is probably
