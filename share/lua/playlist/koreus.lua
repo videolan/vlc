@@ -22,7 +22,7 @@ function probe()
     if vlc.access ~= "http" and vlc.access ~= "https" then
         return false
     end
-	koreus_site = string.match( vlc.path, "koreus" )
+    koreus_site = string.match( vlc.path, "koreus" )
     if not koreus_site then
         return false
     end
@@ -31,58 +31,58 @@ end
 
 -- Parse function.
 function parse()
-	while true do
-		line = vlc.readline()
-		if not line then break end
-		if string.match( line, "<meta name=\"title\"" ) then
-			_,_,name = string.find( line, "content=\"(.-)\"" )
-			name = vlc.strings.resolve_xml_special_chars( name )
-		end
-		if string.match( line, "<meta name=\"description\"" ) then
-			_,_,description = string.find( line, "content=\"(.-)\"" )
+    while true do
+        line = vlc.readline()
+        if not line then break end
+        if string.match( line, "<meta name=\"title\"" ) then
+            _,_,name = string.find( line, "content=\"(.-)\"" )
+            name = vlc.strings.resolve_xml_special_chars( name )
+        end
+        if string.match( line, "<meta name=\"description\"" ) then
+            _,_,description = string.find( line, "content=\"(.-)\"" )
             if (description ~= nil) then
                 description = vlc.strings.resolve_xml_special_chars( description )
             end
-		end
-		if string.match( line, "<meta name=\"author\"" ) then
-			_,_,artist = string.find( line, "content=\"(.-)\"" )
-			artist = vlc.strings.resolve_xml_special_chars( artist )
-		end
-		if string.match( line, "link rel=\"image_src\"" ) then
-			_,_,arturl = string.find( line, "href=\"(.-)\"" )
-		end
+        end
+        if string.match( line, "<meta name=\"author\"" ) then
+            _,_,artist = string.find( line, "content=\"(.-)\"" )
+            artist = vlc.strings.resolve_xml_special_chars( artist )
+        end
+        if string.match( line, "link rel=\"image_src\"" ) then
+            _,_,arturl = string.find( line, "href=\"(.-)\"" )
+        end
 
-		vid_url = string.match( line, '(http://embed%.koreus%.com/%d+/%d+/[%w-]*%.mp4)' )
-		if vid_url then
-			path_url = vid_url
-		end
+        vid_url = string.match( line, '(http://embed%.koreus%.com/%d+/%d+/[%w-]*%.mp4)' )
+        if vid_url then
+            path_url = vid_url
+        end
 
         vid_url_hd = string.match( line, '(http://embed%.koreus%.com/%d+/%d+/[%w-]*%-hd%.mp4)' )
-		if vid_url_hd then
-			path_url_hd = vid_url_hd
-		end
+        if vid_url_hd then
+            path_url_hd = vid_url_hd
+        end
 
-		vid_url_webm = string.match( line, '(http://embed%.koreus%.com/%d+/%d+/[%w-]*%.webm)' )
-		if vid_url_webm then
-			path_url_webm = vid_url_webm
-		end
+        vid_url_webm = string.match( line, '(http://embed%.koreus%.com/%d+/%d+/[%w-]*%.webm)' )
+        if vid_url_webm then
+            path_url_webm = vid_url_webm
+        end
 
-		vid_url_flv = string.match( line, '(http://embed%.koreus%.com/%d+/%d+/[%w-]*%.flv)' )
-		if vid_ulr_flv then
-			path_url_flv = vid_url_flv
-		end
+        vid_url_flv = string.match( line, '(http://embed%.koreus%.com/%d+/%d+/[%w-]*%.flv)' )
+        if vid_ulr_flv then
+            path_url_flv = vid_url_flv
+        end
 
-	end
+    end
 
-	if path_url_hd then
-		return { { path = path_url_hd; name = name; description = description; artist = artist; arturl = arturl } }
-	elseif path_url then
-		return { { path = path_url; name = name; description = description; artist = artist; arturl = arturl } }
-	elseif path_url_webm then
-		return { { path = path_url_webm; name = name; description = description; artist = artist; arturl = arturl } }
-	elseif path_url_flv then
-		return { { path = path_url_flv; name = name; description = description; artist = artist; arturl = arturl } }
-	else
-		return {}
-	end
+    if path_url_hd then
+        return { { path = path_url_hd; name = name; description = description; artist = artist; arturl = arturl } }
+    elseif path_url then
+        return { { path = path_url; name = name; description = description; artist = artist; arturl = arturl } }
+    elseif path_url_webm then
+        return { { path = path_url_webm; name = name; description = description; artist = artist; arturl = arturl } }
+    elseif path_url_flv then
+        return { { path = path_url_flv; name = name; description = description; artist = artist; arturl = arturl } }
+    else
+        return {}
+    end
 end
