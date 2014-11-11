@@ -1353,6 +1353,18 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
     else if( p_stream->fmt.i_cat == AUDIO_ES )
     {
+        if ( p_stream->fmt.i_codec == VLC_CODEC_FLAC &&
+             p_stream->p_es && 0 >= p_oggpacket->granulepos &&
+             p_stream->fmt.b_packetized )
+        {
+            /* Handle OggFlac spec violation (multiple frame/packet
+             * by turning on packetizer */
+            msg_Warn( p_demux, "Invalid FLAC in ogg detected. Restarting ES with packetizer." );
+            p_stream->fmt.b_packetized = false;
+            es_out_Del( p_demux->out, p_stream->p_es );
+            p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
+        }
+
         /* Blatant abuse of the i_length field. */
         p_block->i_length = p_stream->i_end_trim;
     }
