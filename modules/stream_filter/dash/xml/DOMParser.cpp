@@ -26,6 +26,7 @@
 #endif
 
 #include "DOMParser.h"
+#include "../Helper.h"
 
 #include <vector>
 
@@ -141,16 +142,24 @@ void    DOMParser::print                    ()
 }
 bool    DOMParser::isDash                   (stream_t *stream)
 {
-    const char* psz_namespaceDIS = "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011";
-    const char* psz_namespaceIS  = "urn:mpeg:DASH:schema:MPD:2011";
+    const std::string namespaces[] = {
+        "xmlns=\"urn:mpeg:mpegB:schema:DASH:MPD:DIS2011\"",
+        "xmlns=\"urn:mpeg:schema:dash:mpd:2011\"",
+        "xmlns=\"urn:mpeg:DASH:schema:MPD:2011\"",
+    };
 
     const uint8_t *peek;
     int peek_size = stream_Peek(stream, &peek, 1024);
-    if (peek_size < (int)strlen(psz_namespaceDIS))
+    if (peek_size < (int)namespaces[0].length())
         return false;
 
     std::string header((const char*)peek, peek_size);
-    return (header.find(psz_namespaceDIS) != std::string::npos) || (header.find(psz_namespaceIS) != std::string::npos);
+    for( size_t i=0; i<ARRAY_SIZE(namespaces); i++ )
+    {
+        if ( Helper::ifind(header, namespaces[i]) )
+            return true;
+    }
+    return false;
 }
 Profile DOMParser::getProfile               ()
 {

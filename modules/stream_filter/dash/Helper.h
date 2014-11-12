@@ -34,6 +34,7 @@ namespace dash
         public:
             static std::string combinePaths     (const std::string &path1, const std::string &path2);
             static std::string getDirectoryPath (const std::string &path);
+            static bool        ifind            (std::string haystack, std::string needle);
     };
 }
 
