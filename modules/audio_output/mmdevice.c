@@ -117,6 +117,7 @@ struct aout_sys_t
 
     LONG refs;
     unsigned ducks;
+    float gain; /**< Current software gain volume */
 
     wchar_t *device; /**< Requested device identifier, NULL if none */
     float volume; /**< Requested volume, negative if none */
@@ -197,9 +198,20 @@ static void Flush(audio_output_t *aout, bool wait)
 static int VolumeSet(audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
+    float gain = 1.f;
 
     vol = vol * vol * vol; /* ISimpleAudioVolume is tapered linearly. */
+
+    if (vol > 1.f)
+    {
+        gain = vol;
+        vol = 1.f;
+    }
+
+    aout_GainRequest(aout, gain);
+
     EnterCriticalSection(&sys->lock);
+    sys->gain = gain;
     sys->volume = vol;
     WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
@@ -923,16 +935,13 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
 
             hr = ISimpleAudioVolume_GetMasterVolume(volume, &level);
             if (SUCCEEDED(hr))
-                aout_VolumeReport(aout, cbrtf(level));
+                aout_VolumeReport(aout, cbrtf(level * sys->gain));
             else
                 msg_Err(aout, "cannot get master volume (error 0x%lx)", hr);
 
             level = sys->volume;
             if (level >= 0.f)
             {
-                if (level > 1.f)
-                    level = 1.f;
-
                 hr = ISimpleAudioVolume_SetMasterVolume(volume, level, NULL);
                 if (FAILED(hr))
                     msg_Err(aout, "cannot set master volume (error 0x%lx)",
@@ -1091,6 +1100,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     assert (sys->stream == NULL);
     sys->stream = s;
+    aout_GainRequest(aout, sys->gain);
     return 0;
 }
 
@@ -1128,6 +1138,7 @@ static int Open(vlc_object_t *obj)
     sys->ducks = 0;
 
     sys->device = default_device;
+    sys->gain = 1.f;
     sys->volume = -1.f;
     sys->mute = -1;
     InitializeCriticalSection(&sys->lock);
