@@ -161,22 +161,14 @@ bool    DOMParser::isDash                   (stream_t *stream)
     }
     return false;
 }
-Profile DOMParser::getProfile               ()
+Profile::Name DOMParser::getProfile               ()
 {
     if(this->root == NULL)
-        return dash::mpd::UnknownProfile;
+        return dash::mpd::Profile::Unknown;
 
     std::string profile = this->root->getAttributeValue("profiles");
     if ( profile.length() == 0 )
         profile = this->root->getAttributeValue("profile"); //The standard spells it the both ways...
 
-    if(profile.find("urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm") != std::string::npos ||
-            profile.find("urn:mpeg:dash:profile:isoff-ondemand:2011") != std::string::npos ||
-            profile.find("urn:mpeg:dash:profile:isoff-on-demand:2011") != std::string::npos)
-        return dash::mpd::BasicCM;
-
-    if(profile.find("urn:mpeg:dash:profile:isoff-main:2011") != std::string::npos)
-        return dash::mpd::IsoffMain;
-
-    return dash::mpd::UnknownProfile;
+    return dash::mpd::Profile::getNameByURN(profile);
 }

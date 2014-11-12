@@ -34,14 +34,22 @@ namespace dash
     {
         class MPD;
 
-        enum Profile
+        class Profile
         {
-            UnknownProfile,
-            Full2011,
-            Basic,
-            BasicCM,
-            IsoffMain
+            public:
+                enum Name
+                {
+                    Unknown,
+                    Full,
+                    ISOOnDemand,
+                    ISOMain,
+                    ISOLive,
+                    MPEG2TSMain,
+                    MPEG2TSSimple,
+                };
+                static Name getNameByURN( std::string urn );
         };
+
         class IMPDManager
         {
             public:

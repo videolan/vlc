@@ -30,7 +30,7 @@
 using namespace dash::mpd;
 
 MPD::MPD () :
-    profile( dash::mpd::UnknownProfile ),
+    profile( dash::mpd::Profile::Unknown ),
     live( false ),
     availabilityStartTime( -1 ),
     availabilityEndTime( -1 ),
@@ -158,12 +158,12 @@ void MPD::setAvailabilityEndTime(time_t time)
         this->availabilityEndTime = time;
 }
 
-Profile MPD::getProfile() const
+Profile::Name MPD::getProfile() const
 {
     return this->profile;
 }
 
-void MPD::setProfile(Profile profile)
+void MPD::setProfile(Profile::Name profile)
 {
     this->profile = profile;
 }

@@ -1,11 +1,7 @@
 /*
- * MPDManagerFactory.cpp
+ * IMPDManager.cpp
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
- *
- * Created on: Apr 20, 2011
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2014 - VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -25,20 +21,34 @@
 # include "config.h"
 #endif
 
-#include "mpd/MPDManagerFactory.h"
+#include "IMPDManager.h"
 
 using namespace dash::mpd;
 
-IMPDManager* MPDManagerFactory::create( MPD *mpd )
+Profile::Name Profile::getNameByURN(std::string urn)
 {
-    switch( mpd->getProfile() )
+    struct
     {
-        case mpd::Profile::ISOOnDemand:
-        case mpd::Profile::Full:
-            return new BasicCMManager   (mpd);
-        case mpd::Profile::ISOMain:
-            return new IsoffMainManager (mpd);
-        default:
-            return NULL;
+        const Name name;
+        const char * urn;
     }
+    urnmap[] =
+    {
+        { Full,         "urn:mpeg:dash:profile:full:2011" },
+        { ISOOnDemand,  "urn:mpeg:dash:profile:isoff-on-demand:2011" },
+        { ISOOnDemand,  "urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm" },
+        { ISOOnDemand,  "urn:mpeg:dash:profile:isoff-ondemand:2011" },
+        { ISOMain,      "urn:mpeg:dash:profile:isoff-main:2011" },
+        { ISOLive,      "urn:mpeg:dash:profile:isoff-live:2011" },
+        { MPEG2TSMain,  "urn:mpeg:dash:profile:mp2t-main:2011" },
+        { MPEG2TSSimple,"urn:mpeg:dash:profile:mp2t-simple:2011" },
+        { Unknown,      "" },
+    };
+
+    for( int i=0; urnmap[i].name != Unknown; i++ )
+    {
+        if ( urn == urnmap[i].urn )
+            return urnmap[i].name;
+    }
+    return Unknown;
 }
