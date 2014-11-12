@@ -90,6 +90,8 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/DASHDownloader.h \
     stream_filter/dash/DASHManager.cpp \
     stream_filter/dash/DASHManager.h \
+    stream_filter/dash/Logger.cpp \
+    stream_filter/dash/Logger.h \
     stream_filter/dash/Helper.cpp \
     stream_filter/dash/Helper.h
 libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/stream_filter/dash

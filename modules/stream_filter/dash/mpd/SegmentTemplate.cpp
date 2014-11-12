@@ -29,6 +29,7 @@
 #include "Representation.h"
 #include "AdaptationSet.h"
 #include "SegmentInfoDefault.h"
+#include "Logger.h"
 
 #include <cassert>
 #include <cstring>
@@ -55,7 +56,7 @@ std::string     SegmentTemplate::getSourceUrl() const
         return Segment::getSourceUrl();
 
     if ( this->beginIndex != std::string::npos )
-        std::cerr << "Unhandled identifier \"$Index$\"" << std::endl;
+        Logger::Error("Unhandled identifier \"$Index$\"");
     if ( this->beginTime != std::string::npos )
     {
         //FIXME: This should use the current representation SegmentInfo
