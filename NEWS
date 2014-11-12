@@ -67,13 +67,13 @@ Changes between 2.1.x and 2.2.0:
 
 Important changes:
  * The licenses of more modules have changed from GPLv2+ to LGPLv2.1+,
-   notably the streaming output, muxers and access output ones
+   notably most of the streaming output, muxers and access output modules
 
 Core:
  * Support automatic rotation using streams metadata, GPU-accelerated when possible
- * Partial fix of playback of short audio samples
- * Add extensions download from external repositories
+ * Add extensions manager and downloading from external repositories
  * Rework the metadata fetching algorithm and policies
+ * Partial fix of playback of short audio samples
 
 Access:
  * Added TLS support for ftp access and sout access
@@ -149,7 +149,7 @@ Video Output:
  * New Android native window provider module
  * Direct rendering for MediaCodec Android hardware acceleration
  * Support for loading HLSL shaders in Direct3D video output
- * Add mmal based video output
+ * Add MMAL based video output for RaspberryPi
 
 Video Filter:
  * New Oldmovie effect filter
@@ -201,26 +201,41 @@ Interfaces:
  * Add record button in Qt menus
  * New module for core dialogs on iOS
  * New layout for Qt buttons customization
- * Support to continue media playback where it was left off for Qt and MacOS
+ * Support to continue media playback where it was left off for Qt and OS X
 
 Mac OS X Interface:
  * Avoid grey bars in fullscreen when using Mavericks with multiple monitors
  * Improve fullscreen behavior for the native and VLCs own mode
  * Fixes for advanced preferences
+ * Added 'file size' column to playlist table
+ * in addition to iTunes, Spotify is automatically paused on playback start
  * Option to increase playlist font size
+ * Improved crash log reporting
 
 Misc:
  * New module for TLS on OS X and iOS
  * Windows installer will kill running instance before installing
  * Teletext navigation buttons support in Qt4 gui
 
+Security:
+ * Numerous integer and heap overflow in Ogg, AVI, ASF, TTA and MP4 demuxers
+
 Removed modules:
- * ios video output: use ios2
+ * iOS video output: use ios2
  * OpenMash H.261 video decoder
  * dirac encoder: use schroedinger
 
 Translations:
- * Update of all translations
+ * New translation in Urdu, Tatar, Silesian, Samoan, Kapampangan, N'ko,
+   Kurdish, Kabyle, Mexican Spanish, Catalan, Amharic
+ * Update of all translations:
+   Traditional Chinese, Simplified Chinese, Vietnamese, Uzbek, Ukrainian,
+   Turkish, Thai, Swedish, Serbian, Albanian, Slovenian, Slovak, Russian,
+   Romanian, Brazilian Portuguese, Polish, Punjabi, Dutch, Nepali, Norwegian
+   Bokmål, Malay, Marathi, Latvian, Lithuanian, Korean, Kannada, Khmer,
+   Japanese, Italian, Icelandic, Indonesian, Hebrew, Galician, Scottish
+   Gaelic, French, Finnish, Persian, Estonian, Spanish, Modern Greek, German,
+   Danish, Welsh, Czech, Bosnian, Bengali, Asturian
 
 
 Changes between 2.1.4 and 2.1.5:
