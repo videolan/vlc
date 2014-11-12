@@ -193,7 +193,6 @@ static void Flush(audio_output_t *aout, bool wait)
     EnterMTA();
     aout_stream_Flush(sys->stream, wait);
     LeaveMTA();
-
 }
 
 static int VolumeSet(audio_output_t *aout, float vol)
@@ -1217,7 +1216,7 @@ static void Stop(audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
 
-    assert (sys->stream != NULL);
+    assert(sys->stream != NULL);
 
     EnterMTA();
     vlc_module_unload(sys->module, aout_stream_Stop, sys->stream);
