@@ -1194,7 +1194,8 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     {
         HRESULT hr;
 
-        sys->module = vlc_module_load(s, "aout stream", NULL, false,
+        /* TODO: Do not overload the "aout" configuration item. */
+        sys->module = vlc_module_load(s, "aout stream", "$aout", false,
                                       aout_stream_Start, s, fmt, &hr);
         if (hr != AUDCLNT_E_DEVICE_INVALIDATED || DeviceSelect(aout, NULL))
             break;
@@ -1320,6 +1321,6 @@ vlc_module_begin()
     set_capability("audio output", 150)
     set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
-    add_shortcut("wasapi")
+    add_shortcut("wasapi", "directsound")
     set_callbacks(Open, Close)
 vlc_module_end()
