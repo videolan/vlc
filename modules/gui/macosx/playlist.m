@@ -124,291 +124,6 @@
 
 @end
 
-/*****************************************************************************
- * VLCPlaylistCommon implementation
- *
- * This class the superclass of the VLCPlaylist and VLCPlaylistWizard.
- * It contains the common methods and elements of these 2 entities.
- *****************************************************************************/
-@interface VLCPlaylistCommon ()
-{
-    playlist_item_t * p_current_root_item;
-}
-@end
-
-@implementation VLCPlaylistCommon
-
-- (id)init
-{
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    p_current_root_item = p_playlist->p_local_category;
-
-    self = [super init];
-    if (self != nil)
-        o_outline_dict = [[NSMutableDictionary alloc] init];
-
-    return self;
-}
-
-- (void)awakeFromNib
-{
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    [o_outline_view setTarget: self];
-    [o_outline_view setDelegate: self];
-    [o_outline_view setDataSource: self];
-    [o_outline_view setAllowsEmptySelection: NO];
-    [o_outline_view expandItem: [o_outline_view itemAtRow:0]];
-
-    [self reloadStyles];
-}
-
-- (void)setPlaylistRoot: (playlist_item_t *)root_item
-{
-    p_current_root_item = root_item;
-    [o_outline_view reloadData];
-}
-
-- (playlist_item_t *)currentPlaylistRoot
-{
-    return p_current_root_item;
-}
-
-- (NSOutlineView *)outlineView
-{
-    return o_outline_view;
-}
-
-- (playlist_item_t *)selectedPlaylistItem
-{
-    return [[o_outline_view itemAtRow: [o_outline_view selectedRow]]
-                                                                pointerValue];
-}
-
-- (void)reloadStyles
-{
-    NSFont *fontToUse;
-    CGFloat rowHeight;
-    if (config_GetInt(VLCIntf, "macosx-large-text")) {
-        fontToUse = [NSFont systemFontOfSize:13.];
-        rowHeight = 21.;
-    } else {
-        fontToUse = [NSFont systemFontOfSize:11.];
-        rowHeight = 16.;
-    }
-
-    NSArray *columns = [o_outline_view tableColumns];
-    NSUInteger count = columns.count;
-    for (NSUInteger x = 0; x < count; x++)
-        [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
-    [o_outline_view setRowHeight:rowHeight];
-}
-
-- (void)dealloc {
-    [o_outline_dict release];
-    [super dealloc];
-}
-
-@end
-
-@implementation VLCPlaylistCommon (NSOutlineViewDataSource)
-/* return the number of children for Obj-C pointer item */ /* DONE */
-- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
-{
-    int i_return = 0;
-    playlist_item_t *p_item = NULL;
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    //assert(outlineView == o_outline_view);
-
-    PL_LOCK;
-    if (!item)
-        p_item = p_current_root_item;
-    else
-        p_item = (playlist_item_t *)[item pointerValue];
-
-    if (p_item)
-        i_return = p_item->i_children;
-    PL_UNLOCK;
-
-    return i_return > 0 ? i_return : 0;
-}
-
-/* return the child at index for the Obj-C pointer item */ /* DONE */
-- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
-{
-    playlist_item_t *p_return = NULL, *p_item = NULL;
-    NSValue *o_value;
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-
-    PL_LOCK;
-    if (item == nil)
-        p_item = p_current_root_item; /* root object */
-    else
-        p_item = (playlist_item_t *)[item pointerValue];
-
-    if (p_item && index < p_item->i_children && index >= 0)
-        p_return = p_item->pp_children[index];
-    PL_UNLOCK;
-
-    o_value = [o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_return]];
-
-    if (o_value == nil) {
-        /* FIXME: Why is there a warning if that happens all the time and seems
-         * to be normal? Add an assert and fix it.
-         * msg_Warn(VLCIntf, "playlist item misses pointer value, adding one"); */
-        o_value = [[NSValue valueWithPointer: p_return] retain];
-    }
-    return o_value;
-}
-
-/* is the item expandable */
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
-{
-    int i_return = 0;
-    playlist_t *p_playlist = pl_Get(VLCIntf);
-
-    PL_LOCK;
-    if (item == nil) {
-        /* root object */
-        if (p_current_root_item) {
-            i_return = p_current_root_item->i_children;
-        }
-    } else {
-        playlist_item_t *p_item = (playlist_item_t *)[item pointerValue];
-        if (p_item)
-            i_return = p_item->i_children;
-    }
-    PL_UNLOCK;
-
-    return (i_return >= 0);
-}
-
-/* retrieve the string values for the cells */
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)o_tc byItem:(id)item
-{
-    id o_value = nil;
-    char * psz_value;
-    playlist_item_t *p_item;
-
-    /* For error handling */
-    static BOOL attempted_reload = NO;
-
-    if (item == nil || ![item isKindOfClass: [NSValue class]]) {
-        /* Attempt to fix the error by asking for a data redisplay
-         * This might cause infinite loop, so add a small check */
-        if (!attempted_reload) {
-            attempted_reload = YES;
-            [outlineView reloadData];
-        }
-        return @"error" ;
-    }
-
-    p_item = (playlist_item_t *)[item pointerValue];
-    if (!p_item || !p_item->p_input) {
-        /* Attempt to fix the error by asking for a data redisplay
-         * This might cause infinite loop, so add a small check */
-        if (!attempted_reload) {
-            attempted_reload = YES;
-            [outlineView reloadData];
-        }
-        return @"error";
-    }
-
-    attempted_reload = NO;
-    NSString * o_identifier = [o_tc identifier];
-
-    if ([o_identifier isEqualToString:TRACKNUM_COLUMN]) {
-        psz_value = input_item_GetTrackNumber(p_item->p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    } else if ([o_identifier isEqualToString:TITLE_COLUMN]) {
-        /* sanity check to prevent the NSString class from crashing */
-        char *psz_title =  input_item_GetTitleFbName(p_item->p_input);
-        if (psz_title) {
-            o_value = [NSString stringWithUTF8String:psz_title];
-            free(psz_title);
-        }
-    } else if ([o_identifier isEqualToString:ARTIST_COLUMN]) {
-        psz_value = input_item_GetArtist(p_item->p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    } else if ([o_identifier isEqualToString:@"duration"]) {
-        char psz_duration[MSTRTIME_MAX_SIZE];
-        mtime_t dur = input_item_GetDuration(p_item->p_input);
-        if (dur != -1) {
-            secstotimestr(psz_duration, dur/1000000);
-            o_value = [NSString stringWithUTF8String:psz_duration];
-        }
-        else
-            o_value = @"--:--";
-    } else if ([o_identifier isEqualToString:GENRE_COLUMN]) {
-        psz_value = input_item_GetGenre(p_item->p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    } else if ([o_identifier isEqualToString:ALBUM_COLUMN]) {
-        psz_value = input_item_GetAlbum(p_item->p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    } else if ([o_identifier isEqualToString:DESCRIPTION_COLUMN]) {
-        psz_value = input_item_GetDescription(p_item->p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    } else if ([o_identifier isEqualToString:DATE_COLUMN]) {
-        psz_value = input_item_GetDate(p_item->p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    } else if ([o_identifier isEqualToString:LANGUAGE_COLUMN]) {
-        psz_value = input_item_GetLanguage(p_item->p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    }
-    else if ([o_identifier isEqualToString:URI_COLUMN]) {
-        psz_value = decode_URI(input_item_GetURI(p_item->p_input));
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    }
-    else if ([o_identifier isEqualToString:FILESIZE_COLUMN]) {
-        psz_value = input_item_GetURI(p_item->p_input);
-        o_value = @"";
-        if (psz_value) {
-            NSURL *url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_value]];
-            if ([url isFileURL]) {
-                NSFileManager *fileManager = [NSFileManager defaultManager];
-                if ([fileManager fileExistsAtPath:[url path]]) {
-                    NSError *error;
-                    NSDictionary *attributes = [fileManager attributesOfItemAtPath:[url path] error:&error];
-                    o_value = [VLCByteCountFormatter stringFromByteCount:[attributes fileSize] countStyle:NSByteCountFormatterCountStyleDecimal];
-                }
-            }
-            free(psz_value);
-        }
-    }
-    else if ([o_identifier isEqualToString:@"status"]) {
-        if (input_item_HasErrorWhenReading(p_item->p_input)) {
-            o_value = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertCautionIcon)];
-            [o_value setSize: NSMakeSize(16,16)];
-        }
-    }
-
-    return o_value;
-}
-
-@end
 
 /*****************************************************************************
  * VLCPlaylistWizard implementation
@@ -419,8 +134,9 @@
 {
     /* Only reload the outlineview if the wizard window is open since this can
        be quite long on big playlists */
-    if ([[o_outline_view window] isVisible])
-        [o_outline_view reloadData];
+
+
+    // to be removed
 }
 
 @end
@@ -444,6 +160,8 @@
  *****************************************************************************/
 @interface VLCPlaylist ()
 {
+    playlist_item_t * p_current_root_item;
+
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
 
@@ -481,10 +199,46 @@
     [o_columnArray release];
 }
 
+- (void)setPlaylistRoot: (playlist_item_t *)root_item
+{
+    p_current_root_item = root_item;
+    [o_outline_view reloadData];
+}
+
+- (playlist_item_t *)currentPlaylistRoot
+{
+    return p_current_root_item;
+}
+
+- (void)reloadStyles
+{
+    NSFont *fontToUse;
+    CGFloat rowHeight;
+    if (config_GetInt(VLCIntf, "macosx-large-text")) {
+        fontToUse = [NSFont systemFontOfSize:13.];
+        rowHeight = 21.;
+    } else {
+        fontToUse = [NSFont systemFontOfSize:11.];
+        rowHeight = 16.;
+    }
+
+    NSArray *columns = [o_outline_view tableColumns];
+    NSUInteger count = columns.count;
+    for (NSUInteger x = 0; x < count; x++)
+        [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
+    [o_outline_view setRowHeight:rowHeight];
+}
+
 - (id)init
 {
     self = [super init];
     if (self != nil) {
+
+
+        playlist_t * p_playlist = pl_Get(VLCIntf);
+        p_current_root_item = p_playlist->p_local_category;
+        o_outline_dict = [[NSMutableDictionary alloc] init];
+
         o_nodes_array = [[NSMutableArray alloc] init];
         o_items_array = [[NSMutableArray alloc] init];
     }
@@ -493,6 +247,7 @@
 
 - (void)dealloc
 {
+    [o_outline_dict release];
     [o_nodes_array release];
     [o_items_array release];
     [super dealloc];
@@ -504,8 +259,13 @@
         return;
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
+    [o_outline_view setTarget: self];
+    [o_outline_view setDelegate: self];
+    [o_outline_view setDataSource: self];
+    [o_outline_view setAllowsEmptySelection: NO];
+    [o_outline_view expandItem: [o_outline_view itemAtRow:0]];
 
-    [super awakeFromNib];
+    [self reloadStyles];
     [self initStrings];
 
     [o_outline_view setDoubleAction: @selector(playItem:)];
@@ -1625,15 +1385,208 @@
 
 @end
 
-@implementation VLCPlaylist (NSOutlineViewDataSource)
 
+@implementation VLCPlaylist (NSOutlineViewDataSource)
+/* return the number of children for Obj-C pointer item */ /* DONE */
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+{
+    int i_return = 0;
+    playlist_item_t *p_item = NULL;
+    playlist_t * p_playlist = pl_Get(VLCIntf);
+    //assert(outlineView == o_outline_view);
+
+    PL_LOCK;
+    if (!item)
+        p_item = p_current_root_item;
+    else
+        p_item = (playlist_item_t *)[item pointerValue];
+
+    if (p_item)
+        i_return = p_item->i_children;
+    PL_UNLOCK;
+
+    return i_return > 0 ? i_return : 0;
+}
+
+/* return the child at index for the Obj-C pointer item */ /* DONE */
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-    id o_value = [super outlineView: outlineView child: index ofItem: item];
+    playlist_item_t *p_return = NULL, *p_item = NULL;
+    NSValue *o_value;
+    playlist_t * p_playlist = pl_Get(VLCIntf);
+
+    PL_LOCK;
+    if (item == nil)
+        p_item = p_current_root_item; /* root object */
+    else
+        p_item = (playlist_item_t *)[item pointerValue];
+
+    if (p_item && index < p_item->i_children && index >= 0)
+        p_return = p_item->pp_children[index];
+    PL_UNLOCK;
+
+    o_value = [o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_return]];
+
+    if (o_value == nil) {
+        /* FIXME: Why is there a warning if that happens all the time and seems
+         * to be normal? Add an assert and fix it.
+         * msg_Warn(VLCIntf, "playlist item misses pointer value, adding one"); */
+        o_value = [[NSValue valueWithPointer: p_return] retain];
+    }
 
     [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p", [o_value pointerValue]]];
+
     return o_value;
 }
+
+/* is the item expandable */
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+{
+    int i_return = 0;
+    playlist_t *p_playlist = pl_Get(VLCIntf);
+
+    PL_LOCK;
+    if (item == nil) {
+        /* root object */
+        if (p_current_root_item) {
+            i_return = p_current_root_item->i_children;
+        }
+    } else {
+        playlist_item_t *p_item = (playlist_item_t *)[item pointerValue];
+        if (p_item)
+            i_return = p_item->i_children;
+    }
+    PL_UNLOCK;
+
+    return (i_return >= 0);
+}
+
+/* retrieve the string values for the cells */
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)o_tc byItem:(id)item
+{
+    id o_value = nil;
+    char * psz_value;
+    playlist_item_t *p_item;
+
+    /* For error handling */
+    static BOOL attempted_reload = NO;
+
+    if (item == nil || ![item isKindOfClass: [NSValue class]]) {
+        /* Attempt to fix the error by asking for a data redisplay
+         * This might cause infinite loop, so add a small check */
+        if (!attempted_reload) {
+            attempted_reload = YES;
+            [outlineView reloadData];
+        }
+        return @"error" ;
+    }
+
+    p_item = (playlist_item_t *)[item pointerValue];
+    if (!p_item || !p_item->p_input) {
+        /* Attempt to fix the error by asking for a data redisplay
+         * This might cause infinite loop, so add a small check */
+        if (!attempted_reload) {
+            attempted_reload = YES;
+            [outlineView reloadData];
+        }
+        return @"error";
+    }
+
+    attempted_reload = NO;
+    NSString * o_identifier = [o_tc identifier];
+
+    if ([o_identifier isEqualToString:TRACKNUM_COLUMN]) {
+        psz_value = input_item_GetTrackNumber(p_item->p_input);
+        if (psz_value) {
+            o_value = [NSString stringWithUTF8String:psz_value];
+            free(psz_value);
+        }
+    } else if ([o_identifier isEqualToString:TITLE_COLUMN]) {
+        /* sanity check to prevent the NSString class from crashing */
+        char *psz_title =  input_item_GetTitleFbName(p_item->p_input);
+        if (psz_title) {
+            o_value = [NSString stringWithUTF8String:psz_title];
+            free(psz_title);
+        }
+    } else if ([o_identifier isEqualToString:ARTIST_COLUMN]) {
+        psz_value = input_item_GetArtist(p_item->p_input);
+        if (psz_value) {
+            o_value = [NSString stringWithUTF8String:psz_value];
+            free(psz_value);
+        }
+    } else if ([o_identifier isEqualToString:@"duration"]) {
+        char psz_duration[MSTRTIME_MAX_SIZE];
+        mtime_t dur = input_item_GetDuration(p_item->p_input);
+        if (dur != -1) {
+            secstotimestr(psz_duration, dur/1000000);
+            o_value = [NSString stringWithUTF8String:psz_duration];
+        }
+        else
+            o_value = @"--:--";
+    } else if ([o_identifier isEqualToString:GENRE_COLUMN]) {
+        psz_value = input_item_GetGenre(p_item->p_input);
+        if (psz_value) {
+            o_value = [NSString stringWithUTF8String:psz_value];
+            free(psz_value);
+        }
+    } else if ([o_identifier isEqualToString:ALBUM_COLUMN]) {
+        psz_value = input_item_GetAlbum(p_item->p_input);
+        if (psz_value) {
+            o_value = [NSString stringWithUTF8String:psz_value];
+            free(psz_value);
+        }
+    } else if ([o_identifier isEqualToString:DESCRIPTION_COLUMN]) {
+        psz_value = input_item_GetDescription(p_item->p_input);
+        if (psz_value) {
+            o_value = [NSString stringWithUTF8String:psz_value];
+            free(psz_value);
+        }
+    } else if ([o_identifier isEqualToString:DATE_COLUMN]) {
+        psz_value = input_item_GetDate(p_item->p_input);
+        if (psz_value) {
+            o_value = [NSString stringWithUTF8String:psz_value];
+            free(psz_value);
+        }
+    } else if ([o_identifier isEqualToString:LANGUAGE_COLUMN]) {
+        psz_value = input_item_GetLanguage(p_item->p_input);
+        if (psz_value) {
+            o_value = [NSString stringWithUTF8String:psz_value];
+            free(psz_value);
+        }
+    }
+    else if ([o_identifier isEqualToString:URI_COLUMN]) {
+        psz_value = decode_URI(input_item_GetURI(p_item->p_input));
+        if (psz_value) {
+            o_value = [NSString stringWithUTF8String:psz_value];
+            free(psz_value);
+        }
+    }
+    else if ([o_identifier isEqualToString:FILESIZE_COLUMN]) {
+        psz_value = input_item_GetURI(p_item->p_input);
+        o_value = @"";
+        if (psz_value) {
+            NSURL *url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_value]];
+            if ([url isFileURL]) {
+                NSFileManager *fileManager = [NSFileManager defaultManager];
+                if ([fileManager fileExistsAtPath:[url path]]) {
+                    NSError *error;
+                    NSDictionary *attributes = [fileManager attributesOfItemAtPath:[url path] error:&error];
+                    o_value = [VLCByteCountFormatter stringFromByteCount:[attributes fileSize] countStyle:NSByteCountFormatterCountStyleDecimal];
+                }
+            }
+            free(psz_value);
+        }
+    }
+    else if ([o_identifier isEqualToString:@"status"]) {
+        if (input_item_HasErrorWhenReading(p_item->p_input)) {
+            o_value = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertCautionIcon)];
+            [o_value setSize: NSMakeSize(16,16)];
+        }
+    }
+
+    return o_value;
+}
+
 
 /* Required for drag & drop and reordering */
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard

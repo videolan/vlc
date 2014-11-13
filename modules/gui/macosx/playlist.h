@@ -46,26 +46,9 @@
 @end
 
 /*****************************************************************************
- * VLCPlaylistCommon interface
- *****************************************************************************/
-@interface VLCPlaylistCommon : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate>
-{
-    IBOutlet VLCPlaylistView* o_outline_view;
-
-    NSMutableDictionary *o_outline_dict;
-}
-
-- (void)setPlaylistRoot: (playlist_item_t *)root_item;
-- (playlist_item_t *)currentPlaylistRoot;
-- (playlist_item_t *)selectedPlaylistItem;
-- (NSOutlineView *)outlineView;
-- (void)reloadStyles;
-@end
-
-/*****************************************************************************
  * VLCPlaylistWizard interface
  *****************************************************************************/
-@interface VLCPlaylistWizard : VLCPlaylistCommon
+@interface VLCPlaylistWizard : NSObject
 - (IBAction)reloadOutlineView;
 
 @end
@@ -73,8 +56,12 @@
 /*****************************************************************************
  * VLCPlaylist interface
  *****************************************************************************/
-@interface VLCPlaylist : VLCPlaylistCommon
+@interface VLCPlaylist : NSObject<NSOutlineViewDataSource, NSOutlineViewDelegate>
 {
+    IBOutlet VLCPlaylistView* o_outline_view;
+
+    NSMutableDictionary *o_outline_dict;
+
     IBOutlet id o_controller;
     IBOutlet id o_playlist_wizard;
 
@@ -104,6 +91,10 @@
 
     int currentResumeTimeout;
 }
+
+- (void)setPlaylistRoot: (playlist_item_t *)root_item;
+- (playlist_item_t *)currentPlaylistRoot;
+- (void)reloadStyles;
 
 - (void)searchfieldChanged:(NSNotification *)o_notification;
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
