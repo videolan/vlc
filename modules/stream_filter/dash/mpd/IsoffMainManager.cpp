@@ -52,7 +52,8 @@ std::vector<Segment*>       IsoffMainManager::getSegments           (const Repre
             retSegments.push_back(initSegment);
     }
 
-    retSegments.insert(retSegments.end(), list->getSegments().begin(), list->getSegments().end());
+    if ( list )
+        retSegments.insert(retSegments.end(), list->getSegments().begin(), list->getSegments().end());
     return retSegments;
 }
 const std::vector<Period*>& IsoffMainManager::getPeriods            () const
