@@ -35,6 +35,7 @@ typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
 typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
 typedef int32_t (*ptr_ANativeWindow_lock)(ANativeWindow*, ANativeWindow_Buffer*, ARect*);
 typedef void (*ptr_ANativeWindow_unlockAndPost)(ANativeWindow*);
+typedef int32_t (*ptr_ANativeWindow_setBuffersGeometry)(ANativeWindow*, int32_t, int32_t, int32_t);
 
 typedef struct
 {
@@ -42,6 +43,7 @@ typedef struct
     ptr_ANativeWindow_release winRelease;
     ptr_ANativeWindow_lock winLock;
     ptr_ANativeWindow_unlockAndPost unlockAndPost;
+    ptr_ANativeWindow_setBuffersGeometry setBuffersGeometry;
 } native_window_api_t;
 
 /* Fill the structure passed as parameter and return a library handle

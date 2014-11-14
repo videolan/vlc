@@ -36,14 +36,18 @@ void *LoadNativeWindowAPI(native_window_api_t *native)
         (ptr_ANativeWindow_lock)(dlsym(p_library, "ANativeWindow_lock"));
     native->unlockAndPost =
         (ptr_ANativeWindow_unlockAndPost)(dlsym(p_library, "ANativeWindow_unlockAndPost"));
+    native->setBuffersGeometry =
+        (ptr_ANativeWindow_setBuffersGeometry)(dlsym(p_library, "ANativeWindow_setBuffersGeometry"));
 
-    if (native->winFromSurface && native->winRelease && native->winLock && native->unlockAndPost)
+    if (native->winFromSurface && native->winRelease && native->winLock
+        && native->unlockAndPost && native->setBuffersGeometry)
         return p_library;
 
     native->winFromSurface = NULL;
     native->winRelease = NULL;
     native->winLock = NULL;
     native->unlockAndPost = NULL;
+    native->setBuffersGeometry = NULL;
 
     dlclose(p_library);
     return NULL;
