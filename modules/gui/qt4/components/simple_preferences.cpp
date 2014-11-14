@@ -306,6 +306,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     ConfigControl *control;
     number = _number;
     lang = NULL;
+    radioGroup = NULL;
 
 #define CONFIG_GENERIC( option, type, label, qcontrol )                   \
             p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
