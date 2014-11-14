@@ -55,7 +55,6 @@ extern void jni_detach_thread();
 /* JNI functions to get/set an Android Surface object. */
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
-extern void jni_SetAndroidSurfaceSizeEnv(JNIEnv *p_env, int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 extern void jni_EventHardwareAccelerationError();
 extern bool jni_IsVideoPlayerActivityCreated();
 
@@ -823,14 +822,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             int crop_bottom     = GET_INTEGER(format, "crop-bottom");
 
             const char *name = "unknown";
-            if (p_sys->direct_rendering) {
-                int sar_num = 1, sar_den = 1;
-                if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0) {
-                    sar_num = p_dec->fmt_in.video.i_sar_num;
-                    sar_den = p_dec->fmt_in.video.i_sar_den;
-                }
-                jni_SetAndroidSurfaceSizeEnv(env, width, height, width, height, sar_num, sar_den);
-            } else {
+            if (!p_sys->direct_rendering) {
                 if (!GetVlcChromaFormat(p_sys->pixel_format,
                                         &p_dec->fmt_out.i_codec, &name)) {
                     msg_Err(p_dec, "color-format not recognized");
