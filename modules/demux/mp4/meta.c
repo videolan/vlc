@@ -317,6 +317,7 @@ static void SetupmdirMeta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
             }
             vlc_meta_AddExtra( p_meta, N_("Rating"), psz_rating );
         }
+        break;
     }
     case ATOM_trkn:
     {
