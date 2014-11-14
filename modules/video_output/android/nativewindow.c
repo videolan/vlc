@@ -42,7 +42,7 @@ extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
 extern void jni_detach_thread();
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
-extern void  jni_SetAndroidSurfaceSize(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
+extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 
 static int Open(vout_window_t *, const vout_window_cfg_t *);
 static void Close(vout_window_t *);
@@ -110,7 +110,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->sys = p_sys;
 
     // Set the Java surface size.
-    jni_SetAndroidSurfaceSize(cfg->width, cfg->height, cfg->width, cfg->height, 1, 1);
+    jni_SetSurfaceLayout(cfg->width, cfg->height, cfg->width, cfg->height, 1, 1);
 
     return VLC_SUCCESS;
 
@@ -144,7 +144,7 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
         {
             unsigned width = va_arg(ap, unsigned);
             unsigned height = va_arg(ap, unsigned);
-            jni_SetAndroidSurfaceSize(width, height, width, height, 1, 1);
+            jni_SetSurfaceLayout(width, height, width, height, 1, 1);
             break;
         }
         case VOUT_WINDOW_SET_STATE:

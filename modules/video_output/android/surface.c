@@ -79,7 +79,7 @@ extern void jni_detach_thread();
 extern void *jni_LockAndGetAndroidSurface();
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void  jni_UnlockAndroidSurface();
-extern void  jni_SetAndroidSurfaceSize(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
+extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 
 // _ZN7android7Surface4lockEPNS0_11SurfaceInfoEb
 typedef void (*Surface_lock)(void *, void *, int);
@@ -413,7 +413,7 @@ static int  AndroidLockSurface(picture_t *picture)
 
     if (info->w != aligned_width || info->h != sh || sys->b_changed_crop) {
         // input size doesn't match the surface size -> request a resize
-        jni_SetAndroidSurfaceSize(aligned_width, sh, sys->fmt.i_visible_width, sys->fmt.i_visible_height, sys->i_sar_num, sys->i_sar_den);
+        jni_SetSurfaceLayout(aligned_width, sh, sys->fmt.i_visible_width, sys->fmt.i_visible_height, sys->i_sar_num, sys->i_sar_den);
         // When using ANativeWindow, one should use ANativeWindow_setBuffersGeometry
         // to set the size and format. In our case, these are set via the SurfaceHolder
         // in Java, so we seem to manage without calling this ANativeWindow function.
