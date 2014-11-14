@@ -183,6 +183,8 @@ static int Open(vlc_object_t *p_this)
 
     /* Allocate structure */
     vout_display_sys_t *sys = (struct vout_display_sys_t*) calloc(1, sizeof(*sys));
+    if (!sys)
+        goto error;
 
     /* */
     sys->p_library = LoadNativeWindowAPI(&sys->native_window);
@@ -190,9 +192,8 @@ static int Open(vlc_object_t *p_this)
     if (!sys->p_library)
         sys->p_library = InitLibrary(sys);
     if (!sys->p_library) {
-        free(sys);
         msg_Err(vd, "Could not initialize libandroid.so/libui.so/libgui.so/libsurfaceflinger_client.so!");
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* Setup chroma */
@@ -234,14 +235,14 @@ static int Open(vlc_object_t *p_this)
     /* Create the associated picture */
     picture_sys_t *picsys = malloc(sizeof(*picsys));
     if (unlikely(picsys == NULL))
-        goto enomem;
+        goto error;
     picsys->sys = sys;
 
     picture_resource_t resource = { .p_sys = picsys };
     picture_t *picture = picture_NewFromResource(&fmt, &resource);
     if (!picture) {
         free(picsys);
-        goto enomem;
+        goto error;
     }
 
     /* Wrap it into a picture pool */
@@ -255,7 +256,7 @@ static int Open(vlc_object_t *p_this)
     sys->pool = picture_pool_NewExtended(&pool_cfg);
     if (!sys->pool) {
         picture_Release(picture);
-        goto enomem;
+        goto error;
     }
 
     /* Setup vout_display */
@@ -275,10 +276,8 @@ static int Open(vlc_object_t *p_this)
 
     return VLC_SUCCESS;
 
-enomem:
-    dlclose(sys->p_library);
-    free(sys);
-    vlc_mutex_unlock(&single_instance);
+error:
+    Close(p_this);
     return VLC_ENOMEM;
 }
 
@@ -287,11 +286,15 @@ static void Close(vlc_object_t *p_this)
     vout_display_t *vd = (vout_display_t *)p_this;
     vout_display_sys_t *sys = vd->sys;
 
-    picture_pool_Release(sys->pool);
-    if (sys->window)
-        sys->native_window.winRelease(sys->window);
-    dlclose(sys->p_library);
-    free(sys);
+    if (sys) {
+        if (sys->pool)
+            picture_pool_Release(sys->pool);
+        if (sys->window)
+            sys->native_window.winRelease(sys->window);
+        if (sys->p_library)
+            dlclose(sys->p_library);
+        free(sys);
+    }
 }
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
