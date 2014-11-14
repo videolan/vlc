@@ -5,11 +5,13 @@
 // This code is public domain
 
 #include "comb.hpp"
+#include <stddef.h>
 
 comb::comb()
 {
     filterstore = 0;
     bufidx = 0;
+    buffer = NULL;
 }
 
 void comb::setbuffer(float *buf, int size)
