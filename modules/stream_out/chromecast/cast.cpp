@@ -378,7 +378,10 @@ static int connectChromecast(sout_stream_t *p_stream, char *psz_ipChromecast)
 
     p_sys->p_creds = vlc_tls_ClientCreate(VLC_OBJECT(p_stream));
     if (p_sys->p_creds == NULL)
+    {
+        net_Close(fd);
         return -1;
+    }
 
     p_sys->p_tls = vlc_tls_ClientSessionCreate(p_sys->p_creds, fd, psz_ipChromecast,
                                                "tcps", NULL, NULL);
