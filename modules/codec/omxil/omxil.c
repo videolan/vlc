@@ -2223,6 +2223,7 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
                                         def->format.video.nFrameWidth,
                                         def->format.video.nFrameHeight,
                                         colorFormat,
+                                        true,
                                         (int) i_hw_usage ) != 0 )
     {
         msg_Err( p_dec, "can't setup OMXHWBuffer" );

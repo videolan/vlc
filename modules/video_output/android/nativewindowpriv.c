@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #if ANDROID_API <= 13
 #include <ui/android_native_buffer.h>
@@ -113,7 +114,7 @@ int ANativeWindowPriv_disconnect( native_window_priv *priv )
     return 0;
 }
 
-int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_format, int hw_usage )
+int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_format, bool is_hw, int hw_usage )
 {
     int usage = 0;
     status_t err;
@@ -121,7 +122,10 @@ int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_for
     LOGD( "setup: %p, %d, %d, %X, %X\n",
           priv->anw, w, h, hal_format, hw_usage );
 
-    usage |= hw_usage | GRALLOC_USAGE_HW_RENDER | GRALLOC_USAGE_HW_TEXTURE;
+    if (is_hw)
+        usage = hw_usage | GRALLOC_USAGE_HW_RENDER | GRALLOC_USAGE_HW_TEXTURE;
+    else
+        usage= GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_OFTEN;
 #if ANDROID_API >= 11
     usage |= GRALLOC_USAGE_EXTERNAL_DISP;
 #endif

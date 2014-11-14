@@ -54,7 +54,7 @@ void Manage(vout_display_t *);
 typedef struct native_window_priv native_window_priv;
 typedef native_window_priv *(*ptr_ANativeWindowPriv_connect) (void *);
 typedef int (*ptr_ANativeWindowPriv_disconnect) (native_window_priv *);
-typedef int (*ptr_ANativeWindowPriv_setup) (native_window_priv *, int, int, int, int );
+typedef int (*ptr_ANativeWindowPriv_setup) (native_window_priv *, int, int, int, bool, int );
 typedef int (*ptr_ANativeWindowPriv_getMinUndequeued) (native_window_priv *, unsigned int *);
 typedef int (*ptr_ANativeWindowPriv_setBufferCount) (native_window_priv *, unsigned int );
 typedef int (*ptr_ANativeWindowPriv_setCrop) (native_window_priv *, int, int, int, int);
