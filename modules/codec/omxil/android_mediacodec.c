@@ -837,6 +837,14 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
 
             p_dec->fmt_out.video.i_width = crop_right + 1 - crop_left;
             p_dec->fmt_out.video.i_height = crop_bottom + 1 - crop_top;
+            if (p_dec->fmt_out.video.i_width <= 1
+                || p_dec->fmt_out.video.i_height <= 1) {
+                p_dec->fmt_out.video.i_width = width;
+                p_dec->fmt_out.video.i_height = height;
+            }
+            p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
+            p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
+
             if (p_sys->stride <= 0)
                 p_sys->stride = width;
             if (p_sys->slice_height <= 0)
