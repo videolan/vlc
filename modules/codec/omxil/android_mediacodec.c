@@ -42,6 +42,7 @@
 #include <OMX_Component.h>
 #include "omxil_utils.h"
 #include "android_opaque.h"
+#include "../../video_output/android/android_window.h"
 
 #define INFO_OUTPUT_BUFFERS_CHANGED -3
 #define INFO_OUTPUT_FORMAT_CHANGED  -2
@@ -617,23 +618,25 @@ static void CloseDecoder(vlc_object_t *p_this)
 /*****************************************************************************
  * vout callbacks
  *****************************************************************************/
-static void DisplayBuffer(picture_sys_t* p_picsys, bool b_render)
+static void UnlockPicture(picture_t* p_pic)
 {
-    decoder_t *p_dec = p_picsys->p_dec;
+    picture_sys_t *p_picsys = p_pic->p_sys;
+    decoder_t *p_dec = p_picsys->priv.hw.p_dec;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (!p_picsys->b_valid)
+    if (!p_picsys->priv.hw.b_valid)
         return;
 
     vlc_mutex_lock(get_android_opaque_mutex());
 
     /* Picture might have been invalidated while waiting on the mutex. */
-    if (!p_picsys->b_valid) {
+    if (!p_picsys->priv.hw.b_valid) {
         vlc_mutex_unlock(get_android_opaque_mutex());
         return;
     }
 
-    uint32_t i_index = p_picsys->i_index;
+    uint32_t i_index = p_picsys->priv.hw.i_index;
+    bool b_render = p_picsys->b_render;
     p_sys->inflight_picture[i_index] = NULL;
 
     /* Release the MediaCodec buffer. */
@@ -646,19 +649,9 @@ static void DisplayBuffer(picture_sys_t* p_picsys, bool b_render)
     }
 
     jni_detach_thread();
-    p_picsys->b_valid = false;
+    p_picsys->priv.hw.b_valid = false;
 
     vlc_mutex_unlock(get_android_opaque_mutex());
-}
-
-static void UnlockCallback(picture_sys_t* p_picsys)
-{
-    DisplayBuffer(p_picsys, false);
-}
-
-static void DisplayCallback(picture_sys_t* p_picsys)
-{
-    DisplayBuffer(p_picsys, true);
 }
 
 static void InvalidateAllPictures(decoder_t *p_dec)
@@ -669,7 +662,7 @@ static void InvalidateAllPictures(decoder_t *p_dec)
     for (int i = 0; i < p_sys->i_output_buffers; ++i) {
         picture_t *p_pic = p_sys->inflight_picture[i];
         if (p_pic) {
-            p_pic->p_sys->b_valid = false;
+            p_pic->p_sys->priv.hw.b_valid = false;
             p_sys->inflight_picture[i] = NULL;
         }
     }
@@ -707,7 +700,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             } else if (p_sys->direct_rendering) {
                 picture_t *p_pic = *pp_pic;
                 picture_sys_t *p_picsys = p_pic->p_sys;
-                int i_prev_index = p_picsys->i_index;
+                int i_prev_index = p_picsys->priv.hw.i_index;
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, i_prev_index, false);
                 if ((*env)->ExceptionOccurred(env)) {
                     msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer " \
@@ -738,11 +731,11 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
 
                 if (p_sys->direct_rendering) {
                     picture_sys_t *p_picsys = p_pic->p_sys;
-                    p_picsys->pf_display_callback = DisplayCallback;
-                    p_picsys->pf_unlock_callback = UnlockCallback;
-                    p_picsys->p_dec = p_dec;
-                    p_picsys->i_index = index;
-                    p_picsys->b_valid = true;
+                    p_picsys->pf_lock_pic = NULL;
+                    p_picsys->pf_unlock_pic = UnlockPicture;
+                    p_picsys->priv.hw.p_dec = p_dec;
+                    p_picsys->priv.hw.i_index = index;
+                    p_picsys->priv.hw.b_valid = true;
 
                     p_sys->inflight_picture[index] = p_pic;
                 } else {
@@ -974,11 +967,11 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                 if (invalid_picture) {
                     invalid_picture->date = VLC_TS_INVALID;
                     picture_sys_t *p_picsys = invalid_picture->p_sys;
-                    p_picsys->pf_display_callback = NULL;
-                    p_picsys->pf_unlock_callback = NULL;
-                    p_picsys->p_dec = NULL;
-                    p_picsys->i_index = -1;
-                    p_picsys->b_valid = false;
+                    p_picsys->pf_lock_pic = NULL;
+                    p_picsys->pf_unlock_pic = NULL;
+                    p_picsys->priv.hw.p_dec = NULL;
+                    p_picsys->priv.hw.i_index = -1;
+                    p_picsys->priv.hw.b_valid = false;
                 }
                 else {
                     /* If we cannot return a picture we must free the

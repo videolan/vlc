@@ -3364,7 +3364,7 @@ AC_ARG_ENABLE(android-surface,
   [  --enable-android-surface   Android Surface video output module (default disabled)])
 if test "${enable_android_surface}" = "yes"; then
      VLC_ADD_PLUGIN([android_surface])
-     VLC_ADD_PLUGIN([android_opaque])
+     VLC_ADD_PLUGIN([android_window])
 fi
 
 dnl

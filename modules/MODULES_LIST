@@ -33,8 +33,8 @@ $Id$
  * anaglyph: anaglyph 3d video filter
  * android_audiotrack: audio output for Android, based on AudioTrack
  * android_native_window: Android native window provider module
- * android_opaque: Android direct GPU rendering video output
  * android_surface: video output for Android, based on Surface
+ * android_window: Android direct/undirect rendering video output
  * antiflicker: anti-flicker video filter
  * araw: Pseudo audio decoder for raw PCM
  * aribcam: ARIB STD-B25 decoder/virtual CAM

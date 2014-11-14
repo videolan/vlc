@@ -46,6 +46,7 @@
 #include <dlfcn.h>
 #include <jni.h>
 #include "android_opaque.h"
+#include "../../video_output/android/android_window.h"
 #endif
 
 #ifndef NDEBUG
@@ -96,8 +97,7 @@ static OMX_ERRORTYPE OmxFillBufferDone( OMX_HANDLETYPE, OMX_PTR,
 
 #if defined(USE_IOMX)
 static void *DequeueThread( void *data );
-static void DisplayCallback( picture_sys_t* p_picsys );
-static void UnlockCallback( picture_sys_t* p_picsys );
+static void UnlockPicture( picture_t* p_pic );
 static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port );
 static void HwBuffer_Destroy( decoder_t *p_dec, OmxPort *p_port );
 static int  HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port );
@@ -1635,11 +1635,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if (invalid_picture) {
                 invalid_picture->date = VLC_TS_INVALID;
                 picture_sys_t *p_picsys = invalid_picture->p_sys;
-                p_picsys->pf_display_callback = NULL;
-                p_picsys->pf_unlock_callback = NULL;
-                p_picsys->p_dec = NULL;
-                p_picsys->i_index = -1;
-                p_picsys->b_valid = false;
+                p_picsys->pf_lock_pic = NULL;
+                p_picsys->pf_unlock_pic = NULL;
+                p_picsys->priv.hw.p_dec = NULL;
+                p_picsys->priv.hw.i_index = -1;
+                p_picsys->priv.hw.b_valid = false;
             } else {
                 /* If we cannot return a picture we must free the
                    block since the decoder will proceed with the
@@ -2418,14 +2418,14 @@ static int HwBuffer_Stop( decoder_t *p_dec, OmxPort *p_port )
             if( p_pic ) {
                 picture_sys_t *p_picsys = p_pic->p_sys;
                 if( p_picsys ) {
-                    void *p_handle = p_port->pp_buffers[p_picsys->i_index]->pBuffer;
+                    void *p_handle = p_port->pp_buffers[p_picsys->priv.hw.i_index]->pBuffer;
                     if( p_handle )
                     {
                         p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );
-                        HwBuffer_ChangeState( p_dec, p_port, p_picsys->i_index,
+                        HwBuffer_ChangeState( p_dec, p_port, p_picsys->priv.hw.i_index,
                                               BUF_STATE_NOT_OWNED );
                     }
-                    p_picsys->b_valid = false;
+                    p_picsys->priv.hw.b_valid = false;
                 }
                 p_port->p_hwbuf->inflight_picture[i] = NULL;
             }
@@ -2493,11 +2493,11 @@ static int HwBuffer_GetPic( decoder_t *p_dec, OmxPort *p_port,
     p_pic->date = FromOmxTicks( p_header->nTimeStamp );
 
     p_picsys = p_pic->p_sys;
-    p_picsys->pf_display_callback = DisplayCallback;
-    p_picsys->pf_unlock_callback = UnlockCallback;
-    p_picsys->p_dec = p_dec;
-    p_picsys->i_index = i_index;
-    p_picsys->b_valid = true;
+    p_picsys->pf_lock_pic = NULL;
+    p_picsys->pf_unlock_pic = UnlockPicture;
+    p_picsys->priv.hw.p_dec = p_dec;
+    p_picsys->priv.hw.i_index = i_index;
+    p_picsys->priv.hw.b_valid = true;
 
     HWBUFFER_LOCK();
     p_port->p_hwbuf->inflight_picture[i_index] = p_pic;
@@ -2600,27 +2600,28 @@ static void *DequeueThread( void *data )
 /*****************************************************************************
  * vout callbacks
  *****************************************************************************/
-static void DisplayBuffer( picture_sys_t* p_picsys, bool b_render )
+static void UnlockPicture( picture_t* p_pic )
 {
-    decoder_t *p_dec = p_picsys->p_dec;
+    picture_sys_t *p_picsys = p_pic->p_sys;
+    decoder_t *p_dec = p_picsys->priv.hw.p_dec;
     decoder_sys_t *p_sys = p_dec->p_sys;
     OmxPort *p_port = &p_sys->out;
     void *p_handle;
 
-    if( !p_picsys->b_valid ) return;
+    if( !p_picsys->priv.hw.b_valid ) return;
 
     HWBUFFER_LOCK();
 
     /* Picture might have been invalidated while waiting on the mutex. */
-    if (!p_picsys->b_valid) {
+    if (!p_picsys->priv.hw.b_valid) {
         HWBUFFER_UNLOCK();
         return;
     }
 
-    p_handle = p_port->pp_buffers[p_picsys->i_index]->pBuffer;
+    p_handle = p_port->pp_buffers[p_picsys->priv.hw.i_index]->pBuffer;
 
     OMX_DBG( "DisplayBuffer: %s %p",
-             b_render ? "render" : "cancel", p_handle );
+             p_picsys->b_render ? "render" : "cancel", p_handle );
 
     if( !p_handle )
     {
@@ -2628,31 +2629,21 @@ static void DisplayBuffer( picture_sys_t* p_picsys, bool b_render )
         goto end;
     }
 
-    if( b_render )
+    if( p_picsys->b_render )
         p_port->p_hwbuf->anwpriv.queue( p_port->p_hwbuf->window_priv, p_handle );
     else
         p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );
 
-    HwBuffer_ChangeState( p_dec, p_port, p_picsys->i_index, BUF_STATE_NOT_OWNED );
+    HwBuffer_ChangeState( p_dec, p_port, p_picsys->priv.hw.i_index, BUF_STATE_NOT_OWNED );
     HWBUFFER_BROADCAST( p_port );
 
-    p_port->p_hwbuf->inflight_picture[p_picsys->i_index] = NULL;
+    p_port->p_hwbuf->inflight_picture[p_picsys->priv.hw.i_index] = NULL;
 
 end:
-    p_picsys->b_valid = false;
-    p_picsys->i_index = -1;
+    p_picsys->priv.hw.b_valid = false;
+    p_picsys->priv.hw.i_index = -1;
 
     HWBUFFER_UNLOCK();
-}
-
-static void UnlockCallback( picture_sys_t* p_picsys )
-{
-    DisplayBuffer( p_picsys, false );
-}
-
-static void DisplayCallback( picture_sys_t* p_picsys )
-{
-    DisplayBuffer( p_picsys, true );
 }
 
 #endif // USE_IOMX
