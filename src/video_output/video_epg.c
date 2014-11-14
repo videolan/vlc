@@ -282,6 +282,7 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
     }
 
     vlc_mutex_unlock(&input->lock);
+    free(now_playing);
 
     /* If no EPG event has been found. */
     if (epg == NULL)
