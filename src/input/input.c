@@ -1657,8 +1657,6 @@ static bool Control( input_thread_t *p_input,
             }
 
             float f_pos = val.f_float;
-            if( i_type != INPUT_CONTROL_SET_POSITION )
-                f_pos += var_GetFloat( p_input, "position" );
             if( f_pos < 0.f )
                 f_pos = 0.f;
             else if( f_pos > 1.f )
@@ -1694,9 +1692,6 @@ static bool Control( input_thread_t *p_input,
             }
 
             i_time = val.i_time;
-            if( i_type != INPUT_CONTROL_SET_TIME )
-                i_time += var_GetTime( p_input, "time" );
-
             if( i_time < 0 )
                 i_time = 0;
 
