@@ -26,6 +26,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #if ANDROID_API <= 13
 #include <ui/android_native_buffer.h>
@@ -44,6 +45,12 @@ typedef int32_t status_t;
 #if ANDROID_API <= 13
 typedef android_native_buffer_t ANativeWindowBuffer_t;
 #endif
+typedef struct native_window_priv native_window_priv;
+
+struct native_window_priv
+{
+    ANativeWindow *anw;
+};
 
 #define LOG_TAG "VLC/ANW"
 
@@ -57,14 +64,6 @@ typedef android_native_buffer_t ANativeWindowBuffer_t;
     }\
 } while (0)
 
-#define CHECK_ANW() do {\
-    if( anw->common.magic != ANDROID_NATIVE_WINDOW_MAGIC &&\
-            anw->common.version != sizeof(ANativeWindow) ) {\
-        LOGE( "error, window not valid\n"  );\
-        return -EINVAL;\
-    }\
-} while (0)
-
 #define CHECK_ANB() do {\
     if( anb->common.magic != ANDROID_NATIVE_BUFFER_MAGIC &&\
             anb->common.version != sizeof(ANativeWindowBuffer_t) ) {\
@@ -73,130 +72,129 @@ typedef android_native_buffer_t ANativeWindowBuffer_t;
     }\
 } while (0)
 
-int ANativeWindowPriv_connect( void *window )
+native_window_priv *ANativeWindowPriv_connect( void *window )
 {
+    native_window_priv *priv;
     ANativeWindow *anw = (ANativeWindow *)window;
-    CHECK_ANW();
+
+    if( anw->common.magic != ANDROID_NATIVE_WINDOW_MAGIC &&
+            anw->common.version != sizeof(ANativeWindow) ) {
+        LOGE( "error, window not valid\n"  );
+        return NULL;
+    }
 
 #if ANDROID_API >= 14
     if (native_window_api_connect( anw, NATIVE_WINDOW_API_MEDIA ) != 0) {
         LOGE( "native_window_api_connect FAIL"  );
-        return -EINVAL;
+        return NULL;
     }
 #endif
 
-    return 0;
-}
+    priv = calloc( 1, sizeof(native_window_priv) );
 
-int ANativeWindowPriv_disconnect( void *window )
-{
-    ANativeWindow *anw = (ANativeWindow *)window;
-
-    CHECK_ANW();
-
+    if( !priv ) {
 #if ANDROID_API >= 14
-    native_window_api_disconnect( anw, NATIVE_WINDOW_API_MEDIA );
+        native_window_api_disconnect( anw, NATIVE_WINDOW_API_MEDIA );
 #endif
+        return NULL;
+    }
+    priv->anw = anw;
+
+    return priv;
+}
+
+int ANativeWindowPriv_disconnect( native_window_priv *priv )
+{
+#if ANDROID_API >= 14
+    native_window_api_disconnect( priv->anw, NATIVE_WINDOW_API_MEDIA );
+#endif
+    free(priv);
 
     return 0;
 }
 
-int ANativeWindowPriv_setup( void *window, int w, int h, int hal_format, int hw_usage )
+int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_format, int hw_usage )
 {
-    ANativeWindow *anw = (ANativeWindow *)window;
     int usage = 0;
     status_t err;
 
-    CHECK_ANW();
-
     LOGD( "setup: %p, %d, %d, %X, %X\n",
-          anw, w, h, hal_format, hw_usage );
+          priv->anw, w, h, hal_format, hw_usage );
 
     usage |= hw_usage | GRALLOC_USAGE_HW_RENDER | GRALLOC_USAGE_HW_TEXTURE;
 #if ANDROID_API >= 11
     usage |= GRALLOC_USAGE_EXTERNAL_DISP;
 #endif
 
-    err = native_window_set_usage( anw, usage );
+    err = native_window_set_usage( priv->anw, usage );
     CHECK_ERR();
 
 #if ANDROID_API <= 13
-    err = native_window_set_buffers_geometry( anw, w, h, hal_format );
+    err = native_window_set_buffers_geometry( priv->anw, w, h, hal_format );
     CHECK_ERR();
 #else
-    err = native_window_set_scaling_mode( anw, NATIVE_WINDOW_SCALING_MODE_SCALE_TO_WINDOW );
+    err = native_window_set_scaling_mode( priv->anw, NATIVE_WINDOW_SCALING_MODE_SCALE_TO_WINDOW );
     CHECK_ERR();
 
-    err = native_window_set_buffers_dimensions( anw, w, h );
+    err = native_window_set_buffers_dimensions( priv->anw, w, h );
     CHECK_ERR();
 
-    err = native_window_set_buffers_format( anw, hal_format );
+    err = native_window_set_buffers_format( priv->anw, hal_format );
     CHECK_ERR();
 #endif
 
     return 0;
 }
 
-int ANativeWindowPriv_getMinUndequeued( void *window, unsigned int *min_undequeued )
+int ANativeWindowPriv_getMinUndequeued( native_window_priv *priv, unsigned int *min_undequeued )
 {
-    ANativeWindow *anw = (ANativeWindow *)window;
     status_t err;
 
-    CHECK_ANW();
 #if ANDROID_API >= 11
-    err = anw->query( anw, NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS, min_undequeued );
+    err = priv->anw->query( priv->anw, NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS, min_undequeued );
     CHECK_ERR();
 #endif
     /* set a minimum value of min_undequeued in case query fails */
     if( *min_undequeued == 0 )
         *min_undequeued = 2;
 
-    LOGD( "getMinUndequeued: %p %u", anw, *min_undequeued );
+    LOGD( "getMinUndequeued: %p %u", priv->anw, *min_undequeued );
 
     return 0;
 }
 
-int ANativeWindowPriv_setBufferCount(void *window, unsigned int count )
+int ANativeWindowPriv_setBufferCount(native_window_priv *priv, unsigned int count )
 {
-    ANativeWindow *anw = (ANativeWindow *)window;
     status_t err;
 
-    CHECK_ANW();
+    LOGD( "setBufferCount: %p %u", priv->anw, count );
 
-    LOGD( "setBufferCount: %p %u", anw, count );
-
-    err = native_window_set_buffer_count( anw, count );
+    err = native_window_set_buffer_count( priv->anw, count );
     CHECK_ERR();
 
     return 0;
 }
 
-int ANativeWindowPriv_setCrop( void *window, int ofs_x, int ofs_y, int w, int h )
+int ANativeWindowPriv_setCrop( native_window_priv *priv, int ofs_x, int ofs_y, int w, int h )
 {
-    ANativeWindow *anw = (ANativeWindow *)window;
     android_native_rect_t crop;
-
-    CHECK_ANW();
 
     crop.left = ofs_x;
     crop.top = ofs_y;
     crop.right = ofs_x + w;
     crop.bottom = ofs_y + h;
-    return native_window_set_crop( anw, &crop );
+    return native_window_set_crop( priv->anw, &crop );
 }
 
-int ANativeWindowPriv_dequeue( void *window, void **pp_handle )
+int ANativeWindowPriv_dequeue( native_window_priv *priv, void **pp_handle )
 {
-    ANativeWindow *anw = (ANativeWindow *)window;
     ANativeWindowBuffer_t *anb;
     status_t err = NO_ERROR;
 
-    CHECK_ANW();
-
 #if ANDROID_API >= 18
-    err = anw->dequeueBuffer_DEPRECATED( anw, &anb );
+    err = priv->anw->dequeueBuffer_DEPRECATED( priv->anw, &anb );
 #else
-    err = anw->dequeueBuffer( anw, &anb );
+    err = priv->anw->dequeueBuffer( priv->anw, &anb );
 #endif
     CHECK_ERR();
 
@@ -205,70 +203,61 @@ int ANativeWindowPriv_dequeue( void *window, void **pp_handle )
     return 0;
 }
 
-int ANativeWindowPriv_lock( void *window, void *p_handle )
+int ANativeWindowPriv_lock( native_window_priv *priv, void *p_handle )
 {
-    ANativeWindow *anw = (ANativeWindow *)window;
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
 
-    CHECK_ANW();
     CHECK_ANB();
 
 #if ANDROID_API >= 18
-    err = anw->lockBuffer_DEPRECATED( anw, anb );
+    err = priv->anw->lockBuffer_DEPRECATED( priv->anw, anb );
 #else
-    err = anw->lockBuffer( anw, anb );
+    err = priv->anw->lockBuffer( priv->anw, anb );
 #endif
     CHECK_ERR();
 
     return 0;
 }
 
-int ANativeWindowPriv_queue( void *window, void *p_handle )
+int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
 {
-    ANativeWindow *anw = (ANativeWindow *)window;
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
 
-    CHECK_ANW();
     CHECK_ANB();
 
 #if ANDROID_API >= 18
-    err = anw->queueBuffer_DEPRECATED( anw, anb );
+    err = priv->anw->queueBuffer_DEPRECATED( priv->anw, anb );
 #else
-    err = anw->queueBuffer( anw, anb );
+    err = priv->anw->queueBuffer( priv->anw, anb );
 #endif
     CHECK_ERR();
 
     return 0;
 }
 
-int ANativeWindowPriv_cancel( void *window, void *p_handle )
+int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
 {
-    ANativeWindow *anw = (ANativeWindow *)window;
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
 
-    CHECK_ANW();
     CHECK_ANB();
 
 #if ANDROID_API >= 18
-    err = anw->cancelBuffer_DEPRECATED( anw, anb );
+    err = priv->anw->cancelBuffer_DEPRECATED( priv->anw, anb );
 #else
-    err = anw->cancelBuffer( anw, anb );
+    err = priv->anw->cancelBuffer( priv->anw, anb );
 #endif
     CHECK_ERR();
 
     return 0;
 }
 
-int ANativeWindowPriv_setOrientation( void *window, int orientation )
+int ANativeWindowPriv_setOrientation( native_window_priv *priv, int orientation )
 {
-    ANativeWindow *anw = (ANativeWindow *)window;
     status_t err = NO_ERROR;
     int transform;
-
-    CHECK_ANW();
 
     switch( orientation )
     {
@@ -285,7 +274,7 @@ int ANativeWindowPriv_setOrientation( void *window, int orientation )
             transform = 0;
     }
 
-    err = native_window_set_buffers_transform( anw, transform );
+    err = native_window_set_buffers_transform( priv->anw, transform );
     CHECK_ERR();
 
     return 0;

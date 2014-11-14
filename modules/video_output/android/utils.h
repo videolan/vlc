@@ -51,17 +51,18 @@ typedef struct
 void *LoadNativeWindowAPI(native_window_api_t *native);
 void Manage(vout_display_t *);
 
-typedef int (*ptr_ANativeWindowPriv_connect) (void *);
-typedef int (*ptr_ANativeWindowPriv_disconnect) (void *);
-typedef int (*ptr_ANativeWindowPriv_setup) (void *, int, int, int, int );
-typedef int (*ptr_ANativeWindowPriv_getMinUndequeued) (void *, unsigned int *);
-typedef int (*ptr_ANativeWindowPriv_setBufferCount) (void *, unsigned int );
-typedef int (*ptr_ANativeWindowPriv_setCrop) (void *, int, int, int, int);
-typedef int (*ptr_ANativeWindowPriv_dequeue) (void *, void **);
-typedef int (*ptr_ANativeWindowPriv_lock) (void *, void *);
-typedef int (*ptr_ANativeWindowPriv_queue) (void *, void *);
-typedef int (*ptr_ANativeWindowPriv_cancel) (void *, void *);
-typedef int (*ptr_ANativeWindowPriv_setOrientation) (void *, int);
+typedef struct native_window_priv native_window_priv;
+typedef native_window_priv *(*ptr_ANativeWindowPriv_connect) (void *);
+typedef int (*ptr_ANativeWindowPriv_disconnect) (native_window_priv *);
+typedef int (*ptr_ANativeWindowPriv_setup) (native_window_priv *, int, int, int, int );
+typedef int (*ptr_ANativeWindowPriv_getMinUndequeued) (native_window_priv *, unsigned int *);
+typedef int (*ptr_ANativeWindowPriv_setBufferCount) (native_window_priv *, unsigned int );
+typedef int (*ptr_ANativeWindowPriv_setCrop) (native_window_priv *, int, int, int, int);
+typedef int (*ptr_ANativeWindowPriv_dequeue) (native_window_priv *, void **);
+typedef int (*ptr_ANativeWindowPriv_lock) (native_window_priv *, void *);
+typedef int (*ptr_ANativeWindowPriv_queue) (native_window_priv *, void *);
+typedef int (*ptr_ANativeWindowPriv_cancel) (native_window_priv *, void *);
+typedef int (*ptr_ANativeWindowPriv_setOrientation) (native_window_priv *, int);
 
 typedef struct
 {
