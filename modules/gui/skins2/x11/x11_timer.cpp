@@ -49,7 +49,7 @@ X11Timer::~X11Timer()
 
 void X11Timer::start( int delay, bool oneShot )
 {
-    m_interval = 1000 * delay;
+    m_interval = 1000LL * (mtime_t)delay;
     m_oneShot = oneShot;
     m_nextDate = mdate() + m_interval;
     m_pTimerLoop->addTimer( *this );
