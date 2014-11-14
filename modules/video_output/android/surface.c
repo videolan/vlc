@@ -76,8 +76,9 @@ vlc_module_end()
 #define THREAD_NAME "AndroidSurface"
 extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
 extern void jni_detach_thread();
-extern void *jni_LockAndGetAndroidSurface();
+extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void  jni_UnlockAndroidSurface();
+extern void *jni_AndroidJavaSurfaceToNativeSurface(jobject *surf);
 extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 
 // _ZN7android7Surface4lockEPNS0_11SurfaceInfoEb
@@ -115,6 +116,7 @@ struct vout_display_sys_t {
     Surface_unlockAndPost s_unlockAndPost;
 
     jobject jsurf;
+    void *native_surface;
 
     /* density */
     int i_sar_num;
@@ -337,21 +339,27 @@ static int  AndroidLockSurface(picture_t *picture)
     vout_display_sys_t *sys = picsys->sys;
     SurfaceInfo *info = &picsys->info;
     uint32_t sw, sh;
-    void *surf;
+
+    if (!sys->native_surface) {
+        picsys->surf = jni_LockAndGetAndroidJavaSurface();
+        if (unlikely(!picsys->surf)) {
+            jni_UnlockAndroidSurface();
+            return VLC_EGENERIC;
+        }
+        sys->native_surface = jni_AndroidJavaSurfaceToNativeSurface(picsys->surf);
+        jni_UnlockAndroidSurface();
+
+        if (!sys->native_surface)
+            return VLC_EGENERIC;
+    }
 
     sw = sys->fmt.i_width;
     sh = sys->fmt.i_height;
 
-    picsys->surf = surf = jni_LockAndGetAndroidSurface();
-    if (unlikely(!surf)) {
-        jni_UnlockAndroidSurface();
-        return VLC_EGENERIC;
-    }
-
     if (sys->s_lock)
-        sys->s_lock(surf, info, 1);
+        sys->s_lock(sys->native_surface, info, 1);
     else
-        sys->s_lock2(surf, info, NULL);
+        sys->s_lock2(sys->native_surface, info, NULL);
 
     // For RGB (32 or 16) we need to align on 8 or 4 pixels, 16 pixels for YUV
     int align_pixels = (16 / picture->p[0].i_pixel_pitch) - 1;
@@ -363,7 +371,7 @@ static int  AndroidLockSurface(picture_t *picture)
         // When using ANativeWindow, one should use ANativeWindow_setBuffersGeometry
         // to set the size and format. In our case, these are set via the SurfaceHolder
         // in Java, so we seem to manage without calling this ANativeWindow function.
-        sys->s_unlockAndPost(surf);
+        sys->s_unlockAndPost(sys->native_surface);
         jni_UnlockAndroidSurface();
         sys->b_changed_crop = false;
         return VLC_EGENERIC;
@@ -384,9 +392,8 @@ static void AndroidUnlockSurface(picture_t *picture)
     picture_sys_t *picsys = picture->p_sys;
     vout_display_sys_t *sys = picsys->sys;
 
-    if (likely(picsys->surf))
-        sys->s_unlockAndPost(picsys->surf);
-    jni_UnlockAndroidSurface();
+    if (sys->native_surface)
+        sys->s_unlockAndPost(sys->native_surface);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
