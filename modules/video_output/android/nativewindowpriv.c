@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include <android/native_window.h>
+
 #if ANDROID_API <= 13
 #include <ui/android_native_buffer.h>
 #include <ui/egl/android_natives.h>
@@ -51,6 +53,8 @@ typedef struct native_window_priv native_window_priv;
 struct native_window_priv
 {
     ANativeWindow *anw;
+    gralloc_module_t const* gralloc;
+    int usage;
 };
 
 #define LOG_TAG "VLC/ANW"
@@ -76,6 +80,7 @@ struct native_window_priv
 native_window_priv *ANativeWindowPriv_connect( void *window )
 {
     native_window_priv *priv;
+    hw_module_t const* module;
     ANativeWindow *anw = (ANativeWindow *)window;
 
     if( anw->common.magic != ANDROID_NATIVE_WINDOW_MAGIC &&
@@ -83,6 +88,10 @@ native_window_priv *ANativeWindowPriv_connect( void *window )
         LOGE( "error, window not valid\n"  );
         return NULL;
     }
+
+    if ( hw_get_module( GRALLOC_HARDWARE_MODULE_ID,
+                        &module ) != 0 )
+        return NULL;
 
 #if ANDROID_API >= 14
     if (native_window_api_connect( anw, NATIVE_WINDOW_API_MEDIA ) != 0) {
@@ -100,6 +109,7 @@ native_window_priv *ANativeWindowPriv_connect( void *window )
         return NULL;
     }
     priv->anw = anw;
+    priv->gralloc = (gralloc_module_t const *) module;
 
     return priv;
 }
@@ -116,21 +126,20 @@ int ANativeWindowPriv_disconnect( native_window_priv *priv )
 
 int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_format, bool is_hw, int hw_usage )
 {
-    int usage = 0;
     status_t err;
 
     LOGD( "setup: %p, %d, %d, %X, %X\n",
           priv->anw, w, h, hal_format, hw_usage );
 
     if (is_hw)
-        usage = hw_usage | GRALLOC_USAGE_HW_RENDER | GRALLOC_USAGE_HW_TEXTURE;
+        priv->usage = hw_usage | GRALLOC_USAGE_HW_RENDER | GRALLOC_USAGE_HW_TEXTURE;
     else
-        usage= GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_OFTEN;
+        priv->usage= GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_OFTEN;
 #if ANDROID_API >= 11
-    usage |= GRALLOC_USAGE_EXTERNAL_DISP;
+    priv->usage |= GRALLOC_USAGE_EXTERNAL_DISP;
 #endif
 
-    err = native_window_set_usage( priv->anw, usage );
+    err = native_window_set_usage( priv->anw, priv->usage );
     CHECK_ERR();
 
 #if ANDROID_API <= 13
@@ -219,6 +228,42 @@ int ANativeWindowPriv_lock( native_window_priv *priv, void *p_handle )
 #else
     err = priv->anw->lockBuffer( priv->anw, anb );
 #endif
+    CHECK_ERR();
+
+    return 0;
+}
+
+int ANativeWindowPriv_lockData( native_window_priv *priv, void *p_handle,
+                                ANativeWindow_Buffer *p_out_anb )
+{
+    ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
+    status_t err = NO_ERROR;
+    void *p_data;
+
+    CHECK_ANB();
+
+    err = priv->gralloc->lock( priv->gralloc, anb->handle, priv->usage,
+                               0, 0, anb->width, anb->height, &p_data );
+    CHECK_ERR();
+    if( p_out_anb ) {
+        p_out_anb->bits = p_data;
+        p_out_anb->width = anb->width;
+        p_out_anb->height = anb->height;
+        p_out_anb->stride = anb->stride;
+        p_out_anb->format = anb->format;
+    }
+
+    return 0;
+}
+
+int ANativeWindowPriv_unlockData( native_window_priv *priv, void *p_handle )
+{
+    ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
+    status_t err = NO_ERROR;
+
+    CHECK_ANB();
+
+    err = priv->gralloc->unlock(priv->gralloc, anb->handle);
     CHECK_ERR();
 
     return 0;

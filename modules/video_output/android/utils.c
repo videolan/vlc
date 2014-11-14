@@ -63,14 +63,16 @@ int LoadNativeWindowPrivAPI(native_window_priv_api_t *native)
     native->setCrop = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setCrop");
     native->dequeue = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_dequeue");
     native->lock = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_lock");
+    native->lockData = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_lockData");
+    native->unlockData = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_unlockData");
     native->queue = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_queue");
     native->cancel = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_cancel");
     native->setOrientation = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setOrientation");
 
     return native->connect && native->disconnect && native->setup &&
         native->getMinUndequeued && native->setBufferCount && native->setCrop &&
-        native->dequeue && native->lock && native->queue && native->cancel &&
-        native->setOrientation ? 0 : -1;
+        native->dequeue && native->lock && native->lockData && native->unlockData &&
+        native->queue && native->cancel && native->setOrientation ? 0 : -1;
 }
 
 extern void jni_getMouseCoordinates(int *, int *, int *, int *);
