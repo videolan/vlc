@@ -161,7 +161,10 @@ static int Open( vlc_object_t *p_this )
     /* Fill p_demux field */
     p_demux->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
+    {
+        free( psz_base );
         return VLC_EGENERIC;
+    }
     p_sys->psz_base = psz_base;
     p_sys->b_shortname = b_shortname;
     TAB_INIT( p_sys->i_mpls, p_sys->pp_mpls );
