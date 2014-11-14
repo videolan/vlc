@@ -77,6 +77,24 @@ struct native_window_priv
     }\
 } while (0)
 
+static int window_connect( ANativeWindow *anw )
+{
+#if ANDROID_API >= 14
+    return native_window_api_connect( anw, NATIVE_WINDOW_API_MEDIA );
+#else
+    return native_window_connect( anw, NATIVE_WINDOW_API_EGL );
+#endif
+}
+
+static int window_disconnect( ANativeWindow *anw )
+{
+#if ANDROID_API >= 14
+    return native_window_api_disconnect( anw, NATIVE_WINDOW_API_MEDIA );
+#else
+    return native_window_disconnect( anw, NATIVE_WINDOW_API_EGL );
+#endif
+}
+
 native_window_priv *ANativeWindowPriv_connect( void *window )
 {
     native_window_priv *priv;
@@ -93,19 +111,15 @@ native_window_priv *ANativeWindowPriv_connect( void *window )
                         &module ) != 0 )
         return NULL;
 
-#if ANDROID_API >= 14
-    if (native_window_api_connect( anw, NATIVE_WINDOW_API_MEDIA ) != 0) {
+    if( window_connect( anw ) != 0 ) {
         LOGE( "native_window_api_connect FAIL"  );
         return NULL;
     }
-#endif
 
     priv = calloc( 1, sizeof(native_window_priv) );
 
     if( !priv ) {
-#if ANDROID_API >= 14
-        native_window_api_disconnect( anw, NATIVE_WINDOW_API_MEDIA );
-#endif
+        window_disconnect( anw );
         return NULL;
     }
     priv->anw = anw;
@@ -116,9 +130,7 @@ native_window_priv *ANativeWindowPriv_connect( void *window )
 
 int ANativeWindowPriv_disconnect( native_window_priv *priv )
 {
-#if ANDROID_API >= 14
-    native_window_api_disconnect( priv->anw, NATIVE_WINDOW_API_MEDIA );
-#endif
+    window_disconnect( priv->anw );
     free(priv);
 
     return 0;
