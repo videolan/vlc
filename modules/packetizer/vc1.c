@@ -168,7 +168,7 @@ static int Open( vlc_object_t *p_this )
         /* With (some) ASF the first byte has to be stripped */
         if( p_extra[0] != 0x00 )
         {
-            memcpy( &p_extra[0], &p_extra[1], p_dec->fmt_out.i_extra - 1 );
+            memmove( &p_extra[0], &p_extra[1], p_dec->fmt_out.i_extra - 1 );
             p_dec->fmt_out.i_extra--;
         }
 
