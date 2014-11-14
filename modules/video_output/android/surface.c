@@ -233,7 +233,7 @@ static int Open(vlc_object_t *p_this)
     sys->fmt = fmt;
 
     /* Create the associated picture */
-    picture_sys_t *picsys = malloc(sizeof(*picsys));
+    picture_sys_t *picsys = calloc(1, sizeof(picture_sys_t));
     if (unlikely(picsys == NULL))
         goto error;
     picsys->sys = sys;
