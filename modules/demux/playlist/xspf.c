@@ -752,6 +752,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
         }
     }
     if (b_release_input_item) vlc_gc_decref(p_new_input);
+    free(psz_value);
     return false;
 }
 
