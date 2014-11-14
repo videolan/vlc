@@ -43,7 +43,6 @@
 #include "http/HTTPConnectionManager.h"
 #include "adaptationlogic/IAdaptationLogic.h"
 #include "mpd/MPDFactory.h"
-#include "Logger.h"
 
 #define SEEK 0
 
@@ -95,7 +94,6 @@ static int  Control         (stream_t *p_stream, int i_query, va_list args);
 static int Open(vlc_object_t *p_obj)
 {
     stream_t *p_stream = (stream_t*) p_obj;
-    dash::Logger::setObject(p_obj);
 
     if(!dash::xml::DOMParser::isDash(p_stream->p_source))
         return VLC_EGENERIC;

@@ -30,7 +30,6 @@
 #include "mpd/SegmentInfoDefault.h"
 #include "mpd/SegmentTemplate.h"
 #include "mpd/SegmentTimeline.h"
-#include "Logger.h"
 
 #include <cstdlib>
 #include <sstream>
@@ -84,7 +83,7 @@ bool    BasicCMParser::setMPD()
     it = attr.find( "availabilityStartTime" );
     if ( it == attr.end() && this->mpd->isLive() == true )
     {
-        Logger::Error( "An @availabilityStartTime attribute must be specified when"
+        msg_Err( p_stream, "An @availabilityStartTime attribute must be specified when"
                      " the stream @type is Live" );
         return false;
     }
@@ -97,8 +96,8 @@ bool    BasicCMParser::setMPD()
         {
             if ( this->mpd->isLive() == true )
             {
-                Logger::Error("An @availabilityStartTime attribute must be specified when"
-                             " the stream @type is Live");
+                msg_Err( p_stream, "An @availabilityStartTime attribute must be specified when"
+                             " the stream @type is Live" );
                 return false;
             }
         }
@@ -179,7 +178,7 @@ void BasicCMParser::parseSegmentTimeline(Node *node, SegmentInfoCommon *segmentI
             sIt = sAttr.find( "t" );
             if ( sIt == sAttr.end() )
             {
-                Logger::Error("'t' attribute is mandatory for every SegmentTimeline/S element");
+                msg_Err( p_stream, "'t' attribute is mandatory for every SegmentTimeline/S element" );
                 delete s;
                 ++it;
                 continue ;
@@ -188,7 +187,7 @@ void BasicCMParser::parseSegmentTimeline(Node *node, SegmentInfoCommon *segmentI
             sIt = sAttr.find( "d" );
             if ( sIt == sAttr.end() )
             {
-                Logger::Error("'d' attribute is mandatory for every SegmentTimeline/S element");
+                msg_Err( p_stream, "'d' attribute is mandatory for every SegmentTimeline/S element" );
                 delete s;
                 ++it;
                 continue ;
@@ -275,7 +274,7 @@ void BasicCMParser::parseTrickMode(Node *node, Representation *repr)
     if ( trickModes.size() == 0 )
         return ;
     if ( trickModes.size() > 1 )
-        Logger::Error("More than 1 TrickMode element. Only the first one will be used.");
+        msg_Err( p_stream, "More than 1 TrickMode element. Only the first one will be used." );
 
     Node*                                       trickModeNode = trickModes[0];
     TrickModeType                               *trickMode = new TrickModeType;
@@ -307,14 +306,14 @@ void    BasicCMParser::setRepresentations   (Node *root, AdaptationSet *group)
 
         it = attributes.find( "id" );
         if ( it == attributes.end() )
-            Logger::Error("Missing mandatory attribute for Representation: @id");
+            msg_Err( p_stream, "Missing mandatory attribute for Representation: @id" );
         else
             rep->setId( it->second );
 
         it = attributes.find( "bandwidth" );
         if ( it == attributes.end() )
         {
-            Logger::Error("Missing mandatory attribute for Representation: @bandwidth");
+            msg_Err( p_stream, "Missing mandatory attribute for Representation: @bandwidth"  );
             delete rep;
             continue ;
         }
@@ -369,7 +368,7 @@ bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
         rep->setSegmentInfo( info );
         return true;
     }
-    Logger::Error("Missing mandatory element: Representation/SegmentInfo");
+    msg_Err( p_stream, "Missing mandatory element: Representation/SegmentInfo"  );
     return false;
 }
 
@@ -394,7 +393,7 @@ Segment*    BasicCMParser::parseSegment( Node* node )
         {
             if ( this->resolveUrlTemplates( url, runtimeToken ) == false )
             {
-                Logger::Error("Failed to substitute URLTemplate identifier.");
+                msg_Err( p_stream, "Failed to substitute URLTemplate identifier."  );
                 return NULL;
             }
             seg = new SegmentTemplate( runtimeToken, this->currentRepresentation );
@@ -436,8 +435,8 @@ void    BasicCMParser::setInitSegment       (Node *root, SegmentInfoCommon *info
     const std::vector<Node *> initSeg = DOMHelper::getChildElementByTagName(root, "InitialisationSegmentURL");
 
     if (  initSeg.size() > 1 )
-        Logger::Error("There could be at most one InitialisationSegmentURL per SegmentInfo"
-                     " other InitialisationSegmentURL will be dropped.");
+        msg_Err( p_stream, "There could be at most one InitialisationSegmentURL per SegmentInfo"
+                     " other InitialisationSegmentURL will be dropped."  );
     if ( initSeg.size() == 1 )
     {
         Segment     *seg = parseSegment( initSeg.at(0) );
@@ -475,7 +474,7 @@ bool    BasicCMParser::resolveUrlTemplates( std::string &url, bool &containRunti
         size_t  closing = url.find( '$', it + 1 );
         if ( closing == std::string::npos )
         {
-            Logger::Error(std::string("Unmatched '$' in url template: ").append(url));
+            msg_Err( p_stream, "Unmatched '$' in url template: %s", url.c_str() );
             return false;
         }
         std::string     token = std::string( url, it, closing - it + 1 );
@@ -488,8 +487,8 @@ bool    BasicCMParser::resolveUrlTemplates( std::string &url, bool &containRunti
         {
             if ( this->currentRepresentation->getId().empty() == false )
             {
-                Logger::Error("Representation doesn't have an ID. Can't substitute"
-                             " identifier $RepresentationID$");
+                msg_Err( p_stream, "Representation doesn't have an ID. Can't substitute"
+                             " identifier $RepresentationID$"  );
                 return false;
             }
             url.replace( it, token.length(), this->currentRepresentation->getId() );
@@ -511,7 +510,7 @@ bool    BasicCMParser::resolveUrlTemplates( std::string &url, bool &containRunti
             }
             else
             {
-                Logger::Error(std::string("Unhandled token ").append(token));
+                msg_Err( p_stream, "Unhandled token %s", token.c_str() );
                 return false;
             }
         }
@@ -564,7 +563,7 @@ bool    BasicCMParser::parseCommonAttributesElements( Node *node, CommonAttribut
             common->setMimeType( parent->getMimeType() );
         else if ( node->getName().find( "Representation" ) != std::string::npos )
         {
-            Logger::Error("Missing mandatory attribute: @mimeType");
+            msg_Err( p_stream, "Missing mandatory attribute: @mimeType"  );
             return false;
         }
     }
