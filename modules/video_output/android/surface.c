@@ -77,7 +77,6 @@ vlc_module_end()
 extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
 extern void jni_detach_thread();
 extern void *jni_LockAndGetAndroidSurface();
-extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void  jni_UnlockAndroidSurface();
 extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 
@@ -114,10 +113,8 @@ struct vout_display_sys_t {
     Surface_lock s_lock;
     Surface_lock2 s_lock2;
     Surface_unlockAndPost s_unlockAndPost;
-    native_window_api_t native_window;
 
     jobject jsurf;
-    ANativeWindow *window;
 
     /* density */
     int i_sar_num;
@@ -187,10 +184,7 @@ static int Open(vlc_object_t *p_this)
         goto error;
 
     /* */
-    sys->p_library = LoadNativeWindowAPI(&sys->native_window);
-    sys->s_unlockAndPost = (Surface_unlockAndPost)sys->native_window.unlockAndPost;
-    if (!sys->p_library)
-        sys->p_library = InitLibrary(sys);
+    sys->p_library = InitLibrary(sys);
     if (!sys->p_library) {
         msg_Err(vd, "Could not initialize libandroid.so/libui.so/libgui.so/libsurfaceflinger_client.so!");
         goto error;
@@ -289,8 +283,6 @@ static void Close(vlc_object_t *p_this)
     if (sys) {
         if (sys->pool)
             picture_pool_Release(sys->pool);
-        if (sys->window)
-            sys->native_window.winRelease(sys->window);
         if (sys->p_library)
             dlclose(sys->p_library);
         free(sys);
@@ -343,55 +335,20 @@ static int  AndroidLockSurface(picture_t *picture)
 {
     picture_sys_t *picsys = picture->p_sys;
     vout_display_sys_t *sys = picsys->sys;
-    SurfaceInfo *info;
+    SurfaceInfo *info = &picsys->info;
     uint32_t sw, sh;
     void *surf;
 
     sw = sys->fmt.i_width;
     sh = sys->fmt.i_height;
 
-    if (sys->native_window.winFromSurface) {
-        jobject jsurf = jni_LockAndGetAndroidJavaSurface();
-        if (unlikely(!jsurf)) {
-            jni_UnlockAndroidSurface();
-            return VLC_EGENERIC;
-        }
-        if (sys->window && jsurf != sys->jsurf) {
-            sys->native_window.winRelease(sys->window);
-            sys->window = NULL;
-        }
-        sys->jsurf = jsurf;
-        if (!sys->window) {
-            JNIEnv *p_env;
-            jni_attach_thread(&p_env, THREAD_NAME);
-            sys->window = sys->native_window.winFromSurface(p_env, jsurf);
-            jni_detach_thread();
-        }
-        // Using sys->window instead of the native surface object
-        // as parameter to the unlock function
-        picsys->surf = surf = sys->window;
-    } else {
-        picsys->surf = surf = jni_LockAndGetAndroidSurface();
-        if (unlikely(!surf)) {
-            jni_UnlockAndroidSurface();
-            return VLC_EGENERIC;
-        }
+    picsys->surf = surf = jni_LockAndGetAndroidSurface();
+    if (unlikely(!surf)) {
+        jni_UnlockAndroidSurface();
+        return VLC_EGENERIC;
     }
-    info = &picsys->info;
 
-    if (sys->native_window.winLock) {
-        ANativeWindow_Buffer buf = { 0 };
-        int32_t err = sys->native_window.winLock(sys->window, &buf, NULL);
-        if (err) {
-            jni_UnlockAndroidSurface();
-            return VLC_EGENERIC;
-        }
-        info->w      = buf.width;
-        info->h      = buf.height;
-        info->bits   = buf.bits;
-        info->s      = buf.stride;
-        info->format = buf.format;
-    } else if (sys->s_lock)
+    if (sys->s_lock)
         sys->s_lock(surf, info, 1);
     else
         sys->s_lock2(surf, info, NULL);
