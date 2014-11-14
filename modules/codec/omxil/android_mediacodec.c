@@ -157,7 +157,6 @@ struct decoder_sys_t
     jobject input_buffers, output_buffers;
     int pixel_format;
     int stride, slice_height;
-    int crop_top, crop_left;
     char *name;
 
     bool allocated;
@@ -716,10 +715,6 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             if (*pp_pic) {
 
                 picture_t *p_pic = *pp_pic;
-                // TODO: Use crop_top/crop_left as well? Or is that already taken into account?
-                // On OMX_TI_COLOR_FormatYUV420PackedSemiPlanar the offset already incldues
-                // the cropping, so the top/left cropping params should just be ignored.
-
                 /* If the oldest input block had no PTS, the timestamp
                  * of the frame returned by MediaCodec might be wrong
                  * so we overwrite it with the corresponding dts. */
@@ -822,8 +817,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             p_sys->stride       = GET_INTEGER(format, "stride");
             p_sys->slice_height = GET_INTEGER(format, "slice-height");
             p_sys->pixel_format = GET_INTEGER(format, "color-format");
-            p_sys->crop_left    = GET_INTEGER(format, "crop-left");
-            p_sys->crop_top     = GET_INTEGER(format, "crop-top");
+            int crop_left       = GET_INTEGER(format, "crop-left");
+            int crop_top        = GET_INTEGER(format, "crop-top");
             int crop_right      = GET_INTEGER(format, "crop-right");
             int crop_bottom     = GET_INTEGER(format, "crop-bottom");
 
@@ -844,12 +839,12 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 }
             }
 
-            msg_Dbg(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
+            msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
                     p_sys->pixel_format, name, width, height, p_sys->stride, p_sys->slice_height,
-                    p_sys->crop_left, p_sys->crop_top, crop_right, crop_bottom);
+                    crop_left, crop_top, crop_right, crop_bottom);
 
-            p_dec->fmt_out.video.i_width = crop_right + 1 - p_sys->crop_left;
-            p_dec->fmt_out.video.i_height = crop_bottom + 1 - p_sys->crop_top;
+            p_dec->fmt_out.video.i_width = crop_right + 1 - crop_left;
+            p_dec->fmt_out.video.i_height = crop_bottom + 1 - crop_top;
             if (p_sys->stride <= 0)
                 p_sys->stride = width;
             if (p_sys->slice_height <= 0)
@@ -859,14 +854,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
 
             ArchitectureSpecificCopyHooks(p_dec, p_sys->pixel_format, p_sys->slice_height,
                                           p_sys->stride, &p_sys->architecture_specific_data);
-            if (p_sys->pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar) {
-                p_sys->slice_height -= p_sys->crop_top/2;
-                /* Reset crop top/left here, since the offset parameter already includes this.
-                 * If we'd ignore the offset parameter in the BufferInfo, we could just keep
-                 * the original slice height and apply the top/left cropping instead. */
-                p_sys->crop_top = 0;
-                p_sys->crop_left = 0;
-            }
+            if (p_sys->pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
+                p_sys->slice_height -= crop_top/2;
             if (IgnoreOmxDecoderPadding(p_sys->name)) {
                 p_sys->slice_height = 0;
                 p_sys->stride = p_dec->fmt_out.video.i_width;
