@@ -136,8 +136,6 @@ struct picture_sys_t {
 static int  AndroidLockSurface(picture_t *);
 static void AndroidUnlockSurface(picture_t *);
 
-static vlc_mutex_t single_instance = VLC_STATIC_MUTEX;
-
 static inline void *LoadSurface(const char *psz_lib, vout_display_sys_t *sys)
 {
     void *p_library = dlopen(psz_lib, RTLD_NOW);
@@ -183,18 +181,8 @@ static int Open(vlc_object_t *p_this)
     if (vout_display_IsWindowed(vd))
         return VLC_EGENERIC;
 
-    /* */
-    if (vlc_mutex_trylock(&single_instance) != 0) {
-        msg_Err(vd, "Can't start more than one instance at a time");
-        return VLC_EGENERIC;
-    }
-
     /* Allocate structure */
     vout_display_sys_t *sys = (struct vout_display_sys_t*) calloc(1, sizeof(*sys));
-    if (!sys) {
-        vlc_mutex_unlock(&single_instance);
-        return VLC_ENOMEM;
-    }
 
     /* */
     sys->p_library = LoadNativeWindowAPI(&sys->native_window);
@@ -204,7 +192,6 @@ static int Open(vlc_object_t *p_this)
     if (!sys->p_library) {
         free(sys);
         msg_Err(vd, "Could not initialize libandroid.so/libui.so/libgui.so/libsurfaceflinger_client.so!");
-        vlc_mutex_unlock(&single_instance);
         return VLC_EGENERIC;
     }
 
@@ -305,7 +292,6 @@ static void Close(vlc_object_t *p_this)
         sys->native_window.winRelease(sys->window);
     dlclose(sys->p_library);
     free(sys);
-    vlc_mutex_unlock(&single_instance);
 }
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
