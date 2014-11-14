@@ -72,7 +72,6 @@ extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
 extern void jni_detach_thread();
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
-extern void jni_SetAndroidSurfaceSize(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 extern bool jni_IsVideoPlayerActivityCreated();
 #endif
 
@@ -2214,10 +2213,7 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
         }
         p_port->p_hwbuf->anwpriv.setOrientation( p_port->p_hwbuf->window_priv,
                                                  i_angle );
-        video_format_ApplyRotation( &p_port->p_hwbuf->fmt_out,
-                                    &p_port->p_fmt->video );
-    } else
-        p_port->p_hwbuf->fmt_out = p_port->p_fmt->video;
+    }
 
     if( p_port->p_hwbuf->anwpriv.setup( p_port->p_hwbuf->window_priv,
                                         def->format.video.nFrameWidth,
@@ -2258,13 +2254,6 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
         msg_Err( p_dec, "can't set buffer_count" );
         goto error;
     }
-
-    jni_SetAndroidSurfaceSize( p_port->p_hwbuf->fmt_out.i_width,
-                               p_port->p_hwbuf->fmt_out.i_height,
-                               p_port->p_hwbuf->fmt_out.i_visible_width,
-                               p_port->p_hwbuf->fmt_out.i_visible_height,
-                               p_port->p_hwbuf->fmt_out.i_sar_num,
-                               p_port->p_hwbuf->fmt_out.i_sar_den );
 
     p_port->p_hwbuf->i_buffers = p_port->definition.nBufferCountActual;
     p_port->p_hwbuf->i_max_owned = p_port->p_hwbuf->i_buffers - min_undequeued;

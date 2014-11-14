@@ -76,7 +76,6 @@ typedef struct HwBuffer
 
     void            *p_library;
     void            *window;
-    video_format_t  fmt_out;
 #if defined(USE_IOMX)
     native_window_api_t native_window;
     native_window_priv_api_t anwpriv;
