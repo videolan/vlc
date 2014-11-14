@@ -569,15 +569,16 @@ static int VolumeSet(audio_output_t *aout, float vol)
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
     pa_operation *op;
+    pa_volume_t volume;
 
     /* VLC provides the software volume so convert directly to PulseAudio
      * software volume, pa_volume_t. This is not a linear amplification factor
      * so do not use PulseAudio linear amplification! */
     vol *= PA_VOLUME_NORM;
-    if (unlikely(vol >= PA_VOLUME_MAX))
-        vol = PA_VOLUME_MAX;
-
-    pa_volume_t volume = lroundf(vol);
+    if (unlikely(vol >= (float)PA_VOLUME_MAX))
+        volume = PA_VOLUME_MAX;
+    else
+        volume = lroundf(vol);
 
     if (s == NULL)
     {
