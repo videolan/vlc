@@ -584,7 +584,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     if (fmt->i_chroma == VLC_CODEC_XYZ12) {
-        vlc_fourcc_GetChromaDescription(fmt->i_chroma);
         need_fs_xyz       = true;
         vgl->fmt          = *fmt;
         vgl->fmt.i_chroma = VLC_CODEC_XYZ12;
