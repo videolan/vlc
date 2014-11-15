@@ -3091,7 +3091,7 @@ static int MP4_ReadBox_keys( stream_t *p_stream, MP4_Box_t *p_box )
         i_read -= i_keysize;
 #ifdef MP4_ULTRA_VERBOSE
         msg_Dbg( p_stream, "read box: \"keys\": %u '%s'", i + 1,
-                 p_box->data.p_keys->p_entries[i].p_value );
+                 p_box->data.p_keys->p_entries[i].psz_value );
 #endif
     }
     if ( i < i_count )
