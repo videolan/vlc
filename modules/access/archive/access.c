@@ -316,7 +316,7 @@ int AccessOpen(vlc_object_t *p_object)
     if (unlikely(psz_base == NULL))
         return VLC_ENOMEM;
 
-    const char *psz_name = psz_base + (sep - p_access->psz_location);
+    char *psz_name = psz_base + (sep - p_access->psz_location);
     *(psz_name++) = '\0';
 
     if (decode_URI(psz_base) == NULL)
