@@ -629,7 +629,7 @@ typedef struct {
  * It returns a vlc_chroma_description_t describing the request fourcc or NULL
  * if not found.
  */
-VLC_API const vlc_chroma_description_t * vlc_fourcc_GetChromaDescription( vlc_fourcc_t fourcc );
+VLC_API const vlc_chroma_description_t * vlc_fourcc_GetChromaDescription( vlc_fourcc_t fourcc ) VLC_USED;
 
 #endif /* _VLC_FOURCC_H */
 
