@@ -541,15 +541,15 @@ static int string_to_IV(char *string_hexa, uint8_t iv[AES_BLOCK_SIZE])
     if (len <= 16) {
         iv_hi = 0;
         iv_lo = strtoull(string_hexa, &end, 16);
-        if (end)
+        if (*end)
             return VLC_EGENERIC;
     } else {
         iv_lo = strtoull(&string_hexa[len-16], &end, 16);
-        if (end)
+        if (*end)
             return VLC_EGENERIC;
         string_hexa[len-16] = '\0';
         iv_hi = strtoull(string_hexa, &end, 16);
-        if (end)
+        if (*end)
             return VLC_EGENERIC;
     }
 
