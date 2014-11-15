@@ -272,6 +272,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *va_arg( args, bool* ) = true;
             break;
 
+        case ACCESS_GET_SIZE:
+            *va_arg( args, uint64_t* ) = p_sys->size;
+            break;
+
         case ACCESS_GET_PTS_DELAY:
             pi64 = va_arg( args, int64_t * );
             *pi64 = INT64_C(1000)
