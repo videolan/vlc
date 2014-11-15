@@ -89,7 +89,6 @@ typedef struct playlist_private_t
     bool     b_reset_currently_playing; /** Reset current item array */
 
     bool     b_tree; /**< Display as a tree */
-    bool     b_doing_ml; /**< Doing media library stuff  get quicker */
 } playlist_private_t;
 
 #define pl_priv( pl ) ((playlist_private_t *)(pl))

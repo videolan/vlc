@@ -229,8 +229,6 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
 
     pl_priv(p_playlist)->b_tree = var_InheritBool( p_parent, "playlist-tree" );
 
-    pl_priv(p_playlist)->b_doing_ml = false;
-
     /* Create the root node */
     PL_LOCK;
     p_playlist->p_root = playlist_NodeCreate( p_playlist, NULL, NULL,
