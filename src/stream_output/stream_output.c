@@ -548,7 +548,7 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 /*****************************************************************************
  * sout_MuxGetStream: find stream to be muxed
  *****************************************************************************/
-int sout_MuxGetStream( sout_mux_t *p_mux, int i_blocks, mtime_t *pi_dts )
+int sout_MuxGetStream( sout_mux_t *p_mux, unsigned i_blocks, mtime_t *pi_dts )
 {
     mtime_t i_dts = 0;
     int     i_stream = -1;
