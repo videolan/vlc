@@ -3020,7 +3020,15 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
 
         if( p_soun->i_qt_version == 1 )
         {
-            if ( p_soun->i_compressionid != 0 || p_soun->i_bytes_per_sample > 1 ) /* compressed */
+            if ( p_soun->i_compressionid == 0xFFFE )
+            {
+                *pi_nb_samples = 1; /* != number of audio samples */
+                if ( p_track->i_sample_size )
+                    return p_track->i_sample_size;
+                else
+                    return p_track->p_sample_size[p_track->i_sample];
+            }
+            else if ( p_soun->i_compressionid != 0 || p_soun->i_bytes_per_sample > 1 ) /* compressed */
             {
                 /* in this case we are dealing with compressed data
                    -2 in V1: additional fields are meaningless (VBR and such) */

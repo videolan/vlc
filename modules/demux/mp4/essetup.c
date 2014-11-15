@@ -441,15 +441,18 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         default:
             break;
         }
-    }
 
-    if( p_track->i_sample_size != 0 && p_soun->i_qt_version == 1 &&
-        p_soun->i_sample_per_packet <= 0 )
-    {
-        msg_Err( p_demux, "Invalid sample per packet value for qt_version 1. Broken muxer!" );
-        p_soun->i_qt_version = 0;
+        if ( p_sample->data.p_sample_soun->i_compressionid == 0xFFFE /* -2 */)
+        {
+            /* redefined sample tables for vbr audio */
+        }
+        else if ( p_track->i_sample_size != 0 && p_soun->i_sample_per_packet == 0 )
+        {
+            msg_Err( p_demux, "Invalid sample per packet value for qt_version 1. Broken muxer! %u %u",
+                     p_track->i_sample_size, p_soun->i_sample_per_packet );
+            p_soun->i_qt_version = 0;
+        }
     }
-
 
     /* Endianness atom */
     const MP4_Box_t *p_enda = MP4_BoxGet( p_sample, "wave/enda" );
