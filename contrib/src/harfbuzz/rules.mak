@@ -1,6 +1,6 @@
 # HARFBUZZ
 
-HARFBUZZ_VERSION := 0.9.19
+HARFBUZZ_VERSION := 0.9.17
 HARFBUZZ_URL := http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-$(HARFBUZZ_VERSION).tar.bz2
 PKGS += harfbuzz
 ifeq ($(call need_pkg,"harfbuzz"),)
