@@ -1833,6 +1833,13 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratehi );
     MP4_GET2BYTES( p_box->data.p_sample_soun->i_sampleratelo );
 
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream,
+             "read box: \"soun\" stsd qt_version %"PRIu16" compid=%"PRIx16,
+             p_box->data.p_sample_soun->i_qt_version,
+             p_box->data.p_sample_soun->i_compressionid );
+#endif
+
     if( p_box->data.p_sample_soun->i_qt_version == 1 && i_read >= 16 )
     {
         /* SoundDescriptionV1 */
@@ -1843,7 +1850,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream,
-                 "read box: \"soun\" qt3+ sample/packet=%d bytes/packet=%d "
+                 "read box: \"soun\" V1 sample/packet=%d bytes/packet=%d "
                  "bytes/frame=%d bytes/sample=%d",
                  p_box->data.p_sample_soun->i_sample_per_packet,
                  p_box->data.p_sample_soun->i_bytes_per_packet,
@@ -1917,7 +1924,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         p_box->data.p_sample_soun->i_bytes_per_sample = 0;
 
 #ifdef MP4_VERBOSE
-        msg_Dbg( p_stream, "read box: \"soun\" mp4 or qt1/2 (rest=%"PRId64")",
+        msg_Dbg( p_stream, "read box: \"soun\" V0 or qt1/2 (rest=%"PRId64")",
                  i_read );
 #endif
         stream_Seek( p_stream, p_box->i_pos +
