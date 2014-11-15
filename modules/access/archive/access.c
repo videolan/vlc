@@ -314,7 +314,7 @@ int AccessOpen(vlc_object_t *p_object)
 
     char *psz_base = strdup(p_access->psz_location);
     if (unlikely(psz_base == NULL))
-        return VLC_EENOMEM;
+        return VLC_ENOMEM;
 
     const char *psz_name = psz_base + (sep - p_access->psz_location);
     *(psz_name++) = '\0';
