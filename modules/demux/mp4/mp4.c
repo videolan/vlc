@@ -2996,7 +2996,7 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
     {
         const MP4_Box_data_sample_soun_t *p_soun = p_track->p_sample->data.p_sample_soun;
         const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
-        uint32_t i_max_samples = p_chunk->i_sample_count - p_chunk->i_sample + 1;
+        uint32_t i_max_samples = p_chunk->i_sample_count - p_chunk->i_sample;
 
         /* Group audio packets so we don't call demux for single sample unit */
         if( p_track->fmt.i_original_fourcc == VLC_CODEC_DVD_LPCM &&
