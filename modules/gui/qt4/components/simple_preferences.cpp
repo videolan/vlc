@@ -1098,9 +1098,7 @@ void SPrefsPanel::apply()
             qobject_cast<QSlider *>(optionWidgets["defaultVolume"])->value();
         bool b_reset_volume =
             qobject_cast<QCheckBox *>(optionWidgets["resetVolumeCheckbox"])->isChecked();
-        module_config_t *p_config = config_FindConfig( VLC_OBJECT(p_intf), "aout" );
-        char *psz_aout = p_config->value.psz;
-
+        char *psz_aout = config_GetPsz( p_intf, "aout" );
 
         float f_gain = powf( i_volume / 100.f, 3 );
 
@@ -1129,6 +1127,7 @@ void SPrefsPanel::apply()
             config_PutFloat( p_intf, "jack-gain", f_gain );
 #endif
 #undef save_vol_aout
+        free( psz_aout );
 
         config_PutInt( p_intf, "volume-save", !b_reset_volume );
 
