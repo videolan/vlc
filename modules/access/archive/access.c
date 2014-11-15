@@ -308,15 +308,16 @@ static int Control(access_t *p_access, int i_query, va_list args)
 int AccessOpen(vlc_object_t *p_object)
 {
     access_t *p_access = (access_t*)p_object;
-
-    if (!strchr(p_access->psz_location, ARCHIVE_SEP_CHAR))
+    const char *sep = strchr(p_access->psz_location, ARCHIVE_SEP_CHAR);
+    if (sep == NULL)
         return VLC_EGENERIC;
 
     char *psz_base = strdup(p_access->psz_location);
-    if (!psz_base)
-        return VLC_EGENERIC;
-    char *psz_name = strchr(psz_base, ARCHIVE_SEP_CHAR);
-    *psz_name++ = '\0';
+    if (unlikely(psz_base == NULL))
+        return VLC_EENOMEM;
+
+    const char *psz_name = psz_base + (sep - p_access->psz_location);
+    *(psz_name++) = '\0';
 
     if (decode_URI(psz_base) == NULL)
     {
