@@ -83,9 +83,11 @@ static void mrl_Clean( mrl_t *p_mrl );
 sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest )
 {
     sout_instance_t *p_sout;
-
     char *psz_chain;
-    if( psz_dest && psz_dest[0] == '#' )
+
+    assert( psz_dest != NULL );
+
+    if( psz_dest[0] == '#' )
     {
         psz_chain = strdup( &psz_dest[1] );
     }
