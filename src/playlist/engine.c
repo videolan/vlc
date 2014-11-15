@@ -229,38 +229,27 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
 
     pl_priv(p_playlist)->b_tree = var_InheritBool( p_parent, "playlist-tree" );
 
-    /* Create the root node */
+    /* Create the root, playing items and meida library nodes */
+    playlist_item_t *root, *playing, *ml;
+
     PL_LOCK;
-    p_playlist->p_root = playlist_NodeCreate( p_playlist, NULL, NULL,
-                                    PLAYLIST_END, 0, NULL );
-    PL_UNLOCK;
-    if( !p_playlist->p_root ) return NULL;
-
-    /* Create currently playing items node */
-    PL_LOCK;
-    p_playlist->p_playing = playlist_NodeCreate(
-        p_playlist, _( "Playlist" ), p_playlist->p_root,
-        PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
-
-    PL_UNLOCK;
-
-    if( !p_playlist->p_playing ) return NULL;
-
-    /* Create media library node */
-    const bool b_ml = var_InheritBool( p_parent, "media-library");
-    if( b_ml )
-    {
-        PL_LOCK;
-        p_playlist->p_media_library = playlist_NodeCreate(
-            p_playlist, _( "Media Library" ), p_playlist->p_root,
-            PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
-        PL_UNLOCK;
-    }
+    root = playlist_NodeCreate( p_playlist, NULL, NULL,
+                                PLAYLIST_END, 0, NULL );
+    playing = playlist_NodeCreate( p_playlist, _( "Playlist" ), root,
+                                   PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
+    if( var_InheritBool( p_parent, "media-library") )
+        ml = playlist_NodeCreate( p_playlist, _( "Media Library" ), root,
+                                  PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
     else
-    {
-        p_playlist->p_media_library = NULL;
-    }
+        ml = NULL;
+    PL_UNLOCK;
 
+    if( unlikely(root == NULL || playing == NULL || ml == NULL) )
+        abort();
+
+    p_playlist->p_root = root;
+    p_playlist->p_playing = playing;
+    p_playlist->p_media_library = ml;
     p_playlist->p_root_category = p_playlist->p_root;
     p_playlist->p_root_onelevel = p_playlist->p_root;
     p_playlist->p_local_category = p_playlist->p_playing;
@@ -274,7 +263,7 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->request.b_request = false;
     pl_priv(p_playlist)->status.i_status = PLAYLIST_STOPPED;
 
-    if(b_ml)
+    if (ml != NULL)
         playlist_MLLoad( p_playlist );
 
     /* Preparser (and meta retriever) _after_ the Media Library*/
