@@ -89,6 +89,7 @@ static int PLItemUpdated(vlc_object_t *, const char *,
                          vlc_value_t, vlc_value_t, void *);
 static int PlaylistUpdated(vlc_object_t *, const char *,
                            vlc_value_t, vlc_value_t, void *);
+
 static int PlaybackModeUpdated(vlc_object_t *, const char *,
                                vlc_value_t, vlc_value_t, void *);
 static int VolumeUpdated(vlc_object_t *, const char *,
@@ -413,6 +414,31 @@ static int PLItemUpdated(vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+static int PLItemAppended(vlc_object_t *p_this, const char *psz_var,
+                           vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    playlist_add_t *p_add = new_val.p_address;
+    NSArray *o_val = [NSArray arrayWithObjects:[NSNumber numberWithInt:p_add->i_node], [NSNumber numberWithInt:p_add->i_item], nil];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(plItemAppended:) withObject:o_val waitUntilDone:NO];
+
+    [o_pool release];
+    return VLC_SUCCESS;
+}
+
+static int PLItemRemoved(vlc_object_t *p_this, const char *psz_var,
+                           vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    NSNumber *o_val = [NSNumber numberWithInt:new_val.i_int];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(plItemRemoved:) withObject:o_val waitUntilDone:NO];
+
+    [o_pool release];
+    return VLC_SUCCESS;
+}
+
 static int PlaylistUpdated(vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
@@ -682,8 +708,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback(p_playlist, "item-change", PLItemUpdated, self);
     var_AddCallback(p_playlist, "activity", PLItemChanged, self);
     var_AddCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
-    var_AddCallback(p_playlist, "playlist-item-append", PlaylistUpdated, self);
-    var_AddCallback(p_playlist, "playlist-item-deleted", PlaylistUpdated, self);
+    var_AddCallback(p_playlist, "playlist-item-append", PLItemAppended, self);
+    var_AddCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, self);
     var_AddCallback(p_playlist, "random", PlaybackModeUpdated, self);
     var_AddCallback(p_playlist, "repeat", PlaybackModeUpdated, self);
     var_AddCallback(p_playlist, "loop", PlaybackModeUpdated, self);
@@ -856,8 +882,8 @@ static bool f_appExit = false;
     var_DelCallback(p_playlist, "item-change", PLItemUpdated, self);
     var_DelCallback(p_playlist, "activity", PLItemChanged, self);
     var_DelCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
-    var_DelCallback(p_playlist, "playlist-item-append", PlaylistUpdated, self);
-    var_DelCallback(p_playlist, "playlist-item-deleted", PlaylistUpdated, self);
+    var_DelCallback(p_playlist, "playlist-item-append", PLItemAppended, self);
+    var_DelCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, self);
     var_DelCallback(p_playlist, "random", PlaybackModeUpdated, self);
     var_DelCallback(p_playlist, "repeat", PlaybackModeUpdated, self);
     var_DelCallback(p_playlist, "loop", PlaybackModeUpdated, self);
@@ -1289,6 +1315,23 @@ static bool f_appExit = false;
 
 #pragma mark -
 #pragma mark Interface updaters
+
+- (void)plItemAppended:(NSArray *)o_val
+{
+    int i_node = [[o_val objectAtIndex:0] intValue];
+    int i_item = [[o_val objectAtIndex:1] intValue];
+
+    [[[self playlist] model] addItem:i_item withParentNode:i_node];
+}
+
+- (void)plItemRemoved:(NSNumber *)o_val
+{
+    int i_item = [o_val intValue];
+
+    [[[self playlist] model] removeItem:i_item];
+}
+
+
 // This must be called on main thread
 - (void)PlaylistItemChanged
 {
@@ -1848,7 +1891,7 @@ static const int kCurrentPreferencesVersion = 3;
     if (b_mediaKeySupport && !o_mediaKeyController)
         o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
 
-    if (b_mediaKeySupport && ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot]->i_children > 0 ||
+    if (b_mediaKeySupport && ([[[[VLCMain sharedInstance] playlist] model] hasChildren] ||
                               p_current_input)) {
         if (!b_mediaKeyTrapEnabled) {
             b_mediaKeyTrapEnabled = YES;

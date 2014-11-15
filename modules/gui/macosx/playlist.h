@@ -53,6 +53,8 @@
 
 @end
 
+#import "PLModel.h"
+
 /*****************************************************************************
  * VLCPlaylist interface
  *****************************************************************************/
@@ -90,9 +92,12 @@
     IBOutlet id o_playlist_header;
 
     int currentResumeTimeout;
+
+    PLModel *o_model;
 }
 
-- (void)setPlaylistRoot: (playlist_item_t *)root_item;
+- (PLModel *)model;
+
 - (playlist_item_t *)currentPlaylistRoot;
 - (void)reloadStyles;
 

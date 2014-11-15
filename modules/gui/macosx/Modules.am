@@ -95,4 +95,8 @@ SOURCES_macosx = \
 	BWQuincyUI.m \
 	iTunes.h \
 	Spotify.h \
+	PLItem.h \
+	PLItem.m \
+	PLModel.h \
+	PLModel.m \
 	$(NULL)

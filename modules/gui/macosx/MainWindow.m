@@ -769,7 +769,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [o_fspanel setSeekable: b_seekable];
 
     PL_LOCK;
-    if ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot] != p_playlist->p_local_category || p_playlist->p_local_category->i_children > 0)
+    if ([[[[VLCMain sharedInstance] playlist] model] currentRootType] != ROOT_TYPE_PLAYLIST ||
+        [[[[VLCMain sharedInstance] playlist] model] hasChildren])
         [self hideDropZone];
     else
         [self showDropZone];
@@ -947,15 +948,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
 #pragma mark private playlist magic
 - (void)_updatePlaylistTitle
 {
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    PL_LOCK;
-    playlist_item_t *currentPlaylistRoot = [[[VLCMain sharedInstance] playlist] currentPlaylistRoot];
-    PL_UNLOCK;
+    PLRootType root = [[[[VLCMain sharedInstance] playlist] model] currentRootType];
+    playlist_t *p_playlist = pl_Get(VLCIntf);
 
-    if (currentPlaylistRoot == p_playlist->p_local_category)
+    PL_LOCK;
+    if (root == ROOT_TYPE_PLAYLIST)
         [o_chosen_category_lbl setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_local_category]]];
-    else if (currentPlaylistRoot == p_playlist->p_ml_category)
+    else if (root == ROOT_TYPE_MEDIALIBRARY)
         [o_chosen_category_lbl setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_ml_category]]];
+
+    PL_UNLOCK;
 }
 
 - (NSString *)_playbackDurationOfNode:(playlist_item_t*)node
@@ -964,9 +966,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
         return @"";
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
-    PL_LOCK;
+    PL_ASSERT_LOCKED;
+
     mtime_t mt_duration = playlist_GetNodeDuration( node );
-    PL_UNLOCK;
 
     if (mt_duration < 1)
         return @"";
@@ -1132,19 +1134,29 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_chosen_category_lbl setStringValue:[item title]];
 
     if ([[item identifier] isEqualToString:@"playlist"]) {
-        [[[VLCMain sharedInstance] playlist] setPlaylistRoot:p_playlist->p_local_category];
-        [o_chosen_category_lbl setStringValue: [[o_chosen_category_lbl stringValue] stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_local_category]]];
+        PL_LOCK;
+
+        [[[[VLCMain sharedInstance] playlist] model] changeRootItem:p_playlist->p_playing];
+        PL_UNLOCK;
+
+        [self _updatePlaylistTitle];
+
     } else if ([[item identifier] isEqualToString:@"medialibrary"]) {
         if (p_playlist->p_ml_category) {
-            [[[VLCMain sharedInstance] playlist] setPlaylistRoot:p_playlist->p_ml_category];
-            [o_chosen_category_lbl setStringValue: [[o_chosen_category_lbl stringValue] stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_ml_category]]];
+
+            PL_LOCK;
+            [[[[VLCMain sharedInstance] playlist] model] changeRootItem:p_playlist->p_media_library];
+
+            PL_UNLOCK;
+
+            [self _updatePlaylistTitle];
         }
     } else {
-        playlist_item_t * pl_item;
         PL_LOCK;
-        pl_item = playlist_ChildSearchName(p_playlist->p_root, [[item untranslatedTitle] UTF8String]);
+        playlist_item_t *pl_item = playlist_ChildSearchName(p_playlist->p_root, [[item untranslatedTitle] UTF8String]);
+        [[[[VLCMain sharedInstance] playlist] model] changeRootItem:pl_item];
+
         PL_UNLOCK;
-        [[[VLCMain sharedInstance] playlist] setPlaylistRoot: pl_item];
     }
 
     // Note the order: first hide the podcast controls, then show the drop zone
@@ -1154,7 +1166,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self hidePodcastControls];
 
     PL_LOCK;
-    if ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot] != p_playlist->p_local_category || p_playlist->p_local_category->i_children > 0)
+    if ([[[[VLCMain sharedInstance] playlist] model] currentRootType] != ROOT_TYPE_PLAYLIST ||
+        [[[[VLCMain sharedInstance] playlist] model] hasChildren])
         [self hideDropZone];
     else
         [self showDropZone];

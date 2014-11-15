@@ -84,7 +84,8 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         empty = playlist_IsEmpty(p_playlist);
         PL_UNLOCK;
 
-        if ([[[VLCMain sharedInstance] playlist] isSelectionEmpty] && ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot] == p_playlist->p_local_category || [[[VLCMain sharedInstance] playlist] currentPlaylistRoot] == p_playlist->p_ml_category))
+        PLRootType root = [[[[VLCMain sharedInstance] playlist] model] currentRootType];
+        if ([[[VLCMain sharedInstance] playlist] isSelectionEmpty] && (root == ROOT_TYPE_PLAYLIST || root == ROOT_TYPE_MEDIALIBRARY))
             [[[VLCMain sharedInstance] open] openFileGeneric];
         else
             [[[VLCMain sharedInstance] playlist] playItem:nil];
