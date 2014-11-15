@@ -1153,8 +1153,8 @@ modules/video_filter/vhs.c
 modules/video_filter/wave.c
 modules/video_filter/yuvp.c
 modules/video_output/aa.c
+modules/video_output/android/android_window.c
 modules/video_output/android/nativewindow.c
-modules/video_output/android/opaque.c
 modules/video_output/android/surface.c
 modules/video_output/caca.c
 modules/video_output/caopengllayer.m
