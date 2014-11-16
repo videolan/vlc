@@ -49,6 +49,7 @@ bool    IsoffMainParser::parse              ()
     this->setMPDAttributes();
     this->setMPDBaseUrl();
     this->setPeriods();
+    this->print();
 
     return true;
 }
@@ -198,36 +199,33 @@ void    IsoffMainParser::setSegments        (dash::xml::Node *segListNode, Segme
 }
 void    IsoffMainParser::print              ()
 {
-    if(this->mpd)
+    if(mpd)
     {
-        msg_Dbg(this->p_stream, "MPD profile=%d mediaPresentationDuration=%ld minBufferTime=%ld", this->mpd->getProfile(),
-                                                                                                  this->mpd->getDuration(),
-                                                                                                  this->mpd->getMinBufferTime());
-        const std::vector<BaseUrl *> baseurls = this->mpd->getBaseUrls();
+        msg_Dbg(p_stream, "MPD profile=%d mediaPresentationDuration=%ld minBufferTime=%ld", mpd->getProfile(),
+                                                                                                  mpd->getDuration(),
+                                                                                                  mpd->getMinBufferTime());
+        std::vector<BaseUrl *>::const_iterator h;
+        for(h = mpd->getBaseUrls().begin(); h != mpd->getBaseUrls().end(); h++)
+            msg_Dbg(p_stream, "BaseUrl=%s", (*h)->getUrl().c_str());
 
-        for(size_t i = 0; i < baseurls.size(); i++)
-            msg_Dbg(this->p_stream, "BaseUrl=%s", baseurls.at(i)->getUrl().c_str());
-
-        const std::vector<Period *> periods = this->mpd->getPeriods();
-
-        for(size_t i = 0; i < periods.size(); i++)
+        std::vector<Period *>::const_iterator i;
+        for(i = mpd->getPeriods().begin(); i != mpd->getPeriods().end(); i++)
         {
-            Period *period = periods.at(i);
-            msg_Dbg(this->p_stream, " Period");
-            for(size_t j = 0; j < period->getAdaptationSets().size(); j++)
+            msg_Dbg(p_stream, " Period");
+            std::vector<AdaptationSet *>::const_iterator j;
+            for(j = (*i)->getAdaptationSets().begin(); j != (*i)->getAdaptationSets().end(); j++)
             {
-                AdaptationSet *aset = period->getAdaptationSets().at(j);
-                msg_Dbg(this->p_stream, "  AdaptationSet");
-                for(size_t k = 0; k < aset->getRepresentations().size(); k++)
+                msg_Dbg(p_stream, "  AdaptationSet");
+                std::vector<Representation *>::const_iterator k;
+                for(k = (*j)->getRepresentations().begin(); k != (*j)->getRepresentations().begin(); k++)
                 {
-                    Representation *rep = aset->getRepresentations().at(k);
-                    msg_Dbg(this->p_stream, "   Representation");
-                    Segment *initSeg = rep->getSegmentBase()->getInitSegment();
-                    msg_Dbg(this->p_stream, "    InitSeg url=%s", initSeg->getSourceUrl().c_str());
-                    for(size_t l = 0; l < rep->getSegmentList()->getSegments().size(); l++)
+                    msg_Dbg(p_stream, "   Representation");
+                    msg_Dbg(p_stream, "    InitSeg url=%s", (*k)->getSegmentBase()->getInitSegment()->getSourceUrl().c_str());
+                    std::vector<Segment *>::const_iterator l;
+                    for(l = (*k)->getSegmentList()->getSegments().begin();
+                        l < (*k)->getSegmentList()->getSegments().end(); l++)
                     {
-                        Segment *seg = rep->getSegmentList()->getSegments().at(l);
-                        msg_Dbg(this->p_stream, "    Segment url=%s", seg->getSourceUrl().c_str());
+                        msg_Dbg(p_stream, "    Segment url=%s", (*l)->getSourceUrl().c_str());
                     }
                 }
             }
