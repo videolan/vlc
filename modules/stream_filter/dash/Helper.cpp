@@ -31,6 +31,11 @@ using namespace dash;
 
 std::string Helper::combinePaths        (const std::string &path1, const std::string &path2)
 {
+    if ( path2.length() == 0 )
+        return path1;
+    else if ( path1.length() == 0 )
+        return path2;
+
     char path1Last  = path1.at(path1.size() - 1);
     char path2First = path2.at(0);
 
