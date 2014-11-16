@@ -721,6 +721,14 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
     }
 
+    /* Late fixes */
+    if ( p_soun->i_qt_version == 0 && p_track->fmt.i_codec == VLC_CODEC_QCELP )
+    {
+        /* Shouldn't be v0, as it is a compressed codec !*/
+        p_soun->i_qt_version = 1;
+        p_soun->i_compressionid = 0xFFFE;
+    }
+
     return 1;
 }
 
