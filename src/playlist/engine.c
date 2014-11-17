@@ -244,7 +244,7 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
         ml = NULL;
     PL_UNLOCK;
 
-    if( unlikely(root == NULL || playing == NULL || ml == NULL) )
+    if( unlikely(root == NULL || playing == NULL) )
         abort();
 
     p_playlist->p_root = root;
