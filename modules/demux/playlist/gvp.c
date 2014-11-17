@@ -59,11 +59,6 @@ description:The now infamous Apple Macintosh commercial aired during the 1984 Su
 
 #define MAX_LINE 1024
 
-struct demux_sys_t
-{
-    input_item_t *p_current_input;
-};
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -95,28 +90,12 @@ int Import_GVP( vlc_object_t *p_this )
     msg_Dbg( p_this, "using Google Video Playlist (gvp) import" );
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
-    p_demux->p_sys = malloc( sizeof( demux_sys_t ) );
-    if( !p_demux->p_sys )
-        return VLC_ENOMEM;
 
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Deactivate: frees unused data
- *****************************************************************************/
-void Close_GVP( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    free( p_sys );
-}
-
 static int Demux( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     char *psz_line;
     char *psz_attrvalue;
 
@@ -130,8 +109,6 @@ static int Demux( demux_t *p_demux )
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
-
-    p_sys->p_current_input = p_current_input;
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
