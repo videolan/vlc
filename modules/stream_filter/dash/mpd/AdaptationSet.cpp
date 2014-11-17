@@ -58,7 +58,7 @@ void AdaptationSet::setSubsegmentAlignmentFlag(bool alignment)
     this->subsegmentAlignmentFlag = alignment;
 }
 
-std::vector<Representation*>    AdaptationSet::getRepresentations       ()
+std::vector<Representation*>&    AdaptationSet::getRepresentations       ()
 {
     return this->representations;
 }

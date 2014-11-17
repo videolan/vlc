@@ -192,15 +192,20 @@ void    IsoffMainParser::print              ()
             {
                 msg_Dbg(p_stream, "  AdaptationSet");
                 std::vector<Representation *>::const_iterator k;
-                for(k = (*j)->getRepresentations().begin(); k != (*j)->getRepresentations().begin(); k++)
+                for(k = (*j)->getRepresentations().begin(); k != (*j)->getRepresentations().end(); k++)
                 {
                     msg_Dbg(p_stream, "   Representation");
                     msg_Dbg(p_stream, "    InitSeg url=%s", (*k)->getSegmentBase()->getInitSegment()->getSourceUrl().c_str());
-                    std::vector<Segment *>::const_iterator l;
-                    for(l = (*k)->getSegmentList()->getSegments().begin();
-                        l < (*k)->getSegmentList()->getSegments().end(); l++)
+
+                    const SegmentList *segmentList = (*k)->getSegmentList();
+                    if (segmentList)
                     {
-                        msg_Dbg(p_stream, "    Segment url=%s", (*l)->getSourceUrl().c_str());
+                        std::vector<Segment *>::const_iterator l;
+                        for(l = segmentList->getSegments().begin();
+                            l < segmentList->getSegments().end(); l++)
+                        {
+                            msg_Dbg(p_stream, "    Segment url=%s", (*l)->getSourceUrl().c_str());
+                        }
                     }
                 }
             }

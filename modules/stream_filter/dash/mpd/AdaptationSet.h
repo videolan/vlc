@@ -46,7 +46,7 @@ namespace dash
 
                 bool                            getSubsegmentAlignmentFlag() const;
                 void                            setSubsegmentAlignmentFlag( bool alignment );
-                std::vector<Representation *>   getRepresentations      ();
+                std::vector<Representation *>&  getRepresentations      ();
                 const Representation*           getRepresentationById   ( const std::string &id ) const;
                 const SegmentInfoDefault*       getSegmentInfoDefault() const;
                 void                            setSegmentInfoDefault( const SegmentInfoDefault* seg );
