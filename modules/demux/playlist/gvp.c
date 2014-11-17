@@ -123,7 +123,6 @@ static int Demux( demux_t *p_demux )
     char *psz_version = NULL;
     char *psz_url = NULL;
     char *psz_docid = NULL;
-    int i_duration = -1;
     char *psz_title = NULL;
     char *psz_description = NULL;
     input_item_t *p_input;
@@ -164,9 +163,7 @@ static int Demux( demux_t *p_demux )
             psz_docid = strdup( psz_attrvalue );
         }
         else if( !strcmp( psz_line, "duration" ) )
-        {
-            i_duration = atoi( psz_attrvalue );
-        }
+            /*atoi( psz_attrvalue )*/;
         else if( !strcmp( psz_line, "title" ) )
         {
             psz_title = strdup( psz_attrvalue );
