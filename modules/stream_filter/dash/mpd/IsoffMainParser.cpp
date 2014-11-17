@@ -27,15 +27,14 @@
 #endif
 
 #include "IsoffMainParser.h"
+#include "xml/DOMHelper.h"
+#include <vlc_strings.h>
 
 using namespace dash::mpd;
 using namespace dash::xml;
 
 IsoffMainParser::IsoffMainParser    (Node *root, stream_t *p_stream) :
-                 root               (root),
-                 p_stream           (p_stream),
-                 mpd                (NULL),
-                 currentRepresentation( NULL )
+                 IMPDParser(root, NULL, p_stream, NULL)
 {
 }
 IsoffMainParser::~IsoffMainParser   ()
@@ -44,19 +43,14 @@ IsoffMainParser::~IsoffMainParser   ()
 
 bool    IsoffMainParser::parse              ()
 {
-    this->mpd = new MPD();
-
-    this->setMPDAttributes();
-    this->setMPDBaseUrl();
-    this->setPeriods();
-    this->print();
-
+    mpd = new MPD();
+    setMPDAttributes();
+    setMPDBaseUrl(root);
+    setPeriods(root);
+    print();
     return true;
 }
-MPD*    IsoffMainParser::getMPD             ()
-{
-    return this->mpd;
-}
+
 void    IsoffMainParser::setMPDAttributes   ()
 {
     const std::map<std::string, std::string> attr = this->root->getAttributes();
@@ -72,27 +66,7 @@ void    IsoffMainParser::setMPDAttributes   ()
         this->mpd->setMinBufferTime(str_duration( it->second.c_str()));
 
 }
-void    IsoffMainParser::setMPDBaseUrl      ()
-{
-    std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(this->root, "BaseURL");
 
-    for(size_t i = 0; i < baseUrls.size(); i++)
-    {
-        BaseUrl *url = new BaseUrl(baseUrls.at(i)->getText());
-        this->mpd->addBaseUrl(url);
-    }
-}
-void    IsoffMainParser::setPeriods         ()
-{
-    std::vector<Node *> periods = DOMHelper::getElementByTagName(this->root, "Period", false);
-
-    for(size_t i = 0; i < periods.size(); i++)
-    {
-        Period *period = new Period();
-        this->setAdaptationSets(periods.at(i), period);
-        this->mpd->addPeriod(period);
-    }
-}
 void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
 {
     std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", false);

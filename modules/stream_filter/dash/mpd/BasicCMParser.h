@@ -26,12 +26,8 @@
 #define BASICCMPARSER_H_
 
 #include "xml/Node.h"
-#include "xml/DOMHelper.h"
 #include "mpd/IMPDParser.h"
-#include "mpd/MPD.h"
-#include "mpd/Period.h"
 #include "mpd/AdaptationSet.h"
-#include "mpd/Representation.h"
 #include "mpd/BaseUrl.h"
 #include "mpd/SegmentInfo.h"
 #include "mpd/Segment.h"
@@ -49,25 +45,21 @@ namespace dash
                 virtual ~BasicCMParser();
 
                 bool    parse  ();
-                MPD*    getMPD ();
 
             private:
                 void    handleDependencyId( Representation* rep, const AdaptationSet* adaptationSet, const std::string& dependencyId );
 
             private:
-                bool    setMPD              ();
-                void    setPeriods          (dash::xml::Node *root);
                 void    parseSegmentTimeline( xml::Node* node, SegmentInfoCommon *segmentInfo );
                 void    parseSegmentInfoCommon( xml::Node* node, SegmentInfoCommon *segmentInfo );
                 void    parseSegmentInfoDefault( xml::Node* node, AdaptationSet* group );
-                void    setAdaptationSet           (dash::xml::Node *root, Period *period);
+                void    setAdaptationSets   (dash::xml::Node *root, Period *period);
                 void    parseTrickMode( dash::xml::Node *node, Representation *repr );
                 void    setRepresentations  (dash::xml::Node *root, AdaptationSet *group);
                 bool    setSegmentInfo      (dash::xml::Node *root, Representation *rep);
                 void    setInitSegment      (dash::xml::Node *root, SegmentInfoCommon *info);
                 bool    setSegments         (dash::xml::Node *root, SegmentInfo *info );
                 bool    resolveUrlTemplates( std::string &url, bool &containRuntimeToken );
-                void    setMPDBaseUrl       (dash::xml::Node *root);
                 void    parseContentDescriptor( xml::Node *node, const std::string &name,
                                                 void (CommonAttributesElements::*addPtr)(ContentDescription*),
                                                 CommonAttributesElements *self ) const;
@@ -78,11 +70,7 @@ namespace dash
                 ProgramInformation*     parseProgramInformation();
 
             private:
-                dash::xml::Node *root;
-                MPD             *mpd;
                 std::string     url;
-                stream_t        *p_stream;
-                Representation  *currentRepresentation;
         };
     }
 }

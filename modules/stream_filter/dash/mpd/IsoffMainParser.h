@@ -26,12 +26,8 @@
 #define ISOFFMAINPARSER_H_
 
 #include "xml/Node.h"
-#include "xml/DOMHelper.h"
 #include "mpd/IMPDParser.h"
-#include "mpd/MPD.h"
-#include "mpd/Period.h"
 #include "mpd/AdaptationSet.h"
-#include "mpd/Representation.h"
 #include "mpd/BaseUrl.h"
 #include "mpd/SegmentBase.h"
 #include "mpd/SegmentList.h"
@@ -39,10 +35,6 @@
 
 #include <cstdlib>
 #include <sstream>
-
-#include <vlc_common.h>
-#include <vlc_stream.h>
-#include <vlc_strings.h>
 
 namespace dash
 {
@@ -55,18 +47,10 @@ namespace dash
                 virtual ~IsoffMainParser    ();
 
                 bool    parse  ();
-                MPD*    getMPD ();
                 void    print  ();
 
             private:
-                dash::xml::Node *root;
-                stream_t        *p_stream;
-                MPD             *mpd;
-                Representation  *currentRepresentation;
-
                 void    setMPDAttributes    ();
-                void    setMPDBaseUrl       ();
-                void    setPeriods          ();
                 void    setAdaptationSets   (dash::xml::Node *periodNode, Period *period);
                 void    setRepresentations  (dash::xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
                 void    setSegmentBase      (dash::xml::Node *repNode, Representation *rep);

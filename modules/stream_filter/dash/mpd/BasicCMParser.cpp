@@ -30,23 +30,18 @@
 #include "mpd/SegmentInfoDefault.h"
 #include "mpd/SegmentTemplate.h"
 #include "mpd/SegmentTimeline.h"
+#include "xml/DOMHelper.h"
 
 #include <cstdlib>
 #include <sstream>
-#include <sstream>
 
-#include <vlc_common.h>
-#include <vlc_stream.h>
 #include <vlc_strings.h>
 
 using namespace dash::mpd;
 using namespace dash::xml;
 
-BasicCMParser::BasicCMParser( Node *root, stream_t *p_stream ) :
-    root( root ),
-    mpd( NULL ),
-    p_stream( p_stream ),
-    currentRepresentation( NULL )
+BasicCMParser::BasicCMParser( Node *root_, stream_t *p_stream ) :
+    IMPDParser( root_, NULL, p_stream, NULL )
 {
     this->url = p_stream->psz_access;
     this->url += "://";
@@ -65,10 +60,6 @@ BasicCMParser::~BasicCMParser   ()
 }
 
 bool    BasicCMParser::parse                ()
-{
-    return this->setMPD();
-}
-bool    BasicCMParser::setMPD()
 {
     const std::map<std::string, std::string>    attr = this->root->getAttributes();
     this->mpd = new MPD;
@@ -135,28 +126,6 @@ bool    BasicCMParser::setMPD()
     this->setPeriods(this->root);
     this->mpd->setProgramInformation( this->parseProgramInformation() );
     return true;
-}
-void    BasicCMParser::setMPDBaseUrl        (Node *root)
-{
-    std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(root, "BaseURL");
-
-    for(size_t i = 0; i < baseUrls.size(); i++)
-    {
-        BaseUrl *url = new BaseUrl(baseUrls.at(i)->getText());
-        this->mpd->addBaseUrl(url);
-    }
-}
-
-void    BasicCMParser::setPeriods           (Node *root)
-{
-    std::vector<Node *> periods = DOMHelper::getElementByTagName(root, "Period", false);
-
-    for(size_t i = 0; i < periods.size(); i++)
-    {
-        Period *period = new Period();
-        this->setAdaptationSet(periods.at(i), period);
-        this->mpd->addPeriod(period);
-    }
 }
 
 void BasicCMParser::parseSegmentTimeline(Node *node, SegmentInfoCommon *segmentInfo)
@@ -243,7 +212,7 @@ void BasicCMParser::parseSegmentInfoDefault(Node *node, AdaptationSet *group)
     }
 }
 
-void    BasicCMParser::setAdaptationSet            (Node *root, Period *period)
+void    BasicCMParser::setAdaptationSets(Node *root, Period *period)
 {
     std::vector<Node *> adaptSets = DOMHelper::getElementByTagName(root, "AdaptationSet", false);
     if ( adaptSets.size() == 0 ) //In some old file, AdaptationSet may still be called Group
@@ -517,11 +486,6 @@ bool    BasicCMParser::resolveUrlTemplates( std::string &url, bool &containRunti
         it = url.find( '$', it );
     }
     return true;
-}
-
-MPD*    BasicCMParser::getMPD()
-{
-    return this->mpd;
 }
 
 void BasicCMParser::parseContentDescriptor(Node *node, const std::string &name, void (CommonAttributesElements::*addPtr)(ContentDescription *), CommonAttributesElements *self) const

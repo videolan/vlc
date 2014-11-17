@@ -44,6 +44,7 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/mpd/ContentDescription.h \
     stream_filter/dash/mpd/IMPDManager.h \
     stream_filter/dash/mpd/IMPDManager.cpp \
+    stream_filter/dash/mpd/IMPDParser.cpp \
     stream_filter/dash/mpd/IMPDParser.h \
     stream_filter/dash/mpd/IsoffMainParser.cpp \
     stream_filter/dash/mpd/IsoffMainParser.h \
