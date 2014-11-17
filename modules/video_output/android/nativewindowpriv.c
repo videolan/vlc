@@ -81,8 +81,6 @@ static int window_connect( ANativeWindow *anw )
 {
 #if ANDROID_API >= 14
     return native_window_api_connect( anw, NATIVE_WINDOW_API_MEDIA );
-#else
-    return native_window_connect( anw, NATIVE_WINDOW_API_EGL );
 #endif
 }
 
@@ -90,8 +88,6 @@ static int window_disconnect( ANativeWindow *anw )
 {
 #if ANDROID_API >= 14
     return native_window_api_disconnect( anw, NATIVE_WINDOW_API_MEDIA );
-#else
-    return native_window_disconnect( anw, NATIVE_WINDOW_API_EGL );
 #endif
 }
 
