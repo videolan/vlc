@@ -99,6 +99,7 @@ struct android_window
     unsigned int i_pic_count;
     unsigned int i_min_undequeued;
     bool b_use_priv;
+    bool b_opaque;
 
     jobject jsurf;
     ANativeWindow *p_handle;
@@ -243,7 +244,8 @@ static android_window *AndroidWindow_New(vout_display_sys_t *sys,
     if (!p_window)
         return NULL;
 
-    if (p_fmt->i_chroma != VLC_CODEC_ANDROID_OPAQUE) {
+    p_window->b_opaque = p_fmt->i_chroma == VLC_CODEC_ANDROID_OPAQUE;
+    if (!p_window->b_opaque) {
         p_window->b_use_priv = sys->b_has_anwp && b_use_priv;
 
         p_window->i_android_hal = ChromaToAndroidHal(p_fmt->i_chroma);
@@ -320,7 +322,7 @@ static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
     }
 
     p_window->jsurf = jsurf;
-    if (!p_window->p_handle) {
+    if (!p_window->p_handle && !p_window->b_opaque) {
         JNIEnv *p_env;
 
         jni_attach_thread(&p_env, THREAD_NAME);
@@ -425,18 +427,25 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
                                     android_window *p_window,
                                     unsigned int i_pic_count)
 {
-    int align_pixels;
-    picture_t *p_pic;
-
     if (i_pic_count != 0)
         p_window->i_pic_count = i_pic_count;
 
-    p_pic = PictureAlloc(sys, &p_window->fmt);
-    // For RGB (32 or 16) we need to align on 8 or 4 pixels, 16 pixels for YUV
-    align_pixels = (16 / p_pic->p[0].i_pixel_pitch) - 1;
-    p_window->fmt.i_height = p_pic->format.i_height;
-    p_window->fmt.i_width = (p_pic->format.i_width + align_pixels) & ~align_pixels;
-    picture_Release(p_pic);
+    if (!p_window->b_opaque) {
+        int align_pixels;
+        picture_t *p_pic = PictureAlloc(sys, &p_window->fmt);
+
+        // For RGB (32 or 16) we need to align on 8 or 4 pixels, 16 pixels for YUV
+        align_pixels = (16 / p_pic->p[0].i_pixel_pitch) - 1;
+        p_window->fmt.i_height = p_pic->format.i_height;
+        p_window->fmt.i_width = (p_pic->format.i_width + align_pixels) & ~align_pixels;
+        picture_Release(p_pic);
+    }
+
+    if (p_window->b_opaque) {
+        sys->p_window->i_pic_count = 31; // TODO
+        sys->p_window->i_min_undequeued = 0;
+        return 0;
+    }
 
     if (!p_window->b_use_priv
         || AndroidWindow_SetupANWP(sys, p_window) != 0) {
@@ -603,26 +612,21 @@ static int Open(vlc_object_t *p_this)
             default:
                 goto error;
         }
-
-        sys->p_window = AndroidWindow_New(sys, &vd->fmt, true);
-        if (!sys->p_window)
-            goto error;
-
-        if (SetupWindowSurface(sys, 0) != 0)
-            goto error;
-
-        /* use software rotation if we don't use private anw */
-        if (!sys->p_window->b_use_priv)
-            video_format_ApplyRotation(&vd->fmt, &vd->fmt);
-
-        msg_Dbg(vd, "using %s", sys->p_window->b_use_priv ? "ANWP" : "ANW");
-    } else {
-        /* vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE */
-        sys->p_window = AndroidWindow_New(sys, &vd->fmt, false);
-        if (!sys->p_window)
-            goto error;
-        msg_Dbg(vd, "using opaque");
     }
+
+    sys->p_window = AndroidWindow_New(sys, &vd->fmt, true);
+    if (!sys->p_window)
+        goto error;
+
+    if (SetupWindowSurface(sys, 0) != 0)
+        goto error;
+
+    /* use software rotation if we don't use private anw */
+    if (!sys->p_window->b_opaque && !sys->p_window->b_use_priv)
+        video_format_ApplyRotation(&vd->fmt, &vd->fmt);
+
+    msg_Dbg(vd, "using %s", sys->p_window->b_opaque ? "opaque" :
+            (sys->p_window->b_use_priv ? "ANWP" : "ANW"));
 
     video_format_ApplyRotation(&sub_fmt, &vd->fmt);
     sub_fmt.i_chroma = subpicture_chromas[0];
@@ -720,15 +724,12 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     picture_t **pp_pics = NULL;
     unsigned int i = 0;
 
-    if (vd->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE) {
-        if (SetupWindowSurface(sys, requested_count) != 0)
-            goto error;
+    if (SetupWindowSurface(sys, requested_count) != 0)
+        goto error;
 
-        requested_count = AndroidWindow_GetPicCount(sys, sys->p_window);
-        msg_Dbg(vd, "PoolAlloc: request %d frames", requested_count);
-    } else {
-        requested_count = 31; // TODO:
-    }
+    requested_count = AndroidWindow_GetPicCount(sys, sys->p_window);
+    msg_Dbg(vd, "PoolAlloc: request %d frames", requested_count);
+
     UpdateWindowSize(&sys->p_window->fmt, sys->p_window->b_use_priv);
 
     pp_pics = calloc(requested_count, sizeof(picture_t));
@@ -738,7 +739,7 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
         picture_t *p_pic = PictureAlloc(sys, &sys->p_window->fmt);
         if (!p_pic)
             goto error;
-        if (vd->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE) {
+        if (!sys->p_window->b_opaque) {
             p_pic->p_sys->pf_lock_pic = DefaultLockPicture;
             p_pic->p_sys->pf_unlock_pic = DefaultUnlockPicture;
         }
@@ -868,7 +869,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     case VOUT_DISPLAY_RESET_PICTURES:
     {
-        if (sys->p_window->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
+        if (sys->p_window->b_opaque)
             return VLC_EGENERIC;
 
         msg_Dbg(vd, "resetting pictures");
