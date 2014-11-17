@@ -25,6 +25,10 @@
 #ifndef IMPDPARSER_H_
 #define IMPDPARSER_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "mpd/MPD.h"
 #include "xml/DOMParser.h"
 
