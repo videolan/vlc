@@ -383,21 +383,18 @@ error:
     return -1;
 }
 
-static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
-                                  android_window *p_window)
+static int AndroidWindow_ConfigureSurface(vout_display_sys_t *sys,
+                                          android_window *p_window)
 {
     int err;
     bool configured;
 
-    p_window->i_pic_count = 1;
-    p_window->i_min_undequeued = 0;
-
     /*
-     * anw.setBuffersGeometry is broken in gingerbread.
+     * anw.setBuffersGeometry and anwp.setup are broken before ics.
      * use jni_ConfigureSurface to configure the surface on the java side
-     * synchronsouly.
+     * synchronously.
      * jni_ConfigureSurface return -1 when you don't need to call it (ie, after
-     * gingerbread).
+     * honeycomb).
      * if jni_ConfigureSurface succeed, you need to get a new surface handle.
      * That's why AndroidWindow_SetSurface is called again here.
      */
@@ -414,13 +411,20 @@ static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
                 return -1;
         } else
             return -1;
-    } else {
-        err = sys->anw.setBuffersGeometry(p_window->p_handle,
-                                          p_window->fmt.i_width,
-                                          p_window->fmt.i_height,
-                                          p_window->i_android_hal);
     }
-    return err;
+    return 0;
+}
+
+static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
+                                  android_window *p_window)
+{
+    p_window->i_pic_count = 1;
+    p_window->i_min_undequeued = 0;
+
+    return sys->anw.setBuffersGeometry(p_window->p_handle,
+                                       p_window->fmt.i_width,
+                                       p_window->fmt.i_height,
+                                       p_window->i_android_hal);
 }
 
 static int AndroidWindow_Setup(vout_display_sys_t *sys,
@@ -440,6 +444,9 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
         p_window->fmt.i_width = (p_pic->format.i_width + align_pixels) & ~align_pixels;
         picture_Release(p_pic);
     }
+
+    if (AndroidWindow_ConfigureSurface(sys, p_window) != 0)
+        return -1;
 
     if (p_window->b_opaque) {
         sys->p_window->i_pic_count = 31; // TODO
