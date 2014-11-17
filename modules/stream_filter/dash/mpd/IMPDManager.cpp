@@ -25,30 +25,100 @@
 
 using namespace dash::mpd;
 
-Profile::Name Profile::getNameByURN(std::string urn)
+IMPDManager::IMPDManager(MPD *mpd_) :
+    mpd(mpd_)
 {
-    struct
-    {
-        const Name name;
-        const char * urn;
-    }
-    urnmap[] =
-    {
-        { Full,         "urn:mpeg:dash:profile:full:2011" },
-        { ISOOnDemand,  "urn:mpeg:dash:profile:isoff-on-demand:2011" },
-        { ISOOnDemand,  "urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm" },
-        { ISOOnDemand,  "urn:mpeg:dash:profile:isoff-ondemand:2011" },
-        { ISOMain,      "urn:mpeg:dash:profile:isoff-main:2011" },
-        { ISOLive,      "urn:mpeg:dash:profile:isoff-live:2011" },
-        { MPEG2TSMain,  "urn:mpeg:dash:profile:mp2t-main:2011" },
-        { MPEG2TSSimple,"urn:mpeg:dash:profile:mp2t-simple:2011" },
-        { Unknown,      "" },
-    };
 
-    for( int i=0; urnmap[i].name != Unknown; i++ )
+}
+
+IMPDManager::~IMPDManager()
+{
+    delete mpd;
+}
+
+const std::vector<Period*>& IMPDManager::getPeriods() const
+{
+    return mpd->getPeriods();
+}
+
+Period* IMPDManager::getFirstPeriod() const
+{
+    std::vector<Period *> periods = getPeriods();
+
+    if( !periods.empty() )
+        return periods.front();
+    else
+        return NULL;
+}
+
+Period* IMPDManager::getNextPeriod(Period *period)
+{
+    std::vector<Period *> periods = getPeriods();
+
+    for(size_t i = 0; i < periods.size(); i++)
     {
-        if ( urn == urnmap[i].urn )
-            return urnmap[i].name;
+        if(periods.at(i) == period && (i + 1) < periods.size())
+            return periods.at(i + 1);
     }
-    return Unknown;
+
+    return NULL;
+}
+
+const MPD* IMPDManager::getMPD() const
+{
+    return mpd;
+}
+
+Representation* IMPDManager::getBestRepresentation(Period *period) const
+{
+    if (period == NULL)
+        return NULL;
+
+    std::vector<AdaptationSet *> adaptSet = period->getAdaptationSets();
+
+    uint64_t        bitrate  = 0;
+    Representation  *best    = NULL;
+
+    for(size_t i = 0; i < adaptSet.size(); i++)
+    {
+        std::vector<Representation *> reps = adaptSet.at(i)->getRepresentations();
+        for(size_t j = 0; j < reps.size(); j++)
+        {
+            uint64_t currentBitrate = reps.at(j)->getBandwidth();
+
+            if( currentBitrate > bitrate)
+            {
+                bitrate = currentBitrate;
+                best    = reps.at(j);
+            }
+        }
+    }
+    return best;
+}
+
+Representation* IMPDManager::getRepresentation(Period *period, uint64_t bitrate ) const
+{
+    if (period == NULL)
+        return NULL;
+
+    std::vector<AdaptationSet *>    adaptSet = period->getAdaptationSets();
+
+    Representation  *best = NULL;
+
+    for(size_t i = 0; i < adaptSet.size(); i++)
+    {
+        std::vector<Representation *> reps = adaptSet.at(i)->getRepresentations();
+        for( size_t j = 0; j < reps.size(); j++ )
+        {
+            uint64_t currentBitrate = reps.at(j)->getBandwidth();
+
+            if ( best == NULL ||
+                 ( currentBitrate > best->getBandwidth() &&
+                   currentBitrate < bitrate ) )
+            {
+                best = reps.at( j );
+            }
+        }
+    }
+    return best;
 }

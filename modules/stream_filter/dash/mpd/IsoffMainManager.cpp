@@ -30,13 +30,10 @@
 
 using namespace dash::mpd;
 
-IsoffMainManager::IsoffMainManager  (MPD *mpd)
+IsoffMainManager::IsoffMainManager(MPD *mpd) :
+    IMPDManager( mpd )
 {
-    this->mpd = mpd;
-}
-IsoffMainManager::~IsoffMainManager ()
-{
-    delete this->mpd;
+
 }
 
 std::vector<Segment*>       IsoffMainManager::getSegments           (const Representation *rep)
@@ -56,82 +53,7 @@ std::vector<Segment*>       IsoffMainManager::getSegments           (const Repre
         retSegments.insert(retSegments.end(), list->getSegments().begin(), list->getSegments().end());
     return retSegments;
 }
-const std::vector<Period*>& IsoffMainManager::getPeriods            () const
-{
-    return this->mpd->getPeriods();
-}
-Representation*             IsoffMainManager::getBestRepresentation (Period *period)
-{
-    std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
 
-    int             bitrate  = 0;
-    Representation  *best    = NULL;
-
-    for(size_t i = 0; i < adaptationSets.size(); i++)
-    {
-        std::vector<Representation *> reps = adaptationSets.at(i)->getRepresentations();
-        for(size_t j = 0; j < reps.size(); j++)
-        {
-            int currentBitrate = reps.at(j)->getBandwidth();
-
-            if(currentBitrate > bitrate)
-            {
-                bitrate = currentBitrate;
-                best    = reps.at(j);
-            }
-        }
-    }
-    return best;
-}
-Period*                     IsoffMainManager::getFirstPeriod        ()
-{
-    std::vector<Period *> periods = this->mpd->getPeriods();
-
-    if(periods.size() == 0)
-        return NULL;
-
-    return periods.at(0);
-}
-Representation*             IsoffMainManager::getRepresentation     (Period *period, uint64_t bitrate) const
-{
-    if(period == NULL)
-        return NULL;
-
-    std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
-
-    Representation  *best = NULL;
-
-    for(size_t i = 0; i < adaptationSets.size(); i++)
-    {
-        std::vector<Representation *> reps = adaptationSets.at(i)->getRepresentations();
-        for( size_t j = 0; j < reps.size(); j++ )
-        {
-            uint64_t currentBitrate = reps.at(j)->getBandwidth();
-
-            if(best == NULL || (currentBitrate > best->getBandwidth() && currentBitrate < bitrate))
-            {
-                best = reps.at( j );
-            }
-        }
-    }
-    return best;
-}
-Period*                     IsoffMainManager::getNextPeriod         (Period *period)
-{
-    std::vector<Period *> periods = this->mpd->getPeriods();
-
-    for(size_t i = 0; i < periods.size(); i++)
-    {
-        if(periods.at(i) == period && (i + 1) < periods.size())
-            return periods.at(i + 1);
-    }
-
-    return NULL;
-}
-const MPD*                  IsoffMainManager::getMPD                () const
-{
-    return this->mpd;
-}
 Representation*             IsoffMainManager::getRepresentation     (Period *period, uint64_t bitrate, int width, int height) const
 {
     if(period == NULL)
@@ -151,7 +73,7 @@ Representation*             IsoffMainManager::getRepresentation     (Period *per
     }
 
     if(resMatchReps.size() == 0)
-        return this->getRepresentation(period, bitrate);
+        return IMPDManager::getRepresentation(period, bitrate);
 
     Representation  *best = NULL;
     for( size_t j = 0; j < resMatchReps.size(); j++ )

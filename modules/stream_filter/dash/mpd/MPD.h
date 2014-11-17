@@ -32,7 +32,7 @@
 #include "mpd/Period.h"
 #include "mpd/BaseUrl.h"
 #include "mpd/ProgramInformation.h"
-#include "mpd/IMPDManager.h"
+#include "mpd/Profile.hpp"
 
 namespace dash
 {

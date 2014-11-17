@@ -29,12 +29,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "mpd/MPD.h"
-#include "mpd/Period.h"
-#include "mpd/Representation.h"
+#include "mpd/IMPDManager.h"
 #include "mpd/SegmentInfo.h"
 #include "mpd/Segment.h"
-#include "mpd/IMPDManager.h"
 
 namespace dash
 {
@@ -44,20 +41,10 @@ namespace dash
         {
             public:
                 BasicCMManager          (MPD *mpd);
-                virtual ~BasicCMManager ();
 
-                const std::vector<Period *>&    getPeriods() const;
-                Period*                         getFirstPeriod();
-                Period*                         getNextPeriod( Period *period );
-                Representation*                 getBestRepresentation( Period *period );
                 std::vector<Segment *>          getSegments( const Representation *rep );
-                Representation*                 getRepresentation( Period *period, uint64_t bitrate ) const;
-                const MPD*                      getMPD() const;
                 Representation*                 getRepresentation (Period *period, uint64_t bitrate,
                                                                    int width, int height) const;
-
-            private:
-                MPD *mpd;
         };
     }
 }

@@ -57,6 +57,8 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/mpd/MPDManagerFactory.h \
     stream_filter/dash/mpd/Period.cpp \
     stream_filter/dash/mpd/Period.h \
+    stream_filter/dash/mpd/Profile.cpp \
+    stream_filter/dash/mpd/Profile.hpp \
     stream_filter/dash/mpd/ProgramInformation.cpp \
     stream_filter/dash/mpd/ProgramInformation.h \
     stream_filter/dash/mpd/Representation.cpp \

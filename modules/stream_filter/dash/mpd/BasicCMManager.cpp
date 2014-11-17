@@ -27,17 +27,12 @@
 
 #include "BasicCMManager.h"
 
-#include <cassert>
-
 using namespace dash::mpd;
 
-BasicCMManager::BasicCMManager  (MPD *mpd)
+BasicCMManager::BasicCMManager(MPD *mpd) :
+    IMPDManager(mpd)
 {
-    this->mpd = mpd;
-}
-BasicCMManager::~BasicCMManager ()
-{
-    delete this->mpd;
+
 }
 
 std::vector<Segment*>   BasicCMManager::getSegments( const Representation *rep )
@@ -52,85 +47,8 @@ std::vector<Segment*>   BasicCMManager::getSegments( const Representation *rep )
                                             info->getSegments().end() );
     return retSegments;
 }
-const std::vector<Period*>&    BasicCMManager::getPeriods              () const
-{
-    return this->mpd->getPeriods();
-}
 
-Representation*         BasicCMManager::getBestRepresentation   (Period *period)
-{
-    std::vector<AdaptationSet *> adaptSet = period->getAdaptationSets();
-
-    uint64_t        bitrate  = 0;
-    Representation  *best    = NULL;
-
-    for(size_t i = 0; i < adaptSet.size(); i++)
-    {
-        std::vector<Representation *> reps = adaptSet.at(i)->getRepresentations();
-        for(size_t j = 0; j < reps.size(); j++)
-        {
-            uint64_t currentBitrate = reps.at(j)->getBandwidth();
-
-            if( currentBitrate > bitrate)
-            {
-                bitrate = currentBitrate;
-                best    = reps.at(j);
-            }
-        }
-    }
-    return best;
-}
-Period*                 BasicCMManager::getFirstPeriod          ()
-{
-    std::vector<Period *> periods = this->mpd->getPeriods();
-
-    if(periods.size() == 0)
-        return NULL;
-
-    return periods.at(0);
-}
-
-Representation*         BasicCMManager::getRepresentation(Period *period, uint64_t bitrate ) const
-{
-    std::vector<AdaptationSet *>    adaptSet = period->getAdaptationSets();
-
-    Representation  *best = NULL;
-
-    for(size_t i = 0; i < adaptSet.size(); i++)
-    {
-        std::vector<Representation *> reps = adaptSet.at(i)->getRepresentations();
-        for( size_t j = 0; j < reps.size(); j++ )
-        {
-            uint64_t currentBitrate = reps.at(j)->getBandwidth();
-
-            if ( best == NULL ||
-                 ( currentBitrate > best->getBandwidth() &&
-                   currentBitrate < bitrate ) )
-            {
-                best = reps.at( j );
-            }
-        }
-    }
-    return best;
-}
-Period*                 BasicCMManager::getNextPeriod           (Period *period)
-{
-    std::vector<Period *> periods = this->mpd->getPeriods();
-
-    for(size_t i = 0; i < periods.size(); i++)
-    {
-        if(periods.at(i) == period && (i + 1) < periods.size())
-            return periods.at(i + 1);
-    }
-
-    return NULL;
-}
-
-const MPD*      BasicCMManager::getMPD() const
-{
-    return this->mpd;
-}
 Representation*         BasicCMManager::getRepresentation (Period *period, uint64_t bitrate, int, int ) const
 {
-    return this->getRepresentation(period, bitrate);
+    return IMPDManager::getRepresentation(period, bitrate);
 }

@@ -1,11 +1,7 @@
 /*
- * IsoffMainManager.h
+ * Profile.hpp
  *****************************************************************************
- * Copyright (C) 2010 - 2012 Klagenfurt University
- *
- * Created on: Jan 27, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2010 - 2014 VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,33 +17,30 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef PROFILE_HPP
+#define PROFILE_HPP
 
-#ifndef ISOFFMAINMANAGER_H_
-#define ISOFFMAINMANAGER_H_
-
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "mpd/IMPDManager.h"
-#include "mpd/AdaptationSet.h"
-#include "mpd/SegmentInfo.h"
-#include "mpd/Segment.h"
+#include <string>
 
 namespace dash
 {
     namespace mpd
     {
-        class IsoffMainManager : public IMPDManager
+        class Profile
         {
             public:
-                IsoffMainManager            (MPD *mpd);
-
-                std::vector<Segment *>          getSegments             (const Representation *rep);
-                Representation*                 getRepresentation       (Period *period, uint64_t bitrate,
-                                                                         int width, int height) const;
+                enum Name
+                {
+                    Unknown,
+                    Full,
+                    ISOOnDemand,
+                    ISOMain,
+                    ISOLive,
+                    MPEG2TSMain,
+                    MPEG2TSSimple,
+                };
+                static Name getNameByURN( std::string urn );
         };
     }
 }
-
-#endif /* ISOFFMAINMANAGER_H_ */
+#endif // PROFILE_HPP

@@ -25,6 +25,7 @@
 #ifndef IMPDMANAGER_H_
 #define IMPDMANAGER_H_
 
+#include "mpd/MPD.h"
 #include "mpd/Period.h"
 #include "mpd/Representation.h"
 
@@ -32,38 +33,23 @@ namespace dash
 {
     namespace mpd
     {
-        class MPD;
-
-        class Profile
-        {
-            public:
-                enum Name
-                {
-                    Unknown,
-                    Full,
-                    ISOOnDemand,
-                    ISOMain,
-                    ISOLive,
-                    MPEG2TSMain,
-                    MPEG2TSSimple,
-                };
-                static Name getNameByURN( std::string urn );
-        };
-
         class IMPDManager
         {
             public:
-                virtual ~IMPDManager(){}
+                IMPDManager( MPD *mpd );
+                virtual ~IMPDManager();
 
-                virtual const std::vector<Period *>&    getPeriods              () const                            = 0;
-                virtual Period*                         getFirstPeriod          ()                                  = 0;
-                virtual Period*                         getNextPeriod           (Period *period)                    = 0;
-                virtual Representation*                 getBestRepresentation   (Period *period)                    = 0;
+                virtual const std::vector<Period *>&    getPeriods              () const;
+                virtual Period*                         getFirstPeriod          () const;
+                virtual Period*                         getNextPeriod           (Period *period);
+                virtual Representation*                 getBestRepresentation   (Period *period) const;
                 virtual std::vector<Segment *>          getSegments             (const Representation *rep)         = 0;
-                virtual Representation*                 getRepresentation       (Period *period, uint64_t bitrate) const = 0;
-                virtual const MPD*                      getMPD                  () const                            = 0;
+                virtual Representation*                 getRepresentation       (Period *period, uint64_t bitrate) const;
+                virtual const MPD*                      getMPD                  () const;
                 virtual Representation*                 getRepresentation       (Period *period, uint64_t bitrate,
                                                                                  int width, int height) const       = 0;
+            protected:
+                MPD *mpd;
         };
     }
 }
