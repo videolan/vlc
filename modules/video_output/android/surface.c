@@ -225,19 +225,15 @@ static int Open(vlc_object_t *p_this)
         fmt.i_chroma = VLC_CODEC_RGB32;
 
     switch(fmt.i_chroma) {
-        case VLC_CODEC_YV12:
-            /* avoid swscale usage by asking for I420 instead since the
-             * vout already has code to swap the buffers */
-            fmt.i_chroma = VLC_CODEC_I420;
-        case VLC_CODEC_I420:
-            break;
-
         case VLC_CODEC_RGB16:
             fmt.i_bmask = 0x0000001f;
             fmt.i_gmask = 0x000007e0;
             fmt.i_rmask = 0x0000f800;
             break;
 
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_I420:
+            fmt.i_chroma = VLC_CODEC_RGB32;
         case VLC_CODEC_RGB32:
             fmt.i_rmask  = 0x000000ff;
             fmt.i_gmask  = 0x0000ff00;
@@ -324,41 +320,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     return vd->sys->pool;
 }
 
-#define ALIGN_16_PIXELS( x ) ( ( ( x ) + 15 ) / 16 * 16 )
-static void SetupPictureYV12( SurfaceInfo* p_surfaceInfo, picture_t *p_picture )
-{
-    /* according to document of android.graphics.ImageFormat.YV12 */
-    int i_stride = ALIGN_16_PIXELS( p_surfaceInfo->s );
-    int i_c_stride = ALIGN_16_PIXELS( i_stride / 2 );
-
-    p_picture->p->i_pitch = i_stride;
-
-    /* Fill chroma planes for planar YUV */
-    for( int n = 1; n < p_picture->i_planes; n++ )
-    {
-        const plane_t *o = &p_picture->p[n-1];
-        plane_t *p = &p_picture->p[n];
-
-        p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
-        p->i_pitch  = i_c_stride;
-        p->i_lines  = p_picture->format.i_height / 2;
-        /*
-          Explicitly set the padding lines of the picture to black (127 for YUV)
-          since they might be used by Android during rescaling.
-        */
-        int visible_lines = p_picture->format.i_visible_height / 2;
-        if (visible_lines < p->i_lines)
-            memset(&p->p_pixels[visible_lines * p->i_pitch], 127, (p->i_lines - visible_lines) * p->i_pitch);
-    }
-
-    if( vlc_fourcc_AreUVPlanesSwapped( p_picture->format.i_chroma,
-                                       VLC_CODEC_YV12 ) ) {
-        uint8_t *p_tmp = p_picture->p[1].p_pixels;
-        p_picture->p[1].p_pixels = p_picture->p[2].p_pixels;
-        p_picture->p[2].p_pixels = p_tmp;
-    }
-}
-
 static int  AndroidLockSurface(picture_t *picture)
 {
     picture_sys_t *picsys = picture->p_sys;
@@ -413,9 +374,6 @@ static int  AndroidLockSurface(picture_t *picture)
     picture->p[0].p_pixels = (uint8_t*)info->bits;
     picture->p[0].i_lines = info->h;
     picture->p[0].i_pitch = picture->p[0].i_pixel_pitch * info->s;
-
-    if (info->format == 0x32315659 /*ANDROID_IMAGE_FORMAT_YV12*/)
-        SetupPictureYV12(info, picture);
 
     return VLC_SUCCESS;
 }
