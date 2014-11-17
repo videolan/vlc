@@ -761,6 +761,8 @@ char *str_format_meta(input_thread_t *input, const char *s)
                 fputc('\n', stream);
                 break;
             case 'Z':
+                if (item == NULL)
+                    break;
                 if (write_meta(stream, item, vlc_meta_NowPlaying) == EOF)
                 {
                     char *title = input_item_GetTitleFbName(item);
