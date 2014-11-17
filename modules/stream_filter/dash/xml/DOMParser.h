@@ -46,7 +46,7 @@ namespace dash
                 Node*               getRootNode ();
                 void                print       ();
                 static bool         isDash      (stream_t *stream);
-                mpd::Profile::Name  getProfile  ();
+                mpd::Profile        getProfile  () const;
 
             private:
                 Node                *root;

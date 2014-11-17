@@ -31,9 +31,9 @@
 using namespace dash::xml;
 using namespace dash::mpd;
 
-MPD* MPDFactory::create             (dash::xml::Node *root, stream_t *p_stream, Profile::Name profile)
+MPD* MPDFactory::create             (dash::xml::Node *root, stream_t *p_stream, Profile profile)
 {
-    switch(profile)
+    switch( profile )
     {
         case dash::mpd::Profile::Full:
         case dash::mpd::Profile::ISOOnDemand:

@@ -44,8 +44,8 @@ namespace dash
                 MPD();
                 virtual ~MPD();
 
-                Profile::Name                   getProfile() const;
-                void                            setProfile( Profile::Name profile );
+                Profile                         getProfile() const;
+                void                            setProfile( Profile profile );
                 bool                            isLive() const;
                 void                            setLive( bool live );
                 time_t                          getAvailabilityStartTime() const;
@@ -69,7 +69,7 @@ namespace dash
                 void    setProgramInformation   (ProgramInformation *progInfo);
 
             private:
-                Profile::Name                       profile;
+                Profile                             profile;
                 bool                                live;
                 time_t                              availabilityStartTime;
                 time_t                              availabilityEndTime;

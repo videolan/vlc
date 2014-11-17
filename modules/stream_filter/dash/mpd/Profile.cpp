@@ -25,30 +25,60 @@
 
 using namespace dash::mpd;
 
-Profile::Name Profile::getNameByURN(std::string urn)
+struct
 {
-    struct
-    {
-        const Name name;
-        const char * urn;
-    }
-    urnmap[] =
-    {
-        { Full,         "urn:mpeg:dash:profile:full:2011" },
-        { ISOOnDemand,  "urn:mpeg:dash:profile:isoff-on-demand:2011" },
-        { ISOOnDemand,  "urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm" },
-        { ISOOnDemand,  "urn:mpeg:dash:profile:isoff-ondemand:2011" },
-        { ISOMain,      "urn:mpeg:dash:profile:isoff-main:2011" },
-        { ISOLive,      "urn:mpeg:dash:profile:isoff-live:2011" },
-        { MPEG2TSMain,  "urn:mpeg:dash:profile:mp2t-main:2011" },
-        { MPEG2TSSimple,"urn:mpeg:dash:profile:mp2t-simple:2011" },
-        { Unknown,      "" },
-    };
+    const Profile::Name name;
+    const char * urn;
+}
+const urnmap[] =
+{
+    { Profile::Full,         "urn:mpeg:dash:profile:full:2011" },
+    { Profile::ISOOnDemand,  "urn:mpeg:dash:profile:isoff-on-demand:2011" },
+    { Profile::ISOOnDemand,  "urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm" },
+    { Profile::ISOOnDemand,  "urn:mpeg:dash:profile:isoff-ondemand:2011" },
+    { Profile::ISOMain,      "urn:mpeg:dash:profile:isoff-main:2011" },
+    { Profile::ISOLive,      "urn:mpeg:dash:profile:isoff-live:2011" },
+    { Profile::MPEG2TSMain,  "urn:mpeg:dash:profile:mp2t-main:2011" },
+    { Profile::MPEG2TSSimple,"urn:mpeg:dash:profile:mp2t-simple:2011" },
+    { Profile::Unknown,      "" },
+};
 
+Profile::Profile(Name name)
+{
+    type = name;
+}
+
+Profile::Profile(const std::string &urn)
+{
+    type = getNameByURN(urn);
+}
+
+Profile::Name Profile::getNameByURN(const std::string &urn) const
+{
     for( int i=0; urnmap[i].name != Unknown; i++ )
     {
         if ( urn == urnmap[i].urn )
             return urnmap[i].name;
     }
     return Unknown;
+}
+
+Profile::operator Profile::Name ()
+{
+    return type;
+}
+
+Profile::operator std::string ()
+{
+    for( int i=0; urnmap[i].name != Unknown; i++ )
+    {
+        if ( urnmap[i].name == type )
+            return std::string( urnmap[i].urn );
+    }
+    return std::string();
+}
+
+bool Profile::operator==(Profile &profile) const
+{
+    return profile.type == type;
 }

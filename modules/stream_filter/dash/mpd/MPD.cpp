@@ -158,12 +158,12 @@ void MPD::setAvailabilityEndTime(time_t time)
         this->availabilityEndTime = time;
 }
 
-Profile::Name MPD::getProfile() const
+Profile MPD::getProfile() const
 {
-    return this->profile;
+    return profile;
 }
 
-void MPD::setProfile(Profile::Name profile)
+void MPD::setProfile(Profile profile)
 {
     this->profile = profile;
 }

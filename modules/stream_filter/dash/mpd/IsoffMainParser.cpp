@@ -175,9 +175,10 @@ void    IsoffMainParser::print              ()
 {
     if(mpd)
     {
-        msg_Dbg(p_stream, "MPD profile=%d mediaPresentationDuration=%ld minBufferTime=%ld", mpd->getProfile(),
-                                                                                                  mpd->getDuration(),
-                                                                                                  mpd->getMinBufferTime());
+        msg_Dbg(p_stream, "MPD profile=%s mediaPresentationDuration=%ld minBufferTime=%ld",
+                static_cast<std::string>(mpd->getProfile()).c_str(),
+                mpd->getDuration(),
+                mpd->getMinBufferTime());
         std::vector<BaseUrl *>::const_iterator h;
         for(h = mpd->getBaseUrls().begin(); h != mpd->getBaseUrls().end(); h++)
             msg_Dbg(p_stream, "BaseUrl=%s", (*h)->getUrl().c_str());

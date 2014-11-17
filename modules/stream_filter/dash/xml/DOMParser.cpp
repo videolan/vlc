@@ -161,14 +161,15 @@ bool    DOMParser::isDash                   (stream_t *stream)
     }
     return false;
 }
-Profile::Name DOMParser::getProfile               ()
+
+Profile DOMParser::getProfile() const
 {
     if(this->root == NULL)
-        return dash::mpd::Profile::Unknown;
+        return Profile(Profile::Unknown);
 
-    std::string profile = this->root->getAttributeValue("profiles");
-    if ( profile.length() == 0 )
-        profile = this->root->getAttributeValue("profile"); //The standard spells it the both ways...
+    std::string urn = this->root->getAttributeValue("profiles");
+    if ( urn.length() == 0 )
+        urn = this->root->getAttributeValue("profile"); //The standard spells it the both ways...
 
-    return dash::mpd::Profile::getNameByURN(profile);
+    return Profile(urn);
 }

@@ -39,7 +39,15 @@ namespace dash
                     MPEG2TSMain,
                     MPEG2TSSimple,
                 };
-                static Name getNameByURN( std::string urn );
+                Profile(Name);
+                Profile(const std::string &);
+                bool operator==(Profile &) const;
+                operator Profile::Name ();
+                operator std::string ();
+
+            private:
+                Name getNameByURN(const std::string &) const;
+                Name type;
         };
     }
 }
