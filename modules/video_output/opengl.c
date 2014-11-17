@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
 #include <vlc_subpicture.h>
@@ -592,7 +594,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->tex_type     = GL_UNSIGNED_SHORT;
     }
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
-    vgl->use_multitexture = vgl->chroma && vgl->chroma->plane_count > 1;
+    assert(vgl->chroma != NULL);
+    vgl->use_multitexture = vgl->chroma->plane_count > 1;
 
     /* Texture size */
     for (unsigned j = 0; j < vgl->chroma->plane_count; j++) {
