@@ -37,12 +37,10 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPDManager *mpdManager, str
                           AbstractAdaptationLogic   (mpdManager, stream),
                           mpdManager                (mpdManager),
                           count                     (0),
-                          currentPeriod             (mpdManager->getFirstPeriod()),
-                          width                     (0),
-                          height                    (0)
+                          currentPeriod             (mpdManager->getFirstPeriod())
 {
-    this->width  = var_InheritInteger(stream, "dash-prefwidth");
-    this->height = var_InheritInteger(stream, "dash-prefheight");
+    width  = var_InheritInteger(stream, "dash-prefwidth");
+    height = var_InheritInteger(stream, "dash-prefheight");
 }
 
 Chunk*  RateBasedAdaptationLogic::getNextChunk()
