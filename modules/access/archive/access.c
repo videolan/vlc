@@ -139,7 +139,7 @@ static int FindVolumes(access_t *p_access, struct archive *p_archive, const char
 
             if (*pi_files == 0)
                 FREENULL(ppsz_files);
-             *pppsz_files = ppsz_files;
+            *pppsz_files = ppsz_files;
 
             return VLC_SUCCESS;
         }
