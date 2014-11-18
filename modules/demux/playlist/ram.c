@@ -439,7 +439,10 @@ static void ParseClipInfo( const char *psz_clipinfo, char **ppsz_artist, char **
             *( strchr( psz_suboption, '=' ) ) = '\0';
         }
         else
+        {
+            free( psz_suboption );
             break;
+        }
         /* Put into args */
         if( !strcmp( psz_param, "artist name" ) )
             *ppsz_artist = decode_URI_duplicate( psz_value );
