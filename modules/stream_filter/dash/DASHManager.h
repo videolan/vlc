@@ -49,13 +49,10 @@ namespace dash
             int     peek          ( const uint8_t **pp_peek, size_t i_peek );
             int     seekBackwards ( unsigned len );
 
-            const mpd::MPDManager*         getMpdManager   () const;
             mtime_t getDuration() const;
-            const http::Chunk *getCurrentChunk() const;
 
         private:
             http::HTTPConnectionManager         *conManager;
-            http::Chunk                         *currentChunk;
             logic::IAdaptationLogic             *adaptationLogic;
             logic::IAdaptationLogic::LogicType  logicType;
             mpd::MPDManager                    *mpdManager;

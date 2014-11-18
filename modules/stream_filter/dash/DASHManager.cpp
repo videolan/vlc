@@ -37,7 +37,6 @@ using namespace dash::buffer;
 DASHManager::DASHManager    ( MPD *mpd,
                               IAdaptationLogic::LogicType type, stream_t *stream) :
              conManager     ( NULL ),
-             currentChunk   ( NULL ),
              adaptationLogic( NULL ),
              logicType      ( type ),
              mpdManager     ( NULL ),
@@ -92,11 +91,6 @@ int     DASHManager::peek( const uint8_t **pp_peek, size_t i_peek )
     return this->buffer->peek(pp_peek, i_peek);
 }
 
-const mpd::MPDManager*         DASHManager::getMpdManager() const
-{
-    return this->mpdManager;
-}
-
 mtime_t DASHManager::getDuration() const
 {
     if (mpd->isLive())
@@ -111,9 +105,4 @@ mtime_t DASHManager::getDuration() const
         else
             return mpd->getDuration() * rep->getBandwidth() / 8;
     }
-}
-
-const Chunk *DASHManager::getCurrentChunk() const
-{
-    return this->currentChunk;
 }
