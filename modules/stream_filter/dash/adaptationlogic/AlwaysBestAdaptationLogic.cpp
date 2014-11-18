@@ -32,7 +32,7 @@ using namespace dash::xml;
 using namespace dash::http;
 using namespace dash::mpd;
 
-AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (IMPDManager *mpdManager, stream_t *stream) :
+AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (MPDManager *mpdManager, stream_t *stream) :
                            AbstractAdaptationLogic      (mpdManager, stream)
 {
     this->mpdManager    = mpdManager;

@@ -25,9 +25,7 @@
 #ifndef MPDMANAGERFACTORY_H_
 #define MPDMANAGERFACTORY_H_
 
-#include "mpd/IMPDManager.h"
-#include "mpd/BasicCMManager.h"
-#include "mpd/IsoffMainManager.h"
+#include "mpd/MPDManager.hpp"
 
 namespace dash
 {
@@ -36,7 +34,7 @@ namespace dash
         class MPDManagerFactory
         {
             public:
-                static IMPDManager* create( MPD *mpd );
+                static MPDManager* create( MPD *mpd );
         };
     }
 }

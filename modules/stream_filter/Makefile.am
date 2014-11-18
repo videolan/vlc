@@ -36,22 +36,18 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/mpd/AdaptationSet.cpp \
     stream_filter/dash/mpd/AdaptationSet.h \
     stream_filter/dash/mpd/BaseUrl.h \
-    stream_filter/dash/mpd/BasicCMManager.cpp \
-    stream_filter/dash/mpd/BasicCMManager.h \
     stream_filter/dash/mpd/BasicCMParser.cpp \
     stream_filter/dash/mpd/BasicCMParser.h \
     stream_filter/dash/mpd/CommonAttributesElements.cpp \
     stream_filter/dash/mpd/CommonAttributesElements.h \
     stream_filter/dash/mpd/ContentDescription.cpp \
     stream_filter/dash/mpd/ContentDescription.h \
-    stream_filter/dash/mpd/IMPDManager.h \
-    stream_filter/dash/mpd/IMPDManager.cpp \
+    stream_filter/dash/mpd/MPDManager.hpp \
+    stream_filter/dash/mpd/MPDManager.cpp \
     stream_filter/dash/mpd/IMPDParser.cpp \
     stream_filter/dash/mpd/IMPDParser.h \
     stream_filter/dash/mpd/IsoffMainParser.cpp \
     stream_filter/dash/mpd/IsoffMainParser.h \
-    stream_filter/dash/mpd/IsoffMainManager.cpp \
-    stream_filter/dash/mpd/IsoffMainManager.h \
     stream_filter/dash/mpd/MPD.cpp \
     stream_filter/dash/mpd/MPD.h \
     stream_filter/dash/mpd/MPDFactory.cpp \

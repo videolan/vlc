@@ -1,11 +1,7 @@
 /*
- * IsoffMainManager.h
+ * MPDManager.cpp
  *****************************************************************************
- * Copyright (C) 2010 - 2012 Klagenfurt University
- *
- * Created on: Jan 27, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2014 - VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,30 +17,55 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-#ifndef ISOFFMAINMANAGER_H_
-#define ISOFFMAINMANAGER_H_
+#include "MPDManager.hpp"
+#include <limits>
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+using namespace dash::mpd;
 
-#include "mpd/IMPDManager.h"
-#include "mpd/AdaptationSet.h"
-#include "mpd/SegmentInfo.h"
-#include "mpd/Segment.h"
-
-namespace dash
+MPDManager::MPDManager(MPD *mpd_) :
+    mpd(mpd_)
 {
-    namespace mpd
-    {
-        class IsoffMainManager : public IMPDManager
-        {
-            public:
-                IsoffMainManager            (MPD *mpd);
 
-        };
-    }
 }
 
-#endif /* ISOFFMAINMANAGER_H_ */
+MPDManager::~MPDManager()
+{
+    delete mpd;
+}
+
+const std::vector<Period*>& MPDManager::getPeriods() const
+{
+    return mpd->getPeriods();
+}
+
+Period* MPDManager::getFirstPeriod() const
+{
+    std::vector<Period *> periods = getPeriods();
+
+    if( !periods.empty() )
+        return periods.front();
+    else
+        return NULL;
+}
+
+Period* MPDManager::getNextPeriod(Period *period)
+{
+    std::vector<Period *> periods = getPeriods();
+
+    for(size_t i = 0; i < periods.size(); i++)
+    {
+        if(periods.at(i) == period && (i + 1) < periods.size())
+            return periods.at(i + 1);
+    }
+
+    return NULL;
+}
+
+const MPD* MPDManager::getMPD() const
+{
+    return mpd;
+}

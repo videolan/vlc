@@ -29,7 +29,7 @@
 #include "xml/Node.h"
 #include "adaptationlogic/IAdaptationLogic.h"
 #include "adaptationlogic/AdaptationLogicFactory.h"
-#include "mpd/IMPDManager.h"
+#include "mpd/MPDManager.hpp"
 #include "mpd/MPDManagerFactory.h"
 #include "buffer/BlockBuffer.h"
 #include "DASHDownloader.h"
@@ -49,7 +49,7 @@ namespace dash
             int     peek          ( const uint8_t **pp_peek, size_t i_peek );
             int     seekBackwards ( unsigned len );
 
-            const mpd::IMPDManager*         getMpdManager   () const;
+            const mpd::MPDManager*         getMpdManager   () const;
             const logic::IAdaptationLogic*  getAdaptionLogic() const;
             const http::Chunk *getCurrentChunk() const;
 
@@ -58,7 +58,7 @@ namespace dash
             http::Chunk                         *currentChunk;
             logic::IAdaptationLogic             *adaptationLogic;
             logic::IAdaptationLogic::LogicType  logicType;
-            mpd::IMPDManager                    *mpdManager;
+            mpd::MPDManager                    *mpdManager;
             mpd::MPD                            *mpd;
             stream_t                            *stream;
             DASHDownloader                      *downloader;

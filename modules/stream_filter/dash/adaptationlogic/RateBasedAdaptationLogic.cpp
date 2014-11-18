@@ -33,7 +33,7 @@ using namespace dash::xml;
 using namespace dash::http;
 using namespace dash::mpd;
 
-RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager, stream_t *stream) :
+RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPDManager *mpdManager, stream_t *stream) :
                           AbstractAdaptationLogic   (mpdManager, stream),
                           mpdManager                (mpdManager),
                           count                     (0),

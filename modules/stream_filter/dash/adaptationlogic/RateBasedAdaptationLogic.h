@@ -27,9 +27,8 @@
 
 #include "adaptationlogic/AbstractAdaptationLogic.h"
 #include "xml/Node.h"
-#include "mpd/IMPDManager.h"
+#include "mpd/MPDManager.hpp"
 #include "http/Chunk.h"
-#include "mpd/BasicCMManager.h"
 
 #include <vlc_common.h>
 #include <vlc_stream.h>
@@ -43,13 +42,13 @@ namespace dash
         class RateBasedAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                RateBasedAdaptationLogic            (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
+                RateBasedAdaptationLogic            (dash::mpd::MPDManager *mpdManager, stream_t *stream);
 
                 dash::http::Chunk*      getNextChunk();
                 const dash::mpd::Representation *getCurrentRepresentation() const;
 
             private:
-                dash::mpd::IMPDManager  *mpdManager;
+                dash::mpd::MPDManager  *mpdManager;
                 size_t                  count;
                 dash::mpd::Period       *currentPeriod;
                 int                     width;

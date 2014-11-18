@@ -29,10 +29,9 @@
 #include "Representationselectors.hpp"
 #include "http/Chunk.h"
 #include "xml/Node.h"
-#include "mpd/IMPDManager.h"
+#include "mpd/MPDManager.hpp"
 #include "mpd/Period.h"
 #include "mpd/Segment.h"
-#include "mpd/BasicCMManager.h"
 #include <vector>
 
 namespace dash
@@ -42,7 +41,7 @@ namespace dash
         class AlwaysBestAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                AlwaysBestAdaptationLogic           (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
+                AlwaysBestAdaptationLogic           (dash::mpd::MPDManager *mpdManager, stream_t *stream);
                 virtual ~AlwaysBestAdaptationLogic  ();
 
                 dash::http::Chunk* getNextChunk();
@@ -50,7 +49,7 @@ namespace dash
 
             private:
                 std::vector<mpd::Segment *>         schedule;
-                dash::mpd::IMPDManager              *mpdManager;
+                dash::mpd::MPDManager              *mpdManager;
                 size_t                              count;
                 dash::mpd::Representation           *bestRepresentation;
 

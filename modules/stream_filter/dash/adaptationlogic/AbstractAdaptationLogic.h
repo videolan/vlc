@@ -29,7 +29,7 @@
 #include "xml/Node.h"
 #include "http/Chunk.h"
 #include "mpd/MPD.h"
-#include "mpd/IMPDManager.h"
+#include "mpd/MPDManager.hpp"
 #include "mpd/Period.h"
 #include "mpd/Representation.h"
 #include "mpd/Segment.h"
@@ -43,7 +43,7 @@ namespace dash
         class AbstractAdaptationLogic : public IAdaptationLogic
         {
             public:
-                AbstractAdaptationLogic             (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
+                AbstractAdaptationLogic             (dash::mpd::MPDManager *mpdManager, stream_t *stream);
                 virtual ~AbstractAdaptationLogic    ();
 
                 virtual void                downloadRateChanged     (uint64_t bpsAvg, uint64_t bpsLastChunk);
@@ -56,7 +56,7 @@ namespace dash
             private:
                 int                     bpsAvg;
                 long                    bpsLastChunk;
-                dash::mpd::IMPDManager  *mpdManager;
+                dash::mpd::MPDManager  *mpdManager;
                 stream_t                *stream;
                 mtime_t                 bufferedMicroSec;
                 int                     bufferedPercent;

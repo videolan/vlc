@@ -1,5 +1,5 @@
 /*
- * BasicCMManager.h
+ * MPDManager.hpp
  *****************************************************************************
  * Copyright (C) 2010 - 2011 Klagenfurt University
  *
@@ -22,28 +22,31 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef BASICCMMANAGER_H_
-#define BASICCMMANAGER_H_
+#ifndef MPDMANAGER_H_
+#define MPDMANAGER_H_
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "mpd/IMPDManager.h"
-#include "mpd/SegmentInfo.h"
-#include "mpd/Segment.h"
+#include "mpd/MPD.h"
+#include "mpd/Period.h"
+#include "mpd/Representation.h"
 
 namespace dash
 {
     namespace mpd
     {
-        class BasicCMManager : public IMPDManager
+        class MPDManager
         {
             public:
-                BasicCMManager          (MPD *mpd);
+                MPDManager( MPD *mpd );
+                virtual ~MPDManager();
 
+                virtual const std::vector<Period *>&    getPeriods              () const;
+                virtual Period*                         getFirstPeriod          () const;
+                virtual Period*                         getNextPeriod           (Period *period);
+                virtual const MPD*                      getMPD                  () const;
+
+            protected:
+                MPD *mpd;
         };
     }
 }
-
-#endif /* BASICCMMANAGER_H_ */
+#endif /* MPDMANAGER_H_ */

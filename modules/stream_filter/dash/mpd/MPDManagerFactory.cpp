@@ -29,15 +29,14 @@
 
 using namespace dash::mpd;
 
-IMPDManager* MPDManagerFactory::create( MPD *mpd )
+MPDManager* MPDManagerFactory::create( MPD *mpd )
 {
     switch( mpd->getProfile() )
     {
         case mpd::Profile::ISOOnDemand:
         case mpd::Profile::Full:
-            return new BasicCMManager   (mpd);
         case mpd::Profile::ISOMain:
-            return new IsoffMainManager (mpd);
+            return new MPDManager(mpd);
         default:
             return NULL;
     }

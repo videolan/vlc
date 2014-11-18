@@ -27,7 +27,7 @@
 
 #include "adaptationlogic/IAdaptationLogic.h"
 #include "xml/Node.h"
-#include "mpd/IMPDManager.h"
+#include "mpd/MPDManager.hpp"
 #include "adaptationlogic/AlwaysBestAdaptationLogic.h"
 #include "adaptationlogic/RateBasedAdaptationLogic.h"
 
@@ -40,7 +40,7 @@ namespace dash
         class AdaptationLogicFactory
         {
             public:
-                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::IMPDManager *mpdManager, stream_t *stream);
+                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::MPDManager *mpdManager, stream_t *stream);
         };
     }
 }

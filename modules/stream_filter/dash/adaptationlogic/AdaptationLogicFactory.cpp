@@ -32,7 +32,7 @@ using namespace dash::xml;
 using namespace dash::mpd;
 
 IAdaptationLogic* AdaptationLogicFactory::create ( IAdaptationLogic::LogicType logic,
-                                                  IMPDManager *mpdManager, stream_t *stream)
+                                                  MPDManager *mpdManager, stream_t *stream)
 {
     switch(logic)
     {
