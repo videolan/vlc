@@ -89,7 +89,9 @@ function js_descramble( sig, js_url )
         -- HTTP request later
         table.insert( lines, line )
         -- c&&(b.signature=ij(c));
-        descrambler = string.match( line, "%.signature=(.-)%(" )
+        -- descrambler = string.match( line, "%.signature=(.-)%(" )
+        -- descrambler = string.match( line, "%.sig%|%|(.-)%(" )
+        descrambler = string.match( line, "%.sig||([a-zA-Z0-9]+)%(" )
     end
 
     -- Fetch the code of the descrambler function. The function is
