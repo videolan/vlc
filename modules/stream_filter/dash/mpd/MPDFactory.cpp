@@ -36,8 +36,8 @@ MPD* MPDFactory::create             (dash::xml::Node *root, stream_t *p_stream, 
     switch( profile )
     {
         case dash::mpd::Profile::Full:
-        case dash::mpd::Profile::ISOOnDemand:
             return MPDFactory::createBasicCMMPD(root, p_stream);
+        case dash::mpd::Profile::ISOOnDemand:
         case dash::mpd::Profile::ISOMain:
             return MPDFactory::createIsoffMainMPD(root, p_stream);
 
@@ -50,7 +50,7 @@ MPD* MPDFactory::createBasicCMMPD    (dash::xml::Node *root, stream_t *p_stream)
 
     if(mpdParser.parse() == false || mpdParser.getMPD() == NULL)
         return NULL;
-    mpdParser.getMPD()->setProfile( dash::mpd::Profile::ISOOnDemand );
+    mpdParser.getMPD()->setProfile( Profile(Profile::ISOOnDemand) );
     return mpdParser.getMPD();
 }
 MPD* MPDFactory::createIsoffMainMPD  (dash::xml::Node *root, stream_t *p_stream)
@@ -59,6 +59,6 @@ MPD* MPDFactory::createIsoffMainMPD  (dash::xml::Node *root, stream_t *p_stream)
 
     if(mpdParser.parse() == false || mpdParser.getMPD() == NULL)
         return NULL;
-    mpdParser.getMPD()->setProfile( dash::mpd::Profile::ISOMain );
+    mpdParser.getMPD()->setProfile( Profile(Profile::ISOMain) );
     return mpdParser.getMPD();
 }
