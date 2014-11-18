@@ -97,9 +97,20 @@ const mpd::MPDManager*         DASHManager::getMpdManager() const
     return this->mpdManager;
 }
 
-const logic::IAdaptationLogic*  DASHManager::getAdaptionLogic() const
+mtime_t DASHManager::getDuration() const
 {
-    return this->adaptationLogic;
+    if (mpd->isLive())
+    {
+        return 0;
+    }
+    else
+    {
+        const Representation *rep = adaptationLogic->getCurrentRepresentation();
+        if ( !rep )
+            return 0;
+        else
+            return mpd->getDuration() * rep->getBandwidth() / 8;
+    }
 }
 
 const Chunk *DASHManager::getCurrentChunk() const

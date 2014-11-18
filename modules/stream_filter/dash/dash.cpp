@@ -81,7 +81,6 @@ struct stream_sys_t
         dash::DASHManager   *p_dashManager;
         dash::mpd::MPD      *p_mpd;
         uint64_t                            position;
-        bool                                isLive;
 };
 
 static int  Read            (stream_t *p_stream, void *p_ptr, unsigned int i_len);
@@ -129,7 +128,6 @@ static int Open(vlc_object_t *p_obj)
     }
     p_sys->p_dashManager    = p_dashManager;
     p_sys->position         = 0;
-    p_sys->isLive           = p_dashManager->getMpdManager()->getMPD()->isLive();
     p_stream->p_sys         = p_sys;
     p_stream->pf_read       = Read;
     p_stream->pf_peek       = Peek;
@@ -276,16 +274,7 @@ static int  Control         (stream_t *p_stream, int i_query, va_list args)
         case STREAM_GET_SIZE:
         {
             uint64_t*   res = (va_arg (args, uint64_t *));
-            if(p_sys->isLive)
-                *res = 0;
-            else
-            {
-                const dash::mpd::Representation *rep = p_sys->p_dashManager->getAdaptionLogic()->getCurrentRepresentation();
-                if ( rep == NULL )
-                    *res = 0;
-                else
-                    *res = p_sys->p_mpd->getDuration() * rep->getBandwidth() / 8;
-            }
+            *res = p_sys->p_dashManager->getDuration();
             break;
         }
         case STREAM_GET_PTS_DELAY:

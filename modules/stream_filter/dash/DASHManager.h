@@ -50,7 +50,7 @@ namespace dash
             int     seekBackwards ( unsigned len );
 
             const mpd::MPDManager*         getMpdManager   () const;
-            const logic::IAdaptationLogic*  getAdaptionLogic() const;
+            mtime_t getDuration() const;
             const http::Chunk *getCurrentChunk() const;
 
         private:
