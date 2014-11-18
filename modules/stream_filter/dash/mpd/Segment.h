@@ -51,13 +51,9 @@ namespace dash
                 virtual bool                            isSingleShot    () const;
                 virtual void                            done            ();
                 virtual void                            addBaseUrl      (BaseUrl *url);
-                virtual const std::vector<BaseUrl *>&   getBaseUrls     () const;
                 virtual void                            setByteRange    (int start, int end);
-                virtual int                             getStartByte    () const;
-                virtual int                             getEndByte      () const;
                 virtual dash::http::Chunk*              toChunk         ();
                 const Representation*                   getParentRepresentation() const;
-                virtual int                             getSize() const;
 
             protected:
                 std::string             sourceUrl;

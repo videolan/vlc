@@ -67,23 +67,13 @@ void                    Segment::addBaseUrl     (BaseUrl *url)
 {
     this->baseUrls.push_back(url);
 }
-const std::vector<BaseUrl *>&  Segment::getBaseUrls    () const
-{
-    return this->baseUrls;
-}
+
 void                    Segment::setByteRange   (int start, int end)
 {
     this->startByte = start;
     this->endByte   = end;
 }
-int                     Segment::getStartByte   () const
-{
-    return this->startByte;
-}
-int                     Segment::getEndByte     () const
-{
-    return this->endByte;
-}
+
 dash::http::Chunk*      Segment::toChunk        ()
 {
     Chunk *chunk = new Chunk();
@@ -122,9 +112,4 @@ dash::http::Chunk*      Segment::toChunk        ()
 const Representation *Segment::getParentRepresentation() const
 {
     return this->parentRepresentation;
-}
-
-int Segment::getSize() const
-{
-    return this->size;
 }
