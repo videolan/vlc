@@ -93,30 +93,32 @@ static int FindVolumes(access_t *p_access, struct archive *p_archive, const char
         uint16_t i_min;
         uint16_t i_max;
     } patterns[] = {
-        { ".part1.rar",   ".part%.1d.rar", 2,   9 },
-        { ".part01.rar",  ".part%.2d.rar", 2,  99 },
-        { ".part001.rar", ".part%.3d.rar", 2, 999 },
-        { ".001",         ".%.3d",         2, 999 },
-        { ".000",         ".%.3d",         1, 999 },
+        { ".part1.rar",   "%.*s.part%.1d.rar", 2,   9 },
+        { ".part01.rar",  "%.*s.part%.2d.rar", 2,  99 },
+        { ".part001.rar", "%.*s.part%.3d.rar", 2, 999 },
+        { ".001",         "%.*s.%.3d",         2, 999 },
+        { ".000",         "%.*s.%.3d",         1, 999 },
     };
 
-    const size_t i_uri_size = strlen(psz_uri);
-    const int i_patterns = ARRAY_SIZE(patterns);
-    for (int i=0; i<i_patterns; i++)
+    const int i_uri_size = strlen(psz_uri);
+    const size_t i_patterns = ARRAY_SIZE(patterns);
+
+    for (size_t i = 0; i < i_patterns; i++)
     {
-        const size_t i_match_size = strlen(patterns[i].psz_match);
+        const int i_match_size = strlen(patterns[i].psz_match);
         if (i_uri_size < i_match_size)
             continue;
 
         if (!strcmp(&psz_uri[i_uri_size - i_match_size], patterns[i].psz_match))
         {
-            char **ppsz_files = malloc(sizeof(char *) * patterns[i].i_max);
+            char **ppsz_files = xmalloc(sizeof(char *) * patterns[i].i_max);
 
-            for(int j=patterns[i].i_min; j<patterns[i].i_max; j++)
+            for (unsigned j = patterns[i].i_min; j < patterns[i].i_max; j++)
             {
-                char *psz_newuri = strdup(psz_uri);
-                if (!psz_newuri ||
-                    !sprintf(&psz_newuri[i_uri_size - i_match_size], patterns[i].psz_format, j))
+                char *psz_newuri;
+
+                if (asprintf(&psz_newuri, patterns[i].psz_format,
+                             i_uri_size - i_match_size, psz_uri, j) == -1)
                     break;
 
                 /* Probe URI */
