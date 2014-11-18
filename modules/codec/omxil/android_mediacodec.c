@@ -409,7 +409,13 @@ static int OpenDecoder(vlc_object_t *p_this)
 
         jobject types = (*env)->CallObjectMethod(env, info, p_sys->get_supported_types);
         int num_types = (*env)->GetArrayLength(env, types);
+        jobject name = (*env)->CallObjectMethod(env, info, p_sys->get_name);
+        jsize name_len = (*env)->GetStringUTFLength(env, name);
+        const char *name_ptr = (*env)->GetStringUTFChars(env, name, NULL);
         bool found = false;
+
+        if (!strncmp(name_ptr, "OMX.google.", __MIN(11, name_len)))
+            continue;
         for (int j = 0; j < num_types && !found; j++) {
             jobject type = (*env)->GetObjectArrayElement(env, types, j);
             if (!jstrcmp(env, type, mime)) {
@@ -435,9 +441,6 @@ static int OpenDecoder(vlc_object_t *p_this)
             (*env)->DeleteLocalRef(env, type);
         }
         if (found) {
-            jobject name = (*env)->CallObjectMethod(env, info, p_sys->get_name);
-            jsize name_len = (*env)->GetStringUTFLength(env, name);
-            const char *name_ptr = (*env)->GetStringUTFChars(env, name, NULL);
             msg_Dbg(p_dec, "using %.*s", name_len, name_ptr);
             p_sys->name = malloc(name_len + 1);
             memcpy(p_sys->name, name_ptr, name_len);
