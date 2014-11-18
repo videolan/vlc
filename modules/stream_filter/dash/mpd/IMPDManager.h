@@ -42,11 +42,8 @@ namespace dash
                 virtual const std::vector<Period *>&    getPeriods              () const;
                 virtual Period*                         getFirstPeriod          () const;
                 virtual Period*                         getNextPeriod           (Period *period);
-                virtual Representation*                 getBestRepresentation   (Period *period) const;
-                virtual Representation*                 getRepresentation       (Period *period, uint64_t bitrate) const;
                 virtual const MPD*                      getMPD                  () const;
-                virtual Representation*                 getRepresentation       (Period *period, uint64_t bitrate,
-                                                                                 int width, int height) const       = 0;
+
             protected:
                 MPD *mpd;
         };

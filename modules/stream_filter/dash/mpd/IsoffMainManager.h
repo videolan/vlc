@@ -43,8 +43,6 @@ namespace dash
             public:
                 IsoffMainManager            (MPD *mpd);
 
-                Representation*                 getRepresentation       (Period *period, uint64_t bitrate,
-                                                                         int width, int height) const;
         };
     }
 }

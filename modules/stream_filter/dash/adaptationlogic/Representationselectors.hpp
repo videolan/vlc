@@ -1,11 +1,7 @@
 /*
- * BasicCMManager.h
+ * Representationselectors.hpp
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
- *
- * Created on: Aug 10, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2014 - VideoLAN authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,29 +17,33 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef REPRESENTATIONSELECTORS_HPP
+#define REPRESENTATIONSELECTORS_HPP
+#include "mpd/Representation.h"
+#include "mpd/Period.h"
 
-#ifndef BASICCMMANAGER_H_
-#define BASICCMMANAGER_H_
-
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "mpd/IMPDManager.h"
-#include "mpd/SegmentInfo.h"
-#include "mpd/Segment.h"
+using namespace dash::mpd;
 
 namespace dash
 {
-    namespace mpd
+    namespace logic
     {
-        class BasicCMManager : public IMPDManager
-        {
-            public:
-                BasicCMManager          (MPD *mpd);
 
+        class RepresentationSelector
+        {
+        public:
+            RepresentationSelector();
+            virtual ~RepresentationSelector() {}
+            virtual Representation * select(Period *period) const;
+            virtual Representation * select(Period *period, uint64_t bitrate) const;
+            virtual Representation * select(Period *period, uint64_t bitrate,
+                                            int width, int height) const;
+        protected:
+            virtual Representation * select(std::vector<Representation *>&reps,
+                                            uint64_t minbitrate, uint64_t maxbitrate) const;
         };
+
     }
 }
 
-#endif /* BASICCMMANAGER_H_ */
+#endif // REPRESENTATIONSELECTORS_HPP

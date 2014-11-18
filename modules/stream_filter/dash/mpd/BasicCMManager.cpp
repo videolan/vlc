@@ -34,8 +34,3 @@ BasicCMManager::BasicCMManager(MPD *mpd) :
 {
 
 }
-
-Representation*         BasicCMManager::getRepresentation (Period *period, uint64_t bitrate, int, int ) const
-{
-    return IMPDManager::getRepresentation(period, bitrate);
-}

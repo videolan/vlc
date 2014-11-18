@@ -26,6 +26,7 @@
 #endif
 
 #include "RateBasedAdaptationLogic.h"
+#include "Representationselectors.hpp"
 
 using namespace dash::logic;
 using namespace dash::xml;
@@ -46,20 +47,11 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager, st
 
 Chunk*  RateBasedAdaptationLogic::getNextChunk()
 {
-    if(this->mpdManager == NULL)
-        return NULL;
-
     if(this->currentPeriod == NULL)
         return NULL;
 
-    uint64_t bitrate = this->getBpsAvg();
-
-    if(this->getBufferPercent() < MINBUFFER)
-        bitrate = 0;
-
-    Representation *rep = this->mpdManager->getRepresentation(this->currentPeriod, bitrate, this->width, this->height);
-
-    if ( rep == NULL )
+    const Representation *rep = getCurrentRepresentation();
+    if (!rep)
         return NULL;
 
     std::vector<Segment *> segments = rep->getSegments();
@@ -86,5 +78,20 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk()
 
 const Representation *RateBasedAdaptationLogic::getCurrentRepresentation() const
 {
-    return this->mpdManager->getRepresentation( this->currentPeriod, this->getBpsAvg() );
+    if(currentPeriod == NULL)
+        return NULL;
+
+    uint64_t bitrate = this->getBpsAvg();
+    if(getBufferPercent() < MINBUFFER)
+        bitrate = 0;
+
+    RepresentationSelector selector;
+    Representation *rep = selector.select(currentPeriod, bitrate, width, height);
+    if ( rep == NULL )
+    {
+        rep = selector.select(currentPeriod);
+        if ( rep == NULL )
+            return NULL;
+    }
+    return rep;
 }

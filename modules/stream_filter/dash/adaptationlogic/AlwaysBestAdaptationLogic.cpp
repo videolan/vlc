@@ -70,20 +70,22 @@ const Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation() cons
 
 void    AlwaysBestAdaptationLogic::initSchedule ()
 {
-    if(this->mpdManager != NULL)
+    if(mpdManager)
     {
-        std::vector<Period *> periods = this->mpdManager->getPeriods();
+        std::vector<Period *> periods = mpdManager->getPeriods();
+        std::vector<Period *>::const_iterator it;
+        RepresentationSelector selector;
 
-        for(size_t i = 0; i < periods.size(); i++)
+        for(it=periods.begin(); it!=periods.end(); it++)
         {
-            Representation *best = this->mpdManager->getBestRepresentation(periods.at(i));
-
-            if(best != NULL)
+            Representation *best = selector.select(*it);
+            if(best)
             {
                 std::vector<Segment *> segments = best->getSegments();
-                for(size_t j = 0; j < segments.size(); j++)
+                std::vector<Segment *>::const_iterator segIt;
+                for(segIt=segments.begin(); segIt!=segments.end(); segIt++)
                 {
-                    this->schedule.push_back(segments.at(j));
+                    schedule.push_back(*segIt);
                 }
             }
         }

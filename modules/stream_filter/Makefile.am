@@ -19,6 +19,8 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/adaptationlogic/IDownloadRateObserver.h \
     stream_filter/dash/adaptationlogic/RateBasedAdaptationLogic.h \
     stream_filter/dash/adaptationlogic/RateBasedAdaptationLogic.cpp \
+    stream_filter/dash/adaptationlogic/Representationselectors.hpp \
+    stream_filter/dash/adaptationlogic/Representationselectors.cpp \
     stream_filter/dash/buffer/BlockBuffer.cpp \
     stream_filter/dash/buffer/BlockBuffer.h \
     stream_filter/dash/buffer/IBufferObserver.h \

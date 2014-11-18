@@ -69,35 +69,3 @@ const MPD* IMPDManager::getMPD() const
 {
     return mpd;
 }
-
-Representation* IMPDManager::getBestRepresentation(Period *period) const
-{
-    return getRepresentation(period, std::numeric_limits<uint64_t>::max());
-}
-
-Representation* IMPDManager::getRepresentation(Period *period, uint64_t bitrate ) const
-{
-    if (period == NULL)
-        return NULL;
-
-    std::vector<AdaptationSet *>    adaptSet = period->getAdaptationSets();
-
-    Representation  *best = NULL;
-
-    for(size_t i = 0; i < adaptSet.size(); i++)
-    {
-        std::vector<Representation *> reps = adaptSet.at(i)->getRepresentations();
-        for( size_t j = 0; j < reps.size(); j++ )
-        {
-            uint64_t currentBitrate = reps.at(j)->getBandwidth();
-
-            if ( best == NULL ||
-                 ( currentBitrate > best->getBandwidth() &&
-                   currentBitrate < bitrate ) )
-            {
-                best = reps.at( j );
-            }
-        }
-    }
-    return best;
-}

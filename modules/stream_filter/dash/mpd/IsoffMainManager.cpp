@@ -27,8 +27,10 @@
 #endif
 
 #include "IsoffMainManager.h"
+#include "../adaptationlogic/Representationselectors.hpp"
 
 using namespace dash::mpd;
+using namespace dash::logic;
 
 IsoffMainManager::IsoffMainManager(MPD *mpd) :
     IMPDManager( mpd )
@@ -36,37 +38,3 @@ IsoffMainManager::IsoffMainManager(MPD *mpd) :
 
 }
 
-Representation*             IsoffMainManager::getRepresentation     (Period *period, uint64_t bitrate, int width, int height) const
-{
-    if(period == NULL)
-        return NULL;
-
-    std::vector<AdaptationSet *> adaptationSets = period->getAdaptationSets();
-    std::vector<Representation *> resMatchReps;
-
-    for(size_t i = 0; i < adaptationSets.size(); i++)
-    {
-        std::vector<Representation *> reps = adaptationSets.at(i)->getRepresentations();
-        for( size_t j = 0; j < reps.size(); j++ )
-        {
-            if(reps.at(j)->getWidth() == width && reps.at(j)->getHeight() == height)
-                resMatchReps.push_back(reps.at(j));
-        }
-    }
-
-    if(resMatchReps.size() == 0)
-        return IMPDManager::getRepresentation(period, bitrate);
-
-    Representation  *best = NULL;
-    for( size_t j = 0; j < resMatchReps.size(); j++ )
-    {
-        uint64_t currentBitrate = resMatchReps.at(j)->getBandwidth();
-
-        if(best == NULL || (currentBitrate > best->getBandwidth() && currentBitrate < bitrate))
-        {
-            best = resMatchReps.at(j);
-        }
-    }
-
-    return best;
-}

@@ -26,6 +26,7 @@
 #define ALWAYSBESTADAPTATIONLOGIC_H_
 
 #include "adaptationlogic/AbstractAdaptationLogic.h"
+#include "Representationselectors.hpp"
 #include "http/Chunk.h"
 #include "xml/Node.h"
 #include "mpd/IMPDManager.h"
