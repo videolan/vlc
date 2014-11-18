@@ -32,6 +32,7 @@
 #include "mpd/TrickModeType.h"
 #include "mpd/SegmentBase.h"
 #include "mpd/SegmentList.h"
+#include "mpd/BaseUrl.h"
 
 namespace dash
 {
@@ -80,6 +81,8 @@ namespace dash
                 int                 getWidth                () const;
                 void                setHeight               (int height);
                 int                 getHeight               () const;
+                BaseUrl*            getBaseUrl              () const;
+                void                setBaseUrl              (BaseUrl *baseUrl);
 
             private:
                 uint64_t                            bandwidth;
@@ -91,6 +94,7 @@ namespace dash
                 const AdaptationSet                         *parentGroup;
                 SegmentBase                         *segmentBase;
                 SegmentList                         *segmentList;
+                BaseUrl                             *baseUrl;
                 int                                 width;
                 int                                 height;
         };

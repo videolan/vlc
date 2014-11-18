@@ -87,6 +87,10 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
         this->currentRepresentation = new Representation;
         Node *repNode = representations.at(i);
 
+        std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");
+        if(!baseUrls.empty())
+            currentRepresentation->setBaseUrl( new BaseUrl( baseUrls.front()->getText() ) );
+
         if(repNode->hasAttribute("width"))
             this->currentRepresentation->setWidth(atoi(repNode->getAttributeValue("width").c_str()));
 

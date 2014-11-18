@@ -39,6 +39,7 @@ Representation::Representation  () :
                 parentGroup     ( NULL ),
                 segmentBase     ( NULL ),
                 segmentList     ( NULL ),
+                baseUrl         ( NULL ),
                 width           (0),
                 height          (0)
 
@@ -49,6 +50,7 @@ Representation::~Representation ()
 {
     delete(this->segmentInfo);
     delete(this->trickModeType);
+    delete baseUrl;
 }
 
 const std::string&  Representation::getId                   () const
@@ -141,6 +143,17 @@ void                Representation::setSegmentBase          (SegmentBase *base)
 {
     this->segmentBase = base;
 }
+
+BaseUrl* Representation::getBaseUrl() const
+{
+    return baseUrl;
+}
+
+void Representation::setBaseUrl(BaseUrl *base)
+{
+    baseUrl = base;
+}
+
 void                Representation::setWidth                (int width)
 {
     this->width = width;
