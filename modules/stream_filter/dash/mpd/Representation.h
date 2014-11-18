@@ -73,9 +73,8 @@ namespace dash
                 const AdaptationSet*        getParentGroup() const;
                 void                setParentGroup( const AdaptationSet *group );
 
-                SegmentList*        getSegmentList          () const;
+                std::vector<Segment*> getSegments           ()const;
                 void                setSegmentList          (SegmentList *list);
-                SegmentBase*        getSegmentBase          () const;
                 void                setSegmentBase          (SegmentBase *base);
                 void                setWidth                (int width);
                 int                 getWidth                () const;
@@ -83,6 +82,8 @@ namespace dash
                 int                 getHeight               () const;
                 BaseUrl*            getBaseUrl              () const;
                 void                setBaseUrl              (BaseUrl *baseUrl);
+
+                std::vector<std::string> toString() const;
 
             private:
                 uint64_t                            bandwidth;

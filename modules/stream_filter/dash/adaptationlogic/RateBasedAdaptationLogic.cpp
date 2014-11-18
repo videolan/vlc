@@ -62,7 +62,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk()
     if ( rep == NULL )
         return NULL;
 
-    std::vector<Segment *> segments = this->mpdManager->getSegments(rep);
+    std::vector<Segment *> segments = rep->getSegments();
 
     if ( this->count == segments.size() )
     {

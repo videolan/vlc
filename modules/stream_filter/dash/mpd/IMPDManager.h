@@ -43,7 +43,6 @@ namespace dash
                 virtual Period*                         getFirstPeriod          () const;
                 virtual Period*                         getNextPeriod           (Period *period);
                 virtual Representation*                 getBestRepresentation   (Period *period) const;
-                virtual std::vector<Segment *>          getSegments             (const Representation *rep)         = 0;
                 virtual Representation*                 getRepresentation       (Period *period, uint64_t bitrate) const;
                 virtual const MPD*                      getMPD                  () const;
                 virtual Representation*                 getRepresentation       (Period *period, uint64_t bitrate,

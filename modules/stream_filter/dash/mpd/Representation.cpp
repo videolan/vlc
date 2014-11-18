@@ -127,18 +127,39 @@ void Representation::addDependency(const Representation *dep)
     if ( dep != NULL )
         this->dependencies.push_back( dep );
 }
-SegmentList*        Representation::getSegmentList          () const
+
+std::vector<Segment *> Representation::getSegments() const
 {
-    return this->segmentList;
+    std::vector<Segment *>  retSegments;
+
+    if ( segmentInfo )
+    {
+        retSegments.push_back( segmentInfo->getInitialisationSegment() );
+
+        if ( !segmentInfo->getSegments().empty() )
+            retSegments.insert( retSegments.end(),
+                                segmentInfo->getSegments().begin(),
+                                segmentInfo->getSegments().end() );
+    }
+    else
+    {
+        if( segmentBase && segmentBase->getInitSegment() )
+            retSegments.push_back( segmentBase->getInitSegment() );
+
+        if ( segmentList )
+            retSegments.insert( retSegments.end(),
+                                segmentList->getSegments().begin(),
+                                segmentList->getSegments().end() );
+    }
+
+    return retSegments;
 }
+
 void                Representation::setSegmentList          (SegmentList *list)
 {
     this->segmentList = list;
 }
-SegmentBase*        Representation::getSegmentBase          () const
-{
-    return this->segmentBase;
-}
+
 void                Representation::setSegmentBase          (SegmentBase *base)
 {
     this->segmentBase = base;
@@ -169,4 +190,23 @@ void                Representation::setHeight               (int height)
 int                 Representation::getHeight               () const
 {
     return this->height;
+}
+
+std::vector<std::string> Representation::toString() const
+{
+    std::vector<std::string> ret;
+    ret.push_back(std::string("  Representation"));
+    ret.push_back(std::string("    InitSeg url=")
+                  .append(segmentBase->getInitSegment()->getSourceUrl()));
+    if (segmentList)
+    {
+        std::vector<Segment *>::const_iterator l;
+        for(l = segmentList->getSegments().begin();
+            l < segmentList->getSegments().end(); l++)
+        {
+            ret.push_back(std::string("    Segment url=")
+                          .append((*l)->getSourceUrl()));
+        }
+    }
+    return ret;
 }

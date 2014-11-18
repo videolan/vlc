@@ -42,7 +42,6 @@ namespace dash
             public:
                 BasicCMManager          (MPD *mpd);
 
-                std::vector<Segment *>          getSegments( const Representation *rep );
                 Representation*                 getRepresentation (Period *period, uint64_t bitrate,
                                                                    int width, int height) const;
         };

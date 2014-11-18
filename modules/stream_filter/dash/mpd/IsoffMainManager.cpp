@@ -36,24 +36,6 @@ IsoffMainManager::IsoffMainManager(MPD *mpd) :
 
 }
 
-std::vector<Segment*>       IsoffMainManager::getSegments           (const Representation *rep)
-{
-    std::vector<Segment *>  retSegments;
-    SegmentList*            list= rep->getSegmentList();
-
-    if(rep->getSegmentBase())
-    {
-        Segment* initSegment = rep->getSegmentBase()->getInitSegment();
-
-        if(initSegment)
-            retSegments.push_back(initSegment);
-    }
-
-    if ( list )
-        retSegments.insert(retSegments.end(), list->getSegments().begin(), list->getSegments().end());
-    return retSegments;
-}
-
 Representation*             IsoffMainManager::getRepresentation     (Period *period, uint64_t bitrate, int width, int height) const
 {
     if(period == NULL)

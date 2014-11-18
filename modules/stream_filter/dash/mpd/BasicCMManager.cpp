@@ -35,19 +35,6 @@ BasicCMManager::BasicCMManager(MPD *mpd) :
 
 }
 
-std::vector<Segment*>   BasicCMManager::getSegments( const Representation *rep )
-{
-    std::vector<Segment *>          retSegments;
-    SegmentInfo*                    info = rep->getSegmentInfo();
-    Segment*                        initSegment = info->getInitialisationSegment();
-
-    if ( initSegment )
-        retSegments.push_back( initSegment );
-    retSegments.insert( retSegments.end(), info->getSegments().begin(),
-                                            info->getSegments().end() );
-    return retSegments;
-}
-
 Representation*         BasicCMManager::getRepresentation (Period *period, uint64_t bitrate, int, int ) const
 {
     return IMPDManager::getRepresentation(period, bitrate);
