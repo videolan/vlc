@@ -30,6 +30,7 @@
 using namespace dash::http;
 
 HTTPConnection::HTTPConnection  (stream_t *stream) :
+                httpSocket      (-1),
                 stream          (stream),
                 peekBufferLen   (0),
                 contentLength   (0)
@@ -166,7 +167,8 @@ bool            HTTPConnection::sendData        (const std::string& data)
 }
 void            HTTPConnection::closeSocket     ()
 {
-    net_Close(this->httpSocket);
+    if (httpSocket >= 0)
+        net_Close(httpSocket);
 }
 bool            HTTPConnection::setUrlRelative  (Chunk *chunk)
 {
