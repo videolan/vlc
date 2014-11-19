@@ -24,16 +24,22 @@
  * Preamble
  *****************************************************************************/
 
+#define ANDROID_HC_OR_LATER (ANDROID_API >= 11)
+#define ANDROID_ICS_OR_LATER (ANDROID_API >= 14)
+#define ANDROID_JBMR2_OR_LATER (ANDROID_API >= 18)
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#if ANDROID_JBMR2_OR_LATER
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 #include <android/native_window.h>
-
-#define ANDROID_HC_OR_LATER (ANDROID_API >= 11)
-#define ANDROID_ICS_OR_LATER (ANDROID_API >= 14)
-#define ANDROID_JBMR2_OR_LATER (ANDROID_API >= 18)
 
 #if ANDROID_ICS_OR_LATER
 #include <system/window.h>
@@ -65,6 +71,7 @@ struct native_window_priv
 
 #define LOGD(...) __android_log_print( ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__ )
 #define LOGE(...) __android_log_print( ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__ )
+#define LOGW(...) __android_log_print( ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__ )
 
 #define CHECK_ERR() do {\
     if( err != NO_ERROR ) {\
@@ -221,15 +228,49 @@ int ANativeWindowPriv_setCrop( native_window_priv *priv, int ofs_x, int ofs_y, i
     return native_window_set_crop( priv->anw, &crop );
 }
 
-int ANativeWindowPriv_dequeue( native_window_priv *priv, void **pp_handle )
+int ANativeWindowPriv_dequeue( native_window_priv *priv, void **pp_handle,
+                               int *p_fence_fd )
 {
     ANativeWindowBuffer_t *anb;
     status_t err = NO_ERROR;
 
 #if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->dequeueBuffer_DEPRECATED( priv->anw, &anb );
+    int i_fence_fd = -1;
+    err = priv->anw->dequeueBuffer( priv->anw, &anb, &i_fence_fd );
+    if( p_fence_fd )
+    {
+        *p_fence_fd = i_fence_fd;
+    }
+    else if( i_fence_fd != -1 )
+    {
+        fd_set rfds;
+        struct timeval tv;
+        int ret;
+
+        LOGW("dequeue: fence_fd != -1 and not handled");
+
+        FD_ZERO(&rfds);
+        FD_SET(i_fence_fd, &rfds);
+
+        /* Wait up to 5 seconds. */
+        tv.tv_sec = 5;
+        tv.tv_usec = 0;
+
+        ret = select(i_fence_fd + 1, &rfds, NULL, NULL, &tv);
+        if (ret == -1) {
+            priv->anw->cancelBuffer( priv->anw, anb, i_fence_fd );
+            LOGE("dequeue: select error on fence_fd");
+            return -1;
+        } else if (ret == 0) {
+            LOGW("dequeue: fence_fd timed out");
+        }
+        
+        close(i_fence_fd);
+    }
 #else
     err = priv->anw->dequeueBuffer( priv->anw, &anb );
+    if (p_fence_fd)
+        *p_fence_fd = -1;
 #endif
     CHECK_ERR();
 
@@ -238,20 +279,19 @@ int ANativeWindowPriv_dequeue( native_window_priv *priv, void **pp_handle )
     return 0;
 }
 
-int ANativeWindowPriv_lock( native_window_priv *priv, void *p_handle )
+int ANativeWindowPriv_lock( native_window_priv *priv, void *p_handle,
+                            int i_fence_fd )
 {
+#if !ANDROID_JBMR2_OR_LATER
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
 
     CHECK_ANB();
 
-#if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->lockBuffer_DEPRECATED( priv->anw, anb );
-#else
     err = priv->anw->lockBuffer( priv->anw, anb );
-#endif
     CHECK_ERR();
 
+#endif
     return 0;
 }
 
@@ -291,7 +331,8 @@ int ANativeWindowPriv_unlockData( native_window_priv *priv, void *p_handle )
     return 0;
 }
 
-int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
+int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle,
+                             int i_fence_fd )
 {
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
@@ -299,7 +340,7 @@ int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
     CHECK_ANB();
 
 #if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->queueBuffer_DEPRECATED( priv->anw, anb );
+    err = priv->anw->queueBuffer( priv->anw, anb, i_fence_fd );
 #else
     err = priv->anw->queueBuffer( priv->anw, anb );
 #endif
@@ -308,7 +349,8 @@ int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
     return 0;
 }
 
-int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
+int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle,
+                              int i_fence_fd )
 {
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
@@ -316,7 +358,7 @@ int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
     CHECK_ANB();
 
 #if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->cancelBuffer_DEPRECATED( priv->anw, anb );
+    err = priv->anw->cancelBuffer( priv->anw, anb, i_fence_fd );
 #else
     err = priv->anw->cancelBuffer( priv->anw, anb );
 #endif

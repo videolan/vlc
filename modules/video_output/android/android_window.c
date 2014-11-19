@@ -472,6 +472,7 @@ static void AndroidWindow_UnlockPicture(vout_display_sys_t *sys,
     if (p_window->b_use_priv) {
         int err = 0;
         void *p_handle = p_picsys->priv.sw.p_handle;
+        int i_fence_fd = p_picsys->priv.sw.i_fence_fd;
 
         if (p_handle == NULL)
             return;
@@ -480,9 +481,11 @@ static void AndroidWindow_UnlockPicture(vout_display_sys_t *sys,
 
         if (err == 0) {
             if (p_picsys->b_render)
-                err = sys->anwp.queue(p_window->p_handle_priv, p_handle);
+                err = sys->anwp.queue(p_window->p_handle_priv, p_handle,
+                                      i_fence_fd);
             else
-                err = sys->anwp.cancel(p_window->p_handle_priv, p_handle);
+                err = sys->anwp.cancel(p_window->p_handle_priv, p_handle,
+                                       i_fence_fd);
         }
     } else
         sys->anw.unlockAndPost(p_window->p_handle);
@@ -496,16 +499,19 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
 
     if (p_window->b_use_priv) {
         void *p_handle;
+        int i_fence_fd = -1;
         int err;
 
-        err = sys->anwp.dequeue(p_window->p_handle_priv, &p_handle);
-        err = err == 0 ? sys->anwp.lock(p_window->p_handle_priv, p_handle) : err;
+        err = sys->anwp.dequeue(p_window->p_handle_priv, &p_handle, &i_fence_fd);
+        err = err == 0 ? sys->anwp.lock(p_window->p_handle_priv,
+                                        p_handle, i_fence_fd) : err;
         err = err == 0 ? sys->anwp.lockData(p_window->p_handle_priv,
                                             p_handle,
                                             &p_picsys->priv.sw.buf) : err;
         if (err != 0)
             return -1;
         p_picsys->priv.sw.p_handle = p_handle;
+        p_picsys->priv.sw.i_fence_fd = i_fence_fd;
     } else {
         if (sys->anw.winLock(p_window->p_handle,
                              &p_picsys->priv.sw.buf, NULL) != 0)

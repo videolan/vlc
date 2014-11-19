@@ -2277,7 +2277,7 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
         void *p_handle = NULL;
 
         if( p_port->p_hwbuf->anwpriv.dequeue( p_port->p_hwbuf->window_priv,
-                                              &p_handle ) != 0 )
+                                              &p_handle, NULL ) != 0 )
         {
             msg_Err( p_dec, "OMXHWBuffer_dequeue Fail" );
             goto error;
@@ -2290,7 +2290,7 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
     {
         OMX_DBG( "canceling buffer(%d)", i );
         p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv,
-                                         p_port->p_hwbuf->pp_handles[i] );
+                                         p_port->p_hwbuf->pp_handles[i], -1 );
     }
 
     return 0;
@@ -2320,7 +2320,7 @@ static int HwBuffer_FreeBuffers( decoder_t *p_dec, OmxPort *p_port )
 
             if( p_handle && p_port->p_hwbuf->i_states[i] == BUF_STATE_OWNED )
             {
-                p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );
+                p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle, -1 );
                 HwBuffer_ChangeState( p_dec, p_port, i, BUF_STATE_NOT_OWNED );
             }
         }
@@ -2361,7 +2361,7 @@ static int HwBuffer_Start( decoder_t *p_dec, OmxPort *p_port )
         if( p_header && p_port->p_hwbuf->i_states[i] == BUF_STATE_OWNED )
         {
             if( p_port->p_hwbuf->anwpriv.lock( p_port->p_hwbuf->window_priv,
-                                               p_header->pBuffer ) != 0 )
+                                               p_header->pBuffer, -1 ) != 0 )
             {
                 msg_Err( p_dec, "lock failed" );
                 HWBUFFER_UNLOCK();
@@ -2410,7 +2410,7 @@ static int HwBuffer_Stop( decoder_t *p_dec, OmxPort *p_port )
                     void *p_handle = p_port->pp_buffers[p_picsys->priv.hw.i_index]->pBuffer;
                     if( p_handle )
                     {
-                        p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );
+                        p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle, -1 );
                         HwBuffer_ChangeState( p_dec, p_port, p_picsys->priv.hw.i_index,
                                               BUF_STATE_NOT_OWNED );
                     }
@@ -2540,9 +2540,9 @@ static void *DequeueThread( void *data )
         /* The thread can be stuck here. It shouldn't happen since we make sure
          * we call the dequeue function if there is at least one buffer
          * available. */
-        err = p_port->p_hwbuf->anwpriv.dequeue( p_port->p_hwbuf->window_priv, &p_handle );
+        err = p_port->p_hwbuf->anwpriv.dequeue( p_port->p_hwbuf->window_priv, &p_handle, NULL );
         if( err == 0 )
-            err = p_port->p_hwbuf->anwpriv.lock( p_port->p_hwbuf->window_priv, p_handle );
+            err = p_port->p_hwbuf->anwpriv.lock( p_port->p_hwbuf->window_priv, p_handle, -1 );
 
         HWBUFFER_LOCK();
 
@@ -2554,7 +2554,7 @@ static void *DequeueThread( void *data )
 
         if( !p_port->p_hwbuf->b_run )
         {
-            p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );
+            p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle, -1 );
             continue;
         }
 
@@ -2619,9 +2619,9 @@ static void UnlockPicture( picture_t* p_pic )
     }
 
     if( p_picsys->b_render )
-        p_port->p_hwbuf->anwpriv.queue( p_port->p_hwbuf->window_priv, p_handle );
+        p_port->p_hwbuf->anwpriv.queue( p_port->p_hwbuf->window_priv, p_handle, -1 );
     else
-        p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );
+        p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle, -1 );
 
     HwBuffer_ChangeState( p_dec, p_port, p_picsys->priv.hw.i_index, BUF_STATE_NOT_OWNED );
     HWBUFFER_BROADCAST( p_port );
