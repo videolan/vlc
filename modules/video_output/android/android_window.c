@@ -43,9 +43,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define PRIV_WINDOW_MAX_BUFFER_COUNT 32
-#define PRIV_WINDOW_MIN_BUFFER_COUNT 2
-
 #define USE_ANWP
 #define CHROMA_TEXT N_("Chroma used")
 #define CHROMA_LONGTEXT N_(\
@@ -340,6 +337,8 @@ static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
 static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
                                    android_window *p_window)
 {
+    unsigned int i_max_buffer_count = 0;
+
     if (!p_window->p_handle_priv)
         p_window->p_handle_priv = sys->anwp.connect(p_window->p_handle);
 
@@ -355,10 +354,11 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
     sys->anwp.getMinUndequeued(p_window->p_handle_priv,
                                &p_window->i_min_undequeued);
 
+    sys->anwp.getMaxBufferCount(p_window->p_handle_priv, &i_max_buffer_count);
+
     if ((p_window->i_min_undequeued + p_window->i_pic_count) >
-         PRIV_WINDOW_MAX_BUFFER_COUNT)
-        p_window->i_pic_count = PRIV_WINDOW_MAX_BUFFER_COUNT
-                                - p_window->i_min_undequeued;
+         i_max_buffer_count)
+        p_window->i_pic_count = i_max_buffer_count - p_window->i_min_undequeued;
 
     if (sys->anwp.setBufferCount(p_window->p_handle_priv,
                                  AndroidWindow_GetPicCount(sys, p_window)) != 0)
