@@ -177,7 +177,7 @@ int ANativeWindowPriv_getMinUndequeued( native_window_priv *priv, unsigned int *
 #endif
     /* set a minimum value of min_undequeued in case query fails */
     if( *min_undequeued == 0 )
-        *min_undequeued = 2;
+        *min_undequeued = 1;
 
     LOGD( "getMinUndequeued: %p %u", priv->anw, *min_undequeued );
 
