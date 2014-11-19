@@ -450,6 +450,8 @@ static void Stop(aout_stream_t *s)
 
     IAudioClient_Stop(sys->client); /* should not be needed */
     IAudioClient_Release(sys->client);
+
+    free(sys);
 }
 
 vlc_module_begin()
