@@ -31,11 +31,15 @@
 
 #include <android/native_window.h>
 
-#if ANDROID_API <= 13
+#define ANDROID_HC_OR_LATER (ANDROID_API >= 11)
+#define ANDROID_ICS_OR_LATER (ANDROID_API >= 14)
+#define ANDROID_JBMR2_OR_LATER (ANDROID_API >= 18)
+
+#if ANDROID_ICS_OR_LATER
+#include <system/window.h>
+#else
 #include <ui/android_native_buffer.h>
 #include <ui/egl/android_natives.h>
-#else
-#include <system/window.h>
 #endif
 
 #include <hardware/gralloc.h>
@@ -45,7 +49,7 @@
 #define NO_ERROR 0
 typedef int32_t status_t;
 
-#if ANDROID_API <= 13
+#if !ANDROID_ICS_OR_LATER
 typedef android_native_buffer_t ANativeWindowBuffer_t;
 #endif
 typedef struct native_window_priv native_window_priv;
@@ -79,14 +83,14 @@ struct native_window_priv
 
 static int window_connect( ANativeWindow *anw )
 {
-#if ANDROID_API >= 14
+#if ANDROID_ICS_OR_LATER
     return native_window_api_connect( anw, NATIVE_WINDOW_API_MEDIA );
 #endif
 }
 
 static int window_disconnect( ANativeWindow *anw )
 {
-#if ANDROID_API >= 14
+#if ANDROID_ICS_OR_LATER
     return native_window_api_disconnect( anw, NATIVE_WINDOW_API_MEDIA );
 #endif
 }
@@ -143,17 +147,14 @@ int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_for
         priv->usage = hw_usage | GRALLOC_USAGE_HW_RENDER | GRALLOC_USAGE_HW_TEXTURE;
     else
         priv->usage= GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_OFTEN;
-#if ANDROID_API >= 11
+#if ANDROID_HC_OR_LATER
     priv->usage |= GRALLOC_USAGE_EXTERNAL_DISP;
 #endif
 
     err = native_window_set_usage( priv->anw, priv->usage );
     CHECK_ERR();
 
-#if ANDROID_API <= 13
-    err = native_window_set_buffers_geometry( priv->anw, w, h, hal_format );
-    CHECK_ERR();
-#else
+#if ANDROID_ICS_OR_LATER
     err = native_window_set_scaling_mode( priv->anw, NATIVE_WINDOW_SCALING_MODE_SCALE_TO_WINDOW );
     CHECK_ERR();
 
@@ -161,6 +162,9 @@ int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_for
     CHECK_ERR();
 
     err = native_window_set_buffers_format( priv->anw, hal_format );
+    CHECK_ERR();
+#else
+    err = native_window_set_buffers_geometry( priv->anw, w, h, hal_format );
     CHECK_ERR();
 #endif
 
@@ -171,7 +175,7 @@ int ANativeWindowPriv_getMinUndequeued( native_window_priv *priv, unsigned int *
 {
     status_t err;
 
-#if ANDROID_API >= 11
+#if ANDROID_HC_OR_LATER
     err = priv->anw->query( priv->anw, NATIVE_WINDOW_MIN_UNDEQUEUED_BUFFERS, min_undequeued );
     CHECK_ERR();
 #endif
@@ -186,7 +190,7 @@ int ANativeWindowPriv_getMinUndequeued( native_window_priv *priv, unsigned int *
 
 int ANativeWindowPriv_getMaxBufferCount( native_window_priv *priv, unsigned int *max_buffer_count )
 {
-#if ANDROID_API >= 14
+#if ANDROID_ICS_OR_LATER
     *max_buffer_count = 32;
 #else
     *max_buffer_count = 15;
@@ -222,7 +226,7 @@ int ANativeWindowPriv_dequeue( native_window_priv *priv, void **pp_handle )
     ANativeWindowBuffer_t *anb;
     status_t err = NO_ERROR;
 
-#if ANDROID_API >= 18
+#if ANDROID_JBMR2_OR_LATER
     err = priv->anw->dequeueBuffer_DEPRECATED( priv->anw, &anb );
 #else
     err = priv->anw->dequeueBuffer( priv->anw, &anb );
@@ -241,7 +245,7 @@ int ANativeWindowPriv_lock( native_window_priv *priv, void *p_handle )
 
     CHECK_ANB();
 
-#if ANDROID_API >= 18
+#if ANDROID_JBMR2_OR_LATER
     err = priv->anw->lockBuffer_DEPRECATED( priv->anw, anb );
 #else
     err = priv->anw->lockBuffer( priv->anw, anb );
@@ -294,7 +298,7 @@ int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
 
     CHECK_ANB();
 
-#if ANDROID_API >= 18
+#if ANDROID_JBMR2_OR_LATER
     err = priv->anw->queueBuffer_DEPRECATED( priv->anw, anb );
 #else
     err = priv->anw->queueBuffer( priv->anw, anb );
@@ -311,7 +315,7 @@ int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
 
     CHECK_ANB();
 
-#if ANDROID_API >= 18
+#if ANDROID_JBMR2_OR_LATER
     err = priv->anw->cancelBuffer_DEPRECATED( priv->anw, anb );
 #else
     err = priv->anw->cancelBuffer( priv->anw, anb );
