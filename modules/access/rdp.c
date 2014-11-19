@@ -248,7 +248,13 @@ static bool postConnectHandler( freerdp *p_instance )
     p_instance->update->BeginPaint = beginPaintHandler;
     p_instance->update->EndPaint = endPaintHandler;
 
-    gdi_init( p_instance, CLRBUF_16BPP | CLRBUF_24BPP | CLRBUF_32BPP, NULL );
+    gdi_init( p_instance,
+                CLRBUF_16BPP |
+#if defined(FREERDP_VERSION_MAJOR) && defined(FREERDP_VERSION_MINOR) && \
+    !(FREERDP_VERSION_MAJOR > 1 || (FREERDP_VERSION_MAJOR == 1 && FREERDP_VERSION_MINOR >= 2))
+                CLRBUF_24BPP |
+#endif
+                CLRBUF_32BPP, NULL );
 
     desktopResizeHandler( p_instance->context );
     return true;
