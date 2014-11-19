@@ -47,7 +47,7 @@ int             HTTPConnection::read            (void *p_buffer, size_t len)
 {
     if(this->peekBufferLen == 0)
     {
-        int size = net_Read(this->stream, this->httpSocket, NULL, p_buffer, len, false);
+        ssize_t size = net_Read(stream, httpSocket, NULL, p_buffer, len, false);
 
         if(size <= 0)
             return 0;
@@ -135,15 +135,15 @@ std::string     HTTPConnection::readLine        ()
 {
     std::stringstream ss;
     char c[1];
-    size_t size = net_Read(this->stream, this->httpSocket, NULL, c, 1, false);
+    ssize_t size = net_Read(stream, httpSocket, NULL, c, 1, false);
 
-    while(size)
+    while(size >= 0)
     {
         ss << c[0];
         if(c[0] == '\n')
             break;
 
-        size = net_Read(this->stream, this->httpSocket, NULL, c, 1, false);
+        size = net_Read(stream, httpSocket, NULL, c, 1, false);
     }
 
     if(size > 0)
