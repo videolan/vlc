@@ -184,6 +184,16 @@ int ANativeWindowPriv_getMinUndequeued( native_window_priv *priv, unsigned int *
     return 0;
 }
 
+int ANativeWindowPriv_getMaxBufferCount( native_window_priv *priv, unsigned int *max_buffer_count )
+{
+#if ANDROID_API >= 14
+    *max_buffer_count = 32;
+#else
+    *max_buffer_count = 15;
+#endif
+    return 0;
+}
+
 int ANativeWindowPriv_setBufferCount(native_window_priv *priv, unsigned int count )
 {
     status_t err;

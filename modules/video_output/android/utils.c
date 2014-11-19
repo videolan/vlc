@@ -59,6 +59,7 @@ int LoadNativeWindowPrivAPI(native_window_priv_api_t *native)
     native->disconnect = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_disconnect");
     native->setup = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setup");
     native->getMinUndequeued = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_getMinUndequeued");
+    native->getMaxBufferCount = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_getMaxBufferCount");
     native->setBufferCount = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setBufferCount");
     native->setCrop = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setCrop");
     native->dequeue = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_dequeue");
@@ -70,7 +71,8 @@ int LoadNativeWindowPrivAPI(native_window_priv_api_t *native)
     native->setOrientation = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_setOrientation");
 
     return native->connect && native->disconnect && native->setup &&
-        native->getMinUndequeued && native->setBufferCount && native->setCrop &&
+        native->getMinUndequeued && native->getMaxBufferCount &&
+        native->setBufferCount && native->setCrop &&
         native->dequeue && native->lock && native->lockData && native->unlockData &&
         native->queue && native->cancel && native->setOrientation ? 0 : -1;
 }

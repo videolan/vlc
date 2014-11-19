@@ -75,6 +75,7 @@ typedef native_window_priv *(*ptr_ANativeWindowPriv_connect) (void *);
 typedef int (*ptr_ANativeWindowPriv_disconnect) (native_window_priv *);
 typedef int (*ptr_ANativeWindowPriv_setup) (native_window_priv *, int, int, int, bool, int );
 typedef int (*ptr_ANativeWindowPriv_getMinUndequeued) (native_window_priv *, unsigned int *);
+typedef int (*ptr_ANativeWindowPriv_getMaxBufferCount) (native_window_priv *, unsigned int *);
 typedef int (*ptr_ANativeWindowPriv_setBufferCount) (native_window_priv *, unsigned int );
 typedef int (*ptr_ANativeWindowPriv_setCrop) (native_window_priv *, int, int, int, int);
 typedef int (*ptr_ANativeWindowPriv_dequeue) (native_window_priv *, void **);
@@ -91,6 +92,7 @@ typedef struct
     ptr_ANativeWindowPriv_disconnect disconnect;
     ptr_ANativeWindowPriv_setup setup;
     ptr_ANativeWindowPriv_getMinUndequeued getMinUndequeued;
+    ptr_ANativeWindowPriv_getMaxBufferCount getMaxBufferCount;
     ptr_ANativeWindowPriv_setBufferCount setBufferCount;
     ptr_ANativeWindowPriv_setCrop setCrop;
     ptr_ANativeWindowPriv_dequeue dequeue;
