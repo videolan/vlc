@@ -94,7 +94,7 @@ static block_t *U8toS16(filter_t *filter, block_t *bsrc)
     uint8_t *src = (uint8_t *)bsrc->p_buffer;
     int16_t *dst = (int16_t *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer; i--;)
-        *dst++ = ((*src++) - 128) << 8;
+        *dst++ = ((*src++) << 8) - 0x8000;
 out:
     block_Release(bsrc);
     VLC_UNUSED(filter);
@@ -128,7 +128,7 @@ static block_t *U8toS32(filter_t *filter, block_t *bsrc)
     uint8_t *src = (uint8_t *)bsrc->p_buffer;
     int32_t *dst = (int32_t *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer; i--;)
-        *dst++ = ((*src++) - 128) << 24;
+        *dst++ = ((*src++) << 24) - 0x80000000;
 out:
     block_Release(bsrc);
     VLC_UNUSED(filter);
