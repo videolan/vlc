@@ -731,11 +731,12 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     picture_t **pp_pics = NULL;
     unsigned int i = 0;
 
+    msg_Dbg(vd, "PoolAlloc: request %d frames", requested_count);
     if (SetupWindowSurface(sys, requested_count) != 0)
         goto error;
 
     requested_count = AndroidWindow_GetPicCount(sys, sys->p_window);
-    msg_Dbg(vd, "PoolAlloc: request %d frames", requested_count);
+    msg_Dbg(vd, "PoolAlloc: got %d frames", requested_count);
 
     UpdateWindowSize(&sys->p_window->fmt, sys->p_window->b_use_priv);
 
