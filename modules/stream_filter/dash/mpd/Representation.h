@@ -33,17 +33,20 @@
 #include "mpd/SegmentBase.h"
 #include "mpd/SegmentList.h"
 #include "mpd/BaseUrl.h"
+#include "mpd/ICanonicalUrl.hpp"
 
 namespace dash
 {
     namespace mpd
     {
         class AdaptationSet;
+        class MPD;
 
-        class Representation : public CommonAttributesElements
+        class Representation : public CommonAttributesElements,
+                               public ICanonicalUrl
         {
             public:
-                Representation();
+                Representation( MPD *mpd );
                 virtual ~Representation ();
 
                 const std::string&  getId                   () const;
@@ -80,10 +83,10 @@ namespace dash
                 int                 getWidth                () const;
                 void                setHeight               (int height);
                 int                 getHeight               () const;
-                BaseUrl*            getBaseUrl              () const;
                 void                setBaseUrl              (BaseUrl *baseUrl);
 
                 std::vector<std::string> toString() const;
+                virtual std::string getUrlSegment           () const; /* impl */
 
             private:
                 uint64_t                            bandwidth;

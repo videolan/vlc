@@ -30,6 +30,7 @@
 using namespace dash::mpd;
 
 MPD::MPD () :
+    ICanonicalUrl(),
     profile( dash::mpd::Profile::Unknown ),
     live( false ),
     availabilityStartTime( -1 ),
@@ -57,12 +58,6 @@ const std::vector<Period*>&    MPD::getPeriods             () const
 {
     return this->periods;
 }
-
-const std::vector<BaseUrl*>&   MPD::getBaseUrls            () const
-{
-    return this->baseUrls;
-}
-
 
 time_t      MPD::getDuration() const
 {
@@ -166,4 +161,12 @@ Profile MPD::getProfile() const
 void MPD::setProfile(Profile profile)
 {
     this->profile = profile;
+}
+
+std::string MPD::getUrlSegment() const
+{
+    if (!baseUrls.empty())
+        return baseUrls.front()->getUrl();
+    else
+        return std::string();
 }

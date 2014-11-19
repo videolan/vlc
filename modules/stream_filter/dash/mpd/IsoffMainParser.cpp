@@ -84,7 +84,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
 
     for(size_t i = 0; i < representations.size(); i++)
     {
-        this->currentRepresentation = new Representation;
+        this->currentRepresentation = new Representation(getMPD());
         Node *repNode = representations.at(i);
 
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");
@@ -147,9 +147,6 @@ void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, Segme
             seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
         }
 
-        for(size_t i = 0; i < this->mpd->getBaseUrls().size(); i++)
-            seg->addBaseUrl(this->mpd->getBaseUrls().at(i));
-
         base->addInitSegment(seg);
     }
 }
@@ -169,9 +166,6 @@ void    IsoffMainParser::setSegments        (dash::xml::Node *segListNode, Segme
             seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
         }
 
-        for(size_t j = 0; j < this->mpd->getBaseUrls().size(); j++)
-            seg->addBaseUrl(this->mpd->getBaseUrls().at(j));
-
         list->addSegment(seg);
     }
 }
@@ -183,9 +177,7 @@ void    IsoffMainParser::print              ()
                 static_cast<std::string>(mpd->getProfile()).c_str(),
                 mpd->getDuration(),
                 mpd->getMinBufferTime());
-        std::vector<BaseUrl *>::const_iterator h;
-        for(h = mpd->getBaseUrls().begin(); h != mpd->getBaseUrls().end(); h++)
-            msg_Dbg(p_stream, "BaseUrl=%s", (*h)->getUrl().c_str());
+        msg_Dbg(p_stream, "BaseUrl=%s", mpd->getUrlSegment().c_str());
 
         std::vector<Period *>::const_iterator i;
         for(i = mpd->getPeriods().begin(); i != mpd->getPeriods().end(); i++)

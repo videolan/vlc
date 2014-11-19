@@ -34,6 +34,7 @@ using namespace dash::mpd;
 using namespace dash::http;
 
 Segment::Segment(const Representation *parent) :
+        ICanonicalUrl( parent ),
         startByte  (-1),
         endByte    (-1),
         parentRepresentation( parent )
@@ -43,11 +44,6 @@ Segment::Segment(const Representation *parent) :
         this->size = parent->getBandwidth() * parent->getSegmentInfo()->getDuration();
     else
         this->size = -1;
-}
-
-std::string             Segment::getSourceUrl   () const
-{
-    return this->sourceUrl;
 }
 
 void                    Segment::setSourceUrl   ( const std::string &url )
@@ -62,10 +58,6 @@ bool                    Segment::isSingleShot   () const
 void                    Segment::done           ()
 {
     //Only used for a SegmentTemplate.
-}
-void                    Segment::addBaseUrl     (BaseUrl *url)
-{
-    this->baseUrls.push_back(url);
 }
 
 void                    Segment::setByteRange   (int start, int end)
@@ -85,24 +77,7 @@ dash::http::Chunk*      Segment::toChunk        ()
         chunk->setEndByte(this->endByte);
     }
 
-    if(this->baseUrls.size() > 0)
-    {
-        std::stringstream ss;
-        ss << this->baseUrls.at(0)->getUrl() << this->sourceUrl;
-        chunk->setUrl(ss.str());
-        ss.clear();
-
-        for(size_t i = 1; i < this->baseUrls.size(); i++)
-        {
-            ss << this->baseUrls.at(i)->getUrl() << this->sourceUrl;
-            chunk->addOptionalUrl(ss.str());
-            ss.clear();
-        }
-    }
-    else
-    {
-        chunk->setUrl(this->sourceUrl);
-    }
+    chunk->setUrl( getUrlSegment() );
 
     chunk->setBitrate(this->parentRepresentation->getBandwidth());
 
@@ -112,4 +87,12 @@ dash::http::Chunk*      Segment::toChunk        ()
 const Representation *Segment::getParentRepresentation() const
 {
     return this->parentRepresentation;
+}
+
+std::string Segment::getUrlSegment() const
+{
+    std::string ret = getParentUrlSegment();
+    if (!sourceUrl.empty())
+        ret.append(sourceUrl);
+    return ret;
 }

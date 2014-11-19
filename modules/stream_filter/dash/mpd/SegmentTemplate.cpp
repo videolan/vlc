@@ -30,60 +30,45 @@
 #include "AdaptationSet.h"
 #include "SegmentInfoDefault.h"
 
-#include <cassert>
-#include <cstring>
-#include <iostream>
-#include <sstream>
-
 using namespace dash::mpd;
 
 SegmentTemplate::SegmentTemplate( bool containRuntimeIdentifier,
                                   Representation* representation ) :
     Segment( representation ),
     containRuntimeIdentifier( containRuntimeIdentifier ),
-    beginTime( std::string::npos ),
-    beginIndex( std::string::npos ),
     currentSegmentIndex( 0 )
 {
 }
 
-std::string     SegmentTemplate::getSourceUrl() const
+std::string SegmentTemplate::getUrlSegment() const
 {
-    std::string     res = this->sourceUrl;
+    std::string res = Segment::getUrlSegment();
 
-    if ( this->containRuntimeIdentifier == false )
-        return Segment::getSourceUrl();
+    if ( !containRuntimeIdentifier )
+        return res;
 
-//    if ( this->beginIndex != std::string::npos )
-//        std::cerr << "Unhandled identifier \"$Index$\"" << std::endl;
-    if ( this->beginTime != std::string::npos )
+    size_t beginTime = res.find( "$Time$" );
+//    size_t beginIndex = res.find( "$Index$" );
+
+    if ( beginTime != std::string::npos )
     {
         //FIXME: This should use the current representation SegmentInfo
         //which "inherits" the SegmentInfoDefault values.
-        if ( this->parentRepresentation->getParentGroup()->getSegmentInfoDefault() != NULL &&
-             this->parentRepresentation->getParentGroup()->getSegmentInfoDefault()->getSegmentTimeline() != NULL )
+        if ( parentRepresentation->getParentGroup()->getSegmentInfoDefault() != NULL &&
+             parentRepresentation->getParentGroup()->getSegmentInfoDefault()->getSegmentTimeline() != NULL )
         {
-            const SegmentTimeline::Element  *el = this->parentRepresentation->getParentGroup()->
-                    getSegmentInfoDefault()->getSegmentTimeline()->getElement( this->currentSegmentIndex );
+            const SegmentTimeline::Element  *el = parentRepresentation->getParentGroup()->
+                    getSegmentInfoDefault()->getSegmentTimeline()->getElement( currentSegmentIndex );
             if ( el != NULL )
             {
                 std::ostringstream  oss;
                 oss << el->t;
-                res.replace( this->beginTime, strlen("$Time$"), oss.str() );
+                res.replace( beginTime, strlen("$Time$"), oss.str() );
             }
         }
     }
-    return res;
-}
 
-void    SegmentTemplate::setSourceUrl( const std::string &url )
-{
-    if ( this->containRuntimeIdentifier == true )
-    {
-        this->beginTime = url.find( "$Time$" );
-        this->beginIndex = url.find( "$Index$" );
-    }
-    Segment::setSourceUrl( url );
+    return res;
 }
 
 bool            SegmentTemplate::isSingleShot() const

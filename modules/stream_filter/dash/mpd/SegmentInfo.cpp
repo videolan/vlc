@@ -29,7 +29,8 @@
 
 using namespace dash::mpd;
 
-SegmentInfo::SegmentInfo() :
+SegmentInfo::SegmentInfo( ICanonicalUrl *parent ) :
+    SegmentInfoCommon( parent ),
     initSeg( NULL )
 {
 }

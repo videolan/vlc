@@ -36,14 +36,11 @@ namespace dash
         {
             public:
                 SegmentTemplate( bool containRuntimeIdentifier, Representation *rep );
-                virtual std::string     getSourceUrl() const;
-                virtual void            setSourceUrl( const std::string & url );
+                virtual std::string     getUrlSegment() const; /* reimpl */
                 virtual bool            isSingleShot() const;
                 virtual void            done();
             private:
                 bool                    containRuntimeIdentifier;
-                size_t                  beginTime;
-                size_t                  beginIndex;
                 int                     currentSegmentIndex;
         };
     }

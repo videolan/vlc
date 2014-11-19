@@ -31,6 +31,7 @@
 
 #include "mpd/Period.h"
 #include "mpd/BaseUrl.h"
+#include "mpd/ICanonicalUrl.hpp"
 #include "mpd/ProgramInformation.h"
 #include "mpd/Profile.hpp"
 
@@ -38,7 +39,7 @@ namespace dash
 {
     namespace mpd
     {
-        class MPD
+        class MPD : public ICanonicalUrl
         {
             public:
                 MPD();
@@ -60,13 +61,14 @@ namespace dash
                 void                            setMinBufferTime( time_t time );
                 time_t                          getTimeShiftBufferDepth() const;
                 void                            setTimeShiftBufferDepth( time_t depth );
-                const std::vector<BaseUrl *>&   getBaseUrls() const;
                 const std::vector<Period *>&    getPeriods() const;
                 const ProgramInformation*       getProgramInformation() const;
 
                 void    addPeriod               (Period *period);
                 void    addBaseUrl              (BaseUrl *url);
                 void    setProgramInformation   (ProgramInformation *progInfo);
+
+                virtual std::string getUrlSegment() const; /* impl */
 
             private:
                 Profile                             profile;

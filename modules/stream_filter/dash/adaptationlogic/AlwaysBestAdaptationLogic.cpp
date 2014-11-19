@@ -54,7 +54,7 @@ Chunk*  AlwaysBestAdaptationLogic::getNextChunk()
     if ( this->count < this->schedule.size() )
     {
         Chunk *chunk = new Chunk();
-        chunk->setUrl(this->schedule.at( this->count )->getSourceUrl());
+        chunk->setUrl(this->schedule.at( this->count )->getUrlSegment());
         this->count++;
         return chunk;
     }

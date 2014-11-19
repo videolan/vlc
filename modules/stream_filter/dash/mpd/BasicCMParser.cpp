@@ -263,7 +263,7 @@ void    BasicCMParser::setRepresentations   (Node *root, AdaptationSet *group)
     {
         const std::map<std::string, std::string>    attributes = representations.at(i)->getAttributes();
 
-        Representation *rep = new Representation;
+        Representation *rep = new Representation(getMPD());
         rep->setParentGroup( group );
         this->currentRepresentation = rep;
         if ( this->parseCommonAttributesElements( representations.at( i ), rep, group ) == false )
@@ -326,7 +326,7 @@ bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
 
     if ( segmentInfo )
     {
-        SegmentInfo *info = new SegmentInfo;
+        SegmentInfo *info = new SegmentInfo(rep);
         this->parseSegmentInfoCommon( segmentInfo, info );
         //If we don't have any segment, there's no point keeping this SegmentInfo.
         if ( this->setSegments( segmentInfo, info ) == false )
@@ -427,8 +427,7 @@ bool    BasicCMParser::setSegments          (Node *root, SegmentInfo *info)
         Segment*    seg = parseSegment( segments.at( i ) );
         if ( seg == NULL )
             continue ;
-        if ( seg->getSourceUrl().empty() == false )
-            info->addSegment(seg);
+        info->addSegment(seg);
     }
     return true;
 }

@@ -31,6 +31,7 @@
 
 #include "mpd/Segment.h"
 #include "mpd/SegmentInfoCommon.h"
+#include "ICanonicalUrl.hpp"
 
 namespace dash
 {
@@ -39,7 +40,7 @@ namespace dash
         class SegmentInfo : public SegmentInfoCommon
         {
             public:
-                SegmentInfo             ();
+                SegmentInfo             ( ICanonicalUrl * = NULL );
                 virtual ~SegmentInfo    ();
 
                 const std::vector<Segment *>&   getSegments() const;

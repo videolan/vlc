@@ -29,6 +29,7 @@
 #include <sstream>
 #include <vector>
 #include "mpd/BaseUrl.h"
+#include "mpd/ICanonicalUrl.hpp"
 #include "http/Chunk.h"
 
 namespace dash
@@ -36,12 +37,11 @@ namespace dash
     namespace mpd
     {
         class Representation;
-        class Segment
+        class Segment : public ICanonicalUrl
         {
             public:
                 Segment( const Representation *parent );
                 virtual ~Segment(){}
-                virtual std::string getSourceUrl() const;
                 virtual void        setSourceUrl( const std::string &url );
                 /**
                  *  @return true if the segment should be dropped after being read.
@@ -50,14 +50,13 @@ namespace dash
                  */
                 virtual bool                            isSingleShot    () const;
                 virtual void                            done            ();
-                virtual void                            addBaseUrl      (BaseUrl *url);
                 virtual void                            setByteRange    (int start, int end);
                 virtual dash::http::Chunk*              toChunk         ();
                 const Representation*                   getParentRepresentation() const;
+                virtual std::string                     getUrlSegment   () const; /* impl */
 
             protected:
                 std::string             sourceUrl;
-                std::vector<BaseUrl *>  baseUrls;
                 int                     startByte;
                 int                     endByte;
                 const Representation*   parentRepresentation;

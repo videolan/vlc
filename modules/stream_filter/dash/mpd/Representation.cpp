@@ -28,10 +28,12 @@
 #include <cstdlib>
 
 #include "Representation.h"
+#include "mpd/MPD.h"
 
 using namespace dash::mpd;
 
-Representation::Representation  () :
+Representation::Representation  ( MPD *mpd ) :
+                ICanonicalUrl   ( mpd ),
                 bandwidth       (0),
                 qualityRanking  ( -1 ),
                 segmentInfo     ( NULL ),
@@ -42,7 +44,6 @@ Representation::Representation  () :
                 baseUrl         ( NULL ),
                 width           (0),
                 height          (0)
-
 {
 }
 
@@ -165,11 +166,6 @@ void                Representation::setSegmentBase          (SegmentBase *base)
     this->segmentBase = base;
 }
 
-BaseUrl* Representation::getBaseUrl() const
-{
-    return baseUrl;
-}
-
 void Representation::setBaseUrl(BaseUrl *base)
 {
     baseUrl = base;
@@ -208,5 +204,13 @@ std::vector<std::string> Representation::toString() const
                           .append((*l)->getSourceUrl()));
         }
     }
+    return ret;
+}
+
+std::string Representation::getUrlSegment() const
+{
+    std::string ret = getParentUrlSegment();
+    if (baseUrl)
+        ret.append(baseUrl->getUrl());
     return ret;
 }
