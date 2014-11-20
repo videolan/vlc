@@ -51,6 +51,8 @@ Representation::~Representation ()
 {
     delete(this->segmentInfo);
     delete(this->trickModeType);
+    delete segmentBase;
+    delete segmentList;
     delete baseUrl;
 }
 
