@@ -21,6 +21,7 @@
 #include "IHTTPConnection.h"
 #include "Chunk.h"
 #include "Helper.h"
+#include "dash.hpp"
 
 #include <vlc_network.h>
 
@@ -63,7 +64,8 @@ std::string IHTTPConnection::getRequestHeader(const Chunk *chunk) const
 {
     std::stringstream req;
     req << "GET " << chunk->getPath() << " HTTP/1.1\r\n" <<
-           "Host: " << chunk->getHostname() << "\r\n";
+           "Host: " << chunk->getHostname() << "\r\n" <<
+           "User-Agent: " << std::string(stream->p_sys->psz_useragent) << "\r\n";
 
     if(chunk->usesByteRange())
         req << "Range: bytes=" << chunk->getStartByte() << "-" << chunk->getEndByte() << "\r\n";

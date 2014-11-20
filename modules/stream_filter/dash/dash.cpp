@@ -38,7 +38,7 @@
 
 #include <errno.h>
 
-#include "DASHManager.h"
+#include "dash.hpp"
 #include "xml/DOMParser.h"
 #include "mpd/MPDFactory.h"
 
@@ -74,12 +74,6 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct stream_sys_t
-{
-        dash::DASHManager   *p_dashManager;
-        dash::mpd::MPD      *p_mpd;
-        uint64_t                            position;
-};
 
 static int  Read            (stream_t *p_stream, void *p_ptr, unsigned int i_len);
 static int  Peek            (stream_t *p_stream, const uint8_t **pp_peek, unsigned int i_peek);
@@ -113,6 +107,8 @@ static int Open(vlc_object_t *p_obj)
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
+    p_sys->psz_useragent = var_InheritString(p_stream, "http-user-agent");
+
     p_sys->p_mpd = mpd;
     dash::DASHManager*p_dashManager = new dash::DASHManager(p_sys->p_mpd,
                                           dash::logic::IAdaptationLogic::RateBased,
@@ -122,6 +118,7 @@ static int Open(vlc_object_t *p_obj)
     {
         delete p_dashManager;
         free( p_sys );
+        free( p_sys->psz_useragent );
         return VLC_EGENERIC;
     }
     p_sys->p_dashManager    = p_dashManager;
@@ -145,6 +142,7 @@ static void Close(vlc_object_t *p_obj)
     dash::DASHManager                   *p_dashManager  = p_sys->p_dashManager;
 
     delete(p_dashManager);
+    free(p_sys->psz_useragent);
     free(p_sys);
 }
 /*****************************************************************************
