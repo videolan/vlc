@@ -29,6 +29,8 @@
 #include "IsoffMainParser.h"
 #include "xml/DOMHelper.h"
 #include <vlc_strings.h>
+#include <vlc_stream.h>
+#include <cstdio>
 
 using namespace dash::mpd;
 using namespace dash::xml;
@@ -105,14 +107,41 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
         adaptationSet->addRepresentation(this->currentRepresentation);
     }
 }
+
 void    IsoffMainParser::setSegmentBase     (dash::xml::Node *repNode, Representation *rep)
 {
     std::vector<Node *> segmentBase = DOMHelper::getElementByTagName(repNode, "SegmentBase", false);
 
-    if(segmentBase.size() > 0)
+    if(segmentBase.front()->hasAttribute("indexRange"))
+    {
+        SegmentList *list = new SegmentList();
+        Segment *seg = new Segment(rep);
+
+        size_t start = 0, end = 0;
+        if (std::sscanf(segmentBase.front()->getAttributeValue("indexRange").c_str(), "%"PRIu64"-%"PRIu64, &start, &end) == 2)
+        {
+            seg->setByteRange(start, end);
+            list->addSegment(seg);
+            /* index must be before data, so data starts at index end */
+            seg = new Segment(rep);
+            seg->setByteRange(end + 1, 0);
+        }
+
+        list->addSegment(seg);
+        rep->setSegmentList(list);
+
+        std::vector<Node *> initSeg = DOMHelper::getElementByTagName(segmentBase.front(), "Initialization", false);
+        if(!initSeg.empty())
+        {
+            SegmentBase *base = new SegmentBase();
+            setInitSegment(segmentBase.front(), base);
+            rep->setSegmentBase(base);
+        }
+    }
+    else if(!segmentBase.empty())
     {
         SegmentBase *base = new SegmentBase();
-        this->setInitSegment(segmentBase.at(0), base);
+        setInitSegment(segmentBase.front(), base);
         rep->setSegmentBase(base);
     }
 }
