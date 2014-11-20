@@ -29,6 +29,7 @@
 #include "../Helper.h"
 
 #include <vector>
+#include <vlc_xml.h>
 
 using namespace dash::xml;
 using namespace dash::mpd;
