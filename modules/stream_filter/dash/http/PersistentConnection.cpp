@@ -88,7 +88,7 @@ int                 PersistentConnection::read              (void *p_buffer, siz
 std::string         PersistentConnection::prepareRequest    (Chunk *chunk)
 {
     std::string request;
-    if(!chunk->useByteRange())
+    if(!chunk->usesByteRange())
     {
         request = "GET "    + chunk->getPath()     + " HTTP/1.1" + "\r\n" +
                   "Host: "  + chunk->getHostname() + "\r\n\r\n";

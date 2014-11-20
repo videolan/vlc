@@ -76,7 +76,7 @@ std::string     HTTPConnection::prepareRequest  (Chunk *chunk)
 {
     std::string request;
 
-    if(!chunk->useByteRange())
+    if(!chunk->usesByteRange())
     {
         request = "GET "    + chunk->getPath()    + " HTTP/1.1" + "\r\n" +
                   "Host: "  + chunk->getHostname() + "\r\n" +

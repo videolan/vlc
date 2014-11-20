@@ -58,8 +58,8 @@ namespace dash
 
             protected:
                 std::string             sourceUrl;
-                int                     startByte;
-                int                     endByte;
+                size_t                  startByte;
+                size_t                  endByte;
                 const Representation*   parentRepresentation;
                 int                     size;
                 bool                    init;

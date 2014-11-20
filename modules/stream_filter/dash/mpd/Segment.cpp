@@ -35,8 +35,8 @@ using namespace dash::http;
 
 Segment::Segment(const Representation *parent, bool isinit) :
         ICanonicalUrl( parent ),
-        startByte  (-1),
-        endByte    (-1),
+        startByte  (0),
+        endByte    (0),
         parentRepresentation( parent ),
         init( isinit )
 {
@@ -71,11 +71,10 @@ dash::http::Chunk*      Segment::toChunk        ()
 {
     Chunk *chunk = new Chunk();
 
-    if(this->startByte != -1 && this->endByte != -1)
+    if(startByte != endByte)
     {
-        chunk->setUseByteRange(true);
-        chunk->setStartByte(this->startByte);
-        chunk->setEndByte(this->endByte);
+        chunk->setStartByte(startByte);
+        chunk->setEndByte(endByte);
     }
 
     chunk->setUrl( getUrlSegment() );

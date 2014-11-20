@@ -32,7 +32,6 @@ using namespace dash::http;
 Chunk::Chunk        () :
        startByte    (0),
        endByte      (0),
-       hasByteRange (false),
        port         (0),
        isHostname   (false),
        length       (0),
@@ -41,11 +40,11 @@ Chunk::Chunk        () :
 {
 }
 
-int                 Chunk::getEndByte           () const
+size_t              Chunk::getEndByte           () const
 {
     return endByte;
 }
-int                 Chunk::getStartByte         () const
+size_t              Chunk::getStartByte         () const
 {
     return startByte;
 }
@@ -53,11 +52,11 @@ const std::string&  Chunk::getUrl               () const
 {
     return url;
 }
-void                Chunk::setEndByte           (int endByte)
+void                Chunk::setEndByte           (size_t endByte)
 {
     this->endByte = endByte;
 }
-void                Chunk::setStartByte         (int startByte)
+void                Chunk::setStartByte         (size_t startByte)
 {
     this->startByte = startByte;
 }
@@ -85,14 +84,11 @@ void                Chunk::addOptionalUrl       (const std::string& url)
 {
     this->optionalUrls.push_back(url);
 }
-bool                Chunk::useByteRange         ()
+bool                Chunk::usesByteRange        () const
 {
-    return this->hasByteRange;
+    return (startByte != endByte);
 }
-void                Chunk::setUseByteRange      (bool value)
-{
-    this->hasByteRange = value;
-}
+
 void                Chunk::setBitrate           (uint64_t bitrate)
 {
     this->bitrate = bitrate;

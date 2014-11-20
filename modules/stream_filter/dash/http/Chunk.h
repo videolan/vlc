@@ -47,8 +47,8 @@ namespace dash
             public:
                 Chunk           ();
 
-                int                 getEndByte              () const;
-                int                 getStartByte            () const;
+                size_t              getEndByte              () const;
+                size_t              getStartByte            () const;
                 const std::string&  getUrl                  () const;
                 bool                hasHostname             () const;
                 const std::string&  getHostname             () const;
@@ -63,12 +63,11 @@ namespace dash
                 void                setConnection   (IHTTPConnection *connection);
                 void                setBytesRead    (uint64_t bytes);
                 void                setLength       (uint64_t length);
-                void                setEndByte      (int endByte);
-                void                setStartByte    (int startByte);
+                void                setEndByte      (size_t endByte);
+                void                setStartByte    (size_t startByte);
                 void                setUrl          (const std::string& url);
                 void                addOptionalUrl  (const std::string& url);
-                bool                useByteRange    ();
-                void                setUseByteRange (bool value);
+                bool                usesByteRange   () const;
                 void                setBitrate      (uint64_t bitrate);
                 int                 getBitrate      ();
 
@@ -77,9 +76,8 @@ namespace dash
                 std::string                 path;
                 std::string                 hostname;
                 std::vector<std::string>    optionalUrls;
-                int                         startByte;
-                int                         endByte;
-                bool                        hasByteRange;
+                size_t                      startByte;
+                size_t                      endByte;
                 int                         bitrate;
                 int                         port;
                 bool                        isHostname;
