@@ -48,6 +48,14 @@ AdaptationSet::~AdaptationSet   ()
     vlc_delete_all( this->representations );
 }
 
+const std::string& AdaptationSet::getMimeType() const
+{
+    if (mimeType.empty() && !representations.empty())
+        return representations.front()->getMimeType();
+    else
+        return mimeType;
+}
+
 bool                AdaptationSet::getSubsegmentAlignmentFlag() const
 {
     return this->subsegmentAlignmentFlag;

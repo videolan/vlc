@@ -44,6 +44,7 @@ namespace dash
                 AdaptationSet();
                 virtual ~AdaptationSet();
 
+                virtual const std::string&      getMimeType() const; /*reimpl*/
                 bool                            getSubsegmentAlignmentFlag() const;
                 void                            setSubsegmentAlignmentFlag( bool alignment );
                 std::vector<Representation *>&  getRepresentations      ();

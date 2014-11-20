@@ -72,11 +72,16 @@ void    IsoffMainParser::setMPDAttributes   ()
 void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
 {
     std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", false);
+    std::vector<Node *>::const_iterator it;
 
-    for(size_t i = 0; i < adaptationSets.size(); i++)
+    for(it = adaptationSets.begin(); it != adaptationSets.end(); it++)
     {
         AdaptationSet *adaptationSet = new AdaptationSet();
-        this->setRepresentations(adaptationSets.at(i), adaptationSet);
+        if(!adaptationSet)
+            continue;
+        if((*it)->hasAttribute("mimeType"))
+            adaptationSet->setMimeType((*it)->getAttributeValue("mimeType"));
+        setRepresentations((*it), adaptationSet);
         period->addAdaptationSet(adaptationSet);
     }
 }
@@ -101,6 +106,9 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
 
         if(repNode->hasAttribute("bandwidth"))
             this->currentRepresentation->setBandwidth(atoi(repNode->getAttributeValue("bandwidth").c_str()));
+
+        if(repNode->hasAttribute("mimeType"))
+            currentRepresentation->setMimeType(repNode->getAttributeValue("mimeType"));
 
         this->setSegmentBase(repNode, this->currentRepresentation);
         this->setSegmentList(repNode, this->currentRepresentation);
