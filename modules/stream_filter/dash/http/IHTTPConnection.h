@@ -25,8 +25,12 @@
 #ifndef IHTTPCONNECTION_H_
 #define IHTTPCONNECTION_H_
 
-#include <stdint.h>
-#include <unistd.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_common.h>
+#include <vlc_stream.h>
 #include <string>
 
 namespace dash
@@ -37,11 +41,17 @@ namespace dash
         class IHTTPConnection
         {
             public:
+                IHTTPConnection(stream_t *stream);
+                virtual ~IHTTPConnection();
+                virtual bool    init        (Chunk *chunk);
+                virtual bool    send        (const std::string& data) = 0;
                 virtual int     read        (void *p_buffer, size_t len)              = 0;
                 virtual int     peek        (const uint8_t **pp_peek, size_t i_peek)  = 0;
-                virtual ~IHTTPConnection() {}
             protected:
                 virtual std::string getRequestHeader(const Chunk *chunk) const;
+                virtual std::string getUrlRelative  (const Chunk *chunk) const;
+                stream_t    *stream;
+                int         httpSocket;
         };
     }
 }

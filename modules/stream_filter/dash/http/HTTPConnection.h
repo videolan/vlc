@@ -25,15 +25,7 @@
 #ifndef HTTPCONNECTION_H_
 #define HTTPCONNECTION_H_
 
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-#include <vlc_stream.h>
-#include <vlc_network.h>
-
 #include <string>
-#include <stdint.h>
-#include <iostream>
-#include <sstream>
 
 #include "http/IHTTPConnection.h"
 #include "http/Chunk.h"
@@ -57,17 +49,14 @@ namespace dash
                 virtual int     peek        (const uint8_t **pp_peek, size_t i_peek);
 
             protected:
-                int         httpSocket;
-                stream_t    *stream;
                 uint8_t     *peekBuffer;
                 size_t      peekBufferLen;
                 int         contentLength;
 
-                bool                sendData        (const std::string& data);
+                virtual bool        send        (const std::string& data);
                 bool                parseHeader     ();
                 std::string         readLine        ();
                 virtual std::string getRequestHeader(const Chunk *chunk) const; /* reimpl */
-                bool                setUrlRelative  (Chunk *chunk);
         };
     }
 }

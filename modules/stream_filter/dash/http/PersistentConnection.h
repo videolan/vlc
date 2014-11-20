@@ -55,6 +55,7 @@ namespace dash
                 bool                initChunk           (Chunk *chunk);
                 bool                reconnect           (Chunk *chunk);
                 bool                resendAllRequests   ();
+                virtual std::string getRequestHeader    (const Chunk *chunk) const; /* reimpl */
         };
     }
 }

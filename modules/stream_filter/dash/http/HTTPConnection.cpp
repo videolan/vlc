@@ -26,12 +26,14 @@
 #endif
 
 #include "HTTPConnection.h"
+#include <vlc_network.h>
+
+#include <sstream>
 
 using namespace dash::http;
 
 HTTPConnection::HTTPConnection  (stream_t *stream) :
-                httpSocket      (-1),
-                stream          (stream),
+                IHTTPConnection (stream),
                 peekBufferLen   (0),
                 contentLength   (0)
 {
@@ -81,20 +83,12 @@ std::string     HTTPConnection::getRequestHeader  (const Chunk *chunk) const
 
 bool            HTTPConnection::init            (Chunk *chunk)
 {
-    if(!chunk->hasHostname())
-        if(!this->setUrlRelative(chunk))
-            return false;
-
-    this->httpSocket = net_ConnectTCP(this->stream, chunk->getHostname().c_str(), chunk->getPort());
-
-    if(this->httpSocket == -1)
+    if (IHTTPConnection::init(chunk))
+        return parseHeader();
+    else
         return false;
-
-    if(this->sendData(this->getRequestHeader(chunk).append("\r\n")))
-        return this->parseHeader();
-
-    return false;
 }
+
 bool            HTTPConnection::parseHeader     ()
 {
     std::string line = this->readLine();
@@ -135,7 +129,7 @@ std::string     HTTPConnection::readLine        ()
 
     return "";
 }
-bool            HTTPConnection::sendData        (const std::string& data)
+bool            HTTPConnection::send        (const std::string& data)
 {
     ssize_t size = net_Write(this->stream, this->httpSocket, NULL, data.c_str(), data.size());
     if (size == -1)
@@ -144,7 +138,7 @@ bool            HTTPConnection::sendData        (const std::string& data)
     }
     if ((size_t)size != data.length())
     {
-        this->sendData(data.substr(size, data.size()));
+        this->send(data.substr(size, data.size()));
     }
 
     return true;
@@ -154,11 +148,4 @@ void            HTTPConnection::closeSocket     ()
     if (httpSocket >= 0)
         net_Close(httpSocket);
 }
-bool            HTTPConnection::setUrlRelative  (Chunk *chunk)
-{
-    std::stringstream ss;
-    ss << stream->psz_access << "://" << Helper::combinePaths(Helper::getDirectoryPath(stream->psz_path), chunk->getUrl());
-    chunk->setUrl(ss.str());
 
-    return chunk->hasHostname();
-}

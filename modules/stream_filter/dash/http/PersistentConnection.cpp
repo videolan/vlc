@@ -27,6 +27,8 @@
 
 #include "PersistentConnection.h"
 
+#include <vlc_network.h>
+
 using namespace dash::http;
 
 const int PersistentConnection::RETRY = 5;
@@ -88,28 +90,17 @@ int                 PersistentConnection::read              (void *p_buffer, siz
 
 bool                PersistentConnection::init              (Chunk *chunk)
 {
-    if(this->isInit)
+    if(isInit)
         return true;
 
-    if(chunk == NULL)
-        return false;
+    if (IHTTPConnection::init(chunk))
+    {
+        isInit = true;
+        chunkQueue.push_back(chunk);
+        hostname = chunk->getHostname();
+    }
 
-    if(!chunk->hasHostname())
-        if(!this->setUrlRelative(chunk))
-            return false;
-
-    this->httpSocket = net_ConnectTCP(this->stream, chunk->getHostname().c_str(), chunk->getPort());
-
-    if(this->httpSocket == -1)
-        return false;
-
-    if(this->sendData(this->getRequestHeader(chunk).append("\r\n")))
-        this->isInit = true;
-
-    this->chunkQueue.push_back(chunk);
-    this->hostname = chunk->getHostname();
-
-    return this->isInit;
+    return isInit;
 }
 bool                PersistentConnection::addChunk          (Chunk *chunk)
 {
@@ -120,13 +111,16 @@ bool                PersistentConnection::addChunk          (Chunk *chunk)
         return this->init(chunk);
 
     if(!chunk->hasHostname())
-        if(!this->setUrlRelative(chunk))
+    {
+        chunk->setUrl(getUrlRelative(chunk));
+        if(!chunk->hasHostname())
             return false;
+    }
 
     if(chunk->getHostname().compare(this->hostname))
         return false;
 
-    if(this->sendData(this->getRequestHeader(chunk).append("\r\n")))
+    if(send(getRequestHeader(chunk).append("\r\n")))
     {
         this->chunkQueue.push_back(chunk);
         return true;
@@ -156,7 +150,7 @@ bool                PersistentConnection::initChunk         (Chunk *chunk)
 bool                PersistentConnection::reconnect         (Chunk *chunk)
 {
     int         count   = 0;
-    std::string request = this->getRequestHeader(chunk).append("\r\n");
+    std::string request = getRequestHeader(chunk).append("\r\n");
 
     while(count < this->RETRY)
     {
@@ -180,9 +174,15 @@ bool                PersistentConnection::isConnected       () const
 }
 bool                PersistentConnection::resendAllRequests ()
 {
-    for(size_t i = 0; i < this->chunkQueue.size(); i++)
-        if(!this->sendData(this->getRequestHeader(this->chunkQueue.at(i)).append("\r\n")))
+    for(size_t i = 0; i < chunkQueue.size(); i++)
+        if(!send(getRequestHeader(chunkQueue.at(i)).append("\r\n")))
             return false;
 
     return true;
+}
+
+std::string PersistentConnection::getRequestHeader(const Chunk *chunk) const
+{
+    /* can clearly see here that inheritance is reversed :/ */
+    return IHTTPConnection::getRequestHeader(chunk);
 }
