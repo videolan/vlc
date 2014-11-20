@@ -40,8 +40,6 @@
 
 #include "DASHManager.h"
 #include "xml/DOMParser.h"
-#include "http/HTTPConnectionManager.h"
-#include "adaptationlogic/IAdaptationLogic.h"
 #include "mpd/MPDFactory.h"
 
 #define SEEK 0
