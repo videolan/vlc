@@ -137,7 +137,7 @@ void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, Segme
 
     if(initSeg.size() > 0)
     {
-        Segment *seg = new Segment( this->currentRepresentation );
+        Segment *seg = new Segment( currentRepresentation, true );
         seg->setSourceUrl(initSeg.at(0)->getAttributeValue("sourceURL"));
 
         if(initSeg.at(0)->hasAttribute("range"))

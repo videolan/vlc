@@ -40,7 +40,7 @@ namespace dash
         class Segment : public ICanonicalUrl
         {
             public:
-                Segment( const Representation *parent );
+                Segment( const Representation *parent, bool isinit = false );
                 virtual ~Segment(){}
                 virtual void        setSourceUrl( const std::string &url );
                 /**
@@ -49,6 +49,7 @@ namespace dash
                  *          when using an UrlTemplate
                  */
                 virtual bool                            isSingleShot    () const;
+                virtual bool                            isInit          () const;
                 virtual void                            done            ();
                 virtual void                            setByteRange    (int start, int end);
                 virtual dash::http::Chunk*              toChunk         ();
@@ -61,6 +62,7 @@ namespace dash
                 int                     endByte;
                 const Representation*   parentRepresentation;
                 int                     size;
+                bool                    init;
         };
     }
 }

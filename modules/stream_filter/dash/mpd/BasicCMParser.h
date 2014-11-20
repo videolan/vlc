@@ -66,7 +66,7 @@ namespace dash
                 bool    parseCommonAttributesElements( dash::xml::Node *node,
                                                        CommonAttributesElements *common,
                                                        CommonAttributesElements *parent ) const;
-                Segment*    parseSegment( xml::Node* node );
+                Segment*    parseSegment( xml::Node* node, bool init = false );
                 ProgramInformation*     parseProgramInformation();
 
             private:

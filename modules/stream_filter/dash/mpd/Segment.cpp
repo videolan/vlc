@@ -33,11 +33,12 @@
 using namespace dash::mpd;
 using namespace dash::http;
 
-Segment::Segment(const Representation *parent) :
+Segment::Segment(const Representation *parent, bool isinit) :
         ICanonicalUrl( parent ),
         startByte  (-1),
         endByte    (-1),
-        parentRepresentation( parent )
+        parentRepresentation( parent ),
+        init( isinit )
 {
     assert( parent != NULL );
     if ( parent->getSegmentInfo() != NULL && parent->getSegmentInfo()->getDuration() >= 0 )
@@ -95,4 +96,9 @@ std::string Segment::getUrlSegment() const
     if (!sourceUrl.empty())
         ret.append(sourceUrl);
     return ret;
+}
+
+bool Segment::isInit() const
+{
+    return init;
 }

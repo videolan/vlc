@@ -341,7 +341,7 @@ bool    BasicCMParser::setSegmentInfo       (Node *root, Representation *rep)
     return false;
 }
 
-Segment*    BasicCMParser::parseSegment( Node* node )
+Segment*    BasicCMParser::parseSegment( Node* node, bool init )
 {
     const std::map<std::string, std::string>    attr = node->getAttributes();
     std::map<std::string, std::string>::const_iterator  it;
@@ -368,7 +368,7 @@ Segment*    BasicCMParser::parseSegment( Node* node )
             seg = new SegmentTemplate( runtimeToken, this->currentRepresentation );
         }
         else
-            seg = new Segment( this->currentRepresentation );
+            seg = new Segment( this->currentRepresentation, init );
         if ( url.find( this->p_stream->psz_access ) != 0 ) //Relative url
             url = this->url + url;
         seg->setSourceUrl( url );
@@ -408,7 +408,7 @@ void    BasicCMParser::setInitSegment       (Node *root, SegmentInfoCommon *info
                      " other InitialisationSegmentURL will be dropped."  );
     if ( initSeg.size() == 1 )
     {
-        Segment     *seg = parseSegment( initSeg.at(0) );
+        Segment     *seg = parseSegment( initSeg.at(0), true );
         if ( seg != NULL )
             info->setInitialisationSegment( seg );
     }

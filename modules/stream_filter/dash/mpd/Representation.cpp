@@ -192,17 +192,16 @@ std::vector<std::string> Representation::toString() const
 {
     std::vector<std::string> ret;
     ret.push_back(std::string("  Representation"));
-    ret.push_back(std::string("    InitSeg url=")
-                  .append(segmentBase->getInitSegment()->getSourceUrl()));
-    if (segmentList)
+    std::vector<Segment *> list = getSegments();
+    std::vector<Segment *>::const_iterator l;
+    for(l = list.begin(); l < list.end(); l++)
     {
-        std::vector<Segment *>::const_iterator l;
-        for(l = segmentList->getSegments().begin();
-            l < segmentList->getSegments().end(); l++)
-        {
+        if ((*l)->isInit())
+            ret.push_back(std::string("    InitSeg url=")
+                          .append((*l)->getUrlSegment()));
+        else
             ret.push_back(std::string("    Segment url=")
-                          .append((*l)->getSourceUrl()));
-        }
+                          .append((*l)->getUrlSegment()));
     }
     return ret;
 }
