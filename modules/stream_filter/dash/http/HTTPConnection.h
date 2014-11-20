@@ -66,7 +66,7 @@ namespace dash
                 bool                sendData        (const std::string& data);
                 bool                parseHeader     ();
                 std::string         readLine        ();
-                virtual std::string prepareRequest  (Chunk *chunk);
+                virtual std::string getRequestHeader(const Chunk *chunk) const; /* reimpl */
                 bool                setUrlRelative  (Chunk *chunk);
         };
     }

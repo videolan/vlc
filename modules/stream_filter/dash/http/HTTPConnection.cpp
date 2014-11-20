@@ -72,29 +72,13 @@ int             HTTPConnection::peek            (const uint8_t **pp_peek, size_t
     *pp_peek = peek;
     return size;
 }
-std::string     HTTPConnection::prepareRequest  (Chunk *chunk)
+
+std::string     HTTPConnection::getRequestHeader  (const Chunk *chunk) const
 {
-    std::string request;
-
-    if(!chunk->usesByteRange())
-    {
-        request = "GET "    + chunk->getPath()    + " HTTP/1.1" + "\r\n" +
-                  "Host: "  + chunk->getHostname() + "\r\n" +
-                  "Connection: close\r\n\r\n";
-    }
-    else
-    {
-        std::stringstream req;
-        req << "GET " << chunk->getPath() << " HTTP/1.1\r\n" <<
-               "Host: " << chunk->getHostname() << "\r\n" <<
-               "Range: bytes=" << chunk->getStartByte() << "-" << chunk->getEndByte() << "\r\n" <<
-               "Connection: close\r\n\r\n";
-
-        request = req.str();
-    }
-
-    return request;
+    return IHTTPConnection::getRequestHeader(chunk)
+            .append("Connection: close\r\n");
 }
+
 bool            HTTPConnection::init            (Chunk *chunk)
 {
     if(!chunk->hasHostname())
@@ -106,7 +90,7 @@ bool            HTTPConnection::init            (Chunk *chunk)
     if(this->httpSocket == -1)
         return false;
 
-    if(this->sendData(this->prepareRequest(chunk)))
+    if(this->sendData(this->getRequestHeader(chunk).append("\r\n")))
         return this->parseHeader();
 
     return false;

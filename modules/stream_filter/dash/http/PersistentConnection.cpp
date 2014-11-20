@@ -85,25 +85,7 @@ int                 PersistentConnection::read              (void *p_buffer, siz
 
     return ret;
 }
-std::string         PersistentConnection::prepareRequest    (Chunk *chunk)
-{
-    std::string request;
-    if(!chunk->usesByteRange())
-    {
-        request = "GET "    + chunk->getPath()     + " HTTP/1.1" + "\r\n" +
-                  "Host: "  + chunk->getHostname() + "\r\n\r\n";
-    }
-    else
-    {
-        std::stringstream req;
-        req << "GET " << chunk->getPath() << " HTTP/1.1\r\n" <<
-               "Host: " << chunk->getHostname() << "\r\n" <<
-               "Range: bytes=" << chunk->getStartByte() << "-" << chunk->getEndByte() << "\r\n\r\n";
 
-        request = req.str();
-    }
-    return request;
-}
 bool                PersistentConnection::init              (Chunk *chunk)
 {
     if(this->isInit)
@@ -121,7 +103,7 @@ bool                PersistentConnection::init              (Chunk *chunk)
     if(this->httpSocket == -1)
         return false;
 
-    if(this->sendData(this->prepareRequest(chunk)))
+    if(this->sendData(this->getRequestHeader(chunk).append("\r\n")))
         this->isInit = true;
 
     this->chunkQueue.push_back(chunk);
@@ -144,7 +126,7 @@ bool                PersistentConnection::addChunk          (Chunk *chunk)
     if(chunk->getHostname().compare(this->hostname))
         return false;
 
-    if(this->sendData(this->prepareRequest(chunk)))
+    if(this->sendData(this->getRequestHeader(chunk).append("\r\n")))
     {
         this->chunkQueue.push_back(chunk);
         return true;
@@ -174,7 +156,7 @@ bool                PersistentConnection::initChunk         (Chunk *chunk)
 bool                PersistentConnection::reconnect         (Chunk *chunk)
 {
     int         count   = 0;
-    std::string request = this->prepareRequest(chunk);
+    std::string request = this->getRequestHeader(chunk).append("\r\n");
 
     while(count < this->RETRY)
     {
@@ -199,7 +181,7 @@ bool                PersistentConnection::isConnected       () const
 bool                PersistentConnection::resendAllRequests ()
 {
     for(size_t i = 0; i < this->chunkQueue.size(); i++)
-        if(!this->sendData((this->prepareRequest(this->chunkQueue.at(i)))))
+        if(!this->sendData(this->getRequestHeader(this->chunkQueue.at(i)).append("\r\n")))
             return false;
 
     return true;

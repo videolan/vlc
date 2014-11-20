@@ -1,11 +1,7 @@
 /*
- * IHTTPConnection.h
+ * IHTTPConnection.cpp
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
- *
- * Created on: Aug 10, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2014 - VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -22,28 +18,29 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef IHTTPCONNECTION_H_
-#define IHTTPCONNECTION_H_
+#include "IHTTPConnection.h"
+#include "Chunk.h"
 
-#include <stdint.h>
-#include <unistd.h>
-#include <string>
+#include <sstream>
 
-namespace dash
+using namespace dash::http;
+
+std::string IHTTPConnection::getRequestHeader(const Chunk *chunk) const
 {
-    namespace http
+    std::string request;
+    if(!chunk->usesByteRange())
     {
-        class Chunk;
-        class IHTTPConnection
-        {
-            public:
-                virtual int     read        (void *p_buffer, size_t len)              = 0;
-                virtual int     peek        (const uint8_t **pp_peek, size_t i_peek)  = 0;
-                virtual ~IHTTPConnection() {}
-            protected:
-                virtual std::string getRequestHeader(const Chunk *chunk) const;
-        };
+        request = "GET "    + chunk->getPath()     + " HTTP/1.1" + "\r\n" +
+                  "Host: "  + chunk->getHostname() + "\r\n";
     }
-}
+    else
+    {
+        std::stringstream req;
+        req << "GET " << chunk->getPath() << " HTTP/1.1\r\n" <<
+               "Host: " << chunk->getHostname() << "\r\n" <<
+               "Range: bytes=" << chunk->getStartByte() << "-" << chunk->getEndByte() << "\r\n";
 
-#endif /* IHTTPCONNECTION_H_ */
+        request = req.str();
+    }
+    return request;
+}

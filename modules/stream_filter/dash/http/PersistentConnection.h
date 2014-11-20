@@ -52,7 +52,6 @@ namespace dash
                 static const int RETRY;
 
             protected:
-                virtual std::string prepareRequest      (Chunk *chunk);
                 bool                initChunk           (Chunk *chunk);
                 bool                reconnect           (Chunk *chunk);
                 bool                resendAllRequests   ();

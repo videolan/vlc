@@ -30,6 +30,7 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/http/HTTPConnection.h \
     stream_filter/dash/http/HTTPConnectionManager.cpp \
     stream_filter/dash/http/HTTPConnectionManager.h \
+    stream_filter/dash/http/IHTTPConnection.cpp \
     stream_filter/dash/http/IHTTPConnection.h \
     stream_filter/dash/http/PersistentConnection.cpp \
     stream_filter/dash/http/PersistentConnection.h \
