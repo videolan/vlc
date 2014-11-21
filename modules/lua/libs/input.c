@@ -44,8 +44,6 @@
 #include "../libs.h"
 #include "../extension.h"
 
-extern const luaL_Reg vlclua_input_item_reg[];
-
 static input_item_t* vlclua_input_item_get_internal( lua_State *L );
 
 input_thread_t * vlclua_get_input_internal( lua_State *L )
@@ -254,25 +252,7 @@ static int vlclua_input_item_delete( lua_State *L )
     return 1;
 }
 
-static int vlclua_input_item_get( lua_State *L, input_item_t *p_item )
-{
-    vlc_gc_incref( p_item );
-    input_item_t **pp = lua_newuserdata( L, sizeof( input_item_t* ) );
-    *pp = p_item;
-
-    if( luaL_newmetatable( L, "input_item" ) )
-    {
-        lua_newtable( L );
-        luaL_register( L, NULL, vlclua_input_item_reg );
-        lua_setfield( L, -2, "__index" );
-        lua_pushcfunction( L, vlclua_input_item_delete );
-        lua_setfield( L, -2, "__gc" );
-    }
-
-    lua_setmetatable(L, -2);
-
-    return 1;
-}
+static int vlclua_input_item_get( lua_State *L, input_item_t *p_item );
 
 static int vlclua_input_item_get_current( lua_State *L )
 {
@@ -407,6 +387,26 @@ static const luaL_Reg vlclua_input_item_reg[] = {
     { "info", vlclua_input_item_info },
     { NULL, NULL }
 };
+
+static int vlclua_input_item_get( lua_State *L, input_item_t *p_item )
+{
+    vlc_gc_incref( p_item );
+    input_item_t **pp = lua_newuserdata( L, sizeof( input_item_t* ) );
+    *pp = p_item;
+
+    if( luaL_newmetatable( L, "input_item" ) )
+    {
+        lua_newtable( L );
+        luaL_register( L, NULL, vlclua_input_item_reg );
+        lua_setfield( L, -2, "__index" );
+        lua_pushcfunction( L, vlclua_input_item_delete );
+        lua_setfield( L, -2, "__gc" );
+    }
+
+    lua_setmetatable(L, -2);
+
+    return 1;
+}
 
 
 void luaopen_input_item( lua_State *L, input_item_t *item )
