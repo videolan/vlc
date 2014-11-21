@@ -259,7 +259,6 @@ case "${host_os}" in
         LDFLAGS="${LDFLAGS} -Wl,--nxcompat -Wl,--no-seh -Wl,--dynamicbase"
 
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
-        VLC_ADD_LIBS([win32text],[-lgdi32])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_win32"
         DESTDIR="`pwd`/_win32/"
@@ -512,6 +511,7 @@ AS_IF([test "${SYS}" = "mingw32"],[
     vlc_winstore_app=1
      VLC_ADD_LIBS([libvlccore], [-lole32 -lruntimeobject])
     ],[
+     VLC_ADD_LIBS([win32text],[-lgdi32])
      VLC_ADD_LIBS([libvlccore],[-lwinmm])
     ])
   ])
@@ -3309,7 +3309,9 @@ if test "${enable_freetype}" != "no"; then
             ],[AC_MSG_WARN([library fontconfig not found. Styles will be disabled in freetype])])
           fi
       else
-          VLC_ADD_LIBS([freetype],[-lgdi32])
+          AS_IF([test "$vlc_winstore_app" != "1"],[
+            VLC_ADD_LIBS([freetype],[-lgdi32])
+          ])
       fi
 
       dnl fribidi support
