@@ -465,7 +465,8 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
 
 static void AndroidWindow_UnlockPicture(vout_display_sys_t *sys,
                                         android_window *p_window,
-                                        picture_t *p_pic)
+                                        picture_t *p_pic,
+                                        bool b_render)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
 
@@ -475,8 +476,7 @@ static void AndroidWindow_UnlockPicture(vout_display_sys_t *sys,
         if (p_handle == NULL)
             return;
 
-        sys->anwp.unlockData(p_window->p_handle_priv, p_handle,
-                             p_picsys->b_render);
+        sys->anwp.unlockData(p_window->p_handle_priv, p_handle, b_render);
     } else
         sys->anw.unlockAndPost(p_window->p_handle);
 }
@@ -506,7 +506,7 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
         p_picsys->priv.sw.buf.height < 0 ||
         (unsigned)p_picsys->priv.sw.buf.width < p_window->fmt.i_width ||
         (unsigned)p_picsys->priv.sw.buf.height < p_window->fmt.i_height) {
-        AndroidWindow_UnlockPicture(sys, p_window, p_pic);
+        AndroidWindow_UnlockPicture(sys, p_window, p_pic, false);
         return -1;
     }
 
@@ -689,30 +689,36 @@ static int DefaultLockPicture(picture_t *p_pic)
     return AndroidWindow_LockPicture(sys, sys->p_window, p_pic);
 }
 
-static void DefaultUnlockPicture(picture_t *p_pic)
+static void DefaultUnlockPicture(picture_t *p_pic, bool b_render)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
     vout_display_sys_t *sys = p_picsys->p_vd_sys;
 
-    AndroidWindow_UnlockPicture(sys, sys->p_window, p_pic);
+    AndroidWindow_UnlockPicture(sys, sys->p_window, p_pic, b_render);
 }
 
-static int LockPicture(picture_t *p_pic)
+static void UnlockPicture(picture_t *p_pic, bool b_render)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
 
-    p_picsys->b_render = false;
-    if (p_picsys->pf_lock_pic)
-        return p_picsys->pf_lock_pic(p_pic);
+    if (p_picsys->b_locked && p_picsys->pf_unlock_pic)
+        p_picsys->pf_unlock_pic(p_pic, b_render);
+    p_picsys->b_locked  = false;
+}
+
+static int PoolLockPicture(picture_t *p_pic)
+{
+    picture_sys_t *p_picsys = p_pic->p_sys;
+
+    if (p_picsys->pf_lock_pic && p_picsys->pf_lock_pic(p_pic) != 0)
+        return -1;
+    p_picsys->b_locked = true;
     return 0;
 }
 
-static void UnlockPicture(picture_t *p_pic)
+static void PoolUnlockPicture(picture_t *p_pic)
 {
-    picture_sys_t *p_picsys = p_pic->p_sys;
-
-    if (p_picsys->pf_unlock_pic)
-        p_picsys->pf_unlock_pic(p_pic);
+    UnlockPicture(p_pic, false);
 }
 
 static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
@@ -750,8 +756,8 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     memset(&pool_cfg, 0, sizeof(pool_cfg));
     pool_cfg.picture_count = requested_count;
     pool_cfg.picture       = pp_pics;
-    pool_cfg.lock          = LockPicture;
-    pool_cfg.unlock        = UnlockPicture;
+    pool_cfg.lock          = PoolLockPicture;
+    pool_cfg.unlock        = PoolUnlockPicture;
     pool = picture_pool_NewExtended(&pool_cfg);
 
 error:
@@ -804,7 +810,7 @@ static void SubpictureDisplay(vout_display_t *vd, subpicture_t *subpicture)
                                                &sys->p_sub_pic->format);
         picture_BlendSubpicture(sys->p_sub_pic, sys->p_spu_blend, subpicture);
     }
-    AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic);
+    AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic, true);
 }
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
@@ -820,10 +826,9 @@ static void Display(vout_display_t *vd, picture_t *picture,
                     subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    picture_sys_t *p_picsys = picture->p_sys;
 
     /* refcount lowers to 0, and pool_cfg.unlock is called */
-    p_picsys->b_render = true;
+    UnlockPicture(picture, true);
     picture_Release(picture);
 
     if (subpicture) {

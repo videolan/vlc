@@ -40,7 +40,7 @@ struct picture_sys_t
     vout_display_sys_t *p_vd_sys;
 
     int (*pf_lock_pic)(picture_t *);
-    void (*pf_unlock_pic)(picture_t *);
+    void (*pf_unlock_pic)(picture_t *, bool b_render);
 
     union {
         struct {
@@ -53,7 +53,7 @@ struct picture_sys_t
             ANativeWindow_Buffer buf;
         } sw;
     } priv;
-    bool b_render;
+    bool b_locked;
 };
 
 #endif

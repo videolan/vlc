@@ -96,7 +96,7 @@ static OMX_ERRORTYPE OmxFillBufferDone( OMX_HANDLETYPE, OMX_PTR,
 
 #if defined(USE_IOMX)
 static void *DequeueThread( void *data );
-static void UnlockPicture( picture_t* p_pic );
+static void UnlockPicture( picture_t* p_pic, bool b_render );
 static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port );
 static void HwBuffer_Destroy( decoder_t *p_dec, OmxPort *p_port );
 static int  HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port );
@@ -2589,7 +2589,7 @@ static void *DequeueThread( void *data )
 /*****************************************************************************
  * vout callbacks
  *****************************************************************************/
-static void UnlockPicture( picture_t* p_pic )
+static void UnlockPicture( picture_t* p_pic, bool b_render )
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
     decoder_t *p_dec = p_picsys->priv.hw.p_dec;
@@ -2610,7 +2610,7 @@ static void UnlockPicture( picture_t* p_pic )
     p_handle = p_port->pp_buffers[p_picsys->priv.hw.i_index]->pBuffer;
 
     OMX_DBG( "DisplayBuffer: %s %p",
-             p_picsys->b_render ? "render" : "cancel", p_handle );
+             b_render ? "render" : "cancel", p_handle );
 
     if( !p_handle )
     {
@@ -2618,7 +2618,7 @@ static void UnlockPicture( picture_t* p_pic )
         goto end;
     }
 
-    if( p_picsys->b_render )
+    if( b_render )
         p_port->p_hwbuf->anwpriv.queue( p_port->p_hwbuf->window_priv, p_handle );
     else
         p_port->p_hwbuf->anwpriv.cancel( p_port->p_hwbuf->window_priv, p_handle );

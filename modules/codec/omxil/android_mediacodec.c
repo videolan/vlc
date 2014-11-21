@@ -619,7 +619,7 @@ static void CloseDecoder(vlc_object_t *p_this)
 /*****************************************************************************
  * vout callbacks
  *****************************************************************************/
-static void UnlockPicture(picture_t* p_pic)
+static void UnlockPicture(picture_t* p_pic, bool b_render)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
     decoder_t *p_dec = p_picsys->priv.hw.p_dec;
@@ -637,7 +637,6 @@ static void UnlockPicture(picture_t* p_pic)
     }
 
     uint32_t i_index = p_picsys->priv.hw.i_index;
-    bool b_render = p_picsys->b_render;
     p_sys->inflight_picture[i_index] = NULL;
 
     /* Release the MediaCodec buffer. */
