@@ -35,6 +35,14 @@
 #define ANDROID_ICS_OR_LATER (ANDROID_API >= 14)
 #define ANDROID_JBMR2_OR_LATER (ANDROID_API >= 18)
 
+#if ANDROID_JBMR2_OR_LATER
+/* for waiting for fence_fd returned by dequeueBuffer */
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#define SYNC_IOC_MAGIC '>'
+#define SYNC_IOC_WAIT _IOW(SYNC_IOC_MAGIC, 0, __s32)
+#endif
+
 #if ANDROID_ICS_OR_LATER
 #include <system/window.h>
 #else
@@ -225,21 +233,42 @@ int ANativeWindowPriv_setCrop( native_window_priv *priv, int ofs_x, int ofs_y, i
     return native_window_set_crop( priv->anw, &crop );
 }
 
-int ANativeWindowPriv_dequeue( native_window_priv *priv, void **pp_handle )
+static int dequeue_fence( native_window_priv *priv, void **pp_handle,
+                          int *p_fence_fd )
 {
     ANativeWindowBuffer_t *anb;
     status_t err = NO_ERROR;
+    int i_fence_fd = -1;
 
 #if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->dequeueBuffer_DEPRECATED( priv->anw, &anb );
+    err = priv->anw->dequeueBuffer( priv->anw, &anb, &i_fence_fd );
+    CHECK_ERR();
+    if( !p_fence_fd && i_fence_fd != -1 )
+    {
+        __s32 timeout = 5000;
+        if( ioctl( i_fence_fd, SYNC_IOC_WAIT, &timeout ) != 0 )
+        {
+            priv->anw->queueBuffer( priv->anw, anb, i_fence_fd );
+            return -1;
+        }
+        close( i_fence_fd );
+        i_fence_fd = -1;
+    }
 #else
     err = priv->anw->dequeueBuffer( priv->anw, &anb );
-#endif
     CHECK_ERR();
+#endif
 
+    if( p_fence_fd )
+        *p_fence_fd = i_fence_fd;
     *pp_handle = anb;
 
     return 0;
+}
+
+int ANativeWindowPriv_dequeue( native_window_priv *priv, void **pp_handle )
+{
+    return dequeue_fence( priv, pp_handle, NULL );
 }
 
 int ANativeWindowPriv_lock( native_window_priv *priv, void *p_handle )
@@ -257,7 +286,8 @@ int ANativeWindowPriv_lock( native_window_priv *priv, void *p_handle )
     return 0;
 }
 
-int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
+static int queue_fence( native_window_priv *priv, void *p_handle,
+                        int i_fence_fd )
 {
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
@@ -265,7 +295,7 @@ int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
     CHECK_ANB();
 
 #if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->queueBuffer_DEPRECATED( priv->anw, anb );
+    err = priv->anw->queueBuffer( priv->anw, anb, i_fence_fd );
 #else
     err = priv->anw->queueBuffer( priv->anw, anb );
 #endif
@@ -274,7 +304,13 @@ int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
     return 0;
 }
 
-int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
+int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
+{
+    return queue_fence( priv, p_handle, -1 );
+}
+
+static int cancel_fence( native_window_priv *priv, void *p_handle,
+                         int i_fence_fd )
 {
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
@@ -282,13 +318,18 @@ int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
     CHECK_ANB();
 
 #if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->cancelBuffer_DEPRECATED( priv->anw, anb );
+    err = priv->anw->cancelBuffer( priv->anw, anb, i_fence_fd );
 #else
     err = priv->anw->cancelBuffer( priv->anw, anb );
 #endif
     CHECK_ERR();
 
     return 0;
+}
+
+int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
+{
+    return cancel_fence( priv, p_handle, -1 );
 }
 
 int ANativeWindowPriv_lockData( native_window_priv *priv, void **pp_handle,
@@ -298,7 +339,7 @@ int ANativeWindowPriv_lockData( native_window_priv *priv, void **pp_handle,
     status_t err = NO_ERROR;
     void *p_data;
 
-    err = ANativeWindowPriv_dequeue( priv, pp_handle );
+    err = dequeue_fence( priv, pp_handle, NULL );
     CHECK_ERR();
 
     anb = (ANativeWindowBuffer_t *)*pp_handle;
@@ -333,9 +374,9 @@ int ANativeWindowPriv_unlockData( native_window_priv *priv, void *p_handle,
     CHECK_ERR();
 
     if( b_render )
-        ANativeWindowPriv_queue( priv, p_handle );
+        queue_fence( priv, p_handle, -1 );
     else
-        ANativeWindowPriv_cancel( priv, p_handle );
+        cancel_fence( priv, p_handle, -1 );
 
     return 0;
 }
