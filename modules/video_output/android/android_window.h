@@ -50,7 +50,6 @@ struct picture_sys_t
         } hw;
         struct {
             void *p_handle;
-            int i_fence_fd;
             ANativeWindow_Buffer buf;
         } sw;
     } priv;
