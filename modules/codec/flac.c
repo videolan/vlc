@@ -37,6 +37,10 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 
+#ifdef _WIN32
+# define FLAC__NO_DLL
+#endif
+
 #include <FLAC/stream_decoder.h>
 #include <FLAC/stream_encoder.h>
 
