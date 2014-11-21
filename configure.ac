@@ -258,7 +258,6 @@ case "${host_os}" in
         # DEP, ASLR, NO SEH
         LDFLAGS="${LDFLAGS} -Wl,--nxcompat -Wl,--no-seh -Wl,--dynamicbase"
 
-        VLC_ADD_LIBS([libvlccore],[-lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([win32text],[-lgdi32])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
@@ -510,7 +509,9 @@ AC_ARG_ENABLE(winstore_app,
 vlc_winstore_app=0
 AS_IF([test "${SYS}" = "mingw32" -a "${enable_winstore_app}" = "yes"], [
     vlc_winstore_app=1
-    VLC_ADD_LIBS([libvlccore], [-lole32 -lruntimeobject])
+     VLC_ADD_LIBS([libvlccore], [-lole32 -lruntimeobject])
+    ],[
+     VLC_ADD_LIBS([libvlccore],[-lwinmm])
     ])
 AC_DEFINE_UNQUOTED(VLC_WINSTORE_APP, ${vlc_winstore_app}, [Define to 1 if you want to build for Windows Store apps])
 AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])
