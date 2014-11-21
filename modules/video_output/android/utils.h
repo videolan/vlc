@@ -80,10 +80,10 @@ typedef int (*ptr_ANativeWindowPriv_setBufferCount) (native_window_priv *, unsig
 typedef int (*ptr_ANativeWindowPriv_setCrop) (native_window_priv *, int, int, int, int);
 typedef int (*ptr_ANativeWindowPriv_dequeue) (native_window_priv *, void **);
 typedef int (*ptr_ANativeWindowPriv_lock) (native_window_priv *, void *);
-typedef int (*ptr_ANativeWindowPriv_lockData) (native_window_priv *, void *, ANativeWindow_Buffer *);
-typedef int (*ptr_ANativeWindowPriv_unlockData) (native_window_priv *, void *);
 typedef int (*ptr_ANativeWindowPriv_queue) (native_window_priv *, void *);
 typedef int (*ptr_ANativeWindowPriv_cancel) (native_window_priv *, void *);
+typedef int (*ptr_ANativeWindowPriv_lockData) (native_window_priv *, void *, ANativeWindow_Buffer *);
+typedef int (*ptr_ANativeWindowPriv_unlockData) (native_window_priv *, void *);
 typedef int (*ptr_ANativeWindowPriv_setOrientation) (native_window_priv *, int);
 
 typedef struct

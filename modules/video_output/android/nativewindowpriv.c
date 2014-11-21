@@ -259,6 +259,40 @@ int ANativeWindowPriv_lock( native_window_priv *priv, void *p_handle )
     return 0;
 }
 
+int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
+{
+    ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
+    status_t err = NO_ERROR;
+
+    CHECK_ANB();
+
+#if ANDROID_JBMR2_OR_LATER
+    err = priv->anw->queueBuffer_DEPRECATED( priv->anw, anb );
+#else
+    err = priv->anw->queueBuffer( priv->anw, anb );
+#endif
+    CHECK_ERR();
+
+    return 0;
+}
+
+int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
+{
+    ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
+    status_t err = NO_ERROR;
+
+    CHECK_ANB();
+
+#if ANDROID_JBMR2_OR_LATER
+    err = priv->anw->cancelBuffer_DEPRECATED( priv->anw, anb );
+#else
+    err = priv->anw->cancelBuffer( priv->anw, anb );
+#endif
+    CHECK_ERR();
+
+    return 0;
+}
+
 int ANativeWindowPriv_lockData( native_window_priv *priv, void *p_handle,
                                 ANativeWindow_Buffer *p_out_anb )
 {
@@ -290,40 +324,6 @@ int ANativeWindowPriv_unlockData( native_window_priv *priv, void *p_handle )
     CHECK_ANB();
 
     err = priv->gralloc->unlock(priv->gralloc, anb->handle);
-    CHECK_ERR();
-
-    return 0;
-}
-
-int ANativeWindowPriv_queue( native_window_priv *priv, void *p_handle )
-{
-    ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
-    status_t err = NO_ERROR;
-
-    CHECK_ANB();
-
-#if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->queueBuffer_DEPRECATED( priv->anw, anb );
-#else
-    err = priv->anw->queueBuffer( priv->anw, anb );
-#endif
-    CHECK_ERR();
-
-    return 0;
-}
-
-int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
-{
-    ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
-    status_t err = NO_ERROR;
-
-    CHECK_ANB();
-
-#if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->cancelBuffer_DEPRECATED( priv->anw, anb );
-#else
-    err = priv->anw->cancelBuffer( priv->anw, anb );
-#endif
     CHECK_ERR();
 
     return 0;
