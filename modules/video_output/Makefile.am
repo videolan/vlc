@@ -210,7 +210,9 @@ libwingdi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_wingdi
 libwingdi_plugin_la_LIBADD = -lgdi32 -lole32 -luuid
 if HAVE_WIN32
+if !HAVE_WINSTORE
 vout_LTLIBRARIES += libwingdi_plugin.la
+endif
 endif
 
 libegl_win32_plugin_la_SOURCES = video_output/egl.c
