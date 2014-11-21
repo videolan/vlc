@@ -155,13 +155,13 @@ int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_for
     CHECK_ERR();
 
 #if ANDROID_ICS_OR_LATER
-    err = native_window_set_scaling_mode( priv->anw, NATIVE_WINDOW_SCALING_MODE_SCALE_TO_WINDOW );
+    err = native_window_set_buffers_format( priv->anw, hal_format );
     CHECK_ERR();
 
     err = native_window_set_buffers_dimensions( priv->anw, w, h );
     CHECK_ERR();
 
-    err = native_window_set_buffers_format( priv->anw, hal_format );
+    err = native_window_set_scaling_mode( priv->anw, NATIVE_WINDOW_SCALING_MODE_SCALE_TO_WINDOW );
     CHECK_ERR();
 #else
     err = native_window_set_buffers_geometry( priv->anw, w, h, hal_format );
