@@ -158,7 +158,11 @@ int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_for
     err = native_window_set_buffers_format( priv->anw, hal_format );
     CHECK_ERR();
 
+#if ANDROID_JBMR2_OR_LATER
+    err = native_window_set_buffers_user_dimensions( priv->anw, w, h );
+#else
     err = native_window_set_buffers_dimensions( priv->anw, w, h );
+#endif
     CHECK_ERR();
 
     err = native_window_set_scaling_mode( priv->anw, NATIVE_WINDOW_SCALING_MODE_SCALE_TO_WINDOW );
