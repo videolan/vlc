@@ -258,7 +258,6 @@ case "${host_os}" in
         # DEP, ASLR, NO SEH
         LDFLAGS="${LDFLAGS} -Wl,--nxcompat -Wl,--no-seh -Wl,--dynamicbase"
 
-        VLC_ADD_LDFLAGS([vlc],[-mwindows])
         AC_CHECK_PROGS(U2D, [unix2dos todos], unix2dos)
         ac_default_prefix="`pwd`/_win32"
         DESTDIR="`pwd`/_win32/"
@@ -455,6 +454,7 @@ AM_ICONV
 dnl
 dnl checks for mingw
 AS_IF([test "${SYS}" = "mingw32"], [
+
 dnl Check for broken versions of mingw-runtime compatability library
     AC_MSG_CHECKING(for broken mingw-runtime)
     AC_PREPROC_IFELSE([AC_LANG_SOURCE([
@@ -472,10 +472,14 @@ dnl Check for broken versions of mingw-runtime compatability library
         AC_MSG_RESULT([present])
         AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.15 or higher, or mingw-w64 version 3.0 or higher!])
     ])
+
     dnl force use of mingw provided c99 *printf over msvcrt
     CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
 
-dnl Check for the need to include the mingwex lib for mingw32
+    dnl Add WinMainCRTStartup entry point to show it's a WinMain application
+    VLC_ADD_LDFLAGS([vlc],[-mwindows])
+
+    dnl Check for the need to include the mingwex lib for mingw32
     VLC_SAVE_FLAGS
     AC_CHECK_LIB(mingwex,opendir,
         AC_CHECK_LIB(mingw32,opendir,,
@@ -483,7 +487,7 @@ dnl Check for the need to include the mingwex lib for mingw32
     )
     VLC_RESTORE_FLAGS
 
-dnl Check for fnative-struct or mms-bitfields support for mingw32
+    dnl Check for fnative-struct or mms-bitfields support for mingw32
     VLC_SAVE_FLAGS
     CFLAGS="${CFLAGS} -mms-bitfields"
     CXXFLAGS="${CXXFLAGS} -mms-bitfields"
