@@ -90,6 +90,8 @@ struct decoder_sys_t
     size_t i_frame_size;
     uint16_t crc;
     unsigned int i_rate, i_channels, i_bits_per_sample;
+    size_t i_buf;
+    uint8_t *p_buf;
 };
 
 static const int pi_channels_maps[9] =
@@ -603,19 +605,21 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
     {
         /* Calculate the initial CRC for the minimal frame size,
          * We'll update it as we look for the next start code. */
-        uint8_t *buf = malloc(p_sys->i_frame_size);
-        if (!buf)
-            return NULL;
+        if (p_sys->i_buf < p_sys->i_frame_size)
+        {
+            p_sys->p_buf = realloc(p_sys->p_buf, p_sys->i_frame_size);
+            if (!p_sys->p_buf)
+                return NULL;
+            p_sys->i_buf = p_sys->i_frame_size;
+        }
 
-        if (block_PeekOffsetBytes(&p_sys->bytestream, 0, buf, p_sys->i_frame_size)) {
-            free(buf);
+        if (block_PeekOffsetBytes(&p_sys->bytestream, 0, p_sys->p_buf, p_sys->i_frame_size)) {
             return NULL;
         }
 
         uint16_t crc = 0;
         for (unsigned i = 0; i < p_sys->i_frame_size; i++)
-            crc = flac_crc16(crc, buf[i]);
-        free(buf);
+            crc = flac_crc16(crc, p_sys->p_buf[i]);
         p_sys->crc = crc;
 
         /* Check if next expected frame contains the sync word */
@@ -752,6 +756,8 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_state       = STATE_NOSYNC;
     p_sys->b_stream_info = false;
     p_sys->i_pts         = VLC_TS_INVALID;
+    p_sys->i_buf         = 0;
+    p_sys->p_buf         = NULL;
     block_BytestreamInit(&p_sys->bytestream);
 
     /* */
@@ -773,5 +779,6 @@ static void Close(vlc_object_t *p_this)
 
     es_format_Clean(&p_dec->fmt_out);
     block_BytestreamRelease(&p_sys->bytestream);
+    free(p_sys->p_buf);
     free(p_sys);
 }
