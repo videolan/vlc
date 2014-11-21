@@ -244,18 +244,16 @@ int ANativeWindowPriv_dequeue( native_window_priv *priv, void **pp_handle )
 
 int ANativeWindowPriv_lock( native_window_priv *priv, void *p_handle )
 {
+#if !ANDROID_JBMR2_OR_LATER
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
 
     CHECK_ANB();
 
-#if ANDROID_JBMR2_OR_LATER
-    err = priv->anw->lockBuffer_DEPRECATED( priv->anw, anb );
-#else
     err = priv->anw->lockBuffer( priv->anw, anb );
-#endif
     CHECK_ERR();
 
+#endif
     return 0;
 }
 
