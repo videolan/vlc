@@ -291,14 +291,21 @@ int ANativeWindowPriv_cancel( native_window_priv *priv, void *p_handle )
     return 0;
 }
 
-int ANativeWindowPriv_lockData( native_window_priv *priv, void *p_handle,
+int ANativeWindowPriv_lockData( native_window_priv *priv, void **pp_handle,
                                 ANativeWindow_Buffer *p_out_anb )
 {
-    ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
+    ANativeWindowBuffer_t *anb;
     status_t err = NO_ERROR;
     void *p_data;
 
+    err = ANativeWindowPriv_dequeue( priv, pp_handle );
+    CHECK_ERR();
+
+    anb = (ANativeWindowBuffer_t *)*pp_handle;
     CHECK_ANB();
+
+    err = ANativeWindowPriv_lock( priv, *pp_handle );
+    CHECK_ERR();
 
     err = priv->gralloc->lock( priv->gralloc, anb->handle, priv->usage,
                                0, 0, anb->width, anb->height, &p_data );
@@ -314,15 +321,21 @@ int ANativeWindowPriv_lockData( native_window_priv *priv, void *p_handle,
     return 0;
 }
 
-int ANativeWindowPriv_unlockData( native_window_priv *priv, void *p_handle )
+int ANativeWindowPriv_unlockData( native_window_priv *priv, void *p_handle,
+                                  bool b_render )
 {
     ANativeWindowBuffer_t *anb = (ANativeWindowBuffer_t *)p_handle;
     status_t err = NO_ERROR;
 
     CHECK_ANB();
 
-    err = priv->gralloc->unlock(priv->gralloc, anb->handle);
+    err = priv->gralloc->unlock( priv->gralloc, anb->handle );
     CHECK_ERR();
+
+    if( b_render )
+        ANativeWindowPriv_queue( priv, p_handle );
+    else
+        ANativeWindowPriv_cancel( priv, p_handle );
 
     return 0;
 }
