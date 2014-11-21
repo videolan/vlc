@@ -607,9 +607,10 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
          * We'll update it as we look for the next start code. */
         if (p_sys->i_buf < p_sys->i_frame_size)
         {
-            p_sys->p_buf = realloc(p_sys->p_buf, p_sys->i_frame_size);
-            if (!p_sys->p_buf)
+            uint8_t *p_buf = realloc(p_sys->p_buf, p_sys->i_frame_size);
+            if (!p_buf)
                 return NULL;
+            p_sys->p_buf = p_buf;
             p_sys->i_buf = p_sys->i_frame_size;
         }
 
