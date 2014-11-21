@@ -151,13 +151,15 @@ int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_for
     LOGD( "setup: %p, %d, %d, %X, %X\n",
           priv->anw, w, h, hal_format, hw_usage );
 
-    if (is_hw)
+    if( is_hw )
+    {
         priv->usage = hw_usage | GRALLOC_USAGE_HW_RENDER | GRALLOC_USAGE_HW_TEXTURE;
-    else
-        priv->usage= GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_OFTEN;
 #if ANDROID_HC_OR_LATER
-    priv->usage |= GRALLOC_USAGE_EXTERNAL_DISP;
+        priv->usage |= GRALLOC_USAGE_EXTERNAL_DISP;
 #endif
+    }
+    else
+        priv->usage = GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_OFTEN;
 
     err = native_window_set_usage( priv->anw, priv->usage );
     CHECK_ERR();
