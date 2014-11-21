@@ -1088,6 +1088,7 @@ static int FindMFT(decoder_t *p_dec)
 
 static int LoadMFTLibrary(MFHandle *mf)
 {
+#if _WINNT_VER < 0x601
     mf->mfplat_dll = LoadLibrary(TEXT("mfplat.dll"));
     if (!mf->mfplat_dll)
         return VLC_EGENERIC;
@@ -1098,6 +1099,12 @@ static int LoadMFTLibrary(MFHandle *mf)
     mf->fptr_MFCreateAlignedMemoryBuffer = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateAlignedMemoryBuffer");
     if (!mf->fptr_MFTEnumEx || !mf->fptr_MFCreateSample || !mf->fptr_MFCreateMemoryBuffer || !mf->fptr_MFCreateAlignedMemoryBuffer)
         return VLC_EGENERIC;
+#else
+    mf->fptr_MFTEnumEx = &MFTEnumEx;
+    mf->fptr_MFCreateSample = &MFCreateSample;
+    mf->fptr_MFCreateMemoryBuffer = &MFCreateMemoryBuffer;
+    mf->fptr_MFCreateAlignedMemoryBuffer = &MFCreateAlignedMemoryBuffer;
+#endif
 
     return VLC_SUCCESS;
 }
