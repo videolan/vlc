@@ -298,13 +298,6 @@ static int AndroidWindow_UpdateCrop(vout_display_sys_t *sys,
                              p_window->fmt.i_visible_height);
 }
 
-static unsigned int AndroidWindow_GetPicCount(vout_display_sys_t *sys,
-                                              android_window *p_window)
-{
-    VLC_UNUSED(sys);
-    return p_window->i_min_undequeued + p_window->i_pic_count;
-}
-
 static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
                                     android_window *p_window,
                                     jobject jsurf)
@@ -361,7 +354,8 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
         p_window->i_pic_count = i_max_buffer_count - p_window->i_min_undequeued;
 
     if (sys->anwp.setBufferCount(p_window->p_handle_priv,
-                                 AndroidWindow_GetPicCount(sys, p_window)) != 0)
+                                 p_window->i_pic_count +
+                                 p_window->i_min_undequeued) != 0)
         goto error;
 
     if (sys->anwp.setOrientation(p_window->p_handle_priv,
@@ -732,7 +726,7 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     if (SetupWindowSurface(sys, requested_count) != 0)
         goto error;
 
-    requested_count = AndroidWindow_GetPicCount(sys, sys->p_window);
+    requested_count = sys->p_window->i_pic_count;
     msg_Dbg(vd, "PoolAlloc: got %d frames", requested_count);
 
     UpdateWindowSize(&sys->p_window->fmt, sys->p_window->b_use_priv);
