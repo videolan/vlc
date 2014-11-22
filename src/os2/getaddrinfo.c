@@ -151,19 +151,6 @@ gai_error_from_herrno (void)
 }
 
 /*
- * This functions must be used to free the memory allocated by getaddrinfo().
- */
-void freeaddrinfo (struct addrinfo *res)
-{
-    if (res == NULL)
-        return;
-    free (res->ai_canonname);
-    free (res->ai_addr);
-    free (res->ai_next);
-    free (res);
-}
-
-/*
  * Internal function that builds an addrinfo struct.
  */
 static struct addrinfo *
