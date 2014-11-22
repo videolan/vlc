@@ -45,12 +45,6 @@ AlwaysBestAdaptationLogic::~AlwaysBestAdaptationLogic   ()
 
 Chunk*  AlwaysBestAdaptationLogic::getNextChunk()
 {
-    if(this->schedule.size() == 0)
-        return NULL;
-
-    if(this->count == this->schedule.size())
-        return NULL;
-
     if ( this->count < this->schedule.size() )
     {
         Chunk *chunk = new Chunk();
