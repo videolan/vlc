@@ -34,12 +34,13 @@
  */
 void freeaddrinfo (struct addrinfo *res)
 {
-    if (res == NULL)
-        return;
+    while (res != NULL)
+    {
+        struct addrinfo *next = res->ai_next;
 
-    freeaddrinfo (res->ai_next);
-
-    free (res->ai_canonname);
-    free (res->ai_addr);
-    free (res);
+        free (res->ai_canonname);
+        free (res->ai_addr);
+        free (res);
+        res = next;
+    }
 }
