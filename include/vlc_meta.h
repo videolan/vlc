@@ -55,9 +55,10 @@ typedef enum vlc_meta_type_t
     vlc_meta_Episode,
     vlc_meta_ShowName,
     vlc_meta_Actors,
+    vlc_meta_AlbumArtist
 } vlc_meta_type_t;
 
-#define VLC_META_TYPE_COUNT 23
+#define VLC_META_TYPE_COUNT 24
 
 #define ITEM_PREPARSED       1
 #define ITEM_ARTURL_FETCHED  2
@@ -137,6 +138,7 @@ VLC_API int input_item_WriteMeta(vlc_object_t *, input_item_t *);
 #define vlc_meta_SetEpisode( meta, b )     vlc_meta_Set( meta, vlc_meta_Episode, b )
 #define vlc_meta_SetShowName( meta, b )    vlc_meta_Set( meta, vlc_meta_ShowName, b )
 #define vlc_meta_SetActors( meta, b )      vlc_meta_Set( meta, vlc_meta_Actors, b )
+#define vlc_meta_SetAlbumArtist( meta, b ) vlc_meta_Set( meta, vlc_meta_AlbumArtist, b )
 
 #define VLC_META_TITLE              vlc_meta_TypeToLocalizedString( vlc_meta_Title )
 #define VLC_META_ARTIST             vlc_meta_TypeToLocalizedString( vlc_meta_Artist )
@@ -160,6 +162,7 @@ VLC_API int input_item_WriteMeta(vlc_object_t *, input_item_t *);
 #define VLC_META_EPISODE            vlc_meta_TypeToLocalizedString( vlc_meta_Episode )
 #define VLC_META_SHOW_NAME          vlc_meta_TypeToLocalizedString( vlc_meta_ShowName )
 #define VLC_META_ACTORS             vlc_meta_TypeToLocalizedString( vlc_meta_Actors )
+#define VLC_META_ALBUMARTIST        vlc_meta_TypeToLocalizedString( vlc_meta_AlbumArtist )
 
 #define VLC_META_EXTRA_MB_ALBUMID   "MB_ALBUMID"
 

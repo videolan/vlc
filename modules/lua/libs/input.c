@@ -338,6 +338,7 @@ static int vlclua_input_item_set_meta( lua_State *L )
         META_TYPE( Episode, "episode" )
         META_TYPE( ShowName, "show_name" )
         META_TYPE( Actors, "actors" )
+        META_TYPE( AlbumArtist, "album_artist" )
     };
 #undef META_TYPE
 

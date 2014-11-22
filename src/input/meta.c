@@ -50,7 +50,7 @@ struct vlc_meta_t
 /* FIXME bad name convention */
 const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
 {
-    static const char posix_names[][17] =
+    static const char posix_names[][18] =
     {
         [vlc_meta_Title]       = N_("Title"),
         [vlc_meta_Artist]      = N_("Artist"),
@@ -75,6 +75,7 @@ const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
         [vlc_meta_Episode]     = N_("Episode"),
         [vlc_meta_ShowName]    = N_("Show Name"),
         [vlc_meta_Actors]      = N_("Actors"),
+        [vlc_meta_AlbumArtist] = N_("Album Artist")
     };
 
     assert (meta_type < (sizeof(posix_names) / sizeof(posix_names[0])));
