@@ -49,7 +49,7 @@ namespace dash
 
                 void    closeAllConnections ();
                 bool    addChunk            (Chunk *chunk);
-                int     read                (block_t *block);
+                int     read                (block_t **, size_t);
                 void    attach              (dash::logic::IDownloadRateObserver *observer);
                 void    notify              ();
 

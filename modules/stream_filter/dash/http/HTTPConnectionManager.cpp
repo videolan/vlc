@@ -58,7 +58,7 @@ void                                HTTPConnectionManager::closeAllConnections  
     vlc_delete_all(this->connectionPool);
     vlc_delete_all(this->downloadQueue);
 }
-int                                 HTTPConnectionManager::read                     (block_t *block)
+int HTTPConnectionManager::read(block_t **pp_block, size_t len)
 {
     if(this->downloadQueue.size() == 0)
         if(!this->addChunk(this->adaptationLogic->getNextChunk()))
@@ -70,6 +70,10 @@ int                                 HTTPConnectionManager::read                 
 
     int ret = 0;
 
+    block_t *block = block_Alloc(len);
+    if(!block)
+        return -1;
+
     mtime_t start = mdate();
     ret = this->downloadQueue.front()->getConnection()->read(block->p_buffer, block->i_buffer);
     mtime_t end = mdate();
@@ -80,6 +84,7 @@ int                                 HTTPConnectionManager::read                 
 
     if(ret <= 0)
     {
+        block_Release(block);
         this->bpsLastChunk   = this->bpsCurrentChunk;
         this->bytesReadChunk = 0;
         this->timeChunk      = 0;
@@ -87,12 +92,15 @@ int                                 HTTPConnectionManager::read                 
         delete(this->downloadQueue.front());
         this->downloadQueue.pop_front();
 
-        return this->read(block);
+        return this->read(pp_block, len);
     }
     else
     {
         this->updateStatistics(ret, time);
+        block->i_buffer = ret;
     }
+
+    *pp_block = block;
 
     return ret;
 }

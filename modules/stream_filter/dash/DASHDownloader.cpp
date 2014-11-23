@@ -58,24 +58,17 @@ void*       DASHDownloader::download    (void *thread_sys)
     thread_sys_t            *t_sys              = (thread_sys_t *) thread_sys;
     HTTPConnectionManager   *conManager         = t_sys->conManager;
     BlockBuffer             *buffer             = t_sys->buffer;
-    block_t                 *block              = block_Alloc(BLOCKSIZE);
     int                     ret                 = 0;
 
     do
     {
-        ret = conManager->read(block);
+        block_t *block = NULL;
+        ret = conManager->read(&block, BLOCKSIZE);
         if(ret > 0)
-        {
-            block_t *bufBlock = block_Alloc(ret);
-            memcpy(bufBlock->p_buffer, block->p_buffer, ret);
-
-            bufBlock->i_length = block->i_length;
-            buffer->put(bufBlock);
-        }
+            buffer->put(block);
     }while(ret && !buffer->getEOF());
 
     buffer->setEOF(true);
-    block_Release(block);
 
     return NULL;
 }
