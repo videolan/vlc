@@ -37,32 +37,62 @@ namespace dash
     namespace mpd
     {
         class Representation;
-        class Segment : public ICanonicalUrl
+        class SubSegment;
+
+        class ISegment : public ICanonicalUrl
         {
             public:
-                Segment( const Representation *parent, bool isinit = false );
-                virtual ~Segment(){}
-                virtual void        setSourceUrl( const std::string &url );
+                ISegment(const ICanonicalUrl *parent);
+                virtual ~ISegment(){}
                 /**
                  *  @return true if the segment should be dropped after being read.
                  *          That is basically true when using an Url, and false
                  *          when using an UrlTemplate
                  */
                 virtual bool                            isSingleShot    () const;
-                virtual bool                            isInit          () const;
                 virtual void                            done            ();
-                virtual void                            setByteRange    (int start, int end);
-                virtual dash::http::Chunk*              toChunk         ();
-                const Representation*                   getParentRepresentation() const;
-                virtual std::string                     getUrlSegment   () const; /* impl */
+                virtual dash::http::Chunk*              toChunk         () const;
+                virtual void                            setByteRange    (size_t start, size_t end);
+                virtual std::vector<ISegment*>          subSegments     () = 0;
+                virtual std::string                     toString        () const;
+                virtual Representation*                 getRepresentation() const = 0;
 
             protected:
-                std::string             sourceUrl;
                 size_t                  startByte;
                 size_t                  endByte;
-                const Representation*   parentRepresentation;
-                int                     size;
-                bool                    init;
+        };
+
+        class Segment : public ISegment
+        {
+            public:
+                Segment( Representation *parent, bool isinit = false, bool tosplit = false );
+                ~Segment();
+                virtual void setSourceUrl( const std::string &url );
+                virtual bool needsSplit() const;
+                virtual std::string getUrlSegment() const; /* impl */
+                virtual dash::http::Chunk* toChunk() const;
+                virtual std::vector<ISegment*> subSegments();
+                virtual std::string toString() const;
+                virtual Representation* getRepresentation() const;
+
+            protected:
+                Representation* parentRepresentation;
+                bool init;
+                bool needssplit;
+                std::vector<SubSegment *> subsegments;
+                std::string sourceUrl;
+                int size;
+        };
+
+        class SubSegment : public ISegment
+        {
+            public:
+                SubSegment(Segment *, size_t start, size_t end);
+                virtual std::string getUrlSegment() const; /* impl */
+                virtual std::vector<ISegment*> subSegments();
+                virtual Representation* getRepresentation() const;
+            private:
+                Segment *parent;
         };
     }
 }

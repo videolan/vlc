@@ -58,7 +58,7 @@ Chunk*  AlwaysBestAdaptationLogic::getNextChunk()
 const Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation() const
 {
     if ( this->count < this->schedule.size() )
-        return this->schedule.at( this->count )->getParentRepresentation();
+        return this->schedule.at( this->count )->getRepresentation();
     return NULL;
 }
 
