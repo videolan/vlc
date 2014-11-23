@@ -27,6 +27,8 @@
 
 #include "Segment.h"
 #include "Representation.h"
+#include "MPD.h"
+#include "mp4/AtomsReader.hpp"
 
 #include <cassert>
 

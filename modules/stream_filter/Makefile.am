@@ -84,6 +84,8 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/mpd/SegmentTimeline.h \
     stream_filter/dash/mpd/TrickModeType.cpp \
     stream_filter/dash/mpd/TrickModeType.h \
+    stream_filter/dash/mp4/AtomsReader.cpp \
+    stream_filter/dash/mp4/AtomsReader.hpp \
     stream_filter/dash/xml/DOMHelper.cpp \
     stream_filter/dash/xml/DOMHelper.h \
     stream_filter/dash/xml/DOMParser.cpp \
@@ -98,8 +100,14 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/DASHManager.h \
     stream_filter/dash/Helper.cpp \
     stream_filter/dash/Helper.h
+
+libdash_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
+
 libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/stream_filter/dash
-libdash_plugin_la_LIBADD = $(SOCKET_LIBS)
+libdash_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
+if HAVE_ZLIB
+libdash_plugin_la_LIBADD += -lz
+endif
 stream_filter_LTLIBRARIES += libdash_plugin.la
 
 libsmooth_plugin_la_SOURCES = \
