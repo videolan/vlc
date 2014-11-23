@@ -75,8 +75,8 @@ void    AlwaysBestAdaptationLogic::initSchedule ()
             Representation *best = selector.select(*it);
             if(best)
             {
-                std::vector<Segment *> segments = best->getSegments();
-                std::vector<Segment *>::const_iterator segIt;
+                std::vector<ISegment *> segments = best->getSegments();
+                std::vector<ISegment *>::const_iterator segIt;
                 for(segIt=segments.begin(); segIt!=segments.end(); segIt++)
                 {
                     schedule.push_back(*segIt);

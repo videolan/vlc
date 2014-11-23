@@ -48,7 +48,7 @@ namespace dash
                 const mpd::Representation *getCurrentRepresentation() const;
 
             private:
-                std::vector<mpd::Segment *>         schedule;
+                std::vector<mpd::ISegment *>        schedule;
                 dash::mpd::MPDManager              *mpdManager;
                 size_t                              count;
                 dash::mpd::Representation           *bestRepresentation;

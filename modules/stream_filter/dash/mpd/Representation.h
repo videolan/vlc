@@ -76,7 +76,7 @@ namespace dash
                 const AdaptationSet*        getParentGroup() const;
                 void                setParentGroup( const AdaptationSet *group );
 
-                std::vector<Segment*> getSegments           ()const;
+                std::vector<ISegment*> getSegments          ()const;
                 void                setSegmentList          (SegmentList *list);
                 void                setSegmentBase          (SegmentBase *base);
                 void                setWidth                (int width);

@@ -131,28 +131,42 @@ void Representation::addDependency(const Representation *dep)
         this->dependencies.push_back( dep );
 }
 
-std::vector<Segment *> Representation::getSegments() const
+std::vector<ISegment *> Representation::getSegments() const
 {
-    std::vector<Segment *>  retSegments;
+    std::vector<ISegment *>  retSegments;
 
     if ( segmentInfo )
     {
+        /* init segments are always single segment */
         retSegments.push_back( segmentInfo->getInitialisationSegment() );
 
         if ( !segmentInfo->getSegments().empty() )
-            retSegments.insert( retSegments.end(),
-                                segmentInfo->getSegments().begin(),
-                                segmentInfo->getSegments().end() );
+        {
+            std::vector<Segment *>::const_iterator it;
+            for(it=segmentInfo->getSegments().begin();
+                it!=segmentInfo->getSegments().end(); it++)
+            {
+                std::vector<ISegment *> list = (*it)->subSegments();
+                retSegments.insert( retSegments.end(), list.begin(), list.end() );
+            }
+        }
     }
     else
     {
+        /* init segments are always single segment */
         if( segmentBase && segmentBase->getInitSegment() )
             retSegments.push_back( segmentBase->getInitSegment() );
 
-        if ( segmentList )
-            retSegments.insert( retSegments.end(),
-                                segmentList->getSegments().begin(),
-                                segmentList->getSegments().end() );
+        if ( segmentList && !segmentList->getSegments().empty() )
+        {
+            std::vector<Segment *>::const_iterator it;
+            for(it=segmentList->getSegments().begin();
+                it!=segmentList->getSegments().end(); it++)
+            {
+                std::vector<ISegment *> list = (*it)->subSegments();
+                retSegments.insert( retSegments.end(), list.begin(), list.end() );
+            }
+        }
     }
 
     return retSegments;
@@ -194,17 +208,11 @@ std::vector<std::string> Representation::toString() const
 {
     std::vector<std::string> ret;
     ret.push_back(std::string("  Representation"));
-    std::vector<Segment *> list = getSegments();
-    std::vector<Segment *>::const_iterator l;
+    std::vector<ISegment *> list = getSegments();
+    std::vector<ISegment *>::const_iterator l;
     for(l = list.begin(); l < list.end(); l++)
-    {
-        if ((*l)->isInit())
-            ret.push_back(std::string("    InitSeg url=")
-                          .append((*l)->getUrlSegment()));
-        else
-            ret.push_back(std::string("    Segment url=")
-                          .append((*l)->getUrlSegment()));
-    }
+        ret.push_back((*l)->toString());
+
     return ret;
 }
 

@@ -52,7 +52,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk()
     if (!rep)
         return NULL;
 
-    std::vector<Segment *> segments = rep->getSegments();
+    std::vector<ISegment *> segments = rep->getSegments();
 
     if ( this->count == segments.size() )
     {
@@ -63,7 +63,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk()
 
     if ( segments.size() > this->count )
     {
-        Segment *seg = segments.at( this->count );
+        ISegment *seg = segments.at( this->count );
         Chunk *chunk = seg->toChunk();
         //In case of UrlTemplate, we must stay on the same segment.
         if ( seg->isSingleShot() == true )
