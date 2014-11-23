@@ -46,6 +46,7 @@ namespace dash
         {
             public:
                 Chunk           ();
+                virtual ~Chunk  () {}
 
                 size_t              getEndByte              () const;
                 size_t              getStartByte            () const;
@@ -70,6 +71,8 @@ namespace dash
                 bool                usesByteRange   () const;
                 void                setBitrate      (uint64_t bitrate);
                 int                 getBitrate      ();
+
+                virtual void        onDownload      () {}
 
             private:
                 std::string                 url;
