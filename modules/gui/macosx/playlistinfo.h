@@ -113,6 +113,7 @@
 - (void)initMediaPanelStats;
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
 - (void)setMeta: (char *)meta forLabel: (id)theItem;
+- (void)updateMetadata;
 - (void)updateStatistics;
 
 + (VLCInfo *)sharedInstance;

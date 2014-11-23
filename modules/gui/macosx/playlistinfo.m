@@ -179,6 +179,14 @@ static VLCInfo *_o_sharedInstance = nil;
 
 }
 
+- (void)updateMetadata
+{
+    if (!p_item)
+        return;
+
+    [self updatePanelWithItem:p_item];
+}
+
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
