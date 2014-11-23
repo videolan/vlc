@@ -41,9 +41,9 @@ ISegment::ISegment(const ICanonicalUrl *parent):
 
 }
 
-dash::http::Chunk* ISegment::toChunk() const
+dash::http::Chunk* ISegment::toChunk()
 {
-    Chunk *chunk = new Chunk();
+    Chunk *chunk = new SegmentChunk(this);
     if (!chunk)
         return NULL;
 
@@ -76,6 +76,17 @@ void ISegment::setByteRange(size_t start, size_t end)
 std::string ISegment::toString() const
 {
     return std::string("    Segment url=").append(getUrlSegment());
+}
+
+ISegment::SegmentChunk::SegmentChunk(ISegment *segment_) :
+    Chunk()
+{
+    segment = segment_;
+}
+
+void ISegment::SegmentChunk::onDownload(void *, size_t)
+{
+
 }
 
 Segment::Segment(Representation *parent, bool isinit, bool tosplit) :
@@ -122,7 +133,7 @@ std::string Segment::getUrlSegment() const
     return ret;
 }
 
-dash::http::Chunk* Segment::toChunk() const
+dash::http::Chunk* Segment::toChunk()
 {
     Chunk *chunk = ISegment::toChunk();
     if (chunk)

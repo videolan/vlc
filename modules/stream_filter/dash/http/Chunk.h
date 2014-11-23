@@ -72,7 +72,7 @@ namespace dash
                 void                setBitrate      (uint64_t bitrate);
                 int                 getBitrate      ();
 
-                virtual void        onDownload      () {}
+                virtual void        onDownload      (void *, size_t) {}
 
             private:
                 std::string                 url;
@@ -84,7 +84,7 @@ namespace dash
                 int                         bitrate;
                 int                         port;
                 bool                        isHostname;
-                size_t                      length;
+                uint64_t                    length;
                 uint64_t                    bytesRead;
                 IHTTPConnection             *connection;
         };
