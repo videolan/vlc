@@ -54,6 +54,7 @@ class SpeedControlWidget;
 class QVBoxLayout;
 class QMenu;
 class QSize;
+class QTimer;
 class StandardPLPanel;
 struct vout_window_t;
 
@@ -150,6 +151,7 @@ private:
 
     /* continue */
     QWidget             *continueDialog;
+    QTimer              *continueTimer;
     int64_t             i_continueTime;
 
     /* Status Bar */

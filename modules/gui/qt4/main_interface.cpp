@@ -385,6 +385,12 @@ void MainInterface::createContinueDialog( QWidget *w )
     continueDialogLayout->addWidget( ok );
     continueDialogLayout->addWidget( cancel );
 
+    continueTimer = new QTimer( continueDialog );
+    continueTimer->setSingleShot( true );
+    continueTimer->setInterval( 6000 );
+
+    CONNECT( continueTimer, timeout(), this, hideContinueDialog() );
+
     CONNECT( cancel, clicked(), this, hideContinueDialog() );
     BUTTONACT(ok, continuePlayback() );
 
@@ -406,7 +412,7 @@ void MainInterface::showContinueDialog( int64_t _time ) {
     else
     {
         continueDialog->setVisible(true);
-        QTimer::singleShot(6000, this, SLOT(hideContinueDialog()));
+        continueTimer->start();
     }
 }
 
@@ -417,6 +423,7 @@ void MainInterface::hideContinueDialog()
         if( !isFullScreen() && !isMaximized() )
             resize( width(), height() - continueDialog->height() );
         continueDialog->hide();
+        continueTimer->stop();
     }
 }
 
