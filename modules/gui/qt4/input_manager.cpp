@@ -136,7 +136,7 @@ void InputManager::setInput( input_thread_t *_p_input )
                     !var_GetFloat( p_input, "start-time" ) &&
                     !var_GetFloat( p_input, "stop-time" ) )
             {
-                emit continuePlayback( (int64_t)i_time * 1000 );
+                emit resumePlayback( (int64_t)i_time * 1000 );
             }
         }
     }

@@ -113,7 +113,7 @@ private:
     void createMainWidget( QSettings* );
     void createStatusBar();
     void createPlaylist();
-    void createContinueDialog( QWidget *w );
+    void createResumePanel( QWidget *w );
 
     /* Systray */
     void createSystray();
@@ -149,10 +149,10 @@ private:
     PlaylistWidget      *playlistWidget;
     //VisualSelector      *visualSelector;
 
-    /* continue */
-    QWidget             *continueDialog;
-    QTimer              *continueTimer;
-    int64_t             i_continueTime;
+    /* resume panel */
+    QWidget             *resumePanel;
+    QTimer              *resumeTimer;
+    int64_t             i_resumeTime;
 
     /* Status Bar */
     QLabel              *nameLabel;
@@ -260,9 +260,9 @@ private slots:
     void setBoss();
     void setRaise();
 
-    void showContinueDialog( int64_t);
-    void hideContinueDialog();
-    void continuePlayback();
+    void showResumePanel( int64_t);
+    void hideResumePanel();
+    void resumePlayback();
 
 signals:
     void askGetVideo( WId *, struct vout_window_t *, unsigned *, unsigned * );
