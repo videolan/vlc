@@ -34,8 +34,7 @@ using namespace dash::http;
 
 HTTPConnection::HTTPConnection  (stream_t *stream) :
                 IHTTPConnection (stream),
-                peekBufferLen   (0),
-                contentLength   (0)
+                peekBufferLen   (0)
 {
     this->peekBuffer = new uint8_t[PEEKBUFFER];
 }
@@ -84,12 +83,15 @@ std::string     HTTPConnection::getRequestHeader  (const Chunk *chunk) const
 bool            HTTPConnection::init            (Chunk *chunk)
 {
     if (IHTTPConnection::init(chunk))
-        return parseHeader();
+    {
+        HeaderReply reply;
+        return parseHeader(&reply);
+    }
     else
         return false;
 }
 
-bool            HTTPConnection::parseHeader     ()
+bool            HTTPConnection::parseHeader     (HeaderReply *reply)
 {
     std::string line = this->readLine();
 
@@ -99,7 +101,7 @@ bool            HTTPConnection::parseHeader     ()
     while(line.compare("\r\n"))
     {
         if(!strncasecmp(line.c_str(), "Content-Length", 14))
-            this->contentLength = atoi(line.substr(15,line.size()).c_str());
+            reply->contentLength = atoi(line.substr(15,line.size()).c_str());
 
         line = this->readLine();
 

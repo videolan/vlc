@@ -49,12 +49,18 @@ namespace dash
                 virtual int     peek        (const uint8_t **pp_peek, size_t i_peek);
 
             protected:
+
+                class HeaderReply
+                {
+                    public:
+                        int contentLength;
+                };
+
                 uint8_t     *peekBuffer;
                 size_t      peekBufferLen;
-                int         contentLength;
 
                 virtual bool        send        (const std::string& data);
-                bool                parseHeader     ();
+                bool                parseHeader     (HeaderReply *);
                 std::string         readLine        ();
                 virtual std::string getRequestHeader(const Chunk *chunk) const; /* reimpl */
         };

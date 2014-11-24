@@ -130,18 +130,19 @@ bool                PersistentConnection::addChunk          (Chunk *chunk)
 }
 bool                PersistentConnection::initChunk         (Chunk *chunk)
 {
-    if(this->parseHeader())
+    HeaderReply reply;
+    if(parseHeader(&reply))
     {
-        chunk->setLength(this->contentLength);
+        chunk->setLength(reply.contentLength);
         return true;
     }
 
-    if(!this->reconnect(chunk))
+    if(!reconnect(chunk))
         return false;
 
-    if(this->parseHeader())
+    if(parseHeader(&reply))
     {
-        chunk->setLength(this->contentLength);
+        chunk->setLength(reply.contentLength);
         return true;
     }
 
