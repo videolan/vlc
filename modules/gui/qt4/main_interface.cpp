@@ -374,12 +374,18 @@ void MainInterface::createContinueDialog( QWidget *w )
     QHBoxLayout *continueDialogLayout = new QHBoxLayout( continueDialog );
     continueDialogLayout->setSpacing( 0 ); continueDialogLayout->setMargin( 0 );
 
+    QLabel *continuePixmapLabel = new QLabel();
+    continuePixmapLabel->setPixmap( QPixmap( ":/menu/help" ) );
+    continuePixmapLabel->setContentsMargins( 5, 0, 5, 0 );
+
     QLabel *continueLabel = new QLabel( qtr( "Do you want to restart the playback where left off?") );
+
     QToolButton *cancel = new QToolButton( continueDialog );
     cancel->setAutoRaise( true );
     cancel->setText( "X" );
     QPushButton *ok = new QPushButton( qtr("&Continue")  );
 
+    continueDialogLayout->addWidget( continuePixmapLabel );
     continueDialogLayout->addWidget(continueLabel);
     continueDialogLayout->addStretch( 1 );
     continueDialogLayout->addWidget( ok );
