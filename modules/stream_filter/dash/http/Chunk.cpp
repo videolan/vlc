@@ -36,6 +36,7 @@ Chunk::Chunk        () :
        isHostname   (false),
        length       (0),
        bytesRead    (0),
+       bytesToRead  (0),
        connection   (NULL)
 {
 }
@@ -55,10 +56,14 @@ const std::string&  Chunk::getUrl               () const
 void                Chunk::setEndByte           (size_t endByte)
 {
     this->endByte = endByte;
+    if (endByte > startByte)
+        bytesToRead = endByte - startByte;
 }
 void                Chunk::setStartByte         (size_t startByte)
 {
     this->startByte = startByte;
+    if (endByte > startByte)
+        bytesToRead = endByte - startByte;
 }
 void                Chunk::setUrl               (const std::string& url )
 {
@@ -129,10 +134,17 @@ void                Chunk::setBytesRead         (uint64_t bytes)
 {
     this->bytesRead = bytes;
 }
+
+void                Chunk::setBytesToRead         (uint64_t bytes)
+{
+    bytesToRead = bytes;
+}
+
 uint64_t            Chunk::getBytesToRead       () const
 {
-    return this->length - this->bytesRead;
+        return length - bytesRead;
 }
+
 size_t              Chunk::getPercentDownloaded () const
 {
     return (size_t)(((float)this->bytesRead / this->length) * 100);

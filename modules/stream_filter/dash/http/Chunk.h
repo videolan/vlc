@@ -63,6 +63,7 @@ namespace dash
 
                 void                setConnection   (IHTTPConnection *connection);
                 void                setBytesRead    (uint64_t bytes);
+                void                setBytesToRead  (uint64_t bytes);
                 void                setLength       (uint64_t length);
                 void                setEndByte      (size_t endByte);
                 void                setStartByte    (size_t startByte);
@@ -86,6 +87,7 @@ namespace dash
                 bool                        isHostname;
                 uint64_t                    length;
                 uint64_t                    bytesRead;
+                uint64_t                    bytesToRead;
                 IHTTPConnection             *connection;
         };
     }
