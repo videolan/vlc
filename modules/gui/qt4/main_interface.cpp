@@ -368,7 +368,6 @@ void MainInterface::reloadPrefs()
 
 void MainInterface::createResumePanel( QWidget *w )
 {
-    /* Create non-modal resumePanel */
     resumePanel = new QWidget( w );
     resumePanel->hide();
     QHBoxLayout *resumePanelLayout = new QHBoxLayout( resumePanel );
@@ -383,10 +382,11 @@ void MainInterface::createResumePanel( QWidget *w )
     QToolButton *cancel = new QToolButton( resumePanel );
     cancel->setAutoRaise( true );
     cancel->setText( "X" );
-    QPushButton *ok = new QPushButton( qtr("&Continue")  );
+
+    QPushButton *ok = new QPushButton( qtr( "&Continue" )  );
 
     resumePanelLayout->addWidget( continuePixmapLabel );
-    resumePanelLayout->addWidget(continueLabel);
+    resumePanelLayout->addWidget( continueLabel );
     resumePanelLayout->addStretch( 1 );
     resumePanelLayout->addWidget( ok );
     resumePanelLayout->addWidget( cancel );
@@ -396,11 +396,9 @@ void MainInterface::createResumePanel( QWidget *w )
     resumeTimer->setInterval( 6000 );
 
     CONNECT( resumeTimer, timeout(), this, hideResumePanel() );
-
     CONNECT( cancel, clicked(), this, hideResumePanel() );
-    BUTTONACT(ok, resumePlayback() );
-
     CONNECT( THEMIM->getIM(), resumePlayback(int64_t), this, showResumePanel(int64_t) );
+    BUTTONACT( ok, resumePlayback() );
 
     w->layout()->addWidget( resumePanel );
 }
