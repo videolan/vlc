@@ -748,6 +748,7 @@ void MainInterface::releaseVideoSlot( void )
     videoWidget->release();
     setVideoOnTop( false );
     setVideoFullScreen( false );
+    hideContinueDialog();
 
     if( stackCentralW->currentWidget() == videoWidget )
         restoreStackOldWidget();
