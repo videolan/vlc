@@ -32,8 +32,9 @@
 
 using namespace dash::mpd;
 
-Representation::Representation  ( MPD *mpd ) :
-                ICanonicalUrl   ( mpd ),
+Representation::Representation  ( MPD *mpd_ ) :
+                ICanonicalUrl   ( mpd_ ),
+                mpd             ( mpd_ ),
                 bandwidth       (0),
                 qualityRanking  ( -1 ),
                 segmentInfo     ( NULL ),
@@ -222,4 +223,9 @@ std::string Representation::getUrlSegment() const
     if (baseUrl)
         ret.append(baseUrl->getUrl());
     return ret;
+}
+
+MPD * Representation::getMPD() const
+{
+    return mpd;
 }

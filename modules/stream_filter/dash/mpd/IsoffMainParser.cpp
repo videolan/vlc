@@ -45,7 +45,7 @@ IsoffMainParser::~IsoffMainParser   ()
 
 bool    IsoffMainParser::parse              ()
 {
-    mpd = new MPD();
+    mpd = new MPD(p_stream);
     setMPDAttributes();
     setMPDBaseUrl(root);
     setPeriods(root);

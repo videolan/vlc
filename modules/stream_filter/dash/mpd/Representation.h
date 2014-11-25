@@ -84,11 +84,13 @@ namespace dash
                 void                setHeight               (int height);
                 int                 getHeight               () const;
                 void                setBaseUrl              (BaseUrl *baseUrl);
+                MPD*                getMPD                  () const;
 
                 std::vector<std::string> toString() const;
                 virtual std::string getUrlSegment           () const; /* impl */
 
             private:
+                MPD                                *mpd;
                 uint64_t                            bandwidth;
                 std::string                         id;
                 int                                 qualityRanking;

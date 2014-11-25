@@ -63,7 +63,7 @@ BasicCMParser::~BasicCMParser   ()
 bool    BasicCMParser::parse                ()
 {
     const std::map<std::string, std::string>    attr = this->root->getAttributes();
-    this->mpd = new MPD;
+    this->mpd = new MPD(p_stream);
 
     std::map<std::string, std::string>::const_iterator  it;
     it = attr.find("mediaPresentationDuration");

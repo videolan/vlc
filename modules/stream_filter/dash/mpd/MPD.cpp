@@ -26,11 +26,14 @@
 #endif
 
 #include "MPD.h"
+#include "Helper.h"
+#include "dash.hpp"
 
 using namespace dash::mpd;
 
-MPD::MPD () :
+MPD::MPD (stream_t *stream_) :
     ICanonicalUrl(),
+    stream(stream_),
     profile( dash::mpd::Profile::Unknown ),
     live( false ),
     availabilityStartTime( -1 ),
@@ -169,4 +172,9 @@ std::string MPD::getUrlSegment() const
         return baseUrls.front()->getUrl();
     else
         return std::string();
+}
+
+vlc_object_t * MPD::getVLCObject() const
+{
+    return VLC_OBJECT(stream);
 }

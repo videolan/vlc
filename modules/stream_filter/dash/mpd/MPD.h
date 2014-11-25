@@ -42,7 +42,7 @@ namespace dash
         class MPD : public ICanonicalUrl
         {
             public:
-                MPD();
+                MPD(stream_t *);
                 virtual ~MPD();
 
                 Profile                         getProfile() const;
@@ -69,8 +69,10 @@ namespace dash
                 void    setProgramInformation   (ProgramInformation *progInfo);
 
                 virtual std::string getUrlSegment() const; /* impl */
+                vlc_object_t *      getVLCObject()  const;
 
             private:
+                stream_t                           *stream;
                 Profile                             profile;
                 bool                                live;
                 time_t                              availabilityStartTime;
