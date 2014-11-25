@@ -115,6 +115,7 @@ struct vout_display_sys_t
     android_window *p_window;
     android_window *p_sub_window;
 
+    bool b_sub_invalid;
     filter_t *p_spu_blend;
     picture_t *p_sub_pic;
 
@@ -195,6 +196,7 @@ static void FixSubtitleFormat(vout_display_sys_t *sys)
     }
     p_fmt->i_x_offset = 0;
     p_fmt->i_y_offset = 0;
+    sys->b_sub_invalid = true;
 }
 
 #define ALIGN_16_PIXELS( x ) ( ( ( x ) + 15 ) / 16 * 16 )
@@ -826,6 +828,18 @@ static void Display(vout_display_t *vd, picture_t *picture,
     picture_Release(picture);
 
     if (subpicture) {
+        if (sys->b_sub_invalid) {
+            sys->b_sub_invalid = false;
+            if (sys->p_sub_pic) {
+                picture_Release(sys->p_sub_pic);
+                sys->p_sub_pic = NULL;
+            }
+            if (sys->p_spu_blend) {
+                filter_DeleteBlend(sys->p_spu_blend);
+                sys->p_spu_blend = NULL;
+            }
+        }
+
         if (!sys->p_sub_pic && SetupWindowSubtitleSurface(sys) == 0)
             sys->p_sub_pic = PictureAlloc(sys, &sys->p_sub_window->fmt);
 
@@ -902,15 +916,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
         }
         UpdateWindowSize(&sys->p_window->fmt, sys->p_window->b_use_priv);
         FixSubtitleFormat(sys);
-
-        if (sys->p_sub_pic) {
-            picture_Release(sys->p_sub_pic);
-            sys->p_sub_pic = NULL;
-        }
-        if (sys->p_spu_blend) {
-            filter_DeleteBlend(sys->p_spu_blend);
-            sys->p_spu_blend = NULL;
-        }
 
         return VLC_SUCCESS;
     }
