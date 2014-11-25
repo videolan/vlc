@@ -254,25 +254,24 @@ static android_window *AndroidWindow_New(vout_display_sys_t *sys,
         }
     }
 
-    if (p_window->b_use_priv) {
-        switch (p_fmt->orientation)
-        {
-            case ORIENT_ROTATED_90:
-                p_window->i_angle = 90;
-                break;
-            case ORIENT_ROTATED_180:
-                p_window->i_angle = 180;
-                break;
-            case ORIENT_ROTATED_270:
-                p_window->i_angle = 270;
-                break;
-            default:
-                p_window->i_angle = 0;
-        }
-        p_window->fmt = *p_fmt;
-    } else {
-        video_format_ApplyRotation(&p_window->fmt, p_fmt);
+    switch (p_fmt->orientation)
+    {
+        case ORIENT_ROTATED_90:
+            p_window->i_angle = 90;
+            break;
+        case ORIENT_ROTATED_180:
+            p_window->i_angle = 180;
+            break;
+        case ORIENT_ROTATED_270:
+            p_window->i_angle = 270;
+            break;
+        default:
+            p_window->i_angle = 0;
     }
+    if (p_window->b_use_priv)
+        p_window->fmt = *p_fmt;
+    else
+        video_format_ApplyRotation(&p_window->fmt, p_fmt);
     p_window->i_pic_count = 1;
     return p_window;
 }
@@ -375,7 +374,6 @@ error:
     p_window->b_use_priv = false;
     if (p_window->i_angle != 0)
         video_format_ApplyRotation(&p_window->fmt, &p_window->fmt);
-    p_window->i_angle = 0;
     return -1;
 }
 
