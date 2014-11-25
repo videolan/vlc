@@ -45,9 +45,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#ifdef HAVE_TIME_H
-#   include <time.h>                                               /* time() */
-#endif
+#include <time.h>
 
 #include <vlc_meta.h>
 #include <vlc_charset.h>

@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <errno.h>
+#include <time.h>
 
 /*** Static mutex and condition variable ***/
 static vlc_mutex_t super_mutex;
