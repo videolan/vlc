@@ -76,6 +76,7 @@ extern void  jni_UnlockAndroidSurface();
 
 extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 extern int jni_ConfigureSurface(jobject jsurf, int width, int height, int hal, bool *configured);
+extern int jni_GetWindowSize(int *width, int *height);
 
 static const vlc_fourcc_t subpicture_chromas[] =
 {
@@ -84,6 +85,7 @@ static const vlc_fourcc_t subpicture_chromas[] =
 };
 
 static picture_pool_t   *Pool  (vout_display_t *, unsigned);
+static void             Prepare(vout_display_t *, picture_t *, subpicture_t *);
 static void             Display(vout_display_t *, picture_t *, subpicture_t *);
 static int              Control(vout_display_t *, int, va_list);
 
@@ -106,6 +108,9 @@ struct android_window
 struct vout_display_sys_t
 {
     picture_pool_t *pool;
+
+    int i_display_width;
+    int i_display_height;
 
     void *p_library;
     native_window_api_t anw;
@@ -177,25 +182,55 @@ static picture_t *PictureAlloc(vout_display_sys_t *sys, video_format_t *fmt)
 
 static void FixSubtitleFormat(vout_display_sys_t *sys)
 {
-    video_format_t *p_fmt = &sys->p_sub_window->fmt;
+    video_format_t *p_subfmt = &sys->p_sub_window->fmt;
+    video_format_t fmt;
+    int i_width, i_height;
+    int i_display_width, i_display_height;
+    double aspect;
 
-    if (p_fmt->i_visible_width == 0 || p_fmt->i_visible_height == 0) {
-        p_fmt->i_visible_width = p_fmt->i_width;
-        p_fmt->i_visible_height = p_fmt->i_height;
-    }
-    if (p_fmt->i_sar_num > 0 && p_fmt->i_sar_den > 0) {
-        if (p_fmt->i_sar_num >= p_fmt->i_sar_den)
-            p_fmt->i_width = (int64_t)p_fmt->i_visible_width * p_fmt->i_sar_num / p_fmt->i_sar_den;
-        else
-            p_fmt->i_height = (int64_t)p_fmt->i_visible_height * p_fmt->i_sar_den / p_fmt->i_sar_num;
-        p_fmt->i_sar_num = 1;
-        p_fmt->i_sar_den = 1;
+    video_format_ApplyRotation(&fmt, &sys->p_window->fmt);
+
+    if (fmt.i_visible_width == 0 || fmt.i_visible_height == 0) {
+        i_width = fmt.i_width;
+        i_height = fmt.i_height;
     } else {
-        p_fmt->i_width = p_fmt->i_visible_width;
-        p_fmt->i_height = p_fmt->i_visible_height;
+        i_width = fmt.i_visible_width;
+        i_height = fmt.i_visible_height;
     }
-    p_fmt->i_x_offset = 0;
-    p_fmt->i_y_offset = 0;
+
+    if (fmt.i_sar_num > 0 && fmt.i_sar_den > 0) {
+        if (fmt.i_sar_num >= fmt.i_sar_den)
+            i_width = i_width * fmt.i_sar_num / fmt.i_sar_den;
+        else
+            i_height = i_height * fmt.i_sar_den / fmt.i_sar_num;
+    }
+
+    if (sys->p_window->i_angle == 90 || sys->p_window->i_angle == 180) {
+        i_display_width = sys->i_display_height;
+        i_display_height = sys->i_display_width;
+        aspect = i_height / (double) i_width;
+    } else {
+        i_display_width = sys->i_display_width;
+        i_display_height = sys->i_display_height;
+        aspect = i_width / (double) i_height;
+    }
+
+    if (i_display_width / aspect < i_display_height) {
+        i_width = i_display_width;
+        i_height = i_display_width / aspect;
+    } else {
+        i_width = i_display_height * aspect;
+        i_height = i_display_height;
+    }
+
+    p_subfmt->i_width =
+    p_subfmt->i_visible_width = i_width;
+    p_subfmt->i_height =
+    p_subfmt->i_visible_height = i_height;
+    p_subfmt->i_x_offset = 0;
+    p_subfmt->i_y_offset = 0;
+    p_subfmt->i_sar_num = 1;
+    p_subfmt->i_sar_den = 1;
     sys->b_sub_invalid = true;
 }
 
@@ -552,6 +587,19 @@ static void SetRGBMask(video_format_t *p_fmt)
     }
 }
 
+static void SendEventDisplaySize(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    int i_display_width, i_display_height;
+
+    if (jni_GetWindowSize(&i_display_width, &i_display_height) == 0
+        && i_display_width != 0 && i_display_height != 0
+        && (i_display_width != sys->i_display_width
+         || i_display_height != sys->i_display_height))
+        vout_display_SendEventDisplaySize(vd, i_display_width,
+                                              i_display_height);
+}
+
 static int Open(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t*)p_this;
@@ -578,6 +626,9 @@ static int Open(vlc_object_t *p_this)
     else
         msg_Warn(vd, "Could not initialize NativeWindow Priv API.");
 #endif
+
+    sys->i_display_width = vd->cfg->display.width;
+    sys->i_display_height = vd->cfg->display.height;
 
     if (vd->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE) {
         /* Setup chroma */
@@ -634,13 +685,14 @@ static int Open(vlc_object_t *p_this)
 
     /* Setup vout_display */
     vd->pool    = Pool;
-    vd->prepare = NULL;
+    vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
     vd->manage  = Manage;
 
     /* Fix initial state */
-    vout_display_SendEventFullscreen(vd, false);
+    vout_display_SendEventFullscreen(vd, true);
+    SendEventDisplaySize(vd);
 
     return VLC_SUCCESS;
 
@@ -811,6 +863,14 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
     return sys->pool;
 }
 
+static void Prepare(vout_display_t *vd, picture_t *picture,
+                    subpicture_t *subpicture)
+{
+    VLC_UNUSED(picture);
+    VLC_UNUSED(subpicture);
+    SendEventDisplaySize(vd);
+}
+
 static void Display(vout_display_t *vd, picture_t *picture,
                     subpicture_t *subpicture)
 {
@@ -874,6 +934,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     switch (query) {
     case VOUT_DISPLAY_HIDE_MOUSE:
+    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         return VLC_SUCCESS;
     case VOUT_DISPLAY_RESET_PICTURES:
     {
@@ -891,26 +952,32 @@ static int Control(vout_display_t *vd, int query, va_list args)
     }
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
-        const video_format_t *source;
-        video_format_t sub_fmt;
+        if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT
+         || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
+            const video_format_t *source;
 
-        msg_Dbg(vd, "change source crop/aspect");
+            msg_Dbg(vd, "change source crop/aspect");
+            source = va_arg(args, const video_format_t *);
 
-        source = va_arg(args, const video_format_t *);
-        video_format_ApplyRotation(&sub_fmt, source);
+            if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
+                video_format_CopyCrop(&sys->p_window->fmt, source);
+                AndroidWindow_UpdateCrop(sys, sys->p_window);
+            } else
+                CopySourceAspect(&sys->p_window->fmt, source);
 
-        if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-            video_format_CopyCrop(&sys->p_window->fmt, source);
-            AndroidWindow_UpdateCrop(sys, sys->p_window);
-
-            video_format_CopyCrop(&sys->p_sub_window->fmt, &sub_fmt);
+            UpdateWindowSize(&sys->p_window->fmt, sys->p_window->b_use_priv);
         } else {
-            CopySourceAspect(&sys->p_window->fmt, source);
+            const vout_display_cfg_t *cfg;
 
-            CopySourceAspect(&sys->p_sub_window->fmt, &sub_fmt);
+            cfg = va_arg(args, const vout_display_cfg_t *);
+
+            sys->i_display_width = cfg->display.width;
+            sys->i_display_height = cfg->display.height;
+            msg_Dbg(vd, "change display size: %dx%d", sys->i_display_width,
+                                                      sys->i_display_height);
         }
-        UpdateWindowSize(&sys->p_window->fmt, sys->p_window->b_use_priv);
         FixSubtitleFormat(sys);
 
         return VLC_SUCCESS;
@@ -918,7 +985,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     default:
         msg_Warn(vd, "Unknown request in android_window");
     case VOUT_DISPLAY_CHANGE_ZOOM:
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         return VLC_EGENERIC;
     }
