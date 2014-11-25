@@ -105,6 +105,13 @@ struct android_window
     native_window_priv *p_handle_priv;
 };
 
+typedef struct buffer_bounds buffer_bounds;
+struct buffer_bounds
+{
+    uint8_t *p_pixels;
+    ARect bounds;
+};
+
 struct vout_display_sys_t
 {
     picture_pool_t *pool;
@@ -123,6 +130,7 @@ struct vout_display_sys_t
     bool b_sub_invalid;
     filter_t *p_spu_blend;
     picture_t *p_sub_pic;
+    buffer_bounds *p_sub_buffer_bounds;
 
     bool b_has_subpictures;
 
@@ -718,6 +726,7 @@ static void Close(vlc_object_t *p_this)
         picture_Release(sys->p_sub_pic);
     if (sys->p_spu_blend)
         filter_DeleteBlend(sys->p_spu_blend);
+    free(sys->p_sub_buffer_bounds);
     if (sys->p_sub_window)
         AndroidWindow_Destroy(sys, sys->p_sub_window);
 
@@ -815,11 +824,91 @@ error:
     return pool;
 }
 
+static void SubtitleRegionToBounds(subpicture_t *subpicture,
+                                   ARect *p_out_bounds)
+{
+    if (subpicture) {
+        for (subpicture_region_t *r = subpicture->p_region; r != NULL; r = r->p_next) {
+            ARect new_bounds;
+
+            new_bounds.left = r->i_x;
+            new_bounds.top = r->i_y;
+            new_bounds.right = r->fmt.i_width + r->i_x;
+            new_bounds.bottom = r->fmt.i_height + r->i_y;
+            if (r == &subpicture->p_region[0])
+                *p_out_bounds = new_bounds;
+            else {
+                if (p_out_bounds->left > new_bounds.left)
+                    p_out_bounds->left = new_bounds.left;
+                if (p_out_bounds->right < new_bounds.right)
+                    p_out_bounds->right = new_bounds.right;
+                if (p_out_bounds->top > new_bounds.top)
+                    p_out_bounds->top = new_bounds.top;
+                if (p_out_bounds->bottom < new_bounds.bottom)
+                    p_out_bounds->bottom = new_bounds.bottom;
+            }
+        }
+    } else {
+        p_out_bounds->left = p_out_bounds->top = 0;
+        p_out_bounds->right = p_out_bounds->bottom = 0;
+    }
+}
+
+static void SubtitleGetDirtyBounds(vout_display_t *vd,
+                                   subpicture_t *subpicture,
+                                   ARect *p_out_bounds)
+{
+    vout_display_sys_t *sys = vd->sys;
+    int i = 0;
+    bool b_found = false;
+
+    /* Try to find last bounds set by current locked buffer.
+     * Indeed, even if we can lock only one buffer at a time, differents
+     * buffers can be locked. This functions will find the last bounds set by
+     * the current buffer. */
+    if (sys->p_sub_buffer_bounds) {
+        for (; sys->p_sub_buffer_bounds[i].p_pixels != NULL; ++i) {
+            buffer_bounds *p_bb = &sys->p_sub_buffer_bounds[i];
+            if (p_bb->p_pixels == sys->p_sub_pic->p[0].p_pixels) {
+                *p_out_bounds = p_bb->bounds;
+                b_found = true;
+                break;
+            }
+        }
+    }
+
+    /* default is full picture */
+    if (!b_found) {
+        p_out_bounds->left = 0;
+        p_out_bounds->top = 0;
+        p_out_bounds->right = sys->p_sub_pic->format.i_width;
+        p_out_bounds->bottom = sys->p_sub_pic->format.i_height;
+    }
+
+    /* buffer not found, add it to the array */
+    if (!sys->p_sub_buffer_bounds
+     || sys->p_sub_buffer_bounds[i].p_pixels == NULL) {
+        buffer_bounds *p_bb = realloc(sys->p_sub_buffer_bounds,
+                                      (i + 2) * sizeof(buffer_bounds)); 
+        if (p_bb) {
+            sys->p_sub_buffer_bounds = p_bb;
+            sys->p_sub_buffer_bounds[i].p_pixels = sys->p_sub_pic->p[0].p_pixels;
+            sys->p_sub_buffer_bounds[i+1].p_pixels = NULL;
+        }
+    }
+
+    /* set buffer bounds */
+    if (sys->p_sub_buffer_bounds
+     && sys->p_sub_buffer_bounds[i].p_pixels != NULL)
+        SubtitleRegionToBounds(subpicture, &sys->p_sub_buffer_bounds[i].bounds);
+}
+
 static void SubpictureDisplay(vout_display_t *vd, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-
     struct md5_s hash;
+    ARect memset_bounds;
+
     InitMD5(&hash);
     if (subpicture) {
         for (subpicture_region_t *r = subpicture->p_region; r != NULL; r = r->p_next) {
@@ -844,9 +933,16 @@ static void SubpictureDisplay(vout_display_t *vd, subpicture_t *subpicture)
     if (AndroidWindow_LockPicture(sys, sys->p_sub_window, sys->p_sub_pic) != 0)
         return;
 
+
     /* Clear the subtitles surface. */
-    memset(sys->p_sub_pic->p[0].p_pixels, 0,
-           sys->p_sub_pic->p[0].i_pitch * sys->p_sub_pic->p[0].i_lines);
+    SubtitleGetDirtyBounds(vd, subpicture, &memset_bounds);
+    const int x_pixels_offset = memset_bounds.left
+                                * sys->p_sub_pic->p[0].i_pixel_pitch;
+    const int i_line_size = (memset_bounds.right - memset_bounds.left)
+                            * sys->p_sub_pic->p->i_pixel_pitch;
+    for (int y = memset_bounds.top; y < memset_bounds.bottom; y++)
+        memset(&sys->p_sub_pic->p[0].p_pixels[y * sys->p_sub_pic->p[0].i_pitch
+                                              + x_pixels_offset], 0, i_line_size);
 
     if (subpicture)
         picture_BlendSubpicture(sys->p_sub_pic, sys->p_spu_blend, subpicture);
@@ -891,6 +987,8 @@ static void Display(vout_display_t *vd, picture_t *picture,
                 filter_DeleteBlend(sys->p_spu_blend);
                 sys->p_spu_blend = NULL;
             }
+            free(sys->p_sub_buffer_bounds);
+            sys->p_sub_buffer_bounds = NULL;
         }
 
         if (!sys->p_sub_pic && SetupWindowSubtitleSurface(sys) == 0)
