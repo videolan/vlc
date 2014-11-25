@@ -147,6 +147,7 @@ void SoutDialog::addDest( )
             break;
         default:
             assert(0);
+            return;
     }
 
     int index = ui.destTab->addTab( db, caption );
