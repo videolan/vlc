@@ -131,6 +131,7 @@ struct vout_display_sys_t
     filter_t *p_spu_blend;
     picture_t *p_sub_pic;
     buffer_bounds *p_sub_buffer_bounds;
+    bool b_sub_pic_locked;
 
     bool b_has_subpictures;
 
@@ -903,7 +904,7 @@ static void SubtitleGetDirtyBounds(vout_display_t *vd,
         SubtitleRegionToBounds(subpicture, &sys->p_sub_buffer_bounds[i].bounds);
 }
 
-static void SubpictureDisplay(vout_display_t *vd, subpicture_t *subpicture)
+static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
     struct md5_s hash;
@@ -933,6 +934,7 @@ static void SubpictureDisplay(vout_display_t *vd, subpicture_t *subpicture)
     if (AndroidWindow_LockPicture(sys, sys->p_sub_window, sys->p_sub_pic) != 0)
         return;
 
+    sys->b_sub_pic_locked = true;
 
     /* Clear the subtitles surface. */
     SubtitleGetDirtyBounds(vd, subpicture, &memset_bounds);
@@ -946,8 +948,6 @@ static void SubpictureDisplay(vout_display_t *vd, subpicture_t *subpicture)
 
     if (subpicture)
         picture_BlendSubpicture(sys->p_sub_pic, sys->p_spu_blend, subpicture);
-
-    AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic, true);
 }
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
@@ -962,19 +962,10 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
 static void Prepare(vout_display_t *vd, picture_t *picture,
                     subpicture_t *subpicture)
 {
-    VLC_UNUSED(picture);
-    VLC_UNUSED(subpicture);
-    SendEventDisplaySize(vd);
-}
-
-static void Display(vout_display_t *vd, picture_t *picture,
-                    subpicture_t *subpicture)
-{
     vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(picture);
 
-    /* refcount lowers to 0, and pool_cfg.unlock is called */
-    UnlockPicture(picture, true);
-    picture_Release(picture);
+    SendEventDisplaySize(vd);
 
     if (subpicture) {
         if (sys->b_sub_invalid) {
@@ -1005,7 +996,7 @@ static void Display(vout_display_t *vd, picture_t *picture,
        surface are expensive operations. */
     if (sys->b_has_subpictures)
     {
-        SubpictureDisplay(vd, subpicture);
+        SubpicturePrepare(vd, subpicture);
         if (!subpicture)
         {
             /* The surface has been cleared and there is no new
@@ -1014,7 +1005,21 @@ static void Display(vout_display_t *vd, picture_t *picture,
             sys->b_has_subpictures = false;
         }
     }
+}
 
+static void Display(vout_display_t *vd, picture_t *picture,
+                    subpicture_t *subpicture)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    /* refcount lowers to 0, and pool_cfg.unlock is called */
+    UnlockPicture(picture, true);
+    picture_Release(picture);
+
+    if (sys->b_sub_pic_locked) {
+        sys->b_sub_pic_locked = false;
+        AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic, true);
+    }
     if (subpicture)
         subpicture_Delete(subpicture);
 }
