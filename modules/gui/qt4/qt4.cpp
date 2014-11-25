@@ -52,8 +52,10 @@
 #ifdef _WIN32 /* For static builds */
  #include <QtPlugin>
  #if HAS_QT5
-  Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
-  Q_IMPORT_PLUGIN(AccessibleFactory)
+  #ifdef QT_STATICPLUGIN
+   Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+   Q_IMPORT_PLUGIN(AccessibleFactory)
+  #endif
  #else
   Q_IMPORT_PLUGIN(qjpeg)
   Q_IMPORT_PLUGIN(qtaccessiblewidgets)

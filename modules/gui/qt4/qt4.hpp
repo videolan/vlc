@@ -33,6 +33,12 @@
 #include <vlc_interface.h> /* intf_thread_t */
 #include <vlc_playlist.h>  /* playlist_t */
 
+#include <qconfig.h>
+
+#ifdef QT_STATIC
+#define QT_STATICPLUGIN
+#endif
+
 #define QT_NO_CAST_TO_ASCII
 #include <QString>
 
