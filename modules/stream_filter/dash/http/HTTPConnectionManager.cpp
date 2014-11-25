@@ -28,11 +28,13 @@
 #include "HTTPConnectionManager.h"
 #include "mpd/Segment.h"
 
+#include <vlc_block.h>
+
+#include <vlc_stream.h>
+
 using namespace dash::http;
 using namespace dash::logic;
 
-const size_t    HTTPConnectionManager::PIPELINE               = 80;
-const size_t    HTTPConnectionManager::PIPELINELENGTH         = 2;
 const uint64_t  HTTPConnectionManager::CHUNKDEFAULTBITRATE    = 1;
 
 HTTPConnectionManager::HTTPConnectionManager    (IAdaptationLogic *adaptationLogic, stream_t *stream) :
@@ -58,52 +60,73 @@ void                                HTTPConnectionManager::closeAllConnections  
     vlc_delete_all(this->connectionPool);
     vlc_delete_all(this->downloadQueue);
 }
-int HTTPConnectionManager::read(block_t **pp_block, size_t len)
+
+ssize_t HTTPConnectionManager::read(block_t **pp_block)
 {
-    if(this->downloadQueue.size() == 0)
-        if(!this->addChunk(this->adaptationLogic->getNextChunk()))
-            return 0;
+    Chunk *chunk;
 
-    if(this->downloadQueue.front()->getPercentDownloaded() > HTTPConnectionManager::PIPELINE &&
-       this->downloadQueue.size() < HTTPConnectionManager::PIPELINELENGTH)
-        this->addChunk(this->adaptationLogic->getNextChunk());
+    if(downloadQueue.empty())
+    {
+        chunk = adaptationLogic->getNextChunk();
+        if(!connectChunk(chunk))
+            return -1;
+        else
+            downloadQueue.push_back(chunk);
+    }
 
-    int ret = 0;
+    chunk = downloadQueue.front();
 
-    block_t *block = block_Alloc(len);
+    if(chunk->getBytesRead() == 0)
+    {
+        if (!chunk->getConnection()->query(chunk->getPath()))
+            return -1;
+    }
+
+    /* chunk length should be set at connect/query reply time */
+    size_t readsize = chunk->getBytesToRead();
+    if (readsize > 128000)
+        readsize = 32768;
+
+    block_t *block = block_Alloc(readsize);
     if(!block)
         return -1;
 
-    mtime_t start = mdate();
-    ret = this->downloadQueue.front()->getConnection()->read(block->p_buffer, block->i_buffer);
-    mtime_t end = mdate();
+    mtime_t time = mdate();
+    ssize_t ret = chunk->getConnection()->read(block->p_buffer, readsize);
+    time = mdate() - time;
 
-    block->i_length = (mtime_t)((ret * 8) / ((float)this->downloadQueue.front()->getBitrate() / 1000000));
-
-    double time = ((double)(end - start)) / 1000000;
+    block->i_length = (mtime_t)((ret * 8) / ((float)chunk->getBitrate() / CLOCK_FREQ));
 
     if(ret <= 0)
     {
         block_Release(block);
+        *pp_block = NULL;
         this->bpsLastChunk   = this->bpsCurrentChunk;
         this->bytesReadChunk = 0;
         this->timeChunk      = 0;
 
-        delete(this->downloadQueue.front());
-        this->downloadQueue.pop_front();
+        delete(chunk);
+        downloadQueue.pop_front();
 
-        return this->read(pp_block, len);
+        return read(pp_block);
     }
     else
     {
-        this->updateStatistics(ret, time);
+        updateStatistics((size_t)ret, ((double)time) / CLOCK_FREQ);
         block->i_buffer = ret;
+        if (chunk->getBytesToRead() == 0)
+        {
+            chunk->onDownload(block->p_buffer, block->i_buffer);
+            delete chunk;
+            downloadQueue.pop_front();
+        }
     }
 
     *pp_block = block;
 
     return ret;
 }
+
 void                                HTTPConnectionManager::attach                   (IDownloadRateObserver *observer)
 {
     this->rateObservers.push_back(observer);
@@ -115,17 +138,19 @@ void                                HTTPConnectionManager::notify               
     for(size_t i = 0; i < this->rateObservers.size(); i++)
         this->rateObservers.at(i)->downloadRateChanged(this->bpsAvg, this->bpsLastChunk);
 }
-std::vector<PersistentConnection *> HTTPConnectionManager::getConnectionsForHost    (const std::string &hostname)
+
+PersistentConnection * HTTPConnectionManager::getConnectionForHost(const std::string &hostname)
 {
-    std::vector<PersistentConnection *> cons;
-
-    for(size_t i = 0; i < this->connectionPool.size(); i++)
-        if(!this->connectionPool.at(i)->getHostname().compare(hostname) || !this->connectionPool.at(i)->isConnected())
-            cons.push_back(this->connectionPool.at(i));
-
-    return cons;
+    std::vector<PersistentConnection *>::const_iterator it;
+    for(it = connectionPool.begin(); it != connectionPool.end(); it++)
+    {
+        if(!(*it)->getHostname().compare(hostname))
+            return *it;
+    }
+    return NULL;
 }
-void                                HTTPConnectionManager::updateStatistics         (int bytes, double time)
+
+void HTTPConnectionManager::updateStatistics(size_t bytes, double time)
 {
     this->bytesReadSession  += bytes;
     this->bytesReadChunk    += bytes;
@@ -143,29 +168,28 @@ void                                HTTPConnectionManager::updateStatistics     
 
     this->notify();
 }
-bool                                HTTPConnectionManager::addChunk                 (Chunk *chunk)
+
+bool HTTPConnectionManager::connectChunk(Chunk *chunk)
 {
     if(chunk == NULL)
         return false;
 
-    this->downloadQueue.push_back(chunk);
+    msg_Dbg(stream, "Retrieving %s", chunk->getUrl().c_str());
 
-    std::vector<PersistentConnection *> cons = this->getConnectionsForHost(chunk->getHostname());
-
-    if(cons.size() == 0)
+    PersistentConnection *conn = getConnectionForHost(chunk->getHostname());
+    if(!conn)
     {
-        PersistentConnection *con = new PersistentConnection(this->stream);
-        this->connectionPool.push_back(con);
-        cons.push_back(con);
+        conn = new PersistentConnection(stream, chunk);
+        if(!conn)
+            return false;
+        if (!chunk->getConnection()->connect(chunk->getHostname(), chunk->getPort()))
+            return false;
+        connectionPool.push_back(conn);
     }
 
-    size_t pos = this->chunkCount % cons.size();
+    conn->bindChunk(chunk);
 
-    cons.at(pos)->addChunk(chunk);
-
-    chunk->setConnection(cons.at(pos));
-
-    this->chunkCount++;
+    chunkCount++;
 
     if(chunk->getBitrate() <= 0)
         chunk->setBitrate(HTTPConnectionManager::CHUNKDEFAULTBITRATE);

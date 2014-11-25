@@ -26,164 +26,97 @@
 #endif
 
 #include "PersistentConnection.h"
+#include "Chunk.h"
 
 #include <vlc_network.h>
 
 using namespace dash::http;
 
-const int PersistentConnection::RETRY = 5;
-
-PersistentConnection::PersistentConnection  (stream_t *stream) :
-                      HTTPConnection        (stream),
-                      isInit                (false)
+PersistentConnection::PersistentConnection  (stream_t *stream, Chunk *chunk) :
+                      HTTPConnection        (stream, chunk)
 {
+    queryOk = false;
+    retries = 0;
 }
-PersistentConnection::~PersistentConnection ()
+#include <cassert>
+ssize_t PersistentConnection::read(void *p_buffer, size_t len)
 {
-}
-
-int                 PersistentConnection::read              (void *p_buffer, size_t len)
-{
-    if(this->chunkQueue.size() == 0)
+    if(!chunk)
         return -1;
 
-    Chunk *readChunk = this->chunkQueue.front();
-
-    if(readChunk->getBytesRead() == 0)
-    {
-        if(!this->initChunk(readChunk))
-        {
-            this->chunkQueue.pop_front();
-            return -1;
-        }
-    }
-
-    if(readChunk->getBytesToRead() == 0)
-    {
-        this->chunkQueue.pop_front();
+    if(len == 0)
         return 0;
+
+    if(chunk->getBytesRead() == 0 && !queryOk)
+    {
+        if(!query(chunk->getPath()))
+            return -1;
     }
 
-    int ret = 0;
-    if(len > readChunk->getBytesToRead())
-        ret = HTTPConnection::read(p_buffer, readChunk->getBytesToRead());
-    else
-        ret = HTTPConnection::read(p_buffer, len);
+    assert(connected() && queryOk);
 
+    if(chunk->getBytesToRead() == 0)
+        return 0;
+
+    if(len > chunk->getBytesToRead())
+        len = chunk->getBytesToRead();
+
+    ssize_t ret = IHTTPConnection::read(p_buffer, len);
     if(ret <= 0)
     {
-        readChunk->setStartByte(readChunk->getStartByte() + readChunk->getBytesRead());
-        readChunk->setBytesRead(0);
-        if(!this->reconnect(readChunk))
-        {
-            this->chunkQueue.pop_front();
+        chunk->setStartByte(chunk->getStartByte() + chunk->getBytesRead());
+        chunk->setBytesRead(0);
+        disconnect();
+        if(retries++ == retryCount || !query(chunk->getPath()))
             return -1;
-        }
 
-        return this->read(p_buffer, len);
+        return read(p_buffer, len);
     }
 
-    readChunk->setBytesRead(readChunk->getBytesRead() + ret);
+    retries = 0;
+    chunk->setBytesRead(chunk->getBytesRead() + ret);
 
     return ret;
 }
 
-bool                PersistentConnection::init              (Chunk *chunk)
+bool PersistentConnection::query(const std::string &path)
 {
-    if(isInit)
-        return true;
-
-    if (IHTTPConnection::init(chunk))
-    {
-        isInit = true;
-        chunkQueue.push_back(chunk);
-        hostname = chunk->getHostname();
-    }
-
-    return isInit;
-}
-bool                PersistentConnection::addChunk          (Chunk *chunk)
-{
-    if(chunk == NULL)
+    if(!connected() &&
+       !connect(chunk->getHostname(), chunk->getPort()))
         return false;
 
-    if(!this->isInit)
-        return this->init(chunk);
-
-    if(!chunk->hasHostname())
-    {
-        chunk->setUrl(getUrlRelative(chunk));
-        if(!chunk->hasHostname())
-            return false;
-    }
-
-    if(chunk->getHostname().compare(this->hostname))
-        return false;
-
-    if(send(getRequestHeader(chunk).append("\r\n")))
-    {
-        this->chunkQueue.push_back(chunk);
-        return true;
-    }
-
-    return false;
-}
-bool                PersistentConnection::initChunk         (Chunk *chunk)
-{
-    HeaderReply reply;
-    if(parseHeader(&reply))
-    {
-        chunk->setLength(reply.contentLength);
-        return true;
-    }
-
-    if(!reconnect(chunk))
-        return false;
-
-    if(parseHeader(&reply))
-    {
-        chunk->setLength(reply.contentLength);
-        return true;
-    }
-
-    return false;
-}
-bool                PersistentConnection::reconnect         (Chunk *chunk)
-{
-    int         count   = 0;
-    std::string request = getRequestHeader(chunk).append("\r\n");
-
-    while(count < this->RETRY)
-    {
-        this->httpSocket = net_ConnectTCP(this->stream, chunk->getHostname().c_str(), chunk->getPort());
-        if(this->httpSocket != -1)
-            if(this->resendAllRequests())
-                return true;
-
-        count++;
-    }
-
-    return false;
-}
-const std::string&  PersistentConnection::getHostname       () const
-{
-    return this->hostname;
-}
-bool                PersistentConnection::isConnected       () const
-{
-    return this->isInit;
-}
-bool                PersistentConnection::resendAllRequests ()
-{
-    for(size_t i = 0; i < chunkQueue.size(); i++)
-        if(!send(getRequestHeader(chunkQueue.at(i)).append("\r\n")))
-            return false;
-
-    return true;
+    queryOk = IHTTPConnection::query(path);
+    return queryOk;
 }
 
-std::string PersistentConnection::getRequestHeader(const Chunk *chunk) const
+bool PersistentConnection::connect(const std::string &hostname, int port)
 {
-    /* can clearly see here that inheritance is reversed :/ */
-    return IHTTPConnection::getRequestHeader(chunk);
+    assert(!connected());
+    assert(!queryOk);
+    return IHTTPConnection::connect(hostname, port);
+}
+
+void PersistentConnection::releaseChunk()
+{
+    if(!chunk)
+        return;
+    if(toRead > 0 && connected()) /* We can't resend request if we haven't finished reading */
+        disconnect();
+    HTTPConnection::releaseChunk();
+}
+
+void PersistentConnection::disconnect()
+{
+    queryOk = false;
+    IHTTPConnection::disconnect();
+}
+
+const std::string& PersistentConnection::getHostname() const
+{
+    return hostname;
+}
+
+std::string PersistentConnection::buildRequestHeader(const std::string &path) const
+{
+    return IHTTPConnection::buildRequestHeader(path);
 }

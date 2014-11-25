@@ -30,6 +30,7 @@
 
 #include <vector>
 #include <vlc_xml.h>
+#include <vlc_stream.h>
 
 using namespace dash::xml;
 using namespace dash::mpd;

@@ -63,10 +63,10 @@ void*       DASHDownloader::download    (void *thread_sys)
     do
     {
         block_t *block = NULL;
-        ret = conManager->read(&block, BLOCKSIZE);
+        ret = conManager->read(&block);
         if(ret > 0)
             buffer->put(block);
-    }while(ret && !buffer->getEOF());
+    }while(ret > 0 && !buffer->getEOF());
 
     buffer->setEOF(true);
 

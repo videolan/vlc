@@ -26,128 +26,88 @@
 #endif
 
 #include "HTTPConnection.h"
-#include <vlc_network.h>
+#include "Chunk.h"
 
 #include <sstream>
+#include <vlc_stream.h>
 
 using namespace dash::http;
 
-HTTPConnection::HTTPConnection  (stream_t *stream) :
-                IHTTPConnection (stream),
-                peekBufferLen   (0)
+HTTPConnection::HTTPConnection  (stream_t *stream, Chunk *chunk_) :
+                IHTTPConnection (stream)
 {
-    this->peekBuffer = new uint8_t[PEEKBUFFER];
-}
-HTTPConnection::~HTTPConnection ()
-{
-    delete[] this->peekBuffer;
-    this->closeSocket();
+    toRead = 0;
+    chunk = NULL;
+    bindChunk(chunk_);
 }
 
-int             HTTPConnection::read            (void *p_buffer, size_t len)
+std::string HTTPConnection::buildRequestHeader(const std::string &path) const
 {
-    if(this->peekBufferLen == 0)
+    std::string req = IHTTPConnection::buildRequestHeader(path);
+    return req.append("Connection: close\r\n");
+}
+
+void HTTPConnection::bindChunk(Chunk *chunk_)
+{
+    if(chunk_ == chunk)
+        return;
+    if (chunk_)
     {
-        ssize_t size = net_Read(stream, httpSocket, NULL, p_buffer, len, false);
-
-        if(size <= 0)
-            return 0;
-
-        return size;
+        chunk_->setConnection(this);
+        if(!chunk->hasHostname())
+            chunk->setUrl(getUrlRelative(chunk));
     }
-
-    memcpy(p_buffer, this->peekBuffer, this->peekBufferLen);
-    int ret = this->peekBufferLen;
-    this->peekBufferLen = 0;
-    return ret;
-}
-int             HTTPConnection::peek            (const uint8_t **pp_peek, size_t i_peek)
-{
-    if(this->peekBufferLen == 0)
-        this->peekBufferLen = this->read(this->peekBuffer, PEEKBUFFER);
-
-    int size = i_peek > this->peekBufferLen ? this->peekBufferLen : i_peek;
-
-    uint8_t *peek = new uint8_t [size];
-    memcpy(peek, this->peekBuffer, size);
-    *pp_peek = peek;
-    return size;
+    chunk = chunk_;
 }
 
-std::string     HTTPConnection::getRequestHeader  (const Chunk *chunk) const
+void HTTPConnection::releaseChunk()
 {
-    return IHTTPConnection::getRequestHeader(chunk)
-            .append("Connection: close\r\n");
-}
-
-bool            HTTPConnection::init            (Chunk *chunk)
-{
-    if (IHTTPConnection::init(chunk))
+    if(chunk)
     {
-        HeaderReply reply;
-        return parseHeader(&reply);
+        chunk->setConnection(NULL);
+        chunk = NULL;
     }
-    else
-        return false;
 }
 
-bool            HTTPConnection::parseHeader     (HeaderReply *reply)
+void HTTPConnection::onHeader(const std::string &key,
+                              const std::string &value)
 {
-    std::string line = this->readLine();
-
-    if(line.size() == 0)
-        return false;
-
-    while(line.compare("\r\n"))
+    if(key == "Content-Length")
     {
-        if(!strncasecmp(line.c_str(), "Content-Length", 14))
-            reply->contentLength = atoi(line.substr(15,line.size()).c_str());
-
-        line = this->readLine();
-
-        if(line.size() == 0)
-            return false;
+        std::istringstream ss(value);
+        size_t length;
+        ss >> length;
+        chunk->setLength(length);
+        toRead = length;
     }
-
-    return true;
 }
-std::string     HTTPConnection::readLine        ()
+
+std::string HTTPConnection::extraRequestHeaders() const
 {
     std::stringstream ss;
-    char c[1];
-    ssize_t size = net_Read(stream, httpSocket, NULL, c, 1, false);
-
-    while(size >= 0)
+    if(chunk->usesByteRange())
     {
-        ss << c[0];
-        if(c[0] == '\n')
-            break;
-
-        size = net_Read(stream, httpSocket, NULL, c, 1, false);
+        ss << "Range: bytes=" << chunk->getStartByte() << "-";
+        if(chunk->getEndByte())
+            ss << chunk->getEndByte();
+        ss << "\r\n";
     }
-
-    if(size > 0)
-        return ss.str();
-
-    return "";
+    return ss.str();
 }
-bool            HTTPConnection::send        (const std::string& data)
+
+std::string HTTPConnection::getUrlRelative(const Chunk *chunk) const
 {
-    ssize_t size = net_Write(this->stream, this->httpSocket, NULL, data.c_str(), data.size());
-    if (size == -1)
-    {
-        return false;
-    }
-    if ((size_t)size != data.length())
-    {
-        this->send(data.substr(size, data.size()));
-    }
-
-    return true;
+    std::stringstream ss;
+    ss << stream->psz_access << "://" << Helper::combinePaths(Helper::getDirectoryPath(stream->psz_path), chunk->getUrl());
+    return ss.str();
 }
-void            HTTPConnection::closeSocket     ()
+
+bool HTTPConnection::isAvailable() const
 {
-    if (httpSocket >= 0)
-        net_Close(httpSocket);
+    return chunk == NULL;
 }
 
+void HTTPConnection::disconnect()
+{
+    toRead = 0;
+}

@@ -48,8 +48,7 @@ namespace dash
                 virtual ~HTTPConnectionManager  ();
 
                 void    closeAllConnections ();
-                bool    addChunk            (Chunk *chunk);
-                int     read                (block_t **, size_t);
+                ssize_t read                (block_t **);
                 void    attach              (dash::logic::IDownloadRateObserver *observer);
                 void    notify              ();
 
@@ -68,12 +67,11 @@ namespace dash
                 double                                              timeSession;
                 double                                              timeChunk;
 
-                static const size_t     PIPELINE;
-                static const size_t     PIPELINELENGTH;
                 static const uint64_t   CHUNKDEFAULTBITRATE;
 
-                std::vector<PersistentConnection *>     getConnectionsForHost   (const std::string &hostname);
-                void                                    updateStatistics        (int bytes, double time);
+                bool                                    connectChunk            (Chunk *chunk);
+                PersistentConnection *                  getConnectionForHost    (const std::string &hostname);
+                void                                    updateStatistics        (size_t bytes, double time);
 
         };
     }

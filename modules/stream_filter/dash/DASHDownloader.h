@@ -29,7 +29,6 @@
 #include "adaptationlogic/IAdaptationLogic.h"
 #include "buffer/BlockBuffer.h"
 
-#define BLOCKSIZE           32768
 #define CHUNKDEFAULTBITRATE 1
 
 #include <iostream>

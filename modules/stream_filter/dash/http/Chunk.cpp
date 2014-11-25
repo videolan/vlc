@@ -32,6 +32,7 @@ using namespace dash::http;
 Chunk::Chunk        () :
        startByte    (0),
        endByte      (0),
+       bitrate      (1),
        port         (0),
        isHostname   (false),
        length       (0),
@@ -149,11 +150,11 @@ size_t              Chunk::getPercentDownloaded () const
 {
     return (size_t)(((float)this->bytesRead / this->length) * 100);
 }
-IHTTPConnection*    Chunk::getConnection           () const
+HTTPConnection*     Chunk::getConnection           () const
 {
     return this->connection;
 }
-void                Chunk::setConnection   (IHTTPConnection *connection)
+void                Chunk::setConnection   (HTTPConnection *connection)
 {
     this->connection = connection;
 }

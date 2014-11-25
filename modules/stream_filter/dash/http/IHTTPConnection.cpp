@@ -24,6 +24,7 @@
 #include "dash.hpp"
 
 #include <vlc_network.h>
+#include <vlc_stream.h>
 
 #include <sstream>
 
@@ -37,45 +38,135 @@ IHTTPConnection::IHTTPConnection(stream_t *stream_)
 
 IHTTPConnection::~IHTTPConnection()
 {
-
+    disconnect();
 }
 
-bool IHTTPConnection::init(Chunk *chunk)
+bool IHTTPConnection::connect(const std::string &hostname, int port)
 {
-    if(chunk == NULL)
-        return false;
-
-    if(!chunk->hasHostname())
-    {
-        chunk->setUrl(getUrlRelative(chunk));
-        if(!chunk->hasHostname())
-            return false;
-    }
-
-    httpSocket = net_ConnectTCP(stream, chunk->getHostname().c_str(), chunk->getPort());
+    httpSocket = net_ConnectTCP(stream, hostname.c_str(), port);
+    this->hostname = hostname;
 
     if(httpSocket == -1)
         return false;
 
-    return send(getRequestHeader(chunk).append("\r\n"));
+    return true;
 }
 
-std::string IHTTPConnection::getRequestHeader(const Chunk *chunk) const
+bool IHTTPConnection::connected() const
 {
-    std::stringstream req;
-    req << "GET " << chunk->getPath() << " HTTP/1.1\r\n" <<
-           "Host: " << chunk->getHostname() << "\r\n" <<
-           "User-Agent: " << std::string(stream->p_sys->psz_useragent) << "\r\n";
-
-    if(chunk->usesByteRange())
-        req << "Range: bytes=" << chunk->getStartByte() << "-" << chunk->getEndByte() << "\r\n";
-
-    return req.str();
+    return (httpSocket != -1);
 }
 
-std::string IHTTPConnection::getUrlRelative(const Chunk *chunk) const
+void IHTTPConnection::disconnect()
+{
+    if (httpSocket >= 0)
+    {
+        net_Close(httpSocket);
+        httpSocket = -1;
+    }
+}
+
+bool IHTTPConnection::query(const std::string &path)
+{
+    std::string header = buildRequestHeader(path);
+    header.append("\r\n");
+    if (!send( header ) || !parseReply())
+        return false;
+    return true;
+}
+
+ssize_t IHTTPConnection::read(void *p_buffer, size_t len)
+{
+    ssize_t size = net_Read(stream, httpSocket, NULL, p_buffer, len, true);
+    if(size <= 0)
+        return -1;
+    else
+        return size;
+}
+
+bool IHTTPConnection::send(const std::string &data)
+{
+    return send(data.c_str(), data.length());
+}
+
+bool IHTTPConnection::send(const void *buf, size_t size)
+{
+    if (size == 0)
+        return true;
+
+    if (httpSocket == -1)
+        return false;
+
+    ssize_t ret = net_Write(stream, httpSocket, NULL, buf, size);
+    if (ret <= 0)
+        return false;
+
+    if ( (size_t)ret < size )
+        send( ((uint8_t*)buf) + ret, size - ret );
+
+    return true;
+}
+
+bool IHTTPConnection::parseReply()
+{
+    std::string line = readLine();
+
+    if(line.empty())
+        return false;
+
+    if (line.compare(0, 9, "HTTP/1.1 ")!=0)
+        return false;
+
+    std::istringstream ss(line.substr(9));
+    int replycode;
+    ss >> replycode;
+    if (replycode != 200 && replycode != 206)
+        return false;
+
+    readLine();
+
+    while(!line.empty() && line.compare("\r\n"))
+    {
+        size_t split = line.find_first_of(':');
+        size_t value = split + 1;
+
+        while(line.at(value) == ' ')
+            value++;
+
+        onHeader(line.substr(0, split), line.substr(value));
+        line = readLine();
+    }
+
+    return true;
+}
+
+std::string IHTTPConnection::readLine()
 {
     std::stringstream ss;
-    ss << stream->psz_access << "://" << Helper::combinePaths(Helper::getDirectoryPath(stream->psz_path), chunk->getUrl());
-    return ss.str();
+    char c[1];
+    ssize_t size = net_Read(stream, httpSocket, NULL, c, 1, false);
+
+    while(size >= 0)
+    {
+        ss << c[0];
+        if(c[0] == '\n')
+            break;
+
+        size = net_Read(stream, httpSocket, NULL, c, 1, false);
+    }
+
+    if(size > 0)
+        return ss.str();
+
+    return "";
+}
+
+std::string IHTTPConnection::buildRequestHeader(const std::string &path) const
+{
+    std::stringstream req;
+    req << "GET " << path << " HTTP/1.1\r\n" <<
+           "Host: " << hostname << "\r\n" <<
+           "User-Agent: " << std::string(stream->p_sys->psz_useragent) << "\r\n";
+    req << extraRequestHeaders();
+    return req.str();
 }

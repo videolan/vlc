@@ -35,27 +35,23 @@ namespace dash
         class PersistentConnection : public HTTPConnection
         {
             public:
-                PersistentConnection            (stream_t *stream);
-                virtual ~PersistentConnection   ();
+                PersistentConnection(stream_t *stream, Chunk *chunk = NULL);
 
-                virtual int         read        (void *p_buffer, size_t len);
-                virtual bool        init        (Chunk *chunk);
-                bool                addChunk    (Chunk *chunk);
+                virtual bool        connect     (const std::string &hostname, int port = 80);
+                virtual bool        query       (const std::string& path);
+                virtual ssize_t     read        (void *p_buffer, size_t len);
+                virtual void        disconnect  ();
+                virtual void        releaseChunk();
+
                 const std::string&  getHostname () const;
-                bool                isConnected () const;
 
             private:
-                std::deque<Chunk *>  chunkQueue;
-                bool                isInit;
-                std::string         hostname;
-
-                static const int RETRY;
+                bool                queryOk;
+                int                 retries;
 
             protected:
-                bool                initChunk           (Chunk *chunk);
-                bool                reconnect           (Chunk *chunk);
-                bool                resendAllRequests   ();
-                virtual std::string getRequestHeader    (const Chunk *chunk) const; /* reimpl */
+                static const int    retryCount = 5;
+                virtual std::string buildRequestHeader(const std::string &path) const;
         };
     }
 }

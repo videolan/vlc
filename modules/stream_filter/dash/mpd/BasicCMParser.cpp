@@ -36,6 +36,7 @@
 #include <sstream>
 
 #include <vlc_strings.h>
+#include <vlc_stream.h>
 
 using namespace dash::mpd;
 using namespace dash::xml;
