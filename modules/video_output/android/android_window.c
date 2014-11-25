@@ -799,13 +799,8 @@ static void SubpictureDisplay(vout_display_t *vd, subpicture_t *subpicture)
            sys->p_sub_pic->p[0].i_pitch * sys->p_sub_pic->p[0].i_lines);
 
     if (subpicture)
-    {
-        /* Allocate a blending filter if needed. */
-        if (unlikely(!sys->p_spu_blend))
-            sys->p_spu_blend = filter_NewBlend(VLC_OBJECT(vd),
-                                               &sys->p_sub_pic->format);
         picture_BlendSubpicture(sys->p_sub_pic, sys->p_spu_blend, subpicture);
-    }
+
     AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic, true);
 }
 
@@ -842,8 +837,11 @@ static void Display(vout_display_t *vd, picture_t *picture,
 
         if (!sys->p_sub_pic && SetupWindowSubtitleSurface(sys) == 0)
             sys->p_sub_pic = PictureAlloc(sys, &sys->p_sub_window->fmt);
+        if (!sys->p_spu_blend)
+            sys->p_spu_blend = filter_NewBlend(VLC_OBJECT(vd),
+                                               &sys->p_sub_pic->format);
 
-        if (sys->p_sub_pic)
+        if (sys->p_sub_pic && sys->p_spu_blend)
             sys->b_has_subpictures = true;
     }
     /* As long as no subpicture was received, do not call
