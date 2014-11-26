@@ -483,98 +483,94 @@ static int Open( vlc_object_t *obj )
     EssenceType_t AudioEssType;
     EssenceType_t AudioEssTypeCompare;
 
-    if( p_sys->p_dcp->audio_reels.size() == 0 )
+    if( !p_sys->p_dcp->audio_reels.empty() )
     {
-        msg_Err( p_demux, "No audio reel found" );
-        retval = VLC_EGENERIC;
-        goto error;
-    }
+        EssenceType( p_sys->p_dcp->audio_reels[0].filename.c_str(), AudioEssType );
 
-    EssenceType( p_sys->p_dcp->audio_reels[0].filename.c_str(), AudioEssType );
+        if ( (AudioEssType == ESS_PCM_24b_48k) || (AudioEssType == ESS_PCM_24b_96k) ) {
+            PCM::AudioDescriptor AudioDesc;
 
-    if ( (AudioEssType == ESS_PCM_24b_48k) || (AudioEssType == ESS_PCM_24b_96k) ) {
-        PCM::AudioDescriptor AudioDesc;
-
-        for ( size_t i = 0; i < ( p_sys->p_dcp->audio_reels.size() ); i++)
-        {
-            if ( i != 0 )
+            for ( size_t i = 0; i < ( p_sys->p_dcp->audio_reels.size() ); i++)
             {
-                EssenceType( p_sys->p_dcp->audio_reels[i].filename.c_str(), AudioEssTypeCompare );
-                if ( AudioEssTypeCompare != AudioEssType )
+                if ( i != 0 )
                 {
-                    msg_Err( p_demux, "Integrity check failed : different audio essence types in %s",
-                    p_sys->p_dcp->audio_reels[i].filename.c_str() );
-                    retval = VLC_EGENERIC;
+                    EssenceType( p_sys->p_dcp->audio_reels[i].filename.c_str(), AudioEssTypeCompare );
+                    if ( AudioEssTypeCompare != AudioEssType )
+                    {
+                        msg_Err( p_demux, "Integrity check failed : different audio essence types in %s",
+                        p_sys->p_dcp->audio_reels[i].filename.c_str() );
+                        retval = VLC_EGENERIC;
+                        goto error;
+                    }
+                }
+                PCM::MXFReader *p_AudioMXFReader = new ( nothrow ) PCM::MXFReader();
+
+                if( !p_AudioMXFReader ) {
+                    retval = VLC_ENOMEM;
                     goto error;
                 }
-            }
-            PCM::MXFReader *p_AudioMXFReader = new ( nothrow ) PCM::MXFReader();
 
-            if( !p_AudioMXFReader ) {
-                retval = VLC_ENOMEM;
-                goto error;
-            }
+                if( !ASDCP_SUCCESS( p_AudioMXFReader->OpenRead( p_sys->p_dcp->audio_reels[i].filename.c_str() ) ) ) {
+                    msg_Err( p_demux, "File %s could not be opened with ASDCP",
+                                    p_sys->p_dcp->audio_reels[i].filename.c_str() );
+                    retval = VLC_EGENERIC;
+                    delete p_AudioMXFReader;
+                    goto error;
+                }
 
-            if( !ASDCP_SUCCESS( p_AudioMXFReader->OpenRead( p_sys->p_dcp->audio_reels[i].filename.c_str() ) ) ) {
-                msg_Err( p_demux, "File %s could not be opened with ASDCP",
-                                p_sys->p_dcp->audio_reels[i].filename.c_str() );
+                p_AudioMXFReader->FillAudioDescriptor( AudioDesc );
+
+                if (  (AudioDesc.ChannelCount >= sizeof(pi_channels_aout)/sizeof(uint32_t *))
+                        || (pi_channels_aout[AudioDesc.ChannelCount] == NULL) )
+                {
+                    msg_Err(p_demux, " DCP module does not support %i channels", AudioDesc.ChannelCount);
+                    retval = VLC_EGENERIC;
+                    delete p_AudioMXFReader;
+                    goto error;
+                }
+                audioReader_t audioReader;
+                audioReader.p_AudioMXFReader = p_AudioMXFReader;
+                p_sys->v_audioReader.push_back( audioReader );
+
+            }
+            es_format_Init( &audio_format, AUDIO_ES, VLC_CODEC_S24L );
+            if( AudioDesc.AudioSamplingRate.Denominator != 0 )
+                audio_format.audio.i_rate =
+                    AudioDesc.AudioSamplingRate.Numerator
+                    / AudioDesc.AudioSamplingRate.Denominator;
+            else if ( AudioEssType == ESS_PCM_24b_96k )
+                audio_format.audio.i_rate = 96000;
+            else
+                audio_format.audio.i_rate = 48000;
+
+            p_sys->i_audio_buffer = PCM::CalcFrameBufferSize( AudioDesc );
+            if (p_sys->i_audio_buffer == 0) {
+                msg_Err( p_demux, "Failed to get audio buffer size" );
                 retval = VLC_EGENERIC;
-                delete p_AudioMXFReader;
                 goto error;
             }
 
-            p_AudioMXFReader->FillAudioDescriptor( AudioDesc );
+            audio_format.audio.i_bitspersample = AudioDesc.QuantizationBits;
+            audio_format.audio.i_blockalign    = AudioDesc.BlockAlign;
+            audio_format.audio.i_channels      =
+            p_sys->i_channels                  = AudioDesc.ChannelCount;
 
-            if (  (AudioDesc.ChannelCount >= sizeof(pi_channels_aout)/sizeof(uint32_t *))
-                    || (pi_channels_aout[AudioDesc.ChannelCount] == NULL) )
-            {
-                msg_Err(p_demux, " DCP module does not support %i channels", AudioDesc.ChannelCount);
+            /* Manage channel orders */
+            p_sys->i_chans_to_reorder =  aout_CheckChannelReorder(
+                    pi_channels_aout[AudioDesc.ChannelCount], NULL,
+                    i_channel_mask[AudioDesc.ChannelCount],   p_sys->pi_chan_table );
+
+            if( ( p_sys->p_audio_es = es_out_Add( p_demux->out, &audio_format ) ) == NULL ) {
+                msg_Err( p_demux, "Failed to add audio es" );
                 retval = VLC_EGENERIC;
-                delete p_AudioMXFReader;
                 goto error;
             }
-            audioReader_t audioReader;
-            audioReader.p_AudioMXFReader = p_AudioMXFReader;
-            p_sys->v_audioReader.push_back( audioReader );
-
-        }
-        es_format_Init( &audio_format, AUDIO_ES, VLC_CODEC_S24L );
-        if( AudioDesc.AudioSamplingRate.Denominator != 0 )
-            audio_format.audio.i_rate =
-                AudioDesc.AudioSamplingRate.Numerator
-                / AudioDesc.AudioSamplingRate.Denominator;
-        else if ( AudioEssType == ESS_PCM_24b_96k )
-            audio_format.audio.i_rate = 96000;
-        else
-            audio_format.audio.i_rate = 48000;
-
-        p_sys->i_audio_buffer = PCM::CalcFrameBufferSize( AudioDesc );
-        if (p_sys->i_audio_buffer == 0) {
-            msg_Err( p_demux, "Failed to get audio buffer size" );
+        } else {
+            msg_Err( p_demux, "The file %s is not a supported AS_DCP essence container",
+                    p_sys->p_dcp->audio_reels[0].filename.c_str() );
             retval = VLC_EGENERIC;
             goto error;
         }
-
-        audio_format.audio.i_bitspersample = AudioDesc.QuantizationBits;
-        audio_format.audio.i_blockalign    = AudioDesc.BlockAlign;
-        audio_format.audio.i_channels      =
-        p_sys->i_channels                  = AudioDesc.ChannelCount;
-
-        /* Manage channel orders */
-        p_sys->i_chans_to_reorder =  aout_CheckChannelReorder(
-                pi_channels_aout[AudioDesc.ChannelCount], NULL,
-                i_channel_mask[AudioDesc.ChannelCount],   p_sys->pi_chan_table );
-
-        if( ( p_sys->p_audio_es = es_out_Add( p_demux->out, &audio_format ) ) == NULL ) {
-            msg_Err( p_demux, "Failed to add audio es" );
-            retval = VLC_EGENERIC;
-            goto error;
-        }
-    } else {
-        msg_Err( p_demux, "The file %s is not a supported AS_DCP essence container",
-                p_sys->p_dcp->audio_reels[0].filename.c_str() );
-        retval = VLC_EGENERIC;
-        goto error;
     }
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
@@ -623,7 +619,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* swaping audio reels */
-    if  ( p_sys->frame_no == p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].i_absolute_end )
+    if  ( !p_sys->p_dcp->audio_reels.empty() && p_sys->frame_no == p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].i_absolute_end )
      {
          if ( p_sys->i_audio_reel + 1 == p_sys->v_audioReader.size() )
          {
@@ -704,52 +700,57 @@ static int Demux( demux_t *p_demux )
     p_video_frame->i_length = CLOCK_FREQ * p_sys->frame_rate_denom / p_sys->frame_rate_num;
     p_video_frame->i_pts = CLOCK_FREQ * p_sys->frame_no * p_sys->frame_rate_denom / p_sys->frame_rate_num;
 
-    /* audio frame */
-    if ( ( p_audio_frame = block_Alloc( p_sys->i_audio_buffer )) == NULL ) {
-        goto error;
-    }
-
-    /* initialize AES context, if reel is encrypted */
-    if( p_sys &&
-            p_sys->p_dcp &&
-            p_sys->p_dcp->audio_reels.size() > p_sys->i_audio_reel &&
-            p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].p_key )
+    if( !p_sys->p_dcp->audio_reels.empty() )
     {
-        if( ! ASDCP_SUCCESS( audio_aes_ctx.InitKey( p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].p_key->getKey() ) ) )
-        {
-            msg_Err( p_demux, "ASDCP failed to initialize AES key" );
+        /* audio frame */
+        if ( ( p_audio_frame = block_Alloc( p_sys->i_audio_buffer )) == NULL ) {
             goto error;
         }
-    }
 
-    if ( ! ASDCP_SUCCESS(
-            AudioFrameBuff.SetData(p_audio_frame->p_buffer, p_sys->i_audio_buffer)) ) {
-        goto error_asdcp;
-    }
+        /* initialize AES context, if reel is encrypted */
+        if( p_sys &&
+                p_sys->p_dcp &&
+                p_sys->p_dcp->audio_reels.size() > p_sys->i_audio_reel &&
+                p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].p_key )
+        {
+            if( ! ASDCP_SUCCESS( audio_aes_ctx.InitKey( p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].p_key->getKey() ) ) )
+            {
+                msg_Err( p_demux, "ASDCP failed to initialize AES key" );
+                goto error;
+            }
+        }
 
-    if ( ! ASDCP_SUCCESS(
-            p_sys->v_audioReader[p_sys->i_audio_reel].p_AudioMXFReader->ReadFrame(p_sys->frame_no + p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].i_correction, AudioFrameBuff, &audio_aes_ctx, 0)) ) {
-        AudioFrameBuff.SetData(0,0);
-        goto error_asdcp;
-    }
+        if ( ! ASDCP_SUCCESS(
+                AudioFrameBuff.SetData(p_audio_frame->p_buffer, p_sys->i_audio_buffer)) ) {
+            goto error_asdcp;
+        }
 
-    if( p_sys->i_chans_to_reorder )
-        aout_ChannelReorder( p_audio_frame->p_buffer, p_audio_frame->i_buffer,
-                p_sys->i_channels,
-                p_sys->pi_chan_table, VLC_CODEC_S24L );
+        if ( ! ASDCP_SUCCESS(
+                p_sys->v_audioReader[p_sys->i_audio_reel].p_AudioMXFReader->ReadFrame(p_sys->frame_no + p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].i_correction, AudioFrameBuff, &audio_aes_ctx, 0)) ) {
+            AudioFrameBuff.SetData(0,0);
+            goto error_asdcp;
+        }
 
-    p_audio_frame->i_buffer = AudioFrameBuff.Size();
-    p_audio_frame->i_length = CLOCK_FREQ * p_sys->frame_rate_denom / p_sys->frame_rate_num;
-    p_audio_frame->i_pts = CLOCK_FREQ * p_sys->frame_no * p_sys->frame_rate_denom / p_sys->frame_rate_num;
-    /* Video is the main pts */
-    if ( p_audio_frame->i_pts != p_video_frame->i_pts ) {
-        msg_Err( p_demux, "Audio and video frame pts are not in sync" );
+        if( p_sys->i_chans_to_reorder )
+            aout_ChannelReorder( p_audio_frame->p_buffer, p_audio_frame->i_buffer,
+                    p_sys->i_channels,
+                    p_sys->pi_chan_table, VLC_CODEC_S24L );
+
+        p_audio_frame->i_buffer = AudioFrameBuff.Size();
+        p_audio_frame->i_length = CLOCK_FREQ * p_sys->frame_rate_denom / p_sys->frame_rate_num;
+        p_audio_frame->i_pts = CLOCK_FREQ * p_sys->frame_no * p_sys->frame_rate_denom / p_sys->frame_rate_num;
+        /* Video is the main pts */
+        if ( p_audio_frame->i_pts != p_video_frame->i_pts ) {
+            msg_Err( p_demux, "Audio and video frame pts are not in sync" );
+        }
     }
 
     p_sys->i_pts = p_video_frame->i_pts;
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
-    es_out_Send( p_demux->out, p_sys->p_video_es, p_video_frame );
-    es_out_Send( p_demux->out, p_sys->p_audio_es, p_audio_frame );
+    if(p_video_frame)
+        es_out_Send( p_demux->out, p_sys->p_video_es, p_video_frame );
+    if(p_audio_frame)
+        es_out_Send( p_demux->out, p_sys->p_audio_es, p_audio_frame );
 
     p_sys->frame_no++;
 

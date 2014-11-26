@@ -227,7 +227,7 @@ class Reel
 {
 public:
     Reel(demux_t * demux, AssetList *asset_list, xml_reader_t *xmlReader)
-        : p_asset_list(asset_list), p_xmlReader(xmlReader), p_demux(demux)
+        : p_asset_list(asset_list), p_xmlReader(xmlReader), p_demux(demux), p_picture_track(NULL), p_sound_track(NULL), p_subtitle_track(NULL)
          {};
     int Parse(string p_node, int p_type);
     Asset * getTrack(TrackType_t e_track);
