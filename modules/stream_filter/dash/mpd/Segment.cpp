@@ -38,12 +38,17 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     startByte  (0),
     endByte    (0)
 {
+    debugName = "Segment";
+}
 
+dash::http::Chunk * ISegment::getChunk()
+{
+    return new SegmentChunk(this);
 }
 
 dash::http::Chunk* ISegment::toChunk()
 {
-    Chunk *chunk = new SegmentChunk(this);
+    Chunk *chunk = getChunk();
     if (!chunk)
         return NULL;
 
@@ -75,11 +80,15 @@ void ISegment::setByteRange(size_t start, size_t end)
 
 std::string ISegment::toString() const
 {
-    return std::string("    Segment url=").append(getUrlSegment());
+    std::stringstream ss("    ");
+    ss << debugName << " url=" << getUrlSegment();
+    if(startByte!=endByte)
+        ss << " @" << startByte << ".." << endByte;
+    return ss.str();
 }
 
 ISegment::SegmentChunk::SegmentChunk(ISegment *segment_) :
-    Chunk()
+    dash::http::Chunk()
 {
     segment = segment_;
 }
@@ -89,11 +98,9 @@ void ISegment::SegmentChunk::onDownload(void *, size_t)
 
 }
 
-Segment::Segment(Representation *parent, bool isinit, bool tosplit) :
+Segment::Segment(Representation *parent) :
         ISegment(parent),
-        parentRepresentation( parent ),
-        init( isinit ),
-        needssplit( tosplit )
+        parentRepresentation( parent )
 {
     assert( parent != NULL );
     if ( parent->getSegmentInfo() != NULL && parent->getSegmentInfo()->getDuration() >= 0 )
@@ -115,14 +122,28 @@ void                    Segment::setSourceUrl   ( const std::string &url )
         this->sourceUrl = url;
 }
 
-bool                    Segment::needsSplit() const
-{
-    return needssplit;
-}
-
 Representation *Segment::getRepresentation() const
 {
     return parentRepresentation;
+}
+
+
+std::string Segment::toString() const
+{
+    if (subsegments.empty())
+    {
+        return ISegment::toString();
+    }
+    else
+    {
+        std::string ret;
+        std::vector<SubSegment *>::const_iterator l;
+        for(l = subsegments.begin(); l != subsegments.end(); l++)
+        {
+            ret.append( (*l)->toString() );
+        }
+        return ret;
+    }
 }
 
 std::string Segment::getUrlSegment() const
@@ -157,19 +178,38 @@ std::vector<ISegment*> Segment::subSegments()
     return list;
 }
 
-std::string Segment::toString() const
+InitSegment::InitSegment(Representation *parent) :
+    Segment(parent)
 {
-    if (init)
-        return std::string("    InitSeg url=")
-                    .append(getUrlSegment());
-    else
-        return ISegment::toString();
+    debugName = "InitSegment";
+}
+
+IndexSegment::IndexSegment(Representation *parent) :
+    Segment(parent)
+{
+    debugName = "IndexSegment";
+}
+
+dash::http::Chunk * IndexSegment::getChunk()
+{
+    return new IndexSegmentChunk(this);
+}
+
+IndexSegment::IndexSegmentChunk::IndexSegmentChunk(ISegment *segment)
+    : SegmentChunk(segment)
+{
+
+}
+
+void IndexSegment::IndexSegmentChunk::onDownload(void *buffer, size_t size)
+{
 }
 
 SubSegment::SubSegment(Segment *main, size_t start, size_t end) :
     ISegment(main), parent(main)
 {
     setByteRange(start, end);
+    debugName = "SubSegment";
 }
 
 std::string SubSegment::getUrlSegment() const

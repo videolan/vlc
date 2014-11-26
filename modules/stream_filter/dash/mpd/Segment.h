@@ -60,6 +60,7 @@ namespace dash
             protected:
                 size_t                  startByte;
                 size_t                  endByte;
+                std::string             debugName;
 
                 class SegmentChunk : public dash::http::Chunk
                 {
@@ -67,31 +68,51 @@ namespace dash
                         SegmentChunk(ISegment *segment);
                         virtual void onDownload(void *, size_t);
 
-                    private:
+                    protected:
                         ISegment *segment;
                 };
+
+                virtual dash::http::Chunk * getChunk();
         };
 
         class Segment : public ISegment
         {
             public:
-                Segment( Representation *parent, bool isinit = false, bool tosplit = false );
+                Segment( Representation *parent );
                 ~Segment();
                 virtual void setSourceUrl( const std::string &url );
-                virtual bool needsSplit() const;
                 virtual std::string getUrlSegment() const; /* impl */
                 virtual dash::http::Chunk* toChunk();
                 virtual std::vector<ISegment*> subSegments();
-                virtual std::string toString() const;
                 virtual Representation* getRepresentation() const;
 
             protected:
                 Representation* parentRepresentation;
-                bool init;
-                bool needssplit;
                 std::vector<SubSegment *> subsegments;
                 std::string sourceUrl;
                 int size;
+        };
+
+        class InitSegment : public Segment
+        {
+            public:
+                InitSegment( Representation *parent );
+        };
+
+        class IndexSegment : public Segment
+        {
+            public:
+                IndexSegment( Representation *parent );
+
+            protected:
+                class IndexSegmentChunk : public SegmentChunk
+                {
+                    public:
+                        IndexSegmentChunk(ISegment *segment);
+                        virtual void onDownload(void *, size_t);
+                };
+
+                virtual dash::http::Chunk * getChunk();
         };
 
         class SubSegment : public ISegment

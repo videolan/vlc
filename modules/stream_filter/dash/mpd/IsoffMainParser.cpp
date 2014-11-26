@@ -123,16 +123,21 @@ void    IsoffMainParser::setSegmentBase     (dash::xml::Node *repNode, Represent
     if(segmentBase.front()->hasAttribute("indexRange"))
     {
         SegmentList *list = new SegmentList();
-        Segment *seg = new Segment(rep);
+        Segment *seg;
 
         size_t start = 0, end = 0;
         if (std::sscanf(segmentBase.front()->getAttributeValue("indexRange").c_str(), "%"PRIu64"-%"PRIu64, &start, &end) == 2)
         {
+            seg = new IndexSegment(rep);
             seg->setByteRange(start, end);
             list->addSegment(seg);
             /* index must be before data, so data starts at index end */
             seg = new Segment(rep);
             seg->setByteRange(end + 1, 0);
+        }
+        else
+        {
+            seg = new Segment(rep);
         }
 
         list->addSegment(seg);
@@ -174,7 +179,7 @@ void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, Segme
 
     if(initSeg.size() > 0)
     {
-        Segment *seg = new Segment( currentRepresentation, true );
+        Segment *seg = new InitSegment( currentRepresentation );
         seg->setSourceUrl(initSeg.at(0)->getAttributeValue("sourceURL"));
 
         if(initSeg.at(0)->hasAttribute("range"))

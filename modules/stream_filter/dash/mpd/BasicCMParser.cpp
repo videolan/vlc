@@ -369,7 +369,12 @@ Segment*    BasicCMParser::parseSegment( Node* node, bool init )
             seg = new SegmentTemplate( runtimeToken, this->currentRepresentation );
         }
         else
-            seg = new Segment( this->currentRepresentation, init );
+        {
+            if ( init )
+                seg = new InitSegment( currentRepresentation );
+            else
+                seg = new Segment( currentRepresentation );
+        }
         if ( url.find( this->p_stream->psz_access ) != 0 ) //Relative url
             url = this->url + url;
         seg->setSourceUrl( url );
