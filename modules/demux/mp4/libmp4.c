@@ -4106,7 +4106,7 @@ static void MP4_BoxDumpStructure_Internal( stream_t *s,
         }
 
         snprintf( &str[i_level * 4], sizeof(str) - 4*i_level,
-                  "+ %4.4s size %"PRIu64" offset %ju%s",
+                  "+ %4.4s size %"PRIu64" offset %" PRIuMAX "%s",
                     (char*)&i_displayedtype, p_box->i_size,
                   (uintmax_t)p_box->i_pos,
                 p_box->e_flags & BOX_FLAG_INCOMPLETE ? " (\?\?\?\?)" : "" );
