@@ -1453,6 +1453,8 @@ static void hds_free( hds_stream_t *p_stream )
 
     FREENULL( p_stream->abst_url );
 
+    cleanup_threading( p_stream );
+
     FREENULL( p_stream->url );
     FREENULL( p_stream->movie_id );
     for( int i = 0; i < p_stream->server_entry_count; i++ )
@@ -1562,11 +1564,6 @@ static void Close( vlc_object_t *p_this )
         vlc_cond_signal( & stream->dl_cond );
 
     vlc_join( p_sys->dl_thread, NULL );
-
-    if (stream)
-    {
-        cleanup_threading( stream );
-    }
 
     if( p_sys->live )
     {
