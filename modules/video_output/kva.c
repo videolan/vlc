@@ -606,10 +606,10 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     sys->kvas.ulLength           = sizeof( KVASETUP );
     sys->kvas.szlSrcSize.cx      = w;
     sys->kvas.szlSrcSize.cy      = h;
-    sys->kvas.rclSrcRect.xLeft   = 0;
-    sys->kvas.rclSrcRect.yTop    = 0;
-    sys->kvas.rclSrcRect.xRight  = w;
-    sys->kvas.rclSrcRect.yBottom = h;
+    sys->kvas.rclSrcRect.xLeft   = fmt->i_x_offset;
+    sys->kvas.rclSrcRect.yTop    = fmt->i_y_offset;
+    sys->kvas.rclSrcRect.xRight  = fmt->i_x_offset + fmt->i_visible_width;
+    sys->kvas.rclSrcRect.yBottom = fmt->i_y_offset + fmt->i_visible_height;
     sys->kvas.ulRatio            = KVAR_FORCEANY;
     sys->kvas.ulAspectWidth      = w;
     sys->kvas.ulAspectHeight     = h;
