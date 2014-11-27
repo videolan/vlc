@@ -15,6 +15,8 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/adaptationlogic/AdaptationLogicFactory.h \
     stream_filter/dash/adaptationlogic/AlwaysBestAdaptationLogic.cpp \
     stream_filter/dash/adaptationlogic/AlwaysBestAdaptationLogic.h \
+    stream_filter/dash/adaptationlogic/AlwaysLowestAdaptationLogic.cpp \
+    stream_filter/dash/adaptationlogic/AlwaysLowestAdaptationLogic.hpp \
     stream_filter/dash/adaptationlogic/IAdaptationLogic.h \
     stream_filter/dash/adaptationlogic/IDownloadRateObserver.h \
     stream_filter/dash/adaptationlogic/RateBasedAdaptationLogic.h \

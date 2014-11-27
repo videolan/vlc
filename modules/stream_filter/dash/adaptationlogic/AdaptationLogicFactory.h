@@ -28,8 +28,6 @@
 #include "adaptationlogic/IAdaptationLogic.h"
 #include "xml/Node.h"
 #include "mpd/MPDManager.hpp"
-#include "adaptationlogic/AlwaysBestAdaptationLogic.h"
-#include "adaptationlogic/RateBasedAdaptationLogic.h"
 
 struct stream_t;
 

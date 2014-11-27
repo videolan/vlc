@@ -26,6 +26,9 @@
 #endif
 
 #include "AdaptationLogicFactory.h"
+#include "adaptationlogic/AlwaysBestAdaptationLogic.h"
+#include "adaptationlogic/RateBasedAdaptationLogic.h"
+#include "adaptationlogic/AlwaysLowestAdaptationLogic.hpp"
 
 using namespace dash::logic;
 using namespace dash::xml;
@@ -38,8 +41,8 @@ IAdaptationLogic* AdaptationLogicFactory::create ( IAdaptationLogic::LogicType l
     {
         case IAdaptationLogic::AlwaysBest:      return new AlwaysBestAdaptationLogic    (mpdManager);
         case IAdaptationLogic::RateBased:       return new RateBasedAdaptationLogic     (mpdManager);
+        case IAdaptationLogic::AlwaysLowest:    return new AlwaysLowestAdaptationLogic  (mpdManager);
         case IAdaptationLogic::Default:
-        case IAdaptationLogic::AlwaysLowest:
         default:
             return NULL;
     }
