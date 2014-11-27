@@ -375,7 +375,7 @@ prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
 package: install
 	rm -Rf tmp/
 	mkdir -p tmp/
-	cp -r $(PREFIX) tmp/
+	cp -R $(PREFIX) tmp/
 	# remove useless files
 	cd tmp/$(notdir $(PREFIX)); \
 		cd share; rm -Rf man doc gtk-doc info lua projectM gettext; cd ..; \
