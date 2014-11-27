@@ -46,7 +46,11 @@ Representation * RepresentationSelector::select(Period *period, uint64_t bitrate
         std::vector<Representation *> reps = (*adaptIt)->getRepresentations();
         Representation *candidate = select(reps, (best)?best->getBandwidth():0, bitrate);
         if (candidate)
+        {
+            if (candidate->getBandwidth() > bitrate) /* none matched, returned lowest */
+                return candidate;
             best = candidate;
+        }
     }
     return best;
 }
@@ -82,10 +86,13 @@ Representation * RepresentationSelector::select(Period *period, uint64_t bitrate
 Representation * RepresentationSelector::select(std::vector<Representation *>& reps,
                                                 uint64_t minbitrate, uint64_t maxbitrate) const
 {
-    Representation  *candidate = NULL;
+    Representation  *candidate = NULL, *lowest = NULL;
     std::vector<Representation *>::const_iterator repIt;
     for(repIt=reps.begin(); repIt!=reps.end(); repIt++)
     {
+        if ( !lowest || (*repIt)->getBandwidth() < lowest->getBandwidth())
+            lowest = *repIt;
+
         if ( (*repIt)->getBandwidth() < maxbitrate &&
              (*repIt)->getBandwidth() > minbitrate )
         {
@@ -93,5 +100,9 @@ Representation * RepresentationSelector::select(std::vector<Representation *>& r
             minbitrate = (*repIt)->getBandwidth();
         }
     }
+
+    if (!candidate)
+        return candidate = lowest;
+
     return candidate;
 }
