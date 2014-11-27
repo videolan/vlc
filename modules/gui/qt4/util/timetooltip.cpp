@@ -33,12 +33,14 @@
 TimeTooltip::TimeTooltip( QWidget *parent ) :
     QWidget( parent )
 {
-    setWindowFlags( Qt::Window                  |
+    setWindowFlags(
+#if defined( Q_OS_WIN )
+                    Qt::ToolTip
+#else
+                    Qt::Window                  |
                     Qt::WindowStaysOnTopHint    |
                     Qt::FramelessWindowHint     |
                     Qt::X11BypassWindowManagerHint
-#if HAS_QT5
-                    | Qt::WindowDoesNotAcceptFocus
 #endif
                     );
 
