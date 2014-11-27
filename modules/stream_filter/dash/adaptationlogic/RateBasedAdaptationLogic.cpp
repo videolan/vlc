@@ -28,18 +28,21 @@
 #include "RateBasedAdaptationLogic.h"
 #include "Representationselectors.hpp"
 
+#include <vlc_common.h>
+#include <vlc_variables.h>
+
 using namespace dash::logic;
 using namespace dash::xml;
 using namespace dash::http;
 using namespace dash::mpd;
 
-RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPDManager *mpdManager, stream_t *stream) :
-                          AbstractAdaptationLogic   (mpdManager, stream),
+RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPDManager *mpdManager) :
+                          AbstractAdaptationLogic   (mpdManager),
                           count                     (0),
                           currentPeriod             (mpdManager->getFirstPeriod())
 {
-    width  = var_InheritInteger(stream, "dash-prefwidth");
-    height = var_InheritInteger(stream, "dash-prefheight");
+    width  = var_InheritInteger(mpdManager->getMPD()->getVLCObject(), "dash-prefwidth");
+    height = var_InheritInteger(mpdManager->getMPD()->getVLCObject(), "dash-prefheight");
 }
 
 Chunk*  RateBasedAdaptationLogic::getNextChunk()

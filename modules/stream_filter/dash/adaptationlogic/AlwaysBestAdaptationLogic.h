@@ -41,7 +41,7 @@ namespace dash
         class AlwaysBestAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                AlwaysBestAdaptationLogic           (dash::mpd::MPDManager *mpdManager, stream_t *stream);
+                AlwaysBestAdaptationLogic           (dash::mpd::MPDManager *mpdManager);
                 virtual ~AlwaysBestAdaptationLogic  ();
 
                 dash::http::Chunk* getNextChunk();

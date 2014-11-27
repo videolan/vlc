@@ -32,12 +32,12 @@ using namespace dash::xml;
 using namespace dash::mpd;
 
 IAdaptationLogic* AdaptationLogicFactory::create ( IAdaptationLogic::LogicType logic,
-                                                  MPDManager *mpdManager, stream_t *stream)
+                                                  MPDManager *mpdManager)
 {
     switch(logic)
     {
-        case IAdaptationLogic::AlwaysBest:      return new AlwaysBestAdaptationLogic    (mpdManager, stream);
-        case IAdaptationLogic::RateBased:       return new RateBasedAdaptationLogic     (mpdManager, stream);
+        case IAdaptationLogic::AlwaysBest:      return new AlwaysBestAdaptationLogic    (mpdManager);
+        case IAdaptationLogic::RateBased:       return new RateBasedAdaptationLogic     (mpdManager);
         case IAdaptationLogic::Default:
         case IAdaptationLogic::AlwaysLowest:
         default:

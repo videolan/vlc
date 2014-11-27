@@ -62,7 +62,7 @@ bool    DASHManager::start()
     if ( this->mpdManager == NULL )
         return false;
 
-    this->adaptationLogic = AdaptationLogicFactory::create( this->logicType, this->mpdManager, this->stream);
+    adaptationLogic = AdaptationLogicFactory::create( logicType, mpdManager );
 
     if ( this->adaptationLogic == NULL )
         return false;

@@ -30,9 +30,6 @@
 #include "mpd/MPDManager.hpp"
 #include "http/Chunk.h"
 
-#include <vlc_common.h>
-#include <vlc_stream.h>
-
 #define MINBUFFER 30
 
 namespace dash
@@ -42,7 +39,7 @@ namespace dash
         class RateBasedAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                RateBasedAdaptationLogic            (dash::mpd::MPDManager *mpdManager, stream_t *stream);
+                RateBasedAdaptationLogic            (dash::mpd::MPDManager *mpdManager);
 
                 dash::http::Chunk*      getNextChunk();
                 const dash::mpd::Representation *getCurrentRepresentation() const;

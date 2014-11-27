@@ -43,7 +43,7 @@ namespace dash
         class AbstractAdaptationLogic : public IAdaptationLogic
         {
             public:
-                AbstractAdaptationLogic             (dash::mpd::MPDManager *mpdManager, stream_t *stream);
+                AbstractAdaptationLogic             (dash::mpd::MPDManager *mpdManager);
                 virtual ~AbstractAdaptationLogic    ();
 
                 virtual void                downloadRateChanged     (uint64_t bpsAvg, uint64_t bpsLastChunk);
@@ -59,7 +59,6 @@ namespace dash
             private:
                 int                     bpsAvg;
                 long                    bpsLastChunk;
-                stream_t                *stream;
                 mtime_t                 bufferedMicroSec;
                 int                     bufferedPercent;
         };

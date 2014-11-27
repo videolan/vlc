@@ -40,7 +40,7 @@ namespace dash
         class AdaptationLogicFactory
         {
             public:
-                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::MPDManager *mpdManager, stream_t *stream);
+                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::MPDManager *mpdManager);
         };
     }
 }
