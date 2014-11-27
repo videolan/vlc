@@ -32,9 +32,9 @@ using namespace dash::xml;
 using namespace dash::mpd;
 
 AbstractAdaptationLogic::AbstractAdaptationLogic    (MPDManager *mpdManager, stream_t *stream) :
+                         mpdManager                 (mpdManager),
                          bpsAvg                     (0),
                          bpsLastChunk               (0),
-                         mpdManager                 (mpdManager),
                          stream                     (stream),
                          bufferedMicroSec           (0),
                          bufferedPercent            (0)

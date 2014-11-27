@@ -53,10 +53,12 @@ namespace dash
                 uint64_t                    getBpsLastChunk         () const;
                 int                         getBufferPercent        () const;
 
+            protected:
+                dash::mpd::MPDManager  *mpdManager;
+
             private:
                 int                     bpsAvg;
                 long                    bpsLastChunk;
-                dash::mpd::MPDManager  *mpdManager;
                 stream_t                *stream;
                 mtime_t                 bufferedMicroSec;
                 int                     bufferedPercent;

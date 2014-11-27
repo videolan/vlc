@@ -49,7 +49,6 @@ namespace dash
 
             private:
                 std::vector<mpd::ISegment *>        schedule;
-                dash::mpd::MPDManager              *mpdManager;
                 size_t                              count;
                 dash::mpd::Representation           *bestRepresentation;
 

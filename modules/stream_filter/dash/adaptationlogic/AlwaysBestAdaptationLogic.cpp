@@ -35,7 +35,6 @@ using namespace dash::mpd;
 AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (MPDManager *mpdManager, stream_t *stream) :
                            AbstractAdaptationLogic      (mpdManager, stream)
 {
-    this->mpdManager    = mpdManager;
     this->count         = 0;
     this->initSchedule();
 }

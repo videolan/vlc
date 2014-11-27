@@ -35,7 +35,6 @@ using namespace dash::mpd;
 
 RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPDManager *mpdManager, stream_t *stream) :
                           AbstractAdaptationLogic   (mpdManager, stream),
-                          mpdManager                (mpdManager),
                           count                     (0),
                           currentPeriod             (mpdManager->getFirstPeriod())
 {

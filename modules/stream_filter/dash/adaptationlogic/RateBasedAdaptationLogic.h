@@ -48,7 +48,6 @@ namespace dash
                 const dash::mpd::Representation *getCurrentRepresentation() const;
 
             private:
-                dash::mpd::MPDManager  *mpdManager;
                 size_t                  count;
                 dash::mpd::Period       *currentPeriod;
                 int                     width;
