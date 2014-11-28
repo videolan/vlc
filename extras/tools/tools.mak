@@ -207,7 +207,7 @@ gas: gas-preprocessor-$(GAS_VERSION).tar.gz
 
 .gas: gas
 	mkdir -p $(PREFIX)/bin
-	cp gas/gas-preprocessor.pl $(PREFIX)/build/bin/
+	cp gas/gas-preprocessor.pl $(PREFIX)/bin/
 	touch $@
 
 CLEAN_FILE += .gas
