@@ -834,8 +834,8 @@ static void SubtitleRegionToBounds(subpicture_t *subpicture,
 
             new_bounds.left = r->i_x;
             new_bounds.top = r->i_y;
-            new_bounds.right = r->fmt.i_width + r->i_x;
-            new_bounds.bottom = r->fmt.i_height + r->i_y;
+            new_bounds.right = r->fmt.i_visible_width + r->i_x;
+            new_bounds.bottom = r->fmt.i_visible_height + r->i_y;
             if (r == &subpicture->p_region[0])
                 *p_out_bounds = new_bounds;
             else {
