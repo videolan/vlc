@@ -56,11 +56,15 @@ namespace dash
                 virtual std::vector<ISegment*>          subSegments     () = 0;
                 virtual std::string                     toString        () const;
                 virtual Representation*                 getRepresentation() const = 0;
+                int                                     getClassId      () const;
+
+                static const int CLASSID_ISEGMENT = 0;
 
             protected:
                 size_t                  startByte;
                 size_t                  endByte;
                 std::string             debugName;
+                int                     classId;
 
                 class SegmentChunk : public dash::http::Chunk
                 {
@@ -85,6 +89,7 @@ namespace dash
                 virtual dash::http::Chunk* toChunk();
                 virtual std::vector<ISegment*> subSegments();
                 virtual Representation* getRepresentation() const;
+                static const int CLASSID_SEGMENT = 1;
 
             protected:
                 Representation* parentRepresentation;
@@ -97,12 +102,14 @@ namespace dash
         {
             public:
                 InitSegment( Representation *parent );
+                static const int CLASSID_INITSEGMENT = 2;
         };
 
         class IndexSegment : public Segment
         {
             public:
                 IndexSegment( Representation *parent );
+                static const int CLASSID_INDEXSEGMENT = 3;
 
             protected:
                 class IndexSegmentChunk : public SegmentChunk
@@ -122,6 +129,7 @@ namespace dash
                 virtual std::string getUrlSegment() const; /* impl */
                 virtual std::vector<ISegment*> subSegments();
                 virtual Representation* getRepresentation() const;
+                static const int CLASSID_SUBSEGMENT = 4;
             private:
                 Segment *parent;
         };

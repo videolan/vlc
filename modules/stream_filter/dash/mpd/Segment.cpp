@@ -41,6 +41,7 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     endByte    (0)
 {
     debugName = "Segment";
+    classId = CLASSID_ISEGMENT;
 }
 
 dash::http::Chunk * ISegment::getChunk()
@@ -89,6 +90,11 @@ std::string ISegment::toString() const
     return ss.str();
 }
 
+int ISegment::getClassId() const
+{
+    return classId;
+}
+
 ISegment::SegmentChunk::SegmentChunk(ISegment *segment_) :
     dash::http::Chunk()
 {
@@ -109,6 +115,7 @@ Segment::Segment(Representation *parent) :
         this->size = parent->getBandwidth() * parent->getSegmentInfo()->getDuration();
     else
         this->size = -1;
+    classId = CLASSID_SEGMENT;
 }
 
 Segment::~Segment()
@@ -184,12 +191,14 @@ InitSegment::InitSegment(Representation *parent) :
     Segment(parent)
 {
     debugName = "InitSegment";
+    classId = CLASSID_INITSEGMENT;
 }
 
 IndexSegment::IndexSegment(Representation *parent) :
     Segment(parent)
 {
     debugName = "IndexSegment";
+    classId = CLASSID_INDEXSEGMENT;
 }
 
 dash::http::Chunk * IndexSegment::getChunk()
@@ -212,6 +221,7 @@ SubSegment::SubSegment(Segment *main, size_t start, size_t end) :
 {
     setByteRange(start, end);
     debugName = "SubSegment";
+    classId = CLASSID_SUBSEGMENT;
 }
 
 std::string SubSegment::getUrlSegment() const
