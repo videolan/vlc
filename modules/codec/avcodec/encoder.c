@@ -631,7 +631,7 @@ int OpenEncoder( vlc_object_t *p_this )
 
         p_context->mb_decision = p_sys->i_hq;
 
-        if( p_sys->i_quality )
+        if( p_sys->i_quality && !p_enc->fmt_out.i_bitrate )
         {
             p_context->flags |= CODEC_FLAG_QSCALE;
             p_context->global_quality = p_sys->i_quality;
