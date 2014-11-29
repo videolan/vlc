@@ -633,6 +633,28 @@ void transcode_video_close( sout_stream_t *p_stream,
         filter_chain_Delete( id->p_uf_chain );
 }
 
+static picture_t* check_picture_drop( sout_stream_id_sys_t *id, picture_t *input_pic) {
+    /* If input pts lower than next_output_pts - output_frame_interval Then the
+     * future input frame should fit better and we can drop this one
+     *
+     * We check this here as we don't need to run user defined video filter at
+     * all for pictures we are going to drop anyway
+     *
+     * Duplication need is checked in OutputFrame */
+
+    if( ( input_pic->date ) <
+        ( date_Get( &id->next_output_pts ) - (mtime_t)id->i_output_frame_interval ) )
+    {
+#if 0
+        msg_Dbg( p_stream, "dropping frame (%"PRId64" + %"PRId64" vs %"PRId64")",
+                 p_pic->date, id->i_input_frame_interval, date_Get(&id->next_output_pts) );
+#endif
+        picture_Release( input_pic );
+        return NULL;
+    }
+    return input_pic;
+}
+
 static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_id_sys_t *id, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -861,32 +883,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             date_Set( &id->next_input_pts, p_pic->date );
         }
 
-        /*Input lipsync and drop check */
-        if( p_sys->b_master_sync )
-        {
-            /* If input pts lower than next_output_pts - output_frame_interval
-             * Then the future input frame should fit better and we can drop this one 
-             *
-             * We check this here as we don't need to run video filter at all for pictures
-             * we are going to drop anyway
-             *
-             * Duplication need is checked in OutputFrame */
-            if( ( p_pic->date ) <
-                ( date_Get( &id->next_output_pts ) - (mtime_t)id->i_output_frame_interval ) )
-            {
-#if 0
-                msg_Dbg( p_stream, "dropping frame (%"PRId64" + %"PRId64" vs %"PRId64")",
-                         p_pic->date, id->i_input_frame_interval, date_Get(&id->next_output_pts) );
-#endif
-                picture_Release( p_pic );
-                date_Increment( &id->next_input_pts, id->p_decoder->fmt_out.video.i_frame_rate_base );
-                continue;
-            }
-#if 0
-            msg_Dbg( p_stream, "not dropping frame");
-#endif
-
-        }
         /* Check input drift regardless, if it's more than 100ms from our approximation, we most likely have lost pictures
          * and are in danger to become out of sync, so better reset timestamps then */
         if( likely( p_pic->date != VLC_TS_INVALID ) )
@@ -901,7 +897,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 date_Set( &id->next_input_pts, p_pic->date );
             }
         }
-        date_Increment( &id->next_input_pts, id->p_decoder->fmt_out.video.i_frame_rate_base );
 
         /* Run the filter and output chains; first with the picture,
          * and then with NULL as many times as we need until they
@@ -913,6 +908,12 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             /* Run filter chain */
             if( id->p_f_chain )
                 p_filtered_pic = filter_chain_VideoFilter( id->p_f_chain, p_filtered_pic );
+            if( !p_filtered_pic )
+                break;
+
+            /*drop check. We do it here because we want to feed all frames to deinterlacer */
+            if( p_sys->b_master_sync )
+                p_filtered_pic = check_picture_drop( id, p_filtered_pic );
             if( !p_filtered_pic )
                 break;
 
@@ -932,6 +933,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
             p_pic = NULL;
         }
+        date_Increment( &id->next_input_pts, id->p_decoder->fmt_out.video.i_frame_rate_base );
     }
 
     if( p_sys->i_threads >= 1 )
