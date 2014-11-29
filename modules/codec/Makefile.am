@@ -54,7 +54,11 @@ liblpcm_plugin_la_SOURCES = codec/lpcm.c
 codec_LTLIBRARIES += liblpcm_plugin.la
 
 libmpeg_audio_plugin_la_SOURCES = codec/mpeg_audio.c
+libmpeg_audio_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 codec_LTLIBRARIES += libmpeg_audio_plugin.la
+if HAVE_MAD
+libmpeg_audio_plugin_la_CPPFLAGS += -DHAVE_MPGA_FILTER
+endif
 
 libuleaddvaudio_plugin_la_SOURCES = codec/uleaddvaudio.c
 codec_LTLIBRARIES += libuleaddvaudio_plugin.la
