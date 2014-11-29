@@ -404,7 +404,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_record setTitle: _NS("Record")];
     [o_mi_rate setView: o_mi_rate_view];
     [o_mi_rate_lbl setStringValue: _NS("Playback Speed")];
-    [o_mi_rate_lbl_gray setStringValue: _NS("Playback Speed")];
     [o_mi_rate_slower_lbl setStringValue: _NS("Slower")];
     [o_mi_rate_normal_lbl setStringValue: _NS("Normal")];
     [o_mi_rate_faster_lbl setStringValue: _NS("Faster")];
