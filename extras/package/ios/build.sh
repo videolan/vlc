@@ -244,6 +244,7 @@ fi
     --disable-fontconfig \
     --disable-gpg-error \
     --disable-lua \
+    --disable-protobuf \
     --enable-vpx \
     --enable-taglib > ${out}
 
