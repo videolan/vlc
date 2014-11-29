@@ -137,6 +137,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
         msg_Dbg(VLCIntf, "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
         [o_mi_rate_fld setAlignment: NSLeftTextAlignment];
     }
+
+    [self setRateControlsEnabled:NO];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
@@ -700,13 +702,15 @@ static VLCMainMenu *_o_sharedInstance = nil;
     int i = [[VLCCoreInteraction sharedInstance] playbackRate];
     double speed =  pow(2, (double)i / 17);
     [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
-    if (b_enabled) {
-        [o_mi_rate_lbl setHidden: NO];
-        [o_mi_rate_lbl_gray setHidden: YES];
-    } else {
-        [o_mi_rate_lbl setHidden: YES];
-        [o_mi_rate_lbl_gray setHidden: NO];
-    }
+
+    NSColor *o_color = b_enabled ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
+
+    [o_mi_rate_lbl setTextColor:o_color];
+    [o_mi_rate_slower_lbl setTextColor:o_color];
+    [o_mi_rate_normal_lbl setTextColor:o_color];
+    [o_mi_rate_faster_lbl setTextColor:o_color];
+    [o_mi_rate_fld setTextColor:o_color];
+
     [self setSubtitleMenuEnabled: b_enabled];
     [o_pool release];
 }

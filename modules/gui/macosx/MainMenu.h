@@ -98,7 +98,6 @@
     IBOutlet NSMenuItem * o_mi_rate;
     IBOutlet NSView * o_mi_rate_view;
     IBOutlet id o_mi_rate_lbl;
-    IBOutlet id o_mi_rate_lbl_gray;
     IBOutlet id o_mi_rate_slower_lbl;
     IBOutlet id o_mi_rate_normal_lbl;
     IBOutlet id o_mi_rate_faster_lbl;
