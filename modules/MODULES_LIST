@@ -134,6 +134,7 @@ $Id$
  * float_mixer: Precise float audio mixer
  * fluidsynth: Software MIDI synthetizer using libfluidsynth
  * folder: folder meta data and art finder
+ * fps: convert picture rate
  * freetype: Utility to put text on video using freetype2
  * freeze: picture freezing video filter
  * ftp: FTP Network access module
