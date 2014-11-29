@@ -101,6 +101,8 @@
     IBOutlet id o_save_accessory_text;
 
     IBOutlet id o_playlist_header;
+
+    int currentResumeTimeout;
 }
 
 - (void)searchfieldChanged:(NSNotification *)o_notification;
