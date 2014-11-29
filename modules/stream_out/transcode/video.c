@@ -879,6 +879,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                          p_pic->date, id->i_input_frame_interval, date_Get(&id->next_output_pts) );
 #endif
                 picture_Release( p_pic );
+                date_Increment( &id->next_input_pts, id->p_decoder->fmt_out.video.i_frame_rate_base );
                 continue;
             }
 #if 0
