@@ -58,6 +58,7 @@ VLCStatsView::VLCStatsView( QWidget *parent ) : QGraphicsView( parent )
     reset();
 
     QPen linepen( Qt::DotLine );
+    linepen.setCosmetic( true );
     linepen.setBrush( QBrush( QColor( 33, 33, 33 ) ) );
     for ( int i=0; i<3; i++ )
         rulers[i] = viewScene->addLine( QLineF(), linepen );
