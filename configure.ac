@@ -2211,37 +2211,6 @@ then
     VLC_ADD_LIBS([mpgatofixed32],[-L${with_mad}/lib])
   fi
 
-  AC_ARG_WITH(mad-tree,
-    [  --with-mad-tree=PATH    mad tree for static linking],[],[])
-  if test "${with_mad_tree}" != "no" -a -n "${with_mad_tree}"
-  then
-    real_mad_tree="`cd ${with_mad_tree} 2>/dev/null && pwd`"
-    if test -z "${real_mad_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_mad_tree} directory does not exist])
-    fi
-    dnl  Use a custom libmad
-    AC_MSG_CHECKING(for mad.h in ${real_mad_tree})
-    if test -f ${real_mad_tree}/mad.h
-    then
-      AC_MSG_RESULT(yes)
-      VLC_ADD_CPPFLAGS([mpgatofixed32],[-I${real_mad_tree}])
-      VLC_ADD_LIBS([mpgatofixed32],[-L${real_mad_tree}/.libs])
-      VLC_SAVE_FLAGS
-      LDFLAGS="${LDFLAGS} ${LIBS_mpgatofixed32}"
-      AC_CHECK_LIB(mad, mad_bit_init, [
-        VLC_ADD_PLUGIN([mpgatofixed32])
-        VLC_ADD_LIBS([mpgatofixed32],[-lmad])
-        ],[ AC_MSG_ERROR([the specified tree has not been compiled ])
-      ],[])
-      VLC_RESTORE_FLAGS
-    else
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([the specified tree does not have mad.h])
-    fi
-  else
     VLC_SAVE_FLAGS
     CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_mpgatofixed32}"
     LDFLAGS="${LDFLAGS} ${LIBS_mpgatofixed32}"
@@ -2252,7 +2221,6 @@ then
       VLC_ADD_LIBS([mpgatofixed32],[-lmad])],
       [ AC_MSG_ERROR([Cannot find libmad library...]) ])
     VLC_RESTORE_FLAGS
-  fi
 fi
 
 
@@ -2537,27 +2505,6 @@ dnl
 AC_ARG_ENABLE(faad,
 [  --enable-faad           faad codec (default auto)])
 if test "${enable_faad}" != "no"; then
-  AC_ARG_WITH(faad-tree,  [  --with-faad-tree=PATH   faad tree for static linking])
-  if test -n "${with_faad_tree}"; then
-    AC_MSG_CHECKING(for libfaad.a in ${with_faad_tree})
-    real_faad_tree="`cd ${with_faad_tree} 2>/dev/null && pwd`"
-    if test -z "${real_faad_tree}"; then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_faad_tree}])
-    fi
-    if test -f "${real_faad_tree}/libfaad/.libs/libfaad.a"; then
-      dnl  Use the custom faad
-      AC_MSG_RESULT(${real_faad_tree}/libfaad/.libs/libfaad.a)
-      VLC_ADD_PLUGIN([faad])
-      VLC_ADD_LIBS([faad],[${real_faad_tree}/libfaad/.libs/libfaad.a])
-      VLC_ADD_CPPFLAGS([faad],[-I${real_faad_tree}/include])
-    else
-      dnl  The given libfaad wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_faad_tree}/libfaad/.libs/libfaad.a, make sure you compiled libfaad in ${with_faad_tree}])
-    fi
-  else
     VLC_SAVE_FLAGS
     CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_faad}"
     LDFLAGS="${LDFLAGS} ${LIBS_faad}"
@@ -2575,7 +2522,6 @@ if test "${enable_faad}" != "no"; then
         [ AC_MSG_ERROR([Cannot find development headers for libfaad...]) ],
         [ AC_MSG_WARN([Cannot find development headers for libfaad...]) ]) ])
     VLC_RESTORE_FLAGS
-  fi
 fi
 
 dnl
@@ -2635,43 +2581,6 @@ if test "${enable_a52}" != "no"
 then
   AC_ARG_WITH(a52,
     [  --with-a52=PATH         a52 headers and libraries])
-  AC_ARG_WITH(a52-tree,
-    [  --with-a52-tree=PATH    a52dec tree for static linking ],[],[])
-  if test "${with_a52_tree}" != "no" -a -n "${with_a52_tree}"
-  then
-    real_a52_tree="`cd ${with_a52_tree} 2>/dev/null && pwd`"
-    if test -z "${real_a52_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_a52_tree} directory does not exist])
-    fi
-    dnl  Use a custom a52dec
-    AC_MSG_CHECKING(for a52.h in ${real_a52_tree}/include)
-    if test -f ${real_a52_tree}/include/a52.h
-    then
-      AC_MSG_RESULT(yes)
-      VLC_ADD_CPPFLAGS([a52tofloat32],[-I${real_a52_tree}])
-      VLC_ADD_LIBS([a52tofloat32],[-L${real_a52_tree}/liba52/.libs])
-      VLC_SAVE_FLAGS
-      LDFLAGS="${LDFLAGS} ${LIBS_a52tofloat32}"
-      AC_CHECK_LIB(a52, a52_free, [
-        VLC_ADD_PLUGIN([a52tofloat32])
-        VLC_ADD_CPPFLAGS([a52tofloat32],[-DUSE_A52DEC_TREE])
-        VLC_ADD_LIBS([a52tofloat32],[-la52])
-        ],[
-        if test -f ${real_a52_tree}/liba52/.libs/liba52.a
-        then
-          AC_MSG_ERROR([make sure you have at least a52dec-0.7.3 ($real_a52_tree)])
-        else
-          AC_MSG_ERROR([the specified tree has not been compiled])
-        fi
-      ])
-    else
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([the specified tree does not have a52.h])
-    fi
-  else
     if test -z "${with_a52}"
     then
       LDFLAGS_test=""
@@ -2695,7 +2604,6 @@ then
       AC_MSG_ERROR([Could not find liba52 on your system: you may get it from http://liba52.sf.net/. Alternatively you can use --disable-a52 to disable the a52 plugin.])
     ])
     VLC_RESTORE_FLAGS
-  fi
 fi
 
 dnl
@@ -2797,27 +2705,6 @@ dnl
 AC_ARG_ENABLE(x262,
   [  --enable-x262           H262 encoding support with static libx262 (default disabled)])
 if test "${enable_x262}" != "no"; then
-AC_ARG_WITH(x262-tree,
-  [ --with-x262-tree=PATH      H262 encoding module with libx262 (static linking)],[],[])
-  if test "${with_x262_tree}" != "no" -a -n "${with_x262_tree}"
-  then
-    real_x262_tree="̧`cd ${with_x262_tree} 2>/dev/null && pwd`"
-    if test -z "${real_x262_tree}"
-    then
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_x262_tree} directory does not exist])
-    fi
-    AC_MSG_CHECKING(for x262.h in ${real_x262_tree})
-    if test -f ${with_x262_tree}/x262_config.h
-    then
-      VLC_ADD_PLUGIN([x262])
-      VLC_ADD_CFLAGS([x262],[-I${with_x262_tree}])
-      VLC_ADD_LIBS([x262],[-L${with_x262_tree} -lm -lpthread -lx262])
-    else
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_x262_tree} doesnt have x262_config.h])
-    fi
-  else
     PKG_CHECK_MODULES(X262, x262, [
         VLC_ADD_PLUGIN([x262])
         VLC_ADD_LDFLAGS([x262],[${X262_LIBS}])
@@ -2833,7 +2720,6 @@ AC_ARG_WITH(x262-tree,
         AC_MSG_ERROR([x262 module doesn't work without staticly compiled libx262.a])
        fi
     ])
-  fi
 fi
 
 dnl x265 encoder
@@ -2845,35 +2731,6 @@ dnl
 AC_ARG_ENABLE(x26410b,
   [  --enable-x26410b           H264 10-bit encoding support with static libx264 (default disabled)])
 if test "${enable_x26410b}" != "no"; then
-AC_ARG_WITH(x26410b-tree,
-  [ --with-x26410b-tree=PATH      H264 10-bit encoding module with libx264 (static linking)],[],[])
-  if test "${with_x26410b_tree}" != "no" -a -n "${with_x26410b_tree}"
-  then
-    real_x26410b_tree="̧`cd ${with_x26410b_tree} 2>/dev/null && pwd`"
-    if test -z "${real_x26410b_tree}"
-    then
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_x26410b_tree} directory does not exist])
-    fi
-    AC_MSG_CHECKING(for x264.h in ${real_x26410b_tree})
-    if test -f ${with_x26410b_tree}/x264_config.h
-    then
-      AC_MSG_RESULT(yes)
-      AC_MSG_CHECKING(for 10-bit build of x264)
-      if grep -q "BIT_DEPTH.*10"  ${with_x26410b_tree}/x264_config.h ;then
-        AC_MSG_RESULT(yes)
-        VLC_ADD_PLUGIN([x26410b])
-        VLC_ADD_CFLAGS([x26410b],[-I${with_x26410b_tree}])
-        VLC_ADD_LIBS([x26410b],[-L${with_x26410b_tree} -lm -lpthread -lx264])
-      else
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([${with_x26410b_tree} isnt build 10-bit])
-      fi
-    else
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_x26410b_tree} doesnt have x264_config.h])
-    fi
-  else
     PKG_CHECK_MODULES(X26410B, x26410b, [
         VLC_ADD_PLUGIN([x26410b])
         VLC_ADD_LIBS([x26410b],[${X26410B_LIBS}])
@@ -2889,7 +2746,6 @@ AC_ARG_WITH(x26410b-tree,
         AC_MSG_ERROR([x26410b module doesn't work without staticly compiled libx264.a])
        fi
     ])
-  fi
 fi
 
 
@@ -2899,39 +2755,6 @@ dnl
 AC_ARG_ENABLE(x264,
   [  --enable-x264           H264 encoding support with libx264 (default enabled)])
 if test "${enable_x264}" != "no"; then
-  AC_ARG_WITH(x264-tree,
-    [  --with-x264-tree=PATH   x264 tree for static linking ],[],[])
-  if test "${with_x264_tree}" != "no" -a -n "${with_x264_tree}"
-  then
-    real_x264_tree="`cd ${with_x264_tree} 2>/dev/null && pwd`"
-    if test -z "${real_x264_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_x264_tree} directory does not exist])
-    fi
-    dnl  Use a custom libx264
-    AC_MSG_CHECKING(for x264.h in ${real_x264_tree})
-    if test -f ${real_x264_tree}/x264.h
-    then
-      AC_MSG_RESULT(yes)
-      VLC_ADD_CPPFLAGS([x264],[-I${real_x264_tree}])
-      VLC_ADD_LIBS([x264],[-L${real_x264_tree}])
-      PKG_CHECK_MODULES(X264,x264, [
-        VLC_ADD_PLUGIN([x264])
-        VLC_ADD_LIBS([x264],[${X264_LIBS}])
-        VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
-        if echo ${X264_LIBS} |grep -q 'pthreadGC2'; then
-          VLC_ADD_CFLAGS([x264], [-DPTW32_STATIC_LIB])
-        fi
-      ],[
-        AC_MSG_ERROR([the specified tree has not been compiled])
-      ])
-    else
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([the specified tree does not have x264.h])
-    fi
-  else
       PKG_CHECK_MODULES(X264,x264 >= 0.86, [
         VLC_ADD_PLUGIN([x264])
         VLC_ADD_LIBS([x264],[${X264_LIBS}])
@@ -2949,7 +2772,6 @@ if test "${enable_x264}" != "no"; then
             AC_MSG_ERROR([${X264_PKG_ERRORS}: you may get it from http://www.videolan.org/x264.html])
           fi
       ])
-  fi
 fi
 
 dnl
