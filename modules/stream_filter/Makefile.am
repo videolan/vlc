@@ -131,7 +131,7 @@ stream_filter_LTLIBRARIES += librecord_plugin.la
 
 libaribcam_plugin_la_SOURCES = stream_filter/aribcam.c
 libaribcam_plugin_la_CFLAGS = $(AM_CFLAGS) $(ARIBB25_CFLAGS)
-libaribcam_plugin_la_LDFLAGS = $(ARIBB25_LDFLAGS) -rpath '$(stream_filterdir)'
+libaribcam_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(ARIBB25_LDFLAGS) -rpath '$(stream_filterdir)'
 libaribcam_plugin_la_LIBADD = $(ARIBB25_LIBS)
 stream_filter_LTLIBRARIES += $(LTLIBaribcam)
 EXTRA_LTLIBRARIES += libaribcam_plugin.la
