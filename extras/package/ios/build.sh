@@ -245,6 +245,8 @@ fi
     --disable-gpg-error \
     --disable-lua \
     --disable-protobuf \
+    --disable-aribb24 \
+    --disable-aribb25 \
     --enable-vpx \
     --enable-taglib > ${out}
 
