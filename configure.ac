@@ -2199,29 +2199,40 @@ fi
 dnl
 dnl  mad plugin
 dnl
+have_mad="no"
+MAD_CFLAGS=""
+MAD_LIBS=""
+
+AC_ARG_WITH(mad, [  --with-mad=PATH         path to libmad], [
+  enable_mad="yes"
+], [
+  with_mad="no"
+])
+AS_IF([test "${with_mad}" != "no"], [
+  MAD_CFLAGS="-I${with_mad}/include"
+  MAD_LIBS="-L${with_mad}/lib"
+])
+
 AC_ARG_ENABLE(mad,
   [  --enable-mad            libmad module (default enabled)])
-if test "${enable_mad}" != "no"
-then
-  AC_ARG_WITH(mad,
-    [  --with-mad=PATH         path to libmad],[],[])
-  if test "${with_mad}" != "no" -a -n "${with_mad}"
-  then
-    VLC_ADD_CPPFLAGS([mpgatofixed32],[-I${with_mad}/include])
-    VLC_ADD_LIBS([mpgatofixed32],[-L${with_mad}/lib])
-  fi
-
-    VLC_SAVE_FLAGS
-    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_mpgatofixed32}"
-    LDFLAGS="${LDFLAGS} ${LIBS_mpgatofixed32}"
-    AC_CHECK_HEADERS(mad.h, ,
-      [ AC_MSG_ERROR([Could not find libmad on your system: you may get it from http://www.underbit.com/products/mad/. Alternatively you can use --disable-mad to disable the mad plugin.]) ])
+AS_IF([test "${enable_mad}" != "no"], [
+  VLC_SAVE_FLAGS
+  CPPFLAGS="${CPPFLAGS} ${MAD_CFLAGS}"
+  LDFLAGS="${LDFLAGS} ${MAD_LIBS}"
+  AC_CHECK_HEADERS(mad.h, [
     AC_CHECK_LIB(mad, mad_bit_init, [
-      VLC_ADD_PLUGIN([mpgatofixed32])
-      VLC_ADD_LIBS([mpgatofixed32],[-lmad])],
-      [ AC_MSG_ERROR([Cannot find libmad library...]) ])
-    VLC_RESTORE_FLAGS
-fi
+      have_mad="yes"
+      MAD_LIBS="${MAD_LIBS} -lmad"
+    ])
+  ])
+  VLC_RESTORE_FLAGS
+  AS_IF([test -n "$enable_mad" -a "${have_mad}" = "no"], [
+    AC_MSG_ERROR([Could not find libmad. Install it or pass --disable-mad to disable it.])
+  ])
+])
+AC_SUBST(MAD_CFLAGS)
+AC_SUBST(MAD_LIBS)
+AM_CONDITIONAL([HAVE_MAD], [test "${have_mad}" = "yes"])
 
 
 AC_ARG_ENABLE(merge-ffmpeg,

@@ -202,6 +202,7 @@ $Id$
  * lua: Lua scripting inteface
  * macosx: Video output, and interface module for Mac OS X
  * macosx_dialog_provider: Minimal Dialog Provider for Mac OS X
+ * mad: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  * magnify: zoom video filter
  * marq: Overlays a marquee on the video
  * mediacodec: Android Jelly Bean MediaCodec decoder module
@@ -224,7 +225,6 @@ $Id$
  * mp4: MP4 file input module
  * mpc: Musepack decoder
  * mpeg_audio: MPEG audio parser/packetizer
- * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  * mpgv: MPEG-I/II Video demuxer
  * mtp: MTP interface module
  * mux_asf: ASF muxer
