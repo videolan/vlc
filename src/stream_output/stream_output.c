@@ -559,7 +559,14 @@ int sout_MuxGetStream( sout_mux_t *p_mux, unsigned i_blocks, mtime_t *pi_dts )
         block_t *p_data;
 
         if( block_FifoCount( p_input->p_fifo ) < i_blocks )
+        {
+            if( p_input->p_fmt->i_cat != SPU_ES )
+            {
+                return -1;
+            }
+            /* FIXME: SPU muxing */
             continue;
+        }
 
         p_data = block_FifoShow( p_input->p_fifo );
         if( i_stream < 0 || p_data->i_dts < i_dts )
