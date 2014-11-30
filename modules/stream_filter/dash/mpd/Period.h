@@ -28,6 +28,7 @@
 #include <string>
 
 #include "mpd/AdaptationSet.h"
+#include "Streams.hpp"
 
 namespace dash
 {
@@ -40,6 +41,8 @@ namespace dash
                 virtual ~Period ();
 
                 const std::vector<AdaptationSet *>& getAdaptationSets   () const;
+                const std::vector<AdaptationSet *>  getAdaptationSets   (Streams::Type) const;
+                AdaptationSet *                     getAdaptationSet    (Streams::Type) const;
                 void                                addAdaptationSet    (AdaptationSet *AdaptationSet);
 
             private:

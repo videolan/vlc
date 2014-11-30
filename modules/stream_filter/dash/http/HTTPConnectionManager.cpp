@@ -38,6 +38,7 @@ using namespace dash::logic;
 const uint64_t  HTTPConnectionManager::CHUNKDEFAULTBITRATE    = 1;
 
 HTTPConnectionManager::HTTPConnectionManager    (IAdaptationLogic *adaptationLogic, stream_t *stream) :
+                       currentChunk             (NULL),
                        adaptationLogic          (adaptationLogic),
                        stream                   (stream),
                        chunkCount               (0),
@@ -58,23 +59,25 @@ HTTPConnectionManager::~HTTPConnectionManager   ()
 void                                HTTPConnectionManager::closeAllConnections      ()
 {
     vlc_delete_all(this->connectionPool);
-    vlc_delete_all(this->downloadQueue);
+    for(int i=0; i<Streams::count; i++)
+        vlc_delete_all(downloadQueue[i]);
+    delete currentChunk;
 }
 
-ssize_t HTTPConnectionManager::read(block_t **pp_block)
+ssize_t HTTPConnectionManager::read(Streams::Type type, block_t **pp_block)
 {
     Chunk *chunk;
 
-    if(downloadQueue.empty())
+    if(downloadQueue[type].empty())
     {
-        chunk = adaptationLogic->getNextChunk();
+        chunk = adaptationLogic->getNextChunk(type);
         if(!connectChunk(chunk))
             return -1;
         else
-            downloadQueue.push_back(chunk);
+            downloadQueue[type].push_back(chunk);
     }
 
-    chunk = downloadQueue.front();
+    chunk = downloadQueue[type].front();
 
     if(chunk->getBytesRead() == 0)
     {
@@ -106,9 +109,9 @@ ssize_t HTTPConnectionManager::read(block_t **pp_block)
         this->timeChunk      = 0;
 
         delete(chunk);
-        downloadQueue.pop_front();
+        downloadQueue[type].pop_front();
 
-        return read(pp_block);
+        return read(type, pp_block);
     }
     else
     {
@@ -118,7 +121,7 @@ ssize_t HTTPConnectionManager::read(block_t **pp_block)
         {
             chunk->onDownload(block->p_buffer, block->i_buffer);
             delete chunk;
-            downloadQueue.pop_front();
+            downloadQueue[type].pop_front();
         }
     }
 

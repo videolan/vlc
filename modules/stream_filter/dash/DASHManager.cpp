@@ -99,7 +99,7 @@ mtime_t DASHManager::getDuration() const
     }
     else
     {
-        const Representation *rep = adaptationLogic->getCurrentRepresentation();
+        const Representation *rep = adaptationLogic->getCurrentRepresentation(Streams::VIDEO);
         if ( !rep )
             return 0;
         else

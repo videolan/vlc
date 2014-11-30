@@ -1,5 +1,5 @@
 /*
- * Representationselectors.hpp
+ * StreamsType.hpp
  *****************************************************************************
  * Copyright (C) 2014 - VideoLAN authors
  *
@@ -17,33 +17,23 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef REPRESENTATIONSELECTORS_HPP
-#define REPRESENTATIONSELECTORS_HPP
-#include "mpd/Representation.h"
-#include "mpd/Period.h"
-
-using namespace dash::mpd;
+#ifndef STREAMSTYPE_HPP
+#define STREAMSTYPE_HPP
 
 namespace dash
 {
-    namespace logic
+    namespace Streams
     {
-
-        class RepresentationSelector
+        enum Type
         {
-        public:
-            RepresentationSelector();
-            virtual ~RepresentationSelector() {}
-            virtual Representation * select(Period *period, Streams::Type) const;
-            virtual Representation * select(Period *period, Streams::Type, uint64_t bitrate) const;
-            virtual Representation * select(Period *period, Streams::Type, uint64_t bitrate,
-                                            int width, int height) const;
-        protected:
-            virtual Representation * select(std::vector<Representation *>&reps,
-                                            uint64_t minbitrate, uint64_t maxbitrate) const;
+            UNKNOWN = 0,
+            VIDEO,
+            AUDIO,
+            APPLICATION
         };
 
+        static const int count = APPLICATION + 1;
     }
 }
 
-#endif // REPRESENTATIONSELECTORS_HPP
+#endif

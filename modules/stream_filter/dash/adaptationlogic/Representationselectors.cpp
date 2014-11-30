@@ -26,18 +26,16 @@ RepresentationSelector::RepresentationSelector()
 {
 }
 
-Representation * RepresentationSelector::select(Period *period) const
+Representation * RepresentationSelector::select(Period *period, Streams::Type type) const
 {
-    return select(period, std::numeric_limits<uint64_t>::max());
+    return select(period, type, std::numeric_limits<uint64_t>::max());
 }
-
-Representation * RepresentationSelector::select(Period *period, uint64_t bitrate) const
+Representation * RepresentationSelector::select(Period *period, Streams::Type type, uint64_t bitrate) const
 {
     if (period == NULL)
         return NULL;
 
-    std::vector<AdaptationSet *> adaptSets = period->getAdaptationSets();
-
+    std::vector<AdaptationSet *> adaptSets = period->getAdaptationSets(type);
     Representation  *best = NULL;
 
     std::vector<AdaptationSet *>::const_iterator adaptIt;
@@ -55,7 +53,7 @@ Representation * RepresentationSelector::select(Period *period, uint64_t bitrate
     return best;
 }
 
-Representation * RepresentationSelector::select(Period *period, uint64_t bitrate,
+Representation * RepresentationSelector::select(Period *period, Streams::Type type, uint64_t bitrate,
                                                 int width, int height) const
 {
     if(period == NULL)
@@ -64,7 +62,7 @@ Representation * RepresentationSelector::select(Period *period, uint64_t bitrate
     std::vector<Representation *> resMatchReps;
 
     /* subset matching WxH */
-    std::vector<AdaptationSet *> adaptSets = period->getAdaptationSets();
+    std::vector<AdaptationSet *> adaptSets = period->getAdaptationSets(type);
     std::vector<AdaptationSet *>::const_iterator adaptIt;
     for(adaptIt=adaptSets.begin(); adaptIt!=adaptSets.end(); adaptIt++)
     {
@@ -78,7 +76,7 @@ Representation * RepresentationSelector::select(Period *period, uint64_t bitrate
     }
 
     if(resMatchReps.empty())
-        return select(period, bitrate);
+        return select(period, type, bitrate);
     else
         return select(resMatchReps, 0, bitrate);
 }

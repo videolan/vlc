@@ -31,8 +31,8 @@ namespace dash
             public:
                 AlwaysLowestAdaptationLogic(dash::mpd::MPDManager *mpdManager);
 
-                virtual dash::http::Chunk*                  getNextChunk            ();
-                virtual const dash::mpd::Representation*    getCurrentRepresentation() const;
+                virtual dash::http::Chunk*                  getNextChunk            (Streams::Type);
+                virtual const dash::mpd::Representation*    getCurrentRepresentation(Streams::Type) const;
 
             private:
                 dash::mpd::Period *currentPeriod;

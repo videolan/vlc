@@ -36,6 +36,7 @@
 
 #include "http/PersistentConnection.h"
 #include "adaptationlogic/IAdaptationLogic.h"
+#include "Streams.hpp"
 
 namespace dash
 {
@@ -48,13 +49,14 @@ namespace dash
                 virtual ~HTTPConnectionManager  ();
 
                 void    closeAllConnections ();
-                ssize_t read                (block_t **);
+                ssize_t read                (Streams::Type, block_t **);
                 void    attach              (dash::logic::IDownloadRateObserver *observer);
                 void    notify              ();
 
             private:
                 std::vector<dash::logic::IDownloadRateObserver *>   rateObservers;
-                std::deque<Chunk *>                                 downloadQueue;
+                std::deque<Chunk *>                                 downloadQueue[Streams::count];
+                Chunk                                               *currentChunk;
                 std::vector<PersistentConnection *>                 connectionPool;
                 logic::IAdaptationLogic                             *adaptationLogic;
                 stream_t                                            *stream;

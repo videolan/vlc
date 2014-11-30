@@ -1,5 +1,5 @@
 /*
- * Streams.hpp
+ * Streams.cpp
  *****************************************************************************
  * Copyright (C) 2014 - VideoLAN authors
  *
@@ -17,30 +17,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef STREAM_HPP
-#define STREAM_HPP
+#include "Streams.hpp"
 
-#include <string>
-#include "StreamsType.hpp"
+using namespace dash::Streams;
 
-namespace dash
+Stream::Stream(const std::string &mime)
 {
-    namespace Streams
-    {
-        class AbstractStreamOutput;
-
-        class Stream
-        {
-            public:
-                Stream(const std::string &mime);
-                Stream(const Type);
-                bool operator==(const Stream &) const;
-                static Type mimeToType(const std::string &mime);
-
-            private:
-                Type type;
-        };
-
-    }
+    type = mimeToType(mime);
 }
-#endif // STREAMS_HPP
+
+Stream::Stream(const Type type)
+{
+    this->type = type;
+}
+
+Type Stream::mimeToType(const std::string &mime)
+{
+    Type mimetype;
+    if (mime == "video/mp4")
+        mimetype = Streams::VIDEO;
+    else if (mime == "audio/mp4")
+        mimetype = Streams::AUDIO;
+    else if (mime == "application/mp4")
+        mimetype = Streams::APPLICATION;
+    else /* unknown of unsupported */
+        mimetype = Streams::UNKNOWN;
+    return mimetype;
+}
+
+bool Stream::operator ==(const Stream &stream) const
+{
+    return stream.type == type;
+}

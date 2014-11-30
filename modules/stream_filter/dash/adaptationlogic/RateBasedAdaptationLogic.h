@@ -41,8 +41,8 @@ namespace dash
             public:
                 RateBasedAdaptationLogic            (dash::mpd::MPDManager *mpdManager);
 
-                dash::http::Chunk*      getNextChunk();
-                const dash::mpd::Representation *getCurrentRepresentation() const;
+                virtual dash::http::Chunk*      getNextChunk(Streams::Type);
+                const dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;
 
             private:
                 size_t                  count;

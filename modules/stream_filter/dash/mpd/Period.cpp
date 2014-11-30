@@ -47,8 +47,31 @@ const std::vector<AdaptationSet*>&  Period::getAdaptationSets() const
     return this->adaptationSets;
 }
 
+const std::vector<AdaptationSet*>   Period::getAdaptationSets(Streams::Type type) const
+{
+    std::vector<AdaptationSet*> list;
+    std::vector<AdaptationSet*>::const_iterator it;
+    for(it = adaptationSets.begin(); it!= adaptationSets.end(); it++)
+    {
+        if( Streams::Stream::mimeToType((*it)->getMimeType()) == type )
+            list.push_back(*it);
+    }
+    return list;
+}
+
 void                                Period::addAdaptationSet(AdaptationSet *adaptationSet)
 {
     if ( adaptationSet != NULL )
         this->adaptationSets.push_back(adaptationSet);
+}
+
+AdaptationSet * Period::getAdaptationSet(Streams::Type type) const
+{
+    std::vector<AdaptationSet *>::const_iterator it;
+    for(it = adaptationSets.begin(); it != adaptationSets.end(); it++)
+    {
+        if ( Streams::Stream::mimeToType((*it)->getMimeType()) == type )
+            return *it;
+    }
+    return NULL;
 }

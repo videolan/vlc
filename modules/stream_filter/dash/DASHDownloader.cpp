@@ -63,7 +63,7 @@ void*       DASHDownloader::download    (void *thread_sys)
     do
     {
         block_t *block = NULL;
-        ret = conManager->read(&block);
+        ret = conManager->read(Streams::VIDEO, &block);
         if(ret > 0)
             buffer->put(block);
     }while(ret > 0 && !buffer->getEOF());

@@ -45,12 +45,12 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPDManager *mpdManager) :
     height = var_InheritInteger(mpdManager->getMPD()->getVLCObject(), "dash-prefheight");
 }
 
-Chunk*  RateBasedAdaptationLogic::getNextChunk()
+Chunk*  RateBasedAdaptationLogic::getNextChunk(Streams::Type type)
 {
     if(this->currentPeriod == NULL)
         return NULL;
 
-    const Representation *rep = getCurrentRepresentation();
+    const Representation *rep = getCurrentRepresentation(type);
     if (!rep)
         return NULL;
 
@@ -60,7 +60,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk()
     {
         this->currentPeriod = this->mpdManager->getNextPeriod(this->currentPeriod);
         this->count = 0;
-        return this->getNextChunk();
+        return getNextChunk(type);
     }
 
     if ( segments.size() > this->count )
@@ -76,7 +76,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk()
     return NULL;
 }
 
-const Representation *RateBasedAdaptationLogic::getCurrentRepresentation() const
+const Representation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
 {
     if(currentPeriod == NULL)
         return NULL;
@@ -86,10 +86,10 @@ const Representation *RateBasedAdaptationLogic::getCurrentRepresentation() const
         bitrate = 0;
 
     RepresentationSelector selector;
-    Representation *rep = selector.select(currentPeriod, bitrate, width, height);
+    Representation *rep = selector.select(currentPeriod, type, bitrate, width, height);
     if ( rep == NULL )
     {
-        rep = selector.select(currentPeriod);
+        rep = selector.select(currentPeriod, type);
         if ( rep == NULL )
             return NULL;
     }

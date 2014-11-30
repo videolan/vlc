@@ -31,12 +31,12 @@ AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic(dash::mpd::MPDManager *
 {
 }
 
-Chunk*  AlwaysLowestAdaptationLogic::getNextChunk()
+Chunk*  AlwaysLowestAdaptationLogic::getNextChunk(Streams::Type type)
 {
     if(!currentPeriod)
         return NULL;
 
-    const Representation *rep = getCurrentRepresentation();
+    const Representation *rep = getCurrentRepresentation(type);
     if ( rep == NULL )
             return NULL;
 
@@ -45,7 +45,7 @@ Chunk*  AlwaysLowestAdaptationLogic::getNextChunk()
     {
         currentPeriod = mpdManager->getNextPeriod(currentPeriod);
         count = 0;
-        return getNextChunk();
+        return getNextChunk(type);
     }
 
     if ( segments.size() > count )
@@ -61,8 +61,8 @@ Chunk*  AlwaysLowestAdaptationLogic::getNextChunk()
     return NULL;
 }
 
-const Representation *AlwaysLowestAdaptationLogic::getCurrentRepresentation() const
+const Representation *AlwaysLowestAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
 {
     RepresentationSelector selector;
-    return selector.select(currentPeriod, 0);
+    return selector.select(currentPeriod, type, 0);
 }

@@ -32,6 +32,7 @@
 #include "mpd/MPDManager.hpp"
 #include "mpd/Period.h"
 #include "mpd/Segment.h"
+#include "Streams.hpp"
 #include <vector>
 
 namespace dash
@@ -44,15 +45,17 @@ namespace dash
                 AlwaysBestAdaptationLogic           (dash::mpd::MPDManager *mpdManager);
                 virtual ~AlwaysBestAdaptationLogic  ();
 
-                dash::http::Chunk* getNextChunk();
-                const mpd::Representation *getCurrentRepresentation() const;
+                virtual dash::http::Chunk* getNextChunk(Streams::Type);
+                const mpd::Representation *getCurrentRepresentation(Streams::Type) const;
 
             private:
-                std::vector<mpd::ISegment *>        schedule;
-                size_t                              count;
-                dash::mpd::Representation           *bestRepresentation;
-
-                void initSchedule();
+                struct
+                {
+                    std::vector<mpd::ISegment *>    schedule;
+                    size_t                          count;
+                    mpd::Representation            *bestRepresentation;
+                } streams[Streams::count];
+                void  initSchedule ();
         };
     }
 }

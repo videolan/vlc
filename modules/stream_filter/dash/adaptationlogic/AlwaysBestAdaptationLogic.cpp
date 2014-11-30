@@ -35,29 +35,30 @@ using namespace dash::mpd;
 AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (MPDManager *mpdManager) :
                            AbstractAdaptationLogic      (mpdManager)
 {
-    this->count         = 0;
-    this->initSchedule();
+    initSchedule();
 }
+
 AlwaysBestAdaptationLogic::~AlwaysBestAdaptationLogic   ()
 {
 }
 
-Chunk*  AlwaysBestAdaptationLogic::getNextChunk()
+Chunk*  AlwaysBestAdaptationLogic::getNextChunk(Streams::Type type)
 {
-    if ( this->count < this->schedule.size() )
+    if ( streams[type].count < streams[type].schedule.size() )
     {
         Chunk *chunk = new Chunk();
-        chunk->setUrl(this->schedule.at( this->count )->getUrlSegment());
-        this->count++;
+        chunk->setUrl(streams[type].schedule.at( streams[type].count )->getUrlSegment());
+        streams[type].count++;
         return chunk;
     }
     return NULL;
 }
 
-const Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation() const
+const Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
 {
-    if ( this->count < this->schedule.size() )
-        return this->schedule.at( this->count )->getRepresentation();
+    if ( streams[type].count < streams[type].schedule.size() )
+        return streams[type].schedule.at( streams[type].count )->getRepresentation();
+
     return NULL;
 }
 
@@ -66,19 +67,22 @@ void    AlwaysBestAdaptationLogic::initSchedule ()
     if(mpdManager)
     {
         std::vector<Period *> periods = mpdManager->getPeriods();
-        std::vector<Period *>::const_iterator it;
+        if (periods.empty())
+            return;
         RepresentationSelector selector;
 
-        for(it=periods.begin(); it!=periods.end(); it++)
+        for(int type=0; type<Streams::count; type++)
         {
-            Representation *best = selector.select(*it);
+            streams[type].count = 0;
+            Representation *best = selector.select(periods.front(),
+                                                   static_cast<Streams::Type>(type));
             if(best)
             {
                 std::vector<ISegment *> segments = best->getSegments();
                 std::vector<ISegment *>::const_iterator segIt;
                 for(segIt=segments.begin(); segIt!=segments.end(); segIt++)
                 {
-                    schedule.push_back(*segIt);
+                    streams[type].schedule.push_back(*segIt);
                 }
             }
         }
