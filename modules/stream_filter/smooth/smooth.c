@@ -756,7 +756,11 @@ static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read 
             else
             {
                 vlc_mutex_lock( &p_sys->lock );
-                gotoNextChunk( p_sys );
+                if( gotoNextChunk( p_sys ) == NULL )
+                {
+                    vlc_mutex_unlock( &p_sys->lock );
+                    return 0;
+                }
                 vlc_mutex_unlock( &p_sys->lock );
             }
 
