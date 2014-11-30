@@ -46,8 +46,10 @@
 static int  OpenClient  (vlc_tls_creds_t *);
 static void CloseClient (vlc_tls_creds_t *);
 
-static int  OpenServer  (vlc_tls_creds_t *crd, const char *cert, const char *key);
-static void CloseServer (vlc_tls_creds_t *);
+#if !TARGET_OS_IPHONE
+	static int  OpenServer  (vlc_tls_creds_t *crd, const char *cert, const char *key);
+	static void CloseServer (vlc_tls_creds_t *);
+#endif
 
 vlc_module_begin ()
     set_description(N_("TLS support for OS X and iOS"))
@@ -487,7 +489,7 @@ static int st_Recv (void *opaque, void *buf, size_t length)
 
     /* peer performed shutdown */
     if (ret == errSSLClosedNoNotify || ret == errSSLClosedGraceful) {
-        msg_Dbg(session, "Got close notification with code %d", ret);
+        msg_Dbg(session, "Got close notification with code %i", (int)ret);
         return 0;
     }
 
