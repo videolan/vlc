@@ -56,8 +56,7 @@ typedef enum {
 
 - (void)sortForColumn:(NSString *)o_column withMode:(int)i_mode;
 
-
-
+- (void)searchUpdate:(NSString *)o_search;
 
 
 @end

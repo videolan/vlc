@@ -315,12 +315,6 @@
     [self saveTableColumns];
 }
 
-- (void)searchfieldChanged:(NSNotification *)o_notification
-{
-    assert(0);
-    [o_search_field setStringValue:[[o_notification object] stringValue]];
-}
-
 - (void)initStrings
 {
     [o_mi_play setTitle: _NS("Play")];
@@ -893,93 +887,9 @@
 //    [self playlistUpdated];
 }
 
-- (NSMutableArray *)subSearchItem:(playlist_item_t *)p_item
-{
-    playlist_t *p_playlist = pl_Get(VLCIntf);
-    playlist_item_t *p_selected_item;
-    int i_selected_row;
-
-    i_selected_row = [o_outline_view selectedRow];
-    if (i_selected_row < 0)
-        i_selected_row = 0;
-
-    p_selected_item = (playlist_item_t *)[[o_outline_view itemAtRow: i_selected_row] pointerValue];
-
-    for (NSUInteger i_current = 0; i_current < p_item->i_children ; i_current++) {
-        char *psz_temp;
-        NSString *o_current_name, *o_current_author;
-
-        PL_LOCK;
-        o_current_name = [NSString stringWithUTF8String:p_item->pp_children[i_current]->p_input->psz_name];
-        psz_temp = input_item_GetInfo(p_item->p_input, _("Meta-information"),_("Artist"));
-        o_current_author = [NSString stringWithUTF8String:psz_temp];
-        free(psz_temp);
-        PL_UNLOCK;
-
-        if (p_selected_item == p_item->pp_children[i_current] && b_selected_item_met == NO)
-            b_selected_item_met = YES;
-        else if (p_selected_item == p_item->pp_children[i_current] && b_selected_item_met == YES)
-            return NULL;
-        else if (b_selected_item_met == YES &&
-                    ([o_current_name rangeOfString:[o_search_field
-                        stringValue] options:NSCaseInsensitiveSearch].length ||
-                      [o_current_author rangeOfString:[o_search_field
-                        stringValue] options:NSCaseInsensitiveSearch].length))
-            /*Adds the parent items in the result array as well, so that we can
-            expand the tree*/
-            return [NSMutableArray arrayWithObject: [NSValue valueWithPointer: p_item->pp_children[i_current]]];
-
-        if (p_item->pp_children[i_current]->i_children > 0) {
-            id o_result = [self subSearchItem:
-                                            p_item->pp_children[i_current]];
-            if (o_result != NULL) {
-                [o_result insertObject: [NSValue valueWithPointer:
-                                p_item->pp_children[i_current]] atIndex:0];
-                return o_result;
-            }
-        }
-    }
-    return NULL;
-}
-
 - (IBAction)searchItem:(id)sender
 {
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    id o_result;
-
-    int i_row = -1;
-
-    b_selected_item_met = NO;
-
-    /* First, only search after the selected item:
-     * (b_selected_item_met = NO) */
-    o_result = [self subSearchItem:[self currentPlaylistRoot]];
-    if (o_result == NULL)
-        /* If the first search failed, search again from the beginning */
-        o_result = [self subSearchItem:[self currentPlaylistRoot]];
-
-    if (o_result != NULL) {
-        int i_start;
-        if ([[o_result objectAtIndex:0] pointerValue] == p_playlist->p_local_category)
-            i_start = 1;
-        else
-            i_start = 0;
-        NSUInteger count = [o_result count];
-
-        for (NSUInteger i = i_start ; i < count - 1 ; i++) {
-            [o_outline_view expandItem: [o_outline_dict objectForKey:
-                        [NSString stringWithFormat: @"%p",
-                        [[o_result objectAtIndex:i] pointerValue]]]];
-        }
-        i_row = [o_outline_view rowForItem: [o_outline_dict objectForKey:
-                        [NSString stringWithFormat: @"%p",
-                        [[o_result objectAtIndex:count - 1 ]
-                        pointerValue]]]];
-    }
-    if (i_row > -1) {
-        [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_row] byExtendingSelection:NO];
-        [o_outline_view scrollRowToVisible: i_row];
-    }
+    [[self model] searchUpdate:[o_search_field stringValue]];
 }
 
 - (IBAction)recursiveExpandNode:(id)sender

@@ -94,18 +94,22 @@
     [self currentRootType] == ROOT_TYPE_PLAYLIST;
 }
 
-
-
 - (void)rebuildPLItem:(PLItem *)o_item
 {
     [o_item clear];
     playlist_item_t *p_item = playlist_ItemGetById(p_playlist, [o_item plItemId]);
     if (p_item) {
+        int currPos = 0;
         for(int i = 0; i < p_item->i_children; ++i) {
-            PLItem *o_child = [[[PLItem alloc] initWithPlaylistItem:p_item->pp_children[i] parent:o_item] autorelease];
-            [o_item addChild:o_child atPos:i];
+            playlist_item_t *p_child = p_item->pp_children[i];
 
-            if (p_item->pp_children[i]->i_children >= 0) {
+            if (p_child->i_flags & PLAYLIST_DBL_FLAG)
+                continue;
+
+            PLItem *o_child = [[[PLItem alloc] initWithPlaylistItem:p_child parent:o_item] autorelease];
+            [o_item addChild:o_child atPos:currPos++];
+
+            if (p_child->i_children >= 0) {
                 [self rebuildPLItem:o_child];
             }
 
@@ -225,6 +229,21 @@
 
     playlist_RecursiveNodeSort(p_playlist, p_root, i_column, i_mode);
 
+    [self rebuildPLItem:_rootItem];
+    [_outlineView reloadData];
+    PL_UNLOCK;
+}
+
+- (void)searchUpdate:(NSString *)o_search
+{
+    PL_LOCK;
+    playlist_item_t *p_root = playlist_ItemGetById(p_playlist, [_rootItem plItemId]);
+    if (!p_root) {
+        PL_UNLOCK;
+        return;
+    }
+    playlist_LiveSearchUpdate(p_playlist, p_root, [o_search UTF8String],
+                              true);
     [self rebuildPLItem:_rootItem];
     [_outlineView reloadData];
     PL_UNLOCK;

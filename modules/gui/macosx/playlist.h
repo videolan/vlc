@@ -101,7 +101,6 @@
 - (playlist_item_t *)currentPlaylistRoot;
 - (void)reloadStyles;
 
-- (void)searchfieldChanged:(NSNotification *)o_notification;
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
 
 - (IBAction)searchItem:(id)sender;
