@@ -81,6 +81,11 @@ void ISegment::setByteRange(size_t start, size_t end)
     endByte   = end;
 }
 
+size_t ISegment::getOffset() const
+{
+    return startByte;
+}
+
 std::string ISegment::toString() const
 {
     std::stringstream ss("    ");
@@ -88,6 +93,14 @@ std::string ISegment::toString() const
     if(startByte!=endByte)
         ss << " @" << startByte << ".." << endByte;
     return ss.str();
+}
+
+bool ISegment::contains(size_t byte) const
+{
+    if (startByte == endByte)
+        return false;
+    return (byte >= startByte &&
+            (!endByte || byte <= endByte) );
 }
 
 int ISegment::getClassId() const
@@ -116,6 +129,11 @@ Segment::Segment(Representation *parent) :
     else
         this->size = -1;
     classId = CLASSID_SEGMENT;
+}
+
+void Segment::addSubSegment(SubSegment *subsegment)
+{
+    subsegments.push_back(subsegment);
 }
 
 Segment::~Segment()
@@ -214,6 +232,8 @@ IndexSegment::IndexSegmentChunk::IndexSegmentChunk(ISegment *segment)
 
 void IndexSegment::IndexSegmentChunk::onDownload(void *buffer, size_t size)
 {
+    dash::mp4::AtomsReader br(segment);
+    br.parseBlock(buffer, size);
 }
 
 SubSegment::SubSegment(Segment *main, size_t start, size_t end) :

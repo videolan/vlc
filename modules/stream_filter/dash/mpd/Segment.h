@@ -53,9 +53,11 @@ namespace dash
                 virtual void                            done            ();
                 virtual dash::http::Chunk*              toChunk         ();
                 virtual void                            setByteRange    (size_t start, size_t end);
+                virtual size_t                          getOffset       () const;
                 virtual std::vector<ISegment*>          subSegments     () = 0;
                 virtual std::string                     toString        () const;
                 virtual Representation*                 getRepresentation() const = 0;
+                virtual bool                            contains        (size_t byte) const;
                 int                                     getClassId      () const;
 
                 static const int CLASSID_ISEGMENT = 0;
@@ -89,6 +91,8 @@ namespace dash
                 virtual dash::http::Chunk* toChunk();
                 virtual std::vector<ISegment*> subSegments();
                 virtual Representation* getRepresentation() const;
+                virtual std::string toString() const;
+                virtual void addSubSegment(SubSegment *);
                 static const int CLASSID_SEGMENT = 1;
 
             protected:

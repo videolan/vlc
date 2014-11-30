@@ -229,3 +229,47 @@ MPD * Representation::getMPD() const
 {
     return mpd;
 }
+
+static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
+                              size_t end)
+{
+    std::vector<Segment *>::iterator segIt;
+    for(segIt = seglist.begin(); segIt < seglist.end(); segIt++)
+    {
+        Segment *segment = *segIt;
+        if(segment->getClassId() == Segment::CLASSID_SEGMENT &&
+           segment->contains(end + segment->getOffset()))
+        {
+            SubSegment *subsegment = new SubSegment(segment,
+                                                    start + segment->getOffset(),
+                                                    end + segment->getOffset());
+            segment->addSubSegment(subsegment);
+            break;
+        }
+    }
+}
+
+void Representation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
+{
+    std::vector<Segment *> seglist = segmentList->getSegments();
+    std::vector<SplitPoint>::const_iterator splitIt;
+    size_t start = 0, end = 0;
+
+    for(splitIt = splitlist.begin(); splitIt < splitlist.end(); splitIt++)
+    {
+        start = end;
+        SplitPoint split = *splitIt;
+        end = split.offset;
+        if(splitIt == splitlist.begin() && split.offset == 0)
+            continue;
+        insertIntoSegment(seglist, start, end);
+        end++;
+    }
+
+    if(start != 0)
+    {
+        start = end;
+        end = 0;
+        insertIntoSegment(seglist, start, end);
+    }
+}

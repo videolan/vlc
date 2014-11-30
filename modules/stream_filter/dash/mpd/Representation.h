@@ -89,6 +89,14 @@ namespace dash
                 std::vector<std::string> toString() const;
                 virtual std::string getUrlSegment           () const; /* impl */
 
+                class SplitPoint
+                {
+                    public:
+                        size_t offset;
+                        mtime_t time;
+                };
+                void SplitUsingIndex(std::vector<SplitPoint>&);
+
             private:
                 MPD                                *mpd;
                 uint64_t                            bandwidth;

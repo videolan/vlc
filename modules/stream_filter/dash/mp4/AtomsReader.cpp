@@ -67,15 +67,19 @@ bool AtomsReader::parseBlock(void *buffer, size_t size)
             MP4_Box_t *sidxbox = MP4_BoxGet(rootbox, "sidx");
             if (sidxbox)
             {
+                Representation::SplitPoint point;
+                std::vector<Representation::SplitPoint> splitlist;
                 MP4_Box_data_sidx_t *sidx = sidxbox->data.p_sidx;
-                size_t offset = sidx->i_first_offset;
+                point.offset = sidx->i_first_offset;
+                point.time = 0;
                 for(uint16_t i=0; i<sidx->i_reference_count; i++)
                 {
-                    std::cerr << " offset " << offset << std::endl;
-                    offset += sidx->p_items[i].i_referenced_size;
+                    splitlist.push_back(point);
+                    point.offset += sidx->p_items[i].i_referenced_size;
+                    point.time += sidx->p_items[i].i_subsegment_duration;
                 }
+                segment->getRepresentation()->SplitUsingIndex(splitlist);
             }
-            std::cerr << "index seg " << ((uint8_t *)buffer)[4] << ((uint8_t *)buffer)[5] << std::endl;
         }
         stream_Delete(stream);
     }
