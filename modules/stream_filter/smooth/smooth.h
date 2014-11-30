@@ -93,6 +93,7 @@ typedef struct sms_stream_s
     int            type;
     quality_level_t *current_qlvl; /* current quality level for Download() */
     uint64_t       rgi_bw[SMS_BW_SHORTSTATS]; /* Measured bandwidths of the N last chunks */
+    int            rgi_tidx;       /* tail index of rgi_bw */
     uint64_t       i_obw;          /* Overwall bandwidth average */
     unsigned int   i_obw_samples;  /* used to compute overall incrementally */
 } sms_stream_t;

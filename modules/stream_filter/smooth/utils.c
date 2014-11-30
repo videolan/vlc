@@ -170,9 +170,8 @@ void bw_stats_put( sms_stream_t *sms, const uint64_t bw )
     }
     else
     {
-        memmove( sms->rgi_bw, &sms->rgi_bw[1],
-                sizeof(sms->rgi_bw[0]) * (SMS_BW_SHORTSTATS - 1) );
-        sms->rgi_bw[SMS_BW_SHORTSTATS - 1] = bw;
+        sms->rgi_tidx = (sms->rgi_tidx + 1) % SMS_BW_SHORTSTATS;
+        sms->rgi_bw[sms->rgi_tidx] = bw;
     }
 }
 
