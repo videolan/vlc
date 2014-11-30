@@ -23,8 +23,11 @@
 
 #import "misc.h"
 
+#import "playlist.h"
+
 #include <vlc_playlist.h>
 #include <vlc_input_item.h>
+#import <vlc_input.h>
 #include <vlc_url.h>
 
 #define TRACKNUM_COLUMN @"tracknumber"
@@ -44,16 +47,19 @@
 @implementation PLModel
 
 @synthesize rootItem=_rootItem;
+@synthesize draggedItems=_draggedItems;
 
-- (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root;
+
+- (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root playlistObject:(id)plObj;
 {
     self = [super init];
     if(self) {
         p_playlist = pl;
         _outlineView = [outlineView retain];
+        _playlist = plObj;
 
         PL_LOCK;
-        _rootItem = [[PLItem alloc] initWithPlaylistItem:root parent:nil];
+        _rootItem = [[PLItem alloc] initWithPlaylistItem:root];
         [self rebuildPLItem:_rootItem];
         PL_UNLOCK;
 
@@ -67,7 +73,7 @@
     NSLog(@"change root item to %p", p_root);
     PL_ASSERT_LOCKED;
     [_rootItem release];
-    _rootItem = [[PLItem alloc] initWithPlaylistItem:p_root parent:nil];
+    _rootItem = [[PLItem alloc] initWithPlaylistItem:p_root];
     [self rebuildPLItem:_rootItem];
     [_outlineView reloadData];
 }
@@ -106,7 +112,7 @@
             if (p_child->i_flags & PLAYLIST_DBL_FLAG)
                 continue;
 
-            PLItem *o_child = [[[PLItem alloc] initWithPlaylistItem:p_child parent:o_item] autorelease];
+            PLItem *o_child = [[[PLItem alloc] initWithPlaylistItem:p_child] autorelease];
             [o_item addChild:o_child atPos:currPos++];
 
             if (p_child->i_children >= 0) {
@@ -159,7 +165,8 @@
     playlist_item_t *p_item = playlist_ItemGetById(p_playlist, i_item);
     if (!p_item || p_item->i_flags & PLAYLIST_DBL_FLAG)
     {
-        PL_UNLOCK; return;
+        PL_UNLOCK;
+        return;
     }
 
     int pos;
@@ -167,7 +174,7 @@
         if(p_item->p_parent->pp_children[pos] == p_item)
             break;
 
-    PLItem *o_new_item = [[[PLItem alloc] initWithPlaylistItem:p_item parent:o_parent] autorelease];
+    PLItem *o_new_item = [[[PLItem alloc] initWithPlaylistItem:p_item] autorelease];
     PL_UNLOCK;
     if (pos < 0)
         return;
@@ -373,6 +380,199 @@
     }
 
     return o_value;
+}
+
+#pragma mark -
+#pragma mark Drag and Drop support
+
+- (BOOL)isItem: (PLItem *)p_item inNode: (PLItem *)p_node
+{
+    while(p_item) {
+        if ([p_item plItemId] == [p_node plItemId]) {
+            return YES;
+        }
+
+        p_item = [p_item parent];
+    }
+
+    return NO;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
+{
+    NSUInteger itemCount = [items count];
+    [_draggedItems release];
+    _draggedItems = [[NSMutableArray alloc] initWithArray:items];
+
+    /* Add the data to the pasteboard object. */
+    [pboard declareTypes: [NSArray arrayWithObject:VLCPLItemPasteboadType] owner: self];
+    [pboard setData:[NSData data] forType:VLCPLItemPasteboadType];
+
+    return YES;
+}
+
+- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
+{
+    NSPasteboard *o_pasteboard = [info draggingPasteboard];
+
+    /* Dropping ON items is not allowed if item is not a node */
+    if (item) {
+        if (index == NSOutlineViewDropOnItemIndex && [item isLeaf]) {
+            return NSDragOperationNone;
+        }
+    }
+
+    if (![self editAllowed])
+        return NSDragOperationNone;
+
+    /* Drop from the Playlist */
+    if ([[o_pasteboard types] containsObject:VLCPLItemPasteboadType]) {
+        NSUInteger count = [_draggedItems count];
+        for (NSUInteger i = 0 ; i < count ; i++) {
+            /* We refuse to Drop in a child of an item we are moving */
+            if ([self isItem: item inNode: [_draggedItems objectAtIndex:i]]) {
+                return NSDragOperationNone;
+            }
+        }
+        return NSDragOperationMove;
+    }
+    /* Drop from the Finder */
+    else if ([[o_pasteboard types] containsObject: NSFilenamesPboardType]) {
+        return NSDragOperationGeneric;
+    }
+    return NSDragOperationNone;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)targetItem childIndex:(NSInteger)index
+{
+    NSPasteboard *o_pasteboard = [info draggingPasteboard];
+
+    /* Drag & Drop inside the playlist */
+    if ([[o_pasteboard types] containsObject:VLCPLItemPasteboadType]) {
+        if (index == -1) // this is no valid target, sanitize to top of table
+            index = 0;
+
+        if (targetItem == nil) {
+            targetItem = _rootItem;
+        }
+
+        NSMutableArray *o_filteredItems = [NSMutableArray arrayWithArray:_draggedItems];
+        const NSUInteger draggedItemsCount = [_draggedItems count];
+        for (NSInteger i = 0; i < [o_filteredItems count]; i++) {
+            for (NSUInteger j = 0; j < draggedItemsCount; j++) {
+                PLItem *itemToCheck = [o_filteredItems objectAtIndex:i];
+                PLItem *nodeToTest = [_draggedItems objectAtIndex:j];
+                if ([itemToCheck plItemId] == [nodeToTest plItemId])
+                    continue;
+
+                if ([self isItem:itemToCheck inNode:nodeToTest]) {
+                    [o_filteredItems removeObjectAtIndex:i];
+                    --i;
+                    break;
+                }
+            }
+        }
+
+        NSUInteger count = [o_filteredItems count];
+        if (count == 0)
+            return NO;
+
+        playlist_item_t **pp_items = (playlist_item_t **)calloc(count, sizeof(playlist_item_t*));
+        if (!pp_items)
+            return NO;
+
+        PL_LOCK;
+        playlist_item_t *p_new_parent = playlist_ItemGetById(p_playlist, [targetItem plItemId]);
+        if (!p_new_parent) {
+            PL_UNLOCK;
+            return NO;
+        }
+
+        NSUInteger j = 0;
+        for (NSUInteger i = 0; i < count; i++) {
+            playlist_item_t *p_item = playlist_ItemGetById(p_playlist, [[o_filteredItems objectAtIndex:i] plItemId]);
+            if (p_item)
+                pp_items[j++] = p_item;
+        }
+
+        if (playlist_TreeMoveMany(p_playlist, j, pp_items, p_new_parent, index) != VLC_SUCCESS) {
+            PL_UNLOCK;
+            free(pp_items);
+            return NO;
+        }
+
+        PL_UNLOCK;
+        free(pp_items);
+
+        // rebuild our model
+        NSUInteger filteredItemsCount = [o_filteredItems count];
+        for(NSUInteger i = 0; i < filteredItemsCount; ++i) {
+            PLItem *o_item = [o_filteredItems objectAtIndex:i];
+            NSLog(@"delete child from parent %p", [o_item parent]);
+            [[o_item parent] deleteChild:o_item];
+            [targetItem addChild:o_item atPos:index + i];
+        }
+
+        [_outlineView reloadData];
+
+        NSMutableIndexSet *selectedIndexes = [[NSMutableIndexSet alloc] init];
+        for(NSUInteger i = 0; i < draggedItemsCount; ++i) {
+            NSInteger row = [_outlineView rowForItem:[_draggedItems objectAtIndex:i]];
+            if (row < 0)
+                continue;
+
+            [selectedIndexes addIndex:row];
+        }
+
+        if ([selectedIndexes count] == 0)
+            [selectedIndexes addIndex:[_outlineView rowForItem:targetItem]];
+
+        [_outlineView selectRowIndexes:selectedIndexes byExtendingSelection:NO];
+        [selectedIndexes release];
+
+        return YES;
+    }
+
+    else if ([[o_pasteboard types] containsObject: NSFilenamesPboardType]) {
+
+        NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]
+                             sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
+        NSUInteger count = [o_values count];
+        NSMutableArray *o_array = [NSMutableArray arrayWithCapacity:count];
+        input_thread_t *p_input = playlist_CurrentInput(p_playlist);
+
+        if (count == 1 && p_input) {
+            int i_result = input_AddSubtitleOSD(p_input, vlc_path2uri([[o_values objectAtIndex:0] UTF8String], NULL), true, true);
+            vlc_object_release(p_input);
+            if (i_result == VLC_SUCCESS)
+                return YES;
+        }
+        else if (p_input)
+            vlc_object_release(p_input);
+
+        for (NSUInteger i = 0; i < count; i++) {
+            NSDictionary *o_dic;
+            char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], NULL);
+            if (!psz_uri)
+                continue;
+
+            o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+
+            free(psz_uri);
+
+            [o_array addObject: o_dic];
+        }
+
+//        if (item == nil)
+            [_playlist appendArray:o_array atPos:index enqueue: YES];
+        // TODO support for drop on sub nodes
+//        else {
+//            assert(p_node->i_children != -1);
+//            [_playlist appendNodeArray:o_array inNode: p_node atPos:index enqueue:YES];
+//        }
+        return YES;
+    }
+    return NO;
 }
 
 @end

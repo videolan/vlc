@@ -25,17 +25,29 @@
 
 #include <vlc_common.h>
 
+#define VLCPLItemPasteboadType @"VLCPlaylistItemPboardType"
+
+@class VLCPlaylist;
+
 @interface PLModel : NSObject<NSOutlineViewDataSource>
 {
     PLItem *_rootItem;
 
     playlist_t *p_playlist;
     NSOutlineView *_outlineView;
+
+    // TODO: write these objects to the pastboard properly?
+    NSMutableArray *_draggedItems;
+
+    // TODO: for transition
+    VLCPlaylist *_playlist;
 }
 
 @property(readonly) PLItem *rootItem;
+@property(readonly, copy) NSArray *draggedItems;
 
-- (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root;
+
+- (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root playlistObject:(id)plObj;
 
 - (void)changeRootItem:(playlist_item_t *)p_root;
 

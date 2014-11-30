@@ -1182,7 +1182,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 {
     if ([[item identifier] isEqualToString:@"playlist"] || [[item identifier] isEqualToString:@"medialibrary"]) {
         NSPasteboard *o_pasteboard = [info draggingPasteboard];
-        if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"] || [[o_pasteboard types] containsObject: NSFilenamesPboardType])
+        if ([[o_pasteboard types] containsObject: VLCPLItemPasteboadType] || [[o_pasteboard types] containsObject: NSFilenamesPboardType])
             return NSDragOperationGeneric;
     }
     return NSDragOperationNone;
@@ -1225,11 +1225,10 @@ static VLCMainWindow *_o_sharedInstance = nil;
         NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];
 
         NSUInteger count = [array count];
-        playlist_item_t * p_item = NULL;
 
         PL_LOCK;
         for(NSUInteger i = 0; i < count; i++) {
-            p_item = [[array objectAtIndex:i] pointerValue];
+            playlist_item_t *p_item = playlist_ItemGetById(p_playlist, [[array objectAtIndex:i] plItemId]);
             if (!p_item) continue;
             playlist_NodeAddCopy(p_playlist, p_item, p_node, PLAYLIST_END);
         }

@@ -164,9 +164,6 @@
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
 
-    NSMutableArray *o_nodes_array;
-    NSMutableArray *o_items_array;
-
     BOOL b_selected_item_met;
     BOOL b_isSortDescending;
     id o_tc_sortColumn;
@@ -238,9 +235,6 @@
         playlist_t * p_playlist = pl_Get(VLCIntf);
         p_current_root_item = p_playlist->p_local_category;
         o_outline_dict = [[NSMutableDictionary alloc] init];
-
-        o_nodes_array = [[NSMutableArray alloc] init];
-        o_items_array = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -248,8 +242,6 @@
 - (void)dealloc
 {
     [o_outline_dict release];
-    [o_nodes_array release];
-    [o_items_array release];
     [super dealloc];
 }
 
@@ -267,7 +259,7 @@
     [self reloadStyles];
     [self initStrings];
 
-    o_model = [[PLModel alloc] initWithOutlineView:o_outline_view playlist:p_playlist rootItem:p_current_root_item];
+    o_model = [[PLModel alloc] initWithOutlineView:o_outline_view playlist:p_playlist rootItem:p_current_root_item playlistObject:self];
     [o_outline_view setDataSource:o_model];
     [o_outline_view reloadData];
 
@@ -448,30 +440,6 @@
     }
 
     return NO;
-}
-
-/* This method is useful for instance to remove the selected children of an
-   already selected node */
-- (void)removeItemsFrom:(id)o_items ifChildrenOf:(id)o_nodes
-{
-    NSUInteger itemCount = [o_items count];
-    NSUInteger nodeCount = [o_nodes count];
-    for (NSUInteger i = 0 ; i < itemCount ; i++) {
-        for (NSUInteger j = 0 ; j < nodeCount ; j++) {
-            if (o_items == o_nodes) {
-                if (j == i) continue;
-            }
-            if ([self isItem: [o_items objectAtIndex:i]
-                    inNode: [o_nodes objectAtIndex:j]
-                    checkItemExistence: NO locked:NO]) {
-                [o_items removeObjectAtIndex:i];
-                /* We need to execute the next iteration with the same index
-                   since the current item has been deleted */
-                i--;
-                break;
-            }
-        }
-    }
 }
 
 - (IBAction)savePlaylist:(id)sender
@@ -1048,9 +1016,10 @@
     return o_playing_item;
 }
 
+// TODO remove method
 - (NSArray *)draggedItems
 {
-    return [[o_nodes_array arrayByAddingObjectsFromArray: o_items_array] retain];
+    return [[self model] draggedItems];
 }
 
 - (void)setColumn: (NSString *)o_column state: (NSInteger)i_state translationDict:(NSDictionary *)o_dict
@@ -1464,205 +1433,6 @@
     }
 
     return o_value;
-}
-
-
-/* Required for drag & drop and reordering */
-- (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
-{
-    playlist_t *p_playlist = pl_Get(VLCIntf);
-
-    /* First remove the items that were moved during the last drag & drop
-       operation */
-    [o_items_array removeAllObjects];
-    [o_nodes_array removeAllObjects];
-
-    NSUInteger itemCount = [items count];
-
-    for (NSUInteger i = 0 ; i < itemCount ; i++) {
-        id o_item = [items objectAtIndex:i];
-
-        /* Fill the items and nodes to move in 2 different arrays */
-        if (![o_item isLeaf])
-            [o_nodes_array addObject: o_item];
-        else
-            [o_items_array addObject: o_item];
-    }
-
-    /* Now we need to check if there are selected items that are in already
-       selected nodes. In that case, we only want to move the nodes */
-    [self removeItemsFrom: o_nodes_array ifChildrenOf: o_nodes_array];
-    [self removeItemsFrom: o_items_array ifChildrenOf: o_nodes_array];
-
-    /* We add the "VLCPlaylistItemPboardType" type to be able to recognize
-       a Drop operation coming from the playlist. */
-
-    [pboard declareTypes: [NSArray arrayWithObject:@"VLCPlaylistItemPboardType"] owner: self];
-    [pboard setData:[NSData data] forType:@"VLCPlaylistItemPboardType"];
-
-    return YES;
-}
-
-- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
-{
-    playlist_t *p_playlist = pl_Get(VLCIntf);
-    NSPasteboard *o_pasteboard = [info draggingPasteboard];
-
-    if (!p_playlist) return NSDragOperationNone;
-
-    /* Dropping ON items is not allowed if item is not a node */
-    if (item) {
-        if (index == NSOutlineViewDropOnItemIndex &&
-                ((playlist_item_t *)[item pointerValue])->i_children == -1) {
-            return NSDragOperationNone;
-        }
-    }
-
-    /* We refuse to drop an item in anything else than a child of the General
-       Node. We still accept items that would be root nodes of the outlineview
-       however, to allow drop in an empty playlist. */
-    /// todo
-    //    if (!(([self isItem: [item pointerValue] inNode: p_playlist->p_local_category checkItemExistence: NO locked: NO] ||
-//            (var_CreateGetBool(p_playlist, "media-library") && [self isItem: [item pointerValue] inNode: p_playlist->p_ml_category checkItemExistence: NO locked: NO])) || item == nil)) {
-//        return NSDragOperationNone;
-//    }
-
-    /* Drop from the Playlist */
-    if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"]) {
-        NSUInteger count = [o_nodes_array count];
-        for (NSUInteger i = 0 ; i < count ; i++) {
-            /* We refuse to Drop in a child of an item we are moving */
-            if ([self isItem: item inNode: [o_nodes_array objectAtIndex:i] checkItemExistence: NO locked:NO]) {
-                return NSDragOperationNone;
-            }
-        }
-        return NSDragOperationMove;
-    }
-    /* Drop from the Finder */
-    else if ([[o_pasteboard types] containsObject: NSFilenamesPboardType]) {
-        return NSDragOperationGeneric;
-    }
-    return NSDragOperationNone;
-}
-
-- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index
-{
-    playlist_t * p_playlist =  pl_Get(VLCIntf);
-    NSPasteboard *o_pasteboard = [info draggingPasteboard];
-
-    /* Drag & Drop inside the playlist */
-    if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"]) {
-        if (index == -1) // this is no valid target, sanitize to top of table
-            index = 0;
-
-        int i_row = 0;
-        playlist_item_t *p_new_parent, *p_item = NULL;
-        NSArray *o_all_items = [o_nodes_array arrayByAddingObjectsFromArray: o_items_array];
-        /* If the item is to be dropped as root item of the outline, make it a
-           child of the respective general node, if is either the pl or the ml
-           Else, choose the proposed parent as parent. */
-        if (item == nil) {
-            // TODO edit allowed / no drop in other types
-            if ([[self model] currentRootType] == ROOT_TYPE_PLAYLIST ||
-                [[self model] currentRootType] == ROOT_TYPE_MEDIALIBRARY)
-                item = [[self model] rootItem];
-            else
-                return NO;
-        }
-
-        /* Make sure the proposed parent is a node.
-           (This should never be true) */
-        if (p_new_parent->i_children < 0)
-            return NO;
-
-        NSUInteger count = [o_all_items count];
-        if (count == 0)
-            return NO;
-
-        playlist_item_t **pp_items = (playlist_item_t **)calloc(count, sizeof(playlist_item_t*));
-        if (!pp_items)
-            return NO;
-
-        PL_LOCK;
-        p_new_parent = playlist_ItemGetById(p_playlist, [item plItemId]);
-        if (!p_new_parent) {
-            PL_UNLOCK;
-            return NO;
-        }
-
-        NSUInteger j = 0;
-        for (NSUInteger i = 0; i < count; i++) {
-            p_item = playlist_ItemGetById(p_playlist, [[o_all_items objectAtIndex:i] plItemId]);
-            if (p_item)
-                pp_items[j++] = p_item;
-        }
-
-        if (j == 0 || playlist_TreeMoveMany(p_playlist, j, pp_items, p_new_parent, index) != VLC_SUCCESS) {
-            PL_UNLOCK;
-            free(pp_items);
-            return NO;
-        }
-
-        PL_UNLOCK;
-        free(pp_items);
-
-        [self playlistUpdated];
-        i_row = [o_outline_view rowForItem:[o_all_items objectAtIndex:0]];
-
-        if (i_row == -1)
-            i_row = [o_outline_view rowForItem:item];
-
-        [o_outline_view deselectAll: self];
-        [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_row] byExtendingSelection:NO];
-        [o_outline_view scrollRowToVisible: i_row];
-
-        return YES;
-    }
-
-    else if ([[o_pasteboard types] containsObject: NSFilenamesPboardType]) {
-        // TODO: can this already checked in drop validation?
-        if (![[self model] editAllowed])
-            return NO;
-
-        playlist_item_t *p_node = [item pointerValue];
-
-        NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType]
-                                sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
-        NSUInteger count = [o_values count];
-        NSMutableArray *o_array = [NSMutableArray arrayWithCapacity:count];
-        input_thread_t * p_input = pl_CurrentInput(VLCIntf);
-
-        if (count == 1 && p_input) {
-            int i_result = input_AddSubtitleOSD(p_input, vlc_path2uri([[o_values objectAtIndex:0] UTF8String], NULL), true, true);
-            vlc_object_release(p_input);
-            if (i_result == VLC_SUCCESS)
-                return YES;
-        }
-        else if (p_input)
-            vlc_object_release(p_input);
-
-        for (NSUInteger i = 0; i < count; i++) {
-            NSDictionary *o_dic;
-            char *psz_uri = vlc_path2uri([[o_values objectAtIndex:i] UTF8String], NULL);
-            if (!psz_uri)
-                continue;
-
-            o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
-
-            free(psz_uri);
-
-            [o_array addObject: o_dic];
-        }
-
-        if (item == nil)
-            [self appendArray:o_array atPos:index enqueue: YES];
-        else {
-            assert(p_node->i_children != -1);
-            [self appendNodeArray:o_array inNode: p_node atPos:index enqueue:YES];
-        }
-        return YES;
-    }
-    return NO;
 }
 
 @end

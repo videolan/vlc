@@ -33,7 +33,7 @@
 @synthesize input=p_input;
 @synthesize parent=_parent;
 
-- (id)initWithPlaylistItem:(playlist_item_t *)p_item parent:(PLItem *)parent;
+- (id)initWithPlaylistItem:(playlist_item_t *)p_item;
 {
     self = [super init];
     if(self) {
@@ -42,8 +42,6 @@
         p_input = p_item->p_input;
         input_item_Hold(p_input);
         _children = [[NSMutableArray alloc] init];
-        [parent retain];
-        _parent = parent;
     }
 
     return self;
@@ -58,6 +56,21 @@
     [super dealloc];
 }
 
+// own hash and isEqual methods are important to retain expandable state
+// when items are moved / recreated
+- (NSUInteger)hash
+{
+    return (NSUInteger)[self plItemId];
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (other == self)
+        return YES;
+    if (!other || ![other isKindOfClass:[self class]])
+        return NO;
+    return [self plItemId] == [other plItemId];
+}
 
 - (BOOL)isLeaf
 {
@@ -71,15 +84,14 @@
 
 - (void)addChild:(PLItem *)item atPos:(int)pos
 {
-//    if ([o_children count] > pos) {
-//        NSLog(@"invalid position %d", pos);
-//    }
     [_children insertObject:item atIndex:pos];
+    [item setParent: self];
 
 }
 
 - (void)deleteChild:(PLItem *)child
 {
+    [child setParent:nil];
     [_children removeObject:child];
 }
 
