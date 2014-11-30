@@ -634,6 +634,9 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
     }
     free( psz_speaker );
 
+    vlc_mutex_init(&sys->lock);
+    vlc_cond_init(&sys->cond);
+
     if( AOUT_FMT_SPDIF( fmt ) && var_InheritBool( obj, "spdif" ) )
     {
         hr = CreateDSBuffer( obj, sys, VLC_CODEC_SPDIFL,
@@ -769,9 +772,6 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
             goto error;
         }
     }
-
-    vlc_mutex_init(&sys->lock);
-    vlc_cond_init(&sys->cond);
 
     int ret = vlc_clone(&sys->eraser_thread, PlayedDataEraser, (void*) obj,
                         VLC_THREAD_PRIORITY_LOW);
