@@ -42,6 +42,10 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int Open( vlc_object_t * );
+static void Close( vlc_object_t * );
+
+#define vlc_sd_probe_Open bdsm_sd_probe_Open
 
 #define USER_TEXT N_("SMB user name")
 #define USER_LONGTEXT N_("User name that will " \
@@ -74,7 +78,7 @@ vlc_module_begin ()
         set_category( CAT_PLAYLIST )
         set_subcategory( SUBCAT_PLAYLIST_SD )
         set_capability( "services_discovery", 0 )
-        set_callbacks( SdOpen, SdClose )
+        set_callbacks( bdsm_SdOpen, bdsm_SdClose )
 
         VLC_SD_PROBE_SUBMODULE
 
@@ -108,7 +112,7 @@ static void bdsm_destroy( access_sys_t *p_sys );
 /*****************************************************************************
  * Open: Initialize module's data structures and libdsm
  *****************************************************************************/
-int Open( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
@@ -166,7 +170,7 @@ int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close: free unused data structures
  *****************************************************************************/
-void Close( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;

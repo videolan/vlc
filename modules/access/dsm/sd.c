@@ -37,7 +37,7 @@ struct services_discovery_sys_t
     netbios_ns      *ns;
 };
 
-int vlc_sd_probe_Open (vlc_object_t *p_this)
+int bdsm_sd_probe_Open (vlc_object_t *p_this)
 {
     vlc_probe_t *p_probe = (vlc_probe_t *)p_this;
 
@@ -47,7 +47,7 @@ int vlc_sd_probe_Open (vlc_object_t *p_this)
     return VLC_PROBE_CONTINUE;
 }
 
-int SdOpen (vlc_object_t *p_this)
+int bdsm_SdOpen (vlc_object_t *p_this)
 {
     services_discovery_t *p_sd = (services_discovery_t *)p_this;
     services_discovery_sys_t *p_sys = malloc (sizeof (*p_sys));
@@ -97,7 +97,7 @@ int SdOpen (vlc_object_t *p_this)
         return VLC_EGENERIC;
 }
 
-void SdClose (vlc_object_t *p_this)
+void bdsm_SdClose (vlc_object_t *p_this)
 {
     services_discovery_t *sd = (services_discovery_t *)p_this;
     services_discovery_sys_t *p_sys = sd->p_sys;
