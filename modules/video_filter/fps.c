@@ -32,9 +32,9 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 
-int Open( vlc_object_t *p_this);
-void Close( vlc_object_t *p_this);
-picture_t *Filter( filter_t *p_filter, picture_t *p_picture);
+static int Open( vlc_object_t *p_this);
+static void Close( vlc_object_t *p_this);
+static picture_t *Filter( filter_t *p_filter, picture_t *p_picture);
 
 #define CFG_PREFIX "fps-"
 
@@ -65,7 +65,7 @@ struct filter_sys_t
     int             i_output_frame_interval;
 };
 
-picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
+static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     /* If input picture doesn't have actual valid timestamp,
@@ -122,7 +122,7 @@ picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
     return last_pic;
 }
 
-int Open( vlc_object_t *p_this)
+static int Open( vlc_object_t *p_this)
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
@@ -164,7 +164,7 @@ int Open( vlc_object_t *p_this)
     return VLC_SUCCESS;
 }
 
-void Close( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     if( p_filter->p_sys->p_previous_pic )
