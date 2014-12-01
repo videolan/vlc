@@ -231,7 +231,7 @@ MPD * Representation::getMPD() const
 }
 
 static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
-                              size_t end)
+                              size_t end, mtime_t time)
 {
     std::vector<Segment *>::iterator segIt;
     for(segIt = seglist.begin(); segIt < seglist.end(); segIt++)
@@ -244,6 +244,7 @@ static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
                                                     start + segment->getOffset(),
                                                     end + segment->getOffset());
             segment->addSubSegment(subsegment);
+            segment->setStartTime(time);
             break;
         }
     }
@@ -254,6 +255,7 @@ void Representation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
     std::vector<Segment *> seglist = segmentList->getSegments();
     std::vector<SplitPoint>::const_iterator splitIt;
     size_t start = 0, end = 0;
+    mtime_t time = 0;
 
     for(splitIt = splitlist.begin(); splitIt < splitlist.end(); splitIt++)
     {
@@ -262,7 +264,8 @@ void Representation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
         end = split.offset;
         if(splitIt == splitlist.begin() && split.offset == 0)
             continue;
-        insertIntoSegment(seglist, start, end);
+        time = split.time;
+        insertIntoSegment(seglist, start, end, time);
         end++;
     }
 
@@ -270,6 +273,6 @@ void Representation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
     {
         start = end;
         end = 0;
-        insertIntoSegment(seglist, start, end);
+        insertIntoSegment(seglist, start, end, time);
     }
 }

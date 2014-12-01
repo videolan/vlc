@@ -25,6 +25,8 @@
 # include "config.h"
 #endif
 
+#define __STDC_CONSTANT_MACROS
+
 #include "Segment.h"
 #include "Representation.h"
 #include "MPD.h"
@@ -38,7 +40,8 @@ using namespace dash::http;
 ISegment::ISegment(const ICanonicalUrl *parent):
     ICanonicalUrl( parent ),
     startByte  (0),
-    endByte    (0)
+    endByte    (0),
+    startTime  (VLC_TS_INVALID)
 {
     debugName = "Segment";
     classId = CLASSID_ISEGMENT;
@@ -79,6 +82,16 @@ void ISegment::setByteRange(size_t start, size_t end)
 {
     startByte = start;
     endByte   = end;
+}
+
+void ISegment::setStartTime(mtime_t ztime)
+{
+    startTime = ztime;
+}
+
+mtime_t ISegment::getStartTime() const
+{
+    return startTime;
 }
 
 size_t ISegment::getOffset() const
