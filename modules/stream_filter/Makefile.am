@@ -45,8 +45,6 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/mpd/CommonAttributesElements.h \
     stream_filter/dash/mpd/ContentDescription.cpp \
     stream_filter/dash/mpd/ContentDescription.h \
-    stream_filter/dash/mpd/MPDManager.hpp \
-    stream_filter/dash/mpd/MPDManager.cpp \
     stream_filter/dash/mpd/ICanonicalUrl.hpp \
     stream_filter/dash/mpd/IMPDParser.cpp \
     stream_filter/dash/mpd/IMPDParser.h \
@@ -56,8 +54,6 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/mpd/MPD.h \
     stream_filter/dash/mpd/MPDFactory.cpp \
     stream_filter/dash/mpd/MPDFactory.h \
-    stream_filter/dash/mpd/MPDManagerFactory.cpp \
-    stream_filter/dash/mpd/MPDManagerFactory.h \
     stream_filter/dash/mpd/Period.cpp \
     stream_filter/dash/mpd/Period.h \
     stream_filter/dash/mpd/Profile.cpp \

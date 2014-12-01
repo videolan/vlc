@@ -24,9 +24,9 @@ using namespace dash::logic;
 using namespace dash::http;
 using namespace dash::mpd;
 
-AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic(dash::mpd::MPDManager *mpdManager):
-    AbstractAdaptationLogic(mpdManager),
-    currentPeriod(mpdManager->getFirstPeriod()),
+AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic(mpd::MPD *mpd):
+    AbstractAdaptationLogic(mpd),
+    currentPeriod(mpd->getFirstPeriod()),
     count(0)
 {
 }
@@ -43,7 +43,7 @@ Chunk*  AlwaysLowestAdaptationLogic::getNextChunk(Streams::Type type)
     std::vector<ISegment *> segments = rep->getSegments();
     if ( count == segments.size() )
     {
-        currentPeriod = mpdManager->getNextPeriod(currentPeriod);
+        currentPeriod = mpd->getNextPeriod(currentPeriod);
         count = 0;
         return getNextChunk(type);
     }

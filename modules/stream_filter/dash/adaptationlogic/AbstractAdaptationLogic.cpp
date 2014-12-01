@@ -31,8 +31,8 @@ using namespace dash::logic;
 using namespace dash::xml;
 using namespace dash::mpd;
 
-AbstractAdaptationLogic::AbstractAdaptationLogic    (MPDManager *mpdManager) :
-                         mpdManager                 (mpdManager),
+AbstractAdaptationLogic::AbstractAdaptationLogic    (MPD *mpd_) :
+                         mpd                        (mpd_),
                          bpsAvg                     (0),
                          bpsLastChunk               (0),
                          bufferedMicroSec           (0),

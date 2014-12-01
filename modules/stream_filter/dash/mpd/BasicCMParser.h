@@ -44,7 +44,7 @@ namespace dash
                 BasicCMParser( dash::xml::Node *root, stream_t *p_stream );
                 virtual ~BasicCMParser();
 
-                bool    parse  ();
+                bool    parse  (Profile profile);
 
             private:
                 void    handleDependencyId( Representation* rep, const AdaptationSet* adaptationSet, const std::string& dependencyId );

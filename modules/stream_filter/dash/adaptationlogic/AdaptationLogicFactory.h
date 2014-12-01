@@ -27,7 +27,6 @@
 
 #include "adaptationlogic/IAdaptationLogic.h"
 #include "xml/Node.h"
-#include "mpd/MPDManager.hpp"
 
 struct stream_t;
 
@@ -38,7 +37,7 @@ namespace dash
         class AdaptationLogicFactory
         {
             public:
-                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::MPDManager *mpdManager);
+                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, mpd::MPD *mpd);
         };
     }
 }

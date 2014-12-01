@@ -36,13 +36,13 @@ using namespace dash::xml;
 using namespace dash::http;
 using namespace dash::mpd;
 
-RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPDManager *mpdManager) :
-                          AbstractAdaptationLogic   (mpdManager),
+RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPD *mpd) :
+                          AbstractAdaptationLogic   (mpd),
                           count                     (0),
-                          currentPeriod             (mpdManager->getFirstPeriod())
+                          currentPeriod             (mpd->getFirstPeriod())
 {
-    width  = var_InheritInteger(mpdManager->getMPD()->getVLCObject(), "dash-prefwidth");
-    height = var_InheritInteger(mpdManager->getMPD()->getVLCObject(), "dash-prefheight");
+    width  = var_InheritInteger(mpd->getVLCObject(), "dash-prefwidth");
+    height = var_InheritInteger(mpd->getVLCObject(), "dash-prefheight");
 }
 
 Chunk*  RateBasedAdaptationLogic::getNextChunk(Streams::Type type)
@@ -58,7 +58,7 @@ Chunk*  RateBasedAdaptationLogic::getNextChunk(Streams::Type type)
 
     if ( this->count == segments.size() )
     {
-        this->currentPeriod = this->mpdManager->getNextPeriod(this->currentPeriod);
+        currentPeriod = mpd->getNextPeriod(currentPeriod);
         this->count = 0;
         return getNextChunk(type);
     }

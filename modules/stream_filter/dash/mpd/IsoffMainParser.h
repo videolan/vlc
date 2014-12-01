@@ -46,7 +46,7 @@ namespace dash
                 IsoffMainParser             (dash::xml::Node *root, stream_t *p_stream);
                 virtual ~IsoffMainParser    ();
 
-                bool    parse  ();
+                bool    parse  (Profile profile);
                 void    print  ();
 
             private:

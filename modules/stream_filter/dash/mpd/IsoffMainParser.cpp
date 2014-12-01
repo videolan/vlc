@@ -43,9 +43,9 @@ IsoffMainParser::~IsoffMainParser   ()
 {
 }
 
-bool    IsoffMainParser::parse              ()
+bool    IsoffMainParser::parse              (Profile profile)
 {
-    mpd = new MPD(p_stream);
+    mpd = new MPD(p_stream, profile);
     setMPDAttributes();
     setMPDBaseUrl(root);
     setPeriods(root);

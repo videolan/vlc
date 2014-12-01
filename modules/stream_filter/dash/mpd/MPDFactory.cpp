@@ -51,13 +51,10 @@ MPD* MPDFactory::create             (dash::xml::Node *root, stream_t *p_stream, 
         return NULL;
 
     MPD* mpd = NULL;
-    if(parser->parse())
+    if(parser->parse(profile))
         mpd = parser->getMPD();
 
     delete parser;
-
-    if (mpd)
-        mpd->setProfile(profile);
 
     return mpd;
 }

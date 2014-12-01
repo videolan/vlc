@@ -31,8 +31,8 @@
 
 #include <vlc_common.h>
 
-#include "mpd/MPDManager.hpp"
 #include "xml/Node.h"
+#include "mpd/Profile.hpp"
 
 namespace dash
 {

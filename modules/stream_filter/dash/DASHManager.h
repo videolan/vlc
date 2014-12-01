@@ -29,8 +29,6 @@
 #include "xml/Node.h"
 #include "adaptationlogic/IAdaptationLogic.h"
 #include "adaptationlogic/AdaptationLogicFactory.h"
-#include "mpd/MPDManager.hpp"
-#include "mpd/MPDManagerFactory.h"
 #include "buffer/BlockBuffer.h"
 #include "DASHDownloader.h"
 #include "mpd/MPD.h"
@@ -55,7 +53,6 @@ namespace dash
             http::HTTPConnectionManager         *conManager;
             logic::IAdaptationLogic             *adaptationLogic;
             logic::IAdaptationLogic::LogicType  logicType;
-            mpd::MPDManager                    *mpdManager;
             mpd::MPD                            *mpd;
             stream_t                            *stream;
             DASHDownloader                      *downloader;

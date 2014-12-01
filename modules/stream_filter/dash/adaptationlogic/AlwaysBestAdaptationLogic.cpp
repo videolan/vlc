@@ -32,8 +32,8 @@ using namespace dash::xml;
 using namespace dash::http;
 using namespace dash::mpd;
 
-AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (MPDManager *mpdManager) :
-                           AbstractAdaptationLogic      (mpdManager)
+AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (MPD *mpd) :
+                           AbstractAdaptationLogic      (mpd)
 {
     initSchedule();
 }
@@ -64,9 +64,9 @@ const Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation(Stream
 
 void    AlwaysBestAdaptationLogic::initSchedule ()
 {
-    if(mpdManager)
+    if(mpd)
     {
-        std::vector<Period *> periods = mpdManager->getPeriods();
+        std::vector<Period *> periods = mpd->getPeriods();
         if (periods.empty())
             return;
         RepresentationSelector selector;

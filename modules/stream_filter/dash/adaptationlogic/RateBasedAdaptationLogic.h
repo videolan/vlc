@@ -27,7 +27,6 @@
 
 #include "adaptationlogic/AbstractAdaptationLogic.h"
 #include "xml/Node.h"
-#include "mpd/MPDManager.hpp"
 #include "http/Chunk.h"
 
 #define MINBUFFER 30
@@ -39,7 +38,7 @@ namespace dash
         class RateBasedAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                RateBasedAdaptationLogic            (dash::mpd::MPDManager *mpdManager);
+                RateBasedAdaptationLogic            (mpd::MPD *mpd);
 
                 virtual dash::http::Chunk*      getNextChunk(Streams::Type);
                 const dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;

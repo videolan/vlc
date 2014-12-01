@@ -31,10 +31,10 @@
 
 using namespace dash::mpd;
 
-MPD::MPD (stream_t *stream_) :
+MPD::MPD (stream_t *stream_, Profile profile_) :
     ICanonicalUrl(),
     stream(stream_),
-    profile( dash::mpd::Profile::Unknown ),
+    profile( profile_ ),
     live( false ),
     availabilityStartTime( -1 ),
     availabilityEndTime( -1 ),
@@ -161,11 +161,6 @@ Profile MPD::getProfile() const
     return profile;
 }
 
-void MPD::setProfile(Profile profile)
-{
-    this->profile = profile;
-}
-
 std::string MPD::getUrlSegment() const
 {
     if (!baseUrls.empty())
@@ -177,4 +172,27 @@ std::string MPD::getUrlSegment() const
 vlc_object_t * MPD::getVLCObject() const
 {
     return VLC_OBJECT(stream);
+}
+
+Period* MPD::getFirstPeriod() const
+{
+    std::vector<Period *> periods = getPeriods();
+
+    if( !periods.empty() )
+        return periods.front();
+    else
+        return NULL;
+}
+
+Period* MPD::getNextPeriod(Period *period)
+{
+    std::vector<Period *> periods = getPeriods();
+
+    for(size_t i = 0; i < periods.size(); i++)
+    {
+        if(periods.at(i) == period && (i + 1) < periods.size())
+            return periods.at(i + 1);
+    }
+
+    return NULL;
 }

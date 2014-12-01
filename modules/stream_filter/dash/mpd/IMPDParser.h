@@ -43,7 +43,7 @@ namespace dash
             public:
                 IMPDParser(dash::xml::Node *, MPD*, stream_t*, Representation*);
                 virtual ~IMPDParser(){}
-                virtual bool    parse  () = 0;
+                virtual bool    parse  (Profile profile) = 0;
                 virtual MPD*    getMPD ();
                 virtual void    setMPDBaseUrl(dash::xml::Node *root);
                 virtual void    setAdaptationSets(dash::xml::Node *periodNode, Period *period) = 0;

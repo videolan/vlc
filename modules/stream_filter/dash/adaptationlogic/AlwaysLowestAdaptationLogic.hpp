@@ -29,7 +29,7 @@ namespace dash
         class AlwaysLowestAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                AlwaysLowestAdaptationLogic(dash::mpd::MPDManager *mpdManager);
+                AlwaysLowestAdaptationLogic(mpd::MPD *mpd);
 
                 virtual dash::http::Chunk*                  getNextChunk            (Streams::Type);
                 virtual const dash::mpd::Representation*    getCurrentRepresentation(Streams::Type) const;

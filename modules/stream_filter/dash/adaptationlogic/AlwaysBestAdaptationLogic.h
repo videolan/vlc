@@ -29,7 +29,6 @@
 #include "Representationselectors.hpp"
 #include "http/Chunk.h"
 #include "xml/Node.h"
-#include "mpd/MPDManager.hpp"
 #include "mpd/Period.h"
 #include "mpd/Segment.h"
 #include "Streams.hpp"
@@ -42,7 +41,7 @@ namespace dash
         class AlwaysBestAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                AlwaysBestAdaptationLogic           (dash::mpd::MPDManager *mpdManager);
+                AlwaysBestAdaptationLogic           (mpd::MPD *mpd);
                 virtual ~AlwaysBestAdaptationLogic  ();
 
                 virtual dash::http::Chunk* getNextChunk(Streams::Type);

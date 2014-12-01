@@ -39,7 +39,6 @@ DASHManager::DASHManager    ( MPD *mpd,
              conManager     ( NULL ),
              adaptationLogic( NULL ),
              logicType      ( type ),
-             mpdManager     ( NULL ),
              mpd            ( mpd ),
              stream         ( stream ),
              downloader     ( NULL ),
@@ -52,17 +51,11 @@ DASHManager::~DASHManager   ()
     delete this->buffer;
     delete this->conManager;
     delete this->adaptationLogic;
-    delete this->mpdManager;
 }
 
 bool    DASHManager::start()
 {
-    this->mpdManager = mpd::MPDManagerFactory::create( mpd );
-
-    if ( this->mpdManager == NULL )
-        return false;
-
-    adaptationLogic = AdaptationLogicFactory::create( logicType, mpdManager );
+    adaptationLogic = AdaptationLogicFactory::create( logicType, mpd );
 
     if ( this->adaptationLogic == NULL )
         return false;

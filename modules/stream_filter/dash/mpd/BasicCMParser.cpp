@@ -60,10 +60,10 @@ BasicCMParser::~BasicCMParser   ()
 {
 }
 
-bool    BasicCMParser::parse                ()
+bool    BasicCMParser::parse                (Profile profile)
 {
     const std::map<std::string, std::string>    attr = this->root->getAttributes();
-    this->mpd = new MPD(p_stream);
+    mpd = new MPD(p_stream, profile);
 
     std::map<std::string, std::string>::const_iterator  it;
     it = attr.find("mediaPresentationDuration");

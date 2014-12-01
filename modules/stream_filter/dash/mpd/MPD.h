@@ -42,11 +42,10 @@ namespace dash
         class MPD : public ICanonicalUrl
         {
             public:
-                MPD(stream_t *);
+                MPD(stream_t *, Profile);
                 virtual ~MPD();
 
                 Profile                         getProfile() const;
-                void                            setProfile( Profile profile );
                 bool                            isLive() const;
                 void                            setLive( bool live );
                 time_t                          getAvailabilityStartTime() const;
@@ -61,7 +60,6 @@ namespace dash
                 void                            setMinBufferTime( time_t time );
                 time_t                          getTimeShiftBufferDepth() const;
                 void                            setTimeShiftBufferDepth( time_t depth );
-                const std::vector<Period *>&    getPeriods() const;
                 const ProgramInformation*       getProgramInformation() const;
 
                 void    addPeriod               (Period *period);
@@ -70,6 +68,10 @@ namespace dash
 
                 virtual std::string getUrlSegment() const; /* impl */
                 vlc_object_t *      getVLCObject()  const;
+
+                virtual const std::vector<Period *>&    getPeriods() const;
+                virtual Period*                         getFirstPeriod() const;
+                virtual Period*                         getNextPeriod(Period *period);
 
             private:
                 stream_t                           *stream;

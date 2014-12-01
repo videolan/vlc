@@ -29,7 +29,6 @@
 #include "xml/Node.h"
 #include "http/Chunk.h"
 #include "mpd/MPD.h"
-#include "mpd/MPDManager.hpp"
 #include "mpd/Period.h"
 #include "mpd/Representation.h"
 #include "mpd/Segment.h"
@@ -43,7 +42,7 @@ namespace dash
         class AbstractAdaptationLogic : public IAdaptationLogic
         {
             public:
-                AbstractAdaptationLogic             (dash::mpd::MPDManager *mpdManager);
+                AbstractAdaptationLogic             (mpd::MPD *mpd);
                 virtual ~AbstractAdaptationLogic    ();
 
                 virtual void                downloadRateChanged     (uint64_t bpsAvg, uint64_t bpsLastChunk);
@@ -54,7 +53,7 @@ namespace dash
                 int                         getBufferPercent        () const;
 
             protected:
-                dash::mpd::MPDManager  *mpdManager;
+                dash::mpd::MPD         *mpd;
 
             private:
                 int                     bpsAvg;
