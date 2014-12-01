@@ -19,10 +19,8 @@
  *****************************************************************************/
 #include "DASHManager.h"
 
-struct stream_sys_t
+struct demux_sys_t
 {
         dash::DASHManager   *p_dashManager;
         dash::mpd::MPD      *p_mpd;
-        uint64_t             position;
-        char                *psz_useragent;
 };

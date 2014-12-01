@@ -28,10 +28,7 @@
 #include "buffer/IBufferObserver.h"
 
 #include <vlc_stream.h>
-#include <vlc_block_helper.h>
 #include <vector>
-
-#include <iostream>
 
 #define DEFAULTBUFFERLENGTH 30000000
 #define INTIALPEEKSIZE      32768
@@ -43,34 +40,23 @@ namespace dash
         class BlockBuffer
         {
             public:
-                BlockBuffer           (stream_t *stream);
+                BlockBuffer           ();
                 virtual ~BlockBuffer  ();
 
                 void    put           (block_t *block);
-                int     get           (void *p_data, unsigned int len);
+                block_t *get          ();
                 int     peek          (const uint8_t **pp_peek, unsigned int i_peek);
-                int     seekBackwards (unsigned len);
                 void    setEOF        (bool value);
                 bool    getEOF        ();
-                mtime_t size          ();
                 void    attach        (IBufferObserver *observer);
                 void    notify        ();
 
             private:
-                mtime_t             capacityMicroSec;
-                mtime_t             sizeMicroSec;
                 size_t              sizeBytes;
-                vlc_mutex_t         monitorMutex;
-                vlc_cond_t          empty;
-                vlc_cond_t          full;
-                stream_t            *stream;
                 bool                isEOF;
-                block_bytestream_t  buffer;
-                block_t             *peekBlock;
+                block_fifo_t        *fifo;
 
                 std::vector<IBufferObserver *> bufferObservers;
-
-                void updateBufferSize(size_t bytes);
         };
     }
 }

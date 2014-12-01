@@ -92,8 +92,6 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/xml/Node.h \
     stream_filter/dash/dash.cpp \
     stream_filter/dash/dash.hpp \
-    stream_filter/dash/DASHDownloader.cpp \
-    stream_filter/dash/DASHDownloader.h \
     stream_filter/dash/DASHManager.cpp \
     stream_filter/dash/DASHManager.h \
     stream_filter/dash/Helper.cpp \

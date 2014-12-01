@@ -35,6 +35,7 @@ AbstractAdaptationLogic::AbstractAdaptationLogic    (MPD *mpd_) :
                          mpd                        (mpd_),
                          currentPeriod              (mpd->getFirstPeriod()),
                          count                      (0),
+                         prevRepresentation         (NULL),
                          bufferedMicroSec           (0),
                          bufferedPercent            (0)
 {
@@ -53,8 +54,14 @@ Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
     if ( rep == NULL )
             return NULL;
 
+    bool reinit = count && (rep != prevRepresentation);
+    prevRepresentation = rep;
+
     std::vector<ISegment *> segments = rep->getSegments();
     ISegment *first = segments.empty() ? NULL : segments.front();
+
+    if (reinit && first && first->getClassId() == InitSegment::CLASSID_INITSEGMENT)
+        return first->toChunk(count, rep);
 
     bool b_templated = (first && !first->isSingleShot());
 

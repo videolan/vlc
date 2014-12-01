@@ -60,6 +60,7 @@ namespace dash
                 bool parseReply();
                 std::string readLine();
                 std::string hostname;
+                char * psz_useragent;
                 stream_t   *stream;
 
             private:

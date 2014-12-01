@@ -20,8 +20,16 @@
 #ifndef STREAM_HPP
 #define STREAM_HPP
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <string>
+#include <vlc_common.h>
 #include "StreamsType.hpp"
+#include "adaptationlogic/IAdaptationLogic.h"
+#include "http/HTTPConnectionManager.h"
+#include "http/Chunk.h"
 
 namespace dash
 {
@@ -34,13 +42,59 @@ namespace dash
             public:
                 Stream(const std::string &mime);
                 Stream(const Type);
+                ~Stream();
                 bool operator==(const Stream &) const;
                 static Type mimeToType(const std::string &mime);
+                void init(demux_t *, logic::IAdaptationLogic *);
+                bool isEOF() const;
+                mtime_t getPCR() const;
+                int getGroup() const;
+                int esCount() const;
+                size_t read(http::HTTPConnectionManager *);
 
             private:
+                http::Chunk *getChunk();
+                void init(const Type);
                 Type type;
+                AbstractStreamOutput *output;
+                logic::IAdaptationLogic *adaptationLogic;
+                http::Chunk *currentChunk;
+                bool eof;
         };
 
+        class AbstractStreamOutput
+        {
+            public:
+                AbstractStreamOutput(demux_t *);
+                virtual ~AbstractStreamOutput();
+
+                virtual void pushBlock(block_t *);
+                mtime_t getPCR() const;
+                int getGroup() const;
+                int esCount() const;
+
+            protected:
+                mtime_t   pcr;
+                int       group;
+                int       escount;
+                es_out_t *fakeesout; /* to intercept/proxy what is sent from demuxstream */
+                stream_t *demuxstream;
+
+            private:
+                demux_t  *realdemux;
+                static es_out_id_t *esOutAdd(es_out_t *, const es_format_t *);
+                static int esOutSend(es_out_t *, es_out_id_t *, block_t *);
+                static void esOutDel(es_out_t *, es_out_id_t *);
+                static int esOutControl(es_out_t *, int, va_list);
+                static void esOutDestroy(es_out_t *);
+        };
+
+        class MP4StreamOutput : public AbstractStreamOutput
+        {
+            public:
+                MP4StreamOutput(demux_t *);
+                virtual ~MP4StreamOutput(){}
+        };
     }
 }
 #endif // STREAMS_HPP

@@ -29,7 +29,7 @@
 #include <adaptationlogic/IDownloadRateObserver.h>
 #include "mpd/Representation.h"
 #include "buffer/IBufferObserver.h"
-#include "Streams.hpp"
+#include "StreamsType.hpp"
 
 namespace dash
 {

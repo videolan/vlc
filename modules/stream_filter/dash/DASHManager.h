@@ -26,11 +26,7 @@
 #define DASHMANAGER_H_
 
 #include "http/HTTPConnectionManager.h"
-#include "xml/Node.h"
 #include "adaptationlogic/IAdaptationLogic.h"
-#include "adaptationlogic/AdaptationLogicFactory.h"
-#include "buffer/BlockBuffer.h"
-#include "DASHDownloader.h"
 #include "mpd/MPD.h"
 
 namespace dash
@@ -42,22 +38,21 @@ namespace dash
                          logic::IAdaptationLogic::LogicType type, stream_t *stream);
             virtual ~DASHManager    ();
 
-            bool    start         ();
-            int     read          ( void *p_buffer, size_t len );
-            int     peek          ( const uint8_t **pp_peek, size_t i_peek );
-            int     seekBackwards ( unsigned len );
-
+            bool    start         (demux_t *);
+            size_t  read();
             mtime_t getDuration() const;
+            mtime_t getPCR() const;
+            int     getGroup() const;
+            int     esCount() const;
 
         private:
             http::HTTPConnectionManager         *conManager;
-            logic::IAdaptationLogic             *adaptationLogic;
             logic::IAdaptationLogic::LogicType  logicType;
             mpd::MPD                            *mpd;
             stream_t                            *stream;
-            DASHDownloader                      *downloader;
-            buffer::BlockBuffer                 *buffer;
+            Streams::Stream                     *streams[Streams::count];
     };
+
 }
 
 #endif /* DASHMANAGER_H_ */

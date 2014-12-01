@@ -25,11 +25,13 @@
 # include "config.h"
 #endif
 
+#define __STDC_CONSTANT_MACROS
+
 #include "DASHManager.h"
+#include "adaptationlogic/AdaptationLogicFactory.h"
 
 using namespace dash;
 using namespace dash::http;
-using namespace dash::xml;
 using namespace dash::logic;
 using namespace dash::mpd;
 using namespace dash::buffer;
@@ -37,64 +39,103 @@ using namespace dash::buffer;
 DASHManager::DASHManager    ( MPD *mpd,
                               IAdaptationLogic::LogicType type, stream_t *stream) :
              conManager     ( NULL ),
-             adaptationLogic( NULL ),
              logicType      ( type ),
              mpd            ( mpd ),
-             stream         ( stream ),
-             downloader     ( NULL ),
-             buffer         ( NULL )
+             stream         ( stream )
 {
+    for(int i=0; i<Streams::count; i++)
+        streams[i] = NULL;
 }
+
 DASHManager::~DASHManager   ()
 {
-    delete this->downloader;
-    delete this->buffer;
-    delete this->conManager;
-    delete this->adaptationLogic;
+    delete conManager;
+    for(int i=0; i<Streams::count; i++)
+        delete streams[i];
 }
 
-bool    DASHManager::start()
+bool DASHManager::start(demux_t *demux)
 {
-    adaptationLogic = AdaptationLogicFactory::create( logicType, mpd );
-
-    if ( this->adaptationLogic == NULL )
+    const Period *period = mpd->getFirstPeriod();
+    if(!period)
         return false;
 
-    this->conManager = new dash::http::HTTPConnectionManager(this->adaptationLogic, this->stream);
-    this->buffer     = new BlockBuffer(this->stream);
-    this->downloader = new DASHDownloader(this->conManager, this->buffer);
+    for(int i=0; i<Streams::count; i++)
+    {
+        Streams::Type type = static_cast<Streams::Type>(i);
+        const AdaptationSet *set = period->getAdaptationSet(type);
+        if(set)
+        {
+            streams[type] = new Streams::Stream(type);
+            try
+            {
+                streams[type]->init(demux, AdaptationLogicFactory::create( logicType, mpd ) );
+            } catch (int) {
+                delete streams[type];
+                streams[type] = NULL;
+            }
+        }
+    }
 
-    this->buffer->attach(this->adaptationLogic);
+    conManager = new HTTPConnectionManager(stream);
+    if(!conManager)
+        return false;
 
-    return this->downloader->start();
+    return true;
 }
-int     DASHManager::read( void *p_buffer, size_t len )
+
+size_t DASHManager::read()
 {
-    return this->buffer->get(p_buffer, len);
+    size_t i_ret = 0;
+    for(int type=0; type<Streams::count; type++)
+    {
+        if(!streams[type])
+            continue;
+        i_ret += streams[type]->read(conManager);
+    }
+    return i_ret;
 }
 
-int     DASHManager::seekBackwards( unsigned i_len )
+mtime_t DASHManager::getPCR() const
 {
-    return this->buffer->seekBackwards( i_len );
+    mtime_t pcr = VLC_TS_INVALID;
+    for(int type=0; type<Streams::count; type++)
+    {
+        if(!streams[type])
+            continue;
+        if(pcr == VLC_TS_INVALID || pcr > streams[type]->getPCR())
+            pcr = streams[type]->getPCR();
+    }
+    return pcr;
 }
 
-int     DASHManager::peek( const uint8_t **pp_peek, size_t i_peek )
+int DASHManager::getGroup() const
 {
-    return this->buffer->peek(pp_peek, i_peek);
+    for(int type=0; type<Streams::count; type++)
+    {
+        if(!streams[type])
+            continue;
+        return streams[type]->getGroup();
+    }
+    return -1;
+}
+
+int DASHManager::esCount() const
+{
+    int es = 0;
+    for(int type=0; type<Streams::count; type++)
+    {
+        if(!streams[type])
+            continue;
+        es += streams[type]->esCount();
+    }
+    return es;
 }
 
 mtime_t DASHManager::getDuration() const
 {
     if (mpd->isLive())
-    {
         return 0;
-    }
     else
-    {
-        const Representation *rep = adaptationLogic->getCurrentRepresentation(Streams::VIDEO);
-        if ( !rep )
-            return 0;
-        else
-            return mpd->getDuration() * rep->getBandwidth() / 8;
-    }
+        return CLOCK_FREQ * mpd->getDuration();
 }

@@ -28,6 +28,8 @@
 #include "MPD.h"
 #include "Helper.h"
 #include "dash.hpp"
+#include <vlc_common.h>
+#include <vlc_stream.h>
 
 using namespace dash::mpd;
 

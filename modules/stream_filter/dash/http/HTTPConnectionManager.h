@@ -30,19 +30,10 @@
 #endif
 
 #include "http/PersistentConnection.h"
+#include "adaptationlogic/IDownloadRateObserver.h"
 
 #include <vlc_common.h>
-
-#include <string>
 #include <vector>
-#include <deque>
-#include <iostream>
-#include <ctime>
-#include <limits.h>
-
-#include "http/PersistentConnection.h"
-#include "adaptationlogic/IAdaptationLogic.h"
-#include "Streams.hpp"
 
 namespace dash
 {
@@ -51,25 +42,20 @@ namespace dash
         class HTTPConnectionManager
         {
             public:
-                HTTPConnectionManager           (logic::IAdaptationLogic *adaptationLogic, stream_t *stream);
+                HTTPConnectionManager           (stream_t *stream);
                 virtual ~HTTPConnectionManager  ();
 
                 void    closeAllConnections ();
-                ssize_t read                (Streams::Type, block_t **);
+                void    releaseAllConnections ();
+                bool    connectChunk        (Chunk *chunk);
 
             private:
-                std::deque<Chunk *>                                 downloadQueue[Streams::count];
-                void    releaseAllConnections ();
-
                 Chunk                                               *currentChunk;
                 std::vector<PersistentConnection *>                 connectionPool;
-                logic::IAdaptationLogic                             *adaptationLogic;
                 stream_t                                            *stream;
-                int                                                 chunkCount;
 
                 static const uint64_t   CHUNKDEFAULTBITRATE;
 
-                bool                                    connectChunk            (Chunk *chunk);
                 PersistentConnection *                  getConnectionForHost    (const std::string &hostname);
         };
     }

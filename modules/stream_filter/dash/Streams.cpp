@@ -17,18 +17,40 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#define __STDC_CONSTANT_MACROS
 #include "Streams.hpp"
+#include "adaptationlogic/IAdaptationLogic.h"
+#include "adaptationlogic/AdaptationLogicFactory.h"
+#include <vlc_stream.h>
+#include <vlc_demux.h>
 
 using namespace dash::Streams;
+using namespace dash::http;
+using namespace dash::logic;
 
 Stream::Stream(const std::string &mime)
 {
-    type = mimeToType(mime);
+    init(mimeToType(mime));
 }
 
 Stream::Stream(const Type type)
 {
-    this->type = type;
+    init(type);
+}
+
+void Stream::init(const Type type_)
+{
+    type = type_;
+    output = NULL;
+    currentChunk = NULL;
+    eof = false;
+}
+
+Stream::~Stream()
+{
+    delete currentChunk;
+    delete adaptationLogic;
+    delete output;
 }
 
 Type Stream::mimeToType(const std::string &mime)
@@ -45,7 +67,214 @@ Type Stream::mimeToType(const std::string &mime)
     return mimetype;
 }
 
+void Stream::init(demux_t *demux, IAdaptationLogic *logic)
+{
+    output = new Streams::MP4StreamOutput(demux);
+    adaptationLogic = logic;
+}
+
+bool Stream::isEOF() const
+{
+    return false;
+}
+
+mtime_t Stream::getPCR() const
+{
+    return output->getPCR();
+}
+
+int Stream::getGroup() const
+{
+    return output->getGroup();
+}
+
+int Stream::esCount() const
+{
+    return output->esCount();
+}
+
 bool Stream::operator ==(const Stream &stream) const
 {
     return stream.type == type;
+}
+
+Chunk * Stream::getChunk()
+{
+    if (currentChunk == NULL)
+    {
+        currentChunk = adaptationLogic->getNextChunk(type);
+        if (currentChunk == NULL)
+            eof = true;
+    }
+    return currentChunk;
+}
+
+size_t Stream::read(HTTPConnectionManager *connManager)
+{
+    Chunk *chunk = getChunk();
+    if(!chunk)
+        return 0;
+
+    if(!chunk->getConnection())
+    {
+       if(!connManager->connectChunk(chunk))
+        return 0;
+    }
+
+    size_t readsize = 0;
+
+    /* Because we don't know Chunk size at start, we need to get size
+       from content length */
+    if(chunk->getBytesRead() == 0)
+    {
+        if(chunk->getConnection()->query(chunk->getPath()) == false)
+            readsize = 32768; /* we don't handle retry here :/ */
+        else
+            readsize = chunk->getBytesToRead();
+    }
+    else
+    {
+        readsize = chunk->getBytesToRead();
+    }
+
+    if (readsize > 128000)
+        readsize = 32768;
+
+    block_t *block = block_Alloc(readsize);
+    if(!block)
+        return 0;
+
+    mtime_t time = mdate();
+    ssize_t ret = chunk->getConnection()->read(block->p_buffer, readsize);
+    time = mdate() - time;
+
+    if(ret <= 0)
+    {
+        block_Release(block);
+        chunk->getConnection()->releaseChunk();
+        currentChunk = NULL;
+        delete chunk;
+        return 0;
+    }
+    else
+    {
+        block->i_buffer = (size_t)ret;
+
+        adaptationLogic->updateDownloadRate(block->i_buffer, time);
+
+        if (chunk->getBytesToRead() == 0)
+        {
+            chunk->onDownload(block->p_buffer, block->i_buffer);
+            chunk->getConnection()->releaseChunk();
+            currentChunk = NULL;
+            delete chunk;
+        }
+    }
+
+    readsize = block->i_buffer;
+
+    output->pushBlock(block);
+
+    return readsize;
+}
+
+AbstractStreamOutput::AbstractStreamOutput(demux_t *demux)
+{
+    realdemux = demux;
+    demuxstream = NULL;
+    pcr = VLC_TS_0;
+    group = -1;
+    escount = 0;
+
+    fakeesout = new es_out_t;
+    if (!fakeesout)
+        throw VLC_ENOMEM;
+
+    fakeesout->pf_add = esOutAdd;
+    fakeesout->pf_control = esOutControl;
+    fakeesout->pf_del = esOutDel;
+    fakeesout->pf_destroy = esOutDestroy;
+    fakeesout->pf_send = esOutSend;
+    fakeesout->p_sys = (es_out_sys_t*) this;
+}
+
+AbstractStreamOutput::~AbstractStreamOutput()
+{
+    if (demuxstream)
+        stream_Delete(demuxstream);
+    delete fakeesout;
+}
+
+mtime_t AbstractStreamOutput::getPCR() const
+{
+    return pcr;
+}
+
+int AbstractStreamOutput::getGroup() const
+{
+    return group;
+}
+
+int AbstractStreamOutput::esCount() const
+{
+    return escount;
+}
+
+void AbstractStreamOutput::pushBlock(block_t *block)
+{
+    stream_DemuxSend(demuxstream, block);
+}
+
+/* Static callbacks */
+es_out_id_t * AbstractStreamOutput::esOutAdd(es_out_t *fakees, const es_format_t *p_fmt)
+{
+    AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
+    me->escount++;
+    return me->realdemux->out->pf_add(me->realdemux->out, p_fmt);
+}
+
+int AbstractStreamOutput::esOutSend(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
+{
+    AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
+    return me->realdemux->out->pf_send(me->realdemux->out, p_es, p_block);
+}
+
+void AbstractStreamOutput::esOutDel(es_out_t *fakees, es_out_id_t *p_es)
+{
+    AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
+    me->escount--;
+    me->realdemux->out->pf_del(me->realdemux->out, p_es);
+}
+
+int AbstractStreamOutput::esOutControl(es_out_t *fakees, int i_query, va_list args)
+{
+    AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
+    if (i_query == ES_OUT_SET_PCR )
+    {
+        me->pcr = (int64_t)va_arg( args, int64_t );
+        return VLC_SUCCESS;
+    }
+    else if( i_query == ES_OUT_SET_GROUP_PCR )
+    {
+        me->group = (int) va_arg( args, int );
+        me->pcr = (int64_t)va_arg( args, int64_t );
+        return VLC_SUCCESS;
+    }
+
+    return me->realdemux->out->pf_control(me->realdemux->out, i_query, args);
+}
+
+void AbstractStreamOutput::esOutDestroy(es_out_t *fakees)
+{
+    AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
+    me->realdemux->out->pf_destroy(me->realdemux->out);
+}
+/* !Static callbacks */
+
+MP4StreamOutput::MP4StreamOutput(demux_t *demux) :
+    AbstractStreamOutput(demux)
+{
+    demuxstream = stream_DemuxNew(demux, "mp4", fakeesout);
+    if(!demuxstream)
+        throw VLC_EGENERIC;
 }

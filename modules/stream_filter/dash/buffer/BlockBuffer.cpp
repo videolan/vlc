@@ -29,170 +29,61 @@
 
 using namespace dash::buffer;
 
-BlockBuffer::BlockBuffer    (stream_t *stream) :
-             sizeMicroSec   (0),
+BlockBuffer::BlockBuffer    () :
              sizeBytes      (0),
-             stream         (stream),
              isEOF          (false)
 
 {
-    this->capacityMicroSec  = var_InheritInteger(stream, "dash-buffersize") * 1000000;
-
-    if(this->capacityMicroSec <= 0)
-        this->capacityMicroSec = DEFAULTBUFFERLENGTH;
-
-    this->peekBlock = block_Alloc(INTIALPEEKSIZE);
-
-    block_BytestreamInit(&this->buffer);
-    vlc_mutex_init(&this->monitorMutex);
-    vlc_cond_init(&this->empty);
-    vlc_cond_init(&this->full);
+    fifo = block_FifoNew();
+    if(!fifo)
+        throw VLC_ENOMEM;
 }
 BlockBuffer::~BlockBuffer   ()
 {
-    block_Release(this->peekBlock);
-
-    block_BytestreamRelease(&this->buffer);
-    vlc_mutex_destroy(&this->monitorMutex);
-    vlc_cond_destroy(&this->empty);
-    vlc_cond_destroy(&this->full);
+    block_FifoRelease(fifo);
 }
 
-int     BlockBuffer::peek                 (const uint8_t **pp_peek, unsigned int len)
+int BlockBuffer::peek(const uint8_t **pp_peek, unsigned int len)
 {
-    vlc_mutex_lock(&this->monitorMutex);
-
-    while(this->sizeBytes == 0 && !this->isEOF)
-        vlc_cond_wait(&this->full, &this->monitorMutex);
-
-    if(this->sizeBytes == 0)
-    {
-        vlc_cond_signal(&this->empty);
-        vlc_mutex_unlock(&this->monitorMutex);
+    block_t *p_block = block_FifoShow(fifo);
+    if(!p_block)
         return 0;
-    }
 
-    size_t ret = len > this->sizeBytes ? this->sizeBytes : len;
-
-    if(ret > this->peekBlock->i_buffer)
-        this->peekBlock = block_Realloc(this->peekBlock, 0, ret);
-
-    block_PeekBytes(&this->buffer, this->peekBlock->p_buffer, ret);
-    *pp_peek = this->peekBlock->p_buffer;
-
-    vlc_mutex_unlock(&this->monitorMutex);
-    return ret;
+    *pp_peek = p_block->p_buffer;
+    return __MIN(len, p_block->i_buffer);
 }
 
-int     BlockBuffer::seekBackwards       (unsigned len)
+block_t * BlockBuffer::get()
 {
-    vlc_mutex_lock(&this->monitorMutex);
-    if( this->buffer.i_offset > len )
-    {
-        this->buffer.i_offset -= len;
-        this->sizeBytes += len;
-        vlc_mutex_unlock(&this->monitorMutex);
-        return VLC_SUCCESS;
-    }
-
-    vlc_mutex_unlock(&this->monitorMutex);
-    return VLC_EGENERIC;
+    block_t *p_block = block_FifoGet(fifo);
+    if(p_block)
+        notify();
+    return p_block;
 }
 
-int     BlockBuffer::get                  (void *p_data, unsigned int len)
+void BlockBuffer::put(block_t *block)
 {
-    vlc_mutex_lock(&this->monitorMutex);
-
-    while(this->sizeBytes == 0 && !this->isEOF)
-        vlc_cond_wait(&this->full, &this->monitorMutex);
-
-    if(this->sizeBytes == 0)
-    {
-        vlc_cond_signal(&this->empty);
-        vlc_mutex_unlock(&this->monitorMutex);
-        return 0;
-    }
-
-    int ret = len > this->sizeBytes ? this->sizeBytes : len;
-
-    if(p_data == NULL)
-        block_SkipBytes(&this->buffer, ret);
-    else
-        block_GetBytes(&this->buffer, (uint8_t *)p_data, ret);
-
-    block_BytestreamFlush(&this->buffer);
-    this->updateBufferSize(ret);
-
-    this->notify();
-
-    vlc_cond_signal(&this->empty);
-    vlc_mutex_unlock(&this->monitorMutex);
-    return ret;
+    block_FifoPut(fifo, block);
+    notify();
 }
-void    BlockBuffer::put                  (block_t *block)
+
+void BlockBuffer::setEOF(bool value)
 {
-    vlc_mutex_lock(&this->monitorMutex);
-
-    while(this->sizeMicroSec >= this->capacityMicroSec && !this->isEOF)
-        vlc_cond_wait(&this->empty, &this->monitorMutex);
-
-    if(this->isEOF)
-    {
-        vlc_cond_signal(&this->full);
-        vlc_mutex_unlock(&this->monitorMutex);
-        return;
-    }
-
-    this->sizeMicroSec  += block->i_length;
-    this->sizeBytes     += block->i_buffer;
-
-    block_BytestreamPush(&this->buffer, block);
-    this->notify();
-
-    vlc_cond_signal(&this->full);
-    vlc_mutex_unlock(&this->monitorMutex);
+    isEOF = value;
+    block_FifoWake(fifo);
 }
-void    BlockBuffer::setEOF               (bool value)
+
+bool BlockBuffer::getEOF()
 {
-    vlc_mutex_lock(&this->monitorMutex);
-    this->isEOF = value;
-    vlc_cond_signal(&this->empty);
-    vlc_cond_signal(&this->full);
-    vlc_mutex_unlock(&this->monitorMutex);
+    return isEOF;
 }
-bool    BlockBuffer::getEOF               ()
-{
-    vlc_mutex_locker    lock(&this->monitorMutex);
 
-    return this->isEOF;
-}
 void    BlockBuffer::attach               (IBufferObserver *observer)
 {
     this->bufferObservers.push_back(observer);
 }
 void    BlockBuffer::notify               ()
 {
-    for(size_t i = 0; i < this->bufferObservers.size(); i++)
-        this->bufferObservers.at(i)->bufferLevelChanged(this->sizeMicroSec, ((float)this->sizeMicroSec / this->capacityMicroSec) * 100);
-}
-void    BlockBuffer::updateBufferSize     (size_t bytes)
-{
-    block_t *block = this->buffer.p_block;
-
-    this->sizeMicroSec = 0;
-
-    while(block)
-    {
-        this->sizeMicroSec += block->i_length;
-        block = block->p_next;
-    }
-
-    this->sizeBytes -= bytes;
-}
-mtime_t BlockBuffer::size                 ()
-{
-    vlc_mutex_lock(&this->monitorMutex);
-    mtime_t ret = this->sizeMicroSec;
-    vlc_mutex_unlock(&this->monitorMutex);
-    return ret;
+//    for(size_t i = 0; i < this->bufferObservers.size(); i++)
+//        this->bufferObservers.at(i)->bufferLevelChanged(this->sizeMicroSec, ((float)this->sizeMicroSec / this->capacityMicroSec) * 100);
 }

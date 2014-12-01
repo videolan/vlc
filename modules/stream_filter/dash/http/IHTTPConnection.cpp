@@ -34,11 +34,13 @@ IHTTPConnection::IHTTPConnection(stream_t *stream_)
 {
     stream = stream_;
     httpSocket = -1;
+    psz_useragent = var_InheritString(stream, "http-user-agent");
 }
 
 IHTTPConnection::~IHTTPConnection()
 {
     disconnect();
+    free(psz_useragent);
 }
 
 bool IHTTPConnection::connect(const std::string &hostname, int port)
@@ -166,7 +168,7 @@ std::string IHTTPConnection::buildRequestHeader(const std::string &path) const
     std::stringstream req;
     req << "GET " << path << " HTTP/1.1\r\n" <<
            "Host: " << hostname << "\r\n" <<
-           "User-Agent: " << std::string(stream->p_sys->psz_useragent) << "\r\n";
+           "User-Agent: " << std::string(psz_useragent) << "\r\n";
     req << extraRequestHeaders();
     return req.str();
 }
