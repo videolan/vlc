@@ -39,7 +39,8 @@
 
 ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
                               const QStringList& inputMRLs )
-              : QVLCDialog( parent, _p_intf )
+              : QVLCDialog( parent, _p_intf ),
+                singleFileSelected( inputMRLs.length() == 1 )
 {
     setWindowTitle( qtr( "Convert" ) );
     setWindowRole( "vlc-convert" );
@@ -47,8 +48,6 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     QGridLayout *mainLayout = new QGridLayout( this );
     SoutInputBox *inputBox = new SoutInputBox( this );
     incomingMRLs = &inputMRLs;
-
-    singleFileSelected = (inputMRLs.length() == 1);
 
     if(singleFileSelected)
     {
@@ -220,7 +219,7 @@ void ConvertDialog::close()
                 }
 
                 // If we have multiple files (i.e. we have an appenBox) and it's checked
-                if(!singleFileSelected && appendBox->isChecked())
+                if( appendBox->isChecked() )
                 {
                     newFileName = newFileName.append("-converted");
                 }

@@ -50,7 +50,7 @@ private:
     VLCProfileSelector *profile;
 
     const QStringList *incomingMRLs;
-    bool singleFileSelected;
+    const bool singleFileSelected;
     QStringList mrls;
 
 private slots:
