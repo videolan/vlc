@@ -22,6 +22,8 @@
 # include "config.h"
 #endif
 
+#include <stdio.h>
+
 #ifndef UPDATE_CHECK
 int main(void)
 {
