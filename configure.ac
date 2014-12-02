@@ -2234,6 +2234,11 @@ AC_SUBST(MAD_CFLAGS)
 AC_SUBST(MAD_LIBS)
 AM_CONDITIONAL([HAVE_MAD], [test "${have_mad}" = "yes"])
 
+dnl  mpg123 plugin
+dnl
+dnl
+PKG_ENABLE_MODULES_VLC([MPG123], [mpg123], [libmpg123], [libmpg123 decoder support], [auto])
+
 
 AC_ARG_ENABLE(merge-ffmpeg,
 [  --enable-merge-ffmpeg   merge FFmpeg-based plugins (default disabled)],, [

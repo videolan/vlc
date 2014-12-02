@@ -60,6 +60,13 @@ if HAVE_MAD
 libmpeg_audio_plugin_la_CPPFLAGS += -DHAVE_MPGA_FILTER
 endif
 
+libmpg123_plugin_la_SOURCES = codec/mpg123.c
+libmpg123_plugin_la_CFLAGS = $(AM_CFLAGS) $(MPG123_CFLAGS)
+libmpg123_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libmpg123_plugin_la_LIBADD = $(MPG123_LIBS)
+EXTRA_LTLIBRARIES += libmpg123_plugin.la
+codec_LTLIBRARIES += $(LTLIBmpg123)
+
 libuleaddvaudio_plugin_la_SOURCES = codec/uleaddvaudio.c
 codec_LTLIBRARIES += libuleaddvaudio_plugin.la
 

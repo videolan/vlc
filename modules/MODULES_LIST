@@ -226,6 +226,7 @@ $Id$
  * mp4: MP4 file input module
  * mpc: Musepack decoder
  * mpeg_audio: MPEG audio parser/packetizer
+ * mpg123: MPEG-1 & 2 audio layer I, II, III + MPEG 2.5 decoder using mpg123
  * mpgv: MPEG-I/II Video demuxer
  * mtp: MTP interface module
  * mux_asf: ASF muxer
