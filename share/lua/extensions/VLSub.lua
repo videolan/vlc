@@ -1668,7 +1668,7 @@ function download_subtitles()
   local item = openSub.itemStore[index]
   
   if openSub.option.downloadBehaviour == 'manual' 
-  or not subfileName then
+  or not openSub.file.hasInput then
     local link = "<span style='color:#181'>"
     link = link.."<b>"..lang["mess_dowload_link"]..":</b>"
     link = link.."</span> &nbsp;"
@@ -1681,7 +1681,7 @@ function download_subtitles()
   end
   
   local message = ""
-  local subfileName = openSub.file.name
+  local subfileName = openSub.file.name or ""
   
   if openSub.option.langExt then
     subfileName = subfileName.."."..item.SubLanguageID
