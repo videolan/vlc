@@ -1,0 +1,11 @@
+--- musepack.clean/libmpcpsy/psy_tab.c	2014-12-03 15:25:37.877616700 +0100
++++ musepack/libmpcpsy/psy_tab.c	2014-12-03 15:20:59.300071300 +0100
+@@ -186,7 +187,7 @@
+     }
+ }
+
+-#ifdef _MSC_VER
++#if defined(_MSC_VER) && _MSC_VER < 1800
+ static double
+ asinh ( double x )
+ {
