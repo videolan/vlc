@@ -26,13 +26,6 @@
 #define ALWAYSBESTADAPTATIONLOGIC_H_
 
 #include "adaptationlogic/AbstractAdaptationLogic.h"
-#include "Representationselectors.hpp"
-#include "http/Chunk.h"
-#include "xml/Node.h"
-#include "mpd/Period.h"
-#include "mpd/Segment.h"
-#include "Streams.hpp"
-#include <vector>
 
 namespace dash
 {
@@ -42,19 +35,8 @@ namespace dash
         {
             public:
                 AlwaysBestAdaptationLogic           (mpd::MPD *mpd);
-                virtual ~AlwaysBestAdaptationLogic  ();
 
-                virtual dash::http::Chunk* getNextChunk(Streams::Type);
-                const mpd::Representation *getCurrentRepresentation(Streams::Type) const;
-
-            private:
-                struct
-                {
-                    std::vector<mpd::ISegment *>    schedule;
-                    size_t                          count;
-                    mpd::Representation            *bestRepresentation;
-                } streams[Streams::count];
-                void  initSchedule ();
+                virtual const mpd::Representation *getCurrentRepresentation(Streams::Type) const;
         };
     }
 }

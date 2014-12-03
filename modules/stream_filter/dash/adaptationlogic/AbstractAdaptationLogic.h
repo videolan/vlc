@@ -26,12 +26,10 @@
 #define ABSTRACTADAPTATIONLOGIC_H_
 
 #include "adaptationlogic/IAdaptationLogic.h"
-#include "xml/Node.h"
 #include "http/Chunk.h"
 #include "mpd/MPD.h"
 #include "mpd/Period.h"
 #include "mpd/Representation.h"
-#include "mpd/Segment.h"
 
 struct stream_t;
 
@@ -45,6 +43,8 @@ namespace dash
                 AbstractAdaptationLogic             (mpd::MPD *mpd);
                 virtual ~AbstractAdaptationLogic    ();
 
+                virtual dash::http::Chunk*  getNextChunk            (Streams::Type);
+
                 virtual void                downloadRateChanged     (uint64_t bpsAvg, uint64_t bpsLastChunk);
                 virtual void                bufferLevelChanged      (mtime_t bufferedMicroSec, int bufferedPercent);
 
@@ -54,6 +54,8 @@ namespace dash
 
             protected:
                 dash::mpd::MPD         *mpd;
+                dash::mpd::Period      *currentPeriod;
+                size_t                  count;
 
             private:
                 int                     bpsAvg;

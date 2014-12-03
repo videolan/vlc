@@ -28,11 +28,13 @@
 #include "AbstractAdaptationLogic.h"
 
 using namespace dash::logic;
-using namespace dash::xml;
 using namespace dash::mpd;
+using namespace dash::http;
 
 AbstractAdaptationLogic::AbstractAdaptationLogic    (MPD *mpd_) :
                          mpd                        (mpd_),
+                         currentPeriod              (mpd->getFirstPeriod()),
+                         count                      (0),
                          bpsAvg                     (0),
                          bpsLastChunk               (0),
                          bufferedMicroSec           (0),
@@ -42,6 +44,36 @@ AbstractAdaptationLogic::AbstractAdaptationLogic    (MPD *mpd_) :
 
 AbstractAdaptationLogic::~AbstractAdaptationLogic   ()
 {
+}
+
+Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
+{
+    if(!currentPeriod)
+        return NULL;
+
+    const Representation *rep = getCurrentRepresentation(type);
+    if ( rep == NULL )
+            return NULL;
+
+    std::vector<ISegment *> segments = rep->getSegments();
+    if ( count == segments.size() )
+    {
+        currentPeriod = mpd->getNextPeriod(currentPeriod);
+        count = 0;
+        return getNextChunk(type);
+    }
+
+    if ( segments.size() > count )
+    {
+        ISegment *seg = segments.at( count );
+        Chunk *chunk = seg->toChunk();
+        //In case of UrlTemplate, we must stay on the same segment.
+        if ( seg->isSingleShot() == true )
+            count++;
+        seg->done();
+        return chunk;
+    }
+    return NULL;
 }
 
 void AbstractAdaptationLogic::bufferLevelChanged     (mtime_t bufferedMicroSec, int bufferedPercent)

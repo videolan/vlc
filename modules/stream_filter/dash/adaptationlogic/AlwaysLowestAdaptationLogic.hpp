@@ -31,12 +31,7 @@ namespace dash
             public:
                 AlwaysLowestAdaptationLogic(mpd::MPD *mpd);
 
-                virtual dash::http::Chunk*                  getNextChunk            (Streams::Type);
                 virtual const dash::mpd::Representation*    getCurrentRepresentation(Streams::Type) const;
-
-            private:
-                dash::mpd::Period *currentPeriod;
-                size_t             count;
         };
     }
 }

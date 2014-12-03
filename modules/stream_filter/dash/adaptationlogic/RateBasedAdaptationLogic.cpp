@@ -32,48 +32,13 @@
 #include <vlc_variables.h>
 
 using namespace dash::logic;
-using namespace dash::xml;
-using namespace dash::http;
 using namespace dash::mpd;
 
 RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPD *mpd) :
-                          AbstractAdaptationLogic   (mpd),
-                          count                     (0),
-                          currentPeriod             (mpd->getFirstPeriod())
+                          AbstractAdaptationLogic   (mpd)
 {
     width  = var_InheritInteger(mpd->getVLCObject(), "dash-prefwidth");
     height = var_InheritInteger(mpd->getVLCObject(), "dash-prefheight");
-}
-
-Chunk*  RateBasedAdaptationLogic::getNextChunk(Streams::Type type)
-{
-    if(this->currentPeriod == NULL)
-        return NULL;
-
-    const Representation *rep = getCurrentRepresentation(type);
-    if (!rep)
-        return NULL;
-
-    std::vector<ISegment *> segments = rep->getSegments();
-
-    if ( this->count == segments.size() )
-    {
-        currentPeriod = mpd->getNextPeriod(currentPeriod);
-        this->count = 0;
-        return getNextChunk(type);
-    }
-
-    if ( segments.size() > this->count )
-    {
-        ISegment *seg = segments.at( this->count );
-        Chunk *chunk = seg->toChunk();
-        //In case of UrlTemplate, we must stay on the same segment.
-        if ( seg->isSingleShot() == true )
-            this->count++;
-        seg->done();
-        return chunk;
-    }
-    return NULL;
 }
 
 const Representation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams::Type type) const

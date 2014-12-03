@@ -26,7 +26,6 @@
 #define ADAPTATIONLOGICFACTORY_H_
 
 #include "adaptationlogic/IAdaptationLogic.h"
-#include "xml/Node.h"
 
 struct stream_t;
 

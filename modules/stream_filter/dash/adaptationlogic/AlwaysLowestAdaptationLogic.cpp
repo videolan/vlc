@@ -21,44 +21,11 @@
 #include "Representationselectors.hpp"
 
 using namespace dash::logic;
-using namespace dash::http;
 using namespace dash::mpd;
 
 AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic(mpd::MPD *mpd):
-    AbstractAdaptationLogic(mpd),
-    currentPeriod(mpd->getFirstPeriod()),
-    count(0)
+    AbstractAdaptationLogic(mpd)
 {
-}
-
-Chunk*  AlwaysLowestAdaptationLogic::getNextChunk(Streams::Type type)
-{
-    if(!currentPeriod)
-        return NULL;
-
-    const Representation *rep = getCurrentRepresentation(type);
-    if ( rep == NULL )
-            return NULL;
-
-    std::vector<ISegment *> segments = rep->getSegments();
-    if ( count == segments.size() )
-    {
-        currentPeriod = mpd->getNextPeriod(currentPeriod);
-        count = 0;
-        return getNextChunk(type);
-    }
-
-    if ( segments.size() > count )
-    {
-        ISegment *seg = segments.at( count );
-        Chunk *chunk = seg->toChunk();
-        //In case of UrlTemplate, we must stay on the same segment.
-        if ( seg->isSingleShot() == true )
-            count++;
-        seg->done();
-        return chunk;
-    }
-    return NULL;
 }
 
 const Representation *AlwaysLowestAdaptationLogic::getCurrentRepresentation(Streams::Type type) const

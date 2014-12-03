@@ -26,65 +26,18 @@
 #endif
 
 #include "AlwaysBestAdaptationLogic.h"
+#include "Representationselectors.hpp"
 
 using namespace dash::logic;
-using namespace dash::xml;
-using namespace dash::http;
 using namespace dash::mpd;
 
 AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (MPD *mpd) :
                            AbstractAdaptationLogic      (mpd)
 {
-    initSchedule();
-}
-
-AlwaysBestAdaptationLogic::~AlwaysBestAdaptationLogic   ()
-{
-}
-
-Chunk*  AlwaysBestAdaptationLogic::getNextChunk(Streams::Type type)
-{
-    if ( streams[type].count < streams[type].schedule.size() )
-    {
-        Chunk *chunk = new Chunk();
-        chunk->setUrl(streams[type].schedule.at( streams[type].count )->getUrlSegment());
-        streams[type].count++;
-        return chunk;
-    }
-    return NULL;
 }
 
 const Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
 {
-    if ( streams[type].count < streams[type].schedule.size() )
-        return streams[type].schedule.at( streams[type].count )->getRepresentation();
-
-    return NULL;
-}
-
-void    AlwaysBestAdaptationLogic::initSchedule ()
-{
-    if(mpd)
-    {
-        std::vector<Period *> periods = mpd->getPeriods();
-        if (periods.empty())
-            return;
-        RepresentationSelector selector;
-
-        for(int type=0; type<Streams::count; type++)
-        {
-            streams[type].count = 0;
-            Representation *best = selector.select(periods.front(),
-                                                   static_cast<Streams::Type>(type));
-            if(best)
-            {
-                std::vector<ISegment *> segments = best->getSegments();
-                std::vector<ISegment *>::const_iterator segIt;
-                for(segIt=segments.begin(); segIt!=segments.end(); segIt++)
-                {
-                    streams[type].schedule.push_back(*segIt);
-                }
-            }
-        }
-    }
+    RepresentationSelector selector;
+    return selector.select(currentPeriod, type);
 }
