@@ -506,6 +506,27 @@ static int OpenDecoder(vlc_object_t *p_this)
        attached to the JNI. */
     p_sys->direct_rendering = jni_IsVideoPlayerActivityCreated() && var_InheritBool(p_dec, CFG_PREFIX "dr");
     if (p_sys->direct_rendering) {
+        if (p_dec->fmt_in.video.orientation != ORIENT_NORMAL) {
+            int i_angle;
+
+            switch (p_dec->fmt_in.video.orientation) {
+                case ORIENT_ROTATED_90:
+                    i_angle = 90;
+                    break;
+                case ORIENT_ROTATED_180:
+                    i_angle = 180;
+                    break;
+                case ORIENT_ROTATED_270:
+                    i_angle = 270;
+                    break;
+                default:
+                    i_angle = 0;
+            }
+            (*env)->CallVoidMethod(env, format, p_sys->set_integer,
+                                   (*env)->NewStringUTF(env, "rotation-degrees"),
+                                   i_angle);
+        }
+
         jobject surf = jni_LockAndGetAndroidJavaSurface();
         if (surf) {
             // Configure MediaCodec with the Android surface.
