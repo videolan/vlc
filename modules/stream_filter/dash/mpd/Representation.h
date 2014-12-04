@@ -46,7 +46,7 @@ namespace dash
                                public ICanonicalUrl
         {
             public:
-                Representation( MPD *mpd );
+                Representation( AdaptationSet *, MPD *mpd );
                 virtual ~Representation ();
 
                 const std::string&  getId                   () const;

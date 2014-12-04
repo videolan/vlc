@@ -47,24 +47,30 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     classId = CLASSID_ISEGMENT;
 }
 
-dash::http::Chunk * ISegment::getChunk()
+dash::http::Chunk * ISegment::getChunk(const std::string &url)
 {
-    return new SegmentChunk(this);
+    return new (std::nothrow) SegmentChunk(this, url);
 }
 
 dash::http::Chunk* ISegment::toChunk()
 {
-    Chunk *chunk = getChunk();
-    if (!chunk)
+    Chunk *chunk;
+    try
+    {
+        chunk = getChunk(getUrlSegment());
+        if (!chunk)
+            return NULL;
+    }
+    catch (int)
+    {
         return NULL;
+    }
 
     if(startByte != endByte)
     {
         chunk->setStartByte(startByte);
         chunk->setEndByte(endByte);
     }
-
-    chunk->setUrl(getUrlSegment());
 
     return chunk;
 }
@@ -121,8 +127,8 @@ int ISegment::getClassId() const
     return classId;
 }
 
-ISegment::SegmentChunk::SegmentChunk(ISegment *segment_) :
-    dash::http::Chunk()
+ISegment::SegmentChunk::SegmentChunk(ISegment *segment_, const std::string &url) :
+    dash::http::Chunk(url)
 {
     segment = segment_;
 }
@@ -232,13 +238,13 @@ IndexSegment::IndexSegment(Representation *parent) :
     classId = CLASSID_INDEXSEGMENT;
 }
 
-dash::http::Chunk * IndexSegment::getChunk()
+dash::http::Chunk * IndexSegment::getChunk(const std::string &url)
 {
-    return new IndexSegmentChunk(this);
+    return new IndexSegmentChunk(this, url);
 }
 
-IndexSegment::IndexSegmentChunk::IndexSegmentChunk(ISegment *segment)
-    : SegmentChunk(segment)
+IndexSegment::IndexSegmentChunk::IndexSegmentChunk(ISegment *segment, const std::string &url)
+    : SegmentChunk(segment, url)
 {
 
 }

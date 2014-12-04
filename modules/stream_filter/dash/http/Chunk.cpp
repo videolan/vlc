@@ -29,17 +29,34 @@
 
 using namespace dash::http;
 
-Chunk::Chunk        () :
+Chunk::Chunk        (const std::string& url) :
        startByte    (0),
        endByte      (0),
        bitrate      (1),
        port         (0),
-       isHostname   (false),
        length       (0),
        bytesRead    (0),
        bytesToRead  (0),
        connection   (NULL)
 {
+    this->url = url;
+
+    if(url.compare(0, 7, "http://"))
+        throw VLC_EGENERIC;
+
+    vlc_url_t url_components;
+    vlc_UrlParse(&url_components, url.c_str(), 0);
+
+    if(url_components.psz_path)
+        path = url_components.psz_path;
+    port = url_components.i_port ? url_components.i_port : 80;
+    if(url_components.psz_host)
+        hostname = url_components.psz_host;
+
+    vlc_UrlClean(&url_components);
+
+    if(path.empty() || hostname.empty())
+        throw VLC_EGENERIC;
 }
 
 size_t              Chunk::getEndByte           () const
@@ -66,26 +83,6 @@ void                Chunk::setStartByte         (size_t startByte)
     if (endByte > startByte)
         bytesToRead = endByte - startByte;
 }
-void                Chunk::setUrl               (const std::string& url )
-{
-    this->url = url;
-
-    if(this->url.compare(0, 4, "http"))
-    {
-        this->isHostname = false;
-        return;
-    }
-
-    vlc_url_t url_components;
-    vlc_UrlParse(&url_components, url.c_str(), 0);
-
-    this->path          = url_components.psz_path;
-    this->port          = url_components.i_port ? url_components.i_port : 80;
-    this->hostname      = url_components.psz_host;
-    this->isHostname    = true;
-
-    vlc_UrlClean(&url_components);
-}
 void                Chunk::addOptionalUrl       (const std::string& url)
 {
     this->optionalUrls.push_back(url);
@@ -103,13 +100,9 @@ int                 Chunk::getBitrate           ()
 {
     return this->bitrate;
 }
-bool                Chunk::hasHostname          () const
-{
-    return this->isHostname;
-}
 const std::string&  Chunk::getHostname          () const
 {
-    return this->hostname;
+    return hostname;
 }
 const std::string&  Chunk::getPath              () const
 {

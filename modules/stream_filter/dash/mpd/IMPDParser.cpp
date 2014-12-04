@@ -48,7 +48,7 @@ void IMPDParser::setPeriods(Node *root_)
 
     for(size_t i = 0; i < periods.size(); i++)
     {
-        Period *period = new Period();
+        Period *period = new Period(mpd);
         setAdaptationSets(periods.at(i), period);
         mpd->addPeriod(period);
     }

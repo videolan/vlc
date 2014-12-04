@@ -32,10 +32,12 @@
 #include <vlc_arrays.h>
 
 #include "SegmentInfoDefault.h"
+#include "Period.h"
 
 using namespace dash::mpd;
 
-AdaptationSet::AdaptationSet() :
+AdaptationSet::AdaptationSet(Period *period) :
+    ICanonicalUrl( period ),
     subsegmentAlignmentFlag( false ),
     segmentInfoDefault( NULL ),
     isBitstreamSwitching( false )
@@ -109,4 +111,9 @@ void AdaptationSet::setBitstreamSwitching  (bool value)
 bool AdaptationSet::getBitstreamSwitching  () const
 {
     return this->isBitstreamSwitching;
+}
+
+std::string AdaptationSet::getUrlSegment() const
+{
+    return getParentUrlSegment();
 }

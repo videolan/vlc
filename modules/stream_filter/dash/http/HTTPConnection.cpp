@@ -29,7 +29,6 @@
 #include "Chunk.h"
 
 #include <sstream>
-#include <vlc_stream.h>
 
 using namespace dash::http;
 
@@ -52,11 +51,7 @@ void HTTPConnection::bindChunk(Chunk *chunk_)
     if(chunk_ == chunk)
         return;
     if (chunk_)
-    {
         chunk_->setConnection(this);
-        if(!chunk->hasHostname())
-            chunk->setUrl(getUrlRelative(chunk));
-    }
     chunk = chunk_;
 }
 
@@ -92,13 +87,6 @@ std::string HTTPConnection::extraRequestHeaders() const
             ss << chunk->getEndByte();
         ss << "\r\n";
     }
-    return ss.str();
-}
-
-std::string HTTPConnection::getUrlRelative(const Chunk *chunk) const
-{
-    std::stringstream ss;
-    ss << stream->psz_access << "://" << Helper::combinePaths(Helper::getDirectoryPath(stream->psz_path), chunk->getUrl());
     return ss.str();
 }
 

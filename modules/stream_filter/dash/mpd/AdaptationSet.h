@@ -31,17 +31,19 @@
 
 #include "mpd/Representation.h"
 #include "mpd/CommonAttributesElements.h"
+#include "mpd/ICanonicalUrl.hpp"
 
 namespace dash
 {
     namespace mpd
     {
         class SegmentInfoDefault;
+        class Period;
 
-        class AdaptationSet : public CommonAttributesElements
+        class AdaptationSet : public CommonAttributesElements, public ICanonicalUrl
         {
             public:
-                AdaptationSet();
+                AdaptationSet(Period *);
                 virtual ~AdaptationSet();
 
                 virtual const std::string&      getMimeType() const; /*reimpl*/
@@ -54,6 +56,7 @@ namespace dash
                 void                            setBitstreamSwitching(bool value);
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( Representation *rep );
+                virtual std::string             getUrlSegment() const; /* reimpl */
 
             private:
                 bool                            subsegmentAlignmentFlag;

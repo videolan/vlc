@@ -166,7 +166,11 @@ std::string MPD::getUrlSegment() const
     if (!baseUrls.empty())
         return baseUrls.front()->getUrl();
     else
-        return std::string();
+    {
+        std::stringstream ss;
+        ss << stream->psz_access << "://" << Helper::getDirectoryPath(stream->psz_path) << "/";
+        return ss.str();
+    }
 }
 
 vlc_object_t * MPD::getVLCObject() const

@@ -27,13 +27,15 @@
 #endif
 
 #include "Period.h"
+#include "MPD.h"
 
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 
 using namespace dash::mpd;
 
-Period::Period()
+Period::Period(MPD *mpd) :
+    ICanonicalUrl( mpd )
 {
 }
 
@@ -74,4 +76,9 @@ AdaptationSet * Period::getAdaptationSet(Streams::Type type) const
             return *it;
     }
     return NULL;
+}
+
+std::string Period::getUrlSegment() const
+{
+    return getParentUrlSegment();
 }

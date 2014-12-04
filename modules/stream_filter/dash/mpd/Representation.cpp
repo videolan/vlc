@@ -28,12 +28,13 @@
 #include <cstdlib>
 
 #include "Representation.h"
+#include "mpd/AdaptationSet.h"
 #include "mpd/MPD.h"
 
 using namespace dash::mpd;
 
-Representation::Representation  ( MPD *mpd_ ) :
-                ICanonicalUrl   ( mpd_ ),
+Representation::Representation  ( AdaptationSet *set, MPD *mpd_ ) :
+                ICanonicalUrl   ( set ),
                 mpd             ( mpd_ ),
                 bandwidth       (0),
                 qualityRanking  ( -1 ),

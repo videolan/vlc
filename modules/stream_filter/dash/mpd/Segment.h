@@ -74,14 +74,14 @@ namespace dash
                 class SegmentChunk : public dash::http::Chunk
                 {
                     public:
-                        SegmentChunk(ISegment *segment);
+                        SegmentChunk(ISegment *segment, const std::string &url);
                         virtual void onDownload(void *, size_t);
 
                     protected:
                         ISegment *segment;
                 };
 
-                virtual dash::http::Chunk * getChunk();
+                virtual dash::http::Chunk * getChunk(const std::string &);
         };
 
         class Segment : public ISegment
@@ -122,11 +122,11 @@ namespace dash
                 class IndexSegmentChunk : public SegmentChunk
                 {
                     public:
-                        IndexSegmentChunk(ISegment *segment);
+                        IndexSegmentChunk(ISegment *segment, const std::string &);
                         virtual void onDownload(void *, size_t);
                 };
 
-                virtual dash::http::Chunk * getChunk();
+                virtual dash::http::Chunk * getChunk(const std::string &);
         };
 
         class SubSegment : public ISegment

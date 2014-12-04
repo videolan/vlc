@@ -222,7 +222,7 @@ void    BasicCMParser::setAdaptationSets(Node *root, Period *period)
     for(size_t i = 0; i < adaptSets.size(); i++)
     {
         const std::map<std::string, std::string>    attr = adaptSets.at(i)->getAttributes();
-        AdaptationSet *adaptSet = new AdaptationSet;
+        AdaptationSet *adaptSet = new AdaptationSet(period);
         if ( this->parseCommonAttributesElements( adaptSets.at( i ), adaptSet, NULL ) == false )
         {
             delete adaptSet;
@@ -264,7 +264,7 @@ void    BasicCMParser::setRepresentations   (Node *root, AdaptationSet *group)
     {
         const std::map<std::string, std::string>    attributes = representations.at(i)->getAttributes();
 
-        Representation *rep = new Representation(getMPD());
+        Representation *rep = new Representation(group, getMPD());
         rep->setParentGroup( group );
         this->currentRepresentation = rep;
         if ( this->parseCommonAttributesElements( representations.at( i ), rep, group ) == false )

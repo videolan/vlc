@@ -51,8 +51,6 @@ namespace dash
                 Chunk *chunk;
                 virtual std::string extraRequestHeaders() const;
                 virtual std::string buildRequestHeader(const std::string &path) const;
-
-                std::string getUrlRelative(const Chunk *chunk) const;
         };
     }
 }

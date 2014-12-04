@@ -76,7 +76,7 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
 
     for(it = adaptationSets.begin(); it != adaptationSets.end(); it++)
     {
-        AdaptationSet *adaptationSet = new AdaptationSet();
+        AdaptationSet *adaptationSet = new AdaptationSet(period);
         if(!adaptationSet)
             continue;
         if((*it)->hasAttribute("mimeType"))
@@ -91,7 +91,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
 
     for(size_t i = 0; i < representations.size(); i++)
     {
-        this->currentRepresentation = new Representation(getMPD());
+        this->currentRepresentation = new Representation(adaptationSet, getMPD());
         Node *repNode = representations.at(i);
 
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");

@@ -28,22 +28,26 @@
 #include <string>
 
 #include "mpd/AdaptationSet.h"
+#include "mpd/ICanonicalUrl.hpp"
 #include "Streams.hpp"
 
 namespace dash
 {
     namespace mpd
     {
-        class Period
+        class MPD;
+        class Period : public ICanonicalUrl
         {
             public:
-                Period();
+                Period(MPD *);
                 virtual ~Period ();
 
                 const std::vector<AdaptationSet *>& getAdaptationSets   () const;
                 const std::vector<AdaptationSet *>  getAdaptationSets   (Streams::Type) const;
                 AdaptationSet *                     getAdaptationSet    (Streams::Type) const;
                 void                                addAdaptationSet    (AdaptationSet *AdaptationSet);
+
+                virtual std::string getUrlSegment() const; /* reimpl */
 
             private:
                 std::vector<AdaptationSet *>    adaptationSets;

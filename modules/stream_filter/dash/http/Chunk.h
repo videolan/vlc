@@ -45,13 +45,12 @@ namespace dash
         class Chunk
         {
             public:
-                Chunk           ();
+                Chunk           (const std::string &url);
                 virtual ~Chunk  () {}
 
                 size_t              getEndByte              () const;
                 size_t              getStartByte            () const;
                 const std::string&  getUrl                  () const;
-                bool                hasHostname             () const;
                 const std::string&  getHostname             () const;
                 const std::string&  getPath                 () const;
                 int                 getPort                 () const;
@@ -67,7 +66,6 @@ namespace dash
                 void                setLength       (uint64_t length);
                 void                setEndByte      (size_t endByte);
                 void                setStartByte    (size_t startByte);
-                void                setUrl          (const std::string& url);
                 void                addOptionalUrl  (const std::string& url);
                 bool                usesByteRange   () const;
                 void                setBitrate      (uint64_t bitrate);
@@ -84,7 +82,6 @@ namespace dash
                 size_t                      endByte;
                 int                         bitrate;
                 int                         port;
-                bool                        isHostname;
                 uint64_t                    length;
                 uint64_t                    bytesRead;
                 uint64_t                    bytesToRead;
