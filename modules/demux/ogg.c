@@ -307,7 +307,7 @@ static int Demux( demux_t * p_demux )
         }
 
         if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS )
-            return 0;
+            return VLC_DEMUXER_EOF;
 
         msg_Dbg( p_demux, "beginning of a group of logical streams" );
 
@@ -350,7 +350,7 @@ static int Demux( demux_t * p_demux )
          * Demux an ogg page from the stream
          */
         if( Ogg_ReadPage( p_demux, &p_sys->current_page ) != VLC_SUCCESS )
-            return 0; /* EOF */
+            return VLC_DEMUXER_EOF; /* EOF */
         /* Test for End of Stream */
         if( ogg_page_eos( &p_sys->current_page ) )
         {
@@ -671,7 +671,7 @@ static int Demux( demux_t * p_demux )
         }
     }
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 static void Ogg_ResetStream( logical_stream_t *p_stream )

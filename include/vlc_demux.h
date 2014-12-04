@@ -77,6 +77,11 @@ struct demux_t
     input_thread_t *p_input;
 };
 
+/* pf_demux return values */
+#define VLC_DEMUXER_EOF       0
+#define VLC_DEMUXER_EGENERIC -1
+#define VLC_DEMUXER_SUCCESS   1
+
 /* demux_t.info.i_update field */
 #define INPUT_UPDATE_TITLE      0x0010
 #define INPUT_UPDATE_SEEKPOINT  0x0020
