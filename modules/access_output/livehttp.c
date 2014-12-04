@@ -264,7 +264,8 @@ static int Open( vlc_object_t *p_this )
         }
         path_sanitize( psz_tmp );
         p_sys->psz_indexPath = psz_tmp;
-        vlc_unlink( p_sys->psz_indexPath );
+        if( p_sys->i_initial_segment != 1 )
+            vlc_unlink( p_sys->psz_indexPath );
     }
 
     p_sys->psz_indexUrl = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "index-url" );
@@ -291,7 +292,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->i_handle = -1;
-    p_sys->i_segment = p_sys->i_initial_segment > 0 ? p_sys->i_initial_segment -1 : 0;
+    p_sys->i_segment = p_sys->i_initial_segment-1;
     p_sys->psz_cursegPath = NULL;
 
     p_access->pf_write = Write;
@@ -564,7 +565,7 @@ static int updateIndexAndDel( sout_access_out_t *p_access, sout_access_out_sys_t
     if ( p_sys->i_numsegs == 0 ||
          p_sys->i_segment < ( p_sys->i_numsegs + p_sys->i_initial_segment ) )
     {
-        i_firstseg = p_sys->i_initial_segment == 0 ? 1 : p_sys->i_initial_segment;
+        i_firstseg = p_sys->i_initial_segment;
     }
     else
     {
