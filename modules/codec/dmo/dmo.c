@@ -1324,6 +1324,9 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
         msg_Dbg( p_enc, "found cbSize: %i", p_wf->cbSize );
         p_enc->fmt_out.i_extra = p_wf->cbSize;
         p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
+        if( p_enc->fmt_out.p_extra == NULL)
+            return VLC_EGENERIC;
+
         memcpy( p_enc->fmt_out.p_extra, &p_wf[1], p_enc->fmt_out.i_extra );
     }
 
