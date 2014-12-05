@@ -2520,25 +2520,24 @@ dnl  faad decoder plugin
 dnl
 AC_ARG_ENABLE(faad,
 [  --enable-faad           faad codec (default auto)])
-if test "${enable_faad}" != "no"; then
-    VLC_SAVE_FLAGS
-    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_faad}"
-    LDFLAGS="${LDFLAGS} ${LIBS_faad}"
-    AC_CHECK_HEADERS(faad.h,
-      [ AC_CHECK_LIB(faad, faacDecOpen, [
-          VLC_ADD_PLUGIN([faad])
-          VLC_ADD_LIBS([faad],[-lfaad]) ], [
-            AC_CHECK_LIB(faad, NeAACDecOpen, [
-              VLC_ADD_PLUGIN([faad])
-              VLC_ADD_LIBS([faad],[-lfaad]) ], [
-                AS_IF([test "${enable_faad}" = "yes"],
-                [ AC_MSG_ERROR([Cannot find libfaad library...]) ],
-                [ AC_MSG_WARN([Cannot find libfaad library...]) ]) ]) ])
-      ] , [ AS_IF([test "${enable_faad}" = "yes"],
-        [ AC_MSG_ERROR([Cannot find development headers for libfaad...]) ],
-        [ AC_MSG_WARN([Cannot find development headers for libfaad...]) ]) ])
-    VLC_RESTORE_FLAGS
-fi
+have_faad="no"
+AS_IF([test "${enable_faad}" != "no"], [
+  AC_CHECK_HEADERS([faad.h], [
+    AC_CHECK_LIB(faad, faacDecOpen, [have_faad="yes"],, [$LIBM])
+    AC_CHECK_LIB(faad, NeAACDecOpen, [have_faad="yes"],, [$LIBM])
+
+    AS_IF([test "${have_faad}" = "yes"], [
+      VLC_ADD_PLUGIN([faad])
+      VLC_ADD_LIBS([faad],[-lfaad])
+    ], [
+      AS_IF([test "${enable_faad}" = "yes"], [
+        AC_MSG_ERROR([cannot find FAAD library])
+      ], [
+        AC_MSG_WARN([cannot find FAAD library])
+      ])
+    ])
+  ])
+])
 
 dnl
 dnl libvpx decoder plugin
