@@ -1548,6 +1548,10 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
                      * is appended to the sequence header to allow guard
                      * against poor streaming servers */
                     /* XXX, should this be done using the packetizer ? */
+
+                    if( len > UINT32_MAX - sizeof( eos ) )
+                        return NULL;
+
                     p_enc->fmt_out.p_extra = malloc( len + sizeof( eos ) );
                     if( !p_enc->fmt_out.p_extra )
                         return NULL;
