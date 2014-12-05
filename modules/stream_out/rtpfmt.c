@@ -559,7 +559,11 @@ int rtp_packetize_xiph_config( sout_stream_id_sys_t *id, const char *fmtp,
     char *end = strchr(start, ';');
     assert(end != NULL);
     size_t len = end - start;
-    char b64[len + 1];
+
+    char *b64 = malloc(len + 1);
+    if(!b64)
+        return VLC_EGENERIC;
+
     memcpy(b64, start, len);
     b64[len] = '\0';
 
@@ -569,6 +573,7 @@ int rtp_packetize_xiph_config( sout_stream_id_sys_t *id, const char *fmtp,
     int i_data;
 
     i_data = vlc_b64_decode_binary(&p_orig, b64);
+    free(b64);
     if (i_data <= 9)
     {
         free(p_orig);
