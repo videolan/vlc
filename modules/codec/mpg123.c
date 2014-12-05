@@ -118,6 +118,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( i_err == MPG123_NEED_MORE )
     {
         /* Need moar data */
+        block_Release( p_block );
         return NULL;
     }
     else if( i_err != MPG123_OK )
