@@ -35,12 +35,6 @@
 
 namespace dash
 {
-    struct thread_sys_t
-    {
-        dash::http::HTTPConnectionManager   *conManager;
-        buffer::BlockBuffer                 *buffer;
-    };
-
     class DASHDownloader
     {
         public:
@@ -51,8 +45,9 @@ namespace dash
             static void*    download    (void *);
 
         private:
-            thread_sys_t    *t_sys;
             vlc_thread_t    dashDLThread;
+            http::HTTPConnectionManager *conManager;
+            buffer::BlockBuffer         *buffer;
     };
 }
 

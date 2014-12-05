@@ -33,42 +33,38 @@ using namespace dash::logic;
 using namespace dash::buffer;
 
 
-DASHDownloader::DASHDownloader  (HTTPConnectionManager *conManager, BlockBuffer *buffer)
+DASHDownloader::DASHDownloader  (HTTPConnectionManager *conManager_, BlockBuffer *buffer_)
 {
-    this->t_sys                     = (thread_sys_t *) malloc(sizeof(thread_sys_t));
-    this->t_sys->conManager         = conManager;
-    this->t_sys->buffer             = buffer;
+    conManager = conManager_;
+    buffer = buffer_;
 }
 DASHDownloader::~DASHDownloader ()
 {
-    this->t_sys->buffer->setEOF(true);
+    buffer->setEOF(true);
     vlc_join(this->dashDLThread, NULL);
-    free(this->t_sys);
 }
 
 bool        DASHDownloader::start       ()
 {
-    if(vlc_clone(&(this->dashDLThread), download, (void*)this->t_sys, VLC_THREAD_PRIORITY_LOW))
+    if(vlc_clone(&(this->dashDLThread), download, static_cast<void*>(this), VLC_THREAD_PRIORITY_LOW))
         return false;
 
     return true;
 }
-void*       DASHDownloader::download    (void *thread_sys)
+void* DASHDownloader::download(void *dashDownloader)
 {
-    thread_sys_t            *t_sys              = (thread_sys_t *) thread_sys;
-    HTTPConnectionManager   *conManager         = t_sys->conManager;
-    BlockBuffer             *buffer             = t_sys->buffer;
-    int                     ret                 = 0;
+    DASHDownloader *me = static_cast<DASHDownloader*>(dashDownloader);
+    int ret = 0;
 
     do
     {
         block_t *block = NULL;
-        ret = conManager->read(Streams::VIDEO, &block);
+        ret = me->conManager->read(Streams::VIDEO, &block);
         if(ret > 0)
-            buffer->put(block);
-    }while(ret > 0 && !buffer->getEOF());
+            me->buffer->put(block);
+    }while(ret > 0 && !me->buffer->getEOF());
 
-    buffer->setEOF(true);
+    me->buffer->setEOF(true);
 
     return NULL;
 }
