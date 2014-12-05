@@ -372,6 +372,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
     SET( "TLAN", Language );
     SET( "TPUB", Publisher );
     SET( "TPE2", AlbumArtist );
+    SET( "TPOS", DiscNumber );
 
 #undef SET
 
@@ -519,6 +520,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     SET( "LANGUAGE", Language );
     SET( "MUSICBRAINZ_TRACKID", TrackID );
     SET( "ALBUMARTIST", AlbumArtist );
+    SET( "DISCNUMBER", DiscNumber );
 
     SET_EXTRA( "MUSICBRAINZ_ALBUMID", VLC_META_EXTRA_MB_ALBUMID );
 #undef SET
