@@ -62,8 +62,6 @@
 {
     IBOutlet VLCPlaylistView* o_outline_view;
 
-    NSMutableDictionary *o_outline_dict;
-
     IBOutlet id o_controller;
     IBOutlet id o_playlist_wizard;
 
@@ -98,7 +96,6 @@
 
 - (PLModel *)model;
 
-- (playlist_item_t *)currentPlaylistRoot;
 - (void)reloadStyles;
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
@@ -124,7 +121,6 @@
 - (IBAction)recursiveExpandNode:(id)sender;
 - (IBAction)showInfoPanel:(id)sender;
 
-- (id)playingItem;
 - (NSArray *)draggedItems;
 
 /**
