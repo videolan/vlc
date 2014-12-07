@@ -26,9 +26,14 @@
 #import "playlist.h"
 #import "StringUtility.h"
 
+#ifdef HAVE_CONFIG_H
+# import "config.h"
+#endif
+#include <assert.h>
+
 #include <vlc_playlist.h>
 #include <vlc_input_item.h>
-#import <vlc_input.h>
+#include <vlc_input.h>
 #include <vlc_url.h>
 
 #define TRACKNUM_COLUMN @"tracknumber"
@@ -448,10 +453,6 @@
 {
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
 
-    // this is no valid target, sanitize to top of table
-    if (index == NSOutlineViewDropOnItemIndex)
-        index = 0;
-
     if (targetItem == nil) {
         targetItem = _rootItem;
     }
@@ -497,6 +498,10 @@
             if (p_item)
                 pp_items[j++] = p_item;
         }
+
+        // drop on a node itself will append entries at the end
+        if (index == NSOutlineViewDropOnItemIndex)
+            index = p_new_parent->i_children;
 
         if (playlist_TreeMoveMany(p_playlist, j, pp_items, p_new_parent, index) != VLC_SUCCESS) {
             PL_UNLOCK;
@@ -564,6 +569,9 @@
 
             [o_array addObject: o_dic];
         }
+
+        // drop on a node itself will append entries at the end
+        static_assert(NSOutlineViewDropOnItemIndex == -1, "Expect NSOutlineViewDropOnItemIndex to be -1");
 
         [_playlist addPlaylistItems:o_array withParentItemId:[targetItem plItemId] atPos:index startPlayback:NO];
         return YES;
