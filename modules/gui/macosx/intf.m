@@ -1088,7 +1088,7 @@ static bool f_appExit = false;
         [o_result addObject: o_dic];
     }
 
-    [o_playlist appendArray: o_result atPos: -1 enqueue: !config_GetInt(VLCIntf, "macosx-autoplay")];
+    [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_result];
 }
 
 /* When user click in the Dock icon our double click in the finder */

@@ -568,7 +568,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     NSArray *o_types = [NSArray arrayWithObject:NSFilenamesPboardType];
     NSString *o_desired_type = [o_paste availableTypeFromArray:o_types];
     NSData *o_carried_data = [o_paste dataForType:o_desired_type];
-    BOOL b_autoplay = config_GetInt(VLCIntf, "macosx-autoplay");
 
     if (o_carried_data) {
         if ([o_desired_type isEqualToString:NSFilenamesPboardType]) {
@@ -598,11 +597,8 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
                 o_array = [o_array arrayByAddingObject: o_dic];
             }
-            if (b_autoplay)
-                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:NO];
-            else
-                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:YES];
 
+            [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_array];
             return YES;
         }
     }

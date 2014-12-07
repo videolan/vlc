@@ -127,8 +127,20 @@
 - (id)playingItem;
 - (NSArray *)draggedItems;
 
-- (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
-- (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue;
+/**
+ * Simplified version to add new items at the end of the current playlist
+ */
+- (void)addPlaylistItems:(NSArray*)o_array;
+
+/**
+ * Adds new items to the playlist, at specified parent node and index.
+ * @param o_array array of items. Each item is a Dictionary with meta info.
+ * @param i_plItemId parent playlist node id, -1 for default playlist
+ * @param i_position index for new items, -1 for appending at end
+ * @param b_start starts playback of first item if true
+ */
+- (void)addPlaylistItems:(NSArray*)o_array withParentItemId:(int)i_plItemId atPos:(int)i_position startPlayback:(BOOL)b_start;
+
 
 - (void)setColumn: (NSString *)o_column state: (NSInteger)i_state translationDict:(NSDictionary *)o_dict;
 - (void)continuePlaybackWhereYouLeftOff:(input_thread_t *)p_input_thread;

@@ -419,8 +419,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     int i_result;
 
-    b_autoplay = config_GetInt(VLCIntf, "macosx-autoplay");
-
     [o_tabview selectTabViewItemAtIndex: i_type];
     [o_file_sub_ckbox setState: NSOffState];
 
@@ -516,10 +514,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
         /* apply the options to our item(s) */
         [o_dic setObject: (NSArray *)[o_options copy] forKey: @"ITEM_OPTIONS"];
-        if (b_autoplay)
-            [[[VLCMain sharedInstance] playlist] appendArray: [NSArray arrayWithObject:o_dic] atPos: -1 enqueue:NO];
-        else
-            [[[VLCMain sharedInstance] playlist] appendArray: [NSArray arrayWithObject:o_dic] atPos: -1 enqueue:YES];
+
+        [[[VLCMain sharedInstance] playlist] addPlaylistItems:[NSArray arrayWithObject:o_dic]];
     }
 }
 
@@ -657,7 +653,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (void)openFile
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-    b_autoplay = config_GetInt(VLCIntf, "macosx-autoplay");
 
     [o_open_panel setAllowsMultipleSelection: YES];
     [o_open_panel setCanChooseDirectories: YES];
@@ -685,10 +680,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
             [o_array addObject: o_dic];
         }
-        if (b_autoplay)
-            [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:NO];
-        else
-            [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:YES];
+
+        [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_array];
     }
 }
 

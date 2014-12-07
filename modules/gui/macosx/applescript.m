@@ -42,7 +42,6 @@
 
     if ([o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"]) {
         if (o_urlString) {
-            BOOL b_autoplay = config_GetInt(VLCIntf, "macosx-autoplay");
             NSURL * o_url = [NSURL fileURLWithPath: o_urlString];
             if (o_url != nil)
                 [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_url];
@@ -62,10 +61,7 @@
             o_dic = [NSDictionary dictionaryWithObject:o_urlString forKey:@"ITEM_URL"];
             o_array = [NSArray arrayWithObject: o_dic];
 
-            if (b_autoplay)
-                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue: NO];
-            else
-                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue: YES];
+            [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_array];
         }
     }
     return nil;

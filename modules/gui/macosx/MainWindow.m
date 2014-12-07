@@ -1196,9 +1196,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     playlist_item_t *p_node;
 
     if ([[item identifier] isEqualToString:@"playlist"])
-        p_node = p_playlist->p_local_category;
+        p_node = p_playlist->p_playing;
     else
-        p_node = p_playlist->p_ml_category;
+        p_node = p_playlist->p_media_library;
 
     if ([[o_pasteboard types] containsObject: NSFilenamesPboardType]) {
         NSArray *o_values = [[o_pasteboard propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
@@ -1218,7 +1218,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
             [o_array addObject: o_dic];
         }
 
-        [[[VLCMain sharedInstance] playlist] appendNodeArray:o_array inNode: p_node atPos:-1 enqueue:YES];
+        [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_array withParentItemId:p_node->i_id atPos:-1 startPlayback:NO];
         return YES;
     }
     else if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"]) {

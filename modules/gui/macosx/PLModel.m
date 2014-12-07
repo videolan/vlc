@@ -21,9 +21,10 @@
 
 #import "PLModel.h"
 
-#import "misc.h"
+#import "misc.h"    /* VLCByteCountFormatter */
 
 #import "playlist.h"
+#import "StringUtility.h"
 
 #include <vlc_playlist.h>
 #include <vlc_input_item.h>
@@ -447,14 +448,16 @@
 {
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
 
+    // this is no valid target, sanitize to top of table
+    if (index == NSOutlineViewDropOnItemIndex)
+        index = 0;
+
+    if (targetItem == nil) {
+        targetItem = _rootItem;
+    }
+
     /* Drag & Drop inside the playlist */
     if ([[o_pasteboard types] containsObject:VLCPLItemPasteboadType]) {
-        if (index == -1) // this is no valid target, sanitize to top of table
-            index = 0;
-
-        if (targetItem == nil) {
-            targetItem = _rootItem;
-        }
 
         NSMutableArray *o_filteredItems = [NSMutableArray arrayWithArray:_draggedItems];
         const NSUInteger draggedItemsCount = [_draggedItems count];
@@ -556,20 +559,13 @@
             if (!psz_uri)
                 continue;
 
-            o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
-
+            o_dic = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
             free(psz_uri);
 
             [o_array addObject: o_dic];
         }
 
-//        if (item == nil)
-            [_playlist appendArray:o_array atPos:index enqueue: YES];
-        // TODO support for drop on sub nodes
-//        else {
-//            assert(p_node->i_children != -1);
-//            [_playlist appendNodeArray:o_array inNode: p_node atPos:index enqueue:YES];
-//        }
+        [_playlist addPlaylistItems:o_array withParentItemId:[targetItem plItemId] atPos:index startPlayback:NO];
         return YES;
     }
     return NO;

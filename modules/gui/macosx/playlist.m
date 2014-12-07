@@ -784,76 +784,59 @@
     return p_input;
 }
 
-- (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
+- (void)addPlaylistItems:(NSArray*)o_array
+{
+
+    int i_plItemId = -1;
+
+    // add items directly to media library if this is the current root
+    if ([[self model] currentRootType] == ROOT_TYPE_MEDIALIBRARY)
+        i_plItemId = [[[self model] rootItem] plItemId];
+
+    BOOL b_autoplay = var_InheritBool(VLCIntf, "macosx-autoplay");
+
+    [self addPlaylistItems:o_array withParentItemId:i_plItemId atPos:-1 startPlayback:b_autoplay];
+}
+
+- (void)addPlaylistItems:(NSArray*)o_array withParentItemId:(int)i_plItemId atPos:(int)i_position startPlayback:(BOOL)b_start
 {
     playlist_t * p_playlist = pl_Get(VLCIntf);
-    NSUInteger count = [o_array count];
-    BOOL b_usingPlaylist = [[self model] currentRootType] == ROOT_TYPE_PLAYLIST;
-
     PL_LOCK;
-    for (NSUInteger i_item = 0; i_item < count; i_item++) {
-        input_item_t *p_input;
-        NSDictionary *o_one_item;
 
-        /* Get the item */
-        o_one_item = [o_array objectAtIndex:i_item];
-        p_input = [self createItem: o_one_item];
+    playlist_item_t *p_parent = NULL;
+    if (i_plItemId >= 0)
+        p_parent = playlist_ItemGetById(p_playlist, i_plItemId);
+    else
+        p_parent = p_playlist->p_playing;
+
+    if (!p_parent) {
+        PL_UNLOCK;
+        return;
+    }
+
+    NSUInteger count = [o_array count];
+    int i_current_offset = 0;
+    for (NSUInteger i = 0; i < count; ++i) {
+
+        NSDictionary *o_current_item = [o_array objectAtIndex:i];
+        input_item_t *p_input = [self createItem: o_current_item];
         if (!p_input)
             continue;
 
-        /* Add the item */
-        int returnValue = playlist_AddInput(p_playlist, p_input, PLAYLIST_INSERT, i_position == -1 ? PLAYLIST_END : i_position + i_item, b_usingPlaylist, pl_Locked);
-        if (returnValue != VLC_SUCCESS) {
-            vlc_gc_decref(p_input);
+        int i_pos = (i_position == -1) ? PLAYLIST_END : i_position + i_current_offset++;
+        playlist_item_t *p_item = playlist_NodeAddInput(p_playlist, p_input, p_parent,
+                                                        PLAYLIST_INSERT, i_pos, pl_Locked);
+        if (!p_item)
             continue;
-        }
 
-        if (i_item == 0 && !b_enqueue) {
-            playlist_item_t *p_item = playlist_ItemGetByInput(p_playlist, p_input);
-            playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_item->p_parent, p_item);
+        if (i == 0 && b_start) {
+            playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_parent, p_item);
         }
-
-        vlc_gc_decref(p_input);
+        input_item_Release(p_input);
     }
     PL_UNLOCK;
-    [self playlistUpdated];
 }
 
-- (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue
-{
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    NSUInteger count = [o_array count];
-
-    for (NSUInteger i_item = 0; i_item < count; i_item++) {
-        input_item_t *p_input;
-        NSDictionary *o_one_item;
-
-        /* Get the item */
-        PL_LOCK;
-        o_one_item = [o_array objectAtIndex:i_item];
-        p_input = [self createItem: o_one_item];
-
-        if (!p_input)
-            continue;
-
-        /* Add the item */
-        playlist_NodeAddInput(p_playlist, p_input, p_node,
-                                      PLAYLIST_INSERT,
-                                      i_position == -1 ?
-                                      PLAYLIST_END : i_position + i_item,
-                                      pl_Locked);
-
-
-        if (i_item == 0 && !b_enqueue) {
-            playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput(p_playlist, p_input);
-            playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item);
-        }
-        PL_UNLOCK;
-        vlc_gc_decref(p_input);
-    }
-//    [self playlistUpdated];
-}
 
 - (IBAction)searchItem:(id)sender
 {
