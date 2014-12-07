@@ -1,20 +1,25 @@
 # speexdsp
 
-SPEEXDSP_VERSION := 1.2rc2
-SPEEXDSP_URL := http://downloads.us.xiph.org/releases/speex/speexdsp-$(SPEEXDSP_VERSION).tar.gz
+SPEEXDSP_VERSION := git
+SPEEXDSP_HASH := HEAD
+SPEEXDSP_GITURL := http://git.xiph.org/?p=speexdsp.git;a=snapshot;h=$(SPEEXDSP_HASH);sf=tgz
 
 PKGS += speexdsp
 ifeq ($(call need_pkg,"speexdsp"),)
 PKGS_FOUND += speexdsp
 endif
 
-$(TARBALLS)/speexdsp-$(SPEEXDSP_VERSION).tar.gz:
-	$(call download,$(SPEEXDSP_URL))
+$(TARBALLS)/speexdsp-git.tar.gz:
+	$(call download,$(SPEEXDSP_GITURL))
 
 .sum-speexdsp: speexdsp-$(SPEEXDSP_VERSION).tar.gz
+	$(warning $@ not implemented)
+	touch $@
 
 speexdsp: speexdsp-$(SPEEXDSP_VERSION).tar.gz .sum-speexdsp
-	$(UNPACK)
+	rm -Rf $@-git $@
+	mkdir -p $@-git
+	$(ZCAT) "$<" | (cd $@-git && tar xv --strip-components=1)
 	$(MOVE)
 
 SPEEXDSP_CONF := --enable-resample-full-sinc-table --disable-examples
