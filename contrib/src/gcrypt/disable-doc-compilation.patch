@@ -1,0 +1,43 @@
+diff -ru libgcrypt/Makefile.am libgcrypt/Makefile.am
+--- libgcrypt/Makefile.am	2014-08-18 08:46:51.000000000 +0200
++++ libgcrypt/Makefile.am	2014-12-07 19:54:02.000000000 +0100
+@@ -25,11 +25,11 @@
+ # (A suitable gitlog-to-changelog script can be found in GnuPG master.)
+ GITLOG_TO_CHANGELOG=gitlog-to-changelog
+ 
+-DIST_SUBDIRS = m4 compat mpi cipher random src doc tests
+-SUBDIRS =         compat mpi cipher random src doc tests
++DIST_SUBDIRS = m4 compat mpi cipher random src tests
++SUBDIRS =         compat mpi cipher random src tests
+ 
+ EXTRA_DIST = autogen.sh autogen.rc README.GIT LICENSES      	           \
+-             ChangeLog-2011 build-aux/ChangeLog-2011 doc/ChangeLog-2011    \
++             ChangeLog-2011 build-aux/ChangeLog-2011 \
+              m4/ChangeLog-2011 cipher/ChangeLog-2011 src/ChangeLog-2011    \
+              random/ChangeLog-2011 tests/ChangeLog-2011 mpi/ChangeLog-2011 \
+              build-aux/git-log-footer build-aux/git-log-fix
+Only in libgcrypt: Makefile.am.orig
+Only in libgcrypt: Makefile.am.rej
+diff -ru libgcrypt-raw/configure.ac libgcrypt/configure.ac
+--- libgcrypt-raw/configure.ac	2014-12-07 19:51:54.000000000 +0100
++++ libgcrypt/configure.ac	2014-12-07 19:52:48.000000000 +0100
+@@ -2043,7 +2043,6 @@
+ mpi/Makefile
+ cipher/Makefile
+ random/Makefile
+-doc/Makefile
+ src/Makefile
+ src/gcrypt.h
+ src/libgcrypt-config
+diff -ru libgcrypt-raw/configure.ac.orig libgcrypt/configure.ac.orig
+--- libgcrypt-raw/configure.ac.orig	2014-12-07 19:51:54.000000000 +0100
++++ libgcrypt/configure.ac.orig	2014-12-07 19:52:37.000000000 +0100
+@@ -1219,7 +1219,7 @@
+           AC_COMPILE_IFELSE([AC_LANG_SOURCE(
+             [[__asm__("xorl \$(123456789/12345678), %ebp;\n\t");]])],
+             [gcry_cv_gcc_as_const_division_with_wadivide_ok=yes])])
+-    if test "$gcry_cv_gcc_as_const_division_ok_with_wadivide_ok" = "no" ; then
++    if test "$gcry_cv_gcc_as_const_division_with_wadivide_ok" = "no" ; then
+       # '-Wa,--divide' did not work, restore old flags.
+       CPPFLAGS="$_gcc_cppflags_save"
+     fi
