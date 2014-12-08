@@ -67,9 +67,7 @@ endif
 
 # ARM stuff
 ifeq ($(ARCH),arm)
-ifndef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=arm
-endif
 ifdef HAVE_NEON
 FFMPEGCONF += --enable-neon
 endif
@@ -83,9 +81,7 @@ endif
 
 # ARM64 stuff
 ifeq ($(ARCH),aarch64)
-ifndef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=aarch64
-endif
 endif
 
 # MIPS stuff
@@ -113,7 +109,6 @@ FFMPEGCONF += --arch=$(ARCH) --target-os=darwin
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
-endif
 ifdef HAVE_IOS
 FFMPEGCONF += --enable-pic --extra-ldflags="$(EXTRA_CFLAGS)"
 ifdef HAVE_NEON
@@ -122,6 +117,7 @@ endif
 endif
 ifdef HAVE_MACOSX
 FFMPEGCONF += --enable-vda
+endif
 endif
 
 # Linux
