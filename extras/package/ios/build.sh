@@ -87,10 +87,14 @@ fi
 
 info "Building libvlc for iOS"
 
-if [ "$PLATFORM" = "Simulator" ]; then
-    TARGET="${ARCH}-apple-darwin11"
+TARGET="${ARCH}-apple-darwin11"
+
+# apple doesn't call AArch64 that way, but arm64 (a contrario to all libraries)
+# so we need to translate it..
+if [ "$ARCH" = "aarch64" ]; then
+	ACTUAL_ARCH="arm64"
 else
-    TARGET="arm-apple-darwin11"
+	ACTUAL_ARCH="$ARCH"
 fi
 
 if [ "$DEBUG" = "yes" ]; then
@@ -146,10 +150,10 @@ export STRIP="xcrun strip"
 export PLATFORM=$PLATFORM
 export SDK_VERSION=$SDK_VERSION
 
-export CFLAGS="-isysroot ${SDKROOT} -arch ${ARCH} ${OPTIM}"
+export CFLAGS="-isysroot ${SDKROOT} -arch ${ACTUAL_ARCH} ${OPTIM}"
 
 if [ "$PLATFORM" = "OS" ]; then
-if [ "$ARCH" != "arm64" ]; then
+if [ "$ARCH" != "aarch64" ]; then
 export CFLAGS="${CFLAGS} -mcpu=cortex-a8 -miphoneos-version-min=${SDK_MIN}"
 else
 export CFLAGS="${CFLAGS} -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
@@ -172,12 +176,12 @@ if [ "$PLATFORM" = "Simulator" ]; then
     export OBJCFLAGS="-fobjc-abi-version=2 -fobjc-legacy-dispatch ${OBJCFLAGS}"
 fi
 
-export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ARCH} -isysroot ${SDKROOT}"
+export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ACTUAL_ARCH} -isysroot ${SDKROOT}"
 
 if [ "$PLATFORM" = "OS" ]; then
-    EXTRA_CFLAGS="-arch ${ARCH}"
-    EXTRA_LDFLAGS="-arch ${ARCH}"
-if [ "$ARCH" != "arm64" ]; then
+    EXTRA_CFLAGS="-arch ${ACTUAL_ARCH}"
+    EXTRA_LDFLAGS="-arch ${ACTUAL_ARCH}"
+if [ "$ARCH" != "aarch64" ]; then
     EXTRA_CFLAGS+=" -mcpu=cortex-a8"
     EXTRA_CFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
     EXTRA_LDFLAGS+=" -Wl,-ios_version_min,${SDK_MIN}"
@@ -207,14 +211,14 @@ if [ "$PLATFORM" = "OS" ]; then
     export AS="gas-preprocessor.pl ${CC}"
     export ASCPP="gas-preprocessor.pl ${CC}"
     export CCAS="gas-preprocessor.pl ${CC}"
-    if [ "$ARCH" = "arm64" ]; then
+    if [ "$ARCH" = "aarch64" ]; then
         export GASPP_FIX_XCODE5=1
     fi
 else
     export ASCPP="xcrun as"
 fi
 
-../bootstrap --build=x86_64-apple-darwin11 --host=${TARGET} --prefix=${VLCROOT}/contrib/${TARGET}-${ARCH} --arch=${ARCH} --disable-gpl \
+../bootstrap --build=x86_64-apple-darwin11 --host=${TARGET} --prefix=${VLCROOT}/contrib/${TARGET}-${ARCH} --disable-gpl \
     --disable-disc --disable-sout \
     --disable-sdl \
     --disable-SDL_image \
