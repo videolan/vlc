@@ -41,6 +41,7 @@ ZVBI_CFLAGS += -DPTW32_STATIC_LIB
 endif
 
 .zvbi: zvbi
+	 $(UPDATE_AUTOCONFIG)
 ifdef HAVE_WIN32
 	$(RECONF)
 endif
