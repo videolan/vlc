@@ -38,12 +38,19 @@ function parse()
             _,_,name = string.find( line, "content=\"(.-)\"" )
             name = vlc.strings.resolve_xml_special_chars( name )
         end
-        if string.match( line, "<meta name=\"description\"" ) then
+
+        if string.match( line, "<meta property=\"og:description\"" ) then
             _,_,description = string.find( line, "content=\"(.-)\"" )
             if (description ~= nil) then
                 description = vlc.strings.resolve_xml_special_chars( description )
             end
         end
+        if string.match( line, "<span id=\"spoil\" style=\"display:none\">" ) then
+            _,_,desc_spoil = string.find( line, "<span id=\"spoil\" style=\"display:none\">(.-)<\/span>" )
+            desc_spoil = vlc.strings.resolve_xml_special_chars( desc_spoil )
+            description = description .. "\n\r" .. desc_spoil
+        end
+
         if string.match( line, "<meta name=\"author\"" ) then
             _,_,artist = string.find( line, "content=\"(.-)\"" )
             artist = vlc.strings.resolve_xml_special_chars( artist )
@@ -75,12 +82,16 @@ function parse()
     end
 
     if path_url_hd then
+        if vlc.access == 'https' then path_url_hd = path_url_hd:gsub('http','https') end
         return { { path = path_url_hd; name = name; description = description; artist = artist; arturl = arturl } }
     elseif path_url then
+        if vlc.access == 'https' then path_url = path_url:gsub('http','https') end
         return { { path = path_url; name = name; description = description; artist = artist; arturl = arturl } }
     elseif path_url_webm then
+        if vlc.access == 'https' then path_url_webm = path_url_webm:gsub('http','https') end
         return { { path = path_url_webm; name = name; description = description; artist = artist; arturl = arturl } }
     elseif path_url_flv then
+        if vlc.access == 'https' then path_url_flv = path_url_flv:gsub('http','https') end
         return { { path = path_url_flv; name = name; description = description; artist = artist; arturl = arturl } }
     else
         return {}
