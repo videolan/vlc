@@ -90,15 +90,13 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         /* We've just started the stream, wait for the first PTS. */
         msg_Dbg( p_dec, "waiting for PTS" );
-        block_Release( p_block );
-        return NULL;
+        goto error;
     }
 
     if( p_block->i_flags & ( BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED ) )
     {
         date_Set( &p_sys->end_date, 0 );
-        block_Release( p_block );
-        return NULL;
+        goto error;
     }
 
     /* Feed mpg123 with raw data */
@@ -108,8 +106,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( i_err != MPG123_OK )
     {
         msg_Err( p_dec, "mpg123_feed failed: %s", mpg123_plain_strerror( i_err ) );
-        block_Release( p_block );
-        return NULL;
+        goto error;
     }
 
     /* Get details about the stream */
@@ -118,14 +115,12 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( i_err == MPG123_NEED_MORE )
     {
         /* Need moar data */
-        block_Release( p_block );
-        return NULL;
+        goto error;
     }
     else if( i_err != MPG123_OK )
     {
         msg_Err( p_dec, "mpg123_info failed: %s", mpg123_plain_strerror( i_err ) );
-        block_Release( p_block );
-        return NULL;
+        goto error;
     }
 
     /* Configure the output */
@@ -147,8 +142,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             break;
         default:
             msg_Err( p_dec, "Unknown mode");
-            block_Release( p_block );
-            return NULL;
+            goto error;
     }
 
     p_dec->fmt_out.audio.i_physical_channels =
@@ -171,7 +165,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     /* Request a new audio buffer */
     block_t *p_out = decoder_NewAudioBuffer( p_dec, p_block->i_nb_samples );
     if( unlikely( !p_out ) )
-        return NULL;
+        goto error;
 
     /* Configure the buffer */
     p_out->i_nb_samples = p_block->i_nb_samples;
@@ -185,7 +179,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Err( p_dec, "could not replace buffer: %s", mpg123_plain_strerror( i_err ) );
         block_Release( p_out );
-        return NULL;
+        goto error;
     }
 
     *pp_block = NULL; /* avoid being fed the same packet again */
@@ -197,11 +191,15 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( i_err != MPG123_NEW_FORMAT )
             msg_Err( p_dec, "mpg123_decode_frame error: %s", mpg123_plain_strerror( i_err ) );
         block_Release( p_out );
-        p_out = NULL;
+        goto error;
     }
 
     block_Release( p_block );
     return p_out;
+
+error:
+    block_Release( p_block );
+    return NULL;
 }
 
 /*****************************************************************************
