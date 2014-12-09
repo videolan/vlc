@@ -556,7 +556,6 @@ static block_t *CreateAnnexbNAL( decoder_t *p_dec, const uint8_t *p, int i_size 
 static void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
                               const uint8_t *src, int i_src )
 {
-    const uint8_t *end = &src[i_src];
     uint8_t *dst = malloc( i_src );
 
     *pp_ret = dst;
