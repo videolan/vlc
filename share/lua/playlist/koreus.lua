@@ -46,7 +46,7 @@ function parse()
             end
         end
         if string.match( line, "<span id=\"spoil\" style=\"display:none\">" ) then
-            _,_,desc_spoil = string.find( line, "<span id=\"spoil\" style=\"display:none\">(.-)<\/span>" )
+            _,_,desc_spoil = string.find( line, "<span id=\"spoil\" style=\"display:none\">(.-)</span>" )
             desc_spoil = vlc.strings.resolve_xml_special_chars( desc_spoil )
             description = description .. "\n\r" .. desc_spoil
         end
