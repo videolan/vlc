@@ -10,6 +10,8 @@ endif
 $(TARBALLS)/libtasn1-$(LIBTASN1_VERSION).tar.gz:
 	$(call download,$(LIBTASN1_URL))
 
+.sum-libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz
+
 libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	$(UNPACK)
 	$(MOVE)

@@ -11,6 +11,8 @@ endif
 $(TARBALLS)/libdsm-$(LIBDSM_VERSION).tar.gz:
 	$(call download,$(LIBDSM_URL))
 
+.sum-libdsm: libdsm-$(LIBDSM_VERSION).tar.gz
+
 libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
 	$(UNPACK)
 	$(MOVE)
