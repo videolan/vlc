@@ -47,11 +47,11 @@ namespace dash
 
                 Profile                         getProfile() const;
                 bool                            isLive() const;
-                void                            setLive( bool live );
                 time_t                          getAvailabilityStartTime() const;
                 void                            setAvailabilityStartTime( time_t time );
                 time_t                          getAvailabilityEndTime() const;
                 void                            setAvailabilityEndTime( time_t time );
+                void                            setType(const std::string &);
                 time_t                          getDuration() const;
                 void                            setDuration( time_t duration );
                 time_t                          getMinUpdatePeriod() const;
@@ -76,7 +76,6 @@ namespace dash
             private:
                 stream_t                           *stream;
                 Profile                             profile;
-                bool                                live;
                 time_t                              availabilityStartTime;
                 time_t                              availabilityEndTime;
                 time_t                              duration;
@@ -86,6 +85,7 @@ namespace dash
                 std::vector<Period *>               periods;
                 std::vector<BaseUrl *>              baseUrls;
                 ProgramInformation                  *programInfo;
+                std::string                         type;
         };
     }
 }

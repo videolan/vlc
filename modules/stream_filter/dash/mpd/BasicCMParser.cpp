@@ -71,7 +71,7 @@ bool    BasicCMParser::parse                (Profile profile)
         Standard specifies a default of "On-Demand",
         so anything that is not "Live" is "On-Demand"
     */
-    this->mpd->setLive( it != attr.end() && it->second == "Live" );
+
     it = attr.find( "availabilityStartTime" );
     if ( it == attr.end() && this->mpd->isLive() == true )
     {

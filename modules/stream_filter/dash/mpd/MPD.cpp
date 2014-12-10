@@ -35,7 +35,6 @@ MPD::MPD (stream_t *stream_, Profile profile_) :
     ICanonicalUrl(),
     stream(stream_),
     profile( profile_ ),
-    live( false ),
     availabilityStartTime( -1 ),
     availabilityEndTime( -1 ),
     duration( -1 ),
@@ -126,12 +125,18 @@ void                    MPD::setProgramInformation  (ProgramInformation *progInf
 
 bool                    MPD::isLive() const
 {
-    return this->live;
+    if(type.empty())
+    {
+        Profile live(Profile::ISOLive);
+        return profile == live;
+    }
+    else
+        return (type != "static");
 }
 
-void                    MPD::setLive( bool live )
+void MPD::setType(const std::string &type_)
 {
-    this->live = live;
+    type = type_;
 }
 
 time_t MPD::getAvailabilityStartTime() const

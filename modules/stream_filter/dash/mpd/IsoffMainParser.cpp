@@ -67,6 +67,9 @@ void    IsoffMainParser::setMPDAttributes   ()
     if(it != attr.end())
         this->mpd->setMinBufferTime(str_duration( it->second.c_str()));
 
+    it = attr.find("type");
+    if(it != attr.end())
+        mpd->setType(it->second);
 }
 
 void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
