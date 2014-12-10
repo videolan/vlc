@@ -110,17 +110,39 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
         if(repNode->hasAttribute("mimeType"))
             currentRepresentation->setMimeType(repNode->getAttributeValue("mimeType"));
 
-        this->setSegmentBase(repNode, this->currentRepresentation);
-        this->setSegmentList(repNode, this->currentRepresentation);
+        std::vector<Node *> segmentBase = DOMHelper::getElementByTagName(repNode, "SegmentBase", false);
+        std::vector<Node *> segmentList = DOMHelper::getElementByTagName(repNode, "SegmentList", false);
+
+        setSegmentBase(segmentBase, currentRepresentation);
+        setSegmentList(segmentList, currentRepresentation);
+
+        if(segmentBase.empty() && segmentList.empty())
+        {
+            /* unranged & segment less representation, add fake segment */
+            SegmentList *list = new SegmentList();
+            Segment *seg = new Segment(currentRepresentation);
+            if(list && seg)
+            {
+                list->addSegment(seg);
+                currentRepresentation->setSegmentList(list);
+            }
+            else
+            {
+                delete seg;
+                delete list;
+            }
+        }
+
         adaptationSet->addRepresentation(this->currentRepresentation);
     }
 }
 
-void    IsoffMainParser::setSegmentBase     (dash::xml::Node *repNode, Representation *rep)
+void    IsoffMainParser::setSegmentBase     (std::vector<Node *> &segmentBase, Representation *rep)
 {
-    std::vector<Node *> segmentBase = DOMHelper::getElementByTagName(repNode, "SegmentBase", false);
+    if(segmentBase.empty())
+        return;
 
-    if(segmentBase.front()->hasAttribute("indexRange"))
+    else if(segmentBase.front()->hasAttribute("indexRange"))
     {
         SegmentList *list = new SegmentList();
         Segment *seg;
@@ -151,17 +173,15 @@ void    IsoffMainParser::setSegmentBase     (dash::xml::Node *repNode, Represent
             rep->setSegmentBase(base);
         }
     }
-    else if(!segmentBase.empty())
+    else
     {
         SegmentBase *base = new SegmentBase();
         setInitSegment(segmentBase.front(), base);
         rep->setSegmentBase(base);
     }
 }
-void    IsoffMainParser::setSegmentList     (dash::xml::Node *repNode, Representation *rep)
+void    IsoffMainParser::setSegmentList     (std::vector<Node *> &segmentList, Representation *rep)
 {
-    std::vector<Node *> segmentList = DOMHelper::getElementByTagName(repNode, "SegmentList", false);
-
     if(segmentList.size() > 0)
     {
         SegmentList *list = new SegmentList();
