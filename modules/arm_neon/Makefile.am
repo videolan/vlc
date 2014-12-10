@@ -27,7 +27,6 @@ libyuv_rgb_neon_plugin_LIBTOOLFLAGS = --tag=CC
 if HAVE_NEON
 neon_LTLIBRARIES = \
 	libchroma_yuv_neon_plugin.la \
-	libvolume_neon_plugin.la \
 	libyuv_rgb_neon_plugin.la
 endif
 
