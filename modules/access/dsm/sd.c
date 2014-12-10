@@ -67,16 +67,18 @@ int bdsm_SdOpen (vlc_object_t *p_this)
     for( ssize_t i = 0; i < netbios_ns_entry_count( p_sys->ns ); i++ )
     {
         netbios_ns_entry *p_entry = netbios_ns_entry_at( p_sys->ns, i );
+        char type = netbios_ns_entry_type( p_entry );
 
-        if( p_entry->type == 0x20 )
+        if( type == 0x20 )
         {
             input_item_t *p_item;
             char *psz_mrl;
+            const char *name = netbios_ns_entry_name( p_entry );
 
-            if( asprintf(&psz_mrl, "smb://%s", p_entry->name) < 0 )
+            if( asprintf(&psz_mrl, "smb://%s", name) < 0 )
                 goto error;
 
-            p_item = input_item_NewWithType( psz_mrl, p_entry->name, 0, NULL,
+            p_item = input_item_NewWithType( psz_mrl, name, 0, NULL,
                                              0, -1, ITEM_TYPE_NODE );
             msg_Dbg( p_sd, "Adding item %s", psz_mrl );
 
