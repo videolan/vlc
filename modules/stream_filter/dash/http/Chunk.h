@@ -25,6 +25,10 @@
 #ifndef CHUNK_H_
 #define CHUNK_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc_common.h>
 #include <vlc_url.h>
 
