@@ -51,7 +51,7 @@ namespace dash
                 void                    appendBaseURL( const std::string& url );
                 const SegmentTimeline*  getSegmentTimeline() const;
                 void                    setSegmentTimeline( const SegmentTimeline *segTl );
-                virtual std::string     getUrlSegment() const; /* impl */
+                virtual Url             getUrlSegment() const; /* impl */
 
             private:
                 time_t                  duration;

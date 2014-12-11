@@ -96,9 +96,9 @@ void SegmentInfoCommon::setSegmentTimeline( const SegmentTimeline *segTl )
         this->segmentTimeline = segTl;
 }
 
-std::string SegmentInfoCommon::getUrlSegment() const
+Url SegmentInfoCommon::getUrlSegment() const
 {
-    std::string ret = getParentUrlSegment();
+    Url ret = getParentUrlSegment();
     if (!baseURLs.empty())
         ret.append(baseURLs.front());
     return ret;

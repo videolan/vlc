@@ -88,9 +88,10 @@ namespace dash
         {
             public:
                 Segment( Representation *parent );
+                explicit Segment( ICanonicalUrl *parent );
                 ~Segment();
                 virtual void setSourceUrl( const std::string &url );
-                virtual std::string getUrlSegment() const; /* impl */
+                virtual Url getUrlSegment() const; /* impl */
                 virtual dash::http::Chunk* toChunk();
                 virtual std::vector<ISegment*> subSegments();
                 virtual Representation* getRepresentation() const;
@@ -133,7 +134,7 @@ namespace dash
         {
             public:
                 SubSegment(Segment *, size_t start, size_t end);
-                virtual std::string getUrlSegment() const; /* impl */
+                virtual Url getUrlSegment() const; /* impl */
                 virtual std::vector<ISegment*> subSegments();
                 virtual Representation* getRepresentation() const;
                 static const int CLASSID_SUBSEGMENT = 4;

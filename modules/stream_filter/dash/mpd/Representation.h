@@ -87,7 +87,7 @@ namespace dash
                 MPD*                getMPD                  () const;
 
                 std::vector<std::string> toString() const;
-                virtual std::string getUrlSegment           () const; /* impl */
+                virtual Url         getUrlSegment           () const; /* impl */
 
                 class SplitPoint
                 {

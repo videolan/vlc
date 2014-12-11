@@ -78,7 +78,7 @@ AdaptationSet * Period::getAdaptationSet(Streams::Type type) const
     return NULL;
 }
 
-std::string Period::getUrlSegment() const
+Url Period::getUrlSegment() const
 {
     return getParentUrlSegment();
 }

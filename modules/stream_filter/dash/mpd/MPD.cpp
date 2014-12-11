@@ -165,16 +165,15 @@ Profile MPD::getProfile() const
 {
     return profile;
 }
-
-std::string MPD::getUrlSegment() const
+Url MPD::getUrlSegment() const
 {
     if (!baseUrls.empty())
-        return baseUrls.front()->getUrl();
+        return Url(baseUrls.front()->getUrl());
     else
     {
         std::stringstream ss;
         ss << stream->psz_access << "://" << Helper::getDirectoryPath(stream->psz_path) << "/";
-        return ss.str();
+        return Url(ss.str());
     }
 }
 

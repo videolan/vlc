@@ -80,6 +80,8 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/mpd/SegmentTimeline.h \
     stream_filter/dash/mpd/TrickModeType.cpp \
     stream_filter/dash/mpd/TrickModeType.h \
+    stream_filter/dash/mpd/Url.cpp \
+    stream_filter/dash/mpd/Url.hpp \
     stream_filter/dash/mp4/AtomsReader.cpp \
     stream_filter/dash/mp4/AtomsReader.hpp \
     stream_filter/dash/xml/DOMHelper.cpp \

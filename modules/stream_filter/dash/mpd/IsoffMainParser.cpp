@@ -101,6 +101,9 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
         if(!baseUrls.empty())
             currentRepresentation->setBaseUrl( new BaseUrl( baseUrls.front()->getText() ) );
 
+        if(repNode->hasAttribute("id"))
+            currentRepresentation->setId(repNode->getAttributeValue("id"));
+
         if(repNode->hasAttribute("width"))
             this->currentRepresentation->setWidth(atoi(repNode->getAttributeValue("width").c_str()));
 
@@ -242,7 +245,7 @@ void    IsoffMainParser::print              ()
                 static_cast<std::string>(mpd->getProfile()).c_str(),
                 mpd->getDuration(),
                 mpd->getMinBufferTime());
-        msg_Dbg(p_stream, "BaseUrl=%s", mpd->getUrlSegment().c_str());
+        msg_Dbg(p_stream, "BaseUrl=%s", mpd->getUrlSegment().toString().c_str());
 
         std::vector<Period *>::const_iterator i;
         for(i = mpd->getPeriods().begin(); i != mpd->getPeriods().end(); i++)

@@ -108,7 +108,7 @@ size_t ISegment::getOffset() const
 std::string ISegment::toString() const
 {
     std::stringstream ss("    ");
-    ss << debugName << " url=" << getUrlSegment();
+    ss << debugName << " url=" << getUrlSegment().toString();
     if(startByte!=endByte)
         ss << " @" << startByte << ".." << endByte;
     return ss.str();
@@ -263,7 +263,7 @@ SubSegment::SubSegment(Segment *main, size_t start, size_t end) :
     classId = CLASSID_SUBSEGMENT;
 }
 
-std::string SubSegment::getUrlSegment() const
+Url SubSegment::getUrlSegment() const
 {
     return getParentUrlSegment();
 }

@@ -66,7 +66,7 @@ namespace dash
                 void    addBaseUrl              (BaseUrl *url);
                 void    setProgramInformation   (ProgramInformation *progInfo);
 
-                virtual std::string getUrlSegment() const; /* impl */
+                virtual Url         getUrlSegment() const; /* impl */
                 vlc_object_t *      getVLCObject()  const;
 
                 virtual const std::vector<Period *>&    getPeriods() const;

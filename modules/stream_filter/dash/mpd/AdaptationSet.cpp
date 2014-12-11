@@ -113,7 +113,7 @@ bool AdaptationSet::getBitstreamSwitching  () const
     return this->isBitstreamSwitching;
 }
 
-std::string AdaptationSet::getUrlSegment() const
+Url AdaptationSet::getUrlSegment() const
 {
     return getParentUrlSegment();
 }

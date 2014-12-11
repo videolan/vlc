@@ -20,7 +20,7 @@
 #ifndef CANONICALURL_HPP
 #define CANONICALURL_HPP
 
-#include <string>
+#include "Url.hpp"
 
 namespace dash
 {
@@ -30,12 +30,12 @@ namespace dash
         {
             public:
                 ICanonicalUrl( const ICanonicalUrl *parent = NULL ) { parentUrlMember = parent; }
-                virtual std::string getUrlSegment() const = 0;
+                virtual Url getUrlSegment() const = 0;
 
             protected:
-                std::string getParentUrlSegment() const {
+                Url getParentUrlSegment() const {
                     return (parentUrlMember) ? parentUrlMember->getUrlSegment()
-                                             : std::string();
+                                             : Url();
                 }
 
             private:

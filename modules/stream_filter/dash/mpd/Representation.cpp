@@ -218,9 +218,9 @@ std::vector<std::string> Representation::toString() const
     return ret;
 }
 
-std::string Representation::getUrlSegment() const
+Url Representation::getUrlSegment() const
 {
-    std::string ret = getParentUrlSegment();
+    Url ret = getParentUrlSegment();
     if (baseUrl)
         ret.append(baseUrl->getUrl());
     return ret;
