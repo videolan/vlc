@@ -39,6 +39,7 @@ namespace dash
     {
         class SegmentInfoDefault;
         class Period;
+        class SegmentTemplate;
 
         class AdaptationSet : public CommonAttributesElements, public ICanonicalUrl
         {
@@ -54,6 +55,8 @@ namespace dash
                 const SegmentInfoDefault*       getSegmentInfoDefault() const;
                 void                            setSegmentInfoDefault( const SegmentInfoDefault* seg );
                 void                            setBitstreamSwitching(bool value);
+                void                            setTemplates( SegmentTemplate *, SegmentTemplate * = NULL );
+                std::vector<SegmentTemplate *>  getTemplates() const;
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( Representation *rep );
                 virtual Url                     getUrlSegment() const; /* reimpl */
@@ -63,6 +66,8 @@ namespace dash
                 std::vector<Representation *>   representations;
                 const SegmentInfoDefault*       segmentInfoDefault;
                 bool                            isBitstreamSwitching;
+                SegmentTemplate *               mediaTemplate;
+                SegmentTemplate *               initTemplate;
         };
     }
 }

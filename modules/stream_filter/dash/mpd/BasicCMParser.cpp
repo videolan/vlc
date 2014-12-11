@@ -265,7 +265,6 @@ void    BasicCMParser::setRepresentations   (Node *root, AdaptationSet *group)
         const std::map<std::string, std::string>    attributes = representations.at(i)->getAttributes();
 
         Representation *rep = new Representation(group, getMPD());
-        rep->setParentGroup( group );
         this->currentRepresentation = rep;
         if ( this->parseCommonAttributesElements( representations.at( i ), rep, group ) == false )
         {
@@ -366,7 +365,7 @@ Segment*    BasicCMParser::parseSegment( Node* node, bool init )
                 msg_Err( p_stream, "Failed to substitute URLTemplate identifier."  );
                 return NULL;
             }
-            seg = new SegmentTemplate( runtimeToken, this->currentRepresentation );
+            seg = new SegmentTemplate( currentRepresentation );
         }
         else
         {

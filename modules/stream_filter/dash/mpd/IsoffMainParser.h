@@ -57,6 +57,7 @@ namespace dash
                 void    setSegmentList      (std::vector<xml::Node *> &, Representation *rep);
                 void    setInitSegment      (dash::xml::Node *segBaseNode, SegmentBase *base);
                 void    setSegments         (dash::xml::Node *segListNode, SegmentList *list);
+                void    parseTemplate       (dash::xml::Node *templateNode, AdaptationSet *);
         };
     }
 }

@@ -56,20 +56,31 @@ Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
             return NULL;
 
     std::vector<ISegment *> segments = rep->getSegments();
-    if ( count == segments.size() )
+    ISegment *first = segments.empty() ? NULL : segments.front();
+
+    bool b_templated = (first && !first->isSingleShot());
+
+    if (count == segments.size() && !b_templated)
     {
         currentPeriod = mpd->getNextPeriod(currentPeriod);
         count = 0;
         return getNextChunk(type);
     }
 
+    ISegment *seg = NULL;
     if ( segments.size() > count )
     {
-        ISegment *seg = segments.at( count );
-        Chunk *chunk = seg->toChunk();
-        //In case of UrlTemplate, we must stay on the same segment.
-        if ( seg->isSingleShot() == true )
-            count++;
+        seg = segments.at( count );
+    }
+    else if(b_templated)
+    {
+        seg = segments.back();
+    }
+
+    if(seg)
+    {
+        Chunk *chunk = seg->toChunk(count, rep);
+        count++;
         seg->done();
         return chunk;
     }

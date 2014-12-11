@@ -73,8 +73,6 @@ namespace dash
 
                 void                setSegmentInfo( SegmentInfo *info );
                 void                setTrickMode( TrickModeType *trickModeType );
-                const AdaptationSet*        getParentGroup() const;
-                void                setParentGroup( const AdaptationSet *group );
 
                 std::vector<ISegment*> getSegments          ()const;
                 void                setSegmentList          (SegmentList *list);
@@ -99,13 +97,13 @@ namespace dash
 
             private:
                 MPD                                *mpd;
+                AdaptationSet                      *adaptationSet;
                 uint64_t                            bandwidth;
                 std::string                         id;
                 int                                 qualityRanking;
                 std::list<const Representation*>    dependencies;
                 SegmentInfo                         *segmentInfo;
                 TrickModeType                       *trickModeType;
-                const AdaptationSet                         *parentGroup;
                 SegmentBase                         *segmentBase;
                 SegmentList                         *segmentList;
                 BaseUrl                             *baseUrl;

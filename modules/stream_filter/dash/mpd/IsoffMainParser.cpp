@@ -27,10 +27,13 @@
 #endif
 
 #include "IsoffMainParser.h"
+#include "SegmentTemplate.h"
+#include "SegmentInfoDefault.h"
 #include "xml/DOMHelper.h"
 #include <vlc_strings.h>
 #include <vlc_stream.h>
 #include <cstdio>
+#include <sstream>
 
 using namespace dash::mpd;
 using namespace dash::xml;
@@ -72,6 +75,45 @@ void    IsoffMainParser::setMPDAttributes   ()
         mpd->setType(it->second);
 }
 
+void IsoffMainParser::parseTemplate(Node *templateNode, AdaptationSet *set)
+{
+    if (templateNode == NULL || !templateNode->hasAttribute("media"))
+        return;
+
+    std::string mediaurl = templateNode->getAttributeValue("media");
+    SegmentTemplate *mediaTemplate = NULL;
+    if(mediaurl.empty() || !(mediaTemplate = new (std::nothrow) SegmentTemplate(set)) )
+        return;
+    mediaTemplate->setSourceUrl(mediaurl);
+
+    if(templateNode->hasAttribute("startNumber"))
+    {
+        std::istringstream in(templateNode->getAttributeValue("startNumber"));
+        size_t i;
+        in >> i;
+        mediaTemplate->setStartIndex(i);
+    }
+
+    if(templateNode->hasAttribute("duration"))
+    {
+        std::istringstream in(templateNode->getAttributeValue("duration"));
+        size_t i;
+        in >> i;
+        mediaTemplate->setDuration(i);
+    }
+
+    InitSegmentTemplate *initTemplate = NULL;
+
+    if(templateNode->hasAttribute("initialization"))
+    {
+        std::string initurl = templateNode->getAttributeValue("initialization");
+        if(!initurl.empty() && (initTemplate = new (std::nothrow) InitSegmentTemplate(set)))
+            initTemplate->setSourceUrl(initurl);
+    }
+
+    set->setTemplates(mediaTemplate, initTemplate);
+}
+
 void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
 {
     std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", false);
@@ -84,6 +126,9 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
             continue;
         if((*it)->hasAttribute("mimeType"))
             adaptationSet->setMimeType((*it)->getAttributeValue("mimeType"));
+
+        parseTemplate(DOMHelper::getFirstChildElementByName( *it, "SegmentTemplate" ), adaptationSet);
+
         setRepresentations((*it), adaptationSet);
         period->addAdaptationSet(adaptationSet);
     }
@@ -122,7 +167,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
         setSegmentBase(segmentBase, currentRepresentation);
         setSegmentList(segmentList, currentRepresentation);
 
-        if(segmentBase.empty() && segmentList.empty())
+        if(segmentBase.empty() && segmentList.empty() && adaptationSet->getTemplates().empty())
         {
             /* unranged & segment less representation, add fake segment */
             SegmentList *list = new SegmentList();

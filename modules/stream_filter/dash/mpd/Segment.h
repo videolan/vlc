@@ -51,7 +51,7 @@ namespace dash
                  */
                 virtual bool                            isSingleShot    () const;
                 virtual void                            done            ();
-                virtual dash::http::Chunk*              toChunk         ();
+                virtual dash::http::Chunk*              toChunk         (size_t, const Representation * = NULL);
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual void                            setStartTime    (mtime_t ztime);
                 virtual mtime_t                         getStartTime    () const;
@@ -95,7 +95,7 @@ namespace dash
                 ~Segment();
                 virtual void setSourceUrl( const std::string &url );
                 virtual Url getUrlSegment() const; /* impl */
-                virtual dash::http::Chunk* toChunk();
+                virtual dash::http::Chunk* toChunk(size_t, const Representation * = NULL);
                 virtual std::vector<ISegment*> subSegments();
                 virtual Representation* getRepresentation() const;
                 virtual std::string toString() const;

@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 
+#include "SegmentTemplate.h"
 #include "SegmentInfoDefault.h"
 #include "Period.h"
 
@@ -40,7 +41,9 @@ AdaptationSet::AdaptationSet(Period *period) :
     ICanonicalUrl( period ),
     subsegmentAlignmentFlag( false ),
     segmentInfoDefault( NULL ),
-    isBitstreamSwitching( false )
+    isBitstreamSwitching( false ),
+    mediaTemplate( NULL ),
+    initTemplate( NULL )
 {
 }
 
@@ -48,6 +51,8 @@ AdaptationSet::~AdaptationSet   ()
 {
     delete this->segmentInfoDefault;
     vlc_delete_all( this->representations );
+    delete mediaTemplate;
+    delete initTemplate;
 }
 
 const std::string& AdaptationSet::getMimeType() const
@@ -101,6 +106,24 @@ void AdaptationSet::setSegmentInfoDefault(const SegmentInfoDefault *seg)
 void                            AdaptationSet::addRepresentation        (Representation *rep)
 {
     this->representations.push_back(rep);
+}
+
+void AdaptationSet::setTemplates(SegmentTemplate *media, SegmentTemplate *init)
+{
+    mediaTemplate = media;
+    initTemplate = init;
+}
+
+std::vector<SegmentTemplate *> AdaptationSet::getTemplates() const
+{
+    std::vector<SegmentTemplate *> ret;
+    if(mediaTemplate)
+    {
+        if(initTemplate)
+            ret.push_back(initTemplate);
+        ret.push_back(mediaTemplate);
+    }
+    return ret;
 }
 
 void AdaptationSet::setBitstreamSwitching  (bool value)

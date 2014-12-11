@@ -30,17 +30,18 @@
 #include "Representation.h"
 #include "mpd/AdaptationSet.h"
 #include "mpd/MPD.h"
+#include "mpd/SegmentTemplate.h"
 
 using namespace dash::mpd;
 
 Representation::Representation  ( AdaptationSet *set, MPD *mpd_ ) :
                 ICanonicalUrl   ( set ),
                 mpd             ( mpd_ ),
+                adaptationSet   ( set ),
                 bandwidth       (0),
                 qualityRanking  ( -1 ),
                 segmentInfo     ( NULL ),
                 trickModeType   ( NULL ),
-                parentGroup     ( NULL ),
                 segmentBase     ( NULL ),
                 segmentList     ( NULL ),
                 baseUrl         ( NULL ),
@@ -92,17 +93,6 @@ TrickModeType*      Representation::getTrickModeType        () const
 void                Representation::setTrickMode        (TrickModeType *trickModeType)
 {
     this->trickModeType = trickModeType;
-}
-
-const AdaptationSet *Representation::getParentGroup() const
-{
-    return this->parentGroup;
-}
-
-void Representation::setParentGroup(const AdaptationSet *group)
-{
-    if ( group != NULL )
-        this->parentGroup = group;
 }
 
 void                Representation::setSegmentInfo          (SegmentInfo *info)
@@ -169,6 +159,12 @@ std::vector<ISegment *> Representation::getSegments() const
                 retSegments.insert( retSegments.end(), list.begin(), list.end() );
             }
         }
+    }
+
+    if(retSegments.empty())
+    {
+        std::vector<SegmentTemplate *> list = adaptationSet->getTemplates();
+        retSegments.insert( retSegments.end(), list.begin(), list.end() );
     }
 
     return retSegments;

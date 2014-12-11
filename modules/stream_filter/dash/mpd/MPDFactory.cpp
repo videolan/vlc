@@ -42,6 +42,7 @@ MPD* MPDFactory::create             (dash::xml::Node *root, stream_t *p_stream, 
             break;
         case Profile::ISOOnDemand:
         case Profile::ISOMain:
+        case Profile::ISOLive:
             parser = new IsoffMainParser(root, p_stream);
         default:
             break;

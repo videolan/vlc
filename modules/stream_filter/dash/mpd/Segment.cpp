@@ -53,12 +53,12 @@ dash::http::Chunk * ISegment::getChunk(const std::string &url)
     return new (std::nothrow) SegmentChunk(this, url);
 }
 
-dash::http::Chunk* ISegment::toChunk()
+dash::http::Chunk* ISegment::toChunk(size_t index, const Representation *ctxrep)
 {
     Chunk *chunk;
     try
     {
-        chunk = getChunk(getUrlSegment());
+        chunk = getChunk(getUrlSegment().toString(index, ctxrep));
         if (!chunk)
             return NULL;
     }
@@ -149,12 +149,19 @@ void ISegment::SegmentChunk::onDownload(void *, size_t)
 
 }
 
+Segment::Segment(ICanonicalUrl *parent) :
+        ISegment(parent),
+        parentRepresentation( NULL )
+{
+    size = -1;
+    classId = CLASSID_SEGMENT;
+}
+
 Segment::Segment(Representation *parent) :
         ISegment(parent),
         parentRepresentation( parent )
 {
-    assert( parent != NULL );
-    if ( parent->getSegmentInfo() != NULL && parent->getSegmentInfo()->getDuration() >= 0 )
+    if ( parent && parent->getSegmentInfo() != NULL && parent->getSegmentInfo()->getDuration() >= 0 )
         this->size = parent->getBandwidth() * parent->getSegmentInfo()->getDuration();
     else
         this->size = -1;
@@ -203,18 +210,18 @@ std::string Segment::toString() const
     }
 }
 
-std::string Segment::getUrlSegment() const
+Url Segment::getUrlSegment() const
 {
-    std::string ret = getParentUrlSegment();
+    Url ret = getParentUrlSegment();
     if (!sourceUrl.empty())
         ret.append(sourceUrl);
     return ret;
 }
 
-dash::http::Chunk* Segment::toChunk()
+dash::http::Chunk* Segment::toChunk(size_t index, const Representation *ctxrep)
 {
-    Chunk *chunk = ISegment::toChunk();
-    if (chunk)
+    Chunk *chunk = ISegment::toChunk(index, ctxrep);
+    if (chunk && parentRepresentation)
         chunk->setBitrate(parentRepresentation->getBandwidth());
     return chunk;
 }
