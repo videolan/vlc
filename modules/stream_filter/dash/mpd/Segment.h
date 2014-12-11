@@ -55,6 +55,8 @@ namespace dash
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual void                            setStartTime    (mtime_t ztime);
                 virtual mtime_t                         getStartTime    () const;
+                virtual mtime_t                         getDuration     () const;
+                virtual void                            setDuration     (mtime_t);
                 virtual size_t                          getOffset       () const;
                 virtual std::vector<ISegment*>          subSegments     () = 0;
                 virtual std::string                     toString        () const;
@@ -70,6 +72,7 @@ namespace dash
                 mtime_t                 startTime;
                 std::string             debugName;
                 int                     classId;
+                mtime_t                 duration;
 
                 class SegmentChunk : public dash::http::Chunk
                 {

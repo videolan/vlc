@@ -41,7 +41,8 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     ICanonicalUrl( parent ),
     startByte  (0),
     endByte    (0),
-    startTime  (VLC_TS_INVALID)
+    startTime  (VLC_TS_INVALID),
+    duration   (0)
 {
     debugName = "Segment";
     classId = CLASSID_ISEGMENT;
@@ -98,6 +99,16 @@ void ISegment::setStartTime(mtime_t ztime)
 mtime_t ISegment::getStartTime() const
 {
     return startTime;
+}
+
+mtime_t ISegment::getDuration() const
+{
+    return duration;
+}
+
+void ISegment::setDuration(mtime_t d)
+{
+    duration = d;
 }
 
 size_t ISegment::getOffset() const
