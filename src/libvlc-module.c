@@ -1583,7 +1583,7 @@ vlc_module_begin ()
         change_integer_list( pi_align_values, ppsz_align_descriptions )
     add_float( "zoom", 1., ZOOM_TEXT, ZOOM_LONGTEXT, true )
         change_safe()
-    add_integer( "deinterlace", 0,
+    add_integer( "deinterlace", -1,
                  DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
         change_integer_list( pi_deinterlace, ppsz_deinterlace_text )
         change_safe()
