@@ -313,38 +313,20 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
         if (!BetterFormat (chroma, chromav, &rank))
             continue;
 
-        /* VLC pads scanline to 16 pixels internally */
-        unsigned width = (fmt->i_width + 31) & ~31;
-        unsigned height = (fmt->i_height + 15) & ~15;
         xcb_xv_query_image_attributes_reply_t *i;
         i = xcb_xv_query_image_attributes_reply (conn,
             xcb_xv_query_image_attributes (conn, a->base_id, f->id,
-                                           width, height), NULL);
+                                           fmt->i_visible_width,
+                                           fmt->i_visible_height), NULL);
         if (i == NULL)
             continue;
 
-        if (i->width != width || i->height != height)
-        {
-            msg_Warn (obj, "incompatible size %ux%u -> %"PRIu32"x%"PRIu32,
-                      fmt->i_width, fmt->i_height,
-                      i->width, i->height);
-            var_Create (obj->p_libvlc, "xvideo-res-error", VLC_VAR_BOOL);
-            if (!var_GetBool (obj->p_libvlc, "xvideo-res-error"))
-            {
-                dialog_FatalWait (obj, _("Video acceleration not available"),
-                    _("The XVideo rendering acceleration driver does not "
-                      "support the required resolution of %ux%u pixels but "
-                      "%"PRIu32"x%"PRIu32" pixels instead.\n"
-                      "Acceleration will thus be disabled. Performance may "
-                      "be degraded severely if the resolution is large."),
-                                  width, height, i->width, i->height);
-                var_SetBool (obj->p_libvlc, "xvideo-res-error", true);
-            }
-            free (i);
-            continue;
-        }
-
         fmt->i_chroma = chroma;
+        fmt->i_x_offset = 0;
+        fmt->i_y_offset = 0;
+        fmt->i_width = i->width;
+        fmt->i_height = i->height;
+
         if (f->type == XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB)
         {
             fmt->i_rmask = f->red_mask;
