@@ -45,11 +45,9 @@ namespace dash
 
                 virtual dash::http::Chunk*  getNextChunk            (Streams::Type);
 
-                virtual void                downloadRateChanged     (uint64_t bpsAvg, uint64_t bpsLastChunk);
-                virtual void                bufferLevelChanged      (mtime_t bufferedMicroSec, int bufferedPercent);
+                virtual void                updateDownloadRate     (size_t, mtime_t);
 
-                uint64_t                    getBpsAvg               () const;
-                uint64_t                    getBpsLastChunk         () const;
+                virtual void                bufferLevelChanged      (mtime_t bufferedMicroSec, int bufferedPercent);
                 int                         getBufferPercent        () const;
 
             protected:
@@ -58,8 +56,6 @@ namespace dash
                 size_t                  count;
 
             private:
-                int                     bpsAvg;
-                long                    bpsLastChunk;
                 mtime_t                 bufferedMicroSec;
                 int                     bufferedPercent;
         };

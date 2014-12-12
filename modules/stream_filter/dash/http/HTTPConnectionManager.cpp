@@ -33,22 +33,14 @@
 #include <vlc_stream.h>
 
 using namespace dash::http;
-using namespace dash::logic;
 
 const uint64_t  HTTPConnectionManager::CHUNKDEFAULTBITRATE    = 1;
 
-HTTPConnectionManager::HTTPConnectionManager    (IAdaptationLogic *adaptationLogic, stream_t *stream) :
+HTTPConnectionManager::HTTPConnectionManager    (logic::IAdaptationLogic *adaptationLogic, stream_t *stream) :
                        currentChunk             (NULL),
                        adaptationLogic          (adaptationLogic),
                        stream                   (stream),
-                       chunkCount               (0),
-                       bpsAvg                   (0),
-                       bpsLastChunk             (0),
-                       bpsCurrentChunk          (0),
-                       bytesReadSession         (0),
-                       bytesReadChunk           (0),
-                       timeSession              (0),
-                       timeChunk                (0)
+                       chunkCount               (0)
 {
 }
 HTTPConnectionManager::~HTTPConnectionManager   ()
@@ -104,9 +96,6 @@ ssize_t HTTPConnectionManager::read(Streams::Type type, block_t **pp_block)
     {
         block_Release(block);
         *pp_block = NULL;
-        this->bpsLastChunk   = this->bpsCurrentChunk;
-        this->bytesReadChunk = 0;
-        this->timeChunk      = 0;
 
         delete(chunk);
         downloadQueue[type].pop_front();
@@ -115,8 +104,9 @@ ssize_t HTTPConnectionManager::read(Streams::Type type, block_t **pp_block)
     }
     else
     {
-        updateStatistics((size_t)ret, ((double)time) / CLOCK_FREQ);
         block->i_buffer = ret;
+        adaptationLogic->updateDownloadRate(block->i_buffer, time);
+
         if (chunk->getBytesToRead() == 0)
         {
             chunk->onDownload(block->p_buffer, block->i_buffer);
@@ -130,18 +120,6 @@ ssize_t HTTPConnectionManager::read(Streams::Type type, block_t **pp_block)
     return ret;
 }
 
-void                                HTTPConnectionManager::attach                   (IDownloadRateObserver *observer)
-{
-    this->rateObservers.push_back(observer);
-}
-void                                HTTPConnectionManager::notify                   ()
-{
-    if ( this->bpsAvg == 0 )
-        return ;
-    for(size_t i = 0; i < this->rateObservers.size(); i++)
-        this->rateObservers.at(i)->downloadRateChanged(this->bpsAvg, this->bpsLastChunk);
-}
-
 PersistentConnection * HTTPConnectionManager::getConnectionForHost(const std::string &hostname)
 {
     std::vector<PersistentConnection *>::const_iterator it;
@@ -151,25 +129,6 @@ PersistentConnection * HTTPConnectionManager::getConnectionForHost(const std::st
             return *it;
     }
     return NULL;
-}
-
-void HTTPConnectionManager::updateStatistics(size_t bytes, double time)
-{
-    this->bytesReadSession  += bytes;
-    this->bytesReadChunk    += bytes;
-    this->timeSession       += time;
-    this->timeChunk         += time;
-
-    this->bpsAvg            = (int64_t) ((this->bytesReadSession * 8) / this->timeSession);
-    this->bpsCurrentChunk   = (int64_t) ((this->bytesReadChunk * 8) / this->timeChunk);
-
-    if(this->bpsAvg < 0)
-        this->bpsAvg = 0;
-
-    if(this->bpsCurrentChunk < 0)
-        this->bpsCurrentChunk = 0;
-
-    this->notify();
 }
 
 bool HTTPConnectionManager::connectChunk(Chunk *chunk)

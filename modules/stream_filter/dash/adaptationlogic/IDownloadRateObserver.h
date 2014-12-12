@@ -34,7 +34,7 @@ namespace dash
         class IDownloadRateObserver
         {
             public:
-                virtual void downloadRateChanged(uint64_t bpsAvg, uint64_t bpsLastChunk) = 0;
+                virtual void updateDownloadRate(size_t, mtime_t) = 0;
                 virtual ~IDownloadRateObserver(){}
         };
     }

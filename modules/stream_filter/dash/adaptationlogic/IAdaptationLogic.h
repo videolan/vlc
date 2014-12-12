@@ -49,11 +49,6 @@ namespace dash
 
                 virtual dash::http::Chunk*                  getNextChunk            (Streams::Type) = 0;
                 virtual const dash::mpd::Representation*    getCurrentRepresentation(Streams::Type) const    = 0;
-                /**
-                 *  \return     The average bitrate in bits per second.
-                 */
-                virtual uint64_t                getBpsAvg               () const = 0;
-                virtual uint64_t                getBpsLastChunk         () const = 0;
         };
     }
 }

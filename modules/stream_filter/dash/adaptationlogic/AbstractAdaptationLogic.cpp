@@ -35,8 +35,6 @@ AbstractAdaptationLogic::AbstractAdaptationLogic    (MPD *mpd_) :
                          mpd                        (mpd_),
                          currentPeriod              (mpd->getFirstPeriod()),
                          count                      (0),
-                         bpsAvg                     (0),
-                         bpsLastChunk               (0),
                          bufferedMicroSec           (0),
                          bufferedPercent            (0)
 {
@@ -92,19 +90,11 @@ void AbstractAdaptationLogic::bufferLevelChanged     (mtime_t bufferedMicroSec, 
     this->bufferedMicroSec = bufferedMicroSec;
     this->bufferedPercent  = bufferedPercent;
 }
-void AbstractAdaptationLogic::downloadRateChanged    (uint64_t bpsAvg, uint64_t bpsLastChunk)
+
+void AbstractAdaptationLogic::updateDownloadRate    (size_t, mtime_t)
 {
-    this->bpsAvg        = bpsAvg;
-    this->bpsLastChunk  = bpsLastChunk;
 }
-uint64_t AbstractAdaptationLogic::getBpsAvg          () const
-{
-    return this->bpsAvg;
-}
-uint64_t AbstractAdaptationLogic::getBpsLastChunk    () const
-{
-    return this->bpsLastChunk;
-}
+
 int AbstractAdaptationLogic::getBufferPercent        () const
 {
     return this->bufferedPercent;

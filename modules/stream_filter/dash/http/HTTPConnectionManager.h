@@ -25,6 +25,12 @@
 #ifndef HTTPCONNECTIONMANAGER_H_
 #define HTTPCONNECTIONMANAGER_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include "http/PersistentConnection.h"
+
 #include <vlc_common.h>
 
 #include <string>
@@ -50,31 +56,21 @@ namespace dash
 
                 void    closeAllConnections ();
                 ssize_t read                (Streams::Type, block_t **);
-                void    attach              (dash::logic::IDownloadRateObserver *observer);
-                void    notify              ();
 
             private:
-                std::vector<dash::logic::IDownloadRateObserver *>   rateObservers;
                 std::deque<Chunk *>                                 downloadQueue[Streams::count];
+                void    releaseAllConnections ();
+
                 Chunk                                               *currentChunk;
                 std::vector<PersistentConnection *>                 connectionPool;
                 logic::IAdaptationLogic                             *adaptationLogic;
                 stream_t                                            *stream;
                 int                                                 chunkCount;
-                int64_t                                             bpsAvg;
-                int64_t                                             bpsLastChunk;
-                int64_t                                             bpsCurrentChunk;
-                int64_t                                             bytesReadSession;
-                int64_t                                             bytesReadChunk;
-                double                                              timeSession;
-                double                                              timeChunk;
 
                 static const uint64_t   CHUNKDEFAULTBITRATE;
 
                 bool                                    connectChunk            (Chunk *chunk);
                 PersistentConnection *                  getConnectionForHost    (const std::string &hostname);
-                void                                    updateStatistics        (size_t bytes, double time);
-
         };
     }
 }

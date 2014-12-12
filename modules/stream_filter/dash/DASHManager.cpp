@@ -64,7 +64,6 @@ bool    DASHManager::start()
     this->buffer     = new BlockBuffer(this->stream);
     this->downloader = new DASHDownloader(this->conManager, this->buffer);
 
-    this->conManager->attach(this->adaptationLogic);
     this->buffer->attach(this->adaptationLogic);
 
     return this->downloader->start();

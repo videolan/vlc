@@ -39,10 +39,13 @@ namespace dash
                 RateBasedAdaptationLogic            (mpd::MPD *mpd);
 
                 const dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;
+                virtual void updateDownloadRate(size_t, mtime_t);
 
             private:
                 int                     width;
                 int                     height;
+                size_t                  bpsAvg;
+                size_t                  bpsSamplecount;
         };
     }
 }
