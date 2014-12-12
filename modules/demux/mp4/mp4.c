@@ -612,12 +612,12 @@ static int Open( vlc_object_t * p_this )
                or if that file is just ready to append fragments */
             ProbeFragments( p_demux, false );
             p_sys->b_fragmented = !!MP4_BoxCount( p_sys->p_root, "/moof" );
+
+            if ( p_sys->b_fragmented && !p_sys->i_overall_duration )
+                ProbeFragments( p_demux, true );
         }
         else
             p_sys->b_fragmented = true;
-
-        if ( p_sys->b_fragmented && !p_sys->i_overall_duration )
-            ProbeFragments( p_demux, true );
     }
 
     if ( !p_sys->moovfragment.p_moox )
