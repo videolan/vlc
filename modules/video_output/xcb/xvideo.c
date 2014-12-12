@@ -324,6 +324,8 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
         fmt->i_chroma = chroma;
         fmt->i_x_offset = 0;
         fmt->i_y_offset = 0;
+        /* TODO: Check pitches and offsets as in PoolAlloc() to increase
+         * i_width and i_height where possible. */
         fmt->i_width = i->width;
         fmt->i_height = i->height;
 
