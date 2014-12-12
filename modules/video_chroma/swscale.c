@@ -85,8 +85,7 @@ vlc_module_end ()
  */
 struct filter_sys_t
 {
-    SwsFilter *p_src_filter;
-    SwsFilter *p_dst_filter;
+    SwsFilter *p_filter;
     int i_cpu_mask, i_sws_flags;
 
     video_format_t fmt_in;
@@ -183,8 +182,8 @@ static int OpenScaler( vlc_object_t *p_this )
 
     if( Init( p_filter ) )
     {
-        if( p_sys->p_src_filter )
-            sws_freeFilter( p_sys->p_src_filter );
+        if( p_sys->p_filter )
+            sws_freeFilter( p_sys->p_filter );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -213,8 +212,8 @@ static void CloseScaler( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     Clean( p_filter );
-    if( p_sys->p_src_filter )
-        sws_freeFilter( p_sys->p_src_filter );
+    if( p_sys->p_filter )
+        sws_freeFilter( p_sys->p_filter );
     free( p_sys );
 }
 
@@ -416,7 +415,7 @@ static int Init( filter_t *p_filter )
         ctx = sws_getContext( iwidth, iheight, i_fmti,
                               owidth, oheight, i_fmto,
                               cfg.i_sws_flags | p_sys->i_cpu_mask,
-                              p_sys->p_src_filter, p_sys->p_dst_filter, 0 );
+                              p_sys->p_filter, NULL, 0 );
         if( n == 0 )
             p_sys->ctx = ctx;
         else
