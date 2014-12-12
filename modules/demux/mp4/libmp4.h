@@ -35,6 +35,7 @@
 #define MAJOR_isml VLC_FOURCC( 'i', 's', 'm', 'l' )
 #define MAJOR_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
 #define MAJOR_qt__ VLC_FOURCC( 'q', 't', ' ', ' ' )
+#define MAJOR_dash VLC_FOURCC( 'd', 'a', 's', 'h' )
 
 #define ATOM_root VLC_FOURCC( 'r', 'o', 'o', 't' )
 #define ATOM_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )

@@ -84,6 +84,7 @@ struct demux_sys_t
     bool         b_fastseekable;
     bool         b_seekmode;
     bool         b_smooth;       /* Is it Smooth Streaming? */
+    bool         b_dash;
 
     bool            b_index_probed;
     bool            b_fragments_probed;
@@ -626,15 +627,6 @@ static int Open( vlc_object_t * p_this )
     if ( !p_sys->moovfragment.p_moox && !p_sys->b_smooth )
         goto error;
 
-    if ( p_sys->b_smooth )
-    {
-        p_demux->pf_demux = DemuxFrg;
-    }
-    else if( p_sys->b_fragmented )
-    {
-        p_demux->pf_demux = DemuxAsLeaf;
-    }
-
     if( p_sys->b_smooth )
     {
         if( InitTracks( p_demux ) != VLC_SUCCESS )
@@ -672,16 +664,38 @@ static int Open( vlc_object_t * p_this )
             case MAJOR_isml:
                 msg_Dbg( p_demux, "PIFF (= isml = fMP4) file" );
                 break;
+            case MAJOR_dash:
+                msg_Dbg( p_demux, "DASH Stream file" );
+                p_sys->b_dash = true;
+                break;
             default:
                 msg_Dbg( p_demux,
                          "unrecognized major file specification (%4.4s).",
                           (char*)&BOXDATA(p_ftyp)->i_major_brand );
                 break;
         }
+        /* also lookup in compatibility list */
+        for(uint32_t i=0; i<BOXDATA(p_ftyp)->i_compatible_brands_count; i++)
+        {
+            if (BOXDATA(p_ftyp)->i_compatible_brands[i] == MAJOR_dash)
+            {
+                msg_Dbg( p_demux, "DASH Stream file" );
+                p_sys->b_dash = true;
+            }
+        }
     }
     else
     {
         msg_Dbg( p_demux, "file type box missing (assuming ISO Media file)" );
+    }
+
+    if ( p_sys->b_smooth || p_sys->b_dash )
+    {
+        p_demux->pf_demux = DemuxFrg;
+    }
+    else if( p_sys->b_fragmented )
+    {
+        p_demux->pf_demux = DemuxAsLeaf;
     }
 
     /* the file need to have one moov box */
