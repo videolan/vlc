@@ -90,6 +90,8 @@ struct filter_sys_t
 
     video_format_t fmt_in;
     video_format_t fmt_out;
+    const vlc_chroma_description_t *desc_in;
+    const vlc_chroma_description_t *desc_out;
 
     struct SwsContext *ctx;
     struct SwsContext *ctxA;
@@ -378,6 +380,11 @@ static int Init( filter_t *p_filter )
         return VLC_EGENERIC;
     }
 
+    p_sys->desc_in = vlc_fourcc_GetChromaDescription( p_fmti->i_chroma );
+    p_sys->desc_out = vlc_fourcc_GetChromaDescription( p_fmto->i_chroma );
+    if( p_sys->desc_in == NULL || p_sys->desc_out == NULL )
+        return VLC_EGENERIC;
+
     /* swscale does not like too small width */
     p_sys->i_extend_factor = 1;
     while( __MIN( p_fmti->i_visible_width, p_fmto->i_visible_width ) * p_sys->i_extend_factor < MINIMUM_WIDTH)
@@ -485,21 +492,35 @@ static void Clean( filter_t *p_filter )
 }
 
 static void GetPixels( uint8_t *pp_pixel[4], int pi_pitch[4],
-                       const picture_t *p_picture, int i_plane_count,
+                       const vlc_chroma_description_t *desc,
+                       const video_format_t *fmt,
+                       const picture_t *p_picture, unsigned planes,
                        bool b_swap_uv )
 {
-    assert( !b_swap_uv || i_plane_count >= 3 );
-    int n;
-    for( n = 0; n < __MIN(i_plane_count, p_picture->i_planes); n++ )
+    unsigned i = 0;
+
+    if( planes > (unsigned)p_picture->i_planes )
+        planes = p_picture->i_planes;
+    assert( !b_swap_uv || planes >= 3 );
+
+    for( ; i < planes; i++ )
     {
-        const int nd = ( b_swap_uv && n >= 1 && n <= 2 ) ? (3 - n) : n;
-        pp_pixel[nd] = p_picture->p[n].p_pixels;
-        pi_pitch[nd] = p_picture->p[n].i_pitch;
+        const plane_t *p = p_picture->p + i;
+        if( b_swap_uv && (i == 1 || i== 2) )
+            p = p_picture->p + 3 - i;
+
+        pp_pixel[i] = p->p_pixels
+            + (((fmt->i_x_offset * desc->p[i].w.num) / desc->p[i].w.den)
+                * p->i_pixel_pitch)
+            + (((fmt->i_y_offset * desc->p[i].h.num) / desc->p[i].h.den)
+                * p->i_pitch);
+        pi_pitch[i] = p->i_pitch;
     }
-    for( ; n < 4; n++ )
+
+    for( ; i < 4; i++ )
     {
-        pp_pixel[n] = NULL;
-        pi_pitch[n] = 0;
+        pp_pixel[i] = NULL;
+        pi_pitch[i] = 0;
     }
 }
 
@@ -556,16 +577,18 @@ static void SwapUV( picture_t *p_dst, const picture_t *p_src )
 
     picture_CopyPixels( p_dst, &tmp );
 }
+
 static void Convert( filter_t *p_filter, struct SwsContext *ctx,
                      picture_t *p_dst, picture_t *p_src, int i_height,
                      int i_plane_count, bool b_swap_uvi, bool b_swap_uvo )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
     uint8_t palette[AVPALETTE_SIZE];
-
     uint8_t *src[4]; int src_stride[4];
     uint8_t *dst[4]; int dst_stride[4];
 
-    GetPixels( src, src_stride, p_src, i_plane_count, b_swap_uvi );
+    GetPixels( src, src_stride, p_sys->desc_in, &p_filter->fmt_in.video,
+               p_src, i_plane_count, b_swap_uvi );
     if( p_filter->fmt_in.video.i_chroma == VLC_CODEC_RGBP )
     {
         video_palette_t *src_pal =
@@ -580,7 +603,8 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
         src_stride[1] = 4;
     }
 
-    GetPixels( dst, dst_stride, p_dst, i_plane_count, b_swap_uvo );
+    GetPixels( dst, dst_stride, p_sys->desc_out, &p_filter->fmt_out.video,
+               p_dst, i_plane_count, b_swap_uvo );
 
 #if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
     sws_scale( ctx, src, src_stride, 0, i_height,
