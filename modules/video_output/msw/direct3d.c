@@ -89,7 +89,7 @@ vlc_module_begin ()
         change_string_cb(FindShadersCallback)
     add_loadfile("direct3d-shader-file", NULL, PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT, false)
 
-    set_capability("vout display", 240)
+    set_capability("vout display", 280)
     add_shortcut("direct3d")
     set_callbacks(Open, Close)
 
