@@ -1,6 +1,8 @@
 voutdir = $(pluginsdir)/video_output
 vout_LTLIBRARIES =
 
+EXTRA_DIST += video_output/README
+
 if HAVE_DECKLINK
 libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp
 libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CFLAGS) $(CPPFLAGS_decklinkoutput)
