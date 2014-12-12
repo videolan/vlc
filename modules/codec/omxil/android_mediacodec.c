@@ -384,22 +384,27 @@ static int OpenDecoder(vlc_object_t *p_this)
     jobject codec_name = NULL;
 
     for (int i = 0; i < num_codecs; i++) {
-        jobject info = (*env)->CallStaticObjectMethod(env, p_sys->media_codec_list_class,
-                                                      p_sys->get_codec_info_at, i);
-        if ((*env)->CallBooleanMethod(env, info, p_sys->is_encoder)) {
-            (*env)->DeleteLocalRef(env, info);
-            continue;
-        }
-
-        jobject codec_capabilities = (*env)->CallObjectMethod(env, info, p_sys->get_capabilities_for_type,
-                                                              (*env)->NewStringUTF(env, mime));
+        jobject codec_capabilities = NULL;
         jobject profile_levels = NULL;
-        int profile_levels_len = 0;
+        jobject info = NULL;
+        jobject name = NULL;
+        jobject types = NULL;
+        jsize name_len = 0;
+        int profile_levels_len = 0, num_types = 0;
+        const char *name_ptr = NULL;
+        bool found = false;
+
+        info = (*env)->CallStaticObjectMethod(env, p_sys->media_codec_list_class,
+                                              p_sys->get_codec_info_at, i);
+        if ((*env)->CallBooleanMethod(env, info, p_sys->is_encoder))
+            goto loopclean;
+
+        codec_capabilities = (*env)->CallObjectMethod(env, info, p_sys->get_capabilities_for_type,
+                                                      (*env)->NewStringUTF(env, mime));
         if ((*env)->ExceptionOccurred(env)) {
             msg_Warn(p_dec, "Exception occurred in MediaCodecInfo.getCapabilitiesForType");
             (*env)->ExceptionClear(env);
-            (*env)->DeleteLocalRef(env, info);
-            continue;
+            goto loopclean;
         } else if (codec_capabilities) {
             profile_levels = (*env)->GetObjectField(env, codec_capabilities, p_sys->profile_levels_field);
             if (profile_levels)
@@ -407,15 +412,15 @@ static int OpenDecoder(vlc_object_t *p_this)
         }
         msg_Dbg(p_dec, "Number of profile levels: %d", profile_levels_len);
 
-        jobject types = (*env)->CallObjectMethod(env, info, p_sys->get_supported_types);
-        int num_types = (*env)->GetArrayLength(env, types);
-        jobject name = (*env)->CallObjectMethod(env, info, p_sys->get_name);
-        jsize name_len = (*env)->GetStringUTFLength(env, name);
-        const char *name_ptr = (*env)->GetStringUTFChars(env, name, NULL);
-        bool found = false;
+        types = (*env)->CallObjectMethod(env, info, p_sys->get_supported_types);
+        num_types = (*env)->GetArrayLength(env, types);
+        name = (*env)->CallObjectMethod(env, info, p_sys->get_name);
+        name_len = (*env)->GetStringUTFLength(env, name);
+        name_ptr = (*env)->GetStringUTFChars(env, name, NULL);
+        found = false;
 
         if (!strncmp(name_ptr, "OMX.google.", __MIN(11, name_len)))
-            continue;
+            goto loopclean;
         for (int j = 0; j < num_types && !found; j++) {
             jobject type = (*env)->GetObjectArrayElement(env, types, j);
             if (!jstrcmp(env, type, mime)) {
@@ -428,6 +433,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 
                         int omx_profile = (*env)->GetIntField(env, profile_level, p_sys->profile_field);
                         size_t codec_profile = convert_omx_to_profile_idc(omx_profile);
+                        (*env)->DeleteLocalRef(env, profile_level);
                         if (codec_profile != fmt_profile)
                             continue;
                         /* Some encoders set the level too high, thus we ignore it for the moment.
@@ -445,12 +451,21 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->name = malloc(name_len + 1);
             memcpy(p_sys->name, name_ptr, name_len);
             p_sys->name[name_len] = '\0';
-            (*env)->ReleaseStringUTFChars(env, name, name_ptr);
             codec_name = name;
-            (*env)->DeleteLocalRef(env, info);
-            break;
         }
-        (*env)->DeleteLocalRef(env, info);
+loopclean:
+        if (name)
+            (*env)->ReleaseStringUTFChars(env, name, name_ptr);
+        if (profile_levels)
+            (*env)->DeleteLocalRef(env, profile_levels);
+        if (types)
+            (*env)->DeleteLocalRef(env, types);
+        if (codec_capabilities)
+            (*env)->DeleteLocalRef(env, codec_capabilities);
+        if (info)
+            (*env)->DeleteLocalRef(env, info);
+        if (found)
+            break;
     }
 
     if (!codec_name) {
