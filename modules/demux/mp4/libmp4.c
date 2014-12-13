@@ -72,6 +72,30 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date, bool b_relative )
  *****************************************************************************/
 static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father );
 
+static int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
+{
+    bool b_canseek = false;
+    if ( stream_Control( p_stream, STREAM_CAN_SEEK, &b_canseek ) != VLC_SUCCESS ||
+         b_canseek )
+    {
+        /* can seek or don't know */
+        return stream_Seek( p_stream, i_pos );
+    }
+    /* obviously can't seek then */
+
+    int64_t i_current_pos = stream_Tell( p_stream );
+    if ( i_current_pos < 0 || i_pos < (uint64_t)i_current_pos )
+        return VLC_EGENERIC;
+
+    size_t i_toread = i_pos - i_current_pos;
+    if( i_toread == 0 )
+        return VLC_SUCCESS;
+    else if( i_toread > (1<<17) )
+        return VLC_EGENERIC;
+    else
+        return (stream_Read( p_stream, NULL, (int)i_toread ) != (int)i_toread);
+}
+
 static void MP4_BoxAddChild( MP4_Box_t *p_parent, MP4_Box_t *p_childbox )
 {
     if( !p_parent->p_first )
@@ -81,6 +105,9 @@ static void MP4_BoxAddChild( MP4_Box_t *p_parent, MP4_Box_t *p_childbox )
     p_parent->p_last = p_childbox;
 }
 
+/* Don't use stream_Seek directly */
+#undef stream_Seek
+#define stream_Seek(a,b) __NO__
 
 /*****************************************************************************
  * MP4_ReadBoxCommon : Load only common parameters for all boxes
@@ -187,7 +214,7 @@ static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
             }
         }
     }
-    if( stream_Seek( p_stream, p_box->i_size + p_box->i_pos ) )
+    if( MP4_Seek( p_stream, p_box->i_size + p_box->i_pos ) )
     {
         return 0;
     }
@@ -266,9 +293,9 @@ static int MP4_ReadBoxContainer( stream_t *p_stream, MP4_Box_t *p_container )
     }
 
     /* enter box */
-    stream_Seek( p_stream, p_container->i_pos +
-                 mp4_box_headersize( p_container ) );
-
+    if ( MP4_Seek( p_stream, p_container->i_pos +
+                      mp4_box_headersize( p_container ) ) )
+        return 0;
     return MP4_ReadBoxContainerRaw( p_stream, p_container );
 }
 
@@ -1864,8 +1891,9 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
                  p_box->data.p_sample_soun->i_bytes_per_frame,
                  p_box->data.p_sample_soun->i_bytes_per_sample );
 #endif
-        stream_Seek( p_stream, p_box->i_pos +
-                        mp4_box_headersize( p_box ) + 44 );
+
+        if ( MP4_Seek(p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 44) )
+            MP4_READBOX_EXIT( 0 );
     }
     else if( p_box->data.p_sample_soun->i_qt_version == 2 && i_read >= 36 )
     {
@@ -1918,10 +1946,10 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
                  p_box->data.p_sample_soun->i_constbytesperaudiopacket,
                  p_box->data.p_sample_soun->i_constLPCMframesperaudiopacket );
 #endif
-        if ( i_extoffset < p_box->i_size )
-            stream_Seek( p_stream, p_box->i_pos + i_extoffset );
-        else
-            stream_Seek( p_stream, p_box->i_pos + p_box->i_size );
+
+        i_extoffset = VLC_CLIP( i_extoffset, i_read, p_box->i_size );
+        if ( MP4_Seek( p_stream, p_box->i_pos + i_extoffset ) )
+            MP4_READBOX_EXIT( 0 );
     }
     else
     {
@@ -1934,8 +1962,8 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         msg_Dbg( p_stream, "read box: \"soun\" V0 or qt1/2 (rest=%"PRId64")",
                  i_read );
 #endif
-        stream_Seek( p_stream, p_box->i_pos +
-                        mp4_box_headersize( p_box ) + 28 );
+        if ( MP4_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 28 ) )
+            MP4_READBOX_EXIT( 0 );
     }
 
     if( p_box->i_type == ATOM_drms )
@@ -2026,7 +2054,8 @@ int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_depth );
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_qt_color_table );
 
-    stream_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 78);
+    if ( MP4_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 78 ) )
+        MP4_READBOX_EXIT( 0 );
 
     if( p_box->i_type == ATOM_drmi )
     {
@@ -2054,7 +2083,8 @@ void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
 
 static int MP4_ReadBox_sample_mp4s( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    stream_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 8 );
+    if ( MP4_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 8 ) )
+        return 0;
     MP4_ReadBoxContainerRaw( p_stream, p_box );
     return 1;
 }
@@ -3877,7 +3907,7 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
     {
         off_t i_end = p_box->i_pos + p_box->i_size;
         MP4_BoxFree( p_stream, p_box );
-        stream_Seek( p_stream, i_end ); /* Skip the failed box */
+        MP4_Seek( p_stream, i_end ); /* Skip the failed box */
         return NULL;
     }
 
@@ -4086,7 +4116,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
 
 error:
     free( p_root );
-    stream_Seek( p_stream, 0 );
+    MP4_Seek( p_stream, 0 );
     return NULL;
 }
 
