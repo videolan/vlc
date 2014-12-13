@@ -283,6 +283,36 @@ static int MP4_ReadBoxContainerRaw( stream_t *p_stream, MP4_Box_t *p_container )
     return MP4_ReadBoxContainerChildren( p_stream, p_container, 0 );
 }
 
+static void MP4_BoxOffsetUp( MP4_Box_t *p_box, uint64_t i_offset )
+{
+    while(p_box)
+    {
+        p_box->i_pos += i_offset;
+        MP4_BoxOffsetUp( p_box->p_first, i_offset );
+        p_box = p_box->p_next;
+    }
+}
+
+/* Reads within an already read/in memory box (containers without having to seek) */
+static int MP4_ReadBoxContainerRawInBox( stream_t *p_stream, MP4_Box_t *p_container,
+                                         uint8_t *p_buffer, uint64_t i_size, uint64_t i_offset )
+{
+    stream_t *p_substream = stream_MemoryNew( p_stream, p_buffer, i_size, true );
+    if( !p_substream )
+        return 0;
+    MP4_Box_t *p_last = (p_container) ? p_container->p_last : NULL;
+    MP4_ReadBoxContainerRaw( p_substream, p_container );
+    stream_Delete( p_substream );
+    /* do pos fixup */
+    if( p_container )
+    {
+        MP4_Box_t *p_box = p_last ? p_last : p_container->p_first;
+        MP4_BoxOffsetUp(p_box, i_offset);
+    }
+
+    return 1;
+}
+
 static int MP4_ReadBoxContainer( stream_t *p_stream, MP4_Box_t *p_container )
 {
     if( p_container->i_size &&
@@ -1166,23 +1196,41 @@ static void MP4_FreeBox_urn( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_urn->psz_location );
 }
 
-
-static int MP4_ReadBox_dref( stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_LtdContainer( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    MP4_READBOX_ENTER( MP4_Box_data_dref_t );
+    MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_lcont_t, 16 );
+    if( i_read < 8 )
+        MP4_READBOX_EXIT( 0 );
 
-    MP4_GETVERSIONFLAGS( p_box->data.p_dref );
+    MP4_GETVERSIONFLAGS( p_box->data.p_lcont );
+    if( p_box->data.p_lcont->i_version != 0 )
+        MP4_READBOX_EXIT( 0 );
+    MP4_GET4BYTES( p_box->data.p_lcont->i_entry_count );
 
-    MP4_GET4BYTES( p_box->data.p_dref->i_entry_count );
+    uint32_t i_entry = 0;
+    i_read = p_box->i_size - 16;
+    while (i_read > 8 && i_entry < p_box->data.p_lcont->i_entry_count )
+    {
+        MP4_Box_t *p_childbox = MP4_ReadBox( p_stream, p_box );
+        if( !p_childbox )
+            break;
+        MP4_BoxAddChild( p_box, p_childbox );
+        i_entry++;
+        i_read -= p_childbox->i_size;
+    }
 
-    stream_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 8 );
-    MP4_ReadBoxContainerRaw( p_stream, p_box );
+    if (i_entry != p_box->data.p_lcont->i_entry_count)
+        p_box->data.p_lcont->i_entry_count = i_entry;
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"dref\" entry-count %d",
-                      p_box->data.p_dref->i_entry_count );
+    msg_Dbg( p_stream, "read box: \"%4.4s\" entry-count %d", (char *)&p_box->i_type,
+                        p_box->data.p_lcont->i_entry_count );
 
 #endif
+
+    if ( MP4_Seek( p_stream, p_box->i_pos + p_box->i_size ) )
+        MP4_READBOX_EXIT( 0 );
+
     MP4_READBOX_EXIT( 1 );
 }
 
@@ -1873,7 +1921,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
              p_box->data.p_sample_soun->i_qt_version,
              p_box->data.p_sample_soun->i_compressionid );
 #endif
-
+    /* @36 bytes */
     if( p_box->data.p_sample_soun->i_qt_version == 1 && i_read >= 16 )
     {
         /* SoundDescriptionV1 */
@@ -1891,9 +1939,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
                  p_box->data.p_sample_soun->i_bytes_per_frame,
                  p_box->data.p_sample_soun->i_bytes_per_sample );
 #endif
-
-        if ( MP4_Seek(p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 44) )
-            MP4_READBOX_EXIT( 0 );
+        /* @52 bytes */
     }
     else if( p_box->data.p_sample_soun->i_qt_version == 2 && i_read >= 36 )
     {
@@ -1946,10 +1992,10 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
                  p_box->data.p_sample_soun->i_constbytesperaudiopacket,
                  p_box->data.p_sample_soun->i_constLPCMframesperaudiopacket );
 #endif
-
+        /* @72 bytes */
         i_extoffset = VLC_CLIP( i_extoffset, i_read, p_box->i_size );
-        if ( MP4_Seek( p_stream, p_box->i_pos + i_extoffset ) )
-            MP4_READBOX_EXIT( 0 );
+        p_peek += i_extoffset;
+        i_read -= i_extoffset;
     }
     else
     {
@@ -1962,8 +2008,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         msg_Dbg( p_stream, "read box: \"soun\" V0 or qt1/2 (rest=%"PRId64")",
                  i_read );
 #endif
-        if ( MP4_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 28 ) )
-            MP4_READBOX_EXIT( 0 );
+        /* @36 bytes */
     }
 
     if( p_box->i_type == ATOM_drms )
@@ -1979,7 +2024,8 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
     /* Loads extensions */
-    MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds/wave/... */
+    MP4_ReadBoxContainerRawInBox( p_stream, p_box, p_peek, i_read,
+                                  p_box->i_pos + p_peek - p_buff ); /* esds/wave/... */
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"soun\" in stsd channel %d "
@@ -2054,16 +2100,17 @@ int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_depth );
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_qt_color_table );
 
-    if ( MP4_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 78 ) )
-        MP4_READBOX_EXIT( 0 );
-
     if( p_box->i_type == ATOM_drmi )
     {
         msg_Warn( p_stream, "DRM protected streams are not supported." );
         MP4_READBOX_EXIT( 0 );
     }
 
-    MP4_ReadBoxContainerRaw( p_stream, p_box );
+    if( i_actually_read > 78 && p_peek - p_buff > 78 )
+    {
+        MP4_ReadBoxContainerRawInBox( p_stream, p_box, p_peek, i_read,
+                                      p_box->i_pos + p_peek - p_buff );
+    }
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"vide\" in stsd %dx%d depth %d",
@@ -2188,29 +2235,6 @@ static void MP4_FreeBox_sample_text( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_sample_text->psz_text_name );
 }
 #endif
-
-
-static int MP4_ReadBox_stsd( stream_t *p_stream, MP4_Box_t *p_box )
-{
-
-    MP4_READBOX_ENTER( MP4_Box_data_stsd_t );
-
-    MP4_GETVERSIONFLAGS( p_box->data.p_stsd );
-
-    MP4_GET4BYTES( p_box->data.p_stsd->i_entry_count );
-
-    stream_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 8 );
-
-    MP4_ReadBoxContainerRaw( p_stream, p_box );
-
-#ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"stsd\" entry-count %d",
-                      p_box->data.p_stsd->i_entry_count );
-
-#endif
-    MP4_READBOX_EXIT( 1 );
-}
-
 
 static int MP4_ReadBox_stsz( stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -3596,10 +3620,10 @@ static const struct
     { ATOM_alis,    MP4_ReadBoxSkip,          MP4_FreeBox_Common, ATOM_dref },
     { ATOM_url,     MP4_ReadBox_url,          MP4_FreeBox_url, 0 },
     { ATOM_urn,     MP4_ReadBox_urn,          MP4_FreeBox_urn, 0 },
-    { ATOM_dref,    MP4_ReadBox_dref,         MP4_FreeBox_Common, 0 },
+    { ATOM_dref,    MP4_ReadBox_LtdContainer, MP4_FreeBox_Common, 0 },
     { ATOM_stts,    MP4_ReadBox_stts,         MP4_FreeBox_stts,   ATOM_stbl },
     { ATOM_ctts,    MP4_ReadBox_ctts,         MP4_FreeBox_ctts,   ATOM_stbl },
-    { ATOM_stsd,    MP4_ReadBox_stsd,         MP4_FreeBox_Common, ATOM_stbl },
+    { ATOM_stsd,    MP4_ReadBox_LtdContainer, MP4_FreeBox_Common, ATOM_stbl },
     { ATOM_stsz,    MP4_ReadBox_stsz,         MP4_FreeBox_stsz,   ATOM_stbl },
     { ATOM_stsc,    MP4_ReadBox_stsc,         MP4_FreeBox_stsc,   ATOM_stbl },
     { ATOM_stco,    MP4_ReadBox_stco_co64,    MP4_FreeBox_stco_co64, ATOM_stbl },

@@ -513,14 +513,14 @@ typedef struct MP4_Box_data_urn_s
 
 } MP4_Box_data_urn_t;
 
-typedef struct MP4_Box_data_dref_s
+typedef struct MP4_Box_data_lcont_s
 {
     uint8_t  i_version;
     uint32_t i_flags;
 
     uint32_t i_entry_count;
 /* XXX it's also a container with i_entry_count entry */
-} MP4_Box_data_dref_t;
+} MP4_Box_data_lcont_t;
 
 typedef struct MP4_Box_data_stts_s
 {
@@ -676,20 +676,6 @@ typedef struct MP4_Box_data_moviehintinformation_rtp_s
     unsigned char *psz_text;
 
 } MP4_Box_data_moviehintinformation_rtp_t;
-
-
-
-typedef struct MP4_Box_data_stsd_s
-{
-    uint8_t  i_version;
-    uint32_t i_flags;
-
-    uint32_t i_entry_count;
-
-    /* it contains SampleEntry handled as if it was Box */
-
-} MP4_Box_data_stsd_t;
-
 
 typedef struct MP4_Box_data_stsz_s
 {
@@ -1401,10 +1387,9 @@ typedef union MP4_Box_data_s
     MP4_Box_data_hmhd_t *p_hmhd;
     MP4_Box_data_url_t  *p_url;
     MP4_Box_data_urn_t  *p_urn;
-    MP4_Box_data_dref_t *p_dref;
+    MP4_Box_data_lcont_t *p_lcont;
     MP4_Box_data_stts_t *p_stts;
     MP4_Box_data_ctts_t *p_ctts;
-    MP4_Box_data_stsd_t *p_stsd;
     MP4_Box_data_sample_vide_t *p_sample_vide;
     MP4_Box_data_sample_soun_t *p_sample_soun;
     MP4_Box_data_sample_text_t *p_sample_text;
@@ -1555,8 +1540,9 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
         p_str = NULL; \
     }
 
-#define MP4_READBOX_ENTER( MP4_Box_data_TYPE_t ) \
-    int64_t  i_read = p_box->i_size; \
+#define MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, maxread ) \
+    int64_t i_read = p_box->i_size; \
+    if( maxread < (uint64_t)i_read ) i_read = maxread;\
     uint8_t *p_peek, *p_buff; \
     int i_actually_read; \
     if( !( p_peek = p_buff = malloc( i_read ) ) ) \
@@ -1578,6 +1564,9 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
         free( p_buff ); \
         return( 0 ); \
     }
+
+#define MP4_READBOX_ENTER( MP4_Box_data_TYPE_t ) \
+    MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, p_box->i_size )
 
 #define MP4_READBOX_EXIT( i_code ) \
     do \
