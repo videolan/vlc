@@ -72,6 +72,15 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date, bool b_relative )
  *****************************************************************************/
 static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father );
 
+static void MP4_BoxAddChild( MP4_Box_t *p_parent, MP4_Box_t *p_childbox )
+{
+    if( !p_parent->p_first )
+            p_parent->p_first = p_childbox;
+    else
+            p_parent->p_last->p_next = p_childbox;
+    p_parent->p_last = p_childbox;
+}
+
 
 /*****************************************************************************
  * MP4_ReadBoxCommon : Load only common parameters for all boxes
@@ -222,9 +231,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         p_box->i_index = i_index;
 
         /* chain this box with the father and the other at same level */
-        if( !p_container->p_first ) p_container->p_first = p_box;
-        else p_container->p_last->p_next = p_box;
-        p_container->p_last = p_box;
+        MP4_BoxAddChild( p_container, p_box );
 
         if( p_box->i_type == i_last_child )
         {
