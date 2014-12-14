@@ -317,8 +317,13 @@ UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 		fi; \
 	done
 
+ifdef HAVE_IOS
+AUTORECONF = AUTOPOINT=true autoreconf
+else
+AUTORECONF = autoreconf
+endif
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
-	cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
+	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX)
 
