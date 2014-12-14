@@ -253,7 +253,16 @@ enum pl_locked_state
 #define PL_UNLOCK playlist_Unlock( p_playlist )
 #define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
 
-/* Playlist control */
+/** Playlist commands */
+enum {
+    PLAYLIST_PLAY,      /**< No arg.                            res=can fail*/
+    PLAYLIST_VIEWPLAY,  /**< arg1= playlist_item_t*,*/
+                        /**  arg2 = playlist_item_t*          , res=can fail */
+    PLAYLIST_PAUSE,     /**< No arg                             res=can fail*/
+    PLAYLIST_STOP,      /**< No arg                             res=can fail*/
+    PLAYLIST_SKIP,      /**< arg1=int,                          res=can fail*/
+};
+
 #define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, pl_Unlocked )
 #define playlist_Pause(p) playlist_Control(p,PLAYLIST_PAUSE, pl_Unlocked )
 #define playlist_Stop(p) playlist_Control(p,PLAYLIST_STOP, pl_Unlocked )

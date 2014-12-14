@@ -202,20 +202,6 @@ typedef struct date_t date_t;
 
 /* Playlist */
 
-/* FIXME */
-/**
- * Playlist commands
- */
-typedef enum {
-    PLAYLIST_PLAY,      /**< No arg.                            res=can fail*/
-    PLAYLIST_VIEWPLAY,  /**< arg1= playlist_item_t*,*/
-                        /**  arg2 = playlist_item_t*          , res=can fail */
-    PLAYLIST_PAUSE,     /**< No arg                             res=can fail*/
-    PLAYLIST_STOP,      /**< No arg                             res=can fail*/
-    PLAYLIST_SKIP,      /**< arg1=int,                          res=can fail*/
-} playlist_command_t;
-
-
 typedef struct playlist_t playlist_t;
 typedef struct playlist_item_t playlist_item_t;
 typedef struct services_discovery_t services_discovery_t;
