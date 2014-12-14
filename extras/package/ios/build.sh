@@ -123,9 +123,9 @@ then
     exit 1
 fi
 
-BUILDDIR="${VLCROOT}/build-ios-${PLATFORM}/${ARCH}"
+BUILDDIR="${VLCROOT}/build-ios-${PLATFORM}/${ACTUAL_ARCH}"
 
-PREFIX="${VLCROOT}/install-ios-${PLATFORM}/${ARCH}"
+PREFIX="${VLCROOT}/install-ios-${PLATFORM}/${ACTUAL_ARCH}"
 
 export PATH="${VLCROOT}/extras/tools/build/bin:${VLCROOT}/contrib/${TARGET}/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"
 
