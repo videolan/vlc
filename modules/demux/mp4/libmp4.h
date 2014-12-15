@@ -47,6 +47,7 @@
 #define ATOM_dcom VLC_FOURCC( 'd', 'c', 'o', 'm' )
 #define ATOM_cmvd VLC_FOURCC( 'c', 'm', 'v', 'd' )
 
+#define ATOM_styp VLC_FOURCC( 's', 't', 'y', 'p' )
 #define ATOM_moof VLC_FOURCC( 'm', 'o', 'o', 'f' )
 #define ATOM_mdat VLC_FOURCC( 'm', 'd', 'a', 't' )
 #define ATOM_skip VLC_FOURCC( 's', 'k', 'i', 'p' )

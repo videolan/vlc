@@ -3605,6 +3605,7 @@ static const struct
 
     /* specific box */
     { ATOM_ftyp,    MP4_ReadBox_ftyp,         MP4_FreeBox_ftyp, 0 },
+    { ATOM_styp,    MP4_ReadBox_ftyp,         MP4_FreeBox_ftyp, 0 },
     { ATOM_cmov,    MP4_ReadBox_cmov,         MP4_FreeBox_Common, 0 },
     { ATOM_mvhd,    MP4_ReadBox_mvhd,         MP4_FreeBox_Common, ATOM_moov },
     { ATOM_mvhd,    MP4_ReadBox_mvhd,         MP4_FreeBox_Common, ATOM_foov },
