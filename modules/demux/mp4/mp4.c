@@ -585,12 +585,6 @@ static int Open( vlc_object_t * p_this )
 
     /* I need to seek */
     stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
-    if( !p_sys->b_seekable )
-    {
-        msg_Warn( p_demux, "MP4 plugin discarded (not seekable)" );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
     stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_fastseekable );
     p_sys->b_seekmode = p_sys->b_fastseekable;
 
@@ -610,38 +604,6 @@ static int Open( vlc_object_t * p_this )
     if( LoadInitFrag( p_demux ) != VLC_SUCCESS )
         goto error;
 
-    if( MP4_BoxCount( p_sys->p_root, "/moov/mvex" ) > 0 )
-    {
-        if ( p_sys->b_seekable )
-        {
-            /* Probe remaining to check if there's really fragments
-               or if that file is just ready to append fragments */
-            ProbeFragments( p_demux, false );
-            p_sys->b_fragmented = !!MP4_BoxCount( p_sys->p_root, "/moof" );
-
-            if ( p_sys->b_fragmented && !p_sys->i_overall_duration )
-                ProbeFragments( p_demux, true );
-        }
-        else
-            p_sys->b_fragmented = true;
-    }
-
-    if ( !p_sys->moovfragment.p_moox )
-        AddFragment( p_demux, MP4_BoxGet( p_sys->p_root, "/moov" ) );
-
-    /* we always need a moov entry, but smooth has a workaround */
-    if ( !p_sys->moovfragment.p_moox && !p_sys->b_smooth )
-        goto error;
-
-    if( p_sys->b_smooth )
-    {
-        if( InitTracks( p_demux ) != VLC_SUCCESS )
-            goto error;
-        CreateTracksFromSmooBox( p_demux );
-        return VLC_SUCCESS;
-    }
-
-    MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
 
     if( ( p_ftyp = MP4_BoxGet( p_sys->p_root, "/ftyp" ) ) )
     {
@@ -695,13 +657,54 @@ static int Open( vlc_object_t * p_this )
         msg_Dbg( p_demux, "file type box missing (assuming ISO Media file)" );
     }
 
+    if( MP4_BoxCount( p_sys->p_root, "/moov/mvex" ) > 0 )
+    {
+        if ( p_sys->b_seekable && !p_sys->b_smooth && !p_sys->b_dash )
+        {
+            /* Probe remaining to check if there's really fragments
+               or if that file is just ready to append fragments */
+            ProbeFragments( p_demux, false );
+            p_sys->b_fragmented = !!MP4_BoxCount( p_sys->p_root, "/moof" );
+
+            if ( p_sys->b_fragmented && !p_sys->i_overall_duration )
+                ProbeFragments( p_demux, true );
+        }
+        else
+            p_sys->b_fragmented = true;
+    }
+
+    if ( !p_sys->moovfragment.p_moox )
+        AddFragment( p_demux, MP4_BoxGet( p_sys->p_root, "/moov" ) );
+
+    /* we always need a moov entry, but smooth has a workaround */
+    if ( !p_sys->moovfragment.p_moox && !p_sys->b_smooth )
+        goto error;
+
+    if( p_sys->b_smooth )
+    {
+        if( InitTracks( p_demux ) != VLC_SUCCESS )
+            goto error;
+        CreateTracksFromSmooBox( p_demux );
+        return VLC_SUCCESS;
+    }
+
+    MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
+
     if ( p_sys->b_smooth || p_sys->b_dash )
     {
         p_demux->pf_demux = DemuxFrg;
+        msg_Dbg( p_demux, "Set DemuxFrg mode" );
     }
     else if( p_sys->b_fragmented )
     {
         p_demux->pf_demux = DemuxAsLeaf;
+        msg_Dbg( p_demux, "Set experimental DemuxLeaf mode" );
+    }
+
+    if( !p_sys->b_seekable && p_demux->pf_demux == Demux )
+    {
+        msg_Warn( p_demux, "MP4 plugin discarded (not seekable)" );
+        goto error;
     }
 
     /* the file need to have one moov box */
