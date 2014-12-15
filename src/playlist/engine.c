@@ -84,18 +84,19 @@ static int CorksCallback( vlc_object_t *obj, char const *var,
     if( !old.i_int == !cur.i_int )
         return VLC_SUCCESS; /* nothing to do */
 
+    if( !var_InheritBool( obj, "playlist-cork" ) )
+        return VLC_SUCCESS;
+
     if( cur.i_int )
     {
-        if( var_InheritBool( obj, "playlist-cork" ) )
-        {
-            msg_Dbg( obj, "corked" );
-            playlist_Pause( pl );
-        }
-        else
-            msg_Dbg( obj, "not corked" );
+        msg_Dbg( obj, "corked" );
+        playlist_Pause( pl );
     }
     else
+    {
         msg_Dbg( obj, "uncorked" );
+        playlist_Resume( pl );
+    }
 
     (void) var; (void) dummy;
     return VLC_SUCCESS;
