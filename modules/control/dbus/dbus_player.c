@@ -215,14 +215,7 @@ DBUS_METHOD( Play )
 DBUS_METHOD( Pause )
 {
     REPLY_INIT;
-    input_thread_t *p_input = pl_CurrentInput( p_this );
-
-    if( p_input && var_GetInteger(p_input, "state") == PLAYING_S )
-        playlist_TogglePause( PL );
-
-    if( p_input )
-        vlc_object_release( p_input );
-
+    playlist_Pause( PL );
     REPLY_SEND;
 }
 

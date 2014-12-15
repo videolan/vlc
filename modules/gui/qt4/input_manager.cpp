@@ -1129,10 +1129,7 @@ void MainInputManager::play()
 
 void MainInputManager::pause()
 {
-    if(p_input && PLAYING_S == var_GetInteger( p_input, "state" ) )
-    {
-        playlist_TogglePause( THEPL );
-    }
+    playlist_Pause( THEPL );
 }
 
 void MainInputManager::toggleRandom()
