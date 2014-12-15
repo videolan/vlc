@@ -134,6 +134,10 @@ static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 static void     MP4_UpdateSeekpoint( demux_t * );
 
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id );
+static void MP4_GetDefaultSizeAndDuration( demux_t *p_demux,
+                                           const MP4_Box_data_tfhd_t *p_tfhd_data,
+                                           uint32_t *pi_default_size,
+                                           uint32_t *pi_default_duration );
 
 static bool AddFragment( demux_t *p_demux, MP4_Box_t *p_moox );
 static int  ProbeFragments( demux_t *p_demux, bool b_force );
@@ -195,6 +199,8 @@ static mtime_t GetTrackDurationInFragment( const mp4_fragment_t *p_fragment,
 
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id )
 {
+    if(!p_moov)
+        return NULL;
     MP4_Box_t *p_trex = MP4_BoxGet( p_moov, "mvex/trex" );
     while( p_trex )
     {
@@ -4900,6 +4906,32 @@ static int LeafIndexGetMoofPosByTime( demux_t *p_demux, const mtime_t i_target_t
     return VLC_EGENERIC;
 }
 
+static void MP4_GetDefaultSizeAndDuration( demux_t *p_demux,
+                                           const MP4_Box_data_tfhd_t *p_tfhd_data,
+                                           uint32_t *pi_default_size,
+                                           uint32_t *pi_default_duration )
+{
+    if( p_tfhd_data->i_flags & MP4_TFHD_DFLT_SAMPLE_DURATION )
+        *pi_default_duration = p_tfhd_data->i_default_sample_duration;
+
+    if( p_tfhd_data->i_flags & MP4_TFHD_DFLT_SAMPLE_SIZE )
+        *pi_default_size = p_tfhd_data->i_default_sample_size;
+
+    if( !*pi_default_duration || !*pi_default_size )
+    {
+        const MP4_Box_t *p_trex = MP4_GetTrexByTrackID(
+                    MP4_BoxGet( p_demux->p_sys->p_root, "moov" ),
+                    p_tfhd_data->i_track_ID );
+        if ( p_trex )
+        {
+            if ( !*pi_default_duration )
+                *pi_default_duration = BOXDATA(p_trex)->i_default_sample_duration;
+            if ( !*pi_default_size )
+                *pi_default_size = BOXDATA(p_trex)->i_default_sample_size;
+        }
+    }
+}
+
 static int LeafParseMDATwithMOOF( demux_t *p_demux, MP4_Box_t *p_moof )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -4934,32 +4966,16 @@ static int LeafParseMDATwithMOOF( demux_t *p_demux, MP4_Box_t *p_moof )
     mp4_track_t *p_track = LeafGetTrackByTrunPos( p_demux, i_pos, p_moof->i_pos );
     if( p_track )
     {
-        MP4_Box_data_tfhd_t *p_tfhd_data = p_track->context.BOXDATA(p_tfhd);
         uint32_t i_trun_sample_default_duration = 0;
         uint32_t i_trun_sample_default_size = 0;
 
         if ( p_track->context.p_trun )
         {
             /* Get defaults for this/these RUN */
-            if( p_tfhd_data->i_flags & MP4_TFHD_DFLT_SAMPLE_DURATION )
-                i_trun_sample_default_duration = p_tfhd_data->i_default_sample_duration;
-
-            if( p_tfhd_data->i_flags & MP4_TFHD_DFLT_SAMPLE_SIZE )
-                i_trun_sample_default_size = p_tfhd_data->i_default_sample_size;
-
-            if( !i_trun_sample_default_duration || !i_trun_sample_default_size )
-            {
-                MP4_Box_t *p_trex = MP4_BoxGet( p_demux->p_sys->p_root, "moov/mvex/trex");
-                if ( p_trex )
-                {
-                    while( p_trex && BOXDATA(p_trex)->i_track_ID != p_tfhd_data->i_track_ID )
-                        p_trex = p_trex->p_next;
-                    if ( p_trex && !i_trun_sample_default_duration )
-                        i_trun_sample_default_duration = BOXDATA(p_trex)->i_default_sample_duration;
-                    if ( p_trex && !i_trun_sample_default_size )
-                        i_trun_sample_default_size = BOXDATA(p_trex)->i_default_sample_size;
-                }
-            }
+            const MP4_Box_data_tfhd_t *p_tfhd_data = p_track->context.BOXDATA(p_tfhd);
+            MP4_GetDefaultSizeAndDuration( p_demux, p_tfhd_data,
+                                           &i_trun_sample_default_size,
+                                           &i_trun_sample_default_duration );
 
             const MP4_Box_data_trun_t *p_trun_data = p_track->context.BOXDATA(p_trun);
 
