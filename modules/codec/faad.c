@@ -313,7 +313,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Decode all data */
-    if( p_sys->i_buffer )
+    if( p_sys->i_buffer > 1)
     {
         void *samples;
         faacDecFrameInfo frame;
@@ -395,10 +395,15 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* Flush the buffer */
             p_sys->i_buffer -= frame.bytesconsumed;
-            if( p_sys->i_buffer > 0 )
+            if( p_sys->i_buffer > 1 )
             {
                 memmove( p_sys->p_buffer,&p_sys->p_buffer[frame.bytesconsumed],
                          p_sys->i_buffer );
+            }
+            else
+            {
+                /* Drop byte of padding */
+                p_sys->i_buffer = 0;
             }
             block_Release( p_block );
             return NULL;
@@ -507,6 +512,11 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 
         return p_out;
+    }
+    else
+    {
+        /* Drop byte of padding */
+        p_sys->i_buffer = 0;
     }
 
     block_Release( p_block );
