@@ -46,6 +46,7 @@ namespace dash
                 int                     height;
                 size_t                  bpsAvg;
                 size_t                  bpsSamplecount;
+                size_t                  currentBps;
         };
     }
 }

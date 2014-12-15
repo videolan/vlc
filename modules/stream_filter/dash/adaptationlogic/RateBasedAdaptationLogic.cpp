@@ -36,7 +36,8 @@ using namespace dash::mpd;
 
 RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPD *mpd) :
                           AbstractAdaptationLogic   (mpd),
-                          bpsAvg(0), bpsSamplecount(0)
+                          bpsAvg(0), bpsSamplecount(0),
+                          currentBps(0)
 {
     width  = var_InheritInteger(mpd->getVLCObject(), "dash-prefwidth");
     height = var_InheritInteger(mpd->getVLCObject(), "dash-prefheight");
@@ -48,7 +49,7 @@ const Representation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams
         return NULL;
 
     RepresentationSelector selector;
-    Representation *rep = selector.select(currentPeriod, type, bpsAvg, width, height);
+    Representation *rep = selector.select(currentPeriod, type, currentBps, width, height);
     if ( rep == NULL )
     {
         rep = selector.select(currentPeriod, type);
@@ -71,4 +72,7 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
         bpsAvg = bpsAvg - (bpsAvg - current) / (bpsSamplecount + 1);
 
     bpsSamplecount++;
+
+    if(bpsSamplecount % 5 == 0)
+        currentBps = bpsAvg;
 }
