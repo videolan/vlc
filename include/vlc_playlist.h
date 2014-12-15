@@ -261,6 +261,8 @@ enum {
     PLAYLIST_TOGGLE_PAUSE, /**< No arg                          res=can fail */
     PLAYLIST_STOP,      /**< No arg                             res=can fail*/
     PLAYLIST_SKIP,      /**< arg1=int,                          res=can fail*/
+    PLAYLIST_PAUSE,     /**< No arg */
+    PLAYLIST_RESUME,    /**< No arg */
 };
 
 #define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, pl_Unlocked )
@@ -270,6 +272,10 @@ enum {
 #define playlist_Next(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, 1)
 #define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, -1)
 #define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked,  (i) )
+#define playlist_Pause(p) \
+        playlist_Control(p, PLAYLIST_PAUSE, pl_Unlocked)
+#define playlist_Resume(p) \
+        playlist_Control(p, PLAYLIST_RESUME, pl_Unlocked)
 
 VLC_API void playlist_Lock( playlist_t * );
 VLC_API void playlist_Unlock( playlist_t * );

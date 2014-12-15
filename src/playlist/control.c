@@ -119,6 +119,18 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list arg
         pl_priv(p_playlist)->request.i_skip = (int) va_arg( args, int );
         pl_priv(p_playlist)->request.b_request = true;
         break;
+
+    case PLAYLIST_PAUSE:
+        if( pl_priv(p_playlist)->p_input == NULL )
+            return;
+        var_SetInteger( pl_priv(p_playlist)->p_input, "state", PAUSE_S );
+        break;
+
+    case PLAYLIST_RESUME:
+        if( pl_priv(p_playlist)->p_input == NULL )
+            return;
+        var_SetInteger( pl_priv(p_playlist)->p_input, "state", PLAYING_S );
+        break;
     }
     vlc_cond_signal( &pl_priv(p_playlist)->signal );
 }
