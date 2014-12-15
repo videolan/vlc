@@ -104,7 +104,7 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list arg
         }
         break;
 
-    case PLAYLIST_PAUSE:
+    case PLAYLIST_TOGGLE_PAUSE:
         if( !pl_priv(p_playlist)->p_input )
         {   /* FIXME: is this really useful without input? */
             pl_priv(p_playlist)->status.i_status = PLAYLIST_PAUSED;

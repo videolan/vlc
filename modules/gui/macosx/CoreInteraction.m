@@ -75,7 +75,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
     if (p_input) {
-        playlist_Pause(p_playlist);
+        playlist_TogglePause(p_playlist);
         vlc_object_release(p_input);
     } else {
         bool empty;
@@ -100,7 +100,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     PL_UNLOCK;
 
     if (b_playlist_playing)
-        playlist_Pause(p_playlist);
+        playlist_TogglePause(p_playlist);
 }
 
 - (void)stop

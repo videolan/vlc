@@ -61,7 +61,7 @@ void CmdPause::execute()
 {
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
     if( pPlaylist != NULL )
-        playlist_Pause( pPlaylist );
+        playlist_TogglePause( pPlaylist );
 }
 
 

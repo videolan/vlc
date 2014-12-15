@@ -968,7 +968,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     /* Parse commands that only require an input */
     if( !strcmp( psz_cmd, "pause" ) )
     {
-        playlist_Pause( p_intf->p_sys->p_playlist );
+        playlist_TogglePause( p_intf->p_sys->p_playlist );
         i_error = VLC_SUCCESS;
     }
     else if( !strcmp( psz_cmd, "seek" ) )

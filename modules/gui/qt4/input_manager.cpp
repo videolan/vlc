@@ -1123,7 +1123,7 @@ void MainInputManager::togglePlayPause()
     if( !p_input )
         playlist_Play( THEPL );
     else
-        playlist_Pause( THEPL );
+        playlist_TogglePause( THEPL );
 }
 
 void MainInputManager::play()
@@ -1135,7 +1135,7 @@ void MainInputManager::play()
     {
         if( PLAYING_S != var_GetInteger( p_input, "state" ) )
         {
-            playlist_Pause( THEPL );
+            playlist_TogglePause( THEPL );
         }
     }
 }
@@ -1144,7 +1144,7 @@ void MainInputManager::pause()
 {
     if(p_input && PLAYING_S == var_GetInteger( p_input, "state" ) )
     {
-        playlist_Pause( THEPL );
+        playlist_TogglePause( THEPL );
     }
 }
 
