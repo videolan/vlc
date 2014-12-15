@@ -61,7 +61,6 @@ typedef struct playlist_private_t
     struct {
         /* Current status. These fields are readonly, only the playlist
          * main loop can touch it*/
-        playlist_status_t   i_status;  /**< Current status of playlist */
         playlist_item_t *   p_item; /**< Currently playing/active item */
         playlist_item_t *   p_node; /**< Current node to play from */
     } status;

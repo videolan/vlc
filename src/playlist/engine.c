@@ -261,7 +261,6 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->status.p_item = NULL;
     pl_priv(p_playlist)->status.p_node = p_playlist->p_playing;
     pl_priv(p_playlist)->request.b_request = false;
-    pl_priv(p_playlist)->status.i_status = PLAYLIST_STOPPED;
 
     if (ml != NULL)
         playlist_MLLoad( p_playlist );
@@ -496,8 +495,14 @@ playlist_item_t * playlist_CurrentPlayingItem( playlist_t * p_playlist )
 
 int playlist_Status( playlist_t * p_playlist )
 {
+    input_thread_t *p_input = pl_priv(p_playlist)->p_input;
+
     PL_ASSERT_LOCKED;
 
-    return pl_priv(p_playlist)->status.i_status;
+    if( p_input == NULL )
+        return PLAYLIST_STOPPED;
+    if( var_GetInteger( p_input, "state" ) == PAUSE_S )
+        return PLAYLIST_PAUSED;
+    return PLAYLIST_RUNNING;
 }
 
