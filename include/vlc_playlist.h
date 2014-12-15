@@ -283,9 +283,8 @@ VLC_API void playlist_Deactivate( playlist_t * );
  * \param i_query the command to do
  * \param b_locked TRUE if playlist is locked when entering this function
  * \param variable number of arguments
- * \return VLC_SUCCESS or an error
  */
-VLC_API int playlist_Control( playlist_t *p_playlist, int i_query, bool b_locked, ...  );
+VLC_API void playlist_Control( playlist_t *p_playlist, int i_query, bool b_locked, ...  );
 
 /** Get current playing input. The object is retained.
  */
