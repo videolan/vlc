@@ -3543,15 +3543,7 @@ static int ReInitDecoder( demux_t *p_demux, mp4_track_t *p_track )
  */
 static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_tk_id )
 {
-    MP4_Box_t *p_sidx = MP4_BoxGet( p_chunk, "sidx" );
-    MP4_Box_t *p_moof = MP4_BoxGet( p_chunk, "moof" );
-    if( p_moof == NULL)
-    {
-        msg_Warn( p_demux, "no moof box found!" );
-        return VLC_EGENERIC;
-    }
-
-    MP4_Box_t *p_traf = MP4_BoxGet( p_moof, "traf" );
+    MP4_Box_t *p_traf = MP4_BoxGet( p_chunk, "moof/traf" );
     if( p_traf == NULL)
     {
         msg_Warn( p_demux, "no traf box found!" );
@@ -3597,14 +3589,6 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
     if( ret->i_sample_count )
         FreeAndResetChunk( ret );
 
-    uint32_t default_duration = 0;
-    if( BOXDATA(p_tfhd)->i_flags & MP4_TFHD_DFLT_SAMPLE_DURATION )
-        default_duration = BOXDATA(p_tfhd)->i_default_sample_duration;
-
-    uint32_t default_size = 0;
-    if( BOXDATA(p_tfhd)->i_flags & MP4_TFHD_DFLT_SAMPLE_SIZE )
-        default_size = BOXDATA(p_tfhd)->i_default_sample_size;
-
     MP4_Box_t *p_trun = MP4_BoxGet( p_traf, "trun");
     if( p_trun == NULL)
     {
@@ -3621,31 +3605,11 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
 
     ret->i_first_dts = p_track->i_first_dts;
 
-    /* XXX I already saw DASH content with no default_duration and no
-     * MP4_TRUN_SAMPLE_DURATION flag, but a sidx box was present.
-     * This chunk of code might be buggy with segments having
-     * more than one subsegment. */
-    if( !default_duration )
-    {
-        MP4_Box_t *p_trex = MP4_GetTrexByTrackID( p_moof, i_track_ID );
-        if ( p_trex )
-            default_duration = BOXDATA(p_trex)->i_default_sample_duration;
-        else if( p_sidx )
-        {
-            MP4_Box_data_sidx_t *p_sidx_data = BOXDATA(p_sidx);
-            assert( p_sidx_data->i_reference_count == 1 );
+    uint32_t default_duration = 0;
+    uint32_t default_size = 0;
 
-            if( p_sidx_data->i_timescale == 0 )
-                return VLC_EGENERIC;
-
-            unsigned i_chunk_duration = p_sidx_data->p_items[0].i_subsegment_duration /
-                                        p_sidx_data->i_timescale;
-            default_duration = i_chunk_duration * p_track->i_timescale / ret->i_sample_count;
-
-        }
-    }
-
-    msg_Dbg( p_demux, "Default sample duration is %"PRIu32, default_duration );
+    MP4_GetDefaultSizeAndDuration( p_demux, BOXDATA(p_tfhd),
+                                   &default_size, &default_duration );
 
     ret->p_sample_count_dts = calloc( ret->i_sample_count, sizeof( uint32_t ) );
     ret->p_sample_delta_dts = calloc( ret->i_sample_count, sizeof( uint32_t ) );
