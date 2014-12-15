@@ -60,9 +60,9 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list arg
     switch( i_query )
     {
     case PLAYLIST_STOP:
-        pl_priv(p_playlist)->request.i_status = PLAYLIST_STOPPED;
         pl_priv(p_playlist)->request.b_request = true;
         pl_priv(p_playlist)->request.p_item = NULL;
+        pl_priv(p_playlist)->request.p_node = NULL;
         break;
 
     // Node can be null, it will keep the same. Use with care ...
@@ -77,7 +77,6 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list arg
             p_node = get_current_status_node( p_playlist );
             assert( p_node );
         }
-        pl_priv(p_playlist)->request.i_status = PLAYLIST_RUNNING;
         pl_priv(p_playlist)->request.i_skip = 0;
         pl_priv(p_playlist)->request.b_request = true;
         pl_priv(p_playlist)->request.p_node = p_node;
@@ -96,7 +95,6 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list arg
         }
         else
         {
-            pl_priv(p_playlist)->request.i_status = PLAYLIST_RUNNING;
             pl_priv(p_playlist)->request.b_request = true;
             pl_priv(p_playlist)->request.p_node = get_current_status_node( p_playlist );
             pl_priv(p_playlist)->request.p_item = get_current_status_item( p_playlist );
@@ -128,9 +126,6 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query, va_list arg
         pl_priv(p_playlist)->request.p_node = get_current_status_node( p_playlist );
         pl_priv(p_playlist)->request.p_item = get_current_status_item( p_playlist );
         pl_priv(p_playlist)->request.i_skip = (int) va_arg( args, int );
-        /* if already running, keep running */
-        if( pl_priv(p_playlist)->status.i_status != PLAYLIST_STOPPED )
-            pl_priv(p_playlist)->request.i_status = pl_priv(p_playlist)->status.i_status;
         pl_priv(p_playlist)->request.b_request = true;
         break;
     }

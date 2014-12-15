@@ -523,8 +523,10 @@ static void *Thread ( void *data )
         if( p_sys->killed )
             break; /* THE END */
 
-        const int status = p_sys->request.b_request ?
-                           p_sys->request.i_status : p_sys->status.i_status;
+        int status = p_sys->status.i_status;
+        if( p_sys->request.b_request )
+            status = (p_sys->request.p_item || p_sys->request.p_node)
+                     ? PLAYLIST_RUNNING : PLAYLIST_STOPPED;
 
         /* Destroy any video display if the playlist is supposed to stop */
         if( status == PLAYLIST_STOPPED
