@@ -102,6 +102,7 @@
 #define ATOM_traf VLC_FOURCC( 't', 'r', 'a', 'f' )
 #define ATOM_sidx VLC_FOURCC( 's', 'i', 'd', 'x' )
 #define ATOM_tfhd VLC_FOURCC( 't', 'f', 'h', 'd' )
+#define ATOM_tfdt VLC_FOURCC( 't', 'f', 'd', 't' )
 #define ATOM_trun VLC_FOURCC( 't', 'r', 'u', 'n' )
 #define ATOM_cprt VLC_FOURCC( 'c', 'p', 'r', 't' )
 #define ATOM_iods VLC_FOURCC( 'i', 'o', 'd', 's' )
@@ -1025,6 +1026,14 @@ typedef struct MP4_Box_data_trun_s
 
 } MP4_Box_data_trun_t;
 
+typedef struct MP4_Box_data_tfdt_s
+{
+    uint8_t  i_version;
+    uint32_t i_flags;
+    int64_t  i_base_media_decode_time;
+
+} MP4_Box_data_tfdt_t;
+
 typedef struct
 {
     uint32_t i_date;
@@ -1380,6 +1389,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_sidx_t *p_sidx;
     MP4_Box_data_tfhd_t *p_tfhd;
     MP4_Box_data_trun_t *p_trun;
+    MP4_Box_data_tfdt_t *p_tfdt;
     MP4_Box_data_tkhd_t *p_tkhd;
     MP4_Box_data_mdhd_t *p_mdhd;
     MP4_Box_data_hdlr_t *p_hdlr;

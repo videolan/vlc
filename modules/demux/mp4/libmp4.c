@@ -872,6 +872,23 @@ static void MP4_FreeBox_trun( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_trun->p_samples );
 }
 
+static int MP4_ReadBox_tfdt( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_tfdt_t );
+    if( i_read < 8 )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_GETVERSIONFLAGS( p_box->data.p_tfdt );
+
+    if( p_box->data.p_tfdt->i_version == 0 )
+        MP4_GET4BYTES( p_box->data.p_tfdt->i_base_media_decode_time );
+    else if( p_box->data.p_tfdt->i_version == 1 )
+        MP4_GET8BYTES( p_box->data.p_tfdt->i_base_media_decode_time );
+    else
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_READBOX_EXIT( 1 );
+}
 
 static int MP4_ReadBox_tkhd(  stream_t *p_stream, MP4_Box_t *p_box )
 {
@@ -3875,6 +3892,7 @@ static const struct
     { ATOM_sidx,    MP4_ReadBox_sidx,         MP4_FreeBox_sidx,    0 },
     { ATOM_tfhd,    MP4_ReadBox_tfhd,         MP4_FreeBox_Common,  ATOM_traf },
     { ATOM_trun,    MP4_ReadBox_trun,         MP4_FreeBox_trun,    ATOM_traf },
+    { ATOM_tfdt,    MP4_ReadBox_tfdt,         MP4_FreeBox_Common,  ATOM_traf },
     { ATOM_trex,    MP4_ReadBox_trex,         MP4_FreeBox_Common,  ATOM_mvex },
     { ATOM_mehd,    MP4_ReadBox_mehd,         MP4_FreeBox_Common,  ATOM_mvex },
     { ATOM_sdtp,    MP4_ReadBox_sdtp,         MP4_FreeBox_sdtp,    0 },
