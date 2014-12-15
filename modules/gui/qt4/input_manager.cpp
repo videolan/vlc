@@ -1128,16 +1128,7 @@ void MainInputManager::togglePlayPause()
 
 void MainInputManager::play()
 {
-    /* No input, play */
-    if( !p_input )
-        playlist_Play( THEPL );
-    else
-    {
-        if( PLAYING_S != var_GetInteger( p_input, "state" ) )
-        {
-            playlist_TogglePause( THEPL );
-        }
-    }
+    playlist_Play( THEPL );
 }
 
 void MainInputManager::pause()
