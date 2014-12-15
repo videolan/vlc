@@ -1119,11 +1119,7 @@ void MainInputManager::prevOrReset()
 
 void MainInputManager::togglePlayPause()
 {
-    /* No input, play */
-    if( !p_input )
-        playlist_Play( THEPL );
-    else
-        playlist_TogglePause( THEPL );
+    playlist_TogglePause( THEPL );
 }
 
 void MainInputManager::play()

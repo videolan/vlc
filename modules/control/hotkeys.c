@@ -349,10 +349,8 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
                 int state = var_GetInteger( p_input, "state" );
                 DisplayIcon( p_vout, state != PAUSE_S ? OSD_PAUSE_ICON : OSD_PLAY_ICON );
-                playlist_TogglePause( p_playlist );
             }
-            else
-                playlist_Play( p_playlist );
+            playlist_TogglePause( p_playlist );
             break;
 
         case ACTIONID_PLAY:
