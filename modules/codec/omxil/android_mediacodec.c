@@ -168,8 +168,8 @@ struct decoder_sys_t
 
     /* Direct rendering members. */
     bool direct_rendering;
-    int i_output_buffers; /**< number of MediaCodec output buffers */
-    picture_t** inflight_picture; /**< stores the inflight picture for each output buffer or NULL */
+    picture_t** pp_inflight_pictures; /**< stores the inflight picture for each output buffer or NULL */
+    unsigned int i_inflight_pictures;
 
     timestamp_fifo_t *timestamp_fifo;
 };
@@ -259,6 +259,7 @@ static void CloseDecoder(vlc_object_t *);
 static picture_t *DecodeVideo(decoder_t *, block_t **);
 
 static void InvalidateAllPictures(decoder_t *);
+static int InsertInflightPicture(decoder_t *, picture_t *, unsigned int );
 
 /*****************************************************************************
  * Module descriptor
@@ -582,10 +583,6 @@ loopclean:
     p_sys->input_buffers = (*env)->NewGlobalRef(env, p_sys->input_buffers);
     p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
     p_sys->buffer_info = (*env)->NewGlobalRef(env, p_sys->buffer_info);
-    p_sys->i_output_buffers = (*env)->GetArrayLength(env, p_sys->output_buffers);
-    p_sys->inflight_picture = calloc(1, sizeof(picture_t*) * p_sys->i_output_buffers);
-    if (!p_sys->inflight_picture)
-        goto error;
     (*env)->DeleteLocalRef(env, format);
 
     jni_detach_thread();
@@ -646,7 +643,7 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     free(p_sys->name);
     ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
-    free(p_sys->inflight_picture);
+    free(p_sys->pp_inflight_pictures);
     if (p_sys->timestamp_fifo)
         timestamp_FifoRelease(p_sys->timestamp_fifo);
     free(p_sys);
@@ -673,7 +670,7 @@ static void UnlockPicture(picture_t* p_pic, bool b_render)
     }
 
     uint32_t i_index = p_picsys->priv.hw.i_index;
-    p_sys->inflight_picture[i_index] = NULL;
+    InsertInflightPicture(p_dec, NULL, i_index);
 
     /* Release the MediaCodec buffer. */
     JNIEnv *env = NULL;
@@ -695,14 +692,35 @@ static void InvalidateAllPictures(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     vlc_mutex_lock(get_android_opaque_mutex());
-    for (int i = 0; i < p_sys->i_output_buffers; ++i) {
-        picture_t *p_pic = p_sys->inflight_picture[i];
+
+    for (unsigned int i = 0; i < p_sys->i_inflight_pictures; ++i) {
+        picture_t *p_pic = p_sys->pp_inflight_pictures[i];
         if (p_pic) {
             p_pic->p_sys->priv.hw.b_valid = false;
-            p_sys->inflight_picture[i] = NULL;
+            p_sys->pp_inflight_pictures[i] = NULL;
         }
     }
     vlc_mutex_unlock(get_android_opaque_mutex());
+}
+
+static int InsertInflightPicture(decoder_t *p_dec, picture_t *p_pic,
+                                 unsigned int i_index)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (i_index >= p_sys->i_inflight_pictures) {
+        picture_t **pp_pics = realloc(p_sys->pp_inflight_pictures,
+                                      (i_index + 1) * sizeof (picture_t *));
+        if (!pp_pics)
+            return -1;
+        if (i_index - p_sys->i_inflight_pictures > 0)
+            memset(&pp_pics[p_sys->i_inflight_pictures], 0,
+                   (i_index - p_sys->i_inflight_pictures) * sizeof (picture_t *));
+        p_sys->pp_inflight_pictures = pp_pics;
+        p_sys->i_inflight_pictures = i_index + 1;
+    }
+    p_sys->pp_inflight_pictures[i_index] = p_pic;
+    return 0;
 }
 
 static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong timeout)
@@ -747,7 +765,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 }
 
                 // No need to lock here since the previous picture was not sent.
-                p_sys->inflight_picture[i_prev_index] = NULL;
+                InsertInflightPicture(p_dec, NULL, i_prev_index);
             }
             if (*pp_pic) {
 
@@ -769,7 +787,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                     p_picsys->priv.hw.i_index = index;
                     p_picsys->priv.hw.b_valid = true;
 
-                    p_sys->inflight_picture[index] = p_pic;
+                    InsertInflightPicture(p_dec, p_pic, index);
                 } else {
                     jobject buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers, index);
                     //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
@@ -824,13 +842,6 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             }
 
             p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
-
-            vlc_mutex_lock(get_android_opaque_mutex());
-            free(p_sys->inflight_picture);
-            p_sys->i_output_buffers = (*env)->GetArrayLength(env, p_sys->output_buffers);
-            p_sys->inflight_picture = calloc(1, sizeof(picture_t*) * p_sys->i_output_buffers);
-            vlc_mutex_unlock(get_android_opaque_mutex());
-
         } else if (index == INFO_OUTPUT_FORMAT_CHANGED) {
             jobject format = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_format);
             if ((*env)->ExceptionOccurred(env)) {
