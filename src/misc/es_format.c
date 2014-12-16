@@ -373,30 +373,31 @@ void video_format_ApplyRotation( video_format_t *restrict out,
     video_format_TransformTo(out, ORIENT_NORMAL);
 }
 
-bool video_format_IsSimilar( const video_format_t *p_fmt1, const video_format_t *p_fmt2 )
+bool video_format_IsSimilar( const video_format_t *f1,
+                             const video_format_t *f2 )
 {
-    video_format_t v1 = *p_fmt1;
-    video_format_t v2 = *p_fmt2;
-
-    if( v1.i_chroma != v2.i_chroma )
+    if( f1->i_chroma != f2->i_chroma )
         return false;
 
-    if( v1.i_width != v2.i_width || v1.i_height != v2.i_height ||
-        v1.i_visible_width != v2.i_visible_width ||
-        v1.i_visible_height != v2.i_visible_height ||
-        v1.i_x_offset != v2.i_x_offset || v1.i_y_offset != v2.i_y_offset )
+    if( f1->i_width != f2->i_width || f1->i_height != f2->i_height ||
+        f1->i_visible_width != f2->i_visible_width ||
+        f1->i_visible_height != f2->i_visible_height ||
+        f1->i_x_offset != f2->i_x_offset || f1->i_y_offset != f2->i_y_offset )
         return false;
-    if( v1.i_sar_num * v2.i_sar_den != v2.i_sar_num * v1.i_sar_den )
-        return false;
-
-    if( v1.orientation != v2.orientation)
+    if( f1->i_sar_num * f2->i_sar_den != f2->i_sar_num * f1->i_sar_den )
         return false;
 
-    if( v1.i_chroma == VLC_CODEC_RGB15 ||
-        v1.i_chroma == VLC_CODEC_RGB16 ||
-        v1.i_chroma == VLC_CODEC_RGB24 ||
-        v1.i_chroma == VLC_CODEC_RGB32 )
+    if( f1->orientation != f2->orientation)
+        return false;
+
+    if( f1->i_chroma == VLC_CODEC_RGB15 ||
+        f1->i_chroma == VLC_CODEC_RGB16 ||
+        f1->i_chroma == VLC_CODEC_RGB24 ||
+        f1->i_chroma == VLC_CODEC_RGB32 )
     {
+        video_format_t v1 = *f1;
+        video_format_t v2 = *f2;
+
         video_format_FixRgb( &v1 );
         video_format_FixRgb( &v2 );
 
