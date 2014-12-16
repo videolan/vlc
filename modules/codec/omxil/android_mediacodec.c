@@ -787,7 +787,9 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                     p_picsys->priv.hw.i_index = index;
                     p_picsys->priv.hw.b_valid = true;
 
+                    vlc_mutex_lock(get_android_opaque_mutex());
                     InsertInflightPicture(p_dec, p_pic, index);
+                    vlc_mutex_unlock(get_android_opaque_mutex());
                 } else {
                     jobject buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers, index);
                     //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
