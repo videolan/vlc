@@ -79,7 +79,7 @@ namespace dash
                 void                setBaseUrl              (BaseUrl *baseUrl);
                 MPD*                getMPD                  () const;
 
-                std::vector<std::string> toString() const;
+                std::vector<std::string> toString(int = 0) const;
                 virtual Url         getUrlSegment           () const; /* impl */
 
             private:

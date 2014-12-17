@@ -59,6 +59,7 @@ namespace dash
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( Representation *rep );
                 virtual Url                     getUrlSegment() const; /* reimpl */
+                std::vector<std::string>        toString(int = 0) const;
 
             private:
                 bool                            subsegmentAlignmentFlag;

@@ -335,21 +335,11 @@ void    IsoffMainParser::print              ()
         std::vector<Period *>::const_iterator i;
         for(i = mpd->getPeriods().begin(); i != mpd->getPeriods().end(); i++)
         {
-            msg_Dbg(p_stream, " Period");
-            std::vector<AdaptationSet *>::const_iterator j;
-            for(j = (*i)->getAdaptationSets().begin(); j != (*i)->getAdaptationSets().end(); j++)
+            std::vector<std::string> debug = (*i)->toString();
+            std::vector<std::string>::const_iterator l;
+            for(l = debug.begin(); l < debug.end(); l++)
             {
-                msg_Dbg(p_stream, "  AdaptationSet");
-                std::vector<Representation *>::const_iterator k;
-                for(k = (*j)->getRepresentations().begin(); k != (*j)->getRepresentations().end(); k++)
-                {
-                    std::vector<std::string> debug = (*k)->toString();
-                    std::vector<std::string>::const_iterator l;
-                    for(l = debug.begin(); l < debug.end(); l++)
-                    {
-                        msg_Dbg(p_stream, "%s", (*l).c_str());
-                    }
-                }
+                msg_Dbg(p_stream, "%s", (*l).c_str());
             }
         }
     }

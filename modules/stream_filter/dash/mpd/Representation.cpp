@@ -132,14 +132,16 @@ int                 Representation::getHeight               () const
     return this->height;
 }
 
-std::vector<std::string> Representation::toString() const
+std::vector<std::string> Representation::toString(int indent) const
 {
     std::vector<std::string> ret;
-    ret.push_back(std::string("  Representation"));
+    std::string text(indent, ' ');
+    text.append("Representation");
+    ret.push_back(text);
     std::vector<ISegment *> list = getSegments();
     std::vector<ISegment *>::const_iterator l;
     for(l = list.begin(); l < list.end(); l++)
-        ret.push_back((*l)->toString());
+        ret.push_back((*l)->toString(indent + 1));
 
     return ret;
 }

@@ -119,3 +119,18 @@ Url AdaptationSet::getUrlSegment() const
 {
     return getParentUrlSegment();
 }
+
+std::vector<std::string> AdaptationSet::toString(int indent) const
+{
+    std::vector<std::string> ret;
+    std::string text(indent, ' ');
+    text.append("AdaptationSet");
+    ret.push_back(text);
+    std::vector<Representation *>::const_iterator k;
+    for(k = representations.begin(); k != representations.end(); k++)
+    {
+        std::vector<std::string> debug = (*k)->toString(indent + 1);
+        ret.insert(ret.end(), debug.begin(), debug.end());
+    }
+    return ret;
+}

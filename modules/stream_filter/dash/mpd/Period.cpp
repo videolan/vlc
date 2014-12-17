@@ -82,3 +82,18 @@ Url Period::getUrlSegment() const
 {
     return getParentUrlSegment();
 }
+
+std::vector<std::string> Period::toString(int indent) const
+{
+    std::vector<std::string> ret;
+    std::string text(indent, ' ');
+    text.append("Period");
+    ret.push_back(text);
+    std::vector<AdaptationSet *>::const_iterator k;
+    for(k = adaptationSets.begin(); k != adaptationSets.end(); k++)
+    {
+        std::vector<std::string> debug = (*k)->toString(indent + 1);
+        ret.insert(ret.end(), debug.begin(), debug.end());
+    }
+    return ret;
+}

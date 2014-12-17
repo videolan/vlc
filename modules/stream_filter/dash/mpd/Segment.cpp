@@ -116,10 +116,10 @@ size_t ISegment::getOffset() const
     return startByte;
 }
 
-std::string ISegment::toString() const
+std::string ISegment::toString(int indent) const
 {
-    std::stringstream ss("    ");
-    ss << debugName << " url=" << getUrlSegment().toString();
+    std::stringstream ss;
+    ss << std::string(indent, ' ') << debugName << " url=" << getUrlSegment().toString();
     if(startByte!=endByte)
         ss << " @" << startByte << ".." << endByte;
     return ss.str();
@@ -174,11 +174,11 @@ void                    Segment::setSourceUrl   ( const std::string &url )
         this->sourceUrl = url;
 }
 
-std::string Segment::toString() const
+std::string Segment::toString(int indent) const
 {
     if (subsegments.empty())
     {
-        return ISegment::toString();
+        return ISegment::toString(indent);
     }
     else
     {
@@ -186,7 +186,7 @@ std::string Segment::toString() const
         std::vector<SubSegment *>::const_iterator l;
         for(l = subsegments.begin(); l != subsegments.end(); l++)
         {
-            ret.append( (*l)->toString() );
+            ret.append( (*l)->toString(indent + 1) );
         }
         return ret;
     }

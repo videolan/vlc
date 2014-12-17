@@ -48,6 +48,7 @@ namespace dash
                 const std::vector<AdaptationSet *>  getAdaptationSets   (Streams::Type) const;
                 AdaptationSet *                     getAdaptationSet    (Streams::Type) const;
                 void                                addAdaptationSet    (AdaptationSet *AdaptationSet);
+                std::vector<std::string>            toString            (int = 0) const;
 
                 virtual Url getUrlSegment() const; /* reimpl */
 

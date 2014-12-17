@@ -60,7 +60,7 @@ namespace dash
                 virtual void                            setDuration     (mtime_t);
                 virtual size_t                          getOffset       () const;
                 virtual std::vector<ISegment*>          subSegments     () = 0;
-                virtual std::string                     toString        () const;
+                virtual std::string                     toString        (int = 0) const;
                 virtual bool                            contains        (size_t byte) const;
                 int                                     getClassId      () const;
 
@@ -96,7 +96,7 @@ namespace dash
                 virtual Url getUrlSegment() const; /* impl */
                 virtual dash::http::Chunk* toChunk(size_t, Representation * = NULL);
                 virtual std::vector<ISegment*> subSegments();
-                virtual std::string toString() const;
+                virtual std::string toString(int = 0) const;
                 virtual void addSubSegment(SubSegment *);
                 static const int CLASSID_SEGMENT = 1;
 
