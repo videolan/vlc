@@ -24,7 +24,6 @@
 # include "config.h"
 #endif
 
-#include "mpd/Segment.h"
 #include <vlc_common.h>
 #include <vlc_stream.h>
 extern "C" {
@@ -33,17 +32,21 @@ extern "C" {
 
 namespace dash
 {
+    namespace mpd
+    {
+        class Representation;
+    }
     namespace mp4
     {
         class AtomsReader
         {
             public:
-                AtomsReader(dash::mpd::ISegment *);
+                AtomsReader(vlc_object_t *);
                 ~AtomsReader();
-                bool parseBlock(void *, size_t);
+                bool parseBlock(void *, size_t, dash::mpd::Representation *);
 
             protected:
-                dash::mpd::ISegment *segment;
+                vlc_object_t *object;
                 MP4_Box_t *rootbox;
         };
     }

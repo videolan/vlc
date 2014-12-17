@@ -24,15 +24,14 @@
 using namespace dash::mp4;
 using namespace dash::mpd;
 
-AtomsReader::AtomsReader(ISegment *segment_)
+AtomsReader::AtomsReader(vlc_object_t *object_)
 {
-    segment = segment_;
+    object = object_;
     rootbox = NULL;
 }
 
 AtomsReader::~AtomsReader()
 {
-    vlc_object_t *object = segment->getRepresentation()->getMPD()->getVLCObject();
     while(rootbox && rootbox->p_first)
     {
         MP4_Box_t *p_next = rootbox->p_first->p_next;
@@ -42,11 +41,11 @@ AtomsReader::~AtomsReader()
     delete rootbox;
 }
 
-bool AtomsReader::parseBlock(void *buffer, size_t size)
+bool AtomsReader::parseBlock(void *buffer, size_t size, Representation *rep)
 {
-    if(!segment->getRepresentation())
+    if(!rep)
         return false;
-    vlc_object_t *object = segment->getRepresentation()->getMPD()->getVLCObject();
+
     stream_t *stream = stream_MemoryNew( object, (uint8_t *)buffer, size, true);
     if (stream)
     {
@@ -78,7 +77,7 @@ bool AtomsReader::parseBlock(void *buffer, size_t size)
                     point.offset += sidx->p_items[i].i_referenced_size;
                     point.time += sidx->p_items[i].i_subsegment_duration;
                 }
-                segment->getRepresentation()->SplitUsingIndex(splitlist);
+                rep->SplitUsingIndex(splitlist);
             }
         }
         stream_Delete(stream);

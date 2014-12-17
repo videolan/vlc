@@ -47,7 +47,6 @@ namespace dash
                 virtual MPD*    getMPD ();
                 virtual void    setMPDBaseUrl(dash::xml::Node *root);
                 virtual void    setAdaptationSets(dash::xml::Node *periodNode, Period *period) = 0;
-                virtual void    setPeriods(dash::xml::Node *root);
 
             protected:
                 dash::xml::Node *root;

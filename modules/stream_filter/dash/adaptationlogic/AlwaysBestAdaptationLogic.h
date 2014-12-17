@@ -36,7 +36,7 @@ namespace dash
             public:
                 AlwaysBestAdaptationLogic           (mpd::MPD *mpd);
 
-                virtual const mpd::Representation *getCurrentRepresentation(Streams::Type) const;
+                virtual mpd::Representation *getCurrentRepresentation(Streams::Type) const;
         };
     }
 }

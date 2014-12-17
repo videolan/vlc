@@ -70,6 +70,8 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/mpd/SegmentInfoCommon.h \
     stream_filter/dash/mpd/SegmentInfoDefault.cpp \
     stream_filter/dash/mpd/SegmentInfoDefault.h \
+    stream_filter/dash/mpd/SegmentInformation.cpp \
+    stream_filter/dash/mpd/SegmentInformation.hpp \
     stream_filter/dash/mpd/SegmentList.cpp \
     stream_filter/dash/mpd/SegmentList.h \
     stream_filter/dash/mpd/SegmentTemplate.cpp \

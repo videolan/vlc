@@ -31,7 +31,7 @@
 
 #include "mpd/Representation.h"
 #include "mpd/CommonAttributesElements.h"
-#include "mpd/ICanonicalUrl.hpp"
+#include "mpd/SegmentInformation.hpp"
 
 namespace dash
 {
@@ -41,7 +41,8 @@ namespace dash
         class Period;
         class SegmentTemplate;
 
-        class AdaptationSet : public CommonAttributesElements, public ICanonicalUrl
+        class AdaptationSet : public CommonAttributesElements,
+                              public SegmentInformation
         {
             public:
                 AdaptationSet(Period *);
@@ -55,8 +56,6 @@ namespace dash
                 const SegmentInfoDefault*       getSegmentInfoDefault() const;
                 void                            setSegmentInfoDefault( const SegmentInfoDefault* seg );
                 void                            setBitstreamSwitching(bool value);
-                void                            setTemplates( SegmentTemplate *, SegmentTemplate * = NULL );
-                std::vector<SegmentTemplate *>  getTemplates() const;
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( Representation *rep );
                 virtual Url                     getUrlSegment() const; /* reimpl */
@@ -66,8 +65,6 @@ namespace dash
                 std::vector<Representation *>   representations;
                 const SegmentInfoDefault*       segmentInfoDefault;
                 bool                            isBitstreamSwitching;
-                SegmentTemplate *               mediaTemplate;
-                SegmentTemplate *               initTemplate;
         };
     }
 }

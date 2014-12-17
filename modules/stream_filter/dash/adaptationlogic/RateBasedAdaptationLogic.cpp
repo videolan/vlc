@@ -43,7 +43,7 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPD *mpd) :
     height = var_InheritInteger(mpd->getVLCObject(), "dash-prefheight");
 }
 
-const Representation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
+Representation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
 {
     if(currentPeriod == NULL)
         return NULL;

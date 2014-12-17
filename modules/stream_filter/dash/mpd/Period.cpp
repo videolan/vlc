@@ -35,7 +35,7 @@
 using namespace dash::mpd;
 
 Period::Period(MPD *mpd) :
-    ICanonicalUrl( mpd )
+    SegmentInformation( mpd )
 {
 }
 

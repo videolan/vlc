@@ -38,12 +38,10 @@
 using namespace dash::mpd;
 
 AdaptationSet::AdaptationSet(Period *period) :
-    ICanonicalUrl( period ),
+    SegmentInformation( period ),
     subsegmentAlignmentFlag( false ),
     segmentInfoDefault( NULL ),
-    isBitstreamSwitching( false ),
-    mediaTemplate( NULL ),
-    initTemplate( NULL )
+    isBitstreamSwitching( false )
 {
 }
 
@@ -51,8 +49,6 @@ AdaptationSet::~AdaptationSet   ()
 {
     delete this->segmentInfoDefault;
     vlc_delete_all( this->representations );
-    delete mediaTemplate;
-    delete initTemplate;
 }
 
 const std::string& AdaptationSet::getMimeType() const
@@ -108,23 +104,6 @@ void                            AdaptationSet::addRepresentation        (Represe
     this->representations.push_back(rep);
 }
 
-void AdaptationSet::setTemplates(SegmentTemplate *media, SegmentTemplate *init)
-{
-    mediaTemplate = media;
-    initTemplate = init;
-}
-
-std::vector<SegmentTemplate *> AdaptationSet::getTemplates() const
-{
-    std::vector<SegmentTemplate *> ret;
-    if(mediaTemplate)
-    {
-        if(initTemplate)
-            ret.push_back(initTemplate);
-        ret.push_back(mediaTemplate);
-    }
-    return ret;
-}
 
 void AdaptationSet::setBitstreamSwitching  (bool value)
 {

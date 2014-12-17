@@ -28,7 +28,7 @@ AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic(mpd::MPD *mpd):
 {
 }
 
-const Representation *AlwaysLowestAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
+Representation *AlwaysLowestAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
 {
     RepresentationSelector selector;
     return selector.select(currentPeriod, type, 0);

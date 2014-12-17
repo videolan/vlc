@@ -38,6 +38,7 @@ namespace dash
     {
         class Representation;
         class SubSegment;
+        class SegmentInformation;
 
         class ISegment : public ICanonicalUrl
         {
@@ -51,7 +52,7 @@ namespace dash
                  */
                 virtual bool                            isSingleShot    () const;
                 virtual void                            done            ();
-                virtual dash::http::Chunk*              toChunk         (size_t, const Representation * = NULL);
+                virtual dash::http::Chunk*              toChunk         (size_t, Representation * = NULL);
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual void                            setStartTime    (mtime_t ztime);
                 virtual mtime_t                         getStartTime    () const;
@@ -60,7 +61,6 @@ namespace dash
                 virtual size_t                          getOffset       () const;
                 virtual std::vector<ISegment*>          subSegments     () = 0;
                 virtual std::string                     toString        () const;
-                virtual Representation*                 getRepresentation() const = 0;
                 virtual bool                            contains        (size_t byte) const;
                 int                                     getClassId      () const;
 
@@ -90,20 +90,17 @@ namespace dash
         class Segment : public ISegment
         {
             public:
-                Segment( Representation *parent );
-                explicit Segment( ICanonicalUrl *parent );
+                Segment( ICanonicalUrl *parent );
                 ~Segment();
                 virtual void setSourceUrl( const std::string &url );
                 virtual Url getUrlSegment() const; /* impl */
-                virtual dash::http::Chunk* toChunk(size_t, const Representation * = NULL);
+                virtual dash::http::Chunk* toChunk(size_t, Representation * = NULL);
                 virtual std::vector<ISegment*> subSegments();
-                virtual Representation* getRepresentation() const;
                 virtual std::string toString() const;
                 virtual void addSubSegment(SubSegment *);
                 static const int CLASSID_SEGMENT = 1;
 
             protected:
-                Representation* parentRepresentation;
                 std::vector<SubSegment *> subsegments;
                 std::string sourceUrl;
                 int size;
@@ -112,14 +109,15 @@ namespace dash
         class InitSegment : public Segment
         {
             public:
-                InitSegment( Representation *parent );
+                InitSegment( ICanonicalUrl *parent );
                 static const int CLASSID_INITSEGMENT = 2;
         };
 
         class IndexSegment : public Segment
         {
             public:
-                IndexSegment( Representation *parent );
+                IndexSegment( ICanonicalUrl *parent );
+                virtual dash::http::Chunk* toChunk(size_t, Representation * = NULL);
                 static const int CLASSID_INDEXSEGMENT = 3;
 
             protected:
@@ -127,7 +125,11 @@ namespace dash
                 {
                     public:
                         IndexSegmentChunk(ISegment *segment, const std::string &);
+                        void setIndexRepresentation(Representation *);
                         virtual void onDownload(void *, size_t);
+
+                    private:
+                        Representation *rep;
                 };
 
                 virtual dash::http::Chunk * getChunk(const std::string &);
@@ -139,7 +141,6 @@ namespace dash
                 SubSegment(Segment *, size_t start, size_t end);
                 virtual Url getUrlSegment() const; /* impl */
                 virtual std::vector<ISegment*> subSegments();
-                virtual Representation* getRepresentation() const;
                 static const int CLASSID_SUBSEGMENT = 4;
             private:
                 Segment *parent;

@@ -50,7 +50,7 @@ Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
     if(!currentPeriod)
         return NULL;
 
-    const Representation *rep = getCurrentRepresentation(type);
+    Representation *rep = getCurrentRepresentation(type);
     if ( rep == NULL )
             return NULL;
 

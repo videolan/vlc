@@ -42,18 +42,6 @@ void IMPDParser::setMPDBaseUrl(Node *root)
     }
 }
 
-void IMPDParser::setPeriods(Node *root_)
-{
-    std::vector<Node *> periods = DOMHelper::getElementByTagName(root_, "Period", false);
-
-    for(size_t i = 0; i < periods.size(); i++)
-    {
-        Period *period = new Period(mpd);
-        setAdaptationSets(periods.at(i), period);
-        mpd->addPeriod(period);
-    }
-}
-
 MPD* IMPDParser::getMPD()
 {
     return mpd;

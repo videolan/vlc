@@ -35,15 +35,12 @@
 using namespace dash::mpd;
 
 Representation::Representation  ( AdaptationSet *set, MPD *mpd_ ) :
-                ICanonicalUrl   ( set ),
+                SegmentInformation( set ),
                 mpd             ( mpd_ ),
                 adaptationSet   ( set ),
                 bandwidth       (0),
                 qualityRanking  ( -1 ),
-                segmentInfo     ( NULL ),
                 trickModeType   ( NULL ),
-                segmentBase     ( NULL ),
-                segmentList     ( NULL ),
                 baseUrl         ( NULL ),
                 width           (0),
                 height          (0)
@@ -52,10 +49,7 @@ Representation::Representation  ( AdaptationSet *set, MPD *mpd_ ) :
 
 Representation::~Representation ()
 {
-    delete(this->segmentInfo);
     delete(this->trickModeType);
-    delete segmentBase;
-    delete segmentList;
     delete baseUrl;
 }
 
@@ -80,10 +74,6 @@ void    Representation::setBandwidth( uint64_t bandwidth )
     this->bandwidth = bandwidth;
 }
 
-SegmentInfo*        Representation::getSegmentInfo() const
-{
-    return this->segmentInfo;
-}
 
 TrickModeType*      Representation::getTrickModeType        () const
 {
@@ -95,10 +85,6 @@ void                Representation::setTrickMode        (TrickModeType *trickMod
     this->trickModeType = trickModeType;
 }
 
-void                Representation::setSegmentInfo          (SegmentInfo *info)
-{
-    this->segmentInfo = info;
-}
 
 
 int Representation::getQualityRanking() const
@@ -123,62 +109,6 @@ void Representation::addDependency(const Representation *dep)
         this->dependencies.push_back( dep );
 }
 
-std::vector<ISegment *> Representation::getSegments() const
-{
-    std::vector<ISegment *>  retSegments;
-
-    if ( segmentInfo )
-    {
-        /* init segments are always single segment */
-        retSegments.push_back( segmentInfo->getInitialisationSegment() );
-
-        if ( !segmentInfo->getSegments().empty() )
-        {
-            std::vector<Segment *>::const_iterator it;
-            for(it=segmentInfo->getSegments().begin();
-                it!=segmentInfo->getSegments().end(); it++)
-            {
-                std::vector<ISegment *> list = (*it)->subSegments();
-                retSegments.insert( retSegments.end(), list.begin(), list.end() );
-            }
-        }
-    }
-    else
-    {
-        /* init segments are always single segment */
-        if( segmentBase && segmentBase->getInitSegment() )
-            retSegments.push_back( segmentBase->getInitSegment() );
-
-        if ( segmentList && !segmentList->getSegments().empty() )
-        {
-            std::vector<Segment *>::const_iterator it;
-            for(it=segmentList->getSegments().begin();
-                it!=segmentList->getSegments().end(); it++)
-            {
-                std::vector<ISegment *> list = (*it)->subSegments();
-                retSegments.insert( retSegments.end(), list.begin(), list.end() );
-            }
-        }
-    }
-
-    if(retSegments.empty())
-    {
-        std::vector<SegmentTemplate *> list = adaptationSet->getTemplates();
-        retSegments.insert( retSegments.end(), list.begin(), list.end() );
-    }
-
-    return retSegments;
-}
-
-void                Representation::setSegmentList          (SegmentList *list)
-{
-    this->segmentList = list;
-}
-
-void                Representation::setSegmentBase          (SegmentBase *base)
-{
-    this->segmentBase = base;
-}
 
 void Representation::setBaseUrl(BaseUrl *base)
 {
@@ -225,51 +155,4 @@ Url Representation::getUrlSegment() const
 MPD * Representation::getMPD() const
 {
     return mpd;
-}
-
-static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
-                              size_t end, mtime_t time)
-{
-    std::vector<Segment *>::iterator segIt;
-    for(segIt = seglist.begin(); segIt < seglist.end(); segIt++)
-    {
-        Segment *segment = *segIt;
-        if(segment->getClassId() == Segment::CLASSID_SEGMENT &&
-           segment->contains(end + segment->getOffset()))
-        {
-            SubSegment *subsegment = new SubSegment(segment,
-                                                    start + segment->getOffset(),
-                                                    end + segment->getOffset());
-            segment->addSubSegment(subsegment);
-            segment->setStartTime(time);
-            break;
-        }
-    }
-}
-
-void Representation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
-{
-    std::vector<Segment *> seglist = segmentList->getSegments();
-    std::vector<SplitPoint>::const_iterator splitIt;
-    size_t start = 0, end = 0;
-    mtime_t time = 0;
-
-    for(splitIt = splitlist.begin(); splitIt < splitlist.end(); splitIt++)
-    {
-        start = end;
-        SplitPoint split = *splitIt;
-        end = split.offset;
-        if(splitIt == splitlist.begin() && split.offset == 0)
-            continue;
-        time = split.time;
-        insertIntoSegment(seglist, start, end, time);
-        end++;
-    }
-
-    if(start != 0)
-    {
-        start = end;
-        end = 0;
-        insertIntoSegment(seglist, start, end, time);
-    }
 }

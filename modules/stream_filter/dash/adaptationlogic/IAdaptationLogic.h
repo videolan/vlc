@@ -48,7 +48,7 @@ namespace dash
                 };
 
                 virtual dash::http::Chunk*                  getNextChunk            (Streams::Type) = 0;
-                virtual const dash::mpd::Representation*    getCurrentRepresentation(Streams::Type) const    = 0;
+                virtual dash::mpd::Representation*          getCurrentRepresentation(Streams::Type) const    = 0;
         };
     }
 }

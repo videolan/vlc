@@ -38,7 +38,7 @@ namespace dash
             public:
                 RateBasedAdaptationLogic            (mpd::MPD *mpd);
 
-                const dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;
+                dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;
                 virtual void updateDownloadRate(size_t, mtime_t);
 
             private:

@@ -53,11 +53,12 @@ namespace dash
                 void    setMPDAttributes    ();
                 void    setAdaptationSets   (dash::xml::Node *periodNode, Period *period);
                 void    setRepresentations  (dash::xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
-                void    setSegmentBase      (std::vector<xml::Node *> &, Representation *rep);
-                void    setSegmentList      (std::vector<xml::Node *> &, Representation *rep);
                 void    setInitSegment      (dash::xml::Node *segBaseNode, SegmentBase *base);
-                void    setSegments         (dash::xml::Node *segListNode, SegmentList *list);
-                void    parseTemplate       (dash::xml::Node *templateNode, AdaptationSet *);
+                void    parsePeriods        (dash::xml::Node *);
+                size_t  parseSegmentInformation(dash::xml::Node *, SegmentInformation *);
+                void    parseSegmentBase    (dash::xml::Node *, SegmentInformation *);
+                size_t  parseSegmentList    (dash::xml::Node *, SegmentInformation *);
+                size_t  parseSegmentTemplate(dash::xml::Node *, SegmentInformation *);
         };
     }
 }

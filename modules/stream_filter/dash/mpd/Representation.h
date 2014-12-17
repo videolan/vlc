@@ -32,8 +32,8 @@
 #include "mpd/TrickModeType.h"
 #include "mpd/SegmentBase.h"
 #include "mpd/SegmentList.h"
+#include "mpd/SegmentInformation.hpp"
 #include "mpd/BaseUrl.h"
-#include "mpd/ICanonicalUrl.hpp"
 
 namespace dash
 {
@@ -43,7 +43,7 @@ namespace dash
         class MPD;
 
         class Representation : public CommonAttributesElements,
-                               public ICanonicalUrl
+                               public SegmentInformation
         {
             public:
                 Representation( AdaptationSet *, MPD *mpd );
@@ -68,15 +68,10 @@ namespace dash
                  *          It cannot be NULL, or without any Segments in it.
                  *          It can however have a NULL InitSegment
                  */
-                SegmentInfo*        getSegmentInfo          () const;
                 TrickModeType*      getTrickModeType        () const;
 
-                void                setSegmentInfo( SegmentInfo *info );
                 void                setTrickMode( TrickModeType *trickModeType );
 
-                std::vector<ISegment*> getSegments          ()const;
-                void                setSegmentList          (SegmentList *list);
-                void                setSegmentBase          (SegmentBase *base);
                 void                setWidth                (int width);
                 int                 getWidth                () const;
                 void                setHeight               (int height);
@@ -87,14 +82,6 @@ namespace dash
                 std::vector<std::string> toString() const;
                 virtual Url         getUrlSegment           () const; /* impl */
 
-                class SplitPoint
-                {
-                    public:
-                        size_t offset;
-                        mtime_t time;
-                };
-                void SplitUsingIndex(std::vector<SplitPoint>&);
-
             private:
                 MPD                                *mpd;
                 AdaptationSet                      *adaptationSet;
@@ -102,10 +89,7 @@ namespace dash
                 std::string                         id;
                 int                                 qualityRanking;
                 std::list<const Representation*>    dependencies;
-                SegmentInfo                         *segmentInfo;
                 TrickModeType                       *trickModeType;
-                SegmentBase                         *segmentBase;
-                SegmentList                         *segmentList;
                 BaseUrl                             *baseUrl;
                 int                                 width;
                 int                                 height;

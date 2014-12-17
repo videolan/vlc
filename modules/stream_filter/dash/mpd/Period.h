@@ -29,6 +29,7 @@
 
 #include "mpd/AdaptationSet.h"
 #include "mpd/ICanonicalUrl.hpp"
+#include "mpd/SegmentInformation.hpp"
 #include "Streams.hpp"
 
 namespace dash
@@ -36,7 +37,8 @@ namespace dash
     namespace mpd
     {
         class MPD;
-        class Period : public ICanonicalUrl
+
+        class Period : public SegmentInformation
         {
             public:
                 Period(MPD *);
