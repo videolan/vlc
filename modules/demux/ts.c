@@ -1916,7 +1916,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                         block_Duplicate( p_block ) );
             }
 
-            if (!p_sys->b_trust_pcr)
+            if (!p_sys->b_trust_pcr && p_block->i_pts > VLC_TS_INVALID )
                 es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
                         pid->i_owner_number, p_block->i_pts);
 
