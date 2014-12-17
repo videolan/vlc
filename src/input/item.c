@@ -386,6 +386,17 @@ void input_item_SetDuration( input_item_t *p_i, mtime_t i_duration )
     }
 }
 
+char *input_item_GetNowPlayingFb( input_item_t *p_item )
+{
+    char *psz_meta = input_item_GetMeta( p_item, vlc_meta_NowPlaying );
+    if( !psz_meta || strlen( psz_meta ) == 0 )
+    {
+        free( psz_meta );
+        return input_item_GetMeta( p_item, vlc_meta_ESNowPlaying );
+    }
+
+    return psz_meta;
+}
 
 bool input_item_IsPreparsed( input_item_t *p_item )
 {

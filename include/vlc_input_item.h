@@ -192,6 +192,7 @@ VLC_API char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type 
 VLC_API char * input_item_GetName( input_item_t * p_i ) VLC_USED;
 VLC_API char * input_item_GetTitleFbName( input_item_t * p_i ) VLC_USED;
 VLC_API char * input_item_GetURI( input_item_t * p_i ) VLC_USED;
+VLC_API char * input_item_GetNowPlayingFb( input_item_t *p_item ) VLC_USED;
 VLC_API void input_item_SetURI( input_item_t * p_i, const char *psz_uri );
 VLC_API mtime_t input_item_GetDuration( input_item_t * p_i );
 VLC_API void input_item_SetDuration( input_item_t * p_i, mtime_t i_duration );
@@ -223,6 +224,7 @@ INPUT_META(Setting)
 INPUT_META(URL)
 INPUT_META(Language)
 INPUT_META(NowPlaying)
+INPUT_META(ESNowPlaying)
 INPUT_META(Publisher)
 INPUT_META(EncodedBy)
 INPUT_META(ArtworkURL)

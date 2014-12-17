@@ -45,6 +45,7 @@ typedef enum vlc_meta_type_t
     vlc_meta_URL,
     vlc_meta_Language,
     vlc_meta_NowPlaying,
+    vlc_meta_ESNowPlaying,
     vlc_meta_Publisher,
     vlc_meta_EncodedBy,
     vlc_meta_ArtworkURL,

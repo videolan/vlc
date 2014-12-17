@@ -1012,7 +1012,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     }
 
     /* Update now playing */
-    input_item_SetNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
+    input_item_SetESNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
     input_item_SetPublisher( p_input->p->p_item, p_pgrm->psz_publisher );
 
     input_SendEventMeta( p_input );
@@ -1154,7 +1154,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
 
     /* Check against empty meta data (empty for what we handle) */
     if( !vlc_meta_Get( p_meta, vlc_meta_Title) &&
-        !vlc_meta_Get( p_meta, vlc_meta_NowPlaying) &&
+        !vlc_meta_Get( p_meta, vlc_meta_ESNowPlaying) &&
         !vlc_meta_Get( p_meta, vlc_meta_Publisher) &&
         vlc_meta_GetExtraCount( p_meta ) <= 0 )
     {
@@ -1293,20 +1293,20 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
 
     if( p_pgrm == p_sys->p_pgrm )
     {
-        input_item_SetNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
+        input_item_SetESNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
         input_SendEventMeta( p_input );
     }
 
     if( p_pgrm->psz_now_playing )
     {
         input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-            vlc_meta_TypeToLocalizedString(vlc_meta_NowPlaying), "%s",
+            vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying), "%s",
             p_pgrm->psz_now_playing );
     }
     else
     {
         input_Control( p_input, INPUT_DEL_INFO, psz_cat,
-            vlc_meta_TypeToLocalizedString(vlc_meta_NowPlaying) );
+            vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying) );
     }
 
     free( psz_cat );

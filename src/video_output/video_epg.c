@@ -263,7 +263,7 @@ static void OSDEpgDestroy(subpicture_t *subpic)
  */
 int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
 {
-    char *now_playing = input_item_GetNowPlaying(input);
+    char *now_playing = input_item_GetNowPlayingFb(input);
     vlc_epg_t *epg = NULL;
 
     vlc_mutex_lock(&input->lock);

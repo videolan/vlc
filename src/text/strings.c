@@ -603,7 +603,16 @@ char *str_format_meta(input_thread_t *input, const char *s)
                 write_meta(stream, item, vlc_meta_TrackNumber);
                 break;
             case 'p':
-                write_meta(stream, item, vlc_meta_NowPlaying);
+                if (item == NULL)
+                    break;
+                {
+                    char *value = input_item_GetNowPlayingFb(item);
+                    if (value == NULL)
+                        break;
+
+                    fputs(value, stream);
+                    free(value);
+                }
                 break;
             case 'r':
                 write_meta(stream, item, vlc_meta_Rating);
@@ -763,18 +772,27 @@ char *str_format_meta(input_thread_t *input, const char *s)
             case 'Z':
                 if (item == NULL)
                     break;
-                if (write_meta(stream, item, vlc_meta_NowPlaying) == EOF)
                 {
-                    char *title = input_item_GetTitleFbName(item);
+                    char *value = input_item_GetNowPlayingFb(item);
+                    if (value == NULL)
+                        break;
 
-                    if (write_meta(stream, item, vlc_meta_Artist) >= 0
-                     && title != NULL)
-                        fputs(" - ", stream);
+                    int ret = fputs(value, stream);
+                    free(value);
 
-                    if (title != NULL)
+                    if (ret == EOF)
                     {
-                        fputs(title, stream);
-                        free(title);
+                        char *title = input_item_GetTitleFbName(item);
+
+                        if (write_meta(stream, item, vlc_meta_Artist) >= 0
+                            && title != NULL)
+                            fputs(" - ", stream);
+
+                        if (title != NULL)
+                        {
+                            fputs(title, stream);
+                            free(title);
+                        }
                     }
                 }
                 break;
