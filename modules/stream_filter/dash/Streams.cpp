@@ -77,6 +77,8 @@ Format Stream::mimeToFormat(const std::string &mime)
         std::string tail = mime.substr(pos + 1);
         if(tail == "mp4")
             format = Streams::MP4;
+        else if (tail == "mp2t")
+            format = Streams::MPEG2TS;
     }
     return format;
 }
@@ -88,6 +90,9 @@ void Stream::create(demux_t *demux, IAdaptationLogic *logic)
     {
         case Streams::MP4:
             output = new MP4StreamOutput(demux);
+            break;
+        case Streams::MPEG2TS:
+            output = new MPEG2TSStreamOutput(demux);
             break;
         default:
             throw VLC_EBADVAR;
@@ -297,6 +302,14 @@ MP4StreamOutput::MP4StreamOutput(demux_t *demux) :
     AbstractStreamOutput(demux)
 {
     demuxstream = stream_DemuxNew(demux, "mp4", fakeesout);
+    if(!demuxstream)
+        throw VLC_EGENERIC;
+}
+
+MPEG2TSStreamOutput::MPEG2TSStreamOutput(demux_t *demux) :
+    AbstractStreamOutput(demux)
+{
+    demuxstream = stream_DemuxNew(demux, "ts", fakeesout);
     if(!demuxstream)
         throw VLC_EGENERIC;
 }

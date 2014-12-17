@@ -97,6 +97,13 @@ namespace dash
                 MP4StreamOutput(demux_t *);
                 virtual ~MP4StreamOutput(){}
         };
+
+        class MPEG2TSStreamOutput : public AbstractStreamOutput
+        {
+            public:
+                MPEG2TSStreamOutput(demux_t *);
+                virtual ~MPEG2TSStreamOutput(){}
+        };
     }
 }
 #endif // STREAMS_HPP
