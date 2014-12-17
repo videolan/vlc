@@ -26,7 +26,6 @@
 #define MPDFACTORY_H_
 
 #include "mpd/MPD.h"
-#include "mpd/BasicCMParser.h"
 #include "mpd/IsoffMainParser.h"
 
 namespace dash

@@ -37,9 +37,6 @@ MPD* MPDFactory::create             (dash::xml::Node *root, stream_t *p_stream, 
 
     switch( profile )
     {
-        case Profile::Full:
-            parser = new BasicCMParser(root, p_stream);
-            break;
         case Profile::ISOOnDemand:
         case Profile::ISOMain:
         case Profile::ISOLive:

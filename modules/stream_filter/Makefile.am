@@ -39,8 +39,6 @@ libdash_plugin_la_SOURCES = \
     stream_filter/dash/mpd/AdaptationSet.cpp \
     stream_filter/dash/mpd/AdaptationSet.h \
     stream_filter/dash/mpd/BaseUrl.h \
-    stream_filter/dash/mpd/BasicCMParser.cpp \
-    stream_filter/dash/mpd/BasicCMParser.h \
     stream_filter/dash/mpd/CommonAttributesElements.cpp \
     stream_filter/dash/mpd/CommonAttributesElements.h \
     stream_filter/dash/mpd/ContentDescription.cpp \
