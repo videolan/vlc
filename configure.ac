@@ -3792,7 +3792,7 @@ AS_IF([test "${enable_ncurses}" != "no"] ,[
   PKG_CHECK_MODULES([NCURSES], [ncursesw], [
     VLC_ADD_PLUGIN([ncurses])
     VLC_ADD_CFLAGS([ncurses],[${NCURSES_CFLAGS}])
-    VLC_ADD_LIBS([ncurses],[${NCURSES_LIBS}])
+    VLC_ADD_LIBS([ncurses],[${NCURSES_LIBS} ${LIBPTHREAD}])
     ALIASES="${ALIASES} nvlc"
   ], [
     AS_IF([test -n "${enable_ncurses}"], [
