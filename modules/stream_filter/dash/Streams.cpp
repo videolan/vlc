@@ -30,17 +30,18 @@ using namespace dash::logic;
 
 Stream::Stream(const std::string &mime)
 {
-    init(mimeToType(mime));
+    init(mimeToType(mime), mimeToFormat(mime));
 }
 
-Stream::Stream(const Type type)
+Stream::Stream(const Type type, const Format format)
 {
-    init(type);
+    init(type, format);
 }
 
-void Stream::init(const Type type_)
+void Stream::init(const Type type_, const Format format_)
 {
     type = type_;
+    format = format_;
     output = NULL;
     currentChunk = NULL;
     eof = false;
@@ -56,21 +57,42 @@ Stream::~Stream()
 Type Stream::mimeToType(const std::string &mime)
 {
     Type mimetype;
-    if (mime == "video/mp4")
+    if (!mime.compare(0, 6, "video/"))
         mimetype = Streams::VIDEO;
-    else if (mime == "audio/mp4")
+    else if (!mime.compare(0, 6, "audio/"))
         mimetype = Streams::AUDIO;
-    else if (mime == "application/mp4")
+    else if (!mime.compare(0, 12, "application/"))
         mimetype = Streams::APPLICATION;
     else /* unknown of unsupported */
         mimetype = Streams::UNKNOWN;
     return mimetype;
 }
 
-void Stream::init(demux_t *demux, IAdaptationLogic *logic)
+Format Stream::mimeToFormat(const std::string &mime)
 {
-    output = new Streams::MP4StreamOutput(demux);
+    Format format = Streams::UNSUPPORTED;
+    std::string::size_type pos = mime.find("/");
+    if(pos != std::string::npos)
+    {
+        std::string tail = mime.substr(pos + 1);
+        if(tail == "mp4")
+            format = Streams::MP4;
+    }
+    return format;
+}
+
+void Stream::create(demux_t *demux, IAdaptationLogic *logic)
+{
     adaptationLogic = logic;
+    switch(format)
+    {
+        case Streams::MP4:
+            output = new MP4StreamOutput(demux);
+            break;
+        default:
+            throw VLC_EBADVAR;
+            break;
+    }
 }
 
 bool Stream::isEOF() const

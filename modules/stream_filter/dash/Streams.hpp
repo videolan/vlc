@@ -41,11 +41,12 @@ namespace dash
         {
             public:
                 Stream(const std::string &mime);
-                Stream(const Type);
+                Stream(const Type, const Format);
                 ~Stream();
                 bool operator==(const Stream &) const;
                 static Type mimeToType(const std::string &mime);
-                void init(demux_t *, logic::IAdaptationLogic *);
+                static Format mimeToFormat(const std::string &mime);
+                void create(demux_t *, logic::IAdaptationLogic *);
                 bool isEOF() const;
                 mtime_t getPCR() const;
                 int getGroup() const;
@@ -54,8 +55,9 @@ namespace dash
 
             private:
                 http::Chunk *getChunk();
-                void init(const Type);
+                void init(const Type, const Format);
                 Type type;
+                Format format;
                 AbstractStreamOutput *output;
                 logic::IAdaptationLogic *adaptationLogic;
                 http::Chunk *currentChunk;

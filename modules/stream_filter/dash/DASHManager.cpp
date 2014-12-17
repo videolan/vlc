@@ -66,10 +66,10 @@ bool DASHManager::start(demux_t *demux)
         const AdaptationSet *set = period->getAdaptationSet(type);
         if(set)
         {
-            streams[type] = new Streams::Stream(type);
+            streams[type] = new Streams::Stream(set->getMimeType());
             try
             {
-                streams[type]->init(demux, AdaptationLogicFactory::create( logicType, mpd ) );
+                streams[type]->create(demux, AdaptationLogicFactory::create( logicType, mpd ) );
             } catch (int) {
                 delete streams[type];
                 streams[type] = NULL;

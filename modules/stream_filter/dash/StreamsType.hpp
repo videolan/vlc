@@ -32,6 +32,13 @@ namespace dash
             APPLICATION
         };
 
+        enum Format
+        {
+            UNSUPPORTED = 0,
+            MP4,
+            MPEG2TS
+        };
+
         static const int count = APPLICATION + 1;
     }
 }
