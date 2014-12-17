@@ -141,7 +141,9 @@ struct decoder_sys_t
     jfieldID profile_levels_field, profile_field, level_field;
     jmethodID get_supported_types, get_name;
     jmethodID create_by_codec_name, configure, start, stop, flush, release;
-    jmethodID get_output_format, get_input_buffers, get_output_buffers;
+    jmethodID get_output_format;
+    jmethodID get_input_buffers, get_input_buffer;
+    jmethodID get_output_buffers, get_output_buffer;
     jmethodID dequeue_input_buffer, dequeue_output_buffer, queue_input_buffer;
     jmethodID release_output_buffer;
     jmethodID create_video_format, set_integer, set_bytebuffer, get_integer;
@@ -226,8 +228,10 @@ static const struct member members[] = {
     { "flush", "()V", "android/media/MediaCodec", OFF(flush), METHOD, true },
     { "release", "()V", "android/media/MediaCodec", OFF(release), METHOD, true },
     { "getOutputFormat", "()Landroid/media/MediaFormat;", "android/media/MediaCodec", OFF(get_output_format), METHOD, true },
-    { "getInputBuffers", "()[Ljava/nio/ByteBuffer;", "android/media/MediaCodec", OFF(get_input_buffers), METHOD, true },
-    { "getOutputBuffers", "()[Ljava/nio/ByteBuffer;", "android/media/MediaCodec", OFF(get_output_buffers), METHOD, true },
+    { "getInputBuffers", "()[Ljava/nio/ByteBuffer;", "android/media/MediaCodec", OFF(get_input_buffers), METHOD, false },
+    { "getInputBuffer", "(I)Ljava/nio/ByteBuffer;", "android/media/MediaCodec", OFF(get_input_buffer), METHOD, false },
+    { "getOutputBuffers", "()[Ljava/nio/ByteBuffer;", "android/media/MediaCodec", OFF(get_output_buffers), METHOD, false },
+    { "getOutputBuffer", "(I)Ljava/nio/ByteBuffer;", "android/media/MediaCodec", OFF(get_output_buffer), METHOD, false },
     { "dequeueInputBuffer", "(J)I", "android/media/MediaCodec", OFF(dequeue_input_buffer), METHOD, true },
     { "dequeueOutputBuffer", "(Landroid/media/MediaCodec$BufferInfo;J)I", "android/media/MediaCodec", OFF(dequeue_output_buffer), METHOD, true },
     { "queueInputBuffer", "(IIIJI)V", "android/media/MediaCodec", OFF(queue_input_buffer), METHOD, true },
@@ -380,6 +384,15 @@ static int OpenDecoder(vlc_object_t *p_this)
             if (members[i].critical)
                 goto error;
         }
+    }
+    /* getInputBuffers and getOutputBuffers are deprecated if API >= 21
+     * use getInputBuffer and getOutputBuffer instead. */
+    if (p_sys->get_input_buffer && p_sys->get_output_buffer) {
+        p_sys->get_output_buffers =
+        p_sys->get_input_buffers = NULL;
+    } else if (!p_sys->get_output_buffers && !p_sys->get_input_buffers) {
+        msg_Warn(p_dec, "Unable to find get Output/Input Buffer/Buffers");
+        goto error;
     }
 
     int num_codecs = (*env)->CallStaticIntMethod(env, p_sys->media_codec_list_class,
@@ -579,11 +592,13 @@ loopclean:
     }
     p_sys->started = true;
 
-    p_sys->input_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_input_buffers);
-    p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_buffers);
+    if (p_sys->get_input_buffers && p_sys->get_output_buffers) {
+        p_sys->input_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_input_buffers);
+        p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_buffers);
+        p_sys->input_buffers = (*env)->NewGlobalRef(env, p_sys->input_buffers);
+        p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
+    }
     p_sys->buffer_info = (*env)->NewObject(env, p_sys->buffer_info_class, p_sys->buffer_info_ctor);
-    p_sys->input_buffers = (*env)->NewGlobalRef(env, p_sys->input_buffers);
-    p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
     p_sys->buffer_info = (*env)->NewGlobalRef(env, p_sys->buffer_info);
     (*env)->DeleteLocalRef(env, format);
 
@@ -793,7 +808,12 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                     InsertInflightPicture(p_dec, p_pic, index);
                     vlc_mutex_unlock(get_android_opaque_mutex());
                 } else {
-                    jobject buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers, index);
+                    jobject buf;
+                    if (p_sys->get_output_buffers)
+                        buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers, index);
+                    else
+                        buf = (*env)->CallObjectMethod(env, p_sys->codec,
+                                                       p_sys->get_output_buffer, index);
                     //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
                     uint8_t *ptr = (*env)->GetDirectBufferAddress(env, buf);
 
@@ -833,6 +853,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
 
         } else if (index == INFO_OUTPUT_BUFFERS_CHANGED) {
             msg_Dbg(p_dec, "output buffers changed");
+            if (!p_sys->get_output_buffers)
+                continue;
             (*env)->DeleteGlobalRef(env, p_sys->output_buffers);
 
             p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
@@ -1028,7 +1050,11 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             continue;
         }
 
-        jobject buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers, index);
+        jobject buf;
+        if (p_sys->get_input_buffers)
+            buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers, index);
+        else
+            buf = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_input_buffer, index);
         jsize size = (*env)->GetDirectBufferCapacity(env, buf);
         uint8_t *bufptr = (*env)->GetDirectBufferAddress(env, buf);
         if (size < 0) {
