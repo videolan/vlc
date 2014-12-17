@@ -308,6 +308,7 @@ typedef struct
 struct demux_sys_t
 {
     stream_t   *stream;
+    bool        b_canseek;
     vlc_mutex_t     csa_lock;
 
     /* TS packet size (188, 192, 204) */
@@ -794,6 +795,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_split_es = var_InheritBool( p_demux, "ts-split-es" );
 
+    p_sys->b_canseek = false;
     p_sys->i_pid_ref_pcr = -1;
     p_sys->i_first_pcr = -1;
     p_sys->i_current_pcr = -1;
@@ -811,18 +813,23 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    bool can_seek = false;
-    stream_Control( p_sys->stream, STREAM_CAN_FASTSEEK, &can_seek );
-    if( can_seek  )
+    bool b_can_fastseek = false;
+    stream_Control( p_sys->stream, STREAM_CAN_SEEK, &p_sys->b_canseek );
+    stream_Control( p_sys->stream, STREAM_CAN_FASTSEEK, &b_can_fastseek );
+    if ( p_sys->b_canseek )
     {
-        GetFirstPCR( p_demux );
-        CheckPCR( p_demux );
-        GetLastPCR( p_demux );
-    }
-    if( p_sys->i_first_pcr < 0 || p_sys->i_last_pcr < 0 )
-    {
-        msg_Dbg( p_demux, "Force Seek Per Percent: PCR's not found,");
-        p_sys->b_force_seek_per_percent = true;
+        if( b_can_fastseek )
+        {
+            GetFirstPCR( p_demux );
+            CheckPCR( p_demux );
+            GetLastPCR( p_demux );
+        }
+
+        if( p_sys->i_first_pcr < 0 || p_sys->i_last_pcr < 0 )
+        {
+            msg_Dbg( p_demux, "Force Seek Per Percent: PCR's not found,");
+            p_sys->b_force_seek_per_percent = true;
+        }
     }
 
     while( p_sys->i_pmt_es <= 0 && vlc_object_alive( p_demux ) )
@@ -1087,6 +1094,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_POSITION:
         f = (double) va_arg( args, double );
+
+        if(!p_sys->b_canseek)
+            return VLC_EGENERIC;
 
         if( p_sys->b_force_seek_per_percent ||
             (p_sys->b_dvb_meta && p_sys->b_access_control) ||
