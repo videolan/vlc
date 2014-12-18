@@ -76,3 +76,25 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
     if(bpsSamplecount % 5 == 0)
         currentBps = bpsAvg;
 }
+
+FixedRateAdaptationLogic::FixedRateAdaptationLogic(mpd::MPD *mpd) :
+    AbstractAdaptationLogic(mpd)
+{
+    currentBps = var_InheritInteger( mpd->getVLCObject(), "dash-prefbw" ) * 8192;
+}
+
+Representation *FixedRateAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
+{
+    if(currentPeriod == NULL)
+        return NULL;
+
+    RepresentationSelector selector;
+    Representation *rep = selector.select(currentPeriod, type, currentBps);
+    if ( rep == NULL )
+    {
+        rep = selector.select(currentPeriod, type);
+        if ( rep == NULL )
+            return NULL;
+    }
+    return rep;
+}

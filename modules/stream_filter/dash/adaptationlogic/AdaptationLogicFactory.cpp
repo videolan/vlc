@@ -39,9 +39,10 @@ IAdaptationLogic* AdaptationLogicFactory::create ( IAdaptationLogic::LogicType l
     switch(logic)
     {
         case IAdaptationLogic::AlwaysBest:      return new AlwaysBestAdaptationLogic    (mpd);
-        case IAdaptationLogic::RateBased:       return new RateBasedAdaptationLogic     (mpd);
         case IAdaptationLogic::AlwaysLowest:    return new AlwaysLowestAdaptationLogic  (mpd);
+        case IAdaptationLogic::FixedRate:       return new FixedRateAdaptationLogic     (mpd);
         case IAdaptationLogic::Default:
+        case IAdaptationLogic::RateBased:       return new RateBasedAdaptationLogic     (mpd);
         default:
             return NULL;
     }

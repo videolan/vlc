@@ -44,7 +44,8 @@ namespace dash
                     Default,
                     AlwaysBest,
                     AlwaysLowest,
-                    RateBased
+                    RateBased,
+                    FixedRate
                 };
 
                 virtual dash::http::Chunk*                  getNextChunk            (Streams::Type) = 0;

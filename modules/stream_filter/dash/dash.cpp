@@ -55,6 +55,9 @@ static void Close   (vlc_object_t *);
 #define DASH_HEIGHT_TEXT N_("Preferred Height")
 #define DASH_HEIGHT_LONGTEXT N_("Preferred Height")
 
+#define DASH_BW_TEXT N_("Fixed Bandwidth in KiB/s")
+#define DASH_BW_LONGTEXT N_("Preferred bandwidth for non adaptative streams")
+
 vlc_module_begin ()
         set_shortname( N_("DASH"))
         set_description( N_("Dynamic Adaptive Streaming over HTTP") )
@@ -63,6 +66,7 @@ vlc_module_begin ()
         set_subcategory( SUBCAT_INPUT_DEMUX )
         add_integer( "dash-prefwidth",  480, DASH_WIDTH_TEXT,  DASH_WIDTH_LONGTEXT,  true )
         add_integer( "dash-prefheight", 360, DASH_HEIGHT_TEXT, DASH_HEIGHT_LONGTEXT, true )
+        add_integer( "dash-prefbw",     250, DASH_BW_TEXT,     DASH_BW_LONGTEXT,     false )
         set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -105,7 +109,7 @@ static int Open(vlc_object_t *p_obj)
 
     p_sys->p_mpd = mpd;
     dash::DASHManager*p_dashManager = new dash::DASHManager(p_sys->p_mpd,
-                                          dash::logic::IAdaptationLogic::AlwaysLowest,
+                                          dash::logic::IAdaptationLogic::Default,
                                           p_demux->s);
 
     dash::mpd::Period *period = mpd->getFirstPeriod();

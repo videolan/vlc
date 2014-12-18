@@ -48,6 +48,17 @@ namespace dash
                 size_t                  bpsSamplecount;
                 size_t                  currentBps;
         };
+
+        class FixedRateAdaptationLogic : public AbstractAdaptationLogic
+        {
+            public:
+                FixedRateAdaptationLogic(mpd::MPD *mpd);
+
+                dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;
+
+            private:
+                size_t                  currentBps;
+        };
     }
 }
 
