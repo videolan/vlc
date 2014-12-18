@@ -58,12 +58,27 @@ static void Close   (vlc_object_t *);
 #define DASH_BW_TEXT N_("Fixed Bandwidth in KiB/s")
 #define DASH_BW_LONGTEXT N_("Preferred bandwidth for non adaptative streams")
 
+#define DASH_LOGIC_TEXT N_("Adaptation Logic")
+
+static const int pi_logics[] = {dash::logic::IAdaptationLogic::RateBased,
+                                dash::logic::IAdaptationLogic::FixedRate,
+                                dash::logic::IAdaptationLogic::AlwaysLowest,
+                                dash::logic::IAdaptationLogic::AlwaysBest};
+
+static const char *const ppsz_logics[] = { N_("Bandwidth Adaptive"),
+                                           N_("Fixed Bandwidth"),
+                                           N_("Lowest Bandwidth/Quality"),
+                                           N_("Highest Bandwith/Quality")};
+
 vlc_module_begin ()
         set_shortname( N_("DASH"))
         set_description( N_("Dynamic Adaptive Streaming over HTTP") )
         set_capability( "demux", 10 )
         set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_DEMUX )
+        add_integer( "dash-logic",      dash::logic::IAdaptationLogic::Default,
+                                             DASH_LOGIC_TEXT, NULL, false )
+            change_integer_list( pi_logics, ppsz_logics )
         add_integer( "dash-prefwidth",  480, DASH_WIDTH_TEXT,  DASH_WIDTH_LONGTEXT,  true )
         add_integer( "dash-prefheight", 360, DASH_HEIGHT_TEXT, DASH_HEIGHT_LONGTEXT, true )
         add_integer( "dash-prefbw",     250, DASH_BW_TEXT,     DASH_BW_LONGTEXT,     false )
@@ -108,9 +123,10 @@ static int Open(vlc_object_t *p_obj)
         return VLC_ENOMEM;
 
     p_sys->p_mpd = mpd;
+    int logic = var_InheritInteger( p_obj, "dash-logic" );
     dash::DASHManager*p_dashManager = new dash::DASHManager(p_sys->p_mpd,
-                                          dash::logic::IAdaptationLogic::Default,
-                                          p_demux->s);
+            static_cast<dash::logic::IAdaptationLogic::LogicType>(logic),
+            p_demux->s);
 
     dash::mpd::Period *period = mpd->getFirstPeriod();
     if(period && !p_dashManager->start(p_demux))
