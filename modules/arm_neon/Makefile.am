@@ -1,3 +1,5 @@
+LIBTOOL=@LIBTOOL@ --tag=CC
+
 neondir = $(pluginsdir)/arm_neon
 
 libchroma_yuv_neon_plugin_la_SOURCES = \
