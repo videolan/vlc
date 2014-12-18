@@ -226,7 +226,7 @@ void IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformatio
         Segment *seg;
 
         size_t start = 0, end = 0;
-        if (std::sscanf(segmentBaseNode->getAttributeValue("indexRange").c_str(), "%"PRIu64"-%"PRIu64, &start, &end) == 2)
+        if (std::sscanf(segmentBaseNode->getAttributeValue("indexRange").c_str(), "%zu-%zu", &start, &end) == 2)
         {
             seg = new IndexSegment(info);
             seg->setByteRange(start, end);
