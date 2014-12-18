@@ -690,7 +690,7 @@ static int Open( vlc_object_t * p_this )
 
     MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
 
-    if ( p_sys->b_smooth || p_sys->b_dash )
+    if ( p_sys->b_smooth )
     {
         p_demux->pf_demux = DemuxFrg;
         msg_Dbg( p_demux, "Set DemuxFrg mode" );
