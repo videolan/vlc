@@ -687,7 +687,7 @@ static chunk_t *get_chunk( stream_t *s, const bool wait, bool *pb_isinit )
          * module anyaway. */
         if( !wait || p_sys->b_error )
         {
-            msg_Warn( s, "get_chunk failed! (starttime %"PRIu64")", p_chunk->start_time );
+            msg_Warn( s, "get_chunk failed! (starttime %"PRId64")", p_chunk->start_time );
             vlc_mutex_unlock( &p_sys->p_current_stream->chunks_lock );
             return NULL;
         }
@@ -699,7 +699,7 @@ static chunk_t *get_chunk( stream_t *s, const bool wait, bool *pb_isinit )
             return NULL;
         }
 
-        msg_Dbg( s, "get_chunk is waiting for chunk %ld !!!", p_chunk->start_time );
+        msg_Dbg( s, "get_chunk is waiting for chunk %"PRId64"!!!", p_chunk->start_time );
         vlc_mutex_lock( &p_sys->playback.lock );
         p_sys->playback.b_underrun = true;
         vlc_mutex_unlock( &p_sys->playback.lock );
@@ -712,7 +712,7 @@ static chunk_t *get_chunk( stream_t *s, const bool wait, bool *pb_isinit )
         setChunkOffset( p_sys, p_chunk );
 #ifndef NDEBUG
         if ( !p_chunk->read_pos )
-            msg_Dbg( s, "Sending chunk %ld from offset %"PRId64, p_chunk->start_time, p_chunk->offset );
+            msg_Dbg( s, "Sending chunk %"PRId64" from offset %"PRId64, p_chunk->start_time, p_chunk->offset );
 #endif
     }
     vlc_mutex_unlock( &p_sys->p_current_stream->chunks_lock );
@@ -882,11 +882,11 @@ static int chunk_Seek( stream_t *s, const uint64_t pos )
     {
         if( p_sys->b_live )
         {
-            msg_Err( s, "Cannot seek to %ld outside the current chunk for a live stream at %ld", pos, p_sys->playback.boffset );
+            msg_Err( s, "Cannot seek to %"PRIu64" outside the current chunk for a live stream at %"PRIu64, pos, p_sys->playback.boffset );
             return VLC_EGENERIC;
         }
 
-        msg_Info( s, "Seeking outside the current chunk (%ld->%ld) to %ld", chunk->offset, chunk->offset+chunk->size, pos );
+        msg_Info( s, "Seeking outside the current chunk (%"PRIu64"->%"PRIu64") to %"PRIu64, chunk->offset, chunk->offset+chunk->size, pos );
         assert( pos <= FAKE_STREAM_SIZE );
 
         vlc_mutex_lock( &p_sys->lock );
