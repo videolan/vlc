@@ -1,0 +1,29 @@
+--- harfbuzz-0.9.5/configure.ac.orig	2012-10-18 15:58:56.940962618 +0200
++++ harfbuzz-0.9.5/configure.ac	2012-10-18 15:59:24.348963620 +0200
+@@ -117,7 +117,7 @@
+ 
+ dnl ===========================================================================
+ 
+-have_hb_old=true
++have_hb_old=false
+ if $have_hb_old; then
+ 	AC_DEFINE(HAVE_HB_OLD, 1, [Have Old HarfBuzz backend])
+ fi
+@@ -208,7 +208,7 @@
+ 
+ dnl ===========================================================================
+ 
+-AC_CHECK_HEADERS(usp10.h windows.h, have_uniscribe=true, have_uniscribe=false)
++have_uniscribe=false
+ if $have_uniscribe; then
+ 	UNISCRIBE_CFLAGS=
+ 	UNISCRIBE_LIBS="-lusp10 -lgdi32"
+@@ -220,7 +220,7 @@
+ 
+ dnl ===========================================================================
+ 
+-AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, have_coretext=true, have_coretext=false)
++have_coretext=false
+ if $have_coretext; then
+ 	CORETEXT_CFLAGS=
+ 	CORETEXT_LIBS="-framework ApplicationServices"
