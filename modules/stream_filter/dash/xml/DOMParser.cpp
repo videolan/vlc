@@ -166,12 +166,24 @@ bool    DOMParser::isDash                   (stream_t *stream)
 
 Profile DOMParser::getProfile() const
 {
+    Profile res(Profile::Unknown);
     if(this->root == NULL)
-        return Profile(Profile::Unknown);
+        return res;
 
     std::string urn = this->root->getAttributeValue("profiles");
     if ( urn.length() == 0 )
         urn = this->root->getAttributeValue("profile"); //The standard spells it the both ways...
 
-    return Profile(urn);
+
+    size_t pos;
+    size_t nextpos = -1;
+    do
+    {
+        pos = nextpos + 1;
+        nextpos = urn.find_first_of(",", pos);
+        res = Profile(urn.substr(pos, nextpos - pos));
+    }
+    while (nextpos != std::string::npos && res == Profile::Unknown);
+
+    return res;
 }
