@@ -55,10 +55,29 @@ struct vlc_va_sys_t
 {
     vdp_t *vdp;
     VdpDevice device;
-    uint16_t width;
-    uint16_t height;
+    VdpChromaType type;
+    uint32_t width;
+    uint32_t height;
     vlc_vdp_video_field_t **pool;
 };
+
+#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 10, 0))
+static int av_vdpau_get_surface_parameters(AVCodecContext *avctx,
+                                           VdpChromaType *type,
+                                           uint32_t *width, uint32_t *height)
+{
+    if (type != NULL)
+        *type = VDP_CHROMA_TYPE_420;
+    if (width != NULL)
+        *width = (avctx->coded_width + 1) & ~1;
+    if (height != NULL)
+        *height = (avctx->coded_height + 3) & ~3;
+    return 0;
+}
+#endif
+#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 9, 0))
+# define AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH (0)
+#endif
 
 static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
 {
@@ -66,7 +85,7 @@ static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
     VdpVideoSurface surface;
     VdpStatus err;
 
-    err = vdp_video_surface_create(sys->vdp, sys->device, VDP_CHROMA_TYPE_420,
+    err = vdp_video_surface_create(sys->vdp, sys->device, sys->type,
                                    sys->width, sys->height, &surface);
     if (err != VDP_STATUS_OK)
     {
@@ -153,10 +172,14 @@ static int Copy(vlc_va_t *va, picture_t *pic, void *opaque, uint8_t *data)
 static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
 {
     vlc_va_sys_t *sys = va->sys;
-    unsigned width = (avctx->coded_width + 1) & ~1;
-    unsigned height = (avctx->coded_height + 3) & ~3;
+    VdpChromaType type;
+    uint32_t width, height;
 
-    if (sys->width == width && sys->height == height && sys->pool != NULL)
+    if (av_vdpau_get_surface_parameters(avctx, &type, &width, &height))
+        return VLC_EGENERIC;
+
+    if (sys->type == type && sys->width == width && sys->height == height
+     && sys->pool != NULL)
         return VLC_SUCCESS;
 
 #if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
@@ -179,8 +202,25 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
         sys->pool = NULL;
     }
 
+    sys->type = type;
     sys->width = width;
     sys->height =  height;
+
+    switch (type)
+    {
+        case VDP_CHROMA_TYPE_420:
+            *chromap = VLC_CODEC_VDPAU_VIDEO_420;
+            break;
+        case VDP_CHROMA_TYPE_422:
+            *chromap = VLC_CODEC_VDPAU_VIDEO_422;
+            break;
+        case VDP_CHROMA_TYPE_444:
+            *chromap = VLC_CODEC_VDPAU_VIDEO_444;
+            break;
+        default:
+            msg_Err(va, "unsupported chroma type %"PRIu32, type);
+            return VLC_EGENERIC;
+    }
 
     vlc_vdp_video_field_t **pool = malloc(sizeof (*pool) * (avctx->refs + 6));
     if (unlikely(pool == NULL))
@@ -226,8 +266,6 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
         return VLC_EGENERIC;
     }
 #endif
-    /* TODO: select better chromas when appropriate */
-    *chromap = VLC_CODEC_VDPAU_VIDEO_420;
     return VLC_SUCCESS;
 }
 
@@ -283,17 +321,20 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
         return VLC_EGENERIC;
     }
 
+    sys->type = VDP_CHROMA_TYPE_420;
     sys->width = 0;
     sys->height = 0;
     sys->pool = NULL;
 
 #if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(56, 2, 0))
+    unsigned flags = AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH;
+
     err = vdp_get_proc_address(sys->vdp, sys->device,
                                VDP_FUNC_ID_GET_PROC_ADDRESS, &func);
     if (err != VDP_STATUS_OK)
         goto error;
 
-    if (av_vdpau_bind_context(avctx, sys->device, func, 0))
+    if (av_vdpau_bind_context(avctx, sys->device, func, flags))
         goto error;
 
     (void) fmt;
