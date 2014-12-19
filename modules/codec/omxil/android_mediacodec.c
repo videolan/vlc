@@ -444,6 +444,11 @@ static int OpenDecoder(vlc_object_t *p_this)
                    now check if the capabilities of the codec is
                    matching the video format. */
                 if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && fmt_profile) {
+                    /* This decoder doesn't expose its profiles and is high
+                     * profile capable */
+                    if (!strncmp(name_ptr, "OMX.LUMEVideoDecoder", __MIN(20, name_len)))
+                        found = true;
+
                     for (int i = 0; i < profile_levels_len && !found; ++i) {
                         jobject profile_level = (*env)->GetObjectArrayElement(env, profile_levels, i);
 
