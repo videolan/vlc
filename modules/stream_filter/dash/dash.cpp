@@ -99,7 +99,15 @@ static int Open(vlc_object_t *p_obj)
 {
     demux_t *p_demux = (demux_t*) p_obj;
 
-    if(!dash::xml::DOMParser::isDash(p_demux->s))
+    bool b_mimematched = false;
+    char *psz_mime = stream_ContentType(p_demux->s);
+    if(psz_mime)
+    {
+        b_mimematched = !strcmp(psz_mime, "application/dash+xml");
+        free(psz_mime);
+    }
+
+    if(!b_mimematched && !dash::xml::DOMParser::isDash(p_demux->s))
         return VLC_EGENERIC;
 
     //Build a XML tree
