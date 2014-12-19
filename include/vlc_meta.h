@@ -60,7 +60,7 @@ typedef enum vlc_meta_type_t
     vlc_meta_DiscNumber
 } vlc_meta_type_t;
 
-#define VLC_META_TYPE_COUNT 25
+#define VLC_META_TYPE_COUNT 26
 
 #define ITEM_PREPARSED       1
 #define ITEM_ARTURL_FETCHED  2
