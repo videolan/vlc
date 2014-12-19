@@ -65,11 +65,11 @@ void    IsoffMainParser::setMPDAttributes   ()
 
     it = attr.find("mediaPresentationDuration");
     if(it != attr.end())
-        this->mpd->setDuration(str_duration(it->second.c_str()));
+        this->mpd->setDuration(IsoTime(it->second));
 
     it = attr.find("minBufferTime");
     if(it != attr.end())
-        this->mpd->setMinBufferTime(str_duration( it->second.c_str()));
+        this->mpd->setMinBufferTime(IsoTime(it->second));
 
     it = attr.find("type");
     if(it != attr.end())
@@ -343,4 +343,14 @@ void    IsoffMainParser::print              ()
             }
         }
     }
+}
+
+IsoTime::IsoTime(const std::string &str)
+{
+    time = str_duration(str.c_str());
+}
+
+IsoTime::operator mtime_t () const
+{
+    return time;
 }

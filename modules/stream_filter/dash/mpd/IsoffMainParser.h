@@ -60,6 +60,16 @@ namespace dash
                 size_t  parseSegmentList    (dash::xml::Node *, SegmentInformation *);
                 size_t  parseSegmentTemplate(dash::xml::Node *, SegmentInformation *);
         };
+
+        class IsoTime
+        {
+            public:
+                IsoTime(const std::string&);
+                operator mtime_t() const;
+
+            private:
+                mtime_t time;
+        };
     }
 }
 
