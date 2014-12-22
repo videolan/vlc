@@ -253,7 +253,7 @@ dash::http::Chunk * IndexSegment::getChunk(const std::string &url)
 IndexSegment::IndexSegmentChunk::IndexSegmentChunk(ISegment *segment, const std::string &url)
     : SegmentChunk(segment, url)
 {
-
+    rep = NULL;
 }
 
 void IndexSegment::IndexSegmentChunk::setIndexRepresentation(Representation *rep_)
