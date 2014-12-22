@@ -54,7 +54,7 @@ namespace dash
                 dash::mpd::MPD         *mpd;
                 dash::mpd::Period      *currentPeriod;
                 size_t                  count;
-                const mpd::Representation *prevRepresentation;
+                mpd::Representation    *prevRepresentation;
 
             private:
                 mtime_t                 bufferedMicroSec;

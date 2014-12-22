@@ -48,6 +48,7 @@ namespace dash
                 explicit SegmentInformation( ICanonicalUrl * );
                 virtual ~SegmentInformation();
                 std::vector<ISegment *> getSegments() const;
+                bool canBitswitch() const;
 
                 class SplitPoint
                 {
@@ -69,6 +70,7 @@ namespace dash
                 void setSegmentList(SegmentList *);
                 void setSegmentBase(SegmentBase *);
                 void setSegmentTemplate(SegmentTemplate *, SegmentInfoType);
+                void setBitstreamSwitching(bool);
 
                 SegmentBase *     inheritSegmentBase() const;
                 SegmentList *     inheritSegmentList() const;
@@ -78,6 +80,13 @@ namespace dash
                 SegmentBase     *segmentBase;
                 SegmentList     *segmentList;
                 SegmentTemplate *segmentTemplate[InfoTypeCount];
+
+                enum BitswitchPolicy
+                {
+                    BITSWITCH_INHERIT,
+                    BITSWITCH_YES,
+                    BITSWITCH_NO
+                } bitswitch_policy;
         };
     }
 }

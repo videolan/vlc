@@ -35,6 +35,7 @@ SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
     segmentList = NULL;
     for(int i=0; i<InfoTypeCount; i++)
         segmentTemplate[i] = NULL;
+    bitswitch_policy = BITSWITCH_INHERIT;
 }
 
 SegmentInformation::SegmentInformation(ICanonicalUrl * parent_) :
@@ -45,6 +46,7 @@ SegmentInformation::SegmentInformation(ICanonicalUrl * parent_) :
     segmentList = NULL;
     for(int i=0; i<InfoTypeCount; i++)
         segmentTemplate[i] = NULL;
+    bitswitch_policy = BITSWITCH_INHERIT;
 }
 
 SegmentInformation::~SegmentInformation()
@@ -92,6 +94,14 @@ vector<ISegment *> SegmentInformation::getSegments() const
     }
 
     return retSegments;
+}
+
+bool SegmentInformation::canBitswitch() const
+{
+    if(bitswitch_policy == BITSWITCH_INHERIT)
+        return (parent) ? parent->canBitswitch() : false;
+    else
+        return (bitswitch_policy == BITSWITCH_YES);
 }
 
 void SegmentInformation::setSegmentList(SegmentList *list)
@@ -154,6 +164,11 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
         end = 0;
         insertIntoSegment(seglist, start, end, time);
     }
+}
+
+void SegmentInformation::setBitstreamSwitching(bool bitswitch)
+{
+    bitswitch_policy = (bitswitch) ? BITSWITCH_YES : BITSWITCH_NO;
 }
 
 SegmentBase * SegmentInformation::inheritSegmentBase() const

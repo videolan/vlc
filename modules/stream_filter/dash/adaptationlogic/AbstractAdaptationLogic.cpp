@@ -50,7 +50,13 @@ Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
     if(!currentPeriod)
         return NULL;
 
-    Representation *rep = getCurrentRepresentation(type);
+    Representation *rep;
+
+    if(prevRepresentation && !prevRepresentation->canBitswitch())
+        rep = prevRepresentation;
+    else
+        rep = getCurrentRepresentation(type);
+
     if ( rep == NULL )
             return NULL;
 
@@ -68,6 +74,7 @@ Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
     if (count == segments.size() && !b_templated)
     {
         currentPeriod = mpd->getNextPeriod(currentPeriod);
+        prevRepresentation = NULL;
         count = 0;
         return getNextChunk(type);
     }

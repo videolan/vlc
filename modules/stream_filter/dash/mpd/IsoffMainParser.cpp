@@ -143,6 +143,8 @@ size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *
     parseSegmentBase(DOMHelper::getFirstChildElementByName(node, "SegmentBase"), info);
     total += parseSegmentList(DOMHelper::getFirstChildElementByName(node, "SegmentList"), info);
     total += parseSegmentTemplate(DOMHelper::getFirstChildElementByName(node, "SegmentTemplate" ), info);
+    if(node->hasAttribute("bitstreamSwitching"))
+        info->setBitstreamSwitching(node->getAttributeValue("bitstreamSwitching") == "true");
     return total;
 }
 
