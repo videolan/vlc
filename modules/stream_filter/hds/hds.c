@@ -99,8 +99,10 @@ typedef struct hds_stream_s
     /* can be left as null */
     char*          abst_url;
 
-    /* this comes from the manifest media section  */
+    /* these come from the manifest media section  */
     char*          url;
+    uint8_t*       metadata;
+    size_t         metadata_len;
 
     /* this comes from the bootstrap info */
     char*          movie_id;
@@ -135,7 +137,12 @@ struct stream_sys_t
 
     vlc_array_t  *hds_streams; /* available streams */
 
-    uint32_t     flv_header_bytes_sent;
+    /* Buffer that holds the very first bytes of the stream: the FLV
+     * file header and a possible metadata packet.
+     */
+    uint8_t      *flv_header;
+    size_t       flv_header_len;
+    size_t       flv_header_bytes_sent;
     uint64_t     duration_seconds;
     uint64_t     playback_offset;
 
@@ -155,6 +162,8 @@ typedef struct _media_info {
     char*    stream_id;
     char*    media_url;
     char*    bootstrap_id;
+    uint8_t* metadata;
+    size_t   metadata_len;
     uint32_t bitrate;
 } media_info;
 
@@ -169,6 +178,28 @@ typedef struct _manifest {
     xml_reader_t *vlc_reader;
     xml_t *vlc_xml;
 } manifest_t;
+
+static unsigned char flv_header_bytes[] = {
+        'F',
+        'L',
+        'V',
+        0x1, //version
+        0x5, //indicates audio and video
+        0x0, // length
+        0x0, // length
+        0x0, // length
+        0x9, // length of header
+        0x0,
+        0x0,
+        0x0,
+        0x0, // initial "trailer"
+};
+
+static unsigned char amf_object_end[] = { 0x0, 0x0, 0x9 };
+
+#define FLV_FILE_HEADER_LEN sizeof(flv_header_bytes)
+#define FLV_TAG_HEADER_LEN 15
+#define SCRIPT_TAG 0x12
 
 /*****************************************************************************
  * Module descriptor
@@ -239,7 +270,7 @@ static uint64_t get_stream_size( stream_t* s )
     if ( hds_stream->bitrate == 0 )
         return 0;
 
-    return p_sys->duration_seconds *
+    return p_sys->flv_header_len + p_sys->duration_seconds *
         hds_stream->bitrate * BITRATE_AS_BYTES_PER_SECOND;
 }
 
@@ -1182,6 +1213,7 @@ static void cleanup_Manifest( manifest_t *m )
         free( m->medias[i].stream_id );
         free( m->medias[i].media_url );
         free( m->medias[i].bootstrap_id );
+        free( m->medias[i].metadata );
     }
 
     for( unsigned i = 0; i < MAX_BOOTSTRAP_INFO; i++ )
@@ -1203,6 +1235,76 @@ static void cleanup_threading( hds_stream_t *stream )
     vlc_mutex_destroy( &stream->dl_lock );
     vlc_cond_destroy( &stream->dl_cond );
     vlc_mutex_destroy( &stream->abst_lock );
+}
+
+static void write_int_24( uint8_t *p, uint32_t val )
+{
+    *p         = ( val & 0xFF0000 ) >> 16;
+    *( p + 1 ) = ( val & 0xFF00 ) >> 8;
+    *( p + 2 ) = val & 0xFF;
+}
+
+static void write_int_32( uint8_t *p, uint32_t val )
+{
+    *p         = ( val & 0xFF000000 ) >> 24;
+    *( p + 1 ) = ( val & 0xFF0000 ) >> 16;
+    *( p + 2 ) = ( val & 0xFF00 ) >> 8;
+    *( p + 3 ) = val & 0xFF;
+}
+
+static size_t write_flv_header_and_metadata(
+    uint8_t **pp_buffer,
+    const uint8_t *p_metadata_payload,
+    size_t metadata_payload_len )
+{
+    size_t metadata_packet_len;
+    if ( metadata_payload_len > 0 && p_metadata_payload )
+        metadata_packet_len = FLV_TAG_HEADER_LEN + metadata_payload_len;
+    else
+        metadata_packet_len = 0;
+    size_t data_len = FLV_FILE_HEADER_LEN + metadata_packet_len;
+
+    *pp_buffer = malloc( data_len );
+    if ( ! *pp_buffer )
+    {
+        return 0;
+    }
+
+    // FLV file header
+    memcpy( *pp_buffer, flv_header_bytes, FLV_FILE_HEADER_LEN );
+
+    if ( metadata_payload_len > 0 )
+    {
+        uint8_t *p = *pp_buffer + FLV_FILE_HEADER_LEN;
+
+        // tag type
+        *p = SCRIPT_TAG;
+        p++;
+
+        // payload size
+        write_int_24( p, metadata_payload_len );
+        p += 3;
+
+        // timestamp and stream id
+        memset( p, 0, 7 );
+        p += 7;
+
+        // metadata payload
+        memcpy( p, p_metadata_payload, metadata_payload_len );
+        p += metadata_payload_len;
+
+        // packet payload size
+        write_int_32( p, metadata_packet_len );
+    }
+
+    return data_len;
+}
+
+static void initialize_header_and_metadata( stream_sys_t* p_sys, hds_stream_t *stream )
+{
+    p_sys->flv_header_len =
+        write_flv_header_and_metadata( &p_sys->flv_header, stream->metadata,
+                                       stream->metadata_len );
 }
 
 static int parse_Manifest( stream_t *s, manifest_t *m )
@@ -1297,7 +1399,6 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                     medias[media_idx].bitrate = (uint32_t) atoi( attr_value );
                 }
             }
-
             media_idx++;
         }
 
@@ -1352,6 +1453,35 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                         return VLC_ENOMEM;
                 }
             }
+            else if( ! strcmp( current_element, "metadata" ) &&
+                     ! strcmp( element_stack[current_element_idx-1], "media" ) &&
+                     ( media_idx >= 1 ) )
+            {
+                uint8_t mi = media_idx - 1;
+                if ( ! medias[mi].metadata )
+                {
+                    char* start = node;
+                    char* end = start + strlen(start);
+                    whitespace_substr( &start, &end );
+                    *end = '\0';
+
+                    medias[mi].metadata_len =
+                        vlc_b64_decode_binary( (uint8_t**)&medias[mi].metadata, start );
+
+                    if ( ! medias[mi].metadata )
+                        return VLC_ENOMEM;
+
+                    uint8_t *end_marker =
+                        medias[mi].metadata + medias[mi].metadata_len - sizeof(amf_object_end);
+                    if ( ( end_marker < medias[mi].metadata ) ||
+                         memcmp(end_marker, amf_object_end, sizeof(amf_object_end)) != 0 )
+                    {
+                        msg_Dbg( (vlc_object_t*)s, "Ignoring invalid metadata packet on stream %d", mi );
+                        FREENULL( medias[mi].metadata );
+                        medias[mi].metadata_len = 0;
+                    }
+                }
+            }
         }
     }
 
@@ -1395,6 +1525,22 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                     }
                 }
 
+                if( medias[i].metadata )
+                {
+                    new_stream->metadata = malloc( medias[i].metadata_len );
+                    if ( ! new_stream->metadata )
+                    {
+                        free( new_stream->url );
+                        free( media_id );
+                        cleanup_threading( new_stream );
+                        free( new_stream );
+                        return VLC_ENOMEM;
+                    }
+
+                    memcpy( new_stream->metadata, medias[i].metadata, medias[i].metadata_len );
+                    new_stream->metadata_len = medias[i].metadata_len;
+                }
+
                 if( ! sys->live )
                 {
                     parse_BootstrapData( (vlc_object_t*)s,
@@ -1421,6 +1567,8 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                 {
                     if( !(new_stream->abst_url = strdup( bootstraps[j].url ) ) )
                     {
+                        free( new_stream->metadata );
+                        free( new_stream->url );
                         free( media_id );
                         cleanup_threading( new_stream );
                         free( new_stream );
@@ -1455,6 +1603,7 @@ static void hds_free( hds_stream_t *p_stream )
 
     cleanup_threading( p_stream );
 
+    FREENULL( p_stream->metadata );
     FREENULL( p_stream->url );
     FREENULL( p_stream->movie_id );
     for( int i = 0; i < p_stream->server_entry_count; i++ )
@@ -1574,31 +1723,22 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static unsigned char flv_header[] = {
-        'F',
-        'L',
-        'V',
-        0x1, //version
-        0x5, //indicates audio and video
-        0x0, // length
-        0x0, // length
-        0x0, // length
-        0x9, // length of header
-        0x0,
-        0x0,
-        0x0,
-        0x0, // initial "trailer"
-};
-
-static int send_flv_header( stream_sys_t* p_sys, void* buffer, unsigned i_read,
-                            bool peek )
+static int send_flv_header( hds_stream_t *stream, stream_sys_t* p_sys,
+                            void* buffer, unsigned i_read, bool peek )
 {
-    uint32_t to_be_read = i_read;
-    if( to_be_read > 13 - p_sys->flv_header_bytes_sent ) {
-        to_be_read = 13 - p_sys->flv_header_bytes_sent;
+    if ( !p_sys->flv_header )
+    {
+        initialize_header_and_metadata( p_sys, stream );
     }
 
-    memcpy( buffer, flv_header + p_sys->flv_header_bytes_sent, to_be_read );
+    uint32_t to_be_read = i_read;
+    uint32_t header_remaining =
+        p_sys->flv_header_len - p_sys->flv_header_bytes_sent;
+    if( to_be_read > header_remaining ) {
+        to_be_read = header_remaining;
+    }
+
+    memcpy( buffer, p_sys->flv_header + p_sys->flv_header_bytes_sent, to_be_read );
 
     if( ! peek )
     {
@@ -1710,6 +1850,11 @@ static unsigned read_chunk_data(
     return ( ((uint8_t*)buffer) - ((uint8_t*)buffer_start));
 }
 
+static inline bool header_unfinished( stream_sys_t *p_sys )
+{
+    return p_sys->flv_header_bytes_sent < p_sys->flv_header_len;
+}
+
 static int Read( stream_t *s, void *buffer, unsigned i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -1723,10 +1868,13 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
 
     uint8_t *buffer_uint8 = (uint8_t*) buffer;
 
-    unsigned hdr_bytes = send_flv_header( p_sys, buffer, i_read, false );
-    length += hdr_bytes;
-    i_read -= hdr_bytes;
-    buffer_uint8 += hdr_bytes;
+    if ( header_unfinished( p_sys ) )
+    {
+        unsigned hdr_bytes = send_flv_header( stream, p_sys, buffer, i_read, false );
+        length += hdr_bytes;
+        i_read -= hdr_bytes;
+        buffer_uint8 += hdr_bytes;
+    }
 
     bool eof = false;
     while( i_read > 0 && ! eof )
@@ -1751,10 +1899,15 @@ static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned i_peek )
     // TODO: change here for selectable stream
     hds_stream_t *stream = p_sys->hds_streams->pp_elems[0];
 
-    if( p_sys->flv_header_bytes_sent < 13 )
+    if ( !p_sys->flv_header )
     {
-        *pp_peek = flv_header + p_sys->flv_header_bytes_sent;
-        return 13 - p_sys->flv_header_bytes_sent;
+        initialize_header_and_metadata( p_sys, stream );
+    }
+
+    if( header_unfinished( p_sys ) )
+    {
+        *pp_peek = p_sys->flv_header + p_sys->flv_header_bytes_sent;
+        return p_sys->flv_header_len - p_sys->flv_header_bytes_sent;
     }
 
     if( stream->chunks_head && ! stream->chunks_head->failed && stream->chunks_head->data )
