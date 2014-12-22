@@ -297,10 +297,12 @@ static void MP4_BoxOffsetUp( MP4_Box_t *p_box, uint64_t i_offset )
 static int MP4_ReadBoxContainerRawInBox( stream_t *p_stream, MP4_Box_t *p_container,
                                          uint8_t *p_buffer, uint64_t i_size, uint64_t i_offset )
 {
+    if(!p_container)
+        return 0;
     stream_t *p_substream = stream_MemoryNew( p_stream, p_buffer, i_size, true );
     if( !p_substream )
         return 0;
-    MP4_Box_t *p_last = (p_container) ? p_container->p_last : NULL;
+    MP4_Box_t *p_last = p_container->p_last;
     MP4_ReadBoxContainerRaw( p_substream, p_container );
     stream_Delete( p_substream );
     /* do pos fixup */
