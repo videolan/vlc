@@ -43,6 +43,7 @@ void Stream::init(const Type type_, const Format format_)
     type = type_;
     format = format_;
     output = NULL;
+    adaptationLogic = NULL;
     currentChunk = NULL;
     eof = false;
 }
