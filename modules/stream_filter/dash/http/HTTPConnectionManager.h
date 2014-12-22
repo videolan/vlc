@@ -50,7 +50,6 @@ namespace dash
                 bool    connectChunk        (Chunk *chunk);
 
             private:
-                Chunk                                               *currentChunk;
                 std::vector<PersistentConnection *>                 connectionPool;
                 stream_t                                            *stream;
 
