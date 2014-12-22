@@ -36,6 +36,7 @@ using namespace dash::mpd;
 SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
     ICanonicalUrl( parent ),
     duration( -1 ),
+    startIndex( 0 ),
     initialisationSegment( NULL ),
     segmentTimeline( NULL )
 {
