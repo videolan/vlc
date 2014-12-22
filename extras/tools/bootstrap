@@ -70,8 +70,8 @@ else
 fi
 }
 
-check autoconf 2.67
-check automake 1.11
+check autoconf 2.69
+check automake 1.14
 check m4 1.4.16
 check libtool 2.4
 check pkg-config
@@ -80,8 +80,10 @@ check yasm
 check_tar
 check ragel
 check_sed
+check protoc
+check ant
 
-[ -n "$NEEDED" ] && mkdir -p build/
+[ -n "$NEEDED" ] && mkdir -p build/ && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
 
 CPUS=
 CC=

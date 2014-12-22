@@ -30,6 +30,7 @@
  */
 
 struct vout_window_t;
+struct vout_window_cfg_t;
 
 /**
  * A VLC GL context (and its underlying surface)
@@ -46,9 +47,12 @@ struct vlc_gl_t
 
     int  (*makeCurrent)(vlc_gl_t *);
     void (*releaseCurrent)(vlc_gl_t *);
+    void (*resize)(vlc_gl_t *, unsigned, unsigned);
     void (*swap)(vlc_gl_t *);
+#ifdef __APPLE__
     int  (*lock)(vlc_gl_t *);
     void (*unlock)(vlc_gl_t *);
+#endif
     void*(*getProcAddress)(vlc_gl_t *, const char *);
 };
 
@@ -73,13 +77,27 @@ static inline void vlc_gl_ReleaseCurrent(vlc_gl_t *gl)
 
 static inline int vlc_gl_Lock(vlc_gl_t *gl)
 {
+#ifdef __APPLE__
     return (gl->lock != NULL) ? gl->lock(gl) : VLC_SUCCESS;
+#else
+    (void) gl; return VLC_SUCCESS;
+#endif
 }
 
 static inline void vlc_gl_Unlock(vlc_gl_t *gl)
 {
+#ifdef __APPLE__
     if (gl->unlock != NULL)
         gl->unlock(gl);
+#else
+    (void) gl;
+#endif
+}
+
+static inline void vlc_gl_Resize(vlc_gl_t *gl, unsigned w, unsigned h)
+{
+    if (gl->resize != NULL)
+        gl->resize(gl, w, h);
 }
 
 static inline void vlc_gl_Swap(vlc_gl_t *gl)
@@ -91,5 +109,11 @@ static inline void *vlc_gl_GetProcAddress(vlc_gl_t *gl, const char *name)
 {
     return (gl->getProcAddress != NULL) ? gl->getProcAddress(gl, name) : NULL;
 }
+
+VLC_API vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *,
+                                        const struct vout_window_cfg_t *,
+                                        struct vout_window_t **) VLC_USED;
+VLC_API bool vlc_gl_surface_CheckSize(vlc_gl_t *, unsigned *w, unsigned *h);
+VLC_API void vlc_gl_surface_Destroy(vlc_gl_t *);
 
 #endif /* VLC_GL_H */

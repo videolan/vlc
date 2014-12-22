@@ -54,22 +54,6 @@
     vaCreateSurfaces(d, w, h, f, ns, s)
 #endif
 
-static int Create( vlc_va_t *, AVCodecContext *, const es_format_t * );
-static void Delete( vlc_va_t * );
-
-vlc_module_begin ()
-#if defined (VLC_VA_BACKEND_XLIB)
-    set_description( N_("VA-API video decoder via X11") )
-#elif defined (VLC_VA_BACKEND_DRM)
-    set_description( N_("VA-API video decoder via DRM") )
-#endif
-    set_capability( "hw decoder", 0 )
-    set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_VCODEC )
-    set_callbacks( Create, Delete )
-    add_shortcut( "vaapi" )
-vlc_module_end ()
-
 typedef struct
 {
     VASurfaceID  i_id;
@@ -108,155 +92,6 @@ struct vlc_va_sys_t
 
     bool b_supports_derive;
 };
-
-/* */
-static int Open( vlc_va_t *va, int i_codec_id, int i_thread_count )
-{
-    vlc_va_sys_t *sys = calloc( 1, sizeof(*sys) );
-    if ( unlikely(sys == NULL) )
-       return VLC_ENOMEM;
-
-    VAProfile i_profile, *p_profiles_list;
-    bool b_supported_profile = false;
-    int i_profiles_nb = 0;
-    int i_surface_count;
-
-    /* */
-    switch( i_codec_id )
-    {
-    case AV_CODEC_ID_MPEG1VIDEO:
-    case AV_CODEC_ID_MPEG2VIDEO:
-        i_profile = VAProfileMPEG2Main;
-        i_surface_count = 2 + 2;
-        break;
-    case AV_CODEC_ID_MPEG4:
-        i_profile = VAProfileMPEG4AdvancedSimple;
-        i_surface_count = 2+1;
-        break;
-    case AV_CODEC_ID_WMV3:
-        i_profile = VAProfileVC1Main;
-        i_surface_count = 2+1;
-        break;
-    case AV_CODEC_ID_VC1:
-        i_profile = VAProfileVC1Advanced;
-        i_surface_count = 2+1;
-        break;
-    case AV_CODEC_ID_H264:
-        i_profile = VAProfileH264High;
-        i_surface_count = 16 + i_thread_count + 2;
-        break;;
-    default:
-        free( sys );
-        return VLC_EGENERIC;
-    }
-
-    /* */
-    sys->i_config_id  = VA_INVALID_ID;
-    sys->i_context_id = VA_INVALID_ID;
-    sys->image.image_id = VA_INVALID_ID;
-
-    /* Create a VA display */
-#ifdef VLC_VA_BACKEND_XLIB
-    sys->p_display_x11 = XOpenDisplay(NULL);
-    if( !sys->p_display_x11 )
-    {
-        msg_Err( va, "Could not connect to X server" );
-        goto error;
-    }
-
-    sys->p_display = vaGetDisplay( sys->p_display_x11 );
-#endif
-#ifdef VLC_VA_BACKEND_DRM
-    sys->drm_fd = vlc_open("/dev/dri/card0", O_RDWR);
-    if( sys->drm_fd == -1 )
-    {
-        msg_Err( va, "Could not access rendering device: %m" );
-        goto error;
-    }
-
-    sys->p_display = vaGetDisplayDRM( sys->drm_fd );
-#endif
-    if( !sys->p_display )
-    {
-        msg_Err( va, "Could not get a VAAPI device" );
-        goto error;
-    }
-
-    int major, minor;
-
-    if( vaInitialize( sys->p_display, &major, &minor ) )
-    {
-        msg_Err( va, "Failed to initialize the VAAPI device" );
-        goto error;
-    }
-
-    /* Check if the selected profile is supported */
-    i_profiles_nb = vaMaxNumProfiles( sys->p_display );
-    p_profiles_list = calloc( i_profiles_nb, sizeof( VAProfile ) );
-    if( !p_profiles_list )
-        goto error;
-
-    VAStatus i_status = vaQueryConfigProfiles( sys->p_display, p_profiles_list, &i_profiles_nb );
-    if ( i_status == VA_STATUS_SUCCESS )
-    {
-        for( int i = 0; i < i_profiles_nb; i++ )
-        {
-            if ( p_profiles_list[i] == i_profile )
-            {
-                b_supported_profile = true;
-                break;
-            }
-        }
-    }
-    free( p_profiles_list );
-    if ( !b_supported_profile )
-    {
-        msg_Dbg( va, "Codec and profile not supported by the hardware" );
-        goto error;
-    }
-
-    /* Create a VA configuration */
-    VAConfigAttrib attrib;
-    memset( &attrib, 0, sizeof(attrib) );
-    attrib.type = VAConfigAttribRTFormat;
-    if( vaGetConfigAttributes( sys->p_display,
-                               i_profile, VAEntrypointVLD, &attrib, 1 ) )
-        goto error;
-
-    /* Not sure what to do if not, I don't have a way to test */
-    if( (attrib.value & VA_RT_FORMAT_YUV420) == 0 )
-        goto error;
-    if( vaCreateConfig( sys->p_display,
-                        i_profile, VAEntrypointVLD, &attrib, 1, &sys->i_config_id ) )
-    {
-        sys->i_config_id = VA_INVALID_ID;
-        goto error;
-    }
-
-    sys->i_surface_count = i_surface_count;
-
-    sys->b_supports_derive = false;
-
-    vlc_mutex_init(&sys->lock);
-
-    va->sys = sys;
-    va->description = vaQueryVendorString( sys->p_display );
-    return VLC_SUCCESS;
-
-error:
-    if( sys->p_display != NULL )
-        vaTerminate( sys->p_display );
-#ifdef VLC_VA_BACKEND_XLIB
-    if( sys->p_display_x11 != NULL )
-        XCloseDisplay( sys->p_display_x11 );
-#endif
-#ifdef VLC_VA_BACKEND_DRM
-    if( sys->drm_fd != -1 )
-        close( sys->drm_fd );
-#endif
-    free( sys );
-    return VLC_EGENERIC;
-}
 
 static void DestroySurfaces( vlc_va_sys_t *sys )
 {
@@ -437,30 +272,6 @@ error:
     return VLC_EGENERIC;
 }
 
-static int Setup( vlc_va_t *va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
-                  int i_width, int i_height )
-{
-    vlc_va_sys_t *sys = va->sys;
-
-    if( sys->i_surface_width == i_width &&
-        sys->i_surface_height == i_height )
-    {
-        *pp_hw_ctx = &sys->hw_ctx;
-        *pi_chroma = sys->i_surface_chroma;
-        return VLC_SUCCESS;
-    }
-
-    *pp_hw_ctx = NULL;
-    *pi_chroma = 0;
-    if( sys->i_surface_width || sys->i_surface_height )
-        DestroySurfaces( sys );
-
-    if( i_width > 0 && i_height > 0 )
-        return CreateSurfaces( sys, pp_hw_ctx, pi_chroma, i_width, i_height );
-
-    return VLC_EGENERIC;
-}
-
 static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
                     uint8_t *data )
 {
@@ -581,8 +392,35 @@ static void Release( void *opaque, uint8_t *data )
     (void) data;
 }
 
-static void Close( vlc_va_sys_t *sys )
+static int Setup( vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *pi_chroma )
 {
+    vlc_va_sys_t *sys = va->sys;
+
+    if( sys->i_surface_width == avctx->coded_width &&
+        sys->i_surface_height == avctx->coded_height )
+    {
+        avctx->hwaccel_context = &sys->hw_ctx;
+        *pi_chroma = sys->i_surface_chroma;
+        return VLC_SUCCESS;
+    }
+
+    avctx->hwaccel_context = NULL;
+    *pi_chroma = 0;
+    if( sys->i_surface_width || sys->i_surface_height )
+        DestroySurfaces( sys );
+
+    if( avctx->coded_width <= 0 && avctx->coded_height <= 0 )
+        return VLC_EGENERIC;
+
+    return CreateSurfaces( sys, &avctx->hwaccel_context, pi_chroma,
+                           avctx->coded_width, avctx->coded_height );
+}
+
+static void Delete( vlc_va_t *va, AVCodecContext *avctx )
+{
+    vlc_va_sys_t *sys = va->sys;
+
+    (void) avctx;
     if( sys->i_surface_width || sys->i_surface_height )
         DestroySurfaces( sys );
 
@@ -595,37 +433,180 @@ static void Close( vlc_va_sys_t *sys )
 #ifdef VLC_VA_BACKEND_DRM
     close( sys->drm_fd );
 #endif
-}
-
-static void Delete( vlc_va_t *va )
-{
-    vlc_va_sys_t *sys = va->sys;
-    Close( sys );
     free( sys );
 }
 
-static int Create( vlc_va_t *p_va, AVCodecContext *ctx,
-                   const es_format_t *fmt )
+static int Create( vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt )
 {
+    (void) fmt;
 #ifdef VLC_VA_BACKEND_XLIB
-    if( !vlc_xlib_init( VLC_OBJECT(p_va) ) )
+    if( !vlc_xlib_init( VLC_OBJECT(va) ) )
     {
-        msg_Warn( p_va, "Ignoring VA API" );
+        msg_Warn( va, "Ignoring VA-X11 API" );
         return VLC_EGENERIC;
     }
 #endif
 
-    (void) fmt;
+    vlc_va_sys_t *sys = calloc( 1, sizeof(*sys) );
+    if ( unlikely(sys == NULL) )
+       return VLC_ENOMEM;
 
-    int err = Open( p_va, ctx->codec_id, ctx->thread_count );
-    if( err )
-        return err;
+    VAProfile i_profile, *p_profiles_list;
+    bool b_supported_profile = false;
+    int i_profiles_nb = 0;
+    int i_surface_count;
 
-    /* Only VLD supported */
-    p_va->pix_fmt = PIX_FMT_VAAPI_VLD;
-    p_va->setup = Setup;
-    p_va->get = Get;
-    p_va->release = Release;
-    p_va->extract = Extract;
+    /* */
+    switch( ctx->codec_id )
+    {
+    case AV_CODEC_ID_MPEG1VIDEO:
+    case AV_CODEC_ID_MPEG2VIDEO:
+        i_profile = VAProfileMPEG2Main;
+        i_surface_count = 2 + 2;
+        break;
+    case AV_CODEC_ID_MPEG4:
+        i_profile = VAProfileMPEG4AdvancedSimple;
+        i_surface_count = 2+1;
+        break;
+    case AV_CODEC_ID_WMV3:
+        i_profile = VAProfileVC1Main;
+        i_surface_count = 2+1;
+        break;
+    case AV_CODEC_ID_VC1:
+        i_profile = VAProfileVC1Advanced;
+        i_surface_count = 2+1;
+        break;
+    case AV_CODEC_ID_H264:
+        i_profile = VAProfileH264High;
+        i_surface_count = 16 + ctx->thread_count + 2;
+        break;;
+    default:
+        free( sys );
+        return VLC_EGENERIC;
+    }
+
+    /* */
+    sys->i_config_id  = VA_INVALID_ID;
+    sys->i_context_id = VA_INVALID_ID;
+    sys->image.image_id = VA_INVALID_ID;
+
+    /* Create a VA display */
+#ifdef VLC_VA_BACKEND_XLIB
+    sys->p_display_x11 = XOpenDisplay(NULL);
+    if( !sys->p_display_x11 )
+    {
+        msg_Err( va, "Could not connect to X server" );
+        goto error;
+    }
+
+    sys->p_display = vaGetDisplay( sys->p_display_x11 );
+#endif
+#ifdef VLC_VA_BACKEND_DRM
+    sys->drm_fd = vlc_open("/dev/dri/card0", O_RDWR);
+    if( sys->drm_fd == -1 )
+    {
+        msg_Err( va, "Could not access rendering device: %m" );
+        goto error;
+    }
+
+    sys->p_display = vaGetDisplayDRM( sys->drm_fd );
+#endif
+    if( !sys->p_display )
+    {
+        msg_Err( va, "Could not get a VAAPI device" );
+        goto error;
+    }
+
+    int major, minor;
+
+    if( vaInitialize( sys->p_display, &major, &minor ) )
+    {
+        msg_Err( va, "Failed to initialize the VAAPI device" );
+        goto error;
+    }
+
+    /* Check if the selected profile is supported */
+    i_profiles_nb = vaMaxNumProfiles( sys->p_display );
+    p_profiles_list = calloc( i_profiles_nb, sizeof( VAProfile ) );
+    if( !p_profiles_list )
+        goto error;
+
+    VAStatus i_status = vaQueryConfigProfiles( sys->p_display, p_profiles_list, &i_profiles_nb );
+    if ( i_status == VA_STATUS_SUCCESS )
+    {
+        for( int i = 0; i < i_profiles_nb; i++ )
+        {
+            if ( p_profiles_list[i] == i_profile )
+            {
+                b_supported_profile = true;
+                break;
+            }
+        }
+    }
+    free( p_profiles_list );
+    if ( !b_supported_profile )
+    {
+        msg_Dbg( va, "Codec and profile not supported by the hardware" );
+        goto error;
+    }
+
+    /* Create a VA configuration */
+    VAConfigAttrib attrib;
+    memset( &attrib, 0, sizeof(attrib) );
+    attrib.type = VAConfigAttribRTFormat;
+    if( vaGetConfigAttributes( sys->p_display,
+                               i_profile, VAEntrypointVLD, &attrib, 1 ) )
+        goto error;
+
+    /* Not sure what to do if not, I don't have a way to test */
+    if( (attrib.value & VA_RT_FORMAT_YUV420) == 0 )
+        goto error;
+    if( vaCreateConfig( sys->p_display,
+                        i_profile, VAEntrypointVLD, &attrib, 1, &sys->i_config_id ) )
+    {
+        sys->i_config_id = VA_INVALID_ID;
+        goto error;
+    }
+
+    sys->i_surface_count = i_surface_count;
+
+    sys->b_supports_derive = false;
+
+    vlc_mutex_init(&sys->lock);
+
+    va->sys = sys;
+    va->description = vaQueryVendorString( sys->p_display );
+    va->pix_fmt = PIX_FMT_VAAPI_VLD; /* Only VLD supported */
+    va->setup = Setup;
+    va->get = Get;
+    va->release = Release;
+    va->extract = Extract;
     return VLC_SUCCESS;
+
+error:
+    if( sys->p_display != NULL )
+        vaTerminate( sys->p_display );
+#ifdef VLC_VA_BACKEND_XLIB
+    if( sys->p_display_x11 != NULL )
+        XCloseDisplay( sys->p_display_x11 );
+#endif
+#ifdef VLC_VA_BACKEND_DRM
+    if( sys->drm_fd != -1 )
+        close( sys->drm_fd );
+#endif
+    free( sys );
+    return VLC_EGENERIC;
 }
+
+vlc_module_begin ()
+#if defined (VLC_VA_BACKEND_XLIB)
+    set_description( N_("VA-API video decoder via X11") )
+#elif defined (VLC_VA_BACKEND_DRM)
+    set_description( N_("VA-API video decoder via DRM") )
+#endif
+    set_capability( "hw decoder", 0 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_callbacks( Create, Delete )
+    add_shortcut( "vaapi" )
+vlc_module_end ()

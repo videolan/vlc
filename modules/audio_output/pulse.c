@@ -57,7 +57,6 @@ struct sink
 {
     struct sink *next;
     uint32_t index;
-    pa_volume_t base_volume;
     char name[1];
 };
 
@@ -67,7 +66,6 @@ struct aout_sys_t
     pa_context *context; /**< PulseAudio connection context */
     pa_threaded_mainloop *mainloop; /**< PulseAudio thread */
     pa_time_event *trigger; /**< Deferred stream trigger */
-    pa_volume_t base_volume; /**< 0dB reference volume */
     pa_cvolume cvolume; /**< actual sink input volume */
     mtime_t first_pts; /**< Play time of buffer start */
 
@@ -83,27 +81,10 @@ static void VolumeReport(audio_output_t *aout)
     aout_sys_t *sys = aout->sys;
     pa_volume_t volume = pa_cvolume_max(&sys->cvolume);
 
-    volume = pa_sw_volume_divide(volume, sys->base_volume);
     aout_VolumeReport(aout, (float)volume / PA_VOLUME_NORM);
 }
 
 /*** Sink ***/
-static struct sink *sink_find(aout_sys_t *sys, uint32_t index)
-{
-    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
-        if (sink->index == index)
-            return sink;
-    return NULL;
-}
-
-static struct sink *sink_find_by_name(aout_sys_t *sys, const char *name)
-{
-    for (struct sink *sink = sys->sinks; sink != NULL; sink = sink->next)
-        if (!strcmp(sink->name, name))
-            return sink;
-    return NULL;
-}
-
 static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
                         void *userdata)
 {
@@ -128,15 +109,6 @@ static void sink_add_cb(pa_context *ctx, const pa_sink_info *i, int eol,
 
     sink->next = sys->sinks;
     sink->index = i->index;
-    /* PulseAudio flat volume NORM / 100% / 0dB corresponds to no software
-     * amplification and maximum hardware amplification.
-     * VLC maps DEFAULT / 100% to no gain at all (software/hardware).
-     * Thus we need to use the sink base_volume as a multiplier,
-     * if and only if flat volume is active for our current sink. */
-    if (i->flags & PA_SINK_FLAT_VOLUME)
-        sink->base_volume = i->base_volume;
-    else
-        sink->base_volume = PA_VOLUME_NORM;
     memcpy(sink->name, i->name, namelen + 1);
     sys->sinks = sink;
 }
@@ -145,7 +117,6 @@ static void sink_mod_cb(pa_context *ctx, const pa_sink_info *i, int eol,
                         void *userdata)
 {
     audio_output_t *aout = userdata;
-    aout_sys_t *sys = aout->sys;
 
     if (eol)
         return;
@@ -154,15 +125,6 @@ static void sink_mod_cb(pa_context *ctx, const pa_sink_info *i, int eol,
     msg_Dbg(aout, "changing sink %"PRIu32": %s (%s)", i->index, i->name,
             i->description);
     aout_HotplugReport(aout, i->name, i->description);
-
-    struct sink *sink = sink_find(sys, i->index);
-    if (unlikely(sink == NULL))
-        return;
-
-    if (i->flags & PA_SINK_FLAT_VOLUME)
-        sink->base_volume = i->base_volume;
-    else
-        sink->base_volume = PA_VOLUME_NORM;
 }
 
 static void sink_del(uint32_t index, audio_output_t *aout)
@@ -350,18 +312,10 @@ static void stream_event_cb(pa_stream *s, const char *name, pa_proplist *pl,
 static void stream_moved_cb(pa_stream *s, void *userdata)
 {
     audio_output_t *aout = userdata;
-    aout_sys_t *sys = aout->sys;
     const char *name = pa_stream_get_device_name(s);
-    struct sink *sink = sink_find(sys, pa_stream_get_device_index(s));
 
     msg_Dbg(aout, "connected to sink %s", name);
     aout_DeviceReport(aout, name);
-
-    sys->base_volume = likely(sink != NULL) ? sink->base_volume
-                                            : PA_VOLUME_INVALID;
-    msg_Dbg(aout, "base volume: %"PRIu32, sys->base_volume);
-    if (pa_cvolume_valid(&sys->cvolume))
-        VolumeReport(aout);
 }
 
 static void stream_overflow_cb(pa_stream *s, void *userdata)
@@ -427,8 +381,7 @@ static void sink_input_info_cb(pa_context *ctx, const pa_sink_input_info *i,
     (void) ctx;
 
     sys->cvolume = i->volume; /* cache volume for balance preservation */
-    if (PA_VOLUME_IS_VALID(sys->base_volume))
-        VolumeReport(aout);
+    VolumeReport(aout);
     aout_MuteReport(aout, i->mute);
 }
 
@@ -616,47 +569,25 @@ static int VolumeSet(audio_output_t *aout, float vol)
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
     pa_operation *op;
-    int ret = -1;
-    pa_volume_t base_volume;
+    pa_volume_t volume;
 
     /* VLC provides the software volume so convert directly to PulseAudio
      * software volume, pa_volume_t. This is not a linear amplification factor
      * so do not use PulseAudio linear amplification! */
     vol *= PA_VOLUME_NORM;
-    if (unlikely(vol >= PA_VOLUME_MAX))
-        vol = PA_VOLUME_MAX;
-
-    pa_threaded_mainloop_lock(sys->mainloop);
-
-    base_volume = sys->base_volume;
-    if (!PA_VOLUME_IS_VALID(base_volume))
-    {   /* Base volume is unknown, typically because sink is unknown.
-         * Try to guess the base volume. */
-        const struct sink *sink = sys->sinks;
-        if (unlikely(sink == NULL))
-        {
-            msg_Err(aout, "cannot change volume without sink");
-            goto out;
-        }
-
-        base_volume = sink->base_volume;
-        while ((sink = sink->next) != NULL)
-            if (sink->base_volume != base_volume)
-            {
-                msg_Err(aout, "cannot change volume without base");
-                goto out;
-            }
-    }
-
-    pa_volume_t volume = pa_sw_volume_multiply(lroundf(vol), base_volume);
+    if (unlikely(vol >= (float)PA_VOLUME_MAX))
+        volume = PA_VOLUME_MAX;
+    else
+        volume = lroundf(vol);
 
     if (s == NULL)
     {
         sys->volume_force = volume;
-        aout_VolumeReport(aout, vol / (float)PA_VOLUME_NORM);
-        ret = 0;
-        goto out;
+        aout_VolumeReport(aout, (float)volume / (float)PA_VOLUME_NORM);
+        return 0;
     }
+
+    pa_threaded_mainloop_lock(sys->mainloop);
 
     if (!pa_cvolume_valid(&sys->cvolume))
     {
@@ -675,13 +606,9 @@ static int VolumeSet(audio_output_t *aout, float vol)
     op = pa_context_set_sink_input_volume(sys->context, pa_stream_get_index(s),
                                           &cvolume, NULL, NULL);
     if (likely(op != NULL))
-    {
         pa_operation_unref(op);
-        ret = 0;
-    }
-out:
     pa_threaded_mainloop_unlock(sys->mainloop);
-    return ret;
+    return likely(op != NULL) ? 0 : -1;
 }
 
 static int MuteSet(audio_output_t *aout, bool mute)
@@ -714,10 +641,6 @@ static int StreamMove(audio_output_t *aout, const char *name)
 
     if (sys->stream == NULL)
     {
-        struct sink *sink = sink_find_by_name(sys, name);
-
-        sys->base_volume = likely(sink != NULL) ? sink->base_volume
-                                                : PA_VOLUME_INVALID;
         msg_Dbg(aout, "will connect to sink %s", name);
         free(sys->sink_force);
         sys->sink_force = strdup(name);
@@ -837,6 +760,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     }
     if (fmt->i_physical_channels & AOUT_CHAN_LFE)
         map.map[map.channels++] = PA_CHANNEL_POSITION_LFE;
+    fmt->i_original_channels = fmt->i_physical_channels;
 
     for (unsigned i = 0; map.channels < ss.channels; i++) {
         map.map[map.channels++] = PA_CHANNEL_POSITION_AUX0 + i;
@@ -1005,7 +929,6 @@ static void Stop(audio_output_t *aout)
 
     pa_stream_unref(s);
     sys->stream = NULL;
-    sys->base_volume = PA_VOLUME_INVALID;
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
@@ -1027,7 +950,6 @@ static int Open(vlc_object_t *obj)
     }
     sys->stream = NULL;
     sys->context = ctx;
-    sys->base_volume = PA_VOLUME_INVALID;
     sys->volume_force = PA_VOLUME_INVALID;
     sys->flags_force = PA_STREAM_NOFLAGS;
     sys->sink_force = NULL;

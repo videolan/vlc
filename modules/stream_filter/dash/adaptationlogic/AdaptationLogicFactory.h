@@ -26,10 +26,6 @@
 #define ADAPTATIONLOGICFACTORY_H_
 
 #include "adaptationlogic/IAdaptationLogic.h"
-#include "xml/Node.h"
-#include "mpd/IMPDManager.h"
-#include "adaptationlogic/AlwaysBestAdaptationLogic.h"
-#include "adaptationlogic/RateBasedAdaptationLogic.h"
 
 struct stream_t;
 
@@ -40,7 +36,7 @@ namespace dash
         class AdaptationLogicFactory
         {
             public:
-                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, dash::mpd::IMPDManager *mpdManager, stream_t *stream);
+                static IAdaptationLogic* create (IAdaptationLogic::LogicType logic, mpd::MPD *mpd);
         };
     }
 }

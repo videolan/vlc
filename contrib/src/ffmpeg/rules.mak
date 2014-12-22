@@ -67,9 +67,7 @@ endif
 
 # ARM stuff
 ifeq ($(ARCH),arm)
-ifndef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=arm
-endif
 ifdef HAVE_NEON
 FFMPEGCONF += --enable-neon
 endif
@@ -79,6 +77,11 @@ endif
 ifdef HAVE_ARMV6
 FFMPEGCONF += --cpu=armv6 --disable-neon
 endif
+endif
+
+# ARM64 stuff
+ifeq ($(ARCH),aarch64)
+FFMPEGCONF += --arch=aarch64
 endif
 
 # MIPS stuff
@@ -93,21 +96,28 @@ FFMPEGCONF += --arch=x86
 endif
 endif
 
+# x86_64 stuff
+ifeq ($(ARCH),x86_64)
+ifndef HAVE_DARWIN_OS
+FFMPEGCONF += --arch=x86_64
+endif
+endif
+
 # Darwin
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=$(ARCH) --target-os=darwin
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
-endif
 ifdef HAVE_IOS
-FFMPEGCONF += --enable-pic
+FFMPEGCONF += --enable-pic --extra-ldflags="$(EXTRA_CFLAGS)"
 ifdef HAVE_NEON
 FFMPEGCONF += --as="$(AS)"
 endif
 endif
 ifdef HAVE_MACOSX
 FFMPEGCONF += --enable-vda
+endif
 endif
 
 # Linux
@@ -148,6 +158,8 @@ PKGS += ffmpeg
 ifeq ($(call need_pkg,"libavcodec >= 54.25.0 libavformat >= 53.21.0 libswscale"),)
 PKGS_FOUND += ffmpeg
 endif
+
+FFMPEGCONF += --nm="$(NM)" --ar="$(AR)"
 
 $(TARBALLS)/ffmpeg-$(HASH).tar.gz:
 	$(call download,$(FFMPEG_SNAPURL))

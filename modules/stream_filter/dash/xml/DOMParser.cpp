@@ -26,8 +26,11 @@
 #endif
 
 #include "DOMParser.h"
+#include "../Helper.h"
 
 #include <vector>
+#include <vlc_xml.h>
+#include <vlc_stream.h>
 
 using namespace dash::xml;
 using namespace dash::mpd;
@@ -141,33 +144,46 @@ void    DOMParser::print                    ()
 }
 bool    DOMParser::isDash                   (stream_t *stream)
 {
-    const char* psz_namespaceDIS = "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011";
-    const char* psz_namespaceIS  = "urn:mpeg:DASH:schema:MPD:2011";
+    const std::string namespaces[] = {
+        "xmlns=\"urn:mpeg:mpegB:schema:DASH:MPD:DIS2011\"",
+        "xmlns=\"urn:mpeg:schema:dash:mpd:2011\"",
+        "xmlns=\"urn:mpeg:DASH:schema:MPD:2011\"",
+    };
 
     const uint8_t *peek;
     int peek_size = stream_Peek(stream, &peek, 1024);
-    if (peek_size < (int)strlen(psz_namespaceDIS))
+    if (peek_size < (int)namespaces[0].length())
         return false;
 
     std::string header((const char*)peek, peek_size);
-    return (header.find(psz_namespaceDIS) != std::string::npos) || (header.find(psz_namespaceIS) != std::string::npos);
+    for( size_t i=0; i<ARRAY_SIZE(namespaces); i++ )
+    {
+        if ( Helper::ifind(header, namespaces[i]) )
+            return true;
+    }
+    return false;
 }
-Profile DOMParser::getProfile               ()
+
+Profile DOMParser::getProfile() const
 {
+    Profile res(Profile::Unknown);
     if(this->root == NULL)
-        return dash::mpd::UnknownProfile;
+        return res;
 
-    std::string profile = this->root->getAttributeValue("profiles");
-    if ( profile.length() == 0 )
-        profile = this->root->getAttributeValue("profile"); //The standard spells it the both ways...
+    std::string urn = this->root->getAttributeValue("profiles");
+    if ( urn.length() == 0 )
+        urn = this->root->getAttributeValue("profile"); //The standard spells it the both ways...
 
-    if(profile.find("urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm") != std::string::npos ||
-            profile.find("urn:mpeg:dash:profile:isoff-ondemand:2011") != std::string::npos ||
-            profile.find("urn:mpeg:dash:profile:isoff-on-demand:2011") != std::string::npos)
-        return dash::mpd::BasicCM;
 
-    if(profile.find("urn:mpeg:dash:profile:isoff-main:2011") != std::string::npos)
-        return dash::mpd::IsoffMain;
+    size_t pos;
+    size_t nextpos = -1;
+    do
+    {
+        pos = nextpos + 1;
+        nextpos = urn.find_first_of(",", pos);
+        res = Profile(urn.substr(pos, nextpos - pos));
+    }
+    while (nextpos != std::string::npos && res == Profile::Unknown);
 
-    return dash::mpd::UnknownProfile;
+    return res;
 }

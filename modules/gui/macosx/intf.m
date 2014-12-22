@@ -85,6 +85,8 @@ static int InputEvent(vlc_object_t *, const char *,
                       vlc_value_t, vlc_value_t, void *);
 static int PLItemChanged(vlc_object_t *, const char *,
                          vlc_value_t, vlc_value_t, void *);
+static int PLItemUpdated(vlc_object_t *, const char *,
+                         vlc_value_t, vlc_value_t, void *);
 static int PlaylistUpdated(vlc_object_t *, const char *,
                            vlc_value_t, vlc_value_t, void *);
 static int PlaybackModeUpdated(vlc_object_t *, const char *,
@@ -118,6 +120,10 @@ static int WindowControl(vout_window_t *, int i_query, va_list);
 
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
+    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
+     && cfg->type != VOUT_WINDOW_TYPE_NSOBJECT)
+        return VLC_EGENERIC;
+
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
     intf_thread_t *p_intf = VLCIntf;
     if (!p_intf) {
@@ -156,6 +162,7 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
     [o_vout_provider_lock unlock];
 
+    p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
     p_wnd->control = WindowControl;
 
     [o_pool release];
@@ -392,6 +399,20 @@ static int PLItemChanged(vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+/**
+ * Callback for item-change variable. Is triggered after update of duration or metadata.
+ */
+static int PLItemUpdated(vlc_object_t *p_this, const char *psz_var,
+                         vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(plItemUpdated) withObject:nil waitUntilDone:NO];
+
+    [o_pool release];
+    return VLC_SUCCESS;
+}
+
 static int PlaylistUpdated(vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
@@ -611,7 +632,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     o_open = [[VLCOpen alloc] init];
     o_coredialogs = [[VLCCoreDialogProvider alloc] init];
-    o_info = [[VLCInfo alloc] init];
     o_mainmenu = [[VLCMainMenu alloc] init];
     o_coreinteraction = [[VLCCoreInteraction alloc] init];
     o_eyetv = [[VLCEyeTVController alloc] init];
@@ -659,7 +679,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, self);
     var_AddCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
     var_AddCallback(p_intf->p_libvlc, "intf-boss", BossCallback, self);
-    //    var_AddCallback(p_playlist, "item-change", PLItemChanged, self);
+    var_AddCallback(p_playlist, "item-change", PLItemUpdated, self);
     var_AddCallback(p_playlist, "activity", PLItemChanged, self);
     var_AddCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
     var_AddCallback(p_playlist, "playlist-item-append", PlaylistUpdated, self);
@@ -774,12 +794,14 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainwindow updateTimeSlider];
     [o_mainwindow updateVolumeSlider];
 
+    // respect playlist-autostart
+    // note that PLAYLIST_PLAY will not stop any playback if already started
     playlist_t * p_playlist = pl_Get(VLCIntf);
     PL_LOCK;
     BOOL kidsAround = p_playlist->p_local_category->i_children != 0;
-    PL_UNLOCK;
     if (kidsAround && var_GetBool(p_playlist, "playlist-autostart"))
-        [[self playlist] playItem:nil];
+        playlist_Control(p_playlist, PLAYLIST_PLAY, true);
+    PL_UNLOCK;
 }
 
 /* don't allow a double termination call. If the user has
@@ -831,7 +853,7 @@ static bool f_appExit = false;
     var_DelCallback(p_intf, "dialog-login", DialogCallback, self);
     var_DelCallback(p_intf, "dialog-question", DialogCallback, self);
     var_DelCallback(p_intf, "dialog-progress-bar", DialogCallback, self);
-    //var_DelCallback(p_playlist, "item-change", PLItemChanged, self);
+    var_DelCallback(p_playlist, "item-change", PLItemUpdated, self);
     var_DelCallback(p_playlist, "activity", PLItemChanged, self);
     var_DelCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
     var_DelCallback(p_playlist, "playlist-item-append", PlaylistUpdated, self);
@@ -997,6 +1019,10 @@ static bool f_appExit = false;
 
 - (void)application:(NSApplication *)o_app openFiles:(NSArray *)o_names
 {
+    // Only add items here which are getting dropped to to the application icon
+    // or are given at startup. If a file is passed via command line, libvlccore
+    // will add the item, but cocoa also calls this function. In this case, the
+    // invocation is ignored here.
     if (launched == NO) {
         if (items_at_launch) {
             int items = [o_names count];
@@ -1274,6 +1300,9 @@ static bool f_appExit = false;
         p_current_input = NULL;
 
         [o_mainmenu setRateControlsEnabled: NO];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
+                                                            object:nil];
     }
     else if (!p_current_input) {
         // object is hold here and released then it is dead
@@ -1290,6 +1319,9 @@ static bool f_appExit = false;
             p_input_changed = vlc_object_hold(p_current_input);
 
             [[self playlist] continuePlaybackWhereYouLeftOff:p_current_input];
+
+            [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
+                                                                object:nil];
         }
     }
 
@@ -1308,6 +1340,14 @@ static bool f_appExit = false;
         if (p_input_changed)
             vlc_object_release(p_input_changed);
     });
+}
+
+- (void)plItemUpdated
+{
+    [o_mainwindow updateName];
+
+    if (o_info != NULL)
+        [o_info updateMetadata];
 }
 
 - (void)updateMainMenu
@@ -1388,7 +1428,7 @@ static bool f_appExit = false;
             iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
             if (iTunesApp && [iTunesApp isRunning]) {
                 if ([iTunesApp playerState] == iTunesEPlSPaused) {
-                    msg_Dbg(p_intf, "Unpause iTunes...");
+                    msg_Dbg(p_intf, "unpausing iTunes");
                     [iTunesApp playpause];
                 }
             }
@@ -1396,9 +1436,13 @@ static bool f_appExit = false;
 
         if (b_has_spotify_paused) {
             SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
-            if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePaused) {
-                msg_Dbg(p_intf, "Unpause Spotify...");
-                [spotifyApp play];
+            if (spotifyApp) {
+                if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
+                    if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePaused) {
+                        msg_Dbg(p_intf, "unpausing Spotify");
+                        [spotifyApp play];
+                    }
+                }
             }
         }
     }
@@ -1431,7 +1475,7 @@ static bool f_appExit = false;
                 iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
                 if (iTunesApp && [iTunesApp isRunning]) {
                     if ([iTunesApp playerState] == iTunesEPlSPlaying) {
-                        msg_Dbg(p_intf, "Pause iTunes...");
+                        msg_Dbg(p_intf, "pausing iTunes");
                         [iTunesApp pause];
                         b_has_itunes_paused = YES;
                     }
@@ -1441,10 +1485,15 @@ static bool f_appExit = false;
             // pause Spotify
             if (!b_has_spotify_paused) {
                 SpotifyApplication *spotifyApp = (SpotifyApplication *) [SBApplication applicationWithBundleIdentifier:@"com.spotify.client"];
-                if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
-                    msg_Dbg(p_intf, "Pause Spotify...");
-                    [spotifyApp pause];
-                    b_has_spotify_paused = YES;
+
+                if (spotifyApp) {
+                    if ([spotifyApp respondsToSelector:@selector(isRunning)] && [spotifyApp respondsToSelector:@selector(playerState)]) {
+                        if ([spotifyApp isRunning] && [spotifyApp playerState] == kSpotifyPlayerStatePlaying) {
+                            msg_Dbg(p_intf, "pausing Spotify");
+                            [spotifyApp pause];
+                            b_has_spotify_paused = YES;
+                        }
+                    }
                 }
             }
         }
@@ -1471,7 +1520,7 @@ static bool f_appExit = false;
 
         IOReturn success;
         /* work-around a bug in 10.7.4 and 10.7.5, so check for 10.7.x < 10.7.4, 10.8 and 10.6 */
-        if ((NSAppKitVersionNumber >= 1115.2 && NSAppKitVersionNumber < 1138.45) || OSX_MOUNTAIN_LION || OSX_MAVERICKS || OSX_SNOW_LEOPARD) {
+        if ((NSAppKitVersionNumber >= 1115.2 && NSAppKitVersionNumber < 1138.45) || OSX_MOUNTAIN_LION || OSX_MAVERICKS || OSX_YOSEMITE || OSX_SNOW_LEOPARD) {
             CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
             if ([self activeVideoPlayback])
                 success = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &systemSleepAssertionID);
@@ -1637,6 +1686,9 @@ static bool f_appExit = false;
 
 - (id)info
 {
+    if (!o_info)
+        o_info = [[VLCInfo alloc] init];
+
     if (! nib_info_loaded)
         nib_info_loaded = [NSBundle loadNibNamed:@"MediaInfo" owner: NSApp];
 
@@ -1793,18 +1845,23 @@ static const int kCurrentPreferencesVersion = 3;
 - (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
 {
     b_mediaKeySupport = var_InheritBool(VLCIntf, "macosx-mediakeys");
-    if (b_mediaKeySupport) {
-        if (!o_mediaKeyController)
-            o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
+    if (b_mediaKeySupport && !o_mediaKeyController)
+        o_mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
 
-        if ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot]->i_children > 0 ||
-            p_current_input)
+    if (b_mediaKeySupport && ([[[VLCMain sharedInstance] playlist] currentPlaylistRoot]->i_children > 0 ||
+                              p_current_input)) {
+        if (!b_mediaKeyTrapEnabled) {
+            b_mediaKeyTrapEnabled = YES;
+            msg_Dbg(p_intf, "Enable media key support");
             [o_mediaKeyController startWatchingMediaKeys];
-        else
+        }
+    } else {
+        if (b_mediaKeyTrapEnabled) {
+            b_mediaKeyTrapEnabled = NO;
+            msg_Dbg(p_intf, "Disable media key support");
             [o_mediaKeyController stopWatchingMediaKeys];
+        }
     }
-    else if (!b_mediaKeySupport && o_mediaKeyController)
-        [o_mediaKeyController stopWatchingMediaKeys];
 }
 
 @end

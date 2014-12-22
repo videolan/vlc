@@ -177,14 +177,10 @@ static int dvb_open_adapter (uint8_t adapter)
 /** Opens the DVB device node of the specified type */
 static int dvb_open_node (dvb_device_t *d, const char *type, int flags)
 {
-    int fd;
     char path[strlen (type) + 4];
 
     snprintf (path, sizeof (path), "%s%u", type, d->device);
-    fd = vlc_openat (d->dir, path, flags);
-    if (fd != -1)
-        fcntl (fd, F_SETFL, fcntl (fd, F_GETFL) | O_NONBLOCK);
-    return fd;
+    return vlc_openat (d->dir, path, flags | O_NONBLOCK);
 }
 
 /**
@@ -305,6 +301,23 @@ void dvb_close (dvb_device_t *d)
     free (d);
 }
 
+static void dvb_frontend_status(vlc_object_t *obj, fe_status_t s)
+{
+    msg_Dbg(obj, "frontend status:");
+#define S(f) \
+    if (s & FE_ ## f) \
+        msg_Dbg(obj, "\t%s", #f);
+
+    S(HAS_SIGNAL);
+    S(HAS_CARRIER);
+    S(HAS_VITERBI);
+    S(HAS_SYNC);
+    S(HAS_LOCK);
+    S(TIMEDOUT);
+    S(REINIT);
+#undef S
+}
+
 /**
  * Reads TS data from the tuner.
  * @return number of bytes read, 0 on EOF, -1 if no data (yet).
@@ -349,7 +362,7 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
             return 0;
         }
 
-        msg_Dbg (d->obj, "frontend status: 0x%02X", (unsigned)ev.status);
+        dvb_frontend_status(d->obj, ev.status);
     }
 
     if (ufd[0].revents)

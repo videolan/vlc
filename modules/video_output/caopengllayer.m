@@ -120,16 +120,7 @@ static int Open (vlc_object_t *p_this)
     if (container)
         vout_display_DeleteWindow(vd, NULL);
     else {
-        vout_window_cfg_t wnd_cfg;
-
-        memset(&wnd_cfg, 0, sizeof(wnd_cfg));
-        wnd_cfg.type = VOUT_WINDOW_TYPE_NSOBJECT;
-        wnd_cfg.x = var_InheritInteger(vd, "video-x");
-        wnd_cfg.y = var_InheritInteger(vd, "video-y");
-        wnd_cfg.height = vd->cfg->display.height;
-        wnd_cfg.width = vd->cfg->display.width;
-
-        sys->embed = vout_display_NewWindow(vd, &wnd_cfg);
+        sys->embed = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_NSOBJECT);
         if (sys->embed)
             container = sys->embed->handle.nsobject;
 
@@ -203,7 +194,7 @@ static int Open (vlc_object_t *p_this)
     else
         outputSize = [sys->container visibleRect].size;
     vout_display_SendEventFullscreen(vd, false);
-    vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height, false);
+    vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height);
 
     [pool release];
     return VLC_SUCCESS;
@@ -300,7 +291,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         {
             const vout_display_cfg_t *cfg;
             const video_format_t *source;
@@ -316,7 +306,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             /* we always use our current frame here */
             vout_display_cfg_t cfg_tmp = *cfg;
             [CATransaction lock];
-            CGRect bounds = [sys->cgLayer bounds];
+            CGRect bounds = [sys->cgLayer visibleRect];
             [CATransaction unlock];
             cfg_tmp.display.width = bounds.size.width;
             cfg_tmp.display.height = bounds.size.height;
@@ -334,12 +324,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             return VLC_SUCCESS;
         }
 
-        case VOUT_DISPLAY_GET_OPENGL:
-        {
-            vlc_gl_t **gl = va_arg (ap, vlc_gl_t **);
-            *gl = &sys->gl;
-            return VLC_SUCCESS;
-        }
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         {
             return VLC_SUCCESS;
@@ -349,6 +333,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             assert (0);
         default:
             msg_Err (vd, "Unhandled request %d", query);
+        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
             return VLC_EGENERIC;
     }
 
@@ -410,7 +395,8 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     self = [super init];
     if (self) {
         [CATransaction lock];
-        [self setAutoresizingMask: kCALayerWidthSizable | kCALayerHeightSizable];
+        self.needsDisplayOnBoundsChange = YES;
+        self.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
         self.asynchronous = NO;
         [CATransaction unlock];
     }
@@ -427,9 +413,10 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 {
     [super resizeWithOldSuperlayerSize: size];
 
-    CGSize boundsSize = self.bounds.size;
+    CGSize boundsSize = self.visibleRect.size;
+
     if (_vd)
-        vout_display_SendEventDisplaySize(_vd, boundsSize.width, boundsSize.height, _vd->cfg->is_fullscreen);
+        vout_display_SendEventDisplaySize(_vd, boundsSize.width, boundsSize.height);
 }
 
 - (BOOL)canDrawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
@@ -450,7 +437,8 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     if (!sys->vgl)
         return;
 
-    CGRect bounds = [self bounds];
+    CGRect bounds = [self visibleRect];
+
     // x / y are top left corner, but we need the lower left one
     glViewport (sys->place.x, bounds.size.height - (sys->place.y + sys->place.height), sys->place.width, sys->place.height);
 

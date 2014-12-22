@@ -55,6 +55,10 @@ static inline int ReadType( const char *value )
         return ADDON_SERVICE_DISCOVERY;
     else if ( !strcmp( value, "extension" ) )
         return ADDON_EXTENSION;
+    else if ( !strcmp( value, "interface" ) )
+        return ADDON_INTERFACE;
+    else if ( !strcmp( value, "meta" ) )
+        return ADDON_META;
     else
         return ADDON_UNKNOWN;
 }
@@ -71,6 +75,10 @@ static inline const char * getTypePsz( int i_type )
         return "discovery";
     case ADDON_EXTENSION:
         return "extension";
+    case ADDON_INTERFACE:
+        return "interface";
+    case ADDON_META:
+        return "meta";
     case ADDON_UNKNOWN:
     default:
         return "unknown";

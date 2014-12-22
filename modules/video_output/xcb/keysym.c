@@ -32,18 +32,19 @@ struct keysym
 {
     char xname[32];
     char uname[64];
-    int32_t xsym;
-    int32_t usym;
+    uint32_t xsym;
+    uint32_t usym;
 };
 
 static int cmpkey (const void *va, const void *vb)
 {
     const struct keysym *ka = va, *kb = vb;
 
-#if (INT_MAX < 0x7fffffff)
-# error Oups!
-#endif
-    return ka->xsym - kb->xsym;
+    if (ka->xsym > kb->xsym)
+        return +1;
+    if (ka->xsym < kb->xsym)
+        return -1;
+    return 0;
 }
 
 static void printkey (const void *node, const VISIT which, const int depth)
@@ -79,7 +80,7 @@ static int parse (FILE *in)
             abort ();
 
         int val = sscanf (line,
-                          "#define XK_%31s %"SCNi32" /*%*cU+%"SCNx32" %63[^*]",
+                          "#define XK_%31s %"SCNu32" /*%*cU+%"SCNx32" %63[^*]",
                           sym->xname, &sym->xsym, &sym->usym, sym->uname);
         if (val < 3)
         {

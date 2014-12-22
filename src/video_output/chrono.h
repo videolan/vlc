@@ -24,6 +24,8 @@
 #ifndef LIBVLC_VOUT_CHRONO_H
 #define LIBVLC_VOUT_CHRONO_H
 
+#include <assert.h>
+
 typedef struct {
     int     shift;
     mtime_t avg;

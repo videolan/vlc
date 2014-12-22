@@ -20,6 +20,9 @@ endif
 ifdef HAVE_WIN32
 LUA_TARGET := mingw
 endif
+ifdef HAVE_SOLARIS
+LUA_TARGET := solaris
+endif
 
 # Feel free to add autodetection if you need to...
 PKGS += lua
@@ -46,6 +49,11 @@ ifdef HAVE_DARWIN_OS
 	(cd $(UNPACK_DIR) && \
 	sed -e 's%gcc%$(CC)%' \
 		-e 's%LDFLAGS=%LDFLAGS=$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' \
+		-i.orig src/Makefile)
+endif
+ifdef HAVE_SOLARIS
+	(cd $(UNPACK_DIR) && \
+	sed -e 's%LIBS="-ldl"$$%LIBS="-ldl" MYLDFLAGS="$(EXTRA_LDFLAGS)"%' \
 		-i.orig src/Makefile)
 endif
 ifdef HAVE_WIN32

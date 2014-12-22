@@ -39,6 +39,7 @@ OPTIONS="
       --enable-skins2
       --enable-libxml2
       --enable-libgcrypt
+      --enable-gnutls
       --enable-vlc
 "
 

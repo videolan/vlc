@@ -45,8 +45,7 @@ static void combine_side_by_side_yuv420(picture_t *, picture_t *, int, int);
  * color schemes */
 enum scheme_e
 {
-    unknown = 0,
-    red_green,
+    red_green = 1,
     red_blue,
     red_cyan,
     trioscopic,
@@ -155,9 +154,6 @@ static int Create(vlc_object_t *p_this)
         case magenta_cyan:
             p_sys->left = 0xff00ff;
             p_sys->right = 0x00ffff;
-            break;
-        case unknown:
-            msg_Err(p_filter, "Oops");
             break;
     }
 

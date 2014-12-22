@@ -73,7 +73,7 @@ int vlc_bindtextdomain (const char *domain)
      */
     if (bind_textdomain_codeset (PACKAGE_NAME, "UTF-8") == NULL)
     {
-        fprintf (stderr, "%s: UTF-8 encoding bot available\n", domain);
+        fprintf (stderr, "%s: UTF-8 encoding not available\n", domain);
         // Unbinds the text domain to avoid broken encoding
         bindtextdomain (PACKAGE_NAME, "/DOES_NOT_EXIST");
         return -1;

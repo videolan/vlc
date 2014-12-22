@@ -26,65 +26,75 @@
 #endif
 
 #include "RateBasedAdaptationLogic.h"
+#include "Representationselectors.hpp"
+
+#include <vlc_common.h>
+#include <vlc_variables.h>
 
 using namespace dash::logic;
-using namespace dash::xml;
-using namespace dash::http;
 using namespace dash::mpd;
 
-RateBasedAdaptationLogic::RateBasedAdaptationLogic  (IMPDManager *mpdManager, stream_t *stream) :
-                          AbstractAdaptationLogic   (mpdManager, stream),
-                          mpdManager                (mpdManager),
-                          count                     (0),
-                          currentPeriod             (mpdManager->getFirstPeriod()),
-                          width                     (0),
-                          height                    (0)
+RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPD *mpd) :
+                          AbstractAdaptationLogic   (mpd),
+                          bpsAvg(0), bpsSamplecount(0),
+                          currentBps(0)
 {
-    this->width  = var_InheritInteger(stream, "dash-prefwidth");
-    this->height = var_InheritInteger(stream, "dash-prefheight");
+    width  = var_InheritInteger(mpd->getVLCObject(), "dash-prefwidth");
+    height = var_InheritInteger(mpd->getVLCObject(), "dash-prefheight");
 }
 
-Chunk*  RateBasedAdaptationLogic::getNextChunk()
+Representation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
 {
-    if(this->mpdManager == NULL)
+    if(currentPeriod == NULL)
         return NULL;
 
-    if(this->currentPeriod == NULL)
-        return NULL;
-
-    uint64_t bitrate = this->getBpsAvg();
-
-    if(this->getBufferPercent() < MINBUFFER)
-        bitrate = 0;
-
-    Representation *rep = this->mpdManager->getRepresentation(this->currentPeriod, bitrate, this->width, this->height);
-
+    RepresentationSelector selector;
+    Representation *rep = selector.select(currentPeriod, type, currentBps, width, height);
     if ( rep == NULL )
-        return NULL;
-
-    std::vector<Segment *> segments = this->mpdManager->getSegments(rep);
-
-    if ( this->count == segments.size() )
     {
-        this->currentPeriod = this->mpdManager->getNextPeriod(this->currentPeriod);
-        this->count = 0;
-        return this->getNextChunk();
+        rep = selector.select(currentPeriod, type);
+        if ( rep == NULL )
+            return NULL;
     }
-
-    if ( segments.size() > this->count )
-    {
-        Segment *seg = segments.at( this->count );
-        Chunk *chunk = seg->toChunk();
-        //In case of UrlTemplate, we must stay on the same segment.
-        if ( seg->isSingleShot() == true )
-            this->count++;
-        seg->done();
-        return chunk;
-    }
-    return NULL;
+    return rep;
 }
 
-const Representation *RateBasedAdaptationLogic::getCurrentRepresentation() const
+void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
 {
-    return this->mpdManager->getRepresentation( this->currentPeriod, this->getBpsAvg() );
+    if(unlikely(time == 0))
+        return;
+
+    size_t current = size * 8000 / time;
+
+    if (current >= bpsAvg)
+        bpsAvg = bpsAvg + (current - bpsAvg) / (bpsSamplecount + 1);
+    else
+        bpsAvg = bpsAvg - (bpsAvg - current) / (bpsSamplecount + 1);
+
+    bpsSamplecount++;
+
+    if(bpsSamplecount % 5 == 0)
+        currentBps = bpsAvg;
+}
+
+FixedRateAdaptationLogic::FixedRateAdaptationLogic(mpd::MPD *mpd) :
+    AbstractAdaptationLogic(mpd)
+{
+    currentBps = var_InheritInteger( mpd->getVLCObject(), "dash-prefbw" ) * 8192;
+}
+
+Representation *FixedRateAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
+{
+    if(currentPeriod == NULL)
+        return NULL;
+
+    RepresentationSelector selector;
+    Representation *rep = selector.select(currentPeriod, type, currentBps);
+    if ( rep == NULL )
+    {
+        rep = selector.select(currentPeriod, type);
+        if ( rep == NULL )
+            return NULL;
+    }
+    return rep;
 }

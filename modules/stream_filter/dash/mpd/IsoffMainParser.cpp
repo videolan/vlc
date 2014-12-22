@@ -27,35 +27,36 @@
 #endif
 
 #include "IsoffMainParser.h"
+#include "SegmentTemplate.h"
+#include "SegmentInfoDefault.h"
+#include "xml/DOMHelper.h"
+#include <vlc_strings.h>
+#include <vlc_stream.h>
+#include <cstdio>
+#include <sstream>
 
 using namespace dash::mpd;
 using namespace dash::xml;
 
 IsoffMainParser::IsoffMainParser    (Node *root, stream_t *p_stream) :
-                 root               (root),
-                 p_stream           (p_stream),
-                 mpd                (NULL),
-                 currentRepresentation( NULL )
+                 IMPDParser(root, NULL, p_stream, NULL)
 {
 }
 IsoffMainParser::~IsoffMainParser   ()
 {
 }
 
-bool    IsoffMainParser::parse              ()
+bool    IsoffMainParser::parse              (Profile profile)
 {
-    this->mpd = new MPD();
+    mpd = new MPD(p_stream, profile);
+    setMPDAttributes();
+    setMPDBaseUrl(root);
+    parsePeriods(root);
 
-    this->setMPDAttributes();
-    this->setMPDBaseUrl();
-    this->setPeriods();
-
+    print();
     return true;
 }
-MPD*    IsoffMainParser::getMPD             ()
-{
-    return this->mpd;
-}
+
 void    IsoffMainParser::setMPDAttributes   ()
 {
     const std::map<std::string, std::string> attr = this->root->getAttributes();
@@ -70,36 +71,97 @@ void    IsoffMainParser::setMPDAttributes   ()
     if(it != attr.end())
         this->mpd->setMinBufferTime(str_duration( it->second.c_str()));
 
+    it = attr.find("type");
+    if(it != attr.end())
+        mpd->setType(it->second);
 }
-void    IsoffMainParser::setMPDBaseUrl      ()
-{
-    std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(this->root, "BaseURL");
 
-    for(size_t i = 0; i < baseUrls.size(); i++)
+void IsoffMainParser::parsePeriods(Node *root)
+{
+    std::vector<Node *> periods = DOMHelper::getElementByTagName(root, "Period", false);
+    std::vector<Node *>::const_iterator it;
+
+    for(it = periods.begin(); it != periods.end(); it++)
     {
-        BaseUrl *url = new BaseUrl(baseUrls.at(i)->getText());
-        this->mpd->addBaseUrl(url);
+        Period *period = new (std::nothrow) Period(mpd);
+        if (!period)
+            continue;
+        parseSegmentInformation(*it, period);
+        setAdaptationSets(*it, period);
+        mpd->addPeriod(period);
     }
 }
-void    IsoffMainParser::setPeriods         ()
-{
-    std::vector<Node *> periods = DOMHelper::getElementByTagName(this->root, "Period", false);
 
-    for(size_t i = 0; i < periods.size(); i++)
+size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformation *info)
+{
+    size_t total = 0;
+    if (templateNode == NULL || !templateNode->hasAttribute("media"))
+        return total;
+
+    std::string mediaurl = templateNode->getAttributeValue("media");
+    SegmentTemplate *mediaTemplate = NULL;
+    if(mediaurl.empty() || !(mediaTemplate = new (std::nothrow) SegmentTemplate(info)) )
+        return total;
+    mediaTemplate->setSourceUrl(mediaurl);
+
+    if(templateNode->hasAttribute("startNumber"))
     {
-        Period *period = new Period();
-        this->setAdaptationSets(periods.at(i), period);
-        this->mpd->addPeriod(period);
+        std::istringstream in(templateNode->getAttributeValue("startNumber"));
+        size_t i;
+        in >> i;
+        mediaTemplate->setStartIndex(i);
     }
+
+    if(templateNode->hasAttribute("duration"))
+    {
+        std::istringstream in(templateNode->getAttributeValue("duration"));
+        size_t i;
+        in >> i;
+        mediaTemplate->setDuration(i);
+    }
+
+    InitSegmentTemplate *initTemplate = NULL;
+
+    if(templateNode->hasAttribute("initialization"))
+    {
+        std::string initurl = templateNode->getAttributeValue("initialization");
+        if(!initurl.empty() && (initTemplate = new (std::nothrow) InitSegmentTemplate(info)))
+            initTemplate->setSourceUrl(initurl);
+    }
+
+    info->setSegmentTemplate(mediaTemplate, SegmentInformation::INFOTYPE_MEDIA);
+    info->setSegmentTemplate(initTemplate, SegmentInformation::INFOTYPE_INIT);
+
+    total += ( mediaTemplate != NULL );
+
+    return total;
 }
+
+size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *info)
+{
+    size_t total = 0;
+    parseSegmentBase(DOMHelper::getFirstChildElementByName(node, "SegmentBase"), info);
+    total += parseSegmentList(DOMHelper::getFirstChildElementByName(node, "SegmentList"), info);
+    total += parseSegmentTemplate(DOMHelper::getFirstChildElementByName(node, "SegmentTemplate" ), info);
+    return total;
+}
+
 void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
 {
     std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", false);
+    std::vector<Node *>::const_iterator it;
 
-    for(size_t i = 0; i < adaptationSets.size(); i++)
+    for(it = adaptationSets.begin(); it != adaptationSets.end(); it++)
     {
-        AdaptationSet *adaptationSet = new AdaptationSet();
-        this->setRepresentations(adaptationSets.at(i), adaptationSet);
+        AdaptationSet *adaptationSet = new AdaptationSet(period);
+        if(!adaptationSet)
+            continue;
+        if((*it)->hasAttribute("mimeType"))
+            adaptationSet->setMimeType((*it)->getAttributeValue("mimeType"));
+
+        parseSegmentInformation( *it, adaptationSet );
+
+        setRepresentations((*it), adaptationSet);
         period->addAdaptationSet(adaptationSet);
     }
 }
@@ -109,8 +171,15 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
 
     for(size_t i = 0; i < representations.size(); i++)
     {
-        this->currentRepresentation = new Representation;
+        this->currentRepresentation = new Representation(adaptationSet, getMPD());
         Node *repNode = representations.at(i);
+
+        std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");
+        if(!baseUrls.empty())
+            currentRepresentation->setBaseUrl( new BaseUrl( baseUrls.front()->getText() ) );
+
+        if(repNode->hasAttribute("id"))
+            currentRepresentation->setId(repNode->getAttributeValue("id"));
 
         if(repNode->hasAttribute("width"))
             this->currentRepresentation->setWidth(atoi(repNode->getAttributeValue("width").c_str()));
@@ -121,34 +190,115 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
         if(repNode->hasAttribute("bandwidth"))
             this->currentRepresentation->setBandwidth(atoi(repNode->getAttributeValue("bandwidth").c_str()));
 
-        this->setSegmentBase(repNode, this->currentRepresentation);
-        this->setSegmentList(repNode, this->currentRepresentation);
+        if(repNode->hasAttribute("mimeType"))
+            currentRepresentation->setMimeType(repNode->getAttributeValue("mimeType"));
+
+        size_t totalmediasegments = parseSegmentInformation(repNode, currentRepresentation);
+        if(!totalmediasegments)
+        {
+            /* unranged & segment less representation, add fake segment */
+            SegmentList *list = new SegmentList();
+            Segment *seg = new Segment(currentRepresentation);
+            if(list && seg)
+            {
+                list->addSegment(seg);
+                currentRepresentation->setSegmentList(list);
+            }
+            else
+            {
+                delete seg;
+                delete list;
+            }
+        }
+
         adaptationSet->addRepresentation(this->currentRepresentation);
     }
 }
-void    IsoffMainParser::setSegmentBase     (dash::xml::Node *repNode, Representation *rep)
-{
-    std::vector<Node *> segmentBase = DOMHelper::getElementByTagName(repNode, "SegmentBase", false);
 
-    if(segmentBase.size() > 0)
-    {
-        SegmentBase *base = new SegmentBase();
-        this->setInitSegment(segmentBase.at(0), base);
-        rep->setSegmentBase(base);
-    }
-}
-void    IsoffMainParser::setSegmentList     (dash::xml::Node *repNode, Representation *rep)
+void IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformation *info)
 {
-    std::vector<Node *> segmentList = DOMHelper::getElementByTagName(repNode, "SegmentList", false);
+    if(!segmentBaseNode)
+        return;
 
-    if(segmentList.size() > 0)
+    else if(segmentBaseNode->hasAttribute("indexRange"))
     {
         SegmentList *list = new SegmentList();
-        this->setSegments(segmentList.at(0), list);
-        rep->setSegmentList(list);
-    }
+        Segment *seg;
 
+        size_t start = 0, end = 0;
+        if (std::sscanf(segmentBaseNode->getAttributeValue("indexRange").c_str(), "%zu-%zu", &start, &end) == 2)
+        {
+            seg = new IndexSegment(info);
+            seg->setByteRange(start, end);
+            list->addSegment(seg);
+            /* index must be before data, so data starts at index end */
+            seg = new Segment(info);
+            seg->setByteRange(end + 1, 0);
+        }
+        else
+        {
+            seg = new Segment(info);
+        }
+
+        list->addSegment(seg);
+        info->setSegmentList(list);
+
+        std::vector<Node *> initSeg = DOMHelper::getElementByTagName(segmentBaseNode, "Initialization", false);
+        if(!initSeg.empty())
+        {
+            SegmentBase *base = new SegmentBase();
+            setInitSegment(segmentBaseNode, base);
+            info->setSegmentBase(base);
+        }
+    }
+    else
+    {
+        SegmentBase *base = new SegmentBase();
+        setInitSegment(segmentBaseNode, base);
+        info->setSegmentBase(base);
+    }
 }
+
+size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation *info)
+{
+    size_t total = 0;
+    if(segListNode)
+    {
+        std::vector<Node *> segments = DOMHelper::getElementByTagName(segListNode, "SegmentURL", false);
+        SegmentList *list = new SegmentList();
+        if(!segments.empty() && (list = new (std::nothrow) SegmentList()))
+        {
+            std::vector<Node *>::const_iterator it;
+            for(it = segments.begin(); it != segments.end(); it++)
+            {
+                Node *segmentURL = *it;
+                std::string mediaUrl = segmentURL->getAttributeValue("media");
+                if(mediaUrl.empty())
+                    continue;
+
+                Segment *seg = new (std::nothrow) Segment(info);
+                if(!seg)
+                    continue;
+
+                seg->setSourceUrl(segmentURL->getAttributeValue("media"));
+
+                if(segmentURL->hasAttribute("mediaRange"))
+                {
+                    std::string range = segmentURL->getAttributeValue("mediaRange");
+                    size_t pos = range.find("-");
+                    seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
+                }
+
+                list->addSegment(seg);
+                total++;
+            }
+
+            info->setSegmentList(list);
+        }
+    }
+    return total;
+}
+
 void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, SegmentBase *base)
 {
     std::vector<Node *> initSeg = DOMHelper::getElementByTagName(segBaseNode, "Initialisation", false);
@@ -158,7 +308,7 @@ void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, Segme
 
     if(initSeg.size() > 0)
     {
-        Segment *seg = new Segment( this->currentRepresentation );
+        Segment *seg = new InitSegment( currentRepresentation );
         seg->setSourceUrl(initSeg.at(0)->getAttributeValue("sourceURL"));
 
         if(initSeg.at(0)->hasAttribute("range"))
@@ -168,68 +318,28 @@ void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, Segme
             seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
         }
 
-        for(size_t i = 0; i < this->mpd->getBaseUrls().size(); i++)
-            seg->addBaseUrl(this->mpd->getBaseUrls().at(i));
-
         base->addInitSegment(seg);
     }
 }
-void    IsoffMainParser::setSegments        (dash::xml::Node *segListNode, SegmentList *list)
-{
-    std::vector<Node *> segments = DOMHelper::getElementByTagName(segListNode, "SegmentURL", false);
 
-    for(size_t i = 0; i < segments.size(); i++)
-    {
-        Segment *seg = new Segment( this->currentRepresentation );
-        seg->setSourceUrl(segments.at(i)->getAttributeValue("media"));
-
-        if(segments.at(i)->hasAttribute("mediaRange"))
-        {
-            std::string range = segments.at(i)->getAttributeValue("mediaRange");
-            size_t pos = range.find("-");
-            seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
-        }
-
-        for(size_t j = 0; j < this->mpd->getBaseUrls().size(); j++)
-            seg->addBaseUrl(this->mpd->getBaseUrls().at(j));
-
-        list->addSegment(seg);
-    }
-}
 void    IsoffMainParser::print              ()
 {
-    if(this->mpd)
+    if(mpd)
     {
-        msg_Dbg(this->p_stream, "MPD profile=%d mediaPresentationDuration=%ld minBufferTime=%ld", this->mpd->getProfile(),
-                                                                                                  this->mpd->getDuration(),
-                                                                                                  this->mpd->getMinBufferTime());
-        const std::vector<BaseUrl *> baseurls = this->mpd->getBaseUrls();
+        msg_Dbg(p_stream, "MPD profile=%s mediaPresentationDuration=%ld minBufferTime=%ld",
+                static_cast<std::string>(mpd->getProfile()).c_str(),
+                mpd->getDuration(),
+                mpd->getMinBufferTime());
+        msg_Dbg(p_stream, "BaseUrl=%s", mpd->getUrlSegment().toString().c_str());
 
-        for(size_t i = 0; i < baseurls.size(); i++)
-            msg_Dbg(this->p_stream, "BaseUrl=%s", baseurls.at(i)->getUrl().c_str());
-
-        const std::vector<Period *> periods = this->mpd->getPeriods();
-
-        for(size_t i = 0; i < periods.size(); i++)
+        std::vector<Period *>::const_iterator i;
+        for(i = mpd->getPeriods().begin(); i != mpd->getPeriods().end(); i++)
         {
-            Period *period = periods.at(i);
-            msg_Dbg(this->p_stream, " Period");
-            for(size_t j = 0; j < period->getAdaptationSets().size(); j++)
+            std::vector<std::string> debug = (*i)->toString();
+            std::vector<std::string>::const_iterator l;
+            for(l = debug.begin(); l < debug.end(); l++)
             {
-                AdaptationSet *aset = period->getAdaptationSets().at(j);
-                msg_Dbg(this->p_stream, "  AdaptationSet");
-                for(size_t k = 0; k < aset->getRepresentations().size(); k++)
-                {
-                    Representation *rep = aset->getRepresentations().at(k);
-                    msg_Dbg(this->p_stream, "   Representation");
-                    Segment *initSeg = rep->getSegmentBase()->getInitSegment();
-                    msg_Dbg(this->p_stream, "    InitSeg url=%s", initSeg->getSourceUrl().c_str());
-                    for(size_t l = 0; l < rep->getSegmentList()->getSegments().size(); l++)
-                    {
-                        Segment *seg = rep->getSegmentList()->getSegments().at(l);
-                        msg_Dbg(this->p_stream, "    Segment url=%s", seg->getSourceUrl().c_str());
-                    }
-                }
+                msg_Dbg(p_stream, "%s", (*l).c_str());
             }
         }
     }

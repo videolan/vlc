@@ -38,15 +38,25 @@
 #include <QCheckBox>
 
 ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
-                              const QString& inputMRL )
-              : QVLCDialog( parent, _p_intf )
+                              const QStringList& inputMRLs )
+              : QVLCDialog( parent, _p_intf ),
+                singleFileSelected( inputMRLs.length() == 1 )
 {
     setWindowTitle( qtr( "Convert" ) );
     setWindowRole( "vlc-convert" );
 
     QGridLayout *mainLayout = new QGridLayout( this );
     SoutInputBox *inputBox = new SoutInputBox( this );
-    inputBox->setMRL( inputMRL );
+    incomingMRLs = &inputMRLs;
+
+    if(singleFileSelected)
+    {
+        inputBox->setMRL( inputMRLs[0] );
+    }
+    else
+    {
+        inputBox->setMRL("Multiple files selected.");
+    }
     mainLayout->addWidget( inputBox, 0, 0, 1, -1  );
 
     /**
@@ -62,12 +72,26 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     fileLine->setMinimumWidth( 300 );
     fileLine->setFocus( Qt::ActiveWindowFocusReason );
     destLabel->setBuddy( fileLine );
+    // You can set a specific name for only one file.
+    if(singleFileSelected)
+    {
+        QPushButton *fileSelectButton = new QPushButton( qtr( "Browse" ) );
+        destLayout->addWidget( fileSelectButton, 0, 2);
+        BUTTONACT( fileSelectButton, fileBrowse() );
+    }
 
-    QPushButton *fileSelectButton = new QPushButton( qtr( "Browse" ) );
+    // but multiple files follow a naming convention
+    else
+    {
+        fileLine->setText("Multiple Files Selected.");
+        fileLine->setReadOnly(true);
+        fileLine->setToolTip("Files will be placed in the same directory "
+                "with the same name.");
+
+        appendBox = new QCheckBox( qtr( "Append '-converted' to filename" ) );
+        destLayout->addWidget( appendBox, 1, 0 );
+    }
     destLayout->addWidget( fileLine, 0, 1 );
-    destLayout->addWidget( fileSelectButton, 0, 2);
-    BUTTONACT( fileSelectButton, fileBrowse() );
-
     mainLayout->addWidget( destBox, 3, 0, 1, -1  );
 
 
@@ -147,29 +171,74 @@ void ConvertDialog::close()
 {
     hide();
 
-    if( dumpRadio->isChecked() )
+    for(int i = 0; i < incomingMRLs->length(); i++)
     {
-        mrl = "demux=dump :demuxdump-file=" + fileLine->text();
-    }
-    else
-    {
-        mrl = "sout=#" + profile->getTranscode();
-        if( deinterBox->isChecked() )
-        {
-            mrl.remove( '}' );
-            mrl += ",deinterlace}";
-        }
-        mrl += ":";
-        if( displayBox->isChecked() )
-            mrl += "duplicate{dst=display,dst=";
-        mrl += "std{access=file{no-overwrite},mux=" + profile->getMux()
-             + ",dst='" + fileLine->text().replace( QChar('\''), "\\\'" )
-             + "'}";
-        if( displayBox->isChecked() )
-            mrl += "}";
-    }
+        QString mrl;
 
-    msg_Dbg( p_intf, "Transcode MRL: %s", qtu( mrl ) );
+        if( dumpRadio->isChecked() )
+        {
+            mrl = "demux=dump :demuxdump-file=" + fileLine->text();
+        }
+        else
+        {
+            mrl = "sout=#" + profile->getTranscode();
+            if( deinterBox->isChecked() )
+            {
+                mrl.remove( '}' );
+                mrl += ",deinterlace}";
+            }
+            mrl += ":";
+            if( displayBox->isChecked() )
+            {
+                mrl += "duplicate{dst=display,dst=";
+            }
+
+            QString newFileName;
+
+            // Only one file, use the destination provided
+            if(singleFileSelected)
+            {
+                newFileName = fileLine->text();
+            }
+
+            // Multiple, use the convention.
+            else
+            {
+                QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
+
+                newFileName = incomingMRLs->at(i);
+
+                // Remove the file:// from the front of our MRL
+                newFileName = newFileName.remove(0,7);
+
+                // Remote the existing extention (if any)
+                int extentionPos = newFileName.lastIndexOf('.');
+                if(extentionPos >= 0)
+                {
+                    newFileName = newFileName.remove(extentionPos, newFileName.length() - extentionPos);
+                }
+
+                // If we have multiple files (i.e. we have an appenBox) and it's checked
+                if( appendBox->isChecked() )
+                {
+                    newFileName = newFileName.append("-converted");
+                }
+
+                // Stick our new extention on
+                newFileName = newFileName.append(fileExtension);
+            }
+
+            newFileName.replace( QChar('\''), "\\\'" );
+
+            mrl += "std{access=file{no-overwrite},mux=" + profile->getMux()
+                 + ",dst='" + newFileName
+                 + "'}";
+            if( displayBox->isChecked() )
+                mrl += "}";
+        }
+        msg_Dbg( p_intf, "Transcode MRL: %s", qtu( mrl ) );
+        mrls.append(mrl);
+    }
     accept();
 }
 

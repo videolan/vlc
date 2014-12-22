@@ -45,6 +45,10 @@
 #include <android/log.h>
 #include <sys/syscall.h> /* __NR_gettid */
 
+#if !defined(HAVE_PTHREAD_CONDATTR_SETCLOCK) && !defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP)
+#error no pthread monotonic clock support
+#endif
+
 /* helper */
 static struct timespec mtime_to_ts (mtime_t date)
 {
@@ -185,8 +189,18 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
 
 void vlc_cond_init (vlc_cond_t *condvar)
 {
+#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP
     if (unlikely(pthread_cond_init (&condvar->cond, NULL)))
         abort ();
+#else
+    pthread_condattr_t attr;
+
+    pthread_condattr_init (&attr);
+    pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
+
+    if (unlikely(pthread_cond_init (&condvar->cond, &attr)))
+        abort ();
+#endif
     condvar->clock = CLOCK_MONOTONIC;
 }
 
@@ -257,7 +271,9 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
 {
     struct timespec ts = mtime_to_ts (deadline);
     vlc_thread_t th = thread;
+#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP
     int (*cb)(pthread_cond_t *, pthread_mutex_t *, const struct timespec *);
+#endif
 
     if (th != NULL)
     {
@@ -277,6 +293,7 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
         }
     }
 
+#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC_NP
     switch (condvar->clock)
     {
          case CLOCK_REALTIME:
@@ -290,6 +307,10 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
     }
 
     int val = cb (&condvar->cond, p_mutex, &ts);
+#else
+    int val = pthread_cond_timedwait(&condvar->cond, p_mutex, &ts);
+#endif
+
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
 

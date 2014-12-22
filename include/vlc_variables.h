@@ -121,7 +121,7 @@
 #define VLC_VAR_CLEARCHOICES        0x0022
 #define VLC_VAR_SETDEFAULT          0x0023
 #define VLC_VAR_GETCHOICES          0x0024
-#define VLC_VAR_GETLIST             0x0025
+
 #define VLC_VAR_CHOICESCOUNT        0x0026
 
 /**@}*/
@@ -183,9 +183,15 @@ VLC_API int var_AddCallback( vlc_object_t *, const char *, vlc_callback_t, void 
 VLC_API int var_DelCallback( vlc_object_t *, const char *, vlc_callback_t, void * );
 VLC_API int var_TriggerCallback( vlc_object_t *, const char * );
 
+VLC_API int var_AddListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
+VLC_API int var_DelListCallback( vlc_object_t *, const char *, vlc_list_callback_t, void * );
+
 #define var_AddCallback(a,b,c,d) var_AddCallback( VLC_OBJECT(a), b, c, d )
 #define var_DelCallback(a,b,c,d) var_DelCallback( VLC_OBJECT(a), b, c, d )
 #define var_TriggerCallback(a,b) var_TriggerCallback( VLC_OBJECT(a), b )
+
+#define var_AddListCallback(a,b,c,d) var_AddListCallback( VLC_OBJECT(a), b, c, d )
+#define var_DelListCallback(a,b,c,d) var_DelListCallback( VLC_OBJECT(a), b, c, d )
 
 /*****************************************************************************
  * helpers functions
@@ -422,7 +428,8 @@ static inline int64_t var_IncInteger( vlc_object_t *p_obj, const char *psz_name 
 {
     vlc_value_t val;
     val.i_int = 1;
-    var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val );
+    if( var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val ) )
+        return 0;
     return val.i_int;
 }
 #define var_IncInteger(a,b) var_IncInteger( VLC_OBJECT(a), b )
@@ -436,7 +443,8 @@ static inline int64_t var_DecInteger( vlc_object_t *p_obj, const char *psz_name 
 {
     vlc_value_t val;
     val.i_int = -1;
-    var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val );
+    if( var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val ) )
+        return 0;
     return val.i_int;
 }
 #define var_DecInteger(a,b) var_DecInteger( VLC_OBJECT(a), b )
@@ -446,7 +454,8 @@ static inline uint64_t var_OrInteger( vlc_object_t *obj, const char *name,
 {
     vlc_value_t val;
     val.i_int = v;
-    var_GetAndSet( obj, name, VLC_VAR_INTEGER_OR, &val );
+    if( var_GetAndSet( obj, name, VLC_VAR_INTEGER_OR, &val ) )
+        return 0;
     return val.i_int;
 }
 #define var_OrInteger(a,b,c) var_OrInteger(VLC_OBJECT(a),b,c)
@@ -456,7 +465,8 @@ static inline uint64_t var_NAndInteger( vlc_object_t *obj, const char *name,
 {
     vlc_value_t val;
     val.i_int = v;
-    var_GetAndSet( obj, name, VLC_VAR_INTEGER_NAND, &val );
+    if( var_GetAndSet( obj, name, VLC_VAR_INTEGER_NAND, &val ) )
+        return 0;
     return val.i_int;
 }
 #define var_NAndInteger(a,b,c) var_NAndInteger(VLC_OBJECT(a),b,c)
@@ -658,7 +668,8 @@ static inline int var_CountChoices( vlc_object_t *p_obj, const char *psz_name )
 static inline bool var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
-    var_GetAndSet( p_obj, psz_name, VLC_VAR_BOOL_TOGGLE, &val );
+    if( var_GetAndSet( p_obj, psz_name, VLC_VAR_BOOL_TOGGLE, &val ) )
+        return false;
     return val.b_bool;
 }
 #define var_ToggleBool(a,b) var_ToggleBool( VLC_OBJECT(a),b )

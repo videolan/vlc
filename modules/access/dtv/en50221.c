@@ -34,6 +34,7 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
+#include <sys/uio.h>
 #include <poll.h>
 #include <netinet/in.h>
 
@@ -243,64 +244,29 @@ static void Dump( bool b_outgoing, uint8_t *p_data, int i_size )
  * TPDUSend
  *****************************************************************************/
 static int TPDUSend( cam_t * p_cam, uint8_t i_slot, uint8_t i_tag,
-                     const uint8_t *p_content, int i_length )
+                     const uint8_t *p_content, size_t i_length )
 {
-    uint8_t i_tcid = i_slot + 1;
-    uint8_t p_data[MAX_TPDU_SIZE];
-    int i_size;
+    uint8_t p_data[9], *p = p_data;
 
-    i_size = 0;
-    p_data[0] = i_slot;
-    p_data[1] = i_tcid;
-    p_data[2] = i_tag;
+    *(p++) = i_slot;
+    *(p++) = i_slot + 1; /* TCID */
+    *(p++) = i_tag;
+    p = SetLength( p, i_length + 1 );
 
-    switch ( i_tag )
-    {
-    case T_RCV:
-    case T_CREATE_TC:
-    case T_CTC_REPLY:
-    case T_DELETE_TC:
-    case T_DTC_REPLY:
-    case T_REQUEST_TC:
-        p_data[3] = 1; /* length */
-        p_data[4] = i_tcid;
-        i_size = 5;
-        break;
+    *(p++) = i_slot + 1;
+    Dump( true, p_data, p - p_data );
 
-    case T_NEW_TC:
-    case T_TC_ERROR:
-        p_data[3] = 2; /* length */
-        p_data[4] = i_tcid;
-        p_data[5] = p_content[0];
-        i_size = 6;
-        break;
+    const struct iovec iov[2] = {
+        { p_data, p - p_data },
+        { (void *)p_content, i_length },
+    };
 
-    case T_DATA_LAST:
-    case T_DATA_MORE:
-    {
-        /* i_length <= MAX_TPDU_DATA */
-        uint8_t *p = p_data + 3;
-        p = SetLength( p, i_length + 1 );
-        *p++ = i_tcid;
-
-        if ( i_length )
-            memcpy( p, p_content, i_length );
-        i_size = i_length + (p - p_data);
-        break;
-    }
-
-    default:
-        break;
-    }
-    Dump( true, p_data, i_size );
-
-    if ( write( p_cam->fd, p_data, i_size ) != i_size )
+    if ( writev( p_cam->fd, iov, 2 ) <= 0 )
     {
         msg_Err( p_cam->obj, "cannot write to CAM device: %s",
                  vlc_strerror_c(errno) );
         return VLC_EGENERIC;
     }
-
     return VLC_SUCCESS;
 }
 
@@ -945,6 +911,68 @@ static void ResourceManagerOpen( cam_t * p_cam, unsigned i_session_id )
  */
 
 #ifdef ENABLE_HTTPD
+
+/****************************************************************************
+ * HTTPExtractValue: Extract a GET variable from psz_request
+ ****************************************************************************/
+static const char *HTTPExtractValue( const char *psz_uri, const char *psz_name,
+                        char *psz_value, int i_value_max )
+{
+    const char *p = psz_uri;
+
+    while( (p = strstr( p, psz_name )) )
+    {
+        /* Verify that we are dealing with a post/get argument */
+        if( (p == psz_uri || *(p - 1) == '&' || *(p - 1) == '\n')
+              && p[strlen(psz_name)] == '=' )
+            break;
+        p++;
+    }
+
+    if( p )
+    {
+        int i_len;
+
+        p += strlen( psz_name );
+        if( *p == '=' ) p++;
+
+        if( strchr( p, '&' ) )
+        {
+            i_len = strchr( p, '&' ) - p;
+        }
+        else
+        {
+            /* for POST method */
+            if( strchr( p, '\n' ) )
+            {
+                i_len = strchr( p, '\n' ) - p;
+                if( i_len && *(p+i_len-1) == '\r' ) i_len--;
+            }
+            else
+            {
+                i_len = strlen( p );
+            }
+        }
+        i_len = __MIN( i_value_max - 1, i_len );
+        if( i_len > 0 )
+        {
+            strncpy( psz_value, p, i_len );
+            psz_value[i_len] = '\0';
+        }
+        else
+        {
+            strncpy( psz_value, "", i_value_max );
+        }
+        p += i_len;
+    }
+    else
+    {
+        strncpy( psz_value, "", i_value_max );
+    }
+
+    return p;
+}
+
 /*****************************************************************************
  * ApplicationInformationEnterMenu
  *****************************************************************************/
@@ -1194,7 +1222,7 @@ static uint8_t *CAPMTES( system_ids_t *p_ids, uint8_t *p_capmt,
 
 static uint8_t *CAPMTBuild( cam_t * p_cam, int i_session_id,
                             dvbpsi_pmt_t *p_pmt, uint8_t i_list_mgt,
-                            uint8_t i_cmd, int *pi_capmt_size )
+                            uint8_t i_cmd, int *restrict pi_capmt_size )
 {
     system_ids_t *p_ids =
         (system_ids_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
@@ -1214,7 +1242,6 @@ static uint8_t *CAPMTBuild( cam_t * p_cam, int i_session_id,
         msg_Warn( p_cam->obj,
                   "no compatible scrambling system for SID %d on session %d",
                   p_pmt->i_program_number, i_session_id );
-        *pi_capmt_size = 0;
         return NULL;
     }
 
@@ -1261,8 +1288,7 @@ static void CAPMTFirst( cam_t * p_cam, int i_session_id,
     p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x3 /* only */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
-
-    if( i_capmt_size )
+    if( p_capmt != NULL )
     {
         APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
@@ -1301,8 +1327,7 @@ static void CAPMTAdd( cam_t * p_cam, int i_session_id,
     p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x4 /* add */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
-
-    if( i_capmt_size )
+    if( p_capmt != NULL )
     {
         APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
@@ -1324,8 +1349,7 @@ static void CAPMTUpdate( cam_t * p_cam, int i_session_id,
     p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x5 /* update */, 0x1 /* ok_descrambling */,
                           &i_capmt_size );
-
-    if( i_capmt_size )
+    if( p_capmt != NULL )
     {
         APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
@@ -1348,8 +1372,7 @@ static void CAPMTDelete( cam_t * p_cam, int i_session_id,
     p_capmt = CAPMTBuild( p_cam, i_session_id, p_pmt,
                           0x5 /* update */, 0x4 /* not selected */,
                           &i_capmt_size );
-
-    if( i_capmt_size )
+    if( p_capmt != NULL )
     {
         APDUSend( p_cam, i_session_id, AOT_CA_PMT, p_capmt, i_capmt_size );
         free( p_capmt );
@@ -1971,6 +1994,7 @@ cam_t *en50221_Init( vlc_object_t *obj, int fd )
 
     p_cam->obj = obj;
     p_cam->fd = fd;
+    p_cam->i_nb_slots = caps.slot_num;
 
     if( caps.slot_type & CA_CI_LINK )
     {

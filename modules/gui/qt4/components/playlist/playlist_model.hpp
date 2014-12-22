@@ -73,39 +73,39 @@ public:
     /*** QAbstractItemModel subclassing ***/
 
     /* Data structure */
-    virtual QVariant data( const QModelIndex &index, const int role ) const;
-    virtual int rowCount( const QModelIndex &parent = QModelIndex() ) const;
-    virtual Qt::ItemFlags flags( const QModelIndex &index ) const;
-    virtual QModelIndex index( const int r, const int c, const QModelIndex &parent ) const;
-    virtual QModelIndex parent( const QModelIndex &index ) const;
+    QVariant data( const QModelIndex &index, const int role ) const Q_DECL_OVERRIDE;
+    int rowCount( const QModelIndex &parent = QModelIndex() ) const Q_DECL_OVERRIDE;
+    Qt::ItemFlags flags( const QModelIndex &index ) const Q_DECL_OVERRIDE;
+    QModelIndex index( const int r, const int c, const QModelIndex &parent ) const Q_DECL_OVERRIDE;
+    QModelIndex parent( const QModelIndex &index ) const Q_DECL_OVERRIDE;
 
     /* Drag and Drop */
-    virtual Qt::DropActions supportedDropActions() const;
-    virtual QMimeData* mimeData( const QModelIndexList &indexes ) const;
-    virtual bool dropMimeData( const QMimeData *data, Qt::DropAction action,
-                      int row, int column, const QModelIndex &target );
-    virtual QStringList mimeTypes() const;
+    Qt::DropActions supportedDropActions() const Q_DECL_OVERRIDE;
+    QMimeData* mimeData( const QModelIndexList &indexes ) const Q_DECL_OVERRIDE;
+    bool dropMimeData( const QMimeData *data, Qt::DropAction action,
+              int row, int column, const QModelIndex &target );
+    QStringList mimeTypes() const Q_DECL_OVERRIDE;
 
     /* Sort */
-    virtual void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder );
+    void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder ) Q_DECL_OVERRIDE;
 
     /*** VLCModelSubInterface subclassing ***/
-    virtual void rebuild( playlist_item_t * p = NULL );
-    virtual void doDelete( QModelIndexList selected );
-    virtual void createNode( QModelIndex index, QString name );
-    virtual void renameNode( QModelIndex index, QString name );
-    virtual void removeAll();
+    void rebuild( playlist_item_t * p = NULL ) Q_DECL_OVERRIDE;
+    void doDelete( QModelIndexList selected ) Q_DECL_OVERRIDE;
+    void createNode( QModelIndex index, QString name ) Q_DECL_OVERRIDE;
+    void renameNode( QModelIndex index, QString name ) Q_DECL_OVERRIDE;
+    void removeAll();
 
     /* Lookups */
-    virtual QModelIndex rootIndex() const;
-    virtual void filter( const QString& search_text, const QModelIndex & root, bool b_recursive );
-    virtual QModelIndex currentIndex() const;
-    virtual QModelIndex indexByPLID( const int i_plid, const int c ) const;
-    virtual QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const;
-    virtual bool isTree() const;
-    virtual bool canEdit() const;
-    virtual bool action( QAction *action, const QModelIndexList &indexes );
-    virtual bool isSupportedAction( actions action, const QModelIndex & ) const;
+    QModelIndex rootIndex() const Q_DECL_OVERRIDE;
+    void filter( const QString& search_text, const QModelIndex & root, bool b_recursive ) Q_DECL_OVERRIDE;
+    QModelIndex currentIndex() const Q_DECL_OVERRIDE;
+    QModelIndex indexByPLID( const int i_plid, const int c ) const Q_DECL_OVERRIDE;
+    QModelIndex indexByInputItemID( const int i_inputitem_id, const int c ) const Q_DECL_OVERRIDE;
+    bool isTree() const Q_DECL_OVERRIDE;
+    bool canEdit() const Q_DECL_OVERRIDE;
+    bool action( QAction *action, const QModelIndexList &indexes ) Q_DECL_OVERRIDE;
+    bool isSupportedAction( actions action, const QModelIndex & ) const Q_DECL_OVERRIDE;
 
 protected:
     /* VLCModel subclassing */
@@ -157,7 +157,7 @@ private:
 
 private slots:
     void processInputItemUpdate( input_item_t *);
-    void processInputItemUpdate( input_thread_t* p_input );
+    void processInputItemUpdate();
     void processItemRemoval( int i_pl_itemid );
     void processItemAppend( int i_pl_itemid, int i_pl_itemidparent );
     void activateItem( playlist_item_t *p_item );

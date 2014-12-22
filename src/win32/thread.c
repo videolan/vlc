@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <errno.h>
+#include <time.h>
 
 /*** Static mutex and condition variable ***/
 static vlc_mutex_t super_mutex;
@@ -226,9 +227,6 @@ void vlc_cond_destroy (vlc_cond_t *p_condvar)
 
 void vlc_cond_signal (vlc_cond_t *p_condvar)
 {
-    if (!p_condvar->clock)
-        return;
-
     /* This is suboptimal but works. */
     vlc_cond_broadcast (p_condvar);
 }
@@ -503,17 +501,18 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     }
 
     if (detached)
+    {
         CloseHandle((HANDLE)h);
+        th->id = NULL;
+    }
     else
         th->id = (HANDLE)h;
 
     if (p_handle != NULL)
         *p_handle = th;
 
-#if !VLC_WINSTORE_APP
     if (priority)
         SetThreadPriority (th->id, priority);
-#endif
 
     return 0;
 }
@@ -548,10 +547,8 @@ int vlc_clone_detach (vlc_thread_t *p_handle, void *(*entry) (void *),
 
 int vlc_set_priority (vlc_thread_t th, int priority)
 {
-#if !VLC_WINSTORE_APP
     if (!SetThreadPriority (th->id, priority))
         return VLC_EGENERIC;
-#endif
     return VLC_SUCCESS;
 }
 

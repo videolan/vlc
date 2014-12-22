@@ -86,13 +86,13 @@ int playlist_VolumeUp (playlist_t *pl, int value, float *volp)
     if (aout != NULL)
     {
         float vol = aout_VolumeGet (aout);
-        if (vol >= 0.)
+        if (vol >= 0.f)
         {
             vol += delta;
-            if (vol < 0.)
-                vol = 0.;
-            if (vol > 2.)
-                vol = 2.;
+            if (vol < 0.f)
+                vol = 0.f;
+            if (vol > 2.f)
+                vol = 2.f;
             vol = (roundf (vol / stepSize)) * stepSize;
             if (volp != NULL)
                 *volp = vol;

@@ -25,6 +25,7 @@
 #define VOUT_WINDOW_HPP
 
 #include "generic_window.hpp"
+#include "dialogs.hpp"
 #include <vlc_vout_window.h>
 
 class OSGraphics;
@@ -67,6 +68,9 @@ public:
     /// set original size of vout
     virtual void setOriginalWidth( int width ) { original_width = width; }
     virtual void setOriginalHeight( int height ) { original_height = height; }
+
+    /// Resize the window
+    virtual void resize( int width, int height );
 
     virtual string getType() const { return "Vout"; }
 

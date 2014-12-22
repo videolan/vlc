@@ -28,21 +28,68 @@
 #include "AbstractAdaptationLogic.h"
 
 using namespace dash::logic;
-using namespace dash::xml;
 using namespace dash::mpd;
+using namespace dash::http;
 
-AbstractAdaptationLogic::AbstractAdaptationLogic    (IMPDManager *mpdManager, stream_t *stream) :
-                         bpsAvg                     (0),
-                         bpsLastChunk               (0),
-                         mpdManager                 (mpdManager),
-                         stream                     (stream),
+AbstractAdaptationLogic::AbstractAdaptationLogic    (MPD *mpd_) :
+                         mpd                        (mpd_),
+                         currentPeriod              (mpd->getFirstPeriod()),
+                         count                      (0),
+                         prevRepresentation         (NULL),
                          bufferedMicroSec           (0),
                          bufferedPercent            (0)
-
 {
 }
+
 AbstractAdaptationLogic::~AbstractAdaptationLogic   ()
 {
+}
+
+Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
+{
+    if(!currentPeriod)
+        return NULL;
+
+    Representation *rep = getCurrentRepresentation(type);
+    if ( rep == NULL )
+            return NULL;
+
+    bool reinit = count && (rep != prevRepresentation);
+    prevRepresentation = rep;
+
+    std::vector<ISegment *> segments = rep->getSegments();
+    ISegment *first = segments.empty() ? NULL : segments.front();
+
+    if (reinit && first && first->getClassId() == InitSegment::CLASSID_INITSEGMENT)
+        return first->toChunk(count, rep);
+
+    bool b_templated = (first && !first->isSingleShot());
+
+    if (count == segments.size() && !b_templated)
+    {
+        currentPeriod = mpd->getNextPeriod(currentPeriod);
+        count = 0;
+        return getNextChunk(type);
+    }
+
+    ISegment *seg = NULL;
+    if ( segments.size() > count )
+    {
+        seg = segments.at( count );
+    }
+    else if(b_templated)
+    {
+        seg = segments.back();
+    }
+
+    if(seg)
+    {
+        Chunk *chunk = seg->toChunk(count, rep);
+        count++;
+        seg->done();
+        return chunk;
+    }
+    return NULL;
 }
 
 void AbstractAdaptationLogic::bufferLevelChanged     (mtime_t bufferedMicroSec, int bufferedPercent)
@@ -50,19 +97,11 @@ void AbstractAdaptationLogic::bufferLevelChanged     (mtime_t bufferedMicroSec, 
     this->bufferedMicroSec = bufferedMicroSec;
     this->bufferedPercent  = bufferedPercent;
 }
-void AbstractAdaptationLogic::downloadRateChanged    (uint64_t bpsAvg, uint64_t bpsLastChunk)
+
+void AbstractAdaptationLogic::updateDownloadRate    (size_t, mtime_t)
 {
-    this->bpsAvg        = bpsAvg;
-    this->bpsLastChunk  = bpsLastChunk;
 }
-uint64_t AbstractAdaptationLogic::getBpsAvg          () const
-{
-    return this->bpsAvg;
-}
-uint64_t AbstractAdaptationLogic::getBpsLastChunk    () const
-{
-    return this->bpsLastChunk;
-}
+
 int AbstractAdaptationLogic::getBufferPercent        () const
 {
     return this->bufferedPercent;

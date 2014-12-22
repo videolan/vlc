@@ -25,10 +25,14 @@
 #ifndef CHUNK_H_
 #define CHUNK_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc_common.h>
 #include <vlc_url.h>
 
-#include "IHTTPConnection.h"
+#include "HTTPConnection.h"
 
 #include <vector>
 #include <string>
@@ -41,12 +45,12 @@ namespace dash
         class Chunk
         {
             public:
-                Chunk           ();
+                Chunk           (const std::string &url);
+                virtual ~Chunk  () {}
 
-                int                 getEndByte              () const;
-                int                 getStartByte            () const;
+                size_t              getEndByte              () const;
+                size_t              getStartByte            () const;
                 const std::string&  getUrl                  () const;
-                bool                hasHostname             () const;
                 const std::string&  getHostname             () const;
                 const std::string&  getPath                 () const;
                 int                 getPort                 () const;
@@ -54,34 +58,34 @@ namespace dash
                 uint64_t            getBytesRead            () const;
                 uint64_t            getBytesToRead          () const;
                 size_t              getPercentDownloaded    () const;
-                IHTTPConnection*    getConnection           () const;
+                HTTPConnection*     getConnection           () const;
 
-                void                setConnection   (IHTTPConnection *connection);
+                void                setConnection   (HTTPConnection *connection);
                 void                setBytesRead    (uint64_t bytes);
+                void                setBytesToRead  (uint64_t bytes);
                 void                setLength       (uint64_t length);
-                void                setEndByte      (int endByte);
-                void                setStartByte    (int startByte);
-                void                setUrl          (const std::string& url);
+                void                setEndByte      (size_t endByte);
+                void                setStartByte    (size_t startByte);
                 void                addOptionalUrl  (const std::string& url);
-                bool                useByteRange    ();
-                void                setUseByteRange (bool value);
+                bool                usesByteRange   () const;
                 void                setBitrate      (uint64_t bitrate);
                 int                 getBitrate      ();
+
+                virtual void        onDownload      (void *, size_t) {}
 
             private:
                 std::string                 url;
                 std::string                 path;
                 std::string                 hostname;
                 std::vector<std::string>    optionalUrls;
-                int                         startByte;
-                int                         endByte;
-                bool                        hasByteRange;
+                size_t                      startByte;
+                size_t                      endByte;
                 int                         bitrate;
                 int                         port;
-                bool                        isHostname;
-                size_t                      length;
+                uint64_t                    length;
                 uint64_t                    bytesRead;
-                IHTTPConnection             *connection;
+                uint64_t                    bytesToRead;
+                HTTPConnection             *connection;
         };
     }
 }

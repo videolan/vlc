@@ -47,7 +47,7 @@ vlc_module_begin ()
     set_description (N_("Embedded window video"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window hwnd", 0)
+    set_capability ("vout window", 70)
     set_callbacks (Open, Close)
     add_shortcut ("embed-hwnd")
 
@@ -67,7 +67,10 @@ static uintptr_t *used = NULL;
  */
 static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    VLC_UNUSED (cfg);
+    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
+     && cfg->type != VOUT_WINDOW_TYPE_HWND)
+        return VLC_EGENERIC;
+
     uintptr_t val = var_InheritInteger (wnd, "drawable-hwnd");
     if (val == 0)
         return VLC_EGENERIC;
@@ -100,6 +103,7 @@ skip:
     if (val == 0)
         return VLC_EGENERIC;
 
+    wnd->type = VOUT_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = (void *)val;
     wnd->control = Control;
     wnd->sys = (void *)val;

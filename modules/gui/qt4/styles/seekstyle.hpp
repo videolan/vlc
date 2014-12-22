@@ -23,6 +23,8 @@
 #ifndef SEEKSTYLE_HPP
 #define SEEKSTYLE_HPP
 
+#include "qt4.hpp"
+
 #include <inttypes.h>
 #include <QProxyStyle>
 #include <QStyleOptionSlider>
@@ -44,8 +46,8 @@ public:
 
 public:
     SeekStyle();
-    virtual int pixelMetric(PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0) const;
-    virtual void drawComplexControl(ComplexControl cc, const QStyleOptionComplex *opt, QPainter *p, const QWidget *widget) const;
+    int pixelMetric(PixelMetric metric, const QStyleOption * option = 0, const QWidget * widget = 0) const Q_DECL_OVERRIDE;
+    void drawComplexControl(ComplexControl cc, const QStyleOptionComplex *opt, QPainter *p, const QWidget *widget) const Q_DECL_OVERRIDE;
 };
 
 #endif // SEEKSTYLE_HPP

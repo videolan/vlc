@@ -54,7 +54,9 @@ class SpeedControlWidget;
 class QVBoxLayout;
 class QMenu;
 class QSize;
+class QTimer;
 class StandardPLPanel;
+struct vout_window_t;
 
 class MainInterface : public QVLCMW
 {
@@ -70,8 +72,8 @@ public:
     static const QEvent::Type ToolbarsNeedRebuild;
 
     /* Video requests from core */
-    WId  getVideo( int *pi_x, int *pi_y,
-                  unsigned int *pi_width, unsigned int *pi_height );
+    WId  getVideo( struct vout_window_t *,
+                   unsigned int *pi_width, unsigned int *pi_height );
     void releaseVideo( void );
     int  controlVideo( int i_query, va_list args );
 
@@ -96,21 +98,22 @@ protected:
 #ifdef _WIN32
     virtual bool winEvent( MSG *, long * );
 #endif
-    virtual void changeEvent( QEvent * );
-    virtual void dropEvent( QDropEvent *);
-    virtual void dragEnterEvent( QDragEnterEvent * );
-    virtual void dragMoveEvent( QDragMoveEvent * );
-    virtual void dragLeaveEvent( QDragLeaveEvent * );
-    virtual void closeEvent( QCloseEvent *);
-    virtual void keyPressEvent( QKeyEvent *);
-    virtual void wheelEvent( QWheelEvent * );
-    virtual bool eventFilter(QObject *, QEvent *);
+    void changeEvent( QEvent * ) Q_DECL_OVERRIDE;
+    void dropEvent( QDropEvent *) Q_DECL_OVERRIDE;
+    void dragEnterEvent( QDragEnterEvent * ) Q_DECL_OVERRIDE;
+    void dragMoveEvent( QDragMoveEvent * ) Q_DECL_OVERRIDE;
+    void dragLeaveEvent( QDragLeaveEvent * ) Q_DECL_OVERRIDE;
+    void closeEvent( QCloseEvent *) Q_DECL_OVERRIDE;
+    void keyPressEvent( QKeyEvent *) Q_DECL_OVERRIDE;
+    void wheelEvent( QWheelEvent * ) Q_DECL_OVERRIDE;
+    bool eventFilter(QObject *, QEvent *) Q_DECL_OVERRIDE;
 
 private:
     /* Main Widgets Creation */
     void createMainWidget( QSettings* );
     void createStatusBar();
     void createPlaylist();
+    void createResumePanel( QWidget *w );
 
     /* Systray */
     void createSystray();
@@ -146,6 +149,11 @@ private:
     PlaylistWidget      *playlistWidget;
     //VisualSelector      *visualSelector;
 
+    /* resume panel */
+    QWidget             *resumePanel;
+    QTimer              *resumeTimer;
+    int64_t             i_resumeTime;
+
     /* Status Bar */
     QLabel              *nameLabel;
     QLabel              *cryptedLabel;
@@ -175,7 +183,7 @@ private:
     bool                 b_statusbarVisible;
 
 #ifdef _WIN32
-    HWND WinId();
+    HWND WinId( QWidget *);
     HIMAGELIST himl;
     ITaskbarList3 *p_taskbl;
     UINT taskbar_wmsg;
@@ -199,13 +207,12 @@ public slots:
     void setStatusBarVisibility(bool b_visible);
     void setPlaylistVisibility(bool b_visible);
 
-    void popupMenu( const QPoint& );
 #ifdef _WIN32
     void changeThumbbarButtons( int );
 #endif
 
     /* Manage the Video Functions from the vout threads */
-    void getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
+    void getVideoSlot( WId *p_id, struct vout_window_t *,
                        unsigned *pi_width, unsigned *pi_height );
     void releaseVideoSlot( void );
 
@@ -217,7 +224,6 @@ public slots:
 
 private slots:
     void debug();
-    void destroyPopupMenu();
     void recreateToolbars();
     void setName( const QString& );
     void setVLCWindowsTitle( const QString& title = "" );
@@ -254,9 +260,12 @@ private slots:
     void setBoss();
     void setRaise();
 
+    void showResumePanel( int64_t);
+    void hideResumePanel();
+    void resumePlayback();
+
 signals:
-    void askGetVideo( WId *p_id, int *pi_x, int *pi_y,
-                      unsigned *pi_width, unsigned *pi_height );
+    void askGetVideo( WId *, struct vout_window_t *, unsigned *, unsigned * );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );

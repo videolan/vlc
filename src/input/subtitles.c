@@ -357,28 +357,26 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             }
             if( i_prio >= i_fuzzy )
             {
-                char psz_path[strlen( psz_dir ) + strlen( psz_name ) + 2];
                 struct stat st;
+                char *path;
 
-                sprintf( psz_path, "%s"DIR_SEP"%s", psz_dir, psz_name );
-                if( !strcmp( psz_path, psz_fname ) )
+                if( asprintf( &path, "%s"DIR_SEP"%s", psz_dir, psz_name ) < 0 )
                     continue;
 
-                if( !vlc_stat( psz_path, &st ) && S_ISREG( st.st_mode ) && result )
+                if( strcmp( path, psz_fname )
+                 && vlc_stat( path, &st ) == 0
+                 && S_ISREG( st.st_mode ) && result )
                 {
                     msg_Dbg( p_this,
                             "autodetected subtitle: %s with priority %d",
-                            psz_path, i_prio );
+                            path, i_prio );
                     result[i_sub_count].priority = i_prio;
-                    result[i_sub_count].psz_fname = strdup( psz_path );
+                    result[i_sub_count].psz_fname = path;
+                    path = NULL;
                     result[i_sub_count].psz_ext = strdup(tmp_fname_ext);
                     i_sub_count++;
                 }
-                else
-                {
-                    msg_Dbg( p_this, "stat failed (autodetecting subtitle: %s with priority %d)",
-                             psz_path, i_prio );
-                }
+                free( path );
             }
         }
         closedir( dir );

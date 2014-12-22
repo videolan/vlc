@@ -28,7 +28,6 @@
 extern "C" {
 # endif
 
-#include <vlc_input.h>
 #include <vlc_events.h>
 
 TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
@@ -139,6 +138,7 @@ struct playlist_item_t
     playlist_item_t      **pp_children; /**< Children nodes/items */
     playlist_item_t       *p_parent;    /**< Item parent */
     int                    i_children;  /**< Number of children, -1 if not a node */
+    unsigned               i_nb_played; /**< Times played */
 
     int                    i_id;        /**< Playlist item specific id */
     uint8_t                i_flags;     /**< Flags \see playlist_item_flags_e */
@@ -253,13 +253,29 @@ enum pl_locked_state
 #define PL_UNLOCK playlist_Unlock( p_playlist )
 #define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
 
-/* Playlist control */
+/** Playlist commands */
+enum {
+    PLAYLIST_PLAY,      /**< No arg.                            res=can fail*/
+    PLAYLIST_VIEWPLAY,  /**< arg1= playlist_item_t*,*/
+                        /**  arg2 = playlist_item_t*          , res=can fail */
+    PLAYLIST_TOGGLE_PAUSE, /**< No arg                          res=can fail */
+    PLAYLIST_STOP,      /**< No arg                             res=can fail*/
+    PLAYLIST_SKIP,      /**< arg1=int,                          res=can fail*/
+    PLAYLIST_PAUSE,     /**< No arg */
+    PLAYLIST_RESUME,    /**< No arg */
+};
+
 #define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, pl_Unlocked )
-#define playlist_Pause(p) playlist_Control(p,PLAYLIST_PAUSE, pl_Unlocked )
+#define playlist_TogglePause(p) \
+        playlist_Control(p, PLAYLIST_TOGGLE_PAUSE, pl_Unlocked)
 #define playlist_Stop(p) playlist_Control(p,PLAYLIST_STOP, pl_Unlocked )
 #define playlist_Next(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, 1)
 #define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, -1)
 #define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked,  (i) )
+#define playlist_Pause(p) \
+        playlist_Control(p, PLAYLIST_PAUSE, pl_Unlocked)
+#define playlist_Resume(p) \
+        playlist_Control(p, PLAYLIST_RESUME, pl_Unlocked)
 
 VLC_API void playlist_Lock( playlist_t * );
 VLC_API void playlist_Unlock( playlist_t * );
@@ -274,9 +290,8 @@ VLC_API void playlist_Deactivate( playlist_t * );
  * \param i_query the command to do
  * \param b_locked TRUE if playlist is locked when entering this function
  * \param variable number of arguments
- * \return VLC_SUCCESS or an error
  */
-VLC_API int playlist_Control( playlist_t *p_playlist, int i_query, bool b_locked, ...  );
+VLC_API void playlist_Control( playlist_t *p_playlist, int i_query, bool b_locked, ...  );
 
 /** Get current playing input. The object is retained.
  */

@@ -66,6 +66,12 @@ typedef struct variable_ops_t
     void (*pf_free) ( vlc_value_t * );
 } variable_ops_t;
 
+typedef struct callback_table_t
+{
+    int                i_entries;
+    callback_entry_t * p_entries;
+} callback_table_t;
+
 /**
  * The structure describing a variable.
  * \note vlc_value_t is the common union for variable values
@@ -99,10 +105,10 @@ struct variable_t
     /** Set to TRUE if the variable is in a callback */
     bool   b_incallback;
 
-    /** Number of registered callbacks */
-    int                i_entries;
-    /** Array of registered callbacks */
-    callback_entry_t * p_entries;
+    /** Registered value callbacks */
+    callback_table_t    value_callbacks;
+    /** Registered list callbacks */
+    callback_table_t    list_callbacks;
 };
 
 extern void var_DestroyAll( vlc_object_t * );

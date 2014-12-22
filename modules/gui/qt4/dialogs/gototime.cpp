@@ -92,7 +92,8 @@ void GotoTimeDialog::toggleVisible()
         timeEdit->setTime( timeEdit->time().addSecs( i_time / 1000000 ) );
     }
     QVLCDialog::toggleVisible();
-    activateWindow ();
+    if(isVisible())
+        activateWindow();
 }
 
 void GotoTimeDialog::cancel()

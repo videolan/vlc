@@ -49,8 +49,8 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
     menuMapper = new QSignalMapper( this );
     CONNECT( menuMapper, mapped( int ), this, triggerMenu( int ) );
     CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, playingChanged( int ) );
-    DCONNECT( THEMIM, inputChanged( input_thread_t* ),
-              this, inputChanged( input_thread_t* ) );
+    DCONNECT( THEMIM, inputChanged(  ),
+              this, inputChanged( ) );
     CONNECT( THEMIM->getIM(), metaChanged( input_item_t* ),
              this, metaChanged( input_item_t* ) );
     b_unloading = false;
@@ -264,8 +264,9 @@ void ExtensionsManager::triggerMenu( int id )
     }
 }
 
-void ExtensionsManager::inputChanged( input_thread_t* p_input )
+void ExtensionsManager::inputChanged( )
 {
+    input_thread_t* p_input = THEMIM->getInput();
     //This is unlikely, but can happen if no extension modules can be loaded.
     if ( p_extensions_manager == NULL )
         return ;

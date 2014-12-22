@@ -28,6 +28,7 @@
 #include <string>
 #include <list>
 #include <ctime>
+#include "ICanonicalUrl.hpp"
 
 namespace dash
 {
@@ -36,10 +37,10 @@ namespace dash
         class Segment;
         class SegmentTimeline;
 
-        class SegmentInfoCommon
+        class SegmentInfoCommon : public ICanonicalUrl
         {
             public:
-                SegmentInfoCommon();
+                SegmentInfoCommon( ICanonicalUrl *parent = NULL );
                 virtual ~SegmentInfoCommon();
                 time_t                  getDuration() const;
                 void                    setDuration( time_t duration );
@@ -47,10 +48,10 @@ namespace dash
                 void                    setStartIndex( int startIndex );
                 Segment*                getInitialisationSegment() const;
                 void                    setInitialisationSegment( Segment* seg );
-                const std::list<std::string>&   getBaseURL() const;
                 void                    appendBaseURL( const std::string& url );
                 const SegmentTimeline*  getSegmentTimeline() const;
                 void                    setSegmentTimeline( const SegmentTimeline *segTl );
+                virtual Url             getUrlSegment() const; /* impl */
 
             private:
                 time_t                  duration;

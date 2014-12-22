@@ -76,6 +76,9 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
+    if (vout_display_IsWindowed(vd))
+        return VLC_EGENERIC;
+
     vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
@@ -110,8 +113,6 @@ static int Open(vlc_object_t *object)
     int height;
 
     primary->GetSize(primary, &width, &height);
-
-    vout_display_DeleteWindow(vd, NULL);
 
     /* */
     video_format_t fmt;
@@ -157,7 +158,7 @@ static int Open(vlc_object_t *object)
 
     /* */
     vout_display_SendEventFullscreen(vd, true);
-    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height, true);
+    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height);
     return VLC_SUCCESS;
 
 error:
@@ -172,7 +173,7 @@ static void Close(vlc_object_t *object)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
 
     IDirectFBSurface *primary = sys->primary;
     if (primary)
@@ -266,16 +267,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
 static int Control(vout_display_t *vd, int query, va_list args)
 {
-    switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE: {
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        if (cfg->display.width  != vd->fmt.i_width ||
-            cfg->display.height != vd->fmt.i_height)
-            return VLC_EGENERIC;
-        return VLC_SUCCESS;
-    }
-    default:
-        msg_Err(vd, "Unsupported query in vout display directfb");
-        return VLC_EGENERIC;
-    }
+    (void) vd; (void) query; (void) args;
+    return VLC_EGENERIC;
 }

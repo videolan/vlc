@@ -210,7 +210,7 @@ static int Demux( demux_t *p_demux )
                 }
                 else
                 {
-                    if( !strcmp( psz_elname, "url" ) )
+                    if( !strcmp( psz_elname, "url" ) && *node )
                     {
                         free( psz_art_url );
                         psz_art_url = strdup( node );

@@ -602,7 +602,7 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
             if( ++i >= i_property )
                 break;
 
-            psz_line = strdup( ppsz_property[i] );
+            psz_line = xstrdup( ppsz_property[i] );
             for( j = i+1; j < i_property; j++ )
             {
                 psz_line = xrealloc( psz_line,
@@ -611,7 +611,9 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
                 strcat( psz_line, ppsz_property[j] );
             }
 
-            if( vlm_ScheduleSetup( p_schedule, "append", psz_line ) )
+            int val = vlm_ScheduleSetup( p_schedule, "append", psz_line );
+            free( psz_line );
+            if( val )
                 goto error;
             break;
         }

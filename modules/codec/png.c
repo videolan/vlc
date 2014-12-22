@@ -405,7 +405,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
 
     /* Encode picture */
 
-    for( int i = 0; i < p_pic->p->i_lines; i++ )
+    for( int i = 0; i < p_pic->p->i_visible_lines; i++ )
     {
         png_write_row( p_png, p_pic->p->p_pixels + (i * p_pic->p->i_pitch) );
         if( p_sys->b_error ) goto error;

@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_playlist.h>
+#include <vlc_input_item.h>
 
 #include "cmd_generic.hpp"
 #include "../utils/ustring.hpp"

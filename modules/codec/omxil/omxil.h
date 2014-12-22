@@ -36,6 +36,16 @@
 #include "omxil_utils.h"
 #include "omxil_core.h"
 
+#if defined(USE_IOMX)
+#include "../../video_output/android/utils.h"
+#endif
+
+enum
+{
+    BUF_STATE_NOT_OWNED = 0,
+    BUF_STATE_OWNED,
+};
+
 /*****************************************************************************
  * decoder_sys_t : omxil decoder descriptor
  *****************************************************************************/
@@ -50,6 +60,29 @@ typedef struct OmxFifo
     int offset;
 
 } OmxFifo;
+
+typedef struct HwBuffer
+{
+    vlc_thread_t    dequeue_thread;
+    bool            b_run;
+    vlc_cond_t      wait;
+    picture_t**     inflight_picture; /**< stores the inflight picture for each output buffer or NULL */
+
+    unsigned int    i_buffers;
+    void            **pp_handles;
+    int             *i_states;
+    unsigned int    i_max_owned;
+    unsigned int    i_owned;
+
+    void            *p_library;
+    void            *window;
+#if defined(USE_IOMX)
+    native_window_api_t native_window;
+    native_window_priv_api_t anwpriv;
+    native_window_priv *window_priv;
+#endif
+
+} HwBuffer;
 
 typedef struct OmxPort
 {
@@ -74,6 +107,8 @@ typedef struct OmxPort
     OMX_BOOL b_update_def;
     OMX_BOOL b_direct;
     OMX_BOOL b_flushed;
+
+    HwBuffer *p_hwbuf;
 
 } OmxPort;
 

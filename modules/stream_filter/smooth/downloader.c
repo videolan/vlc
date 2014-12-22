@@ -21,336 +21,393 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-#include <vlc_common.h>
+#include "smooth.h"
+
 #include <assert.h>
 #include <vlc_stream.h>
-#include <vlc_es.h>
+#include <vlc_charset.h>
 
-#include "smooth.h"
 #include "../../demux/mp4/libmp4.h"
 
-static char *ConstructUrl( const char *template, const char *base_url,
-        const uint64_t bandwidth, const uint64_t start_time )
+static bool Replace( char **ppsz_string, off_t off, const char *psz_old,
+                     const char *psz_new )
 {
-    char *frag, *end, *qual;
-    char *url_template = strdup( template );
-    char *saveptr = NULL;
+    const size_t i_oldlen = strlen( psz_old );
+    const size_t i_newlen = strlen( psz_new );
+    size_t i_stringlen = strlen( *ppsz_string );
 
-    qual = strtok_r( url_template, "{", &saveptr );
-    strtok_r( NULL, "}", &saveptr );
-    frag = strtok_r( NULL, "{", &saveptr );
-    strtok_r( NULL, "}", &saveptr );
-    end = strtok_r( NULL, "", &saveptr );
-    char *url = NULL;
-
-    if( asprintf( &url, "%s/%s%"PRIu64"%s%"PRIu64"%s", base_url, qual,
-                bandwidth, frag, start_time, end) < 0 )
+    if ( i_newlen > i_oldlen )
     {
-       return NULL;
+        i_stringlen += i_newlen - i_oldlen;
+        char *psz_realloc = realloc( *ppsz_string, i_stringlen + 1 );
+        if( !psz_realloc )
+            return false;
+        *ppsz_string = psz_realloc;
     }
+    memmove( *ppsz_string + off + i_newlen,
+             *ppsz_string + off + i_oldlen,
+             i_stringlen - off - i_newlen );
+    strncpy( *ppsz_string + off, psz_new, i_newlen );
+    (*ppsz_string)[i_stringlen] = 0;
 
-    free( url_template );
-    return url;
+    return true;
 }
 
-static chunk_t * chunk_Get( sms_stream_t *sms, const int64_t start_time )
+static char *ConstructUrl( const char *psz_template, const char *psz_base_url,
+                           const quality_level_t *p_qlevel, const uint64_t i_start_time )
 {
-    int len = vlc_array_count( sms->chunks );
-    for( int i = 0; i < len; i++ )
-    {
-        chunk_t * chunk = vlc_array_item_at_index( sms->chunks, i );
-        if( !chunk ) return NULL;
+    char *psz_path = strdup( psz_template );
+    if ( !psz_path )
+        return NULL;
 
-        if( chunk->start_time <= start_time &&
-                chunk->start_time + chunk->duration > start_time )
+    char *psz_start;
+    while( true )
+    {
+        if ( (psz_start = strstr( psz_path, "{bitrate}" )) )
         {
-            return chunk;
+            char *psz_bitrate = NULL;
+            if ( us_asprintf( &psz_bitrate, "%u", p_qlevel->Bitrate ) < 0 ||
+                 ! Replace( &psz_path, psz_start - psz_path, "{bitrate}", psz_bitrate ) )
+            {
+                free( psz_bitrate );
+                free( psz_path );
+                return false;
+            }
+            free( psz_bitrate );
         }
+        else if ( (psz_start = strstr( psz_path, "{start time}" )) ||
+                  (psz_start = strstr( psz_path, "{start_time}" )) )
+        {
+            psz_start[6] = ' ';
+            char *psz_starttime = NULL;
+            if ( us_asprintf( &psz_starttime, "%"PRIu64, i_start_time ) < 0 ||
+                 ! Replace( &psz_path, psz_start - psz_path, "{start time}", psz_starttime ) )
+            {
+                free( psz_starttime );
+                free( psz_path );
+                return false;
+            }
+            free( psz_starttime );
+        }
+        else if ( (psz_start = strstr( psz_path, "{CustomAttributes}" )) )
+        {
+            char *psz_attributes = NULL;
+            FOREACH_ARRAY( const custom_attrs_t *p_attrs, p_qlevel->custom_attrs )
+            if ( asprintf( &psz_attributes,
+                           psz_attributes ? "%s,%s=%s" : "%s%s=%s",
+                           psz_attributes ? psz_attributes : "",
+                           p_attrs->psz_key, p_attrs->psz_value ) < 0 )
+                    break;
+            FOREACH_END()
+            if ( !psz_attributes ||
+                 ! Replace( &psz_path, psz_start - psz_path, "{CustomAttributes}", psz_attributes ) )
+            {
+                free( psz_attributes );
+                free( psz_path );
+                return false;
+            }
+            free( psz_attributes );
+        }
+        else
+            break;
     }
-    return NULL;
+
+    char *psz_url;
+    if( asprintf( &psz_url, "%s/%s", psz_base_url, psz_path ) < 0 )
+    {
+        free( psz_path );
+        return NULL;
+    }
+    free( psz_path );
+    return psz_url;
 }
 
-static unsigned set_track_id( chunk_t *chunk, const unsigned tid )
+static chunk_t * chunk_Get( sms_stream_t *sms, const uint64_t start_time )
 {
-    uint32_t size, type;
-    if( !chunk->data )
-        return 0;
-    uint8_t *slice = chunk->data;
-    if( !slice )
-        return 0;
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_moof );
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_mfhd );
-    slice += size - 8;
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_traf );
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    if( type != ATOM_tfhd )
-        return 0;
-
-    unsigned ret = bswap32( ((uint32_t *)slice)[1] );
-    ((uint32_t *)slice)[1] = bswap32( tid );
-
-    return ret;
+    chunk_t *p_chunk = sms->p_chunks;
+    while( p_chunk )
+    {
+        if( p_chunk->start_time <= start_time &&
+                p_chunk->start_time + p_chunk->duration > start_time )
+            break;
+        p_chunk = p_chunk->p_next;
+    }
+    return p_chunk;
 }
 
 static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
 {
-    stream_sys_t *p_sys = s->p_sys;
-
     stream_t *p_ts = stream_UrlNew( s, url );
     free( url );
     if( p_ts == NULL )
         return VLC_EGENERIC;
 
     int64_t size = stream_Size( p_ts );
+    if ( size < 0 )
+    {
+        stream_Delete( p_ts );
+        return VLC_EGENERIC;
+    }
 
-    chunk->size = size;
-    chunk->offset = p_sys->download.next_chunk_offset;
-    p_sys->download.next_chunk_offset += chunk->size;
-
-    chunk->data = malloc( size );
-
-    if( chunk->data == NULL )
+    uint8_t *p_data = malloc( size );
+    if( p_data == NULL )
     {
         stream_Delete( p_ts );
         return VLC_ENOMEM;
     }
 
-    int read = stream_Read( p_ts, chunk->data, size );
-    if( read < size )
+    int read = stream_Read( p_ts, p_data, size );
+    if( read < size && read > 0 )
     {
         msg_Warn( s, "sms_Download: I requested %"PRIi64" bytes, "\
                 "but I got only %i", size, read );
-        chunk->data = realloc( chunk->data, read );
+        p_data = realloc( p_data, read );
     }
 
-    stream_Delete( p_ts );
+    chunk->data = p_data;
+    chunk->size = (uint64_t) (read > 0 ? read : 0);
 
-    vlc_mutex_lock( &p_sys->download.lock_wait );
-    int index = es_cat_to_index( chunk->type );
-    p_sys->download.lead[index] += chunk->duration;
-    vlc_mutex_unlock( &p_sys->download.lock_wait );
+    stream_Delete( p_ts );
 
     return VLC_SUCCESS;
 }
 
 #ifdef DISABLE_BANDWIDTH_ADAPTATION
-static unsigned BandwidthAdaptation( stream_t *s,
-        sms_stream_t *sms, uint64_t *bandwidth )
+static quality_level_t *
+BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
+                     uint64_t obw, uint64_t i_duration,
+                     bool b_starved )
 {
-    return sms->download_qlvl;
+    VLC_UNUSED(obw);
+    VLC_UNUSED(s);
+    VLC_UNUSED(i_duration);
+    VLC_UNUSED(b_starved);
+    return sms->current_qlvl;
 }
 #else
 
-static unsigned BandwidthAdaptation( stream_t *s,
-        sms_stream_t *sms, uint64_t bandwidth )
+static quality_level_t *
+BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
+                     uint64_t obw, uint64_t i_duration,
+                     bool b_starved )
 {
-    if( sms->type != VIDEO_ES )
-        return sms->download_qlvl;
+    quality_level_t *ret = NULL;
 
-    uint64_t bw_candidate = 0;
-    quality_level_t *qlevel;
-    unsigned ret = sms->download_qlvl;
+    assert( sms->current_qlvl );
+    if ( sms->qlevels.i_size < 2 )
+        return sms->qlevels.p_elems[0];
 
-    for( unsigned i = 0; i < sms->qlevel_nb; i++ )
+    if ( b_starved )
     {
-        qlevel = vlc_array_item_at_index( sms->qlevels, i );
-        if( unlikely( !qlevel ) )
-        {
-            msg_Err( s, "Could no get %uth quality level", i );
-            return 0;
-        }
-
-        if( qlevel->Bitrate < (bandwidth - bandwidth / 3) &&
-                qlevel->Bitrate > bw_candidate )
-        {
-            bw_candidate = qlevel->Bitrate;
-            ret = qlevel->id;
-        }
+        //TODO: do something on starvation post first buffering
+        //   s->p_sys->i_probe_length *= 2;
     }
+
+    /* PASS 1 */
+    quality_level_t *lowest = sms->qlevels.p_elems[0];
+    FOREACH_ARRAY( quality_level_t *qlevel, sms->qlevels );
+    if ( qlevel->Bitrate >= obw )
+    {
+        qlevel->i_validation_length -= i_duration;
+        qlevel->i_validation_length = __MAX(qlevel->i_validation_length, - s->p_sys->i_probe_length);
+    }
+    else
+    {
+        qlevel->i_validation_length += i_duration;
+        qlevel->i_validation_length = __MIN(qlevel->i_validation_length, s->p_sys->i_probe_length);
+    }
+    if ( qlevel->Bitrate < lowest->Bitrate )
+        lowest = qlevel;
+    FOREACH_END();
+
+    /* PASS 2 */
+    if ( sms->current_qlvl->i_validation_length == s->p_sys->i_probe_length )
+    {
+        /* might upgrade */
+        ret = sms->current_qlvl;
+    }
+    else if ( sms->current_qlvl->i_validation_length >= 0 )
+    {
+        /* do nothing */
+        ret = sms->current_qlvl;
+        msg_Dbg( s, "bw current:%uKB/s avg:%"PRIu64"KB/s qualified %"PRId64"%%",
+                (ret->Bitrate) / (8 * 1024),
+                 obw / (8 * 1024),
+                 ( ret->i_validation_length*1000 / s->p_sys->i_probe_length ) /10 );
+        return ret;
+    }
+    else
+    {
+        /* downgrading */
+        ret = lowest;
+    }
+
+    /* might upgrade */
+    FOREACH_ARRAY( quality_level_t *qlevel, sms->qlevels );
+    if( qlevel->Bitrate <= obw &&
+            ret->Bitrate <= qlevel->Bitrate &&
+            qlevel->i_validation_length >= 0 &&
+            qlevel->i_validation_length >= ret->i_validation_length )
+    {
+        ret = qlevel;
+    }
+    FOREACH_END();
+
+    msg_Dbg( s, "bw reselected:%uKB/s avg:%"PRIu64"KB/s qualified %"PRId64"%%",
+            (ret->Bitrate) / (8 * 1024),
+             obw / (8 * 1024),
+             ( ret->i_validation_length*1000 / s->p_sys->i_probe_length ) /10 );
 
     return ret;
 }
 #endif
 
-static int get_new_chunks( stream_t *s, chunk_t *ck )
+static int parse_chunk( stream_t *s, chunk_t *ck, sms_stream_t *sms )
 {
-    stream_sys_t *p_sys = s->p_sys;
-
-    uint8_t *slice = ck->data;
-    if( !slice )
+    if( ck->size < 24 )
         return VLC_EGENERIC;
-    uint8_t version, fragment_count;
-    uint32_t size, type, flags;
-    sms_stream_t *sms;
-    UUID_t uuid;
-    TfrfBoxDataFields_t *tfrf_df;
 
-    sms = SMS_GET_SELECTED_ST( ck->type );
+    stream_t *ck_s = stream_MemoryNew( s, ck->data, ck->size, true );
+    if ( !ck_s )
+        return VLC_EGENERIC;
 
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_moof );
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_mfhd );
-    slice += size - 8;
-
-    SMS_GET4BYTES( size );
-    SMS_GETFOURCC( type );
-    assert( type == ATOM_traf );
-
-    for(;;)
+    MP4_Box_t root_box = { 0 };
+    root_box.i_type = ATOM_root;
+    root_box.i_size = ck->size;
+    if ( MP4_ReadBoxContainerChildren( ck_s, &root_box, 0 ) != 1 )
     {
-        SMS_GET4BYTES( size );
-        assert( size > 1 );
-        SMS_GETFOURCC( type );
-        if( type == ATOM_mdat )
+        stream_Delete( ck_s );
+        return VLC_EGENERIC;
+    }
+#ifndef NDEBUG
+    MP4_BoxDumpStructure( ck_s, &root_box );
+#endif
+
+    /* Do track ID fixup */
+    const MP4_Box_t *tfhd_box = MP4_BoxGet( &root_box, "moof/traf/tfhd" );
+    if ( tfhd_box )
+        SetDWBE( &ck->data[tfhd_box->i_pos + 8 + 4], sms->id );
+
+    if ( s->p_sys->b_live )
+    {
+        const MP4_Box_t *uuid_box = MP4_BoxGet( &root_box, "moof/traf/uuid" );
+        while( uuid_box && uuid_box->i_type == ATOM_uuid )
         {
-            msg_Err( s, "No uuid box found :-(" );
-            return VLC_EGENERIC;
-        }
-        else if( type == ATOM_uuid )
-        {
-            GetUUID( &uuid, slice);
-            if( !CmpUUID( &uuid, &TfrfBoxUUID ) )
+            if ( !CmpUUID( &uuid_box->i_uuid, &TfrfBoxUUID ) )
                 break;
+            uuid_box = uuid_box->p_next;
         }
-        slice += size - 8;
+
+        if ( uuid_box )
+        {
+            const MP4_Box_data_tfrf_t *p_tfrfdata = uuid_box->data.p_tfrf;
+            for ( uint8_t i=0; i<p_tfrfdata->i_fragment_count; i++ )
+            {
+                uint64_t dur = p_tfrfdata->p_tfrf_data_fields[i].i_fragment_duration;
+                uint64_t stime = p_tfrfdata->p_tfrf_data_fields[i].i_fragment_abs_time;
+                msg_Dbg( s, "\"tfrf\" fragment duration %"PRIu64", "
+                            "fragment abs time %"PRIu64, dur, stime );
+                if( !chunk_Get( sms, stime + dur ) )
+                    chunk_AppendNew( sms, dur, stime );
+            }
+        }
     }
 
-    slice += 16;
-    SMS_GET1BYTE( version );
-    SMS_GET3BYTES( flags );
-    SMS_GET1BYTE( fragment_count );
-
-    tfrf_df = calloc( fragment_count, sizeof( TfrfBoxDataFields_t ) );
-    if( unlikely( tfrf_df == NULL ) )
-        return VLC_EGENERIC;
-
-    for( uint8_t i = 0; i < fragment_count; i++ )
+    MP4_Box_t *p_box = root_box.p_first;
+    while( p_box )
     {
-        SMS_GET4or8BYTES( tfrf_df[i].i_fragment_abs_time );
-        SMS_GET4or8BYTES( tfrf_df[i].i_fragment_duration );
+        MP4_BoxFree( ck_s, p_box );
+        p_box = p_box->p_next;
     }
-
-    msg_Dbg( s, "read box: \"tfrf\" version %d, flags 0x%x, "\
-            "fragment count %"PRIu8, version, flags, fragment_count );
-
-    for( uint8_t i = 0; i < fragment_count; i++ )
-    {
-        int64_t dur = tfrf_df[i].i_fragment_duration;
-        int64_t stime = tfrf_df[i].i_fragment_abs_time;
-        msg_Dbg( s, "\"tfrf\" fragment duration %"PRIu64", "\
-                    "fragment abs time %"PRIu64, dur, stime);
-
-        if( !chunk_Get( sms, stime + dur ) )
-            chunk_New( sms, dur, stime );
-    }
-    free( tfrf_df );
+    stream_Delete( ck_s );
 
     return VLC_SUCCESS;
 }
 
 #define STRA_SIZE 334
-#define SMOO_SIZE (STRA_SIZE * 3 + 24) /* 1026 */
+//#define SMOO_SIZE (STRA_SIZE * 3 + 24) /* 1026 */
 
 /* SmooBox is a very simple MP4 box, used only to pass information
  * to the demux layer. As this box is not aimed to travel accross networks,
  * simplicity of the design is better than compactness */
-static int build_smoo_box( stream_t *s, uint8_t *smoo_box )
+static int build_smoo_box( stream_t *s, chunk_t *p_chunk )
 {
     stream_sys_t *p_sys = s->p_sys;
-    sms_stream_t *sms = NULL;
     uint32_t FourCC;
 
     /* smoo */
-    memset( smoo_box, 0, SMOO_SIZE );
-    smoo_box[2] = (SMOO_SIZE & 0xff00)>>8;
-    smoo_box[3] = SMOO_SIZE & 0xff;
+    assert(p_sys->sms_selected.i_size);
+    size_t i_size = p_sys->sms_selected.i_size * STRA_SIZE + 24;
+    p_chunk->data = calloc( 1, i_size );
+    if ( !p_chunk->data )
+        return VLC_EGENERIC;
+    p_chunk->size = i_size;
+    uint8_t *smoo_box = p_chunk->data;
+
+    SetWBE( &smoo_box[2], i_size );
     smoo_box[4] = 'u';
     smoo_box[5] = 'u';
     smoo_box[6] = 'i';
     smoo_box[7] = 'd';
 
+    uint32_t *smoo_box32 = (uint32_t *)smoo_box;
     /* UUID is e1da72ba-24d7-43c3-a6a5-1b5759a1a92c */
-    ((uint32_t *)smoo_box)[2] = bswap32( 0xe1da72ba );
-    ((uint32_t *)smoo_box)[3] = bswap32( 0x24d743c3 );
-    ((uint32_t *)smoo_box)[4] = bswap32( 0xa6a51b57 );
-    ((uint32_t *)smoo_box)[5] = bswap32( 0x59a1a92c );
+    SetDWBE( &smoo_box32[2], 0xe1da72ba );
+    SetDWBE( &smoo_box32[3], 0x24d743c3 );
+    SetDWBE( &smoo_box32[4], 0xa6a51b57 );
+    SetDWBE( &smoo_box32[5], 0x59a1a92c );
 
-    uint8_t *stra_box;
-    for( int i = 0; i < 3; i++ )
+    int i = 0;
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    uint8_t *stra_box = smoo_box + i++ * STRA_SIZE;
+    uint16_t *stra_box16 = (uint16_t *)stra_box;
+    uint32_t *stra_box32 = (uint32_t *)stra_box;
+    uint64_t *stra_box64 = (uint64_t *)stra_box;
+
+    SetWBE( &stra_box[26], STRA_SIZE );
+    stra_box[28] = 'u';
+    stra_box[29] = 'u';
+    stra_box[30] = 'i';
+    stra_box[31] = 'd';
+
+    /* UUID is b03ef770-33bd-4bac-96c7-bf25f97e2447 */
+    SetDWBE( &stra_box32[8], 0xb03ef770 );
+    SetDWBE( &stra_box32[9], 0x33bd4bac );
+    SetDWBE( &stra_box32[10], 0x96c7bf25 );
+    SetDWBE( &stra_box32[11], 0xf97e2447 );
+
+    stra_box[48] = sms->type;
+    stra_box[49] = 0; /* reserved */
+    SetWBE( &stra_box[50], sms->id );
+
+    SetDWBE( &stra_box32[13], sms->timescale );
+    SetQWBE( &stra_box64[7], p_sys->vod_duration );
+
+    const quality_level_t *qlvl = sms->current_qlvl;
+    if ( qlvl )
     {
-        sms = NULL;
-        int cat = UNKNOWN_ES;
-        stra_box = smoo_box + i * STRA_SIZE;
+        FourCC = qlvl->FourCC ? qlvl->FourCC : sms->default_FourCC;
+        SetDWBE( &stra_box32[16], FourCC );
+        SetDWBE( &stra_box32[17], qlvl->Bitrate );
+        SetDWBE( &stra_box32[18], qlvl->MaxWidth );
+        SetDWBE( &stra_box32[19], qlvl->MaxHeight );
+        SetDWBE( &stra_box32[20], qlvl->SamplingRate );
+        SetDWBE( &stra_box32[21], qlvl->Channels );
+        SetDWBE( &stra_box32[22], qlvl->BitsPerSample );
+        SetDWBE( &stra_box32[23], qlvl->AudioTag );
+        SetWBE( &stra_box16[48], qlvl->nBlockAlign );
 
-        stra_box[26] = (STRA_SIZE & 0xff00)>>8;
-        stra_box[27] = STRA_SIZE & 0xff;
-        stra_box[28] = 'u';
-        stra_box[29] = 'u';
-        stra_box[30] = 'i';
-        stra_box[31] = 'd';
-
-        /* UUID is b03ef770-33bd-4bac-96c7-bf25f97e2447 */
-        ((uint32_t *)stra_box)[8] = bswap32( 0xb03ef770 );
-        ((uint32_t *)stra_box)[9] = bswap32( 0x33bd4bac );
-        ((uint32_t *)stra_box)[10] = bswap32( 0x96c7bf25 );
-        ((uint32_t *)stra_box)[11] = bswap32( 0xf97e2447 );
-
-        cat = index_to_es_cat( i );
-        stra_box[48] = cat;
-        sms = SMS_GET_SELECTED_ST( cat );
-
-        stra_box[49] = 0; /* reserved */
-        if( sms == NULL )
+        if( !qlvl->CodecPrivateData )
             continue;
-        stra_box[50] = (sms->id & 0xff00)>>8;
-        stra_box[51] = sms->id & 0xff;
-
-        ((uint32_t *)stra_box)[13] = bswap32( sms->timescale );
-        ((uint64_t *)stra_box)[7] = bswap64( p_sys->vod_duration );
-
-        quality_level_t * qlvl = get_qlevel( sms, sms->download_qlvl );
-
-        if ( qlvl )
-        {
-            FourCC = qlvl->FourCC ? qlvl->FourCC : sms->default_FourCC;
-            ((uint32_t *)stra_box)[16] = bswap32( FourCC );
-            ((uint32_t *)stra_box)[17] = bswap32( qlvl->Bitrate );
-            ((uint32_t *)stra_box)[18] = bswap32( qlvl->MaxWidth );
-            ((uint32_t *)stra_box)[19] = bswap32( qlvl->MaxHeight );
-            ((uint32_t *)stra_box)[20] = bswap32( qlvl->SamplingRate );
-            ((uint32_t *)stra_box)[21] = bswap32( qlvl->Channels );
-            ((uint32_t *)stra_box)[22] = bswap32( qlvl->BitsPerSample );
-            ((uint32_t *)stra_box)[23] = bswap32( qlvl->AudioTag );
-            ((uint16_t *)stra_box)[48] = bswap16( qlvl->nBlockAlign );
-
-            if( !qlvl->CodecPrivateData )
-                continue;
-            stra_box[98] = stra_box[99] = stra_box[100] = 0; /* reserved */
-            assert( strlen( qlvl->CodecPrivateData ) < 512 );
-            stra_box[101] = strlen( qlvl->CodecPrivateData ) / 2;
-            uint8_t *binary_cpd = decode_string_hex_to_binary( qlvl->CodecPrivateData );
-            memcpy( stra_box + 102, binary_cpd, stra_box[101] );
-            free( binary_cpd );
-        }
+        stra_box[98] = stra_box[99] = stra_box[100] = 0; /* reserved */
+        stra_box[101] = strlen( qlvl->CodecPrivateData ) / 2;
+        if ( stra_box[101] > STRA_SIZE - 102 )
+            stra_box[101] = STRA_SIZE - 102;
+        uint8_t *binary_cpd = decode_string_hex_to_binary( qlvl->CodecPrivateData );
+        memcpy( stra_box + 102, binary_cpd, stra_box[101] );
+        free( binary_cpd );
     }
+    FOREACH_END();
 
     return VLC_SUCCESS;
 }
@@ -361,15 +418,9 @@ static chunk_t *build_init_chunk( stream_t *s )
     if( unlikely( ret == NULL ) )
         goto build_init_chunk_error;
 
-    ret->size = SMOO_SIZE;
-    ret->data = malloc( SMOO_SIZE );
-    if( !ret->data )
-        goto build_init_chunk_error;
-
-    if( build_smoo_box( s, ret->data ) == VLC_SUCCESS)
+    if( build_smoo_box( s, ret ) == VLC_SUCCESS )
         return ret;
 
-    free( ret->data );
 build_init_chunk_error:
     free( ret );
     msg_Err( s, "build_init_chunk failed" );
@@ -380,27 +431,14 @@ static int Download( stream_t *s, sms_stream_t *sms )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    int index = es_cat_to_index( sms->type );
-    if ( unlikely( index == -1 ) )
-    {
-        msg_Err( s, "invalid stream type" );
-        return VLC_EGENERIC;
-    }
-    int64_t start_time = p_sys->download.lead[index];
+    assert( sms->p_nextdownload );
+    assert( sms->p_nextdownload->data == NULL );
+    assert( sms->current_qlvl );
 
-    quality_level_t *qlevel = get_qlevel( sms, sms->download_qlvl );
-    if( unlikely( !qlevel ) )
-    {
-        msg_Err( s, "Could not get quality level id %u", sms->download_qlvl );
-        return VLC_EGENERIC;
-    }
-
-
-    chunk_t *chunk = chunk_Get( sms, start_time );
+    chunk_t *chunk = sms->p_nextdownload;
     if( !chunk )
     {
-        msg_Warn( s, "Could not find a chunk for stream %s, "\
-                "start time = %"PRIu64"", sms->name, start_time );
+        msg_Warn( s, "Could not find a chunk for stream %s", sms->name );
         return VLC_EGENERIC;
     }
     if( chunk->data != NULL )
@@ -412,8 +450,8 @@ static int Download( stream_t *s, sms_stream_t *sms )
 
     chunk->type = sms->type;
 
-    char *url = ConstructUrl( sms->url_template, p_sys->base_url,
-                                  qlevel->Bitrate, chunk->start_time );
+    char *url = ConstructUrl( sms->url_template, p_sys->download.base_url,
+                              sms->current_qlvl, chunk->start_time );
     if( !url )
     {
         msg_Err( s, "ConstructUrl returned NULL" );
@@ -421,274 +459,250 @@ static int Download( stream_t *s, sms_stream_t *sms )
     }
 
     /* sanity check - can we download this chunk on time? */
-    uint64_t avg_bw = sms_queue_avg( p_sys->bws );
-    if( (avg_bw > 0) && (qlevel->Bitrate > 0) )
+    if( (sms->i_obw > 0) && (sms->current_qlvl->Bitrate > 0) )
     {
         /* duration in ms */
         unsigned chunk_duration = chunk->duration * 1000 / sms->timescale;
-        uint64_t size = chunk_duration * qlevel->Bitrate / 1000; /* bits */
-        unsigned estimated = size * 1000 / avg_bw;
+        uint64_t size = chunk_duration * sms->current_qlvl->Bitrate / 1000; /* bits */
+        unsigned estimated = size * 1000 / sms->i_obw;
         if( estimated > chunk_duration )
         {
-            msg_Warn( s,"downloading of chunk %d would take %d ms, "\
-                    "which is longer than its playback (%d ms)",
-                        chunk->sequence, estimated, chunk_duration );
+            msg_Warn( s,"downloading of chunk @%"PRIu64" would take %d ms, "
+                        "which is longer than its playback (%d ms)",
+                        chunk->start_time, estimated, chunk_duration );
         }
     }
 
-    mtime_t start = mdate();
+    mtime_t duration = mdate();
     if( sms_Download( s, chunk, url ) != VLC_SUCCESS )
     {
-        msg_Err( s, "downloaded chunk %u from stream %s at quality\
-            %u failed", chunk->sequence, sms->name, qlevel->Bitrate );
+        msg_Err( s, "downloaded chunk @%"PRIu64" from stream %s at quality"
+                    " %u *failed*", chunk->start_time, sms->name, sms->current_qlvl->Bitrate );
         return VLC_EGENERIC;
     }
-    mtime_t duration = mdate() - start;
+    duration = mdate() - duration;
 
-    unsigned real_id = set_track_id( chunk, sms->id );
-    if( real_id == 0)
-    {
-        msg_Err( s, "tfhd box not found or invalid chunk" );
-        return VLC_EGENERIC;
-    }
+    parse_chunk( s, chunk, sms );
 
-    //msg_Dbg( s, "chunk ID was %i and is now %i", real_id, sms->id );
+    msg_Info( s, "downloaded chunk @%"PRIu64" from stream %s at quality %u",
+                 chunk->start_time, sms->name, sms->current_qlvl->Bitrate );
 
-    if( p_sys->b_live )
-        get_new_chunks( s, chunk );
+    if (likely( duration ))
+        bw_stats_put( sms, chunk->size * 8 * CLOCK_FREQ / duration ); /* bits / s */
 
-    vlc_mutex_lock( &p_sys->download.lock_wait );
-    vlc_array_append( p_sys->download.chunks, chunk );
-    vlc_cond_signal( &p_sys->download.wait );
-    vlc_mutex_unlock( &p_sys->download.lock_wait );
-
-    msg_Info( s, "downloaded chunk %d from stream %s at quality %u",
-                chunk->sequence, sms->name, qlevel->Bitrate );
-
-    uint64_t actual_lead = chunk->start_time + chunk->duration;
-    int ind = es_cat_to_index( sms->type );
-    p_sys->download.ck_index[ind] = chunk->sequence;
-    p_sys->download.lead[ind] = __MIN( p_sys->download.lead[ind], actual_lead );
-
-    if( sms->type == VIDEO_ES ||
-            ( !SMS_GET_SELECTED_ST( VIDEO_ES ) && sms->type == AUDIO_ES ) )
-    {
-        p_sys->playback.toffset = __MIN( p_sys->playback.toffset,
-                                            (uint64_t)chunk->start_time );
-    }
-
-    unsigned dur_ms = __MAX( 1, duration / 1000 );
-    uint64_t bw = chunk->size * 8 * 1000 / dur_ms; /* bits / s */
-    if( sms_queue_put( p_sys->bws, bw ) != VLC_SUCCESS )
-        return VLC_EGENERIC;
-    avg_bw = sms_queue_avg( p_sys->bws );
-
-    if( sms->type != VIDEO_ES )
+    /* Track could get disabled in mp4 demux if we trigger adaption too soon.
+       And we don't need adaptation on last chunk */
+    if( sms->p_chunks == NULL || sms->p_chunks == sms->p_lastchunk )
         return VLC_SUCCESS;
 
-    /* Track could get disabled in mp4 demux if we trigger adaption too soon. */
-    if( chunk->sequence <= 1 )
-        return VLC_SUCCESS;
-
-    unsigned new_qlevel_id = BandwidthAdaptation( s, sms, avg_bw );
-    quality_level_t *new_qlevel = get_qlevel( sms, new_qlevel_id );
-    if( unlikely( !new_qlevel ) )
+    bool b_starved = false;
+    vlc_mutex_lock( &p_sys->playback.lock );
+    if ( &p_sys->playback.b_underrun )
     {
-        msg_Err( s, "Could not get quality level id %u", new_qlevel_id );
-        return VLC_EGENERIC;
+        p_sys->playback.b_underrun = false;
+        bw_stats_underrun( sms );
+        b_starved = true;
+    }
+    vlc_mutex_unlock( &p_sys->playback.lock );
+
+    quality_level_t *new_qlevel = BandwidthAdaptation( s, sms, sms->i_obw,
+                                                       duration, b_starved );
+    assert(new_qlevel);
+
+    if( sms->qlevels.i_size < 2 )
+    {
+        assert(new_qlevel == sms->current_qlvl);
+        return VLC_SUCCESS;
     }
 
-    if( new_qlevel->Bitrate != qlevel->Bitrate )
+    vlc_mutex_lock( &p_sys->playback.lock );
+    if ( p_sys->playback.init.p_datachunk == NULL && /* Don't chain/nest reinits */
+         new_qlevel != sms->current_qlvl )
     {
         msg_Warn( s, "detected %s bandwidth (%u) stream",
-                 (new_qlevel->Bitrate >= qlevel->Bitrate) ? "faster" : "lower",
-                 new_qlevel->Bitrate );
+                  (new_qlevel->Bitrate >= sms->current_qlvl->Bitrate) ? "faster" : "lower",
+                  new_qlevel->Bitrate );
 
-        sms->download_qlvl = new_qlevel_id;
-    }
-
-    if( new_qlevel->MaxWidth != qlevel->MaxWidth ||
-        new_qlevel->MaxHeight != qlevel->MaxHeight )
-    {
+        quality_level_t *qlvl_backup = sms->current_qlvl;
+        sms->current_qlvl = new_qlevel;
         chunk_t *new_init_ck = build_init_chunk( s );
-        if( !new_init_ck )
+        if( new_init_ck )
         {
-            return VLC_EGENERIC;
+            p_sys->playback.init.p_datachunk = new_init_ck;
+            p_sys->playback.init.p_startchunk = chunk->p_next; /* to send before that one */
+            assert( chunk->p_next && chunk != sms->p_lastchunk );
         }
-
-        new_init_ck->offset = p_sys->download.next_chunk_offset;
-        p_sys->download.next_chunk_offset += new_init_ck->size;
-
-        vlc_mutex_lock( &p_sys->download.lock_wait );
-        vlc_array_append( p_sys->download.chunks, new_init_ck );
-        vlc_array_append( p_sys->init_chunks, new_init_ck );
-        vlc_mutex_unlock( &p_sys->download.lock_wait );
+        else
+            sms->current_qlvl = qlvl_backup;
     }
+    vlc_mutex_unlock( &p_sys->playback.lock );
+
     return VLC_SUCCESS;
 }
 
-static inline int64_t get_lead( stream_t *s )
+static inline bool reached_download_limit( sms_stream_t *sms, unsigned int i_max_chunks,
+                                           uint64_t i_max_time )
 {
-    stream_sys_t *p_sys = s->p_sys;
-    int64_t lead = 0;
-    int64_t alead = p_sys->download.lead[es_cat_to_index( AUDIO_ES )];
-    int64_t vlead = p_sys->download.lead[es_cat_to_index( VIDEO_ES )];
-    bool video = SMS_GET_SELECTED_ST( VIDEO_ES ) ? true : false;
-    bool audio = SMS_GET_SELECTED_ST( AUDIO_ES ) ? true : false;
+    if ( !sms->p_nextdownload )
+        return true;
 
-    if( video && audio )
-        lead = __MIN( vlead, alead );
-    else if( video )
-        lead = vlead;
-    else
-        lead = alead;
+    if ( sms->p_playback == sms->p_nextdownload ) /* chunk can be > max_time */
+        return false;
 
-    lead -= p_sys->playback.toffset;
-    return lead;
+    const chunk_t *p_head = sms->p_playback;
+    if ( !p_head )
+        return true;
+
+    unsigned int i_chunk_count = 0;
+    uint64_t i_total_time = 0;
+    const chunk_t *p_tail = sms->p_nextdownload;
+    while( p_head )
+    {
+        i_total_time += p_head->duration * CLOCK_FREQ / sms->timescale;
+        if ( i_max_time && i_total_time >= i_max_time )
+        {
+            return true;
+        }
+        else if ( i_max_chunks && i_chunk_count >= i_max_chunks )
+        {
+            return true;
+        }
+
+        if ( p_head == p_tail )
+            break;
+
+        p_head = p_head->p_next;
+        i_chunk_count += 1;
+    }
+
+    return false;
 }
 
-static int next_track( stream_t *s )
+static bool all_reached_download_limit( stream_sys_t *p_sys, unsigned int i_max_chunks,
+                                        uint64_t i_max_time )
 {
-    stream_sys_t *p_sys = s->p_sys;
-    uint64_t tmp, min = 0;
-    int cat, ret = UNKNOWN_ES;
-    for( int i = 0; i < 3; i++ )
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    vlc_mutex_lock( &sms->chunks_lock );
+    bool b_ret = reached_download_limit( sms, i_max_chunks, i_max_time );
+    vlc_mutex_unlock( &sms->chunks_lock );
+    if ( ! b_ret )
+        return false;
+    FOREACH_END();
+    return true;
+}
+
+/* Returns the first download chunk by time in the download queue */
+static sms_stream_t *next_download_stream( stream_sys_t *p_sys )
+{
+    sms_stream_t *p_candidate = NULL;
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    vlc_mutex_lock( &sms->chunks_lock );
+    if ( !sms->p_nextdownload )
     {
-        tmp = p_sys->download.lead[i];
-        cat = index_to_es_cat( i );
-        if( (!min || tmp < min) && SMS_GET_SELECTED_ST( cat ) )
-        {
-            min = tmp;
-            ret = cat;
-        }
+        vlc_mutex_unlock( &sms->chunks_lock );
+        continue;
     }
-    return ret;
+    if ( p_candidate == NULL ||
+         sms->p_nextdownload->start_time < p_candidate->p_nextdownload->start_time )
+        p_candidate = sms;
+    vlc_mutex_unlock( &sms->chunks_lock );
+    FOREACH_END();
+    return p_candidate;
 }
 
 void* sms_Thread( void *p_this )
 {
     stream_t *s = (stream_t *)p_this;
     stream_sys_t *p_sys = s->p_sys;
-    sms_stream_t *sms = NULL;
-    chunk_t *chunk;
 
     int canc = vlc_savecancel();
-
-    /* We compute the average bandwidth of the 4 last downloaded
-     * chunks, but feel free to replace '4' by whatever you wish */
-    p_sys->bws = sms_queue_init( 4 );
-    if( !p_sys->bws )
-        goto cancel;
 
     chunk_t *init_ck = build_init_chunk( s );
     if( !init_ck )
         goto cancel;
 
-    vlc_mutex_lock( &p_sys->download.lock_wait );
-    vlc_array_append( p_sys->download.chunks, init_ck );
-    vlc_array_append( p_sys->init_chunks, init_ck );
-    vlc_mutex_unlock( &p_sys->download.lock_wait );
+    vlc_mutex_lock( &p_sys->playback.lock );
+    p_sys->playback.init.p_datachunk = init_ck;
+    p_sys->playback.init.p_startchunk = NULL; /* before any */
+    vlc_mutex_unlock( &p_sys->playback.lock );
+    vlc_cond_signal( &p_sys->playback.wait ); /* demuxer in Open() can start reading */
 
-    p_sys->download.next_chunk_offset = init_ck->size;
+    int64_t i_pts_delay = 0;
 
-    /* XXX Sometimes, the video stream is cut into pieces of one exact length,
-     * while the audio stream fragments can't be made to match exactly,
-     * and for some reason the n^th advertised video fragment is related to
-     * the n+1^th advertised audio chunk or vice versa */
-
-    int64_t start_time = 0, lead = 0;
-
-    for( int i = 0; i < 3; i++ )
+    /* Buffer up first chunks */
+    int i_initial_buffering = p_sys->download.lookahead_count;
+    if ( !i_initial_buffering )
+        i_initial_buffering = 3;
+    for( int i = 0; i < i_initial_buffering; i++ )
     {
-        sms = SMS_GET_SELECTED_ST( index_to_es_cat( i ) );
-        if( sms && vlc_array_count( sms->chunks ) )
+        FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+        vlc_mutex_lock( &sms->chunks_lock );
+        if ( sms->p_nextdownload )
         {
-            chunk = vlc_array_item_at_index( sms->chunks, 0 );
-            p_sys->download.lead[i] = chunk->start_time + p_sys->timescale / 1000;
-            if( !start_time )
-                start_time = chunk->start_time;
-
+            mtime_t duration = mdate();
             if( Download( s, sms ) != VLC_SUCCESS )
+            {
+                vlc_mutex_unlock( &sms->chunks_lock );
                 goto cancel;
+            }
+            duration = mdate() - duration;
+            if (likely( duration ))
+                bw_stats_put( sms, sms->p_nextdownload->size * 8 * CLOCK_FREQ / duration ); /* bits / s */
+            sms->p_nextdownload = sms->p_nextdownload->p_next;
         }
+        vlc_mutex_unlock( &sms->chunks_lock );
+        FOREACH_END();
     }
+    vlc_cond_signal( &p_sys->playback.wait );
 
-    while( 1 )
+    while( !p_sys->b_close )
     {
-        /* XXX replace magic number 10 by a value depending on
-         * LookAheadFragmentCount and DVRWindowLength */
-        vlc_mutex_lock( &p_sys->download.lock_wait );
+        if ( !p_sys->b_live || !p_sys->download.lookahead_count )
+            stream_Control( s, STREAM_GET_PTS_DELAY, &i_pts_delay );
 
-        if( p_sys->b_close )
+        vlc_mutex_lock( &p_sys->lock );
+        while( all_reached_download_limit( p_sys,
+                                           p_sys->download.lookahead_count,
+                                           i_pts_delay ) )
         {
-            vlc_mutex_unlock( &p_sys->download.lock_wait );
-            break;
-        }
-
-        lead = get_lead( s );
-
-        while( lead > 10 * p_sys->timescale + start_time || NO_MORE_CHUNKS )
-        {
-            vlc_cond_wait( &p_sys->download.wait, &p_sys->download.lock_wait );
-            lead = get_lead( s );
-
+            vlc_cond_wait( &p_sys->download.wait, &p_sys->lock );
             if( p_sys->b_close )
                 break;
         }
 
-        if( p_sys->b_tseek )
+        if( p_sys->b_close )
         {
-            int count = vlc_array_count( p_sys->download.chunks );
-            chunk_t *ck = NULL;
-            for( int i = 0; i < count; i++ )
-            {
-                ck = vlc_array_item_at_index( p_sys->download.chunks, i );
-                if( unlikely( !ck ) )
-                    goto cancel;
-                ck->read_pos = 0;
-                if( ck->data == NULL )
-                    continue;
-                FREENULL( ck->data );
-            }
-
-            vlc_array_destroy( p_sys->download.chunks );
-            p_sys->download.chunks = vlc_array_new();
-
-            p_sys->playback.toffset = p_sys->time_pos;
-            for( int i = 0; i < 3; i++ )
-            {
-                p_sys->download.lead[i] = p_sys->time_pos;
-                p_sys->download.ck_index[i] = 0;
-            }
-            p_sys->download.next_chunk_offset = 0;
-
-            p_sys->playback.boffset = 0;
-            p_sys->playback.index = 0;
-
-            chunk_t *new_init_ck = build_init_chunk( s );
-            if( !new_init_ck )
-                goto cancel;
-
-            new_init_ck->offset = p_sys->download.next_chunk_offset;
-            p_sys->download.next_chunk_offset += new_init_ck->size;
-
-            vlc_array_append( p_sys->download.chunks, new_init_ck );
-            vlc_array_append( p_sys->init_chunks, new_init_ck );
-            p_sys->b_tseek = false;
+            vlc_mutex_unlock( &p_sys->lock );
+            break;
         }
-        vlc_mutex_unlock( &p_sys->download.lock_wait );
 
-        sms = SMS_GET_SELECTED_ST( next_track( s ) );
-        if ( vlc_array_count( sms->chunks ) )
+        sms_stream_t *sms = next_download_stream( p_sys );
+        if ( sms )
         {
+            vlc_mutex_lock( &sms->chunks_lock );
+            vlc_mutex_unlock( &p_sys->lock );
+
             if( Download( s, sms ) != VLC_SUCCESS )
-                goto cancel;
+            {
+                vlc_mutex_unlock( &sms->chunks_lock );
+                break;
+            }
+            vlc_cond_signal( &p_sys->playback.wait );
+
+            if ( sms->p_nextdownload ) /* could have been modified by seek */
+                sms->p_nextdownload = sms->p_nextdownload->p_next;
+
+            vlc_mutex_unlock( &sms->chunks_lock );
         }
+        else
+            vlc_mutex_unlock( &p_sys->lock );
+
+        vlc_testcancel();
     }
 
 cancel:
     p_sys->b_error = true;
-    msg_Warn(s, "Canceling download thread!");
+    msg_Dbg(s, "Canceling download thread!");
     vlc_restorecancel( canc );
     return NULL;
 }

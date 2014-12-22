@@ -15,14 +15,13 @@
  # endif
 +#endif
  #endif /* !HAVE_DECL_GAI_STRERROR */
---- gnutls-3.1.14/lib/gnutls.pc.in.orig	2013-09-17 18:14:16.270374773 +0200
-+++ gnutls-3.1.14/lib/gnutls.pc.in	2013-09-17 18:16:10.232464936 +0200
-@@ -18,7 +18,7 @@
- Description: Transport Security Layer implementation for the GNU system
+--- gnutls-3.2.17/lib/gnutls.pc.in.orig	2014-08-30 06:48:22.371307704 +0200
++++ gnutls-3.2.17/lib/gnutls.pc.in	2014-08-30 06:48:40.504956268 +0200
+@@ -19,6 +19,6 @@
  URL: http://www.gnutls.org/
  Version: @VERSION@
--Libs: -L${libdir} -lgnutls
-+Libs: -L${libdir} -lgnutls -lws2_32 -lcrypt32 @LTLIBINTL@
- Libs.private: @LTLIBNETTLE@ @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @LIB_CLOCK_GETTIME@ @GMP_LIBS@
+ Libs: -L${libdir} -lgnutls
+-Libs.private: @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @GMP_LIBS@
++Libs.private: @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ -lcrypt32 @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @GMP_LIBS@
  @GNUTLS_REQUIRES_PRIVATE@
  Cflags: -I${includedir}

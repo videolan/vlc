@@ -32,8 +32,10 @@ typedef struct event_thread_t event_thread_t;
 typedef struct {
     bool use_desktop; /* direct3d */
     bool use_overlay; /* directx */
-
-    vout_window_cfg_t win;
+    int x;
+    int y;
+    unsigned width;
+    unsigned height;
 } event_cfg_t;
 
 typedef struct {

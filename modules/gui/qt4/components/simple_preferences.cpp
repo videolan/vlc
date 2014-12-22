@@ -306,6 +306,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     ConfigControl *control;
     number = _number;
     lang = NULL;
+    radioGroup = NULL;
 
 #define CONFIG_GENERIC( option, type, label, qcontrol )                   \
             p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
@@ -465,10 +466,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 #define audioControl2( name) \
             audioCommon( name ) \
+            QHBoxLayout * name ## hboxLayout = new QHBoxLayout; \
             QLineEdit * name ## Device = new QLineEdit; \
             name ## Label->setBuddy( name ## Device ); \
+            name ## hboxLayout->addWidget( name ## Device ); \
             QPushButton * name ## Browse = new QPushButton( qtr( "Browse..." ) ); \
-            outputAudioLayout->addWidget( name ## Device, outputAudioLayout->rowCount() - 1, 0, 1, -1, Qt::AlignLeft );
+            name ## hboxLayout->addWidget( name ## Browse ); \
+            outputAudioLayout->addLayout( name ## hboxLayout, outputAudioLayout->rowCount() - 1, 1, 1, 1, Qt::AlignLeft );
 
             /* Build if necessary */
             QGridLayout * outputAudioLayout = qobject_cast<QGridLayout *>(ui.outputAudioBox->layout());
@@ -506,7 +510,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 optionWidgets["ossL"] = OSSLabel;
                 optionWidgets["ossW"] = OSSDevice;
                 optionWidgets["ossB"] = OSSBrowse;
-                CONFIG_GENERIC_FILE( "oss-audio-device" , File, NULL, OSSDevice,
+                CONFIG_GENERIC_FILE( "oss-audio-device" , File, OSSLabel, OSSDevice,
                                  OSSBrowse );
             }
 #endif
@@ -906,7 +910,15 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             line++;
 
-            p_config = config_FindConfig( VLC_OBJECT(p_intf), "hotkeys-mousewheel-mode" );
+            p_config = config_FindConfig( VLC_OBJECT(p_intf), "hotkeys-y-wheel-mode" );
+            control = new IntegerListConfigControl( VLC_OBJECT(p_intf),
+                    p_config, this, false );
+            control->insertIntoExistingGrid( gLayout, line );
+            controls.append( control );
+
+            line++;
+
+            p_config = config_FindConfig( VLC_OBJECT(p_intf), "hotkeys-x-wheel-mode" );
             control = new IntegerListConfigControl( VLC_OBJECT(p_intf),
                     p_config, this, false );
             control->insertIntoExistingGrid( gLayout, line );
@@ -1086,9 +1098,7 @@ void SPrefsPanel::apply()
             qobject_cast<QSlider *>(optionWidgets["defaultVolume"])->value();
         bool b_reset_volume =
             qobject_cast<QCheckBox *>(optionWidgets["resetVolumeCheckbox"])->isChecked();
-        module_config_t *p_config = config_FindConfig( VLC_OBJECT(p_intf), "aout" );
-        char *psz_aout = p_config->value.psz;
-
+        char *psz_aout = config_GetPsz( p_intf, "aout" );
 
         float f_gain = powf( i_volume / 100.f, 3 );
 
@@ -1117,6 +1127,7 @@ void SPrefsPanel::apply()
             config_PutFloat( p_intf, "jack-gain", f_gain );
 #endif
 #undef save_vol_aout
+        free( psz_aout );
 
         config_PutInt( p_intf, "volume-save", !b_reset_volume );
 

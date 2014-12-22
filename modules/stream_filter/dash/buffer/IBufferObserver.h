@@ -25,6 +25,10 @@
 #ifndef IBUFFEROBSERVER_H_
 #define IBUFFEROBSERVER_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc_common.h>
 
 namespace dash

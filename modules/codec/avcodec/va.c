@@ -41,9 +41,10 @@ static int vlc_va_Start(void *func, va_list ap)
 static void vlc_va_Stop(void *func, va_list ap)
 {
     vlc_va_t *va = va_arg(ap, vlc_va_t *);
-    void (*close)(vlc_va_t *) = func;
+    AVCodecContext *ctx = va_arg(ap, AVCodecContext *);
+    void (*close)(vlc_va_t *, AVCodecContext *) = func;
 
-    close(va);
+    close(va, ctx);
 }
 
 vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
@@ -63,8 +64,8 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
     return va;
 }
 
-void vlc_va_Delete(vlc_va_t *va)
+void vlc_va_Delete(vlc_va_t *va, AVCodecContext *avctx)
 {
-    vlc_module_unload(va->module, vlc_va_Stop, va);
+    vlc_module_unload(va->module, vlc_va_Stop, va, avctx);
     vlc_object_release(va);
 }

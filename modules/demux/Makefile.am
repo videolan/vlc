@@ -6,7 +6,7 @@ libflacsys_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 demux_LTLIBRARIES += libflacsys_plugin.la
 
 libogg_plugin_la_SOURCES = demux/ogg.c demux/ogg.h demux/oggseek.c demux/oggseek.h \
-	demux/xiph_metadata.h demux/xiph.h demux/xiph_metadata.c
+	demux/xiph_metadata.h demux/xiph.h demux/xiph_metadata.c demux/opus.h
 libogg_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_ogg) $(LIBVORBIS_CFLAGS)
 libogg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libogg_plugin_la_LIBADD = $(LIBS_ogg) $(LIBVORBIS_LIBS)
@@ -57,6 +57,7 @@ libmjpeg_plugin_la_SOURCES = demux/mjpeg.c demux/mxpeg_helper.h
 demux_LTLIBRARIES += libmjpeg_plugin.la
 
 libsubtitle_plugin_la_SOURCES = demux/subtitle.c
+libsubtitle_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libsubtitle_plugin.la
 
 libty_plugin_la_SOURCES = demux/ty.c codec/cc.h
@@ -120,7 +121,9 @@ libdemux_stl_plugin_la_SOURCES = demux/stl.c
 libdemux_stl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 demux_LTLIBRARIES += libdemux_stl_plugin.la
 
-libasf_plugin_la_SOURCES = demux/asf/asf.c demux/asf/libasf.c demux/asf/libasf.h demux/asf/libasf_guid.h
+libasf_plugin_la_SOURCES = demux/asf/asf.c demux/asf/libasf.c demux/asf/libasf.h \
+                           demux/asf/asfpacket.c demux/asf/asfpacket.h \
+                           demux/asf/libasf_guid.h
 demux_LTLIBRARIES += libasf_plugin.la
 
 libavi_plugin_la_SOURCES = demux/avi/avi.c demux/avi/libavi.c demux/avi/libavi.h
@@ -187,7 +190,10 @@ demux_LTLIBRARIES += $(LTLIBmkv)
 EXTRA_LTLIBRARIES += libmkv_plugin.la
 
 libmp4_plugin_la_SOURCES = demux/mp4/mp4.c demux/mp4/mp4.h \
-                           demux/mp4/libmp4.c demux/mp4/libmp4.h demux/mp4/id3genres.h
+                           demux/mp4/libmp4.c demux/mp4/libmp4.h \
+                           demux/mp4/id3genres.h demux/mp4/languages.h \
+                           demux/asf/asfpacket.c demux/asf/asfpacket.h \
+                           demux/mp4/essetup.c demux/mp4/meta.c
 libmp4_plugin_la_LIBADD = $(LIBM)
 libmp4_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 if HAVE_ZLIB
@@ -220,9 +226,13 @@ libplaylist_plugin_la_SOURCES = \
 	demux/playlist/playlist.c demux/playlist/playlist.h
 demux_LTLIBRARIES += libplaylist_plugin.la
 
-libts_plugin_la_SOURCES = demux/ts.c mux/mpeg/csa.c mux/mpeg/dvbpsi_compat.h demux/dvb-text.h
+libts_plugin_la_SOURCES = demux/ts.c mux/mpeg/csa.c mux/mpeg/dvbpsi_compat.h demux/dvb-text.h codec/opus_header.c demux/opus.h
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(DVBPSI_LIBS) $(SOCKET_LIBS)
+if HAVE_ARIBB24
+libts_plugin_la_CFLAGS += $(ARIBB24_CFLAGS)
+libts_plugin_la_LIBADD += $(ARIBB24_LIBS)
+endif
 if HAVE_DVBPSI
 demux_LTLIBRARIES += libts_plugin.la
 endif

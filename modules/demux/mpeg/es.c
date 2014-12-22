@@ -362,7 +362,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                               (double)(uint64_t)( stream_Size( p_demux->s ) );
                 /* The first few seconds are guaranteed to be very whacky,
                  * don't bother trying ... Too bad */
-                if( f_pos < 0.01 ||
+                if( f_pos < 0.01f ||
                     (p_sys->i_pts + p_sys->i_time_offset) < 8000000 )
                 {
                     return VLC_EGENERIC;

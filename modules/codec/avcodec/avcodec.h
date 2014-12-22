@@ -31,10 +31,6 @@ int GetVlcFourcc( unsigned i_ffmpeg_codec, int *pi_cat,
                   vlc_fourcc_t *pi_fourcc, const char **ppsz_name );
 vlc_fourcc_t GetVlcAudioFormat( int i_sample_fmt );
 
-picture_t * DecodeVideo( decoder_t *, block_t ** );
-block_t * DecodeAudio( decoder_t *, block_t ** );
-subpicture_t *DecodeSubtitle( decoder_t *p_dec, block_t ** );
-
 /* Video encoder module */
 int  OpenEncoder ( vlc_object_t * );
 void CloseEncoder( vlc_object_t * );
@@ -48,20 +44,18 @@ int  OpenDeinterlace( vlc_object_t * );
 void CloseDeinterlace( vlc_object_t * );
 
 /* Video Decoder */
-int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );
+int InitVideoDec( decoder_t *, AVCodecContext *, const AVCodec * );
 void EndVideoDec( decoder_t *p_dec );
 
 /* Audio Decoder */
-int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
-                  AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );
+int InitAudioDec( decoder_t *, AVCodecContext *, const AVCodec * );
 
 /* Subtitle Decoder */
-int InitSubtitleDec( decoder_t *p_dec, AVCodecContext *p_context,
-                     AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );
+int InitSubtitleDec( decoder_t *, AVCodecContext *, const AVCodec * );
 
 /* Initialize decoder */
 int ffmpeg_OpenCodec( decoder_t *p_dec );
+void ffmpeg_CloseCodec( decoder_t *p_dec );
 
 /*****************************************************************************
  * Module descriptor help strings
@@ -114,16 +108,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
 
 #define CODEC_TEXT N_( "Codec name" )
 #define CODEC_LONGTEXT N_( "Internal libavcodec codec name" )
-
-/* TODO: Use a predefined list, with 0,1,2,4,7 */
-#define VISMV_TEXT N_( "Visualize motion vectors" )
-#define VISMV_LONGTEXT N_( \
-    "You can overlay the motion vectors (arrows showing how the images move) "\
-    "on the image. This value is a mask, based on these values:\n"\
-    "1 - visualize forward predicted MVs of P frames\n" \
-    "2 - visualize forward predicted MVs of B frames\n" \
-    "4 - visualize backward predicted MVs of B frames\n" \
-    "To visualize all vectors, the value should be 7." )
 
 #define SKIPLOOPF_TEXT N_( "Skip the loop filter for H.264 decoding" )
 #define SKIPLOOPF_LONGTEXT N_( "Skipping the loop filter (aka deblocking) " \
@@ -257,11 +241,8 @@ int ffmpeg_OpenCodec( decoder_t *p_dec );
    "hev1 and hev2 are currently supported only with libfdk-aac enabled libavcodec" )
 
 #define AVCODEC_COMMON_MEMBERS   \
-    int i_cat;                  \
-    int i_codec_id;             \
-    const char *psz_namecodec;  \
     AVCodecContext *p_context;  \
-    AVCodec        *p_codec;    \
+    const AVCodec  *p_codec;    \
     bool b_delayed_open;
 
 #ifndef AV_VERSION_INT

@@ -202,6 +202,7 @@ static const staticentry_t p_list_video[] = {
         E("DP02", "DynaPel MPEG-4 codec"),
         E("PLV1", "Pelco DVR MPEG-4"),
         E("QMP4", "QNAP Systems MPEG-4"),
+        E("qMP4", "QNAP Systems MPEG-4"),
         /* 3ivx delta 3.5 Unsupported
          * putting it here gives extreme distorted images */
         //E("3IV1", "3ivx delta 3.5 MPEG-4 Video"),
@@ -791,6 +792,8 @@ static const staticentry_t p_list_video[] = {
         A("I40A"),
     B(VLC_CODEC_YUV422A, "Planar YUV 4:2:2 Y:U:V:A"),
         A("I42A"),
+    B(VLC_CODEC_YUVA_444_10L, "Planar YUV 4:4:4 Y:U:V:A 10bits"),
+        A("YUVA"),
 
     B(VLC_CODEC_RGBP, "Palettized RGB with palette element R:G:B"),
         A("RGBP"),
@@ -1008,6 +1011,8 @@ static const staticentry_t p_list_video[] = {
         A("ULRG"),
         A("ULY0"),
         A("ULY2"),
+        A("ULH0"),
+        A("ULH2"),
 
     B(VLC_CODEC_VBLE, "VBLE Lossless"),
         A("VBLE"),
@@ -1556,6 +1561,12 @@ static const staticentry_t p_list_spu[] = {
     B(VLC_CODEC_CVD, "CVD subtitles"),
         A("cvd "),
 
+    B(VLC_CODEC_ARIB_A, "ARIB subtitles (A-profile)"),
+        A("arba"),
+
+    B(VLC_CODEC_ARIB_C, "ARIB subtitles (C-profile)"),
+        A("arbc"),
+
     B(VLC_CODEC_BD_PG, "BD subtitles"),
         A("bdpg"),
 
@@ -1564,6 +1575,12 @@ static const staticentry_t p_list_spu[] = {
 
     B(VLC_CODEC_SCTE_27, "SCTE-27 subtitles"),
         A("SC27"),
+
+    B(VLC_CODEC_EIA608_1, "EIA-608 subtitles"),
+        A("cc1 "),
+        A("cc2 "),
+        A("cc3 "),
+        A("cc4 "),
 
     B(0, "")
 };
@@ -2131,6 +2148,8 @@ static const struct
         VLC_CODEC_I444_9B },                   PLANAR_16(3, 1, 1,  9) },
     { { VLC_CODEC_I444_16L,
         VLC_CODEC_I444_16B },                  PLANAR_16(3, 1, 1, 16) },
+    { { VLC_CODEC_YUVA_444_10L,
+        VLC_CODEC_YUVA_444_10B },              PLANAR_16(4, 1, 1, 10) },
 
     { { VLC_CODEC_YUV_PACKED },                PACKED_FMT(2, 16) },
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,

@@ -70,7 +70,7 @@ private slots:
     void updateAllTabs( input_item_t * );
     void clearAllTabs();
 
-    virtual void close();
+    void close() Q_DECL_OVERRIDE;
 
     void saveMeta();
     void updateButtons( int i_tab );

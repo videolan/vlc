@@ -414,7 +414,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->p_region = subpicture_region_New( &fmt );
     if( !p_spu->p_region )
     {
-        p_filter->pf_sub_buffer_del( p_filter, p_spu );
+        subpicture_Delete( p_spu );
         vlc_mutex_unlock( &p_sys->lock );
         return NULL;
     }

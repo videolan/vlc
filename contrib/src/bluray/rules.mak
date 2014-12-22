@@ -1,7 +1,7 @@
 # LIBBLURAY
 
-BLURAY_VERSION := 0.6.0
-BLURAY_URL := http://ftp.videolan.org/pub/videolan/libbluray/$(BLURAY_VERSION)/libbluray-$(BLURAY_VERSION).tar.bz2
+BLURAY_VERSION := 0.6.2
+BLURAY_URL := $(VIDEOLAN)/libbluray/$(BLURAY_VERSION)/libbluray-$(BLURAY_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
 PKGS += bluray
@@ -10,11 +10,10 @@ ifeq ($(call need_pkg,"libbluray >= 0.3.0"),)
 PKGS_FOUND += bluray
 endif
 
-DEPS_bluray = libxml2 $(DEPS_libxml2)
+DEPS_bluray = libxml2 $(DEPS_libxml2) freetype2 $(DEPS_freetype2)
 
 BLURAY_CONF = --disable-examples  \
-              --disable-debug     \
-              --enable-libxml2    \
+              --with-libxml2      \
               --enable-bdjava
 
 $(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.bz2:

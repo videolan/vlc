@@ -391,7 +391,24 @@ struct vlc_cleanup_t
 #ifndef LIBVLC_USE_PTHREAD_CANCEL
 /* poll() with cancellation */
 # ifdef __OS2__
-int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout);
+static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
+{
+    static int (*vlc_poll_os2)(struct pollfd *, unsigned, int) = NULL;
+
+    if (!vlc_poll_os2)
+    {
+        HMODULE hmod;
+        CHAR szFailed[CCHMAXPATH];
+
+        if (DosLoadModule(szFailed, sizeof(szFailed), "vlccore", &hmod))
+            return -1;
+
+        if (DosQueryProcAddr(hmod, 0, "_vlc_poll_os2", (PFN *)&vlc_poll_os2))
+            return -1;
+    }
+
+    return (*vlc_poll_os2)(fds, nfds, timeout);
+}
 # else
 static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {

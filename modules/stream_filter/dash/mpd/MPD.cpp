@@ -26,12 +26,17 @@
 #endif
 
 #include "MPD.h"
+#include "Helper.h"
+#include "dash.hpp"
+#include <vlc_common.h>
+#include <vlc_stream.h>
 
 using namespace dash::mpd;
 
-MPD::MPD () :
-    profile( dash::mpd::UnknownProfile ),
-    live( false ),
+MPD::MPD (stream_t *stream_, Profile profile_) :
+    ICanonicalUrl(),
+    stream(stream_),
+    profile( profile_ ),
     availabilityStartTime( -1 ),
     availabilityEndTime( -1 ),
     duration( -1 ),
@@ -57,12 +62,6 @@ const std::vector<Period*>&    MPD::getPeriods             () const
 {
     return this->periods;
 }
-
-const std::vector<BaseUrl*>&   MPD::getBaseUrls            () const
-{
-    return this->baseUrls;
-}
-
 
 time_t      MPD::getDuration() const
 {
@@ -128,12 +127,18 @@ void                    MPD::setProgramInformation  (ProgramInformation *progInf
 
 bool                    MPD::isLive() const
 {
-    return this->live;
+    if(type.empty())
+    {
+        Profile live(Profile::ISOLive);
+        return profile == live;
+    }
+    else
+        return (type != "static");
 }
 
-void                    MPD::setLive( bool live )
+void MPD::setType(const std::string &type_)
 {
-    this->live = live;
+    type = type_;
 }
 
 time_t MPD::getAvailabilityStartTime() const
@@ -160,10 +165,44 @@ void MPD::setAvailabilityEndTime(time_t time)
 
 Profile MPD::getProfile() const
 {
-    return this->profile;
+    return profile;
+}
+Url MPD::getUrlSegment() const
+{
+    if (!baseUrls.empty())
+        return Url(baseUrls.front()->getUrl());
+    else
+    {
+        std::stringstream ss;
+        ss << stream->psz_access << "://" << Helper::getDirectoryPath(stream->psz_path) << "/";
+        return Url(ss.str());
+    }
 }
 
-void MPD::setProfile(Profile profile)
+vlc_object_t * MPD::getVLCObject() const
 {
-    this->profile = profile;
+    return VLC_OBJECT(stream);
+}
+
+Period* MPD::getFirstPeriod() const
+{
+    std::vector<Period *> periods = getPeriods();
+
+    if( !periods.empty() )
+        return periods.front();
+    else
+        return NULL;
+}
+
+Period* MPD::getNextPeriod(Period *period)
+{
+    std::vector<Period *> periods = getPeriods();
+
+    for(size_t i = 0; i < periods.size(); i++)
+    {
+        if(periods.at(i) == period && (i + 1) < periods.size())
+            return periods.at(i + 1);
+    }
+
+    return NULL;
 }

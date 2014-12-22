@@ -41,7 +41,9 @@
 #include <vlc_meta.h>
 
 #include "../demux/mpeg/mpeg_parser_helpers.h"
+#include "../demux/mp4/libmp4.h"
 
+#include "assert.h"
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -53,6 +55,8 @@
 
 static int  Open   (vlc_object_t *);
 static void Close  (vlc_object_t *);
+static int  OpenFrag   (vlc_object_t *);
+static void CloseFrag  (vlc_object_t *);
 
 #define SOUT_CFG_PREFIX "sout-mp4-"
 
@@ -68,6 +72,16 @@ vlc_module_begin ()
     set_capability("sout mux", 5)
     add_shortcut("mp4", "mov", "3gp")
     set_callbacks(Open, Close)
+
+add_submodule ()
+    set_description(N_("Fragmented and streamable MP4 muxer"))
+    set_category(CAT_SOUT)
+    set_subcategory(SUBCAT_SOUT_MUX)
+    set_shortname("MP4 Frag")
+    add_shortcut("mp4frag", "mp4stream")
+    set_capability("sout mux", 0)
+    set_callbacks(OpenFrag, CloseFrag)
+
 vlc_module_end ()
 
 /*****************************************************************************
@@ -81,6 +95,7 @@ static int Control(sout_mux_t *, int, va_list);
 static int AddStream(sout_mux_t *, sout_input_t *);
 static int DelStream(sout_mux_t *, sout_input_t *);
 static int Mux      (sout_mux_t *);
+static int MuxFrag  (sout_mux_t *);
 
 /*****************************************************************************
  * Local prototypes
@@ -93,8 +108,31 @@ typedef struct
     mtime_t  i_pts_dts;
     mtime_t  i_length;
     unsigned int i_flags;
-
 } mp4_entry_t;
+
+typedef struct mp4_fragentry_t mp4_fragentry_t;
+
+struct mp4_fragentry_t
+{
+    block_t  *p_block;
+    uint32_t  i_run;
+    mp4_fragentry_t *p_next;
+};
+
+typedef struct mp4_fragindex_t
+{
+    uint64_t i_moofoffset;
+    mtime_t  i_time;
+    uint8_t  i_traf;
+    uint8_t  i_trun;
+    uint32_t i_sample;
+} mp4_fragindex_t;
+
+typedef struct mp4_fragqueue_t
+{
+    mp4_fragentry_t *p_first;
+    mp4_fragentry_t *p_last;
+} mp4_fragqueue_t;
 
 typedef struct
 {
@@ -109,10 +147,13 @@ typedef struct
 
     /* stats */
     int64_t      i_dts_start; /* applies to current segment only */
-    int64_t      i_duration;
+    int64_t      i_read_duration;
     uint32_t     i_timescale;
     mtime_t      i_starttime; /* the really first packet */
     bool         b_hasbframes;
+
+    /* XXX: needed for other codecs too, see lavf */
+    block_t      *a52_frame;
 
     /* for later stco fix-up (fast start files) */
     uint64_t i_stco_pos;
@@ -120,7 +161,23 @@ typedef struct
 
     /* for spu */
     int64_t i_last_dts; /* applies to current segment only */
+    int64_t i_last_length;
 
+    /*** mp4frag ***/
+    bool         b_hasiframes;
+    uint32_t     i_trex_length;
+    uint32_t     i_trex_size;
+    uint32_t     i_tfhd_flags;
+
+    uint32_t         i_current_run;
+    mp4_fragentry_t *p_held_entry;
+    mp4_fragqueue_t  read;
+    mp4_fragqueue_t  towrite;
+    mtime_t          i_last_iframe_time;
+    mtime_t          i_written_duration;
+    mp4_fragindex_t *p_indexentries;
+    uint32_t         i_indexentriesmax;
+    uint32_t         i_indexentries;
 } mp4_stream_t;
 
 struct sout_mux_sys_t
@@ -132,10 +189,16 @@ struct sout_mux_sys_t
 
     uint64_t i_mdat_pos;
     uint64_t i_pos;
-    mtime_t  i_duration;
+    mtime_t  i_read_duration;
 
     unsigned int   i_nb_streams;
     mp4_stream_t **pp_streams;
+
+    /* mp4frag */
+    bool           b_fragmented;
+    bool           b_header_sent;
+    mtime_t        i_written_duration;
+    uint32_t       i_mfhd_sequence;
 };
 
 typedef struct bo_t
@@ -195,7 +258,8 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_mdat_pos   = 0;
     p_sys->b_mov        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "mov");
     p_sys->b_3gp        = p_mux->psz_mux && !strcmp(p_mux->psz_mux, "3gp");
-    p_sys->i_duration   = 0;
+    p_sys->i_read_duration   = 0;
+    p_sys->b_fragmented = false;
 
     if (!p_sys->b_mov) {
         /* Now add ftyp header */
@@ -210,7 +274,6 @@ static int Open(vlc_object_t *p_this)
         else
             bo_add_fourcc(box, "mp41");
         bo_add_fourcc(box, "avc1");
-        bo_add_fourcc(box, "qt  ");
         box_fix(box);
 
         p_sys->i_pos += box->len;
@@ -331,6 +394,8 @@ static void Close(vlc_object_t *p_this)
         mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
 
         es_format_Clean(&p_stream->fmt);
+        if (p_stream->a52_frame)
+            block_Release(p_stream->a52_frame);
         free(p_stream->entry);
         free(p_stream);
     }
@@ -375,6 +440,8 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
 
     switch(p_input->p_fmt->i_codec)
     {
+    case VLC_CODEC_A52:
+    case VLC_CODEC_EAC3:
     case VLC_CODEC_MP4A:
     case VLC_CODEC_MP4V:
     case VLC_CODEC_MPGA:
@@ -413,15 +480,43 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     p_stream->entry         =
         calloc(p_stream->i_entry_max, sizeof(mp4_entry_t));
     p_stream->i_dts_start   = 0;
-    p_stream->i_duration    = 0;
-    if (p_stream->fmt.i_cat == AUDIO_ES)
+    p_stream->i_read_duration    = 0;
+    p_stream->a52_frame = NULL;
+    switch( p_stream->fmt.i_cat )
+    {
+    case AUDIO_ES:
         p_stream->i_timescale = p_stream->fmt.audio.i_rate;
-    else
+        break;
+    case VIDEO_ES:
+        p_stream->i_timescale = p_stream->fmt.video.i_frame_rate * 1000 /
+                                p_stream->fmt.video.i_frame_rate_base;
+        break;
+    default:
         p_stream->i_timescale = CLOCK_FREQ;
-    p_stream->i_starttime   = p_sys->i_duration;
+        break;
+    }
+
+    p_stream->i_starttime   = p_sys->i_read_duration;
     p_stream->b_hasbframes  = false;
 
     p_stream->i_last_dts    = 0;
+    p_stream->i_last_length = 0;
+
+    p_stream->b_hasiframes  = false;
+    p_stream->i_trex_length = 0;
+    p_stream->i_trex_size   = 0;
+
+    p_stream->i_current_run = 0;
+    p_stream->read.p_first  = NULL;
+    p_stream->read.p_last   = NULL;
+    p_stream->towrite.p_first = NULL;
+    p_stream->towrite.p_last  = NULL;
+    p_stream->p_held_entry    = NULL;
+    p_stream->i_last_iframe_time = 0;
+    p_stream->i_written_duration = 0;
+    p_stream->p_indexentries     = NULL;
+    p_stream->i_indexentriesmax  = 0;
+    p_stream->i_indexentries     = 0;
 
     p_input->p_sys          = p_stream;
 
@@ -464,6 +559,11 @@ static int Mux(sout_mux_t *p_mux)
                 p_data = ConvertFromAnnexB(p_data);
             else if (p_stream->fmt.i_codec == VLC_CODEC_SUBT)
                 p_data = ConvertSUBT(p_data);
+            else if (p_stream->fmt.i_codec == VLC_CODEC_A52 ||
+                     p_stream->fmt.i_codec == VLC_CODEC_EAC3) {
+                if (p_stream->a52_frame == NULL && p_data->i_buffer >= 8)
+                    p_stream->a52_frame = block_Duplicate(p_data);
+            }
         } while (!p_data);
 
         /* Reset reference dts in case of discontinuity (ex: gather sout) */
@@ -559,7 +659,8 @@ static int Mux(sout_mux_t *p_mux)
         }
 
         /* update */
-        p_stream->i_duration += __MAX( 0, p_data->i_length );
+        p_stream->i_read_duration += __MAX( 0, p_data->i_length );
+        p_stream->i_last_length = p_data->i_length;
         p_sys->i_pos += p_data->i_buffer;
 
         /* Save the DTS for SPU */
@@ -603,15 +704,15 @@ static int Mux(sout_mux_t *p_mux)
             }
 
             /* Fix duration = current segment starttime + duration within */
-            p_stream->i_duration = p_stream->i_starttime + ( p_stream->i_last_dts - p_stream->i_dts_start );
+            p_stream->i_read_duration = p_stream->i_starttime + ( p_stream->i_last_dts - p_stream->i_dts_start );
         }
     }
 
     /* Update the global segment/media duration */
     for ( unsigned int i=0; i<p_sys->i_nb_streams; i++ )
     {
-        if ( p_sys->pp_streams[i]->i_duration > p_sys->i_duration )
-            p_sys->i_duration = p_sys->pp_streams[i]->i_duration;
+        if ( p_sys->pp_streams[i]->i_read_duration > p_sys->i_read_duration )
+            p_sys->i_read_duration = p_sys->pp_streams[i]->i_read_duration;
     }
 
     return(VLC_SUCCESS);
@@ -684,8 +785,8 @@ static bo_t *GetESDS(mp4_stream_t *p_stream)
         }
     }
 
-    if (p_stream->i_duration > 0)
-        i_bitrate_avg = INT64_C(8000000) * i_bitrate_avg / p_stream->i_duration;
+    if (p_stream->i_read_duration > 0)
+        i_bitrate_avg = INT64_C(8000000) * i_bitrate_avg / p_stream->i_read_duration;
     else
         i_bitrate_avg = 0;
     if (i_bitrate_max <= 1)
@@ -782,6 +883,174 @@ static bo_t *GetWaveTag(mp4_stream_t *p_stream)
     return wave;
 }
 
+static bo_t *GetDec3Tag(mp4_stream_t *p_stream)
+{
+    if (!p_stream->a52_frame)
+        return NULL;
+
+    bs_t s;
+    bs_init(&s, p_stream->a52_frame->p_buffer, sizeof(p_stream->a52_frame->i_buffer));
+    bs_skip(&s, 16); // syncword
+
+    uint8_t fscod, bsid, bsmod, acmod, lfeon, strmtyp;
+
+    bsmod = 0;
+
+    strmtyp = bs_read(&s, 2);
+
+    if (strmtyp & 0x1) // dependant or reserved stream
+        return NULL;
+
+    if (bs_read(&s, 3) != 0x0) // substreamid: we don't support more than 1 stream
+        return NULL;
+
+    int numblkscod;
+    bs_skip(&s, 11); // frmsizecod
+    fscod = bs_read(&s, 2);
+    if (fscod == 0x03) {
+        bs_skip(&s, 2); // fscod2
+        numblkscod = 3;
+    } else {
+        numblkscod = bs_read(&s, 2);
+    }
+
+    acmod = bs_read(&s, 3);
+    lfeon = bs_read1(&s);
+
+    bsid = bs_read(&s, 5);
+
+    bs_skip(&s, 5); // dialnorm
+    if (bs_read1(&s)) // compre
+        bs_skip(&s, 5); // compr
+
+    if (acmod == 0) {
+        bs_skip(&s, 5); // dialnorm2
+        if (bs_read1(&s)) // compr2e
+            bs_skip(&s, 8); // compr2
+    }
+
+    if (strmtyp == 0x1) // dependant stream XXX: unsupported
+        if (bs_read1(&s)) // chanmape
+            bs_skip(&s, 16); // chanmap
+
+    /* we have to skip mixing info to read bsmod */
+    if (bs_read1(&s)) { // mixmdate
+        if (acmod > 0x2) // 2+ channels
+            bs_skip(&s, 2); // dmixmod
+        if ((acmod & 0x1) && (acmod > 0x2)) // 3 front channels
+            bs_skip(&s, 3 + 3); // ltrtcmixlev + lorocmixlev
+        if (acmod & 0x4) // surround channel
+            bs_skip(&s, 3 + 3); // ltrsurmixlev + lorosurmixlev
+        if (lfeon)
+            if (bs_read1(&s))
+                bs_skip(&s, 5); // lfemixlevcod
+        if (strmtyp == 0) { // independant stream
+            if (bs_read1(&s)) // pgmscle
+                bs_skip(&s, 6); // pgmscl
+            if (acmod == 0x0) // dual mono
+                if (bs_read1(&s)) // pgmscl2e
+                    bs_skip(&s, 6); // pgmscl2
+            if (bs_read1(&s)) // extpgmscle
+                bs_skip(&s, 6); // extpgmscl
+            uint8_t mixdef = bs_read(&s, 2);
+            if (mixdef == 0x1)
+                bs_skip(&s, 5);
+            else if (mixdef == 0x2)
+                bs_skip(&s, 12);
+            else if (mixdef == 0x3) {
+                uint8_t mixdeflen = bs_read(&s, 5);
+                bs_skip(&s, 8 * (mixdeflen + 2));
+            }
+            if (acmod < 0x2) { // mono or dual mono
+                if (bs_read1(&s)) // paninfoe
+                    bs_skip(&s, 14); // paninfo
+                if (acmod == 0) // dual mono
+                    if (bs_read1(&s)) // paninfo2e
+                        bs_skip(&s, 14); // paninfo2
+            }
+            if (bs_read1(&s)) { // frmmixcfginfoe
+                static const int blocks[4] = { 1, 2, 3, 6 };
+                int number_of_blocks = blocks[numblkscod];
+                if (number_of_blocks == 1)
+                    bs_skip(&s, 5); // blkmixcfginfo[0]
+                else for (int i = 0; i < number_of_blocks; i++)
+                    if (bs_read1(&s)) // blkmixcfginfoe
+                        bs_skip(&s, 5); // blkmixcfginfo[i]
+            }
+        }
+    }
+
+    if (bs_read1(&s)) // infomdate
+        bsmod = bs_read(&s, 3);
+
+    uint8_t mp4_eac3_header[5];
+    bs_init(&s, mp4_eac3_header, sizeof(mp4_eac3_header));
+
+    int data_rate = p_stream->fmt.i_bitrate / 1000;
+    bs_write(&s, 13, data_rate);
+    bs_write(&s, 3, 0); // num_ind_sub - 1
+    bs_write(&s, 2, fscod);
+    bs_write(&s, 5, bsid);
+    bs_write(&s, 5, bsmod);
+    bs_write(&s, 3, acmod);
+    bs_write(&s, 1, lfeon);
+    bs_write(&s, 3, 0); // reserved
+    bs_write(&s, 4, 0); // num_dep_sub
+    bs_write(&s, 1, 0); // reserved
+
+    bo_t *dec3 = box_new("dec3");
+
+    bo_add_mem(dec3, sizeof(mp4_eac3_header), mp4_eac3_header);
+
+    return dec3;
+}
+
+static bo_t *GetDac3Tag(mp4_stream_t *p_stream)
+{
+    if (!p_stream->a52_frame)
+        return NULL;
+
+    bo_t *dac3 = box_new("dac3");
+
+    bs_t s;
+    bs_init(&s, p_stream->a52_frame->p_buffer, sizeof(p_stream->a52_frame->i_buffer));
+
+    uint8_t fscod, bsid, bsmod, acmod, lfeon, frmsizecod;
+
+    bs_skip(&s, 16 + 16); // syncword + crc
+
+    fscod = bs_read(&s, 2);
+    frmsizecod = bs_read(&s, 6);
+    bsid = bs_read(&s, 5);
+    bsmod = bs_read(&s, 3);
+    acmod = bs_read(&s, 3);
+    if (acmod == 2)
+        bs_skip(&s, 2); // dsurmod
+    else {
+        if ((acmod & 1) && acmod != 1)
+            bs_skip(&s, 2); // cmixlev
+        if (acmod & 4)
+            bs_skip(&s, 2); // surmixlev
+    }
+
+    lfeon = bs_read1(&s);
+
+    uint8_t mp4_a52_header[3];
+    bs_init(&s, mp4_a52_header, sizeof(mp4_a52_header));
+
+    bs_write(&s, 2, fscod);
+    bs_write(&s, 5, bsid);
+    bs_write(&s, 3, bsmod);
+    bs_write(&s, 3, acmod);
+    bs_write(&s, 1, lfeon);
+    bs_write(&s, 5, frmsizecod >> 1); // bit_rate_code
+    bs_write(&s, 5, 0); // reserved
+
+    bo_add_mem(dac3, sizeof(mp4_a52_header), mp4_a52_header);
+
+    return dac3;
+}
+
 static bo_t *GetDamrTag(mp4_stream_t *p_stream)
 {
     bo_t *damr;
@@ -856,26 +1125,26 @@ static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_i
     hevc_skip_profile_tiers_level(&bs, sps_max_sublayer_minus1);
 
     /* skip sps id */
-    (void) read_ue( &bs );
+    (void) bs_read_ue( &bs );
 
-    *chroma_idc = read_ue(&bs);
+    *chroma_idc = bs_read_ue(&bs);
     if (*chroma_idc == 3)
         bs_skip(&bs, 1);
 
     /* skip width and heigh */
-    (void) read_ue( &bs );
-    (void) read_ue( &bs );
+    (void) bs_read_ue( &bs );
+    (void) bs_read_ue( &bs );
 
     uint32_t conformance_window_flag = bs_read1(&bs);
     if (conformance_window_flag) {
         /* skip offsets*/
-        (void) read_ue(&bs);
-        (void) read_ue(&bs);
-        (void) read_ue(&bs);
-        (void) read_ue(&bs);
+        (void) bs_read_ue(&bs);
+        (void) bs_read_ue(&bs);
+        (void) bs_read_ue(&bs);
+        (void) bs_read_ue(&bs);
     }
-    *bit_depth_luma_minus8 = read_ue(&bs);
-    *bit_depth_chroma_minus8 = read_ue(&bs);
+    *bit_depth_luma_minus8 = bs_read_ue(&bs);
+    *bit_depth_chroma_minus8 = bs_read_ue(&bs);
 }
 
 static bo_t *GetHvcCTag(mp4_stream_t *p_stream)
@@ -1063,7 +1332,7 @@ static bo_t *GetAvcCTag(mp4_stream_t *p_stream)
             }
             const int i_nal_type = p_buffer[3]&0x1f;
             int i_startcode = 0;
- 
+
             for (int i_offset = 1; i_offset+2 < i_buffer ; i_offset++)
                 if (!memcmp(&p_buffer[i_offset], &avc1_start_code[1], 3)) {
                     /* we found another startcode */
@@ -1087,7 +1356,7 @@ static bo_t *GetAvcCTag(mp4_stream_t *p_stream)
             p_buffer += i_size;
         }
     }
- 
+
     /* FIXME use better value */
     avcC = box_new("avcC");
     bo_add_8(avcC, 1);      /* configuration version */
@@ -1208,7 +1477,6 @@ static bo_t *GetSounBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     bool b_descr = true;
     vlc_fourcc_t codec = p_stream->fmt.i_codec;
     char fcc[4];
-    vlc_fourcc_to_char(codec, fcc);
 
     if (codec == VLC_CODEC_MPGA) {
         if (p_sys->b_mov) {
@@ -1216,7 +1484,12 @@ static bo_t *GetSounBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
             memcpy(fcc, ".mp3", 4);
         } else
             memcpy(fcc, "mp4a", 4);
-    }
+    } else if (codec == VLC_CODEC_A52) {
+        memcpy(fcc, "ac-3", 4);
+    } else if (codec == VLC_CODEC_EAC3) {
+        memcpy(fcc, "ec-3", 4);
+    } else
+        vlc_fourcc_to_char(codec, fcc);
 
     bo_t *soun = box_new(fcc);
     for (int i = 0; i < 6; i++)
@@ -1258,9 +1531,15 @@ static bo_t *GetSounBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
             box = GetWaveTag(p_stream);
         else if (codec == VLC_CODEC_AMR_NB)
             box = GetDamrTag(p_stream);
+        else if (codec == VLC_CODEC_A52)
+            box = GetDac3Tag(p_stream);
+        else if (codec == VLC_CODEC_EAC3)
+            box = GetDec3Tag(p_stream);
         else
             box = GetESDS(p_stream);
-        box_gather(soun, box);
+
+        if (box)
+            box_gather(soun, box);
     }
 
     return soun;
@@ -1449,7 +1728,7 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
                 break;
 
         bo_add_32be(stts, i - i_first); // sample-count
-        bo_add_32be(stts, i_delta * p_stream->i_timescale / CLOCK_FREQ ); // sample-delta
+        bo_add_32be(stts, (uint64_t)i_delta  * p_stream->i_timescale / CLOCK_FREQ); // sample-delta
     }
     bo_fix_32be(stts, 12, i_index);
 
@@ -1577,13 +1856,18 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
     moov = box_new("moov");
 
     /* Create general info */
-    for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++) {
-        mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
-        i_movie_duration = __MAX(i_movie_duration, p_stream->i_duration);
-    }
-    msg_Dbg(p_mux, "movie duration %"PRId64"s", i_movie_duration / CLOCK_FREQ);
+    if ( !p_sys->b_fragmented )
+    {
+        for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++) {
+            mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
+            i_movie_duration = __MAX(i_movie_duration, p_stream->i_read_duration);
+        }
+        msg_Dbg(p_mux, "movie duration %"PRId64"s", i_movie_duration / CLOCK_FREQ);
 
-    i_movie_duration = i_movie_duration * i_movie_timescale / CLOCK_FREQ;
+        i_movie_duration = i_movie_duration * i_movie_timescale / CLOCK_FREQ;
+    }
+    else
+        i_movie_duration = 0;
 
     /* *** add /moov/mvhd *** */
     if (!p_sys->b_64_ext) {
@@ -1620,6 +1904,12 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
     for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++) {
         mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
 
+        mtime_t i_stream_duration;
+        if ( !p_sys->b_fragmented )
+            i_stream_duration = p_stream->i_read_duration * i_movie_timescale / CLOCK_FREQ;
+        else
+            i_stream_duration = 0;
+
         /* *** add /moov/trak *** */
         bo_t *trak = box_new("trak");
 
@@ -1635,8 +1925,7 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
             bo_add_32be(tkhd, i_timestamp);       // modification time
             bo_add_32be(tkhd, p_stream->i_track_id);
             bo_add_32be(tkhd, 0);                     // reserved 0
-            bo_add_32be(tkhd, p_stream->i_duration *
-                         (int64_t)i_movie_timescale / CLOCK_FREQ); // duration
+            bo_add_32be(tkhd, i_stream_duration); // duration
         } else {
             if (p_sys->b_mov)
                 tkhd = box_full_new("tkhd", 1, 0x0f);
@@ -1647,8 +1936,7 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
             bo_add_64be(tkhd, i_timestamp);       // modification time
             bo_add_32be(tkhd, p_stream->i_track_id);
             bo_add_32be(tkhd, 0);                     // reserved 0
-            bo_add_64be(tkhd, p_stream->i_duration *
-                         (int64_t)i_movie_timescale / CLOCK_FREQ); // duration
+            bo_add_64be(tkhd, i_stream_duration); // duration
         }
 
         for (int i = 0; i < 2; i++)
@@ -1699,39 +1987,42 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
         box_gather(trak, tkhd);
 
         /* *** add /moov/trak/edts and elst */
-        bo_t *edts = box_new("edts");
-        bo_t *elst = box_full_new("elst", p_sys->b_64_ext ? 1 : 0, 0);
-        if (p_stream->i_starttime > 0) {
-            bo_add_32be(elst, 2);
+        if ( !p_sys->b_fragmented )
+        {
+            bo_t *edts = box_new("edts");
+            bo_t *elst = box_full_new("elst", p_sys->b_64_ext ? 1 : 0, 0);
+            if (p_stream->i_starttime > 0) {
+                bo_add_32be(elst, 2);
 
-            if (p_sys->b_64_ext) {
-                bo_add_64be(elst, p_stream->i_starttime *
-                             i_movie_timescale / CLOCK_FREQ);
-                bo_add_64be(elst, -1);
+                if (p_sys->b_64_ext) {
+                    bo_add_64be(elst, p_stream->i_starttime *
+                                i_movie_timescale / CLOCK_FREQ);
+                    bo_add_64be(elst, -1);
+                } else {
+                    bo_add_32be(elst, p_stream->i_starttime *
+                                i_movie_timescale / CLOCK_FREQ);
+                    bo_add_32be(elst, -1);
+                }
+                bo_add_16be(elst, 1);
+                bo_add_16be(elst, 0);
             } else {
-                bo_add_32be(elst, p_stream->i_starttime *
-                             i_movie_timescale / CLOCK_FREQ);
-                bo_add_32be(elst, -1);
+                bo_add_32be(elst, 1);
+            }
+            if (p_sys->b_64_ext) {
+                bo_add_64be(elst, p_stream->i_read_duration *
+                            i_movie_timescale / CLOCK_FREQ);
+                bo_add_64be(elst, 0);
+            } else {
+                bo_add_32be(elst, p_stream->i_read_duration *
+                            i_movie_timescale / CLOCK_FREQ);
+                bo_add_32be(elst, 0);
             }
             bo_add_16be(elst, 1);
             bo_add_16be(elst, 0);
-        } else {
-            bo_add_32be(elst, 1);
-        }
-        if (p_sys->b_64_ext) {
-            bo_add_64be(elst, p_stream->i_duration *
-                         i_movie_timescale / CLOCK_FREQ);
-            bo_add_64be(elst, 0);
-        } else {
-            bo_add_32be(elst, p_stream->i_duration *
-                         i_movie_timescale / CLOCK_FREQ);
-            bo_add_32be(elst, 0);
-        }
-        bo_add_16be(elst, 1);
-        bo_add_16be(elst, 0);
 
-        box_gather(edts, elst);
-        box_gather(trak, edts);
+            box_gather(edts, elst);
+            box_gather(trak, edts);
+        }
 
         /* *** add /moov/trak/mdia *** */
         bo_t *mdia = box_new("mdia");
@@ -1743,15 +2034,13 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
             bo_add_32be(mdhd, i_timestamp);   // creation time
             bo_add_32be(mdhd, i_timestamp);   // modification time
             bo_add_32be(mdhd, p_stream->i_timescale); // timescale
-            bo_add_32be(mdhd, p_stream->i_duration * (int64_t)p_stream->i_timescale /
-                               CLOCK_FREQ);  // duration
+            bo_add_32be(mdhd, i_stream_duration);  // duration
         } else {
             mdhd = box_full_new("mdhd", 1, 0);
             bo_add_64be(mdhd, i_timestamp);   // creation time
             bo_add_64be(mdhd, i_timestamp);   // modification time
             bo_add_32be(mdhd, p_stream->i_timescale); // timescale
-            bo_add_64be(mdhd, p_stream->i_duration * (int64_t)p_stream->i_timescale /
-                               CLOCK_FREQ);  // duration
+            bo_add_64be(mdhd, i_stream_duration);  // duration
         }
 
         if (p_stream->fmt.psz_language) {
@@ -1859,7 +2148,16 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
         box_gather(minf, dinf);
 
         /* add stbl */
-        bo_t *stbl = GetStblBox(p_mux, p_stream);
+        bo_t *stbl;
+        if ( p_sys->b_fragmented )
+        {
+            uint32_t i_backup = p_stream->i_entry_count;
+            p_stream->i_entry_count = 0;
+            stbl = GetStblBox(p_mux, p_stream);
+            p_stream->i_entry_count = i_backup;
+        }
+        else
+            stbl = GetStblBox(p_mux, p_stream);
 
         /* append stbl to minf */
         p_stream->i_stco_pos += minf->len;
@@ -1880,6 +2178,33 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
 
     /* Add user data tags */
     box_gather(moov, GetUdtaTag(p_mux));
+
+    if ( p_sys->b_fragmented )
+    {
+        bo_t *mvex = box_new("mvex");
+        for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++)
+        {
+            mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
+
+            /* Try to find some defaults */
+            if ( p_stream->i_entry_count )
+            {
+                // FIXME: find highest occurence
+                p_stream->i_trex_length = p_stream->entry[0].i_length;
+                p_stream->i_trex_size = p_stream->entry[0].i_size;
+            }
+
+            /* *** add /mvex/trex *** */
+            bo_t *trex = box_full_new("trex", 0, 0);
+            bo_add_32be(trex, p_stream->i_track_id);
+            bo_add_32be(trex, 1); // sample desc index
+            bo_add_32be(trex, (uint64_t)p_stream->i_trex_length * p_stream->i_timescale / CLOCK_FREQ); // sample duration
+            bo_add_32be(trex, p_stream->i_trex_size); // sample size
+            bo_add_32be(trex, 0); // sample flags
+            box_gather(mvex, trex);
+        }
+        box_gather(moov, mvex);
+    }
 
     box_fix(moov);
     return moov;
@@ -2019,4 +2344,642 @@ static int64_t get_timestamp(void)
     // 208284480 is (((1970 - 1904) * 365) + 17) * 24 * 60 * 60
 
     return i_timestamp;
+}
+
+/***************************************************************************
+    MP4 Live submodule
+****************************************************************************/
+#define FRAGMENT_LENGTH  (CLOCK_FREQ * 3/2)
+
+#define ENQUEUE_ENTRY(object, entry) \
+    do {\
+        if (object.p_last)\
+            object.p_last->p_next = entry;\
+        object.p_last = entry;\
+        if (!object.p_first)\
+            object.p_first = entry;\
+    } while(0)
+
+#define DEQUEUE_ENTRY(object, entry) \
+    do {\
+        entry = object.p_first;\
+        if (object.p_last == entry)\
+            object.p_last = NULL;\
+        object.p_first = object.p_first->p_next;\
+        entry->p_next = NULL;\
+    } while(0)
+
+/* Creates mfra/traf index entries */
+static void AddKeyframeEntry(mp4_stream_t *p_stream, const uint64_t i_moof_pos,
+                             const uint8_t i_traf, const uint32_t i_sample,
+                             const mtime_t i_time)
+{
+    /* alloc or realloc */
+    mp4_fragindex_t *p_entries = p_stream->p_indexentries;
+    if (p_stream->i_indexentries >= p_stream->i_indexentriesmax)
+    {
+        p_stream->i_indexentriesmax += 256;
+        p_entries = xrealloc(p_stream->p_indexentries,
+                             p_stream->i_indexentriesmax * sizeof(mp4_fragindex_t));
+        if (p_entries) /* realloc can fail */
+            p_stream->p_indexentries = p_entries;
+    }
+
+    mtime_t i_last_entry_time;
+    if (p_stream->i_indexentries)
+        i_last_entry_time = p_stream->p_indexentries[p_stream->i_indexentries - 1].i_time;
+    else
+        i_last_entry_time = 0;
+
+    if (p_entries && i_time - i_last_entry_time >= CLOCK_FREQ * 2)
+    {
+        mp4_fragindex_t *p_indexentry = &p_stream->p_indexentries[p_stream->i_indexentries];
+        p_indexentry->i_time = i_time;
+        p_indexentry->i_moofoffset = i_moof_pos;
+        p_indexentry->i_sample = i_sample;
+        p_indexentry->i_traf = i_traf;
+        p_indexentry->i_trun = 1;
+        p_stream->i_indexentries++;
+    }
+}
+
+/* Creates moof box and traf/trun information.
+ * Single run per traf is absolutely not optimal as interleaving should be done
+ * using runs and not limiting moof size, but creating an relative offset only
+ * requires base_offset_is_moof and then comply to late iso brand spec which
+ * breaks clients. */
+static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
+                        mtime_t i_barrier_time, const uint64_t i_write_pos)
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+
+    bo_t            *moof, *mfhd;
+    size_t           i_fixupoffset = 0;
+
+    *pi_mdat_total_size = 0;
+
+    moof = box_new("moof");
+
+    /* *** add /moof/mfhd *** */
+
+    mfhd = box_full_new("mfhd", 0, 0);
+    bo_add_32be(mfhd, p_sys->i_mfhd_sequence++);   // sequence number
+
+    box_gather(moof, mfhd);
+
+    for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++)
+    {
+        mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
+
+        /* *** add /moof/traf *** */
+        bo_t *traf = box_new("traf");
+
+        uint32_t i_sample = 0;
+        mtime_t i_time = p_stream->i_written_duration;
+        bool b_allsamesize = true;
+        bool b_allsamelength = true;
+        if ( p_stream->read.p_first )
+        {
+            mp4_fragentry_t *p_entry = p_stream->read.p_first->p_next;
+            while (p_entry && (b_allsamelength || b_allsamesize))
+            {
+                /* compare against queue head */
+                b_allsamelength &= ( p_entry->p_block->i_length == p_stream->read.p_first->p_block->i_length );
+                b_allsamesize &= ( p_entry->p_block->i_buffer == p_stream->read.p_first->p_block->i_buffer );
+                p_entry = p_entry->p_next;
+            }
+        }
+
+        uint32_t i_tfhd_flags = 0x0;
+        if (p_stream->read.p_first)
+        {
+            /* Current segment have all same duration value, different than trex's default */
+            if (b_allsamelength &&
+                p_stream->read.p_first->p_block->i_length != p_stream->i_trex_length &&
+                p_stream->read.p_first->p_block->i_length)
+                    i_tfhd_flags |= MP4_TFHD_DFLT_SAMPLE_DURATION;
+
+            /* Current segment have all same size value, different than trex's default */
+            if (b_allsamesize &&
+                p_stream->read.p_first->p_block->i_buffer != p_stream->i_trex_size &&
+                p_stream->read.p_first->p_block->i_buffer)
+                    i_tfhd_flags |= MP4_TFHD_DFLT_SAMPLE_SIZE;
+        }
+        else
+        {
+            /* We have no samples */
+            i_tfhd_flags |= MP4_TFHD_DURATION_IS_EMPTY;
+        }
+
+        /* *** add /moof/traf/tfhd *** */
+        bo_t *tfhd = box_full_new("tfhd", 0, i_tfhd_flags);
+        bo_add_32be(tfhd, p_stream->i_track_id);
+
+        /* set the local sample duration default */
+        if (i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_DURATION)
+            bo_add_32be(tfhd, p_stream->read.p_first->p_block->i_length * p_stream->i_timescale / CLOCK_FREQ);
+
+        /* set the local sample size default */
+        if (i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_SIZE)
+            bo_add_32be(tfhd, p_stream->read.p_first->p_block->i_buffer);
+
+        box_gather(traf, tfhd);
+
+        /* *** add /moof/traf/tfdt *** */
+        bo_t *tfdt = box_full_new("tfdt", 1, 0);
+        bo_add_64be(tfdt, p_stream->i_written_duration * p_stream->i_timescale / CLOCK_FREQ );
+        box_gather(traf, tfdt);
+
+        /* *** add /moof/traf/trun *** */
+        if (p_stream->read.p_first)
+        {
+            uint32_t i_trun_flags = 0x0;
+
+            if (p_stream->b_hasiframes && !(p_stream->read.p_first->p_block->i_flags & BLOCK_FLAG_TYPE_I))
+                i_trun_flags |= MP4_TRUN_FIRST_FLAGS;
+
+            if (!b_allsamelength ||
+                ( !(i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_DURATION) && p_stream->i_trex_length == 0 ))
+                i_trun_flags |= MP4_TRUN_SAMPLE_DURATION;
+
+            if (!b_allsamesize ||
+                ( !(i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_SIZE) && p_stream->i_trex_size == 0 ))
+                i_trun_flags |= MP4_TRUN_SAMPLE_SIZE;
+
+            if (p_stream->b_hasbframes)
+                i_trun_flags |= MP4_TRUN_SAMPLE_TIME_OFFSET;
+
+            if (i_fixupoffset == 0)
+                i_trun_flags |= MP4_TRUN_DATA_OFFSET;
+
+            bo_t *trun = box_full_new("trun", 0, i_trun_flags);
+
+            /* count entries */
+            uint32_t i_entry_count = 0;
+            mtime_t i_run_time = p_stream->i_written_duration;
+            mp4_fragentry_t *p_entry = p_stream->read.p_first;
+            while(p_entry)
+            {
+                if ( i_barrier_time && i_run_time + p_entry->p_block->i_length > i_barrier_time )
+                    break;
+                i_entry_count++;
+                i_run_time += p_entry->p_block->i_length;
+                p_entry = p_entry->p_next;
+            }
+            bo_add_32be(trun, i_entry_count); // sample count
+
+            if (i_trun_flags & MP4_TRUN_DATA_OFFSET)
+            {
+                i_fixupoffset = moof->len + traf->len + trun->len;
+                bo_add_32be(trun, 0xdeadbeef); // data offset
+            }
+
+            if (i_trun_flags & MP4_TRUN_FIRST_FLAGS)
+                bo_add_32be(trun, 1<<16); // flag as non keyframe
+
+            while(p_stream->read.p_first && i_entry_count)
+            {
+                DEQUEUE_ENTRY(p_stream->read, p_entry);
+
+                if (i_trun_flags & MP4_TRUN_SAMPLE_DURATION)
+                    bo_add_32be(trun, p_entry->p_block->i_length * p_stream->i_timescale / CLOCK_FREQ); // sample duration
+
+                if (i_trun_flags & MP4_TRUN_SAMPLE_SIZE)
+                    bo_add_32be(trun, p_entry->p_block->i_buffer); // sample size
+
+                if (i_trun_flags & MP4_TRUN_SAMPLE_TIME_OFFSET)
+                {
+                    uint32_t i_diff = 0;
+                    if ( p_entry->p_block->i_dts  > VLC_TS_INVALID &&
+                         p_entry->p_block->i_pts > p_entry->p_block->i_dts )
+                    {
+                        i_diff = p_entry->p_block->i_pts - p_entry->p_block->i_dts;
+                    }
+                    bo_add_32be(trun, i_diff * p_stream->i_timescale / CLOCK_FREQ); // ctts
+                }
+
+                *pi_mdat_total_size += p_entry->p_block->i_buffer;
+
+                ENQUEUE_ENTRY(p_stream->towrite, p_entry);
+                i_entry_count--;
+                i_sample++;
+
+                /* Add keyframe entry if needed */
+                if (p_stream->b_hasiframes && (p_entry->p_block->i_flags & BLOCK_FLAG_TYPE_I) &&
+                    (p_stream->fmt.i_cat == VIDEO_ES || p_stream->fmt.i_cat == AUDIO_ES))
+                {
+                    AddKeyframeEntry(p_stream, i_write_pos, i_trak, i_sample, i_time);
+                }
+
+                i_time += p_entry->p_block->i_length;
+            }
+
+            box_gather(traf, trun);
+        }
+
+        box_gather(moof, traf);
+    }
+
+    box_fix(moof);
+
+    /* do tfhd base data offset fixup */
+    if (i_fixupoffset)
+    {
+        /* mdat will follow moof */
+        SetDWBE(moof->b->p_buffer + i_fixupoffset, moof->len + 8);
+    }
+
+    /* set iframe flag, so the streaming server always starts from moof */
+    moof->b->i_flags |= BLOCK_FLAG_TYPE_I;
+
+    return moof;
+}
+
+static void WriteFragmentMDAT(sout_mux_t *p_mux, size_t i_total_size)
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+
+    /* Now add mdat header */
+    bo_t *mdat = box_new("mdat");
+    /* force update of real size */
+    mdat->b->i_buffer = mdat->len;
+    assert(mdat->len==8);
+    mdat->len += i_total_size;
+    box_fix(mdat);
+    p_sys->i_pos += mdat->b->i_buffer;
+    /* only write header */
+    sout_AccessOutWrite(p_mux->p_access, mdat->b);
+    free(mdat);
+    /* Header and its size are written and good, now write content */
+    for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++)
+    {
+        mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
+
+        while(p_stream->towrite.p_first)
+        {
+            mp4_fragentry_t *p_entry = p_stream->towrite.p_first;
+            p_sys->i_pos += p_entry->p_block->i_buffer;
+            p_stream->i_written_duration += p_entry->p_block->i_length;
+
+            p_entry->p_block->i_flags &= ~BLOCK_FLAG_TYPE_I; // clear flag for http stream
+            sout_AccessOutWrite(p_mux->p_access, p_entry->p_block);
+
+            p_stream->towrite.p_first = p_entry->p_next;
+            free(p_entry);
+            if (!p_stream->towrite.p_first)
+                p_stream->towrite.p_last = NULL;
+        }
+    }
+}
+
+static bo_t *GetMfraBox(sout_mux_t *p_mux)
+{
+    sout_mux_sys_t *p_sys = (sout_mux_sys_t*) p_mux->p_sys;
+    bo_t *mfra = NULL;
+    for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
+    {
+        mp4_stream_t *p_stream = p_sys->pp_streams[i];
+        if (p_stream->i_indexentries)
+        {
+            bo_t *tfra = box_full_new("tfra", 0, 0x0);
+            if (!tfra) continue;
+            bo_add_32be(tfra, p_stream->i_track_id);
+            bo_add_32be(tfra, 0x3); // reserved + lengths (1,1,4)=>(0,0,3)
+            bo_add_32be(tfra, p_stream->i_indexentries);
+            for(uint32_t i_index=0; i_index<p_stream->i_indexentries; i_index++)
+            {
+                const mp4_fragindex_t *p_indexentry = &p_stream->p_indexentries[i_index];
+                bo_add_32be(tfra, p_indexentry->i_time);
+                bo_add_32be(tfra, p_indexentry->i_moofoffset);
+                assert(sizeof(p_indexentry->i_traf)==1); /* guard against sys changes */
+                assert(sizeof(p_indexentry->i_trun)==1);
+                assert(sizeof(p_indexentry->i_sample)==4);
+                bo_add_8(tfra, p_indexentry->i_traf);
+                bo_add_8(tfra, p_indexentry->i_trun);
+                bo_add_32be(tfra, p_indexentry->i_sample);
+            }
+
+            if (!mfra && !(mfra = box_new("mfra")))
+            {
+                box_free(tfra);
+                return NULL;
+            }
+
+            box_gather(mfra,tfra);
+        }
+    }
+    return mfra;
+}
+
+static void FlushHeader(sout_mux_t *p_mux)
+{
+    sout_mux_sys_t *p_sys = (sout_mux_sys_t*) p_mux->p_sys;
+
+    /* Now add ftyp header */
+    bo_t *ftyp = box_new("ftyp");
+    bo_add_fourcc(ftyp, "isom");
+    bo_add_32be  (ftyp, 0); // minor version
+    box_fix(ftyp);
+
+    bo_t *moov = GetMoovBox(p_mux);
+
+    /* merge into a single block */
+    box_gather(ftyp, moov);
+
+    /* add header flag for streaming server */
+    ftyp->b->i_flags |= BLOCK_FLAG_HEADER;
+    p_sys->i_pos += ftyp->len;
+    box_send(p_mux, ftyp);
+    p_sys->b_header_sent = true;
+}
+
+static int OpenFrag(vlc_object_t *p_this)
+{
+    sout_mux_t *p_mux = (sout_mux_t*) p_this;
+    sout_mux_sys_t *p_sys = malloc(sizeof(sout_mux_sys_t));
+    if (!p_sys)
+        return VLC_ENOMEM;
+
+    p_mux->p_sys = (sout_mux_sys_t *) p_sys;
+    p_mux->pf_control   = Control;
+    p_mux->pf_addstream = AddStream;
+    p_mux->pf_delstream = DelStream;
+    p_mux->pf_mux       = MuxFrag;
+
+    /* unused */
+    p_sys->b_mov        = false;
+    p_sys->b_3gp        = false;
+    p_sys->b_64_ext     = false;
+    /* !unused */
+
+    p_sys->i_pos        = 0;
+    p_sys->i_nb_streams = 0;
+    p_sys->pp_streams   = NULL;
+    p_sys->i_mdat_pos   = 0;
+    p_sys->i_read_duration   = 0;
+    p_sys->i_written_duration= 0;
+
+    p_sys->b_header_sent = false;
+    p_sys->b_fragmented  = true;
+    p_sys->i_mfhd_sequence = 1;
+
+    return VLC_SUCCESS;
+}
+
+static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
+{
+    sout_mux_sys_t *p_sys = (sout_mux_sys_t*) p_mux->p_sys;
+    bo_t *moof = NULL;
+    mtime_t i_barrier_time = p_sys->i_written_duration + FRAGMENT_LENGTH;
+    size_t i_mdat_size = 0;
+    bool b_has_samples = false;
+
+    for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
+    {
+        const mp4_stream_t *p_stream = p_sys->pp_streams[i];
+        if (p_stream->read.p_first)
+        {
+            b_has_samples = true;
+
+            /* set a barrier so we try to align to keyframe */
+            if (p_stream->b_hasiframes &&
+                    p_stream->i_last_iframe_time > p_stream->i_written_duration &&
+                    (p_stream->fmt.i_cat == VIDEO_ES ||
+                     p_stream->fmt.i_cat == AUDIO_ES) )
+            {
+                i_barrier_time = __MIN(i_barrier_time, p_stream->i_last_iframe_time);
+            }
+        }
+    }
+
+    if (!p_sys->b_header_sent)
+        FlushHeader(p_mux);
+
+    if (b_has_samples)
+        moof = GetMoofBox(p_mux, &i_mdat_size, (b_flush)?0:i_barrier_time, p_sys->i_pos);
+
+    if (moof && i_mdat_size == 0)
+    {
+        block_Release(moof->b);
+        FREENULL(moof);
+    }
+
+    if (moof)
+    {
+        msg_Dbg(p_mux, "writing moof @ %"PRId64, p_sys->i_pos);
+        p_sys->i_pos += moof->len;
+        assert(moof->b->i_flags & BLOCK_FLAG_TYPE_I); /* http sout */
+        box_send(p_mux, moof);
+        msg_Dbg(p_mux, "writing mdat @ %"PRId64, p_sys->i_pos);
+        WriteFragmentMDAT(p_mux, i_mdat_size);
+
+        /* update iframe point */
+        for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
+        {
+            mp4_stream_t *p_stream = p_sys->pp_streams[i];
+            p_stream->i_last_iframe_time = 0;
+        }
+    }
+}
+
+/* Do an entry length fixup using only its own info.
+ * This is the end boundary case. */
+static void LengthLocalFixup(sout_mux_t *p_mux, const mp4_stream_t *p_stream, block_t *p_entrydata)
+{
+    if ( p_stream->fmt.i_cat == VIDEO_ES )
+    {
+        p_entrydata->i_length = CLOCK_FREQ *
+                p_stream->fmt.video.i_frame_rate_base /
+                p_stream->fmt.video.i_frame_rate;
+        msg_Dbg(p_mux, "video track %d fixup to %"PRId64" for sample %u",
+                p_stream->i_track_id, p_entrydata->i_length, p_stream->i_entry_count - 1);
+    }
+    else if (p_stream->fmt.i_cat == AUDIO_ES &&
+             p_stream->fmt.audio.i_rate &&
+             p_entrydata->i_nb_samples)
+    {
+        p_entrydata->i_length = CLOCK_FREQ * p_entrydata->i_nb_samples /
+                p_stream->fmt.audio.i_rate;
+        msg_Dbg(p_mux, "audio track %d fixup to %"PRId64" for sample %u",
+                p_stream->i_track_id, p_entrydata->i_length, p_stream->i_entry_count - 1);
+    }
+    else
+    {
+        msg_Warn(p_mux, "unknown length for track %d sample %u",
+                 p_stream->i_track_id, p_stream->i_entry_count - 1);
+        p_entrydata->i_length = 1;
+    }
+}
+
+static void CleanupFrag(sout_mux_sys_t *p_sys)
+{
+    for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
+    {
+        mp4_stream_t *p_stream = p_sys->pp_streams[i];
+        if (p_stream->p_held_entry)
+        {
+            block_Release(p_stream->p_held_entry->p_block);
+            free(p_stream->p_held_entry);
+        }
+        while(p_stream->read.p_first)
+        {
+            mp4_fragentry_t *p_next = p_stream->read.p_first->p_next;
+            block_Release(p_stream->read.p_first->p_block);
+            free(p_stream->read.p_first);
+            p_stream->read.p_first = p_next;
+        }
+        while(p_stream->towrite.p_first)
+        {
+            mp4_fragentry_t *p_next = p_stream->towrite.p_first->p_next;
+            block_Release(p_stream->towrite.p_first->p_block);
+            free(p_stream->towrite.p_first);
+            p_stream->towrite.p_first = p_next;
+        }
+        free(p_stream->p_indexentries);
+    }
+    free(p_sys);
+}
+
+static void CloseFrag(vlc_object_t *p_this)
+{
+    sout_mux_t *p_mux = (sout_mux_t *) p_this;
+    sout_mux_sys_t *p_sys = (sout_mux_sys_t*) p_mux->p_sys;
+
+    /* Flush remaining entries */
+    for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
+    {
+        mp4_stream_t *p_stream = p_sys->pp_streams[i];
+        if (p_stream->p_held_entry)
+        {
+            if (p_stream->p_held_entry->p_block->i_length < 1)
+                LengthLocalFixup(p_mux, p_stream, p_stream->p_held_entry->p_block);
+            ENQUEUE_ENTRY(p_stream->read, p_stream->p_held_entry);
+            p_stream->p_held_entry = NULL;
+        }
+    }
+
+    /* and force creating a fragment from it */
+    WriteFragments(p_mux, true);
+
+    /* Write indexes, but only for non streamed content
+       as they refer to moof by absolute position */
+    if (!strcmp(p_mux->psz_mux, "mp4frag"))
+    {
+        bo_t *mfra = GetMfraBox(p_mux);
+        if (mfra)
+        {
+            bo_t *mfro = box_full_new("mfro", 0, 0x0);
+            if (mfro)
+            {
+                box_fix(mfra);
+                bo_add_32be(mfro, mfra->len + MP4_MFRO_BOXSIZE);
+                box_gather(mfra, mfro);
+            }
+            box_send(p_mux, mfra);
+        }
+    }
+
+    CleanupFrag(p_sys);
+}
+
+static int MuxFrag(sout_mux_t *p_mux)
+{
+    sout_mux_sys_t *p_sys = (sout_mux_sys_t*) p_mux->p_sys;
+
+    int i_stream = sout_MuxGetStream(p_mux, 1, NULL);
+    if (i_stream < 0)
+        return VLC_SUCCESS;
+    sout_input_t *p_input  = p_mux->pp_inputs[i_stream];
+    mp4_stream_t *p_stream = (mp4_stream_t*) p_input->p_sys;
+    block_t *p_currentblock = block_FifoGet(p_input->p_fifo);
+
+    /* do block conversion */
+    switch(p_stream->fmt.i_codec)
+    {
+    case VLC_CODEC_H264:
+    case VLC_CODEC_HEVC:
+        p_currentblock = ConvertFromAnnexB(p_currentblock);
+        break;
+    case VLC_CODEC_SUBT:
+        p_currentblock = ConvertSUBT(p_currentblock);
+        break;
+    default:
+        break;
+    }
+
+    /* If we have a previous entry for outgoing queue */
+    if (p_stream->p_held_entry)
+    {
+        block_t *p_heldblock = p_stream->p_held_entry->p_block;
+
+        /* Fix previous block length from current */
+        if (p_heldblock->i_length < 1)
+        {
+
+            /* Fix using dts if not on a boundary */
+            if ((p_currentblock->i_flags & BLOCK_FLAG_DISCONTINUITY) == 0)
+                p_heldblock->i_length = p_currentblock->i_dts - p_heldblock->i_dts;
+
+            if (p_heldblock->i_length < 1)
+                LengthLocalFixup(p_mux, p_stream, p_heldblock);
+        }
+
+        /* enqueue */
+        ENQUEUE_ENTRY(p_stream->read, p_stream->p_held_entry);
+        p_stream->p_held_entry = NULL;
+
+        if (p_stream->b_hasiframes && (p_heldblock->i_flags & BLOCK_FLAG_TYPE_I) &&
+            p_stream->i_read_duration - p_sys->i_written_duration < FRAGMENT_LENGTH)
+        {
+            /* Flag the last iframe time, we'll use it as boundary so it will start
+               next fragment */
+            p_stream->i_last_iframe_time = p_stream->i_read_duration;
+        }
+
+        /* update buffered time */
+        p_stream->i_read_duration += __MAX(0, p_heldblock->i_length);
+    }
+
+
+    /* set temp entry */
+    p_stream->p_held_entry = malloc(sizeof(mp4_fragentry_t));
+    if (unlikely(!p_stream->p_held_entry))
+        return VLC_ENOMEM;
+
+    p_stream->p_held_entry->p_block  = p_currentblock;
+    p_stream->p_held_entry->i_run    = p_stream->i_current_run;
+    p_stream->p_held_entry->p_next   = NULL;
+
+    if (p_stream->fmt.i_cat == VIDEO_ES )
+    {
+        if (!p_stream->b_hasiframes && (p_currentblock->i_flags & BLOCK_FLAG_TYPE_I))
+            p_stream->b_hasiframes = true;
+
+        if (!p_stream->b_hasbframes && p_currentblock->i_dts > VLC_TS_INVALID &&
+            p_currentblock->i_pts > p_currentblock->i_dts)
+            p_stream->b_hasbframes = true;
+    }
+
+    /* Update the global fragment/media duration */
+    mtime_t i_min_read_duration = p_stream->i_read_duration;
+    mtime_t i_min_written_duration = p_stream->i_written_duration;
+    for (unsigned int i=0; i<p_sys->i_nb_streams; i++)
+    {
+        const mp4_stream_t *p_s = p_sys->pp_streams[i];
+        if (p_s->fmt.i_cat != VIDEO_ES && p_s->fmt.i_cat != AUDIO_ES)
+            continue;
+        if (p_s->i_read_duration < i_min_read_duration)
+            i_min_read_duration = p_s->i_read_duration;
+
+        if (p_s->i_written_duration < i_min_written_duration)
+            i_min_written_duration = p_s->i_written_duration;
+    }
+    p_sys->i_read_duration = i_min_read_duration;
+    p_sys->i_written_duration = i_min_written_duration;
+
+    /* we have prerolled enough to know all streams, and have enough date to create a fragment */
+    if (p_stream->read.p_first && p_sys->i_read_duration - p_sys->i_written_duration >= FRAGMENT_LENGTH)
+        WriteFragments(p_mux, false);
+
+    return VLC_SUCCESS;
 }

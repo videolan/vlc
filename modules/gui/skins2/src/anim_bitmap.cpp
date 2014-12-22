@@ -121,3 +121,10 @@ void AnimBitmap::CmdNextFrame::execute()
     m_pParent->notify();
 }
 
+bool AnimBitmap::operator ==( const AnimBitmap& rOther ) const
+{
+    return &m_rBitmap == &rOther.m_rBitmap
+        && m_nbFrames == rOther.m_nbFrames
+        && m_frameRate == rOther.m_frameRate
+        && m_nbLoops == rOther.m_nbLoops;
+}

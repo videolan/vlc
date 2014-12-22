@@ -37,6 +37,7 @@
 #include <vlc_memory.h>
 
 #include <ctype.h>
+#include <math.h>
 
 #include <vlc_demux.h>
 #include <vlc_charset.h>
@@ -261,17 +262,17 @@ static int Open ( vlc_object_t *p_this )
 
     /* Get the FPS */
     f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" ); /* FIXME */
-    if( f_fps >= 1.0 )
-        p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
+    if( f_fps >= 1.f )
+        p_sys->i_microsecperframe = llroundf( 1000000.f / f_fps );
 
-    msg_Dbg( p_demux, "Movie fps: %f", f_fps );
+    msg_Dbg( p_demux, "Movie fps: %f", (double) f_fps );
 
     /* Check for override of the fps */
     f_fps = var_CreateGetFloat( p_demux, "sub-fps" );
-    if( f_fps >= 1.0 )
+    if( f_fps >= 1.f )
     {
-        p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
-        msg_Dbg( p_demux, "Override subtitle fps %f", f_fps );
+        p_sys->i_microsecperframe = llroundf( 1000000.f / f_fps );
+        msg_Dbg( p_demux, "Override subtitle fps %f", (double) f_fps );
     }
 
     /* Get or probe the type */
@@ -584,6 +585,7 @@ static void Close( vlc_object_t *p_this )
     for( i = 0; i < p_sys->i_subtitles; i++ )
         free( p_sys->subtitle[i].psz_text );
     free( p_sys->subtitle );
+    free( p_sys->psz_header );
 
     free( p_sys );
 }
@@ -872,15 +874,14 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle,
         if( sscanf( s, "{%d}{}%[^\r\n]", &i_start, psz_text ) == 2 ||
             sscanf( s, "{%d}{%d}%[^\r\n]", &i_start, &i_stop, psz_text ) == 3)
         {
-            float f_fps;
             if( i_start != 1 || i_stop != 1 )
                 break;
 
             /* We found a possible setting of the framerate "{1}{1}23.976" */
             /* Check if it's usable, and if the sub-fps is not set */
-            f_fps = us_strtod( psz_text, NULL );
-            if( f_fps > 0.0 && var_GetFloat( p_demux, "sub-fps" ) <= 0.0 )
-                p_sys->i_microsecperframe = (int64_t)((float)1000000 / f_fps);
+            float f_fps = us_strtof( psz_text, NULL );
+            if( f_fps > 0.f && var_GetFloat( p_demux, "sub-fps" ) <= 0.f )
+                p_sys->i_microsecperframe = llroundf(1000000.f / f_fps);
         }
         free( psz_text );
     }
@@ -1082,6 +1083,7 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
+    size_t header_len = 0;
 
     for( ;; )
     {
@@ -1154,11 +1156,12 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
         free( psz_text );
 
         /* All the other stuff we add to the header field */
-        char *psz_header;
-        if( asprintf( &psz_header, "%s%s\n",
-                       p_sys->psz_header ? p_sys->psz_header : "", s ) == -1 )
+        size_t s_len = strlen( s );
+        p_sys->psz_header = realloc_or_free( p_sys->psz_header, header_len + s_len + 2 );
+        if( !p_sys->psz_header )
             return VLC_ENOMEM;
-        p_sys->psz_header = psz_header;
+        snprintf( p_sys->psz_header + header_len, s_len + 2, "%s\n", s );
+        header_len += s_len + 1;
     }
 }
 
@@ -1573,7 +1576,6 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
     for( ;; )
     {
-        float f1, f2;
         char p_dummy;
         char *psz_temp;
 
@@ -1601,26 +1603,27 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
             if( sscanf( s, "FORMAT=%[^\r\n]", psz_temp ) )
             {
-                float f_fps;
-                f_fps = us_strtod( psz_temp, NULL );
-                if( f_fps > 0.0 && var_GetFloat( p_demux, "sub-fps" ) <= 0.0 )
+                float f_fps = us_strtof( psz_temp, NULL );
+
+                if( f_fps > 0.f && var_GetFloat( p_demux, "sub-fps" ) <= 0.f )
                     var_SetFloat( p_demux, "sub-fps", f_fps );
 
-                p_sys->mpsub.f_factor = 1.0;
+                p_sys->mpsub.f_factor = 1.f;
                 free( psz_temp );
                 break;
             }
             free( psz_temp );
         }
+
         /* Data Lines */
-        f1 = us_strtod( s, &psz_temp );
+        float f1 = us_strtof( s, &psz_temp );
         if( *psz_temp )
         {
-            f2 = us_strtod( psz_temp, NULL );
+            float f2 = us_strtof( psz_temp, NULL );
             p_sys->mpsub.f_total += f1 * p_sys->mpsub.f_factor;
-            p_subtitle->i_start = (int64_t)(10000.0 * p_sys->mpsub.f_total);
+            p_subtitle->i_start = llroundf(10000.f * p_sys->mpsub.f_total);
             p_sys->mpsub.f_total += f2 * p_sys->mpsub.f_factor;
-            p_subtitle->i_stop = (int64_t)(10000.0 * p_sys->mpsub.f_total);
+            p_subtitle->i_stop = llroundf(10000.f * p_sys->mpsub.f_total);
             break;
         }
     }

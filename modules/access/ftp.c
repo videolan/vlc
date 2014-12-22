@@ -286,7 +286,8 @@ static int createCmdTLS( vlc_object_t *p_access, access_sys_t *p_sys, int fd,
     /* TLS/SSL handshake */
     p_sys->cmd.p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds, fd,
                                                     p_sys->url.psz_host,
-                                                    psz_session_name );
+                                                    psz_session_name,
+                                                    NULL, NULL );
     if( p_sys->cmd.p_tls == NULL )
     {
         msg_Err( p_access, "cannot establish FTP/TLS session on command channel" );
@@ -309,7 +310,6 @@ static void clearCmdTLS( access_sys_t *p_sys )
 static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
 {
     int i_answer;
-    char *psz;
 
     /* *** Open a TCP connection with server *** */
     int fd = p_sys->cmd.fd = net_ConnectTCP( p_access, p_sys->url.psz_host,
@@ -339,13 +339,6 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     }
 
     msg_Dbg( p_access, "connection accepted (%d)", i_answer );
-
-    if( p_sys->url.psz_username && *p_sys->url.psz_username )
-        psz = strdup( p_sys->url.psz_username );
-    else
-        psz = var_InheritString( p_access, "ftp-user" );
-    if( !psz )
-        return -1;
 
     /* Features check first */
     if( ftp_SendCommand( p_access, p_sys, "FEAT" ) < 0
@@ -387,7 +380,6 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
             i_answer != 200 )
         {
             msg_Err( p_access, "Can't truncate Protection buffer size for TLS" );
-            free( psz );
             goto error;
         }
 
@@ -396,12 +388,20 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
             i_answer != 200 )
         {
             msg_Err( p_access, "Can't set Data channel protection" );
-            free( psz );
             goto error;
         }
     }
 
     /* Send credentials over channel */
+    char *psz;
+
+    if( p_sys->url.psz_username && *p_sys->url.psz_username )
+        psz = strdup( p_sys->url.psz_username );
+    else
+        psz = var_InheritString( p_access, "ftp-user" );
+    if( !psz )
+        goto error;
+
     if( ftp_SendCommand( p_access, p_sys, "USER %s", psz ) < 0 ||
         ftp_RecvCommand( p_access, p_sys, &i_answer, NULL ) < 0 )
     {
@@ -1028,7 +1028,8 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
         p_sys->data.p_tls = vlc_tls_ClientSessionCreate( p_sys->p_creds,
                             p_sys->data.fd, p_sys->url.psz_host,
                             ( p_sys->tlsmode == EXPLICIT ) ? "ftpes-data"
-                                                           : "ftps-data" );
+                                                           : "ftps-data",
+                                                         NULL, NULL );
         if( p_sys->data.p_tls == NULL )
         {
             msg_Err( p_access, "cannot establish FTP/TLS session for data" \

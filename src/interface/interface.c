@@ -207,6 +207,7 @@ int libvlc_InternalAddIntf(libvlc_int_t *libvlc, const char *name)
                          "Use 'cvlc' to use vlc without interface."));
         }
         ret = intf_Create(playlist, intf);
+        free(intf);
         name = "default";
     }
     if (ret != VLC_SUCCESS)

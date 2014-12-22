@@ -38,7 +38,7 @@ namespace dash
             public:
                 CommonAttributesElements();
                 virtual ~CommonAttributesElements();
-                const std::string&              getMimeType() const;
+                virtual const std::string&      getMimeType() const;
                 void                            setMimeType( const std::string &mimeType );
                 int                             getWidth() const;
                 void                            setWidth( int width );

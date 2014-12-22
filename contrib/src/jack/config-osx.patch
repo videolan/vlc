@@ -1,0 +1,25 @@
+From 7bbaa8a2541987ae8db90819f4a94b9f3b133b24 Mon Sep 17 00:00:00 2001
+From: Tristan Matthews <tristan.matthews@savoirfairelinux.com>
+Date: Fri, 31 Oct 2014 16:29:26 -0400
+Subject: [PATCH 1/1] config: patch to build on OS X
+
+---
+ config/os/macosx/pThreadUtilities.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/os/macosx/pThreadUtilities.h b/config/os/macosx/pThreadUtilities.h
+index bd1d1e8..cdb59b4 100644
+--- a/config/os/macosx/pThreadUtilities.h
++++ b/config/os/macosx/pThreadUtilities.h
+@@ -66,7 +66,7 @@
+ #define __PTHREADUTILITIES_H__
+ 
+ #import "pthread.h"
+-#import <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
++#import <MacTypes.h>
+ 
+ #define THREAD_SET_PRIORITY			0
+ #define THREAD_SCHEDULED_PRIORITY		1
+-- 
+1.9.3
+

@@ -349,16 +349,14 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
                 int state = var_GetInteger( p_input, "state" );
                 DisplayIcon( p_vout, state != PAUSE_S ? OSD_PAUSE_ICON : OSD_PLAY_ICON );
-                playlist_Pause( p_playlist );
             }
-            else
-                playlist_Play( p_playlist );
+            playlist_TogglePause( p_playlist );
             break;
 
         case ACTIONID_PLAY:
-            if( p_input && var_GetFloat( p_input, "rate" ) != 1. )
+            if( p_input && var_GetFloat( p_input, "rate" ) != 1.f )
                 /* Return to normal speed */
-                var_SetFloat( p_input, "rate", 1. );
+                var_SetFloat( p_input, "rate", 1.f );
             else
             {
                 ClearChannels( p_intf, p_vout );
@@ -805,7 +803,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "aspect-ratio", &val );
-                if( var_Change( p_vout, "aspect-ratio", VLC_VAR_GETLIST,
+                if( var_Change( p_vout, "aspect-ratio", VLC_VAR_GETCHOICES,
                                 &val_list, &text_list ) >= 0 )
                 {
                     int i;
@@ -835,7 +833,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "crop", &val );
-                if( var_Change( p_vout, "crop", VLC_VAR_GETLIST,
+                if( var_Change( p_vout, "crop", VLC_VAR_GETCHOICES,
                                 &val_list, &text_list ) >= 0 )
                 {
                     int i;
@@ -895,10 +893,10 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
          case ACTIONID_TOGGLE_AUTOSCALE:
             if( p_vout )
             {
-                float f_scalefactor = var_GetFloat( p_vout, "scale" );
+                float f_scalefactor = var_GetFloat( p_vout, "zoom" );
                 if ( f_scalefactor != 1.f )
                 {
-                    var_SetFloat( p_vout, "scale", 1.f );
+                    var_SetFloat( p_vout, "zoom", 1.f );
                     DisplayMessage( p_vout, _("Zooming reset") );
                 }
                 else
@@ -915,21 +913,21 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_SCALE_UP:
             if( p_vout )
             {
-               float f_scalefactor = var_GetFloat( p_vout, "scale" );
+               float f_scalefactor = var_GetFloat( p_vout, "zoom" );
 
                if( f_scalefactor < 10.f )
                    f_scalefactor += .1f;
-               var_SetFloat( p_vout, "scale", f_scalefactor );
+               var_SetFloat( p_vout, "zoom", f_scalefactor );
             }
             break;
         case ACTIONID_SCALE_DOWN:
             if( p_vout )
             {
-               float f_scalefactor = var_GetFloat( p_vout, "scale" );
+               float f_scalefactor = var_GetFloat( p_vout, "zoom" );
 
                if( f_scalefactor > .3f )
                    f_scalefactor -= .1f;
-               var_SetFloat( p_vout, "scale", f_scalefactor );
+               var_SetFloat( p_vout, "zoom", f_scalefactor );
             }
             break;
 
@@ -957,7 +955,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "zoom", &val );
-                if( var_Change( p_vout, "zoom", VLC_VAR_GETLIST,
+                if( var_Change( p_vout, "zoom", VLC_VAR_GETCHOICES,
                                 &val_list, &text_list ) >= 0 )
                 {
                     int i;
@@ -1225,7 +1223,7 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
 
 static void DisplayRate( vout_thread_t *p_vout, float f_rate )
 {
-    DisplayMessage( p_vout, _("Speed: %.2fx"), f_rate );
+    DisplayMessage( p_vout, _("Speed: %.2fx"), (double) f_rate );
 }
 
 static float AdjustRateFine( vlc_object_t *p_obj, const int i_dir )

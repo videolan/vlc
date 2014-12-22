@@ -63,7 +63,6 @@ vlc_module_end()
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *);
-static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
 
 static void           Swap   (vlc_gl_t *);
@@ -205,8 +204,6 @@ static int Open(vlc_object_t *object)
 #endif
 
     /* */
-    sys->gl.lock = NULL;
-    sys->gl.unlock = NULL;
     sys->gl.swap = Swap;
     sys->gl.getProcAddress = OurGetProcAddress;
     sys->gl.sys = vd;
@@ -230,7 +227,7 @@ static int Open(vlc_object_t *object)
     vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
-    vd->control = Control;
+    vd->control = CommonControl;
     vd->manage  = Manage;
 
     return VLC_SUCCESS;
@@ -292,21 +289,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         subpicture_Delete(subpicture);
 
     CommonDisplay(vd);
-}
-
-static int Control(vout_display_t *vd, int query, va_list args)
-{
-    switch (query) {
-    case VOUT_DISPLAY_GET_OPENGL: {
-        vlc_gl_t **gl = va_arg(args, vlc_gl_t **);
-        *gl = &vd->sys->gl;
-
-        CommonDisplay(vd);
-        return VLC_SUCCESS;
-    }
-    default:
-        return CommonControl(vd, query, args);
-    }
 }
 
 static void Manage (vout_display_t *vd)

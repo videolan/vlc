@@ -1,0 +1,20 @@
+Video output display plugins
+=============================
+
+Priority rules
+---------------
+
+The priorities ranges are as follows since December 2014:
+
+ - less than  20: console (text)
+ - less than  50: plain frame buffers
+ - less than 100: no embedded windowing
+ - less than 150: SW scaling
+ - less than 200: SW chroma conversion
+ - less than 250: SW subpicture blending
+ - rest: good stuff :-)
+
+No more than one plugin with a given non-zero riority.
+
+On Windows, native outputs are now priorized over XCB (as there now is
+a Win32 port of XCB).

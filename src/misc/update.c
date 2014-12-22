@@ -193,6 +193,13 @@ static bool GetUpdateFile( update_t *p_update )
     }
 
     const int64_t i_read = stream_Size( p_stream );
+
+    if( i_read < 0 || i_read >= UINT16_MAX)
+    {
+        msg_Err(p_update->p_libvlc, "Status file too large");
+        goto error;
+    }
+
     psz_update_data = malloc( i_read + 1 ); /* terminating '\0' */
     if( !psz_update_data )
         goto error;

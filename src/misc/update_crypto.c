@@ -1,5 +1,5 @@
 /*****************************************************************************
- * update_crypto.c: DSA related functions used for updating
+ * update_crypto.c: OpenPGP related functions used for updating
  *****************************************************************************
  * Copyright © 2008-2009 VLC authors and VideoLAN
  * $Id$
@@ -104,7 +104,7 @@ static size_t read_mpi(uint8_t *dst, const uint8_t *buf, size_t buflen, size_t b
 
 /*
  * fill a public_key_packet_t structure from public key packet data
- * verify that it is a version 4 public key packet, using DSA
+ * verify that it is a version 4 public key packet, using DSA or RSA
  */
 static int parse_public_key_packet( public_key_packet_t *p_key,
                                     const uint8_t *p_buf, size_t i_packet_len )
@@ -122,13 +122,16 @@ static int parse_public_key_packet( public_key_packet_t *p_key,
     memcpy( p_key->timestamp, p_buf, 4 ); p_buf += 4; i_read += 4;
 
     p_key->algo      = *p_buf++; i_read++;
-    if( p_key->algo != GCRY_PK_DSA )
+    if( p_key->algo == GCRY_PK_DSA ) {
+        READ_MPI(p_key->sig.dsa.p, 3072);
+        READ_MPI(p_key->sig.dsa.q, 256);
+        READ_MPI(p_key->sig.dsa.g, 3072);
+        READ_MPI(p_key->sig.dsa.y, 3072);
+    } else if ( p_key->algo == GCRY_PK_RSA ) {
+        READ_MPI(p_key->sig.rsa.n, 4096);
+        READ_MPI(p_key->sig.rsa.e, 4096);
+    } else
         return VLC_EGENERIC;
-
-    READ_MPI(p_key->p, 3072);
-    READ_MPI(p_key->q, 256);
-    READ_MPI(p_key->g, 3072);
-    READ_MPI(p_key->y, 3072);
 
     if( i_read == i_packet_len )
         return VLC_SUCCESS;
@@ -175,7 +178,7 @@ static size_t parse_signature_v3_packet( signature_packet_t *p_sig,
 
 /*
  * fill a signature_packet_v4_t from signature packet data
- * verify that it was used with a DSA public key
+ * verify that it was used with a DSA or RSA public key
  */
 static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
                                       const uint8_t *p_buf, size_t i_sig_len )
@@ -188,6 +191,8 @@ static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
     p_sig->type = *p_buf++; i_read++;
 
     p_sig->public_key_algo = *p_buf++; i_read++;
+    if (p_sig->public_key_algo != GCRY_PK_DSA && p_sig->public_key_algo != GCRY_PK_RSA )
+            return 0;
 
     p_sig->digest_algo = *p_buf++; i_read++;
 
@@ -250,12 +255,10 @@ static size_t parse_signature_v4_packet( signature_packet_t *p_sig,
         }
         else
         {
-            if( p + 4 > max_pos )
+            if( ++p + 4 > max_pos )
                 return 0;
-            i_subpacket_len = *++p << 24;
-            i_subpacket_len += *++p << 16;
-            i_subpacket_len += *++p << 8;
-            i_subpacket_len += *++p;
+            i_subpacket_len = U32_AT(p);
+            p += 4;
         }
 
         if( *p == ISSUER_SUBPACKET )
@@ -299,7 +302,7 @@ static int parse_signature_packet( signature_packet_t *p_sig,
     if( i_read == 0 ) /* signature packet parsing has failed */
         goto error;
 
-    if( p_sig->public_key_algo != GCRY_PK_DSA )
+    if( p_sig->public_key_algo != GCRY_PK_DSA && p_sig->public_key_algo != GCRY_PK_RSA )
         goto error;
 
     switch( p_sig->type )
@@ -318,8 +321,13 @@ static int parse_signature_packet( signature_packet_t *p_sig,
     p_buf--; /* rewind to the version byte */
     p_buf += i_read;
 
-    READ_MPI(p_sig->r, 256);
-    READ_MPI(p_sig->s, 256);
+    if( p_sig->public_key_algo == GCRY_PK_DSA ) {
+        READ_MPI(p_sig->algo_specific.dsa.r, 256);
+        READ_MPI(p_sig->algo_specific.dsa.s, 256);
+    } else if ( p_sig->public_key_algo == GCRY_PK_RSA ) {
+        READ_MPI(p_sig->algo_specific.rsa.s, 4096);
+    } else
+        goto error;
 
     assert( i_read == i_packet_len );
     if( i_read < i_packet_len ) /* some extra data, hm ? */
@@ -427,13 +435,95 @@ static int pgp_unarmor( const char *p_ibuf, size_t i_ibuf_len,
     return l_crc2 == l_crc ? p_opos - p_obuf : 0;
 }
 
+static int rsa_pkcs1_encode_sig(gcry_mpi_t *r_result, size_t size,
+                                const uint8_t *hash, int algo)
+{
+    uint8_t asn[100];
+    uint8_t frame[4096/8];
+
+    size_t asnlen = sizeof(asn);
+    size_t hashlen = gcry_md_get_algo_dlen(algo);
+
+    if (gcry_md_algo_info(algo, GCRYCTL_GET_ASNOID, asn, &asnlen))
+        return VLC_EGENERIC;
+
+    if (!hashlen || hashlen + asnlen + 4 > size)
+        return VLC_EGENERIC;
+
+    frame[0] = 0;
+    frame[1] = 1; /* block type */
+    int pad = size - hashlen - asnlen - 3 ;
+    memset (&frame[2], 0xff, pad );
+    frame[2+pad] = 0;
+    memcpy(&frame[3+pad], asn, asnlen);
+    memcpy(&frame[3+pad+asnlen], hash, hashlen);
+
+    if (gcry_mpi_scan(r_result, GCRYMPI_FMT_USG, frame, size, &size))
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
+}
+
+/*
+ * Verify an OpenPGP signature made with some RSA public key
+ */
+static int verify_signature_rsa( signature_packet_t *sign, public_key_packet_t *p_key,
+                      uint8_t *p_hash )
+{
+    int ret = VLC_EGENERIC;
+    /* the data to be verified (a hash) */
+    const char *hash_sexp_s = "(data(flags raw)(value %m))";
+    /* the public key */
+    const char *key_sexp_s = "(public-key(rsa(n %m)(e %m)))";
+    /* the signature */
+    const char *sig_sexp_s = "(sig-val(rsa(s%m)))";
+
+    size_t erroff;
+    gcry_mpi_t n, e, s, hash;
+    n = e = s = hash = NULL;
+    gcry_sexp_t key_sexp, hash_sexp, sig_sexp;
+    key_sexp = hash_sexp = sig_sexp = NULL;
+
+    int i_n_len = mpi_len( p_key->sig.rsa.n );
+    int i_e_len = mpi_len( p_key->sig.rsa.e );
+    if( gcry_mpi_scan( &n, GCRYMPI_FMT_USG, p_key->sig.rsa.n + 2, i_n_len, NULL ) ||
+        gcry_mpi_scan( &e, GCRYMPI_FMT_USG, p_key->sig.rsa.e + 2, i_e_len, NULL ) ||
+        gcry_sexp_build( &key_sexp, &erroff, key_sexp_s, n, e ) )
+        goto out;
+
+    uint8_t *p_s = sign->algo_specific.rsa.s;
+    int i_s_len = mpi_len( p_s );
+    if( gcry_mpi_scan( &s, GCRYMPI_FMT_USG, p_s + 2, i_s_len, NULL ) ||
+        gcry_sexp_build( &sig_sexp, &erroff, sig_sexp_s, s ) )
+        goto out;
+
+    if( rsa_pkcs1_encode_sig (&hash, i_n_len, p_hash, sign->digest_algo) ||
+        gcry_sexp_build( &hash_sexp, &erroff, hash_sexp_s, hash ) )
+        goto out;
+
+    if( gcry_pk_verify( sig_sexp, hash_sexp, key_sexp ) )
+        goto out;
+
+    ret = VLC_SUCCESS;
+
+out:
+    if( n ) gcry_mpi_release( n );
+    if( e ) gcry_mpi_release( e );
+    if( s ) gcry_mpi_release( s );
+    if( hash ) gcry_mpi_release( hash );
+    if( key_sexp ) gcry_sexp_release( key_sexp );
+    if( sig_sexp ) gcry_sexp_release( sig_sexp );
+    if( hash_sexp ) gcry_sexp_release( hash_sexp );
+    return ret;
+}
 
 /*
  * Verify an OpenPGP signature made with some DSA public key
  */
-int verify_signature( signature_packet_t *sign, public_key_packet_t *p_key,
+static int verify_signature_dsa( signature_packet_t *sign, public_key_packet_t *p_key,
                       uint8_t *p_hash )
 {
+    int ret = VLC_EGENERIC;
+
     /* the data to be verified (a hash) */
     const char *hash_sexp_s = "(data(flags raw)(value %m))";
     /* the public key */
@@ -447,41 +537,39 @@ int verify_signature( signature_packet_t *sign, public_key_packet_t *p_key,
     gcry_sexp_t key_sexp, hash_sexp, sig_sexp;
     key_sexp = hash_sexp = sig_sexp = NULL;
 
-    int i_p_len = mpi_len( p_key->p );
-    int i_q_len = mpi_len( p_key->q );
-    int i_g_len = mpi_len( p_key->g );
-    int i_y_len = mpi_len( p_key->y );
-    if( gcry_mpi_scan( &p, GCRYMPI_FMT_USG, p_key->p + 2, i_p_len, NULL ) ||
-        gcry_mpi_scan( &q, GCRYMPI_FMT_USG, p_key->q + 2, i_q_len, NULL ) ||
-        gcry_mpi_scan( &g, GCRYMPI_FMT_USG, p_key->g + 2, i_g_len, NULL ) ||
-        gcry_mpi_scan( &y, GCRYMPI_FMT_USG, p_key->y + 2, i_y_len, NULL ) ||
+    int i_p_len = mpi_len( p_key->sig.dsa.p );
+    int i_q_len = mpi_len( p_key->sig.dsa.q );
+    int i_g_len = mpi_len( p_key->sig.dsa.g );
+    int i_y_len = mpi_len( p_key->sig.dsa.y );
+    if( gcry_mpi_scan( &p, GCRYMPI_FMT_USG, p_key->sig.dsa.p + 2, i_p_len, NULL ) ||
+        gcry_mpi_scan( &q, GCRYMPI_FMT_USG, p_key->sig.dsa.q + 2, i_q_len, NULL ) ||
+        gcry_mpi_scan( &g, GCRYMPI_FMT_USG, p_key->sig.dsa.g + 2, i_g_len, NULL ) ||
+        gcry_mpi_scan( &y, GCRYMPI_FMT_USG, p_key->sig.dsa.y + 2, i_y_len, NULL ) ||
         gcry_sexp_build( &key_sexp, &erroff, key_sexp_s, p, q, g, y ) )
-        goto problem;
+        goto out;
 
-    uint8_t *p_r = sign->r;
-    uint8_t *p_s = sign->s;
+    uint8_t *p_r = sign->algo_specific.dsa.r;
+    uint8_t *p_s = sign->algo_specific.dsa.s;
     int i_r_len = mpi_len( p_r );
     int i_s_len = mpi_len( p_s );
     if( gcry_mpi_scan( &r, GCRYMPI_FMT_USG, p_r + 2, i_r_len, NULL ) ||
         gcry_mpi_scan( &s, GCRYMPI_FMT_USG, p_s + 2, i_s_len, NULL ) ||
         gcry_sexp_build( &sig_sexp, &erroff, sig_sexp_s, r, s ) )
-        goto problem;
+        goto out;
 
     int i_hash_len = gcry_md_get_algo_dlen (sign->digest_algo);
-    if (sign->public_key_algo == GCRY_PK_DSA) {
-        if (i_hash_len > i_q_len)
-            i_hash_len = i_q_len;
-    }
+    if (i_hash_len > i_q_len)
+        i_hash_len = i_q_len;
     if( gcry_mpi_scan( &hash, GCRYMPI_FMT_USG, p_hash, i_hash_len, NULL ) ||
         gcry_sexp_build( &hash_sexp, &erroff, hash_sexp_s, hash ) )
-        goto problem;
+        goto out;
 
     if( gcry_pk_verify( sig_sexp, hash_sexp, key_sexp ) )
-        goto problem;
+        goto out;
 
-    return VLC_SUCCESS;
+    ret = VLC_SUCCESS;
 
-problem:
+out:
     if( p ) gcry_mpi_release( p );
     if( q ) gcry_mpi_release( q );
     if( g ) gcry_mpi_release( g );
@@ -492,7 +580,22 @@ problem:
     if( key_sexp ) gcry_sexp_release( key_sexp );
     if( sig_sexp ) gcry_sexp_release( sig_sexp );
     if( hash_sexp ) gcry_sexp_release( hash_sexp );
-    return VLC_EGENERIC;
+
+    return ret;
+}
+
+/*
+ * Verify an OpenPGP signature made with some public key
+ */
+int verify_signature( signature_packet_t *sign, public_key_packet_t *p_key,
+                      uint8_t *p_hash )
+{
+    if (sign->public_key_algo == GCRY_PK_DSA)
+        return verify_signature_dsa(sign, p_key, p_hash);
+    else if (sign->public_key_algo == GCRY_PK_RSA)
+        return verify_signature_rsa(sign, p_key, p_hash);
+    else
+        return VLC_EGENERIC;
 }
 
 
@@ -744,6 +847,11 @@ uint8_t *hash_from_file( const char *psz_file, signature_packet_t *p_sig )
  */
 uint8_t *hash_from_public_key( public_key_t *p_pkey )
 {
+    const uint8_t pk_algo = p_pkey->key.algo;
+    size_t i_size;
+    size_t i_p_len, i_g_len, i_q_len, i_y_len;
+    size_t i_n_len, i_e_len;
+
     if( p_pkey->sig.version != 4 )
         return NULL;
 
@@ -754,18 +862,26 @@ uint8_t *hash_from_public_key( public_key_t *p_pkey )
     gcry_error_t error = 0;
     gcry_md_hd_t hd;
 
+    if (pk_algo == GCRY_PK_DSA) {
+        i_p_len = mpi_len( p_pkey->key.sig.dsa.p );
+        i_g_len = mpi_len( p_pkey->key.sig.dsa.g );
+        i_q_len = mpi_len( p_pkey->key.sig.dsa.q );
+        i_y_len = mpi_len( p_pkey->key.sig.dsa.y );
+
+        i_size = 6 + 2*4 + i_p_len + i_g_len + i_q_len + i_y_len;
+    } else if (pk_algo == GCRY_PK_RSA) {
+        i_n_len = mpi_len( p_pkey->key.sig.rsa.n );
+        i_e_len = mpi_len( p_pkey->key.sig.rsa.e );
+
+        i_size = 6 + 2*2 + i_n_len + i_e_len;
+    } else
+        return NULL;
+
     error = gcry_md_open( &hd, p_pkey->sig.digest_algo, 0 );
     if( error )
         return NULL;
 
     gcry_md_putc( hd, 0x99 );
-
-    size_t i_p_len = mpi_len( p_pkey->key.p );
-    size_t i_g_len = mpi_len( p_pkey->key.g );
-    size_t i_q_len = mpi_len( p_pkey->key.q );
-    size_t i_y_len = mpi_len( p_pkey->key.y );
-
-    size_t i_size = 6 + 2*4 + i_p_len + i_g_len + i_q_len + i_y_len;
 
     gcry_md_putc( hd, (i_size >> 8) & 0xff );
     gcry_md_putc( hd, i_size & 0xff );
@@ -774,17 +890,15 @@ uint8_t *hash_from_public_key( public_key_t *p_pkey )
     gcry_md_write( hd, p_pkey->key.timestamp, 4 );
     gcry_md_putc( hd, p_pkey->key.algo );
 
-    gcry_md_write( hd, (uint8_t*)&p_pkey->key.p, 2 );
-    gcry_md_write( hd, (uint8_t*)&p_pkey->key.p + 2, i_p_len );
-
-    gcry_md_write( hd, (uint8_t*)&p_pkey->key.q, 2 );
-    gcry_md_write( hd, (uint8_t*)&p_pkey->key.q + 2, i_q_len );
-
-    gcry_md_write( hd, (uint8_t*)&p_pkey->key.g, 2 );
-    gcry_md_write( hd, (uint8_t*)&p_pkey->key.g + 2, i_g_len );
-
-    gcry_md_write( hd, (uint8_t*)&p_pkey->key.y, 2 );
-    gcry_md_write( hd, (uint8_t*)&p_pkey->key.y + 2, i_y_len );
+    if (pk_algo == GCRY_PK_DSA) {
+        gcry_md_write( hd, (uint8_t*)&p_pkey->key.sig.dsa.p, 2 + i_p_len );
+        gcry_md_write( hd, (uint8_t*)&p_pkey->key.sig.dsa.q, 2 + i_q_len );
+        gcry_md_write( hd, (uint8_t*)&p_pkey->key.sig.dsa.g, 2 + i_g_len );
+        gcry_md_write( hd, (uint8_t*)&p_pkey->key.sig.dsa.y, 2 + i_y_len );
+    } else if (pk_algo == GCRY_PK_RSA) {
+        gcry_md_write( hd, (uint8_t*)&p_pkey->key.sig.rsa.n, 2 + i_n_len );
+        gcry_md_write( hd, (uint8_t*)&p_pkey->key.sig.rsa.e, 2 + i_e_len );
+    }
 
     gcry_md_putc( hd, 0xb4 );
 

@@ -19,7 +19,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef _VLC_LIBASF_H
+#define _VLC_LIBASF_H
 
+#define ASF_MAX_STREAMNUMBER 127
 
 /*****************************************************************************
  * Structure needed for decoder
@@ -244,7 +247,7 @@ typedef struct
     {
         uint8_t  i_stream_number;
         uint32_t i_avg_bitrate;
-    } bitrate[128];
+    } bitrate[ASF_MAX_STREAMNUMBER + 1];
 } asf_object_stream_bitrate_properties_t;
 
 
@@ -387,3 +390,4 @@ void               ASF_FreeObjectRoot( stream_t *, asf_object_root_t *p_root );
 int ASF_CountObject ( void *p_obj, const guid_t *p_guid );
 
 void *ASF_FindObject( void *p_obj, const guid_t *p_guid, int i_number );
+#endif

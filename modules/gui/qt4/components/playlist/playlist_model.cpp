@@ -61,8 +61,8 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     rebuild( p_root );
     DCONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
               this, processInputItemUpdate( input_item_t *) );
-    DCONNECT( THEMIM, inputChanged( input_thread_t * ),
-              this, processInputItemUpdate( input_thread_t* ) );
+    DCONNECT( THEMIM, inputChanged( ),
+              this, processInputItemUpdate( ) );
     CONNECT( THEMIM, playlistItemAppended( int, int ),
              this, processItemAppend( int, int ) );
     CONNECT( THEMIM, playlistItemRemoved( int ),
@@ -560,8 +560,9 @@ bool PLModel::canEdit() const
 /************************* Updates handling *****************************/
 
 /**** Events processing ****/
-void PLModel::processInputItemUpdate( input_thread_t *p_input )
+void PLModel::processInputItemUpdate( )
 {
+    input_thread_t *p_input = THEMIM->getInput();
     if( !p_input ) return;
 
     if( p_input && !( p_input->b_dead || !vlc_object_alive( p_input ) ) )

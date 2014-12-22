@@ -133,7 +133,7 @@ protected:
     {
         hide();
     }
-    virtual void keyPressEvent( QKeyEvent *keyEvent )
+    void keyPressEvent( QKeyEvent *keyEvent ) Q_DECL_OVERRIDE
     {
         if( keyEvent->key() == Qt::Key_Escape )
         {
@@ -171,7 +171,7 @@ protected:
     {
         hide();
     }
-    virtual void keyPressEvent( QKeyEvent *keyEvent )
+    void keyPressEvent( QKeyEvent *keyEvent ) Q_DECL_OVERRIDE
     {
         if( keyEvent->key() == Qt::Key_Escape )
         {

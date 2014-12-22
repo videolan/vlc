@@ -212,7 +212,7 @@ void Dialogs::showChangeSkin()
 void Dialogs::showPlaylistLoad()
 {
     showFileGeneric( _("Open playlist"),
-                     _("Playlist Files|"EXTENSIONS_PLAYLIST"|"
+                     _("Playlist Files|" EXTENSIONS_PLAYLIST "|"
                        "All Files|*"),
                      showPlaylistLoadCB, kOPEN );
 }
@@ -342,5 +342,14 @@ void Dialogs::showInteraction( interaction_dialog_t *p_dialog )
 
         m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_INTERACTION,
                                      0, p_arg );
+    }
+}
+
+void Dialogs::sendKey( int key )
+{
+    if( m_pProvider && m_pProvider->pf_show_dialog )
+    {
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_SENDKEY,
+                                     key, NULL );
     }
 }

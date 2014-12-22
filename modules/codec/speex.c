@@ -335,11 +335,13 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( !pp_block ) return NULL;
 
-    if( *pp_block )
+    block_t *block = *pp_block;
+
+    if( block != NULL )
     {
         /* Block to Ogg packet */
-        oggpacket.packet = (*pp_block)->p_buffer;
-        oggpacket.bytes = (*pp_block)->i_buffer;
+        oggpacket.packet = block->p_buffer;
+        oggpacket.bytes = block->i_buffer;
     }
     else
     {
@@ -364,13 +366,15 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( CreateDefaultHeader( p_dec ) )
             {
-                block_Release( *pp_block );
+                if( block != NULL )
+                    block_Release( block );
                 return NULL;
             }
         }
         else if( ProcessHeaders( p_dec ) )
         {
-            block_Release( *pp_block );
+            if( block != NULL )
+                block_Release( block );
             return NULL;
         }
         p_sys->b_has_headers = true;

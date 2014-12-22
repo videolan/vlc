@@ -84,7 +84,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.libtool: libtool
+.libtool: libtool .automake
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	ln -sf libtool $(PREFIX)/bin/glibtool
 	ln -sf libtoolize $(PREFIX)/bin/glibtoolize
@@ -206,7 +206,8 @@ gas: gas-preprocessor-$(GAS_VERSION).tar.gz
 	$(MOVE)
 
 .gas: gas
-	cp gas/gas-preprocessor.pl build/bin/
+	mkdir -p $(PREFIX)/bin
+	cp gas/gas-preprocessor.pl $(PREFIX)/bin/
 	touch $@
 
 CLEAN_FILE += .gas
@@ -247,6 +248,43 @@ sed: sed-$(SED_VERSION).tar.bz2
 CLEAN_PKG += sed
 DISTCLEAN_PKG += sed-$(SED_VERSION).tar.bz2
 CLEAN_FILE += .sed
+
+# Apache ANT
+
+apache-ant-$(ANT_VERSION).tar.bz2:
+	$(call download,$(ANT_URL))
+
+ant: apache-ant-$(ANT_VERSION).tar.bz2
+	$(UNPACK)
+	$(MOVE)
+
+.ant: ant
+	(mkdir -p $(PREFIX)/bin && cp $</bin/* $(PREFIX)/bin/)
+	(mkdir -p $(PREFIX)/lib && cp $</lib/* $(PREFIX)/lib/)
+	touch $@
+
+CLEAN_PKG += ant
+DISTCLEAN_PKG += apache-ant-$(ANT_VERSION).tar.bz2
+CLEAN_FILE += .ant
+
+
+# Protobuf Protoc
+
+protobuf-$(PROTOBUF_VERSION).tar.bz2:
+	$(call download,$(PROTOBUF_URL))
+
+protobuf: protobuf-$(PROTOBUF_VERSION).tar.bz2
+	$(UNPACK)
+	$(MOVE)
+
+.protoc: protobuf
+	(cd $< && ./configure --prefix="$(PREFIX)" --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
+	(find $(PREFIX) -name 'protobuf*.pc' -exec rm -f {} \;)
+	touch $@
+
+CLEAN_PKG += protobuf
+DISTCLEAN_PKG += protobuf-$(PROTOBUF_VERSION).tar.bz2
+CLEAN_FILE += .protoc
 
 #
 #

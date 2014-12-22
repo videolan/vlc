@@ -24,7 +24,7 @@ struct musicbrainz_recording_t
 {
     char *psz_artist;
     char *psz_title;
-    char sz_musicbrainz_id[MB_ID_SIZE];
+    char s_musicbrainz_id[MB_ID_SIZE];
 };
 typedef struct musicbrainz_recording_t musicbrainz_recording_t;
 

@@ -315,8 +315,8 @@ public:
     PictureFlowSoftwareRenderer();
     ~PictureFlowSoftwareRenderer();
 
-    virtual void init();
-    virtual void paint();
+    void init() Q_DECL_OVERRIDE;
+    void paint() Q_DECL_OVERRIDE;
 
 private:
     QSize size;

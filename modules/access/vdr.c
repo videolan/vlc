@@ -201,6 +201,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    free( p_access->psz_demux );
+    p_access->psz_demux = strdup( p_sys->b_ts_format ? "ts" : "ps" );
     return VLC_SUCCESS;
 }
 
@@ -272,6 +274,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *va_arg( args, bool* ) = true;
             break;
 
+        case ACCESS_GET_SIZE:
+            *va_arg( args, uint64_t* ) = p_sys->size;
+            break;
+
         case ACCESS_GET_PTS_DELAY:
             pi64 = va_arg( args, int64_t * );
             *pi64 = INT64_C(1000)
@@ -288,7 +294,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 return VLC_EGENERIC;
             ppp_title = va_arg( args, input_title_t*** );
             *va_arg( args, int* ) = 1;
-            *ppp_title = malloc( sizeof( input_title_t* ) );
+            *ppp_title = malloc( sizeof( *ppp_title ) );
             if( !*ppp_title )
                 return VLC_ENOMEM;
             **ppp_title = vlc_input_title_Duplicate( p_sys->p_marks );
@@ -892,7 +898,7 @@ static bool ReadIndexRecord( FILE *p_file, bool b_ts, int64_t i_frame,
     uint8_t index_record[8];
     if( fseek( p_file, sizeof(index_record) * i_frame, SEEK_SET ) != 0 )
         return false;
-    if( fread( &index_record, sizeof(index_record), 1, p_file ) <= 0 )
+    if( fread( &index_record, sizeof(index_record), 1, p_file ) < 1 )
         return false;
 
     /* VDR usually (only?) runs on little endian machines, but VLC has a

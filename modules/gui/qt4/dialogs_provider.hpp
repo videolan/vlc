@@ -104,6 +104,12 @@ private:
     static DialogsProvider *instance;
 
     intf_thread_t *p_intf;
+
+    QMenu* popupMenu;
+    QMenu* videoPopupMenu;
+    QMenu* audioPopupMenu;
+    QMenu* miscPopupMenu;
+
     QWidget* root;
     bool b_isDying;
 
@@ -120,6 +126,7 @@ public slots:
     void extendedDialog();
     void synchroDialog();
     void messagesDialog();
+    void sendKey( int key );
 #ifdef ENABLE_VLM
     void vlmDialog();
 #endif
@@ -133,6 +140,8 @@ public slots:
     void toolbarDialog();
     void pluginDialog();
     void epgDialog();
+    void setPopupMenu();
+    void destroyPopupMenu();
 
     void openFileGenericDialog( intf_dialog_args_t * );
 
@@ -151,7 +160,7 @@ public slots:
     void PLOpenDir();
     void PLAppendDir();
 
-    void streamingDialog( QWidget *parent, const QString& mrl, bool b_stream = true,
+    void streamingDialog( QWidget *parent, const QStringList& mrls, bool b_stream = true,
                           QStringList options = QStringList("") );
     void openAndStreamingDialogs();
     void openAndTranscodingDialogs();

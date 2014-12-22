@@ -31,11 +31,14 @@
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 
+#include "SegmentTemplate.h"
 #include "SegmentInfoDefault.h"
+#include "Period.h"
 
 using namespace dash::mpd;
 
-AdaptationSet::AdaptationSet() :
+AdaptationSet::AdaptationSet(Period *period) :
+    SegmentInformation( period ),
     subsegmentAlignmentFlag( false ),
     segmentInfoDefault( NULL ),
     isBitstreamSwitching( false )
@@ -48,6 +51,14 @@ AdaptationSet::~AdaptationSet   ()
     vlc_delete_all( this->representations );
 }
 
+const std::string& AdaptationSet::getMimeType() const
+{
+    if (mimeType.empty() && !representations.empty())
+        return representations.front()->getMimeType();
+    else
+        return mimeType;
+}
+
 bool                AdaptationSet::getSubsegmentAlignmentFlag() const
 {
     return this->subsegmentAlignmentFlag;
@@ -58,7 +69,7 @@ void AdaptationSet::setSubsegmentAlignmentFlag(bool alignment)
     this->subsegmentAlignmentFlag = alignment;
 }
 
-std::vector<Representation*>    AdaptationSet::getRepresentations       ()
+std::vector<Representation*>&    AdaptationSet::getRepresentations       ()
 {
     return this->representations;
 }
@@ -93,6 +104,7 @@ void                            AdaptationSet::addRepresentation        (Represe
     this->representations.push_back(rep);
 }
 
+
 void AdaptationSet::setBitstreamSwitching  (bool value)
 {
     this->isBitstreamSwitching = value;
@@ -101,4 +113,24 @@ void AdaptationSet::setBitstreamSwitching  (bool value)
 bool AdaptationSet::getBitstreamSwitching  () const
 {
     return this->isBitstreamSwitching;
+}
+
+Url AdaptationSet::getUrlSegment() const
+{
+    return getParentUrlSegment();
+}
+
+std::vector<std::string> AdaptationSet::toString(int indent) const
+{
+    std::vector<std::string> ret;
+    std::string text(indent, ' ');
+    text.append("AdaptationSet");
+    ret.push_back(text);
+    std::vector<Representation *>::const_iterator k;
+    for(k = representations.begin(); k != representations.end(); k++)
+    {
+        std::vector<std::string> debug = (*k)->toString(indent + 1);
+        ret.insert(ret.end(), debug.begin(), debug.end());
+    }
+    return ret;
 }

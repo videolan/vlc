@@ -191,7 +191,7 @@ int packed_sat_hue_clip_C( picture_t * p_pic, picture_t * p_outpic, int i_sin, i
 
     for( ; p_in < p_in_end ; )
     {
-            p_line_end = p_in + i_visible_pitch - 8 * 4;
+        p_line_end = p_in + i_visible_pitch - 8 * 4;
 
         for( ; p_in < p_line_end ; )
         {
@@ -206,10 +206,10 @@ int packed_sat_hue_clip_C( picture_t * p_pic, picture_t * p_outpic, int i_sin, i
             PACKED_WRITE_UV_CLIP();
         }
 
-            p_in += i_pitch - i_visible_pitch;
-            p_in_v += i_pitch - i_visible_pitch;
-            p_out += i_pitch - i_visible_pitch;
-            p_out_v += i_pitch - i_visible_pitch;
+        p_in += i_pitch - i_visible_pitch;
+        p_in_v += i_pitch - i_visible_pitch;
+        p_out += i_pitch - i_visible_pitch;
+        p_out_v += i_pitch - i_visible_pitch;
     }
 
     return VLC_SUCCESS;
@@ -244,7 +244,7 @@ int packed_sat_hue_C( picture_t * p_pic, picture_t * p_outpic, int i_sin,
 
     for( ; p_in < p_in_end ; )
     {
-            p_line_end = p_in + i_visible_pitch - 8 * 4;
+        p_line_end = p_in + i_visible_pitch - 8 * 4;
 
         for( ; p_in < p_line_end ; )
         {
@@ -259,10 +259,10 @@ int packed_sat_hue_C( picture_t * p_pic, picture_t * p_outpic, int i_sin,
             PACKED_WRITE_UV();
         }
 
-            p_in += i_pitch - i_visible_pitch;
-            p_in_v += i_pitch - i_visible_pitch;
-            p_out += i_pitch - i_visible_pitch;
-            p_out_v += i_pitch - i_visible_pitch;
+        p_in += i_pitch - i_visible_pitch;
+        p_in_v += i_pitch - i_visible_pitch;
+        p_out += i_pitch - i_visible_pitch;
+        p_out_v += i_pitch - i_visible_pitch;
     }
 
     return VLC_SUCCESS;

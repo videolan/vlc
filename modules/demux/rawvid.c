@@ -190,13 +190,14 @@ valid:
     /* override presets if yuv4mpeg2 */
     if( b_y4m )
     {
+        /* The string should start with "YUV4MPEG2" */
         char *psz = stream_ReadLine( p_demux->s );
         char *psz_buf;
         int a = 1;
         int b = 1;
 
-        /* The string will start with "YUV4MPEG2" */
-        assert( strlen(psz) >= 9 );
+        if( unlikely(psz == NULL) )
+            goto error;
 
         /* NB, it is not possible to handle interlaced here, since the
          * interlaced picture flags are in picture_t not block_t */

@@ -49,7 +49,7 @@ vlc_module_begin ()
     set_description (N_("OpenGL GLX video output (XCB)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout display", 150)
+    set_capability ("vout display", 250)
     set_callbacks (Open, Close)
 
     add_shortcut ("xcb-glx", "glx", "opengl", "xid")
@@ -58,7 +58,6 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     xcb_connection_t *conn; /**< XCB connection */
-    vout_window_t *embed; /* VLC window (when windowed) */
     vlc_gl_t *gl;
 
     xcb_cursor_t cursor; /* blank cursor */
@@ -91,16 +90,17 @@ static int Open (vlc_object_t *obj)
     /* Get window, connect to X server (via XCB) */
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    uint16_t width, height;
-    sys->embed = XCB_parent_Create (vd, &conn, &scr, &width, &height);
-    if (sys->embed == NULL)
+    vout_window_t *surface;
+
+    surface = XCB_parent_Create (vd, &conn, &scr);
+    if (surface == NULL)
     {
         free (sys);
         return VLC_EGENERIC;
     }
 
     sys->conn = conn;
-    sys->gl = vlc_gl_Create (sys->embed, VLC_OPENGL, "glx");
+    sys->gl = vlc_gl_Create (surface, VLC_OPENGL, "glx");
     if (sys->gl == NULL)
         goto error;
 
@@ -128,20 +128,13 @@ static int Open (vlc_object_t *obj)
     vd->control = Control;
     vd->manage = Manage;
 
-    /* */
-    bool is_fullscreen = vd->cfg->is_fullscreen;
-    if (is_fullscreen && vout_window_SetFullScreen (sys->embed, true))
-        is_fullscreen = false;
-    vout_display_SendEventFullscreen (vd, is_fullscreen);
-    vout_display_SendEventDisplaySize (vd, width, height, is_fullscreen);
-
     return VLC_SUCCESS;
 
 error:
     if (sys->gl != NULL)
         vlc_gl_Destroy (sys->gl);
     xcb_disconnect (sys->conn);
-    vout_display_DeleteWindow (vd, sys->embed);
+    vout_display_DeleteWindow (vd, surface);
     free (sys);
     return VLC_EGENERIC;
 }
@@ -154,19 +147,21 @@ static void Close (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
+    vlc_gl_t *gl = sys->gl;
+    vout_window_t *surface = gl->surface;
 
-    vlc_gl_MakeCurrent (sys->gl);
+    vlc_gl_MakeCurrent (gl);
     vout_display_opengl_Delete (sys->vgl);
-    vlc_gl_ReleaseCurrent (sys->gl);
-    vlc_gl_Destroy (sys->gl);
+    vlc_gl_ReleaseCurrent (gl);
+    vlc_gl_Destroy (gl);
 
     /* show the default cursor */
-    xcb_change_window_attributes (sys->conn, sys->embed->handle.xid,
+    xcb_change_window_attributes (sys->conn, surface->handle.xid,
                                XCB_CW_CURSOR, &(uint32_t) { XCB_CURSOR_NONE });
     xcb_flush (sys->conn);
     xcb_disconnect (sys->conn);
 
-    vout_display_DeleteWindow (vd, sys->embed);
+    vout_display_DeleteWindow (vd, surface);
     free (sys);
 }
 
@@ -214,18 +209,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-    {
-        const vout_display_cfg_t *c = va_arg (ap, const vout_display_cfg_t *);
-        return vout_window_SetFullScreen (sys->embed, c->is_fullscreen);
-    }
-
-    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-    {
-        unsigned state = va_arg (ap, unsigned);
-        return vout_window_SetState (sys->embed, state);
-    }
-
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:
@@ -247,14 +230,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
         }
 
-        /* */
-        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && va_arg (ap, int))
-        {
-            vout_window_SetSize (sys->embed,
-                                 cfg->display.width, cfg->display.height);
-            return VLC_EGENERIC; /* Always fail. See x11.c for rationale. */
-        }
-
         vout_display_place_t place;
         vout_display_PlacePicture (&place, source, cfg, false);
 
@@ -267,17 +242,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     /* Hide the mouse. It will be send when
      * vout_display_t::info.b_hide_mouse is false */
     case VOUT_DISPLAY_HIDE_MOUSE:
-        xcb_change_window_attributes (sys->conn, sys->embed->handle.xid,
+        xcb_change_window_attributes (sys->conn, sys->gl->surface->handle.xid,
                                     XCB_CW_CURSOR, &(uint32_t){ sys->cursor });
         xcb_flush (sys->conn);
         return VLC_SUCCESS;
-
-    case VOUT_DISPLAY_GET_OPENGL:
-    {
-        vlc_gl_t **gl = va_arg (ap, vlc_gl_t **);
-        *gl = sys->gl;
-        return VLC_SUCCESS;
-    }
 
     case VOUT_DISPLAY_RESET_PICTURES:
         assert (0);

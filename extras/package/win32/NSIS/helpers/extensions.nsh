@@ -168,6 +168,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".divx"
   !insertmacro ${_action} Video ".drc"
   !insertmacro ${_action} Video ".dv"
+  !insertmacro ${_action} Video ".evo"
   !insertmacro ${_action} Video ".f4v"
   !insertmacro ${_action} Video ".flv"
   !insertmacro ${_action} Video ".gvi"

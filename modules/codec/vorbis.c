@@ -318,7 +318,8 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         if( ProcessHeaders( p_dec ) )
         {
-            block_Release( *pp_block );
+            if( *pp_block )
+                block_Release( *pp_block );
             return NULL;
         }
         p_sys->b_has_headers = true;

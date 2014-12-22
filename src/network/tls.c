@@ -143,52 +143,34 @@ void vlc_tls_Delete (vlc_tls_creds_t *crd)
 }
 
 
-/**
- * Adds one or more certificate authorities from a file.
- * @return -1 on error, 0 on success.
- */
-int vlc_tls_ServerAddCA (vlc_tls_creds_t *srv, const char *path)
-{
-    return srv->add_CA (srv, path);
-}
-
-
-/**
- * Adds one or more certificate revocation list from a file.
- * @return -1 on error, 0 on success.
- */
-int vlc_tls_ServerAddCRL (vlc_tls_creds_t *srv, const char *path)
-{
-    return srv->add_CRL (srv, path);
-}
-
-
 /*** TLS  session ***/
 
 vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
-                                  const char *host)
+                                  const char *host, const char *const *alpn)
 {
     vlc_tls_t *session = vlc_custom_create (crd, sizeof (*session),
                                             "tls session");
-    int val = crd->open (crd, session, fd, host);
+    int val = crd->open (crd, session, fd, host, alpn);
     if (val == VLC_SUCCESS)
         return session;
     vlc_object_release (session);
     return NULL;
 }
 
+int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host,
+                              const char *service, char **restrict alp)
+{
+    vlc_tls_creds_t *crd = (vlc_tls_creds_t *)(session->p_parent);
+
+    return crd->handshake (session, host, service, alp);
+}
+
 void vlc_tls_SessionDelete (vlc_tls_t *session)
 {
     vlc_tls_creds_t *crd = (vlc_tls_creds_t *)(session->p_parent);
 
-    crd->close (crd, session);
+    crd->close (session);
     vlc_object_release (session);
-}
-
-int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host,
-                              const char *service)
-{
-    return session->handshake (session, host, service);
 }
 
 /**
@@ -198,13 +180,20 @@ int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host,
  * @param fd socket through which to establish the secure channel
  * @param hostname expected server name, used both as Server Name Indication
  *                 and as expected Common Name of the peer certificate
+ * @param service unique identifier for the service to connect to
+ *                (only used locally for certificates database)
+ * @param alpn NULL-terminated list of Application Layer Protocols
+ *             to negotiate, or NULL to not negotiate protocols
+ * @param alp storage space for the negotiated Application Layer
+ *            Protocol or NULL if negotiation was not performed[OUT]
  *
  * @return NULL on error.
  **/
 vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
-                                        const char *host, const char *service)
+                                        const char *host, const char *service,
+                                        const char *const *alpn, char **alp)
 {
-    vlc_tls_t *session = vlc_tls_SessionCreate (crd, fd, host);
+    vlc_tls_t *session = vlc_tls_SessionCreate (crd, fd, host, alpn);
     if (session == NULL)
         return NULL;
 
@@ -215,8 +204,14 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
     ufd[0].fd = fd;
 
     int val;
-    while ((val = vlc_tls_SessionHandshake (session, host, service)) > 0)
+    while ((val = vlc_tls_SessionHandshake (session, host, service, alp)) != 0)
     {
+        if (val < 0)
+        {
+            msg_Err (session, "TLS client session handshake error");
+            goto error;
+        }
+
         mtime_t now = mdate ();
         if (now > deadline)
            now = deadline;
@@ -227,16 +222,11 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
         if (poll (ufd, 1, (deadline - now) / 1000) == 0)
         {
             msg_Err (session, "TLS client session handshake timeout");
-            val = -1;
-            break;
+            goto error;
         }
     }
-
-    if (val != 0)
-    {
-        msg_Err (session, "TLS client session handshake error");
-        vlc_tls_SessionDelete (session);
-        session = NULL;
-    }
     return session;
+error:
+    vlc_tls_SessionDelete (session);
+    return NULL;
 }

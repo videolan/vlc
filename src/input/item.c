@@ -386,6 +386,17 @@ void input_item_SetDuration( input_item_t *p_i, mtime_t i_duration )
     }
 }
 
+char *input_item_GetNowPlayingFb( input_item_t *p_item )
+{
+    char *psz_meta = input_item_GetMeta( p_item, vlc_meta_NowPlaying );
+    if( !psz_meta || strlen( psz_meta ) == 0 )
+    {
+        free( psz_meta );
+        return input_item_GetMeta( p_item, vlc_meta_ESNowPlaying );
+    }
+
+    return psz_meta;
+}
 
 bool input_item_IsPreparsed( input_item_t *p_item )
 {
@@ -851,7 +862,6 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
     TAB_INIT( p_input->i_categories, p_input->pp_categories );
     TAB_INIT( p_input->i_es, p_input->es );
     p_input->p_stats = NULL;
-    p_input->i_nb_played = 0;
     p_input->p_meta = NULL;
     TAB_INIT( p_input->i_epg, p_input->pp_epg );
 
@@ -867,7 +877,6 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
 
     if( type != ITEM_TYPE_UNKNOWN )
         p_input->i_type = type;
-    p_input->b_fixed_name = false;
     p_input->b_error_when_reading = false;
     return p_input;
 }

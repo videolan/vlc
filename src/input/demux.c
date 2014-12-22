@@ -398,7 +398,8 @@ static bool SkipID3Tag( demux_t *p_demux )
     i_size += 10;
 
     /* Skip the entire tag */
-    stream_Read( p_demux->s, NULL, i_size );
+    if( stream_Read( p_demux->s, NULL, i_size ) < i_size )
+        return false;
 
     msg_Dbg( p_demux, "ID3v2.%d revision %d tag found, skipping %d bytes",
              version, revision, i_size );
@@ -429,7 +430,8 @@ static bool SkipAPETag( demux_t *p_demux )
     i_size = GetDWLE( &p_peek[8+4] ) + ( (flags&(1<<30)) ? 32 : 0 );
 
     /* Skip the entire tag */
-    stream_Read( p_demux->s, NULL, i_size );
+    if( stream_Read( p_demux->s, NULL, i_size ) < i_size )
+        return false;
 
     msg_Dbg( p_demux, "AP2 v%d tag found, skipping %d bytes",
              i_version/1000, i_size );

@@ -56,11 +56,12 @@ struct aout_sys_t
     int fd;
     audio_sample_format_t format;
     bool starting;
-
-    bool mute;
-    uint8_t level;
+    bool soft_mute;
+    float soft_gain;
     char *device;
 };
+
+#include "volume.h"
 
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
@@ -75,6 +76,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string ("oss-audio-device", "",
                 AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT, false)
+    add_sw_gain ()
     set_capability( "audio output", 100 )
     set_callbacks (Open, Close)
 vlc_module_end ()
@@ -83,7 +85,6 @@ static int TimeGet (audio_output_t *, mtime_t *);
 static void Play (audio_output_t *, block_t *);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
-static int VolumeSync (audio_output_t *);
 
 static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
@@ -231,7 +232,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
                  vlc_strerror_c(errno));
 
     sys->fd = fd;
-    VolumeSync (aout);
+    aout_SoftVolumeStart (aout);
     sys->starting = true;
     sys->format = *fmt;
     return VLC_SUCCESS;
@@ -276,9 +277,6 @@ static void Play (audio_output_t *aout, block_t *block)
             msg_Err (aout, "cannot write samples: %s", vlc_strerror_c(errno));
     }
     block_Release (block);
-
-    /* Dumb OSS cannot send any kind of events for this... */
-    VolumeSync (aout);
 }
 
 /**
@@ -306,23 +304,6 @@ static void Flush (audio_output_t *aout, bool wait)
     ioctl (fd, SNDCTL_DSP_HALT, NULL);
 }
 
-static int VolumeSync (audio_output_t *aout)
-{
-    aout_sys_t *sys = aout->sys;
-    int fd = sys->fd;
-
-    int level;
-    if (ioctl (fd, SNDCTL_DSP_GETPLAYVOL, &level) < 0)
-        return -1;
-
-    sys->mute = !level;
-    if (level) /* try to keep last volume before mute */
-        sys->level = level;
-    aout_MuteReport (aout, !level);
-    aout_VolumeReport (aout, (float)(level & 0xFF) / 100.f);
-    return 0;
-}
-
 /**
  * Releases the audio output device.
  */
@@ -334,48 +315,6 @@ static void Stop (audio_output_t *aout)
     ioctl (fd, SNDCTL_DSP_HALT, NULL);
     close (fd);
     sys->fd = -1;
-}
-
-static int VolumeSet (audio_output_t *aout, float vol)
-{
-    aout_sys_t *sys = aout->sys;
-    int fd = sys->fd;
-    if (fd == -1)
-        return -1;
-
-    int level = lroundf (vol * 100.f);
-    if (level > 0xFF)
-        level = 0xFFFF;
-    else
-        level |= level << 8;
-    if (!sys->mute && ioctl (fd, SNDCTL_DSP_SETPLAYVOL, &level) < 0)
-    {
-        msg_Err (aout, "cannot set volume: %s", vlc_strerror_c(errno));
-        return -1;
-    }
-
-    sys->level = level;
-    aout_VolumeReport (aout, (float)(level & 0xFF) / 100.f);
-    return 0;
-}
-
-static int MuteSet (audio_output_t *aout, bool mute)
-{
-    aout_sys_t *sys = aout->sys;
-    int fd = sys->fd;
-    if (fd == -1)
-        return -1;
-
-    int level = mute ? 0 : (sys->level | (sys->level << 8));
-    if (ioctl (fd, SNDCTL_DSP_SETPLAYVOL, &level) < 0)
-    {
-        msg_Err (aout, "cannot mute: %s", vlc_strerror_c(errno));
-        return -1;
-    }
-
-    sys->mute = mute;
-    aout_MuteReport (aout, mute);
-    return 0;
 }
 
 static int DevicesEnum (audio_output_t *aout)
@@ -449,17 +388,13 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     sys->fd = -1;
-
-    sys->level = 100;
-    sys->mute = false;
     sys->device = var_InheritString (aout, "oss-audio-device");
 
     aout->sys = sys;
     aout->start = Start;
     aout->stop = Stop;
-    aout->volume_set = VolumeSet;
-    aout->mute_set = MuteSet;
     aout->device_select = DeviceSelect;
+    aout_SoftVolumeInit (aout);
 
     DevicesEnum (aout);
     return VLC_SUCCESS;

@@ -121,6 +121,10 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 static int Open(vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
+
+    if (vout_display_IsWindowed(vd))
+        return VLC_EGENERIC;
+
     vout_display_sys_t *sys = calloc (1, sizeof(*sys));
     NSAutoreleasePool *autoreleasePool = nil;
 
@@ -137,8 +141,6 @@ static int Open(vlc_object_t *this)
     UIView* viewContainer = var_CreateGetAddress (vd, "drawable-nsobject");
     if (!viewContainer || ![viewContainer isKindOfClass:[UIView class]])
         goto bailout;
-
-    vout_display_DeleteWindow (vd, NULL);
 
     /* This will be released in Close(), on
      * main thread, after we are done using it. */
@@ -201,7 +203,7 @@ static int Open(vlc_object_t *this)
     /* forward our dimensions to the vout core */
     CGSize viewSize = sys->viewContainer.frame.size;
     vout_display_SendEventFullscreen(vd, false);
-    vout_display_SendEventDisplaySize(vd, (int)viewSize.width, (int)viewSize.height, false);
+    vout_display_SendEventDisplaySize(vd, (int)viewSize.width, (int)viewSize.height);
 
     /* */
     [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
@@ -263,8 +265,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_HIDE_MOUSE:
             return VLC_EGENERIC;
 
-        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-        case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
@@ -307,14 +307,11 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                 sys->place = place;
             }
 
-            [autoreleasePool release];
-            return VLC_SUCCESS;
-        }
+            // x / y are top left corner, but we need the lower left one
+            if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
+                glViewport(place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
 
-        case VOUT_DISPLAY_GET_OPENGL:
-        {
-            vlc_gl_t **gl = va_arg(ap, vlc_gl_t **);
-            *gl = &sys->gl;
+            [autoreleasePool release];
             return VLC_SUCCESS;
         }
 
@@ -322,6 +319,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             assert (0);
         default:
             msg_Err(vd, "Unknown request %d", query);
+        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
             return VLC_EGENERIC;
     }
 }
@@ -498,8 +496,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
             vout_display_PlacePicture(&place, &_voutDisplay->source, &cfg_tmp, false);
             _voutDisplay->sys->place = place;
             vout_display_SendEventDisplaySize(_voutDisplay, viewSize.width * scaleFactor,
-                                              viewSize.height * scaleFactor,
-                                              _voutDisplay->cfg->is_fullscreen);
+                                              viewSize.height * scaleFactor);
         }
     }
 

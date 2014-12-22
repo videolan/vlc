@@ -80,9 +80,9 @@
 
 - (BOOL)fixPreferences;
 
-- (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on;
-- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char*)psz_filter integer: (int)i_value;
-- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char*)psz_filter float: (float)f_value;
-- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter string: (const char *)psz_value;
-- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter boolean: (BOOL)b_value;
+- (void)setVideoFilter: (const char *)psz_name on:(BOOL)b_on;
+- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter integer: (int)i_value;
+- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter float: (float)f_value;
+- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter string: (const char *)psz_value;
+- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter boolean: (BOOL)b_value;
 @end

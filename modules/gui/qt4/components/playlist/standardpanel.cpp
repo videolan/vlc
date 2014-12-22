@@ -157,7 +157,7 @@ void StandardPLPanel::popupPlView( const QPoint &point )
         currentView->selectionModel()->select( index, QItemSelectionModel::Select );
     }
 
-    if( !popup( globalPoint ) ) VLCMenuBar::PopupMenu( p_intf, true );
+    if( !popup( globalPoint ) ) THEDP->setPopupMenu();
 }
 
 /*********** Popup *********/
@@ -319,14 +319,22 @@ void StandardPLPanel::popupAction( QAction *action )
         /* locally handled only */
         temp = model->getURI( index );
         if ( ! temp.isEmpty() )
-            THEDP->streamingDialog( NULL, temp, false );
+        {
+            QStringList tempList;
+            tempList.append(temp);
+            THEDP->streamingDialog( NULL, tempList, false );
+        }
         break;
 
     case VLCModelSubInterface::ACTION_SAVE:
         /* locally handled only */
         temp = model->getURI( index );
         if ( ! temp.isEmpty() )
-            THEDP->streamingDialog( NULL, temp );
+        {
+            QStringList tempList;
+            tempList.append(temp);
+            THEDP->streamingDialog( NULL, tempList );
+        }
         break;
 
     case VLCModelSubInterface::ACTION_CREATENODE:

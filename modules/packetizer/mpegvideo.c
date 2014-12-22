@@ -159,8 +159,6 @@ static int Open( vlc_object_t *p_this )
     es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_MPGV );
     p_dec->fmt_out.i_original_fourcc = p_dec->fmt_in.i_original_fourcc;
 
-    p_dec->pf_packetize = Packetize;
-    p_dec->pf_get_cc = GetCc;
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     if( !p_dec->p_sys )
@@ -209,6 +207,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_cc_dts = 0;
     p_sys->i_cc_flags = 0;
     cc_Init( &p_sys->cc );
+
+    p_dec->pf_packetize = Packetize;
+    p_dec->pf_get_cc = GetCc;
 
     return VLC_SUCCESS;
 }
@@ -318,8 +319,8 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
 
     /* If a discontinuity has been encountered, then wait till
      * the next Intra frame before continuing with packetizing */
-    if( p_sys->b_discontinuity &&
-        p_sys->b_sync_on_intra_frame )
+    if( unlikely( p_sys->b_discontinuity &&
+        p_sys->b_sync_on_intra_frame ) )
     {
         if( (p_au->i_flags & BLOCK_FLAG_TYPE_I) == 0 )
         {
@@ -333,8 +334,8 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
 
     /* We've just started the stream, wait for the first PTS.
      * We discard here so we can still get the sequence header. */
-    if( p_sys->i_dts <= VLC_TS_INVALID && p_sys->i_pts <= VLC_TS_INVALID &&
-        p_sys->i_interpolated_dts <= VLC_TS_INVALID )
+    if( unlikely( p_sys->i_dts <= VLC_TS_INVALID && p_sys->i_pts <= VLC_TS_INVALID &&
+        p_sys->i_interpolated_dts <= VLC_TS_INVALID ))
     {
         msg_Dbg( p_dec, "need a starting pts/dts" );
         return VLC_EGENERIC;
@@ -342,7 +343,7 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
 
     /* When starting the stream we can have the first frame with
      * an invalid DTS (i_interpolated_pts is initialized to VLC_TS_INVALID) */
-    if( p_au->i_dts <= VLC_TS_INVALID )
+    if( unlikely( p_au->i_dts <= VLC_TS_INVALID ) )
         p_au->i_dts = p_au->i_pts;
 
     return VLC_SUCCESS;

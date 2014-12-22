@@ -31,28 +31,35 @@
 
 #include "mpd/Representation.h"
 #include "mpd/CommonAttributesElements.h"
+#include "mpd/SegmentInformation.hpp"
 
 namespace dash
 {
     namespace mpd
     {
         class SegmentInfoDefault;
+        class Period;
+        class SegmentTemplate;
 
-        class AdaptationSet : public CommonAttributesElements
+        class AdaptationSet : public CommonAttributesElements,
+                              public SegmentInformation
         {
             public:
-                AdaptationSet();
+                AdaptationSet(Period *);
                 virtual ~AdaptationSet();
 
+                virtual const std::string&      getMimeType() const; /*reimpl*/
                 bool                            getSubsegmentAlignmentFlag() const;
                 void                            setSubsegmentAlignmentFlag( bool alignment );
-                std::vector<Representation *>   getRepresentations      ();
+                std::vector<Representation *>&  getRepresentations      ();
                 const Representation*           getRepresentationById   ( const std::string &id ) const;
                 const SegmentInfoDefault*       getSegmentInfoDefault() const;
                 void                            setSegmentInfoDefault( const SegmentInfoDefault* seg );
                 void                            setBitstreamSwitching(bool value);
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( Representation *rep );
+                virtual Url                     getUrlSegment() const; /* reimpl */
+                std::vector<std::string>        toString(int = 0) const;
 
             private:
                 bool                            subsegmentAlignmentFlag;

@@ -34,6 +34,7 @@
 #include "menus.hpp"
 #include "recents.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/customwidgets.hpp" /* VLCKeyToString() */
 #include "main_interface.hpp"
 
 /* The dialogs */
@@ -68,7 +69,11 @@
 DialogsProvider* DialogsProvider::instance = NULL;
 
 DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
-                                  QObject( NULL ), p_intf( _p_intf )
+                                  QObject( NULL ), p_intf( _p_intf ),
+                                  popupMenu( NULL ),
+                                  videoPopupMenu( NULL ),
+                                  audioPopupMenu( NULL ),
+                                  miscPopupMenu( NULL )
 {
     b_isDying = false;
 
@@ -103,10 +108,10 @@ DialogsProvider::~DialogsProvider()
     delete menusUpdateMapper;
     delete SDMapper;
 
-    VLCMenuBar::PopupMenu( p_intf, false );
-    VLCMenuBar::AudioPopupMenu( p_intf, false );
-    VLCMenuBar::VideoPopupMenu( p_intf, false );
-    VLCMenuBar::MiscPopupMenu( p_intf, false );
+    delete popupMenu;
+    delete videoPopupMenu;
+    delete audioPopupMenu;
+    delete miscPopupMenu;
 }
 
 void DialogsProvider::quit()
@@ -148,18 +153,44 @@ void DialogsProvider::customEvent( QEvent *event )
            bookmarksDialog(); break;
         case INTF_DIALOG_EXTENDED:
            extendedDialog(); break;
+        case INTF_DIALOG_SENDKEY:
+           sendKey( de->i_arg ); break;
 #ifdef ENABLE_VLM
         case INTF_DIALOG_VLM:
            vlmDialog(); break;
 #endif
         case INTF_DIALOG_POPUPMENU:
-           VLCMenuBar::PopupMenu( p_intf, (de->i_arg != 0) ); break;
+        {
+           delete popupMenu; popupMenu = NULL;
+           bool show = (de->i_arg != 0);
+           if( show )
+               popupMenu = VLCMenuBar::PopupMenu( p_intf, show );
+           break;
+        }
         case INTF_DIALOG_AUDIOPOPUPMENU:
-           VLCMenuBar::AudioPopupMenu( p_intf, (de->i_arg != 0) ); break;
+        {
+           delete audioPopupMenu; audioPopupMenu = NULL;
+           bool show = (de->i_arg != 0);
+           if( show )
+               audioPopupMenu = VLCMenuBar::AudioPopupMenu( p_intf, show );
+           break;
+        }
         case INTF_DIALOG_VIDEOPOPUPMENU:
-           VLCMenuBar::VideoPopupMenu( p_intf, (de->i_arg != 0) ); break;
+        {
+           delete videoPopupMenu; videoPopupMenu = NULL;
+           bool show = (de->i_arg != 0);
+           if( show )
+               videoPopupMenu = VLCMenuBar::VideoPopupMenu( p_intf, show );
+           break;
+        }
         case INTF_DIALOG_MISCPOPUPMENU:
-           VLCMenuBar::MiscPopupMenu( p_intf, (de->i_arg != 0) ); break;
+        {
+           delete miscPopupMenu; miscPopupMenu = NULL;
+           bool show = (de->i_arg != 0);
+           if( show )
+               miscPopupMenu = VLCMenuBar::MiscPopupMenu( p_intf, show );
+           break;
+        }
         case INTF_DIALOG_WIZARD:
         case INTF_DIALOG_STREAMWIZARD:
             openAndStreamingDialogs(); break;
@@ -285,6 +316,18 @@ void DialogsProvider::epgDialog()
     EpgDialog::getInstance( p_intf )->toggleVisible();
 }
 
+void DialogsProvider::setPopupMenu()
+{
+    delete popupMenu;
+    popupMenu = VLCMenuBar::PopupMenu( p_intf, true );
+}
+
+void DialogsProvider::destroyPopupMenu()
+{
+    delete popupMenu;
+    popupMenu = NULL;
+}
+
 /* Generic open file */
 void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
 {
@@ -310,7 +353,8 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     /* Save */
     if( p_arg->b_save )
     {
-        QString file = QFileDialog::getSaveFileName( NULL, p_arg->psz_title,
+        QString file = QFileDialog::getSaveFileName( NULL,
+                                        qfu( p_arg->psz_title ),
                                         p_intf->p_sys->filepath, extensions );
         if( !file.isEmpty() )
         {
@@ -324,7 +368,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     else /* non-save mode */
     {
         QStringList files = QFileDialog::getOpenFileNames( NULL,
-                p_arg->psz_title, p_intf->p_sys->filepath,
+                qfu( p_arg->psz_title ), p_intf->p_sys->filepath,
                 extensions );
         p_arg->i_results = files.count();
         p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
@@ -645,20 +689,22 @@ void DialogsProvider::saveRecentsToPlaylist()
  ****************************************************************************/
 
 void DialogsProvider::streamingDialog( QWidget *parent,
-                                       const QString& mrl,
+                                       const QStringList& mrls,
                                        bool b_transcode_only,
                                        QStringList options )
 {
-    QString soutoption;
+    QStringList outputMRLs;
 
     /* Stream */
+    // Does streaming multiple files make sense?  I suppose so, just stream one
+    // after the other, but not at the moment.
     if( !b_transcode_only )
     {
-        SoutDialog *s = new SoutDialog( parent, p_intf, mrl );
+        SoutDialog *s = new SoutDialog( parent, p_intf, mrls[0] );
         s->setAttribute( Qt::WA_QuitOnClose, false ); // See #4883
         if( s->exec() == QDialog::Accepted )
         {
-            soutoption = s->getMrl();
+            outputMRLs.append(s->getMrl());
             delete s;
         }
         else
@@ -667,11 +713,15 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         }
     } else {
     /* Convert */
-        ConvertDialog *s = new ConvertDialog( parent, p_intf, mrl );
+        ConvertDialog *s = new ConvertDialog( parent, p_intf, mrls );
         s->setAttribute( Qt::WA_QuitOnClose, false ); // See #4883
         if( s->exec() == QDialog::Accepted )
         {
-            soutoption = s->getMrl();
+            /* Clear the playlist.  This is because we're going to be populating
+               it */
+            playlist_Clear( THEPL, pl_Unlocked );
+
+            outputMRLs = s->getMrls();
             delete s;
         }
         else
@@ -680,12 +730,30 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         }
     }
 
-    /* Get SoutMRL */
-    if( !soutoption.isEmpty() )
+    /* Get SoutMRL(s) */
+    if( !outputMRLs.isEmpty() )
     {
-        options += soutoption.split( " :");
+        /* For all of our MRLs */
+        for(int i = 0; i < outputMRLs.length(); i++)
+        {
 
-        Open::openMRLwithOptions( p_intf, mrl, &options, true, true, _("Streaming") );
+            /* Duplicate the options list.  This is because we need to have a
+             copy for every file we add to the playlist.*/
+            QStringList optionsCopy;
+            for(int j = 0; j < options.length(); j++)
+            {
+                optionsCopy.append(options[j]);
+            }
+
+            optionsCopy+= outputMRLs[i].split( " :");
+            QString title = "Converting " + mrls[i];
+
+            /* Add each file to convert to our playlist, making sure to not attempt to start playing it.*/
+            Open::openMRLwithOptions( p_intf, mrls[i], &optionsCopy, false, true, _(title.toStdString().c_str()) );
+        }
+
+        /* Start the playlist from the beginning */
+        playlist_Control(THEPL,PLAYLIST_PLAY,pl_Unlocked);
     }
 }
 
@@ -760,3 +828,32 @@ void DialogsProvider::SDMenuAction( const QString& data )
         playlist_ServicesDiscoveryRemove( THEPL, qtu( data ) );
 }
 
+void DialogsProvider::sendKey( int key )
+{
+     // translate from a vlc keycode into a Qt sequence
+     QKeySequence kseq0( VLCKeyToString( key, true ) );
+
+     if( popupMenu == NULL )
+     {
+         // make sure at least a non visible popupmenu is available
+         popupMenu = VLCMenuBar::PopupMenu( p_intf, false );
+         if( unlikely( popupMenu == NULL ) )
+             return;
+     }
+
+     // test against key accelerators from the popupmenu
+     QList<QAction*> actions = popupMenu->findChildren<QAction*>();
+     for( int i = 0; i < actions.size(); i++ )
+     {
+         QAction* action = actions.at(i);
+         QKeySequence kseq = action->shortcut();
+         if( kseq == kseq0 )
+         {
+             action->trigger();
+             return;
+         }
+     }
+
+     // forward key to vlc core when not a key accelerator
+     var_SetInteger( p_intf->p_libvlc, "key-pressed", key );
+}

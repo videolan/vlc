@@ -197,7 +197,7 @@ static int SkipFile(stream_t *s, int *count, rar_file_t ***file,
 
     rar_file_t *current = NULL;
     if (method != 0x30) {
-        msg_Warn(s, "Ignoring compressed file %s (method=0x%2.2x)", name, method);
+        msg_Dbg(s, "Ignoring compressed file %s (method=0x%2.2x)", name, method);
         goto exit;
     }
 
@@ -287,7 +287,8 @@ typedef struct {
 static const rar_pattern_t *FindVolumePattern(const char *location, bool b_extonly )
 {
     static const rar_pattern_t patterns[] = {
-        { ".part01.rar",  "%s.part%.2d.rar", 2,  99, false }, // new naming
+        { ".part1.rar",   "%s.part%.1d.rar", 2,   9, false }, // new naming
+        { ".part01.rar",  "%s.part%.2d.rar", 2,  99, false }, // new
         { ".part001.rar", "%s.part%.3d.rar", 2, 999, false }, // new
         { ".rar",         "%s.%c%.2d",       0, 999, true },  // old
         { NULL, NULL, 0, 0, false },
@@ -309,10 +310,12 @@ static const rar_pattern_t *FindVolumePattern(const char *location, bool b_exton
     return NULL;
 }
 
-int RarParse(stream_t *s, int *count, rar_file_t ***file, bool b_extonly)
+int RarParse(stream_t *s, int *count, rar_file_t ***file, unsigned int *pi_nbvols,
+             bool b_extonly)
 {
     *count = 0;
     *file = NULL;
+    *pi_nbvols = 1;
 
     const rar_pattern_t *pattern = FindVolumePattern(s->psz_path, b_extonly);
     int volume_offset = 0;
@@ -397,8 +400,7 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file, bool b_extonly)
             return VLC_SUCCESS;
 
         const int s_flags = s->i_flags;
-        if (has_next < 0)
-            s->i_flags |= OBJECT_FLAGS_NOINTERACT;
+        s->i_flags |= OBJECT_FLAGS_NOINTERACT;
         vol = stream_UrlNew(s, volume_mrl);
         s->i_flags = s_flags;
 
@@ -406,6 +408,7 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file, bool b_extonly)
             free(volume_mrl);
             return VLC_SUCCESS;
         }
+        (*pi_nbvols)++;
     }
 }
 

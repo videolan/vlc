@@ -171,6 +171,7 @@ static int Open(vlc_object_t *object)
     vd->manage  = NULL;
 
     vout_display_SendEventFullscreen(vd, false);
+    vout_display_DeleteWindow(vd, NULL);
     return VLC_SUCCESS;
 }
 
@@ -181,7 +182,7 @@ static void Close(vlc_object_t *object)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     fclose(sys->f);
     free(sys);
 }
@@ -281,16 +282,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
 static int Control(vout_display_t *vd, int query, va_list args)
 {
-    VLC_UNUSED(vd);
-    switch (query) {
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        if (cfg->is_fullscreen)
-            return VLC_EGENERIC;
-        return VLC_SUCCESS;
-    }
-    default:
-        return VLC_EGENERIC;
-    }
+    (void) vd; (void) query; (void) args;
+    return VLC_EGENERIC;
 }
-

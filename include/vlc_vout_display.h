@@ -143,7 +143,7 @@ enum {
 
     /* Ask the module to acknowledge/refuse the fullscreen state change after
      * being requested (externally or by VOUT_DISPLAY_EVENT_FULLSCREEN */
-    VOUT_DISPLAY_CHANGE_FULLSCREEN,     /* const vout_display_cfg_t *p_cfg */
+    VOUT_DISPLAY_CHANGE_FULLSCREEN,     /* bool fs */
 
     /* Ask the module to acknowledge/refuse the window management state change
      * after being requested externally or by VOUT_DISPLAY_WINDOW_STATE */
@@ -151,7 +151,7 @@ enum {
 
     /* Ask the module to acknowledge/refuse the display size change requested
      * (externally or by VOUT_DISPLAY_EVENT_DISPLAY_SIZE) */
-    VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,   /* const vout_display_cfg_t *p_cfg, int is_forced */
+    VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,   /* const vout_display_cfg_t *p_cfg */
 
     /* Ask the module to acknowledge/refuse fill display state change after
      * being requested externally */
@@ -170,9 +170,6 @@ enum {
      * The cropping requested is stored by video_format_t::i_x/y_offset and
      * video_format_t::i_visible_width/height */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,   /* const video_format_t *p_source */
-
-    /* Ask an opengl interface if available. */
-    VOUT_DISPLAY_GET_OPENGL,           /* vlc_gl_t ** */
 };
 
 /**
@@ -189,9 +186,11 @@ enum {
     VOUT_DISPLAY_EVENT_PICTURES_INVALID,    /* The buffer are now invalid and need to be changed */
 
     VOUT_DISPLAY_EVENT_FULLSCREEN,
+#if defined(_WIN32) || defined(__OS2__)
     VOUT_DISPLAY_EVENT_WINDOW_STATE,
+#endif
 
-    VOUT_DISPLAY_EVENT_DISPLAY_SIZE,        /* The display size need to change : int i_width, int i_height, bool is_fullscreen */
+    VOUT_DISPLAY_EVENT_DISPLAY_SIZE,        /* The display size need to change : int i_width, int i_height */
 
     /* */
     VOUT_DISPLAY_EVENT_CLOSE,
@@ -236,7 +235,7 @@ struct vout_display_owner_t {
      * These functions are set prior to the module instantiation and must not
      * be overwritten nor used directly (use the vout_display_*Window
      * wrapper */
-    vout_window_t *(*window_new)(vout_display_t *, const vout_window_cfg_t *);
+    vout_window_t *(*window_new)(vout_display_t *, unsigned type);
     void           (*window_del)(vout_display_t *, vout_window_t *);
 };
 
@@ -340,9 +339,9 @@ static inline void vout_display_SendEvent(vout_display_t *vd, int query, ...)
     va_end(args);
 }
 
-static inline void vout_display_SendEventDisplaySize(vout_display_t *vd, int width, int height, bool is_fullscreen)
+static inline void vout_display_SendEventDisplaySize(vout_display_t *vd, int width, int height)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_DISPLAY_SIZE, width, height, is_fullscreen);
+    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_DISPLAY_SIZE, width, height);
 }
 static inline void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 {
@@ -360,10 +359,12 @@ static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen);
 }
+#if defined(_WIN32)
 static inline void vout_display_SendWindowState(vout_display_t *vd, unsigned state)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_WINDOW_STATE, state);
 }
+#endif
 /* The mouse position (State and Moved event) must be expressed against vout_display_t::source unit */
 static inline void vout_display_SendEventMouseState(vout_display_t *vd, int x, int y, int button_mask)
 {
@@ -387,13 +388,11 @@ static inline void vout_display_SendEventMouseDoubleClick(vout_display_t *vd)
 }
 
 /**
- * Asks for a new window with the given configuration as hint.
- *
- * b_standalone/i_x/i_y may be overwritten by the core
+ * Asks for a new window of a given type.
  */
-static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, const vout_window_cfg_t *cfg)
+static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, unsigned type)
 {
-    return vd->owner.window_new(vd, cfg);
+    return vd->owner.window_new(vd, type);
 }
 /**
  * Deletes a window created by vout_display_NewWindow if window is non NULL
@@ -403,6 +402,14 @@ static inline void vout_display_DeleteWindow(vout_display_t *vd,
                                              vout_window_t *window)
 {
     vd->owner.window_del(vd, window);
+}
+
+static inline bool vout_display_IsWindowed(vout_display_t *vd)
+{
+    vout_window_t *window = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_INVALID);
+    if (window != NULL)
+        vout_display_DeleteWindow(vd, window);
+    return window != NULL;
 }
 
 /**

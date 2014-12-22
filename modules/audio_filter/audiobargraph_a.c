@@ -147,20 +147,17 @@ static int Open( vlc_object_t *p_this )
 
 static void SendValues(filter_t *p_filter, float *value, int nbChannels)
 {
-    char message[256];
+    char msg[256];
     size_t len = 0;
 
     for (int i = 0; i < nbChannels; i++) {
-        if (len >= sizeof(message))
+        if (len >= sizeof (msg))
             break;
-        len += snprintf(message + len, sizeof (message),"%f:", value[i]);
+        len += snprintf(msg + len, sizeof (msg) - len, "%f:", value[i]);
     }
 
-    message[len-1] = '\0';
     //msg_Dbg(p_filter, "values: %s", message);
-
-    var_SetString(p_filter->p_libvlc, "audiobargraph_v-i_values",
-            message);
+    var_SetString(p_filter->p_libvlc, "audiobargraph_v-i_values", msg);
 }
 
 /*****************************************************************************

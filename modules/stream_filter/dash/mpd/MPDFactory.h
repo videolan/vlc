@@ -26,7 +26,6 @@
 #define MPDFACTORY_H_
 
 #include "mpd/MPD.h"
-#include "mpd/BasicCMParser.h"
 #include "mpd/IsoffMainParser.h"
 
 namespace dash
@@ -37,10 +36,6 @@ namespace dash
         {
             public:
                 static MPD* create(dash::xml::Node *root, stream_t *p_stream, Profile profile);
-
-            private:
-                static MPD* createBasicCMMPD    (dash::xml::Node *root, stream_t *p_stream);
-                static MPD* createIsoffMainMPD  (dash::xml::Node *root, stream_t *p_stream);
         };
     }
 }

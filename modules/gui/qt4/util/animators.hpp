@@ -21,6 +21,8 @@
 #ifndef ANIMATORS_HPP
 #define ANIMATORS_HPP
 
+#include "qt4.hpp"
+
 #include <QObject>
 #include <QList>
 #include <QString>
@@ -38,13 +40,13 @@ class BasicAnimator : public QAbstractAnimation
 public:
     BasicAnimator( QObject *parent = 0 );
     void setFps( int _fps ) { fps = _fps; interval = 1000.0 / fps; }
-    virtual int duration() const { return 1000; }
+    int duration() const Q_DECL_OVERRIDE { return 1000; }
 
 signals:
     void frameChanged();
 
 protected:
-    virtual void updateCurrentTime ( int msecs );
+    void updateCurrentTime ( int msecs ) Q_DECL_OVERRIDE;
     int fps;
     int interval;
     int current_frame;
@@ -62,11 +64,11 @@ class PixmapAnimator : public BasicAnimator
 
 public:
     PixmapAnimator( QWidget *parent, QList<QString> _frames );
-    virtual int duration() const { return interval * pixmaps.count(); }
+    int duration() const Q_DECL_OVERRIDE { return interval * pixmaps.count(); }
     virtual ~PixmapAnimator();
     QPixmap *getPixmap() { return currentPixmap; }
 protected:
-    virtual void updateCurrentTime ( int msecs );
+    void updateCurrentTime ( int msecs ) Q_DECL_OVERRIDE;
     QList<QPixmap *> pixmaps;
     QPixmap *currentPixmap;
 signals:

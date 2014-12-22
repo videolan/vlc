@@ -21,6 +21,8 @@
 #ifndef VALIDATORS_HPP
 #define VALIDATORS_HPP
 
+#include "qt4.hpp"
+
 #include <QValidator>
 
 class UrlValidator : public QValidator
@@ -28,8 +30,8 @@ class UrlValidator : public QValidator
    Q_OBJECT
 public:
    UrlValidator( QObject *parent ) : QValidator( parent ) { }
-   virtual QValidator::State validate( QString&, int& ) const;
-   virtual void fixup ( QString & input ) const;
+   QValidator::State validate( QString&, int& ) const Q_DECL_OVERRIDE;
+   void fixup ( QString & input ) const Q_DECL_OVERRIDE;
 };
 
 #endif // VALIDATORS_HPP

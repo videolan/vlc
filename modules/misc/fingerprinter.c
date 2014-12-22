@@ -328,7 +328,7 @@ static void fill_metas_with_results( fingerprint_request_t *p_r, acoustid_finger
             {
                 vlc_meta_Set( p_meta, vlc_meta_Title, p_record->psz_title );
                 vlc_meta_Set( p_meta, vlc_meta_Artist, p_record->psz_artist );
-                vlc_meta_AddExtra( p_meta, "musicbrainz-id", p_record->sz_musicbrainz_id );
+                vlc_meta_AddExtra( p_meta, "musicbrainz-id", p_record->s_musicbrainz_id );
                 vlc_array_append( & p_r->results.metas_array, p_meta );
             }
         }

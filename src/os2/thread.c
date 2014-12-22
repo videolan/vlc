@@ -696,7 +696,9 @@ static int vlc_select( int nfds, fd_set *rdset, fd_set *wrset, fd_set *exset,
 
 }
 
-int vlc_poll( struct pollfd *fds, unsigned nfds, int timeout )
+/* Export vlc_poll_os2 directly regardless of EXPORTS of .def */
+__declspec(dllexport)
+int vlc_poll_os2( struct pollfd *fds, unsigned nfds, int timeout )
 {
     fd_set rdset, wrset, exset;
 

@@ -37,10 +37,12 @@
 
 #include "utils.h"
 
-extern JavaVM *myVm;
+#define THREAD_NAME "ANativeWindow"
+extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
+extern void jni_detach_thread();
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
-extern void  jni_SetAndroidSurfaceSize(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
+extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 
 static int Open(vout_window_t *, const vout_window_cfg_t *);
 static void Close(vout_window_t *);
@@ -54,7 +56,7 @@ vlc_module_begin()
     set_description(N_("Android native window"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_capability("vout window anative", 10)
+    set_capability("vout window", 0)
     set_callbacks(Open, Close)
 vlc_module_end()
 
@@ -72,6 +74,10 @@ struct vout_window_sys_t
  */
 static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
+    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
+     && cfg->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+        return VLC_EGENERIC;
+
     vout_window_sys_t *p_sys = malloc(sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
@@ -89,21 +95,22 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
 
     JNIEnv *p_env;
-    (*myVm)->AttachCurrentThread(myVm, &p_env, NULL);
+    jni_attach_thread(&p_env, THREAD_NAME);
     p_sys->window = p_sys->native_window.winFromSurface(p_env, javaSurface); // ANativeWindow_fromSurface call.
-    (*myVm)->DetachCurrentThread(myVm);
+    jni_detach_thread();
 
     jni_UnlockAndroidSurface();
 
     if (p_sys->window == NULL)
         goto error;
 
+    wnd->type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
     wnd->handle.anativewindow = p_sys->window;
     wnd->control = Control;
     wnd->sys = p_sys;
 
     // Set the Java surface size.
-    jni_SetAndroidSurfaceSize(cfg->width, cfg->height, cfg->width, cfg->height, 1, 1);
+    jni_SetSurfaceLayout(cfg->width, cfg->height, cfg->width, cfg->height, 1, 1);
 
     return VLC_SUCCESS;
 
@@ -137,7 +144,7 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
         {
             unsigned width = va_arg(ap, unsigned);
             unsigned height = va_arg(ap, unsigned);
-            jni_SetAndroidSurfaceSize(width, height, width, height, 1, 1);
+            jni_SetSurfaceLayout(width, height, width, height, 1, 1);
             break;
         }
         case VOUT_WINDOW_SET_STATE:

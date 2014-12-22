@@ -307,7 +307,7 @@ static int  Open ( vlc_object_t *p_this )
     p_demux->p_sys     = p_sys = (demux_sys_t*)calloc( 1, sizeof( demux_sys_t ) );
     if( !p_sys ) return VLC_ENOMEM;
 
-    msg_Dbg( p_demux, "version "LIVEMEDIA_LIBRARY_VERSION_STRING );
+    msg_Dbg( p_demux, "version " LIVEMEDIA_LIBRARY_VERSION_STRING );
 
     TAB_INIT( p_sys->i_track, p_sys->track );
     p_sys->f_npt = 0.;
@@ -591,7 +591,7 @@ createnew:
 
     p_sys->rtsp = new RTSPClientVlc( *p_sys->env, psz_url,
                                      var_InheritInteger( p_demux, "verbose" ) > 1 ? 1 : 0,
-                                     "LibVLC/"VERSION, i_http_port, p_sys );
+                                     "LibVLC/" VERSION, i_http_port, p_sys );
     if( !p_sys->rtsp )
     {
         msg_Err( p_demux, "RTSPClient::createNew failed (%s)",

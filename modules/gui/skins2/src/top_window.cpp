@@ -207,28 +207,7 @@ void TopWindow::processEvent( EvtKey &rEvtKey )
     // Only do the action when the key is down
     if( rEvtKey.getKeyState() == EvtKey::kDown )
     {
-        //XXX not to be hardcoded!
-        // Ctrl-S = Change skin
-        if( (rEvtKey.getMod() & EvtInput::kModCtrl) &&
-            rEvtKey.getKey() == 's' )
-        {
-            CmdDlgChangeSkin cmd( getIntf() );
-            cmd.execute();
-            return;
-        }
-
-        //XXX not to be hardcoded!
-        // Ctrl-T = Toggle on top
-        if( (rEvtKey.getMod() & EvtInput::kModCtrl) &&
-            rEvtKey.getKey() == 't' )
-        {
-            CmdOnTop cmd( getIntf() );
-            cmd.execute();
-            return;
-        }
-
-        var_SetInteger( getIntf()->p_libvlc, "key-pressed",
-                        rEvtKey.getModKey() );
+        getIntf()->p_sys->p_dialogs->sendKey( rEvtKey.getModKey() );
     }
 
     // Always store the modifier, which can be needed for scroll events.
@@ -260,7 +239,7 @@ void TopWindow::processEvent( EvtScroll &rEvtScroll )
         int i = (rEvtScroll.getDirection() == EvtScroll::kUp ?
                  KEY_MOUSEWHEELUP : KEY_MOUSEWHEELDOWN) | m_currModifier;
 
-        var_SetInteger( getIntf()->p_libvlc, "key-pressed", i );
+        getIntf()->p_sys->p_dialogs->sendKey( i );
     }
 }
 
@@ -382,13 +361,14 @@ void TopWindow::setActiveLayout( GenericLayout *pLayout )
     // Get the size of the layout and resize the window
     resize( pLayout->getWidth(), pLayout->getHeight() );
 
+    // The new layout is active
+    pLayout->getActiveVar().set( true );
+
     if( isVisible )
     {
         pLayout->onShow();
     }
 
-    // The new layout is active
-    pLayout->getActiveVar().set( true );
 }
 
 

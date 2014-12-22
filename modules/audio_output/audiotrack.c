@@ -135,7 +135,7 @@ static void Flush (audio_output_t *, bool);
 vlc_module_begin ()
     set_shortname("AudioTrack")
     set_description(N_("Android AudioTrack audio output"))
-    set_capability("audio output", 225)
+    set_capability("audio output", 0)
     set_category(CAT_AUDIO)
     set_subcategory(SUBCAT_AUDIO_AOUT)
     add_sw_gain()

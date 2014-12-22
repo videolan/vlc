@@ -68,7 +68,6 @@ static int AllocatePicture( picture_t *p_pic )
         p_pic->i_planes = 0;
         return VLC_EGENERIC;
     }
-    p_pic->gc.p_sys = (void *)p_data;
 
     /* Fill the p_pixels field for each plane */
     p_pic->p[0].p_pixels = p_data;
@@ -96,13 +95,23 @@ static void PictureDestroyContext( picture_t *p_picture )
     }
 }
 
-static void PictureDestroy( picture_t *p_picture )
+/**
+ * Destroys a picture allocated by picture_NewFromResource() but without
+ * a custom destruction callback.
+ */
+static void picture_DestroyFromResource( picture_t *p_picture )
 {
-    assert( p_picture &&
-            atomic_load( &p_picture->gc.refcount ) == 0 );
-
-    vlc_free( p_picture->gc.p_sys );
     free( p_picture->p_sys );
+    free( p_picture );
+}
+
+/**
+ * Destroys a picture allocated with picture_NewFromFormat()
+ * (and thus AllocatePicture()).
+ */
+static void picture_Destroy( picture_t *p_picture )
+{
+    vlc_free( p_picture->p[0].p_pixels );
     free( p_picture );
 }
 
@@ -140,7 +149,6 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
     }
 
     atomic_init( &p_picture->gc.refcount, 0 );
-    p_picture->gc.pf_destroy = NULL;
     p_picture->gc.p_sys = NULL;
 
     p_picture->i_nb_fields = 2;
@@ -226,7 +234,8 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     {
         p_picture->p_sys = p_resource->p_sys;
         p_picture->gc.pf_destroy = p_resource->pf_destroy;
-        assert( p_picture->gc.p_sys == NULL );
+        if( p_picture->gc.pf_destroy == NULL )
+            p_picture->gc.pf_destroy = picture_DestroyFromResource;
 
         for( int i = 0; i < p_picture->i_planes; i++ )
         {
@@ -242,14 +251,13 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
             free( p_picture );
             return NULL;
         }
+        p_picture->gc.pf_destroy = picture_Destroy;
     }
 
     /* */
     p_picture->format = fmt;
 
     atomic_init( &p_picture->gc.refcount, 1 );
-    if( p_picture->gc.pf_destroy == NULL )
-        p_picture->gc.pf_destroy = PictureDestroy;
 
     return p_picture;
 }
@@ -276,12 +284,15 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
 
 picture_t *picture_Hold( picture_t *p_picture )
 {
-    atomic_fetch_add( &p_picture->gc.refcount, 1 );
+    uintptr_t refs = atomic_fetch_add( &p_picture->gc.refcount, 1 );
+    assert( refs > 0 );
     return p_picture;
 }
 
 void picture_Release( picture_t *p_picture )
 {
+    assert( p_picture != NULL );
+
     uintptr_t refs = atomic_fetch_sub( &p_picture->gc.refcount, 1 );
     assert( refs != 0 );
     if( refs > 1 )

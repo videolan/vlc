@@ -209,7 +209,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
     if ([o_window isKeyWindow])
         [o_window orderOut:sender];
     else {
-        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentWindowLevel]];
+        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
         [o_window makeKeyAndOrderFront:sender];
     }
 }
@@ -305,7 +305,7 @@ static VLCAudioEffects *_o_sharedInstance = nil;
             tempArray = [tempString componentsSeparatedByString:@":"];
             count = [tempArray count];
             for (NSUInteger x = 0; x < count; x++)
-                playlist_EnableAudioFilter(p_playlist, (char *)[[tempArray objectAtIndex:x] UTF8String], true);
+                playlist_EnableAudioFilter(p_playlist, [[tempArray objectAtIndex:x] UTF8String], true);
         }
     }
     config_PutPsz(p_intf,"audio-filter",[tempString UTF8String]);

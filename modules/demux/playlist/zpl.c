@@ -86,6 +86,9 @@ static int Demux( demux_t *p_demux )
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     psz_line = stream_ReadLine( p_demux->s );
+    if( !psz_line )
+        return -1;
+
     char *psz_parse = psz_line;
 
     /* Skip leading tabs and spaces */

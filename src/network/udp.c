@@ -294,7 +294,9 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
                      const struct sockaddr *src, socklen_t srclen,
                      const struct sockaddr *grp, socklen_t grplen)
 {
-#ifdef MCAST_JOIN_SOURCE_GROUP
+/* MCAST_JOIN_SOURCE_GROUP was introduced to OS X in v10.7, but it doesn't work,
+ * so ignore it to use the same code path as on 10.5 or 10.6 */
+#if defined (MCAST_JOIN_SOURCE_GROUP) && !defined (__APPLE__)
     /* Agnostic SSM multicast join */
     int level;
     struct group_source_req gsr;

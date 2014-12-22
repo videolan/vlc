@@ -40,8 +40,8 @@ class EPGItem : public QGraphicsItem
 public:
     EPGItem( vlc_epg_event_t *data, EPGView *view );
 
-    virtual QRectF boundingRect() const;
-    virtual void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 );
+    QRectF boundingRect() const Q_DECL_OVERRIDE;
+    void paint( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0 ) Q_DECL_OVERRIDE;
 
     const QDateTime& start() const;
     QDateTime end() const;
@@ -60,9 +60,9 @@ public:
     bool playsAt( const QDateTime & ) const;
 
 protected:
-    virtual void focusInEvent( QFocusEvent * event );
-    virtual void hoverEnterEvent ( QGraphicsSceneHoverEvent * );
-    virtual void hoverLeaveEvent ( QGraphicsSceneHoverEvent * );
+    void focusInEvent( QFocusEvent * event ) Q_DECL_OVERRIDE;
+    void hoverEnterEvent ( QGraphicsSceneHoverEvent * ) Q_DECL_OVERRIDE;
+    void hoverLeaveEvent ( QGraphicsSceneHoverEvent * ) Q_DECL_OVERRIDE;
 
 private:
     EPGView     *m_view;

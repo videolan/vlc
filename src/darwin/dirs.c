@@ -1,11 +1,12 @@
 /*****************************************************************************
  * darwin_dirs.c: Mac OS X directories configuration
  *****************************************************************************
- * Copyright (C) 2001-2009 VLC authors and VideoLAN
- * Copyright © 2007-2012 Rémi Denis-Courmont
+ * Copyright (C) 2001-2014 VLC authors and VideoLAN
+ * Copyright (C) 2007-2012 Rémi Denis-Courmont
  *
- * Authors: Gildas Bazin <gbazin@videolan.org>
+ * Authors: Rémi Denis-Courmont
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          Pierre d'Herbemont <pdherbemont # videolan org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -42,7 +43,7 @@
 # define MAXPATHLEN 1024
 #endif
 
-static char *config_GetLibPath (void)
+char *config_GetLibDir (void)
 {
     /* Get the full program path and name */
     /* First try to see if we are linked to the framework */
@@ -54,54 +55,36 @@ static char *config_GetLibPath (void)
         /* Check for "VLCKit.framework/Versions/Current/VLCKit",
          * as well as "VLCKit.framework/Versions/A/VLCKit" and
          * "VLC.framework/Versions/B/VLCKit" */
-        if( p != NULL )
-        {
+        if (p != NULL) {
             /* Look for the next forward slash */
             p += 26; /* p_char += strlen(" VLCKit.framework/Versions/" ) */
             p += strcspn( p, "/" );
 
-            /* If the string ends with VLC then we've found a winner */
-            if ( !strcmp( p, "/VLCKit" ) )
-                return strdup( psz_img_name );
+            /* If the string ends with VLCKit then we've found a winner */
+            if (!strcmp( p, "/VLCKit"))
+                return strdup( dirname(psz_img_name) );
         }
 
         /* Do we end by "VLC"? If so we are the legacy VLC.app that doesn't
          * link to VLCKit. */
         size_t len = strlen(psz_img_name);
-        if( len >= 3 && !strcmp( psz_img_name + len - 3, "VLC") )
-            return strdup( psz_img_name );
+        if (len >= 3 && !strcmp( psz_img_name + len - 3, "VLC"))
+            return strdup( dirname(psz_img_name) );
 
         /* Do we end by "VLC-Plugin"? oh, we must be the NPAPI plugin */
-        if( len >= 10 && !strcmp( psz_img_name + len - 10, "VLC-Plugin") )
-            return strdup( psz_img_name );
+        if (len >= 10 && !strcmp( psz_img_name + len - 10, "VLC-Plugin"))
+            return strdup( dirname(psz_img_name) );
     }
 
-    /* We are not linked to the VLC.framework, let's use dladdr to figure
-     * libvlc path */
+    /* we are not part of any Mac-style package but were installed
+     * the UNIX way. let's trick-around a bit */
     Dl_info info;
-    if( dladdr(system_Init, &info) )
-        return strdup(dirname( info.dli_fname ));
-
-    char path[MAXPATHLEN+1];
-    uint32_t path_len = sizeof(path) - 1;
-
-    if ( !_NSGetExecutablePath(path, &path_len) )
-        return strdup(path);
-    return NULL;
-}
-
-char *config_GetLibDir (void)
-{
-    char *path = config_GetLibPath ();
-    if (path != NULL)
-    {
-        char *p = strrchr (path, '/');
-        if (p != NULL)
-        {
-            *p = '\0';
-            return path;
-        }
-        free (path);
+    if (dladdr(system_Init, &info)) {
+        char *incompletepath = strdup(dirname( (char *)info.dli_fname ));
+        char *path = NULL;
+        asprintf(&path, "%s/"PACKAGE, incompletepath);
+        free(incompletepath);
+        return path;
     }
 
     /* should never happen */
@@ -137,8 +120,7 @@ static char *config_GetHomeDir (void)
 static char *getAppDependentDir(vlc_userdir_t type)
 {
     const char *psz_path;
-    switch (type)
-    {
+    switch (type) {
         case VLC_CONFIG_DIR:
             psz_path = "%s/Library/Preferences/%s";
             break;
@@ -158,11 +140,9 @@ static char *getAppDependentDir(vlc_userdir_t type)
     const char *name = "org.videolan.vlc";
 
     CFBundleRef mainBundle = CFBundleGetMainBundle();
-    if (mainBundle)
-    {
+    if (mainBundle) {
         CFStringRef identifierAsNS = CFBundleGetIdentifier(mainBundle);
-        if (identifierAsNS)
-        {
+        if (identifierAsNS) {
             char identifier[256];
             Boolean ret = CFStringGetCString(identifierAsNS, identifier, sizeof(identifier), kCFStringEncodingUTF8);
             if (ret)
@@ -172,7 +152,7 @@ static char *getAppDependentDir(vlc_userdir_t type)
 
     char *psz_parent = config_GetHomeDir ();
     char *psz_dir;
-    if( asprintf( &psz_dir, psz_path, psz_parent, name) == -1 )
+    if ( asprintf( &psz_dir, psz_path, psz_parent, name) == -1 )
         psz_dir = NULL;
     free(psz_parent);
 
@@ -182,8 +162,7 @@ static char *getAppDependentDir(vlc_userdir_t type)
 char *config_GetUserDir (vlc_userdir_t type)
 {
     const char *psz_path;
-    switch (type)
-    {
+    switch (type) {
         case VLC_CONFIG_DIR:
         case VLC_TEMPLATES_DIR:
         case VLC_DATA_DIR:
@@ -215,9 +194,9 @@ char *config_GetUserDir (vlc_userdir_t type)
         default:
             psz_path = "%s";
     }
-    char *psz_parent = config_GetHomeDir ();
+    char *psz_parent = config_GetHomeDir();
     char *psz_dir;
-    if( asprintf( &psz_dir, psz_path, psz_parent ) == -1 )
+    if (asprintf( &psz_dir, psz_path, psz_parent ) == -1)
         psz_dir = NULL;
     free(psz_parent);
     return psz_dir;

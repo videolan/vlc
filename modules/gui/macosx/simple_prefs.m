@@ -1451,10 +1451,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [o_hotkeys_listbox reloadData];
         b_hotkeyChanged = YES;
     }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
-                                                        object: nil
-                                                      userInfo: nil];
 }
 
 - (void)showHotkeySettings

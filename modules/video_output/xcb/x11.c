@@ -115,8 +115,7 @@ static int Open (vlc_object_t *obj)
     /* Get window, connect to X server */
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    uint16_t width, height;
-    sys->embed = XCB_parent_Create (vd, &conn, &scr, &width, &height);
+    sys->embed = XCB_parent_Create (vd, &conn, &scr);
     if (sys->embed == NULL)
     {
         free (sys);
@@ -275,7 +274,8 @@ found_format:;
         xcb_create_pixmap (conn, sys->depth, pixmap, scr->root, 1, 1);
         c = xcb_create_window_checked (conn, sys->depth, sys->window,
                                        sys->embed->handle.xid, 0, 0,
-                                       width, height, 0,
+                                       vd->cfg->display.width,
+                                       vd->cfg->display.height, 0,
                                        XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                        vid, mask, values);
         xcb_map_window (conn, sys->window);
@@ -309,13 +309,6 @@ found_format:;
     vd->display = Display;
     vd->control = Control;
     vd->manage = Manage;
-
-    /* */
-    bool is_fullscreen = vd->cfg->is_fullscreen;
-    if (is_fullscreen && vout_window_SetFullScreen (sys->embed, true))
-        is_fullscreen = false;
-    vout_display_SendEventFullscreen (vd, is_fullscreen);
-    vout_display_SendEventDisplaySize (vd, width, height, is_fullscreen);
 
     return VLC_SUCCESS;
 
@@ -375,12 +368,12 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
     assert (pic->i_planes == 1);
 
     picture_resource_t res = {
-       .p = {
-           [0] = {
-               .i_lines = pic->p->i_lines,
-               .i_pitch = pic->p->i_pitch,
-           },
-       },
+        .p = {
+            [0] = {
+                .i_lines = pic->p->i_lines,
+                .i_pitch = pic->p->i_pitch,
+            },
+        },
     };
     picture_Release (pic);
 
@@ -393,13 +386,10 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 
         if (XCB_picture_Alloc (vd, &res, size, sys->conn, seg))
             break;
-        pic_array[count] = XCB_picture_NewFromResource (&vd->fmt, &res);
+        pic_array[count] = XCB_picture_NewFromResource (&vd->fmt, &res,
+                                                        sys->conn);
         if (unlikely(pic_array[count] == NULL))
-        {
-            if (seg != 0)
-                xcb_shm_detach (sys->conn, seg);
             break;
-        }
     }
     xcb_flush (sys->conn);
 
@@ -471,31 +461,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-    {
-        const vout_display_cfg_t *c = va_arg (ap, const vout_display_cfg_t *);
-        return vout_window_SetFullScreen (sys->embed, c->is_fullscreen);
-    }
-
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
         const vout_display_cfg_t *p_cfg =
             (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
-        const bool is_forced = (bool)va_arg (ap, int);
-
-        if (is_forced)
-        {   /* Changing the dimensions of the parent window takes place
-             * asynchronously (in the X server). Also it might fail or result
-             * in different dimensions than requested. Request the size change
-             * and return a failure since the size is not (yet) changed.
-             * If the change eventually succeeds, HandleParentStructure()
-             * will trigger a non-forced display size change later. */
-            vout_window_SetSize (sys->embed, p_cfg->display.width,
-                                 p_cfg->display.height);
-            return VLC_EGENERIC;
-        }
-
         vout_display_place_t place;
+
         vout_display_PlacePicture (&place, &vd->source, p_cfg, false);
 
         if (place.width  != vd->fmt.i_visible_width ||
@@ -511,11 +482,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                               XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y,
                               values);
         return VLC_SUCCESS;
-    }
-    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-    {
-        unsigned state = va_arg (ap, unsigned);
-        return vout_window_SetState (sys->embed, state);
     }
 
     case VOUT_DISPLAY_CHANGE_ZOOM:
@@ -578,6 +544,6 @@ static void ResetPictures (vout_display_t *vd)
         for (unsigned i = 0; i < MAX_PICTURES; i++)
             xcb_shm_detach (sys->conn, sys->seg_base + i);
 
-    picture_pool_Delete (sys->pool);
+    picture_pool_Release (sys->pool);
     sys->pool = NULL;
 }

@@ -95,15 +95,19 @@ static int Demux( demux_t *p_demux )
             psz_parse = strchr( psz_uri, '"' );
             if( psz_parse != NULL )
             {
-                input_item_t *p_input;
-
                 *psz_parse = '\0';
                 resolve_xml_special_chars( psz_uri );
                 psz_uri = ProcessMRL( psz_uri, p_demux->p_sys->psz_prefix );
-                p_input = input_item_NewExt( psz_uri, psz_uri,
-                                        0, NULL, 0, -1 );
-                input_item_node_AppendItem( p_subitems, p_input );
-                vlc_gc_decref( p_input );
+                if( psz_uri != NULL )
+                {
+                    input_item_t *p_input;
+
+                    p_input = input_item_NewExt( psz_uri, psz_uri,
+                                                 0, NULL, 0, -1 );
+                    input_item_node_AppendItem( p_subitems, p_input );
+                    vlc_gc_decref( p_input );
+                    free( psz_uri );
+                }
             }
         }
 

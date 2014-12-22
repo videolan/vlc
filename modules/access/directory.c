@@ -203,14 +203,10 @@ static int directory_open (directory *p_dir, char *psz_entry, DIR **handle)
 
 static bool directory_push (access_sys_t *p_sys, DIR *handle, char *psz_uri)
 {
-    directory *p_dir;
-
-    p_dir = malloc (sizeof (*p_dir));
-    if (unlikely (p_dir == NULL))
-        return NULL;
+    directory *p_dir = malloc (sizeof (*p_dir));
 
     psz_uri = strdup (psz_uri);
-    if (unlikely (psz_uri == NULL))
+    if (unlikely (p_dir == NULL || psz_uri == NULL))
         goto error;
 
     p_dir->parent = p_sys->current;
@@ -224,23 +220,27 @@ static bool directory_push (access_sys_t *p_sys, DIR *handle, char *psz_uri)
 #ifdef HAVE_OPENAT
     struct stat st;
     if (fstat (dirfd (handle), &st))
-        goto error;
+        goto error_filev;
     p_dir->device = st.st_dev;
     p_dir->inode = st.st_ino;
 #else
     p_dir->path = make_path (psz_uri);
     if (p_dir->path == NULL)
-        goto error;
+        goto error_filev;
 #endif
 
     p_sys->current = p_dir;
     return true;
 
-    error:
+error_filev:
+    for (int i = 0; i < p_dir->filec; i++)
+        free (p_dir->filev[i]);
+    free (p_dir->filev);
+
+error:
     closedir (handle);
     free (p_dir);
     free (psz_uri);
-
     return false;
 }
 
@@ -254,6 +254,8 @@ static bool directory_pop (access_sys_t *p_sys)
     p_sys->current = p_old->parent;
     closedir (p_old->handle);
     free (p_old->uri);
+    for (int i = 0; i < p_old->filec; i++)
+        free (p_old->filev[i]);
     free (p_old->filev);
 #ifndef HAVE_OPENAT
     free (p_old->path);
@@ -307,7 +309,10 @@ int DirInit (access_t *p_access, DIR *handle)
     else
         uri = vlc_path2uri (p_access->psz_filepath, "file");
     if (unlikely (uri == NULL))
+    {
+        closedir (handle);
         goto error;
+    }
 
     /* "Open" the base directory */
     p_sys->current = NULL;
@@ -338,7 +343,6 @@ int DirInit (access_t *p_access, DIR *handle)
     return VLC_SUCCESS;
 
 error:
-    closedir (handle);
     free (p_sys);
     return VLC_EGENERIC;
 }
@@ -396,12 +400,15 @@ int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         /* Create an input item for the current entry */
         psz_uri = encode_URI_component (psz_entry);
         if (psz_uri == NULL
-            || asprintf (&psz_full_uri, "%s/%s", p_current->uri, psz_uri) == -1)
+         || asprintf (&psz_full_uri, "%s/%s", p_current->uri, psz_uri) == -1)
+            psz_full_uri = NULL;
+
+        free (psz_uri);
+        if (psz_full_uri == NULL)
         {
             closedir (handle);
             continue;
         }
-        free (psz_uri);
 
         int i_type = i_res == ENTRY_DIR ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
         p_new = input_item_NewWithType (psz_full_uri, psz_entry,

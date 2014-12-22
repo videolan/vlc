@@ -25,9 +25,13 @@ Release HOWTO
  * Tarballs (Use a clean tree !!!)
   - Use 'make distcheck' to make sure all files are exported correctly
   - copy the tar.xz file on ganesh.videolan.org
-  - generate SHA, MD5 hashes and OpenPGP signature of these files
-    (use sha*sum --binary, md5sum --binary, gpg -u VideoLAN\ Release --sign --detach --armor)
-    Use the sumandsign.sh script
+  - generate SHA, MD5 hashes and OpenPGP signature of these files :
+        for file in vlc*; do
+            for sum in md5 sha1 sha256; do
+                ${sum}sum --binary $file > $file.$sum
+            done
+            gpg -sb -u VideoLAN\ Release --armor --force-v3-sigs $file
+        done
 
  * Contribs
   - Put a copy of the libraries or git snapshot in ftp://ftp.videolan.org/pub/contrib/

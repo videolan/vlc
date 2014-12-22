@@ -23,7 +23,10 @@
 
 #ifndef _SORTING_H_
 #define _SORTING_H_
+
 #include <vlc_media_library.h>
+#include <vlc_input_item.h>
+
 /* You can use these numbers with | and & to determine what you want to show */
 enum
 {

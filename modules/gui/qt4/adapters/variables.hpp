@@ -25,6 +25,8 @@
 # include <config.h>
 #endif
 
+#include "qt4.hpp"
+
 #include <QObject>
 #include <vlc_common.h>
 
@@ -47,7 +49,7 @@ class QVLCPointer : public QVLCVariable
 {
     Q_OBJECT
 private:
-    virtual void trigger (vlc_value_t, vlc_value_t);
+    void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
     QVLCPointer (vlc_object_t *, const char *, bool inherit = false);
@@ -62,7 +64,7 @@ class QVLCInteger : public QVLCVariable
 {
     Q_OBJECT
 private:
-    virtual void trigger (vlc_value_t, vlc_value_t);
+    void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
     QVLCInteger (vlc_object_t *, const char *, bool inherit = false);
@@ -77,7 +79,7 @@ class QVLCBool : public QVLCVariable
 {
     Q_OBJECT
 private:
-    virtual void trigger (vlc_value_t, vlc_value_t);
+   void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
     QVLCBool (vlc_object_t *, const char *, bool inherit = false);
@@ -92,7 +94,7 @@ class QVLCFloat : public QVLCVariable
 {
     Q_OBJECT
 private:
-    virtual void trigger (vlc_value_t, vlc_value_t);
+    void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
     QVLCFloat (vlc_object_t *, const char *, bool inherit = false);
@@ -107,7 +109,7 @@ class QVLCString : public QVLCVariable
 {
     Q_OBJECT
 private:
-    virtual void trigger (vlc_value_t, vlc_value_t);
+    void trigger (vlc_value_t, vlc_value_t) Q_DECL_OVERRIDE;
 
 public:
     QVLCString (vlc_object_t *, const char *, bool inherit = false);

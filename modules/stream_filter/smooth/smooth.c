@@ -23,25 +23,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include "smooth.h"
 
-#include <limits.h>
-
-#include <vlc_common.h>
 #include <vlc_plugin.h>
-
-#include <assert.h>
-#include <inttypes.h>
-
 #include <vlc_xml.h>
 #include <vlc_charset.h>
 #include <vlc_stream.h>
 #include <vlc_es.h>
 #include <vlc_codecs.h>
 
-#include "smooth.h"
+#include <limits.h>
+#include <assert.h>
+#include <inttypes.h>
+
 #include "../../demux/mp4/libmp4.h"
 
 /* I make the assumption that when the demux want to do a *time* seek,
@@ -116,6 +110,16 @@ static void print_chunk( stream_t *s, chunk_t *ck )
 }
 #endif
 
+static void cleanup_attributes(custom_attrs_t **cp)
+{
+    if( !*cp )
+        return;
+
+    free( (*cp)->psz_key );
+    free( (*cp)->psz_value );
+    FREENULL( *cp );
+}
+
 static int parse_Manifest( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
@@ -145,12 +149,13 @@ static int parse_Manifest( stream_t *s )
     uint8_t *WaveFormatEx;
     sms_stream_t *sms = NULL;
     quality_level_t *ql = NULL;
+    custom_attrs_t *cp = NULL;
     int64_t start_time = 0, duration = 0;
     int64_t computed_start_time = 0, computed_duration = 0;
     unsigned next_track_id = 1;
-    unsigned next_qid = 1;
     int loop_count = 0;
     bool b_weird = false;
+    int ret = VLC_SUCCESS;
 
 #define TIMESCALE 10000000
     while( (type = xml_ReaderNextNode( vlc_reader, &node )) > 0 )
@@ -166,19 +171,21 @@ static int parse_Manifest( stream_t *s )
                         if( !strcmp( name, "Duration" ) )
                             p_sys->vod_duration = strtoull( value, NULL, 10 );
                         else if( !strcmp( name, "TimeScale" ) )
-                            p_sys->timescale = strtoull( value, NULL, 10 );
+                            p_sys->timescale = strtoul( value, NULL, 10 );
+                        else if ( !strcmp( name, "LookAheadFragmentCount" ) )
+                            p_sys->download.lookahead_count = strtoul( value, NULL, 10 );
                     }
                     if( !p_sys->timescale )
                         p_sys->timescale = TIMESCALE;
                 }
                 else if( !strcmp( node, "StreamIndex" ) )
                 {
+                    sms_Free( sms );
                     sms = sms_New();
                     if( unlikely( !sms ) )
                     {
-                        xml_ReaderDelete( vlc_reader );
-                        xml_Delete( vlc_xml );
-                        return VLC_ENOMEM;
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
                     }
                     sms->id = next_track_id;
                     next_track_id++;
@@ -205,7 +212,7 @@ static int parse_Manifest( stream_t *s )
 
                         else if( !strcmp( name, "Chunks" ) )
                         {
-                            sms->vod_chunks_nb = strtol( value, NULL, 10 );
+                            sms->vod_chunks_nb = strtoul( value, NULL, 10 );
                             if( sms->vod_chunks_nb == 0 ) /* live */
                                 sms->vod_chunks_nb = UINT32_MAX;
                         }
@@ -229,6 +236,30 @@ static int parse_Manifest( stream_t *s )
                             sms->name = strdup( "text" );
                     }
                 }
+                else if ( !strcmp( node, "CustomAttributes" ) )
+                {
+                    if (!sms || !ql || cp)
+                        break;
+                    cp = (custom_attrs_t *) calloc( 1, sizeof(*cp) );
+                    if( unlikely( !cp ) )
+                    {
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
+                    }
+                }
+                else if ( !strcmp( node, "Attribute" ) )
+                {
+                    if (!sms || !ql || !cp)
+                        break;
+                    while( (name = xml_ReaderNextAttr( vlc_reader, &value )) )
+                    {
+                        if( !strcmp( name, "Name" ) && !cp->psz_key )
+                            cp->psz_key = strdup( value );
+                        else
+                        if( !strcmp( name, "Value" ) && !cp->psz_value )
+                            cp->psz_value = strdup( value );
+                    }
+                }
                 else if( !strcmp( node, "QualityLevel" ) )
                 {
                     if ( !sms )
@@ -237,21 +268,18 @@ static int parse_Manifest( stream_t *s )
                     ql = ql_New();
                     if( !ql )
                     {
-                        sms_Free( sms );
-                        xml_ReaderDelete( vlc_reader );
-                        xml_Delete( vlc_xml );
-                        return VLC_ENOMEM;
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
                     }
-                    ql->id = next_qid;
-                    next_qid++;
+
                     while( (name = xml_ReaderNextAttr( vlc_reader, &value )) )
                     {
                         if( !strcmp( name, "Index" ) )
                             ql->Index = strtol( value, NULL, 10 );
                         else if( !strcmp( name, "Bitrate" ) )
-                            ql->Bitrate = strtoull( value, NULL, 10 );
+                            ql->Bitrate = strtoul( value, NULL, 10 );
                         else if( !strcmp( name, "PacketSize" ) )
-                            ql->nBlockAlign = strtoull( value, NULL, 10 );
+                            ql->nBlockAlign = strtoul( value, NULL, 10 );
                         else if( !strcmp( name, "FourCC" ) )
                             ql->FourCC = VLC_FOURCC( value[0], value[1],
                                                      value[2], value[3] );
@@ -284,7 +312,7 @@ static int parse_Manifest( stream_t *s )
                             ql->BitsPerSample = strtoul( value, NULL, 10 );
                     }
 
-                    vlc_array_append( sms->qlevels, ql );
+                    ARRAY_APPEND( sms->qlevels, ql );
                 }
                 else if ( !strcmp( node, "Content" ) && sms && !sms->url_template )
                 {
@@ -301,9 +329,9 @@ static int parse_Manifest( stream_t *s )
                     while( (name = xml_ReaderNextAttr( vlc_reader, &value )) )
                     {
                         if( !strcmp( name, "t" ) )
-                            start_time = strtoull( value, NULL, 10 );
+                            start_time = strtoll( value, NULL, 10 );
                         if( !strcmp( name, "d" ) )
-                            duration = strtoull( value, NULL, 10 );
+                            duration = strtoll( value, NULL, 10 );
                     }
                     if( start_time == -1 )
                     {
@@ -340,13 +368,11 @@ static int parse_Manifest( stream_t *s )
                         }
                     }
 
-                    if( unlikely( chunk_New( sms, computed_duration,
+                    if( unlikely( chunk_AppendNew( sms, computed_duration,
                                         computed_start_time ) == NULL ) )
                     {
-                        sms_Free( sms );
-                        xml_ReaderDelete( vlc_reader );
-                        xml_Delete( vlc_xml );
-                        return VLC_ENOMEM;
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
                     }
                     if( b_weird && start_time != -1 )
                         computed_start_time = start_time;
@@ -354,29 +380,40 @@ static int parse_Manifest( stream_t *s )
                 break;
 
             case XML_READER_ENDELEM:
-                if( strcmp( node, "StreamIndex" ) )
-                    break;
-
-                if ( sms )
+                if ( !strcmp( node, "CustomAttributes" ) )
                 {
-                    vlc_array_append( p_sys->sms_streams, sms );
+                    if ( cp )
+                    {
+                        ARRAY_APPEND(ql->custom_attrs, cp);
+                        cp = NULL;
+                    }
+                }
+                else if ( !strcmp( node, "Attribute" ) )
+                {
+                    if( !cp->psz_key || !cp->psz_value )
+                    {
+                        cleanup_attributes( &cp );
+                    }
+                }
+                else if( strcmp( node, "StreamIndex" ) )
+                    break;
+                else if ( sms )
+                {
+                    ARRAY_APPEND( p_sys->sms, sms );
 
                     computed_start_time = 0;
                     computed_duration = 0;
                     loop_count = 0;
-                    if( b_weird && !chunk_New( sms, computed_duration, computed_start_time ) )
+                    if( b_weird && !chunk_AppendNew( sms, computed_duration, computed_start_time ) )
                     {
-                        sms_Free( sms );
-                        xml_ReaderDelete( vlc_reader );
-                        xml_Delete( vlc_xml );
-                        return VLC_ENOMEM;
+                        ret = VLC_ENOMEM;
+                        goto cleanup;
                     }
 
                     b_weird = false;
-                    next_qid = 1;
 
                     if( sms->qlevel_nb == 0 )
-                        sms->qlevel_nb = vlc_array_count( sms->qlevels );
+                        sms->qlevel_nb = sms->qlevels.i_size;
 
                     sms = NULL;
                 }
@@ -385,39 +422,47 @@ static int parse_Manifest( stream_t *s )
             case XML_READER_TEXT:
                 break;
             default:
-                sms_Free( sms );
-                xml_ReaderDelete( vlc_reader );
-                xml_Delete( vlc_xml );
-                return VLC_EGENERIC;
+                ret = VLC_EGENERIC;
+                goto cleanup;
         }
     }
 #undef TIMESCALE
 
+cleanup:
+    cleanup_attributes( &cp );
     sms_Free( sms );
     xml_ReaderDelete( vlc_reader );
     xml_Delete( vlc_xml );
 
-    return VLC_SUCCESS;
+    return ret;
 }
 
 static void SysCleanup( stream_sys_t *p_sys )
 {
-    if ( p_sys->sms_streams )
+    if ( p_sys->sms.i_size )
     {
-        for ( int i=0; i< p_sys->sms_streams->i_count ; i++ )
-            sms_Free( p_sys->sms_streams->pp_elems[i] );
-        vlc_array_destroy( p_sys->sms_streams );
+        FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms );
+            sms_Free( sms );
+        FOREACH_END();
+        ARRAY_RESET( p_sys->sms );
     }
-    vlc_array_destroy( p_sys->selected_st );
-    vlc_array_destroy( p_sys->download.chunks );
-    if ( p_sys->init_chunks )
-    {
-        for ( int i=0; i< p_sys->init_chunks->i_count ; i++ )
-            chunk_Free( p_sys->init_chunks->pp_elems[i] );
-        vlc_array_destroy( p_sys->init_chunks );
-    }
-    sms_queue_free( p_sys->bws );
-    free( p_sys->base_url );
+    ARRAY_RESET( p_sys->sms_selected );
+    if ( p_sys->playback.init.p_datachunk )
+        chunk_Free( p_sys->playback.init.p_datachunk );
+    free( p_sys->download.base_url );
+}
+
+static sms_stream_t *next_playback_stream( stream_sys_t *p_sys )
+{
+    sms_stream_t *p_candidate = NULL;
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+    if ( !sms->p_playback )
+        continue;
+    if ( p_candidate == NULL ||
+         sms->p_playback->start_time < p_candidate->p_playback->start_time )
+        p_candidate = sms;
+    FOREACH_END();
+    return p_candidate;
 }
 
 static int Open( vlc_object_t *p_this )
@@ -444,22 +489,10 @@ static int Open( vlc_object_t *p_this )
     /* remove the last part of the url */
     char *pos = strrchr( uri, '/');
     *pos = '\0';
-    p_sys->base_url = uri;
+    p_sys->download.base_url = uri;
 
-    /* XXX I don't know wether or not we should allow caching */
-    p_sys->b_cache = false;
-
-    p_sys->sms_streams = vlc_array_new();
-    p_sys->selected_st = vlc_array_new();
-    p_sys->download.chunks = vlc_array_new();
-    p_sys->init_chunks = vlc_array_new();
-    if( unlikely( !p_sys->sms_streams || !p_sys->download.chunks ||
-                  !p_sys->selected_st || !p_sys->init_chunks ) )
-    {
-        SysCleanup( p_sys );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
+    ARRAY_INIT( p_sys->sms );
+    ARRAY_INIT( p_sys->sms_selected );
 
     /* Parse SMS ismc content. */
     if( parse_Manifest( s ) != VLC_SUCCESS )
@@ -472,55 +505,69 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->vod_duration )
        p_sys->b_live = true;
 
-    p_sys->i_tracks = vlc_array_count( p_sys->sms_streams );
-
     /* Choose first video / audio / subtitle stream available */
-    sms_stream_t *tmp = NULL, *selected = NULL;
-    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
-    {
-        tmp = vlc_array_item_at_index( p_sys->sms_streams, i );
-        selected = SMS_GET_SELECTED_ST( tmp->type );
-        if( !selected )
-            vlc_array_append( p_sys->selected_st, tmp );
-    }
+    sms_stream_t *selected = NULL;
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms );
+    selected = SMS_GET_SELECTED_ST( sms->type );
+    if( !selected )
+        ARRAY_APPEND( p_sys->sms_selected, sms );
+    FOREACH_END();
 
     /* Choose lowest quality for the first chunks */
-    quality_level_t *wanted, *qlvl;
-    sms_stream_t *sms = NULL;
-
-    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
+    FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms );
+    quality_level_t *wanted = NULL;
+    if ( sms->qlevels.i_size )
     {
-        wanted = qlvl = NULL;
-        sms = vlc_array_item_at_index( p_sys->sms_streams, i );
-        if ( vlc_array_count( sms->qlevels ) )
+        wanted = sms->qlevels.p_elems[0];
+        for( int i=1; i < sms->qlevels.i_size; i++ )
         {
-            wanted = vlc_array_item_at_index( sms->qlevels, 0 );
-            for( unsigned i=1; i < sms->qlevel_nb; i++ )
-            {
-                qlvl = vlc_array_item_at_index( sms->qlevels, i );
-                if( qlvl->Bitrate < wanted->Bitrate )
-                    wanted = qlvl;
-            }
-            sms->download_qlvl = wanted->id;
+            if( sms->qlevels.p_elems[i]->Bitrate < wanted->Bitrate )
+                wanted = sms->qlevels.p_elems[i];
         }
+        sms->current_qlvl = wanted;
     }
+    FOREACH_END();
 
-    vlc_mutex_init( &p_sys->download.lock_wait );
+    /* Init our playback queue */
+    p_sys->p_current_stream = next_playback_stream( p_sys );
+    if ( !p_sys->p_current_stream )
+    {
+        SysCleanup( p_sys );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+    p_sys->playback.toffset = p_sys->p_current_stream->p_playback->start_time;
+    p_sys->playback.next_chunk_offset = CHUNK_OFFSET_UNSET;
+    p_sys->i_probe_length = SMS_PROBE_LENGTH;
+
+    vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->download.wait );
+    vlc_cond_init( &p_sys->playback.wait );
+    vlc_mutex_init( &p_sys->playback.lock );
 
     /* */
     s->pf_read = Read;
     s->pf_peek = Peek;
     s->pf_control = Control;
 
-    if( vlc_clone( &p_sys->thread, sms_Thread, s, VLC_THREAD_PRIORITY_INPUT ) )
+    vlc_mutex_lock( &p_sys->playback.lock );
+
+    if( vlc_clone( &p_sys->download.thread, sms_Thread, s, VLC_THREAD_PRIORITY_INPUT ) )
     {
+        vlc_mutex_unlock( &p_sys->playback.lock );
         SysCleanup( p_sys );
-        vlc_mutex_destroy( &p_sys->download.lock_wait );
+        vlc_mutex_destroy( &p_sys->lock );
         vlc_cond_destroy( &p_sys->download.wait );
+        vlc_mutex_destroy( &p_sys->playback.lock );
+        vlc_cond_destroy( &p_sys->playback.wait );
         free( p_sys );
         return VLC_EGENERIC;
     }
+
+    /* avoid race condition where the first init chunk isn't there yet
+       and a non waiting get_chunk() is done (would return empty stream)*/
+    vlc_cond_wait( &p_sys->playback.wait, &p_sys->playback.lock );
+    vlc_mutex_unlock( &p_sys->playback.lock );
 
     return VLC_SUCCESS;
 }
@@ -530,32 +577,109 @@ static void Close( vlc_object_t *p_this )
     stream_t *s = (stream_t*)p_this;
     stream_sys_t *p_sys = s->p_sys;
 
-    vlc_mutex_lock( &p_sys->download.lock_wait );
     p_sys->b_close = true;
-    /* Negate the condition variable's predicate */
-    for( int i = 0; i < 3; i++ )
-        p_sys->download.lead[i] = 0;
-    p_sys->playback.toffset = 0;
     vlc_cond_signal(&p_sys->download.wait);
-    vlc_mutex_unlock( &p_sys->download.lock_wait );
 
-    vlc_join( p_sys->thread, NULL );
-    vlc_mutex_destroy( &p_sys->download.lock_wait );
+    vlc_mutex_lock( &p_sys->playback.lock );
+    p_sys->playback.toffset = 0;
+    vlc_mutex_unlock( &p_sys->playback.lock );
+
+    vlc_join( p_sys->download.thread, NULL );
+    vlc_mutex_destroy( &p_sys->lock );
     vlc_cond_destroy( &p_sys->download.wait );
+    vlc_mutex_destroy( &p_sys->playback.lock );
+    vlc_cond_destroy( &p_sys->playback.wait );
 
     SysCleanup( p_sys );
     free( p_sys );
 }
 
-static chunk_t *get_chunk( stream_t *s, const bool wait )
+static chunk_t * gotoNextChunk( stream_sys_t *p_sys )
+{
+    assert(p_sys->p_current_stream);
+    chunk_t *p_prev = p_sys->p_current_stream->p_playback;
+    if ( p_prev )
+    {
+        if ( p_sys->b_live )
+        {
+            /* Discard chunk and update stream pointers */
+            assert( p_sys->p_current_stream->p_chunks ==  p_sys->p_current_stream->p_playback );
+            p_sys->p_current_stream->p_playback = p_sys->p_current_stream->p_playback->p_next;
+            p_sys->p_current_stream->p_chunks = p_sys->p_current_stream->p_chunks->p_next;
+            if ( p_sys->p_current_stream->p_lastchunk == p_prev )
+                p_sys->p_current_stream->p_lastchunk = NULL;
+            chunk_Free( p_prev );
+        }
+        else
+        {
+            /* Just cleanup chunk for reuse on seek */
+            p_sys->p_current_stream->p_playback = p_sys->p_current_stream->p_playback->p_next;
+            FREENULL(p_prev->data);
+            p_prev->read_pos = 0;
+            p_prev->offset = CHUNK_OFFSET_UNSET;
+            p_prev->size = 0;
+        }
+    }
+
+    /* Select new current pointer among streams playback heads */
+    p_sys->p_current_stream = next_playback_stream( p_sys );
+    if ( !p_sys->p_current_stream )
+        return NULL;
+
+    return p_sys->p_current_stream->p_playback;
+}
+
+static void setChunkOffset( stream_sys_t *p_sys, chunk_t *p_chunk )
+{
+    if ( p_chunk->offset == CHUNK_OFFSET_UNSET )
+    {
+        p_chunk->offset = CHUNK_OFFSET_0 + p_sys->playback.next_chunk_offset;
+        p_sys->playback.next_chunk_offset += p_chunk->size;
+    }
+}
+
+static chunk_t *get_chunk( stream_t *s, const bool wait, bool *pb_isinit )
 {
     stream_sys_t *p_sys = s->p_sys;
-    unsigned count;
-    chunk_t *chunk = NULL;
 
-    vlc_mutex_lock( &p_sys->download.lock_wait );
-    count = vlc_array_count( p_sys->download.chunks );
-    while( p_sys->playback.index >= count || p_sys->b_tseek )
+    bool b_foo;
+    if ( !pb_isinit )
+        pb_isinit = &b_foo;
+
+    *pb_isinit = false;
+
+    vlc_mutex_lock( &p_sys->lock );
+
+    assert(p_sys->p_current_stream);
+    chunk_t *p_chunk = p_sys->p_current_stream->p_playback;
+
+    /* init chunk handling, overrides the current one */
+    vlc_mutex_lock( &p_sys->playback.lock );
+    if ( p_sys->playback.init.p_datachunk )
+    {
+        if ( p_sys->playback.init.p_startchunk == NULL ||
+             p_sys->playback.init.p_startchunk == p_chunk )
+        {
+            /* Override current chunk and pass init chunk instead */
+            p_chunk = p_sys->playback.init.p_datachunk;
+            *pb_isinit = true;
+            setChunkOffset( p_sys, p_chunk );
+#ifndef NDEBUG
+            if ( !p_chunk->read_pos )
+                msg_Dbg( s, "Sending init chunk from offset %"PRId64, p_chunk->offset );
+#endif
+            vlc_mutex_unlock( &p_sys->playback.lock );
+            vlc_mutex_unlock( &p_sys->lock );
+            return p_chunk;
+        }
+    }
+    vlc_mutex_unlock( &p_sys->playback.lock );
+    /* !init chunk handling */
+
+    vlc_mutex_lock( &p_sys->p_current_stream->chunks_lock );
+    vlc_mutex_unlock( &p_sys->lock );
+
+    while( p_chunk && !p_chunk->data )
     {
         /* Yes I know, checking for p_sys->b_die is not reliable,
          * that's why vlc_object_alive() has been deprecated. But if I
@@ -563,63 +687,82 @@ static chunk_t *get_chunk( stream_t *s, const bool wait )
          * module anyaway. */
         if( !wait || p_sys->b_error )
         {
-            vlc_mutex_unlock( &p_sys->download.lock_wait );
-            msg_Warn( s, "get_chunk failed! (playback index %u)",
-                    p_sys->playback.index );
+            msg_Warn( s, "get_chunk failed! (starttime %"PRId64")", p_chunk->start_time );
+            vlc_mutex_unlock( &p_sys->p_current_stream->chunks_lock );
             return NULL;
         }
-        if( NO_MORE_CHUNKS )
+
+        if( no_more_chunks( p_sys ) )
         {
-            vlc_mutex_unlock( &p_sys->download.lock_wait );
             msg_Info( s, "No more chunks, end of the VOD" );
+            vlc_mutex_unlock( &p_sys->p_current_stream->chunks_lock );
             return NULL;
         }
 
-        msg_Dbg( s, "get_chunk is waiting !!!" );
-        vlc_cond_timedwait( &p_sys->download.wait,
-                &p_sys->download.lock_wait, mdate() + 500000 );
-        count = vlc_array_count( p_sys->download.chunks );
-        msg_Dbg( s, "count is %u, and index is %u", count, p_sys->playback.index );
+        msg_Dbg( s, "get_chunk is waiting for chunk %"PRId64"!!!", p_chunk->start_time );
+        vlc_mutex_lock( &p_sys->playback.lock );
+        p_sys->playback.b_underrun = true;
+        vlc_mutex_unlock( &p_sys->playback.lock );
+        vlc_cond_timedwait( &p_sys->playback.wait,
+                &p_sys->p_current_stream->chunks_lock, mdate() + CLOCK_FREQ/2 );
     }
-    chunk = vlc_array_item_at_index( p_sys->download.chunks, p_sys->playback.index );
 
-    vlc_mutex_unlock( &p_sys->download.lock_wait );
+    if ( p_chunk )
+    {
+        setChunkOffset( p_sys, p_chunk );
+#ifndef NDEBUG
+        if ( !p_chunk->read_pos )
+            msg_Dbg( s, "Sending chunk %"PRId64" from offset %"PRId64, p_chunk->start_time, p_chunk->offset );
+#endif
+    }
+    vlc_mutex_unlock( &p_sys->p_current_stream->chunks_lock );
 
-    return chunk;
+    return p_chunk;
 }
 
-static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
+static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
-    int copied = 0;
+    unsigned int copied = 0;
     chunk_t *chunk = NULL;
 
     do
     {
-        chunk = get_chunk( s, true );
+        bool b_isinitchunk = false;
+        chunk = get_chunk( s, true, &b_isinitchunk );
+        /* chunk here won't be processed further */
+//        msg_Dbg( s, "chunk %"PRIu64" init %d", (uint64_t) chunk, b_isinitchunk );
         if( !chunk )
             return copied;
 
-        if( chunk->read_pos >= (int)chunk->size )
+        if( chunk->read_pos >= chunk->size )
         {
             if( chunk->type == VIDEO_ES ||
                 ( !SMS_GET_SELECTED_ST( VIDEO_ES ) && chunk->type == AUDIO_ES ) )
             {
-                vlc_mutex_lock( &p_sys->download.lock_wait );
                 p_sys->playback.toffset += chunk->duration;
-                vlc_mutex_unlock( &p_sys->download.lock_wait );
-                vlc_cond_signal( &p_sys->download.wait);
+                vlc_cond_signal( &p_sys->download.wait );
             }
-            if( !p_sys->b_cache || p_sys->b_live )
+
+            if ( b_isinitchunk )
             {
-                FREENULL( chunk->data );
-                chunk->read_pos = 0;
+                assert( chunk->read_pos == chunk->size );
+                vlc_mutex_lock( &p_sys->playback.lock );
+                p_sys->playback.init.p_startchunk = NULL;
+                p_sys->playback.init.p_datachunk = NULL;
+                chunk_Free( chunk );
+                vlc_mutex_unlock( &p_sys->playback.lock );
             }
-
-            chunk->read_pos = 0;
-
-            p_sys->playback.index += 1;
-            msg_Dbg( s, "Incrementing playback index" );
+            else
+            {
+                vlc_mutex_lock( &p_sys->lock );
+                if( gotoNextChunk( p_sys ) == NULL )
+                {
+                    vlc_mutex_unlock( &p_sys->lock );
+                    return 0;
+                }
+                vlc_mutex_unlock( &p_sys->lock );
+            }
 
             continue;
         }
@@ -627,17 +770,11 @@ static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
         if( chunk->read_pos == 0 )
         {
             const char *verb = p_read == NULL ? "skipping" : "reading";
-            msg_Dbg( s, "%s chunk %u (%u bytes), type %i",
-                        verb, chunk->sequence, i_read, chunk->type );
-            /* check integrity */
-            uint32_t type;
-            uint8_t *slice = chunk->data;
-            SMS_GET4BYTES( type );
-            SMS_GETFOURCC( type );
-            assert( type == ATOM_moof || type == ATOM_uuid );
+            msg_Dbg( s, "%s chunk time %"PRIu64" (%u bytes), type %i",
+                        verb, chunk->start_time, i_read, chunk->type );
         }
 
-        int len = -1;
+        uint64_t len = 0;
         uint8_t *src = chunk->data + chunk->read_pos;
         if( i_read <= chunk->size - chunk->read_pos )
             len = i_read;
@@ -651,8 +788,8 @@ static int sms_Read( stream_t *s, uint8_t *p_read, int i_read )
             chunk->read_pos += len;
             copied += len;
             i_read -= len;
+            p_sys->playback.boffset += len;
         }
-
 
     } while ( i_read > 0 );
 
@@ -663,21 +800,21 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     int length = 0;
+    i_read = __MIN(INT_MAX, i_read);
 
     if( p_sys->b_error )
         return 0;
 
     length = sms_Read( s, (uint8_t*) buffer, i_read );
-    if( length < 0 )
+    if( length == 0 )
         return 0;
 
     /* This call to sms_Read will increment p_sys->playback.index
      * in case the last chunk we read into is entirely read */
     sms_Read( s, NULL, 0 );
 
-    p_sys->playback.boffset += length;
-    if( (unsigned)length < i_read )
-        msg_Warn( s, "could not read %i bytes, only %i!", i_read, length );
+    if( length < (int)i_read )
+        msg_Warn( s, "could not read %u bytes, only %u !", i_read, length );
 
     return length;
 }
@@ -685,9 +822,12 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
 /* The MP4 demux should never have to to peek outside the current chunk */
 static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned i_peek )
 {
-    chunk_t *chunk = get_chunk( s, true );
+    chunk_t *chunk = get_chunk( s, true, NULL );
     if( !chunk || !chunk->data )
+    {
+        msg_Err( s, "peek %"PRIu64" or no data", (uint64_t) chunk );
         return 0;
+    }
 
     int bytes = chunk->size - chunk->read_pos;
     assert( bytes > 0 );
@@ -696,7 +836,7 @@ static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned i_peek )
     {
         msg_Err( s, "could not peek %u bytes, only %i!", i_peek, bytes );
     }
-    msg_Dbg( s, "peeking at chunk %u!", chunk->sequence );
+    msg_Dbg( s, "peeking at chunk %"PRIu64, chunk->start_time );
     *pp_peek = chunk->data + chunk->read_pos;
 
     return bytes;
@@ -722,16 +862,19 @@ static int chunk_Seek( stream_t *s, const uint64_t pos )
     if( pos == p_sys->playback.boffset )
         return VLC_SUCCESS;
 
-    chunk_t *chunk = get_chunk( s, false );
+    chunk_t *chunk = get_chunk( s, false, NULL );
     if( chunk == NULL )
         return VLC_EGENERIC;
 
-    bool inside_chunk = pos >= chunk->offset &&
-            pos < (chunk->offset + chunk->size) ? true : false;
+    assert( chunk->offset != CHUNK_OFFSET_UNSET );
+    uint64_t i_chunkspos = CHUNK_OFFSET_0 + pos;
+
+    bool inside_chunk = i_chunkspos >= chunk->offset &&
+                        i_chunkspos < (chunk->offset + chunk->size);
 
     if( inside_chunk )
     {
-        chunk->read_pos = pos - chunk->offset;
+        chunk->read_pos = i_chunkspos - chunk->offset;
         p_sys->playback.boffset = pos;
         return VLC_SUCCESS;
     }
@@ -739,23 +882,43 @@ static int chunk_Seek( stream_t *s, const uint64_t pos )
     {
         if( p_sys->b_live )
         {
-            msg_Err( s, "Cannot seek outside the current chunk for a live stream" );
+            msg_Err( s, "Cannot seek to %"PRIu64" outside the current chunk for a live stream at %"PRIu64, pos, p_sys->playback.boffset );
             return VLC_EGENERIC;
         }
 
-        msg_Info( s, "Seeking outside the current chunk" );
+        msg_Info( s, "Seeking outside the current chunk (%"PRIu64"->%"PRIu64") to %"PRIu64, chunk->offset, chunk->offset+chunk->size, pos );
         assert( pos <= FAKE_STREAM_SIZE );
 
-        vlc_mutex_lock( &p_sys->download.lock_wait );
-
-        p_sys->b_tseek = true;
+        vlc_mutex_lock( &p_sys->lock );
+        resetChunksState( p_sys );
+        p_sys->playback.toffset = p_sys->time_pos;
+        p_sys->playback.next_chunk_offset = 0;
+        p_sys->playback.boffset = 0;
         p_sys->time_pos = p_sys->vod_duration * pos / FAKE_STREAM_SIZE;
-        for( int i = 0; i < 3; i++ )
-            p_sys->download.lead[i] = 0;
-        p_sys->playback.toffset = 0;
+
+        /* set queues heads */
+        FOREACH_ARRAY( sms_stream_t *sms, p_sys->sms_selected );
+        vlc_mutex_lock( &sms->chunks_lock );
+        chunk_t *p_chunk = sms->p_chunks;
+        while ( p_chunk )
+        {
+            if ( p_chunk->start_time > p_sys->time_pos )
+                break;
+            if ( p_chunk->start_time <= p_sys->time_pos &&
+                 p_chunk->start_time + p_chunk->duration >= p_sys->time_pos )
+            {
+                sms->p_playback = p_chunk;
+                sms->p_nextdownload = p_chunk;
+                break;
+            }
+            p_chunk = p_chunk->p_next;
+        }
+        vlc_mutex_unlock( &sms->chunks_lock );
+        FOREACH_END();
+        /* !set queues heads */
 
         vlc_cond_signal( &p_sys->download.wait);
-        vlc_mutex_unlock( &p_sys->download.lock_wait );
+        vlc_mutex_unlock( &p_sys->lock );
 
         return VLC_SUCCESS;
     }
@@ -771,9 +934,11 @@ static int Control( stream_t *s, int i_query, va_list args )
             *(va_arg( args, bool * )) = true;
             break;
         case STREAM_CAN_FASTSEEK:
+            *(va_arg( args, bool * )) = false;
+            break;
         case STREAM_CAN_PAUSE: /* TODO */
         case STREAM_CAN_CONTROL_PACE:
-            *(va_arg( args, bool * )) = false;
+            *(va_arg( args, bool * )) = true;
             break;
         case STREAM_GET_POSITION:
             *(va_arg( args, uint64_t * )) = p_sys->playback.boffset;
@@ -794,6 +959,9 @@ static int Control( stream_t *s, int i_query, va_list args )
             *va_arg (args, int64_t *) = INT64_C(1000) *
                 var_InheritInteger(s, "network-caching");
              break;
+        case STREAM_SET_PAUSE_STATE:
+            return (p_sys->b_live) ? VLC_EGENERIC : VLC_SUCCESS;
+            break;
         default:
             return VLC_EGENERIC;
     }

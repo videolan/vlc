@@ -72,9 +72,9 @@ private:
 
 protected:
     PlaylistWidget( intf_thread_t *_p_i, QWidget * );
-    virtual void dropEvent( QDropEvent *);
-    virtual void dragEnterEvent( QDragEnterEvent * );
-    virtual void closeEvent( QCloseEvent * );
+    void dropEvent( QDropEvent *) Q_DECL_OVERRIDE;
+    void dragEnterEvent( QDragEnterEvent * ) Q_DECL_OVERRIDE;
+    void closeEvent( QCloseEvent * ) Q_DECL_OVERRIDE;
 private slots:
     void changeView( const QModelIndex& index );
 
@@ -100,10 +100,10 @@ public:
     SplitterHandle( Qt::Orientation orientation, QSplitter * parent );
 
 protected:
-    virtual void paintEvent ( QPaintEvent * );
+    void paintEvent ( QPaintEvent * ) Q_DECL_OVERRIDE;
 
 private:
-    virtual QSize sizeHint () const;
+    QSize sizeHint () const Q_DECL_OVERRIDE;
 };
 #endif /* __APPLE__ */
 
@@ -111,9 +111,9 @@ class LocationButton : public QPushButton
 {
 public:
     LocationButton( const QString &, bool bold, bool arrow, QWidget * parent = NULL );
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const Q_DECL_OVERRIDE;
 protected:
-    virtual void paintEvent ( QPaintEvent * event );
+    void paintEvent ( QPaintEvent * event ) Q_DECL_OVERRIDE;
 private:
     bool b_arrow;
 };
@@ -128,9 +128,9 @@ public:
     LocationBar( VLCModel * );
     void setIndex( const QModelIndex & );
     void setModel( VLCModel * _model ) { model = _model; };
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const Q_DECL_OVERRIDE;
 protected:
-    virtual void resizeEvent ( QResizeEvent * event );
+    void resizeEvent ( QResizeEvent * event ) Q_DECL_OVERRIDE;
 
 private:
     void layOut( const QSize& size );

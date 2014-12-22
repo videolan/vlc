@@ -547,7 +547,7 @@ static bool set_item_info SIMPLE_INTERFACE
         input_item_SetDescription(p_input, psz_value);
     else if (!strcmp(psz_name, "info"))
         input_item_SetURL(p_input, psz_value);
-    else if (!strcmp(psz_name, "image"))
+    else if (!strcmp(psz_name, "image") && *psz_value)
         input_item_SetArtURL(p_input, psz_value);
     return true;
 }
@@ -752,6 +752,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
         }
     }
     if (b_release_input_item) vlc_gc_decref(p_new_input);
+    free(psz_value);
     return false;
 }
 

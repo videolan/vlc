@@ -29,13 +29,10 @@
 # define __STDC_CONSTANT_MACROS
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_vout.h>
-#include <vlc_vout_wrapper.h>
+#include <vlc_vout_window.h>
 #include <vlc_opengl.h>
 #include <vlc_filter.h>
 #include <vlc_rand.h>
@@ -135,16 +132,9 @@ struct filter_sys_t
 {
     /* */
     vlc_thread_t thread;
-    vlc_sem_t    ready;
-    bool         b_error;
 
     /* Opengl */
-    vout_thread_t  *p_vout;
-    vout_display_t *p_vd;
-
-    /* Window size */
-    int i_width;
-    int i_height;
+    vlc_gl_t  *gl;
 
     /* audio info */
     int i_channels;
@@ -176,25 +166,29 @@ static int Open( vlc_object_t * p_this )
         return VLC_ENOMEM;
 
     /* Create the object for the thread */
-    vlc_sem_init( &p_sys->ready, 0 );
-    p_sys->b_error       = false;
     p_sys->b_quit        = false;
-    p_sys->i_width       = var_InheritInteger( p_filter, "projectm-width" );
-    p_sys->i_height      = var_InheritInteger( p_filter, "projectm-height" );
     p_sys->i_channels    = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     vlc_mutex_init( &p_sys->lock );
     p_sys->p_buffer      = NULL;
     p_sys->i_buffer_size = 0;
     p_sys->i_nb_samples  = 0;
 
-    /* Create the thread */
-    if( vlc_clone( &p_sys->thread, Thread, p_filter, VLC_THREAD_PRIORITY_LOW ) )
+    /* Create the OpenGL context */
+    vout_window_cfg_t cfg;
+
+    memset(&cfg, 0, sizeof (cfg));
+    cfg.width = var_CreateGetInteger( p_filter, "projectm-width" );
+    cfg.height = var_CreateGetInteger( p_filter, "projectm-height" );
+
+    p_sys->gl = vlc_gl_surface_Create( VLC_OBJECT(p_filter), &cfg, NULL );
+    if( p_sys->gl == NULL )
         goto error;
 
-    vlc_sem_wait( &p_sys->ready );
-    if( p_sys->b_error )
+    /* Create the thread */
+    if( vlc_clone( &p_sys->thread, Thread, p_filter,
+                   VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_join( p_sys->thread, NULL );
+        vlc_gl_surface_Destroy( p_sys->gl );
         goto error;
     }
 
@@ -204,7 +198,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    vlc_sem_destroy( &p_sys->ready );
+    vlc_mutex_destroy( &p_sys->lock );
     free (p_sys );
     return VLC_EGENERIC;
 }
@@ -229,7 +223,7 @@ static void Close( vlc_object_t *p_this )
     vlc_join( p_sys->thread, NULL );
 
     /* Free the ressources */
-    vlc_sem_destroy( &p_sys->ready );
+    vlc_gl_surface_Destroy( p_sys->gl );
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->p_buffer );
     free( p_sys );
@@ -268,22 +262,6 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 }
 
 /**
- * Variable callback for the dummy vout
- */
-static int VoutCallback( vlc_object_t *p_vout, char const *psz_name,
-                         vlc_value_t oldv, vlc_value_t newv, void *p_data )
-{
-    VLC_UNUSED( p_vout ); VLC_UNUSED( oldv );
-    vout_display_t *p_vd = (vout_display_t*)p_data;
-
-    if( !strcmp(psz_name, "fullscreen") )
-    {
-        vout_SetDisplayFullscreen( p_vd, newv.b_bool );
-    }
-    return VLC_SUCCESS;
-}
-
-/**
  * ProjectM update thread which do the rendering
  * @param p_this: the p_thread object
  */
@@ -291,11 +269,7 @@ static void *Thread( void *p_data )
 {
     filter_t  *p_filter = (filter_t*)p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    video_format_t fmt;
-    vlc_gl_t *gl = NULL;
-    unsigned int i_last_width  = 0;
-    unsigned int i_last_height = 0;
+    vlc_gl_t *gl = p_sys->gl;
     locale_t loc;
     locale_t oldloc;
 
@@ -308,48 +282,6 @@ static void *Thread( void *p_data )
     char *psz_menu_font;
     projectM::Settings settings;
 #endif
-
-    vlc_savecancel();
-
-    /* Create the openGL provider */
-    p_sys->p_vout =
-        (vout_thread_t *)vlc_object_create( p_filter, sizeof(vout_thread_t) );
-    if( !p_sys->p_vout )
-        goto error;
-
-    /* */
-    video_format_Init( &fmt, 0 );
-    video_format_Setup( &fmt, VLC_CODEC_RGB32, p_sys->i_width, p_sys->i_height,
-                        p_sys->i_width, p_sys->i_height, 1, 1 );
-
-    vout_display_state_t state;
-    memset( &state, 0, sizeof(state) );
-    state.cfg.display.sar.num = 1;
-    state.cfg.display.sar.den = 1;
-    state.cfg.is_display_filled = true;
-    state.cfg.zoom.num = 1;
-    state.cfg.zoom.den = 1;
-    state.sar.num = 1;
-    state.sar.den = 1;
-
-    p_sys->p_vd = vout_NewDisplay( p_sys->p_vout, &fmt, &state, "opengl",
-                                   300000, 1000000 );
-    if( !p_sys->p_vd )
-    {
-        vlc_object_release( p_sys->p_vout );
-        goto error;
-    }
-    var_Create( p_sys->p_vout, "fullscreen", VLC_VAR_BOOL );
-    var_AddCallback( p_sys->p_vout, "fullscreen", VoutCallback, p_sys->p_vd );
-
-    gl = vout_GetDisplayOpengl( p_sys->p_vd );
-    if( !gl )
-    {
-        var_DelCallback( p_sys->p_vout, "fullscreen", VoutCallback, p_sys->p_vd );
-        vout_DeleteDisplay( p_sys->p_vd, NULL );
-        vlc_object_release( p_sys->p_vout );
-        goto error;
-    }
 
     vlc_gl_MakeCurrent( gl );
 
@@ -380,8 +312,8 @@ static void *Thread( void *p_data )
     settings.meshY                = var_InheritInteger( p_filter, "projectm-meshy" );
     settings.fps                  = 35;
     settings.textureSize          = var_InheritInteger( p_filter, "projectm-texture-size" );
-    settings.windowWidth          = p_sys->i_width;
-    settings.windowHeight         = p_sys->i_height;
+    settings.windowWidth          = var_InheritInteger( p_filter, "projectm-width" );
+    settings.windowHeight         = var_CreateGetInteger( p_filter, "projectm-height" );
     settings.presetURL            = psz_preset_path;
     settings.titleFontURL         = psz_title_font;
     settings.menuFontURL          = psz_menu_font;
@@ -403,8 +335,6 @@ static void *Thread( void *p_data )
     p_sys->p_buffer = (float*)calloc( p_sys->i_buffer_size,
                                       sizeof( float ) );
 
-    vlc_sem_post( &p_sys->ready );
-
     /* Choose a preset randomly or projectM will always show the first one */
     if ( p_projectm->getPlaylistSize() > 0 )
         p_projectm->selectPreset( (unsigned)vlc_mrand48() % p_projectm->getPlaylistSize() );
@@ -413,19 +343,13 @@ static void *Thread( void *p_data )
     for( ;; )
     {
         const mtime_t i_deadline = mdate() + CLOCK_FREQ / 50; /* 50 fps max */
-        /* Manage the events */
-        vout_ManageDisplay( p_sys->p_vd, true );
-        if( p_sys->p_vd->cfg->display.width  != i_last_width ||
-            p_sys->p_vd->cfg->display.height != i_last_height )
-        {
-            /* FIXME it is not perfect as we will have black bands */
-            vout_display_place_t place;
-            vout_display_PlacePicture( &place, &p_sys->p_vd->source, p_sys->p_vd->cfg, false );
-            p_projectm->projectM_resetGL( place.width, place.height );
 
-            i_last_width  = p_sys->p_vd->cfg->display.width;
-            i_last_height = p_sys->p_vd->cfg->display.height;
-        }
+        /* Manage the events */
+        unsigned width, height;
+        bool quit;
+
+        if( vlc_gl_surface_CheckSize( gl, &width, &height ) )
+            p_projectm->projectM_resetGL( width, height );
 
         /* Render the image and swap the buffers */
         vlc_mutex_lock( &p_sys->lock );
@@ -435,23 +359,11 @@ static void *Thread( void *p_data )
                                             p_sys->i_nb_samples );
             p_sys->i_nb_samples = 0;
         }
-        if( p_sys->b_quit )
-        {
-            vlc_mutex_unlock( &p_sys->lock );
-
-            delete p_projectm;
-            var_DelCallback( p_sys->p_vout, "fullscreen", VoutCallback, p_sys->p_vd );
-            vout_DeleteDisplay( p_sys->p_vd, NULL );
-            vlc_object_release( p_sys->p_vout );
-            if (loc != (locale_t)0)
-            {
-                uselocale (oldloc);
-                freelocale (loc);
-            }
-            vlc_gl_ReleaseCurrent( gl );
-            return NULL;
-        }
+        quit = p_sys->b_quit;
         vlc_mutex_unlock( &p_sys->lock );
+
+        if( quit )
+            break;
 
         p_projectm->renderFrame();
 
@@ -464,11 +376,15 @@ static void *Thread( void *p_data )
             vlc_gl_Unlock( gl );
         }
     }
-    assert(0);
 
-error:
-    p_sys->b_error = true;
-    vlc_sem_post( &p_sys->ready );
+    delete p_projectm;
+
+    if (loc != (locale_t)0)
+    {
+        uselocale (oldloc);
+        freelocale (loc);
+    }
+
+    vlc_gl_ReleaseCurrent( gl );
     return NULL;
 }
-

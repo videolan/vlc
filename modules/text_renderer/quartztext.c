@@ -79,7 +79,8 @@ static int RenderYUVA(filter_t *p_filter, subpicture_region_t *p_region,
                        CFMutableAttributedStringRef p_attrString);
 
 static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_font_color,
-                              bool b_bold, bool b_italic, bool b_underline,
+                              bool b_bold, bool b_italic, bool b_underline, bool b_halfwidth,
+                              int i_spacing,
                               CFRange p_range, CFMutableAttributedStringRef p_attrString);
 
 /*****************************************************************************
@@ -100,6 +101,8 @@ static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_fon
     "the video. This must be an hexadecimal (like HTML colors). The first two "\
     "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
     " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white")
+#define OUTLINE_TEXT N_("Add outline")
+#define SHADOW_TEXT N_("Add shadow")
 
 static const int pi_color_values[] = {
   0x00000000, 0x00808080, 0x00C0C0C0, 0x00FFFFFF, 0x00800000,
@@ -134,6 +137,8 @@ vlc_module_begin ()
     add_integer("quartztext-color", 0x00FFFFFF, COLOR_TEXT,
                  COLOR_LONGTEXT, false)
         change_integer_list(pi_color_values, ppsz_color_descriptions)
+    add_bool("quartztext-outline", false, OUTLINE_TEXT, NULL, false)
+    add_bool("quartztext-shadow", true, SHADOW_TEXT, NULL, false)
     set_capability("text renderer", 50)
     add_shortcut("text")
     set_callbacks(Create, Destroy)
@@ -181,6 +186,8 @@ struct filter_sys_t
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
+    bool           b_outline;
+    bool           b_shadow;
 
 #ifndef TARGET_OS_IPHONE
     ATSFontContainerRef    *p_fonts;
@@ -205,6 +212,8 @@ static int Create(vlc_object_t *p_this)
     p_sys->psz_font_name  = var_CreateGetString(p_this, "quartztext-font");
     p_sys->i_font_opacity = 255;
     p_sys->i_font_color = VLC_CLIP(var_CreateGetInteger(p_this, "quartztext-color") , 0, 0xFFFFFF);
+    p_sys->b_outline = var_InheritBool(p_this, "quartztext-outline");
+    p_sys->b_shadow = var_InheritBool(p_this, "quartztext-shadow");
     p_sys->i_font_size = GetFontSize(p_filter);
 
     p_filter->pf_render_text = RenderText;
@@ -310,11 +319,14 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     char         *psz_string;
+    char         *psz_fontname;
     int           i_font_size;
+    int           i_spacing = 0;
+    int           i_font_alpha;
     uint32_t      i_font_color;
-    bool          b_bold, b_uline, b_italic;
+    bool          b_bold, b_uline, b_italic, b_halfwidth;
     vlc_value_t val;
-    b_bold = b_uline = b_italic = FALSE;
+    b_bold = b_uline = b_italic = b_halfwidth = FALSE;
     VLC_UNUSED(p_chroma_list);
 
     p_sys->i_font_size = GetFontSize(p_filter);
@@ -328,6 +340,8 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         return VLC_EGENERIC;
 
     if (p_region_in->p_style) {
+        psz_fontname = p_region_in->p_style->psz_fontname ?
+            p_region_in->p_style->psz_fontname : p_sys->psz_font_name;
         i_font_color = VLC_CLIP(p_region_in->p_style->i_font_color, 0, 0xFFFFFF);
         i_font_size  = VLC_CLIP(p_region_in->p_style->i_font_size, 0, 255);
         if (p_region_in->p_style->i_style_flags) {
@@ -337,8 +351,12 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
                 b_italic = TRUE;
             if (p_region_in->p_style->i_style_flags & STYLE_UNDERLINE)
                 b_uline = TRUE;
+            if (p_region_in->p_style->i_style_flags & STYLE_HALFWIDTH)
+                b_halfwidth = TRUE;
         }
+        i_spacing = VLC_CLIP(p_region_in->p_style->i_spacing, 0, 255);
     } else {
+        psz_fontname = p_sys->psz_font_name;
         i_font_color = p_sys->i_font_color;
         i_font_size  = p_sys->i_font_size;
     }
@@ -366,7 +384,8 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         CFRelease(p_cfString);
         len = CFAttributedStringGetLength(p_attrString);
 
-        setFontAttibutes(p_sys->psz_font_name, i_font_size, i_font_color, b_bold, b_italic, b_uline,
+        setFontAttibutes(psz_fontname, i_font_size, i_font_color, b_bold, b_italic, b_uline, b_halfwidth,
+                                             i_spacing,
                                              CFRangeMake(0, len), p_attrString);
 
         RenderYUVA(p_filter, p_region_out, p_attrString);
@@ -523,11 +542,16 @@ static int HandleFontAttributes(xml_reader_t *p_xml_reader,
 }
 
 static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_font_color,
-        bool b_bold, bool b_italic, bool b_underline,
+        bool b_bold, bool b_italic, bool b_underline, bool b_halfwidth,
+        int i_spacing,
         CFRange p_range, CFMutableAttributedStringRef p_attrString)
 {
     CFStringRef p_cfString;
     CTFontRef   p_font;
+
+    int i_font_width = b_halfwidth ? i_font_size / 2 : i_font_size;
+    CGAffineTransform trans = CGAffineTransformMakeScale((float)i_font_width
+                                                         / i_font_size, 1.0);
 
     // fallback on default
     if (!psz_fontname)
@@ -538,7 +562,7 @@ static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_fon
                                             kCFStringEncodingUTF8);
     p_font     = CTFontCreateWithName(p_cfString,
                                        (float)i_font_size,
-                                       NULL);
+                                       &trans);
     CFRelease(p_cfString);
     CFAttributedStringSetAttribute(p_attrString,
                                     p_range,
@@ -607,6 +631,18 @@ static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_fon
                                     fg_text);
     CFRelease(fg_text);
 
+    // spacing
+    if (i_spacing > 0)
+    {
+        CGFloat spacing = i_spacing;
+        CFNumberRef spacingCFNum = CFNumberCreate(NULL,
+                kCFNumberCGFloatType, &spacing);
+        CFAttributedStringSetAttribute(p_attrString,
+                                        p_range,
+                                        kCTKernAttributeName,
+                                        spacingCFNum);
+        CFRelease(spacingCFNum);
+    }
 }
 
 static void GetAttrStrFromFontStack(font_stack_t **p_fonts,
@@ -622,7 +658,8 @@ static void GetAttrStrFromFontStack(font_stack_t **p_fonts,
         setFontAttibutes(psz_fontname,
                          i_font_size,
                          i_font_color,
-                         b_bold, b_italic, b_uline,
+                         b_bold, b_italic, b_uline, FALSE,
+                         0,
                          p_range,
                          p_attrString);
     }
@@ -785,7 +822,7 @@ static int RenderHtml(filter_t *p_filter, subpicture_region_t *p_region_out,
                          * of times to show the progress marker on the text.
                          */
                         var_SetBool(p_filter, "text-rerender", true);
-                    } else {
+                    } else if (strcasecmp("text", name)) {
                         /* Only text and karaoke tags are supported */
                         msg_Dbg(p_filter, "Unsupported top-level tag "
                                            "<%s> ignored.", name);
@@ -861,12 +898,14 @@ static CGContextRef CreateOffScreenContext(int i_width, int i_height,
     return p_context;
 }
 
-static offscreen_bitmap_t *Compose(int i_text_align,
+static offscreen_bitmap_t *Compose(filter_t *p_filter,
+                                    subpicture_region_t *p_region,
                                     CFMutableAttributedStringRef p_attrString,
                                     unsigned i_width,
                                     unsigned i_height,
                                     unsigned *pi_textblock_height)
 {
+    filter_sys_t *p_sys   = p_filter->p_sys;
     offscreen_bitmap_t  *p_offScreen  = NULL;
     CGColorSpaceRef      p_colorSpace = NULL;
     CGContextRef         p_context = NULL;
@@ -879,9 +918,9 @@ static offscreen_bitmap_t *Compose(int i_text_align,
 
         CGContextSetTextMatrix(p_context, CGAffineTransformIdentity);
 
-        if (i_text_align == SUBPICTURE_ALIGN_RIGHT)
+        if (p_region->i_align & SUBPICTURE_ALIGN_RIGHT)
             horiz_flush = 1.0;
-        else if (i_text_align != SUBPICTURE_ALIGN_LEFT)
+        else if ((p_region->i_align & SUBPICTURE_ALIGN_LEFT) == 0)
             horiz_flush = 0.5;
         else
             horiz_flush = 0.0;
@@ -903,8 +942,19 @@ static offscreen_bitmap_t *Compose(int i_text_align,
             CGPathRelease(p_path);
 
             // Set up black outlining of the text --
-            CGContextSetRGBStrokeColor(p_context, 0, 0, 0, 0.5);
-            CGContextSetTextDrawingMode(p_context, kCGTextFillStroke);
+            if (p_sys->b_outline)
+            {
+                CGContextSetRGBStrokeColor(p_context, 0, 0, 0, 0.5);
+                CGContextSetTextDrawingMode(p_context, kCGTextFillStroke);
+            }
+
+            // Shadow
+            if (p_sys->b_shadow)
+            {
+                // TODO: Use CGContextSetShadowWithColor.
+                // TODO: Use user defined parrameters (color, distance, etc.)
+                CGContextSetShadow(p_context, CGSizeMake(3.0f, -3.0f), 2.0f);
+            }
 
             if (frame != NULL) {
                 CFArrayRef lines;
@@ -925,6 +975,8 @@ static offscreen_bitmap_t *Compose(int i_text_align,
 
                     double penOffset = CTLineGetPenOffsetForFlush(line, horiz_flush, (i_width  - HORIZONTAL_MARGIN*2));
                     penPosition.x = HORIZONTAL_MARGIN + penOffset;
+                    if (horiz_flush == 0.0)
+                        penPosition.x = p_region->i_x;
                     penPosition.y -= ascent;
                     CGContextSetTextPosition(p_context, penPosition.x, penPosition.y);
                     CTLineDraw(line, p_context);
@@ -969,14 +1021,13 @@ static int RenderYUVA(filter_t *p_filter, subpicture_region_t *p_region,
 
     unsigned i_width = p_filter->fmt_out.video.i_visible_width;
     unsigned i_height = p_filter->fmt_out.video.i_visible_height;
-    unsigned i_text_align = p_region->i_align & 0x3;
 
     if (!p_attrString) {
         msg_Err(p_filter, "Invalid argument to RenderYUVA");
         return VLC_EGENERIC;
     }
 
-    p_offScreen = Compose(i_text_align, p_attrString,
+    p_offScreen = Compose(p_filter, p_region, p_attrString,
                            i_width, i_height, &i_textblock_height);
 
     if (!p_offScreen) {

@@ -74,7 +74,7 @@ enum ItemAction {
 class SelectorActionButton : public QFramelessButton
 {
 protected:
-    virtual void paintEvent( QPaintEvent * );
+    void paintEvent( QPaintEvent * ) Q_DECL_OVERRIDE;
 };
 
 class PLSelItem : public QWidget
@@ -109,6 +109,8 @@ private:
     QHBoxLayout*         layout;
 };
 
+#include <vlc_input_item.h>
+
 Q_DECLARE_METATYPE( playlist_item_t *);
 Q_DECLARE_METATYPE( input_item_t *);
 class PLSelector: public QTreeWidget
@@ -122,11 +124,11 @@ public:
     int getCurrentItemCategory();
 
 protected:
-    virtual void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const;
-    virtual void dragMoveEvent ( QDragMoveEvent * event );
-    virtual bool dropMimeData ( QTreeWidgetItem *, int, const QMimeData *, Qt::DropAction );
-    virtual QStringList mimeTypes () const;
-    virtual void wheelEvent(QWheelEvent *e);
+    void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const Q_DECL_OVERRIDE;
+    void dragMoveEvent ( QDragMoveEvent * event ) Q_DECL_OVERRIDE;
+    bool dropMimeData ( QTreeWidgetItem *, int, const QMimeData *, Qt::DropAction ) Q_DECL_OVERRIDE;
+    QStringList mimeTypes () const Q_DECL_OVERRIDE;
+    void wheelEvent(QWheelEvent *e) Q_DECL_OVERRIDE;
 
 private:
     void createItems();

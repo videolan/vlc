@@ -38,11 +38,10 @@
 #endif
 
 #include <assert.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <unistd.h>     /* close() */
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -51,7 +50,6 @@
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
-#include <vlc_url.h>
 #include <vlc_vout.h>
 #include <vlc_dialog.h>
 #include <vlc_iso_lang.h>
@@ -1285,7 +1283,7 @@ static void ESNew( demux_t *p_demux, int i_id )
 
     if( tk->b_seen ) return;
 
-    if( ps_track_fill( tk, 0, i_id ) )
+    if( ps_track_fill( tk, 0, i_id, NULL ) )
     {
         msg_Warn( p_demux, "unknown codec for id=0x%x", i_id );
         return;
@@ -1469,7 +1467,7 @@ static int ProbeDVD( const char *psz_name )
     /* ISO 9660 volume descriptor */
     char iso_dsc[6];
     if( lseek( fd, 0x8000 + 1, SEEK_SET ) == -1
-     || read( fd, iso_dsc, sizeof (iso_dsc) ) < sizeof (iso_dsc)
+     || read( fd, iso_dsc, sizeof (iso_dsc) ) < (int)sizeof (iso_dsc)
      || memcmp( iso_dsc, "CD001\x01", 6 ) )
         goto bailout;
 

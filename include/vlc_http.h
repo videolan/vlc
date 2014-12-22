@@ -33,6 +33,9 @@
  * HTTP clients.
  */
 
+#include <vlc_url.h>
+#include <vlc_arrays.h>
+
 /* RFC 2617: Basic and Digest Access Authentication */
 typedef struct http_auth_t
 {
@@ -63,5 +66,31 @@ VLC_API char *http_auth_FormatAuthorizationHeader
             ( vlc_object_t *, http_auth_t *,
               const char *, const char *,
               const char *, const char * ) VLC_USED;
+
+/* RFC 6265: cookies */
+
+typedef struct vlc_http_cookie_jar_t vlc_http_cookie_jar_t;
+
+VLC_API vlc_http_cookie_jar_t * vlc_http_cookies_new( void ) VLC_USED;
+VLC_API void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar );
+
+/**
+ * Parse a value of an incoming Set-Cookie header and append the
+ * cookie to the cookie jar if appropriate.
+ *
+ * @param p_jar cookie jar object
+ * @param psz_cookie_header value of Set-Cookie
+ * @return true, if the cookie was added, false otherwise
+ */
+VLC_API bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char * psz_cookie_header, const vlc_url_t * p_url );
+
+/**
+ * Returns a cookie value that match the given URL.
+ *
+ * @params p_jar a cookie jar
+ * @params p_url the URL for which the cookies are returned
+ * @return A string consisting of semicolon-separated cookie NAME=VALUE pairs.
+ */
+VLC_API char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t * p_url );
 
 #endif /* VLC_HTTP_H */

@@ -94,7 +94,7 @@ static block_t *U8toS16(filter_t *filter, block_t *bsrc)
     uint8_t *src = (uint8_t *)bsrc->p_buffer;
     int16_t *dst = (int16_t *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer; i--;)
-        *dst++ = ((*src++) - 128) << 8;
+        *dst++ = ((*src++) << 8) - 0x8000;
 out:
     block_Release(bsrc);
     VLC_UNUSED(filter);
@@ -128,7 +128,7 @@ static block_t *U8toS32(filter_t *filter, block_t *bsrc)
     uint8_t *src = (uint8_t *)bsrc->p_buffer;
     int32_t *dst = (int32_t *)bdst->p_buffer;
     for (size_t i = bsrc->i_buffer; i--;)
-        *dst++ = ((*src++) - 128) << 24;
+        *dst++ = ((*src++) << 24) - 0x80000000;
 out:
     block_Release(bsrc);
     VLC_UNUSED(filter);
@@ -185,7 +185,7 @@ static block_t *S16toFl32(filter_t *filter, block_t *bsrc)
          * of 19 seconds for the above division. */
         union { float f; int32_t i; } u;
         u.i = *src++ + 0x43c00000;
-        *dst++ = u.f - 384.0;
+        *dst++ = u.f - 384.f;
     }
 #endif
 out:
@@ -265,7 +265,7 @@ static block_t *Fl32toS16(filter_t *filter, block_t *b)
 #else
         /* This is Walken's trick based on IEEE float format. */
         union { float f; int32_t i; } u;
-        u.f = *src++ + 384.0;
+        u.f = *src++ + 384.f;
         if (u.i > 0x43c07fff)
             *dst++ = 32767;
         else if (u.i < 0x43bf8000)
@@ -375,11 +375,11 @@ static block_t *Fl64toU8(filter_t *filter, block_t *b)
     uint8_t *dst = (uint8_t *)src;
     for (size_t i = b->i_buffer / 8; i--;)
     {
-        float s = *(src++) * 128.f;
-        if (s >= 127.)
+        float s = *(src++) * 128.;
+        if (s >= 127.f)
             *(dst++) = 255;
         else
-        if (s <= -128.)
+        if (s <= -128.f)
             *(dst++) = 0;
         else
             *(dst++) = lround(s) + 128;
@@ -426,10 +426,10 @@ static block_t *Fl64toS32(filter_t *filter, block_t *b)
     for (size_t i = b->i_buffer / 8; i--;)
     {
         float s = *(src++) * 2147483648.;
-        if (s >= 2147483647.)
+        if (s >= 2147483647.f)
             *(dst++) = 2147483647;
         else
-        if (s <= -2147483648.)
+        if (s <= -2147483648.f)
             *(dst++) = -2147483648;
         else
             *(dst++) = lround(s);

@@ -26,20 +26,23 @@
 #endif
 
 #include "AdaptationLogicFactory.h"
+#include "adaptationlogic/AlwaysBestAdaptationLogic.h"
+#include "adaptationlogic/RateBasedAdaptationLogic.h"
+#include "adaptationlogic/AlwaysLowestAdaptationLogic.hpp"
 
 using namespace dash::logic;
-using namespace dash::xml;
 using namespace dash::mpd;
 
 IAdaptationLogic* AdaptationLogicFactory::create ( IAdaptationLogic::LogicType logic,
-                                                  IMPDManager *mpdManager, stream_t *stream)
+                                                   MPD *mpd)
 {
     switch(logic)
     {
-        case IAdaptationLogic::AlwaysBest:      return new AlwaysBestAdaptationLogic    (mpdManager, stream);
-        case IAdaptationLogic::RateBased:       return new RateBasedAdaptationLogic     (mpdManager, stream);
+        case IAdaptationLogic::AlwaysBest:      return new AlwaysBestAdaptationLogic    (mpd);
+        case IAdaptationLogic::AlwaysLowest:    return new AlwaysLowestAdaptationLogic  (mpd);
+        case IAdaptationLogic::FixedRate:       return new FixedRateAdaptationLogic     (mpd);
         case IAdaptationLogic::Default:
-        case IAdaptationLogic::AlwaysLowest:
+        case IAdaptationLogic::RateBased:       return new RateBasedAdaptationLogic     (mpd);
         default:
             return NULL;
     }

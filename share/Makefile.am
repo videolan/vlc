@@ -160,6 +160,7 @@ nobase_doc_DATA = \
 	lua/extensions/README.txt \
 	lua/intf/README.txt \
 	lua/intf/dumpmeta.lua \
+	lua/meta/README.txt \
 	lua/meta/art/README.txt \
 	lua/meta/art/01_googleimage.lua \
 	lua/meta/fetcher/README.txt \
@@ -198,6 +199,7 @@ EXTRA_DIST += \
 	lua/intf/modules/host.lua \
 	lua/intf/modules/httprequests.lua \
 	lua/intf/telnet.lua \
+	lua/meta/README.txt \
 	lua/meta/art/README.txt \
 	lua/meta/art/02_frenchtv.lua \
 	lua/meta/art/03_lastfm.lua \

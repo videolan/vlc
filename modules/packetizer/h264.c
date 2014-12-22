@@ -42,6 +42,7 @@
 #include <vlc_bits.h>
 #include "../codec/cc.h"
 #include "packetizer_helper.h"
+#include "../demux/mpeg/mpeg_parser_helpers.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -144,6 +145,13 @@ enum nal_unit_type_e
     NAL_PPS         = 8,
     NAL_AU_DELIMITER= 9
     /* ref_idc == 0 for 6,9,10,11,12 */
+};
+
+/* Defined in H.264 annex D */
+enum sei_type_e
+{
+    SEI_USER_DATA_REGISTERED = 4,
+    SEI_RECOVERY_POINT = 6
 };
 
 #define BLOCK_FLAG_PRIVATE_AUD (1 << BLOCK_FLAG_PRIVATE_SHIFT)
@@ -548,46 +556,12 @@ static block_t *CreateAnnexbNAL( decoder_t *p_dec, const uint8_t *p, int i_size 
 static void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
                               const uint8_t *src, int i_src )
 {
-    const uint8_t *end = &src[i_src];
     uint8_t *dst = malloc( i_src );
 
     *pp_ret = dst;
 
     if( dst )
-    {
-        while( src < end )
-        {
-            if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00 &&
-                src[2] == 0x03 )
-            {
-                *dst++ = 0x00;
-                *dst++ = 0x00;
-
-                src += 3;
-                continue;
-            }
-            *dst++ = *src++;
-        }
-    }
-    *pi_ret = dst - *pp_ret;
-}
-
-static inline int bs_read_ue( bs_t *s )
-{
-    int i = 0;
-
-    while( bs_read1( s ) == 0 && s->p < s->p_end && i < 32 )
-    {
-        i++;
-    }
-    return( ( 1 << i) - 1 + bs_read( s, i ) );
-}
-
-static inline int bs_read_se( bs_t *s )
-{
-    int val = bs_read_ue( s );
-
-    return val&0x01 ? (val+1)/2 : -(val/2);
+        *pi_ret = nal_decode(src, dst, i_src);
 }
 
 /*****************************************************************************
@@ -1162,7 +1136,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
             break;
 
         /* Look for user_data_registered_itu_t_t35 */
-        if( i_type == 4 )
+        if( i_type == SEI_USER_DATA_REGISTERED )
         {
             static const uint8_t p_dvb1_data_start_code[] = {
                 0xb5,
@@ -1181,7 +1155,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
         }
 
         /* Look for SEI recovery point */
-        if( i_type == 6 )
+        if( i_type == SEI_RECOVERY_POINT )
         {
             bs_t s;
             const int      i_rec = i_size;

@@ -1,5 +1,6 @@
---- fontconfig/src/fcxml.c	2009-08-13 16:07:13.000000000 +0200
-+++ fontconfig.new/src/fcxml.c	2009-08-13 16:05:41.000000000 +0200
+diff -ruN fontconfig/src/fcxml.c fontconfig.new/src/fcxml.c
+--- fontconfig/src/fcxml.c	2014-07-06 00:38:32.773443543 +0200
++++ fontconfig.new/src/fcxml.c	2014-07-05 21:11:51.171349523 +0200
 @@ -23,6 +23,8 @@
   */
  
@@ -9,8 +10,8 @@
  #include <fcntl.h>
  #include <stdarg.h>
  #include <dirent.h>
-@@ -58,6 +60,8 @@
- #undef STRICT
+@@ -56,6 +58,8 @@
+ #include <mbstring.h>
  #endif
  
 +#endif
@@ -18,15 +19,31 @@
  static void
  FcExprDestroy (FcExpr *e);
  
-@@ -71,6 +75,7 @@
-     free (test);
+@@ -86,6 +90,7 @@
+ 	FcRuleDestroy (n);
  }
  
 +#if 0
  static FcExpr *
  FcExprCreateInteger (FcConfig *config, int i)
  {
-@@ -179,7 +184,7 @@
+@@ -132,6 +137,7 @@
+   }
+   return m;
+ }
++#endif 
+ 
+ static void
+ FcExprMatrixFreeShallow (FcExprMatrix *m)
+@@ -156,6 +162,7 @@
+   free (m);
+ }
+ 
++#if 0
+ static FcExpr *
+ FcExprCreateMatrix (FcConfig *config, const FcExprMatrix *matrix)
+ {
+@@ -240,7 +247,7 @@
      }
      return e;
  }
@@ -35,7 +52,7 @@
  static void
  FcExprDestroy (FcExpr *e)
  {
-@@ -255,6 +260,7 @@
+@@ -323,6 +330,7 @@
      free (e);
  }
  
@@ -43,7 +60,7 @@
  typedef enum _FcElement {
      FcElementNone,
      FcElementFontconfig,
-@@ -2373,6 +2379,7 @@
+@@ -2973,6 +2981,7 @@
      const FcChar8    *bs = *((FcChar8 **) b);
      return FcStrCmp (as, bs);
  }
@@ -51,7 +68,7 @@
  
  static FcBool
  FcConfigParseAndLoadDir (FcConfig	*config,
-@@ -2380,6 +2387,9 @@
+@@ -2980,6 +2989,9 @@
  			 const FcChar8	*dir,
  			 FcBool		complain)
  {
@@ -61,15 +78,7 @@
      DIR		    *d;
      struct dirent   *e;
      FcBool	    ret = FcTrue;
-@@ -2589,3 +2599,4 @@
- #define __fcxml__
- #include "fcaliastail.h"
- #undef __fcxml__
-+#endif
-diff -ruN fontconfig/src/fcxml.c fontconfig.new/src/fcxml.c
---- fontconfig/src/fcxml.c	2009-08-13 16:08:49.000000000 +0200
-+++ fontconfig.new/src/fcxml.c	2009-08-19 00:03:35.000000000 +0200
-@@ -2850,6 +2850,7 @@
+@@ -3056,6 +3068,7 @@
  bail0:
      return ret || !complain;
  }
@@ -77,7 +86,7 @@ diff -ruN fontconfig/src/fcxml.c fontconfig.new/src/fcxml.c
  
  #ifdef _WIN32
  pfnGetSystemWindowsDirectory pGetSystemWindowsDirectory = NULL;
-@@ -2861,7 +2862,10 @@
+@@ -3067,7 +3080,10 @@
  		      const FcChar8 *name,
  		      FcBool	    complain)
  {
@@ -88,14 +97,20 @@ diff -ruN fontconfig/src/fcxml.c fontconfig.new/src/fcxml.c
      XML_Parser	    p;
      FcChar8	    *filename;
      int		    fd;
---- fontconfig/src/fcinit.c	2010-04-27 15:31:41.000000000 +0200
-+++ fontconfig.new/src/fcinit.c	2010-04-27 15:35:42.000000000 +0200
-@@ -34,11 +34,16 @@
+@@ -3210,3 +3226,4 @@
+ #define __fcxml__
+ #include "fcaliastail.h"
+ #undef __fcxml__
++#endif
+diff -ruN fontconfig/src/fcinit.c fontconfig.new/src/fcinit.c
+--- fontconfig/src/fcinit.c	2014-07-06 00:38:32.773443543 +0200
++++ fontconfig.new/src/fcinit.c	2014-07-04 22:37:41.036255327 +0200
+@@ -44,11 +44,16 @@
      config = FcConfigCreate ();
      if (!config)
  	goto bail0;
 -    if (!FcConfigAddDir (config, (FcChar8 *) FC_DEFAULT_FONTS))
-+    char *path = malloc( MAX_PATH + 1 );
++    char path[MAX_PATH + 8];
 +    GetWindowsDirectory( path, MAX_PATH + 1 );
 +    strcat( path, "\\fonts" );
 +//    printf( "Fonts dir: %s\n", path );

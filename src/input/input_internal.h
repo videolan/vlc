@@ -116,6 +116,7 @@ struct input_thread_private_t
     /* Input attachment */
     int i_attachment;
     input_attachment_t **attachment;
+    demux_t **attachment_demux;
 
     /* Main input properties */
 
@@ -227,8 +228,8 @@ void input_ControlPush( input_thread_t *, int i_type, vlc_value_t * );
  * Item metadata
  **********************************************************************/
 /* input_ExtractAttachmentAndCacheArt:
- *  Becarefull; p_item lock HAS to be taken */
-void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input );
+ *  Be careful: p_item lock will be taken! */
+void input_ExtractAttachmentAndCacheArt( input_thread_t *, const char *name );
 
 /***************************************************************************
  * Internal prototypes

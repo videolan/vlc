@@ -258,7 +258,7 @@ uint64_t NTPtime64 (void)
      * No leap seconds during that period since they were not invented yet.
      */
     assert (t < 0x100000000);
-    t |= ((70LL * 365 + 17) * 24 * 60 * 60 + ts.tv_sec) << 32;
+    t |= ((UINT64_C(70) * 365 + 17) * 24 * 60 * 60 + ts.tv_sec) << 32;
     return t;
 }
 

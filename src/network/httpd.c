@@ -890,31 +890,7 @@ httpd_host_t *vlc_https_HostNew(vlc_object_t *obj)
     free(key);
     free(cert);
 
-    char *ca = var_InheritString(obj, "http-ca");
-    if (ca) {
-        if (vlc_tls_ServerAddCA(tls, ca)) {
-            msg_Err(obj, "HTTP/TLS CA error (%s)", ca);
-            free(ca);
-            goto error;
-        }
-        free(ca);
-    }
-
-    char *crl = var_InheritString(obj, "http-crl");
-    if (crl) {
-        if (vlc_tls_ServerAddCRL(tls, crl)) {
-            msg_Err(obj, "TLS CRL error (%s)", crl);
-            free(crl);
-            goto error;
-        }
-        free(crl);
-    }
-
     return httpd_HostCreate(obj, "http-host", "https-port", tls);
-
-error:
-    vlc_tls_Delete(tls);
-    return NULL;
 }
 
 httpd_host_t *vlc_rtsp_HostNew(vlc_object_t *p_this)
@@ -1373,6 +1349,7 @@ static void httpd_ClientRecv(httpd_client_t *cl)
         }
     } else if (cl->query.i_body > 0) {
         /* we are reading the body of a request or a channel */
+        assert (cl->query.p_body != NULL);
         i_len = httpd_NetRecv(cl, &cl->query.p_body[cl->i_buffer],
                                cl->query.i_body - cl->i_buffer);
         if (i_len > 0)
@@ -1565,24 +1542,25 @@ static void httpd_ClientRecv(httpd_client_t *cl)
                 /* TODO Mhh, handle the case where the client only
                  * sends a request and closes the connection to
                  * mark the end of the body (probably only RTSP) */
-                cl->query.p_body = malloc(cl->query.i_body);
+                if (cl->query.i_body >= 65536)
+                    cl->query.p_body = malloc(cl->query.i_body);
+                else
+                    cl->query.p_body = NULL;
                 cl->i_buffer = 0;
                 if (!cl->query.p_body) {
                     switch (cl->query.i_proto) {
                         case HTTPD_PROTO_HTTP: {
-                                                   const uint8_t sorry[] =
-                                                       "HTTP/1.1 413 Request Entity Too Large\r\n\r\n";
-                                                   httpd_NetSend(cl, sorry, sizeof(sorry) - 1);
-                                                   break;
-                                               }
+                            const uint8_t sorry[] = "HTTP/1.1 413 Request Entity Too Large\r\n\r\n";
+                            httpd_NetSend(cl, sorry, sizeof(sorry) - 1);
+                            break;
+                        }
                         case HTTPD_PROTO_RTSP: {
-                                                   const uint8_t sorry[] =
-                                                       "RTSP/1.0 413 Request Entity Too Large\r\n\r\n";
-                                                   httpd_NetSend(cl, sorry, sizeof(sorry) - 1);
-                                                   break;
-                                               }
+                            const uint8_t sorry[] = "RTSP/1.0 413 Request Entity Too Large\r\n\r\n";
+                            httpd_NetSend(cl, sorry, sizeof(sorry) - 1);
+                            break;
+                        }
                         default:
-                                               assert(0);
+                            assert(0);
                     }
                     i_len = 0; /* drop */
                 }
@@ -1694,7 +1672,8 @@ static void httpd_ClientSend(httpd_client_t *cl)
 
 static void httpd_ClientTlsHandshake(httpd_client_t *cl)
 {
-    switch(vlc_tls_SessionHandshake(cl->p_tls, NULL, NULL)) {
+    switch (vlc_tls_SessionHandshake(cl->p_tls, NULL, NULL, NULL))
+    {
         case -1: cl->i_state = HTTPD_CLIENT_DEAD;       break;
         case 0:  cl->i_state = HTTPD_CLIENT_RECEIVING;  break;
         case 1:  cl->i_state = HTTPD_CLIENT_TLS_HS_IN;  break;
@@ -2070,8 +2049,12 @@ static void httpdLoop(httpd_host_t *host)
 
         vlc_tls_t *p_tls;
 
-        if (host->p_tls)
-            p_tls = vlc_tls_SessionCreate(host->p_tls, fd, NULL);
+        if (host->p_tls != NULL)
+        {
+            const char *alpn[] = { "http/1.1", NULL };
+
+            p_tls = vlc_tls_SessionCreate(host->p_tls, fd, NULL, alpn);
+        }
         else
             p_tls = NULL;
 

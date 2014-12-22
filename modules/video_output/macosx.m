@@ -156,16 +156,7 @@ static int Open (vlc_object_t *this)
     if (container)
         vout_display_DeleteWindow (vd, NULL);
     else {
-        vout_window_cfg_t wnd_cfg;
-
-        memset (&wnd_cfg, 0, sizeof (wnd_cfg));
-        wnd_cfg.type = VOUT_WINDOW_TYPE_NSOBJECT;
-        wnd_cfg.x = var_InheritInteger (vd, "video-x");
-        wnd_cfg.y = var_InheritInteger (vd, "video-y");
-        wnd_cfg.width  = vd->cfg->display.width;
-        wnd_cfg.height = vd->cfg->display.height;
-
-        sys->embed = vout_display_NewWindow (vd, &wnd_cfg);
+        sys->embed = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_NSOBJECT);
         if (sys->embed)
             container = sys->embed->handle.nsobject;
 
@@ -239,7 +230,7 @@ static int Open (vlc_object_t *this)
     vd->control = Control;
 
     /* */
-    vout_display_SendEventDisplaySize (vd, vd->fmt.i_visible_width, vd->fmt.i_visible_height, false);
+    vout_display_SendEventDisplaySize (vd, vd->fmt.i_visible_width, vd->fmt.i_visible_height);
 
     return VLC_SUCCESS;
 
@@ -322,19 +313,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
-        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-        {
-            const vout_display_cfg_t *cfg = va_arg (ap, const vout_display_cfg_t *);
-            if (vout_window_SetFullScreen (sys->embed, cfg->is_fullscreen))
-                return VLC_EGENERIC;
-
-            return VLC_SUCCESS;
-        }
-        case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-        {
-            unsigned state = va_arg (ap, unsigned);
-            return vout_window_SetState (sys->embed, state);
-        }
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
@@ -353,7 +331,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
             const vout_display_cfg_t *cfg;
             const video_format_t *source;
-            bool is_forced = false;
 
             if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
                 source = (const video_format_t *)va_arg (ap, const video_format_t *);
@@ -361,14 +338,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             } else {
                 source = &vd->source;
                 cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
-                if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                    is_forced = (bool)va_arg (ap, int);
-            }
-
-            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && is_forced
-                && vout_window_SetSize (sys->embed, cfg->display.width, cfg->display.height)) {
-                [o_pool release];
-                return VLC_EGENERIC;
             }
 
             /* we always use our current frame here, because we have some size constraints
@@ -403,13 +372,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_HIDE_MOUSE:
         {
             [NSCursor setHiddenUntilMouseMoves: YES];
-            return VLC_SUCCESS;
-        }
-
-        case VOUT_DISPLAY_GET_OPENGL:
-        {
-            vlc_gl_t **gl = va_arg (ap, vlc_gl_t **);
-            *gl = &sys->gl;
             return VLC_SUCCESS;
         }
 
@@ -644,7 +606,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 
             vout_display_PlacePicture (&place, &vd->source, &cfg_tmp, false);
             vd->sys->place = place;
-            vout_display_SendEventDisplaySize (vd, bounds.size.width, bounds.size.height, vd->cfg->is_fullscreen);
+            vout_display_SendEventDisplaySize (vd, bounds.size.width, bounds.size.height);
         }
     }
 

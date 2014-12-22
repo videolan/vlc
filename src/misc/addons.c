@@ -301,6 +301,7 @@ static void LoadLocalStorage( addons_manager_t *p_manager )
 {
     addons_finder_t *p_finder =
         vlc_custom_create( p_manager->p_priv->p_parent, sizeof( *p_finder ), "entries finder" );
+    p_finder->i_flags |= OBJECT_FLAGS_NOINTERACT;
 
     module_t *p_module = module_need( p_finder, "addons finder",
                                       "addons.store.list", true );
@@ -343,6 +344,7 @@ static void *FinderThread( void *p_data )
         i_cancel = vlc_savecancel();
         if( p_finder != NULL )
         {
+            p_finder->i_flags |= OBJECT_FLAGS_NOINTERACT;
             module_t *p_module;
             ARRAY_INIT( p_finder->entries );
             vlc_mutex_lock( &p_manager->p_priv->finder.lock );
@@ -379,6 +381,7 @@ static int addons_manager_WriteCatalog( addons_manager_t *p_manager )
 
     addons_storage_t *p_storage =
         vlc_custom_create( p_manager->p_priv->p_parent, sizeof( *p_storage ), "entries storage" );
+    p_storage->i_flags |= OBJECT_FLAGS_NOINTERACT;
 
     module_t *p_module = module_need( p_storage, "addons storage",
                                       "addons.store.install", true );
@@ -407,6 +410,7 @@ static int installOrRemoveAddon( addons_manager_t *p_manager, addon_entry_t *p_e
 
     addons_storage_t *p_storage =
         vlc_custom_create( p_manager->p_priv->p_parent, sizeof( *p_storage ), "entries storage" );
+    p_storage->i_flags |= OBJECT_FLAGS_NOINTERACT;
 
     module_t *p_module = module_need( p_storage, "addons storage",
                                       "addons.store.install", true );

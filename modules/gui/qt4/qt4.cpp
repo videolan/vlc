@@ -42,7 +42,7 @@
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 #include "components/playlist/playlist_model.hpp" /* for ~PLModel() */
 
-#ifdef Q_WS_X11
+#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
  #include <vlc_xlib.h>
 #endif
 
@@ -52,8 +52,10 @@
 #ifdef _WIN32 /* For static builds */
  #include <QtPlugin>
  #if HAS_QT5
-  Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
-  Q_IMPORT_PLUGIN(AccessibleFactory)
+  #ifdef QT_STATICPLUGIN
+   Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+   Q_IMPORT_PLUGIN(AccessibleFactory)
+  #endif
  #else
   Q_IMPORT_PLUGIN(qjpeg)
   Q_IMPORT_PLUGIN(qtaccessiblewidgets)
@@ -185,11 +187,20 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define FULLSCREEN_CONTROL_PIXELS N_( "Fullscreen controller mouse sensitivity" )
 
+#define CONTINUE_PLAYBACK_TEXT N_("Continue playback?")
+
 static const int i_notification_list[] =
     { NOTIFICATION_NEVER, NOTIFICATION_MINIMIZED, NOTIFICATION_ALWAYS };
 
 static const char *const psz_notification_list_text[] =
     { N_("Never"), N_("When minimized"), N_("Always") };
+
+static const int i_continue_list[] =
+    { 0, 1, 2 };
+
+static const char *const psz_continue_list_text[] =
+    { N_("Never"), N_("Ask"), N_("Always") };
+
 
 /**********************************************************************/
 vlc_module_begin ()
@@ -233,6 +244,8 @@ vlc_module_begin ()
               RECENTPLAY_TEXT, false )
     add_string( "qt-recentplay-filter", "",
                 RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false )
+    add_integer( "qt-continue", 1, CONTINUE_PLAYBACK_TEXT, CONTINUE_PLAYBACK_TEXT, false )
+            change_integer_list(i_continue_list, psz_continue_list_text )
 
 #ifdef UPDATE_CHECK
     add_bool( "qt-updates-notif", true, UPDATER_TEXT,
@@ -298,21 +311,9 @@ vlc_module_begin ()
 
         set_callbacks( OpenDialogs, Close )
 
-#if defined (Q_WS_X11) || (defined (Q_WS_QPA) && defined (__unix__))
     add_submodule ()
-        set_capability( "vout window xid", 0 )
+        set_capability( "vout window", 0 )
         set_callbacks( WindowOpen, WindowClose )
-#endif
-#if (defined (Q_OS_WIN) && !defined (_WIN32_X11_)) || defined (Q_OS_OS2)
-    add_submodule ()
-        set_capability( "vout window hwnd", 0 )
-        set_callbacks( WindowOpen, WindowClose )
-#endif
-#if defined (Q_OS_DARWIN)
-    add_submodule ()
-        set_capability( "vout window nsobject", 0 )
-        set_callbacks( WindowOpen, WindowClose )
-#endif
 
 vlc_module_end ()
 
@@ -351,7 +352,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-#ifdef Q_WS_X11
+#if defined (QT5_HAS_X11) || defined (Q_WS_X11)
     if( !vlc_xlib_init( p_this ) )
         return VLC_EGENERIC;
 
@@ -457,8 +458,18 @@ static void *Thread( void *obj )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
     MainInterface *p_mi;
-    char dummy[] = "vlc"; /* for WM_CLASS */
-    char *argv[] = { dummy, NULL, };
+    char vlc_name[] = "vlc"; /* for WM_CLASS */
+#ifdef QT5_HAS_X11
+    char platform_parm[] = "-platform";
+    char platform_value[] = "xcb";
+#endif
+    char *argv[] = {
+        vlc_name,
+#ifdef QT5_HAS_X11
+        platform_parm, platform_value,
+#endif
+        NULL,
+    };
     int argc = sizeof(argv) / sizeof(argv[0]) - 1;
 
     Q_INIT_RESOURCE( vlc );
@@ -520,7 +531,7 @@ static void *Thread( void *obj )
 
     /* Check window type from the Qt platform back-end */
     p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
-#if defined (Q_WS_QPA) || HAS_QT5
+#if HAS_QT5 || defined (Q_WS_QPA)
     QString platform = app.platformName();
     if( platform == qfu("xcb") )
         p_intf->p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
@@ -640,9 +651,12 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         msg_Dbg( p_wnd, "Qt interface not found" );
         return VLC_EGENERIC;
     }
-    if( p_intf->p_sys->voutWindowType != cfg->type )
+
+    if( cfg->type != VOUT_WINDOW_TYPE_INVALID
+     && cfg->type != p_intf->p_sys->voutWindowType )
         return VLC_EGENERIC;
-    switch( cfg->type )
+
+    switch( p_intf->p_sys->voutWindowType )
     {
         case VOUT_WINDOW_TYPE_XID:
             if( var_InheritBool( p_wnd, "video-wallpaper" ) )
@@ -657,16 +671,16 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     MainInterface *p_mi = p_intf->p_sys->p_mi;
     msg_Dbg( p_wnd, "requesting video window..." );
 
-    int i_x = cfg->x;
-    int i_y = cfg->y;
     unsigned i_width = cfg->width;
     unsigned i_height = cfg->height;
 
-    WId wid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
+    WId wid = p_mi->getVideo( p_wnd, &i_width, &i_height );
     if( !wid )
         return VLC_EGENERIC;
 
-    switch( cfg->type )
+    p_wnd->type = p_intf->p_sys->voutWindowType;
+
+    switch( p_wnd->type )
     {
         case VOUT_WINDOW_TYPE_XID:
             p_wnd->handle.xid = (uintptr_t)wid;
@@ -678,6 +692,8 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         case VOUT_WINDOW_TYPE_NSOBJECT:
             p_wnd->handle.nsobject = (void *)wid;
             break;
+        default:
+            assert(0);
     }
 
     p_wnd->control = WindowControl;

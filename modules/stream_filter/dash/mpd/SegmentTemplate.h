@@ -30,21 +30,25 @@ namespace dash
 {
     namespace mpd
     {
-        class   Representation;
+        class ICanonicalUrl;
 
         class SegmentTemplate : public Segment
         {
             public:
-                SegmentTemplate( bool containRuntimeIdentifier, Representation *rep );
-                virtual std::string     getSourceUrl() const;
-                virtual void            setSourceUrl( const std::string & url );
+                SegmentTemplate( ICanonicalUrl * = NULL );
+                virtual Url             getUrlSegment() const; /* reimpl */
                 virtual bool            isSingleShot() const;
-                virtual void            done();
+                size_t                  getStartIndex() const;
+                void                    setStartIndex(size_t);
+
             private:
-                bool                    containRuntimeIdentifier;
-                size_t                  beginTime;
-                size_t                  beginIndex;
-                int                     currentSegmentIndex;
+                size_t                  startIndex;
+        };
+
+        class InitSegmentTemplate : public SegmentTemplate
+        {
+            public:
+                InitSegmentTemplate( ICanonicalUrl * = NULL );
         };
     }
 }

@@ -474,6 +474,8 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
             libvlc_MediaListPlayerNextItemSet );
     libvlc_event_manager_register_event_type( p_mlp->p_event_manager,
             libvlc_MediaListPlayerStopped );
+    libvlc_event_manager_register_event_type( p_mlp->p_event_manager,
+            libvlc_MediaListPlayerPlayed );
     p_mlp->e_playback_mode = libvlc_playback_mode_default;
 
     return p_mlp;
@@ -781,6 +783,10 @@ static int set_relative_playlist_position_and_play(
     if (!path)
     {
         libvlc_media_list_unlock(p_mlp->p_mlist);
+        /* Send list played event */
+        libvlc_event_t event;
+        event.type = libvlc_MediaListPlayerPlayed;
+        libvlc_event_send(p_mlp->p_event_manager, &event);
         return -1;
     }
 

@@ -39,12 +39,9 @@
 #include <libvlc.h>
 
 #include "display.h"
+#include "window.h"
 
 #include "event.h"
-
-/* It must be present as long as a vout_display_t must be created using a dummy
- * vout (as an opengl provider) */
-#define ALLOW_DUMMY_VOUT
 
 static void SplitterClose(vout_display_t *vd);
 
@@ -53,7 +50,7 @@ static void SplitterClose(vout_display_t *vd);
  *****************************************************************************/
 static picture_t *VideoBufferNew(filter_t *filter)
 {
-    vout_display_t *vd = (vout_display_t*)filter->p_owner;
+    vout_display_t *vd = filter->owner.sys;
     const video_format_t *fmt = &filter->fmt_out.video;
 
     assert(vd->fmt.i_chroma == fmt->i_chroma &&
@@ -64,26 +61,6 @@ static picture_t *VideoBufferNew(filter_t *filter)
     if (!pool)
         return NULL;
     return picture_pool_Get(pool);
-}
-static void VideoBufferDelete(filter_t *filter, picture_t *picture)
-{
-    VLC_UNUSED(filter);
-    picture_Release(picture);
-}
-
-static int  FilterAllocationInit(filter_t *filter, void *vd)
-{
-    filter->pf_video_buffer_new = VideoBufferNew;
-    filter->pf_video_buffer_del = VideoBufferDelete;
-    filter->p_owner             = vd;
-
-    return VLC_SUCCESS;
-}
-static void FilterAllocationClean(filter_t *filter)
-{
-    filter->pf_video_buffer_new = NULL;
-    filter->pf_video_buffer_del = NULL;
-    filter->p_owner             = NULL;
 }
 
 /*****************************************************************************
@@ -146,6 +123,9 @@ static void vout_display_Delete(vout_display_t *vd)
 {
     if (vd->module)
         module_unneed(vd, vd->module);
+
+    video_format_Clean(&vd->source);
+    video_format_Clean(&vd->fmt);
 
     vlc_object_release(vd);
 }
@@ -347,7 +327,6 @@ struct vout_display_owner_sys_t {
 
     /* */
     vout_display_cfg_t cfg;
-    unsigned     wm_state_initial;
     struct {
         unsigned num;
         unsigned den;
@@ -371,10 +350,11 @@ struct vout_display_owner_sys_t {
         unsigned num;
         unsigned den;
     } zoom;
-
+#if defined(_WIN32) || defined(__OS2__)
     bool ch_wm_state;
     unsigned wm_state;
-
+    unsigned wm_state_initial;
+#endif
     bool ch_sar;
     struct {
         unsigned num;
@@ -421,8 +401,6 @@ struct vout_display_owner_sys_t {
     bool ch_display_size;
     int  display_width;
     int  display_height;
-    bool display_is_fullscreen;
-    bool display_is_forced;
 
     int  fit_window;
 
@@ -430,13 +408,7 @@ struct vout_display_owner_sys_t {
         vlc_thread_t thread;
         block_fifo_t *fifo;
     } event;
-
-#ifdef ALLOW_DUMMY_VOUT
-    vlc_mouse_t vout_mouse;
-#endif
 };
-
-static void DummyVoutSendDisplayEventMouse(vout_thread_t *, vlc_mouse_t *fallback, const vlc_mouse_t *m);
 
 static void VoutDisplayCreateRender(vout_display_t *vd)
 {
@@ -465,9 +437,14 @@ static void VoutDisplayCreateRender(vout_display_t *vd)
 
     msg_Dbg(vd, "A filter to adapt decoder to display is needed");
 
-    osys->filters = filter_chain_New(vd, "video filter2", false,
-                                     FilterAllocationInit,
-                                     FilterAllocationClean, vd);
+    filter_owner_t owner = {
+        .sys = vd,
+        .video = {
+            .buffer_new = VideoBufferNew,
+        },
+    };
+
+    osys->filters = filter_chain_NewVideo(vd, false, &owner);
     assert(osys->filters); /* TODO critical */
 
     /* */
@@ -475,19 +452,20 @@ static void VoutDisplayCreateRender(vout_display_t *vd)
     es_format_InitFromVideo(&src, &v_src);
 
     /* */
-    es_format_t dst;
-
     filter_t *filter;
     for (int i = 0; i < 1 + (v_dst_cmp.i_chroma != v_dst.i_chroma); i++) {
+        es_format_t dst;
 
         es_format_InitFromVideo(&dst, i == 0 ? &v_dst : &v_dst_cmp);
 
         filter_chain_Reset(osys->filters, &src, &dst);
         filter = filter_chain_AppendFilter(osys->filters,
                                            NULL, NULL, &src, &dst);
+        es_format_Clean(&dst);
         if (filter)
             break;
     }
+    es_format_Clean(&src);
     if (!filter)
         msg_Err(vd, "Failed to adapt decoder format to display");
 }
@@ -597,11 +575,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
 
     /* */
     vout_SendEventMouseVisible(osys->vout);
-#ifdef ALLOW_DUMMY_VOUT
-    DummyVoutSendDisplayEventMouse(osys->vout, &osys->vout_mouse, &m);
-#else
     vout_SendDisplayEventMouse(osys->vout, &m);
-#endif
     vlc_mutex_unlock(&osys->lock);
 }
 
@@ -686,7 +660,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         vlc_mutex_unlock(&osys->lock);
         break;
     }
-
+#if defined(_WIN32) || defined(__OS2__)
     case VOUT_DISPLAY_EVENT_WINDOW_STATE: {
         const unsigned state = va_arg(args, unsigned);
 
@@ -700,22 +674,18 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         vlc_mutex_unlock(&osys->lock);
         break;
     }
-
+#endif
     case VOUT_DISPLAY_EVENT_DISPLAY_SIZE: {
         const int width  = (int)va_arg(args, int);
         const int height = (int)va_arg(args, int);
-        const bool is_fullscreen = (bool)va_arg(args, int);
-        msg_Dbg(vd, "VoutDisplayEvent 'resize' %dx%d %s",
-                width, height, is_fullscreen ? "fullscreen" : "window");
+        msg_Dbg(vd, "VoutDisplayEvent 'resize' %dx%d", width, height);
 
         /* */
         vlc_mutex_lock(&osys->lock);
 
-        osys->ch_display_size       = true;
-        osys->display_width         = width;
-        osys->display_height        = height;
-        osys->display_is_fullscreen = is_fullscreen;
-        osys->display_is_forced     = false;
+        osys->ch_display_size   = true;
+        osys->display_width     = width;
+        osys->display_height    = height;
 
         vlc_mutex_unlock(&osys->lock);
         break;
@@ -739,34 +709,22 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     }
 }
 
-static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, const vout_window_cfg_t *cfg)
+static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, unsigned type)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
-
-#ifdef ALLOW_DUMMY_VOUT
-    if (!osys->vout->p) {
-        vout_window_cfg_t cfg_override = *cfg;
-
-        if (!var_InheritBool(osys->vout, "embedded-video"))
-            cfg_override.is_standalone = true;
-
-        return vout_window_New(VLC_OBJECT(osys->vout), "$window", &cfg_override);
-    }
-#endif
-    return vout_NewDisplayWindow(osys->vout, vd, cfg);
+    vout_window_t *window = vout_NewDisplayWindow(osys->vout, type);
+    if (window != NULL)
+        vout_display_window_Attach(window, vd);
+    return window;
 }
+
 static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-#ifdef ALLOW_DUMMY_VOUT
-    if (!osys->vout->p) {
-        if( window)
-            vout_window_Delete(window);
-        return;
-    }
-#endif
-    vout_DeleteDisplayWindow(osys->vout, vd, window);
+    if (window != NULL)
+        vout_display_window_Detach(window);
+    vout_DeleteDisplayWindow(osys->vout, window);
 }
 
 static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
@@ -790,16 +748,7 @@ static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
     unsigned display_height;
     vout_display_GetDefaultDisplaySize(&display_width, &display_height,
                                        &vd->source, &cfg);
-
-    vlc_mutex_lock(&osys->lock);
-
-    osys->ch_display_size       = true;
-    osys->display_width         = display_width;
-    osys->display_height        = display_height;
-    osys->display_is_fullscreen = osys->cfg.is_fullscreen;
-    osys->display_is_forced     = true;
-
-    vlc_mutex_unlock(&osys->lock);
+    vout_SetDisplayWindowSize(osys->vout, display_width, display_height);
 }
 
 static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
@@ -860,15 +809,15 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         bool is_fullscreen  = osys->is_fullscreen;
         osys->ch_fullscreen = false;
 
+#if defined(_WIN32) || defined(__OS2__)
         bool ch_wm_state  = osys->ch_wm_state;
         unsigned wm_state  = osys->wm_state;
         osys->ch_wm_state = false;
+#endif
 
         bool ch_display_size       = osys->ch_display_size;
         int  display_width         = osys->display_width;
         int  display_height        = osys->display_height;
-        bool display_is_fullscreen = osys->display_is_fullscreen;
-        bool display_is_forced     = osys->display_is_forced;
         osys->ch_display_size = false;
 
         bool reset_pictures;
@@ -886,7 +835,9 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             !reset_pictures &&
             !osys->ch_display_filled &&
             !osys->ch_zoom &&
+#if defined(_WIN32) || defined(__OS2__)
             !ch_wm_state &&
+#endif
             !osys->ch_sar &&
             !osys->ch_crop) {
 
@@ -900,22 +851,18 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
         /* */
         if (ch_fullscreen) {
-            vout_display_cfg_t cfg = osys->cfg;
+            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
+                                     is_fullscreen) == VLC_SUCCESS) {
+                osys->cfg.is_fullscreen = is_fullscreen;
 
-            cfg.is_fullscreen  = is_fullscreen;
-            cfg.display.width  = cfg.is_fullscreen ? 0 : osys->width_saved;
-            cfg.display.height = cfg.is_fullscreen ? 0 : osys->height_saved;
-
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN, &cfg)) {
-                msg_Err(vd, "Failed to set fullscreen");
+                if (!is_fullscreen)
+                    vout_SetDisplayWindowSize(osys->vout, osys->width_saved,
+                                              osys->height_saved);
+            } else {
                 is_fullscreen = osys->cfg.is_fullscreen;
-            } else if (!is_fullscreen) {
-                vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg, true);
-            }
-            osys->cfg.is_fullscreen = is_fullscreen;
 
-            /* */
-            vout_SendEventFullscreen(osys->vout, osys->cfg.is_fullscreen);
+                msg_Err(vd, "Failed to set fullscreen");
+            }
         }
 
         /* */
@@ -924,22 +871,13 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             cfg.display.width  = display_width;
             cfg.display.height = display_height;
 
-            if (!cfg.is_fullscreen != !display_is_fullscreen ||
-                vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg, display_is_forced)) {
-                if (!display_is_forced)
-                    msg_Err(vd, "Failed to resize display");
+            osys->width_saved  = osys->cfg.display.width;
+            osys->height_saved = osys->cfg.display.height;
 
-                /* We ignore the resized */
-                display_width  = osys->cfg.display.width;
-                display_height = osys->cfg.display.height;
-            }
+            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg);
+
             osys->cfg.display.width  = display_width;
             osys->cfg.display.height = display_height;
-
-            if (!display_is_fullscreen) {
-                osys->width_saved  = display_width;
-                osys->height_saved = display_height;
-            }
         }
         /* */
         if (osys->ch_display_filled) {
@@ -953,8 +891,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             }
             osys->cfg.is_display_filled = osys->is_display_filled;
             osys->ch_display_filled = false;
-
-            vout_SendEventDisplayFilled(osys->vout, osys->cfg.is_display_filled);
         }
         /* */
         if (osys->ch_zoom) {
@@ -982,9 +918,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->cfg.zoom.num = osys->zoom.num;
             osys->cfg.zoom.den = osys->zoom.den;
             osys->ch_zoom = false;
-
-            vout_SendEventZoom(osys->vout, osys->cfg.zoom.num, osys->cfg.zoom.den);
         }
+#if defined(_WIN32) || defined(__OS2__)
         /* */
         if (ch_wm_state) {
             if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE, wm_state)) {
@@ -992,10 +927,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 wm_state = osys->wm_state;
             }
             osys->wm_state_initial = wm_state;
-
-            /* */
-            vout_SendEventOnTop(osys->vout, osys->wm_state_initial);
         }
+#endif
         /* */
         if (osys->ch_sar) {
             video_format_t source = vd->source;
@@ -1024,21 +957,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->sar.den = source.i_sar_den;
             osys->ch_sar  = false;
 
-            /* */
-            if (osys->sar.num == osys->source.i_sar_num &&
-                osys->sar.den == osys->source.i_sar_den)
-            {
-                vout_SendEventSourceAspect(osys->vout, 0, 0);
-            }
-            else
-            {
-                unsigned dar_num, dar_den;
-                vlc_ureduce( &dar_num, &dar_den,
-                             osys->sar.num * vd->source.i_visible_width,
-                             osys->sar.den * vd->source.i_visible_height,
-                             65536);
-                vout_SendEventSourceAspect(osys->vout, dar_num, dar_den);
-            }
             /* If a crop ratio is requested, recompute the parameters */
             if (osys->crop.num > 0 && osys->crop.den > 0)
                 osys->ch_crop = true;
@@ -1104,11 +1022,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->crop.num    = crop_num;
             osys->crop.den    = crop_den;
             osys->ch_crop = false;
-
-            vout_SendEventSourceCrop(osys->vout,
-                                     osys->crop.num, osys->crop.den,
-                                     osys->crop.left, osys->crop.top,
-                                     -osys->crop.right, -osys->crop.bottom);
         }
 
         /* */
@@ -1227,18 +1140,6 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
     }
 }
 
-void vout_SetWindowState(vout_display_t *vd, unsigned state)
-{
-    vout_display_owner_sys_t *osys = vd->owner.sys;
-
-    vlc_mutex_lock(&osys->lock);
-    if (osys->wm_state != state) {
-        osys->ch_wm_state = true;
-        osys->wm_state = state;
-    }
-    vlc_mutex_unlock(&osys->lock);
-}
-
 void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_den)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -1281,14 +1182,6 @@ void vout_SetDisplayCrop(vout_display_t *vd,
     }
 }
 
-struct vlc_gl_t *vout_GetDisplayOpengl(vout_display_t *vd)
-{
-    struct vlc_gl_t *gl;
-    if (vout_display_Control(vd, VOUT_DISPLAY_GET_OPENGL, &gl))
-        return NULL;
-    return gl;
-}
-
 static vout_display_t *DisplayNew(vout_thread_t *vout,
                                   const video_format_t *source,
                                   const vout_display_state_t *state,
@@ -1303,7 +1196,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vout_display_cfg_t *cfg = &osys->cfg;
 
     *cfg = state->cfg;
-    osys->wm_state_initial = -1;
     osys->sar_initial.num = state->sar.num;
     osys->sar_initial.den = state->sar.den;
     vout_display_GetDefaultDisplaySize(&cfg->display.width, &cfg->display.height,
@@ -1334,9 +1226,14 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                            &osys->height_saved,
                                            source, &cfg_windowed);
     }
+
     osys->zoom.num = cfg->zoom.num;
     osys->zoom.den = cfg->zoom.den;
+#if defined(_WIN32) || defined(__OS2__)
+    osys->wm_state_initial = VOUT_WINDOW_STATE_NORMAL;
     osys->wm_state = state->wm_state;
+    osys->ch_wm_state = true;
+#endif
     osys->fit_window = 0;
     osys->event.fifo = NULL;
 
@@ -1352,9 +1249,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
     osys->sar.num = osys->sar_initial.num ? osys->sar_initial.num : source->i_sar_num;
     osys->sar.den = osys->sar_initial.den ? osys->sar_initial.den : source->i_sar_den;
-#ifdef ALLOW_DUMMY_VOUT
-    vlc_mouse_Init(&osys->vout_mouse);
-#endif
 
     vout_display_owner_t owner;
     if (owner_ptr) {
@@ -1380,8 +1274,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     if (osys->sar.num != source->i_sar_num ||
         osys->sar.den != source->i_sar_den)
         osys->ch_sar = true;
-    if (osys->wm_state != osys->wm_state_initial)
-        osys->ch_wm_state = true;
 
     return p_display;
 }
@@ -1393,7 +1285,9 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
     if (state) {
         if (!osys->is_wrapper )
             state->cfg = osys->cfg;
+#if defined(_WIN32) || defined(__OS2__)
         state->wm_state = osys->wm_state;
+#endif
         state->sar.num  = osys->sar_initial.num;
         state->sar.den  = osys->sar_initial.den;
     }
@@ -1441,23 +1335,32 @@ struct video_splitter_owner_t {
     vout_display_t *wrapper;
 };
 
-static vout_window_t *SplitterNewWindow(vout_display_t *vd, const vout_window_cfg_t *cfg_ptr)
+static vout_window_t *SplitterNewWindow(vout_display_t *vd, unsigned type)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_window_t *window;
+    vout_window_cfg_t cfg = {
+        .type = type,
+        .width = vd->cfg->display.width,
+        .height = vd->cfg->display.height,
+        .is_standalone = true,
+    };
 
-    vout_window_cfg_t cfg = *cfg_ptr;
-    cfg.is_standalone = true;
-    cfg.x += 0;//output->window.i_x; FIXME
-    cfg.y += 0;//output->window.i_y;
-
-    return vout_NewDisplayWindow(osys->vout, vd, &cfg);
+    window = vout_display_window_New(osys->vout, &cfg);
+    if (window != NULL)
+        vout_display_window_Attach(window, vd);
+    return window;
 }
+
 static void SplitterDelWindow(vout_display_t *vd, vout_window_t *window)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
-
-    vout_DeleteDisplayWindow(osys->vout, vd, window);
+    if (window != NULL) {
+        vout_display_window_Detach(window);
+        vout_display_window_Delete(window);
+    }
+    (void) vd;
 }
+
 static void SplitterEvent(vout_display_t *vd, int event, va_list args)
 {
     //vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -1579,7 +1482,7 @@ static void SplitterClose(vout_display_t *vd)
     video_splitter_Delete(splitter);
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
 
     /* */
     for (int i = 0; i < sys->count; i++)
@@ -1628,23 +1531,20 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
     wrapper->sys     = sys;
 
     /* */
-    video_splitter_owner_t *owner = malloc(sizeof(*owner));
-    if (!owner)
-        abort();
-    owner->wrapper = wrapper;
-    splitter->p_owner = owner;
+    video_splitter_owner_t *vso = xmalloc(sizeof(*vso));
+    vso->wrapper = wrapper;
+    splitter->p_owner = vso;
     splitter->pf_picture_new = SplitterPictureNew;
     splitter->pf_picture_del = SplitterPictureDel;
 
     /* */
     TAB_INIT(sys->count, sys->display);
     for (int i = 0; i < splitter->i_output; i++) {
-        vout_display_owner_t owner;
-
-        owner.event      = SplitterEvent;
-        owner.window_new = SplitterNewWindow;
-        owner.window_del = SplitterDelWindow;
-
+        vout_display_owner_t vdo = {
+            .event      = SplitterEvent,
+            .window_new = SplitterNewWindow,
+            .window_del = SplitterDelWindow,
+        };
         const video_splitter_output_t *output = &splitter->p_output[i];
         vout_display_state_t ostate;
 
@@ -1658,9 +1558,9 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
         ostate.cfg.zoom.den = 1;
 
         vout_display_t *vd = DisplayNew(vout, &output->fmt, &ostate,
-                                           output->psz_module ? output->psz_module : module,
-                                           false, wrapper,
-                                           double_click_timeout, hide_timeout, &owner);
+                                        output->psz_module ? output->psz_module : module,
+                                        false, wrapper,
+                                        double_click_timeout, hide_timeout, &vdo);
         if (!vd) {
             vout_DeleteDisplay(wrapper, NULL);
             return NULL;
@@ -1707,25 +1607,3 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
         vout_SendEventMouseDoubleClick(vout);
     vout->p->mouse = *m;
 }
-#ifdef ALLOW_DUMMY_VOUT
-static void DummyVoutSendDisplayEventMouse(vout_thread_t *vout, vlc_mouse_t *fallback, const vlc_mouse_t *m)
-{
-    vout_thread_sys_t p;
-
-    if (!vout->p) {
-        p.mouse = *fallback;
-        vlc_mutex_init(&p.filter.lock);
-        p.filter.chain_static = NULL;
-        p.filter.chain_interactive = NULL;
-        p.spu = NULL;
-        vout->p = &p;
-    }
-    vout_SendDisplayEventMouse(vout, m);
-    if (vout->p == &p) {
-        vlc_mutex_destroy(&p.filter.lock);
-        *fallback = p.mouse;
-        vout->p = NULL;
-    }
-}
-#endif
-

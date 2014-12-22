@@ -276,6 +276,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     p_sys->i_pos = var_CreateGetIntegerCommand( p_filter, "logo-position" );
     p_sys->i_pos_x = var_CreateGetIntegerCommand( p_filter, "logo-x" );
     p_sys->i_pos_y = var_CreateGetIntegerCommand( p_filter, "logo-y" );
+    p_sys->b_absolute = (p_sys->i_pos < 0);
 
     /* Ignore aligment if a position is given for video filter */
     if( !b_sub && p_sys->i_pos_x >= 0 && p_sys->i_pos_y >= 0 )
@@ -389,7 +390,7 @@ static subpicture_t *FilterSub( filter_t *p_filter, mtime_t date )
     if( !p_region )
     {
         msg_Err( p_filter, "cannot allocate SPU region" );
-        p_filter->pf_sub_buffer_del( p_filter, p_spu );
+        subpicture_Delete( p_spu );
         p_spu = NULL;
         goto exit;
     }

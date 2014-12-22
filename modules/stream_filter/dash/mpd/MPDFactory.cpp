@@ -33,31 +33,27 @@ using namespace dash::mpd;
 
 MPD* MPDFactory::create             (dash::xml::Node *root, stream_t *p_stream, Profile profile)
 {
-    switch(profile)
+    IMPDParser *parser = NULL;
+
+    switch( profile )
     {
-        case dash::mpd::Full2011:
-        case dash::mpd::Basic:
-        case dash::mpd::BasicCM:    return MPDFactory::createBasicCMMPD(root, p_stream);
-        case dash::mpd::IsoffMain:  return MPDFactory::createIsoffMainMPD(root, p_stream);
-
-        default: return NULL;
+        case Profile::ISOOnDemand:
+        case Profile::ISOMain:
+        case Profile::ISOLive:
+        case Profile::MPEG2TSSimple:
+            parser = new IsoffMainParser(root, p_stream);
+        default:
+            break;
     }
-}
-MPD* MPDFactory::createBasicCMMPD    (dash::xml::Node *root, stream_t *p_stream)
-{
-    dash::mpd::BasicCMParser mpdParser(root, p_stream);
 
-    if(mpdParser.parse() == false || mpdParser.getMPD() == NULL)
+    if(!parser)
         return NULL;
-    mpdParser.getMPD()->setProfile( dash::mpd::BasicCM );
-    return mpdParser.getMPD();
-}
-MPD* MPDFactory::createIsoffMainMPD  (dash::xml::Node *root, stream_t *p_stream)
-{
-    dash::mpd::IsoffMainParser mpdParser(root, p_stream);
 
-    if(mpdParser.parse() == false || mpdParser.getMPD() == NULL)
-        return NULL;
-    mpdParser.getMPD()->setProfile( dash::mpd::IsoffMain );
-    return mpdParser.getMPD();
+    MPD* mpd = NULL;
+    if(parser->parse(profile))
+        mpd = parser->getMPD();
+
+    delete parser;
+
+    return mpd;
 }

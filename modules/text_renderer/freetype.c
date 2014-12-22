@@ -1331,9 +1331,16 @@ static int ProcessLines( filter_t *p_filter,
                 p_face = LoadFace( p_filter, p_current_style );
             }
             FT_Face p_current_face = p_face ? p_face : p_sys->p_face;
-            if( !p_previous_style || p_previous_style->i_font_size != p_current_style->i_font_size )
+            if( !p_previous_style || p_previous_style->i_font_size != p_current_style->i_font_size ||
+                ((p_previous_style->i_style_flags ^ p_current_style->i_style_flags) & STYLE_HALFWIDTH) )
+
             {
-                if( FT_Set_Pixel_Sizes( p_current_face, 0, p_current_style->i_font_size ) )
+                int i_font_width = ( p_current_style->i_style_flags & STYLE_HALFWIDTH )
+                                    ? p_current_style->i_font_size / 2
+                                    : p_current_style->i_font_size;
+                if( FT_Set_Pixel_Sizes( p_current_face,
+                                        i_font_width,
+                                        p_current_style->i_font_size ) )
                     msg_Err( p_filter, "Failed to set font size to %d", p_current_style->i_font_size );
                 if( p_sys->p_stroker )
                 {
@@ -1363,17 +1370,28 @@ static int ProcessLines( filter_t *p_filter,
                 /* Get kerning vector */
                 FT_Vector kerning = { .x = 0, .y = 0 };
                 if( FT_HAS_KERNING( p_current_face ) && i_glyph_last != 0 && i_glyph_index != 0 )
+                {
                     FT_Get_Kerning( p_current_face, i_glyph_last, i_glyph_index, ft_kerning_default, &kerning );
+                }
+                if( p_glyph_style->i_spacing > 0 && i_glyph_last != 0 && i_glyph_index != 0 )
+                {
+                    kerning.x = (p_glyph_style->i_spacing) << 6;
+                }
 
                 /* Get the glyph bitmap and its bounding box and all the associated properties */
                 FT_Vector pen_new = {
                     .x = pen.x + kerning.x,
                     .y = pen.y + kerning.y,
                 };
+
+                int i_font_width = ( p_current_style->i_style_flags & STYLE_HALFWIDTH )
+                                    ? p_current_style->i_font_size / 2
+                                    : p_current_style->i_font_size;
                 FT_Vector pen_shadow_new = {
-                    .x = pen_new.x + p_sys->f_shadow_vector_x * (p_current_style->i_font_size << 6),
+                    .x = pen_new.x + p_sys->f_shadow_vector_x * (i_font_width << 6),
                     .y = pen_new.y + p_sys->f_shadow_vector_y * (p_current_style->i_font_size << 6),
                 };
+
                 FT_Glyph glyph;
                 FT_BBox  glyph_bbox;
                 FT_Glyph outline;
@@ -1683,6 +1701,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
         text_style_t *p_style;
         if( p_region_in->p_style )
+        {
             p_style = CreateStyle( p_region_in->p_style->psz_fontname ? p_region_in->p_style->psz_fontname
                                                                       : p_sys->style.psz_fontname,
                                    p_region_in->p_style->i_font_size > 0 ? p_region_in->p_style->i_font_size
@@ -1693,7 +1712,10 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                    p_region_in->p_style->i_style_flags & (STYLE_BOLD |
                                                                           STYLE_ITALIC |
                                                                           STYLE_UNDERLINE |
-                                                                          STYLE_STRIKEOUT) );
+                                                                          STYLE_STRIKEOUT |
+                                                                          STYLE_HALFWIDTH) );
+            p_style->i_spacing = p_region_in->p_style->i_spacing;
+        }
         else
         {
             uint32_t i_font_color = var_InheritInteger( p_filter, "freetype-color" );
@@ -1847,7 +1869,7 @@ static int Init_FT( vlc_object_t *p_this,
     if( SetFontSize( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
     p_sys->p_stroker = NULL;
-    if( f_outline_thickness > 0.001 )
+    if( f_outline_thickness > .001f )
     {
         i_error = FT_Stroker_New( p_sys->p_library, &p_sys->p_stroker );
         if( i_error )
@@ -1915,8 +1937,8 @@ static int Create( vlc_object_t *p_this )
     float f_shadow_angle = var_InheritFloat( p_filter, "freetype-shadow-angle" );
     float f_shadow_distance = var_InheritFloat( p_filter, "freetype-shadow-distance" );
     f_shadow_distance = VLC_CLIP( f_shadow_distance, 0, 1 );
-    p_sys->f_shadow_vector_x = f_shadow_distance * cos(2 * M_PI * f_shadow_angle / 360);
-    p_sys->f_shadow_vector_y = f_shadow_distance * sin(2 * M_PI * f_shadow_angle / 360);
+    p_sys->f_shadow_vector_x = f_shadow_distance * cosf((float)(2. * M_PI) * f_shadow_angle / 360);
+    p_sys->f_shadow_vector_y = f_shadow_distance * sinf((float)(2. * M_PI) * f_shadow_angle / 360);
 
     /* Set default psz_fontname */
     if( !psz_fontname || !*psz_fontname )

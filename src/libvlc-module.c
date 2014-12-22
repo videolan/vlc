@@ -836,16 +836,6 @@ static const char *const ppsz_prefres[] = {
 #define KEY_LONGTEXT N_( \
    "This private key file (PEM format) is used for server-side TLS.")
 
-#define HTTP_CA_TEXT N_("HTTP/TLS Certificate Authority")
-#define CA_LONGTEXT N_( \
-   "This X.509 certificate file (PEM format) can optionally be used " \
-   "to authenticate remote clients in TLS sessions.")
-
-#define HTTP_CRL_TEXT N_("HTTP/TLS Certificate Revocation List")
-#define CRL_LONGTEXT N_( \
-   "This file contains an optional CRL to prevent remote clients " \
-   "from using revoked certificates in TLS sessions.")
-
 #define SOCKS_SERVER_TEXT N_("SOCKS server")
 #define SOCKS_SERVER_LONGTEXT N_( \
     "SOCKS proxy server to use. This must be of the form " \
@@ -1172,20 +1162,20 @@ static const char *const ppsz_prefres[] = {
 #define HOTKEY_CAT_LONGTEXT N_( "These settings are the global VLC key " \
     "bindings, known as \"hotkeys\"." )
 
-enum{
-    MOUSEWHEEL_VOLUME,
-    MOUSEWHEEL_POSITION,
-    NO_MOUSEWHEEL,
+static const int mouse_wheel_values[] = { -1, 0, 2, 3, };
+static const char *const mouse_wheel_texts[] = {
+    N_("Ignore"), N_("Volume control"),
+    N_("Position control"), N_("Position control reversed"),
 };
 
-static const int mouse_wheel_values[] = { 2, 0, 1 };
-static const char *const mouse_wheel_texts[] =
-    { N_("Ignore"), N_("Volume Control"), N_("Position Control") };
-
-#define MOUSE_WHEEL_MODE_TEXT N_("MouseWheel up-down axis Control")
-#define MOUSE_WHEEL_MODE_LONGTEXT N_( \
-   "The MouseWheel up-down (vertical) axis can control volume, position or " \
-   "mousewheel event can be ignored")
+#define MOUSE_Y_WHEEL_MODE_TEXT N_("Mouse wheel vertical axis control")
+#define MOUSE_Y_WHEEL_MODE_LONGTEXT N_( \
+   "The mouse wheel vertical (up/down) axis can control volume, " \
+   "position or be ignored.")
+#define MOUSE_X_WHEEL_MODE_TEXT N_("Mouse wheel horizontal axis control")
+#define MOUSE_X_WHEEL_MODE_LONGTEXT N_( \
+   "The mouse wheel horizontal (left/right) axis can control volume, " \
+   "position or be ignored.")
 #define TOGGLE_FULLSCREEN_KEY_TEXT N_("Fullscreen")
 #define TOGGLE_FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state.")
 #define LEAVE_FULLSCREEN_KEY_TEXT N_("Exit fullscreen")
@@ -1579,8 +1569,7 @@ vlc_module_begin ()
         change_safe ()
     add_bool( "autoscale", true, AUTOSCALE_TEXT, AUTOSCALE_LONGTEXT, false )
         change_safe ()
-    add_float( "scale", 1.0, SCALEFACTOR_TEXT, SCALEFACTOR_LONGTEXT, false )
-        change_safe ()
+    add_obsolete_float( "scale" ) /* since 3.0.0 */
     add_string( "monitor-par", NULL,
                 MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, true )
     add_string( "custom-aspect-ratios", NULL, CUSTOM_ASPECT_RATIOS_TEXT,
@@ -1593,6 +1582,7 @@ vlc_module_begin ()
     add_integer( "align", 0, ALIGN_TEXT, ALIGN_LONGTEXT, true )
         change_integer_list( pi_align_values, ppsz_align_descriptions )
     add_float( "zoom", 1., ZOOM_TEXT, ZOOM_LONGTEXT, true )
+        change_safe()
     add_integer( "deinterlace", 0,
                  DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
         change_integer_list( pi_deinterlace, ppsz_deinterlace_text )
@@ -1747,9 +1737,9 @@ vlc_module_begin ()
     add_obsolete_string( "sout-http-cert" ) /* since 2.0.0 */
     add_loadfile( "http-key", NULL, HTTP_KEY_TEXT, KEY_LONGTEXT, true )
     add_obsolete_string( "sout-http-key" ) /* since 2.0.0 */
-    add_loadfile( "http-ca", NULL, HTTP_CA_TEXT, CA_LONGTEXT, true )
+    add_obsolete_string( "http-ca" ) /* since 3.0.0 */
     add_obsolete_string( "sout-http-ca" ) /* since 2.0.0 */
-    add_loadfile( "http-crl", NULL, HTTP_CRL_TEXT, CRL_LONGTEXT, true )
+    add_obsolete_string( "http-crl" ) /* since 3.0.0 */
     add_obsolete_string( "sout-http-crl" ) /* since 2.0.0 */
 
     set_section( N_( "Socks proxy") , NULL )
@@ -1873,7 +1863,6 @@ vlc_module_begin ()
 
     set_subcategory( SUBCAT_INPUT_DEMUX )
     add_module( "demux", "demux", "any", DEMUX_TEXT, DEMUX_LONGTEXT, true )
-    set_subcategory( SUBCAT_INPUT_VCODEC )
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_subcategory( SUBCAT_INPUT_SCODEC )
     add_obsolete_bool( "prefer-system-codecs" )
@@ -2093,9 +2082,13 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS )
     add_category_hint( N_("Hot keys"), HOTKEY_CAT_LONGTEXT , false )
 
-    add_integer( "hotkeys-mousewheel-mode", 0, MOUSE_WHEEL_MODE_TEXT,
-                 MOUSE_WHEEL_MODE_LONGTEXT, false )
+    add_integer( "hotkeys-y-wheel-mode", 0, MOUSE_Y_WHEEL_MODE_TEXT,
+                 MOUSE_Y_WHEEL_MODE_LONGTEXT, false )
         change_integer_list( mouse_wheel_values, mouse_wheel_texts )
+    add_integer( "hotkeys-x-wheel-mode", 2, MOUSE_X_WHEEL_MODE_TEXT,
+                 MOUSE_X_WHEEL_MODE_LONGTEXT, false )
+        change_integer_list( mouse_wheel_values, mouse_wheel_texts )
+    add_obsolete_integer( "hotkeys-mousewheel-mode" ) /* since 3.0.0 */
 
 #if defined(__APPLE__)
 /* Don't use the following combo's */

@@ -31,6 +31,7 @@
 #include <io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <cfloat>
 
 #include "os2_factory.hpp"
 #include "os2_graphics.hpp"
@@ -169,7 +170,15 @@ bool OS2Factory::init()
     MorphToPM();
 
     m_hab = WinInitialize( 0 );
+
+    // save FPU CW
+    unsigned saved_cw = _control87( 0, 0 );
+
+    // WinCreateMsgQueue() changes FPU CW but does not restore it
     m_hmq = WinCreateMsgQueue( m_hab, 0 );
+
+    // restore FPU CW
+    _control87( saved_cw, MCW_EM | MCW_IC | MCW_RC | MCW_PC );
 
     if( !WinRegisterClass( m_hab, vlc_class, OS2Factory::OS2Proc,
                            CS_SIZEREDRAW, sizeof( PVOID )))

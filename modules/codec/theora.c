@@ -223,7 +223,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         if( ProcessHeaders( p_dec ) )
         {
-            block_Release( *pp_block );
+            block_Release( p_block );
             return NULL;
         }
         p_sys->b_has_headers = true;
@@ -453,8 +453,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     else
     {
         p_buf = DecodePacket( p_dec, p_oggpacket );
-        if( p_block )
-            block_Release( p_block );
+        block_Release( p_block );
     }
 
     /* Date management */
@@ -567,7 +566,6 @@ static void CloseDecoder( vlc_object_t *p_this )
     th_info_clear(&p_sys->ti);
     th_comment_clear(&p_sys->tc);
     th_decode_free(p_sys->tcx);
-    p_sys->tcx = NULL;
     free( p_sys );
 }
 
@@ -636,7 +634,6 @@ struct encoder_sys_t
     th_info      ti;                     /* theora bitstream settings */
     th_comment   tc;                     /* theora comment header */
     th_enc_ctx   *tcx;                   /* theora context */
-    int i_width, i_height;
 };
 
 /*****************************************************************************
@@ -696,9 +693,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->ti.pic_x = 0 /*frame_x_offset*/;
     p_sys->ti.pic_y = 0 /*frame_y_offset*/;
 
-    p_sys->i_width = p_sys->ti.frame_width;
-    p_sys->i_height = p_sys->ti.frame_height;
-
     if( !p_enc->fmt_in.video.i_frame_rate ||
         !p_enc->fmt_in.video.i_frame_rate_base )
     {
@@ -727,7 +721,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     p_sys->ti.target_bitrate = p_enc->fmt_out.i_bitrate;
-    p_sys->ti.quality = ((float)i_quality) * 6.3;
+    p_sys->ti.quality = ((float)i_quality) * 6.3f;
 
 
     p_sys->tcx = th_encode_alloc( &p_sys->ti );
@@ -784,77 +778,77 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     ogg_packet oggpacket;
     block_t *p_block;
     th_ycbcr_buffer ycbcr;
-    int i;
+    unsigned i;
 
     if( !p_pict ) return NULL;
     /* Sanity check */
-    if( p_pict->p[0].i_pitch < (int)p_sys->i_width ||
-        p_pict->p[0].i_lines < (int)p_sys->i_height )
+    if( p_pict->p[0].i_pitch < (int)p_sys->ti.frame_width ||
+        p_pict->p[0].i_lines < (int)p_sys->ti.frame_height )
     {
         msg_Warn( p_enc, "frame is smaller than encoding size"
                   "(%ix%i->%ix%i) -> dropping frame",
                   p_pict->p[0].i_pitch, p_pict->p[0].i_lines,
-                  p_sys->i_width, p_sys->i_height );
+                  p_sys->ti.frame_width, p_sys->ti.frame_height );
         return NULL;
     }
 
     /* Fill padding */
-    if( p_pict->p[0].i_visible_pitch < (int)p_sys->i_width )
+    if( p_pict->p[0].i_visible_pitch < (int)p_sys->ti.frame_width )
     {
-        for( i = 0; i < p_sys->i_height; i++ )
+        for( i = 0; i < p_sys->ti.frame_height; i++ )
         {
             memset( p_pict->p[0].p_pixels + i * p_pict->p[0].i_pitch +
                     p_pict->p[0].i_visible_pitch,
                     *( p_pict->p[0].p_pixels + i * p_pict->p[0].i_pitch +
                        p_pict->p[0].i_visible_pitch - 1 ),
-                    p_sys->i_width - p_pict->p[0].i_visible_pitch );
+                    p_sys->ti.frame_width - p_pict->p[0].i_visible_pitch );
         }
-        for( i = 0; i < p_sys->i_height / 2; i++ )
+        for( i = 0; i < p_sys->ti.frame_height / 2; i++ )
         {
             memset( p_pict->p[1].p_pixels + i * p_pict->p[1].i_pitch +
                     p_pict->p[1].i_visible_pitch,
                     *( p_pict->p[1].p_pixels + i * p_pict->p[1].i_pitch +
                        p_pict->p[1].i_visible_pitch - 1 ),
-                    p_sys->i_width / 2 - p_pict->p[1].i_visible_pitch );
+                    p_sys->ti.frame_width / 2 - p_pict->p[1].i_visible_pitch );
             memset( p_pict->p[2].p_pixels + i * p_pict->p[2].i_pitch +
                     p_pict->p[2].i_visible_pitch,
                     *( p_pict->p[2].p_pixels + i * p_pict->p[2].i_pitch +
                        p_pict->p[2].i_visible_pitch - 1 ),
-                    p_sys->i_width / 2 - p_pict->p[2].i_visible_pitch );
+                    p_sys->ti.frame_width / 2 - p_pict->p[2].i_visible_pitch );
         }
     }
 
-    if( p_pict->p[0].i_visible_lines < (int)p_sys->i_height )
+    if( p_pict->p[0].i_visible_lines < (int)p_sys->ti.frame_height )
     {
-        for( i = p_pict->p[0].i_visible_lines; i < p_sys->i_height; i++ )
+        for( i = p_pict->p[0].i_visible_lines; i < p_sys->ti.frame_height; i++ )
         {
             memset( p_pict->p[0].p_pixels + i * p_pict->p[0].i_pitch, 0,
-                    p_sys->i_width );
+                    p_sys->ti.frame_width );
         }
-        for( i = p_pict->p[1].i_visible_lines; i < p_sys->i_height / 2; i++ )
+        for( i = p_pict->p[1].i_visible_lines; i < p_sys->ti.frame_height / 2; i++ )
         {
             memset( p_pict->p[1].p_pixels + i * p_pict->p[1].i_pitch, 0x80,
-                    p_sys->i_width / 2 );
+                    p_sys->ti.frame_width / 2 );
             memset( p_pict->p[2].p_pixels + i * p_pict->p[2].i_pitch, 0x80,
-                    p_sys->i_width / 2 );
+                    p_sys->ti.frame_width / 2 );
         }
     }
 
     /* Theora is a one-frame-in, one-frame-out system. Submit a frame
      * for compression and pull out the packet. */
 
-    ycbcr[0].width = p_sys->i_width;
-    ycbcr[0].height = p_sys->i_height;
+    ycbcr[0].width = p_sys->ti.frame_width;
+    ycbcr[0].height = p_sys->ti.frame_height;
     ycbcr[0].stride = p_pict->p[0].i_pitch;
     ycbcr[0].data = p_pict->p[0].p_pixels;
 
-    ycbcr[1].width = p_sys->i_width / 2;
-    ycbcr[1].height = p_sys->i_height / 2;
+    ycbcr[1].width = p_sys->ti.frame_width / 2;
+    ycbcr[1].height = p_sys->ti.frame_height / 2;
     ycbcr[1].stride = p_pict->p[1].i_pitch;
     ycbcr[1].data = p_pict->p[1].p_pixels;
 
-    ycbcr[2].width = p_sys->i_width / 2;
-    ycbcr[2].height = p_sys->i_height / 2;
+    ycbcr[2].width = p_sys->ti.frame_width / 2;
+    ycbcr[2].height = p_sys->ti.frame_height / 2;
     ycbcr[2].stride = p_pict->p[1].i_pitch;
     ycbcr[2].data = p_pict->p[2].p_pixels;
 
@@ -890,7 +884,6 @@ static void CloseEncoder( vlc_object_t *p_this )
     th_info_clear(&p_sys->ti);
     th_comment_clear(&p_sys->tc);
     th_encode_free(p_sys->tcx);
-    p_sys->tcx = NULL;
     free( p_sys );
 }
 #endif

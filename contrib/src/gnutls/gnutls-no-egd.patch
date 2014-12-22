@@ -1,46 +1,6 @@
-diff -ru gnutls.orig/lib/nettle/rnd.c gnutls/lib/nettle/rnd.c
---- gnutls-3.1.10/lib/nettle/Makefile.am.orig	2013-03-25 14:41:50.265377296 +0100
-+++ gnutls-3.1.10/lib/nettle/Makefile.am	2013-03-25 14:50:17.436084975 +0100
-@@ -33,7 +33,7 @@
- 
- noinst_LTLIBRARIES = libcrypto.la
- 
--libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h \
-+libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c \
- 	multi.c wmnaf.c ecc_free.c ecc.h ecc_make_key.c ecc_shared_secret.c \
- 	ecc_map.c ecc_mulmod.c ecc_mulmod_cached.c \
- 	ecc_points.c ecc_projective_dbl_point_3.c ecc_projective_isneutral.c \
---- gnutls-3.1.10/lib/nettle/Makefile.in.orig	2013-03-25 14:41:50.268710655 +0100
-+++ gnutls-3.1.10/lib/nettle/Makefile.in	2013-03-25 14:51:42.180123726 +0100
-@@ -219,7 +219,7 @@
- LTLIBRARIES = $(noinst_LTLIBRARIES)
- libcrypto_la_LIBADD =
- am_libcrypto_la_OBJECTS = pk.lo mpi.lo mac.lo cipher.lo rnd.lo init.lo \
--	egd.lo multi.lo wmnaf.lo ecc_free.lo ecc_make_key.lo \
-+	multi.lo wmnaf.lo ecc_free.lo ecc_make_key.lo \
- 	ecc_shared_secret.lo ecc_map.lo ecc_mulmod.lo \
- 	ecc_mulmod_cached.lo ecc_points.lo \
- 	ecc_projective_dbl_point_3.lo ecc_projective_isneutral.lo \
-@@ -1536,7 +1536,7 @@
- 	-I$(srcdir)/../includes -I$(builddir)/../includes \
- 	-I$(builddir)/../../gl -I$(srcdir)/.. $(am__append_1)
- noinst_LTLIBRARIES = libcrypto.la
--libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h \
-+libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c \
- 	multi.c wmnaf.c ecc_free.c ecc.h ecc_make_key.c ecc_shared_secret.c \
- 	ecc_map.c ecc_mulmod.c ecc_mulmod_cached.c \
- 	ecc_points.c ecc_projective_dbl_point_3.c ecc_projective_isneutral.c \
-@@ -1610,7 +1610,6 @@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ecc_shared_secret.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ecc_sign_hash.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ecc_verify_hash.Plo@am__quote@
--@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/egd.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/init.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mac.Plo@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpi.Plo@am__quote@
---- gnutls-3.1.10/lib/nettle/rnd.c.orig	2013-03-21 21:42:28.000000000 +0100
-+++ gnutls-3.1.10/lib/nettle/rnd.c	2013-03-25 14:52:50.004027534 +0100
-@@ -205,7 +205,7 @@
+--- gnutls-3.2.11/lib/nettle/rnd.c.orig	2014-08-26 02:08:42.243632503 +0200
++++ gnutls-3.2.11/lib/nettle/rnd.c	2014-08-26 02:08:41.123615625 +0200
+@@ -216,7 +216,7 @@
  #include <sys/time.h>
  #include <fcntl.h>
  #include <locks.h>
@@ -49,33 +9,48 @@ diff -ru gnutls.orig/lib/nettle/rnd.c gnutls/lib/nettle/rnd.c
  
  #define DEVICE_READ_SIZE 16
  #define DEVICE_READ_SIZE_MAX 32
-@@ -276,6 +276,7 @@
-   return 0;
+@@ -286,6 +286,7 @@
+ 	return 0;
  }
  
 +#if 0
- static int
- do_device_source_egd (int init)
+ static int do_device_source_egd(int init, struct event_st *event)
  {
-@@ -329,6 +330,7 @@
-     }
-   return 0;
+ 	unsigned int read_size = DEVICE_READ_SIZE;
+@@ -342,6 +343,7 @@
+ 	}
+ 	return 0;
  }
 +#endif
  
- static int
- do_device_source (int init)
-@@ -346,11 +348,13 @@
+ static int do_device_source(int init, struct event_st *event)
+ {
+@@ -357,10 +359,12 @@
  
-       do_source = do_device_source_urandom;
-       ret = do_source (init);
+ 		do_source = do_device_source_urandom;
+ 		ret = do_source(init, event);
 +#if 0
-       if (ret < 0)
-         {
-           do_source = do_device_source_egd;
-           ret = do_source (init);
-         }
+ 		if (ret < 0) {
+ 			do_source = do_device_source_egd;
+ 			ret = do_source(init, event);
+ 		}
 +#endif
  
-       if (ret < 0)
-         {
+ 		if (ret < 0) {
+ 			gnutls_assert();
+@@ -450,7 +454,6 @@
+ 		if (level == GNUTLS_RND_NONCE)
+ 			_rnd_get_event(&event);
+ 	}
+-#endif
+ 
+ 	/* update state only when having a non-nonce or if nonce
+ 	 * and nsecs%4096 == 0, i.e., one out of 4096 times called .
+@@ -494,6 +497,7 @@
+ 	RND_UNLOCK;
+ 	return;
+ }
++#endif
+ 
+ int crypto_rnd_prio = INT_MAX;
+ 

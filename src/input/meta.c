@@ -50,7 +50,7 @@ struct vlc_meta_t
 /* FIXME bad name convention */
 const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
 {
-    static const char posix_names[][17] =
+    static const char posix_names[][18] =
     {
         [vlc_meta_Title]       = N_("Title"),
         [vlc_meta_Artist]      = N_("Artist"),
@@ -64,6 +64,7 @@ const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
         [vlc_meta_Setting]     = N_("Setting"),
         [vlc_meta_URL]         = N_("URL"),
         [vlc_meta_Language]    = N_("Language"),
+        [vlc_meta_ESNowPlaying]= N_("Now Playing"),
         [vlc_meta_NowPlaying]  = N_("Now Playing"),
         [vlc_meta_Publisher]   = N_("Publisher"),
         [vlc_meta_EncodedBy]   = N_("Encoded by"),
@@ -75,6 +76,8 @@ const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
         [vlc_meta_Episode]     = N_("Episode"),
         [vlc_meta_ShowName]    = N_("Show Name"),
         [vlc_meta_Actors]      = N_("Actors"),
+        [vlc_meta_AlbumArtist] = N_("Album Artist"),
+        [vlc_meta_DiscNumber]  = N_("DiscNumber")
     };
 
     assert (meta_type < (sizeof(posix_names) / sizeof(posix_names[0])));
@@ -204,26 +207,17 @@ void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
 }
 
 
-void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
+void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input,
+                                         const char *name )
 {
     input_item_t *p_item = p_input->p->p_item;
 
-    /* */
-    char *psz_arturl = input_item_GetArtURL( p_item );
-    if( !psz_arturl || strncmp( psz_arturl, "attachment://", strlen("attachment://") ) )
-    {
-        msg_Err( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
-        free( psz_arturl );
-        return;
-    }
-
     if( input_item_IsArtFetched( p_item ) )
-    {
-        /* XXX Weird, we should not have end up with attachment:// art url unless there is a race
-         * condition */
-        msg_Warn( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
+    {   /* XXX Weird, we should not end up with attachment:// art URL
+         * unless there is a race condition */
+        msg_Warn( p_input, "art already fetched" );
         playlist_FindArtInCache( p_item );
-        goto exit;
+        return;
     }
 
     /* */
@@ -232,38 +226,35 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     vlc_mutex_lock( &p_item->lock );
     for( int i_idx = 0; i_idx < p_input->p->i_attachment; i_idx++ )
     {
-        if( !strcmp( p_input->p->attachment[i_idx]->psz_name,
-                     &psz_arturl[strlen("attachment://")] ) )
+        input_attachment_t *a = p_input->p->attachment[i_idx];
+
+        if( !strcmp( a->psz_name, name ) )
         {
-            p_attachment = vlc_input_attachment_Duplicate( p_input->p->attachment[i_idx] );
+            p_attachment = vlc_input_attachment_Duplicate( a );
             break;
         }
     }
     vlc_mutex_unlock( &p_item->lock );
 
-    if( !p_attachment || p_attachment->i_data <= 0 )
+    if( p_attachment == NULL )
     {
-        if( p_attachment )
-            vlc_input_attachment_Delete( p_attachment );
-        msg_Warn( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
-        goto exit;
+        msg_Warn( p_input, "art attachment %s not found", name );
+        return;
     }
 
     /* */
     const char *psz_type = NULL;
+
     if( !strcmp( p_attachment->psz_mime, "image/jpeg" ) )
         psz_type = ".jpg";
     else if( !strcmp( p_attachment->psz_mime, "image/png" ) )
         psz_type = ".png";
+    else if( !strcmp( p_attachment->psz_mime, "image/x-pict" ) )
+        psz_type = ".pct";
 
-    /* */
     playlist_SaveArt( VLC_OBJECT(p_input), p_item,
                       p_attachment->p_data, p_attachment->i_data, psz_type );
-
     vlc_input_attachment_Delete( p_attachment );
-
-exit:
-    free( psz_arturl );
 }
 
 int input_item_WriteMeta( vlc_object_t *obj, input_item_t *p_item )

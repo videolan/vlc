@@ -35,7 +35,7 @@
 #include <QMetaType>
 #include <QHeaderView>
 
-#include "assert.h"
+#include <assert.h>
 
 /* ICON_SCALER comes currently from harrison-stetson method, so good value */
 #define ICON_SCALER         16

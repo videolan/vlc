@@ -25,17 +25,15 @@
 #ifndef HTTPCONNECTIONMANAGER_H_
 #define HTTPCONNECTIONMANAGER_H_
 
-#include <vlc_common.h>
-
-#include <string>
-#include <vector>
-#include <deque>
-#include <iostream>
-#include <ctime>
-#include <limits.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include "http/PersistentConnection.h"
-#include "adaptationlogic/IAdaptationLogic.h"
+#include "adaptationlogic/IDownloadRateObserver.h"
+
+#include <vlc_common.h>
+#include <vector>
 
 namespace dash
 {
@@ -44,37 +42,21 @@ namespace dash
         class HTTPConnectionManager
         {
             public:
-                HTTPConnectionManager           (logic::IAdaptationLogic *adaptationLogic, stream_t *stream);
+                HTTPConnectionManager           (stream_t *stream);
                 virtual ~HTTPConnectionManager  ();
 
                 void    closeAllConnections ();
-                bool    addChunk            (Chunk *chunk);
-                int     read                (block_t *block);
-                void    attach              (dash::logic::IDownloadRateObserver *observer);
-                void    notify              ();
+                void    releaseAllConnections ();
+                bool    connectChunk        (Chunk *chunk);
 
             private:
-                std::vector<dash::logic::IDownloadRateObserver *>   rateObservers;
-                std::deque<Chunk *>                                 downloadQueue;
+                Chunk                                               *currentChunk;
                 std::vector<PersistentConnection *>                 connectionPool;
-                logic::IAdaptationLogic                             *adaptationLogic;
                 stream_t                                            *stream;
-                int                                                 chunkCount;
-                int64_t                                             bpsAvg;
-                int64_t                                             bpsLastChunk;
-                int64_t                                             bpsCurrentChunk;
-                int64_t                                             bytesReadSession;
-                int64_t                                             bytesReadChunk;
-                double                                              timeSession;
-                double                                              timeChunk;
 
-                static const size_t     PIPELINE;
-                static const size_t     PIPELINELENGTH;
                 static const uint64_t   CHUNKDEFAULTBITRATE;
 
-                std::vector<PersistentConnection *>     getConnectionsForHost   (const std::string &hostname);
-                void                                    updateStatistics        (int bytes, double time);
-
+                PersistentConnection *                  getConnectionForHost    (const std::string &hostname);
         };
     }
 }

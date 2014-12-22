@@ -26,11 +26,16 @@
 #endif
 
 #include "Helper.h"
-
+#include <algorithm>
 using namespace dash;
 
 std::string Helper::combinePaths        (const std::string &path1, const std::string &path2)
 {
+    if ( path2.length() == 0 )
+        return path1;
+    else if ( path1.length() == 0 )
+        return path2;
+
     char path1Last  = path1.at(path1.size() - 1);
     char path2First = path2.at(0);
 
@@ -47,4 +52,11 @@ std::string Helper::getDirectoryPath    (const std::string &path)
     int pos = path.find_last_of('/');
 
     return path.substr(0, pos);
+}
+
+bool Helper::ifind(std::string haystack, std::string needle)
+{
+    transform(haystack.begin(), haystack.end(), haystack.begin(), toupper);
+    transform(needle.begin(), needle.end(), needle.begin(), toupper);
+    return haystack.find(needle) != std::string::npos;
 }

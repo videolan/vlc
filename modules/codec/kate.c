@@ -1261,7 +1261,7 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
         if( !p_bitmap_region )
         {
             msg_Err( p_dec, "cannot allocate SPU region" );
-            decoder_DeleteSubpicture( p_dec, p_spu );
+            subpicture_Delete( p_spu );
             return NULL;
         }
 
@@ -1283,7 +1283,7 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
         msg_Err( p_dec, "cannot allocate SPU region" );
         if( p_bitmap_region )
             subpicture_region_Delete( p_bitmap_region );
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         return NULL;
     }
 

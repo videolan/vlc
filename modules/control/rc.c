@@ -30,15 +30,15 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-
 #include <errno.h>                                                 /* ENOMEM */
 #include <signal.h>
 #include <assert.h>
 #include <math.h>
 
+#include <vlc_common.h>
+#include <vlc_plugin.h>
 #include <vlc_interface.h>
+#include <vlc_input.h>
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_playlist.h>
@@ -47,9 +47,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+
 #include <vlc_network.h>
 #include <vlc_url.h>
-
 #include <vlc_charset.h>
 
 #if defined(PF_UNIX) && !defined(PF_LOCAL)
@@ -482,7 +482,7 @@ static void *Run( void *data )
     if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
     {
         msg_Err( p_intf, "couldn't find user input handle" );
-        return;
+        return NULL;
     }
 #endif
 
@@ -968,7 +968,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     /* Parse commands that only require an input */
     if( !strcmp( psz_cmd, "pause" ) )
     {
-        playlist_Pause( p_intf->p_sys->p_playlist );
+        playlist_TogglePause( p_intf->p_sys->p_playlist );
         i_error = VLC_SUCCESS;
     }
     else if( !strcmp( psz_cmd, "seek" ) )
@@ -1127,7 +1127,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             i_value = val.i_int;
 
             if ( var_Change( p_input, psz_variable,
-                             VLC_VAR_GETLIST, &val, &text ) < 0 )
+                             VLC_VAR_GETCHOICES, &val, &text ) < 0 )
                 goto out;
 
             msg_rc( "+----[ %s ]", val_name.psz_string );
@@ -1584,7 +1584,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         if ( var_Change( p_vout, psz_variable,
-                         VLC_VAR_GETLIST, &val, &text ) < 0 )
+                         VLC_VAR_GETCHOICES, &val, &text ) < 0 )
         {
             vlc_object_release( p_vout );
             free( psz_value );
@@ -1689,7 +1689,7 @@ static int AudioChannel( vlc_object_t *obj, char const *cmd,
         /* Retrieve all registered ***. */
         vlc_value_t val, text;
         if ( var_Change( p_aout, "stereo-mode",
-                         VLC_VAR_GETLIST, &val, &text ) < 0 )
+                         VLC_VAR_GETCHOICES, &val, &text ) < 0 )
         {
             ret = VLC_ENOVAR;
             goto out;
@@ -1798,8 +1798,8 @@ static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     DWORD i_dw;
 
     /* On Win32, select() only works on socket descriptors */
-    while( WaitForSingleObject( p_intf->p_sys->hConsoleIn,
-                                INTF_IDLE_SLEEP/1000 ) == WAIT_OBJECT_0 )
+    while( WaitForSingleObjectEx( p_intf->p_sys->hConsoleIn,
+                                INTF_IDLE_SLEEP/1000, TRUE ) == WAIT_OBJECT_0 )
     {
         while( *pi_size < MAX_LINE_LENGTH &&
                ReadConsoleInput( p_intf->p_sys->hConsoleIn, &input_record,
@@ -1852,6 +1852,8 @@ static bool ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
             return true;
         }
     }
+
+    vlc_testcancel ();
 
     return false;
 }

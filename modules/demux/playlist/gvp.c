@@ -59,11 +59,6 @@ description:The now infamous Apple Macintosh commercial aired during the 1984 Su
 
 #define MAX_LINE 1024
 
-struct demux_sys_t
-{
-    input_item_t *p_current_input;
-};
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -92,47 +87,28 @@ int Import_GVP( vlc_object_t *p_this )
 
     if( !b_found ) return VLC_EGENERIC;
 
-    STANDARD_DEMUX_INIT_MSG(  "using Google Video Playlist (gvp) import" );
+    msg_Dbg( p_this, "using Google Video Playlist (gvp) import" );
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
-    p_demux->p_sys = malloc( sizeof( demux_sys_t ) );
-    if( !p_demux->p_sys )
-        return VLC_ENOMEM;
 
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Deactivate: frees unused data
- *****************************************************************************/
-void Close_GVP( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    free( p_sys );
-}
-
 static int Demux( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     char *psz_line;
-    char *psz_attrvalue;
 
     char *psz_version = NULL;
     char *psz_url = NULL;
     char *psz_docid = NULL;
-    int i_duration = -1;
     char *psz_title = NULL;
-    char *psz_description = NULL;
+    char *psz_desc = NULL;
+    size_t desclen = 0;
     input_item_t *p_input;
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
-
-    p_sys->p_current_input = p_current_input;
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
@@ -142,56 +118,41 @@ static int Demux( demux_t *p_demux )
             free( psz_line );
             continue;
         }
-        psz_attrvalue = strchr( psz_line, ':' );
-        if( !psz_attrvalue )
+
+        char *value = strchr( psz_line, ':' );
+        if( value == NULL )
         {
             msg_Dbg( p_demux, "Unable to parse line (%s)", psz_line );
             free( psz_line );
             continue;
         }
-        *psz_attrvalue = '\0';
-        psz_attrvalue++;
-        if( !strcmp( psz_line, "gvp_version" ) )
-        {
-            psz_version = strdup( psz_attrvalue );
-        }
-        else if( !strcmp( psz_line, "url" ) )
-        {
-            psz_url = strdup( psz_attrvalue );
-        }
-        else if( !strcmp( psz_line, "docid" ) )
-        {
-            psz_docid = strdup( psz_attrvalue );
-        }
+        *(value++) = '\0';
+
+        size_t len = strlen( value );
+        if( len > 0 && value[len - 1] == '\r' )
+            value[--len] = '\0'; /* strip trailing CR */
+
+        if( psz_version == NULL && !strcmp( psz_line, "gvp_version" ) )
+            psz_version = strdup( value );
+        else if( psz_url == NULL && !strcmp( psz_line, "url" ) )
+            psz_url = strdup( value );
+        else if( psz_docid == NULL && !strcmp( psz_line, "docid" ) )
+            psz_docid = strdup( value );
         else if( !strcmp( psz_line, "duration" ) )
+            /*atoi( psz_attrvalue )*/;
+        else if( psz_title == NULL && !strcmp( psz_line, "title" ) )
+            psz_title = strdup( value );
+        else if( !strcmp( psz_line, "description" )
+              && desclen < 32768 && len < 32768 )
         {
-            i_duration = atoi( psz_attrvalue );
-        }
-        else if( !strcmp( psz_line, "title" ) )
-        {
-            psz_title = strdup( psz_attrvalue );
-        }
-        else if( !strcmp( psz_line, "description" ) )
-        {
-            char *buf;
-            if( !psz_description )
+            char *buf = realloc( psz_desc, desclen + 1 + len + 1 );
+            if( buf != NULL )
             {
-                psz_description = strdup( psz_attrvalue );
-            }
-            else
-            {
-                /* handle multi-line descriptions */
-                if( asprintf( &buf, "%s\n%s", psz_description, psz_attrvalue ) == -1 )
-                    buf = NULL;
-                free( psz_description );
-                psz_description = buf;
-            }
-            /* remove ^M char at the end of the line (if any) */
-            buf = psz_description + strlen( psz_description );
-            if( buf != psz_description )
-            {
-                buf--;
-                if( *buf == '\r' ) *buf = '\0';
+                if( desclen > 0 )
+                    buf[desclen++] = '\n';
+                memcpy( buf + desclen, value, len + 1 );
+                desclen += len;
+                psz_desc = buf;
             }
         }
         free( psz_line );
@@ -208,7 +169,7 @@ static int Demux( demux_t *p_demux )
                     p_input, _("Google Video"), type, "%s", field ) ; }
         SADD_INFO( "gvp_version", psz_version );
         SADD_INFO( "docid", psz_docid );
-        SADD_INFO( "description", psz_description );
+        SADD_INFO( "description", psz_desc );
         input_item_node_AppendItem( p_subitems, p_input );
         vlc_gc_decref( p_input );
     }
@@ -221,7 +182,7 @@ static int Demux( demux_t *p_demux )
     free( psz_url );
     free( psz_docid );
     free( psz_title );
-    free( psz_description );
+    free( psz_desc );
 
     return 0; /* Needed for correct operation of go back */
 }

@@ -1,11 +1,11 @@
 /*****************************************************************************
  * vlc_filter.h: filter related structures and functions
  *****************************************************************************
- * Copyright (C) 1999-2008 VLC authors and VideoLAN
- * $Id$
+ * Copyright (C) 1999-2014 VLC authors and VideoLAN
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Antoine Cellerier <dionoea at videolan dot org>
+ *          Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -37,6 +37,24 @@
 
 typedef struct filter_owner_sys_t filter_owner_sys_t;
 
+typedef struct filter_owner_t
+{
+    void *sys;
+
+    union
+    {
+        struct
+        {
+            picture_t * (*buffer_new)( filter_t * );
+        } video;
+        struct
+        {
+            subpicture_t * (*buffer_new)( filter_t * );
+        } sub;
+    };
+} filter_owner_t;
+
+
 /** Structure describing a filter
  * @warning BIG FAT WARNING : the code relies on the first 4 members of
  * filter_t and decoder_t to be the same, so if you have anything to add,
@@ -66,8 +84,6 @@ struct filter_t
         {
             picture_t * (*pf_filter) ( filter_t *, picture_t * );
             void        (*pf_flush)( filter_t * );
-            picture_t * (*pf_buffer_new) ( filter_t * );
-            void        (*pf_buffer_del) ( filter_t *, picture_t * );
             /* Filter mouse state.
              *
              * If non-NULL, you must convert from output to input formats:
@@ -83,8 +99,6 @@ struct filter_t
 #define pf_video_filter     u.video.pf_filter
 #define pf_video_flush      u.video.pf_flush
 #define pf_video_mouse      u.video.pf_mouse
-#define pf_video_buffer_new u.video.pf_buffer_new
-#define pf_video_buffer_del u.video.pf_buffer_del
 
         struct
         {
@@ -102,16 +116,12 @@ struct filter_t
         struct
         {
             subpicture_t * (*pf_source)    ( filter_t *, mtime_t );
-            subpicture_t * (*pf_buffer_new)( filter_t * );
-            void           (*pf_buffer_del)( filter_t *, subpicture_t * );
             int            (*pf_mouse)     ( filter_t *,
                                              const vlc_mouse_t *p_old,
                                              const vlc_mouse_t *p_new,
                                              const video_format_t * );
         } sub;
 #define pf_sub_source      u.sub.pf_source
-#define pf_sub_buffer_new  u.sub.pf_buffer_new
-#define pf_sub_buffer_del  u.sub.pf_buffer_del
 #define pf_sub_mouse       u.sub.pf_mouse
 
         struct
@@ -139,12 +149,12 @@ struct filter_t
     int (*pf_get_attachments)( filter_t *, input_attachment_t ***, int * );
 
     /* Private structure for the owner of the decoder */
-    filter_owner_sys_t *p_owner;
+    filter_owner_t      owner;
 };
 
 /**
  * This function will return a new picture usable by p_filter as an output
- * buffer. You have to release it using filter_DeletePicture or by returning
+ * buffer. You have to release it using picture_Release or by returning
  * it to the caller as a pf_video_filter return value.
  * Provided for convenience.
  *
@@ -153,22 +163,10 @@ struct filter_t
  */
 static inline picture_t *filter_NewPicture( filter_t *p_filter )
 {
-    picture_t *p_picture = p_filter->pf_video_buffer_new( p_filter );
-    if( !p_picture )
+    picture_t *pic = p_filter->owner.video.buffer_new( p_filter );
+    if( pic == NULL )
         msg_Warn( p_filter, "can't get output picture" );
-    return p_picture;
-}
-
-/**
- * This function will release a picture create by filter_NewPicture.
- * Provided for convenience.
- *
- * \param p_filter filter_t object
- * \param p_picture picture to be deleted
- */
-static inline void filter_DeletePicture( filter_t *p_filter, picture_t *p_picture )
-{
-    p_filter->pf_video_buffer_del( p_filter, p_picture );
+    return pic;
 }
 
 /**
@@ -182,8 +180,8 @@ static inline void filter_FlushPictures( filter_t *p_filter )
 
 /**
  * This function will return a new subpicture usable by p_filter as an output
- * buffer. You have to release it using filter_DeleteSubpicture or by returning
- * it to the caller as a pf_sub_source return value.
+ * buffer. You have to release it using subpicture_Delete or by returning it to
+ * the caller as a pf_sub_source return value.
  * Provided for convenience.
  *
  * \param p_filter filter_t object
@@ -191,22 +189,10 @@ static inline void filter_FlushPictures( filter_t *p_filter )
  */
 static inline subpicture_t *filter_NewSubpicture( filter_t *p_filter )
 {
-    subpicture_t *p_subpicture = p_filter->pf_sub_buffer_new( p_filter );
-    if( !p_subpicture )
+    subpicture_t *subpic = p_filter->owner.sub.buffer_new( p_filter );
+    if( subpic == NULL )
         msg_Warn( p_filter, "can't get output subpicture" );
-    return p_subpicture;
-}
-
-/**
- * This function will release a subpicture create by filter_NewSubicture.
- * Provided for convenience.
- *
- * \param p_filter filter_t object
- * \param p_subpicture to be released
- */
-static inline void filter_DeleteSubpicture( filter_t *p_filter, subpicture_t *p_subpicture )
-{
-    p_filter->pf_sub_buffer_del( p_filter, p_subpicture );
+    return subpic;
 }
 
 /**
@@ -284,13 +270,25 @@ typedef struct filter_chain_t filter_chain_t;
  * \param p_object pointer to a vlc object
  * \param psz_capability vlc capability of filters in filter chain
  * \param b_allow_format_fmt_change allow changing of fmt
- * \param pf_buffer_allocation_init callback function to initialize buffer allocations
- * \param pf_buffer_allocation_clear callback function to clear buffer allocation initialization
- * \param p_buffer_allocation_data pointer to private allocation data
  * \return pointer to a filter chain
  */
-VLC_API filter_chain_t * filter_chain_New( vlc_object_t *, const char *, bool, int (*)( filter_t *, void * ), void (*)( filter_t * ), void *  ) VLC_USED;
-#define filter_chain_New( a, b, c, d, e, f ) filter_chain_New( VLC_OBJECT( a ), b, c, d, e, f )
+VLC_API filter_chain_t * filter_chain_New( vlc_object_t *, const char *, bool )
+VLC_USED;
+#define filter_chain_New( a, b, c ) filter_chain_New( VLC_OBJECT( a ), b, c )
+
+/**
+ * Creates a new video filter chain.
+ *
+ * \param obj pointer to parent VLC object
+ * \param change whether to allow changing the output format
+ * \param owner owner video buffer callbacks
+ * \return new filter chain, or NULL on error
+ */
+VLC_API filter_chain_t * filter_chain_NewVideo( vlc_object_t *obj, bool change,
+                                                const filter_owner_t *owner )
+VLC_USED;
+#define filter_chain_NewVideo( a, b, c ) \
+        filter_chain_NewVideo( VLC_OBJECT( a ), b, c )
 
 /**
  * Delete filter chain will delete all filters in the chain and free all
@@ -338,9 +336,8 @@ VLC_API int filter_chain_AppendFromString( filter_chain_t *, const char * );
  *
  * \param p_chain pointer to filter chain
  * \param p_filter pointer to filter object
- * \return VLC_SUCCESS on succes, else VLC_EGENERIC
  */
-VLC_API int filter_chain_DeleteFilter( filter_chain_t *, filter_t * );
+VLC_API void filter_chain_DeleteFilter( filter_chain_t *, filter_t * );
 
 /**
  * Get the number of filters in the filter chain.
@@ -387,7 +384,7 @@ VLC_API block_t * filter_chain_AudioFilter( filter_chain_t *, block_t * );
  * \param p_chain pointer to filter chain
  * \param display_date of subpictures
  */
-VLC_API void filter_chain_SubSource( filter_chain_t *, mtime_t );
+void filter_chain_SubSource( filter_chain_t *, spu_t *, mtime_t );
 
 /**
  * Apply filter chain to subpictures.
@@ -414,6 +411,9 @@ VLC_API int filter_chain_MouseFilter( filter_chain_t *, vlc_mouse_t *, const vlc
  * It makes sense only for a sub source chain.
  */
 VLC_API int filter_chain_MouseEvent( filter_chain_t *, const vlc_mouse_t *, const video_format_t * );
+
+int filter_chain_ForEach( filter_chain_t *chain,
+                          int (*cb)( filter_t *, void * ), void *opaque );
 
 #endif /* _VLC_FILTER_H */
 

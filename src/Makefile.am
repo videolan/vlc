@@ -182,7 +182,7 @@ libvlccore_la_LDFLAGS = \
 	$(LDFLAGS_libvlccore) \
 	-no-undefined \
 	-export-symbols $(srcdir)/libvlccore.sym \
-	-version-info 7:0:0
+	-version-info 8:0:0
 libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 	../compat/libcompat.la \
 	$(LTLIBINTL) $(LTLIBICONV) \
@@ -190,7 +190,11 @@ libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
-libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version
+libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version \
+						 -Wc,--static -Wc,-static-libgcc
+endif
+if HAVE_OS2
+libvlccore_la_LDFLAGS += -avoid-version
 endif
 if HAVE_DBUS
 libvlccore_la_LIBADD += $(DBUS_LIBS)
@@ -408,6 +412,7 @@ SOURCES_libvlc_common = \
 	video_output/video_widgets.c \
 	video_output/vout_subpictures.c \
 	video_output/window.c \
+	video_output/window.h \
 	video_output/opengl.c \
 	video_output/vout_intf.c \
 	video_output/vout_internal.h \
@@ -480,6 +485,7 @@ SOURCES_libvlc_common = \
 	misc/filter.c \
 	misc/filter_chain.c \
 	misc/http_auth.c \
+	misc/httpcookies.c \
 	misc/fingerprinter.c \
 	misc/text_style.c \
 	misc/subpicture.c \
@@ -514,6 +520,7 @@ check_PROGRAMS = \
 	test_dictionary \
 	test_i18n_atof \
 	test_md5 \
+	test_picture_pool \
 	test_timer \
 	test_url \
 	test_utf8 \
@@ -529,6 +536,7 @@ test_block_DEPENDENCIES =
 test_dictionary_SOURCES = test/dictionary.c
 test_i18n_atof_SOURCES = test/i18n_atof.c
 test_md5_SOURCES = test/md5.c
+test_picture_pool_SOURCES = test/picture_pool.c
 test_timer_SOURCES = test/timer.c
 test_url_SOURCES = test/url.c
 test_utf8_SOURCES = test/utf8.c

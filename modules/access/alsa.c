@@ -185,6 +185,7 @@ static void *Thread (void *data)
         pts = mdate ();
         if (frames < 0)
         {
+            block_Release (block);
             if (frames == -EAGAIN)
                 continue;
 
@@ -193,7 +194,23 @@ static void *Thread (void *data)
             {
                 msg_Warn (demux, "cannot read samples: %s",
                           snd_strerror (frames));
-                continue;
+                snd_pcm_state_t state = snd_pcm_state (pcm);
+                switch (state)
+                {
+                case SND_PCM_STATE_PREPARED:
+                    val = snd_pcm_start (pcm);
+                    if (val < 0)
+                    {
+                        msg_Err (demux, "cannot prepare device: %s",
+                                 snd_strerror (val));
+                        return NULL;
+                    }
+                    continue;
+                case SND_PCM_STATE_RUNNING:
+                    continue;
+                default:
+                    break;
+                }
             }
             msg_Err (demux, "cannot recover record stream: %s",
                      snd_strerror (val));

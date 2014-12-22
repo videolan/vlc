@@ -25,7 +25,14 @@
 #ifndef IMPDPARSER_H_
 #define IMPDPARSER_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "mpd/MPD.h"
+#include "xml/DOMParser.h"
+
+#include <vlc_common.h>
 
 namespace dash
 {
@@ -34,9 +41,18 @@ namespace dash
         class IMPDParser
         {
             public:
-                virtual bool    parse  () = 0;
-                virtual MPD*    getMPD () = 0;
+                IMPDParser(dash::xml::Node *, MPD*, stream_t*, Representation*);
                 virtual ~IMPDParser(){}
+                virtual bool    parse  (Profile profile) = 0;
+                virtual MPD*    getMPD ();
+                virtual void    setMPDBaseUrl(dash::xml::Node *root);
+                virtual void    setAdaptationSets(dash::xml::Node *periodNode, Period *period) = 0;
+
+            protected:
+                dash::xml::Node *root;
+                MPD             *mpd;
+                stream_t        *p_stream;
+                Representation  *currentRepresentation;
         };
     }
 }

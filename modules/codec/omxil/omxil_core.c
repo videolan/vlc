@@ -57,11 +57,12 @@ static const char *ppsz_dll_list[] =
     "libiomx.so", /* Not used when using IOMX, the lib should already be loaded */
 #elif defined(RPI_OMX)
     "/opt/vc/lib/libopenmaxil.so",  /* Broadcom IL core */
-#else
+#elif 1
     "libOMX_Core.so", /* TI OMAP IL core */
     "libOmxCore.so", /* Qualcomm IL core */
-    "libomxil-bellagio.so",  /* Bellagio IL core */
     "libnvomx.so", /* Tegra3 IL core */
+#else
+    "libomxil-bellagio.so",  /* Bellagio IL core reference implementation */
 #endif
     0
 };
@@ -87,6 +88,9 @@ OMX_ERRORTYPE (*pf_get_handle) (OMX_HANDLETYPE *, OMX_STRING,
 OMX_ERRORTYPE (*pf_free_handle) (OMX_HANDLETYPE);
 OMX_ERRORTYPE (*pf_component_enum)(OMX_STRING, OMX_U32, OMX_U32);
 OMX_ERRORTYPE (*pf_get_roles_of_component)(OMX_STRING, OMX_U32 *, OMX_U8 **);
+OMX_ERRORTYPE (*pf_enable_graphic_buffers)(OMX_HANDLETYPE, OMX_U32, OMX_BOOL);
+OMX_ERRORTYPE (*pf_get_graphic_buffer_usage)(OMX_HANDLETYPE, OMX_U32, OMX_U32*);
+OMX_ERRORTYPE (*pf_get_hal_format) (const char *, int *);
 
 #ifdef RPI_OMX
 static void *extra_dll_handle;
@@ -160,6 +164,11 @@ int InitOmxCore(vlc_object_t *p_this)
         vlc_mutex_unlock( &omx_core_mutex );
         return VLC_EGENERIC;
     }
+#if defined(USE_IOMX)
+    pf_enable_graphic_buffers = dlsym( dll_handle, "OMXAndroid_EnableGraphicBuffers" );
+    pf_get_graphic_buffer_usage = dlsym( dll_handle, "OMXAndroid_GetGraphicBufferUsage" );
+    pf_get_hal_format = dlsym( dll_handle, "OMXAndroid_GetHalFormat" );
+#endif
 
     /* Initialise the OMX core */
     OMX_ERRORTYPE omx_error = pf_init();

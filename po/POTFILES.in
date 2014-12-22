@@ -179,6 +179,7 @@ lib/vlm.c
 
 # modules
 modules/access/alsa.c
+modules/access/archive/archive.c
 modules/access/attachment.c
 modules/access/avio.h
 modules/access/bd/bd.c
@@ -192,6 +193,7 @@ modules/access/dshow/crossbar.cpp
 modules/access/dshow/dshow.cpp
 modules/access/dshow/filter.cpp
 modules/access/dshow/filter.h
+modules/access/dsm/access.c
 modules/access/dtv/access.c
 modules/access/dv.c
 modules/access/dvdnav.c
@@ -252,6 +254,7 @@ modules/access/rtsp/rtsp.h
 modules/access/screen/mac.c
 modules/access/screen/screen.c
 modules/access/screen/screen.h
+modules/access/screen/wayland.c
 modules/access/screen/win32.c
 modules/access/screen/xcb.c
 modules/access/sdp.c
@@ -343,6 +346,7 @@ modules/codec/a52.c
 modules/codec/adpcm.c
 modules/codec/aes3.c
 modules/codec/araw.c
+modules/codec/arib/aribsub.c
 modules/codec/avcodec/audio.c
 modules/codec/avcodec/avcodec.c
 modules/codec/avcodec/avcodec.h
@@ -350,7 +354,6 @@ modules/codec/avcodec/chroma.c
 modules/codec/avcodec/dxva2.c
 modules/codec/avcodec/encoder.c
 modules/codec/avcodec/fourcc.c
-modules/codec/avcodec/hwdummy.c
 modules/codec/avcodec/vaapi.c
 modules/codec/avcodec/vda.c
 modules/codec/avcodec/video.c
@@ -359,6 +362,7 @@ modules/codec/cc.h
 modules/codec/cdg.c
 modules/codec/crystalhd.c
 modules/codec/cvdsub.c
+modules/codec/daala.c
 modules/codec/ddummy.c
 modules/codec/dmo/buffer.c
 modules/codec/dmo/dmo.c
@@ -378,8 +382,8 @@ modules/codec/libass.c
 modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mft.c
-modules/codec/mmal.c
 modules/codec/mpeg_audio.c
+modules/codec/mpg123.c
 modules/codec/omxil/android_mediacodec.c
 modules/codec/omxil/omxil.c
 modules/codec/omxil/omxil.h
@@ -925,6 +929,8 @@ modules/gui/skins2/x11/x11_tooltip.cpp
 modules/gui/skins2/x11/x11_tooltip.hpp
 modules/gui/skins2/x11/x11_window.cpp
 modules/gui/skins2/x11/x11_window.hpp
+modules/hw/mmal/codec.c
+modules/hw/mmal/vout.c
 modules/hw/vdpau/adjust.c
 modules/hw/vdpau/avcodec.c
 modules/hw/vdpau/chroma.c
@@ -1010,8 +1016,10 @@ modules/services_discovery/udev.c
 modules/services_discovery/upnp.cpp
 modules/services_discovery/windrive.c
 modules/services_discovery/xcb_apps.c
+modules/stream_filter/aribcam.c
 modules/stream_filter/dash/dash.cpp
 modules/stream_filter/decomp.c
+modules/stream_filter/hds/hds.c
 modules/stream_filter/httplive.c
 modules/stream_filter/record.c
 modules/stream_filter/smooth/smooth.c
@@ -1109,6 +1117,7 @@ modules/video_filter/erase.c
 modules/video_filter/extract.c
 modules/video_filter/filter_event_info.h
 modules/video_filter/filter_picture.h
+modules/video_filter/fps.c
 modules/video_filter/freeze.c
 modules/video_filter/gaussianblur.c
 modules/video_filter/gradfun.c
@@ -1146,8 +1155,8 @@ modules/video_filter/vhs.c
 modules/video_filter/wave.c
 modules/video_filter/yuvp.c
 modules/video_output/aa.c
+modules/video_output/android/android_window.c
 modules/video_output/android/nativewindow.c
-modules/video_output/android/opaque.c
 modules/video_output/android/surface.c
 modules/video_output/caca.c
 modules/video_output/caopengllayer.m
@@ -1161,7 +1170,6 @@ modules/video_output/glx.c
 modules/video_output/ios2.m
 modules/video_output/kva.c
 modules/video_output/macosx.m
-modules/video_output/mmal.c
 modules/video_output/msw/direct2d.c
 modules/video_output/msw/direct3d.c
 modules/video_output/msw/directx.c
@@ -1171,6 +1179,8 @@ modules/video_output/msw/wingdi.c
 modules/video_output/sdl.c
 modules/video_output/vdummy.c
 modules/video_output/vmem.c
+modules/video_output/wayland/shell_surface.c
+modules/video_output/wayland/shm.c
 modules/video_output/xcb/glx.c
 modules/video_output/xcb/window.c
 modules/video_output/xcb/x11.c

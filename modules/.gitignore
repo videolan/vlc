@@ -1,3 +1,6 @@
+*-client-protocol.h
+*-protocol.c
+dummy.cpp
 plugins.dat
 srtp-test-aes
 srtp-test-recv

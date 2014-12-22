@@ -124,7 +124,7 @@ void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level )
 libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance )
 {
     (void) p_instance;
-    return malloc(1);
+    return malloc(sizeof(libvlc_log_t));
 }
 
 void libvlc_log_close( libvlc_log_t *p_log )

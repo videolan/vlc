@@ -1,0 +1,11 @@
+--- mpg123/Makefile.am	2014-09-28 23:27:28.000000000 +0200
++++ mpg123.new/Makefile.am	2014-12-01 19:26:28.156173697 +0100
+@@ -6,7 +6,7 @@
+ ## initially written by Nicholas J. Humfrey
+ dist_man_MANS = man1/mpg123.1 man1/out123.1
+ 
+-SUBDIRS = src doc
++SUBDIRS = src/libmpg123 doc
+ DIST_SUBDIRS = src doc
+ ACLOCAL_AMFLAGS = -I m4
+ 

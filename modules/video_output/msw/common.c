@@ -78,11 +78,10 @@ int CommonInit(vout_display_t *vd)
 #ifdef MODULE_NAME_IS_directdraw
     cfg.use_overlay = sys->use_overlay;
 #endif
-    cfg.win.type   = VOUT_WINDOW_TYPE_HWND;
-    cfg.win.x      = var_InheritInteger(vd, "video-x");
-    cfg.win.y      = var_InheritInteger(vd, "video-y");
-    cfg.win.width  = vd->cfg->display.width;
-    cfg.win.height = vd->cfg->display.height;
+    cfg.x      = var_InheritInteger(vd, "video-x");
+    cfg.y      = var_InheritInteger(vd, "video-y");
+    cfg.width  = vd->cfg->display.width;
+    cfg.height = vd->cfg->display.height;
 
     event_hwnd_t hwnd;
     if (EventThreadStart(sys->event, &hwnd, &cfg))
@@ -329,8 +328,8 @@ void UpdateRects(vout_display_t *vd,
                                     point.x, point.y,
                                     rect.right, rect.bottom);
     if (is_resized)
-        vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom, cfg->is_fullscreen);
-    if (!is_forced && !has_moved && !is_resized )
+        vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom);
+    if (!is_forced && !has_moved && !is_resized)
         return;
 
     /* Update the window position and size */
@@ -473,7 +472,7 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
 
     /* */
     if (sys->parent_window)
-        return vout_window_SetFullScreen(sys->parent_window, is_fullscreen);
+        return VLC_EGENERIC;
 
     /* */
     HWND hwnd = sys->hparent && sys->hfswnd ? sys->hfswnd : sys->hwnd;
@@ -554,14 +553,30 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg, int is_forced */
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
+    {   /* Update dimensions */
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
+        RECT rect_window = {
+            .top    = 0,
+            .left   = 0,
+            .right  = cfg->display.width,
+            .bottom = cfg->display.height,
+        };
+
+        AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
+        SetWindowPos(sys->hwnd, 0, 0, 0,
+                     rect_window.right - rect_window.left,
+                     rect_window.bottom - rect_window.top, SWP_NOMOVE);
+        UpdateRects(vd, cfg, &vd->source, false);
+        return VLC_SUCCESS;
+    }
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED: /* const vout_display_cfg_t *p_cfg */
     case VOUT_DISPLAY_CHANGE_ZOOM:           /* const vout_display_cfg_t *p_cfg */
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:  /* const video_format_t *p_source */
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {  /* const video_format_t *p_source */
         const vout_display_cfg_t *cfg;
         const video_format_t *source;
-        bool  is_forced = true;
+
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP ||
             query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT) {
             cfg    = vd->cfg;
@@ -569,28 +584,8 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         } else {
             cfg    = va_arg(args, const vout_display_cfg_t *);
             source = &vd->source;
-            if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                is_forced = va_arg(args, int);
         }
-        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE && is_forced) {
-            /* Update dimensions */
-            if (sys->parent_window) {
-                vout_window_SetSize(sys->parent_window, cfg->display.width, cfg->display.height);
-            } else {
-                RECT rect_window;
-                rect_window.top    = 0;
-                rect_window.left   = 0;
-                rect_window.right  = cfg->display.width;
-                rect_window.bottom = cfg->display.height;
-                AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
-
-                SetWindowPos(sys->hwnd, 0, 0, 0,
-                             rect_window.right - rect_window.left,
-                             rect_window.bottom - rect_window.top, SWP_NOMOVE);
-            }
-            return VLC_EGENERIC;
-        }
-        UpdateRects(vd, cfg, source, is_forced);
+        UpdateRects(vd, cfg, source, false);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
@@ -600,26 +595,21 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         if (sys->use_desktop && is_on_top)
             return VLC_EGENERIC;
 #endif
-        if (sys->parent_window) {
-            if (vout_window_SetState(sys->parent_window, state))
-                return VLC_EGENERIC;
-        } else {
-            HMENU hMenu = GetSystemMenu(sys->hwnd, FALSE);
+        HMENU hMenu = GetSystemMenu(sys->hwnd, FALSE);
 
-            if (is_on_top && !(GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-                CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_CHECKED);
-                SetWindowPos(sys->hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-            } else if (!is_on_top && (GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
-                CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_UNCHECKED);
-                SetWindowPos(sys->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
-            }
+        if (is_on_top && !(GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
+            CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_CHECKED);
+            SetWindowPos(sys->hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+        } else if (!is_on_top && (GetWindowLong(sys->hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
+            CheckMenuItem(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND | MFS_UNCHECKED);
+            SetWindowPos(sys->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE|SWP_NOMOVE);
         }
         sys->is_on_top = is_on_top;
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN: {   /* const vout_display_cfg_t *p_cfg */
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-        if (CommonControlSetFullscreen(vd, cfg->is_fullscreen))
+    case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
+        bool fs = va_arg(args, int);
+        if (CommonControlSetFullscreen(vd, fs))
             return VLC_EGENERIC;
         UpdateRects(vd, NULL, NULL, false);
         return VLC_SUCCESS;

@@ -88,6 +88,8 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
 
+    if (vout_display_IsWindowed(vd))
+        return VLC_EGENERIC;
 #if !defined(__APPLE__) && !defined(_WIN32)
 # ifndef X_DISPLAY_MISSING
     if (!vlc_xlib_init(object))
@@ -166,7 +168,6 @@ static int Open(vlc_object_t *object)
         msg_Err(vd, "cannot initialize libcaca");
         goto error;
     }
-    vout_display_DeleteWindow(vd, NULL);
 
     if (vd->cfg->display.title)
         caca_set_display_title(sys->dp,
@@ -206,7 +207,7 @@ static int Open(vlc_object_t *object)
 error:
     if (sys) {
         if (sys->pool)
-            picture_pool_Delete(sys->pool);
+            picture_pool_Release(sys->pool);
         if (sys->dither)
             cucul_free_dither(sys->dither);
         if (sys->dp)
@@ -231,7 +232,7 @@ static void Close(vlc_object_t *object)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     if (sys->dither)
         cucul_free_dither(sys->dither);
     caca_free_display(sys->dp);
@@ -311,27 +312,18 @@ static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
 
+    (void) args;
+
     switch (query) {
     case VOUT_DISPLAY_HIDE_MOUSE:
         caca_set_mouse(sys->dp, 0);
         return VLC_SUCCESS;
 
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE: {
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-
-        caca_refresh_display(sys->dp);
-
-        /* Not quite good but not sure how to resize it */
-        if ((int)cfg->display.width  != caca_get_display_width(sys->dp) ||
-            (int)cfg->display.height != caca_get_display_height(sys->dp))
-            return VLC_EGENERIC;
-        return VLC_SUCCESS;
-    }
-
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
 
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         if (sys->dither)
@@ -361,7 +353,7 @@ static void Refresh(vout_display_t *vd)
 
     if (width  != vd->cfg->display.width ||
         height != vd->cfg->display.height)
-        vout_display_SendEventDisplaySize(vd, width, height, false);
+        vout_display_SendEventDisplaySize(vd, width, height);
 }
 
 /**
@@ -504,7 +496,7 @@ static void Manage(vout_display_t *vd)
         }
         case CACA_EVENT_RESIZE:
             vout_display_SendEventDisplaySize(vd, caca_get_event_resize_width(&ev),
-                                                  caca_get_event_resize_height(&ev), false);
+                                                  caca_get_event_resize_height(&ev));
             break;
         case CACA_EVENT_MOUSE_MOTION: {
             vout_display_place_t place;

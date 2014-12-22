@@ -1,4 +1,5 @@
 test_libvlc_core
+test_libvlc_equalizer
 test_libvlc_events
 test_libvlc_media
 test_libvlc_media_list

@@ -24,12 +24,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <vlc_input.h>
+#import "intf.h"
+#import "StringUtility.h"
+#import "CompatibilityFixes.h"
+
 #import <vlc_keys.h>
 #import <vlc_strings.h>
-
-#import "StringUtility.h"
-#import "intf.h"
 
 @implementation VLCStringUtility
 
@@ -393,5 +393,16 @@ NSString *toNSStr(const char *str) {
     return returnStr;
 }
 
-
 @end
+
+NSImage *imageFromRes(NSString *o_id)
+{
+    NSString *result = @"";
+    if (OSX_YOSEMITE) {
+        result = [result stringByAppendingString:@"ys-"];
+    }
+
+    result = [result stringByAppendingString:o_id];
+
+    return [NSImage imageNamed:result];
+}

@@ -80,13 +80,6 @@ typedef enum  {
   SUBTITLE_BLOCK_COMPLETE = 2
 } packet_state_t;
 
-#ifndef NDEBUG
-# define dbg_print( s, args...) \
-     msg_Dbg(p_dec, "%s: "s, __func__ , ##args)
-#else
-# define dbg_print( s, args...)
-#endif
-
 struct decoder_sys_t
 {
   packet_state_t i_state; /* data-gathering state for this subtitle */
@@ -174,7 +167,9 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
     block_t *p_block, *p_spu;
 
-    dbg_print( "" );
+#ifndef NDEBUG
+    msg_Dbg( p_dec, "Decode" );
+#endif
 
     if( pp_block == NULL || *pp_block == NULL ) return NULL;
 
@@ -314,7 +309,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
                       p_spu->i_buffer, p_sys->i_spu_size );
         }
 
-        dbg_print( "subtitle packet complete, size=%zu", p_spu->i_buffer );
+        msg_Dbg( p_dec, "subtitle packet complete, size=%zu", p_spu->i_buffer );
 
         p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
         p_sys->p_spu = 0;
@@ -465,7 +460,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     if( !p_region )
     {
         msg_Err( p_dec, "cannot allocate SVCD subtitle region" );
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         return NULL;
     }
 

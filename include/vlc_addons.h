@@ -36,6 +36,8 @@ typedef enum addon_type_t
     ADDON_SERVICE_DISCOVERY,
     ADDON_SKIN2,
     ADDON_PLUGIN,
+    ADDON_INTERFACE,
+    ADDON_META,
     ADDON_OTHER
 } addon_type_t;
 

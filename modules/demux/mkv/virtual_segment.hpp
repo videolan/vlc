@@ -114,14 +114,14 @@ public:
     virtual_segment_c( std::vector<matroska_segment_c*> * opened_segments );
     ~virtual_segment_c();
     std::vector<virtual_edition_c*> editions;
-    int                             i_current_edition;
+    std::vector<virtual_edition_c*>::size_type i_current_edition;
     virtual_chapter_c               *p_current_chapter;
     int                             i_sys_title;
 
 
     inline virtual_edition_c * CurrentEdition()
     {
-        if( i_current_edition >= 0 && (size_t) i_current_edition < editions.size() )
+        if( i_current_edition < editions.size() )
             return editions[i_current_edition];
         return NULL;
     }

@@ -22,11 +22,12 @@
  *****************************************************************************/
 
 #import "MainMenu.h"
+#import "intf.h"
+
 #import <vlc_common.h>
 #import <vlc_playlist.h>
 #import <vlc_input.h>
 
-#import "intf.h"
 #import "open.h"
 #import "wizard.h"
 #import "about.h"
@@ -136,6 +137,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
         msg_Dbg(VLCIntf, "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
         [o_mi_rate_fld setAlignment: NSLeftTextAlignment];
     }
+
+    [self setRateControlsEnabled:NO];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
@@ -290,13 +293,13 @@ static VLCMainMenu *_o_sharedInstance = nil;
                                                action:@selector(togglePostProcessing:)
                                         keyEquivalent:@""];
         o_mitem = [o_mu_ffmpeg_pp itemAtIndex:x];
-        [o_mitem setEnabled: YES];
+        [o_mitem setEnabled:YES];
         [o_mitem setTag:x];
-        [o_mitem setTarget: self];
+        [o_mitem setTarget:self];
     }
     char *psz_config = config_GetPsz(p_intf, "video-filter");
     if (psz_config) {
-        if (!strstr(psz_config, "postprocess"))
+        if (!strstr(psz_config, "postproc"))
             [[o_mu_ffmpeg_pp itemAtIndex:0] setState:NSOnState];
         else
             [[o_mu_ffmpeg_pp itemWithTag:config_GetInt(p_intf, "postproc-q")] setState:NSOnState];
@@ -401,7 +404,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_record setTitle: _NS("Record")];
     [o_mi_rate setView: o_mi_rate_view];
     [o_mi_rate_lbl setStringValue: _NS("Playback Speed")];
-    [o_mi_rate_lbl_gray setStringValue: _NS("Playback Speed")];
     [o_mi_rate_slower_lbl setStringValue: _NS("Slower")];
     [o_mi_rate_normal_lbl setStringValue: _NS("Normal")];
     [o_mi_rate_faster_lbl setStringValue: _NS("Faster")];
@@ -574,8 +576,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     playlist_t * p_playlist = pl_Get(p_intf);
     input_thread_t * p_input = playlist_CurrentInput(p_playlist);
     if (p_input != NULL) {
-        [o_mi_record setEnabled: var_GetBool(p_input, "can-record")];
-
         [self setupVarMenuItem: o_mi_program target: (vlc_object_t *)p_input
                                  var: "program" selector: @selector(toggleVar:)];
 
@@ -626,7 +626,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [o_mi_ffmpeg_pp setEnabled:YES];
         vlc_object_release(p_input);
     } else {
-        [o_mi_record setEnabled: NO];
         [o_mi_ffmpeg_pp setEnabled:NO];
     }
 }
@@ -699,13 +698,15 @@ static VLCMainMenu *_o_sharedInstance = nil;
     int i = [[VLCCoreInteraction sharedInstance] playbackRate];
     double speed =  pow(2, (double)i / 17);
     [o_mi_rate_fld setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
-    if (b_enabled) {
-        [o_mi_rate_lbl setHidden: NO];
-        [o_mi_rate_lbl_gray setHidden: YES];
-    } else {
-        [o_mi_rate_lbl setHidden: YES];
-        [o_mi_rate_lbl_gray setHidden: NO];
-    }
+
+    NSColor *o_color = b_enabled ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
+
+    [o_mi_rate_lbl setTextColor:o_color];
+    [o_mi_rate_slower_lbl setTextColor:o_color];
+    [o_mi_rate_normal_lbl setTextColor:o_color];
+    [o_mi_rate_faster_lbl setTextColor:o_color];
+    [o_mi_rate_fld setTextColor:o_color];
+
     [self setSubtitleMenuEnabled: b_enabled];
     [o_pool release];
 }
@@ -940,17 +941,17 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)_disablePostProcessing
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postprocess" on:false];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postproc" on:false];
 }
 
 - (void)_enablePostProcessing
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postprocess" on:true];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postproc" on:true];
 }
 
 - (IBAction)togglePostProcessing:(id)sender
 {
-    char *psz_name = "postprocess";
+    char *psz_name = "postproc";
     NSInteger count = [o_mu_ffmpeg_pp numberOfItems];
     for (NSUInteger x = 0; x < count; x++)
         [[o_mu_ffmpeg_pp itemAtIndex:x] setState:NSOffState];
@@ -962,7 +963,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         [self _enablePostProcessing];
         [sender setState:NSOnState];
 
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty:"postproc-q" forFilter:"postprocess" integer:[sender tag]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty:"postproc-q" forFilter:"postproc" integer:[sender tag]];
     }
 }
 
@@ -1159,7 +1160,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)viewPreferences:(id)sender
 {
-    NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentWindowLevel];
+    NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel];
     [[[VLCMain sharedInstance] simplePreferences] showSimplePrefsWithLevel:i_level];
 }
 
@@ -1429,7 +1430,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         return;
     }
 
-    if (var_Change(p_object, psz_variable, VLC_VAR_GETLIST,
+    if (var_Change(p_object, psz_variable, VLC_VAR_GETCHOICES,
                    &val_list, &text_list) < 0) {
         if ((i_type & VLC_VAR_TYPE) == VLC_VAR_STRING) free(val.psz_string);
         return;
@@ -1530,6 +1531,10 @@ static VLCMainMenu *_o_sharedInstance = nil;
         if (!p_input)
             bEnabled = FALSE;
         [self setupMenus]; /* Make sure input menu is up to date */
+    } else if ([o_title isEqualToString: _NS("Record")]) {
+        bEnabled = FALSE;
+        if (p_input)
+            bEnabled = var_GetBool(p_input, "can-record");
     } else if ([o_title isEqualToString: _NS("Previous")] ||
             [o_title isEqualToString: _NS("Next")]) {
         PL_LOCK;

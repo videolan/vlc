@@ -45,8 +45,11 @@
        </item>
        <item row="0" column="1">
         <widget class="QSlider" name="hueSlider">
+         <property name="minimum">
+          <number>-180</number>
+         </property>
          <property name="maximum">
-          <number>360</number>
+          <number>180</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -55,7 +58,7 @@
           <enum>QSlider::TicksBelow</enum>
          </property>
          <property name="tickInterval">
-          <number>60</number>
+          <number>1</number>
          </property>
         </widget>
        </item>

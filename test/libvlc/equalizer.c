@@ -3,6 +3,7 @@
  */
 
 #include <string.h>
+#include <math.h>
 
 #include "test.h"
 
@@ -118,7 +119,7 @@ static void test_equalizer (const char ** argv, int argc)
 
     // amp at index out of range
 
-    assert (0.0f == libvlc_audio_equalizer_get_amp_at_index (equalizer, u_bands));
+    assert (isnan(libvlc_audio_equalizer_get_amp_at_index (equalizer, u_bands)));
     assert (-1 == libvlc_audio_equalizer_set_amp_at_index (equalizer, 19.9f, u_bands));
 
     // no equalizer

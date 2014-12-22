@@ -436,7 +436,7 @@ char *http_auth_FormatAuthorizationHeader(
             "%s%s%s" /* cnonce */
             "%s%s%s" /* opaque */
             "%s%s%s" /* message qop */
-            "%s%08x%s", /* nonce count */
+            "%s=\"%08x\"", /* nonce count */
             /* Mandatory parameters */
             psz_username,
             p_auth->psz_realm,
@@ -457,9 +457,8 @@ char *http_auth_FormatAuthorizationHeader(
             p_auth->psz_qop ? p_auth->psz_qop : "",
             p_auth->psz_qop ? "\", " : "",
             /* "uglyhack" will be parsed as an unhandled extension */
-            p_auth->i_nonce ? "nc=\"" : "uglyhack=\"",
-            p_auth->i_nonce,
-            p_auth->i_nonce ? "\"" : "\""
+            p_auth->i_nonce ? "nc" : "uglyhack",
+            p_auth->i_nonce
         );
         if ( i_rc < 0 )
             goto error;

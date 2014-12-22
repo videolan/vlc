@@ -29,6 +29,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <math.h>
 
 #include <vlc_common.h>
@@ -154,7 +155,7 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
     if( hr != DS_OK )
         return hr;
 
-    size = read - sys->i_last_read;
+    size = (mtime_t)read - sys->i_last_read;
 
     /* GetCurrentPosition cannot be trusted if the return doesn't change
      * Just return an error */
@@ -547,9 +548,12 @@ static HRESULT Stop( aout_stream_sys_t *p_sys )
     vlc_mutex_lock( &p_sys->lock );
     p_sys->b_playing =  true;
     vlc_cond_signal( &p_sys->cond );
-    vlc_cancel( p_sys->eraser_thread );
     vlc_mutex_unlock( &p_sys->lock );
+    vlc_cancel( p_sys->eraser_thread );
     vlc_join( p_sys->eraser_thread, NULL );
+    vlc_cond_destroy( &p_sys->cond );
+    vlc_mutex_destroy( &p_sys->lock );
+
     if( p_sys->p_notify != NULL )
     {
         IDirectSoundNotify_Release(p_sys->p_notify );
@@ -629,6 +633,9 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
         i = 0;
     }
     free( psz_speaker );
+
+    vlc_mutex_init(&sys->lock);
+    vlc_cond_init(&sys->cond);
 
     if( AOUT_FMT_SPDIF( fmt ) && var_InheritBool( obj, "spdif" ) )
     {
@@ -772,6 +779,10 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
     {
         if( ret != ENOMEM )
             msg_Err( obj, "Couldn't start eraser thread" );
+
+        vlc_cond_destroy(&sys->cond);
+        vlc_mutex_destroy(&sys->lock);
+
         if( sys->p_notify != NULL )
         {
             IDirectSoundNotify_Release( sys->p_notify );
@@ -1086,9 +1097,6 @@ static int Open(vlc_object_t *obj)
     aout_DeviceReport(aout, dev);
     free(dev);
 
-    vlc_mutex_init(&sys->s.lock);
-    vlc_cond_init(&sys->s.cond);
-
     return VLC_SUCCESS;
 }
 
@@ -1096,8 +1104,6 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
-    vlc_cond_destroy( &sys->s.cond );
-    vlc_mutex_destroy( &sys->s.lock );
 
     var_Destroy(aout, "directx-audio-device");
     FreeLibrary(sys->hdsound_dll); /* free DSOUND.DLL */

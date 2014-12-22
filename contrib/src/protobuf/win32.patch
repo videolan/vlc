@@ -1,0 +1,28 @@
+diff -ruN protobuf/src/google/protobuf/stubs/common.h  protobuf.new/src/google/protobuf/stubs/common.h
+--- protobuf/src/google/protobuf/stubs/common.h	2013-02-26 18:56:38.000000000 +0100
++++ protobuf.new/src/google/protobuf/stubs/common.h	2014-08-13 21:27:13.620935659 +0200
+@@ -619,6 +619,10 @@
+ // ===================================================================
+ // emulates google3/base/logging.h
+
++#if defined(ERROR)
++# undef ERROR
++#endif
++
+ enum LogLevel {
+   LOGLEVEL_INFO,     // Informational.  This is never actually used by
+                      // libprotobuf.
+diff -ruN protobuf/src/google/protobuf/extension_set.cc  protobuf.new/src/google/protobuf/extension_set.cc
+--- protobuf/src/google/protobuf/extension_set.cc	2013-02-26 18:56:42.000000000 +0100
++++ protobuf.new/src/google/protobuf/extension_set.cc	2014-08-13 21:23:50.960935943 +0200
+@@ -218,6 +218,10 @@
+ // ===================================================================
+ // Field accessors
+
++#if defined(OPTIONAL)
++# undef OPTIONAL
++#endif
++
+ namespace {
+
+ enum Cardinality {

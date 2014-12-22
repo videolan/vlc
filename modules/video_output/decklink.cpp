@@ -476,6 +476,8 @@ static struct decklink_sys_t *OpenDecklink(vout_display_t *vd)
 
     vlc_mutex_unlock(&decklink_sys->lock);
 
+    vout_display_DeleteWindow(vd, NULL);
+
     return decklink_sys;
 
 error:
@@ -679,16 +681,8 @@ end:
 
 static int ControlVideo(vout_display_t *vd, int query, va_list args)
 {
-    VLC_UNUSED(vd);
-    const vout_display_cfg_t *cfg;
-
-    switch (query) {
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-        cfg = va_arg(args, const vout_display_cfg_t *);
-        return cfg->is_fullscreen ? VLC_EGENERIC : VLC_SUCCESS;
-    default:
-        return VLC_EGENERIC;
-    }
+    (void) vd; (void) query; (void) args;
+    return VLC_EGENERIC;
 }
 
 static int OpenVideo(vlc_object_t *p_this)
@@ -771,7 +765,7 @@ static void CloseVideo(vlc_object_t *p_this)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
 
     if (sys->pic_nosignal)
         picture_Release(sys->pic_nosignal);

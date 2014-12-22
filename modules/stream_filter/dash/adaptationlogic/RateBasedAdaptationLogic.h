@@ -26,13 +26,6 @@
 #define RATEBASEDADAPTATIONLOGIC_H_
 
 #include "adaptationlogic/AbstractAdaptationLogic.h"
-#include "xml/Node.h"
-#include "mpd/IMPDManager.h"
-#include "http/Chunk.h"
-#include "mpd/BasicCMManager.h"
-
-#include <vlc_common.h>
-#include <vlc_stream.h>
 
 #define MINBUFFER 30
 
@@ -43,17 +36,28 @@ namespace dash
         class RateBasedAdaptationLogic : public AbstractAdaptationLogic
         {
             public:
-                RateBasedAdaptationLogic            (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
+                RateBasedAdaptationLogic            (mpd::MPD *mpd);
 
-                dash::http::Chunk*      getNextChunk();
-                const dash::mpd::Representation *getCurrentRepresentation() const;
+                dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;
+                virtual void updateDownloadRate(size_t, mtime_t);
 
             private:
-                dash::mpd::IMPDManager  *mpdManager;
-                size_t                  count;
-                dash::mpd::Period       *currentPeriod;
                 int                     width;
                 int                     height;
+                size_t                  bpsAvg;
+                size_t                  bpsSamplecount;
+                size_t                  currentBps;
+        };
+
+        class FixedRateAdaptationLogic : public AbstractAdaptationLogic
+        {
+            public:
+                FixedRateAdaptationLogic(mpd::MPD *mpd);
+
+                dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;
+
+            private:
+                size_t                  currentBps;
         };
     }
 }

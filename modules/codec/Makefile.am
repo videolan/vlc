@@ -54,7 +54,18 @@ liblpcm_plugin_la_SOURCES = codec/lpcm.c
 codec_LTLIBRARIES += liblpcm_plugin.la
 
 libmpeg_audio_plugin_la_SOURCES = codec/mpeg_audio.c
+libmpeg_audio_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 codec_LTLIBRARIES += libmpeg_audio_plugin.la
+if HAVE_MAD
+libmpeg_audio_plugin_la_CPPFLAGS += -DHAVE_MPGA_FILTER
+endif
+
+libmpg123_plugin_la_SOURCES = codec/mpg123.c
+libmpg123_plugin_la_CFLAGS = $(AM_CFLAGS) $(MPG123_CFLAGS)
+libmpg123_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libmpg123_plugin_la_LIBADD = $(MPG123_LIBS)
+EXTRA_LTLIBRARIES += libmpg123_plugin.la
+codec_LTLIBRARIES += $(LTLIBmpg123)
 
 libuleaddvaudio_plugin_la_SOURCES = codec/uleaddvaudio.c
 codec_LTLIBRARIES += libuleaddvaudio_plugin.la
@@ -152,6 +163,13 @@ codec_LTLIBRARIES += libcvdsub_plugin.la
 libdvbsub_plugin_la_SOURCES = codec/dvbsub.c
 codec_LTLIBRARIES += libdvbsub_plugin.la
 
+libaribsub_plugin_la_SOURCES = codec/arib/aribsub.c codec/arib/substext.h
+libaribsub_plugin_la_CFLAGS = $(AM_CFLAGS) $(ARIBB24_CFLAGS)
+libaribsub_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libaribsub_plugin_la_LIBADD = $(ARIBB24_LIBS)
+EXTRA_LTLIBRARIES += libaribsub_plugin.la
+codec_LTLIBRARIES += $(LTLIBaribsub)
+
 libscte27_plugin_la_SOURCES = codec/scte27.c
 codec_LTLIBRARIES += libscte27_plugin.la
 
@@ -230,6 +248,13 @@ libtheora_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libtheora_plugin_la_LIBADD = $(THEORA_LIBS)
 EXTRA_LTLIBRARIES += libtheora_plugin.la
 codec_LTLIBRARIES += $(LTLIBtheora)
+
+libdaala_plugin_la_SOURCES = codec/daala.c
+libdaala_plugin_la_CFLAGS = $(AM_CFLAGS) $(DAALA_CFLAGS)
+libdaala_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libdaala_plugin_la_LIBADD = $(DAALA_LIBS)
+EXTRA_LTLIBRARIES += libdaala_plugin.la
+codec_LTLIBRARIES += $(LTLIBdaala)
 
 libtremor_plugin_la_SOURCES = codec/vorbis.c
 libtremor_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DMODULE_NAME_IS_tremor
@@ -321,14 +346,6 @@ if HAVE_AVCODEC_VDA
 codec_LTLIBRARIES += libvda_plugin.la
 endif
 
-libhwdummy_plugin_la_SOURCES = codec/avcodec/hwdummy.c
-libhwdummy_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS) $(AVCODEC_CFLAGS)
-libhwdummy_plugin_la_LIBADD = $(AVCODEC_LIBS)
-# FIXME: hwdummy only needs libavutil, and only if avcodec < 55.13.0
-if HAVE_AVCODEC_VDPAU
-codec_LTLIBRARIES += libhwdummy_plugin.la
-endif
-
 
 ### OpenMAX ###
 
@@ -346,7 +363,8 @@ noinst_HEADERS += \
 
 libomxil_plugin_la_SOURCES = \
 	codec/omxil/utils.c codec/omxil/omxil_utils.h \
-	codec/h264_nal.h \
+	codec/h264_nal.c codec/h264_nal.h \
+	codec/hevc_nal.c codec/hevc_nal.h \
 	codec/omxil/qcom.c codec/omxil/qcom.h \
 	codec/omxil/omxil.c codec/omxil/omxil.h codec/omxil/omxil_core.c codec/omxil/omxil_core.h \
 	video_chroma/copy.c
@@ -365,23 +383,14 @@ libiomx_plugin_la_LIBADD = $(libomxil_plugin_la_LIBADD)
 
 libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/android_mediacodec.c codec/omxil/utils.c \
-	video_chroma/copy.c codec/omxil/android_opaque.c codec/omxil/android_opaque.h
+	video_chroma/copy.c codec/omxil/android_opaque.c codec/omxil/android_opaque.h \
+	codec/h264_nal.c codec/h264_nal.h codec/hevc_nal.c codec/hevc_nal.h
 
 codec_LTLIBRARIES += $(LTLIBomxil) $(LTLIBomxil_vout)
 EXTRA_LTLIBRARIES += libomxil_plugin.la libomxil_vout_plugin.la
 if HAVE_ANDROID
 codec_LTLIBRARIES += libiomx_plugin.la libmediacodec_plugin.la
 endif
-
-
-### MMAL ###
-
-libmmal_codec_plugin_la_SOURCES = codec/mmal.c
-libmmal_codec_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_mmal_codec)
-libmmal_codec_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' $(LDFLAGS_mmal_codec)
-libmmal_codec_plugin_la_LIBADD = $(LIBS_mmal_codec)
-EXTRA_LTLIBRARIES += libmmal_codec_plugin.la
-codec_LTLIBRARIES += $(LTLIBmmal_codec)
 
 
 ### X26x encoders ###
@@ -453,7 +462,7 @@ codec_LTLIBRARIES += $(LTLIBtwolame)
 
 ### Hardware encoders ###
 
-libcrystalhd_plugin_la_SOURCES = codec/crystalhd.c codec/h264_nal.h
+libcrystalhd_plugin_la_SOURCES = codec/crystalhd.c codec/h264_nal.c codec/h264_nal.h
 libcrystalhd_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libcrystalhd_plugin_la_LIBADD = $(LIBS_crystalhd)
 EXTRA_LTLIBRARIES += libcrystalhd_plugin.la
@@ -477,9 +486,9 @@ libdmo_plugin_la_LIBADD += -lole32 -luuid
 codec_LTLIBRARIES += libdmo_plugin.la
 endif
 
-libmft_plugin_la_SOURCES = codec/mft.c
+libmft_plugin_la_SOURCES = codec/mft.c codec/h264_nal.c codec/h264_nal.h
 if HAVE_WIN32
-libmft_plugin_la_LIBADD = -lole32 -luuid
+libmft_plugin_la_LIBADD = -lole32 -luuid -lmfuuid -lmfplat
 codec_LTLIBRARIES += libmft_plugin.la
 endif
 

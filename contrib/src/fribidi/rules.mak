@@ -20,7 +20,7 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.bz2 .sum-fribidi
 
 # FIXME: DEPS_fribidi = iconv $(DEPS_iconv)
 .fribidi: fribidi
-	cd $< && rm -f configure && ./bootstrap
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@

@@ -83,9 +83,11 @@ static void mrl_Clean( mrl_t *p_mrl );
 sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest )
 {
     sout_instance_t *p_sout;
-
     char *psz_chain;
-    if( psz_dest && psz_dest[0] == '#' )
+
+    assert( psz_dest != NULL );
+
+    if( psz_dest[0] == '#' )
     {
         psz_chain = strdup( &psz_dest[1] );
     }
@@ -218,13 +220,6 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
 
     if( p_input->p_fmt->i_codec == VLC_CODEC_NULL )
     {
-        block_Release( p_buffer );
-        return VLC_SUCCESS;
-    }
-
-    if( p_buffer->i_dts <= VLC_TS_INVALID )
-    {
-        msg_Warn( p_sout, "trying to send non-dated packet to stream output!");
         block_Release( p_buffer );
         return VLC_SUCCESS;
     }
@@ -546,7 +541,7 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 /*****************************************************************************
  * sout_MuxGetStream: find stream to be muxed
  *****************************************************************************/
-int sout_MuxGetStream( sout_mux_t *p_mux, int i_blocks, mtime_t *pi_dts )
+int sout_MuxGetStream( sout_mux_t *p_mux, unsigned i_blocks, mtime_t *pi_dts )
 {
     mtime_t i_dts = 0;
     int     i_stream = -1;
@@ -556,8 +551,15 @@ int sout_MuxGetStream( sout_mux_t *p_mux, int i_blocks, mtime_t *pi_dts )
         sout_input_t *p_input = p_mux->pp_inputs[i];
         block_t *p_data;
 
-        if( block_FifoCount( p_input->p_fifo ) < i_blocks )
+        if( (!p_mux->b_add_stream_any_time) && block_FifoCount( p_input->p_fifo ) < i_blocks )
+        {
+            if( p_input->p_fmt->i_cat != SPU_ES )
+            {
+                return -1;
+            }
+            /* FIXME: SPU muxing */
             continue;
+        }
 
         p_data = block_FifoShow( p_input->p_fifo );
         if( i_stream < 0 || p_data->i_dts < i_dts )

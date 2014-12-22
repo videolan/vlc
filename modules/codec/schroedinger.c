@@ -36,7 +36,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_codec.h>                              /* decoder_DeletePicture */
+#include <vlc_codec.h>
 
 #include <schroedinger/schro.h>
 
@@ -646,7 +646,7 @@ static void SchroFrameFree( SchroFrame *frame, void *priv)
     if( !p_free )
         return;
 
-    decoder_DeletePicture( p_free->p_dec, p_free->p_pic );
+    picture_Release( p_free->p_pic );
     free(p_free);
     (void)frame;
 }
@@ -1548,6 +1548,10 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
                      * is appended to the sequence header to allow guard
                      * against poor streaming servers */
                     /* XXX, should this be done using the packetizer ? */
+
+                    if( len > UINT32_MAX - sizeof( eos ) )
+                        return NULL;
+
                     p_enc->fmt_out.p_extra = malloc( len + sizeof( eos ) );
                     if( !p_enc->fmt_out.p_extra )
                         return NULL;

@@ -8,6 +8,7 @@
 *.moc.cpp
 *.o
 *.so
+*.trs
 *.pc
 *.vlt
 *.class

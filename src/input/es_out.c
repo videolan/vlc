@@ -597,17 +597,14 @@ static void EsOutChangePosition( es_out_t *out )
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 {
     es_out_sys_t *p_sys = out->p_sys;
-    int i_ret;
 
     mtime_t i_stream_start;
     mtime_t i_system_start;
     mtime_t i_stream_duration;
     mtime_t i_system_duration;
-    i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
+    if (input_clock_GetState( p_sys->p_pgrm->p_clock,
                                   &i_stream_start, &i_system_start,
-                                  &i_stream_duration, &i_system_duration );
-    assert( !i_ret || b_forced );
-    if( i_ret )
+                                  &i_stream_duration, &i_system_duration ))
         return;
 
     mtime_t i_preroll_duration = 0;
@@ -827,21 +824,19 @@ static void EsOutFrameNext( es_out_t *out )
 static mtime_t EsOutGetBuffering( es_out_t *out )
 {
     es_out_sys_t *p_sys = out->p_sys;
+    mtime_t i_stream_duration, i_system_start;
 
     if( !p_sys->p_pgrm )
         return 0;
+    else
+    {
+        mtime_t i_stream_start, i_system_duration;
 
-    int i_ret;
-    mtime_t i_stream_start;
-    mtime_t i_system_start;
-    mtime_t i_stream_duration;
-    mtime_t i_system_duration;
-    i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
+        if( input_clock_GetState( p_sys->p_pgrm->p_clock,
                                   &i_stream_start, &i_system_start,
-                                  &i_stream_duration, &i_system_duration );
-
-    if( i_ret )
-        return 0;
+                                  &i_stream_duration, &i_system_duration ) )
+            return 0;
+    }
 
     mtime_t i_delay;
 
@@ -852,6 +847,7 @@ static mtime_t EsOutGetBuffering( es_out_t *out )
     else
     {
         mtime_t i_system_duration;
+
         if( p_sys->b_paused )
         {
             i_system_duration = p_sys->i_pause_date  - i_system_start;
@@ -1016,7 +1012,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     }
 
     /* Update now playing */
-    input_item_SetNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
+    input_item_SetESNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
     input_item_SetPublisher( p_input->p->p_item, p_pgrm->psz_publisher );
 
     input_SendEventMeta( p_input );
@@ -1158,7 +1154,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
 
     /* Check against empty meta data (empty for what we handle) */
     if( !vlc_meta_Get( p_meta, vlc_meta_Title) &&
-        !vlc_meta_Get( p_meta, vlc_meta_NowPlaying) &&
+        !vlc_meta_Get( p_meta, vlc_meta_ESNowPlaying) &&
         !vlc_meta_Get( p_meta, vlc_meta_Publisher) &&
         vlc_meta_GetExtraCount( p_meta ) <= 0 )
     {
@@ -1297,20 +1293,20 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
 
     if( p_pgrm == p_sys->p_pgrm )
     {
-        input_item_SetNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
+        input_item_SetESNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
         input_SendEventMeta( p_input );
     }
 
     if( p_pgrm->psz_now_playing )
     {
         input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-            vlc_meta_TypeToLocalizedString(vlc_meta_NowPlaying), "%s",
+            vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying), "%s",
             p_pgrm->psz_now_playing );
     }
     else
     {
         input_Control( p_input, INPUT_DEL_INFO, psz_cat,
-            vlc_meta_TypeToLocalizedString(vlc_meta_NowPlaying) );
+            vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying) );
     }
 
     free( psz_cat );
@@ -1348,48 +1344,34 @@ static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
 {
     es_out_sys_t    *p_sys = p_out->p_sys;
     input_thread_t  *p_input = p_sys->p_input;
-
     input_item_t *p_item = input_GetItem( p_input );
 
-    char *psz_title = NULL;
-    char *psz_arturl = input_item_GetArtURL( p_item );
+    if( vlc_meta_Get( p_meta, vlc_meta_Title ) != NULL )
+        input_item_SetName( p_item, vlc_meta_Get( p_meta, vlc_meta_Title ) );
+
+    char *psz_arturl = NULL;
+    if( vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL ) != NULL )
+        psz_arturl = input_item_GetArtURL( p_item ); /* save value */
 
     vlc_mutex_lock( &p_item->lock );
-
-    if( vlc_meta_Get( p_meta, vlc_meta_Title ) && !p_item->b_fixed_name )
-        psz_title = strdup( vlc_meta_Get( p_meta, vlc_meta_Title ) );
-
     vlc_meta_Merge( p_item->p_meta, p_meta );
-
-    if( !psz_arturl || *psz_arturl == '\0' )
-    {
-        const char *psz_tmp = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
-        if( psz_tmp )
-            psz_arturl = strdup( psz_tmp );
-    }
     vlc_mutex_unlock( &p_item->lock );
 
-    if( psz_arturl && *psz_arturl )
-    {
+    if( psz_arturl != NULL ) /* restore/favor previously set item art URL */
         input_item_SetArtURL( p_item, psz_arturl );
+    else
+        psz_arturl = input_item_GetArtURL( p_item );
 
-        if( !strncmp( psz_arturl, "attachment://", 13 ) )
-        {
-            /* Don't look for art cover if sout
-             * XXX It can change when sout has meta data support */
-            if( p_input->p->p_sout && !p_input->b_preparsing )
-                input_item_SetArtURL( p_item, "" );
-            else
-                input_ExtractAttachmentAndCacheArt( p_input );
-        }
+    if( psz_arturl != NULL && !strncmp( psz_arturl, "attachment://", 13 ) )
+    {   /* Clear art cover if streaming out.
+         * FIXME: Why? Remove this when sout gets meta data support. */
+        if( p_input->p->p_sout && !p_input->b_preparsing )
+            input_item_SetArtURL( p_item, NULL );
+        else
+            input_ExtractAttachmentAndCacheArt( p_input, psz_arturl + 13 );
     }
     free( psz_arturl );
 
-    if( psz_title )
-    {
-        input_item_SetName( p_item, psz_title );
-        free( psz_title );
-    }
     input_item_SetPreparsed( p_item, true );
 
     input_SendEventMeta( p_input );
@@ -1833,6 +1815,16 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                         i_wanted = es->i_channel;
                 }
             }
+            else if ( es->fmt.i_codec == EsOutFourccClosedCaptions[0] ||
+                      es->fmt.i_codec == EsOutFourccClosedCaptions[1] ||
+                      es->fmt.i_codec == EsOutFourccClosedCaptions[2] ||
+                      es->fmt.i_codec == EsOutFourccClosedCaptions[3])
+            {
+                    /* We don't want to enable on initial create since p_master
+                       isn't set yet (otherwise we will think it's a standard
+                       ES_SUB stream and cause a resource leak) */
+                    return;
+            }
             else
             {
                 /* If there is no user preference, select the default subtitle 
@@ -2017,6 +2009,10 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
         /* */
         es->pb_cc_present[i] = true;
+
+        /* Enable if user specified on command line */
+        if (p_sys->i_sub_last == i)
+            EsOutSelect(out, es->pp_cc_es[i], true);
     }
 
     vlc_mutex_unlock( &p_sys->lock );

@@ -35,7 +35,7 @@
 
 #define PES_PAYLOAD_SIZE_MAX 65500
 
-int  EStoPES ( block_t **pp_pes, block_t *p_es,
+void EStoPES ( block_t **pp_pes,
                    es_format_t *p_fmt, int i_stream_id,
                    int b_mpeg2, int b_data_alignment, int i_header_size,
-                   int i_max_pes_size );
+                   int i_max_pes_size, mtime_t ts_offset );

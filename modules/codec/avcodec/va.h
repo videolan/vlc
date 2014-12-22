@@ -35,8 +35,7 @@ struct vlc_va_t {
     const char *description;
     int pix_fmt;
 
-    int  (*setup)(vlc_va_t *, void **hw, vlc_fourcc_t *output,
-                  int width, int height);
+    int  (*setup)(vlc_va_t *, AVCodecContext *, vlc_fourcc_t *output);
     int  (*get)(vlc_va_t *, void **opaque, uint8_t **data);
     void (*release)(void *opaque, uint8_t *surface);
     int  (*extract)(vlc_va_t *, picture_t *dst, void *opaque, uint8_t *data);
@@ -52,16 +51,14 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *, const es_format_t *fmt
 
 /**
  * Initializes the acceleration video decoding back-end for libavcodec.
- * @param hw pointer to libavcodec hardware context pointer [OUT]
+ * @param avctx libavcodec codec context
  * @param output pointer to video chroma output by the back-end [OUT]
- * @param width coded video width in pixels
- * @param height coded video height in pixels
  * @return VLC_SUCCESS on success, otherwise an error code.
  */
-static inline int vlc_va_Setup(vlc_va_t *va, void **hw, vlc_fourcc_t *output,
-                               int width, int height)
+static inline int vlc_va_Setup(vlc_va_t *va, AVCodecContext *avctx,
+                               vlc_fourcc_t *output)
 {
-    return va->setup(va, hw, output, width, height);
+    return va->setup(va, avctx, output);
 }
 
 /**
@@ -124,6 +121,6 @@ static inline int vlc_va_Extract(vlc_va_t *va, picture_t *dst, void *opaque,
  * Destroys a libavcodec hardware acceleration back-end.
  * All allocated surfaces shall have been released beforehand.
  */
-void vlc_va_Delete(vlc_va_t *);
+void vlc_va_Delete(vlc_va_t *, AVCodecContext *);
 
 #endif

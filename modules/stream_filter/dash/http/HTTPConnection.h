@@ -25,49 +25,32 @@
 #ifndef HTTPCONNECTION_H_
 #define HTTPCONNECTION_H_
 
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-#include <vlc_stream.h>
-#include <vlc_network.h>
-
 #include <string>
-#include <stdint.h>
-#include <iostream>
-#include <sstream>
 
 #include "http/IHTTPConnection.h"
-#include "http/Chunk.h"
 #include "Helper.h"
-
-#define PEEKBUFFER 4096
 
 namespace dash
 {
     namespace http
     {
+        class Chunk;
         class HTTPConnection : public IHTTPConnection
         {
             public:
-                HTTPConnection          (stream_t *stream);
-                virtual ~HTTPConnection ();
-
-                virtual bool    init        (Chunk *chunk);
-                void            closeSocket ();
-                virtual int     read        (void *p_buffer, size_t len);
-                virtual int     peek        (const uint8_t **pp_peek, size_t i_peek);
+                HTTPConnection          (stream_t *stream, Chunk *chunk = NULL);
+                virtual void    bindChunk   (Chunk *chunk);
+                virtual void    onHeader    (const std::string &line,
+                                             const std::string &value);
+                virtual bool    isAvailable () const;
+                virtual void    disconnect  ();
+                virtual void    releaseChunk();
 
             protected:
-                int         httpSocket;
-                stream_t    *stream;
-                uint8_t     *peekBuffer;
-                size_t      peekBufferLen;
-                int         contentLength;
-
-                bool                sendData        (const std::string& data);
-                bool                parseHeader     ();
-                std::string         readLine        ();
-                virtual std::string prepareRequest  (Chunk *chunk);
-                bool                setUrlRelative  (Chunk *chunk);
+                size_t toRead;
+                Chunk *chunk;
+                virtual std::string extraRequestHeaders() const;
+                virtual std::string buildRequestHeader(const std::string &path) const;
         };
     }
 }

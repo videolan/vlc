@@ -45,7 +45,7 @@ private:
     virtual ~HelpDialog();
 
 public slots:
-    virtual void close() { toggleVisible(); }
+    void close() Q_DECL_OVERRIDE { toggleVisible(); }
 
     friend class    Singleton<HelpDialog>;
 };
@@ -62,7 +62,7 @@ public slots:
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
-    virtual void showEvent ( QShowEvent * );
+    void showEvent ( QShowEvent * ) Q_DECL_OVERRIDE;
 
 private:
     bool b_advanced;
@@ -93,7 +93,7 @@ private:
     bool b_checked;
 
 private slots:
-    virtual void close() { toggleVisible(); }
+    void close() Q_DECL_OVERRIDE { toggleVisible(); }
 
     void UpdateOrDownload();
 

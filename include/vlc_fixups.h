@@ -256,6 +256,10 @@ static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 #define N_(str)           gettext_noop (str)
 #define gettext_noop(str) (str)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef HAVE_SWAB
 void swab (const void *, void *, ssize_t);
 #endif
@@ -339,13 +343,29 @@ long jrand48 (unsigned short subi[3]);
 long nrand48 (unsigned short subi[3]);
 #endif
 
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
 #ifdef __OS2__
 # undef HAVE_FORK   /* Implementation of fork() is imperfect on OS/2 */
+
+struct addrinfo
+{
+    int ai_flags;
+    int ai_family;
+    int ai_socktype;
+    int ai_protocol;
+    size_t ai_addrlen;
+    struct sockaddr *ai_addr;
+    char *ai_canonname;
+    struct addrinfo *ai_next;
+};
 #endif
 
 /* math.h */
 
-#ifdef __ANDROID__
+#ifndef HAVE_NANF
 #define nanf(tagp) NAN
 #endif
 

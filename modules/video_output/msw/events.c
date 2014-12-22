@@ -75,8 +75,9 @@ struct event_thread_t
     /* Title */
     char *psz_title;
 
-    int               i_window_style;
-    vout_window_cfg_t wnd_cfg;
+    int i_window_style;
+    int x, y;
+    unsigned width, height;
 
     /* */
     vout_window_t *parent_window;
@@ -414,15 +415,13 @@ void EventThreadUpdateWindowPosition( event_thread_t *p_event,
                                       int x, int y, unsigned w, unsigned h )
 {
     vlc_mutex_lock( &p_event->lock );
-    *pb_moved   = x != p_event->wnd_cfg.x ||
-                  y != p_event->wnd_cfg.y;
-    *pb_resized = w != p_event->wnd_cfg.width ||
-                  h != p_event->wnd_cfg.height;
+    *pb_moved   = x != p_event->x || y != p_event->y;
+    *pb_resized = w != p_event->width || h != p_event->height;
 
-    p_event->wnd_cfg.x      = x;
-    p_event->wnd_cfg.y      = y;
-    p_event->wnd_cfg.width  = w;
-    p_event->wnd_cfg.height = h;
+    p_event->x      = x;
+    p_event->y      = y;
+    p_event->width  = w;
+    p_event->height = h;
     vlc_mutex_unlock( &p_event->lock );
 }
 
@@ -495,7 +494,10 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
 {
     p_event->use_desktop = p_cfg->use_desktop;
     p_event->use_overlay = p_cfg->use_overlay;
-    p_event->wnd_cfg     = p_cfg->win;
+    p_event->x           = p_cfg->x;
+    p_event->y           = p_cfg->y;
+    p_event->width       = p_cfg->width;
+    p_event->height      = p_cfg->height;
 
     p_event->has_moved = false;
 
@@ -672,7 +674,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     RECT       rect_window;
     WNDCLASS   wc;                            /* window class components */
     TCHAR      vlc_path[MAX_PATH+1];
-    int        i_style, i_stylex;
+    int        i_style;
 
     msg_Dbg( vd, "Win32VoutCreateWindow" );
 
@@ -681,18 +683,19 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     #ifdef MODULE_NAME_IS_direct3d
     if( !p_event->use_desktop )
-    {
     #endif
+    {
         /* If an external window was specified, we'll draw in it. */
-        p_event->parent_window = vout_display_NewWindow(vd, &p_event->wnd_cfg );
+        p_event->parent_window = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_HWND);
         if( p_event->parent_window )
             p_event->hparent = p_event->parent_window->handle.hwnd;
         else
             p_event->hparent = NULL;
-    #ifdef MODULE_NAME_IS_direct3d
     }
+    #ifdef MODULE_NAME_IS_direct3d
     else
     {
+        vout_display_DeleteWindow(vd, NULL);
         p_event->parent_window = NULL;
         p_event->hparent = GetDesktopHandle(vd);
     }
@@ -746,29 +749,20 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
      * the window corresponding to the useable surface we want */
     rect_window.left   = 10;
     rect_window.top    = 10;
-    rect_window.right  = rect_window.left + p_event->wnd_cfg.width;
-    rect_window.bottom = rect_window.top  + p_event->wnd_cfg.height;
+    rect_window.right  = rect_window.left + p_event->width;
+    rect_window.bottom = rect_window.top  + p_event->height;
 
-    if( var_GetBool( vd, "video-deco" ) )
-    {
+    i_style = var_GetBool( vd, "video-deco" )
         /* Open with window decoration */
-        AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
-        i_style = WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE|WS_CLIPCHILDREN;
-        i_stylex = 0;
-    }
-    else
-    {
+        ? WS_OVERLAPPEDWINDOW|WS_SIZEBOX
         /* No window decoration */
-        AdjustWindowRect( &rect_window, WS_POPUP, 0 );
-        i_style = WS_POPUP|WS_VISIBLE|WS_CLIPCHILDREN;
-        i_stylex = 0; // WS_EX_TOOLWINDOW; Is TOOLWINDOW really needed ?
-                      // It messes up the fullscreen window.
-    }
+        : WS_POPUP;
+    AdjustWindowRect( &rect_window, i_style, 0 );
+    i_style |= WS_VISIBLE|WS_CLIPCHILDREN;
 
     if( p_event->hparent )
     {
         i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
-        i_stylex = 0;
 
         /* allow user to regain control over input events if requested */
         bool b_mouse_support = var_InheritBool( vd, "mouse-events" );
@@ -781,14 +775,14 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
 
     /* Create the window */
     p_event->hwnd =
-        CreateWindowEx( WS_EX_NOPARENTNOTIFY | i_stylex,
+        CreateWindowEx( WS_EX_NOPARENTNOTIFY,
                     p_event->class_main,             /* name of window class */
-                    _T(VOUT_TITLE) _T(" (VLC Video Output)"),  /* window title */
+                    _T(VOUT_TITLE) _T(" (VLC Video Output)"),/* window title */
                     i_style,                                 /* window style */
-                    (!p_event->wnd_cfg.x) ? (UINT)CW_USEDEFAULT :
-                        (UINT)p_event->wnd_cfg.x,   /* default X coordinate */
-                    (!p_event->wnd_cfg.y) ? (UINT)CW_USEDEFAULT :
-                        (UINT)p_event->wnd_cfg.y,   /* default Y coordinate */
+                    (!p_event->x) ? (UINT)CW_USEDEFAULT :
+                        (UINT)p_event->x,            /* default X coordinate */
+                    (!p_event->y) ? (UINT)CW_USEDEFAULT :
+                        (UINT)p_event->y,            /* default Y coordinate */
                     rect_window.right - rect_window.left,    /* window width */
                     rect_window.bottom - rect_window.top,   /* window height */
                     p_event->hparent,                       /* parent window */

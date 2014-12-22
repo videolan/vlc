@@ -745,7 +745,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         virtual_chapter_c *p_chapter = sys.FindChapter( i_chapter_uid, p_segment );
 
         if ( p_chapter == NULL )
-            msg_Dbg( &sys.demuxer, "Chapter %"PRId64" not found", i_chapter_uid);
+            msg_Dbg( &sys.demuxer, "Chapter %" PRId64 " not found", i_chapter_uid);
         else
         {
             if ( !p_chapter->EnterAndLeave( sys.p_current_segment->CurrentChapter() ) )

@@ -1,0 +1,27 @@
+--- harfbuzz-0.9.17/configure.ac.orig	2014-12-22 10:10:36.334227291 +0100
++++ harfbuzz-0.9.17/configure.ac	2014-12-22 10:13:55.664060127 +0100
+@@ -113,7 +113,7 @@
+ 
+ dnl ===========================================================================
+ 
+-have_hb_old=true
++have_hb_old=false
+ if $have_hb_old; then
+ 	AC_DEFINE(HAVE_HB_OLD, 1, [Have Old HarfBuzz backend])
+ fi
+@@ -249,6 +249,7 @@
+ 	[have_uniscribe=true; AC_MSG_RESULT(yes)],
+ 	[have_uniscribe=false;AC_MSG_RESULT(no)])
+ LIBS=$saved_LIBS
++have_uniscribe=false
+ if $have_uniscribe; then
+ 	UNISCRIBE_CFLAGS=
+ 	UNISCRIBE_LIBS="-lusp10 -lgdi32"
+@@ -261,6 +262,7 @@
+ dnl ===========================================================================
+ 
+ AC_CHECK_TYPE(CTFontRef, have_coretext=true, have_coretext=false, [#include <ApplicationServices/ApplicationServices.h>])
++have_coretext=false
+ if $have_coretext; then
+ 	CORETEXT_CFLAGS=
+ 	CORETEXT_LIBS="-framework ApplicationServices"

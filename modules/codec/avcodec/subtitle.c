@@ -44,17 +44,18 @@ struct decoder_sys_t {
 
 static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, mtime_t pts,
                                      AVCodecContext *avctx);
+static subpicture_t *DecodeSubtitle(decoder_t *, block_t **);
 
 /**
  * Initialize subtitle decoder
  */
 int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
-                    AVCodec *codec, int codec_id, const char *namecodec)
+                    const AVCodec *codec)
 {
     decoder_sys_t *sys;
 
     /* */
-    switch (codec_id) {
+    switch (codec->id) {
     case AV_CODEC_ID_HDMV_PGS_SUBTITLE:
     case AV_CODEC_ID_XSUB:
     case AV_CODEC_ID_DVB_SUBTITLE:
@@ -69,13 +70,8 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     if (!sys)
         return VLC_ENOMEM;
 
-    codec->type = AVMEDIA_TYPE_SUBTITLE;
-    context->codec_type = AVMEDIA_TYPE_SUBTITLE;
-    context->codec_id = codec_id;
     sys->p_context = context;
     sys->p_codec = codec;
-    sys->i_codec_id = codec_id;
-    sys->psz_namecodec = namecodec;
     sys->b_delayed_open = false;
 
     /* */
@@ -101,15 +97,16 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     av_dict_free(&options);
 
     if (ret < 0) {
-        msg_Err(dec, "cannot open codec (%s)", namecodec);
+        msg_Err(dec, "cannot open codec (%s)", codec->name);
         free(context->extradata);
         free(sys);
         return VLC_EGENERIC;
     }
 
     /* */
-    msg_Dbg(dec, "libavcodec codec (%s) started", namecodec);
+    msg_Dbg(dec, "libavcodec codec (%s) started", codec->name);
     dec->fmt_out.i_cat = SPU_ES;
+    dec->pf_decode_sub = DecodeSubtitle;
 
     return VLC_SUCCESS;
 }
@@ -117,7 +114,7 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
 /**
  * Decode one subtitle
  */
-subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
+static subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
 {
     decoder_sys_t *sys = dec->p_sys;
 
@@ -195,7 +192,7 @@ static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
 
     video_format_t fmt;
     memset(&fmt, 0, sizeof(fmt));
-    fmt.i_chroma         = VLC_FOURCC('R','G','B','A');
+    fmt.i_chroma         = VLC_CODEC_RGBA;
     fmt.i_width          =
     fmt.i_visible_width  = ffregion->w;
     fmt.i_height         =
@@ -246,8 +243,8 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
     //        pts, ffsub->start_display_time, ffsub->end_display_time);
     spu->i_start    = pts + ffsub->start_display_time * INT64_C(1000);
     spu->i_stop     = pts + ffsub->end_display_time * INT64_C(1000);
-    spu->b_absolute = true; /* FIXME How to set it right ? */
-    spu->b_ephemer  = true; /* FIXME How to set it right ? */
+    spu->b_absolute = true; /* We have offset and size for subtitle */
+    spu->b_ephemer  = false; /* We only show subtitle for i_stop time only */
 
     if (avctx->coded_width != 0 && avctx->coded_height != 0) {
         spu->i_original_picture_width = avctx->coded_width;

@@ -28,27 +28,29 @@
 #include <cstdlib>
 
 #include "Representation.h"
+#include "mpd/AdaptationSet.h"
+#include "mpd/MPD.h"
+#include "mpd/SegmentTemplate.h"
 
 using namespace dash::mpd;
 
-Representation::Representation  () :
+Representation::Representation  ( AdaptationSet *set, MPD *mpd_ ) :
+                SegmentInformation( set ),
+                mpd             ( mpd_ ),
+                adaptationSet   ( set ),
                 bandwidth       (0),
                 qualityRanking  ( -1 ),
-                segmentInfo     ( NULL ),
                 trickModeType   ( NULL ),
-                parentGroup     ( NULL ),
-                segmentBase     ( NULL ),
-                segmentList     ( NULL ),
+                baseUrl         ( NULL ),
                 width           (0),
                 height          (0)
-
 {
 }
 
 Representation::~Representation ()
 {
-    delete(this->segmentInfo);
     delete(this->trickModeType);
+    delete baseUrl;
 }
 
 const std::string&  Representation::getId                   () const
@@ -72,10 +74,6 @@ void    Representation::setBandwidth( uint64_t bandwidth )
     this->bandwidth = bandwidth;
 }
 
-SegmentInfo*        Representation::getSegmentInfo() const
-{
-    return this->segmentInfo;
-}
 
 TrickModeType*      Representation::getTrickModeType        () const
 {
@@ -87,21 +85,6 @@ void                Representation::setTrickMode        (TrickModeType *trickMod
     this->trickModeType = trickModeType;
 }
 
-const AdaptationSet *Representation::getParentGroup() const
-{
-    return this->parentGroup;
-}
-
-void Representation::setParentGroup(const AdaptationSet *group)
-{
-    if ( group != NULL )
-        this->parentGroup = group;
-}
-
-void                Representation::setSegmentInfo          (SegmentInfo *info)
-{
-    this->segmentInfo = info;
-}
 
 
 int Representation::getQualityRanking() const
@@ -125,22 +108,13 @@ void Representation::addDependency(const Representation *dep)
     if ( dep != NULL )
         this->dependencies.push_back( dep );
 }
-SegmentList*        Representation::getSegmentList          () const
+
+
+void Representation::setBaseUrl(BaseUrl *base)
 {
-    return this->segmentList;
+    baseUrl = base;
 }
-void                Representation::setSegmentList          (SegmentList *list)
-{
-    this->segmentList = list;
-}
-SegmentBase*        Representation::getSegmentBase          () const
-{
-    return this->segmentBase;
-}
-void                Representation::setSegmentBase          (SegmentBase *base)
-{
-    this->segmentBase = base;
-}
+
 void                Representation::setWidth                (int width)
 {
     this->width = width;
@@ -156,4 +130,31 @@ void                Representation::setHeight               (int height)
 int                 Representation::getHeight               () const
 {
     return this->height;
+}
+
+std::vector<std::string> Representation::toString(int indent) const
+{
+    std::vector<std::string> ret;
+    std::string text(indent, ' ');
+    text.append("Representation");
+    ret.push_back(text);
+    std::vector<ISegment *> list = getSegments();
+    std::vector<ISegment *>::const_iterator l;
+    for(l = list.begin(); l < list.end(); l++)
+        ret.push_back((*l)->toString(indent + 1));
+
+    return ret;
+}
+
+Url Representation::getUrlSegment() const
+{
+    Url ret = getParentUrlSegment();
+    if (baseUrl)
+        ret.append(baseUrl->getUrl());
+    return ret;
+}
+
+MPD * Representation::getMPD() const
+{
+    return mpd;
 }

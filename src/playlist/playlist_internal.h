@@ -61,14 +61,12 @@ typedef struct playlist_private_t
     struct {
         /* Current status. These fields are readonly, only the playlist
          * main loop can touch it*/
-        playlist_status_t   i_status;  /**< Current status of playlist */
         playlist_item_t *   p_item; /**< Currently playing/active item */
         playlist_item_t *   p_node; /**< Current node to play from */
     } status;
 
     struct {
         /* Request. Use this to give orders to the playlist main loop  */
-        playlist_status_t   i_status; /**< requested playlist status */
         playlist_item_t *   p_node;   /**< requested node to play from */
         playlist_item_t *   p_item;   /**< requested item to play in the node */
 
@@ -89,7 +87,6 @@ typedef struct playlist_private_t
     bool     b_reset_currently_playing; /** Reset current item array */
 
     bool     b_tree; /**< Display as a tree */
-    bool     b_doing_ml; /**< Doing media library stuff  get quicker */
 } playlist_private_t;
 
 #define pl_priv( pl ) ((playlist_private_t *)(pl))

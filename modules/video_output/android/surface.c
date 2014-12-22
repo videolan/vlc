@@ -73,11 +73,14 @@ vlc_module_end()
  * JNI prototypes
  *****************************************************************************/
 
-extern JavaVM *myVm;
-extern void *jni_LockAndGetAndroidSurface();
+#define THREAD_NAME "AndroidSurface"
+extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
+extern void jni_detach_thread();
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void  jni_UnlockAndroidSurface();
-extern void  jni_SetAndroidSurfaceSize(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
+extern void *jni_AndroidJavaSurfaceToNativeSurface(jobject surf);
+extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
+extern int jni_ConfigureSurface(jobject jsurf, int width, int height, int hal, bool *configured);
 
 // _ZN7android7Surface4lockEPNS0_11SurfaceInfoEb
 typedef void (*Surface_lock)(void *, void *, int);
@@ -112,17 +115,15 @@ struct vout_display_sys_t {
     Surface_lock s_lock;
     Surface_lock2 s_lock2;
     Surface_unlockAndPost s_unlockAndPost;
-    native_window_api_t native_window;
 
     jobject jsurf;
-    ANativeWindow *window;
+    void *native_surface;
 
-    /* density */
-    int i_sar_num;
-    int i_sar_den;
+    int i_android_hal;
+    unsigned int i_alloc_width;
+    unsigned int i_alloc_height;
 
     video_format_t fmt;
-    bool b_changed_crop;
 };
 
 struct picture_sys_t {
@@ -133,8 +134,6 @@ struct picture_sys_t {
 
 static int  AndroidLockSurface(picture_t *);
 static void AndroidUnlockSurface(picture_t *);
-
-static vlc_mutex_t single_instance = VLC_STATIC_MUTEX;
 
 static inline void *LoadSurface(const char *psz_lib, vout_display_sys_t *sys)
 {
@@ -170,37 +169,51 @@ static void *InitLibrary(vout_display_sys_t *sys)
     return NULL;
 }
 
+static void UpdateLayout(vout_display_sys_t *sys)
+{
+    unsigned int i_sar_num = 1, i_sar_den = 1;
+    unsigned int i_width, i_height;
+
+    if (sys->fmt.i_sar_num != 0 && sys->fmt.i_sar_den != 0) {
+        i_sar_num = sys->fmt.i_sar_num;
+        i_sar_den = sys->fmt.i_sar_den;
+    }
+    if (sys->i_alloc_width != 0 && sys->i_alloc_height != 0) {
+        i_width = sys->i_alloc_width;
+        i_height = sys->i_alloc_height;
+    } else {
+        i_width = sys->fmt.i_width;
+        i_height = sys->fmt.i_height;
+    }
+
+    jni_SetSurfaceLayout(i_width, i_height,
+                         sys->fmt.i_visible_width,
+                         sys->fmt.i_visible_height,
+                         i_sar_num,
+                         i_sar_den);
+}
+
 static int Open(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t *)p_this;
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt;
+    video_format_ApplyRotation(&fmt, &vd->fmt);
 
     if (fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
         return VLC_EGENERIC;
-
-    /* */
-    if (vlc_mutex_trylock(&single_instance) != 0) {
-        msg_Err(vd, "Can't start more than one instance at a time");
+    if (vout_display_IsWindowed(vd))
         return VLC_EGENERIC;
-    }
 
     /* Allocate structure */
     vout_display_sys_t *sys = (struct vout_display_sys_t*) calloc(1, sizeof(*sys));
-    if (!sys) {
-        vlc_mutex_unlock(&single_instance);
-        return VLC_ENOMEM;
-    }
+    if (!sys)
+        goto error;
 
     /* */
-    sys->p_library = LoadNativeWindowAPI(&sys->native_window);
-    sys->s_unlockAndPost = (Surface_unlockAndPost)sys->native_window.unlockAndPost;
-    if (!sys->p_library)
-        sys->p_library = InitLibrary(sys);
+    sys->p_library = InitLibrary(sys);
     if (!sys->p_library) {
-        free(sys);
         msg_Err(vd, "Could not initialize libandroid.so/libui.so/libgui.so/libsurfaceflinger_client.so!");
-        vlc_mutex_unlock(&single_instance);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* Setup chroma */
@@ -212,19 +225,15 @@ static int Open(vlc_object_t *p_this)
         fmt.i_chroma = VLC_CODEC_RGB32;
 
     switch(fmt.i_chroma) {
-        case VLC_CODEC_YV12:
-            /* avoid swscale usage by asking for I420 instead since the
-             * vout already has code to swap the buffers */
-            fmt.i_chroma = VLC_CODEC_I420;
-        case VLC_CODEC_I420:
-            break;
-
         case VLC_CODEC_RGB16:
             fmt.i_bmask = 0x0000001f;
             fmt.i_gmask = 0x000007e0;
             fmt.i_rmask = 0x0000f800;
             break;
 
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_I420:
+            fmt.i_chroma = VLC_CODEC_RGB32;
         case VLC_CODEC_RGB32:
             fmt.i_rmask  = 0x000000ff;
             fmt.i_gmask  = 0x0000ff00;
@@ -237,19 +246,24 @@ static int Open(vlc_object_t *p_this)
     video_format_FixRgb(&fmt);
 
     msg_Dbg(vd, "Pixel format %4.4s", (char*)&fmt.i_chroma);
+    sys->i_android_hal = ChromaToAndroidHal(fmt.i_chroma);
+    if (sys->i_android_hal == -1)
+        goto error;
+
     sys->fmt = fmt;
+    UpdateLayout(sys);
 
     /* Create the associated picture */
-    picture_sys_t *picsys = malloc(sizeof(*picsys));
+    picture_sys_t *picsys = calloc(1, sizeof(picture_sys_t));
     if (unlikely(picsys == NULL))
-        goto enomem;
+        goto error;
     picsys->sys = sys;
 
     picture_resource_t resource = { .p_sys = picsys };
     picture_t *picture = picture_NewFromResource(&fmt, &resource);
     if (!picture) {
         free(picsys);
-        goto enomem;
+        goto error;
     }
 
     /* Wrap it into a picture pool */
@@ -263,7 +277,7 @@ static int Open(vlc_object_t *p_this)
     sys->pool = picture_pool_NewExtended(&pool_cfg);
     if (!sys->pool) {
         picture_Release(picture);
-        goto enomem;
+        goto error;
     }
 
     /* Setup vout_display */
@@ -278,15 +292,10 @@ static int Open(vlc_object_t *p_this)
     /* Fix initial state */
     vout_display_SendEventFullscreen(vd, false);
 
-    sys->i_sar_num = vd->source.i_sar_num;
-    sys->i_sar_den = vd->source.i_sar_den;
-
     return VLC_SUCCESS;
 
-enomem:
-    dlclose(sys->p_library);
-    free(sys);
-    vlc_mutex_unlock(&single_instance);
+error:
+    Close(p_this);
     return VLC_ENOMEM;
 }
 
@@ -295,12 +304,13 @@ static void Close(vlc_object_t *p_this)
     vout_display_t *vd = (vout_display_t *)p_this;
     vout_display_sys_t *sys = vd->sys;
 
-    picture_pool_Delete(sys->pool);
-    if (sys->window)
-        sys->native_window.winRelease(sys->window);
-    dlclose(sys->p_library);
-    free(sys);
-    vlc_mutex_unlock(&single_instance);
+    if (sys) {
+        if (sys->pool)
+            picture_pool_Release(sys->pool);
+        if (sys->p_library)
+            dlclose(sys->p_library);
+        free(sys);
+    }
 }
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
@@ -310,120 +320,60 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     return vd->sys->pool;
 }
 
-#define ALIGN_16_PIXELS( x ) ( ( ( x ) + 15 ) / 16 * 16 )
-static void SetupPictureYV12( SurfaceInfo* p_surfaceInfo, picture_t *p_picture )
-{
-    /* according to document of android.graphics.ImageFormat.YV12 */
-    int i_stride = ALIGN_16_PIXELS( p_surfaceInfo->s );
-    int i_c_stride = ALIGN_16_PIXELS( i_stride / 2 );
-
-    p_picture->p->i_pitch = i_stride;
-
-    /* Fill chroma planes for planar YUV */
-    for( int n = 1; n < p_picture->i_planes; n++ )
-    {
-        const plane_t *o = &p_picture->p[n-1];
-        plane_t *p = &p_picture->p[n];
-
-        p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
-        p->i_pitch  = i_c_stride;
-        p->i_lines  = p_picture->format.i_height / 2;
-        /*
-          Explicitly set the padding lines of the picture to black (127 for YUV)
-          since they might be used by Android during rescaling.
-        */
-        int visible_lines = p_picture->format.i_visible_height / 2;
-        if (visible_lines < p->i_lines)
-            memset(&p->p_pixels[visible_lines * p->i_pitch], 127, (p->i_lines - visible_lines) * p->i_pitch);
-    }
-
-    if( vlc_fourcc_AreUVPlanesSwapped( p_picture->format.i_chroma,
-                                       VLC_CODEC_YV12 ) ) {
-        uint8_t *p_tmp = p_picture->p[1].p_pixels;
-        p_picture->p[1].p_pixels = p_picture->p[2].p_pixels;
-        p_picture->p[2].p_pixels = p_tmp;
-    }
-}
-
 static int  AndroidLockSurface(picture_t *picture)
 {
     picture_sys_t *picsys = picture->p_sys;
     vout_display_sys_t *sys = picsys->sys;
-    SurfaceInfo *info;
+    SurfaceInfo *info = &picsys->info;
     uint32_t sw, sh;
-    void *surf;
+
+    if (!sys->native_surface) {
+        picsys->surf = jni_LockAndGetAndroidJavaSurface();
+        if (unlikely(!picsys->surf)) {
+            jni_UnlockAndroidSurface();
+            return VLC_EGENERIC;
+        }
+        sys->native_surface = jni_AndroidJavaSurfaceToNativeSurface(picsys->surf);
+        jni_UnlockAndroidSurface();
+
+        if (!sys->native_surface)
+            return VLC_EGENERIC;
+    }
 
     sw = sys->fmt.i_width;
     sh = sys->fmt.i_height;
-
-    if (sys->native_window.winFromSurface) {
-        jobject jsurf = jni_LockAndGetAndroidJavaSurface();
-        if (unlikely(!jsurf)) {
-            jni_UnlockAndroidSurface();
-            return VLC_EGENERIC;
-        }
-        if (sys->window && jsurf != sys->jsurf) {
-            sys->native_window.winRelease(sys->window);
-            sys->window = NULL;
-        }
-        sys->jsurf = jsurf;
-        if (!sys->window) {
-            JNIEnv *p_env;
-            (*myVm)->AttachCurrentThread(myVm, &p_env, NULL);
-            sys->window = sys->native_window.winFromSurface(p_env, jsurf);
-            (*myVm)->DetachCurrentThread(myVm);
-        }
-        // Using sys->window instead of the native surface object
-        // as parameter to the unlock function
-        picsys->surf = surf = sys->window;
-    } else {
-        picsys->surf = surf = jni_LockAndGetAndroidSurface();
-        if (unlikely(!surf)) {
-            jni_UnlockAndroidSurface();
-            return VLC_EGENERIC;
-        }
-    }
-    info = &picsys->info;
-
-    if (sys->native_window.winLock) {
-        ANativeWindow_Buffer buf = { 0 };
-        int32_t err = sys->native_window.winLock(sys->window, &buf, NULL);
-        if (err) {
-            jni_UnlockAndroidSurface();
-            return VLC_EGENERIC;
-        }
-        info->w      = buf.width;
-        info->h      = buf.height;
-        info->bits   = buf.bits;
-        info->s      = buf.stride;
-        info->format = buf.format;
-    } else if (sys->s_lock)
-        sys->s_lock(surf, info, 1);
-    else
-        sys->s_lock2(surf, info, NULL);
-
     // For RGB (32 or 16) we need to align on 8 or 4 pixels, 16 pixels for YUV
     int align_pixels = (16 / picture->p[0].i_pixel_pitch) - 1;
     uint32_t aligned_width = (sw + align_pixels) & ~align_pixels;
 
-    if (info->w != aligned_width || info->h != sh || sys->b_changed_crop) {
-        // input size doesn't match the surface size -> request a resize
-        jni_SetAndroidSurfaceSize(aligned_width, sh, sys->fmt.i_visible_width, sys->fmt.i_visible_height, sys->i_sar_num, sys->i_sar_den);
-        // When using ANativeWindow, one should use ANativeWindow_setBuffersGeometry
-        // to set the size and format. In our case, these are set via the SurfaceHolder
-        // in Java, so we seem to manage without calling this ANativeWindow function.
-        sys->s_unlockAndPost(surf);
-        jni_UnlockAndroidSurface();
-        sys->b_changed_crop = false;
+    if (aligned_width != sys->i_alloc_width || sh != sys->i_alloc_height) {
+        bool configured;
+        if (jni_ConfigureSurface(picsys->surf,
+                                 aligned_width,
+                                 sh,
+                                 sys->i_android_hal,
+                                 &configured) == -1 || !configured) {
+            return VLC_EGENERIC;
+        }
+        sys->i_alloc_width = aligned_width;
+        sys->i_alloc_height = sh;
+        sys->native_surface = jni_AndroidJavaSurfaceToNativeSurface(picsys->surf);
+        UpdateLayout(sys);
+    }
+
+    if (sys->s_lock)
+        sys->s_lock(sys->native_surface, info, 1);
+    else
+        sys->s_lock2(sys->native_surface, info, NULL);
+
+    if (info->w != sys->i_alloc_width || info->h != sh) {
+        sys->s_unlockAndPost(sys->native_surface);
         return VLC_EGENERIC;
     }
 
     picture->p[0].p_pixels = (uint8_t*)info->bits;
     picture->p[0].i_lines = info->h;
     picture->p[0].i_pitch = picture->p[0].i_pixel_pitch * info->s;
-
-    if (info->format == 0x32315659 /*ANDROID_IMAGE_FORMAT_YV12*/)
-        SetupPictureYV12(info, picture);
 
     return VLC_SUCCESS;
 }
@@ -433,9 +383,8 @@ static void AndroidUnlockSurface(picture_t *picture)
     picture_sys_t *picsys = picture->p_sys;
     vout_display_sys_t *sys = picsys->sys;
 
-    if (likely(picsys->surf))
-        sys->s_unlockAndPost(picsys->surf);
-    jni_UnlockAndroidSurface();
+    if (sys->native_surface)
+        sys->s_unlockAndPost(sys->native_surface);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
@@ -457,14 +406,20 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
 
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     {
-        if (!vd->sys)
-            return VLC_EGENERIC;
         vout_display_sys_t *sys = vd->sys;
 
         const video_format_t *source = (const video_format_t *)va_arg(args, const video_format_t *);
-        sys->fmt = *source;
-        sys->b_changed_crop = true;
+
+        if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
+            video_format_CopyCrop(&sys->fmt, source);
+        } else {
+            sys->fmt.i_sar_num = source->i_sar_num;
+            sys->fmt.i_sar_den = source->i_sar_den;
+        }
+        UpdateLayout(sys);
+
         return VLC_SUCCESS;
     }
 
@@ -476,8 +431,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:
-    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-    case VOUT_DISPLAY_GET_OPENGL:
         return VLC_EGENERIC;
     }
 }

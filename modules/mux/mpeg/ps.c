@@ -513,8 +513,8 @@ static int Mux( sout_mux_t *p_mux )
 
         /* Get and mux a packet */
         p_data = block_FifoGet( p_input->p_fifo );
-         EStoPES ( &p_data, p_data, p_input->p_fmt, p_stream->i_stream_id,
-                       p_sys->b_mpeg2, 0, 0, p_sys->i_pes_max_size );
+        EStoPES ( &p_data, p_input->p_fmt, p_stream->i_stream_id,
+                       p_sys->b_mpeg2, 0, 0, p_sys->i_pes_max_size, 0 );
 
         block_ChainAppend( &p_ps, p_data );
 

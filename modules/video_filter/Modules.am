@@ -10,6 +10,7 @@ SOURCES_blend = blend.cpp
 SOURCES_scale = scale.c
 SOURCES_marq = marq.c
 SOURCES_rss = rss.c
+SOURCES_fps = fps.c
 SOURCES_motiondetect = motiondetect.c
 
 libdeinterlace_plugin_la_SOURCES = \
@@ -163,5 +164,6 @@ video_filter_LTLIBRARIES += \
 	libanaglyph_plugin.la \
 	liboldmovie_plugin.la \
 	libvhs_plugin.la \
+	libfps_plugin.la \
 	libfreeze_plugin.la
 

@@ -23,6 +23,8 @@
 #ifndef EPGCHANNELS_HPP
 #define EPGCHANNELS_HPP
 
+#include "qt4.hpp"
+
 #include <QWidget>
 
 class EPGView;
@@ -39,7 +41,7 @@ public slots:
     void removeChannel( QString );
 
 protected:
-    virtual void paintEvent( QPaintEvent *event );
+    void paintEvent( QPaintEvent *event ) Q_DECL_OVERRIDE;
 
 private:
     EPGView *m_epgView;

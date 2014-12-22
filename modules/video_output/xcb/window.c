@@ -63,7 +63,7 @@ vlc_module_begin ()
     set_description (N_("X11 video window (XCB)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window xid", 10)
+    set_capability ("vout window", 10)
     set_callbacks (Open, Close)
 
     /* Obsolete since 1.1.0: */
@@ -77,7 +77,7 @@ vlc_module_begin ()
     set_description (N_("Embedded window video"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window xid", 70)
+    set_capability ("vout window", 70)
     set_callbacks (EmOpen, EmClose)
     add_shortcut ("embed-xid")
 
@@ -202,6 +202,10 @@ static void CacheAtoms (vout_window_sys_t *p_sys)
  */
 static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
+    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
+     && cfg->type != VOUT_WINDOW_TYPE_XID)
+        return VLC_EGENERIC;
+
     xcb_generic_error_t *err;
     xcb_void_cookie_t ck;
 
@@ -243,12 +247,12 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         /* XCB_CW_BACK_PIXEL */
         scr->black_pixel,
         /* XCB_CW_EVENT_MASK */
-        XCB_EVENT_MASK_KEY_PRESS,
+        XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_STRUCTURE_NOTIFY,
     };
 
     xcb_window_t window = xcb_generate_id (conn);
     ck = xcb_create_window_checked (conn, scr->root_depth, window, scr->root,
-                                    cfg->x, cfg->y, cfg->width, cfg->height, 0,
+                                    0, 0, cfg->width, cfg->height, 0,
                                     XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                     scr->root_visual, mask, values);
     err = xcb_request_check (conn, ck);
@@ -259,6 +263,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
     }
 
+    wnd->type = VOUT_WINDOW_TYPE_XID;
     wnd->handle.xid = window;
     wnd->display.x11 = display;
     wnd->control = Control;
@@ -324,13 +329,22 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     /* Make the window visible */
     xcb_map_window (conn, window);
 
+    /* Get the initial mapped size (may differ from requested size) */
+    xcb_get_geometry_reply_t *geo =
+        xcb_get_geometry_reply (conn, xcb_get_geometry (conn, window), NULL);
+    if (geo != NULL)
+    {
+        vout_window_ReportSize(wnd, geo->width, geo->height);
+        free (geo);
+    }
+
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
-    if ((p_sys->keys != NULL)
-     && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
-        XCB_keyHandler_Destroy (p_sys->keys);
-        p_sys->keys = NULL;
+        if (p_sys->keys != NULL)
+            XCB_keyHandler_Destroy (p_sys->keys);
+        goto error;
     }
 
     xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
@@ -352,17 +366,43 @@ static void Close (vout_window_t *wnd)
     vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;
 
-    if (p_sys->keys)
-    {
-        vlc_cancel (p_sys->thread);
-        vlc_join (p_sys->thread, NULL);
+    vlc_cancel (p_sys->thread);
+    vlc_join (p_sys->thread, NULL);
+    if (p_sys->keys != NULL)
         XCB_keyHandler_Destroy (p_sys->keys);
-    }
     xcb_disconnect (conn);
     free (wnd->display.x11);
     free (p_sys);
 }
 
+static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
+{
+    vout_window_sys_t *sys = wnd->sys;
+
+    if (sys->keys != NULL && XCB_keyHandler_Process (sys->keys, ev) == 0)
+        return;
+
+    switch (ev->response_type & 0x7f)
+    {
+        case XCB_CONFIGURE_NOTIFY:
+        {
+            xcb_configure_notify_event_t *cne = (void *)ev;
+            vout_window_ReportSize (wnd, cne->width, cne->height);
+            break;
+        }
+        case XCB_DESTROY_NOTIFY:
+            vout_window_ReportClose (wnd);
+            break;
+
+        case XCB_MAPPING_NOTIFY:
+            break;
+
+        default:
+            msg_Dbg (wnd, "unhandled event %"PRIu8, ev->response_type);
+    }
+
+    free (ev);
+}
 
 /** Background thread for X11 events handling */
 static void *Thread (void *data)
@@ -384,12 +424,7 @@ static void *Thread (void *data)
 
         int canc = vlc_savecancel ();
         while ((ev = xcb_poll_for_event (conn)) != NULL)
-        {
-            if (XCB_keyHandler_Process (p_sys->keys, ev) == 0)
-                continue;
-            msg_Dbg (wnd, "unhandled event: %"PRIu8, ev->response_type);
-            free (ev);
-        }
+            ProcessEvent(wnd, ev);
         vlc_restorecancel (canc);
 
         if (xcb_connection_has_error (conn))
@@ -552,6 +587,10 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
  */
 static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
+    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
+     && cfg->type != VOUT_WINDOW_TYPE_XID)
+        return VLC_EGENERIC;
+
     xcb_window_t window = var_InheritInteger (wnd, "drawable-xid");
     if (window == 0)
         return VLC_EGENERIC;
@@ -565,12 +604,19 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
 
     p_sys->embedded = true;
-    p_sys->keys = NULL;
+    wnd->type = VOUT_WINDOW_TYPE_XID;
+    wnd->display.x11 = NULL;
     wnd->handle.xid = window;
     wnd->control = Control;
     wnd->sys = p_sys;
 
     p_sys->conn = conn;
+
+    /* Subscribe to window events (_before_ the geometry is queried) */
+    uint32_t mask = XCB_CW_EVENT_MASK;
+    uint32_t value = XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+
+    xcb_change_window_attributes (conn, window, mask, &value);
 
     xcb_get_geometry_reply_t *geo =
         xcb_get_geometry_reply (conn, xcb_get_geometry (conn, window), NULL);
@@ -580,27 +626,29 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
     }
     p_sys->root = geo->root;
+    vout_window_ReportSize(wnd, geo->width, geo->height);
     free (geo);
 
+    /* Try to subscribe to keyboard events (only one X11 client can
+     * subscribe to input events, so this can fail). */
     if (var_InheritBool (wnd, "keyboard-events"))
     {
         p_sys->keys = XCB_keyHandler_Create (VLC_OBJECT(wnd), conn);
         if (p_sys->keys != NULL)
-        {
-            const uint32_t mask = XCB_CW_EVENT_MASK;
-            const uint32_t values[1] = {
-                XCB_EVENT_MASK_KEY_PRESS,
-            };
-            xcb_change_window_attributes (conn, window, mask, values);
-        }
+            value |= XCB_EVENT_MASK_KEY_PRESS;
     }
+    else
+        p_sys->keys = NULL;
+
+    if (value & ~XCB_EVENT_MASK_STRUCTURE_NOTIFY)
+        xcb_change_window_attributes (conn, window, mask, &value);
 
     CacheAtoms (p_sys);
-    if ((p_sys->keys != NULL)
-     && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
-        XCB_keyHandler_Destroy (p_sys->keys);
-        p_sys->keys = NULL;
+        if (p_sys->keys != NULL)
+            XCB_keyHandler_Destroy (p_sys->keys);
+        goto error;
     }
 
     xcb_flush (conn);

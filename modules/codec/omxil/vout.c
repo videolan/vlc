@@ -374,7 +374,7 @@ static void Close(vlc_object_t *p_this)
     }
 
     if (p_sys->pool)
-        picture_pool_Delete(p_sys->pool);
+        picture_pool_Release(p_sys->pool);
     free(p_sys);
     DeinitOmxCore();
 }
@@ -464,7 +464,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-    case VOUT_DISPLAY_GET_OPENGL:
         return VLC_EGENERIC;
     }
 }

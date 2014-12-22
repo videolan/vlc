@@ -64,6 +64,7 @@ typedef enum {
     IBOutlet id o_dropzone_btn;
     IBOutlet id o_dropzone_lbl;
     IBOutlet id o_dropzone_box;
+    IBOutlet id o_dropzone_img;
 
     VLCFSPanel *o_fspanel;
 
@@ -121,6 +122,8 @@ typedef enum {
 - (IBAction)removePodcastWindowAction:(id)sender;
 
 - (void)windowResizedOrMoved:(NSNotification *)notification;
+
+- (void)reloadSidebar;
 
 - (void)toggleLeftSubSplitView;
 - (void)showDropZone;

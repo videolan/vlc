@@ -90,13 +90,13 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         BOOL (WINAPI * mySetDllDirectoryA)(const char* lpPathName);
 # define PROCESS_DEP_ENABLE 1
 
-        mySetProcessDEPPolicy = (BOOL WINAPI (*)(DWORD))
+        mySetProcessDEPPolicy = (BOOL (WINAPI *)(DWORD))
                             GetProcAddress(h_Kernel32, "SetProcessDEPPolicy");
         if(mySetProcessDEPPolicy)
             mySetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
         /* Do NOT load any library from cwd. */
-        mySetDllDirectoryA = (BOOL WINAPI (*)(const char*))
+        mySetDllDirectoryA = (BOOL (WINAPI *)(const char*))
                             GetProcAddress(h_Kernel32, "SetDllDirectoryA");
         if(mySetDllDirectoryA)
             mySetDllDirectoryA("");
@@ -151,7 +151,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         SetUnhandledExceptionFilter(vlc_exception_filter);
     }
 
-    _setmode( STDIN_FILENO, _O_BINARY ); /* Needed for pipes */
+    _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
 
     /* */
     if (!lang)
@@ -207,7 +207,14 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 /* Crashdumps handling */
 static void check_crashdump(void)
 {
-    FILE * fd = _wfopen ( crashdump_path, L"r, ccs=UTF-8" );
+    wchar_t mv_crashdump_path[MAX_PATH];
+    wcscpy (mv_crashdump_path, crashdump_path);
+    wcscat (mv_crashdump_path, L".mv");
+
+    if (_wrename (crashdump_path, mv_crashdump_path))
+        return;
+
+    FILE * fd = _wfopen ( mv_crashdump_path, L"r, ccs=UTF-8" );
     if( !fd )
         return;
     fclose( fd );
@@ -235,7 +242,7 @@ static void check_crashdump(void)
                         now.wYear, now.wMonth, now.wDay, now.wHour,
                         now.wMinute, now.wSecond );
 
-                if( FtpPutFile( ftp, crashdump_path, remote_file,
+                if( FtpPutFile( ftp, mv_crashdump_path, remote_file,
                             FTP_TRANSFER_TYPE_BINARY, 0) )
                     MessageBox( NULL, L"Report sent correctly. Thanks a lot " \
                                 "for the help.", L"Report sent", MB_OK);
@@ -265,7 +272,7 @@ static void check_crashdump(void)
         }
     }
 
-    _wremove(crashdump_path);
+    _wremove(mv_crashdump_path);
 }
 
 /*****************************************************************************
@@ -296,7 +303,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
         osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
         GetVersionEx( &osvi );
 
-        fwprintf( fd, L"[version]\nOS=%d.%d.%d.%d.%s\nVLC=" VERSION_MESSAGE,
+        fwprintf( fd, L"[version]\nOS=%d.%d.%d.%d.%ls\nVLC=" VERSION_MESSAGE,
                 osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber,
                 osvi.dwPlatformId, osvi.szCSDVersion);
 
@@ -347,13 +354,18 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
             wchar_t module[ 256 ];
             VirtualQuery( caller, &mbi, sizeof( mbi ) ) ;
             GetModuleFileName( mbi.AllocationBase, module, 256 );
-            fwprintf( fd, L"%p|%s\n", caller, module );
+            fwprintf( fd, L"%p|%ls\n", caller, module );
+
+            if( IsBadReadPtr( pBase, 2 * sizeof( void* ) ) )
+                break;
 
             /*The last BP points to NULL!*/
             caller = *(pBase + 1);
             if( !caller )
                 break;
             pBase = *pBase;
+            if( !pBase )
+                break;
         }
 
         HANDLE hpid = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
@@ -366,7 +378,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
                 for (unsigned int i = 0; i < size / sizeof(HMODULE); i++) {
                     wchar_t module[ 256 ];
                     GetModuleFileName(mods[i], module, 256);
-                    fwprintf( fd, L"%p|%s\n", mods[i], module);
+                    fwprintf( fd, L"%p|%ls\n", mods[i], module);
                 }
             }
             CloseHandle(hpid);

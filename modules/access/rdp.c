@@ -83,7 +83,7 @@ vlc_module_begin()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_description( N_("RDP Remote Desktop") )
-    set_capability( "access_demux", 10 )
+    set_capability( "access_demux", 0 )
 
     add_string( CFG_PREFIX "user", NULL, RDP_USER, RDP_USER, false )
         change_safe()
@@ -233,7 +233,7 @@ static bool postConnectHandler( freerdp *p_instance )
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_instance->context;
 
     msg_Dbg( p_vlccontext->p_demux, "connected to desktop %dx%d (%d bpp)",
-#if (FREERDP_VERSION_MAJOR >= 1 && FREERDP_VERSION_MINOR >= 1 )
+#if defined(FREERDP_VERSION_MAJOR)  && (FREERDP_VERSION_MAJOR >= 1 && FREERDP_VERSION_MINOR >= 1 )
              p_instance->settings->DesktopWidth,
              p_instance->settings->DesktopHeight,
              p_instance->settings->ColorDepth
@@ -248,7 +248,13 @@ static bool postConnectHandler( freerdp *p_instance )
     p_instance->update->BeginPaint = beginPaintHandler;
     p_instance->update->EndPaint = endPaintHandler;
 
-    gdi_init( p_instance, CLRBUF_16BPP | CLRBUF_24BPP | CLRBUF_32BPP, NULL );
+    gdi_init( p_instance,
+                CLRBUF_16BPP |
+#if defined(FREERDP_VERSION_MAJOR) && defined(FREERDP_VERSION_MINOR) && \
+    !(FREERDP_VERSION_MAJOR > 1 || (FREERDP_VERSION_MAJOR == 1 && FREERDP_VERSION_MINOR >= 2))
+                CLRBUF_24BPP |
+#endif
+                CLRBUF_32BPP, NULL );
 
     desktopResizeHandler( p_instance->context );
     return true;

@@ -75,7 +75,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
     if (p_input) {
-        playlist_Pause(p_playlist);
+        playlist_TogglePause(p_playlist);
         vlc_object_release(p_input);
     } else {
         bool empty;
@@ -95,12 +95,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 {
     playlist_t *p_playlist = pl_Get(VLCIntf);
 
-    PL_LOCK;
-    bool b_playlist_playing = playlist_Status(p_playlist) == PLAYLIST_RUNNING;
-    PL_UNLOCK;
-
-    if (b_playlist_playing)
-        playlist_Pause(p_playlist);
+    playlist_Pause(p_playlist);
 }
 
 - (void)stop
@@ -680,7 +675,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 #pragma mark - video filter handling
 
-- (const char *)getFilterType:(char *)psz_name
+- (const char *)getFilterType:(const char *)psz_name
 {
     module_t *p_obj = module_find(psz_name);
     if (!p_obj) {
@@ -701,7 +696,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     }
 }
 
-- (void)setVideoFilter: (char *)psz_name on:(BOOL)b_on
+- (void)setVideoFilter: (const char *)psz_name on:(BOOL)b_on
 {
     intf_thread_t *p_intf = VLCIntf;
     if (!p_intf)
@@ -765,7 +760,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     free(psz_string);
 }
 
-- (void)restartFilterIfNeeded: (char *)psz_filter option: (char *)psz_name
+- (void)restartFilterIfNeeded: (const char *)psz_filter option: (const char *)psz_name
 {
     vout_thread_t *p_vout = getVout();
     intf_thread_t *p_intf = VLCIntf;
@@ -819,7 +814,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     }
 }
 
-- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter integer: (int)i_value
+- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter integer: (int)i_value
 {
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
@@ -845,7 +840,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     }
 }
 
-- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter float: (float)f_value
+- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter float: (float)f_value
 {
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;
@@ -871,7 +866,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     }
 }
 
-- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter string: (const char *)psz_value
+- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter string: (const char *)psz_value
 {
     char *psz_new_value = strdup(psz_value);
     vout_thread_t *p_vout = getVout();
@@ -900,7 +895,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     free(psz_new_value);
 }
 
-- (void)setVideoFilterProperty: (char *)psz_name forFilter: (char *)psz_filter boolean: (BOOL)b_value
+- (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter boolean: (BOOL)b_value
 {
     vout_thread_t *p_vout = getVout();
     vlc_object_t *p_filter;

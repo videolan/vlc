@@ -648,10 +648,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         if( !p_region )
         {
             msg_Err( p_filter, "cannot allocate SPU region" );
-            p_filter->pf_sub_buffer_del( p_filter, p_spu );
+            subpicture_Delete( p_spu );
             vlc_global_unlock( VLC_MOSAIC_MUTEX );
             vlc_mutex_unlock( &p_sys->lock );
-            return p_spu;
+            return NULL;
         }
 
         if( p_es->i_x >= 0 && p_es->i_y >= 0 )

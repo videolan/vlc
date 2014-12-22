@@ -286,7 +286,7 @@ static char* recurse_answer( vlm_message_t *p_answer, const char* psz_delim,
                 strcmp( aw_child->psz_name, "inputs" ) == 0 ||
                 strcmp( aw_child->psz_name, "options" ) == 0 )
             {
-                char *psz_recurse = recurse_answer( aw_child, psz_childdelim, 1 ),
+                char *psz_recurse = recurse_answer( aw_child, psz_childdelim, 1 );
                 i_success = asprintf( &psz_tmp, "%s[%s%s%s]%c%s",
                                       psz_response, psz_childdelim, psz_recurse,
                                       psz_delim, c_comma, psz_delim );
@@ -300,7 +300,7 @@ static char* recurse_answer( vlm_message_t *p_answer, const char* psz_delim,
              */
             else
             {
-                char *psz_recurse = recurse_answer( aw_child, psz_childdelim, 0 ),
+                char *psz_recurse = recurse_answer( aw_child, psz_childdelim, 0 );
                 i_success = asprintf( &psz_tmp, "%s{%s%s%s%s}%c%s",
                                       psz_response, psz_childdelim, psz_nametag,
                                       psz_recurse, psz_delim, c_comma, psz_delim );
@@ -768,7 +768,7 @@ int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
 libvlc_event_manager_t *
 libvlc_vlm_get_event_manager( libvlc_instance_t *p_instance )
 {
-    vlm_t *p_vlm;
-    VLM_RET( p_vlm, NULL);
+    if( libvlc_vlm_init( p_instance ) )
+        return NULL;
     return p_instance->libvlc_vlm.p_event_manager;
 }

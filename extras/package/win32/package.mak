@@ -12,6 +12,8 @@ win32_xpi_destdir=$(abs_top_builddir)/vlc-plugin-$(VERSION)
 
 if HAVE_WIN32
 include extras/package/npapi.am
+
+build-npapi: package-win-install
 endif
 
 if HAVE_WIN64
@@ -24,8 +26,7 @@ package-win-install:
 	$(MAKE) install
 	touch $@
 
-
-package-win-common: package-win-install build-npapi
+package-win-common: package-win-install
 	mkdir -p "$(win32_destdir)"/
 
 # Executables, major libs+manifests
@@ -44,6 +45,9 @@ package-win-common: package-win-install build-npapi
 	cp -r $(prefix)/lib/vlc/plugins $(win32_destdir)
 	-cp -r $(prefix)/share/locale $(win32_destdir)
 
+# BD-J JAR
+	-cp $(CONTRIB_DIR)/share/java/*.jar $(win32_destdir)/plugins/access/
+
 if BUILD_LUA
 	mkdir -p $(win32_destdir)/lua/
 	cp -r $(prefix)/lib/vlc/lua/* $(prefix)/share/vlc/lua/* $(win32_destdir)/lua/
@@ -54,11 +58,6 @@ if BUILD_SKINS
 	cp -r $(prefix)/share/vlc/skins2 $(win32_destdir)/skins
 endif
 
-	cp "$(top_builddir)/npapi-vlc/activex/axvlc.dll.manifest" "$(win32_destdir)/"
-	cp "$(top_builddir)/npapi-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
-	cp "$(top_builddir)/npapi-vlc/npapi/package/npvlc.dll.manifest" "$(win32_destdir)/"
-	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
-
 # Compiler shared DLLs, when using compilers built with --enable-shared
 # The shared DLLs may not necessarily be in the first LIBRARY_PATH, we
 # should check them all.
@@ -66,10 +65,8 @@ endif
 	IFS=':' ;\
 	for x in $$library_path_list ;\
 	do \
-		test -f "$$x/libstdc++-6.dll" && cp "$$x/libstdc++-6.dll" "$(win32_destdir)/" ; \
 		test -f "$$x/libgcc_s_sjlj-1.dll" && cp "$$x/libgcc_s_sjlj-1.dll" "$(win32_destdir)/" ; \
-		test -f "$$x/libwinpthread-1.dll" && cp "$$x/libwinpthread-1.dll" "$(win32_destdir)/" ; \
-		test -f "$$x/../bin/libwinpthread-1.dll" && cp "$$x/../bin/libwinpthread-1.dll" "$(win32_destdir)/" ; \
+		test -f "$$x/libgcc_s_seh-1.dll" && cp "$$x/libgcc_s_seh-1.dll" "$(win32_destdir)/" ; \
 	done
 
 # SDK
@@ -84,17 +81,21 @@ endif
 	$(DLLTOOL) -D libvlccore.dll -l "$(win32_destdir)/sdk/lib/libvlccore.lib" -d "$(top_builddir)/src/.libs/libvlccore.dll.def" "$(prefix)/bin/libvlccore.dll"
 	echo "INPUT(libvlccore.lib)" > "$(win32_destdir)/sdk/lib/vlccore.lib"
 
-	mkdir -p "$(win32_destdir)/sdk/activex/"
-	cd $(top_builddir)/npapi-vlc && cp activex/README.TXT share/test/test.html $(win32_destdir)/sdk/activex/
-
 # Convert to DOS line endings
 	find $(win32_destdir) -type f \( -name "*xml" -or -name "*html" -or -name '*js' -or -name '*css' -or -name '*hosts' -or -iname '*txt' -or -name '*.cfg' -or -name '*.lua' \) -exec $(U2D) {} \;
 
 # Remove cruft
 	find $(win32_destdir)/plugins/ -type f \( -name '*.a' -or -name '*.la' \) -exec rm -rvf {} \;
 
+package-win-npapi: build-npapi
+	cp "$(top_builddir)/npapi-vlc/activex/axvlc.dll.manifest" "$(win32_destdir)/"
+	cp "$(top_builddir)/npapi-vlc/installed/lib/axvlc.dll" "$(win32_destdir)/"
+	cp "$(top_builddir)/npapi-vlc/npapi/package/npvlc.dll.manifest" "$(win32_destdir)/"
+	cp "$(top_builddir)/npapi-vlc/installed/lib/npvlc.dll" "$(win32_destdir)/"
+	mkdir -p "$(win32_destdir)/sdk/activex/"
+	cd $(top_builddir)/npapi-vlc && cp activex/README.TXT share/test/test.html $(win32_destdir)/sdk/activex/
 
-package-win-strip: package-win-common
+package-win-strip: package-win-common package-win-npapi
 	mkdir -p "$(win32_debugdir)"/
 	cd $(win32_destdir); find . -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
 	do if test -n "$$i" ; then \
@@ -103,26 +104,34 @@ package-win-strip: package-win-common
 	    $(OBJCOPY) --add-gnu-debuglink="$(win32_debugdir)/`basename $$i.dbg`" "$$i" ; \
 	  fi ; \
 	done
+	if test -n "$(SIGNATURE)"; then \
+	  cd $(win32_destdir); find . -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
+	  do if test -n "$$i" ; then \
+	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -in "$$i" -out "$$i.sign"; \
+	    mv "$$i.sign" "$$i" ; \
+	  fi ; \
+	  done \
+	fi
 
 
 package-win32-webplugin-common: package-win-strip
-	mkdir -p "$(win32_xpi_destdir)/"
-	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/"
-	find $(prefix) -maxdepth 4 -name "*$(LIBEXT)" -exec cp {} "$(win32_xpi_destdir)/" \;
+	mkdir -p "$(win32_xpi_destdir)/plugins/"
+	cp -r $(win32_destdir)/plugins/ "$(win32_xpi_destdir)/plugins/"
+	cp "$(win32_destdir)/libvlc.dll" "$(win32_destdir)/libvlccore.dll" "$(win32_destdir)/npvlc.dll" "$(win32_xpi_destdir)/plugins/"
 	cp $(top_builddir)/npapi-vlc/npapi/package/npvlc.dll.manifest "$(win32_xpi_destdir)/plugins/"
 	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_xpi_destdir)/plugins/"
-	rm -rf "$(win32_xpi_destdir)/plugins/gui/"
+	rm -rf "$(win32_xpi_destdir)/plugins/plugins/gui/"
 
 
 package-win32-xpi: package-win32-webplugin-common
 	cp $(top_builddir)/npapi-vlc/npapi/package/install.rdf "$(win32_xpi_destdir)/"
-	cd $(win32_xpi_destdir) && zip -r -9 "../vlc-$(VERSION).xpi" install.rdf plugins
+	cd $(win32_xpi_destdir) && zip -r -9 "../$(WINVERSION).xpi" install.rdf plugins
 
 
 package-win32-crx: package-win32-webplugin-common
 	cp $(top_builddir)/npapi-vlc/npapi/package/manifest.json "$(win32_xpi_destdir)/"
 	crxmake --pack-extension "$(win32_xpi_destdir)" \
-		--extension-output "$(win32_destdir)/vlc-$(VERSION).crx" --ignore-file install.rdf
+		--extension-output "$(win32_destdir)/$(WINVERSION).crx" --ignore-file install.rdf
 
 
 # nsis is a 32-bits installer, we need to build a 32bits DLL
@@ -170,6 +179,10 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/UAC.dll $(win32_destd
 	fi; \
 	eval "$$MAKENSIS $(win32_destdir)/spad.nsi"; \
 	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
+	if test -n "$(SIGNATURE)"; then \
+	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -in "$(WINVERSION).exe" -out "$(WINVERSION).exe.sign"; \
+	    mv "$(WINVERSION).exe.sign" "$(WINVERSION).exe" ; \
+	fi
 
 package-win32-zip: package-win-strip
 	rm -f -- $(WINVERSION).zip

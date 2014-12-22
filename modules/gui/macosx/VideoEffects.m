@@ -206,7 +206,20 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     [o_tableView selectFirstTabViewItem:self];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(inputChangedEvent:)
+                                                 name:VLCInputChangedNotification
+                                               object:nil];
+
+
     [self resetValues];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    [super dealloc];
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
@@ -217,6 +230,16 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 #pragma mark -
 #pragma mark internal functions
+
+-(void)inputChangedEvent:(NSNotification *)o_notification
+{
+    // reset crop values when input changed
+    [self setCropBottomValue:0];
+    [self setCropTopValue:0];
+    [self setCropLeftValue:0];
+    [self setCropRightValue:0];
+}
+
 - (void)resetProfileSelector
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -315,15 +338,16 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     }
 
     /* fetch and show the various values */
-    [o_adjust_hue_sld setIntValue: config_GetInt(p_intf, "hue")];
+    [o_adjust_hue_sld setFloatValue: config_GetFloat(p_intf, "hue")];
     [o_adjust_contrast_sld setFloatValue: config_GetFloat(p_intf, "contrast")];
     [o_adjust_brightness_sld setFloatValue: config_GetFloat(p_intf, "brightness")];
     [o_adjust_saturation_sld setFloatValue: config_GetFloat(p_intf, "saturation")];
+    [o_adjust_brightness_ckb setState:(config_GetInt(p_intf, "brightness-threshold") != 0 ? NSOnState : NSOffState)];
     [o_adjust_gamma_sld setFloatValue: config_GetFloat(p_intf, "gamma")];
     [o_adjust_brightness_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "brightness")]];
     [o_adjust_contrast_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "contrast")]];
     [o_adjust_gamma_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "gamma")]];
-    [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "hue")]];
+    [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%.0f", config_GetFloat(p_intf, "hue")]];
     [o_adjust_saturation_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "saturation")]];
     b_state = [o_adjust_ckb state];
     [o_adjust_brightness_sld setEnabled: b_state];
@@ -483,11 +507,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (NSString *)generateProfileString
 {
-    return [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli",
+    return [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli;%lli;%f",
             B64EncAndFree(config_GetPsz(p_intf, "video-filter")),
             B64EncAndFree(config_GetPsz(p_intf, "sub-source")),
             B64EncAndFree(config_GetPsz(p_intf, "video-splitter")),
-            config_GetInt(p_intf, "hue"),
+            0LL, // former "hue" value, deprecated since 3.0.0
             config_GetFloat(p_intf, "contrast"),
             config_GetFloat(p_intf, "brightness"),
             config_GetFloat(p_intf, "saturation"),
@@ -515,7 +539,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
             config_GetInt(p_intf, "logo-opacity"),
             config_GetInt(p_intf, "clone-count"),
             config_GetInt(p_intf, "wall-rows"),
-            config_GetInt(p_intf, "wall-cols")
+            config_GetInt(p_intf, "wall-cols"),
+            // version 2 of profile string:
+            config_GetInt(p_intf, "brightness-threshold"), // index: 32
+            // version 3 of profile string: (vlc-3.0.0)
+            config_GetFloat(p_intf, "hue") // index: 33
             ];
 }
 
@@ -546,7 +574,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     if ([o_window isKeyWindow])
         [o_window orderOut:sender];
     else {
-        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentWindowLevel]];
+        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
         [o_window makeKeyAndOrderFront:sender];
     }
 }
@@ -560,54 +588,50 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSUInteger selectedProfile = [o_profile_pop indexOfSelectedItem];
 
-    /* disable all current video filters, if a vout is available */
-    vout_thread_t *p_vout = getVout();
-    if (p_vout) {
-        var_SetString(p_vout, "video-filter", "");
-        var_SetString(p_vout, "sub-source", "");
-        var_SetString(p_vout, "video-splitter", "");
-        vlc_object_release(p_vout);
-    }
-
     /* fetch preset */
     NSArray *items = [[[defaults objectForKey:@"VideoEffectProfiles"] objectAtIndex:selectedProfile] componentsSeparatedByString:@";"];
 
+    // version 1 of profile string has 32 entries
+    if ([items count] < 32) {
+        msg_Err(p_intf, "Error in parsing profile string");
+        [self resetValues];
+        return;
+    }
+
     /* filter handling */
     NSString *tempString = B64DecNSStr([items objectAtIndex:0]);
-    NSArray *tempArray;
-    NSUInteger count;
+    vout_thread_t *p_vout = getVout();
 
     /* enable the new filters */
-    config_PutPsz(p_intf, "video-filter", "");
-    if ([tempString length] > 0) {
-        tempArray = [tempString componentsSeparatedByString:@":"];
-        count = [tempArray count];
-        for (NSUInteger x = 0; x < count; x++)
-            [vci_si setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
+    config_PutPsz(p_intf, "video-filter", [tempString UTF8String]);
+    if (p_vout) {
+        var_SetString(p_vout, "video-filter", [tempString UTF8String]);
     }
 
     tempString = B64DecNSStr([items objectAtIndex:1]);
     /* enable another round of new filters */
-    config_PutPsz(p_intf,"sub-source", "");
-    if ([tempString length] > 0) {
-        tempArray = [tempString componentsSeparatedByString:@":"];
-        count = [tempArray count];
-        for (NSUInteger x = 0; x < count; x++)
-            [vci_si setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
+    config_PutPsz(p_intf, "sub-source", [tempString UTF8String]);
+    if (p_vout) {
+        var_SetString(p_vout, "sub-source", [tempString UTF8String]);
+    }
+
+    if (p_vout) {
+        vlc_object_release(p_vout);
     }
 
     tempString = B64DecNSStr([items objectAtIndex:2]);
     /* enable another round of new filters */
-    config_PutPsz(p_intf,"video-splitter", "");
-    if ([tempString length] > 0) {
-        tempArray = [tempString componentsSeparatedByString:@":"];
-        count = [tempArray count];
-        for (NSUInteger x = 0; x < count; x++)
-            [vci_si setVideoFilter:(char *)[[tempArray objectAtIndex:x] UTF8String] on:YES];
+    char *psz_current_splitter = var_GetString(pl_Get(p_intf), "video-splitter");
+    bool b_filter_changed = ![tempString isEqualToString:toNSStr(psz_current_splitter)];
+    free(psz_current_splitter);
+
+    if (b_filter_changed) {
+        config_PutPsz(p_intf, "video-splitter", [tempString UTF8String]);
+        var_SetString(pl_Get(p_intf), "video-splitter", [tempString UTF8String]);
     }
 
     /* try to set filter values on-the-fly and store them appropriately */
-    [vci_si setVideoFilterProperty:"hue" forFilter:"adjust" integer:[[items objectAtIndex:3] intValue]];
+    // index 3 is deprecated
     [vci_si setVideoFilterProperty:"contrast" forFilter:"adjust" float:[[items objectAtIndex:4] floatValue]];
     [vci_si setVideoFilterProperty:"brightness" forFilter:"adjust" float:[[items objectAtIndex:5] floatValue]];
     [vci_si setVideoFilterProperty:"saturation" forFilter:"adjust" float:[[items objectAtIndex:6] floatValue]];
@@ -636,6 +660,20 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [vci_si setVideoFilterProperty:"clone-count" forFilter:"clone" integer:[[items objectAtIndex:29] intValue]];
     [vci_si setVideoFilterProperty:"wall-rows" forFilter:"wall" integer:[[items objectAtIndex:30] intValue]];
     [vci_si setVideoFilterProperty:"wall-cols" forFilter:"wall" integer:[[items objectAtIndex:31] intValue]];
+
+    if ([items count] >= 33) { // version >=2 of profile string
+        [vci_si setVideoFilterProperty: "brightness-threshold" forFilter: "adjust" boolean: [[items objectAtIndex:32] intValue]];
+    }
+
+    float hueValue;
+    if ([items count] >= 34) { // version >=3 of profile string
+        hueValue = [[items objectAtIndex:33] floatValue];
+    } else {
+        hueValue = [[items objectAtIndex:3] intValue]; // deprecated since 3.0.0
+        // convert to new scale ([0,360] --> [-180,180])
+        hueValue -= 180;
+    }
+    [vci_si setVideoFilterProperty:"hue" forFilter:"adjust" float:hueValue];
 
     [defaults setInteger:selectedProfile forKey:@"VideoEffectSelectedProfile"];
     [defaults synchronize];
@@ -782,37 +820,39 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     else if (sender == o_adjust_gamma_sld)
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gamma" forFilter: "adjust" float: [o_adjust_gamma_sld floatValue]];
     else if (sender == o_adjust_hue_sld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "hue" forFilter: "adjust" integer: [o_adjust_hue_sld intValue]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "hue" forFilter: "adjust" float: [o_adjust_hue_sld floatValue]];
     else if (sender == o_adjust_saturation_sld)
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "saturation" forFilter: "adjust" float: [o_adjust_saturation_sld floatValue]];
 
     if (sender == o_adjust_hue_sld)
-        [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%i", [o_adjust_hue_sld intValue]]];
+        [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%.0f", [o_adjust_hue_sld floatValue]]];
     else
         [sender setToolTip: [NSString stringWithFormat:@"%0.3f", [sender floatValue]]];
 }
 
 - (IBAction)enableAdjustBrightnessThreshold:(id)sender
 {
+    VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
+
     if (sender == o_adjust_reset_btn) {
-        VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
         [o_adjust_brightness_sld setFloatValue: 1.0];
         [o_adjust_contrast_sld setFloatValue: 1.0];
         [o_adjust_gamma_sld setFloatValue: 1.0];
-        [o_adjust_hue_sld setIntValue: 0];
+        [o_adjust_hue_sld setFloatValue: 0];
         [o_adjust_saturation_sld setFloatValue: 1.0];
         [o_adjust_brightness_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
         [o_adjust_contrast_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
         [o_adjust_gamma_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
-        [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%i", 0]];
+        [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%.0f", 0.0]];
         [o_adjust_saturation_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
         [vci_si setVideoFilterProperty: "brightness" forFilter: "adjust" float: 1.0];
         [vci_si setVideoFilterProperty: "contrast" forFilter: "adjust" float: 1.0];
         [vci_si setVideoFilterProperty: "gamma" forFilter: "adjust" float: 1.0];
-        [vci_si setVideoFilterProperty: "hue" forFilter: "adjust" integer: 0.0];
+        [vci_si setVideoFilterProperty: "hue" forFilter: "adjust" float: 0.0];
         [vci_si setVideoFilterProperty: "saturation" forFilter: "adjust" float: 1.0];
     } else
-        config_PutInt(p_intf, "brightness-threshold", [o_adjust_brightness_ckb state]);
+        [vci_si setVideoFilterProperty: "brightness-threshold" forFilter: "adjust" boolean: [o_adjust_brightness_ckb state]];
+
 }
 
 - (IBAction)enableSharpen:(id)sender
@@ -1136,14 +1176,14 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [o_addtext_text_lbl setEnabled: b_state];
     [o_addtext_text_fld setEnabled: b_state];
     [vci_si setVideoFilter: "marq" on: b_state];
-    [vci_si setVideoFilterProperty: "marq-marquee" forFilter: "marq" string: (char *)[[o_addtext_text_fld stringValue] UTF8String]];
+    [vci_si setVideoFilterProperty: "marq-marquee" forFilter: "marq" string: [[o_addtext_text_fld stringValue] UTF8String]];
     [vci_si setVideoFilterProperty: "marq-position" forFilter: "marq" integer: [[o_addtext_pos_pop selectedItem] tag]];
 }
 
 - (IBAction)addTextModifierChanged:(id)sender
 {
     if (sender == o_addtext_text_fld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-marquee" forFilter: "marq" string: (char *)[[o_addtext_text_fld stringValue] UTF8String]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-marquee" forFilter: "marq" string:[[o_addtext_text_fld stringValue] UTF8String]];
     else
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-position" forFilter: "marq" integer: [[o_addtext_pos_pop selectedItem] tag]];
 }
@@ -1164,7 +1204,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 - (IBAction)addLogoModifierChanged:(id)sender
 {
     if (sender == o_addlogo_logo_fld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-file" forFilter: "logo" string: (char *)[[o_addlogo_logo_fld stringValue] UTF8String]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-file" forFilter: "logo" string: [[o_addlogo_logo_fld stringValue] UTF8String]];
     else if (sender == o_addlogo_pos_pop)
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-position" forFilter: "logo" integer: [[o_addlogo_pos_pop selectedItem] tag]];
     else {

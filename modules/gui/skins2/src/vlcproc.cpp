@@ -227,11 +227,13 @@ int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
     VlcProc *pThis = (VlcProc*)pParam;
     input_thread_t *pInput = static_cast<input_thread_t*>(newval.p_address);
 
-    var_AddCallback( pInput, "intf-event", onGenericCallback2, pThis );
-    var_AddCallback( pInput, "bit-rate", onGenericCallback, pThis );
-    var_AddCallback( pInput, "sample-rate", onGenericCallback, pThis );
-    var_AddCallback( pInput, "can-record", onGenericCallback, pThis );
-
+    if( pInput != NULL )
+    {
+        var_AddCallback( pInput, "intf-event", onGenericCallback2, pThis );
+        var_AddCallback( pInput, "bit-rate", onGenericCallback, pThis );
+        var_AddCallback( pInput, "sample-rate", onGenericCallback, pThis );
+        var_AddCallback( pInput, "can-record", onGenericCallback, pThis );
+    }
     return VLC_SUCCESS;
 }
 

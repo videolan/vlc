@@ -31,6 +31,10 @@
 
 #define PREFIX(x) I ## x
 
+#if ANDROID_API >= 11
+#define HAS_USE_BUFFER
+#endif
+
 using namespace android;
 
 class IOMXContext {
@@ -76,6 +80,9 @@ public:
 class OMXBuffer {
 public:
     sp<MemoryDealer> dealer;
+#ifdef HAS_USE_BUFFER
+    sp<GraphicBuffer> graphicBuffer;
+#endif
     IOMX::buffer_id id;
 };
 
@@ -133,8 +140,17 @@ static OMX_ERRORTYPE iomx_send_command(OMX_HANDLETYPE component, OMX_COMMANDTYPE
 
 static OMX_ERRORTYPE iomx_get_parameter(OMX_HANDLETYPE component, OMX_INDEXTYPE param_index, OMX_PTR param)
 {
+    /*
+     * Some QCOM OMX_getParameter implementations override the nSize element to
+     * a bad value. So, save the initial nSize in order to restore it after.
+     */
+    OMX_U32 nSize = *(OMX_U32*)param;
+    OMX_ERRORTYPE error;
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
-    return get_error(ctx->iomx->getParameter(node->node, param_index, param, *(OMX_U32*)param));
+
+    error = get_error(ctx->iomx->getParameter(node->node, param_index, param, nSize));
+    *(OMX_U32*)param = nSize;
+    return error;
 }
 
 static OMX_ERRORTYPE iomx_set_parameter(OMX_HANDLETYPE component, OMX_INDEXTYPE param_index, OMX_PTR param)
@@ -153,6 +169,9 @@ static OMX_ERRORTYPE iomx_allocate_buffer(OMX_HANDLETYPE component, OMX_BUFFERHE
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
     OMXBuffer* info = new OMXBuffer;
+#ifdef HAS_USE_BUFFER
+    info->graphicBuffer = NULL;
+#endif
     info->dealer = new MemoryDealer(size + 4096); // Do we need to keep this around, or is it kept alive via the IMemory that references it?
     sp<IMemory> mem = info->dealer->allocate(size);
     int ret = ctx->iomx->allocateBufferWithBackup(node->node, port_index, mem, &info->id);
@@ -167,6 +186,31 @@ static OMX_ERRORTYPE iomx_allocate_buffer(OMX_HANDLETYPE component, OMX_BUFFERHE
     node->buffers.push_back(buffer);
     return OMX_ErrorNone;
 }
+
+#ifdef HAS_USE_BUFFER
+static OMX_ERRORTYPE iomx_use_buffer(OMX_HANDLETYPE component, OMX_BUFFERHEADERTYPE **bufferptr, OMX_U32 port_index, OMX_PTR app_private, OMX_U32 size, OMX_U8* data)
+{
+    OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
+    OMXBuffer* info = new OMXBuffer;
+    info->dealer = NULL;
+#if ANDROID_API <= 13
+    info->graphicBuffer = new GraphicBuffer((android_native_buffer_t*) data, false);
+#else
+    info->graphicBuffer = new GraphicBuffer((ANativeWindowBuffer*) data, false);
+#endif
+    int ret = ctx->iomx->useGraphicBuffer(node->node, port_index, info->graphicBuffer, &info->id);
+    if (ret != OK)
+        return OMX_ErrorUndefined;
+    OMX_BUFFERHEADERTYPE *buffer = (OMX_BUFFERHEADERTYPE*) calloc(1, sizeof(OMX_BUFFERHEADERTYPE));
+    *bufferptr = buffer;
+    buffer->pPlatformPrivate = info;
+    buffer->pAppPrivate = app_private;
+    buffer->nAllocLen = size;
+    buffer->pBuffer = data;
+    node->buffers.push_back(buffer);
+    return OMX_ErrorNone;
+}
+#endif
 
 static OMX_ERRORTYPE iomx_free_buffer(OMX_HANDLETYPE component, OMX_U32 port, OMX_BUFFERHEADERTYPE *buffer)
 {
@@ -261,6 +305,11 @@ OMX_ERRORTYPE PREFIX(OMX_GetHandle)(OMX_HANDLETYPE *handle_ptr, OMX_STRING compo
     component->FillThisBuffer = iomx_fill_this_buffer;
     component->GetState = iomx_get_state;
     component->AllocateBuffer = iomx_allocate_buffer;
+#ifdef HAS_USE_BUFFER
+    component->UseBuffer = iomx_use_buffer;
+#else
+    component->UseBuffer = NULL;
+#endif
     component->ComponentRoleEnum = iomx_component_role_enum;
     component->GetExtensionIndex = iomx_get_extension_index;
     component->SetConfig = iomx_set_config;
@@ -359,5 +408,49 @@ OMX_ERRORTYPE PREFIX(OMX_GetComponentsOfRole)(OMX_STRING role, OMX_U32 *num_comp
     *num_comps = i;
     return OMX_ErrorNone;
 }
+
+#ifdef HAS_USE_BUFFER
+OMX_ERRORTYPE PREFIX(OMXAndroid_EnableGraphicBuffers)(OMX_HANDLETYPE component, OMX_U32 port_index, OMX_BOOL enable)
+{
+    OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
+    int ret = ctx->iomx->enableGraphicBuffers(node->node, port_index, enable);
+    if (ret != OK)
+        return OMX_ErrorUndefined;
+    return OMX_ErrorNone;
+}
+
+OMX_ERRORTYPE PREFIX(OMXAndroid_GetGraphicBufferUsage)(OMX_HANDLETYPE component, OMX_U32 port_index, OMX_U32* usage)
+{
+    OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
+    int ret = ctx->iomx->getGraphicBufferUsage(node->node, port_index, usage);
+    if (ret != OK)
+        return OMX_ErrorUndefined;
+    return OMX_ErrorNone;
+}
+
+OMX_ERRORTYPE PREFIX(OMXAndroid_GetHalFormat)( const char *comp_name, int* hal_format )
+{
+    if( !strncmp( comp_name, "OMX.SEC.", 8 ) ) {
+        switch( *hal_format ) {
+        case OMX_COLOR_FormatYUV420SemiPlanar:
+            *hal_format = 0x105; // HAL_PIXEL_FORMAT_YCbCr_420_SP
+            break;
+        case OMX_COLOR_FormatYUV420Planar:
+            *hal_format = 0x101; // HAL_PIXEL_FORMAT_YCbCr_420_P
+            break;
+        }
+    }
+    else if( !strcmp( comp_name, "OMX.TI.720P.Decoder" ) ||
+        !strcmp( comp_name, "OMX.TI.Video.Decoder" ) )
+        *hal_format = 0x14; // HAL_PIXEL_FORMAT_YCbCr_422_I
+#if ANDROID_API <= 13 // Required on msm8660 on 3.2, not required on 4.1
+    else if( !strcmp( comp_name, "OMX.qcom.video.decoder.avc" ))
+        *hal_format = 0x108;
+#endif
+
+    return OMX_ErrorNone;
+}
+
+#endif
 }
 

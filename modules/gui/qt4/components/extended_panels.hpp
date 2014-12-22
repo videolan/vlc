@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 
+#include "qt4.hpp"
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
 
@@ -46,6 +47,8 @@ class ExtVideo: public QObject
     friend class ExtendedDialog;
 public:
     ExtVideo( struct intf_thread_t *, QTabWidget * );
+    static void setPostprocessing( struct intf_thread_t *, int q);
+    static int getPostprocessing( struct intf_thread_t *p_intf);
 private:
     Ui::ExtVideoWidget ui;
     QSignalMapper* filterMapper;
@@ -53,6 +56,8 @@ private:
     void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
     void clean();
+    static void setFilterOption( struct intf_thread_t *, const char *psz_module, const char *psz_option, int, double, QString );
+
 private slots:
     void updateFilters();
     void updateFilterOptions();
@@ -67,7 +72,7 @@ class ExtV4l2 : public QWidget
 public:
     ExtV4l2( intf_thread_t *, QWidget * );
 
-    virtual void showEvent( QShowEvent *event );
+    void showEvent( QShowEvent *event ) Q_DECL_OVERRIDE;
 
 private:
     intf_thread_t *p_intf;
@@ -152,13 +157,13 @@ public:
                          const slider_data_t *p_data, int index );
 
 protected:
-    virtual float initialValue();
+    float initialValue() Q_DECL_OVERRIDE;
     int index;
     QStringList getBandsFromAout() const;
 
 public slots:
-    virtual void onValueChanged( int i ) const;
-    virtual void writeToConfig() const;
+    void onValueChanged( int i ) const Q_DECL_OVERRIDE;
+    void writeToConfig() const Q_DECL_OVERRIDE;
 };
 
 class Equalizer: public AudioFilterControlWidget
@@ -169,10 +174,10 @@ public:
     Equalizer( intf_thread_t *, QWidget * );
 
 protected:
-    virtual void build();
+    void build() Q_DECL_OVERRIDE;
 
 protected slots:
-    virtual void setSaveToConfig( bool );
+    void setSaveToConfig( bool ) Q_DECL_OVERRIDE;
 
 private:
     FilterSliderData *preamp;

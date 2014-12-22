@@ -1,0 +1,13 @@
+diff -ru sparkle/SUBasicUpdateDriver.m sparkled/SUBasicUpdateDriver.m
+--- sparkle/SUBasicUpdateDriver.m	2014-11-05 00:05:47.000000000 +0100
++++ sparkled-fixed/SUBasicUpdateDriver.m	2014-11-04 23:48:19.000000000 +0100
+@@ -105,9 +105,6 @@
+ {
+ 	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)])
+ 		[[updater delegate] updater:updater didFinishLoadingAppcast:ac];
+-	
+-	NSDictionary *userInfo = (ac != nil) ? [NSDictionary dictionaryWithObject:SUUpdaterAppcastNotificationKey forKey:ac] : nil;
+-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:updater userInfo:userInfo];
+     
+     SUAppcastItem *item = nil;
+     

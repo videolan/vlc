@@ -290,13 +290,9 @@ static int Init(vout_display_t *vd,
     rsc.p[0].i_pitch  = i_pic_pitch;;
 
     picture_t *picture = picture_NewFromResource(fmt, &rsc);
-    if (picture) {
-        picture_pool_configuration_t cfg;
-        memset(&cfg, 0, sizeof(cfg));
-        cfg.picture_count = 1;
-        cfg.picture = &picture;
-        sys->pool = picture_pool_NewExtended(&cfg);
-    } else
+    if (picture != NULL)
+        sys->pool = picture_pool_New(1, &picture);
+    else
         sys->pool = NULL;
 
     UpdateRects(vd, NULL, NULL, true);
@@ -309,7 +305,7 @@ static void Clean(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     sys->pool = NULL;
 
     if (sys->off_dc)

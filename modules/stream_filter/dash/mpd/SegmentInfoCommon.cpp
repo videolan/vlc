@@ -33,7 +33,8 @@
 
 using namespace dash::mpd;
 
-SegmentInfoCommon::SegmentInfoCommon() :
+SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
+    ICanonicalUrl( parent ),
     duration( -1 ),
     initialisationSegment( NULL ),
     segmentTimeline( NULL )
@@ -79,11 +80,6 @@ void SegmentInfoCommon::setInitialisationSegment(Segment *seg)
         this->initialisationSegment = seg;
 }
 
-const std::list<std::string>&   SegmentInfoCommon::getBaseURL() const
-{
-    return this->baseURLs;
-}
-
 void SegmentInfoCommon::appendBaseURL(const std::string &url)
 {
     this->baseURLs.push_back( url );
@@ -98,4 +94,12 @@ void SegmentInfoCommon::setSegmentTimeline( const SegmentTimeline *segTl )
 {
     if ( segTl != NULL )
         this->segmentTimeline = segTl;
+}
+
+Url SegmentInfoCommon::getUrlSegment() const
+{
+    Url ret = getParentUrlSegment();
+    if (!baseURLs.empty())
+        ret.append(baseURLs.front());
+    return ret;
 }

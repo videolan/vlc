@@ -54,7 +54,7 @@ typedef struct scan_parameter_t
         int i_max;
         int i_step;
 
-        int i_count;    /* Number of frequency test to do */
+        unsigned i_count;    /* Number of frequency test to do */
     } frequency;
 
     struct
@@ -64,7 +64,7 @@ typedef struct scan_parameter_t
         int i_max;
         int i_step;
 
-        int i_count;
+        unsigned i_count;
     } bandwidth;
 
     struct
@@ -73,7 +73,7 @@ typedef struct scan_parameter_t
         char *psz_path;         /* config file path */
 
         scan_dvbs_transponder_t *p_transponders;
-        int i_count;
+        unsigned i_count;
     } sat_info;
 } scan_parameter_t;
 

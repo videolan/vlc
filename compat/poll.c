@@ -36,6 +36,7 @@
 #else
 # include <sys/time.h>
 # include <sys/select.h>
+# include <fcntl.h>
 #endif
 
 int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
@@ -114,7 +115,32 @@ int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
     val = select (val + 1, rdset, wrset, exset,
                   (timeout >= 0) ? &tv : NULL);
     if (val == -1)
-        return -1;
+    {
+#ifndef _WIN32
+        if (errno != EBADF)
+#else
+        if (WSAGetLastError () != WSAENOTSOCK)
+#endif
+            return -1;
+
+        val = 0;
+
+        for (unsigned i = 0; i < nfds; i++)
+#ifndef _WIN32
+            if (fcntl (fds[i].fd, F_GETFD) == -1)
+#else
+            if (getsockopt (fds[i].fd, SOL_SOCKET, SO_REUSEADDR,
+                            &(DWORD){ 0 }, &(int){ sizeof (DWORD) }) != 0)
+#endif
+            {
+                fds[i].revents = POLLNVAL;
+                val++;
+            }
+            else
+                fds[i].revents = 0;
+
+        return val ? val : -1;
+    }
 
     for (unsigned i = 0; i < nfds; i++)
     {

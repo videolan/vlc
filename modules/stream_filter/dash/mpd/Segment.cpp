@@ -21,33 +21,151 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#define __STDC_CONSTANT_MACROS
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include "Segment.h"
 #include "Representation.h"
+#include "MPD.h"
+#include "mp4/AtomsReader.hpp"
 
 #include <cassert>
 
 using namespace dash::mpd;
 using namespace dash::http;
 
-Segment::Segment(const Representation *parent) :
-        startByte  (-1),
-        endByte    (-1),
-        parentRepresentation( parent )
+ISegment::ISegment(const ICanonicalUrl *parent):
+    ICanonicalUrl( parent ),
+    startByte  (0),
+    endByte    (0),
+    startTime  (VLC_TS_INVALID),
+    duration   (0)
 {
-    assert( parent != NULL );
-    if ( parent->getSegmentInfo() != NULL && parent->getSegmentInfo()->getDuration() >= 0 )
-        this->size = parent->getBandwidth() * parent->getSegmentInfo()->getDuration();
-    else
-        this->size = -1;
+    debugName = "Segment";
+    classId = CLASSID_ISEGMENT;
 }
 
-std::string             Segment::getSourceUrl   () const
+dash::http::Chunk * ISegment::getChunk(const std::string &url)
 {
-    return this->sourceUrl;
+    return new (std::nothrow) SegmentChunk(this, url);
+}
+
+dash::http::Chunk* ISegment::toChunk(size_t index, Representation *ctxrep)
+{
+    Chunk *chunk;
+    try
+    {
+        chunk = getChunk(getUrlSegment().toString(index, ctxrep));
+        if (!chunk)
+            return NULL;
+    }
+    catch (int)
+    {
+        return NULL;
+    }
+
+    if(startByte != endByte)
+    {
+        chunk->setStartByte(startByte);
+        chunk->setEndByte(endByte);
+    }
+
+    return chunk;
+}
+
+bool ISegment::isSingleShot() const
+{
+    return true;
+}
+void ISegment::done()
+{
+    //Only used for a SegmentTemplate.
+}
+
+void ISegment::setByteRange(size_t start, size_t end)
+{
+    startByte = start;
+    endByte   = end;
+}
+
+void ISegment::setStartTime(mtime_t ztime)
+{
+    startTime = ztime;
+}
+
+mtime_t ISegment::getStartTime() const
+{
+    return startTime;
+}
+
+mtime_t ISegment::getDuration() const
+{
+    return duration;
+}
+
+void ISegment::setDuration(mtime_t d)
+{
+    duration = d;
+}
+
+size_t ISegment::getOffset() const
+{
+    return startByte;
+}
+
+std::string ISegment::toString(int indent) const
+{
+    std::stringstream ss;
+    ss << std::string(indent, ' ') << debugName << " url=" << getUrlSegment().toString();
+    if(startByte!=endByte)
+        ss << " @" << startByte << ".." << endByte;
+    return ss.str();
+}
+
+bool ISegment::contains(size_t byte) const
+{
+    if (startByte == endByte)
+        return false;
+    return (byte >= startByte &&
+            (!endByte || byte <= endByte) );
+}
+
+int ISegment::getClassId() const
+{
+    return classId;
+}
+
+ISegment::SegmentChunk::SegmentChunk(ISegment *segment_, const std::string &url) :
+    dash::http::Chunk(url)
+{
+    segment = segment_;
+}
+
+void ISegment::SegmentChunk::onDownload(void *, size_t)
+{
+
+}
+
+Segment::Segment(ICanonicalUrl *parent) :
+        ISegment(parent)
+{
+    size = -1;
+    classId = CLASSID_SEGMENT;
+}
+
+void Segment::addSubSegment(SubSegment *subsegment)
+{
+    subsegments.push_back(subsegment);
+}
+
+Segment::~Segment()
+{
+    std::vector<SubSegment*>::iterator it;
+    for(it=subsegments.begin();it!=subsegments.end();it++)
+        delete *it;
 }
 
 void                    Segment::setSourceUrl   ( const std::string &url )
@@ -55,76 +173,119 @@ void                    Segment::setSourceUrl   ( const std::string &url )
     if ( url.empty() == false )
         this->sourceUrl = url;
 }
-bool                    Segment::isSingleShot   () const
-{
-    return true;
-}
-void                    Segment::done           ()
-{
-    //Only used for a SegmentTemplate.
-}
-void                    Segment::addBaseUrl     (BaseUrl *url)
-{
-    this->baseUrls.push_back(url);
-}
-const std::vector<BaseUrl *>&  Segment::getBaseUrls    () const
-{
-    return this->baseUrls;
-}
-void                    Segment::setByteRange   (int start, int end)
-{
-    this->startByte = start;
-    this->endByte   = end;
-}
-int                     Segment::getStartByte   () const
-{
-    return this->startByte;
-}
-int                     Segment::getEndByte     () const
-{
-    return this->endByte;
-}
-dash::http::Chunk*      Segment::toChunk        ()
-{
-    Chunk *chunk = new Chunk();
 
-    if(this->startByte != -1 && this->endByte != -1)
+std::string Segment::toString(int indent) const
+{
+    if (subsegments.empty())
     {
-        chunk->setUseByteRange(true);
-        chunk->setStartByte(this->startByte);
-        chunk->setEndByte(this->endByte);
-    }
-
-    if(this->baseUrls.size() > 0)
-    {
-        std::stringstream ss;
-        ss << this->baseUrls.at(0)->getUrl() << this->sourceUrl;
-        chunk->setUrl(ss.str());
-        ss.clear();
-
-        for(size_t i = 1; i < this->baseUrls.size(); i++)
-        {
-            ss << this->baseUrls.at(i)->getUrl() << this->sourceUrl;
-            chunk->addOptionalUrl(ss.str());
-            ss.clear();
-        }
+        return ISegment::toString(indent);
     }
     else
     {
-        chunk->setUrl(this->sourceUrl);
+        std::string ret;
+        std::vector<SubSegment *>::const_iterator l;
+        for(l = subsegments.begin(); l != subsegments.end(); l++)
+        {
+            ret.append( (*l)->toString(indent + 1) );
+        }
+        return ret;
     }
+}
 
-    chunk->setBitrate(this->parentRepresentation->getBandwidth());
+Url Segment::getUrlSegment() const
+{
+    Url ret = getParentUrlSegment();
+    if (!sourceUrl.empty())
+        ret.append(sourceUrl);
+    return ret;
+}
 
+dash::http::Chunk* Segment::toChunk(size_t index, Representation *ctxrep)
+{
+    Chunk *chunk = ISegment::toChunk(index, ctxrep);
+    if (chunk && ctxrep)
+        chunk->setBitrate(ctxrep->getBandwidth());
     return chunk;
 }
 
-const Representation *Segment::getParentRepresentation() const
+std::vector<ISegment*> Segment::subSegments()
 {
-    return this->parentRepresentation;
+    std::vector<ISegment*> list;
+    if(!subsegments.empty())
+    {
+        std::vector<SubSegment*>::iterator it;
+        for(it=subsegments.begin();it!=subsegments.end();it++)
+            list.push_back(*it);
+    }
+    else
+    {
+        list.push_back(this);
+    }
+    return list;
 }
 
-int Segment::getSize() const
+InitSegment::InitSegment(ICanonicalUrl *parent) :
+    Segment(parent)
 {
-    return this->size;
+    debugName = "InitSegment";
+    classId = CLASSID_INITSEGMENT;
+}
+
+IndexSegment::IndexSegment(ICanonicalUrl *parent) :
+    Segment(parent)
+{
+    debugName = "IndexSegment";
+    classId = CLASSID_INDEXSEGMENT;
+}
+
+dash::http::Chunk* IndexSegment::toChunk(size_t index, Representation *ctxrep)
+{
+    IndexSegmentChunk *chunk = dynamic_cast<IndexSegmentChunk *>(Segment::toChunk(index, ctxrep));
+    chunk->setIndexRepresentation(ctxrep);
+    return chunk;
+}
+
+dash::http::Chunk * IndexSegment::getChunk(const std::string &url)
+{
+    return new IndexSegmentChunk(this, url);
+}
+
+IndexSegment::IndexSegmentChunk::IndexSegmentChunk(ISegment *segment, const std::string &url)
+    : SegmentChunk(segment, url)
+{
+
+}
+
+void IndexSegment::IndexSegmentChunk::setIndexRepresentation(Representation *rep_)
+{
+    rep = rep_;
+}
+
+void IndexSegment::IndexSegmentChunk::onDownload(void *buffer, size_t size)
+{
+    if(!rep)
+        return;
+
+    dash::mp4::AtomsReader br(rep->getMPD()->getVLCObject());
+    br.parseBlock(buffer, size, rep);
+}
+
+SubSegment::SubSegment(Segment *main, size_t start, size_t end) :
+    ISegment(main), parent(main)
+{
+    setByteRange(start, end);
+    debugName = "SubSegment";
+    classId = CLASSID_SUBSEGMENT;
+}
+
+Url SubSegment::getUrlSegment() const
+{
+    return getParentUrlSegment();
+}
+
+std::vector<ISegment*> SubSegment::subSegments()
+{
+    std::vector<ISegment*> list;
+    list.push_back(this);
+    return list;
 }

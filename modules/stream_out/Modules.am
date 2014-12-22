@@ -20,6 +20,7 @@ libstream_out_transcode_plugin_la_SOURCES = \
 	transcode/transcode.c transcode/transcode.h \
 	transcode/osd.c transcode/spu.c transcode/audio.c transcode/video.c
 libstream_out_transcode_plugin_la_CFLAGS = $(AM_CFLAGS)
+libstream_out_transcode_plugin_la_LIBADD = $(LIBM)
 
 
 stream_out_LTLIBRARIES += \
@@ -68,3 +69,19 @@ BUILT_SOURCES += dummy.cpp
 
 dummy.cpp:
 	touch dummy.cpp
+
+# Chromecast plugin
+SUFFIXES += .proto .pb.cc
+
+%.pb.h %.pb.cc: %.proto
+	$(PROTOC) --cpp_out=. -I$(srcdir) $<
+
+SOURCES_stream_out_chromecast = chromecast/cast_channel.proto chromecast/cast.cpp \
+                                ../misc/webservices/json.h ../misc/webservices/json.c
+nodist_libstream_out_chromecast_plugin_la_SOURCES = chromecast/cast_channel.pb.cc
+CLEANFILES += $(nodist_libstream_out_chromecast_plugin_la_SOURCES)
+
+if BUILD_CHROMECAST
+BUILT_SOURCES += chromecast/cast_channel.pb.h
+stream_out_LTLIBRARIES += libstream_out_chromecast_plugin.la
+endif

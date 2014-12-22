@@ -427,7 +427,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                                 KaxTagTrackUID &uid = *(KaxTagTrackUID*) el;
                                 uid.ReadData( es.I_O() );
                                 p_tag->i_uid = uint64( uid );
-                                msg_Dbg( &sys.demuxer, "|   |   + TrackUID: %"PRIu64, p_tag->i_uid);
+                                msg_Dbg( &sys.demuxer, "|   |   + TrackUID: %" PRIu64, p_tag->i_uid);
 
                             }
                             if( MKV_IS_ID( el, KaxTagEditionUID ) )
@@ -436,7 +436,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                                 KaxTagEditionUID &uid = *(KaxTagEditionUID*) el;
                                 uid.ReadData( es.I_O() );
                                 p_tag->i_uid = uint64( uid );
-                                msg_Dbg( &sys.demuxer, "|   |   + EditionUID: %"PRIu64, p_tag->i_uid);
+                                msg_Dbg( &sys.demuxer, "|   |   + EditionUID: %" PRIu64, p_tag->i_uid);
                             }
                             if( MKV_IS_ID( el, KaxTagChapterUID ) )
                             {
@@ -444,7 +444,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                                 KaxTagChapterUID &uid = *(KaxTagChapterUID*) el;
                                 uid.ReadData( es.I_O() );
                                 p_tag->i_uid = uint64( uid );
-                                msg_Dbg( &sys.demuxer, "|   |   + ChapterUID: %"PRIu64, p_tag->i_uid);
+                                msg_Dbg( &sys.demuxer, "|   |   + ChapterUID: %" PRIu64, p_tag->i_uid);
                             }
                             if( MKV_IS_ID( el, KaxTagAttachmentUID ) )
                             {
@@ -452,7 +452,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                                 KaxTagAttachmentUID &uid = *(KaxTagAttachmentUID*) el;
                                 uid.ReadData( es.I_O() );
                                 p_tag->i_uid = uint64( uid );
-                                msg_Dbg( &sys.demuxer, "|   |   + AttachmentUID: %"PRIu64, p_tag->i_uid);
+                                msg_Dbg( &sys.demuxer, "|   |   + AttachmentUID: %" PRIu64, p_tag->i_uid);
                             }
                         }
                         catch(...)
@@ -927,7 +927,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         i_seek_time = p_indexes[i_idx].i_time;
     }
 
-    msg_Dbg( &sys.demuxer, "seek got %"PRId64" - %"PRId64, i_seek_time, i_seek_position );
+    msg_Dbg( &sys.demuxer, "seek got %" PRId64 " - %" PRId64, i_seek_time, i_seek_position );
 
     es.I_O().setFilePointer( i_seek_position, seek_beginning );
 

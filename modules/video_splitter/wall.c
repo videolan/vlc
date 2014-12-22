@@ -361,7 +361,7 @@ static int Open( vlc_object_t *p_this )
             p_cfg->fmt.i_height         = p_output->i_height;
             p_cfg->fmt.i_sar_num        = (int64_t)i_aspect * i_target_height;
             p_cfg->fmt.i_sar_den        = VOUT_ASPECT_FACTOR * i_target_width;
-            p_cfg->window.i_x     = p_output->i_left; /* FIXME relative to video-x/y (TODO in wrapper.c) ? */
+            p_cfg->window.i_x     = p_output->i_left;
             p_cfg->window.i_y     = p_output->i_top;
             p_cfg->window.i_align = p_output->i_align;
             p_cfg->psz_module = NULL;

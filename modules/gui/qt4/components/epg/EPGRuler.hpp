@@ -24,6 +24,8 @@
 #ifndef EPGRULER_H
 #define EPGRULER_H
 
+#include "qt4.hpp"
+
 #include <QWidget>
 #include <QDateTime>
 
@@ -42,7 +44,7 @@ public slots:
     void setOffset( int offset );
 
 protected:
-    virtual void paintEvent( QPaintEvent *event );
+    void paintEvent( QPaintEvent *event ) Q_DECL_OVERRIDE;
 
 private:
     qreal m_scale;

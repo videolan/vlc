@@ -5,10 +5,12 @@
 // This code is public domain
 
 #include "allpass.hpp"
+#include <stddef.h>
 
 allpass::allpass()
 {
     bufidx = 0;
+    buffer = NULL;
 }
 
 void allpass::setbuffer(float *buf, int size)

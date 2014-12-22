@@ -119,6 +119,8 @@ static int Open(vlc_object_t *object)
     fmt.i_chroma = VLC_CODEC_RGB8;
     fmt.i_width  = aa_imgwidth(sys->aa_context);
     fmt.i_height = aa_imgheight(sys->aa_context);
+    fmt.i_visible_width = fmt.i_width;
+    fmt.i_visible_height = fmt.i_height;
 
     /* */
     vout_display_info_t info = vd->info;
@@ -139,7 +141,7 @@ static int Open(vlc_object_t *object)
     sys->state = *vd->cfg;
     sys->state.is_fullscreen = false;
     vout_display_SendEventFullscreen(vd, false);
-    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height, false);
+    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height);
 
     return VLC_SUCCESS;
 
@@ -159,7 +161,7 @@ static void Close(vlc_object_t *object)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     aa_close(sys->aa_context);
     free(sys);
 }
@@ -242,7 +244,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     case VOUT_DISPLAY_RESET_PICTURES:
         if (sys->pool)
-            picture_pool_Delete(sys->pool);
+            picture_pool_Release(sys->pool);
         sys->pool = NULL;
 
         vd->fmt.i_width  = aa_imgwidth(sys->aa_context);
@@ -297,7 +299,7 @@ static void Manage(vout_display_t *vd)
             aa_resize(sys->aa_context);
             vout_display_SendEventDisplaySize(vd,
                                               aa_imgwidth(sys->aa_context),
-                                              aa_imgheight(sys->aa_context), false);
+                                              aa_imgheight(sys->aa_context));
             break;
 
         /* TODO keys support to complete */

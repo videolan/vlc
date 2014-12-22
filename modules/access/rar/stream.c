@@ -69,15 +69,39 @@ int RarStreamOpen(vlc_object_t *object)
     if (RarProbe(s->p_source))
         return VLC_EGENERIC;
 
-    int count;
-    rar_file_t **files;
+    struct
+    {
+        int filescount;
+        rar_file_t **files;
+        unsigned int i_nbvols;
+    } newscheme = { 0, NULL, 0 }, oldscheme = { 0, NULL, 0 }, *p_scheme;
+
     const int64_t position = stream_Tell(s->p_source);
-    if (RarParse(s->p_source, &count, &files, false) &&
-        RarParse(s->p_source, &count, &files, true ) )
+
+    if (RarParse(s->p_source, &newscheme.filescount, &newscheme.files, &newscheme.i_nbvols, false)
+            || (newscheme.filescount < 2 && newscheme.i_nbvols < 2) )
+    {
+        /* We might want to lookup old naming scheme, could be a part1.rar,part1.r00 */
+        stream_Seek(s->p_source, 0);
+        RarParse(s->p_source, &oldscheme.filescount, &oldscheme.files, &oldscheme.i_nbvols, true );
+    }
+
+    if (oldscheme.filescount >= newscheme.filescount && oldscheme.i_nbvols > newscheme.i_nbvols)
+    {
+        free(newscheme.files);
+        p_scheme = &oldscheme;
+    }
+    else if (newscheme.filescount)
+    {
+        free(oldscheme.files);
+        p_scheme = &newscheme;
+    }
+    else
     {
         stream_Seek(s->p_source, position);
-        msg_Err(s, "Invalid or unsupported RAR archive");
-        free(files);
+        msg_Info(s, "Invalid or unsupported RAR archive");
+        free(oldscheme.files);
+        free(newscheme.files);
         return VLC_EGENERIC;
     }
 
@@ -97,8 +121,8 @@ int RarStreamOpen(vlc_object_t *object)
     free(encoded);
 
     char *data = strdup("#EXTM3U\n");
-    for (int i = 0; i < count; i++) {
-        rar_file_t *f = files[i];
+    for (int i = 0; i < p_scheme->filescount; i++) {
+        rar_file_t *f = p_scheme->files[i];
         char *next;
         if (base && data &&
             asprintf(&next, "%s"
@@ -111,7 +135,7 @@ int RarStreamOpen(vlc_object_t *object)
         RarFileDelete(f);
     }
     free(base);
-    free(files);
+    free(p_scheme->files);
     if (!data)
         return VLC_EGENERIC;
     stream_t *payload = stream_MemoryNew(s, (uint8_t*)data, strlen(data), false);

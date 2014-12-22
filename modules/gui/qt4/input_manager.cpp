@@ -99,6 +99,11 @@ InputManager::~InputManager()
     delInput();
 }
 
+void InputManager::inputChangedHandler()
+{
+    setInput( THEMIM->getInput() );
+}
+
 /* Define the Input used.
    Add the callbacks on input
    p_input is held once here */
@@ -123,22 +128,16 @@ void InputManager::setInput( input_thread_t *_p_input )
         emit rateChanged( var_GetFloat( p_input, "rate" ) );
 
         /* Get Saved Time */
-        int i_time = RecentsMRL::getInstance( p_intf )->time( p_item->psz_uri );
-        if( i_time > 0 &&
-            !var_GetFloat( p_input, "run-time" ) &&
-            !var_GetFloat( p_input, "start-time" ) &&
-            !var_GetFloat( p_input, "stop-time" ) )
+        if( p_item->i_type == ITEM_TYPE_FILE )
         {
-            playlist_Pause( THEPL );
-
-            if( QMessageBox::question( NULL,
-                        _("Continue playback?"),
-                        _("Do you want to restart the playback where left off?"),
-                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes )
-                    == QMessageBox::Yes )
-                var_SetTime( p_input, "time", (int64_t)i_time * 1000 );
-
-            playlist_Play( THEPL );
+            int i_time = RecentsMRL::getInstance( p_intf )->time( p_item->psz_uri );
+            if( i_time > 0 &&
+                    !var_GetFloat( p_input, "run-time" ) &&
+                    !var_GetFloat( p_input, "start-time" ) &&
+                    !var_GetFloat( p_input, "stop-time" ) )
+            {
+                emit resumePlayback( (int64_t)i_time * 1000 );
+            }
         }
     }
     else
@@ -235,7 +234,7 @@ void InputManager::customEvent( QEvent *event )
         if( p_item == ple->item() )
         {
             UpdateStatus();
-            // UpdateName();
+            UpdateName();
             UpdateArt();
             UpdateMeta();
             /* Update duration of file */
@@ -829,7 +828,7 @@ void InputManager::sectionMenu()
     {
         vlc_value_t val, text;
 
-        if( var_Change( p_input, "title  0", VLC_VAR_GETLIST, &val, &text ) < 0 )
+        if( var_Change( p_input, "title  0", VLC_VAR_GETCHOICES, &val, &text ) < 0 )
             return;
 
         /* XXX is it "Root" or "Title" we want here ?" (set 0 by default) */
@@ -878,7 +877,7 @@ void InputManager::activateTeletext( bool b_enable )
 {
     vlc_value_t list;
     vlc_value_t text;
-    if( hasInput() && !var_Change( p_input, "teletext-es", VLC_VAR_GETLIST, &list, &text ) )
+    if( hasInput() && !var_Change( p_input, "teletext-es", VLC_VAR_GETCHOICES, &list, &text ) )
     {
         if( list.p_list->i_count > 0 )
         {
@@ -1017,13 +1016,13 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     mute.addCallback( this, SLOT(notifyMute(bool)) );
 
     /* Warn our embedded IM about input changes */
-    DCONNECT( this, inputChanged( input_thread_t * ),
-              im, setInput( input_thread_t * ) );
+    DCONNECT( this, inputChanged(),
+              im, inputChangedHandler() );
 
     /* initialize p_input (an input can already be running) */
     p_input = playlist_CurrentInput( THEPL );
     if( p_input )
-        emit inputChanged( p_input );
+        emit inputChanged( );
 
     /* Audio Menu */
     menusAudioMapper = new QSignalMapper();
@@ -1034,8 +1033,9 @@ MainInputManager::~MainInputManager()
 {
     if( p_input )
     {
-       emit inputChanged( NULL );
        vlc_object_release( p_input );
+       p_input = NULL;
+       emit inputChanged( );
     }
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
@@ -1090,7 +1090,7 @@ void MainInputManager::customEvent( QEvent *event )
     if( p_input != NULL )
         vlc_object_release( p_input );
     p_input = playlist_CurrentInput( THEPL );
-    emit inputChanged( p_input );
+    emit inputChanged( );
 }
 
 /* Playlist Control functions */
@@ -1119,33 +1119,17 @@ void MainInputManager::prevOrReset()
 
 void MainInputManager::togglePlayPause()
 {
-    /* No input, play */
-    if( !p_input )
-        playlist_Play( THEPL );
-    else
-        playlist_Pause( THEPL );
+    playlist_TogglePause( THEPL );
 }
 
 void MainInputManager::play()
 {
-    /* No input, play */
-    if( !p_input )
-        playlist_Play( THEPL );
-    else
-    {
-        if( PLAYING_S != var_GetInteger( p_input, "state" ) )
-        {
-            playlist_Pause( THEPL );
-        }
-    }
+    playlist_Play( THEPL );
 }
 
 void MainInputManager::pause()
 {
-    if(p_input && PLAYING_S == var_GetInteger( p_input, "state" ) )
-    {
-        playlist_Pause( THEPL );
-    }
+    playlist_Pause( THEPL );
 }
 
 void MainInputManager::toggleRandom()

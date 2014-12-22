@@ -2,7 +2,7 @@
 
 ORC_VERSION := 0.4.18
 
-ORC_URL := http://download.videolan.org/pub/contrib/orc-$(ORC_VERSION).tar.gz
+ORC_URL := $(CONTRIB_VIDEOLAN)/orc-$(ORC_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"orc-0.4"),)
 PKGS_FOUND += orc

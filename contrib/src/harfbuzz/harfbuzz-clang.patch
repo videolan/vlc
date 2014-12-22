@@ -1,0 +1,16 @@
+--- harfbuzz/configure.ac	2013-07-16 22:04:08.000000000 +0200
++++ harfbuzz/configure.ac	2014-03-12 14:46:36.000000000 +0100
+@@ -80,13 +80,6 @@
+ 			CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
+ 		;;
+ 	esac
+-
+-	case "$host" in
+-		arm-*-*)
+-			# Request byte alignment on arm
+-			CXXFLAGS="$CXXFLAGS -mstructure-size-boundary=8"
+-		;;
+-	esac
+ fi
+ 
+ AM_CONDITIONAL(HAVE_GCC, test "x$GCC" = "xyes")

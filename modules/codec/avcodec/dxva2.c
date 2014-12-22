@@ -52,7 +52,7 @@
 #include "../../video_chroma/copy.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
-static void Close(vlc_va_t *);
+static void Close(vlc_va_t *, AVCodecContext *);
 
 vlc_module_begin()
     set_description(N_("DirectX Video Acceleration (DXVA) 2.0"))
@@ -309,28 +309,28 @@ static void DxCreateVideoConversion(vlc_va_sys_t *);
 static void DxDestroyVideoConversion(vlc_va_sys_t *);
 
 /* */
-static int Setup(vlc_va_t *va, void **hw, vlc_fourcc_t *chroma,
-                 int width, int height)
+static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chroma)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    if (sys->width == width && sys->height == height && sys->decoder)
+    if (sys->width == avctx->coded_width && sys->height == avctx->coded_height
+     && sys->decoder != NULL)
         goto ok;
 
     /* */
     DxDestroyVideoConversion(sys);
     DxDestroyVideoDecoder(sys);
 
-    *hw = NULL;
+    avctx->hwaccel_context = NULL;
     *chroma = 0;
-    if (width <= 0 || height <= 0)
+    if (avctx->coded_width <= 0 || avctx->coded_height <= 0)
         return VLC_EGENERIC;
 
     /* FIXME transmit a video_format_t by VaSetup directly */
     video_format_t fmt;
     memset(&fmt, 0, sizeof(fmt));
-    fmt.i_width = width;
-    fmt.i_height = height;
+    fmt.i_width = avctx->coded_width;
+    fmt.i_height = avctx->coded_height;
 
     if (DxCreateVideoDecoder(va, sys->codec_id, &fmt))
         return VLC_EGENERIC;
@@ -345,7 +345,7 @@ static int Setup(vlc_va_t *va, void **hw, vlc_fourcc_t *chroma,
 
     /* */
 ok:
-    *hw = &sys->hw;
+    avctx->hwaccel_context = &sys->hw;
     const d3d_format_t *output = D3dFindFormat(sys->output);
     *chroma = output->codec;
 
@@ -463,10 +463,11 @@ static void Release(void *opaque, uint8_t *data)
     (void) data;
 }
 
-static void Close(vlc_va_t *va)
+static void Close(vlc_va_t *va, AVCodecContext *ctx)
 {
     vlc_va_sys_t *sys = va->sys;
 
+    (void) ctx;
     DxDestroyVideoConversion(sys);
     DxDestroyVideoDecoder(sys);
     DxDestroyVideoService(sys);
@@ -540,7 +541,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
     return VLC_SUCCESS;
 
 error:
-    Close(va);
+    Close(va, ctx);
     return VLC_EGENERIC;
 }
 /* */

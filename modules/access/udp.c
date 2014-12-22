@@ -90,12 +90,6 @@ static void* ThreadRead( void *data );
 static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
-
-    char *psz_name = strdup( p_access->psz_location );
-    char *psz_parser;
-    const char *psz_server_addr, *psz_bind_addr = "";
-    int  i_bind_port = 1234, i_server_port = 0;
-
     access_sys_t *sys = malloc( sizeof( *sys ) );
     if( unlikely( sys == NULL ) )
         return VLC_ENOMEM;
@@ -105,6 +99,14 @@ static int Open( vlc_object_t *p_this )
     /* Set up p_access */
     access_InitFields( p_access );
     ACCESS_SET_CALLBACKS( NULL, BlockUDP, Control, NULL );
+
+    char *psz_name = strdup( p_access->psz_location );
+    char *psz_parser;
+    const char *psz_server_addr, *psz_bind_addr = "";
+    int  i_bind_port = 1234, i_server_port = 0;
+
+    if( unlikely(psz_name == NULL) )
+        goto error;
 
     /* Parse psz_name syntax :
      * [serveraddr[:serverport]][@[bindaddr]:[bindport]] */
@@ -266,7 +268,7 @@ static void* ThreadRead( void *data )
             continue;
         }
 
-        pkt = block_Realloc( pkt, 0, len );
+        pkt->i_buffer = len;
         block_FifoPut( sys->fifo, pkt );
     }
 

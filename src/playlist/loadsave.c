@@ -170,15 +170,9 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemTreeAdded,
                         input_item_subitem_tree_added, p_playlist );
-
-    pl_priv(p_playlist)->b_doing_ml = true;
     PL_UNLOCK;
 
     input_Read( p_playlist, p_input );
-
-    PL_LOCK;
-    pl_priv(p_playlist)->b_doing_ml = false;
-    PL_UNLOCK;
 
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemTreeAdded,
                         input_item_subitem_tree_added, p_playlist );

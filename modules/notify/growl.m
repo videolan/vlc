@@ -57,6 +57,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_playlist.h>
+#include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_interface.h>
 #include <vlc_url.h>
@@ -200,8 +201,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     /* Playing something ... */
-    if( input_item_GetNowPlaying( p_item ) )
-        psz_title = input_item_GetNowPlaying( p_item );
+    if( input_item_GetNowPlayingFb( p_item ) )
+        psz_title = input_item_GetNowPlayingFb( p_item );
     else
         psz_title = input_item_GetTitleFbName( p_item );
     if( EMPTY_STR( psz_title ) )

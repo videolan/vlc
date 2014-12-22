@@ -51,7 +51,7 @@ static filter_t *CreateFilter (vlc_object_t *obj, const char *type,
     if (unlikely(filter == NULL))
         return NULL;
 
-    filter->p_owner = owner;
+    filter->owner.sys = owner;
     filter->fmt_in.audio = *infmt;
     filter->fmt_in.i_codec = infmt->i_format;
     filter->fmt_out.audio = *outfmt;
@@ -317,7 +317,7 @@ vout_thread_t *aout_filter_RequestVout (filter_t *filter, vout_thread_t *vout,
      * If you want to use visualization filters from another place, you will
      * need to add a new pf_aout_request_vout callback or store a pointer
      * to aout_request_vout_t inside filter_t (i.e. a level of indirection). */
-    const aout_request_vout_t *req = (void *)filter->p_owner;
+    const aout_request_vout_t *req = filter->owner.sys;
     char *visual = var_InheritString (filter->p_parent, "audio-visual");
     /* NOTE: Disable recycling to always close the filter vout because OpenGL
      * visualizations do not use this function to ask for a context. */

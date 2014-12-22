@@ -211,8 +211,12 @@ check_android_sdk()
 	add_make "ANDROID_NDK := ${ANDROID_NDK}"
 	[ -z "${ANDROID_ABI}" ] && echo "You must set ANDROID_ABI environment variable" && exit 1
 	add_make "ANDROID_ABI := ${ANDROID_ABI}"
+	[ -z "${ANDROID_API}" ] && echo "You should set ANDROID_API environment variable (using default android-9)" && ANDROID_API := android-9
+	add_make "ANDROID_API := ${ANDROID_API}"
 	[ ${ANDROID_ABI} = "armeabi-v7a" ] && add_make_enabled "HAVE_NEON"
 	[ ${ANDROID_ABI} = "armeabi-v7a" ] && add_make_enabled "HAVE_ARMV7A"
+	[ ${ANDROID_ABI} = "arm64-v8a" ] && add_make_enabled "HAVE_NEON"
+	[ ${ANDROID_ABI} = "arm64-v8a" ] && add_make_enabled "HAVE_ARMV8A"
 	[ ${ANDROID_ABI} = "armeabi" -a -z "${NO_ARMV6}" ] && add_make_enabled "HAVE_ARMV6"
 }
 
@@ -235,7 +239,13 @@ case "${OS}" in
 			add_make_enabled "HAVE_MACOSX" "HAVE_DARWIN_OS" "HAVE_BSD"
 		else
 			check_ios_sdk
-			add_make_enabled "HAVE_IOS" "HAVE_DARWIN_OS" "HAVE_BSD" "HAVE_NEON" "HAVE_ARMV7A"
+			add_make_enabled "HAVE_IOS" "HAVE_DARWIN_OS" "HAVE_BSD"
+
+			case "${HOST}" in
+				*arm*)
+				add_make_enabled "HAVE_NEON" "HAVE_ARMV7A"
+				;;
+			esac;
 		fi
 		;;
 	*bsd*)
@@ -248,8 +258,14 @@ case "${OS}" in
 			*arm*)
 			add_make "PLATFORM_SHORT_ARCH := arm"
 			;;
+			*arm64*)
+			add_make "PLATFORM_SHORT_ARCH := arm64"
+			;;
 			*i686*)
 			add_make "PLATFORM_SHORT_ARCH := x86"
+			;;
+			*x86_64*)
+			add_make "PLATFORM_SHORT_ARCH := x86_64"
 			;;
 			*mipsel*)
 			add_make "PLATFORM_SHORT_ARCH := mips"

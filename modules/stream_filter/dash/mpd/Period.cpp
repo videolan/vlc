@@ -27,13 +27,15 @@
 #endif
 
 #include "Period.h"
+#include "MPD.h"
 
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 
 using namespace dash::mpd;
 
-Period::Period()
+Period::Period(MPD *mpd) :
+    SegmentInformation( mpd )
 {
 }
 
@@ -47,8 +49,51 @@ const std::vector<AdaptationSet*>&  Period::getAdaptationSets() const
     return this->adaptationSets;
 }
 
+const std::vector<AdaptationSet*>   Period::getAdaptationSets(Streams::Type type) const
+{
+    std::vector<AdaptationSet*> list;
+    std::vector<AdaptationSet*>::const_iterator it;
+    for(it = adaptationSets.begin(); it!= adaptationSets.end(); it++)
+    {
+        if( Streams::Stream::mimeToType((*it)->getMimeType()) == type )
+            list.push_back(*it);
+    }
+    return list;
+}
+
 void                                Period::addAdaptationSet(AdaptationSet *adaptationSet)
 {
     if ( adaptationSet != NULL )
         this->adaptationSets.push_back(adaptationSet);
+}
+
+AdaptationSet * Period::getAdaptationSet(Streams::Type type) const
+{
+    std::vector<AdaptationSet *>::const_iterator it;
+    for(it = adaptationSets.begin(); it != adaptationSets.end(); it++)
+    {
+        if ( Streams::Stream::mimeToType((*it)->getMimeType()) == type )
+            return *it;
+    }
+    return NULL;
+}
+
+Url Period::getUrlSegment() const
+{
+    return getParentUrlSegment();
+}
+
+std::vector<std::string> Period::toString(int indent) const
+{
+    std::vector<std::string> ret;
+    std::string text(indent, ' ');
+    text.append("Period");
+    ret.push_back(text);
+    std::vector<AdaptationSet *>::const_iterator k;
+    for(k = adaptationSets.begin(); k != adaptationSets.end(); k++)
+    {
+        std::vector<std::string> debug = (*k)->toString(indent + 1);
+        ret.insert(ret.end(), debug.begin(), debug.end());
+    }
+    return ret;
 }

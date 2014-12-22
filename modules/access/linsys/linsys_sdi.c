@@ -59,7 +59,7 @@
 
 #define DEMUX_BUFFER_SIZE 1350000
 #define MAX_AUDIOS        4
-#define SAMPLERATE_TOLERANCE 0.1
+#define SAMPLERATE_TOLERANCE 0.1f
 
 /*****************************************************************************
  * Module descriptor
@@ -859,7 +859,7 @@ static int InitAudio( demux_t *p_demux, sdi_audio_t *p_audio )
     p_audio->i_nb_samples         = p_audio->i_rate * p_sys->i_frame_rate_base
                                     / p_sys->i_frame_rate;
     p_audio->i_max_samples        = (float)p_audio->i_nb_samples *
-                                    (1. + SAMPLERATE_TOLERANCE);
+                                    (1.f + SAMPLERATE_TOLERANCE);
 
     p_audio->p_buffer             = malloc( p_audio->i_max_samples * sizeof(int16_t) * 2 );
     p_audio->i_left_samples       = p_audio->i_right_samples = 0;
@@ -875,7 +875,7 @@ static void ResampleAudio( int16_t *p_out, int16_t *p_in,
                            unsigned int i_out, unsigned int i_in )
 {
     unsigned int i_remainder = 0;
-    float f_last_sample = (float)*p_in / 32768.0;
+    float f_last_sample = (float)*p_in / 32768.f;
 
     *p_out = *p_in;
     p_out += 2;
@@ -883,14 +883,14 @@ static void ResampleAudio( int16_t *p_out, int16_t *p_in,
 
     for ( unsigned int i = 1; i < i_in; i++ )
     {
-        float f_in = (float)*p_in / 32768.0;
+        float f_in = (float)*p_in / 32768.f;
         while ( i_remainder < i_out )
         {
             float f_out = f_last_sample;
             f_out += (f_in - f_last_sample) * i_remainder / i_out;
-            if ( f_out >= 1.0 ) *p_out = 32767;
-            else if ( f_out < -1.0 ) *p_out = -32768;
-            else *p_out = f_out * 32768.0;
+            if ( f_out >= 1.f ) *p_out = 32767;
+            else if ( f_out < -1.f ) *p_out = -32768;
+            else *p_out = f_out * 32768.f;
             p_out += 2;
             i_remainder += i_in;
         }
@@ -916,9 +916,9 @@ static int DecodeAudio( demux_t *p_demux, sdi_audio_t *p_audio )
         return VLC_EGENERIC;
     }
     if ( p_audio->i_left_samples <
-            (float)p_audio->i_nb_samples * (1. - SAMPLERATE_TOLERANCE) ||
+            (float)p_audio->i_nb_samples * (1.f - SAMPLERATE_TOLERANCE) ||
         p_audio->i_left_samples >
-            (float)p_audio->i_nb_samples * (1. + SAMPLERATE_TOLERANCE) )
+            (float)p_audio->i_nb_samples * (1.f + SAMPLERATE_TOLERANCE) )
     {
         msg_Warn( p_demux,
             "left samplerate out of tolerance for audio %u/%u (%u vs. %u)",
@@ -927,9 +927,9 @@ static int DecodeAudio( demux_t *p_demux, sdi_audio_t *p_audio )
         return VLC_EGENERIC;
     }
     if ( p_audio->i_right_samples <
-            (float)p_audio->i_nb_samples * (1. - SAMPLERATE_TOLERANCE) ||
+            (float)p_audio->i_nb_samples * (1.f - SAMPLERATE_TOLERANCE) ||
         p_audio->i_right_samples >
-            (float)p_audio->i_nb_samples * (1. + SAMPLERATE_TOLERANCE) )
+            (float)p_audio->i_nb_samples * (1.f + SAMPLERATE_TOLERANCE) )
     {
         msg_Warn( p_demux,
             "right samplerate out of tolerance for audio %u/%u (%u vs. %u)",

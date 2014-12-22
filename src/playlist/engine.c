@@ -32,6 +32,7 @@
 #include <vlc_sout.h>
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
+#include <vlc_http.h>
 #include "playlist_internal.h"
 #include "input/resource.h"
 
@@ -83,18 +84,19 @@ static int CorksCallback( vlc_object_t *obj, char const *var,
     if( !old.i_int == !cur.i_int )
         return VLC_SUCCESS; /* nothing to do */
 
+    if( !var_InheritBool( obj, "playlist-cork" ) )
+        return VLC_SUCCESS;
+
     if( cur.i_int )
     {
-        if( var_InheritBool( obj, "playlist-cork" ) )
-        {
-            msg_Dbg( obj, "corked" );
-            playlist_Pause( pl );
-        }
-        else
-            msg_Dbg( obj, "not corked" );
+        msg_Dbg( obj, "corked" );
+        playlist_Pause( pl );
     }
     else
+    {
         msg_Dbg( obj, "uncorked" );
+        playlist_Resume( pl );
+    }
 
     (void) var; (void) dummy;
     return VLC_SUCCESS;
@@ -143,7 +145,7 @@ static int RateOffsetCallback( vlc_object_t *obj, char const *psz_cmd,
     if( !strcmp( psz_cmd, "rate-faster" ) )
     {
         /* compensate for input rounding errors */
-        float r = f_rate * 1.1;
+        float r = f_rate * 1.1f;
         for( size_t i = 0; i < i_rate_count; i++ )
             if( r < pf_rate[i] )
             {
@@ -154,7 +156,7 @@ static int RateOffsetCallback( vlc_object_t *obj, char const *psz_cmd,
     else
     {
         /* compensate for input rounding errors */
-        float r = f_rate * .9;
+        float r = f_rate * .9f;
         for( size_t i = 1; i < i_rate_count; i++ )
             if( r <= pf_rate[i] )
             {
@@ -228,40 +230,27 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
 
     pl_priv(p_playlist)->b_tree = var_InheritBool( p_parent, "playlist-tree" );
 
-    pl_priv(p_playlist)->b_doing_ml = false;
+    /* Create the root, playing items and meida library nodes */
+    playlist_item_t *root, *playing, *ml;
 
-    /* Create the root node */
     PL_LOCK;
-    p_playlist->p_root = playlist_NodeCreate( p_playlist, NULL, NULL,
-                                    PLAYLIST_END, 0, NULL );
-    PL_UNLOCK;
-    if( !p_playlist->p_root ) return NULL;
-
-    /* Create currently playing items node */
-    PL_LOCK;
-    p_playlist->p_playing = playlist_NodeCreate(
-        p_playlist, _( "Playlist" ), p_playlist->p_root,
-        PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
-
-    PL_UNLOCK;
-
-    if( !p_playlist->p_playing ) return NULL;
-
-    /* Create media library node */
-    const bool b_ml = var_InheritBool( p_parent, "media-library");
-    if( b_ml )
-    {
-        PL_LOCK;
-        p_playlist->p_media_library = playlist_NodeCreate(
-            p_playlist, _( "Media Library" ), p_playlist->p_root,
-            PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
-        PL_UNLOCK;
-    }
+    root = playlist_NodeCreate( p_playlist, NULL, NULL,
+                                PLAYLIST_END, 0, NULL );
+    playing = playlist_NodeCreate( p_playlist, _( "Playlist" ), root,
+                                   PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
+    if( var_InheritBool( p_parent, "media-library") )
+        ml = playlist_NodeCreate( p_playlist, _( "Media Library" ), root,
+                                  PLAYLIST_END, PLAYLIST_RO_FLAG, NULL );
     else
-    {
-        p_playlist->p_media_library = NULL;
-    }
+        ml = NULL;
+    PL_UNLOCK;
 
+    if( unlikely(root == NULL || playing == NULL) )
+        abort();
+
+    p_playlist->p_root = root;
+    p_playlist->p_playing = playing;
+    p_playlist->p_media_library = ml;
     p_playlist->p_root_category = p_playlist->p_root;
     p_playlist->p_root_onelevel = p_playlist->p_root;
     p_playlist->p_local_category = p_playlist->p_playing;
@@ -273,9 +262,8 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->status.p_item = NULL;
     pl_priv(p_playlist)->status.p_node = p_playlist->p_playing;
     pl_priv(p_playlist)->request.b_request = false;
-    pl_priv(p_playlist)->status.i_status = PLAYLIST_STOPPED;
 
-    if(b_ml)
+    if (ml != NULL)
         playlist_MLLoad( p_playlist );
 
     /* Preparser (and meta retriever) _after_ the Media Library*/
@@ -296,6 +284,15 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     if( aout != NULL )
         input_resource_PutAout( p->p_input_resource, aout );
 
+    /* Initialize the shared HTTP cookie jar */
+    vlc_value_t cookies;
+    cookies.p_address = vlc_http_cookies_new();
+    if ( likely(cookies.p_address) )
+    {
+        var_Create( p_playlist, "http-cookies", VLC_VAR_ADDRESS );
+        var_SetChecked( p_playlist, "http-cookies", VLC_VAR_ADDRESS, cookies );
+    }
+
     /* Thread */
     playlist_Activate (p_playlist);
 
@@ -303,8 +300,8 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     char *mods = var_InheritString( p_playlist, "services-discovery" );
     if( mods != NULL )
     {
-        char *p = mods, *m;
-        while( (m = strsep( &p, " :," )) != NULL )
+        char *s = mods, *m;
+        while( (m = strsep( &s, " :," )) != NULL )
             playlist_ServicesDiscoveryAdd( p_playlist, m );
         free( mods );
     }
@@ -365,6 +362,13 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     ARRAY_RESET( p_playlist->items );
     ARRAY_RESET( p_playlist->current );
+
+    vlc_http_cookie_jar_t *cookies = var_GetAddress( p_playlist, "http-cookies" );
+    if ( cookies )
+    {
+        var_Destroy( p_playlist, "http-cookies" );
+        vlc_http_cookies_destroy( cookies );
+    }
 
     vlc_object_release( p_playlist );
 }
@@ -492,8 +496,14 @@ playlist_item_t * playlist_CurrentPlayingItem( playlist_t * p_playlist )
 
 int playlist_Status( playlist_t * p_playlist )
 {
+    input_thread_t *p_input = pl_priv(p_playlist)->p_input;
+
     PL_ASSERT_LOCKED;
 
-    return pl_priv(p_playlist)->status.i_status;
+    if( p_input == NULL )
+        return PLAYLIST_STOPPED;
+    if( var_GetInteger( p_input, "state" ) == PAUSE_S )
+        return PLAYLIST_PAUSED;
+    return PLAYLIST_RUNNING;
 }
 

@@ -32,17 +32,21 @@
 #include "mpd/TrickModeType.h"
 #include "mpd/SegmentBase.h"
 #include "mpd/SegmentList.h"
+#include "mpd/SegmentInformation.hpp"
+#include "mpd/BaseUrl.h"
 
 namespace dash
 {
     namespace mpd
     {
         class AdaptationSet;
+        class MPD;
 
-        class Representation : public CommonAttributesElements
+        class Representation : public CommonAttributesElements,
+                               public SegmentInformation
         {
             public:
-                Representation();
+                Representation( AdaptationSet *, MPD *mpd );
                 virtual ~Representation ();
 
                 const std::string&  getId                   () const;
@@ -64,33 +68,29 @@ namespace dash
                  *          It cannot be NULL, or without any Segments in it.
                  *          It can however have a NULL InitSegment
                  */
-                SegmentInfo*        getSegmentInfo          () const;
                 TrickModeType*      getTrickModeType        () const;
 
-                void                setSegmentInfo( SegmentInfo *info );
                 void                setTrickMode( TrickModeType *trickModeType );
-                const AdaptationSet*        getParentGroup() const;
-                void                setParentGroup( const AdaptationSet *group );
 
-                SegmentList*        getSegmentList          () const;
-                void                setSegmentList          (SegmentList *list);
-                SegmentBase*        getSegmentBase          () const;
-                void                setSegmentBase          (SegmentBase *base);
                 void                setWidth                (int width);
                 int                 getWidth                () const;
                 void                setHeight               (int height);
                 int                 getHeight               () const;
+                void                setBaseUrl              (BaseUrl *baseUrl);
+                MPD*                getMPD                  () const;
+
+                std::vector<std::string> toString(int = 0) const;
+                virtual Url         getUrlSegment           () const; /* impl */
 
             private:
+                MPD                                *mpd;
+                AdaptationSet                      *adaptationSet;
                 uint64_t                            bandwidth;
                 std::string                         id;
                 int                                 qualityRanking;
                 std::list<const Representation*>    dependencies;
-                SegmentInfo                         *segmentInfo;
                 TrickModeType                       *trickModeType;
-                const AdaptationSet                         *parentGroup;
-                SegmentBase                         *segmentBase;
-                SegmentList                         *segmentList;
+                BaseUrl                             *baseUrl;
                 int                                 width;
                 int                                 height;
         };

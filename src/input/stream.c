@@ -435,6 +435,8 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
     }
     else
     {
+        msg_Dbg( s, "Using readdir method for AStream*" );
+
         assert( p_sys->method == STREAM_METHOD_READDIR );
         s->pf_readdir = AStreamReadDir;
     }
@@ -689,13 +691,13 @@ static void AStreamPrebufferBlock( stream_t *s )
             /* Update stat */
             p_sys->stat.i_bytes = p_sys->block.i_size;
             p_sys->stat.i_read_time = i_date - i_start;
-            i_byterate = ( INT64_C(1000000) * p_sys->stat.i_bytes ) /
+            i_byterate = ( CLOCK_FREQ * p_sys->stat.i_bytes ) /
                          (p_sys->stat.i_read_time + 1);
 
             msg_Dbg( s, "prebuffering done %"PRId64" bytes in %"PRId64"s - "
                      "%"PRId64" KiB/s",
                      p_sys->stat.i_bytes,
-                     p_sys->stat.i_read_time / INT64_C(1000000),
+                     p_sys->stat.i_read_time / CLOCK_FREQ,
                      i_byterate / 1024 );
             break;
         }
@@ -746,9 +748,9 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
     if( p_data == NULL )
     {
         /* seek within this stream if possible, else use plain old read and discard */
-        stream_sys_t *p_sys = s->p_sys;
-        access_t     *p_access = p_sys->p_access;
-        bool   b_aseek;
+        access_t *p_access = p_sys->p_access;
+        bool b_aseek;
+
         access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
         if( b_aseek )
             return AStreamSeekBlock( s, p_sys->i_pos + i_read ) ? 0 : i_read;
@@ -774,16 +776,13 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
         if( p_sys->block.i_offset >= p_sys->block.p_current->i_buffer )
         {
             /* Current block is now empty, switch to next */
-            if( p_sys->block.p_current )
-            {
-                p_sys->block.i_offset = 0;
-                p_sys->block.p_current = p_sys->block.p_current->p_next;
-            }
+            p_sys->block.i_offset = 0;
+            p_sys->block.p_current = p_sys->block.p_current->p_next;
+
             /*Get a new block if needed */
             if( !p_sys->block.p_current && AStreamRefillBlock( s ) )
-            {
                 break;
-            }
+            assert( p_sys->block.p_current );
         }
     }
 
@@ -992,7 +991,6 @@ static int AStreamSeekBlock( stream_t *s, uint64_t i_pos )
 static int AStreamRefillBlock( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
-    block_t      *b;
 
     /* Release data */
     while( p_sys->block.i_size >= STREAM_CACHE_SIZE &&
@@ -1016,6 +1014,8 @@ static int AStreamRefillBlock( stream_t *s )
 
     /* Now read a new block */
     const int64_t i_start = mdate();
+    block_t *b;
+
     for( ;; )
     {
         bool b_eof;
@@ -1444,13 +1444,13 @@ static void AStreamPrebufferStream( stream_t *s )
             /* Update stat */
             p_sys->stat.i_bytes = i_buffered;
             p_sys->stat.i_read_time = i_date - i_start;
-            i_byterate = ( INT64_C(1000000) * p_sys->stat.i_bytes ) /
+            i_byterate = ( CLOCK_FREQ * p_sys->stat.i_bytes ) /
                          (p_sys->stat.i_read_time+1);
 
             msg_Dbg( s, "pre-buffering done %"PRId64" bytes in %"PRId64"s - "
                      "%"PRId64" KiB/s",
                      p_sys->stat.i_bytes,
-                     p_sys->stat.i_read_time / INT64_C(1000000),
+                     p_sys->stat.i_read_time / CLOCK_FREQ,
                      i_byterate / 1024 );
             break;
         }

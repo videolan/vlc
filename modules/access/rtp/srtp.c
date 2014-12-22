@@ -496,7 +496,7 @@ static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
     {
         /* Sequence in the future, good */
         s->rtp.window = s->rtp.window << diff;
-        s->rtp.window |= 1;
+        s->rtp.window |= UINT64_C(1);
         s->rtp_seq = seq, s->rtp_roc = roc;
     }
     else
@@ -505,7 +505,7 @@ static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
         diff = -diff;
         if ((diff >= 64) || ((s->rtp.window >> diff) & 1))
             return EACCES; /* Replay attack */
-        s->rtp.window |= 1 << diff;
+        s->rtp.window |= UINT64_C(1) << diff;
     }
 
     /* Encrypt/Decrypt */
@@ -738,7 +738,7 @@ static int srtcp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
     {
         /* Packet in the future, good */
         s->rtcp.window = s->rtcp.window << diff;
-        s->rtcp.window |= 1;
+        s->rtcp.window |= UINT64_C(1);
         s->rtcp_index = index;
     }
     else
@@ -747,7 +747,7 @@ static int srtcp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
         diff = -diff;
         if ((diff >= 64) || ((s->rtcp.window >> diff) & 1))
             return EACCES; // replay attack!
-        s->rtp.window |= 1 << diff;
+        s->rtp.window |= UINT64_C(1) << diff;
     }
 
     /* Crypts SRTCP */

@@ -320,7 +320,7 @@ typedef void (*libvlc_video_display_cb)(void *opaque, void *picture);
  * Similarly, the number of scanlines must be bigger than of equal to
  * the pixel height.
  * Furthermore, we recommend that pitches and lines be multiple of 32
- * to not break assumption that might be made by various optimizations
+ * to not break assumptions that might be held by optimized code
  * in the video decoders, video filters and/or video converters.
  */
 typedef unsigned (*libvlc_video_format_cb)(void **opaque, char *chroma,
@@ -572,7 +572,8 @@ void libvlc_audio_set_callbacks( libvlc_media_player_t *mp,
                                  void *opaque );
 
 /**
- * Set callbacks and private data for decoded audio.
+ * Set callbacks and private data for decoded audio. This only works in
+ * combination with libvlc_audio_set_callbacks().
  * Use libvlc_audio_set_format() or libvlc_audio_set_format_callbacks()
  * to configure the decoded audio format.
  *

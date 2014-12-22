@@ -95,6 +95,9 @@ public:
     /// Show an interaction dialog
     void showInteraction( interaction_dialog_t * );
 
+    /// Send hotkeys (key accelerators)
+    void sendKey( int key );
+
 private:
     // Private because it's a singleton
     Dialogs( intf_thread_t *pIntf );

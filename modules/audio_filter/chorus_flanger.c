@@ -99,10 +99,10 @@ vlc_module_end ()
  * small_value: Helper function
  * return high pass cutoff
  */
-static inline float small_value()
+static inline float small_value(void)
 {
     /* allows for 2^-24, should be enough for 24-bit DACs at least */
-    return ( 1.0 / 16777216.0 );
+    return 1.f / 16777216.f;
 }
 
 /**
@@ -130,21 +130,21 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_this, "dry-mix", paramCallback, p_sys );
     var_AddCallback( p_this, "wet-mix", paramCallback, p_sys );
 
-    if( p_sys->f_delayTime < 0.0)
+    if( p_sys->f_delayTime < 0.f )
     {
         msg_Err( p_filter, "Delay Time is invalid" );
         free(p_sys);
         return VLC_EGENERIC;
     }
 
-    if( p_sys->f_sweepDepth > p_sys->f_delayTime || p_sys->f_sweepDepth < 0.0 )
+    if( p_sys->f_sweepDepth > p_sys->f_delayTime || p_sys->f_sweepDepth < 0.f )
     {
         msg_Err( p_filter, "Sweep Depth is invalid" );
         free( p_sys );
         return VLC_EGENERIC;
     }
 
-    if( p_sys->f_sweepRate < 0.0 )
+    if( p_sys->f_sweepRate < 0.f )
     {
         msg_Err( p_filter, "Sweep Rate is invalid" );
         free( p_sys );
@@ -156,9 +156,10 @@ static int Open( vlc_object_t *p_this )
                 + p_sys->f_sweepDepth ) * p_filter->fmt_in.audio.i_rate/1000 ) + 1 );
 
     msg_Dbg( p_filter , "Buffer length:%d, Channels:%d, Sweep Depth:%f, Delay "
-            "time:%f, Sweep Rate:%f, Sample Rate: %d", p_sys->i_bufferLength,
-            p_sys->i_channels, p_sys->f_sweepDepth, p_sys->f_delayTime,
-            p_sys->f_sweepRate, p_filter->fmt_in.audio.i_rate );
+             "time:%f, Sweep Rate:%f, Sample Rate: %d", p_sys->i_bufferLength,
+             p_sys->i_channels, (double) p_sys->f_sweepDepth,
+             (double) p_sys->f_delayTime, (double) p_sys->f_sweepRate,
+             p_filter->fmt_in.audio.i_rate );
     if( p_sys->i_bufferLength <= 0 )
     {
         msg_Err( p_filter, "Delay-time, Sample rate or Channels was incorrect" );
@@ -183,7 +184,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->f_sweepDepth < small_value() ||
             p_filter->fmt_in.audio.i_rate < small_value() ) {
-        p_sys->f_sinMultiplier = 0.0;
+        p_sys->f_sinMultiplier = 0.f;
     }
     else {
         p_sys->f_sinMultiplier = 11 * p_sys->f_sweepRate /
@@ -204,8 +205,8 @@ static int Open( vlc_object_t *p_this )
  */
 static inline void sanitize( float * f_value )
 {
-    if ( fabs( *f_value ) < small_value() )
-        *f_value = 0.0f;
+    if ( fabsf( *f_value ) < small_value() )
+        *f_value = 0.f;
 }
 
 
@@ -221,7 +222,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     int i_chan;
     unsigned i_samples = p_in_buf->i_nb_samples; /* number of samples */
     /* maximum number of samples to offset in buffer */
-    int i_maxOffset = floor( p_sys->f_sweepDepth * p_sys->i_sampleRate / 1000 );
+    int i_maxOffset = floorf( p_sys->f_sweepDepth * p_sys->i_sampleRate / 1000 );
     float *p_out = (float*)p_in_buf->p_buffer;
     float *p_in =  (float*)p_in_buf->p_buffer;
 
@@ -236,13 +237,13 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
                 * floorf(p_sys->f_sweepDepth * p_sys->i_sampleRate / 1000);
         if( abs( p_sys->i_step ) > 0 )
         {
-            if( p_sys->i_cumulative >=  floor( p_sys->f_sweepDepth *
+            if( p_sys->i_cumulative >=  floorf( p_sys->f_sweepDepth *
                         p_sys->i_sampleRate / p_sys->f_sweepRate ))
             {
                 p_sys->f_offset = i_maxOffset;
                 p_sys->i_step = -1 * ( p_sys->i_step );
             }
-            if( p_sys->i_cumulative <= floor( -1 * p_sys->f_sweepDepth *
+            if( p_sys->i_cumulative <= floorf( -1 * p_sys->f_sweepDepth *
                         p_sys->i_sampleRate / p_sys->f_sweepRate ) )
             {
                 p_sys->f_offset = -i_maxOffset;
@@ -250,7 +251,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
             }
         }
         /* Calculate position in delay */
-        int offset = floor( p_sys->f_offset );
+        int offset = floorf( p_sys->f_offset );
         p_ptr = p_sys->p_write + ( i_maxOffset - offset ) * p_sys->i_channels;
 
         /* Handle Overflow */

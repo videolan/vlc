@@ -161,6 +161,7 @@ void CloseMux( vlc_object_t *p_this )
     }
 
     avformat_free_context(p_sys->oc);
+    av_free(p_sys->io);
 
     free( p_sys->io_buffer );
     free( p_sys );
@@ -179,7 +180,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     msg_Dbg( p_mux, "adding input" );
 
-    if( !GetFfmpegCodec( fmt->i_codec, 0, &i_codec_id, 0 ) )
+    if( !GetFfmpegCodec( fmt->i_codec, 0, &i_codec_id, 0 )
+     || i_codec_id == AV_CODEC_ID_NONE )
     {
         msg_Dbg( p_mux, "couldn't find codec for fourcc '%4.4s'",
                  (char *)&fmt->i_codec );

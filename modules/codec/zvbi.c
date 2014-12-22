@@ -372,7 +372,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     if( !b_cached )
     {
-        if( p_sys->i_last_page != i_wanted_page )
+        if( p_sys->b_text && p_sys->i_last_page != i_wanted_page )
         {
             /* We need to reset the subtitle */
             p_spu = Subpicture( p_dec, &fmt, true,
@@ -479,12 +479,6 @@ exit:
 
 error:
     vbi_unref_page( &p_page );
-    if( p_spu != NULL )
-    {
-        decoder_DeleteSubpicture( p_dec, p_spu );
-        p_spu = NULL;
-    }
-
     block_Release( p_block );
     return NULL;
 }
@@ -509,10 +503,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
         return NULL;
     }
 
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = b_text ? VLC_CODEC_TEXT : VLC_CODEC_RGBA;
-    fmt.i_sar_num = 0;
-    fmt.i_sar_den = 1;
+    video_format_Init(&fmt, b_text ? VLC_CODEC_TEXT : VLC_CODEC_RGBA);
     if( b_text )
     {
         fmt.i_bits_per_pixel = 0;
@@ -529,7 +520,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     if( p_spu->p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         return NULL;
     }
 
@@ -611,7 +602,7 @@ static int get_last_visible_row( vbi_char *p_text, int rows, int columns)
     {
         if (p_text[i].opacity != VBI_TRANSPARENT_SPACE)
         {
-            return ( i + columns - 1) / columns;
+            return i / columns;
         }
     }
 
@@ -667,32 +658,37 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
 {
     decoder_sys_t *p_sys = p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    int want_navlink = -1;
 
     vlc_mutex_lock( &p_sys->lock );
     switch( newval.i_int )
     {
         case ZVBI_KEY_RED:
-            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[0].pgno );
-            p_sys->i_wanted_subpage = p_sys->nav_link[0].subno;
+            want_navlink = 0;
             break;
         case ZVBI_KEY_GREEN:
-            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[1].pgno );
-            p_sys->i_wanted_subpage = p_sys->nav_link[1].subno;
+            want_navlink = 1;
             break;
         case ZVBI_KEY_YELLOW:
-            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[2].pgno );
-            p_sys->i_wanted_subpage = p_sys->nav_link[2].subno;
+            want_navlink = 2;
             break;
         case ZVBI_KEY_BLUE:
-            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[3].pgno );
-            p_sys->i_wanted_subpage = p_sys->nav_link[3].subno;
+            want_navlink = 3;
             break;
         case ZVBI_KEY_INDEX:
-            p_sys->i_wanted_page = vbi_bcd2dec( p_sys->nav_link[5].pgno ); /* #4 is SKIPPED */
-            p_sys->i_wanted_subpage = p_sys->nav_link[5].subno;
+            want_navlink = 5; /* #4 is SKIPPED */
             break;
     }
-    if( newval.i_int > 0 && newval.i_int < 999 )
+
+    if (want_navlink > -1)
+    {
+        int page = vbi_bcd2dec( p_sys->nav_link[want_navlink].pgno );
+        if (page > 0 && page < 999) {
+            p_sys->i_wanted_page = page;
+            p_sys->i_wanted_subpage = p_sys->nav_link[want_navlink].subno;
+        }
+    }
+    else if( newval.i_int > 0 && newval.i_int < 999 )
     {
         p_sys->i_wanted_page = newval.i_int;
         p_sys->i_wanted_subpage = VBI_ANY_SUBNO;

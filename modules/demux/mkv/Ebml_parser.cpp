@@ -231,7 +231,7 @@ EbmlElement *EbmlParser::Get( int n_call )
               m_el[mi_level]->GetEndPosition() <= m_el[mi_level-1]->GetEndPosition() ) )
         {
             /* The element fits inside its upper element */
-            msg_Warn( p_demux, "Dummy element found %"PRIu64"... skipping it",
+            msg_Warn( p_demux, "Dummy element found %" PRIu64 "... skipping it",
                       m_el[mi_level]->GetElementPosition() );
             return Get( ++n_call );
         }
@@ -239,7 +239,7 @@ EbmlElement *EbmlParser::Get( int n_call )
         {
             /* Too large, misplaced or 10 successive dummy elements */
             msg_Err( p_demux,
-                     "Dummy element too large or misplaced at %"PRIu64"... skipping to next upper element",
+                     "Dummy element too large or misplaced at %" PRIu64 "... skipping to next upper element",
                      m_el[mi_level]->GetElementPosition() );
 
             if( mi_level >= 1 &&

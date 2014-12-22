@@ -3,7 +3,7 @@
  * @brief EGL OpenGL extension module
  */
 /*****************************************************************************
- * Copyright © 2010-2011 Rémi Denis-Courmont
+ * Copyright © 2010-2014 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -36,33 +36,9 @@
 #ifdef USE_PLATFORM_X11
 # include <vlc_xlib.h>
 #endif
-
-/* Plugin callbacks */
-static int OpenGLES2 (vlc_object_t *);
-static int OpenGLES (vlc_object_t *);
-static int OpenGL (vlc_object_t *);
-static void Close (vlc_object_t *);
-
-vlc_module_begin ()
-    set_shortname (N_("EGL"))
-    set_description (N_("EGL extension for OpenGL"))
-    set_category (CAT_VIDEO)
-    set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("opengl", 50)
-    set_callbacks (OpenGL, Close)
-    add_shortcut ("egl")
-
-    add_submodule ()
-    set_capability ("opengl es2", 50)
-    set_callbacks (OpenGLES2, Close)
-    add_shortcut ("egl")
-
-    add_submodule ()
-    set_capability ("opengl es", 50)
-    set_callbacks (OpenGLES, Close)
-    add_shortcut ("egl")
-
-vlc_module_end ()
+#ifdef USE_PLATFORM_WAYLAND
+# include <wayland-egl.h>
+#endif
 
 typedef struct vlc_gl_sys_t
 {
@@ -72,13 +48,57 @@ typedef struct vlc_gl_sys_t
 #if defined (USE_PLATFORM_X11)
     Display *x11;
 #endif
+#if defined (USE_PLATFORM_WAYLAND)
+    struct wl_egl_window *window;
+    unsigned width, height;
+#endif
 } vlc_gl_sys_t;
 
-/* OpenGL callbacks */
-static int MakeCurrent (vlc_gl_t *);
-static void ReleaseCurrent (vlc_gl_t *);
-static void SwapBuffers (vlc_gl_t *);
-static void *GetSymbol(vlc_gl_t *, const char *);
+static int MakeCurrent (vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    if (eglMakeCurrent (sys->display, sys->surface, sys->surface,
+                        sys->context) != EGL_TRUE)
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
+}
+
+static void ReleaseCurrent (vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    eglMakeCurrent (sys->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                    EGL_NO_CONTEXT);
+}
+
+#ifdef USE_PLATFORM_WAYLAND
+static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    wl_egl_window_resize(sys->window, width, height,
+                         (sys->width - width) / 2,
+                         (sys->height - height) / 2);
+    sys->width = width;
+    sys->height = height;
+}
+#else
+# define Resize (NULL)
+#endif
+
+static void SwapBuffers (vlc_gl_t *gl)
+{
+    vlc_gl_sys_t *sys = gl->sys;
+
+    eglSwapBuffers (sys->display, sys->surface);
+}
+
+static void *GetSymbol(vlc_gl_t *gl, const char *procname)
+{
+    (void) gl;
+    return (void *)eglGetProcAddress (procname);
+}
 
 static bool CheckToken(const char *haystack, const char *needle)
 {
@@ -118,18 +138,58 @@ struct gl_api
    EGLint     attr[3];
 };
 
-/* See http://www.khronos.org/registry/egl/api/EGL/eglplatform.h *
- * for list and order of default EGL platforms. */
-#if defined (_WIN32) || defined (__VC32__) \
- && !defined (__CYGWIN__) && !defined (__SCITECH_SNAP__) /* Win32 and WinCE */
-# define USE_DEFAULT_PLATFORM USE_PLATFORM_WIN32
-#elif defined (__WINSCW__) || defined (__SYMBIAN32__)  /* Symbian */
-# define USE_DEFAULT_PLATFORM USE_PLATFORM_SYMBIAN
-#elif defined (__ANDROID__) || defined (ANDROID)
-# define USE_DEFAULT_PLATFORM USE_PLATFORM_ANDROID
-#elif defined (__unix__) /* X11 (tentative) */
-# define USE_DEFAULT_PLATFORM USE_PLATFORM_X11
+#ifdef EGL_EXT_platform_base
+static EGLDisplay GetDisplayEXT(EGLenum plat, void *dpy, const EGLint *attrs)
+{
+    PFNEGLGETPLATFORMDISPLAYEXTPROC getDisplay =
+        (PFNEGLGETPLATFORMDISPLAYEXTPROC)
+        eglGetProcAddress("eglGetPlatformDisplayEXT");
+
+    assert(getDisplay != NULL);
+    return getDisplay(plat, dpy, attrs);
+}
+
+static EGLSurface CreateWindowSurfaceEXT(EGLDisplay dpy, EGLConfig config,
+                                         void *window, const EGLint *attrs)
+{
+    PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC createSurface =
+        (PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC)
+        eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
+
+    assert(createSurface != NULL);
+    return createSurface(dpy, config, window, attrs);
+}
 #endif
+
+static EGLSurface CreateWindowSurface(EGLDisplay dpy, EGLConfig config,
+                                      void *window, const EGLint *attrs)
+{
+    EGLNativeWindowType *native = window;
+
+    return eglCreateWindowSurface(dpy, config, *native, attrs);
+}
+
+static void Close (vlc_object_t *obj)
+{
+    vlc_gl_t *gl = (vlc_gl_t *)obj;
+    vlc_gl_sys_t *sys = gl->sys;
+
+    if (sys->display != EGL_NO_DISPLAY)
+    {
+        if (sys->surface != EGL_NO_SURFACE)
+            eglDestroySurface(sys->display, sys->surface);
+        eglTerminate(sys->display);
+    }
+#ifdef USE_PLATFORM_X11
+    if (sys->x11 != NULL)
+        XCloseDisplay(sys->x11);
+#endif
+#ifdef USE_PLATFORM_WAYLAND
+    if (sys->window != NULL)
+        wl_egl_window_destroy(sys->window);
+#endif
+    free (sys);
+}
 
 /**
  * Probe EGL display availability
@@ -137,15 +197,6 @@ struct gl_api
 static int Open (vlc_object_t *obj, const struct gl_api *api)
 {
     vlc_gl_t *gl = (vlc_gl_t *)obj;
-    vout_window_t *wnd = gl->surface;
-    union {
-        void *ext_platform;
-        EGLNativeWindowType native;
-    } window;
-#ifdef EGL_EXT_platform_base
-    PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC createSurface = NULL;
-#endif
-
     vlc_gl_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -154,12 +205,18 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     sys->display = EGL_NO_DISPLAY;
     sys->surface = EGL_NO_SURFACE;
 
+    vout_window_t *wnd = gl->surface;
+    EGLSurface (*createSurface)(EGLDisplay, EGLConfig, void *, const EGLint *)
+        = CreateWindowSurface;
+    void *window;
+
 #ifdef USE_PLATFORM_X11
     sys->x11 = NULL;
 
     if (wnd->type != VOUT_WINDOW_TYPE_XID || !vlc_xlib_init(obj))
         goto error;
 
+    window = &wnd->handle.xid;
     sys->x11 = XOpenDisplay(wnd->display.x11);
     if (sys->x11 == NULL)
         goto error;
@@ -175,47 +232,61 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
 # ifdef EGL_EXT_platform_x11
     if (CheckClientExt("EGL_EXT_platform_x11"))
     {
-        PFNEGLGETPLATFORMDISPLAYEXTPROC getDisplay;
         const EGLint attrs[] = {
             EGL_PLATFORM_X11_SCREEN_EXT, snum,
             EGL_NONE
         };
-
-        getDisplay = (PFNEGLGETPLATFORMDISPLAYEXTPROC)
-            eglGetProcAddress("eglGetPlatformDisplayEXT");
-        createSurface = (PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC)
-            eglGetProcAddress("eglCreatePlatformWindowSurfaceEXT");
-        sys->display = getDisplay(EGL_PLATFORM_X11_EXT, sys->x11, attrs);
-        window.ext_platform = &wnd->handle.xid;
+        sys->display = GetDisplayEXT(EGL_PLATFORM_X11_EXT, sys->x11, attrs);
+        createSurface = CreateWindowSurfaceEXT;
     }
     else
 # endif
     {
-# if USE_DEFAULT_PLATFORM
+# ifdef __unix__
         if (snum == XDefaultScreen(sys->x11))
-        {
             sys->display = eglGetDisplay(sys->x11);
-            window.native = wnd->handle.xid;
-        }
-# endif
     }
+# endif
+
+#elif defined (USE_PLATFORM_WAYLAND)
+    sys->window = NULL;
+
+    if (wnd->type != VOUT_WINDOW_TYPE_WAYLAND)
+        goto error;
+
+# ifdef EGL_EXT_platform_wayland
+    if (!CheckClientExt("EGL_EXT_platform_wayland"))
+        goto error;
+
+    /* Resize() should be called with the proper size before Swap() */
+    window = wl_egl_window_create(wnd->handle.wl, 1, 1);
+    if (window == NULL)
+        goto error;
+    sys->window = window;
+
+    sys->display = GetDisplayEXT(EGL_PLATFORM_WAYLAND_EXT, wnd->display.wl,
+                                 NULL);
+    createSurface = CreateWindowSurfaceEXT;
+
+# endif
 
 #elif defined (USE_PLATFORM_WIN32)
     if (wnd->type != VOUT_WINDOW_TYPE_HWND)
         goto error;
 
-# if USE_DEFAULT_PLATFORM
+    window = &wnd->handle.hwnd;
+# if defined (_WIN32) || defined (__VC32__) \
+  && !defined (__CYGWIN__) && !defined (__SCITECH_SNAP__)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    window.native = wnd->handle.hwnd;
 # endif
 
 #elif defined (USE_PLATFORM_ANDROID)
     if (wnd->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
         goto error;
 
-# if USE_DEFAULT_PLATFORM
+    window = &wnd->handle.anativewindow;
+# if defined (__ANDROID__) || defined (ANDROID)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    window.native = wnd->handle.anativewindow;
 # endif
 
 #endif
@@ -260,15 +331,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     }
 
     /* Create a drawing surface */
-#ifdef EGL_EXT_platform_base
-    if (createSurface != NULL)
-        sys->surface = createSurface(sys->display, cfgv[0],
-                                     window.ext_platform, NULL);
-    else
-#endif
-        sys->surface = eglCreateWindowSurface(sys->display, cfgv[0],
-                                              window.native, NULL);
-
+    sys->surface = createSurface(sys->display, cfgv[0], window, NULL);
     if (sys->surface == EGL_NO_SURFACE)
     {
         msg_Err (obj, "cannot create EGL window surface");
@@ -293,10 +356,9 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     /* Initialize OpenGL callbacks */
     gl->makeCurrent = MakeCurrent;
     gl->releaseCurrent = ReleaseCurrent;
+    gl->resize = Resize;
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
-    gl->lock = NULL;
-    gl->unlock = NULL;
     return VLC_SUCCESS;
 
 error:
@@ -331,51 +393,23 @@ static int OpenGL (vlc_object_t *obj)
     return Open (obj, &api);
 }
 
-static void Close (vlc_object_t *obj)
-{
-    vlc_gl_t *gl = (vlc_gl_t *)obj;
-    vlc_gl_sys_t *sys = gl->sys;
+vlc_module_begin ()
+    set_shortname (N_("EGL"))
+    set_description (N_("EGL extension for OpenGL"))
+    set_category (CAT_VIDEO)
+    set_subcategory (SUBCAT_VIDEO_VOUT)
+    set_capability ("opengl", 50)
+    set_callbacks (OpenGL, Close)
+    add_shortcut ("egl")
 
-    if (sys->display != EGL_NO_DISPLAY)
-    {
-        if (sys->surface != EGL_NO_SURFACE)
-            eglDestroySurface(sys->display, sys->surface);
-        eglTerminate(sys->display);
-    }
-#ifdef USE_PLATFORM_X11
-    if (sys->x11 != NULL)
-        XCloseDisplay(sys->x11);
-#endif
-    free (sys);
-}
+    add_submodule ()
+    set_capability ("opengl es2", 50)
+    set_callbacks (OpenGLES2, Close)
+    add_shortcut ("egl")
 
-static int MakeCurrent (vlc_gl_t *gl)
-{
-    vlc_gl_sys_t *sys = gl->sys;
+    add_submodule ()
+    set_capability ("opengl es", 50)
+    set_callbacks (OpenGLES, Close)
+    add_shortcut ("egl")
 
-    if (eglMakeCurrent (sys->display, sys->surface, sys->surface,
-                        sys->context) != EGL_TRUE)
-        return VLC_EGENERIC;
-    return VLC_SUCCESS;
-}
-
-static void ReleaseCurrent (vlc_gl_t *gl)
-{
-    vlc_gl_sys_t *sys = gl->sys;
-
-    eglMakeCurrent (sys->display, EGL_NO_SURFACE, EGL_NO_SURFACE,
-                    EGL_NO_CONTEXT);
-}
-
-static void SwapBuffers (vlc_gl_t *gl)
-{
-    vlc_gl_sys_t *sys = gl->sys;
-
-    eglSwapBuffers (sys->display, sys->surface);
-}
-
-static void *GetSymbol(vlc_gl_t *gl, const char *procname)
-{
-    (void) gl;
-    return (void *)eglGetProcAddress (procname);
-}
+vlc_module_end ()

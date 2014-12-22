@@ -74,7 +74,6 @@ struct input_item_t
     es_format_t **es;                /**< Es formats */
 
     input_stats_t *p_stats;          /**< Statistics */
-    int           i_nb_played;       /**< Number of times played */
 
     vlc_meta_t *p_meta;
 
@@ -86,7 +85,6 @@ struct input_item_t
     vlc_mutex_t lock;                 /**< Lock for the item */
 
     uint8_t     i_type;              /**< Type (file, disc, ... see input_item_type_e) */
-    bool        b_fixed_name;        /**< Can the interface change the name ?*/
     bool        b_error_when_reading;/**< Error When Reading */
 };
 
@@ -194,6 +192,7 @@ VLC_API char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type 
 VLC_API char * input_item_GetName( input_item_t * p_i ) VLC_USED;
 VLC_API char * input_item_GetTitleFbName( input_item_t * p_i ) VLC_USED;
 VLC_API char * input_item_GetURI( input_item_t * p_i ) VLC_USED;
+VLC_API char * input_item_GetNowPlayingFb( input_item_t *p_item ) VLC_USED;
 VLC_API void input_item_SetURI( input_item_t * p_i, const char *psz_uri );
 VLC_API mtime_t input_item_GetDuration( input_item_t * p_i );
 VLC_API void input_item_SetDuration( input_item_t * p_i, mtime_t i_duration );
@@ -225,6 +224,7 @@ INPUT_META(Setting)
 INPUT_META(URL)
 INPUT_META(Language)
 INPUT_META(NowPlaying)
+INPUT_META(ESNowPlaying)
 INPUT_META(Publisher)
 INPUT_META(EncodedBy)
 INPUT_META(ArtworkURL)

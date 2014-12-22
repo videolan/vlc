@@ -49,7 +49,7 @@ vlc_module_begin ()
 # define MODULE_VARNAME "gles2"
     set_shortname (N_("OpenGL ES2"))
     set_description (N_("OpenGL for Embedded Systems 2 video output"))
-    set_capability ("vout display", /*165*/0)
+    set_capability ("vout display", /*265*/0)
     set_callbacks (Open, Close)
     add_shortcut ("opengles2", "gles2")
     add_module ("gles2", "opengl es2", NULL,
@@ -60,7 +60,7 @@ vlc_module_begin ()
 # define MODULE_VARNAME "gles"
     set_shortname (N_("OpenGL ES"))
     set_description (N_("OpenGL for Embedded Systems video output"))
-    set_capability ("vout display", /*160*/0)
+    set_capability ("vout display", /*260*/0)
     set_callbacks (Open, Close)
     add_shortcut ("opengles", "gles")
     add_module ("gles", "opengl es", NULL,
@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_description (N_("OpenGL video output (experimental)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout display", /*170*/0)
+    set_capability ("vout display", /*270*/0)
     set_callbacks (Open, Close)
     add_shortcut ("opengl", "gl")
     add_module ("gl", "opengl", NULL,
@@ -83,8 +83,6 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     vout_display_opengl_t *vgl;
-
-    vout_window_t *window;
     vlc_gl_t *gl;
     picture_pool_t *pool;
 };
@@ -94,32 +92,6 @@ static picture_pool_t *Pool (vout_display_t *, unsigned);
 static void PictureRender (vout_display_t *, picture_t *, subpicture_t *);
 static void PictureDisplay (vout_display_t *, picture_t *, subpicture_t *);
 static int Control (vout_display_t *, int, va_list);
-
-static vout_window_t *MakeWindow (vout_display_t *vd)
-{
-    vout_window_cfg_t cfg = {
-        .x = var_InheritInteger (vd, "video-x"),
-        .y = var_InheritInteger (vd, "video-y"),
-        .width = vd->cfg->display.width,
-        .height = vd->cfg->display.height,
-    };
-    vout_window_t *wnd;
-
-#if defined(_WIN32)
-    cfg.type = VOUT_WINDOW_TYPE_HWND;
-#elif defined(__ANDROID__)
-    cfg.type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
-#else
-    cfg.type = VOUT_WINDOW_TYPE_XID;
-#endif
-
-    wnd = vout_display_NewWindow (vd, &cfg);
-    if (wnd != NULL)
-        return wnd;
-
-    msg_Err (vd, "parent window not available");
-    return NULL;
-}
 
 /**
  * Allocates a surface and an OpenGL context for video output.
@@ -134,13 +106,18 @@ static int Open (vlc_object_t *obj)
     sys->gl = NULL;
     sys->pool = NULL;
 
-    sys->window = MakeWindow (vd);
-    if (sys->window == NULL)
+    vout_window_t *surface = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_INVALID);
+    if (surface == NULL)
+    {
+        msg_Err (vd, "parent window not available");
         goto error;
+    }
 
-    sys->gl = vlc_gl_Create (sys->window, API, "$" MODULE_VARNAME);
+    sys->gl = vlc_gl_Create (surface, API, "$" MODULE_VARNAME);
     if (sys->gl == NULL)
         goto error;
+
+    vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
 
     /* Initialize video display */
     const vlc_fourcc_t *spu_chromas;
@@ -168,8 +145,8 @@ static int Open (vlc_object_t *obj)
 error:
     if (sys->gl != NULL)
         vlc_gl_Destroy (sys->gl);
-    if (sys->window != NULL)
-        vout_display_DeleteWindow (vd, sys->window);
+    if (surface != NULL)
+        vout_display_DeleteWindow (vd, surface);
     free (sys);
     return VLC_EGENERIC;
 }
@@ -181,13 +158,15 @@ static void Close (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
+    vlc_gl_t *gl = sys->gl;
+    vout_window_t *surface = gl->surface;
 
-    vlc_gl_MakeCurrent (sys->gl);
+    vlc_gl_MakeCurrent (gl);
     vout_display_opengl_Delete (sys->vgl);
-    vlc_gl_ReleaseCurrent (sys->gl);
+    vlc_gl_ReleaseCurrent (gl);
 
-    vlc_gl_Destroy (sys->gl);
-    vout_display_DeleteWindow (vd, sys->window);
+    vlc_gl_Destroy (gl);
+    vout_display_DeleteWindow (vd, surface);
     free (sys);
 }
 
@@ -240,44 +219,17 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       case VOUT_DISPLAY_RESET_PICTURES: // not needed
         assert(0);
 #endif
-      case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-      {
-        const vout_display_cfg_t *cfg =
-            va_arg (ap, const vout_display_cfg_t *);
-
-        return vout_window_SetFullScreen (sys->window, cfg->is_fullscreen);
-      }
-
-      case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-      {
-        unsigned state = va_arg (ap, unsigned);
-
-        return vout_window_SetState (sys->window, state);
-      }
 
       case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
       case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
       case VOUT_DISPLAY_CHANGE_ZOOM:
       {
-        const vout_display_cfg_t *cfg = va_arg (ap, const vout_display_cfg_t *);
+        const vout_display_cfg_t *c = va_arg (ap, const vout_display_cfg_t *);
         const video_format_t *src = &vd->source;
-
-        if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-        {
-            bool force = false;
-
-            force = va_arg (ap, int);
-            if (force
-             && (cfg->display.width  != vd->cfg->display.width
-              || cfg->display.height != vd->cfg->display.height)
-             && vout_window_SetSize (sys->window,
-                                     cfg->display.width, cfg->display.height))
-                return VLC_EGENERIC;
-        }
-
         vout_display_place_t place;
 
-        vout_display_PlacePicture (&place, src, cfg, false);
+        vout_display_PlacePicture (&place, src, c, false);
+        vlc_gl_Resize (sys->gl, place.width, place.height);
         vlc_gl_MakeCurrent (sys->gl);
         glViewport (place.x, place.y, place.width, place.height);
         vlc_gl_ReleaseCurrent (sys->gl);
@@ -297,15 +249,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         vlc_gl_ReleaseCurrent (sys->gl);
         return VLC_SUCCESS;
       }
-
-      case VOUT_DISPLAY_GET_OPENGL:
-      {
-        vlc_gl_t **pgl = va_arg (ap, vlc_gl_t **);
-
-        *pgl = sys->gl;
-        return VLC_SUCCESS;
-      }
-
       default:
         msg_Err (vd, "Unknown request %d", query);
     }

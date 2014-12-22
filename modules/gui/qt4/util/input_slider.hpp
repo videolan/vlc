@@ -59,18 +59,18 @@ public:
     void setChapters( SeekPoints * );
 
 protected:
-    virtual void mouseMoveEvent( QMouseEvent *event );
-    virtual void mousePressEvent( QMouseEvent* event );
-    virtual void mouseReleaseEvent( QMouseEvent *event );
-    virtual void wheelEvent( QWheelEvent *event );
-    virtual void enterEvent( QEvent * );
-    virtual void leaveEvent( QEvent * );
-    virtual void hideEvent( QHideEvent * );
-    virtual void paintEvent(QPaintEvent *ev);
+    void mouseMoveEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+    void mousePressEvent( QMouseEvent* event ) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
+    void wheelEvent( QWheelEvent *event ) Q_DECL_OVERRIDE;
+    void enterEvent( QEvent * ) Q_DECL_OVERRIDE;
+    void leaveEvent( QEvent * ) Q_DECL_OVERRIDE;
+    void hideEvent( QHideEvent * ) Q_DECL_OVERRIDE;
+    void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
 
-    virtual bool eventFilter( QObject *obj, QEvent *event );
+    bool eventFilter( QObject *obj, QEvent *event ) Q_DECL_OVERRIDE;
 
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const Q_DECL_OVERRIDE;
 
     void processReleasedButton();
     qreal handleOpacity() const;
@@ -137,11 +137,11 @@ protected:
     const static int paddingL = 3;
     const static int paddingR = 2;
 
-    virtual void paintEvent( QPaintEvent *);
-    virtual void wheelEvent( QWheelEvent *event );
-    virtual void mousePressEvent( QMouseEvent * );
-    virtual void mouseMoveEvent( QMouseEvent * );
-    virtual void mouseReleaseEvent( QMouseEvent * );
+    void paintEvent( QPaintEvent *) Q_DECL_OVERRIDE;
+    void wheelEvent( QWheelEvent *event ) Q_DECL_OVERRIDE;
+    void mousePressEvent( QMouseEvent * ) Q_DECL_OVERRIDE;
+    void mouseMoveEvent( QMouseEvent * ) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent( QMouseEvent * ) Q_DECL_OVERRIDE;
 
     void processReleasedButton();
 

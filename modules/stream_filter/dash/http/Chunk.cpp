@@ -29,23 +29,41 @@
 
 using namespace dash::http;
 
-Chunk::Chunk        () :
+Chunk::Chunk        (const std::string& url) :
        startByte    (0),
        endByte      (0),
-       hasByteRange (false),
+       bitrate      (1),
        port         (0),
-       isHostname   (false),
        length       (0),
        bytesRead    (0),
+       bytesToRead  (0),
        connection   (NULL)
 {
+    this->url = url;
+
+    if(url.compare(0, 7, "http://"))
+        throw VLC_EGENERIC;
+
+    vlc_url_t url_components;
+    vlc_UrlParse(&url_components, url.c_str(), 0);
+
+    if(url_components.psz_path)
+        path = url_components.psz_path;
+    port = url_components.i_port ? url_components.i_port : 80;
+    if(url_components.psz_host)
+        hostname = url_components.psz_host;
+
+    vlc_UrlClean(&url_components);
+
+    if(path.empty() || hostname.empty())
+        throw VLC_EGENERIC;
 }
 
-int                 Chunk::getEndByte           () const
+size_t              Chunk::getEndByte           () const
 {
     return endByte;
 }
-int                 Chunk::getStartByte         () const
+size_t              Chunk::getStartByte         () const
 {
     return startByte;
 }
@@ -53,46 +71,27 @@ const std::string&  Chunk::getUrl               () const
 {
     return url;
 }
-void                Chunk::setEndByte           (int endByte)
+void                Chunk::setEndByte           (size_t endByte)
 {
     this->endByte = endByte;
+    if (endByte > startByte)
+        bytesToRead = endByte - startByte;
 }
-void                Chunk::setStartByte         (int startByte)
+void                Chunk::setStartByte         (size_t startByte)
 {
     this->startByte = startByte;
-}
-void                Chunk::setUrl               (const std::string& url )
-{
-    this->url = url;
-
-    if(this->url.compare(0, 4, "http"))
-    {
-        this->isHostname = false;
-        return;
-    }
-
-    vlc_url_t url_components;
-    vlc_UrlParse(&url_components, url.c_str(), 0);
-
-    this->path          = url_components.psz_path;
-    this->port          = url_components.i_port ? url_components.i_port : 80;
-    this->hostname      = url_components.psz_host;
-    this->isHostname    = true;
-
-    vlc_UrlClean(&url_components);
+    if (endByte > startByte)
+        bytesToRead = endByte - startByte;
 }
 void                Chunk::addOptionalUrl       (const std::string& url)
 {
     this->optionalUrls.push_back(url);
 }
-bool                Chunk::useByteRange         ()
+bool                Chunk::usesByteRange        () const
 {
-    return this->hasByteRange;
+    return (startByte != endByte);
 }
-void                Chunk::setUseByteRange      (bool value)
-{
-    this->hasByteRange = value;
-}
+
 void                Chunk::setBitrate           (uint64_t bitrate)
 {
     this->bitrate = bitrate;
@@ -101,13 +100,9 @@ int                 Chunk::getBitrate           ()
 {
     return this->bitrate;
 }
-bool                Chunk::hasHostname          () const
-{
-    return this->isHostname;
-}
 const std::string&  Chunk::getHostname          () const
 {
-    return this->hostname;
+    return hostname;
 }
 const std::string&  Chunk::getPath              () const
 {
@@ -133,19 +128,26 @@ void                Chunk::setBytesRead         (uint64_t bytes)
 {
     this->bytesRead = bytes;
 }
+
+void                Chunk::setBytesToRead         (uint64_t bytes)
+{
+    bytesToRead = bytes;
+}
+
 uint64_t            Chunk::getBytesToRead       () const
 {
-    return this->length - this->bytesRead;
+        return length - bytesRead;
 }
+
 size_t              Chunk::getPercentDownloaded () const
 {
     return (size_t)(((float)this->bytesRead / this->length) * 100);
 }
-IHTTPConnection*    Chunk::getConnection           () const
+HTTPConnection*     Chunk::getConnection           () const
 {
     return this->connection;
 }
-void                Chunk::setConnection   (IHTTPConnection *connection)
+void                Chunk::setConnection   (HTTPConnection *connection)
 {
     this->connection = connection;
 }

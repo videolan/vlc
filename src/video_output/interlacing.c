@@ -103,7 +103,7 @@ static void DeinterlaceRemove(vout_thread_t *vout)
     /* */
     strcpy(&start[0], &start[strlen("deinterlace")]);
     if (*start == ':')
-        strcpy(&start[0], &start[1]);
+        memmove(start, start + 1, strlen(start) /* + 1 - 1 */);
 
     var_SetString(vout, "video-filter", filter);
     free(filter);

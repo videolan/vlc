@@ -34,6 +34,7 @@
 #include <limits.h>
 #include <assert.h>
 #include <errno.h>
+#include <math.h>
 #include <sys/stat.h>
 
 #include "input_internal.h"
@@ -91,13 +92,13 @@ static void SlaveDemux( input_thread_t *p_input, bool *pb_demux_polled );
 static void SlaveSeek( input_thread_t *p_input );
 
 static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta );
-static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta );
+static void InputUpdateMeta( input_thread_t *p_input, demux_t *p_demux );
 static void InputGetExtraFiles( input_thread_t *p_input,
                                 int *pi_list, char ***pppsz_list,
                                 const char *psz_access, const char *psz_path );
 
-static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
-                              int i_new, input_attachment_t **pp_new );
+static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment, demux_t ***ppp_attachment_demux,
+                              int i_new, input_attachment_t **pp_new, demux_t *p_demux );
 
 enum {
     SUB_NOFLAG = 0x00,
@@ -340,6 +341,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     memset( &p_input->p->bookmark, 0, sizeof(p_input->p->bookmark) );
     TAB_INIT( p_input->p->i_bookmark, p_input->p->pp_bookmark );
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
+    p_input->p->attachment_demux = NULL;
     p_input->p->p_sout   = NULL;
     p_input->p->b_out_pace_control = false;
 
@@ -429,7 +431,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                      else if( !strncmp( psz_start, "time=", 5 ) )
                      {
                          p_seekpoint->i_time_offset = atoll(psz_start + 5) *
-                                                        1000000;
+                                                        CLOCK_FREQ;
                      }
                      psz_start = psz_end + 1;
                 }
@@ -446,6 +448,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Remove 'Now playing' info as it is probably outdated */
     input_item_SetNowPlaying( p_item, NULL );
+    input_item_SetESNowPlaying( p_item, NULL );
     input_SendEventMeta( p_input );
 
     /* */
@@ -631,7 +634,7 @@ static int MainLoopTryRepeat( input_thread_t *p_input, mtime_t *pi_start_mdate )
     }
     else
     {
-        val.f_float = 0.0;
+        val.f_float = 0.f;
         input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &val );
     }
 
@@ -700,8 +703,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     {
         bool b_force_update;
         vlc_value_t val;
-        mtime_t i_current;
-        mtime_t i_wakeup;
+        mtime_t i_wakeup, i_current;
         bool b_paused;
         bool b_demux_polled;
 
@@ -765,9 +767,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 if( b_buffering )
                 {
                     /* When postpone is in order, check the ES level every 20ms */
-                    mtime_t i_current = mdate();
-                    if( i_last_seek_mdate + INT64_C(125000) >= i_current )
-                        i_limit = __MIN( i_deadline, i_current + INT64_C(20000) );
+                    mtime_t now = mdate();
+                    if( i_last_seek_mdate + INT64_C(125000) >= now )
+                        i_limit = __MIN( i_deadline, now + INT64_C(20000) );
                 }
 
                 int i_type;
@@ -801,7 +803,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             if( i_statistic_update < i_current )
             {
                 MainLoopStatistic( p_input );
-                i_statistic_update = i_current + INT64_C(1000000);
+                i_statistic_update = i_current + CLOCK_FREQ;
             }
 
             /* Update the wakeup time */
@@ -922,11 +924,11 @@ static void StartTitle( input_thread_t * p_input )
         input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 
     /* Start/stop/run time */
-    p_input->p->i_start = (int64_t)(1000000.0
+    p_input->p->i_start = llroundf(1000000.f
                                      * var_GetFloat( p_input, "start-time" ));
-    p_input->p->i_stop  = (int64_t)(1000000.0
+    p_input->p->i_stop  = llroundf(1000000.f
                                      * var_GetFloat( p_input, "stop-time" ));
-    p_input->p->i_run   = (int64_t)(1000000.0
+    p_input->p->i_run   = llroundf(1000000.f
                                      * var_GetFloat( p_input, "run-time" ));
     if( p_input->p->i_run < 0 )
     {
@@ -939,7 +941,7 @@ static void StartTitle( input_thread_t * p_input )
         vlc_value_t s;
 
         msg_Dbg( p_input, "starting at time: %ds",
-                 (int)( p_input->p->i_start / INT64_C(1000000) ) );
+                 (int)( p_input->p->i_start / CLOCK_FREQ ) );
 
         s.i_time = p_input->p->i_start;
         input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &s );
@@ -956,15 +958,13 @@ static void LoadSubtitles( input_thread_t *p_input )
 {
     /* Load subtitles */
     /* Get fps and set it if not already set */
-    const double f_fps = p_input->p->f_fps;
-    if( f_fps > 1.0 )
+    const float f_fps = p_input->p->f_fps;
+    if( f_fps > 1.f )
     {
-        float f_requested_fps;
-
         var_Create( p_input, "sub-original-fps", VLC_VAR_FLOAT );
         var_SetFloat( p_input, "sub-original-fps", f_fps );
 
-        f_requested_fps = var_CreateGetFloat( p_input, "sub-fps" );
+        float f_requested_fps = var_CreateGetFloat( p_input, "sub-fps" );
         if( f_requested_fps != f_fps )
         {
             var_Create( p_input, "sub-fps", VLC_VAR_FLOAT|
@@ -1128,11 +1128,6 @@ static void InitPrograms( input_thread_t * p_input )
     {
         char *prgms;
 
-        if( var_GetBool( p_input, "sout-all" ) )
-        {
-            i_es_out_mode = ES_OUT_MODE_ALL;
-        }
-        else
         if( (prgms = var_GetNonEmptyString( p_input, "programs" )) != NULL )
         {
             char *buf;
@@ -1151,6 +1146,10 @@ static void InitPrograms( input_thread_t * p_input )
                 /* Note : we should remove the "program" callback. */
 
             free( prgms );
+        }
+        else if( var_GetBool( p_input, "sout-all" ) )
+        {
+            i_es_out_mode = ES_OUT_MODE_ALL;
         }
     }
     es_out_SetMode( p_input->p->p_es_out, i_es_out_mode );
@@ -1175,10 +1174,7 @@ static void InitPrograms( input_thread_t * p_input )
 
 static int Init( input_thread_t * p_input )
 {
-    vlc_meta_t *p_meta;
-    int i;
-
-    for( i = 0; i < p_input->p->p_item->i_options; i++ )
+    for( int i = 0; i < p_input->p->p_item->i_options; i++ )
     {
         if( !strncmp( p_input->p->p_item->ppsz_options[i], "meta-file", 9 ) )
         {
@@ -1256,8 +1252,8 @@ static int Init( input_thread_t * p_input )
                  p_input->p->b_out_pace_control ? "async" : "sync" );
     }
 
-    p_meta = vlc_meta_New();
-    if( p_meta )
+    vlc_meta_t *p_meta = vlc_meta_New();
+    if( p_meta != NULL )
     {
         /* Get meta data from users */
         InputMetaUser( p_input, p_meta );
@@ -1269,8 +1265,8 @@ static int Init( input_thread_t * p_input )
         for( int i = 0; i < p_input->p->i_slave; i++ )
             InputSourceMeta( p_input, p_input->p->slave[i], p_meta );
 
-        /* */
-        InputUpdateMeta( p_input, p_meta );
+        es_out_ControlSetMeta( p_input->p->p_es_out, p_meta );
+        vlc_meta_Delete( p_meta );
     }
 
     msg_Dbg( p_input, "`%s' successfully opened",
@@ -1405,6 +1401,8 @@ static void End( input_thread_t * p_input )
         for( i = 0; i < p_input->p->i_attachment; i++ )
             vlc_input_attachment_Delete( p_input->p->attachment[i] );
         TAB_CLEAN( p_input->p->i_attachment, p_input->p->attachment );
+        free( p_input->p->attachment_demux);
+        p_input->p->attachment_demux = NULL;
     }
     vlc_mutex_unlock( &p_input->p->p_item->lock );
 
@@ -1653,27 +1651,24 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_SET_POSITION:
         {
-            double f_pos;
-
             if( p_input->p->b_recording )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) ignored while recording" );
                 break;
             }
-            f_pos = val.f_float;
-            if( i_type != INPUT_CONTROL_SET_POSITION )
-                f_pos += var_GetFloat( p_input, "position" );
-            if( f_pos < 0.0 )
-                f_pos = 0.0;
-            else if( f_pos > 1.0 )
-                f_pos = 1.0;
+
+            float f_pos = val.f_float;
+            if( f_pos < 0.f )
+                f_pos = 0.f;
+            else if( f_pos > 1.f )
+                f_pos = 1.f;
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_SetTime( p_input->p->p_es_out, -1 );
             if( demux_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
-                                f_pos, !p_input->p->b_fast_seek ) )
+                               (double) f_pos, !p_input->p->b_fast_seek ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) "
-                         "%2.1f%% failed", f_pos * 100 );
+                         "%2.1f%% failed", (double)(f_pos * 100.f) );
             }
             else
             {
@@ -1698,9 +1693,6 @@ static bool Control( input_thread_t *p_input,
             }
 
             i_time = val.i_time;
-            if( i_type != INPUT_CONTROL_SET_TIME )
-                i_time += var_GetTime( p_input, "time" );
-
             if( i_time < 0 )
                 i_time = 0;
 
@@ -1960,7 +1952,6 @@ static bool Control( input_thread_t *p_input,
 
                 if( slave && !InputSourceInit( p_input, slave, uri, NULL, false ) )
                 {
-                    vlc_meta_t *p_meta;
                     int64_t i_time;
 
                     /* Add the slave */
@@ -1985,12 +1976,7 @@ static bool Control( input_thread_t *p_input,
                     }
 
                     /* Get meta (access and demux) */
-                    p_meta = vlc_meta_New();
-                    if( p_meta )
-                    {
-                        demux_Control( slave->p_demux, DEMUX_GET_META, p_meta );
-                        InputUpdateMeta( p_input, p_meta );
-                    }
+                    InputUpdateMeta( p_input, slave->p_demux );
 
                     TAB_APPEND( p_input->p->i_slave, p_input->p->slave, slave );
                 }
@@ -2146,12 +2132,7 @@ static void UpdateGenericFromDemux( input_thread_t *p_input )
 
     if( p_demux->info.i_update & INPUT_UPDATE_META )
     {
-        vlc_meta_t *p_meta = vlc_meta_New();
-        if( p_meta )
-        {
-            demux_Control( p_input->p->input.p_demux, DEMUX_GET_META, p_meta );
-            InputUpdateMeta( p_input, p_meta );
-        }
+        InputUpdateMeta( p_input, p_demux );
         p_demux->info.i_update &= ~INPUT_UPDATE_META;
     }
     {
@@ -2413,7 +2394,6 @@ static int InputSourceInit( input_thread_t *p_input,
 
         if( in->p_demux == NULL )
         {
-            stream_Delete( p_stream );
             if( vlc_object_alive( p_input ) )
             {
                 msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
@@ -2424,6 +2404,7 @@ static int InputSourceInit( input_thread_t *p_input,
                                   _("The format of '%s' cannot be detected. "
                                     "Have a look at the log for details."), psz_mrl );
             }
+            stream_Delete( p_stream );
             goto error;
         }
         assert( in->p_demux->pf_demux != NULL );
@@ -2468,8 +2449,8 @@ static int InputSourceInit( input_thread_t *p_input,
                              &attachment, &i_attachment ) )
         {
             vlc_mutex_lock( &p_input->p->p_item->lock );
-            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
-                              i_attachment, attachment );
+            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment, &p_input->p->attachment_demux,
+                              i_attachment, attachment, in->p_demux );
             vlc_mutex_unlock( &p_input->p->p_item->lock );
         }
 
@@ -2570,8 +2551,8 @@ static void InputSourceMeta( input_thread_t *p_input,
         if( p_demux_meta->i_attachments > 0 )
         {
             vlc_mutex_lock( &p_input->p->p_item->lock );
-            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
-                              p_demux_meta->i_attachments, p_demux_meta->attachments );
+            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment, &p_input->p->attachment_demux,
+                              p_demux_meta->i_attachments, p_demux_meta->attachments, p_demux);
             vlc_mutex_unlock( &p_input->p->p_item->lock );
         }
         module_unneed( p_demux, p_id3 );
@@ -2700,49 +2681,73 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
     }
 }
 
-static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
-                              int i_new, input_attachment_t **pp_new )
+static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment, demux_t ***ppp_attachment_demux,
+                              int i_new, input_attachment_t **pp_new, demux_t *p_demux )
 {
     int i_attachment = *pi_attachment;
     input_attachment_t **attachment = *ppp_attachment;
+    demux_t **attachment_demux = *ppp_attachment_demux;
     int i;
 
     attachment = xrealloc( attachment,
                     sizeof(*attachment) * ( i_attachment + i_new ) );
+    attachment_demux = xrealloc( attachment_demux,
+                    sizeof(*attachment_demux) * ( i_attachment + i_new ) );
     for( i = 0; i < i_new; i++ )
-        attachment[i_attachment++] = pp_new[i];
+    {
+        attachment[i_attachment] = pp_new[i];
+        attachment_demux[i_attachment++] = p_demux;
+    }
     free( pp_new );
 
     /* */
     *pi_attachment = i_attachment;
     *ppp_attachment = attachment;
+    *ppp_attachment_demux = attachment_demux;
 }
 
 /*****************************************************************************
  * InputUpdateMeta: merge p_item meta data with p_meta taking care of
  * arturl and locking issue.
  *****************************************************************************/
-static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
+static void InputUpdateMeta( input_thread_t *p_input, demux_t *p_demux )
 {
+    vlc_meta_t *p_meta = vlc_meta_New();
+    if( unlikely(p_meta == NULL) )
+        return;
+
+    demux_Control( p_demux, DEMUX_GET_META, p_meta );
+
     /* If metadata changed, then the attachments might have changed.
        We need to update them in case they contain album art. */
-    input_source_t *in = &p_input->p->input;
-    int i_attachment;
     input_attachment_t **attachment;
-    if( !demux_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
-                         &attachment, &i_attachment ) )
+    int i_attachment;
+
+    if( !demux_Control( p_demux, DEMUX_GET_ATTACHMENTS,
+                        &attachment, &i_attachment ) )
     {
         vlc_mutex_lock( &p_input->p->p_item->lock );
         if( p_input->p->i_attachment > 0 )
         {
+            int j = 0;
             for( int i = 0; i < p_input->p->i_attachment; i++ )
-                vlc_input_attachment_Delete( p_input->p->attachment[i] );
-            TAB_CLEAN( p_input->p->i_attachment, p_input->p->attachment );
+            {
+                if( p_input->p->attachment_demux[i] == p_demux )
+                    vlc_input_attachment_Delete( p_input->p->attachment[i] );
+                else
+                {
+                    p_input->p->attachment[j] = p_input->p->attachment[i];
+                    p_input->p->attachment_demux[j] = p_input->p->attachment_demux[i];
+                    j++;
+                }
+            }
+            p_input->p->i_attachment = j;
         }
-        AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
-                          i_attachment, attachment );
+        AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment, &p_input->p->attachment_demux,
+                          i_attachment, attachment, p_demux );
         vlc_mutex_unlock( &p_input->p->p_item->lock );
     }
+
     es_out_ControlSetMeta( p_input->p->p_es_out, p_meta );
     vlc_meta_Delete( p_meta );
 }
@@ -3005,7 +3010,7 @@ static void input_SubtitleAdd( input_thread_t *p_input,
     /* Select the ES */
     vlc_value_t list;
 
-    if( var_Change( p_input, "spu-es", VLC_VAR_GETLIST, &list, NULL ) )
+    if( var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES, &list, NULL ) )
         return;
     if( count.i_int == 0 )
         count.i_int++;

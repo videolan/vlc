@@ -89,7 +89,7 @@ vlc_module_begin ()
         change_string_cb(FindShadersCallback)
     add_loadfile("direct3d-shader-file", NULL, PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT, false)
 
-    set_capability("vout display", 240)
+    set_capability("vout display", 280)
     add_shortcut("direct3d")
     set_callbacks(Open, Close)
 
@@ -228,7 +228,8 @@ static int Open(vlc_object_t *object)
     var_AddCallback(vd, "video-wallpaper", DesktopCallback, NULL);
 
     /* Setup vout_display now that everything is fine */
-    vd->fmt  = fmt;
+    video_format_Clean(&vd->fmt);
+    video_format_Copy(&vd->fmt, &fmt);
     vd->info = info;
 
     vd->pool    = Pool;
@@ -398,11 +399,10 @@ static int ControlReopenDevice(vout_display_t *vd)
     memset(&cfg, 0, sizeof(cfg));
     cfg.use_desktop = sys->use_desktop;
     if (!sys->use_desktop) {
-        cfg.win.type   = VOUT_WINDOW_TYPE_HWND;
-        cfg.win.x      = sys->desktop_save.win.left;
-        cfg.win.y      = sys->desktop_save.win.top;
-        cfg.win.width  = sys->desktop_save.win.right  - sys->desktop_save.win.left;
-        cfg.win.height = sys->desktop_save.win.bottom - sys->desktop_save.win.top;
+        cfg.x      = sys->desktop_save.win.left;
+        cfg.y      = sys->desktop_save.win.top;
+        cfg.width  = sys->desktop_save.win.right  - sys->desktop_save.win.left;
+        cfg.height = sys->desktop_save.win.bottom - sys->desktop_save.win.top;
     }
 
     event_hwnd_t hwnd;
@@ -511,11 +511,9 @@ static HINSTANCE Direct3DLoadShaderLibrary(void)
 {
     HINSTANCE instance = NULL;
     for (int i = 43; i > 23; --i) {
-        char *filename = NULL;
-        if (asprintf(&filename, "D3dx9_%d.dll", i) == -1)
-            continue;
-        instance = LoadLibrary(ToT(filename));
-        free(filename);
+        TCHAR filename[16];
+        _sntprintf(filename, 16, TEXT("D3dx9_%d.dll"), i);
+        instance = LoadLibrary(filename);
         if (instance)
             break;
     }
@@ -1034,7 +1032,7 @@ static void Direct3DDestroyPool(vout_display_t *vd)
         IDirect3DSurface9_Release(picsys->surface);
         if (picsys->fallback)
             picture_Release(picsys->fallback);
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     }
     sys->pool = NULL;
 }

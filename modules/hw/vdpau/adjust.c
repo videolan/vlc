@@ -84,19 +84,22 @@ static int SaturationCallback(vlc_object_t *obj, const char *varname,
     return VLC_SUCCESS;
 }
 
-static float vlc_to_vdp_hue(int hue)
+static float vlc_to_vdp_hue(float hue)
 {
-    hue %= 360;
-    if (hue > 180)
-        hue -= 360;
-    return (float)hue * (float)(M_PI / 180.);
+    float dummy;
+
+    hue /= 360.f;
+    hue = modff(hue, &dummy);
+    if (hue > .5f)
+        hue -= 1.f;
+    return hue * (float)(2. * M_PI);
 }
 
 static int HueCallback(vlc_object_t *obj, const char *varname,
                               vlc_value_t prev, vlc_value_t cur, void *data)
 {
 
-    vlc_atomic_store_float(data, vlc_to_vdp_hue(cur.i_int));
+    vlc_atomic_store_float(data, vlc_to_vdp_hue(cur.f_float));
     (void) obj; (void) varname; (void) prev;
     return VLC_SUCCESS;
 }
@@ -125,8 +128,9 @@ static int Open(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
-    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420)
+    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
         return VLC_EGENERIC;
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
@@ -157,7 +161,7 @@ static int Open(vlc_object_t *obj)
                     &sys->saturation);
     vlc_atomic_init_float(&sys->saturation, vlc_to_vdp_saturation(f));
 
-    i = var_CreateGetIntegerCommand(filter, "hue");
+    i = var_CreateGetFloatCommand(filter, "hue");
     var_AddCallback(filter, "hue", HueCallback, &sys->hue);
     vlc_atomic_init_float(&sys->hue, vlc_to_vdp_hue(i));
 

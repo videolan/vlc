@@ -91,8 +91,8 @@ endif
 endif
 
 ifdef HAVE_ANDROID
-CC :=  $(HOST)-gcc --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-$(PLATFORM_SHORT_ARCH)
-CXX := $(HOST)-g++ --sysroot=$(ANDROID_NDK)/platforms/android-9/arch-$(PLATFORM_SHORT_ARCH)
+CC :=  $(HOST)-gcc --sysroot=$(ANDROID_NDK)/platforms/$(ANDROID_API)/arch-$(PLATFORM_SHORT_ARCH)
+CXX := $(HOST)-g++ --sysroot=$(ANDROID_NDK)/platforms/$(ANDROID_API)/arch-$(PLATFORM_SHORT_ARCH)
 endif
 
 ifdef HAVE_MACOSX
@@ -317,8 +317,13 @@ UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 		fi; \
 	done
 
+ifdef HAVE_IOS
+AUTORECONF = AUTOPOINT=true autoreconf
+else
+AUTORECONF = autoreconf
+endif
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
-	cd $< && autoreconf -fiv $(ACLOCAL_AMFLAGS)
+	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX)
 
@@ -375,7 +380,7 @@ prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
 package: install
 	rm -Rf tmp/
 	mkdir -p tmp/
-	cp -r $(PREFIX) tmp/
+	cp -R $(PREFIX) tmp/
 	# remove useless files
 	cd tmp/$(notdir $(PREFIX)); \
 		cd share; rm -Rf man doc gtk-doc info lua projectM gettext; cd ..; \

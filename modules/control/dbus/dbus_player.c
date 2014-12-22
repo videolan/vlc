@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_playlist.h>
+#include <vlc_input.h>
 #include <vlc_interface.h>
 
 #include <math.h>
@@ -207,44 +208,21 @@ DBUS_METHOD( Stop )
 DBUS_METHOD( Play )
 {
     REPLY_INIT;
-    input_thread_t *p_input =  pl_CurrentInput( p_this );
-
-    if( !p_input || var_GetInteger( p_input, "state" ) != PLAYING_S )
-        playlist_Play( PL );
-
-    if( p_input )
-        vlc_object_release( p_input );
-
+    playlist_Play( PL );
     REPLY_SEND;
 }
 
 DBUS_METHOD( Pause )
 {
     REPLY_INIT;
-    input_thread_t *p_input = pl_CurrentInput( p_this );
-
-    if( p_input && var_GetInteger(p_input, "state") == PLAYING_S )
-        playlist_Pause( PL );
-
-    if( p_input )
-        vlc_object_release( p_input );
-
+    playlist_Pause( PL );
     REPLY_SEND;
 }
 
 DBUS_METHOD( PlayPause )
 {
     REPLY_INIT;
-    input_thread_t *p_input = pl_CurrentInput( p_this );
-
-    if( p_input && var_GetInteger(p_input, "state") == PLAYING_S )
-        playlist_Pause( PL );
-    else
-        playlist_Play( PL );
-
-    if( p_input )
-        vlc_object_release( p_input );
-
+    playlist_TogglePause( PL );
     REPLY_SEND;
 }
 

@@ -1,0 +1,37 @@
+--- zvbi/src/conv.c	2013-08-28 14:10:16.000000000 +0200
++++ zvbi-new/src/conv.c	2014-12-09 11:14:36.948231282 +0100
+@@ -26,7 +26,9 @@
+ #endif
+ 
+ #include <errno.h>
+-#include <langinfo.h>
++#ifdef HAVE_LANGINFO_H
++# include <langinfo.h>
++#endif
+ 
+ #include "misc.h"
+ #include "conv.h"
+@@ -1234,9 +1236,12 @@
+ 	const char *dst_format;
+ 
+ 	dst_format = bind_textdomain_codeset (vbi_intl_domainname, NULL);
+-
++#ifdef HAVE_LANGINFO_H
+ 	if (NULL == dst_format)
+ 		dst_format = nl_langinfo (CODESET);
++#else
++        dst_format = "UTF-8";
++#endif
+ 
+ 	return dst_format; /* may be NULL */
+ }
+--- zvbi/src/Makefile.am	2013-07-10 11:14:47.000000000 +0200
++++ zvbi-new/src/Makefile.am	2014-12-10 22:09:27.410157237 +0100
+@@ -94,7 +94,6 @@
+ 	page_table.c page_table.h \
+ 	pdc.c pdc.h \
+ 	pfc_demux.c pfc_demux.h \
+-	proxy-client.c proxy-client.h \
+ 	raw_decoder.c raw_decoder.h \
+ 	sampling_par.c sampling_par.h \
+ 	search.c search.h ure.c ure.h \

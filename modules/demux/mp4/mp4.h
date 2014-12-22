@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include "libmp4.h"
+#include "../asf/asfpacket.h"
 
 /* Contain all information about a chunk */
 typedef struct
@@ -69,10 +70,13 @@ typedef struct
     int b_enable;           /* is the trak enable by default */
     bool b_selected;  /* is the trak being played */
     bool b_chapter;   /* True when used for chapter only */
+    uint32_t i_switch_group;
 
     bool b_mac_encoding;
 
     es_format_t fmt;
+    uint8_t     rgi_chans_reordering[AOUT_CHAN_MAX];
+    bool        b_chans_reorder;
     es_out_id_t *p_es;
 
     /* display size only ! */
@@ -111,6 +115,7 @@ typedef struct
     uint64_t     i_first_dts;    /* i_first_dts value
                                                    of the next chunk */
 
+    MP4_Box_t *p_track;
     MP4_Box_t *p_stbl;  /* will contain all timing information */
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
     MP4_Box_t *p_sample;/* point on actual sdsd */
@@ -121,7 +126,7 @@ typedef struct
     void      *p_drms;
     MP4_Box_t *p_skcr;
 
-    mtime_t i_time;
+    mtime_t i_time; // track scaled
 
     struct
     {
@@ -132,6 +137,11 @@ typedef struct
         uint64_t   i_traf_base_offset;
     } context;
 
+    /* ASF packets handling */
+    MP4_Box_t       *p_asf;
+    mtime_t          i_dts_backup;
+    mtime_t          i_pts_backup;
+    asf_track_info_t asfinfo;
 } mp4_track_t;
 
 typedef struct mp4_fragment_t mp4_fragment_t;
@@ -139,9 +149,18 @@ struct mp4_fragment_t
 {
     uint64_t i_chunk_range_min_offset;
     uint64_t i_chunk_range_max_offset;
-    uint64_t i_duration;
+    struct
+    {
+        unsigned int i_track_ID;
+        uint64_t i_duration; // movie scaled
+    } *p_durations;
+    unsigned int i_durations;
     MP4_Box_t *p_moox;
     mp4_fragment_t *p_next;
 };
 
+int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
+int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
+int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
+void SetupMeta( vlc_meta_t *p_meta, MP4_Box_t *p_udta );
 #endif

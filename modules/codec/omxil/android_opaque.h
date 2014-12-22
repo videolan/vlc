@@ -30,15 +30,6 @@
 
 #include <vlc_common.h>
 
-struct picture_sys_t
-{
-    void (*pf_display_callback)(picture_sys_t*);
-    void (*pf_unlock_callback)(picture_sys_t*);
-    decoder_t *p_dec;
-    uint32_t i_index;
-    int b_valid;
-};
-
 vlc_mutex_t* get_android_opaque_mutex(void);
 
 #endif

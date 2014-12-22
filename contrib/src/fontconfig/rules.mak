@@ -1,6 +1,6 @@
 # fontconfig
 
-FONTCONFIG_VERSION := 2.10.2
+FONTCONFIG_VERSION := 2.11.1
 FONTCONFIG_URL := http://fontconfig.org/release/fontconfig-$(FONTCONFIG_VERSION).tar.gz
 
 PKGS += fontconfig

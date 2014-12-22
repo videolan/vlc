@@ -71,12 +71,19 @@ static VLCBookmarks *_o_sharedInstance = nil;
         [o_bookmarks_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self initStrings];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(inputChangedEvent:)
+                                                 name:VLCInputChangedNotification
+                                               object:nil];
 }
 
 - (void)dealloc
 {
     if (p_old_input)
         vlc_object_release(p_old_input);
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     [super dealloc];
 }
@@ -117,8 +124,13 @@ static VLCBookmarks *_o_sharedInstance = nil;
 {
     /* show the window, called from intf.m */
     [o_bookmarks_window displayIfNeeded];
-    [o_bookmarks_window setLevel: [[[VLCMain sharedInstance] voutController] currentWindowLevel]];
+    [o_bookmarks_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
     [o_bookmarks_window makeKeyAndOrderFront:nil];
+}
+
+-(void)inputChangedEvent:(NSNotification *)o_notification
+{
+    [o_tbl_dataTable reloadData];
 }
 
 - (IBAction)add:(id)sender
@@ -345,15 +357,6 @@ clear:
 }
 
 /*****************************************************************************
- * callback stuff
- *****************************************************************************/
-
--(id)dataTable
-{
-    return o_tbl_dataTable;
-}
-
-/*****************************************************************************
  * data source methods
  *****************************************************************************/
 
@@ -391,6 +394,8 @@ clear:
     if (!p_input)
         return @"";
     else if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS)
+        ret = @"";
+    else if (row >= i_bookmarks)
         ret = @"";
     else {
         NSString * identifier = [theTableColumn identifier];

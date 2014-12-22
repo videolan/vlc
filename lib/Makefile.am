@@ -59,12 +59,16 @@ libvlc_la_LIBADD = \
 libvlc_la_LDFLAGS = \
 	$(LDFLAGS_libvlc) \
 	-no-undefined \
-	-version-info 9:0:4 \
+	-version-info 10:0:5 \
 	-export-symbols $(srcdir)/libvlc.sym
 libvlc_la_DEPENDENCIES = libvlc.sym
 if HAVE_WIN32
 libvlc_la_DEPENDENCIES += ../src/libvlc_win32_rc.$(OBJEXT)
-libvlc_la_LDFLAGS += -Wl,../src/libvlc_win32_rc.$(OBJEXT) -avoid-version
+libvlc_la_LDFLAGS += -Wl,../src/libvlc_win32_rc.$(OBJEXT) -avoid-version \
+					 -Wc,--static -Wc,-static-libgcc
+endif
+if HAVE_OS2
+libvlc_la_LDFLAGS += -avoid-version
 endif
 
 pkgconfig_DATA = libvlc.pc

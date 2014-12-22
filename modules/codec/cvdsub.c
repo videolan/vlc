@@ -526,7 +526,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     if( !p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         return NULL;
     }
 

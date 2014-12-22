@@ -1,0 +1,13 @@
+--- libdvbpsi/src/descriptor.h.ORIG	Wed Mar 20 11:31:51 2013
++++ libdvbpsi/src/descriptor.h	Thu Jul 10 20:16:22 2014
+@@ -39,6 +39,10 @@
+ extern "C" {
+ #endif
+ 
++#ifdef HAVE_SYS_TYPES_H
++#include <sys/types.h>
++#endif
++
+ /*****************************************************************************
+  * common definitions
+  *****************************************************************************/

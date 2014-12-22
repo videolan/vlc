@@ -11,7 +11,7 @@ info()
 
 ARCH="x86_64"
 MINIMAL_OSX_VERSION="10.6"
-OSX_VERSION="10.8"
+OSX_VERSION=`xcrun --show-sdk-version`
 SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
 
 usage()
@@ -90,7 +90,7 @@ export CXX="xcrun clang++"
 export OBJC="xcrun clang"
 export OSX_VERSION
 export SDKROOT
-export PATH="${vlcroot}/extras/tools/build/bin:$PATH"
+export PATH="${vlcroot}/extras/tools/build/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin"
 
 TRIPLET=$ARCH-apple-darwin10
 

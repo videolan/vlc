@@ -5,6 +5,7 @@ $Id$
  * a52tospdif: Audio converter module to encapsulate A/52 into S/PDIF
  * aa: Ascii art video output
  * access_alsa: Alsa access module
+ * access_archive: libarchive based access and stream filter
  * access_bd: Blu-Ray Disc access
  * access_eyetv: Access module to connect to our plugin running within EyeTV
  * access_jack: JACK audio input module
@@ -32,10 +33,12 @@ $Id$
  * anaglyph: anaglyph 3d video filter
  * android_audiotrack: audio output for Android, based on AudioTrack
  * android_native_window: Android native window provider module
- * android_opaque: Android direct GPU rendering video output
  * android_surface: video output for Android, based on Surface
+ * android_window: Android direct/undirect rendering video output
  * antiflicker: anti-flicker video filter
  * araw: Pseudo audio decoder for raw PCM
+ * aribcam: ARIB STD-B25 decoder/virtual CAM
+ * aribsub: ARIB subtitles decoder
  * asf: ASF demuxer
  * atmo: Ambilight-like video-output
  * attachment: Attachment access module
@@ -75,6 +78,7 @@ $Id$
  * croppadd: Crop/Padd image filter
  * crystalhd: crystalhd decoder
  * cvdsub: CVD subtitles decoder
+ * daala: a daala video decoder/packetizer using libdaala
  * dash: MPEG DASH playback
  * dbus: D-Bus control interface
  * dbus_screensaver: preventing the computer from suspending
@@ -98,6 +102,7 @@ $Id$
  * dolby_surround_decoder: simple decoder for dolby surround encoded streams
  * drawable: legacy LibVLC video window provider
  * dshow: DirectShow access plugin for encoding cards under Windows
+ * dsm: SMB access module
  * dts: DTS basic parser/packetizer
  * dtstofloat32: DTS Audio converter
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
@@ -129,6 +134,7 @@ $Id$
  * float_mixer: Precise float audio mixer
  * fluidsynth: Software MIDI synthetizer using libfluidsynth
  * folder: folder meta data and art finder
+ * fps: convert picture rate
  * freetype: Utility to put text on video using freetype2
  * freeze: picture freezing video filter
  * ftp: FTP Network access module
@@ -153,13 +159,13 @@ $Id$
  * growl: announce currently playing stream to growl
  * gstdecode: GStreamer based decoder module.
  * h264: H264 decoder
+ * hds: HTTP Dynamic Streaming, per Adobe's specs
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
  * hevc: HEVC demuxer
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
  * http: HTTP Network access module
  * httplive: HTTP Live streaming for playback
- * hwdummy: dummy hardware video decoding
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb
  * i420_rgb_sse2: sse2 accelerated version of i420_rgb
@@ -197,6 +203,7 @@ $Id$
  * lua: Lua scripting inteface
  * macosx: Video output, and interface module for Mac OS X
  * macosx_dialog_provider: Minimal Dialog Provider for Mac OS X
+ * mad: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  * magnify: zoom video filter
  * marq: Overlays a marquee on the video
  * mediacodec: Android Jelly Bean MediaCodec decoder module
@@ -207,6 +214,7 @@ $Id$
  * mjpeg: a demuxer for multipart and concatenated JPEG data
  * mkv: Matroska demuxer
  * mmal_codec: mmal based video decoder
+ * mmal_deinterlace: mmal deinterlace filter
  * mmal_vout: mmal based video renderer
  * mmdevice: Windows Audio Session API audio output using MMDevice
  * mod: MOD demuxer
@@ -218,7 +226,7 @@ $Id$
  * mp4: MP4 file input module
  * mpc: Musepack decoder
  * mpeg_audio: MPEG audio parser/packetizer
- * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
+ * mpg123: MPEG-1 & 2 audio layer I, II, III + MPEG 2.5 decoder using mpg123
  * mpgv: MPEG-I/II Video demuxer
  * mtp: MTP interface module
  * mux_asf: ASF muxer
@@ -329,6 +337,7 @@ $Id$
  * stream_out_autodel: monitor mux inputs and automatically add/delete streams
  * stream_out_bridge: "exchange" streams between sout instances. To be used with VLM
  * stream_out_chromaprint: Audio fingerprinter
+ * stream_out_chromecast: Chromecast streaming output module
  * stream_out_delay: introduce delay in an ES when streaming
  * stream_out_description: helper module for RTSP vod
  * stream_out_display: displays a stream output chain
@@ -414,6 +423,9 @@ $Id$
  * windrive: Windows logical disc drives
  * wingdi: WIN 32 / WIN CE GDI video output
  * winstore: Windows Store App audio output
+ * wl_screenshooter: Wayland screen capture input
+ * wl_shell_surface: Wayland shell surface window provider
+ * wl_shm: Wayland shared memory video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
  * x262: MPEG-2 video encoder using x262
  * x26410b: H264 10 bit video encoder using x264

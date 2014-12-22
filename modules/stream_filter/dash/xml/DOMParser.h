@@ -25,12 +25,14 @@
 #ifndef DOMPARSER_H_
 #define DOMPARSER_H_
 
-#include <vlc_common.h>
-#include <vlc_stream.h>
-#include <vlc_xml.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-#include "mpd/IMPDManager.h"
+#include <vlc_common.h>
+
 #include "xml/Node.h"
+#include "mpd/Profile.hpp"
 
 namespace dash
 {
@@ -46,7 +48,7 @@ namespace dash
                 Node*               getRootNode ();
                 void                print       ();
                 static bool         isDash      (stream_t *stream);
-                mpd::Profile        getProfile  ();
+                mpd::Profile        getProfile  () const;
 
             private:
                 Node                *root;

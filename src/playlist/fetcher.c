@@ -227,15 +227,15 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
                 msg_Dbg( p_fetcher->object,
                          " will search at higher scope, if possible" );
                 p_album = &p_fetcher->albums.p_elems[fe_idx];
+
+                psz_artist = psz_album = NULL;
                 break;
             }
         FOREACH_END();
     }
-    else
-    {
-        free( psz_artist );
-        free( psz_album );
-    }
+
+    free( psz_artist );
+    free( psz_album );
 
     if ( playlist_FindArtInCacheUsingItemUID( p_item ) != VLC_SUCCESS )
         playlist_FindArtInCache( p_item );

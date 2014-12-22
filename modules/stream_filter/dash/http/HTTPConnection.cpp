@@ -26,153 +26,76 @@
 #endif
 
 #include "HTTPConnection.h"
+#include "Chunk.h"
+
+#include <sstream>
 
 using namespace dash::http;
 
-HTTPConnection::HTTPConnection  (stream_t *stream) :
-                stream          (stream),
-                peekBufferLen   (0),
-                contentLength   (0)
+HTTPConnection::HTTPConnection  (stream_t *stream, Chunk *chunk_) :
+                IHTTPConnection (stream)
 {
-    this->peekBuffer = new uint8_t[PEEKBUFFER];
-}
-HTTPConnection::~HTTPConnection ()
-{
-    delete[] this->peekBuffer;
-    this->closeSocket();
+    toRead = 0;
+    chunk = NULL;
+    bindChunk(chunk_);
 }
 
-int             HTTPConnection::read            (void *p_buffer, size_t len)
+std::string HTTPConnection::buildRequestHeader(const std::string &path) const
 {
-    if(this->peekBufferLen == 0)
+    std::string req = IHTTPConnection::buildRequestHeader(path);
+    return req.append("Connection: close\r\n");
+}
+
+void HTTPConnection::bindChunk(Chunk *chunk_)
+{
+    if(chunk_ == chunk)
+        return;
+    if (chunk_)
+        chunk_->setConnection(this);
+    chunk = chunk_;
+}
+
+void HTTPConnection::releaseChunk()
+{
+    if(chunk)
     {
-        int size = net_Read(this->stream, this->httpSocket, NULL, p_buffer, len, false);
-
-        if(size <= 0)
-            return 0;
-
-        return size;
+        chunk->setConnection(NULL);
+        chunk = NULL;
     }
-
-    memcpy(p_buffer, this->peekBuffer, this->peekBufferLen);
-    int ret = this->peekBufferLen;
-    this->peekBufferLen = 0;
-    return ret;
 }
-int             HTTPConnection::peek            (const uint8_t **pp_peek, size_t i_peek)
+
+void HTTPConnection::onHeader(const std::string &key,
+                              const std::string &value)
 {
-    if(this->peekBufferLen == 0)
-        this->peekBufferLen = this->read(this->peekBuffer, PEEKBUFFER);
-
-    int size = i_peek > this->peekBufferLen ? this->peekBufferLen : i_peek;
-
-    uint8_t *peek = new uint8_t [size];
-    memcpy(peek, this->peekBuffer, size);
-    *pp_peek = peek;
-    return size;
-}
-std::string     HTTPConnection::prepareRequest  (Chunk *chunk)
-{
-    std::string request;
-
-    if(!chunk->useByteRange())
+    if(key == "Content-Length")
     {
-        request = "GET "    + chunk->getPath()    + " HTTP/1.1" + "\r\n" +
-                  "Host: "  + chunk->getHostname() + "\r\n" +
-                  "Connection: close\r\n\r\n";
+        std::istringstream ss(value);
+        size_t length;
+        ss >> length;
+        chunk->setLength(length);
+        toRead = length;
     }
-    else
-    {
-        std::stringstream req;
-        req << "GET " << chunk->getPath() << " HTTP/1.1\r\n" <<
-               "Host: " << chunk->getHostname() << "\r\n" <<
-               "Range: bytes=" << chunk->getStartByte() << "-" << chunk->getEndByte() << "\r\n" <<
-               "Connection: close\r\n\r\n";
-
-        request = req.str();
-    }
-
-    return request;
 }
-bool            HTTPConnection::init            (Chunk *chunk)
-{
-    if(!chunk->hasHostname())
-        if(!this->setUrlRelative(chunk))
-            return false;
 
-    this->httpSocket = net_ConnectTCP(this->stream, chunk->getHostname().c_str(), chunk->getPort());
-
-    if(this->httpSocket == -1)
-        return false;
-
-    if(this->sendData(this->prepareRequest(chunk)))
-        return this->parseHeader();
-
-    return false;
-}
-bool            HTTPConnection::parseHeader     ()
-{
-    std::string line = this->readLine();
-
-    if(line.size() == 0)
-        return false;
-
-    while(line.compare("\r\n"))
-    {
-        if(!strncasecmp(line.c_str(), "Content-Length", 14))
-            this->contentLength = atoi(line.substr(15,line.size()).c_str());
-
-        line = this->readLine();
-
-        if(line.size() == 0)
-            return false;
-    }
-
-    return true;
-}
-std::string     HTTPConnection::readLine        ()
+std::string HTTPConnection::extraRequestHeaders() const
 {
     std::stringstream ss;
-    char c[1];
-    size_t size = net_Read(this->stream, this->httpSocket, NULL, c, 1, false);
-
-    while(size)
+    if(chunk->usesByteRange())
     {
-        ss << c[0];
-        if(c[0] == '\n')
-            break;
-
-        size = net_Read(this->stream, this->httpSocket, NULL, c, 1, false);
+        ss << "Range: bytes=" << chunk->getStartByte() << "-";
+        if(chunk->getEndByte())
+            ss << chunk->getEndByte();
+        ss << "\r\n";
     }
-
-    if(size > 0)
-        return ss.str();
-
-    return "";
+    return ss.str();
 }
-bool            HTTPConnection::sendData        (const std::string& data)
-{
-    ssize_t size = net_Write(this->stream, this->httpSocket, NULL, data.c_str(), data.size());
-    if (size == -1)
-    {
-        return false;
-    }
-    if ((size_t)size != data.length())
-    {
-        this->sendData(data.substr(size, data.size()));
-    }
 
-    return true;
-}
-void            HTTPConnection::closeSocket     ()
+bool HTTPConnection::isAvailable() const
 {
-    net_Close(this->httpSocket);
+    return chunk == NULL;
 }
-bool            HTTPConnection::setUrlRelative  (Chunk *chunk)
-{
-    std::stringstream ss;
-    ss << stream->psz_access << "://" << Helper::combinePaths(Helper::getDirectoryPath(stream->psz_path), chunk->getUrl());
-    chunk->setUrl(ss.str());
 
-    return chunk->hasHostname();
+void HTTPConnection::disconnect()
+{
+    toRead = 0;
 }

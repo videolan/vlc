@@ -21,15 +21,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#define __STDC_CONSTANT_MACROS
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include "DASHManager.h"
+#include "adaptationlogic/AdaptationLogicFactory.h"
 
 using namespace dash;
 using namespace dash::http;
-using namespace dash::xml;
 using namespace dash::logic;
 using namespace dash::mpd;
 using namespace dash::buffer;
@@ -37,72 +39,103 @@ using namespace dash::buffer;
 DASHManager::DASHManager    ( MPD *mpd,
                               IAdaptationLogic::LogicType type, stream_t *stream) :
              conManager     ( NULL ),
-             currentChunk   ( NULL ),
-             adaptationLogic( NULL ),
              logicType      ( type ),
-             mpdManager     ( NULL ),
              mpd            ( mpd ),
-             stream         ( stream ),
-             downloader     ( NULL ),
-             buffer         ( NULL )
+             stream         ( stream )
 {
+    for(int i=0; i<Streams::count; i++)
+        streams[i] = NULL;
 }
+
 DASHManager::~DASHManager   ()
 {
-    delete this->downloader;
-    delete this->buffer;
-    delete this->conManager;
-    delete this->adaptationLogic;
-    delete this->mpdManager;
+    delete conManager;
+    for(int i=0; i<Streams::count; i++)
+        delete streams[i];
 }
 
-bool    DASHManager::start()
+bool DASHManager::start(demux_t *demux)
 {
-    this->mpdManager = mpd::MPDManagerFactory::create( mpd );
-
-    if ( this->mpdManager == NULL )
+    const Period *period = mpd->getFirstPeriod();
+    if(!period)
         return false;
 
-    this->adaptationLogic = AdaptationLogicFactory::create( this->logicType, this->mpdManager, this->stream);
+    for(int i=0; i<Streams::count; i++)
+    {
+        Streams::Type type = static_cast<Streams::Type>(i);
+        const AdaptationSet *set = period->getAdaptationSet(type);
+        if(set)
+        {
+            streams[type] = new Streams::Stream(set->getMimeType());
+            try
+            {
+                streams[type]->create(demux, AdaptationLogicFactory::create( logicType, mpd ) );
+            } catch (int) {
+                delete streams[type];
+                streams[type] = NULL;
+            }
+        }
+    }
 
-    if ( this->adaptationLogic == NULL )
+    conManager = new HTTPConnectionManager(stream);
+    if(!conManager)
         return false;
 
-    this->conManager = new dash::http::HTTPConnectionManager(this->adaptationLogic, this->stream);
-    this->buffer     = new BlockBuffer(this->stream);
-    this->downloader = new DASHDownloader(this->conManager, this->buffer);
-
-    this->conManager->attach(this->adaptationLogic);
-    this->buffer->attach(this->adaptationLogic);
-
-    return this->downloader->start();
-}
-int     DASHManager::read( void *p_buffer, size_t len )
-{
-    return this->buffer->get(p_buffer, len);
+    return true;
 }
 
-int     DASHManager::seekBackwards( unsigned i_len )
+size_t DASHManager::read()
 {
-    return this->buffer->seekBackwards( i_len );
+    size_t i_ret = 0;
+    for(int type=0; type<Streams::count; type++)
+    {
+        if(!streams[type])
+            continue;
+        i_ret += streams[type]->read(conManager);
+    }
+    return i_ret;
 }
 
-int     DASHManager::peek( const uint8_t **pp_peek, size_t i_peek )
+mtime_t DASHManager::getPCR() const
 {
-    return this->buffer->peek(pp_peek, i_peek);
+    mtime_t pcr = VLC_TS_INVALID;
+    for(int type=0; type<Streams::count; type++)
+    {
+        if(!streams[type])
+            continue;
+        if(pcr == VLC_TS_INVALID || pcr > streams[type]->getPCR())
+            pcr = streams[type]->getPCR();
+    }
+    return pcr;
 }
 
-const mpd::IMPDManager*         DASHManager::getMpdManager() const
+int DASHManager::getGroup() const
 {
-    return this->mpdManager;
+    for(int type=0; type<Streams::count; type++)
+    {
+        if(!streams[type])
+            continue;
+        return streams[type]->getGroup();
+    }
+    return -1;
 }
 
-const logic::IAdaptationLogic*  DASHManager::getAdaptionLogic() const
+int DASHManager::esCount() const
 {
-    return this->adaptationLogic;
+    int es = 0;
+    for(int type=0; type<Streams::count; type++)
+    {
+        if(!streams[type])
+            continue;
+        es += streams[type]->esCount();
+    }
+    return es;
 }
 
-const Chunk *DASHManager::getCurrentChunk() const
+mtime_t DASHManager::getDuration() const
 {
-    return this->currentChunk;
+    if (mpd->isLive())
+        return 0;
+    else
+        return CLOCK_FREQ * mpd->getDuration();
 }

@@ -723,13 +723,14 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_use_key_frames = var_GetBool( p_mux, SOUT_CFG_PREFIX "use-key-frames" );
 
+    p_mux->p_sys        = p_sys;
+
     p_sys->csa = csaSetup(p_this);
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
-    p_mux->p_sys        = p_sys;
 
     return VLC_SUCCESS;
 }
@@ -949,14 +950,17 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         p_stream->i_stream_type = 0x81;
         p_stream->i_stream_id = 0xbd;
         break;
-    case VLC_CODEC_EAC3:
-        p_stream->i_stream_type = 0x06;
-        p_stream->i_stream_id = 0xbd;
-        break;
     case VLC_CODEC_DVD_LPCM:
         p_stream->i_stream_type = 0x83;
         p_stream->i_stream_id = 0xbd;
         break;
+    case VLC_CODEC_OPUS:
+        if (p_input->p_fmt->audio.i_channels > 8) {
+            msg_Err(p_mux, "Too many opus channels (%d > 8)",
+                p_input->p_fmt->audio.i_channels);
+            break;
+        }
+    case VLC_CODEC_EAC3:
     case VLC_CODEC_DTS:
         p_stream->i_stream_type = 0x06;
         p_stream->i_stream_id = 0xbd;
@@ -1218,6 +1222,20 @@ static void SetHeader( sout_buffer_chain_t *c,
     p_ts->i_flags |= BLOCK_FLAG_HEADER;
 }
 
+static block_t *Pack_Opus(block_t *p_data)
+{
+    lldiv_t d = lldiv(p_data->i_buffer, 255);
+    p_data = block_Realloc(p_data, 2 + d.quot + 1, p_data->i_buffer);
+    if (p_data) { /* no flags */
+        p_data->p_buffer[0] = 0x7f;
+        p_data->p_buffer[1] = 0xe0;
+        memset(&p_data->p_buffer[2], 0xff, d.quot);
+        p_data->p_buffer[2+d.quot] = d.rem;
+    }
+
+    return p_data;
+}
+
 /* returns true if needs more data */
 static bool MuxStreams(sout_mux_t *p_mux )
 {
@@ -1276,13 +1294,13 @@ static bool MuxStreams(sout_mux_t *p_mux )
                 /* Don't mux the SPU yet if it is too early */
                 block_t *p_spu = block_FifoShow( p_input->p_fifo );
 
-                int64_t i_spu_delay = p_spu->i_dts - p_sys->first_dts - p_pcr_stream->i_pes_dts;
+                int64_t i_spu_delay = p_spu->i_dts - p_pcr_stream->i_pes_dts;
                 if( ( i_spu_delay > i_shaping_delay ) &&
-                    ( i_spu_delay < INT64_C(100000000) ) )
+                    ( i_spu_delay < 100 * CLOCK_FREQ ) )
                     continue;
 
-                if ( ( i_spu_delay >= INT64_C(100000000) ) ||
-                     ( i_spu_delay < INT64_C(10000) ) )
+                if ( ( i_spu_delay >= 100 * CLOCK_FREQ ) ||
+                     ( i_spu_delay < CLOCK_FREQ / 100 ) )
                 {
                     BufferChainClean( &p_stream->chain_pes );
                     p_stream->i_pes_dts = 0;
@@ -1305,6 +1323,8 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
             if( p_input->p_fmt->i_codec == VLC_CODEC_MP4A )
                 p_data = Add_ADTS( p_data, p_input->p_fmt );
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_OPUS )
+                p_data = Pack_Opus( p_data );
         }
         else
             p_data = FixPES( p_mux, p_input->p_fifo );
@@ -1322,16 +1342,13 @@ static bool MuxStreams(sout_mux_t *p_mux )
         if (p_sys->first_dts == 0)
             p_sys->first_dts = p_data->i_dts;
 
-        p_data->i_dts -= p_sys->first_dts;
-        p_data->i_pts -= p_sys->first_dts;
-
         if( ( p_pcr_stream->i_pes_dts > 0 &&
-              p_data->i_dts - 10000000 > p_pcr_stream->i_pes_dts +
+              p_data->i_dts - 10 * CLOCK_FREQ > p_pcr_stream->i_pes_dts +
               p_pcr_stream->i_pes_length ) ||
             p_data->i_dts < p_stream->i_pes_dts ||
             ( p_stream->i_pes_dts > 0 &&
               p_input->p_fmt->i_cat != SPU_ES &&
-              p_data->i_dts - 10000000 > p_stream->i_pes_dts +
+              p_data->i_dts - 10 * CLOCK_FREQ > p_stream->i_pes_dts +
               p_stream->i_pes_length ) )
         {
             msg_Warn( p_mux, "packet with too strange dts "
@@ -1385,8 +1402,8 @@ static bool MuxStreams(sout_mux_t *p_mux )
                 p_spu->p_buffer[1] = 1;
                 p_spu->p_buffer[2] = ' ';
 
-                EStoPES( &p_spu, p_spu, p_input->p_fmt,
-                             p_stream->i_stream_id, 1, 0, 0, 0 );
+                EStoPES( &p_spu, p_input->p_fmt,
+                             p_stream->i_stream_id, 1, 0, 0, 0, p_sys->first_dts );
                 p_data->p_next = p_spu;
             }
             break;
@@ -1431,9 +1448,9 @@ static bool MuxStreams(sout_mux_t *p_mux )
             i_max_pes_size = INT_MAX;
         }
 
-         EStoPES ( &p_data, p_data, p_input->p_fmt, p_stream->i_stream_id,
+        EStoPES ( &p_data, p_input->p_fmt, p_stream->i_stream_id,
                        1, b_data_alignment, i_header_size,
-                       i_max_pes_size );
+                       i_max_pes_size, p_sys->first_dts );
 
         BufferChainAppend( &p_stream->chain_pes, p_data );
 
@@ -1674,19 +1691,8 @@ static block_t *Add_ADTS( block_t *p_data, es_format_t *p_fmt )
 
     int i_channels = (p_extra[i_index == 0x0f ? 4 : 1] >> 3) & 0x0f;
 
-    /* keep a copy in case block_Realloc() fails */
-    block_t *p_bak_block = block_Duplicate( p_data );
-    if( !p_bak_block ) /* OOM, block_Realloc() is likely to lose our block */
-        return p_data; /* the frame isn't correct but that's the best we have */
-
     block_t *p_new_block = block_Realloc( p_data, ADTS_HEADER_SIZE,
                                             p_data->i_buffer );
-    if( !p_new_block )
-        return p_bak_block; /* OOM, send the (incorrect) original frame */
-
-    block_Release( p_bak_block ); /* we don't need the copy anymore */
-
-
     uint8_t *p_buffer = p_new_block->p_buffer;
 
     /* fixed header */
@@ -1801,7 +1807,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         if( p_ts->i_flags & BLOCK_FLAG_CLOCK )
         {
             /* msg_Dbg( p_mux, "pcr=%lld ms", p_ts->i_dts / 1000 ); */
-            TSSetPCR( p_ts, p_ts->i_dts - p_sys->i_dts_delay );
+            TSSetPCR( p_ts, p_ts->i_dts - p_sys->i_dts_delay - p_sys->first_dts );
         }
         if( p_ts->i_flags & BLOCK_FLAG_SCRAMBLED )
         {
@@ -1867,34 +1873,21 @@ static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
             p_ts->i_flags |= BLOCK_FLAG_CLOCK;
 
             p_ts->p_buffer[4] = 7 + i_stuffing;
-            p_ts->p_buffer[5] = 0x10;   /* flags */
+            p_ts->p_buffer[5] = 1 << 4; /* PCR_flag */
             if( p_stream->b_discontinuity )
             {
                 p_ts->p_buffer[5] |= 0x80; /* flag TS dicontinuity */
                 p_stream->b_discontinuity = false;
             }
-            p_ts->p_buffer[6] = 0 &0xff;
-            p_ts->p_buffer[7] = 0 &0xff;
-            p_ts->p_buffer[8] = 0 &0xff;
-            p_ts->p_buffer[9] = 0 &0xff;
-            p_ts->p_buffer[10]= ( 0 &0x80 ) | 0x7e;
-            p_ts->p_buffer[11]= 0;
-
-            for (int i = 12; i < 12 + i_stuffing; i++ )
-            {
-                p_ts->p_buffer[i] = 0xff;
-            }
+            memset(&p_ts->p_buffer[12], 0xff, i_stuffing);
         }
         else
         {
-            p_ts->p_buffer[4] = i_stuffing - 1;
-            if( i_stuffing > 1 )
+            p_ts->p_buffer[4] = --i_stuffing;
+            if( i_stuffing-- )
             {
-                p_ts->p_buffer[5] = 0x00;
-                for (int i = 6; i < 6 + i_stuffing - 2; i++ )
-                {
-                    p_ts->p_buffer[i] = 0xff;
-                }
+                p_ts->p_buffer[5] = 0;
+                memset(&p_ts->p_buffer[6], 0xff, i_stuffing);
             }
         }
     }
@@ -1941,7 +1934,9 @@ static void TSSetPCR( block_t *p_ts, mtime_t i_dts )
     p_ts->p_buffer[7]  = ( i_pcr >> 17 )&0xff;
     p_ts->p_buffer[8]  = ( i_pcr >> 9  )&0xff;
     p_ts->p_buffer[9]  = ( i_pcr >> 1  )&0xff;
-    p_ts->p_buffer[10]|= ( i_pcr << 7  )&0x80;
+    p_ts->p_buffer[10] = ( i_pcr << 7  )&0x80;
+    p_ts->p_buffer[10] |= 0x7e;
+    p_ts->p_buffer[11] = 0; /* we don't set PCR extension */
 }
 
 static void PEStoTS( sout_buffer_chain_t *c, block_t *p_pes,
@@ -2299,9 +2294,10 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
     for (int i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
     {
-        ts_stream_t *p_stream = (ts_stream_t*)p_mux->pp_inputs[i_stream]->p_sys;
+        sout_input_t *p_input = p_mux->pp_inputs[i_stream];
+        ts_stream_t *p_stream = (ts_stream_t*)p_input->p_sys;
 
-        int i_pidinput = p_mux->pp_inputs[i_stream]->p_fmt->i_id;
+        int i_pidinput = p_input->p_fmt->i_id;
         pmt_map_t *p_usepid = bsearch( &i_pidinput, p_sys->pmtmap,
                     p_sys->i_pmtslots, sizeof(pmt_map_t), intcompare );
 
@@ -2367,6 +2363,17 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         {
             uint8_t data[1] = { 0x00 };
             dvbpsi_PMTESAddDescriptor( p_es, 0x7a, 1, data );
+        }
+        else if( p_stream->i_codec == VLC_CODEC_OPUS )
+        {
+            uint8_t data[2] = {
+                0x80, /* tag extension */
+                p_input->p_fmt->audio.i_channels
+            };
+            dvbpsi_PMTESAddDescriptor( p_es, 0x7f, 2, data );
+            uint8_t format[4] = { 'O', 'p', 'u', 's'};
+            /* "registration" descriptor : "Opus" */
+            dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, format );
         }
         else if( p_stream->i_codec == VLC_CODEC_TELETEXT )
         {

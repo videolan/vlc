@@ -201,7 +201,7 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
     if (!src) return NULL;
 
     dst = filter_NewPicture(filter);
-    if (!dst) {
+    if ( unlikely(!dst) ) {
         picture_Release(src);
         return NULL;
     }

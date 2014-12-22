@@ -275,7 +275,7 @@ static void ClosePostproc( vlc_object_t *p_this )
     /* Destroy the resources */
     vlc_mutex_destroy( &p_sys->lock );
     pp_free_context( p_sys->pp_context );
-    if( p_sys->pp_mode ) pp_free_mode( p_sys->pp_mode );
+    pp_free_mode( p_sys->pp_mode );
     free( p_sys );
 }
 
@@ -286,11 +286,6 @@ static picture_t *PostprocPict( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    const uint8_t *src[3];
-    uint8_t *dst[3];
-    int i_plane;
-    int i_src_stride[3], i_dst_stride[3];
-
     picture_t *p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
@@ -300,29 +295,30 @@ static picture_t *PostprocPict( filter_t *p_filter, picture_t *p_pic )
 
     /* Lock to prevent issues if pp_mode is changed */
     vlc_mutex_lock( &p_sys->lock );
-    if( !p_sys->pp_mode )
+    if( p_sys->pp_mode != NULL )
     {
-        vlc_mutex_unlock( &p_sys->lock );
+        const uint8_t *src[3];
+        uint8_t *dst[3];
+        int i_src_stride[3], i_dst_stride[3];
+
+        for( int i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+        {
+            src[i_plane] = p_pic->p[i_plane].p_pixels;
+            dst[i_plane] = p_outpic->p[i_plane].p_pixels;
+
+            /* I'm not sure what happens if i_pitch != i_visible_pitch ...
+             * at least it shouldn't crash. */
+            i_src_stride[i_plane] = p_pic->p[i_plane].i_pitch;
+            i_dst_stride[i_plane] = p_outpic->p[i_plane].i_pitch;
+        }
+
+        pp_postprocess( src, i_src_stride, dst, i_dst_stride,
+                        p_filter->fmt_in.video.i_width,
+                        p_filter->fmt_in.video.i_height, NULL, 0,
+                        p_sys->pp_mode, p_sys->pp_context, 0 );
+    }
+    else
         picture_CopyPixels( p_outpic, p_pic );
-        return CopyInfoAndRelease( p_outpic, p_pic );
-    }
-
-
-    for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-    {
-        src[i_plane] = p_pic->p[i_plane].p_pixels;
-        dst[i_plane] = p_outpic->p[i_plane].p_pixels;
-
-        /* I'm not sure what happens if i_pitch != i_visible_pitch ...
-         * at least it shouldn't crash. */
-        i_src_stride[i_plane] = p_pic->p[i_plane].i_pitch;
-        i_dst_stride[i_plane] = p_outpic->p[i_plane].i_pitch;
-    }
-
-    pp_postprocess( src, i_src_stride, dst, i_dst_stride,
-                    p_filter->fmt_in.video.i_width,
-                    p_filter->fmt_in.video.i_height, NULL, 0,
-                    p_sys->pp_mode, p_sys->pp_context, 0 );
     vlc_mutex_unlock( &p_sys->lock );
 
     return CopyInfoAndRelease( p_outpic, p_pic );
@@ -335,28 +331,26 @@ static void PPChangeMode( filter_t *p_filter, const char *psz_name,
                           int i_quality )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_mutex_lock( &p_sys->lock );
+    pp_mode *newmode = NULL, *oldmode;
+
     if( i_quality > 0 )
     {
-        pp_mode *pp_mode = pp_get_mode_by_name_and_quality( psz_name ?
-                                                              psz_name :
-                                                              "default",
-                                                              i_quality );
-        if( pp_mode )
-        {
-            pp_free_mode( p_sys->pp_mode );
-            p_sys->pp_mode = pp_mode;
+         newmode = pp_get_mode_by_name_and_quality( psz_name ? psz_name :
+                                                    "default", i_quality );
+         if( newmode == NULL )
+         {
+             msg_Warn( p_filter, "Error while changing post processing mode. "
+                       "Keeping previous mode." );
+             return;
         }
-        else
-            msg_Warn( p_filter, "Error while changing post processing mode. "
-                      "Keeping previous mode." );
     }
-    else
-    {
-        pp_free_mode( p_sys->pp_mode );
-        p_sys->pp_mode = NULL;
-    }
+
+    vlc_mutex_lock( &p_sys->lock );
+    oldmode = p_sys->pp_mode;
+    p_sys->pp_mode = newmode;
     vlc_mutex_unlock( &p_sys->lock );
+
+    pp_free_mode( oldmode );
 }
 
 static int PPQCallback( vlc_object_t *p_this, const char *psz_var,

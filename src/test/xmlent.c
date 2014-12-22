@@ -67,6 +67,12 @@ int main (void)
 
     decode ("R&eacute;mi&nbsp;Fran&ccedil;ois&nbsp;&amp;&nbsp;&Eacute;mile",
             "Rémi François & Émile");
+    decode ("R&#233;mi&nbsp;Fran&#231;ois&nbsp;&amp;&nbsp;&#201;mile",
+            "Rémi François & Émile");
+    decode ("R&#xe9;mi&nbsp;Fran&#xe7;ois&nbsp;&amp;&nbsp;&#xc9;mile",
+            "Rémi François & Émile");
+    decode ("R&#xE9;mi&nbsp;Fran&#xE7;ois&nbsp;&amp;&nbsp;&#xC9;mile",
+            "Rémi François & Émile");
 
     decode ("", "");
 

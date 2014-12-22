@@ -229,16 +229,17 @@ static void FindMountPoint(char **file)
 {
     char *device = *file;
 #if defined (HAVE_MNTENT_H) && defined (HAVE_SYS_STAT_H)
+    /* bd path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make sure
+     * we look up the real device */
+    char *bd_device = realpath(device, NULL);
+    if (bd_device == NULL)
+        return;
+
     struct stat st;
-    if (!stat (device, &st) && S_ISBLK (st.st_mode)) {
+    if (lstat (bd_device, &st) == 0 && S_ISBLK (st.st_mode)) {
         FILE *mtab = setmntent ("/proc/self/mounts", "r");
         struct mntent *m, mbuf;
         char buf [8192];
-        /* bd path may be a symlink (e.g. /dev/dvd -> /dev/sr0), so make
-         * sure we look up the real device */
-        char *bd_device = realpath(device, NULL);
-        if (!bd_device)
-            bd_device = strdup(device);
 
         while ((m = getmntent_r (mtab, &mbuf, buf, sizeof(buf))) != NULL) {
             if (!strcmp (m->mnt_fsname, bd_device)) {
@@ -247,9 +248,10 @@ static void FindMountPoint(char **file)
                 break;
             }
         }
-        free(bd_device);
         endmntent (mtab);
     }
+    free(bd_device);
+
 #elif defined(__APPLE__)
     struct stat st;
     if (!stat (device, &st) && S_ISBLK (st.st_mode)) {
@@ -868,20 +870,17 @@ static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height
 
     assert(p_sys->p_overlays[plane] == NULL);
 
-    p_sys->p_overlays[plane] = calloc(1, sizeof(**p_sys->p_overlays));
-    if (unlikely(!p_sys->p_overlays[plane]))
+    bluray_overlay_t *ov = calloc(1, sizeof(*ov));
+    if (unlikely(ov == NULL))
         return;
 
-    bluray_overlay_t *ov = p_sys->p_overlays[plane];
-
     subpicture_updater_sys_t *p_upd_sys = malloc(sizeof(*p_upd_sys));
-    if (unlikely(!p_upd_sys)) {
+    if (unlikely(p_upd_sys == NULL)) {
         free(ov);
-        p_sys->p_overlays[plane] = NULL;
         return;
     }
     /* two references: vout + demux */
-    ov->released_once = ATOMIC_FLAG_INIT;
+    atomic_flag_clear(&ov->released_once);
 
     p_upd_sys->p_overlay = ov;
     subpicture_updater_t updater = {
@@ -890,12 +889,22 @@ static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height
         .pf_destroy  = subpictureUpdaterDestroy,
         .p_sys       = p_upd_sys,
     };
-    vlc_mutex_init(&ov->lock);
+
     ov->p_pic = subpicture_New(&updater);
+    if (ov->p_pic == NULL) {
+        free(p_upd_sys);
+        free(ov);
+        return;
+    }
+
     ov->p_pic->i_original_picture_width = width;
     ov->p_pic->i_original_picture_height = height;
     ov->p_pic->b_ephemer = true;
     ov->p_pic->b_absolute = true;
+
+    vlc_mutex_init(&ov->lock);
+
+    p_sys->p_overlays[plane] = ov;
 }
 
 /**

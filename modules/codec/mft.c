@@ -64,13 +64,13 @@ vlc_module_end()
 typedef struct
 {
     HINSTANCE mfplat_dll;
-    HRESULT (STDCALL *MFTEnumEx)(GUID guidCategory, UINT32 Flags,
+    HRESULT (STDCALL *fptr_MFTEnumEx)(GUID guidCategory, UINT32 Flags,
                                  const MFT_REGISTER_TYPE_INFO *pInputType,
                                  const MFT_REGISTER_TYPE_INFO *pOutputType,
                                  IMFActivate ***pppMFTActivate, UINT32 *pcMFTActivate);
-    HRESULT (STDCALL *MFCreateSample)(IMFSample **ppIMFSample);
-    HRESULT (STDCALL *MFCreateMemoryBuffer)(DWORD cbMaxLength, IMFMediaBuffer **ppBuffer);
-    HRESULT (STDCALL *MFCreateAlignedMemoryBuffer)(DWORD cbMaxLength, DWORD fAlignmentFlags, IMFMediaBuffer **ppBuffer);
+    HRESULT (STDCALL *fptr_MFCreateSample)(IMFSample **ppIMFSample);
+    HRESULT (STDCALL *fptr_MFCreateMemoryBuffer)(DWORD cbMaxLength, IMFMediaBuffer **ppBuffer);
+    HRESULT (STDCALL *fptr_MFCreateAlignedMemoryBuffer)(DWORD cbMaxLength, DWORD fAlignmentFlags, IMFMediaBuffer **ppBuffer);
 } MFHandle;
 
 struct decoder_sys_t
@@ -461,13 +461,13 @@ static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, IMFSample** re
     if (FAILED(hr))
         goto error;
 
-    hr = mf->MFCreateSample(&input_sample);
+    hr = mf->fptr_MFCreateSample(&input_sample);
     if (FAILED(hr))
         goto error;
 
     IMFMediaBuffer *input_media_buffer = NULL;
     DWORD allocation_size = __MAX(input_info.cbSize, size);
-    hr = mf->MFCreateMemoryBuffer(allocation_size, &input_media_buffer);
+    hr = mf->fptr_MFCreateMemoryBuffer(allocation_size, &input_media_buffer);
     if (FAILED(hr))
         goto error;
 
@@ -518,7 +518,7 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, IMFSample **r
     if ((output_info.dwFlags & expected_flags) != expected_flags)
         goto error;
 
-    hr = mf->MFCreateSample(&output_sample);
+    hr = mf->fptr_MFCreateSample(&output_sample);
     if (FAILED(hr))
         goto error;
 
@@ -526,9 +526,9 @@ static int AllocateOutputSample(decoder_t *p_dec, DWORD stream_id, IMFSample **r
     DWORD allocation_size = output_info.cbSize;
     DWORD alignment = output_info.cbAlignment;
     if (alignment > 0)
-        hr = mf->MFCreateAlignedMemoryBuffer(allocation_size, alignment - 1, &output_media_buffer);
+        hr = mf->fptr_MFCreateAlignedMemoryBuffer(allocation_size, alignment - 1, &output_media_buffer);
     else
-        hr = mf->MFCreateMemoryBuffer(allocation_size, &output_media_buffer);
+        hr = mf->fptr_MFCreateMemoryBuffer(allocation_size, &output_media_buffer);
     if (FAILED(hr))
         goto error;
 
@@ -557,7 +557,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
         goto error;
 
     IMFMediaBuffer *input_media_buffer = NULL;
-    hr = IMFSample_GetBufferByIndex(input_sample, stream_id, &input_media_buffer);
+    hr = IMFSample_GetBufferByIndex(input_sample, 0, &input_media_buffer);
     if (FAILED(hr))
         goto error;
 
@@ -745,7 +745,8 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, void **result)
     }
     else /* An error not listed above occurred */
     {
-        msg_Err(p_dec, "Unexpected error in IMFTransform::ProcessOutput: %#x", hr);
+        msg_Err(p_dec, "Unexpected error in IMFTransform::ProcessOutput: %#lx",
+                hr);
         goto error;
     }
 
@@ -1059,7 +1060,7 @@ static int FindMFT(decoder_t *p_dec)
     MFT_REGISTER_TYPE_INFO input_type = { *p_sys->major_type, *p_sys->subtype };
     IMFActivate **activate_objects = NULL;
     UINT32 activate_objects_count = 0;
-    hr = mf->MFTEnumEx(category, flags, &input_type, NULL, &activate_objects, &activate_objects_count);
+    hr = mf->fptr_MFTEnumEx(category, flags, &input_type, NULL, &activate_objects, &activate_objects_count);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
@@ -1087,16 +1088,23 @@ static int FindMFT(decoder_t *p_dec)
 
 static int LoadMFTLibrary(MFHandle *mf)
 {
+#if _WIN32_WINNT < 0x601
     mf->mfplat_dll = LoadLibrary(TEXT("mfplat.dll"));
     if (!mf->mfplat_dll)
         return VLC_EGENERIC;
 
-    mf->MFTEnumEx = (void*)GetProcAddress(mf->mfplat_dll, "MFTEnumEx");
-    mf->MFCreateSample = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateSample");
-    mf->MFCreateMemoryBuffer = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateMemoryBuffer");
-    mf->MFCreateAlignedMemoryBuffer = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateAlignedMemoryBuffer");
-    if (!mf->MFTEnumEx || !mf->MFCreateSample || !mf->MFCreateMemoryBuffer || !mf->MFCreateAlignedMemoryBuffer)
+    mf->fptr_MFTEnumEx = (void*)GetProcAddress(mf->mfplat_dll, "MFTEnumEx");
+    mf->fptr_MFCreateSample = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateSample");
+    mf->fptr_MFCreateMemoryBuffer = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateMemoryBuffer");
+    mf->fptr_MFCreateAlignedMemoryBuffer = (void*)GetProcAddress(mf->mfplat_dll, "MFCreateAlignedMemoryBuffer");
+    if (!mf->fptr_MFTEnumEx || !mf->fptr_MFCreateSample || !mf->fptr_MFCreateMemoryBuffer || !mf->fptr_MFCreateAlignedMemoryBuffer)
         return VLC_EGENERIC;
+#else
+    mf->fptr_MFTEnumEx = &MFTEnumEx;
+    mf->fptr_MFCreateSample = &MFCreateSample;
+    mf->fptr_MFCreateMemoryBuffer = &MFCreateMemoryBuffer;
+    mf->fptr_MFCreateAlignedMemoryBuffer = &MFCreateAlignedMemoryBuffer;
+#endif
 
     return VLC_SUCCESS;
 }

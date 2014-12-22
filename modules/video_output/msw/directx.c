@@ -210,7 +210,8 @@ static int Open(vlc_object_t *object)
     var_AddCallback(vd, "video-wallpaper", WallpaperCallback, NULL);
 
     /* Setup vout_display now that everything is fine */
-    vd->fmt     = fmt;
+    video_format_Clean(&vd->fmt);
+    video_format_Copy(&vd->fmt, &fmt);
     vd->info    = info;
 
     vd->pool    = Pool;
@@ -850,8 +851,8 @@ static int DirectXCreateSurface(vout_display_t *vd,
     ddsd.dwSize   = sizeof(ddsd);
     ddsd.ddpfPixelFormat.dwSize = sizeof(ddsd.ddpfPixelFormat);
     ddsd.dwFlags  = DDSD_HEIGHT | DDSD_WIDTH;
-    ddsd.dwWidth  = fmt->i_visible_width;
-    ddsd.dwHeight = fmt->i_visible_height;
+    ddsd.dwWidth  = fmt->i_width;
+    ddsd.dwHeight = fmt->i_height;
     if (fourcc) {
         ddsd.dwFlags |= DDSD_PIXELFORMAT;
         ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
@@ -1272,7 +1273,7 @@ static void DirectXDestroyPool(vout_display_t *vd)
 
     if (sys->pool) {
         DirectXDestroyPictureResource(vd);
-        picture_pool_Delete(sys->pool);
+        picture_pool_Release(sys->pool);
     }
     sys->pool = NULL;
 }

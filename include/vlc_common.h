@@ -202,20 +202,6 @@ typedef struct date_t date_t;
 
 /* Playlist */
 
-/* FIXME */
-/**
- * Playlist commands
- */
-typedef enum {
-    PLAYLIST_PLAY,      /**< No arg.                            res=can fail*/
-    PLAYLIST_VIEWPLAY,  /**< arg1= playlist_item_t*,*/
-                        /**  arg2 = playlist_item_t*          , res=can fail */
-    PLAYLIST_PAUSE,     /**< No arg                             res=can fail*/
-    PLAYLIST_STOP,      /**< No arg                             res=can fail*/
-    PLAYLIST_SKIP,      /**< arg1=int,                          res=can fail*/
-} playlist_command_t;
-
-
 typedef struct playlist_t playlist_t;
 typedef struct playlist_item_t playlist_item_t;
 typedef struct services_discovery_t services_discovery_t;
@@ -362,10 +348,9 @@ typedef union
  */
 struct vlc_list_t
 {
-    int             i_count;
-    vlc_value_t *   p_values;
-    int *           pi_types;
-
+    int          i_type;
+    int          i_count;
+    vlc_value_t *p_values;
 };
 
 /*****************************************************************************
@@ -382,13 +367,28 @@ struct vlc_list_t
 #define VLC_ENOITEM        (-8) /**< Item not found */
 
 /*****************************************************************************
- * Variable callbacks
+ * Variable callbacks: called when the value is modified
  *****************************************************************************/
 typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
                                    char const *,            /* variable name */
                                    vlc_value_t,                 /* old value */
                                    vlc_value_t,                 /* new value */
                                    void * );                /* callback data */
+
+/*****************************************************************************
+ * List callbacks: called when elements are added/removed from the list
+ *****************************************************************************/
+typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's object */
+                                        char const *,            /* variable name */
+                                        int,                  /* VLC_VAR_* action */
+                                        vlc_value_t *,      /* new/deleted value  */
+                                        void *);                 /* callback data */
+
+typedef enum
+{
+    vlc_value_callback,
+    vlc_list_callback
+} vlc_callback_type_t;
 
 /*****************************************************************************
  * OS-specific headers and thread types

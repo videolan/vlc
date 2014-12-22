@@ -30,7 +30,8 @@
 
 using namespace dash::mpd;
 
-SegmentList::SegmentList    ()
+SegmentList::SegmentList    ( ICanonicalUrl *parent ):
+    SegmentInfo( parent )
 {
 
 }

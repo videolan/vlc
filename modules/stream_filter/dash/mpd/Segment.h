@@ -29,6 +29,7 @@
 #include <sstream>
 #include <vector>
 #include "mpd/BaseUrl.h"
+#include "mpd/ICanonicalUrl.hpp"
 #include "http/Chunk.h"
 
 namespace dash
@@ -36,13 +37,14 @@ namespace dash
     namespace mpd
     {
         class Representation;
-        class Segment
+        class SubSegment;
+        class SegmentInformation;
+
+        class ISegment : public ICanonicalUrl
         {
             public:
-                Segment( const Representation *parent );
-                virtual ~Segment(){}
-                virtual std::string getSourceUrl() const;
-                virtual void        setSourceUrl( const std::string &url );
+                ISegment(const ICanonicalUrl *parent);
+                virtual ~ISegment(){}
                 /**
                  *  @return true if the segment should be dropped after being read.
                  *          That is basically true when using an Url, and false
@@ -50,22 +52,98 @@ namespace dash
                  */
                 virtual bool                            isSingleShot    () const;
                 virtual void                            done            ();
-                virtual void                            addBaseUrl      (BaseUrl *url);
-                virtual const std::vector<BaseUrl *>&   getBaseUrls     () const;
-                virtual void                            setByteRange    (int start, int end);
-                virtual int                             getStartByte    () const;
-                virtual int                             getEndByte      () const;
-                virtual dash::http::Chunk*              toChunk         ();
-                const Representation*                   getParentRepresentation() const;
-                virtual int                             getSize() const;
+                virtual dash::http::Chunk*              toChunk         (size_t, Representation * = NULL);
+                virtual void                            setByteRange    (size_t start, size_t end);
+                virtual void                            setStartTime    (mtime_t ztime);
+                virtual mtime_t                         getStartTime    () const;
+                virtual mtime_t                         getDuration     () const;
+                virtual void                            setDuration     (mtime_t);
+                virtual size_t                          getOffset       () const;
+                virtual std::vector<ISegment*>          subSegments     () = 0;
+                virtual std::string                     toString        (int = 0) const;
+                virtual bool                            contains        (size_t byte) const;
+                int                                     getClassId      () const;
+
+                static const int CLASSID_ISEGMENT = 0;
 
             protected:
-                std::string             sourceUrl;
-                std::vector<BaseUrl *>  baseUrls;
-                int                     startByte;
-                int                     endByte;
-                const Representation*   parentRepresentation;
-                int                     size;
+                size_t                  startByte;
+                size_t                  endByte;
+                mtime_t                 startTime;
+                std::string             debugName;
+                int                     classId;
+                mtime_t                 duration;
+
+                class SegmentChunk : public dash::http::Chunk
+                {
+                    public:
+                        SegmentChunk(ISegment *segment, const std::string &url);
+                        virtual void onDownload(void *, size_t);
+
+                    protected:
+                        ISegment *segment;
+                };
+
+                virtual dash::http::Chunk * getChunk(const std::string &);
+        };
+
+        class Segment : public ISegment
+        {
+            public:
+                Segment( ICanonicalUrl *parent );
+                ~Segment();
+                virtual void setSourceUrl( const std::string &url );
+                virtual Url getUrlSegment() const; /* impl */
+                virtual dash::http::Chunk* toChunk(size_t, Representation * = NULL);
+                virtual std::vector<ISegment*> subSegments();
+                virtual std::string toString(int = 0) const;
+                virtual void addSubSegment(SubSegment *);
+                static const int CLASSID_SEGMENT = 1;
+
+            protected:
+                std::vector<SubSegment *> subsegments;
+                std::string sourceUrl;
+                int size;
+        };
+
+        class InitSegment : public Segment
+        {
+            public:
+                InitSegment( ICanonicalUrl *parent );
+                static const int CLASSID_INITSEGMENT = 2;
+        };
+
+        class IndexSegment : public Segment
+        {
+            public:
+                IndexSegment( ICanonicalUrl *parent );
+                virtual dash::http::Chunk* toChunk(size_t, Representation * = NULL);
+                static const int CLASSID_INDEXSEGMENT = 3;
+
+            protected:
+                class IndexSegmentChunk : public SegmentChunk
+                {
+                    public:
+                        IndexSegmentChunk(ISegment *segment, const std::string &);
+                        void setIndexRepresentation(Representation *);
+                        virtual void onDownload(void *, size_t);
+
+                    private:
+                        Representation *rep;
+                };
+
+                virtual dash::http::Chunk * getChunk(const std::string &);
+        };
+
+        class SubSegment : public ISegment
+        {
+            public:
+                SubSegment(Segment *, size_t start, size_t end);
+                virtual Url getUrlSegment() const; /* impl */
+                virtual std::vector<ISegment*> subSegments();
+                static const int CLASSID_SUBSEGMENT = 4;
+            private:
+                Segment *parent;
         };
     }
 }

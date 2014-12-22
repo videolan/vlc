@@ -52,11 +52,6 @@
 {
     IBOutlet VLCPlaylistView* o_outline_view;
 
-    IBOutlet id o_tc_name_other;
-    IBOutlet id o_tc_author_other;
-    IBOutlet id o_tc_duration_other;
-    IBOutlet VLCPlaylistView* o_outline_view_other;
-
     NSMutableDictionary *o_outline_dict;
 }
 
@@ -106,6 +101,8 @@
     IBOutlet id o_save_accessory_text;
 
     IBOutlet id o_playlist_header;
+
+    int currentResumeTimeout;
 }
 
 - (void)searchfieldChanged:(NSNotification *)o_notification;

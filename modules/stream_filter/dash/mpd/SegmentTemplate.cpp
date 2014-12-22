@@ -30,60 +30,34 @@
 #include "AdaptationSet.h"
 #include "SegmentInfoDefault.h"
 
-#include <cassert>
-#include <cstring>
-#include <iostream>
-#include <sstream>
-
 using namespace dash::mpd;
 
-SegmentTemplate::SegmentTemplate( bool containRuntimeIdentifier,
-                                  Representation* representation ) :
-    Segment( representation ),
-    containRuntimeIdentifier( containRuntimeIdentifier ),
-    beginTime( std::string::npos ),
-    beginIndex( std::string::npos ),
-    currentSegmentIndex( 0 )
+SegmentTemplate::SegmentTemplate( ICanonicalUrl *parent ) :
+    Segment( parent ),
+    startIndex( 0 )
 {
+    debugName = "SegmentTemplate";
+    classId = Segment::CLASSID_SEGMENT;
 }
 
-std::string     SegmentTemplate::getSourceUrl() const
+Url SegmentTemplate::getUrlSegment() const
 {
-    std::string     res = this->sourceUrl;
-
-    if ( this->containRuntimeIdentifier == false )
-        return Segment::getSourceUrl();
-
-    if ( this->beginIndex != std::string::npos )
-        std::cerr << "Unhandled identifier \"$Index$\"" << std::endl;
-    if ( this->beginTime != std::string::npos )
+    Url ret = getParentUrlSegment();
+    if (!sourceUrl.empty())
     {
-        //FIXME: This should use the current representation SegmentInfo
-        //which "inherits" the SegmentInfoDefault values.
-        if ( this->parentRepresentation->getParentGroup()->getSegmentInfoDefault() != NULL &&
-             this->parentRepresentation->getParentGroup()->getSegmentInfoDefault()->getSegmentTimeline() != NULL )
-        {
-            const SegmentTimeline::Element  *el = this->parentRepresentation->getParentGroup()->
-                    getSegmentInfoDefault()->getSegmentTimeline()->getElement( this->currentSegmentIndex );
-            if ( el != NULL )
-            {
-                std::ostringstream  oss;
-                oss << el->t;
-                res.replace( this->beginTime, strlen("$Time$"), oss.str() );
-            }
-        }
+        ret.append(Url::Component(sourceUrl, this));
     }
-    return res;
+    return ret;
 }
 
-void    SegmentTemplate::setSourceUrl( const std::string &url )
+size_t SegmentTemplate::getStartIndex() const
 {
-    if ( this->containRuntimeIdentifier == true )
-    {
-        this->beginTime = url.find( "$Time$" );
-        this->beginIndex = url.find( "$Index$" );
-    }
-    Segment::setSourceUrl( url );
+    return startIndex;
+}
+
+void SegmentTemplate::setStartIndex(size_t i)
+{
+    startIndex = i;
 }
 
 bool            SegmentTemplate::isSingleShot() const
@@ -91,8 +65,9 @@ bool            SegmentTemplate::isSingleShot() const
     return false;
 }
 
-void SegmentTemplate::done()
+InitSegmentTemplate::InitSegmentTemplate( ICanonicalUrl *parent ) :
+    SegmentTemplate(parent)
 {
-    this->currentSegmentIndex++;
+    debugName = "InitSegmentTemplate";
+    classId = InitSegment::CLASSID_INITSEGMENT;
 }
-

@@ -564,11 +564,11 @@ module_config_t *config_FindConfig (vlc_object_t *p_this, const char *name)
  * \param config start of array of items
  * \param confsize number of items in the array
  */
-void config_Free (module_config_t *config, size_t confsize)
+void config_Free (module_config_t *tab, size_t confsize)
 {
     for (size_t j = 0; j < confsize; j++)
     {
-        module_config_t *p_item = config + j;
+        module_config_t *p_item = &tab[j];
 
         free( p_item->psz_type );
         free( p_item->psz_name );
@@ -598,7 +598,7 @@ void config_Free (module_config_t *config, size_t confsize)
         free (p_item->list_text);
     }
 
-    free (config);
+    free (tab);
 }
 
 #undef config_ResetAll

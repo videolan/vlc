@@ -32,12 +32,6 @@
 #include "zip.h"
 #include <stddef.h>
 
-/* FIXME remove */
-#include <vlc_input.h>
-
-#define FILENAME_TEXT N_( "Media in Zip" )
-#define FILENAME_LONGTEXT N_( "Path to the media in the Zip archive" )
-
 /** **************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -46,7 +40,7 @@ vlc_module_begin()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
     set_description( N_( "Zip files filter" ) )
-    set_capability( "stream_filter", 1 )
+    set_capability( "stream_filter", 15 )
     set_callbacks( StreamOpen, StreamClose )
     add_submodule()
         set_subcategory( SUBCAT_INPUT_ACCESS )
@@ -716,7 +710,7 @@ static node* findOrCreateParentNode( node *root, const char *fullpath )
 
     while( current )
     {
-        if( !strcmp( current->name, folder ) )
+        if( current->name && !strcmp( current->name, folder ) )
         {
             /* We found the folder, go recursively deeper */
             node *parentNode = findOrCreateParentNode( current, sep );

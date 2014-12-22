@@ -153,7 +153,7 @@ static void PoolFree(vout_display_t *vd, picture_pool_t *pool)
 
     if (sys->current != NULL)
         picture_Release(sys->current);
-    picture_pool_Delete(pool);
+    picture_pool_Release(pool);
 }
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
@@ -315,7 +315,11 @@ static void Wait(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
     }
 
     sys->current = pic;
-    (void) subpicture;
+
+    /* We already dealt with the subpicture in the Queue phase, so it's safe to
+       delete at this point */
+    if (subpicture)
+        subpicture_Delete(subpicture);
 }
 
 static int Control(vout_display_t *vd, int query, va_list ap)
@@ -358,28 +362,11 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                              values);
         break;
     }
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-    {
-        const vout_display_cfg_t *c = va_arg(ap, const vout_display_cfg_t *);
-        return vout_window_SetFullScreen(sys->embed, c->is_fullscreen);
-    }
-    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-    {
-        unsigned state = va_arg(ap, unsigned);
-        return vout_window_SetState(sys->embed, state);
-    }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
         const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
-        bool forced = va_arg(ap, int);
-        if (forced)
-        {
-            vout_window_SetSize(sys->embed,
-                                cfg->display.width, cfg->display.height);
-            return VLC_EGENERIC; /* Always fail. See x11.c for rationale. */
-        }
-
         vout_display_place_t place;
+
         vout_display_PlacePicture(&place, &vd->source, cfg, false);
         if (place.width  != vd->fmt.i_visible_width
          || place.height != vd->fmt.i_visible_height)
@@ -444,8 +431,7 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     const xcb_screen_t *screen;
-    uint16_t width, height;
-    sys->embed = XCB_parent_Create(vd, &sys->conn, &screen, &width, &height);
+    sys->embed = XCB_parent_Create(vd, &sys->conn, &screen);
     if (sys->embed == NULL)
     {
         free(sys);
@@ -477,7 +463,8 @@ static int Open(vlc_object_t *obj)
     video_format_ApplyRotation(&fmt, &vd->fmt);
 
     if (fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
-     || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422)
+     || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
+     || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_444)
         ;
     else
     if (vlc_fourcc_to_vdp_ycc(fmt.i_chroma, &chroma, &format))
@@ -661,9 +648,6 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    VdpColor black = { 0.f, 0.f, 0.f, 1.f };
-    vdp_presentation_queue_set_background_color(sys->vdp, sys->queue, &black);
-
     sys->cursor = XCB_cursor_Create(sys->conn, screen);
     sys->pool = NULL;
 
@@ -679,13 +663,6 @@ static int Open(vlc_object_t *obj)
     vd->display = Wait;
     vd->control = Control;
     vd->manage = Manage;
-
-    /* */
-    bool is_fullscreen = vd->cfg->is_fullscreen;
-    if (is_fullscreen && vout_window_SetFullScreen(sys->embed, true))
-        is_fullscreen = false;
-    vout_display_SendEventFullscreen(vd, is_fullscreen);
-    vout_display_SendEventDisplaySize(vd, width, height, is_fullscreen);
 
     return VLC_SUCCESS;
 

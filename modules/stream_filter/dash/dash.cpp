@@ -35,16 +35,13 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_demux.h>
 
 #include <errno.h>
 
-#include "DASHManager.h"
+#include "dash.hpp"
 #include "xml/DOMParser.h"
-#include "http/HTTPConnectionManager.h"
-#include "adaptationlogic/IAdaptationLogic.h"
 #include "mpd/MPDFactory.h"
-
-#define SEEK 0
 
 /*****************************************************************************
  * Module descriptor
@@ -58,84 +55,92 @@ static void Close   (vlc_object_t *);
 #define DASH_HEIGHT_TEXT N_("Preferred Height")
 #define DASH_HEIGHT_LONGTEXT N_("Preferred Height")
 
-#define DASH_BUFFER_TEXT N_("Buffer Size (Seconds)")
-#define DASH_BUFFER_LONGTEXT N_("Buffer size in seconds")
+#define DASH_BW_TEXT N_("Fixed Bandwidth in KiB/s")
+#define DASH_BW_LONGTEXT N_("Preferred bandwidth for non adaptative streams")
+
+#define DASH_LOGIC_TEXT N_("Adaptation Logic")
+
+static const int pi_logics[] = {dash::logic::IAdaptationLogic::RateBased,
+                                dash::logic::IAdaptationLogic::FixedRate,
+                                dash::logic::IAdaptationLogic::AlwaysLowest,
+                                dash::logic::IAdaptationLogic::AlwaysBest};
+
+static const char *const ppsz_logics[] = { N_("Bandwidth Adaptive"),
+                                           N_("Fixed Bandwidth"),
+                                           N_("Lowest Bandwidth/Quality"),
+                                           N_("Highest Bandwith/Quality")};
 
 vlc_module_begin ()
         set_shortname( N_("DASH"))
         set_description( N_("Dynamic Adaptive Streaming over HTTP") )
-        set_capability( "stream_filter", 19 )
+        set_capability( "demux", 10 )
         set_category( CAT_INPUT )
-        set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
+        set_subcategory( SUBCAT_INPUT_DEMUX )
+        add_integer( "dash-logic",      dash::logic::IAdaptationLogic::Default,
+                                             DASH_LOGIC_TEXT, NULL, false )
+            change_integer_list( pi_logics, ppsz_logics )
         add_integer( "dash-prefwidth",  480, DASH_WIDTH_TEXT,  DASH_WIDTH_LONGTEXT,  true )
         add_integer( "dash-prefheight", 360, DASH_HEIGHT_TEXT, DASH_HEIGHT_LONGTEXT, true )
-        add_integer( "dash-buffersize", 30, DASH_BUFFER_TEXT, DASH_BUFFER_LONGTEXT, true )
+        add_integer( "dash-prefbw",     250, DASH_BW_TEXT,     DASH_BW_LONGTEXT,     false )
         set_callbacks( Open, Close )
 vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct stream_sys_t
-{
-        dash::DASHManager   *p_dashManager;
-        dash::mpd::MPD      *p_mpd;
-        uint64_t                            position;
-        bool                                isLive;
-};
 
-static int  Read            (stream_t *p_stream, void *p_ptr, unsigned int i_len);
-static int  Peek            (stream_t *p_stream, const uint8_t **pp_peek, unsigned int i_peek);
-static int  Control         (stream_t *p_stream, int i_query, va_list args);
+static int  Demux( demux_t * );
+static int  Control         (demux_t *p_demux, int i_query, va_list args);
 
 /*****************************************************************************
  * Open:
  *****************************************************************************/
 static int Open(vlc_object_t *p_obj)
 {
-    stream_t *p_stream = (stream_t*) p_obj;
+    demux_t *p_demux = (demux_t*) p_obj;
 
-    if(!dash::xml::DOMParser::isDash(p_stream->p_source))
+    if(!dash::xml::DOMParser::isDash(p_demux->s))
         return VLC_EGENERIC;
 
     //Build a XML tree
-    dash::xml::DOMParser        parser(p_stream->p_source);
+    dash::xml::DOMParser        parser(p_demux->s);
     if( !parser.parse() )
     {
-        msg_Dbg( p_stream, "Could not parse mpd file." );
+        msg_Err( p_demux, "Could not parse MPD" );
         return VLC_EGENERIC;
     }
 
     //Begin the actual MPD parsing:
-    dash::mpd::MPD *mpd = dash::mpd::MPDFactory::create(parser.getRootNode(), p_stream->p_source, parser.getProfile());
-
+    dash::mpd::MPD *mpd = dash::mpd::MPDFactory::create(parser.getRootNode(), p_demux->s, parser.getProfile());
     if(mpd == NULL)
+    {
+        msg_Err( p_demux, "Cannot create/unknown MPD for profile");
         return VLC_EGENERIC;
+    }
 
-    stream_sys_t        *p_sys = (stream_sys_t *) malloc(sizeof(stream_sys_t));
+    demux_sys_t        *p_sys = (demux_sys_t *) malloc(sizeof(demux_sys_t));
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
     p_sys->p_mpd = mpd;
+    int logic = var_InheritInteger( p_obj, "dash-logic" );
     dash::DASHManager*p_dashManager = new dash::DASHManager(p_sys->p_mpd,
-                                          dash::logic::IAdaptationLogic::RateBased,
-                                          p_stream);
+            static_cast<dash::logic::IAdaptationLogic::LogicType>(logic),
+            p_demux->s);
 
-    if(!p_dashManager->start())
+    dash::mpd::Period *period = mpd->getFirstPeriod();
+    if(period && !p_dashManager->start(p_demux))
     {
         delete p_dashManager;
         free( p_sys );
         return VLC_EGENERIC;
     }
     p_sys->p_dashManager    = p_dashManager;
-    p_sys->position         = 0;
-    p_sys->isLive           = p_dashManager->getMpdManager()->getMPD()->isLive();
-    p_stream->p_sys         = p_sys;
-    p_stream->pf_read       = Read;
-    p_stream->pf_peek       = Peek;
-    p_stream->pf_control    = Control;
+    p_demux->p_sys         = p_sys;
+    p_demux->pf_demux      = Demux;
+    p_demux->pf_control    = Control;
 
-    msg_Dbg(p_obj,"opening mpd file (%s)", p_stream->psz_path);
+    msg_Dbg(p_obj,"opening mpd file (%s)", p_demux->s->psz_path);
 
     return VLC_SUCCESS;
 }
@@ -144,151 +149,73 @@ static int Open(vlc_object_t *p_obj)
  *****************************************************************************/
 static void Close(vlc_object_t *p_obj)
 {
-    stream_t                            *p_stream       = (stream_t*) p_obj;
-    stream_sys_t                        *p_sys          = (stream_sys_t *) p_stream->p_sys;
+    demux_t                            *p_demux       = (demux_t*) p_obj;
+    demux_sys_t                        *p_sys          = (demux_sys_t *) p_demux->p_sys;
     dash::DASHManager                   *p_dashManager  = p_sys->p_dashManager;
 
-    delete(p_dashManager);
+    delete p_dashManager;
     free(p_sys);
 }
 /*****************************************************************************
  * Callbacks:
  *****************************************************************************/
-static int  Seek            ( stream_t *p_stream, uint64_t pos )
+static int Demux(demux_t *p_demux)
 {
-    stream_sys_t        *p_sys          = (stream_sys_t *) p_stream->p_sys;
-    dash::DASHManager   *p_dashManager  = p_sys->p_dashManager;
-    int                 i_ret           = 0;
-    unsigned            i_len           = 0;
-    long                i_read          = 0;
-
-    if( pos < p_sys->position )
+    demux_sys_t *p_sys = p_demux->p_sys;
+    if ( p_sys->p_dashManager->read() > 0 )
     {
-        if( p_sys->position - pos > UINT_MAX )
+        if ( p_sys->p_dashManager->esCount() )
         {
-            msg_Err( p_stream, "Cannot seek backward that far!" );
-            return VLC_EGENERIC;
+            mtime_t pcr = p_sys->p_dashManager->getPCR();
+            int group = p_sys->p_dashManager->getGroup();
+            if(group > 0)
+                es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, pcr);
+            else
+                es_out_Control(p_demux->out, ES_OUT_SET_PCR, pcr);
         }
-        i_len = p_sys->position - pos;
-        i_ret = p_dashManager->seekBackwards( i_len );
-        if( i_ret == VLC_EGENERIC )
-        {
-            msg_Err( p_stream, "Cannot seek backward outside the current block :-/" );
-            return VLC_EGENERIC;
-        }
-        else
-            return VLC_SUCCESS;
+        return VLC_DEMUXER_SUCCESS;
     }
-
-    /* Seek forward */
-    if( pos - p_sys->position > UINT_MAX )
-    {
-        msg_Err( p_stream, "Cannot seek forward that far!" );
-        return VLC_EGENERIC;
-    }
-    i_len = pos - p_sys->position;
-    i_read = Read( p_stream, (void *)NULL, i_len );
-    if( (unsigned)i_read == i_len )
-        return VLC_SUCCESS;
     else
-        return VLC_EGENERIC;
+        return VLC_DEMUXER_EOF;
 }
 
-static int  Read            (stream_t *p_stream, void *p_ptr, unsigned int i_len)
+static int  Control         (demux_t *p_demux, int i_query, va_list args)
 {
-    stream_sys_t        *p_sys          = (stream_sys_t *) p_stream->p_sys;
-    dash::DASHManager   *p_dashManager  = p_sys->p_dashManager;
-    uint8_t             *p_buffer       = (uint8_t*)p_ptr;
-    int                 i_ret           = 0;
-    int                 i_read          = 0;
-
-    while( i_len > 0 )
-    {
-        i_read = p_dashManager->read( p_buffer, i_len );
-        if( i_read < 0 )
-            break;
-        p_buffer += i_read;
-        i_ret += i_read;
-        i_len -= i_read;
-    }
-    p_buffer -= i_ret;
-
-    if (i_read < 0)
-    {
-        switch (errno)
-        {
-            case EINTR:
-            case EAGAIN:
-                break;
-            default:
-                msg_Dbg(p_stream, "DASH Read: failed to read (%s)",
-                        vlc_strerror_c(errno));
-                return 0;
-        }
-        return 0;
-    }
-
-    p_sys->position += i_ret;
-
-    return i_ret;
-}
-
-static int  Peek            (stream_t *p_stream, const uint8_t **pp_peek, unsigned int i_peek)
-{
-    stream_sys_t        *p_sys          = (stream_sys_t *) p_stream->p_sys;
-    dash::DASHManager   *p_dashManager  = p_sys->p_dashManager;
-
-    return p_dashManager->peek( pp_peek, i_peek );
-}
-
-static int  Control         (stream_t *p_stream, int i_query, va_list args)
-{
-    stream_sys_t *p_sys = p_stream->p_sys;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     switch (i_query)
     {
-        case STREAM_CAN_SEEK:
-        case STREAM_CAN_FASTSEEK:
-            /*TODO Support Seek */
-            *(va_arg (args, bool *)) = SEEK;
-            break;
-        case STREAM_CAN_PAUSE:
-        case STREAM_CAN_CONTROL_PACE:
-            *(va_arg (args, bool *)) = false; /* TODO */
+        case DEMUX_CAN_SEEK:
+            *(va_arg (args, bool *)) = false;
             break;
 
-        case STREAM_GET_POSITION:
-            *(va_arg (args, uint64_t *)) = p_sys->position;
+        case DEMUX_CAN_CONTROL_PACE:
+            *(va_arg (args, bool *)) = true;
             break;
-        case STREAM_SET_POSITION:
-        {
-            uint64_t pos = (uint64_t)va_arg(args, uint64_t);
-            if(Seek(p_stream, pos) == VLC_SUCCESS)
-            {
-                p_sys->position = pos;
-                break;
-            }
-            else
+
+        case DEMUX_CAN_PAUSE:
+            *(va_arg (args, bool *)) = p_sys->p_mpd->isLive();
+            break;
+
+        case DEMUX_GET_TIME:
+            *(va_arg (args, int64_t *)) = p_sys->p_dashManager->getPCR();
+            break;
+
+        case DEMUX_GET_LENGTH:
+            *(va_arg (args, int64_t *)) = p_sys->p_dashManager->getDuration();
+            break;
+
+        case DEMUX_GET_POSITION:
+            if(!p_sys->p_dashManager->getDuration())
                 return VLC_EGENERIC;
-        }
-        case STREAM_GET_SIZE:
-        {
-            uint64_t*   res = (va_arg (args, uint64_t *));
-            if(p_sys->isLive)
-                *res = 0;
-            else
-            {
-                const dash::mpd::Representation *rep = p_sys->p_dashManager->getAdaptionLogic()->getCurrentRepresentation();
-                if ( rep == NULL )
-                    *res = 0;
-                else
-                    *res = p_sys->p_mpd->getDuration() * rep->getBandwidth() / 8;
-            }
+
+            *(va_arg (args, double *)) = (double) p_sys->p_dashManager->getPCR()
+                                         / p_sys->p_dashManager->getDuration();
             break;
-        }
-        case STREAM_GET_PTS_DELAY:
+
+        case DEMUX_GET_PTS_DELAY:
             *va_arg (args, int64_t *) = INT64_C(1000) *
-                var_InheritInteger(p_stream, "network-caching");
+                var_InheritInteger(p_demux, "network-caching");
              break;
 
         default:

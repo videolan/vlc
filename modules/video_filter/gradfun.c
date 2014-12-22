@@ -49,7 +49,7 @@ static void Close(vlc_object_t *);
 #define RADIUS_TEXT N_("Radius")
 #define RADIUS_LONGTEXT N_("Radius in pixels")
 
-#define STRENGTH_MIN (0.51)
+#define STRENGTH_MIN (0.51f)
 #define STRENGTH_MAX (255)
 #define STRENGTH_TEXT N_("Strength")
 #define STRENGTH_LONGTEXT N_("Strength used to modify the value of a pixel")

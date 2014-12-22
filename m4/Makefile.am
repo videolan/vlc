@@ -2,6 +2,7 @@ NULL =
 
 EXTRA_DIST = \
 	codeset.m4 \
+	extern-inline.m4 \
 	flags.m4 \
 	gettext.m4 \
 	glibc21.m4 \

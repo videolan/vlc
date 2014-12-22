@@ -173,7 +173,7 @@ static bool b_old_spaces_style = YES;
     /* init our fake object attribute */
     blackoutWindows = [[NSMutableArray alloc] initWithCapacity:1];
 
-    if (OSX_MAVERICKS) {
+    if (OSX_MAVERICKS || OSX_YOSEMITE) {
         NSUserDefaults *userDefaults = [[NSUserDefaults alloc] init];
         [userDefaults addSuiteNamed:@"com.apple.spaces"];
         /* this is system settings -> mission control -> monitors using different spaces */
@@ -533,10 +533,10 @@ void _drawFrameInRect(NSRect frameRect)
 - (void)awakeFromNib
 {
     if (config_GetInt( VLCIntf, "macosx-interfacestyle" )) {
-        o_knob_img = [NSImage imageNamed:@"progression-knob_dark"];
+        o_knob_img = imageFromRes(@"progression-knob_dark");
         b_dark = YES;
     } else {
-        o_knob_img = [NSImage imageNamed:@"progression-knob"];
+        o_knob_img = imageFromRes(@"progression-knob");
         b_dark = NO;
     }
     img_rect.size = [o_knob_img size];
@@ -686,9 +686,9 @@ void _drawFrameInRect(NSRect frameRect)
 {
     BOOL b_dark = config_GetInt( VLCIntf, "macosx-interfacestyle" );
     if (b_dark)
-        img = [NSImage imageNamed:@"volume-slider-knob_dark"];
+        img = imageFromRes(@"volume-slider-knob_dark");
     else
-        img = [NSImage imageNamed:@"volume-slider-knob"];
+        img = imageFromRes(@"volume-slider-knob");
 
     image_rect.size = [img size];
     image_rect.origin.x = 0;

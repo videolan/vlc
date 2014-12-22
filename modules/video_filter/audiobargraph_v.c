@@ -162,7 +162,7 @@ static float iec_scale(float dB)
         return (dB + 70.0f) * 0.0025f;
     if (dB < -50.0f)
         return (dB + 60.0f) * 0.005f + 0.025f;
-    if (dB < -40.0)
+    if (dB < -40.0f)
         return (dB + 50.0f) * 0.0075f + 0.075f;
     if (dB < -30.0f)
         return (dB + 40.0f) * 0.015f + 0.15f;
@@ -400,7 +400,7 @@ static subpicture_t *FilterSub(filter_t *p_filter, mtime_t date)
     p_region = subpicture_region_New(&fmt);
     if (!p_region) {
         msg_Err(p_filter, "cannot allocate SPU region");
-        p_filter->pf_sub_buffer_del(p_filter, p_spu);
+        subpicture_Delete(p_spu);
         p_spu = NULL;
         goto exit;
     }

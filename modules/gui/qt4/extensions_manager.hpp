@@ -78,7 +78,7 @@ public slots:
 
 private slots:
     void triggerMenu( int id );
-    void inputChanged( input_thread_t *p_input );
+    void inputChanged( );
     void playingChanged( int );
     void metaChanged( input_item_t *p_input );
 

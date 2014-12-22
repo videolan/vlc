@@ -68,7 +68,9 @@ static const vlc_meta_type_t libvlc_to_vlc_meta[] =
     [libvlc_meta_Season]       = vlc_meta_Season,
     [libvlc_meta_Episode]      = vlc_meta_Episode,
     [libvlc_meta_ShowName]     = vlc_meta_ShowName,
-    [libvlc_meta_Actors]       = vlc_meta_Actors
+    [libvlc_meta_Actors]       = vlc_meta_Actors,
+    [libvlc_meta_AlbumArtist]  = vlc_meta_AlbumArtist,
+    [libvlc_meta_DiscNumber]   = vlc_meta_DiscNumber
 };
 
 static const libvlc_meta_t vlc_to_libvlc_meta[] =
@@ -86,6 +88,7 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
     [vlc_meta_URL]          = libvlc_meta_URL,
     [vlc_meta_Language]     = libvlc_meta_Language,
     [vlc_meta_NowPlaying]   = libvlc_meta_NowPlaying,
+    [vlc_meta_ESNowPlaying] = libvlc_meta_NowPlaying,
     [vlc_meta_Publisher]    = libvlc_meta_Publisher,
     [vlc_meta_EncodedBy]    = libvlc_meta_EncodedBy,
     [vlc_meta_ArtworkURL]   = libvlc_meta_ArtworkURL,
@@ -95,7 +98,9 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
     [vlc_meta_Season]       = libvlc_meta_Season,
     [vlc_meta_Episode]      = libvlc_meta_Episode,
     [vlc_meta_ShowName]     = libvlc_meta_ShowName,
-    [vlc_meta_Actors]       = libvlc_meta_Actors
+    [vlc_meta_Actors]       = libvlc_meta_Actors,
+    [vlc_meta_AlbumArtist]  = libvlc_meta_AlbumArtist,
+    [vlc_meta_DiscNumber]   = libvlc_meta_DiscNumber
 };
 
 /**************************************************************************
@@ -491,13 +496,21 @@ libvlc_media_get_mrl( libvlc_media_t * p_md )
 
 char *libvlc_media_get_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta )
 {
-    char *psz_meta = input_item_GetMeta( p_md->p_input_item,
-                                         libvlc_to_vlc_meta[e_meta] );
-    /* Should be integrated in core */
-    if( psz_meta == NULL && e_meta == libvlc_meta_Title
-     && p_md->p_input_item->psz_name != NULL )
-        psz_meta = strdup( p_md->p_input_item->psz_name );
+    char *psz_meta = NULL;
 
+    if( e_meta == libvlc_meta_NowPlaying )
+    {
+        psz_meta = input_item_GetNowPlayingFb( p_md->p_input_item );
+    }
+    else
+    {
+        psz_meta = input_item_GetMeta( p_md->p_input_item,
+                                             libvlc_to_vlc_meta[e_meta] );
+        /* Should be integrated in core */
+        if( psz_meta == NULL && e_meta == libvlc_meta_Title
+         && p_md->p_input_item->psz_name != NULL )
+            psz_meta = strdup( p_md->p_input_item->psz_name );
+    }
     return psz_meta;
 }
 

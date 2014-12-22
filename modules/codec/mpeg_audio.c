@@ -47,9 +47,10 @@
  *****************************************************************************/
 struct decoder_sys_t
 {
+#ifdef HAVE_MPGA_FILTER
     /* Module mode */
     bool b_packetizer;
-
+#endif
     /*
      * Input properties
      */
@@ -84,15 +85,16 @@ struct decoder_sys_t
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
+
+#ifdef HAVE_MPGA_FILTER
 static int  OpenDecoder   ( vlc_object_t * );
-static int  OpenPacketizer( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
-static block_t *DecodeBlock  ( decoder_t *, block_t ** );
-
-static uint8_t *GetOutBuffer ( decoder_t *, block_t ** );
 static block_t *GetAoutBuffer( decoder_t * );
+#endif
+static int  Open( vlc_object_t * );
+static block_t *DecodeBlock  ( decoder_t *, block_t ** );
+static uint8_t *GetOutBuffer ( decoder_t *, block_t ** );
 static block_t *GetSoutBuffer( decoder_t * );
-
+static void Close(  vlc_object_t * );
 static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
                      unsigned int * pi_channels_conf,
                      unsigned int * pi_sample_rate, unsigned int * pi_bit_rate,
@@ -104,16 +106,17 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-    set_description( N_("MPEG audio layer I/II/III decoder") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
-    set_capability( "decoder", 100 )
-    set_callbacks( OpenDecoder, CloseDecoder )
-
-    add_submodule ()
     set_description( N_("MPEG audio layer I/II/III packetizer") )
     set_capability( "packetizer", 10 )
-    set_callbacks( OpenPacketizer, CloseDecoder )
+    set_callbacks( Open, Close )
+#ifdef HAVE_MPGA_FILTER
+    add_submodule ()
+    set_description( N_("MPEG audio layer I/II/III decoder") )
+    set_capability( "decoder", 100 )
+    set_callbacks( OpenDecoder, Close )
+#endif
 vlc_module_end ()
 
 /*****************************************************************************
@@ -136,7 +139,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Misc init */
-    p_sys->b_packetizer = false;
+#ifdef HAVE_MPGA_FILTER
+    p_sys->b_packetizer = true;
+#endif
     p_sys->i_state = STATE_NOSYNC;
     date_Set( &p_sys->end_date, 0 );
     block_BytestreamInit( &p_sys->bytestream );
@@ -158,25 +163,23 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+#ifdef HAVE_MPGA_FILTER
 static int OpenDecoder( vlc_object_t *p_this )
 {
+    decoder_t *p_dec = (decoder_t *)p_this;
+
     /* HACK: Don't use this codec if we don't have an mpga audio filter */
-    if( !module_exists( "mpgatofixed32" ) )
+    if( !module_exists( "mad" ) )
         return VLC_EGENERIC;
 
-    return Open( p_this );
-}
-
-static int OpenPacketizer( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t*)p_this;
-
     int i_ret = Open( p_this );
+    if( i_ret != VLC_SUCCESS )
+        return i_ret;
 
-    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = true;
-
-    return i_ret;
+    p_dec->p_sys->b_packetizer = false;
+    return VLC_SUCCESS;
 }
+#endif
 
 /****************************************************************************
  * DecodeBlock: the whole thing
@@ -248,7 +251,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* New frame, set the Presentation Time Stamp */
             p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
             if( p_sys->i_pts > VLC_TS_INVALID &&
-                p_sys->i_pts != date_Get( &p_sys->end_date ) )
+                p_sys->i_pts > date_Get( &p_sys->end_date ) )
             {
                 date_Set( &p_sys->end_date, p_sys->i_pts );
             }
@@ -455,6 +458,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
 
+#ifdef HAVE_MPGA_FILTER
             /* Get beginning of next frame for libmad */
             if( !p_sys->b_packetizer )
             {
@@ -462,7 +466,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 memcpy( p_buf + p_sys->i_frame_size,
                         p_header, MAD_BUFFER_GUARD );
             }
-
+#endif
             p_sys->i_state = STATE_NOSYNC;
 
             /* Make sure we don't reuse the same pts twice */
@@ -512,22 +516,24 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
 
     p_dec->fmt_out.i_bitrate = p_sys->i_bit_rate * 1000;
 
-    if( p_sys->b_packetizer )
-    {
-        block_t *p_sout_buffer = GetSoutBuffer( p_dec );
-        p_buf = p_sout_buffer ? p_sout_buffer->p_buffer : NULL;
-        *pp_out_buffer = p_sout_buffer;
-    }
-    else
+#ifdef HAVE_MPGA_FILTER
+    if( !p_sys->b_packetizer )
     {
         block_t *p_aout_buffer = GetAoutBuffer( p_dec );
         p_buf = p_aout_buffer ? p_aout_buffer->p_buffer : NULL;
         *pp_out_buffer = p_aout_buffer;
     }
-
+    else
+#endif
+    {
+        block_t *p_sout_buffer = GetSoutBuffer( p_dec );
+        p_buf = p_sout_buffer ? p_sout_buffer->p_buffer : NULL;
+        *pp_out_buffer = p_sout_buffer;
+    }
     return p_buf;
 }
 
+#ifdef HAVE_MPGA_FILTER
 /*****************************************************************************
  * GetAoutBuffer:
  *****************************************************************************/
@@ -551,6 +557,7 @@ static block_t *GetAoutBuffer( decoder_t *p_dec )
 
     return p_buf;
 }
+#endif
 
 /*****************************************************************************
  * GetSoutBuffer:
@@ -572,9 +579,9 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
 }
 
 /*****************************************************************************
- * CloseDecoder: clean up the decoder
+ * Close: clean up the decoder
  *****************************************************************************/
-static void CloseDecoder( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;

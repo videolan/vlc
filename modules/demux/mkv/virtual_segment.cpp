@@ -54,7 +54,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     int64_t start = ( b_ordered )? *usertime_offset : p_chap->i_start_time;
     int64_t stop = ( b_ordered )? ( *usertime_offset + p_chap->i_end_time - p_chap->i_start_time ) : p_chap->i_end_time;
 
-    if( p_chap->p_segment_uid && 
+    if( p_chap->p_segment_uid &&
        ( !( p_segment = getSegmentbyUID( (KaxSegmentUID*) p_chap->p_segment_uid,segments ) ) || !b_ordered ) )
     {
         msg_Warn( &p_main_segment->sys.demuxer,
@@ -88,7 +88,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         *usertime_offset = tmp;
 
     msg_Dbg( &p_main_segment->sys.demuxer,
-             "Virtual chapter %s from %"PRId64" to %"PRId64" - " ,
+             "Virtual chapter %s from %" PRId64 " to %" PRId64 " - " ,
              p_chap->psz_name.c_str(), p_vchap->i_virtual_start_time, p_vchap->i_virtual_stop_time );
 
     return p_vchap;
@@ -261,7 +261,7 @@ void virtual_edition_c::retimeChapters()
 virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opened_segments )
 {
     /* Main segment */
-    size_t i;
+    std::vector<chapter_edition_c*>::size_type i;
     matroska_segment_c *p_segment = (*p_opened_segments)[0];
     i_current_edition = 0;
     i_sys_title = 0;
@@ -274,7 +274,7 @@ virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opene
         /* Create a virtual edition from opened */
         virtual_edition_c * p_vedition = new virtual_edition_c( p_segment->stored_editions[i], p_opened_segments );
 
-        /* Ordered empty edition can happen when all chapters are 
+        /* Ordered empty edition can happen when all chapters are
          * on an other segment which couldn't be found... ignore it */
         if(p_vedition->b_ordered && p_vedition->i_duration == 0)
         {
@@ -308,7 +308,7 @@ virtual_segment_c::virtual_segment_c( std::vector<matroska_segment_c*> * p_opene
             i_current_edition = i;
             break;
         }
-    } 
+    }
     /* Set current chapter */
     p_current_chapter = editions[i_current_edition]->getChapterbyTimecode(0);
 
@@ -409,7 +409,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
     /* we have moved to a new chapter */
     if ( p_cur_chapter != NULL && p_current_chapter != p_cur_chapter )
         {
-            msg_Dbg( &demux, "NEW CHAPTER %"PRId64, sys.i_pts );
+            msg_Dbg( &demux, "NEW CHAPTER %" PRId64, sys.i_pts );
             if ( p_cur_edition->b_ordered )
             {
                 /* FIXME EnterAndLeave has probably been broken for a long time */
@@ -462,7 +462,7 @@ bool virtual_chapter_c::EnterAndLeave( virtual_chapter_c *p_item, bool b_enter )
     return p_chapter->EnterAndLeave( p_item->p_chapter, b_enter );
 }
 
-void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset, 
+void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset,
                               virtual_chapter_c *p_chapter, int64_t i_global_position )
 {
     demux_sys_t *p_sys = demuxer.p_sys;
@@ -611,7 +611,7 @@ bool virtual_chapter_c::Leave( bool b_do_subs )
 }
 
 #if MKV_DEBUG
-void virtual_chapter_c::print() 
+void virtual_chapter_c::print()
 {
     msg_Dbg( &p_segment->sys.demuxer, "*** chapter %"PRId64" - %"PRId64" (%u)",
              i_virtual_start_time, i_virtual_stop_time, sub_chapters.size() );
@@ -649,7 +649,7 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segm
         /* Let's only do that for audio and video for now */
         if( p_nfmt->i_cat == AUDIO_ES || p_nfmt->i_cat == VIDEO_ES )
         {
-            
+
             /* check for a similar elementary stream */
             for( j = 0; j < p_old->tracks.size(); j++)
             {
@@ -663,12 +663,12 @@ void virtual_segment_c::ChangeSegment( matroska_segment_c * p_old, matroska_segm
                     ( p_nfmt->i_priority == p_ofmt->i_priority ) &&
                     ( p_nfmt->i_bitrate == p_ofmt->i_bitrate ) &&
                     ( p_nfmt->i_extra == p_ofmt->i_extra ) &&
-                    ( (!p_nfmt->p_extra && !p_ofmt->p_extra) || 
+                    ( p_nfmt->i_extra == 0 ||
                       !memcmp( p_nfmt->p_extra, p_ofmt->p_extra, p_nfmt->i_extra ) ) &&
                     !strcasecmp( p_nfmt->psz_language, p_ofmt->psz_language ) &&
-                    ( ( p_nfmt->i_cat == AUDIO_ES && 
+                    ( ( p_nfmt->i_cat == AUDIO_ES &&
                         !memcmp( &p_nfmt->audio, &p_ofmt->audio, sizeof(audio_format_t) ) ) ||
-                      ( p_nfmt->i_cat == VIDEO_ES && 
+                      ( p_nfmt->i_cat == VIDEO_ES &&
                         !memcmp( &p_nfmt->video, &p_ofmt->video, sizeof(video_format_t) ) ) ) )
                 {
                     /* FIXME handle video palettes... */

@@ -49,7 +49,6 @@ vlc_module_end ()
  * Local prototypes.
  *****************************************************************************/
 static picture_t *Chain         ( filter_t *, picture_t * );
-static int BufferAllocationInit ( filter_t *, void * );
 
 static int BuildTransformChain( filter_t *p_filter );
 static int BuildChromaResize( filter_t * );
@@ -73,6 +72,16 @@ struct filter_sys_t
 {
     filter_chain_t *p_chain;
 };
+
+/*****************************************************************************
+ * Buffer management
+ *****************************************************************************/
+static picture_t *BufferNew( filter_t *p_filter )
+{
+    filter_t *p_parent = p_filter->owner.sys;
+
+    return filter_NewPicture( p_parent );
+}
 
 #define CHAIN_LEVEL_MAX 1
 
@@ -99,7 +108,14 @@ static int Activate( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->p_chain = filter_chain_New( p_filter, "video filter2", false, BufferAllocationInit, NULL, p_filter );
+    filter_owner_t owner = {
+        .sys = p_filter,
+        .video = {
+            .buffer_new = BufferNew,
+        },
+    };
+
+    p_sys->p_chain = filter_chain_NewVideo( p_filter, false, &owner );
     if( !p_sys->p_chain )
     {
         free( p_sys );
@@ -259,29 +275,6 @@ exit:
     free( cfg_level.psz_name );
     free( cfg_level.psz_value );
     return i_ret;
-}
-
-/*****************************************************************************
- * Buffer management
- *****************************************************************************/
-static picture_t *BufferNew( filter_t *p_filter )
-{
-    filter_t *p_parent = (filter_t*)p_filter->p_owner;
-
-    return filter_NewPicture( p_parent );
-}
-static void BufferDel( filter_t *p_filter, picture_t *p_pic )
-{
-    filter_t *p_parent = (filter_t*)p_filter->p_owner;
-
-    filter_DeletePicture( p_parent, p_pic );
-}
-static int BufferAllocationInit ( filter_t *p_filter, void *p_data )
-{
-    p_filter->pf_video_buffer_new = BufferNew;
-    p_filter->pf_video_buffer_del = BufferDel;
-    p_filter->p_owner = p_data;
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

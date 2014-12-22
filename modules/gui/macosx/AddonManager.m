@@ -25,6 +25,7 @@
 
 #import "AddonManager.h"
 #import "intf.h"
+#import "MainWindow.h"
 #import "AddonListDataSource.h"
 
 @interface VLCAddonManager ()
@@ -32,6 +33,7 @@
     addons_manager_t *_manager;
     NSMutableArray *_addons;
     NSArray *_displayedAddons;
+    BOOL _shouldRefreshSideBarOnAddonChange;
 }
 
 - (void)addAddon:(NSValue *)o_value;
@@ -97,6 +99,10 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [[_typeSwitcher lastItem] setTag:ADDON_PLAYLIST_PARSER];
     [_typeSwitcher addItemWithTitle:_NS("Service Discovery")];
     [[_typeSwitcher lastItem] setTag:ADDON_SERVICE_DISCOVERY];
+    [_typeSwitcher addItemWithTitle:_NS("Interfaces")];
+    [[_typeSwitcher lastItem] setTag:ADDON_INTERFACE];
+    [_typeSwitcher addItemWithTitle:_NS("Art and meta fetchers")];
+    [[_typeSwitcher lastItem] setTag:ADDON_META];
     [_typeSwitcher addItemWithTitle:_NS("Extensions")];
     [[_typeSwitcher lastItem] setTag:ADDON_EXTENSION];
 
@@ -161,7 +167,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
         return;
 
     VLCAddon *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
-    [self _installAddonWithID:[currentAddon uuid]];
+    [self _installAddonWithID:[currentAddon uuid] type:[currentAddon type]];
 
     [_installButton setEnabled:NO];
 }
@@ -173,7 +179,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
         return;
 
     VLCAddon *currentAddon = [_displayedAddons objectAtIndex:selectedRow];
-    [self _removeAddonWithID:[currentAddon uuid]];
+    [self _removeAddonWithID:[currentAddon uuid] type:[currentAddon type]];
 
     [_installButton setEnabled:NO];
 }
@@ -248,6 +254,10 @@ static VLCAddonManager *_o_sharedInstance = nil;
 - (void)addonChanged:(NSValue *)o_value
 {
     [self _refactorDataModel];
+    if (_shouldRefreshSideBarOnAddonChange) {
+        [[VLCMainWindow sharedInstance] performSelector:@selector(reloadSidebar) withObject:nil afterDelay:0.5];
+        _shouldRefreshSideBarOnAddonChange = NO;
+    }
 }
 
 #pragma mark - helpers
@@ -309,18 +319,24 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [self performSelectorOnMainThread:@selector(_refactorDataModel) withObject:nil waitUntilDone:NO];
 }
 
-- (void)_installAddonWithID:(NSData *)o_data
+- (void)_installAddonWithID:(NSData *)o_data type:(addon_type_t)type
 {
     addon_uuid_t uuid;
     [o_data getBytes:uuid length:sizeof(uuid)];
+
+    if (type == ADDON_SERVICE_DISCOVERY)
+        _shouldRefreshSideBarOnAddonChange = YES;
 
     addons_manager_Install(_manager, uuid);
 }
 
-- (void)_removeAddonWithID:(NSData *)o_data
+- (void)_removeAddonWithID:(NSData *)o_data type:(addon_type_t)type
 {
     addon_uuid_t uuid;
     [o_data getBytes:uuid length:sizeof(uuid)];
+
+    if (type == ADDON_SERVICE_DISCOVERY)
+        _shouldRefreshSideBarOnAddonChange = YES;
 
     addons_manager_Remove(_manager, uuid);
 }

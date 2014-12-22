@@ -723,14 +723,24 @@ block_t *block_FifoShow( block_fifo_t *p_fifo )
     return b;
 }
 
-/* FIXME: not thread-safe */
-size_t block_FifoSize( const block_fifo_t *p_fifo )
+/* FIXME: not (really) thread-safe */
+size_t block_FifoSize (block_fifo_t *fifo)
 {
-    return p_fifo->i_size;
+    size_t size;
+
+    vlc_mutex_lock (&fifo->lock);
+    size = fifo->i_size;
+    vlc_mutex_unlock (&fifo->lock);
+    return size;
 }
 
-/* FIXME: not thread-safe */
-size_t block_FifoCount( const block_fifo_t *p_fifo )
+/* FIXME: not (really) thread-safe */
+size_t block_FifoCount (block_fifo_t *fifo)
 {
-    return p_fifo->i_depth;
+    size_t depth;
+
+    vlc_mutex_lock (&fifo->lock);
+    depth = fifo->i_depth;
+    vlc_mutex_unlock (&fifo->lock);
+    return depth;
 }

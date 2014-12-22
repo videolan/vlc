@@ -237,6 +237,7 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
     p_item->p_parent = NULL;
     p_item->i_children = -1;
     p_item->pp_children = NULL;
+    p_item->i_nb_played = 0;
     p_item->i_flags = 0;
     p_item->p_playlist = p_playlist;
 
@@ -448,10 +449,6 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
                        bool b_locked )
 {
     playlist_item_t *p_item;
-
-    if( !pl_priv(p_playlist)->b_doing_ml )
-        PL_DEBUG( "adding item `%s' ( %s )", p_input->psz_name,
-                                             p_input->psz_uri );
 
     PL_LOCK_IF( !b_locked );
 
@@ -759,7 +756,6 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         sys->request.p_item = p_item;
         if( sys->p_input != NULL )
             input_Stop( sys->p_input, true );
-        sys->request.i_status = PLAYLIST_RUNNING;
         vlc_cond_signal( &sys->signal );
     }
     /* Preparse if no artist/album info, and hasn't been preparsed allready
@@ -787,9 +783,8 @@ static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
     else
         playlist_NodeInsert( p_playlist, p_item, p_node, i_pos );
 
-    if( !pl_priv(p_playlist)->b_doing_ml )
-        playlist_SendAddNotify( p_playlist, p_item->i_id, p_node->i_id,
-                                 !( i_mode & PLAYLIST_NO_REBUILD ) );
+    playlist_SendAddNotify( p_playlist, p_item->i_id, p_node->i_id,
+                            !( i_mode & PLAYLIST_NO_REBUILD ) );
 }
 
 /* Actually convert an item to a node */

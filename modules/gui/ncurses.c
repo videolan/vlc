@@ -1567,7 +1567,7 @@ static void CycleESTrack(intf_sys_t *sys, const char *var)
         return;
 
     vlc_value_t val;
-    if (var_Change(input, var, VLC_VAR_GETLIST, &val, NULL) < 0)
+    if (var_Change(input, var, VLC_VAR_GETCHOICES, &val, NULL) < 0)
         return;
 
     vlc_list_t *list = val.p_list;
@@ -1795,6 +1795,15 @@ static inline void UpdateInput(intf_sys_t *sys, playlist_t *p_playlist)
     }
 }
 
+static void cleanup_run(void *data)
+{
+    intf_thread_t *intf = data;
+    playlist_t *p_playlist = pl_Get(intf);
+    var_DelCallback(p_playlist, "intf-change", PlaylistChanged, intf);
+    var_DelCallback(p_playlist, "item-change", ItemChanged, intf);
+    var_DelCallback(p_playlist, "playlist-item-append", PlaylistChanged, intf);
+}
+
 /*****************************************************************************
  * Run: ncurses thread
  *****************************************************************************/
@@ -1808,15 +1817,14 @@ static void *Run(void *data)
     var_AddCallback(p_playlist, "item-change", ItemChanged, intf);
     var_AddCallback(p_playlist, "playlist-item-append", PlaylistChanged, intf);
 
+    vlc_cleanup_push(cleanup_run, data);
     while (!sys->exit) {
         UpdateInput(sys, p_playlist);
         Redraw(intf);
         HandleKey(intf);
     }
+    vlc_cleanup_pop();
 
-    var_DelCallback(p_playlist, "intf-change", PlaylistChanged, intf);
-    var_DelCallback(p_playlist, "item-change", ItemChanged, intf);
-    var_DelCallback(p_playlist, "playlist-item-append", PlaylistChanged, intf);
     return NULL;
 }
 
@@ -1881,6 +1889,7 @@ static void Close(vlc_object_t *p_this)
 {
     intf_sys_t *sys = ((intf_thread_t*)p_this)->p_sys;
 
+    vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
 
     PlaylistDestroy(sys);

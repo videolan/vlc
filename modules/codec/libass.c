@@ -219,7 +219,7 @@ static int Create( vlc_object_t *p_this )
 #endif
 
 #ifdef HAVE_FONTCONFIG
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__APPLE__)
     dialog_progress_bar_t *p_dialog =
         dialog_ProgressCreate( p_dec,
                                _("Building font cache"),
@@ -227,7 +227,7 @@ static int Create( vlc_object_t *p_this )
                                   "This should take less than a minute." ), NULL );
 #endif
     ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 1 );  // setup default font/family
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
     if( p_dialog )
     {
         dialog_ProgressSet( p_dialog, NULL, 1.0 );
@@ -350,7 +350,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu_sys->i_pts = p_block->i_pts;
     if( !p_spu_sys->p_subs_data )
     {
-        decoder_DeleteSubpicture( p_dec, p_spu );
+        subpicture_Delete( p_spu );
         block_Release( p_block );
         return NULL;
     }
@@ -627,11 +627,14 @@ static int BuildRegions( rectangle_t *p_region, int i_max_region, ASS_Image *p_i
 #ifdef DEBUG_REGION
             msg_Err( p_spu, "Merging %d and %d", i_best_i, i_best_j );
 #endif
-            r_add( &region[i_best_i], &region[i_best_j] );
+            if( i_best_j >= 0 && i_best_i >= 0 )
+            {
+                r_add( &region[i_best_i], &region[i_best_j] );
 
-            if( i_best_j+1 < i_region )
-                memmove( &region[i_best_j], &region[i_best_j+1], sizeof(*region) * ( i_region - (i_best_j+1)  ) );
-            i_region--;
+                if( i_best_j+1 < i_region )
+                    memmove( &region[i_best_j], &region[i_best_j+1], sizeof(*region) * ( i_region - (i_best_j+1)  ) );
+                i_region--;
+            }
         }
     }
 

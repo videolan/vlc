@@ -57,6 +57,7 @@ vout_thread_t *getVout(void);
 vout_thread_t *getVoutForActiveWindow(void);
 audio_output_t *getAout(void);
 
+static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
 /*****************************************************************************
  * VLCMain interface
@@ -104,6 +105,7 @@ audio_output_t *getAout(void);
     BOOL b_mediaKeySupport;
     BOOL b_mediakeyJustJumped;
     SPMediaKeyTap * o_mediaKeyController;
+    BOOL b_mediaKeyTrapEnabled;
 
     NSArray *o_usedHotkeys;
 
@@ -151,6 +153,7 @@ audio_output_t *getAout(void);
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
 
 - (void)PlaylistItemChanged;
+- (void)plItemUpdated;
 - (void)playbackStatusUpdated;
 - (void)sendDistributedNotificationWithUpdatedPlaybackStatus;
 - (void)playbackModeUpdated;

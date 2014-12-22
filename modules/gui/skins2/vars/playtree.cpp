@@ -31,6 +31,7 @@
 
 #include "playtree.hpp"
 #include <vlc_playlist.h>
+#include <vlc_input_item.h>
 #include <vlc_url.h>
 #include "../utils/ustring.hpp"
 

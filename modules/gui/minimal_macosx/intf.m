@@ -148,6 +148,10 @@ static int WindowControl(vout_window_t *, int i_query, va_list);
 
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
+    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
+     && cfg->type != VOUT_WINDOW_TYPE_NSOBJECT)
+        return VLC_EGENERIC;
+
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
     NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
@@ -168,6 +172,7 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     if (var_GetBool(pl_Get(p_wnd), "fullscreen"))
         [o_window performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
 
+    p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
     p_wnd->control = WindowControl;
 
     [o_pool release];

@@ -383,6 +383,12 @@ AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
                   qtr( "Service discoveries adds new sources to your playlist"
                        " such as web radios, video websites, ..." ),
                   ADDON_SERVICE_DISCOVERY );
+    ADD_CATEGORY( qtr("Interfaces"),
+                  "",
+                  ADDON_INTERFACE );
+    ADD_CATEGORY( qtr("Art and meta fetchers"),
+                  qtr( "Retrieves extra info and art for playlist items" ),
+                  ADDON_META );
     ADD_CATEGORY( qtr("Extensions"),
                   qtr( "Extensions brings various enhancements."
                        " Check descriptions for more details" ),
@@ -930,6 +936,12 @@ QColor AddonsListModel::getColorByAddonType( int i_type )
         break;
     case ADDON_SKIN2:
         color = QColor(0x8B, 0xD6, 0xFC);
+        break;
+    case ADDON_INTERFACE:
+        color = QColor(0x00, 0x13, 0x85);
+        break;
+    case ADDON_META:
+        color = QColor(0xCD, 0x23, 0xBF);
         break;
     case ADDON_PLUGIN:
     case ADDON_UNKNOWN:

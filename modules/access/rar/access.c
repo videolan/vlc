@@ -154,24 +154,52 @@ int RarAccessOpen(vlc_object_t *object)
     decode_URI(base);
 
     stream_t *s = stream_UrlNew(access, base);
-    if (!s)
+    if (!s || RarProbe(s))
         goto error;
-    int count = 0;
-    rar_file_t **files;
-     if ( RarProbe(s) || (
-            RarParse(s, &count, &files, false ) &&
-            RarParse(s, &count, &files, true )
-          ) ||
-          count <= 0 )
-         goto error;
-    rar_file_t *file = NULL;
-    for (int i = 0; i < count; i++) {
-        if (!file && !strcmp(files[i]->name, name))
-            file = files[i];
-        else
-            RarFileDelete(files[i]);
+
+    struct
+    {
+        int filescount;
+        rar_file_t **files;
+        unsigned int i_nbvols;
+    } newscheme = { 0, NULL, 0 }, oldscheme = { 0, NULL, 0 }, *p_scheme;
+
+    if (RarParse(s, &newscheme.filescount, &newscheme.files, &newscheme.i_nbvols, false)
+            || newscheme.filescount < 1 || newscheme.i_nbvols < 2 )
+    {
+        /* We might want to lookup old naming scheme, could be a part1.rar,part1.r00 */
+        stream_Seek(s, 0);
+        RarParse(s, &oldscheme.filescount, &oldscheme.files, &oldscheme.i_nbvols, true);
     }
-    free(files);
+
+    if (oldscheme.filescount >= newscheme.filescount && oldscheme.i_nbvols > newscheme.i_nbvols)
+    {
+        free(newscheme.files);
+        p_scheme = &oldscheme;
+        msg_Dbg(s, "using rar old naming for %d files nbvols %u", p_scheme->filescount, oldscheme.i_nbvols);
+    }
+    else if (newscheme.filescount)
+    {
+        free(oldscheme.files);
+        p_scheme = &newscheme;
+        msg_Dbg(s, "using rar new naming for %d files nbvols %u", p_scheme->filescount, oldscheme.i_nbvols);
+    }
+    else
+    {
+        msg_Info(s, "Invalid or unsupported RAR archive");
+        free(oldscheme.files);
+        free(newscheme.files);
+        goto error;
+    }
+
+    rar_file_t *file = NULL;
+    for (int i = 0; i < p_scheme->filescount; i++) {
+        if (!file && !strcmp(p_scheme->files[i]->name, name))
+            file = p_scheme->files[i];
+        else
+            RarFileDelete(p_scheme->files[i]);
+    }
+    free(p_scheme->files);
     if (!file)
         goto error;
 

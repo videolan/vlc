@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
+#include <vlc_input.h>
 #include <vlc_playlist.h>
 #include <vlc_url.h>
 
@@ -134,7 +135,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t   *p_intf = ( intf_thread_t* ) p_this;
     intf_sys_t      *p_sys  = p_intf->p_sys;
 
-    var_DelCallback( pl_Get( p_this ), "activity", ItemChange, p_this );
+    var_DelCallback( pl_Get( p_intf ), "activity", ItemChange, p_this );
 
     if( p_sys->notification )
     {
@@ -283,7 +284,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 /* libnotify callback, called when the "Next" button is pressed */
 static void Next( NotifyNotification *notification, gchar *psz, gpointer p )
 {
-    vlc_object_t *p_object = (vlc_object_t*)p;
+    intf_thread_t *p_object = (intf_thread_t *)p;
 
     VLC_UNUSED(psz);
     notify_notification_close( notification, NULL );
@@ -293,7 +294,7 @@ static void Next( NotifyNotification *notification, gchar *psz, gpointer p )
 /* libnotify callback, called when the "Previous" button is pressed */
 static void Prev( NotifyNotification *notification, gchar *psz, gpointer p )
 {
-    vlc_object_t *p_object = (vlc_object_t*)p;
+    intf_thread_t *p_object = (intf_thread_t *)p;
 
     VLC_UNUSED(psz);
     notify_notification_close( notification, NULL );

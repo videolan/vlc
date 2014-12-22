@@ -46,7 +46,7 @@ public:
     bool hasPlaylistWidget();
 
 protected:
-    virtual void hideEvent( QHideEvent * );
+    void hideEvent( QHideEvent * ) Q_DECL_OVERRIDE;
 
 private:
     PlaylistWidget *playlistWidget;

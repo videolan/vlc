@@ -51,9 +51,9 @@ static int vout_window_start(void *func, va_list ap)
     return activate(wnd, cfg);
 }
 
-vout_window_t *vout_window_New(vlc_object_t *obj,
-                               const char *module,
-                               const vout_window_cfg_t *cfg)
+vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
+                               const vout_window_cfg_t *cfg,
+                               const vout_window_owner_t *owner)
 {
     window_t *w = vlc_custom_create(obj, sizeof(*w), "window");
     vout_window_t *window = &w->wnd;
@@ -61,36 +61,14 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     memset(&window->handle, 0, sizeof(window->handle));
     window->control = NULL;
     window->sys = NULL;
-    window->type = cfg->type;
 
-    const char *type;
-    switch (cfg->type) {
-#if defined(_WIN32) || defined(__OS2__)
-    case VOUT_WINDOW_TYPE_HWND:
-        type = "vout window hwnd";
-        window->handle.hwnd = NULL;
-        break;
-#endif
-#ifdef __APPLE__
-    case VOUT_WINDOW_TYPE_NSOBJECT:
-        type = "vout window nsobject";
-        window->handle.nsobject = NULL;
-        break;
-#endif
-    case VOUT_WINDOW_TYPE_XID:
-        type = "vout window xid";
-        window->handle.xid = 0;
-        window->display.x11 = NULL;
-        break;
-    case VOUT_WINDOW_TYPE_ANDROID_NATIVE:
-        type = "vout window anative";
-        window->handle.anativewindow = NULL;
-        break;
-    default:
-        assert(0);
-    }
+    if (owner != NULL)
+        window->owner = *owner;
+    else
+        window->owner.resized = NULL;
 
-    w->module = vlc_module_load(window, type, module, module && *module,
+    w->module = vlc_module_load(window, "vout window", module,
+                                module && *module,
                                 vout_window_start, window, cfg);
     if (!w->module) {
         vlc_object_release(window);
@@ -99,7 +77,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
 
     /* Hook for screensaver inhibition */
     if (var_InheritBool(obj, "disable-screensaver") &&
-        cfg->type == VOUT_WINDOW_TYPE_XID) {
+        window->type == VOUT_WINDOW_TYPE_XID) {
         w->inhibit = vlc_inhibit_Create(VLC_OBJECT (window));
         if (w->inhibit != NULL)
             vlc_inhibit_Set(w->inhibit, VLC_INHIBIT_VIDEO);
@@ -134,13 +112,115 @@ void vout_window_Delete(vout_window_t *window)
     vlc_object_release(window);
 }
 
-int vout_window_Control(vout_window_t *window, int query, ...)
-{
-    va_list args;
-    va_start(args, query);
-    int ret = window->control(window, query, args);
-    va_end(args);
+/* Video output display integration */
+#include <vlc_vout.h>
+#include <vlc_vout_display.h>
+#include "window.h"
+#include "event.h"
 
-    return ret;
+typedef struct vout_display_window
+{
+    vout_display_t *vd;
+    unsigned width;
+    unsigned height;
+
+    vlc_mutex_t lock;
+} vout_display_window_t;
+
+static void vout_display_window_ResizeNotify(vout_window_t *window,
+                                             unsigned width, unsigned height)
+{
+    vout_display_window_t *state = window->owner.sys;
+
+    msg_Dbg(window, "resized to %ux%u", width, height);
+    vlc_mutex_lock(&state->lock);
+    state->width = width;
+    state->height = height;
+
+    if (state->vd != NULL)
+        vout_display_SendEventDisplaySize(state->vd, width, height);
+    vlc_mutex_unlock(&state->lock);
 }
 
+static void vout_display_window_CloseNotify(vout_window_t *window)
+{
+    vout_thread_t *vout = (vout_thread_t *)window->p_parent;
+
+    vout_SendEventClose(vout);
+}
+
+/**
+ * Creates a video window, initially without any attached display.
+ */
+vout_window_t *vout_display_window_New(vout_thread_t *vout,
+                                       const vout_window_cfg_t *cfg)
+{
+    vout_display_window_t *state = malloc(sizeof (*state));
+    if (state == NULL)
+        return NULL;
+
+    state->vd = NULL;
+    state->width = cfg->width;
+    state->height = cfg->height;
+    vlc_mutex_init(&state->lock);
+
+    vout_window_owner_t owner = {
+        .sys = state,
+        .resized = vout_display_window_ResizeNotify,
+        .closed = vout_display_window_CloseNotify,
+    };
+    vout_window_t *window;
+
+    window = vout_window_New((vlc_object_t *)vout, "$window", cfg, &owner);
+    if (window == NULL) {
+        vlc_mutex_destroy(&state->lock);
+        free(state);
+    }
+    return window;
+}
+
+/**
+ * Attaches a window to a display. Window events will be dispatched to the
+ * display until they are detached.
+ */
+void vout_display_window_Attach(vout_window_t *window, vout_display_t *vd)
+{
+    vout_display_window_t *state = window->owner.sys;
+
+    vout_window_SetSize(window,
+                        vd->cfg->display.width, vd->cfg->display.height);
+
+    vlc_mutex_lock(&state->lock);
+    state->vd = vd;
+
+    vout_display_SendEventDisplaySize(vd, state->width, state->height);
+    vlc_mutex_unlock(&state->lock);
+}
+
+/**
+ * Detaches a window from a display. Window events will no longer be dispatched
+ * (except those that do not need a display).
+ */
+void vout_display_window_Detach(vout_window_t *window)
+{
+    vout_display_window_t *state = window->owner.sys;
+
+    vlc_mutex_lock(&state->lock);
+    state->vd = NULL;
+    vlc_mutex_unlock(&state->lock);
+}
+
+/**
+ * Destroys a video window.
+ * \note The window must be detached.
+ */
+void vout_display_window_Delete(vout_window_t *window)
+{
+    vout_display_window_t *state = window->owner.sys;
+
+    vout_window_Delete(window);
+
+    assert(state->vd == NULL);
+    vlc_mutex_destroy(&state->lock);
+    free(state);
+}

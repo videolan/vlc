@@ -124,14 +124,14 @@ public:
     virtual ~VLCModel();
 
     /*** QAbstractItemModel subclassing ***/
-    virtual int columnCount( const QModelIndex &parent = QModelIndex() ) const;
-    QVariant headerData( int, Qt::Orientation, int ) const;
+    int columnCount( const QModelIndex &parent = QModelIndex() ) const Q_DECL_OVERRIDE;
+    QVariant headerData( int, Qt::Orientation, int ) const Q_DECL_OVERRIDE;
 
     /*** VLCModelSubInterface subclassing ***/
-    virtual int itemId( const QModelIndex &, int type ) const;
-    virtual QString getURI( const QModelIndex &index ) const;
-    virtual input_item_t *getInputItem( const QModelIndex & ) const;
-    virtual QString getTitle( const QModelIndex &index ) const;
+    int itemId( const QModelIndex &, int type ) const Q_DECL_OVERRIDE;
+    QString getURI( const QModelIndex &index ) const Q_DECL_OVERRIDE;
+    input_item_t *getInputItem( const QModelIndex & ) const Q_DECL_OVERRIDE;
+    QString getTitle( const QModelIndex &index ) const Q_DECL_OVERRIDE;
 
     /* Custom */
     static int columnToMeta( int _column );
@@ -141,7 +141,7 @@ public:
 
 public slots:
     /* slots handlers */
-    virtual void ensureArtRequested( const QModelIndex &index );
+    void ensureArtRequested( const QModelIndex &index ) Q_DECL_OVERRIDE;
 
 signals:
     void currentIndexChanged( const QModelIndex& );

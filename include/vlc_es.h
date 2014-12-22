@@ -213,7 +213,7 @@ struct video_format_t
     unsigned int i_frame_rate;                     /**< frame rate numerator */
     unsigned int i_frame_rate_base;              /**< frame rate denominator */
 
-    uint32_t i_rmask, i_gmask, i_bmask;          /**< color masks for RGB chroma */
+    uint32_t i_rmask, i_gmask, i_bmask;      /**< color masks for RGB chroma */
     int i_rrshift, i_lrshift;
     int i_rgshift, i_lgshift;
     int i_rbshift, i_lbshift;
@@ -285,7 +285,8 @@ VLC_API void video_format_ScaleCropAr( video_format_t *, const video_format_t * 
  * This function "normalizes" the formats orientation, by switching the a/r according to the orientation,
  * producing a format whose orientation is ORIENT_NORMAL. It makes a shallow copy (pallette is not alloc'ed).
  */
-VLC_API void video_format_ApplyRotation(video_format_t *restrict out, const video_format_t *restrict in);
+VLC_API void video_format_ApplyRotation(video_format_t * /*restrict*/ out,
+                                        const video_format_t *in);
 
 /**
  * This function applies the transform operation to fmt.

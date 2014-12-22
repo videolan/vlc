@@ -127,12 +127,8 @@ void picture_fifo_Flush(picture_fifo_t *fifo, mtime_t date, bool flush_before)
     }
     vlc_mutex_unlock(&fifo->lock);
 
-    for (;;) {
-        picture_t *picture = PictureFifoPop(&tmp);
-        if (!picture)
-            break;
+    while ((picture = PictureFifoPop(&tmp)) != NULL)
         picture_Release(picture);
-    }
 }
 void picture_fifo_OffsetDate(picture_fifo_t *fifo, mtime_t delta)
 {

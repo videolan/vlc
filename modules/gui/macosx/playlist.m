@@ -159,15 +159,6 @@
     [o_outline_view setAllowsEmptySelection: NO];
     [o_outline_view expandItem: [o_outline_view itemAtRow:0]];
 
-    [o_outline_view_other setTarget: self];
-    [o_outline_view_other setDelegate: self];
-    [o_outline_view_other setDataSource: self];
-    [o_outline_view_other setAllowsEmptySelection: NO];
-
-    [[o_tc_name_other headerCell] setStringValue:_NS("Name")];
-    [[o_tc_author_other headerCell] setStringValue:_NS("Author")];
-    [[o_tc_duration_other headerCell] setStringValue:_NS("Duration")];
-
     [self reloadStyles];
 }
 
@@ -175,7 +166,6 @@
 {
     p_current_root_item = root_item;
     [o_outline_view reloadData];
-    [o_outline_view_other reloadData];
 }
 
 - (playlist_item_t *)currentPlaylistRoot
@@ -209,14 +199,8 @@
     NSArray *columns = [o_outline_view tableColumns];
     NSUInteger count = columns.count;
     for (NSUInteger x = 0; x < count; x++)
-        [[columns[x] dataCell] setFont:fontToUse];
+        [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
     [o_outline_view setRowHeight:rowHeight];
-
-    columns = [o_outline_view_other tableColumns];
-    count = columns.count;
-    for (NSUInteger x = 0; x < count; x++)
-        [[columns[x] dataCell] setFont:fontToUse];
-    [o_outline_view_other setRowHeight:rowHeight];
 }
 
 - (void)dealloc {
@@ -469,7 +453,7 @@
     BOOL b_selected_item_met;
     BOOL b_isSortDescending;
     id o_tc_sortColumn;
-    NSInteger retainedRowSelection;
+    NSUInteger retainedRowSelection;
 
     BOOL b_playlistmenu_nib_loaded;
     BOOL b_view_setup;
@@ -525,13 +509,9 @@
     [self initStrings];
 
     [o_outline_view setDoubleAction: @selector(playItem:)];
-    [o_outline_view_other setDoubleAction: @selector(playItem:)];
 
     [o_outline_view registerForDraggedTypes: [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
     [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
-
-    [o_outline_view_other registerForDraggedTypes: [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
-    [o_outline_view_other setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
     /* This uses a private API, but works fine on all current OSX releases.
      * Radar ID 11739459 request a public API for this. However, it is probably
@@ -608,7 +588,6 @@
     //[o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
     [[[[VLCMain sharedInstance] wizard] playlistWizard] reloadOutlineView];
-    [[[[VLCMain sharedInstance] bookmarks] dataTable] reloadData];
 
     [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:retainedRowSelection] byExtendingSelection:NO];
 
@@ -962,14 +941,19 @@
 {
     int i_count;
     NSIndexSet *o_selected_indexes;
-    playlist_t * p_playlist;
     intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = pl_Get(p_intf);
+
+    // check if deletion is allowed
+    if ([self currentPlaylistRoot] != p_playlist->p_local_category && [self currentPlaylistRoot] != p_playlist->p_ml_category)
+        return;
 
     o_selected_indexes = [o_outline_view selectedRowIndexes];
     i_count = [o_selected_indexes count];
     retainedRowSelection = [o_selected_indexes firstIndex];
+    if (retainedRowSelection == NSNotFound)
+        retainedRowSelection = 0;
 
-    p_playlist = pl_Get(p_intf);
 
     NSUInteger indexes[i_count];
     if (i_count == [o_outline_view numberOfRows]) {
@@ -1065,21 +1049,20 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:o_path isDirectory:&b_dir] && b_dir &&
         [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath:o_path isRemovable: &b_rem
                                                      isWritable:&b_writable isUnmountable:NULL description:NULL type:NULL] && b_rem && !b_writable && [o_nsurl isFileURL]) {
-        id o_vlc_open = [[VLCMain sharedInstance] open];
 
-        NSString *diskType = [o_vlc_open getVolumeTypeFromMountPath: o_path];
+        NSString *diskType = [VLCOpen getVolumeTypeFromMountPath: o_path];
         msg_Dbg(p_intf, "detected optical media of type %s in the file input", [diskType UTF8String]);
 
         if ([diskType isEqualToString: kVLCMediaDVD])
-            o_uri = [NSString stringWithFormat: @"dvdnav://%@", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+            o_uri = [NSString stringWithFormat: @"dvdnav://%@", [VLCOpen getBSDNodeFromMountPath: o_path]];
         else if ([diskType isEqualToString: kVLCMediaVideoTSFolder])
             o_uri = [NSString stringWithFormat: @"dvdnav://%@", o_path];
         else if ([diskType isEqualToString: kVLCMediaAudioCD])
-            o_uri = [NSString stringWithFormat: @"cdda://%@", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+            o_uri = [NSString stringWithFormat: @"cdda://%@", [VLCOpen getBSDNodeFromMountPath: o_path]];
         else if ([diskType isEqualToString: kVLCMediaVCD])
-            o_uri = [NSString stringWithFormat: @"vcd://%@#0:0", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+            o_uri = [NSString stringWithFormat: @"vcd://%@#0:0", [VLCOpen getBSDNodeFromMountPath: o_path]];
         else if ([diskType isEqualToString: kVLCMediaSVCD])
-            o_uri = [NSString stringWithFormat: @"vcd://%@@0:0", [o_vlc_open getBSDNodeFromMountPath: o_path]];
+            o_uri = [NSString stringWithFormat: @"vcd://%@@0:0", [VLCOpen getBSDNodeFromMountPath: o_path]];
         else if ([diskType isEqualToString: kVLCMediaBD] || [diskType isEqualToString: kVLCMediaBDMVFolder])
             o_uri = [NSString stringWithFormat: @"bluray://%@", o_path];
         else
@@ -1313,8 +1296,11 @@
     b_item_sel = (row != -1 && [o_outline_view selectedRow] != -1);
     b_rows = [o_outline_view numberOfRows] != 0;
 
+    playlist_t *p_playlist = pl_Get(VLCIntf);
+    bool b_del_allowed = [self currentPlaylistRoot] == p_playlist->p_local_category || [self currentPlaylistRoot] == p_playlist->p_ml_category;
+
     [o_mi_play setEnabled: b_item_sel];
-    [o_mi_delete setEnabled: b_item_sel];
+    [o_mi_delete setEnabled: b_item_sel && b_del_allowed];
     [o_mi_selectall setEnabled: b_rows];
     [o_mi_info setEnabled: b_item_sel];
     [o_mi_preparse setEnabled: b_item_sel];
@@ -1476,89 +1462,145 @@
     [o_arrayToSave release];
 }
 
+- (BOOL)isValidResumeItem:(input_item_t *)p_item
+{
+    char *psz_url = input_item_GetURI(p_item);
+    NSString *o_url_string = toNSStr(psz_url);
+    free(psz_url);
+
+    if ([o_url_string isEqualToString:@""])
+        return NO;
+
+    NSURL *o_url = [NSURL URLWithString:o_url_string];
+
+    if (![o_url isFileURL])
+        return NO;
+
+    BOOL isDir = false;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[o_url path] isDirectory:&isDir])
+        return NO;
+
+    if (isDir)
+        return NO;
+
+    return YES;
+}
+
+- (void)updateAlertWindow:(NSTimer *)timer
+{
+    NSAlert *alert = [timer userInfo];
+
+    --currentResumeTimeout;
+    if (currentResumeTimeout <= 0) {
+        [[alert window] close];
+        [NSApp abortModal];
+    }
+
+    NSString *buttonLabel = _NS("Restart playback");
+    buttonLabel = [buttonLabel stringByAppendingFormat:@" (%d)", currentResumeTimeout];
+
+    [[[alert buttons] objectAtIndex:2] setTitle:buttonLabel];
+}
+
 - (void)continuePlaybackWhereYouLeftOff:(input_thread_t *)p_input_thread
 {
     NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"recentlyPlayedMedia"];
-    if (recentlyPlayedFiles) {
-        input_item_t *p_item = input_GetItem(p_input_thread);
-        if (!p_item)
-            return;
+    if (!recentlyPlayedFiles)
+        return;
 
-        /* allow the user to over-write the start-time */
-        if (p_item->i_options > 0) {
-            for (int x = 0; x < p_item->i_options; x++) {
-                if (strstr(p_item->ppsz_options[x],"start-time"))
-                    return;
-            }
-        }
-
-        char *psz_url = decode_URI(input_item_GetURI(p_item));
-        NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
-        free(psz_url);
-
-        NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
-        if (lastPosition && lastPosition.intValue > 0) {
-            vlc_value_t pos;
-            var_Get(p_input_thread, "position", &pos);
-            float f_current_pos = 100. * pos.f_float;
-            long long int dur = input_item_GetDuration(p_item) / 1000000;
-            int current_pos_in_sec = (f_current_pos * dur) / 100;
-
-            if (current_pos_in_sec >= lastPosition.intValue)
-                return;
-
-            int settingValue = config_GetInt(VLCIntf, "macosx-continue-playback");
-            NSInteger returnValue = NSAlertErrorReturn;
-
-            if (settingValue == 0) {
-                NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:_NS("Restart playback") otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%@\" will continue at %@"), [NSString stringWithUTF8String:input_item_GetTitleFbName(p_item)], [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
-
-                [[VLCCoreInteraction sharedInstance] pause];
-                returnValue = [theAlert runModal];
-                [[VLCCoreInteraction sharedInstance] playOrPause];
-            }
-
-            if (returnValue == NSAlertAlternateReturn || settingValue == 2)
-                lastPosition = [NSNumber numberWithInt:0];
-
-            pos.f_float = (float)lastPosition.intValue / (float)dur;
-            msg_Dbg(VLCIntf, "continuing playback at %2.2f", pos.f_float);
-            var_Set(p_input_thread, "position", pos);
-
-            if (returnValue == NSAlertOtherReturn)
-                config_PutInt(VLCIntf, "macosx-continue-playback", 1);
-        }
-    }
-}
-
-- (void)storePlaybackPositionForItem:(input_thread_t *)p_input_thread
-{
     input_item_t *p_item = input_GetItem(p_input_thread);
     if (!p_item)
         return;
 
+    /* allow the user to over-write the start/stop/run-time */
+    if (var_GetFloat(p_input_thread, "run-time") > 0 ||
+        var_GetFloat(p_input_thread, "start-time") > 0 ||
+        var_GetFloat(p_input_thread, "stop-time") > 0) {
+        return;
+    }
+
+    /* check for file existance before resuming */
+    if (![self isValidResumeItem:p_item])
+        return;
+
     char *psz_url = decode_URI(input_item_GetURI(p_item));
-    NSString *url = [NSString stringWithUTF8String:psz_url ? psz_url : ""];
+    if (!psz_url)
+        return;
+    NSString *url = toNSStr(psz_url);
     free(psz_url);
 
-    if (url.length < 1)
+    NSNumber *lastPosition = [recentlyPlayedFiles objectForKey:url];
+    if (!lastPosition || lastPosition.intValue <= 0)
         return;
 
-    if ([url rangeOfString:@"file://" options:NSCaseInsensitiveSearch].location != 0)
+    int settingValue = config_GetInt(VLCIntf, "macosx-continue-playback");
+    if (settingValue == 2) // never resume
         return;
+
+    NSInteger returnValue = NSAlertErrorReturn;
+    if (settingValue == 0) { // ask
+
+        currentResumeTimeout = 6;
+        NSString *o_restartButtonLabel = _NS("Restart playback");
+        o_restartButtonLabel = [o_restartButtonLabel stringByAppendingFormat:@" (%d)", currentResumeTimeout];
+        NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:o_restartButtonLabel otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%@\" will continue at %@"), [NSString stringWithUTF8String:input_item_GetTitleFbName(p_item)], [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
+
+        NSTimer *timer = [NSTimer timerWithTimeInterval:1
+                                                 target:self
+                                               selector:@selector(updateAlertWindow:)
+                                               userInfo:theAlert
+                                                repeats:YES];
+
+        [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode];
+
+        [[VLCCoreInteraction sharedInstance] pause];
+        returnValue = [theAlert runModal];
+        [timer invalidate];
+        [[VLCCoreInteraction sharedInstance] playOrPause];
+
+        // restart button was pressed or timeout happened
+        if (returnValue == NSAlertAlternateReturn ||
+            returnValue == NSRunAbortedResponse)
+            return;
+    }
+
+    mtime_t lastPos = (mtime_t)lastPosition.intValue * 1000000;
+    msg_Dbg(VLCIntf, "continuing playback at %lld", lastPos);
+    var_SetTime(p_input_thread, "time", lastPos);
+
+    if (returnValue == NSAlertOtherReturn)
+        config_PutInt(VLCIntf, "macosx-continue-playback", 1);
+}
+
+- (void)storePlaybackPositionForItem:(input_thread_t *)p_input_thread
+{
+    if (!var_InheritBool(VLCIntf, "macosx-recentitems"))
+        return;
+
+    input_item_t *p_item = input_GetItem(p_input_thread);
+    if (!p_item)
+        return;
+
+    if (![self isValidResumeItem:p_item])
+        return;
+
+    char *psz_url = decode_URI(input_item_GetURI(p_item));
+    if (!psz_url)
+        return;
+    NSString *url = toNSStr(psz_url);
+    free(psz_url);
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
 
-    vlc_value_t pos;
-    var_Get(p_input_thread, "position", &pos);
-    float f_current_pos = 100. * pos.f_float;
-    long long int dur = input_item_GetDuration(p_item) / 1000000;
-    int current_pos_in_sec = (f_current_pos * dur) / 100;
+    float relativePos = var_GetFloat(p_input_thread, "position");
+    mtime_t pos = var_GetTime(p_input_thread, "time") / 1000000;
+    mtime_t dur = input_item_GetDuration(p_item) / 1000000;
+
     NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];
 
-    if (pos.f_float > .05 && pos.f_float < .95 && dur > 180) {
-        [mutDict setObject:[NSNumber numberWithInt:current_pos_in_sec] forKey:url];
+    if (relativePos > .05 && relativePos < .95 && dur > 180) {
+        [mutDict setObject:[NSNumber numberWithInt:pos] forKey:url];
 
         [mediaList removeObject:url];
         [mediaList addObject:url];

@@ -30,12 +30,15 @@
  * This file defines vout windows structures and functions in vlc
  */
 
+#include <stdarg.h>
 #include <vlc_common.h>
 
 /* */
 typedef struct vout_window_t vout_window_t;
 typedef struct vout_window_sys_t vout_window_sys_t;
 
+struct wl_display;
+struct wl_surface;
 
 /**
  * Window handle type
@@ -46,6 +49,7 @@ enum {
     VOUT_WINDOW_TYPE_HWND,
     VOUT_WINDOW_TYPE_NSOBJECT,
     VOUT_WINDOW_TYPE_ANDROID_NATIVE,
+    VOUT_WINDOW_TYPE_WAYLAND,
 };
 
 /**
@@ -57,22 +61,30 @@ enum {
     VOUT_WINDOW_SET_FULLSCREEN, /* int b_fullscreen */
 };
 
-typedef struct {
+typedef struct vout_window_cfg_t {
     /* If true, a standalone window is requested */
     bool is_standalone;
 
     /* Window handle type */
     unsigned type;
 
+#ifdef __APPLE__
     /* Window position hint */
     int x;
     int y;
+#endif
 
     /* Windows size hint */
     unsigned width;
     unsigned height;
 
 } vout_window_cfg_t;
+
+typedef struct vout_window_owner {
+    void *sys;
+    void (*resized)(vout_window_t *, unsigned width, unsigned height);
+    void (*closed)(vout_window_t *);
+} vout_window_owner_t;
 
 /**
  * FIXME do we need an event system in the window too ?
@@ -92,11 +104,13 @@ struct vout_window_t {
         uint32_t xid;            /* X11 windows ID */
         void     *nsobject;      /* Mac OSX view object */
         void     *anativewindow; /* Android native window. */
+        struct wl_surface *wl;   /* Wayland surface */
     } handle;
 
     /* display server (mandatory) */
     union {
         char     *x11; /* X11 display (NULL = use default) */
+        struct wl_display *wl;   /* Wayland struct wl_display pointer */
     } display;
 
     /* Control on the module (mandatory)
@@ -110,6 +124,8 @@ struct vout_window_t {
      * A module is free to use it as it wishes.
      */
     vout_window_sys_t *sys;
+
+    vout_window_owner_t owner;
 };
 
 /**
@@ -120,7 +136,7 @@ struct vout_window_t {
  / vout_display_NewWindow() and vout_display_DeleteWindow() instead.
  * This enables recycling windows.
  */
-VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_cfg_t *);
+VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_cfg_t *, const vout_window_owner_t *);
 
 /**
  * Deletes a window created by vout_window_New().
@@ -129,6 +145,11 @@ VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, cons
  */
 VLC_API void vout_window_Delete(vout_window_t *);
 
+static inline int vout_window_vaControl(vout_window_t *window, int query,
+                                        va_list ap)
+{
+    return window->control(window, query, ap);
+}
 
 /**
  * Reconfigures a window.
@@ -137,7 +158,16 @@ VLC_API void vout_window_Delete(vout_window_t *);
  *
  * @warning The caller must own the window, as vout_window_t is not thread safe.
  */
-VLC_API int vout_window_Control(vout_window_t *, int query, ...);
+static inline int vout_window_Control(vout_window_t *window, int query, ...)
+{
+    va_list ap;
+    int ret;
+
+    va_start(ap, query);
+    ret = vout_window_vaControl(window, query, ap);
+    va_end(ap);
+    return ret;
+}
 
 /**
  * Configures the window manager state for this window.
@@ -162,6 +192,19 @@ static inline int vout_window_SetSize(vout_window_t *window,
 static inline int vout_window_SetFullScreen(vout_window_t *window, bool full)
 {
     return vout_window_Control(window, VOUT_WINDOW_SET_FULLSCREEN, full);
+}
+
+static inline void vout_window_ReportSize(vout_window_t *window,
+                                          unsigned width, unsigned height)
+{
+    if (window->owner.resized != NULL)
+        window->owner.resized(window, width, height);
+}
+
+static inline void vout_window_ReportClose(vout_window_t *window)
+{
+    if (window->owner.closed != NULL)
+        window->owner.closed(window);
 }
 
 #endif /* VLC_VOUT_WINDOW_H */

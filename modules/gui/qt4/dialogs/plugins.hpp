@@ -87,7 +87,7 @@ public:
     };
 
 protected:
-    virtual void keyPressEvent( QKeyEvent *keyEvent );
+    void keyPressEvent( QKeyEvent *keyEvent ) Q_DECL_OVERRIDE;
 
 private:
     PluginTab( intf_thread_t *p_intf );
@@ -108,7 +108,7 @@ class ExtensionTab : public QVLCFrame
     Q_OBJECT
 
 protected:
-    virtual void keyPressEvent( QKeyEvent *keyEvent );
+    void keyPressEvent( QKeyEvent *keyEvent ) Q_DECL_OVERRIDE;
 
 private:
     ExtensionTab( intf_thread_t *p_intf );
@@ -195,10 +195,10 @@ public:
         FilenameRole
     };
 
-    virtual QVariant data( const QModelIndex& index, int role ) const;
-    virtual QModelIndex index( int row, int column = 0,
-                               const QModelIndex& = QModelIndex() ) const;
-    virtual int rowCount( const QModelIndex& = QModelIndex() ) const;
+    QVariant data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
+    QModelIndex index( int row, int column = 0,
+                       const QModelIndex& = QModelIndex() ) const Q_DECL_OVERRIDE;
+    int rowCount( const QModelIndex& = QModelIndex() ) const Q_DECL_OVERRIDE;
 
 protected slots:
     void updateList();
@@ -214,12 +214,12 @@ class AddonsListModel: public ExtensionListModel
 
 public:
     AddonsListModel( AddonsManager *AM, QObject *parent = 0 );
-    virtual QVariant data( const QModelIndex& index, int role ) const;
-    virtual QModelIndex index( int row, int column = 0,
-                               const QModelIndex& = QModelIndex() ) const;
-    virtual int rowCount( const QModelIndex& = QModelIndex() ) const;
-    virtual Qt::ItemFlags flags( const QModelIndex &index ) const;
-    virtual bool setData( const QModelIndex &index, const QVariant &value, int role );
+    QVariant data( const QModelIndex& index, int role ) const Q_DECL_OVERRIDE;
+    QModelIndex index( int row, int column = 0,
+                       const QModelIndex& = QModelIndex() ) const Q_DECL_OVERRIDE;
+    int rowCount( const QModelIndex& = QModelIndex() ) const Q_DECL_OVERRIDE;
+    Qt::ItemFlags flags( const QModelIndex &index ) const Q_DECL_OVERRIDE;
+    bool setData( const QModelIndex &index, const QVariant &value, int role ) Q_DECL_OVERRIDE;
 
     enum
     {
@@ -268,7 +268,7 @@ public slots:
     virtual void setStatusFilter( int );
 
 protected:
-    virtual bool filterAcceptsRow( int, const QModelIndex & ) const;
+    bool filterAcceptsRow( int, const QModelIndex & ) const Q_DECL_OVERRIDE;
 
 private:
     int i_type_filter;
@@ -283,13 +283,13 @@ public:
     ExtensionItemDelegate( QObject *parent );
     virtual ~ExtensionItemDelegate();
 
-    virtual void paint( QPainter *painter,
-                        const QStyleOptionViewItem &option,
-                        const QModelIndex &index ) const;
-    virtual QSize sizeHint( const QStyleOptionViewItem &option,
-                            const QModelIndex &index ) const;
-    virtual void initStyleOption( QStyleOptionViewItem *option,
-                                  const QModelIndex &index ) const;
+    void paint( QPainter *painter,
+                const QStyleOptionViewItem &option,
+                const QModelIndex &index ) const Q_DECL_OVERRIDE;
+    QSize sizeHint( const QStyleOptionViewItem &option,
+                    const QModelIndex &index ) const Q_DECL_OVERRIDE;
+    void initStyleOption( QStyleOptionViewItem *option,
+                          const QModelIndex &index ) const Q_DECL_OVERRIDE;
 
 protected:
     QMargins margins;
@@ -304,15 +304,15 @@ public:
     AddonItemDelegate( QObject *parent );
     ~AddonItemDelegate();
 
-    virtual void paint( QPainter *painter,
-                        const QStyleOptionViewItem &option,
-                        const QModelIndex &index ) const;
-    virtual QSize sizeHint( const QStyleOptionViewItem &option,
-                            const QModelIndex &index ) const;
-    virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void paint( QPainter *painter,
+                const QStyleOptionViewItem &option,
+                const QModelIndex &index ) const Q_DECL_OVERRIDE;
+    QSize sizeHint( const QStyleOptionViewItem &option,
+                    const QModelIndex &index ) const Q_DECL_OVERRIDE;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const Q_DECL_OVERRIDE;
 
     void setAnimator( DelegateAnimationHelper *animator );
 

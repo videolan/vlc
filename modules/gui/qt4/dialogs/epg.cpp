@@ -75,7 +75,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     CONNECT( epg, itemSelectionChanged( EPGItem *), this, displayEvent( EPGItem *) );
     CONNECT( THEMIM->getIM(), epgChanged(), this, updateInfos() );
-    CONNECT( THEMIM, inputChanged( input_thread_t * ), this, updateInfos() );
+    CONNECT( THEMIM, inputChanged( ), this, updateInfos() );
 
     QDialogButtonBox *buttonsBox = new QDialogButtonBox( this );
 

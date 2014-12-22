@@ -69,6 +69,7 @@ struct decoder_sys_t
 #define BLOCK_FLAG_PRIVATE_REALLOCATED (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust );
+static block_t *DecodeAudio( decoder_t *, block_t ** );
 
 static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
 {
@@ -113,6 +114,38 @@ static void InitDecoderConfig( decoder_t *p_dec, AVCodecContext *p_context )
         p_context->extradata_size = 0;
         p_context->extradata = NULL;
     }
+}
+
+static int OpenAudioCodec( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_context->extradata_size <= 0 )
+    {
+        if( p_sys->p_codec->id == AV_CODEC_ID_VORBIS ||
+            ( p_sys->p_codec->id == AV_CODEC_ID_AAC &&
+              !p_dec->fmt_in.b_packetized ) )
+        {
+            msg_Warn( p_dec, "waiting for extra data for codec %s",
+                      p_sys->p_codec->name );
+            return 1;
+        }
+    }
+
+    p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
+    p_sys->p_context->channels = p_dec->fmt_in.audio.i_channels;
+    p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
+    p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
+    p_sys->p_context->bits_per_coded_sample =
+                                           p_dec->fmt_in.audio.i_bitspersample;
+
+    if( p_sys->p_codec->id == AV_CODEC_ID_ADPCM_G726 &&
+        p_sys->p_context->bit_rate > 0 &&
+        p_sys->p_context->sample_rate >  0)
+        p_sys->p_context->bits_per_coded_sample = p_sys->p_context->bit_rate
+                                               / p_sys->p_context->sample_rate;
+
+    return ffmpeg_OpenCodec( p_dec );
 }
 
 /**
@@ -203,7 +236,7 @@ static int GetAudioBuf( AVCodecContext *ctx, AVFrame *buf )
  * The avcodec codec will be opened, some memory allocated.
  *****************************************************************************/
 int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
-                      AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
+                  const AVCodec *p_codec )
 {
     decoder_sys_t *p_sys;
 
@@ -213,9 +246,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         return VLC_ENOMEM;
     }
 
-    p_codec->type = AVMEDIA_TYPE_AUDIO;
-    p_context->codec_type = AVMEDIA_TYPE_AUDIO;
-    p_context->codec_id = i_codec_id;
 #if (LIBAVCODEC_VERSION_MAJOR >= 55)
     p_context->refcounted_frames = true;
 #else
@@ -223,18 +253,15 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 #endif
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
-    p_sys->i_codec_id = i_codec_id;
-    p_sys->psz_namecodec = psz_namecodec;
     p_sys->b_delayed_open = true;
 
     // Initialize decoder extradata
     InitDecoderConfig( p_dec, p_context);
 
     /* ***** Open the codec ***** */
-    if( ffmpeg_OpenCodec( p_dec ) < 0 )
+    if( OpenAudioCodec( p_dec ) < 0 )
     {
-        msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
-        av_free( p_sys->p_context->extradata );
+        av_free( p_context->extradata );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -249,19 +276,20 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* Try to set as much information as possible but do not trust it */
     SetupOutputFormat( p_dec, false );
 
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
     if( p_dec->fmt_out.audio.i_rate )
         date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
     else if( p_dec->fmt_in.audio.i_rate )
         date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
 
+    p_dec->pf_decode_audio = DecodeAudio;
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * DecodeAudio: Called to decode one frame
  *****************************************************************************/
-block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
+static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *ctx = p_sys->p_context;
@@ -274,8 +302,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     if( !ctx->extradata_size && p_dec->fmt_in.i_extra && p_sys->b_delayed_open)
     {
         InitDecoderConfig( p_dec, ctx );
-        if( ffmpeg_OpenCodec( p_dec ) )
-            msg_Err( p_dec, "Cannot open decoder %s", p_sys->psz_namecodec );
+        OpenAudioCodec( p_dec );
     }
 
     if( p_sys->b_delayed_open )
@@ -284,9 +311,10 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
         avcodec_flush_buffers( ctx );
-        date_Set( &p_sys->end_date, 0 );
+        date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
-        if( p_sys->i_codec_id == AV_CODEC_ID_MP2 || p_sys->i_codec_id == AV_CODEC_ID_MP3 )
+        if( ctx->codec_id == AV_CODEC_ID_MP2 ||
+            ctx->codec_id == AV_CODEC_ID_MP3 )
             p_sys->i_reject_count = 3;
 
         goto end;
@@ -352,8 +380,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     if( p_dec->fmt_out.audio.i_rate != (unsigned int)ctx->sample_rate )
         date_Init( &p_sys->end_date, ctx->sample_rate, 1 );
 
-    if( p_block->i_pts > VLC_TS_INVALID &&
-        p_block->i_pts > date_Get( &p_sys->end_date ) )
+    if( p_block->i_pts > date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
@@ -361,6 +388,7 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_buffer == 0 )
     {   /* Done with this buffer */
         block_Release( p_block );
+        p_block = NULL;
         *pp_block = NULL;
     }
 
@@ -448,7 +476,8 @@ block_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 end:
     *pp_block = NULL;
 drop:
-    block_Release(p_block);
+    if( p_block != NULL )
+        block_Release(p_block);
     return NULL;
 }
 

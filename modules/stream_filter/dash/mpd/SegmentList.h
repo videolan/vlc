@@ -26,6 +26,7 @@
 #define SEGMENTLIST_H_
 
 #include "mpd/SegmentInfo.h"
+#include "mpd/ICanonicalUrl.hpp"
 
 namespace dash
 {
@@ -34,7 +35,7 @@ namespace dash
         class SegmentList : public SegmentInfo
         {
             public:
-                SegmentList             ();
+                SegmentList             ( ICanonicalUrl * = NULL );
                 virtual ~SegmentList    ();
         };
     }

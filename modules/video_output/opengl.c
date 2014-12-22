@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
 #include <vlc_subpicture.h>
@@ -309,12 +311,12 @@ static void BuildYUVFragmentShader(vout_display_opengl_t *vgl,
         code = NULL;
 
     for (int i = 0; i < 4; i++) {
-        float correction = i < 3 ? yuv_range_correction : 1.0;
+        float correction = i < 3 ? yuv_range_correction : 1.f;
         /* We place coefficient values for coefficient[4] in one array from matrix values.
            Notice that we fill values from top down instead of left to right.*/
         for (int j = 0; j < 4; j++)
             local_value[*local_count + i*4+j] = j < 3 ? correction * matrix[j*4+i]
-                                                      : 0.0 ;
+                                                      : 0.f;
     }
     (*local_count) += 4;
 
@@ -584,7 +586,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     if (fmt->i_chroma == VLC_CODEC_XYZ12) {
-        vlc_fourcc_GetChromaDescription(fmt->i_chroma);
         need_fs_xyz       = true;
         vgl->fmt          = *fmt;
         vgl->fmt.i_chroma = VLC_CODEC_XYZ12;
@@ -593,6 +594,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->tex_type     = GL_UNSIGNED_SHORT;
     }
     vgl->chroma = vlc_fourcc_GetChromaDescription(vgl->fmt.i_chroma);
+    assert(vgl->chroma != NULL);
     vgl->use_multitexture = vgl->chroma->plane_count > 1;
 
     /* Texture size */
@@ -750,7 +752,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
         vlc_gl_Unlock(vgl->gl);
     }
     if (vgl->pool)
-        picture_pool_Delete(vgl->pool);
+        picture_pool_Release(vgl->pool);
     free(vgl);
 }
 
@@ -772,11 +774,7 @@ picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned
         return NULL;
 
     /* Wrap the pictures into a pool */
-    picture_pool_configuration_t cfg;
-    memset(&cfg, 0, sizeof(cfg));
-    cfg.picture_count = count;
-    cfg.picture       = picture;
-    vgl->pool = picture_pool_NewExtended(&cfg);
+    vgl->pool = picture_pool_New(count, picture);
     if (!vgl->pool)
         goto error;
 

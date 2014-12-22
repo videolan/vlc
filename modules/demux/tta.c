@@ -195,7 +195,7 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_data;
 
-    if( p_sys->i_currentframe > p_sys->i_totalframes )
+    if( p_sys->i_currentframe >= p_sys->i_totalframes )
         return 0;
 
     p_data = stream_Block( p_demux->s, p_sys->pi_seektable[p_sys->i_currentframe] );

@@ -26,13 +26,10 @@
 #define ABSTRACTADAPTATIONLOGIC_H_
 
 #include "adaptationlogic/IAdaptationLogic.h"
-#include "xml/Node.h"
 #include "http/Chunk.h"
 #include "mpd/MPD.h"
-#include "mpd/IMPDManager.h"
 #include "mpd/Period.h"
 #include "mpd/Representation.h"
-#include "mpd/Segment.h"
 
 struct stream_t;
 
@@ -43,21 +40,23 @@ namespace dash
         class AbstractAdaptationLogic : public IAdaptationLogic
         {
             public:
-                AbstractAdaptationLogic             (dash::mpd::IMPDManager *mpdManager, stream_t *stream);
+                AbstractAdaptationLogic             (mpd::MPD *mpd);
                 virtual ~AbstractAdaptationLogic    ();
 
-                virtual void                downloadRateChanged     (uint64_t bpsAvg, uint64_t bpsLastChunk);
-                virtual void                bufferLevelChanged      (mtime_t bufferedMicroSec, int bufferedPercent);
+                virtual dash::http::Chunk*  getNextChunk            (Streams::Type);
 
-                uint64_t                    getBpsAvg               () const;
-                uint64_t                    getBpsLastChunk         () const;
+                virtual void                updateDownloadRate     (size_t, mtime_t);
+
+                virtual void                bufferLevelChanged      (mtime_t bufferedMicroSec, int bufferedPercent);
                 int                         getBufferPercent        () const;
 
+            protected:
+                dash::mpd::MPD         *mpd;
+                dash::mpd::Period      *currentPeriod;
+                size_t                  count;
+                const mpd::Representation *prevRepresentation;
+
             private:
-                int                     bpsAvg;
-                long                    bpsLastChunk;
-                dash::mpd::IMPDManager  *mpdManager;
-                stream_t                *stream;
                 mtime_t                 bufferedMicroSec;
                 int                     bufferedPercent;
         };

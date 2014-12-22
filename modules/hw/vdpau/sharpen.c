@@ -82,8 +82,9 @@ static int Open(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
-    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420)
+    if (filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
+     && filter->fmt_in.video.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
         return VLC_EGENERIC;
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;

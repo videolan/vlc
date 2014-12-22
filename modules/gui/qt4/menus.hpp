@@ -78,10 +78,10 @@ public:
     static void createMenuBar( MainInterface *mi, intf_thread_t * );
 
     /* Popups Menus */
-    static void PopupMenu( intf_thread_t *, bool );
-    static void AudioPopupMenu( intf_thread_t *, bool );
-    static void VideoPopupMenu( intf_thread_t *, bool );
-    static void MiscPopupMenu( intf_thread_t *, bool );
+    static QMenu* PopupMenu( intf_thread_t *, bool );
+    static QMenu* AudioPopupMenu( intf_thread_t *, bool );
+    static QMenu* VideoPopupMenu( intf_thread_t *, bool );
+    static QMenu* MiscPopupMenu( intf_thread_t *, bool );
 
     /* Systray */
     static void updateSystrayMenu( MainInterface *, intf_thread_t  *,
@@ -98,6 +98,8 @@ public:
         ACTION_DELETE_ON_REBUILD = 0x8
     };
     Q_DECLARE_FLAGS(actionflags, actionflag)
+
+    static QMenu *ppMenu;
 
 private:
     /* All main Menus */
@@ -133,6 +135,7 @@ private:
     }
 
     static QMenu *HelpMenu( QWidget * );
+    static QMenu *PPMenu( intf_thread_t *p_intf );
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );

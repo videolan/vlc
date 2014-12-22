@@ -26,66 +26,18 @@
 #endif
 
 #include "AlwaysBestAdaptationLogic.h"
+#include "Representationselectors.hpp"
 
 using namespace dash::logic;
-using namespace dash::xml;
-using namespace dash::http;
 using namespace dash::mpd;
 
-AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (IMPDManager *mpdManager, stream_t *stream) :
-                           AbstractAdaptationLogic      (mpdManager, stream)
-{
-    this->mpdManager    = mpdManager;
-    this->count         = 0;
-    this->initSchedule();
-}
-AlwaysBestAdaptationLogic::~AlwaysBestAdaptationLogic   ()
+AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (MPD *mpd) :
+                           AbstractAdaptationLogic      (mpd)
 {
 }
 
-Chunk*  AlwaysBestAdaptationLogic::getNextChunk()
+Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
 {
-    if(this->schedule.size() == 0)
-        return NULL;
-
-    if(this->count == this->schedule.size())
-        return NULL;
-
-    if ( this->count < this->schedule.size() )
-    {
-        Chunk *chunk = new Chunk();
-        chunk->setUrl(this->schedule.at( this->count )->getSourceUrl());
-        this->count++;
-        return chunk;
-    }
-    return NULL;
-}
-
-const Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation() const
-{
-    if ( this->count < this->schedule.size() )
-        return this->schedule.at( this->count )->getParentRepresentation();
-    return NULL;
-}
-
-void    AlwaysBestAdaptationLogic::initSchedule ()
-{
-    if(this->mpdManager != NULL)
-    {
-        std::vector<Period *> periods = this->mpdManager->getPeriods();
-
-        for(size_t i = 0; i < periods.size(); i++)
-        {
-            Representation *best = this->mpdManager->getBestRepresentation(periods.at(i));
-
-            if(best != NULL)
-            {
-                std::vector<Segment *> segments = this->mpdManager->getSegments(best);
-                for(size_t j = 0; j < segments.size(); j++)
-                {
-                    this->schedule.push_back(segments.at(j));
-                }
-            }
-        }
-    }
+    RepresentationSelector selector;
+    return selector.select(currentPeriod, type);
 }

@@ -2,7 +2,7 @@
 # Output a system dependent set of variables, describing how to set the
 # run time search path of shared libraries in an executable.
 #
-#   Copyright 1996-2013 Free Software Foundation, Inc.
+#   Copyright 1996-2014 Free Software Foundation, Inc.
 #   Taken from GNU libtool, 2001
 #   Originally by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 #
@@ -367,11 +367,7 @@ else
     dgux*)
       hardcode_libdir_flag_spec='-L$libdir'
       ;;
-    freebsd2.2*)
-      hardcode_libdir_flag_spec='-R$libdir'
-      hardcode_direct=yes
-      ;;
-    freebsd2*)
+    freebsd2.[01]*)
       hardcode_direct=yes
       hardcode_minus_L=yes
       ;;
@@ -548,13 +544,11 @@ case "$host_os" in
   dgux*)
     library_names_spec='$libname$shrext'
     ;;
+  freebsd[23].*)
+    library_names_spec='$libname$shrext$versuffix'
+    ;;
   freebsd* | dragonfly*)
-    case "$host_os" in
-      freebsd[123]*)
-        library_names_spec='$libname$shrext$versuffix' ;;
-      *)
-        library_names_spec='$libname$shrext' ;;
-    esac
+    library_names_spec='$libname$shrext'
     ;;
   gnu*)
     library_names_spec='$libname$shrext'

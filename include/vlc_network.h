@@ -239,18 +239,6 @@ VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *, 
 #  define NI_DGRAM       0x10
 # endif
 
-struct addrinfo
-{
-    int ai_flags;
-    int ai_family;
-    int ai_socktype;
-    int ai_protocol;
-    size_t ai_addrlen;
-    struct sockaddr *ai_addr;
-    char *ai_canonname;
-    struct addrinfo *ai_next;
-};
-
 # define AI_PASSIVE     1
 # define AI_CANONNAME   2
 # define AI_NUMERICHOST 4

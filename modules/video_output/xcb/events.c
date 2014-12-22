@@ -85,8 +85,7 @@ static void RegisterEvents (vlc_object_t *obj, xcb_connection_t *conn,
                             xcb_window_t wnd)
 {
     /* Subscribe to parent window resize events */
-    uint32_t value = XCB_EVENT_MASK_POINTER_MOTION
-                   | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+    uint32_t value = XCB_EVENT_MASK_POINTER_MOTION;
     xcb_change_window_attributes (conn, wnd, XCB_CW_EVENT_MASK, &value);
     /* Try to subscribe to click events */
     /* (only one X11 client can get them, so might not work) */
@@ -127,19 +126,9 @@ static const xcb_screen_t *FindScreen (vlc_object_t *obj,
  */
 vout_window_t *XCB_parent_Create (vout_display_t *vd,
                                   xcb_connection_t **restrict pconn,
-                                  const xcb_screen_t **restrict pscreen,
-                                  uint16_t *restrict pwidth,
-                                  uint16_t *restrict pheight)
+                                  const xcb_screen_t **restrict pscreen)
 {
-    vout_window_cfg_t cfg = {
-        .type = VOUT_WINDOW_TYPE_XID,
-        .x = var_InheritInteger (vd, "video-x"),
-        .y = var_InheritInteger (vd, "video-y"),
-        .width  = vd->cfg->display.width,
-        .height = vd->cfg->display.height,
-    };
-
-    vout_window_t *wnd = vout_display_NewWindow (vd, &cfg);
+    vout_window_t *wnd = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_XID);
     if (wnd == NULL)
     {
         msg_Err (vd, "window not available");
@@ -163,8 +152,6 @@ vout_window_t *XCB_parent_Create (vout_display_t *vd,
         msg_Err (vd, "window not valid");
         goto error;
     }
-    *pwidth = geo->width;
-    *pheight = geo->height;
 
     const xcb_screen_t *screen = FindScreen (VLC_OBJECT(vd), conn, geo->root);
     free (geo);
@@ -247,13 +234,6 @@ static void HandleVisibilityNotify (vout_display_t *vd, bool *visible,
     msg_Dbg (vd, "display is %svisible", *visible ? "" : "not ");
 }
 
-static void
-HandleParentStructure (vout_display_t *vd,
-                       const xcb_configure_notify_event_t *ev)
-{
-    vout_display_SendEventDisplaySize (vd, ev->width, ev->height, vd->cfg->is_fullscreen);
-}
-
 /**
  * Process an X11 event.
  */
@@ -277,15 +257,6 @@ static int ProcessEvent (vout_display_t *vd, xcb_connection_t *conn,
         case XCB_VISIBILITY_NOTIFY:
             HandleVisibilityNotify (vd, visible,
                                     (xcb_visibility_notify_event_t *)ev);
-            break;
-
-        case XCB_CONFIGURE_NOTIFY:
-            HandleParentStructure (vd, (xcb_configure_notify_event_t *)ev);
-            break;
-
-        /* FIXME I am not sure it is the right one */
-        case XCB_DESTROY_NOTIFY:
-            vout_display_SendEventClose (vd);
             break;
 
         case XCB_MAPPING_NOTIFY:

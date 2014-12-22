@@ -58,6 +58,9 @@ public:
     virtual int getWidth() const;
     virtual int getHeight() const;
 
+    /// compare two animated image
+    bool operator==( const AnimBitmap& other ) const;
+
 private:
     /// Bitmap stored
     const GenericBitmap &m_rBitmap;
