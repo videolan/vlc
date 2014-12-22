@@ -33,14 +33,19 @@ using namespace dash::http;
 
 AbstractAdaptationLogic::AbstractAdaptationLogic    (MPD *mpd_) :
                          mpd                        (mpd_),
-                         currentPeriod              (mpd->getFirstPeriod()),
-                         count                      (0),
-                         prevRepresentation         (NULL)
+                         currentPeriod              (mpd->getFirstPeriod())
 {
+    reset();
 }
 
 AbstractAdaptationLogic::~AbstractAdaptationLogic   ()
 {
+}
+
+void AbstractAdaptationLogic::reset()
+{
+    count = 0;
+    prevRepresentation = NULL;
 }
 
 Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
@@ -72,8 +77,7 @@ Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
     if (count == segments.size() && !b_templated)
     {
         currentPeriod = mpd->getNextPeriod(currentPeriod);
-        prevRepresentation = NULL;
-        count = 0;
+        reset();
         return getNextChunk(type);
     }
 

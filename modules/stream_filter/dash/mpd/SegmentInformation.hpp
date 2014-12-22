@@ -25,6 +25,7 @@
 #endif
 
 #include "ICanonicalUrl.hpp"
+#include "Properties.hpp"
 #include <vlc_common.h>
 #include <vector>
 
@@ -49,6 +50,8 @@ namespace dash
                 virtual ~SegmentInformation();
                 std::vector<ISegment *> getSegments() const;
                 bool canBitswitch() const;
+                uint64_t getTimescale() const;
+                virtual mtime_t getPeriodStart() const;
 
                 class SplitPoint
                 {
@@ -87,6 +90,8 @@ namespace dash
                     BITSWITCH_YES,
                     BITSWITCH_NO
                 } bitswitch_policy;
+
+                Property<uint64_t> timescale;
         };
     }
 }

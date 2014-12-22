@@ -70,6 +70,16 @@ namespace dash
             private:
                 mtime_t time;
         };
+
+        class UTCTime
+        {
+            public:
+                UTCTime(const std::string&);
+                operator mtime_t() const;
+
+            private:
+                mtime_t time;
+        };
     }
 }
 

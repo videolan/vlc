@@ -40,12 +40,12 @@ using namespace dash::http;
 ISegment::ISegment(const ICanonicalUrl *parent):
     ICanonicalUrl( parent ),
     startByte  (0),
-    endByte    (0),
-    startTime  (VLC_TS_INVALID),
-    duration   (0)
+    endByte    (0)
 {
     debugName = "Segment";
     classId = CLASSID_ISEGMENT;
+    startTime.Set(VLC_TS_INVALID);
+    duration.Set(0);
 }
 
 dash::http::Chunk * ISegment::getChunk(const std::string &url)
@@ -89,26 +89,6 @@ void ISegment::setByteRange(size_t start, size_t end)
 {
     startByte = start;
     endByte   = end;
-}
-
-void ISegment::setStartTime(mtime_t ztime)
-{
-    startTime = ztime;
-}
-
-mtime_t ISegment::getStartTime() const
-{
-    return startTime;
-}
-
-mtime_t ISegment::getDuration() const
-{
-    return duration;
-}
-
-void ISegment::setDuration(mtime_t d)
-{
-    duration = d;
 }
 
 size_t ISegment::getOffset() const

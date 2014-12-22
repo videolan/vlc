@@ -38,6 +38,8 @@ SegmentTemplate::SegmentTemplate( ICanonicalUrl *parent ) :
 {
     debugName = "SegmentTemplate";
     classId = Segment::CLASSID_SEGMENT;
+    duration.Set(0);
+    timescale.Set(0);
 }
 
 Url SegmentTemplate::getUrlSegment() const

@@ -36,6 +36,7 @@ SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
     for(int i=0; i<InfoTypeCount; i++)
         segmentTemplate[i] = NULL;
     bitswitch_policy = BITSWITCH_INHERIT;
+    timescale.Set(0);
 }
 
 SegmentInformation::SegmentInformation(ICanonicalUrl * parent_) :
@@ -47,6 +48,7 @@ SegmentInformation::SegmentInformation(ICanonicalUrl * parent_) :
     for(int i=0; i<InfoTypeCount; i++)
         segmentTemplate[i] = NULL;
     bitswitch_policy = BITSWITCH_INHERIT;
+    timescale.Set(0);
 }
 
 SegmentInformation::~SegmentInformation()
@@ -104,6 +106,24 @@ bool SegmentInformation::canBitswitch() const
         return (bitswitch_policy == BITSWITCH_YES);
 }
 
+uint64_t SegmentInformation::getTimescale() const
+{
+    if (timescale.Get())
+        return timescale.Get();
+    else if (parent)
+        return parent->getTimescale();
+    else
+        return 1;
+}
+
+mtime_t SegmentInformation::getPeriodStart() const
+{
+    if(parent)
+        return parent->getPeriodStart();
+    else
+        return 0;
+}
+
 void SegmentInformation::setSegmentList(SegmentList *list)
 {
     segmentList = list;
@@ -133,7 +153,7 @@ static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
                                                     start + segment->getOffset(),
                                                     end + segment->getOffset());
             segment->addSubSegment(subsegment);
-            segment->setStartTime(time);
+            segment->startTime.Set(time);
             break;
         }
     }

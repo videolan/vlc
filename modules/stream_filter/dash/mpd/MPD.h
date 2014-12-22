@@ -34,6 +34,7 @@
 #include "mpd/ICanonicalUrl.hpp"
 #include "mpd/ProgramInformation.h"
 #include "mpd/Profile.hpp"
+#include "Properties.hpp"
 
 namespace dash
 {
@@ -72,6 +73,8 @@ namespace dash
                 virtual const std::vector<Period *>&    getPeriods() const;
                 virtual Period*                         getFirstPeriod() const;
                 virtual Period*                         getNextPeriod(Period *period);
+
+                Property<time_t>                    playbackStart;
 
             private:
                 stream_t                           *stream;

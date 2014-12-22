@@ -81,6 +81,8 @@ bool DASHManager::start(demux_t *demux)
     if(!conManager)
         return false;
 
+    mpd->playbackStart.Set(time(NULL));
+
     return true;
 }
 

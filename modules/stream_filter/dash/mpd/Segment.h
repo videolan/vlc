@@ -31,6 +31,7 @@
 #include "mpd/BaseUrl.h"
 #include "mpd/ICanonicalUrl.hpp"
 #include "http/Chunk.h"
+#include "Properties.hpp"
 
 namespace dash
 {
@@ -54,25 +55,21 @@ namespace dash
                 virtual void                            done            ();
                 virtual dash::http::Chunk*              toChunk         (size_t, Representation * = NULL);
                 virtual void                            setByteRange    (size_t start, size_t end);
-                virtual void                            setStartTime    (mtime_t ztime);
-                virtual mtime_t                         getStartTime    () const;
-                virtual mtime_t                         getDuration     () const;
-                virtual void                            setDuration     (mtime_t);
                 virtual size_t                          getOffset       () const;
                 virtual std::vector<ISegment*>          subSegments     () = 0;
                 virtual std::string                     toString        (int = 0) const;
                 virtual bool                            contains        (size_t byte) const;
                 int                                     getClassId      () const;
+                Property<mtime_t>       startTime;
+                Property<mtime_t>       duration;
 
                 static const int CLASSID_ISEGMENT = 0;
 
             protected:
                 size_t                  startByte;
                 size_t                  endByte;
-                mtime_t                 startTime;
                 std::string             debugName;
                 int                     classId;
-                mtime_t                 duration;
 
                 class SegmentChunk : public dash::http::Chunk
                 {

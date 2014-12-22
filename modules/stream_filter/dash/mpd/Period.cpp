@@ -37,6 +37,8 @@ using namespace dash::mpd;
 Period::Period(MPD *mpd) :
     SegmentInformation( mpd )
 {
+    duration.Set(0);
+    startTime.Set(0);
 }
 
 Period::~Period ()
@@ -96,4 +98,9 @@ std::vector<std::string> Period::toString(int indent) const
         ret.insert(ret.end(), debug.begin(), debug.end());
     }
     return ret;
+}
+
+mtime_t Period::getPeriodStart() const
+{
+    return startTime.Get();
 }

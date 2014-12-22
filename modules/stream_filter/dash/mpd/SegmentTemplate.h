@@ -25,6 +25,7 @@
 #define SEGMENTTEMPLATE_H
 
 #include "mpd/Segment.h"
+#include "Properties.hpp"
 
 namespace dash
 {
@@ -40,6 +41,8 @@ namespace dash
                 virtual bool            isSingleShot() const;
                 size_t                  getStartIndex() const;
                 void                    setStartIndex(size_t);
+                Property<mtime_t>       duration;
+                Property<uint64_t>      timescale;
 
             private:
                 size_t                  startIndex;

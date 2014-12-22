@@ -37,14 +37,15 @@ MPD::MPD (stream_t *stream_, Profile profile_) :
     ICanonicalUrl(),
     stream(stream_),
     profile( profile_ ),
-    availabilityStartTime( -1 ),
-    availabilityEndTime( -1 ),
-    duration( -1 ),
+    availabilityStartTime( 0 ),
+    availabilityEndTime( 0 ),
+    duration( 0 ),
     minUpdatePeriod( -1 ),
-    minBufferTime( -1 ),
-    timeShiftBufferDepth( -1 ),
+    minBufferTime( 0 ),
+    timeShiftBufferDepth( 0 ),
     programInfo( NULL )
 {
+    playbackStart.Set(0);
 }
 
 MPD::~MPD   ()

@@ -42,6 +42,7 @@ namespace dash
             public:
                 AbstractAdaptationLogic             (mpd::MPD *mpd);
                 virtual ~AbstractAdaptationLogic    ();
+                virtual void reset                  ();
 
                 virtual dash::http::Chunk*  getNextChunk            (Streams::Type);
 

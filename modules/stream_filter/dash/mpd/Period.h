@@ -30,6 +30,7 @@
 #include "mpd/AdaptationSet.h"
 #include "mpd/ICanonicalUrl.hpp"
 #include "mpd/SegmentInformation.hpp"
+#include "Properties.hpp"
 #include "Streams.hpp"
 
 namespace dash
@@ -51,6 +52,10 @@ namespace dash
                 std::vector<std::string>            toString            (int = 0) const;
 
                 virtual Url getUrlSegment() const; /* reimpl */
+                virtual mtime_t getPeriodStart() const; /* reimpl */
+
+                Property<mtime_t> duration;
+                Property<mtime_t> startTime;
 
             private:
                 std::vector<AdaptationSet *>    adaptationSets;

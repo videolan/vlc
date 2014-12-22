@@ -20,6 +20,7 @@
 #include "Url.hpp"
 #include "Representation.h"
 #include "SegmentTemplate.h"
+#include "MPD.h"
 
 #include <sstream>
 using namespace dash::mpd;
@@ -95,22 +96,28 @@ std::string Url::Component::contextualize(size_t index, const Representation *re
     if(pos != std::string::npos)
     {
         std::stringstream ss;
-        ss << (templ->getDuration() * index);
+        ss << (templ->duration.Get() * index);
         ret.replace(pos, std::string("$Time$").length(), ss.str());
     }
 
-    pos = ret.find("$Index$");
-    if(pos != std::string::npos)
-    {
-        std::stringstream ss;
-        ss << index;
-        ret.replace(pos, std::string("$Index$").length(), ss.str());
-    }
 
     pos = ret.find("$Number$");
     if(pos != std::string::npos)
     {
         std::stringstream ss;
+        /* live streams / templated */
+        if(templ && rep->getMPD()->isLive() && templ->duration.Get())
+        {
+            mtime_t playbackstart = rep->getMPD()->playbackStart.Get();
+            mtime_t streamstart = rep->getMPD()->getAvailabilityStartTime();
+            streamstart += rep->getPeriodStart();
+            mtime_t duration = templ->duration.Get();
+            uint64_t timescale = templ->timescale.Get() ?
+                                 templ->timescale.Get() :
+                                 rep->getTimescale();
+            if(duration && timescale)
+                index += (playbackstart - streamstart) * timescale / duration;
+        }
         ss << index;
         ret.replace(pos, std::string("$Number$").length(), ss.str());
     }
