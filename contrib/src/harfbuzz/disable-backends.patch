@@ -1,6 +1,6 @@
---- harfbuzz-0.9.5/configure.ac.orig	2012-10-18 15:58:56.940962618 +0200
-+++ harfbuzz-0.9.5/configure.ac	2012-10-18 15:59:24.348963620 +0200
-@@ -117,7 +117,7 @@
+--- harfbuzz-0.9.17/configure.ac.orig	2014-12-22 10:10:36.334227291 +0100
++++ harfbuzz-0.9.17/configure.ac	2014-12-22 10:13:55.664060127 +0100
+@@ -113,7 +113,7 @@
  
  dnl ===========================================================================
  
@@ -9,20 +9,18 @@
  if $have_hb_old; then
  	AC_DEFINE(HAVE_HB_OLD, 1, [Have Old HarfBuzz backend])
  fi
-@@ -208,7 +208,7 @@
- 
- dnl ===========================================================================
- 
--AC_CHECK_HEADERS(usp10.h windows.h, have_uniscribe=true, have_uniscribe=false)
+@@ -249,6 +249,7 @@
+ 	[have_uniscribe=true; AC_MSG_RESULT(yes)],
+ 	[have_uniscribe=false;AC_MSG_RESULT(no)])
+ LIBS=$saved_LIBS
 +have_uniscribe=false
  if $have_uniscribe; then
  	UNISCRIBE_CFLAGS=
  	UNISCRIBE_LIBS="-lusp10 -lgdi32"
-@@ -220,7 +220,7 @@
- 
+@@ -261,6 +262,7 @@
  dnl ===========================================================================
  
--AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, have_coretext=true, have_coretext=false)
+ AC_CHECK_TYPE(CTFontRef, have_coretext=true, have_coretext=false, [#include <ApplicationServices/ApplicationServices.h>])
 +have_coretext=false
  if $have_coretext; then
  	CORETEXT_CFLAGS=
