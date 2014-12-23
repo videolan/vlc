@@ -25,7 +25,7 @@
 #ifdef MODULE_NAME_IS_directdraw
 # include <ddraw.h>
 #endif
-#ifdef MODULE_NAME_IS_direct3d
+#ifdef MODULE_NAME_IS_direct3d9
 # include <d3d9.h>
 # include <d3dx9effect.h>
 #endif
@@ -135,7 +135,7 @@ struct vout_display_sys_t
     ID2D1Bitmap            *d2_bitmap;                            /* D2 bitmap */
 #endif
 
-#ifdef MODULE_NAME_IS_direct3d
+#ifdef MODULE_NAME_IS_direct3d9
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
     /* show video on desktop window ? */
     bool use_desktop;

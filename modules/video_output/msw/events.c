@@ -620,7 +620,7 @@ static void MouseReleased( event_thread_t *p_event, unsigned button )
     vout_display_SendEventMouseReleased( p_event->vd, button );
 }
 
-#ifdef MODULE_NAME_IS_direct3d
+#ifdef MODULE_NAME_IS_direct3d9
 static int CALLBACK
 enumWindowsProc(HWND hwnd, LPARAM lParam)
 {
@@ -681,7 +681,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     /* Get this module's instance */
     hInstance = GetModuleHandle(NULL);
 
-    #ifdef MODULE_NAME_IS_direct3d
+    #ifdef MODULE_NAME_IS_direct3d9
     if( !p_event->use_desktop )
     #endif
     {
@@ -692,7 +692,7 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
         else
             p_event->hparent = NULL;
     }
-    #ifdef MODULE_NAME_IS_direct3d
+    #ifdef MODULE_NAME_IS_direct3d9
     else
     {
         vout_display_DeleteWindow(vd, NULL);
@@ -869,7 +869,7 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
     if( p_event->hfswnd )
         DestroyWindow( p_event->hfswnd );
 
-    #ifdef MODULE_NAME_IS_direct3d
+    #ifdef MODULE_NAME_IS_direct3d9
     if( !p_event->use_desktop )
     #endif
         vout_display_DeleteWindow( vd, p_event->parent_window );

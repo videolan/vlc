@@ -72,7 +72,7 @@ int CommonInit(vout_display_t *vd)
 
     event_cfg_t cfg;
     memset(&cfg, 0, sizeof(cfg));
-#ifdef MODULE_NAME_IS_direct3d
+#ifdef MODULE_NAME_IS_direct3d9
     cfg.use_desktop = sys->use_desktop;
 #endif
 #ifdef MODULE_NAME_IS_directdraw
@@ -143,7 +143,7 @@ void CommonManage(vout_display_t *vd)
 
             /* This code deals with both resize and move
              *
-             * For most drivers(direct3d, gdi, opengl), move is never
+             * For most drivers(direct3d9, gdi, opengl), move is never
              * an issue. The surface automatically gets moved together
              * with the associated window (hvideownd)
              *
@@ -348,7 +348,7 @@ void UpdateRects(vout_display_t *vd,
                      SWP_NOCOPYBITS|SWP_NOZORDER|SWP_ASYNCWINDOWPOS);
 
     /* Destination image position and dimensions */
-#if defined(MODULE_NAME_IS_direct3d) || defined(MODULE_NAME_IS_direct2d)
+#if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct2d)
     rect_dest.left   = 0;
     rect_dest.right  = place.width;
     rect_dest.top    = 0;
@@ -425,7 +425,7 @@ void UpdateRects(vout_display_t *vd,
     /* Apply overlay hardware constraints */
     if (sys->use_overlay)
         AlignRect(&rect_src_clipped, sys->i_align_src_boundary, sys->i_align_src_size);
-#elif defined(MODULE_NAME_IS_direct3d) || defined(MODULE_NAME_IS_direct2d)
+#elif defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct2d)
     /* Needed at least with YUV content */
     rect_src_clipped.left &= ~1;
     rect_src_clipped.right &= ~1;
@@ -465,7 +465,7 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
 {
     vout_display_sys_t *sys = vd->sys;
 
-#ifdef MODULE_NAME_IS_direct3d
+#ifdef MODULE_NAME_IS_direct3d9
     if (sys->use_desktop && is_fullscreen)
         return VLC_EGENERIC;
 #endif
@@ -591,7 +591,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
         const unsigned state = va_arg(args, unsigned);
         const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
-#ifdef MODULE_NAME_IS_direct3d
+#ifdef MODULE_NAME_IS_direct3d9
         if (sys->use_desktop && is_on_top)
             return VLC_EGENERIC;
 #endif

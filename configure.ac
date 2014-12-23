@@ -3234,7 +3234,7 @@ AS_IF([test "${enable_directx}" != "no"], [
 
   dnl Direct3D
   AC_CHECK_HEADERS(d3d9.h, [
-    VLC_ADD_PLUGIN([direct3d])
+    VLC_ADD_PLUGIN([direct3d9])
   ])
 
   dnl Direct2D
