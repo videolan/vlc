@@ -47,18 +47,11 @@ namespace dash
 
                 virtual void                updateDownloadRate     (size_t, mtime_t);
 
-                virtual void                bufferLevelChanged      (mtime_t bufferedMicroSec, int bufferedPercent);
-                int                         getBufferPercent        () const;
-
             protected:
                 dash::mpd::MPD         *mpd;
                 dash::mpd::Period      *currentPeriod;
                 size_t                  count;
                 mpd::Representation    *prevRepresentation;
-
-            private:
-                mtime_t                 bufferedMicroSec;
-                int                     bufferedPercent;
         };
     }
 }

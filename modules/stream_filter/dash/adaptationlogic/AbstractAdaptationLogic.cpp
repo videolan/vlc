@@ -35,9 +35,7 @@ AbstractAdaptationLogic::AbstractAdaptationLogic    (MPD *mpd_) :
                          mpd                        (mpd_),
                          currentPeriod              (mpd->getFirstPeriod()),
                          count                      (0),
-                         prevRepresentation         (NULL),
-                         bufferedMicroSec           (0),
-                         bufferedPercent            (0)
+                         prevRepresentation         (NULL)
 {
 }
 
@@ -99,17 +97,6 @@ Chunk*  AbstractAdaptationLogic::getNextChunk(Streams::Type type)
     return NULL;
 }
 
-void AbstractAdaptationLogic::bufferLevelChanged     (mtime_t bufferedMicroSec, int bufferedPercent)
-{
-    this->bufferedMicroSec = bufferedMicroSec;
-    this->bufferedPercent  = bufferedPercent;
-}
-
 void AbstractAdaptationLogic::updateDownloadRate    (size_t, mtime_t)
 {
-}
-
-int AbstractAdaptationLogic::getBufferPercent        () const
-{
-    return this->bufferedPercent;
 }

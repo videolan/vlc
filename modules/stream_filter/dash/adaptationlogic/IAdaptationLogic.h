@@ -35,7 +35,7 @@ namespace dash
 {
     namespace logic
     {
-        class IAdaptationLogic : public IDownloadRateObserver, public dash::buffer::IBufferObserver
+        class IAdaptationLogic : public IDownloadRateObserver
         {
             public:
 
