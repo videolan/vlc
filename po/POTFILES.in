@@ -1175,6 +1175,7 @@ modules/video_output/kva.c
 modules/video_output/macosx.m
 modules/video_output/msw/direct2d.c
 modules/video_output/msw/direct3d9.c
+modules/video_output/msw/direct3d11.c
 modules/video_output/msw/directdraw.c
 modules/video_output/msw/events.c
 modules/video_output/msw/glwin32.c

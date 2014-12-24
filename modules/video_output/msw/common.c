@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Martell Malone <martellmalone@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -117,6 +118,13 @@ void CommonClean(vout_display_t *vd)
     RestoreScreensaver(vd);
 }
 
+/* */
+picture_pool_t *CommonPool(vout_display_t *vd, unsigned count)
+{
+    VLC_UNUSED(count);
+    return vd->sys->pool;
+}
+
 void CommonManage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -213,6 +221,25 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
     picture->p->p_pixels = data;
     picture->p->i_pitch  = pitch;
     picture->p->i_lines  = picture->format.i_visible_height;
+
+    /*  Fill chroma planes for biplanar YUV */
+    if (picture->format.i_chroma == VLC_CODEC_NV12 ||
+        picture->format.i_chroma == VLC_CODEC_NV21) {
+
+        for (int n = 1; n < picture->i_planes; n++) {
+            const plane_t *o = &picture->p[n-1];
+            plane_t *p = &picture->p[n];
+
+            p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
+            p->i_pitch  = pitch;
+            p->i_lines  = picture->format.i_visible_height;
+        }
+        /* The dx/d3d buffer is always allocated as NV12 */
+        if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_NV12)) {
+            /* TODO : Swap NV21 UV planes to match NV12 */
+            return VLC_EGENERIC;
+        }
+    }
 
     /*  Fill chroma planes for planar YUV */
     if (picture->format.i_chroma == VLC_CODEC_I420 ||
@@ -348,7 +375,7 @@ void UpdateRects(vout_display_t *vd,
                      SWP_NOCOPYBITS|SWP_NOZORDER|SWP_ASYNCWINDOWPOS);
 
     /* Destination image position and dimensions */
-#if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct2d)
+#if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11) || defined(MODULE_NAME_IS_direct2d)
     rect_dest.left   = 0;
     rect_dest.right  = place.width;
     rect_dest.top    = 0;
@@ -425,7 +452,7 @@ void UpdateRects(vout_display_t *vd,
     /* Apply overlay hardware constraints */
     if (sys->use_overlay)
         AlignRect(&rect_src_clipped, sys->i_align_src_boundary, sys->i_align_src_size);
-#elif defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct2d)
+#elif defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11) || defined(MODULE_NAME_IS_direct2d)
     /* Needed at least with YUV content */
     rect_src_clipped.left &= ~1;
     rect_src_clipped.right &= ~1;

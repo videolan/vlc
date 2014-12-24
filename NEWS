@@ -55,6 +55,8 @@ Video ouput:
  * Large rework of the Android video outputs: there is now Surface (2.1, 2.2)
    NativeWindow (2.3+, supports hw rotation, subpicture blending, opaque)
  * Support rotation in Android NativeWindow output and hardware decoders
+ * Renamed the Direct3D output module to Direct3D9
+ * Added Direct3D11 video mode supporting both Windows desktop and WinRT modes.
 
 Video filter:
  * Hardware deinterlacing on the rPI, using MMAL

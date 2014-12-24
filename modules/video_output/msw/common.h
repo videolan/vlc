@@ -6,6 +6,7 @@
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Damien Fouilleul <damienf@videolan.org>
+ *          Martell Malone <martellmalone@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -24,6 +25,15 @@
 
 #ifdef MODULE_NAME_IS_directdraw
 # include <ddraw.h>
+#endif
+#ifdef MODULE_NAME_IS_direct3d11
+# include <d3d11.h>
+# if VLC_WINSTORE_APP
+#  include <dxgi1_2.h>
+# else
+#  include <dxgi.h>
+#endif
+# include <d3dcompiler.h>
 #endif
 #ifdef MODULE_NAME_IS_direct3d9
 # include <d3d9.h>
@@ -135,6 +145,38 @@ struct vout_display_sys_t
     ID2D1Bitmap            *d2_bitmap;                            /* D2 bitmap */
 #endif
 
+#ifdef MODULE_NAME_IS_direct3d11
+#if !VLC_WINSTORE_APP
+    HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
+    HINSTANCE                hd3d11_dll;       /* handle of the opened d3d11 dll */
+    HINSTANCE                hd3dcompiler_dll; /* handle of the opened d3dcompiler dll */
+    IDXGIAdapter             *dxgiadapter;     /* DXGI adapter */
+    IDXGIFactory             *dxgifactory;     /* DXGI factory */
+    IDXGISwapChain           *dxgiswapChain;   /* DXGI 1.0 swap chain */
+    /* We should find a better way to store this or atleast a shorter name */
+    PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN OurD3D11CreateDeviceAndSwapChain;
+    PFN_D3D11_CREATE_DEVICE                OurD3D11CreateDevice;
+    pD3DCompile                            OurD3DCompile;
+#else
+    IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.1 swap chain */
+#endif
+    ID3D11Device             *d3ddevice;       /* D3D device */
+    ID3D11DeviceContext      *d3dcontext;      /* D3D context */
+    ID3D11Texture2D          *d3dtexture;
+    ID3D11ShaderResourceView *d3dresViewY;
+    ID3D11ShaderResourceView *d3dresViewUV;
+    ID3D11RenderTargetView   *d3drenderTargetView;
+    ID3D11DepthStencilView   *d3ddepthStencilView;
+    ID3D11VertexShader       *d3dvertexShader;
+    ID3D11PixelShader        *d3dpixelShader;
+    ID3D11InputLayout        *d3dvertexLayout;
+    ID3D11SamplerState       *d3dsampState;
+    picture_sys_t            *picsys;
+    D3D_FEATURE_LEVEL        d3dfeaturelevel;
+    DXGI_FORMAT              d3dFormat;
+    vlc_fourcc_t             vlcFormat;
+#endif
+
 #ifdef MODULE_NAME_IS_direct3d9
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
     /* show video on desktop window ? */
@@ -208,6 +250,8 @@ void UpdateRects (vout_display_t *,
                   const video_format_t *,
                   bool is_forced);
 void AlignRect(RECT *, int align_boundary, int align_size);
+
+picture_pool_t *CommonPool(vout_display_t *, unsigned);
 
 /*****************************************************************************
  * Constants

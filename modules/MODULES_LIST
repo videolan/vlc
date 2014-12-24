@@ -98,6 +98,7 @@ $Id$
  * diracsys: BBC Dirac demuxer
  * direct2d: video output module using the Direct2D API
  * direct3d9: video output module using the Direct3D9 API
+ * direct3d11: video output module using the Direct3D11 API
  * directdraw: video output module using the DirectDraw API
  * directfb: Direct Framebuffer video output
  * directsound: audio output module using the DirectSound API
