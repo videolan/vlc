@@ -253,6 +253,10 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
     playlist_item_t *p_new = NULL;
+    bool requested = p_sys->request.b_request;
+
+    /* Clear the request */
+    p_sys->request.b_request = false;
 
     /* Handle quickly a few special cases */
     /* No items to play */
@@ -263,11 +267,8 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
     }
 
     /* Start the real work */
-    if( p_sys->request.b_request )
+    if( requested )
     {
-        /* Clear the request */
-        p_sys->request.b_request = false;
-
         p_new = p_sys->request.p_item;
 
         if( p_new == NULL && p_sys->request.p_node == NULL )
