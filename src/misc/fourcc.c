@@ -285,6 +285,7 @@ static const staticentry_t p_list_video[] = {
         /* avc1: special case h264 */
         A("avc1"),
         A("AVC1"),
+        A("avc3"),
         E("ai5p", "AVC-Intra  50M 720p24/30/60"),
         E("ai5q", "AVC-Intra  50M 720p25/50"),
         E("ai52", "AVC-Intra  50M 1080p25/50"),
