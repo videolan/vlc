@@ -3661,6 +3661,7 @@ static const struct
     { ATOM_dcom,    MP4_ReadBox_dcom,         MP4_FreeBox_Common, 0 },
     { ATOM_cmvd,    MP4_ReadBox_cmvd,         MP4_FreeBox_cmvd, 0 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         MP4_FreeBox_avcC, ATOM_avc1 },
+    { ATOM_avcC,    MP4_ReadBox_avcC,         MP4_FreeBox_avcC, ATOM_avc3 },
     { ATOM_hvcC,    MP4_ReadBox_hvcC,         MP4_FreeBox_hvcC, 0 },
     { ATOM_dac3,    MP4_ReadBox_dac3,         MP4_FreeBox_Common, 0 },
     { ATOM_dec3,    MP4_ReadBox_dec3,         MP4_FreeBox_Common, 0 },
@@ -3757,6 +3758,7 @@ static const struct
 
     { ATOM_jpeg,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
     { ATOM_avc1,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
+    { ATOM_avc3,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
 
     { ATOM_yv12,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, 0 },
     { ATOM_yuv2,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, 0 },

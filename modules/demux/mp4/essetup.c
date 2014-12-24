@@ -286,6 +286,7 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         }
 
         /* avc1: send avcC (h264 without annexe B, ie without start code)*/
+        case VLC_FOURCC( 'a', 'v', 'c', '3' ):
         case VLC_FOURCC( 'a', 'v', 'c', '1' ):
         {
             MP4_Box_t *p_avcC = MP4_BoxGet( p_sample, "avcC" );

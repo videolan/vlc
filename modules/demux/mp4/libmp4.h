@@ -194,6 +194,7 @@
 #define ATOM_WMV3 VLC_FOURCC( 'W', 'M', 'V', '3' )
 
 #define ATOM_avc1 VLC_FOURCC( 'a', 'v', 'c', '1' )
+#define ATOM_avc3 VLC_FOURCC( 'a', 'v', 'c', '3' )
 #define ATOM_avcC VLC_FOURCC( 'a', 'v', 'c', 'C' )
 #define ATOM_m4ds VLC_FOURCC( 'm', '4', 'd', 's' )
 
