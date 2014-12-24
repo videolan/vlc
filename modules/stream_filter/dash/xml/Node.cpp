@@ -94,20 +94,9 @@ std::vector<std::string>            Node::getAttributeKeys      () const
     return keys;
 }
 
-bool                                Node::hasText               () const
-{
-    return false;
-}
-
 const std::string&                         Node::getText               () const
 {
-    if ( this->type == XML_READER_TEXT )
-        return this->text;
-    else
-    {
-        assert( this->subNodes.size() == 1 );
-        return this->subNodes[0]->getText();
-    }
+    return text;
 }
 
 void Node::setText(const std::string &text)
@@ -128,4 +117,19 @@ int Node::getType() const
 void Node::setType(int type)
 {
     this->type = type;
+}
+
+std::vector<std::string> Node::toString(int indent) const
+{
+    std::vector<std::string> ret;
+    std::string text(indent, ' ');
+    text.append(getName());
+    ret.push_back(text);
+    std::vector<Node *>::const_iterator l;
+    for(l = subNodes.begin(); l < subNodes.end(); l++)
+    {
+        std::vector<std::string> sub = (*l)->toString(indent + 1);
+        ret.insert(ret.end(), sub.begin(), sub.end());
+    }
+    return ret;
 }

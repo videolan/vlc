@@ -29,6 +29,7 @@
 #include "../Helper.h"
 
 #include <vector>
+#include <stack>
 #include <vlc_xml.h>
 #include <vlc_stream.h>
 
@@ -68,43 +69,74 @@ bool    DOMParser::parse                    ()
     if(!this->vlc_reader)
         return false;
 
-    this->root = this->processNode();
-    if ( this->root == NULL )
+    root = processNode();
+    if ( root == NULL )
         return false;
 
     return true;
 }
-Node*   DOMParser::processNode              ()
+
+Node* DOMParser::processNode()
 {
     const char *data;
-    int type = xml_ReaderNextNode(this->vlc_reader, &data);
-    if(type != -1 && type != XML_READER_NONE && type != XML_READER_ENDELEM)
+    int type;
+    std::stack<Node *> lifo;
+
+    while( (type = xml_ReaderNextNode(vlc_reader, &data)) > 0 )
     {
-        Node *node = new Node();
-        node->setType( type );
-
-        if ( type != XML_READER_TEXT )
+        switch(type)
         {
-            std::string name    = data;
-            bool        isEmpty = xml_ReaderIsEmptyElement(this->vlc_reader);
-            node->setName(name);
+            case XML_READER_STARTELEM:
+            {
+                bool empty = xml_ReaderIsEmptyElement(vlc_reader);
+                Node *node = new (std::nothrow) Node();
+                if(node)
+                {
+                    if(!lifo.empty())
+                        lifo.top()->addSubNode(node);
+                    lifo.push(node);
 
-            this->addAttributesToNode(node);
+                    node->setName(std::string(data));
+                    addAttributesToNode(node);
+                }
 
-            if(isEmpty)
-                return node;
+                if(empty)
+                    lifo.pop();
+                break;
+            }
 
-            Node *subnode = NULL;
+            case XML_READER_TEXT:
+            {
+                if(!lifo.empty())
+                    lifo.top()->setText(std::string(data));
+                break;
+            }
 
-            while((subnode = this->processNode()) != NULL)
-                node->addSubNode(subnode);
+            case XML_READER_ENDELEM:
+            {
+                if(lifo.empty())
+                    return NULL;
+
+                Node *node = lifo.top();
+                lifo.pop();
+                if(lifo.empty())
+                    return node;
+            }
+
+            default:
+                break;
         }
-        else
-            node->setText( data );
-        return node;
     }
+
+    while( lifo.size() > 1 )
+        lifo.pop();
+
+    if(!lifo.empty())
+        delete lifo.top();
+
     return NULL;
 }
+
 void    DOMParser::addAttributesToNode      (Node *node)
 {
     const char *attrValue;

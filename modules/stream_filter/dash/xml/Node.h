@@ -48,12 +48,12 @@ namespace dash
                 void                                addAttribute        (const std::string& key, const std::string& value);
                 const std::string&                  getAttributeValue   (const std::string& key) const;
                 std::vector<std::string>            getAttributeKeys    () const;
-                bool                                hasText             () const;
                 const std::string&                  getText             () const;
                 void                                setText( const std::string &text );
                 const std::map<std::string, std::string>& getAttributes () const;
                 int                                 getType() const;
                 void                                setType( int type );
+                std::vector<std::string>            toString(int) const;
 
             private:
                 static const std::string            EmptyString;
