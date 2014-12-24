@@ -36,8 +36,7 @@ const std::string &ProgramInformation::getSource() const
 
 void ProgramInformation::setSource(const std::string &source)
 {
-    if ( source.empty() == false )
-        this->source = source;
+    this->source = source;
 }
 
 const std::string &ProgramInformation::getCopyright() const
@@ -47,14 +46,17 @@ const std::string &ProgramInformation::getCopyright() const
 
 void ProgramInformation::setCopyright(const std::string &copyright)
 {
-    if ( copyright.empty() == false )
-        this->copyright = copyright;
+    this->copyright = copyright;
 }
 
 void ProgramInformation::setMoreInformationUrl(const std::string &url)
 {
-    if ( url.empty() == false )
-        this->moreInformationUrl = url;
+    this->moreInformationUrl = url;
+}
+
+const std::string & ProgramInformation::getMoreInformationUrl() const
+{
+    return moreInformationUrl;
 }
 
 const std::string &ProgramInformation::getTitle() const
@@ -64,6 +66,5 @@ const std::string &ProgramInformation::getTitle() const
 
 void        ProgramInformation::setTitle                (const std::string &title)
 {
-    if ( title.empty() == false )
-        this->title = title;
+    this->title = title;
 }
