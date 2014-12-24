@@ -115,28 +115,13 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
     mediaTemplate->setSourceUrl(mediaurl);
 
     if(templateNode->hasAttribute("startNumber"))
-    {
-        std::istringstream in(templateNode->getAttributeValue("startNumber"));
-        size_t i;
-        in >> i;
-        mediaTemplate->setStartIndex(i);
-    }
+        mediaTemplate->setStartIndex(Integer<uint64_t>(templateNode->getAttributeValue("startNumber")));
 
     if(templateNode->hasAttribute("duration"))
-    {
-        std::istringstream in(templateNode->getAttributeValue("duration"));
-        size_t i;
-        in >> i;
-        mediaTemplate->duration.Set(i);
-    }
+        mediaTemplate->duration.Set(Integer<mtime_t>(templateNode->getAttributeValue("duration")));
 
     if(templateNode->hasAttribute("timescale"))
-    {
-        std::istringstream in(templateNode->getAttributeValue("timescale"));
-        size_t i;
-        in >> i;
-        mediaTemplate->timescale.Set(i);
-    }
+        mediaTemplate->timescale.Set(Integer<uint64_t>(templateNode->getAttributeValue("timescale")));
 
     InitSegmentTemplate *initTemplate = NULL;
 
@@ -164,12 +149,7 @@ size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *
     if(node->hasAttribute("bitstreamSwitching"))
         info->setBitstreamSwitching(node->getAttributeValue("bitstreamSwitching") == "true");
     if(node->hasAttribute("timescale"))
-    {
-        std::istringstream in(node->getAttributeValue("timescale"));
-        uint64_t i;
-        in >> i;
-        info->timescale.Set(i);
-    }
+        info->timescale.Set(Integer<uint64_t>(node->getAttributeValue("timescale")));
     return total;
 }
 

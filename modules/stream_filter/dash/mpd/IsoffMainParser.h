@@ -80,6 +80,29 @@ namespace dash
             private:
                 mtime_t time;
         };
+
+        template<typename T> class Integer
+        {
+            public:
+                Integer(const std::string &str)
+                {
+                    try
+                    {
+                        std::istringstream in(str);
+                        in >> value;
+                    } catch (int) {
+                        value = 0;
+                    }
+                }
+
+                operator T() const
+                {
+                    return value;
+                }
+
+            private:
+                T value;
+        };
     }
 }
 
