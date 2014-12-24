@@ -29,6 +29,7 @@
 #include "IsoffMainParser.h"
 #include "SegmentTemplate.h"
 #include "SegmentInfoDefault.h"
+#include "ProgramInformation.h"
 #include "xml/DOMHelper.h"
 #include <vlc_strings.h>
 #include <vlc_stream.h>
@@ -50,6 +51,7 @@ bool    IsoffMainParser::parse              (Profile profile)
 {
     mpd = new MPD(p_stream, profile);
     setMPDAttributes();
+    parseProgramInformation(DOMHelper::getFirstChildElementByName(root, "ProgramInformation"), mpd);
     setMPDBaseUrl(root);
     parsePeriods(root);
 
@@ -326,6 +328,33 @@ void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, Segme
         }
 
         base->addInitSegment(seg);
+    }
+}
+
+void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)
+{
+    if(!node)
+        return;
+
+    ProgramInformation *info = new (std::nothrow) ProgramInformation();
+    if (info)
+    {
+        Node *child = DOMHelper::getFirstChildElementByName(node, "Title");
+        if(child)
+            info->setTitle(child->getText());
+
+        child = DOMHelper::getFirstChildElementByName(node, "Source");
+        if(child)
+            info->setSource(child->getText());
+
+        child = DOMHelper::getFirstChildElementByName(node, "Copyright");
+        if(child)
+            info->setCopyright(child->getText());
+
+        if(node->hasAttribute("moreInformationURL"))
+            info->setMoreInformationUrl(node->getAttributeValue("moreInformationURL"));
+
+        mpd->setProgramInformation(info);
     }
 }
 

@@ -59,6 +59,7 @@ namespace dash
                 void    parseSegmentBase    (dash::xml::Node *, SegmentInformation *);
                 size_t  parseSegmentList    (dash::xml::Node *, SegmentInformation *);
                 size_t  parseSegmentTemplate(dash::xml::Node *, SegmentInformation *);
+                void    parseProgramInformation(dash::xml::Node *, MPD *);
         };
 
         class IsoTime
