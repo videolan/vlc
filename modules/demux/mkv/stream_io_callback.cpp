@@ -47,6 +47,7 @@ uint32 vlc_stream_io_callback::read( void *p_buffer, size_t i_size )
 void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
 {
     int64_t i_pos, i_size;
+    int64_t i_current = stream_Tell( s );
 
     switch( mode )
     {
@@ -57,9 +58,12 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
             i_pos = stream_Size( s ) - i_offset;
             break;
         default:
-            i_pos= stream_Tell( s ) + i_offset;
+            i_pos= i_current + i_offset;
             break;
     }
+
+    if(i_pos == i_current)
+        return;
 
     if( i_pos < 0 || ( ( i_size = stream_Size( s ) ) != 0 && i_pos >= i_size ) )
     {
