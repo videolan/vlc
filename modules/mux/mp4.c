@@ -485,9 +485,23 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     switch( p_stream->fmt.i_cat )
     {
     case AUDIO_ES:
+        if(!p_stream->fmt.audio.i_rate)
+        {
+            msg_Warn( p_mux, "no audio rate given for stream %d, assuming 48KHz",
+                      p_sys->i_nb_streams );
+            p_stream->fmt.audio.i_rate = 48000;
+        }
         p_stream->i_timescale = p_stream->fmt.audio.i_rate;
         break;
     case VIDEO_ES:
+        if( !p_stream->fmt.video.i_frame_rate ||
+            !p_stream->fmt.video.i_frame_rate_base )
+        {
+            msg_Warn( p_mux, "Missing frame rate for stream %d, assuming 25fps",
+                      p_sys->i_nb_streams );
+            p_stream->fmt.video.i_frame_rate = 25;
+            p_stream->fmt.video.i_frame_rate_base = 1;
+        }
         p_stream->i_timescale = p_stream->fmt.video.i_frame_rate * 1000 /
                                 p_stream->fmt.video.i_frame_rate_base;
         break;
