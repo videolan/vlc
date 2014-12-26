@@ -86,6 +86,7 @@ int Import_xspf(vlc_object_t *p_this)
 {
     DEMUX_BY_EXTENSION_OR_MIMETYPE(".xspf", "application/xspf+xml",
                                       "using XSPF playlist reader");
+
     return VLC_SUCCESS;
 }
 
@@ -113,7 +114,7 @@ static int Demux(demux_t *p_demux)
     p_demux->p_sys->pp_tracklist = NULL;
     p_demux->p_sys->i_tracklist_entries = 0;
     p_demux->p_sys->i_track_id = -1;
-    p_demux->p_sys->psz_base = NULL;
+    p_demux->p_sys->psz_base = FindPrefix(p_demux);
 
     /* create new xml parser from stream */
     p_xml_reader = xml_ReaderCreate(p_demux, p_demux->s);
@@ -479,8 +480,6 @@ static bool parse_track_node COMPLEX_INTERFACE
              * and anchors (#...) are not resolved correctly. Also,
              * host-relative (/...) and directory-relative locations
              * ("relative path" in vernacular) should be resolved.
-             * Last, psz_base should default to the XSPF resource
-             * location if missing (not the current working directory).
              * -- Courmisch */
             if (p_sys->psz_base && !strstr(psz_value, "://"))
             {
