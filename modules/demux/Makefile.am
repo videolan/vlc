@@ -236,3 +236,107 @@ endif
 if HAVE_DVBPSI
 demux_LTLIBRARIES += libts_plugin.la
 endif
+
+libdash_plugin_la_SOURCES = \
+    demux/dash/adaptationlogic/AbstractAdaptationLogic.cpp \
+    demux/dash/adaptationlogic/AbstractAdaptationLogic.h \
+    demux/dash/adaptationlogic/AdaptationLogicFactory.cpp \
+    demux/dash/adaptationlogic/AdaptationLogicFactory.h \
+    demux/dash/adaptationlogic/AlwaysBestAdaptationLogic.cpp \
+    demux/dash/adaptationlogic/AlwaysBestAdaptationLogic.h \
+    demux/dash/adaptationlogic/AlwaysLowestAdaptationLogic.cpp \
+    demux/dash/adaptationlogic/AlwaysLowestAdaptationLogic.hpp \
+    demux/dash/adaptationlogic/IAdaptationLogic.h \
+    demux/dash/adaptationlogic/IDownloadRateObserver.h \
+    demux/dash/adaptationlogic/RateBasedAdaptationLogic.h \
+    demux/dash/adaptationlogic/RateBasedAdaptationLogic.cpp \
+    demux/dash/adaptationlogic/Representationselectors.hpp \
+    demux/dash/adaptationlogic/Representationselectors.cpp \
+    demux/dash/buffer/BlockBuffer.cpp \
+    demux/dash/buffer/BlockBuffer.h \
+    demux/dash/buffer/IBufferObserver.h \
+    demux/dash/http/Chunk.cpp \
+    demux/dash/http/Chunk.h \
+    demux/dash/http/HTTPConnection.cpp \
+    demux/dash/http/HTTPConnection.h \
+    demux/dash/http/HTTPConnectionManager.cpp \
+    demux/dash/http/HTTPConnectionManager.h \
+    demux/dash/http/IHTTPConnection.cpp \
+    demux/dash/http/IHTTPConnection.h \
+    demux/dash/http/PersistentConnection.cpp \
+    demux/dash/http/PersistentConnection.h \
+    demux/dash/mpd/AdaptationSet.cpp \
+    demux/dash/mpd/AdaptationSet.h \
+    demux/dash/mpd/BaseUrl.h \
+    demux/dash/mpd/CommonAttributesElements.cpp \
+    demux/dash/mpd/CommonAttributesElements.h \
+    demux/dash/mpd/ContentDescription.cpp \
+    demux/dash/mpd/ContentDescription.h \
+    demux/dash/mpd/ICanonicalUrl.hpp \
+    demux/dash/mpd/IMPDParser.cpp \
+    demux/dash/mpd/IMPDParser.h \
+    demux/dash/mpd/IsoffMainParser.cpp \
+    demux/dash/mpd/IsoffMainParser.h \
+    demux/dash/mpd/MPD.cpp \
+    demux/dash/mpd/MPD.h \
+    demux/dash/mpd/MPDFactory.cpp \
+    demux/dash/mpd/MPDFactory.h \
+    demux/dash/mpd/Period.cpp \
+    demux/dash/mpd/Period.h \
+    demux/dash/mpd/Profile.cpp \
+    demux/dash/mpd/Profile.hpp \
+    demux/dash/mpd/ProgramInformation.cpp \
+    demux/dash/mpd/ProgramInformation.h \
+    demux/dash/mpd/Representation.cpp \
+    demux/dash/mpd/Representation.h \
+    demux/dash/mpd/Segment.cpp \
+    demux/dash/mpd/Segment.h \
+    demux/dash/mpd/SegmentBase.cpp \
+    demux/dash/mpd/SegmentBase.h \
+    demux/dash/mpd/SegmentInfo.cpp \
+    demux/dash/mpd/SegmentInfo.h \
+    demux/dash/mpd/SegmentInfoCommon.cpp \
+    demux/dash/mpd/SegmentInfoCommon.h \
+    demux/dash/mpd/SegmentInfoDefault.cpp \
+    demux/dash/mpd/SegmentInfoDefault.h \
+    demux/dash/mpd/SegmentInformation.cpp \
+    demux/dash/mpd/SegmentInformation.hpp \
+    demux/dash/mpd/SegmentList.cpp \
+    demux/dash/mpd/SegmentList.h \
+    demux/dash/mpd/SegmentTemplate.cpp \
+    demux/dash/mpd/SegmentTemplate.h \
+    demux/dash/mpd/SegmentTimeline.cpp \
+    demux/dash/mpd/SegmentTimeline.h \
+    demux/dash/mpd/TrickModeType.cpp \
+    demux/dash/mpd/TrickModeType.h \
+    demux/dash/mpd/Url.cpp \
+    demux/dash/mpd/Url.hpp \
+    demux/dash/mp4/AtomsReader.cpp \
+    demux/dash/mp4/AtomsReader.hpp \
+    demux/dash/xml/DOMHelper.cpp \
+    demux/dash/xml/DOMHelper.h \
+    demux/dash/xml/DOMParser.cpp \
+    demux/dash/xml/DOMParser.h \
+    demux/dash/xml/Node.cpp \
+    demux/dash/xml/Node.h \
+    demux/dash/dash.cpp \
+    demux/dash/dash.hpp \
+    demux/dash/DASHManager.cpp \
+    demux/dash/DASHManager.h \
+    demux/dash/Helper.cpp \
+    demux/dash/Helper.h \
+    demux/dash/Properties.hpp \
+    demux/dash/StreamsType.hpp \
+    demux/dash/Streams.cpp \
+    demux/dash/Streams.hpp
+
+libdash_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
+
+libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/demux/dash
+libdash_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
+if HAVE_ZLIB
+libdash_plugin_la_LIBADD += -lz
+endif
+demux_LTLIBRARIES += libdash_plugin.la
+
+
