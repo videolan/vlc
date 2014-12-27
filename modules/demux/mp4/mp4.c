@@ -233,28 +233,28 @@ static MP4_Box_t * MP4_GetTrakByTrackID( MP4_Box_t *p_moov, const uint32_t i_id 
 static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    mp4_chunk_t chunk;
+    const mp4_chunk_t *p_chunk;
     if( p_sys->b_fragmented )
-        chunk = *p_track->cchunk;
+        p_chunk = p_track->cchunk;
     else
-        chunk = p_track->chunk[p_track->i_chunk];
+        p_chunk = &p_track->chunk[p_track->i_chunk];
 
     unsigned int i_index = 0;
-    unsigned int i_sample = p_track->i_sample - chunk.i_sample_first;
-    int64_t i_dts = chunk.i_first_dts;
+    unsigned int i_sample = p_track->i_sample - p_chunk->i_sample_first;
+    int64_t i_dts = p_chunk->i_first_dts;
 
     while( i_sample > 0 )
     {
-        if( i_sample > chunk.p_sample_count_dts[i_index] )
+        if( i_sample > p_chunk->p_sample_count_dts[i_index] )
         {
-            i_dts += chunk.p_sample_count_dts[i_index] *
-                chunk.p_sample_delta_dts[i_index];
-            i_sample -= chunk.p_sample_count_dts[i_index];
+            i_dts += p_chunk->p_sample_count_dts[i_index] *
+                p_chunk->p_sample_delta_dts[i_index];
+            i_sample -= p_chunk->p_sample_count_dts[i_index];
             i_index++;
         }
         else
         {
-            i_dts += i_sample * chunk.p_sample_delta_dts[i_index];
+            i_dts += i_sample * p_chunk->p_sample_delta_dts[i_index];
             break;
         }
     }
