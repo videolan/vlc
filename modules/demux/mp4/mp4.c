@@ -1077,7 +1077,7 @@ static int Demux( demux_t *p_demux )
     }
 
 #if 0
-    msg_Dbg( p_demux, "tk(%i)=%"PRId64" mv=%"PRId64" pos=%"PRIu64, i_track,
+    msg_Dbg( p_demux, "tk(%i)=%"PRId64" mv=%"PRId64" pos=%"PRIu64, tk->i_track_ID,
              MP4_TrackGetDTS( p_demux, tk ),
              MP4_GetMoviePTS( p_sys ), i_candidate_pos );
 #endif
