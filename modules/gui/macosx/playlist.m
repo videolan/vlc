@@ -228,10 +228,6 @@
         return;
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
-    [o_outline_view setTarget: self];
-    [o_outline_view setDelegate: self];
-    [o_outline_view setAllowsEmptySelection: NO];
-    [o_outline_view expandItem: [o_outline_view itemAtRow:0]];
 
     [self reloadStyles];
     [self initStrings];
@@ -240,8 +236,10 @@
     [o_outline_view setDataSource:o_model];
     [o_outline_view reloadData];
 
+    [o_outline_view setTarget: self];
     [o_outline_view setDoubleAction: @selector(playItem:)];
 
+    [o_outline_view setAllowsEmptySelection: NO];
     [o_outline_view registerForDraggedTypes: [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
     [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 

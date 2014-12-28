@@ -21,12 +21,12 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="5305"/>
       <integer value="5605"/>
-      <integer value="4756"/>
       <integer value="5265"/>
-      <integer value="5260"/>
+      <integer value="21"/>
       <integer value="4850"/>
+      <integer value="5260"/>
+      <integer value="5305"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -2461,14 +2461,6 @@
             <reference key="destination" ref="545072553"/>
           </object>
           <int key="connectionID">5412</int>
-        </object>
-        <object class="IBConnectionRecord">
-          <object class="IBOutletConnection" key="connection">
-            <string key="label">dataSource</string>
-            <reference key="source" ref="23448837"/>
-            <reference key="destination" ref="998338913"/>
-          </object>
-          <int key="connectionID">5599</int>
         </object>
         <object class="IBConnectionRecord">
           <object class="IBOutletConnection" key="connection">
