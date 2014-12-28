@@ -1064,10 +1064,14 @@
     NSInteger returnValue = NSAlertErrorReturn;
     if (settingValue == 0) { // ask
 
+        char *psz_title_name = input_item_GetTitleFbName(p_item);
+        NSString *o_title = toNSStr(psz_title_name);
+        free(psz_title_name);
+
         currentResumeTimeout = 6;
         NSString *o_restartButtonLabel = _NS("Restart playback");
         o_restartButtonLabel = [o_restartButtonLabel stringByAppendingFormat:@" (%d)", currentResumeTimeout];
-        NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:o_restartButtonLabel otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%@\" will continue at %@"), [NSString stringWithUTF8String:input_item_GetTitleFbName(p_item)], [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
+        NSAlert *theAlert = [NSAlert alertWithMessageText:_NS("Continue playback?") defaultButton:_NS("Continue") alternateButton:o_restartButtonLabel otherButton:_NS("Always continue") informativeTextWithFormat:_NS("Playback of \"%@\" will continue at %@"), o_title, [[VLCStringUtility sharedInstance] stringForTime:lastPosition.intValue]];
 
         NSTimer *timer = [NSTimer timerWithTimeInterval:1
                                                  target:self
