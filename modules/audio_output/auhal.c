@@ -1265,8 +1265,13 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         }
         length = CFStringGetLength(device_name_ref);
         length++;
-        psz_name = (char *)malloc(length);
+        psz_name = malloc(length);
+        if (!psz_name) {
+            CFRelease(device_name_ref);
+            return;
+        }
         CFStringGetCString(device_name_ref, psz_name, length, kCFStringEncodingUTF8);
+        CFRelease(device_name_ref);
 
         msg_Dbg(p_aout, "DevID: %i DevName: %s", deviceIDs[i], psz_name);
 
@@ -1296,7 +1301,6 @@ static void RebuildDeviceList(audio_output_t * p_aout)
         // TODO: only register once for each device
         ManageAudioStreamsCallback(p_aout, deviceIDs[i], true);
 
-        CFRelease(device_name_ref);
         free(psz_name);
     }
 
