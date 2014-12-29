@@ -496,6 +496,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
     DCONNECT( THEMIM, inputChanged( ),
               speedControl, activateOnState() );
 
+    setContentsMargins(4, 0, 4, 0);
     setRate( var_InheritFloat( THEPL, "rate" ) );
 }
 
