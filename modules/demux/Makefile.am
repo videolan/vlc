@@ -246,7 +246,6 @@ libdash_plugin_la_SOURCES = \
     demux/dash/adaptationlogic/AlwaysBestAdaptationLogic.h \
     demux/dash/adaptationlogic/AlwaysLowestAdaptationLogic.cpp \
     demux/dash/adaptationlogic/AlwaysLowestAdaptationLogic.hpp \
-    demux/dash/adaptationlogic/IAdaptationLogic.h \
     demux/dash/adaptationlogic/IDownloadRateObserver.h \
     demux/dash/adaptationlogic/RateBasedAdaptationLogic.h \
     demux/dash/adaptationlogic/RateBasedAdaptationLogic.cpp \
@@ -326,6 +325,8 @@ libdash_plugin_la_SOURCES = \
     demux/dash/Helper.cpp \
     demux/dash/Helper.h \
     demux/dash/Properties.hpp \
+    demux/dash/SegmentTracker.cpp \
+    demux/dash/SegmentTracker.hpp \
     demux/dash/StreamsType.hpp \
     demux/dash/Streams.cpp \
     demux/dash/Streams.hpp

@@ -25,34 +25,42 @@
 #ifndef ABSTRACTADAPTATIONLOGIC_H_
 #define ABSTRACTADAPTATIONLOGIC_H_
 
-#include "adaptationlogic/IAdaptationLogic.h"
-#include "http/Chunk.h"
-#include "mpd/MPD.h"
-#include "mpd/Period.h"
-#include "mpd/Representation.h"
+#include <adaptationlogic/IDownloadRateObserver.h>
+#include "StreamsType.hpp"
 
-struct stream_t;
+//struct stream_t;
 
 namespace dash
 {
+    namespace mpd
+    {
+        class MPD;
+        class Period;
+        class Representation;
+    }
+
     namespace logic
     {
-        class AbstractAdaptationLogic : public IAdaptationLogic
+        class AbstractAdaptationLogic : public IDownloadRateObserver
         {
             public:
                 AbstractAdaptationLogic             (mpd::MPD *mpd);
                 virtual ~AbstractAdaptationLogic    ();
-                virtual void reset                  ();
 
-                virtual dash::http::Chunk*  getNextChunk            (Streams::Type);
-
+                virtual mpd::Representation* getCurrentRepresentation(Streams::Type, mpd::Period *) const = 0;
                 virtual void                updateDownloadRate     (size_t, mtime_t);
+
+                enum LogicType
+                {
+                    Default,
+                    AlwaysBest,
+                    AlwaysLowest,
+                    RateBased,
+                    FixedRate
+                };
 
             protected:
                 dash::mpd::MPD         *mpd;
-                dash::mpd::Period      *currentPeriod;
-                size_t                  count;
-                mpd::Representation    *prevRepresentation;
         };
     }
 }

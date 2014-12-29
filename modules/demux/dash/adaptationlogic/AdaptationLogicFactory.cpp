@@ -30,19 +30,25 @@
 #include "adaptationlogic/RateBasedAdaptationLogic.h"
 #include "adaptationlogic/AlwaysLowestAdaptationLogic.hpp"
 
+#include <new>
+
 using namespace dash::logic;
 using namespace dash::mpd;
 
-IAdaptationLogic* AdaptationLogicFactory::create ( IAdaptationLogic::LogicType logic,
-                                                   MPD *mpd)
+AbstractAdaptationLogic* AdaptationLogicFactory::create (
+        AbstractAdaptationLogic::LogicType logic, MPD *mpd)
 {
     switch(logic)
     {
-        case IAdaptationLogic::AlwaysBest:      return new AlwaysBestAdaptationLogic    (mpd);
-        case IAdaptationLogic::AlwaysLowest:    return new AlwaysLowestAdaptationLogic  (mpd);
-        case IAdaptationLogic::FixedRate:       return new FixedRateAdaptationLogic     (mpd);
-        case IAdaptationLogic::Default:
-        case IAdaptationLogic::RateBased:       return new RateBasedAdaptationLogic     (mpd);
+        case AbstractAdaptationLogic::AlwaysBest:
+            return new (std::nothrow) AlwaysBestAdaptationLogic(mpd);
+        case AbstractAdaptationLogic::AlwaysLowest:
+            return new (std::nothrow) AlwaysLowestAdaptationLogic(mpd);
+        case AbstractAdaptationLogic::FixedRate:
+            return new (std::nothrow) FixedRateAdaptationLogic(mpd);
+        case AbstractAdaptationLogic::Default:
+        case AbstractAdaptationLogic::RateBased:
+            return new (std::nothrow) RateBasedAdaptationLogic(mpd);
         default:
             return NULL;
     }

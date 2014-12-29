@@ -63,22 +63,12 @@ vector<ISegment *> SegmentInformation::getSegments() const
 {
     vector<ISegment *> retSegments;
 
-    SegmentBase *segBase = inheritSegmentBase();
     SegmentList *segList = inheritSegmentList();
 
     /* init segments are always single segment */
-    if( segBase && segBase->getInitSegment() )
-    {
-        retSegments.push_back( segBase->getInitSegment() );
-    }
-    else if ( segList && segList->getInitialisationSegment() )
-    {
-        retSegments.push_back( segList->getInitialisationSegment() );
-    }
-    else if( inheritSegmentTemplate(INFOTYPE_INIT) )
-    {
-        retSegments.push_back( inheritSegmentTemplate(INFOTYPE_INIT) );
-    }
+    ISegment *segment = getSegment( INFOTYPE_INIT );
+    if( segment )
+        retSegments.push_back( segment );
 
     if( inheritSegmentTemplate(INFOTYPE_MEDIA) )
     {
@@ -96,6 +86,52 @@ vector<ISegment *> SegmentInformation::getSegments() const
     }
 
     return retSegments;
+}
+
+ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) const
+{
+    SegmentBase *segBase = inheritSegmentBase();
+    SegmentList *segList = inheritSegmentList();
+
+    ISegment *segment = NULL;
+
+    switch(type)
+    {
+        case INFOTYPE_INIT:
+            if( segBase && segBase->getInitSegment() )
+            {
+                segment = segBase->getInitSegment();
+            }
+            else if( segList && segList->getInitialisationSegment() )
+            {
+                segment = segList->getInitialisationSegment();
+            }
+            else if( inheritSegmentTemplate(INFOTYPE_INIT) )
+            {
+                segment = inheritSegmentTemplate(INFOTYPE_INIT);
+            }
+            break;
+
+        case INFOTYPE_MEDIA:
+            if( inheritSegmentTemplate(INFOTYPE_MEDIA) )
+            {
+                segment = inheritSegmentTemplate(INFOTYPE_MEDIA);
+            }
+            else if ( segList && !segList->getSegments().empty() )
+            {
+                std::vector<Segment *> list = segList->getSegments();
+                if(pos < list.size())
+                    segment = list.at(pos);
+            }
+            break;
+
+        case INFOTYPE_INDEX:
+            //returned with media for now;
+        default:
+            break;
+    }
+
+    return segment;
 }
 
 bool SegmentInformation::canBitswitch() const

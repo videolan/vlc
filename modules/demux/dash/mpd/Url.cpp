@@ -104,9 +104,10 @@ std::string Url::Component::contextualize(size_t index, const Representation *re
     pos = ret.find("$Number$");
     if(pos != std::string::npos)
     {
+        index += templ->getStartIndex();
         std::stringstream ss;
         /* live streams / templated */
-        if(templ && rep->getMPD()->isLive() && templ->duration.Get())
+        if(rep->getMPD()->isLive() && templ->duration.Get())
         {
             mtime_t playbackstart = rep->getMPD()->playbackStart.Get();
             mtime_t streamstart = rep->getMPD()->getAvailabilityStartTime();

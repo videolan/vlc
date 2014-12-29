@@ -27,6 +27,7 @@
 
 #include "RateBasedAdaptationLogic.h"
 #include "Representationselectors.hpp"
+#include "mpd/MPD.h"
 
 #include <vlc_common.h>
 #include <vlc_variables.h>
@@ -43,16 +44,16 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPD *mpd) :
     height = var_InheritInteger(mpd->getVLCObject(), "dash-prefheight");
 }
 
-Representation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
+Representation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams::Type type, mpd::Period *period) const
 {
-    if(currentPeriod == NULL)
+    if(period == NULL)
         return NULL;
 
     RepresentationSelector selector;
-    Representation *rep = selector.select(currentPeriod, type, currentBps, width, height);
+    Representation *rep = selector.select(period, type, currentBps, width, height);
     if ( rep == NULL )
     {
-        rep = selector.select(currentPeriod, type);
+        rep = selector.select(period, type);
         if ( rep == NULL )
             return NULL;
     }
@@ -83,16 +84,16 @@ FixedRateAdaptationLogic::FixedRateAdaptationLogic(mpd::MPD *mpd) :
     currentBps = var_InheritInteger( mpd->getVLCObject(), "dash-prefbw" ) * 8192;
 }
 
-Representation *FixedRateAdaptationLogic::getCurrentRepresentation(Streams::Type type) const
+Representation *FixedRateAdaptationLogic::getCurrentRepresentation(Streams::Type type, mpd::Period *period) const
 {
-    if(currentPeriod == NULL)
+    if(period == NULL)
         return NULL;
 
     RepresentationSelector selector;
-    Representation *rep = selector.select(currentPeriod, type, currentBps);
+    Representation *rep = selector.select(period, type, currentBps);
     if ( rep == NULL )
     {
-        rep = selector.select(currentPeriod, type);
+        rep = selector.select(period, type);
         if ( rep == NULL )
             return NULL;
     }

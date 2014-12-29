@@ -27,12 +27,14 @@
 #include <string>
 #include <vlc_common.h>
 #include "StreamsType.hpp"
-#include "adaptationlogic/IAdaptationLogic.h"
+#include "adaptationlogic/AbstractAdaptationLogic.h"
 #include "http/HTTPConnectionManager.h"
 #include "http/Chunk.h"
 
 namespace dash
 {
+    class SegmentTracker;
+
     namespace Streams
     {
         class AbstractStreamOutput;
@@ -46,7 +48,7 @@ namespace dash
                 bool operator==(const Stream &) const;
                 static Type mimeToType(const std::string &mime);
                 static Format mimeToFormat(const std::string &mime);
-                void create(demux_t *, logic::IAdaptationLogic *);
+                void create(demux_t *, logic::AbstractAdaptationLogic *, SegmentTracker *);
                 bool isEOF() const;
                 mtime_t getPCR() const;
                 int getGroup() const;
@@ -59,7 +61,8 @@ namespace dash
                 Type type;
                 Format format;
                 AbstractStreamOutput *output;
-                logic::IAdaptationLogic *adaptationLogic;
+                logic::AbstractAdaptationLogic *adaptationLogic;
+                SegmentTracker *segmentTracker;
                 http::Chunk *currentChunk;
                 bool eof;
         };

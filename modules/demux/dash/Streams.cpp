@@ -19,8 +19,9 @@
  *****************************************************************************/
 #define __STDC_CONSTANT_MACROS
 #include "Streams.hpp"
-#include "adaptationlogic/IAdaptationLogic.h"
+#include "adaptationlogic/AbstractAdaptationLogic.h"
 #include "adaptationlogic/AdaptationLogicFactory.h"
+#include "SegmentTracker.hpp"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 
@@ -46,6 +47,7 @@ void Stream::init(const Type type_, const Format format_)
     adaptationLogic = NULL;
     currentChunk = NULL;
     eof = false;
+    segmentTracker = NULL;
 }
 
 Stream::~Stream()
@@ -53,6 +55,7 @@ Stream::~Stream()
     delete currentChunk;
     delete adaptationLogic;
     delete output;
+    delete segmentTracker;
 }
 
 Type Stream::mimeToType(const std::string &mime)
@@ -84,9 +87,8 @@ Format Stream::mimeToFormat(const std::string &mime)
     return format;
 }
 
-void Stream::create(demux_t *demux, IAdaptationLogic *logic)
+void Stream::create(demux_t *demux, AbstractAdaptationLogic *logic, SegmentTracker *tracker)
 {
-    adaptationLogic = logic;
     switch(format)
     {
         case Streams::MP4:
@@ -99,6 +101,8 @@ void Stream::create(demux_t *demux, IAdaptationLogic *logic)
             throw VLC_EBADVAR;
             break;
     }
+    adaptationLogic = logic;
+    segmentTracker = tracker;
 }
 
 bool Stream::isEOF() const
@@ -130,7 +134,7 @@ Chunk * Stream::getChunk()
 {
     if (currentChunk == NULL)
     {
-        currentChunk = adaptationLogic->getNextChunk(type);
+        currentChunk = segmentTracker->getNextChunk(type);
         if (currentChunk == NULL)
             eof = true;
     }

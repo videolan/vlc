@@ -26,7 +26,7 @@
 #define DASHMANAGER_H_
 
 #include "http/HTTPConnectionManager.h"
-#include "adaptationlogic/IAdaptationLogic.h"
+#include "adaptationlogic/AbstractAdaptationLogic.h"
 #include "mpd/MPD.h"
 
 namespace dash
@@ -35,7 +35,7 @@ namespace dash
     {
         public:
             DASHManager( mpd::MPD *mpd,
-                         logic::IAdaptationLogic::LogicType type, stream_t *stream);
+                         logic::AbstractAdaptationLogic::LogicType type, stream_t *stream);
             virtual ~DASHManager    ();
 
             bool    start         (demux_t *);
@@ -47,7 +47,7 @@ namespace dash
 
         private:
             http::HTTPConnectionManager         *conManager;
-            logic::IAdaptationLogic::LogicType  logicType;
+            logic::AbstractAdaptationLogic::LogicType  logicType;
             mpd::MPD                            *mpd;
             stream_t                            *stream;
             Streams::Stream                     *streams[Streams::count];

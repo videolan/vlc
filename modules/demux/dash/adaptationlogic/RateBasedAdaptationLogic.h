@@ -38,7 +38,7 @@ namespace dash
             public:
                 RateBasedAdaptationLogic            (mpd::MPD *mpd);
 
-                dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;
+                dash::mpd::Representation *getCurrentRepresentation(Streams::Type, mpd::Period *) const;
                 virtual void updateDownloadRate(size_t, mtime_t);
 
             private:
@@ -54,7 +54,7 @@ namespace dash
             public:
                 FixedRateAdaptationLogic(mpd::MPD *mpd);
 
-                dash::mpd::Representation *getCurrentRepresentation(Streams::Type) const;
+                dash::mpd::Representation *getCurrentRepresentation(Streams::Type, mpd::Period *) const;
 
             private:
                 size_t                  currentBps;

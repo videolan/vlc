@@ -29,15 +29,15 @@
 
 #include "DASHManager.h"
 #include "adaptationlogic/AdaptationLogicFactory.h"
+#include "SegmentTracker.hpp"
 
 using namespace dash;
 using namespace dash::http;
 using namespace dash::logic;
 using namespace dash::mpd;
-using namespace dash::buffer;
 
 DASHManager::DASHManager    ( MPD *mpd,
-                              IAdaptationLogic::LogicType type, stream_t *stream) :
+                              AbstractAdaptationLogic::LogicType type, stream_t *stream) :
              conManager     ( NULL ),
              logicType      ( type ),
              mpd            ( mpd ),
@@ -66,18 +66,33 @@ bool DASHManager::start(demux_t *demux)
         const AdaptationSet *set = period->getAdaptationSet(type);
         if(set)
         {
-            streams[type] = new Streams::Stream(set->getMimeType());
+            streams[type] = new (std::nothrow) Streams::Stream(set->getMimeType());
+            if(!streams[type])
+                continue;
+            AbstractAdaptationLogic *logic = AdaptationLogicFactory::create(logicType, mpd);
+            if(!logic)
+            {
+                delete streams[type];
+                streams[type] = NULL;
+                continue;
+            }
+
+            SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, mpd);
             try
             {
-                streams[type]->create(demux, AdaptationLogicFactory::create( logicType, mpd ) );
+                if(!tracker)
+                    throw VLC_ENOMEM;
+                streams[type]->create(demux, logic, tracker);
             } catch (int) {
                 delete streams[type];
+                delete logic;
+                delete tracker;
                 streams[type] = NULL;
             }
         }
     }
 
-    conManager = new HTTPConnectionManager(stream);
+    conManager = new (std::nothrow) HTTPConnectionManager(stream);
     if(!conManager)
         return false;
 

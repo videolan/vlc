@@ -69,6 +69,8 @@ namespace dash
                 };
                 static const int InfoTypeCount = INFOTYPE_INDEX + 1;
 
+                ISegment * getSegment(SegmentInfoType, uint64_t = 0) const;
+
             private:
                 void setSegmentList(SegmentList *);
                 void setSegmentBase(SegmentBase *);

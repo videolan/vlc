@@ -25,7 +25,11 @@
 #ifndef IDOWNLOADRATEOBSERVER_H_
 #define IDOWNLOADRATEOBSERVER_H_
 
-#include <stdint.h>
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_common.h>
 
 namespace dash
 {

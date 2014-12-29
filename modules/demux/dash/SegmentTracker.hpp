@@ -1,11 +1,7 @@
 /*
- * AdaptationLogicFactory.h
+ * SegmentTracker.hpp
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
- *
- * Created on: Aug 10, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2014 - VideoLAN authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,30 +17,54 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef SEGMENTTRACKER_HPP
+#define SEGMENTTRACKER_HPP
 
-#ifndef ADAPTATIONLOGICFACTORY_H_
-#define ADAPTATIONLOGICFACTORY_H_
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-#include "adaptationlogic/AbstractAdaptationLogic.h"
-
-struct stream_t;
+#include "StreamsType.hpp"
+#include <vlc_common.h>
 
 namespace dash
 {
     namespace mpd
     {
         class MPD;
+        class Period;
+        class Representation;
+        class Segment;
     }
 
     namespace logic
     {
-        class AdaptationLogicFactory
-        {
-            public:
-                static AbstractAdaptationLogic* create (
-                        AbstractAdaptationLogic::LogicType logic, mpd::MPD *mpd);
-        };
+        class AbstractAdaptationLogic;
     }
+
+    namespace http
+    {
+        class Chunk;
+    }
+
+    class SegmentTracker
+    {
+        public:
+            SegmentTracker(logic::AbstractAdaptationLogic *, mpd::MPD *);
+            ~SegmentTracker();
+
+            void setAdaptationLogic(logic::AbstractAdaptationLogic *);
+            void resetCounter();
+            http::Chunk* getNextChunk(Streams::Type);
+
+        private:
+            bool initializing;
+            uint64_t count;
+            logic::AbstractAdaptationLogic *logic;
+            mpd::MPD *mpd;
+            mpd::Period *currentPeriod;
+            mpd::Representation *prevRepresentation;
+    };
 }
 
-#endif /* ADAPTATIONLOGICFACTORY_H_ */
+#endif // SEGMENTTRACKER_HPP
