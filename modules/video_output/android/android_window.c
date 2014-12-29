@@ -878,8 +878,15 @@ static void SubtitleGetDirtyBounds(vout_display_t *vd,
         }
     }
 
-    /* default is full picture */
-    if (!b_found) {
+    if (!b_found
+     || p_out_bounds->left < 0
+     || p_out_bounds->right < 0
+     || (unsigned int) p_out_bounds->right > sys->p_sub_pic->format.i_width
+     || p_out_bounds->bottom < 0
+     || p_out_bounds->top < 0
+     || (unsigned int) p_out_bounds->top > sys->p_sub_pic->format.i_height)
+    {
+        /* default is full picture */
         p_out_bounds->left = 0;
         p_out_bounds->top = 0;
         p_out_bounds->right = sys->p_sub_pic->format.i_width;
