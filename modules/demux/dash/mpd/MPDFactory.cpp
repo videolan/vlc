@@ -37,12 +37,10 @@ MPD* MPDFactory::create             (dash::xml::Node *root, stream_t *p_stream, 
 
     switch( profile )
     {
-        case Profile::ISOOnDemand:
-        case Profile::ISOMain:
-        case Profile::ISOLive:
-        case Profile::MPEG2TSSimple:
-            parser = new IsoffMainParser(root, p_stream);
+        case Profile::Unknown:
+            break;
         default:
+            parser = new IsoffMainParser(root, p_stream);
             break;
     }
 
