@@ -52,7 +52,7 @@ vlc_module_begin()
 
     add_integer("gpu-affinity", -1, HW_GPU_AFFINITY_TEXT, HW_GPU_AFFINITY_TEXT, true)
 
-    set_capability("vout display", 160)
+    set_capability("vout display", 220)
     add_shortcut("glwin32", "opengl")
     set_callbacks(Open, Close)
 vlc_module_end()
