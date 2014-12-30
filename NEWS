@@ -7,15 +7,20 @@ Core:
 Access:
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
  * New SMB access module using libdsm
+ * Rewrite MPEG-DASH (Dynamic Adaptive Streaming over HTTP) support, including
+   MPEG2TS and ISOFF profiles
+ * Large rework of the Smooth Streaming module
  * Screen capture plugin for Wayland display
  * Support decompression and extraction through libarchive (tar, zip, rar...)
  * Improvements of cookie handling (share cookies between playlist items,
    domain / path matching, Secure cookies)
+ * Support DVB-T2 on Windows BDA
+
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
- * Support 4:4:4 chroma sampling with VDPAU hw acceleration
- * Support for ARIB B24 subtitles
+ * Support 4:4:4 and 4:2:2 chroma samplings with VDPAU hw acceleration
+ * Support for ARIB STD-B24 subtitles
  * Support for Daala video
  * Important improvements for the MMAL decoder and output for rPI
  * Support HEVC hardware decoding using OMX and MediaCodec
@@ -26,17 +31,22 @@ Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
  * Support Opus in MPEG Transport Stream
  * Support Daala in Ogg
+ * Important rework of the MP4 demuxer
  * Support EIA-608 subtitles in MP4/mov
  * Support WMV and WMAV in MP4/mov, aka Flip4Mac files
  * Support bitmap audio channel reordering in MP4/mov
+ * Support AlbumArtist and DiscNumber metadata
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
 
 Video ouput:
+ * Linux/BSD default video output is now OpenGL, instead of Xvideo
  * Wayland shell surface window provider
  * Wayland shared memory video output
- * Support rotation in Android NativeWindow output
+ * Large rework of the Android video outputs: there is now Surface (2.1, 2.2)
+   NativeWindow (2.3+, supports hw rotation, subpicture blending, opaque)
+ * Support rotation in Android NativeWindow output and hardware decoders
 
 Video filter:
  * Hardware deinterlacing on the rPI, using MMAL
@@ -59,6 +69,9 @@ Service Discovery:
 Mac OS X Interface
  * new AppleScript API giving access to audio desynchronization
  * Port to Yosemite X.10
+
+Qt interface:
+ * Batch convert support
 
 Skins2:
  * Support key accelerators
