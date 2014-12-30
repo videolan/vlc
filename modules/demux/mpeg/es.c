@@ -91,6 +91,14 @@ typedef struct
     int  (*pf_init)( demux_t *p_demux );
 } codec_t;
 
+typedef struct
+{
+    char  psz_version[10];
+    int   i_lowpass;
+    float pf_replay_gain[AUDIO_REPLAY_GAIN_MAX];
+    float pf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
+} lame_extra_t;
+
 struct demux_sys_t
 {
     codec_t codec;
@@ -124,6 +132,8 @@ struct demux_sys_t
         int i_bytes;
         int i_bitrate_avg;
         int i_frame_samples;
+        lame_extra_t lame;
+        bool b_lame;
     } xing;
 };
 
@@ -207,6 +217,26 @@ static int OpenCommon( demux_t *p_demux,
     {
         free( p_sys );
         return VLC_EGENERIC;
+    }
+
+    if( p_sys->xing.b_lame )
+    {
+        lame_extra_t *p_lame = &p_sys->xing.lame;
+        es_format_t *p_fmt = &p_sys->p_packetizer->fmt_out;
+
+        for( int i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
+        {
+            if ( p_lame->pf_replay_gain[i] != 0 )
+            {
+                p_fmt->audio_replay_gain.pb_gain[i] = true;
+                p_fmt->audio_replay_gain.pf_gain[i] = p_lame->pf_replay_gain[i];
+            }
+            if ( p_lame->pf_replay_peak[i] != 0 )
+            {
+                p_fmt->audio_replay_gain.pb_peak[i] = true;
+                p_fmt->audio_replay_gain.pf_peak[i] = p_lame->pf_replay_peak[i];
+            }
+        }
     }
 
     while( vlc_object_alive( p_demux ) )
@@ -743,6 +773,30 @@ static uint32_t MpgaXingGetDWBE( const uint8_t **pp_xing, int *pi_xing, uint32_t
     return v;
 }
 
+static uint16_t MpgaXingGetWBE( const uint8_t **pp_xing, int *pi_xing, uint16_t i_default )
+{
+    if( *pi_xing < 2 )
+        return i_default;
+
+    uint16_t v = GetWBE( *pp_xing );
+
+    MpgaXingSkip( pp_xing, pi_xing, 2 );
+
+    return v;
+}
+
+static double MpgaXingLameConvertGain( uint16_t x )
+{
+    double gain = (x & 0x1FF) / 10.0;
+
+    return x & 0x200 ? -gain : gain;
+}
+
+static double MpgaXingLameConvertPeak( uint32_t x )
+{
+    return x / 8388608.0; /* pow(2, 23) */
+}
+
 static int MpgaInit( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -802,6 +856,32 @@ static int MpgaInit( demux_t *p_demux )
                  p_sys->xing.i_bytes, p_sys->xing.i_frames,
                  p_sys->xing.i_frame_samples );
     }
+
+    if( i_xing >= 20 && memcmp( p_xing, "LAME", 4 ) == 0)
+    {
+        p_sys->xing.b_lame = true;
+        lame_extra_t *p_lame = &p_sys->xing.lame;
+
+        memcpy( p_lame->psz_version, p_xing, 9 );
+        p_lame->psz_version[9] = '\0';
+
+        MpgaXingSkip( &p_xing, &i_xing, 9 );
+        MpgaXingSkip( &p_xing, &i_xing, 1 ); /* rev_method */
+
+        p_lame->i_lowpass = (*p_xing) * 100;
+        MpgaXingSkip( &p_xing, &i_xing, 1 );
+
+        uint32_t peak  = MpgaXingGetDWBE( &p_xing, &i_xing, 0 );
+        uint16_t track = MpgaXingGetWBE( &p_xing, &i_xing, 0 );
+        uint16_t album = MpgaXingGetWBE( &p_xing, &i_xing, 0 );
+
+        p_lame->pf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = (float) MpgaXingLameConvertPeak( peak );
+        p_lame->pf_replay_gain[AUDIO_REPLAY_GAIN_TRACK] = (float) MpgaXingLameConvertGain( track );
+        p_lame->pf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM] = (float) MpgaXingLameConvertGain( album );
+
+        MpgaXingSkip( &p_xing, &i_xing, 1 ); /* flags */
+    }
+
     return VLC_SUCCESS;
 }
 
