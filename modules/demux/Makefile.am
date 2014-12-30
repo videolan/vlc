@@ -251,9 +251,6 @@ libdash_plugin_la_SOURCES = \
     demux/dash/adaptationlogic/RateBasedAdaptationLogic.cpp \
     demux/dash/adaptationlogic/Representationselectors.hpp \
     demux/dash/adaptationlogic/Representationselectors.cpp \
-    demux/dash/buffer/BlockBuffer.cpp \
-    demux/dash/buffer/BlockBuffer.h \
-    demux/dash/buffer/IBufferObserver.h \
     demux/dash/http/Chunk.cpp \
     demux/dash/http/Chunk.h \
     demux/dash/http/HTTPConnection.cpp \
