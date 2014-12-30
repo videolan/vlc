@@ -3113,7 +3113,8 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
             p_track->p_sample->data.p_sample_soun;
 
         if( p_track->fmt.i_cat != AUDIO_ES || p_soun->i_qt_version == 0 ||
-            p_track->fmt.audio.i_blockalign <= 1 )
+            p_track->fmt.audio.i_blockalign <= 1 ||
+            p_soun->i_sample_per_packet * p_soun->i_bytes_per_frame == 0 )
         {
             i_pos += ( p_track->i_sample -
                        p_track->chunk[p_track->i_chunk].i_sample_first ) *
