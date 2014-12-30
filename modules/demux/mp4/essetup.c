@@ -265,6 +265,22 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
         }
 
+        case VLC_CODEC_FFV1:
+        {
+            MP4_Box_t *p_binary = MP4_BoxGet( p_sample, "glbl" );
+            if( p_binary && BOXDATA(p_binary) && BOXDATA(p_binary)->i_blob )
+            {
+                p_track->fmt.p_extra = malloc( BOXDATA(p_binary)->i_blob );
+                if( p_track->fmt.p_extra )
+                {
+                    p_track->fmt.i_extra = BOXDATA(p_binary)->i_blob;
+                    memcpy( p_track->fmt.p_extra, BOXDATA(p_binary)->p_blob,
+                            p_track->fmt.i_extra );
+                }
+            }
+            break;
+        }
+
         case VLC_FOURCC( 'v', 'c', '-', '1' ):
         {
             MP4_Box_t *p_dvc1 = MP4_BoxGet( p_sample, "dvc1" );

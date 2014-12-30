@@ -178,6 +178,7 @@
 #define ATOM_3ivd VLC_FOURCC( '3', 'i', 'v', 'd' )
 #define ATOM_3VID VLC_FOURCC( '3', 'V', 'I', 'D' )
 #define ATOM_3vid VLC_FOURCC( '3', 'v', 'i', 'd' )
+#define ATOM_FFV1 VLC_FOURCC( 'F', 'F', 'V', '1' )
 #define ATOM_h263 VLC_FOURCC( 'h', '2', '6', '3' )
 #define ATOM_s263 VLC_FOURCC( 's', '2', '6', '3' )
 #define ATOM_DIVX VLC_FOURCC( 'D', 'I', 'V', 'X' )
@@ -198,6 +199,7 @@
 #define ATOM_avcC VLC_FOURCC( 'a', 'v', 'c', 'C' )
 #define ATOM_m4ds VLC_FOURCC( 'm', '4', 'd', 's' )
 
+#define ATOM_glbl VLC_FOURCC( 'g', 'l', 'b', 'l' )
 #define ATOM_hvcC VLC_FOURCC( 'h', 'v', 'c', 'C' )
 
 #define ATOM_dvc  VLC_FOURCC( 'd', 'v', 'c', ' ' )
