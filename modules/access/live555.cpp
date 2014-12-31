@@ -1292,7 +1292,7 @@ static int Demux( demux_t *p_demux )
         {
             bool b;
             es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk->p_es, &b );
-            if( !b && tk->b_selected )
+            if( !b && tk->b_selected && p_sys->rtsp )
             {
                 tk->b_selected = false;
                 p_sys->rtsp->sendTeardownCommand( *tk->sub, NULL );
