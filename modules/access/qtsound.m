@@ -519,6 +519,8 @@ static int Demux(demux_t *p_demux)
 
     if (p_blocka) {
         if (!p_blocka->i_pts) {
+            block_Release(p_blocka);
+
             // Nothing to transfer yet, just forget
             msleep(10000);
             return 1;
