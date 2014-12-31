@@ -41,6 +41,7 @@ namespace dash
 
                     protected:
                         std::string contextualize(size_t, const Representation *) const;
+                        size_t getSegmentNumber(size_t, const Representation *) const;
                         std::string component;
                         const SegmentTemplate *templ;
                 };

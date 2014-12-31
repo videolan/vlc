@@ -85,6 +85,25 @@ Url::Component::Component(const std::string & str, const SegmentTemplate *templ_
     templ = templ_;
 }
 
+size_t Url::Component::getSegmentNumber(size_t index, const Representation *rep) const
+{
+    index += templ->getStartIndex();
+    /* live streams / templated */
+    if(rep->getMPD()->isLive() && templ->duration.Get())
+    {
+        mtime_t playbackstart = rep->getMPD()->playbackStart.Get();
+        mtime_t streamstart = rep->getMPD()->getAvailabilityStartTime();
+        streamstart += rep->getPeriodStart();
+        mtime_t duration = templ->duration.Get();
+        uint64_t timescale = templ->timescale.Get() ?
+                             templ->timescale.Get() :
+                             rep->getTimescale();
+        if(duration && timescale)
+            index += (playbackstart - streamstart) * timescale / duration;
+    }
+    return index;
+}
+
 std::string Url::Component::contextualize(size_t index, const Representation *rep) const
 {
     std::string ret(component);
@@ -100,27 +119,38 @@ std::string Url::Component::contextualize(size_t index, const Representation *re
         ret.replace(pos, std::string("$Time$").length(), ss.str());
     }
 
-
     pos = ret.find("$Number$");
     if(pos != std::string::npos)
     {
-        index += templ->getStartIndex();
         std::stringstream ss;
-        /* live streams / templated */
-        if(rep->getMPD()->isLive() && templ->duration.Get())
-        {
-            mtime_t playbackstart = rep->getMPD()->playbackStart.Get();
-            mtime_t streamstart = rep->getMPD()->getAvailabilityStartTime();
-            streamstart += rep->getPeriodStart();
-            mtime_t duration = templ->duration.Get();
-            uint64_t timescale = templ->timescale.Get() ?
-                                 templ->timescale.Get() :
-                                 rep->getTimescale();
-            if(duration && timescale)
-                index += (playbackstart - streamstart) * timescale / duration;
-        }
-        ss << index;
+        ss << getSegmentNumber(index, rep);
         ret.replace(pos, std::string("$Number$").length(), ss.str());
+    }
+    else
+    {
+        pos = ret.find("$Number%");
+        size_t tokenlength = std::string("$Number%").length();
+        size_t fmtstart = pos + tokenlength;
+        if(pos != std::string::npos && fmtstart < ret.length())
+        {
+            size_t fmtend = ret.find('$', fmtstart);
+            if(fmtend != std::string::npos)
+            {
+                std::istringstream iss(ret.substr(fmtstart, fmtend - fmtstart + 1));
+                try
+                {
+                    size_t width;
+                    iss >> width;
+                    if (iss.peek() != '$')
+                        throw VLC_EGENERIC;
+                    std::stringstream oss;
+                    oss.width(width); /* set format string length */
+                    oss.fill('0');
+                    oss << getSegmentNumber(index, rep);
+                    ret.replace(pos, fmtend - pos + 1, oss.str());
+                } catch(int) {}
+            }
+        }
     }
 
     pos = ret.find("$Bandwidth$");
