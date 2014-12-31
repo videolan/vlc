@@ -28,7 +28,6 @@
 
 #include "IsoffMainParser.h"
 #include "SegmentTemplate.h"
-#include "SegmentInfoDefault.h"
 #include "ProgramInformation.h"
 #include "xml/DOMHelper.h"
 #include <vlc_strings.h>

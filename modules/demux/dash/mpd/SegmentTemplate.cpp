@@ -28,7 +28,6 @@
 #include "SegmentTimeline.h"
 #include "Representation.h"
 #include "AdaptationSet.h"
-#include "SegmentInfoDefault.h"
 
 using namespace dash::mpd;
 

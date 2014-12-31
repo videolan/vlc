@@ -32,7 +32,6 @@
 #include <vlc_arrays.h>
 
 #include "SegmentTemplate.h"
-#include "SegmentInfoDefault.h"
 #include "Period.h"
 
 using namespace dash::mpd;
@@ -40,14 +39,12 @@ using namespace dash::mpd;
 AdaptationSet::AdaptationSet(Period *period) :
     SegmentInformation( period ),
     subsegmentAlignmentFlag( false ),
-    segmentInfoDefault( NULL ),
     isBitstreamSwitching( false )
 {
 }
 
 AdaptationSet::~AdaptationSet   ()
 {
-    delete this->segmentInfoDefault;
     vlc_delete_all( this->representations );
 }
 
@@ -86,17 +83,6 @@ const Representation *AdaptationSet::getRepresentationById(const std::string &id
         ++it;
     }
     return NULL;
-}
-
-const SegmentInfoDefault *AdaptationSet::getSegmentInfoDefault() const
-{
-    return this->segmentInfoDefault;
-}
-
-void AdaptationSet::setSegmentInfoDefault(const SegmentInfoDefault *seg)
-{
-    if ( seg != NULL )
-        this->segmentInfoDefault = seg;
 }
 
 void                            AdaptationSet::addRepresentation        (Representation *rep)

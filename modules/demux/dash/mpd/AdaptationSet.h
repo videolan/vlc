@@ -37,7 +37,6 @@ namespace dash
 {
     namespace mpd
     {
-        class SegmentInfoDefault;
         class Period;
         class SegmentTemplate;
 
@@ -53,8 +52,6 @@ namespace dash
                 void                            setSubsegmentAlignmentFlag( bool alignment );
                 std::vector<Representation *>&  getRepresentations      ();
                 const Representation*           getRepresentationById   ( const std::string &id ) const;
-                const SegmentInfoDefault*       getSegmentInfoDefault() const;
-                void                            setSegmentInfoDefault( const SegmentInfoDefault* seg );
                 void                            setBitstreamSwitching(bool value);
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( Representation *rep );
@@ -64,7 +61,6 @@ namespace dash
             private:
                 bool                            subsegmentAlignmentFlag;
                 std::vector<Representation *>   representations;
-                const SegmentInfoDefault*       segmentInfoDefault;
                 bool                            isBitstreamSwitching;
         };
     }

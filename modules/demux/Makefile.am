@@ -293,8 +293,6 @@ libdash_plugin_la_SOURCES = \
     demux/dash/mpd/SegmentInfo.h \
     demux/dash/mpd/SegmentInfoCommon.cpp \
     demux/dash/mpd/SegmentInfoCommon.h \
-    demux/dash/mpd/SegmentInfoDefault.cpp \
-    demux/dash/mpd/SegmentInfoDefault.h \
     demux/dash/mpd/SegmentInformation.cpp \
     demux/dash/mpd/SegmentInformation.hpp \
     demux/dash/mpd/SegmentList.cpp \
