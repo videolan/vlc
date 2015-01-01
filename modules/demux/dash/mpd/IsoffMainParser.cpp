@@ -280,6 +280,9 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
             if(segListNode->hasAttribute("duration"))
                 list->setDuration(Integer<mtime_t>(segListNode->getAttributeValue("duration")));
 
+            if(segListNode->hasAttribute("timescale"))
+                list->timescale.Set(Integer<uint64_t>(segListNode->getAttributeValue("timescale")));
+
             std::vector<Node *>::const_iterator it;
             for(it = segments.begin(); it != segments.end(); it++)
             {

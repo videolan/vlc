@@ -53,7 +53,9 @@ namespace dash
                 mtime_t getPCR() const;
                 int getGroup() const;
                 int esCount() const;
+                bool seekAble() const;
                 size_t read(http::HTTPConnectionManager *);
+                bool setPosition(mtime_t, bool);
 
             private:
                 http::Chunk *getChunk();
@@ -77,6 +79,8 @@ namespace dash
                 mtime_t getPCR() const;
                 int getGroup() const;
                 int esCount() const;
+                bool seekAble() const;
+                void setPosition(mtime_t);
 
             protected:
                 mtime_t   pcr;
@@ -84,6 +88,7 @@ namespace dash
                 int       escount;
                 es_out_t *fakeesout; /* to intercept/proxy what is sent from demuxstream */
                 stream_t *demuxstream;
+                bool      seekable;
 
             private:
                 demux_t  *realdemux;

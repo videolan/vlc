@@ -44,6 +44,8 @@ namespace dash
             mtime_t getPCR() const;
             int     getGroup() const;
             int     esCount() const;
+            bool    setPosition(mtime_t);
+            bool    seekAble() const;
 
         private:
             http::HTTPConnectionManager         *conManager;

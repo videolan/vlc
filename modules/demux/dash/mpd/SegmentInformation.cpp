@@ -59,32 +59,55 @@ SegmentInformation::~SegmentInformation()
         delete segmentTemplate[i];
 }
 
-vector<ISegment *> SegmentInformation::getSegments() const
+vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
 {
     vector<ISegment *> retSegments;
 
-    SegmentList *segList = inheritSegmentList();
-
-    /* init segments are always single segment */
-    ISegment *segment = getSegment( INFOTYPE_INIT );
-    if( segment )
-        retSegments.push_back( segment );
-
-    if( inheritSegmentTemplate(INFOTYPE_MEDIA) )
+    switch (type)
     {
-        retSegments.push_back( inheritSegmentTemplate(INFOTYPE_MEDIA) );
-    }
-    else if ( segList && !segList->getSegments().empty() )
-    {
-        std::vector<Segment *>::const_iterator it;
-        for(it=segList->getSegments().begin();
-            it!=segList->getSegments().end(); it++)
+        case INFOTYPE_INIT:
         {
-            std::vector<ISegment *> list = (*it)->subSegments();
-            retSegments.insert( retSegments.end(), list.begin(), list.end() );
+            /* init segments are always single segment */
+            ISegment *segment = getSegment( INFOTYPE_INIT );
+            if( segment )
+                retSegments.push_back( segment );
         }
+        break;
+
+        case INFOTYPE_MEDIA:
+        {
+            SegmentList *segList = inheritSegmentList();
+            if( inheritSegmentTemplate(INFOTYPE_MEDIA) )
+            {
+                retSegments.push_back( inheritSegmentTemplate(INFOTYPE_MEDIA) );
+            }
+            else if ( segList && !segList->getSegments().empty() )
+            {
+                std::vector<Segment *>::const_iterator it;
+                for(it=segList->getSegments().begin();
+                    it!=segList->getSegments().end(); it++)
+                {
+                    std::vector<ISegment *> list = (*it)->subSegments();
+                    retSegments.insert( retSegments.end(), list.begin(), list.end() );
+                }
+            }
+        }
+
+        default:
+        break;
     }
 
+    return retSegments;
+}
+
+vector<ISegment *> SegmentInformation::getSegments() const
+{
+    vector<ISegment *> retSegments;
+    for(int i=0; i<InfoTypeCount; i++)
+    {
+        vector<ISegment *> segs = getSegments(static_cast<SegmentInfoType>(i));
+        retSegments.insert( retSegments.end(), segs.begin(), segs.end() );
+    }
     return retSegments;
 }
 
@@ -132,6 +155,20 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
     }
 
     return segment;
+}
+
+bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
+{
+    SegmentList *segList = inheritSegmentList();
+    if ( segList->getDuration() )
+    {
+        uint64_t timescale = segList->timescale.Get();
+        if(!timescale)
+            timescale = getTimescale();
+        *ret = time / (CLOCK_FREQ * segList->getDuration() / timescale);
+        return true;
+    }
+    return false;
 }
 
 bool SegmentInformation::canBitswitch() const

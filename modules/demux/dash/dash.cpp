@@ -195,7 +195,7 @@ static int  Control         (demux_t *p_demux, int i_query, va_list args)
     switch (i_query)
     {
         case DEMUX_CAN_SEEK:
-            *(va_arg (args, bool *)) = false;
+            *(va_arg (args, bool *)) = p_sys->p_dashManager->seekAble();
             break;
 
         case DEMUX_CAN_CONTROL_PACE:
@@ -220,6 +220,17 @@ static int  Control         (demux_t *p_demux, int i_query, va_list args)
 
             *(va_arg (args, double *)) = (double) p_sys->p_dashManager->getPCR()
                                          / p_sys->p_dashManager->getDuration();
+            break;
+
+        case DEMUX_SET_POSITION:
+            if(!p_sys->p_dashManager->getDuration() ||
+               !p_sys->p_dashManager->setPosition( p_sys->p_dashManager->getDuration() * va_arg(args, double)))
+                return VLC_EGENERIC;
+            break;
+
+        case DEMUX_SET_TIME:
+            if(!p_sys->p_dashManager->setPosition(va_arg(args, int64_t)))
+                return VLC_EGENERIC;
             break;
 
         case DEMUX_GET_PTS_DELAY:

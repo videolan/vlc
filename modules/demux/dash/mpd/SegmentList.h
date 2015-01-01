@@ -25,8 +25,15 @@
 #ifndef SEGMENTLIST_H_
 #define SEGMENTLIST_H_
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "mpd/SegmentInfoCommon.h"
 #include "mpd/ICanonicalUrl.hpp"
+#include "Properties.hpp"
+
+#include <vlc_common.h>
 
 namespace dash
 {
@@ -40,6 +47,8 @@ namespace dash
 
                 const std::vector<Segment *>&   getSegments() const;
                 void                    addSegment(Segment *seg);
+
+                Property<uint64_t> timescale;
 
             private:
                 std::vector<Segment *>  segments;

@@ -156,3 +156,33 @@ mtime_t DASHManager::getDuration() const
     else
         return CLOCK_FREQ * mpd->getDuration();
 }
+
+bool DASHManager::setPosition(mtime_t time)
+{
+    bool ret = true;
+    for(int real = 0; real < 2; real++)
+    {
+        /* Always probe if we can seek first */
+        for(int type=0; type<Streams::count; type++)
+        {
+            if(!streams[type])
+                continue;
+            ret &= streams[type]->setPosition(time, !real);
+        }
+        if(!ret)
+            break;
+    }
+    return ret;
+}
+
+bool DASHManager::seekAble() const
+{
+    for(int type=0; type<Streams::count; type++)
+    {
+        if(!streams[type])
+            continue;
+        if(!streams[type]->seekAble())
+            return false;
+    }
+    return true;
+}

@@ -34,7 +34,7 @@ using namespace dash::mpd;
 SegmentList::SegmentList( ICanonicalUrl *parent ):
     SegmentInfoCommon( parent )
 {
-
+    timescale.Set(0);
 }
 SegmentList::~SegmentList()
 {

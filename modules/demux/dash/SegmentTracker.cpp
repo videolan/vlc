@@ -95,3 +95,16 @@ Chunk * SegmentTracker::getNextChunk(Streams::Type type)
 
     return chunk;
 }
+
+bool SegmentTracker::setPosition(mtime_t time, bool tryonly)
+{
+    uint64_t segcount;
+    if(prevRepresentation &&
+       prevRepresentation->getSegmentNumberByTime(time, &segcount))
+    {
+        if(!tryonly)
+            count = segcount;
+        return true;
+    }
+    return false;
+}

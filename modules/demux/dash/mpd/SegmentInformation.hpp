@@ -48,7 +48,6 @@ namespace dash
                 SegmentInformation( SegmentInformation * = 0 );
                 explicit SegmentInformation( ICanonicalUrl * );
                 virtual ~SegmentInformation();
-                std::vector<ISegment *> getSegments() const;
                 bool canBitswitch() const;
                 uint64_t getTimescale() const;
                 virtual mtime_t getPeriodStart() const;
@@ -70,6 +69,11 @@ namespace dash
                 static const int InfoTypeCount = INFOTYPE_INDEX + 1;
 
                 ISegment * getSegment(SegmentInfoType, uint64_t = 0) const;
+                bool getSegmentNumberByTime(mtime_t, uint64_t *) const;
+
+            protected:
+                std::vector<ISegment *> getSegments() const;
+                std::vector<ISegment *> getSegments(SegmentInfoType) const;
 
             private:
                 void setSegmentList(SegmentList *);

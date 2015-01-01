@@ -141,6 +141,11 @@ Chunk * Stream::getChunk()
     return currentChunk;
 }
 
+bool Stream::seekAble() const
+{
+    return (output && output->seekAble());
+}
+
 size_t Stream::read(HTTPConnectionManager *connManager)
 {
     Chunk *chunk = getChunk();
@@ -210,6 +215,14 @@ size_t Stream::read(HTTPConnectionManager *connManager)
     return readsize;
 }
 
+bool Stream::setPosition(mtime_t time, bool tryonly)
+{
+    bool ret = segmentTracker->setPosition(time, tryonly);
+    if(!tryonly && ret)
+        output->setPosition(time);
+    return ret;
+}
+
 AbstractStreamOutput::AbstractStreamOutput(demux_t *demux)
 {
     realdemux = demux;
@@ -217,6 +230,7 @@ AbstractStreamOutput::AbstractStreamOutput(demux_t *demux)
     pcr = VLC_TS_0;
     group = -1;
     escount = 0;
+    seekable = true;
 
     fakeesout = new es_out_t;
     if (!fakeesout)
@@ -255,6 +269,17 @@ int AbstractStreamOutput::esCount() const
 void AbstractStreamOutput::pushBlock(block_t *block)
 {
     stream_DemuxSend(demuxstream, block);
+}
+
+bool AbstractStreamOutput::seekAble() const
+{
+    return (demuxstream && seekable);
+}
+
+void AbstractStreamOutput::setPosition(mtime_t nztime)
+{
+    es_out_Control(realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                   VLC_TS_0 + nztime);
 }
 
 /* Static callbacks */

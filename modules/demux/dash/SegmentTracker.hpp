@@ -56,6 +56,7 @@ namespace dash
             void setAdaptationLogic(logic::AbstractAdaptationLogic *);
             void resetCounter();
             http::Chunk* getNextChunk(Streams::Type);
+            bool setPosition(mtime_t, bool);
 
         private:
             bool initializing;
