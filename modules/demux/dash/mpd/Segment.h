@@ -51,8 +51,6 @@ namespace dash
                  *          That is basically true when using an Url, and false
                  *          when using an UrlTemplate
                  */
-                virtual bool                            isSingleShot    () const;
-                virtual void                            done            ();
                 virtual dash::http::Chunk*              toChunk         (size_t, Representation * = NULL);
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual size_t                          getOffset       () const;

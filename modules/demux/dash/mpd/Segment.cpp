@@ -76,15 +76,6 @@ dash::http::Chunk* ISegment::toChunk(size_t index, Representation *ctxrep)
     return chunk;
 }
 
-bool ISegment::isSingleShot() const
-{
-    return true;
-}
-void ISegment::done()
-{
-    //Only used for a SegmentTemplate.
-}
-
 void ISegment::setByteRange(size_t start, size_t end)
 {
     startByte = start;

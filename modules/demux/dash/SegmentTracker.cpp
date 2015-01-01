@@ -91,9 +91,7 @@ Chunk * SegmentTracker::getNextChunk(Streams::Type type)
 
     Chunk *chunk = segment->toChunk(count, rep);
     if(chunk)
-    {
-        segment->done();
         count++;
-    }
+
     return chunk;
 }

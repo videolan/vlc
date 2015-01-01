@@ -61,11 +61,6 @@ void SegmentTemplate::setStartIndex(size_t i)
     startIndex = i;
 }
 
-bool            SegmentTemplate::isSingleShot() const
-{
-    return false;
-}
-
 InitSegmentTemplate::InitSegmentTemplate( ICanonicalUrl *parent ) :
     SegmentTemplate(parent)
 {

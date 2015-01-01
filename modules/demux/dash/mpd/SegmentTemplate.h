@@ -38,7 +38,6 @@ namespace dash
             public:
                 SegmentTemplate( ICanonicalUrl * = NULL );
                 virtual Url             getUrlSegment() const; /* reimpl */
-                virtual bool            isSingleShot() const;
                 size_t                  getStartIndex() const;
                 void                    setStartIndex(size_t);
                 Property<mtime_t>       duration;
