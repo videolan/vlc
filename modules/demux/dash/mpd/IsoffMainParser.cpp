@@ -270,12 +270,16 @@ void IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformatio
 size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation *info)
 {
     size_t total = 0;
+    mtime_t totaltime = 0;
     if(segListNode)
     {
         std::vector<Node *> segments = DOMHelper::getElementByTagName(segListNode, "SegmentURL", false);
         SegmentList *list;
         if(!segments.empty() && (list = new (std::nothrow) SegmentList()))
         {
+            if(segListNode->hasAttribute("duration"))
+                list->setDuration(Integer<mtime_t>(segListNode->getAttributeValue("duration")));
+
             std::vector<Node *>::const_iterator it;
             for(it = segments.begin(); it != segments.end(); it++)
             {
@@ -295,6 +299,12 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
                     std::string range = segmentURL->getAttributeValue("mediaRange");
                     size_t pos = range.find("-");
                     seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
+                }
+
+                if(totaltime || list->getDuration())
+                {
+                    seg->startTime.Set(totaltime);
+                    totaltime += list->getDuration();
                 }
 
                 list->addSegment(seg);
