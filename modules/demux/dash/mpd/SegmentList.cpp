@@ -27,14 +27,28 @@
 #endif
 
 #include "SegmentList.h"
+#include "Segment.h"
 
 using namespace dash::mpd;
 
-SegmentList::SegmentList    ( ICanonicalUrl *parent ):
-    SegmentInfo( parent )
+SegmentList::SegmentList( ICanonicalUrl *parent ):
+    SegmentInfoCommon( parent )
 {
 
 }
-SegmentList::~SegmentList   ()
+SegmentList::~SegmentList()
 {
+    std::vector<Segment *>::iterator it;
+    for(it = segments.begin(); it != segments.end(); it++)
+        delete(*it);
+}
+
+const std::vector<Segment*>& SegmentList::getSegments() const
+{
+    return segments;
+}
+
+void SegmentList::addSegment(Segment *seg)
+{
+    segments.push_back(seg);
 }

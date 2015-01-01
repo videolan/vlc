@@ -28,7 +28,6 @@
 #include <string>
 
 #include "mpd/CommonAttributesElements.h"
-#include "mpd/SegmentInfo.h"
 #include "mpd/TrickModeType.h"
 #include "mpd/SegmentBase.h"
 #include "mpd/SegmentList.h"

@@ -25,18 +25,24 @@
 #ifndef SEGMENTLIST_H_
 #define SEGMENTLIST_H_
 
-#include "mpd/SegmentInfo.h"
+#include "mpd/SegmentInfoCommon.h"
 #include "mpd/ICanonicalUrl.hpp"
 
 namespace dash
 {
     namespace mpd
     {
-        class SegmentList : public SegmentInfo
+        class SegmentList : public SegmentInfoCommon
         {
             public:
                 SegmentList             ( ICanonicalUrl * = NULL );
                 virtual ~SegmentList    ();
+
+                const std::vector<Segment *>&   getSegments() const;
+                void                    addSegment(Segment *seg);
+
+            private:
+                std::vector<Segment *>  segments;
         };
     }
 }
