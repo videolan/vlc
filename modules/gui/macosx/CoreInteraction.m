@@ -70,20 +70,14 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (void)playOrPause
 {
-    input_thread_t * p_input;
-    p_input = pl_CurrentInput(VLCIntf);
-    playlist_t * p_playlist = pl_Get(VLCIntf);
+    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    playlist_t *p_playlist = pl_Get(VLCIntf);
 
     if (p_input) {
         playlist_TogglePause(p_playlist);
         vlc_object_release(p_input);
+
     } else {
-        bool empty;
-
-        PL_LOCK;
-        empty = playlist_IsEmpty(p_playlist);
-        PL_UNLOCK;
-
         PLRootType root = [[[[VLCMain sharedInstance] playlist] model] currentRootType];
         if ([[[VLCMain sharedInstance] playlist] isSelectionEmpty] && (root == ROOT_TYPE_PLAYLIST || root == ROOT_TYPE_MEDIALIBRARY))
             [[[VLCMain sharedInstance] open] openFileGeneric];
