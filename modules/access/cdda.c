@@ -662,11 +662,12 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
         goto error;
     }
 
-    int64_t i_length = 0;
+    int64_t i_length = 2000000; /* PreGap */
     for( int i = 0; i < i_titles; i++ )
     {
         cddb_track_t *t = cddb_track_new();
-        cddb_track_set_frame_offset( t, p_sectors[i] );
+        cddb_track_set_frame_offset( t, p_sectors[i] + 150 );  /* Pregap offset */
+
         cddb_disc_add_track( p_disc, t );
         const int64_t i_size = ( p_sectors[i+1] - p_sectors[i] ) *
                                (int64_t)CDDA_DATA_SIZE;
