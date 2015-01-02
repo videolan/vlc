@@ -1837,12 +1837,12 @@ vlc_module_begin ()
     add_bool( "network-synchronisation", false, NETSYNC_TEXT,
               NETSYNC_LONGTEXT, true )
 
-    add_string( "input-record-path", NULL, INPUT_RECORD_PATH_TEXT,
+    add_directory( "input-record-path", NULL, INPUT_RECORD_PATH_TEXT,
                 INPUT_RECORD_PATH_LONGTEXT, true )
     add_bool( "input-record-native", true, INPUT_RECORD_NATIVE_TEXT,
               INPUT_RECORD_NATIVE_LONGTEXT, true )
 
-    add_string( "input-timeshift-path", NULL, INPUT_TIMESHIFT_PATH_TEXT,
+    add_directory( "input-timeshift-path", NULL, INPUT_TIMESHIFT_PATH_TEXT,
                 INPUT_TIMESHIFT_PATH_LONGTEXT, true )
     add_integer( "input-timeshift-granularity", -1, INPUT_TIMESHIFT_GRANULARITY_TEXT,
                  INPUT_TIMESHIFT_GRANULARITY_LONGTEXT, true )
