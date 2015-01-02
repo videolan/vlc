@@ -2149,10 +2149,17 @@ void MP4_FreeBox_sample_vide( MP4_Box_t *p_box )
 
 static int MP4_ReadBox_sample_mp4s( stream_t *p_stream, MP4_Box_t *p_box )
 {
-    if ( MP4_Seek( p_stream, p_box->i_pos + mp4_box_headersize( p_box ) + 8 ) )
-        return 0;
+    p_box->i_handler = ATOM_text;
+    MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_sample_text_t, 16 );
+    if( i_read < 8 )
+        MP4_READBOX_EXIT( 0 );
+
     MP4_ReadBoxContainerRaw( p_stream, p_box );
-    return 1;
+
+    if ( MP4_Seek( p_stream, p_box->i_pos + p_box->i_size ) )
+        MP4_READBOX_EXIT( 0 );
+
+    MP4_READBOX_EXIT( 1 );
 }
 
 static int MP4_ReadBox_sample_text( stream_t *p_stream, MP4_Box_t *p_box )
