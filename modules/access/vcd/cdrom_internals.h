@@ -46,15 +46,6 @@ struct vcddev_s
 
 };
 
-
-/*****************************************************************************
- * Misc. Macros
- *****************************************************************************/
-/* LBA = msf.frame + 75 * ( msf.second + 60 * msf.minute ) */
-#define MSF_TO_LBA(min, sec, frame) ((int)frame + 75 * (sec + 60 * min))
-/* LBA = msf.frame + 75 * ( msf.second - 2 + 60 * msf.minute ) */
-#define MSF_TO_LBA2(min, sec, frame) ((int)frame + 75 * (sec -2 + 60 * min))
-
 #ifndef O_BINARY
 #   define O_BINARY 0
 #endif
