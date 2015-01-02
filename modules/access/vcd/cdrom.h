@@ -22,6 +22,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef VLC_CDROM_H
+#define VLC_CDROM_H
+
 #define CDDA_TYPE 0
 #define VCD_TYPE 1
 
@@ -100,3 +103,5 @@ int       ioctl_ReadSectors  ( vlc_object_t *, const vcddev_t *,
  * The track 0 is for album meta data */
 int       ioctl_GetCdText( vlc_object_t *, const vcddev_t *,
                            vlc_meta_t ***ppp_tracks, int *pi_tracks );
+
+#endif /* VLC_CDROM_H */
