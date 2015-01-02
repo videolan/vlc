@@ -289,7 +289,6 @@
 {
     id o_value = nil;
     char * psz_value;
-    playlist_item_t *p_item;
 
     input_item_t *p_input = [item input];
 
@@ -362,7 +361,7 @@
         }
     }
     else if ([o_identifier isEqualToString:FILESIZE_COLUMN]) {
-        psz_value = input_item_GetURI(p_item->p_input);
+        psz_value = input_item_GetURI(p_input);
         o_value = @"";
         if (psz_value) {
             NSURL *url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_value]];
