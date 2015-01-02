@@ -5035,6 +5035,35 @@ static int DemuxAsLeaf( demux_t *p_demux )
                     return 1;
                 }
 
+                if( p_sys->b_dash && p_sys->moovfragment.p_moox && p_sys->moovfragment.p_next )
+                {
+                    /* Detect and Handle Passive Seek */
+                    mp4_fragment_t *lastfrag = p_sys->moovfragment.p_next;
+                    while(lastfrag->p_next)
+                        lastfrag = lastfrag->p_next;
+                    MP4_Box_t *p_mfhd = MP4_BoxGet( p_fragbox, "mfhd" );
+                    MP4_Box_t *p_prevmfhd = MP4_BoxGet( lastfrag->p_moox, "mfhd" );
+                    if( p_mfhd && p_prevmfhd &&
+                        BOXDATA(p_mfhd)->i_sequence_number != p_prevmfhd->data.p_mfhd->i_sequence_number + 1 )
+                    {
+                        msg_Info( p_demux, "Passive DASH Seek detected" );
+                        MP4_Box_t *p_sidx = MP4_BoxGet( p_vroot, "sidx" );
+                        if( p_sidx && BOXDATA(p_sidx) && BOXDATA(p_sidx)->i_timescale )
+                        {
+                            mtime_t i_time_base = BOXDATA(p_sidx)->i_earliest_presentation_time;
+
+                            for( unsigned int i_track = 0; i_track < p_sys->i_tracks; i_track++ )
+                            {
+                                p_sys->track[i_track].i_time = i_time_base * p_sys->track[i_track].i_timescale
+                                                                           / BOXDATA(p_sidx)->i_timescale;
+                            }
+
+                            p_sys->i_time = i_time_base * p_sys->i_timescale / BOXDATA(p_sidx)->i_timescale;
+                            p_sys->i_pcr  = VLC_TS_INVALID;
+                        }
+                    }
+                }
+
                 /* detach */
                 while( p_vroot->p_first )
                 {
