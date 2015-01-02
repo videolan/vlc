@@ -1,6 +1,6 @@
 --- libcddb/lib/cddb_conn.c	2006-10-15 13:53:11.000000000 +0200
 +++ libcddb.new/lib/cddb_conn.c	2010-11-28 21:03:39.012749230 +0100
-@@ -100,9 +100,17 @@
+@@ -100,9 +100,18 @@
          c->use_cache = CACHE_ON;
          /* construct cache dir '$HOME/[DEFAULT_CACHE]' */
          s = getenv("HOME");
@@ -17,6 +17,7 @@
 +        {
 +            c->cache_dir = NULL;
 +            c->use_cache = CACHE_OFF;
++            c->cache_read = FALSE;
 +        }
  
          /* use anonymous@localhost */
