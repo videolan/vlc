@@ -36,18 +36,6 @@
 #include <vlc_input.h>
 #include <vlc_url.h>
 
-#define TRACKNUM_COLUMN @"tracknumber"
-#define TITLE_COLUMN @"name"
-#define ARTIST_COLUMN @"artist"
-#define DURATION_COLUMN @"duration"
-#define GENRE_COLUMN @"genre"
-#define ALBUM_COLUMN @"album"
-#define DESCRIPTION_COLUMN @"description"
-#define DATE_COLUMN @"date"
-#define LANGUAGE_COLUMN @"language"
-#define URI_COLUMN @"uri"
-#define FILESIZE_COLUMN @"file-size"
-
 #pragma mark -
 
 @implementation PLModel
@@ -288,7 +276,7 @@
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
     id o_value = nil;
-    char * psz_value;
+    char *psz_value;
 
     input_item_t *p_input = [item input];
 
@@ -296,88 +284,80 @@
 
     if ([o_identifier isEqualToString:TRACKNUM_COLUMN]) {
         psz_value = input_item_GetTrackNumber(p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
+        o_value = toNSStr(psz_value);
+        free(psz_value);
+
     } else if ([o_identifier isEqualToString:TITLE_COLUMN]) {
-        /* sanity check to prevent the NSString class from crashing */
-        char *psz_title =  input_item_GetTitleFbName(p_input);
-        if (psz_title) {
-            o_value = [NSString stringWithUTF8String:psz_title];
-            free(psz_title);
-        }
+        psz_value = input_item_GetTitleFbName(p_input);
+        o_value = toNSStr(psz_value);
+        free(psz_value);
+
     } else if ([o_identifier isEqualToString:ARTIST_COLUMN]) {
         psz_value = input_item_GetArtist(p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    } else if ([o_identifier isEqualToString:@"duration"]) {
+        o_value = toNSStr(psz_value);
+        free(psz_value);
+
+    } else if ([o_identifier isEqualToString:DURATION_COLUMN]) {
         char psz_duration[MSTRTIME_MAX_SIZE];
         mtime_t dur = input_item_GetDuration(p_input);
         if (dur != -1) {
             secstotimestr(psz_duration, dur/1000000);
-            o_value = [NSString stringWithUTF8String:psz_duration];
+            o_value = toNSStr(psz_duration);
         }
         else
             o_value = @"--:--";
+
     } else if ([o_identifier isEqualToString:GENRE_COLUMN]) {
         psz_value = input_item_GetGenre(p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
+        o_value = toNSStr(psz_value);
+        free(psz_value);
+
     } else if ([o_identifier isEqualToString:ALBUM_COLUMN]) {
         psz_value = input_item_GetAlbum(p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
+        o_value = toNSStr(psz_value);
+        free(psz_value);
+
     } else if ([o_identifier isEqualToString:DESCRIPTION_COLUMN]) {
         psz_value = input_item_GetDescription(p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
+        o_value = toNSStr(psz_value);
+        free(psz_value);
+
     } else if ([o_identifier isEqualToString:DATE_COLUMN]) {
         psz_value = input_item_GetDate(p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
+        o_value = toNSStr(psz_value);
+        free(psz_value);
+
     } else if ([o_identifier isEqualToString:LANGUAGE_COLUMN]) {
         psz_value = input_item_GetLanguage(p_input);
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    }
-    else if ([o_identifier isEqualToString:URI_COLUMN]) {
-        psz_value = decode_URI(input_item_GetURI(p_input));
-        if (psz_value) {
-            o_value = [NSString stringWithUTF8String:psz_value];
-            free(psz_value);
-        }
-    }
-    else if ([o_identifier isEqualToString:FILESIZE_COLUMN]) {
-        psz_value = input_item_GetURI(p_input);
-        o_value = @"";
-        if (psz_value) {
-            NSURL *url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_value]];
-            if ([url isFileURL]) {
-                NSFileManager *fileManager = [NSFileManager defaultManager];
-                if ([fileManager fileExistsAtPath:[url path]]) {
-                    NSError *error;
-                    NSDictionary *attributes = [fileManager attributesOfItemAtPath:[url path] error:&error];
-                    o_value = [VLCByteCountFormatter stringFromByteCount:[attributes fileSize] countStyle:NSByteCountFormatterCountStyleDecimal];
-                }
-            }
-            free(psz_value);
-        }
+        o_value = toNSStr(psz_value);
+        free(psz_value);
 
-    }
-    else if ([o_identifier isEqualToString:@"status"]) {
+    } else if ([o_identifier isEqualToString:URI_COLUMN]) {
+        psz_value = decode_URI(input_item_GetURI(p_input));
+        o_value = toNSStr(psz_value);
+        free(psz_value);
+
+    } else if ([o_identifier isEqualToString:FILESIZE_COLUMN]) {
+        psz_value = input_item_GetURI(p_input);
+        if (!psz_value)
+            return @"";
+        NSURL *url = [NSURL URLWithString:toNSStr(psz_value)];
+        free(psz_value);
+        if (![url isFileURL])
+            return @"";
+
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        BOOL b_isDir;
+        if (![fileManager fileExistsAtPath:[url path] isDirectory:&b_isDir] || b_isDir)
+            return @"";
+
+        NSDictionary *attributes = [fileManager attributesOfItemAtPath:[url path] error:nil];
+        if (!attributes)
+            return @"";
+
+        o_value = [VLCByteCountFormatter stringFromByteCount:[attributes fileSize] countStyle:NSByteCountFormatterCountStyleDecimal];
+
+    } else if ([o_identifier isEqualToString:STATUS_COLUMN]) {
         if (input_item_HasErrorWhenReading(p_input)) {
             o_value = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertCautionIcon)];
             [o_value setSize: NSMakeSize(16,16)];

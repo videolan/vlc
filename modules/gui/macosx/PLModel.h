@@ -27,6 +27,20 @@
 
 #define VLCPLItemPasteboadType @"VLCPlaylistItemPboardType"
 
+/* playlist column definitions */
+#define STATUS_COLUMN @"status"
+#define TRACKNUM_COLUMN @"tracknumber"
+#define TITLE_COLUMN @"name"
+#define ARTIST_COLUMN @"artist"
+#define DURATION_COLUMN @"duration"
+#define GENRE_COLUMN @"genre"
+#define ALBUM_COLUMN @"album"
+#define DESCRIPTION_COLUMN @"description"
+#define DATE_COLUMN @"date"
+#define LANGUAGE_COLUMN @"language"
+#define URI_COLUMN @"uri"
+#define FILESIZE_COLUMN @"file-size"
+
 @class VLCPlaylist;
 
 @interface PLModel : NSObject<NSOutlineViewDataSource>
