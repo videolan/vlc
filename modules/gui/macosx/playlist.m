@@ -465,31 +465,21 @@
 /* When called retrieves the selected outlineview row and plays that node or item */
 - (IBAction)playItem:(id)sender
 {
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get(p_intf);
-
-    playlist_item_t *p_item;
-    playlist_item_t *p_node = NULL;
+    playlist_t *p_playlist = pl_Get(VLCIntf);
 
     // ignore clicks on column header when handling double action
-    if (sender != nil && [o_outline_view clickedRow] == -1 && sender != o_mi_play)
+    if (sender == o_outline_view && [o_outline_view clickedRow] == -1)
+        return;
+
+    PLItem *o_item = [o_outline_view itemAtRow:[o_outline_view selectedRow]];
+    if (!o_item)
         return;
 
     PL_LOCK;
-    PLItem *o_item = [o_outline_view itemAtRow:[o_outline_view selectedRow]];
-    p_item = playlist_ItemGetById(p_playlist, [o_item plItemId]);
+    playlist_item_t *p_item = playlist_ItemGetById(p_playlist, [o_item plItemId]);
+    playlist_item_t *p_node = playlist_ItemGetById(p_playlist, [[[self model] rootItem] plItemId]);
 
-    if (p_item) {
-        if (p_item->i_children == -1) {
-            p_node = p_item->p_parent;
-        } else {
-            p_node = p_item;
-            if (p_node->i_children > 0 && p_node->pp_children[0]->i_children == -1)
-                p_item = p_node->pp_children[0];
-            else
-                p_item = NULL;
-        }
-
+    if (p_item && p_node) {
         playlist_Control(p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item);
     }
     PL_UNLOCK;
