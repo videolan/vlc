@@ -397,6 +397,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     cddb_disc_t *p_disc = GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
     if( p_disc )
     {
+        msg_Dbg( p_access, "Disc ID: %u", cddb_disc_get_discid( p_disc ) );
         psz_album = cddb_disc_get_title( p_disc );
         psz_genre = cddb_disc_get_genre( p_disc );
 
@@ -672,8 +673,11 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
         const int64_t i_size = ( p_sectors[i+1] - p_sectors[i] ) *
                                (int64_t)CDDA_DATA_SIZE;
         i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
+
+        msg_Dbg( p_access, "Track %i offset: %i", i, p_sectors[i] + 150 );
     }
 
+    msg_Dbg( p_access, "Total length: %i", i_length/1000000 );
     cddb_disc_set_length( p_disc, (int)(i_length/1000000) );
 
     if( !cddb_disc_calc_discid( p_disc ) )
