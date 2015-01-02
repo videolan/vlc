@@ -829,6 +829,7 @@
     [o_mi_recursive_expand setEnabled: b_item_sel];
     [o_mi_sort_name setEnabled: b_item_sel];
     [o_mi_sort_author setEnabled: b_item_sel];
+    [o_mi_dl_cover_art setEnabled: b_item_sel];
 
     return o_ctx_menu;
 }
