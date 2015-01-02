@@ -61,7 +61,7 @@ struct vlc_va_sys_t
     vlc_vdp_video_field_t **pool;
 };
 
-#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 10, 0))
+#if !LIBAVCODEC_VERSION_CHECK(56, 10, 0, 19, 100)
 static int av_vdpau_get_surface_parameters(AVCodecContext *avctx,
                                            VdpChromaType *type,
                                            uint32_t *width, uint32_t *height)
@@ -75,7 +75,7 @@ static int av_vdpau_get_surface_parameters(AVCodecContext *avctx,
     return 0;
 }
 #endif
-#if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 9, 0))
+#if !LIBAVCODEC_VERSION_CHECK(56, 9, 0, 18, 100)
 # define AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH (0)
 #endif
 

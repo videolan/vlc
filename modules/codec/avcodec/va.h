@@ -21,6 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "avcommon_compat.h"
+
 #ifndef VLC_AVCODEC_VA_H
 #define VLC_AVCODEC_VA_H 1
 
