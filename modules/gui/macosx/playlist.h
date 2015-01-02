@@ -63,7 +63,6 @@
     IBOutlet id o_mi_info;
     IBOutlet id o_mi_preparse;
     IBOutlet id o_mi_revealInFinder;
-    IBOutlet id o_mm_mi_revealInFinder;
     IBOutlet id o_mi_dl_cover_art;
     IBOutlet id o_mi_selectall;
     IBOutlet id o_mi_sort_name;

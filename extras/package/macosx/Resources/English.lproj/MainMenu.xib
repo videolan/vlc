@@ -12,11 +12,11 @@
     </object>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="2730"/>
-      <integer value="5547"/>
-      <integer value="2461"/>
       <integer value="4596"/>
-      <integer value="57"/>
+      <integer value="2730"/>
+      <integer value="2461"/>
+      <integer value="5547"/>
+      <integer value="81"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -4510,6 +4510,22 @@
           </object>
           <int key="connectionID">5615</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">o_mi_revealInFinder</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="252497091"/>
+          </object>
+          <int key="connectionID">5616</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">revealItemInFinder:</string>
+            <reference key="source" ref="651263286"/>
+            <reference key="destination" ref="252497091"/>
+          </object>
+          <int key="connectionID">5617</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -7181,7 +7197,7 @@
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
-          <string>{{431, 473}, {297, 263}}</string>
+          <string>{{302, 473}, {297, 263}}</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <boolean value="YES"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -7212,7 +7228,7 @@
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">5615</int>
+      <int key="maxID">5617</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -7805,6 +7821,7 @@
               <string>openWebsite:</string>
               <string>quitAfterPlayback:</string>
               <string>resizeVideoWindow:</string>
+              <string>revealItemInFinder:</string>
               <string>savePlaylist:</string>
               <string>setPlaybackRate:</string>
               <string>showAudioEffects:</string>
@@ -7890,6 +7907,7 @@
               <string>id</string>
               <string>id</string>
               <string>id</string>
+              <string>id</string>
             </object>
           </object>
           <object class="NSMutableDictionary" key="actionInfosByName">
@@ -7912,6 +7930,7 @@
               <string>openWebsite:</string>
               <string>quitAfterPlayback:</string>
               <string>resizeVideoWindow:</string>
+              <string>revealItemInFinder:</string>
               <string>savePlaylist:</string>
               <string>setPlaybackRate:</string>
               <string>showAudioEffects:</string>
@@ -8010,6 +8029,10 @@
               </object>
               <object class="IBActionInfo">
                 <string key="name">resizeVideoWindow:</string>
+                <string key="candidateClassName">id</string>
+              </object>
+              <object class="IBActionInfo">
+                <string key="name">revealItemInFinder:</string>
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBActionInfo">
@@ -8237,6 +8260,7 @@
               <string>o_mi_readme</string>
               <string>o_mi_record</string>
               <string>o_mi_repeat</string>
+              <string>o_mi_revealInFinder</string>
               <string>o_mi_save_playlist</string>
               <string>o_mi_screen</string>
               <string>o_mi_select_all</string>
@@ -8416,6 +8440,7 @@
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
               <string>NSMenuItem</string>
+              <string>NSMenuItem</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -8580,6 +8605,7 @@
               <string>o_mi_readme</string>
               <string>o_mi_record</string>
               <string>o_mi_repeat</string>
+              <string>o_mi_revealInFinder</string>
               <string>o_mi_save_playlist</string>
               <string>o_mi_screen</string>
               <string>o_mi_select_all</string>
@@ -9009,6 +9035,10 @@
               </object>
               <object class="IBToOneOutletInfo">
                 <string key="name">o_mi_repeat</string>
+                <string key="candidateClassName">NSMenuItem</string>
+              </object>
+              <object class="IBToOneOutletInfo">
+                <string key="name">o_mi_revealInFinder</string>
                 <string key="candidateClassName">NSMenuItem</string>
               </object>
               <object class="IBToOneOutletInfo">
@@ -9687,7 +9717,7 @@
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCPlaylist</string>
-          <string key="superclassName">VLCPlaylistCommon</string>
+          <string key="superclassName">NSObject</string>
           <object class="NSMutableDictionary" key="actions">
             <bool key="EncodedWithXMLCoder">YES</bool>
             <object class="NSArray" key="dict.sortedKeys">
@@ -9809,6 +9839,7 @@
               <string>o_mi_sort_author</string>
               <string>o_mi_sort_name</string>
               <string>o_mm_mi_revealInFinder</string>
+              <string>o_outline_view</string>
               <string>o_playlist_header</string>
               <string>o_playlist_view</string>
               <string>o_playlist_wizard</string>
@@ -9834,6 +9865,7 @@
               <string>id</string>
               <string>id</string>
               <string>id</string>
+              <string>VLCPlaylistView</string>
               <string>id</string>
               <string>id</string>
               <string>id</string>
@@ -9862,6 +9894,7 @@
               <string>o_mi_sort_author</string>
               <string>o_mi_sort_name</string>
               <string>o_mm_mi_revealInFinder</string>
+              <string>o_outline_view</string>
               <string>o_playlist_header</string>
               <string>o_playlist_view</string>
               <string>o_playlist_wizard</string>
@@ -9933,6 +9966,10 @@
                 <string key="candidateClassName">id</string>
               </object>
               <object class="IBToOneOutletInfo">
+                <string key="name">o_outline_view</string>
+                <string key="candidateClassName">VLCPlaylistView</string>
+              </object>
+              <object class="IBToOneOutletInfo">
                 <string key="name">o_playlist_header</string>
                 <string key="candidateClassName">id</string>
               </object>
@@ -9966,22 +10003,6 @@
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">../../../modules/gui/macosx/playlist.h</string>
           </object>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">VLCPlaylistCommon</string>
-          <string key="superclassName">NSObject</string>
-          <object class="NSMutableDictionary" key="outlets">
-            <string key="NS.key.0">o_outline_view</string>
-            <string key="NS.object.0">VLCPlaylistView</string>
-          </object>
-          <object class="NSMutableDictionary" key="toOneOutletInfosByName">
-            <string key="NS.key.0">o_outline_view</string>
-            <object class="IBToOneOutletInfo" key="NS.object.0">
-              <string key="name">o_outline_view</string>
-              <string key="candidateClassName">VLCPlaylistView</string>
-            </object>
-          </object>
-          <reference key="sourceIdentifier" ref="669160037"/>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">VLCPlaylistView</string>

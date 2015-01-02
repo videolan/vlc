@@ -74,6 +74,7 @@
     IBOutlet NSMenuItem * o_mi_open_wizard;
     IBOutlet NSMenuItem * o_mi_convertandsave;
     IBOutlet NSMenuItem * o_mi_save_playlist;
+    IBOutlet NSMenuItem * o_mi_revealInFinder;
 
     IBOutlet NSMenu * o_mu_edit;
     IBOutlet NSMenuItem * o_mi_cut;
@@ -246,6 +247,7 @@
 - (IBAction)intfOpenNet:(id)sender;
 - (IBAction)intfOpenCapture:(id)sender;
 - (IBAction)savePlaylist:(id)sender;
+- (IBAction)revealItemInFinder:(id)sender;
 
 - (IBAction)toggleEffectsButton:(id)sender;
 - (IBAction)toggleJumpButtons:(id)sender;

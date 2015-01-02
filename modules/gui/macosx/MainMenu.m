@@ -378,6 +378,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [o_mi_open_wizard setTitle: _NS("Streaming/Exporting Wizard...")];
     [o_mi_convertandsave setTitle: _NS("Convert / Stream...")];
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
+    [o_mi_revealInFinder setTitle: _NS("Reveal in Finder")];
 
     [o_mu_edit setTitle: _NS("Edit")];
     [o_mi_cut setTitle: _NS("Cut")];
@@ -1107,6 +1108,11 @@ static VLCMainMenu *_o_sharedInstance = nil;
 - (IBAction)savePlaylist:(id)sender
 {
     [[[VLCMain sharedInstance] playlist] savePlaylist:sender];
+}
+
+- (IBAction)revealItemInFinder:(id)sender
+{
+    [[[VLCMain sharedInstance] playlist] revealItemInFinder:sender];
 }
 
 - (IBAction)showConvertAndSave:(id)sender

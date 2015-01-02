@@ -292,8 +292,6 @@
     [o_mi_dl_cover_art setTitle: _NS("Download Cover Art")];
     [o_mi_preparse setTitle: _NS("Fetch Meta Data")];
     [o_mi_revealInFinder setTitle: _NS("Reveal in Finder")];
-    [o_mm_mi_revealInFinder setTitle: _NS("Reveal in Finder")];
-    [[o_mm_mi_revealInFinder menu] setAutoenablesItems: NO];
     [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
     [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
 
