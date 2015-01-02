@@ -46,15 +46,13 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#ifdef HAVE_ARPA_INET_H
-#   include <arpa/inet.h>
-#endif
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_access.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
-#include <limits.h>
+#include <vlc_meta.h>
 
 #if defined( SYS_BSDI )
 #   include <dvd.h>
@@ -141,7 +139,6 @@ exit_free:
 
 #include "cdrom_internals.h"
 #include "cdrom.h"
-#include <vlc_meta.h>
 
 /*****************************************************************************
  * ioctl_Open: Opens a VCD device or file and returns an opaque handle
@@ -821,7 +818,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     msg_Dbg( p_this,"guessing vcd image file: %s", psz_vcdfile );
     p_vcddev->i_vcdimage_handle = vlc_open( psz_vcdfile,
                                     O_RDONLY | O_NONBLOCK | O_BINARY );
- 
+
     while( fgets( line, 1024, cuefile ) && !b_found )
     {
         /* We have a cue file, but no valid vcd file yet */
