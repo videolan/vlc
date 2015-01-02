@@ -60,10 +60,15 @@ enum {
 /*****************************************************************************
  * Misc. Macros
  *****************************************************************************/
-/* LBA = msf.frame + 75 * ( msf.second + 60 * msf.minute ) */
-#define MSF_TO_LBA(min, sec, frame) ((int)frame + 75 * (sec + 60 * min))
-/* LBA = msf.frame + 75 * ( msf.second - 2 + 60 * msf.minute ) */
-#define MSF_TO_LBA2(min, sec, frame) ((int)frame + 75 * (sec -2 + 60 * min))
+static inline int MSF_TO_LBA(uint8_t min, uint8_t sec, uint8_t frame)
+{
+    return (int)(frame + 75 * (sec + 60 * min));
+}
+static inline int MSF_TO_LBA2(uint8_t min, uint8_t sec, uint8_t frame)
+{
+    return (int)(frame + 75 * (sec -2 + 60 * min));
+}
+
 /* Converts BCD to Binary data */
 #define BCD_TO_BIN(i) \
     (uint8_t)((uint8_t)(0xf & (uint8_t)i)+((uint8_t)10*((uint8_t)i >> 4)))
