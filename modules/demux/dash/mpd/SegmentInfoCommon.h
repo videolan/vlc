@@ -29,6 +29,7 @@
 #include <list>
 #include <ctime>
 #include "ICanonicalUrl.hpp"
+#include "Properties.hpp"
 
 namespace dash
 {
@@ -37,7 +38,16 @@ namespace dash
         class Segment;
         class SegmentTimeline;
 
-        class SegmentInfoCommon : public ICanonicalUrl
+        class Initializable
+        {
+            public:
+                Initializable();
+                ~Initializable();
+                Property<Segment *> initialisationSegment;
+        };
+
+        class SegmentInfoCommon : public ICanonicalUrl,
+                                  public Initializable
         {
             public:
                 SegmentInfoCommon( ICanonicalUrl *parent = NULL );
@@ -46,8 +56,6 @@ namespace dash
                 void                    setDuration( time_t duration );
                 int                     getStartIndex() const;
                 void                    setStartIndex( int startIndex );
-                Segment*                getInitialisationSegment() const;
-                void                    setInitialisationSegment( Segment* seg );
                 void                    appendBaseURL( const std::string& url );
                 const SegmentTimeline*  getSegmentTimeline() const;
                 void                    setSegmentTimeline( const SegmentTimeline *segTl );
@@ -56,7 +64,6 @@ namespace dash
             private:
                 time_t                  duration;
                 int                     startIndex;
-                Segment*                initialisationSegment;
                 std::list<std::string>  baseURLs;
                 const SegmentTimeline*  segmentTimeline;
         };

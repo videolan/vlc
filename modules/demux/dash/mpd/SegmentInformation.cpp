@@ -121,13 +121,13 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
     switch(type)
     {
         case INFOTYPE_INIT:
-            if( segBase && segBase->getInitSegment() )
+            if( segBase && segBase->initialisationSegment.Get() )
             {
-                segment = segBase->getInitSegment();
+                segment = segBase->initialisationSegment.Get();
             }
-            else if( segList && segList->getInitialisationSegment() )
+            else if( segList && segList->initialisationSegment.Get() )
             {
-                segment = segList->getInitialisationSegment();
+                segment = segList->initialisationSegment.Get();
             }
             else if( inheritSegmentTemplate(INFOTYPE_INIT) )
             {

@@ -31,18 +31,9 @@
 using namespace dash::mpd;
 
 SegmentBase::SegmentBase    () :
-             initSeg        (NULL)
+             Initializable()
 {
 }
 SegmentBase::~SegmentBase   ()
 {
-}
-
-void        SegmentBase::addInitSegment  (Segment *seg)
-{
-    this->initSeg = seg;
-}
-Segment*    SegmentBase::getInitSegment  ()
-{
-    return this->initSeg;
 }

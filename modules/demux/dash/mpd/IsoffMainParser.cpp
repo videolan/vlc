@@ -251,18 +251,18 @@ void IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformatio
         list->addSegment(seg);
         info->setSegmentList(list);
 
-        std::vector<Node *> initSeg = DOMHelper::getElementByTagName(segmentBaseNode, "Initialization", false);
-        if(!initSeg.empty())
+        Node *initSeg = DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization");
+        if(initSeg)
         {
             SegmentBase *base = new SegmentBase();
-            setInitSegment(segmentBaseNode, base);
+            parseInitSegment(initSeg, base);
             info->setSegmentBase(base);
         }
     }
     else
     {
         SegmentBase *base = new SegmentBase();
-        setInitSegment(segmentBaseNode, base);
+        parseInitSegment(DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization"), base);
         info->setSegmentBase(base);
     }
 }
@@ -277,6 +277,8 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
         SegmentList *list;
         if(!segments.empty() && (list = new (std::nothrow) SegmentList()))
         {
+            parseInitSegment(DOMHelper::getFirstChildElementByName(segListNode, "Initialization"), list);
+
             if(segListNode->hasAttribute("duration"))
                 list->setDuration(Integer<mtime_t>(segListNode->getAttributeValue("duration")));
 
@@ -320,27 +322,22 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
     return total;
 }
 
-void    IsoffMainParser::setInitSegment     (dash::xml::Node *segBaseNode, SegmentBase *base)
+void IsoffMainParser::parseInitSegment(Node *initNode, Initializable *init)
 {
-    std::vector<Node *> initSeg = DOMHelper::getElementByTagName(segBaseNode, "Initialisation", false);
+    if(!initNode)
+        return;
 
-    if(initSeg.size() == 0)
-        initSeg = DOMHelper::getElementByTagName(segBaseNode, "Initialization", false);
+    Segment *seg = new InitSegment( currentRepresentation );
+    seg->setSourceUrl(initNode->getAttributeValue("sourceURL"));
 
-    if(initSeg.size() > 0)
+    if(initNode->hasAttribute("range"))
     {
-        Segment *seg = new InitSegment( currentRepresentation );
-        seg->setSourceUrl(initSeg.at(0)->getAttributeValue("sourceURL"));
-
-        if(initSeg.at(0)->hasAttribute("range"))
-        {
-            std::string range = initSeg.at(0)->getAttributeValue("range");
-            size_t pos = range.find("-");
-            seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
-        }
-
-        base->addInitSegment(seg);
+        std::string range = initNode->getAttributeValue("range");
+        size_t pos = range.find("-");
+        seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
     }
+
+    init->initialisationSegment.Set(seg);
 }
 
 void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)

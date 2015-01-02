@@ -33,11 +33,20 @@
 
 using namespace dash::mpd;
 
+Initializable::Initializable()
+{
+    initialisationSegment.Set(NULL);
+}
+
+Initializable::~Initializable()
+{
+    delete initialisationSegment.Get();
+}
+
 SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
-    ICanonicalUrl( parent ),
+    ICanonicalUrl( parent ), Initializable(),
     duration( -1 ),
     startIndex( 0 ),
-    initialisationSegment( NULL ),
     segmentTimeline( NULL )
 {
 }
@@ -45,7 +54,6 @@ SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
 SegmentInfoCommon::~SegmentInfoCommon()
 {
     delete this->segmentTimeline;
-    delete this->initialisationSegment;
 }
 
 time_t      SegmentInfoCommon::getDuration() const
@@ -68,17 +76,6 @@ void        SegmentInfoCommon::setStartIndex(int startIndex)
 {
     if ( startIndex >= 0 )
         this->startIndex = startIndex;
-}
-
-Segment*  SegmentInfoCommon::getInitialisationSegment() const
-{
-    return this->initialisationSegment;
-}
-
-void SegmentInfoCommon::setInitialisationSegment(Segment *seg)
-{
-    if ( seg != NULL )
-        this->initialisationSegment = seg;
 }
 
 void SegmentInfoCommon::appendBaseURL(const std::string &url)

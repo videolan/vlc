@@ -26,22 +26,17 @@
 #define SEGMENTBASE_H_
 
 #include "mpd/Segment.h"
+#include "mpd/SegmentInfoCommon.h"
 
 namespace dash
 {
     namespace mpd
     {
-        class SegmentBase
+        class SegmentBase : public Initializable
         {
             public:
                 SegmentBase             ();
                 virtual ~SegmentBase    ();
-
-                void        addInitSegment  (Segment *seg);
-                Segment*    getInitSegment  ();
-
-            private:
-                Segment *initSeg;
         };
     }
 }
