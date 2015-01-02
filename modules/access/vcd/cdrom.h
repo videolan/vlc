@@ -25,26 +25,37 @@
 #ifndef VLC_CDROM_H
 #define VLC_CDROM_H
 
-#define CDDA_TYPE 0
-#define VCD_TYPE 1
+enum {
+    CDDA_TYPE = 0,
+    VCD_TYPE  = 1,
+};
+
+/* size of a CD sector */
+#define CD_RAW_SECTOR_SIZE  2352
+#define CD_ROM_MODE1_DATA_SIZE 2048
+#define CD_ROM_MODE2_DATA_SIZE 2336
+
+#define CD_ROM_XA_MODE2_F1_DATA_SIZE 2048
+#define CD_ROM_XA_MODE2_F2_DATA_SIZE 2324
+
+/* size of a CD sector */
+#define CD_SECTOR_SIZE      CD_ROM_MODE1_DATA_SIZE
 
 /* where the data start on a VCD sector */
-#define VCD_DATA_START 24
-/* size of the availablr data on a VCD sector */
-#define VCD_DATA_SIZE 2324
+#define VCD_DATA_START      24
+/* size of the available data on a VCD sector */
+#define VCD_DATA_SIZE       CD_ROM_XA_MODE2_F2_DATA_SIZE
 /* size of a VCD sector, header and tail included */
-#define VCD_SECTOR_SIZE 2352
-/* size of a CD sector */
-#define CD_SECTOR_SIZE 2048
+#define VCD_SECTOR_SIZE     CD_RAW_SECTOR_SIZE
 /* sector containing the entry points */
-#define VCD_ENTRIES_SECTOR 151
+#define VCD_ENTRIES_SECTOR  151
 
 /* where the data start on a CDDA sector */
-#define CDDA_DATA_START 0
-/* size of the availablr data on a CDDA sector */
-#define CDDA_DATA_SIZE 2352
+#define CDDA_DATA_START     0
+/* size of the available data on a CDDA sector */
+#define CDDA_DATA_SIZE      CD_RAW_SECTOR_SIZE
 /* size of a CDDA sector, header and tail included */
-#define CDDA_SECTOR_SIZE 2352
+#define CDDA_SECTOR_SIZE    CD_RAW_SECTOR_SIZE
 
 /*****************************************************************************
  * Misc. Macros
