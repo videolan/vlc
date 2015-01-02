@@ -487,32 +487,24 @@
 
 - (IBAction)revealItemInFinder:(id)sender
 {
-    NSIndexSet * selectedRows = [o_outline_view selectedRowIndexes];
-    NSUInteger count = [selectedRows count];
-    NSUInteger indexes[count];
-    [selectedRows getIndexes:indexes maxCount:count inIndexRange:nil];
+    NSIndexSet *selectedRows = [o_outline_view selectedRowIndexes];
+    [selectedRows enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 
-    NSMutableString * o_mrl;
-    for (NSUInteger i = 0; i < count; i++) {
-        PLItem *o_item = [o_outline_view itemAtRow:indexes[i]];
-
-        char * psz_url = decode_URI(input_item_GetURI([o_item input]));
-        o_mrl = [[NSMutableString alloc] initWithString: [NSString stringWithUTF8String:psz_url ? psz_url : ""]];
-        if (psz_url != NULL)
-            free( psz_url );
+        PLItem *o_item = [o_outline_view itemAtRow:idx];
 
         /* perform some checks whether it is a file and if it is local at all... */
-        if ([o_mrl length] > 0) {
-            NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
-            if (prefix_range.location != NSNotFound)
-                [o_mrl deleteCharactersInRange: prefix_range];
+        char *psz_url = input_item_GetURI([o_item input]);
+        NSURL *url = [NSURL URLWithString:toNSStr(psz_url)];
+        free(psz_url);
+        if (![url isFileURL])
+            return;
+        if (![[NSFileManager defaultManager] fileExistsAtPath:[url path]])
+            return;
 
-            if ([o_mrl characterAtIndex:0] == '/')
-                [[NSWorkspace sharedWorkspace] selectFile: o_mrl inFileViewerRootedAtPath: o_mrl];
-        }
+        msg_Dbg(VLCIntf, "Reveal url %s in finder", [[url path] UTF8String]);
+        [[NSWorkspace sharedWorkspace] selectFile: [url path] inFileViewerRootedAtPath: [url path]];
+    }];
 
-        [o_mrl release];
-    }
 }
 
 /* When called retrieves the selected outlineview row and plays that node or item */
