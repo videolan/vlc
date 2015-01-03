@@ -181,7 +181,7 @@ libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d9)
 EXTRA_LTLIBRARIES += libdirect3d9_plugin.la
 
-libdirectdraw_plugin_la_SOURCES = video_output/msw/directx.c \
+libdirectdraw_plugin_la_SOURCES = video_output/msw/directdraw.c \
 	video_output/msw/common.c video_output/msw/common.h \
 	video_output/msw/events.c video_output/msw/events.h \
 	video_output/msw/win32touch.c video_output/msw/win32touch.h

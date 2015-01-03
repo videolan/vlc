@@ -1,5 +1,5 @@
 /*****************************************************************************
- * directx.c: Windows DirectDraw video output
+ * directdraw.c: Windows DirectDraw video output
  *****************************************************************************
  * Copyright (C) 2001-2009 VLC authors and VideoLAN
  * $Id$
@@ -94,7 +94,7 @@ static void Close(vlc_object_t *);
 static int FindDevicesCallback(vlc_object_t *, const char *,
                                char ***, char ***);
 vlc_module_begin()
-    set_shortname("DirectX")
+    set_shortname("DirectDraw")
     set_description(N_("DirectX (DirectDraw) video output"))
     set_help(DX_HELP)
     set_category(CAT_VIDEO)
@@ -109,7 +109,7 @@ vlc_module_begin()
         change_string_cb(FindDevicesCallback)
 
     set_capability("vout display", 230)
-    add_shortcut("directx")
+    add_shortcut("directx", "directdraw")
     set_callbacks(Open, Close)
 vlc_module_end()
 

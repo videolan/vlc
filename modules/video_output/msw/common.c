@@ -147,7 +147,7 @@ void CommonManage(vout_display_t *vd)
              * an issue. The surface automatically gets moved together
              * with the associated window (hvideownd)
              *
-             * For directx, it is still important to call UpdateRects
+             * For directdraw, it is still important to call UpdateRects
              * on a move of the parent window, even if no resize occurred
              */
             SetWindowPos(sys->hwnd, 0, 0, 0,
