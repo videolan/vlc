@@ -159,15 +159,29 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
 
 bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
 {
-    SegmentList *segList = inheritSegmentList();
-    if ( segList->getDuration() )
+    SegmentList *segList;
+    SegmentTemplate *segTemplate;
+    uint64_t timescale;
+    mtime_t duration = 0;
+    if ( (segList = inheritSegmentList()) )
     {
-        uint64_t timescale = segList->timescale.Get();
+        timescale = segList->timescale.Get();
+        duration = segList->getDuration();
+    }
+    else if( (segTemplate = inheritSegmentTemplate(INFOTYPE_MEDIA)) )
+    {
+        timescale = segTemplate->timescale.Get();
+        duration = segTemplate->duration.Get();
+    }
+
+    if(duration)
+    {
         if(!timescale)
-            timescale = getTimescale();
-        *ret = time / (CLOCK_FREQ * segList->getDuration() / timescale);
+            timescale = getTimescale(); /* inherit */
+        *ret = time / (CLOCK_FREQ * duration / timescale);
         return true;
     }
+
     return false;
 }
 
