@@ -177,6 +177,9 @@ bool DASHManager::setPosition(mtime_t time)
 
 bool DASHManager::seekAble() const
 {
+    if(mpd->isLive())
+        return false;
+
     for(int type=0; type<Streams::count; type++)
     {
         if(!streams[type])

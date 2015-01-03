@@ -223,13 +223,15 @@ static int  Control         (demux_t *p_demux, int i_query, va_list args)
             break;
 
         case DEMUX_SET_POSITION:
-            if(!p_sys->p_dashManager->getDuration() ||
+            if(p_sys->p_mpd->isLive() ||
+               !p_sys->p_dashManager->getDuration() ||
                !p_sys->p_dashManager->setPosition( p_sys->p_dashManager->getDuration() * va_arg(args, double)))
                 return VLC_EGENERIC;
             break;
 
         case DEMUX_SET_TIME:
-            if(!p_sys->p_dashManager->setPosition(va_arg(args, int64_t)))
+            if(p_sys->p_mpd->isLive() ||
+               !p_sys->p_dashManager->setPosition(va_arg(args, int64_t)))
                 return VLC_EGENERIC;
             break;
 
