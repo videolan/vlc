@@ -33,7 +33,6 @@ endif
 endif
 
 .speexdsp: speexdsp
-	mkdir -p $</m4 && $(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SPEEXDSP_CONF)
 	cd $< && $(MAKE) install
 	touch $@
