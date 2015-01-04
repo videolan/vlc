@@ -29,7 +29,6 @@ SPEEX_CONF += --disable-neon
 endif
 
 .speex: speex
-	mkdir -p $</m4 && $(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(SPEEX_CONF)
 	cd $< && $(MAKE) install
 	touch $@
