@@ -76,7 +76,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     struct sio_par par;
     sio_initpar (&par);
     switch (fmt->i_format) {
-    case VLC_CODEC_S8:
+    case VLC_CODEC_U8:
 	par.bits = 8;
 	par.sig = 0;
 	break;
