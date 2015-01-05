@@ -592,7 +592,7 @@ static inline void VolumeEntries( intf_thread_t *p_intf, QMenu *current )
     QAction *action = current->addAction( QIcon( ":/toolbar/volume-high" ), qtr( "&Increase Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
-    action = current->addAction( QIcon( ":/toolbar/volume-low" ), qtr( "&Decrease Volume" ),
+    action = current->addAction( QIcon( ":/toolbar/volume-low" ), qtr( "D&ecrease Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
     action = current->addAction( QIcon( ":/toolbar/volume-muted" ), qtr( "&Mute" ),
