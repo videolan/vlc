@@ -180,6 +180,9 @@ bool    DOMParser::isDash                   (stream_t *stream)
         "xmlns=\"urn:mpeg:mpegB:schema:DASH:MPD:DIS2011\"",
         "xmlns=\"urn:mpeg:schema:dash:mpd:2011\"",
         "xmlns=\"urn:mpeg:DASH:schema:MPD:2011\"",
+        "xmlns='urn:mpeg:mpegB:schema:DASH:MPD:DIS2011'",
+        "xmlns='urn:mpeg:schema:dash:mpd:2011'",
+        "xmlns='urn:mpeg:DASH:schema:MPD:2011'",
     };
 
     const uint8_t *peek;
