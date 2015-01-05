@@ -397,7 +397,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     cddb_disc_t *p_disc = GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
     if( p_disc )
     {
-        msg_Dbg( p_access, "Disc ID: %u", cddb_disc_get_discid( p_disc ) );
+        msg_Dbg( p_access, "Disc ID: %08x", cddb_disc_get_discid( p_disc ) );
         psz_album = cddb_disc_get_title( p_disc );
         psz_genre = cddb_disc_get_genre( p_disc );
 
