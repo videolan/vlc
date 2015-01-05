@@ -45,11 +45,9 @@
 #include <QPropertyAnimation>
 #include <QLinkedList>
 
-class ResizeEvent;
-class QPixmap;
-class QHBoxLayout;
 class QMenu;
 class QSlider;
+class SpeedControlWidget;
 struct vout_window_t;
 
 /******************** Video Widget ****************/

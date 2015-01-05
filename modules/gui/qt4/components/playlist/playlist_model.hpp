@@ -44,7 +44,6 @@
 #include <QAction>
 
 class PLItem;
-class PLSelector;
 class PlMimeData;
 
 class PLModel : public VLCModel

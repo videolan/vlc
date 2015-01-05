@@ -29,19 +29,15 @@
 
 class PrefsTree;
 class SPrefsCatList;
-class AdvPrefsPanel;
 class SPrefsPanel;
 class QTreeWidgetItem;
-class QTreeWidget;
 class QGroupBox;
 class QRadioButton;
 class QWidget;
 class QCheckBox;
-class QLabel;
 class SearchLineEdit;
 class QStackedWidget;
 class QSplitter;
-class QScrollArea;
 
 class PrefsDialog : public QVLCDialog
 {

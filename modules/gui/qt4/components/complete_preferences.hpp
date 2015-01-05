@@ -35,7 +35,6 @@
 #include <QSet>
 
 class AdvPrefsPanel;
-class QLabel;
 class QVBoxLayout;
 
 class PrefsItemData : public QObject

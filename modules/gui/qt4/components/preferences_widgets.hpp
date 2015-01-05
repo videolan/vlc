@@ -50,8 +50,6 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
 class QGridLayout;
-class QDialogButtonBox;
-class QVBoxLayout;
 class QBoxLayout;
 class SearchLineEdit;
 

@@ -45,7 +45,6 @@ class QHideEvent;
 class QTimer;
 class SeekPoints;
 class QPropertyAnimation;
-class QStyleOption;
 class QCommonStyle;
 
 /* Input Slider derived from QSlider */

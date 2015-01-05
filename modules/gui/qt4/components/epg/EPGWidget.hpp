@@ -35,8 +35,6 @@
 #include <QWidget>
 #include <QStackedWidget>
 
-class QDateTime;
-
 class EPGWidget : public QWidget
 {
     Q_OBJECT

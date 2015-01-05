@@ -27,9 +27,7 @@
 #include "util/qvlcframe.hpp"
 #include "util/singleton.hpp"
 
-class QPushButton;
 class QCheckBox;
-class QGridLayout;
 class QTextEdit;
 
 class ErrorsDialog : public QVLCDialog, public Singleton<ErrorsDialog>

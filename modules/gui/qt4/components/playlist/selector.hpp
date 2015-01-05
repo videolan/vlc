@@ -37,7 +37,6 @@
 class QHBoxLayout;
 class QPainter;
 class QTreeWidgetItem;
-class PlaylistWidget;
 class QLabel;
 
 enum SelectorItemType {

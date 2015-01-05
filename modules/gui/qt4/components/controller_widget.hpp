@@ -38,7 +38,6 @@
 
 class QLabel;
 class QFrame;
-class QSpinBox;
 class QAbstractSlider;
 
 /**

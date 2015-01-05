@@ -30,10 +30,6 @@
 
 #include <QModelIndex>
 
-class QSignalMapper;
-class PLSelector;
-class PLPanel;
-class QSettings;
 class QHideEvent;
 
 class PlaylistDialog : public QVLCMW, public Singleton<PlaylistDialog>

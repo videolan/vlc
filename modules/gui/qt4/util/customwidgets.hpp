@@ -40,7 +40,6 @@
 #include "animators.hpp"
 #include "qt4.hpp"
 
-class QPixmap;
 class QWidget;
 
 class QFramelessButton : public QPushButton

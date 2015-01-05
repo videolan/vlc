@@ -36,10 +36,6 @@
 #include <QWizard>
 
 class QPushButton;
-class QToolButton;
-class QCheckBox;
-class QGridLayout;
-class QTextEdit;
 
 class SoutMrl
 {

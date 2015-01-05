@@ -33,9 +33,6 @@
 
 using namespace std;
 
-class QMenuBar;
-class QSystemTrayIcon;
-
 class MenuItemData : public QObject
 {
     Q_OBJECT

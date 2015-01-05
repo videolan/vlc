@@ -68,7 +68,6 @@ enum{
 };
 
 class QVLCApp;
-class QMenu;
 class MainInterface;
 class QSettings;
 class PLModel;

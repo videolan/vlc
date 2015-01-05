@@ -119,7 +119,6 @@ private:
 };
 
 class VLCModel;
-class QHBoxLayout;
 
 class LocationBar : public QWidget
 {

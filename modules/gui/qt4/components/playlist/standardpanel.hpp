@@ -38,8 +38,6 @@
 #include <vlc_playlist.h> /* playlist_item_t */
 
 class QSignalMapper;
-class VLCProxyModel;
-class QKeyEvent;
 class QWheelEvent;
 class QStackedLayout;
 class QModelIndex;

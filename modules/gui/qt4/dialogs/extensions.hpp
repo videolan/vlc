@@ -38,7 +38,6 @@ class QKeyEvent;
 
 class ExtensionsDialogProvider;
 class ExtensionDialog;
-class WidgetMapper;
 
 class ExtensionsDialogProvider : public QObject
 {

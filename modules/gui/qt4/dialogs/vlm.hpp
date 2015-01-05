@@ -53,15 +53,10 @@ enum{
 
 class QComboBox;
 class QVBoxLayout;
-class QStackedWidget;
 class QLabel;
 class QGridLayout;
-class QLineEdit;
-class QCheckBox;
 class QToolButton;
 class QGroupBox;
-class QPushButton;
-class QHBoxLayout;
 class QDateTimeEdit;
 class QSpinBox;
 class VLMAWidget;

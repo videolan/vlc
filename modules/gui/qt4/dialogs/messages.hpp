@@ -31,15 +31,9 @@
 #include <vlc_atomic.h>
 #include <QMutex>
 
-class QTabWidget;
 class QPushButton;
-class QSpinBox;
-class QGridLayout;
-class QLabel;
-class QTextEdit;
 class QTreeWidget;
 class QTreeWidgetItem;
-class QLineEdit;
 class MsgEvent;
 
 class MessagesDialog : public QVLCFrame, public Singleton<MessagesDialog>

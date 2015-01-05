@@ -251,8 +251,6 @@ struct SlideInfo {
     int blend;
 };
 
-class PictureFlow;
-
 class PictureFlowState
 {
 public:

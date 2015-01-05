@@ -59,7 +59,6 @@ enum
 class QWidget;
 class QLineEdit;
 class QString;
-class QStringListModel;
 class QEvent;
 
 class OpenPanel: public QWidget

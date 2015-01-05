@@ -31,7 +31,6 @@
 #include "util/pictureflow.hpp"
 
 class QPainter;
-class QFont;
 
 class AbstractPlViewItemDelegate : public QStyledItemDelegate
 {

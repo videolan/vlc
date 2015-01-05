@@ -64,10 +64,6 @@ enum {
 };
 
 class ConfigControl;
-class QComboBox;
-class QLineEdit;
-class QRadioButton;
-class QCheckBox;
 class QString;
 
 #ifdef _WIN32

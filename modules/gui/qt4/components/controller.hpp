@@ -42,20 +42,12 @@
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a medium")
 
-class QPixmap;
-class QLabel;
-
-class QGridLayout;
 class QBoxLayout;
 class QHBoxLayout;
-class QVBoxLayout;
 
-class QAbstractSlider;
 class QAbstractButton;
-class SeekSlider;
 class QToolButton;
 
-class VolumeClickHandler;
 class WidgetListing;
 
 class QSignalMapper;

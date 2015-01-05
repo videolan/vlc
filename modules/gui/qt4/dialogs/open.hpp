@@ -53,7 +53,6 @@ enum {
 
 
 class QString;
-class QTabWidget;
 
 class OpenDialog : public QVLCDialog
 {
