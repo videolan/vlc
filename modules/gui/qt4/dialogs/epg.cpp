@@ -27,6 +27,7 @@
 #include "dialogs/epg.hpp"
 
 #include "components/epg/EPGWidget.hpp"
+#include "components/epg/EPGItem.hpp"
 #include <vlc_playlist.h>
 
 #include <QVBoxLayout>
@@ -37,6 +38,7 @@
 #include <QTextEdit>
 #include <QDialogButtonBox>
 #include <QTimer>
+#include <QDateTime>
 
 #include "qt4.hpp"
 #include "input_manager.hpp"

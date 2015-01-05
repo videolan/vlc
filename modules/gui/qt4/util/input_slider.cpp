@@ -30,6 +30,7 @@
 #include "qt4.hpp"
 
 #include "util/input_slider.hpp"
+#include "util/timetooltip.hpp"
 #include "adapters/seekpoints.hpp"
 
 #include <QPaintEvent>

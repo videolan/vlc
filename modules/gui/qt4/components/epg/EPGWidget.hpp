@@ -24,16 +24,16 @@
 #ifndef EPGWIDGET_H
 #define EPGWIDGET_H
 
-#include "EPGView.hpp"
-#include "EPGItem.hpp"
-#include "EPGRuler.hpp"
-#include "EPGChannels.hpp"
-
 #include <vlc_common.h>
 #include <vlc_epg.h>
 
 #include <QWidget>
 #include <QStackedWidget>
+
+class EPGView;
+class EPGItem;
+class EPGRuler;
+class EPGChannels;
 
 class EPGWidget : public QWidget
 {

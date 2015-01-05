@@ -30,7 +30,6 @@
 # include "config.h"
 #endif
 
-#include "timetooltip.hpp"
 #include "styles/seekstyle.hpp"
 
 #include <QSlider>
@@ -46,6 +45,7 @@ class QTimer;
 class SeekPoints;
 class QPropertyAnimation;
 class QCommonStyle;
+class TimeTooltip;
 
 /* Input Slider derived from QSlider */
 class SeekSlider : public QSlider

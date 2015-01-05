@@ -24,7 +24,9 @@
 #ifndef EPGVIEW_H
 #define EPGVIEW_H
 
-#include "EPGItem.hpp"
+#include "qt4.hpp"
+
+#include <vlc_epg.h>
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -32,6 +34,8 @@
 #include <QMap>
 #include <QMutex>
 #include <QDateTime>
+
+class EPGItem;
 
 #define TRACKS_HEIGHT 60
 

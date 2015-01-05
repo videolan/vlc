@@ -39,9 +39,7 @@
 
 #include <assert.h>
 #include <QFont>
-#include <QTimer>
 #include <QAction>
-#include <QBuffer>
 
 /*************************************************************************
  * Playlist model implementation

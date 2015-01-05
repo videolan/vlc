@@ -32,7 +32,6 @@
 
 class QPainter;
 class QString;
-
 class EPGView;
 
 class EPGItem : public QGraphicsItem

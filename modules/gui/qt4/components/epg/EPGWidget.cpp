@@ -21,21 +21,21 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include "qt4.hpp"
 
-#include "EPGWidget.hpp"
+#include <vlc_epg.h>
+#include "input_manager.hpp"
 
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <QScrollBar>
 #include <QLabel>
 #include <QStringList>
-#include "qt4.hpp"
-#include "input_manager.hpp"
-#include <vlc_common.h>
-#include <vlc_epg.h>
+
+#include "EPGWidget.hpp"
+#include "EPGRuler.hpp"
+#include "EPGView.hpp"
+#include "EPGChannels.hpp"
 
 EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
 {

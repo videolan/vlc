@@ -20,6 +20,10 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "qt4.hpp"
+
+#include <vlc_epg.h>
+
 #include "EPGChannels.hpp"
 #include "EPGView.hpp"
 

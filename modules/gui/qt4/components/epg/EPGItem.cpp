@@ -24,10 +24,8 @@
 #include <QTransform>
 #include <QFont>
 #include <QFontMetrics>
-#include <QDebug>
 #include <QDateTime>
 #include <QFocusEvent>
-#include <QGraphicsScene>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsSceneHoverEvent>
 #include <QStyle>
