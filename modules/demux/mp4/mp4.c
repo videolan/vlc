@@ -680,20 +680,16 @@ static int Open( vlc_object_t * p_this )
     if ( !p_sys->moovfragment.p_moox && !p_sys->b_smooth )
         goto error;
 
+    MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
+
     if( p_sys->b_smooth )
     {
         if( InitTracks( p_demux ) != VLC_SUCCESS )
             goto error;
         CreateTracksFromSmooBox( p_demux );
-        return VLC_SUCCESS;
-    }
-
-    MP4_BoxDumpStructure( p_demux->s, p_sys->p_root );
-
-    if ( p_sys->b_smooth )
-    {
         p_demux->pf_demux = DemuxFrg;
         msg_Dbg( p_demux, "Set DemuxFrg mode" );
+        return VLC_SUCCESS;
     }
     else if( p_sys->b_fragmented )
     {
