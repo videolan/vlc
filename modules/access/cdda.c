@@ -677,7 +677,7 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
         msg_Dbg( p_access, "Track %i offset: %i", i, p_sectors[i] + 150 );
     }
 
-    msg_Dbg( p_access, "Total length: %i", i_length/1000000 );
+    msg_Dbg( p_access, "Total length: %i", (int)(i_length/1000000) );
     cddb_disc_set_length( p_disc, (int)(i_length/1000000) );
 
     if( !cddb_disc_calc_discid( p_disc ) )
