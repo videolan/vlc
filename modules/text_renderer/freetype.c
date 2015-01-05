@@ -1367,6 +1367,12 @@ static int ProcessLines( filter_t *p_filter,
                 uni_char_t character = psz_text[i_index];
                 int i_glyph_index = FT_Get_Char_Index( p_current_face, character );
 
+                /* If the missing glyph is U+FEFF (ZERO WIDTH NO-BREAK SPACE) */
+                /* we can safely ignore it. Otherwise extra squares show up   */
+                /* in Arabic text.                                            */
+                if( i_glyph_index == 0 && character == 0xFEFF )
+                    goto next;
+
                 /* Get kerning vector */
                 FT_Vector kerning = { .x = 0, .y = 0 };
                 if( FT_HAS_KERNING( p_current_face ) && i_glyph_last != 0 && i_glyph_index != 0 )
