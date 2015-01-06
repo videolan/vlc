@@ -129,10 +129,10 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     int i_width=-1, i_height=-1;
-    unsigned u_fps_num=0, u_fps_den=1;
+    unsigned u_fps_num, u_fps_den;
     vlc_fourcc_t i_chroma = 0;
-    unsigned int i_sar_num = 0;
-    unsigned int i_sar_den = 0;
+    unsigned int i_sar_num;
+    unsigned int i_sar_den;
     const struct preset_t *p_preset = NULL;
     const uint8_t *p_peek;
     bool b_y4m = false;
@@ -295,47 +295,15 @@ valid:
         free( psz_tmp );
     }
 
-    psz_tmp = var_CreateGetNonEmptyString( p_demux, "rawvid-fps" );
-    if( psz_tmp )
+    if( var_InheritURational( p_demux, &u_fps_num, &u_fps_den, "rawvid-fps" ) )
     {
-        char *p_ptr;
-        /* fps can either be n/d or q.f
-         * for accuracy, avoid representation in float */
-        u_fps_num = strtol( psz_tmp, &p_ptr, 10 );
-        if( *p_ptr == '/' )
-        {
-            p_ptr++;
-            u_fps_den = strtol( p_ptr, NULL, 10 );
-        }
-        else if( *p_ptr == '.' )
-        {
-            char *p_end;
-            p_ptr++;
-            int i_frac =  strtol( p_ptr, &p_end, 10 );
-            u_fps_den = (p_end - p_ptr) * 10;
-            if( !u_fps_den )
-                u_fps_den = 1;
-            u_fps_num = u_fps_num * u_fps_den + i_frac;
-        }
-        else if( *p_ptr == '\0')
-        {
-            u_fps_den = 1;
-        }
-        free( psz_tmp );
+        u_fps_num = 0;
+        u_fps_den = 1;
     }
 
-    psz_tmp = var_CreateGetNonEmptyString( p_demux, "rawvid-aspect-ratio" );
-    if( psz_tmp )
-    {
-        char *psz_denominator = strchr( psz_tmp, ':' );
-        if( psz_denominator )
-        {
-            *psz_denominator++ = '\0';
-            i_sar_num = atoi( psz_tmp )         * i_height;
-            i_sar_den = atoi( psz_denominator ) * i_width;
-        }
-        free( psz_tmp );
-    }
+    if( var_InheritURational( p_demux, &i_sar_num, &i_sar_den,
+                              "rawvid-aspect-ratio" ) )
+        i_sar_num = i_sar_den = 1;
 
     /* moan about anything wrong */
     if( i_width <= 0 || i_height <= 0 )
