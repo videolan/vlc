@@ -224,7 +224,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Allocate the memory needed to store the module's structure */
     p_sys = p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
     if( p_sys == NULL )
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
 
     /* Create our mpg123 handle */
     if( ( p_sys->p_handle = mpg123_new( NULL, NULL ) ) == NULL )
