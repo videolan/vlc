@@ -1,0 +1,11 @@
+--- libbpg-0.9.4/Makefile.old	2015-01-07 15:41:29.030598098 -0500
++++ libbpg-0.9.4/Makefile	2015-01-07 15:51:18.146608993 -0500
+@@ -36,7 +36,7 @@
+ 
+ PWD:=$(shell pwd)
+ 
+-CFLAGS:=-Os -Wall -MMD -fno-asynchronous-unwind-tables -fdata-sections -ffunction-sections -fno-math-errno -fno-signed-zeros -fno-tree-vectorize -fomit-frame-pointer
++CFLAGS+=-Os -Wall -MMD -fno-asynchronous-unwind-tables -fdata-sections -ffunction-sections -fno-math-errno -fno-signed-zeros -fno-tree-vectorize -fomit-frame-pointer
+ CFLAGS+=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_REENTRANT
+ CFLAGS+=-I.
+ CFLAGS+=-DCONFIG_BPG_VERSION=\"$(shell cat VERSION)\"
