@@ -576,7 +576,7 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
 void transcode_video_close( sout_stream_t *p_stream,
                                    sout_stream_id_sys_t *id )
 {
-    if( p_stream->p_sys->i_threads >= 1 )
+    if( p_stream->p_sys->i_threads >= 1 && !p_stream->p_sys->b_abort )
     {
         vlc_mutex_lock( &p_stream->p_sys->lock_out );
         p_stream->p_sys->b_abort = true;
@@ -584,13 +584,14 @@ void transcode_video_close( sout_stream_t *p_stream,
         vlc_mutex_unlock( &p_stream->p_sys->lock_out );
 
         vlc_join( p_stream->p_sys->thread, NULL );
-        vlc_mutex_destroy( &p_stream->p_sys->lock_out );
-        vlc_cond_destroy( &p_stream->p_sys->cond );
 
         picture_fifo_Delete( p_stream->p_sys->pp_pics );
         block_ChainRelease( p_stream->p_sys->p_buffers );
         p_stream->p_sys->pp_pics = NULL;
     }
+
+    vlc_mutex_destroy( &p_stream->p_sys->lock_out );
+    vlc_cond_destroy( &p_stream->p_sys->cond );
 
     /* Close decoder */
     if( id->p_decoder->p_module )
