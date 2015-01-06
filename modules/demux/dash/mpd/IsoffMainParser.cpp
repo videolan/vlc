@@ -110,13 +110,13 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
         return total;
 
     std::string mediaurl = templateNode->getAttributeValue("media");
-    SegmentTemplate *mediaTemplate = NULL;
-    if(mediaurl.empty() || !(mediaTemplate = new (std::nothrow) SegmentTemplate(info)) )
+    MediaSegmentTemplate *mediaTemplate = NULL;
+    if(mediaurl.empty() || !(mediaTemplate = new (std::nothrow) MediaSegmentTemplate(info)) )
         return total;
     mediaTemplate->setSourceUrl(mediaurl);
 
     if(templateNode->hasAttribute("startNumber"))
-        mediaTemplate->setStartIndex(Integer<uint64_t>(templateNode->getAttributeValue("startNumber")));
+        mediaTemplate->startIndex.Set(Integer<uint64_t>(templateNode->getAttributeValue("startNumber")));
 
     if(templateNode->hasAttribute("duration"))
         mediaTemplate->duration.Set(Integer<mtime_t>(templateNode->getAttributeValue("duration")));
@@ -133,8 +133,8 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
             initTemplate->setSourceUrl(initurl);
     }
 
-    info->setSegmentTemplate(mediaTemplate, SegmentInformation::INFOTYPE_MEDIA);
-    info->setSegmentTemplate(initTemplate, SegmentInformation::INFOTYPE_INIT);
+    mediaTemplate->initialisationSegment.Set(initTemplate);
+    info->setSegmentTemplate(mediaTemplate);
 
     total += ( mediaTemplate != NULL );
 
@@ -322,7 +322,7 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
     return total;
 }
 
-void IsoffMainParser::parseInitSegment(Node *initNode, Initializable *init)
+void IsoffMainParser::parseInitSegment(Node *initNode, Initializable<Segment> *init)
 {
     if(!initNode)
         return;

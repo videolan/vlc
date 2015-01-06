@@ -26,28 +26,32 @@
 
 #include "mpd/Segment.h"
 #include "Properties.hpp"
+#include "SegmentInfoCommon.h"
 
 namespace dash
 {
     namespace mpd
     {
         class ICanonicalUrl;
+        class InitSegmentTemplate;
 
-        class SegmentTemplate : public Segment
+        class BaseSegmentTemplate : public Segment
         {
             public:
-                SegmentTemplate( ICanonicalUrl * = NULL );
+                BaseSegmentTemplate( ICanonicalUrl * = NULL );
                 virtual Url             getUrlSegment() const; /* reimpl */
-                size_t                  getStartIndex() const;
-                void                    setStartIndex(size_t);
-                Property<mtime_t>       duration;
-                Property<uint64_t>      timescale;
-
-            private:
-                size_t                  startIndex;
         };
 
-        class InitSegmentTemplate : public SegmentTemplate
+        class MediaSegmentTemplate : public BaseSegmentTemplate,
+                                     public Initializable<InitSegmentTemplate>
+        {
+            public:
+                MediaSegmentTemplate( ICanonicalUrl * = NULL );
+                Property<size_t>        startIndex;
+                Property<uint64_t>      timescale;
+        };
+
+        class InitSegmentTemplate : public BaseSegmentTemplate
         {
             public:
                 InitSegmentTemplate( ICanonicalUrl * = NULL );

@@ -32,7 +32,7 @@ namespace dash
 {
     namespace mpd
     {
-        class SegmentBase : public Initializable
+        class SegmentBase : public Initializable<Segment>
         {
             public:
                 SegmentBase             ();

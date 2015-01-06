@@ -38,16 +38,22 @@ namespace dash
         class Segment;
         class SegmentTimeline;
 
-        class Initializable
+        template<class T> class Initializable
         {
             public:
-                Initializable();
-                ~Initializable();
-                Property<Segment *> initialisationSegment;
+                Initializable()
+                {
+                    initialisationSegment.Set(NULL);
+                }
+                ~Initializable()
+                {
+                    delete initialisationSegment.Get();
+                }
+                Property<T *> initialisationSegment;
         };
 
         class SegmentInfoCommon : public ICanonicalUrl,
-                                  public Initializable
+                                  public Initializable<Segment>
         {
             public:
                 SegmentInfoCommon( ICanonicalUrl *parent = NULL );

@@ -31,38 +31,36 @@
 
 using namespace dash::mpd;
 
-SegmentTemplate::SegmentTemplate( ICanonicalUrl *parent ) :
-    Segment( parent ),
-    startIndex( 0 )
+BaseSegmentTemplate::BaseSegmentTemplate( ICanonicalUrl *parent ) :
+    Segment( parent )
 {
-    debugName = "SegmentTemplate";
-    classId = Segment::CLASSID_SEGMENT;
-    duration.Set(0);
-    timescale.Set(0);
 }
 
-Url SegmentTemplate::getUrlSegment() const
+Url BaseSegmentTemplate::getUrlSegment() const
 {
     Url ret = getParentUrlSegment();
     if (!sourceUrl.empty())
     {
-        ret.append(Url::Component(sourceUrl, this));
+        ret.append(Url::Component(
+                     sourceUrl,
+                     dynamic_cast<const MediaSegmentTemplate *>(this)) /* casts to NULL if != */
+        );
     }
     return ret;
 }
 
-size_t SegmentTemplate::getStartIndex() const
+MediaSegmentTemplate::MediaSegmentTemplate( ICanonicalUrl *parent ) :
+    BaseSegmentTemplate( parent )
 {
-    return startIndex;
-}
-
-void SegmentTemplate::setStartIndex(size_t i)
-{
-    startIndex = i;
+    debugName = "SegmentTemplate";
+    classId = Segment::CLASSID_SEGMENT;
+    timescale.Set( 0 );
+    startIndex.Set( 0 );
+    initialisationSegment.Set( NULL );
 }
 
 InitSegmentTemplate::InitSegmentTemplate( ICanonicalUrl *parent ) :
-    SegmentTemplate(parent)
+    BaseSegmentTemplate(parent)
 {
     debugName = "InitSegmentTemplate";
     classId = InitSegment::CLASSID_INITSEGMENT;

@@ -79,7 +79,7 @@ std::string Url::toString(size_t index, const Representation *rep) const
     return ret;
 }
 
-Url::Component::Component(const std::string & str, const SegmentTemplate *templ_)
+Url::Component::Component(const std::string & str, const MediaSegmentTemplate *templ_)
 {
     component = str;
     templ = templ_;
@@ -87,7 +87,7 @@ Url::Component::Component(const std::string & str, const SegmentTemplate *templ_
 
 size_t Url::Component::getSegmentNumber(size_t index, const Representation *rep) const
 {
-    index += templ->getStartIndex();
+    index += templ->startIndex.Get();
     /* live streams / templated */
     if(rep->getMPD()->isLive() && templ->duration.Get())
     {
@@ -107,48 +107,52 @@ size_t Url::Component::getSegmentNumber(size_t index, const Representation *rep)
 std::string Url::Component::contextualize(size_t index, const Representation *rep) const
 {
     std::string ret(component);
+    size_t pos;
 
-    if(!rep || !templ)
+    if(!rep)
         return ret;
 
-    size_t pos = ret.find("$Time$");
-    if(pos != std::string::npos)
+    if(templ)
     {
-        std::stringstream ss;
-        ss << (templ->duration.Get() * index);
-        ret.replace(pos, std::string("$Time$").length(), ss.str());
-    }
-
-    pos = ret.find("$Number$");
-    if(pos != std::string::npos)
-    {
-        std::stringstream ss;
-        ss << getSegmentNumber(index, rep);
-        ret.replace(pos, std::string("$Number$").length(), ss.str());
-    }
-    else
-    {
-        pos = ret.find("$Number%");
-        size_t tokenlength = std::string("$Number%").length();
-        size_t fmtstart = pos + tokenlength;
-        if(pos != std::string::npos && fmtstart < ret.length())
+        pos = ret.find("$Time$");
+        if(pos != std::string::npos)
         {
-            size_t fmtend = ret.find('$', fmtstart);
-            if(fmtend != std::string::npos)
+            std::stringstream ss;
+            ss << (templ->duration.Get() * index);
+            ret.replace(pos, std::string("$Time$").length(), ss.str());
+        }
+
+        pos = ret.find("$Number$");
+        if(pos != std::string::npos)
+        {
+            std::stringstream ss;
+            ss << getSegmentNumber(index, rep);
+            ret.replace(pos, std::string("$Number$").length(), ss.str());
+        }
+        else
+        {
+            pos = ret.find("$Number%");
+            size_t tokenlength = std::string("$Number%").length();
+            size_t fmtstart = pos + tokenlength;
+            if(pos != std::string::npos && fmtstart < ret.length())
             {
-                std::istringstream iss(ret.substr(fmtstart, fmtend - fmtstart + 1));
-                try
+                size_t fmtend = ret.find('$', fmtstart);
+                if(fmtend != std::string::npos)
                 {
-                    size_t width;
-                    iss >> width;
-                    if (iss.peek() != '$')
-                        throw VLC_EGENERIC;
-                    std::stringstream oss;
-                    oss.width(width); /* set format string length */
-                    oss.fill('0');
-                    oss << getSegmentNumber(index, rep);
-                    ret.replace(pos, fmtend - pos + 1, oss.str());
-                } catch(int) {}
+                    std::istringstream iss(ret.substr(fmtstart, fmtend - fmtstart + 1));
+                    try
+                    {
+                        size_t width;
+                        iss >> width;
+                        if (iss.peek() != '$')
+                            throw VLC_EGENERIC;
+                        std::stringstream oss;
+                        oss.width(width); /* set format string length */
+                        oss.fill('0');
+                        oss << getSegmentNumber(index, rep);
+                        ret.replace(pos, fmtend - pos + 1, oss.str());
+                    } catch(int) {}
+                }
             }
         }
     }

@@ -33,8 +33,7 @@ SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
     parent = parent_;
     segmentBase = NULL;
     segmentList = NULL;
-    for(int i=0; i<InfoTypeCount; i++)
-        segmentTemplate[i] = NULL;
+    mediaSegmentTemplate = NULL;
     bitswitch_policy = BITSWITCH_INHERIT;
     timescale.Set(0);
 }
@@ -45,8 +44,7 @@ SegmentInformation::SegmentInformation(ICanonicalUrl * parent_) :
     parent = NULL;
     segmentBase = NULL;
     segmentList = NULL;
-    for(int i=0; i<InfoTypeCount; i++)
-        segmentTemplate[i] = NULL;
+    mediaSegmentTemplate = NULL;
     bitswitch_policy = BITSWITCH_INHERIT;
     timescale.Set(0);
 }
@@ -55,8 +53,7 @@ SegmentInformation::~SegmentInformation()
 {
     delete segmentBase;
     delete segmentList;
-    for(int i=0; i<InfoTypeCount; i++)
-        delete segmentTemplate[i];
+    delete mediaSegmentTemplate;
 }
 
 vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
@@ -77,9 +74,9 @@ vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
         case INFOTYPE_MEDIA:
         {
             SegmentList *segList = inheritSegmentList();
-            if( inheritSegmentTemplate(INFOTYPE_MEDIA) )
+            if( inheritSegmentTemplate() )
             {
-                retSegments.push_back( inheritSegmentTemplate(INFOTYPE_MEDIA) );
+                retSegments.push_back( inheritSegmentTemplate() );
             }
             else if ( segList && !segList->getSegments().empty() )
             {
@@ -129,16 +126,16 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
             {
                 segment = segList->initialisationSegment.Get();
             }
-            else if( inheritSegmentTemplate(INFOTYPE_INIT) )
+            else if( inheritSegmentTemplate() )
             {
-                segment = inheritSegmentTemplate(INFOTYPE_INIT);
+                segment = inheritSegmentTemplate()->initialisationSegment.Get();
             }
             break;
 
         case INFOTYPE_MEDIA:
-            if( inheritSegmentTemplate(INFOTYPE_MEDIA) )
+            if( inheritSegmentTemplate() )
             {
-                segment = inheritSegmentTemplate(INFOTYPE_MEDIA);
+                segment = inheritSegmentTemplate();
             }
             else if ( segList && !segList->getSegments().empty() )
             {
@@ -160,7 +157,7 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
 bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
 {
     SegmentList *segList;
-    SegmentTemplate *segTemplate;
+    MediaSegmentTemplate *mediaTemplate;
     uint64_t timescale;
     mtime_t duration = 0;
     if ( (segList = inheritSegmentList()) )
@@ -168,10 +165,10 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
         timescale = segList->timescale.Get();
         duration = segList->getDuration();
     }
-    else if( (segTemplate = inheritSegmentTemplate(INFOTYPE_MEDIA)) )
+    else if( (mediaTemplate = inheritSegmentTemplate()) )
     {
-        timescale = segTemplate->timescale.Get();
-        duration = segTemplate->duration.Get();
+        timescale = mediaTemplate->timescale.Get();
+        duration = mediaTemplate->duration.Get();
     }
 
     if(duration)
@@ -221,9 +218,9 @@ void SegmentInformation::setSegmentBase(SegmentBase *base)
     segmentBase = base;
 }
 
-void SegmentInformation::setSegmentTemplate(SegmentTemplate *templ, SegmentInfoType type)
+void SegmentInformation::setSegmentTemplate(MediaSegmentTemplate *templ)
 {
-    segmentTemplate[type] = templ;
+    mediaSegmentTemplate = templ;
 }
 
 static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
@@ -298,12 +295,12 @@ SegmentList * SegmentInformation::inheritSegmentList() const
         return NULL;
 }
 
-SegmentTemplate * SegmentInformation::inheritSegmentTemplate(SegmentInfoType type) const
+MediaSegmentTemplate * SegmentInformation::inheritSegmentTemplate() const
 {
-    if(segmentTemplate[type])
-        return segmentTemplate[type];
+    if(mediaSegmentTemplate)
+        return mediaSegmentTemplate;
     else if (parent)
-        return parent->inheritSegmentTemplate(type);
+        return parent->inheritSegmentTemplate();
     else
         return NULL;
 }

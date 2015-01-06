@@ -80,17 +80,17 @@ namespace dash
             private:
                 void setSegmentList(SegmentList *);
                 void setSegmentBase(SegmentBase *);
-                void setSegmentTemplate(SegmentTemplate *, SegmentInfoType);
+                void setSegmentTemplate(MediaSegmentTemplate *);
                 void setBitstreamSwitching(bool);
 
                 SegmentBase *     inheritSegmentBase() const;
                 SegmentList *     inheritSegmentList() const;
-                SegmentTemplate * inheritSegmentTemplate(SegmentInfoType) const;
+                MediaSegmentTemplate * inheritSegmentTemplate() const;
 
                 SegmentInformation *parent;
                 SegmentBase     *segmentBase;
                 SegmentList     *segmentList;
-                SegmentTemplate *segmentTemplate[InfoTypeCount];
+                MediaSegmentTemplate *mediaSegmentTemplate;
 
                 enum BitswitchPolicy
                 {

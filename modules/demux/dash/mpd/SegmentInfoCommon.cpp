@@ -33,16 +33,6 @@
 
 using namespace dash::mpd;
 
-Initializable::Initializable()
-{
-    initialisationSegment.Set(NULL);
-}
-
-Initializable::~Initializable()
-{
-    delete initialisationSegment.Get();
-}
-
 SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
     ICanonicalUrl( parent ), Initializable(),
     duration( -1 ),

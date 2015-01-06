@@ -28,7 +28,7 @@ namespace dash
     namespace mpd
     {
         class Representation;
-        class SegmentTemplate;
+        class MediaSegmentTemplate;
 
         class Url
         {
@@ -37,13 +37,13 @@ namespace dash
                 {
                     friend class Url;
                     public:
-                        Component(const std::string &, const SegmentTemplate * = NULL);
+                        Component(const std::string &, const MediaSegmentTemplate * = NULL);
 
                     protected:
                         std::string contextualize(size_t, const Representation *) const;
                         size_t getSegmentNumber(size_t, const Representation *) const;
                         std::string component;
-                        const SegmentTemplate *templ;
+                        const MediaSegmentTemplate *templ;
                 };
 
                 Url();
