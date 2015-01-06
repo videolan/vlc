@@ -259,33 +259,36 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
 {
     assert( p_doc );
 
-    /* Missing namespaces confuse the ixml parser. This is a very ugly
-     * hack but it is needeed until devices start sending valid XML.
-     *
-     * It works that way:
-     *
-     * The DIDL document is extracted from the Result tag, then wrapped into
-     * a valid XML header and a new root tag which contains missing namespace
-     * definitions so the ixml parser understands it.
-     *
-     * If you know of a better workaround, please oh please fix it */
-    const char* psz_xml_result_fmt = "<?xml version=\"1.0\" ?>"
-        "<Result xmlns:sec=\"urn:samsung:metadata:2009\">%s</Result>";
-
-    char* psz_xml_result_string = NULL;
     const char* psz_raw_didl = xml_getChildElementValue( p_doc, "Result" );
 
     if( !psz_raw_didl )
         return NULL;
 
-    if( -1 == asprintf( &psz_xml_result_string,
-                         psz_xml_result_fmt,
-                         psz_raw_didl) )
-        return NULL;
+    /* First, try parsing the buffer as is */
+    IXML_Document* p_result_doc = ixmlParseBuffer( psz_raw_didl );
+    if( !p_result_doc ) {
+        /* Missing namespaces confuse the ixml parser. This is a very ugly
+         * hack but it is needeed until devices start sending valid XML.
+         *
+         * It works that way:
+         *
+         * The DIDL document is extracted from the Result tag, then wrapped into
+         * a valid XML header and a new root tag which contains missing namespace
+         * definitions so the ixml parser understands it.
+         *
+         * If you know of a better workaround, please oh please fix it */
+        const char* psz_xml_result_fmt = "<?xml version=\"1.0\" ?>"
+            "<Result xmlns:sec=\"urn:samsung:metadata:2009\">%s</Result>";
 
+        char* psz_xml_result_string = NULL;
+        if( -1 == asprintf( &psz_xml_result_string,
+                             psz_xml_result_fmt,
+                             psz_raw_didl) )
+            return NULL;
 
-    IXML_Document* p_result_doc = ixmlParseBuffer( psz_xml_result_string );
-    free( psz_xml_result_string );
+        p_result_doc = ixmlParseBuffer( psz_xml_result_string );
+        free( psz_xml_result_string );
+    }
 
     if( !p_result_doc )
         return NULL;
