@@ -74,50 +74,35 @@ static void* EncoderThread( void *obj )
     int canc = vlc_savecancel ();
     block_t *p_block = NULL;
 
+    vlc_mutex_lock( &p_sys->lock_out );
+
     for( ;; )
     {
-
-        vlc_mutex_lock( &p_sys->lock_out );
         while( !p_sys->b_abort &&
                (p_pic = picture_fifo_Pop( p_sys->pp_pics )) == NULL )
             vlc_cond_wait( &p_sys->cond, &p_sys->lock_out );
 
-        if( p_sys->b_abort && !p_pic )
-        {
-            vlc_mutex_unlock( &p_sys->lock_out );
-            break;
-        }
-        vlc_mutex_unlock( &p_sys->lock_out );
-
         if( p_pic )
         {
+            /* release lock while encoding */
+            vlc_mutex_unlock( &p_sys->lock_out );
             p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
-
-            vlc_mutex_lock( &p_sys->lock_out );
-            block_ChainAppend( &p_sys->p_buffers, p_block );
-
-            vlc_mutex_unlock( &p_sys->lock_out );
             picture_Release( p_pic );
+            vlc_mutex_lock( &p_sys->lock_out );
+
+            block_ChainAppend( &p_sys->p_buffers, p_block );
         }
 
-        vlc_mutex_lock( &p_sys->lock_out );
         if( p_sys->b_abort )
-        {
-            vlc_mutex_unlock( &p_sys->lock_out );
             break;
-        }
-        vlc_mutex_unlock( &p_sys->lock_out );
     }
 
     /*Encode what we have in the buffer on closing*/
-    vlc_mutex_lock( &p_sys->lock_out );
     while( (p_pic = picture_fifo_Pop( p_sys->pp_pics )) != NULL )
     {
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
-
-        block_ChainAppend( &p_sys->p_buffers, p_block );
-
         picture_Release( p_pic );
+        block_ChainAppend( &p_sys->p_buffers, p_block );
     }
 
     /*Now flush encoder*/
