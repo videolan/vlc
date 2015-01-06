@@ -535,7 +535,7 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     {
         strcpy( psz_value, "bookmarks=" );
 
-        char *psz_next = psz_value + strlen( "bookmarks" );
+        char *psz_next = psz_value + strlen( "bookmarks=" );
 
         for( int i = 0; i < p_input->p->i_bookmark && psz_value != NULL; i++ )
         {
