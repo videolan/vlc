@@ -1361,6 +1361,10 @@ static int ProcessLines( filter_t *p_filter,
             /* Render the part */
             bool b_break_line = false;
             int i_glyph_last = 0;
+            FT_Vector advance = {
+                .x = 0,
+                .y = 0,
+            };
             while( i_part_length > 0 )
             {
                 const text_style_t *p_glyph_style = pp_styles[i_index];
@@ -1372,6 +1376,16 @@ static int ProcessLines( filter_t *p_filter,
                 /* in Arabic text.                                            */
                 if( i_glyph_index == 0 && character == 0xFEFF )
                     goto next;
+
+/* These are the most common Arabic diacritics */
+#define DIACRITIC( a ) ( a >= 0x064B && a <= 0x0653 )
+
+                /* Diacritics should be rendered over the preceding base glyph */
+                if( DIACRITIC( character ) )
+                {
+                    pen.x -= advance.x;
+                    pen.y -= advance.y;
+                }
 
                 /* Get kerning vector */
                 FT_Vector kerning = { .x = 0, .y = 0 };
@@ -1516,8 +1530,17 @@ static int ProcessLines( filter_t *p_filter,
                     .i_line_thickness = i_line_thickness,
                 };
 
-                pen.x = pen_new.x + p_current_face->glyph->advance.x;
-                pen.y = pen_new.y + p_current_face->glyph->advance.y;
+                /* Diacritics do not determine advance values. We use        */
+                /* the advance values from the last encountered base glyph,  */
+                /* since multiple diacritics may follow a single base glyph. */
+                if( !DIACRITIC( character ) )
+                {
+                    advance.x = p_current_face->glyph->advance.x;
+                    advance.y = p_current_face->glyph->advance.y;
+                }
+
+                pen.x = pen_new.x + advance.x;
+                pen.y = pen_new.y + advance.y;
                 line_bbox = line_bbox_new;
             next:
                 i_glyph_last = i_glyph_index;
