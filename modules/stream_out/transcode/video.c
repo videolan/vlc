@@ -212,37 +212,35 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     }
     id->p_encoder->p_module = NULL;
 
-    if( p_sys->i_threads >= 1 )
+    if( p_sys->i_threads <= 0 )
+        return VLC_SUCCESS;
+
+    int i_priority = p_sys->b_high_priority ? VLC_THREAD_PRIORITY_OUTPUT :
+                       VLC_THREAD_PRIORITY_VIDEO;
+    p_sys->id_video = id;
+    p_sys->pp_pics = picture_fifo_New();
+    if( p_sys->pp_pics == NULL )
     {
-        int i_priority = p_sys->b_high_priority ? VLC_THREAD_PRIORITY_OUTPUT :
-                           VLC_THREAD_PRIORITY_VIDEO;
-        p_sys->id_video = id;
-        vlc_mutex_init( &p_sys->lock_out );
-        vlc_cond_init( &p_sys->cond );
-        p_sys->pp_pics = picture_fifo_New();
-        if( p_sys->pp_pics == NULL )
-        {
-            msg_Err( p_stream, "cannot create picture fifo" );
-            vlc_mutex_destroy( &p_sys->lock_out );
-            vlc_cond_destroy( &p_sys->cond );
-            module_unneed( id->p_decoder, id->p_decoder->p_module );
-            id->p_decoder->p_module = NULL;
-            free( id->p_decoder->p_owner );
-            return VLC_ENOMEM;
-        }
-        p_sys->p_buffers = NULL;
-        p_sys->b_abort = false;
-        if( vlc_clone( &p_sys->thread, EncoderThread, p_sys, i_priority ) )
-        {
-            msg_Err( p_stream, "cannot spawn encoder thread" );
-            vlc_mutex_destroy( &p_sys->lock_out );
-            vlc_cond_destroy( &p_sys->cond );
-            picture_fifo_Delete( p_sys->pp_pics );
-            module_unneed( id->p_decoder, id->p_decoder->p_module );
-            id->p_decoder->p_module = NULL;
-            free( id->p_decoder->p_owner );
-            return VLC_EGENERIC;
-        }
+        msg_Err( p_stream, "cannot create picture fifo" );
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
+        id->p_decoder->p_module = NULL;
+        free( id->p_decoder->p_owner );
+        return VLC_ENOMEM;
+    }
+    vlc_mutex_init( &p_sys->lock_out );
+    vlc_cond_init( &p_sys->cond );
+    p_sys->p_buffers = NULL;
+    p_sys->b_abort = false;
+    if( vlc_clone( &p_sys->thread, EncoderThread, p_sys, i_priority ) )
+    {
+        msg_Err( p_stream, "cannot spawn encoder thread" );
+        vlc_mutex_destroy( &p_sys->lock_out );
+        vlc_cond_destroy( &p_sys->cond );
+        picture_fifo_Delete( p_sys->pp_pics );
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
+        id->p_decoder->p_module = NULL;
+        free( id->p_decoder->p_owner );
+        return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
 }
