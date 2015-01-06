@@ -181,6 +181,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( id == NULL )
         return NULL;
     es_format_Copy( &id->fmt, p_fmt );
+    id->b_streamswap     = false;
     id->b_used           = true;
     id->id               = sout_StreamIdAdd( p_stream->p_next, &id->fmt );
     if( id->id == NULL )
