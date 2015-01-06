@@ -587,7 +587,6 @@ void transcode_video_close( sout_stream_t *p_stream,
 
         picture_fifo_Delete( p_stream->p_sys->pp_pics );
         block_ChainRelease( p_stream->p_sys->p_buffers );
-        p_stream->p_sys->pp_pics = NULL;
     }
 
     vlc_mutex_destroy( &p_stream->p_sys->lock_out );
