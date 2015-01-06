@@ -107,14 +107,14 @@ static void* EncoderThread( void *obj )
 
     /*Now flush encoder*/
     do {
-       p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
-       block_ChainAppend( &p_sys->p_buffers, p_block );
+        p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
+        block_ChainAppend( &p_sys->p_buffers, p_block );
     } while( p_block );
 
     vlc_mutex_unlock( &p_sys->lock_out );
 
-
     vlc_restorecancel (canc);
+
     return NULL;
 }
 
