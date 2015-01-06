@@ -101,8 +101,6 @@ static VLCBookmarks *_o_sharedInstance = nil;
     [o_btn_rm setTitle: _NS("Remove")];
     [[[o_tbl_dataTable tableColumnWithIdentifier:@"description"] headerCell]
         setStringValue: _NS("Description")];
-    [[[o_tbl_dataTable tableColumnWithIdentifier:@"size_offset"] headerCell]
-        setStringValue: _NS("Position")];
     [[[o_tbl_dataTable tableColumnWithIdentifier:@"time_offset"] headerCell]
         setStringValue: _NS("Time")];
 
@@ -111,7 +109,6 @@ static VLCBookmarks *_o_sharedInstance = nil;
     [o_edit_btn_cancel setTitle: _NS("Cancel")];
     [o_edit_lbl_name setStringValue: _NS("Name")];
     [o_edit_lbl_time setStringValue: _NS("Time")];
-    [o_edit_lbl_bytes setStringValue: _NS("Position")];
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
@@ -198,7 +195,6 @@ static VLCBookmarks *_o_sharedInstance = nil;
     int min = (total - hour*60*60) / 60;
     int sec = total - hour*60*60 - min*60;
     [o_edit_fld_time setStringValue: [NSString stringWithFormat:@"%02d:%02d:%02d", hour, min, sec]];
-    [o_edit_fld_bytes setStringValue: [NSString stringWithFormat:@"%lli", pp_bookmarks[row]->i_byte_offset]];
 
     /* Just keep the pointer value to check if it
      * changes. Note, we don't need to keep a reference to the object.
@@ -248,7 +244,6 @@ static VLCBookmarks *_o_sharedInstance = nil;
     free(pp_bookmarks[i]->psz_name);
 
     pp_bookmarks[i]->psz_name = strdup([[o_edit_fld_name stringValue] UTF8String]);
-    pp_bookmarks[i]->i_byte_offset = [[o_edit_fld_bytes stringValue] intValue];
 
     NSArray * components = [[o_edit_fld_time stringValue] componentsSeparatedByString:@":"];
     NSUInteger componentCount = [components count];
@@ -401,9 +396,7 @@ clear:
         NSString * identifier = [theTableColumn identifier];
         if ([identifier isEqualToString: @"description"])
             ret = toNSStr(pp_bookmarks[row]->psz_name);
-        else if ([identifier isEqualToString: @"size_offset"])
-            ret = [NSString stringWithFormat:@"%lli", pp_bookmarks[row]->i_byte_offset];
-        else if ([identifier isEqualToString: @"time_offset"]) {
+		else if ([identifier isEqualToString: @"time_offset"]) {
             int total = pp_bookmarks[row]->i_time_offset/ 1000000;
             int hour = total / (60*60);
             int min = (total - hour*60*60) / 60;

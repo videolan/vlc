@@ -42,10 +42,8 @@
     IBOutlet id o_edit_btn_cancel;
     IBOutlet id o_edit_lbl_name;
     IBOutlet id o_edit_lbl_time;
-    IBOutlet id o_edit_lbl_bytes;
     IBOutlet id o_edit_fld_name;
     IBOutlet id o_edit_fld_time;
-    IBOutlet id o_edit_fld_bytes;
 
     input_thread_t *p_old_input;
 }
