@@ -61,6 +61,7 @@ $Id$
  * blendbench: a picture filter that test performance of blending routines
  * bluescreen: Bluescreen (weather channel like) video filter
  * bonjour: Zeroconf services discovery
+ * bpg: BPG image decoder using libbpg
  * caca: color ASCII art video output using libcaca
  * caf: CAF demuxer
  * canvas: Automatically resize and padd a video

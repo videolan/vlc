@@ -334,6 +334,7 @@
 #define VLC_CODEC_PGMYUV          VLC_FOURCC('p','g','m','y')
 #define VLC_CODEC_PAM             VLC_FOURCC('p','a','m',' ')
 #define VLC_CODEC_JPEG            VLC_FOURCC('j','p','e','g')
+#define VLC_CODEC_BPG             VLC_FOURCC('B','P','G',0xFB)
 #define VLC_CODEC_JPEGLS          VLC_FOURCC('M','J','L','S')
 #define VLC_CODEC_BMP             VLC_FOURCC('b','m','p',' ')
 #define VLC_CODEC_TIFF            VLC_FOURCC('t','i','f','f')

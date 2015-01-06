@@ -121,6 +121,12 @@ libjpeg_plugin_la_LIBADD = -ljpeg
 EXTRA_LTLIBRARIES += libjpeg_plugin.la
 codec_LTLIBRARIES += $(LTLIBjpeg)
 
+libbpg_plugin_la_SOURCES = codec/bpg.c
+libbpg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libbpg_plugin_la_LIBADD = -lbpg
+EXTRA_LTLIBRARIES += libbpg_plugin.la
+codec_LTLIBRARIES += $(LTLIBbpg)
+
 libsvgdec_plugin_la_SOURCES = codec/svg.c
 libsvgdec_plugin_la_CFLAGS = $(AM_CLAGS) $(CFLAGS_svgdec)
 libsvgdec_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'  $(LDFLAGS_svg)

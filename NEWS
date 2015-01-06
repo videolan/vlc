@@ -26,6 +26,7 @@ Decoder:
  * Support HEVC hardware decoding using OMX and MediaCodec
  * Support VP9 and WMV3 decoding using OMX and performance improvements
  * New MPEG-1 & 2 audio layer I, II, III + MPEG 2.5 decoder based on libmpg123
+ * New BPG decoder based on libbpg
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)

@@ -2715,6 +2715,17 @@ AC_CHECK_HEADERS(jpeglib.h, [
 ])
 
 dnl
+dnl  BPG decoder module
+dnl
+AC_ARG_ENABLE(bpg,
+  [  --enable-bpg           BPG support (default disabled)])
+AS_IF([test "${enable_bpg}" != "no"], [
+AC_CHECK_HEADERS(libbpg.h, [
+  VLC_ADD_PLUGIN([bpg])
+  ])
+])
+
+dnl
 dnl H262 encoder plugin (lib262)
 dnl
 AC_ARG_ENABLE(x262,

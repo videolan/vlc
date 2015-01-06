@@ -958,6 +958,9 @@ static const staticentry_t p_list_video[] = {
         A("jpeg"),
         A("JPEG"),
 
+    B(VLC_CODEC_BPG, "BPG Image"),
+        A("BPG "),
+
     B(VLC_CODEC_BMP, "BMP Image"),
         A("bmp "),
 
