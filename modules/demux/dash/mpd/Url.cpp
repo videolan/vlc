@@ -20,6 +20,7 @@
 #include "Url.hpp"
 #include "Representation.h"
 #include "SegmentTemplate.h"
+#include "SegmentTimeline.h"
 #include "MPD.h"
 
 #include <sstream>
@@ -85,21 +86,42 @@ Url::Component::Component(const std::string & str, const MediaSegmentTemplate *t
     templ = templ_;
 }
 
+mtime_t Url::Component::getScaledTimeBySegmentNumber(size_t index, const Representation *) const
+{
+    mtime_t time = 0;
+    if(templ->segmentTimeline.Get())
+    {
+        time = templ->segmentTimeline.Get()->getScaledPlaybackTimeByElementNumber(index);
+    }
+    else if(templ->duration.Get())
+    {
+        time = templ->duration.Get() * index;
+    }
+    return time;
+}
+
 size_t Url::Component::getSegmentNumber(size_t index, const Representation *rep) const
 {
     index += templ->startNumber.Get();
     /* live streams / templated */
-    if(rep->getMPD()->isLive() && templ->duration.Get())
+    if(rep->getMPD()->isLive())
     {
-        mtime_t playbackstart = rep->getMPD()->playbackStart.Get();
-        mtime_t streamstart = rep->getMPD()->getAvailabilityStartTime();
-        streamstart += rep->getPeriodStart();
-        mtime_t duration = templ->duration.Get();
-        uint64_t timescale = templ->timescale.Get() ?
-                             templ->timescale.Get() :
-                             rep->getTimescale();
-        if(duration && timescale)
-            index += (playbackstart - streamstart) * timescale / duration;
+        if(templ->segmentTimeline.Get())
+        {
+            // do nothing ?
+        }
+        else if(templ->duration.Get())
+        {
+            mtime_t playbackstart = rep->getMPD()->playbackStart.Get();
+            mtime_t streamstart = rep->getMPD()->getAvailabilityStartTime();
+            streamstart += rep->getPeriodStart();
+            mtime_t duration = templ->duration.Get();
+            uint64_t timescale = templ->timescale.Get() ?
+                                 templ->timescale.Get() :
+                                 rep->getTimescale();
+            if(duration && timescale)
+                index += (playbackstart - streamstart) * timescale / duration;
+        }
     }
     return index;
 }
@@ -118,7 +140,7 @@ std::string Url::Component::contextualize(size_t index, const Representation *re
         if(pos != std::string::npos)
         {
             std::stringstream ss;
-            ss << (templ->duration.Get() * index);
+            ss << getScaledTimeBySegmentNumber(index, rep);
             ret.replace(pos, std::string("$Time$").length(), ss.str());
         }
 

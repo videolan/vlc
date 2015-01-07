@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include <vlc_common.h>
 
 namespace dash
 {
@@ -41,6 +42,7 @@ namespace dash
 
                     protected:
                         std::string contextualize(size_t, const Representation *) const;
+                        mtime_t getScaledTimeBySegmentNumber(size_t, const Representation *) const;
                         size_t getSegmentNumber(size_t, const Representation *) const;
                         std::string component;
                         const MediaSegmentTemplate *templ;

@@ -72,6 +72,7 @@ namespace dash
 
                 ISegment * getSegment(SegmentInfoType, uint64_t = 0) const;
                 bool getSegmentNumberByTime(mtime_t, uint64_t *) const;
+                mtime_t getPlaybackTimeBySegmentNumber(uint64_t) const;
 
             protected:
                 std::vector<ISegment *> getSegments() const;

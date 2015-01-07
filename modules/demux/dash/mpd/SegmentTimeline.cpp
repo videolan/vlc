@@ -47,6 +47,53 @@ void SegmentTimeline::addElement(mtime_t d, uint64_t r, mtime_t t)
         elements.push_back(element);
 }
 
+uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(time_t scaled) const
+{
+    uint64_t count = 0;
+    std::list<Element *>::const_iterator it;
+    for(it = elements.begin(); it != elements.end(); it++)
+    {
+        const Element *el = *it;
+        for(uint64_t repeat = 1 + el->r; repeat; repeat--)
+        {
+            if(el->d >= scaled)
+                return count;
+
+            scaled -= el->d;
+            count++;
+        }
+    }
+    return count;
+}
+
+mtime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) const
+{
+    mtime_t totalscaledtime = 0;
+
+    std::list<Element *>::const_iterator it;
+    for(it = elements.begin(); it != elements.end(); it++)
+    {
+        const Element *el = *it;
+
+        if(number == 0)
+        {
+            totalscaledtime = el->t;
+            break;
+        }
+        else if(number <= el->r)
+        {
+            totalscaledtime = el->t + (number * el->d);
+            break;
+        }
+        else
+        {
+            number -= el->r + 1;
+        }
+    }
+
+    return totalscaledtime;
+}
+
 SegmentTimeline::Element::Element(mtime_t d_, uint64_t r_, mtime_t t_)
 {
     d = d_;

@@ -23,6 +23,7 @@
 #include "SegmentBase.h"
 #include "SegmentList.h"
 #include "SegmentTemplate.h"
+#include "SegmentTimeline.h"
 
 using namespace dash::mpd;
 using namespace std;
@@ -158,17 +159,18 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
 {
     SegmentList *segList;
     MediaSegmentTemplate *mediaTemplate;
-    uint64_t timescale;
+    uint64_t timescale = 0;
     mtime_t duration = 0;
-    if ( (segList = inheritSegmentList()) )
-    {
-        timescale = segList->timescale.Get();
-        duration = segList->getDuration();
-    }
-    else if( (mediaTemplate = inheritSegmentTemplate()) )
+
+    if( (mediaTemplate = inheritSegmentTemplate()) )
     {
         timescale = mediaTemplate->timescale.Get();
         duration = mediaTemplate->duration.Get();
+    }
+    else if ( (segList = inheritSegmentList()) )
+    {
+        timescale = segList->timescale.Get();
+        duration = segList->getDuration();
     }
 
     if(duration)
@@ -180,6 +182,41 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
     }
 
     return false;
+}
+
+mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) const
+{
+    SegmentList *segList;
+    MediaSegmentTemplate *mediaTemplate;
+    uint64_t timescale = 0;
+    mtime_t time = 0;
+    if( (mediaTemplate = inheritSegmentTemplate()) )
+    {
+        timescale = mediaTemplate->timescale.Get();
+        if(mediaTemplate->segmentTimeline.Get())
+        {
+            time = mediaTemplate->segmentTimeline.Get()->
+                    getScaledPlaybackTimeByElementNumber(number);
+        }
+        else
+        {
+            time = number * mediaTemplate->duration.Get();
+        }
+    }
+    else if ( (segList = inheritSegmentList()) )
+    {
+        timescale = segList->timescale.Get();
+        time = number * segList->getDuration();
+    }
+
+    if(time)
+    {
+        if(!timescale)
+            timescale = getTimescale(); /* inherit */
+        time = CLOCK_FREQ * time / timescale;
+    }
+
+    return time;
 }
 
 bool SegmentInformation::canBitswitch() const

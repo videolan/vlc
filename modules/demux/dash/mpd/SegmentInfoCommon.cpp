@@ -45,7 +45,7 @@ Timelineable::~Timelineable()
 
 SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
     ICanonicalUrl( parent ), Initializable(),
-    duration( -1 ),
+    duration( 0 ),
     startIndex( 0 )
 {
 }
