@@ -28,6 +28,7 @@
 
 #include "IsoffMainParser.h"
 #include "SegmentTemplate.h"
+#include "SegmentTimeline.h"
 #include "ProgramInformation.h"
 #include "xml/DOMHelper.h"
 #include <vlc_strings.h>
@@ -135,6 +136,8 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
 
     mediaTemplate->initialisationSegment.Set(initTemplate);
     info->setSegmentTemplate(mediaTemplate);
+
+    parseTimeline(DOMHelper::getFirstChildElementByName(templateNode, "SegmentTimeline"), mediaTemplate);
 
     total += ( mediaTemplate != NULL );
 
@@ -338,6 +341,37 @@ void IsoffMainParser::parseInitSegment(Node *initNode, Initializable<Segment> *i
     }
 
     init->initialisationSegment.Set(seg);
+}
+
+void IsoffMainParser::parseTimeline(Node *node, Timelineable *timelineable)
+{
+    if(!node)
+        return;
+
+    SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline();
+    if(timeline)
+    {
+        std::vector<Node *> elements = DOMHelper::getElementByTagName(node, "S", false);
+        std::vector<Node *>::const_iterator it;
+        for(it = elements.begin(); it != elements.end(); it++)
+        {
+            const Node *s = *it;
+            if(!s->hasAttribute("d")) /* Mandatory */
+                continue;
+            mtime_t d = Integer<mtime_t>(s->getAttributeValue("d"));
+            mtime_t r = 0; // never repeats by default
+            if(s->hasAttribute("r"))
+                r = Integer<uint64_t>(s->getAttributeValue("r"));
+            if(s->hasAttribute("t"))
+            {
+                mtime_t t = Integer<mtime_t>(s->getAttributeValue("t"));
+                timeline->addElement(d, r, t);
+            }
+            else timeline->addElement(d, r);
+
+            timelineable->segmentTimeline.Set(timeline);
+        }
+    }
 }
 
 void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)
