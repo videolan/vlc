@@ -73,7 +73,7 @@ static void *Run( void *data )
         netbios_ns_entry *p_entry = netbios_ns_entry_at( p_sys->p_ns, i );
         char type = netbios_ns_entry_type( p_entry );
 
-        if( type == 0x20 )
+        if( type == NETBIOS_FILESERVER )
         {
             input_item_t *p_item;
             char *psz_mrl;

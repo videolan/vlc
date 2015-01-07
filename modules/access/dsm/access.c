@@ -306,7 +306,8 @@ static int get_address( access_t *p_access )
         struct addrinfo *p_info = NULL;
 
         /* Is this a netbios name on this LAN ? */
-        if( netbios_ns_resolve( p_sys->p_ns, p_sys->url.psz_host, 0x20,
+        if( netbios_ns_resolve( p_sys->p_ns, p_sys->url.psz_host,
+                                NETBIOS_FILESERVER,
                                 &p_sys->addr.s_addr) )
         {
             strlcpy( p_sys->netbios_name, p_sys->url.psz_host, 16);
