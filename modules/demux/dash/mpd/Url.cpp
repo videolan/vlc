@@ -87,7 +87,7 @@ Url::Component::Component(const std::string & str, const MediaSegmentTemplate *t
 
 size_t Url::Component::getSegmentNumber(size_t index, const Representation *rep) const
 {
-    index += templ->startIndex.Get();
+    index += templ->startNumber.Get();
     /* live streams / templated */
     if(rep->getMPD()->isLive() && templ->duration.Get())
     {

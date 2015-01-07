@@ -55,7 +55,7 @@ MediaSegmentTemplate::MediaSegmentTemplate( ICanonicalUrl *parent ) :
     debugName = "SegmentTemplate";
     classId = Segment::CLASSID_SEGMENT;
     timescale.Set( 0 );
-    startIndex.Set( 0 );
+    startNumber.Set( 0 );
     initialisationSegment.Set( NULL );
 }
 

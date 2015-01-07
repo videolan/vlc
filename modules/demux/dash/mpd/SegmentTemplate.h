@@ -48,7 +48,7 @@ namespace dash
         {
             public:
                 MediaSegmentTemplate( ICanonicalUrl * = NULL );
-                Property<size_t>        startIndex;
+                Property<size_t>        startNumber;
                 Property<uint64_t>      timescale;
         };
 

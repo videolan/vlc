@@ -117,7 +117,7 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
     mediaTemplate->setSourceUrl(mediaurl);
 
     if(templateNode->hasAttribute("startNumber"))
-        mediaTemplate->startIndex.Set(Integer<uint64_t>(templateNode->getAttributeValue("startNumber")));
+        mediaTemplate->startNumber.Set(Integer<uint64_t>(templateNode->getAttributeValue("startNumber")));
 
     if(templateNode->hasAttribute("duration"))
         mediaTemplate->duration.Set(Integer<mtime_t>(templateNode->getAttributeValue("duration")));
