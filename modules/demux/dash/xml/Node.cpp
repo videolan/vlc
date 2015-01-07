@@ -62,7 +62,7 @@ void                                Node::setName               (const std::stri
     this->name = name;
 }
 
-bool                                Node::hasAttribute        (const std::string& name)
+bool                                Node::hasAttribute        (const std::string& name) const
 {
     if(this->attributes.find(name) != this->attributes.end())
         return true;
