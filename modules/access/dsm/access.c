@@ -27,8 +27,10 @@
 # include "config.h"
 #endif
 
-#include "common.h"
-
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+#include <vlc_services_discovery.h>
+#include <vlc_url.h>
 #include <vlc_access.h>
 #include <vlc_variables.h>
 #include <vlc_dialog.h>
@@ -39,9 +41,15 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#include <bdsm/bdsm.h>
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+int bdsm_SdOpen( vlc_object_t * );
+void bdsm_SdClose( vlc_object_t * );
+int bdsm_sd_probe_Open( vlc_object_t * );
+
 static int Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -90,16 +98,35 @@ vlc_module_end ()
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
+static int BrowserInit( access_t *p_access );
 
 static void split_domain_login( char **psz_login, char **psz_domain );
-static void get_credentials( access_t *p_access, access_sys_t *p_sys );
-static bool get_address( access_t *p_access, access_sys_t *p_sys );
-static void login_dialog( access_t *p_access, access_sys_t *p_sys );
-static bool login( access_t *p_access, access_sys_t *p_sys );
+static void get_credentials( access_t *p_access );
+static int get_address( access_t *p_access );
+static void login_dialog( access_t *p_access );
+static int login( access_t *p_access );
 static void backslash_path( vlc_url_t *p_url );
-static bool get_path( access_t *p_access, access_sys_t *p_sys );
-static bool bdsm_init( access_t *p_access, access_sys_t *p_sys );
-static void bdsm_destroy( access_sys_t *p_sys );
+static bool get_path( access_t *p_access );
+static int add_item( access_t *p_access,  input_item_node_t *p_node,
+                     const char *psz_name );
+
+struct access_sys_t
+{
+    netbios_ns         *p_ns;               /**< Netbios name service */
+    smb_session        *p_session;          /**< bdsm SMB Session object */
+    smb_creds           creds;              /**< Credentials used to connect */
+
+    vlc_url_t           url;
+    char               *psz_share;
+    char               *psz_path;
+
+    char                netbios_name[16];
+    struct in_addr      addr;
+
+    smb_fd              i_fd;               /**< SMB fd for the file we're reading */
+    smb_tid             i_tid;              /**< SMB Tree ID we're connected to */
+    bool                b_is_browsing;
+};
 
 /*****************************************************************************
  * Dialog strings
@@ -116,6 +143,7 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
+    smb_stat st;
 
     /* Init p_access */
     access_InitFields( p_access );
@@ -123,14 +151,44 @@ static int Open( vlc_object_t *p_this )
     if( p_access->p_sys == NULL )
         return VLC_ENOMEM;
 
-    if( !bdsm_init( p_access, p_sys ) )
+    p_sys->p_ns = netbios_ns_new();
+    if( p_sys->p_ns == NULL )
         goto error;
 
-    if( !get_path( p_access, p_sys ) )
+    p_sys->p_session = smb_session_new();
+    if( p_sys->p_session == NULL )
+        goto error;
+
+    vlc_UrlParse( &p_sys->url, p_access->psz_location, 0 );
+    get_credentials( p_access );
+    if( get_address( p_access ) != VLC_SUCCESS )
+        goto error;
+
+    msg_Dbg( p_access, "Creds: username = %s, password = %s, domain = %s",
+             p_sys->creds.login, p_sys->creds.password,
+             p_sys->creds.domain );
+    msg_Dbg( p_access, "Session: Host name = %s, ip = %s", p_sys->netbios_name,
+             inet_ntoa( p_sys->addr ) );
+
+    /* Now that we have the required data, let's establish a session */
+    if( !smb_session_connect( p_sys->p_session, p_sys->netbios_name,
+                              p_sys->addr.s_addr, SMB_TRANSPORT_TCP ) )
+    {
+        msg_Err( p_access, "Unable to connect/negotiate SMB session");
+        goto error;
+    }
+
+    if( login( p_access ) != VLC_SUCCESS )
+        goto error;
+
+    if( !get_path( p_access ) )
+    {
+        p_sys->b_is_browsing = true;
         return BrowserInit( p_access );
+    }
+
     msg_Dbg( p_access, "Path: Share name = %s, path = %s", p_sys->psz_share,
              p_sys->psz_path );
-
 
     /* Connect to the share */
     p_sys->i_tid = smb_tree_connect( p_sys->p_session, p_sys->psz_share );
@@ -150,20 +208,21 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    smb_stat st = smb_stat_fd( p_sys->p_session, p_sys->i_fd );
+    st = smb_stat_fd( p_sys->p_session, p_sys->i_fd );
     if( smb_stat_get( st, SMB_STAT_ISDIR ) )
     {
         smb_fclose( p_sys->p_session, p_sys->i_fd );
+        p_sys->b_is_browsing = true;
         return BrowserInit( p_access );
     }
 
     msg_Dbg( p_access, "Successfully opened smb://%s", p_access->psz_location );
+
     ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );
     return VLC_SUCCESS;
 
     error:
-        bdsm_destroy( p_sys );
-        free( p_sys );
+        Close( p_this );
         return VLC_EGENERIC;
 }
 
@@ -175,8 +234,18 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    smb_fclose( p_sys->p_session, p_sys->i_fd );
-    bdsm_destroy( p_sys );
+    if( p_sys->p_ns )
+        netbios_ns_destroy( p_sys->p_ns );
+    if( p_sys->i_fd )
+        smb_fclose( p_sys->p_session, p_sys->i_fd );
+    if( p_sys->p_session )
+        smb_session_destroy( p_sys->p_session );
+    free( p_sys->creds.login );
+    free( p_sys->creds.password );
+    free( p_sys->creds.domain );
+    free( p_sys->url.psz_buffer );
+    free( p_sys->psz_share );
+    free( p_sys->psz_path );
     free( p_sys );
 }
 
@@ -198,8 +267,10 @@ static void split_domain_login( char **psz_login, char **psz_domain )
 }
 
 /* Get credentials from uri or variables. */
-static void get_credentials( access_t *p_access, access_sys_t *p_sys )
+static void get_credentials( access_t *p_access )
 {
+    access_sys_t *p_sys = p_access->p_sys;
+
     /* Fetch credentials, either from URI or from options if not provided */
     if( p_sys->url.psz_password == NULL )
         p_sys->creds.password = var_InheritString( p_access, "smb-pwd" );
@@ -222,12 +293,13 @@ static void get_credentials( access_t *p_access, access_sys_t *p_sys )
 
     if( p_sys->creds.domain == NULL )
         p_sys->creds.domain = var_InheritString( p_access, "smb-domain" );
-
 }
 
-/* Returns false if it wasn't able to get an ip address to connect to */
-static bool get_address( access_t *p_access, access_sys_t *p_sys )
+/* Returns VLC_EGENERIC if it wasn't able to get an ip address to connect to */
+static int get_address( access_t *p_access )
 {
+    access_sys_t *p_sys = p_access->p_sys;
+
     if( !inet_aton( p_sys->url.psz_host, &p_sys->addr ) )
     {
         /* This is not an ip address, let's try netbios/dns resolve */
@@ -238,7 +310,7 @@ static bool get_address( access_t *p_access, access_sys_t *p_sys )
                                 &p_sys->addr.s_addr) )
         {
             strlcpy( p_sys->netbios_name, p_sys->url.psz_host, 16);
-            return true;
+            return VLC_SUCCESS;
         }
         /* or is it an existing dns name ? */
         else if( getaddrinfo( p_sys->url.psz_host, NULL, NULL, &p_info ) == 0 )
@@ -250,10 +322,10 @@ static bool get_address( access_t *p_access, access_sys_t *p_sys )
             }
             freeaddrinfo( p_info );
             if( p_info->ai_family != AF_INET )
-                return false;
+                return VLC_EGENERIC;
         }
         else
-            return false;
+            return VLC_EGENERIC;
     }
 
     /* We have an IP address, let's find the NETBIOS name */
@@ -271,12 +343,14 @@ static bool get_address( access_t *p_access, access_sys_t *p_sys )
     if( p_sys->creds.domain == NULL && p_sys->netbios_name[0] )
         p_sys->creds.domain = strdup( p_sys->netbios_name );
 
-    return true;
+    return VLC_SUCCESS;
 }
 
 /* Displays a dialog for the user to enter his/her credentials */
-static void login_dialog( access_t *p_access, access_sys_t *p_sys )
+static void login_dialog( access_t *p_access )
 {
+    access_sys_t *p_sys = p_access->p_sys;
+
     char *psz_login = NULL, *psz_pass = NULL, *psz_title;
     int i_ret;
 
@@ -307,8 +381,10 @@ static void login_dialog( access_t *p_access, access_sys_t *p_sys )
 
 /* Performs login with existing credentials and ask the user for new ones on
    failure */
-static bool login( access_t *p_access, access_sys_t *p_sys )
+static int login( access_t *p_access )
 {
+    access_sys_t *p_sys = p_access->p_sys;
+
     if( p_sys->creds.login == NULL )
         p_sys->creds.login = strdup( "Guest" );
     if( p_sys->creds.password == NULL )
@@ -323,23 +399,23 @@ static bool login( access_t *p_access, access_sys_t *p_sys )
     {
         for( int i = 0; i < BDSM_LOGIN_DIALOG_RETRY; i++ )
         {
-            login_dialog( p_access, p_sys );
+            login_dialog( p_access );
             smb_session_set_creds( p_sys->p_session, p_sys->creds.domain,
                                    p_sys->creds.login, p_sys->creds.password );
             if( smb_session_login( p_sys->p_session ) )
-                return true;
+                return VLC_SUCCESS;
         }
 
         /* FIXME, Try to force netbios name as domain then WORKGROUP here */
         msg_Err( p_access, "Unable to login with username = %s, password = %s, domain = %s",
                    p_sys->creds.login, p_sys->creds.password,
                    p_sys->creds.domain );
-        return false;
+        return VLC_EGENERIC;
     }
     else if( smb_session_is_guest( p_sys->p_session ) == 1 )
         msg_Warn( p_access, "Login failure but you were logged in as a Guest");
 
-    return true;
+    return VLC_SUCCESS;
 }
 
 static void backslash_path( vlc_url_t *p_url )
@@ -356,10 +432,9 @@ static void backslash_path( vlc_url_t *p_url )
 }
 
 /* Get the share and filepath from uri (also replace all / by \ in url.psz_path) */
-static bool get_path( access_t *p_access, access_sys_t *p_sys )
+static bool get_path( access_t *p_access )
 {
-    VLC_UNUSED( p_access );
-
+    access_sys_t *p_sys = p_access->p_sys;
     char *iter;
 
     if( p_sys->url.psz_path == NULL )
@@ -401,67 +476,6 @@ static bool get_path( access_t *p_access, access_sys_t *p_sys )
         return false;
 
     return true;
-}
-
-/* get ip address/path/creds, then connects and try to authenticate */
-static bool bdsm_init( access_t *p_access, access_sys_t *p_sys )
-{
-    p_sys->url.psz_buffer = NULL;
-    p_sys->creds.login    = NULL;
-    p_sys->creds.password = NULL;
-    p_sys->creds.domain   = NULL;
-    p_sys->psz_share      = NULL;
-    p_sys->psz_path       = NULL;
-    p_sys->i_fd           = 0;
-    p_sys->i_tid          = 0;
-
-    p_sys->p_session = smb_session_new();
-    if( p_sys->p_session == NULL )
-        return false;
-
-    p_sys->p_ns = netbios_ns_new();
-    if( p_sys->p_ns == NULL )
-        return false;
-
-    vlc_UrlParse( &p_sys->url, p_access->psz_location, 0 );
-    get_credentials( p_access, p_sys );
-    if( !get_address( p_access, p_sys ) )
-        return false;
-
-    msg_Dbg( p_access, "Creds: username = %s, password = %s, domain = %s",
-             p_sys->creds.login, p_sys->creds.password,
-             p_sys->creds.domain );
-    msg_Dbg( p_access, "Session: Host name = %s, ip = %s", p_sys->netbios_name,
-             inet_ntoa( p_sys->addr ) );
-
-    /* Now that we have the required data, let's establish a session */
-    if( !smb_session_connect( p_sys->p_session, p_sys->netbios_name,
-                              p_sys->addr.s_addr, SMB_TRANSPORT_TCP ))
-    {
-        msg_Err( p_access, "Unable to connect/negotiate SMB session");
-        return false;
-    }
-
-    if( !login( p_access, p_sys ) )
-        return false;
-
-
-
-    return true;
-}
-
-/* Cleanup libdsm stuff */
-static void bdsm_destroy( access_sys_t *p_sys )
-{
-    smb_session_destroy( p_sys->p_session );
-    netbios_ns_destroy( p_sys->p_ns );
-
-    free( p_sys->creds.login );
-    free( p_sys->creds.password );
-    free( p_sys->creds.domain );
-    free( p_sys->url.psz_buffer );
-    free( p_sys->psz_share );
-    free( p_sys->psz_path );
 }
 
 /*****************************************************************************
@@ -542,6 +556,174 @@ static int Control( access_t *p_access, int i_query, va_list args )
     default:
         return VLC_EGENERIC;
     }
+
+    return VLC_SUCCESS;
+}
+
+static int add_item( access_t *p_access, input_item_node_t *p_node,
+                     const char *psz_name )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    input_item_t *p_item;
+    char         *psz_uri, *psz_option;
+    int           i_ret;
+
+    i_ret = asprintf( &psz_uri, "%s/%s", p_node->p_item->psz_uri, psz_name );
+    if( i_ret == -1 )
+        return VLC_ENOMEM;
+
+    p_item = input_item_New( psz_uri, psz_name );
+    free( psz_uri );
+    if( p_item == NULL )
+        return VLC_ENOMEM;
+
+    /* Here we save on the node the credentials that allowed us to login.
+     * That way the user isn't prompted more than once for credentials */
+    i_ret = asprintf( &psz_option, "smb-user=%s", p_sys->creds.login );
+    if( i_ret == -1 )
+        return VLC_ENOMEM;
+    input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
+    free( psz_option );
+
+    i_ret = asprintf( &psz_option, "smb-pwd=%s", p_sys->creds.password );
+    if( i_ret == -1 )
+        return VLC_ENOMEM;
+    input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
+    free( psz_option );
+
+    i_ret = asprintf( &psz_option, "smb-domain=%s", p_sys->creds.domain );
+    if( i_ret == -1 )
+        return VLC_ENOMEM;
+    input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
+    free( psz_option );
+
+    input_item_CopyOptions( p_node->p_item, p_item );
+    i_ret = input_item_node_AppendItem( p_node, p_item ) != NULL ? VLC_SUCCESS
+                                                                 : VLC_EGENERIC;
+
+    input_item_Release( p_item );
+    return i_ret;
+}
+
+static int BrowseShare( access_t *p_access, input_item_node_t *p_node )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    smb_share_list  shares;
+    const char     *psz_name;
+    size_t          share_count;
+    int             i_ret;
+
+    share_count = smb_share_get_list( p_sys->p_session, &shares );
+    if( !share_count )
+        return VLC_ENOITEM;
+
+    for( size_t i = 0; i < share_count; i++ )
+    {
+        psz_name = smb_share_list_at( shares, i );
+
+        if( psz_name[strlen( psz_name ) - 1] == '$')
+            continue;
+
+        i_ret = add_item( p_access, p_node, psz_name );
+        if( i_ret != VLC_SUCCESS )
+            goto error;
+    }
+
+    smb_share_list_destroy( shares );
+    return VLC_SUCCESS;
+    error:
+        smb_share_list_destroy( shares );
+        return i_ret;
+}
+
+static int BrowseDirectory( access_t *p_access, input_item_node_t *p_node )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    smb_stat_list   files;
+    smb_stat        st;
+    char           *psz_query;
+    const char     *psz_name;
+    size_t          files_count;
+    int             i_ret;
+
+    if( p_sys->psz_path != NULL )
+    {
+        i_ret = asprintf( &psz_query, "%s\\*", p_sys->psz_path );
+        if( i_ret == -1 )
+            return VLC_ENOMEM;
+        files = smb_find( p_sys->p_session, p_sys->i_tid, psz_query );
+        free( psz_query );
+    }
+    else
+        files = smb_find( p_sys->p_session, p_sys->i_tid, "\\*" );
+
+    if( files == NULL )
+        return VLC_ENOITEM;
+
+    files_count = smb_stat_list_count( files );
+    for( size_t i = 0; i < files_count; i++ )
+    {
+        st = smb_stat_list_at( files, i );
+
+        if( st == NULL ) {
+            i_ret = VLC_ENOITEM;
+            goto error;
+        }
+
+        psz_name = smb_stat_name( st );
+
+        /* Avoid infinite loop */
+        if( !strcmp( psz_name, ".") || !strcmp( psz_name, "..") )
+            continue;
+
+        i_ret = add_item( p_access, p_node, psz_name );
+        if( i_ret != VLC_SUCCESS )
+            goto error;
+    }
+
+    smb_stat_list_destroy( files );
+    return VLC_SUCCESS;
+
+    error:
+        smb_stat_list_destroy( files );
+        return i_ret;
+}
+
+static int BrowserControl( access_t *p_access, int i_query, va_list args )
+{
+    VLC_UNUSED( p_access );
+
+    switch( i_query )
+    {
+        case ACCESS_CAN_SEEK:
+        case ACCESS_CAN_FASTSEEK:
+            *va_arg( args, bool* ) = false;
+            break;
+
+        case ACCESS_CAN_PAUSE:
+        case ACCESS_CAN_CONTROL_PACE:
+            *va_arg( args, bool* ) = true;
+            break;
+
+        case ACCESS_GET_PTS_DELAY:
+            *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY * 1000;
+            break;
+
+        default:
+            return VLC_EGENERIC;
+     }
+     return VLC_SUCCESS;
+}
+
+static int BrowserInit( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    if( p_sys->psz_share == NULL )
+        p_access->pf_readdir = BrowseShare;
+    else
+        p_access->pf_readdir = BrowseDirectory;
+    p_access->pf_control = BrowserControl;
 
     return VLC_SUCCESS;
 }

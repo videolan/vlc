@@ -32,9 +32,12 @@
 
 #include <vlc_common.h>
 #include <vlc_atomic.h>
+#include <vlc_services_discovery.h>
 #include <bdsm/bdsm.h>
 
-#include "common.h"
+int bdsm_SdOpen( vlc_object_t * );
+void bdsm_SdClose( vlc_object_t * );
+int bdsm_sd_probe_Open( vlc_object_t * );
 
 struct services_discovery_sys_t
 {
