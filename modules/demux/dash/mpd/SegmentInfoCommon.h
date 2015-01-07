@@ -52,6 +52,14 @@ namespace dash
                 Property<T *> initialisationSegment;
         };
 
+        class Timelineable
+        {
+            public:
+                Timelineable();
+                ~Timelineable();
+                Property<SegmentTimeline *> segmentTimeline;
+        };
+
         class SegmentInfoCommon : public ICanonicalUrl,
                                   public Initializable<Segment>
         {
@@ -63,15 +71,12 @@ namespace dash
                 int                     getStartIndex() const;
                 void                    setStartIndex( int startIndex );
                 void                    appendBaseURL( const std::string& url );
-                const SegmentTimeline*  getSegmentTimeline() const;
-                void                    setSegmentTimeline( const SegmentTimeline *segTl );
                 virtual Url             getUrlSegment() const; /* impl */
 
             private:
                 time_t                  duration;
                 int                     startIndex;
                 std::list<std::string>  baseURLs;
-                const SegmentTimeline*  segmentTimeline;
         };
     }
 }

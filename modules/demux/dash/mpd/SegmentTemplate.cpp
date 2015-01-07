@@ -50,7 +50,7 @@ Url BaseSegmentTemplate::getUrlSegment() const
 }
 
 MediaSegmentTemplate::MediaSegmentTemplate( ICanonicalUrl *parent ) :
-    BaseSegmentTemplate( parent )
+    BaseSegmentTemplate( parent ), Timelineable()
 {
     debugName = "SegmentTemplate";
     classId = Segment::CLASSID_SEGMENT;

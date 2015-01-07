@@ -27,72 +27,29 @@
 
 #include "SegmentTimeline.h"
 
-#include <vlc_common.h>
-#include <vlc_arrays.h>
-
-#include <iostream>
-
 using namespace dash::mpd;
 
-SegmentTimeline::SegmentTimeline() :
-    timescale( -1 )
+SegmentTimeline::SegmentTimeline()
 {
 }
 
 SegmentTimeline::~SegmentTimeline()
 {
-    vlc_delete_all( this->elements );
+    std::list<Element *>::iterator it;
+    for(it = elements.begin(); it != elements.end(); it++)
+        delete *it;
 }
 
-int dash::mpd::SegmentTimeline::getTimescale() const
+void SegmentTimeline::addElement(mtime_t d, uint64_t r, mtime_t t)
 {
-    return this->timescale;
+    Element *element = new (std::nothrow) Element(d, r, t);
+    if(element)
+        elements.push_back(element);
 }
 
-void dash::mpd::SegmentTimeline::setTimescale(int timescale)
+SegmentTimeline::Element::Element(mtime_t d_, uint64_t r_, mtime_t t_)
 {
-    this->timescale = timescale;
-}
-
-void dash::mpd::SegmentTimeline::addElement(dash::mpd::SegmentTimeline::Element *e)
-{
-    int64_t offset = 0;
-
-    for ( int i = 0; i < e->r; ++i )
-    {
-        this->elements.push_back( e );
-        e = new SegmentTimeline::Element( *e );
-        offset += e->d;
-        e->t += offset;
-    }
-    this->elements.push_back( e );
-}
-
-const SegmentTimeline::Element*    SegmentTimeline::getElement( unsigned int index ) const
-{
-    if ( this->elements.size() <= index )
-        return NULL;
-    std::list<Element*>::const_iterator     it = this->elements.begin();
-    std::list<Element*>::const_iterator     end = this->elements.end();
-    unsigned int                            i = 0;
-    while ( it != end )
-    {
-        if ( i == index )
-            return *it;
-        ++it;
-        ++i;
-    }
-    return NULL;
-}
-
-dash::mpd::SegmentTimeline::Element::Element() :
-    r( 0 )
-{
-}
-
-SegmentTimeline::Element::Element(const SegmentTimeline::Element &e) :
-    t( e.t ),
-    d( e.d ),
-    r( 0 )
-{
+    d = d_;
+    t = t_;
+    r = r_;
 }

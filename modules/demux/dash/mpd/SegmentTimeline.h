@@ -24,9 +24,8 @@
 #ifndef SEGMENTTIMELINE_H
 #define SEGMENTTIMELINE_H
 
-#include <sys/types.h>
+#include <vlc_common.h>
 #include <list>
-#include <stdint.h>
 
 namespace dash
 {
@@ -34,25 +33,24 @@ namespace dash
     {
         class SegmentTimeline
         {
+            class Element;
+
             public:
-                struct  Element
-                {
-                    Element();
-                    Element( const Element& e );
-                    int64_t     t;
-                    int64_t     d;
-                    int         r;
-                };
                 SegmentTimeline();
-                ~SegmentTimeline();
-                int                     getTimescale() const;
-                void                    setTimescale( int timescale );
-                void                    addElement( Element* e );
-                const Element*          getElement( unsigned int index ) const;
+                virtual ~SegmentTimeline();
+                void addElement(mtime_t d, uint64_t r = 0, mtime_t t = 0);
 
             private:
-                int                     timescale;
-                std::list<Element*>     elements;
+                std::list<Element *> elements;
+
+                class Element
+                {
+                    public:
+                        Element(mtime_t, uint64_t, mtime_t);
+                        mtime_t  t;
+                        mtime_t  d;
+                        uint64_t r;
+                };
         };
     }
 }

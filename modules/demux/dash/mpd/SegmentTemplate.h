@@ -43,7 +43,8 @@ namespace dash
         };
 
         class MediaSegmentTemplate : public BaseSegmentTemplate,
-                                     public Initializable<InitSegmentTemplate>
+                                     public Initializable<InitSegmentTemplate>,
+                                     public Timelineable
         {
             public:
                 MediaSegmentTemplate( ICanonicalUrl * = NULL );
