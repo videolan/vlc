@@ -1537,6 +1537,7 @@ static const staticentry_t p_list_spu[] = {
         A("XSUB"),
         A("xsub"),
         A("DXSB"),
+        A("DXSA"),
 
     B(VLC_CODEC_SSA, "SubStation Alpha subtitles"),
         A("ssa "),
