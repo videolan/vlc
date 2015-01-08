@@ -1273,7 +1273,7 @@ static size_t write_flv_header_and_metadata(
     // FLV file header
     memcpy( *pp_buffer, flv_header_bytes, FLV_FILE_HEADER_LEN );
 
-    if ( metadata_payload_len > 0 )
+    if ( metadata_packet_len > 0 )
     {
         uint8_t *p = *pp_buffer + FLV_FILE_HEADER_LEN;
 
