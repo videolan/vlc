@@ -48,7 +48,7 @@ LRESULT DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
                 /* Set the win32_gesture_sys_t values */
                 p_gesture->i_beginx      = gi.ptsLocation.x;
                 p_gesture->i_beginy      = gi.ptsLocation.y;
-                p_gesture->i_lasty       = -1;
+                p_gesture->i_lasty       = p_gesture->i_beginy;
                 p_gesture->b_2fingers    = false;
                 break;
             case GID_END:
@@ -101,11 +101,16 @@ LRESULT DecodeGesture( vlc_object_t *p_this, win32_gesture_sys_t *p_gesture,
 
                 if( p_gesture->i_action == GESTURE_ACTION_VOLUME )
                 {
-                    int offset = p_gesture->i_beginy - gi.ptsLocation.y;
-                    if( offset > 0 )
+                    int offset = p_gesture->i_lasty - gi.ptsLocation.y;
+
+                    if( offset > 100)
                         var_SetInteger( p_this->p_libvlc, "key-action", ACTIONID_VOL_UP );
-                    else
+                    else if( offset < -100)
                         var_SetInteger( p_this->p_libvlc, "key-action", ACTIONID_VOL_DOWN );
+                    else
+                        break;
+
+                    p_gesture->i_lasty = gi.ptsLocation.y;
                 }
                 else if ( p_gesture->i_action == GESTURE_ACTION_BRIGHTNESS )
                 {
