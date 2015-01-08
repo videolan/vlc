@@ -2225,10 +2225,7 @@ static int InputSourceInit( input_thread_t *p_input,
     }
     else
     {
-        /* Preparsing is only for file:// */
         if( *psz_demux )
-            goto error;
-        if( strcmp( psz_access, "file" ) )
             goto error;
         msg_Dbg( p_input, "trying to pre-parse %s",  psz_path );
     }
