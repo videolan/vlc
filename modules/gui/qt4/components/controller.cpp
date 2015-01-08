@@ -167,14 +167,15 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout_,
         buttonGroupLayout = NULL;
     }
 
+    qreal scalingFactorX = static_cast<qreal>(logicalDpiX())/DPI_REF_VALUE;
     /* Special case for SPACERS, who aren't QWidgets */
     if( i_type == WIDGET_SPACER )
     {
-        controlLayout_->addSpacing( 12 );
+        controlLayout_->addSpacing( static_cast<int>(12*scalingFactorX) );
     }
     else if(  i_type == WIDGET_SPACER_EXTEND )
     {
-        controlLayout_->addStretch( 12 );
+        controlLayout_->addStretch( static_cast<int>(12*scalingFactorX) );
     }
     else
     {
