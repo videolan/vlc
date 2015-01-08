@@ -4430,8 +4430,11 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
         else
             len = i_defaultsize;
 
-        assert( dur ); /* dur, dur ! */
-        assert( len );
+        if(!dur)
+            msg_Warn(p_demux, "Zero duration sample in trun.");
+
+        if(!len)
+            msg_Warn(p_demux, "Zero length sample in trun.");
 
         if ( chunk_size + len > *pi_mdatlen )
         {
