@@ -44,7 +44,14 @@ void SegmentTimeline::addElement(mtime_t d, uint64_t r, mtime_t t)
 {
     Element *element = new (std::nothrow) Element(d, r, t);
     if(element)
+    {
+        if(!elements.empty() && !t)
+        {
+            const Element *el = elements.back();
+            element->t = el->t + (el->d * (el->r + 1));
+        }
         elements.push_back(element);
+    }
 }
 
 uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(time_t scaled) const
