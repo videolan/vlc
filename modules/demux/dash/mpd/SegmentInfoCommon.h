@@ -60,6 +60,21 @@ namespace dash
                 Property<SegmentTimeline *> segmentTimeline;
         };
 
+        template<class T> class UniqueNess
+        {
+            public:
+                UniqueNess(){}
+                ~UniqueNess() {}
+                void setId(const std::string &id_) {id = id_;}
+                const std::string & getId() const {return id;}
+                bool sameAs(const T &other) const
+                {
+                    return (!id.empty() && id == other.id);
+                }
+            private:
+                std::string id;
+        };
+
         class SegmentInfoCommon : public ICanonicalUrl,
                                   public Initializable<Segment>
         {

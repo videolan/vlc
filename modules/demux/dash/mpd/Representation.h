@@ -42,14 +42,13 @@ namespace dash
         class MPD;
 
         class Representation : public CommonAttributesElements,
-                               public SegmentInformation
+                               public SegmentInformation,
+                               public UniqueNess<Representation>
         {
             public:
                 Representation( AdaptationSet *, MPD *mpd );
                 virtual ~Representation ();
 
-                const std::string&  getId                   () const;
-                void                setId                   ( const std::string &id );
                 /*
                  *  @return The bitrate required for this representation
                  *          in bits per seconds.
@@ -85,7 +84,6 @@ namespace dash
                 MPD                                *mpd;
                 AdaptationSet                      *adaptationSet;
                 uint64_t                            bandwidth;
-                std::string                         id;
                 int                                 qualityRanking;
                 std::list<const Representation*>    dependencies;
                 TrickModeType                       *trickModeType;

@@ -53,17 +53,6 @@ Representation::~Representation ()
     delete baseUrl;
 }
 
-const std::string&  Representation::getId                   () const
-{
-    return this->id;
-}
-
-void    Representation::setId(const std::string &id)
-{
-    if ( id.empty() == false )
-        this->id = id;
-}
-
 uint64_t     Representation::getBandwidth            () const
 {
     return this->bandwidth;
