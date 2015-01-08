@@ -181,12 +181,9 @@ static void services_discovery_ended( const vlc_event_t * p_event,
 
 /**************************************************************************
  *       new (Public)
- *
- * Init an object.
  **************************************************************************/
 libvlc_media_discoverer_t *
-libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
-                                       const char * psz_name )
+libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
 {
     /* podcast SD is a hack and only works with custom playlist callbacks. */
     if( !strncasecmp( psz_name, "podcast", 7 ) )
@@ -250,14 +247,45 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                       services_discovery_removeall,
                       p_mdis );
 
+    return p_mdis;
+}
+
+/**************************************************************************
+ *       start (Public)
+ **************************************************************************/
+LIBVLC_API int
+libvlc_media_discoverer_start( libvlc_media_discoverer_t * p_mdis )
+{
     /* Here we go */
-    if( !vlc_sd_Start( p_mdis->p_sd ) )
+    return vlc_sd_Start( p_mdis->p_sd ) ? 0 : -1;
+}
+
+/**************************************************************************
+ *       stop (Public)
+ **************************************************************************/
+LIBVLC_API void
+libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis )
+{
+    return vlc_sd_Stop( p_mdis->p_sd );
+}
+
+/**************************************************************************
+ *       new_from_name (Public)
+ *
+ * \deprecated Use libvlc_media_discoverer_new and libvlc_media_discoverer_start
+ **************************************************************************/
+libvlc_media_discoverer_t *
+libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
+                                       const char * psz_name )
+{
+    libvlc_media_discoverer_t *p_mdis = libvlc_media_discoverer_new( p_inst, psz_name );
+
+    if( !p_mdis )
+        return NULL;
+
+    if( libvlc_media_discoverer_start( p_mdis ) != 0)
     {
-        libvlc_printerr( "%s: internal module error",
-                         p_mdis->p_sd->psz_name );
-        libvlc_media_list_release( p_mdis->p_mlist );
-        libvlc_event_manager_release( p_mdis->p_event_manager );
-        free( p_mdis );
+        libvlc_media_discoverer_release( p_mdis );
         return NULL;
     }
 
@@ -295,7 +323,10 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
 
     libvlc_media_list_release( p_mdis->p_mlist );
 
-    vlc_sd_StopAndDestroy( p_mdis->p_sd );
+    if( p_mdis->running )
+        vlc_sd_Stop( p_mdis->p_sd );
+
+    vlc_sd_Destroy( p_mdis->p_sd );
 
     /* Free catname_to_submedialist and all the mlist */
     char ** all_keys = vlc_dictionary_all_keys( &p_mdis->catname_to_submedialist );

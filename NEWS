@@ -78,6 +78,12 @@ Qt interface:
 Skins2:
  * Support key accelerators
 
+libVLC:
+ * split of libvlc_media_discoverer_new_from_name into libvlc_media_discoverer_new,
+   libvlc_media_discoverer_new and libvlc_media_discoverer_start.
+   This allows to attach media events between create and start.
+
+
 
 Changes between 2.1.x and 2.2.0:
 --------------------------------
