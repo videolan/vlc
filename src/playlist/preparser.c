@@ -34,6 +34,14 @@
 /*****************************************************************************
  * Structures/definitions
  *****************************************************************************/
+typedef struct preparser_entry_t preparser_entry_t;
+
+struct preparser_entry_t
+{
+    input_item_t    *p_item;
+    input_item_meta_request_option_t i_options;
+};
+
 struct playlist_preparser_t
 {
     vlc_object_t        *object;
@@ -42,7 +50,7 @@ struct playlist_preparser_t
     vlc_mutex_t     lock;
     vlc_cond_t      wait;
     bool            b_live;
-    input_item_t  **pp_waiting;
+    preparser_entry_t  **pp_waiting;
     int             i_waiting;
 };
 
@@ -74,12 +82,17 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t *parent )
 void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p_item,
                               input_item_meta_request_option_t i_options )
 {
-    vlc_gc_incref( p_item );
-    VLC_UNUSED( i_options );
+    preparser_entry_t *p_entry = malloc( sizeof(preparser_entry_t) );
+
+    if ( !p_entry )
+        return;
+    p_entry->p_item = p_item;
+    p_entry->i_options = i_options;
+    vlc_gc_incref( p_entry->p_item );
 
     vlc_mutex_lock( &p_preparser->lock );
     INSERT_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting,
-                 p_preparser->i_waiting, p_item );
+                 p_preparser->i_waiting, p_entry );
     if( !p_preparser->b_live )
     {
         if( vlc_clone_detach( NULL, Thread, p_preparser,
@@ -104,7 +117,9 @@ void playlist_preparser_Delete( playlist_preparser_t *p_preparser )
     /* Remove pending item to speed up preparser thread exit */
     while( p_preparser->i_waiting > 0 )
     {
-        vlc_gc_decref( p_preparser->pp_waiting[0] );
+        preparser_entry_t *p_entry = p_preparser->pp_waiting[0];
+        vlc_gc_decref( p_entry->p_item );
+        free( p_entry );
         REMOVE_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting, 0 );
     }
 
@@ -127,13 +142,27 @@ void playlist_preparser_Delete( playlist_preparser_t *p_preparser )
 /**
  * This function preparses an item when needed.
  */
-static void Preparse( vlc_object_t *obj, input_item_t *p_item )
+static void Preparse( vlc_object_t *obj, input_item_t *p_item,
+                      input_item_meta_request_option_t i_options )
 {
     vlc_mutex_lock( &p_item->lock );
     int i_type = p_item->i_type;
     vlc_mutex_unlock( &p_item->lock );
 
-    if( i_type != ITEM_TYPE_FILE )
+    bool b_preparse = false;
+    switch (i_type) {
+    case ITEM_TYPE_FILE:
+    case ITEM_TYPE_DIRECTORY:
+    case ITEM_TYPE_PLAYLIST:
+    case ITEM_TYPE_NODE:
+        b_preparse = true;
+        break;
+    case ITEM_TYPE_NET:
+        if (i_options & META_REQUEST_OPTION_SCOPE_NETWORK)
+            b_preparse = true;
+        break;
+    }
+    if( !b_preparse )
     {
         input_item_SetPreparsed( p_item, true );
         return;
@@ -201,12 +230,16 @@ static void *Thread( void *data )
     for( ;; )
     {
         input_item_t *p_current;
+        input_item_meta_request_option_t i_options;
 
         /* */
         vlc_mutex_lock( &p_preparser->lock );
         if( p_preparser->i_waiting > 0 )
         {
-            p_current = p_preparser->pp_waiting[0];
+            preparser_entry_t *p_entry = p_preparser->pp_waiting[0];
+            p_current = p_entry->p_item;
+            i_options = p_entry->i_options;
+            free( p_entry );
             REMOVE_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting, 0 );
         }
         else
@@ -220,7 +253,7 @@ static void *Thread( void *data )
         if( !p_current )
             break;
 
-        Preparse( obj, p_current );
+        Preparse( obj, p_current, i_options );
 
         Art( p_preparser, p_current );
         vlc_gc_decref(p_current);
