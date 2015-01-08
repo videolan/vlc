@@ -99,6 +99,8 @@ void IsoffMainParser::parsePeriods(Node *root)
         parseSegmentInformation(*it, period);
         if((*it)->hasAttribute("start"))
             period->startTime.Set(IsoTime((*it)->getAttributeValue("start")));
+        if((*it)->hasAttribute("id"))
+            period->setId((*it)->getAttributeValue("id"));
         setAdaptationSets(*it, period);
         mpd->addPeriod(period);
     }

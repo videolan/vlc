@@ -39,7 +39,8 @@ namespace dash
     {
         class MPD;
 
-        class Period : public SegmentInformation
+        class Period : public SegmentInformation,
+                       public UniqueNess<Period>
         {
             public:
                 Period(MPD *);
