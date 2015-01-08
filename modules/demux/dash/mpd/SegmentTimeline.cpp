@@ -128,6 +128,54 @@ size_t SegmentTimeline::prune(mtime_t scaled)
     return prunednow;
 }
 
+void SegmentTimeline::mergeWith(SegmentTimeline &other)
+{
+    if(elements.empty())
+    {
+        while(other.elements.size())
+        {
+            elements.push_back(other.elements.front());
+            other.elements.pop_front();
+        }
+        return;
+    }
+
+    Element *last = elements.back();
+    while(other.elements.size())
+    {
+        Element *el = other.elements.front();
+        other.elements.pop_front();
+        if(el->t == last->t) /* Same element, but prev could have been middle of repeat */
+        {
+            last->r = std::max(last->r, el->r);
+            delete el;
+        }
+        else if(el->t > last->t) /* Did not exist in previous list */
+        {
+            if( el->t - last->t >= last->d * (mtime_t)(last->r + 1) )
+            {
+                elements.push_back(el);
+                last = el;
+            }
+            else if(last->d == el->d) /* should always be in that case */
+            {
+                last->r = ((el->t - last->t) / last->d) - 1;
+                elements.push_back(el);
+                last = el;
+            }
+            else
+            {
+                /* borked: skip */
+                delete el;
+            }
+        }
+        else
+        {
+            delete el;
+        }
+    }
+}
+
 SegmentTimeline::Element::Element(mtime_t d_, uint64_t r_, mtime_t t_)
 {
     d = d_;
