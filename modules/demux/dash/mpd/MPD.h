@@ -48,24 +48,10 @@ namespace dash
 
                 Profile                         getProfile() const;
                 bool                            isLive() const;
-                time_t                          getAvailabilityStartTime() const;
-                void                            setAvailabilityStartTime( time_t time );
-                time_t                          getAvailabilityEndTime() const;
-                void                            setAvailabilityEndTime( time_t time );
                 void                            setType(const std::string &);
-                time_t                          getDuration() const;
-                void                            setDuration( time_t duration );
-                time_t                          getMinUpdatePeriod() const;
-                void                            setMinUpdatePeriod( time_t period );
-                time_t                          getMinBufferTime() const;
-                void                            setMinBufferTime( time_t time );
-                time_t                          getTimeShiftBufferDepth() const;
-                void                            setTimeShiftBufferDepth( time_t depth );
-                const ProgramInformation*       getProgramInformation() const;
 
                 void    addPeriod               (Period *period);
                 void    addBaseUrl              (BaseUrl *url);
-                void    setProgramInformation   (ProgramInformation *progInfo);
 
                 virtual Url         getUrlSegment() const; /* impl */
                 vlc_object_t *      getVLCObject()  const;
@@ -74,20 +60,20 @@ namespace dash
                 virtual Period*                         getFirstPeriod() const;
                 virtual Period*                         getNextPeriod(Period *period);
 
+                Property<time_t>                    duration;
                 Property<time_t>                    playbackStart;
+                Property<time_t>                    availabilityEndTime;
+                Property<time_t>                    availabilityStartTime;
+                Property<time_t>                    minUpdatePeriod;
+                Property<time_t>                    minBufferTime;
+                Property<time_t>                    timeShiftBufferDepth;
+                Property<ProgramInformation *>      programInfo;
 
             private:
                 stream_t                           *stream;
                 Profile                             profile;
-                time_t                              availabilityStartTime;
-                time_t                              availabilityEndTime;
-                time_t                              duration;
-                time_t                              minUpdatePeriod;
-                time_t                              minBufferTime;
-                time_t                              timeShiftBufferDepth;
                 std::vector<Period *>               periods;
                 std::vector<BaseUrl *>              baseUrls;
-                ProgramInformation                  *programInfo;
                 std::string                         type;
         };
     }

@@ -242,7 +242,7 @@ static int  Control         (demux_t *p_demux, int i_query, va_list args)
 
         case DEMUX_GET_META:
         {
-            if(!p_sys->p_mpd->getProgramInformation())
+            if(!p_sys->p_mpd->programInfo.Get())
                 break;
 
             vlc_meta_t *p_meta = (vlc_meta_t *) va_arg (args, vlc_meta_t*);
@@ -250,17 +250,17 @@ static int  Control         (demux_t *p_demux, int i_query, va_list args)
             if (meta == NULL)
                 return VLC_EGENERIC;
 
-            if(!p_sys->p_mpd->getProgramInformation()->getTitle().empty())
-                vlc_meta_SetTitle(meta, p_sys->p_mpd->getProgramInformation()->getTitle().c_str());
+            if(!p_sys->p_mpd->programInfo.Get()->getTitle().empty())
+                vlc_meta_SetTitle(meta, p_sys->p_mpd->programInfo.Get()->getTitle().c_str());
 
-            if(!p_sys->p_mpd->getProgramInformation()->getSource().empty())
-                vlc_meta_SetPublisher(meta, p_sys->p_mpd->getProgramInformation()->getSource().c_str());
+            if(!p_sys->p_mpd->programInfo.Get()->getSource().empty())
+                vlc_meta_SetPublisher(meta, p_sys->p_mpd->programInfo.Get()->getSource().c_str());
 
-            if(!p_sys->p_mpd->getProgramInformation()->getCopyright().empty())
-                vlc_meta_SetCopyright(meta, p_sys->p_mpd->getProgramInformation()->getCopyright().c_str());
+            if(!p_sys->p_mpd->programInfo.Get()->getCopyright().empty())
+                vlc_meta_SetCopyright(meta, p_sys->p_mpd->programInfo.Get()->getCopyright().c_str());
 
-            if(!p_sys->p_mpd->getProgramInformation()->getMoreInformationUrl().empty())
-                vlc_meta_SetURL(meta, p_sys->p_mpd->getProgramInformation()->getMoreInformationUrl().c_str());
+            if(!p_sys->p_mpd->programInfo.Get()->getMoreInformationUrl().empty())
+                vlc_meta_SetURL(meta, p_sys->p_mpd->programInfo.Get()->getMoreInformationUrl().c_str());
 
             vlc_meta_Merge(p_meta, meta);
             vlc_meta_Delete(meta);

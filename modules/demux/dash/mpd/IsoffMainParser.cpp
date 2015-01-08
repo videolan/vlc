@@ -67,11 +67,11 @@ void    IsoffMainParser::setMPDAttributes   ()
 
     it = attr.find("mediaPresentationDuration");
     if(it != attr.end())
-        this->mpd->setDuration(IsoTime(it->second));
+        this->mpd->duration.Set(IsoTime(it->second));
 
     it = attr.find("minBufferTime");
     if(it != attr.end())
-        this->mpd->setMinBufferTime(IsoTime(it->second));
+        this->mpd->minBufferTime.Set(IsoTime(it->second));
 
     it = attr.find("type");
     if(it != attr.end())
@@ -79,11 +79,11 @@ void    IsoffMainParser::setMPDAttributes   ()
 
     it = attr.find("availabilityStartTime");
     if(it != attr.end())
-        mpd->setAvailabilityStartTime(UTCTime(it->second));
+        mpd->availabilityStartTime.Set(UTCTime(it->second));
 
     it = attr.find("timeShiftBufferDepth");
         if(it != attr.end())
-            mpd->setTimeShiftBufferDepth(IsoTime(it->second));
+            mpd->timeShiftBufferDepth.Set(IsoTime(it->second));
 }
 
 void IsoffMainParser::parsePeriods(Node *root)
@@ -397,7 +397,7 @@ void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)
         if(node->hasAttribute("moreInformationURL"))
             info->setMoreInformationUrl(node->getAttributeValue("moreInformationURL"));
 
-        mpd->setProgramInformation(info);
+        mpd->programInfo.Set(info);
     }
 }
 
@@ -407,8 +407,8 @@ void    IsoffMainParser::print              ()
     {
         msg_Dbg(p_stream, "MPD profile=%s mediaPresentationDuration=%ld minBufferTime=%ld",
                 static_cast<std::string>(mpd->getProfile()).c_str(),
-                mpd->getDuration(),
-                mpd->getMinBufferTime());
+                mpd->duration.Get(),
+                mpd->minBufferTime.Get());
         msg_Dbg(p_stream, "BaseUrl=%s", mpd->getUrlSegment().toString().c_str());
 
         std::vector<Period *>::const_iterator i;

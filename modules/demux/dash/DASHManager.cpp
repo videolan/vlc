@@ -154,7 +154,7 @@ mtime_t DASHManager::getDuration() const
     if (mpd->isLive())
         return 0;
     else
-        return CLOCK_FREQ * mpd->getDuration();
+        return CLOCK_FREQ * mpd->duration.Get();
 }
 
 bool DASHManager::setPosition(mtime_t time)

@@ -36,16 +36,16 @@ using namespace dash::mpd;
 MPD::MPD (stream_t *stream_, Profile profile_) :
     ICanonicalUrl(),
     stream(stream_),
-    profile( profile_ ),
-    availabilityStartTime( 0 ),
-    availabilityEndTime( 0 ),
-    duration( 0 ),
-    minUpdatePeriod( -1 ),
-    minBufferTime( 0 ),
-    timeShiftBufferDepth( 0 ),
-    programInfo( NULL )
+    profile( profile_ )
 {
     playbackStart.Set(0);
+    availabilityStartTime.Set( 0 );
+    availabilityEndTime.Set( 0 );
+    duration.Set( 0 );
+    minUpdatePeriod.Set( 0 );
+    minBufferTime.Set( 0 );
+    timeShiftBufferDepth.Set( 0 );
+    programInfo.Set( NULL );
 }
 
 MPD::~MPD   ()
@@ -56,61 +56,12 @@ MPD::~MPD   ()
     for(size_t i = 0; i < this->baseUrls.size(); i++)
         delete(this->baseUrls.at(i));
 
-    delete(this->programInfo);
+    delete(programInfo.Get());
 }
 
 const std::vector<Period*>&    MPD::getPeriods             () const
 {
     return this->periods;
-}
-
-time_t      MPD::getDuration() const
-{
-    return this->duration;
-}
-
-void MPD::setDuration(time_t duration)
-{
-    if ( duration >= 0 )
-        this->duration = duration;
-}
-
-time_t MPD::getMinUpdatePeriod() const
-{
-    return this->minUpdatePeriod;
-}
-
-void MPD::setMinUpdatePeriod(time_t period)
-{
-    if ( period >= 0 )
-        this->minUpdatePeriod = period;
-}
-
-time_t MPD::getMinBufferTime() const
-{
-    return this->minBufferTime;
-}
-
-void MPD::setMinBufferTime(time_t time)
-{
-    if ( time >= 0 )
-        this->minBufferTime = time;
-}
-
-time_t MPD::getTimeShiftBufferDepth() const
-{
-    return this->timeShiftBufferDepth;
-}
-
-void MPD::setTimeShiftBufferDepth(time_t depth)
-{
-    if ( depth >= 0 )
-        this->timeShiftBufferDepth = depth;
-}
-
-const ProgramInformation*     MPD::getProgramInformation  () const
-{
-    return this->programInfo;
 }
 
 void                    MPD::addBaseUrl             (BaseUrl *url)
@@ -120,10 +71,6 @@ void                    MPD::addBaseUrl             (BaseUrl *url)
 void                    MPD::addPeriod              (Period *period)
 {
     this->periods.push_back(period);
-}
-void                    MPD::setProgramInformation  (ProgramInformation *progInfo)
-{
-    this->programInfo = progInfo;
 }
 
 bool                    MPD::isLive() const
@@ -140,28 +87,6 @@ bool                    MPD::isLive() const
 void MPD::setType(const std::string &type_)
 {
     type = type_;
-}
-
-time_t MPD::getAvailabilityStartTime() const
-{
-    return this->availabilityStartTime;
-}
-
-void MPD::setAvailabilityStartTime(time_t time)
-{
-    if ( time >=0 )
-        this->availabilityStartTime = time;
-}
-
-time_t MPD::getAvailabilityEndTime() const
-{
-    return this->availabilityEndTime;
-}
-
-void MPD::setAvailabilityEndTime(time_t time)
-{
-    if ( time >= 0 )
-        this->availabilityEndTime = time;
 }
 
 Profile MPD::getProfile() const
