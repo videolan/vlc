@@ -1,0 +1,11 @@
+--- opus/celt/float_cast.h	2013-11-29 21:17:15.000000000 +0100
++++ /home/vlc/vlc/contrib/windowsphone/opus/celt/float_cast.h	2014-12-15 16:55:21.951193100 +0100
+@@ -97,7 +97,7 @@
+         {
+                 return _mm_cvtss_si32(_mm_load_ss(&value));
+         }
+-#elif (defined(_MSC_VER) && _MSC_VER >= 1400) && (defined (WIN32) || defined (_WIN32))
++#elif (defined(_MSC_VER) && _MSC_VER >= 1400) && (defined (WIN32) || defined (_WIN32)) && !defined(_M_ARM)
+         #include <math.h>
+
+         /*      Win32 doesn't seem to have these functions.

@@ -17,6 +17,9 @@ $(TARBALLS)/opus-$(OPUS_VERSION).tar.gz:
 opus: opus-$(OPUS_VERSION).tar.gz .sum-opus
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
+ifdef HAVE_VISUALSTUDIO
+	$(APPLY) $(SRC)/opus/msvc.patch
+endif
 	$(MOVE)
 
 OPUS_CONF= --disable-extra-programs --disable-doc
