@@ -996,6 +996,10 @@ static int SessionsSetup( demux_t *p_demux )
                     else
                         msg_Warn( p_demux,"Missing or unsupported vorbis header." );
                 }
+                else if( !strcmp( sub->codecName(), "OPUS" ) )
+                {
+                    tk->fmt.i_codec = VLC_CODEC_OPUS;
+                }
             }
             else if( !strcmp( sub->mediumName(), "video" ) )
             {
