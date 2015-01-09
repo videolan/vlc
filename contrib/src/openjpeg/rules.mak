@@ -11,6 +11,9 @@ $(TARBALLS)/openjpeg-$(OPENJPEG_VERSION).tar.gz:
 openjpeg: openjpeg-$(OPENJPEG_VERSION).tar.gz .sum-openjpeg
 	$(UNPACK)
 	$(APPLY) $(SRC)/openjpeg/freebsd.patch
+ifdef HAVE_VISUALSTUDIO
+	$(APPLY) $(SRC)/openjpeg/msvc.patch
+endif
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 

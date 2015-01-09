@@ -1,0 +1,11 @@
+--- openjpeg/libopenjpeg/opj_includes.h	2012-02-07 11:49:55.000000000 +0100
++++ /home/vlc/vlc/contrib/windowsphone/openjpeg/libopenjpeg/opj_includes.h	2014-12-15 16:54:31.303058600 +0100
+@@ -87,7 +87,7 @@
+ #endif
+
+ /* MSVC and Borland C do not have lrintf */
+-#if defined(_MSC_VER) || defined(__BORLANDC__)
++#if (defined(_MSC_VER) && _MSC_VER < 1800) || defined(__BORLANDC__)
+ static INLINE long lrintf(float f){
+ #ifdef _M_X64
+     return (long)((f>0.0f) ? (f + 0.5f):(f -0.5f));
