@@ -1,0 +1,18 @@
+--- fribidi/charset/fribidi-char-sets.c	2012-12-02 17:25:40.000000000 +0100
++++ /home/vlc/vlc/contrib/windowsphone/fribidi/charset/fribidi-char-sets.c	2014-12-15 16:54:39.537785800 +0100
+@@ -117,6 +117,7 @@
+ # include <glib/gstrfuncs.h>
+ # define fribidi_strcasecmp g_ascii_strcasecmp
+ #else /* !FRIBIDI_USE_GLIB */
++#if !defined(_MSC_VER)
+ static char
+ toupper (
+   /* input */
+@@ -125,6 +126,7 @@
+ {
+   return c < 'a' || c > 'z' ? c : c + 'A' - 'a';
+ }
++#endif
+
+ static int
+ fribidi_strcasecmp (
