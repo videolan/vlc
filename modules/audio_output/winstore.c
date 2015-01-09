@@ -178,7 +178,7 @@ static int Open(vlc_object_t *obj)
 
     aout->sys = sys;
     sys->stream = NULL;
-    sys->client = var_InheritAddress(aout, "mmdevice-audioclient");
+    sys->client = var_InheritInteger(aout, "winstore-audioclient");
     assert(sys->client != NULL);
     aout->start = Start;
     aout->stop = Stop;
