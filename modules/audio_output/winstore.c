@@ -101,10 +101,9 @@ static void Flush(audio_output_t *aout, bool wait)
 static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
                               void **restrict pv)
 {
-    aout_sys_t *sys = opaque;
+    (void) iid; (void) actparms;
+    *pv = opaque;
 
-    (void)iid; (void)actparms;
-    *pv = sys->client;
     return S_OK;
 }
 
