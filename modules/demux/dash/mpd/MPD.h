@@ -56,9 +56,11 @@ namespace dash
                 virtual Url         getUrlSegment() const; /* impl */
                 vlc_object_t *      getVLCObject()  const;
 
-                virtual const std::vector<Period *>&    getPeriods() const;
-                virtual Period*                         getFirstPeriod() const;
+                virtual const std::vector<Period *>&    getPeriods();
+                virtual Period*                         getFirstPeriod();
                 virtual Period*                         getNextPeriod(Period *period);
+
+                void                mergeWith(MPD *);
 
                 Property<time_t>                    duration;
                 Property<time_t>                    playbackStart;

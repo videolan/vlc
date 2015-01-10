@@ -28,6 +28,7 @@
 #include "MPD.h"
 #include "Helper.h"
 #include "dash.hpp"
+#include "SegmentTimeline.h"
 #include <vlc_common.h>
 #include <vlc_stream.h>
 
@@ -59,7 +60,7 @@ MPD::~MPD   ()
     delete(programInfo.Get());
 }
 
-const std::vector<Period*>&    MPD::getPeriods             () const
+const std::vector<Period*>&    MPD::getPeriods             ()
 {
     return this->periods;
 }
@@ -110,7 +111,7 @@ vlc_object_t * MPD::getVLCObject() const
     return VLC_OBJECT(stream);
 }
 
-Period* MPD::getFirstPeriod() const
+Period* MPD::getFirstPeriod()
 {
     std::vector<Period *> periods = getPeriods();
 
@@ -131,4 +132,20 @@ Period* MPD::getNextPeriod(Period *period)
     }
 
     return NULL;
+}
+
+void MPD::mergeWith(MPD *updatedMPD)
+{
+    availabilityEndTime.Set(updatedMPD->availabilityEndTime.Get());
+    /* Only merge timelines for now */
+    for(size_t i = 0; i < periods.size() && i < updatedMPD->periods.size(); i++)
+    {
+        std::vector<SegmentTimeline *> timelines;
+        std::vector<SegmentTimeline *> timelinesUpdate;
+        periods.at(i)->collectTimelines(&timelines);
+        updatedMPD->periods.at(i)->collectTimelines(&timelinesUpdate);
+
+        for(size_t j = 0; j < timelines.size() && j < timelinesUpdate.size(); j++)
+            timelines.at(j)->mergeWith(*timelinesUpdate.at(j));
+    }
 }
