@@ -5045,7 +5045,8 @@ static int DemuxAsLeaf( demux_t *p_demux )
                     if( p_mfhd && p_prevmfhd &&
                         BOXDATA(p_mfhd)->i_sequence_number != p_prevmfhd->data.p_mfhd->i_sequence_number + 1 )
                     {
-                        msg_Info( p_demux, "Passive DASH Seek detected" );
+                        msg_Info( p_demux, "Passive DASH Seek detected %"PRIu32" %"PRIu32,
+                                  BOXDATA(p_mfhd)->i_sequence_number, p_prevmfhd->data.p_mfhd->i_sequence_number + 1 );
                         MP4_Box_t *p_sidx = MP4_BoxGet( p_vroot, "sidx" );
                         if( p_sidx && BOXDATA(p_sidx) && BOXDATA(p_sidx)->i_timescale )
                         {
