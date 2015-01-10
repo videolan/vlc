@@ -4419,7 +4419,7 @@ static int LeafParseTRUN( demux_t *p_demux, mp4_track_t *p_track,
 
         if( p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET )
         {
-            if ( p_trun->i_version == 0 )
+            if ( p_trun->i_version == 1 )
                 i_nzpts += CLOCK_FREQ * (int32_t) p_trun->p_samples[i].i_composition_time_offset / p_track->i_timescale;
             else
                 i_nzpts += CLOCK_FREQ * p_trun->p_samples[i].i_composition_time_offset / p_track->i_timescale;
