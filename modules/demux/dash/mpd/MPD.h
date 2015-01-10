@@ -67,6 +67,7 @@ namespace dash
                 Property<time_t>                    availabilityEndTime;
                 Property<time_t>                    availabilityStartTime;
                 Property<time_t>                    minUpdatePeriod;
+                Property<time_t>                    maxSegmentDuration;
                 Property<time_t>                    minBufferTime;
                 Property<time_t>                    timeShiftBufferDepth;
                 Property<ProgramInformation *>      programInfo;

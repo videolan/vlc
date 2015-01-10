@@ -73,6 +73,14 @@ void    IsoffMainParser::setMPDAttributes   ()
     if(it != attr.end())
         this->mpd->minBufferTime.Set(IsoTime(it->second));
 
+    it = attr.find("minimumUpdatePeriod");
+    if(it != attr.end())
+        mpd->minUpdatePeriod.Set(IsoTime(it->second));
+
+    it = attr.find("maxSegmentDuration");
+    if(it != attr.end())
+        mpd->maxSegmentDuration.Set(IsoTime(it->second));
+
     it = attr.find("type");
     if(it != attr.end())
         mpd->setType(it->second);

@@ -44,6 +44,7 @@ MPD::MPD (stream_t *stream_, Profile profile_) :
     availabilityEndTime.Set( 0 );
     duration.Set( 0 );
     minUpdatePeriod.Set( 0 );
+    maxSegmentDuration.Set( 0 );
     minBufferTime.Set( 0 );
     timeShiftBufferDepth.Set( 0 );
     programInfo.Set( NULL );
