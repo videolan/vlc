@@ -44,6 +44,7 @@ Period::Period(MPD *mpd) :
 Period::~Period ()
 {
     vlc_delete_all( this->adaptationSets );
+    childs.clear();
 }
 
 const std::vector<AdaptationSet*>&  Period::getAdaptationSets() const
@@ -66,7 +67,10 @@ const std::vector<AdaptationSet*>   Period::getAdaptationSets(Streams::Type type
 void                                Period::addAdaptationSet(AdaptationSet *adaptationSet)
 {
     if ( adaptationSet != NULL )
+    {
         this->adaptationSets.push_back(adaptationSet);
+        childs.push_back(adaptationSet);
+    }
 }
 
 AdaptationSet * Period::getAdaptationSet(Streams::Type type) const

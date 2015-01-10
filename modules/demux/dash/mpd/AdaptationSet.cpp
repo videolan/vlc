@@ -46,6 +46,7 @@ AdaptationSet::AdaptationSet(Period *period) :
 AdaptationSet::~AdaptationSet   ()
 {
     vlc_delete_all( this->representations );
+    childs.clear();
 }
 
 const std::string& AdaptationSet::getMimeType() const
@@ -88,6 +89,7 @@ const Representation *AdaptationSet::getRepresentationById(const std::string &id
 void                            AdaptationSet::addRepresentation        (Representation *rep)
 {
     this->representations.push_back(rep);
+    childs.push_back(rep);
 }
 
 

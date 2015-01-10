@@ -219,6 +219,16 @@ mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) cons
     return time;
 }
 
+void SegmentInformation::collectTimelines(std::vector<SegmentTimeline *> *timelines) const
+{
+    if(mediaSegmentTemplate && mediaSegmentTemplate->segmentTimeline.Get())
+        timelines->push_back(mediaSegmentTemplate->segmentTimeline.Get());
+
+    std::vector<SegmentInformation *>::const_iterator it;
+    for(it = childs.begin(); it != childs.end(); it++)
+        (*it)->collectTimelines(timelines);
+}
+
 bool SegmentInformation::canBitswitch() const
 {
     if(bitswitch_policy == BITSWITCH_INHERIT)
