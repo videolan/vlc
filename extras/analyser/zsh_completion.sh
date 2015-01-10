@@ -53,7 +53,7 @@ if ! find_libvlccore; then
     exit 1
 fi
 
-export LD_LIBRARY_PATH=$BUILDDIR/src/.libs
+export LD_LIBRARY_PATH=$BUILDDIR/src/.libs:$BUILDDIR/lib/.libs
 CXXFLAGS="$CXXFLAGS -g -O0"
 
 if [ -e ../../extras/contrib/config.mak -a ! "`grep HOST ../../extras/contrib/config.mak 2>/dev/null|awk '{print $3}'`" != "$HOST" ]; then
