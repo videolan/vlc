@@ -342,6 +342,98 @@
 		1C88BCC119DC7CB300645190 /* ys-fs_volume_slider_knob@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8B19DC7CB300645190 /* ys-fs_volume_slider_knob@2x.png */; };
 		1C88BCC219DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8C19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png */; };
 		1C88BCC319DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8D19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png */; };
+		1CCB5F511A62A724004C3E90 /* about.h in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AF9F044465080059A3A7 /* about.h */; };
+		1CCB5F521A62A724004C3E90 /* about.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AFA0044465080059A3A7 /* about.m */; };
+		1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435E1972E26A0022B534 /* AddonListDataSource.h */; };
+		1CCB5F541A62A724004C3E90 /* AddonListDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435F1972E26A0022B534 /* AddonListDataSource.m */; };
+		1CCB5F551A62A724004C3E90 /* AddonManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5218ABD6380053B874 /* AddonManager.h */; };
+		1CCB5F561A62A724004C3E90 /* AddonManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5318ABD6380053B874 /* AddonManager.m */; };
+		1CCB5F571A62A724004C3E90 /* applescript.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6F6041643860059A3A7 /* applescript.h */; };
+		1CCB5F581A62A724004C3E90 /* applescript.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6F7041643860059A3A7 /* applescript.m */; };
+		1CCB5F591A62A724004C3E90 /* AudioEffects.h in Sources */ = {isa = PBXBuildFile; fileRef = CC5560231365CDC700D54038 /* AudioEffects.h */; };
+		1CCB5F5A1A62A724004C3E90 /* AudioEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5560241365CDC800D54038 /* AudioEffects.m */; };
+		1CCB5F5B1A62A724004C3E90 /* bookmarks.h in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0708A5724D007B10AE /* bookmarks.h */; };
+		1CCB5F5C1A62A724004C3E90 /* bookmarks.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0608A5724D007B10AE /* bookmarks.m */; };
+		1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */; };
+		1CCB5F5E1A62A724004C3E90 /* controls.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6FA041684EC0059A3A7 /* controls.h */; };
+		1CCB5F5F1A62A724004C3E90 /* controls.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27B03E2EB1C0059A3A7 /* controls.m */; };
+		1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */ = {isa = PBXBuildFile; fileRef = E0382C00160BA09E0031D7FF /* ControlsBar.h */; };
+		1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = E0382C01160BA09E0031D7FF /* ControlsBar.m */; };
+		1CCB5F621A62A724004C3E90 /* ConvertAndSave.h in Sources */ = {isa = PBXBuildFile; fileRef = CC0663341566C34C003A411C /* ConvertAndSave.h */; };
+		1CCB5F631A62A724004C3E90 /* ConvertAndSave.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0663351566C34C003A411C /* ConvertAndSave.m */; };
+		1CCB5F641A62A724004C3E90 /* coredialogs.h in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33220F8CB017000FC4A7 /* coredialogs.h */; };
+		1CCB5F651A62A724004C3E90 /* coredialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = CC4A33210F8CB017000FC4A7 /* coredialogs.m */; };
+		1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6013B68A0B009F72E0 /* CoreInteraction.h */; };
+		1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6113B68A0B009F72E0 /* CoreInteraction.m */; };
+		1CCB5F681A62A724004C3E90 /* DebugMessageVisualizer.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */; };
+		1CCB5F691A62A724004C3E90 /* DebugMessageVisualizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */; };
+		1CCB5F6A1A62A724004C3E90 /* ExtensionsDialogProvider.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */; };
+		1CCB5F6B1A62A724004C3E90 /* ExtensionsDialogProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */; };
+		1CCB5F6C1A62A724004C3E90 /* ExtensionsManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */; };
+		1CCB5F6D1A62A724004C3E90 /* ExtensionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */; };
+		1CCB5F6E1A62A724004C3E90 /* eyetv.h in Sources */ = {isa = PBXBuildFile; fileRef = CC6EDD4F0B9CA2140096068A /* eyetv.h */; };
+		1CCB5F6F1A62A724004C3E90 /* eyetv.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6EDD500B9CA2140096068A /* eyetv.m */; };
+		1CCB5F701A62A724004C3E90 /* fspanel.h in Sources */ = {isa = PBXBuildFile; fileRef = 2AEF857609A5FEC900130822 /* fspanel.h */; };
+		1CCB5F711A62A724004C3E90 /* fspanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2AEF857709A5FEC900130822 /* fspanel.m */; };
+		1CCB5F721A62A724004C3E90 /* intf.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27C03E2EB1C0059A3A7 /* intf.h */; };
+		1CCB5F731A62A724004C3E90 /* intf.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27D03E2EB1C0059A3A7 /* intf.m */; };
+		1CCB5F741A62A724004C3E90 /* macosx.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27E03E2EB1C0059A3A7 /* macosx.m */; };
+		1CCB5F751A62A724004C3E90 /* MainMenu.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A5A13B61D49009F72E0 /* MainMenu.h */; };
+		1CCB5F761A62A724004C3E90 /* MainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A5B13B61D49009F72E0 /* MainMenu.m */; };
+		1CCB5F771A62A724004C3E90 /* MainWindow.h in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6213B68A0B009F72E0 /* MainWindow.h */; };
+		1CCB5F781A62A724004C3E90 /* MainWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6313B68A0B009F72E0 /* MainWindow.m */; };
+		1CCB5F791A62A724004C3E90 /* open.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28103E2EB1C0059A3A7 /* open.h */; };
+		1CCB5F7A1A62A724004C3E90 /* open.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28203E2EB1C0059A3A7 /* open.m */; };
+		1CCB5F7B1A62A724004C3E90 /* output.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E55FB7F0459B0FD00FB3317 /* output.h */; };
+		1CCB5F7C1A62A724004C3E90 /* output.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E55FB800459B0FD00FB3317 /* output.m */; };
+		1CCB5F7D1A62A724004C3E90 /* playlist.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28303E2EB1C0059A3A7 /* playlist.h */; };
+		1CCB5F7E1A62A724004C3E90 /* playlist.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28403E2EB1C0059A3A7 /* playlist.m */; };
+		1CCB5F7F1A62A724004C3E90 /* playlistinfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E49720006417F6800370C9F /* playlistinfo.h */; };
+		1CCB5F801A62A724004C3E90 /* playlistinfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E49720106417F6800370C9F /* playlistinfo.m */; };
+		1CCB5F811A62A724004C3E90 /* prefs_widgets.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */; };
+		1CCB5F821A62A724004C3E90 /* prefs_widgets.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */; };
+		1CCB5F831A62A724004C3E90 /* prefs.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28503E2EB1C0059A3A7 /* prefs.h */; };
+		1CCB5F841A62A724004C3E90 /* prefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28603E2EB1C0059A3A7 /* prefs.m */; };
+		1CCB5F851A62A724004C3E90 /* SharedDialogs.h in Sources */ = {isa = PBXBuildFile; fileRef = CC461F6C160078340022423C /* SharedDialogs.h */; };
+		1CCB5F861A62A724004C3E90 /* SharedDialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = CC461F6D160078340022423C /* SharedDialogs.m */; };
+		1CCB5F871A62A724004C3E90 /* simple_prefs.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5E0D54BBAE004D780C /* simple_prefs.h */; };
+		1CCB5F881A62A724004C3E90 /* simple_prefs.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB24D5D0D54BBAE004D780C /* simple_prefs.m */; };
+		1CCB5F891A62A724004C3E90 /* StringUtility.h in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4615E7947F00F2FDC9 /* StringUtility.h */; };
+		1CCB5F8A1A62A724004C3E90 /* StringUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = CC269A4715E7947F00F2FDC9 /* StringUtility.m */; };
+		1CCB5F8B1A62A724004C3E90 /* TrackSynchronization.h in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC3137464CD0003010A /* TrackSynchronization.h */; };
+		1CCB5F8C1A62A724004C3E90 /* TrackSynchronization.m in Sources */ = {isa = PBXBuildFile; fileRef = CC707EC4137464CD0003010A /* TrackSynchronization.m */; };
+		1CCB5F8D1A62A724004C3E90 /* VideoEffects.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366D13817E4500694F2A /* VideoEffects.h */; };
+		1CCB5F8E1A62A724004C3E90 /* VideoEffects.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCE366E13817E4500694F2A /* VideoEffects.m */; };
+		1CCB5F8F1A62A724004C3E90 /* VideoView.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCCDCA01413E1C000FE3DE1 /* VideoView.h */; };
+		1CCB5F901A62A724004C3E90 /* VideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCDCA11413E1C000FE3DE1 /* VideoView.m */; };
+		1CCB5F911A62A724004C3E90 /* VLCUIWidgets.h in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */; };
+		1CCB5F921A62A724004C3E90 /* VLCUIWidgets.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */; };
+		1CCB5F931A62A724004C3E90 /* VLCVoutWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */; };
+		1CCB5F941A62A724004C3E90 /* VLCVoutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */; };
+		1CCB5F951A62A724004C3E90 /* wizard.h in Sources */ = {isa = PBXBuildFile; fileRef = DC769AB8085DF0DB001A838D /* wizard.h */; };
+		1CCB5F961A62A724004C3E90 /* wizard.m in Sources */ = {isa = PBXBuildFile; fileRef = DC769AB7085DF0DB001A838D /* wizard.m */; };
+		1CCB5F971A62A724004C3E90 /* Windows.h in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F416020F6200C698B7 /* Windows.h */; };
+		1CCB5F981A62A724004C3E90 /* Windows.m in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F516020F6200C698B7 /* Windows.m */; };
+		1CCB5F991A62A724004C3E90 /* misc.h in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27F03E2EB1C0059A3A7 /* misc.h */; };
+		1CCB5F9A1A62A724004C3E90 /* misc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28003E2EB1C0059A3A7 /* misc.m */; };
+		1CCB5F9B1A62A724004C3E90 /* MainWindowTitle.h in Sources */ = {isa = PBXBuildFile; fileRef = CC017A0B14A4C8AF00C09A4F /* MainWindowTitle.h */; };
+		1CCB5F9C1A62A724004C3E90 /* MainWindowTitle.m in Sources */ = {isa = PBXBuildFile; fileRef = CC017A0C14A4C8AF00C09A4F /* MainWindowTitle.m */; };
+		1CCB5F9D1A62A724004C3E90 /* BWQuincyManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652618805297005776C4 /* BWQuincyManager.h */; };
+		1CCB5F9E1A62A724004C3E90 /* BWQuincyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652718805297005776C4 /* BWQuincyManager.m */; };
+		1CCB5F9F1A62A724004C3E90 /* BWQuincyUI.h in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652818805297005776C4 /* BWQuincyUI.h */; };
+		1CCB5FA01A62A724004C3E90 /* BWQuincyUI.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D3F652918805297005776C4 /* BWQuincyUI.m */; };
+		1CCB5FA11A62A724004C3E90 /* AppleRemote.h in Sources */ = {isa = PBXBuildFile; fileRef = CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */; };
+		1CCB5FA21A62A724004C3E90 /* AppleRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */; };
+		1CCB5FA31A62A724004C3E90 /* SideBarItem.h in Sources */ = {isa = PBXBuildFile; fileRef = CCCDDEEF13E870BB00A35661 /* SideBarItem.h */; };
+		1CCB5FA41A62A724004C3E90 /* SideBarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCDDEF013E870BB00A35661 /* SideBarItem.m */; };
+		1CCB5FA51A62A724004C3E90 /* PXSourceList.h in Sources */ = {isa = PBXBuildFile; fileRef = CC0CD0DF13DE0EAE00B0D90D /* PXSourceList.h */; };
+		1CCB5FA61A62A724004C3E90 /* PXSourceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */; };
+		1CCB5FA71A62A724004C3E90 /* PXSourceListDataSource.h in Sources */ = {isa = PBXBuildFile; fileRef = CC0CD0E113DE0EAE00B0D90D /* PXSourceListDataSource.h */; };
+		1CCB5FA81A62A724004C3E90 /* PXSourceListDelegate.h in Sources */ = {isa = PBXBuildFile; fileRef = CC0CD0E213DE0EAE00B0D90D /* PXSourceListDelegate.h */; };
+		1CCB5FA91A62A724004C3E90 /* SPInvocationGrabbing.h in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */; };
+		1CCB5FAA1A62A724004C3E90 /* SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */; };
+		1CCB5FAB1A62A724004C3E90 /* SPMediaKeyTap.h in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */; };
+		1CCB5FAC1A62A724004C3E90 /* SPMediaKeyTap.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */; };
 		1CE5ED2119DD6AB700FCEFD3 /* lion-window-fullscreen-on.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED1B19DD6AB700FCEFD3 /* lion-window-fullscreen-on.png */; };
 		1CE5ED2219DD6AB700FCEFD3 /* lion-window-fullscreen-on@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED1C19DD6AB700FCEFD3 /* lion-window-fullscreen-on@2x.png */; };
 		1CE5ED2319DD6AB700FCEFD3 /* lion-window-fullscreen-over.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED1D19DD6AB700FCEFD3 /* lion-window-fullscreen-over.png */; };
@@ -1112,6 +1204,7 @@
 		1C88BC8B19DC7CB300645190 /* ys-fs_volume_slider_knob@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob@2x.png"; sourceTree = "<group>"; };
 		1C88BC8C19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob_highlight.png"; sourceTree = "<group>"; };
 		1C88BC8D19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob_highlight@2x.png"; sourceTree = "<group>"; };
+		1CCB5F2F1A62A6A5004C3E90 /* pseudo-vlc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "pseudo-vlc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CE5ED1B19DD6AB700FCEFD3 /* lion-window-fullscreen-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-on.png"; sourceTree = "<group>"; };
 		1CE5ED1C19DD6AB700FCEFD3 /* lion-window-fullscreen-on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-on@2x.png"; sourceTree = "<group>"; };
 		1CE5ED1D19DD6AB700FCEFD3 /* lion-window-fullscreen-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-over.png"; sourceTree = "<group>"; };
@@ -1643,6 +1736,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1CCB5F2C1A62A6A5004C3E90 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CC402F400E00ABBB006A4BA4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1705,76 +1805,76 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				8EE1AF9F044465080059A3A7 /* about.h */,
+				8EE1AFA0044465080059A3A7 /* about.m */,
+				7DF0435E1972E26A0022B534 /* AddonListDataSource.h */,
+				7DF0435F1972E26A0022B534 /* AddonListDataSource.m */,
+				7DB65D5218ABD6380053B874 /* AddonManager.h */,
+				7DB65D5318ABD6380053B874 /* AddonManager.m */,
+				8E6BC6F6041643860059A3A7 /* applescript.h */,
+				8E6BC6F7041643860059A3A7 /* applescript.m */,
+				CC5560231365CDC700D54038 /* AudioEffects.h */,
+				CC5560241365CDC800D54038 /* AudioEffects.m */,
+				DCE7BD0708A5724D007B10AE /* bookmarks.h */,
+				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
 				CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */,
-				8ED6C27E03E2EB1C0059A3A7 /* macosx.m */,
-				8ED6C27C03E2EB1C0059A3A7 /* intf.h */,
-				8ED6C27D03E2EB1C0059A3A7 /* intf.m */,
-				7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */,
-				7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */,
-				CC448A5A13B61D49009F72E0 /* MainMenu.h */,
-				CC448A5B13B61D49009F72E0 /* MainMenu.m */,
-				CC448A6013B68A0B009F72E0 /* CoreInteraction.h */,
-				CC448A6113B68A0B009F72E0 /* CoreInteraction.m */,
-				CC448A6213B68A0B009F72E0 /* MainWindow.h */,
-				CC448A6313B68A0B009F72E0 /* MainWindow.m */,
+				8E6BC6FA041684EC0059A3A7 /* controls.h */,
+				8ED6C27B03E2EB1C0059A3A7 /* controls.m */,
 				E0382C00160BA09E0031D7FF /* ControlsBar.h */,
 				E0382C01160BA09E0031D7FF /* ControlsBar.m */,
-				E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */,
-				E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */,
+				CC0663341566C34C003A411C /* ConvertAndSave.h */,
+				CC0663351566C34C003A411C /* ConvertAndSave.m */,
 				CC4A33220F8CB017000FC4A7 /* coredialogs.h */,
 				CC4A33210F8CB017000FC4A7 /* coredialogs.m */,
+				CC448A6013B68A0B009F72E0 /* CoreInteraction.h */,
+				CC448A6113B68A0B009F72E0 /* CoreInteraction.m */,
+				7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */,
+				7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */,
 				5CCED71014C0D4A90057F8D1 /* ExtensionsDialogProvider.h */,
 				5CCED71114C0D4A90057F8D1 /* ExtensionsDialogProvider.m */,
 				5CCED71214C0D4A90057F8D1 /* ExtensionsManager.h */,
 				5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */,
-				7DB65D5218ABD6380053B874 /* AddonManager.h */,
-				7DB65D5318ABD6380053B874 /* AddonManager.m */,
-				7DF0435E1972E26A0022B534 /* AddonListDataSource.h */,
-				7DF0435F1972E26A0022B534 /* AddonListDataSource.m */,
-				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
-				5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */,
-				8E6BC6FA041684EC0059A3A7 /* controls.h */,
-				8ED6C27B03E2EB1C0059A3A7 /* controls.m */,
-				8E6BC6F6041643860059A3A7 /* applescript.h */,
-				8E6BC6F7041643860059A3A7 /* applescript.m */,
-				8EE1AF9F044465080059A3A7 /* about.h */,
-				8EE1AFA0044465080059A3A7 /* about.m */,
-				8ED6C28103E2EB1C0059A3A7 /* open.h */,
-				8ED6C28203E2EB1C0059A3A7 /* open.m */,
-				8ED6C28303E2EB1C0059A3A7 /* playlist.h */,
-				8ED6C28403E2EB1C0059A3A7 /* playlist.m */,
-				8ED6C28503E2EB1C0059A3A7 /* prefs.h */,
-				8ED6C28603E2EB1C0059A3A7 /* prefs.m */,
-				8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */,
-				8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */,
-				8E49720006417F6800370C9F /* playlistinfo.h */,
-				8E49720106417F6800370C9F /* playlistinfo.m */,
-				8E55FB7F0459B0FD00FB3317 /* output.h */,
-				8E55FB800459B0FD00FB3317 /* output.m */,
-				CCCCDCA01413E1C000FE3DE1 /* VideoView.h */,
-				CCCCDCA11413E1C000FE3DE1 /* VideoView.m */,
-				DC769AB8085DF0DB001A838D /* wizard.h */,
-				DC769AB7085DF0DB001A838D /* wizard.m */,
-				DCE7BD0708A5724D007B10AE /* bookmarks.h */,
-				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
-				2AEF857609A5FEC900130822 /* fspanel.h */,
-				2AEF857709A5FEC900130822 /* fspanel.m */,
 				CC6EDD4F0B9CA2140096068A /* eyetv.h */,
 				CC6EDD500B9CA2140096068A /* eyetv.m */,
+				2AEF857609A5FEC900130822 /* fspanel.h */,
+				2AEF857709A5FEC900130822 /* fspanel.m */,
+				8ED6C27C03E2EB1C0059A3A7 /* intf.h */,
+				8ED6C27D03E2EB1C0059A3A7 /* intf.m */,
+				8ED6C27E03E2EB1C0059A3A7 /* macosx.m */,
+				CC448A5A13B61D49009F72E0 /* MainMenu.h */,
+				CC448A5B13B61D49009F72E0 /* MainMenu.m */,
+				CC448A6213B68A0B009F72E0 /* MainWindow.h */,
+				CC448A6313B68A0B009F72E0 /* MainWindow.m */,
+				8ED6C28103E2EB1C0059A3A7 /* open.h */,
+				8ED6C28203E2EB1C0059A3A7 /* open.m */,
+				8E55FB7F0459B0FD00FB3317 /* output.h */,
+				8E55FB800459B0FD00FB3317 /* output.m */,
+				8ED6C28303E2EB1C0059A3A7 /* playlist.h */,
+				8ED6C28403E2EB1C0059A3A7 /* playlist.m */,
+				8E49720006417F6800370C9F /* playlistinfo.h */,
+				8E49720106417F6800370C9F /* playlistinfo.m */,
+				8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */,
+				8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */,
+				8ED6C28503E2EB1C0059A3A7 /* prefs.h */,
+				8ED6C28603E2EB1C0059A3A7 /* prefs.m */,
+				CC461F6C160078340022423C /* SharedDialogs.h */,
+				CC461F6D160078340022423C /* SharedDialogs.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
 				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
-				CC5560231365CDC700D54038 /* AudioEffects.h */,
-				CC5560241365CDC800D54038 /* AudioEffects.m */,
+				CC269A4615E7947F00F2FDC9 /* StringUtility.h */,
+				CC269A4715E7947F00F2FDC9 /* StringUtility.m */,
 				CC707EC3137464CD0003010A /* TrackSynchronization.h */,
 				CC707EC4137464CD0003010A /* TrackSynchronization.m */,
 				CCCE366D13817E4500694F2A /* VideoEffects.h */,
 				CCCE366E13817E4500694F2A /* VideoEffects.m */,
-				CC0663341566C34C003A411C /* ConvertAndSave.h */,
-				CC0663351566C34C003A411C /* ConvertAndSave.m */,
-				CC269A4615E7947F00F2FDC9 /* StringUtility.h */,
-				CC269A4715E7947F00F2FDC9 /* StringUtility.m */,
-				CC461F6C160078340022423C /* SharedDialogs.h */,
-				CC461F6D160078340022423C /* SharedDialogs.m */,
+				CCCCDCA01413E1C000FE3DE1 /* VideoView.h */,
+				CCCCDCA11413E1C000FE3DE1 /* VideoView.m */,
+				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
+				5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */,
+				E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */,
+				E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */,
+				DC769AB8085DF0DB001A838D /* wizard.h */,
+				DC769AB7085DF0DB001A838D /* wizard.m */,
 				CC017A0E14A4C8B600C09A4F /* custom UI code */,
 				CC0CD0E513DE0FC600B0D90D /* Imported Code */,
 			);
@@ -1810,6 +1910,7 @@
 			isa = PBXGroup;
 			children = (
 				CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */,
+				1CCB5F2F1A62A6A5004C3E90 /* pseudo-vlc.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2807,6 +2908,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1CCB5F2E1A62A6A5004C3E90 /* pseudo-vlc */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1CCB5F491A62A6A5004C3E90 /* Build configuration list for PBXNativeTarget "pseudo-vlc" */;
+			buildPhases = (
+				1CCB5F2B1A62A6A5004C3E90 /* Sources */,
+				1CCB5F2C1A62A6A5004C3E90 /* Frameworks */,
+				1CCB5F2D1A62A6A5004C3E90 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "pseudo-vlc";
+			productName = "pseudo-vlc";
+			productReference = 1CCB5F2F1A62A6A5004C3E90 /* pseudo-vlc.app */;
+			productType = "com.apple.product-type.application";
+		};
 		CC402EAE0E00ABBB006A4BA4 /* vlc */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CC402F460E00ABBB006A4BA4 /* Build configuration list for PBXNativeTarget "vlc" */;
@@ -2832,6 +2950,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0430;
+				TargetAttributes = {
+					1CCB5F2E1A62A6A5004C3E90 = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+				};
 			};
 			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -2842,17 +2965,26 @@
 				Japanese,
 				French,
 				German,
+				Base,
 			);
 			mainGroup = 089C166AFE841209C02AAC07 /* vlc */;
 			projectDirPath = "";
 			projectRoot = ../../..;
 			targets = (
 				CC402EAE0E00ABBB006A4BA4 /* vlc */,
+				1CCB5F2E1A62A6A5004C3E90 /* pseudo-vlc */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1CCB5F2D1A62A6A5004C3E90 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CC402EAF0E00ABBB006A4BA4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3600,6 +3732,108 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXSourcesBuildPhase section */
+		1CCB5F2B1A62A6A5004C3E90 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1CCB5F511A62A724004C3E90 /* about.h in Sources */,
+				1CCB5F521A62A724004C3E90 /* about.m in Sources */,
+				1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */,
+				1CCB5F541A62A724004C3E90 /* AddonListDataSource.m in Sources */,
+				1CCB5F551A62A724004C3E90 /* AddonManager.h in Sources */,
+				1CCB5F561A62A724004C3E90 /* AddonManager.m in Sources */,
+				1CCB5F571A62A724004C3E90 /* applescript.h in Sources */,
+				1CCB5F581A62A724004C3E90 /* applescript.m in Sources */,
+				1CCB5F591A62A724004C3E90 /* AudioEffects.h in Sources */,
+				1CCB5F5A1A62A724004C3E90 /* AudioEffects.m in Sources */,
+				1CCB5F5B1A62A724004C3E90 /* bookmarks.h in Sources */,
+				1CCB5F5C1A62A724004C3E90 /* bookmarks.m in Sources */,
+				1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */,
+				1CCB5F5E1A62A724004C3E90 /* controls.h in Sources */,
+				1CCB5F5F1A62A724004C3E90 /* controls.m in Sources */,
+				1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */,
+				1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */,
+				1CCB5F621A62A724004C3E90 /* ConvertAndSave.h in Sources */,
+				1CCB5F631A62A724004C3E90 /* ConvertAndSave.m in Sources */,
+				1CCB5F641A62A724004C3E90 /* coredialogs.h in Sources */,
+				1CCB5F651A62A724004C3E90 /* coredialogs.m in Sources */,
+				1CCB5F661A62A724004C3E90 /* CoreInteraction.h in Sources */,
+				1CCB5F671A62A724004C3E90 /* CoreInteraction.m in Sources */,
+				1CCB5F681A62A724004C3E90 /* DebugMessageVisualizer.h in Sources */,
+				1CCB5F691A62A724004C3E90 /* DebugMessageVisualizer.m in Sources */,
+				1CCB5F6A1A62A724004C3E90 /* ExtensionsDialogProvider.h in Sources */,
+				1CCB5F6B1A62A724004C3E90 /* ExtensionsDialogProvider.m in Sources */,
+				1CCB5F6C1A62A724004C3E90 /* ExtensionsManager.h in Sources */,
+				1CCB5F6D1A62A724004C3E90 /* ExtensionsManager.m in Sources */,
+				1CCB5F6E1A62A724004C3E90 /* eyetv.h in Sources */,
+				1CCB5F6F1A62A724004C3E90 /* eyetv.m in Sources */,
+				1CCB5F701A62A724004C3E90 /* fspanel.h in Sources */,
+				1CCB5F711A62A724004C3E90 /* fspanel.m in Sources */,
+				1CCB5F721A62A724004C3E90 /* intf.h in Sources */,
+				1CCB5F731A62A724004C3E90 /* intf.m in Sources */,
+				1CCB5F741A62A724004C3E90 /* macosx.m in Sources */,
+				1CCB5F751A62A724004C3E90 /* MainMenu.h in Sources */,
+				1CCB5F761A62A724004C3E90 /* MainMenu.m in Sources */,
+				1CCB5F771A62A724004C3E90 /* MainWindow.h in Sources */,
+				1CCB5F781A62A724004C3E90 /* MainWindow.m in Sources */,
+				1CCB5F791A62A724004C3E90 /* open.h in Sources */,
+				1CCB5F7A1A62A724004C3E90 /* open.m in Sources */,
+				1CCB5F7B1A62A724004C3E90 /* output.h in Sources */,
+				1CCB5F7C1A62A724004C3E90 /* output.m in Sources */,
+				1CCB5F7D1A62A724004C3E90 /* playlist.h in Sources */,
+				1CCB5F7E1A62A724004C3E90 /* playlist.m in Sources */,
+				1CCB5F7F1A62A724004C3E90 /* playlistinfo.h in Sources */,
+				1CCB5F801A62A724004C3E90 /* playlistinfo.m in Sources */,
+				1CCB5F811A62A724004C3E90 /* prefs_widgets.h in Sources */,
+				1CCB5F821A62A724004C3E90 /* prefs_widgets.m in Sources */,
+				1CCB5F831A62A724004C3E90 /* prefs.h in Sources */,
+				1CCB5F841A62A724004C3E90 /* prefs.m in Sources */,
+				1CCB5F851A62A724004C3E90 /* SharedDialogs.h in Sources */,
+				1CCB5F861A62A724004C3E90 /* SharedDialogs.m in Sources */,
+				1CCB5F871A62A724004C3E90 /* simple_prefs.h in Sources */,
+				1CCB5F881A62A724004C3E90 /* simple_prefs.m in Sources */,
+				1CCB5F891A62A724004C3E90 /* StringUtility.h in Sources */,
+				1CCB5F8A1A62A724004C3E90 /* StringUtility.m in Sources */,
+				1CCB5F8B1A62A724004C3E90 /* TrackSynchronization.h in Sources */,
+				1CCB5F8C1A62A724004C3E90 /* TrackSynchronization.m in Sources */,
+				1CCB5F8D1A62A724004C3E90 /* VideoEffects.h in Sources */,
+				1CCB5F8E1A62A724004C3E90 /* VideoEffects.m in Sources */,
+				1CCB5F8F1A62A724004C3E90 /* VideoView.h in Sources */,
+				1CCB5F901A62A724004C3E90 /* VideoView.m in Sources */,
+				1CCB5F911A62A724004C3E90 /* VLCUIWidgets.h in Sources */,
+				1CCB5F921A62A724004C3E90 /* VLCUIWidgets.m in Sources */,
+				1CCB5F931A62A724004C3E90 /* VLCVoutWindowController.h in Sources */,
+				1CCB5F941A62A724004C3E90 /* VLCVoutWindowController.m in Sources */,
+				1CCB5F951A62A724004C3E90 /* wizard.h in Sources */,
+				1CCB5F961A62A724004C3E90 /* wizard.m in Sources */,
+				1CCB5F971A62A724004C3E90 /* Windows.h in Sources */,
+				1CCB5F981A62A724004C3E90 /* Windows.m in Sources */,
+				1CCB5F991A62A724004C3E90 /* misc.h in Sources */,
+				1CCB5F9A1A62A724004C3E90 /* misc.m in Sources */,
+				1CCB5F9B1A62A724004C3E90 /* MainWindowTitle.h in Sources */,
+				1CCB5F9C1A62A724004C3E90 /* MainWindowTitle.m in Sources */,
+				1CCB5F9D1A62A724004C3E90 /* BWQuincyManager.h in Sources */,
+				1CCB5F9E1A62A724004C3E90 /* BWQuincyManager.m in Sources */,
+				1CCB5F9F1A62A724004C3E90 /* BWQuincyUI.h in Sources */,
+				1CCB5FA01A62A724004C3E90 /* BWQuincyUI.m in Sources */,
+				1CCB5FA11A62A724004C3E90 /* AppleRemote.h in Sources */,
+				1CCB5FA21A62A724004C3E90 /* AppleRemote.m in Sources */,
+				1CCB5FA31A62A724004C3E90 /* SideBarItem.h in Sources */,
+				1CCB5FA41A62A724004C3E90 /* SideBarItem.m in Sources */,
+				1CCB5FA51A62A724004C3E90 /* PXSourceList.h in Sources */,
+				1CCB5FA61A62A724004C3E90 /* PXSourceList.m in Sources */,
+				1CCB5FA71A62A724004C3E90 /* PXSourceListDataSource.h in Sources */,
+				1CCB5FA81A62A724004C3E90 /* PXSourceListDelegate.h in Sources */,
+				1CCB5FA91A62A724004C3E90 /* SPInvocationGrabbing.h in Sources */,
+				1CCB5FAA1A62A724004C3E90 /* SPInvocationGrabbing.m in Sources */,
+				1CCB5FAB1A62A724004C3E90 /* SPMediaKeyTap.h in Sources */,
+				1CCB5FAC1A62A724004C3E90 /* SPMediaKeyTap.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
 /* Begin PBXVariantGroup section */
 		7D3F6523188051F2005776C4 /* BWQuincyMain.xib */ = {
 			isa = PBXVariantGroup;
@@ -3780,6 +4014,132 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		1CCB5F4A1A62A6A5004C3E90 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "pseudo-vlc/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Development;
+		};
+		1CCB5F4B1A62A6A5004C3E90 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "pseudo-vlc/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Deployment;
+		};
+		1CCB5F4C1A62A6A5004C3E90 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "pseudo-vlc/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Default;
+		};
 		C2F2A6EB09588F1B00018C74 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3899,6 +4259,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1CCB5F491A62A6A5004C3E90 /* Build configuration list for PBXNativeTarget "pseudo-vlc" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1CCB5F4A1A62A6A5004C3E90 /* Development */,
+				1CCB5F4B1A62A6A5004C3E90 /* Deployment */,
+				1CCB5F4C1A62A6A5004C3E90 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
