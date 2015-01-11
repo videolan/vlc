@@ -31,6 +31,7 @@ using namespace dash::mpd;
 
 SegmentTimeline::SegmentTimeline()
 {
+    pruned = 0;
 }
 
 SegmentTimeline::~SegmentTimeline()
@@ -70,12 +71,18 @@ uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(time_t scaled) co
             count++;
         }
     }
+    count += pruned;
     return count;
 }
 
 mtime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) const
 {
     mtime_t totalscaledtime = 0;
+
+    if(number < pruned)
+        return 0;
+
+    number -= pruned;
 
     std::list<Element *>::const_iterator it;
     for(it = elements.begin(); it != elements.end(); it++)
@@ -99,6 +106,26 @@ mtime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) c
     }
 
     return totalscaledtime;
+}
+
+size_t SegmentTimeline::prune(mtime_t scaled)
+{
+    size_t prunednow = 0;
+    while(elements.size())
+    {
+        Element *el = elements.front();
+        if(el->t + (el->d * (mtime_t)(el->r + 1)) < scaled)
+        {
+            prunednow += el->r + 1;
+            delete el;
+            elements.pop_front();
+        }
+        else
+            break;
+    }
+
+    pruned += prunednow;
+    return prunednow;
 }
 
 SegmentTimeline::Element::Element(mtime_t d_, uint64_t r_, mtime_t t_)

@@ -41,9 +41,11 @@ namespace dash
                 void addElement(mtime_t d, uint64_t r = 0, mtime_t t = 0);
                 uint64_t getElementNumberByScaledPlaybackTime(time_t) const;
                 mtime_t getScaledPlaybackTimeByElementNumber(uint64_t) const;
+                size_t prune(mtime_t);
 
             private:
                 std::list<Element *> elements;
+                size_t pruned;
 
                 class Element
                 {
