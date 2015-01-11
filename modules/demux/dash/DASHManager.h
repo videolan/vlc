@@ -46,6 +46,7 @@ namespace dash
             int     esCount() const;
             bool    setPosition(mtime_t);
             bool    seekAble() const;
+            bool    updateMPD();
 
         private:
             http::HTTPConnectionManager         *conManager;
@@ -53,6 +54,7 @@ namespace dash
             mpd::MPD                            *mpd;
             stream_t                            *stream;
             Streams::Stream                     *streams[Streams::count];
+            mtime_t                              nextMPDupdate;
     };
 
 }

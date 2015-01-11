@@ -182,6 +182,10 @@ static int Demux(demux_t *p_demux)
             else
                 es_out_Control(p_demux->out, ES_OUT_SET_PCR, pcr);
         }
+
+        if( !p_sys->p_dashManager->updateMPD() )
+            return VLC_DEMUXER_EOF;
+
         return VLC_DEMUXER_SUCCESS;
     }
     else

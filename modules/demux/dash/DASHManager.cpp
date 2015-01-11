@@ -28,8 +28,12 @@
 #endif
 
 #include "DASHManager.h"
+#include "mpd/MPDFactory.h"
+#include "mpd/SegmentTimeline.h"
+#include "xml/DOMParser.h"
 #include "adaptationlogic/AdaptationLogicFactory.h"
 #include "SegmentTracker.hpp"
+#include <vlc_stream.h>
 
 using namespace dash;
 using namespace dash::http;
@@ -41,7 +45,8 @@ DASHManager::DASHManager    ( MPD *mpd,
              conManager     ( NULL ),
              logicType      ( type ),
              mpd            ( mpd ),
-             stream         ( stream )
+             stream         ( stream ),
+             nextMPDupdate  ( 0 )
 {
     for(int i=0; i<Streams::count; i++)
         streams[i] = NULL;
@@ -97,6 +102,7 @@ bool DASHManager::start(demux_t *demux)
         return false;
 
     mpd->playbackStart.Set(time(NULL));
+    nextMPDupdate = mpd->playbackStart.Get();
 
     return true;
 }
@@ -187,5 +193,62 @@ bool DASHManager::seekAble() const
         if(!streams[type]->seekAble())
             return false;
     }
+    return true;
+}
+
+bool DASHManager::updateMPD()
+{
+    if(!mpd->isLive() || !mpd->minUpdatePeriod.Get())
+        return true;
+
+    mtime_t now = time(NULL);
+    if(nextMPDupdate && now < nextMPDupdate)
+        return true;
+
+    /* do update */
+    if(nextMPDupdate)
+    {
+        std::string url(stream->psz_access);
+        url.append("://");
+        url.append(stream->psz_path);
+
+        stream_t *mpdstream = stream_UrlNew(stream, url.c_str());
+        if(!mpdstream)
+            return false;
+
+        xml::DOMParser parser(mpdstream);
+        if(!parser.parse())
+        {
+            stream_Delete(mpdstream);
+            return false;
+        }
+
+        MPD *newmpd = MPDFactory::create(parser.getRootNode(), mpdstream, parser.getProfile());
+        if(newmpd)
+        {
+            mpd->mergeWith(newmpd);
+            delete newmpd;
+        }
+        stream_Delete(mpdstream);
+    }
+
+    /* Compute new MPD update time */
+    mtime_t mininterval = 0;
+    mtime_t maxinterval = 0;
+    mpd->getTimeLinesBoundaries(&mininterval, &maxinterval);
+    if(maxinterval > mininterval)
+        maxinterval = (maxinterval - mininterval) / CLOCK_FREQ;
+    else
+        maxinterval = 60;
+    maxinterval = std::max(maxinterval, (mtime_t)60);
+
+    mininterval = std::max(mpd->minUpdatePeriod.Get(),
+                           mpd->maxSegmentDuration.Get());
+
+    nextMPDupdate = now + (maxinterval - mininterval) / 2;
+
+    msg_Dbg(stream, "Updated MPD, next update in %"PRId64"s (%"PRId64"..%"PRId64")",
+            nextMPDupdate - now, mininterval, maxinterval );
+
     return true;
 }
