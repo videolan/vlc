@@ -976,11 +976,6 @@ static int SessionsSetup( demux_t *p_demux )
                 else if( !strcmp( sub->codecName(), "SPEEX" ) )
                 {
                     tk->fmt.i_codec = VLC_FOURCC( 's', 'p', 'x', 'r' );
-                    if ( tk->fmt.audio.i_rate == 0 )
-                    {
-                        msg_Warn( p_demux,"Using 8kHz as default sample rate." );
-                        tk->fmt.audio.i_rate = 8000;
-                    }
                 }
                 else if( !strcmp( sub->codecName(), "VORBIS" ) )
                 {
