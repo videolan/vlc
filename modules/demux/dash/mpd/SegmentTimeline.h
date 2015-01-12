@@ -43,6 +43,8 @@ namespace dash
                 mtime_t getScaledPlaybackTimeByElementNumber(uint64_t) const;
                 size_t prune(mtime_t);
                 void mergeWith(SegmentTimeline &);
+                mtime_t start() const;
+                mtime_t end() const;
 
             private:
                 std::list<Element *> elements;

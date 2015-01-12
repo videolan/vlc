@@ -135,6 +135,25 @@ Period* MPD::getNextPeriod(Period *period)
     return NULL;
 }
 
+void MPD::getTimeLinesBoundaries(mtime_t *min, mtime_t *max) const
+{
+    *min = *max = 0;
+    for(size_t i = 0; i < periods.size(); i++)
+    {
+        std::vector<SegmentTimeline *> timelines;
+        periods.at(i)->collectTimelines(&timelines);
+
+        for(size_t j = 0; j < timelines.size(); j++)
+        {
+            const SegmentTimeline *timeline = timelines.at(j);
+            if(timeline->start() > *min)
+                *min = timeline->start();
+            if(!*max || timeline->end() < *max)
+                *max = timeline->end();
+        }
+    }
+}
+
 void MPD::mergeWith(MPD *updatedMPD)
 {
     availabilityEndTime.Set(updatedMPD->availabilityEndTime.Get());

@@ -176,6 +176,22 @@ void SegmentTimeline::mergeWith(SegmentTimeline &other)
     }
 }
 
+mtime_t SegmentTimeline::start() const
+{
+    if(elements.empty())
+        return 0;
+    return CLOCK_FREQ * elements.front()->t / inheritTimescale();
+}
+
+mtime_t SegmentTimeline::end() const
+{
+    if(elements.empty())
+        return 0;
+    const Element *last = elements.back();
+    mtime_t scaled = last->t + last->d * (last->r + 1);
+    return CLOCK_FREQ * scaled / inheritTimescale();
+}
+
 SegmentTimeline::Element::Element(mtime_t d_, uint64_t r_, mtime_t t_)
 {
     d = d_;
