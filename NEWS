@@ -15,6 +15,7 @@ Access:
  * Improvements of cookie handling (share cookies between playlist items,
    domain / path matching, Secure cookies)
  * Support DVB-T2 on Windows BDA
+ * Support depayloading Opus from RTP
 
 
 Decoder:
