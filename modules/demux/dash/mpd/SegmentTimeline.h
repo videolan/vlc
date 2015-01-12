@@ -24,6 +24,7 @@
 #ifndef SEGMENTTIMELINE_H
 #define SEGMENTTIMELINE_H
 
+#include "SegmentInfoCommon.h"
 #include <vlc_common.h>
 #include <list>
 
@@ -31,12 +32,12 @@ namespace dash
 {
     namespace mpd
     {
-        class SegmentTimeline
+        class SegmentTimeline : public TimescaleAble
         {
             class Element;
 
             public:
-                SegmentTimeline();
+                SegmentTimeline(TimescaleAble * = NULL);
                 virtual ~SegmentTimeline();
                 void addElement(mtime_t d, uint64_t r = 0, mtime_t t = 0);
                 uint64_t getElementNumberByScaledPlaybackTime(time_t) const;

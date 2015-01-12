@@ -54,7 +54,7 @@ namespace dash
                 void    setAdaptationSets   (dash::xml::Node *periodNode, Period *period);
                 void    setRepresentations  (dash::xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
                 void    parseInitSegment    (dash::xml::Node *, Initializable<Segment> *);
-                void    parseTimeline       (dash::xml::Node *, Timelineable *);
+                void    parseTimeline       (dash::xml::Node *, MediaSegmentTemplate *);
                 void    parsePeriods        (dash::xml::Node *);
                 size_t  parseSegmentInformation(dash::xml::Node *, SegmentInformation *);
                 void    parseSegmentBase    (dash::xml::Node *, SegmentInformation *);

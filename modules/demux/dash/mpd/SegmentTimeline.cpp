@@ -29,7 +29,8 @@
 
 using namespace dash::mpd;
 
-SegmentTimeline::SegmentTimeline()
+SegmentTimeline::SegmentTimeline(TimescaleAble *parent)
+    :TimescaleAble(parent)
 {
     pruned = 0;
 }
@@ -108,8 +109,9 @@ mtime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) c
     return totalscaledtime;
 }
 
-size_t SegmentTimeline::prune(mtime_t scaled)
+size_t SegmentTimeline::prune(mtime_t time)
 {
+    mtime_t scaled = time * inheritTimescale() / CLOCK_FREQ;
     size_t prunednow = 0;
     while(elements.size())
     {

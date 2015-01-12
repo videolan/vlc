@@ -353,12 +353,12 @@ void IsoffMainParser::parseInitSegment(Node *initNode, Initializable<Segment> *i
     init->initialisationSegment.Set(seg);
 }
 
-void IsoffMainParser::parseTimeline(Node *node, Timelineable *timelineable)
+void IsoffMainParser::parseTimeline(Node *node, MediaSegmentTemplate *templ)
 {
     if(!node)
         return;
 
-    SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline();
+    SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(templ);
     if(timeline)
     {
         std::vector<Node *> elements = DOMHelper::getElementByTagName(node, "S", false);
@@ -379,7 +379,7 @@ void IsoffMainParser::parseTimeline(Node *node, Timelineable *timelineable)
             }
             else timeline->addElement(d, r);
 
-            timelineable->segmentTimeline.Set(timeline);
+            templ->segmentTimeline.Set(timeline);
         }
     }
 }
