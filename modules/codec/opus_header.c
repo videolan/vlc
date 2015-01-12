@@ -299,7 +299,7 @@ static int comment_pad(char **comments, size_t *length)
     return 0;
 }
 
-int opus_prepare_header(unsigned channels, unsigned rate, OpusHeader *header)
+void opus_prepare_header(unsigned channels, unsigned rate, OpusHeader *header)
 {
     header->version = 1;
     header->channels = channels;
@@ -309,8 +309,6 @@ int opus_prepare_header(unsigned channels, unsigned rate, OpusHeader *header)
     header->gain = 0; // 0dB
     header->channel_mapping = header->channels > 8 ? 255 :
                               header->channels > 2;
-
-    return 0;
 }
 
 static int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int len)

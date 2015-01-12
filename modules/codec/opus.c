@@ -611,14 +611,8 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     OpusHeader header;
 
-    if (opus_prepare_header(enc->fmt_out.audio.i_channels,
-            enc->fmt_out.audio.i_rate,
-            &header))
-    {
-        msg_Err(enc, "Failed to prepare header.");
-        status = VLC_ENOMEM;
-        goto error;
-    }
+    opus_prepare_header(enc->fmt_out.audio.i_channels,
+            enc->fmt_out.audio.i_rate, &header);
 
     /* needed for max encoded size calculation */
     sys->nb_streams = header.nb_streams;
