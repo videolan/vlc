@@ -868,6 +868,26 @@ libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
     return i_es;
 }
 
+/**************************************************************************
+ * Get codec description from media elementary stream
+ **************************************************************************/
+const char *
+libvlc_media_get_codec_description( libvlc_track_type_t i_type,
+                                    uint32_t i_codec )
+{
+    switch( i_type )
+    {
+        case libvlc_track_audio:
+            return vlc_fourcc_GetDescription( AUDIO_ES, i_codec );
+        case libvlc_track_video:
+            return vlc_fourcc_GetDescription( VIDEO_ES, i_codec );
+        case libvlc_track_text:
+            return vlc_fourcc_GetDescription( SPU_ES, i_codec );
+        case libvlc_track_unknown:
+        default:
+            return vlc_fourcc_GetDescription( UNKNOWN_ES, i_codec );
+    }
+}
 
 /**************************************************************************
  * Release media descriptor's elementary streams description array
