@@ -60,6 +60,18 @@ namespace dash
                 Property<SegmentTimeline *> segmentTimeline;
         };
 
+        class TimescaleAble
+        {
+            public:
+                TimescaleAble( TimescaleAble * = NULL );
+                ~TimescaleAble();
+                uint64_t inheritTimescale() const;
+                Property<uint64_t> timescale;
+
+            private:
+                TimescaleAble *parentTimescale;
+        };
+
         template<class T> class UniqueNess
         {
             public:

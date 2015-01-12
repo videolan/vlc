@@ -39,16 +39,17 @@ namespace dash
 {
     namespace mpd
     {
-        class SegmentList : public SegmentInfoCommon
+        class SegmentInformation;
+
+        class SegmentList : public SegmentInfoCommon,
+                            public TimescaleAble
         {
             public:
-                SegmentList             ( ICanonicalUrl * = NULL );
+                SegmentList             ( SegmentInformation * = NULL );
                 virtual ~SegmentList    ();
 
                 const std::vector<Segment *>&   getSegments() const;
                 void                    addSegment(Segment *seg);
-
-                Property<uint64_t> timescale;
 
             private:
                 std::vector<Segment *>  segments;

@@ -44,12 +44,12 @@ namespace dash
 
         class MediaSegmentTemplate : public BaseSegmentTemplate,
                                      public Initializable<InitSegmentTemplate>,
-                                     public Timelineable
+                                     public Timelineable,
+                                     public TimescaleAble
         {
             public:
-                MediaSegmentTemplate( ICanonicalUrl * = NULL );
+                MediaSegmentTemplate( SegmentInformation * = NULL );
                 Property<size_t>        startNumber;
-                Property<uint64_t>      timescale;
         };
 
         class InitSegmentTemplate : public BaseSegmentTemplate

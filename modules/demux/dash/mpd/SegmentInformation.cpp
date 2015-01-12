@@ -24,30 +24,33 @@
 #include "SegmentList.h"
 #include "SegmentTemplate.h"
 #include "SegmentTimeline.h"
+#include "MPD.h"
 
 using namespace dash::mpd;
 using namespace std;
 
 SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
-    ICanonicalUrl( parent_ )
+    ICanonicalUrl( parent_ ),
+    TimescaleAble( parent_ )
 {
     parent = parent_;
-    segmentBase = NULL;
-    segmentList = NULL;
-    mediaSegmentTemplate = NULL;
-    bitswitch_policy = BITSWITCH_INHERIT;
-    timescale.Set(0);
+    init();
 }
 
-SegmentInformation::SegmentInformation(ICanonicalUrl * parent_) :
-    ICanonicalUrl( parent_ )
+SegmentInformation::SegmentInformation(MPD * parent_) :
+    ICanonicalUrl(parent_),
+    TimescaleAble()
 {
     parent = NULL;
+    init();
+}
+
+void SegmentInformation::init()
+{
     segmentBase = NULL;
     segmentList = NULL;
     mediaSegmentTemplate = NULL;
     bitswitch_policy = BITSWITCH_INHERIT;
-    timescale.Set(0);
 }
 
 SegmentInformation::~SegmentInformation()
@@ -159,24 +162,22 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
 {
     SegmentList *segList;
     MediaSegmentTemplate *mediaTemplate;
-    uint64_t timescale = 0;
+    uint64_t timescale = 1;
     mtime_t duration = 0;
 
     if( (mediaTemplate = inheritSegmentTemplate()) )
     {
-        timescale = mediaTemplate->timescale.Get();
+        timescale = mediaTemplate->inheritTimescale();
         duration = mediaTemplate->duration.Get();
     }
     else if ( (segList = inheritSegmentList()) )
     {
-        timescale = segList->timescale.Get();
+        timescale = segList->inheritTimescale();
         duration = segList->getDuration();
     }
 
     if(duration)
     {
-        if(!timescale)
-            timescale = getTimescale(); /* inherit */
         *ret = time / (CLOCK_FREQ * duration / timescale);
         return true;
     }
@@ -188,11 +189,11 @@ mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) cons
 {
     SegmentList *segList;
     MediaSegmentTemplate *mediaTemplate;
-    uint64_t timescale = 0;
+    uint64_t timescale = 1;
     mtime_t time = 0;
     if( (mediaTemplate = inheritSegmentTemplate()) )
     {
-        timescale = mediaTemplate->timescale.Get();
+        timescale = mediaTemplate->inheritTimescale();
         if(mediaTemplate->segmentTimeline.Get())
         {
             time = mediaTemplate->segmentTimeline.Get()->
@@ -205,16 +206,12 @@ mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) cons
     }
     else if ( (segList = inheritSegmentList()) )
     {
-        timescale = segList->timescale.Get();
+        timescale = segList->inheritTimescale();
         time = number * segList->getDuration();
     }
 
     if(time)
-    {
-        if(!timescale)
-            timescale = getTimescale(); /* inherit */
         time = CLOCK_FREQ * time / timescale;
-    }
 
     return time;
 }
@@ -235,16 +232,6 @@ bool SegmentInformation::canBitswitch() const
         return (parent) ? parent->canBitswitch() : false;
     else
         return (bitswitch_policy == BITSWITCH_YES);
-}
-
-uint64_t SegmentInformation::getTimescale() const
-{
-    if (timescale.Get())
-        return timescale.Get();
-    else if (parent)
-        return parent->getTimescale();
-    else
-        return 1;
 }
 
 mtime_t SegmentInformation::getPeriodStart() const

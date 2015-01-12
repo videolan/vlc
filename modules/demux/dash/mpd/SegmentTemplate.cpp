@@ -49,12 +49,11 @@ Url BaseSegmentTemplate::getUrlSegment() const
     return ret;
 }
 
-MediaSegmentTemplate::MediaSegmentTemplate( ICanonicalUrl *parent ) :
-    BaseSegmentTemplate( parent ), Timelineable()
+MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
+    BaseSegmentTemplate( parent ), Timelineable(), TimescaleAble( parent )
 {
     debugName = "SegmentTemplate";
     classId = Segment::CLASSID_SEGMENT;
-    timescale.Set( 0 );
     startNumber.Set( 0 );
     initialisationSegment.Set( NULL );
 }

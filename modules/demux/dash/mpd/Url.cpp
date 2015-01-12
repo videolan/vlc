@@ -116,9 +116,7 @@ size_t Url::Component::getSegmentNumber(size_t index, const Representation *rep)
             mtime_t streamstart = rep->getMPD()->availabilityStartTime.Get();
             streamstart += rep->getPeriodStart();
             mtime_t duration = templ->duration.Get();
-            uint64_t timescale = templ->timescale.Get() ?
-                                 templ->timescale.Get() :
-                                 rep->getTimescale();
+            uint64_t timescale = templ->inheritTimescale();
             if(duration && timescale)
                 index += (playbackstart - streamstart) * timescale / duration;
         }

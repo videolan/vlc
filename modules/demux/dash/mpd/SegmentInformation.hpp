@@ -28,6 +28,7 @@
 
 #include "ICanonicalUrl.hpp"
 #include "Properties.hpp"
+#include "SegmentInfoCommon.h"
 #include <vlc_common.h>
 #include <vector>
 
@@ -40,19 +41,20 @@ namespace dash
         class SegmentList;
         class SegmentTemplate;
         class SegmentTimeline;
+        class MPD;
 
         /* common segment elements for period/adaptset/rep 5.3.9.1,
          * with properties inheritance */
-        class SegmentInformation : public ICanonicalUrl
+        class SegmentInformation : public ICanonicalUrl,
+                                   public TimescaleAble
         {
             friend class IsoffMainParser;
 
             public:
                 SegmentInformation( SegmentInformation * = 0 );
-                explicit SegmentInformation( ICanonicalUrl * );
+                explicit SegmentInformation( MPD * );
                 virtual ~SegmentInformation();
                 bool canBitswitch() const;
-                uint64_t getTimescale() const;
                 virtual mtime_t getPeriodStart() const;
 
                 class SplitPoint
@@ -82,6 +84,7 @@ namespace dash
                 std::vector<SegmentInformation *> childs;
 
             private:
+                void init();
                 void setSegmentList(SegmentList *);
                 void setSegmentBase(SegmentBase *);
                 void setSegmentTemplate(MediaSegmentTemplate *);
@@ -102,8 +105,6 @@ namespace dash
                     BITSWITCH_YES,
                     BITSWITCH_NO
                 } bitswitch_policy;
-
-                Property<uint64_t> timescale;
         };
     }
 }

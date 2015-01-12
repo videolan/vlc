@@ -28,13 +28,13 @@
 
 #include "SegmentList.h"
 #include "Segment.h"
+#include "SegmentInformation.hpp"
 
 using namespace dash::mpd;
 
-SegmentList::SegmentList( ICanonicalUrl *parent ):
-    SegmentInfoCommon( parent )
+SegmentList::SegmentList( SegmentInformation *parent ):
+    SegmentInfoCommon( parent ), TimescaleAble( parent )
 {
-    timescale.Set(0);
 }
 SegmentList::~SegmentList()
 {
