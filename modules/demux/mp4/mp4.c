@@ -96,6 +96,7 @@ struct demux_sys_t
         mp4_fragment_t *p_fragment;
         uint32_t        i_current_box_type;
         uint32_t        i_mdatbytesleft;
+        uint32_t        i_lastseqnumber;
     } context;
 
     /* */
@@ -591,6 +592,8 @@ static int Open( vlc_object_t * p_this )
     /*Set exported functions */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
+
+    p_sys->context.i_lastseqnumber = 1;
 
     p_demux->p_sys = p_sys;
 
@@ -5034,19 +5037,14 @@ static int DemuxAsLeaf( demux_t *p_demux )
                     return 1;
                 }
 
-                if( p_sys->b_dash && p_sys->moovfragment.p_moox && p_sys->moovfragment.p_next )
+                MP4_Box_t *p_mfhd = MP4_BoxGet( p_fragbox, "mfhd" );
+                if( p_mfhd && BOXDATA(p_mfhd) )
                 {
                     /* Detect and Handle Passive Seek */
-                    mp4_fragment_t *lastfrag = p_sys->moovfragment.p_next;
-                    while(lastfrag->p_next)
-                        lastfrag = lastfrag->p_next;
-                    MP4_Box_t *p_mfhd = MP4_BoxGet( p_fragbox, "mfhd" );
-                    MP4_Box_t *p_prevmfhd = MP4_BoxGet( lastfrag->p_moox, "mfhd" );
-                    if( p_mfhd && p_prevmfhd &&
-                        BOXDATA(p_mfhd)->i_sequence_number != p_prevmfhd->data.p_mfhd->i_sequence_number + 1 )
+                    if( p_sys->context.i_lastseqnumber + 1 != BOXDATA(p_mfhd)->i_sequence_number )
                     {
-                        msg_Info( p_demux, "Passive DASH Seek detected %"PRIu32" %"PRIu32,
-                                  BOXDATA(p_mfhd)->i_sequence_number, p_prevmfhd->data.p_mfhd->i_sequence_number + 1 );
+                        msg_Info( p_demux, "Fragment sequence discontinuity detected %"PRIu32" != %"PRIu32,
+                                  BOXDATA(p_mfhd)->i_sequence_number, p_sys->context.i_lastseqnumber + 1 );
                         MP4_Box_t *p_sidx = MP4_BoxGet( p_vroot, "sidx" );
                         if( p_sidx && BOXDATA(p_sidx) && BOXDATA(p_sidx)->i_timescale )
                         {
@@ -5062,6 +5060,7 @@ static int DemuxAsLeaf( demux_t *p_demux )
                             p_sys->i_pcr  = VLC_TS_INVALID;
                         }
                     }
+                    p_sys->context.i_lastseqnumber = BOXDATA(p_mfhd)->i_sequence_number;
                 }
 
                 /* detach */
