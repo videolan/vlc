@@ -60,7 +60,7 @@ namespace dash
                 virtual Period*                         getFirstPeriod();
                 virtual Period*                         getNextPeriod(Period *period);
 
-                void                mergeWith(MPD *);
+                void                mergeWith(MPD *, mtime_t = 0);
                 void                getTimeLinesBoundaries(mtime_t *, mtime_t *) const;
 
                 Property<time_t>                    duration;

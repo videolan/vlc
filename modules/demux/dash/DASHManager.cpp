@@ -223,10 +223,20 @@ bool DASHManager::updateMPD()
             return false;
         }
 
+        mtime_t minsegmentTime = 0;
+        for(int type=0; type<Streams::count; type++)
+        {
+            if(!streams[type])
+                continue;
+            mtime_t segmentTime = streams[type]->getPosition();
+            if(!minsegmentTime || segmentTime < minsegmentTime)
+                minsegmentTime = segmentTime;
+        }
+
         MPD *newmpd = MPDFactory::create(parser.getRootNode(), mpdstream, parser.getProfile());
         if(newmpd)
         {
-            mpd->mergeWith(newmpd);
+            mpd->mergeWith(newmpd, minsegmentTime);
             delete newmpd;
         }
         stream_Delete(mpdstream);

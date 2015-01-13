@@ -57,6 +57,7 @@ namespace dash
             void resetCounter();
             http::Chunk* getNextChunk(Streams::Type);
             bool setPosition(mtime_t, bool);
+            mtime_t getSegmentStart() const;
 
         private:
             bool initializing;

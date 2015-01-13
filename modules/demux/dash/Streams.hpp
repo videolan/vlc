@@ -56,6 +56,7 @@ namespace dash
                 bool seekAble() const;
                 size_t read(http::HTTPConnectionManager *);
                 bool setPosition(mtime_t, bool);
+                mtime_t getPosition() const;
 
             private:
                 http::Chunk *getChunk();

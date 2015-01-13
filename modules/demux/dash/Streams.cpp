@@ -223,6 +223,11 @@ bool Stream::setPosition(mtime_t time, bool tryonly)
     return ret;
 }
 
+mtime_t Stream::getPosition() const
+{
+    return segmentTracker->getSegmentStart();
+}
+
 AbstractStreamOutput::AbstractStreamOutput(demux_t *demux)
 {
     realdemux = demux;

@@ -154,7 +154,7 @@ void MPD::getTimeLinesBoundaries(mtime_t *min, mtime_t *max) const
     }
 }
 
-void MPD::mergeWith(MPD *updatedMPD)
+void MPD::mergeWith(MPD *updatedMPD, mtime_t prunebarrier)
 {
     availabilityEndTime.Set(updatedMPD->availabilityEndTime.Get());
     /* Only merge timelines for now */
@@ -166,6 +166,10 @@ void MPD::mergeWith(MPD *updatedMPD)
         updatedMPD->periods.at(i)->collectTimelines(&timelinesUpdate);
 
         for(size_t j = 0; j < timelines.size() && j < timelinesUpdate.size(); j++)
+        {
             timelines.at(j)->mergeWith(*timelinesUpdate.at(j));
+            if(prunebarrier)
+                timelines.at(j)->prune(prunebarrier);
+        }
     }
 }

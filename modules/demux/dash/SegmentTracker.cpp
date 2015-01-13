@@ -108,3 +108,11 @@ bool SegmentTracker::setPosition(mtime_t time, bool tryonly)
     }
     return false;
 }
+
+mtime_t SegmentTracker::getSegmentStart() const
+{
+    if(prevRepresentation)
+        return prevRepresentation->getPlaybackTimeBySegmentNumber(count);
+    else
+        return 0;
+}
