@@ -2135,9 +2135,10 @@ int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET4BYTES( p_box->data.p_sample_vide->i_qt_data_size );
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_qt_frame_count );
 
-    if ( i_read < 32 )
+    if ( i_read < 32 || p_peek[0] > 31 ) // Pascal String
         MP4_READBOX_EXIT( 0 );
-    memcpy( &p_box->data.p_sample_vide->i_compressorname, p_peek, 32 );
+    memcpy( &p_box->data.p_sample_vide->sz_compressorname, &p_peek[1], p_peek[0] );
+    p_box->data.p_sample_vide->sz_compressorname[p_peek[0]] = 0;
     p_peek += 32; i_read -= 32;
 
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_depth );
@@ -2156,10 +2157,11 @@ int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"vide\" in stsd %dx%d depth %d",
+    msg_Dbg( p_stream, "read box: \"vide\" in stsd %dx%d depth %d (%s)",
                       p_box->data.p_sample_vide->i_width,
                       p_box->data.p_sample_vide->i_height,
-                      p_box->data.p_sample_vide->i_depth );
+                      p_box->data.p_sample_vide->i_depth,
+                      p_box->data.p_sample_vide->sz_compressorname );
 
 #endif
     MP4_READBOX_EXIT( 1 );

@@ -608,7 +608,7 @@ typedef struct MP4_Box_data_sample_vide_s
     uint32_t i_qt_data_size;
     uint16_t i_qt_frame_count;
 
-    uint8_t  i_compressorname[32];
+    char     sz_compressorname[32];
     int16_t  i_depth;
 
     int16_t  i_qt_color_table;
