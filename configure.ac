@@ -629,8 +629,8 @@ AC_SEARCH_LIBS(connect, [socket], [
 ])
 
 AC_SEARCH_LIBS([inet_pton], [nsl], [
- AS_IF([test "$ac_cv_search_getaddrinfo" != "none required"], [
-    SOCKET_LIBS="$ac_cv_search_getaddrinfo $SOCKET_LIBS"
+ AS_IF([test "$ac_cv_search_inet_pton" != "none required"], [
+    SOCKET_LIBS="$ac_cv_search_inet_pton $SOCKET_LIBS"
   ])
 ],, [${SOCKET_LIBS}])
 
