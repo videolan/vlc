@@ -165,6 +165,7 @@
 #define ATOM_in32 VLC_FOURCC( 'i', 'n', '3', '2' )
 #define ATOM_fl32 VLC_FOURCC( 'f', 'l', '3', '2' )
 #define ATOM_fl64 VLC_FOURCC( 'f', 'l', '6', '4' )
+#define ATOM_Opus VLC_FOURCC( 'O', 'p', 'u', 's' )
 
 #define ATOM_zlib VLC_FOURCC( 'z', 'l', 'i', 'b' )
 #define ATOM_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
@@ -208,6 +209,7 @@
 #define ATOM_dv5n VLC_FOURCC( 'd', 'v', '5', 'n' )
 #define ATOM_dv5p VLC_FOURCC( 'd', 'v', '5', 'p' )
 #define ATOM_raw  VLC_FOURCC( 'r', 'a', 'w', ' ' )
+#define ATOM_dOps VLC_FOURCC( 'd', 'O', 'p', 's' )
 
 #define ATOM_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
 

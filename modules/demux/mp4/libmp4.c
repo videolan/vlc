@@ -3750,9 +3750,11 @@ static const struct
     { ATOM_OggS,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun, ATOM_stsd },
     { ATOM_alac,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun, ATOM_stsd },
     { ATOM_WMA2,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun, ATOM_stsd }, /* flip4mac */
+    { ATOM_Opus,    MP4_ReadBox_sample_soun,  MP4_FreeBox_sample_soun, ATOM_stsd },
     /* Sound extensions */
     { ATOM_chan,    MP4_ReadBox_stsdext_chan, MP4_FreeBox_stsdext_chan, 0 },
     { ATOM_WMA2,    MP4_ReadBox_WMA2,         MP4_FreeBox_WMA2,        ATOM_wave }, /* flip4mac */
+    { ATOM_dOps,    MP4_ReadBox_Binary,       MP4_FreeBox_Binary,      ATOM_Opus },
 
     { ATOM_drmi,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
     { ATOM_vide,    MP4_ReadBox_sample_vide,  MP4_FreeBox_sample_vide, ATOM_stsd },
