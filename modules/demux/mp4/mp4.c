@@ -515,6 +515,8 @@ static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_b
                              p_track->fmt.i_codec );
     }
 
+    p_block->i_flags |= p_track->i_block_flags;
+
     /* ASF packets in mov */
     if( p_track->p_asf )
     {

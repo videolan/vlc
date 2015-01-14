@@ -221,6 +221,12 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         p_track->fmt.video.i_sar_den = BOXDATA(p_pasp)->i_vertical_spacing;
     }
 
+    const MP4_Box_t *p_fiel = MP4_BoxGet( p_sample, "fiel" );
+    if( p_fiel && BOXDATA(p_fiel) )
+    {
+        p_track->i_block_flags = BOXDATA(p_fiel)->i_flags;
+    }
+
     /* now see if esds is present and if so create a data packet
         with decoder_specific_info  */
     MP4_Box_t *p_esds = MP4_BoxGet( p_sample, "esds" );
