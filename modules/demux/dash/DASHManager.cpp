@@ -21,11 +21,18 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#define __STDC_CONSTANT_MACROS
+
+/* config.h may include inttypes.h, so make sure we define that option
+ * early enough. */
+#define __STDC_FORMAT_MACROS 1
+#define __STDC_CONSTANT_MACROS 1
+#define __STDC_LIMIT_MACROS 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <inttypes.h>
 
 #include "DASHManager.h"
 #include "mpd/MPDFactory.h"
