@@ -199,6 +199,7 @@
 #define ATOM_avcC VLC_FOURCC( 'a', 'v', 'c', 'C' )
 #define ATOM_m4ds VLC_FOURCC( 'm', '4', 'd', 's' )
 
+#define ATOM_fiel VLC_FOURCC( 'f', 'i', 'e', 'l' )
 #define ATOM_glbl VLC_FOURCC( 'g', 'l', 'b', 'l' )
 #define ATOM_hvcC VLC_FOURCC( 'h', 'v', 'c', 'C' )
 
@@ -1226,6 +1227,11 @@ typedef struct
 
 typedef struct
 {
+    uint32_t i_flags;
+} MP4_Box_data_fiel_t;
+
+typedef struct
+{
     uint16_t i_little_endian;
 
 } MP4_Box_data_enda_t;
@@ -1414,6 +1420,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_dac3_t *p_dac3;
     MP4_Box_data_dec3_t *p_dec3;
     MP4_Box_data_dvc1_t *p_dvc1;
+    MP4_Box_data_fiel_t *p_fiel;
     MP4_Box_data_chan_t *p_chan;
     MP4_Box_data_enda_t *p_enda;
     MP4_Box_data_keys_t *p_keys;

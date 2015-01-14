@@ -1871,6 +1871,30 @@ static int MP4_ReadBox_dvc1( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_fiel( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_Box_data_fiel_t *p_fiel;
+    MP4_READBOX_ENTER( MP4_Box_data_fiel_t );
+    p_fiel = p_box->data.p_fiel;
+    if(i_read < 2)
+        MP4_READBOX_EXIT( 0 );
+    if(p_peek[0] == 2) /* Interlaced */
+    {
+        /*
+         * 0 – There is only one field.
+         * 1 – T is displayed earliest, T is stored first in the file.
+         * 6 – B is displayed earliest, B is stored first in the file.
+         * 9 – B is displayed earliest, T is stored first in the file.
+         * 14 – T is displayed earliest, B is stored first in the file.
+        */
+        if(p_peek[1] == 1 || p_peek[1] == 9)
+            p_fiel->i_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
+        else if(p_peek[1] == 6 || p_peek[1] == 14)
+            p_fiel->i_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+    }
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_enda( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_Box_data_enda_t *p_enda;
@@ -3673,6 +3697,7 @@ static const struct
     { ATOM_dac3,    MP4_ReadBox_dac3,         MP4_FreeBox_Common, 0 },
     { ATOM_dec3,    MP4_ReadBox_dec3,         MP4_FreeBox_Common, 0 },
     { ATOM_dvc1,    MP4_ReadBox_dvc1,         MP4_FreeBox_Common, 0 },
+    { ATOM_fiel,    MP4_ReadBox_fiel,         MP4_FreeBox_Common, 0 },
     { ATOM_glbl,    MP4_ReadBox_Binary,       MP4_FreeBox_Binary, ATOM_FFV1 },
     { ATOM_enda,    MP4_ReadBox_enda,         MP4_FreeBox_Common, 0 },
     { ATOM_iods,    MP4_ReadBox_iods,         MP4_FreeBox_Common, 0 },
