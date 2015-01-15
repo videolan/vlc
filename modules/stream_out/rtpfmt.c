@@ -1626,11 +1626,14 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
 
         int i_payload = __MIN( i_data, (int)(rtp_mtu (id) - hdr_size) );
         if ( i_payload <= 0 )
-            return VLC_EGENERIC;
+            goto error;
 
         block_t *out = block_Alloc( 12 + hdr_size + i_payload );
         if( out == NULL )
+        {
+            block_Release( in );
             return VLC_ENOMEM;
+        }
 
         uint8_t *p = out->p_buffer + 12;
         /* set main header */
