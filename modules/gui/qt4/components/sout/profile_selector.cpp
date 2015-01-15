@@ -77,7 +77,7 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
 
     CONNECT( profileBox, activated( int ),
              this, updateOptions( int ) );
-    updateOptions( 0 );
+    updateOptions( qMax(profileBox->currentIndex(), 0) );
 }
 
 VLCProfileSelector::~VLCProfileSelector()
