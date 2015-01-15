@@ -157,7 +157,7 @@ void ConvertDialog::fileBrowse()
     QString fileName = QFileDialog::getSaveFileName( this, qtr( "Save file..." ),
         p_intf->p_sys->filepath,
         QString( "%1 (*%2);;%3 (*.*)" ).arg( qtr( "Containers" ) )
-            .arg( fileExtension ).arg( qtr("All") ) );
+            .arg( fileExtension ).arg( qtr("All") ), 0, QFileDialog::DontConfirmOverwrite );
     fileLine->setText( toNativeSeparators( fileName ) );
     setDestinationFileExtension();
 }
