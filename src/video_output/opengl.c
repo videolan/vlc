@@ -130,7 +130,7 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
         *wp = surface;
 
     /* TODO: support ES? */
-    vlc_gl_t *gl = vlc_gl_Create(surface, VLC_OPENGL, "glx");
+    vlc_gl_t *gl = vlc_gl_Create(surface, VLC_OPENGL, NULL);
     if (gl == NULL) {
         vout_window_Delete(surface);
         return NULL;
