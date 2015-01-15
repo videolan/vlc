@@ -214,7 +214,7 @@ static void bo_add_24be (bo_t *, uint32_t);
 static void bo_add_32be (bo_t *, uint32_t);
 static void bo_add_64be (bo_t *, uint64_t);
 static void bo_add_fourcc(bo_t *, const char *);
-static void bo_add_mem  (bo_t *, int , uint8_t *);
+static void bo_add_mem  (bo_t *, int , const uint8_t *);
 static void bo_add_descr(bo_t *, uint8_t , uint32_t);
 
 static void bo_fix_32be (bo_t *, int , uint32_t);
@@ -2280,7 +2280,7 @@ static void bo_add_fourcc(bo_t *p_bo, const char *fcc)
     bo_add_8(p_bo, fcc[3]);
 }
 
-static void bo_add_mem(bo_t *p_bo, int i_size, uint8_t *p_mem)
+static void bo_add_mem(bo_t *p_bo, int i_size, const uint8_t *p_mem)
 {
     for (int i = 0; i < i_size; i++)
         bo_add_8(p_bo, p_mem[i]);
