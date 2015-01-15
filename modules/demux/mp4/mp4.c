@@ -3080,7 +3080,7 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
             }
         }
 
-        /* uncompressed v0 */
+        /* uncompressed v0 (qt) or... not (ISO) */
         *pi_nb_samples = 0;
         for( uint32_t i=p_track->i_sample;
              i<p_chunk->i_sample_first+p_chunk->i_sample_count &&
@@ -3092,6 +3092,14 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
                 i_size += p_track->p_sample_size[i];
             else
                 i_size += p_track->i_sample_size;
+
+            /* Try to detect compression in ISO */
+            if(p_soun->i_compressionid != 0)
+            {
+                /* Return only 1 sample */
+                break;
+            }
+
             if ( *pi_nb_samples == QT_V0_MAX_SAMPLES )
                 break;
         }
