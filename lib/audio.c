@@ -146,7 +146,7 @@ libvlc_audio_output_device_enum( libvlc_media_player_t *mp )
     if( aout == NULL )
         return NULL;
 
-    libvlc_audio_output_device_t *list = NULL, **pp = &list;
+    libvlc_audio_output_device_t *list, **pp = &list;
     char **values, **texts;
 
     int n = aout_DevicesList( aout, &values, &texts );
@@ -173,6 +173,7 @@ libvlc_audio_output_device_enum( libvlc_media_player_t *mp )
     free( texts );
     free( values );
 err:
+    *pp = NULL;
     return list;
 }
 
