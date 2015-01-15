@@ -41,6 +41,7 @@ class VLCProfileSelector : public QWidget
 
 public:
     VLCProfileSelector( QWidget *_parent );
+    ~VLCProfileSelector();
     QString getMux() { return mux; }
     QString getTranscode() { return transcode; }
 private:

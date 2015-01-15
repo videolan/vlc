@@ -80,6 +80,19 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
     updateOptions( 0 );
 }
 
+VLCProfileSelector::~VLCProfileSelector()
+{
+    QSettings settings(
+#ifdef _WIN32
+            QSettings::IniFormat,
+#else
+            QSettings::NativeFormat,
+#endif
+            QSettings::UserScope, "vlc", "vlc-qt-interface" );
+    ;
+    settings.setValue( "codecs-profiles-selected", profileBox->currentText() );
+}
+
 inline void VLCProfileSelector::fillProfilesCombo()
 {
     QSettings settings(
@@ -108,6 +121,11 @@ inline void VLCProfileSelector::fillProfilesCombo()
         }
     }
     settings.endArray();
+
+    profileBox->setCurrentIndex(
+        profileBox->findText(
+            settings.value( "codecs-profiles-selected" ).toString() ));
+
 }
 
 void VLCProfileSelector::newProfile()
