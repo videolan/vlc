@@ -456,7 +456,7 @@ static int64_t vlc_timegm( int i_year, int i_month, int i_mday, int i_hour, int 
         return -1;
 
     /* Count the number of days */
-    i_day = 365 * (i_year-70) + pn_day[i_month] + i_mday - 1;
+    i_day = (int64_t)365 * (i_year-70) + pn_day[i_month] + i_mday - 1;
 #define LEAP(y) ( ((y)%4) == 0 && (((y)%100) != 0 || ((y)%400) == 0) ? 1 : 0)
     for( int i = 70; i < i_year; i++ )
         i_day += LEAP(1900+i);
