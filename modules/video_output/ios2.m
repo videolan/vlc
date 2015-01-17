@@ -100,7 +100,7 @@ struct vout_display_sys_t
 {
     VLCOpenGLES2VideoView *glESView;
     UIView* viewContainer;
-    UITapGestureRecognizer *tapRecognizer;
+    UILongPressGestureRecognizer *longTouchRecognizer;
 
     vlc_gl_t gl;
     vout_display_opengl_t *vgl;
@@ -159,16 +159,16 @@ static int Open(vlc_object_t *this)
                                       waitUntilDone:YES];
 
     /* add tap gesture recognizer for DVD menus and stuff */
-    sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:sys->glESView
-                                                                 action:@selector(tapRecognized:)];
-    sys->tapRecognizer.numberOfTapsRequired = 2;
+    sys->longTouchRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:sys->glESView
+                                                                             action:@selector(longTouchRecognized:)];
+    sys->longTouchRecognizer.allowableMovement = 20.;
     if (sys->viewContainer.window) {
         if (sys->viewContainer.window.rootViewController) {
             if (sys->viewContainer.window.rootViewController.view)
-                [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
+                [sys->viewContainer.superview addGestureRecognizer:sys->longTouchRecognizer];
         }
     }
-    sys->tapRecognizer.cancelsTouchesInView = NO;
+    sys->longTouchRecognizer.cancelsTouchesInView = YES;
 
     /* Initialize common OpenGL video display */
     sys->gl.lock = OpenglESClean;
@@ -232,9 +232,9 @@ void Close (vlc_object_t *this)
     vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->tapRecognizer) {
-        [sys->glESView removeGestureRecognizer:sys->tapRecognizer];
-        [sys->tapRecognizer release];
+    if (sys->longTouchRecognizer) {
+        [sys->glESView removeGestureRecognizer:sys->longTouchRecognizer];
+        [sys->longTouchRecognizer release];
     }
 
     [sys->glESView setVoutDisplay:nil];
@@ -504,10 +504,10 @@ static void OpenglESSwap(vlc_gl_t *gl)
     glViewport(place.x, place.y, place.width, place.height);
 }
 
-- (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
+- (void)longTouchRecognized:(UITapGestureRecognizer *)longTouchRecognizer
 {
-    UIGestureRecognizerState state = [tapRecognizer state];
-    CGPoint touchPoint = [tapRecognizer locationInView:self];
+    UIGestureRecognizerState state = [longTouchRecognizer state];
+    CGPoint touchPoint = [longTouchRecognizer locationInView:self];
     CGFloat scaleFactor = self.contentScaleFactor;
     vout_display_SendMouseMovedDisplayCoordinates(_voutDisplay, ORIENT_NORMAL,
                                                   (int)touchPoint.x * scaleFactor, (int)touchPoint.y * scaleFactor,
