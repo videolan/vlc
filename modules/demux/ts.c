@@ -355,6 +355,7 @@ struct demux_sys_t
     bool        b_split_es;
 
     bool        b_trust_pcr;
+    bool        b_disable_pcr;
 
     /* */
     bool        b_access_control;
@@ -369,6 +370,13 @@ struct demux_sys_t
     /* */
     int         i_current_program;
     vlc_list_t  programs_list;
+
+    struct
+    {
+        /* broken PCR handling */
+        bool        b_program_pcr_seen;
+        mtime_t     i_first_dts;
+    } pcrfix;
 
     /* */
     bool        b_start_record;
@@ -406,6 +414,7 @@ static void GetFirstPCR( demux_t *p_demux );
 static void GetLastPCR( demux_t *p_demux );
 static void CheckPCR( demux_t *p_demux );
 static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
+static void PCRFixHandle( demux_t *, block_t * );
 
 static void              IODFree( iod_descriptor_t * );
 
@@ -1402,6 +1411,8 @@ static void SetPrgFilter( demux_t *p_demux, int i_prg_id, bool b_selected )
     ts_prg_psi_t *p_prg = NULL;
     int i_pmt_pid = -1;
 
+    p_sys->b_disable_pcr = !p_sys->b_trust_pcr;
+
     /* Search pmt to be unselected */
     for( int i = 0; i < p_sys->i_pmt; i++ )
     {
@@ -1916,7 +1927,9 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                         block_Duplicate( p_block ) );
             }
 
-            if (!p_sys->b_trust_pcr && p_block->i_dts > VLC_TS_INVALID )
+            PCRFixHandle( p_demux, p_block );
+
+            if ( p_sys->b_disable_pcr && p_block->i_dts > VLC_TS_INVALID )
                 es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
                         pid->i_owner_number, p_block->i_dts);
 
@@ -1978,6 +1991,8 @@ static void ParseTableSection( demux_t *p_demux, ts_pid_t *pid, block_t *p_data 
         p_content->i_pts = VLC_TS_0 + i_date * 100 / 9;
     }
     es_out_Send( p_demux->out, pid->es->id, p_content );
+
+    PCRFixHandle( p_demux, p_content );
 }
 static void ParseData( demux_t *p_demux, ts_pid_t *pid )
 {
@@ -2221,6 +2236,7 @@ static int Seek( demux_t *p_demux, double f_percent )
     else
     {
         msg_Dbg( p_demux, "Seek():can find a time position. i_cnt:%d", i_cnt );
+        p_demux->p_sys->pcrfix.i_first_dts = 0;
         return VLC_SUCCESS;
     }
 }
@@ -2369,6 +2385,9 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                 {
                     p_prg->i_pcr_value = i_pcr; /* ? update PCR for the whole group program */
                     i_group = p_prg->i_number;
+                    p_sys->pcrfix.b_program_pcr_seen = true;
+                    p_sys->pcrfix.i_first_dts = 0;
+                    p_sys->b_disable_pcr = false;
                 }
                 else
                 {
@@ -2383,12 +2402,36 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                 {
                     p_prg->i_pcr_value = i_pcr;
                     i_group = p_prg->i_number; /* We've found a target group for update */
+                    p_sys->pcrfix.b_program_pcr_seen = true;
+                    p_sys->pcrfix.i_first_dts = 0;
+                    p_sys->b_disable_pcr = false;
                 }
             }
         }
-        if ( p_sys->b_trust_pcr && i_group > 0 && p_sys->i_pmt_es )
+        if ( !p_sys->b_disable_pcr && i_group > 0 && p_sys->i_pmt_es )
+        {
             es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
               i_group, VLC_TS_0 + i_pcr * 100 / 9 );
+        }
+    }
+}
+
+static void PCRFixHandle( demux_t *p_demux, block_t *p_block )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    /* Record the first data packet timestamp in case there wont be any PCR */
+    if( !p_sys->pcrfix.b_program_pcr_seen && !p_sys->b_disable_pcr )
+    {
+        if( !p_sys->pcrfix.i_first_dts )
+        {
+            p_sys->pcrfix.i_first_dts = p_block->i_dts;
+        }
+        else if( p_block->i_dts - p_sys->pcrfix.i_first_dts > CLOCK_FREQ / 10 ) /* "shall not exceed 100ms" */
+        {
+            p_sys->b_disable_pcr = true;
+            msg_Warn( p_demux, "No PCR received for program %d, set up workaround",
+                      p_sys->i_current_program );
+        }
     }
 }
 
