@@ -2363,18 +2363,37 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
         for( int i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
         {
-            if( pid->i_pid == p_sys->pmt[i]->psi->prg[i_prg]->i_pid_pcr )
+            ts_prg_psi_t *p_prg = p_sys->pmt[i]->psi->prg[i_prg];
+
+            if( p_prg->i_pid_pcr == 0x1FFF ) /* That program has no dedicated PCR pid ISO/IEC 13818-1 2.4.4.9 */
             {
-                /* We've found our target group */
-                p_sys->pmt[i]->psi->prg[i_prg]->i_pcr_value = i_pcr;
-                i_group = p_sys->pmt[i]->psi->prg[i_prg]->i_number;
-                for( int j = 0; j < 8192; j++ )
+                if( pid->p_owner ) /* PCR shall be on pid itself */
                 {
-                    const ts_pid_t *pid = &p_sys->pid[j];
-                    if( pid->b_valid && pid->p_owner == p_sys->pmt[i]->psi && pid->es )
+                    p_prg->i_pcr_value = i_pcr; /* ? update PCR for the whole group program */
+                    i_group = p_prg->i_number;
+                    b_pmt_has_es = pid->es;
+                }
+                else
+                {
+                    msg_Warn(p_demux, "discarding PCR update from pid %d which has no owner", pid->i_pid);
+                }
+                break;
+            }
+            else /* set PCR provided by current pid to program(s) referencing it */
+            {
+                /* Can be dedicated PCR pid (no owned then) or another pid (owner == pmt) */
+                if( p_prg->i_pid_pcr == pid->i_pid ) /* If that program references current pid as PCR */
+                {
+                    p_prg->i_pcr_value = i_pcr;
+                    i_group = p_prg->i_number; /* We've found a target group for update */
+                    for( int j = 0; j < 8192; j++ )
                     {
-                        b_pmt_has_es = true;
-                        break;
+                        const ts_pid_t *pid = &p_sys->pid[j];
+                        if( pid->b_valid && pid->p_owner == p_sys->pmt[i]->psi && pid->es )
+                        {
+                            b_pmt_has_es = true;
+                            break;
+                        }
                     }
                 }
             }
