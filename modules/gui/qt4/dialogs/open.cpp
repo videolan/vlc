@@ -395,6 +395,9 @@ void OpenDialog::stream( bool b_transcode_only )
 //    QString soutMRL = getMRL( false );
 //    if( soutMRL.isEmpty() ) return;
 
+    for( int i = 0; i < OPEN_TAB_MAX; i++ )
+        qobject_cast<OpenPanel*>( ui.Tab->widget( i ) )->onAccept();
+
     QStringList soutMRLS = getMRLs(false);
     if(soutMRLS.empty())
     {
