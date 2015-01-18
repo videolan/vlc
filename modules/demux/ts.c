@@ -2359,8 +2359,6 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     int i_group = -1;
     for( int i = 0; i < p_sys->i_pmt && i_group < 0 ; i++ )
     {
-        bool b_pmt_has_es = false;
-
         for( int i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
         {
             ts_prg_psi_t *p_prg = p_sys->pmt[i]->psi->prg[i_prg];
@@ -2371,7 +2369,6 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                 {
                     p_prg->i_pcr_value = i_pcr; /* ? update PCR for the whole group program */
                     i_group = p_prg->i_number;
-                    b_pmt_has_es = pid->es;
                 }
                 else
                 {
@@ -2386,20 +2383,10 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                 {
                     p_prg->i_pcr_value = i_pcr;
                     i_group = p_prg->i_number; /* We've found a target group for update */
-                    for( int j = 0; j < 8192; j++ )
-                    {
-                        const ts_pid_t *pid = &p_sys->pid[j];
-                        if( pid->b_valid && pid->p_owner == p_sys->pmt[i]->psi && pid->es )
-                        {
-                            b_pmt_has_es = true;
-                            break;
-                        }
-                    }
                 }
             }
         }
-
-        if ( p_sys->b_trust_pcr && i_group > 0 && b_pmt_has_es )
+        if ( p_sys->b_trust_pcr && i_group > 0 && p_sys->i_pmt_es )
             es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
               i_group, VLC_TS_0 + i_pcr * 100 / 9 );
     }
