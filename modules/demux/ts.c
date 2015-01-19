@@ -2392,7 +2392,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                     i_group = p_prg->i_number;
                     p_sys->pcrfix.b_program_pcr_seen = true;
                     p_sys->pcrfix.i_first_dts = 0;
-                    p_sys->b_disable_pcr = false;
+                    p_sys->b_disable_pcr = !p_sys->b_trust_pcr;
                 }
                 else
                 {
@@ -2409,7 +2409,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                     i_group = p_prg->i_number; /* We've found a target group for update */
                     p_sys->pcrfix.b_program_pcr_seen = true;
                     p_sys->pcrfix.i_first_dts = 0;
-                    p_sys->b_disable_pcr = false;
+                    p_sys->b_disable_pcr = !p_sys->b_trust_pcr;
                 }
             }
         }
