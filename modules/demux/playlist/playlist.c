@@ -154,7 +154,16 @@ vlc_module_end ()
 
 int Control(demux_t *demux, int query, va_list args)
 {
-    (void) demux; (void) query; (void) args;
+    (void) demux;
+    switch( query )
+    {
+        case DEMUX_IS_PLAYLIST:
+        {
+            bool *pb_bool = (bool*)va_arg( args, bool * );
+            *pb_bool = true;
+            return VLC_SUCCESS;
+        }
+    }
     return VLC_EGENERIC;
 }
 
