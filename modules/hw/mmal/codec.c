@@ -38,10 +38,6 @@
 
 #include "mmal_picture.h"
 
-/* We need a smaller size of available buffer headers than actual buffers
- * in the decoder to avoid stalls. MMAL seems a a bit picky here */
-#define NUM_OPAQUE_BUFFER_HEADERS (NUM_ACTUAL_OPAQUE_BUFFERS - 2)
-
 /* These are only required when combined with image_fx filter. But as they
  * won't do much harm besides using a few MB GPU memory, keep them always on
  */
@@ -318,13 +314,12 @@ static int change_output_format(decoder_t *dec)
 
     if (sys->opaque) {
         sys->output->buffer_num = NUM_ACTUAL_OPAQUE_BUFFERS;
-        pool_size = NUM_OPAQUE_BUFFER_HEADERS;
     } else {
         sys->output->buffer_num = __MAX(sys->output->buffer_num_recommended,
                 MIN_NUM_BUFFERS_IN_TRANSIT);
-        pool_size = sys->output->buffer_num;
     }
 
+    pool_size = sys->output->buffer_num;
     sys->output->buffer_size = sys->output->buffer_size_recommended;
 
     status = mmal_port_enable(sys->output, output_port_cb);
