@@ -308,6 +308,9 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_GET_META:
             return stream_vaControl( s, STREAM_GET_META, args );
 
+        case DEMUX_IS_PLAYLIST:
+            return stream_vaControl(s, STREAM_IS_DIRECTORY, args );
+
         case DEMUX_GET_PTS_DELAY:
         case DEMUX_GET_FPS:
         case DEMUX_HAS_UNSUPPORTED_META:
