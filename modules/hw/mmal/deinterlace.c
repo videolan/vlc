@@ -66,15 +66,18 @@ struct filter_sys_t {
 
     MMAL_QUEUE_T *filtered_pictures;
     vlc_mutex_t mutex;
+    vlc_cond_t buffer_cond;
 
     /* statistics */
     int output_in_transit;
+    int input_in_transit;
 };
 
 static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
 static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
 static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
 static picture_t *deinterlace(filter_t *filter, picture_t *picture);
+static void flush(filter_t *filter);
 
 #define MMAL_COMPONENT_DEFAULT_DEINTERLACE "vc.ril.image_fx"
 
@@ -278,7 +281,9 @@ static int Open(filter_t *filter)
         goto out;
 
     filter->pf_video_filter = deinterlace;
+    filter->pf_video_flush = flush;
     vlc_mutex_init_recursive(&sys->mutex);
+    vlc_cond_init(&sys->buffer_cond);
 
 out:
     if (ret != VLC_SUCCESS)
@@ -333,6 +338,7 @@ static void Close(filter_t *filter)
         picture_pool_Release(sys->picture_pool);
 
     vlc_mutex_destroy(&sys->mutex);
+    vlc_cond_destroy(&sys->buffer_cond);
     free(sys->pictures);
     free(sys);
 
@@ -455,10 +461,39 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
         msg_Err(filter, "Failed to send buffer to input port (status=%"PRIx32" %s)",
                 status, mmal_status_to_string(status));
     }
+    sys->input_in_transit++;
 
 out:
     vlc_mutex_unlock(&sys->mutex);
     return ret;
+}
+
+static void flush(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+    MMAL_STATUS_T status;
+
+    mmal_port_disable(sys->output);
+    mmal_port_disable(sys->input);
+    mmal_port_flush(sys->output);
+    mmal_port_flush(sys->input);
+    status = mmal_port_enable(sys->input, input_port_cb);
+    if (status != MMAL_SUCCESS) {
+        msg_Err(filter, "Failed to enable input port %s (status=%"PRIx32" %s)",
+                sys->input->name, status, mmal_status_to_string(status));
+        return;
+    }
+    status = mmal_port_enable(sys->output, output_port_cb);
+    if (status != MMAL_SUCCESS) {
+        msg_Err(filter, "Failed to enable output port %s (status=%"PRIx32" %s)",
+                sys->output->name, status, mmal_status_to_string(status));
+    }
+
+    msg_Dbg(filter, "flush: wait for all buffers to be returned");
+    vlc_mutex_lock(&sys->mutex);
+    while (sys->input_in_transit || sys->output_in_transit)
+        vlc_cond_wait(&sys->buffer_cond, &sys->mutex);
+    vlc_mutex_unlock(&sys->mutex);
 }
 
 static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
@@ -486,6 +521,8 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     mmal_buffer_header_release(buffer);
     if (picture)
         picture_Release(picture);
+    sys->input_in_transit--;
+    vlc_cond_signal(&sys->buffer_cond);
     vlc_mutex_unlock(&sys->mutex);
 }
 
@@ -506,6 +543,7 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
             buffer->user_data = NULL;
         }
         sys->output_in_transit--;
+        vlc_cond_signal(&sys->buffer_cond);
     } else if (buffer->cmd == MMAL_EVENT_FORMAT_CHANGED) {
         msg_Warn(filter, "MMAL_EVENT_FORMAT_CHANGED seen but not handled");
         mmal_buffer_header_release(buffer);
