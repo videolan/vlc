@@ -3376,7 +3376,7 @@ AC_ARG_ENABLE(mmal,
     [Multi-Media Abstraction Layer (MMAL) hardware plugin (default enable)]))
 if test "${enable_mmal}" != "no"; then
   VLC_SAVE_FLAGS
-  LDFLAGS="${LDFLAGS} -L/opt/vc/lib"
+  LDFLAGS="${LDFLAGS} -L/opt/vc/lib -lvchostif"
   CPPFLAGS="${CPPFLAGS} -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux"
   AC_CHECK_HEADERS(interface/mmal/mmal.h,
     [ AC_CHECK_LIB(bcm_host, vc_tv_unregister_callback_full, [
@@ -3384,7 +3384,7 @@ if test "${enable_mmal}" != "no"; then
         VLC_ADD_PLUGIN([mmal])
         VLC_ADD_LDFLAGS([mmal],[ -L/opt/vc/lib ])
         VLC_ADD_CFLAGS([mmal],[ -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux ])
-        VLC_ADD_LIBS([mmal],[ -lbcm_host -lmmal ]) ], [
+        VLC_ADD_LIBS([mmal],[ -lbcm_host -lmmal -lvchostif ]) ], [
           AS_IF([test "${enable_mmal}" = "yes"],
             [ AC_MSG_ERROR([Cannot find bcm library...]) ],
             [ AC_MSG_WARN([Cannot find bcm library...]) ])
