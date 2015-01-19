@@ -479,11 +479,14 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 {
     picture_t *picture = (picture_t *)buffer->user_data;
     filter_t *filter = (filter_t *)port->userdata;
+    filter_sys_t *sys = filter->p_sys;
 
     buffer->user_data = NULL;
+    vlc_mutex_lock(&sys->mutex);
     mmal_buffer_header_release(buffer);
     if (picture)
         picture_Release(picture);
+    vlc_mutex_unlock(&sys->mutex);
 }
 
 static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
@@ -492,6 +495,7 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     filter_sys_t *sys = filter->p_sys;
     picture_t *picture;
 
+    vlc_mutex_lock(&sys->mutex);
     if (buffer->cmd == 0) {
         if (buffer->length > 0) {
             mmal_queue_put(sys->filtered_pictures, buffer);
@@ -508,4 +512,5 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     } else {
         mmal_buffer_header_release(buffer);
     }
+    vlc_mutex_unlock(&sys->mutex);
 }
