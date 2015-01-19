@@ -408,9 +408,8 @@ static int send_output_buffer(decoder_t *dec)
     picture = decoder_NewPicture(dec);
     if (!picture) {
         msg_Warn(dec, "Failed to get new picture");
-        mmal_buffer_header_release(buffer);
         ret = -1;
-        goto out;
+        goto err;
     }
 
     p_sys = picture->p_sys;
@@ -426,7 +425,7 @@ static int send_output_buffer(decoder_t *dec)
         if (p_sys->buffer == NULL) {
             msg_Err(dec, "Retrieved picture without opaque handle");
             ret = VLC_EGENERIC;
-            goto out;
+            goto err;
         }
         buffer->data = p_sys->buffer->data;
     } else {
@@ -434,7 +433,7 @@ static int send_output_buffer(decoder_t *dec)
             msg_Err(dec, "Retrieved picture with too small data block (%d < %d)",
                     buffer_size, sys->output->buffer_size);
             ret = VLC_EGENERIC;
-            goto out;
+            goto err;
         }
         buffer->data = picture->p[0].p_pixels;
     }
@@ -443,13 +442,17 @@ static int send_output_buffer(decoder_t *dec)
     if (status != MMAL_SUCCESS) {
         msg_Err(dec, "Failed to send buffer to output port (status=%"PRIx32" %s)",
                 status, mmal_status_to_string(status));
-        mmal_buffer_header_release(buffer);
-        picture_Release(picture);
         ret = -1;
-        goto out;
+        goto err;
     }
 
 out:
+    return ret;
+
+err:
+    if (picture)
+        picture_Release(picture);
+    mmal_buffer_header_release(buffer);
     return ret;
 }
 
