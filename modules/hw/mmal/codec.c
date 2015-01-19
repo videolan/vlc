@@ -97,7 +97,6 @@ static int OpenDecoder(decoder_t *dec)
 {
     int ret = VLC_SUCCESS;
     decoder_sys_t *sys;
-    MMAL_PARAMETER_BOOLEAN_T error_concealment;
     MMAL_PARAMETER_UINT32_T extra_buffers;
     MMAL_STATUS_T status;
 
@@ -155,14 +154,6 @@ static int OpenDecoder(decoder_t *dec)
                 msg_Err(dec, "Failed to allocate extra format data on input port %s (status=%"PRIx32" %s)",
                         sys->input->name, status, mmal_status_to_string(status));
             }
-        } else {
-            error_concealment.hdr.id = MMAL_PARAMETER_VIDEO_DECODE_ERROR_CONCEALMENT;
-            error_concealment.hdr.size = sizeof(MMAL_PARAMETER_BOOLEAN_T);
-            error_concealment.enable = MMAL_FALSE;
-            status = mmal_port_parameter_set(sys->input, &error_concealment.hdr);
-            if (status != MMAL_SUCCESS)
-                msg_Err(dec, "Failed to disable error concealment (status=%"PRIx32" %s)",
-                        status, mmal_status_to_string(status));
         }
     }
 
