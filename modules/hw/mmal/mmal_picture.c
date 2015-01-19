@@ -27,18 +27,12 @@
 
 #include "mmal_picture.h"
 
-vlc_mutex_t* get_mmal_opaque_mutex(void)
-{
-    static vlc_mutex_t mmal_mutex = VLC_STATIC_MUTEX;
-    return &mmal_mutex;
-}
-
 int mmal_picture_lock(picture_t *picture)
 {
     picture_sys_t *pic_sys = picture->p_sys;
     int ret = VLC_SUCCESS;
 
-    vlc_mutex_lock(get_mmal_opaque_mutex());
+    vlc_mutex_lock(pic_sys->mutex);
 
     MMAL_BUFFER_HEADER_T *buffer = mmal_queue_timedwait(pic_sys->queue, 2);
     if (!buffer) {
@@ -57,7 +51,7 @@ int mmal_picture_lock(picture_t *picture)
     pic_sys->displayed = false;
 
 out:
-    vlc_mutex_unlock(get_mmal_opaque_mutex());
+    vlc_mutex_unlock(pic_sys->mutex);
     return ret;
 }
 
@@ -66,7 +60,7 @@ void mmal_picture_unlock(picture_t *picture)
     picture_sys_t *pic_sys = picture->p_sys;
     MMAL_BUFFER_HEADER_T *buffer = pic_sys->buffer;
 
-    vlc_mutex_lock(get_mmal_opaque_mutex());
+    vlc_mutex_lock(pic_sys->mutex);
 
     pic_sys->buffer = NULL;
     if (buffer) {
@@ -74,5 +68,5 @@ void mmal_picture_unlock(picture_t *picture)
         mmal_buffer_header_release(buffer);
     }
 
-    vlc_mutex_unlock(get_mmal_opaque_mutex());
+    vlc_mutex_unlock(pic_sys->mutex);
 }

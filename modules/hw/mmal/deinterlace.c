@@ -98,6 +98,7 @@ static int create_picture_pool(filter_t *filter)
 
         picture_res.p_sys->owner = (vlc_object_t *)filter;
         picture_res.p_sys->queue = sys->output_pool->queue;
+        picture_res.p_sys->mutex = &sys->mutex;
 
         sys->pictures[i] = picture_NewFromResource(&filter->fmt_out.video,
                 &picture_res);

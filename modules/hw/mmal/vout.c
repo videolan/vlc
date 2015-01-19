@@ -498,6 +498,7 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
         picture_res.p_sys = calloc(1, sizeof(picture_sys_t));
         picture_res.p_sys->owner = (vlc_object_t *)vd;
         picture_res.p_sys->queue = sys->pool->queue;
+        picture_res.p_sys->mutex = &sys->buffer_mutex;
 
         sys->pictures[i] = picture_NewFromResource(&fmt, &picture_res);
         if (!sys->pictures[i]) {

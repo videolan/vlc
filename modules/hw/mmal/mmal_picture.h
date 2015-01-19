@@ -32,6 +32,7 @@ struct picture_sys_t {
 
     MMAL_BUFFER_HEADER_T *buffer;
     MMAL_QUEUE_T *queue;
+    vlc_mutex_t *mutex;
     bool displayed;
 };
 
