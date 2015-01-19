@@ -173,6 +173,10 @@ enum demux_query_e
 
     DEMUX_CAN_SEEK,            /* arg1= bool*    can fail (assume false)*/
 
+    /* DEMUX_IS_PLAYLIST returns true if the demux is a playlist
+     * (an archive, a directory or a network share is also a playlist) */
+    DEMUX_IS_PLAYLIST,  /* arg1= bool*    can fail (assume false)*/
+
     /* Navigation */
     DEMUX_NAV_ACTIVATE,        /* res=can fail */
     DEMUX_NAV_UP,              /* res=can fail */
