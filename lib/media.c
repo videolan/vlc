@@ -141,7 +141,11 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
     /* Add this to our media list */
     p_subitems = media_get_subitems( p_md );
     if( p_subitems != NULL )
+    {
+        libvlc_media_list_lock( p_subitems );
         libvlc_media_list_internal_add_media( p_subitems, p_md_child );
+        libvlc_media_list_unlock( p_subitems );
+    }
 
     /* Construct the event */
     event.type = libvlc_MediaSubItemAdded;
