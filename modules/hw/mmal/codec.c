@@ -392,6 +392,7 @@ static int send_output_buffer(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
     MMAL_BUFFER_HEADER_T *buffer;
+    picture_sys_t *p_sys;
     picture_t *picture;
     MMAL_STATUS_T status;
     int buffer_size = 0;
@@ -412,21 +413,31 @@ static int send_output_buffer(decoder_t *dec)
         goto out;
     }
 
+    p_sys = picture->p_sys;
     for (int i = 0; i < picture->i_planes; i++)
         buffer_size += picture->p[i].i_lines * picture->p[i].i_pitch;
-
-    if (buffer_size < sys->output->buffer_size) {
-        msg_Err(dec, "Retrieved picture with too small data block (%d < %d)",
-                buffer_size, sys->output->buffer_size);
-        ret = VLC_EGENERIC;
-        goto out;
-    }
 
     mmal_buffer_header_reset(buffer);
     buffer->user_data = picture;
     buffer->cmd = 0;
     buffer->alloc_size = sys->output->buffer_size;
-    buffer->data = picture->p[0].p_pixels;
+
+    if (sys->opaque) {
+        if (p_sys->buffer == NULL) {
+            msg_Err(dec, "Retrieved picture without opaque handle");
+            ret = VLC_EGENERIC;
+            goto out;
+        }
+        buffer->data = p_sys->buffer->data;
+    } else {
+        if (buffer_size < sys->output->buffer_size) {
+            msg_Err(dec, "Retrieved picture with too small data block (%d < %d)",
+                    buffer_size, sys->output->buffer_size);
+            ret = VLC_EGENERIC;
+            goto out;
+        }
+        buffer->data = picture->p[0].p_pixels;
+    }
 
     status = mmal_port_send_buffer(sys->output, buffer);
     if (status != MMAL_SUCCESS) {
