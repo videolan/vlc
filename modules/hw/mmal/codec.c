@@ -74,6 +74,9 @@ struct decoder_sys_t {
 
     bool b_top_field_first;
     bool b_progressive;
+
+    /* statistics */
+    int output_in_transit;
 };
 
 /* Utilities */
@@ -440,6 +443,7 @@ static int send_output_buffer(decoder_t *dec)
         ret = -1;
         goto err;
     }
+    sys->output_in_transit++;
 
 out:
     return ret;
@@ -458,9 +462,7 @@ static void fill_output_port(decoder_t *dec)
     unsigned max_buffers_in_transit = __MAX(sys->output_pool->headers_num,
             MIN_NUM_BUFFERS_IN_TRANSIT);
     unsigned buffers_available = mmal_queue_length(sys->output_pool->queue);
-    unsigned buffers_in_transit = sys->output_pool->headers_num - buffers_available -
-        mmal_queue_length(sys->decoded_pictures);
-    unsigned buffers_to_send = max_buffers_in_transit - buffers_in_transit;
+    unsigned buffers_to_send = max_buffers_in_transit - sys->output_in_transit;
     unsigned i;
 
     if (buffers_to_send > buffers_available)
@@ -468,7 +470,7 @@ static void fill_output_port(decoder_t *dec)
 
 #ifndef NDEBUG
     msg_Dbg(dec, "Send %d buffers to output port (available: %d, in_transit: %d, buffer_num: %d)",
-                    buffers_to_send, buffers_available, buffers_in_transit,
+                    buffers_to_send, buffers_available, sys->output_in_transit,
                     sys->output->buffer_num);
 #endif
     for (i = 0; i < buffers_to_send; ++i)
@@ -664,6 +666,7 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
             buffer->data = NULL;
             mmal_buffer_header_release(buffer);
         }
+        sys->output_in_transit--;
     } else if (buffer->cmd == MMAL_EVENT_FORMAT_CHANGED) {
         fmt = mmal_event_format_changed_get(buffer);
 
