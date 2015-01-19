@@ -351,15 +351,15 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     //if (var_InheritBool (wnd, "keyboard-events"))
     //    do_something();
 
-    if (vlc_clone (&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
-        goto error;
-
     wl_display_flush(display);
 
     wnd->type = VOUT_WINDOW_TYPE_WAYLAND;
     wnd->handle.wl = surface;
     wnd->display.wl = display;
     wnd->control = Control;
+
+    if (vlc_clone (&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+        goto error;
 
     vout_window_ReportSize(wnd, cfg->width, cfg->height);
     return VLC_SUCCESS;
