@@ -37,7 +37,7 @@
 
 #include "libvlc_internal.h"
 #include "media_internal.h" // libvlc_media_new_from_input_item()
-#include "media_list_internal.h" // _libvlc_media_list_add_media()
+#include "media_list_internal.h" // libvlc_media_list_internal_add_media()
 
 struct libvlc_media_discoverer_t
 {
@@ -87,7 +87,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
 
             /* Insert the md into the root list */
             libvlc_media_list_lock( p_mdis->p_mlist );
-            _libvlc_media_list_add_media( p_mdis->p_mlist, p_catmd );
+            libvlc_media_list_internal_add_media( p_mdis->p_mlist, p_catmd );
             libvlc_media_list_unlock( p_mdis->p_mlist );
 
             /* We don't release the mlist cause the dictionary
@@ -97,7 +97,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
     }
 
     libvlc_media_list_lock( p_mlist );
-    _libvlc_media_list_add_media( p_mlist, p_md );
+    libvlc_media_list_internal_add_media( p_mlist, p_md );
     libvlc_media_list_unlock( p_mlist );
 
     libvlc_media_release( p_md );
@@ -121,7 +121,7 @@ static void services_discovery_item_removed( const vlc_event_t * p_event,
         p_md = libvlc_media_list_item_at_index( p_mdis->p_mlist, i );
         if( p_md->p_input_item == p_item )
         {
-            _libvlc_media_list_remove_index( p_mdis->p_mlist, i );
+            libvlc_media_list_internal_remove_index( p_mdis->p_mlist, i );
             break;
         }
     }
@@ -140,7 +140,7 @@ static void services_discovery_removeall( const vlc_event_t * p_event,
     libvlc_media_list_lock( p_mdis->p_mlist );
     for( int i = 0; i < libvlc_media_list_count( p_mdis->p_mlist ); i++ )
     {
-        _libvlc_media_list_remove_index( p_mdis->p_mlist, i );
+        libvlc_media_list_internal_remove_index( p_mdis->p_mlist, i );
     }
     libvlc_media_list_unlock( p_mdis->p_mlist );
 }

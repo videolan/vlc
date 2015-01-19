@@ -334,13 +334,13 @@ int libvlc_media_list_add_media( libvlc_media_list_t * p_mlist,
 {
     if( !mlist_is_writable(p_mlist) )
         return -1;
-    _libvlc_media_list_add_media( p_mlist, p_md );
+    libvlc_media_list_internal_add_media( p_mlist, p_md );
     return 0;
 }
 
 /* LibVLC internal version */
-void _libvlc_media_list_add_media( libvlc_media_list_t * p_mlist,
-                                   libvlc_media_t * p_md )
+void libvlc_media_list_internal_add_media( libvlc_media_list_t * p_mlist,
+                                           libvlc_media_t * p_md )
 {
     libvlc_media_retain( p_md );
 
@@ -362,15 +362,14 @@ int libvlc_media_list_insert_media( libvlc_media_list_t * p_mlist,
 {
     if( !mlist_is_writable(p_mlist) )
         return -1;
-    _libvlc_media_list_insert_media( p_mlist, p_md, index );
+    libvlc_media_list_internal_insert_media( p_mlist, p_md, index );
     return 0;
 }
 
 /* LibVLC internal version */
-void _libvlc_media_list_insert_media(
-                                   libvlc_media_list_t * p_mlist,
-                                   libvlc_media_t * p_md,
-                                   int index )
+void libvlc_media_list_internal_insert_media( libvlc_media_list_t * p_mlist,
+                                              libvlc_media_t * p_md,
+                                              int index )
 {
     libvlc_media_retain( p_md );
 
@@ -389,12 +388,12 @@ int libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
 {
     if( !mlist_is_writable(p_mlist) )
         return -1;
-    return _libvlc_media_list_remove_index( p_mlist, index );
+    return libvlc_media_list_internal_remove_index( p_mlist, index );
 }
 
 /* LibVLC internal version */
-int _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
-                                     int index )
+int libvlc_media_list_internal_remove_index( libvlc_media_list_t * p_mlist,
+                                             int index )
 {
     libvlc_media_t * p_md;
 

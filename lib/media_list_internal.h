@@ -52,15 +52,15 @@ struct libvlc_media_list_t
 };
 
 /* Media List */
-void _libvlc_media_list_add_media(
+void libvlc_media_list_internal_add_media(
         libvlc_media_list_t * p_mlist,
         libvlc_media_t * p_md );
 
-void _libvlc_media_list_insert_media(
+void libvlc_media_list_internal_insert_media(
         libvlc_media_list_t * p_mlist,
         libvlc_media_t * p_md, int index );
 
-int _libvlc_media_list_remove_index(
+int libvlc_media_list_internal_remove_index(
         libvlc_media_list_t * p_mlist, int index );
 
 #endif
