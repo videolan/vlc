@@ -38,10 +38,11 @@
 
 #include "mmal_picture.h"
 
-/* These are only required when combined with image_fx filter. But as they
- * won't do much harm besides using a few MB GPU memory, keep them always on
+/*
+ * This seems to be a bit high, but reducing it causes instabilities
  */
-#define NUM_EXTRA_BUFFERS 5
+#define NUM_EXTRA_BUFFERS 20
+#define NUM_DECODER_BUFFER_HEADERS 20
 
 #define MIN_NUM_BUFFERS_IN_TRANSIT 2
 
@@ -317,12 +318,13 @@ static int change_output_format(decoder_t *dec)
 
     if (sys->opaque) {
         sys->output->buffer_num = NUM_ACTUAL_OPAQUE_BUFFERS;
+        pool_size = NUM_DECODER_BUFFER_HEADERS;
     } else {
         sys->output->buffer_num = __MAX(sys->output->buffer_num_recommended,
                 MIN_NUM_BUFFERS_IN_TRANSIT);
+        pool_size = sys->output->buffer_num;
     }
 
-    pool_size = sys->output->buffer_num;
     sys->output->buffer_size = sys->output->buffer_size_recommended;
 
     status = mmal_port_enable(sys->output, output_port_cb);
