@@ -305,6 +305,11 @@ typedef struct
 
 } ts_pid_t;
 
+typedef struct
+{
+    int i_service;
+} vdr_info_t;
+
 struct demux_sys_t
 {
     stream_t   *stream;
@@ -377,6 +382,8 @@ struct demux_sys_t
         bool        b_program_pcr_seen;
         mtime_t     i_first_dts;
     } pcrfix;
+
+    vdr_info_t  vdr;
 
     /* */
     bool        b_start_record;
@@ -607,6 +614,7 @@ static int Open( vlc_object_t *p_this )
     int          i_packet_size, i_packet_header_size = 0;
 
     ts_pid_t    *pat;
+    vdr_info_t   vdr = {0};
 
     /* Search first sync byte */
     i_packet_size = DetectPacketSize( p_demux, &i_packet_header_size );
@@ -631,6 +639,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_tdt_delta = 0;
     p_sys->i_dvb_start = 0;
     p_sys->i_dvb_length = 0;
+
+    p_sys->vdr = vdr;
 
     p_sys->arib.b25stream = NULL;
     p_sys->stream = p_demux->s;
@@ -3090,6 +3100,13 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                  p_srv->i_service_id, p_srv->b_eit_schedule,
                  p_srv->b_eit_present, p_srv->i_running_status,
                  p_srv->b_free_ca );
+
+        if( p_sys->vdr.i_service && p_srv->i_service_id != p_sys->vdr.i_service )
+        {
+            msg_Dbg( p_demux, "  * service id=%d skipped (not declared in vdr header)",
+                     p_sys->vdr.i_service );
+            continue;
+        }
 
         p_meta = vlc_meta_New();
         for( p_dr = p_srv->p_first_descriptor; p_dr; p_dr = p_dr->p_next )
