@@ -66,6 +66,9 @@ struct filter_sys_t {
 
     MMAL_QUEUE_T *filtered_pictures;
     vlc_mutex_t mutex;
+
+    /* statistics */
+    int output_in_transit;
 };
 
 static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
@@ -365,6 +368,7 @@ static int send_output_buffer(filter_t *filter)
         ret = -1;
         goto out;
     }
+    sys->output_in_transit++;
 
 out:
     return ret;
@@ -377,9 +381,7 @@ static void fill_output_port(filter_t *filter)
     unsigned max_buffers_in_transit = __MAX(sys->output->buffer_num,
             MIN_NUM_BUFFERS_IN_TRANSIT);
     unsigned buffers_available = mmal_queue_length(sys->output_pool->queue);
-    unsigned buffers_in_transit = sys->output_pool->headers_num - buffers_available -
-        mmal_queue_length(sys->filtered_pictures);
-    unsigned buffers_to_send = max_buffers_in_transit - buffers_in_transit;
+    unsigned buffers_to_send = max_buffers_in_transit - sys->output_in_transit;
     unsigned i;
 
     if (buffers_to_send > buffers_available)
@@ -387,7 +389,7 @@ static void fill_output_port(filter_t *filter)
 
 #ifndef NDEBUG
     msg_Dbg(filter, "Send %d buffers to output port (available: %d, in_transit: %d, buffer_num: %d)",
-                    buffers_to_send, buffers_available, buffers_in_transit,
+                    buffers_to_send, buffers_available, sys->output_in_transit,
                     sys->output->buffer_num);
 #endif
     for (i = 0; i < buffers_to_send; ++i) {
@@ -499,6 +501,7 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
             picture_Release(picture);
             buffer->user_data = NULL;
         }
+        sys->output_in_transit--;
     } else if (buffer->cmd == MMAL_EVENT_FORMAT_CHANGED) {
         msg_Warn(filter, "MMAL_EVENT_FORMAT_CHANGED seen but not handled");
         mmal_buffer_header_release(buffer);
