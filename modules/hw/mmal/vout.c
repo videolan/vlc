@@ -42,7 +42,7 @@
 #include <interface/vmcs_host/vc_tvservice.h>
 #include <interface/vmcs_host/vc_dispmanx.h>
 
-#define MAX_BUFFERS_IN_TRANSIT 2
+#define MAX_BUFFERS_IN_TRANSIT 1
 #define VC_TV_MAX_MODE_IDS 127
 
 #define MMAL_LAYER_NAME "mmal-layer"
@@ -565,9 +565,6 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
         buffer->length = sys->input->buffer_size;
 
         vlc_mutex_lock(&sys->buffer_mutex);
-        while (sys->buffers_in_transit >= MAX_BUFFERS_IN_TRANSIT)
-            vlc_cond_wait(&sys->buffer_cond, &sys->buffer_mutex);
-
         status = mmal_port_send_buffer(sys->input, buffer);
         if (status == MMAL_SUCCESS)
             ++sys->buffers_in_transit;
@@ -591,6 +588,11 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
     if (sys->next_phase_check == 0 && sys->adjust_refresh_rate)
         maintain_phase_sync(vd);
     sys->next_phase_check = (sys->next_phase_check + 1) % PHASE_CHECK_INTERVAL;
+
+    vlc_mutex_lock(&sys->buffer_mutex);
+    while (sys->buffers_in_transit >= MAX_BUFFERS_IN_TRANSIT)
+        vlc_cond_wait(&sys->buffer_cond, &sys->buffer_mutex);
+    vlc_mutex_unlock(&sys->buffer_mutex);
 }
 
 static int vd_control(vout_display_t *vd, int query, va_list args)
@@ -682,13 +684,13 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     vout_display_sys_t *sys = vd->sys;
     picture_t *picture = (picture_t *)buffer->user_data;
 
+    if (picture)
+        picture_Release(picture);
+
     vlc_mutex_lock(&sys->buffer_mutex);
     --sys->buffers_in_transit;
     vlc_cond_signal(&sys->buffer_cond);
     vlc_mutex_unlock(&sys->buffer_mutex);
-
-    if (picture)
-        picture_Release(picture);
 }
 
 static int query_resolution(vout_display_t *vd, unsigned *width, unsigned *height)
