@@ -43,6 +43,7 @@ struct libvlc_media_t
 
     vlc_cond_t parsed_cond;
     vlc_mutex_t parsed_lock;
+    vlc_mutex_t subitems_lock;
 
     bool is_parsed;
     bool has_asked_preparse;
