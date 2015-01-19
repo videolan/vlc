@@ -1933,6 +1933,11 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
                         pid->i_owner_number, p_block->i_dts);
 
+            if( !p_sys->b_disable_pcr && p_block->i_dts > VLC_TS_INVALID &&
+                 p_block->i_dts < (VLC_TS_0 + p_sys->i_current_pcr * 100 / 9) )
+                msg_Warn( p_demux, "Broken stream: pid %d sends packets with dts %"PRId64"us later than pcr",
+                          pid->i_pid, (p_sys->i_current_pcr * 100 / 9) - p_block->i_dts + VLC_TS_0  );
+
             es_out_Send( p_demux->out, pid->es->id, p_block );
 
             p_block = p_next;
