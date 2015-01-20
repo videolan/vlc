@@ -122,6 +122,17 @@ notify_item_deletion( libvlc_media_list_t * p_mlist,
     libvlc_event_send( p_mlist->p_event_manager, &event );
 }
 
+/* LibVLC internal */
+void libvlc_media_list_internal_end_reached( libvlc_media_list_t * p_mlist )
+{
+    libvlc_event_t event;
+
+    event.type = libvlc_MediaListEndReached;
+
+    /* Send the event */
+    libvlc_event_send( p_mlist->p_event_manager, &event );
+}
+
 /**************************************************************************
  *       static mlist_is_writable (private)
  **************************************************************************/
@@ -176,6 +187,8 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
             libvlc_MediaListItemDeleted );
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
             libvlc_MediaListWillDeleteItem );
+    libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
+            libvlc_MediaListEndReached );
 
     vlc_mutex_init( &p_mlist->object_lock );
     vlc_mutex_init( &p_mlist->refcount_lock ); // FIXME: spinlock?

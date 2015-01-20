@@ -169,8 +169,15 @@ static void services_discovery_ended( const vlc_event_t * p_event,
 {
     VLC_UNUSED(p_event);
     libvlc_media_discoverer_t * p_mdis = user_data;
+    libvlc_media_list_t * p_mlist = p_mdis->p_mlist;
     libvlc_event_t event;
+
     p_mdis->running = false;
+
+    libvlc_media_list_lock( p_mlist );
+    libvlc_media_list_internal_end_reached( p_mlist );
+    libvlc_media_list_unlock( p_mlist );
+
     event.type = libvlc_MediaDiscovererEnded;
     libvlc_event_send( p_mdis->p_event_manager, &event );
 }

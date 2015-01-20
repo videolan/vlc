@@ -164,7 +164,17 @@ static void input_item_subitemtree_added( const vlc_event_t * p_event,
 {
     VLC_UNUSED( p_event );
     libvlc_media_t * p_md = user_data;
+    libvlc_media_list_t *p_subitems;
     libvlc_event_t event;
+
+    /* notify the media list */
+    p_subitems = media_get_subitems( p_md );
+    if( p_subitems != NULL )
+    {
+        libvlc_media_list_lock( p_subitems );
+        libvlc_media_list_internal_end_reached( p_subitems );
+        libvlc_media_list_unlock( p_subitems );
+    }
 
     /* Construct the event */
     event.type = libvlc_MediaSubItemTreeAdded;
