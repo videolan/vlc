@@ -678,44 +678,8 @@ libvlc_media_get_duration( libvlc_media_t * p_md )
     return from_mtime(input_item_GetDuration( p_md->p_input_item ));
 }
 
-static int media_parse(libvlc_media_t *media)
-{
-    libvlc_int_t *libvlc = media->p_libvlc_instance->p_libvlc_int;
-    input_item_t *item = media->p_input_item;
-
-    /* TODO: Fetch art on need basis. But how not to break compatibility? */
-    libvlc_ArtRequest(libvlc, item, META_REQUEST_OPTION_NONE);
-    return libvlc_MetaRequest(libvlc, item, META_REQUEST_OPTION_NONE);
-}
-
-/**************************************************************************
- * Parse the media and wait.
- **************************************************************************/
-void
-libvlc_media_parse(libvlc_media_t *media)
-{
-    vlc_mutex_lock(&media->parsed_lock);
-    if (!media->has_asked_preparse)
-    {
-        media->has_asked_preparse = true;
-        vlc_mutex_unlock(&media->parsed_lock);
-
-        if (media_parse(media))
-            /* Parse failed: do not wait! */
-            return;
-        vlc_mutex_lock(&media->parsed_lock);
-    }
-
-    while (!media->is_parsed)
-        vlc_cond_wait(&media->parsed_cond, &media->parsed_lock);
-    vlc_mutex_unlock(&media->parsed_lock);
-}
-
-/**************************************************************************
- * Parse the media but do not wait.
- **************************************************************************/
-void
-libvlc_media_parse_async(libvlc_media_t *media)
+static int media_parse(libvlc_media_t *media, bool b_async,
+                       libvlc_media_parse_flag_t parse_flag)
 {
     bool needed;
 
@@ -725,7 +689,68 @@ libvlc_media_parse_async(libvlc_media_t *media)
     vlc_mutex_unlock(&media->parsed_lock);
 
     if (needed)
-        media_parse(media);
+    {
+        libvlc_int_t *libvlc = media->p_libvlc_instance->p_libvlc_int;
+        input_item_t *item = media->p_input_item;
+        input_item_meta_request_option_t art_scope = META_REQUEST_OPTION_NONE;
+        input_item_meta_request_option_t parse_scope = META_REQUEST_OPTION_SCOPE_LOCAL;
+        int ret;
+
+        if (parse_flag & libvlc_media_fetch_local)
+            art_scope |= META_REQUEST_OPTION_SCOPE_LOCAL;
+        if (parse_flag & libvlc_media_fetch_network)
+            art_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
+        if (art_scope != META_REQUEST_OPTION_NONE) {
+            ret = libvlc_ArtRequest(libvlc, item, art_scope);
+            if (ret != VLC_SUCCESS)
+                return ret;
+        }
+
+        if (parse_flag & libvlc_media_parse_network)
+            parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
+        ret = libvlc_MetaRequest(libvlc, item, parse_scope);
+        if (ret != VLC_SUCCESS)
+            return ret;
+    }
+    else
+        return VLC_EGENERIC;
+
+    if (!b_async)
+    {
+        vlc_mutex_lock(&media->parsed_lock);
+        while (!media->is_parsed)
+            vlc_cond_wait(&media->parsed_cond, &media->parsed_lock);
+        vlc_mutex_unlock(&media->parsed_lock);
+    }
+    return VLC_SUCCESS;
+}
+
+/**************************************************************************
+ * Parse the media and wait.
+ **************************************************************************/
+void
+libvlc_media_parse(libvlc_media_t *media)
+{
+    media_parse( media, false, libvlc_media_fetch_local );
+}
+
+/**************************************************************************
+ * Parse the media but do not wait.
+ **************************************************************************/
+void
+libvlc_media_parse_async(libvlc_media_t *media)
+{
+    media_parse( media, true, libvlc_media_fetch_local );
+}
+
+/**************************************************************************
+ * Parse the media asynchronously with options.
+ **************************************************************************/
+int
+libvlc_media_parse_with_options( libvlc_media_t *media,
+                                 libvlc_media_parse_flag_t parse_flag )
+{
+    return media_parse( media, true, parse_flag ) == VLC_SUCCESS ? 0 : -1;
 }
 
 /**************************************************************************
