@@ -286,7 +286,7 @@ void libvlc_media_list_set_media( libvlc_media_list_t * p_mlist,
 
 {
     vlc_mutex_lock( &p_mlist->object_lock );
-    if( p_mlist->p_internal_md )
+    if( p_mlist->p_internal_md || !mlist_is_writable(p_mlist) )
     {
         vlc_mutex_unlock( &p_mlist->object_lock );
         return;
