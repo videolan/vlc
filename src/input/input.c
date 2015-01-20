@@ -192,8 +192,19 @@ int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
     if( !p_input )
         return VLC_EGENERIC;
 
-    if( !Init( p_input ) )
+    if( !Init( p_input ) ) {
+        /* if the demux is a playlist, call Mainloop that will call
+         * demux_Demux in order to fetch sub items */
+        bool b_is_playlist = false;
+
+        if ( demux_Control( p_input->p->input.p_demux,
+                            DEMUX_IS_PLAYLIST,
+                            &b_is_playlist ) )
+            b_is_playlist = false;
+        if( b_is_playlist )
+            MainLoop( p_input, false );
         End( p_input );
+    }
 
     vlc_object_release( p_input );
 
