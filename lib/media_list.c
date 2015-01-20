@@ -184,6 +184,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
     assert( p_mlist->items.i_count == 0 );
     p_mlist->i_refcount = 1;
     p_mlist->p_md = NULL;
+    p_mlist->p_internal_md = NULL;
 
     return p_mlist;
 }
@@ -285,6 +286,11 @@ void libvlc_media_list_set_media( libvlc_media_list_t * p_mlist,
 
 {
     vlc_mutex_lock( &p_mlist->object_lock );
+    if( p_mlist->p_internal_md )
+    {
+        vlc_mutex_unlock( &p_mlist->object_lock );
+        return;
+    }
     libvlc_media_release( p_mlist->p_md );
     libvlc_media_retain( p_md );
     p_mlist->p_md = p_md;
@@ -306,7 +312,7 @@ libvlc_media_list_media( libvlc_media_list_t * p_mlist )
     libvlc_media_t *p_md;
 
     vlc_mutex_lock( &p_mlist->object_lock );
-    p_md = p_mlist->p_md;
+    p_md = p_mlist->p_internal_md ? p_mlist->p_internal_md : p_mlist->p_md;
     if( p_md )
         libvlc_media_retain( p_md );
     vlc_mutex_unlock( &p_mlist->object_lock );

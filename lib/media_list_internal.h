@@ -44,6 +44,7 @@ struct libvlc_media_list_t
     vlc_mutex_t                 refcount_lock;
     libvlc_media_t * p_md; /* The media from which the
                                        * mlist comes, if any. */
+    libvlc_media_t * p_internal_md; /* media set from media.c */
     vlc_array_t                items;
 
     /* This indicates if this media list is read-only

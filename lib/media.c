@@ -115,7 +115,7 @@ static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md )
         if( p_md->p_subitems != NULL )
         {
             p_md->p_subitems->b_read_only = true;
-            libvlc_media_list_set_media( p_md->p_subitems, p_md );
+            p_md->p_subitems->p_internal_md = p_md;
         }
     }
     p_subitems = p_md->p_subitems;
