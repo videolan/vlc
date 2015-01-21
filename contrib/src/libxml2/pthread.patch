@@ -1,6 +1,6 @@
---- libxml2-2.8.0/configure.in.orig	2012-05-23 10:33:55.000000000 +0200
-+++ libxml2-2.8.0/configure.in	2012-08-08 00:20:20.544880094 +0200
-@@ -958,12 +958,17 @@
+--- libxml2-2.9.2/configure.ac	2015-01-21 10:40:13.706152933 +0100
++++ libxml2-2.9.2/configure.ac.new	2015-01-21 10:39:36.014876563 +0100
+@@ -1049,12 +1049,17 @@
      dnl Use pthread by default in other cases
      if test -z "$THREADS_W32"; then
          if test "$with_threads" = "pthread" || test "$with_threads" = "" || test "$with_threads" = "yes" ; then
