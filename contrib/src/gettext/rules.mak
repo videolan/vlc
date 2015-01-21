@@ -1,5 +1,5 @@
 # gettext
-GETTEXT_VERSION=0.19.2
+GETTEXT_VERSION=0.19.4
 GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 
 PKGS += gettext
