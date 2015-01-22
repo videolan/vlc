@@ -1,17 +1,15 @@
-diff -Naur libupnp/configure.ac libupnp.new/configure.ac
---- libupnp/configure.ac	2013-11-15 17:18:45.000000000 +0100
-+++ libupnp.new/configure.ac	2014-12-15 19:36:30.625350753 +0100
-@@ -557,6 +557,7 @@
- echo "-------------------------------------------------------------------------------"
- 
+--- libupnp/configure.ac.orig	2011-02-10 23:53:25.000000000 +0100
++++ libupnp/configure.ac	2011-02-10 23:54:23.574454501 +0100
+@@ -546,6 +546,7 @@
+ AC_SUBST(PTHREAD_CFLAGS)
+ AC_SUBST(PTHREAD_CC)
  
 +AC_DEFINE([_WIN32_WINNT], 0x0501, [Define to '0x0500' for Windows 2000 APIs.])
  #
- # Lot's of stuff to ensure large file support
+ # Determine if pthread_rwlock_t is available
  #
-diff -Naur libupnp/libupnp.pc.in libupnp.new/libupnp.pc.in
 --- libupnp/libupnp.pc.in	2010-12-23 21:24:05.000000000 +0100
-+++ libupnp.new/libupnp.pc.in	2014-12-15 19:36:30.625350753 +0100
++++ libupnp.new/libupnp.pc.in	2011-02-13 11:27:23.000000000 +0100
 @@ -6,6 +6,6 @@
  Name: libupnp
  Description: Linux SDK for UPnP Devices
@@ -20,10 +18,20 @@ diff -Naur libupnp/libupnp.pc.in libupnp.new/libupnp.pc.in
 +Libs: @PTHREAD_CFLAGS@ -L${libdir} -lupnp -lthreadutil -lixml -liphlpapi @PTHREAD_LIBS@ 
  Cflags: @PTHREAD_CFLAGS@ -I${includedir}/upnp
  
-diff -Naur libupnp/upnp/inc/UpnpInet.h libupnp.new/upnp/inc/UpnpInet.h
---- libupnp/upnp/inc/UpnpInet.h	2012-03-26 18:49:42.000000000 +0200
-+++ libupnp.new/upnp/inc/UpnpInet.h	2014-12-15 19:36:48.353041056 +0100
-@@ -15,13 +15,7 @@
+--- libupnp/upnp/src/inc/upnputil.h	2010-12-23 21:24:06.000000000 +0100
++++ libupnp.new/upnp/src/inc/upnputil.h	2011-02-13 08:24:24.000000000 +0100
+@@ -125,7 +125,7 @@
+ 		#define strncasecmp		strnicmp
+ 		#define sleep(a)		Sleep((a)*1000)
+ 		#define usleep(a)		Sleep((a)/1000)
+-		#define strerror_r(a,b,c)	(strerror_s((b),(c),(a)))
++		#define strerror_r(a,b,c)       strncpy( b, strerror(a), c)
+ 	#else
+ 		#define max(a, b)   (((a)>(b))? (a):(b))
+ 		#define min(a, b)   (((a)<(b))? (a):(b))
+--- upnp/upnp/inc/UpnpInet.h	2011-04-03 04:50:36.000000000 +0200
++++ upnp.neww/upnp/inc/UpnpInet.h	2011-11-18 01:54:45.418529337 +0100
+@@ -15,11 +15,6 @@
  
  #ifdef WIN32
  	#include <stdarg.h>
@@ -33,19 +41,5 @@ diff -Naur libupnp/upnp/inc/UpnpInet.h libupnp.new/upnp/inc/UpnpInet.h
 -		#include <windef.h>
 -	#endif
  	#include <winsock2.h>
--	#include <iphlpapi.h>
+ 	#include <iphlpapi.h>
  	#include <ws2tcpip.h>
- 
- 	#define UpnpCloseSocket closesocket
-diff -Naur libupnp/upnp/src/inc/upnputil.h libupnp.new/upnp/src/inc/upnputil.h
---- libupnp/upnp/src/inc/upnputil.h	2012-04-29 00:32:06.000000000 +0200
-+++ libupnp.new/upnp/src/inc/upnputil.h	2014-12-15 19:36:30.625350753 +0100
-@@ -130,7 +130,7 @@
- 		#define strncasecmp		strnicmp
- 		#define sleep(a)		Sleep((a)*1000)
- 		#define usleep(a)		Sleep((a)/1000)
--		#define strerror_r(a,b,c)	(strerror_s((b),(c),(a)))
-+		#define strerror_r(a,b,c)       strncpy( b, strerror(a), c)
- 	#else
- 		#define max(a, b)   (((a)>(b))? (a):(b))
- 		#define min(a, b)   (((a)<(b))? (a):(b))
