@@ -384,10 +384,13 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
     if (!p_window->p_handle_priv)
         goto error;
 
-    if (sys->anwp.setup(p_window->p_handle_priv,
-                        p_window->fmt.i_width, p_window->fmt.i_height,
-                        p_window->i_android_hal,
-                        false, 0) != 0)
+    if (sys->anwp.setUsage(p_window->p_handle_priv, false, 0) != 0)
+        goto error;
+
+    if (sys->anwp.setBuffersGeometry(p_window->p_handle_priv,
+                                     p_window->fmt.i_width,
+                                     p_window->fmt.i_height,
+                                     p_window->i_android_hal) != 0)
         goto error;
 
     sys->anwp.getMinUndequeued(p_window->p_handle_priv,

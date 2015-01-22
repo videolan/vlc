@@ -144,12 +144,11 @@ int ANativeWindowPriv_disconnect( native_window_priv *priv )
     return 0;
 }
 
-int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_format, bool is_hw, int hw_usage )
+int ANativeWindowPriv_setUsage( native_window_priv *priv,  bool is_hw, int hw_usage )
 {
     status_t err;
 
-    LOGD( "setup: %p, %d, %d, %X, %X\n",
-          priv->anw, w, h, hal_format, hw_usage );
+    LOGD( "setUsage: %p, %d %X\n", priv->anw, is_hw, hw_usage );
 
     if( is_hw )
     {
@@ -163,6 +162,15 @@ int ANativeWindowPriv_setup( native_window_priv *priv, int w, int h, int hal_for
 
     err = native_window_set_usage( priv->anw, priv->usage );
     CHECK_ERR();
+
+    return 0;
+}
+
+int ANativeWindowPriv_setBuffersGeometry( native_window_priv *priv, int w, int h, int hal_format )
+{
+    status_t err;
+
+    LOGD( "setBuffersGeometry: %p, %d, %d", priv->anw, w, h );
 
 #if ANDROID_ICS_OR_LATER
     err = native_window_set_buffers_format( priv->anw, hal_format );

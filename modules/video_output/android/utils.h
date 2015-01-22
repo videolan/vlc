@@ -73,7 +73,8 @@ static inline int ChromaToAndroidHal(vlc_fourcc_t i_chroma)
 typedef struct native_window_priv native_window_priv;
 typedef native_window_priv *(*ptr_ANativeWindowPriv_connect) (void *);
 typedef int (*ptr_ANativeWindowPriv_disconnect) (native_window_priv *);
-typedef int (*ptr_ANativeWindowPriv_setup) (native_window_priv *, int, int, int, bool, int );
+typedef int (*ptr_ANativeWindowPriv_setUsage) (native_window_priv *, bool, int );
+typedef int (*ptr_ANativeWindowPriv_setBuffersGeometry) (native_window_priv *, int, int, int );
 typedef int (*ptr_ANativeWindowPriv_getMinUndequeued) (native_window_priv *, unsigned int *);
 typedef int (*ptr_ANativeWindowPriv_getMaxBufferCount) (native_window_priv *, unsigned int *);
 typedef int (*ptr_ANativeWindowPriv_setBufferCount) (native_window_priv *, unsigned int );
@@ -90,7 +91,8 @@ typedef struct
 {
     ptr_ANativeWindowPriv_connect connect;
     ptr_ANativeWindowPriv_disconnect disconnect;
-    ptr_ANativeWindowPriv_setup setup;
+    ptr_ANativeWindowPriv_setUsage setUsage;
+    ptr_ANativeWindowPriv_setBuffersGeometry setBuffersGeometry;
     ptr_ANativeWindowPriv_getMinUndequeued getMinUndequeued;
     ptr_ANativeWindowPriv_getMaxBufferCount getMaxBufferCount;
     ptr_ANativeWindowPriv_setBufferCount setBufferCount;

@@ -2215,14 +2215,18 @@ static int HwBuffer_AllocateBuffers( decoder_t *p_dec, OmxPort *p_port )
                                                  i_angle );
     }
 
-    if( p_port->p_hwbuf->anwpriv.setup( p_port->p_hwbuf->window_priv,
-                                        def->format.video.nFrameWidth,
-                                        def->format.video.nFrameHeight,
-                                        colorFormat,
-                                        true,
-                                        (int) i_hw_usage ) != 0 )
+    if( p_port->p_hwbuf->anwpriv.setUsage( p_port->p_hwbuf->window_priv,
+                                           true, (int) i_hw_usage ) != 0 )
     {
-        msg_Err( p_dec, "can't setup OMXHWBuffer" );
+        msg_Err( p_dec, "can't set usage" );
+        goto error;
+    }
+    if( p_port->p_hwbuf->anwpriv.setBuffersGeometry( p_port->p_hwbuf->window_priv,
+                                                     def->format.video.nFrameWidth,
+                                                     def->format.video.nFrameHeight,
+                                                     colorFormat ) != 0 )
+    {
+        msg_Err( p_dec, "can't set buffers geometry" );
         goto error;
     }
 
