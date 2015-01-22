@@ -17,7 +17,6 @@ Access:
  * Support DVB-T2 on Windows BDA
  * Support depayloading Opus from RTP
 
-
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
  * Support 4:4:4 and 4:2:2 chroma samplings with VDPAU hw acceleration
@@ -39,6 +38,7 @@ Demuxers:
  * Support bitmap audio channel reordering in MP4/mov
  * Support AlbumArtist and DiscNumber metadata
  * Fixed selecting recorded program from TopField TS files
+ * Support for lame's replaygain extension in mpeg files
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
