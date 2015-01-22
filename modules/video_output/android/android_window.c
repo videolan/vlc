@@ -374,7 +374,8 @@ static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
 }
 
 static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
-                                   android_window *p_window)
+                                   android_window *p_window,
+                                   bool b_java_configured)
 {
     unsigned int i_max_buffer_count = 0;
 
@@ -387,10 +388,11 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
     if (sys->anwp.setUsage(p_window->p_handle_priv, false, 0) != 0)
         goto error;
 
-    if (sys->anwp.setBuffersGeometry(p_window->p_handle_priv,
-                                     p_window->fmt.i_width,
-                                     p_window->fmt.i_height,
-                                     p_window->i_android_hal) != 0)
+    if (!b_java_configured
+        && sys->anwp.setBuffersGeometry(p_window->p_handle_priv,
+                                        p_window->fmt.i_width,
+                                        p_window->fmt.i_height,
+                                        p_window->i_android_hal) != 0)
         goto error;
 
     sys->anwp.getMinUndequeued(p_window->p_handle_priv,
@@ -425,21 +427,18 @@ error:
     return -1;
 }
 
-static int AndroidWindow_ConfigureSurface(vout_display_sys_t *sys,
-                                          android_window *p_window)
+static int AndroidWindow_ConfigureJavaSurface(vout_display_sys_t *sys,
+                                              android_window *p_window,
+                                              bool *p_java_configured)
 {
     int err;
-    bool configured;
+    bool configured = false;
 
-    /*
-     * anw.setBuffersGeometry and anwp.setup are broken before ics.
-     * use jni_ConfigureSurface to configure the surface on the java side
-     * synchronously.
+    /* setBuffersGeometry is broken before ics. Use jni_ConfigureSurface to
+     * configure the surface on the java side synchronously.
      * jni_ConfigureSurface return -1 when you don't need to call it (ie, after
-     * honeycomb).
-     * if jni_ConfigureSurface succeed, you need to get a new surface handle.
-     * That's why AndroidWindow_SetSurface is called again here.
-     */
+     * ics). if jni_ConfigureSurface succeed, you need to get a new surface
+     * handle. That's why AndroidWindow_SetSurface is called again here. */
     err = jni_ConfigureSurface(p_window->jsurf,
                                p_window->fmt.i_width,
                                p_window->fmt.i_height,
@@ -454,25 +453,32 @@ static int AndroidWindow_ConfigureSurface(vout_display_sys_t *sys,
         } else
             return -1;
     }
+    *p_java_configured = configured;
     return 0;
 }
 
 static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
-                                  android_window *p_window)
+                                  android_window *p_window,
+                                  bool b_java_configured)
 {
     p_window->i_pic_count = 1;
     p_window->i_min_undequeued = 0;
 
-    return sys->anw.setBuffersGeometry(p_window->p_handle,
-                                       p_window->fmt.i_width,
-                                       p_window->fmt.i_height,
-                                       p_window->i_android_hal);
+    if (!b_java_configured)
+        return sys->anw.setBuffersGeometry(p_window->p_handle,
+                                           p_window->fmt.i_width,
+                                           p_window->fmt.i_height,
+                                           p_window->i_android_hal);
+    else
+        return 0;
 }
 
 static int AndroidWindow_Setup(vout_display_sys_t *sys,
                                     android_window *p_window,
                                     unsigned int i_pic_count)
 {
+    bool b_java_configured = false;
+
     if (i_pic_count != 0)
         p_window->i_pic_count = i_pic_count;
 
@@ -487,7 +493,8 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
         picture_Release(p_pic);
     }
 
-    if (AndroidWindow_ConfigureSurface(sys, p_window) != 0)
+    if (AndroidWindow_ConfigureJavaSurface(sys, p_window,
+                                           &b_java_configured) != 0)
         return -1;
 
     if (p_window->b_opaque) {
@@ -497,8 +504,8 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
     }
 
     if (!p_window->b_use_priv
-        || AndroidWindow_SetupANWP(sys, p_window) != 0) {
-        if (AndroidWindow_SetupANW(sys, p_window) != 0)
+        || AndroidWindow_SetupANWP(sys, p_window, b_java_configured) != 0) {
+        if (AndroidWindow_SetupANW(sys, p_window, b_java_configured) != 0)
             return -1;
     }
 
