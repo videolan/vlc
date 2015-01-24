@@ -14,10 +14,10 @@ libebml: libebml-$(EBML_VERSION).tar.bz2 .sum-ebml
 	$(MOVE)
 
 # libebml requires exceptions
-EBML_EXTRA_FLAGS = CXXFLAGS="${CXXFLAGS} -fexceptions" \
+EBML_EXTRA_FLAGS = CXXFLAGS="${CXXFLAGS} -fexceptions -fvisibility=hidden" \
 					CPPFLAGS=""
 
 .ebml: libebml
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(EBML_EXTRA_FLAGS)
 	cd $< && $(MAKE) install
 	touch $@

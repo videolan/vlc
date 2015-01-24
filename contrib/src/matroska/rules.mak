@@ -16,7 +16,9 @@ libmatroska: libmatroska-$(MATROSKA_VERSION).tar.bz2 .sum-matroska
 	$(UNPACK)
 	$(MOVE)
 
+MATROSKA_EXTRA_FLAGS = CXXFLAGS="${CXXFLAGS} -fvisibility=hidden"
+
 .matroska: libmatroska
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(MATROSKA_EXTRA_FLAGS)
 	cd $< && $(MAKE) install
 	touch $@
