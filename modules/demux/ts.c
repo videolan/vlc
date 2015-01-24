@@ -626,6 +626,15 @@ static void vlc_dvbpsi_reset( demux_t *p_demux )
 }
 #endif
 
+static inline mtime_t ExtractPESTimestamp( const uint8_t *p_data )
+{
+    return ((mtime_t)(p_data[ 0]&0x0e ) << 29)|
+             (mtime_t)(p_data[1] << 22)|
+            ((mtime_t)(p_data[2]&0xfe) << 14)|
+             (mtime_t)(p_data[3] << 7)|
+             (mtime_t)(p_data[4] >> 1);
+}
+
 /*****************************************************************************
  * Open
  *****************************************************************************/
@@ -1768,20 +1777,10 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
             if( header[7]&0x80 )    /* has pts */
             {
-                i_pts = ((mtime_t)(header[ 9]&0x0e ) << 29)|
-                         (mtime_t)(header[10] << 22)|
-                        ((mtime_t)(header[11]&0xfe) << 14)|
-                         (mtime_t)(header[12] << 7)|
-                         (mtime_t)(header[13] >> 1);
+                i_pts = ExtractPESTimestamp( &header[9] );
 
                 if( header[7]&0x40 )    /* has dts */
-                {
-                     i_dts = ((mtime_t)(header[14]&0x0e ) << 29)|
-                             (mtime_t)(header[15] << 22)|
-                            ((mtime_t)(header[16]&0xfe) << 14)|
-                             (mtime_t)(header[17] << 7)|
-                             (mtime_t)(header[18] >> 1);
-                }
+                    i_dts = ExtractPESTimestamp( &header[14] );
             }
         }
         else
@@ -1804,20 +1803,12 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
             if(  header[i_skip]&0x20 )
             {
-                 i_pts = ((mtime_t)(header[i_skip]&0x0e ) << 29)|
-                          (mtime_t)(header[i_skip+1] << 22)|
-                         ((mtime_t)(header[i_skip+2]&0xfe) << 14)|
-                          (mtime_t)(header[i_skip+3] << 7)|
-                          (mtime_t)(header[i_skip+4] >> 1);
+                i_pts = ExtractPESTimestamp( &header[i_skip] );
 
                 if( header[i_skip]&0x10 )    /* has dts */
                 {
-                     i_dts = ((mtime_t)(header[i_skip+5]&0x0e ) << 29)|
-                              (mtime_t)(header[i_skip+6] << 22)|
-                             ((mtime_t)(header[i_skip+7]&0xfe) << 14)|
-                              (mtime_t)(header[i_skip+8] << 7)|
-                              (mtime_t)(header[i_skip+9] >> 1);
-                     i_skip += 10;
+                    i_dts = ExtractPESTimestamp( &header[i_skip+5] );
+                    i_skip += 10;
                 }
                 else
                 {
