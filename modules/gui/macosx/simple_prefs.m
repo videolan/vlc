@@ -1268,8 +1268,12 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (void)changeFont:(id)sender
 {
-    NSFont * font = [sender convertFont:[[NSFontManager sharedFontManager] selectedFont]];
-    [o_osd_font_fld setStringValue:[font fontName]];
+    NSFont *someFont = [NSFont systemFontOfSize:12];
+
+    // converts given font to changes in font panel. Original font is irrelevant
+    NSFont *selectedFont = [sender convertFont:someFont];
+
+    [o_osd_font_fld setStringValue:[selectedFont fontName]];
     [self osdSettingChanged:self];
 }
 
