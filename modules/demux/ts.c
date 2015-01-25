@@ -62,6 +62,9 @@
 # include <dvbpsi/tot.h>
 
 #include "../mux/mpeg/dvbpsi_compat.h"
+#include "../mux/mpeg/streams.h"
+#include "../mux/mpeg/tsutil.h"
+#include "../mux/mpeg/tables.h"
 
 #include "../codec/opus_header.h"
 
@@ -303,12 +306,21 @@ typedef struct
     ts_es_t     **extra_es;
     int         i_extra_es;
 
+    struct
+    {
+        vlc_fourcc_t i_fourcc;
+        int i_type;
+        bool b_haspcr;
+    } probed;
 } ts_pid_t;
 
 typedef struct
 {
     int i_service;
 } vdr_info_t;
+
+#define MIN_ES_PID 32
+#define MAX_ES_PID 8190
 
 struct demux_sys_t
 {
@@ -382,6 +394,13 @@ struct demux_sys_t
         bool        b_program_pcr_seen;
         mtime_t     i_first_dts;
     } pcrfix;
+
+    struct
+    {
+        mtime_t i_first_dts;     /* first dts encountered for the stream */
+        int     i_timesourcepid; /* which pid we saved the dts from */
+        bool    b_pat_deadline;  /* set if we haven't seen PAT within 140ms */
+    } patfix;
 
     vdr_info_t  vdr;
 
@@ -636,6 +655,279 @@ static inline mtime_t ExtractPESTimestamp( const uint8_t *p_data )
              (mtime_t)(p_data[4] >> 1);
 }
 
+static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, bool b_adaptfield )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    const uint8_t *p_pes = p_pesstart;
+    pid->probed.i_type = -1;
+
+    if( b_adaptfield )
+    {
+        uint8_t len = *p_pes;
+        p_pes++;
+
+        if(len == 0)
+        {
+            p_pes++; /* stuffing */
+        }
+        else
+        {
+            pid->probed.b_haspcr = ( *p_pes >= 7 && (p_pes[1] & 0x10) );
+            p_pes += len;
+        }
+    }
+
+    if( p_pes - p_pesstart >= TS_PACKET_SIZE_188 - 9)
+        return;
+
+    if( p_pes[0] != 0 || p_pes[1] != 0 || p_pes[2] != 1 )
+        return;
+
+    size_t i_pesextoffset = 8;
+    mtime_t i_dts = -1;
+    if( p_pes[7] & 0x80 ) // PTS
+    {
+        i_pesextoffset += 5;
+        i_dts = ExtractPESTimestamp( &p_pes[9] );
+    }
+    if( p_pes[7] & 0x40 ) // DTS
+    {
+        i_pesextoffset += 5;
+        i_dts = ExtractPESTimestamp( &p_pes[14] );
+    }
+    if( p_pes[7] & 0x20 ) // ESCR
+        i_pesextoffset += 6;
+    if( p_pes[7] & 0x10 ) // ESrate
+        i_pesextoffset += 3;
+    if( p_pes[7] & 0x08 ) // DSM
+        i_pesextoffset += 1;
+    if( p_pes[7] & 0x04 ) // CopyInfo
+        i_pesextoffset += 1;
+    if( p_pes[7] & 0x02 ) // PESCRC
+        i_pesextoffset += 2;
+
+     /* HeaderdataLength */
+    const size_t i_payloadoffset = 8 + 1 + p_pes[8];
+    i_pesextoffset += 1;
+
+    if( p_pes[7] & 0x01 ) // PESExt
+    {
+        size_t i_extension2_offset = 1;
+        if ( p_pes[i_pesextoffset] & 0x80 ) // private data
+            i_extension2_offset += 16;
+        if ( p_pes[i_pesextoffset] & 0x40 ) // pack
+            i_extension2_offset += 1;
+        if ( p_pes[i_pesextoffset] & 0x20 ) // seq
+            i_extension2_offset += 2;
+        if ( p_pes[i_pesextoffset] & 0x10 ) // P-STD
+            i_extension2_offset += 2;
+        if ( p_pes[i_pesextoffset] & 0x01 ) // Extension 2
+        {
+            uint8_t i_len = p_pes[i_pesextoffset + i_extension2_offset] & 0x7F;
+            i_extension2_offset += i_len;
+        }
+    }
+    /* (i_payloadoffset - i_pesextoffset) 0xFF stuffing */
+
+    if( &p_pes[i_payloadoffset] - p_pesstart >= TS_PACKET_SIZE_188 - 4)
+        return;
+
+    const uint8_t *p_data = &p_pes[i_payloadoffset];
+    /* AUDIO STREAM */
+    if(p_pes[3] >= 0xC0 && p_pes[3] <= 0xDF)
+    {
+        if( !memcmp( p_data, "\x7F\xFE\x80\x01", 4 ) )
+        {
+            pid->probed.i_type = 0x06;
+            pid->probed.i_fourcc = VLC_CODEC_DTS;
+        }
+        else if( !memcmp( p_data, "\x0B\x77", 2 ) )
+        {
+            pid->probed.i_type = 0x06;
+            pid->probed.i_fourcc = VLC_CODEC_EAC3;
+        }
+        else if( p_data[0] == 0xFF && (p_data[1] & 0xE0) == 0xE0 )
+        {
+            switch(p_data[1] & 18)
+            {
+            /* 10 - MPEG Version 2 (ISO/IEC 13818-3)
+               11 - MPEG Version 1 (ISO/IEC 11172-3) */
+                case 0x10:
+                    pid->probed.i_type = 0x04;
+                    break;
+                case 0x18:
+                    pid->probed.i_type = 0x03;
+                default:
+                    break;
+            }
+
+            switch(p_data[1] & 6)
+            {
+            /* 01 - Layer III
+               10 - Layer II
+               11 - Layer I */
+                case 0x06:
+                    pid->probed.i_type = 0x04;
+                    pid->probed.i_fourcc = VLC_CODEC_MPGA;
+                    break;
+                case 0x04:
+                    pid->probed.i_type = 0x04;
+                    pid->probed.i_fourcc = VLC_CODEC_MP2;
+                    break;
+                case 0x02:
+                    pid->probed.i_type = 0x04;
+                    pid->probed.i_fourcc = VLC_CODEC_MP3;
+                default:
+                    break;
+            }
+        }
+    }
+    /* VIDEO STREAM */
+    else if( p_pes[3] >= 0xE0 && p_pes[3] <= 0xEF )
+    {
+        if( !memcmp( p_data, "\x00\x00\x00", 4 ) )
+        {
+            pid->probed.i_type = 0x1b;
+            pid->probed.i_fourcc = VLC_CODEC_H264;
+        }
+        else if( !memcmp( p_data, "\x00\x00\x01", 4 ) )
+        {
+            pid->probed.i_type = 0x02;
+            pid->probed.i_fourcc = VLC_CODEC_MPGV;
+        }
+    }
+
+    /* Track timestamps and flag missing PAT */
+    if( !p_sys->patfix.i_timesourcepid && i_dts > -1 )
+    {
+        p_sys->patfix.i_first_dts = i_dts;
+        p_sys->patfix.i_timesourcepid = pid->i_pid;
+    }
+    else if( p_sys->patfix.i_timesourcepid == pid->i_pid && i_dts > -1 &&
+             !p_sys->patfix.b_pat_deadline )
+    {
+        if( i_dts - p_sys->patfix.i_first_dts > 9 * 140000 / 100 )
+            p_sys->patfix.b_pat_deadline = true;
+    }
+
+}
+
+static void BuildPATCallback( void *p_opaque, block_t *p_block )
+{
+    ts_pid_t *pat_pid = (ts_pid_t *) p_opaque;
+    dvbpsi_PushPacket( pat_pid->psi->handle, p_block->p_buffer );
+}
+
+static void BuildPMTCallback( void *p_opaque, block_t *p_block )
+{
+    ts_pid_t *program_pid = (ts_pid_t *) p_opaque;
+    while( p_block )
+    {
+        for( int i_prg = 0; i_prg < program_pid->psi->i_prg; i_prg++ )
+        {
+            dvbpsi_PushPacket( program_pid->psi->prg[i_prg]->handle,
+                               p_block->p_buffer );
+        }
+        p_block = p_block->p_next;
+    }
+}
+
+static void MissingPATPMTFixup( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int i_program_number = 1234;
+    int i_program_pid = 1337;
+    int i_pcr_pid = 0x1FFF;
+    int i_num_pes = 0;
+
+    if( p_sys->pid[i_program_pid].b_seen )
+    {
+        /* Find a free one */
+        for( i_program_pid = MIN_ES_PID;
+             i_program_pid < MAX_ES_PID && p_sys->pid[i_program_pid].b_seen;
+             i_program_pid++ );
+    }
+
+    for( int i = MIN_ES_PID; i < MAX_ES_PID; i++ )
+    {
+        if( !p_sys->pid[i].b_seen ||
+            !p_sys->pid[i].probed.i_type )
+            continue;
+
+        if( i_pcr_pid == 0x1FFF && ( p_sys->pid[i].probed.i_type == 0x03 ||
+                                     p_sys->pid[i].probed.b_haspcr ) )
+            i_pcr_pid = p_sys->pid[i].i_pid;
+
+        i_num_pes++;
+    }
+
+    if( i_num_pes == 0 )
+        return;
+
+    ts_stream_t patstream =
+    {
+        .i_pid = 0,
+        .i_continuity_counter = 0x10,
+        .b_discontinuity = false
+    };
+
+    ts_stream_t pmtprogramstream =
+    {
+        .i_pid = i_program_pid,
+        .i_continuity_counter = 0x0,
+        .b_discontinuity = false
+    };
+
+    BuildPAT( DVBPSI_HANDLE_PARAM(p_sys->pid[0].psi->handle)
+            &p_sys->pid[0], BuildPATCallback,
+            0, 1,
+            &patstream,
+            1, &pmtprogramstream, &i_program_number );
+
+    if( !p_sys->pid[i_program_pid].psi )
+    {
+        msg_Err( p_demux, "PAT creation failed" );
+        return;
+    }
+
+    struct esstreams_t
+    {
+        pes_stream_t pes;
+        ts_stream_t ts;
+    };
+    es_format_t esfmt = {0};
+    struct esstreams_t *esstreams = calloc( i_num_pes, sizeof(struct esstreams_t) );
+    pes_mapped_stream_t *mapped = calloc( i_num_pes, sizeof(pes_mapped_stream_t) );
+    if( esstreams && mapped )
+    {
+        int j=0;
+        for( int i = MIN_ES_PID; i < MAX_ES_PID; i++ )
+        {
+            if( !p_sys->pid[i].b_seen ||
+                !p_sys->pid[i].probed.i_type )
+                continue;
+
+            esstreams[j].pes.i_stream_type = p_sys->pid[i].probed.i_type;
+            esstreams[j].pes.i_stream_type = p_sys->pid[i].probed.i_type;
+            esstreams[j].ts.i_pid = p_sys->pid[i].i_pid;
+            mapped[j].pes = &esstreams[j].pes;
+            mapped[j].ts = &esstreams[j].ts;
+            mapped[j].fmt = &esfmt;
+            j++;
+        }
+
+        BuildPMT( DVBPSI_HANDLE_PARAM(p_sys->pid[0].psi->handle) VLC_OBJECT(p_demux),
+                &p_sys->pid[i_program_pid], BuildPMTCallback,
+                0, 1,
+                i_pcr_pid,
+                NULL,
+                1, &pmtprogramstream, &i_program_number,
+                i_num_pes, mapped );
+    }
+    free(esstreams);
+    free(mapped);
+}
+
 /*****************************************************************************
  * Open
  *****************************************************************************/
@@ -686,6 +978,8 @@ static int Open( vlc_object_t *p_this )
         pid->i_pid      = i;
         pid->b_seen     = false;
         pid->b_valid    = false;
+        pid->probed.i_fourcc = 0;
+        pid->probed.i_type = 0;
     }
     /* PID 8191 is padding */
     p_sys->pid[8191].b_seen = true;
@@ -884,6 +1178,17 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
+    while( p_sys->i_pmt_es <= 0 && vlc_object_alive( p_demux )
+           && (!p_sys->pid[0].b_seen && !p_sys->patfix.b_pat_deadline) )
+    {
+        if( Demux( p_demux ) != 1 )
+            break;
+    }
+
+    /* If we had no PAT within 140ms, create PAT/PMT from probed streams */
+    if( p_sys->i_pmt_es == 0 && !p_sys->pid[0].b_seen )
+        MissingPATPMTFixup( p_demux );
+
     while( p_sys->i_pmt_es <= 0 && vlc_object_alive( p_demux ) )
     {
         if( Demux( p_demux ) != 1 )
@@ -1036,6 +1341,15 @@ static int Demux( demux_t *p_demux )
 
         /* Parse the TS packet */
         ts_pid_t *p_pid = &p_sys->pid[PIDGet( p_pkt )];
+
+        /* Probe streams to build PAT/PMT after 140ms in case we don't see any PAT */
+        if( !p_sys->pid[0].b_seen &&
+            (p_pid->probed.i_type == 0 || p_pid->i_pid == p_sys->patfix.i_timesourcepid) &&
+            (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
+            (p_pkt->p_buffer[3] & 0xD0) == 0x10 )  /* Has payload but is not encrypted */
+        {
+            ProbePES( p_demux, p_pid, p_pkt->p_buffer + 4, p_pkt->p_buffer[3] & 0x20 /* Adaptation field */);
+        }
 
         if( p_pid->b_valid )
         {
