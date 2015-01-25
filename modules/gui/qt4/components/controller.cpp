@@ -961,7 +961,7 @@ void FullscreenControllerWidget::toggleFullwidth()
 
 int FullscreenControllerWidget::targetScreen()
 {
-    if( i_screennumber == -1 || i_screennumber > QApplication::desktop()->numScreens() )
+    if( i_screennumber < 0 || i_screennumber > QApplication::desktop()->numScreens() )
         return QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
     return i_screennumber;
 }
