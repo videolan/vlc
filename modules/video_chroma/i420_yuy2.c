@@ -134,7 +134,7 @@ static int Activate( vlc_object_t *p_this )
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
-        case VLC_CODEC_YV12:
+//        case VLC_CODEC_YV12: FIXME invert U and V in the filters :)
         case VLC_CODEC_I420:
             switch( p_filter->fmt_out.video.i_chroma )
             {
