@@ -364,6 +364,7 @@ struct demux_sys_t
     int         i_pmt;
     ts_pid_t    **pmt;
     int         i_pmt_es;
+    bool        b_delay_es_creation;
 
     /* */
     bool        b_es_id_pid;
@@ -433,6 +434,7 @@ static inline int PIDGet( block_t *p )
 }
 
 static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk );
+static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid );
 
 static block_t* ReadTSPacket( demux_t *p_demux );
 static int Seek( demux_t *p_demux, double f_percent );
@@ -1079,6 +1081,7 @@ static int Open( vlc_object_t *p_this )
     /* Init PMT array */
     TAB_INIT( p_sys->i_pmt, p_sys->pmt );
     p_sys->i_pmt_es = 0;
+    p_sys->b_delay_es_creation = true;
 
     /* Read config */
     p_sys->b_es_id_pid = var_CreateGetBool( p_demux, "ts-es-id-pid" );
@@ -1371,6 +1374,8 @@ static int Demux( demux_t *p_demux )
             }
             else
             {
+                if(p_sys->b_delay_es_creation) /* No longer delay ES since that pid's program sends data */
+                    AddAndCreateES( p_demux, NULL );
                 b_frame = GatherData( p_demux, p_pid, p_pkt );
             }
         }
@@ -4813,6 +4818,54 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
 #endif
 }
 
+static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid )
+{
+    demux_sys_t  *p_sys = p_demux->p_sys;
+    bool b_create_delayed = false;
+
+    if( pid )
+    {
+        if( pid->b_seen && p_sys->b_delay_es_creation )
+        {
+            p_sys->b_delay_es_creation = false;
+            b_create_delayed = true;
+        }
+
+        if( !p_sys->b_delay_es_creation )
+        {
+            pid->es->id = es_out_Add( p_demux->out, &pid->es->fmt );
+            for( int i = 0; i < pid->i_extra_es; i++ )
+            {
+                pid->extra_es[i]->id =
+                    es_out_Add( p_demux->out, &pid->extra_es[i]->fmt );
+            }
+            p_sys->i_pmt_es += 1 + pid->i_extra_es;
+        }
+    }
+    else if( p_sys->b_delay_es_creation )
+    {
+        p_sys->b_delay_es_creation = false;
+        b_create_delayed = true;
+    }
+
+    if( b_create_delayed )
+    {
+        for(int i=MIN_ES_PID; i<MAX_ES_PID; i++)
+        {
+            pid = &p_sys->pid[i];
+            if(!pid->es || pid->es->id)
+                continue;
+            pid->es->id = es_out_Add( p_demux->out, &pid->es->fmt );
+            for( int j = 0; j < pid->i_extra_es; j++ )
+            {
+                pid->extra_es[j]->id =
+                    es_out_Add( p_demux->out, &pid->extra_es[j]->fmt );
+            }
+            p_sys->i_pmt_es += 1 + pid->i_extra_es;
+        }
+    }
+}
+
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
 {
     demux_t      *p_demux = data;
@@ -5160,13 +5213,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             }
             else
             {
-                pid->es->id = es_out_Add( p_demux->out, &pid->es->fmt );
-                for( int i = 0; i < pid->i_extra_es; i++ )
-                {
-                    pid->extra_es[i]->id =
-                        es_out_Add( p_demux->out, &pid->extra_es[i]->fmt );
-                }
-                p_sys->i_pmt_es += 1 + pid->i_extra_es;
+                AddAndCreateES( p_demux, pid );
             }
         }
 
