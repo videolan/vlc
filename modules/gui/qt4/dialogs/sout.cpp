@@ -88,7 +88,10 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     CB( localOutput ); CB( transcodeBox );
     CONNECT( ui.profileSelect, optionsChanged(), this, updateMRL() );
 
-    setButtonText( QWizard::FinishButton, "Stream" );
+    setButtonText( QWizard::BackButton, qtr("Back") );
+    setButtonText( QWizard::CancelButton, qtr("Cancel") );
+    setButtonText( QWizard::NextButton, qtr("Next") );
+    setButtonText( QWizard::FinishButton, qtr("Stream") );
 
 #undef CC
 #undef CS
