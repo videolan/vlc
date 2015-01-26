@@ -774,13 +774,12 @@ char *str_format_meta(input_thread_t *input, const char *s)
                     break;
                 {
                     char *value = input_item_GetNowPlayingFb(item);
-                    if (value == NULL)
-                        break;
-
-                    int ret = fputs(value, stream);
-                    free(value);
-
-                    if (ret == EOF)
+                    if (value != NULL)
+                    {
+                        fputs(value, stream);
+                        free(value);
+                    }
+                    else
                     {
                         char *title = input_item_GetTitleFbName(item);
 
