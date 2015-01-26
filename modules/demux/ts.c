@@ -502,6 +502,7 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, int *pi_header_size,
         return -1;
 
     if( memcmp( p_peek, "TFrc", 4 ) == 0 &&
+        p_peek[6] == 0 && memcmp( &p_peek[53], "\x80\x00\x00", 4 ) == 0 &&
         stream_Peek( p_demux->s, &p_peek, TOPFIELD_HEADER_SIZE + TS_PACKET_SIZE_MAX )
             == TOPFIELD_HEADER_SIZE + TS_PACKET_SIZE_MAX )
     {
