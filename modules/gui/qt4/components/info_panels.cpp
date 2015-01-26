@@ -158,6 +158,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     lblURL = new QLabel;
     lblURL->setOpenExternalLinks( true );
     lblURL->setTextFormat( Qt::RichText );
+    lblURL->setMaximumWidth( 128 );
     metaLayout->addWidget( lblURL, line -1, 7, 1, -1 );
 
     ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
