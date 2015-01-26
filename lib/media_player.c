@@ -1,7 +1,7 @@
 /*****************************************************************************
  * media_player.c: Libvlc API Media Instance management functions
  *****************************************************************************
- * Copyright (C) 2005-2011 VLC authors and VideoLAN
+ * Copyright (C) 2005-2015 VLC authors and VideoLAN
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -1328,6 +1328,84 @@ int libvlc_media_player_get_title_count( libvlc_media_player_t *p_mi )
     vlc_object_release( p_input_thread );
 
     return i_ret == VLC_SUCCESS ? val.i_int : -1;
+}
+
+int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi,
+                                                     libvlc_title_description_t *** pp_titles )
+{
+    assert( p_mi );
+
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
+
+    if( !p_input_thread )
+        return -1;
+
+    input_title_t **p_input_title = NULL;
+    int *i_titles = 0;
+
+    /* fetch data */
+    int ret = input_Control(p_input_thread, INPUT_GET_FULL_TITLE_INFO, &p_input_title, &i_titles);
+    vlc_object_release( p_input_thread );
+
+    if( ret != VLC_SUCCESS || p_input_title == NULL)
+    {
+        return -1;
+    }
+
+    if (i_titles == 0)
+    {
+        return 0;
+    }
+
+    const int ci_title_count = (const int)i_titles;
+
+    *pp_titles = calloc( ci_title_count, sizeof(**pp_titles) );
+    if( !*pp_titles )
+    {
+        return -1;
+    }
+
+    /* fill array */
+    for( int i = 0; i < ci_title_count; i++)
+    {
+        libvlc_title_description_t *p_title = calloc( 1, sizeof(*p_title) );
+        if( unlikely(p_title == NULL) )
+        {
+            libvlc_title_descriptions_release( *pp_titles, ci_title_count );
+            free( p_title );
+            return -1;
+        }
+        (*pp_titles)[i] = p_title;
+
+        /* we want to return milliseconds to match the rest of the API */
+        p_title->i_duration = p_input_title[i]->i_length / 1000;
+        p_title->b_menu = p_input_title[i]->b_menu;
+        if( p_input_title[i]->psz_name )
+        {
+            p_title->psz_name = strdup( p_input_title[i]->psz_name );
+        }
+        else
+        {
+            p_title->psz_name = NULL;
+        }
+        vlc_input_title_Delete( p_input_title[i] );
+    }
+
+    return ci_title_count;
+}
+
+void libvlc_title_descriptions_release( libvlc_title_description_t **p_titles,
+                                        unsigned i_count )
+{
+    for (unsigned i = 0; i < i_count; i++ )
+    {
+        if ( !p_titles[i] )
+            continue;
+
+        free( p_titles[i]->psz_name );
+        free( p_titles[i] );
+    }
+    free( p_titles );
 }
 
 void libvlc_media_player_next_chapter( libvlc_media_player_t *p_mi )

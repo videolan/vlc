@@ -1,7 +1,7 @@
 /*****************************************************************************
  * control.c
  *****************************************************************************
- * Copyright (C) 1999-2004 VLC authors and VideoLAN
+ * Copyright (C) 1999-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -356,6 +356,39 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 vlc_mutex_unlock( &p_input->p->p_item->lock );
                 return VLC_EGENERIC;
             }
+        }
+
+        case INPUT_GET_FULL_TITLE_INFO:
+        {
+            input_title_t ***array = (input_title_t ***)va_arg( args, input_title_t *** );
+            int *count = (int *) va_arg( args, int * );
+
+            vlc_mutex_lock( &p_input->p->p_item->lock );
+
+            const int i_titles = p_input->p->i_title;
+            *count = i_titles;
+
+            if( i_titles == 0 )
+            {
+                vlc_mutex_unlock( &p_input->p->p_item->lock );
+                return VLC_EGENERIC;
+            }
+
+            *array = calloc( i_titles, sizeof(**array) );
+            if (!array )
+            {
+                vlc_mutex_unlock( &p_input->p->p_item->lock );
+                return VLC_ENOMEM;
+            }
+
+            for( int i = 0; i < i_titles; i++ )
+            {
+                (*array)[i] = vlc_input_title_Duplicate( p_input->p->title[i] );
+            }
+
+            vlc_mutex_unlock( &p_input->p->p_item->lock );
+
+            return VLC_SUCCESS;
         }
 
         case INPUT_GET_VIDEO_FPS:

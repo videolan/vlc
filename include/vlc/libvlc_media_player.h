@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc_media_player.h:  libvlc_media_player external API
  *****************************************************************************
- * Copyright (C) 1998-2010 VLC authors and VideoLAN
+ * Copyright (C) 1998-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -59,6 +59,18 @@ typedef struct libvlc_track_description_t
     struct libvlc_track_description_t *p_next;
 
 } libvlc_track_description_t;
+
+/**
+ * Description for titles. It contains name (description string),
+ * duration in milliseconds if known,
+ * and information if it was recognized as a menu by the demuxer.
+ */
+typedef struct libvlc_title_description_t
+{
+    int64_t i_duration;
+    char *psz_name;
+    bool b_menu;
+} libvlc_title_description_t;
 
 /**
  * Description for audio output. It contains
@@ -1127,8 +1139,35 @@ LIBVLC_API int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi, int64_t 
  * \return list containing description of available titles.
  * It must be freed with libvlc_track_description_list_release()
  */
-LIBVLC_API libvlc_track_description_t *
+LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
         libvlc_video_get_title_description( libvlc_media_player_t *p_mi );
+
+/**
+ * Get the full description of available titles
+ *
+ * \version LibVLC 3.0.0 and later.
+ *
+ * \param p_mi the media player
+ * \param address to store an allocated array of title descriptions
+ *        descriptions (must be freed with libvlc_title_descriptions_release()
+ *        by the caller) [OUT]
+ *
+ * \return the number of titles (-1 on error)
+ */
+LIBVLC_API int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi,
+                                                                libvlc_title_description_t ***titles );
+
+/**
+ * Release a title description
+ *
+ * \version LibVLC 3.0.0 and later
+ *
+ * \param title description array to release
+ * \param number of title descriptions to release
+ */
+LIBVLC_API
+    void libvlc_title_descriptions_release( libvlc_title_description_t **p_titles,
+                                            unsigned i_count );
 
 /**
  * Get the description of available chapters for specific title.

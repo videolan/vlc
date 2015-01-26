@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_input.h: Core input structures
  *****************************************************************************
- * Copyright (C) 1999-2006 VLC authors and VideoLAN
+ * Copyright (C) 1999-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -92,7 +92,6 @@ typedef struct input_title_t
     /* Title seekpoint */
     int         i_seekpoint;
     seekpoint_t **seekpoint;
-
 } input_title_t;
 
 static inline input_title_t *vlc_input_title_New(void)
@@ -454,6 +453,7 @@ enum input_query_e
 
     /* titles */
     INPUT_GET_TITLE_INFO,     /* arg1=input_title_t** arg2= int * res=can fail */
+    INPUT_GET_FULL_TITLE_INFO,     /* arg1=input_title_t*** arg2= int * res=can fail */
 
     /* Attachments */
     INPUT_GET_ATTACHMENTS, /* arg1=input_attachment_t***, arg2=int*  res=can fail */
