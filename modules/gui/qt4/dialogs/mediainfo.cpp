@@ -54,7 +54,8 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
         setWindowTitle( qtr( "Media Information" ) );
     setWindowRole( "vlc-media-info" );
 
-    setWindowFlags( Qt::Window | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint );
+    setWindowFlags( Qt::Window | Qt::CustomizeWindowHint |
+                    Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint );
 
     /* TabWidgets and Tabs creation */
     infoTabW = new QTabWidget;
