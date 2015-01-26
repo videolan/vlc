@@ -127,11 +127,13 @@ void InputManager::setInput( input_thread_t *_p_input )
         p_item = input_GetItem( p_input );
         emit rateChanged( var_GetFloat( p_input, "rate" ) );
 
+        char *uri = input_item_GetURI( p_item );
+
         /* Get Saved Time */
         if( p_item->i_type == ITEM_TYPE_FILE )
         {
             int i_time = RecentsMRL::getInstance( p_intf )->time( p_item->psz_uri );
-            if( i_time > 0 &&
+            if( i_time > 0 && qfu( uri ) != lastURI &&
                     !var_GetFloat( p_input, "run-time" ) &&
                     !var_GetFloat( p_input, "start-time" ) &&
                     !var_GetFloat( p_input, "stop-time" ) )
@@ -139,6 +141,11 @@ void InputManager::setInput( input_thread_t *_p_input )
                 emit resumePlayback( (int64_t)i_time * 1000 );
             }
         }
+
+        // Save the latest URI to avoid asking to restore the
+        // position on the same input file.
+        lastURI = qfu( uri );
+        free( uri );
     }
     else
     {
@@ -1097,6 +1104,7 @@ void MainInputManager::customEvent( QEvent *event )
 void MainInputManager::stop()
 {
    playlist_Stop( THEPL );
+   getIM()->lastURI.clear();
 }
 
 void MainInputManager::next()

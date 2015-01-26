@@ -154,6 +154,7 @@ private:
     input_item_t   *p_item;
     int             i_old_playing_status;
     QString         oldName;
+    QString         lastURI;
     QString         artUrl;
     float           f_rate;
     float           f_cache;
