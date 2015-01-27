@@ -277,6 +277,19 @@ void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
     vlc_object_release( aout );
 }
 
+char *libvlc_audio_output_device_get( libvlc_media_player_t *mp )
+{
+    audio_output_t *aout = GetAOut( mp );
+    if( aout == NULL )
+        return NULL;
+
+    char *devid = aout_DeviceGet( aout );
+
+    vlc_object_release( aout );
+
+    return devid;
+}
+
 int libvlc_audio_output_get_device_type( libvlc_media_player_t *mp )
 {
     (void) mp;

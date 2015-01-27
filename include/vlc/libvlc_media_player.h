@@ -1571,6 +1571,30 @@ LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
                                                 const char *device_id );
 
 /**
+ * Get the current audio output device identifier.
+ *
+ * This complements libvlc_audio_output_device_set().
+ *
+ * \warning The initial value for the current audio output device identifier
+ * may not be set or may be some unknown value. A LibVLC application should
+ * compare this value against the known device identifiers (e.g. those that
+ * were previously retrieved by a call to libvlc_audio_output_device_enum or
+ * libvlc_audio_output_device_list_get) to find the current audio output device.
+ *
+ * It is possible that the selected audio output device changes (an external
+ * change) without a call to libvlc_audio_output_device_set. That may make this
+ * method unsuitable to use if a LibVLC application is attempting to track
+ * dynamic audio device changes as they happen.
+ *
+ * \param mp media player
+ * \return the current audio output device identifier
+ *         NULL if no device is selected or in case of error
+ *         (the result must be released with free() or libvlc_free()).
+ * \version LibVLC 3.0.0 or later.
+ */
+LIBVLC_API char *libvlc_audio_output_device_get( libvlc_media_player_t *mp );
+
+/**
  * Stub for backward compatibility.
  * \return always -1.
  */
