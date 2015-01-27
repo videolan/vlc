@@ -294,8 +294,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
 
             if( likely(psz_filename != NULL) )
             {
-                msg_Dbg( p_this, "Trying Lua playlist script %s",
-                         psz_filename );
+                msg_Dbg( p_this, "Trying Lua playlist script %s", psz_filename );
                 i_ret = func( p_this, psz_filename, user_data );
                 free( psz_filename );
                 if( i_ret == VLC_SUCCESS )
