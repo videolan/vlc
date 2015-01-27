@@ -83,7 +83,7 @@ static inline void test_current_directory_path (const char *in, const char *cwd,
     char * expected_result = NULL;
     int val = asprintf(&expected_result, "file://%s/%s", cwd, out);
     assert (val != -1);
-    
+
     test (make_URI_def, in, expected_result);
 }
 
