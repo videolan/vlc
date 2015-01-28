@@ -4645,7 +4645,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
     dvbpsi_pmt_es_t      *p_es;
     for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
     {
-        ts_pid_t tmp_pid, *old_pid = 0, *pid = &tmp_pid;
+        ts_pid_t tmp_pid = {0}, *old_pid = {0}, *pid = &tmp_pid;
 
         /* Find out if the PID was already declared */
         for( int i = 0; i < i_clean; i++ )
