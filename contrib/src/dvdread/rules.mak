@@ -1,5 +1,5 @@
 # DVDREAD
-LIBDVDREAD_VERSION := 5.0.0
+LIBDVDREAD_VERSION := 5.0.2
 LIBDVDREAD_URL := $(VIDEOLAN)/libdvdread/$(LIBDVDREAD_VERSION)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
@@ -7,7 +7,7 @@ ifdef GPL
 PKGS += dvdread
 endif
 endif
-ifeq ($(call need_pkg,"dvdread > 4.9.0 "),)
+ifeq ($(call need_pkg,"dvdread > 5.0.0 "),)
 PKGS_FOUND += dvdread
 endif
 
@@ -18,9 +18,6 @@ $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/dvdread/dvdread-win32.patch
-endif
 	cd $(UNPACK_DIR) && sed -i -e 's,Requires.private,Requires,g' misc/*.pc.in
 	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
