@@ -26,7 +26,6 @@ FFMPEGCONF = \
 	--disable-filters \
 	--disable-bsfs \
 	--disable-bzlib \
-	--disable-programs \
 	--disable-avresample
 
 ifdef USE_FFMPEG
@@ -59,7 +58,7 @@ endif
 endif
 
 ifdef HAVE_CROSS_COMPILE
-FFMPEGCONF += --enable-cross-compile
+FFMPEGCONF += --enable-cross-compile --disable-programs
 ifndef HAVE_DARWIN_OS
 FFMPEGCONF += --cross-prefix=$(HOST)-
 endif
