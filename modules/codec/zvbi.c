@@ -513,6 +513,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
         fmt.i_width = fmt.i_visible_width = i_columns * 12;
         fmt.i_height = fmt.i_visible_height = i_rows * 10;
         fmt.i_bits_per_pixel = 32;
+        fmt.i_sar_num = fmt.i_sar_den = 0; /* let the vout set the correct AR */
     }
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
