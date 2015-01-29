@@ -31,8 +31,8 @@ libcaca - Copyright (c) 2004 Sam Hocevar - WTFPL / LGPLv2.1 or later /
 libdca - Copyright (c) 2004-2007 VideoLAN and authors - GPLv2 or later
 libdvbpsi - Copyright (c) 2001-2015 VideoLAN and authors - LGPLv2.1 or later
 libdvdcss - Copyright (c) 2001-2015 VideoLAN and authors - GPLv2 or later
-libdvdread - LGPLv2.1 or later
-libdvdnav - LGPLv2.1 or later
+libdvdread - GPLv2 or later
+libdvdnav - GPLv2 or later
 libebml - Copyright (c) 2002-2015 Steve Lhomme - LGPLv2.1 or later
 libFLAC - Copyright (c) 2001 - 2014 Josh Coalson et al. - Xiph.org BSD license
 libgme - LGPLv2.1 or later
