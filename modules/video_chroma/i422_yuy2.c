@@ -39,9 +39,9 @@
 
 #define SRC_FOURCC  "I422"
 #if defined (MODULE_NAME_IS_i422_yuy2)
-#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv,Y211"
+#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,Y211"
 #else
-#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv"
+#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV"
 #endif
 
 /*****************************************************************************
@@ -53,12 +53,10 @@ static void I422_YUY2               ( filter_t *, picture_t *, picture_t * );
 static void I422_YVYU               ( filter_t *, picture_t *, picture_t * );
 static void I422_UYVY               ( filter_t *, picture_t *, picture_t * );
 static void I422_IUYV               ( filter_t *, picture_t *, picture_t * );
-static void I422_cyuv               ( filter_t *, picture_t *, picture_t * );
 static picture_t *I422_YUY2_Filter  ( filter_t *, picture_t * );
 static picture_t *I422_YVYU_Filter  ( filter_t *, picture_t * );
 static picture_t *I422_UYVY_Filter  ( filter_t *, picture_t * );
 static picture_t *I422_IUYV_Filter  ( filter_t *, picture_t * );
-static picture_t *I422_cyuv_Filter  ( filter_t *, picture_t * );
 #if defined (MODULE_NAME_IS_i422_yuy2)
 static void I422_Y211               ( filter_t *, picture_t *, picture_t * );
 static picture_t *I422_Y211_Filter  ( filter_t *, picture_t * );
@@ -130,10 +128,6 @@ static int Activate( vlc_object_t *p_this )
                     p_filter->pf_video_filter = I422_IUYV_Filter;
                     break;
 
-                case VLC_CODEC_CYUV:
-                    p_filter->pf_video_filter = I422_cyuv_Filter;
-                    break;
-
 #if defined (MODULE_NAME_IS_i422_yuy2)
                 case VLC_CODEC_Y211:
                     p_filter->pf_video_filter = I422_Y211_Filter;
@@ -157,7 +151,6 @@ VIDEO_FILTER_WRAPPER( I422_YUY2 )
 VIDEO_FILTER_WRAPPER( I422_YVYU )
 VIDEO_FILTER_WRAPPER( I422_UYVY )
 VIDEO_FILTER_WRAPPER( I422_IUYV )
-VIDEO_FILTER_WRAPPER( I422_cyuv )
 #if defined (MODULE_NAME_IS_i422_yuy2)
 VIDEO_FILTER_WRAPPER( I422_Y211 )
 #endif
@@ -453,104 +446,6 @@ static void I422_IUYV( filter_t *p_filter, picture_t *p_source,
     VLC_UNUSED(p_source); VLC_UNUSED(p_dest);
     /* FIXME: TODO ! */
     msg_Err( p_filter, "I422_IUYV unimplemented, please harass <sam@zoy.org>" );
-}
-
-/*****************************************************************************
- * I422_cyuv: planar YUV 4:2:2 to upside-down packed UYVY 4:2:2
- *****************************************************************************/
-VLC_TARGET
-static void I422_cyuv( filter_t *p_filter, picture_t *p_source,
-                                           picture_t *p_dest )
-{
-    uint8_t *p_line = p_dest->p->p_pixels + p_dest->p->i_visible_lines * p_dest->p->i_pitch;
-    uint8_t *p_y = p_source->Y_PIXELS;
-    uint8_t *p_u = p_source->U_PIXELS;
-    uint8_t *p_v = p_source->V_PIXELS;
-
-    int i_x, i_y;
-
-    const int i_source_margin = p_source->p[0].i_pitch
-                                 - p_source->p[0].i_visible_pitch;
-    const int i_source_margin_c = p_source->p[1].i_pitch
-                                 - p_source->p[1].i_visible_pitch;
-    const int i_dest_margin = p_dest->p->i_pitch
-                               - p_dest->p->i_visible_pitch;
-
-#if defined (MODULE_NAME_IS_i422_yuy2_sse2)
-
-    if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((intptr_t)p_line|(intptr_t)p_y))) )
-    {
-        /* use faster SSE2 aligned fetch and store */
-        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
-        {
-            p_line -= 2 * p_dest->p->i_pitch;
-
-            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
-            {
-                SSE2_CALL( SSE2_YUV422_UYVY_ALIGNED );
-            }
-            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
-            {
-                C_YUV422_UYVY( p_line, p_y, p_u, p_v );
-            }
-            p_y += i_source_margin;
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-            p_line += i_dest_margin;
-        }
-    }
-    else {
-        /* use slower SSE2 unaligned fetch and store */
-        for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
-        {
-            p_line -= 2 * p_dest->p->i_pitch;
-
-            for( i_x = p_filter->fmt_in.video.i_width / 16 ; i_x-- ; )
-            {
-                SSE2_CALL( SSE2_YUV422_UYVY_UNALIGNED );
-            }
-            for( i_x = ( p_filter->fmt_in.video.i_width % 16 ) / 2; i_x-- ; )
-            {
-                C_YUV422_UYVY( p_line, p_y, p_u, p_v );
-            }
-            p_y += i_source_margin;
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-            p_line += i_dest_margin;
-        }
-    }
-    SSE2_END;
-
-#else
-
-    for( i_y = p_filter->fmt_in.video.i_height ; i_y-- ; )
-    {
-        for( i_x = p_filter->fmt_in.video.i_width / 8 ; i_x-- ; )
-        {
-            p_line -= 2 * p_dest->p->i_pitch;
-
-#if defined (MODULE_NAME_IS_i422_yuy2)
-            C_YUV422_UYVY( p_line, p_y, p_u, p_v );
-            C_YUV422_UYVY( p_line, p_y, p_u, p_v );
-            C_YUV422_UYVY( p_line, p_y, p_u, p_v );
-            C_YUV422_UYVY( p_line, p_y, p_u, p_v );
-#elif defined (MODULE_NAME_IS_i422_yuy2_mmx)
-            MMX_CALL( MMX_YUV422_UYVY );
-#endif
-        }
-        p_y += i_source_margin;
-        p_u += i_source_margin_c;
-        p_v += i_source_margin_c;
-        p_line += i_dest_margin;
-    }
-#if defined (MODULE_NAME_IS_i422_yuy2_mmx)
-    MMX_END;
-#elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
-    SSE2_END;
-#endif
-
-#endif
 }
 
 /*****************************************************************************
