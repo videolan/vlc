@@ -42,7 +42,6 @@
 
 #define CASE_PACKED_YUV_422                 \
         case VLC_CODEC_UYVY:   \
-        case VLC_CODEC_CYUV:   \
         case VLC_CODEC_YUYV:   \
         case VLC_CODEC_YVYU:
 
@@ -52,7 +51,6 @@ static inline int GetPackedYuvOffsets( vlc_fourcc_t i_chroma,
     switch( i_chroma )
     {
         case VLC_CODEC_UYVY:
-        case VLC_CODEC_CYUV: /* <-- FIXME: reverted, whatever that means */
             /* UYVY */
             *i_y_offset = 1;
             *i_u_offset = 0;

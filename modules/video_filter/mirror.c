@@ -233,9 +233,6 @@ static void VerticalMirror( picture_t *p_pic, picture_t *p_outpic, int i_plane,
                                  true );
             break;
         case VLC_CODEC_UYVY:
-        case VLC_CODEC_CYUV:
-            YUV422VerticalMirror( p_pic, p_outpic, i_plane, b_left_to_right,
-                                 false );
             break;
         case VLC_CODEC_RGB24:
             RV24VerticalMirror( p_pic, p_outpic, i_plane, b_left_to_right );
