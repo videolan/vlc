@@ -37,7 +37,8 @@ Demuxers:
  * Support WMV and WMAV in MP4/mov, aka Flip4Mac files
  * Support bitmap audio channel reordering in MP4/mov
  * Support AlbumArtist and DiscNumber metadata
- * Fixed selecting recorded program from TopField TS files
+ * Fixed program selection with recorded TS (TopField, DreamBox and others)
+ * Fixed TS playback with PAT/PMT less recordings
  * Support for lame's replaygain extension in mpeg files
 
 Stream filter:
