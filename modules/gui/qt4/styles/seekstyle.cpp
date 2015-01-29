@@ -128,7 +128,7 @@ void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex
                 }
 
                 /* draw buffering overlay */
-                if ( slideroptions->buffering < 1.0 )
+                if ( slideroptions->buffering > 0.0 && slideroptions->buffering < 1.0 )
                 {
                     QRect innerRect = groove.adjusted( 1, 1,
                                         groove.width() * ( -1.0 + slideroptions->buffering ) - 1, 0 );

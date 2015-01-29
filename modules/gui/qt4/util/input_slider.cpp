@@ -60,7 +60,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
 {
     isSliding = false;
     isJumping = false;
-    f_buffering = 1.0;
+    f_buffering = 0.0;
     mHandleOpacity = 1.0;
     chapters = NULL;
     mHandleLength = -1;
@@ -393,7 +393,7 @@ void SeekSlider::paintEvent( QPaintEvent *ev )
         if ( QTime::currentTime() > bufferingStart.addSecs( 1 ) )
             option.buffering = f_buffering;
         else
-            option.buffering = 1.0;
+            option.buffering = 0.0;
         option.length = inputLength;
         option.animate = ( animHandle->state() == QAbstractAnimation::Running
                            || hideHandleTimer->isActive() );
