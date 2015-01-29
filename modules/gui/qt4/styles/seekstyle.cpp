@@ -127,6 +127,17 @@ void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex
                     painter->drawRoundedRect( valueRect, RADIUS, RADIUS );
                 }
 
+                if ( slideroptions->buffering == 0.0 && slideroptions->animationloading > 0.0 )
+                {
+                    int width = groove.width() - groove.width() / 6;
+                    QRect innerRect = groove.adjusted( slideroptions->animationloading * width + 1, 1,
+                            width * ( -1.0 + slideroptions->animationloading ) - 1, 0);
+                    QColor overlayColor = QColor( "Orange" );
+                    overlayColor.setAlpha( 128 );
+                    painter->setBrush( overlayColor );
+                    painter->drawRoundedRect( innerRect, RADIUS, RADIUS );
+                }
+
                 /* draw buffering overlay */
                 if ( slideroptions->buffering > 0.0 && slideroptions->buffering < 1.0 )
                 {

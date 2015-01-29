@@ -32,6 +32,7 @@
 #include "util/input_slider.hpp"
 #include "util/timetooltip.hpp"
 #include "adapters/seekpoints.hpp"
+#include "input_manager.hpp"
 
 #include <QPaintEvent>
 #include <QPainter>
@@ -48,6 +49,7 @@
 #include <QPropertyAnimation>
 #include <QApplication>
 #include <QDebug>
+#include <QSequentialAnimationGroup>
 
 #define MINIMUM 0
 #define MAXIMUM 1000
@@ -62,6 +64,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     isJumping = false;
     f_buffering = 0.0;
     mHandleOpacity = 1.0;
+    mLoading = 0.0;
     chapters = NULL;
     mHandleLength = -1;
     b_seekable = true;
@@ -130,10 +133,27 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     animHandle->setStartValue( 0.0 );
     animHandle->setEndValue( 1.0 );
 
+    QPropertyAnimation *animLoadingIn = new QPropertyAnimation( this, "loadingProperty", this );
+    animLoadingIn->setDuration( 2000 );
+    animLoadingIn->setStartValue( 0.0 );
+    animLoadingIn->setEndValue( 1.0 );
+    animLoadingIn->setEasingCurve( QEasingCurve::OutBounce );
+    QPropertyAnimation *animLoadingOut = new QPropertyAnimation( this, "loadingProperty", this );
+    animLoadingOut->setDuration( 2000 );
+    animLoadingOut->setStartValue( 1.0 );
+    animLoadingOut->setEndValue( 0.0 );
+    animLoadingOut->setEasingCurve( QEasingCurve::OutBounce );
+
+    animLoading = new QSequentialAnimationGroup();
+    animLoading->addAnimation( animLoadingIn );
+    animLoading->addAnimation( animLoadingOut );
+    animLoading->setLoopCount( -1 );
+
     hideHandleTimer = new QTimer( this );
     hideHandleTimer->setSingleShot( true );
     hideHandleTimer->setInterval( FADEOUTDELAY );
 
+    CONNECT( MainInputManager::getInstance(), inputChanged( input_thread_t * ), this , inputUpdated( input_thread_t * ) );
     CONNECT( this, sliderMoved( int ), this, startSeekTimer() );
     CONNECT( seekLimitTimer, timeout(), this, updatePos() );
     CONNECT( hideHandleTimer, timeout(), this, hideHandle() );
@@ -202,7 +222,22 @@ void SeekSlider::updateBuffering( float f_buffering_ )
     if ( f_buffering_ < f_buffering )
         bufferingStart = QTime::currentTime();
     f_buffering = f_buffering_;
+    if ( f_buffering > 0.0 || isEnabled() ) {
+        animLoading->stop();
+        mLoading = 0.0;
+    }
     repaint();
+}
+
+void SeekSlider::inputUpdated( input_thread_t *p_input )
+{
+    if ( p_input == NULL ) {
+        animLoading->stop();
+        mLoading = 0.0;
+        repaint();
+    }
+    else if ( f_buffering == 0.0 && !isEnabled() )
+        animLoading->start();
 }
 
 void SeekSlider::processReleasedButton()
@@ -398,6 +433,7 @@ void SeekSlider::paintEvent( QPaintEvent *ev )
         option.animate = ( animHandle->state() == QAbstractAnimation::Running
                            || hideHandleTimer->isActive() );
         option.animationopacity = mHandleOpacity;
+        option.animationloading = mLoading;
         option.sliderPosition = sliderPosition();
         option.sliderValue = value();
         option.maximum = maximum();
@@ -446,9 +482,21 @@ qreal SeekSlider::handleOpacity() const
     return mHandleOpacity;
 }
 
+qreal SeekSlider::loading() const
+{
+    return mLoading;
+}
+
 void SeekSlider::setHandleOpacity(qreal opacity)
 {
     mHandleOpacity = opacity;
+    /* Request a new paintevent */
+    update();
+}
+
+void SeekSlider::setLoading(qreal loading)
+{
+    mLoading = loading;
     /* Request a new paintevent */
     update();
 }

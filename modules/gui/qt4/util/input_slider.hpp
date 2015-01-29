@@ -46,12 +46,14 @@ class SeekPoints;
 class QPropertyAnimation;
 class QCommonStyle;
 class TimeTooltip;
+class QSequentialAnimationGroup;
 
 /* Input Slider derived from QSlider */
 class SeekSlider : public QSlider
 {
     Q_OBJECT
     Q_PROPERTY(qreal handleOpacity READ handleOpacity WRITE setHandleOpacity)
+    Q_PROPERTY(qreal loadingProperty READ loading WRITE setLoading)
 public:
     SeekSlider( Qt::Orientation q, QWidget *_parent = 0, bool _classic = false );
     virtual ~SeekSlider();
@@ -73,7 +75,9 @@ protected:
 
     void processReleasedButton();
     qreal handleOpacity() const;
+    qreal loading() const;
     void setHandleOpacity( qreal opacity );
+    void setLoading( qreal loading );
     int handleLength();
 
 private:
@@ -102,7 +106,9 @@ private:
 
     /* Handle's animation */
     qreal mHandleOpacity;
+    qreal mLoading;
     QPropertyAnimation *animHandle;
+    QSequentialAnimationGroup *animLoading;
     QTimer *hideHandleTimer;
 
 public slots:
@@ -114,6 +120,7 @@ public slots:
 private slots:
     void startSeekTimer();
     void updatePos();
+    void inputUpdated( input_thread_t *p_input );
 
 signals:
     void sliderDragged( float );
