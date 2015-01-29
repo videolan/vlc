@@ -1102,14 +1102,14 @@ static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int
             /* Be sure we will read something */
             p_sys->stream.i_used += tk->i_start + p_sys->stream.i_offset + i_read - tk->i_end;
         }
-        if( AStreamRefillStream( s ) ) break;
+        if( AStreamRefillStream( s ) )
+        {
+            if( tk->i_end < tk->i_start + p_sys->stream.i_offset )
+                return 0; /* EOF */
+            i_read = tk->i_end - tk->i_start - p_sys->stream.i_offset;
+            break;
+        }
     }
-
-    if( tk->i_end < tk->i_start + p_sys->stream.i_offset + i_read )
-    {
-        i_read = tk->i_end - tk->i_start - p_sys->stream.i_offset;
-    }
-
 
     /* Now, direct pointer or a copy ? */
     i_off = (tk->i_start + p_sys->stream.i_offset) % STREAM_CACHE_TRACK_SIZE;
