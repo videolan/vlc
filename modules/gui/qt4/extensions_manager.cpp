@@ -49,7 +49,7 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
     menuMapper = new QSignalMapper( this );
     CONNECT( menuMapper, mapped( int ), this, triggerMenu( int ) );
     CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, playingChanged( int ) );
-    DCONNECT( THEMIM, inputChanged(  ),
+    DCONNECT( THEMIM, inputChanged( input_thread_t * ),
               this, inputChanged( ) );
     CONNECT( THEMIM->getIM(), metaChanged( input_item_t* ),
              this, metaChanged( input_item_t* ) );

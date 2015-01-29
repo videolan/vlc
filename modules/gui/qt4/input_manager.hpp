@@ -314,7 +314,7 @@ private slots:
     void menusUpdateAudio( const QString& );
 
 signals:
-    void inputChanged( );
+    void inputChanged( input_thread_t * );
     void volumeChanged( float );
     void soundMuteChanged( bool );
     void playlistItemAppended( int itemId, int parentId );

@@ -1023,13 +1023,13 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     mute.addCallback( this, SLOT(notifyMute(bool)) );
 
     /* Warn our embedded IM about input changes */
-    DCONNECT( this, inputChanged(),
+    DCONNECT( this, inputChanged( input_thread_t * ),
               im, inputChangedHandler() );
 
     /* initialize p_input (an input can already be running) */
     p_input = playlist_CurrentInput( THEPL );
     if( p_input )
-        emit inputChanged( );
+        emit inputChanged( p_input );
 
     /* Audio Menu */
     menusAudioMapper = new QSignalMapper();
@@ -1042,7 +1042,7 @@ MainInputManager::~MainInputManager()
     {
        vlc_object_release( p_input );
        p_input = NULL;
-       emit inputChanged( );
+       emit inputChanged( NULL );
     }
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
@@ -1097,7 +1097,7 @@ void MainInputManager::customEvent( QEvent *event )
     if( p_input != NULL )
         vlc_object_release( p_input );
     p_input = playlist_CurrentInput( THEPL );
-    emit inputChanged( );
+    emit inputChanged( p_input );
 }
 
 /* Playlist Control functions */
