@@ -35,16 +35,26 @@
 #include <vlc_services_discovery.h>
 #include <bdsm/bdsm.h>
 
+#if !defined(BDSM_VERSION_CURRENT) || BDSM_VERSION_CURRENT < 2
+# error libdsm version current too low: need at least BDSM_VERSION_CURRENT 2
+#endif
+
+#define BROADCAST_TIMEOUT 6 // in seconds
+
 int bdsm_SdOpen( vlc_object_t * );
 void bdsm_SdClose( vlc_object_t * );
 int bdsm_sd_probe_Open( vlc_object_t * );
 
+struct entry_item
+{
+    netbios_ns_entry *p_entry;
+    input_item_t *p_item;
+};
+
 struct services_discovery_sys_t
 {
     netbios_ns      *p_ns;
-    vlc_thread_t    thread;
-
-    atomic_bool     stop;
+    vlc_array_t     *p_entry_item_list;
 };
 
 int bdsm_sd_probe_Open (vlc_object_t *p_this)
@@ -57,63 +67,100 @@ int bdsm_sd_probe_Open (vlc_object_t *p_this)
     return VLC_PROBE_CONTINUE;
 }
 
-static void *Run( void *data )
+static void entry_item_append( services_discovery_t *p_sd,
+                               netbios_ns_entry *p_entry,
+                               input_item_t *p_item )
 {
-    services_discovery_t *p_sd = data;
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    struct entry_item *p_entry_item = calloc(1, sizeof(struct entry_item));
+
+    if( !p_entry_item )
+        return;
+    p_entry_item->p_entry = p_entry;
+    p_entry_item->p_item = p_item;
+    vlc_gc_incref( p_item );
+    vlc_array_append( p_sys->p_entry_item_list, p_entry_item );
+    services_discovery_AddItem( p_sd, p_item, NULL );
+}
+
+static void entry_item_remove( services_discovery_t *p_sd,
+                               netbios_ns_entry *p_entry )
+{
     services_discovery_sys_t *p_sys = p_sd->p_sys;
 
-    if( !netbios_ns_discover( p_sys->p_ns ) )
-        return NULL;
-
-    if (atomic_load(&p_sys->stop))
-        return NULL;
-
-    for( ssize_t i = 0; i < netbios_ns_entry_count( p_sys->p_ns ); i++ )
+    for ( int i = 0; i < vlc_array_count( p_sys->p_entry_item_list ); i++ )
     {
-        netbios_ns_entry *p_entry = netbios_ns_entry_at( p_sys->p_ns, i );
-        char type = netbios_ns_entry_type( p_entry );
+        struct entry_item *p_entry_item;
 
-        if( type == NETBIOS_FILESERVER )
+        p_entry_item = vlc_array_item_at_index( p_sys->p_entry_item_list, i );
+        if( p_entry_item->p_entry == p_entry  )
         {
-            input_item_t *p_item;
-            char *psz_mrl;
-            const char *name = netbios_ns_entry_name( p_entry );
-
-            if( asprintf(&psz_mrl, "smb://%s", name) < 0 )
-                return NULL;
-
-            p_item = input_item_NewWithType( psz_mrl, name, 0, NULL,
-                                             0, -1, ITEM_TYPE_NODE );
-            msg_Dbg( p_sd, "Adding item %s", psz_mrl );
-
-            services_discovery_AddItem( p_sd, p_item, NULL );
-
+            services_discovery_RemoveItem( p_sd, p_entry_item->p_item );
+            vlc_gc_decref( p_entry_item->p_item );
+            vlc_array_remove(  p_sys->p_entry_item_list, i );
+            free( p_entry_item );
+            break;
         }
     }
-    return NULL;
+}
+
+static void netbios_ns_discover_on_entry_added( void *p_opaque,
+                                                netbios_ns_entry *p_entry )
+{
+    services_discovery_t *p_sd = (services_discovery_t *)p_opaque;
+
+    char type = netbios_ns_entry_type( p_entry );
+
+    if( type == NETBIOS_FILESERVER )
+    {
+        input_item_t *p_item;
+        char *psz_mrl;
+        const char *name = netbios_ns_entry_name( p_entry );
+
+        if( asprintf(&psz_mrl, "smb://%s", name) < 0 )
+            return;
+
+        p_item = input_item_NewWithType( psz_mrl, name, 0, NULL,
+                                         0, -1, ITEM_TYPE_NODE );
+        msg_Dbg( p_sd, "Adding item %s", psz_mrl );
+        free(psz_mrl);
+
+        entry_item_append( p_sd, p_entry, p_item );
+        vlc_gc_decref( p_item );
+    }
+}
+
+static void netbios_ns_discover_on_entry_removed( void *p_opaque,
+                                                  netbios_ns_entry *p_entry )
+{
+    services_discovery_t *p_sd = (services_discovery_t *)p_opaque;
+
+    entry_item_remove( p_sd, p_entry );
 }
 
 int bdsm_SdOpen (vlc_object_t *p_this)
 {
     services_discovery_t *p_sd = (services_discovery_t *)p_this;
     services_discovery_sys_t *p_sys = calloc (1, sizeof (*p_sys));
+    netbios_ns_discover_callbacks callbacks;
 
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
     p_sd->p_sys = p_sys;
+    p_sys->p_entry_item_list = vlc_array_new();
 
     p_sys->p_ns = netbios_ns_new();
     if( p_sys->p_ns == NULL )
         goto error;
 
-    atomic_store(&p_sys->stop, false);
+    callbacks.p_opaque = p_sd;
+    callbacks.pf_on_entry_added = netbios_ns_discover_on_entry_added;
+    callbacks.pf_on_entry_removed = netbios_ns_discover_on_entry_removed;
 
-    if( vlc_clone( &p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW ) )
-    {
-        p_sys->thread = 0;
+    if( !netbios_ns_discover_start( p_sys->p_ns, BROADCAST_TIMEOUT,
+                                    &callbacks) )
         goto error;
-    }
 
     return VLC_SUCCESS;
 
@@ -130,16 +177,25 @@ void bdsm_SdClose (vlc_object_t *p_this)
     if( p_sys == NULL )
         return;
 
-    if( p_sys->thread ) {
-        atomic_store(&p_sys->stop, true);
-
-        if( p_sys->p_ns )
-            netbios_ns_abort( p_sys->p_ns );
-        vlc_join( p_sys->thread, NULL );
-    }
     if( p_sys->p_ns )
+    {
+        netbios_ns_discover_stop( p_sys->p_ns );
         netbios_ns_destroy( p_sys->p_ns );
+    }
+
+    if( p_sys->p_entry_item_list )
+    {
+        for ( int i = 0; i < vlc_array_count( p_sys->p_entry_item_list ); i++ )
+        {
+            struct entry_item *p_entry_item;
+
+            p_entry_item = vlc_array_item_at_index( p_sys->p_entry_item_list,
+                                                    i );
+            vlc_gc_decref( p_entry_item->p_item );
+            free( p_entry_item );
+        }
+        vlc_array_destroy( p_sys->p_entry_item_list );
+    }
 
     free( p_sys );
 }
-
