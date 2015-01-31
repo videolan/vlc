@@ -88,10 +88,8 @@ function js_descramble( sig, js_url )
         -- Buffer lines for later, so we don't have to make a second
         -- HTTP request later
         table.insert( lines, line )
-        -- c&&(b.signature=ij(c));
-        -- descrambler = string.match( line, "%.signature=(.-)%(" )
-        -- descrambler = string.match( line, "%.sig%|%|(.-)%(" )
-        descrambler = string.match( line, "%.sig||([a-zA-Z0-9]+)%(" )
+        -- c&&a.set("signature",br(c));
+        descrambler = string.match( line, "%.set%(\"signature\",(.-)%(" )
     end
 
     -- Fetch the code of the descrambler function. The function is
