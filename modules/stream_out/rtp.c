@@ -355,7 +355,8 @@ struct sout_stream_id_sys_t
 {
     sout_stream_t *p_stream;
     /* rtp field */
-    uint16_t    i_sequence;
+    /* For RFC 4175, seqnum is extended to 32-bits */
+    uint32_t    i_sequence;
     bool        b_first_packet;
     bool        b_ts_init;
     uint32_t    i_ts_offset;
@@ -1652,6 +1653,11 @@ void rtp_packetize_common( sout_stream_id_sys_t *id, block_t *out,
     id->i_sequence++;
 }
 
+uint16_t rtp_get_extended_sequence( sout_stream_id_sys_t *id )
+{
+    return id->i_sequence >> 16;
+}
+
 void rtp_packetize_send( sout_stream_id_sys_t *id, block_t *out )
 {
     block_FifoPut( id->p_fifo, out );
@@ -1796,4 +1802,10 @@ static sout_access_out_t *GrabberCreate( sout_stream_t *p_stream )
     p_grab->pf_seek     = NULL;
     p_grab->pf_write    = AccessOutGrabberWrite;
     return p_grab;
+}
+
+void rtp_get_video_geometry( sout_stream_id_sys_t *id, int *width, int *height )
+{
+    int ret = sscanf( id->rtp_fmt.fmtp, "%*s width=%d; height=%d; ", width, height );
+    assert( ret == 2 );
 }

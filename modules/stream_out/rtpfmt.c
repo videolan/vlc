@@ -6,6 +6,8 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ * RFC 4175 support based on gstrtpvrawpay.c (LGPL 2) by:
+ * Wim Taymans <wim.taymans@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -57,6 +59,8 @@ static int rtp_packetize_g726_40 (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_xiph (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_vp8 (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_jpeg (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_r420 (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_rgb24 (sout_stream_id_sys_t *, block_t *);
 
 #define XIPH_IDENT (0)
 
@@ -523,6 +527,32 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
         case VLC_CODEC_VP8:
             rtp_fmt->ptname = "VP8";
             rtp_fmt->pf_packetize = rtp_packetize_vp8;
+            break;
+        case VLC_CODEC_R420:
+            rtp_fmt->ptname = "RAW";
+            rtp_fmt->pf_packetize = rtp_packetize_r420;
+            if( asprintf( &rtp_fmt->fmtp,
+                    "sampling=YCbCr-4:2:0; width=%d; height=%d; "
+                    "depth=8; colorimetry=BT%s",
+                    p_fmt->video.i_visible_width, p_fmt->video.i_visible_height,
+                    p_fmt->video.i_visible_height > 576 ? "709-2" : "601-5") == -1 )
+            {
+                rtp_fmt->fmtp = NULL;
+                return VLC_ENOMEM;
+            }
+            break;
+        case VLC_CODEC_RGB24:
+            rtp_fmt->ptname = "RAW";
+            rtp_fmt->pf_packetize = rtp_packetize_rgb24;
+            if( asprintf( &rtp_fmt->fmtp,
+                    "sampling=RGB; width=%d; height=%d; "
+                    "depth=8; colorimetry=SMPTE240M",
+                    p_fmt->video.i_visible_width,
+                    p_fmt->video.i_visible_height ) == -1 )
+            {
+                rtp_fmt->fmtp = NULL;
+                return VLC_ENOMEM;
+            }
             break;
         case VLC_CODEC_MJPG:
         case VLC_CODEC_JPEG:
@@ -1500,6 +1530,154 @@ static int rtp_packetize_vp8( sout_stream_id_sys_t *id, block_t *in )
 
     block_Release(in);
     return VLC_SUCCESS;
+}
+
+/* See RFC 4175 */
+static int rtp_packetize_rawvideo( sout_stream_id_sys_t *id, block_t *in, vlc_fourcc_t i_format  )
+{
+    int i_width, i_height;
+    rtp_get_video_geometry( id, &i_width, &i_height );
+    int i_pgroup; /* Size of a group of pixels */
+    int i_xdec, i_ydec; /* sub-sampling factor in x and y */
+    switch( i_format )
+    {
+        case VLC_CODEC_RGB24:
+            i_pgroup = 3;
+            i_xdec = i_ydec = 1;
+            break;
+        case VLC_CODEC_R420:
+            i_pgroup = 6;
+            i_xdec = i_ydec = 2;
+            break;
+        default:
+            assert(0);
+    }
+
+    static const int RTP_HEADER_LEN = 12;
+    /* each partial or complete line needs a 6 byte header */
+    const int i_line_header_size = 6;
+    const int i_min_line_size = i_line_header_size + i_pgroup;
+    uint8_t *p_data = in->p_buffer;
+
+    for( uint16_t i_line_number = 0, i_column = 0; i_line_number < i_height; )
+    {
+        /* Allocate a packet */
+        int i_payload = (int)(rtp_mtu (id) - RTP_HEADER_LEN);
+        if( i_payload <= 0 )
+        {
+            block_Release( in );
+            return VLC_EGENERIC;
+        }
+
+        block_t *out = block_Alloc( RTP_HEADER_LEN + i_payload );
+        if( unlikely( out == NULL ) )
+        {
+            block_Release( in );
+            return VLC_ENOMEM;
+        }
+
+        /* Do headers first... */
+
+        /* Write extended seqnum */
+        uint8_t *p_outdata = out->p_buffer + RTP_HEADER_LEN;
+        SetWBE( p_outdata, rtp_get_extended_sequence( id ) );
+        p_outdata += 2;
+        i_payload -= 2;
+
+        uint8_t *p_headers = p_outdata;
+
+        for( uint8_t i_cont = 0x80; i_cont && i_payload > i_min_line_size; )
+        {
+            i_payload -= i_line_header_size;
+
+            int i_pixels = i_width - i_column;
+            int i_length = (i_pixels * i_pgroup) / i_xdec;
+
+            const bool b_next_line = i_payload >= i_length;
+            if( !b_next_line )
+            {
+                i_pixels = (i_payload / i_pgroup) * i_xdec;
+                i_length = (i_pixels * i_pgroup) / i_xdec;
+            }
+
+            i_payload -= i_length;
+
+            /* write length */
+            SetWBE( p_outdata, i_length );
+            p_outdata += 2;
+
+            /* write line number */
+            /* TODO: support interlaced */
+            const uint8_t i_field = 0;
+            SetWBE( p_outdata, i_line_number );
+            *p_outdata |= i_field << 7;
+            p_outdata += 2;
+
+            /* continue if there's still room in the packet and we have more lines */
+            i_cont = (i_payload > i_min_line_size && i_line_number < (i_height - i_ydec)) ? 0x80 : 0x00;
+
+            /* write offset and continuation marker */
+            SetWBE( p_outdata, i_column );
+            *p_outdata |= i_cont;
+            p_outdata += 2;
+
+            if( b_next_line )
+            {
+                i_column = 0;
+                i_line_number += i_ydec;
+            }
+            else
+            {
+                i_column += i_pixels;
+            }
+        }
+
+        /* write the actual video data here */
+        for( uint8_t i_cont = 0x80; i_cont; p_headers += i_line_header_size )
+        {
+            const uint16_t i_length = GetWBE( p_headers );
+            const uint16_t i_lin = GetWBE( p_headers + 2 ) & 0x7fff;
+            uint16_t i_offs = GetWBE( p_headers + 4 ) & 0x7fff;
+            i_cont = p_headers[4] & 0x80;
+
+            if( i_format == VLC_CODEC_RGB24 )
+            {
+                const int i_ystride = i_width * i_pgroup;
+                i_offs /= i_xdec;
+                memcpy( p_outdata, p_data + (i_lin * i_ystride) + (i_offs * i_pgroup), i_length );
+                p_outdata += i_length;
+            }
+            else if( i_format == VLC_CODEC_R420 )
+            {
+                memcpy( p_outdata, p_data, i_length );
+                p_outdata += i_length;
+                p_data += i_length;
+            }
+            else assert(0);
+        }
+
+        /* rtp common header */
+        rtp_packetize_common( id, out, i_line_number >= i_height,
+                (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+
+        out->i_dts    = in->i_dts;
+        out->i_length = in->i_length;
+
+        rtp_packetize_send( id, out );
+    }
+
+    block_Release( in );
+    return VLC_SUCCESS;
+}
+
+static int rtp_packetize_r420( sout_stream_id_sys_t *id, block_t *in )
+{
+    return rtp_packetize_rawvideo( id, in, VLC_CODEC_R420 );
+}
+
+static int rtp_packetize_rgb24( sout_stream_id_sys_t *id, block_t *in )
+{
+    return rtp_packetize_rawvideo( id, in, VLC_CODEC_RGB24 );
 }
 
 static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
