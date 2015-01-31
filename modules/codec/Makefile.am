@@ -99,6 +99,12 @@ codec_LTLIBRARIES += $(LTLIBlibmpeg2)
 librawvideo_plugin_la_SOURCES = codec/rawvideo.c
 codec_LTLIBRARIES += librawvideo_plugin.la
 
+librtpvideo_plugin_la_SOURCES = codec/rtpvideo.c
+if ENABLE_SOUT
+codec_LTLIBRARIES += librtpvideo_plugin.la
+endif
+
+
 libschroedinger_plugin_la_SOURCES = codec/schroedinger.c
 libschroedinger_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_schroedinger)
 libschroedinger_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'

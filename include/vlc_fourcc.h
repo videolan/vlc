@@ -275,6 +275,8 @@
 #define VLC_CODEC_CYUV            VLC_FOURCC('c','y','u','v')
 /* 10-bit 4:2:2 Component YCbCr */
 #define VLC_CODEC_V210            VLC_FOURCC('v','2','1','0')
+/* I420 packed for RTP (RFC 4175) */
+#define VLC_CODEC_R420            VLC_FOURCC('r','4','2','0')
 
 
 /* RGB */
