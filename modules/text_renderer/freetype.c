@@ -1520,7 +1520,6 @@ static int ProcessLines( filter_t *p_filter,
                     break;
                 }
 
-                assert( p_line->i_character_count == i_index - i_start);
                 p_line->p_character[p_line->i_character_count++] = (line_character_t){
                     .p_glyph = (FT_BitmapGlyph)glyph,
                     .p_outline = (FT_BitmapGlyph)outline,
