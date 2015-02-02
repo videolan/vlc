@@ -1,10 +1,12 @@
 /*****************************************************************************
  * vlc_bits.h : Bit handling helpers
  *****************************************************************************
- * Copyright (C) 2003 VLC authors and VideoLAN
+ * Copyright (C) 2001, 2002, 2003, 2006, 2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Gildas Bazin <gbazin at videolan dot org>
+ *          Rafaël Carré <funman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -24,10 +26,19 @@
 #ifndef VLC_BITS_H
 #define VLC_BITS_H 1
 
+#include <vlc_block.h>
+
 /**
  * \file
  * This file defines functions, structures for handling streams of bits in vlc
  */
+
+typedef struct bo_t
+{
+    block_t     *b;
+    size_t      len;
+    size_t      basesize;
+} bo_t;
 
 typedef struct bs_s
 {
@@ -192,6 +203,134 @@ static inline void bs_align_1( bs_t *s )
     {
         bs_write( s, 1, 1 );
     }
+}
+
+static inline void bo_init(bo_t *p_bo, int i_size)
+{
+    p_bo->b = block_Alloc(i_size);
+    p_bo->b->i_buffer = 0;
+    p_bo->len = p_bo->basesize = i_size;
+}
+
+static inline void bo_set_8(bo_t *p_bo, size_t i_offset, uint8_t i)
+{
+    if (i_offset >= p_bo->len)
+    {
+        int i_growth = p_bo->basesize;
+        while(i_offset >= p_bo->len + i_growth)
+            i_growth += p_bo->basesize;
+
+        int i = p_bo->b->i_buffer; /* Realloc would set payload size == buffer size */
+        p_bo->b = block_Realloc(p_bo->b, 0, p_bo->len + i_growth);
+        if (!p_bo->b)
+            return;
+        p_bo->b->i_buffer = i;
+        p_bo->len += i_growth;
+    }
+    p_bo->b->p_buffer[i_offset] = i;
+}
+
+static inline void bo_add_8(bo_t *p_bo, uint8_t i)
+{
+    bo_set_8( p_bo, p_bo->b->i_buffer, i );
+    p_bo->b->i_buffer++;
+}
+
+static inline void bo_add_16be(bo_t *p_bo, uint16_t i)
+{
+    bo_add_8(p_bo, ((i >> 8) &0xff));
+    bo_add_8(p_bo, i &0xff);
+}
+
+static inline void bo_add_16le(bo_t *p_bo, uint16_t i)
+{
+    bo_add_8(p_bo, i &0xff);
+    bo_add_8(p_bo, ((i >> 8) &0xff));
+}
+
+static inline void bo_set_16be(bo_t *p_bo, int i_offset, uint16_t i)
+{
+    bo_set_8(p_bo, i_offset + 1, ((i >> 8) &0xff));
+    bo_set_8(p_bo, i_offset, i &0xff);
+}
+
+static inline void bo_set_16le(bo_t *p_bo, int i_offset, uint16_t i)
+{
+    bo_set_8(p_bo, i_offset, i &0xff);
+    bo_set_8(p_bo, i_offset + 1, ((i >> 8) &0xff));
+}
+
+static inline void bo_add_24be(bo_t *p_bo, uint32_t i)
+{
+    bo_add_8(p_bo, ((i >> 16) &0xff));
+    bo_add_8(p_bo, ((i >> 8) &0xff));
+    bo_add_8(p_bo, (i &0xff));
+}
+
+static inline void bo_add_32be(bo_t *p_bo, uint32_t i)
+{
+    bo_add_16be(p_bo, ((i >> 16) &0xffff));
+    bo_add_16be(p_bo, i &0xffff);
+}
+
+static inline void bo_add_32le(bo_t *p_bo, uint32_t i)
+{
+    bo_add_16le(p_bo, i &0xffff);
+    bo_add_16le(p_bo, ((i >> 16) &0xffff));
+}
+
+static inline void bo_set_32be(bo_t *p_bo, int i_offset, uint32_t i)
+{
+    bo_set_16be(p_bo, i_offset + 2, ((i >> 16) &0xffff));
+    bo_set_16be(p_bo, i_offset, i &0xffff);
+}
+
+static inline void bo_set_32le(bo_t *p_bo, int i_offset, uint32_t i)
+{
+    bo_set_16le(p_bo, i_offset, i &0xffff);
+    bo_set_16le(p_bo, i_offset + 2, ((i >> 16) &0xffff));
+}
+
+static inline void bo_swap_32be (bo_t *p_bo, int i_pos, uint32_t i)
+{
+    p_bo->b->p_buffer[i_pos    ] = (i >> 24)&0xff;
+    p_bo->b->p_buffer[i_pos + 1] = (i >> 16)&0xff;
+    p_bo->b->p_buffer[i_pos + 2] = (i >>  8)&0xff;
+    p_bo->b->p_buffer[i_pos + 3] = (i      )&0xff;
+}
+
+static inline void bo_add_64be(bo_t *p_bo, uint64_t i)
+{
+    bo_add_32be(p_bo, ((i >> 32) &0xffffffff));
+    bo_add_32be(p_bo, i &0xffffffff);
+}
+
+static inline void bo_add_64le(bo_t *p_bo, uint64_t i)
+{
+    bo_add_32le(p_bo, i &0xffffffff);
+    bo_add_32le(p_bo, ((i >> 32) &0xffffffff));
+}
+
+static inline void bo_add_fourcc(bo_t *p_bo, const char *fcc)
+{
+    bo_add_8(p_bo, fcc[0]);
+    bo_add_8(p_bo, fcc[1]);
+    bo_add_8(p_bo, fcc[2]);
+    bo_add_8(p_bo, fcc[3]);
+}
+
+static inline void bo_add_mem(bo_t *p_bo, int i_size, const uint8_t *p_mem)
+{
+    for (int i = 0; i < i_size; i++)
+        bo_add_8(p_bo, p_mem[i]);
+}
+
+static inline void bo_add_mp4_tag_descr(bo_t *p_bo, uint8_t tag, uint32_t size)
+{
+    bo_add_8(p_bo, tag);
+    for (int i = 3; i>0; i--)
+        bo_add_8(p_bo, (size>>(7*i)) | 0x80);
+    bo_add_8(p_bo, size & 0x7F);
 }
 
 #endif

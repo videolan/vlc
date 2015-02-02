@@ -35,6 +35,8 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 
+#include <vlc_bits.h>
+
 #include <time.h>
 
 #include <vlc_iso_lang.h>
@@ -201,24 +203,6 @@ struct sout_mux_sys_t
     uint32_t       i_mfhd_sequence;
 };
 
-typedef struct bo_t
-{
-    block_t    *b;
-    size_t     len;
-} bo_t;
-
-static void bo_init     (bo_t *);
-static void bo_add_8    (bo_t *, uint8_t);
-static void bo_add_16be (bo_t *, uint16_t);
-static void bo_add_24be (bo_t *, uint32_t);
-static void bo_add_32be (bo_t *, uint32_t);
-static void bo_add_64be (bo_t *, uint64_t);
-static void bo_add_fourcc(bo_t *, const char *);
-static void bo_add_mem  (bo_t *, int , const uint8_t *);
-static void bo_add_descr(bo_t *, uint8_t , uint32_t);
-
-static void bo_fix_32be (bo_t *, int , uint32_t);
-
 static bo_t *box_new     (const char *fcc);
 static bo_t *box_full_new(const char *fcc, uint8_t v, uint32_t f);
 static void  box_fix     (bo_t *box);
@@ -309,7 +293,7 @@ static void Close(vlc_object_t *p_this)
 
     /* Update mdat size */
     bo_t bo;
-    bo_init(&bo);
+    bo_init(&bo, 1024);
     if (p_sys->i_pos - p_sys->i_mdat_pos >= (((uint64_t)1)<<32)) {
         /* Extended size */
         bo_add_32be  (&bo, 1);
@@ -812,12 +796,12 @@ static bo_t *GetESDS(mp4_stream_t *p_stream)
     esds = box_full_new("esds", 0, 0);
 
     /* ES_Descr */
-    bo_add_descr(esds, 0x03, 3 + 5 + 13 + i_decoder_specific_info_size + 5 + 1);
+    bo_add_mp4_tag_descr(esds, 0x03, 3 + 5 + 13 + i_decoder_specific_info_size + 5 + 1);
     bo_add_16be(esds, p_stream->i_track_id);
     bo_add_8   (esds, 0x1f);      // flags=0|streamPriority=0x1f
 
     /* DecoderConfigDescr */
-    bo_add_descr(esds, 0x04, 13 + i_decoder_specific_info_size);
+    bo_add_mp4_tag_descr(esds, 0x04, 13 + i_decoder_specific_info_size);
 
     int  i_object_type_indication;
     switch(p_stream->fmt.i_codec)
@@ -855,14 +839,14 @@ static bo_t *GetESDS(mp4_stream_t *p_stream)
 
     if (p_stream->fmt.i_extra > 0) {
         /* DecoderSpecificInfo */
-        bo_add_descr(esds, 0x05, p_stream->fmt.i_extra);
+        bo_add_mp4_tag_descr(esds, 0x05, p_stream->fmt.i_extra);
 
         for (int i = 0; i < p_stream->fmt.i_extra; i++)
             bo_add_8(esds, ((uint8_t*)p_stream->fmt.p_extra)[i]);
     }
 
     /* SL_Descr mandatory */
-    bo_add_descr(esds, 0x06, 1);
+    bo_add_mp4_tag_descr(esds, 0x06, 1);
     bo_add_8    (esds, 0x02);  // sl_predefined
 
     return esds;
@@ -1722,11 +1706,11 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     }
 
     /* Fix stco entry count */
-    bo_fix_32be(stco, 12, i_chunk);
+    bo_swap_32be(stco, 12, i_chunk);
     msg_Dbg(p_mux, "created %d chunks (stco)", i_chunk);
 
     /* Fix stsc entry count */
-    bo_fix_32be(stsc, 12, i_stsc_entries );
+    bo_swap_32be(stsc, 12, i_stsc_entries );
 
     /* add stts */
     bo_t *stts = box_full_new("stts", 0, 0);
@@ -1744,7 +1728,7 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
         bo_add_32be(stts, i - i_first); // sample-count
         bo_add_32be(stts, (uint64_t)i_delta  * p_stream->i_timescale / CLOCK_FREQ); // sample-delta
     }
-    bo_fix_32be(stts, 12, i_index);
+    bo_swap_32be(stts, 12, i_index);
 
     /* composition time handling */
     bo_t *ctts = NULL;
@@ -1764,7 +1748,7 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
             bo_add_32be(ctts, i - i_first); // sample-count
             bo_add_32be(ctts, i_offset * p_stream->i_timescale / CLOCK_FREQ ); // sample-offset
         }
-        bo_fix_32be(ctts, 12, i_index);
+        bo_swap_32be(ctts, 12, i_index);
     }
 
     bo_t *stsz = box_full_new("stsz", 0, 0);
@@ -1815,7 +1799,7 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
     }
 
     if (stss)
-        bo_fix_32be(stss, 12, i_index);
+        bo_swap_32be(stss, 12, i_index);
 
     /* Now gather all boxes into stbl */
     bo_t *stbl = box_new("stbl");
@@ -2226,81 +2210,13 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
 
 /****************************************************************************/
 
-static void bo_init(bo_t *p_bo)
-{
-    p_bo->len = 0;
-    p_bo->b = block_Alloc(1024);
-}
-
-static void bo_add_8(bo_t *p_bo, uint8_t i)
-{
-    if (p_bo->len >= p_bo->b->i_buffer)
-        p_bo->b = block_Realloc(p_bo->b, 0, p_bo->b->i_buffer + 1024);
-
-    p_bo->b->p_buffer[p_bo->len++] = i;
-}
-
-static void bo_add_16be(bo_t *p_bo, uint16_t i)
-{
-    bo_add_8(p_bo, ((i >> 8) &0xff));
-    bo_add_8(p_bo, i &0xff);
-}
-
-static void bo_add_24be(bo_t *p_bo, uint32_t i)
-{
-    bo_add_8(p_bo, ((i >> 16) &0xff));
-    bo_add_8(p_bo, ((i >> 8) &0xff));
-    bo_add_8(p_bo, (  i &0xff));
-}
-static void bo_add_32be(bo_t *p_bo, uint32_t i)
-{
-    bo_add_16be(p_bo, ((i >> 16) &0xffff));
-    bo_add_16be(p_bo, i &0xffff);
-}
-
-static void bo_fix_32be (bo_t *p_bo, int i_pos, uint32_t i)
-{
-    p_bo->b->p_buffer[i_pos    ] = (i >> 24)&0xff;
-    p_bo->b->p_buffer[i_pos + 1] = (i >> 16)&0xff;
-    p_bo->b->p_buffer[i_pos + 2] = (i >>  8)&0xff;
-    p_bo->b->p_buffer[i_pos + 3] = (i      )&0xff;
-}
-
-static void bo_add_64be(bo_t *p_bo, uint64_t i)
-{
-    bo_add_32be(p_bo, ((i >> 32) &0xffffffff));
-    bo_add_32be(p_bo, i &0xffffffff);
-}
-
-static void bo_add_fourcc(bo_t *p_bo, const char *fcc)
-{
-    bo_add_8(p_bo, fcc[0]);
-    bo_add_8(p_bo, fcc[1]);
-    bo_add_8(p_bo, fcc[2]);
-    bo_add_8(p_bo, fcc[3]);
-}
-
-static void bo_add_mem(bo_t *p_bo, int i_size, const uint8_t *p_mem)
-{
-    for (int i = 0; i < i_size; i++)
-        bo_add_8(p_bo, p_mem[i]);
-}
-
-static void bo_add_descr(bo_t *p_bo, uint8_t tag, uint32_t size)
-{
-    bo_add_8(p_bo, tag);
-    for (int i = 3; i>0; i--)
-        bo_add_8(p_bo, (size>>(7*i)) | 0x80);
-    bo_add_8(p_bo, size & 0x7F);
-}
-
 static bo_t *box_new(const char *fcc)
 {
     bo_t *box = malloc(sizeof(*box));
     if (!box)
         return NULL;
 
-    bo_init(box);
+    bo_init(box, 1024);
 
     bo_add_32be  (box, 0);
     bo_add_fourcc(box, fcc);
