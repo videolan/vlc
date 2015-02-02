@@ -319,7 +319,7 @@ typedef struct
     int i_service;
 } vdr_info_t;
 
-#define MIN_ES_PID 32
+#define MIN_ES_PID 4    /* Should be 32.. broken muxers */
 #define MAX_ES_PID 8190
 
 struct demux_sys_t
