@@ -108,7 +108,8 @@ void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, mtime_
  * this case, *p_ts0 and *p_ts1 will hold an invalid timestamp.
  * Otherwise it will return VLC_SUCCESS.
  */
-int input_clock_ConvertTS( input_clock_t *, int *pi_rate, mtime_t *pi_ts0, mtime_t *pi_ts1, mtime_t i_ts_bound );
+int input_clock_ConvertTS( vlc_object_t *, input_clock_t *, int *pi_rate,
+                           mtime_t *pi_ts0, mtime_t *pi_ts1, mtime_t i_ts_bound );
 
 /**
  * This function returns the current rate.
