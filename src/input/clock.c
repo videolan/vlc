@@ -417,6 +417,8 @@ int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
     if( !cl->b_has_reference )
     {
         vlc_mutex_unlock( &cl->lock );
+        vlc_Log(p_object, VLC_MSG_ERR, "clock",
+            "Timestamp conversion failed for %"PRId64": no reference clock", *pi_ts0);
         *pi_ts0 = VLC_TS_INVALID;
         if( pi_ts1 )
             *pi_ts1 = VLC_TS_INVALID;
