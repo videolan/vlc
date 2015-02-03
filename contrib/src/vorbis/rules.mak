@@ -26,6 +26,9 @@ $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.xz .sum-vorbis
 	$(UNPACK)
 	$(APPLY) $(SRC)/vorbis/osx.patch
+ifdef HAVE_VISUALSTUDIO
+	$(APPLY) $(SRC)/vorbis/msvc.patch
+endif
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
