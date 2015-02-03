@@ -205,11 +205,16 @@ static inline void bs_align_1( bs_t *s )
     }
 }
 
-static inline void bo_init(bo_t *p_bo, int i_size)
+static inline int bo_init(bo_t *p_bo, int i_size)
 {
     p_bo->b = block_Alloc(i_size);
+    if (!p_bo->b)
+        return VLC_ENOMEM;
+
     p_bo->b->i_buffer = 0;
     p_bo->len = p_bo->basesize = i_size;
+
+    return VLC_SUCCESS;
 }
 
 static inline void bo_set_8(bo_t *p_bo, size_t i_offset, uint8_t i)
