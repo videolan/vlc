@@ -185,6 +185,10 @@ endif
 ACLOCAL_AMFLAGS += -I$(PREFIX)/share/aclocal
 export ACLOCAL_AMFLAGS
 
+#########
+# Tools #
+#########
+
 PKG_CONFIG ?= pkg-config
 ifdef HAVE_CROSS_COMPILE
 # This inhibits .pc file from within the cross-compilation toolchain sysroot.
@@ -224,6 +228,12 @@ download = rm -f $@.tmp && \
 	mv $@.tmp $@
 else
 download = $(error Neither curl nor wget found!)
+endif
+
+ifeq ($(shell which xzcat >/dev/null 2>&1 || echo FAIL),)
+XZCAT = xzcat
+else
+XZCAT ?= $(error xz and lzma client not found!)
 endif
 
 ifeq ($(shell which bzcat >/dev/null 2>&1 || echo FAIL),)
