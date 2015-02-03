@@ -10,6 +10,9 @@ SIXTYFOURBIT_SDK_MIN=7.0
 ARCH=armv7
 SCARY=yes
 
+CORE_COUNT=`sysctl -n machdep.cpu.core_count`
+let MAKE_JOBS=$CORE_COUNT+1
+
 usage()
 {
 cat << EOF
@@ -257,7 +260,7 @@ fi
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
 echo "EXTRA_LDFLAGS += ${EXTRA_LDFLAGS}" >> config.mak
 make fetch
-make
+make -j$MAKE_JOBS > ${out}
 spopd
 
 info "Bootstraping vlc"
@@ -360,9 +363,6 @@ ${VLCROOT}/configure \
     --disable-addonmanagermodules \
     --disable-mad > ${out} # MMX and SSE support requires llvm which is broken on Simulator
 fi
-
-CORE_COUNT=`sysctl -n machdep.cpu.core_count`
-let MAKE_JOBS=$CORE_COUNT+1
 
 info "Building libvlc"
 make -j$MAKE_JOBS > ${out}
