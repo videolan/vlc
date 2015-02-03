@@ -105,6 +105,9 @@ endif
 # Darwin
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=$(ARCH) --target-os=darwin
+ifdef USE_FFMPEG
+FFMPEGCONF += --disable-lzma
+endif
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
