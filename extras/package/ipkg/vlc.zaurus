@@ -1,9 +1,0 @@
-#!/bin/sh
-export QTDIR=/opt/QtPalmtop/sharp
-export LD_LIBRARY_PATH=.:/usr/X11R6/lib:/opt/QtPalmtop/sharp/lib:/usr/lib/vlc
-if [ "$*" = "" ] ; then
-   /usr/bin/vlc udp://@:1234
-else
-   /usr/bin/vlc $*
-fi
-

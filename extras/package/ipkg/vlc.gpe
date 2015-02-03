@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=VLC MediaPlayer
-Comment=Media Player with network and multiple codec support
-Exec=vlc
-Type=Application
-Icon=/usr/share/vlc/vlc48x48.png
-

@@ -1,5 +1,0 @@
-#!/bin/sh
-/sbin/ldconfig
-[ -x /opt/QtPalmtop/pics/vlc ] || rm /opt/QtPalmtop/pics/vlc
-exit $?
-

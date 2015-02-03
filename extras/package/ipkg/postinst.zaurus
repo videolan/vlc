@@ -1,6 +1,0 @@
-#!/bin/sh
-/bin/ldconfig
-if [ -x /usr/share/vlc ] ; then
-   ln -s /usr/share/vlc /opt/QtPalmtop/sharp/pics/vlc
-fi
-exit $?

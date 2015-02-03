@@ -1,5 +1,0 @@
-#!/bin/sh
-/sbin/ldconfig
-if [ -x /usr/bin/update-menus ] && [ ! /usr/bin/update-menus ] ; then 
-   exit $?; 
-fi
