@@ -443,6 +443,7 @@ static void GetLastPCR( demux_t *p_demux );
 static void CheckPCR( demux_t *p_demux );
 static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 static void PCRFixHandle( demux_t *, block_t * );
+static mtime_t AdjustPTSWrapAround( demux_t *, mtime_t );
 
 static void              IODFree( iod_descriptor_t * );
 
@@ -2098,9 +2099,13 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
             if( header[7]&0x80 )    /* has pts */
             {
                 i_pts = ExtractPESTimestamp( &header[9] );
+                i_pts = AdjustPTSWrapAround( p_demux, i_pts );
 
                 if( header[7]&0x40 )    /* has dts */
+                {
                     i_dts = ExtractPESTimestamp( &header[14] );
+                    i_dts = AdjustPTSWrapAround( p_demux, i_dts );
+                }
             }
         }
         else
@@ -2452,6 +2457,32 @@ static mtime_t AdjustPCRWrapAround( demux_t *p_demux, mtime_t i_pcr )
     return i_pcr + i_adjust;
 }
 
+static mtime_t AdjustPTSWrapAround( demux_t *p_demux, mtime_t i_pts )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    mtime_t i_pcr = p_sys->i_current_pcr;
+
+    mtime_t i_adjustremain = i_pcr % 0x1FFFFFFFF;
+    mtime_t i_adjustbase = i_pcr - i_adjustremain;
+
+    mtime_t i_pts_adjust = i_adjustbase;
+
+    /* PTS has rolled first */
+    if( i_adjustremain >= 0xFFFFFFFF && i_pts < 0xFFFFFFFF )
+    {
+        i_pts_adjust += 0x1FFFFFFFF;
+    }
+    /* PCR has rolled first (PTS is late!) */
+    else if( i_adjustremain < 0xFFFFFFFF && i_pts >= 0xFFFFFFFF )
+    {
+        if( i_adjustbase >= 0x1FFFFFFFF ) /* we need to remove current roll */
+            i_pts_adjust -= 0x1FFFFFFFF;
+    }
+
+    i_pts += i_pts_adjust;
+    return i_pts;
+}
+
 static mtime_t GetPCR( block_t *p_pkt )
 {
     const uint8_t *p = p_pkt->p_buffer;
@@ -2717,8 +2748,10 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     if( i_pcr < 0 )
         return;
 
+    i_pcr = AdjustPCRWrapAround( p_demux, i_pcr );
+
     if( p_sys->i_pid_ref_pcr == pid->i_pid )
-        p_sys->i_current_pcr = AdjustPCRWrapAround( p_demux, i_pcr );
+        p_sys->i_current_pcr = i_pcr;
 
     /* Search program and set the PCR */
     int i_group = -1;
