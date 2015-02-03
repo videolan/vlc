@@ -4,7 +4,7 @@ set -e
 PLATFORM=OS
 VERBOSE=no
 DEBUG=no
-SDK_VERSION=7.0
+SDK_VERSION=`xcrun --sdk iphoneos --show-sdk-version`
 SDK_MIN=6.1
 SIXTYFOURBIT_SDK_MIN=7.0
 ARCH=armv7
