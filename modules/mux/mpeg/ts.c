@@ -192,13 +192,13 @@ vlc_module_begin ()
     set_capability( "sout mux", 120 )
     add_shortcut( "ts" )
 
-    add_integer(SOUT_CFG_PREFIX "pid-video", 0, VPID_TEXT, VPID_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "pid-video", 100, VPID_TEXT, VPID_LONGTEXT, true)
         change_integer_range( 32, 8190 )
-    add_integer(SOUT_CFG_PREFIX "pid-audio", 0, APID_TEXT, APID_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "pid-audio", 200, APID_TEXT, APID_LONGTEXT, true)
         change_integer_range( 32, 8190 )
-    add_integer(SOUT_CFG_PREFIX "pid-spu",   0, SPUPID_TEXT, SPUPID_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "pid-spu",   300, SPUPID_TEXT, SPUPID_LONGTEXT, true)
         change_integer_range( 32, 8190 )
-    add_integer(SOUT_CFG_PREFIX "pid-pmt", 0, PMTPID_TEXT, PMTPID_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "pid-pmt", 32, PMTPID_TEXT, PMTPID_LONGTEXT, true)
         change_integer_range( 32, 8190 )
     add_integer(SOUT_CFG_PREFIX "tsid",  0, TSID_TEXT, TSID_LONGTEXT, true)
     add_integer(SOUT_CFG_PREFIX "netid", 0, NETID_TEXT, NETID_LONGTEXT, true)
@@ -340,7 +340,6 @@ struct sout_mux_sys_t
     int             i_pid_video;
     int             i_pid_audio;
     int             i_pid_spu;
-    int             i_pid_free; /* first usable pid */
 
     int             i_tsid;
     unsigned        i_num_pmt;
@@ -376,29 +375,66 @@ struct sout_mux_sys_t
     bool            b_crypt_video;
 };
 
-/* Reserve a pid and return it */
-static int  AllocatePID( sout_mux_sys_t *p_sys, int i_cat )
+
+static int GetNextFreePID( sout_mux_t *p_mux, int i_pid_start )
 {
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+
+    restart:
+    for(unsigned i=i_pid_start; i<p_sys->i_num_pmt; i++)
+    {
+        if(p_sys->pmt[i].i_pid == i_pid_start)
+        {
+            i_pid_start++;
+            goto restart;
+        }
+    }
+
+    for(int i=0; i<p_mux->i_nb_inputs; i++)
+    {
+        sout_input_sys_t *p_stream = (sout_input_sys_t*)p_mux->pp_inputs[i]->p_sys;
+        if(p_stream->ts.i_pid == i_pid_start)
+        {
+            i_pid_start++;
+            goto restart;
+        }
+    }
+
+    if( i_pid_start > 8190 )
+    {
+        i_pid_start = 32;
+        goto restart;
+    }
+
+    return i_pid_start;
+}
+
+/* Reserve a pid and return it */
+static int  AllocatePID( sout_mux_t *p_mux, int i_cat )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
     int i_pid;
-    if ( i_cat == VIDEO_ES && p_sys->i_pid_video )
+    int *pi_candidate_pid = NULL;
+
+    switch( i_cat )
     {
-        i_pid = p_sys->i_pid_video;
-        p_sys->i_pid_video = 0;
+    case VIDEO_ES:
+        pi_candidate_pid = &p_sys->i_pid_video;
+        break;
+
+    case AUDIO_ES:
+        pi_candidate_pid = &p_sys->i_pid_audio;
+        break;
+
+    case SPU_ES:
+    default:
+        pi_candidate_pid = &p_sys->i_pid_spu;
+        break;
     }
-    else if ( i_cat == AUDIO_ES && p_sys->i_pid_audio )
-    {
-        i_pid = p_sys->i_pid_audio;
-        p_sys->i_pid_audio = 0;
-    }
-    else if ( i_cat == SPU_ES && p_sys->i_pid_spu )
-    {
-        i_pid = p_sys->i_pid_spu;
-        p_sys->i_pid_spu = 0;
-    }
-    else
-    {
-        i_pid = ++p_sys->i_pid_free;
-    }
+
+    *pi_candidate_pid = GetNextFreePID( p_mux, *pi_candidate_pid );
+    i_pid = (*pi_candidate_pid)++;
+
     return i_pid;
 }
 
@@ -632,30 +668,12 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pid-pmt", &val );
-    if( !val.i_int ) /* Does this make any sense? */
-        val.i_int = 0x42;
     for (unsigned i = 0; i < p_sys->i_num_pmt; i++ )
         p_sys->pmt[i].i_pid = val.i_int + i;
 
-    p_sys->i_pid_free = p_sys->pmt[p_sys->i_num_pmt - 1].i_pid + 1;
-
     p_sys->i_pid_video = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-video" );
-    if ( p_sys->i_pid_video > p_sys->i_pid_free )
-    {
-        p_sys->i_pid_free = p_sys->i_pid_video + 1;
-    }
-
     p_sys->i_pid_audio = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-audio" );
-    if ( p_sys->i_pid_audio > p_sys->i_pid_free )
-    {
-        p_sys->i_pid_free = p_sys->i_pid_audio + 1;
-    }
-
     p_sys->i_pid_spu = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-spu" );
-    if ( p_sys->i_pid_spu > p_sys->i_pid_free )
-    {
-        p_sys->i_pid_free = p_sys->i_pid_spu + 1;
-    }
 
     p_sys->i_pcr_pid = 0x1fff;
 
@@ -870,7 +888,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     if ( p_sys->b_es_id_pid )
         p_stream->ts.i_pid = p_input->p_fmt->i_id & 0x1fff;
     else
-        p_stream->ts.i_pid = AllocatePID( p_sys, p_input->p_fmt->i_cat );
+        p_stream->ts.i_pid = AllocatePID( p_mux, p_input->p_fmt->i_cat );
 
     p_stream->pes.i_codec = p_input->p_fmt->i_codec;
 
