@@ -233,7 +233,7 @@ void Close (vlc_object_t *this)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->longTouchRecognizer) {
-        [sys->glESView removeGestureRecognizer:sys->longTouchRecognizer];
+        [sys->longTouchRecognizer.view removeGestureRecognizer:sys->longTouchRecognizer];
         [sys->longTouchRecognizer release];
     }
 
