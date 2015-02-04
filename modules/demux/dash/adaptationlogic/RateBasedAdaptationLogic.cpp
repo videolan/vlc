@@ -44,7 +44,7 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (MPD *mpd) :
     height = var_InheritInteger(mpd->getVLCObject(), "dash-prefheight");
 }
 
-Representation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams::Type type, mpd::Period *period) const
+Representation *RateBasedAdaptationLogic::getCurrentRepresentation(dash::Streams::Type type, Period *period) const
 {
     if(period == NULL)
         return NULL;
@@ -78,13 +78,13 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
         currentBps = bpsAvg;
 }
 
-FixedRateAdaptationLogic::FixedRateAdaptationLogic(mpd::MPD *mpd) :
+FixedRateAdaptationLogic::FixedRateAdaptationLogic(MPD *mpd) :
     AbstractAdaptationLogic(mpd)
 {
     currentBps = var_InheritInteger( mpd->getVLCObject(), "dash-prefbw" ) * 8192;
 }
 
-Representation *FixedRateAdaptationLogic::getCurrentRepresentation(Streams::Type type, mpd::Period *period) const
+Representation *FixedRateAdaptationLogic::getCurrentRepresentation(dash::Streams::Type type, Period *period) const
 {
     if(period == NULL)
         return NULL;

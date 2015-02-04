@@ -28,6 +28,8 @@
 
 #include "SegmentTimeline.h"
 
+#include <algorithm>
+
 using namespace dash::mpd;
 
 SegmentTimeline::SegmentTimeline(TimescaleAble *parent)

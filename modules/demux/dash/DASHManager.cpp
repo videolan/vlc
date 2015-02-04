@@ -42,6 +42,8 @@
 #include "SegmentTracker.hpp"
 #include <vlc_stream.h>
 
+#include <algorithm>
+
 using namespace dash;
 using namespace dash::http;
 using namespace dash::logic;

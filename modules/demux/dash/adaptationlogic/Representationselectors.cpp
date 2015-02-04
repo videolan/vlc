@@ -26,11 +26,11 @@ RepresentationSelector::RepresentationSelector()
 {
 }
 
-Representation * RepresentationSelector::select(Period *period, Streams::Type type) const
+Representation * RepresentationSelector::select(Period *period, dash::Streams::Type type) const
 {
     return select(period, type, std::numeric_limits<uint64_t>::max());
 }
-Representation * RepresentationSelector::select(Period *period, Streams::Type type, uint64_t bitrate) const
+Representation * RepresentationSelector::select(Period *period, dash::Streams::Type type, uint64_t bitrate) const
 {
     if (period == NULL)
         return NULL;
@@ -53,7 +53,7 @@ Representation * RepresentationSelector::select(Period *period, Streams::Type ty
     return best;
 }
 
-Representation * RepresentationSelector::select(Period *period, Streams::Type type, uint64_t bitrate,
+Representation * RepresentationSelector::select(Period *period, dash::Streams::Type type, uint64_t bitrate,
                                                 int width, int height) const
 {
     if(period == NULL)

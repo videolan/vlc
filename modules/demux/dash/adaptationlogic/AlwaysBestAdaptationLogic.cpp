@@ -36,7 +36,7 @@ AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    (MPD *mpd) :
 {
 }
 
-Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation(Streams::Type type, mpd::Period *period) const
+Representation *AlwaysBestAdaptationLogic::getCurrentRepresentation(dash::Streams::Type type, Period *period) const
 {
     RepresentationSelector selector;
     return selector.select(period, type);

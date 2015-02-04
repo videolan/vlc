@@ -23,12 +23,12 @@
 using namespace dash::logic;
 using namespace dash::mpd;
 
-AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic(mpd::MPD *mpd):
+AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic(MPD *mpd):
     AbstractAdaptationLogic(mpd)
 {
 }
 
-Representation *AlwaysLowestAdaptationLogic::getCurrentRepresentation(Streams::Type type, mpd::Period *period) const
+Representation *AlwaysLowestAdaptationLogic::getCurrentRepresentation(dash::Streams::Type type, Period *period) const
 {
     RepresentationSelector selector;
     return selector.select(period, type, 0);

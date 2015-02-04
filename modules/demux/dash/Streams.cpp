@@ -87,14 +87,14 @@ Format Stream::mimeToFormat(const std::string &mime)
     return format;
 }
 
-void Stream::create(demux_t *demux, AbstractAdaptationLogic *logic, SegmentTracker *tracker)
+void Stream::create(demux_t *demux, AbstractAdaptationLogic *logic, dash::SegmentTracker *tracker)
 {
     switch(format)
     {
-        case Streams::MP4:
+        case dash::Streams::MP4:
             output = new MP4StreamOutput(demux);
             break;
-        case Streams::MPEG2TS:
+        case dash::Streams::MPEG2TS:
             output = new MPEG2TSStreamOutput(demux);
             break;
         default:
