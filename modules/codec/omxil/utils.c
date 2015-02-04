@@ -37,6 +37,7 @@
 #include "omxil.h"
 #include "qcom.h"
 #include "../../video_chroma/copy.h"
+#include "../h264_nal.h"
 
 /*****************************************************************************
  * Events utility functions
@@ -1053,13 +1054,13 @@ static const struct
     size_t                   profile_idc;
 } omx_to_profile_idc[] =
 {
-    { OMX_VIDEO_AVCProfileBaseline,  66 },
-    { OMX_VIDEO_AVCProfileMain,      77 },
-    { OMX_VIDEO_AVCProfileExtended,  88 },
-    { OMX_VIDEO_AVCProfileHigh,     100 },
-    { OMX_VIDEO_AVCProfileHigh10,   110 },
-    { OMX_VIDEO_AVCProfileHigh422,  122 },
-    { OMX_VIDEO_AVCProfileHigh444,  244 },
+    { OMX_VIDEO_AVCProfileBaseline,  PROFILE_H264_BASELINE },
+    { OMX_VIDEO_AVCProfileMain,      PROFILE_H264_MAIN },
+    { OMX_VIDEO_AVCProfileExtended,  PROFILE_H264_EXTENDED },
+    { OMX_VIDEO_AVCProfileHigh,      PROFILE_H264_HIGH },
+    { OMX_VIDEO_AVCProfileHigh10,    PROFILE_H264_HIGH_10 },
+    { OMX_VIDEO_AVCProfileHigh422,   PROFILE_H264_HIGH_422 },
+    { OMX_VIDEO_AVCProfileHigh444,   PROFILE_H264_HIGH_444 },
 };
 
 size_t convert_omx_to_profile_idc(OMX_VIDEO_AVCPROFILETYPE profile_type)

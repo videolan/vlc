@@ -190,7 +190,7 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
     {
         if(p_fmt->i_cat == VIDEO_ES && def->eDir == OMX_DirInput &&
            p_fmt->i_codec == VLC_CODEC_H264 &&
-           (i_profile != 66 || i_level > 30))
+           (i_profile != PROFILE_H264_BASELINE || i_level > 30))
         {
             msg_Dbg(p_dec, "h264 profile/level not supported (0x%x, 0x%x)",
                     i_profile, i_level);
