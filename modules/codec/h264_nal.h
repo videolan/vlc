@@ -28,6 +28,21 @@
 # include <vlc_common.h>
 # include <vlc_codec.h>
 
+#define PROFILE_H264_BASELINE             66
+#define PROFILE_H264_MAIN                 77
+#define PROFILE_H264_EXTENDED             88
+#define PROFILE_H264_HIGH                 100
+#define PROFILE_H264_HIGH_10              110
+#define PROFILE_H264_HIGH_422             122
+#define PROFILE_H264_HIGH_444             144
+#define PROFILE_H264_HIGH_444_PREDICTIVE  244
+
+#define PROFILE_H264_CAVLC_INTRA          44
+#define PROFILE_H264_SVC_BASELINE         83
+#define PROFILE_H264_SVC_HIGH             86
+#define PROFILE_H264_MVC_STEREO_HIGH      128
+#define PROFILE_H264_MVC_MULTIVIEW_HIGH   118
+
 /* Parse the SPS/PPS Metadata and convert it to annex b format */
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,
