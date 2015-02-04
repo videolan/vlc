@@ -348,23 +348,22 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 
         if ( orientation() == Qt::Horizontal ) /* TODO: vertical */
         {
-                QList<SeekPoint> points = chapters->getPoints();
-                int i_selected = -1;
-                bool b_startsnonzero = false;
-                if ( points.count() > 0 )
-                    b_startsnonzero = ( points.at(0).time > 0 );
-                for( int i = 0 ; i < points.count() ; i++ )
-                {
-                    int x = points.at(i).time / 1000000.0 / inputLength * size().width();
-                    if ( event->x() >= x )
-                        i_selected = i + ( ( b_startsnonzero )? 1 : 0 );
-                }
-                if ( i_selected >= 0 && i_selected < points.size() )
-                    chapterLabel = points.at( i_selected ).name;
+            QList<SeekPoint> points = chapters->getPoints();
+            int i_selected = -1;
+            for( int i = 0 ; i < points.count() ; i++ )
+            {
+                int x = points.at(i).time / 1000000.0 / inputLength * size().width();
+                if ( event->x() >= x )
+                    i_selected = i;
+            }
+            if ( i_selected >= 0 && i_selected < points.size() )
+            {
+                chapterLabel = points.at( i_selected ).name;
+            }
         }
 
         QPoint target( event->globalX() - ( event->x() - posX ),
-                  QWidget::mapToGlobal( QPoint( 0, 0 ) ).y() );
+                QWidget::mapToGlobal( QPoint( 0, 0 ) ).y() );
         if( likely( size().width() > handleLength() ) ) {
             secstotimestr( psz_length, ( ( posX - margin ) * inputLength ) / ( size().width() - handleLength() ) );
             mTimeTooltip->setTip( target, psz_length, chapterLabel );
