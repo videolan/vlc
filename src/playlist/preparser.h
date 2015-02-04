@@ -45,6 +45,8 @@ playlist_preparser_t *playlist_preparser_New( vlc_object_t * );
  *
  * The input item is retained until the preparsing is done or until the
  * preparser object is deleted.
+ * Listen to vlc_InputItemPreparseEnded event to get notified when item is
+ * preparsed.
  */
 void playlist_preparser_Push( playlist_preparser_t *, input_item_t *,
                               input_item_meta_request_option_t );

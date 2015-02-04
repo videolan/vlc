@@ -165,6 +165,7 @@ static void Preparse( vlc_object_t *obj, input_item_t *p_item,
     if( !b_preparse )
     {
         input_item_SetPreparsed( p_item, true );
+        input_item_SignalPreparseEnded( p_item );
         return;
     }
 
@@ -176,6 +177,7 @@ static void Preparse( vlc_object_t *obj, input_item_t *p_item,
 
         var_SetAddress( obj, "item-change", p_item );
     }
+    input_item_SignalPreparseEnded( p_item );
 }
 
 /**

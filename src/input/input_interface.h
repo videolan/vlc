@@ -30,6 +30,7 @@
 /**********************************************************************
  * Item metadata
  **********************************************************************/
+void input_item_SignalPreparseEnded( input_item_t *p_i );
 void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed );
 void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found );
 void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched );

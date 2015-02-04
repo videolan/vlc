@@ -57,6 +57,13 @@ void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
         vlc_event_send( &p_i->event_manager, &event );
     }
 }
+void input_item_SignalPreparseEnded( input_item_t *p_i )
+{
+    vlc_event_t event;
+    event.type = vlc_InputItemPreparseEnded;
+    vlc_event_send( &p_i->event_manager, &event );
+}
+
 void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed )
 {
     bool b_send_event = false;
@@ -874,6 +881,7 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
     vlc_event_manager_register_event_type( p_em, vlc_InputItemNameChanged );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemInfoChanged );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemErrorWhenReadingChanged );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemPreparseEnded );
 
     if( type != ITEM_TYPE_UNKNOWN )
         p_input->i_type = type;

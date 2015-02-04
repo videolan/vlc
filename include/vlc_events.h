@@ -123,6 +123,7 @@ typedef enum vlc_event_type_t {
     vlc_InputItemNameChanged,
     vlc_InputItemInfoChanged,
     vlc_InputItemErrorWhenReadingChanged,
+    vlc_InputItemPreparseEnded,
 
     /* Service Discovery event */
     vlc_ServicesDiscoveryItemAdded,
