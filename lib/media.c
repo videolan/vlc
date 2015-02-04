@@ -104,12 +104,13 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
     [vlc_meta_DiscNumber]   = libvlc_meta_DiscNumber
 };
 
-static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md )
+static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md,
+                                                bool b_create )
 {
     libvlc_media_list_t *p_subitems = NULL;
 
     vlc_mutex_lock( &p_md->subitems_lock );
-    if( p_md->p_subitems == NULL )
+    if( p_md->p_subitems == NULL && b_create )
     {
         p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance );
         if( p_md->p_subitems != NULL )
@@ -139,7 +140,7 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
                 p_event->u.input_item_subitem_added.p_new_child );
 
     /* Add this to our media list */
-    p_subitems = media_get_subitems( p_md );
+    p_subitems = media_get_subitems( p_md, true );
     if( p_subitems != NULL )
     {
         libvlc_media_list_lock( p_subitems );
@@ -164,17 +165,7 @@ static void input_item_subitemtree_added( const vlc_event_t * p_event,
 {
     VLC_UNUSED( p_event );
     libvlc_media_t * p_md = user_data;
-    libvlc_media_list_t *p_subitems;
     libvlc_event_t event;
-
-    /* notify the media list */
-    p_subitems = media_get_subitems( p_md );
-    if( p_subitems != NULL )
-    {
-        libvlc_media_list_lock( p_subitems );
-        libvlc_media_list_internal_end_reached( p_subitems );
-        libvlc_media_list_unlock( p_subitems );
-    }
 
     /* Construct the event */
     event.type = libvlc_MediaSubItemTreeAdded;
@@ -246,6 +237,25 @@ static void input_item_preparsed_changed(const vlc_event_t *p_event,
 }
 
 /**************************************************************************
+ * input_item_preparse_ended (Private) (vlc event Callback)
+ **************************************************************************/
+static void input_item_preparse_ended( const vlc_event_t * p_event,
+                                       void * user_data )
+{
+    VLC_UNUSED( p_event );
+    libvlc_media_t * p_md = user_data;
+    libvlc_media_list_t *p_subitems = media_get_subitems( p_md, false );
+
+    if( p_subitems != NULL )
+    {
+        /* notify the media list */
+        libvlc_media_list_lock( p_subitems );
+        libvlc_media_list_internal_end_reached( p_subitems );
+        libvlc_media_list_unlock( p_subitems );
+    }
+}
+
+/**************************************************************************
  * Install event handler (Private)
  **************************************************************************/
 static void install_input_item_observer( libvlc_media_t *p_md )
@@ -269,6 +279,10 @@ static void install_input_item_observer( libvlc_media_t *p_md )
     vlc_event_attach( &p_md->p_input_item->event_manager,
                       vlc_InputItemSubItemTreeAdded,
                       input_item_subitemtree_added,
+                      p_md );
+    vlc_event_attach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemPreparseEnded,
+                      input_item_preparse_ended,
                       p_md );
 }
 
@@ -296,6 +310,10 @@ static void uninstall_input_item_observer( libvlc_media_t *p_md )
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemSubItemTreeAdded,
                       input_item_subitemtree_added,
+                      p_md );
+    vlc_event_detach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemPreparseEnded,
+                      input_item_preparse_ended,
                       p_md );
 }
 
@@ -428,7 +446,7 @@ libvlc_media_t * libvlc_media_new_as_node( libvlc_instance_t *p_instance,
 
     p_md = libvlc_media_new_from_input_item( p_instance, p_input_item );
 
-    p_subitems = media_get_subitems( p_md );
+    p_subitems = media_get_subitems( p_md, true );
     if( p_subitems == NULL) {
         libvlc_media_release( p_md );
         return NULL;
@@ -606,7 +624,7 @@ libvlc_media_set_state( libvlc_media_t *p_md,
 libvlc_media_list_t *
 libvlc_media_subitems( libvlc_media_t * p_md )
 {
-    libvlc_media_list_t *p_subitems = media_get_subitems( p_md );
+    libvlc_media_list_t *p_subitems = media_get_subitems( p_md, true );
     if( p_subitems )
         libvlc_media_list_retain( p_subitems );
     return p_subitems;
