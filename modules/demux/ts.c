@@ -2679,20 +2679,7 @@ static void GetLastPCR( demux_t *p_demux )
         if( ( i_pos = stream_Tell( p_sys->stream ) ) >= i_last_pos )
             break;
     }
-    if( p_sys->i_last_pcr >= 0 )
-    {
-        int64_t i_size = stream_Size( p_sys->stream );
-        mtime_t i_duration_msec = ( p_sys->i_last_pcr - p_sys->i_first_pcr ) * 100 / 9 / 1000;
-        int64_t i_rate = ( i_size < 0 || i_duration_msec <= 0 ) ? 0 : i_size * 1000 * 8 / i_duration_msec;
-        const int64_t TS_SUPPOSED_MAXRATE = 55 * 1000 * 1000; //FIXME I think it's enough.
-        const int64_t TS_SUPPOSED_MINRATE = 0.5 * 1000 * 1000; //FIXME
-        if( i_rate < TS_SUPPOSED_MINRATE || i_rate > TS_SUPPOSED_MAXRATE )
-        {
-            msg_Dbg( p_demux, "calculated bitrate (%"PRId64"bit/s) is too low or too high. min bitrate (%"PRId64"bit/s) max bitrate (%"PRId64"bit/s)",
-                     i_rate, TS_SUPPOSED_MINRATE, TS_SUPPOSED_MAXRATE );
-            p_sys->i_last_pcr = -1;
-        }
-    }
+
     stream_Seek( p_sys->stream, i_initial_pos );
     assert( i_initial_pos == stream_Tell( p_sys->stream ) );
     p_sys->i_current_pcr = i_initial_pcr;
