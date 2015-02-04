@@ -41,6 +41,7 @@
 #include <vlc_block_helper.h>
 #include <vlc_bits.h>
 #include "../codec/cc.h"
+#include "../codec/h264_nal.h"
 #include "packetizer_helper.h"
 #include "../demux/mpeg/mpeg_parser_helpers.h"
 
@@ -789,10 +790,10 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         return;
     }
 
-    if( i_profile_idc == 100 || i_profile_idc == 110 ||
-        i_profile_idc == 122 || i_profile_idc == 244 ||
-        i_profile_idc ==  44 || i_profile_idc ==  83 ||
-        i_profile_idc ==  86 )
+    if( i_profile_idc == PROFILE_H264_HIGH || i_profile_idc == PROFILE_H264_HIGH_10 ||
+        i_profile_idc == PROFILE_H264_HIGH_422 || i_profile_idc == PROFILE_H264_HIGH_444_PREDICTIVE ||
+        i_profile_idc ==  PROFILE_H264_CAVLC_INTRA || i_profile_idc ==  PROFILE_H264_SVC_BASELINE ||
+        i_profile_idc ==  PROFILE_H264_SVC_HIGH )
     {
         /* chroma_format_idc */
         const int i_chroma_format_idc = bs_read_ue( &s );
