@@ -395,16 +395,11 @@ static void Close(vlc_object_t *p_this)
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    /* Hack: if libvlc was killed, main interface thread was,
-     * and poor QTKit needs it, so don't tell him.
-     * Else we dead lock. */
-    if (vlc_object_alive(p_this->p_libvlc)) {
-        // Perform this on main thread, as the framework itself will sometimes try to synchronously
-        // work on main thread. And this will create a dead lock.
-        [p_sys->session performSelectorOnMainThread:@selector(stopRunning) withObject:nil waitUntilDone:NO];
-        [p_sys->output performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
-        [p_sys->session performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
-    }
+    // Perform this on main thread, as the framework itself will sometimes try to synchronously
+    // work on main thread. And this will create a dead lock.
+    [p_sys->session performSelectorOnMainThread:@selector(stopRunning) withObject:nil waitUntilDone:NO];
+    [p_sys->output performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
+    [p_sys->session performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
     free(p_sys);
 
     [pool release];
