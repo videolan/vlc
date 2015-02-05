@@ -235,24 +235,14 @@ int input_Start( input_thread_t *p_input )
 /**
  * Request a running input thread to stop and die
  *
- * b_abort must be true when a user stop is requested and not because you have
- * detected an error or an eof. It will be used to properly send the
- * INPUT_EVENT_ABORT event.
- *
  * \param p_input the input thread to stop
- * \param b_abort true if the input has been aborted by a user request
  */
-void input_Stop( input_thread_t *p_input, bool b_abort )
+void input_Stop( input_thread_t *p_input )
 {
     /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
      * It is needed here even if it is done in INPUT_CONTROL_SET_DIE handler to
      * unlock the control loop */
     ObjectKillChildrens( VLC_OBJECT(p_input) );
-
-    vlc_mutex_lock( &p_input->p->lock_control );
-    p_input->p->b_abort |= b_abort;
-    vlc_mutex_unlock( &p_input->p->lock_control );
-
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
 
@@ -397,7 +387,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     vlc_mutex_init( &p_input->p->lock_control );
     vlc_cond_init( &p_input->p->wait_control );
     p_input->p->i_control = 0;
-    p_input->p->b_abort = false;
     p_input->p->is_running = false;
 
     /* Create Object Variables for private use only */

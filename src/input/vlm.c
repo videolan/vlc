@@ -662,7 +662,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 var_DelCallback( p_input, "intf-event", InputEventPreparse,
                                  &preparse );
 
-                input_Stop( p_input, true );
+                input_Stop( p_input );
                 input_Close( p_input );
                 vlc_sem_destroy( &sem_preparse );
             }
@@ -904,7 +904,7 @@ static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instanc
     input_thread_t *p_input = p_instance->p_input;
     if( p_input )
     {
-        input_Stop( p_input, true );
+        input_Stop( p_input );
         input_Join( p_input );
         var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
         input_Release( p_input );
@@ -996,7 +996,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         }
 
 
-        input_Stop( p_input, true );
+        input_Stop( p_input );
         input_Join( p_input );
         var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
         input_Release( p_input );

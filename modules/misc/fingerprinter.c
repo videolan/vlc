@@ -143,7 +143,7 @@ static void cancelDoFingerprint( void *p_arg )
     fingerprinter_sys_t *p_sys = ( fingerprinter_sys_t * ) p_arg;
     if ( p_sys->p_input )
     {
-        input_Stop( p_sys->p_input, true );
+        input_Stop( p_sys->p_input );
         input_Close( p_sys->p_input );
     }
     /* cleanup temporary result */
@@ -217,7 +217,7 @@ static void DoFingerprint( vlc_object_t *p_this, fingerprinter_sys_t *p_sys, aco
             }
             var_DelCallback( p_sys->p_input, "intf-event", inputStateCallback, p_sys );
         }
-        input_Stop( p_sys->p_input, true );
+        input_Stop( p_sys->p_input );
         input_Close( p_sys->p_input );
         p_sys->p_input = NULL;
 

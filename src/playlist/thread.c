@@ -438,7 +438,7 @@ static void LoopInput( playlist_t *p_playlist )
     if( p_sys->request.b_request || p_sys->killed )
     {
         PL_DEBUG( "incoming request - stopping current input" );
-        input_Stop( p_input, true );
+        input_Stop( p_input );
     }
 
 #warning Unsynchronized access to *p_input flags...
@@ -466,7 +466,7 @@ static void LoopInput( playlist_t *p_playlist )
     else if( p_input->b_error || p_input->b_eof )
     {
         PL_DEBUG( "finished input" );
-        input_Stop( p_input, false );
+        input_Stop( p_input );
     }
 
     vlc_cond_wait( &p_sys->signal, &p_sys->lock );

@@ -755,7 +755,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         sys->request.i_skip = 0;
         sys->request.p_item = p_item;
         if( sys->p_input != NULL )
-            input_Stop( sys->p_input, true );
+            input_Stop( sys->p_input );
         vlc_cond_signal( &sys->signal );
     }
     /* Preparse if no artist/album info, and hasn't been preparsed allready

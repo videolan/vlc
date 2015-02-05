@@ -124,7 +124,7 @@ static inline void unlock_input(libvlc_media_player_t *mp)
  * Object lock is NOT held.
  * Input lock is held or instance is being destroyed.
  */
-static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abort )
+static void release_input_thread( libvlc_media_player_t *p_mi )
 {
     assert( p_mi );
 
@@ -144,7 +144,7 @@ static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abor
     del_es_callbacks( p_input_thread, p_mi );
 
     /* We owned this one */
-    input_Stop( p_input_thread, b_input_abort );
+    input_Stop( p_input_thread );
     input_Close( p_input_thread );
 }
 
@@ -685,7 +685,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 
     /* No need for lock_input() because no other threads knows us anymore */
     if( p_mi->input.p_thread )
-        release_input_thread(p_mi, true);
+        release_input_thread(p_mi);
     input_resource_Terminate( p_mi->input.p_resource );
     input_resource_Release( p_mi->input.p_resource );
     vlc_mutex_destroy( &p_mi->input.lock );
@@ -742,12 +742,7 @@ void libvlc_media_player_set_media(
 {
     lock_input(p_mi);
 
-    /* FIXME I am not sure if it is a user request or on die(eof/error)
-     * request here */
-    release_input_thread( p_mi,
-                          p_mi->input.p_thread &&
-                          !p_mi->input.p_thread->b_eof &&
-                          !p_mi->input.p_thread->b_error );
+    release_input_thread( p_mi );
 
     lock( p_mi );
     set_state( p_mi, libvlc_NothingSpecial, true );
@@ -899,7 +894,7 @@ void libvlc_media_player_set_pause( libvlc_media_player_t *p_mi, int paused )
             if( libvlc_media_player_can_pause( p_mi ) )
                 input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
             else
-                input_Stop( p_input_thread, true );
+                input_Stop( p_input_thread );
         }
     }
     else
@@ -941,7 +936,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
     libvlc_state_t state = libvlc_media_player_get_state( p_mi );
 
     lock_input(p_mi);
-    release_input_thread( p_mi, true ); /* This will stop the input thread */
+    release_input_thread( p_mi ); /* This will stop the input thread */
 
     /* Force to go to stopped state, in case we were in Ended, or Error
      * state. */

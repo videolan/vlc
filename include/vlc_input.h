@@ -494,7 +494,7 @@ VLC_API input_thread_t * input_CreateAndStart( vlc_object_t *p_parent, input_ite
 
 VLC_API int input_Start( input_thread_t * );
 
-VLC_API void input_Stop( input_thread_t *, bool b_abort );
+VLC_API void input_Stop( input_thread_t * );
 
 VLC_API int input_Read( vlc_object_t *, input_item_t * );
 #define input_Read(a,b) input_Read(VLC_OBJECT(a),b)

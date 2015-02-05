@@ -186,7 +186,7 @@ static void Close( vlc_object_t *p_this )
         if( !p_input )
             continue;
 
-        input_Stop( p_input, true );
+        input_Stop( p_input );
         input_Close( p_input );
 
         p_sd->p_sys->pp_input[i] = NULL;
@@ -237,7 +237,7 @@ static void *Run( void *data )
 
             if( p_input->b_eof || p_input->b_error )
             {
-                input_Stop( p_input, false );
+                input_Stop( p_input );
                 input_Close( p_input );
 
                 p_sd->p_sys->pp_input[i] = NULL;
