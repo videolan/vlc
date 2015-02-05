@@ -2741,9 +2741,9 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         p_sys->i_current_pcr = i_pcr;
 
     /* Search program and set the PCR */
-    int i_group = -1;
-    for( int i = 0; i < p_sys->i_pmt && i_group < 0 ; i++ )
+    for( int i = 0; i < p_sys->i_pmt; i++ )
     {
+        int i_group = -1;
         for( int i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
         {
             ts_prg_psi_t *p_prg = p_sys->pmt[i]->psi->prg[i_prg];
