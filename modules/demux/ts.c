@@ -4723,6 +4723,10 @@ static bool PMTSetupEsHDMV( demux_t *p_demux, ts_pid_t *pid,
     case 0x91: /* Interactive graphics */
     case 0x92: /* Subtitle */
         return false;
+    case 0xEA:
+        p_fmt->i_cat = VIDEO_ES;
+        p_fmt->i_codec = VLC_CODEC_VC1;
+        break;
     default:
         msg_Info( p_demux, "HDMV registration not implemented for pid 0x%x type 0x%x",
                   p_es->i_pid, p_es->i_type );
