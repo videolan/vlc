@@ -251,7 +251,7 @@ static void FindLength( demux_t *p_demux )
         /* Check beginning */
         int i = 0;
         i_current_pos = stream_Tell( p_demux->s );
-        while( vlc_object_alive (p_demux) && i < 40 && Demux2( p_demux, false ) > 0 ) i++;
+        while( i < 40 && Demux2( p_demux, false ) > 0 ) i++;
 
         /* Check end */
         i_size = stream_Size( p_demux->s );
@@ -259,7 +259,7 @@ static void FindLength( demux_t *p_demux )
         stream_Seek( p_demux->s, i_size - i_end );
 
         i = 0;
-        while( vlc_object_alive (p_demux) && i < 400 && Demux2( p_demux, true ) > 0 ) i++;
+        while( i < 400 && Demux2( p_demux, true ) > 0 ) i++;
         if( i_current_pos >= 0 ) stream_Seek( p_demux->s, i_current_pos );
     }
 

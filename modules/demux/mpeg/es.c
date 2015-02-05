@@ -239,13 +239,14 @@ static int OpenCommon( demux_t *p_demux,
         }
     }
 
-    while( vlc_object_alive( p_demux ) )
+    for( ;; )
     {
         if( Parse( p_demux, &p_sys->p_packetized_data ) )
             break;
         if( p_sys->p_packetized_data )
             break;
     }
+
     return VLC_SUCCESS;
 }
 static int OpenAudio( vlc_object_t *p_this )

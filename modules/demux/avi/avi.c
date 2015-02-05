@@ -718,9 +718,6 @@ aviindex:
                           (mtime_t)p_avih->i_microsecperframe /
                           CLOCK_FREQ )
     {
-        if( !vlc_object_alive( p_demux) )
-            goto error;
-
         msg_Warn( p_demux, "broken or missing index, 'seek' will be "
                            "approximative or will exhibit strange behavior" );
         if( (i_do_index == 0 || i_do_index == 3) && !b_index )
@@ -1128,7 +1125,6 @@ static int Demux_Seekable( demux_t *p_demux )
                      * affect the reading speed too much. */
                     if( !(++i_loop_count % 1024) )
                     {
-                        if( !vlc_object_alive (p_demux) ) return -1;
                         msleep( 10000 );
 
                         if( !(i_loop_count % (1024 * 10)) )
@@ -1775,8 +1771,6 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
 
     for( ;; )
     {
-        if( !vlc_object_alive (p_demux) ) return VLC_EGENERIC;
-
         if( AVI_PacketGetHeader( p_demux, &avi_pk ) )
         {
             msg_Warn( p_demux, "cannot get packet header" );
@@ -1795,7 +1789,6 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
              * affect the reading speed too much. */
             if( !(++i_loop_count % 1024) )
             {
-                if( !vlc_object_alive (p_demux) ) return VLC_EGENERIC;
                 msleep( 10000 );
 
                 if( !(i_loop_count % (1024 * 10)) )
@@ -2233,8 +2226,6 @@ static int AVI_PacketSearch( demux_t *p_demux )
          * this code is called only on broken files). */
         if( !(++i_count % 1024) )
         {
-            if( !vlc_object_alive (p_demux) ) return VLC_EGENERIC;
-
             msleep( 10000 );
             if( !(i_count % (1024 * 10)) )
                 msg_Warn( p_demux, "trying to resync..." );
@@ -2571,9 +2562,6 @@ static void AVI_IndexCreate( demux_t *p_demux )
     for( ;; )
     {
         avi_packet_t pk;
-
-        if( !vlc_object_alive (p_demux) )
-            break;
 
         /* Don't update/check dialog too often */
         if( p_dialog && mdate() - i_dialog_update > 100000 )

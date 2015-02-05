@@ -364,9 +364,6 @@ static int Demux( demux_t *p_demux )
 
     for( ;; )
     {
-        if( !vlc_object_alive (p_demux) )
-            return -1;
-
         if( FrameHeaderLoad( p_demux, &fh ) )
             return 0;
 
@@ -573,7 +570,7 @@ static int ControlSetPosition( demux_t *p_demux, int64_t i_pos, bool b_guess )
         }
     }
 
-    while( vlc_object_alive (p_demux) )
+    for( ;; )
     {
         frame_header_t fh;
         int64_t i_tell;

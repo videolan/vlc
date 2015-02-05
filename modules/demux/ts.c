@@ -1182,7 +1182,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    while( p_sys->i_pmt_es <= 0 && vlc_object_alive( p_demux )
+    while( p_sys->i_pmt_es <= 0
            && (!p_sys->pid[0].b_seen && !p_sys->patfix.b_pat_deadline) )
     {
         if( Demux( p_demux ) != 1 )
@@ -1193,7 +1193,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->i_pmt_es == 0 && !p_sys->pid[0].b_seen )
         MissingPATPMTFixup( p_demux );
 
-    while( p_sys->i_pmt_es <= 0 && vlc_object_alive( p_demux ) )
+    while( p_sys->i_pmt_es <= 0 )
     {
         if( Demux( p_demux ) != 1 )
             break;
@@ -2397,7 +2397,7 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     {
         msg_Warn( p_demux, "lost synchro" );
         block_Release( p_pkt );
-        while( vlc_object_alive (p_demux) )
+        for( ;; )
         {
             const uint8_t *p_peek;
             int i_peek, i_skip = 0;
@@ -2520,7 +2520,7 @@ static int SeekToPCR( demux_t *p_demux, int64_t i_pos )
     if( stream_Seek( p_sys->stream, i_pos ) )
         return VLC_EGENERIC;
 
-    while( vlc_object_alive( p_demux ) )
+    for( ;; )
     {
         block_t *p_pkt;
 
@@ -2630,7 +2630,7 @@ static void GetFirstPCR( demux_t *p_demux )
     if( stream_Seek( p_sys->stream, 0 ) )
         return;
 
-    while( vlc_object_alive (p_demux) )
+    for( ;; )
     {
         block_t     *p_pkt;
 
@@ -2671,7 +2671,7 @@ static void GetLastPCR( demux_t *p_demux )
     if( i_pos < 0 && i_pos >= i_stream_size )
         return;
 
-    while( vlc_object_alive( p_demux ) )
+    for( ;; )
     {
         if( SeekToPCR( p_demux, i_pos ) )
             break;
@@ -2698,7 +2698,7 @@ static void CheckPCR( demux_t *p_demux )
     p_sys->p_pcrs[0] = p_sys->i_first_pcr;
     p_sys->p_pos[0] = i_initial_pos;
 
-    for( i = 1; i < p_sys->i_pcrs_num && vlc_object_alive( p_demux ); ++i )
+    for( i = 1; i < p_sys->i_pcrs_num; ++i )
     {
         /* Round i_pos to a multiple of p_sys->i_packet_size */
         int64_t i_pos = i_size / p_sys->i_pcrs_num * i;

@@ -355,13 +355,6 @@ static int  Open ( vlc_object_t *p_this )
         {
             int i_read = stream_Read( p_demux->s, &p_sdp[i_sdp],
                                       i_sdp_max - i_sdp - 1 );
-
-            if( !vlc_object_alive (p_demux) )
-            {
-                free( p_sdp );
-                goto error;
-            }
-
             if( i_read < 0 )
             {
                 msg_Err( p_demux, "failed to read SDP" );
