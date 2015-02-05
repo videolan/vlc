@@ -58,6 +58,7 @@ Video filter:
 
 Stream Output:
  * Chromecast output module
+ * RGB24 and YCbCr 4:2:0 RTP packetization
 
 Encoder:
  * Support for Daala video in 4:2:0 and 4:4:4

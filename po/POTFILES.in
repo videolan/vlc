@@ -396,6 +396,7 @@ modules/codec/png.c
 modules/codec/qsv.c
 modules/codec/quicktime.c
 modules/codec/rawvideo.c
+modules/codec/rtpvideo.c
 modules/codec/schroedinger.c
 modules/codec/sdl_image.c
 modules/codec/shine.c

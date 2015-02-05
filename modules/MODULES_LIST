@@ -303,6 +303,7 @@ $Id$
  * rotate: Video rotation filter
  * rss: Display a RSS feed on the video output
  * rtp: rtp demux module
+ * rtpvideo: encoder for raw video over RTP
  * rv32: RV32 image format conversion module
  * samplerate: Secret Rabbit Code (libsamplerate) audio resampler
  * sap: Interface module to read SAP/SDP announcements
