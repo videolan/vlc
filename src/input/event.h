@@ -30,7 +30,6 @@
  * Event for input.c
  *****************************************************************************/
 void input_SendEventDead( input_thread_t *p_input );
-void input_SendEventAbort( input_thread_t *p_input );
 void input_SendEventPosition( input_thread_t *p_input, double f_position, mtime_t i_time );
 void input_SendEventLength( input_thread_t *p_input, mtime_t i_length );
 void input_SendEventStatistics( input_thread_t *p_input );

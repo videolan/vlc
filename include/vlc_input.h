@@ -335,8 +335,6 @@ typedef enum input_event_type_e
     INPUT_EVENT_STATE,
     /* b_dead is true */
     INPUT_EVENT_DEAD,
-    /* a *user* abort has been requested */
-    INPUT_EVENT_ABORT,
 
     /* "rate" has changed */
     INPUT_EVENT_RATE,

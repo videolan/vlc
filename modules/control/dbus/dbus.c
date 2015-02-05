@@ -893,7 +893,6 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
     switch( newval.i_int )
     {
         case INPUT_EVENT_DEAD:
-        case INPUT_EVENT_ABORT:
             i_state = PLAYBACK_STATE_STOPPED;
             break;
         case INPUT_EVENT_STATE:

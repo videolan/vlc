@@ -376,11 +376,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updatePlaybackPosition) withObject:nil waitUntilDone:NO];
             break;
 
-        case INPUT_EVENT_ABORT:
-            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updatePlaybackPosition) withObject:nil waitUntilDone:NO];
-            break;
-
         default:
             break;
     }
