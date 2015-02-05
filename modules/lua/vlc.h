@@ -38,6 +38,7 @@
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 
+#define LUA_COMPAT_APIINTCASTS
 #define LUA_COMPAT_MODULE
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
