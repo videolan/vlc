@@ -722,12 +722,6 @@ static int SessionsSetup( demux_t *p_demux )
         Boolean bInit;
         live_track_t *tk;
 
-        if( !vlc_object_alive (p_demux) )
-        {
-            delete iter;
-            return VLC_EGENERIC;
-        }
-
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
             i_receive_buffer = 100000;
