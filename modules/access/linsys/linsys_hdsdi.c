@@ -673,7 +673,7 @@ static int InitCapture( demux_t *p_demux )
         struct pollfd pfd[1];
 
         pfd[0].fd = p_sys->i_vfd;
-        pfd[0].events = POLLIN | POLLPRI;
+        pfd[0].events = POLLPRI;
 
         if ( poll( pfd, 1, READ_TIMEOUT ) < 0 )
         {
