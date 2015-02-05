@@ -661,7 +661,6 @@ static int InitCapture( demux_t *p_demux )
     char psz_vdev[MAXLEN];
 
     snprintf( psz_vdev, sizeof(psz_vdev), SDIVIDEO_DEVICE, p_sys->i_link );
-    psz_vdev[sizeof(psz_vdev) - 1] = '\0';
     if ( (p_sys->i_vfd = vlc_open( psz_vdev, O_RDONLY ) ) < 0 )
     {
         msg_Err( p_demux, "couldn't open device %s", psz_vdev );
@@ -735,7 +734,6 @@ static int InitCapture( demux_t *p_demux )
         char psz_adev[MAXLEN];
 
         snprintf( psz_adev, sizeof(psz_adev), SDIAUDIO_DEVICE, p_sys->i_link );
-        psz_adev[sizeof(psz_adev) - 1] = '\0';
         if ( (p_sys->i_afd = vlc_open( psz_adev, O_RDONLY ) ) < 0 )
         {
             msg_Err( p_demux, "couldn't open device %s", psz_adev );
