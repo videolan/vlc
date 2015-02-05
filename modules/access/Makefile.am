@@ -134,6 +134,7 @@ liblinsys_hdsdi_plugin_la_SOURCES = \
 	access/linsys/linsys_sdivideo.h \
 	access/linsys/linsys_hdsdi.c
 liblinsys_hdsdi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
+liblinsys_hdsdi_plugin_la_LIBADD = $(LIBPTHREAD)
 liblinsys_sdi_plugin_la_SOURCES = access/linsys/linsys_sdi.c access/linsys/linsys_sdi.h
 liblinsys_sdi_plugin_la_CFLAGS = $(AM_CFLAGS) $(LINSYS_SDI_CFLAGS)
 liblinsys_sdi_plugin_la_LIBADD = $(LINSYS_SDI_LIBS)

@@ -32,6 +32,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/eventfd.h>
 #include <fcntl.h>
 #include <errno.h>
 
@@ -60,7 +61,6 @@
 #define SDIAUDIO_SAMPLESIZE_FILE "/sys/class/sdiaudio/sdiaudiorx%u/sample_size"
 #define SDIAUDIO_CHANNELS_FILE  "/sys/class/sdiaudio/sdiaudiorx%u/channels"
 #define NB_VBUFFERS             2
-#define READ_TIMEOUT            80000
 #define CLOCK_GAP               INT64_C(500000)
 #define START_DATE              INT64_C(4294967296)
 
@@ -154,10 +154,13 @@ struct demux_sys_t
     int          i_id_video;
     es_out_id_t  *p_es_video;
     hdsdi_audio_t p_audios[MAX_AUDIOS];
+
+    pthread_t thread;
+    int evfd;
 };
 
 static int Control( demux_t *, int, va_list );
-static int Demux( demux_t * );
+static void *Demux( void * );
 
 static int InitCapture( demux_t *p_demux );
 static void CloseCapture( demux_t *p_demux );
@@ -173,8 +176,6 @@ static int Open( vlc_object_t *p_this )
     char        *psz_parser;
 
     /* Fill p_demux field */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( unlikely(!p_sys) )
         return VLC_ENOMEM;
@@ -246,13 +247,22 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_link = var_InheritInteger( p_demux, "linsys-hdsdi-link" );
 
-    if( InitCapture( p_demux ) != VLC_SUCCESS )
+    p_sys->evfd = eventfd( 0, EFD_CLOEXEC );
+    if( p_sys->evfd == -1 )
+        goto error;
+
+    if( pthread_create( &p_sys->thread, NULL, Demux, p_demux ) )
     {
-        free( p_sys );
-        return VLC_EGENERIC;
+        close( p_sys->evfd );
+        goto error;
     }
 
+    p_demux->pf_demux = NULL;
+    p_demux->pf_control = Control;
     return VLC_SUCCESS;
+error:
+    free( p_sys );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -263,16 +273,26 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    CloseCapture( p_demux );
+    write( p_sys->evfd, &(uint64_t){ 1 }, sizeof (uint64_t));
+    pthread_join( p_sys->thread, NULL );
+    close( p_sys->evfd );
     free( p_sys );
 }
 
 /*****************************************************************************
  * DemuxDemux:
  *****************************************************************************/
-static int Demux( demux_t *p_demux )
+static void *Demux( void *opaque )
 {
-    return ( Capture( p_demux ) == VLC_SUCCESS );
+    demux_t *p_demux = opaque;
+
+    if( InitCapture( p_demux ) != VLC_SUCCESS )
+        return NULL;
+
+    while( Capture( p_demux ) == VLC_SUCCESS );
+
+    CloseCapture( p_demux );
+    return NULL;
 }
 
 /*****************************************************************************
@@ -668,15 +688,17 @@ static int InitCapture( demux_t *p_demux )
     }
 
     /* Wait for standard to settle down */
-    while ( vlc_object_alive(p_demux) )
+    struct pollfd pfd[2];
+
+    pfd[0].fd = p_sys->i_vfd;
+    pfd[0].events = POLLPRI;
+    pfd[1].fd = p_sys->evfd;
+    pfd[1].events = POLLIN;
+
+    for( ;; )
     {
-        struct pollfd pfd[1];
-
-        pfd[0].fd = p_sys->i_vfd;
-        pfd[0].events = POLLPRI;
-
-        if( poll( pfd, 1, READ_TIMEOUT ) < 0 )
-           continue;
+        if( poll( pfd, 2, -1 ) < 0 )
+            continue;
 
         if ( pfd[0].revents & POLLPRI )
         {
@@ -702,11 +724,12 @@ static int InitCapture( demux_t *p_demux )
                 }
             }
         }
-    }
-    if ( !vlc_object_alive(p_demux) )
-    {
-        close( p_sys->i_vfd );
-        return VLC_EGENERIC;
+
+        if( pfd[1].revents )
+        {
+            close( p_sys->i_vfd );
+            return VLC_EGENERIC;
+        }
     }
 
     if ( ioctl( p_sys->i_vfd, SDIVIDEO_IOC_RXGETVIDSTATUS, &p_sys->i_standard )
@@ -917,20 +940,25 @@ static void CloseCapture( demux_t *p_demux )
 static int Capture( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    struct pollfd pfd[2];
+    struct pollfd pfd[3];
 
-    pfd[0].fd = p_sys->i_vfd;
-    pfd[0].events = POLLIN | POLLPRI;
+    pfd[0].fd = p_sys->evfd;
+    pfd[0].events = POLLIN;
+    pfd[1].fd = p_sys->i_vfd;
+    pfd[1].events = POLLIN | POLLPRI;
     if ( p_sys->i_max_channel != -1 )
     {
-        pfd[1].fd = p_sys->i_afd;
-        pfd[1].events = POLLIN | POLLPRI;
+        pfd[2].fd = p_sys->i_afd;
+        pfd[2].events = POLLIN | POLLPRI;
     }
 
-    if( poll( pfd, 1 + (p_sys->i_max_channel != -1), READ_TIMEOUT ) < 0 )
+    if( poll( pfd, 2 + (p_sys->i_max_channel != -1), -1 ) < 0 )
         return VLC_SUCCESS;
 
-    if ( pfd[0].revents & POLLPRI )
+    if( pfd[0].revents )
+        return VLC_EGENERIC; /* Stop! */
+
+    if( pfd[1].revents & POLLPRI )
     {
         unsigned int i_val;
 
@@ -955,7 +983,7 @@ static int Capture( demux_t *p_demux )
         p_sys->i_next_vdate += CLOCK_GAP;
     }
 
-    if ( p_sys->i_max_channel != -1 && pfd[1].revents & POLLPRI )
+    if( p_sys->i_max_channel != -1 && (pfd[2].revents & POLLPRI) )
     {
         unsigned int i_val;
 
@@ -978,7 +1006,7 @@ static int Capture( demux_t *p_demux )
         p_sys->i_next_vdate += CLOCK_GAP;
     }
 
-    if ( pfd[0].revents & POLLIN )
+    if( pfd[1].revents & POLLIN )
     {
 #ifdef HAVE_MMAP_SDIVIDEO
         if ( ioctl( p_sys->i_vfd, SDIVIDEO_IOC_DQBUF, p_sys->i_current_vbuffer )
@@ -1023,7 +1051,7 @@ static int Capture( demux_t *p_demux )
 #endif
     }
 
-    if ( p_sys->i_max_channel != -1 && pfd[1].revents & POLLIN )
+    if( p_sys->i_max_channel != -1 && (pfd[2].revents & POLLIN) )
     {
 #ifdef HAVE_MMAP_SDIAUDIO
         if ( ioctl( p_sys->i_afd, SDIAUDIO_IOC_DQBUF, p_sys->i_current_abuffer )
