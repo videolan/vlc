@@ -70,7 +70,7 @@ static int     OutSeek (sout_access_out_t *, off_t);
 
 static int UrlInterruptCallback(void *access)
 {
-    return !vlc_object_alive((vlc_object_t*)access);
+    return !vlc_object_alive((access_t *)access);
 }
 
 struct access_sys_t
@@ -233,10 +233,6 @@ int OutOpenAvio(vlc_object_t *object)
 #if LIBAVFORMAT_VERSION_MAJOR < 54
     ret = avio_open(&sys->context, access->psz_path, AVIO_FLAG_WRITE);
 #else
-    AVIOInterruptCB cb = {
-        .callback = UrlInterruptCallback,
-        .opaque = access,
-    };
     AVDictionary *options = NULL;
     char *psz_opts = var_InheritString(access, "sout-avio-options");
     if (psz_opts && *psz_opts) {
@@ -244,7 +240,7 @@ int OutOpenAvio(vlc_object_t *object)
         free(psz_opts);
     }
     ret = avio_open2(&sys->context, access->psz_path, AVIO_FLAG_WRITE,
-                     &cb, &options);
+                     NULL, &options);
     AVDictionaryEntry *t = NULL;
     while ((t = av_dict_get(options, "", t, AV_DICT_IGNORE_SUFFIX)))
         msg_Err( access, "unknown option \"%s\"", t->key );
