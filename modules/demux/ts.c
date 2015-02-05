@@ -4694,6 +4694,10 @@ static bool PMTSetupEsHDMV( demux_t *p_demux, ts_pid_t *pid,
         p_fmt->i_cat = AUDIO_ES;
         p_fmt->i_codec = VLC_CODEC_BD_LPCM;
         break;
+    case 0x81:
+        p_fmt->i_cat = AUDIO_ES;
+        p_fmt->i_codec = VLC_CODEC_A52;
+        break;
     case 0x82:
     case 0x85: /* DTS-HD High resolution audio */
     case 0x86: /* DTS-HD Master audio */
