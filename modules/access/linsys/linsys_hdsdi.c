@@ -675,12 +675,8 @@ static int InitCapture( demux_t *p_demux )
         pfd[0].fd = p_sys->i_vfd;
         pfd[0].events = POLLPRI;
 
-        if ( poll( pfd, 1, READ_TIMEOUT ) < 0 )
-        {
-            msg_Warn( p_demux, "couldn't poll(): %s", vlc_strerror_c(errno) );
-            close( p_sys->i_vfd );
-            return VLC_EGENERIC;
-        }
+        if( poll( pfd, 1, READ_TIMEOUT ) < 0 )
+           continue;
 
         if ( pfd[0].revents & POLLPRI )
         {
@@ -931,11 +927,8 @@ static int Capture( demux_t *p_demux )
         pfd[1].events = POLLIN | POLLPRI;
     }
 
-    if ( poll( pfd, 1 + (p_sys->i_max_channel != -1), READ_TIMEOUT ) < 0 )
-    {
-        msg_Warn( p_demux, "couldn't poll(): %s", vlc_strerror_c(errno) );
-        return VLC_EGENERIC;
-    }
+    if( poll( pfd, 1 + (p_sys->i_max_channel != -1), READ_TIMEOUT ) < 0 )
+        return VLC_SUCCESS;
 
     if ( pfd[0].revents & POLLPRI )
     {
