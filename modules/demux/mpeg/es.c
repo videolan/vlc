@@ -445,8 +445,8 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
     {
         /* Make sure we are word aligned */
         int64_t i_pos = stream_Tell( p_demux->s );
-        if( i_pos % 2 )
-            stream_Read( p_demux->s, NULL, 1 );
+        if( (i_pos & 1) && stream_Read( p_demux->s, NULL, 1 ) != 1 )
+            return true;
     }
 
     p_block_in = stream_Block( p_demux->s, p_sys->i_packet_size );
