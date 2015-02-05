@@ -398,15 +398,7 @@ void event_thread_t::EventThread()
         vlc_mutex_unlock( &lock );
 
         /* Always check vout */
-        if( p_vout && !vlc_object_alive (p_vout) )
-        {
-            var_DelCallback( p_vout, "mouse-moved", EventMouse, this );
-            var_DelCallback( p_vout, "mouse-clicked", EventMouse, this );
-            vlc_object_release( p_vout );
-            p_vout = NULL;
-        }
-
-        else if( p_vout == NULL )
+        if( p_vout == NULL )
         {
             p_vout = (vlc_object_t*) input_GetVout(p_sys->p_input);
             if( p_vout)
