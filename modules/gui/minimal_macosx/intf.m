@@ -31,6 +31,7 @@
 #ifdef HAVE_CONFIG_H
 # import "config.h"
 #endif
+#include <unistd.h>
 
 #import <vlc_playlist.h>
 #import <vlc_vout_window.h>
@@ -91,16 +92,8 @@ static void * KillerThread(void *user_data)
 
     intf_thread_t *p_intf = user_data;
 
-    vlc_mutex_init(&p_intf->p_sys->lock);
-    vlc_cond_init(&p_intf->p_sys->wait);
-
-    vlc_mutex_lock (&p_intf->p_sys->lock);
-    while(vlc_object_alive(p_intf))
-        vlc_cond_wait(&p_intf->p_sys->wait, &p_intf->p_sys->lock);
-    vlc_mutex_unlock(&p_intf->p_sys->lock);
-
-    vlc_mutex_destroy(&p_intf->p_sys->lock);
-    vlc_cond_destroy(&p_intf->p_sys->wait);
+    for(;;)
+        pause();
 
     /* We are dead, terminate */
     [NSApp terminate: nil];
