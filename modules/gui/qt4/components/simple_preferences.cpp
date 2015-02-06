@@ -207,7 +207,7 @@ static int getDefaultAudioVolume(vlc_object_t *obj, const char *aout)
         return -1;
     else
 #ifdef __APPLE__
-    if (!strcmp("auhal") && module_exists("auhal"))
+    if (!strcmp(aout, "auhal") && module_exists("auhal"))
         return (config_GetFloat(obj, "auhal-volume") * 100.f + .5f)
                  / AOUT_VOLUME_DEFAULT;
     else
