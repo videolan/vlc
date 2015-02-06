@@ -138,7 +138,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
 }
 
 
-static int64_t strtoi (const char *str)
+static int64_t vlc_strtoi (const char *str)
 {
     char *end;
     long long l;
@@ -223,7 +223,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
                 int64_t l;
 
                 errno = 0;
-                l = strtoi (psz_option_value);
+                l = vlc_strtoi (psz_option_value);
                 if ((l > item->max.i) || (l < item->min.i))
                     errno = ERANGE;
                 if (errno)
