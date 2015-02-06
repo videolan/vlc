@@ -121,6 +121,13 @@ inline static void free_all_node( node *root )
     {
         free_all_node( root->child );
         free( root->name );
+        item *media = root->media;
+        while( media )
+        {
+            item *next_media = media->next;
+            free( media );
+            media = next_media;
+        }
         node *tmp = root->next;
         free( root );
         root = tmp;
@@ -563,6 +570,7 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
 
     /* Root node */
     node *playlist = new_node( psz_zip );
+    free( psz_zip );
 
     /* Encode the URI and append ZIP_SEP */
     char *psz_pathtozip;
