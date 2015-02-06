@@ -94,6 +94,7 @@ matroska_segment_c::~matroska_segment_c()
     vlc_delete_all( stored_editions );
     vlc_delete_all( translations );
     vlc_delete_all( families );
+    vlc_delete_all( tags );
 }
 
 
