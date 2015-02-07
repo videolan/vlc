@@ -2966,10 +2966,6 @@ AC_ARG_ENABLE(xvideo,
   [  --enable-xvideo         XVideo support (default enabled)],, [
     enable_xvideo="$enable_xcb"
 ])
-AC_ARG_ENABLE(glx,
-  [  --enable-glx            OpenGL support through GLX (default enabled)],, [
-  enable_glx="$enable_xcb"
-])
 
 have_xcb="no"
 have_xcb_keysyms="no"
