@@ -261,7 +261,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** Open the codec ***** */
     if( OpenAudioCodec( p_dec ) < 0 )
     {
-        av_free( p_context->extradata );
         free( p_sys );
         return VLC_EGENERIC;
     }
