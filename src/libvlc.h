@@ -76,7 +76,10 @@ void vlc_assert_locked (vlc_mutex_t *);
 /*
  * Logging
  */
-void vlc_LogInit(libvlc_int_t *);
+typedef struct vlc_logger_t vlc_logger_t;
+
+int vlc_LogPreinit(libvlc_int_t *);
+int vlc_LogInit(libvlc_int_t *);
 void vlc_LogDeinit(libvlc_int_t *);
 
 /*
@@ -145,16 +148,10 @@ typedef struct libvlc_priv_t
     libvlc_int_t       public_data;
 
     /* Logging */
-    struct
-    {
-        void (*cb) (void *, int, const vlc_log_t *, const char *, va_list);
-        void *opaque;
-        signed char verbose;
-        vlc_rwlock_t lock;
-    } log;
     bool               b_stats;     ///< Whether to collect stats
 
     /* Singleton objects */
+    vlc_logger_t      *logger;
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
     vlc_object_t      *p_dialog_provider; ///< dialog provider
     struct playlist_t *playlist; ///< Playlist for interfaces

@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <stdarg.h>                                       /* va_list for BSD */
 #include <unistd.h>
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
@@ -45,22 +46,33 @@
 #include <android/log.h>
 #endif
 
-/**
- * Emit a log message.
- * \param obj VLC object emitting the message or NULL
- * \param type VLC_MSG_* message type (info, error, warning or debug)
- * \param module name of module from which the message come
- *               (normally MODULE_STRING)
- * \param format printf-like message format
- */
-void vlc_Log (vlc_object_t *obj, int type, const char *module,
-              const char *format, ... )
+struct vlc_logger_t
 {
-    va_list args;
+    vlc_rwlock_t lock;
+    vlc_log_cb log;
+    void *sys;
+};
 
-    va_start (args, format);
-    vlc_vaLog (obj, type, module, format, args);
-    va_end (args);
+static void vlc_vaLogCallback(libvlc_int_t *vlc, int type,
+                              const vlc_log_t *item, const char *format,
+                              va_list ap)
+{
+    vlc_logger_t *logger = libvlc_priv(vlc)->logger;
+
+    assert(logger != NULL);
+    vlc_rwlock_rdlock(&logger->lock);
+    logger->log(logger->sys, type, item, format, ap);
+    vlc_rwlock_unlock(&logger->lock);
+}
+
+static void vlc_LogCallback(libvlc_int_t *vlc, int type, const vlc_log_t *item,
+                            const char *format, ...)
+{
+    va_list ap;
+
+    va_start(ap, format);
+    vlc_vaLogCallback(vlc, type, item, format, ap);
+    va_end(ap);
 }
 
 #ifdef _WIN32
@@ -108,22 +120,35 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
             break;
         }
 
-    /* Pass message to the callback */
-    libvlc_priv_t *priv = obj ? libvlc_priv (obj->p_libvlc) : NULL;
-
 #ifdef _WIN32
     va_list ap;
 
     va_copy (ap, args);
-    Win32DebugOutputMsg (priv ? &priv->log.verbose : NULL, type, &msg, format, ap);
+    Win32DebugOutputMsg (NULL, type, &msg, format, ap);
     va_end (ap);
 #endif
 
-    if (priv) {
-        vlc_rwlock_rdlock (&priv->log.lock);
-        priv->log.cb (priv->log.opaque, type, &msg, format, args);
-        vlc_rwlock_unlock (&priv->log.lock);
-    }
+    /* Pass message to the callback */
+    if (obj != NULL)
+        vlc_vaLogCallback(obj->p_libvlc, type, &msg, format, args);
+}
+
+/**
+ * Emit a log message.
+ * \param obj VLC object emitting the message or NULL
+ * \param type VLC_MSG_* message type (info, error, warning or debug)
+ * \param module name of module from which the message come
+ *               (normally MODULE_STRING)
+ * \param format printf-like message format
+ */
+void vlc_Log(vlc_object_t *obj, int type, const char *module,
+             const char *format, ... )
+{
+    va_list ap;
+
+    va_start(ap, format);
+    vlc_vaLog(obj, type, module, format, ap);
+    va_end(ap);
 }
 
 static const char msg_type[4][9] = { "", " error", " warning", " debug" };
@@ -268,34 +293,192 @@ static void AndroidPrintMsg (void *d, int type, const vlc_log_t *p_item,
 }
 #endif
 
-/**
- * Sets the message logging callback.
- * \param cb message callback, or NULL to reset
- * \param data data pointer for the message callback
- */
-void vlc_LogSet (libvlc_int_t *vlc, vlc_log_cb cb, void *opaque)
+typedef struct vlc_log_early_t
 {
-    libvlc_priv_t *priv = libvlc_priv (vlc);
+    struct vlc_log_early_t *next;
+    int type;
+    vlc_log_t meta;
+    char *msg;
+} vlc_log_early_t;
 
-    if (cb == NULL)
+typedef struct
+{
+    vlc_mutex_t lock;
+    vlc_log_early_t *head;
+    vlc_log_early_t **tailp;
+} vlc_logger_early_t;
+
+static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
+                           const char *format, va_list ap)
+{
+    vlc_logger_early_t *sys = d;
+
+    vlc_log_early_t *log = malloc(sizeof (*log));
+    if (unlikely(log == NULL))
+        return;
+
+    log->next = NULL;
+    log->type = type;
+    log->meta.i_object_id = item->i_object_id;
+    /* NOTE: Object types MUST be static constant - no need to copy them. */
+    log->meta.psz_object_type = item->psz_object_type;
+    log->meta.psz_module = item->psz_module; /* Ditto. */
+    log->meta.psz_header = item->psz_header ? strdup(item->psz_header) : NULL;
+
+    int canc = vlc_savecancel(); /* XXX: needed for vasprintf() ? */
+    if (vasprintf(&log->msg, format, ap) == -1)
+        log->msg = NULL;
+    vlc_restorecancel(canc);
+
+    vlc_mutex_lock(&sys->lock);
+    assert(sys->tailp != NULL);
+    assert(*(sys->tailp) == NULL);
+    *(sys->tailp) = log;
+    sys->tailp = &log->next;
+    vlc_mutex_unlock(&sys->lock);
+}
+
+static int vlc_LogEarlyOpen(vlc_logger_t *logger)
+{
+    vlc_logger_early_t *sys = malloc(sizeof (*sys));
+
+    if (unlikely(sys == NULL))
+        return -1;
+
+    vlc_mutex_init(&sys->lock);
+    sys->head = NULL;
+    sys->tailp = &sys->head;
+
+    logger->log = vlc_vaLogEarly;
+    logger->sys = sys;
+    return 0;
+}
+
+static void vlc_LogEarlyClose(libvlc_int_t *vlc, void *d)
+{
+    vlc_logger_early_t *sys = d;
+
+    /* Drain early log messages */
+    for (vlc_log_early_t *log = sys->head, *next; log != NULL; log = next)
     {
-#ifdef __ANDROID__
-        cb = AndroidPrintMsg;
-#else
-#if defined (HAVE_ISATTY) && !defined (_WIN32)
-        if (isatty (STDERR_FILENO) && var_InheritBool (vlc, "color"))
-            cb = PrintColorMsg;
-        else
-#endif
-            cb = PrintMsg;
-#endif // __ANDROID__
-        opaque = (void *)(intptr_t)priv->log.verbose;
+        vlc_LogCallback(vlc, log->type, &log->meta, "%s",
+                        (log->msg != NULL) ? log->msg : "message lost");
+        free(log->msg);
+        next = log->next;
+        free(log);
     }
 
-    vlc_rwlock_wrlock (&priv->log.lock);
-    priv->log.cb = cb;
-    priv->log.opaque = opaque;
-    vlc_rwlock_unlock (&priv->log.lock);
+    vlc_mutex_destroy(&sys->lock);
+    free(sys);
+}
+
+static void vlc_vaLogDiscard(void *d, int type, const vlc_log_t *item,
+                             const char *format, va_list ap)
+{
+    (void) d; (void) type; (void) item; (void) format; (void) ap;
+}
+
+/**
+ * Performs preinitialization of the messages logging subsystem.
+ *
+ * Early log messages will be stored in memory until the subsystem is fully
+ * initialized with vlc_LogInit(). This enables logging before the
+ * configuration and modules bank are ready.
+ *
+ * \return 0 on success, -1 on error.
+ */
+int vlc_LogPreinit(libvlc_int_t *vlc)
+{
+    vlc_logger_t *logger = malloc(sizeof (*logger));
+
+    libvlc_priv(vlc)->logger = logger;
+
+    if (unlikely(logger == NULL))
+        return -1;
+
+    vlc_rwlock_init(&logger->lock);
+
+    if (vlc_LogEarlyOpen(logger))
+    {
+        logger->log = vlc_vaLogDiscard;
+        return -1;
+    }
+
+    /* Announce who we are */
+    msg_Dbg(vlc, "VLC media player - %s", VERSION_MESSAGE);
+    msg_Dbg(vlc, "%s", COPYRIGHT_MESSAGE);
+    msg_Dbg(vlc, "revision %s", psz_vlc_changeset);
+    msg_Dbg(vlc, "configured with %s", CONFIGURE_LINE);
+    return 0;
+}
+
+/**
+ * Initializes the messages logging subsystem and drain the early messages to
+ * the configured log.
+ *
+ * \return 0 on success, -1 on error.
+ */
+int vlc_LogInit(libvlc_int_t *vlc)
+{
+    vlc_logger_t *logger = libvlc_priv(vlc)->logger;
+    void *early_sys = NULL;
+    vlc_log_cb cb = PrintMsg;
+    signed char verbosity;
+
+    if (unlikely(logger == NULL))
+        return -1;
+
+#ifdef __ANDROID__
+    cb = AndroidPrintMsg;
+#elif defined (HAVE_ISATTY) && !defined (_WIN32)
+    if (isatty(STDERR_FILENO) && var_InheritBool(vlc, "color"))
+        cb = PrintColorMsg;
+#endif
+
+    if (var_InheritBool(vlc, "quiet"))
+        verbosity = -1;
+    else
+    {
+        const char *str = getenv("VLC_VERBOSE");
+
+        if (str == NULL || sscanf(str, "%hhd", &verbosity) < 1)
+            verbosity = var_InheritInteger(vlc, "verbose");
+    }
+
+    vlc_rwlock_wrlock(&logger->lock);
+
+    if (logger->log == vlc_vaLogEarly)
+        early_sys = logger->sys;
+
+    logger->log = cb;
+    logger->sys = (void *)(intptr_t)verbosity;
+    vlc_rwlock_unlock(&logger->lock);
+
+    if (early_sys != NULL)
+        vlc_LogEarlyClose(vlc, early_sys);
+
+    return 0;
+}
+
+/**
+ * Sets the message logging callback.
+ * \param cb message callback, or NULL to clear
+ * \param data data pointer for the message callback
+ */
+void vlc_LogSet(libvlc_int_t *vlc, vlc_log_cb cb, void *opaque)
+{
+    vlc_logger_t *logger = libvlc_priv(vlc)->logger;
+
+    if (unlikely(logger == NULL))
+        return;
+
+    if (cb == NULL)
+        cb = vlc_vaLogDiscard;
+
+    vlc_rwlock_wrlock(&logger->lock);
+    logger->log = cb;
+    logger->sys = opaque;
+    vlc_rwlock_unlock(&logger->lock);
 
     /* Announce who we are */
     msg_Dbg (vlc, "VLC media player - %s", VERSION_MESSAGE);
@@ -304,26 +487,20 @@ void vlc_LogSet (libvlc_int_t *vlc, vlc_log_cb cb, void *opaque)
     msg_Dbg (vlc, "configured with %s", CONFIGURE_LINE);
 }
 
-void vlc_LogInit (libvlc_int_t *vlc)
+void vlc_LogDeinit(libvlc_int_t *vlc)
 {
-    libvlc_priv_t *priv = libvlc_priv (vlc);
-    const char *str;
+    vlc_logger_t *logger = libvlc_priv(vlc)->logger;
 
-    if (var_InheritBool (vlc, "quiet"))
-        priv->log.verbose = -1;
-    else
-    if ((str = getenv ("VLC_VERBOSE")) != NULL)
-        priv->log.verbose = atoi (str);
-    else
-        priv->log.verbose = var_InheritInteger (vlc, "verbose");
+    if (unlikely(logger == NULL))
+        return;
 
-    vlc_rwlock_init (&priv->log.lock);
-    vlc_LogSet (vlc, NULL, NULL);
-}
+    /* Flush early log messages (corner case: no call to vlc_LogInit()) */
+    if (logger->log == vlc_vaLogEarly)
+    {
+        logger->log = vlc_vaLogDiscard;
+        vlc_LogEarlyClose(vlc, logger->sys);
+    }
 
-void vlc_LogDeinit (libvlc_int_t *vlc)
-{
-    libvlc_priv_t *priv = libvlc_priv (vlc);
-
-    vlc_rwlock_destroy (&priv->log.lock);
+    vlc_rwlock_destroy(&logger->lock);
+    free(logger);
 }

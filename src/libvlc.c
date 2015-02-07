@@ -128,6 +128,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* System specific initialization code */
     system_Init();
 
+    vlc_LogPreinit(p_libvlc);
+
     /* Initialize the module bank and load the configuration of the
      * core module. We need to do this at this stage to be able to display
      * a short help if required by the user. (short help == core module
@@ -141,7 +143,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         return VLC_EGENERIC;
     }
 
-    vlc_LogInit (p_libvlc);
     vlc_threads_setup (p_libvlc);
 
     /* Load the builtins and plugins into the module_bank.
@@ -171,6 +172,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         vlc_LogDeinit (p_libvlc);
         return VLC_EGENERIC;
     }
+
+    vlc_LogInit(p_libvlc);
 
     /*
      * Support for gettext
