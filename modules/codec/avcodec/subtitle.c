@@ -40,6 +40,7 @@
 
 struct decoder_sys_t {
     AVCODEC_COMMON_MEMBERS
+    bool b_need_ephemer; /* Does the format need the ephemer flag (no end time set) */
 };
 
 static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, mtime_t pts,
@@ -73,6 +74,7 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
     sys->p_context = context;
     sys->p_codec = codec;
     sys->b_delayed_open = false;
+    sys->b_need_ephemer = codec->id == AV_CODEC_ID_HDMV_PGS_SUBTITLE;
 
     /* */
     context->extradata_size = 0;
@@ -244,7 +246,8 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
     spu->i_start    = pts + ffsub->start_display_time * INT64_C(1000);
     spu->i_stop     = pts + ffsub->end_display_time * INT64_C(1000);
     spu->b_absolute = true; /* We have offset and size for subtitle */
-    spu->b_ephemer  = false; /* We only show subtitle for i_stop time only */
+    spu->b_ephemer  = dec->p_sys->b_need_ephemer;
+                    /* We only show subtitle for i_stop time only */
 
     if (avctx->coded_width != 0 && avctx->coded_height != 0) {
         spu->i_original_picture_width = avctx->coded_width;
