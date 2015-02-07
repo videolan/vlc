@@ -106,21 +106,9 @@ static inline playlist_t *pl_Get( struct intf_thread_t *intf )
 #define pl_CurrentInput(intf) (playlist_CurrentInput(pl_Get(intf)))
 
 /**
- * \defgroup vlc_subscription Log messages subscription
- * These functions deal with log messages.
+ * @ingroup messages
  * @{
  */
-
-/**
- * Message logging callback signature.
- * \param data data pointer as provided to vlc_msg_SetCallback().
- * \param type message type (VLC_MSG_* values from enum vlc_log_type)
- * \param item meta information
- * \param fmt format string
- * \param args format string arguments
- */
-typedef void (*vlc_log_cb) (void *data, int type, const vlc_log_t *item,
-                            const char *fmt, va_list args);
 
 VLC_API void vlc_LogSet(libvlc_int_t *, vlc_log_cb cb, void *data);
 

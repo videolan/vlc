@@ -40,6 +40,7 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_charset.h>
+#include <vlc_modules.h>
 #include "../libvlc.h"
 
 #ifdef __ANDROID__
@@ -52,6 +53,7 @@ struct vlc_logger_t
     vlc_rwlock_t lock;
     vlc_log_cb log;
     void *sys;
+    module_t *module;
 };
 
 static void vlc_vaLogCallback(libvlc_int_t *vlc, int type,
@@ -355,8 +357,9 @@ static int vlc_LogEarlyOpen(vlc_logger_t *logger)
     return 0;
 }
 
-static void vlc_LogEarlyClose(libvlc_int_t *vlc, void *d)
+static void vlc_LogEarlyClose(vlc_logger_t *logger, void *d)
 {
+    libvlc_int_t *vlc = logger->p_libvlc;
     vlc_logger_early_t *sys = d;
 
     /* Drain early log messages */
@@ -377,6 +380,25 @@ static void vlc_vaLogDiscard(void *d, int type, const vlc_log_t *item,
                              const char *format, va_list ap)
 {
     (void) d; (void) type; (void) item; (void) format; (void) ap;
+}
+
+static int vlc_logger_load(void *func, va_list ap)
+{
+    vlc_log_cb (*activate)(vlc_object_t *, void **) = func;
+    vlc_logger_t *logger = va_arg(ap, vlc_logger_t *);
+    vlc_log_cb *cb = va_arg(ap, vlc_log_cb *);
+    void **sys = va_arg(ap, void **);
+
+    *cb = activate(VLC_OBJECT(logger), sys);
+    return (*cb != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static void vlc_logger_unload(void *func, va_list ap)
+{
+    void (*deactivate)(vlc_logger_t *) = func;
+    void *sys = va_arg(ap, void *);
+
+    deactivate(sys);
 }
 
 /**
@@ -422,41 +444,52 @@ int vlc_LogPreinit(libvlc_int_t *vlc)
 int vlc_LogInit(libvlc_int_t *vlc)
 {
     vlc_logger_t *logger = libvlc_priv(vlc)->logger;
-    void *early_sys = NULL;
-    vlc_log_cb cb = PrintMsg;
-    signed char verbosity;
-
     if (unlikely(logger == NULL))
         return -1;
 
-#ifdef __ANDROID__
-    cb = AndroidPrintMsg;
-#elif defined (HAVE_ISATTY) && !defined (_WIN32)
-    if (isatty(STDERR_FILENO) && var_InheritBool(vlc, "color"))
-        cb = PrintColorMsg;
-#endif
+    vlc_log_cb cb;
+    void *sys, *early_sys = NULL;
 
-    if (var_InheritBool(vlc, "quiet"))
-        verbosity = -1;
-    else
+    /* TODO: module configuration item */
+    module_t *module = vlc_module_load(logger, "logger", NULL, false,
+                                       vlc_logger_load, logger, &cb, &sys);
+    if (module == NULL)
     {
-        const char *str = getenv("VLC_VERBOSE");
+#ifdef __ANDROID__
+        cb = AndroidPrintMsg;
+#elif defined (HAVE_ISATTY) && !defined (_WIN32)
+        if (isatty(STDERR_FILENO) && var_InheritBool(vlc, "color"))
+            cb = PrintColorMsg;
+#endif
+        else
+            cb = PrintMsg;
 
-        if (str == NULL || sscanf(str, "%hhd", &verbosity) < 1)
-            verbosity = var_InheritInteger(vlc, "verbose");
+        signed char verbosity;
+
+        if (var_InheritBool(vlc, "quiet"))
+            verbosity = -1;
+        else
+        {
+            const char *str = getenv("VLC_VERBOSE");
+
+            if (str == NULL || sscanf(str, "%hhd", &verbosity) < 1)
+                verbosity = var_InheritInteger(vlc, "verbose");
+        }
+        sys = (void *)(intptr_t)verbosity;
     }
 
     vlc_rwlock_wrlock(&logger->lock);
-
     if (logger->log == vlc_vaLogEarly)
         early_sys = logger->sys;
 
     logger->log = cb;
-    logger->sys = (void *)(intptr_t)verbosity;
+    logger->sys = sys;
+    assert(logger->module == NULL); /* Only one call to vlc_LogInit()! */
+    logger->module = module;
     vlc_rwlock_unlock(&logger->lock);
 
     if (early_sys != NULL)
-        vlc_LogEarlyClose(vlc, early_sys);
+        vlc_LogEarlyClose(logger, early_sys);
 
     return 0;
 }
@@ -473,13 +506,23 @@ void vlc_LogSet(libvlc_int_t *vlc, vlc_log_cb cb, void *opaque)
     if (unlikely(logger == NULL))
         return;
 
+    module_t *module;
+    void *sys;
+
     if (cb == NULL)
         cb = vlc_vaLogDiscard;
 
     vlc_rwlock_wrlock(&logger->lock);
+    sys = logger->sys;
+    module = logger->module;
+
     logger->log = cb;
     logger->sys = opaque;
+    logger->module = NULL;
     vlc_rwlock_unlock(&logger->lock);
+
+    if (module != NULL)
+        vlc_module_unload(module, vlc_logger_unload, sys);
 
     /* Announce who we are */
     msg_Dbg (vlc, "VLC media player - %s", VERSION_MESSAGE);
@@ -495,13 +538,17 @@ void vlc_LogDeinit(libvlc_int_t *vlc)
     if (unlikely(logger == NULL))
         return;
 
+    if (logger->module != NULL)
+        vlc_module_unload(logger->module, vlc_logger_unload, logger->sys);
+    else
     /* Flush early log messages (corner case: no call to vlc_LogInit()) */
     if (logger->log == vlc_vaLogEarly)
     {
         logger->log = vlc_vaLogDiscard;
-        vlc_LogEarlyClose(vlc, logger->sys);
+        vlc_LogEarlyClose(logger, logger->sys);
     }
 
     vlc_rwlock_destroy(&logger->lock);
     vlc_object_release(logger);
+    libvlc_priv(vlc)->logger = NULL;
 }

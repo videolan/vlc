@@ -85,6 +85,17 @@ VLC_API const char *vlc_strerror(int);
 VLC_API const char *vlc_strerror_c(int);
 
 /**
+ * Message logging callback signature.
+ * \param data data pointer as provided to vlc_msg_SetCallback().
+ * \param type message type (VLC_MSG_* values from enum vlc_log_type)
+ * \param item meta information
+ * \param fmt format string
+ * \param args format string arguments
+ */
+typedef void (*vlc_log_cb) (void *data, int type, const vlc_log_t *item,
+                            const char *fmt, va_list args);
+
+/**
  * @}
  */
 #endif

@@ -168,8 +168,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     int vlc_optind;
     if( config_LoadCmdLine( p_libvlc, i_argc, ppsz_argv, &vlc_optind ) )
     {
-        module_EndBank (true);
         vlc_LogDeinit (p_libvlc);
+        module_EndBank (true);
         return VLC_EGENERIC;
     }
 
@@ -194,8 +194,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( module_count <= 1 )
     {
         msg_Err( p_libvlc, "No plugins found! Check your VLC installation.");
-        module_EndBank (true);
         vlc_LogDeinit (p_libvlc);
+        module_EndBank (true);
         return VLC_ENOMOD;
     }
 
@@ -206,8 +206,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( daemon( 1, 0) != 0 )
         {
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
-            module_EndBank (true);
             vlc_LogDeinit (p_libvlc);
+            module_EndBank (true);
             return VLC_ENOMEM;
         }
 
@@ -552,8 +552,8 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         config_AutoSaveConfigFile( VLC_OBJECT(p_libvlc) );
 
     /* Free module bank. It is refcounted, so we call this each time  */
-    module_EndBank (true);
     vlc_LogDeinit (p_libvlc);
+    module_EndBank (true);
 #if defined(_WIN32) || defined(__OS2__)
     system_End( );
 #endif
