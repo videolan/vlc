@@ -174,12 +174,16 @@ int RarAccessOpen(vlc_object_t *object)
 
     if (oldscheme.filescount >= newscheme.filescount && oldscheme.i_nbvols > newscheme.i_nbvols)
     {
+        for (int i = 0; i < newscheme.filescount; i++)
+            RarFileDelete(newscheme.files[i]);
         free(newscheme.files);
         p_scheme = &oldscheme;
         msg_Dbg(s, "using rar old naming for %d files nbvols %u", p_scheme->filescount, oldscheme.i_nbvols);
     }
     else if (newscheme.filescount)
     {
+        for (int i = 0; i < oldscheme.filescount; i++)
+            RarFileDelete(oldscheme.files[i]);
         free(oldscheme.files);
         p_scheme = &newscheme;
         msg_Dbg(s, "using rar new naming for %d files nbvols %u", p_scheme->filescount, oldscheme.i_nbvols);
@@ -187,7 +191,11 @@ int RarAccessOpen(vlc_object_t *object)
     else
     {
         msg_Info(s, "Invalid or unsupported RAR archive");
+        for (int i = 0; i < oldscheme.filescount; i++)
+            RarFileDelete(oldscheme.files[i]);
         free(oldscheme.files);
+        for (int i = 0; i < newscheme.filescount; i++)
+            RarFileDelete(newscheme.files[i]);
         free(newscheme.files);
         goto error;
     }
