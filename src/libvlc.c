@@ -485,9 +485,6 @@ dbus_out:
     var_Create( p_libvlc, "drawable-clip-right", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-nsobject", VLC_VAR_ADDRESS );
 #endif
-#if defined (_WIN32) || defined (__OS2__)
-    var_Create( p_libvlc, "drawable-hwnd", VLC_VAR_INTEGER );
-#endif
 
     /*
      * Get input filenames given as commandline arguments.
