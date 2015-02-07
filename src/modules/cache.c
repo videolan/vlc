@@ -385,6 +385,8 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
     return i_cache;
 
 error:
+    if (ferror (file))
+        msg_Err(p_this, "plugins cache read error: %s", vlc_strerror_c(errno));
     msg_Warn( p_this, "plugins cache not loaded (corrupted)" );
 
     /* TODO: cleanup */
