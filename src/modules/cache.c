@@ -214,6 +214,68 @@ error:
     return -1; /* FIXME: leaks */
 }
 
+static module_t *CacheLoadModule (FILE *file)
+{
+    module_t *module = vlc_module_create (NULL);
+
+    /* Load additional infos */
+    LOAD_STRING(module->psz_shortname);
+    LOAD_STRING(module->psz_longname);
+    LOAD_STRING(module->psz_help);
+
+    LOAD_IMMEDIATE(module->i_shortcuts);
+    if (module->i_shortcuts > MODULE_SHORTCUT_MAX)
+        goto error;
+    else
+    {
+        module->pp_shortcuts =
+            xmalloc (sizeof (*module->pp_shortcuts) * module->i_shortcuts);
+        for (unsigned j = 0; j < module->i_shortcuts; j++)
+            LOAD_STRING(module->pp_shortcuts[j]);
+    }
+
+    LOAD_STRING(module->psz_capability);
+    LOAD_IMMEDIATE(module->i_score);
+    LOAD_IMMEDIATE(module->b_unloadable);
+
+    /* Config stuff */
+    if (CacheLoadModuleConfig (module, file) != VLC_SUCCESS)
+        goto error;
+
+    LOAD_STRING(module->domain);
+    if (module->domain != NULL)
+        vlc_bindtextdomain (module->domain);
+
+    uint32_t submodules;
+    LOAD_IMMEDIATE(submodules);
+
+    for (; submodules > 0; submodules--)
+    {
+        module_t *submodule = vlc_module_create (module);
+
+        free (submodule->pp_shortcuts);
+        LOAD_STRING(submodule->psz_shortname);
+        LOAD_STRING(submodule->psz_longname);
+
+        LOAD_IMMEDIATE(submodule->i_shortcuts);
+        if (submodule->i_shortcuts > MODULE_SHORTCUT_MAX)
+            goto error;
+        else
+        {
+            submodule->pp_shortcuts =
+                xmalloc (sizeof (*submodule->pp_shortcuts) * submodule->i_shortcuts);
+            for (unsigned j = 0; j < submodule->i_shortcuts; j++)
+                LOAD_STRING(submodule->pp_shortcuts[j]);
+        }
+
+        LOAD_STRING(submodule->psz_capability);
+        LOAD_IMMEDIATE(submodule->i_score);
+    }
+
+    return module;
+error:
+    return NULL; /* FIXME: leaks */
+}
 
 /**
  * Loads a plugins cache file.
@@ -308,62 +370,9 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
 
     for (size_t count = 0; count < i_cache;)
     {
-        module_t *module;
-        int i_submodules;
-
-        module = vlc_module_create (NULL);
-
-        /* Load additional infos */
-        LOAD_STRING(module->psz_shortname);
-        LOAD_STRING(module->psz_longname);
-        LOAD_STRING(module->psz_help);
-
-        LOAD_IMMEDIATE(module->i_shortcuts);
-        if (module->i_shortcuts > MODULE_SHORTCUT_MAX)
+        module_t *module = CacheLoadModule (file);
+        if (module == NULL)
             goto error;
-        else
-        {
-            module->pp_shortcuts =
-                              xmalloc (sizeof (*module->pp_shortcuts) * module->i_shortcuts);
-            for (unsigned j = 0; j < module->i_shortcuts; j++)
-                LOAD_STRING(module->pp_shortcuts[j]);
-        }
-
-        LOAD_STRING(module->psz_capability);
-        LOAD_IMMEDIATE(module->i_score);
-        LOAD_IMMEDIATE(module->b_unloadable);
-
-        /* Config stuff */
-        if (CacheLoadModuleConfig (module, file) != VLC_SUCCESS)
-            goto error;
-
-        LOAD_STRING(module->domain);
-        if (module->domain != NULL)
-            vlc_bindtextdomain (module->domain);
-
-        LOAD_IMMEDIATE( i_submodules );
-
-        while( i_submodules-- )
-        {
-            module_t *submodule = vlc_module_create (module);
-            free (submodule->pp_shortcuts);
-            LOAD_STRING(submodule->psz_shortname);
-            LOAD_STRING(submodule->psz_longname);
-
-            LOAD_IMMEDIATE(submodule->i_shortcuts);
-            if (submodule->i_shortcuts > MODULE_SHORTCUT_MAX)
-                goto error;
-            else
-            {
-                submodule->pp_shortcuts =
-                           xmalloc (sizeof (*submodule->pp_shortcuts) * submodule->i_shortcuts);
-                for (unsigned j = 0; j < submodule->i_shortcuts; j++)
-                    LOAD_STRING(submodule->pp_shortcuts[j]);
-            }
-
-            LOAD_STRING(submodule->psz_capability);
-            LOAD_IMMEDIATE(submodule->i_score);
-        }
 
         char *path;
         struct stat st;
