@@ -1019,10 +1019,29 @@ static int DtsCheckSync( const uint8_t *p_peek, int *pi_samples )
                                     &i_frame_length,
                                     &i_audio_mode );
 
-    if( i_frame_size != VLC_EGENERIC && i_frame_size <= 8192 )
-        return VLC_SUCCESS;
-    else
+    if( i_frame_size < 95 || i_frame_size > 16383 )
         return VLC_EGENERIC;
+
+    switch( i_sample_rate )
+    {
+        case 0b0001:
+        case 0b0010:
+        case 0b0011:
+        case 0b0110:
+        case 0b0111:
+        case 0b1000:
+        case 0b1011:
+        case 0b1100:
+        case 0b1101:
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
+
+    if( !i_bit_rate || i_bit_rate > 0x11101 )
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
 }
 
 static int DtsProbe( demux_t *p_demux, int64_t *pi_offset )
