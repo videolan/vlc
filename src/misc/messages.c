@@ -48,6 +48,7 @@
 
 struct vlc_logger_t
 {
+    VLC_COMMON_MEMBERS
     vlc_rwlock_t lock;
     vlc_log_cb log;
     void *sys;
@@ -389,7 +390,7 @@ static void vlc_vaLogDiscard(void *d, int type, const vlc_log_t *item,
  */
 int vlc_LogPreinit(libvlc_int_t *vlc)
 {
-    vlc_logger_t *logger = malloc(sizeof (*logger));
+    vlc_logger_t *logger = vlc_custom_create(vlc, sizeof (*logger), "logger");
 
     libvlc_priv(vlc)->logger = logger;
 
@@ -502,5 +503,5 @@ void vlc_LogDeinit(libvlc_int_t *vlc)
     }
 
     vlc_rwlock_destroy(&logger->lock);
-    free(logger);
+    vlc_object_release(logger);
 }
