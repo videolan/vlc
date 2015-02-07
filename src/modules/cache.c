@@ -55,7 +55,7 @@
 #ifdef HAVE_DYNAMIC_PLUGINS
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 22
+#define CACHE_SUBVERSION_NUM 23
 
 /* Cache filename */
 #define CACHE_NAME "plugins.dat"
@@ -291,7 +291,6 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
     FILE *file;
     int i_size, i_read;
     char p_cachestring[sizeof(CACHE_STRING)];
-    size_t i_cache;
     int32_t i_marker;
 
     assert( dir != NULL );
@@ -337,7 +336,7 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
     }
 #endif
 
-    /* Check Sub-version number */
+    /* Check sub-version number */
     i_read = fread( &i_marker, 1, sizeof(i_marker), file );
     if( i_read != sizeof(i_marker) || i_marker != CACHE_SUBVERSION_NUM )
     {
@@ -358,21 +357,18 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
         return 0;
     }
 
-    if (fread( &i_cache, 1, sizeof(i_cache), file ) != sizeof(i_cache) )
-    {
-        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
-                  "(file too short)" );
-        fclose( file );
-        return 0;
-    }
-
     module_cache_t *cache = NULL;
+    size_t count = 0;
 
-    for (size_t count = 0; count < i_cache;)
+    for (;;)
     {
         module_t *module = CacheLoadModule (file);
         if (module == NULL)
+        {
+            if (feof (file))
+                break;
             goto error;
+        }
 
         char *path;
         struct stat st;
@@ -388,10 +384,11 @@ size_t CacheLoad( vlc_object_t *p_this, const char *dir, module_cache_t **r )
         free (path);
         /* TODO: deal with errors */
     }
+
     fclose( file );
 
     *r = cache;
-    return i_cache;
+    return count;
 
 error:
     if (ferror (file))
@@ -564,9 +561,6 @@ static int CacheSaveBank (FILE *file, const module_cache_t *cache,
     /* Header marker */
     i_file_size = ftell( file );
     if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1)
-        goto error;
-
-    if (fwrite( &i_cache, sizeof (i_cache), 1, file) != 1)
         goto error;
 
     for (unsigned i = 0; i < i_cache; i++)
