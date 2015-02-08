@@ -42,9 +42,9 @@ void libvlc_log_get_context(const libvlc_log_t *ctx,
     if (module != NULL)
         *module = ctx->psz_module;
     if (file != NULL)
-        *file = NULL;
+        *file = ctx->file;
     if (line != NULL)
-        *line = 0;
+        *line = ctx->line;
 }
 
 void libvlc_log_get_object(const libvlc_log_t *ctx,
