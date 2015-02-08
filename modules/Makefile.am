@@ -41,6 +41,7 @@ include audio_output/Makefile.am
 include codec/Makefile.am
 include demux/Makefile.am
 include hw/vdpau/Makefile.am
+include logger/Makefile.am
 include lua/Makefile.am
 include meta_engine/Makefile.am
 include misc/Makefile.am

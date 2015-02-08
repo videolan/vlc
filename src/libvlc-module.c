@@ -85,10 +85,6 @@ static const char *const ppsz_snap_formats[] =
     "This is the verbosity level (0=only errors and " \
     "standard messages, 1=warnings, 2=debug).")
 
-#define QUIET_TEXT N_("Be quiet")
-#define QUIET_LONGTEXT N_( \
-    "Turn off all warning and information messages.")
-
 #define OPEN_TEXT N_("Default stream")
 #define OPEN_LONGTEXT N_( \
     "This stream will always be opened at VLC startup." )
@@ -2034,10 +2030,6 @@ vlc_module_begin ()
         change_short('v')
         change_volatile ()
     add_obsolete_string( "verbose-objects" ) /* since 2.1.0 */
-    add_bool( "quiet", 0, QUIET_TEXT, QUIET_LONGTEXT, false )
-        change_short('q')
-        change_volatile ()
-
 #if !defined(_WIN32) && !defined(__OS2__)
     add_bool( "daemon", 0, DAEMON_TEXT, DAEMON_LONGTEXT, true )
         change_short('d')

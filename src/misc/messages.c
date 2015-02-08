@@ -154,71 +154,9 @@ void vlc_Log(vlc_object_t *obj, int type, const char *module,
     va_end(ap);
 }
 
-static const char msg_type[4][9] = { "", " error", " warning", " debug" };
-#define COL(x,y)  "\033[" #x ";" #y "m"
-#define RED     COL(31,1)
-#define GREEN   COL(32,1)
-#define YELLOW  COL(0,33)
-#define WHITE   COL(0,1)
-#define GRAY    "\033[0m"
-static const char msg_color[4][8] = { WHITE, RED, YELLOW, GRAY };
-
-/* Display size of a pointer */
-static const int ptr_width = 2 * /* hex digits */ sizeof(uintptr_t);
-
-static void PrintColorMsg (void *d, int type, const vlc_log_t *p_item,
-                           const char *format, va_list ap)
-{
-    FILE *stream = stderr;
-    int verbose = (intptr_t)d;
-
-    if (verbose < 0 || verbose < (type - VLC_MSG_ERR))
-        return;
-
-    int canc = vlc_savecancel ();
-
-    flockfile (stream);
-    utf8_fprintf (stream, "["GREEN"%0*"PRIxPTR""GRAY"] ", ptr_width, p_item->i_object_id);
-    if (p_item->psz_header != NULL)
-        utf8_fprintf (stream, "[%s] ", p_item->psz_header);
-    utf8_fprintf (stream, "%s %s%s: %s", p_item->psz_module,
-                  p_item->psz_object_type, msg_type[type], msg_color[type]);
-    utf8_vfprintf (stream, format, ap);
-    fputs (GRAY"\n", stream);
-#if defined (_WIN32) || defined (__OS2__)
-    fflush (stream);
-#endif
-    funlockfile (stream);
-    vlc_restorecancel (canc);
-}
-
-static void PrintMsg (void *d, int type, const vlc_log_t *p_item,
-                      const char *format, va_list ap)
-{
-    FILE *stream = stderr;
-    int verbose = (intptr_t)d;
-
-    if (verbose < 0 || verbose < (type - VLC_MSG_ERR))
-        return;
-
-    int canc = vlc_savecancel ();
-
-    flockfile (stream);
-    utf8_fprintf (stream, "[%0*"PRIxPTR"] ", ptr_width, p_item->i_object_id);
-    if (p_item->psz_header != NULL)
-        utf8_fprintf (stream, "[%s] ", p_item->psz_header);
-    utf8_fprintf (stream, "%s %s%s: ", p_item->psz_module,
-                  p_item->psz_object_type, msg_type[type]);
-    utf8_vfprintf (stream, format, ap);
-    putc_unlocked ('\n', stream);
-#if defined (_WIN32) || defined (__OS2__)
-    fflush (stream);
-#endif
-    funlockfile (stream);
-    vlc_restorecancel (canc);
-}
-
 #ifdef _WIN32
+static const char msg_type[4][9] = { "", " error", " warning", " debug" };
+
 static void Win32DebugOutputMsg (void* d, int type, const vlc_log_t *p_item,
                                  const char *format, va_list dol)
 {
@@ -454,29 +392,11 @@ int vlc_LogInit(libvlc_int_t *vlc)
     module_t *module = vlc_module_load(logger, "logger", NULL, false,
                                        vlc_logger_load, logger, &cb, &sys);
     if (module == NULL)
-    {
 #ifdef __ANDROID__
-        cb = AndroidPrintMsg;
-#elif defined (HAVE_ISATTY) && !defined (_WIN32)
-        if (isatty(STDERR_FILENO) && var_InheritBool(vlc, "color"))
-            cb = PrintColorMsg;
+        cb = AndroidPrintMsg, sys = NULL;
+#else
+        cb = vlc_vaLogDiscard;
 #endif
-        else
-            cb = PrintMsg;
-
-        signed char verbosity;
-
-        if (var_InheritBool(vlc, "quiet"))
-            verbosity = -1;
-        else
-        {
-            const char *str = getenv("VLC_VERBOSE");
-
-            if (str == NULL || sscanf(str, "%hhd", &verbosity) < 1)
-                verbosity = var_InheritInteger(vlc, "verbose");
-        }
-        sys = (void *)(intptr_t)verbosity;
-    }
 
     vlc_rwlock_wrlock(&logger->lock);
     if (logger->log == vlc_vaLogEarly)
