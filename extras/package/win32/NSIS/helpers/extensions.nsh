@@ -219,7 +219,6 @@ FunctionEnd
 !macro MacroOtherExtensions _action
   !insertmacro ${_action} Other ".asx"
   !insertmacro ${_action} Other ".b4s"
-  !insertmacro ${_action} Other ".bin"
   !insertmacro ${_action} Other ".cue"
   !insertmacro ${_action} Other ".ifo"
   !insertmacro ${_action} Other ".m3u"
