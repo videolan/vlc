@@ -66,10 +66,6 @@
     "  </body>\n" \
     "</html>\n"
 
-#ifdef HAVE_SYSLOG_H
-#include <syslog.h>
-#endif
-
 /*****************************************************************************
  * intf_sys_t: description and status of log interface
  *****************************************************************************/
@@ -77,7 +73,6 @@ struct intf_sys_t
 {
     FILE *p_file;
     const char *footer;
-    char *ident;
 };
 
 /*****************************************************************************
@@ -88,9 +83,6 @@ static void Close   ( vlc_object_t * );
 
 static void TextPrint(void *, int, const vlc_log_t *, const char *, va_list);
 static void HtmlPrint(void *, int, const vlc_log_t *, const char *, va_list);
-#ifdef HAVE_SYSLOG_H
-static void SyslogPrint(void *, int, const vlc_log_t *, const char *, va_list);
-#endif
 #ifdef __ANDROID__
 static void AndroidPrint(void *, int, const vlc_log_t *, const char *, va_list);
 #endif
@@ -99,17 +91,11 @@ static void AndroidPrint(void *, int, const vlc_log_t *, const char *, va_list);
  * Module descriptor
  *****************************************************************************/
 static const char *const mode_list[] = { "text", "html"
-#ifdef HAVE_SYSLOG_H
-,"syslog"
-#endif
 #ifdef __ANDROID__
 ,"android"
 #endif
 };
 static const char *const mode_list_text[] = { N_("Text"), "HTML"
-#ifdef HAVE_SYSLOG_H
-, "syslog"
-#endif
 #ifdef __ANDROID__
 ,"android"
 #endif
@@ -117,39 +103,6 @@ static const char *const mode_list_text[] = { N_("Text"), "HTML"
 
 #define LOGMODE_TEXT N_("Log format")
 #define LOGMODE_LONGTEXT N_("Specify the logging format.")
-
-#ifdef HAVE_SYSLOG_H
-#define SYSLOG_IDENT_TEXT N_("Syslog ident")
-#define SYSLOG_IDENT_LONGTEXT N_("Set the ident that VLC would use when " \
-  "logging to syslog.")
-
-#define SYSLOG_FACILITY_TEXT N_("Syslog facility")
-#define SYSLOG_FACILITY_LONGTEXT N_("Select the syslog facility where logs " \
-  "will be forwarded.")
-
-/* First in list is the default facility used. */
-#define DEFINE_SYSLOG_FACILITY \
-  DEF( "user",   LOG_USER ), \
-  DEF( "daemon", LOG_DAEMON ), \
-  DEF( "local0", LOG_LOCAL0 ), \
-  DEF( "local1", LOG_LOCAL1 ), \
-  DEF( "local2", LOG_LOCAL2 ), \
-  DEF( "local3", LOG_LOCAL3 ), \
-  DEF( "local4", LOG_LOCAL4 ), \
-  DEF( "local5", LOG_LOCAL5 ), \
-  DEF( "local6", LOG_LOCAL6 ), \
-  DEF( "local7", LOG_LOCAL7 )
-
-#define DEF( a, b ) a
-static const char *const fac_name[]   = { DEFINE_SYSLOG_FACILITY };
-#undef  DEF
-#define DEF( a, b ) b
-static const int         fac_number[] = { DEFINE_SYSLOG_FACILITY };
-#undef  DEF
-enum                   { fac_entries = sizeof(fac_name)/sizeof(fac_name[0]) };
-#undef  DEFINE_SYSLOG_FACILITY
-
-#endif
 
 #define LOGVERBOSE_TEXT N_("Verbosity")
 #define LOGVERBOSE_LONGTEXT N_("Select the verbosity to use for log or -1 to " \
@@ -167,13 +120,6 @@ vlc_module_begin ()
     add_string( "logmode", "text", LOGMODE_TEXT, LOGMODE_LONGTEXT,
                 false )
         change_string_list( mode_list, mode_list_text )
-#ifdef HAVE_SYSLOG_H
-    add_string( "syslog-ident", "vlc", SYSLOG_IDENT_TEXT,
-                SYSLOG_IDENT_LONGTEXT, true )
-    add_string( "syslog-facility", fac_name[0], SYSLOG_FACILITY_TEXT,
-                SYSLOG_FACILITY_LONGTEXT, true )
-        change_string_list( fac_name, fac_name )
-#endif
     add_integer( "log-verbose", -1, LOGVERBOSE_TEXT, LOGVERBOSE_LONGTEXT,
            false )
     
@@ -214,10 +160,6 @@ static int Open( vlc_object_t *p_this )
             header = HTML_HEADER;
             cb = HtmlPrint;
         }
-#ifdef HAVE_SYSLOG_H
-        else if( !strcmp( mode, "syslog" ) )
-            cb = SyslogPrint;
-#endif
 #ifdef __ANDROID__
         else if( !strcmp( mode, "android" ) )
             cb = AndroidPrint;
@@ -227,52 +169,6 @@ static int Open( vlc_object_t *p_this )
         free( mode );
     }
 
-#ifdef HAVE_SYSLOG_H
-    if( cb == SyslogPrint )
-    {
-        int i_facility;
-        char *psz_facility = var_InheritString( p_intf, "syslog-facility" );
-        if( psz_facility )
-        {
-            bool b_valid = 0;
-            for( size_t i = 0; i < fac_entries; ++i )
-            {
-                if( !strcmp( psz_facility, fac_name[i] ) )
-                {
-                    i_facility = fac_number[i];
-                    b_valid = 1;
-                    break;
-                }
-            }
-            if( !b_valid )
-            {
-                msg_Warn( p_intf, "invalid syslog facility `%s', using `%s'",
-                          psz_facility, fac_name[0] );
-                i_facility = fac_number[0];
-            }
-            free( psz_facility );
-        }
-        else
-        {
-            msg_Warn( p_intf, "no syslog facility specified, using `%s'",
-                      fac_name[0] );
-            i_facility = fac_number[0];
-        }
-
-        char *psz_syslog_ident = var_InheritString( p_intf, "syslog-ident" );
-        if (unlikely(psz_syslog_ident == NULL))
-        {
-            free( p_sys );
-            return VLC_ENOMEM;
-        }
-
-        p_sys->ident = psz_syslog_ident;
-        openlog( p_sys->ident, LOG_PID|LOG_NDELAY, i_facility );
-
-        p_sys->p_file = NULL;
-    }
-    else
-#endif
 #ifdef __ANDROID__
     if( cb == AndroidPrint )
     {
@@ -332,14 +228,6 @@ static void Close( vlc_object_t *p_this )
     vlc_LogSet( p_intf->p_libvlc, NULL, NULL );
 
     /* Close the log file */
-#ifdef HAVE_SYSLOG_H
-    if( p_sys->p_file == NULL )
-    {
-        closelog();
-        free( p_sys->ident );
-    }
-    else
-#endif
     if( p_sys->p_file )
     {
         fputs( p_sys->footer, p_sys->p_file );
@@ -411,32 +299,6 @@ static void TextPrint( void *opaque, int type, const vlc_log_t *item,
     funlockfile( stream );
     vlc_restorecancel( canc );
 }
-
-#ifdef HAVE_SYSLOG_H
-static void SyslogPrint( void *opaque, int type, const vlc_log_t *item,
-                         const char *fmt, va_list ap )
-{
-    static const int i_prio[4] = { LOG_INFO, LOG_ERR, LOG_WARNING, LOG_DEBUG };
-
-    intf_thread_t *p_intf = opaque;
-    char *str;
-    int i_priority = i_prio[type];
-
-    if( IgnoreMessage( p_intf, type )
-     || unlikely(vasprintf( &str, fmt, ap ) == -1) )
-        return;
-
-    int canc = vlc_savecancel();
-    if( item->psz_header != NULL )
-        syslog( i_priority, "[%s] %s%s: %s", item->psz_header,
-                item->psz_module, ppsz_type[type], str );
-    else
-        syslog( i_priority, "%s%s: %s",
-                item->psz_module, ppsz_type[type], str );
-    vlc_restorecancel( canc );
-    free( str );
-}
-#endif
 
 static void HtmlPrint( void *opaque, int type, const vlc_log_t *item,
                        const char *fmt, va_list ap )

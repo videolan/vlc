@@ -455,22 +455,6 @@ dbus_out:
     free( psz_modules );
     free( psz_control );
 
-#ifdef HAVE_SYSLOG_H
-    if( var_InheritBool( p_libvlc, "syslog" ) )
-    {
-        char *logmode = var_CreateGetNonEmptyString( p_libvlc, "logmode" );
-        var_SetString( p_libvlc, "logmode", "syslog" );
-        libvlc_InternalAddIntf( p_libvlc, "logger,none" );
-
-        if( logmode )
-        {
-            var_SetString( p_libvlc, "logmode", logmode );
-            free( logmode );
-        }
-        var_Destroy( p_libvlc, "logmode" );
-    }
-    else
-#endif
     if( var_InheritBool( p_libvlc, "file-logging" ) )
         libvlc_InternalAddIntf( p_libvlc, "logger,none" );
 

@@ -92,6 +92,10 @@ libVLC:
  * Add libvlc_audio_output_device_get to get the currently selected audio output device
    identifier (if there is one available)
 
+Logging
+ * Use --syslog and --syslog-debug command line options to include debug
+   messages in syslog. With --syslog, errors and warnings will be sent only.
+
 
 Changes between 2.1.x and 2.2.0:
 --------------------------------

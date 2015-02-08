@@ -770,18 +770,26 @@ AS_IF([test "${SYS}" != "mingw32"], [
 ])
 AC_SUBST(LIBPTHREAD)
 
+dnl
 dnl Check for headers
+dnl
+
 dnl  POSIX
-AC_CHECK_HEADERS([arpa/inet.h pthread.h search.h syslog.h sys/shm.h sys/socket.h])
+AC_CHECK_HEADERS([arpa/inet.h pthread.h search.h sys/shm.h sys/socket.h])
 AC_CHECK_HEADERS([net/if.h], [], [],
 [
 #include <sys/types.h>
 #include <sys/socket.h>
 ])
+AC_CHECK_HEADER([syslog.h], [have_syslog="yes"], [have_syslog="no"])
+AM_CONDITIONAL([HAVE_SYSLOG], [test "$have_syslog" = "yes"])
+
 dnl  BSD
 AC_CHECK_HEADERS([netinet/udplite.h sys/param.h sys/mount.h])
+
 dnl  GNU/Linux
 AC_CHECK_HEADERS([getopt.h linux/dccp.h linux/magic.h mntent.h sys/eventfd.h])
+
 dnl  MacOS
 AC_CHECK_HEADERS([xlocale.h])
 
