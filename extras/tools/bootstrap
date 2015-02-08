@@ -82,6 +82,7 @@ check ragel
 check_sed
 check protoc
 check ant
+check xz
 
 [ -n "$NEEDED" ] && mkdir -p build/ && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
 
