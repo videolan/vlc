@@ -66,7 +66,8 @@ VLC_API void vlc_Log(vlc_object_t *, int,
                      const char *, const char *, ...) VLC_FORMAT( 4, 5 );
 VLC_API void vlc_vaLog(vlc_object_t *, int,
                        const char *, const char *, va_list);
-#define msg_GenericVa(a, b, c, d, e) vlc_vaLog(VLC_OBJECT(a), b, c, d, e)
+#define msg_GenericVa(a, b, c, d) \
+    vlc_vaLog(VLC_OBJECT(a), b, MODULE_STRING, c, d)
 
 #define msg_Info( p_this, ... ) \
     vlc_Log( VLC_OBJECT(p_this), VLC_MSG_INFO, MODULE_STRING, __VA_ARGS__ )

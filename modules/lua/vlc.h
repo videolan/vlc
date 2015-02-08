@@ -80,7 +80,7 @@ static inline void lua_Dbg( vlc_object_t * p_this, const char * ppz_fmt, ... )
 {
     va_list ap;
     va_start( ap, ppz_fmt );
-    msg_GenericVa( p_this, VLC_MSG_DBG, MODULE_STRING, ppz_fmt, ap );
+    msg_GenericVa( p_this, VLC_MSG_DBG, ppz_fmt, ap );
     va_end( ap );
 }
 

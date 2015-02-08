@@ -114,7 +114,7 @@ void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
     if (provider == NULL)
     {
         msg_Err (obj, "%s", title);
-        msg_GenericVa (obj, VLC_MSG_ERR, MODULE_STRING, fmt, ap);
+        msg_GenericVa (obj, VLC_MSG_ERR, fmt, ap);
         return;
     }
 

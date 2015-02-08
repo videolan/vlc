@@ -1471,7 +1471,7 @@ static void x264_log( void *data, int i_level, const char *psz, va_list args)
             i_level = VLC_MSG_DBG;
     }
 
-    msg_GenericVa( p_enc, i_level, MODULE_STRING, psz, args );
+    msg_GenericVa( p_enc, i_level, psz, args );
 };
 
 /****************************************************************************
