@@ -1213,14 +1213,21 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
 
     if (FAILED(hr)) {
         msg_Warn(vd, "D3DXCompileShader Error (hr=0x%lX)", hr);
-        if (error_msgs)
+        if (error_msgs) {
             msg_Warn(vd, "HLSL Compilation Error: %s", (char*)ID3DXBuffer_GetBufferPointer(error_msgs));
+            ID3DXBuffer_Release(error_msgs);
+	}
         return VLC_EGENERIC;
     }
 
     hr = IDirect3DDevice9_CreatePixelShader(sys->d3ddev,
             ID3DXBuffer_GetBufferPointer(compiled_shader),
             &sys->d3dx_shader);
+
+    if (compiled_shader)
+        ID3DXBuffer_Release(compiled_shader);
+    if (error_msgs)
+        ID3DXBuffer_Release(error_msgs);
 
     if (FAILED(hr)) {
         msg_Warn(vd, "IDirect3DDevice9_CreatePixelShader error (hr=0x%lX)", hr);
