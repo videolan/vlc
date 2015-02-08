@@ -933,14 +933,12 @@ int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi )
  **************************************************************************/
 void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
 {
-    libvlc_state_t state = libvlc_media_player_get_state( p_mi );
-
     lock_input(p_mi);
     release_input_thread( p_mi ); /* This will stop the input thread */
 
     /* Force to go to stopped state, in case we were in Ended, or Error
      * state. */
-    if( state != libvlc_Stopped )
+    if( p_mi->state != libvlc_Stopped )
     {
         set_state( p_mi, libvlc_Stopped, false );
 
