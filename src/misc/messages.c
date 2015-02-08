@@ -88,6 +88,7 @@ static void Win32DebugOutputMsg (void *, int , const vlc_log_t *,
  * to vlc_Log().
  */
 void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
+                const char *file, unsigned line, const char *func,
                 const char *format, va_list args)
 {
     if (obj != NULL && obj->i_flags & OBJECT_FLAGS_QUIET)
@@ -115,6 +116,9 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
     msg.psz_object_type = (obj != NULL) ? obj->psz_object_type : "generic";
     msg.psz_module = module;
     msg.psz_header = NULL;
+    msg.file = file;
+    msg.line = line;
+    msg.func = func;
 
     for (vlc_object_t *o = obj; o != NULL; o = o->p_parent)
         if (o->psz_header != NULL)
@@ -142,15 +146,19 @@ void vlc_vaLog (vlc_object_t *obj, int type, const char *module,
  * \param type VLC_MSG_* message type (info, error, warning or debug)
  * \param module name of module from which the message come
  *               (normally MODULE_STRING)
+ * \param file source module file name (normally __FILE__) or NULL
+ * \param line function call source line number (normally __LINE__) or 0
+ * \param func calling function name (normally __func__) or NULL
  * \param format printf-like message format
  */
 void vlc_Log(vlc_object_t *obj, int type, const char *module,
+             const char *file, unsigned line, const char *func,
              const char *format, ... )
 {
     va_list ap;
 
     va_start(ap, format);
-    vlc_vaLog(obj, type, module, format, ap);
+    vlc_vaLog(obj, type, module, file, line, func, format, ap);
     va_end(ap);
 }
 
@@ -265,6 +273,9 @@ static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
     log->meta.psz_object_type = item->psz_object_type;
     log->meta.psz_module = item->psz_module; /* Ditto. */
     log->meta.psz_header = item->psz_header ? strdup(item->psz_header) : NULL;
+    log->meta.file = item->file;
+    log->meta.line = item->line;
+    log->meta.func = item->func;
 
     int canc = vlc_savecancel(); /* XXX: needed for vasprintf() ? */
     if (vasprintf(&log->msg, format, ap) == -1)

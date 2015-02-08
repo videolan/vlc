@@ -60,23 +60,32 @@ typedef struct vlc_log_t
     const char *psz_object_type; /**< Emitter object type name */
     const char *psz_module; /**< Emitter module (source code) */
     const char *psz_header; /**< Additional header (used by VLM media) */
+    const char *file; /**< Source code file name or NULL */
+    int line; /**< Source code file line number or -1 */
+    const char *func; /**< Source code calling function name or NULL */
 } vlc_log_t;
 
-VLC_API void vlc_Log(vlc_object_t *, int,
-                     const char *, const char *, ...) VLC_FORMAT( 4, 5 );
-VLC_API void vlc_vaLog(vlc_object_t *, int,
-                       const char *, const char *, va_list);
-#define msg_GenericVa(a, b, c, d) \
-    vlc_vaLog(VLC_OBJECT(a), b, MODULE_STRING, c, d)
+VLC_API void vlc_Log(vlc_object_t *obj, int prio, const char *module,
+                     const char *file, unsigned line, const char *func,
+                     const char *format, ...) VLC_FORMAT(7, 8);
+VLC_API void vlc_vaLog(vlc_object_t *obj, int prio, const char *module,
+                       const char *file, unsigned line, const char *func,
+                       const char *format, va_list ap);
+#define msg_GenericVa(o, p, fmt, ap) \
+    vlc_vaLog(VLC_OBJECT(o), p, MODULE_STRING, __FILE__, __LINE__, __func__, \
+              fmt, ap)
 
-#define msg_Info( p_this, ... ) \
-    vlc_Log( VLC_OBJECT(p_this), VLC_MSG_INFO, MODULE_STRING, __VA_ARGS__ )
-#define msg_Err( p_this, ... ) \
-    vlc_Log( VLC_OBJECT(p_this), VLC_MSG_ERR,  MODULE_STRING, __VA_ARGS__ )
-#define msg_Warn( p_this, ... ) \
-    vlc_Log( VLC_OBJECT(p_this), VLC_MSG_WARN, MODULE_STRING, __VA_ARGS__ )
-#define msg_Dbg( p_this, ... ) \
-    vlc_Log( VLC_OBJECT(p_this), VLC_MSG_DBG,  MODULE_STRING, __VA_ARGS__ )
+#define msg_Generic(o, p, ...) \
+    vlc_Log(VLC_OBJECT(o), p, MODULE_STRING, __FILE__, __LINE__, \
+            __func__, __VA_ARGS__)
+#define msg_Info(p_this, ...) \
+    msg_Generic(p_this, VLC_MSG_INFO, __VA_ARGS__)
+#define msg_Err(p_this, ...) \
+    msg_Generic(p_this, VLC_MSG_ERR, __VA_ARGS__)
+#define msg_Warn(p_this, ...) \
+    msg_Generic(p_this, VLC_MSG_WARN, __VA_ARGS__)
+#define msg_Dbg(p_this, ...) \
+    msg_Generic(p_this, VLC_MSG_DBG, __VA_ARGS__)
 
 #ifndef MODULE_STRING
 # define MODULE_STRING __FILE__
