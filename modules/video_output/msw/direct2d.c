@@ -177,6 +177,11 @@ static void Close(vlc_object_t *object)
 
     CommonClean(vd);
 
+    if (vd->sys->d2_factory)
+        ID2D1Factory_Release(vd->sys->d2_factory);
+    if (vd->sys->d2_dll)
+        FreeLibrary(vd->sys->d2_dll);
+
     free(vd->sys);
 }
 
