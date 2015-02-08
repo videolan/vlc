@@ -1036,10 +1036,6 @@ static const char *const ppsz_prefres[] = {
 #define PIDFILE_LONGTEXT N_( \
        "Writes process id into specified file.")
 
-#define FILE_LOG_TEXT N_( "Log to file" )
-#define FILE_LOG_LONGTEXT N_( \
-    "Log all VLC messages to a text file." )
-
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
 #if defined( _WIN32 ) || defined( __OS2__ )
 #define ONEINSTANCE_LONGTEXT N_( \
@@ -2033,9 +2029,6 @@ vlc_module_begin ()
     add_string( "pidfile", NULL, PIDFILE_TEXT, PIDFILE_LONGTEXT,
                                        false )
 #endif
-
-    add_bool( "file-logging", false, FILE_LOG_TEXT, FILE_LOG_LONGTEXT,
-              true )
 
 #if defined (_WIN32) || defined (__APPLE__)
     add_obsolete_string( "language" ) /* since 2.1.0 */

@@ -455,9 +455,6 @@ dbus_out:
     free( psz_modules );
     free( psz_control );
 
-    if( var_InheritBool( p_libvlc, "file-logging" ) )
-        libvlc_InternalAddIntf( p_libvlc, "logger,none" );
-
     if( var_InheritBool( p_libvlc, "network-synchronisation") )
         libvlc_InternalAddIntf( p_libvlc, "netsync,none" );
 
