@@ -865,6 +865,9 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
     vout_display_t *vd = p_event->vd;
     msg_Dbg( vd, "Win32VoutCloseWindow" );
 
+    #ifdef MODULE_NAME_IS_direct3d9
+    DestroyWindow( p_event->hvideownd );
+    #endif
     DestroyWindow( p_event->hwnd );
     if( p_event->hfswnd )
         DestroyWindow( p_event->hfswnd );
