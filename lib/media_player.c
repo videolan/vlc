@@ -304,7 +304,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
     }
     else if( newval.i_int == INPUT_EVENT_DEAD )
     {
-        libvlc_state_t libvlc_state = libvlc_Stopped;
+        libvlc_state_t libvlc_state = libvlc_Ended;
         event.type = libvlc_MediaPlayerStopped;
 
         set_state( p_mi, libvlc_state, false );
