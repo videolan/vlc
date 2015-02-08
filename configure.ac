@@ -868,6 +868,16 @@ AS_IF([test "${enable_dbus}" != "no"], [
 ])
 AM_CONDITIONAL([HAVE_DBUS], [test "${have_dbus}" = "yes"])
 
+
+dnl Check for systemd
+PKG_CHECK_MODULES([SYSTEMD], [libsystemd], [
+  have_systemd="yes"
+], [
+  AC_MSG_WARN([${SYSTEMD_PKG_ERRORS}.])
+])
+AM_CONDITIONAL([HAVE_SYSTEMD], [test "${have_systemd}" = "yes"])
+
+
 dnl Check for ntohl, etc.
 VLC_SAVE_FLAGS
 CFLAGS="${CFLAGS} -Wall -Werror"

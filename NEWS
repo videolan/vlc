@@ -93,6 +93,7 @@ libVLC:
    identifier (if there is one available)
 
 Logging
+ * Support for the SystemD Journal
  * Use --syslog and --syslog-debug command line options to include debug
    messages in syslog. With --syslog, errors and warnings will be sent only.
 
