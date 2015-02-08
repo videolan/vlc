@@ -100,7 +100,6 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
 
     if (ret < 0) {
         msg_Err(dec, "cannot open codec (%s)", codec->name);
-        free(context->extradata);
         free(sys);
         return VLC_EGENERIC;
     }
