@@ -195,7 +195,7 @@ int GetSyncInfo( const uint8_t *p_buf,
     {
         uint8_t conv_buf[DTS_HEADER_SIZE];
         BufLeToBe( conv_buf, p_buf, DTS_HEADER_SIZE );
-        i_frame_size = SyncInfo16be( p_buf, pi_audio_mode, pi_sample_rate,
+        i_frame_size = SyncInfo16be( conv_buf, pi_audio_mode, pi_sample_rate,
                                      pi_bit_rate, pi_frame_length );
     }
     /* DTS-HD */
