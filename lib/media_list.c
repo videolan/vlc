@@ -44,14 +44,6 @@ typedef enum EventPlaceInTime {
     EventDidHappen
 } EventPlaceInTime;
 
-//#define DEBUG_MEDIA_LIST
-
-#ifdef DEBUG_MEDIA_LIST
-# define trace( fmt, ... ) printf( "%s(): " fmt, __FUNCTION__, ##__VA_ARGS__ )
-#else
-# define trace( ... )
-#endif
-
 /*
  * Private functions
  */
@@ -74,7 +66,6 @@ notify_item_addition( libvlc_media_list_t * p_mlist,
     /* Construct the event */
     if( event_status == EventDidHappen )
     {
-        trace("item was added at index %d\n", index);
         event.type = libvlc_MediaListItemAdded;
         event.u.media_list_item_added.item = p_md;
         event.u.media_list_item_added.index = index;
@@ -106,7 +97,6 @@ notify_item_deletion( libvlc_media_list_t * p_mlist,
     /* Construct the event */
     if( event_status == EventDidHappen )
     {
-        trace("item at index %d was deleted\n", index);
         event.type = libvlc_MediaListItemDeleted;
         event.u.media_list_item_deleted.item = p_md;
         event.u.media_list_item_deleted.index = index;
