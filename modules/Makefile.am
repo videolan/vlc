@@ -4,7 +4,6 @@ check_PROGRAMS =
 EXTRA_DIST =
 
 BASE_SUBDIRS = \
-	audio_filter \
 	control \
 	gui \
 	video_filter \
@@ -34,6 +33,7 @@ include common.am
 include access/Makefile.am
 include access/rtp/Makefile.am
 include arm_neon/Makefile.am
+include audio_filter/Makefile.am
 include audio_mixer/Makefile.am
 include audio_output/Makefile.am
 include codec/Makefile.am
