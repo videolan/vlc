@@ -351,7 +351,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     const RECT dst = sys->rect_dest_clipped;
     HRESULT hr = IDirect3DDevice9_Present(d3ddev, &src, &dst, NULL, NULL);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DDevice9_Present: 0x%0lx", hr);
     }
 
 #if 0
@@ -560,7 +560,7 @@ static int Direct3D9Create(vout_display_t *vd)
     ZeroMemory(&sys->d3dcaps, sizeof(sys->d3dcaps));
     HRESULT hr = IDirect3D9_GetDeviceCaps(d3dobj, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &sys->d3dcaps);
     if (FAILED(hr)) {
-       msg_Err(vd, "Could not read adapter capabilities. (hr=0x%lX)", hr);
+       msg_Err(vd, "Could not read adapter capabilities. (hr=0x%0lx)", hr);
        return VLC_EGENERIC;
     }
 
@@ -611,7 +611,7 @@ static int Direct3D9FillPresentationParameters(vout_display_t *vd)
     HRESULT hr = IDirect3D9_GetAdapterDisplayMode(sys->d3dobj,
                                                   D3DADAPTER_DEFAULT, &d3ddm);
     if (FAILED(hr)) {
-       msg_Err(vd, "Could not read adapter display mode. (hr=0x%lX)", hr);
+       msg_Err(vd, "Could not read adapter display mode. (hr=0x%0lx)", hr);
        return VLC_EGENERIC;
     }
 
@@ -692,7 +692,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
                                          D3DCREATE_MULTITHREADED,
                                          &sys->d3dpp, &d3ddev);
     if (FAILED(hr)) {
-       msg_Err(vd, "Could not create the D3D9 device! (hr=0x%lX)", hr);
+       msg_Err(vd, "Could not create the D3D9 device! (hr=0x%0lx)", hr);
        return VLC_EGENERIC;
     }
     sys->d3ddev = d3ddev;
@@ -743,7 +743,7 @@ static int Direct3D9Reset(vout_display_t *vd)
     /* */
     HRESULT hr = IDirect3DDevice9_Reset(d3ddev, &sys->d3dpp);
     if (FAILED(hr)) {
-        msg_Err(vd, "%s failed ! (hr=%08lX)", __FUNCTION__, hr);
+        msg_Err(vd, "IDirect3DDevice9_Reset failed! (hr=0x%0lx)", hr);
         return VLC_EGENERIC;
     }
 
@@ -751,7 +751,7 @@ static int Direct3D9Reset(vout_display_t *vd)
 
     /* re-create them */
     if (Direct3D9CreateResources(vd, &vd->fmt)) {
-        msg_Dbg(vd, "%s failed !", __FUNCTION__);
+        msg_Dbg(vd, "Direct3D9CreateResources failed !");
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -838,7 +838,7 @@ static int Direct3D9CheckConversion(vout_display_t *vd,
     }
     if (!SUCCEEDED(hr)) {
         if (D3DERR_NOTAVAILABLE != hr)
-            msg_Err(vd, "Could not query adapter supported formats. (hr=0x%lX)", hr);
+            msg_Err(vd, "Could not query adapter supported formats. (hr=0x%0lx)", hr);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -917,7 +917,7 @@ static int Direct3D9LockSurface(picture_t *picture)
     D3DLOCKED_RECT d3drect;
     HRESULT hr = IDirect3DSurface9_LockRect(picture->p_sys->surface, &d3drect, NULL, 0);
     if (FAILED(hr)) {
-        //msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        //msg_Dbg(vd, "Failed IDirect3DSurface9_LockRect: 0x%0lx", hr);
         return CommonUpdatePicture(picture, &picture->p_sys->fallback, NULL, 0);
     }
 
@@ -932,7 +932,7 @@ static void Direct3D9UnlockSurface(picture_t *picture)
     /* Unlock the Surface */
     HRESULT hr = IDirect3DSurface9_UnlockRect(picture->p_sys->surface);
     if (FAILED(hr)) {
-        //msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        //msg_Dbg(vd, "Failed IDirect3DSurface9_UnlockRect: 0x%0lx", hr);
     }
 }
 
@@ -1100,17 +1100,17 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
 
     // Set linear filtering quality
     if (sys->d3dcaps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR) {
-        msg_Dbg(vd, "Using D3DTEXF_LINEAR for minification");
+        //msg_Dbg(vd, "Using D3DTEXF_LINEAR for minification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
     } else {
-        msg_Dbg(vd, "Using D3DTEXF_POINT for minification");
+        //msg_Dbg(vd, "Using D3DTEXF_POINT for minification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
     }
     if (sys->d3dcaps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR) {
-        msg_Dbg(vd, "Using D3DTEXF_LINEAR for magnification");
+        //msg_Dbg(vd, "Using D3DTEXF_LINEAR for magnification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
     } else {
-        msg_Dbg(vd, "Using D3DTEXF_POINT for magnification");
+        //msg_Dbg(vd, "Using D3DTEXF_POINT for magnification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
     }
 
@@ -1212,11 +1212,11 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
                 "main", "ps_3_0", shader_flags, &compiled_shader, &error_msgs, NULL);
 
     if (FAILED(hr)) {
-        msg_Warn(vd, "D3DXCompileShader Error (hr=0x%lX)", hr);
+        msg_Warn(vd, "D3DXCompileShader Error (hr=0x%0lx)", hr);
         if (error_msgs) {
             msg_Warn(vd, "HLSL Compilation Error: %s", (char*)ID3DXBuffer_GetBufferPointer(error_msgs));
             ID3DXBuffer_Release(error_msgs);
-	}
+    }
         return VLC_EGENERIC;
     }
 
@@ -1230,7 +1230,7 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
         ID3DXBuffer_Release(error_msgs);
 
     if (FAILED(hr)) {
-        msg_Warn(vd, "IDirect3DDevice9_CreatePixelShader error (hr=0x%lX)", hr);
+        msg_Warn(vd, "IDirect3DDevice9_CreatePixelShader error (hr=0x%0lx)", hr);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -1454,7 +1454,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     HRESULT hr;
 
     if (!source) {
-        msg_Dbg(vd, "no surface to render ?");
+        msg_Dbg(vd, "no surface to render?");
         return VLC_EGENERIC;
     }
 
@@ -1462,7 +1462,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     LPDIRECT3DSURFACE9 destination;
     hr = IDirect3DTexture9_GetSurfaceLevel(sys->d3dtex, 0, &destination);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%0lx", hr);
         return VLC_EGENERIC;
     }
 
@@ -1471,7 +1471,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, NULL, destination, NULL, D3DTEXF_LINEAR);
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%0lx", hr);
         return VLC_EGENERIC;
     }
 
@@ -1545,7 +1545,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
                                                 NULL);
             if (FAILED(hr)) {
                 d3dr->texture = NULL;
-                msg_Err(vd, "Failed to create %dx%d texture for OSD (hr=0x%0lX)",
+                msg_Err(vd, "Failed to create %dx%d texture for OSD (hr=0x%0lx)",
                         d3dr->width, d3dr->height, hr);
                 continue;
             }
@@ -1624,13 +1624,13 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     void *vertex;
     hr = IDirect3DVertexBuffer9_Lock(d3dvtc, 0, 0, &vertex, D3DLOCK_DISCARD);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Lock: 0x%0lx", hr);
         return -1;
     }
     memcpy(vertex, region->vertex, sizeof(region->vertex));
     hr = IDirect3DVertexBuffer9_Unlock(d3dvtc);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Unlock: 0x%0lx", hr);
         return -1;
     }
 
@@ -1640,7 +1640,7 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     // (blending) our texture with the diffuse color of the vertices.
     hr = IDirect3DDevice9_SetTexture(d3ddev, 0, (LPDIRECT3DBASETEXTURE9)d3dtex);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DDevice9_SetTexture: 0x%0lx", hr);
         return -1;
     }
 
@@ -1651,14 +1651,14 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
             float shader_data[4] = { region->width, region->height, 0, 0 };
             hr = IDirect3DDevice9_SetPixelShaderConstantF(d3ddev, 0, shader_data, 1);
             if (FAILED(hr)) {
-                msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+                msg_Dbg(vd, "Failed IDirect3DDevice9_SetPixelShaderConstantF: 0x%0lx", hr);
                 return -1;
             }
         }
         else /* Disable any existing pixel shader. */
             hr = IDirect3DDevice9_SetPixelShader(d3ddev, NULL);
         if (FAILED(hr)) {
-            msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+            msg_Dbg(vd, "Failed IDirect3DDevice9_SetPixelShader: 0x%0lx", hr);
             return -1;
         }
     }
@@ -1666,21 +1666,21 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     // Render the vertex buffer contents
     hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, d3dvtc, 0, sizeof(CUSTOMVERTEX));
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DDevice9_SetStreamSource: 0x%0lx", hr);
         return -1;
     }
 
     // we use FVF instead of vertex shader
     hr = IDirect3DDevice9_SetFVF(d3ddev, D3DFVF_CUSTOMVERTEX);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DDevice9_SetFVF: 0x%0lx", hr);
         return -1;
     }
 
     // draw rectangle
     hr = IDirect3DDevice9_DrawPrimitive(d3ddev, D3DPT_TRIANGLEFAN, 0, 2);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DDevice9_DrawPrimitive: 0x%0lx", hr);
         return -1;
     }
     return 0;
@@ -1706,7 +1706,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
         hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
                                   D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
         if (FAILED(hr)) {
-            msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+            msg_Dbg(vd, "Failed IDirect3DDevice9_Clear: 0x%0lx", hr);
             return;
         }
         sys->clear_scene = false;
@@ -1715,7 +1715,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
     // Begin the scene
     hr = IDirect3DDevice9_BeginScene(d3ddev);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DDevice9_BeginScene: 0x%0lx", hr);
         return;
     }
 
@@ -1734,7 +1734,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
     // End the scene
     hr = IDirect3DDevice9_EndScene(d3ddev);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+        msg_Dbg(vd, "Failed IDirect3DDevice9_EndScene: 0x%0lx", hr);
         return;
     }
 }
