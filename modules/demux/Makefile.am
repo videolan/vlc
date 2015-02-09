@@ -180,6 +180,7 @@ libmkv_plugin_la_SOURCES = \
 	demux/mp4/libmp4.c demux/vobsub.h \
 	demux/mkv/mkv.hpp demux/mkv/mkv.cpp \
 	demux/windows_audio_commons.h
+libmkv_plugin_la_SOURCES += codec/dts_header.h codec/dts_header.c
 libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libmkv_plugin_la_LIBADD = $(LIBS_mkv)
