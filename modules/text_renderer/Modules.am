@@ -1,7 +1,0 @@
-SOURCES_freetype = freetype.c text_renderer.c text_renderer.h platform_fonts.c platform_fonts.h
-SOURCES_quartztext = quartztext.c
-SOURCES_svg = svg.c
-SOURCES_tdummy = tdummy.c
-SOURCES_win32text = win32text.c
-
-text_renderer_LTLIBRARIES += libtdummy_plugin.la

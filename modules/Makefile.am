@@ -7,7 +7,6 @@ BASE_SUBDIRS = \
 	audio_filter \
 	control \
 	gui \
-	text_renderer \
 	video_filter \
 	visualization
 EXTRA_SUBDIRS = \
@@ -48,6 +47,7 @@ include notify/Makefile.am
 include packetizer/Makefile.am
 include services_discovery/Makefile.am
 include stream_filter/Makefile.am
+include text_renderer/Makefile.am
 include video_chroma/Makefile.am
 include video_splitter/Makefile.am
 include video_output/Makefile.am

@@ -516,7 +516,6 @@ AS_IF([test "${SYS}" = "mingw32"],[
     vlc_winstore_app=1
      VLC_ADD_LIBS([libvlccore], [-lole32 -lruntimeobject])
     ],[
-     VLC_ADD_LIBS([win32text],[-lgdi32])
      VLC_ADD_LIBS([libvlccore],[-lwinmm])
     ])
   ])
@@ -700,7 +699,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom noise grain scene chorus_flanger freetype swscale postproc equalizer spatializer param_eq samplerate freetype mpc qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v mono colorthres extract ball hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum smooth],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom noise grain scene chorus_flanger swscale postproc equalizer spatializer param_eq samplerate mpc qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v mono colorthres extract ball hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum smooth],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -3154,15 +3153,15 @@ AC_ARG_WITH([default-monospace-font-family],
         [AC_DEFINE_UNQUOTED([DEFAULT_MONOSPACE_FAMILY],
             "$withval", [Default monospace font family])])
 
+have_freetype="no"
+have_fontconfig="no"
+have_fribidi="no"
+
 if test "${enable_freetype}" != "no"; then
    PKG_CHECK_MODULES(FREETYPE, freetype2, [
-      have_freetype=yes
-      VLC_ADD_PLUGIN([freetype])
-      VLC_ADD_CPPFLAGS([freetype skins2],[${FREETYPE_CFLAGS}])
-      if test "${SYS}" = "mingw32"; then
-        VLC_ADD_LIBS([freetype],[-liconv -lz])
-      fi
-      VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
+      have_freetype="yes"
+      VLC_ADD_CPPFLAGS([skins2],[${FREETYPE_CFLAGS}])
+      VLC_ADD_LIBS([skins2],[${FREETYPE_LIBS}])
 
       AC_CHECK_HEADERS(Carbon/Carbon.h,
                        [VLC_ADD_LIBS([freetype],[-Wl,-framework,Carbon])])
@@ -3171,31 +3170,29 @@ if test "${enable_freetype}" != "no"; then
       if test "${SYS}" != "mingw32"; then
           if test "${enable_fontconfig}" != "no"; then
             AC_CHECK_HEADERS(fontconfig/fontconfig.h, [
-              VLC_ADD_CPPFLAGS([freetype],[-DHAVE_FONTCONFIG])
-              VLC_ADD_LIBS([freetype],[-lfontconfig])
+              have_fontconfig="yes"
             ],[AC_MSG_WARN([library fontconfig not found. Styles will be disabled in freetype])])
           fi
-      else
-          AS_IF([test "$vlc_winstore_app" != "1"],[
-            VLC_ADD_LIBS([freetype],[-lgdi32])
-          ])
       fi
 
       dnl fribidi support
       if test "${enable_fribidi}" != "no"; then
         PKG_CHECK_MODULES(FRIBIDI, fribidi, [
-          VLC_ADD_CPPFLAGS([freetype skins2], [${FRIBIDI_CFLAGS} -DHAVE_FRIBIDI])
-          VLC_ADD_LIBS([freetype skins2], [${FRIBIDI_LIBS}])
+          have_fribidi="yes"
+          VLC_ADD_CPPFLAGS([skins2], [${FRIBIDI_CFLAGS} -DHAVE_FRIBIDI])
+          VLC_ADD_LIBS([skins2], [${FRIBIDI_LIBS}])
         ],[AC_MSG_WARN([${FRIBIDI_PKG_ERRORS}. Bidirectional support will be disabled in FreeType.])])
       fi
-
   ],[
-  have_freetype=no
   AS_IF([test -n "${enable_freetype}"],[
     AC_MSG_ERROR([${FREETYPE_PKG_ERRORS}. Install FreeType2 development or configure with --disable-freetype.])
     ])
   ])
 fi
+
+AM_CONDITIONAL([HAVE_FREETYPE], [test "${have_freetype}" = "yes"])
+AM_CONDITIONAL([HAVE_FONTCONFIG], [test "${have_fontconfig}" = "yes"])
+AM_CONDITIONAL([HAVE_FRIBIDI], [test "${have_fribidi}" = "yes"])
 
 
 dnl
@@ -3207,7 +3204,6 @@ if test "x${enable_macosx_quartztext}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_quartztext}" = "yes")
 then
   VLC_ADD_PLUGIN([quartztext])
-  VLC_ADD_LIBS([quartztext],[-Wl,-framework,ApplicationServices])
 fi
 
 dnl
@@ -4151,7 +4147,6 @@ AC_CONFIG_FILES([
   modules/gui/skins2/Makefile
   modules/mux/Makefile
   modules/stream_out/Makefile
-  modules/text_renderer/Makefile
   modules/video_filter/Makefile
   modules/visualization/Makefile
   modules/hw/mmal/Makefile
