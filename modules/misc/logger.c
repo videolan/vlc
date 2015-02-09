@@ -35,19 +35,11 @@
 
 #include <stdarg.h>
 
-#ifdef __ANDROID__
-# include <android/log.h>
-#endif
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
-
-#ifdef __ANDROID__
-static void AndroidPrint(void *, int, const vlc_log_t *, const char *, va_list);
-#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -72,12 +64,6 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-#ifdef __ANDROID__
-    msg_Info( p_this, "using logger." );
-
-    vlc_LogSet( p_intf->p_libvlc, AndroidPrint, p_intf );
-    return VLC_SUCCESS;
-#else
     msg_Err( p_intf, "The logger interface no longer exists." );
     msg_Info( p_intf, "As of VLC version 0.9.0, use --file-logging to write "
               "logs to a file." );
@@ -85,7 +71,6 @@ static int Open( vlc_object_t *p_this )
     msg_Info( p_intf, "Use --syslog to send logs to the system logger." );
 # endif
     return VLC_EGENERIC;
-#endif
 }
 
 /*****************************************************************************
@@ -96,47 +81,3 @@ static void Close( vlc_object_t *p_this )
     /* Flush the queue and unsubscribe from the message queue */
     vlc_LogSet( p_this->p_libvlc, NULL, NULL );
 }
-
-#ifdef __ANDROID__
-static bool IgnoreMessage( intf_thread_t *p_intf, int type )
-{
-    /* TODO: cache value... */
-    int verbosity = var_InheritInteger( p_intf, "log-verbose" );
-    if (verbosity == -1)
-        verbosity = var_InheritInteger( p_intf, "verbose" );
-
-    return verbosity < 0 || verbosity < (type - VLC_MSG_ERR);
-}
-
-/*
- * Logging callbacks
- */
-
-static const char ppsz_type[4][9] = {
-    "",
-    " error",
-    " warning",
-    " debug",
-};
-
-static const android_LogPriority prioritytype[4] = {
-    ANDROID_LOG_INFO,
-    ANDROID_LOG_ERROR,
-    ANDROID_LOG_WARN,
-    ANDROID_LOG_DEBUG
-};
-
-static void AndroidPrint( void *opaque, int type, const vlc_log_t *item,
-                       const char *fmt, va_list ap )
-{
-    (void)item;
-    intf_thread_t *p_intf = opaque;
-
-    if( IgnoreMessage( p_intf, type ) )
-        return;
-
-    int canc = vlc_savecancel();
-    __android_log_vprint(prioritytype[type], "VLC", fmt, ap);
-    vlc_restorecancel( canc );
-}
-#endif

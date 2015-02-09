@@ -1,9 +1,6 @@
 miscdir = $(pluginsdir)/misc
 
 liblogger_plugin_la_SOURCES = misc/logger.c
-if HAVE_ANDROID
-liblogger_plugin_la_LIBADD = -llog
-endif
 libstats_plugin_la_SOURCES = misc/stats.c
 
 misc_LTLIBRARIES = liblogger_plugin.la libstats_plugin.la
