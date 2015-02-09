@@ -548,18 +548,20 @@ static int SyncInfo( const uint8_t *p_buf,
                                 AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
             break;
 
+        case 0xF:
         default:
-            if( i_audio_mode <= 63 )
+            if( (i_audio_mode & 0xFFFF) >= 0x10 )
             {
                 /* User defined */
                 *pi_channels = 0;
                 *pi_channels_conf = 0;
             }
             else return 0;
+
             break;
     }
 
-    if( i_audio_mode & 0x10000 )
+    if( *pi_channels && (i_audio_mode & 0x10000) )
     {
         (*pi_channels)++;
         *pi_channels_conf |= AOUT_CHAN_LFE;
