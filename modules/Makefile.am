@@ -7,7 +7,6 @@ BASE_SUBDIRS = \
 	audio_filter \
 	control \
 	gui \
-	packetizer \
 	text_renderer \
 	video_filter \
 	visualization
@@ -46,6 +45,7 @@ include lua/Makefile.am
 include meta_engine/Makefile.am
 include misc/Makefile.am
 include notify/Makefile.am
+include packetizer/Makefile.am
 include services_discovery/Makefile.am
 include stream_filter/Makefile.am
 include video_chroma/Makefile.am

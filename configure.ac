@@ -4150,7 +4150,6 @@ AC_CONFIG_FILES([
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
   modules/mux/Makefile
-  modules/packetizer/Makefile
   modules/stream_out/Makefile
   modules/text_renderer/Makefile
   modules/video_filter/Makefile
