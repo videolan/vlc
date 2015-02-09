@@ -1,0 +1,86 @@
+SOURCES_equalizer = equalizer.c equalizer_presets.h
+SOURCES_compressor = compressor.c
+SOURCES_karaoke = karaoke.c
+SOURCES_normvol = normvol.c
+SOURCES_gain = gain.c
+SOURCES_audiobargraph_a = audiobargraph_a.c
+SOURCES_param_eq = param_eq.c
+SOURCES_scaletempo = scaletempo.c
+SOURCES_chorus_flanger = chorus_flanger.c
+SOURCES_stereo_widen = stereo_widen.c
+SOURCES_spatializer = \
+	spatializer/allpass.cpp spatializer/allpass.hpp \
+	spatializer/comb.cpp spatializer/comb.hpp \
+	spatializer/denormals.h spatializer/denormals.c \
+	spatializer/tuning.h \
+	spatializer/revmodel.cpp spatializer/revmodel.hpp \
+	spatializer/spatializer.cpp
+
+audio_filter_LTLIBRARIES += \
+	libaudiobargraph_a_plugin.la \
+	libchorus_flanger_plugin.la \
+	libcompressor_plugin.la \
+	libequalizer_plugin.la \
+	libkaraoke_plugin.la \
+	libnormvol_plugin.la \
+	libgain_plugin.la \
+	libparam_eq_plugin.la \
+	libscaletempo_plugin.la \
+	libspatializer_plugin.la \
+	libstereo_widen_plugin.la
+
+# Channel mixers
+SOURCES_trivial_channel_mixer = channel_mixer/trivial.c
+SOURCES_simple_channel_mixer = channel_mixer/simple.c
+SOURCES_headphone_channel_mixer = channel_mixer/headphone.c
+SOURCES_dolby_surround_decoder = channel_mixer/dolby.c
+SOURCES_mono = channel_mixer/mono.c
+SOURCES_remap = channel_mixer/remap.c
+
+audio_filter_LTLIBRARIES += \
+	libdolby_surround_decoder_plugin.la \
+	libheadphone_channel_mixer_plugin.la \
+	libmono_plugin.la \
+	libremap_plugin.la \
+	libsimple_channel_mixer_plugin.la \
+	libtrivial_channel_mixer_plugin.la
+
+# Converters
+SOURCES_a52tospdif = converter/a52tospdif.c
+SOURCES_a52tofloat32 = converter/a52tofloat32.c
+SOURCES_dtstospdif = converter/dtstospdif.c
+SOURCES_dtstofloat32 = converter/dtstofloat32.c
+
+libmad_plugin_la_SOURCES = converter/mpgatofixed32.c
+libmad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(MAD_CFLAGS)
+libmad_plugin_la_LIBADD = $(AM_LIBADD) $(MAD_LIBS)
+if HAVE_MAD
+audio_filter_LTLIBRARIES += libmad_plugin.la
+endif
+
+libaudio_format_plugin_la_SOURCES = converter/format.c
+libaudio_format_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libaudio_format_plugin_la_LIBADD = $(LIBM)
+
+audio_filter_LTLIBRARIES += \
+	liba52tospdif_plugin.la \
+	libaudio_format_plugin.la \
+	libdtstospdif_plugin.la
+
+# Resamplers
+SOURCES_bandlimited_resampler = \
+	resampler/bandlimited.c resampler/bandlimited.h
+SOURCES_ugly_resampler = resampler/ugly.c
+SOURCES_samplerate = resampler/src.c
+
+audio_filter_LTLIBRARIES += \
+	libugly_resampler_plugin.la
+EXTRA_LTLIBRARIES += \
+	libbandlimited_resampler_plugin.la
+
+libspeex_resampler_plugin_la_SOURCES = resampler/speex.c
+libspeex_resampler_plugin_la_CFLAGS = $(AM_CFLAGS) $(SPEEXDSP_CFLAGS)
+libspeex_resampler_plugin_la_LIBADD = $(SPEEXDSP_LIBS)
+if HAVE_SPEEXDSP
+audio_filter_LTLIBRARIES += libspeex_resampler_plugin.la
+endif

@@ -699,7 +699,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient x264 goom noise grain scene swscale postproc mpc qt4 audiobargraph_v colorthres extract ball hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum smooth],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom noise grain scene chorus_flanger swscale postproc equalizer spatializer param_eq samplerate mpc qt4 compressor headphone_channel_mixer normvol audiobargraph_a audiobargraph_v mono colorthres extract ball hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum smooth],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -4136,6 +4136,7 @@ AC_CONFIG_FILES([
   bin/Makefile
   test/Makefile
   modules/access_output/Makefile
+  modules/audio_filter/Makefile
   modules/control/Makefile
   modules/gui/Makefile
   modules/gui/ios_dialog_provider/Makefile
