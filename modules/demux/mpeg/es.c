@@ -509,11 +509,25 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
     return b_eof;
 }
 
+/* Check to apply to WAVE fmt header */
+static int GenericFormatCheck( int i_format, const uint8_t *p_head )
+{
+    if ( i_format == WAVE_FORMAT_PCM )
+    {
+        if( GetWLE( p_head /* nChannels */ ) != 2 )
+            return VLC_EGENERIC;
+        if( GetDWLE( p_head + 2 /* nSamplesPerSec */ ) != 44100 )
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Wav header skipper
  *****************************************************************************/
 #define WAV_PROBE_SIZE (512*1024)
-static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[] )
+static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[],
+                          int (*pf_format_check)( int, const uint8_t * ) )
 {
     const uint8_t *p_peek;
     int         i_peek = 0;
@@ -559,14 +573,9 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[] 
     if( pi_format[i_format_idx] == WAVE_FORMAT_UNKNOWN )
         return VLC_EGENERIC;
 
-    if( i_format == WAVE_FORMAT_PCM )
-    {
-        if( GetWLE( p_peek + i_peek - i_len - 6 /* nChannels */ ) != 2 )
+    if( pf_format_check &&
+        pf_format_check( i_format, p_peek + i_peek - i_len - 6 ) != VLC_SUCCESS )
             return VLC_EGENERIC;
-        if( GetDWLE( p_peek + i_peek - i_len - 4 /* nSamplesPerSec */ ) !=
-            44100 )
-            return VLC_EGENERIC;
-    }
 
     /* Skip the wave header */
     while( memcmp( p_peek + i_peek - 8, "data", 4 ) )
@@ -586,7 +595,8 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[] 
 static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
                          const char * ppsz_name[],
                          int (*pf_check)( const uint8_t *, int * ), int i_check_size,
-                         const int pi_wav_format[] )
+                         const int pi_wav_format[],
+                         int (*pf_format_check)( int, const uint8_t * ) )
 {
     bool   b_forced_demux;
 
@@ -602,7 +612,7 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
 
     i_offset = stream_Tell( p_demux->s );
 
-    if( WavSkipHeader( p_demux, &i_skip, pi_wav_format ) )
+    if( WavSkipHeader( p_demux, &i_skip, pi_wav_format, pf_format_check ) )
     {
         if( !b_forced_demux )
             return VLC_EGENERIC;
@@ -718,7 +728,7 @@ static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset )
 
     i_offset = stream_Tell( p_demux->s );
 
-    if( WavSkipHeader( p_demux, &i_skip, pi_wav ) )
+    if( WavSkipHeader( p_demux, &i_skip, pi_wav, NULL ) )
     {
         if( !b_forced_demux )
             return VLC_EGENERIC;
@@ -969,7 +979,8 @@ static int EA52Probe( demux_t *p_demux, int64_t *pi_offset )
     const char *ppsz_name[] = { "eac3", NULL };
     const int pi_wav[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_A52, WAVE_FORMAT_UNKNOWN };
 
-    return GenericProbe( p_demux, pi_offset, ppsz_name, EA52CheckSyncProbe, VLC_A52_HEADER_SIZE, pi_wav );
+    return GenericProbe( p_demux, pi_offset, ppsz_name, EA52CheckSyncProbe,
+                         VLC_A52_HEADER_SIZE, pi_wav, GenericFormatCheck );
 }
 
 static int A52CheckSyncProbe( const uint8_t *p_peek, int *pi_samples )
@@ -983,7 +994,8 @@ static int A52Probe( demux_t *p_demux, int64_t *pi_offset )
     const char *ppsz_name[] = { "a52", "ac3", NULL };
     const int pi_wav[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_A52, WAVE_FORMAT_UNKNOWN };
 
-    return GenericProbe( p_demux, pi_offset, ppsz_name, A52CheckSyncProbe, VLC_A52_HEADER_SIZE, pi_wav );
+    return GenericProbe( p_demux, pi_offset, ppsz_name, A52CheckSyncProbe,
+                         VLC_A52_HEADER_SIZE, pi_wav, GenericFormatCheck );
 }
 
 static int A52Init( demux_t *p_demux )
@@ -1031,7 +1043,7 @@ static int DtsProbe( demux_t *p_demux, int64_t *pi_offset )
     const char *ppsz_name[] = { "dts", NULL };
     const int pi_wav[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_DTS, WAVE_FORMAT_UNKNOWN };
 
-    return GenericProbe( p_demux, pi_offset, ppsz_name, DtsCheckSync, 11, pi_wav );
+    return GenericProbe( p_demux, pi_offset, ppsz_name, DtsCheckSync, 11, pi_wav, NULL );
 }
 static int DtsInit( demux_t *p_demux )
 {
@@ -1074,14 +1086,16 @@ static int MlpProbe( demux_t *p_demux, int64_t *pi_offset )
     const char *ppsz_name[] = { "mlp", NULL };
     const int pi_wav[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_UNKNOWN };
 
-    return GenericProbe( p_demux, pi_offset, ppsz_name, MlpCheckSync, 4+28+16*4, pi_wav );
+    return GenericProbe( p_demux, pi_offset, ppsz_name, MlpCheckSync,
+                         4+28+16*4, pi_wav, GenericFormatCheck );
 }
 static int ThdProbe( demux_t *p_demux, int64_t *pi_offset )
 {
     const char *ppsz_name[] = { "thd", NULL };
     const int pi_wav[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_UNKNOWN };
 
-    return GenericProbe( p_demux, pi_offset, ppsz_name, ThdCheckSync, 4+28+16*4, pi_wav );
+    return GenericProbe( p_demux, pi_offset, ppsz_name, ThdCheckSync,
+                         4+28+16*4, pi_wav, GenericFormatCheck );
 }
 static int MlpInit( demux_t *p_demux )
 
