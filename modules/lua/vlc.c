@@ -834,15 +834,23 @@ int vlclua_add_modules_path( lua_State *L, const char *psz_filename )
 }
 
 /** Replacement for luaL_dofile, using VLC's input capabilities */
-int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *uri )
+int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *curi )
 {
-    if( !strstr( uri, "://" ) )
-        return luaL_dofile( L, uri );
-    if( !strncasecmp( uri, "file://", 7 ) )
-        return luaL_dofile( L, uri + 7 );
+    char *uri = ToLocaleDup( curi );
+    if( !strstr( uri, "://" ) ) {
+        int ret = luaL_dofile( L, uri );
+        free( uri );
+        return ret;
+    }
+    if( !strncasecmp( uri, "file://", 7 ) ) {
+        int ret = luaL_dofile( L, uri + 7 );
+        free( uri );
+        return ret;
+    }
     stream_t *s = stream_UrlNew( p_this, uri );
     if( !s )
     {
+        free( uri );
         return 1;
     }
     int64_t i_size = stream_Size( s );
@@ -851,6 +859,7 @@ int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *uri )
     {
         // FIXME: read the whole stream until we reach the end (if no size)
         stream_Delete( s );
+        free( uri );
         return 1;
     }
     int64_t i_read = stream_Read( s, p_buffer, (int) i_size );
@@ -861,5 +870,6 @@ int vlclua_dofile( vlc_object_t *p_this, lua_State *L, const char *uri )
         i_ret = lua_pcall( L, 0, LUA_MULTRET, 0 );
     stream_Delete( s );
     free( p_buffer );
+    free( uri );
     return i_ret;
 }
