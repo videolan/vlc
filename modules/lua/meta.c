@@ -89,7 +89,7 @@ static int run( vlc_object_t *p_this, const char * psz_filename,
     lua_setglobal( L, luafunction );
 
     /* Load and run the script(s) */
-    if( luaL_dofile( L, psz_filename ) )
+    if( vlclua_dofile( p_this, L, psz_filename ) )
     {
         msg_Warn( p_this, "Error loading script %s: %s", psz_filename,
                  lua_tostring( L, lua_gettop( L ) ) );

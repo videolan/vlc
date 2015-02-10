@@ -163,7 +163,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
     }
 
     /* Load and run the script(s) */
-    if( luaL_dofile( L, psz_filename ) )
+    if( vlclua_dofile( VLC_OBJECT(p_demux), L, psz_filename ) )
     {
         msg_Warn( p_demux, "Error loading script %s: %s", psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
