@@ -650,7 +650,7 @@ AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
 
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([access_rtmp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop stream_out_chromecast oldrc netsync ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([access_rtmp access_output_shout sap stream_out_standard stream_out_rtp stream_out_raop stream_out_chromecast ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
@@ -699,7 +699,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient x264 goom noise grain scene swscale postproc mpc qt4 audiobargraph_v colorthres extract ball hotkeys mosaic gaussianblur x262 x26410b hqdn3d anaglyph oldrc ncurses oldmovie glspectrum smooth],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient x264 goom noise grain scene swscale postproc mpc qt4 audiobargraph_v colorthres extract ball mosaic gaussianblur x262 x26410b hqdn3d anaglyph ncurses oldmovie glspectrum smooth],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -3826,15 +3826,15 @@ dnl  Lirc plugin
 dnl
 AC_ARG_ENABLE(lirc,
   [  --enable-lirc           lirc support (default disabled)])
-if test "${enable_lirc}" = "yes"
-then
-  AC_CHECK_HEADER(lirc/lirc_client.h, AC_CHECK_LIB(lirc_client, lirc_init, have_lirc="true", have_lirc="false"),have_lirc="false")
-  if test "${have_lirc}" = "true"
-  then
-    VLC_ADD_PLUGIN([lirc])
-    VLC_ADD_LIBS([lirc],[-llirc_client])
-  fi
-fi
+have_lirc="no"
+AS_IF([test "${enable_lirc}" = "yes"], [
+  AC_CHECK_HEADER(lirc/lirc_client.h, [
+    AC_CHECK_LIB(lirc_client, lirc_init, [
+      have_lirc="true"
+    ])
+  ])
+])
+AM_CONDITIONAL([HAVE_LIRC], [test "${have_lirc}" = "yes"])
 
 EXTEND_HELP_STRING([Visualisations and Video filter plugins:])
 dnl
