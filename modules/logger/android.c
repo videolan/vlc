@@ -36,11 +36,15 @@
 
 static const int ptr_width = 2 * /* hex digits */ sizeof (uintptr_t);
 
-static void AndroidPrintMsg(void *d, int type, const vlc_log_t *p_item,
+static void AndroidPrintMsg(void *opaque, int type, const vlc_log_t *p_item,
                             const char *format, va_list ap)
 {
     int prio;
     char *format2;
+    int verbose = (intptr_t)opaque;
+
+    if (verbose < type)
+        return;
 
     int canc = vlc_savecancel();
 
@@ -69,8 +73,12 @@ static void AndroidPrintMsg(void *d, int type, const vlc_log_t *p_item,
 
 static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
 {
-    VLC_UNUSED(obj);
-    VLC_UNUSED(sysp);
+    int verbosity = var_InheritInteger(obj, "verbose");
+
+    if (verbosity < 0)
+        return NULL;
+
+    *sysp = (void *)(uintptr_t)verbosity;
 
     return AndroidPrintMsg;
 }
