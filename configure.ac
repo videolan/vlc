@@ -699,7 +699,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient x264 goom noise grain scene swscale postproc mpc qt4 audiobargraph_v colorthres extract ball mosaic gaussianblur x262 x26410b hqdn3d anaglyph ncurses oldmovie glspectrum smooth],[-lm])
+  VLC_ADD_LIBS([x264 goom noise swscale mpc qt4 x262 x26410b ncurses glspectrum smooth],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -2523,8 +2523,6 @@ then
       CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
       AC_CHECK_HEADERS(postproc/postprocess.h)
       VLC_ADD_PLUGIN([postproc])
-      VLC_ADD_LIBS([postproc],[$POSTPROC_LIBS $AVUTIL_LIBS])
-      VLC_ADD_CFLAGS([postproc],[$POSTPROC_CFLAGS $AVUTIL_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
       AC_MSG_WARN([${POSTPROC_PKG_ERRORS}.])

@@ -1,17 +1,133 @@
-SOURCES_mosaic = mosaic.c mosaic.h
-SOURCES_transform = transform.c
-SOURCES_invert = invert.c
-SOURCES_mirror = mirror.c
-SOURCES_adjust = adjust.c adjust_sat_hue.c adjust_sat_hue.h
-SOURCES_motionblur = motionblur.c
-SOURCES_logo = logo.c
-SOURCES_audiobargraph_v = audiobargraph_v.c
-SOURCES_blend = blend.cpp
-SOURCES_scale = scale.c
-SOURCES_marq = marq.c
-SOURCES_rss = rss.c
-SOURCES_fps = fps.c
-SOURCES_motiondetect = motiondetect.c
+noinst_HEADERS = filter_picture.h
+
+# video filters
+libadjust_plugin_la_SOURCES = adjust.c adjust_sat_hue.c adjust_sat_hue.h
+libadjust_plugin_la_LIBADD = $(LIBM)
+libalphamask_plugin_la_SOURCES = alphamask.c
+libanaglyph_plugin_la_SOURCES = anaglyph.c
+libantiflicker_plugin_la_SOURCES = antiflicker.c
+libball_plugin_la_SOURCES = ball.c
+libball_plugin_la_LIBADD = $(LIBM)
+libblendbench_plugin_la_SOURCES = blendbench.c
+libbluescreen_plugin_la_SOURCES = bluescreen.c
+libcanvas_plugin_la_SOURCES = canvas.c
+libcolorthres_plugin_la_SOURCES = colorthres.c
+libcolorthres_plugin_la_LIBADD = $(LIBM)
+libcroppadd_plugin_la_SOURCES = croppadd.c
+liberase_plugin_la_SOURCES = erase.c
+libextract_plugin_la_SOURCES = extract.c
+libextract_plugin_la_LIBADD = $(LIBM)
+libfps_plugin_la_SOURCES = fps.c
+libfreeze_plugin_la_SOURCES = freeze.c
+libgaussianblur_plugin_la_SOURCES = gaussianblur.c
+libgaussianblur_plugin_la_LIBADD = $(LIBM)
+libgradfun_plugin_la_SOURCES = gradfun.c gradfun.h
+libgradient_plugin_la_SOURCES = gradient.c
+libgradient_plugin_la_LIBADD = $(LIBM)
+libgrain_plugin_la_SOURCES = grain.c
+libgrain_plugin_la_LIBADD = $(LIBM)
+libhqdn3d_plugin_la_SOURCES = hqdn3d.c hqdn3d.h
+libhqdn3d_plugin_la_LIBADD = $(LIBM)
+libinvert_plugin_la_SOURCES = invert.c
+libmagnify_plugin_la_SOURCES = magnify.c
+libmirror_plugin_la_SOURCES = mirror.c
+libmotionblur_plugin_la_SOURCES = motionblur.c
+libmotiondetect_plugin_la_SOURCES = motiondetect.c
+liboldmovie_plugin_la_SOURCES = oldmovie.c
+liboldmovie_plugin_la_LIBADD = $(LIBM)
+libposterize_plugin_la_SOURCES = posterize.c
+libpsychedelic_plugin_la_SOURCES = psychedelic.c
+libpsychedelic_plugin_la_LIBADD = $(LIBM)
+libpuzzle_plugin_la_SOURCES = \
+	puzzle.c puzzle.h \
+	puzzle_bezier.c puzzle_bezier.h \
+	puzzle_lib.c puzzle_lib.h \
+	puzzle_mgt.c puzzle_mgt.h \
+	puzzle_pce.c puzzle_pce.h
+libpuzzle_plugin_la_LIBADD = $(LIBM)
+libripple_plugin_la_SOURCES = ripple.c
+libripple_plugin_la_LIBADD = $(LIBM)
+librotate_plugin_la_SOURCES = rotate.c
+librotate_plugin_la_LIBADD = ../libvlc_motion.la $(LIBM)
+librotate_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+if HAVE_DARWIN
+librotate_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
+endif
+libscale_plugin_la_SOURCES = scale.c
+libscene_plugin_la_SOURCES = scene.c
+libscene_plugin_la_LIBADD = $(LIBM)
+libsepia_plugin_la_SOURCES = sepia.c
+libsharpen_plugin_la_SOURCES = sharpen.c
+libtransform_plugin_la_SOURCES = transform.c
+libvhs_plugin_la_SOURCES = vhs.c
+libwave_plugin_la_SOURCES = wave.c
+libwave_plugin_la_LIBADD = $(LIBM)
+libyuvp_plugin_la_SOURCES = yuvp.c
+
+video_filter_LTLIBRARIES += \
+	libadjust_plugin.la \
+	libalphamask_plugin.la \
+	libball_plugin.la \
+	libblendbench_plugin.la \
+	libbluescreen_plugin.la \
+	libcanvas_plugin.la \
+	libcolorthres_plugin.la \
+	libcroppadd_plugin.la \
+	liberase_plugin.la \
+	libextract_plugin.la \
+	libgradient_plugin.la \
+	libgrain_plugin.la \
+	libgaussianblur_plugin.la \
+	libinvert_plugin.la \
+	libmagnify_plugin.la \
+	libmirror_plugin.la \
+	libmotionblur_plugin.la \
+	libmotiondetect_plugin.la \
+	libposterize_plugin.la \
+	libpsychedelic_plugin.la \
+	libripple_plugin.la \
+	libscale_plugin.la \
+	libscene_plugin.la \
+	libsepia_plugin.la \
+	libsharpen_plugin.la \
+	libtransform_plugin.la \
+	libwave_plugin.la \
+	libgradfun_plugin.la \
+	libyuvp_plugin.la \
+	libantiflicker_plugin.la \
+	libhqdn3d_plugin.la \
+	libanaglyph_plugin.la \
+	liboldmovie_plugin.la \
+	libvhs_plugin.la \
+	libfps_plugin.la \
+	libfreeze_plugin.la \
+	libpuzzle_plugin.la \
+	librotate_plugin.la
+
+libatmo_plugin_la_SOURCES = atmo/atmo.cpp \
+	atmo/AtmoDefs.h \
+	atmo/AtmoCalculations.cpp atmo/AtmoCalculations.h \
+	atmo/AtmoConfig.cpp atmo/AtmoConfig.h \
+	atmo/AtmoConnection.cpp atmo/AtmoConnection.h \
+	atmo/AtmoDynData.cpp atmo/AtmoDynData.h \
+	atmo/AtmoExternalCaptureInput.cpp atmo/AtmoExternalCaptureInput.h \
+	atmo/AtmoInput.cpp atmo/AtmoInput.h \
+	atmo/AtmoLiveView.cpp atmo/AtmoLiveView.h \
+	atmo/AtmoOutputFilter.cpp atmo/AtmoOutputFilter.h \
+	atmo/AtmoThread.cpp atmo/AtmoThread.h \
+	atmo/AtmoTools.cpp atmo/AtmoTools.h \
+	atmo/AtmoZoneDefinition.cpp atmo/AtmoZoneDefinition.h \
+	atmo/AtmoChannelAssignment.cpp atmo/AtmoChannelAssignment.h \
+	atmo/AtmoClassicConnection.cpp atmo/AtmoClassicConnection.h \
+	atmo/AtmoDmxSerialConnection.cpp atmo/AtmoDmxSerialConnection.h \
+	atmo/DmxTools.cpp atmo/DmxTools.h \
+	atmo/AtmoMultiConnection.cpp atmo/AtmoMultiConnection.h \
+	atmo/MoMoConnection.cpp atmo/MoMoConnection.h \
+	atmo/FnordlichtConnection.cpp atmo/FnordlichtConnection.h \
+	atmo/AtmoPacketQueue.cpp atmo/AtmoPacketQueue.h
+libatmo_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+video_filter_LTLIBRARIES += $(LTLIBatmo)
+EXTRA_LTLIBRARIES += libatmo_plugin.la
 
 libdeinterlace_plugin_la_SOURCES = \
 	deinterlace/deinterlace.c deinterlace/deinterlace.h \
@@ -42,6 +158,40 @@ if !HAVE_WIN32
 video_filter_LTLIBRARIES += libdynamicoverlay_plugin.la
 endif
 
+libopencv_wrapper_plugin_la_SOURCES = opencv_wrapper.c
+libopencv_wrapper_plugin_la_CPPAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
+libopencv_wrapper_plugin_la_LIBADD = $(OPENCV_LIBS)
+libopencv_wrapper_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+video_filter_LTLIBRARIES += $(LTLIBopencv_wrapper)
+EXTRA_LTLIBRARIES += libopencv_wrapper_plugin.la
+
+libpostproc_plugin_la_SOURCES = postproc.c
+libpostproc_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(POSTPROC_CFLAGS) $(AVUTIL_CFLAGS)
+libpostproc_plugin_la_LIBADD = $(LIBM) $(POSTPROC_LIBS) $(AVUTIL_LIBS)
+libpostproc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+video_filter_LTLIBRARIES += $(LTLIBpostproc)
+EXTRA_LTLIBRARIES += libpostproc_plugin.la
+
+# sub filters
+libsubsdelay_plugin_la_SOURCES = subsdelay.c
+video_filter_LTLIBRARIES += libsubsdelay_plugin.la
+
+# sub sources
+libaudiobargraph_v_plugin_la_SOURCES = audiobargraph_v.c
+libaudiobargraph_v_plugin_la_LIBADD = $(LIBM)
+liblogo_plugin_la_SOURCES = logo.c
+libmarq_plugin_la_SOURCES = marq.c
+libmosaic_plugin_la_SOURCES = mosaic.c mosaic.h
+libmosaic_plugin_la_LIBADD = $(LIBM)
+librss_plugin_la_SOURCES = rss.c
+
+video_filter_LTLIBRARIES += \
+	libaudiobargraph_v_plugin.la \
+	liblogo_plugin.la \
+	libmarq_plugin.la \
+	libmosaic_plugin.la \
+	librss_plugin.la
+
 libremoteosd_plugin_la_SOURCES = remoteosd.c remoteosd_rfbproto.h
 libremoteosd_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
 libremoteosd_plugin_la_LIBADD = $(GCRYPT_LIBS) $(LIBS_remoteosd) $(LIBPTHREAD)
@@ -49,121 +199,13 @@ if HAVE_GCRYPT
 video_filter_LTLIBRARIES += libremoteosd_plugin.la
 endif
 
-libpuzzle_plugin_la_SOURCES = \
-	puzzle.c puzzle.h \
-	puzzle_bezier.c puzzle_bezier.h \
-	puzzle_lib.c puzzle_lib.h \
-	puzzle_mgt.c puzzle_mgt.h \
-	puzzle_pce.c puzzle_pce.h
-libpuzzle_plugin_la_LIBADD = $(LIBM)
-video_filter_LTLIBRARIES += libpuzzle_plugin.la
+# misc
+libblend_plugin_la_SOURCES = blend.cpp
+video_filter_LTLIBRARIES += libblend_plugin.la
 
-SOURCES_magnify = magnify.c
-SOURCES_wave = wave.c
-SOURCES_ripple = ripple.c
-SOURCES_posterize = posterize.c
-SOURCES_psychedelic = psychedelic.c
-SOURCES_gradient = gradient.c
-SOURCES_ball = ball.c
-SOURCES_opencv_wrapper = opencv_wrapper.c
-SOURCES_opencv_example = opencv_example.cpp filter_event_info.h
-
-librotate_plugin_la_SOURCES = rotate.c
-librotate_plugin_la_LIBADD = ../libvlc_motion.la $(LIBM)
-librotate_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
-if HAVE_DARWIN
-librotate_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
-endif
-video_filter_LTLIBRARIES += librotate_plugin.la
-
-SOURCES_colorthres = colorthres.c
-SOURCES_extract = extract.c
-SOURCES_sharpen = sharpen.c
-SOURCES_erase = erase.c
-SOURCES_bluescreen = bluescreen.c
-SOURCES_alphamask = alphamask.c
-SOURCES_gaussianblur = gaussianblur.c
-SOURCES_grain = grain.c
-SOURCES_croppadd = croppadd.c
-SOURCES_canvas = canvas.c
-SOURCES_blendbench = blendbench.c
-SOURCES_postproc = postproc.c
-SOURCES_scene = scene.c
-SOURCES_sepia = sepia.c
-SOURCES_yuvp = yuvp.c
-SOURCES_antiflicker = antiflicker.c
-SOURCES_atmo = atmo/atmo.cpp \
-	atmo/AtmoDefs.h \
-	atmo/AtmoCalculations.cpp atmo/AtmoCalculations.h \
-	atmo/AtmoConfig.cpp atmo/AtmoConfig.h \
-	atmo/AtmoConnection.cpp atmo/AtmoConnection.h \
-	atmo/AtmoDynData.cpp atmo/AtmoDynData.h \
-	atmo/AtmoExternalCaptureInput.cpp atmo/AtmoExternalCaptureInput.h \
-	atmo/AtmoInput.cpp atmo/AtmoInput.h \
-	atmo/AtmoLiveView.cpp atmo/AtmoLiveView.h \
-	atmo/AtmoOutputFilter.cpp atmo/AtmoOutputFilter.h \
-	atmo/AtmoThread.cpp atmo/AtmoThread.h \
-	atmo/AtmoTools.cpp atmo/AtmoTools.h \
-	atmo/AtmoZoneDefinition.cpp atmo/AtmoZoneDefinition.h \
-	atmo/AtmoChannelAssignment.cpp atmo/AtmoChannelAssignment.h \
-	atmo/AtmoClassicConnection.cpp atmo/AtmoClassicConnection.h \
-	atmo/AtmoDmxSerialConnection.cpp atmo/AtmoDmxSerialConnection.h \
-	atmo/DmxTools.cpp atmo/DmxTools.h \
-	atmo/AtmoMultiConnection.cpp atmo/AtmoMultiConnection.h \
-	atmo/MoMoConnection.cpp atmo/MoMoConnection.h \
-	atmo/FnordlichtConnection.cpp atmo/FnordlichtConnection.h \
-	atmo/AtmoPacketQueue.cpp atmo/AtmoPacketQueue.h
-SOURCES_gradfun = gradfun.c gradfun.h
-SOURCES_subsdelay = subsdelay.c
-SOURCES_hqdn3d = hqdn3d.c hqdn3d.h
-SOURCES_anaglyph = anaglyph.c
-SOURCES_oldmovie = oldmovie.c
-SOURCES_vhs = vhs.c
-SOURCES_freeze = freeze.c
-noinst_HEADERS = filter_picture.h
-
-video_filter_LTLIBRARIES += \
-	libadjust_plugin.la \
-	libalphamask_plugin.la \
-	libaudiobargraph_v_plugin.la \
-	libball_plugin.la \
-	libblend_plugin.la \
-	libblendbench_plugin.la \
-	libbluescreen_plugin.la \
-	libcanvas_plugin.la \
-	libcolorthres_plugin.la \
-	libcroppadd_plugin.la \
-	liberase_plugin.la \
-	libextract_plugin.la \
-	libgradient_plugin.la \
-	libgrain_plugin.la \
-	libgaussianblur_plugin.la \
-	libinvert_plugin.la \
-	liblogo_plugin.la \
-	libmagnify_plugin.la \
-	libmarq_plugin.la \
-	libmirror_plugin.la \
-	libmosaic_plugin.la \
-	libmotionblur_plugin.la \
-	libmotiondetect_plugin.la \
-	libposterize_plugin.la \
-	libpsychedelic_plugin.la \
-	libripple_plugin.la \
-	librss_plugin.la \
-	libscale_plugin.la \
-	libscene_plugin.la \
-	libsepia_plugin.la \
-	libsharpen_plugin.la \
-	libsubsdelay_plugin.la \
-	libtransform_plugin.la \
-	libwave_plugin.la \
-	libgradfun_plugin.la \
-	libyuvp_plugin.la \
-	libantiflicker_plugin.la \
-	libhqdn3d_plugin.la \
-	libanaglyph_plugin.la \
-	liboldmovie_plugin.la \
-	libvhs_plugin.la \
-	libfps_plugin.la \
-	libfreeze_plugin.la
-
+libopencv_example_plugin_la_SOURCES = opencv_example.cpp filter_event_info.h
+libopencv_example_plugin_la_CPPAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
+libopencv_example_plugin_la_LIBADD = $(OPENCV_LIBS)
+libopencv_example_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+video_filter_LTLIBRARIES += $(LTLIBopencv_example)
+EXTRA_LTLIBRARIES += libopencv_example_plugin.la
