@@ -298,7 +298,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_filename,
     }
     else
     {
-        psz_script = vlc_path2uri( psz_filename, "file" );
+        psz_script = strdup( psz_filename );
         if( !psz_script )
             return 0;
     }
