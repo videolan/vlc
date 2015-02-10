@@ -668,7 +668,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                 free( psz_filename );
                 goto error;
             }
-            if( luaL_dofile( L, psz_filename ) )
+            if( vlclua_dofile( VLC_OBJECT(probe), L, psz_filename ) )
             {
 
                 msg_Err( probe, "Error loading script %s: %s", psz_filename,
