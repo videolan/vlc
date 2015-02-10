@@ -654,7 +654,12 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
             for( int t = 0; t < 1 + !!b_wav; t++ )
             {
                 if( t == 1 )
+                {
+                    if(!i_samples)
+                        break;
                     i_size = i_samples * 2 * 2;
+                }
+
                 if( i_skip + i_check_size + i_size <= i_peek )
                 {
                     b_ok = pf_check( &p_peek[i_skip+i_size], NULL ) >= 0;
