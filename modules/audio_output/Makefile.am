@@ -5,8 +5,7 @@ libopensles_android_plugin_la_SOURCES = audio_output/opensles_android.c
 libopensles_android_plugin_la_LIBADD = $(LIBDL) $(LIBM)
 
 libandroid_audiotrack_plugin_la_SOURCES = audio_output/audiotrack.c
-libandroid_audiotrack_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-libandroid_audiotrack_plugin_la_LIBADD = $(LIBDL)
+libandroid_audiotrack_plugin_la_CFLAGS = $(AM_CFLAGS)
 
 if HAVE_ANDROID
 aout_LTLIBRARIES += libandroid_audiotrack_plugin.la libopensles_android_plugin.la
