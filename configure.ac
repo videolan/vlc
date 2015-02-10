@@ -699,7 +699,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([x264 goom noise swscale mpc qt4 x262 x26410b ncurses glspectrum smooth],[-lm])
+  VLC_ADD_LIBS([x264 goom swscale mpc qt4 x262 x26410b ncurses glspectrum smooth],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
