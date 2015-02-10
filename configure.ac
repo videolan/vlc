@@ -4136,7 +4136,6 @@ AC_CONFIG_FILES([
   bin/Makefile
   test/Makefile
   modules/access_output/Makefile
-  modules/control/Makefile
   modules/gui/Makefile
   modules/gui/ios_dialog_provider/Makefile
   modules/gui/macosx/Makefile

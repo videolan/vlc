@@ -4,7 +4,6 @@ check_PROGRAMS =
 EXTRA_DIST =
 
 BASE_SUBDIRS = \
-	control \
 	gui \
 	video_filter \
 	visualization
@@ -37,6 +36,7 @@ include audio_filter/Makefile.am
 include audio_mixer/Makefile.am
 include audio_output/Makefile.am
 include codec/Makefile.am
+include control/Makefile.am
 include demux/Makefile.am
 include hw/vdpau/Makefile.am
 include logger/Makefile.am

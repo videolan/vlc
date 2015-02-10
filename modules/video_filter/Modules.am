@@ -69,7 +69,7 @@ SOURCES_opencv_wrapper = opencv_wrapper.c
 SOURCES_opencv_example = opencv_example.cpp filter_event_info.h
 
 librotate_plugin_la_SOURCES = rotate.c
-librotate_plugin_la_LIBADD = ../control/libvlc_motion.la $(LIBM)
+librotate_plugin_la_LIBADD = ../libvlc_motion.la $(LIBM)
 librotate_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
 if HAVE_DARWIN
 librotate_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
