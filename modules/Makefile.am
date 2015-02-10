@@ -5,7 +5,6 @@ EXTRA_DIST =
 
 BASE_SUBDIRS = \
 	gui \
-	video_filter \
 	visualization
 EXTRA_SUBDIRS = \
 	access_output \
@@ -49,6 +48,7 @@ include services_discovery/Makefile.am
 include stream_filter/Makefile.am
 include text_renderer/Makefile.am
 include video_chroma/Makefile.am
+include video_filter/Makefile.am
 include video_splitter/Makefile.am
 include video_output/Makefile.am
 

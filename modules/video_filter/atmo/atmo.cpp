@@ -45,7 +45,7 @@
 #include <vlc_atomic.h>
 #include <vlc_charset.h>
 
-#include "filter_picture.h"
+#include "../filter_picture.h"
 
 #include "AtmoDefs.h"
 #include "AtmoDynData.h"

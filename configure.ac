@@ -4141,7 +4141,6 @@ AC_CONFIG_FILES([
   modules/gui/skins2/Makefile
   modules/mux/Makefile
   modules/stream_out/Makefile
-  modules/video_filter/Makefile
   modules/visualization/Makefile
   modules/hw/mmal/Makefile
 ])
