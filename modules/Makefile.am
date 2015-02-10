@@ -8,14 +8,13 @@ BASE_SUBDIRS = \
 	visualization
 EXTRA_SUBDIRS = \
 	access_output \
-	mux \
 	stream_out \
 	hw/mmal
 
 SUBDIRS = . $(BASE_SUBDIRS)
 DIST_SUBDIRS = . $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 if ENABLE_SOUT
-SUBDIRS += access_output mux stream_out
+SUBDIRS += access_output stream_out
 endif
 if HAVE_MMAL
 SUBDIRS += hw/mmal
@@ -51,6 +50,9 @@ include video_chroma/Makefile.am
 include video_filter/Makefile.am
 include video_splitter/Makefile.am
 include video_output/Makefile.am
+if ENABLE_SOUT
+include mux/Makefile.am
+endif
 
 BUILT_SOURCES += dummy.cpp
 
