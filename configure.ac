@@ -3886,9 +3886,7 @@ AS_HELP_STRING([--disable-atmo],[AtmoLight (homemade Philips Ambilight clone)
                 (default enabled)]),, [enable_atmo="yes"])
 AS_IF([test "${enable_atmo}" != no], [
   AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "linux"], [
-    AC_LANG_PUSH(C++)
     VLC_ADD_PLUGIN([atmo])
-    AC_LANG_POP(C++)
   ])
 ])
 
