@@ -161,7 +161,7 @@ video_filter_LTLIBRARIES += libdynamicoverlay_plugin.la
 endif
 
 libopencv_wrapper_plugin_la_SOURCES = video_filter/opencv_wrapper.c
-libopencv_wrapper_plugin_la_CPPAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
+libopencv_wrapper_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_wrapper_plugin_la_LIBADD = $(OPENCV_LIBS)
 libopencv_wrapper_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
 video_filter_LTLIBRARIES += $(LTLIBopencv_wrapper)
@@ -206,7 +206,7 @@ libblend_plugin_la_SOURCES = video_filter/blend.cpp
 video_filter_LTLIBRARIES += libblend_plugin.la
 
 libopencv_example_plugin_la_SOURCES = video_filter/opencv_example.cpp video_filter/filter_event_info.h
-libopencv_example_plugin_la_CPPAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
+libopencv_example_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_example_plugin_la_LIBADD = $(OPENCV_LIBS)
 libopencv_example_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
 video_filter_LTLIBRARIES += $(LTLIBopencv_example)
