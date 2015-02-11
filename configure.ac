@@ -699,7 +699,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([x264 goom swscale mpc qt4 x262 x26410b ncurses glspectrum smooth],[-lm])
+  VLC_ADD_LIBS([x264 goom swscale mpc qt4 x262 x26410b glspectrum smooth],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -3805,11 +3805,10 @@ dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
 [AS_HELP_STRING([--disable-ncurses],[ncurses text-based interface (default auto)])])
+have_ncurses="no"
 AS_IF([test "${enable_ncurses}" != "no"] ,[
   PKG_CHECK_MODULES([NCURSES], [ncursesw], [
-    VLC_ADD_PLUGIN([ncurses])
-    VLC_ADD_CFLAGS([ncurses],[${NCURSES_CFLAGS}])
-    VLC_ADD_LIBS([ncurses],[${NCURSES_LIBS} ${LIBPTHREAD}])
+    have_ncurses="yes"
     ALIASES="${ALIASES} nvlc"
   ], [
     AS_IF([test -n "${enable_ncurses}"], [
@@ -3817,6 +3816,7 @@ AS_IF([test "${enable_ncurses}" != "no"] ,[
     ])
   ])
 ])
+AM_CONDITIONAL([HAVE_NCURSES], [test "${have_ncurses}" = "yes"])
 
 dnl
 dnl  Lirc plugin
@@ -4131,7 +4131,6 @@ AC_CONFIG_FILES([
   bin/Makefile
   test/Makefile
   modules/access_output/Makefile
-  modules/gui/Makefile
   modules/gui/ios_dialog_provider/Makefile
   modules/gui/macosx/Makefile
   modules/gui/minimal_macosx/Makefile

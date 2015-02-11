@@ -4,7 +4,6 @@ check_PROGRAMS =
 EXTRA_DIST =
 
 BASE_SUBDIRS = \
-	gui \
 	visualization
 EXTRA_SUBDIRS = \
 	access_output \
@@ -36,6 +35,7 @@ include audio_output/Makefile.am
 include codec/Makefile.am
 include control/Makefile.am
 include demux/Makefile.am
+include gui/Makefile.am
 include hw/vdpau/Makefile.am
 include logger/Makefile.am
 include lua/Makefile.am
