@@ -3,15 +3,13 @@ noinst_HEADERS =
 check_PROGRAMS =
 EXTRA_DIST =
 
-BASE_SUBDIRS = \
-	visualization
 EXTRA_SUBDIRS = \
 	access_output \
 	stream_out \
 	hw/mmal
 
-SUBDIRS = . $(BASE_SUBDIRS)
-DIST_SUBDIRS = . $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
+SUBDIRS = .
+DIST_SUBDIRS = . $(EXTRA_SUBDIRS)
 if ENABLE_SOUT
 SUBDIRS += access_output stream_out
 endif
@@ -50,6 +48,7 @@ include video_chroma/Makefile.am
 include video_filter/Makefile.am
 include video_splitter/Makefile.am
 include video_output/Makefile.am
+include visualization/Makefile.am
 if ENABLE_SOUT
 include mux/Makefile.am
 endif

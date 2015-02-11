@@ -699,7 +699,7 @@ AC_CHECK_FUNC(getopt_long,, [
 AC_SUBST(GNUGETOPT_LIBS)
 
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([x264 goom swscale mpc qt4 x262 x26410b glspectrum smooth],[-lm])
+  VLC_ADD_LIBS([x264 swscale mpc qt4 x262 x26410b glspectrum smooth],[-lm])
   LIBM="-lm"
 ], [
   LIBM=""
@@ -3868,8 +3868,6 @@ AS_IF([test "${enable_vsxu}" != "no"],
     PKG_CHECK_MODULES(VSXU, libvsxu,
     [
       VLC_ADD_PLUGIN([vsxu])
-      VLC_ADD_CXXFLAGS([vsxu],[$VSXU_CFLAGS])
-      VLC_ADD_LIBS([vsxu],[$VSXU_LIBS])
     ],[
       AC_MSG_WARN([${VSXU_PKG_ERRORS}.])
     ])
@@ -3886,17 +3884,6 @@ AS_IF([test "${enable_atmo}" != no], [
     VLC_ADD_PLUGIN([atmo])
   ])
 ])
-
-dnl
-dnl  glSpectrum
-dnl
-AC_ARG_ENABLE(glspectrum,
-  [  --enable-glspectrum    3D OpenGL spectrum visualization (default auto)])
-if test "${enable_glspectrum}" != "no" && test "${have_gl}" = "yes"
-then
-    VLC_ADD_PLUGIN([glspectrum])
-    VLC_ADD_LIBS([glspectrum],[$GL_LIBS])
-fi
 
 EXTEND_HELP_STRING([Service Discovery plugins:])
 dnl
@@ -4138,7 +4125,6 @@ AC_CONFIG_FILES([
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
   modules/stream_out/Makefile
-  modules/visualization/Makefile
   modules/hw/mmal/Makefile
 ])
 
