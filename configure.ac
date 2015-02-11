@@ -650,7 +650,7 @@ AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
 
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([access_rtmp sap stream_out_standard stream_out_rtp stream_out_raop stream_out_chromecast ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([access_rtmp sap ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
@@ -3590,9 +3590,7 @@ dnl  chromaprint audio track fingerprinter
 dnl
 m4_pushdef([libchromaprint_version], 0.6.0)
 PKG_WITH_MODULES([CHROMAPRINT],[libchromaprint >= libchromaprint_version],
-    VLC_ADD_PLUGIN([stream_out_chromaprint])
-    VLC_ADD_CFLAGS([stream_out_chromaprint],[${CHROMAPRINT_CFLAGS}] [-I./webservices -I../stream_out])
-    VLC_ADD_LIBS([stream_out_chromaprint],[${CHROMAPRINT_LIBS}]),
+    VLC_ADD_PLUGIN([stream_out_chromaprint]),
     AS_IF([test "${enable_chromaprint}" = "yes"],
         [AC_MSG_ERROR(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)],
         [AC_MSG_WARN(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)]
@@ -3608,9 +3606,6 @@ AC_ARG_VAR(PROTOC, [protobuf compiler])
 AC_PATH_PROGS(PROTOC, protoc, no)
 PKG_WITH_MODULES([CHROMECAST],[protobuf-lite >= protobuf_lite_version], [
     AS_IF([test "x${PROTOC}" != "xno"], [
-        VLC_ADD_PLUGIN([stream_out_chromecast])
-        VLC_ADD_CXXFLAGS([stream_out_chromecast],[${CHROMECAST_CFLAGS}] [-I./chromecast])
-        VLC_ADD_LIBS([stream_out_chromecast],[${CHROMECAST_LIBS}])
         build_chromecast="yes"
     ], [
     AC_MSG_ERROR(protoc compiler needed for [chromecast] was not found)
@@ -4123,7 +4118,6 @@ AC_CONFIG_FILES([
   modules/gui/macosx_dialog_provider/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
-  modules/stream_out/Makefile
   modules/hw/mmal/Makefile
 ])
 

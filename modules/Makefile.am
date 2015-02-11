@@ -4,14 +4,10 @@ check_PROGRAMS =
 EXTRA_DIST =
 
 EXTRA_SUBDIRS = \
-	stream_out \
 	hw/mmal
 
 SUBDIRS = .
 DIST_SUBDIRS = . $(EXTRA_SUBDIRS)
-if ENABLE_SOUT
-SUBDIRS += stream_out
-endif
 if HAVE_MMAL
 SUBDIRS += hw/mmal
 endif
@@ -51,6 +47,7 @@ include visualization/Makefile.am
 if ENABLE_SOUT
 include access_output/Makefile.am
 include mux/Makefile.am
+include stream_out/Makefile.am
 endif
 
 BUILT_SOURCES += dummy.cpp
