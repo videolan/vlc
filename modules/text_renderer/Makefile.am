@@ -22,7 +22,7 @@ libfreetype_plugin_la_LIBADD += $(FRIBIDI_LIBS)
 endif
 
 libquartztext_plugin_la_SOURCES = text_renderer/quartztext.c
-libquartztext_plugin_la_LDFLAGS = $(AM_LFLFAGS) \
+libquartztext_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
 	-Wl,-framework,ApplicationServices
 EXTRA_LTLIBRARIES += libquartztext_plugin.la
 text_LTLIBRARIES += $(LTLIBquartztext)
