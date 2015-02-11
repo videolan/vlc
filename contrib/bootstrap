@@ -258,7 +258,7 @@ case "${OS}" in
 			*arm*)
 			add_make "PLATFORM_SHORT_ARCH := arm"
 			;;
-			*arm64*)
+			*arm64*|*aarch64*)
 			add_make "PLATFORM_SHORT_ARCH := arm64"
 			;;
 			*i686*)
