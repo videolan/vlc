@@ -4,14 +4,13 @@ check_PROGRAMS =
 EXTRA_DIST =
 
 EXTRA_SUBDIRS = \
-	access_output \
 	stream_out \
 	hw/mmal
 
 SUBDIRS = .
 DIST_SUBDIRS = . $(EXTRA_SUBDIRS)
 if ENABLE_SOUT
-SUBDIRS += access_output stream_out
+SUBDIRS += stream_out
 endif
 if HAVE_MMAL
 SUBDIRS += hw/mmal
@@ -50,6 +49,7 @@ include video_splitter/Makefile.am
 include video_output/Makefile.am
 include visualization/Makefile.am
 if ENABLE_SOUT
+include access_output/Makefile.am
 include mux/Makefile.am
 endif
 
