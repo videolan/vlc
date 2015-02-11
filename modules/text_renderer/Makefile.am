@@ -1,4 +1,4 @@
-textdir = $(pluginsdir)/text_render
+textdir = $(pluginsdir)/text_renderer
 
 libtdummy_plugin_la_SOURCES = text_renderer/tdummy.c
 text_LTLIBRARIES = libtdummy_plugin.la
