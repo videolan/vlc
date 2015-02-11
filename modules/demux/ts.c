@@ -1193,11 +1193,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->i_pmt_es == 0 && !p_sys->pid[0].b_seen )
         MissingPATPMTFixup( p_demux );
 
-    while( p_sys->i_pmt_es <= 0 )
-    {
-        if( Demux( p_demux ) != 1 )
-            break;
-    }
     return VLC_SUCCESS;
 }
 
