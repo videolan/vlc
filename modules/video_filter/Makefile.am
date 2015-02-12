@@ -196,7 +196,7 @@ video_filter_LTLIBRARIES += \
 
 libremoteosd_plugin_la_SOURCES = video_filter/remoteosd.c video_filter/remoteosd_rfbproto.h
 libremoteosd_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libremoteosd_plugin_la_LIBADD = $(GCRYPT_LIBS) $(LIBS_remoteosd) $(LIBPTHREAD)
+libremoteosd_plugin_la_LIBADD = $(GCRYPT_LIBS) $(SOCKET_LIBS) $(LIBPTHREAD)
 if HAVE_GCRYPT
 video_filter_LTLIBRARIES += libremoteosd_plugin.la
 endif

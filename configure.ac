@@ -648,10 +648,6 @@ AC_LINK_IFELSE([
     ])],[AC_DEFINE([HAVE_INET_PTON],[1],[Define to 1 if you have inet_pton function])],[AC_LIBOBJ([inet_pton])])
 AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
-
-AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([sap ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
-])
 AC_SUBST(SOCKET_LIBS)
 
 dnl Check for socklen_t
