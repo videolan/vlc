@@ -635,6 +635,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         msg_Warn(p_aout, "device driver does not support kAudioDevicePropertyPreferredChannelLayout - using stereo fallback [%4.4s]", (char *)&err);
         fmt->i_physical_channels = AOUT_CHANS_STEREO;
     }
+    fmt->i_original_channels = fmt->i_physical_channels;
 
     msg_Dbg(p_aout, "selected %d physical channels for device output", aout_FormatNbChannels(fmt));
     msg_Dbg(p_aout, "VLC will output: %s", aout_FormatPrintChannels(fmt));
