@@ -263,7 +263,7 @@ playlist.add( ... ): Add a bunch of items to the playlist.
       .arturl: the item's ArtURL (OPTIONAL, meta data)
       .trackid: the item's TrackID (OPTIONAL, meta data)
       .options: a list of VLC options (OPTIONAL)
-                example: .options = { "fullscreen" }
+                example: .options = { "run-time=60" }
       .duration: stream duration in seconds (OPTIONAL)
       .meta: custom meta data (OPTIONAL, meta data)
              A .meta field is a table of custom meta key value pairs.
