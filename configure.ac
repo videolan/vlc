@@ -650,7 +650,7 @@ AC_CHECK_FUNCS([if_nameindex if_nametoindex])
 VLC_RESTORE_FLAGS
 
 AS_IF([test -n "$SOCKET_LIBS"], [
-  VLC_ADD_LIBS([access_rtmp sap ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
+  VLC_ADD_LIBS([sap ts remoteosd audiobargraph_a],[${SOCKET_LIBS}])
 ])
 AC_SUBST(SOCKET_LIBS)
 
