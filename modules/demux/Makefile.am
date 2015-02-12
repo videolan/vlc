@@ -80,7 +80,7 @@ demux_LTLIBRARIES += libnsc_plugin.la
 
 libmpc_plugin_la_SOURCES = demux/mpc.c
 libmpc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
-libmpc_plugin_la_LIBADD = $(LIBS_mpc)
+libmpc_plugin_la_LIBADD = $(LIBS_mpc) $(LIBM)
 EXTRA_LTLIBRARIES += libmpc_plugin.la
 demux_LTLIBRARIES += $(LTLIBmpc)
 

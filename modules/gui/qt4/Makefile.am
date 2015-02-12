@@ -15,7 +15,7 @@ guidir = $(pluginsdir)/gui
 SUFFIXES += .ui .h .hpp .moc.cpp
 
 libqt4_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt4)
-libqt4_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt4)
+libqt4_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt4) $(LIBM)
 libqt4_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'
 if HAVE_OS2
 else
