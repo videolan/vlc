@@ -264,7 +264,7 @@ bool DASHManager::updateMPD()
 
     nextMPDupdate = now + (maxinterval - mininterval) / 2;
 
-    msg_Dbg(stream, "Updated MPD, next update in %"PRId64"s (%"PRId64"..%"PRId64")",
+    msg_Dbg(stream, "Updated MPD, next update in %" PRId64 "s (%" PRId64 "..%" PRId64 ")",
             nextMPDupdate - now, mininterval, maxinterval );
 
     return true;
