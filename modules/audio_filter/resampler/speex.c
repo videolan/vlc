@@ -22,6 +22,8 @@
 # include <config.h>
 #endif
 
+#include <inttypes.h>
+
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_filter.h>
@@ -124,7 +126,8 @@ static block_t *Resample (filter_t *filter, block_t *in)
     const unsigned orate = filter->fmt_out.audio.i_rate;
 
     spx_uint32_t ilen = in->i_nb_samples;
-    spx_uint32_t olen = ((ilen + 2) * orate * 11) / (irate * 10);
+    spx_uint32_t olen = ((ilen + 2) * orate * UINT64_C(11))
+                      / (irate * UINT64_C(10));
 
     block_t *out = block_Alloc (olen * framesize);
     if (unlikely(out == NULL))
