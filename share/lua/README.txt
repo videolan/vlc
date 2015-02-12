@@ -241,8 +241,8 @@ playlist.loop( [status] ): Toggle playlist loop or set to specified value.
 playlist.random( [status] ): Toggle playlist random or set to specified value.
 playlist.goto( id ): Go to specified track.
 playlist.add( ... ): Add a bunch of items to the playlist.
-  The playlist is a table of playlist objects.
-  A playlist object has the following members:
+  The playlist is a table of playlist items.
+  A playlist item has the following members:
       .path: the item's full path / URL
       .name: the item's name in playlist (OPTIONAL)
       .title: the item's Title (OPTIONAL, meta data)
