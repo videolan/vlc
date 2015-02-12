@@ -53,6 +53,7 @@ vlc_module_begin ()
     add_submodule ()
     set_capability ("audio resampler", 0)
     set_callbacks (OpenResampler, Close)
+    add_shortcut ("speex")
 vlc_module_end ()
 
 static block_t *Resample (filter_t *, block_t *);
