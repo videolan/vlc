@@ -20,6 +20,10 @@ if HAVE_FRIBIDI
 libfreetype_plugin_la_CPPFLAGS += $(FRIBIDI_CFLAGS) -DHAVE_FRIBIDI
 libfreetype_plugin_la_LIBADD += $(FRIBIDI_LIBS)
 endif
+libfreetype_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(FREETYPE_LDFLAGS) -rpath '$(textdir)'
+if HAVE_DARWIN
+libfreetype_plugin_la_LDFLAGS += -Wl,-framework,Carbon
+endif
 
 libquartztext_plugin_la_SOURCES = text_renderer/quartztext.c
 libquartztext_plugin_la_LDFLAGS = $(AM_LDLFAGS) -rpath '$(textdir)' \

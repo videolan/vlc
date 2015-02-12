@@ -3155,9 +3155,6 @@ if test "${enable_freetype}" != "no"; then
       VLC_ADD_CPPFLAGS([skins2],[${FREETYPE_CFLAGS}])
       VLC_ADD_LIBS([skins2],[${FREETYPE_LIBS}])
 
-      AC_CHECK_HEADERS(Carbon/Carbon.h,
-                       [VLC_ADD_LIBS([freetype],[-Wl,-framework,Carbon])])
-
       dnl fontconfig support
       if test "${SYS}" != "mingw32"; then
           if test "${enable_fontconfig}" != "no"; then
