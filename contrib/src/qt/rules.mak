@@ -36,13 +36,6 @@ endif
 .qt: qt
 	cd $< && ./configure $(QT_PLATFORM) -static -release -no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -opensource -confirm-license
 	cd $< && $(MAKE) sub-src
-	# BUILDING QT BUILD TOOLS
-ifdef HAVE_CROSS_COMPILE
-	cd $</src/tools; $(MAKE) clean; \
-		for i in bootstrap uic rcc moc; \
-			do (cd $$i; ../../../bin/qmake; $(MAKE) clean; $(MAKE)); \
-		done
-endif
 	# INSTALLING LIBRARIES
 	for lib in Widgets Gui Core; \
 		do install -D -- $</lib/libQt5$${lib}.a "$(PREFIX)/lib/libQt5$${lib}.a"; \
@@ -64,6 +57,14 @@ endif
 	for i in Core Gui Widgets; \
 		do cat $(SRC)/qt/Qt5$${i}.pc.in | sed -e s/@@VERSION@@/$(QT_VERSION)/ | sed -e 's|@@PREFIX@@|$(PREFIX)|' > "$(PREFIX)/lib/pkgconfig/Qt5$${i}.pc"; \
 	done
+	# BUILDING QT BUILD TOOLS
+ifdef HAVE_CROSS_COMPILE
+	cd $</include/QtCore; ln -sf $(QT_VERSION)/QtCore/private
+	cd $</src/tools; $(MAKE) clean; \
+		for i in bootstrap uic rcc moc; \
+			do (cd $$i; echo $i && ../../../bin/qmake -spec win32-g++ ; $(MAKE) clean; $(MAKE)); \
+		done
+endif
 	# INSTALLING QT BUILD TOOLS
 	install -d "$(PREFIX)/bin/"
 	for i in rcc moc uic; \
