@@ -400,19 +400,19 @@ package: install
 
 list:
 	@echo All packages:
-	@echo '  $(PKGS_ALL)' | fmt
+	@echo '  $(PKGS_ALL)' | tr " " "\n" | sort | tr "\n" " " |fmt
 	@echo Distribution-provided packages:
-	@echo '  $(PKGS_FOUND)' | fmt
+	@echo '  $(PKGS_FOUND)' | tr " " "\n" | sort | tr "\n" " " |fmt
 	@echo Automatically selected packages:
-	@echo '  $(PKGS_AUTOMATIC)' | fmt
+	@echo '  $(PKGS_AUTOMATIC)' | tr " " "\n" | sort | tr "\n" " " |fmt
 	@echo Manually deselected packages:
-	@echo '  $(PKGS_DISABLE)' | fmt
+	@echo '  $(PKGS_DISABLE)' | tr " " "\n" | sort | tr "\n" " " |fmt
 	@echo Manually selected packages:
-	@echo '  $(PKGS_ENABLE)' | fmt
+	@echo '  $(PKGS_ENABLE)' | tr " " "\n" | sort | tr "\n" " " |fmt
 	@echo Depended-on packages:
-	@echo '  $(PKGS_DEPS)' | fmt
+	@echo '  $(PKGS_DEPS)' | tr " " "\n" | sort | tr "\n" " " |fmt
 	@echo To-be-built packages:
-	@echo '  $(PKGS)' | fmt
+	@echo '  $(PKGS)' | tr " " "\n" | sort | tr "\n" " " |fmt
 
 .PHONY: all fetch fetch-all install mostlyclean clean distclean package list prebuilt
 
