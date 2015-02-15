@@ -179,6 +179,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
     if (!OSX_SNOW_LEOPARD)
         [o_prefs_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [o_prefs_window setHidesOnDeactivate:YES];
 
     [self initStrings];
     [o_prefs_view setBorderType: NSGrooveBorder];

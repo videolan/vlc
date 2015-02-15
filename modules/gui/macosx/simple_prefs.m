@@ -229,6 +229,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
     if (!OSX_SNOW_LEOPARD)
         [o_sprefs_win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [o_sprefs_win setHidesOnDeactivate:YES];
 
     [o_hotkeys_listbox setTarget:self];
     [o_hotkeys_listbox setDoubleAction:@selector(hotkeyTableDoubleClick:)];
