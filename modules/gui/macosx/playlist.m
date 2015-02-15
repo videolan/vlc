@@ -1060,10 +1060,8 @@
 
         [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode];
 
-        [[VLCCoreInteraction sharedInstance] pause];
         returnValue = [theAlert runModal];
         [timer invalidate];
-        [[VLCCoreInteraction sharedInstance] playOrPause];
 
         // restart button was pressed or timeout happened
         if (returnValue == NSAlertAlternateReturn ||
