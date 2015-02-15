@@ -1150,8 +1150,8 @@ static int  Open ( vlc_object_t *p_this )
        {
            p_sys->param.analyse.i_me_method = X264_ME_TESA;
        }
-       free( psz_val );
     }
+    free( psz_val );
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "merange" );
     if( i_val >= 0 && i_val <= 64 && i_val != 16 )
