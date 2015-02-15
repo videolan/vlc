@@ -482,6 +482,8 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
         dvbpsi_DeletePSISections( sect );
         dvbpsi_EmptySDT( &sdtpsi );
     }
+
+    free( dvbpmt );
 }
 
 
