@@ -24,6 +24,7 @@ $(TARBALLS)/qt-$(QT_VERSION).tar.xz:
 qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(UNPACK)
 	mv qtbase-opensource-src-$(QT_VERSION) qt-$(QT_VERSION)
+	$(APPLY) $(SRC)/qt/Win32-AOT.patch
 	$(MOVE)
 
 ifdef HAVE_MACOSX

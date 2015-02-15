@@ -1,0 +1,11 @@
+--- qt/src/plugins/platforms/windows/qwindowswindow.cpp.old	2015-02-15 21:05:36.302825488 +0100
++++ qt/src/plugins/platforms/windows/qwindowswindow.cpp	2015-02-15 21:06:11.562824592 +0100
+@@ -651,7 +651,7 @@
+         } else if (flags & Qt::WindowStaysOnBottomHint) {
+             SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0, swpFlags);
+         } else if (frameChange) { // Force WM_NCCALCSIZE with wParam=1 in case of custom margins.
+-            SetWindowPos(hwnd, 0, 0, 0, 0, 0, swpFlags);
++            SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, swpFlags);
+         }
+         if (flags & (Qt::CustomizeWindowHint|Qt::WindowTitleHint)) {
+             HMENU systemMenu = GetSystemMenu(hwnd, FALSE);
