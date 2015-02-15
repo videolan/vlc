@@ -2050,6 +2050,80 @@ static block_t *Opus_Parse(demux_t *demux, block_t *block)
 /****************************************************************************
  * gathering stuff
  ****************************************************************************/
+static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header,
+                           unsigned *pi_skip, mtime_t *pi_dts, mtime_t *pi_pts )
+{
+    unsigned i_skip;
+
+    switch( p_header[3] )
+    {
+    case 0xBC:  /* Program stream map */
+    case 0xBE:  /* Padding */
+    case 0xBF:  /* Private stream 2 */
+    case 0xF0:  /* ECM */
+    case 0xF1:  /* EMM */
+    case 0xFF:  /* Program stream directory */
+    case 0xF2:  /* DSMCC stream */
+    case 0xF8:  /* ITU-T H.222.1 type E stream */
+        i_skip = 6;
+        break;
+    default:
+        if( ( p_header[6]&0xC0 ) == 0x80 )
+        {
+            /* mpeg2 PES */
+            i_skip = p_header[8] + 9;
+
+            if( p_header[7]&0x80 )    /* has pts */
+            {
+                *pi_pts = ExtractPESTimestamp( &p_header[9] );
+
+                if( p_header[7]&0x40 )    /* has dts */
+                    *pi_dts = ExtractPESTimestamp( &p_header[14] );
+            }
+        }
+        else
+        {
+            i_skip = 6;
+            while( i_skip < 23 && p_header[i_skip] == 0xff )
+            {
+                i_skip++;
+            }
+            if( i_skip == 23 )
+            {
+                msg_Err( p_demux, "too much MPEG-1 stuffing" );
+                return VLC_EGENERIC;
+            }
+            if( ( p_header[i_skip] & 0xC0 ) == 0x40 )
+            {
+                i_skip += 2;
+            }
+
+            if(  p_header[i_skip]&0x20 )
+            {
+                *pi_pts = ExtractPESTimestamp( &p_header[i_skip] );
+
+                if( p_header[i_skip]&0x10 )    /* has dts */
+                {
+                    *pi_dts = ExtractPESTimestamp( &p_header[i_skip+5] );
+                    i_skip += 10;
+                }
+                else
+                {
+                    i_skip += 5;
+                }
+            }
+            else
+            {
+                i_skip += 1;
+            }
+        }
+        break;
+    }
+
+    *pi_skip = i_skip;
+    return VLC_SUCCESS;
+}
+
 static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -2073,74 +2147,17 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     }
 
     /* TODO check size */
-    switch( header[3] )
+    if( ParsePESHeader( p_demux, (uint8_t*)&header, &i_skip, &i_dts, &i_pts ) == VLC_EGENERIC )
     {
-    case 0xBC:  /* Program stream map */
-    case 0xBE:  /* Padding */
-    case 0xBF:  /* Private stream 2 */
-    case 0xF0:  /* ECM */
-    case 0xF1:  /* EMM */
-    case 0xFF:  /* Program stream directory */
-    case 0xF2:  /* DSMCC stream */
-    case 0xF8:  /* ITU-T H.222.1 type E stream */
-        i_skip = 6;
-        break;
-    default:
-        if( ( header[6]&0xC0 ) == 0x80 )
-        {
-            /* mpeg2 PES */
-            i_skip = header[8] + 9;
-
-            if( header[7]&0x80 )    /* has pts */
-            {
-                i_pts = ExtractPESTimestamp( &header[9] );
-                i_pts = AdjustPTSWrapAround( p_demux, i_pts );
-
-                if( header[7]&0x40 )    /* has dts */
-                {
-                    i_dts = ExtractPESTimestamp( &header[14] );
-                    i_dts = AdjustPTSWrapAround( p_demux, i_dts );
-                }
-            }
-        }
-        else
-        {
-            i_skip = 6;
-            while( i_skip < 23 && header[i_skip] == 0xff )
-            {
-                i_skip++;
-            }
-            if( i_skip == 23 )
-            {
-                msg_Err( p_demux, "too much MPEG-1 stuffing" );
-                block_ChainRelease( p_pes );
-                return;
-            }
-            if( ( header[i_skip] & 0xC0 ) == 0x40 )
-            {
-                i_skip += 2;
-            }
-
-            if(  header[i_skip]&0x20 )
-            {
-                i_pts = ExtractPESTimestamp( &header[i_skip] );
-
-                if( header[i_skip]&0x10 )    /* has dts */
-                {
-                    i_dts = ExtractPESTimestamp( &header[i_skip+5] );
-                    i_skip += 10;
-                }
-                else
-                {
-                    i_skip += 5;
-                }
-            }
-            else
-            {
-                i_skip += 1;
-            }
-        }
-        break;
+        block_ChainRelease( p_pes );
+        return;
+    }
+    else
+    {
+        if( i_pts != -1 )
+            i_pts = AdjustPTSWrapAround( p_demux, i_pts );
+        if( i_dts != -1 )
+            i_dts = AdjustPTSWrapAround( p_demux, i_dts );
     }
 
     if( pid->es->fmt.i_codec == VLC_FOURCC( 'a', '5', '2', 'b' ) ||
