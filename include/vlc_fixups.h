@@ -369,4 +369,8 @@ struct addrinfo
 #define nanf(tagp) NAN
 #endif
 
+#ifdef _WIN32
+FILE *vlc_win32_tmpfile(void);
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */
