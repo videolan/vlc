@@ -73,12 +73,14 @@ struct sout_stream_id_sys_t
 static int Open( vlc_object_t *p_this )
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys;
+    sout_stream_sys_t *p_sys = malloc(sizeof(sout_stream_sys_t));
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
 
     p_stream->pf_add  = Add;
     p_stream->pf_del  = Del;
     p_stream->pf_send = Send;
-    p_sys = p_stream->p_sys = malloc(sizeof(sout_stream_sys_t));
+    p_stream->p_sys = p_sys;
 
     p_sys->data = var_InheritAddress(p_stream, "sout-description-data");
     if (p_sys->data == NULL)
