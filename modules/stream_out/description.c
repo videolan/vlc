@@ -63,10 +63,6 @@ struct sout_stream_sys_t
     mtime_t i_stream_start;
 };
 
-struct sout_stream_id_sys_t
-{
-};
-
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -111,12 +107,12 @@ static void Close( vlc_object_t *p_this )
 static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_stream_id_sys_t *id;
-    es_format_t *p_fmt_copy;
+    es_format_t *p_fmt_copy = malloc( sizeof( *p_fmt_copy ) );
+
+    if( unlikely(p_fmt_copy == NULL ) )
+        return NULL;
 
     msg_Dbg( p_stream, "Adding a stream" );
- 
-    p_fmt_copy = malloc(sizeof(es_format_t));
     es_format_Copy( p_fmt_copy, p_fmt );
 
     TAB_APPEND( p_sys->data->i_es, p_sys->data->es, p_fmt_copy );
@@ -124,15 +120,14 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( p_sys->i_stream_start <= 0 )
         p_sys->i_stream_start = mdate();
 
-    id = malloc( sizeof( sout_stream_id_sys_t ) );
-    return id;
+    return (void *)p_fmt_copy;
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     msg_Dbg( p_stream, "Removing a stream" );
-
-    free( id );
+    /* NOTE: id should be freed by the input manager, not here. */
+    (void) id;
     return VLC_SUCCESS;
 }
 
