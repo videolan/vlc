@@ -102,6 +102,8 @@ static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
                               void **restrict pv)
 {
     (void) iid; (void) actparms;
+    IAudioClient* client = (IAudioClient*)opaque;
+    IAudioClient_AddRef(client);
     *pv = opaque;
 
     return S_OK;
