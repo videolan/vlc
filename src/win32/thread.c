@@ -669,18 +669,18 @@ mtime_t mdate (void)
 
 static union
 {
-    struct
-    {
 #if (_WIN32_WINNT < 0x0601)
-        BOOL (*query) (PULONGLONG);
-#endif
-    } interrupt;
     struct
     {
-#if (_WIN32_WINNT < 0x0600)
-        ULONGLONG (*get) (void);
+        BOOL (*query) (PULONGLONG);
+    } interrupt;
 #endif
+#if (_WIN32_WINNT < 0x0600)
+    struct
+    {
+        ULONGLONG (*get) (void);
     } tick;
+#endif
     struct
     {
         LARGE_INTEGER freq;
