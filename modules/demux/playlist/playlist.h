@@ -53,7 +53,6 @@ void Close_xspf ( vlc_object_t * );
 int Import_Shoutcast ( vlc_object_t * );
 
 int Import_ASX ( vlc_object_t * );
-void Close_ASX ( vlc_object_t * );
 
 int Import_SGIMB ( vlc_object_t * );
 void Close_SGIMB ( vlc_object_t * );

@@ -41,10 +41,6 @@
 
 #include "playlist.h"
 
-struct demux_sys_t
-{
-};
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -158,23 +154,14 @@ int Import_ASX( vlc_object_t *p_this )
         ) ||
         demux_IsForced( p_demux, "asx-open" ) )
     {
-        STANDARD_DEMUX_INIT_MSG( "found valid ASX playlist" );
-        return VLC_SUCCESS;
+        msg_Dbg( p_demux, "found valid ASX playlist" );
     }
     else
         return VLC_EGENERIC;
-}
 
-/*****************************************************************************
- * Deactivate: frees unused data
- *****************************************************************************/
-
-void Close_ASX( vlc_object_t *p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    free( p_sys );
+    p_demux->pf_control = Control;
+    p_demux->pf_demux = Demux;
+    return VLC_SUCCESS;
 }
 
 static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
