@@ -248,7 +248,7 @@ static void *Run( void *data )
         vlc_restorecancel (canc);
     }
     vlc_cleanup_pop();
-    assert(0); /* dead code */
+    vlc_assert_unreachable(); /* dead code */
 }
 
 static int UrlsChange( vlc_object_t *p_this, char const *psz_var,

@@ -220,7 +220,7 @@ static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGE
     }
     @catch (NSException * e) {
         NSLog(@"Strange CGEventType: %d: %@", type, e);
-        assert(0);
+        vlc_assert_unreachable();
         return event;
     }
 

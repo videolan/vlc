@@ -155,7 +155,7 @@ size_t vlc_towc (const char *str, uint32_t *restrict pwc)
             break;
 
         default:
-            assert (0);
+            vlc_assert_unreachable ();
     }
 
     /* Unrolled continuation bytes decoding */

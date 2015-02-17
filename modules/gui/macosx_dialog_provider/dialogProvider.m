@@ -389,7 +389,7 @@ bool checkProgressPanel (void *priv)
             ret = 3;
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
             ret = 0;
             break;
     }
@@ -666,7 +666,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             return spinner;
         }
         default:
-            assert(0);
+            vlc_assert_unreachable();
             return nil;
     }
 

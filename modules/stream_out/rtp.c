@@ -1499,7 +1499,7 @@ static void *rtp_listen_thread( void *data )
         vlc_restorecancel( canc );
     }
 
-    assert( 0 );
+    vlc_assert_unreachable();
 }
 
 

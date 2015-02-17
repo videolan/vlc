@@ -192,7 +192,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             PackedYUVPosterize( p_pic, p_outpic, level );
             break;
         default:
-            assert( false );
+            vlc_assert_unreachable();
     }
 
     return CopyInfoAndRelease( p_outpic, p_pic );
@@ -316,7 +316,7 @@ static void PackedYUVPosterize( picture_t *p_pic, picture_t *p_outpic, int i_lev
                     u = *p_in++;
                     break;
                 default:
-                    assert( false );
+                    vlc_assert_unreachable();
             }
             /* do posterization */
             YuvPosterization( &posterized_y1, &posterized_y2, &posterized_u,
@@ -349,7 +349,7 @@ static void PackedYUVPosterize( picture_t *p_pic, picture_t *p_outpic, int i_lev
                     *p_out++ = posterized_u;
                     break;
                 default:
-                    assert( false );
+                    vlc_assert_unreachable();
             }
         }
         p_in += p_pic->p[0].i_pitch - p_pic->p[0].i_visible_pitch;

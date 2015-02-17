@@ -373,7 +373,7 @@ do { \
         case VLC_CODEC_FL32: INTERLEAVE_TYPE(float);    break;
         case VLC_CODEC_S32N: INTERLEAVE_TYPE(int32_t);  break;
         case VLC_CODEC_FL64: INTERLEAVE_TYPE(double);   break;
-        default:             assert(0);
+        default:             vlc_assert_unreachable();
     }
 #undef INTERLEAVE_TYPE
 }
@@ -409,7 +409,7 @@ do { \
         case VLC_CODEC_FL32: DEINTERLEAVE_TYPE(float);    break;
         case VLC_CODEC_S32N: DEINTERLEAVE_TYPE(int32_t);  break;
         case VLC_CODEC_FL64: DEINTERLEAVE_TYPE(double);   break;
-        default:             assert(0);
+        default:             vlc_assert_unreachable();
     }
 #undef DEINTERLEAVE_TYPE
 }

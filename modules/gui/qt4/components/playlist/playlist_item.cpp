@@ -94,7 +94,7 @@ int PLItem::id( int type )
         return i_playlist_id;
     default:
     case MLMEDIA_ID:
-        assert( 0 );
+        vlc_assert_unreachable();
         return -1;
     }
 }

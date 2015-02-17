@@ -159,8 +159,7 @@ static inline uint32_t CanonicaliseChannels( uint32_t i_physical_channels )
         if( (i_physical_channels & ~valid_channels[i]) == 0 )
             return valid_channels[i];
 
-    assert( false );
-    return 0;
+    vlc_assert_unreachable();
 }
 
 /*****************************************************************************

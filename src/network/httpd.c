@@ -1560,7 +1560,7 @@ static void httpd_ClientRecv(httpd_client_t *cl)
                             break;
                         }
                         default:
-                            assert(0);
+                            vlc_assert_unreachable();
                     }
                     i_len = 0; /* drop */
                 }

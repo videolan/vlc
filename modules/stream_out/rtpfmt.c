@@ -486,7 +486,7 @@ int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
                         c1 = c2 = 4;
                         break;
                     default:
-                        assert(0);
+                        vlc_assert_unreachable();
                 }
 
                 if( asprintf( &rtp_fmt->fmtp,
@@ -1550,7 +1550,7 @@ static int rtp_packetize_rawvideo( sout_stream_id_sys_t *id, block_t *in, vlc_fo
             i_xdec = i_ydec = 2;
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
     }
 
     static const int RTP_HEADER_LEN = 12;
@@ -1653,7 +1653,7 @@ static int rtp_packetize_rawvideo( sout_stream_id_sys_t *id, block_t *in, vlc_fo
                 p_outdata += i_length;
                 p_data += i_length;
             }
-            else assert(0);
+            else vlc_assert_unreachable();
         }
 
         /* rtp common header */

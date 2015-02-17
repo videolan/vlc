@@ -2107,7 +2107,7 @@ static void* TimeoutPrevention( void *p_data )
 
         msleep (((int64_t)p_timeout->p_sys->i_timeout - 2) * CLOCK_FREQ);
     }
-    assert(0); /* dead code */
+    vlc_assert_unreachable(); /* dead code */
 }
 
 /*****************************************************************************

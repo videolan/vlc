@@ -95,7 +95,7 @@ static void *vlc_timer_thread (void *data)
     }
 
     vlc_cleanup_pop ();
-    assert (0);
+    vlc_assert_unreachable ();
 }
 
 /**

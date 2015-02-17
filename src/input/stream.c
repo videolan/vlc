@@ -633,7 +633,7 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             case STREAM_METHOD_STREAM:
                 return AStreamSeekStream( s, offset );
             default:
-                assert(0);
+                vlc_assert_unreachable();
                 return VLC_EGENERIC;
             }
         }

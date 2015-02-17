@@ -270,7 +270,7 @@ int vlc_event_attach( vlc_event_manager_t * p_em,
         }
     FOREACH_END()
     /* Unknown event = BUG */
-    assert( 0 );
+    vlc_assert_unreachable();
 }
 
 /**
@@ -311,5 +311,5 @@ void vlc_event_detach( vlc_event_manager_t *p_em,
         }
     FOREACH_END()
 
-    assert( 0 );
+    vlc_assert_unreachable();
 }

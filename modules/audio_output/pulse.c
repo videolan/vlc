@@ -430,7 +430,7 @@ static void context_cb(pa_context *ctx, pa_subscription_event_type_t type,
             break;
 
         default: /* unsubscribed facility?! */
-            assert(0);
+            vlc_assert_unreachable();
     }
 }
 

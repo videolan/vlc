@@ -611,8 +611,7 @@ JNIThread( void *data )
                                        &p_sys->p_cmd->out.time_get.i_delay );
                 break;
             default:
-                assert( false );
-                break;
+                vlc_assert_unreachable();
         }
         if( b_error )
             p_sys->b_thread_run = false;

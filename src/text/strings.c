@@ -499,7 +499,7 @@ char *str_format_time( const char *tformat )
         }
         free (str);
     }
-    assert (0);
+    vlc_assert_unreachable ();
 }
 
 static void write_duration(FILE *stream, int64_t duration)

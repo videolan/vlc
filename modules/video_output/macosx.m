@@ -376,7 +376,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         }
 
         case VOUT_DISPLAY_RESET_PICTURES:
-            assert (0);
+            vlc_assert_unreachable ();
         default:
             msg_Err (vd, "Unknown request in Mac OS X vout display");
             return VLC_EGENERIC;

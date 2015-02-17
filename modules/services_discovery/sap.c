@@ -603,7 +603,7 @@ static void *Run( void *data )
         else if( timeout < 200 )
             timeout = 200; /* Don't wakeup too fast. */
     }
-    assert (0);
+    vlc_assert_unreachable ();
 }
 
 /**********************************************************************

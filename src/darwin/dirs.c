@@ -132,7 +132,7 @@ static char *getAppDependentDir(vlc_userdir_t type)
             psz_path = "%s/Library/Caches/%s";
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
             break;
     }
 

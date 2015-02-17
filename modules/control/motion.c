@@ -188,7 +188,7 @@ static void *RunIntf( void *data )
 
         vlc_restorecancel( canc );
     }
-    assert(0);
+    vlc_assert_unreachable();
 }
 #undef LOW_THRESHOLD
 #undef HIGH_THRESHOLD

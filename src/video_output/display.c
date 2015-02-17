@@ -544,7 +544,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
         m.b_double_click = true;
         break;
     default:
-        assert(0);
+        vlc_assert_unreachable();
     }
 
     if (is_ignored) {

@@ -273,7 +273,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
             p_dec->fmt_out.i_codec = VLC_CODEC_WIDI_LPCM;
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
         case LPCM_BD:
             p_dec->fmt_out.i_codec = VLC_CODEC_BD_LPCM;
             break;
@@ -451,7 +451,7 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
             AobExtract( p_aout_buffer, p_block, i_bits, p_aob_group );
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
         case LPCM_BD:
             BdExtract( p_aout_buffer, p_block, i_frame_length, i_channels, i_channels_padding, i_bits );
             break;
@@ -575,7 +575,7 @@ static block_t *EncodeFrames( encoder_t *p_enc, block_t *p_aout_buf )
         i_freq_code = 3;
         break;
     default:
-        assert(0);
+        vlc_assert_unreachable();
     }
 
     int i_bytes_consumed = 0;

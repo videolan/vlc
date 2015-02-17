@@ -160,7 +160,7 @@ static void *RunThread (void *self)
     }
 
     vlc_cleanup_pop ();
-    assert (0);
+    vlc_assert_unreachable ();
 }
 
 #undef sout_AnnounceRegisterSDP
@@ -310,7 +310,7 @@ sout_AnnounceRegisterSDP (vlc_object_t *obj, const char *sdp,
             length += 4;
             break;
         default:
-            assert (0);
+            vlc_assert_unreachable ();
     }
 
     /* XXX: Check for dupes */

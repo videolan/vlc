@@ -248,7 +248,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         return VLC_SUCCESS;
 
     case VOUT_DISPLAY_RESET_PICTURES:
-        assert (0);
+        vlc_assert_unreachable ();
     default:
         msg_Err (vd, "Unknown request in XCB vout display");
         return VLC_EGENERIC;

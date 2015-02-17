@@ -429,7 +429,7 @@ connect:
             break;
 
         default:
-            assert(0);
+            vlc_assert_unreachable();
     }
 
     if( p_sys->i_code == 401 )

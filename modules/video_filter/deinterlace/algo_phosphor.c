@@ -336,7 +336,7 @@ int RenderPhosphor( filter_t *p_filter,
             break;
         default:
             /* The above are the only possibilities, if there are no bugs. */
-            assert(0);
+            vlc_assert_unreachable();
             break;
         }
     }

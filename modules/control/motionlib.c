@@ -194,7 +194,7 @@ static int GetOrientation( motion_sensors_t *motion )
             return 0;
 #endif
     default:
-        assert( 0 );
+        vlc_assert_unreachable();
     }
 }
 

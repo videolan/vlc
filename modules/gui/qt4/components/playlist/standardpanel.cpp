@@ -787,7 +787,7 @@ void StandardPLPanel::cycleViews()
 #endif
         showView( ICON_VIEW );
     else
-        assert( 0 );
+        vlc_assert_unreachable();
 }
 
 void StandardPLPanel::activate( const QModelIndex &index )

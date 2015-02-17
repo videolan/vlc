@@ -583,7 +583,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_GET_ES_OBJECTS_BY_ID:
     case ES_OUT_SET_DELAY:
     case ES_OUT_SET_RECORD_STATE:
-        assert(0);
+        vlc_assert_unreachable();
         return VLC_EGENERIC;
 
     /* Pass-through control */
@@ -700,7 +700,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
 
     default:
         msg_Err( p_sys->p_input, "Unknown es_out_Control query !" );
-        assert(0);
+        vlc_assert_unreachable();
         return VLC_EGENERIC;
     }
 }
@@ -1041,7 +1041,7 @@ static void *TsRun( void *p_data )
             CmdExecuteDel( p_ts->p_out, &cmd );
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
             break;
         }
         vlc_restorecancel( canc );
@@ -1222,7 +1222,7 @@ static void CmdClean( ts_cmd_t *p_cmd )
     case C_DEL:
         break;
     default:
-        assert(0);
+        vlc_assert_unreachable();
         break;
     }
 }
@@ -1437,7 +1437,7 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     }
 
     default:
-        assert(0);
+        vlc_assert_unreachable();
         return VLC_EGENERIC;
     }
 
@@ -1506,7 +1506,7 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
                                                p_cmd->u.control.u.jitter.i_cr_average );
 
     default:
-        assert(0);
+        vlc_assert_unreachable();
         return VLC_EGENERIC;
     }
 }

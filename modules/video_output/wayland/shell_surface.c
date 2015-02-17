@@ -87,7 +87,7 @@ static void *Thread(void *data)
         wl_display_read_events(display);
         wl_display_dispatch_pending(display);
     }
-    assert(0);
+    vlc_assert_unreachable();
     vlc_cleanup_pop();
     //vlc_restorecancel(canc);
     //return NULL;

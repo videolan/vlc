@@ -149,7 +149,7 @@ void SoutDialog::addDest( )
             caption = "Icecast";
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
             return;
     }
 

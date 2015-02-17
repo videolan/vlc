@@ -241,7 +241,7 @@ static void VerticalMirror( picture_t *p_pic, picture_t *p_outpic, int i_plane,
             RV32VerticalMirror( p_pic, p_outpic, i_plane, b_left_to_right );
             break;
         default:
-            assert( false );
+            vlc_assert_unreachable();
     }
 }
 

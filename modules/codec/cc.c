@@ -479,7 +479,7 @@ static int Eia608GetWritingScreenIndex( eia608_t *h )
         return h->i_screen;
     default:
         /* It cannot happen, else it is a bug */
-        assert( 0 );
+        vlc_assert_unreachable();
         return 0;
     }
 }

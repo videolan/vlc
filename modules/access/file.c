@@ -366,7 +366,7 @@ static ssize_t StreamRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
 
 static int NoSeek (access_t *p_access, uint64_t i_pos)
 {
-    /* assert(0); ?? */
+    /* vlc_assert_unreachable(); ?? */
     (void) p_access; (void) i_pos;
     return VLC_EGENERIC;
 }

@@ -224,7 +224,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
             fmt->i_physical_channels = AOUT_CHANS_7_1;
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
     }
 
     fmt->i_format = VLC_CODEC_S16N;

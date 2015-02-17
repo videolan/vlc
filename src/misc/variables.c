@@ -255,7 +255,7 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             p_var->ops = &void_ops;
             break;
         default:
-            assert (0);
+            vlc_assert_unreachable ();
     }
 
     if( (i_type & VLC_VAR_DOINHERIT)
@@ -904,7 +904,7 @@ static int DelCallback( vlc_object_t *p_this, const char *psz_name,
         if( b_found_similar )
             fprintf( stderr, "Calling var_DelCallback for '%s' with the same "
                              "function but not the same data.", psz_name );
-        assert( 0 );
+        vlc_assert_unreachable();
 #endif
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_EGENERIC;
@@ -1275,7 +1275,7 @@ int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
             p_val->b_bool = config_GetInt( p_this, psz_name );
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
         case VLC_VAR_ADDRESS:
             return VLC_ENOOBJ;
     }

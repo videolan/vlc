@@ -381,7 +381,7 @@ static picture_t *VideoImport(filter_t *filter, picture_t *src)
             fmt.i_chroma = VLC_CODEC_VDPAU_VIDEO_444;
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
     }
 
     picture_t *dst = picture_NewFromFormat(&fmt);
@@ -433,7 +433,7 @@ static picture_t *VideoRender(filter_t *filter, picture_t *src)
              case VDP_CHROMA_TYPE_420: fmt.i_chroma = VLC_CODEC_NV12; break;
              case VDP_CHROMA_TYPE_422: fmt.i_chroma = VLC_CODEC_UYVY; break;
              case VDP_CHROMA_TYPE_444: fmt.i_chroma = VLC_CODEC_NV24; break;
-             default: assert(0);
+             default: vlc_assert_unreachable();
         }
 
         picture_t *pic = picture_NewFromFormat(&fmt);

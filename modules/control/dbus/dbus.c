@@ -630,7 +630,7 @@ static void ProcessEvents( intf_thread_t *p_intf,
             break;
         }
         default:
-            assert(0);
+            vlc_assert_unreachable();
         }
         free( p_events[i] );
     }
@@ -1015,7 +1015,7 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
     else if( !strcmp( "can-pause", psz_var ) )
         info.signal = SIGNAL_CAN_PAUSE;
     else
-        assert(0);
+        vlc_assert_unreachable();
 
     if( info.signal == SIGNAL_NONE )
         return VLC_SUCCESS;

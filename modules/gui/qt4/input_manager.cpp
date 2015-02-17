@@ -301,7 +301,7 @@ void InputManager::customEvent( QEvent *event )
         break;
     default:
         msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
-        assert(0);
+        vlc_assert_unreachable();
     }
 }
 

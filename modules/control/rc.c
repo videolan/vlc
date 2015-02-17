@@ -1540,7 +1540,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     }
     else
         /* This case can't happen */
-        assert( 0 );
+        vlc_assert_unreachable();
 
     if( newval.psz_string && *newval.psz_string )
     {

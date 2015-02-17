@@ -493,5 +493,5 @@ release:
         vlc_restorecancel(canc);
     }
 
-    assert(0);
+    vlc_assert_unreachable();
 }

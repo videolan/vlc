@@ -112,12 +112,16 @@
 
 /* Branch prediction */
 #ifdef __GNUC__
-#   define likely(p)   __builtin_expect(!!(p), 1)
-#   define unlikely(p) __builtin_expect(!!(p), 0)
+# define likely(p)     __builtin_expect(!!(p), 1)
+# define unlikely(p)   __builtin_expect(!!(p), 0)
+# define unreachable() __builtin_unreachable()
 #else
-#   define likely(p)   (!!(p))
-#   define unlikely(p) (!!(p))
+# define likely(p)     (!!(p))
+# define unlikely(p)   (!!(p))
+# define unreachable() ((void)0)
 #endif
+
+#define vlc_assert_unreachable() (assert(!"unreachable"), unreachable())
 
 /* Linkage */
 #ifdef __cplusplus

@@ -217,7 +217,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         break;
 #ifndef NDEBUG
       case VOUT_DISPLAY_RESET_PICTURES: // not needed
-        assert(0);
+        vlc_assert_unreachable();
 #endif
 
       case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:

@@ -330,7 +330,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         }
 
         case VOUT_DISPLAY_RESET_PICTURES:
-            assert (0);
+            vlc_assert_unreachable ();
         default:
             msg_Err (vd, "Unhandled request %d", query);
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:

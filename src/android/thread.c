@@ -303,7 +303,7 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
              cb = pthread_cond_timedwait_monotonic_np;
              break;
          default:
-             assert (0);
+             vlc_assert_unreachable ();
     }
 
     int val = cb (&condvar->cond, p_mutex, &ts);

@@ -730,7 +730,7 @@ void vlc_testcancel (void)
 void vlc_control_cancel (int cmd, ...)
 {
     (void) cmd;
-    assert (0);
+    vlc_assert_unreachable ();
 }
 
 /* Precision monotonic clock.

@@ -122,5 +122,5 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_VIDEOS_DIR:
             return config_GetShellDir (CSIDL_MYVIDEO);
     }
-    assert (0);
+    vlc_assert_unreachable ();
 }

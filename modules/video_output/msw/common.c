@@ -619,7 +619,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         EventThreadMouseHide(sys->event);
         return VLC_SUCCESS;
     case VOUT_DISPLAY_RESET_PICTURES:
-        assert(0);
+        vlc_assert_unreachable();
     default:
         return VLC_EGENERIC;
     }

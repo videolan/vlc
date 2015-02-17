@@ -2108,7 +2108,7 @@ void en50221_Poll( cam_t * p_cam )
     case CA_CI:
         return;
     default:
-        assert( 0 );
+        vlc_assert_unreachable();
     }
 
     for ( unsigned i_slot = 0; i_slot < p_cam->i_nb_slots; i_slot++ )

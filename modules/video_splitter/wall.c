@@ -446,7 +446,7 @@ static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
             }
         }
     }
-    assert(0);
+    vlc_assert_unreachable();
     return VLC_EGENERIC;
 }
 

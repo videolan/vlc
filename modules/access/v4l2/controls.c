@@ -172,7 +172,7 @@ static int ControlSetCallback (vlc_object_t *obj, const char *var,
             ret = ControlSetStr (ctrl, cur.psz_string);
             break;
         default:
-            assert (0);
+            vlc_assert_unreachable ();
     }
 
     if (ret)

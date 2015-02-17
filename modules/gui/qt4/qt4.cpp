@@ -693,7 +693,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
             p_wnd->handle.nsobject = (void *)wid;
             break;
         default:
-            assert(0);
+            vlc_assert_unreachable();
     }
 
     p_wnd->control = WindowControl;

@@ -2490,7 +2490,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         case ES_OUT_RESTART_ES_BY_ID:     i_new_query = ES_OUT_RESTART_ES; break;
         case ES_OUT_SET_ES_DEFAULT_BY_ID: i_new_query = ES_OUT_SET_ES_DEFAULT; break;
         default:
-          assert(0);
+          vlc_assert_unreachable();
         }
         /* TODO if the lock is made non recursive it should be changed */
         int i_ret = es_out_Control( out, i_new_query, p_es );

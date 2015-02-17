@@ -1573,7 +1573,7 @@ static void *KeepAliveThread( void *p_data )
 
         msleep( 10 * CLOCK_FREQ );
     }
-    assert(0);
+    vlc_assert_unreachable();
 }
 
 static void KeepAliveStart( access_t *p_access )

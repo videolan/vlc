@@ -631,7 +631,7 @@ static void *MmapThread (void *data)
 #endif
     }
 
-    assert (0);
+    vlc_assert_unreachable ();
 }
 
 static void *ReadThread (void *data)
@@ -693,7 +693,7 @@ static void *ReadThread (void *data)
             GrabVBI (demux, sys->vbi);
 #endif
     }
-    assert (0);
+    vlc_assert_unreachable ();
 }
 
 static int DemuxControl( demux_t *demux, int query, va_list args )
