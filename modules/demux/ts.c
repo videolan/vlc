@@ -1082,7 +1082,7 @@ static int Open( vlc_object_t *p_this )
     /* Init PMT array */
     TAB_INIT( p_sys->i_pmt, p_sys->pmt );
     p_sys->i_pmt_es = 0;
-    p_sys->b_delay_es_creation = true;
+    p_sys->b_delay_es_creation = !p_sys->b_access_control;
 
     /* Read config */
     p_sys->b_es_id_pid = var_CreateGetBool( p_demux, "ts-es-id-pid" );
