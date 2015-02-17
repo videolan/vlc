@@ -474,7 +474,7 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
 #if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
         sect = dvbpsi_sdt_sections_generate( p_dvbpsi, &sdtpsi );
 #else
-        sect = dvbpsi_GenSDTSections( &sdt );
+        sect = dvbpsi_GenSDTSections( &sdtpsi );
 #endif
         block_t *p_sdtblock = WritePSISection( sect );
         PEStoTS( p_opaque, pf_callback, p_sdtblock, p_sdt->ts.i_pid,
