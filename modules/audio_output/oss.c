@@ -394,6 +394,7 @@ static int Open (vlc_object_t *obj)
     aout->start = Start;
     aout->stop = Stop;
     aout->device_select = DeviceSelect;
+    aout_DeviceReport (aout, sys->device);
     aout_SoftVolumeInit (aout);
 
     DevicesEnum (aout);
