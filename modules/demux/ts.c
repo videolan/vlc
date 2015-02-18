@@ -847,11 +847,11 @@ static void MissingPATPMTFixup( demux_t *p_demux )
     {
         /* Find a free one */
         for( i_program_pid = MIN_ES_PID;
-             i_program_pid < MAX_ES_PID && p_sys->pid[i_program_pid].b_seen;
+             i_program_pid <= MAX_ES_PID && p_sys->pid[i_program_pid].b_seen;
              i_program_pid++ );
     }
 
-    for( int i = MIN_ES_PID; i < MAX_ES_PID; i++ )
+    for( int i = MIN_ES_PID; i <= MAX_ES_PID; i++ )
     {
         if( !p_sys->pid[i].b_seen ||
             p_sys->pid[i].probed.i_type == -1 )
@@ -904,7 +904,7 @@ static void MissingPATPMTFixup( demux_t *p_demux )
     if( esstreams && mapped )
     {
         int j=0;
-        for( int i = MIN_ES_PID; i < MAX_ES_PID; i++ )
+        for( int i = MIN_ES_PID; i <= MAX_ES_PID; i++ )
         {
             if( !p_sys->pid[i].b_seen ||
                 p_sys->pid[i].probed.i_type == -1 )
@@ -4873,7 +4873,7 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid )
 
     if( b_create_delayed )
     {
-        for(int i=MIN_ES_PID; i<MAX_ES_PID; i++)
+        for(int i=MIN_ES_PID; i<=MAX_ES_PID; i++)
         {
             pid = &p_sys->pid[i];
             if(!pid->es || pid->es->id)
