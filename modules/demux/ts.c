@@ -5304,6 +5304,24 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         free( pp_clean );
 }
 
+static int PATCheck( demux_t *p_demux, dvbpsi_pat_t *p_pat )
+{
+    /* Some Dreambox streams have all PMT set to same pid */
+    int i_prev_pid = -1;
+    for( dvbpsi_pat_program_t * p_program = p_pat->p_first_program;
+         p_program != NULL;
+         p_program = p_program->p_next )
+    {
+        if( p_program->i_pid == i_prev_pid )
+        {
+            msg_Warn( p_demux, "PAT check failed: duplicate program pid %d", i_prev_pid );
+            return VLC_EGENERIC;
+        }
+        i_prev_pid = p_program->i_pid;
+    }
+    return VLC_SUCCESS;
+}
+
 static void PATCallBack( void *data, dvbpsi_pat_t *p_pat )
 {
     demux_t              *p_demux = data;
@@ -5316,7 +5334,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_pat )
     if( ( pat->psi->i_pat_version != -1 &&
             ( !p_pat->b_current_next ||
               p_pat->i_version == pat->psi->i_pat_version ) ) ||
-        p_sys->b_user_pmt )
+        p_sys->b_user_pmt || PATCheck( p_demux, p_pat ) )
     {
         dvbpsi_DeletePAT( p_pat );
         return;
