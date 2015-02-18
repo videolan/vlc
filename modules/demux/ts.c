@@ -854,7 +854,7 @@ static void MissingPATPMTFixup( demux_t *p_demux )
     for( int i = MIN_ES_PID; i < MAX_ES_PID; i++ )
     {
         if( !p_sys->pid[i].b_seen ||
-            !p_sys->pid[i].probed.i_type )
+            p_sys->pid[i].probed.i_type == -1 )
             continue;
 
         if( i_pcr_pid == 0x1FFF && ( p_sys->pid[i].probed.i_type == 0x03 ||
@@ -907,7 +907,7 @@ static void MissingPATPMTFixup( demux_t *p_demux )
         for( int i = MIN_ES_PID; i < MAX_ES_PID; i++ )
         {
             if( !p_sys->pid[i].b_seen ||
-                !p_sys->pid[i].probed.i_type )
+                p_sys->pid[i].probed.i_type == -1 )
                 continue;
 
             esstreams[j].pes.i_stream_type = p_sys->pid[i].probed.i_type;
