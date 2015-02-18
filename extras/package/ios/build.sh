@@ -329,7 +329,6 @@ ${VLCROOT}/configure \
     --disable-vlm \
     --disable-httpd \
     --disable-nls \
-    --disable-glx \
     --disable-sse \
     --enable-neon \
     --disable-notify \
