@@ -146,6 +146,28 @@ void EbmlParser::Reset( demux_t *p_demux )
     mb_dummy = var_InheritBool( p_demux, "mkv-use-dummy" );
 }
 
+
+// Define a special Segment context that doesn't allow void/crc32 elements
+static const EbmlSemanticContext & GetEbmlNoGlobal_Context();
+static const EbmlSemanticContext Context_EbmlNoGlobal = EbmlSemanticContext(0, NULL, NULL, *GetEbmlNoGlobal_Context, NULL);
+static const EbmlSemantic EbmlNoGlobal_ContextList[0] =
+{
+  //EbmlSemantic(false, false, EBML_INFO(EbmlCrc32)),   ///< EbmlCrc32
+  //EbmlSemantic(false, false, EBML_INFO(EbmlVoid)),    ///< EbmlVoid
+};
+static const EbmlSemanticContext EbmlNoGlobal_Context = EbmlSemanticContext(countof(EbmlNoGlobal_ContextList), EbmlNoGlobal_ContextList, NULL, *GetEbmlNoGlobal_Context, NULL);
+static const EbmlSemanticContext & GetEbmlNoGlobal_Context()
+{
+  return EbmlNoGlobal_Context;
+}
+
+// the Segment Context should not allow Void or CRC32 elements to avoid lookup false alarm
+const EbmlSemanticContext Context_KaxSegmentVLC = EbmlSemanticContext(KaxSegment_Context.GetSize(),
+                                                                      KaxSegment_Context.MyTable,
+                                                                      KaxSegment_Context.Parent(),
+                                                                      GetEbmlNoGlobal_Context,
+                                                                      KaxSegment_Context.GetMaster());
+
 EbmlElement *EbmlParser::Get( int n_call )
 {
     int i_ulev = 0;
@@ -170,8 +192,13 @@ EbmlElement *EbmlParser::Get( int n_call )
 
     }
 
+    // ignore global Void/CRC32 elements when looking for level 1 elements in the Segment
+    EbmlSemanticContext e_context =
+            EBML_CTX_MASTER( EBML_CONTEXT(m_el[mi_level - 1]) ) == EBML_CTX_MASTER( Context_KaxSegmentVLC )
+            ? Context_KaxSegmentVLC
+            : EBML_CONTEXT(m_el[mi_level - 1]);
     /* Ignore unknown level 0 or 1 elements */
-    m_el[mi_level] = m_es->FindNextElement( EBML_CONTEXT(m_el[mi_level - 1]),
+    m_el[mi_level] = m_es->FindNextElement( e_context,
                                             i_ulev, UINT64_MAX,
                                             (  mb_dummy | (mi_level > 1) ), 1 );
     if( i_ulev > 0 )

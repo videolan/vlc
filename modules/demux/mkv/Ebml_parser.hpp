@@ -60,6 +60,7 @@ class EbmlParser
 
     int          mi_user_level;
     bool         mb_keep;
+    /* Allow dummy/unknown EBML elements */
     bool         mb_dummy;
 };
 
