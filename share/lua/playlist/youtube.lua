@@ -235,23 +235,21 @@ function parse()
                 name = vlc.strings.resolve_xml_special_chars( name )
                 name = vlc.strings.resolve_xml_special_chars( name )
             end
-            if string.match( line, "<meta name=\"description\"" ) then
-               -- Don't ask me why they double encode ...
-                _,_,description = string.find( line, "content=\"(.-)\"" )
-                description = vlc.strings.resolve_xml_special_chars( description )
+
+            if string.match( line, "<p id=\"eow[-]description\" >" ) then
+                _,_,description = string.find( line, "<p id=\"eow[-]description\" >(.-)<[/]p>" )
                 description = vlc.strings.resolve_xml_special_chars( description )
             end
+
+
             if string.match( line, "<meta property=\"og:image\"" ) then
                 _,_,arturl = string.find( line, "content=\"(.-)\"" )
             end
-            -- This is not available in the video parameters (whereas it
-            -- is given by the get_video_info API as the "author" field)
-            if not artist then
-                artist = string.match( line, "yt%-uix%-sessionlink yt%-user%-name[^>]*>([^<]*)</" )
-                if artist then
-                    artist = vlc.strings.resolve_xml_special_chars( artist )
-                end
+
+            if string.match(line, "\"author\":\"(.-)\",")    then
+                _,_,artist = string.find(line, "\"author\":\"(.-)\",")
             end
+
             -- JSON parameters, also formerly known as "swfConfig",
             -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig" ...
             if string.match( line, "ytplayer%.config" ) then
@@ -279,7 +277,7 @@ function parse()
 
                 if not path then
                     -- If this is a live stream, the URL map will be empty
-                    -- and we get the URL from this field instead 
+                    -- and we get the URL from this field instead
                     local hlsvp = string.match( line, "\"hlsvp\": *\"(.-)\"" )
                     if hlsvp then
                         hlsvp = string.gsub( hlsvp, "\\/", "/" )
@@ -299,7 +297,7 @@ function parse()
                     format = "&fmt=" .. fmt
                 else
                     format = ""
-                end 
+                end
                 -- Without "el=detailpage", /get_video_info fails for many
                 -- music videos with errors about copyrighted content being
                 -- "restricted from playback on certain sites"
@@ -339,7 +337,7 @@ function parse()
 
         if not path then
             -- If this is a live stream, the URL map will be empty
-            -- and we get the URL from this field instead 
+            -- and we get the URL from this field instead
             local hlsvp = string.match( line, "&hlsvp=([^&]*)" )
             if hlsvp then
                 hlsvp = vlc.strings.decode_uri( hlsvp )
