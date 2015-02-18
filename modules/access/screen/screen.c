@@ -51,17 +51,17 @@
 #endif
 
 #ifdef SCREEN_SUBSCREEN
-#define TOP_TEXT N_( "Subscreen top left corner" )
+#define TOP_TEXT N_( "Region top row" )
 #define TOP_LONGTEXT N_( \
-    "Top coordinate of the subscreen top left corner." )
+    "Ordinate of the capture region in pixels." )
 
-#define LEFT_TEXT N_( "Subscreen top left corner" )
+#define LEFT_TEXT N_( "Region left column" )
 #define LEFT_LONGTEXT N_( \
-    "Left coordinate of the subscreen top left corner." )
+    "Abscissa of the capture region in pixels." )
 
-#define WIDTH_TEXT N_( "Subscreen width" )
+#define WIDTH_TEXT N_( "Capture region width" )
 
-#define HEIGHT_TEXT N_( "Subscreen height" )
+#define HEIGHT_TEXT N_( "Capture region heigh" )
 
 #define FOLLOW_MOUSE_TEXT N_( "Follow the mouse" )
 #define FOLLOW_MOUSE_LONGTEXT N_( \
