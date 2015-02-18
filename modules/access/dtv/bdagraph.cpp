@@ -209,7 +209,8 @@ int dvb_set_dvbs (dvb_device_t *d, uint64_t freq, uint32_t srate, uint32_t fec)
 }
 
 int dvb_set_dvbs2 (dvb_device_t *, uint64_t /*freq*/, const char * /*mod*/,
-                   uint32_t /*srate*/, uint32_t /*fec*/, int /*pilot*/, int /*rolloff*/)
+                   uint32_t /*srate*/, uint32_t /*fec*/, int /*pilot*/, int /*rolloff*/,
+                   uint8_t /*sid*/)
 {
     return VLC_EGENERIC;
 }

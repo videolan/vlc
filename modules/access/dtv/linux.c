@@ -888,7 +888,8 @@ int dvb_set_dvbs (dvb_device_t *d, uint64_t freq_Hz,
 }
 
 int dvb_set_dvbs2 (dvb_device_t *d, uint64_t freq_Hz, const char *modstr,
-                   uint32_t srate, uint32_t fec, int pilot, int rolloff)
+                   uint32_t srate, uint32_t fec, int pilot, int rolloff,
+                   uint8_t sid)
 {
     uint32_t freq = freq_Hz / 1000;
     unsigned mod = dvb_parse_modulation (modstr, QPSK);

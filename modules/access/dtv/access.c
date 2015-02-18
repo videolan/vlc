@@ -151,6 +151,8 @@ static const char *const hierarchy_user[] = { N_("Automatic"),
 #define TIME_INTERLEAVING_B_TEXT N_("Layer B time interleaving")
 #define TIME_INTERLEAVING_C_TEXT N_("Layer C time interleaving")
 
+#define STREAM_ID_TEXT N_("Stream identifier")
+
 #define PILOT_TEXT N_("Pilot")
 
 #define ROLLOFF_TEXT N_("Roll-off factor")
@@ -358,6 +360,9 @@ vlc_module_begin ()
         change_safe ()
 
     set_section (N_("DVB-S2 parameters"), NULL)
+    add_integer ("dvb-stream", 0, STREAM_ID_TEXT, STREAM_ID_TEXT, false)
+        change_integer_range (0, 255)
+        change_safe ()
     add_integer ("dvb-pilot", -1, PILOT_TEXT, PILOT_TEXT, true)
         change_integer_list (auto_off_on_vlc, auto_off_on_user)
         change_safe ()
@@ -872,8 +877,9 @@ static int dvbs2_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     uint32_t srate = var_InheritInteger (obj, "dvb-srate");
     int pilot = var_InheritInteger (obj, "dvb-pilot");
     int rolloff = var_InheritInteger (obj, "dvb-rolloff");
+    uint8_t sid = var_InheritInteger (obj, "dvb-stream");
 
-    int ret = dvb_set_dvbs2 (dev, freq, mod, srate, fec, pilot, rolloff);
+    int ret = dvb_set_dvbs2 (dev, freq, mod, srate, fec, pilot, rolloff, sid);
     if (ret == 0)
         sec_setup (obj, dev, freq);
     return ret;
