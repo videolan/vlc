@@ -301,7 +301,7 @@ vlc_module_begin ()
         change_integer_list (hierarchy_vlc, hierarchy_user)
         change_safe ()
     add_integer ("dvb-plp-id", 0, PLP_ID_TEXT, PLP_ID_TEXT, false)
-        change_integer_range (0, 0xFFFFFFFF)
+        change_integer_range (0, 255)
         change_safe ()
 
     set_section (N_("ISDB-T reception parameters"), NULL)

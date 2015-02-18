@@ -238,7 +238,7 @@ int dvb_set_dvbt (dvb_device_t *d, uint32_t freq, const char * /*mod*/,
 /* DVB-T2 */
 int dvb_set_dvbt2 (dvb_device_t *d, uint32_t freq, const char * /*mod*/,
                    uint32_t fec, uint32_t bandwidth, int transmission,
-                   uint32_t guard, uint32_t plp)
+                   uint32_t guard, uint8_t plp)
 {
     return d->module->SetDVBT2(freq / 1000, fec,
                       bandwidth, transmission, guard, plp);
