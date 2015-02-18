@@ -37,6 +37,7 @@
 #include <limits.h>
 #include <strmif.h>
 #include <ksmedia.h>
+#include <wmcodecdsp.h>
 #include <ddraw.h>
 
 #ifndef __MINGW64_VERSION_MAJOR
