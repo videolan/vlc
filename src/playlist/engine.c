@@ -451,8 +451,6 @@ static void VariablesInit( playlist_t *p_playlist )
 
     var_Create( p_playlist, "input-current", VLC_VAR_ADDRESS );
 
-    var_Create( p_playlist, "activity", VLC_VAR_VOID );
-
     /* Variables to control playback */
     var_Create( p_playlist, "playlist-autostart", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_playlist, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
