@@ -195,34 +195,35 @@ static void FixSubtitleFormat(vout_display_sys_t *sys)
     video_format_t *p_subfmt = &sys->p_sub_window->fmt;
     video_format_t fmt;
     int i_width, i_height;
+    int i_video_width, i_video_height;
     int i_display_width, i_display_height;
     double aspect;
 
     video_format_ApplyRotation(&fmt, &sys->p_window->fmt);
 
     if (fmt.i_visible_width == 0 || fmt.i_visible_height == 0) {
-        i_width = fmt.i_width;
-        i_height = fmt.i_height;
+        i_video_width = fmt.i_width;
+        i_video_height = fmt.i_height;
     } else {
-        i_width = fmt.i_visible_width;
-        i_height = fmt.i_visible_height;
+        i_video_width = fmt.i_visible_width;
+        i_video_height = fmt.i_visible_height;
     }
 
     if (fmt.i_sar_num > 0 && fmt.i_sar_den > 0) {
         if (fmt.i_sar_num >= fmt.i_sar_den)
-            i_width = i_width * fmt.i_sar_num / fmt.i_sar_den;
+            i_video_width = i_video_width * fmt.i_sar_num / fmt.i_sar_den;
         else
-            i_height = i_height * fmt.i_sar_den / fmt.i_sar_num;
+            i_display_height = i_display_height * fmt.i_sar_den / fmt.i_sar_num;
     }
 
     if (sys->p_window->i_angle == 90 || sys->p_window->i_angle == 180) {
         i_display_width = sys->i_display_height;
         i_display_height = sys->i_display_width;
-        aspect = i_height / (double) i_width;
+        aspect = i_video_height / (double) i_video_width;
     } else {
         i_display_width = sys->i_display_width;
         i_display_height = sys->i_display_height;
-        aspect = i_width / (double) i_height;
+        aspect = i_video_width / (double) i_video_height;
     }
 
     if (i_display_width / aspect < i_display_height) {
@@ -231,6 +232,12 @@ static void FixSubtitleFormat(vout_display_sys_t *sys)
     } else {
         i_width = i_display_height * aspect;
         i_height = i_display_height;
+    }
+
+    // Use the biggest size available
+    if (i_width * i_height < i_video_width * i_video_height) {
+        i_width = i_video_width;
+        i_height = i_video_height;
     }
 
     p_subfmt->i_width =
