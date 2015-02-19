@@ -80,7 +80,7 @@ check yasm
 check_tar
 check ragel
 check_sed
-check protoc
+check protoc 2.6.0
 check ant
 check xz
 
