@@ -408,7 +408,7 @@ static void populateLoadedSet( QSet<QString> *loaded, vlc_object_t *p_node )
 
     vlc_list_t *l = vlc_list_children( p_node );
     for( int i=0; i < l->i_count; i++ )
-        populateLoadedSet( loaded, l->p_values[i].p_object );
+        populateLoadedSet( loaded, (vlc_object_t *)l->p_values[i].p_address );
     vlc_list_release( l );
 }
 

@@ -718,7 +718,7 @@ static int SubDrawObject(intf_sys_t *sys, int l, vlc_object_t *p_obj, int i_leve
 
     vlc_list_t *list = vlc_list_children(p_obj);
     for (int i = 0; i < list->i_count ; i++) {
-        l = SubDrawObject(sys, l, list->p_values[i].p_object, i_level,
+        l = SubDrawObject(sys, l, list->p_values[i].p_address, i_level,
             (i == list->i_count - 1) ? "`-" : "|-" );
     }
     vlc_list_release(list);

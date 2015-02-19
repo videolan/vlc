@@ -403,7 +403,7 @@ void ObjectKillChildrens( vlc_object_t *p_obj )
 
     vlc_list_t *p_list = vlc_list_children( p_obj );
     for( int i = 0; i < p_list->i_count; i++ )
-        ObjectKillChildrens( p_list->p_values[i].p_object );
+        ObjectKillChildrens( p_list->p_values[i].p_address );
     vlc_list_release( p_list );
 }
 
@@ -562,7 +562,7 @@ vlc_list_t *vlc_list_children( vlc_object_t *obj )
         unsigned i = 0;
 
         for (priv = vlc_internals (obj)->first; priv; priv = priv->next)
-            l->p_values[i++].p_object = vlc_object_hold (vlc_externals (priv));
+            l->p_values[i++].p_address = vlc_object_hold (vlc_externals (priv));
     }
     libvlc_unlock (obj->p_libvlc);
     return l;
@@ -697,12 +697,8 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
  *****************************************************************************/
 void vlc_list_release( vlc_list_t *p_list )
 {
-    int i_index;
-
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
-    {
-        vlc_object_release( p_list->p_values[i_index].p_object );
-    }
+    for( int i = 0; i < p_list->i_count; i++ )
+        vlc_object_release( p_list->p_values[i].p_address );
 
     free( p_list->p_values );
     free( p_list );

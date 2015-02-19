@@ -309,7 +309,7 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
 
     vlc_list_t *l = vlc_list_children( p_obj );
     for( int i=0; i < l->i_count; i++ )
-        buildTree( item, l->p_values[i].p_object );
+        buildTree( item, (vlc_object_t *)l->p_values[i].p_address );
     vlc_list_release( l );
 }
 
