@@ -94,7 +94,7 @@ void BuildPAT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi)
 #if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
     p_section = dvbpsi_pat_sections_generate( p_dvbpsi, &patpsi, 0 );
 #else
-    p_section = dvbpsi_GenPATSections( &pat, 0 /* max program per section */ );
+    p_section = dvbpsi_GenPATSections( &patpsi, 0 /* max program per section */ );
 #endif
     block_t *p_block = WritePSISection( p_section );
 
