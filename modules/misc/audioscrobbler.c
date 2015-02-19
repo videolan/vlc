@@ -36,6 +36,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <time.h>
 
 #include <vlc_common.h>
@@ -74,6 +75,7 @@ struct intf_sys_t
     audioscrobbler_song_t   p_queue[QUEUE_MAX]; /**< songs not submitted yet*/
     int                     i_songs;            /**< number of songs        */
 
+    input_thread_t         *p_input;            /**< current input thread   */
     vlc_mutex_t             lock;               /**< p_sys mutex            */
     vlc_cond_t              wait;               /**< song to submit event   */
     vlc_thread_t            thread;             /**< thread to submit song  */
@@ -96,9 +98,6 @@ struct intf_sys_t
     mtime_t                 time_total_pauses;  /**< total time in pause    */
 
     bool                    b_submit;           /**< do we have to submit ? */
-
-    bool                    b_state_cb;         /**< if we registered the
-                                                 * "state" callback         */
 
     bool                    b_meta_read;        /**< if we read the song's
                                                  * metadata already         */
@@ -156,20 +155,15 @@ static void DeleteSong(audioscrobbler_song_t* p_song)
 /*****************************************************************************
  * ReadMetaData : Read meta data when parsed by vlc
  *****************************************************************************/
-static void ReadMetaData(intf_thread_t *p_this)
+static void ReadMetaData(intf_thread_t *p_this, input_thread_t *p_input)
 {
     intf_sys_t *p_sys = p_this->p_sys;
 
-    input_thread_t *p_input = pl_CurrentInput(p_this);
-    if (!p_input)
-        return;
+    assert(p_input != NULL);
 
     input_item_t *p_item = input_GetItem(p_input);
-    if (!p_item)
-    {
-        vlc_object_release(p_input);
+    if (p_item == NULL)
         return;
-    }
 
 #define ALLOC_ITEM_META(a, b) do { \
         char *psz_meta = input_item_Get##b(p_item); \
@@ -220,7 +214,6 @@ static void ReadMetaData(intf_thread_t *p_this)
 
 end:
     vlc_mutex_unlock(&p_sys->lock);
-    vlc_object_release(p_input);
 }
 
 /*****************************************************************************
@@ -331,7 +324,7 @@ static int PlayingChange(vlc_object_t *p_this, const char *psz_var,
 
     if (!p_sys->b_meta_read && state >= PLAYING_S)
     {
-        ReadMetaData(p_intf);
+        ReadMetaData(p_intf, p_input);
         return VLC_SUCCESS;
     }
 
@@ -355,31 +348,33 @@ static int PlayingChange(vlc_object_t *p_this, const char *psz_var,
 static int ItemChange(vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data)
 {
-    intf_thread_t       *p_intf     = (intf_thread_t*) p_data;
-    intf_sys_t          *p_sys      = p_intf->p_sys;
+    intf_thread_t  *p_intf  = p_data;
+    intf_sys_t     *p_sys   = p_intf->p_sys;
+    input_thread_t *p_input = newval.p_address;
 
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
-    VLC_UNUSED(oldval); VLC_UNUSED(newval);
+    VLC_UNUSED(oldval);
 
-    p_sys->b_state_cb       = false;
     p_sys->b_meta_read      = false;
     p_sys->b_submit         = false;
 
-    input_thread_t *p_input = pl_CurrentInput(p_intf);
-    if (!p_input || p_input->b_dead)
+    if (p_sys->p_input != NULL)
+    {
+        var_DelCallback(p_sys->p_input, "intf-event", PlayingChange, p_intf);
+        vlc_object_release(p_sys->p_input);
+        p_sys->p_input = NULL;
+    }
+
+    if (p_input == NULL)
         return VLC_SUCCESS;
 
     input_item_t *p_item = input_GetItem(p_input);
-    if (!p_item)
-    {
-        vlc_object_release(p_input);
+    if (p_item == NULL)
         return VLC_SUCCESS;
-    }
 
     if (var_CountChoices(p_input, "video-es"))
     {
         msg_Dbg(p_this, "Not an audio-only input, not submitting");
-        vlc_object_release(p_input);
         return VLC_SUCCESS;
     }
 
@@ -387,15 +382,14 @@ static int ItemChange(vlc_object_t *p_this, const char *psz_var,
     time(&p_sys->p_current_song.date);        /* to be sent to last.fm */
     p_sys->p_current_song.i_start = mdate();    /* only used locally */
 
+    p_sys->p_input = vlc_object_hold(p_input);
     var_AddCallback(p_input, "intf-event", PlayingChange, p_intf);
-    p_sys->b_state_cb = true;
 
     if (input_item_IsPreparsed(p_item))
-        ReadMetaData(p_intf);
+        ReadMetaData(p_intf, p_input);
     /* if the input item was not preparsed, we'll do it in PlayingChange()
      * callback, when "state" == PLAYING_S */
 
-    vlc_object_release(p_input);
     return VLC_SUCCESS;
 }
 
@@ -423,7 +417,7 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
     }
 
-    var_AddCallback(pl_Get(p_intf), "activity", ItemChange, p_intf);
+    var_AddCallback(pl_Get(p_intf), "input-current", ItemChange, p_intf);
 
     return VLC_SUCCESS;
 }
@@ -436,17 +430,15 @@ static void Close(vlc_object_t *p_this)
     intf_thread_t               *p_intf = (intf_thread_t*) p_this;
     intf_sys_t                  *p_sys  = p_intf->p_sys;
 
-    var_DelCallback(pl_Get(p_intf), "activity", ItemChange, p_intf);
-
     vlc_cancel(p_sys->thread);
     vlc_join(p_sys->thread, NULL);
 
-    input_thread_t *p_input = pl_CurrentInput(p_intf);
-    if (p_input)
+    var_DelCallback(pl_Get(p_intf), "input-current", ItemChange, p_intf);
+
+    if (p_sys->p_input != NULL)
     {
-        if (p_sys->b_state_cb)
-            var_DelCallback(p_input, "intf-event", PlayingChange, p_intf);
-        vlc_object_release(p_input);
+        var_DelCallback(p_sys->p_input, "intf-event", PlayingChange, p_intf);
+        vlc_object_release(p_sys->p_input);
     }
 
     int i;
