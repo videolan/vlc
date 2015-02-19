@@ -235,10 +235,13 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     }
     free( psz_arturl );
 
+    PL_LOCK;
+    p_sys->p_input = p_input_thread;
+    PL_UNLOCK;
+
     var_TriggerCallback( p_playlist, "activity" );
 
     PL_LOCK;
-    p_sys->p_input = p_input_thread;
     return p_input_thread != NULL;
 }
 
