@@ -33,7 +33,6 @@
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
 #include <vlc_filter.h>
-#include <vlc_md5.h>
 
 #include <dlfcn.h>
 
@@ -133,6 +132,7 @@ struct vout_display_sys_t
     picture_t *p_sub_pic;
     buffer_bounds *p_sub_buffer_bounds;
     bool b_sub_pic_locked;
+    int64_t i_sub_last_order;
 
     bool b_has_subpictures;
 
@@ -713,6 +713,7 @@ static int Open(vlc_object_t *p_this)
     if (!sys->p_sub_window)
         goto error;
     FixSubtitleFormat(sys);
+    sys->i_sub_last_order = -1;
 
     /* Export the subpicture capability of this vout. */
     vd->info.subpicture_chromas = subpicture_chromas;
@@ -939,29 +940,14 @@ static void SubtitleGetDirtyBounds(vout_display_t *vd,
 static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    struct md5_s hash;
     ARect memset_bounds;
 
-    InitMD5(&hash);
-    if (subpicture) {
-        for (subpicture_region_t *r = subpicture->p_region; r != NULL; r = r->p_next) {
-            AddMD5(&hash, &r->i_x, sizeof(r->i_x));
-            AddMD5(&hash, &r->i_y, sizeof(r->i_y));
-            AddMD5(&hash, &r->fmt.i_visible_width, sizeof(r->fmt.i_visible_width));
-            AddMD5(&hash, &r->fmt.i_visible_height, sizeof(r->fmt.i_visible_height));
-            AddMD5(&hash, &r->fmt.i_x_offset, sizeof(r->fmt.i_x_offset));
-            AddMD5(&hash, &r->fmt.i_y_offset, sizeof(r->fmt.i_y_offset));
-            const int pixels_offset = r->fmt.i_y_offset * r->p_picture->p->i_pitch +
-                                      r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
-
-            for (unsigned int y = 0; y < r->fmt.i_visible_height; y++)
-                AddMD5(&hash, &r->p_picture->p->p_pixels[pixels_offset + y*r->p_picture->p->i_pitch], r->fmt.i_visible_width);
-        }
+    if( subpicture )
+    {
+        if( subpicture->i_order == sys->i_sub_last_order )
+            return;
+        sys->i_sub_last_order = subpicture->i_order;
     }
-    EndMD5(&hash);
-    if (!memcmp(hash.buf, sys->hash, 16))
-        return;
-    memcpy(sys->hash, hash.buf, 16);
 
     if (AndroidWindow_LockPicture(sys, sys->p_sub_window, sys->p_sub_pic) != 0)
         return;
