@@ -158,7 +158,7 @@ private:
     void ParseTracks( KaxTracks *tracks );
     void ParseChapterAtom( int i_level, KaxChapterAtom *ca, chapter_item_c & chapters );
     void ParseTrackEntry( KaxTrackEntry *m );
-    void ParseCluster( bool b_update_start_time = true );
+    void ParseCluster( KaxCluster *cluster, bool b_update_start_time = true, ScopeMode read_fully = SCOPE_ALL_DATA );
     SimpleTag * ParseSimpleTags( KaxTagSimple *tag, int level = 50 );
     void IndexAppendCluster( KaxCluster *cluster );
     int32_t TrackInit( mkv_track_t * p_tk );

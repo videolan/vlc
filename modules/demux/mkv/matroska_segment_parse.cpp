@@ -1237,7 +1237,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
     }
 }
 
-void matroska_segment_c::ParseCluster( bool b_update_start_time )
+void matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_time, ScopeMode read_fully )
 {
     EbmlElement *el;
     EbmlMaster  *m;
@@ -1252,7 +1252,7 @@ void matroska_segment_c::ParseCluster( bool b_update_start_time )
     }
     try
     {
-        m->Read( es, EBML_CONTEXT(cluster), i_upper_level, el, true );
+        m->Read( es, EBML_CONTEXT(cluster), i_upper_level, el, true, read_fully );
     }
     catch(...)
     {

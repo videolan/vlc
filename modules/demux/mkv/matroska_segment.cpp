@@ -706,7 +706,7 @@ bool matroska_segment_c::Preload( )
             cluster = (KaxCluster*)el;
 
             i_cluster_pos = i_start_pos = cluster->GetElementPosition();
-            ParseCluster( );
+            ParseCluster( cluster );
 
             ep->Down();
             /* stop pre-parsing the stream */
@@ -887,7 +887,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                     ( i_index > 0 &&
                       p_indexes[i_index - 1].i_position < (int64_t)cluster->GetElementPosition() ) )
                 {
-                    ParseCluster(false);
+                    ParseCluster( cluster, false, SCOPE_NO_DATA );
                     IndexAppendCluster( cluster );
                 }
                 if( es.I_O().getFilePointer() >= (unsigned) i_global_position )
