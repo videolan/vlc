@@ -2135,7 +2135,13 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     mtime_t i_length = 0;
 
     /* FIXME find real max size */
-    /* const int i_max = */ block_ChainExtract( p_pes, header, 34 );
+    const int i_max = block_ChainExtract( p_pes, header, 34 );
+    assert(i_max >= 34);
+    if (unlikely(i_max < 34))
+    {
+        block_ChainRelease( p_pes );
+        return;
+    }
 
     if( pid->b_scrambled || header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
