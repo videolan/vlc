@@ -274,11 +274,11 @@ static const char *const ppsz_sout_options[] = {
 };
 
 static sout_stream_id_sys_t *Add ( sout_stream_t *, es_format_t * );
-static int               Del ( sout_stream_t *, sout_stream_id_sys_t * );
+static void              Del ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send( sout_stream_t *, sout_stream_id_sys_t *,
                                block_t* );
 static sout_stream_id_sys_t *MuxAdd ( sout_stream_t *, es_format_t * );
-static int               MuxDel ( sout_stream_t *, sout_stream_id_sys_t * );
+static void              MuxDel ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               MuxSend( sout_stream_t *, sout_stream_id_sys_t *,
                                   block_t* );
 
@@ -1217,7 +1217,7 @@ error:
     return NULL;
 }
 
-static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -1260,7 +1260,6 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     if( p_sys->psz_sdp_file != NULL ) FileSetup( p_stream );
 
     free( id );
-    return VLC_SUCCESS;
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
@@ -1705,13 +1704,12 @@ static int MuxSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
 
 /** Remove an ES from a non-RTP muxed stream */
-static int MuxDel( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void MuxDel( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_mux_t *p_mux = p_stream->p_sys->p_mux;
     assert( p_mux != NULL );
 
     sout_MuxDeleteStream( p_mux, (sout_input_t *)id );
-    return VLC_SUCCESS;
 }
 
 

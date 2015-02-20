@@ -82,7 +82,7 @@ static int Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 static sout_stream_id_sys_t *Add( sout_stream_t *, es_format_t * );
-static int Del( sout_stream_t *, sout_stream_id_sys_t * );
+static void Del( sout_stream_t *, sout_stream_id_sys_t * );
 static int Send( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
 
 static int VolumeCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -1621,17 +1621,14 @@ error:
 /*****************************************************************************
  * Del:
  *****************************************************************************/
-static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    int i_err = VLC_SUCCESS;
 
     if ( p_sys->p_audio_stream == id )
         p_sys->p_audio_stream = NULL;
 
     FreeId( id );
-
-    return i_err;
 }
 
 

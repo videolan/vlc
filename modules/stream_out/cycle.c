@@ -96,7 +96,7 @@ static sout_stream_id_sys_t *Add(sout_stream_t *stream, es_format_t *fmt)
     return id;
 }
 
-static int Del(sout_stream_t *stream, sout_stream_id_sys_t *id)
+static void Del(sout_stream_t *stream, sout_stream_id_sys_t *id)
 {
     sout_stream_sys_t *sys = stream->p_sys;
 
@@ -115,7 +115,6 @@ static int Del(sout_stream_t *stream, sout_stream_id_sys_t *id)
 
     es_format_Clean(&id->fmt);
     free(id);
-    return VLC_SUCCESS;
 }
 
 static int AddStream(sout_stream_t *stream, char *chain)

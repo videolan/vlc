@@ -74,7 +74,7 @@ struct decoder_owner_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static sout_stream_id_sys_t *Add ( sout_stream_t *, es_format_t * );
-static int               Del ( sout_stream_t *, sout_stream_id_sys_t * );
+static void              Del ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
 inline static int video_update_format_decoder( decoder_t *p_dec );
@@ -409,7 +409,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     return (sout_stream_id_sys_t *)p_sys;
 }
 
-static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     VLC_UNUSED(id);
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -419,7 +419,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     int i;
 
     if( !p_sys->b_inited )
-        return VLC_SUCCESS;
+        return;
 
     if( p_sys->p_decoder != NULL )
     {
@@ -479,8 +479,6 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     }
 
     p_sys->b_inited = false;
-
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

@@ -187,7 +187,7 @@ struct sout_stream_t
 
     /* add, remove a stream */
     sout_stream_id_sys_t *(*pf_add)( sout_stream_t *, es_format_t * );
-    int               (*pf_del)( sout_stream_t *, sout_stream_id_sys_t * );
+    void              (*pf_del)( sout_stream_t *, sout_stream_id_sys_t * );
     /* manage a packet */
     int               (*pf_send)( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
 
@@ -203,9 +203,9 @@ static inline sout_stream_id_sys_t *sout_StreamIdAdd( sout_stream_t *s, es_forma
 {
     return s->pf_add( s, fmt );
 }
-static inline int sout_StreamIdDel( sout_stream_t *s, sout_stream_id_sys_t *id )
+static inline void sout_StreamIdDel( sout_stream_t *s, sout_stream_id_sys_t *id )
 {
-    return s->pf_del( s, id );
+    s->pf_del( s, id );
 }
 static inline int sout_StreamIdSend( sout_stream_t *s, sout_stream_id_sys_t *id, block_t *b )
 {

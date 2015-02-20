@@ -141,11 +141,11 @@ static const char *const ppsz_sout_options_in[] = {
 };
 
 static sout_stream_id_sys_t *AddOut ( sout_stream_t *, es_format_t * );
-static int               DelOut ( sout_stream_t *, sout_stream_id_sys_t * );
+static void              DelOut ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               SendOut( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
 static sout_stream_id_sys_t *AddIn ( sout_stream_t *, es_format_t * );
-static int               DelIn ( sout_stream_t *, sout_stream_id_sys_t * );
+static void              DelIn ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               SendIn( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
 typedef struct bridged_es_t
@@ -295,16 +295,14 @@ static sout_stream_id_sys_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fm
     return (sout_stream_id_sys_t *)p_sys;
 }
 
-static int DelOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void DelOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     VLC_UNUSED(id);
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
     bridged_es_t *p_es;
 
     if ( !p_sys->b_inited )
-    {
-        return VLC_SUCCESS;
-    }
+        return;
 
     vlc_mutex_lock( &lock );
 
@@ -318,8 +316,6 @@ static int DelOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     vlc_mutex_unlock( &lock );
 
     p_sys->b_inited = false;
-
-    return VLC_SUCCESS;
 }
 
 static int SendOut( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
@@ -490,17 +486,15 @@ static sout_stream_id_sys_t * AddIn( sout_stream_t *p_stream, es_format_t *p_fmt
     return id;
 }
 
-static int DelIn( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void DelIn( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
 
     if( id == p_sys->id_video ) p_sys->id_video = NULL;
     if( id == p_sys->id_audio ) p_sys->id_audio = NULL;
 
-    int ret = p_stream->p_next->pf_del( p_stream->p_next, id->id );
-
+    p_stream->p_next->pf_del( p_stream->p_next, id->id );
     free( id );
-    return ret;
 }
 
 static int SendIn( sout_stream_t *p_stream, sout_stream_id_sys_t *id,

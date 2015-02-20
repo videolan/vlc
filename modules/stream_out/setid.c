@@ -97,7 +97,7 @@ static const char *ppsz_sout_options_lang[] = {
 
 static sout_stream_id_sys_t *AddId   ( sout_stream_t *, es_format_t * );
 static sout_stream_id_sys_t *AddLang ( sout_stream_t *, es_format_t * );
-static int               Del     ( sout_stream_t *, sout_stream_id_sys_t * );
+static void              Del     ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send    ( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
 struct sout_stream_sys_t
@@ -214,9 +214,9 @@ static sout_stream_id_sys_t * AddLang( sout_stream_t *p_stream, es_format_t *p_f
     return p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
 }
 
-static int Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static void Del( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    return p_stream->p_next->pf_del( p_stream->p_next, id );
+    p_stream->p_next->pf_del( p_stream->p_next, id );
 }
 
 static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
