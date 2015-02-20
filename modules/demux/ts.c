@@ -3416,9 +3416,9 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 
     msg_Dbg( p_demux, "SDTCallBack called" );
 
-    if( sdt->psi->i_sdt_version != -1 &&
-        ( !p_sdt->b_current_next ||
-          p_sdt->i_version == sdt->psi->i_sdt_version ) )
+    if( p_sys->b_delay_es_creation ||
+       !p_sdt->b_current_next ||
+        p_sdt->i_version == sdt->psi->i_sdt_version )
     {
         dvbpsi_DeleteSDT( p_sdt );
         return;
