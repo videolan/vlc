@@ -213,7 +213,7 @@ static void FixSubtitleFormat(vout_display_sys_t *sys)
         if (fmt.i_sar_num >= fmt.i_sar_den)
             i_video_width = i_video_width * fmt.i_sar_num / fmt.i_sar_den;
         else
-            i_display_height = i_display_height * fmt.i_sar_den / fmt.i_sar_num;
+            i_video_height = i_video_height * fmt.i_sar_den / fmt.i_sar_num;
     }
 
     if (sys->p_window->i_angle == 90 || sys->p_window->i_angle == 180) {
