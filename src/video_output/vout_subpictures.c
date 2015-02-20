@@ -980,6 +980,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
     subpicture_t *output = subpicture_New(NULL);
     if (!output)
         return NULL;
+    output->i_order = pp_subpicture[i_subpicture - 1]->i_order;
     output->i_original_picture_width  = fmt_dst->i_visible_width;
     output->i_original_picture_height = fmt_dst->i_visible_height;
     subpicture_region_t **output_last_ptr = &output->p_region;
