@@ -607,6 +607,12 @@ JNIThread_Stop( JNIEnv *env, bool *p_error, audio_output_t *p_aout )
     JNI_AT_CALL_VOID( release );
     (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
     p_sys->p_audiotrack = NULL;
+
+    if( p_sys->p_audioTimestamp )
+    {
+        (*env)->DeleteGlobalRef( env, p_sys->p_audioTimestamp );
+        p_sys->p_audioTimestamp = NULL;
+    }
 }
 
 static void
