@@ -1,6 +1,7 @@
 soutdir = $(pluginsdir)/stream_out
 
 libstream_out_dummy_plugin_la_SOURCES = stream_out/dummy.c
+libstream_out_cycle_plugin_la_SOURCES = stream_out/cycle.c
 libstream_out_delay_plugin_la_SOURCES = stream_out/delay.c
 libstream_out_stats_plugin_la_SOURCES = stream_out/stats.c
 libstream_out_description_plugin_la_SOURCES = stream_out/description.c
@@ -26,6 +27,7 @@ libstream_out_transcode_plugin_la_LIBADD = $(LIBM)
 
 sout_LTLIBRARIES = \
 	libstream_out_dummy_plugin.la \
+	libstream_out_cycle_plugin.la \
 	libstream_out_delay_plugin.la \
 	libstream_out_stats_plugin.la \
 	libstream_out_description_plugin.la \

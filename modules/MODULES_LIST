@@ -345,6 +345,7 @@ $Id$
  * stream_out_bridge: "exchange" streams between sout instances. To be used with VLM
  * stream_out_chromaprint: Audio fingerprinter
  * stream_out_chromecast: Chromecast streaming output module
+ * stream_out_cycle: cyclic stream output chain
  * stream_out_delay: introduce delay in an ES when streaming
  * stream_out_description: helper module for RTSP vod
  * stream_out_display: displays a stream output chain
