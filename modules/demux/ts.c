@@ -2393,7 +2393,10 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     /* Get a new TS packet */
     if( !( p_pkt = stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
     {
-        msg_Dbg( p_demux, "eof ?" );
+        if( stream_Tell( p_sys->stream ) == stream_Size( p_sys->stream ) )
+            msg_Dbg( p_demux, "EOF at %"PRId64, stream_Tell( p_sys->stream ) );
+        else
+            msg_Dbg( p_demux, "Can't read TS packet at %"PRId64, stream_Tell(p_sys->stream) );
         return NULL;
     }
 
