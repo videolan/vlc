@@ -384,6 +384,12 @@ vlc-contrib-$(HOST)-latest.tar.bz2:
 
 prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
 	-$(UNPACK)
+ifdef HAVE_WIN32
+ifndef HAVE_CROSS_COMPILE
+	$(RM) `find $(HOST) | file -f- | grep ELF | awk -F: '{print $1}' | xargs`
+endif
+endif
+	$(RM) -r $(TOPDST)/$(HOST)
 	mv $(HOST) $(TOPDST)
 	cd $(TOPDST)/$(HOST) && $(SRC)/change_prefix.sh
 
