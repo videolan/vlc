@@ -726,11 +726,11 @@ bool matroska_segment_c::Preload( )
                 ParseChapters( static_cast<KaxChapters*>( el ) );
             i_chapters_position = (int64_t) es.I_O().getFilePointer();
         }
-        else if( MKV_IS_ID( el, KaxTag ) )
+        else if( MKV_IS_ID( el, KaxTags ) )
         {
             msg_Dbg( &sys.demuxer, "|   + Tags" );
-            /*FIXME if( i_tags_position < 0)
-                LoadTags( static_cast<KaxTags*>( el ) );*/
+            if( i_tags_position < 0)
+                LoadTags( static_cast<KaxTags*>( el ) );
             i_tags_position = (int64_t) es.I_O().getFilePointer();
         }
         else if( MKV_IS_ID( el, EbmlVoid ) )
