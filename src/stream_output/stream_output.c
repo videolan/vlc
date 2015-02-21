@@ -433,7 +433,7 @@ void sout_MuxDelete( sout_mux_t *p_mux )
 /*****************************************************************************
  * sout_MuxAddStream:
  *****************************************************************************/
-sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
+sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, const es_format_t *p_fmt )
 {
     sout_input_t *p_input;
 
@@ -450,7 +450,11 @@ sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux, es_format_t *p_fmt )
     p_input = malloc( sizeof( sout_input_t ) );
     if( !p_input )
         return NULL;
-    p_input->p_fmt  = p_fmt;
+
+    // FIXME: remove either fmt or p_fmt...
+    es_format_Copy( &p_input->fmt, p_fmt );
+    p_input->p_fmt = &p_input->fmt;
+
     p_input->p_fifo = block_FifoNew();
     p_input->p_sys  = NULL;
 
@@ -500,6 +504,7 @@ void sout_MuxDeleteStream( sout_mux_t *p_mux, sout_input_t *p_input )
         }
 
         block_FifoRelease( p_input->p_fifo );
+        es_format_Clean( &p_input->fmt );
         free( p_input );
     }
 }

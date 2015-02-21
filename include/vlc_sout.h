@@ -146,15 +146,15 @@ enum sout_mux_query_e
 
 struct sout_input_t
 {
-    es_format_t     *p_fmt;
-    block_fifo_t    *p_fifo;
-
-    void            *p_sys;
+    const es_format_t *p_fmt;
+    block_fifo_t      *p_fifo;
+    void              *p_sys;
+    es_format_t        fmt;
 };
 
 
 VLC_API sout_mux_t * sout_MuxNew( sout_instance_t*, const char *, sout_access_out_t * ) VLC_USED;
-VLC_API sout_input_t * sout_MuxAddStream( sout_mux_t *, es_format_t * ) VLC_USED;
+VLC_API sout_input_t *sout_MuxAddStream( sout_mux_t *, const es_format_t * ) VLC_USED;
 VLC_API void sout_MuxDeleteStream( sout_mux_t *, sout_input_t * );
 VLC_API void sout_MuxDelete( sout_mux_t * );
 VLC_API int sout_MuxSendBuffer( sout_mux_t *, sout_input_t  *, block_t * );

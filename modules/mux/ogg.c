@@ -381,8 +381,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             !p_input->p_fmt->video.i_frame_rate_base )
         {
             msg_Warn( p_mux, "Missing frame rate, assuming 25fps" );
-            p_input->p_fmt->video.i_frame_rate = 25;
-            p_input->p_fmt->video.i_frame_rate_base = 1;
+            assert(p_input->p_fmt == &p_input->fmt);
+            p_input->fmt.video.i_frame_rate = 25;
+            p_input->fmt.video.i_frame_rate_base = 1;
         }
 
         switch( p_stream->i_fourcc )
