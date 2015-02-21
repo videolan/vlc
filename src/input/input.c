@@ -686,7 +686,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     {
         mtime_t i_wakeup = 0;
         bool b_demux_polled = true;
-        bool b_force_update = false;
         bool b_paused = p_input->p->i_state == PAUSE_S;
         /* FIXME if p_input->p->i_state == PAUSE_S the access/access_demux
          * is paused -> this may cause problem with some of them
@@ -698,9 +697,14 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
         {
             if( !p_input->p->input.b_eof )
             {
-                MainLoopDemux( p_input, &b_force_update, &b_demux_polled, i_start_mdate );
+                bool b_force_update = false;
 
+                MainLoopDemux( p_input, &b_force_update, &b_demux_polled,
+                               i_start_mdate );
                 i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
+
+                if( b_force_update )
+                    i_intf_update = 0;
             }
             else if( !es_out_GetEmpty( p_input->p->p_es_out ) )
             {
@@ -724,6 +728,14 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                     break;
                 b_pause_after_eof = var_GetBool( p_input, "play-and-pause" );
             }
+
+            /* Update interface and statistics */
+            mtime_t now = mdate();
+            if( now >= i_intf_update )
+            {
+                MainLoopStatistics( p_input );
+                i_intf_update = now + INT64_C(250000);
+            }
         }
 
         /* */
@@ -732,7 +744,8 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
         do {
             mtime_t i_deadline = i_wakeup;
             if( b_paused || !b_demux_polled )
-                i_deadline = i_intf_update;
+                /* FIXME: remove this polling */
+                i_deadline = mdate() + INT64_C(250000);
 
             /* Handle control */
             for( ;; )
@@ -771,20 +784,12 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 {
                     if( ControlIsSeekRequest( i_type ) )
                         i_last_seek_mdate = mdate();
-                    b_force_update = true;
+                    i_intf_update = 0;
                 }
             }
 
-            /* Update interface and statistics */
-            now = mdate();
-            if( now >= i_intf_update || b_force_update )
-            {
-                MainLoopStatistics( p_input );
-                i_intf_update = now + INT64_C(250000);
-                b_force_update = false;
-            }
-
             /* Update the wakeup time */
+            now = mdate();
             if( i_wakeup != 0 )
                 i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
         } while( now < i_wakeup );
