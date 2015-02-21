@@ -115,7 +115,7 @@ struct  sout_mux_t
     sout_access_out_t   *p_access;
 
     int                 (*pf_addstream)( sout_mux_t *, sout_input_t * );
-    int                 (*pf_delstream)( sout_mux_t *, sout_input_t * );
+    void                (*pf_delstream)( sout_mux_t *, sout_input_t * );
     int                 (*pf_mux)      ( sout_mux_t * );
     int                 (*pf_control)  ( sout_mux_t *, int, va_list );
 

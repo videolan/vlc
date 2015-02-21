@@ -56,7 +56,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Control  ( sout_mux_t *, int, va_list );
 static int AddStream( sout_mux_t *, sout_input_t * );
-static int DelStream( sout_mux_t *, sout_input_t * );
+static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
 #define MAX_CHANNELS 6
@@ -255,7 +255,7 @@ static block_t *GetHeader( sout_mux_t *p_mux )
     return p_block;
 }
 
-static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
+static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     VLC_UNUSED(p_input);
     msg_Dbg( p_mux, "removing input" );
@@ -265,8 +265,6 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         sout_AccessOutWrite( p_mux->p_access, GetHeader( p_mux ) );
     }
-
-    return VLC_SUCCESS;
 }
 
 static int Mux( sout_mux_t *p_mux )

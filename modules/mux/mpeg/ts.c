@@ -456,7 +456,7 @@ static int intcompare( const void *pa, const void *pb )
  *****************************************************************************/
 static int Control  ( sout_mux_t *, int, va_list );
 static int AddStream( sout_mux_t *, sout_input_t * );
-static int DelStream( sout_mux_t *, sout_input_t * );
+static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
 static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo );
@@ -1127,7 +1127,7 @@ oom:
 /*****************************************************************************
  * DelStream: called before a stream deletion
  *****************************************************************************/
-static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
+static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t   *p_sys = p_mux->p_sys;
     sout_input_sys_t *p_stream = (sout_input_sys_t*)p_input->p_sys;
@@ -1200,8 +1200,6 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* We only change PMT version (PAT isn't changed) */
     p_sys->i_pmt_version_number++;
     p_sys->i_pmt_version_number %= 32;
-
-    return VLC_SUCCESS;
 }
 
 static void SetHeader( sout_buffer_chain_t *c,

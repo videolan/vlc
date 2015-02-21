@@ -105,7 +105,7 @@ static const char *const ppsz_sout_options[] = {
 
 static int Control  ( sout_mux_t *, int, va_list );
 static int AddStream( sout_mux_t *, sout_input_t * );
-static int DelStream( sout_mux_t *, sout_input_t * );
+static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
 typedef struct
@@ -634,7 +634,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 /*****************************************************************************
  * DelStream:
  *****************************************************************************/
-static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
+static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     /* if bitrate ain't defined in commandline, reduce it when tracks are deleted
      */
@@ -664,7 +664,6 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
         vlc_array_remove( p_sys->p_tracks, vlc_array_index_of_item( p_sys->p_tracks, (void *)tk ) );
         p_sys->b_write_header = true;
     }
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

@@ -490,10 +490,7 @@ void sout_MuxDeleteStream( sout_mux_t *p_mux, sout_input_t *p_input )
     TAB_FIND( p_mux->i_nb_inputs, p_mux->pp_inputs, p_input, i_index );
     if( i_index >= 0 )
     {
-        if( p_mux->pf_delstream( p_mux, p_input ) < 0 )
-        {
-            msg_Err( p_mux, "cannot delete this stream from mux" );
-        }
+        p_mux->pf_delstream( p_mux, p_input );
 
         /* remove the entry */
         TAB_REMOVE( p_mux->i_nb_inputs, p_mux->pp_inputs, p_input );

@@ -75,7 +75,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Control  ( sout_mux_t *, int, va_list );
 static int AddStream( sout_mux_t *, sout_input_t * );
-static int DelStream( sout_mux_t *, sout_input_t * );
+static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 static int MuxBlock ( sout_mux_t *, sout_input_t * );
 
@@ -555,7 +555,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 /*****************************************************************************
  * DelStream: Delete an elementary stream from the muxed stream
  *****************************************************************************/
-static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
+static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t *p_sys  = p_mux->p_sys;
     ogg_stream_t   *p_stream = (ogg_stream_t*)p_input->p_sys;

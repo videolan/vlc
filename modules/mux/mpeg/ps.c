@@ -80,7 +80,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Control  ( sout_mux_t *, int, va_list );
 static int AddStream( sout_mux_t *, sout_input_t * );
-static int DelStream( sout_mux_t *, sout_input_t * );
+static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
 /*****************************************************************************
@@ -383,7 +383,7 @@ error:
 /*****************************************************************************
  * DelStream:
  *****************************************************************************/
-static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
+static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     ps_stream_t *p_stream =(ps_stream_t*)p_input->p_sys;
@@ -437,7 +437,6 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_sys->i_psm_version++;
 
     free( p_stream );
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

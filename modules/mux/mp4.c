@@ -95,7 +95,7 @@ static const char *const ppsz_sout_options[] = {
 
 static int Control(sout_mux_t *, int, va_list);
 static int AddStream(sout_mux_t *, sout_input_t *);
-static int DelStream(sout_mux_t *, sout_input_t *);
+static void DelStream(sout_mux_t *, sout_input_t *);
 static int Mux      (sout_mux_t *);
 static int MuxFrag  (sout_mux_t *);
 
@@ -527,11 +527,10 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
 /*****************************************************************************
  * DelStream:
  *****************************************************************************/
-static int DelStream(sout_mux_t *p_mux, sout_input_t *p_input)
+static void DelStream(sout_mux_t *p_mux, sout_input_t *p_input)
 {
     VLC_UNUSED(p_input);
     msg_Dbg(p_mux, "removing input");
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
