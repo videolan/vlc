@@ -69,7 +69,7 @@ static mtime_t get_dts(const block_t *block)
     return block->i_dts;
 }
 
-static sout_stream_id_sys_t *Add(sout_stream_t *stream, es_format_t *fmt)
+static sout_stream_id_sys_t *Add(sout_stream_t *stream, const es_format_t *fmt)
 {
     sout_stream_sys_t *sys = stream->p_sys;
     sout_stream_id_sys_t *id = malloc(sizeof (*id));

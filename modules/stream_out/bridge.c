@@ -140,11 +140,11 @@ static const char *const ppsz_sout_options_in[] = {
     NULL
 };
 
-static sout_stream_id_sys_t *AddOut ( sout_stream_t *, es_format_t * );
+static sout_stream_id_sys_t *AddOut( sout_stream_t *, const es_format_t * );
 static void              DelOut ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               SendOut( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
-static sout_stream_id_sys_t *AddIn ( sout_stream_t *, es_format_t * );
+static sout_stream_id_sys_t *AddIn( sout_stream_t *, const es_format_t * );
 static void              DelIn ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               SendIn( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
@@ -233,7 +233,7 @@ static void CloseOut( vlc_object_t * p_this )
     free( p_sys );
 }
 
-static sout_stream_id_sys_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t * AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
     bridge_t *p_bridge;
@@ -451,7 +451,7 @@ struct sout_stream_id_sys_t
     int i_cat; /* es category. Used for placeholder option */
 };
 
-static sout_stream_id_sys_t * AddIn( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t * AddIn( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
 

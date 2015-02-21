@@ -175,7 +175,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Sout callbacks
  *****************************************************************************/
-static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, es_format_t *p_fmt)
+static sout_stream_id_sys_t *Add(sout_stream_t *p_stream, const es_format_t *p_fmt)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     return p_sys->p_out->pf_add(p_sys->p_out, p_fmt);

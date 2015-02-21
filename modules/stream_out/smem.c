@@ -125,12 +125,14 @@ static const char *const ppsz_sout_options[] = {
     "video-postrender-callback", "audio-postrender-callback", "video-data", "audio-data", "time-sync", NULL
 };
 
-static sout_stream_id_sys_t *Add ( sout_stream_t *, es_format_t * );
+static sout_stream_id_sys_t *Add( sout_stream_t *, const es_format_t * );
 static void              Del ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
 
-static sout_stream_id_sys_t *AddVideo( sout_stream_t *p_stream, es_format_t *p_fmt );
-static sout_stream_id_sys_t *AddAudio( sout_stream_t *p_stream, es_format_t *p_fmt );
+static sout_stream_id_sys_t *AddVideo( sout_stream_t *p_stream,
+                                       const es_format_t *p_fmt );
+static sout_stream_id_sys_t *AddAudio( sout_stream_t *p_stream,
+                                       const es_format_t *p_fmt );
 
 static int SendVideo( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                       block_t *p_buffer );
@@ -206,7 +208,8 @@ static void Close( vlc_object_t * p_this )
     free( p_stream->p_sys );
 }
 
-static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
+                                  const es_format_t *p_fmt )
 {
     sout_stream_id_sys_t *id = NULL;
 
@@ -217,7 +220,8 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     return id;
 }
 
-static sout_stream_id_sys_t *AddVideo( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t *AddVideo( sout_stream_t *p_stream,
+                                       const es_format_t *p_fmt )
 {
     char* psz_tmp;
     sout_stream_id_sys_t    *id;
@@ -266,7 +270,8 @@ static sout_stream_id_sys_t *AddVideo( sout_stream_t *p_stream, es_format_t *p_f
     return id;
 }
 
-static sout_stream_id_sys_t *AddAudio( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t *AddAudio( sout_stream_t *p_stream,
+                                       const es_format_t *p_fmt )
 {
     char* psz_tmp;
     sout_stream_id_sys_t* id;

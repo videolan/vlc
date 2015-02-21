@@ -273,11 +273,11 @@ static const char *const ppsz_sout_options[] = {
     "mp4a-latm", NULL
 };
 
-static sout_stream_id_sys_t *Add ( sout_stream_t *, es_format_t * );
+static sout_stream_id_sys_t *Add( sout_stream_t *, const es_format_t * );
 static void              Del ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send( sout_stream_t *, sout_stream_id_sys_t *,
                                block_t* );
-static sout_stream_id_sys_t *MuxAdd ( sout_stream_t *, es_format_t * );
+static sout_stream_id_sys_t *MuxAdd( sout_stream_t *, const es_format_t * );
 static void              MuxDel ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               MuxSend( sout_stream_t *, sout_stream_id_sys_t *,
                                   block_t* );
@@ -953,7 +953,8 @@ uint32_t rtp_compute_ts( unsigned i_clock_rate, int64_t i_pts )
 }
 
 /** Add an ES as a new RTP stream */
-static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
+                                  const es_format_t *p_fmt )
 {
     /* NOTE: As a special case, if we use a non-RTP
      * mux (TS/PS), then p_fmt is NULL. */
@@ -1676,7 +1677,8 @@ size_t rtp_mtu (const sout_stream_id_sys_t *id)
  *****************************************************************************/
 
 /** Add an ES to a non-RTP muxed stream */
-static sout_stream_id_sys_t *MuxAdd( sout_stream_t *p_stream, es_format_t *p_fmt )
+static sout_stream_id_sys_t *MuxAdd( sout_stream_t *p_stream,
+                                     const es_format_t *p_fmt )
 {
     sout_input_t      *p_input;
     sout_mux_t *p_mux = p_stream->p_sys->p_mux;
