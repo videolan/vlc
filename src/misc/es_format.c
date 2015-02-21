@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_es.h>
 
@@ -455,87 +457,108 @@ void es_format_InitFromVideo( es_format_t *p_es, const video_format_t *p_fmt )
     video_format_Copy( &p_es->video, p_fmt );
 }
 
-int es_format_Copy( es_format_t *dst, const es_format_t *src )
+int es_format_Copy(es_format_t *restrict dst, const es_format_t *src)
 {
-    memcpy( dst, src, sizeof( es_format_t ) );
-    dst->psz_language = src->psz_language ? strdup( src->psz_language ) : NULL;
-    dst->psz_description = src->psz_description ? strdup( src->psz_description ) : NULL;
-    if( src->i_extra > 0 && dst->p_extra )
+    int ret = VLC_SUCCESS;
+
+    *dst = *src;
+
+    if (src->psz_language != NULL)
     {
-        dst->i_extra = src->i_extra;
+        dst->psz_language = strdup(src->psz_language);
+        if (unlikely(dst->psz_language == NULL))
+            ret = VLC_ENOMEM;
+    }
+    if (src->psz_description != NULL)
+    {
+        dst->psz_description = strdup(src->psz_description);
+        if (unlikely(dst->psz_description == NULL))
+            ret = VLC_ENOMEM;
+    }
+
+    if (src->i_extra > 0)
+    {
+        assert(src->p_extra != NULL);
         dst->p_extra = malloc( src->i_extra );
-        if(dst->p_extra)
-            memcpy( dst->p_extra, src->p_extra, src->i_extra );
+
+        if( likely(dst->p_extra != NULL) )
+            memcpy(dst->p_extra, src->p_extra, src->i_extra);
         else
+        {
             dst->i_extra = 0;
-    }
-    else
-    {
-        dst->i_extra = 0;
-        dst->p_extra = NULL;
-    }
-
-    dst->subs.psz_encoding = dst->subs.psz_encoding ? strdup( src->subs.psz_encoding ) : NULL;
-    dst->subs.p_style = src->subs.p_style ? text_style_Duplicate( src->subs.p_style ) : NULL;
-
-    if( src->video.p_palette )
-    {
-        dst->video.p_palette =
-            (video_palette_t*)malloc( sizeof( video_palette_t ) );
-        if(dst->video.p_palette)
-        {
-            memcpy( dst->video.p_palette, src->video.p_palette,
-                sizeof( video_palette_t ) );
+            ret = VLC_ENOMEM;
         }
     }
 
-    if( dst->i_extra_languages && src->p_extra_languages)
+    if (src->subs.psz_encoding != NULL)
     {
-        dst->i_extra_languages = src->i_extra_languages;
-        dst->p_extra_languages = (extra_languages_t*)
-            malloc(dst->i_extra_languages * sizeof(*dst->p_extra_languages ));
-        if( dst->p_extra_languages )
+        dst->subs.psz_encoding = strdup(src->subs.psz_encoding);
+        if (unlikely(dst->subs.psz_encoding == NULL))
+            ret = VLC_ENOMEM;
+    }
+    if (src->subs.p_style != NULL)
+    {
+        dst->subs.p_style = text_style_Duplicate(src->subs.p_style);
+        if (unlikely(dst->subs.p_style == NULL))
+            ret = VLC_ENOMEM;
+    }
+
+    if (src->video.p_palette != NULL)
+    {
+        dst->video.p_palette = malloc(sizeof (video_palette_t));
+        if (likely(dst->video.p_palette != NULL))
+            *dst->video.p_palette = *src->video.p_palette;
+        else
+            ret = VLC_ENOMEM;
+    }
+
+    if (src->i_extra_languages > 0)
+    {
+        assert(src->p_extra_languages != NULL);
+        dst->p_extra_languages = calloc(dst->i_extra_languages,
+                                        sizeof (*dst->p_extra_languages));
+        if (likely(dst->p_extra_languages != NULL))
         {
-            for( unsigned i = 0; i < dst->i_extra_languages; i++ ) {
-                if( src->p_extra_languages[i].psz_language )
-                    dst->p_extra_languages[i].psz_language = strdup( src->p_extra_languages[i].psz_language );
-                else
-                    dst->p_extra_languages[i].psz_language = NULL;
-                if( src->p_extra_languages[i].psz_description )
-                    dst->p_extra_languages[i].psz_description = strdup( src->p_extra_languages[i].psz_description );
-                else
-                    dst->p_extra_languages[i].psz_description = NULL;
+            for (unsigned i = 0; i < dst->i_extra_languages; i++)
+            {
+                if (src->p_extra_languages[i].psz_language != NULL)
+                    dst->p_extra_languages[i].psz_language = strdup(src->p_extra_languages[i].psz_language);
+                if (src->p_extra_languages[i].psz_description != NULL)
+                    dst->p_extra_languages[i].psz_description = strdup(src->p_extra_languages[i].psz_description);
             }
+            dst->i_extra_languages = src->i_extra_languages;
         }
         else
+        {
             dst->i_extra_languages = 0;
+            ret = VLC_ENOMEM;
+        }
     }
-    else
-        dst->i_extra_languages = 0;
-    return VLC_SUCCESS;
+    return ret;
 }
 
-void es_format_Clean( es_format_t *fmt )
+void es_format_Clean(es_format_t *fmt)
 {
-    free( fmt->psz_language );
-    free( fmt->psz_description );
+    free(fmt->psz_language);
+    free(fmt->psz_description);
+    assert(fmt->i_extra == 0 || fmt->p_extra != NULL);
+    free(fmt->p_extra);
 
-    if( fmt->i_extra > 0 ) free( fmt->p_extra );
+    free(fmt->video.p_palette);
+    free(fmt->subs.psz_encoding);
 
-    free( fmt->video.p_palette );
-    free( fmt->subs.psz_encoding );
+    if (fmt->subs.p_style != NULL)
+        text_style_Delete(fmt->subs.p_style);
 
-    if ( fmt->subs.p_style ) text_style_Delete( fmt->subs.p_style );
-
-    for( unsigned i = 0; i < fmt->i_extra_languages; i++ )
+    for (unsigned i = 0; i < fmt->i_extra_languages; i++)
     {
-        free( fmt->p_extra_languages[i].psz_language );
-        free( fmt->p_extra_languages[i].psz_description );
+        free(fmt->p_extra_languages[i].psz_language);
+        free(fmt->p_extra_languages[i].psz_description);
     }
-    free( fmt->p_extra_languages );
+    free(fmt->p_extra_languages);
 
     /* es_format_Clean can be called multiple times */
-    memset( fmt, 0, sizeof(*fmt) );
+    es_format_Init(fmt, UNKNOWN_ES, 0);
 }
 
 bool es_format_IsSimilar( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )

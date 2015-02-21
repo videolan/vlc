@@ -80,6 +80,7 @@ static sout_stream_id_sys_t *Add(sout_stream_t *stream, es_format_t *fmt)
 
     if (es_format_Copy(&id->fmt, fmt))
     {
+        es_format_Clean(&id->fmt);
         free(id);
         return NULL;
     }
