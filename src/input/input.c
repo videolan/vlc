@@ -1482,12 +1482,17 @@ static inline int ControlPop( input_thread_t *p_input,
             return VLC_EGENERIC;
         }
 
-        if( vlc_cond_timedwait( &p_sys->wait_control, &p_sys->lock_control,
-                                i_deadline ) )
+        if( i_deadline >= 0 )
         {
-            vlc_mutex_unlock( &p_sys->lock_control );
-            return VLC_EGENERIC;
+            if( vlc_cond_timedwait( &p_sys->wait_control, &p_sys->lock_control,
+                                    i_deadline ) )
+            {
+                vlc_mutex_unlock( &p_sys->lock_control );
+                return VLC_EGENERIC;
+            }
         }
+        else
+            vlc_cond_wait( &p_sys->wait_control, &p_sys->lock_control );
     }
 
     /* */
