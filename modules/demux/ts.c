@@ -4843,7 +4843,7 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pid_t *pid,
                     pid->es->fmt.i_extra_languages );
     if( pid->es->fmt.p_extra_languages )
     {
-        for( int i = 0; i < pid->es->fmt.i_extra_languages; i++ )
+        for( unsigned i = 0; i < pid->es->fmt.i_extra_languages; i++ )
         {
             pid->es->fmt.p_extra_languages[i].psz_language = malloc(4);
             if( pid->es->fmt.p_extra_languages[i].psz_language )

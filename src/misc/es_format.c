@@ -457,7 +457,6 @@ void es_format_InitFromVideo( es_format_t *p_es, const video_format_t *p_fmt )
 
 int es_format_Copy( es_format_t *dst, const es_format_t *src )
 {
-    int i;
     memcpy( dst, src, sizeof( es_format_t ) );
     dst->psz_language = src->psz_language ? strdup( src->psz_language ) : NULL;
     dst->psz_description = src->psz_description ? strdup( src->psz_description ) : NULL;
@@ -497,7 +496,7 @@ int es_format_Copy( es_format_t *dst, const es_format_t *src )
             malloc(dst->i_extra_languages * sizeof(*dst->p_extra_languages ));
         if( dst->p_extra_languages )
         {
-            for( i = 0; i < dst->i_extra_languages; i++ ) {
+            for( unsigned i = 0; i < dst->i_extra_languages; i++ ) {
                 if( src->p_extra_languages[i].psz_language )
                     dst->p_extra_languages[i].psz_language = strdup( src->p_extra_languages[i].psz_language );
                 else
@@ -528,16 +527,12 @@ void es_format_Clean( es_format_t *fmt )
 
     if ( fmt->subs.p_style ) text_style_Delete( fmt->subs.p_style );
 
-    if( fmt->i_extra_languages > 0 && fmt->p_extra_languages )
+    for( unsigned i = 0; i < fmt->i_extra_languages; i++ )
     {
-        int i;
-        for( i = 0; i < fmt->i_extra_languages; i++ )
-        {
-            free( fmt->p_extra_languages[i].psz_language );
-            free( fmt->p_extra_languages[i].psz_description );
-        }
-        free( fmt->p_extra_languages );
+        free( fmt->p_extra_languages[i].psz_language );
+        free( fmt->p_extra_languages[i].psz_description );
     }
+    free( fmt->p_extra_languages );
 
     /* es_format_Clean can be called multiple times */
     memset( fmt, 0, sizeof(*fmt) );
