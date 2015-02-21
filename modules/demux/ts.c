@@ -322,6 +322,9 @@ typedef struct
 #define MIN_ES_PID 4    /* Should be 32.. broken muxers */
 #define MAX_ES_PID 8190
 
+#define FROM_SCALE(x) (VLC_TS_0 + ((x) * 100 / 9))
+#define TO_SCALE(x)   (((x) - VLC_TS_0) * 9 / 100)
+
 struct demux_sys_t
 {
     stream_t   *stream;
