@@ -1476,7 +1476,7 @@ static inline int ControlPop( input_thread_t *p_input,
     while( p_sys->i_control <= 0 ||
            ( b_postpone_seek && ControlIsSeekRequest( p_sys->control[0].i_type ) ) )
     {
-        if( !vlc_object_alive( p_input ) || i_deadline < 0 )
+        if( !vlc_object_alive( p_input ) )
         {
             vlc_mutex_unlock( &p_sys->lock_control );
             return VLC_EGENERIC;
