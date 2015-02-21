@@ -38,7 +38,6 @@
  * Exported prototypes
  *****************************************************************************/
 static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
 
 static sout_stream_id_sys_t *Add ( sout_stream_t *, es_format_t * );
 static void              Del ( sout_stream_t *, sout_stream_id_sys_t * );
@@ -51,7 +50,7 @@ vlc_module_begin ()
     set_description( N_("Dummy stream output") )
     set_capability( "sout stream", 50 )
     add_shortcut( "dummy", "drop" )
-    set_callbacks( Open, Close )
+    set_callbacks( Open, NULL )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -68,14 +67,6 @@ static int Open( vlc_object_t *p_this )
     p_stream->p_sys     = NULL;
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close:
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    (void)p_this;
 }
 
 static sout_stream_id_sys_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
