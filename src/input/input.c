@@ -738,61 +738,55 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             }
         }
 
-        /* */
-        mtime_t now;
-
-        do {
+        /* Handle control */
+        for( ;; )
+        {
             mtime_t i_deadline = i_wakeup;
+
             if( b_paused || !b_demux_polled )
                 /* FIXME: remove this polling */
                 i_deadline = mdate() + INT64_C(250000);
 
-            /* Handle control */
-            for( ;; )
+            /* Postpone seeking until ES buffering is complete or at most
+             * 125 ms. */
+            bool b_postpone = es_out_GetBuffering( p_input->p->p_es_out )
+                            && !p_input->p->input.b_eof;
+            if( b_postpone )
             {
-                mtime_t i_limit = i_deadline;
+                mtime_t now = mdate();
 
-                /* Postpone seeking until ES buffering is complete or at most
-                 * 125 ms. */
-                bool b_buffering = es_out_GetBuffering( p_input->p->p_es_out )
-                                && !p_input->p->input.b_eof;
-                if( b_buffering )
-                {
-                    mtime_t now = mdate();
+                /* Recheck ES buffer level every 20 ms when seeking */
+                if( now < i_last_seek_mdate + INT64_C(125000)
+                 && i_deadline > now + INT64_C(20000) )
+                    i_deadline = now + INT64_C(20000);
+                else
+                    b_postpone = false;
+            }
 
-                    /* Recheck ES buffer level every 20 ms when seeking */
-                    if( now < i_last_seek_mdate + INT64_C(125000)
-                     && i_deadline > now + INT64_C(20000) )
-                        i_limit = now + INT64_C(20000);
-                }
+            int i_type;
+            vlc_value_t val;
 
-                int i_type;
-                vlc_value_t val;
-
-                if( ControlPop( p_input, &i_type, &val, i_limit, b_buffering ) )
-                {
-                    if( b_buffering && i_limit < i_deadline )
-                        continue;
-                    break;
-                }
+            if( ControlPop( p_input, &i_type, &val, i_deadline, b_postpone ) )
+            {
+                if( b_postpone )
+                    continue;
+                break; /* Wake-up time reached */
+            }
 
 #ifndef NDEBUG
-                msg_Dbg( p_input, "control type=%d", i_type );
+            msg_Dbg( p_input, "control type=%d", i_type );
 #endif
-
-                if( Control( p_input, i_type, val ) )
-                {
-                    if( ControlIsSeekRequest( i_type ) )
-                        i_last_seek_mdate = mdate();
-                    i_intf_update = 0;
-                }
+            if( Control( p_input, i_type, val ) )
+            {
+                if( ControlIsSeekRequest( i_type ) )
+                    i_last_seek_mdate = mdate();
+                i_intf_update = 0;
             }
 
             /* Update the wakeup time */
-            now = mdate();
             if( i_wakeup != 0 )
                 i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
-        } while( now < i_wakeup );
+        }
     }
 
     if( !p_input->b_error )
