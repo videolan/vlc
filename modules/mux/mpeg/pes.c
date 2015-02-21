@@ -51,7 +51,7 @@
  *                      header in bytes.
  */
 static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
-                             int i_es_size, es_format_t *p_fmt,
+                             int i_es_size, const es_format_t *p_fmt,
                              int i_stream_id, bool b_mpeg2,
                              bool b_data_alignment, int i_header_size )
 {
@@ -317,7 +317,7 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
  *                       VIDEO_ES, set to INT_MAX.
  */
 void EStoPES ( block_t **pp_pes,
-                   es_format_t *p_fmt, int i_stream_id,
+                   const es_format_t *p_fmt, int i_stream_id,
                    int b_mpeg2, int b_data_alignment, int i_header_size,
                    int i_max_pes_size, mtime_t ts_offset )
 {

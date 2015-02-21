@@ -460,7 +460,7 @@ static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
 static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo );
-static block_t *Add_ADTS( block_t *, es_format_t * );
+static block_t *Add_ADTS( block_t *, const es_format_t * );
 static void TSSchedule  ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                           mtime_t i_pcr_length, mtime_t i_pcr_dts );
 static void TSDate      ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
@@ -1080,7 +1080,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     else
     {
         /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
-        es_format_t *fmt = p_input->p_fmt;
+        const es_format_t *fmt = p_input->p_fmt;
         if( fmt->i_extra > 0 )
         {
             p_stream->pes.i_extra = fmt->i_extra;
@@ -1667,11 +1667,11 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
     }
 }
 
-static block_t *Add_ADTS( block_t *p_data, es_format_t *p_fmt )
+static block_t *Add_ADTS( block_t *p_data, const es_format_t *p_fmt )
 {
 #define ADTS_HEADER_SIZE 7 /* CRC needs 2 more bytes */
 
-    uint8_t *p_extra = p_fmt->p_extra;
+    const uint8_t *p_extra = p_fmt->p_extra;
 
     if( !p_data || p_fmt->i_extra < 2 || !p_extra )
         return p_data; /* no data to construct the headers */
