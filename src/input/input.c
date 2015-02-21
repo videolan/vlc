@@ -684,22 +684,16 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
 
     while( vlc_object_alive( p_input ) && !p_input->b_error )
     {
-        bool b_force_update;
-        vlc_value_t val;
-        mtime_t i_wakeup;
-        bool b_paused;
-        bool b_demux_polled;
-
-        /* Demux data */
-        b_force_update = false;
-        i_wakeup = 0;
+        mtime_t i_wakeup = 0;
+        bool b_demux_polled = true;
+        bool b_force_update = false;
+        bool b_paused = p_input->p->i_state == PAUSE_S;
         /* FIXME if p_input->p->i_state == PAUSE_S the access/access_demux
          * is paused -> this may cause problem with some of them
          * The same problem can be seen when seeking while paused */
-        b_paused = p_input->p->i_state == PAUSE_S &&
-                   ( !es_out_GetBuffering( p_input->p->p_es_out ) || p_input->p->input.b_eof );
+        if( b_paused )
+            b_paused = !es_out_GetBuffering( p_input->p->p_es_out ) || p_input->p->input.b_eof;
 
-        b_demux_polled = true;
         if( !b_paused )
         {
             if( !p_input->p->input.b_eof )
@@ -717,8 +711,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
              * This way we won't trigger timeshifting for nothing */
             else if( b_pause_after_eof && p_input->p->b_can_pause )
             {
+                vlc_value_t val = { .i_int = PAUSE_S };
+
                 msg_Dbg( p_input, "pausing at EOF (pause after each)");
-                val.i_int = PAUSE_S;
                 Control( p_input, INPUT_CONTROL_SET_STATE, val );
 
                 b_paused = true;
@@ -744,20 +739,23 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             {
                 mtime_t i_limit = i_deadline;
 
-                /* We will postpone the execution of a seek until we have
-                 * finished the ES bufferisation (postpone is limited to
-                 * 125ms) */
-                bool b_buffering = es_out_GetBuffering( p_input->p->p_es_out ) &&
-                                   !p_input->p->input.b_eof;
+                /* Postpone seeking until ES buffering is complete or at most
+                 * 125 ms. */
+                bool b_buffering = es_out_GetBuffering( p_input->p->p_es_out )
+                                && !p_input->p->input.b_eof;
                 if( b_buffering )
                 {
-                    /* When postpone is in order, check the ES level every 20ms */
                     mtime_t now = mdate();
-                    if( i_last_seek_mdate + INT64_C(125000) >= now )
-                        i_limit = __MIN( i_deadline, now + INT64_C(20000) );
+
+                    /* Recheck ES buffer level every 20 ms when seeking */
+                    if( now < i_last_seek_mdate + INT64_C(125000)
+                     && i_deadline > now + INT64_C(20000) )
+                        i_limit = now + INT64_C(20000);
                 }
 
                 int i_type;
+                vlc_value_t val;
+
                 if( ControlPop( p_input, &i_type, &val, i_limit, b_buffering ) )
                 {
                     if( b_buffering && i_limit < i_deadline )
