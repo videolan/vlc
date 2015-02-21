@@ -163,8 +163,8 @@ static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 }
 
 /* TODO: make this into something more clever than a big switch? */
-int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
-                  rtp_format_t *rtp_fmt )
+int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
+                 rtp_format_t *rtp_fmt )
 {
     assert( p_fmt != NULL || mux != NULL );
 

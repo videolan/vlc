@@ -86,7 +86,7 @@ typedef struct rtp_format_t
     pf_rtp_packetizer_t pf_packetize;
 } rtp_format_t;
 
-int rtp_get_fmt( vlc_object_t *obj, es_format_t *p_fmt, const char *mux,
+int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
                  rtp_format_t *p_rtp_fmt );
 
 /* Only used by rtp_packetize_rawvideo */
