@@ -815,7 +815,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     return VLC_SUCCESS;
 }
 
-bool transcode_video_add( sout_stream_t *p_stream, es_format_t *p_fmt,
+bool transcode_video_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
                                 sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
