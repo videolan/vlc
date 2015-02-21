@@ -636,10 +636,9 @@ static int MainLoopTryRepeat( input_thread_t *p_input, mtime_t *pi_start_mdate )
 }
 
 /**
- * MainLoopInterface
- * It update the variables used by the interfaces
+ * Update timing infos and statistics.
  */
-static void MainLoopInterface( input_thread_t *p_input )
+static void MainLoopStatistics( input_thread_t *p_input )
 {
     double f_position = 0.0;
     mtime_t i_time = 0;
@@ -666,14 +665,7 @@ static void MainLoopInterface( input_thread_t *p_input )
     p_input->p->bookmark.i_time_offset = i_time;
     p_input->p->bookmark.i_byte_offset = -1;
     vlc_mutex_unlock( &p_input->p->p_item->lock );
-}
 
-/**
- * MainLoopStatistic
- * It updates the globals statics
- */
-static void MainLoopStatistic( input_thread_t *p_input )
-{
     stats_ComputeInputStats( p_input, p_input->p->p_item->p_stats );
     input_SendEventStatistics( p_input );
 }
@@ -686,7 +678,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
 {
     mtime_t i_start_mdate = mdate();
     mtime_t i_intf_update = 0;
-    mtime_t i_statistic_update = 0;
     mtime_t i_last_seek_mdate = 0;
     bool b_pause_after_eof = b_interactive &&
                              var_CreateGetBool( p_input, "play-and-pause" );
@@ -695,7 +686,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     {
         bool b_force_update;
         vlc_value_t val;
-        mtime_t i_wakeup, i_current;
+        mtime_t i_wakeup;
         bool b_paused;
         bool b_demux_polled;
 
@@ -741,10 +732,12 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
         }
 
         /* */
+        mtime_t now;
+
         do {
             mtime_t i_deadline = i_wakeup;
             if( b_paused || !b_demux_polled )
-                i_deadline = __MIN( i_intf_update, i_statistic_update );
+                i_deadline = i_intf_update;
 
             /* Handle control */
             for( ;; )
@@ -785,23 +778,18 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             }
 
             /* Update interface and statistics */
-            i_current = mdate();
-            if( i_intf_update < i_current || b_force_update )
+            now = mdate();
+            if( now >= i_intf_update || b_force_update )
             {
-                MainLoopInterface( p_input );
-                i_intf_update = i_current + INT64_C(250000);
+                MainLoopStatistics( p_input );
+                i_intf_update = now + INT64_C(250000);
                 b_force_update = false;
-            }
-            if( i_statistic_update < i_current )
-            {
-                MainLoopStatistic( p_input );
-                i_statistic_update = i_current + CLOCK_FREQ;
             }
 
             /* Update the wakeup time */
             if( i_wakeup != 0 )
                 i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
-        } while( i_current < i_wakeup );
+        } while( now < i_wakeup );
     }
 
     if( !p_input->b_error )
