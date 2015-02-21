@@ -54,7 +54,7 @@
 #include "../video_output/vout_control.h"
 
 static decoder_t *CreateDecoder( vlc_object_t *, input_thread_t *,
-                                 es_format_t *, bool, input_resource_t *,
+                                 const es_format_t *, bool, input_resource_t *,
                                  sout_instance_t *p_sout );
 static void       DeleteDecoder( decoder_t * );
 
@@ -223,7 +223,7 @@ int decoder_GetDisplayRate( decoder_t *p_dec )
 
 /* TODO: pass p_sout through p_resource? -- Courmisch */
 static decoder_t *decoder_New( vlc_object_t *p_parent, input_thread_t *p_input,
-                               es_format_t *fmt, input_clock_t *p_clock,
+                               const es_format_t *fmt, input_clock_t *p_clock,
                                input_resource_t *p_resource,
                                sout_instance_t *p_sout  )
 {
@@ -290,7 +290,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
 /**
  * Spawn a decoder thread outside of the input thread.
  */
-decoder_t *input_DecoderCreate( vlc_object_t *p_parent, es_format_t *fmt,
+decoder_t *input_DecoderCreate( vlc_object_t *p_parent, const es_format_t *fmt,
                                 input_resource_t *p_resource )
 {
     return decoder_New( p_parent, NULL, fmt, NULL, p_resource, NULL );
@@ -701,7 +701,7 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
  */
 static decoder_t * CreateDecoder( vlc_object_t *p_parent,
                                   input_thread_t *p_input,
-                                  es_format_t *fmt, bool b_packetizer,
+                                  const es_format_t *fmt, bool b_packetizer,
                                   input_resource_t *p_resource,
                                   sout_instance_t *p_sout )
 {
