@@ -684,7 +684,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
 
     while( vlc_object_alive( p_input ) && !p_input->b_error )
     {
-        mtime_t i_wakeup = 0;
+        mtime_t i_wakeup = -1;
         bool b_demux_polled = true;
         bool b_paused = p_input->p->i_state == PAUSE_S;
         /* FIXME if p_input->p->i_state == PAUSE_S the access/access_demux
@@ -743,10 +743,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
         {
             mtime_t i_deadline = i_wakeup;
 
-            if( b_paused || !b_demux_polled )
-                /* FIXME: remove this polling */
-                i_deadline = mdate() + INT64_C(250000);
-
             /* Postpone seeking until ES buffering is complete or at most
              * 125 ms. */
             bool b_postpone = es_out_GetBuffering( p_input->p->p_es_out )
@@ -757,7 +753,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
 
                 /* Recheck ES buffer level every 20 ms when seeking */
                 if( now < i_last_seek_mdate + INT64_C(125000)
-                 && i_deadline > now + INT64_C(20000) )
+                 && (i_deadline < 0 || i_deadline > now + INT64_C(20000)) )
                     i_deadline = now + INT64_C(20000);
                 else
                     b_postpone = false;
