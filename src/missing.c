@@ -277,7 +277,7 @@ encoder_t *sout_EncoderCreate( vlc_object_t *p_this )
     return NULL;
 }
 
-sout_input_t *sout_MuxAddStream (sout_mux_t *mux, es_format_t *fmt)
+sout_input_t *sout_MuxAddStream( sout_mux_t *mux, const es_format_t *fmt )
 {
     VLC_UNUSED (mux); VLC_UNUSED (fmt);
     vlc_assert_unreachable ();
