@@ -2143,10 +2143,13 @@ static block_t *Opus_Parse(demux_t *demux, block_t *block)
 /****************************************************************************
  * gathering stuff
  ****************************************************************************/
-static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header,
+static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header, size_t i_header,
                            unsigned *pi_skip, mtime_t *pi_dts, mtime_t *pi_pts )
 {
     unsigned i_skip;
+
+    if ( i_header < 9 )
+        return VLC_EGENERIC;
 
     switch( p_header[3] )
     {
@@ -2165,21 +2168,33 @@ static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header,
         {
             /* mpeg2 PES */
             i_skip = p_header[8] + 9;
+            if( i_header < i_skip )
+                return VLC_EGENERIC;
 
             if( p_header[7]&0x80 )    /* has pts */
             {
+                if( i_header < 9 + 5 )
+                    return VLC_EGENERIC;
                 *pi_pts = ExtractPESTimestamp( &p_header[9] );
 
                 if( p_header[7]&0x40 )    /* has dts */
+                {
+                    if( i_header < 14 + 5 )
+                        return VLC_EGENERIC;
                     *pi_dts = ExtractPESTimestamp( &p_header[14] );
+                }
             }
         }
         else
         {
             i_skip = 6;
+            if( i_header < i_skip + 1 )
+                return VLC_EGENERIC;
             while( i_skip < 23 && p_header[i_skip] == 0xff )
             {
                 i_skip++;
+                if( i_header < i_skip + 1 )
+                    return VLC_EGENERIC;
             }
             if( i_skip == 23 )
             {
@@ -2191,12 +2206,19 @@ static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header,
                 i_skip += 2;
             }
 
+            if( i_header < i_skip + 1 )
+                return VLC_EGENERIC;
+
             if(  p_header[i_skip]&0x20 )
             {
+                if( i_header < i_skip + 5 )
+                    return VLC_EGENERIC;
                 *pi_pts = ExtractPESTimestamp( &p_header[i_skip] );
 
                 if( p_header[i_skip]&0x10 )    /* has dts */
                 {
+                    if( i_header < i_skip + 10 )
+                        return VLC_EGENERIC;
                     *pi_dts = ExtractPESTimestamp( &p_header[i_skip+5] );
                     i_skip += 10;
                 }
@@ -2213,6 +2235,9 @@ static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header,
         break;
     }
 
+    if( i_header < i_skip )
+        return VLC_EGENERIC;
+
     *pi_skip = i_skip;
     return VLC_SUCCESS;
 }
@@ -2227,10 +2252,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     mtime_t i_pts = -1;
     mtime_t i_length = 0;
 
-    /* FIXME find real max size */
     const int i_max = block_ChainExtract( p_pes, header, 34 );
-    assert(i_max >= 34);
-    if (unlikely(i_max < 34))
+    if ( i_max < 4 )
     {
         block_ChainRelease( p_pes );
         return;
@@ -2245,8 +2268,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
         return;
     }
 
-    /* TODO check size */
-    if( ParsePESHeader( p_demux, (uint8_t*)&header, &i_skip, &i_dts, &i_pts ) == VLC_EGENERIC )
+    if( ParsePESHeader( p_demux, (uint8_t*)&header, i_max, &i_skip, &i_dts, &i_pts ) == VLC_EGENERIC )
     {
         block_ChainRelease( p_pes );
         return;
@@ -2715,14 +2737,18 @@ static int SeekToTime( demux_t *p_demux, ts_prg_psi_t *p_prg, int64_t i_scaledti
                 unsigned i_skip = 4;
                 if ( p_pkt->p_buffer[3] & 0x20 ) // adaptation field
                 {
-                    i_pcr = GetPCR( p_pkt );
-                    i_skip += 1 + p_pkt->p_buffer[4];
+                    if( p_pkt->i_buffer >= 4 + 2 + 5 )
+                    {
+                        i_pcr = GetPCR( p_pkt );
+                        i_skip += 1 + p_pkt->p_buffer[4];
+                    }
                 }
                 else
                 {
                     mtime_t i_dts = -1;
                     mtime_t i_pts = -1;
-                    if ( VLC_SUCCESS == ParsePESHeader( p_demux, &p_pkt->p_buffer[i_skip], &i_skip, &i_dts, &i_pts ) )
+                    if ( VLC_SUCCESS == ParsePESHeader( p_demux, &p_pkt->p_buffer[i_skip],
+                                                        p_pkt->i_buffer - i_skip, &i_skip, &i_dts, &i_pts ) )
                     {
                         if( i_dts > -1 )
                             i_pcr = i_dts;
@@ -2794,7 +2820,8 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
         {
             bool b_pcrresult = true;
 
-            *pi_pcr = GetPCR( p_pkt );
+            if( p_pkt->i_buffer >= 4 + 2 + 5 )
+                *pi_pcr = GetPCR( p_pkt );
 
             if( *pi_pcr == -1 )
             {
@@ -2805,7 +2832,9 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
                 if ( p_pkt->p_buffer[3] & 0x20 ) // adaptation field
                     i_skip += 1 + p_pkt->p_buffer[4];
 
-                if ( VLC_SUCCESS == ParsePESHeader( p_demux, &p_pkt->p_buffer[i_skip], &i_skip, &i_dts, &i_pts ) )
+                if ( VLC_SUCCESS == ParsePESHeader( p_demux, &p_pkt->p_buffer[i_skip],
+                                                    p_pkt->i_buffer - i_skip,
+                                                    &i_skip, &i_dts, &i_pts ) )
                 {
                     if( i_dts != -1 )
                         *pi_pcr = i_dts;
