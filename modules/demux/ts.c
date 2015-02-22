@@ -3034,11 +3034,13 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 static int FindPCRCandidate( demux_sys_t *p_sys, ts_prg_psi_t *p_prg )
 {
     ts_pid_t *p_cand = NULL;
+    int i_previous = p_prg->i_pid_pcr;
     for( int i=MIN_ES_PID; i<=MAX_ES_PID; i++ )
     {
         ts_pid_t *p_pid = &p_sys->pid[i];
         if( p_pid->b_seen && p_pid->es && p_pid->es->id &&
-            p_pid->i_owner_number == p_prg->i_number )
+            p_pid->i_owner_number == p_prg->i_number &&
+            p_cand->i_pid != i_previous )
         {
             if( p_pid->probed.i_pcr_count ) /* check PCR frequency first */
             {
@@ -5567,6 +5569,15 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
     }
     if( i_clean )
         free( pp_clean );
+
+    if( !p_sys->b_trust_pcr )
+    {
+        int i_cand = FindPCRCandidate( p_demux->p_sys, prg );
+        prg->i_pid_pcr = i_cand;
+        prg->pcr.b_disable = true;
+        msg_Warn( p_demux, "PCR not trusted for program %d, set up workaround using pid %d",
+                  prg->i_number, i_cand );
+    }
 
     /* Probe Boundaries */
     if( p_sys->b_canfastseek && prg->i_last_dts == -1 )
