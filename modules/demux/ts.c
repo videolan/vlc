@@ -453,6 +453,7 @@ static block_t* ReadTSPacket( demux_t *p_demux );
 static int ProbeStart( demux_t *p_demux, int i_program );
 static int ProbeEnd( demux_t *p_demux, int i_program );
 static int SeekToTime( demux_t *p_demux, ts_prg_psi_t *, int64_t time );
+static void ReadyQueuesPostSeek( demux_sys_t *p_sys );
 static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 static void PCRFixHandle( demux_t *, ts_prg_psi_t *, block_t * );
 static int64_t TimeStampWrapAround( ts_prg_psi_t *, int64_t );
@@ -1525,6 +1526,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( !DVBEventInformation( p_demux, &i_time, &i_length ) &&
                  i_length > 0 && !SeekToTime( p_demux, p_prg, TO_SCALE(i_length) * f ) )
             {
+                ReadyQueuesPostSeek( p_sys );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                                 TO_SCALE(i_length) * f );
                 return VLC_SUCCESS;
@@ -1540,6 +1542,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                                    p_prg->i_last_dts ) - p_prg->pcr.i_first;
             if( !SeekToTime( p_demux, p_prg, p_prg->pcr.i_first + i_length * f ) )
             {
+                ReadyQueuesPostSeek( p_sys );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                                 FROM_SCALE(p_prg->pcr.i_first + i_length * f) );
                 return VLC_SUCCESS;
@@ -1550,6 +1553,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( i64 > 0 &&
             stream_Seek( p_sys->stream, (int64_t)(i64 * f) ) == VLC_SUCCESS )
         {
+            ReadyQueuesPostSeek( p_sys );
             return VLC_SUCCESS;
         }
         break;
@@ -2619,6 +2623,45 @@ static mtime_t GetPCR( block_t *p_pkt )
     return i_pcr;
 }
 
+static inline void FlushESBuffer( ts_es_t *p_es )
+{
+    if( p_es->p_data )
+    {
+        p_es->i_data_gathered = p_es->i_data_size = 0;
+        block_ChainRelease( p_es->p_data );
+        p_es->p_data = NULL;
+        p_es->pp_last = &p_es->p_data;
+    }
+}
+
+static void ReadyQueuesPostSeek( demux_sys_t *p_sys )
+{
+    for( int i=MIN_ES_PID; i<=MAX_ES_PID; i++ )
+    {
+        ts_pid_t *pid = &p_sys->pid[i];
+
+        if( !pid->es )
+            continue;
+
+        pid->i_cc = 0xff;
+
+        if( pid->es->p_prepcr_outqueue )
+        {
+            block_ChainRelease( pid->es->p_prepcr_outqueue );
+            pid->es->p_prepcr_outqueue = NULL;
+        }
+
+        FlushESBuffer( pid->es );
+
+        for( int j = 0; j < pid->i_extra_es; j++ )
+            FlushESBuffer( pid->extra_es[j] );
+    }
+
+    for( int i=0; i<p_sys->i_pmt; i++ )
+        for( int j=0; j<p_sys->pmt[i]->psi->i_prg; j++ )
+            p_sys->pmt[i]->psi->prg[j]->pcr.i_current = -1;
+}
+
 static int SeekToTime( demux_t *p_demux, ts_prg_psi_t *p_prg, int64_t i_scaledtime )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -2865,6 +2908,39 @@ static int ProbeEnd( demux_t *p_demux, int i_program )
 static void ProgramSetPCR( demux_t *p_demux, ts_prg_psi_t *p_prg, mtime_t i_pcr )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    /* Check if we have enqueued blocks waiting the/before the
+       PCR barrier, and then adapt pcr so they have valid PCR when dequeuing */
+    if( p_prg->pcr.i_current == -1 )
+    {
+        mtime_t i_mindts = -1;
+        for( int i=MIN_ES_PID; i<=MAX_ES_PID; i++ )
+        {
+            ts_pid_t *p_pid = &p_sys->pid[i];
+            if( p_pid->b_valid && p_pid->i_owner_number == p_prg->i_number && p_pid->es )
+            {
+                block_t *p_block = p_pid->es->p_prepcr_outqueue;
+                while( p_block && p_block->i_dts == VLC_TS_INVALID )
+                    p_block = p_block->p_next;
+
+                if( p_block )
+                    msg_Warn( p_demux, "Program %ld %ld *******", i_mindts, p_block->i_dts );
+
+                if( p_block && ( i_mindts == -1 || p_block->i_dts < i_mindts ) )
+                {
+                    i_mindts = p_block->i_dts;
+                    msg_Warn( p_demux, "Program %ld %ld *******", i_mindts, p_block->i_dts );
+                }
+            }
+        }
+
+        if( i_mindts > VLC_TS_INVALID )
+        {
+            msg_Dbg( p_demux, "Program %d PCR prequeue fixup %"PRId64"->%"PRId64,
+                     p_prg->i_number, TO_SCALE(i_mindts), i_pcr );
+            i_pcr = TO_SCALE(i_mindts);
+        }
+    }
 
     p_prg->pcr.i_current = i_pcr;
     if( p_prg->pcr.i_first == -1 )
