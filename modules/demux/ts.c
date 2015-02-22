@@ -460,6 +460,7 @@ static void SetPrgFilter( demux_t *, int i_prg, bool b_selected );
 #define TS_PACKET_SIZE_192 192
 #define TS_PACKET_SIZE_204 204
 #define TS_PACKET_SIZE_MAX 204
+#define TS_HEADER_SIZE 4
 
 static int DetectPacketSize( demux_t *p_demux, int *pi_header_size, int i_offset )
 {
@@ -2406,6 +2407,12 @@ static block_t* ReadTSPacket( demux_t *p_demux )
             msg_Dbg( p_demux, "EOF at %"PRId64, stream_Tell( p_sys->stream ) );
         else
             msg_Dbg( p_demux, "Can't read TS packet at %"PRId64, stream_Tell(p_sys->stream) );
+        return NULL;
+    }
+
+    if( p_pkt->i_buffer < TS_HEADER_SIZE + p_sys->i_packet_header_size )
+    {
+        block_Release( p_pkt );
         return NULL;
     }
 
