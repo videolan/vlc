@@ -596,8 +596,6 @@ static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     p_input->p_sys = NULL;
-
-    return 0;
 }
 
 /*****************************************************************************
