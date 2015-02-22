@@ -1554,6 +1554,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         break;
 
+    case DEMUX_SET_TIME:
+        i64 = (int64_t)va_arg( args, int64_t );
+
+        if( p_sys->b_canseek &&
+           (p_prg = GetProgramByID( p_sys, i_first_program )) &&
+            p_prg->pcr.i_first > -1 &&
+           !SeekToTime( p_demux, p_prg, p_prg->pcr.i_first + TO_SCALE(i64) ) )
+        {
+            ReadyQueuesPostSeek( p_sys );
+            es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                            FROM_SCALE(p_prg->pcr.i_first) + i64 - VLC_TS_0 );
+            return VLC_SUCCESS;
+        }
+        break;
+
     case DEMUX_GET_TIME:
         pi64 = (int64_t*)va_arg( args, int64_t * );
 
