@@ -662,7 +662,7 @@ static inline mtime_t ExtractPESTimestamp( const uint8_t *p_data )
              (mtime_t)(p_data[4] >> 1);
 }
 
-static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, bool b_adaptfield )
+static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_t i_data, bool b_adaptfield )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint8_t *p_pes = p_pesstart;
@@ -670,21 +670,27 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
 
     if( b_adaptfield )
     {
+        if ( i_data < 2 )
+            return;
+
         uint8_t len = *p_pes;
-        p_pes++;
+        p_pes++; i_data--;
 
         if(len == 0)
         {
-            p_pes++; /* stuffing */
+            p_pes++; i_data--;/* stuffing */
         }
         else
         {
-            pid->probed.b_haspcr = ( *p_pes >= 7 && (p_pes[1] & 0x10) );
+            if( i_data < len )
+                return;
+            pid->probed.b_haspcr = ( len >= 7 && (p_pes[1] & 0x10) );
             p_pes += len;
+            i_data -= len;
         }
     }
 
-    if( p_pes - p_pesstart >= TS_PACKET_SIZE_188 - 9)
+    if( i_data < 9 )
         return;
 
     if( p_pes[0] != 0 || p_pes[1] != 0 || p_pes[2] != 1 )
@@ -695,11 +701,15 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
     if( p_pes[7] & 0x80 ) // PTS
     {
         i_pesextoffset += 5;
+        if ( i_data < i_pesextoffset )
+            return;
         i_dts = ExtractPESTimestamp( &p_pes[9] );
     }
     if( p_pes[7] & 0x40 ) // DTS
     {
         i_pesextoffset += 5;
+        if ( i_data < i_pesextoffset )
+            return;
         i_dts = ExtractPESTimestamp( &p_pes[14] );
     }
     if( p_pes[7] & 0x20 ) // ESCR
@@ -713,9 +723,17 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
     if( p_pes[7] & 0x02 ) // PESCRC
         i_pesextoffset += 2;
 
+    if ( i_data < i_pesextoffset )
+        return;
+
      /* HeaderdataLength */
     const size_t i_payloadoffset = 8 + 1 + p_pes[8];
     i_pesextoffset += 1;
+
+    if ( i_data < i_pesextoffset || i_data < i_payloadoffset )
+        return;
+
+    i_data -= 8 + 1 + p_pes[8];
 
     if( p_pes[7] & 0x01 ) // PESExt
     {
@@ -733,10 +751,14 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
             uint8_t i_len = p_pes[i_pesextoffset + i_extension2_offset] & 0x7F;
             i_extension2_offset += i_len;
         }
+        if( i_data < i_extension2_offset )
+            return;
+
+        i_data -= i_extension2_offset;
     }
     /* (i_payloadoffset - i_pesextoffset) 0xFF stuffing */
 
-    if( &p_pes[i_payloadoffset] - p_pesstart >= TS_PACKET_SIZE_188 - 4)
+    if ( i_data < 4 )
         return;
 
     const uint8_t *p_data = &p_pes[i_payloadoffset];
@@ -1351,7 +1373,8 @@ static int Demux( demux_t *p_demux )
             (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
             (p_pkt->p_buffer[3] & 0xD0) == 0x10 )  /* Has payload but is not encrypted */
         {
-            ProbePES( p_demux, p_pid, p_pkt->p_buffer + 4, p_pkt->p_buffer[3] & 0x20 /* Adaptation field */);
+            ProbePES( p_demux, p_pid, p_pkt->p_buffer + TS_HEADER_SIZE,
+                      p_pkt->i_buffer - TS_HEADER_SIZE, p_pkt->p_buffer[3] & 0x20 /* Adaptation field */);
         }
 
         if( p_pid->b_valid )
