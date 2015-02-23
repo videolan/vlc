@@ -226,7 +226,7 @@ void virtual_edition_c::retimeSubChapters( virtual_chapter_c * p_vchap )
     for( size_t i = p_vchap->sub_chapters.size(); i-- > 0; )
     {
         virtual_chapter_c * p_vsubchap = p_vchap->sub_chapters[i];
-        p_vsubchap->i_virtual_start_time += p_vchap->i_virtual_start_time;
+        //p_vsubchap->i_virtual_start_time += p_vchap->i_virtual_start_time;
 
         /*FIXME we artificially extend stop time if they were there before...*/
         /* Just for comfort*/
