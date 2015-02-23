@@ -452,10 +452,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_client->appData.viewOnly = TRUE;
     p_sys->p_client->serverPort = ( url.i_port > 0 ) ? url.i_port : 5900;
 
-    msg_Dbg( p_demux, "VNC init %s host=%s pass=%s port=%d",
+    msg_Dbg( p_demux, "VNC init %s host=%s port=%d",
              p_demux->psz_location,
              p_sys->p_client->serverHost,
-             url.psz_password,
              p_sys->p_client->serverPort );
 
     vlc_UrlClean( &url );
