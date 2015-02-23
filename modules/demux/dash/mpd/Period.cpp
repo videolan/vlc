@@ -39,11 +39,13 @@ Period::Period(MPD *mpd) :
 {
     duration.Set(0);
     startTime.Set(0);
+    baseUrl.Set(NULL);
 }
 
 Period::~Period ()
 {
     vlc_delete_all( this->adaptationSets );
+    delete baseUrl.Get();
     childs.clear();
 }
 
@@ -86,7 +88,10 @@ AdaptationSet * Period::getAdaptationSet(Streams::Type type) const
 
 Url Period::getUrlSegment() const
 {
-    return getParentUrlSegment();
+    if( baseUrl.Get() )
+        return *(baseUrl.Get());
+    else
+        return getParentUrlSegment();
 }
 
 std::vector<std::string> Period::toString(int indent) const

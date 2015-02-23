@@ -111,6 +111,10 @@ void IsoffMainParser::parsePeriods(Node *root)
             period->duration.Set(IsoTime((*it)->getAttributeValue("duration")));
         if((*it)->hasAttribute("id"))
             period->setId((*it)->getAttributeValue("id"));
+        std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(*it, "BaseURL");
+        if(!baseUrls.empty())
+            period->baseUrl.Set( new Url( baseUrls.front()->getText() ) );
+
         setAdaptationSets(*it, period);
         mpd->addPeriod(period);
     }

@@ -55,6 +55,7 @@ namespace dash
                 virtual Url getUrlSegment() const; /* reimpl */
                 virtual mtime_t getPeriodStart() const; /* reimpl */
 
+                Property<Url *> baseUrl;
                 Property<mtime_t> duration;
                 Property<mtime_t> startTime;
 
