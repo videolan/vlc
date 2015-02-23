@@ -407,9 +407,8 @@ static int login( access_t *p_access )
         }
 
         /* FIXME, Try to force netbios name as domain then WORKGROUP here */
-        msg_Err( p_access, "Unable to login with username = %s, password = %s, domain = %s",
-                   p_sys->creds.login, p_sys->creds.password,
-                   p_sys->creds.domain );
+        msg_Err( p_access, "Unable to login with username = %s, domain = %s",
+                   p_sys->creds.login, p_sys->creds.domain );
         return VLC_EGENERIC;
     }
     else if( smb_session_is_guest( p_sys->p_session ) == 1 )
