@@ -448,7 +448,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         int i_ret;
         if ( i >= 0 )
         {
-            i++; /* video/audio-es variable starts 0 */
             msg_Dbg( p_demux, "Requesting access to enable stream %d", i );
             i_ret = stream_Control( p_demux->s, STREAM_SET_PRIVATE_ID_STATE, i, true );
         }
@@ -1090,6 +1089,8 @@ static int DemuxInit( demux_t *p_demux )
                 if ( tk->p_fmt )
                     es_format_Copy( tk->p_fmt, &fmt );
             }
+
+            fmt.i_id = tk->info.p_sp->i_stream_number;
 
             tk->p_es = es_out_Add( p_demux->out, &fmt );
 
