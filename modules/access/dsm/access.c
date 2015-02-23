@@ -164,9 +164,8 @@ static int Open( vlc_object_t *p_this )
     if( get_address( p_access ) != VLC_SUCCESS )
         goto error;
 
-    msg_Dbg( p_access, "Creds: username = %s, password = %s, domain = %s",
-             p_sys->creds.login, p_sys->creds.password,
-             p_sys->creds.domain );
+    msg_Dbg( p_access, "Creds: username = %s, domain = %s",
+             p_sys->creds.login, p_sys->creds.domain );
     msg_Dbg( p_access, "Session: Host name = %s, ip = %s", p_sys->netbios_name,
              inet_ntoa( p_sys->addr ) );
 
