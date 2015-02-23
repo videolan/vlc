@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <unistd.h>         /* isatty(), STDERR_FILNO */
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
