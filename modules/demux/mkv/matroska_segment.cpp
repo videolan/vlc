@@ -139,7 +139,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                     KaxCueTime &ctime = *(KaxCueTime*)el;
                     try
                     {
-                        if( unlikely( ctime.GetSize() >= SIZE_MAX ) )
+                        if( unlikely( !ctime.ValidateSize() ) )
                         {
                             msg_Err( &sys.demuxer, "CueTime size too big");
                             b_invalid_cue = true;
@@ -162,7 +162,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                     {
                         while( ( el = ep->Get() ) != NULL )
                         {
-                            if( unlikely( el->GetSize() >= SIZE_MAX ) )
+                            if( unlikely( !el->ValidateSize() ) )
                             {
                                 ep->Up();
                                 msg_Err( &sys.demuxer, "Error %s too big, aborting", typeid(*el).name() );
@@ -296,7 +296,7 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
     {
         while( ( el = ep->Get() ) != NULL && size < max_size)
         {
-            if( unlikely( el->GetSize() >= SIZE_MAX ) )
+            if( unlikely( !el->ValidateSize() ) )
             {
                 msg_Err( &sys.demuxer, "Error %s too big ignoring the tag", typeid(*el).name() );
                 delete ep;
@@ -409,7 +409,7 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
                     {
                         try
                         {
-                            if( unlikely( el->GetSize() >= SIZE_MAX ) )
+                            if( unlikely( !el->ValidateSize() ) )
                             {
                                 msg_Err( &sys.demuxer, "Invalid size while reading tag");
                                 break;
@@ -1351,7 +1351,8 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     }
                     break;
                 case 2:
-                    if( unlikely( el->GetSize() >= SIZE_MAX ) )
+                    if( unlikely( !el->ValidateSize() ||
+                                  ( el->IsFiniteSize() && el->GetSize() >= SIZE_MAX ) ) )
                     {
                         msg_Err( &sys.demuxer, "Error while reading %s... upping level", typeid(*el).name());
                         ep->Up();
@@ -1388,7 +1389,8 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                     }
                     break;
                 case 3:
-                    if( unlikely( el->GetSize() >= SIZE_MAX ) )
+                    if( unlikely( !el->ValidateSize() ||
+                                  ( el->IsFiniteSize() && el->GetSize() >= SIZE_MAX ) ) )
                     {
                         msg_Err( &sys.demuxer, "Error while reading %s... upping level", typeid(*el).name());
                         ep->Up();
