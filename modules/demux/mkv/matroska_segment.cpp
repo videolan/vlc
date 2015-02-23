@@ -208,7 +208,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                     }
                     catch(...)
                     {
-                        ep->Up();   
+                        ep->Up();
                         msg_Err( &sys.demuxer, "Error while reading %s", typeid(*el).name() );
                         b_invalid_cue = true;
                         break;
@@ -1162,7 +1162,7 @@ void matroska_segment_c::ComputeTrackPriority()
         /* Avoid multivideo tracks when unnecessary */
         if( p_tk->fmt.i_cat == VIDEO_ES )
             p_tk->fmt.i_priority--;
-    } 
+    }
 }
 
 void matroska_segment_c::EnsureDuration()
@@ -1370,7 +1370,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                             DataBuffer *p_data = &pp_block->GetBuffer(0);
                             size_t sz = p_data->Size();
                             const uint8_t * p_buff = p_data->Buffer();
-                            /* if the second bit of a Theora frame is 1 
+                            /* if the second bit of a Theora frame is 1
                                it's not a keyframe */
                             if( sz && p_buff )
                             {
