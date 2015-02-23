@@ -743,6 +743,8 @@ bool matroska_segment_c::Preload( )
 
     b_preloaded = true;
 
+    EnsureDuration();
+
     return true;
 }
 
@@ -1161,6 +1163,108 @@ void matroska_segment_c::ComputeTrackPriority()
         if( p_tk->fmt.i_cat == VIDEO_ES )
             p_tk->fmt.i_priority--;
     } 
+}
+
+void matroska_segment_c::EnsureDuration()
+{
+    if ( i_duration > 0 )
+        return;
+
+    i_duration = -1;
+
+    bool b_seekable;
+
+    stream_Control( sys.demuxer.s, STREAM_CAN_FASTSEEK, &b_seekable );
+    if ( !b_seekable )
+    {
+        msg_Warn( &sys.demuxer, "could not look for the segment duration" );
+        return;
+    }
+
+    uint64 i_current_position = es.I_O().getFilePointer();
+    uint64 i_last_cluster_pos = 0;
+
+    // find the last Cluster from the Cues
+    if ( b_cues && i_index > 0 && p_indexes != NULL)
+    {
+        i_last_cluster_pos = p_indexes[i_index-1].i_position;
+    }
+
+    // find the last Cluster manually
+    if ( !i_last_cluster_pos && cluster != NULL )
+    {
+        EbmlElement *el;
+        EbmlParser *ep;
+
+        es.I_O().setFilePointer( cluster->GetElementPosition(), seek_beginning );
+        ep = new EbmlParser( &es , segment, &sys.demuxer );
+
+        while( ( el = ep->Get() ) != NULL )
+        {
+            if ( MKV_IS_ID( el, KaxCluster ) )
+            {
+                i_last_cluster_pos = el->GetElementPosition();
+            }
+        }
+
+        delete ep;
+    }
+
+    // find the last timecode in the Cluster
+    if ( i_last_cluster_pos )
+    {
+        EbmlParser *ep;
+
+        es.I_O().setFilePointer( i_last_cluster_pos, seek_beginning );
+        ep = new EbmlParser( &es , segment, &sys.demuxer );
+
+        KaxCluster *p_last_cluster = (KaxCluster *) ep->Get();
+        ParseCluster( p_last_cluster, false, SCOPE_PARTIAL_DATA );
+
+        // use the last block + duration
+        uint64 i_last_timecode = p_last_cluster->GlobalTimecode();
+        for( unsigned int i = 0; i < p_last_cluster->ListSize(); i++ )
+        {
+            EbmlElement *l = (*p_last_cluster)[i];
+
+            if( MKV_IS_ID( l, KaxSimpleBlock ) )
+            {
+                KaxSimpleBlock *block = (KaxSimpleBlock*)l;
+                block->SetParent( *p_last_cluster );
+                i_last_timecode = max(i_last_timecode, block->GlobalTimecode());
+            }
+            else if( MKV_IS_ID( l, KaxBlockGroup ) )
+            {
+                KaxBlockGroup *group = (KaxBlockGroup*)l;
+                uint64 i_group_timecode = 0;
+                for( unsigned int j = 0; j < group->ListSize(); j++ )
+                {
+                    EbmlElement *l = (*group)[j];
+
+                    if( MKV_IS_ID( l, KaxBlock ) )
+                    {
+                        KaxBlock *block = (KaxBlock*)l;
+                        block->SetParent( *p_last_cluster );
+                        i_group_timecode += block->GlobalTimecode();
+                    }
+                    else if( MKV_IS_ID( l, KaxBlockDuration ) )
+                    {
+                        KaxBlockDuration & dur = *(KaxBlockDuration*)l;
+                        i_group_timecode += uint64( dur );
+                    }
+                }
+                i_last_timecode = max(i_last_timecode, i_group_timecode);
+            }
+        }
+
+        i_duration = ( i_last_timecode - cluster->GlobalTimecode() ) / (mtime_t)1000000;
+        msg_Dbg( &sys.demuxer, " extracted Duration=%" PRId64, i_duration );
+
+        delete ep;
+    }
+
+    // get back to the reading position we were at before looking for a duration
+    es.I_O().setFilePointer( i_current_position, seek_beginning );
 }
 
 bool matroska_segment_c::Select( mtime_t i_start_time )
