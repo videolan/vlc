@@ -2812,6 +2812,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
         }
 
         int i_pid = PIDGet( p_pkt );
+        p_sys->pid[i_pid].b_seen = true;
 
         if( i_pid != 0x1FFF && p_sys->pid[i_pid].b_valid && p_sys->pid[i_pid].p_owner &&
            (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
