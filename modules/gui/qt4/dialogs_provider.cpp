@@ -749,7 +749,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
             QString title = "Converting " + mrls[i];
 
             /* Add each file to convert to our playlist, making sure to not attempt to start playing it.*/
-            Open::openMRLwithOptions( p_intf, mrls[i], &optionsCopy, false, true, _(title.toStdString().c_str()) );
+            Open::openMRLwithOptions( p_intf, mrls[i], &optionsCopy, false, true, qtu( title ) );
         }
 
         /* Start the playlist from the beginning */
