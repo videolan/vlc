@@ -545,9 +545,9 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
     else
         block_size = block->GetSize();
  
-    for( unsigned int i = 0;
-         ( block != NULL && i < block->NumberFrames()) || ( simpleblock != NULL && i < simpleblock->NumberFrames() );
-         i++ )
+    const unsigned int i_number_frames = block != NULL ? block->NumberFrames() :
+            ( simpleblock != NULL ? simpleblock->NumberFrames() : 0 );
+    for( unsigned int i = 0; i < i_number_frames; i++ )
     {
         block_t *p_block;
         DataBuffer *data;
@@ -687,7 +687,7 @@ msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_b
         if( !tk->b_no_duration )
         {
             p_block->i_length = i_duration * tk-> f_timecodescale *
-                (double) p_segment->i_timescale / 1000.0;
+                (double) p_segment->i_timescale / ( 1000.0 * i_number_frames );
         }
 
         /* FIXME remove when VLC_TS_INVALID work is done */
