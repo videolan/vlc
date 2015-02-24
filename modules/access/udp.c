@@ -232,8 +232,14 @@ static int Control( access_t *p_access, int i_query, va_list args )
 static block_t *BlockUDP( access_t *p_access )
 {
     access_sys_t *sys = p_access->p_sys;
+    block_t *block;
 
-    return block_FifoGet( sys->fifo );
+    if( p_access->info.b_eof )
+        return NULL;
+
+    block = block_FifoGet( sys->fifo );
+    p_access->info.b_eof = block == NULL;
+    return block;
 }
 
 /*****************************************************************************
