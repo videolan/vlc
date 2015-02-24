@@ -484,6 +484,9 @@ PicFlowView::PicFlowView( QAbstractItemModel *p_model, QWidget *parent ) : QAbst
     QHBoxLayout *layout = new QHBoxLayout( this );
     layout->setMargin( 0 );
     picFlow = new PictureFlow( this, p_model );
+    picFlow->setContextMenuPolicy( Qt::CustomContextMenu );
+    connect( picFlow, SIGNAL(customContextMenuRequested( const QPoint & )),
+             this,    SIGNAL(customContextMenuRequested( const QPoint & )) );
     layout->addWidget( picFlow );
     picFlow->setSlideSize(QSize( 4*LISTVIEW_ART_SIZE, 3*LISTVIEW_ART_SIZE) );
     setSelectionMode( QAbstractItemView::SingleSelection );
