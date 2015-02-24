@@ -102,6 +102,9 @@ Logging
    messages in syslog. With --syslog, errors and warnings will be sent only.
  * New Android module for logging
 
+Misc
+ * remove langfromtelx
+
 
 Changes between 2.1.x and 2.2.0:
 --------------------------------

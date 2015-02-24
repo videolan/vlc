@@ -17,7 +17,6 @@ libstream_out_autodel_plugin_la_SOURCES = stream_out/autodel.c
 libstream_out_record_plugin_la_SOURCES = stream_out/record.c
 libstream_out_smem_plugin_la_SOURCES = stream_out/smem.c
 libstream_out_setid_plugin_la_SOURCES = stream_out/setid.c
-#libstream_out_langfromtelx_plugin_la_SOURCES = stream_out/langfromtelx.c
 libstream_out_transcode_plugin_la_SOURCES = \
 	stream_out/transcode/transcode.c stream_out/transcode/transcode.h \
 	stream_out/transcode/osd.c stream_out/transcode/spu.c \
@@ -43,7 +42,6 @@ sout_LTLIBRARIES = \
 	libstream_out_smem_plugin.la \
 	libstream_out_setid_plugin.la \
 	libstream_out_transcode_plugin.la
-#	libstream_out_langfromtelx_plugin.la
 
 # RTP plugin
 sout_LTLIBRARIES += libstream_out_rtp_plugin.la
