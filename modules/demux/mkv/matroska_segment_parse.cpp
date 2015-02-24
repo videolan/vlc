@@ -1497,6 +1497,12 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     }
     else if( !strcmp( p_tk->psz_codec, "A_AC3" ) )
     {
+        // the AC-3 default duration cannot be trusted, see #8512
+        if ( p_tk->fmt.audio.i_rate == 8000 )
+        {
+            p_tk->b_no_duration = true;
+            p_tk->i_default_duration = 0;
+        }
         p_tk->fmt.i_codec = VLC_CODEC_A52;
     }
     else if( !strcmp( p_tk->psz_codec, "A_EAC3" ) )
