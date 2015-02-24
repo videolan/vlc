@@ -1,0 +1,11 @@
+--- ssh2/configure.ac	2015-02-24 10:15:45.581842131 +0100
++++ ssh2/configure.ac.new	2015-02-24 10:15:34.948332253 +0100
+@@ -102,7 +102,7 @@
+ # Look for libgcrypt
+ if test "$ac_cv_libssl" != "yes" && test "$use_libgcrypt" != "no"; then
+   AC_LIB_HAVE_LINKFLAGS([gcrypt], [], [#include <gcrypt.h>])
+-  LIBS="$LIBS -lgcrypt"
++  LIBS="$LIBS -lgcrypt -lgpg-error"
+ fi
+ 
+ AC_SUBST(LIBSREQUIRED)
