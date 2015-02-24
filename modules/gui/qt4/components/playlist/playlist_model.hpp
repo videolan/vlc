@@ -73,6 +73,7 @@ public:
 
     /* Data structure */
     QVariant data( const QModelIndex &index, const int role ) const Q_DECL_OVERRIDE;
+    bool setData( const QModelIndex &index, const QVariant & value, int role = Qt::EditRole ) Q_DECL_OVERRIDE;
     int rowCount( const QModelIndex &parent = QModelIndex() ) const Q_DECL_OVERRIDE;
     Qt::ItemFlags flags( const QModelIndex &index ) const Q_DECL_OVERRIDE;
     QModelIndex index( const int r, const int c, const QModelIndex &parent ) const Q_DECL_OVERRIDE;
@@ -153,6 +154,7 @@ private:
 
     /* */
     QString latestSearch;
+    QFont   customFont;
 
 private slots:
     void processInputItemUpdate( input_item_t *);

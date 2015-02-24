@@ -106,7 +106,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     /* Saved Settings */
     int i_savedViewMode = getSettings()->value( "Playlist/view-mode", TREE_VIEW ).toInt();
-    i_zoom = getSettings()->value( "Playlist/zoom", 0 ).toInt();
+
+    QFont font = QApplication::font();
+    font.setPointSize( font.pointSize() + getSettings()->value( "Playlist/zoom", 0 ).toInt() );
+    model->setData( QModelIndex(), font, Qt::FontRole );
 
     showView( i_savedViewMode );
 
@@ -126,7 +129,9 @@ StandardPLPanel::~StandardPLPanel()
     if( treeView )
         getSettings()->setValue( "headerStateV2", treeView->header()->saveState() );
     getSettings()->setValue( "view-mode", currentViewIndex() );
-    getSettings()->setValue( "zoom", i_zoom );
+    getSettings()->setValue( "zoom",
+                model->data( QModelIndex(), Qt::FontRole ).value<QFont>().pointSize()
+                - QApplication::font().pointSize() );
     getSettings()->endGroup();
 }
 
@@ -659,16 +664,12 @@ void StandardPLPanel::createTreeView()
 
 void StandardPLPanel::updateZoom( int i )
 {
-    if ( i < 5 - QApplication::font().pointSize() ) return;
-    if ( i > 3 + QApplication::font().pointSize() ) return;
-    i_zoom = i;
-#define A_ZOOM( view ) \
-    if ( view ) \
-    qobject_cast<AbstractPlViewItemDelegate*>( view->itemDelegate() )->setZoom( i_zoom )
-    /* Can't iterate as picflow & tree aren't using custom delegate */
-    A_ZOOM( iconView );
-    A_ZOOM( listView );
-#undef A_ZOOM
+    QVariant fontdata = model->data( QModelIndex(), Qt::FontRole );
+    QFont font = fontdata.value<QFont>();
+    font.setPointSize( font.pointSize() + i );
+    if ( font.pointSize() < 5 - QApplication::font().pointSize() ) return;
+    if ( font.pointSize() > 3 + QApplication::font().pointSize() ) return;
+    model->setData( QModelIndex(), font, Qt::FontRole );
 }
 
 void StandardPLPanel::showView( int i_view )
@@ -739,7 +740,6 @@ void StandardPLPanel::showView( int i_view )
         }
     }
 
-    updateZoom( i_zoom );
     viewStack->setCurrentWidget( currentView );
     browseInto();
     gotoPlayingItem();

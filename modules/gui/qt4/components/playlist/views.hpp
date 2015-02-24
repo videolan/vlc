@@ -39,10 +39,6 @@ class AbstractPlViewItemDelegate : public QStyledItemDelegate
 public:
     AbstractPlViewItemDelegate( QWidget * parent = 0 ) : QStyledItemDelegate(parent) {}
     void paintBackground( QPainter *, const QStyleOptionViewItem &, const QModelIndex & ) const;
-    void setZoom( int z ) { i_zoom = z; emit sizeHintChanged( QModelIndex() ); };
-
-protected:
-    int i_zoom;
 };
 
 class PlIconViewItemDelegate : public AbstractPlViewItemDelegate

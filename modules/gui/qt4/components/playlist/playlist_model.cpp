@@ -297,7 +297,17 @@ void PLModel::activateItem( playlist_item_t *p_item )
 /****************** Base model mandatory implementations *****************/
 QVariant PLModel::data( const QModelIndex &index, const int role ) const
 {
-    if( !index.isValid() ) return QVariant();
+    switch( role )
+    {
+
+    case Qt::FontRole:
+        return customFont;
+
+    default:
+        if( !index.isValid() )
+            return QVariant();
+    }
+
     PLItem *item = getItem( index );
     if( role == Qt::DisplayRole )
     {
@@ -345,10 +355,6 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
             return QVariant();
         }
     }
-    else if( role == Qt::FontRole )
-    {
-        return QVariant( QFont() );
-    }
     else if( role == Qt::BackgroundRole && isCurrent( index ) )
     {
         return QVariant( QBrush( Qt::gray ) );
@@ -366,6 +372,18 @@ QVariant PLModel::data( const QModelIndex &index, const int role ) const
         return QVariant( isParent( index, currentIndex() ) );
     }
     return QVariant();
+}
+
+bool PLModel::setData( const QModelIndex &index, const QVariant & value, int role )
+{
+    switch( role )
+    {
+    case Qt::FontRole:
+        customFont = value.value<QFont>();
+        return true;
+    default:
+        return VLCModel::setData( index, value, role );
+    }
 }
 
 /* Seek from current index toward the top and see if index is one of parent nodes */

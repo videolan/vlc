@@ -80,7 +80,6 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QString artist = VLCModel::getMeta( index, COLUMN_ARTIST );
 
     QFont font( index.data( Qt::FontRole ).value<QFont>() );
-    font.setPointSize( __MAX( font.pointSize() + i_zoom, 4 ) );
     font.setBold( index.data( VLCModel::IsCurrentRole ).toBool() );
     painter->setFont( font );
     QFontMetrics fm = painter->fontMetrics();
@@ -167,7 +166,6 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 QSize PlIconViewItemDelegate::sizeHint ( const QStyleOptionViewItem &, const QModelIndex & index ) const
 {
     QFont f( index.data( Qt::FontRole ).value<QFont>() );
-    f.setPointSize( __MAX( f.pointSize() + i_zoom, 4 ) );
     f.setBold( true );
     QFontMetrics fm( f );
     int textHeight = fm.height();
@@ -221,7 +219,6 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     //Draw title info
     f.setItalic( true );
-    f.setPointSize( __MAX( f.pointSize() + i_zoom, 4 ) );
     f.setBold( index.data( VLCModel::IsCurrentRole ).toBool() );
     painter->setFont( f );
     QFontMetrics fm( painter->fontMetrics() );
