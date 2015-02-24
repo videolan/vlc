@@ -522,6 +522,11 @@ struct block_fifo_t
     bool          b_force_wake;
 };
 
+/**
+ * Creates a thread-safe FIFO queue of blocks.
+ * See also block_FifoPut() and block_FifoGet().
+ * @return the FIFO or NULL on memory error
+ */
 block_fifo_t *block_FifoNew( void )
 {
     block_fifo_t *p_fifo = malloc( sizeof( block_fifo_t ) );
@@ -539,6 +544,10 @@ block_fifo_t *block_FifoNew( void )
     return p_fifo;
 }
 
+/**
+ * Destroys a FIFO created by block_FifoNew().
+ * Any queued blocks are also destroyed.
+ */
 void block_FifoRelease( block_fifo_t *p_fifo )
 {
     block_FifoEmpty( p_fifo );
