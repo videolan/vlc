@@ -320,4 +320,28 @@ VLC_API block_t * block_FifoShow( block_fifo_t * );
 size_t block_FifoSize(block_fifo_t *) VLC_USED;
 VLC_API size_t block_FifoCount(block_fifo_t *) VLC_USED;
 
+typedef struct block_fifo_t vlc_fifo_t;
+
+VLC_API void vlc_fifo_Lock(vlc_fifo_t *);
+VLC_API void vlc_fifo_Unlock(vlc_fifo_t *);
+VLC_API void vlc_fifo_Signal(vlc_fifo_t *);
+VLC_API void vlc_fifo_Wait(vlc_fifo_t *);
+VLC_API void vlc_fifo_WaitCond(vlc_fifo_t *, vlc_cond_t *);
+VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *, block_t *);
+VLC_API block_t *vlc_fifo_DequeueUnlocked(vlc_fifo_t *) VLC_USED;
+VLC_API block_t *vlc_fifo_DequeueAllUnlocked(vlc_fifo_t *) VLC_USED;
+VLC_API size_t vlc_fifo_GetCount(const vlc_fifo_t *) VLC_USED;
+VLC_API size_t vlc_fifo_GetBytes(const vlc_fifo_t *) VLC_USED;
+
+VLC_USED static inline bool vlc_fifo_IsEmpty(const vlc_fifo_t *fifo)
+{
+    return vlc_fifo_GetCount(fifo) == 0;
+}
+
+static inline void vlc_fifo_Cleanup(void *fifo)
+{
+    vlc_fifo_Unlock((vlc_fifo_t *)fifo);
+}
+#define vlc_fifo_CleanupPush(fifo) vlc_cleanup_push(vlc_fifo_Cleanup, fifo)
+
 #endif /* VLC_BLOCK_H */
