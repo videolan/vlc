@@ -547,19 +547,19 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
  
     const unsigned int i_number_frames = block != NULL ? block->NumberFrames() :
             ( simpleblock != NULL ? simpleblock->NumberFrames() : 0 );
-    for( unsigned int i = 0; i < i_number_frames; i++ )
+    for( unsigned int i_frame = 0; i_frame < i_number_frames; i_frame++ )
     {
         block_t *p_block;
         DataBuffer *data;
         if( simpleblock != NULL )
         {
-            data = &simpleblock->GetBuffer(i);
+            data = &simpleblock->GetBuffer(i_frame);
             // condition when the DTS is correct (keyframe or B frame == NOT P frame)
             f_mandatory = simpleblock->IsDiscardable() || simpleblock->IsKeyframe();
         }
         else
         {
-            data = &block->GetBuffer(i);
+            data = &block->GetBuffer(i_frame);
             // condition when the DTS is correct (keyframe or B frame == NOT P frame)
         }
         frame_size += data->Size();
@@ -682,7 +682,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         }
 
 #if 0
-msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_block->i_pts);
+msg_Dbg( p_demux, "block (track=%d) i_dts: %"PRId64" / i_pts: %"PRId64, tk->i_number, p_block->i_dts, p_block->i_pts);
 #endif
         if( !tk->b_no_duration )
         {
@@ -691,9 +691,9 @@ msg_Dbg( p_demux, "block i_dts: %"PRId64" / i_pts: %"PRId64, p_block->i_dts, p_b
         }
 
         /* FIXME remove when VLC_TS_INVALID work is done */
-        if( i == 0 || p_block->i_dts > VLC_TS_INVALID )
+        if( i_frame == 0 || p_block->i_dts > VLC_TS_INVALID )
             p_block->i_dts += VLC_TS_0;
-        if( !tk->b_dts_only && ( i == 0 || p_block->i_pts > VLC_TS_INVALID ) )
+        if( !tk->b_dts_only && ( i_frame == 0 || p_block->i_pts > VLC_TS_INVALID ) )
             p_block->i_pts += VLC_TS_0;
 
         es_out_Send( p_demux->out, tk->p_es, p_block );
