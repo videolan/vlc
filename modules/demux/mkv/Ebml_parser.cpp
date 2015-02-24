@@ -102,7 +102,7 @@ EbmlElement* EbmlParser::UnGet( uint64 i_block_pos, uint64 i_cluster_pos )
 
 void EbmlParser::Up( void )
 {
-    if( mi_user_level == mi_level )
+    if( mi_user_level == mi_level && m_el[mi_level] )
     {
         msg_Warn( p_demux, "MKV/Ebml Parser: Up cannot escape itself" );
     }
@@ -232,7 +232,7 @@ EbmlElement *EbmlParser::Get( int n_call )
     }
     else if( m_el[mi_level] == NULL )
     {
-        msg_Warn( p_demux,"MKV/Ebml Parser: m_el[mi_level] == NULL\n" );
+        msg_Dbg( p_demux,"MKV/Ebml Parser: m_el[mi_level] == NULL" );
     }
     else if( m_el[mi_level]->IsDummy() && !mb_dummy )
     {
