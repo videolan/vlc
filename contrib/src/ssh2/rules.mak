@@ -18,6 +18,7 @@ $(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.gz:
 ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz .sum-ssh2
 	$(UNPACK)
 	$(APPLY) $(SRC)/ssh2/no-tests.patch
+	$(APPLY) $(SRC)/ssh2/configure-zlib.patch
 	$(MOVE)
 
 DEPS_ssh2 = gcrypt $(DEPS_gcrypt)

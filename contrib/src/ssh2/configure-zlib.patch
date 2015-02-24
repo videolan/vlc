@@ -1,0 +1,10 @@
+--- ssh2/configure.ac	2015-02-24 10:09:30.662277334 +0100
++++ ssh2/configure.ac.new	2015-02-24 10:08:57.658394756 +0100
+@@ -133,6 +133,7 @@
+     AC_MSG_NOTICE([Try --with-libz-prefix=PATH if you know you have it])
+   else
+     AC_DEFINE(LIBSSH2_HAVE_ZLIB, 1, [Compile in zlib support])
++    LIBS="$LIBS -lz"
+   fi
+ fi
+ 
