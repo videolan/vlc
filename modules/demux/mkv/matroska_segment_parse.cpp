@@ -1494,6 +1494,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
              !strcmp( p_tk->psz_codec, "A_MPEG/L1" ) )
     {
         p_tk->fmt.i_codec = VLC_CODEC_MPGA;
+        p_fmt->b_packetized = false;
     }
     else if( !strcmp( p_tk->psz_codec, "A_AC3" ) )
     {
