@@ -516,8 +516,9 @@ inline void VLCProfileEditor::registerFilters()
 
 inline void VLCProfileEditor::registerCodecs()
 {
-#define SETMUX( button, val,    vid, aud, men, sub, stream, chaps ) \
+#define SETMUX( button, val, mod, vid, aud, men, sub, stream, chaps ) \
     ui.button->setProperty( "sout", val );\
+    ui.button->setProperty( "module", mod );\
     ui.button->setProperty( "capvideo", vid );\
     ui.button->setProperty( "capaudio", aud );\
     ui.button->setProperty( "capmenu", men );\
@@ -525,19 +526,19 @@ inline void VLCProfileEditor::registerCodecs()
     ui.button->setProperty( "capstream", stream );\
     ui.button->setProperty( "capchaps", chaps );\
     CONNECT( ui.button, clicked(bool), this, muxSelected() );
-    SETMUX( PSMux, "ps",        true, true, false, true, false, true )
-    SETMUX( TSMux, "ts",        true, true, false, true, true, false )
-    SETMUX( WEBMux, "webm",     true, true, false, false, true, false )
-    SETMUX( MPEG1Mux, "mpeg1",  true, true, false, false, false, false )
-    SETMUX( OggMux, "ogg",      true, true, false, false, true, true )
-    SETMUX( ASFMux, "asf",      true, true, false, true, true, true )
-    SETMUX( MOVMux, "mp4",      true, true, true, true, true, false )
-    SETMUX( WAVMux, "wav",      false, true, false, false, false, false )
-    SETMUX( RAWMux, "raw",      true, true, false, false, false, false )
-    SETMUX( FLVMux, "flv",      true, true, false, false, true, false )
-    SETMUX( MKVMux, "mkv",      true, true, true, true, true, true )
-    SETMUX( AVIMux, "avi",      true, true, false, false, false, false )
-    SETMUX( MJPEGMux, "mpjpeg", true, false, false, false, false, false )
+    SETMUX( PSMux, "ps", "ps",      true, true, false, true, false, true )
+    SETMUX( TSMux, "ts", "mux_ts",  true, true, false, true, true, false )
+    SETMUX( WEBMux, "webm", "avformat", true, true, false, false, true, false )
+    SETMUX( MPEG1Mux, "mpeg1", "ps", true, true, false, false, false, false )
+    SETMUX( OggMux, "ogg", "mux_ogg",true, true, false, false, true, true )
+    SETMUX( ASFMux, "asf", "asf",   true, true, false, true, true, true )
+    SETMUX( MOVMux, "mp4", "mp4",   true, true, true, true, true, false )
+    SETMUX( WAVMux, "wav", "wav",   false, true, false, false, false, false )
+    SETMUX( RAWMux, "raw", "dummy", true, true, false, false, false, false )
+    SETMUX( FLVMux, "flv", "avformat", true, true, false, false, true, false )
+    SETMUX( MKVMux, "mkv", "avformat", true, true, true, true, true, true )
+    SETMUX( AVIMux, "avi", "avi",   true, true, false, false, false, false )
+    SETMUX( MJPEGMux, "mpjpeg", "mpjpeg", true, false, false, false, false, false )
 #undef SETMUX
 
 #define ADD_VCODEC( name, fourcc ) \
@@ -615,11 +616,15 @@ void VLCProfileEditor::muxSelected()
     SETYESNOSTATE( capsubs, "capsubs" );
     SETYESNOSTATE( capstream, "capstream" );
     SETYESNOSTATE( capchaps, "capchaps" );
-    bool b = caps["muxers"].contains( "mux_" + current->property("sout").toString() );
-    if ( !b )
+    if( current->property("module").toString() == "avformat" )
         ui.muxerwarning->setText(
                     QString( "<img src=\":/menu/info\"/> %1" )
                     .arg( qtr( "This muxer is not provided directly by VLC: It could be missing." ) )
+                    );
+    else if ( !caps["muxers"].contains( current->property("module").toString() ) )
+        ui.muxerwarning->setText(
+                    QString( "<img src=\":/menu/quit\"/> %1" )
+                    .arg( qtr( "This muxer is missing. Using this profile will fail" ) )
                     );
     else
         ui.muxerwarning->setText("");
