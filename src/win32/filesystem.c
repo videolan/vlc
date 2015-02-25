@@ -301,6 +301,7 @@ int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
     return fd;
 }
 
+#if !VLC_WINSTORE_APP
 FILE *vlc_win32_tmpfile(void)
 {
     TCHAR tmp_path[MAX_PATH-14];
@@ -332,4 +333,10 @@ FILE *vlc_win32_tmpfile(void)
     }
     return stream;
 }
+#else
+FILE *vlc_win32_tmpfile(void)
+{
+    return NULL;
+}
+#endif
 
