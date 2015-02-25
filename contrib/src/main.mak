@@ -389,7 +389,7 @@ prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
 	cd $(TOPDST)/$(HOST) && $(SRC)/change_prefix.sh
 ifdef HAVE_WIN32
 ifndef HAVE_CROSS_COMPILE
-	$(RM) `find $(HOST)/bin | file -f- | grep ELF | awk -F: '{print $$1}' | xargs`
+	$(RM) `find $(TOPDST)/$(HOST)/bin | file -f- | grep ELF | awk -F: '{print $$1}' | xargs`
 endif
 endif
 
