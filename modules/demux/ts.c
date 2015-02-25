@@ -1197,9 +1197,10 @@ static int Open( vlc_object_t *p_this )
         while( !p_sys->i_pmt_es && !p_sys->b_end_preparse )
             if( Demux( p_demux ) != VLC_DEMUXER_SUCCESS )
                 break;
+        p_sys->es_creation = DELAY_ES;
     }
-
-    p_sys->es_creation = ( p_sys->b_access_control ? CREATE_ES : DELAY_ES );
+    else
+        p_sys->es_creation = ( p_sys->b_access_control ? CREATE_ES : DELAY_ES );
 
     return VLC_SUCCESS;
 }
