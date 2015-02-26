@@ -90,14 +90,14 @@ static int Open( vlc_object_t *p_this )
     AVCodecParserContext * p_ctx = av_parser_init( i_avcodec_id );
     if( !p_ctx )
         return VLC_EGENERIC;
-    
+
     AVCodec * p_codec = avcodec_find_decoder( i_avcodec_id );
     if( unlikely( !p_codec ) )
     {
         av_parser_close( p_ctx );
         return VLC_EGENERIC;
     }
-  
+
     AVCodecContext * p_codec_ctx = avcodec_alloc_context3( p_codec );
     if( unlikely( !p_codec_ctx ) )
     {
@@ -178,11 +178,11 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
     p_block->i_pts = p_block->i_dts = VLC_TS_INVALID;
 
     return p_ret;
-    
+
 out:
     p_sys->i_offset = 0;
     block_Release( *pp_block );
-    *pp_block == NULL;
+    *pp_block = NULL;
     return NULL;
 }
 
