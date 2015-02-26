@@ -20,9 +20,7 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2 .sum-zvbi
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/zvbi/zvbi-win32.patch
 endif
-ifdef HAVE_DARWIN_OS
 	$(APPLY) $(SRC)/zvbi/zvbi-fix-clang-support.patch
-endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/zvbi/zvbi-android.patch
 endif
