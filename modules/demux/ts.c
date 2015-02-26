@@ -5206,6 +5206,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
         return;
     }
 
+    pmt->b_seen = true;
 
     if( prg->i_version != -1 &&
         ( !p_pmt->b_current_next || prg->i_version == p_pmt->i_version ) )
@@ -5617,6 +5618,8 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_pat )
     ts_pid_t             *pat = &p_sys->pid[0];
 
     msg_Dbg( p_demux, "PATCallBack called" );
+
+    pat->b_seen = true;
 
     if( ( pat->psi->i_pat_version != -1 &&
             ( !p_pat->b_current_next ||
