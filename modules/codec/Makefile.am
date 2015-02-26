@@ -303,9 +303,9 @@ libavcodec_plugin_la_LIBADD = $(AVCODEC_LIBS) $(LIBM)
 libavcodec_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
 
 if MERGE_FFMPEG
-libavcodec_plugin_la_SOURCES += demux/avformat/demux.c access/avio.c
-libavcodec_plugin_la_CFLAGS += $(AVFORMAT_CFLAGS)
-libavcodec_plugin_la_LIBADD += $(AVFORMAT_LIBS)
+libavcodec_plugin_la_SOURCES += demux/avformat/demux.c access/avio.c packetizer/avparser.c
+libavcodec_plugin_la_CFLAGS += $(AVFORMAT_CFLAGS) $(AVUTIL_CFLAGS)
+libavcodec_plugin_la_LIBADD += $(AVFORMAT_LIBS) $(AVUTIL_LIBS) $(LIBM)
 if ENABLE_SOUT
 libavcodec_plugin_la_SOURCES += demux/avformat/mux.c
 endif

@@ -40,6 +40,8 @@ packetizer_LTLIBRARIES += libpacketizer_copy_plugin.la
 endif
 
 if HAVE_AVCODEC
+if !MERGE_FFMPEG
 packetizer_LTLIBRARIES += libpacketizer_avparser_plugin.la
+endif
 endif
 
