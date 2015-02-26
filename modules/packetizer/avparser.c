@@ -40,15 +40,15 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int  OpenPacketizer ( vlc_object_t * );
+static void ClosePacketizer( vlc_object_t * );
 
 vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_PACKETIZER )
     set_description( N_("avparser packetizer") )
     set_capability( "packetizer", 1 )
-    set_callbacks( Open, Close )
+    set_callbacks( OpenPacketizer, ClosePacketizer )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -64,12 +64,12 @@ struct decoder_sys_t
 static block_t * Packetize( decoder_t *, block_t ** );
 
 /*****************************************************************************
- * Open: probe the packetizer and return score
+ * OpenPacketizer: probe the packetizer and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able
  * to choose.
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -123,9 +123,9 @@ static int Open( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Close:
+ * ClosePacketizer:
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void ClosePacketizer( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     avcodec_free_context( &p_dec->p_sys->p_codec_ctx );
