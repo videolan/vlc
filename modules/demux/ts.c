@@ -263,6 +263,7 @@ typedef struct
     dvbpsi_handle   handle; /* PAT/SDT/EIT */
     int             i_pat_version;
     int             i_sdt_version;
+    int             i_ts_id;
 
     /* For PMT */
     int             i_prg;
@@ -1928,6 +1929,7 @@ static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
 
         pid->psi->i_pat_version  = -1;
         pid->psi->i_sdt_version  = -1;
+        pid->psi->i_ts_id        = -1;
         if( p_owner )
         {
             ts_prg_psi_t *prg = malloc( sizeof( ts_prg_psi_t ) );
@@ -5624,6 +5626,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_pat )
     if( ( pat->psi->i_pat_version != -1 &&
             ( !p_pat->b_current_next ||
               p_pat->i_version == pat->psi->i_pat_version ) ) ||
+        ( pat->psi->i_ts_id != -1 && p_pat->i_ts_id != pat->psi->i_ts_id ) ||
         p_sys->b_user_pmt || PATCheck( p_demux, p_pat ) )
     {
         dvbpsi_DeletePAT( p_pat );
@@ -5770,6 +5773,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_pat )
         }
     }
     pat->psi->i_pat_version = p_pat->i_version;
+    pat->psi->i_ts_id = p_pat->i_ts_id;
 
     dvbpsi_DeletePAT( p_pat );
 }
