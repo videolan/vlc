@@ -334,6 +334,7 @@ typedef struct
 
 #define MIN_ES_PID 4    /* Should be 32.. broken muxers */
 #define MAX_ES_PID 8190
+#define MIN_PAT_INTERVAL CLOCK_FREQ // DVB is 500ms
 
 #define FROM_SCALE(x) (VLC_TS_0 + ((x) * 100 / 9))
 #define TO_SCALE(x)   (((x) - VLC_TS_0) * 9 / 100)
@@ -409,7 +410,7 @@ struct demux_sys_t
     {
         mtime_t i_first_dts;     /* first dts encountered for the stream */
         int     i_timesourcepid; /* which pid we saved the dts from */
-        bool    b_pat_deadline;  /* set if we haven't seen PAT within 140ms */
+        bool    b_pat_deadline;  /* set if we haven't seen PAT within MIN_PAT_INTERVAL */
     } patfix;
 
     vdr_info_t  vdr;
@@ -846,7 +847,7 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
     else if( p_sys->patfix.i_timesourcepid == pid->i_pid && i_dts > -1 &&
              !p_sys->patfix.b_pat_deadline )
     {
-        if( i_dts - p_sys->patfix.i_first_dts > 9 * 140000 / 100 )
+        if( i_dts - p_sys->patfix.i_first_dts > TO_SCALE(MIN_PAT_INTERVAL) )
             p_sys->patfix.b_pat_deadline = true;
     }
 
@@ -1327,7 +1328,7 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     bool b_wait_es = p_sys->i_pmt_es <= 0;
 
-    /* If we had no PAT within 140ms, create PAT/PMT from probed streams */
+    /* If we had no PAT within MIN_PAT_INTERVAL, create PAT/PMT from probed streams */
     if( p_sys->i_pmt_es == 0 && !p_sys->pid[0].b_seen && p_sys->patfix.b_pat_deadline )
         MissingPATPMTFixup( p_demux );
 
@@ -1351,7 +1352,7 @@ static int Demux( demux_t *p_demux )
         /* Parse the TS packet */
         ts_pid_t *p_pid = &p_sys->pid[PIDGet( p_pkt )];
 
-        /* Probe streams to build PAT/PMT after 140ms in case we don't see any PAT */
+        /* Probe streams to build PAT/PMT after MIN_PAT_INTERVAL in case we don't see any PAT */
         if( !p_sys->pid[0].b_seen &&
             (p_pid->probed.i_type == 0 || p_pid->i_pid == p_sys->patfix.i_timesourcepid) &&
             (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
