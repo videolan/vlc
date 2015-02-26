@@ -1973,7 +1973,7 @@ dnl
 dnl  libdvbpsi check for ts mux/demux
 dnl
 have_dvbpsi="no"
-PKG_WITH_MODULES([DVBPSI], [libdvbpsi], [have_dvbpsi="yes"])
+PKG_WITH_MODULES([DVBPSI], [libdvbpsi >= 1.0.0], [have_dvbpsi="yes"])
 AM_CONDITIONAL(HAVE_DVBPSI, [test "${have_dvbpsi}" = "yes"])
 
 

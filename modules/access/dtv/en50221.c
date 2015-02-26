@@ -2263,13 +2263,13 @@ int en50221_SetCAPMT( cam_t * p_cam, dvbpsi_pmt_t *p_pmt )
 
             if ( !b_needs_descrambling )
             {
-                dvbpsi_DeletePMT( p_pmt );
+                dvbpsi_pmt_delete( p_pmt );
                 p_pmt = p_cam->pp_selected_programs[i];
                 p_cam->pp_selected_programs[i] = NULL;
             }
             else if( p_pmt != p_cam->pp_selected_programs[i] )
             {
-                dvbpsi_DeletePMT( p_cam->pp_selected_programs[i] );
+                dvbpsi_pmt_delete( p_cam->pp_selected_programs[i] );
                 p_cam->pp_selected_programs[i] = p_pmt;
             }
 
@@ -2308,7 +2308,7 @@ int en50221_SetCAPMT( cam_t * p_cam, dvbpsi_pmt_t *p_pmt )
 
     if ( !b_needs_descrambling )
     {
-        dvbpsi_DeletePMT( p_pmt );
+        dvbpsi_pmt_delete( p_pmt );
     }
 
     return VLC_SUCCESS;
@@ -2684,7 +2684,7 @@ void en50221_End( cam_t * p_cam )
     {
         if( p_cam->pp_selected_programs[i] != NULL )
         {
-            dvbpsi_DeletePMT( p_cam->pp_selected_programs[i] );
+            dvbpsi_pmt_delete( p_cam->pp_selected_programs[i] );
         }
     }
 

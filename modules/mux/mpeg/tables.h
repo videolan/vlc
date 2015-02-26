@@ -20,12 +20,6 @@
 #ifndef _TABLES_H
 #define _TABLES_H 1
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
-    #define DVBPSI_HANDLE_PARAM(a) a,
-#else
-    #define DVBPSI_HANDLE_PARAM(a)
-#endif
-
 #define MAX_SDT_DESC 64
 
 typedef struct
@@ -41,7 +35,7 @@ typedef struct
 
 block_t * WritePSISection( dvbpsi_psi_section_t* p_section );
 
-void BuildPAT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi)
+void BuildPAT( dvbpsi_t *p_dvbpsi,
                void *p_opaque, PEStoTSCallback pf_callback,
                int i_tsid, int i_pat_version_number,
                ts_stream_t *p_pat,
@@ -55,7 +49,7 @@ typedef struct
     int i_mapped_prog;
 } pes_mapped_stream_t;
 
-void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
+void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                void *p_opaque, PEStoTSCallback pf_callback,
                int i_tsid, int i_pmt_version_number,
                int i_pcr_pid,

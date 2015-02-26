@@ -103,15 +103,15 @@ struct scan_session_t
     scan_configuration_t cfg;
     int i_snr;
 
-    dvbpsi_handle pat;
+    dvbpsi_t *pat;
     dvbpsi_pat_t *p_pat;
     int i_nit_pid;
 
-    dvbpsi_handle sdt;
+    dvbpsi_t *sdt;
     dvbpsi_sdt_t *p_sdt;
 
 #ifdef DVBPSI_USE_NIT
-    dvbpsi_handle nit;
+    dvbpsi_t *nit;
     dvbpsi_nit_t *p_nit;
 #else
 #   warning NIT is not supported by your libdvbpsi version
@@ -701,12 +701,12 @@ static void PATCallBack( scan_session_t *p_session, dvbpsi_pat_t *p_pat )
     /* */
     if( p_session->p_pat && p_session->p_pat->b_current_next )
     {
-        dvbpsi_DeletePAT( p_session->p_pat );
+        dvbpsi_pat_delete( p_session->p_pat );
         p_session->p_pat = NULL;
     }
     if( p_session->p_pat )
     {
-        dvbpsi_DeletePAT( p_pat );
+        dvbpsi_pat_delete( p_pat );
         return;
     }
 
@@ -733,12 +733,12 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
 
     if( p_session->p_sdt && p_session->p_sdt->b_current_next )
     {
-        dvbpsi_DeleteSDT( p_session->p_sdt );
+        dvbpsi_sdt_delete( p_session->p_sdt );
         p_session->p_sdt = NULL;
     }
     if( p_session->p_sdt )
     {
-        dvbpsi_DeleteSDT( p_sdt );
+        dvbpsi_sdt_delete( p_sdt );
         return;
     }
 
@@ -747,11 +747,7 @@ static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
 
     /* */
     msg_Dbg( p_obj, "new SDT ts_id=%d version=%d current_next=%d network_id=%d",
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
              p_sdt->i_extension,
-#else
-             p_sdt->i_ts_id,
-#endif
              p_sdt->i_version, p_sdt->b_current_next,
              p_sdt->i_network_id );
 
@@ -801,12 +797,12 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
     /* */
     if( p_session->p_nit && p_session->p_nit->b_current_next )
     {
-        dvbpsi_DeleteNIT( p_session->p_nit );
+        dvbpsi_nit_delete( p_session->p_nit );
         p_session->p_nit = NULL;
     }
     if( p_session->p_nit )
     {
-        dvbpsi_DeleteNIT( p_nit );
+        dvbpsi_nit_delete( p_nit );
         return;
     }
 
@@ -932,7 +928,6 @@ static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
 }
 #endif
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
 static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id, uint16_t i_extension, void *p_data )
 {
     scan_session_t *p_session = (scan_session_t *)p_data;
@@ -948,17 +943,6 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id, uint16_t i_ext
             msg_Err( p_session->p_obj, "PSINewTableCallback: failed attaching NITCallback" );
     }
 }
-#else
-static void PSINewTableCallBack( scan_session_t *p_session, dvbpsi_handle h, uint8_t  i_table_id, uint16_t i_extension )
-{
-    if( i_table_id == 0x42 )
-        dvbpsi_AttachSDT( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_session );
-# ifdef DVBPSI_USE_NIT
-    else if( i_table_id == 0x40 || i_table_id == 0x41 )
-        dvbpsi_AttachNIT( h, i_table_id, i_extension, (dvbpsi_nit_callback)NITCallBack, p_session );
-# endif
-}
-#endif
 
 scan_session_t *scan_session_New( vlc_object_t *p_obj,
                                   const scan_configuration_t *p_cfg )
@@ -1096,20 +1080,20 @@ void scan_session_Destroy( scan_t *p_scan, scan_session_t *p_session )
 
     /* */
     if( p_session->pat )
-        dvbpsi_DetachPAT( p_session->pat );
+        dvbpsi_pat_detach( p_session->pat );
     if( p_session->p_pat )
-        dvbpsi_DeletePAT( p_session->p_pat );
+        dvbpsi_pat_delete( p_session->p_pat );
 
     if( p_session->sdt )
         dvbpsi_DetachDemux( p_session->sdt );
     if( p_session->p_sdt )
-        dvbpsi_DeleteSDT( p_session->p_sdt );
+        dvbpsi_sdt_delete( p_session->p_sdt );
 
 #ifdef DVBPSI_USE_NIT
     if( p_session->nit )
         dvbpsi_DetachDemux( p_session->nit );
     if( p_session->p_nit )
-        dvbpsi_DeleteNIT( p_session->p_nit );
+        dvbpsi_nit_delete( p_session->p_nit );
 #endif
     free( p_session );
 }
@@ -1227,7 +1211,6 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
     if( i_pid == 0x00 )
     {
         if( !p_scan->pat )
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
         {
             p_scan->pat = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
             if( !p_scan->pat )
@@ -1244,16 +1227,12 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
                 return false;
             }
         }
-#else
-            p_scan->pat = dvbpsi_AttachPAT( (dvbpsi_pat_callback)PATCallBack, p_scan );
-#endif
         if( p_scan->pat )
-            dvbpsi_PushPacket( p_scan->pat, p_block->p_buffer );
+            dvbpsi_packet_push( p_scan->pat, p_block->p_buffer );
     }
     else if( i_pid == 0x11 )
     {
         if( !p_scan->sdt )
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
         {
             p_scan->sdt = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
             if( !p_scan->sdt )
@@ -1270,18 +1249,14 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
                 return false;
             }
         }
-#else
-            p_scan->sdt = dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan );
-#endif
 
         if( p_scan->sdt )
-            dvbpsi_PushPacket( p_scan->sdt, p_block->p_buffer );
+            dvbpsi_packet_push( p_scan->sdt, p_block->p_buffer );
     }
     else /*if( i_pid == p_scan->i_nit_pid )*/
     {
 #ifdef DVBPSI_USE_NIT
         if( !p_scan->nit )
-# if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
         {
             p_scan->nit = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
             if( !p_scan->nit )
@@ -1298,11 +1273,8 @@ bool scan_session_Push( scan_session_t *p_scan, block_t *p_block )
                 return false;
             }
         }
-# else
-            p_scan->nit = dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack, p_scan );
-# endif
         if( p_scan->nit )
-            dvbpsi_PushPacket( p_scan->nit, p_block->p_buffer );
+            dvbpsi_packet_push( p_scan->nit, p_block->p_buffer );
 #endif
     }
 

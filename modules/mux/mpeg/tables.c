@@ -77,7 +77,7 @@ error:
     return NULL;
 }
 
-void BuildPAT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi)
+void BuildPAT( dvbpsi_t *p_dvbpsi,
                void *p_opaque, PEStoTSCallback pf_callback,
                int i_tsid, int i_pat_version_number,
                ts_stream_t *p_pat,
@@ -86,23 +86,19 @@ void BuildPAT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi)
     dvbpsi_pat_t         patpsi;
     dvbpsi_psi_section_t *p_section;
 
-    dvbpsi_InitPAT( &patpsi, i_tsid, i_pat_version_number, 1 /* b_current_next */ );
+    dvbpsi_pat_init( &patpsi, i_tsid, i_pat_version_number, true /* b_current_next */ );
     /* add all programs */
     for (unsigned i = 0; i < i_programs; i++ )
-        dvbpsi_PATAddProgram( &patpsi, pi_programs_number[i], p_pmt[i].i_pid );
+        dvbpsi_pat_program_add( &patpsi, pi_programs_number[i], p_pmt[i].i_pid );
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
     p_section = dvbpsi_pat_sections_generate( p_dvbpsi, &patpsi, 0 );
-#else
-    p_section = dvbpsi_GenPATSections( &patpsi, 0 /* max program per section */ );
-#endif
     block_t *p_block = WritePSISection( p_section );
 
     PEStoTS( p_opaque, pf_callback, p_block, p_pat->i_pid,
              &p_pat->b_discontinuity, &p_pat->i_continuity_counter );
 
     dvbpsi_DeletePSISections( p_section );
-    dvbpsi_EmptyPAT( &patpsi );
+    dvbpsi_pat_empty( &patpsi );
 }
 #if 1
 
@@ -248,10 +244,10 @@ static void GetPMTmpeg4( vlc_object_t *p_object, dvbpsi_pmt_t *p_dvbpmt,
     bits_write( &bits_fix_IOD, 24,
                 GetDescriptorLength24b(bits.i_data - bits_fix_IOD.i_data - 3 ));
 
-    dvbpsi_PMTAddDescriptor(&p_dvbpmt[0], 0x1d, bits.i_data, bits.p_data);
+    dvbpsi_pmt_descriptor_add(&p_dvbpmt[0], 0x1d, bits.i_data, bits.p_data);
 }
 
-void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
+void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
                void *p_opaque, PEStoTSCallback pf_callback,
                int i_tsid, int i_pmt_version_number,
                int i_pcr_pid,
@@ -265,25 +261,25 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
 
     dvbpsi_sdt_t sdtpsi;
     if( p_sdt )
-        dvbpsi_InitSDT( &sdtpsi, i_tsid, 1, 1, p_sdt->i_netid );
+        dvbpsi_sdt_init( &sdtpsi, i_tsid, 0, 1, true, p_sdt->i_netid );
 
     for (unsigned i = 0; i < i_programs; i++ )
     {
-        dvbpsi_InitPMT( &dvbpmt[i],
+        dvbpsi_pmt_init( &dvbpmt[i],
                         pi_programs_number[i],   /* program number */
                         i_pmt_version_number,
-                        1,      /* b_current_next */
+                        true,      /* b_current_next */
                         i_pcr_pid );
 
         if( !p_sdt )
             continue;
 
-        dvbpsi_sdt_service_t *p_service = dvbpsi_SDTAddService( &sdtpsi,
+        dvbpsi_sdt_service_t *p_service = dvbpsi_sdt_service_add( &sdtpsi,
             pi_programs_number[i],  /* service id */
-            0,         /* eit schedule */
-            0,         /* eit present */
+            false,     /* eit schedule */
+            false,     /* eit present */
             4,         /* running status ("4=RUNNING") */
-            0 );       /* free ca */
+            false );   /* free ca */
 
         const char *psz_sdtprov = p_sdt->desc[i].psz_provider;
         const char *psz_sdtserv = p_sdt->desc[i].psz_service_name;
@@ -305,14 +301,9 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
         psz_sdt_desc[ 2 + provlen ] = (char)servlen;
         memcpy( &psz_sdt_desc[3+provlen], psz_sdtserv, servlen );
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
         dvbpsi_sdt_service_descriptor_add( p_service, 0x48,
                                            (3 + provlen + servlen),
                                            psz_sdt_desc );
-#else
-        dvbpsi_SDTServiceAddDescriptor( p_service, 0x48,
-                3 + provlen + servlen, psz_sdt_desc );
-#endif
     }
 
     for (unsigned i = 0; i < i_mapped_streams; i++ )
@@ -332,7 +323,7 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
     {
         const pes_mapped_stream_t *p_stream = &p_mapped_streams[i];
 
-        dvbpsi_pmt_es_t *p_es = dvbpsi_PMTAddES( &dvbpmt[p_stream->i_mapped_prog],
+        dvbpsi_pmt_es_t *p_es = dvbpsi_pmt_es_add( &dvbpmt[p_stream->i_mapped_prog],
                     p_stream->pes->i_stream_type, p_stream->ts->i_pid );
 
         if( p_stream->pes->i_stream_id == 0xfa || p_stream->pes->i_stream_id == 0xfb )
@@ -342,7 +333,7 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
             /* SL descriptor */
             es_id[0] = (p_stream->pes->i_es_id >> 8)&0xff;
             es_id[1] = (p_stream->pes->i_es_id)&0xff;
-            dvbpsi_PMTESAddDescriptor( p_es, 0x1f, 2, es_id );
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x1f, 2, es_id );
         }
         else if( p_stream->pes->i_stream_type == 0xa0 )
         {
@@ -363,21 +354,21 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
             }
 
             /* 0xa0 is private */
-            dvbpsi_PMTESAddDescriptor( p_es, 0xa0, i_extra + 10, data );
+            dvbpsi_pmt_es_descriptor_add( p_es, 0xa0, i_extra + 10, data );
         }
         else if( p_stream->pes->i_stream_type == 0x81 )
         {
             uint8_t format[4] = { 'A', 'C', '-', '3'};
 
             /* "registration" descriptor : "AC-3" */
-            dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, format );
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x05, 4, format );
         }
         else if( p_stream->pes->i_codec == VLC_CODEC_DIRAC )
         {
             /* Dirac registration descriptor */
 
             uint8_t data[4] = { 'd', 'r', 'a', 'c' };
-            dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, data );
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x05, 4, data );
         }
         else if( p_stream->pes->i_codec == VLC_CODEC_DTS )
         {
@@ -385,12 +376,12 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
 
             /* DTS format identifier, frame size 1024 - FIXME */
             uint8_t data[4] = { 'D', 'T', 'S', '2' };
-            dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, data );
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x05, 4, data );
         }
         else if( p_stream->pes->i_codec == VLC_CODEC_EAC3 )
         {
             uint8_t data[1] = { 0x00 };
-            dvbpsi_PMTESAddDescriptor( p_es, 0x7a, 1, data );
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x7a, 1, data );
         }
         else if( p_stream->pes->i_codec == VLC_CODEC_OPUS )
         {
@@ -398,16 +389,16 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
                 0x80, /* tag extension */
                 p_stream->fmt->audio.i_channels
             };
-            dvbpsi_PMTESAddDescriptor( p_es, 0x7f, 2, data );
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x7f, 2, data );
             uint8_t format[4] = { 'O', 'p', 'u', 's'};
             /* "registration" descriptor : "Opus" */
-            dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, format );
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x05, 4, format );
         }
         else if( p_stream->pes->i_codec == VLC_CODEC_TELETEXT )
         {
             if( p_stream->pes->i_extra )
             {
-                dvbpsi_PMTESAddDescriptor( p_es, 0x56,
+                dvbpsi_pmt_es_descriptor_add( p_es, 0x56,
                                            p_stream->pes->i_extra,
                                            p_stream->pes->p_extra );
             }
@@ -419,7 +410,7 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
             if( p_stream->pes->i_extra )
             {
                 /* pass-through from the TS demux */
-                dvbpsi_PMTESAddDescriptor( p_es, 0x59,
+                dvbpsi_pmt_es_descriptor_add( p_es, 0x59,
                                            p_stream->pes->i_extra,
                                            p_stream->pes->p_extra );
             }
@@ -440,7 +431,7 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
 
                 p_descr = dvbpsi_GenSubtitlingDr( &descr, 0 );
                 /* Work around bug in old libdvbpsi */ p_descr->i_length = 8;
-                dvbpsi_PMTESAddDescriptor( p_es, p_descr->i_tag,
+                dvbpsi_pmt_es_descriptor_add( p_es, p_descr->i_tag,
                                            p_descr->i_length, p_descr->p_data );
             }
             continue;
@@ -448,39 +439,29 @@ void BuildPMT( DVBPSI_HANDLE_PARAM(dvbpsi_t *p_dvbpsi) vlc_object_t *p_object,
 
         if( p_stream->pes->i_langs )
         {
-            dvbpsi_PMTESAddDescriptor( p_es, 0x0a, 4*p_stream->pes->i_langs,
+            dvbpsi_pmt_es_descriptor_add( p_es, 0x0a, 4*p_stream->pes->i_langs,
                 p_stream->pes->lang);
         }
     }
 
     for (unsigned i = 0; i < i_programs; i++ )
     {
-        dvbpsi_psi_section_t *sect;
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
-        sect = dvbpsi_pmt_sections_generate( p_dvbpsi, &dvbpmt[i] );
-#else
-        sect = dvbpsi_GenPMTSections( &dvbpmt[i] );
-#endif
+        dvbpsi_psi_section_t *sect = dvbpsi_pmt_sections_generate( p_dvbpsi, &dvbpmt[i] );
         block_t *pmt = WritePSISection( sect );
         PEStoTS( p_opaque, pf_callback, pmt, p_pmt[i].i_pid,
                  &p_pmt[i].b_discontinuity, &p_pmt[i].i_continuity_counter );
         dvbpsi_DeletePSISections(sect);
-        dvbpsi_EmptyPMT( &dvbpmt[i] );
+        dvbpsi_pmt_empty( &dvbpmt[i] );
     }
 
     if( p_sdt )
     {
-        dvbpsi_psi_section_t *sect;
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
-        sect = dvbpsi_sdt_sections_generate( p_dvbpsi, &sdtpsi );
-#else
-        sect = dvbpsi_GenSDTSections( &sdtpsi );
-#endif
+        dvbpsi_psi_section_t *sect = dvbpsi_sdt_sections_generate( p_dvbpsi, &sdtpsi );
         block_t *p_sdtblock = WritePSISection( sect );
         PEStoTS( p_opaque, pf_callback, p_sdtblock, p_sdt->ts.i_pid,
                  &p_sdt->ts.b_discontinuity, &p_sdt->ts.i_continuity_counter );
         dvbpsi_DeletePSISections( sect );
-        dvbpsi_EmptySDT( &sdtpsi );
+        dvbpsi_sdt_empty( &sdtpsi );
     }
 
     free( dvbpmt );

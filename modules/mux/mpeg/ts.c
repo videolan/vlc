@@ -332,9 +332,7 @@ struct sout_mux_sys_t
 
     vlc_mutex_t     csa_lock;
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
     dvbpsi_t        *p_dvbpsi;
-#endif
     bool            b_es_id_pid;
     bool            b_sdt;
     int             i_pid_video;
@@ -538,8 +536,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->i_num_pmt = 1;
 
-
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
     p_sys->p_dvbpsi = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
     if( !p_sys->p_dvbpsi )
     {
@@ -547,7 +543,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_sys->p_dvbpsi->p_sys = (void *) p_mux;
-#endif
 
     p_sys->b_es_id_pid = var_GetBool( p_mux, SOUT_CFG_PREFIX "es-id-pid" );
 
@@ -745,10 +740,8 @@ static void Close( vlc_object_t * p_this )
     sout_mux_t          *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
     if( p_sys->p_dvbpsi )
         dvbpsi_delete( p_sys->p_dvbpsi );
-#endif
 
     if( p_sys->csa )
     {
@@ -1935,7 +1928,7 @@ void GetPAT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 {
     sout_mux_sys_t       *p_sys = p_mux->p_sys;
 
-    BuildPAT( DVBPSI_HANDLE_PARAM(p_sys->p_dvbpsi)
+    BuildPAT( p_sys->p_dvbpsi,
               c, (PEStoTSCallback)BufferChainAppend,
               p_sys->i_tsid, p_sys->i_pat_version_number,
               &p_sys->pat,
@@ -1963,7 +1956,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
         mappeds[i_stream].ts = &p_stream->ts;
     }
 
-    BuildPMT( DVBPSI_HANDLE_PARAM(p_sys->p_dvbpsi) VLC_OBJECT(p_mux),
+    BuildPMT( p_sys->p_dvbpsi, VLC_OBJECT(p_mux),
               c, (PEStoTSCallback)BufferChainAppend,
               p_sys->i_tsid, p_sys->i_pmt_version_number,
               p_sys->i_pcr_pid,

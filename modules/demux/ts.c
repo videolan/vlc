@@ -235,7 +235,7 @@ typedef struct
 
 typedef struct
 {
-    dvbpsi_handle   handle;
+    dvbpsi_t       *handle;
     int             i_version;
     int             i_number;
     int             i_pid_pcr;
@@ -260,7 +260,7 @@ typedef struct
 typedef struct
 {
     /* for special PAT/SDT case */
-    dvbpsi_handle   handle; /* PAT/SDT/EIT */
+    dvbpsi_t       *handle; /* PAT/SDT/EIT */
     int             i_pat_version;
     int             i_sdt_version;
     int             i_ts_id;
@@ -429,13 +429,8 @@ static void PIDFillFormat( es_format_t *fmt, int i_stream_type );
 
 static void PATCallBack( void*, dvbpsi_pat_t * );
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt );
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
 static void PSINewTableCallBack( dvbpsi_t *handle, uint8_t  i_table_id,
                                  uint16_t i_extension, demux_t * );
-#else
-static void PSINewTableCallBack( demux_t *, dvbpsi_handle,
-                                 uint8_t  i_table_id, uint16_t i_extension );
-#endif
 
 static int ChangeKeyCallback( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
 
@@ -621,7 +616,6 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, int *pi_header_size,
     return DetectPacketSize( p_demux, pi_header_size, 0 );
 }
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
 static void vlc_dvbpsi_reset( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -663,7 +657,6 @@ static void vlc_dvbpsi_reset( demux_t *p_demux )
         tdt->psi->handle = NULL;
     }
 }
-#endif
 
 static inline mtime_t ExtractPESTimestamp( const uint8_t *p_data )
 {
@@ -857,7 +850,7 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
 static void BuildPATCallback( void *p_opaque, block_t *p_block )
 {
     ts_pid_t *pat_pid = (ts_pid_t *) p_opaque;
-    dvbpsi_PushPacket( pat_pid->psi->handle, p_block->p_buffer );
+    dvbpsi_packet_push( pat_pid->psi->handle, p_block->p_buffer );
 }
 
 static void BuildPMTCallback( void *p_opaque, block_t *p_block )
@@ -867,7 +860,7 @@ static void BuildPMTCallback( void *p_opaque, block_t *p_block )
     {
         for( int i_prg = 0; i_prg < program_pid->psi->i_prg; i_prg++ )
         {
-            dvbpsi_PushPacket( program_pid->psi->prg[i_prg]->handle,
+            dvbpsi_packet_push( program_pid->psi->prg[i_prg]->handle,
                                p_block->p_buffer );
         }
         p_block = p_block->p_next;
@@ -920,7 +913,7 @@ static void MissingPATPMTFixup( demux_t *p_demux )
         .b_discontinuity = false
     };
 
-    BuildPAT( DVBPSI_HANDLE_PARAM(p_sys->pid[0].psi->handle)
+    BuildPAT( p_sys->pid[0].psi->handle,
             &p_sys->pid[0], BuildPATCallback,
             0, 1,
             &patstream,
@@ -958,7 +951,7 @@ static void MissingPATPMTFixup( demux_t *p_demux )
             j++;
         }
 
-        BuildPMT( DVBPSI_HANDLE_PARAM(p_sys->pid[0].psi->handle) VLC_OBJECT(p_demux),
+        BuildPMT( p_sys->pid[0].psi->handle, VLC_OBJECT(p_demux),
                 &p_sys->pid[i_program_pid], BuildPMTCallback,
                 0, 1,
                 i_pcr_pid,
@@ -1031,7 +1024,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->csa = NULL;
     p_sys->b_start_record = false;
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
 # define VLC_DVBPSI_DEMUX_TABLE_INIT(table,obj) \
     do { \
         (table)->psi->handle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG ); \
@@ -1050,12 +1042,10 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC; \
         } \
     } while (0);
-#endif
 
     /* Init PAT handler */
     pat = &p_sys->pid[0];
     PIDInit( pat, true, NULL );
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
     pat->psi->handle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
     if( !pat->psi->handle )
     {
@@ -1071,39 +1061,21 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-#else
-    pat->psi->handle = dvbpsi_AttachPAT( PATCallBack, p_demux );
-#endif
+
     if( p_sys->b_dvb_meta )
     {
         ts_pid_t *sdt = &p_sys->pid[0x11];
         ts_pid_t *eit = &p_sys->pid[0x12];
 
         PIDInit( sdt, true, NULL );
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
         VLC_DVBPSI_DEMUX_TABLE_INIT( sdt, p_demux )
-#else
-        sdt->psi->handle =
-            dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
-                                p_demux );
-#endif
+
         PIDInit( eit, true, NULL );
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
         VLC_DVBPSI_DEMUX_TABLE_INIT( eit, p_demux )
-#else
-        eit->psi->handle =
-            dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
-                                p_demux );
-#endif
+
         ts_pid_t *tdt = &p_sys->pid[0x14];
         PIDInit( tdt, true, NULL );
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
         VLC_DVBPSI_DEMUX_TABLE_INIT( tdt, p_demux )
-#else
-        tdt->psi->handle =
-            dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
-                                p_demux );
-#endif
 
         if( p_sys->b_access_control )
         {
@@ -1114,9 +1086,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
 # undef VLC_DVBPSI_DEMUX_TABLE_INIT
-#endif
 
     /* Init PMT array */
     TAB_INIT( p_sys->i_pmt, p_sys->pmt );
@@ -1225,14 +1195,10 @@ static void Close( vlc_object_t *p_this )
             switch( pid->i_pid )
             {
             case 0: /* PAT */
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
                 if( dvbpsi_decoder_present( pid->psi->handle ) )
                     dvbpsi_pat_detach( pid->psi->handle );
                 dvbpsi_delete( pid->psi->handle );
                 pid->psi->handle = NULL;
-#else
-                dvbpsi_DetachPAT( pid->psi->handle );
-#endif
                 free( pid->psi );
                 break;
             case 1: /* CAT */
@@ -1243,10 +1209,8 @@ static void Close( vlc_object_t *p_this )
                 {
                     /* SDT or EIT or TDT */
                     dvbpsi_DetachDemux( pid->psi->handle );
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
                     dvbpsi_delete( pid->psi->handle );
                     pid->psi->handle = NULL;
-#endif
                     free( pid->psi );
                 }
                 else
@@ -1369,13 +1333,13 @@ static int Demux( demux_t *p_demux )
             {
                 if( p_pid->i_pid == 0 || ( p_sys->b_dvb_meta && ( p_pid->i_pid == 0x11 || p_pid->i_pid == 0x12 || p_pid->i_pid == 0x14 ) ) )
                 {
-                    dvbpsi_PushPacket( p_pid->psi->handle, p_pkt->p_buffer );
+                    dvbpsi_packet_push( p_pid->psi->handle, p_pkt->p_buffer );
                 }
                 else
                 {
                     for( int i_prg = 0; i_prg < p_pid->psi->i_prg; i_prg++ )
                     {
-                        dvbpsi_PushPacket( p_pid->psi->prg[i_prg]->handle,
+                        dvbpsi_packet_push( p_pid->psi->prg[i_prg]->handle,
                                            p_pkt->p_buffer );
                     }
                 }
@@ -1736,7 +1700,6 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
     prg->i_pid_pmt  = -1;
     prg->i_version  = -1;
     prg->i_number   = i_number != 0 ? i_number : TS_USER_PMT_NUMBER;
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
     prg->handle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
     if( !prg->handle )
         goto error;
@@ -1749,11 +1712,6 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
         prg->handle = NULL;
         goto error;
     }
-#else
-    prg->handle     = dvbpsi_AttachPMT(
-        ((i_number != TS_USER_PMT_NUMBER) ? i_number : 1),
-        PMTCallBack, p_demux );
-#endif
     TAB_APPEND( pmt->psi->i_prg, pmt->psi->prg, prg );
 
     psz = strchr( psz, '=' );
@@ -1975,14 +1933,10 @@ static void PIDClean( demux_t *p_demux, ts_pid_t *pid )
     {
         if( pid->psi->handle )
         {
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
             if( dvbpsi_decoder_present( pid->psi->handle ) )
                 dvbpsi_pmt_detach( pid->psi->handle );
             dvbpsi_delete( pid->psi->handle );
             pid->psi->handle = NULL;
-#else
-            dvbpsi_DetachPMT( pid->psi->handle );
-#endif
         }
         for( int i = 0; i < pid->psi->i_prg; i++ )
         {
@@ -1990,13 +1944,9 @@ static void PIDClean( demux_t *p_demux, ts_pid_t *pid )
                 IODFree( pid->psi->prg[i]->iod );
             if( pid->psi->prg[i]->handle )
             {
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
                 if( dvbpsi_decoder_present( pid->psi->prg[i]->handle ) )
                     dvbpsi_pmt_detach( pid->psi->prg[i]->handle );
                 dvbpsi_delete( pid->psi->prg[i]->handle );
-#else
-                dvbpsi_DetachPMT( pid->psi->prg[i]->handle );
-#endif
             }
             free( pid->psi->prg[i] );
         }
@@ -3628,14 +3578,9 @@ static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
         ts_pid_t *p_pid = &p_sys->pid[i];
         if( p_pid->psi )
         {
-
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
             if( dvbpsi_decoder_present( p_pid->psi->handle ))
                 dvbpsi_DetachDemux( p_pid->psi->handle );
             dvbpsi_delete( p_pid->psi->handle );
-#else
-            dvbpsi_DetachDemux( p_pid->psi->handle );
-#endif
             free( p_pid->psi );
             p_pid->psi = NULL;
             p_pid->b_valid = false;
@@ -3706,17 +3651,13 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
        !p_sdt->b_current_next ||
         p_sdt->i_version == sdt->psi->i_sdt_version )
     {
-        dvbpsi_DeleteSDT( p_sdt );
+        dvbpsi_sdt_delete( p_sdt );
         return;
     }
 
     msg_Dbg( p_demux, "new SDT ts_id=%d version=%d current_next=%d "
              "network_id=%d",
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
              p_sdt->i_extension,
-#else
-             p_sdt->i_ts_id,
-#endif
              p_sdt->i_version, p_sdt->b_current_next,
              p_sdt->i_network_id );
 
@@ -3838,7 +3779,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
     }
 
     sdt->psi->i_sdt_version = p_sdt->i_version;
-    dvbpsi_DeleteSDT( p_sdt );
+    dvbpsi_sdt_delete( p_sdt );
 }
 
 /* i_year: year - 1900  i_month: 0-11  i_mday: 1-31 i_hour: 0-23 i_minute: 0-59 i_second: 0-59 */
@@ -3906,7 +3847,7 @@ static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
 
     p_sys->i_tdt_delta = CLOCK_FREQ * EITConvertStartTime( p_tdt->i_utc_time )
                          - mdate();
-    dvbpsi_DeleteTOT(p_tdt);
+    dvbpsi_tot_delete(p_tdt);
 }
 
 
@@ -3920,18 +3861,14 @@ static void EITCallBack( demux_t *p_demux,
     msg_Dbg( p_demux, "EITCallBack called" );
     if( !p_eit->b_current_next )
     {
-        dvbpsi_DeleteEIT( p_eit );
+        dvbpsi_eit_delete( p_eit );
         return;
     }
 
     msg_Dbg( p_demux, "new EIT service_id=%d version=%d current_next=%d "
              "ts_id=%d network_id=%d segment_last_section_number=%d "
              "last_table_id=%d",
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
              p_eit->i_extension,
-#else
-             p_eit->i_service_id,
-#endif
              p_eit->i_version, p_eit->b_current_next,
              p_eit->i_ts_id, p_eit->i_network_id,
              p_eit->i_segment_last_section_number, p_eit->i_last_table_id );
@@ -4102,11 +4039,7 @@ static void EITCallBack( demux_t *p_demux,
         if( b_current_following &&
             (  p_sys->programs.i_size == 0 ||
                p_sys->programs.p_elems[0] ==
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
                     p_eit->i_extension
-#else
-                    p_eit->i_service_id
-#endif
                 ) )
         {
             p_sys->i_dvb_length = 0;
@@ -4119,16 +4052,12 @@ static void EITCallBack( demux_t *p_demux,
             }
         }
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG,
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
                         p_eit->i_extension,
-#else
-                        p_eit->i_service_id,
-#endif
                         p_epg );
     }
     vlc_epg_Delete( p_epg );
 
-    dvbpsi_DeleteEIT( p_eit );
+    dvbpsi_eit_delete( p_eit );
 }
 static void EITCallBackCurrentFollowing( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 {
@@ -4139,13 +4068,8 @@ static void EITCallBackSchedule( demux_t *p_demux, dvbpsi_eit_t *p_eit )
     EITCallBack( p_demux, p_eit, false );
 }
 
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
 static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
                                  uint16_t i_extension, demux_t *p_demux )
-#else
-static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
-                                 uint8_t  i_table_id, uint16_t i_extension )
-#endif
 {
     assert( h );
 #if 0
@@ -4156,13 +4080,9 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
     {
         msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
+
         if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_demux ) )
             msg_Err( p_demux, "PSINewTableCallback: failed attaching SDTCallback" );
-#else
-        dvbpsi_AttachSDT( h, i_table_id, i_extension,
-                          (dvbpsi_sdt_callback)SDTCallBack, p_demux );
-#endif
     }
     else if( p_demux->p_sys->pid[0x11].psi->i_sdt_version != -1 &&
              ( i_table_id == 0x4e || /* Current/Following */
@@ -4174,25 +4094,18 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
         dvbpsi_eit_callback cb = i_table_id == 0x4e ?
                                     (dvbpsi_eit_callback)EITCallBackCurrentFollowing :
                                     (dvbpsi_eit_callback)EITCallBackSchedule;
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
+
         if( !dvbpsi_eit_attach( h, i_table_id, i_extension, cb, p_demux ) )
             msg_Err( p_demux, "PSINewTableCallback: failed attaching EITCallback" );
-#else
-        dvbpsi_AttachEIT( h, i_table_id, i_extension, cb, p_demux );
-#endif
     }
     else if( p_demux->p_sys->pid[0x11].psi->i_sdt_version != -1 &&
             (i_table_id == 0x70 /* TDT */ || i_table_id == 0x73 /* TOT */) )
     {
          msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
+
         if( !dvbpsi_tot_attach( h, i_table_id, i_extension, (dvbpsi_tot_callback)TDTCallBack, p_demux ) )
             msg_Err( p_demux, "PSINewTableCallback: failed attaching TDTCallback" );
-#else
-         dvbpsi_AttachTOT( h, i_table_id, i_extension,
-                           (dvbpsi_tot_callback)TDTCallBack, p_demux);
-#endif
     }
 }
 
@@ -4381,8 +4294,6 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
     unsigned i_page = 0;
 
     /* Gather pages information */
-#if defined _DVBPSI_DR_56_H_ && \
-    defined DVBPSI_VERSION && DVBPSI_VERSION_INT > DVBPSI_VERSION_WANTED(0,1,5)
     for( unsigned i_tag_idx = 0; i_tag_idx < 2; i_tag_idx++ )
     {
         dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, i_tag_idx == 0 ? 0x46 : 0x56 );
@@ -4411,7 +4322,6 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
             memcpy( p_dst->p_iso639, p_src->i_iso6392_language_code, 3 );
         }
     }
-#endif
 
     dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, 0x59 );
     if( p_dr )
@@ -5204,7 +5114,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
     if( pmt == NULL )
     {
         msg_Warn( p_demux, "unreferenced program (broken stream)" );
-        dvbpsi_DeletePMT(p_pmt);
+        dvbpsi_pmt_delete(p_pmt);
         return;
     }
 
@@ -5213,7 +5123,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
     if( prg->i_version != -1 &&
         ( !p_pmt->b_current_next || prg->i_version == p_pmt->i_version ) )
     {
-        dvbpsi_DeletePMT( p_pmt );
+        dvbpsi_pmt_delete( p_pmt );
         return;
     }
 
@@ -5552,7 +5462,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
     /* Set CAM descrambling */
     if( !ProgramIsSelected( p_demux, prg->i_number ) )
     {
-        dvbpsi_DeletePMT( p_pmt );
+        dvbpsi_pmt_delete( p_pmt );
     }
     else if( stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
                              p_pmt ) != VLC_SUCCESS )
@@ -5562,8 +5472,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_pmt )
             p_sys->arib.b25stream = stream_FilterNew( p_demux->s, "aribcam" );
             p_sys->stream = ( p_sys->arib.b25stream ) ? p_sys->arib.b25stream : p_demux->s;
             if (!p_sys->arib.b25stream)
-                dvbpsi_DeletePMT( p_pmt );
-        } else dvbpsi_DeletePMT( p_pmt );
+                dvbpsi_pmt_delete( p_pmt );
+        } else dvbpsi_pmt_delete( p_pmt );
     }
 
     for( int i = 0; i < i_clean; i++ )
@@ -5629,7 +5539,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_pat )
         ( pat->psi->i_ts_id != -1 && p_pat->i_ts_id != pat->psi->i_ts_id ) ||
         p_sys->b_user_pmt || PATCheck( p_demux, p_pat ) )
     {
-        dvbpsi_DeletePAT( p_pat );
+        dvbpsi_pat_delete( p_pat );
         return;
     }
 
@@ -5739,20 +5649,17 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_pat )
 
         PIDInit( pmt, true, pat->psi );
         ts_prg_psi_t *prg = pmt->psi->prg[pmt->psi->i_prg-1];
-#if (DVBPSI_VERSION_INT >= DVBPSI_VERSION_WANTED(1,0,0))
         prg->handle = dvbpsi_new( &dvbpsi_messages, DVBPSI_MSG_DEBUG );
         if( !prg->handle )
         {
-            dvbpsi_DeletePAT( p_pat );
+            dvbpsi_pat_delete( p_pat );
             return;
         }
         prg->handle->p_sys = (void *) VLC_OBJECT(p_demux);
         if( !dvbpsi_pmt_attach( prg->handle, p_program->i_number, PMTCallBack, p_demux ) )
             msg_Err( p_demux, "PATCallback failed attaching PMTCallback to program %d",
                      p_program->i_number );
-#else
-        prg->handle = dvbpsi_AttachPMT( p_program->i_number, PMTCallBack, p_demux );
-#endif
+
         prg->i_number = p_program->i_number;
         prg->i_pid_pmt = p_program->i_pid;
 
@@ -5775,5 +5682,5 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_pat )
     pat->psi->i_pat_version = p_pat->i_version;
     pat->psi->i_ts_id = p_pat->i_ts_id;
 
-    dvbpsi_DeletePAT( p_pat );
+    dvbpsi_pat_delete( p_pat );
 }
