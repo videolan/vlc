@@ -127,6 +127,7 @@ Access:
    and BD-J navigation
  * Digital Cinema Package support, including encrypted DCP with KDM
  * Partial fixes for Arccos protected DVDs
+ * Fix CDDB lookups, including pregap data
 
 Decoder:
  * Support VDPAU acceleration for GPU-zerocopy decoding
@@ -176,7 +177,7 @@ Demuxer:
  * Support microseconds in SubRip subtitles
  * FLAC packets validation using CRC
  * Improvements in metadata support in Ogg/Opus/Vorbis files
- * Fix encoding issues in some XML playlist formats
+ * Fix encoding issues and relative paths in some XML playlist formats
  * Support THP Wii/Gamecube, RenderWare and Escape Replay game video files
  * New HEVC raw packetizer and demuxer
  * TS support for WiDi/Miracast LPCM
@@ -248,6 +249,7 @@ Interfaces:
  * Support to continue media playback where it was left off for Qt and OS X
 
 Mac OS X Interface:
+ * Support for OS X Yosemite
  * Avoid grey bars in fullscreen when using Mavericks with multiple monitors
  * Improve fullscreen behavior for the native and VLCs own mode
  * Fixes for advanced preferences
@@ -260,6 +262,7 @@ Misc:
  * New module for TLS on OS X and iOS
  * Windows installer will kill running instance before installing
  * Teletext navigation buttons support in Qt4 gui
+ * Update and improve Koreus, Dailymotion, Soundcloud and Youtube scripts
 
 Security:
  * Numerous integer and heap overflow in Ogg, AVI, ASF, TTA and MP4 demuxers
@@ -280,6 +283,26 @@ Translations:
    Japanese, Italian, Icelandic, Indonesian, Hebrew, Galician, Scottish
    Gaelic, French, Finnish, Persian, Estonian, Spanish, Modern Greek, German,
    Danish, Welsh, Czech, Bosnian, Bengali, Asturian
+
+
+Changes between 2.1.5 and 2.1.6:
+--------------------------------
+
+Audio output:
+ * Fix OSS stuttering
+
+Security:
+ * Fix heap overflow in decomp stream filter
+ * Fix buffer overflow in updater
+ * Fix potential buffer overflow in schroedinger encoder
+ * Fix null-pointer dereference in DMO decoder
+ * Fix buffer overflow in parsing of string boxes in mp4 demuxer
+ * Fix SRTP integer overflow
+ * Fix potential crash in zip access
+ * Fix read overflow in Ogg demuxer
+
+Win32 installer:
+ * Update translations and greek encoding
 
 
 Changes between 2.1.4 and 2.1.5:
