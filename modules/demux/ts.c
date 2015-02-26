@@ -3045,7 +3045,7 @@ static int FindPCRCandidate( demux_sys_t *p_sys, ts_prg_psi_t *p_prg )
         ts_pid_t *p_pid = &p_sys->pid[i];
         if( p_pid->b_seen && p_pid->es && p_pid->es->id &&
             p_pid->i_owner_number == p_prg->i_number &&
-            p_cand->i_pid != i_previous )
+            (!p_cand || p_cand->i_pid != i_previous) )
         {
             if( p_pid->probed.i_pcr_count ) /* check PCR frequency first */
             {
