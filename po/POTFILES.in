@@ -998,7 +998,7 @@ modules/mux/ogg.c
 modules/mux/wav.c
 modules/notify/growl.m
 modules/notify/notify.c
-modules/packetizer/avparser.c
+modules/packetizer/avparser.h
 modules/packetizer/copy.c
 modules/packetizer/dirac.c
 modules/packetizer/flac.c

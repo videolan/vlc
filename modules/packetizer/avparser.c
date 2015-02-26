@@ -37,19 +37,15 @@
 #include "../codec/avcodec/avcodec.h"
 #include "../codec/avcodec/avcommon.h"
 
+#include "avparser.h"
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  OpenPacketizer ( vlc_object_t * );
-static void ClosePacketizer( vlc_object_t * );
-
+#ifndef MERGE_FFMPEG
 vlc_module_begin ()
-    set_category( CAT_SOUT )
-    set_subcategory( SUBCAT_SOUT_PACKETIZER )
-    set_description( N_("avparser packetizer") )
-    set_capability( "packetizer", 1 )
-    set_callbacks( OpenPacketizer, ClosePacketizer )
+    AVPARSER_MODULE
 vlc_module_end ()
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -69,7 +65,7 @@ static block_t * Packetize( decoder_t *, block_t ** );
  * Tries to launch a decoder and return score so that the interface is able
  * to choose.
  *****************************************************************************/
-static int OpenPacketizer( vlc_object_t *p_this )
+int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -125,7 +121,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 /*****************************************************************************
  * ClosePacketizer:
  *****************************************************************************/
-static void ClosePacketizer( vlc_object_t *p_this )
+void ClosePacketizer( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     avcodec_free_context( &p_dec->p_sys->p_codec_ctx );

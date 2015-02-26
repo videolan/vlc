@@ -14,6 +14,7 @@ libpacketizer_flac_plugin_la_SOURCES = packetizer/flac.c
 libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c
 
 libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
+	packetizer/avparser.h \
 	codec/avcodec/avcommon.h \
 	codec/avcodec/avcodec.h \
 	codec/avcodec/fourcc.c
