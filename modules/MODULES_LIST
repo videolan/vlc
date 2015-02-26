@@ -262,6 +262,7 @@ $Id$
  * opus: a opus audio decoder/packetizer/encoder using the libopus library
  * os2drive: service discovery for OS/2 drives
  * oss: audio output module using the OSS /dev/dsp interface
+ * packetizer_avparser: libavcodec packetizer
  * packetizer_copy: Simple copy packetizer
  * packetizer_dirac: Dirac video packetizer
  * packetizer_flac: FLAC audio packetizer

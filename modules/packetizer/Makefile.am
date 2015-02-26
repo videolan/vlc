@@ -13,6 +13,14 @@ libpacketizer_dirac_plugin_la_SOURCES = packetizer/dirac.c
 libpacketizer_flac_plugin_la_SOURCES = packetizer/flac.c
 libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c
 
+libpacketizer_avparser_plugin_la_SOURCES = packetizer/avparser.c \
+	codec/avcodec/avcommon.h \
+	codec/avcodec/avcodec.h \
+	codec/avcodec/fourcc.c
+libpacketizer_avparser_plugin_la_CFLAGS = $(AVCODEC_CFLAGS) $(AVUTIL_CFLAGS) $(AM_CFLAGS)
+libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM)
+
+
 noinst_HEADERS += packetizer/packetizer_helper.h
 
 packetizer_LTLIBRARIES = \
@@ -29,3 +37,8 @@ packetizer_LTLIBRARIES = \
 if ENABLE_SOUT
 packetizer_LTLIBRARIES += libpacketizer_copy_plugin.la
 endif
+
+if HAVE_AVCODEC
+packetizer_LTLIBRARIES += libpacketizer_avparser_plugin.la
+endif
+

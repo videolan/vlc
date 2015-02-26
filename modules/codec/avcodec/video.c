@@ -454,6 +454,10 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
 
     p_dec->pf_decode_video = DecodeVideo;
+
+    if ( p_dec->fmt_in.i_codec == VLC_CODEC_VP9 )
+        p_dec->b_need_packetized = true;
+
     return VLC_SUCCESS;
 }
 
