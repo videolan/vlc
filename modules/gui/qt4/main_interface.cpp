@@ -260,7 +260,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     if( b_minimalView )
         toggleMinimalView( true );
 
-    setMaximumSize( QSize( 16386, 16386 ) );
     computeMinimumSize();
 }
 
