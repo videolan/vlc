@@ -354,7 +354,6 @@ $Id$
  * stream_out_duplicate: duplicates a stream output chain
  * stream_out_es: stream out module outputing ES
  * stream_out_gather: stream out module gathering inputs for seemless transitions
- * stream_out_langfromtelx: set the the Lang of an ES when streaming based on a teletext page
  * stream_out_mosaic_bridge: stream output module to make a mosaic. To be used with VLM
  * stream_out_raop: Remote Audio Output Protocol (AirTunes) stream out
  * stream_out_record: record stream output module
