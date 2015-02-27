@@ -673,7 +673,7 @@ bool matroska_segment_c::Preload( )
             msg_Dbg(  &sys.demuxer, "|   + Seek head" );
             if( i_seekhead_count < 10 )
             {
-                i_seekhead_position = (int64_t) es.I_O().getFilePointer();
+                i_seekhead_position = el->GetElementPosition();
                 ParseSeekHead( static_cast<KaxSeekHead*>( el ) );
             }
         }
@@ -681,29 +681,35 @@ bool matroska_segment_c::Preload( )
         {
             /* Multiple allowed, mandatory */
             msg_Dbg(  &sys.demuxer, "|   + Information" );
-            if( i_info_position < 0 ) // FIXME
+            if( i_info_position < 0 )
+            {
                 ParseInfo( static_cast<KaxInfo*>( el ) );
-            i_info_position = (int64_t) es.I_O().getFilePointer();
+                i_info_position = el->GetElementPosition();
+            }
         }
         else if( MKV_IS_ID( el, KaxTracks ) )
         {
             /* Multiple allowed */
             msg_Dbg(  &sys.demuxer, "|   + Tracks" );
-            if( i_tracks_position < 0 ) // FIXME
+            if( i_tracks_position < 0 )
+            {
                 ParseTracks( static_cast<KaxTracks*>( el ) );
+            }
             if ( tracks.size() == 0 )
             {
                 msg_Err( &sys.demuxer, "No tracks supported" );
                 return false;
             }
-            i_tracks_position = (int64_t) es.I_O().getFilePointer();
+            i_tracks_position = el->GetElementPosition();
         }
         else if( MKV_IS_ID( el, KaxCues ) )
         {
             msg_Dbg(  &sys.demuxer, "|   + Cues" );
             if( i_cues_position < 0 )
+            {
                 LoadCues( static_cast<KaxCues*>( el ) );
-            i_cues_position = (int64_t) es.I_O().getFilePointer();
+                i_cues_position = el->GetElementPosition();
+            }
         }
         else if( MKV_IS_ID( el, KaxCluster ) )
         {
@@ -722,22 +728,28 @@ bool matroska_segment_c::Preload( )
         {
             msg_Dbg( &sys.demuxer, "|   + Attachments" );
             if( i_attachments_position < 0 )
+            {
                 ParseAttachments( static_cast<KaxAttachments*>( el ) );
-            i_attachments_position = (int64_t) es.I_O().getFilePointer();
+                i_attachments_position = el->GetElementPosition();
+            }
         }
         else if( MKV_IS_ID( el, KaxChapters ) )
         {
             msg_Dbg( &sys.demuxer, "|   + Chapters" );
             if( i_chapters_position < 0 )
+            {
                 ParseChapters( static_cast<KaxChapters*>( el ) );
-            i_chapters_position = (int64_t) es.I_O().getFilePointer();
+                i_chapters_position = el->GetElementPosition();
+            }
         }
         else if( MKV_IS_ID( el, KaxTags ) )
         {
             msg_Dbg( &sys.demuxer, "|   + Tags" );
             if( i_tags_position < 0)
+            {
                 LoadTags( static_cast<KaxTags*>( el ) );
-            i_tags_position = (int64_t) es.I_O().getFilePointer();
+                i_tags_position = el->GetElementPosition();
+            }
         }
         else if( MKV_IS_ID( el, EbmlVoid ) )
             msg_Dbg( &sys.demuxer, "|   + Void" );
@@ -788,8 +800,10 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
         /* Multiple allowed, mandatory */
         msg_Dbg( &sys.demuxer, "|   + Information" );
         if( i_info_position < 0 )
+        {
             ParseInfo( static_cast<KaxInfo*>( el ) );
-        i_info_position = i_element_position;
+            i_info_position = i_element_position;
+        }
     }
     else if( MKV_IS_ID( el, KaxTracks ) ) // FIXME
     {
@@ -810,29 +824,37 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     {
         msg_Dbg( &sys.demuxer, "|   + Cues" );
         if( i_cues_position < 0 )
+        {
             LoadCues( static_cast<KaxCues*>( el ) );
-        i_cues_position = i_element_position;
+            i_cues_position = i_element_position;
+        }
     }
     else if( MKV_IS_ID( el, KaxAttachments ) )
     {
         msg_Dbg( &sys.demuxer, "|   + Attachments" );
         if( i_attachments_position < 0 )
+        {
             ParseAttachments( static_cast<KaxAttachments*>( el ) );
-        i_attachments_position = i_element_position;
+            i_attachments_position = i_element_position;
+        }
     }
     else if( MKV_IS_ID( el, KaxChapters ) )
     {
         msg_Dbg( &sys.demuxer, "|   + Chapters" );
         if( i_chapters_position < 0 )
+        {
             ParseChapters( static_cast<KaxChapters*>( el ) );
-        i_chapters_position = i_element_position;
+            i_chapters_position = i_element_position;
+        }
     }
     else if( MKV_IS_ID( el, KaxTags ) )
     {
         msg_Dbg( &sys.demuxer, "|   + Tags" );
         if( i_tags_position < 0 )
+        {
             LoadTags( static_cast<KaxTags*>( el ) );
-        i_tags_position = i_element_position;
+            i_tags_position = i_element_position;
+        }
     }
     else
     {
