@@ -486,7 +486,8 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
 
 /* Needed by matroska_segment::Seek() and Seek */
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
-                         mtime_t i_pts, mtime_t i_duration, bool f_mandatory )
+                  mtime_t i_pts, mtime_t i_duration, bool b_key_picture,
+                  bool b_discardable_picture )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->p_current_segment->CurrentSegment();
@@ -554,13 +555,10 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         if( simpleblock != NULL )
         {
             data = &simpleblock->GetBuffer(i_frame);
-            // condition when the DTS is correct (keyframe or B frame == NOT P frame)
-            f_mandatory = simpleblock->IsDiscardable() || simpleblock->IsKeyframe();
         }
         else
         {
             data = &block->GetBuffer(i_frame);
-            // condition when the DTS is correct (keyframe or B frame == NOT P frame)
         }
         frame_size += data->Size();
         if( !data->Buffer() || data->Size() > frame_size || frame_size > block_size  )
@@ -633,6 +631,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             break;
         }
 
+        if ( b_key_picture )
+            p_block->i_flags |= BLOCK_FLAG_TYPE_I;
         
         if( tk->fmt.i_cat != VIDEO_ES )
         {
@@ -669,7 +669,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             else
             {
                 p_block->i_pts = i_pts;
-                if ( f_mandatory )
+                // condition when the DTS is correct (keyframe or B frame == NOT P frame)
+                if ( b_key_picture || b_discardable_picture )
                     p_block->i_dts = p_block->i_pts;
                 else
                     p_block->i_dts = min( i_pts, tk->i_last_dts + ( mtime_t )( tk->i_default_duration / 1000 ) );
@@ -806,7 +807,7 @@ static int Demux( demux_t *p_demux)
             break;
         }
 
-        BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, b_key_picture || b_discardable_picture );
+        BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, b_key_picture, b_discardable_picture );
 
         delete block;
 
