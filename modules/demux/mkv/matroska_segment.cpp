@@ -776,8 +776,11 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
         msg_Dbg( &sys.demuxer, "|   + Seek head" );
         if( i_seekhead_count < 10 )
         {
-            i_seekhead_position = i_element_position;
-            ParseSeekHead( static_cast<KaxSeekHead*>( el ) );
+            if ( i_seekhead_position != i_element_position )
+            {
+                i_seekhead_position = i_element_position;
+                ParseSeekHead( static_cast<KaxSeekHead*>( el ) );
+            }
         }
     }
     else if( MKV_IS_ID( el, KaxInfo ) ) // FIXME
