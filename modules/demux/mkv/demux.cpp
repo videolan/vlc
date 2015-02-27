@@ -508,7 +508,8 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
             EbmlParser  *ep;
             matroska_segment_c *p_segment1 = new matroska_segment_c( *this, *p_estream );
 
-            ep = new EbmlParser(p_estream, p_l0, &demuxer );
+            ep = new EbmlParser(p_estream, p_l0, &demuxer,
+                                var_InheritBool( &demuxer, "mkv-use-dummy" ) );
             p_segment1->ep = ep;
             p_segment1->segment = (KaxSegment*)p_l0;
 

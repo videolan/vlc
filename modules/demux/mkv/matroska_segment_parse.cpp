@@ -76,7 +76,8 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
     if( !b_seekable )
         return;
 
-    ep = new EbmlParser( &es, seekhead, &sys.demuxer );
+    ep = new EbmlParser( &es, seekhead, &sys.demuxer,
+                         var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
 
     while( ( l = ep->Get() ) != NULL )
     {
