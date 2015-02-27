@@ -110,7 +110,7 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
                         spos.ReadData( es.I_O() );
                         i_pos = (int64_t)segment->GetGlobalPosition( uint64( spos ) );
                     }
-                    else
+                    else if ( !MKV_IS_ID( l, EbmlVoid ) && !MKV_IS_ID( l, EbmlCrc32 ))
                     {
                         /* Many mkvmerge files hit this case. It seems to be a broken SeekHead */
                         msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
@@ -161,12 +161,13 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
                     LoadSeekHeadItem( EBML_INFO(KaxAttachments), i_pos );
                 }
 #ifdef MKV_DEBUG
-                else
+                else if( id != EBML_ID(KaxCluster) && id != EBML_ID(EbmlVoid) &&
+                         id != EBML_ID(EbmlCrc32))
                     msg_Dbg( &sys.demuxer, "|   - unknown seekhead reference at %" PRId64, i_pos );
 #endif
             }
         }
-        else
+        else if ( !MKV_IS_ID( l, EbmlVoid ) && !MKV_IS_ID( l, EbmlCrc32 ))
             msg_Dbg( &sys.demuxer, "|   |   + ParseSeekHead Unknown (%s)", typeid(*l).name() );
     }
     delete ep;
@@ -481,20 +482,20 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                                 {
                                     tk->p_compression_data = new KaxContentCompSettings( *(KaxContentCompSettings*)l4 );
                                 }
-                                else
+                                else if ( !MKV_IS_ID( l4, EbmlVoid ) )
                                 {
                                     MkvTree( sys.demuxer, 6, "Unknown (%s)", typeid(*l4).name() );
                                 }
                             }
                         }
                         // ContentEncryption Unsupported
-                        else
+                        else if ( !MKV_IS_ID( l3, EbmlVoid ) )
                         {
                             MkvTree( sys.demuxer, 5, "Unknown (%s)", typeid(*l3).name() );
                         }
                     }
                 }
-                else
+                else if ( !MKV_IS_ID( l2, EbmlVoid ) )
                 {
                     MkvTree( sys.demuxer, 4, "Unknown (%s)", typeid(*l2).name() );
                 }
@@ -632,7 +633,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
 //                    msg_Dbg( &sys.demuxer, "   |   |   |   + gamma=%f", float( gamma ) );
 //                }
-                else
+                else if ( !MKV_IS_ID( l, EbmlVoid ) )
                 {
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + Unknown (%s)", typeid(*l).name() );
                 }
@@ -696,13 +697,13 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                     tk->fmt.audio.i_bitspersample = uint8( abits );
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + abits=%u", uint8( abits ) );
                 }
-                else
+                else if ( !MKV_IS_ID( l, EbmlVoid ) )
                 {
                     msg_Dbg( &sys.demuxer, "|   |   |   |   + Unknown (%s)", typeid(*l).name() );
                 }
             }
         }
-        else
+        else if ( !MKV_IS_ID( l, EbmlVoid ) )
         {
             msg_Dbg( &sys.demuxer, "|   |   |   + Unknown (%s)",
                      typeid(*l).name() );
@@ -768,7 +769,7 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
         {
             ParseTrackEntry( static_cast<KaxTrackEntry *>(l) );
         }
-        else
+        else if ( !MKV_IS_ID( l, EbmlVoid ) )
         {
             msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
         }
@@ -948,7 +949,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 msg_Err( &sys.demuxer, "Error while reading Chapter Tranlate");
             }
         }
-        else
+        else if ( !MKV_IS_ID( l, EbmlVoid ) )
         {
             msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
         }
@@ -1223,14 +1224,14 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
                 {
                     // FIXME to implement
                 }
-                else
+                else if ( !MKV_IS_ID( l, EbmlVoid ) )
                 {
                     msg_Dbg( &sys.demuxer, "|   |   |   + Unknown (%s)", typeid(*l).name() );
                 }
             }
             stored_editions.push_back( p_edition );
         }
-        else
+        else if ( !MKV_IS_ID( l, EbmlVoid ) )
         {
             msg_Dbg( &sys.demuxer, "|   |   + Unknown (%s)", typeid(*l).name() );
         }
