@@ -536,8 +536,10 @@ char *str_format_meta(input_thread_t *input, const char *s)
     FILE *stream = open_memstream(&str, &len);
 #elif defined( _WIN32 )
     FILE *stream = vlc_win32_tmpfile();
+    str = NULL;
 #else
     FILE *stream = tmpfile();
+    str = NULL;
 #endif
     if (stream == NULL)
         return NULL;
