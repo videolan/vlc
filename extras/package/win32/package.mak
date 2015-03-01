@@ -107,7 +107,7 @@ package-win-strip: package-win-common package-win-npapi
 	if test -n "$(SIGNATURE)"; then \
 	  cd $(win32_destdir); find . -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
 	  do if test -n "$$i" ; then \
-	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -in "$$i" -out "$$i.sign"; \
+	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -t http://timestamp.verisign.com/scripts/timstamp.dll -in "$$i" -out "$$i.sign"; \
 	    mv "$$i.sign" "$$i" ; \
 	  fi ; \
 	  done \
@@ -180,7 +180,7 @@ package-win32-exe: package-win-strip $(win32_destdir)/NSIS/UAC.dll $(win32_destd
 	eval "$$MAKENSIS $(win32_destdir)/spad.nsi"; \
 	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
 	if test -n "$(SIGNATURE)"; then \
-	    osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -in "$(WINVERSION).exe" -out "$(WINVERSION).exe.sign"; \
+		osslsigncode sign -certs $(SIGNATURE)/cert.cer -key $(SIGNATURE)/videolan.key -n "VLC media player" -i http://www.videolan.org/ -t http://timestamp.verisign.com/scripts/timstamp.dll -in "$(WINVERSION).exe" -out "$(WINVERSION).exe.sign"; \
 	    mv "$(WINVERSION).exe.sign" "$(WINVERSION).exe" ; \
 	fi
 
