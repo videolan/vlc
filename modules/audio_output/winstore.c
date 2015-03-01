@@ -101,8 +101,13 @@ static void Flush(audio_output_t *aout, bool wait)
 static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
                               void **restrict pv)
 {
-    (void) iid; (void) actparms;
-    IAudioClient* client = (IAudioClient*)opaque;
+    IAudioClient *client = opaque;
+
+    if (!IsEqualIID(iid, &IID_IAudioClient))
+        return E_NOINTERFACE;
+    if (actparms != NULL)
+        return E_INVALIDARG;
+
     IAudioClient_AddRef(client);
     *pv = opaque;
 
