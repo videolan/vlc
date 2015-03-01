@@ -190,9 +190,9 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
                          &curtime) == 0)
                 strcpy(buffer, "error");
 
-            if (asprintf(&filename, "%s" DIR_SEP "%s%s%03lu.%s",
-                         cfg->path, prefix, buffer, tv.tv_usec / 1000,
-                         cfg->format) < 0)
+            if (asprintf(&filename, "%s" DIR_SEP "%s%s%03u.%s",
+                         cfg->path, prefix, buffer,
+                         (unsigned)tv.tv_usec / 1000, cfg->format) < 0)
                 filename = NULL;
         }
         free(prefix);
