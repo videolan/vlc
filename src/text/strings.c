@@ -818,6 +818,8 @@ char *str_format_meta(input_thread_t *input, const char *s)
         fread(str, len, 1, stream);
         str[len] = '\0';
     }
+    else
+        str = NULL;
     fclose(stream);
     return str;
 #endif
