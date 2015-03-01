@@ -2724,6 +2724,8 @@ static int SeekToTime( demux_t *p_demux, ts_prg_psi_t *p_prg, int64_t i_scaledti
             }
         }
 
+        if ( !b_found && i_pos > i_tail_pos - p_sys->i_packet_size )
+            i_tail_pos = i_splitpos - p_sys->i_packet_size;
     }
 
     if( !b_found )
