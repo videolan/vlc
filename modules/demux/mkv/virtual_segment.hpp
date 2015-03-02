@@ -72,7 +72,7 @@ public:
     int64_t             i_virtual_stop_time;
     int                 i_seekpoint_num;
     std::vector<virtual_chapter_c *> sub_chapters;
-#if MKV_DEBUG
+#ifdef MKV_DEBUG
     void print();
 #endif
 };
@@ -101,7 +101,7 @@ public:
 private:
     void retimeChapters();
     void retimeSubChapters( virtual_chapter_c * p_vchap );
-#if MKV_DEBUG
+#ifdef MKV_DEBUG
     void print(){ for( size_t i = 0; i<chapters.size(); i++ ) chapters[i]->print(); }
 #endif
 

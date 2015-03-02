@@ -207,7 +207,7 @@ virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, std::vector<ma
             b_ordered = true;
     }
 
-#if MKV_DEBUG
+#ifdef MKV_DEBUG
     msg_Dbg( &p_main_segment->sys.demuxer, "-- RECAP-BEGIN --" );
     print();
     msg_Dbg( &p_main_segment->sys.demuxer, "-- RECAP-END --" );
@@ -610,7 +610,7 @@ bool virtual_chapter_c::Leave( bool b_do_subs )
     return false;
 }
 
-#if MKV_DEBUG
+#ifdef MKV_DEBUG
 void virtual_chapter_c::print()
 {
     msg_Dbg( &p_segment->sys.demuxer, "*** chapter %"PRId64" - %"PRId64" (%u)",
