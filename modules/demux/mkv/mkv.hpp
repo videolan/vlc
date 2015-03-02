@@ -99,7 +99,9 @@
 #   include <zlib.h>
 #endif
 
-#define MKV_DEBUG 0
+#ifndef NDEBUG
+//# define MKV_DEBUG 0
+#endif
 
 #define MATROSKA_COMPRESSION_NONE  -1
 #define MATROSKA_COMPRESSION_ZLIB   0
