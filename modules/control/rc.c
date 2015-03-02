@@ -340,11 +340,11 @@ static int Activate( vlc_object_t *p_this )
 
 #ifdef _WIN32
     p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
+# if !VLC_WINSTORE_APP
     if( !p_sys->b_quiet )
-#endif
-    {
         CONSOLE_INTRO_MSG;
-    }
+# endif
+#endif
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         abort();
