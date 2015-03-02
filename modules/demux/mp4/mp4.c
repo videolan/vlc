@@ -1813,7 +1813,7 @@ static void LoadChapter( demux_t  *p_demux )
             {
                 mp4_track_t *tk = &p_sys->track[j];
                 if( tk->b_ok && tk->i_track_ID == p_chap->i_track_ID[i] &&
-                    tk->fmt.i_cat == SPU_ES && tk->fmt.i_codec == VLC_CODEC_SUBT )
+                    tk->fmt.i_cat == SPU_ES && tk->fmt.i_codec == VLC_CODEC_TX3G )
                     break;
             }
             if( j < p_sys->i_tracks )
@@ -2701,7 +2701,6 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         case( ATOM_text ):
         case( ATOM_subp ):
         case( ATOM_sbtl ):
-            p_track->fmt.i_codec = VLC_CODEC_TX3G;
             p_track->fmt.i_cat = SPU_ES;
             break;
 
