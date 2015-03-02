@@ -25,7 +25,6 @@ include/vlc_gcrypt.h
 include/vlc_httpd.h
 include/vlc_image.h
 include/vlc_input.h
-include/vlc_interface.h
 include/vlc_intf_strings.h
 include/vlc_iso_lang.h
 include/vlc_keys.h
@@ -434,6 +433,7 @@ modules/control/gestures.c
 modules/control/globalhotkeys/win32.c
 modules/control/globalhotkeys/xcb.c
 modules/control/hotkeys.c
+modules/control/intromsg.h
 modules/control/lirc.c
 modules/control/motion.c
 modules/control/netsync.c
