@@ -114,25 +114,6 @@ VLC_API void vlc_LogSet(libvlc_int_t *, vlc_log_cb cb, void *data);
 
 /*@}*/
 
-#if defined( _WIN32 ) && !VLC_WINSTORE_APP
-#    define CONSOLE_INTRO_MSG \
-         if( !getenv( "PWD" ) ) /* detect Cygwin shell or Wine */ \
-         { \
-         AllocConsole(); \
-         freopen( "CONOUT$", "w", stdout ); \
-         freopen( "CONOUT$", "w", stderr ); \
-         freopen( "CONIN$", "r", stdin ); \
-         } \
-         msg_Info( p_intf, "VLC media player - %s", VERSION_MESSAGE ); \
-         msg_Info( p_intf, "%s", COPYRIGHT_MESSAGE ); \
-         msg_Info( p_intf, _("\nWarning: if you cannot access the GUI " \
-                             "anymore, open a command-line window, go to the " \
-                             "directory where you installed VLC and run " \
-                             "\"vlc -I qt\"\n") )
-#else
-#    define CONSOLE_INTRO_MSG (void)0
-#endif
-
 /* Interface dialog ids for dialog providers */
 typedef enum vlc_dialog {
     INTF_DIALOG_FILE_SIMPLE = 1,

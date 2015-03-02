@@ -40,6 +40,7 @@
     "Enabling the quiet mode will not bring this command box but can also " \
     "be pretty annoying when you want to stop VLC and no video window is " \
     "open." )
+#include "intromsg.h"
 #endif
 
 static int Open( vlc_object_t * );
@@ -65,7 +66,7 @@ static int Open( vlc_object_t *p_this )
     bool b_quiet;
     b_quiet = var_InheritBool( p_intf, "dummy-quiet" );
     if( !b_quiet )
-        CONSOLE_INTRO_MSG;
+        intf_consoleIntroMsg(p_intf);
 #endif
 
     msg_Info( p_intf, "using the dummy interface module..." );
