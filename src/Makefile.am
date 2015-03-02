@@ -56,6 +56,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_inhibit.h \
 	../include/vlc_input.h \
 	../include/vlc_input_item.h \
+	../include/vlc_interface.h \
 	../include/vlc_keys.h \
 	../include/vlc_main.h \
 	../include/vlc_md5.h \
@@ -104,7 +105,6 @@ noinst_HEADERS = \
 	../include/vlc_codecs.h \
 	../include/vlc_extensions.h \
 	../include/vlc_fixups.h \
-	../include/vlc_interface.h \
 	../include/vlc_intf_strings.h \
 	../include/vlc_iso_lang.h \
 	../include/vlc_memory.h \
