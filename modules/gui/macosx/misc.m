@@ -731,7 +731,8 @@ void _drawFrameInRect(NSRect frameRect)
  *****************************************************************************/
 
 @implementation VLCTimeField
-+ (void)initialize{
++ (void)initialize
+{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
                                  @"NO", @"DisplayTimeAsTimeRemaining",
@@ -739,16 +740,6 @@ void _drawFrameInRect(NSRect frameRect)
                                  nil];
 
     [defaults registerDefaults:appDefaults];
-}
-
-- (id)initWithFrame:(NSRect)frameRect
-{
-    if (self = [super initWithFrame:frameRect]) {
-        textAlignment = NSCenterTextAlignment;
-        o_remaining_identifier = @"";
-    }
-
-    return self;
 }
 
 - (void)setRemainingIdentifier:(NSString *)o_string
@@ -793,24 +784,19 @@ void _drawFrameInRect(NSRect frameRect)
         [[[VLCMain sharedInstance] controls] goToSpecificTime: nil];
     else
     {
-        if (![o_remaining_identifier isEqualToString: @""]) {
-            if ([[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier]) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"NO" forKey:o_remaining_identifier];
-                b_time_remaining = NO;
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"YES" forKey:o_remaining_identifier];
-                b_time_remaining = YES;
-            }
-        } else {
+        if (o_remaining_identifier) {
+            b_time_remaining = [[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier];
             b_time_remaining = !b_time_remaining;
             [[NSUserDefaults standardUserDefaults] setObject:(b_time_remaining ? @"YES" : @"NO") forKey:o_remaining_identifier];
+        } else {
+            b_time_remaining = !b_time_remaining;
         }
     }
 }
 
 - (BOOL)timeRemaining
 {
-    if (![o_remaining_identifier isEqualToString: @""])
+    if (o_remaining_identifier)
         return [[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier];
     else
         return b_time_remaining;

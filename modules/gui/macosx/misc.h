@@ -188,8 +188,6 @@
 }
 @property (readonly) BOOL timeRemaining;
 
--(id)initWithFrame:(NSRect)frameRect;
-
 - (void)setRemainingIdentifier:(NSString *)o_string;
 
 @end
