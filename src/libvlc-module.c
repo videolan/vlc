@@ -2041,7 +2041,7 @@ vlc_module_begin ()
     add_bool( "interact", true, INTERACTION_TEXT,
               INTERACTION_LONGTEXT, false )
 
-    add_bool ( "stats", false, STATS_TEXT, STATS_LONGTEXT, true )
+    add_bool ( "stats", true, STATS_TEXT, STATS_LONGTEXT, true )
 
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_module_cat( "intf", SUBCAT_INTERFACE_MAIN, NULL, INTF_TEXT,
