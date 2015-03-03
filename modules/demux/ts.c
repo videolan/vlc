@@ -339,19 +339,27 @@ typedef enum
     TYPE_EIT,
 } ts_pid_type_t;
 
+enum
+{
+    FLAGS_NONE = 0,
+    FLAG_SEEN  = 1,
+    FLAG_SCRAMBLED = 2
+};
+
+#define SEEN(x) ((x).i_flags & FLAG_SEEN)
+#define SCRAMBLED(x) ((x).i_flags & FLAG_SCRAMBLED)
+
 struct ts_pid_t
 {
-    int         i_pid;
+    uint16_t    i_pid;
 
-    bool        b_seen;
-    int         i_cc;   /* countinuity counter */
-    bool        b_scrambled;
+    uint8_t     i_flags;
+    uint8_t     i_cc;   /* countinuity counter */
+    uint8_t     type;
 
     /* PSI owner (ie PMT -> PAT, ES -> PMT */
+    uint8_t     i_refcount;
     ts_pid_t   *p_parent;
-    int         i_refcount;
-
-    ts_pid_type_t type;
 
     /* */
     union
@@ -881,17 +889,17 @@ static void MissingPATPMTFixup( demux_t *p_demux )
     int i_pcr_pid = 0x1FFF;
     int i_num_pes = 0;
 
-    if( p_sys->pid[i_program_pid].b_seen )
+    if( SEEN(p_sys->pid[i_program_pid]) )
     {
         /* Find a free one */
         for( i_program_pid = MIN_ES_PID;
-             i_program_pid <= MAX_ES_PID && p_sys->pid[i_program_pid].b_seen;
+             i_program_pid <= MAX_ES_PID && SEEN(p_sys->pid[i_program_pid]);
              i_program_pid++ );
     }
 
     for( int i = MIN_ES_PID; i <= MAX_ES_PID; i++ )
     {
-        if( !p_sys->pid[i].b_seen ||
+        if( !SEEN(p_sys->pid[i]) ||
             p_sys->pid[i].probed.i_type == -1 )
             continue;
 
@@ -944,7 +952,7 @@ static void MissingPATPMTFixup( demux_t *p_demux )
         int j=0;
         for( int i = MIN_ES_PID; i <= MAX_ES_PID; i++ )
         {
-            if( !p_sys->pid[i].b_seen ||
+            if( !SEEN(p_sys->pid[i]) ||
                 p_sys->pid[i].probed.i_type == -1 )
                 continue;
 
@@ -1017,12 +1025,12 @@ static int Open( vlc_object_t *p_this )
     {
         ts_pid_t *pid = &p_sys->pid[i];
         pid->i_pid      = i;
-        pid->b_seen     = false;
+        pid->i_flags    = FLAGS_NONE;
         pid->probed.i_fourcc = 0;
         pid->probed.i_type = 0;
     }
     /* PID 8191 is padding */
-    p_sys->pid[8191].b_seen = true;
+    p_sys->pid[8191].i_flags = FLAG_SEEN;
     p_sys->i_packet_size = i_packet_size;
     p_sys->i_packet_header_size = i_packet_header_size;
     p_sys->i_ts_read = 50;
@@ -1250,7 +1258,7 @@ static int Demux( demux_t *p_demux )
     bool b_wait_es = p_sys->i_pmt_es <= 0;
 
     /* If we had no PAT within MIN_PAT_INTERVAL, create PAT/PMT from probed streams */
-    if( p_sys->i_pmt_es == 0 && !p_sys->pid[0].b_seen && p_sys->patfix.b_pat_deadline )
+    if( p_sys->i_pmt_es == 0 && !SEEN(p_sys->pid[0]) && p_sys->patfix.b_pat_deadline )
         MissingPATPMTFixup( p_demux );
 
     /* We read at most 100 TS packet or until a frame is completed */
@@ -1274,7 +1282,7 @@ static int Demux( demux_t *p_demux )
         ts_pid_t *p_pid = &p_sys->pid[PIDGet( p_pkt )];
 
         /* Probe streams to build PAT/PMT after MIN_PAT_INTERVAL in case we don't see any PAT */
-        if( !p_sys->pid[0].b_seen &&
+        if( !SEEN(p_sys->pid[0]) &&
             (p_pid->probed.i_type == 0 || p_pid->i_pid == p_sys->patfix.i_timesourcepid) &&
             (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
             (p_pkt->p_buffer[3] & 0xD0) == 0x10 )  /* Has payload but is not encrypted */
@@ -1322,7 +1330,7 @@ static int Demux( demux_t *p_demux )
             break;
 
         default:
-            if( !p_pid->b_seen )
+            if( !SEEN(*p_pid) )
                 msg_Dbg( p_demux, "pid[%d] unknown", p_pid->i_pid );
 
             /* We have to handle PCR if present */
@@ -1331,7 +1339,7 @@ static int Demux( demux_t *p_demux )
             break;
         }
 
-        p_pid->b_seen = true;
+        p_pid->i_flags |= FLAG_SEEN;
 
         if( b_frame || ( b_wait_es && p_sys->i_pmt_es > 0 ) )
             break;
@@ -1808,7 +1816,7 @@ static void PIDReset( ts_pid_t *pid )
 {
     assert(pid->i_refcount == 0);
     pid->i_cc       = 0xff;
-    pid->b_scrambled = false;
+    pid->i_flags    &= ~FLAG_SCRAMBLED;
     pid->p_parent    = NULL;
     pid->type = TYPE_FREE;
 }
@@ -1866,7 +1874,7 @@ static bool PIDSetup( demux_t *p_demux, ts_pid_type_t i_type, ts_pid_t *pid, ts_
         pid->type = i_type;
         pid->p_parent = p_parent;
     }
-    else if( pid->type == i_type )
+    else if( pid->type == i_type && pid->i_refcount < UINT8_MAX )
     {
         pid->i_refcount++;
     }
@@ -2157,9 +2165,9 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
         return;
     }
 
-    if( pid->b_scrambled || header[0] != 0 || header[1] != 0 || header[2] != 1 )
+    if( SCRAMBLED(*pid) || header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
-        if ( !pid->b_scrambled )
+        if ( !SCRAMBLED(*pid) )
             msg_Warn( p_demux, "invalid header [0x%02x:%02x:%02x:%02x] (pid: %d)",
                         header[0], header[1],header[2],header[3], pid->i_pid );
         block_ChainRelease( p_pes );
@@ -2718,7 +2726,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
         }
 
         int i_pid = PIDGet( p_pkt );
-        p_sys->pid[i_pid].b_seen = true;
+        p_sys->pid[i_pid].i_flags = FLAG_SEEN;
 
         if( i_pid != 0x1FFF && p_sys->pid[i_pid].type == TYPE_PES &&
            (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
@@ -2945,7 +2953,7 @@ static int FindPCRCandidate( ts_pmt_t *p_pmt )
     for( int i=0; i<p_pmt->e_streams.i_size; i++ )
     {
         ts_pid_t *p_pid = p_pmt->e_streams.p_elems[i];
-        if( p_pid->b_seen &&
+        if( SEEN(*p_pid) &&
             (!p_cand || p_cand->i_pid != i_previous) )
         {
             if( p_pid->probed.i_pcr_count ) /* check PCR frequency first */
@@ -3107,12 +3115,12 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     }
 
     /* */
-    if( !pid->b_scrambled != !b_scrambled )
+    if( !SCRAMBLED(*pid) != !b_scrambled )
     {
         msg_Warn( p_demux, "scrambled state changed on pid %d (%d->%d)",
-                  pid->i_pid, pid->b_scrambled, b_scrambled );
+                  pid->i_pid, SCRAMBLED(*pid), b_scrambled );
 
-        pid->b_scrambled = b_scrambled;
+        pid->i_flags |= (b_scrambled) ? FLAG_SCRAMBLED : FLAGS_NONE;
 
         for( int i = 0; i < pid->u.p_pes->extra_es.i_size; i++ )
         {
@@ -4968,7 +4976,7 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid )
 
     if( pid )
     {
-        if( pid->b_seen && p_sys->es_creation == DELAY_ES )
+        if( SEEN(*pid) && p_sys->es_creation == DELAY_ES )
         {
             p_sys->es_creation = CREATE_ES;
             b_create_delayed = true;
@@ -5056,7 +5064,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         return;
     }
 
-    pmtpid->b_seen = true;
+    pmtpid->i_flags |= FLAG_SEEN;
 
     if( p_pmt->i_version != -1 &&
         ( !p_dvbpsipmt->b_current_next || p_pmt->i_version == p_dvbpsipmt->i_version ) )
@@ -5274,7 +5282,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
         PIDFillFormat( &p_pes->es.fmt, p_dvbpsies->i_type );
 
-        pespid->b_seen         = p_sys->pid[p_dvbpsies->i_pid].b_seen;
+        pespid->i_flags |= SEEN(p_sys->pid[p_dvbpsies->i_pid]);
 
         bool b_registration_applied = false;
         if ( p_dvbpsies->i_type >= 0x80 ) /* non standard, extensions */
@@ -5469,7 +5477,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
     ts_pid_t             *patpid = &p_sys->pid[0];
     ts_pat_t             *p_pat = p_sys->pid[0].u.p_pat;
 
-    patpid->b_seen = true;
+    patpid->i_flags |= FLAG_SEEN;
 
     msg_Dbg( p_demux, "PATCallBack called" );
 
