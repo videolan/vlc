@@ -5684,6 +5684,7 @@ static void ts_pes_Del( demux_t *p_demux, ts_pes_t *pes )
         block_ChainRelease( pes->p_prepcr_outqueue );
 
     es_format_Clean( &pes->es.fmt );
+    free( pes->es.p_mpeg4desc );
 
     for( int i = 0; i < pes->extra_es.i_size; i++ )
     {
