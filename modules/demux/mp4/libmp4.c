@@ -244,6 +244,8 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         return 0;
     }
 
+    off_t i_end = p_container->i_pos + p_container->i_size;
+
     do
     {
         uint32_t i_index = 0;
@@ -254,11 +256,15 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
                 return 0;
             i_index = GetDWBE(&read[4]);
         }
-        if( ( p_box = MP4_ReadBox( p_stream, p_container ) ) == NULL ) continue;
+        if( ( p_box = MP4_ReadBox( p_stream, p_container ) ) == NULL )
+            break;
         p_box->i_index = i_index;
 
         /* chain this box with the father and the other at same level */
         MP4_BoxAddChild( p_container, p_box );
+
+        if( p_container->i_size && stream_Tell( p_stream ) == i_end )
+            break;
 
         if( p_box->i_type == i_last_child )
         {
@@ -267,6 +273,9 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         }
 
     } while( MP4_NextBox( p_stream, p_box ) == 1 );
+
+    if ( p_container->i_size && stream_Tell( p_stream ) != i_end )
+        MP4_Seek( p_stream, i_end );
 
     return 1;
 }
