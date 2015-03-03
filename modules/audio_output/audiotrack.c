@@ -55,8 +55,9 @@ struct aout_sys_t {
     /* Owned by JNIThread */
     jobject p_audiotrack; /* AudioTrack ref */
     jobject p_audioTimestamp; /* AudioTimestamp ref */
-    jbyteArray p_bytearray; /* ByteArray ref */
+    jbyteArray p_bytearray; /* ByteArray ref (for Write) */
     size_t i_bytearray_size; /* size of the ByteArray */
+    jobject p_bytebuffer; /* ByteBuffer ref (for WriteV21) */
     audio_sample_format_t fmt; /* fmt setup by Start */
     uint32_t i_pos_initial; /* initial position set by getPlaybackHeadPosition */
     uint32_t i_samples_written; /* number of samples written since last flush */
@@ -150,6 +151,7 @@ static struct
         jmethodID flush;
         jmethodID pause;
         jmethodID write;
+        jmethodID writeV21;
         jmethodID getPlaybackHeadPosition;
         jmethodID getTimestamp;
         jmethodID getMinBufferSize;
@@ -158,6 +160,7 @@ static struct
         jint ERROR;
         jint ERROR_BAD_VALUE;
         jint ERROR_INVALID_OPERATION;
+        jint WRITE_NON_BLOCKING;
     } AudioTrack;
     struct {
         jint ENCODING_PCM_8BIT;
@@ -251,7 +254,14 @@ InitJNIFields( audio_output_t *p_aout )
     GET_ID( GetMethodID, AudioTrack.stop, "stop", "()V", true );
     GET_ID( GetMethodID, AudioTrack.flush, "flush", "()V", true );
     GET_ID( GetMethodID, AudioTrack.pause, "pause", "()V", true );
-    GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
+
+    GET_ID( GetMethodID, AudioTrack.writeV21, "write", "(Ljava/nio/ByteBuffer;II)I", false );
+    if( jfields.AudioTrack.writeV21 )
+    {
+        jfields.AudioTrack.write = NULL;
+        GET_CONST_INT( AudioTrack.WRITE_NON_BLOCKING, "WRITE_NON_BLOCKING", true );
+    } else
+        GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
 
     GET_ID( GetMethodID, AudioTrack.getTimestamp,
             "getTimestamp", "(Landroid/media/AudioTimestamp;)Z", false );
@@ -717,6 +727,50 @@ JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
     return JNI_AT_CALL_INT( write, p_sys->p_bytearray, 0, i_data );
 }
 
+/**
+ * JNIThread_Write doesn't always work on Lollipop. Probably because audiotrack
+ * buffer size is bigger than the one we pass in ctor arguments (and there is
+ * no way to know it). It's not an issue since there is a new write method that
+ * is non blocking.
+ */
+static int
+JNIThread_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    int i_ret;
+
+    if( !p_sys->p_bytebuffer )
+    {
+        jobject p_bytebuffer;
+
+        p_bytebuffer = (*env)->NewDirectByteBuffer( env, p_buffer->p_buffer,
+                                                    p_buffer->i_buffer );
+        if( !p_bytebuffer )
+            return jfields.AudioTrack.ERROR_BAD_VALUE;
+
+        p_sys->p_bytebuffer = (*env)->NewGlobalRef( env, p_bytebuffer );
+        (*env)->DeleteLocalRef( env, p_bytebuffer );
+
+        if( !p_sys->p_bytebuffer || (*env)->ExceptionOccurred( env ) )
+        {
+            p_sys->p_bytebuffer = NULL;
+            (*env)->ExceptionClear( env );
+            return jfields.AudioTrack.ERROR_BAD_VALUE;
+        }
+    }
+
+    i_ret = JNI_AT_CALL_INT( writeV21, p_sys->p_bytebuffer, p_buffer->i_buffer,
+                             jfields.AudioTrack.WRITE_NON_BLOCKING );
+    if( i_ret > 0 )
+    {
+        /* don't delete the bytebuffer if we wrote nothing, keep it for next
+         * call */
+        (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
+        p_sys->p_bytebuffer = NULL;
+    }
+    return i_ret;
+}
+
 static int
 JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
                 block_t **pp_buffer, mtime_t *p_wait )
@@ -725,7 +779,10 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
     block_t *p_buffer = *pp_buffer;
     int i_ret;
 
-    i_ret = JNIThread_Write( env, p_aout, p_buffer );
+    if( jfields.AudioTrack.writeV21 )
+        i_ret = JNIThread_WriteV21( env, p_aout, p_buffer );
+    else
+        i_ret = JNIThread_Write( env, p_aout, p_buffer );
 
     if( i_ret < 0 ) {
         if( jfields.AudioManager.has_ERROR_DEAD_OBJECT
@@ -816,6 +873,12 @@ JNIThread_Flush( JNIEnv *env, audio_output_t *p_aout,
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
     p_sys->i_play_time = mdate();
+
+    if( p_sys->p_bytebuffer )
+    {
+        (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
+        p_sys->p_bytebuffer = NULL;
+    }
 }
 
 static void *
@@ -951,6 +1014,8 @@ end:
     {
         if( p_sys->p_bytearray )
             (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );
+        if( p_sys->p_bytebuffer )
+            (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
         jni_detach_thread();
     }
     vlc_mutex_unlock( &p_sys->mutex );
