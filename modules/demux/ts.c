@@ -5387,9 +5387,27 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                     pespid->u.p_pes = p_pes;
                     p_pes = e;
 
+                    /* p_pes still tmp, but now contains old config */
+                    pespid->u.p_pes->es.id = p_pes->es.id;
                     if( pespid->u.p_pes->es.id )
+                    {
+                        p_pes->es.id = NULL;
                         es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
-                                        pespid->u.p_pes->es.id, p_pes->es.fmt );
+                                        pespid->u.p_pes->es.id, pespid->u.p_pes->es.fmt );
+                    }
+
+                    for( int i=0; i<pespid->u.p_pes->extra_es.i_size &&
+                                  i<p_pes->extra_es.i_size; i++ )
+                    {
+                        pespid->u.p_pes->extra_es.p_elems[i]->id = p_pes->extra_es.p_elems[i]->id;
+                        if( pespid->u.p_pes->extra_es.p_elems[i]->id )
+                        {
+                            es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
+                                            pespid->u.p_pes->extra_es.p_elems[i]->id,
+                                            pespid->u.p_pes->extra_es.p_elems[i]->fmt );
+                            p_pes->extra_es.p_elems[i]->id = NULL;
+                        }
+                    }
                 }
 
                 ts_pes_Del( p_demux, p_pes ); // delete temp
