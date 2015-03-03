@@ -174,7 +174,7 @@ char *vlc_path2uri (const char *path, const char *scheme)
     path = p;
 #endif
 
-#if defined( _WIN32 ) || defined( __OS2__ )
+#if defined (_WIN32) || defined (__OS2__)
     /* Drive letter */
     if (isalpha ((unsigned char)path[0]) && (path[1] == ':'))
     {
@@ -190,47 +190,21 @@ char *vlc_path2uri (const char *path, const char *scheme)
         }
     }
     else
-#endif
     if (!strncmp (path, "\\\\", 2))
     {   /* Windows UNC paths */
-#if !defined( _WIN32 ) && !defined( __OS2__ )
-        if (scheme != NULL)
-        {
-            errno = ENOTSUP;
-            return NULL; /* remote files not supported */
-        }
-
-        /* \\host\share\path -> smb://host/share/path */
-        if (strchr (path + 2, '\\') != NULL)
-        {   /* Convert backslashes to slashes */
-            char *dup = strdup (path);
-            if (dup == NULL)
-                return NULL;
-            for (size_t i = 2; dup[i]; i++)
-                if (dup[i] == '\\')
-                    dup[i] = DIR_SEP_CHAR;
-
-            char *ret = vlc_path2uri (dup, scheme);
-            free (dup);
-            return ret;
-        }
-# define SMB_SCHEME "smb"
-#else
         /* \\host\share\path -> file://host/share/path */
-# define SMB_SCHEME "file"
-#endif
         size_t hostlen = strcspn (path + 2, DIR_SEP);
 
-        buf = malloc (sizeof (SMB_SCHEME) + 3 + hostlen);
+        buf = malloc (7 + hostlen);
         if (buf != NULL)
-            snprintf (buf, sizeof (SMB_SCHEME) + 3 + hostlen,
-                      SMB_SCHEME"://%s", path + 2);
+            snprintf (buf, 7 + hostlen, "file://%s", path + 2);
         path += 2 + hostlen;
 
         if (path[0] == '\0')
             return buf; /* Hostname without path */
     }
     else
+#endif
     if (path[0] != DIR_SEP_CHAR)
     {   /* Relative path: prepend the current working directory */
         char *cwd, *ret;
