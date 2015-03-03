@@ -294,7 +294,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 return VLC_EGENERIC;
             ppp_title = va_arg( args, input_title_t*** );
             *va_arg( args, int* ) = 1;
-            *ppp_title = malloc( sizeof( *ppp_title ) );
+            *ppp_title = malloc( sizeof( **ppp_title ) );
             if( !*ppp_title )
                 return VLC_ENOMEM;
             **ppp_title = vlc_input_title_Duplicate( p_sys->p_marks );
