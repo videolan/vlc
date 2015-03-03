@@ -138,6 +138,7 @@ static struct
         jclass clazz;
         jmethodID ctor;
         jmethodID release;
+        jmethodID getState;
         jmethodID play;
         jmethodID stop;
         jmethodID flush;
@@ -146,6 +147,7 @@ static struct
         jmethodID getPlaybackHeadPosition;
         jmethodID getTimestamp;
         jmethodID getMinBufferSize;
+        jint STATE_INITIALIZED;
         jint MODE_STREAM;
         jint ERROR;
         jint ERROR_BAD_VALUE;
@@ -238,6 +240,7 @@ InitJNIFields( audio_output_t *p_aout )
 
     GET_ID( GetMethodID, AudioTrack.ctor, "<init>", "(IIIIII)V", true );
     GET_ID( GetMethodID, AudioTrack.release, "release", "()V", true );
+    GET_ID( GetMethodID, AudioTrack.getState, "getState", "()I", true );
     GET_ID( GetMethodID, AudioTrack.play, "play", "()V", true );
     GET_ID( GetMethodID, AudioTrack.stop, "stop", "()V", true );
     GET_ID( GetMethodID, AudioTrack.flush, "flush", "()V", true );
@@ -251,6 +254,7 @@ InitJNIFields( audio_output_t *p_aout )
 
     GET_ID( GetStaticMethodID, AudioTrack.getMinBufferSize, "getMinBufferSize",
             "(III)I", true );
+    GET_CONST_INT( AudioTrack.STATE_INITIALIZED, "STATE_INITIALIZED", true );
     GET_CONST_INT( AudioTrack.MODE_STREAM, "MODE_STREAM", true );
     GET_CONST_INT( AudioTrack.ERROR, "ERROR", true );
     GET_CONST_INT( AudioTrack.ERROR_BAD_VALUE , "ERROR_BAD_VALUE", true );
@@ -570,6 +574,11 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
     (*env)->DeleteLocalRef( env, p_audiotrack );
     if( !p_sys->p_audiotrack )
         return VLC_EGENERIC;
+    if( JNI_AT_CALL_INT( getState ) != jfields.AudioTrack.STATE_INITIALIZED )
+    {
+        msg_Err( p_aout, "AudioTrack init failed" );
+        goto error;
+    }
 
     if( jfields.AudioTimestamp.clazz )
     {
