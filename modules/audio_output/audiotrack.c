@@ -81,6 +81,8 @@ struct aout_sys_t {
 #include "audio_output/volume.h"
 
 //#define AUDIOTRACK_USE_FLOAT
+// TODO: activate getTimestamp for new android versions
+//#define AUDIOTRACK_USE_TIMESTAMP
 
 vlc_module_begin ()
     set_shortname( "AudioTrack" )
@@ -263,8 +265,10 @@ InitJNIFields( audio_output_t *p_aout )
     } else
         GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
 
+#ifdef AUDIOTRACK_USE_TIMESTAMP
     GET_ID( GetMethodID, AudioTrack.getTimestamp,
             "getTimestamp", "(Landroid/media/AudioTimestamp;)Z", false );
+#endif
     GET_ID( GetMethodID, AudioTrack.getPlaybackHeadPosition,
             "getPlaybackHeadPosition", "()I", true );
 
