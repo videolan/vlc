@@ -340,8 +340,6 @@ char *make_path (const char *url)
         /* XXX: Does this work on WinCE? */
         if (fd < 2)
             ret = strdup ("CON");
-        else
-            ret = NULL;
 #endif
     }
 
