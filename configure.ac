@@ -3036,9 +3036,9 @@ AS_IF([test "${have_vdpau}" = "yes" -a "${have_avcodec}" = "yes"], [
     AC_MSG_NOTICE([VDPAU decoding acceleration activated])
   ], [
     AS_IF([test -n "${enable_vdpau}"], [
-      AC_MSG_ERROR([libavutil >= 52.4.0 and libavcodec >= 55.26.0 are required for VDPAU decoding.])
+      AC_MSG_ERROR([libav libavutil >= 52.4.0 and libavcodec >= 55.26.0 are required for VDPAU decoding.])
     ], [
-      AC_MSG_WARN([libavutil >= 52.4.0 and libavcodec >= 55.26.0 are required for VDPAU decoding.])
+      AC_MSG_WARN([libav libavutil >= 52.4.0 and libavcodec >= 55.26.0 are required for VDPAU decoding.])
     ])
   ])
 ])
