@@ -475,12 +475,12 @@ JNIThread_TimeGet( JNIEnv *env, audio_output_t *p_aout, mtime_t *p_delay )
     aout_sys_t *p_sys = p_aout->sys;
     jlong i_frame_pos;
     uint32_t i_audiotrack_delay = 0;
-    mtime_t i_current_time = mdate();
 
     if( p_sys->i_samples_queued == 0 )
         return -1;
     if( p_sys->p_audioTimestamp )
     {
+        mtime_t i_current_time = mdate();
         /* Android doc:
          * getTimestamp: Poll for a timestamp on demand.
          *
