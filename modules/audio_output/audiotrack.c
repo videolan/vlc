@@ -65,6 +65,7 @@ struct aout_sys_t {
     uint32_t i_max_audiotrack_samples;
     mtime_t i_play_time; /* time when play was called */
     bool b_audiotrack_exception; /* true if audiotrack throwed an exception */
+    int i_audiotrack_stuck_count;
 
     /* JNIThread control */
     vlc_mutex_t mutex;
@@ -265,10 +266,8 @@ InitJNIFields( audio_output_t *p_aout )
     } else
         GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
 
-#ifdef AUDIOTRACK_USE_TIMESTAMP
     GET_ID( GetMethodID, AudioTrack.getTimestamp,
             "getTimestamp", "(Landroid/media/AudioTimestamp;)Z", false );
-#endif
     GET_ID( GetMethodID, AudioTrack.getPlaybackHeadPosition,
             "getPlaybackHeadPosition", "()I", true );
 
@@ -617,6 +616,7 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
         goto error;
     }
 
+#ifdef AUDIOTRACK_USE_TIMESTAMP
     if( jfields.AudioTimestamp.clazz )
     {
         /* create AudioTimestamp object */
@@ -630,6 +630,7 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
         if( !p_sys->p_audioTimestamp )
             goto error;
     }
+#endif
 
     p_sys->fmt.i_rate = i_rate;
 
@@ -696,7 +697,25 @@ JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
 
     /* check if audiotrack buffer is not full before writing on it. */
     if( i_samples_pending >= p_sys->i_max_audiotrack_samples )
-        return 0;
+    {
+
+        /* HACK: AudioFlinger can drop frames without notifying us and there is
+         * no way to know it. It it happens, i_audiotrack_pos won't move and
+         * the current code will be stuck because it'll assume that audiotrack
+         * internal buffer is full when it's not. It can happen only after
+         * Android 4.4.2 if we send frames too quickly. This HACK is just an
+         * other precaution since it shouldn't happen anymore thanks to the
+         * HACK in JNIThread_Play */
+
+        p_sys->i_audiotrack_stuck_count++;
+        if( p_sys->i_audiotrack_stuck_count > 100 )
+        {
+            msg_Warn( p_aout, "AudioFlinger underrun, force write" );
+            i_samples_pending = 0;
+            p_sys->i_audiotrack_stuck_count = 0;
+        }
+    } else
+        p_sys->i_audiotrack_stuck_count = 0;
     i_samples = __MIN( p_sys->i_max_audiotrack_samples - i_samples_pending,
                        p_buffer->i_nb_samples );
 
@@ -732,10 +751,8 @@ JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
 }
 
 /**
- * JNIThread_Write doesn't always work on Lollipop. Probably because audiotrack
- * buffer size is bigger than the one we pass in ctor arguments (and there is
- * no way to know it). It's not an issue since there is a new write method that
- * is non blocking.
+ * Non blocking write function for Lollipop and after.
+ * It calls a new write method with WRITE_NON_BLOCKING flags.
  */
 static int
 JNIThread_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
@@ -823,8 +840,17 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
         p_buffer->i_nb_samples -= i_samples;
         if( p_buffer->i_buffer == 0 )
             *pp_buffer = NULL;
-    }
 
+        /* HACK: There is a known issue in audiotrack, "due to an internal
+         * timeout within the AudioTrackThread". It happens after android
+         * 4.4.2, it's not a problem for Android 5.0 since we use an other way
+         * to write samples. A working hack is to wait a little between each
+         * write. This hack is done only for API 19 (AudioTimestamp was added
+         * in API 19). */
+
+        if( jfields.AudioTimestamp.clazz && !jfields.AudioTrack.writeV21 )
+            *p_wait = FRAMES_TO_US( i_samples ) / 2;
+    }
     return i_ret >= 0 ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
