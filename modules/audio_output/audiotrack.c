@@ -808,8 +808,11 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
             msg_Err( p_aout, "Write failed: %s", str );
         }
     } else if( i_ret == 0 )
-        *p_wait = FRAMES_TO_US( p_buffer->i_nb_samples );
-    else
+    {
+        /* audiotrack internal buffer is full, wait a little: between 10ms and
+         * 20ms depending on devices or rate */
+        *p_wait = FRAMES_TO_US( p_sys->i_max_audiotrack_samples / 20 );
+    } else
     {
         uint32_t i_samples = i_ret / p_sys->i_bytes_per_frame;
         p_sys->i_samples_queued -= i_samples;
