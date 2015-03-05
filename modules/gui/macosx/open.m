@@ -236,9 +236,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
         for (int ivideo = 0; ivideo < deviceCount; ivideo++) {
             QTCaptureDevice *qtk_device;
             qtk_device = [qtkvideoDevices objectAtIndex:ivideo];
-            [o_qtk_video_device_pop addItemWithTitle: [qtk_device localizedDisplayName]];
+            // allow same name for multiple times
+            [[o_qtk_video_device_pop menu] addItemWithTitle:[qtk_device localizedDisplayName] action:nil keyEquivalent:@""];
 
-            if ([[[qtk_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_currdevice_uid])
+            if ([[[qtk_device uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtk_currdevice_uid])
                 [o_qtk_video_device_pop selectItemAtIndex:ivideo];
         }
     } else {
@@ -258,11 +259,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
         NSUInteger deviceCount = [qtkaudioDevices count];
         for (int iaudio = 0; iaudio < deviceCount; iaudio++) {
-            QTCaptureDevice *qtkaudio_device;
-            qtkaudio_device = [qtkaudioDevices objectAtIndex:iaudio];
-            [o_qtk_audio_device_pop addItemWithTitle: [qtkaudio_device localizedDisplayName]];
-            [o_screen_qtk_audio_pop addItemWithTitle: [qtkaudio_device localizedDisplayName]];
-            if ([[[qtkaudio_device uniqueID]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtkaudio_currdevice_uid]) {
+            QTCaptureDevice *qtkaudio_device = [qtkaudioDevices objectAtIndex:iaudio];
+
+            // allow same name for multiple times
+            [[o_qtk_audio_device_pop menu] addItemWithTitle:[qtkaudio_device localizedDisplayName] action:nil keyEquivalent:@""];
+            [[o_screen_qtk_audio_pop menu] addItemWithTitle:[qtkaudio_device localizedDisplayName] action:nil keyEquivalent:@""];
+
+            if ([[[qtkaudio_device uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:qtkaudio_currdevice_uid]) {
                 [o_qtk_audio_device_pop selectItemAtIndex:iaudio];
                 [o_screen_qtk_audio_pop selectItemAtIndex:iaudio];
             }
