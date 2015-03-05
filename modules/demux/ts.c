@@ -518,7 +518,7 @@ static void              IODFree( iod_descriptor_t * );
 #define TS_USER_PMT_NUMBER (0)
 static int UserPmt( demux_t *p_demux, const char * );
 
-static int  SetPIDFilter( demux_t *, int i_pid, bool b_selected );
+static int  SetPIDFilter( demux_sys_t *, ts_pid_t *, bool b_selected );
 static void SetPrgFilter( demux_t *, int i_prg, bool b_selected );
 
 #define TS_PACKET_SIZE_188 188
@@ -1078,9 +1078,9 @@ static int Open( vlc_object_t *p_this )
               VLC_DVBPSI_DEMUX_TABLE_INIT(&p_sys->pid[0x12], p_demux);
               VLC_DVBPSI_DEMUX_TABLE_INIT(&p_sys->pid[0x14], p_demux);
               if( p_sys->b_access_control &&
-                  ( SetPIDFilter( p_demux, 0x11, true ) ||
-                    SetPIDFilter( p_demux, 0x14, true ) ||
-                    SetPIDFilter( p_demux, 0x12, true ) )
+                  ( SetPIDFilter( p_sys, &p_sys->pid[0x11], true ) ||
+                    SetPIDFilter( p_sys, &p_sys->pid[0x14], true ) ||
+                    SetPIDFilter( p_sys, &p_sys->pid[0x12], true ) )
                  )
                      p_sys->b_access_control = false;
           }
@@ -1754,22 +1754,20 @@ error:
     return VLC_EGENERIC;
 }
 
-static int SetPIDFilter( demux_t *p_demux, int i_pid, bool b_selected )
+static int SetPIDFilter( demux_sys_t *p_sys, ts_pid_t *p_pid, bool b_selected )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     if( !p_sys->b_access_control )
         return VLC_EGENERIC;
 
     return stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_STATE,
-                           i_pid, b_selected );
+                           p_pid->i_pid, b_selected );
 }
 
 static void SetPrgFilter( demux_t *p_demux, int i_prg_id, bool b_selected )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     ts_pmt_t *p_pmt = NULL;
-    int i_pmt_pid = -1;
+    ts_pid_t *pid = NULL;
 
     /* Search pmt to be unselected */
     if(unlikely(p_sys->pid[0].type != TYPE_PAT))
@@ -1783,23 +1781,19 @@ static void SetPrgFilter( demux_t *p_demux, int i_prg_id, bool b_selected )
 
         if( pmtpid->u.p_pmt->i_number == i_prg_id )
         {
-            i_pmt_pid = pmtpid->i_pid;
-            p_pmt = pmtpid->u.p_pmt;
+            pid = pmtpid;
+            p_pmt = pid->u.p_pmt;
             break;
         }
-
-        if( i_pmt_pid > 0 )
-            break;
     }
-    if( i_pmt_pid <= 0 )
+    if( !pid )
         return;
-    assert( p_pmt );
 
     p_pmt->pcr.b_disable = !p_sys->b_trust_pcr;
 
-    SetPIDFilter( p_demux, i_pmt_pid, b_selected );
+    SetPIDFilter( p_sys, pid, b_selected );
     if( p_pmt->i_pid_pcr > 0 )
-        SetPIDFilter( p_demux, p_pmt->i_pid_pcr, b_selected );
+        SetPIDFilter( p_sys, &p_sys->pid[p_pmt->i_pid_pcr], b_selected );
 
     /* All ES */
     for( int i = 0; i < p_pmt->e_streams.i_size; i++ )
@@ -1808,7 +1802,7 @@ static void SetPrgFilter( demux_t *p_demux, int i_prg_id, bool b_selected )
         assert( pespid->type == TYPE_PES );
         /* We only remove/select es that aren't defined by extra pmt */
         if( pespid->u.p_pes->es.id || !b_selected )
-            SetPIDFilter( p_demux, i, b_selected );
+            SetPIDFilter( p_sys, pespid, b_selected );
     }
 }
 
@@ -1938,7 +1932,7 @@ static void PIDRelease( demux_t *p_demux, ts_pid_t *pid )
 
         }
 
-        SetPIDFilter( p_demux, pid->i_pid, false );
+        SetPIDFilter( p_demux->p_sys, pid, false );
         PIDReset( pid );
     }
 }
@@ -5019,8 +5013,8 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid )
                 }
                 p_sys->i_pmt_es += 1 + pid->u.p_pes->extra_es.i_size;
 
-                if( pid->u.p_pes->es.id != NULL && ProgramIsSelected( p_demux, pid->p_parent->u.p_pmt->i_number ) )
-                    SetPIDFilter( p_demux, pid->i_pid, true );
+                if( pid->u.p_pes->es.id != NULL && ProgramIsSelected( p_sys, pid->p_parent->u.p_pmt->i_number ) )
+                    SetPIDFilter( p_sys, pid, true );
             }
         }
     }
@@ -5093,8 +5087,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
     ValidateDVBMeta( p_demux, p_pmt->i_pid_pcr );
 
-    if( ProgramIsSelected( p_demux, p_pmt->i_number ) )
-        SetPIDFilter( p_demux, p_pmt->i_pid_pcr, true ); /* Set demux filter */
+    if( ProgramIsSelected( p_sys, p_pmt->i_number ) )
+        SetPIDFilter( p_sys, &p_sys->pid[p_pmt->i_pid_pcr], true ); /* Set demux filter */
 
     /* Parse PMT descriptors */
     ts_pmt_registration_type_t registration_type = TS_PMT_REGISTRATION_NONE;
@@ -5426,7 +5420,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         }
 
         if( ProgramIsSelected( p_demux, p_pmt->i_number ) && pespid->u.p_pes->es.id != NULL )
-            SetPIDFilter( p_demux, p_dvbpsies->i_pid, true ); /* Set demux filter */
+            SetPIDFilter( p_sys, pespid, true ); /* Set demux filter */
     }
 
     /* Set CAM descrambling */
@@ -5564,7 +5558,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
                 ARRAY_APPEND( p_sys->programs, p_program->i_number );
             }
 
-            if( SetPIDFilter( p_demux, p_program->i_pid, true ) )
+            if( SetPIDFilter( p_sys, pmtpid, true ) )
                 p_sys->b_access_control = false;
             else if ( p_sys->es_creation == DELAY_ES )
                 p_sys->es_creation = CREATE_ES;
