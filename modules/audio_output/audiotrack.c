@@ -1211,6 +1211,16 @@ Open( vlc_object_t *obj )
     vlc_cond_init( &p_sys->cond );
     TAILQ_INIT( &p_sys->thread_cmd_queue );
 
+    p_aout->sys = p_sys;
+    p_aout->start = Start;
+    p_aout->stop = Stop;
+    p_aout->play = Play;
+    p_aout->pause = Pause;
+    p_aout->flush = Flush;
+    p_aout->time_get = TimeGet;
+
+    aout_SoftVolumeInit( p_aout );
+
     /* create JNIThread */
     p_sys->b_thread_run = true;
     if( vlc_clone( &p_sys->thread,
@@ -1221,16 +1231,6 @@ Open( vlc_object_t *obj )
         Close( obj );
         return VLC_EGENERIC;
     }
-
-    p_aout->sys = p_sys;
-    p_aout->start = Start;
-    p_aout->stop = Stop;
-    p_aout->play = Play;
-    p_aout->pause = Pause;
-    p_aout->flush = Flush;
-    p_aout->time_get = TimeGet;
-
-    aout_SoftVolumeInit( p_aout );
 
     return VLC_SUCCESS;
 }
