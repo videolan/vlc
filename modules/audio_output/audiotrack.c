@@ -893,7 +893,7 @@ JNIThread( void *data )
     bool b_error = false;
     bool b_paused = false;
     block_t *p_buffer = NULL;
-    mtime_t i_play_wait = 0;
+    mtime_t i_play_deadline = 0;
     JNIEnv* env;
 
     jni_attach_thread( &env, THREAD_NAME );
@@ -921,18 +921,19 @@ JNIThread( void *data )
             continue;
         }
 
-        if( p_cmd->id == CMD_PLAY && p_buffer == p_cmd->in.play.p_buffer
-            && i_play_wait > 0 )
+        if( p_cmd->id == CMD_PLAY && i_play_deadline > 0 )
         {
-            int i_ret = 0;
-            mtime_t i_deadline = mdate() + i_play_wait;
-
-            while( p_cmd == TAILQ_FIRST( &p_sys->thread_cmd_queue )
-                   && i_ret != ETIMEDOUT && p_sys->b_thread_run )
-                i_ret = vlc_cond_timedwait( &p_sys->cond, &p_sys->mutex,
-                                            i_deadline );
-            i_play_wait = 0;
-            continue;
+            if( mdate() > i_play_deadline )
+                i_play_deadline = 0;
+            else
+            {
+                int i_ret = 0;
+                while( p_cmd == TAILQ_FIRST( &p_sys->thread_cmd_queue )
+                       && i_ret != ETIMEDOUT && p_sys->b_thread_run )
+                    i_ret = vlc_cond_timedwait( &p_sys->cond, &p_sys->mutex,
+                                                i_play_deadline );
+                continue;
+            }
         }
 
         /* process a command */
@@ -960,6 +961,9 @@ JNIThread( void *data )
                 p_buffer = NULL;
                 break;
             case CMD_PLAY:
+            {
+                mtime_t i_play_wait = 0;
+
                 assert( p_sys->p_audiotrack );
                 if( b_error )
                     break;
@@ -969,7 +973,10 @@ JNIThread( void *data )
                                           &i_play_wait ) != VLC_SUCCESS;
                 if( p_buffer != NULL )
                     b_remove_cmd = false;
+                if( i_play_wait > 0 )
+                    i_play_deadline = mdate() + i_play_wait;
                 break;
+            }
             case CMD_PAUSE:
                 assert( p_sys->p_audiotrack );
                 if( b_error )
