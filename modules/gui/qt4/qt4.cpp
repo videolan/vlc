@@ -483,6 +483,15 @@ static void *Thread( void *obj )
 
 
     /* All the settings are in the .conf/.ini style */
+#ifdef _WIN32
+    char *cConfigDir = config_GetUserDir( VLC_CONFIG_DIR );
+    QString configDir = cConfigDir;
+    free( cConfigDir );
+    if( configDir.endsWith( "\\vlc" ) )
+        configDir.chop( 4 ); /* the "\vlc" dir is added again by QSettings */
+    QSettings::setPath( QSettings::IniFormat, QSettings::UserScope, configDir );
+#endif
+
     p_intf->p_sys->mainSettings = new QSettings(
 #ifdef _WIN32
             QSettings::IniFormat,

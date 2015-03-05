@@ -87,6 +87,21 @@ static char *config_GetShellDir (int csidl)
 
 static char *config_GetAppDir (void)
 {
+    /* if portable directory exists, use it */
+    TCHAR path[MAX_PATH];
+    if (GetModuleFileName (NULL, path, MAX_PATH))
+    {
+        TCHAR *lastDir = _tcsrchr (path, '\\');
+        if (lastDir)
+        {
+            _tcscpy (lastDir + 1, TEXT("portable"));
+            DWORD attrib = GetFileAttributes (path);
+            if (attrib != INVALID_FILE_ATTRIBUTES &&
+                    (attrib & FILE_ATTRIBUTE_DIRECTORY))
+                return FromT (path);
+        }
+    }
+
     char *psz_dir;
     char *psz_parent = config_GetShellDir (CSIDL_APPDATA);
 
