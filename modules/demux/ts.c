@@ -5657,7 +5657,8 @@ static void ts_pmt_Del( demux_t *p_demux, ts_pmt_t *pmt )
     ARRAY_RESET( pmt->e_streams );
     if( pmt->iod )
         IODFree( pmt->iod );
-    es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, pmt->i_number );
+    if( pmt->i_number > -1 )
+        es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, pmt->i_number );
     free( pmt );
 }
 
