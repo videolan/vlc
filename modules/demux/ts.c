@@ -343,7 +343,8 @@ enum
 {
     FLAGS_NONE = 0,
     FLAG_SEEN  = 1,
-    FLAG_SCRAMBLED = 2
+    FLAG_SCRAMBLED = 2,
+    FLAG_FILTERED = 4
 };
 
 #define SEEN(x) ((x).i_flags & FLAG_SEEN)
@@ -423,6 +424,7 @@ struct demux_sys_t
 
     bool        b_user_pmt;
     int         i_pmt_es;
+    bool        b_es_all; /* If we need to return all es/programs */
 
     enum
     {
@@ -495,6 +497,9 @@ static void ts_psi_Del( demux_t *, ts_psi_t * );
 
 /* Helpers */
 static ts_pmt_t * GetProgramByID( demux_sys_t *, int i_program );
+static bool ProgramIsSelected( demux_sys_t *, uint16_t i_pgrm );
+static void UpdatePESFilters( demux_t *p_demux, bool b_all );
+static inline void FlushESBuffer( ts_pes_t *p_pes );
 static inline int PIDGet( block_t *p )
 {
     return ( (p->p_buffer[1]&0x1f)<<8 )|p->p_buffer[2];
@@ -1089,6 +1094,7 @@ static int Open( vlc_object_t *p_this )
 # undef VLC_DVBPSI_DEMUX_TABLE_INIT
 
     p_sys->i_pmt_es = 0;
+    p_sys->b_es_all = false;
 
     /* Read config */
     p_sys->b_es_id_pid = var_CreateGetBool( p_demux, "ts-es-id-pid" );
@@ -1302,6 +1308,13 @@ static int Demux( demux_t *p_demux )
             break;
 
         case TYPE_PES:
+            if( !p_sys->b_access_control && !(p_pid->i_flags & FLAG_FILTERED) )
+            {
+                /* That packet is for an unselected ES, don't waste time/memory gathering its data */
+                block_Release( p_pkt );
+                continue;
+            }
+
             p_sys->b_end_preparse = true;
             if( p_sys->es_creation == DELAY_ES ) /* No longer delay ES since that pid's program sends data */
             {
@@ -1374,6 +1387,45 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
         }
     }
     return VLC_EGENERIC;
+}
+
+static void UpdatePESFilters( demux_t *p_demux, bool b_all )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+    for( int i=0; i< p_pat->programs.i_size; i++ )
+    {
+        ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
+        bool b_program_selected;
+        if( (p_sys->b_default_selection && !p_sys->b_access_control) || b_all )
+             b_program_selected = true;
+        else
+             b_program_selected = ProgramIsSelected( p_sys, p_pmt->i_number );
+
+        SetPIDFilter( p_sys, p_pat->programs.p_elems[i], b_program_selected );
+        if( p_pmt->i_pid_pcr > 0 )
+            SetPIDFilter( p_sys, &p_sys->pid[p_pmt->i_pid_pcr], b_program_selected );
+
+        for( int j=0; j<p_pmt->e_streams.i_size; j++ )
+        {
+            ts_pid_t *espid = p_pmt->e_streams.p_elems[j];
+            bool b_stream_selected = b_program_selected;
+            if( b_program_selected && !b_all && espid->u.p_pes->es.id )
+                es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                                espid->u.p_pes->es.id, &b_stream_selected );
+
+            if( !p_sys->b_es_all && espid->u.p_pes->es.fmt.i_cat == UNKNOWN_ES )
+                b_stream_selected = false;
+
+            if( b_stream_selected )
+                msg_Dbg( p_demux, "enablind pid %d from program %d", espid->i_pid, p_pmt->i_number );
+
+            SetPIDFilter( p_sys, espid, b_stream_selected );
+            if( !b_stream_selected )
+                FlushESBuffer( espid->u.p_pes );
+        }
+
+    }
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
@@ -1555,29 +1607,42 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( i_int != 0 ) /* If not default program */
         {
             /* Deselect/filter current ones */
-            for( int i=0; i<p_sys->programs.i_size; i++ )
-                SetPrgFilter( p_demux, p_sys->programs.p_elems[i], false );
-            ARRAY_RESET( p_sys->programs );
 
             if( i_int != -1 )
             {
+                p_sys->b_es_all = false;
                 ARRAY_APPEND( p_sys->programs, i_int );
+                UpdatePESFilters( p_demux, false );
             }
             else if( likely( p_list != NULL ) )
             {
+                p_sys->b_es_all = false;
                 for( int i = 0; i < p_list->i_count; i++ )
                    ARRAY_APPEND( p_sys->programs, p_list->p_values[i].i_int );
+                UpdatePESFilters( p_demux, false );
             }
-
-            /* Select/filter current ones */
-            for( int i=0; i<p_sys->programs.i_size; i++ )
+            else // All ES Mode
             {
-                msg_Dbg( p_demux, "Program %d in new selection", p_sys->programs.p_elems[i] );
-                SetPrgFilter( p_demux, p_sys->programs.p_elems[i], true );
+                p_sys->b_es_all = true;
+                ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+                for( int i = 0; i < p_pat->programs.i_size; i++ )
+                   ARRAY_APPEND( p_sys->programs, p_pat->programs.p_elems[i]->i_pid );
+                UpdatePESFilters( p_demux, true );
             }
 
             p_sys->b_default_selection = false;
         }
+
+        return VLC_SUCCESS;
+    }
+
+    case DEMUX_SET_ES:
+    {
+        i_int = (int)va_arg( args, int );
+        msg_Dbg( p_demux, "DEMUX_SET_ES %d", i_int );
+
+        if( !p_sys->b_es_all ) /* Won't change anything */
+            UpdatePESFilters( p_demux, false );
 
         return VLC_SUCCESS;
     }
@@ -1756,6 +1821,11 @@ error:
 
 static int SetPIDFilter( demux_sys_t *p_sys, ts_pid_t *p_pid, bool b_selected )
 {
+    if( b_selected )
+        p_pid->i_flags |= FLAG_FILTERED;
+    else
+        p_pid->i_flags &= ~FLAG_FILTERED;
+
     if( !p_sys->b_access_control )
         return VLC_EGENERIC;
 
@@ -2720,7 +2790,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
         }
 
         int i_pid = PIDGet( p_pkt );
-        p_sys->pid[i_pid].i_flags = FLAG_SEEN;
+        p_sys->pid[i_pid].i_flags |= FLAG_SEEN;
 
         if( i_pid != 0x1FFF && p_sys->pid[i_pid].type == TYPE_PES &&
            (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
@@ -3502,10 +3572,8 @@ static void IODFree( iod_descriptor_t *p_iod )
  ** libdvbpsi callbacks
  ****************************************************************************
  ****************************************************************************/
-static bool ProgramIsSelected( demux_t *p_demux, uint16_t i_pgrm )
+static bool ProgramIsSelected( demux_sys_t *p_sys, uint16_t i_pgrm )
 {
-    demux_sys_t          *p_sys = p_demux->p_sys;
-
     for(int i=0; i<p_sys->programs.i_size; i++)
         if( p_sys->programs.p_elems[i] == i_pgrm )
             return true;
@@ -4985,6 +5053,7 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid )
                     es_out_Add( p_demux->out, &pid->u.p_pes->extra_es.p_elems[i]->fmt );
             }
             p_sys->i_pmt_es += 1 + pid->u.p_pes->extra_es.i_size;
+            UpdatePESFilters( p_demux, p_sys->b_es_all );
         }
     }
     else if( p_sys->es_creation == DELAY_ES )
@@ -5017,6 +5086,7 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid )
                     SetPIDFilter( p_sys, pid, true );
             }
         }
+        UpdatePESFilters( p_demux, p_sys->b_es_all );
     }
 }
 
@@ -5419,13 +5489,10 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             msg_Dbg( p_demux, "   * PMT descriptor : CA (0x9) SysID 0x%x",
                      (p_dr->p_data[0] << 8) | p_dr->p_data[1] );
         }
-
-        if( ProgramIsSelected( p_demux, p_pmt->i_number ) && pespid->u.p_pes->es.id != NULL )
-            SetPIDFilter( p_sys, pespid, true ); /* Set demux filter */
     }
 
     /* Set CAM descrambling */
-    if( !ProgramIsSelected( p_demux, p_pmt->i_number ) )
+    if( !ProgramIsSelected( p_sys, p_pmt->i_number ) )
     {
         dvbpsi_pmt_delete( p_dvbpsipmt );
     }
@@ -5445,6 +5512,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     for( int i = 0; i < old_es_rm.i_size; i++ )
         PIDRelease( p_demux, old_es_rm.p_elems[i] );
     ARRAY_RESET( old_es_rm );
+
+    UpdatePESFilters( p_demux, p_sys->b_es_all );
 
     if( !p_sys->b_trust_pcr )
     {
@@ -5551,7 +5620,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
 
         /* Now select PID at access level */
         if( p_sys->programs.i_size == 0 ||
-            ProgramIsSelected( p_demux, p_program->i_number ) )
+            ProgramIsSelected( p_sys, p_program->i_number ) )
         {
             if( p_sys->programs.i_size == 0 )
             {
