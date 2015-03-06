@@ -72,6 +72,8 @@ typedef struct segment_s
     char       *psz_key_path;         /* url key path */
     uint8_t     aes_key[16];      /* AES-128 */
     bool        b_key_loaded;
+    uint8_t     psz_AES_IV[AES_BLOCK_SIZE];    /* IV used when decypher the block */
+    bool        b_iv_loaded;
 
     vlc_mutex_t lock;
     block_t     *data;      /* data */
@@ -94,8 +96,8 @@ typedef struct hls_stream_s
     bool        b_cache;    /* allow caching */
 
     char        *psz_current_key_path;          /* URL path of the encrypted key */
-    uint8_t      psz_AES_IV[AES_BLOCK_SIZE];    /* IV used when decypher the block */
-    bool         b_iv_loaded;
+    uint8_t      psz_current_AES_IV[AES_BLOCK_SIZE];    /* IV used when decypher the block */
+    bool         b_current_iv_loaded;
 } hls_stream_t;
 
 struct stream_sys_t
@@ -294,6 +296,8 @@ static hls_stream_t *hls_Copy(hls_stream_t *src, const bool b_cp_segments)
     dst->b_cache = src->b_cache;
     dst->psz_current_key_path = src->psz_current_key_path ?
                 strdup( src->psz_current_key_path ) : NULL;
+    memcpy(dst->psz_current_AES_IV, src->psz_current_AES_IV, AES_BLOCK_SIZE);
+    dst->b_current_iv_loaded = src->b_current_iv_loaded;
     dst->url = strdup(src->url);
     if (dst->url == NULL)
     {
@@ -396,6 +400,8 @@ static segment_t *segment_New(hls_stream_t* hls, const int duration, const char 
     segment->psz_key_path = NULL;
     if (hls->psz_current_key_path)
         segment->psz_key_path = strdup(hls->psz_current_key_path);
+    segment->b_iv_loaded = hls->b_current_iv_loaded;
+    memcpy(segment->psz_AES_IV, hls->psz_current_AES_IV, AES_BLOCK_SIZE);
     return segment;
 }
 
@@ -853,7 +859,7 @@ static int parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
             * representation of the sequence number SHALL be placed in a 16-octet
             * buffer and padded (on the left) with zeros.
             */
-            hls->b_iv_loaded = false;
+            hls->b_current_iv_loaded = false;
         }
         else
         {
@@ -864,13 +870,13 @@ static int parse_Key(stream_t *s, hls_stream_t *hls, char *p_read)
             * and MUST be prefixed with 0x or 0X.
             */
 
-            if (string_to_IV(iv, hls->psz_AES_IV) == VLC_EGENERIC)
+            if (string_to_IV(iv, hls->psz_current_AES_IV) == VLC_EGENERIC)
             {
                 msg_Err(s, "IV invalid");
                 err = VLC_EGENERIC;
             }
             else
-                hls->b_iv_loaded = true;
+                hls->b_current_iv_loaded = true;
             free(value);
         }
     }
@@ -1278,17 +1284,17 @@ static int hls_DecodeSegmentData(stream_t *s, hls_stream_t *hls, segment_t *segm
         return VLC_EGENERIC;
     }
 
-    if (hls->b_iv_loaded == false)
+    if (segment->b_iv_loaded == false)
     {
-        memset(hls->psz_AES_IV, 0, AES_BLOCK_SIZE);
-        hls->psz_AES_IV[15] = segment->sequence & 0xff;
-        hls->psz_AES_IV[14] = (segment->sequence >> 8)& 0xff;
-        hls->psz_AES_IV[13] = (segment->sequence >> 16)& 0xff;
-        hls->psz_AES_IV[12] = (segment->sequence >> 24)& 0xff;
+        memset(segment->psz_AES_IV, 0, AES_BLOCK_SIZE);
+        segment->psz_AES_IV[15] = segment->sequence & 0xff;
+        segment->psz_AES_IV[14] = (segment->sequence >> 8)& 0xff;
+        segment->psz_AES_IV[13] = (segment->sequence >> 16)& 0xff;
+        segment->psz_AES_IV[12] = (segment->sequence >> 24)& 0xff;
     }
 
-    i_gcrypt_err = gcry_cipher_setiv(aes_ctx, hls->psz_AES_IV,
-                                      sizeof(hls->psz_AES_IV));
+    i_gcrypt_err = gcry_cipher_setiv(aes_ctx, segment->psz_AES_IV,
+                                      sizeof(segment->psz_AES_IV));
 
     if (i_gcrypt_err)
     {
