@@ -1,0 +1,11 @@
+--- a/gme/Fir_Resampler.cpp	2013-03-17 02:38:55.000000000 +0100
++++ b/gme/Fir_Resampler.cpp	2015-03-06 14:33:01.061577900 +0100
+@@ -188,6 +188,8 @@
+ {
+ 	int remain = write_pos - buf.begin();
+ 	int max_count = remain - width_ * stereo;
++	if ( max_count < 0 )
++		return 0;
+ 	if ( count > max_count )
+ 		count = max_count;
+ 	
