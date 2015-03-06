@@ -149,6 +149,8 @@ int bdsm_SdOpen (vlc_object_t *p_this)
 
     p_sd->p_sys = p_sys;
     p_sys->p_entry_item_list = vlc_array_new();
+    if ( p_sys->p_entry_item_list == NULL )
+        return VLC_ENOMEM;
 
     p_sys->p_ns = netbios_ns_new();
     if( p_sys->p_ns == NULL )
