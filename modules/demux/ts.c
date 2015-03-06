@@ -5353,6 +5353,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         {
             msg_Dbg( p_demux, "   => pid %d content is *unknown*",
                      p_dvbpsies->i_pid );
+            p_pes->es.fmt.psz_description = strdup( psz_typedesc );
         }
         else
         {
