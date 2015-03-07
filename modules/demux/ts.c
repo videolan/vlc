@@ -513,7 +513,7 @@ static block_t* ReadTSPacket( demux_t *p_demux );
 static int ProbeStart( demux_t *p_demux, int i_program );
 static int ProbeEnd( demux_t *p_demux, int i_program );
 static int SeekToTime( demux_t *p_demux, ts_pmt_t *, int64_t time );
-static void ReadyQueuesPostSeek( demux_sys_t *p_sys );
+static void ReadyQueuesPostSeek( demux_t *p_demux );
 static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 static int64_t TimeStampWrapAround( ts_pmt_t *, int64_t );
@@ -1509,7 +1509,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( !DVBEventInformation( p_demux, &i_time, &i_length ) &&
                  i_length > 0 && !SeekToTime( p_demux, p_pmt, TO_SCALE(i_length) * f ) )
             {
-                ReadyQueuesPostSeek( p_sys );
+                ReadyQueuesPostSeek( p_demux );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                                 TO_SCALE(i_length) * f );
                 return VLC_SUCCESS;
@@ -1525,7 +1525,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                                    p_pmt->i_last_dts ) - p_pmt->pcr.i_first;
             if( !SeekToTime( p_demux, p_pmt, p_pmt->pcr.i_first + i_length * f ) )
             {
-                ReadyQueuesPostSeek( p_sys );
+                ReadyQueuesPostSeek( p_demux );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                                 FROM_SCALE(p_pmt->pcr.i_first + i_length * f) );
                 return VLC_SUCCESS;
@@ -1536,7 +1536,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( i64 > 0 &&
             stream_Seek( p_sys->stream, (int64_t)(i64 * f) ) == VLC_SUCCESS )
         {
-            ReadyQueuesPostSeek( p_sys );
+            ReadyQueuesPostSeek( p_demux );
             return VLC_SUCCESS;
         }
         break;
@@ -1549,7 +1549,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_pmt->pcr.i_first > -1 &&
            !SeekToTime( p_demux, p_pmt, p_pmt->pcr.i_first + TO_SCALE(i64) ) )
         {
-            ReadyQueuesPostSeek( p_sys );
+            ReadyQueuesPostSeek( p_demux );
             es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                             FROM_SCALE(p_pmt->pcr.i_first) + i64 - VLC_TS_0 );
             return VLC_SUCCESS;
@@ -2631,8 +2631,10 @@ static inline void FlushESBuffer( ts_pes_t *p_pes )
     }
 }
 
-static void ReadyQueuesPostSeek( demux_sys_t *p_sys )
+static void ReadyQueuesPostSeek( demux_t *p_demux )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
     for( int i=0; i< p_pat->programs.i_size; i++ )
     {
@@ -2643,6 +2645,17 @@ static void ReadyQueuesPostSeek( demux_sys_t *p_sys )
 
             if( pid->type != TYPE_PES )
                 continue;
+
+            if( !pid->u.p_pes->es.id )
+            {
+                block_t *p_block = block_Alloc(1);
+                if( p_block )
+                {
+                    p_block->i_buffer = 0;
+                    p_block->i_flags = BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED;
+                    es_out_Send( p_demux->out, pid->u.p_pes->es.id, p_block );
+                }
+            }
 
             pid->i_cc = 0xff;
 
