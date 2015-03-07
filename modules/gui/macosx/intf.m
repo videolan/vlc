@@ -1294,6 +1294,9 @@ static bool f_appExit = false;
 
     [[[self playlist] model] addItem:i_item withParentNode:i_node];
 
+    // update badge in sidebar
+    [o_mainwindow updateWindow];
+
     [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
                                                         object: nil
                                                       userInfo: nil];
@@ -1306,11 +1309,13 @@ static bool f_appExit = false;
     [[[self playlist] model] removeItem:i_item];
     [[self playlist] deletionCompleted];
 
+    // update badge in sidebar
+    [o_mainwindow updateWindow];
+
     [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
                                                         object: nil
                                                       userInfo: nil];
 }
-
 
 // This must be called on main thread
 - (void)PlaylistItemChanged
