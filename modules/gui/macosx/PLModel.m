@@ -69,7 +69,9 @@
     [_rootItem release];
     _rootItem = [[PLItem alloc] initWithPlaylistItem:p_root];
     [self rebuildPLItem:_rootItem];
+
     [_outlineView reloadData];
+    [_outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 }
 
 - (BOOL)hasChildren
