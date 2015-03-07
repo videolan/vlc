@@ -1356,6 +1356,8 @@ static bool f_appExit = false;
 
             p_input_changed = vlc_object_hold(p_current_input);
 
+            [[self playlist] currentlyPlayingItemChanged];
+
             [[self playlist] continuePlaybackWhereYouLeftOff:p_current_input];
 
             [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
@@ -1363,7 +1365,6 @@ static bool f_appExit = false;
         }
     }
 
-    [o_playlist updateRowSelection];
     [o_mainwindow updateWindow];
     [self updateDelays];
     [self updateMainMenu];

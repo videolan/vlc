@@ -80,6 +80,8 @@ typedef enum {
 - (void)addItem:(int)i_item withParentNode:(int)i_node;
 - (void)removeItem:(int)i_item;
 
+- (PLItem *)currentlyPlayingItem;
+
 - (void)sortForColumn:(NSString *)o_column withMode:(int)i_mode;
 
 - (void)searchUpdate:(NSString *)o_search;

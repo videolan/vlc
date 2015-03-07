@@ -199,6 +199,18 @@
         [_outlineView reloadItem:o_parent reloadChildren:YES];
 }
 
+- (PLItem *)currentlyPlayingItem
+{
+    PLItem *item = nil;
+
+    PL_LOCK;
+    playlist_item_t *p_current = playlist_CurrentPlayingItem(p_playlist);
+    if (p_current)
+        item = [self findItemByPlaylistId:p_current->i_id];
+    PL_UNLOCK;
+    return item;
+}
+
 - (void)sortForColumn:(NSString *)o_column withMode:(int)i_mode
 {
     int i_column = 0;

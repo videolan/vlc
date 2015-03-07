@@ -354,42 +354,36 @@
     return [o_outline_view selectedRow] == -1;
 }
 
-- (void)updateRowSelection
+- (void)currentlyPlayingItemChanged
 {
-    // FIXME: unsafe
-    playlist_t *p_playlist = pl_Get(VLCIntf);
-    playlist_item_t *p_item, *p_temp_item;
-    NSMutableArray *o_array = [NSMutableArray array];
+    PLItem *item = [[self model] currentlyPlayingItem];
+    if (!item)
+        return;
 
-    // TODO Rework
-//    PL_LOCK;
-//    p_item = playlist_CurrentPlayingItem(p_playlist);
-//    if (p_item == NULL) {
-//        PL_UNLOCK;
-//        return;
-//    }
-//
-//    p_temp_item = p_item;
-//    while(p_temp_item->p_parent) {
-//        [o_array insertObject: [NSValue valueWithPointer: p_temp_item] atIndex: 0];
-//        p_temp_item = p_temp_item->p_parent;
-//    }
-//    PL_UNLOCK;
-//
-//    NSUInteger count = [o_array count];
-//    for (NSUInteger j = 0; j < count - 1; j++) {
-//        id o_item;
-//        if ((o_item = [o_outline_dict objectForKey:
-//                            [NSString stringWithFormat: @"%p",
-//                            [[o_array objectAtIndex:j] pointerValue]]]) != nil) {
-//            [o_outline_view expandItem: o_item];
-//        }
-//    }
-//
-//    id o_item = [o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_item]];
-//    NSInteger i_index = [o_outline_view rowForItem:o_item];
-//    [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_index] byExtendingSelection:NO];
-//    [o_outline_view setNeedsDisplay:YES];
+    [[[VLCMain sharedInstance] info] updatePanelWithItem: [item input]];
+
+    // select item
+    NSInteger itemIndex = [o_outline_view rowForItem:item];
+    if (itemIndex < 0) {
+        // expand if needed
+        while (item != nil) {
+            PLItem *parent = [item parent];
+
+            if (![o_outline_view isExpandable: parent])
+                break;
+            if (![o_outline_view isItemExpanded: parent])
+                [o_outline_view expandItem: parent];
+            item = parent;
+        }
+
+        // search for row again
+        itemIndex = [o_outline_view rowForItem:item];
+        if (itemIndex < 0) {
+            return;
+        }
+    }
+
+    [o_outline_view selectRowIndexes: [NSIndexSet indexSetWithIndex: itemIndex] byExtendingSelection: NO];
 }
 
 - (IBAction)savePlaylist:(id)sender

@@ -91,7 +91,8 @@
 - (void)playlistUpdated;
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification;
 - (void)sortNode:(int)i_mode;
-- (void)updateRowSelection;
+
+- (void)currentlyPlayingItemChanged;
 
 - (BOOL)isSelectionEmpty;
 
