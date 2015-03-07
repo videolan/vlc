@@ -244,7 +244,7 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
     unsigned int i_sample = p_track->i_sample - p_chunk->i_sample_first;
     int64_t i_dts = p_chunk->i_first_dts;
 
-    while( i_sample > 0 )
+    while( i_sample > 0 && i_index < p_chunk->i_entries_dts )
     {
         if( i_sample > p_chunk->p_sample_count_dts[i_index] )
         {
@@ -300,7 +300,7 @@ static inline bool MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track,
     if( ck->p_sample_count_pts == NULL || ck->p_sample_offset_pts == NULL )
         return false;
 
-    for( i_index = 0;; i_index++ )
+    for( i_index = 0; i_index < ck->i_entries_pts ; i_index++ )
     {
         if( i_sample < ck->p_sample_count_pts[i_index] )
         {
@@ -1871,8 +1871,10 @@ static int TrackCreateChunksIndex( demux_t *p_demux,
         ck->i_offset = BOXDATA(p_co64)->i_chunk_offset[i_chunk];
 
         ck->i_first_dts = 0;
+        ck->i_entries_dts = 0;
         ck->p_sample_count_dts = NULL;
         ck->p_sample_delta_dts = NULL;
+        ck->i_entries_pts = 0;
         ck->p_sample_count_pts = NULL;
         ck->p_sample_offset_pts = NULL;
     }
@@ -1943,7 +1945,7 @@ static int xTTS_CountEntries( demux_t *p_demux, uint32_t *pi_entry /* out */,
         if ( i_array_offset >= i_table_count )
         {
             msg_Err( p_demux, "invalid index counting total samples %u %u", i_array_offset,  i_table_count );
-            return VLC_EGENERIC;
+            return VLC_ENOVAR;
         }
 
         if ( i_index_samples_left )
@@ -2079,7 +2081,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         for( uint32_t i_chunk = 0; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
         {
             mp4_chunk_t *ck = &p_demux_track->chunk[i_chunk];
-            uint32_t i_entry, i_sample_count;
+            uint32_t i_sample_count;
 
             /* save first dts */
             ck->i_first_dts = i_next_dts;
@@ -2087,31 +2089,32 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
 
             /* count how many entries are needed for this chunk
              * for p_sample_delta_dts and p_sample_count_dts */
-            i_entry = 0;
+            ck->i_entries_dts = 0;
 
-            int i_ret = xTTS_CountEntries( p_demux, &i_entry, i_index,
+            int i_ret = xTTS_CountEntries( p_demux, &ck->i_entries_dts, i_index,
                                            i_current_index_samples_left,
                                            ck->i_sample_count,
                                            stts->pi_sample_count,
                                            stts->i_entry_count );
-            if ( i_ret != VLC_SUCCESS )
+            if ( i_ret == VLC_EGENERIC )
                 return i_ret;
 
             /* allocate them */
-            ck->p_sample_count_dts = calloc( i_entry, sizeof( uint32_t ) );
-            ck->p_sample_delta_dts = calloc( i_entry, sizeof( uint32_t ) );
+            ck->p_sample_count_dts = calloc( ck->i_entries_dts, sizeof( uint32_t ) );
+            ck->p_sample_delta_dts = calloc( ck->i_entries_dts, sizeof( uint32_t ) );
             if( !ck->p_sample_count_dts || !ck->p_sample_delta_dts )
             {
                 free( ck->p_sample_count_dts );
                 free( ck->p_sample_delta_dts );
-                msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, i_entry );
+                msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_dts );
+                ck->i_entries_dts = 0;
                 return VLC_ENOMEM;
             }
 
             /* now copy */
             i_sample_count = ck->i_sample_count;
 
-            for( uint32_t i = 0; i < i_entry; i++ )
+            for( uint32_t i = 0; i < ck->i_entries_dts; i++ )
             {
                 if ( i_current_index_samples_left )
                 {
@@ -2123,7 +2126,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                         i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
                         i_current_index_samples_left -= i_sample_count;
                         i_sample_count = 0;
-                        assert( i == i_entry - 1 );
+                        assert( i == ck->i_entries_dts - 1 );
                         break;
                     }
                     else
@@ -2147,7 +2150,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                         i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
                         i_current_index_samples_left = stts->pi_sample_count[i_index] - i_sample_count;
                         i_sample_count = 0;
-                        assert( i == i_entry - 1 );
+                        assert( i == ck->i_entries_dts - 1 );
                         // keep building from same index
                     }
                     else
@@ -2183,34 +2186,35 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         for( uint32_t i_chunk = 0; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
         {
             mp4_chunk_t *ck = &p_demux_track->chunk[i_chunk];
-            uint32_t i_entry, i_sample_count;
+            uint32_t i_sample_count;
 
             /* count how many entries are needed for this chunk
              * for p_sample_offset_pts and p_sample_count_pts */
-            i_entry = 0;
-            int i_ret = xTTS_CountEntries( p_demux, &i_entry, i_index,
+            ck->i_entries_pts = 0;
+            int i_ret = xTTS_CountEntries( p_demux, &ck->i_entries_pts, i_index,
                                            i_current_index_samples_left,
                                            ck->i_sample_count,
                                            ctts->pi_sample_count,
                                            ctts->i_entry_count );
-            if ( i_ret != VLC_SUCCESS )
+            if ( i_ret == VLC_EGENERIC )
                 return i_ret;
 
             /* allocate them */
-            ck->p_sample_count_pts = calloc( i_entry, sizeof( uint32_t ) );
-            ck->p_sample_offset_pts = calloc( i_entry, sizeof( int32_t ) );
+            ck->p_sample_count_pts = calloc( ck->i_entries_pts, sizeof( uint32_t ) );
+            ck->p_sample_offset_pts = calloc( ck->i_entries_pts, sizeof( int32_t ) );
             if( !ck->p_sample_count_pts || !ck->p_sample_offset_pts )
             {
                 free( ck->p_sample_count_pts );
                 free( ck->p_sample_offset_pts );
-                msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, i_entry );
+                msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_pts );
+                ck->i_entries_pts = 0;
                 return VLC_ENOMEM;
             }
 
             /* now copy */
             i_sample_count = ck->i_sample_count;
 
-            for( uint32_t i = 0; i < i_entry; i++ )
+            for( uint32_t i = 0; i < ck->i_entries_pts; i++ )
             {
                 if ( i_current_index_samples_left )
                 {
@@ -2220,7 +2224,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                         ck->p_sample_offset_pts[i] = ctts->pi_sample_offset[i_index];
                         i_current_index_samples_left -= i_sample_count;
                         i_sample_count = 0;
-                        assert( i == i_entry - 1 );
+                        assert( i == ck->i_entries_pts - 1 );
                         break;
                     }
                     else
@@ -2240,7 +2244,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                         ck->p_sample_offset_pts[i] = ctts->pi_sample_offset[i_index];
                         i_current_index_samples_left = ctts->pi_sample_count[i_index] - i_sample_count;
                         i_sample_count = 0;
-                        assert( i == i_entry - 1 );
+                        assert( i == ck->i_entries_pts - 1 );
                         // keep building from same index
                     }
                     else
@@ -3637,10 +3641,12 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
         free( ret->p_sample_delta_dts );
         return VLC_ENOMEM;
     }
+    ret->i_entries_dts = ret->i_sample_count;
 
     ret->p_sample_count_pts = calloc( ret->i_sample_count, sizeof( uint32_t ) );
     if( !ret->p_sample_count_pts )
         return VLC_ENOMEM;
+    ret->i_entries_pts = ret->i_sample_count;
 
     if( p_trun_data->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET )
     {
