@@ -3632,7 +3632,11 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
     ret->p_sample_delta_dts = calloc( ret->i_sample_count, sizeof( uint32_t ) );
 
     if( !ret->p_sample_count_dts || !ret->p_sample_delta_dts )
+    {
+        free( ret->p_sample_count_dts );
+        free( ret->p_sample_delta_dts );
         return VLC_ENOMEM;
+    }
 
     ret->p_sample_count_pts = calloc( ret->i_sample_count, sizeof( uint32_t ) );
     if( !ret->p_sample_count_pts )
