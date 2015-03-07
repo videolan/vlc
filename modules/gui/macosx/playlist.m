@@ -562,56 +562,33 @@
     [[[VLCMain sharedInstance] info] initPanel];
 }
 
+- (void)deletionCompleted
+{
+    // retain selection before deletion
+    [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:retainedRowSelection] byExtendingSelection:NO];
+}
+
 - (IBAction)deleteItem:(id)sender
 {
-    int i_count;
-    NSIndexSet *o_selected_indexes;
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get(p_intf);
+    playlist_t * p_playlist = pl_Get(VLCIntf);
 
     // check if deletion is allowed
     if (![[self model] editAllowed])
         return;
 
-    o_selected_indexes = [o_outline_view selectedRowIndexes];
-    i_count = [o_selected_indexes count];
+    NSIndexSet *o_selected_indexes = [o_outline_view selectedRowIndexes];
     retainedRowSelection = [o_selected_indexes firstIndex];
     if (retainedRowSelection == NSNotFound)
         retainedRowSelection = 0;
 
+    [o_selected_indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        PLItem *o_item = [o_outline_view itemAtRow: idx];
+        if (!o_item)
+            return;
 
-    NSUInteger indexes[i_count];
-//    if (i_count == [o_outline_view numberOfRows]) {
-//        PL_LOCK;
-//        playlist_NodeDelete(p_playlist, [self currentPlaylistRoot], true, false);
-//        PL_UNLOCK;
-//        [self playlistUpdated];
-//        return;
-//    }
-    [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
-    for (int i = 0; i < i_count; i++) {
-        PLItem *o_item = [o_outline_view itemAtRow: indexes[i]];
-        [o_outline_view deselectRow: indexes[i]];
-
-        /// TODO
-//        if (p_item->i_children != -1) {
-//        //is a node and not an item
-//            if (playlist_Status(p_playlist) != PLAYLIST_STOPPED &&
-//                [self isItem: playlist_CurrentPlayingItem(p_playlist) inNode: ((playlist_item_t *)[o_item pointerValue])
-//                        checkItemExistence: NO locked:YES] == YES)
-//                // if current item is in selected node and is playing then stop playlist
-//                playlist_Control(p_playlist, PLAYLIST_STOP, pl_Locked);
-//
-//                playlist_NodeDelete(p_playlist, p_item, true, false);
-//        } else
-
-            playlist_DeleteFromInput(p_playlist, [o_item input], pl_Unlocked);
-//        [[o_item parent] deleteChild:o_item];
-//
-//        [o_outline_view reloadData];
-    }
-
-//    [self playlistUpdated];
+        // model deletion is done via callback
+        playlist_DeleteFromInput(p_playlist, [o_item input], pl_Unlocked);
+    }];
 }
 
 - (IBAction)sortNodeByName:(id)sender

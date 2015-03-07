@@ -96,6 +96,9 @@
 
 - (BOOL)isSelectionEmpty;
 
+- (void)deletionCompleted;
+
+
 - (IBAction)playItem:(id)sender;
 - (IBAction)revealItemInFinder:(id)sender;
 - (IBAction)preparseItem:(id)sender;

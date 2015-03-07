@@ -1324,6 +1324,7 @@ static bool f_appExit = false;
     int i_item = [o_val intValue];
 
     [[[self playlist] model] removeItem:i_item];
+    [[self playlist] deletionCompleted];
 }
 
 
