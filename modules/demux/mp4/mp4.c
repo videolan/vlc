@@ -2102,6 +2102,8 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
             ck->p_sample_delta_dts = calloc( i_entry, sizeof( uint32_t ) );
             if( !ck->p_sample_count_dts || !ck->p_sample_delta_dts )
             {
+                free( ck->p_sample_count_dts );
+                free( ck->p_sample_delta_dts );
                 msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, i_entry );
                 return VLC_ENOMEM;
             }
@@ -2199,6 +2201,8 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
             ck->p_sample_offset_pts = calloc( i_entry, sizeof( int32_t ) );
             if( !ck->p_sample_count_pts || !ck->p_sample_offset_pts )
             {
+                free( ck->p_sample_count_pts );
+                free( ck->p_sample_offset_pts );
                 msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, i_entry );
                 return VLC_ENOMEM;
             }
