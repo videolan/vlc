@@ -87,8 +87,6 @@ static int PLItemChanged(vlc_object_t *, const char *,
                          vlc_value_t, vlc_value_t, void *);
 static int PLItemUpdated(vlc_object_t *, const char *,
                          vlc_value_t, vlc_value_t, void *);
-static int PlaylistUpdated(vlc_object_t *, const char *,
-                           vlc_value_t, vlc_value_t, void *);
 
 static int PlaybackModeUpdated(vlc_object_t *, const char *,
                                vlc_value_t, vlc_value_t, void *);
@@ -363,7 +361,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         case INPUT_EVENT_ITEM_NAME:
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(playlistUpdated) withObject: nil waitUntilDone:NO];
+            // TODO update playlist item with new name
+//            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(playlistUpdated) withObject: nil waitUntilDone:NO];
             break;
 
         case INPUT_EVENT_AUDIO_DELAY:
@@ -429,26 +428,6 @@ static int PLItemRemoved(vlc_object_t *p_this, const char *psz_var,
 
     NSNumber *o_val = [NSNumber numberWithInt:new_val.i_int];
     [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(plItemRemoved:) withObject:o_val waitUntilDone:NO];
-
-    [o_pool release];
-    return VLC_SUCCESS;
-}
-
-static int PlaylistUpdated(vlc_object_t *p_this, const char *psz_var,
-                         vlc_value_t oldval, vlc_value_t new_val, void *param)
-{
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-
-    /* Avoid event queue flooding with playlistUpdated selectors, leading to UI freezes.
-     * Therefore, only enqueue if no selector already enqueued.
-     */
-    VLCMain *o_main = [VLCMain sharedInstance];
-    @synchronized(o_main) {
-        if(![o_main playlistUpdatedSelectorInQueue]) {
-            [o_main setPlaylistUpdatedSelectorInQueue:YES];
-            [o_main performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
-        }
-    }
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -628,7 +607,6 @@ audio_output_t *getAout(void)
 
 @synthesize voutController=o_vout_controller;
 @synthesize nativeFullscreenMode=b_nativeFullscreenMode;
-@synthesize playlistUpdatedSelectorInQueue=b_playlist_updated_selector_in_queue;
 
 #pragma mark -
 #pragma mark Initialization
@@ -702,7 +680,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback(p_intf->p_libvlc, "intf-boss", BossCallback, self);
     var_AddCallback(p_playlist, "item-change", PLItemUpdated, self);
     var_AddCallback(p_playlist, "activity", PLItemChanged, self);
-    var_AddCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
     var_AddCallback(p_playlist, "playlist-item-append", PLItemAppended, self);
     var_AddCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, self);
     var_AddCallback(p_playlist, "random", PlaybackModeUpdated, self);
@@ -876,7 +853,6 @@ static bool f_appExit = false;
     var_DelCallback(p_intf, "dialog-progress-bar", DialogCallback, self);
     var_DelCallback(p_playlist, "item-change", PLItemUpdated, self);
     var_DelCallback(p_playlist, "activity", PLItemChanged, self);
-    var_DelCallback(p_playlist, "leaf-to-parent", PlaylistUpdated, self);
     var_DelCallback(p_playlist, "playlist-item-append", PLItemAppended, self);
     var_DelCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, self);
     var_DelCallback(p_playlist, "random", PlaybackModeUpdated, self);
@@ -1317,6 +1293,10 @@ static bool f_appExit = false;
     int i_item = [[o_val objectAtIndex:1] intValue];
 
     [[[self playlist] model] addItem:i_item withParentNode:i_node];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+                                                        object: nil
+                                                      userInfo: nil];
 }
 
 - (void)plItemRemoved:(NSNumber *)o_val
@@ -1325,6 +1305,10 @@ static bool f_appExit = false;
 
     [[[self playlist] model] removeItem:i_item];
     [[self playlist] deletionCompleted];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+                                                        object: nil
+                                                      userInfo: nil];
 }
 
 
@@ -1433,22 +1417,6 @@ static bool f_appExit = false;
 - (void)updateVolume
 {
     [o_mainwindow updateVolumeSlider];
-}
-
-- (void)playlistUpdated
-{
-    @synchronized(self) {
-        b_playlist_updated_selector_in_queue = NO;
-    }
-
-    [self playbackStatusUpdated];
-    [o_playlist playlistUpdated];
-    [o_mainwindow updateWindow];
-    [o_mainwindow updateName];
-
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
-                                                        object: nil
-                                                      userInfo: nil];
 }
 
 - (void)updateRecordState: (BOOL)b_value

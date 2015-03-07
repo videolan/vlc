@@ -300,21 +300,7 @@
 
 - (void)playlistUpdated
 {
-    /* Clear indications of any existing column sorting */
-    NSUInteger count = [[o_outline_view tableColumns] count];
-    for (NSUInteger i = 0 ; i < count ; i++)
-        [o_outline_view setIndicatorImage:nil inTableColumn: [[o_outline_view tableColumns] objectAtIndex:i]];
-
-    [o_outline_view setHighlightedTableColumn:nil];
-    o_tc_sortColumn = nil;
-
     [o_outline_view reloadData];
-    [[[[VLCMain sharedInstance] wizard] playlistWizard] reloadOutlineView];
-
-    [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:retainedRowSelection] byExtendingSelection:NO];
-
-    [self outlineViewSelectionDidChange: nil];
-    [[VLCMain sharedInstance] updateMainWindow];
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification

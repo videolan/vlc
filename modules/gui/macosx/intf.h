@@ -120,8 +120,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
     BOOL b_has_spotify_paused;
     NSTimer *o_itunes_play_timer;
 
-    BOOL b_playlist_updated_selector_in_queue;
-
     dispatch_queue_t informInputChangedQueue;
 }
 
@@ -160,7 +158,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (void)updateVolume;
 - (void)updatePlaybackPosition;
 - (void)updateName;
-- (void)playlistUpdated;
 - (void)updateRecordState: (BOOL)b_value;
 - (void)updateInfoandMetaPanel;
 - (void)updateMainMenu;
