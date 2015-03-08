@@ -346,8 +346,6 @@
     if (!item)
         return;
 
-    [[[VLCMain sharedInstance] info] updatePanelWithItem: [item input]];
-
     // select item
     NSInteger itemIndex = [o_outline_view rowForItem:item];
     if (itemIndex < 0) {

@@ -159,7 +159,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (void)updatePlaybackPosition;
 - (void)updateName;
 - (void)updateRecordState: (BOOL)b_value;
-- (void)updateInfoandMetaPanel;
+- (void)updateMetaAndInfo;
 - (void)updateMainMenu;
 - (void)updateMainWindow;
 - (void)showMainWindow;

@@ -43,6 +43,8 @@
 @synthesize rootItem=_rootItem;
 @synthesize draggedItems=_draggedItems;
 
+#pragma mark -
+#pragma mark Init and Stuff
 
 - (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root playlistObject:(id)plObj;
 {
@@ -147,6 +149,8 @@
     return nil;
 }
 
+#pragma mark -
+#pragma mark Core events
 
 - (void)addItem:(int)i_item withParentNode:(int)i_node
 {
@@ -201,6 +205,29 @@
         [_outlineView reloadItem:o_parent reloadChildren:YES];
 }
 
+- (void)updateItem:(input_item_t *)p_input_item
+{
+    PL_LOCK;
+    playlist_item_t *pl_item = playlist_ItemGetByInput(p_playlist, p_input_item);
+    if (!pl_item) {
+        PL_UNLOCK;
+        return;
+    }
+    PLItem *item = [self findItemByPlaylistId:pl_item->i_id];
+    PL_UNLOCK;
+
+    if (!item)
+        return;
+
+    NSInteger row = [_outlineView rowForItem:item];
+    if (row == -1)
+        return;
+
+    [_outlineView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row]
+                            columnIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[_outlineView tableColumns] count])]];
+
+}
+
 - (PLItem *)currentlyPlayingItem
 {
     PLItem *item = nil;
@@ -212,6 +239,9 @@
     PL_UNLOCK;
     return item;
 }
+
+#pragma mark -
+#pragma mark Sorting / Searching
 
 - (void)sortForColumn:(NSString *)o_column withMode:(int)i_mode
 {

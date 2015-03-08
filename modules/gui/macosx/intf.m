@@ -344,7 +344,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         case INPUT_EVENT_ITEM_INFO:
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateInfoandMetaPanel) withObject: nil waitUntilDone:NO];
+            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMetaAndInfo) withObject: nil waitUntilDone:NO];
             break;
         case INPUT_EVENT_BOOKMARK:
             break;
@@ -361,8 +361,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         case INPUT_EVENT_ITEM_NAME:
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-            // TODO update playlist item with new name
-//            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(playlistUpdated) withObject: nil waitUntilDone:NO];
             break;
 
         case INPUT_EVENT_AUDIO_DELAY:
@@ -1355,6 +1353,8 @@ static bool f_appExit = false;
         }
     }
 
+    [self updateMetaAndInfo];
+
     [o_mainwindow updateWindow];
     [self updateDelays];
     [self updateMainMenu];
@@ -1429,9 +1429,17 @@ static bool f_appExit = false;
     [o_mainmenu updateRecordState:b_value];
 }
 
-- (void)updateInfoandMetaPanel
+- (void)updateMetaAndInfo
 {
-    [o_playlist outlineViewSelectionDidChange:nil];
+    if (!p_current_input) {
+        [[self info] updatePanelWithItem:nil];
+        return;
+    }
+
+    input_item_t *p_input_item = input_GetItem(p_current_input);
+
+    [[[self playlist] model] updateItem:p_input_item];
+    [[self info] updatePanelWithItem:p_input_item];
 }
 
 - (void)resumeItunesPlayback:(id)sender
