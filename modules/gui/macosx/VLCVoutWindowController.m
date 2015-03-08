@@ -205,8 +205,9 @@
         [[VLCMainWindow sharedInstance] changePlaylistState: psVideoStartedOrStoppedEvent];
 
     if (b_nonembedded) {
-        // event occurs before window is created, so call again
-        [[VLCMain sharedInstance] playlistUpdated];
+        // events might be posted before window is created, so call them again
+        [[VLCMain sharedInstance] updateName];
+        [[VLCMain sharedInstance] updateMainWindow]; // update controls bar
     }
 
     // TODO: find a cleaner way for "start in fullscreen"
