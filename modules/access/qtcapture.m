@@ -42,10 +42,10 @@
 #import <QTKit/QTKit.h>
 #import <CoreAudio/CoreAudio.h>
 
-#define QTKIT_WIDTH_TEXT N_("Video Capture width")
-#define QTKIT_WIDTH_LONGTEXT N_("Video Capture width in pixel")
-#define QTKIT_HEIGHT_TEXT N_("Video Capture height")
-#define QTKIT_HEIGHT_LONGTEXT N_("Video Capture height in pixel")
+#define QTKIT_WIDTH_TEXT N_("Video capture width")
+#define QTKIT_WIDTH_LONGTEXT N_("Video capture width in pixels")
+#define QTKIT_HEIGHT_TEXT N_("Video capture height")
+#define QTKIT_HEIGHT_LONGTEXT N_("Video capture height in pixels")
 
 /*****************************************************************************
 * Local prototypes
@@ -69,7 +69,7 @@ vlc_module_begin ()
    add_integer("qtcapture-width", 640, QTKIT_WIDTH_TEXT, QTKIT_WIDTH_LONGTEXT, true)
       change_integer_range (80, 1280)
    add_integer("qtcapture-height", 480, QTKIT_HEIGHT_TEXT, QTKIT_HEIGHT_LONGTEXT, true)
-      change_integer_range (60, 480)
+      change_integer_range (60, 720)
 vlc_module_end ()
 
 
