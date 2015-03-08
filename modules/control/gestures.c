@@ -417,6 +417,11 @@ static int MovedEvent( vlc_object_t *p_this, char const *psz_var,
                 p_sys->i_pattern |= pattern << ( p_sys->i_num_gestures * 4 );
                 p_sys->i_num_gestures++;
             }
+            else if( p_sys->i_num_gestures == 0 )
+            {
+                p_sys->i_pattern = pattern;
+                p_sys->i_num_gestures++;
+            }
         }
 
     }
