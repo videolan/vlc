@@ -618,17 +618,16 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:  /* const video_format_t *p_source */
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {  /* const video_format_t *p_source */
         const vout_display_cfg_t *cfg;
-        const video_format_t *source;
 
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP ||
             query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT) {
+            const video_format_t *source = va_arg(args, const video_format_t *);
             cfg    = vd->cfg;
-            source = va_arg(args, const video_format_t *);
+            UpdateRects(vd, cfg, source, true);
         } else {
             cfg    = va_arg(args, const vout_display_cfg_t *);
-            source = &vd->source;
+            UpdateRects(vd, cfg, NULL, false);
         }
-        UpdateRects(vd, cfg, source, false);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
