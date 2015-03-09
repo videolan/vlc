@@ -66,6 +66,8 @@ struct aout_sys_t {
     mtime_t i_play_time; /* time when play was called */
     bool b_audiotrack_exception; /* true if audiotrack throwed an exception */
     int i_audiotrack_stuck_count;
+    uint8_t i_chans_to_reorder; /* do we need channel reordering */
+    uint8_t p_chan_table[AOUT_CHAN_MAX];
 
     /* JNIThread control */
     vlc_mutex_t mutex;
@@ -172,6 +174,15 @@ static struct
         bool has_ENCODING_PCM_FLOAT;
         jint CHANNEL_OUT_MONO;
         jint CHANNEL_OUT_STEREO;
+        jint CHANNEL_OUT_BACK_LEFT;
+        jint CHANNEL_OUT_BACK_RIGHT;
+        jint CHANNEL_OUT_FRONT_CENTER;
+        jint CHANNEL_OUT_LOW_FREQUENCY;
+        jint CHANNEL_OUT_BACK_CENTER;
+        jint CHANNEL_OUT_5POINT1;
+        jint CHANNEL_OUT_SIDE_LEFT;
+        jint CHANNEL_OUT_SIDE_RIGHT;
+        bool has_CHANNEL_OUT_SIDE;
     } AudioFormat;
     struct {
         jint ERROR_DEAD_OBJECT;
@@ -314,6 +325,19 @@ InitJNIFields( audio_output_t *p_aout )
 #endif
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_MONO, "CHANNEL_OUT_MONO", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_STEREO, "CHANNEL_OUT_STEREO", true );
+    GET_CONST_INT( AudioFormat.CHANNEL_OUT_5POINT1, "CHANNEL_OUT_5POINT1", true );
+    GET_CONST_INT( AudioFormat.CHANNEL_OUT_BACK_LEFT, "CHANNEL_OUT_BACK_LEFT", true );
+    GET_CONST_INT( AudioFormat.CHANNEL_OUT_BACK_RIGHT, "CHANNEL_OUT_BACK_RIGHT", true );
+    GET_CONST_INT( AudioFormat.CHANNEL_OUT_FRONT_CENTER, "CHANNEL_OUT_FRONT_CENTER", true );
+    GET_CONST_INT( AudioFormat.CHANNEL_OUT_LOW_FREQUENCY, "CHANNEL_OUT_LOW_FREQUENCY", true );
+    GET_CONST_INT( AudioFormat.CHANNEL_OUT_BACK_CENTER, "CHANNEL_OUT_BACK_CENTER", true );
+    GET_CONST_INT( AudioFormat.CHANNEL_OUT_SIDE_LEFT, "CHANNEL_OUT_SIDE_LEFT", false );
+    if( field != NULL )
+    {
+        GET_CONST_INT( AudioFormat.CHANNEL_OUT_SIDE_RIGHT, "CHANNEL_OUT_SIDE_RIGHT", true );
+        jfields.AudioFormat.has_CHANNEL_OUT_SIDE = true;
+    } else
+        jfields.AudioFormat.has_CHANNEL_OUT_SIDE = false;
 
     /* AudioManager class init */
     GET_CLASS( "android/media/AudioManager", true );
@@ -532,84 +556,233 @@ JNIThread_TimeGet( JNIEnv *env, audio_output_t *p_aout, mtime_t *p_delay )
         return -1;
 }
 
+static bool
+AudioTrack_GetChanOrder( int i_mask, uint32_t p_chans_out[] )
+{
+#define HAS_CHAN( x ) ( ( i_mask & (jfields.AudioFormat.x) ) == (jfields.AudioFormat.x) )
+    const int i_sides = jfields.AudioFormat.CHANNEL_OUT_SIDE_LEFT |
+                        jfields.AudioFormat.CHANNEL_OUT_SIDE_RIGHT;
+    const int i_backs = jfields.AudioFormat.CHANNEL_OUT_BACK_LEFT |
+                        jfields.AudioFormat.CHANNEL_OUT_BACK_RIGHT;
+
+    /* verify has FL/FR */
+    if ( !HAS_CHAN( CHANNEL_OUT_STEREO ) )
+        return false;
+
+    /* verify uses SIDE as a pair (ok if not using SIDE at all) */
+    bool b_has_sides = false;
+    if( jfields.AudioFormat.has_CHANNEL_OUT_SIDE && ( i_mask & i_sides ) != 0 )
+    {
+        if( ( i_mask & i_sides ) != i_sides )
+            return false;
+        b_has_sides = true;
+    }
+    /* verify uses BACK as a pair (ok if not using BACK at all) */
+    bool b_has_backs = false;
+    if( ( i_mask & i_backs ) != 0 )
+    {
+        if( ( i_mask & i_backs ) != i_backs )
+            return false;
+        b_has_backs = true;
+    }
+
+    const bool b_has_FC   = HAS_CHAN( CHANNEL_OUT_FRONT_CENTER );
+    const bool b_has_LFE  = HAS_CHAN( CHANNEL_OUT_LOW_FREQUENCY );
+    const bool b_has_BC   = HAS_CHAN( CHANNEL_OUT_BACK_CENTER );
+
+    /* compute at what index each channel is: samples will be in the following
+     * order: FL FR FC LFE BL BR BC SL SR
+     * when a channel is not present, its index is set to the same as the index
+     * of the preceding channel. */
+
+    const int i_FC  = b_has_FC    ? 2           : 1;
+    const int i_LFE = b_has_LFE   ? i_FC + 1    : i_FC;
+    const int i_BL  = b_has_backs ? i_LFE + 1   : i_LFE;
+    const int i_BR  = b_has_backs ? i_BL + 1    : i_BL;
+    const int i_BC  = b_has_BC    ? i_BR + 1    : i_BR;
+    const int i_SL  = b_has_sides ? i_BC + 1    : i_BC;
+    const int i_SR  = b_has_sides ? i_SL + 1    : i_SL;
+
+    p_chans_out[0] = AOUT_CHAN_LEFT;
+    p_chans_out[1] = AOUT_CHAN_RIGHT;
+    if( b_has_FC )
+        p_chans_out[i_FC] = AOUT_CHAN_CENTER;
+    if( b_has_LFE )
+        p_chans_out[i_LFE] = AOUT_CHAN_LFE;
+    if( b_has_backs )
+    {
+        p_chans_out[i_BL] = AOUT_CHAN_REARLEFT;
+        p_chans_out[i_BR] = AOUT_CHAN_REARRIGHT;
+    }
+    if( b_has_BC )
+        p_chans_out[i_BC] = AOUT_CHAN_REARCENTER;
+    if( b_has_sides )
+    {
+        p_chans_out[i_SL] = AOUT_CHAN_MIDDLELEFT;
+        p_chans_out[i_SR] = AOUT_CHAN_MIDDLERIGHT;
+    }
+
+#undef HAS_CHAN
+    return true;
+}
+
+
+/**
+ * Configure and create an Android AudioTrack.
+ * returns -1 on critical error, 0 on success, 1 on configuration error
+ */
 static int
-JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
+JNIThread_Configure( JNIEnv *env, audio_output_t *p_aout )
 {
     struct aout_sys_t *p_sys = p_aout->sys;
-    int i_size, i_min_buffer_size, i_channel_config, i_rate, i_format,
+    int i_size, i_min_buffer_size, i_channel_config, i_format,
         i_format_size, i_nb_channels;
+    uint8_t i_chans_to_reorder = 0;
+    uint8_t p_chan_table[AOUT_CHAN_MAX];
     jobject p_audiotrack;
+    audio_sample_format_t fmt = p_sys->fmt;
 
     /* 4000 <= frequency <= 48000 */
-    i_rate = p_sys->fmt.i_rate;
-    if( i_rate < 4000 )
-        i_rate = 4000;
-    if( i_rate > 48000 )
-        i_rate = 48000;
+    if( fmt.i_rate < 4000 )
+        fmt.i_rate = 4000;
+    if( fmt.i_rate > 48000 )
+        fmt.i_rate = 48000;
 
-    /* We can only accept U8, S16N, and FL32 (depending on Android version) */
-    if( p_sys->fmt.i_format != VLC_CODEC_U8
-        && p_sys->fmt.i_format != VLC_CODEC_S16N
-        && p_sys->fmt.i_format != VLC_CODEC_FL32 )
-        p_sys->fmt.i_format = VLC_CODEC_S16N;
-
-    if( p_sys->fmt.i_format == VLC_CODEC_FL32
-        && !jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
-        p_sys->fmt.i_format = VLC_CODEC_S16N;
-
-    if( p_sys->fmt.i_format == VLC_CODEC_S16N )
+    /* We can only accept U8, S16N, FL32 */
+    switch( fmt.i_format )
     {
-        i_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
-        i_format_size = 2;
-    } else if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
+        case VLC_CODEC_U8:
+            break;
+        case VLC_CODEC_S16N:
+            break;
+        case VLC_CODEC_FL32:
+            if( !jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
+                fmt.i_format = VLC_CODEC_S16N;
+            break;
+        default:
+            fmt.i_format = VLC_CODEC_S16N;
+            break;
+    }
+    switch( fmt.i_format )
     {
-        i_format = jfields.AudioFormat.ENCODING_PCM_FLOAT;
-        i_format_size = 4;
+        case VLC_CODEC_U8:
+            i_format = jfields.AudioFormat.ENCODING_PCM_8BIT;
+            i_format_size = 1;
+            break;
+        case VLC_CODEC_S16N:
+            i_format = jfields.AudioFormat.ENCODING_PCM_16BIT;
+            i_format_size = 2;
+            break;
+        case VLC_CODEC_FL32:
+            i_format = jfields.AudioFormat.ENCODING_PCM_FLOAT;
+            i_format_size = 4;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    i_nb_channels = aout_FormatNbChannels( &fmt );
+
+    /* Android AudioTrack support only mono, stereo, 5.1 and 7.1.
+     * Android will downmix to stereo if audio output doesn't handle 5.1 or 7.1
+     */
+    if( i_nb_channels > 5 )
+    {
+        uint32_t p_chans_out[AOUT_CHAN_MAX];
+
+        if( i_nb_channels > 7 && jfields.AudioFormat.has_CHANNEL_OUT_SIDE )
+        {
+            fmt.i_physical_channels = AOUT_CHANS_7_1;
+            /* bitmak of CHANNEL_OUT_7POINT1 doesn't correspond to 5POINT1 and
+             * SIDES */
+            i_channel_config = jfields.AudioFormat.CHANNEL_OUT_5POINT1 |
+                               jfields.AudioFormat.CHANNEL_OUT_SIDE_LEFT |
+                               jfields.AudioFormat.CHANNEL_OUT_SIDE_RIGHT;
+        } else
+        {
+            fmt.i_physical_channels = AOUT_CHANS_5_1;
+            i_channel_config = jfields.AudioFormat.CHANNEL_OUT_5POINT1;
+        }
+        if( AudioTrack_GetChanOrder( i_channel_config, p_chans_out ) )
+            i_chans_to_reorder =
+                aout_CheckChannelReorder( NULL, p_chans_out,
+                                          fmt.i_physical_channels,
+                                          p_chan_table );
+        else
+            return 1;
     } else
     {
-        i_format = jfields.AudioFormat.ENCODING_PCM_8BIT;
-        i_format_size = 1;
+        if( i_nb_channels == 1 )
+        {
+            i_channel_config = jfields.AudioFormat.CHANNEL_OUT_MONO;
+        } else
+        {
+            fmt.i_physical_channels = AOUT_CHANS_STEREO;
+            i_channel_config = jfields.AudioFormat.CHANNEL_OUT_STEREO;
+        }
     }
-    p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
+    i_nb_channels = aout_FormatNbChannels( &fmt );
 
-    i_nb_channels = aout_FormatNbChannels( &p_sys->fmt );
-    switch( i_nb_channels )
-    {
-    case 1:
-        i_channel_config = jfields.AudioFormat.CHANNEL_OUT_MONO;
-        p_sys->fmt.i_physical_channels = AOUT_CHAN_CENTER;
-        break;
-    default:
-        i_nb_channels = 2; // XXX: AudioTrack handle only stereo for now
-    case 2:
-        i_channel_config = jfields.AudioFormat.CHANNEL_OUT_STEREO;
-        p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
-        break;
-    }
-
-    i_min_buffer_size = JNI_AT_CALL_STATIC_INT( getMinBufferSize, i_rate,
+    i_min_buffer_size = JNI_AT_CALL_STATIC_INT( getMinBufferSize, fmt.i_rate,
                                                 i_channel_config, i_format );
     if( i_min_buffer_size <= 0 )
     {
         msg_Warn( p_aout, "getMinBufferSize returned an invalid size" ) ;
-        /* use a defaut min buffer size (shouldn't happen) */
-        i_min_buffer_size = i_nb_channels * i_format_size * 2048;
+        return 1;
     }
-
     i_size = i_min_buffer_size * 4;
-    p_sys->i_bytes_per_frame = i_nb_channels * i_format_size;
-    p_sys->i_max_audiotrack_samples = i_size / p_sys->i_bytes_per_frame;
 
     /* create AudioTrack object */
-    p_audiotrack = JNI_AT_NEW( jfields.AudioManager.STREAM_MUSIC, i_rate,
+    p_audiotrack = JNI_AT_NEW( jfields.AudioManager.STREAM_MUSIC, fmt.i_rate,
                                i_channel_config, i_format, i_size,
                                jfields.AudioTrack.MODE_STREAM );
     if( CHECK_AT_EXCEPTION( "AudioTrack<init>" ) || !p_audiotrack )
-        return VLC_EGENERIC;
+        return 1;
     p_sys->p_audiotrack = (*env)->NewGlobalRef( env, p_audiotrack );
     (*env)->DeleteLocalRef( env, p_audiotrack );
     if( !p_sys->p_audiotrack )
+        return -1;
+
+    p_sys->i_chans_to_reorder = i_chans_to_reorder;
+    if( i_chans_to_reorder )
+        memcpy( p_sys->p_chan_table, p_chan_table, sizeof(p_sys->p_chan_table) );
+    p_sys->i_bytes_per_frame = i_nb_channels * i_format_size;
+    p_sys->i_max_audiotrack_samples = i_size / p_sys->i_bytes_per_frame;
+    p_sys->fmt = fmt;
+
+    return 0;
+}
+
+static int
+JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    int i_ret;
+
+    aout_FormatPrint( p_aout, "VLC is looking for:", &p_sys->fmt );
+    p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
+
+    i_ret = JNIThread_Configure( env, p_aout );
+    if( i_ret == 1 )
+    {
+        /* configuration error, try to fallback to stereo */
+        if( ( p_sys->fmt.i_format != VLC_CODEC_U8 &&
+              p_sys->fmt.i_format != VLC_CODEC_S16N ) ||
+            aout_FormatNbChannels( &p_sys->fmt ) > 2 )
+        {
+            msg_Warn( p_aout,
+                      "AudioTrack configuration failed, try again in stereo" );
+            p_sys->fmt.i_format = VLC_CODEC_S16N;
+            p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
+
+            i_ret = JNIThread_Configure( env, p_aout );
+        }
+    }
+    if( i_ret != 0 )
         return VLC_EGENERIC;
+
+    aout_FormatPrint( p_aout, "VLC will output:", &p_sys->fmt );
+
     if( JNI_AT_CALL_INT( getState ) != jfields.AudioTrack.STATE_INITIALIZED )
     {
         msg_Err( p_aout, "AudioTrack init failed" );
@@ -631,8 +804,6 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
             goto error;
     }
 #endif
-
-    p_sys->fmt.i_rate = i_rate;
 
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
@@ -997,7 +1168,16 @@ JNIThread( void *data )
                 if( b_error )
                     break;
                 if( p_buffer == NULL )
+                {
                     p_buffer = p_cmd->in.play.p_buffer;
+                    if( p_sys->i_chans_to_reorder )
+                       aout_ChannelReorder( p_buffer->p_buffer,
+                                            p_buffer->i_buffer,
+                                            p_sys->i_chans_to_reorder,
+                                            p_sys->p_chan_table,
+                                            p_sys->fmt.i_format );
+
+                }
                 b_error = JNIThread_Play( env, p_aout, &p_buffer,
                                           &i_play_wait ) != VLC_SUCCESS;
                 if( p_buffer != NULL )
