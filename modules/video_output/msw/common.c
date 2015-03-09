@@ -461,10 +461,26 @@ void UpdateRects(vout_display_t *vd,
 #endif
 
 #ifndef NDEBUG
+    msg_Dbg(vd, "DirectXUpdateRects souce"
+                " offset: %i,%i visible: %ix%i",
+                source->i_x_offset, source->i_y_offset,
+                source->i_visible_width, source->i_visible_height);
+    msg_Dbg(vd, "DirectXUpdateRects image_src"
+                " coords: %li,%li,%li,%li",
+                rect_src.left, rect_src.top,
+                rect_src.right, rect_src.bottom);
     msg_Dbg(vd, "DirectXUpdateRects image_src_clipped"
                 " coords: %li,%li,%li,%li",
                 rect_src_clipped.left, rect_src_clipped.top,
                 rect_src_clipped.right, rect_src_clipped.bottom);
+    msg_Dbg(vd, "DirectXUpdateRects image_dst"
+                " coords: %li,%li,%li,%li",
+                rect_dest.left, rect_dest.top,
+                rect_dest.right, rect_dest.bottom);
+    msg_Dbg(vd, "DirectXUpdateRects image_dst_clipped"
+                " coords: %li,%li,%li,%li",
+                rect_dest_clipped.left, rect_dest_clipped.top,
+                rect_dest_clipped.right, rect_dest_clipped.bottom);
 #endif
 
 #ifdef MODULE_NAME_IS_directdraw

@@ -981,6 +981,12 @@ static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
         msg_Err(vd, "Failed to create picture surface. (hr=0x%lx)", hr);
         return VLC_EGENERIC;
     }
+
+#ifndef NDEBUG
+    msg_Dbg(vd, "Direct3D created offscreen surface: %ix%i",
+                fmt->i_visible_width, fmt->i_visible_height);
+#endif
+
     /* fill surface with black color */
     IDirect3DDevice9_ColorFill(d3ddev, surface, NULL, D3DCOLOR_ARGB(0xFF, 0, 0, 0));
 
@@ -1066,6 +1072,11 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
         msg_Err(vd, "Failed to create texture. (hr=0x%lx)", hr);
         return VLC_EGENERIC;
     }
+
+#ifndef NDEBUG
+    msg_Dbg(vd, "Direct3D created texture: %ix%i",
+                fmt->i_visible_width, fmt->i_visible_height);
+#endif
 
     /*
     ** Create a vertex buffer for use when rendering scene
