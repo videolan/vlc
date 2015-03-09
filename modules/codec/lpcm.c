@@ -434,13 +434,6 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         p_block->p_buffer += p_sys->i_header_size + i_padding;
         p_block->i_buffer -= p_sys->i_header_size + i_padding;
 
-        if( p_sys->i_chans_to_reorder )
-        {
-            aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
-                                 p_sys->i_chans_to_reorder, p_sys->pi_chan_table,
-                                 p_dec->fmt_out.i_codec );
-        }
-
         switch( p_sys->i_type )
         {
         case LPCM_WIDI:
@@ -455,6 +448,13 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         case LPCM_BD:
             BdExtract( p_aout_buffer, p_block, i_frame_length, i_channels, i_channels_padding, i_bits );
             break;
+        }
+
+        if( p_sys->i_chans_to_reorder )
+        {
+            aout_ChannelReorder( p_aout_buffer->p_buffer, p_aout_buffer->i_buffer,
+                                 p_sys->i_chans_to_reorder, p_sys->pi_chan_table,
+                                 p_dec->fmt_out.i_codec );
         }
 
         block_Release( p_block );
