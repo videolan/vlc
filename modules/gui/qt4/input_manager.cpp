@@ -132,7 +132,7 @@ void InputManager::setInput( input_thread_t *_p_input )
         /* Get Saved Time */
         if( p_item->i_type == ITEM_TYPE_FILE )
         {
-            int i_time = RecentsMRL::getInstance( p_intf )->time( p_item->psz_uri );
+            int i_time = RecentsMRL::getInstance( p_intf )->time( qfu(uri) );
             if( i_time > 0 && qfu( uri ) != lastURI &&
                     !var_GetFloat( p_input, "run-time" ) &&
                     !var_GetFloat( p_input, "start-time" ) &&
@@ -164,13 +164,18 @@ void InputManager::delInput()
     msg_Dbg( p_intf, "IM: Deleting the input" );
 
     /* Save time / position */
-    float f_pos = var_GetFloat( p_input , "position" );
-    int64_t i_time = var_GetTime( p_input, "time");
-    int i_length = var_GetTime( p_input , "length" ) / CLOCK_FREQ;
-    if( f_pos < 0.05 || f_pos > 0.95 || i_length < 60) {
-        i_time = -1;
+    char *uri = input_item_GetURI( p_item );
+    if( uri != NULL ) {
+        float f_pos = var_GetFloat( p_input , "position" );
+        int64_t i_time = -1;
+
+        if( f_pos >= 0.05f && f_pos <= 0.95f
+         && var_GetTime( p_input, "length" ) >= 60 * CLOCK_FREQ )
+            i_time = var_GetTime( p_input, "time");
+
+        RecentsMRL::getInstance( p_intf )->setTime( qfu(uri), i_time );
+        free(uri);
     }
-    RecentsMRL::getInstance( p_intf )->setTime( p_item->psz_uri, i_time );
 
     delCallbacks();
     i_old_playing_status = END_S;
