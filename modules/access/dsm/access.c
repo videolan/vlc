@@ -239,10 +239,10 @@ static void Close( vlc_object_t *p_this )
         smb_fclose( p_sys->p_session, p_sys->i_fd );
     if( p_sys->p_session )
         smb_session_destroy( p_sys->p_session );
+    vlc_UrlClean( &p_sys->url );
     free( p_sys->creds.login );
     free( p_sys->creds.password );
     free( p_sys->creds.domain );
-    free( p_sys->url.psz_buffer );
     free( p_sys->psz_share );
     free( p_sys->psz_path );
     free( p_sys );
