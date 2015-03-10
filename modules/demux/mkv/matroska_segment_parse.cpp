@@ -1373,6 +1373,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     {
         p_tk->fmt.i_codec = VLC_CODEC_VP9;
         p_tk->fmt.b_packetized = false;
+        p_tk->b_pts_only = true;
         fill_extra_data( p_tk, 0 );
     }
     else if( !strncmp( p_tk->psz_codec, "V_MPEG4", 7 ) )
