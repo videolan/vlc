@@ -1146,8 +1146,9 @@ static void AobExtract( block_t *p_aout_buffer,
                     else
                     {
                         assert( i_bits == 16 );
-                        p_out[2*i_dst+0] = p_block->p_buffer[2*i_src+0];
-                        p_out[2*i_dst+1] = p_block->p_buffer[2*i_src+1];
+                        /* Big Endian -> Little Endian */
+                        p_out[2*i_dst+1] = p_block->p_buffer[2*i_src+0];
+                        p_out[2*i_dst+0] = p_block->p_buffer[2*i_src+1];
                     }
                 }
             }
