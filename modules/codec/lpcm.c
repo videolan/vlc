@@ -171,7 +171,7 @@ enum
 typedef struct
 {
     unsigned i_channels;
-    bool     b_used;
+    unsigned i_bits;
     unsigned pi_position[6];
 } aob_group_t;
 
@@ -393,8 +393,19 @@ static block_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     p_dec->fmt_out.audio.i_original_channels = i_original_channels;
     p_dec->fmt_out.audio.i_physical_channels = i_original_channels;
 
-    i_frame_length = (p_block->i_buffer - p_sys->i_header_size - i_padding) /
-                     (i_channels + i_channels_padding) * 8 / i_bits;
+    if ( p_sys->i_type == LPCM_AOB )
+    {
+        i_frame_length = (p_block->i_buffer - p_sys->i_header_size - i_padding) /
+                         (
+                            ( (p_aob_group[0].i_bits / 8) * p_aob_group[0].i_channels ) +
+                            ( (p_aob_group[1].i_bits / 8) * p_aob_group[1].i_channels )
+                         );
+    }
+    else
+    {
+        i_frame_length = (p_block->i_buffer - p_sys->i_header_size - i_padding) /
+                         (i_channels + i_channels_padding) * 8 / i_bits;
+    }
 
     if( p_sys->b_packetizer )
     {
@@ -801,7 +812,25 @@ static int AobHeader( unsigned *pi_rate,
         return VLC_EGENERIC;
 
     /* */
-    *pi_bits = 16 + 4 * i_index_size_g1;
+    /* max is 0x2, 0xf == unused */
+    g[0].i_bits = ( i_index_size_g1 != 0x0f ) ? 16 + 4 * i_index_size_g1 : 0;
+    g[1].i_bits = ( i_index_size_g2 != 0x0f ) ? 16 + 4 * i_index_size_g2 : 0;
+
+    /* No info about interlacing of different sampling rate */
+    if ( g[1].i_bits && ( i_index_rate_g1 != i_index_rate_g2 ) )
+        return VLC_EGENERIC;
+
+    /* only set 16bits if both are <= */
+    if( g[0].i_bits )
+    {
+        if( g[0].i_bits > 16 || g[1].i_bits > 16 )
+            *pi_bits = 32;
+        else
+            *pi_bits = 16;
+    }
+    else
+        return VLC_EGENERIC;
+
     if( i_index_rate_g1 & 0x08 )
         *pi_rate = 44100 << (i_index_rate_g1 & 0x07);
     else
@@ -828,13 +857,10 @@ static int AobHeader( unsigned *pi_rate,
         }
         assert( (i_layout1 & i_layout2) == 0 );
     }
-    /* It is enabled only when presents and compatible wih group1 */
-    const bool b_group2_used = i_index_size_g1 == i_index_size_g2 &&
-                               i_index_rate_g1 == i_index_rate_g2;
 
     /* */
-    *pi_channels = i_channels1 + ( b_group2_used ? i_channels2 : 0 );
-    *pi_layout   = i_layout1   | ( b_group2_used ? i_layout2   : 0 );
+    *pi_channels = i_channels1 + ( g[1].i_bits ? i_channels2 : 0 );
+    *pi_layout   = i_layout1   | ( g[1].i_bits ? i_layout2   : 0 );
 
     /* */
     for( unsigned i = 0; i < 2; i++ )
@@ -844,8 +870,7 @@ static int AobHeader( unsigned *pi_rate,
         g[i].i_channels = i == 0 ? i_channels1 :
                                    i_channels2;
 
-        g[i].b_used = i == 0 || b_group2_used;
-        if( !g[i].b_used )
+        if( !g[i].i_bits )
             continue;
         for( unsigned j = 0; j < g[i].i_channels; j++ )
         {
@@ -1102,62 +1127,93 @@ static void VobExtract( block_t *p_aout_buffer, block_t *p_block,
 #endif
     }
 }
+
 static void AobExtract( block_t *p_aout_buffer,
-                        block_t *p_block, unsigned i_bits, aob_group_t p_group[2] )
+                        block_t *p_block, unsigned i_aoutbits, aob_group_t p_group[2] )
 {
-    const unsigned i_channels = p_group[0].i_channels +
-                                ( p_group[1].b_used ? p_group[1].i_channels : 0 );
     uint8_t *p_out = p_aout_buffer->p_buffer;
+    const unsigned i_total_channels = p_group[0].i_channels +
+                                      ( p_group[1].i_bits ? p_group[1].i_channels : 0 );
 
     while( p_block->i_buffer > 0 )
     {
         for( int i = 0; i < 2; i++ )
         {
             const aob_group_t *g = &p_group[1-i];
-            const unsigned int i_group_size = 2 * g->i_channels * i_bits / 8;
+            const unsigned int i_group_size = 2 * g->i_channels * g->i_bits / 8;
 
             if( p_block->i_buffer < i_group_size )
             {
                 p_block->i_buffer = 0;
                 break;
             }
+
+            if( !g->i_bits )
+                continue;
+
+            unsigned int i_aout_written = 0;
             for( unsigned n = 0; n < 2; n++ )
             {
-                for( unsigned j = 0; j < g->i_channels && g->b_used; j++ )
+                for( unsigned j = 0; j < g->i_channels; j++ )
                 {
                     const int i_src = n * g->i_channels + j;
-                    const int i_dst = n * i_channels + g->pi_position[j];
+                    const int i_dst = n * i_total_channels + g->pi_position[j];
+                    uint32_t *p_out32 = (uint32_t *) &p_out[4*i_dst];
 
-                    if( i_bits == 24 )
+                    if( g->i_bits == 24 )
                     {
-                        p_out[3*i_dst+0] = p_block->p_buffer[2*i_src+0];
-                        p_out[3*i_dst+1] = p_block->p_buffer[2*i_src+1];
-                        p_out[3*i_dst+2] = p_block->p_buffer[4*g->i_channels+i_src];
+                        assert( i_aoutbits == 32 );
+                        *p_out32 = (p_block->p_buffer[2*i_src+0] << 24)
+                                 | (p_block->p_buffer[2*i_src+1] << 16)
+                                 | (p_block->p_buffer[4*g->i_channels+i_src] <<  8);
+#ifdef WORDS_BIGENDIAN
+                        *p_out32 = bswap32(*p_out32);
+#endif
+                        i_aout_written += 4;
                     }
-                    else if( i_bits == 20 )
+                    else if( g->i_bits == 20 )
                     {
-                        p_out[3*i_dst+0] = p_block->p_buffer[2*i_src+0];
-                        p_out[3*i_dst+1] = p_block->p_buffer[2*i_src+1];
-                        if( n == 0 )
-                            p_out[3*i_dst+2] = (p_block->p_buffer[4*g->i_channels+i_src]     ) & 0xf0;
-                        else
-                            p_out[3*i_dst+2] = (p_block->p_buffer[4*g->i_channels+i_src] << 4) & 0xf0;
+                        assert( i_aoutbits == 32 );
+                        *p_out32 = (p_block->p_buffer[2*i_src+0] << 24)
+                                 | (p_block->p_buffer[2*i_src+1] << 16)
+                                 | (((p_block->p_buffer[4*g->i_channels+i_src] << ((!n)?0:4) ) & 0xf0) <<  8);
+#ifdef WORDS_BIGENDIAN
+                        *p_out32 = bswap32(*p_out32);
+#endif
+                        i_aout_written += 4;
                     }
                     else
                     {
-                        assert( i_bits == 16 );
-                        /* Big Endian -> Little Endian */
-                        p_out[2*i_dst+1] = p_block->p_buffer[2*i_src+0];
-                        p_out[2*i_dst+0] = p_block->p_buffer[2*i_src+1];
+                        assert( g->i_bits == 16 );
+                        assert( i_aoutbits == 16 || i_aoutbits == 32 );
+                        if( i_aoutbits == 16 )
+                        {
+#ifdef WORDS_BIGENDIAN
+                            memcpy( &p_out[2*i_dst], &p_block->p_buffer[2*i_src], 2 );
+#else
+                            p_out[2*i_dst+1] = p_block->p_buffer[2*i_src+0];
+                            p_out[2*i_dst+0] = p_block->p_buffer[2*i_src+1];
+#endif
+                            i_aout_written += 2;
+                        }
+                        else
+                        {
+                            *p_out32 = (p_block->p_buffer[2*i_src+0] << 24)
+                                     | (p_block->p_buffer[2*i_src+1] << 16);
+#ifdef WORDS_BIGENDIAN
+                            *p_out32 = bswap32(*p_out32);
+#endif
+                            i_aout_written += 4;
+                        }
                     }
                 }
             }
 
+            /* */
+            p_out += i_aout_written;
             p_block->i_buffer -= i_group_size;
             p_block->p_buffer += i_group_size;
         }
-        /* */
-        p_out += (i_bits == 16 ? 2 : 3) * i_channels * 2;
 
     }
 }
