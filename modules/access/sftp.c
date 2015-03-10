@@ -299,6 +299,7 @@ static block_t* Block( access_t* p_access )
     }
     else
     {
+        p_block->i_buffer = i_ret;
         p_access->info.i_pos += i_ret;
         return p_block;
     }
