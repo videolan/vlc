@@ -87,6 +87,26 @@ static inline void test_current_directory_path (const char *in, const char *cwd,
     test (make_URI_def, in, expected_result);
 }
 
+static void test_url_parse(const char* in, const char* protocol, const char* user,
+                           const char* pass, const char* host, unsigned i_port,
+                           const char* path, const char* option )
+{
+#define CHECK( a, b ) assert(((a == NULL) && (b == NULL)) || !strcmp((a), (b)))
+    vlc_url_t url;
+    vlc_UrlParse( &url, in, '?' );
+    CHECK( url.psz_protocol, protocol );
+    CHECK( url.psz_username, user );
+    CHECK( url.psz_password, pass );
+    CHECK( url.psz_host, host );
+    CHECK( url.psz_path, path );
+    assert( url.i_port == i_port );
+    CHECK( url.psz_option, option );
+
+    vlc_UrlClean( &url );
+
+#undef CHECK
+}
+
 int main (void)
 {
     int val;
@@ -155,6 +175,12 @@ int main (void)
     test ("fd://1", "/dev/stdout");
     test ("fd://12345", "/dev/fd/12345");
 #undef test
+
+    test_url_parse("http://test.com", "http", NULL, NULL, "test.com", 0, NULL, NULL);
+    test_url_parse("http://test.com/", "http", NULL, NULL, "test.com", 0, "/", NULL);
+    test_url_parse("protocol://john:doe@1.2.3.4:567", "protocol", "john", "doe", "1.2.3.4", 567, NULL, NULL);
+    test_url_parse("http://a.b/?opt=val", "http", NULL, NULL, "a.b", 0, "/", "opt=val");
+    test_url_parse("p://u:p@host:123/a/b/c?o=v", "p", "u", "p", "host", 123, "/a/b/c", "o=v");
 
     return 0;
 }
