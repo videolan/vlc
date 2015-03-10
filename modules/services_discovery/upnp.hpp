@@ -7,6 +7,7 @@
  * Authors: Rémi Denis-Courmont <rem # videolan.org> (original plugin)
  *          Christian Henz <henz # c-lab.de>
  *          Mirsal Ennaime <mirsal dot ennaime at gmail dot com>
+ *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *
  * UPnP Plugin using the Intel SDK (libupnp) instead of CyberLink
  *
@@ -33,62 +34,55 @@
 
 #include <vlc_common.h>
 
-// Classes
-class Container;
-
-class MediaServer
+namespace SD
 {
-public:
+    class MediaServerList;
+}
 
-    static void parseDeviceDescription( IXML_Document* p_doc,
-                                        const char*    psz_location,
-                                        services_discovery_t* p_sd );
-
-    MediaServer( const char* psz_udn,
-                 const char* psz_friendly_name,
-                 services_discovery_t* p_sd );
-
-    ~MediaServer();
-
-    const char* getUDN() const;
-    const char* getFriendlyName() const;
-
-    void setContentDirectoryEventURL( const char* psz_url );
-    const char* getContentDirectoryEventURL() const;
-
-    void setContentDirectoryControlURL( const char* psz_url );
-    const char* getContentDirectoryControlURL() const;
-
-    void subscribeToContentDirectory();
-    void fetchContents();
-
-    void setInputItem( input_item_t* p_input_item );
-    input_item_t* getInputItem() const;
-
-    bool compareSID( const char* psz_sid );
+/*
+ * libUpnp allows only one instance per process, so we have to share one for
+ * both SD & Access module
+ * Since the callback is bound to the UpnpClient_Handle, we have to register
+ * a wrapper callback, in order for the access module to be able to initialize
+ * libUpnp first.
+ * When a SD wishes to use libUpnp, it will provide its own callback, that the
+ * wrapper will forward.
+ * This way, we always have a register callback & a client handle.
+ */
+class UpnpInstanceWrapper
+{
+public:    
+    // This increases the refcount before returning the instance
+    static UpnpInstanceWrapper* get(vlc_object_t* p_obj, Upnp_FunPtr callback, SD::MediaServerList *opaque);
+    void release(bool isSd);
+    UpnpClient_Handle handle() const;
 
 private:
+    static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data );
 
-    bool _fetchContents( Container* p_parent, int i_starting_index );
-    void _buildPlaylist( Container* p_container, input_item_node_t *p_item_node );
+    UpnpInstanceWrapper();
+    ~UpnpInstanceWrapper();
 
-    IXML_Document* _browseAction( const char*, const char*,
-            const char*, const char*, const char*, const char* );
+private:
+    static UpnpInstanceWrapper* s_instance;
+    static vlc_mutex_t s_lock;
+    UpnpClient_Handle handle_;
+    SD::MediaServerList* opaque_;
+    Upnp_FunPtr callback_;
+    int refcount_;
+};
 
-    services_discovery_t* _p_sd;
+namespace SD
+{
 
-    Container* _p_contents;
-    input_item_t* _p_input_item;
-
-    std::string _UDN;
-    std::string _friendly_name;
-
-    std::string _content_directory_event_url;
-    std::string _content_directory_control_url;
-
-    int _i_subscription_timeout;
-    int _i_content_directory_service_version;
-    Upnp_SID _subscription_id;
+struct MediaServerDesc
+{
+    MediaServerDesc(const std::string& udn, const std::string& fName, const std::string& loc);
+    ~MediaServerDesc();
+    std::string UDN;
+    std::string friendlyName;
+    std::string location;
+    input_item_t* inputItem;
 };
 
 
@@ -99,87 +93,45 @@ public:
     MediaServerList( services_discovery_t* p_sd );
     ~MediaServerList();
 
-    bool addServer( MediaServer* p_server );
-    void removeServer( const char* psz_udn );
-
-    MediaServer* getServer( const char* psz_udn );
-    MediaServer* getServerBySID( const char* psz_sid );
+    bool addServer(MediaServerDesc *desc );
+    void removeServer(const std::string &udn );
+    MediaServerDesc* getServer( const std::string& udn );
+    static int Callback( Upnp_EventType event_type, void* p_event, void* p_user_data );
 
 private:
+    void parseNewServer( IXML_Document* doc, const std::string& location );
 
-    services_discovery_t* _p_sd;
-
-    std::vector<MediaServer*> _list;
+private:
+    services_discovery_t* p_sd_;
+    std::vector<MediaServerDesc*> list_;
+    vlc_mutex_t lock_;
 };
 
+}
 
-class Item
+namespace Access
+{
+
+class MediaServer
 {
 public:
-
-    Item( Container*  parent,
-          const char* objectID,
-          const char* title,
-          const char* subtitles,
-          const char* resource,
-          mtime_t duration );
-    ~Item();
-
-    const char* getObjectID() const;
-    const char* getTitle() const;
-    const char* getResource() const;
-    const char* getSubtitles() const;
-    char* buildInputSlaveOption() const;
-    char* buildSubTrackIdOption() const;
-    mtime_t getDuration() const;
-
-    void setInputItem( input_item_t* p_input_item );
+    MediaServer( const char* psz_url, access_t* p_access, input_item_node_t* node );
+    bool fetchContents();
 
 private:
+    MediaServer(const MediaServer&);
+    MediaServer& operator=(const MediaServer&);
 
-    input_item_t* _p_input_item;
+    void addItem(const char* objectID, const char* title);
+    void addItem(const char* title, const char* psz_objectID, const char* psz_subtitles, mtime_t duration, const char* psz_url );
 
-    Container* _parent;
-    std::string _objectID;
-    std::string _title;
-    std::string _resource;
-    std::string _subtitles;
-    mtime_t _duration;
-};
-
-
-class Container
-{
-public:
-
-    Container( Container* parent, const char* objectID, const char* title );
-    ~Container();
-
-    void addItem( Item* item );
-    void addContainer( Container* container );
-
-    const char* getObjectID() const;
-    const char* getTitle() const;
-
-    unsigned int getNumItems() const;
-    unsigned int getNumContainers() const;
-
-    Item* getItem( unsigned int i ) const;
-    Container* getContainer( unsigned int i ) const;
-    Container* getParent();
-
-    void setInputItem( input_item_t* p_input_item );
-    input_item_t* getInputItem() const;
+    IXML_Document* _browseAction(const char*, const char*,
+            const char*, const char*, const char* );
 
 private:
-
-    input_item_t* _p_input_item;
-
-    Container* _parent;
-
-    std::string _objectID;
-    std::string _title;
-    std::vector<Item*> _items;
-    std::vector<Container*> _containers;
+    const std::string url_;
+    access_t* access_;
+    input_item_node_t* node_;
 };
 
+}
