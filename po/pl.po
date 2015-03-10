@@ -5,7 +5,7 @@
 # Translators:
 # Marcin Szymański <cysioland@gmail.com>, 2013
 # Gootector <gootector@o2.pl>, 2013-2014
-# Marcin Szymański <cysioland@gmail.com>, 2013
+# Cysioland <cysioland@gmail.com>, 2013
 # Michał Trzebiatowski <hippie_1968@hotmail.com>, 2007-2014
 # robaks, 2013
 msgid ""
