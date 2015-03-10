@@ -3,9 +3,8 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Marcin Szymański <cysioland@gmail.com>, 2013
-# Gootector <gootector@o2.pl>, 2013-2014
 # Cysioland <cysioland@gmail.com>, 2013
+# Gootector <gootector@o2.pl>, 2013-2014
 # Michał Trzebiatowski <hippie_1968@hotmail.com>, 2007-2014
 # robaks, 2013
 msgid ""
