@@ -2136,8 +2136,6 @@ static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header, size_t i_h
         {
             /* mpeg2 PES */
             i_skip = p_header[8] + 9;
-            if( i_header < i_skip )
-                return VLC_EGENERIC;
 
             if( p_header[7]&0x80 )    /* has pts */
             {
@@ -2202,9 +2200,6 @@ static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header, size_t i_h
         }
         break;
     }
-
-    if( i_header < i_skip )
-        return VLC_EGENERIC;
 
     *pi_skip = i_skip;
     return VLC_SUCCESS;
