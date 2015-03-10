@@ -174,6 +174,8 @@ static struct
         bool has_ENCODING_PCM_FLOAT;
         jint CHANNEL_OUT_MONO;
         jint CHANNEL_OUT_STEREO;
+        jint CHANNEL_OUT_FRONT_LEFT;
+        jint CHANNEL_OUT_FRONT_RIGHT;
         jint CHANNEL_OUT_BACK_LEFT;
         jint CHANNEL_OUT_BACK_RIGHT;
         jint CHANNEL_OUT_FRONT_CENTER;
@@ -325,6 +327,8 @@ InitJNIFields( audio_output_t *p_aout )
 #endif
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_MONO, "CHANNEL_OUT_MONO", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_STEREO, "CHANNEL_OUT_STEREO", true );
+    GET_CONST_INT( AudioFormat.CHANNEL_OUT_FRONT_LEFT, "CHANNEL_OUT_FRONT_LEFT", true );
+    GET_CONST_INT( AudioFormat.CHANNEL_OUT_FRONT_RIGHT, "CHANNEL_OUT_FRONT_RIGHT", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_5POINT1, "CHANNEL_OUT_5POINT1", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_BACK_LEFT, "CHANNEL_OUT_BACK_LEFT", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_BACK_RIGHT, "CHANNEL_OUT_BACK_RIGHT", true );
@@ -556,76 +560,42 @@ JNIThread_TimeGet( JNIEnv *env, audio_output_t *p_aout, mtime_t *p_delay )
         return -1;
 }
 
-static bool
+static void
 AudioTrack_GetChanOrder( int i_mask, uint32_t p_chans_out[] )
 {
 #define HAS_CHAN( x ) ( ( i_mask & (jfields.AudioFormat.x) ) == (jfields.AudioFormat.x) )
-    const int i_sides = jfields.AudioFormat.CHANNEL_OUT_SIDE_LEFT |
-                        jfields.AudioFormat.CHANNEL_OUT_SIDE_RIGHT;
-    const int i_backs = jfields.AudioFormat.CHANNEL_OUT_BACK_LEFT |
-                        jfields.AudioFormat.CHANNEL_OUT_BACK_RIGHT;
+    /* samples will be in the following order: FL FR FC LFE BL BR BC SL SR */
+    int i = 0;
 
-    /* verify has FL/FR */
-    if ( !HAS_CHAN( CHANNEL_OUT_STEREO ) )
-        return false;
+    if( HAS_CHAN( CHANNEL_OUT_FRONT_LEFT ) )
+        p_chans_out[i++] = AOUT_CHAN_LEFT;
+    if( HAS_CHAN( CHANNEL_OUT_FRONT_RIGHT ) )
+        p_chans_out[i++] = AOUT_CHAN_RIGHT;
 
-    /* verify uses SIDE as a pair (ok if not using SIDE at all) */
-    bool b_has_sides = false;
-    if( jfields.AudioFormat.has_CHANNEL_OUT_SIDE && ( i_mask & i_sides ) != 0 )
+    if( HAS_CHAN( CHANNEL_OUT_FRONT_CENTER ) )
+        p_chans_out[i++] = AOUT_CHAN_CENTER;
+
+    if( HAS_CHAN( CHANNEL_OUT_LOW_FREQUENCY ) )
+        p_chans_out[i++] = AOUT_CHAN_LFE;
+
+    if( HAS_CHAN( CHANNEL_OUT_BACK_LEFT ) )
+        p_chans_out[i++] = AOUT_CHAN_REARLEFT;
+    if( HAS_CHAN( CHANNEL_OUT_BACK_RIGHT ) )
+        p_chans_out[i++] = AOUT_CHAN_REARRIGHT;
+
+    if( HAS_CHAN( CHANNEL_OUT_BACK_CENTER ) )
+        p_chans_out[i++] = AOUT_CHAN_REARCENTER;
+
+    if( jfields.AudioFormat.has_CHANNEL_OUT_SIDE )
     {
-        if( ( i_mask & i_sides ) != i_sides )
-            return false;
-        b_has_sides = true;
+        if( HAS_CHAN( CHANNEL_OUT_SIDE_LEFT ) )
+            p_chans_out[i++] = AOUT_CHAN_MIDDLELEFT;
+        if( HAS_CHAN( CHANNEL_OUT_SIDE_RIGHT ) )
+            p_chans_out[i++] = AOUT_CHAN_MIDDLERIGHT;
     }
-    /* verify uses BACK as a pair (ok if not using BACK at all) */
-    bool b_has_backs = false;
-    if( ( i_mask & i_backs ) != 0 )
-    {
-        if( ( i_mask & i_backs ) != i_backs )
-            return false;
-        b_has_backs = true;
-    }
-
-    const bool b_has_FC   = HAS_CHAN( CHANNEL_OUT_FRONT_CENTER );
-    const bool b_has_LFE  = HAS_CHAN( CHANNEL_OUT_LOW_FREQUENCY );
-    const bool b_has_BC   = HAS_CHAN( CHANNEL_OUT_BACK_CENTER );
-
-    /* compute at what index each channel is: samples will be in the following
-     * order: FL FR FC LFE BL BR BC SL SR
-     * when a channel is not present, its index is set to the same as the index
-     * of the preceding channel. */
-
-    const int i_FC  = b_has_FC    ? 2           : 1;
-    const int i_LFE = b_has_LFE   ? i_FC + 1    : i_FC;
-    const int i_BL  = b_has_backs ? i_LFE + 1   : i_LFE;
-    const int i_BR  = b_has_backs ? i_BL + 1    : i_BL;
-    const int i_BC  = b_has_BC    ? i_BR + 1    : i_BR;
-    const int i_SL  = b_has_sides ? i_BC + 1    : i_BC;
-    const int i_SR  = b_has_sides ? i_SL + 1    : i_SL;
-
-    p_chans_out[0] = AOUT_CHAN_LEFT;
-    p_chans_out[1] = AOUT_CHAN_RIGHT;
-    if( b_has_FC )
-        p_chans_out[i_FC] = AOUT_CHAN_CENTER;
-    if( b_has_LFE )
-        p_chans_out[i_LFE] = AOUT_CHAN_LFE;
-    if( b_has_backs )
-    {
-        p_chans_out[i_BL] = AOUT_CHAN_REARLEFT;
-        p_chans_out[i_BR] = AOUT_CHAN_REARRIGHT;
-    }
-    if( b_has_BC )
-        p_chans_out[i_BC] = AOUT_CHAN_REARCENTER;
-    if( b_has_sides )
-    {
-        p_chans_out[i_SL] = AOUT_CHAN_MIDDLELEFT;
-        p_chans_out[i_SR] = AOUT_CHAN_MIDDLERIGHT;
-    }
-
+    assert( i <= AOUT_CHAN_MAX );
 #undef HAS_CHAN
-    return true;
 }
-
 
 /**
  * Configure and create an Android AudioTrack.
@@ -639,6 +609,7 @@ JNIThread_Configure( JNIEnv *env, audio_output_t *p_aout )
         i_format_size, i_nb_channels;
     uint8_t i_chans_to_reorder = 0;
     uint8_t p_chan_table[AOUT_CHAN_MAX];
+    uint32_t p_chans_out[AOUT_CHAN_MAX];
     jobject p_audiotrack;
     audio_sample_format_t fmt = p_sys->fmt;
 
@@ -685,8 +656,6 @@ JNIThread_Configure( JNIEnv *env, audio_output_t *p_aout )
      */
     if( i_nb_channels > 5 )
     {
-        uint32_t p_chans_out[AOUT_CHAN_MAX];
-
         if( i_nb_channels > 7 && jfields.AudioFormat.has_CHANNEL_OUT_SIDE )
         {
             fmt.i_physical_channels = AOUT_CHANS_7_1;
@@ -700,13 +669,6 @@ JNIThread_Configure( JNIEnv *env, audio_output_t *p_aout )
             fmt.i_physical_channels = AOUT_CHANS_5_1;
             i_channel_config = jfields.AudioFormat.CHANNEL_OUT_5POINT1;
         }
-        if( AudioTrack_GetChanOrder( i_channel_config, p_chans_out ) )
-            i_chans_to_reorder =
-                aout_CheckChannelReorder( NULL, p_chans_out,
-                                          fmt.i_physical_channels,
-                                          p_chan_table );
-        else
-            return 1;
     } else
     {
         if( i_nb_channels == 1 )
@@ -719,6 +681,12 @@ JNIThread_Configure( JNIEnv *env, audio_output_t *p_aout )
         }
     }
     i_nb_channels = aout_FormatNbChannels( &fmt );
+
+    memset( p_chans_out, 0, sizeof(p_chans_out) );
+    AudioTrack_GetChanOrder( i_channel_config, p_chans_out );
+    i_chans_to_reorder = aout_CheckChannelReorder( NULL, p_chans_out,
+                                                   fmt.i_physical_channels,
+                                                   p_chan_table );
 
     i_min_buffer_size = JNI_AT_CALL_STATIC_INT( getMinBufferSize, fmt.i_rate,
                                                 i_channel_config, i_format );
