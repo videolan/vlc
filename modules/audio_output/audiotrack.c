@@ -643,10 +643,7 @@ JNIThread_Configure( JNIEnv *env, audio_output_t *p_aout )
     audio_sample_format_t fmt = p_sys->fmt;
 
     /* 4000 <= frequency <= 48000 */
-    if( fmt.i_rate < 4000 )
-        fmt.i_rate = 4000;
-    if( fmt.i_rate > 48000 )
-        fmt.i_rate = 48000;
+    fmt.i_rate = VLC_CLIP( fmt.i_rate, 4000, 48000 );
 
     /* We can only accept U8, S16N, FL32 */
     switch( fmt.i_format )
