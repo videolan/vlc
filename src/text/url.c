@@ -405,7 +405,7 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
     {
         *next = '\0'; /* temporary nul, reset to slash later */
         url->psz_path = next;
-        if (opt && (next = strchr (next, opt)) != NULL)
+        if (opt && (next = strchr (next + 1, opt)) != NULL)
         {
             *(next++) = '\0';
             url->psz_option = next;
