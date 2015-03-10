@@ -680,7 +680,7 @@ JNIThread_Configure( JNIEnv *env, audio_output_t *p_aout )
 
     i_nb_channels = aout_FormatNbChannels( &fmt );
 
-    /* Android AudioTrack support only mono, stereo, 5.1 and 7.1.
+    /* Android AudioTrack supports only mono, stereo, 5.1 and 7.1.
      * Android will downmix to stereo if audio output doesn't handle 5.1 or 7.1
      */
     if( i_nb_channels > 5 )
@@ -690,7 +690,7 @@ JNIThread_Configure( JNIEnv *env, audio_output_t *p_aout )
         if( i_nb_channels > 7 && jfields.AudioFormat.has_CHANNEL_OUT_SIDE )
         {
             fmt.i_physical_channels = AOUT_CHANS_7_1;
-            /* bitmak of CHANNEL_OUT_7POINT1 doesn't correspond to 5POINT1 and
+            /* bitmask of CHANNEL_OUT_7POINT1 doesn't correspond to 5POINT1 and
              * SIDES */
             i_channel_config = jfields.AudioFormat.CHANNEL_OUT_5POINT1 |
                                jfields.AudioFormat.CHANNEL_OUT_SIDE_LEFT |
