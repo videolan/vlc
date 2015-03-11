@@ -1336,6 +1336,8 @@ JNIThread( void *data )
                     break;
                 if( p_buffer == NULL )
                 {
+                    if( !p_cmd->in.play.p_buffer->i_buffer )
+                        break;
                     p_buffer = p_cmd->in.play.p_buffer;
                     i_buffer_offset = 0;
                     b_error = JNIThread_PreparePlay( env, p_aout, p_buffer )
