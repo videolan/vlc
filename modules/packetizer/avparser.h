@@ -47,5 +47,5 @@ void ClosePacketizer( vlc_object_t * );
     set_category( CAT_SOUT )                            \
     set_subcategory( SUBCAT_SOUT_PACKETIZER )           \
     set_description( N_("avparser packetizer") )        \
-    set_capability( "packetizer", 1 )                   \
+    set_capability( "packetizer", 20 )                   \
     set_callbacks( OpenPacketizer, ClosePacketizer )
