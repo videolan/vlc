@@ -275,7 +275,6 @@ InitJNIFields( audio_output_t *p_aout )
     GET_ID( GetMethodID, AudioTrack.writeV21, "write", "(Ljava/nio/ByteBuffer;II)I", false );
     if( jfields.AudioTrack.writeV21 )
     {
-        jfields.AudioTrack.write = NULL;
         GET_CONST_INT( AudioTrack.WRITE_NON_BLOCKING, "WRITE_NON_BLOCKING", true );
     } else
         GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
@@ -307,12 +306,6 @@ InitJNIFields( audio_output_t *p_aout )
                 "framePosition", "J", true );
         GET_ID( GetFieldID, AudioTimestamp.nanoTime,
                 "nanoTime", "J", true );
-    } else
-    {
-        jfields.AudioTimestamp.clazz = NULL;
-        jfields.AudioTimestamp.ctor = NULL;
-        jfields.AudioTimestamp.framePosition = NULL;
-        jfields.AudioTimestamp.nanoTime = NULL;
     }
 
     /* AudioFormat class init */
