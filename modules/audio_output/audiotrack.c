@@ -1342,9 +1342,9 @@ JNIThread( void *data )
                     i_buffer_offset = 0;
                     b_error = JNIThread_PreparePlay( env, p_aout, p_buffer )
                               != VLC_SUCCESS;
+                    if( b_error )
+                        break;
                 }
-                if( b_error )
-                    break;
                 b_error = JNIThread_Play( env, p_aout, p_buffer,
                                           &i_buffer_offset,
                                           &i_play_wait ) != VLC_SUCCESS;
