@@ -136,8 +136,7 @@ ifndef HAVE_MINGW_W64
 DEPS_ffmpeg += directx
 endif
 FFMPEGCONF += --target-os=mingw32 --enable-memalign-hack
-FFMPEGCONF += --enable-w32threads --enable-dxva2 \
-	--disable-decoder=dca
+FFMPEGCONF += --enable-w32threads --enable-dxva2
 
 ifdef HAVE_WIN64
 FFMPEGCONF += --cpu=athlon64 --arch=x86_64
