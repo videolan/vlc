@@ -69,6 +69,7 @@ struct aout_sys_t {
     mtime_t i_play_time; /* time when play was called */
     bool b_audiotrack_exception; /* true if audiotrack throwed an exception */
     int i_audiotrack_stuck_count;
+    bool b_spdif;
     uint8_t i_chans_to_reorder; /* do we need channel reordering */
     uint8_t p_chan_table[AOUT_CHAN_MAX];
     enum {
@@ -181,6 +182,9 @@ static struct
         jint ENCODING_PCM_16BIT;
         jint ENCODING_PCM_FLOAT;
         bool has_ENCODING_PCM_FLOAT;
+        jint ENCODING_AC3;
+        jint ENCODING_E_AC3;
+        bool has_ENCODING_AC3;
         jint CHANNEL_OUT_MONO;
         jint CHANNEL_OUT_STEREO;
         jint CHANNEL_OUT_FRONT_LEFT;
@@ -331,6 +335,14 @@ InitJNIFields( audio_output_t *p_aout )
 #else
     jfields.AudioFormat.has_ENCODING_PCM_FLOAT = false;
 #endif
+    GET_CONST_INT( AudioFormat.ENCODING_AC3, "ENCODING_AC3", false );
+    if( field != NULL )
+    {
+        GET_CONST_INT( AudioFormat.ENCODING_E_AC3, "ENCODING_E_AC3", false );
+        jfields.AudioFormat.has_ENCODING_AC3 = field != NULL;
+    } else
+        jfields.AudioFormat.has_ENCODING_AC3 = false;
+
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_MONO, "CHANNEL_OUT_MONO", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_STEREO, "CHANNEL_OUT_STEREO", true );
     GET_CONST_INT( AudioFormat.CHANNEL_OUT_FRONT_LEFT, "CHANNEL_OUT_FRONT_LEFT", true );
@@ -409,6 +421,26 @@ frames_to_us( aout_sys_t *p_sys, uint32_t i_nb_frames )
     return  i_nb_frames * CLOCK_FREQ / p_sys->fmt.i_rate;
 }
 #define FRAMES_TO_US(x) frames_to_us( p_sys, (x) )
+
+static inline uint32_t
+bytes_to_frames( aout_sys_t *p_sys, size_t i_bytes )
+{
+    if( p_sys->b_spdif )
+        return i_bytes * A52_FRAME_NB / p_sys->i_bytes_per_frame;
+    else
+        return i_bytes / p_sys->i_bytes_per_frame;
+}
+#define BYTES_TO_FRAMES(x) bytes_to_frames( p_sys, (x) )
+
+static inline size_t
+frames_to_bytes( aout_sys_t *p_sys, uint32_t i_frames )
+{
+    if( p_sys->b_spdif )
+        return i_frames * p_sys->i_bytes_per_frame / A52_FRAME_NB;
+    else
+        return i_frames * p_sys->i_bytes_per_frame;
+}
+#define FRAMES_TO_BYTES(x) frames_to_bytes( p_sys, (x) )
 
 static struct thread_cmd *
 ThreadCmd_New( int id )
@@ -509,7 +541,7 @@ JNIThread_TimeGet( JNIEnv *env, audio_output_t *p_aout, mtime_t *p_delay )
     jlong i_frame_pos;
     uint32_t i_audiotrack_delay = 0;
 
-    if( p_sys->i_samples_queued == 0 )
+    if( p_sys->i_samples_queued == 0 || p_sys->b_spdif )
         return -1;
     if( p_sys->p_audioTimestamp )
     {
@@ -626,6 +658,9 @@ JNIThread_NewAudioTrack( JNIEnv *env, audio_output_t *p_aout,
         case VLC_CODEC_FL32:
             i_format = jfields.AudioFormat.ENCODING_PCM_FLOAT;
             break;
+        case VLC_CODEC_SPDIFB:
+            i_format = jfields.AudioFormat.ENCODING_AC3;
+            break;
         default:
             vlc_assert_unreachable();
     }
@@ -658,7 +693,10 @@ JNIThread_NewAudioTrack( JNIEnv *env, audio_output_t *p_aout,
         msg_Warn( p_aout, "getMinBufferSize returned an invalid size" ) ;
         return NULL;
     }
-    i_size = i_min_buffer_size * 4;
+    if( i_vlc_format == VLC_CODEC_SPDIFB )
+        i_size = ( i_min_buffer_size / AOUT_SPDIF_SIZE + 1 ) * AOUT_SPDIF_SIZE;
+    else
+        i_size = i_min_buffer_size * 4;
 
     /* create AudioTrack object */
     p_audiotrack = JNI_AT_NEW( jfields.AudioManager.STREAM_MUSIC, i_rate,
@@ -688,7 +726,6 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
     aout_sys_t *p_sys = p_aout->sys;
     jobject p_audiotrack = NULL;
     int i_nb_channels, i_audiotrack_size;
-    uint32_t p_chans_out[AOUT_CHAN_MAX];
 
     aout_FormatPrint( p_aout, "VLC is looking for:", &p_sys->fmt );
 
@@ -706,6 +743,15 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
             break;
         case VLC_CODEC_FL32:
             if( !jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
+                p_sys->fmt.i_format = VLC_CODEC_S16N;
+            break;
+        case VLC_CODEC_A52:
+            if( jfields.AudioFormat.has_ENCODING_AC3
+                && var_InheritBool( p_aout, "spdif" ) )
+                p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
+            else if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
+                p_sys->fmt.i_format = VLC_CODEC_FL32;
+            else
                 p_sys->fmt.i_format = VLC_CODEC_S16N;
             break;
         default:
@@ -744,7 +790,16 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
                                                 &i_audiotrack_size );
         if( !p_audiotrack )
         {
-            if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
+            if( p_sys->fmt.i_format == VLC_CODEC_SPDIFB )
+            {
+                msg_Warn( p_aout, "SPDIF configuration failed, "
+                                  "fallback to PCM" );
+                if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
+                    p_sys->fmt.i_format = VLC_CODEC_FL32;
+                else
+                    p_sys->fmt.i_format = VLC_CODEC_S16N;
+            }
+            else if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
             {
                 msg_Warn( p_aout, "FL32 configuration failed, "
                                   "fallback to S16N PCM" );
@@ -770,18 +825,28 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
     if( !p_sys->p_audiotrack )
         return VLC_EGENERIC;
 
-    memset( p_chans_out, 0, sizeof(p_chans_out) );
-    AudioTrack_GetChanOrder( p_sys->fmt.i_physical_channels, p_chans_out );
-    p_sys->i_chans_to_reorder =
-        aout_CheckChannelReorder( NULL, p_chans_out,
-                                  p_sys->fmt.i_physical_channels,
-                                  p_sys->p_chan_table );
+    p_sys->b_spdif = p_sys->fmt.i_format == VLC_CODEC_SPDIFB;
+    if( p_sys->b_spdif )
+    {
+        p_sys->fmt.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        p_sys->fmt.i_frame_length = A52_FRAME_NB;
+        p_sys->i_bytes_per_frame = p_sys->fmt.i_bytes_per_frame;
+    }
+    else
+    {
+        uint32_t p_chans_out[AOUT_CHAN_MAX];
 
-    p_sys->i_bytes_per_frame = i_nb_channels *
-                               aout_BitsPerSample( p_sys->fmt.i_format ) /
-                               8;
-    p_sys->i_max_audiotrack_samples = i_audiotrack_size /
-                                      p_sys->i_bytes_per_frame;
+        memset( p_chans_out, 0, sizeof(p_chans_out) );
+        AudioTrack_GetChanOrder( p_sys->fmt.i_physical_channels, p_chans_out );
+        p_sys->i_chans_to_reorder =
+            aout_CheckChannelReorder( NULL, p_chans_out,
+                                      p_sys->fmt.i_physical_channels,
+                                      p_sys->p_chan_table );
+        p_sys->i_bytes_per_frame = i_nb_channels *
+                                   aout_BitsPerSample( p_sys->fmt.i_format ) /
+                                   8;
+    }
+    p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( i_audiotrack_size );
 
 #ifdef AUDIOTRACK_USE_TIMESTAMP
     if( jfields.AudioTimestamp.clazz )
@@ -903,7 +968,7 @@ JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
     i_samples = __MIN( p_sys->i_max_audiotrack_samples - i_samples_pending,
                        BYTES_TO_FRAMES( i_data ) );
 
-    i_data = i_samples * p_sys->i_bytes_per_frame;
+    i_data = FRAMES_TO_BYTES( i_samples );
 
     return JNI_AT_CALL_INT( write, p_sys->p_bytearray,
                             i_buffer_offset, i_data );
@@ -1105,7 +1170,8 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
         *p_wait = FRAMES_TO_US( p_sys->i_max_audiotrack_samples / 20 );
     } else
     {
-        uint32_t i_samples = i_ret / p_sys->i_bytes_per_frame;
+        uint32_t i_samples = BYTES_TO_FRAMES( i_ret );
+
         p_sys->i_samples_queued -= i_samples;
         p_sys->i_samples_written += i_samples;
 
