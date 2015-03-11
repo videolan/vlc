@@ -69,6 +69,10 @@ struct aout_sys_t {
     int i_audiotrack_stuck_count;
     uint8_t i_chans_to_reorder; /* do we need channel reordering */
     uint8_t p_chan_table[AOUT_CHAN_MAX];
+    enum {
+        WRITE,
+        WRITE_V21
+    } i_write_type;
 
     /* JNIThread control */
     vlc_mutex_t mutex;
@@ -793,6 +797,17 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
     }
 #endif
 
+    if( jfields.AudioTrack.writeV21 )
+    {
+        msg_Dbg( p_aout, "using WRITE_V21");
+        p_sys->i_write_type = WRITE_V21;
+    }
+    else
+    {
+        msg_Dbg( p_aout, "using WRITE");
+        p_sys->i_write_type = WRITE;
+    }
+
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
     p_sys->i_play_time = mdate();
@@ -833,15 +848,16 @@ JNIThread_Stop( JNIEnv *env, audio_output_t *p_aout )
  * that we won't wait in AudioTrack.write() method
  */
 static int
-JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
+JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
+                 size_t i_buffer_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    uint8_t *p_data = p_buffer->p_buffer;
     size_t i_data;
     uint32_t i_samples;
     uint32_t i_audiotrack_pos;
     uint32_t i_samples_pending;
 
+    i_data = p_buffer->i_buffer - i_buffer_offset;
     i_audiotrack_pos = JNIThread_GetAudioTrackPos( env, p_aout );
     if( i_audiotrack_pos > p_sys->i_samples_written )
     {
@@ -873,37 +889,12 @@ JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
     } else
         p_sys->i_audiotrack_stuck_count = 0;
     i_samples = __MIN( p_sys->i_max_audiotrack_samples - i_samples_pending,
-                       p_buffer->i_nb_samples );
+                       BYTES_TO_FRAMES( i_data ) );
 
     i_data = i_samples * p_sys->i_bytes_per_frame;
 
-    /* check if we need to realloc a ByteArray */
-    if( i_data > p_sys->i_bytearray_size )
-    {
-        jbyteArray p_bytearray;
-
-        if( p_sys->p_bytearray )
-        {
-            (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );
-            p_sys->p_bytearray = NULL;
-        }
-
-        p_bytearray = (*env)->NewByteArray( env, i_data );
-        if( p_bytearray )
-        {
-            p_sys->p_bytearray = (*env)->NewGlobalRef( env, p_bytearray );
-            (*env)->DeleteLocalRef( env, p_bytearray );
-        }
-        p_sys->i_bytearray_size = i_data;
-    }
-    if( !p_sys->p_bytearray )
-        return jfields.AudioTrack.ERROR_BAD_VALUE;
-
-    /* copy p_buffer in to ByteArray */
-    (*env)->SetByteArrayRegion( env, p_sys->p_bytearray, 0, i_data,
-                                (jbyte *)p_data);
-
-    return JNI_AT_CALL_INT( write, p_sys->p_bytearray, 0, i_data );
+    return JNI_AT_CALL_INT( write, p_sys->p_bytearray,
+                            i_buffer_offset, i_data );
 }
 
 /**
@@ -911,17 +902,19 @@ JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
  * It calls a new write method with WRITE_NON_BLOCKING flags.
  */
 static int
-JNIThread_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
+JNIThread_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
+                    size_t i_buffer_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
+    size_t i_data = p_buffer->i_buffer - i_buffer_offset;
+    uint8_t *p_data = p_buffer->p_buffer + i_buffer_offset;
 
     if( !p_sys->p_bytebuffer )
     {
         jobject p_bytebuffer;
 
-        p_bytebuffer = (*env)->NewDirectByteBuffer( env, p_buffer->p_buffer,
-                                                    p_buffer->i_buffer );
+        p_bytebuffer = (*env)->NewDirectByteBuffer( env, p_data, i_data );
         if( !p_bytebuffer )
             return jfields.AudioTrack.ERROR_BAD_VALUE;
 
@@ -936,7 +929,7 @@ JNIThread_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
         }
     }
 
-    i_ret = JNI_AT_CALL_INT( writeV21, p_sys->p_bytebuffer, p_buffer->i_buffer,
+    i_ret = JNI_AT_CALL_INT( writeV21, p_sys->p_bytebuffer, i_data,
                              jfields.AudioTrack.WRITE_NON_BLOCKING );
     if( i_ret > 0 )
     {
@@ -949,17 +942,71 @@ JNIThread_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer )
 }
 
 static int
-JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
-                block_t **pp_buffer, mtime_t *p_wait )
+JNIThread_PreparePlay( JNIEnv *env, audio_output_t *p_aout,
+                       block_t *p_buffer )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    block_t *p_buffer = *pp_buffer;
+
+    if( p_sys->i_chans_to_reorder )
+       aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_buffer,
+                            p_sys->i_chans_to_reorder, p_sys->p_chan_table,
+                            p_sys->fmt.i_format );
+
+    switch( p_sys->i_write_type )
+    {
+    case WRITE:
+        /* check if we need to realloc a ByteArray */
+        if( p_buffer->i_buffer > p_sys->i_bytearray_size )
+        {
+            jbyteArray p_bytearray;
+
+            if( p_sys->p_bytearray )
+            {
+                (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );
+                p_sys->p_bytearray = NULL;
+            }
+
+            p_bytearray = (*env)->NewByteArray( env, p_buffer->i_buffer );
+            if( p_bytearray )
+            {
+                p_sys->p_bytearray = (*env)->NewGlobalRef( env, p_bytearray );
+                (*env)->DeleteLocalRef( env, p_bytearray );
+            }
+            p_sys->i_bytearray_size = p_buffer->i_buffer;
+        }
+        if( !p_sys->p_bytearray )
+            return VLC_EGENERIC;
+
+        /* copy p_buffer in to ByteArray */
+        (*env)->SetByteArrayRegion( env, p_sys->p_bytearray, 0,
+                                    p_buffer->i_buffer,
+                                    (jbyte *)p_buffer->p_buffer);
+        break;
+    case WRITE_V21:
+        break;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int
+JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
+                block_t *p_buffer, size_t *p_buffer_offset, mtime_t *p_wait )
+{
+    aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
 
-    if( jfields.AudioTrack.writeV21 )
-        i_ret = JNIThread_WriteV21( env, p_aout, p_buffer );
-    else
-        i_ret = JNIThread_Write( env, p_aout, p_buffer );
+    switch( p_sys->i_write_type )
+    {
+    case WRITE_V21:
+        i_ret = JNIThread_WriteV21( env, p_aout, p_buffer, *p_buffer_offset );
+        break;
+    case WRITE:
+        i_ret = JNIThread_Write( env, p_aout, p_buffer, *p_buffer_offset );
+        break;
+    default:
+        vlc_assert_unreachable();
+    }
 
     if( i_ret < 0 ) {
         if( jfields.AudioManager.has_ERROR_DEAD_OBJECT
@@ -991,11 +1038,7 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
         p_sys->i_samples_queued -= i_samples;
         p_sys->i_samples_written += i_samples;
 
-        p_buffer->p_buffer += i_ret;
-        p_buffer->i_buffer -= i_ret;
-        p_buffer->i_nb_samples -= i_samples;
-        if( p_buffer->i_buffer == 0 )
-            *pp_buffer = NULL;
+        *p_buffer_offset += i_ret;
 
         /* HACK: There is a known issue in audiotrack, "due to an internal
          * timeout within the AudioTrackThread". It happens after android
@@ -1004,7 +1047,7 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
          * write. This hack is done only for API 19 (AudioTimestamp was added
          * in API 19). */
 
-        if( jfields.AudioTimestamp.clazz && !jfields.AudioTrack.writeV21 )
+        if( p_sys->i_write_type == WRITE && jfields.AudioTimestamp.clazz )
             *p_wait = FRAMES_TO_US( i_samples ) / 2;
     }
     return i_ret >= 0 ? VLC_SUCCESS : VLC_EGENERIC;
@@ -1078,6 +1121,7 @@ JNIThread( void *data )
     bool b_error = false;
     bool b_paused = false;
     block_t *p_buffer = NULL;
+    size_t i_buffer_offset = 0;
     mtime_t i_play_deadline = 0;
     JNIEnv* env;
 
@@ -1155,18 +1199,25 @@ JNIThread( void *data )
                 if( p_buffer == NULL )
                 {
                     p_buffer = p_cmd->in.play.p_buffer;
-                    if( p_sys->i_chans_to_reorder )
-                       aout_ChannelReorder( p_buffer->p_buffer,
-                                            p_buffer->i_buffer,
-                                            p_sys->i_chans_to_reorder,
-                                            p_sys->p_chan_table,
-                                            p_sys->fmt.i_format );
-
+                    b_error = JNIThread_PreparePlay( env, p_aout, p_buffer )
+                              != VLC_SUCCESS;
                 }
-                b_error = JNIThread_Play( env, p_aout, &p_buffer,
+                if( b_error )
+                    break;
+                b_error = JNIThread_Play( env, p_aout, p_buffer,
+                                          &i_buffer_offset,
                                           &i_play_wait ) != VLC_SUCCESS;
-                if( p_buffer != NULL )
+                if( i_buffer_offset < p_buffer->i_buffer )
+                {
+                    /* buffer is not fully processed, try again with the
+                     * same cmd and buffer */
                     b_remove_cmd = false;
+                }
+                else
+                {
+                    p_buffer = NULL;
+                    i_buffer_offset = 0;
+                }
                 if( i_play_wait > 0 )
                     i_play_deadline = mdate() + i_play_wait;
                 break;
