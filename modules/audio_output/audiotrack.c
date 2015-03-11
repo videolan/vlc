@@ -58,6 +58,8 @@ struct aout_sys_t {
     jobject p_audioTimestamp; /* AudioTimestamp ref */
     jbyteArray p_bytearray; /* ByteArray ref (for Write) */
     size_t i_bytearray_size; /* size of the ByteArray */
+    jfloatArray p_floatarray; /* FloatArray ref (for WriteFloat) */
+    size_t i_floatarray_size; /* size of the FloatArray */
     jobject p_bytebuffer; /* ByteBuffer ref (for WriteV21) */
     audio_sample_format_t fmt; /* fmt setup by Start */
     uint32_t i_pos_initial; /* initial position set by getPlaybackHeadPosition */
@@ -71,7 +73,8 @@ struct aout_sys_t {
     uint8_t p_chan_table[AOUT_CHAN_MAX];
     enum {
         WRITE,
-        WRITE_V21
+        WRITE_V21,
+        WRITE_FLOAT
     } i_write_type;
 
     /* JNIThread control */
@@ -88,7 +91,7 @@ struct aout_sys_t {
 /* Soft volume helper */
 #include "audio_output/volume.h"
 
-//#define AUDIOTRACK_USE_FLOAT
+#define AUDIOTRACK_USE_FLOAT
 // TODO: activate getTimestamp for new android versions
 //#define AUDIOTRACK_USE_TIMESTAMP
 
@@ -162,6 +165,7 @@ static struct
         jmethodID pause;
         jmethodID write;
         jmethodID writeV21;
+        jmethodID writeFloat;
         jmethodID getPlaybackHeadPosition;
         jmethodID getTimestamp;
         jmethodID getMinBufferSize;
@@ -280,6 +284,9 @@ InitJNIFields( audio_output_t *p_aout )
     if( jfields.AudioTrack.writeV21 )
     {
         GET_CONST_INT( AudioTrack.WRITE_NON_BLOCKING, "WRITE_NON_BLOCKING", true );
+#ifdef AUDIOTRACK_USE_FLOAT
+        GET_ID( GetMethodID, AudioTrack.writeFloat, "write", "([FIII)I", true );
+#endif
     } else
         GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
 
@@ -319,7 +326,8 @@ InitJNIFields( audio_output_t *p_aout )
 #ifdef AUDIOTRACK_USE_FLOAT
     GET_CONST_INT( AudioFormat.ENCODING_PCM_FLOAT, "ENCODING_PCM_FLOAT",
                    false );
-    jfields.AudioFormat.has_ENCODING_PCM_FLOAT = field != NULL;
+    jfields.AudioFormat.has_ENCODING_PCM_FLOAT = field != NULL &&
+                                                 jfields.AudioTrack.writeFloat;
 #else
     jfields.AudioFormat.has_ENCODING_PCM_FLOAT = false;
 #endif
@@ -797,8 +805,12 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
     }
 #endif
 
-    if( jfields.AudioTrack.writeV21 )
+    if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
     {
+        msg_Dbg( p_aout, "using WRITE_FLOAT");
+        p_sys->i_write_type = WRITE_FLOAT;
+    }
+    else if( jfields.AudioTrack.writeV21 )
         msg_Dbg( p_aout, "using WRITE_V21");
         p_sys->i_write_type = WRITE_V21;
     }
@@ -941,6 +953,30 @@ JNIThread_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
     return i_ret;
 }
 
+/**
+ * Non blocking write float function for Lollipop and after.
+ * It calls a new write method with WRITE_NON_BLOCKING flags.
+ */
+static int
+JNIThread_WriteFloat( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
+                      size_t i_buffer_offset )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    int i_ret;
+    size_t i_data;
+
+    i_buffer_offset /= 4;
+    i_data = p_buffer->i_buffer / 4 - i_buffer_offset;
+
+    i_ret = JNI_AT_CALL_INT( writeFloat, p_sys->p_floatarray,
+                             i_buffer_offset, i_data,
+                             jfields.AudioTrack.WRITE_NON_BLOCKING );
+    if( i_ret < 0 )
+        return i_ret;
+    else
+        return i_ret * 4;
+}
+
 static int
 JNIThread_PreparePlay( JNIEnv *env, audio_output_t *p_aout,
                        block_t *p_buffer )
@@ -982,6 +1018,38 @@ JNIThread_PreparePlay( JNIEnv *env, audio_output_t *p_aout,
                                     p_buffer->i_buffer,
                                     (jbyte *)p_buffer->p_buffer);
         break;
+    case WRITE_FLOAT:
+    {
+        size_t i_data = p_buffer->i_buffer / 4;
+
+        /* check if we need to realloc a floatArray */
+        if( i_data > p_sys->i_floatarray_size )
+        {
+            jfloatArray p_floatarray;
+
+            if( p_sys->p_floatarray )
+            {
+                (*env)->DeleteGlobalRef( env, p_sys->p_floatarray );
+                p_sys->p_floatarray = NULL;
+            }
+
+            p_floatarray = (*env)->NewFloatArray( env, i_data );
+            if( p_floatarray )
+            {
+                p_sys->p_floatarray = (*env)->NewGlobalRef( env, p_floatarray );
+                (*env)->DeleteLocalRef( env, p_floatarray );
+            }
+            p_sys->i_floatarray_size = i_data;
+        }
+        if( !p_sys->p_floatarray )
+            return VLC_EGENERIC;
+
+        /* copy p_buffer in to FloatArray */
+        (*env)->SetFloatArrayRegion( env, p_sys->p_floatarray, 0, i_data,
+                                    (jfloat *)p_buffer->p_buffer);
+
+        break;
+    }
     case WRITE_V21:
         break;
     }
@@ -1003,6 +1071,9 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
         break;
     case WRITE:
         i_ret = JNIThread_Write( env, p_aout, p_buffer, *p_buffer_offset );
+        break;
+    case WRITE_FLOAT:
+        i_ret = JNIThread_WriteFloat( env, p_aout, p_buffer, *p_buffer_offset );
         break;
     default:
         vlc_assert_unreachable();
@@ -1275,6 +1346,8 @@ end:
     {
         if( p_sys->p_bytearray )
             (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );
+        if( p_sys->p_floatarray )
+            (*env)->DeleteGlobalRef( env, p_sys->p_floatarray );
         if( p_sys->p_bytebuffer )
             (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
         jni_detach_thread();
