@@ -167,7 +167,7 @@ static int Open(vlc_object_t *this)
                 [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
         }
     }
-    sys->tapRecognizer.cancelsTouchesInView = YES;
+    sys->tapRecognizer.cancelsTouchesInView = NO;
 
     /* Initialize common OpenGL video display */
     sys->gl.lock = OpenglESClean;
