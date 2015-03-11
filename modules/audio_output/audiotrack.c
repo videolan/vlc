@@ -876,6 +876,7 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
         p_sys->i_write_type = WRITE_FLOAT;
     }
     else if( jfields.AudioTrack.writeV21 )
+    {
         msg_Dbg( p_aout, "using WRITE_V21");
         p_sys->i_write_type = WRITE_V21;
     }
