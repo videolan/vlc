@@ -1337,6 +1337,7 @@ JNIThread( void *data )
                 if( p_buffer == NULL )
                 {
                     p_buffer = p_cmd->in.play.p_buffer;
+                    i_buffer_offset = 0;
                     b_error = JNIThread_PreparePlay( env, p_aout, p_buffer )
                               != VLC_SUCCESS;
                 }
@@ -1354,7 +1355,6 @@ JNIThread( void *data )
                 else
                 {
                     p_buffer = NULL;
-                    i_buffer_offset = 0;
                 }
                 if( i_play_wait > 0 )
                     i_play_deadline = mdate() + i_play_wait;
