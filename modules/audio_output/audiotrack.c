@@ -1183,7 +1183,10 @@ JNIThread( void *data )
             case CMD_TIME_GET:
                 assert( p_sys->p_audiotrack );
                 if( b_error )
+                {
+                    p_cmd->out.time_get.i_ret = -1;
                     break;
+                }
                 p_cmd->out.time_get.i_ret =
                         JNIThread_TimeGet( env, p_aout,
                                            &p_cmd->out.time_get.i_delay );
@@ -1202,6 +1205,8 @@ JNIThread( void *data )
         }
         if( p_sys->b_audiotrack_exception )
             b_error = true;
+        if( b_error )
+            p_sys->i_samples_queued = 0;
 
         if( b_remove_cmd )
         {
