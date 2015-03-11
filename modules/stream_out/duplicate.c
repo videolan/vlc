@@ -307,7 +307,14 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
  *****************************************************************************/
 static bool NumInRange( const char *psz_range, int i_num )
 {
-    return true;
+    int beginRange, endRange;
+    int res = sscanf(psz_range, "%d-%d", &beginRange, &endRange);
+    if (res == 0)
+        return false;
+    else if (res == 1)
+        return beginRange == i_num;
+    return (i_num >= beginRange && i_num <= endRange)
+        || (beginRange > endRange && (i_num <= beginRange && i_num >= endRange));
 }
 
 static bool ESSelected( const es_format_t *fmt, char *psz_select )
