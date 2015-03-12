@@ -107,6 +107,7 @@ static int Open( vlc_object_t* p_this )
         return VLC_EGENERIC;
 
     STANDARD_BLOCK_ACCESS_INIT;
+    p_sys->i_socket = -1;
 
     /* Parse the URL */
     const char* path = p_access->psz_location;
@@ -251,6 +252,7 @@ error:
     free( psz_password );
     free( psz_username );
     vlc_UrlClean( &url );
+    net_Close( p_sys->i_socket );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -266,6 +268,7 @@ static void Close( vlc_object_t* p_this )
     libssh2_sftp_shutdown( p_sys->sftp_session );
 
     libssh2_session_free( p_sys->ssh_session );
+    net_Close( p_sys->i_socket );
     free( p_sys );
 }
 
