@@ -244,6 +244,8 @@ static int Open( vlc_object_t* p_this )
     return VLC_SUCCESS;
 
 error:
+    if( p_sys->file )
+        libssh2_sftp_close_handle( p_sys->file );
     if( p_sys->ssh_session )
         libssh2_session_free( p_sys->ssh_session );
     free( psz_password );
