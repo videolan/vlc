@@ -1301,10 +1301,12 @@ static int Demux( demux_t *p_demux )
         {
         case TYPE_PAT:
             dvbpsi_packet_push( p_pid->u.p_pat->handle, p_pkt->p_buffer );
+            block_Release( p_pkt );
             break;
 
         case TYPE_PMT:
             dvbpsi_packet_push( p_pid->u.p_pmt->handle, p_pkt->p_buffer );
+            block_Release( p_pkt );
             break;
 
         case TYPE_PES:
@@ -1340,6 +1342,7 @@ static int Demux( demux_t *p_demux )
         case TYPE_EIT:
             if( p_sys->b_dvb_meta )
                 dvbpsi_packet_push( p_pid->u.p_psi->handle, p_pkt->p_buffer );
+            block_Release( p_pkt );
             break;
 
         default:
