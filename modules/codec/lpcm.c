@@ -1137,6 +1137,8 @@ static void AobExtract( block_t *p_aout_buffer,
 
     while( p_block->i_buffer > 0 )
     {
+        unsigned int i_aout_written = 0;
+
         for( int i = 0; i < 2; i++ )
         {
             const aob_group_t *g = &p_group[1-i];
@@ -1151,7 +1153,6 @@ static void AobExtract( block_t *p_aout_buffer,
             if( !g->i_bits )
                 continue;
 
-            unsigned int i_aout_written = 0;
             for( unsigned n = 0; n < 2; n++ )
             {
                 for( unsigned j = 0; j < g->i_channels; j++ )
@@ -1210,11 +1211,10 @@ static void AobExtract( block_t *p_aout_buffer,
             }
 
             /* */
-            p_out += i_aout_written;
             p_block->i_buffer -= i_group_size;
             p_block->p_buffer += i_group_size;
         }
-
+        p_out += i_aout_written;
     }
 }
 static void BdExtract( block_t *p_aout_buffer, block_t *p_block,
