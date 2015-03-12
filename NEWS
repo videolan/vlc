@@ -106,6 +106,7 @@ Logging
 
 Misc
  * remove langfromtelx
+ * remove ZPL playlist format
 
 
 Changes between 2.1.x and 2.2.0:
