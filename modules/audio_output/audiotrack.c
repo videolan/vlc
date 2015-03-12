@@ -92,7 +92,8 @@ struct aout_sys_t {
 /* Soft volume helper */
 #include "audio_output/volume.h"
 
-#define AUDIOTRACK_USE_FLOAT
+// Don't use Float for now since 5.1/7.1 Float is down sampled to Stereo Float
+//#define AUDIOTRACK_USE_FLOAT
 // TODO: activate getTimestamp for new android versions
 //#define AUDIOTRACK_USE_TIMESTAMP
 
