@@ -26,7 +26,6 @@
 #endif
 
 #include <assert.h>
-#include <limits.h>                         /* PATH_MAX */
 
 #if defined (HAVE_MNTENT_H) && defined(HAVE_SYS_STAT_H)
 # include <mntent.h>
