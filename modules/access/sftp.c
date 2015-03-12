@@ -144,6 +144,11 @@ static int Open( vlc_object_t* p_this )
 
     /* Connect to the server using a regular socket */
     p_sys->i_socket = net_Connect( p_access, url.psz_host, i_port, SOCK_STREAM, 0 );
+    if( p_sys->i_socket < 0 )
+    {
+        msg_Err( p_access, "Impossible to open the connection to %s:%i", url.psz_host, i_port );
+        goto error;
+    }
 
     /* Create the ssh connexion and wait until the server answer */
     if( ( p_sys->ssh_session = libssh2_session_init() ) == NULL )
