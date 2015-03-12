@@ -541,6 +541,17 @@ loopclean:
        direct rendering should be disabled since no surface will be
        attached to the JNI. */
     p_sys->direct_rendering = jni_IsVideoPlayerActivityCreated() && var_InheritBool(p_dec, CFG_PREFIX "dr");
+
+    /* There is no way to rotate the video using direct rendering (and using a
+     * SurfaceView) before  API 21 (Lollipop). Therefore, we deactivate direct
+     * rendering if video doesn't have a normal rotation and if
+     * get_input_buffer method is not present (This method exists since API
+     * 21). */
+    if (p_sys->direct_rendering
+        && p_dec->fmt_in.video.orientation != ORIENT_NORMAL
+        && !p_sys->get_input_buffer)
+        p_sys->direct_rendering = false;
+
     if (p_sys->direct_rendering) {
         if (p_dec->fmt_in.video.orientation != ORIENT_NORMAL) {
             int i_angle;
