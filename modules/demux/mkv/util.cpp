@@ -211,7 +211,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
             if( !p_sys->i_subpacket )
             {
                 p_tk->i_last_dts = 
-                p_block->i_pts = i_pts + VLC_TS_0;
+                p_block->i_pts = i_pts;
             }
 
             p_frame += p_sys->i_subpacket_size;
