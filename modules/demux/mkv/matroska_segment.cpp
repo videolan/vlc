@@ -129,7 +129,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             idx.i_track       = -1;
             idx.i_block_number= -1;
             idx.i_position    = -1;
-            idx.i_time        = 0;
+            idx.i_time        = -1;
             idx.b_key         = true;
 
             ep->Down();
@@ -953,7 +953,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     {
 
         for( ; i_idx < i_index; i_idx++ )
-            if( p_indexes[i_idx].i_time + i_time_offset > i_date )
+            if( p_indexes[i_idx].i_time != -1 && p_indexes[i_idx].i_time + i_time_offset > i_date )
                 break;
 
         if( i_idx > 0 )

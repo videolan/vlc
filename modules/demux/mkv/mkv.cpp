@@ -468,7 +468,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
             for( i_index = 0; i_index < p_segment->i_index; i_index++ )
             {
                 if( p_segment->p_indexes[i_index].i_position >= i_pos &&
-                    p_segment->p_indexes[i_index].i_time > 0 )
+                    p_segment->p_indexes[i_index].i_time != -1 )
                     break;
             }
             if( i_index == p_segment->i_index )
