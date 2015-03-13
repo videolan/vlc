@@ -1408,12 +1408,6 @@ static void UpdatePESFilters( demux_t *p_demux, bool b_all )
              b_program_selected = ProgramIsSelected( p_sys, p_pmt->i_number );
 
         SetPIDFilter( p_sys, p_pat->programs.p_elems[i], b_program_selected );
-        if( p_pmt->i_pid_pcr > 0 )
-        {
-            SetPIDFilter( p_sys, &p_sys->pid[p_pmt->i_pid_pcr], b_program_selected );
-            if( b_program_selected )
-                msg_Dbg( p_demux, "enabling pcr pid %d from program %d", p_pmt->i_pid_pcr, p_pmt->i_number );
-        }
 
         for( int j=0; j<p_pmt->e_streams.i_size; j++ )
         {
@@ -1434,6 +1428,13 @@ static void UpdatePESFilters( demux_t *p_demux, bool b_all )
                 FlushESBuffer( espid->u.p_pes );
         }
 
+        /* Select pcr last in case it is handled by unselected ES */
+        if( p_pmt->i_pid_pcr > 0 )
+        {
+            SetPIDFilter( p_sys, &p_sys->pid[p_pmt->i_pid_pcr], b_program_selected );
+            if( b_program_selected )
+                msg_Dbg( p_demux, "enabling pcr pid %d from program %d", p_pmt->i_pid_pcr, p_pmt->i_number );
+        }
     }
 }
 
@@ -3062,6 +3063,7 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
         p_pmt->pcr.b_disable = true; /* So we do not wait packet PCR flag as there might be none on the pid */
         msg_Warn( p_demux, "No PCR received for program %d, set up workaround using pid %d",
                   p_pmt->i_number, i_cand );
+        UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
     }
 }
 
