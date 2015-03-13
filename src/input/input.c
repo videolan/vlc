@@ -72,6 +72,7 @@ static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, mtime_t i_
 static void       ControlRelease( int i_type, vlc_value_t val );
 static bool       ControlIsSeekRequest( int i_type );
 static bool       Control( input_thread_t *, int, vlc_value_t );
+static void       ControlPause( input_thread_t *, mtime_t );
 
 static int  UpdateTitleSeekpointFromDemux( input_thread_t * );
 static void UpdateGenericFromDemux( input_thread_t * );
@@ -539,6 +540,12 @@ static void *Run( void *obj )
 
     if( !Init( p_input ) )
     {
+        if( var_InheritBool( p_input, "start-paused" ) )
+        {
+            const mtime_t i_control_date = mdate();
+            ControlPause( p_input, i_control_date );
+        }
+
         MainLoop( p_input, true ); /* FIXME it can be wrong (like with VLM) */
 
         /* Clean up */

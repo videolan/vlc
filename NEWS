@@ -3,6 +3,7 @@ Changes between 2.2.x and 3.0.0-git:
 
 Core:
  * Support wayland surface type
+ * Allow to start the video paused on the first frame
 
 Access:
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)

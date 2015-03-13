@@ -1133,6 +1133,10 @@ static const char *const psz_recursive_list_text[] = {
 #define PAP_LONGTEXT N_( \
     "Pause each item in the playlist on the last frame." )
 
+#define SP_TEXT N_("Start paused")
+#define SP_LONGTEXT N_( \
+    "Pause each item in the playlist on the first frame." )
+
 #define AUTOSTART_TEXT N_( "Auto start" )
 #define AUTOSTART_LONGTEXT N_( "Automatically start playing the playlist " \
                 "content once it's loaded." )
@@ -1994,6 +1998,7 @@ vlc_module_begin ()
         change_safe()
     add_bool( "play-and-pause", 0, PAP_TEXT, PAP_LONGTEXT, true )
         change_safe()
+    add_bool( "start-paused", 0, SP_TEXT, SP_LONGTEXT, false )
     add_bool( "playlist-autostart", true,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
     add_bool( "playlist-cork", true, CORK_TEXT, CORK_LONGTEXT, false )
