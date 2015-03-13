@@ -525,7 +525,6 @@ static void              IODFree( iod_descriptor_t * );
 static int UserPmt( demux_t *p_demux, const char * );
 
 static int  SetPIDFilter( demux_sys_t *, ts_pid_t *, bool b_selected );
-static void SetPrgFilter( demux_t *, int i_prg, bool b_selected );
 
 #define TS_PACKET_SIZE_188 188
 #define TS_PACKET_SIZE_192 192
@@ -1327,6 +1326,14 @@ static int Demux( demux_t *p_demux )
             break;
 
         case TYPE_PES:
+            p_sys->b_end_preparse = true;
+
+            if( p_sys->es_creation == DELAY_ES ) /* No longer delay ES since that pid's program sends data */
+            {
+                msg_Dbg( p_demux, "Creating delayed ES" );
+                AddAndCreateES( p_demux, p_pid, true );
+            }
+
             if( !p_sys->b_access_control && !(p_pid->i_flags & FLAG_FILTERED) )
             {
                 /* That packet is for an unselected ES, don't waste time/memory gathering its data */
@@ -1334,24 +1341,7 @@ static int Demux( demux_t *p_demux )
                 continue;
             }
 
-            p_sys->b_end_preparse = true;
-            if( p_sys->es_creation == DELAY_ES ) /* No longer delay ES since that pid's program sends data */
-            {
-                AddAndCreateES( p_demux, p_pid, true );
-            }
             b_frame = GatherData( p_demux, p_pid, p_pkt );
-
-            if( p_sys->b_default_selection )
-            {
-                p_sys->b_default_selection = false;
-                assert(p_sys->programs.i_size == 1);
-                if( p_sys->programs.p_elems[0] != p_pid->p_parent->u.p_pmt->i_number )
-                {
-                    SetPrgFilter( p_demux, p_sys->programs.p_elems[0], false );
-                    SetPrgFilter( p_demux, p_pid->p_parent->u.p_pmt->i_number, true );
-                    p_sys->programs.p_elems[0] = p_pid->p_parent->u.p_pmt->i_number;
-                }
-            }
             break;
 
         case TYPE_SDT:
@@ -1850,49 +1840,6 @@ static int SetPIDFilter( demux_sys_t *p_sys, ts_pid_t *p_pid, bool b_selected )
 
     return stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_STATE,
                            p_pid->i_pid, b_selected );
-}
-
-static void SetPrgFilter( demux_t *p_demux, int i_prg_id, bool b_selected )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    ts_pmt_t *p_pmt = NULL;
-    ts_pid_t *pid = NULL;
-
-    /* Search pmt to be unselected */
-    if(unlikely(p_sys->pid[0].type != TYPE_PAT))
-        return;
-
-    ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
-    for( int i = 0; i < p_pat->programs.i_size; i++ )
-    {
-        ts_pid_t *pmtpid = p_pat->programs.p_elems[i];
-        assert(pmtpid->type == TYPE_PMT);
-
-        if( pmtpid->u.p_pmt->i_number == i_prg_id )
-        {
-            pid = pmtpid;
-            p_pmt = pid->u.p_pmt;
-            break;
-        }
-    }
-    if( !pid )
-        return;
-
-    p_pmt->pcr.b_disable = !p_sys->b_trust_pcr;
-
-    SetPIDFilter( p_sys, pid, b_selected );
-    if( p_pmt->i_pid_pcr > 0 )
-        SetPIDFilter( p_sys, &p_sys->pid[p_pmt->i_pid_pcr], b_selected );
-
-    /* All ES */
-    for( int i = 0; i < p_pmt->e_streams.i_size; i++ )
-    {
-        ts_pid_t *pespid = p_pmt->e_streams.p_elems[i];
-        assert( pespid->type == TYPE_PES );
-        /* We only remove/select es that aren't defined by extra pmt */
-        if( pespid->u.p_pes->es.id || !b_selected )
-            SetPIDFilter( p_sys, pespid, b_selected );
-    }
 }
 
 static void PIDReset( ts_pid_t *pid )
@@ -5651,6 +5598,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
         {
             if( p_sys->programs.i_size == 0 )
             {
+                msg_Dbg( p_demux, "temporary receiving program %d", p_program->i_number );
                 p_sys->b_default_selection = true;
                 ARRAY_APPEND( p_sys->programs, p_program->i_number );
             }
