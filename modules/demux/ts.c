@@ -1298,6 +1298,12 @@ static int Demux( demux_t *p_demux )
             p_pid->i_flags |= FLAG_SEEN;
         }
 
+        if ( SCRAMBLED(*p_pid) && !p_demux->p_sys->csa )
+        {
+            block_Release( p_pkt );
+            continue;
+        }
+
         /* Probe streams to build PAT/PMT after MIN_PAT_INTERVAL in case we don't see any PAT */
         if( !SEEN(p_sys->pid[0]) &&
             (p_pid->probed.i_type == 0 || p_pid->i_pid == p_sys->patfix.i_timesourcepid) &&
