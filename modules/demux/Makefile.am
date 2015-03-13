@@ -220,6 +220,7 @@ libplaylist_plugin_la_SOURCES = \
 	demux/playlist/ram.c \
 	demux/playlist/sgimb.c \
 	demux/playlist/shoutcast.c \
+	demux/playlist/wpl.c \
 	demux/playlist/xspf.c \
 	demux/playlist/directory.c \
 	demux/playlist/playlist.c demux/playlist/playlist.h
