@@ -422,7 +422,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                         ( p_current_chapter && p_current_chapter->p_segment != p_cur_chapter->p_segment ) ||
                         ( p_current_chapter->p_chapter->i_end_time != p_cur_chapter->p_chapter->i_start_time ))
                     {
-                        Seek( demux, p_cur_chapter->i_virtual_start_time, 0, p_cur_chapter, -1 );
+                        Seek( demux, p_cur_chapter->i_virtual_start_time, p_cur_chapter, -1 );
                         return true;
                     }
                 }
@@ -462,7 +462,7 @@ bool virtual_chapter_c::EnterAndLeave( virtual_chapter_c *p_item, bool b_enter )
     return p_chapter->EnterAndLeave( p_item->p_chapter, b_enter );
 }
 
-void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset,
+void virtual_segment_c::Seek( demux_t & demuxer, mkv_time_t i_date,
                               virtual_chapter_c *p_chapter, int64_t i_global_position )
 {
     demux_sys_t *p_sys = demuxer.p_sys;
@@ -475,7 +475,7 @@ void virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_
 
     if ( p_chapter != NULL )
     {
-        i_time_offset = p_chapter->i_virtual_start_time - ( ( p_chapter->p_chapter )? p_chapter->p_chapter->i_start_time : 0 );
+        mtime_t i_time_offset = p_chapter->i_virtual_start_time - ( ( p_chapter->p_chapter )? p_chapter->p_chapter->i_start_time : 0 );
         p_sys->i_chapter_time = i_time_offset - p_chapter->p_segment->i_start_time;
         if ( p_chapter->p_chapter && p_chapter->i_seekpoint_num > 0 )
         {

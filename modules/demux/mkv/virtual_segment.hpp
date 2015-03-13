@@ -155,7 +155,7 @@ public:
     virtual_chapter_c * FindChapter( int64_t i_find_uid );
 
     bool UpdateCurrentToChapter( demux_t & demux );
-    void Seek( demux_t & demuxer, mtime_t i_date, mtime_t i_time_offset,
+    void Seek( demux_t & demuxer, mtime_t i_date,
                virtual_chapter_c *p_chapter, int64_t i_global_position );
 private:
     void ChangeSegment( matroska_segment_c * p_old, matroska_segment_c * p_new, mtime_t i_start_time );

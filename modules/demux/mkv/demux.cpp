@@ -790,7 +790,7 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c *p_new_segment )
 
     /* Seek to the beginning */
     p_current_segment->Seek(p_current_segment->CurrentSegment()->sys.demuxer,
-                            0, 0, NULL, -1);
+                            0, NULL, -1);
 
     return true;
 }
@@ -808,7 +808,7 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, virtual_chapter_c * p_ch
         if ( !p_chapter->p_chapter || !p_chapter->p_chapter->Enter( true ) )
         {
             // jump to the location in the found segment
-            vsegment.Seek( demuxer, p_chapter->i_virtual_start_time, -1, p_chapter, -1 );
+            vsegment.Seek( demuxer, p_chapter->i_virtual_start_time, p_chapter, -1 );
         }
     }
 

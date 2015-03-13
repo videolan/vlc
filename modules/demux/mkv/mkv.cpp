@@ -429,7 +429,6 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
-    mtime_t            i_time_offset = 0;
     int64_t            i_global_position = -1;
 
     int         i_index;
@@ -481,7 +480,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
             }
         }
     }
-    p_vsegment->Seek( *p_demux, i_date, i_time_offset, p_chapter, i_global_position );
+    p_vsegment->Seek( *p_demux, i_date, p_chapter, i_global_position );
 }
 
 /* Needed by matroska_segment::Seek() and Seek */
