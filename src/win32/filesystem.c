@@ -149,6 +149,7 @@ DIR *vlc_opendir (const char *dirname)
         free (wpath);
         p_dir->wdir = NULL;
         p_dir->u.drives = GetLogicalDrives ();
+        p_dir->entry = NULL;
         return (void *)p_dir;
     }
 #endif
@@ -180,7 +181,10 @@ char *vlc_readdir (DIR *dir)
     {
         DWORD drives = p_dir->u.drives;
         if (drives == 0)
+        {
+            p_dir->entry = NULL;
             return NULL; /* end */
+        }
 
         unsigned int i;
         for (i = 0; !(drives & 1); i++)
