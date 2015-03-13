@@ -444,6 +444,8 @@ static int OpenDecoder(vlc_object_t *p_this)
 
         if (!strncmp(name_ptr, "OMX.google.", __MIN(11, name_len)))
             goto loopclean;
+        if (!strncmp(name_ptr, "OMX.MTK.VIDEO.DECODER.MPEG4", name_len))
+            goto loopclean;
         for (int j = 0; j < num_types && !found; j++) {
             jobject type = (*env)->GetObjectArrayElement(env, types, j);
             if (!jstrcmp(env, type, mime)) {
