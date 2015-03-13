@@ -507,7 +507,7 @@ static inline int PIDGet( block_t *p )
 }
 
 static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk );
-static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid );
+static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid, bool );
 static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_prg, mtime_t i_pcr );
 
 static block_t* ReadTSPacket( demux_t *p_demux );
@@ -1331,7 +1331,7 @@ static int Demux( demux_t *p_demux )
             p_sys->b_end_preparse = true;
             if( p_sys->es_creation == DELAY_ES ) /* No longer delay ES since that pid's program sends data */
             {
-                AddAndCreateES( p_demux, NULL );
+                AddAndCreateES( p_demux, p_pid, true );
             }
             b_frame = GatherData( p_demux, p_pid, p_pkt );
 
@@ -5053,35 +5053,32 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
 #endif
 }
 
-static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid )
+static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid, bool b_create_delayed )
 {
     demux_sys_t  *p_sys = p_demux->p_sys;
-    bool b_create_delayed = false;
 
-    if( pid )
-    {
-        if( SEEN(*pid) && p_sys->es_creation == DELAY_ES )
-        {
-            p_sys->es_creation = CREATE_ES;
-            b_create_delayed = true;
-        }
-
-        if( p_sys->es_creation == CREATE_ES )
-        {
-            pid->u.p_pes->es.id = es_out_Add( p_demux->out, &pid->u.p_pes->es.fmt );
-            for( int i = 0; i < pid->u.p_pes->extra_es.i_size; i++ )
-            {
-                pid->u.p_pes->extra_es.p_elems[i]->id =
-                    es_out_Add( p_demux->out, &pid->u.p_pes->extra_es.p_elems[i]->fmt );
-            }
-            p_sys->i_pmt_es += 1 + pid->u.p_pes->extra_es.i_size;
-            UpdatePESFilters( p_demux, p_sys->b_es_all );
-        }
-    }
-    else if( p_sys->es_creation == DELAY_ES )
-    {
+    if( b_create_delayed )
         p_sys->es_creation = CREATE_ES;
-        b_create_delayed = true;
+
+    if( pid && p_sys->es_creation == CREATE_ES )
+    {
+        pid->u.p_pes->es.id = es_out_Add( p_demux->out, &pid->u.p_pes->es.fmt );
+        for( int i = 0; i < pid->u.p_pes->extra_es.i_size; i++ )
+        {
+            pid->u.p_pes->extra_es.p_elems[i]->id =
+                    es_out_Add( p_demux->out, &pid->u.p_pes->extra_es.p_elems[i]->fmt );
+        }
+        p_sys->i_pmt_es += 1 + pid->u.p_pes->extra_es.i_size;
+
+        /* Update the default program == first created ES group */
+        if( p_sys->b_default_selection )
+        {
+            p_sys->b_default_selection = false;
+            assert(p_sys->programs.i_size == 1);
+            if( p_sys->programs.p_elems[0] != pid->p_parent->u.p_pmt->i_number )
+                p_sys->programs.p_elems[0] = pid->p_parent->u.p_pmt->i_number;
+            msg_Dbg( p_demux, "Default program is %d", pid->p_parent->u.p_pmt->i_number );
+        }
     }
 
     if( b_create_delayed )
@@ -5103,13 +5100,11 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid )
                         es_out_Add( p_demux->out, &pid->u.p_pes->extra_es.p_elems[k]->fmt );
                 }
                 p_sys->i_pmt_es += 1 + pid->u.p_pes->extra_es.i_size;
-
-                if( pid->u.p_pes->es.id != NULL && ProgramIsSelected( p_sys, pid->p_parent->u.p_pmt->i_number ) )
-                    SetPIDFilter( p_sys, pid, true );
             }
         }
-        UpdatePESFilters( p_demux, p_sys->b_es_all );
     }
+
+    UpdatePESFilters( p_demux, p_sys->b_es_all );
 }
 
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
@@ -5501,7 +5496,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             }
             else
             {
-                AddAndCreateES( p_demux, pespid );
+                AddAndCreateES( p_demux, pespid, false );
             }
         }
 
