@@ -62,7 +62,6 @@ static void read_head( demux_t* p_demux, input_item_t* p_input )
                 else if ( !strcasecmp( psz_attr, "content" ) )
                     psz_attribute_value = strdup( psz_val );
             }
-            printf( "name: %s; value: %s\n", psz_attribute_name, psz_attribute_value );
             if ( psz_attribute_name && psz_attribute_value )
             {
                 if ( !strcasecmp( psz_attribute_name, "TotalDuration" ) )
