@@ -225,14 +225,6 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
-    /* Open the given file */
-    p_sys->file = libssh2_sftp_open( p_sys->sftp_session, url.psz_path, LIBSSH2_FXF_READ, 0 );
-    if( !p_sys->file )
-    {
-        msg_Err( p_access, "Unable to open the remote file %s", url.psz_path );
-        goto error;
-    }
-
     /* Get some information */
     LIBSSH2_SFTP_ATTRIBUTES attributes;
     if( libssh2_sftp_stat( p_sys->sftp_session, url.psz_path, &attributes ) )
@@ -240,7 +232,19 @@ static int Open( vlc_object_t* p_this )
         msg_Err( p_access, "Impossible to get information about the remote file %s", url.psz_path );
         goto error;
     }
-    p_sys->filesize = attributes.filesize;
+
+    if( !LIBSSH2_SFTP_S_ISDIR( attributes.permissions ))
+    {
+        /* Open the given file */
+        p_sys->file = libssh2_sftp_open( p_sys->sftp_session, url.psz_path, LIBSSH2_FXF_READ, 0 );
+        p_sys->filesize = attributes.filesize;
+    }
+
+    if( !p_sys->file )
+    {
+        msg_Err( p_access, "Unable to open the remote path %s", url.psz_path );
+        goto error;
+    }
 
     p_sys->i_read_size = var_InheritInteger( p_access, "sftp-readsize" );
 
