@@ -52,6 +52,12 @@ static void Close( vlc_object_t* );
 #define PORT_LONGTEXT N_("SFTP port number to use on the server")
 #define MTU_TEXT N_("Read size")
 #define MTU_LONGTEXT N_("Size of the request for reading access")
+#define USER_TEXT N_("SFTP user name")
+#define USER_LONGTEXT N_("Sets the username for the connection, " \
+    "if no username or password are set in the url.")
+#define PASS_TEXT N_("SFTP password")
+#define PASS_LONGTEXT N_("Sets the password for the connection, " \
+    "if no username or password are set in the url.")
 
 vlc_module_begin ()
     set_shortname( "SFTP" )
@@ -61,6 +67,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "sftp-readsize", 8192, MTU_TEXT, MTU_LONGTEXT, true )
     add_integer( "sftp-port", 22, PORT_TEXT, PORT_LONGTEXT, true )
+    add_string( "sftp-user", NULL, USER_TEXT, USER_LONGTEXT, false )
+    add_password( "sftp-pwd", NULL, PASS_TEXT, PASS_LONGTEXT, false )
     add_shortcut( "sftp" )
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -120,13 +128,19 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
-    /* If the user name is empty, ask the user */
-    if( !EMPTY_STR( url.psz_username ) && url.psz_password )
-    {
+    /* get user/password from url or options */
+    if( !EMPTY_STR( url.psz_username ) )
         psz_username = strdup( url.psz_username );
-        psz_password = strdup( url.psz_password );
-    }
     else
+        psz_username = var_InheritString( p_access, "sftp-user" );
+
+    if( url.psz_password )
+        psz_password = strdup( url.psz_password );
+    else
+        psz_password = var_InheritString( p_access, "sftp-pwd" );
+
+    /* If the user name or password is empty, ask the user */
+    if( EMPTY_STR( psz_username ) || !psz_password )
     {
         dialog_Login( p_access, &psz_username, &psz_password,
                       _("SFTP authentication"),
