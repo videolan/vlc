@@ -519,7 +519,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         {
             tk->b_inited = false;
             if( tk->fmt.i_cat == VIDEO_ES || tk->fmt.i_cat == AUDIO_ES )
-                tk->i_last_dts = i_pts;
+                tk->i_last_dts = VLC_TS_INVALID;
             return;
         }
     }
