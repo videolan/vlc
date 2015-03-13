@@ -1413,7 +1413,11 @@ static void UpdatePESFilters( demux_t *p_demux, bool b_all )
 
         SetPIDFilter( p_sys, p_pat->programs.p_elems[i], b_program_selected );
         if( p_pmt->i_pid_pcr > 0 )
+        {
             SetPIDFilter( p_sys, &p_sys->pid[p_pmt->i_pid_pcr], b_program_selected );
+            if( b_program_selected )
+                msg_Dbg( p_demux, "enabling pcr pid %d from program %d", p_pmt->i_pid_pcr, p_pmt->i_number );
+        }
 
         for( int j=0; j<p_pmt->e_streams.i_size; j++ )
         {
@@ -1427,7 +1431,7 @@ static void UpdatePESFilters( demux_t *p_demux, bool b_all )
                 b_stream_selected = false;
 
             if( b_stream_selected )
-                msg_Dbg( p_demux, "enablind pid %d from program %d", espid->i_pid, p_pmt->i_number );
+                msg_Dbg( p_demux, "enabling pid %d from program %d", espid->i_pid, p_pmt->i_number );
 
             SetPIDFilter( p_sys, espid, b_stream_selected );
             if( !b_stream_selected )
