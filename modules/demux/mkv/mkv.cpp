@@ -604,7 +604,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             handle_real_audio(p_demux, tk, p_block, i_pts);
             block_Release(p_block);
             i_pts = ( tk->i_default_duration )?
-                i_pts + ( mtime_t )( tk->i_default_duration / 1000 ):
+                i_pts + ( mtime_t )tk->i_default_duration:
                 VLC_TS_INVALID;
             continue;
          }
@@ -673,7 +673,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 if ( b_key_picture || b_discardable_picture )
                     p_block->i_dts = p_block->i_pts;
                 else
-                    p_block->i_dts = min( i_pts, tk->i_last_dts + ( mtime_t )( tk->i_default_duration / 1000 ) );
+                    p_block->i_dts = min( i_pts, tk->i_last_dts + ( mtime_t )tk->i_default_duration );
             }
         }
         if( p_block->i_dts > VLC_TS_INVALID &&
@@ -701,7 +701,7 @@ msg_Dbg( p_demux, "block (track=%d) i_dts: %"PRId64" / i_pts: %"PRId64, tk->i_nu
 
         /* use time stamp only for first block */
         i_pts = ( tk->i_default_duration )?
-                 i_pts + ( mtime_t )( tk->i_default_duration / 1000 ):
+                 i_pts + ( mtime_t )tk->i_default_duration:
                  VLC_TS_INVALID;
     }
 }

@@ -337,7 +337,8 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             KaxTrackDefaultDuration &defd = *(KaxTrackDefaultDuration*)l;
 
             tk->i_default_duration = uint64(defd);
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track Default Duration=%" PRId64, uint64(defd) );
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track Default Duration=%" PRId64, tk->i_default_duration );
+            tk->i_default_duration /= 1000;
         }
         else  if( MKV_IS_ID( l, KaxTrackTimecodeScale ) )
         {
@@ -532,7 +533,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             msg_Dbg( &sys.demuxer, "|   |   |   + Track Video" );
             tk->f_fps = 0.0;
 
-            tk->fmt.video.i_frame_rate_base = (unsigned int)(tk->i_default_duration / 1000);
+            tk->fmt.video.i_frame_rate_base = (unsigned int)tk->i_default_duration;
             tk->fmt.video.i_frame_rate = 1000000;
 
             for( unsigned int j = 0; j < tkv->ListSize(); j++ )
