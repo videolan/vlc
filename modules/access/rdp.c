@@ -62,9 +62,13 @@
 # include <poll.h>
 #endif
 
-#define RDP_USER N_("RDP auth username")
-#define RDP_PASSWORD N_("RDP auth password")
-#define RDP_PASSWORD_LONGTEXT N_("RDP Password")
+#define USER_TEXT N_("Username")
+#define USER_LONGTEXT N_("Username that will be used for the connection, " \
+        "if no username is set in the URL.")
+#define PASS_TEXT N_("Password")
+#define PASS_LONGTEXT N_("Password that will be used for the connection, " \
+        "if no username or password are set in URL.")
+
 #define RDP_ENCRYPT N_("Encrypted connexion")
 #define RDP_FPS N_("Frame rate")
 #define RDP_FPS_LONGTEXT N_("Acquisition rate (in fps)")
@@ -85,9 +89,9 @@ vlc_module_begin()
     set_description( N_("RDP Remote Desktop") )
     set_capability( "access_demux", 0 )
 
-    add_string( CFG_PREFIX "user", NULL, RDP_USER, RDP_USER, false )
+    add_string( CFG_PREFIX "user", NULL, USER_TEXT, USER_LONGTEXT, false )
         change_safe()
-    add_password( CFG_PREFIX "password", NULL, RDP_PASSWORD, RDP_PASSWORD_LONGTEXT, false )
+    add_password( CFG_PREFIX "password", NULL, PASS_TEXT, PASS_LONGTEXT, false )
         change_safe()
     add_float( CFG_PREFIX "fps", 5, RDP_FPS, RDP_FPS_LONGTEXT, true )
 

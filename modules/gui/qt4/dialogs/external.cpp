@@ -104,13 +104,13 @@ void DialogHandler::requestLogin (void *value)
     dialog->setWindowRole ("vlc-login");
     layout->setMargin (2);
 
-    /* User name and password fields */
+    /* Username and password fields */
     QWidget *panel = new QWidget (dialog);
     QGridLayout *grid = new QGridLayout;
     grid->addWidget (new QLabel (qfu(data->message)), 0, 0, 1, 2);
 
     QLineEdit *userLine = new QLineEdit;
-    grid->addWidget (new QLabel (qtr("User name")), 1, 0);
+    grid->addWidget (new QLabel (qtr("Username")), 1, 0);
     grid->addWidget (userLine, 1, 1);
 
     QLineEdit *passLine = new QLineEdit;

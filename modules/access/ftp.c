@@ -62,12 +62,12 @@ static int  OutOpen ( vlc_object_t * );
 static void OutClose( vlc_object_t * );
 #endif
 
-#define USER_TEXT N_("FTP user name")
-#define USER_LONGTEXT N_("User name that will " \
-    "be used for the connection.")
-#define PASS_TEXT N_("FTP password")
-#define PASS_LONGTEXT N_("Password that will be " \
-    "used for the connection.")
+#define USER_TEXT N_("Username")
+#define USER_LONGTEXT N_("Username that will be used for the connection, " \
+        "if no username is set in the URL.")
+#define PASS_TEXT N_("Password")
+#define PASS_LONGTEXT N_("Password that will be used for the connection, " \
+        "if no username or password are set in URL.")
 #define ACCOUNT_TEXT N_("FTP account")
 #define ACCOUNT_LONGTEXT N_("Account that will be " \
     "used for the connection.")

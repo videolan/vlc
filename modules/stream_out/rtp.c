@@ -173,7 +173,7 @@ static const char *const ppsz_protocols[] = {
     "minute)." )
 
 #define RTSP_USER_TEXT N_("Username")
-#define RTSP_USER_LONGTEXT N_("User name that will be " \
+#define RTSP_USER_LONGTEXT N_("Username that will be " \
                               "requested to access the stream." )
 #define RTSP_PASS_TEXT N_("Password")
 #define RTSP_PASS_LONGTEXT N_("Password that will be " \

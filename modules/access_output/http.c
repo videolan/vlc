@@ -50,7 +50,7 @@ static void Close( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-http-"
 
 #define USER_TEXT N_("Username")
-#define USER_LONGTEXT N_("User name that will be " \
+#define USER_LONGTEXT N_("Username that will be " \
                          "requested to access the stream." )
 #define PASS_TEXT N_("Password")
 #define PASS_LONGTEXT N_("Password that will be " \

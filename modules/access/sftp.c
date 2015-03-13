@@ -52,12 +52,12 @@ static void Close( vlc_object_t* );
 #define PORT_LONGTEXT N_("SFTP port number to use on the server")
 #define MTU_TEXT N_("Read size")
 #define MTU_LONGTEXT N_("Size of the request for reading access")
-#define USER_TEXT N_("SFTP user name")
-#define USER_LONGTEXT N_("Sets the username for the connection, " \
-    "if no username or password are set in the url.")
-#define PASS_TEXT N_("SFTP password")
-#define PASS_LONGTEXT N_("Sets the password for the connection, " \
-    "if no username or password are set in the url.")
+#define USER_TEXT N_("Username")
+#define USER_LONGTEXT N_("Username that will be used for the connection, " \
+        "if no username is set in the URL.")
+#define PASS_TEXT N_("Password")
+#define PASS_LONGTEXT N_("Password that will be used for the connection, " \
+        "if no username or password are set in URL.")
 
 vlc_module_begin ()
     set_shortname( "SFTP" )

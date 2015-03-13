@@ -85,10 +85,10 @@ static void Close( vlc_object_t * );
     "of RTSP. Selecting this parameter will tell VLC to assume some " \
     "options contrary to RFC 2326 guidelines.")
 
-#define USER_TEXT N_("RTSP user name")
+#define USER_TEXT N_("Username")
 #define USER_LONGTEXT N_("Sets the username for the connection, " \
     "if no username or password are set in the url.")
-#define PASS_TEXT N_("RTSP password")
+#define PASS_TEXT N_("Password")
 #define PASS_LONGTEXT N_("Sets the password for the connection, " \
     "if no username or password are set in the url.")
 #define FRAME_BUFFER_SIZE_TEXT N_("RTSP frame buffer size")

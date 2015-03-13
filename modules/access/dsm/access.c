@@ -55,12 +55,12 @@ static void Close( vlc_object_t * );
 
 #define vlc_sd_probe_Open bdsm_sd_probe_Open
 
-#define USER_TEXT N_("SMB user name")
-#define USER_LONGTEXT N_("User name that will " \
-    "be used for the connection. username in uri take precedence over this")
-#define PASS_TEXT N_("SMB password")
-#define PASS_LONGTEXT N_("Password that will be " \
-    "used for the connection. Password in uri take precedence over this.")
+#define USER_TEXT N_("Username")
+#define USER_LONGTEXT N_("Username that will be used for the connection, " \
+        "if no username is set in the URL.")
+#define PASS_TEXT N_("Password")
+#define PASS_LONGTEXT N_("Password that will be used for the connection, " \
+        "if no username or password are set in URL.")
 #define DOMAIN_TEXT N_("SMB domain")
 #define DOMAIN_LONGTEXT N_("Domain/Workgroup that " \
     "will be used for the connection. Domain of uri will also be tried.")

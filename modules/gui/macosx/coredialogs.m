@@ -56,7 +56,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 
 -(void)awakeFromNib
 {
-    [o_auth_login_txt setStringValue: _NS("User name")];
+    [o_auth_login_txt setStringValue: _NS("Username")];
     [o_auth_pw_txt setStringValue: _NS("Password")];
     [o_auth_cancel_btn setTitle: _NS("Cancel")];
     [o_auth_ok_btn setTitle: _NS("OK")];

@@ -313,7 +313,7 @@ create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc
     [o_audio_lang_txt setStringValue: _NS("Preferred Audio language")];
     [o_audio_last_ckb setTitle: _NS("Enable Last.fm submissions")];
     [o_audio_lastpwd_txt setStringValue: _NS("Password")];
-    [o_audio_lastuser_txt setStringValue: _NS("User name")];
+    [o_audio_lastuser_txt setStringValue: _NS("Username")];
     [o_audio_spdif_ckb setTitle: _NS("Use S/PDIF when available")];
     [o_audio_visual_txt setStringValue: _NS("Visualization")];
     [o_audio_autosavevol_yes_bcell setTitle: _NS("Keep audio level between sessions")];

@@ -78,7 +78,7 @@
     s_rc.size.width = 129;
     _userNameLabel = [[NSTextField alloc] initWithFrame:s_rc];
     [_userNameLabel setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
-    [_userNameLabel setStringValue:@"User Name"];
+    [_userNameLabel setStringValue:@"Username"];
     [_userNameLabel setBezeled:NO];
     [_userNameLabel setEditable:NO];
     [_userNameLabel setSelectable:NO];
