@@ -297,6 +297,17 @@ static int jstrcmp(JNIEnv* env, jobject str, const char* str2)
     return ret;
 }
 
+static inline bool check_exception( JNIEnv *env )
+{
+    if ((*env)->ExceptionOccurred(env)) {
+        (*env)->ExceptionClear(env);
+        return true;
+    }
+    else
+        return false;
+}
+#define CHECK_EXCEPTION() check_exception( env )
+
 /*****************************************************************************
  * OpenDecoder: Create the decoder instance
  *****************************************************************************/
@@ -345,9 +356,8 @@ static int OpenDecoder(vlc_object_t *p_this)
         *(jclass*)((uint8_t*)p_sys + classes[i].offset) =
             (*env)->FindClass(env, classes[i].name);
 
-        if ((*env)->ExceptionOccurred(env)) {
+        if (CHECK_EXCEPTION()) {
             msg_Warn(p_dec, "Unable to find class %s", classes[i].name);
-            (*env)->ExceptionClear(env);
             goto error;
         }
     }
@@ -357,9 +367,8 @@ static int OpenDecoder(vlc_object_t *p_this)
         if (i == 0 || strcmp(members[i].class, members[i - 1].class))
             last_class = (*env)->FindClass(env, members[i].class);
 
-        if ((*env)->ExceptionOccurred(env)) {
+        if (CHECK_EXCEPTION()) {
             msg_Warn(p_dec, "Unable to find class %s", members[i].class);
-            (*env)->ExceptionClear(env);
             goto error;
         }
 
@@ -377,10 +386,9 @@ static int OpenDecoder(vlc_object_t *p_this)
                 (*env)->GetFieldID(env, last_class, members[i].name, members[i].sig);
             break;
         }
-        if ((*env)->ExceptionOccurred(env)) {
+        if (CHECK_EXCEPTION()) {
             msg_Warn(p_dec, "Unable to find the member %s in %s",
                      members[i].name, members[i].class);
-            (*env)->ExceptionClear(env);
             if (members[i].critical)
                 goto error;
         }
@@ -417,9 +425,8 @@ static int OpenDecoder(vlc_object_t *p_this)
 
         codec_capabilities = (*env)->CallObjectMethod(env, info, p_sys->get_capabilities_for_type,
                                                       (*env)->NewStringUTF(env, mime));
-        if ((*env)->ExceptionOccurred(env)) {
+        if (CHECK_EXCEPTION()) {
             msg_Warn(p_dec, "Exception occurred in MediaCodecInfo.getCapabilitiesForType");
-            (*env)->ExceptionClear(env);
             goto loopclean;
         } else if (codec_capabilities) {
             profile_levels = (*env)->GetObjectField(env, codec_capabilities, p_sys->profile_levels_field);
@@ -499,9 +506,8 @@ loopclean:
     // but not in 4.1 devices.
     p_sys->codec = (*env)->CallStaticObjectMethod(env, p_sys->media_codec_class,
                                                   p_sys->create_by_codec_name, codec_name);
-    if ((*env)->ExceptionOccurred(env)) {
+    if (CHECK_EXCEPTION()) {
         msg_Warn(p_dec, "Exception occurred in MediaCodec.createByCodecName.");
-        (*env)->ExceptionClear(env);
         goto error;
     }
     p_sys->allocated = true;
@@ -578,9 +584,8 @@ loopclean:
         if (surf) {
             // Configure MediaCodec with the Android surface.
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->configure, format, surf, NULL, 0);
-            if ((*env)->ExceptionOccurred(env)) {
+            if (CHECK_EXCEPTION()) {
                 msg_Warn(p_dec, "Exception occurred in MediaCodec.configure with an output surface.");
-                (*env)->ExceptionClear(env);
                 jni_UnlockAndroidSurface();
                 goto error;
             }
@@ -593,17 +598,15 @@ loopclean:
     }
     if (!p_sys->direct_rendering) {
         (*env)->CallVoidMethod(env, p_sys->codec, p_sys->configure, format, NULL, NULL, 0);
-        if ((*env)->ExceptionOccurred(env)) {
+        if (CHECK_EXCEPTION()) {
             msg_Warn(p_dec, "Exception occurred in MediaCodec.configure");
-            (*env)->ExceptionClear(env);
             goto error;
         }
     }
 
     (*env)->CallVoidMethod(env, p_sys->codec, p_sys->start);
-    if ((*env)->ExceptionOccurred(env)) {
+    if (CHECK_EXCEPTION()) {
         msg_Warn(p_dec, "Exception occurred in MediaCodec.start");
-        (*env)->ExceptionClear(env);
         goto error;
     }
     p_sys->started = true;
@@ -655,18 +658,14 @@ static void CloseDecoder(vlc_object_t *p_this)
         if (p_sys->started)
         {
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->stop);
-            if ((*env)->ExceptionOccurred(env)) {
+            if (CHECK_EXCEPTION())
                 msg_Err(p_dec, "Exception in MediaCodec.stop");
-                (*env)->ExceptionClear(env);
-            }
         }
         if (p_sys->allocated)
         {
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release);
-            if ((*env)->ExceptionOccurred(env)) {
+            if (CHECK_EXCEPTION())
                 msg_Err(p_dec, "Exception in MediaCodec.release");
-                (*env)->ExceptionClear(env);
-            }
         }
         (*env)->DeleteGlobalRef(env, p_sys->codec);
     }
@@ -709,10 +708,8 @@ static void UnlockPicture(picture_t* p_pic, bool b_render)
     JNIEnv *env = NULL;
     jni_attach_thread(&env, THREAD_NAME);
     (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, i_index, b_render);
-    if ((*env)->ExceptionOccurred(env)) {
+    if (CHECK_EXCEPTION())
         msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer (DisplayBuffer)");
-        (*env)->ExceptionClear(env);
-    }
 
     jni_detach_thread();
     p_picsys->priv.hw.b_valid = false;
@@ -762,9 +759,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
     while (1) {
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_output_buffer,
                                           p_sys->buffer_info, timeout);
-        if ((*env)->ExceptionOccurred(env)) {
+        if (CHECK_EXCEPTION()) {
             msg_Err(p_dec, "Exception in MediaCodec.dequeueOutputBuffer (GetOutput)");
-            (*env)->ExceptionClear(env);
             p_sys->error_state = true;
             return;
         }
@@ -773,9 +769,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             if (!p_sys->pixel_format) {
                 msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
-                if ((*env)->ExceptionOccurred(env)) {
+                if (CHECK_EXCEPTION()) {
                     msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer");
-                    (*env)->ExceptionClear(env);
                     p_sys->error_state = true;
                     return;
                 }
@@ -789,10 +784,9 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 picture_sys_t *p_picsys = p_pic->p_sys;
                 int i_prev_index = p_picsys->priv.hw.i_index;
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, i_prev_index, false);
-                if ((*env)->ExceptionOccurred(env)) {
+                if (CHECK_EXCEPTION()) {
                     msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer " \
                             "(GetOutput, overwriting previous picture)");
-                    (*env)->ExceptionClear(env);
                     p_sys->error_state = true;
                     return;
                 }
@@ -859,9 +853,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             } else {
                 msg_Warn(p_dec, "NewPicture failed");
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
-                if ((*env)->ExceptionOccurred(env)) {
+                if (CHECK_EXCEPTION()) {
                     msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer (GetOutput)");
-                    (*env)->ExceptionClear(env);
                     p_sys->error_state = true;
                 }
             }
@@ -875,9 +868,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
 
             p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
                                                              p_sys->get_output_buffers);
-            if ((*env)->ExceptionOccurred(env)) {
+            if (CHECK_EXCEPTION()) {
                 msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffer (GetOutput)");
-                (*env)->ExceptionClear(env);
                 p_sys->output_buffers = NULL;
                 p_sys->error_state = true;
                 return;
@@ -886,9 +878,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
         } else if (index == INFO_OUTPUT_FORMAT_CHANGED) {
             jobject format = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_format);
-            if ((*env)->ExceptionOccurred(env)) {
+            if (CHECK_EXCEPTION()) {
                 msg_Err(p_dec, "Exception in MediaCodec.getOutputFormat (GetOutput)");
-                (*env)->ExceptionClear(env);
                 p_sys->error_state = true;
                 return;
             }
@@ -940,8 +931,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 p_sys->stride = width;
             if (p_sys->slice_height <= 0)
                 p_sys->slice_height = height;
-            if ((*env)->ExceptionOccurred(env))
-                (*env)->ExceptionClear(env);
+            CHECK_EXCEPTION();
 
             ArchitectureSpecificCopyHooks(p_dec, p_sys->pixel_format, p_sys->slice_height,
                                           p_sys->stride, &p_sys->architecture_specific_data);
@@ -993,9 +983,8 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                 InvalidateAllPictures(p_dec);
 
             (*env)->CallVoidMethod(env, p_sys->codec, p_sys->flush);
-            if ((*env)->ExceptionOccurred(env)) {
+            if (CHECK_EXCEPTION()) {
                 msg_Warn(p_dec, "Exception occurred in MediaCodec.flush");
-                (*env)->ExceptionClear(env);
                 p_sys->error_state = true;
             }
         }
@@ -1017,9 +1006,8 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     int attempts = 0;
     while (true) {
         int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_input_buffer, (jlong) 0);
-        if ((*env)->ExceptionOccurred(env)) {
+        if (CHECK_EXCEPTION()) {
             msg_Err(p_dec, "Exception occurred in MediaCodec.dequeueInputBuffer");
-            (*env)->ExceptionClear(env);
             p_sys->error_state = true;
             break;
         }
@@ -1090,9 +1078,8 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         timestamp_FifoPut(p_sys->timestamp_fifo, p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
         (*env)->CallVoidMethod(env, p_sys->codec, p_sys->queue_input_buffer, index, 0, size, ts, 0);
         (*env)->DeleteLocalRef(env, buf);
-        if ((*env)->ExceptionOccurred(env)) {
+        if (CHECK_EXCEPTION()) {
             msg_Err(p_dec, "Exception in MediaCodec.queueInputBuffer");
-            (*env)->ExceptionClear(env);
             p_sys->error_state = true;
             break;
         }
