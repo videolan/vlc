@@ -500,6 +500,7 @@ static ts_pmt_t * GetProgramByID( demux_sys_t *, int i_program );
 static bool ProgramIsSelected( demux_sys_t *, uint16_t i_pgrm );
 static void UpdatePESFilters( demux_t *p_demux, bool b_all );
 static inline void FlushESBuffer( ts_pes_t *p_pes );
+static void UpdateScrambledState( demux_t *p_demux, ts_pid_t *p_pid, bool );
 static inline int PIDGet( block_t *p )
 {
     return ( (p->p_buffer[1]&0x1f)<<8 )|p->p_buffer[2];
@@ -1287,6 +1288,16 @@ static int Demux( demux_t *p_demux )
         /* Parse the TS packet */
         ts_pid_t *p_pid = &p_sys->pid[PIDGet( p_pkt )];
 
+        if( SCRAMBLED(*p_pid) != !!(p_pkt->p_buffer[3] & 0x80) )
+            UpdateScrambledState( p_demux, p_pid, p_pkt->p_buffer[3] & 0x80 );
+
+        if( !SEEN(*p_pid) )
+        {
+            if( p_pid->type == TYPE_FREE )
+                msg_Dbg( p_demux, "pid[%d] unknown", p_pid->i_pid );
+            p_pid->i_flags |= FLAG_SEEN;
+        }
+
         /* Probe streams to build PAT/PMT after MIN_PAT_INTERVAL in case we don't see any PAT */
         if( !SEEN(p_sys->pid[0]) &&
             (p_pid->probed.i_type == 0 || p_pid->i_pid == p_sys->patfix.i_timesourcepid) &&
@@ -1346,16 +1357,11 @@ static int Demux( demux_t *p_demux )
             break;
 
         default:
-            if( !SEEN(*p_pid) )
-                msg_Dbg( p_demux, "pid[%d] unknown", p_pid->i_pid );
-
             /* We have to handle PCR if present */
             PCRHandle( p_demux, p_pid, p_pkt );
             block_Release( p_pkt );
             break;
         }
-
-        p_pid->i_flags |= FLAG_SEEN;
 
         if( b_frame || ( b_wait_es && p_sys->i_pmt_es > 0 ) )
             break;
@@ -2618,6 +2624,29 @@ static mtime_t GetPCR( block_t *p_pkt )
     return i_pcr;
 }
 
+static void UpdateScrambledState( demux_t *p_demux, ts_pid_t *p_pid, bool b_scrambled )
+{
+    if( !SCRAMBLED(*p_pid) == !b_scrambled )
+        return;
+
+    msg_Warn( p_demux, "scrambled state changed on pid %d (%d->%d)",
+              p_pid->i_pid, SCRAMBLED(*p_pid), b_scrambled );
+
+    p_pid->i_flags |= (b_scrambled) ? FLAG_SCRAMBLED : FLAGS_NONE;
+
+    if( p_pid->type == TYPE_PES && p_pid->u.p_pes->es.id )
+    {
+        for( int i = 0; i < p_pid->u.p_pes->extra_es.i_size; i++ )
+        {
+            if( p_pid->u.p_pes->extra_es.p_elems[i]->id )
+                es_out_Control( p_demux->out, ES_OUT_SET_ES_SCRAMBLED_STATE,
+                                p_pid->u.p_pes->extra_es.p_elems[i]->id, b_scrambled );
+        }
+        es_out_Control( p_demux->out, ES_OUT_SET_ES_SCRAMBLED_STATE,
+                        p_pid->u.p_pes->es.id, b_scrambled );
+    }
+}
+
 static inline void FlushESBuffer( ts_pes_t *p_pes )
 {
     if( p_pes->p_data )
@@ -3083,7 +3112,6 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
     const uint8_t *p = p_bk->p_buffer;
     const bool b_unit_start = p[1]&0x40;
-    const bool b_scrambled  = p[3]&0x80;
     const bool b_adaptation = p[3]&0x20;
     const bool b_payload    = p[3]&0x10;
     const int  i_cc         = p[3]&0x0f; /* continuity counter */
@@ -3187,23 +3215,6 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     {
         block_Release( p_bk );
         return i_ret;
-    }
-
-    /* */
-    if( !SCRAMBLED(*pid) != !b_scrambled )
-    {
-        msg_Warn( p_demux, "scrambled state changed on pid %d (%d->%d)",
-                  pid->i_pid, SCRAMBLED(*pid), b_scrambled );
-
-        pid->i_flags |= (b_scrambled) ? FLAG_SCRAMBLED : FLAGS_NONE;
-
-        for( int i = 0; i < pid->u.p_pes->extra_es.i_size; i++ )
-        {
-            es_out_Control( p_demux->out, ES_OUT_SET_ES_SCRAMBLED_STATE,
-                            pid->u.p_pes->extra_es.p_elems[i]->id, b_scrambled );
-        }
-        es_out_Control( p_demux->out, ES_OUT_SET_ES_SCRAMBLED_STATE,
-                        pid->u.p_pes->es.id, b_scrambled );
     }
 
     /* We have to gather it */
