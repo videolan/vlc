@@ -613,7 +613,15 @@ loopclean:
 
     if (p_sys->get_input_buffers && p_sys->get_output_buffers) {
         p_sys->input_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_input_buffers);
+        if (CHECK_EXCEPTION()) {
+            msg_Err(p_dec, "Exception in MediaCodec.getInputBuffers (OpenDecoder)");
+            goto error;
+        }
         p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_buffers);
+        if (CHECK_EXCEPTION()) {
+            msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffers (OpenDecoder)");
+            goto error;
+        }
         p_sys->input_buffers = (*env)->NewGlobalRef(env, p_sys->input_buffers);
         p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
     }
