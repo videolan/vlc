@@ -138,7 +138,22 @@ struct decoder_sys_t
     /* LOAS */
     bool b_latm_cfg;
     latm_mux_t latm;
+
+    int i_warnings;
 };
+
+enum
+{
+    WARN_CRC_UNSUPPORTED = 1
+};
+
+#define WARN_ONCE(warn, msg) do{\
+        if( (p_dec->p_sys->i_warnings & warn) == 0 )\
+        {\
+            p_dec->p_sys->i_warnings |= warn;\
+            msg_Warn( p_dec, msg );\
+        }\
+    } while(0)
 
 enum {
     TYPE_NONE,
@@ -196,6 +211,7 @@ static int OpenPacketizer(vlc_object_t *p_this)
     date_Set(&p_sys->end_date, 0);
     block_BytestreamInit(&p_sys->bytestream);
     p_sys->b_latm_cfg = false;
+    p_sys->i_warnings = 0;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -351,7 +367,7 @@ static int ADTSSyncInfo(decoder_t * p_dec, const uint8_t * p_buf,
 
     if (i_raw_blocks_in_frame == 0) {
         if (b_crc) {
-            msg_Warn(p_dec, "ADTS CRC not supported");
+            WARN_ONCE(WARN_CRC_UNSUPPORTED, "ADTS CRC not supported");
             //uint16_t crc = (p_buf[7] << 8) | p_buf[8];
         }
     } else {
@@ -374,7 +390,7 @@ static int ADTSSyncInfo(decoder_t * p_dec, const uint8_t * p_buf,
         for (i = 0 ; i <= i_raw_blocks_in_frame ; i++) {
             //read 1 block
             if (b_crc) {
-                msg_Err(p_dec, "ADTS CRC not supported");
+                WARN_ONCE(WARN_CRC_UNSUPPORTED, "ADTS CRC not supported");
                 //uint16_t crc = (*p_pos << 8) | *(p_pos+1);
                 //p_pos += 2;
             }
