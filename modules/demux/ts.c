@@ -5475,7 +5475,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     else if( stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
                              p_dvbpsipmt ) != VLC_SUCCESS )
     {
-        if ( p_sys->arib.e_mode == ARIBMODE_ENABLED )
+        if ( p_sys->arib.e_mode == ARIBMODE_ENABLED && !p_sys->arib.b25stream )
         {
             p_sys->arib.b25stream = stream_FilterNew( p_demux->s, "aribcam" );
             p_sys->stream = ( p_sys->arib.b25stream ) ? p_sys->arib.b25stream : p_demux->s;
