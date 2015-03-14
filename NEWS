@@ -31,7 +31,7 @@ Decoder:
  * New BPG decoder based on libbpg
  * Fixed uncompressed DVD-Audio (AOB) LPCM decoding
  * Rewrite WPL playlists and add ZPL playlists support (Zune)
- * Support TDSC
+ * Support TDSC, Canopus HQX
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
