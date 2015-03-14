@@ -16,6 +16,8 @@ Access:
    domain / path matching, Secure cookies)
  * Support DVB-T2 on Windows BDA
  * Support depayloading Opus from RTP
+ * Support sftp username and passwords options and URL
+ * New UPnP access module, to list directories without infinite recursions
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
@@ -28,6 +30,7 @@ Decoder:
  * New MPEG-1 & 2 audio layer I, II, III + MPEG 2.5 decoder based on libmpg123
  * New BPG decoder based on libbpg
  * Fixed uncompressed DVD-Audio (AOB) LPCM decoding
+ * Rewrite WPL playlists and add ZPL playlists support (Zune)
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
@@ -48,6 +51,7 @@ Stream filter:
 
 Audio output:
  * Complete rewrite of the AudioTrack Android module. This is now the default.
+   It now supports HDMI/SPDIF passthrough for AC3, 5.1/7.1 and float output.
 
 Video ouput:
  * Linux/BSD default video output is now OpenGL, instead of Xvideo
@@ -77,6 +81,7 @@ Muxers:
 
 Service Discovery:
  * New NetBios service discovery using libdsm
+ * Rewrite of the UPnP service discovery
 
 Mac OS X Interface
  * new AppleScript API giving access to audio desynchronization
