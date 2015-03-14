@@ -5679,7 +5679,7 @@ static ts_pmt_t *ts_pmt_New( demux_t *p_demux )
 
     pmt->i_version  = -1;
     pmt->i_number   = -1;
-    pmt->i_pid_pcr  = -1;
+    pmt->i_pid_pcr  = 0x1FFF;
     pmt->iod        = NULL;
 
     pmt->i_last_dts = -1;
