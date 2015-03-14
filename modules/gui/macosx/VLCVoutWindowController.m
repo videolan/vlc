@@ -216,7 +216,7 @@
     BOOL b_have_splitter = psz_splitter != NULL && *psz_splitter != '\0';
     free(psz_splitter);
 
-    if (!b_have_splitter && (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen"))) {
+    if (!b_video_wallpaper && !b_have_splitter && (var_InheritBool(VLCIntf, "fullscreen") || var_GetBool(pl_Get(VLCIntf), "fullscreen"))) {
 
         // this is not set when we start in fullscreen because of
         // fullscreen settings in video prefs the second time
