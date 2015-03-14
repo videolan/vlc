@@ -754,6 +754,8 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_FIC, "Mirillis FIC video"),
         A("FICV"),
 
+    B(VLC_CODEC_TDSC, "TDSC"),
+
     /* */
     B(VLC_CODEC_YV12, "Planar 4:2:0 YVU"),
         A("YV12"),
