@@ -556,7 +556,7 @@ need_libc=false
 dnl Check for usual libc functions
 AC_CHECK_DECLS([nanosleep],,,[#include <time.h>])
 AC_CHECK_FUNCS([daemon fcntl fstatvfs fork getenv getpwuid_r isatty lstat memalign mmap open_memstream openat pread posix_fadvise posix_madvise setlocale stricmp strnicmp strptime uselocale pthread_cond_timedwait_monotonic_np pthread_condattr_setclock])
-AC_REPLACE_FUNCS([atof atoll dirfd fdopendir flockfile fsync getdelim getpid gmtime_r lldiv localtime_r nrand48 poll posix_memalign rewind setenv strcasecmp strcasestr strdup strlcpy strndup strnlen strsep strtof strtok_r strtoll swab tdestroy strverscmp])
+AC_REPLACE_FUNCS([atof atoll dirfd fdopendir flockfile fsync getdelim getpid lldiv nrand48 poll posix_memalign rewind setenv strcasecmp strcasestr strdup strlcpy strndup strnlen strsep strtof strtok_r strtoll swab tdestroy strverscmp])
 AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
@@ -564,6 +564,8 @@ AC_CHECK_FUNCS(fdatasync,,
 dnl mingw64 implements those as static inline, not functions with C linkage
 VLC_REPLACE_DECL([asprintf], [#include <stdio.h>])
 VLC_REPLACE_DECL([vasprintf], [#include <stdio.h>])
+VLC_REPLACE_DECL([gmtime_r], [#include <time.h>])
+VLC_REPLACE_DECL([localtime_r], [#include <time.h>])
 
 dnl C11 static_assert()
 AC_MSG_CHECKING([for static_assert in assert.h])
