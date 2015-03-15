@@ -2983,7 +2983,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
         if( p_pmt->i_pid_pcr == 0x1FFF ) /* That program has no dedicated PCR pid ISO/IEC 13818-1 2.4.4.9 */
         {
-            if( pid->p_parent ) /* PCR shall be on pid itself */
+            if( pid->p_parent == p_pat->programs.p_elems[i] ) /* PCR shall be on pid itself */
             {
                 /* ? update PCR for the whole group program ? */
                 ProgramSetPCR( p_demux, p_pmt, i_program_pcr );
