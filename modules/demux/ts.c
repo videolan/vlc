@@ -2988,11 +2988,6 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                 /* ? update PCR for the whole group program ? */
                 ProgramSetPCR( p_demux, p_pmt, i_program_pcr );
             }
-            else
-            {
-                msg_Warn(p_demux, "discarding PCR update from pid %d which has no owner", pid->i_pid);
-            }
-            break;
         }
         else /* set PCR provided by current pid to program(s) referencing it */
         {
