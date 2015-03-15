@@ -2631,7 +2631,7 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
             if( pid->type != TYPE_PES )
                 continue;
 
-            if( !pid->u.p_pes->es.id )
+            if( pid->u.p_pes->es.id )
             {
                 block_t *p_block = block_Alloc(1);
                 if( p_block )
