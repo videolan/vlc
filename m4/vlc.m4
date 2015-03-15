@@ -96,3 +96,23 @@ AC_DEFUN([VLC_LIBRARY_SUFFIX], [
   AC_MSG_RESULT(${LIBEXT})
   AC_DEFINE_UNQUOTED(LIBEXT, "${LIBEXT}", [Dynamic object extension])
 ])
+
+dnl ===========================================================================
+dnl  Custom macros for checking functions with inline fallback, for mingw32/64
+
+dnl VLC_REPLACE_DECL([funcname], [include])
+AC_DEFUN([VLC_REPLACE_DECL], [
+  AS_VAR_PUSHDEF([CACHEVAR], [vlc_cv_replace_decl] AS_TR_SH([$1]))
+  AC_CACHE_VAL(CACHEVAR, [
+    AC_CHECK_DECL(
+      [$1],
+      AS_VAR_SET(CACHEVAR, [yes]),
+      AS_VAR_SET(CACHEVAR, [no]),
+      [$2]
+    )
+  ])
+  AS_IF([test x"AS_VAR_GET(CACHEVAR)" = xyes],
+    [AC_DEFINE(AS_TR_CPP([HAVE_$1]), [1], [Define to 1 if you have $1 function])],
+    [AC_LIBOBJ([$1])])
+  AS_VAR_POPDEF([CACHEVAR])
+])

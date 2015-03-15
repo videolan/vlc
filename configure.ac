@@ -562,20 +562,8 @@ AC_CHECK_FUNCS(fdatasync,,
 ])
 
 dnl mingw64 implements those as static inline, not functions with C linkage
-AC_LINK_IFELSE([
-    AC_LANG_PROGRAM([#include <stdio.h>], [
-        char *c;
-        if (asprintf(&c, "%s %d", "string", 1) == -1)
-            c = NULL;
-    ])],[AC_DEFINE([HAVE_ASPRINTF],[1],[Define to 1 if you have asprintf function])],[AC_LIBOBJ([asprintf])])
-AC_LINK_IFELSE([
-    AC_LANG_PROGRAM([#include <stdio.h>
-                     #include <stdarg.h>], [
-        char *c;
-        va_list ap;
-        if (vasprintf(&c, "%s %d", ap) == -1)
-            c = NULL;
-    ])],[AC_DEFINE([HAVE_VASPRINTF],[1],[Define to 1 if you have asprintf function])],[AC_LIBOBJ([vasprintf])])
+VLC_REPLACE_DECL([asprintf], [#include <stdio.h>])
+VLC_REPLACE_DECL([vasprintf], [#include <stdio.h>])
 
 dnl C11 static_assert()
 AC_MSG_CHECKING([for static_assert in assert.h])
