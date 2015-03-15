@@ -5021,6 +5021,7 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid, bool b_create_delay
 
     if( pid && p_sys->es_creation == CREATE_ES )
     {
+        /* FIXME: other owners / shared pid */
         pid->u.p_pes->es.id = es_out_Add( p_demux->out, &pid->u.p_pes->es.fmt );
         for( int i = 0; i < pid->u.p_pes->extra_es.i_size; i++ )
         {
@@ -5221,6 +5222,11 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         ts_pes_t *p_pes;
 
         ts_pid_t *pespid = &p_sys->pid[p_dvbpsies->i_pid];
+        if ( pespid->type == TYPE_PES && pespid->p_parent->u.p_pmt->i_number != p_pmt->i_number )
+        {
+            msg_Warn( p_demux, " * PMT wants to get a share or pid %d (unsupported)", pespid->i_pid );
+            continue;
+        }
 
         /* Find out if the PID was already declared */
         for( int i = 0; i < old_es_rm.i_size; i++ )
