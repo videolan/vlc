@@ -154,7 +154,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                         b_invalid_cue = true;
                         break;
                     }
-                    idx.i_time = uint64( ctime ) * i_timescale / (mtime_t)1000;
+                    idx.i_time = uint64( ctime ) * i_timescale / INT64_C(1000);
                 }
                 else if( MKV_IS_ID( el, KaxCueTrackPositions ) )
                 {
@@ -598,7 +598,7 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     idx.i_track       = -1;
     idx.i_block_number= -1;
     idx.i_position    = cluster->GetElementPosition();
-    idx.i_time        = cluster->GlobalTimecode()/ (mtime_t) 1000;
+    idx.i_time        = cluster->GlobalTimecode() / INT64_C(1000);
     idx.b_key         = true;
 
     i_index++;
@@ -1056,9 +1056,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             }
 
             if( simpleblock )
-                i_pts = sys.i_chapter_time + simpleblock->GlobalTimecode() / (mtime_t) 1000;
+                i_pts = sys.i_chapter_time + simpleblock->GlobalTimecode() / INT64_C(1000);
             else
-                i_pts = sys.i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
+                i_pts = sys.i_chapter_time + block->GlobalTimecode() / INT64_C(1000);
             if( i_track < tracks.size() )
             {
                 if( tracks[i_track]->fmt.i_cat == i_cat && b_key_picture )
@@ -1294,7 +1294,7 @@ void matroska_segment_c::EnsureDuration()
             }
         }
 
-        i_duration = ( i_last_timecode - cluster->GlobalTimecode() ) / (mtime_t)1000000;
+        i_duration = ( i_last_timecode - cluster->GlobalTimecode() ) / INT64_C(1000000);
         msg_Dbg( &sys.demuxer, " extracted Duration=%" PRId64, i_duration );
 
         delete ep;
@@ -1427,9 +1427,9 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             if( i_index > 0 && idx.i_time == -1 )
             {
                 if ( pp_simpleblock != NULL )
-                    idx.i_time        = pp_simpleblock->GlobalTimecode() / (mtime_t)1000;
+                    idx.i_time        = pp_simpleblock->GlobalTimecode() / INT64_C(1000);
                 else
-                    idx.i_time        = (*pp_block).GlobalTimecode() / (mtime_t)1000;
+                    idx.i_time        = (*pp_block).GlobalTimecode() / INT64_C(1000);
                 idx.b_key         = *pb_key_picture;
             }
 #undef idx
