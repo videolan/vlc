@@ -46,6 +46,12 @@
 # define DMO_DEBUG 1
 #endif
 
+#ifdef UNICODE
+# define PRIs "%ls"
+#else
+# define PRIs "%s"
+#endif
+
 typedef long (STDCALL *GETCLASS) ( const GUID*, const GUID*, void** );
 
 static const int pi_channels_maps[7] =
@@ -249,7 +255,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     {
         if( decoders_table[i].i_fourcc == p_dec->fmt_in.i_codec )
         {
-            msg_Dbg( p_dec, "DMO codec for %4.4s may work with dll=%s",
+            msg_Dbg( p_dec, "DMO codec for %4.4s may work with dll="PRIs,
                      (char*)&p_dec->fmt_in.i_codec,
                      decoders_table[i].psz_dll );
             goto found;
@@ -765,7 +771,7 @@ loader:
     *p_hmsdmo_dll = LoadLibrary( codecs_table[i_codec].psz_dll );
     if( *p_hmsdmo_dll == NULL )
     {
-        msg_Dbg( p_this, "failed loading '%s'",
+        msg_Dbg( p_this, "failed loading '"PRIs"'",
                  codecs_table[i_codec].psz_dll );
         return VLC_EGENERIC;
     }
