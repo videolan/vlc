@@ -202,23 +202,23 @@ static const codec_dll decoders_table[] =
 static const codec_dll encoders_table[] =
 {
     /* WMV3 */
-    { VLC_CODEC_WMV3, "wmvdmoe2.dll", &guid_wmv_enc2 },
+    { VLC_CODEC_WMV3, TEXT("wmvdmoe2.dll"), &guid_wmv_enc2 },
     /* WMV2 */
-    { VLC_CODEC_WMV2, "wmvdmoe2.dll", &guid_wmv_enc2 },
+    { VLC_CODEC_WMV2, TEXT("wmvdmoe2.dll"), &guid_wmv_enc2 },
     /* WMV1 */
-    { VLC_CODEC_WMV1, "wmvdmoe2.dll", &guid_wmv_enc2 },
+    { VLC_CODEC_WMV1, TEXT("wmvdmoe2.dll"), &guid_wmv_enc2 },
 
     /* WMA 3 */
-    { VLC_CODEC_WMAP, "wmadmoe.dll", &guid_wma_enc },
+    { VLC_CODEC_WMAP, TEXT("wmadmoe.dll"), &guid_wma_enc },
     /* WMA 2 */
-    { VLC_CODEC_WMA2, "wmadmoe.dll", &guid_wma_enc },
+    { VLC_CODEC_WMA2, TEXT("wmadmoe.dll"), &guid_wma_enc },
 
     /* WMV3 v11 */
-    { VLC_CODEC_WMV3, "wmvencod.dll", &guid_wmv9_enc },
+    { VLC_CODEC_WMV3, TEXT("wmvencod.dll"), &guid_wmv9_enc },
     /* WMV2 v11 */
-    { VLC_CODEC_WMV2, "wmvxencd.dll", &guid_wmv8_enc },
+    { VLC_CODEC_WMV2, TEXT("wmvxencd.dll"), &guid_wmv8_enc },
     /* WMV1 v11 */
-    { VLC_CODEC_WMV1, "wmvxencd.dll", &guid_wmv8_enc },
+    { VLC_CODEC_WMV1, TEXT("wmvxencd.dll"), &guid_wmv8_enc },
 
     /* */
     { 0, NULL, NULL }
