@@ -382,20 +382,21 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     const int mode = SND_PCM_NO_AUTO_RESAMPLE;
 
     int val = snd_pcm_open (&pcm, device, SND_PCM_STREAM_PLAYBACK, mode);
-    free (devbuf);
     if (val != 0)
     {
-        msg_Err (aout, "cannot open ALSA device \"%s\": %s", sys->device,
+        msg_Err (aout, "cannot open ALSA device \"%s\": %s", device,
                  snd_strerror (val));
         dialog_Fatal (aout, _("Audio output failed"),
                       _("The audio device \"%s\" could not be used:\n%s."),
                       sys->device, snd_strerror (val));
+        free (devbuf);
         return VLC_EGENERIC;
     }
     sys->pcm = pcm;
 
     /* Print some potentially useful debug */
-    msg_Dbg (aout, "using ALSA device: %s", sys->device);
+    msg_Dbg (aout, "using ALSA device: %s", device);
+    free (devbuf);
     DumpDevice (VLC_OBJECT(aout), pcm);
 
     /* Get Initial hardware parameters */
