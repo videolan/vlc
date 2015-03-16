@@ -35,6 +35,7 @@ Decoder:
  * Rewrite WPL playlists and add ZPL playlists support (Zune)
  * Support TDSC, Canopus HQX
  * Support HEVC hardware decoding on Windows, using DxVA2
+ * Basic TTML subtitles support
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)

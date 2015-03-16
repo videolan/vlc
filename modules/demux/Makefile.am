@@ -340,4 +340,6 @@ libdash_plugin_la_LIBADD += -lz
 endif
 demux_LTLIBRARIES += libdash_plugin.la
 
+libttml_plugin_la_SOURCES = demux/ttml.c
+demux_LTLIBRARIES += libttml_plugin.la
 

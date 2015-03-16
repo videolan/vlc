@@ -198,6 +198,9 @@ codec_LTLIBRARIES += libsubsdec_plugin.la
 libsubsusf_plugin_la_SOURCES = codec/subsusf.c
 codec_LTLIBRARIES += libsubsusf_plugin.la
 
+libsubsttml_plugin_la_SOURCES = codec/substtml.c
+codec_LTLIBRARIES += libsubsttml_plugin.la
+
 libsvcdsub_plugin_la_SOURCES = codec/svcdsub.c
 codec_LTLIBRARIES += libsvcdsub_plugin.la
 
