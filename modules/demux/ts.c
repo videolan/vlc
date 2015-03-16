@@ -2778,35 +2778,41 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_count = 0;
     block_t *p_pkt = NULL;
-    *pi_pcr = -1;
 
     for( ;; )
     {
+        *pi_pcr = -1;
+
         if( i_count++ > PROBE_CHUNK_COUNT || !( p_pkt = ReadTSPacket( p_demux ) ) )
         {
             break;
         }
 
-        int i_pid = PIDGet( p_pkt );
-        p_sys->pid[i_pid].i_flags |= FLAG_SEEN;
+        const int i_pid = PIDGet( p_pkt );
+        ts_pid_t *p_pid = &p_sys->pid[i_pid];
 
-        if( i_pid != 0x1FFF && p_sys->pid[i_pid].type == TYPE_PES &&
-           (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
-           (p_pkt->p_buffer[3] & 0xD0) == 0x10    /* Has payload but is not encrypted */
-          )
+        p_pid->i_flags |= FLAG_SEEN;
+
+        if( i_pid != 0x1FFF && (p_pkt->p_buffer[1] & 0x80) == 0 ) /* not corrupt */
         {
             bool b_pcrresult = true;
+            bool b_adaptfield = p_pkt->p_buffer[3] & 0x20;
 
-            if( p_pkt->i_buffer >= 4 + 2 + 5 )
+            if( b_adaptfield && p_pkt->i_buffer >= 4 + 2 + 5 )
                 *pi_pcr = GetPCR( p_pkt );
 
-            if( *pi_pcr == -1 )
+            if( *pi_pcr == -1 &&
+                (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* payload start */
+                (p_pkt->p_buffer[3] & 0xD0) == 0x10 && /* Has payload but is not encrypted */
+                p_pid->type == TYPE_PES &&
+                p_pid->p_parent->u.p_pes->es.fmt.i_cat != UNKNOWN_ES
+              )
             {
                 b_pcrresult = false;
                 mtime_t i_dts = -1;
                 mtime_t i_pts = -1;
                 unsigned i_skip = 4;
-                if ( p_pkt->p_buffer[3] & 0x20 ) // adaptation field
+                if ( b_adaptfield ) // adaptation field
                     i_skip += 1 + p_pkt->p_buffer[4];
 
                 if ( VLC_SUCCESS == ParsePESHeader( p_demux, &p_pkt->p_buffer[i_skip],
@@ -2820,27 +2826,32 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
                 }
             }
 
-            if( *pi_pcr != -1 ) // TODO: non ES PCR
+            if( *pi_pcr != -1 )
             {
-                ts_pid_t *pmtpid = p_sys->pid[i_pid].p_parent;
-                assert(pmtpid->type == TYPE_PMT);
-
-                if( i_program == 0 || i_program == pmtpid->u.p_pmt->i_number )
+                ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+                for( int i=0; i<p_pat->programs.i_size; i++ )
                 {
-                    if( b_end )
+                    ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
+                    if( ( p_pmt->i_pid_pcr == p_pid->i_pid ||
+                        ( p_pmt->i_pid_pcr == 0x1FFF && p_pid->p_parent == p_pat->programs.p_elems[i] ) ) )
                     {
-                        pmtpid->u.p_pmt->i_last_dts = *pi_pcr;
+                        if( b_end )
+                        {
+                            p_pmt->i_last_dts = *pi_pcr;
+                        }
+                        /* Start, only keep first */
+                        else if( b_pcrresult && p_pmt->pcr.i_first == -1 )
+                        {
+                            p_pmt->pcr.i_first = *pi_pcr;
+                        }
+                        else if( p_pmt->pcr.i_first_dts < VLC_TS_0 )
+                        {
+                            p_pmt->pcr.i_first_dts = FROM_SCALE(*pi_pcr);
+                        }
+
+                        if( i_program == 0 || i_program == p_pmt->i_number )
+                            *pb_found = true;
                     }
-                    /* Start, only keep first */
-                    else if( b_pcrresult && pmtpid->u.p_pmt->pcr.i_first == -1 )
-                    {
-                        pmtpid->u.p_pmt->pcr.i_first = *pi_pcr;
-                    }
-                    else if( pmtpid->u.p_pmt->pcr.i_first_dts < VLC_TS_0 )
-                    {
-                        pmtpid->u.p_pmt->pcr.i_first_dts = VLC_TS_0 + *pi_pcr * 100 / 9;
-                    }
-                    *pb_found = true;
                 }
             }
         }
