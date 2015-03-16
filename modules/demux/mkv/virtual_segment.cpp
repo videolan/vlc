@@ -399,12 +399,13 @@ virtual_chapter_c* virtual_edition_c::getChapterbyTimecode( int64_t time )
 bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
 {
     demux_sys_t & sys = *demux.p_sys;
-    virtual_chapter_c *p_cur_chapter;
+    virtual_chapter_c *p_cur_chapter = NULL;
     virtual_edition_c * p_cur_edition = editions[ i_current_edition ];
 
     bool b_has_seeked = false;
 
-    p_cur_chapter = p_cur_edition->getChapterbyTimecode( sys.i_pts );
+    if ( sys.i_pts != VLC_TS_INVALID )
+        p_cur_chapter = p_cur_edition->getChapterbyTimecode( sys.i_pts - VLC_TS_0 );
 
     /* we have moved to a new chapter */
     if ( p_cur_chapter != NULL && p_current_chapter != p_cur_chapter )
@@ -426,7 +427,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                         return true;
                     }
                 }
-                sys.i_start_pts = p_cur_chapter->i_virtual_start_time;;
+                sys.i_start_pts = p_cur_chapter->i_virtual_start_time + VLC_TS_0;
             }
 
             p_current_chapter = p_cur_chapter;

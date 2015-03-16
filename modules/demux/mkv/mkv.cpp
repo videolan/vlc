@@ -757,7 +757,7 @@ static int Demux( demux_t *p_demux)
                 {
                     /* TODO handle successive chapters with the same user_start_time/user_end_time
                     */
-                    p_sys->i_pts = p_chap->i_virtual_stop_time;
+                    p_sys->i_pts = p_chap->i_virtual_stop_time + VLC_TS_0;
                     p_sys->i_pts++; // trick to avoid staying on segments with no duration and no content
 
                     i_return = 1;
@@ -773,9 +773,10 @@ static int Demux( demux_t *p_demux)
         }
 
         if( simpleblock != NULL )
-            p_sys->i_pts = p_sys->i_chapter_time + ( (mtime_t)simpleblock->GlobalTimecode() / INT64_C(1000) );
+            p_sys->i_pts = (mtime_t)simpleblock->GlobalTimecode() / INT64_C(1000);
         else
-            p_sys->i_pts = p_sys->i_chapter_time + ( (mtime_t)block->GlobalTimecode() / INT64_C(1000) );
+            p_sys->i_pts = (mtime_t)block->GlobalTimecode() / INT64_C(1000);
+        p_sys->i_pts += p_sys->i_chapter_time + VLC_TS_0;
 
         mtime_t i_pcr = VLC_TS_INVALID;
         for( size_t i = 0; i < p_segment->tracks.size(); i++)

@@ -942,9 +942,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         ep = new EbmlParser( &es, segment, &sys.demuxer,
                              var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
         cluster = NULL;
-        sys.i_start_pts = 0;
-        sys.i_pts = 0;
-        sys.i_pcr = 0;
+        sys.i_start_pts = VLC_TS_0;
+        sys.i_pts = VLC_TS_INVALID;
+        sys.i_pcr = VLC_TS_0;
         return;
     }
 
@@ -972,7 +972,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                          var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
     cluster = NULL;
 
-    sys.i_start_pts = i_date;
+    sys.i_start_pts = i_date + VLC_TS_0;
 
     /* now parse until key frame */
     const int es_types[3] = { VIDEO_ES, AUDIO_ES, SPU_ES };
@@ -1024,7 +1024,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     /*Neither video nor audio track... no seek further*/
     if( unlikely( !p_first ) )
     {
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, i_date );
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, i_date + VLC_TS_0 );
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
         return;
     }
@@ -1101,8 +1101,8 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
         if( p_last->i_date < p_min->i_date )
             p_min = p_last;
 
-    sys.i_pcr = sys.i_pts = p_min->i_date;
-    es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, VLC_TS_0 + sys.i_pcr );
+    sys.i_pcr = sys.i_pts = p_min->i_date + VLC_TS_0;
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, sys.i_pcr );
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
     cluster = (KaxCluster *) ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos );
 
@@ -1338,7 +1338,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
     }
     es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_start_time );
 
-    sys.i_start_pts = i_start_time;
+    sys.i_start_pts = i_start_time + VLC_TS_0;
     // reset the stream reading to the first cluster of the segment used
     es.I_O().setFilePointer( i_start_pos );
 
