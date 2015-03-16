@@ -37,6 +37,8 @@
 # define STDCALL __stdcall
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -1121,7 +1123,8 @@ int Open(vlc_object_t *p_this)
     if (!p_sys)
         return VLC_ENOMEM;
 
-    CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
+        vlc_assert_unreachable();
 
     if (LoadMFTLibrary(&p_sys->mf_handle))
     {

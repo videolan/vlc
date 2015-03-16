@@ -32,6 +32,8 @@
 #include <QBitmap>
 #include <vlc_windows_interfaces.h>
 
+#include <assert.h>
+
 #if defined(_WIN32) && HAS_QT5
 # include <QWindow>
 # include <qpa/qplatformnativeinterface.h>
@@ -115,7 +117,8 @@ void MainInterface::createTaskBarButtons()
     FIXME:the play button's picture doesn't changed to pause when clicked
     */
 
-    CoInitializeEx( NULL, COINIT_MULTITHREADED );
+    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED )) )
+        vlc_assert_unreachable();
 
     if( S_OK == CoCreateInstance( CLSID_TaskbarList,
                 NULL, CLSCTX_INPROC_SERVER,

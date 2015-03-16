@@ -283,7 +283,8 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
     if (!GetVersionEx(&winVer) || winVer.dwMajorVersion <= 5)
         return;
 
-    CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    if( FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED)) )
+        vlc_assert_unreachable();
 
     void *ptr;
     if (S_OK == CoCreateInstance(&CLSID_TaskbarList,

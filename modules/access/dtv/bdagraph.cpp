@@ -29,6 +29,8 @@
 # include <config.h>
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include "dtv/bdagraph.hpp"
@@ -372,7 +374,8 @@ BDAGraph::BDAGraph( vlc_object_t *p_this ):
     p_scanning_tuner = NULL;
     p_grabber = NULL;
 
-    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    if( FAILED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
+        vlc_assert_unreachable();
 }
 
 /*****************************************************************************

@@ -409,7 +409,8 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     bool b_use_video = true;
 
     /* Initialize OLE/COM */
-    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    if( FAILED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
+        vlc_assert_unreachable();
 
     var_Create( p_this,  CFG_PREFIX "config", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_this,  CFG_PREFIX "tuner", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );

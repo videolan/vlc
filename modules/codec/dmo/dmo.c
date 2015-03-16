@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -366,7 +368,8 @@ static int DecOpen( decoder_t *p_dec )
     WAVEFORMATEX *p_wf = NULL;
 
     /* Initialize OLE/COM */
-    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    if( FAILED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
+        vlc_assert_unreachable();
 
     if( LoadDMO( VLC_OBJECT(p_dec), &hmsdmo_dll, &p_dmo, &p_dec->fmt_in, false )
         != VLC_SUCCESS )
@@ -1394,7 +1397,8 @@ static int EncOpen( vlc_object_t *p_this )
     HINSTANCE hmsdmo_dll = NULL;
 
     /* Initialize OLE/COM */
-    CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    if( FAILED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
+        vlc_assert_unreachable();
 
     if( LoadDMO( p_this, &hmsdmo_dll, &p_dmo, &p_enc->fmt_out, true )
         != VLC_SUCCESS )

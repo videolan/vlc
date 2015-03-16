@@ -44,6 +44,7 @@
 #include <QSettings>
 #include <QtAlgorithms>
 #include <QDir>
+#include <assert.h>
 #include <math.h>
 
 #define ICON_HEIGHT 48
@@ -1255,7 +1256,8 @@ void SPrefsPanel::assoDialog()
 #endif /* __IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__ */
 
     IApplicationAssociationRegistrationUI *p_appassoc;
-    CoInitializeEx( NULL, COINIT_MULTITHREADED );
+    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED )) )
+        vlc_assert_unreachable();
 
     if( S_OK == CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
                 NULL, CLSCTX_INPROC_SERVER,
