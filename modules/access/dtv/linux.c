@@ -912,11 +912,24 @@ int dvb_set_dvbs2 (dvb_device_t *d, uint64_t freq_Hz, const char *modstr,
 
     if (dvb_find_frontend (d, DVB_S2))
         return -1;
+#if DVBv5(8)
     return dvb_set_props (d, 9, DTV_CLEAR, 0, DTV_DELIVERY_SYSTEM, SYS_DVBS2,
                           DTV_FREQUENCY, freq, DTV_MODULATION, mod,
                           DTV_SYMBOL_RATE, srate, DTV_INNER_FEC, fec,
                           DTV_PILOT, pilot, DTV_ROLLOFF, rolloff,
                           DTV_STREAM_ID, (uint32_t)sid);
+#else
+# warning DVB-S2 needs Linux DVB version 5.8 or later.
+    if (sid != 0)
+    {
+        msg_Err (d->obj, "DVB-S2 stream ID support not compiled-in");
+        return -1;
+    }
+    return dvb_set_props (d, 8, DTV_CLEAR, 0,  DTV_DELIVERY_SYSTEM, SYS_DVBS2,
+                          DTV_FREQUENCY, freq, DTV_MODULATION, mod,
+                          DTV_SYMBOL_RATE, srate, DTV_INNER_FEC, fec,
+                          DTV_PILOT, pilot, DTV_ROLLOFF, rolloff);
+#endif
 }
 
 
