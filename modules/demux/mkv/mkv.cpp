@@ -671,6 +671,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 // condition when the DTS is correct (keyframe or B frame == NOT P frame)
                 if ( b_key_picture || b_discardable_picture )
                     p_block->i_dts = p_block->i_pts;
+                else if ( tk->i_last_dts == VLC_TS_INVALID )
+                    p_block->i_dts = i_pts;
                 else
                     p_block->i_dts = min( i_pts, tk->i_last_dts + ( mtime_t )tk->i_default_duration );
             }
