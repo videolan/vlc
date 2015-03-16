@@ -4390,7 +4390,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pes_t *p_pes,
             }
             else
             {
-                p_page_es = malloc( sizeof(*p_page_es) );
+                p_page_es = calloc( 1, sizeof(*p_page_es) );
                 if( !p_page_es )
                     break;
 
