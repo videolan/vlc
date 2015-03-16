@@ -21,7 +21,7 @@ Function RegisterExtension
   WriteRegStr HKCR "VLC$R0\shell\Open" "MultiSelectModel" "Player"
   WriteRegStr HKCR "VLC$R0\shell\Open\command" "" '"$INSTDIR\vlc.exe" --started-from-file "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
-  WriteRegStr HKCR "Applications\vlc.exe\SupportedTypes" ${EXT} ""
+  WriteRegStr HKCR "Applications\vlc.exe\SupportedTypes" $0 ""
 
   ${If} ${AtLeastWinVista}
     WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations" "$R0" "VLC$R0"
