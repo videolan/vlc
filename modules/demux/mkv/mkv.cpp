@@ -692,12 +692,6 @@ msg_Dbg( p_demux, "block (track=%d) i_dts: %"PRId64" / i_pts: %"PRId64, tk->i_nu
                 (double) p_segment->i_timescale / ( 1000.0 * i_number_frames );
         }
 
-        /* FIXME remove when VLC_TS_INVALID work is done */
-        if( i_frame == 0 || p_block->i_dts > VLC_TS_INVALID )
-            p_block->i_dts += VLC_TS_0;
-        if( !tk->b_dts_only && ( i_frame == 0 || p_block->i_pts > VLC_TS_INVALID ) )
-            p_block->i_pts += VLC_TS_0;
-
         es_out_Send( p_demux->out, tk->p_es, p_block );
 
         /* use time stamp only for first block */
