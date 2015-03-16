@@ -531,7 +531,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             {
                 if ( !p_chapter->Enter( true ) )
                     // jump to the location in the found segment
-                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_virtual_start_time, p_chapter, -1 );
+                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_mk_virtual_start_time, p_chapter, -1 );
 
                 f_result = true;
             }
@@ -549,7 +549,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             {
                 if ( !p_chapter->Enter( true ) )
                     // jump to the location in the found segment
-                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_virtual_start_time, p_chapter, -1 );
+                    sys.p_current_segment->Seek( sys.demuxer, p_chapter->i_mk_virtual_start_time, p_chapter, -1 );
 
                 f_result = true;
             }
@@ -749,7 +749,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         else
         {
             if ( !p_chapter->EnterAndLeave( sys.p_current_segment->CurrentChapter() ) )
-                p_segment->Seek( sys.demuxer, p_chapter->i_virtual_start_time, p_chapter, -1 );
+                p_segment->Seek( sys.demuxer, p_chapter->i_mk_virtual_start_time, p_chapter, -1 );
             b_result = true;
         }
     }

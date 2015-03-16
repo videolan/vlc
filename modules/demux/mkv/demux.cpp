@@ -808,7 +808,7 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, virtual_chapter_c * p_ch
         if ( !p_chapter->p_chapter || !p_chapter->p_chapter->Enter( true ) )
         {
             // jump to the location in the found segment
-            vsegment.Seek( demuxer, p_chapter->i_virtual_start_time, p_chapter, -1 );
+            vsegment.Seek( demuxer, p_chapter->i_mk_virtual_start_time, p_chapter, -1 );
         }
     }
 

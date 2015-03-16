@@ -33,7 +33,7 @@ matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estr
     ,es(estream)
     ,i_timescale(MKVD_TIMECODESCALE)
     ,i_duration(-1)
-    ,i_start_time(0)
+    ,i_mk_start_time(0)
     ,i_seekhead_count(0)
     ,i_seekhead_position(-1)
     ,i_cues_position(-1)
@@ -129,7 +129,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             idx.i_track       = -1;
             idx.i_block_number= -1;
             idx.i_position    = -1;
-            idx.i_time        = -1;
+            idx.i_mk_time     = -1;
             idx.b_key         = true;
 
             ep->Down();
@@ -154,7 +154,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                         b_invalid_cue = true;
                         break;
                     }
-                    idx.i_time = uint64( ctime ) * i_timescale / INT64_C(1000);
+                    idx.i_mk_time = uint64( ctime ) * i_timescale / INT64_C(1000);
                 }
                 else if( MKV_IS_ID( el, KaxCueTrackPositions ) )
                 {
@@ -598,7 +598,7 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     idx.i_track       = -1;
     idx.i_block_number= -1;
     idx.i_position    = cluster->GetElementPosition();
-    idx.i_time        = cluster->GlobalTimecode() / INT64_C(1000);
+    idx.i_mk_time     = cluster->GlobalTimecode() / INT64_C(1000);
     idx.b_key         = true;
 
     i_index++;
@@ -868,25 +868,25 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
 
 struct spoint
 {
-    spoint(unsigned int tk, mtime_t date, int64_t pos, int64_t cpos):
-        i_track(tk),i_date(date), i_seek_pos(pos),
+    spoint(unsigned int tk, mtime_t mk_date, int64_t pos, int64_t cpos):
+        i_track(tk),i_mk_date(mk_date), i_seek_pos(pos),
         i_cluster_pos(cpos), p_next(NULL){}
     unsigned int     i_track;
-    mtime_t i_date;
+    mtime_t i_mk_date;
     int64_t i_seek_pos;
     int64_t i_cluster_pos;
     spoint * p_next;
 };
 
-void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position )
+void matroska_segment_c::Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int64_t i_global_position )
 {
     KaxBlock    *block;
     KaxSimpleBlock *simpleblock;
     int64_t     i_block_duration;
     size_t      i_track;
     int64_t     i_seek_position = i_start_pos;
-    int64_t     i_seek_time = i_start_time;
-    mtime_t     i_pts = 0;
+    mtime_t     i_mk_seek_time = i_mk_start_time;
+    mtime_t     i_mk_pts = 0;
     spoint *p_first = NULL;
     spoint *p_last = NULL;
     int i_cat;
@@ -931,7 +931,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     }
 
     /* Don't try complex seek if we seek to 0 */
-    if( i_date == 0 && i_time_offset == 0 )
+    if( i_mk_date == 0 && i_mk_time_offset == 0 )
     {
         es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, VLC_TS_0 );
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME,
@@ -953,17 +953,17 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     {
 
         for( ; i_idx < i_index; i_idx++ )
-            if( p_indexes[i_idx].i_time != -1 && p_indexes[i_idx].i_time + i_time_offset > i_date )
+            if( p_indexes[i_idx].i_mk_time != -1 && p_indexes[i_idx].i_mk_time + i_mk_time_offset > i_mk_date )
                 break;
 
         if( i_idx > 0 )
             i_idx--;
 
         i_seek_position = p_indexes[i_idx].i_position;
-        i_seek_time = p_indexes[i_idx].i_time;
+        i_mk_seek_time = p_indexes[i_idx].i_mk_time;
     }
 
-    msg_Dbg( &sys.demuxer, "seek got %" PRId64 " - %" PRId64, i_seek_time, i_seek_position );
+    msg_Dbg( &sys.demuxer, "seek got %" PRId64 " - %" PRId64, i_mk_seek_time, i_seek_position );
 
     es.I_O().setFilePointer( i_seek_position, seek_beginning );
 
@@ -972,7 +972,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                          var_InheritBool( &sys.demuxer, "mkv-use-dummy" ) );
     cluster = NULL;
 
-    sys.i_start_pts = i_date + VLC_TS_0;
+    sys.i_start_pts = i_mk_date + VLC_TS_0;
 
     /* now parse until key frame */
     const int es_types[3] = { VIDEO_ES, AUDIO_ES, SPU_ES };
@@ -995,7 +995,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             }
             if( tracks[i_track]->fmt.i_cat == i_cat )
             {
-                spoint * seekpoint = new spoint(i_track, i_seek_time, i_seek_position, i_seek_position);
+                spoint * seekpoint = new spoint(i_track, i_mk_seek_time, i_seek_position, i_seek_position);
                 if( unlikely( !seekpoint ) )
                 {
                     for( spoint * sp = p_first; sp; )
@@ -1024,11 +1024,11 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     /*Neither video nor audio track... no seek further*/
     if( unlikely( !p_first ) )
     {
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, i_date + VLC_TS_0 );
-        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, i_mk_date + VLC_TS_0 );
+        es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_date );
         return;
     }
-    i_date -= i_seek_preroll;
+    i_mk_date -= i_seek_preroll;
     for(;;)
     {
         do
@@ -1056,9 +1056,9 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             }
 
             if( simpleblock )
-                i_pts = sys.i_chapter_time + simpleblock->GlobalTimecode() / INT64_C(1000);
+                i_mk_pts = sys.i_mk_chapter_time + simpleblock->GlobalTimecode() / INT64_C(1000);
             else
-                i_pts = sys.i_chapter_time + block->GlobalTimecode() / INT64_C(1000);
+                i_mk_pts = sys.i_mk_chapter_time + block->GlobalTimecode() / INT64_C(1000);
             if( i_track < tracks.size() )
             {
                 if( tracks[i_track]->fmt.i_cat == i_cat && b_key_picture )
@@ -1069,7 +1069,7 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
                         if( sp->i_track == i_track )
                             break;
 
-                    sp->i_date = i_pts;
+                    sp->i_mk_date = i_mk_pts;
                     if( simpleblock )
                         sp->i_seek_pos = simpleblock->GetElementPosition();
                     else
@@ -1080,14 +1080,14 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
             }
 
             delete block;
-        } while( i_pts < i_date );
+        } while( i_mk_pts < i_mk_date );
         if( b_has_key || !i_idx )
             break;
 
         /* No key picture was found in the cluster seek to previous seekpoint */
-        i_date = i_time_offset + p_indexes[i_idx].i_time;
+        i_mk_date = i_mk_time_offset + p_indexes[i_idx].i_mk_time;
         i_idx--;
-        i_pts = 0;
+        i_mk_pts = 0;
         es.I_O().setFilePointer( p_indexes[i_idx].i_position );
         delete ep;
         ep = new EbmlParser( &es, segment, &sys.demuxer,
@@ -1098,12 +1098,12 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_
     /* rewind to the last I img */
     spoint * p_min;
     for( p_min  = p_first, p_last = p_first; p_last; p_last = p_last->p_next )
-        if( p_last->i_date < p_min->i_date )
+        if( p_last->i_mk_date < p_min->i_mk_date )
             p_min = p_last;
 
-    sys.i_pcr = sys.i_pts = p_min->i_date + VLC_TS_0;
+    sys.i_pcr = sys.i_pts = p_min->i_mk_date + VLC_TS_0;
     es_out_Control( sys.demuxer.out, ES_OUT_SET_PCR, sys.i_pcr );
-    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_date );
     cluster = (KaxCluster *) ep->UnGet( p_min->i_seek_pos, p_min->i_cluster_pos );
 
     /* hack use BlockGet to get the cluster then goto the wanted block */
@@ -1304,7 +1304,7 @@ void matroska_segment_c::EnsureDuration()
     es.I_O().setFilePointer( i_current_position, seek_beginning );
 }
 
-bool matroska_segment_c::Select( mtime_t i_start_time )
+bool matroska_segment_c::Select( mtime_t i_mk_start_time )
 {
     /* add all es */
     msg_Dbg( &sys.demuxer, "found %d es", (int)tracks.size() );
@@ -1336,9 +1336,9 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                             p_tk->p_es );
         }
     }
-    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_start_time );
+    es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_mk_start_time );
 
-    sys.i_start_pts = i_start_time + VLC_TS_0;
+    sys.i_start_pts = i_mk_start_time + VLC_TS_0;
     // reset the stream reading to the first cluster of the segment used
     es.I_O().setFilePointer( i_start_pos );
 
@@ -1424,12 +1424,12 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
             /* update the index */
 #define idx p_indexes[i_index - 1]
-            if( i_index > 0 && idx.i_time == -1 )
+            if( i_index > 0 && idx.i_mk_time == -1 )
             {
                 if ( pp_simpleblock != NULL )
-                    idx.i_time        = pp_simpleblock->GlobalTimecode() / INT64_C(1000);
+                    idx.i_mk_time = pp_simpleblock->GlobalTimecode() / INT64_C(1000);
                 else
-                    idx.i_time        = (*pp_block).GlobalTimecode() / INT64_C(1000);
+                    idx.i_mk_time = (*pp_block).GlobalTimecode() / INT64_C(1000);
                 idx.b_key         = *pb_key_picture;
             }
 #undef idx

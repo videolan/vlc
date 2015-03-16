@@ -334,7 +334,7 @@ public:
         ,i_pts(VLC_TS_INVALID)
         ,i_pcr(VLC_TS_INVALID)
         ,i_start_pts(VLC_TS_0)
-        ,i_chapter_time(0)
+        ,i_mk_chapter_time(0)
         ,meta(NULL)
         ,i_current_title(0)
         ,p_current_segment(NULL)
@@ -354,7 +354,7 @@ public:
     mtime_t                 i_pts;
     mtime_t                 i_pcr;
     mtime_t                 i_start_pts;
-    mtime_t                 i_chapter_time;
+    mtime_t                 i_mk_chapter_time;
 
     vlc_meta_t              *meta;
 

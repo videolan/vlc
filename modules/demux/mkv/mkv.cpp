@@ -81,7 +81,7 @@ struct demux_sys_t;
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
-static void Seek   ( demux_t *, mtime_t i_date, double f_percent, virtual_chapter_c *p_chapter );
+static void Seek   ( demux_t *, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_chapter );
 
 /*****************************************************************************
  * Open: initializes matroska demux structures
@@ -424,7 +424,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 }
 
 /* Seek */
-static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_chapter_c *p_chapter )
+static void Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_chapter )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_segment;
@@ -433,8 +433,8 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
 
     int         i_index;
 
-    msg_Dbg( p_demux, "seek request to %" PRId64 " (%f%%)", i_date, f_percent );
-    if( i_date < 0 && f_percent < 0 )
+    msg_Dbg( p_demux, "seek request to %" PRId64 " (%f%%)", i_mk_date, f_percent );
+    if( i_mk_date < 0 && f_percent < 0 )
     {
         msg_Warn( p_demux, "cannot seek nowhere!" );
         return;
@@ -456,9 +456,9 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
     }
 
     /* seek without index or without date */
-    if( f_percent >= 0 && (var_InheritBool( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_date < 0 ))
+    if( f_percent >= 0 && (var_InheritBool( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_mk_date < 0 ))
     {
-        i_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
+        i_mk_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
         if( !p_segment->b_cues )
         {
             int64_t i_pos = int64_t( f_percent * stream_Size( p_demux->s ) );
@@ -467,7 +467,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
             for( i_index = 0; i_index < p_segment->i_index; i_index++ )
             {
                 if( p_segment->p_indexes[i_index].i_position >= i_pos &&
-                    p_segment->p_indexes[i_index].i_time != -1 )
+                    p_segment->p_indexes[i_index].i_mk_time != -1 )
                     break;
             }
             if( i_index == p_segment->i_index )
@@ -480,7 +480,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, virtual_ch
             }
         }
     }
-    p_vsegment->Seek( *p_demux, i_date, p_chapter, i_global_position );
+    p_vsegment->Seek( *p_demux, i_mk_date, p_chapter, i_global_position );
 }
 
 /* Needed by matroska_segment::Seek() and Seek */
@@ -776,7 +776,7 @@ static int Demux( demux_t *p_demux)
                 {
                     /* TODO handle successive chapters with the same user_start_time/user_end_time
                     */
-                    p_sys->i_pts = p_chap->i_virtual_stop_time + VLC_TS_0;
+                    p_sys->i_pts = p_chap->i_mk_virtual_stop_time + VLC_TS_0;
                     p_sys->i_pts++; // trick to avoid staying on segments with no duration and no content
 
                     i_return = 1;
@@ -795,7 +795,7 @@ static int Demux( demux_t *p_demux)
             p_sys->i_pts = (mtime_t)simpleblock->GlobalTimecode() / INT64_C(1000);
         else
             p_sys->i_pts = (mtime_t)block->GlobalTimecode() / INT64_C(1000);
-        p_sys->i_pts += p_sys->i_chapter_time + VLC_TS_0;
+        p_sys->i_pts += p_sys->i_mk_chapter_time + VLC_TS_0;
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
         {

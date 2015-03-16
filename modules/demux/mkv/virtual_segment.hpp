@@ -38,7 +38,7 @@ class virtual_chapter_c
 public:
     virtual_chapter_c( matroska_segment_c *p_seg, chapter_item_c *p_chap, int64_t start, int64_t stop ):
         p_segment(p_seg), p_chapter(p_chap),
-        i_virtual_start_time(start), i_virtual_stop_time(stop)
+        i_mk_virtual_start_time(start), i_mk_virtual_stop_time(stop)
     {}
     ~virtual_chapter_c();
 
@@ -63,13 +63,13 @@ public:
 
     static bool CompareTimecode( const virtual_chapter_c * itemA, const virtual_chapter_c * itemB )
     {
-        return ( itemA->i_virtual_start_time < itemB->i_virtual_start_time );
+        return ( itemA->i_mk_virtual_start_time < itemB->i_mk_virtual_start_time );
     }
 
     matroska_segment_c  *p_segment;
     chapter_item_c      *p_chapter;
-    int64_t             i_virtual_start_time;
-    int64_t             i_virtual_stop_time;
+    mtime_t             i_mk_virtual_start_time;
+    mtime_t             i_mk_virtual_stop_time;
     int                 i_seekpoint_num;
     std::vector<virtual_chapter_c *> sub_chapters;
 #ifdef MKV_DEBUG
@@ -94,7 +94,7 @@ public:
                                              const void *p_cookie, size_t i_cookie_size );
 
     bool                b_ordered;
-    int64_t             i_duration;
+    mtime_t             i_duration;
     chapter_edition_c   *p_edition;
     int                 i_seekpoint_num;
 
@@ -155,10 +155,10 @@ public:
     virtual_chapter_c * FindChapter( int64_t i_find_uid );
 
     bool UpdateCurrentToChapter( demux_t & demux );
-    void Seek( demux_t & demuxer, mtime_t i_date,
+    void Seek( demux_t & demuxer, mtime_t i_mk_date,
                virtual_chapter_c *p_chapter, int64_t i_global_position );
 private:
-    void ChangeSegment( matroska_segment_c * p_old, matroska_segment_c * p_new, mtime_t i_start_time );
+    void ChangeSegment( matroska_segment_c * p_old, matroska_segment_c * p_new, mtime_t i_mk_start_time );
 };
 
 #endif

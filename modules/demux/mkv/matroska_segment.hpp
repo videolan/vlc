@@ -83,7 +83,7 @@ public:
 
     /* duration of the segment */
     mtime_t                 i_duration;
-    mtime_t                 i_start_time;
+    mtime_t                 i_mk_start_time;
 
     /* all tracks */
     std::vector<mkv_track_t*> tracks;
@@ -136,13 +136,13 @@ public:
     bool Preload();
     bool PreloadFamily( const matroska_segment_c & segment );
     void InformationCreate();
-    void Seek( mtime_t i_date, mtime_t i_time_offset, int64_t i_global_position );
+    void Seek( mtime_t i_mk_date, mtime_t i_mk_time_offset, int64_t i_global_position );
     int BlockGet( KaxBlock * &, KaxSimpleBlock * &, bool *, bool *, int64_t *);
 
     int BlockFindTrackIndex( size_t *pi_track,
                              const KaxBlock *, const KaxSimpleBlock * );
 
-    bool Select( mtime_t i_start_time );
+    bool Select( mtime_t i_mk_start_time );
     void UnSelect();
 
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );

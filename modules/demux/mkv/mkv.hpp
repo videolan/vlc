@@ -250,7 +250,7 @@ struct mkv_index_t
     int     i_block_number;
 
     int64_t i_position;
-    int64_t i_time;
+    mtime_t i_mk_time;
 
     bool       b_key;
 };
