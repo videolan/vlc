@@ -2805,7 +2805,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
                 (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* payload start */
                 (p_pkt->p_buffer[3] & 0xD0) == 0x10 && /* Has payload but is not encrypted */
                 p_pid->type == TYPE_PES &&
-                p_pid->p_parent->u.p_pes->es.fmt.i_cat != UNKNOWN_ES
+                p_pid->u.p_pes->es.fmt.i_cat != UNKNOWN_ES
               )
             {
                 b_pcrresult = false;
