@@ -719,10 +719,8 @@ msg_Dbg( p_demux, "block (track=%d) i_dts: %"PRId64" / i_pts: %"PRId64, tk->i_nu
 
         es_out_Send( p_demux->out, tk->p_es, p_block );
 
-        /* use time stamp only for first block */
-        i_pts = ( tk->i_default_duration )?
-                 i_pts + ( mtime_t )tk->i_default_duration:
-                 VLC_TS_INVALID;
+        // prepare the pts for the next frame in the lace
+        i_pts += tk->i_default_duration ? tk->i_default_duration : 1;
     }
 }
 
