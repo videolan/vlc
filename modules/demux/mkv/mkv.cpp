@@ -692,6 +692,31 @@ msg_Dbg( p_demux, "block (track=%d) i_dts: %"PRId64" / i_pts: %"PRId64, tk->i_nu
                 (double) p_segment->i_timescale / ( 1000.0 * i_number_frames );
         }
 
+        // find the latest DTS for an active track
+        mtime_t i_ts_max = INT64_MIN;
+        for( size_t i = 0; i < p_segment->tracks.size(); i++ )
+        {
+            mkv_track_t *tk = p_segment->tracks[i];
+            if( tk->i_last_dts > VLC_TS_INVALID )
+                i_ts_max = __MAX( i_ts_max, tk->i_last_dts );
+        }
+
+        // find the earliest DTS less than 10 clock ticks away from the latest DTS
+        mtime_t i_ts_min = INT64_MAX;
+        for( size_t i = 0; i < p_segment->tracks.size(); i++ )
+        {
+            mkv_track_t *tk = p_segment->tracks[i];
+            if( tk->i_last_dts > VLC_TS_INVALID && tk->i_last_dts + 10 * CLOCK_FREQ >= i_ts_max )
+                i_ts_min = __MIN( i_ts_min, tk->i_last_dts );
+        }
+
+        // the PCR is the earliest active DTS if we found one
+        if( i_ts_min != INT64_MAX && ( i_ts_min > p_sys->i_pcr || p_sys->i_pcr == VLC_TS_INVALID ) )
+        {
+            p_sys->i_pcr = i_ts_min;
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_ts_min );
+        }
+
         es_out_Send( p_demux->out, tk->p_es, p_block );
 
         /* use time stamp only for first block */
@@ -771,18 +796,6 @@ static int Demux( demux_t *p_demux)
         else
             p_sys->i_pts = (mtime_t)block->GlobalTimecode() / INT64_C(1000);
         p_sys->i_pts += p_sys->i_chapter_time + VLC_TS_0;
-
-        mtime_t i_pcr = VLC_TS_INVALID;
-        for( size_t i = 0; i < p_segment->tracks.size(); i++)
-            if( p_segment->tracks[i]->i_last_dts > VLC_TS_INVALID &&
-                ( p_segment->tracks[i]->i_last_dts < i_pcr || i_pcr == VLC_TS_INVALID ))
-                i_pcr = p_segment->tracks[i]->i_last_dts;
-
-        if( i_pcr > p_sys->i_pcr + 300000 )
-        {
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
-            p_sys->i_pcr = i_pcr;
-        }
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
         {
