@@ -1808,7 +1808,6 @@ static void DeleteDecoder( decoder_t * p_dec )
              (unsigned)block_FifoCount( p_owner->p_fifo ) );
 
     /* Free all packets still in the decoder fifo. */
-    block_FifoEmpty( p_owner->p_fifo );
     block_FifoRelease( p_owner->p_fifo );
 
     /* Cleanup */
