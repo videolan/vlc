@@ -1035,11 +1035,6 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     /* Warn our embedded IM about input changes */
     DCONNECT( this, inputChanged( input_thread_t * ),
               im, inputChangedHandler() );
-
-    /* initialize p_input (an input can already be running) */
-    p_input = playlist_CurrentInput( THEPL );
-    if( p_input )
-        emit inputChanged( p_input );
 }
 
 MainInputManager::~MainInputManager()
