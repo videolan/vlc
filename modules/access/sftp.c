@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Rémi Duraffort <ivoire@videolan.org>
+ *          Petri Hintukainen <phintuka@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +36,7 @@
 
 #include <vlc_access.h>
 #include <vlc_dialog.h>
+#include <vlc_input_item.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
 
@@ -81,6 +83,8 @@ static block_t* Block( access_t * );
 static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 
+static int      DirControl( access_t *, int, va_list );
+static int      DirRead( access_t *p_access, input_item_node_t *p_current_node );
 
 struct access_sys_t
 {
@@ -90,6 +94,10 @@ struct access_sys_t
     LIBSSH2_SFTP_HANDLE* file;
     uint64_t filesize;
     size_t i_read_size;
+
+    /* browser */
+    char* psz_username_opt;
+    char* psz_password_opt;
 };
 
 
@@ -114,7 +122,10 @@ static int Open( vlc_object_t* p_this )
     if( !p_access->psz_location )
         return VLC_EGENERIC;
 
-    STANDARD_BLOCK_ACCESS_INIT;
+    access_InitFields( p_access );
+    p_sys = p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
+    if( !p_sys ) return VLC_ENOMEM;
+
     p_sys->i_socket = -1;
 
     /* Parse the URL */
@@ -243,7 +254,7 @@ static int Open( vlc_object_t* p_this )
     LIBSSH2_SFTP_ATTRIBUTES attributes;
     if( libssh2_sftp_stat( p_sys->sftp_session, url.psz_path, &attributes ) )
     {
-        msg_Err( p_access, "Impossible to get information about the remote file %s", url.psz_path );
+        msg_Err( p_access, "Impossible to get information about the remote path %s", url.psz_path );
         goto error;
     }
 
@@ -252,6 +263,24 @@ static int Open( vlc_object_t* p_this )
         /* Open the given file */
         p_sys->file = libssh2_sftp_open( p_sys->sftp_session, url.psz_path, LIBSSH2_FXF_READ, 0 );
         p_sys->filesize = attributes.filesize;
+
+        ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );
+    }
+    else
+    {
+        /* Open the given directory */
+        p_sys->file = libssh2_sftp_opendir( p_sys->sftp_session, url.psz_path );
+
+        p_access->pf_readdir = DirRead;
+        p_access->pf_control = DirControl;
+
+        if( p_sys->file )
+        {
+            if( -1 == asprintf( &p_sys->psz_username_opt, "sftp-user=%s", psz_username ) )
+                p_sys->psz_username_opt = NULL;
+            if( -1 == asprintf( &p_sys->psz_password_opt, "sftp-pwd=%s", psz_password ) )
+                p_sys->psz_password_opt = NULL;
+        }
     }
 
     if( !p_sys->file )
@@ -292,6 +321,10 @@ static void Close( vlc_object_t* p_this )
 
     libssh2_session_free( p_sys->ssh_session );
     net_Close( p_sys->i_socket );
+
+    free( p_sys->psz_password_opt );
+    free( p_sys->psz_username_opt );
+
     free( p_sys );
 }
 
@@ -387,3 +420,116 @@ static int Control( access_t* p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
+
+/*****************************************************************************
+ * Directory access
+ *****************************************************************************/
+
+static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    LIBSSH2_SFTP_ATTRIBUTES attrs;
+    int err;
+    /* Allocate 1024 bytes for file name. Longer names are skipped.
+     * libssh2 does not support seeking in directory streams.
+     * Retrying with larger buffer is possible, but would require
+     * re-opening the directory stream.
+     */
+    size_t i_size = 1024;
+    char *psz_file = malloc( i_size );
+
+    if( !psz_file )
+        return VLC_ENOMEM;
+
+    while( 0 != ( err = libssh2_sftp_readdir( p_sys->file, psz_file, i_size, &attrs ) ) )
+    {
+        if( err < 0 )
+        {
+            if( err == LIBSSH2_ERROR_BUFFER_TOO_SMALL )
+            {
+                /* seeking back is not possible ... */
+                msg_Dbg( p_access, "skipped too long file name" );
+                continue;
+            }
+            if( err == LIBSSH2_ERROR_EAGAIN )
+            {
+                continue;
+            }
+            msg_Err( p_access, "directory read failed" );
+            break;
+        }
+
+        if( psz_file[0] == '.' )
+        {
+            continue;
+        }
+
+        /* Create an input item for the current entry */
+
+        char *psz_full_uri, *psz_uri;
+
+        psz_uri = encode_URI_component( psz_file );
+        if( psz_uri == NULL )
+            continue;
+
+        if( asprintf( &psz_full_uri, "sftp://%s/%s", p_access->psz_location, psz_uri ) == -1 )
+        {
+            free( psz_uri );
+            continue;
+        }
+        free( psz_uri );
+
+        int i_type = LIBSSH2_SFTP_S_ISDIR( attrs.permissions ) ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
+        input_item_t *p_new = input_item_NewWithType( psz_full_uri, psz_file,
+                                                      0, NULL, 0, 0, i_type );
+
+        if( p_new == NULL )
+        {
+            free( psz_full_uri );
+            continue;
+        }
+
+        /* Here we save on the node the credentials that allowed us to login.
+         * That way the user isn't prompted more than once for credentials */
+        if( p_sys->psz_password_opt )
+            input_item_AddOption( p_new, p_sys->psz_password_opt, VLC_INPUT_OPTION_TRUSTED );
+        if( p_sys->psz_username_opt )
+            input_item_AddOption( p_new, p_sys->psz_username_opt, VLC_INPUT_OPTION_TRUSTED );
+
+        input_item_CopyOptions( p_current_node->p_item, p_new );
+        input_item_node_AppendItem( p_current_node, p_new );
+
+        free( psz_full_uri );
+        input_item_Release( p_new );
+    }
+
+    free( psz_file );
+    return VLC_SUCCESS;
+}
+
+
+static int DirControl( access_t *p_access, int i_query, va_list args )
+{
+    VLC_UNUSED( p_access );
+
+    switch( i_query )
+    {
+    case ACCESS_CAN_SEEK:
+    case ACCESS_CAN_FASTSEEK:
+        *va_arg( args, bool* ) = false;
+        break;
+
+    case ACCESS_CAN_PAUSE:
+    case ACCESS_CAN_CONTROL_PACE:
+        *va_arg( args, bool* ) = true;
+        break;
+
+    case ACCESS_GET_PTS_DELAY:
+        *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY * 1000;
+        break;
+
+    default:
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
