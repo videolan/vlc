@@ -43,7 +43,6 @@ struct block_fifo_t
 {
     vlc_mutex_t         lock;                         /* fifo data lock */
     vlc_cond_t          wait;      /**< Wait for data */
-    vlc_cond_t          wait_room; /**< Wait for queue depth to shrink */
 
     block_t             *p_first;
     block_t             **pp_last;
@@ -204,9 +203,6 @@ block_t *vlc_fifo_DequeueUnlocked(block_fifo_t *fifo)
     assert(fifo->i_size >= block->i_buffer);
     fifo->i_size -= block->i_buffer;
 
-    /* We don't know how many threads can queue new packets now. */
-    vlc_cond_broadcast(&fifo->wait_room);
-
     return block;
 }
 
@@ -233,9 +229,6 @@ block_t *vlc_fifo_DequeueAllUnlocked(block_fifo_t *fifo)
     fifo->i_depth = 0;
     fifo->i_size = 0;
 
-    /* We don't know how many threads can queue new packets now. */
-    vlc_cond_broadcast(&fifo->wait_room);
-
     return block;
 }
 
@@ -253,7 +246,6 @@ block_fifo_t *block_FifoNew( void )
 
     vlc_mutex_init( &p_fifo->lock );
     vlc_cond_init( &p_fifo->wait );
-    vlc_cond_init( &p_fifo->wait_room );
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
     p_fifo->i_depth = p_fifo->i_size = 0;
@@ -268,7 +260,6 @@ block_fifo_t *block_FifoNew( void )
 void block_FifoRelease( block_fifo_t *p_fifo )
 {
     block_ChainRelease( p_fifo->p_first );
-    vlc_cond_destroy( &p_fifo->wait_room );
     vlc_cond_destroy( &p_fifo->wait );
     vlc_mutex_destroy( &p_fifo->lock );
     free( p_fifo );
@@ -285,37 +276,6 @@ void block_FifoEmpty(block_fifo_t *fifo)
     block = vlc_fifo_DequeueAllUnlocked(fifo);
     vlc_fifo_Unlock(fifo);
     block_ChainRelease(block);
-}
-
-/**
- * Wait until the FIFO gets below a certain size (if needed).
- *
- * Note that if more than one thread writes to the FIFO, you cannot assume that
- * the FIFO is actually below the requested size upon return (since another
- * thread could have refilled it already). This is typically not an issue, as
- * this function is meant for (relaxed) congestion control.
- *
- * This function may be a cancellation point and it is cancel-safe.
- *
- * @param fifo queue to wait on
- * @param max_depth wait until the queue has no more than this many blocks
- *                  (use SIZE_MAX to ignore this constraint)
- * @param max_size wait until the queue has no more than this many bytes
- *                  (use SIZE_MAX to ignore this constraint)
- * @return nothing.
- */
-void block_FifoPace (block_fifo_t *fifo, size_t max_depth, size_t max_size)
-{
-    vlc_testcancel ();
-
-    vlc_mutex_lock (&fifo->lock);
-    while ((fifo->i_depth > max_depth) || (fifo->i_size > max_size))
-    {
-         mutex_cleanup_push (&fifo->lock);
-         vlc_cond_wait (&fifo->wait_room, &fifo->lock);
-         vlc_cleanup_pop ();
-    }
-    vlc_mutex_unlock (&fifo->lock);
 }
 
 /**
