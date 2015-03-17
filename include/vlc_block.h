@@ -278,6 +278,8 @@ static inline block_t *block_ChainGather( block_t *p_list )
     block_ChainProperties( p_list, NULL, &i_total, &i_length );
 
     g = block_Alloc( i_total );
+    if( !g )
+        return NULL;
     block_ChainExtract( p_list, g->p_buffer, g->i_buffer );
 
     g->i_flags = p_list->i_flags;
