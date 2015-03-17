@@ -1007,12 +1007,11 @@ void InputManager::AtoBLoop( float, int64_t i_time, int )
  **********************************************************************/
 
 MainInputManager::MainInputManager( intf_thread_t *_p_intf )
-    : QObject(NULL), p_intf( _p_intf ),
+    : QObject(NULL), p_input( NULL), p_intf( _p_intf ),
       random( VLC_OBJECT(THEPL), "random" ),
       repeat( VLC_OBJECT(THEPL), "repeat" ), loop( VLC_OBJECT(THEPL), "loop" ),
       volume( VLC_OBJECT(THEPL), "volume" ), mute( VLC_OBJECT(THEPL), "mute" )
 {
-    p_input = NULL;
     im = new InputManager( this, p_intf );
 
     var_AddCallback( THEPL, "item-change", ItemChanged, im );
