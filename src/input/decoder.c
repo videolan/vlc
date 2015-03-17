@@ -125,6 +125,7 @@ struct decoder_owner_sys_t
     } pause;
 
     /* Waiting */
+    bool b_woken;
     bool b_waiting;
     bool b_first;
     bool b_has_data;
@@ -545,7 +546,10 @@ void input_DecoderWait( decoder_t *p_dec )
     vlc_mutex_lock( &p_owner->lock );
     while( !p_owner->b_has_data )
     {
-        block_FifoWake( p_owner->p_fifo );
+        vlc_fifo_Lock( p_owner->p_fifo );
+        p_owner->b_woken = true;
+        vlc_fifo_Signal( p_owner->p_fifo );
+        vlc_fifo_Unlock( p_owner->p_fifo );
         vlc_cond_wait( &p_owner->wait_acknowledge, &p_owner->lock );
     }
     vlc_mutex_unlock( &p_owner->lock );
@@ -744,6 +748,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     es_format_Init( &p_owner->fmt, UNKNOWN_ES, 0 );
 
     /* decoder fifo */
+    p_owner->b_woken = false;
     p_owner->p_fifo = block_FifoNew();
     if( unlikely(p_owner->p_fifo == NULL) )
     {
@@ -865,10 +870,24 @@ static void *DecoderThread( void *p_data )
     /* The decoder's main loop */
     for( ;; )
     {
-        block_t *p_block = block_FifoGet( p_owner->p_fifo );
+        block_t *p_block;
 
-        /* Make sure there is no cancellation point other than this one^^.
-         * If you need one, be sure to push cleanup of p_block. */
+        vlc_fifo_Lock( p_owner->p_fifo );
+        vlc_fifo_CleanupPush( p_owner->p_fifo );
+
+        while( vlc_fifo_IsEmpty( p_owner->p_fifo ) )
+        {
+            if( p_owner->b_woken )
+                break;
+            vlc_fifo_Wait( p_owner->p_fifo );
+            /* Make sure there is no cancellation point other than this one^^.
+             * If you need one, be sure to push cleanup of p_block. */
+        }
+
+        p_block = vlc_fifo_DequeueUnlocked( p_owner->p_fifo );
+        p_owner->b_woken = false;
+        vlc_cleanup_run();
+
         bool end_wait = !p_block || p_block->i_flags & BLOCK_FLAG_CORE_EOS;
         DecoderSignalWait( p_dec, end_wait );
 
