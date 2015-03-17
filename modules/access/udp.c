@@ -72,6 +72,7 @@ vlc_module_end ()
 struct access_sys_t
 {
     int fd;
+    bool running;
     size_t fifo_size;
     block_fifo_t *fifo;
     vlc_thread_t thread;
@@ -166,6 +167,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
+    sys->running = true;
     sys->fifo_size = var_InheritInteger( p_access, "udp-buffer");
 
     if( vlc_clone( &sys->thread, ThreadRead, p_access,
@@ -234,11 +236,17 @@ static block_t *BlockUDP( access_t *p_access )
     access_sys_t *sys = p_access->p_sys;
     block_t *block;
 
-    if( p_access->info.b_eof )
+    if (p_access->info.b_eof)
         return NULL;
 
-    block = block_FifoGet( sys->fifo );
-    p_access->info.b_eof = block == NULL;
+    vlc_fifo_Lock(sys->fifo);
+    while (vlc_fifo_IsEmpty(sys->fifo) && sys->running)
+       vlc_fifo_Wait(sys->fifo);
+
+    block = vlc_fifo_DequeueUnlocked(sys->fifo);
+    p_access->info.b_eof = !sys->running;
+    vlc_fifo_Unlock(sys->fifo);
+
     return block;
 }
 
@@ -250,7 +258,10 @@ static void* ThreadRead( void *data )
     access_t *access = data;
     access_sys_t *sys = access->p_sys;
 
-    for( ;; )
+    vlc_fifo_Lock(sys->fifo);
+    vlc_fifo_CleanupPush(sys->fifo);
+
+    for(;;)
     {
         block_t *pkt = block_Alloc(MTU);
         if (unlikely(pkt == NULL))
@@ -271,10 +282,17 @@ static void* ThreadRead( void *data )
         }
 
         pkt->i_buffer = len;
-        block_FifoPace(sys->fifo, SIZE_MAX, sys->fifo_size - len);
-        block_FifoPut(sys->fifo, pkt);
+
+        /* Discard old buffers on overflow */
+        while (vlc_fifo_GetBytes(sys->fifo) + len > sys->fifo_size)
+            block_Release(vlc_fifo_DequeueUnlocked(sys->fifo));
+
+        vlc_fifo_QueueUnlocked(sys->fifo, pkt);
     }
 
-    block_FifoWake( sys->fifo );
+    sys->running = false;
+    vlc_fifo_Signal(sys->fifo);
+    vlc_cleanup_run();
+
     return NULL;
 }
