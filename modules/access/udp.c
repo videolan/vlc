@@ -252,30 +252,27 @@ static void* ThreadRead( void *data )
 
     for( ;; )
     {
-        block_t *pkt;
-        ssize_t len;
-
-        block_FifoPace( sys->fifo, SIZE_MAX, sys->fifo_size );
-
-        pkt = block_Alloc( MTU );
-        if( unlikely( pkt == NULL ) )
+        block_t *pkt = block_Alloc(MTU);
+        if (unlikely(pkt == NULL))
             break;
 
-        block_cleanup_push( pkt );
-        len = net_Read( access, sys->fd, NULL, pkt->p_buffer, MTU, false );
+        ssize_t len;
+
+        block_cleanup_push(pkt);
+        do
+            len = net_Read(access, sys->fd, NULL, pkt->p_buffer, MTU, false);
+        while (len == -1 && errno != EINTR);
         vlc_cleanup_pop();
 
-        if( len == -1 )
+        if (len == -1)
         {
-            block_Release( pkt );
-
-            if( errno == EINTR )
-                break;
-            continue;
+            block_Release(pkt);
+            break;
         }
 
         pkt->i_buffer = len;
-        block_FifoPut( sys->fifo, pkt );
+        block_FifoPace(sys->fifo, SIZE_MAX, sys->fifo_size - len);
+        block_FifoPut(sys->fifo, pkt);
     }
 
     block_FifoWake( sys->fifo );
