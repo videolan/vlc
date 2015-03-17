@@ -382,9 +382,9 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
     {
         vlc_mutex_lock( &p_owner->lock );
         /* TODO subtitles support */
-        if( p_dec->fmt_out.i_cat == VIDEO_ES && p_owner->p_vout )
+        if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout )
             b_empty = vout_IsEmpty( p_owner->p_vout );
-        else if( p_dec->fmt_out.i_cat == AUDIO_ES && p_owner->p_aout )
+        else if( p_owner->fmt.i_cat == AUDIO_ES && p_owner->p_aout )
             b_empty = aout_DecIsEmpty( p_owner->p_aout );
         vlc_mutex_unlock( &p_owner->lock );
     }
