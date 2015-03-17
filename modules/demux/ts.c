@@ -436,6 +436,8 @@ struct demux_sys_t
 
     /* */
     bool        b_es_id_pid;
+    uint16_t    i_next_extraid;
+
     csa_t       *csa;
     int         i_csa_pkt_size;
     bool        b_split_es;
@@ -1098,6 +1100,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Read config */
     p_sys->b_es_id_pid = var_CreateGetBool( p_demux, "ts-es-id-pid" );
+    p_sys->i_next_extraid = 1;
 
     p_sys->b_trust_pcr = var_CreateGetBool( p_demux, "ts-trust-pcr" );
 
@@ -5018,6 +5021,14 @@ static void PMTParseEsIso639( demux_t *p_demux, ts_pes_es_t *p_es,
 #endif
 }
 
+static inline void SetExtraESGroupAndID( demux_sys_t *p_sys, es_format_t *p_fmt,
+                                         const es_format_t *p_parent_fmt )
+{
+    if ( p_sys->b_es_id_pid ) /* pid is 13 bits */
+        p_fmt->i_id = (p_sys->i_next_extraid++ << 13) | p_parent_fmt->i_id;
+    p_fmt->i_group = p_parent_fmt->i_group;
+}
+
 static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid, bool b_create_delayed )
 {
     demux_sys_t  *p_sys = p_demux->p_sys;
@@ -5031,8 +5042,9 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid, bool b_create_delay
         pid->u.p_pes->es.id = es_out_Add( p_demux->out, &pid->u.p_pes->es.fmt );
         for( int i = 0; i < pid->u.p_pes->extra_es.i_size; i++ )
         {
-            pid->u.p_pes->extra_es.p_elems[i]->id =
-                    es_out_Add( p_demux->out, &pid->u.p_pes->extra_es.p_elems[i]->fmt );
+            es_format_t *p_fmt = &pid->u.p_pes->extra_es.p_elems[i]->fmt;
+            SetExtraESGroupAndID( p_sys, p_fmt, &pid->u.p_pes->es.fmt );
+            pid->u.p_pes->extra_es.p_elems[i]->id = es_out_Add( p_demux->out, p_fmt );
         }
         p_sys->i_pmt_es += 1 + pid->u.p_pes->extra_es.i_size;
 
@@ -5062,8 +5074,9 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid, bool b_create_delay
                 pid->u.p_pes->es.id = es_out_Add( p_demux->out, &pid->u.p_pes->es.fmt );
                 for( int k = 0; k < pid->u.p_pes->extra_es.i_size; k++ )
                 {
-                    pid->u.p_pes->extra_es.p_elems[k]->id =
-                        es_out_Add( p_demux->out, &pid->u.p_pes->extra_es.p_elems[k]->fmt );
+                    es_format_t *p_fmt = &pid->u.p_pes->extra_es.p_elems[k]->fmt;
+                    SetExtraESGroupAndID( p_sys, p_fmt, &pid->u.p_pes->es.fmt );
+                    pid->u.p_pes->extra_es.p_elems[k]->id = es_out_Add( p_demux->out, p_fmt );
                 }
                 p_sys->i_pmt_es += 1 + pid->u.p_pes->extra_es.i_size;
             }
@@ -5403,9 +5416,10 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             break;
         }
 
+        /* Set Groups / ID */
         p_pes->es.fmt.i_group = p_dvbpsipmt->i_program_number;
-        for( int i = 0; i < p_pes->extra_es.i_size; i++ )
-            p_pes->extra_es.p_elems[i]->fmt.i_group = p_dvbpsipmt->i_program_number;
+        if( p_sys->b_es_id_pid )
+            p_pes->es.fmt.i_id = p_dvbpsies->i_pid;
 
         if( p_pes->es.fmt.i_cat == UNKNOWN_ES )
         {
@@ -5417,8 +5431,6 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         {
             msg_Dbg( p_demux, "   => pid %d has now es fcc=%4.4s",
                      p_dvbpsies->i_pid, (char*)&p_pes->es.fmt.i_codec );
-
-            if( p_sys->b_es_id_pid ) p_pes->es.fmt.i_id = p_dvbpsies->i_pid;
 
             /* Check if we can avoid restarting the ES */
             if( b_reusing_pid )
