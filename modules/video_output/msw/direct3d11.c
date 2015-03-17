@@ -29,10 +29,10 @@
 #include <vlc_vout_display.h>
 
 #define COBJMACROS
+#define INITGUID
 #include <d3d11.h>
 
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
-# define INITGUID
 # include <windows.ui.xaml.media.dxinterop.h> */
 
 #include "common.h"
