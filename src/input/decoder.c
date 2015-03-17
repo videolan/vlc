@@ -878,8 +878,6 @@ static void *DecoderThread( void *p_data )
          * If you need one, be sure to push cleanup of p_block. */
         bool end_wait = !p_block || p_block->i_flags & BLOCK_FLAG_CORE_EOS;
         DecoderSignalWait( p_dec, end_wait );
-        if (end_wait)
-            input_DecoderStopWait( p_dec );
 
         if( p_block )
         {
