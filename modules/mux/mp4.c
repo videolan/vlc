@@ -753,10 +753,7 @@ static block_t *ConvertFromAnnexB(block_t *p_block)
 
         /* Fix size */
         int i_size = dat - &last[4];
-        last[0] = (i_size >> 24)&0xff;
-        last[1] = (i_size >> 16)&0xff;
-        last[2] = (i_size >>  8)&0xff;
-        last[3] = (i_size      )&0xff;
+        SetDWBE((uint32_t*) last, i_size);
 
         /* Skip blocks with SPS/PPS */
         //if ((last[4]&0x1f) == 7 || (last[4]&0x1f) == 8)
