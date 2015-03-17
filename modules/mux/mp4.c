@@ -215,6 +215,7 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux);
 static block_t *ConvertSUBT(block_t *);
 static block_t *ConvertFromAnnexB(block_t *);
 
+static const char avc1_short_start_code[3] = { 0, 0, 1 };
 static const char avc1_start_code[4] = { 0, 0, 0, 1 };
 
 /*****************************************************************************
@@ -735,17 +736,59 @@ static block_t *ConvertSUBT(block_t *p_block)
 
 static block_t *ConvertFromAnnexB(block_t *p_block)
 {
-    uint8_t *last = p_block->p_buffer;  /* Assume it starts with 0x00000001 */
+    if(p_block->i_buffer < 4)
+    {
+        block_Release(p_block);
+        return NULL;
+    }
+
+    if(memcmp(p_block->p_buffer, avc1_start_code, 4))
+    {
+        if(!memcmp(p_block->p_buffer, avc1_short_start_code, 3))
+        {
+            p_block = block_Realloc(p_block, 1, p_block->i_buffer);
+            if( !p_block )
+                return NULL;
+        }
+        else /* No startcode on start */
+        {
+            block_Release(p_block);
+            return NULL;
+        }
+    }
+
+    uint8_t *last = p_block->p_buffer;
     uint8_t *dat  = &p_block->p_buffer[4];
     uint8_t *end = &p_block->p_buffer[p_block->i_buffer];
 
-
-    /* Replace the 4 bytes start code with 4 bytes size,
-     * FIXME are all startcodes 4 bytes ? (I don't think :(*/
+    /* Replace the 4 bytes start code with 4 bytes size */
     while (dat < end) {
         while (dat < end - 4) {
             if (!memcmp(dat, avc1_start_code, 4))
+            {
                 break;
+            }
+            else if(!memcmp(dat, avc1_short_start_code, 3))
+            {
+                /* save offsets as we don't know if realloc will replace buffer */
+                size_t i_last = last - p_block->p_buffer;
+                size_t i_dat = dat - p_block->p_buffer;
+                size_t i_end = end - p_block->p_buffer;
+
+                p_block = block_Realloc(p_block, 0, p_block->i_buffer + 1);
+                if( !p_block )
+                    return NULL;
+
+                /* restore offsets */
+                last = &p_block->p_buffer[i_last];
+                dat = &p_block->p_buffer[i_dat];
+                end = &p_block->p_buffer[i_end];
+
+                /* Shift data */
+                memmove(&dat[4], &dat[3], end - &dat[3]);
+                end++;
+                break;
+            }
             dat++;
         }
         if (dat >= end - 4)
