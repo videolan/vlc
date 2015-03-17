@@ -2347,7 +2347,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
             if( p_pmt->pcr.i_first == -1 ) /* Not seen yet */
                 PCRFixHandle( p_demux, p_pmt, p_block );
 
-            if( p_pmt->pcr.i_current > -1 || p_pmt->pcr.b_disable )
+            if( pid->u.p_pes->es.id && (p_pmt->pcr.i_current > -1 || p_pmt->pcr.b_disable) )
             {
                 if( pid->u.p_pes->p_prepcr_outqueue )
                 {
@@ -3179,7 +3179,7 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
     PCRHandle( p_demux, pid, p_bk );
 
-    if( i_skip >= 188 || pid->u.p_pes->es.id == NULL )
+    if( i_skip >= 188 )
     {
         block_Release( p_bk );
         return i_ret;
