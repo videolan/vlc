@@ -721,7 +721,8 @@ static int Mux(sout_mux_t *p_mux)
 static block_t *ConvertSUBT(block_t *p_block)
 {
     p_block = block_Realloc(p_block, 2, p_block->i_buffer);
-
+    if( !p_block )
+        return NULL;
     /* No trailling '\0' */
     if (p_block->i_buffer > 2 && p_block->p_buffer[p_block->i_buffer-1] == '\0')
         p_block->i_buffer--;
@@ -2835,6 +2836,9 @@ static int MuxFrag(sout_mux_t *p_mux)
     default:
         break;
     }
+
+    if( !p_currentblock )
+        return VLC_ENOMEM;
 
     /* If we have a previous entry for outgoing queue */
     if (p_stream->p_held_entry)
