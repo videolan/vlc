@@ -49,7 +49,6 @@ struct block_fifo_t
     block_t             **pp_last;
     size_t              i_depth;
     size_t              i_size;
-    bool          b_force_wake;
 };
 
 /**
@@ -258,7 +257,6 @@ block_fifo_t *block_FifoNew( void )
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
     p_fifo->i_depth = p_fifo->i_size = 0;
-    p_fifo->b_force_wake = false;
 
     return p_fifo;
 }
@@ -332,15 +330,6 @@ void block_FifoPut(block_fifo_t *fifo, block_t *block)
     vlc_fifo_Unlock(fifo);
 }
 
-void block_FifoWake( block_fifo_t *p_fifo )
-{
-    vlc_mutex_lock( &p_fifo->lock );
-    if( p_fifo->p_first == NULL )
-        p_fifo->b_force_wake = true;
-    vlc_cond_broadcast( &p_fifo->wait );
-    vlc_mutex_unlock( &p_fifo->lock );
-}
-
 /**
  * Dequeue the first block from the FIFO. If necessary, wait until there is
  * one block in the queue. This function is (always) cancellation point.
@@ -354,13 +343,12 @@ block_t *block_FifoGet(block_fifo_t *fifo)
     vlc_testcancel();
 
     vlc_fifo_Lock(fifo);
-    while (vlc_fifo_IsEmpty(fifo) && !fifo->b_force_wake)
+    while (vlc_fifo_IsEmpty(fifo))
     {
         vlc_fifo_CleanupPush(fifo);
         vlc_fifo_Wait(fifo);
         vlc_cleanup_pop();
     }
-    fifo->b_force_wake = false;
     block = vlc_fifo_DequeueUnlocked(fifo);
     vlc_fifo_Unlock(fifo);
 
