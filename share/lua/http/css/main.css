@@ -107,6 +107,7 @@ body{
 }
 
 .buttonszone_active {
+	margin-top: 0px;
 	width: 120px;
 	margin-left:-122px;
 	font-size:10px;
