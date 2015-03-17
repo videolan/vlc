@@ -1014,17 +1014,23 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
 {
     im = new InputManager( this, p_intf );
 
+    /* Audio Menu */
+    menusAudioMapper = new QSignalMapper();
+    CONNECT( menusAudioMapper, mapped(QString), this, menusUpdateAudio( QString ) );
+
+    /* Core Callbacks */
     var_AddCallback( THEPL, "item-change", ItemChanged, im );
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
     var_AddCallback( THEPL, "leaf-to-parent", LeafToParent, this );
     var_AddCallback( THEPL, "playlist-item-append", PLItemAppended, this );
     var_AddCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
+
+    /* Core Callbacks to widget */
     random.addCallback( this, SLOT(notifyRandom(bool)) );
     repeat.addCallback( this, SLOT(notifyRepeatLoop(bool)) );
-    loop.addCallback( this, SLOT(notifyRepeatLoop(bool)) );
-
+    loop.addCallback(   this, SLOT(notifyRepeatLoop(bool)) );
     volume.addCallback( this, SLOT(notifyVolume(float)) );
-    mute.addCallback( this, SLOT(notifyMute(bool)) );
+    mute.addCallback(   this, SLOT(notifyMute(bool)) );
 
     /* Warn our embedded IM about input changes */
     DCONNECT( this, inputChanged( input_thread_t * ),
@@ -1034,10 +1040,6 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     p_input = playlist_CurrentInput( THEPL );
     if( p_input )
         emit inputChanged( p_input );
-
-    /* Audio Menu */
-    menusAudioMapper = new QSignalMapper();
-    CONNECT( menusAudioMapper, mapped(QString), this, menusUpdateAudio( QString ) );
 }
 
 MainInputManager::~MainInputManager()
