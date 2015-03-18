@@ -61,7 +61,7 @@ static void       DeleteDecoder( decoder_t * );
 static void      *DecoderThread( void * );
 static void       DecoderProcess( decoder_t *, block_t * );
 static void       DecoderFlush( decoder_t * );
-static void       DecoderSignalWait( decoder_t *, bool );
+static void       DecoderSignalWait( decoder_t * );
 
 static void       DecoderUnsupportedCodec( decoder_t *, vlc_fourcc_t );
 
@@ -888,8 +888,8 @@ static void *DecoderThread( void *p_data )
         p_owner->b_woken = false;
         vlc_cleanup_run();
 
-        bool end_wait = !p_block || p_block->i_flags & BLOCK_FLAG_CORE_EOS;
-        DecoderSignalWait( p_dec, end_wait );
+        if( p_block == NULL || p_block->i_flags & BLOCK_FLAG_CORE_EOS )
+            DecoderSignalWait( p_dec );
 
         if( p_block )
         {
@@ -950,7 +950,7 @@ static void DecoderFlush( decoder_t *p_dec )
         vlc_cond_wait( &p_owner->wait_acknowledge, &p_owner->lock );
 }
 
-static void DecoderSignalWait( decoder_t *p_dec, bool b_has_data )
+static void DecoderSignalWait( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
@@ -958,8 +958,7 @@ static void DecoderSignalWait( decoder_t *p_dec, bool b_has_data )
 
     if( p_owner->b_waiting )
     {
-        if( b_has_data )
-            p_owner->b_has_data = true;
+        p_owner->b_has_data = true;
         vlc_cond_signal( &p_owner->wait_acknowledge );
     }
 
@@ -2165,7 +2164,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             return NULL;
 
         /* */
-        DecoderSignalWait( p_dec, true );
+        DecoderSignalWait( p_dec );
 
         /* Check the decoder doesn't leak pictures */
         vout_FixLeaks( p_owner->p_vout );
