@@ -2192,7 +2192,8 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
     while( i_attempts-- )
     {
-        if( DecoderIsExitRequested( p_dec ) || p_dec->b_error )
+        if( DecoderIsExitRequested( p_dec ) || DecoderIsFlushing( p_dec )
+         || p_dec->b_error )
             break;
 
         p_vout = input_resource_HoldVout( p_owner->p_resource );
