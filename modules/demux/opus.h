@@ -23,14 +23,14 @@
 
 /* Returns Opus frame duration in samples */
 
-static inline int opus_frame_duration(unsigned char *data, long len)
+static inline unsigned opus_frame_duration(unsigned char *data, long len)
 {
     static const int silk_fs_div[4] = { 6000, 3000, 1500, 1000 };
-    int toc;
-    int nframes;
-    int frame_size;
-    int nsamples;
-    int i_rate;
+    unsigned toc;
+    unsigned nframes;
+    unsigned frame_size;
+    unsigned nsamples;
+    unsigned i_rate;
     if( len < 1 )
         return 0;
     toc = data[0];

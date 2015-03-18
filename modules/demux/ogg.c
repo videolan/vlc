@@ -123,7 +123,7 @@ static int  Control( demux_t *, int, va_list );
 static int  Ogg_ReadPage     ( demux_t *, ogg_page * );
 static void Ogg_UpdatePCR    ( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_DecodePacket ( demux_t *, logical_stream_t *, ogg_packet * );
-static int  Ogg_OpusPacketDuration( ogg_packet * );
+static unsigned Ogg_OpusPacketDuration( ogg_packet * );
 static void Ogg_SendOrQueueBlocks( demux_t *, logical_stream_t *, block_t * );
 
 static void Ogg_CreateES( demux_t *p_demux );
@@ -990,7 +990,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
 
             if( p_stream->fmt.i_codec == VLC_CODEC_OPUS && p_oggpacket->e_o_s )
             {
-                int duration = Ogg_OpusPacketDuration( p_oggpacket );
+                unsigned duration = Ogg_OpusPacketDuration( p_oggpacket );
                 if( duration > 0 )
                 {
                     ogg_int64_t end_sample = p_oggpacket->granulepos;
@@ -1011,7 +1011,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
     }
     else if ( p_oggpacket->granulepos == -1 )
     {
-        int i_duration;
+        unsigned i_duration;
         /* no granulepos available, try to interpolate the pcr.
          * If we can't then don't touch the old value. */
         if( p_stream->fmt.i_cat == VIDEO_ES && p_stream->i_pcr > VLC_TS_INVALID )
@@ -1460,7 +1460,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     Ogg_SendOrQueueBlocks( p_demux, p_stream, p_block );
 }
 
-static int Ogg_OpusPacketDuration( ogg_packet *p_oggpacket )
+static unsigned Ogg_OpusPacketDuration( ogg_packet *p_oggpacket )
 {
     return opus_frame_duration(p_oggpacket->packet, p_oggpacket->bytes);
 }
