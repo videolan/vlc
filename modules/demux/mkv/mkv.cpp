@@ -723,7 +723,7 @@ msg_Dbg( p_demux, "block (track=%d) i_dts: %"PRId64" / i_pts: %"PRId64, tk->i_nu
         /* use time stamp only for first block */
         i_pts = ( tk->i_default_duration )?
                  i_pts + ( mtime_t )tk->i_default_duration:
-                 VLC_TS_INVALID;
+                 ( tk->fmt.b_packetized ) ? VLC_TS_INVALID : i_pts + 1;
     }
 }
 
