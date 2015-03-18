@@ -1493,6 +1493,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             if( p_tk->fmt.i_codec == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
                 msg_Err( &sys.demuxer, "Unrecognized wf tag: 0x%x", GetWLE( &p_wf->wFormatTag ) );
         }
+        p_fmt->b_packetized = !p_fmt->audio.i_blockalign;
     }
     else if( !strcmp( p_tk->psz_codec, "A_MPEG/L3" ) ||
              !strcmp( p_tk->psz_codec, "A_MPEG/L2" ) ||
