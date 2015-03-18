@@ -1695,7 +1695,10 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                     p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
                 }
                 else if( !strcmp( p_tk->psz_codec, "A_REAL/ATRC" ) )
+                {
                     p_tk->fmt.i_codec = VLC_CODEC_ATRAC3;
+                    p_tk->fmt.audio.i_blockalign = hton16(priv->sub_packet_size);
+                }
                 else if( !strcmp( p_tk->psz_codec, "A_REAL/28_8" ) )
                     p_tk->fmt.i_codec = VLC_CODEC_RA_288;
                 /* FIXME RALF and SIPR */
