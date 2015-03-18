@@ -400,13 +400,13 @@ struct demux_sys_t
     vlc_mutex_t     csa_lock;
 
     /* TS packet size (188, 192, 204) */
-    int         i_packet_size;
+    unsigned    i_packet_size;
 
     /* Additional TS packet header size (BluRay TS packets have 4-byte header before sync byte) */
-    int         i_packet_header_size;
+    unsigned    i_packet_header_size;
 
     /* how many TS packet we read at once */
-    int         i_ts_read;
+    unsigned    i_ts_read;
 
     bool        b_force_seek_per_percent;
 
@@ -534,7 +534,7 @@ static int  SetPIDFilter( demux_sys_t *, ts_pid_t *, bool b_selected );
 #define TS_PACKET_SIZE_MAX 204
 #define TS_HEADER_SIZE 4
 
-static int DetectPacketSize( demux_t *p_demux, int *pi_header_size, int i_offset )
+static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_offset )
 {
     const uint8_t *p_peek;
 
@@ -589,7 +589,7 @@ static int DetectPacketSize( demux_t *p_demux, int *pi_header_size, int i_offset
 
 #define TOPFIELD_HEADER_SIZE 3712
 
-static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, int *pi_header_size, vdr_info_t *p_vdr )
+static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_size, vdr_info_t *p_vdr )
 {
     const uint8_t *p_peek;
     *pi_header_size = 0;
@@ -992,7 +992,8 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    int          i_packet_size, i_packet_header_size = 0;
+    int          i_packet_size;
+    unsigned     i_packet_header_size = 0;
 
     ts_pid_t    *patpid;
     vdr_info_t   vdr = {0};
@@ -1271,7 +1272,7 @@ static int Demux( demux_t *p_demux )
         MissingPATPMTFixup( p_demux );
 
     /* We read at most 100 TS packet or until a frame is completed */
-    for( int i_pkt = 0; i_pkt < p_sys->i_ts_read; i_pkt++ )
+    for( unsigned i_pkt = 0; i_pkt < p_sys->i_ts_read; i_pkt++ )
     {
         bool         b_frame = false;
         block_t     *p_pkt;
@@ -2520,11 +2521,12 @@ static block_t* ReadTSPacket( demux_t *p_demux )
         for( ;; )
         {
             const uint8_t *p_peek;
-            int i_peek, i_skip = 0;
+            int i_peek = 0;
+            unsigned i_skip = 0;
 
             i_peek = stream_Peek( p_sys->stream, &p_peek,
                     p_sys->i_packet_size * 10 );
-            if( i_peek < p_sys->i_packet_size + 1 )
+            if( i_peek < 0 || (unsigned)i_peek < p_sys->i_packet_size + 1 )
             {
                 msg_Dbg( p_demux, "eof ?" );
                 return NULL;
