@@ -62,6 +62,14 @@
 					}
 					return false;
 				});
+                $('#buttonRewd').click(function(){
+                    sendCommand({'command': 'seek', 'val': '-30S'});
+                    return false;
+                });
+                $('#buttonFwrd').click(function(){
+                    sendCommand({'command': 'seek', 'val': '+30S'});
+                    return false;
+                });
 			})
 		</script>
 	</head>
@@ -74,8 +82,10 @@
 		<div id="play_controls">
 			<div id="buttons">
 				<div id="buttonPrev" class="button48  ui-corner-all" title="Previous"></div>
+				<div id="buttonRewd" class="button48  ui-corner-all" title="Rewind"></div>
 				<div id="buttonPlay" class="button48  ui-corner-all paused" title="Play"></div>
 				<div id="buttonStop" class="button48  ui-corner-all" title="Stop"></div>
+				<div id="buttonFwrd" class="button48  ui-corner-all" title="Forward"></div>
 				<div id="buttonNext" class="button48  ui-corner-all" title="Next"></div>
 			</div>
 			<div id="seekSlider" title="Seek Time" style="font-size:15px;"></div>

@@ -105,6 +105,12 @@ body{
 #buttonStop{
 	background-position: -576px 0px;
 }
+#buttonRewd{
+	background-position: -528px 0px;
+}
+#buttonFwrd{
+	background-position: -96px 0px;
+}
 .playing {
 	background-position: -336px 0px;
 }
