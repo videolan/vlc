@@ -2060,7 +2060,7 @@ static block_t *Opus_Parse(demux_t *demux, block_t *block)
         last = &au->p_next;
 
         au->i_nb_samples = opus_frame_duration(buf, au_size);
-        if (end_trim && end_trim <= au->i_nb_samples)
+        if (end_trim && (uint16_t) end_trim <= au->i_nb_samples)
             au->i_length = end_trim; /* Blatant abuse of the i_length field. */
         else
             au->i_length = 0;
