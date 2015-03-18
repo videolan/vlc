@@ -209,7 +209,7 @@ typedef struct
     uint8_t                 i_objectTypeIndication;
     uint8_t                 i_streamType;
 
-    int                     i_extra;
+    unsigned                i_extra;
     uint8_t                 *p_extra;
 
 } decoder_config_descriptor_t;
@@ -3341,7 +3341,7 @@ static void PIDFillFormat( es_format_t *fmt, int i_stream_type )
 /*****************************************************************************
  * MP4 specific functions (IOD parser)
  *****************************************************************************/
-static int  IODDescriptorLength( int *pi_data, uint8_t **pp_data )
+static unsigned IODDescriptorLength( unsigned *pi_data, uint8_t **pp_data )
 {
     unsigned int i_b;
     unsigned int i_len = 0;
@@ -3360,9 +3360,9 @@ static int  IODDescriptorLength( int *pi_data, uint8_t **pp_data )
     return i_len;
 }
 
-static int IODGetBytes( int *pi_data, uint8_t **pp_data, size_t bytes )
+static unsigned IODGetBytes( unsigned *pi_data, uint8_t **pp_data, size_t bytes )
 {
-    uint32_t res = 0;
+    unsigned res = 0;
     while( *pi_data > 0 && bytes-- )
     {
         res <<= 8;
@@ -3374,9 +3374,9 @@ static int IODGetBytes( int *pi_data, uint8_t **pp_data, size_t bytes )
     return res;
 }
 
-static char* IODGetURL( int *pi_data, uint8_t **pp_data )
+static char* IODGetURL( unsigned *pi_data, uint8_t **pp_data )
 {
-    int len = IODGetBytes( pi_data, pp_data, 1 );
+    unsigned len = IODGetBytes( pi_data, pp_data, 1 );
     if (len > *pi_data)
         len = *pi_data;
     char *url = strndup( (char*)*pp_data, len );
@@ -3385,7 +3385,7 @@ static char* IODGetURL( int *pi_data, uint8_t **pp_data )
     return url;
 }
 
-static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
+static iod_descriptor_t *IODNew( unsigned i_data, uint8_t *p_data )
 {
     uint8_t i_iod_tag, i_iod_label, byte1, byte2, byte3;
 
@@ -3446,17 +3446,17 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     IODGetBytes( &i_data, &p_data, 1 ); /* visual */
     IODGetBytes( &i_data, &p_data, 1 ); /* graphics */
 
-    int i_length = 0;
-    int i_data_sav = i_data;
+    unsigned i_length = 0;
+    unsigned i_data_sav = i_data;
     uint8_t *p_data_sav = p_data;
-    for (int i = 0; i_data > 0 && i < ES_DESCRIPTOR_COUNT; i++)
+    for (unsigned i = 0; i_data > 0 && i < ES_DESCRIPTOR_COUNT; i++)
     {
         es_mpeg4_descriptor_t *es_descr = &p_iod->es_descr[i];
 
         p_data = p_data_sav + i_length;
         i_data = i_data_sav - i_length;
 
-        int i_tag = IODGetBytes( &i_data, &p_data, 1 );
+        uint8_t i_tag = IODGetBytes( &i_data, &p_data, 1 );
         i_length = IODDescriptorLength( &i_data, &p_data );
 
         i_data_sav = i_data;
@@ -3471,7 +3471,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
         }
 
         es_descr->i_es_id = IODGetBytes( &i_data, &p_data, 2 );
-        int i_flags = IODGetBytes( &i_data, &p_data, 1 );
+        uint8_t i_flags = IODGetBytes( &i_data, &p_data, 1 );
         bool b_streamDependenceFlag = ( i_flags >> 7 )&0x01;
         if( b_streamDependenceFlag )
             IODGetBytes( &i_data, &p_data, 2 ); /* dependOn_es_id */
@@ -3488,7 +3488,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
             ts_debug( "\n* ERR missing DecoderConfigDescr" );
             continue;
         }
-        int i_config_desc_length = IODDescriptorLength( &i_data, &p_data ); /* DecoderConfigDescr_length */
+        unsigned i_config_desc_length = IODDescriptorLength( &i_data, &p_data ); /* DecoderConfigDescr_length */
         decoder_config_descriptor_t *dec_descr = &es_descr->dec_descr;
         dec_descr->i_objectTypeIndication = IODGetBytes( &i_data, &p_data, 1 );
         i_flags = IODGetBytes( &i_data, &p_data, 1 );
@@ -4267,7 +4267,7 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pes_es_t *p_es,
 
     if( p_fmt->i_cat != UNKNOWN_ES )
     {
-        p_fmt->i_extra = dcd->i_extra;
+        p_fmt->i_extra = __MIN(dcd->i_extra, INT32_MAX);
         if( p_fmt->i_extra > 0 )
         {
             p_fmt->p_extra = malloc( p_fmt->i_extra );
