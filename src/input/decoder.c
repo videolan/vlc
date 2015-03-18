@@ -347,25 +347,30 @@ void input_DecoderDecode( decoder_t *p_dec, block_t *p_block, bool b_do_pace )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    if( b_do_pace )
-    {
-        /* The fifo is not consumed when waiting and so will
-         * deadlock vlc.
-         * There is no need to lock as b_waiting is never modified
-         * inside decoder thread. */
-        if( !p_owner->b_waiting )
-            block_FifoPace( p_owner->p_fifo, 10, SIZE_MAX );
-    }
-    else if( block_FifoSize( p_owner->p_fifo ) > 400*1024*1024 /* 400 MiB, ie ~ 50mb/s for 60s */ )
+    vlc_fifo_Lock( p_owner->p_fifo );
+    if( !b_do_pace )
     {
         /* FIXME: ideally we would check the time amount of data
          * in the FIFO instead of its size. */
-        msg_Warn( p_dec, "decoder/packetizer fifo full (data not "
-                  "consumed quickly enough), resetting fifo!" );
-        block_FifoEmpty( p_owner->p_fifo );
+        /* 400 MiB, i.e. ~ 50mb/s for 60s */
+        if( vlc_fifo_GetBytes( p_owner->p_fifo ) > 400*1024*1024 )
+        {
+            msg_Warn( p_dec, "decoder/packetizer fifo full (data not "
+                      "consumed quickly enough), resetting fifo!" );
+            block_ChainRelease( vlc_fifo_DequeueAllUnlocked( p_owner->p_fifo ) );
+        }
+    }
+    else
+    if( !p_owner->b_waiting )
+    {   /* The FIFO is not consumed when waiting, so pacing would deadlock VLC.
+         * Locking is not necessary as b_waiting is only read, not written by
+         * the decoder thread. */
+        while( vlc_fifo_GetCount( p_owner->p_fifo ) >= 10 )
+            vlc_fifo_WaitCond( p_owner->p_fifo, &p_owner->wait_acknowledge );
     }
 
-    block_FifoPut( p_owner->p_fifo, p_block );
+    vlc_fifo_QueueUnlocked( p_owner->p_fifo, p_block );
+    vlc_fifo_Unlock( p_owner->p_fifo );
 }
 
 bool input_DecoderIsEmpty( decoder_t * p_dec )
@@ -885,6 +890,9 @@ static void *DecoderThread( void *p_data )
         }
 
         p_block = vlc_fifo_DequeueUnlocked( p_owner->p_fifo );
+        if( p_block != NULL )
+            vlc_cond_signal( &p_owner->wait_acknowledge );
+
         p_owner->b_woken = false;
         vlc_cleanup_run();
 
