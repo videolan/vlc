@@ -595,6 +595,10 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         {
             memcpy( p_block->p_buffer, tk->p_compression_data->GetBuffer(), tk->p_compression_data->GetSize() );
         }
+
+        if ( b_key_picture )
+            p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+
         switch( tk->fmt.i_codec )
         {
         case VLC_CODEC_COOK:
@@ -630,9 +634,6 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             break;
         }
 
-        if ( b_key_picture )
-            p_block->i_flags |= BLOCK_FLAG_TYPE_I;
-        
         if( tk->fmt.i_cat != VIDEO_ES )
         {
             if ( tk->fmt.i_cat == NAV_ES )

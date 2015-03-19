@@ -183,6 +183,13 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
                 p_sys->p_subpackets[i] = NULL;
             }
         p_sys->i_subpacket = 0;
+
+        if ( !( p_blk->i_flags & BLOCK_FLAG_TYPE_I) )
+        {
+            msg_Dbg( p_demux, "discard non-key preroll block in track %d at%"PRId64,
+                     p_tk->i_number, i_pts );
+            return;
+        }
     }
 
     if( p_tk->fmt.i_codec == VLC_CODEC_COOK ||
