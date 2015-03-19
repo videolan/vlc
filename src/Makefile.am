@@ -442,6 +442,7 @@ SOURCES_libvlc_common = \
 	misc/rand.c \
 	misc/mtime.c \
 	misc/block.c \
+	misc/fifo.c \
 	misc/fourcc.c \
 	misc/es_format.c \
 	misc/picture.c \
