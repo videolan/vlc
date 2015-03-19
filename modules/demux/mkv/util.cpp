@@ -236,11 +236,67 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
     {
         for( size_t i = 0; i < p_sys->i_subpackets; i++)
         {
-            es_out_Send( p_demux->out, p_tk->p_es,  p_sys->p_subpackets[i]);
+            send_Block( p_demux, p_tk, p_sys->p_subpackets[i], 1, 0 );
             p_sys->p_subpackets[i] = NULL;
         }
         p_sys->i_subpacket = 0;
     }
+}
+
+void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsigned int i_number_frames, mtime_t i_duration )
+{
+    demux_sys_t        *p_sys = p_demux->p_sys;
+    matroska_segment_c *p_segment = p_sys->p_current_segment->CurrentSegment();
+
+    if( p_tk->fmt.i_cat == AUDIO_ES && p_tk->i_chans_to_reorder )
+    {
+        aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
+                             p_tk->fmt.audio.i_channels,
+                             p_tk->pi_chan_table, p_tk->fmt.i_codec );
+    }
+
+    if( p_block->i_dts > VLC_TS_INVALID &&
+        ( p_tk->fmt.i_cat == VIDEO_ES || p_tk->fmt.i_cat == AUDIO_ES ) )
+    {
+        p_tk->i_last_dts = p_block->i_dts;
+    }
+
+    if( !p_tk->b_no_duration )
+    {
+        p_block->i_length = i_duration * p_tk->f_timecodescale *
+            (double) p_segment->i_timescale / ( 1000.0 * i_number_frames );
+    }
+
+    // find the latest DTS for an active track
+    mtime_t i_ts_max = INT64_MIN;
+    for( size_t j = 0; j < p_segment->tracks.size(); j++ )
+    {
+        mkv_track_t *tk = p_segment->tracks[j];
+        if( tk->i_last_dts > VLC_TS_INVALID )
+            i_ts_max = __MAX( i_ts_max, tk->i_last_dts );
+    }
+
+    // find the earliest DTS less than 10 clock ticks away from the latest DTS
+    mtime_t i_ts_min = INT64_MAX;
+    for( size_t j = 0; j < p_segment->tracks.size(); j++ )
+    {
+        mkv_track_t *tk = p_segment->tracks[j];
+        if( tk->i_last_dts > VLC_TS_INVALID && tk->i_last_dts + 10 * CLOCK_FREQ >= i_ts_max )
+            i_ts_min = __MIN( i_ts_min, tk->i_last_dts );
+    }
+
+    // the PCR is the earliest active DTS if we found one
+    if( i_ts_min != INT64_MAX && ( i_ts_min > p_sys->i_pcr || p_sys->i_pcr == VLC_TS_INVALID ) )
+    {
+        p_sys->i_pcr = i_ts_min;
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_ts_min );
+    }
+
+#if 0
+msg_Dbg( p_demux, "block (track=%d) i_dts: %"PRId64" / i_pts: %"PRId64, p_tk->i_number, p_block->i_dts, p_block->i_pts);
+#endif
+
+    es_out_Send( p_demux->out, p_tk->p_es, p_block);
 }
 
 int32_t Cook_PrivateTrackData::Init()
