@@ -255,8 +255,8 @@ static inline void bo_add_16le(bo_t *p_bo, uint16_t i)
 
 static inline void bo_set_16be(bo_t *p_bo, int i_offset, uint16_t i)
 {
-    bo_set_8(p_bo, i_offset + 1, ((i >> 8) &0xff));
-    bo_set_8(p_bo, i_offset, i &0xff);
+    bo_set_8(p_bo, i_offset, ((i >> 8) &0xff));
+    bo_set_8(p_bo, i_offset + 1, i &0xff);
 }
 
 static inline void bo_set_16le(bo_t *p_bo, int i_offset, uint16_t i)
@@ -286,8 +286,8 @@ static inline void bo_add_32le(bo_t *p_bo, uint32_t i)
 
 static inline void bo_set_32be(bo_t *p_bo, int i_offset, uint32_t i)
 {
-    bo_set_16be(p_bo, i_offset + 2, ((i >> 16) &0xffff));
-    bo_set_16be(p_bo, i_offset, i &0xffff);
+    bo_set_16be(p_bo, i_offset, ((i >> 16) &0xffff));
+    bo_set_16be(p_bo, i_offset + 2, i &0xffff);
 }
 
 static inline void bo_set_32le(bo_t *p_bo, int i_offset, uint32_t i)
