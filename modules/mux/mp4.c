@@ -205,8 +205,16 @@ struct sout_mux_sys_t
 
 static bo_t *box_new     (const char *fcc);
 static bo_t *box_full_new(const char *fcc, uint8_t v, uint32_t f);
-static void  box_fix     (bo_t *box);
+static void  box_fix     (bo_t *box, uint32_t);
 static void  box_gather  (bo_t *box, bo_t *box2);
+
+static inline void bo_add_mp4_tag_descr(bo_t *box, uint8_t tag, uint32_t size)
+{
+    bo_add_8(box, tag);
+    for (int i = 3; i>0; i--)
+        bo_add_8(box, (size>>(7*i)) | 0x80);
+    bo_add_8(box, size & 0x7F);
+}
 
 static void box_send(sout_mux_t *p_mux,  bo_t *box);
 
@@ -259,9 +267,9 @@ static int Open(vlc_object_t *p_this)
         else
             bo_add_fourcc(box, "mp41");
         bo_add_fourcc(box, "avc1");
-        box_fix(box);
+        box_fix(box, box->b->i_buffer);
 
-        p_sys->i_pos += box->len;
+        p_sys->i_pos += box->b->i_buffer;
         p_sys->i_mdat_pos = p_sys->i_pos;
 
         box_send(p_mux, box);
@@ -275,7 +283,7 @@ static int Open(vlc_object_t *p_this)
     box = box_new("mdat");
     bo_add_64be  (box, 0); // enough to store an extended size
 
-    p_sys->i_pos += box->len;
+    p_sys->i_pos += box->b->i_buffer;
 
     box_send(p_mux, box);
 
@@ -294,7 +302,7 @@ static void Close(vlc_object_t *p_this)
 
     /* Update mdat size */
     bo_t bo;
-    bo_init(&bo, 1024);
+    bo_init(&bo, 16);
     if (p_sys->i_pos - p_sys->i_mdat_pos >= (((uint64_t)1)<<32)) {
         /* Extended size */
         bo_add_32be  (&bo, 1);
@@ -307,7 +315,6 @@ static void Close(vlc_object_t *p_this)
         bo_add_fourcc(&bo, "mdat");
     }
 
-    bo.b->i_buffer = bo.len;
     sout_AccessOutSeek(p_mux->p_access, p_sys->i_mdat_pos);
     sout_AccessOutWrite(p_mux->p_access, bo.b);
 
@@ -321,7 +328,7 @@ static void Close(vlc_object_t *p_this)
         /* Move data to the end of the file so we can fit the moov header
          * at the start */
         int64_t i_size = p_sys->i_pos - p_sys->i_mdat_pos;
-        int i_moov_size = moov->len;
+        int i_moov_size = moov->b->i_buffer;
 
         while (i_size > 0) {
             int64_t i_chunk = __MIN(32768, i_size);
@@ -344,17 +351,20 @@ static void Close(vlc_object_t *p_this)
         if (!p_sys->b_fast_start)
             break;
 
+        /* Update pos pointers */
+        i_moov_pos = p_sys->i_mdat_pos;
+        p_sys->i_mdat_pos += moov->b->i_buffer;
+
         /* Fix-up samples to chunks table in MOOV header */
         for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++) {
             mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
-
-            moov->len = p_stream->i_stco_pos;
+            unsigned i_written = 0;
             for (unsigned i = 0; i < p_stream->i_entry_count; ) {
                 mp4_entry_t *entry = p_stream->entry;
                 if (p_stream->b_stco64)
-                    bo_add_64be(moov, entry[i].i_pos + i_moov_size);
+                    bo_set_64be(moov, p_stream->i_stco_pos + i_written++ * 8, entry[i].i_pos + p_sys->i_mdat_pos - i_moov_pos);
                 else
-                    bo_add_32be(moov, entry[i].i_pos + i_moov_size);
+                    bo_set_32be(moov, p_stream->i_stco_pos + i_written++ * 4, entry[i].i_pos + p_sys->i_mdat_pos - i_moov_pos);
 
                 for (; i < p_stream->i_entry_count; i++)
                     if (i >= p_stream->i_entry_count - 1 ||
@@ -365,8 +375,6 @@ static void Close(vlc_object_t *p_this)
             }
         }
 
-        moov->len = i_moov_size;
-        i_moov_pos = p_sys->i_mdat_pos;
         p_sys->b_fast_start = false;
     }
 
@@ -1851,7 +1859,7 @@ static bo_t *GetStblBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
         box_gather(stbl, ctts);
     box_gather(stbl, stsc);
     box_gather(stbl, stsz);
-    p_stream->i_stco_pos = stbl->len + 16;
+    p_stream->i_stco_pos = stbl->b->i_buffer + 16;
     box_gather(stbl, stco);
 
     return stbl;
@@ -2197,19 +2205,19 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
             stbl = GetStblBox(p_mux, p_stream);
 
         /* append stbl to minf */
-        p_stream->i_stco_pos += minf->len;
+        p_stream->i_stco_pos += minf->b->i_buffer;
         box_gather(minf, stbl);
 
         /* append minf to mdia */
-        p_stream->i_stco_pos += mdia->len;
+        p_stream->i_stco_pos += mdia->b->i_buffer;
         box_gather(mdia, minf);
 
         /* append mdia to trak */
-        p_stream->i_stco_pos += trak->len;
+        p_stream->i_stco_pos += trak->b->i_buffer;
         box_gather(trak, mdia);
 
         /* append trak to moov */
-        p_stream->i_stco_pos += moov->len;
+        p_stream->i_stco_pos += moov->b->i_buffer;
         box_gather(moov, trak);
     }
 
@@ -2243,7 +2251,7 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
         box_gather(moov, mvex);
     }
 
-    box_fix(moov);
+    box_fix(moov, moov->b->i_buffer);
     return moov;
 }
 
@@ -2281,26 +2289,22 @@ static void box_free(bo_t *box)
     free(box);
 }
 
-static void box_fix(bo_t *box)
+static void box_fix(bo_t *box, uint32_t i_size)
 {
-    box->b->p_buffer[0] = box->len >> 24;
-    box->b->p_buffer[1] = box->len >> 16;
-    box->b->p_buffer[2] = box->len >>  8;
-    box->b->p_buffer[3] = box->len;
+    bo_set_32be(box, 0, i_size);
 }
 
 static void box_gather (bo_t *box, bo_t *box2)
 {
-    box_fix(box2);
-    box->b = block_Realloc(box->b, 0, box->len + box2->len);
-    memcpy(&box->b->p_buffer[box->len], box2->b->p_buffer, box2->len);
-    box->len += box2->len;
+    box_fix(box2, box2->b->i_buffer);
+    size_t i_offset = box->b->i_buffer;
+    box->b = block_Realloc(box->b, 0, box->b->i_buffer + box2->b->i_buffer);
+    memcpy(&box->b->p_buffer[i_offset], box2->b->p_buffer, box2->b->i_buffer);
     box_free(box2);
 }
 
 static void box_send(sout_mux_t *p_mux,  bo_t *box)
 {
-    box->b->i_buffer = box->len;
     sout_AccessOutWrite(p_mux->p_access, box->b);
     free(box);
 }
@@ -2499,7 +2503,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
 
             if (i_trun_flags & MP4_TRUN_DATA_OFFSET)
             {
-                i_fixupoffset = moof->len + traf->len + trun->len;
+                i_fixupoffset = moof->b->i_buffer + traf->b->i_buffer + trun->b->i_buffer;
                 bo_add_32be(trun, 0xdeadbeef); // data offset
             }
 
@@ -2549,13 +2553,13 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
         box_gather(moof, traf);
     }
 
-    box_fix(moof);
+    box_fix(moof, moof->b->i_buffer);
 
     /* do tfhd base data offset fixup */
     if (i_fixupoffset)
     {
         /* mdat will follow moof */
-        SetDWBE(moof->b->p_buffer + i_fixupoffset, moof->len + 8);
+        SetDWBE(moof->b->p_buffer + i_fixupoffset, moof->b->i_buffer + 8);
     }
 
     /* set iframe flag, so the streaming server always starts from moof */
@@ -2571,10 +2575,8 @@ static void WriteFragmentMDAT(sout_mux_t *p_mux, size_t i_total_size)
     /* Now add mdat header */
     bo_t *mdat = box_new("mdat");
     /* force update of real size */
-    mdat->b->i_buffer = mdat->len;
-    assert(mdat->len==8);
-    mdat->len += i_total_size;
-    box_fix(mdat);
+    assert(mdat->b->i_buffer==8);
+    box_fix(mdat, mdat->b->i_buffer + i_total_size);
     p_sys->i_pos += mdat->b->i_buffer;
     /* only write header */
     sout_AccessOutWrite(p_mux->p_access, mdat->b);
@@ -2648,7 +2650,7 @@ static void FlushHeader(sout_mux_t *p_mux)
     bo_t *ftyp = box_new("ftyp");
     bo_add_fourcc(ftyp, "isom");
     bo_add_32be  (ftyp, 0); // minor version
-    box_fix(ftyp);
+    box_fix(ftyp, ftyp->b->i_buffer);
 
     bo_t *moov = GetMoovBox(p_mux);
 
@@ -2657,7 +2659,7 @@ static void FlushHeader(sout_mux_t *p_mux)
 
     /* add header flag for streaming server */
     ftyp->b->i_flags |= BLOCK_FLAG_HEADER;
-    p_sys->i_pos += ftyp->len;
+    p_sys->i_pos += ftyp->b->i_buffer;
     box_send(p_mux, ftyp);
     p_sys->b_header_sent = true;
 }
@@ -2736,7 +2738,7 @@ static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
     if (moof)
     {
         msg_Dbg(p_mux, "writing moof @ %"PRId64, p_sys->i_pos);
-        p_sys->i_pos += moof->len;
+        p_sys->i_pos += moof->b->i_buffer;
         assert(moof->b->i_flags & BLOCK_FLAG_TYPE_I); /* http sout */
         box_send(p_mux, moof);
         msg_Dbg(p_mux, "writing mdat @ %"PRId64, p_sys->i_pos);
@@ -2840,8 +2842,8 @@ static void CloseFrag(vlc_object_t *p_this)
             bo_t *mfro = box_full_new("mfro", 0, 0x0);
             if (mfro)
             {
-                box_fix(mfra);
-                bo_add_32be(mfro, mfra->len + MP4_MFRO_BOXSIZE);
+                box_fix(mfra, mfra->b->i_buffer);
+                bo_add_32be(mfro, mfra->b->i_buffer + MP4_MFRO_BOXSIZE);
                 box_gather(mfra, mfro);
             }
             box_send(p_mux, mfra);
