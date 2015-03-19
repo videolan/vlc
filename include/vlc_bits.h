@@ -304,6 +304,12 @@ static inline void bo_swap_32be (bo_t *p_bo, int i_pos, uint32_t i)
     p_bo->b->p_buffer[i_pos + 3] = (i      )&0xff;
 }
 
+static inline void bo_set_64be(bo_t *p_bo, int i_offset, uint64_t i)
+{
+    bo_set_32be(p_bo, i_offset, ((i >> 32) &0xffffffff));
+    bo_set_32be(p_bo, i_offset + 4, i &0xffffffff);
+}
+
 static inline void bo_add_64be(bo_t *p_bo, uint64_t i)
 {
     bo_add_32be(p_bo, ((i >> 32) &0xffffffff));
