@@ -36,7 +36,6 @@
 typedef struct bo_t
 {
     block_t     *b;
-    size_t      len;
     size_t      basesize;
 } bo_t;
 
@@ -212,25 +211,25 @@ static inline int bo_init(bo_t *p_bo, int i_size)
         return VLC_ENOMEM;
 
     p_bo->b->i_buffer = 0;
-    p_bo->len = p_bo->basesize = i_size;
+    p_bo->basesize = i_size;
 
     return VLC_SUCCESS;
 }
 
 static inline void bo_set_8(bo_t *p_bo, size_t i_offset, uint8_t i)
 {
-    if (i_offset >= p_bo->len)
+    size_t i_size = p_bo->b->i_size - (p_bo->b->p_buffer - p_bo->b->p_start);
+    if (i_offset >= i_size)
     {
         int i_growth = p_bo->basesize;
-        while(i_offset >= p_bo->len + i_growth)
+        while(i_offset >= i_size + i_growth)
             i_growth += p_bo->basesize;
 
         int i = p_bo->b->i_buffer; /* Realloc would set payload size == buffer size */
-        p_bo->b = block_Realloc(p_bo->b, 0, p_bo->len + i_growth);
+        p_bo->b = block_Realloc(p_bo->b, 0, i_size + i_growth);
         if (!p_bo->b)
             return;
         p_bo->b->i_buffer = i;
-        p_bo->len += i_growth;
     }
     p_bo->b->p_buffer[i_offset] = i;
 }
@@ -334,14 +333,6 @@ static inline void bo_add_mem(bo_t *p_bo, int i_size, const uint8_t *p_mem)
 {
     for (int i = 0; i < i_size; i++)
         bo_add_8(p_bo, p_mem[i]);
-}
-
-static inline void bo_add_mp4_tag_descr(bo_t *p_bo, uint8_t tag, uint32_t size)
-{
-    bo_add_8(p_bo, tag);
-    for (int i = 3; i>0; i--)
-        bo_add_8(p_bo, (size>>(7*i)) | 0x80);
-    bo_add_8(p_bo, size & 0x7F);
 }
 
 #endif
