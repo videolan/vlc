@@ -35,6 +35,8 @@ class QPushButton;
 class BookmarksDialog : public QVLCFrame, public Singleton<BookmarksDialog>
 {
     Q_OBJECT
+public:
+    void toggleVisible();
 private:
     BookmarksDialog( intf_thread_t * );
     virtual ~BookmarksDialog();

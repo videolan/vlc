@@ -278,3 +278,14 @@ void BookmarksDialog::activateItem( QModelIndex index )
 
     input_Control( p_input, INPUT_SET_BOOKMARK, index.row() );
 }
+
+void BookmarksDialog::toggleVisible()
+{
+    /* Update, to show existing bookmarks in case a new playlist
+       was opened */
+    if( !isVisible() )
+    {
+        update();
+    }
+    QVLCFrame::toggleVisible();
+}
