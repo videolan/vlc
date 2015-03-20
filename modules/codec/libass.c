@@ -394,15 +394,13 @@ static int SubpictureValidate( subpicture_t *p_subpic,
     video_format_t fmt = *p_fmt_dst;
     fmt.i_chroma         = VLC_CODEC_RGBA;
     fmt.i_bits_per_pixel = 0;
-    fmt.i_visible_width  = fmt.i_width;
-    fmt.i_visible_height = fmt.i_height;
     fmt.i_x_offset       = 0;
     fmt.i_y_offset       = 0;
     if( b_fmt_src || b_fmt_dst )
     {
-        ass_set_frame_size( p_sys->p_renderer, fmt.i_width, fmt.i_height );
-        const double src_ratio = (double)p_fmt_src->i_width / p_fmt_src->i_height;
-        const double dst_ratio = (double)p_fmt_dst->i_width / p_fmt_dst->i_height;
+        ass_set_frame_size( p_sys->p_renderer, fmt.i_visible_width, fmt.i_visible_height );
+        const double src_ratio = (double)p_fmt_src->i_visible_width / p_fmt_src->i_visible_height;
+        const double dst_ratio = (double)p_fmt_dst->i_visible_width / p_fmt_dst->i_visible_height;
         ass_set_aspect_ratio( p_sys->p_renderer, dst_ratio / src_ratio, 1 );
         p_sys->fmt = fmt;
     }
@@ -438,8 +436,8 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
     ASS_Image *p_img = p_subpic->updater.p_sys->p_img;
 
     /* */
-    p_subpic->i_original_picture_height = fmt.i_height;
-    p_subpic->i_original_picture_width = fmt.i_width;
+    p_subpic->i_original_picture_height = fmt.i_visible_height;
+    p_subpic->i_original_picture_width = fmt.i_visible_width;
 
     /* XXX to improve efficiency we merge regions that are close minimizing
      * the lost surface.
