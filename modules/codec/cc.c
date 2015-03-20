@@ -1383,22 +1383,4 @@ static void eia708_SetPenLocation (eia708_t *service, uint8_t *data)
 
 
 
-static void eia708_Reset_Service(eia708_t *service)
-{
-    //Considering max number of windows in a service packet to be 8
-    for (int j=0;j<8;j++)
-    {
-        service->windows[j].is_defined=0;
-        service->windows[j].visible=0;
-        service->windows[j].memory_reserved=0;
-        service->windows[j].is_empty=1;
-        memset (service->windows[j].commands, 0,
-            sizeof (service->windows[j].commands));
-    }
-    service->current_window=-1;
-    service->current_visible_start_ms=0;
-    clearTV(service,1);
-    clearTV(service,2);
-    service->tv=&service->tv1;
-    service->inited=1;
-}
+
