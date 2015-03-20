@@ -331,17 +331,20 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
             if( ( i_id == 0x02 || i_id == 0x03 ) && i_size >= 44 && i_lines < MAX_SLICES )
             {
-                unsigned line_offset  = p_block->p_buffer[2] & 0x1f;
-                unsigned field_parity = p_block->p_buffer[2] & 0x20;
+                if(p_block->p_buffer[3] == 0xE4 )    /* framing_code */
+                {
+                    unsigned line_offset  = p_block->p_buffer[2] & 0x1f;
+                    unsigned field_parity = p_block->p_buffer[2] & 0x20;
 
-                p_sliced[i_lines].id = VBI_SLICED_TELETEXT_B;
-                if( line_offset > 0 )
-                    p_sliced[i_lines].line = line_offset + (field_parity ? 0 : 313);
-                else
-                    p_sliced[i_lines].line = 0;
-                for( int i = 0; i < 42; i++ )
-                    p_sliced[i_lines].data[i] = vbi_rev8( p_block->p_buffer[4 + i] );
-                i_lines++;
+                    p_sliced[i_lines].id = VBI_SLICED_TELETEXT_B;
+                    if( line_offset > 0 )
+                        p_sliced[i_lines].line = line_offset + (field_parity ? 0 : 313);
+                    else
+                        p_sliced[i_lines].line = 0;
+                    for( int i = 0; i < 42; i++ )
+                        p_sliced[i_lines].data[i] = vbi_rev8( p_block->p_buffer[4 + i] );
+                    i_lines++;
+                }
             }
 
             p_block->i_buffer -= 2 + i_size;
