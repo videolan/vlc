@@ -509,26 +509,30 @@ VLC_METADATA_EXPORTS
          return value; \
     }
 
-#if defined (__LIBVLC__)
-# define VLC_COPYRIGHT_EXPORT VLC_META_EXPORT (copyright, \
+#define VLC_COPYRIGHT_VIDEOLAN \
     "\x43\x6f\x70\x79\x72\x69\x67\x68\x74\x20\x28\x43\x29\x20\x74\x68" \
     "\x65\x20\x56\x69\x64\x65\x6f\x4c\x41\x4e\x20\x56\x4c\x43\x20\x6d" \
     "\x65\x64\x69\x61\x20\x70\x6c\x61\x79\x65\x72\x20\x64\x65\x76\x65" \
-    "\x6c\x6f\x70\x65\x72\x73" )
-# define VLC_LICENSE_EXPORT VLC_META_EXPORT (license, \
+    "\x6c\x6f\x70\x65\x72\x73"
+#define VLC_LICENSE_LGPL_2_1_PLUS \
     "\x4c\x69\x63\x65\x6e\x73\x65\x64\x20\x75\x6e\x64\x65\x72\x20\x74" \
     "\x68\x65\x20\x74\x65\x72\x6d\x73\x20\x6f\x66\x20\x74\x68\x65\x20" \
     "\x47\x4e\x55\x20\x4c\x65\x73\x73\x65\x72\x20\x47\x65\x6e\x65\x72" \
     "\x61\x6c\x20\x50\x75\x62\x6c\x69\x63\x20\x4c\x69\x63\x65\x6e\x73" \
     "\x65\x2c\x20\x76\x65\x72\x73\x69\x6f\x6e\x20\x32\x2e\x31\x20\x6f" \
-    "\x72\x20\x6c\x61\x74\x65\x72\x2e" )
-#else
-# if !defined (VLC_COPYRIGHT_EXPORT)
-#  define VLC_COPYRIGHT_EXPORT
+    "\x72\x20\x6c\x61\x74\x65\x72\x2e"
+#if defined (__LIBVLC__)
+# define VLC_MODULE_COPYRIGHT VLC_COPYRIGHT_VIDEOLAN
+# ifndef VLC_MODULE_LICENSE
+#  define VLC_MODULE_LICENSE VLC_LICENSE_LGPL_2_1_PLUS
 # endif
-# if !defined (VLC_LICENSE_EXPORT)
-#  define VLC_LICENSE_EXPORT
-# endif
+#endif
+
+#ifdef VLC_MODULE_COPYRIGHT
+# define VLC_COPYRIGHT_EXPORT VLC_META_EXPORT(copyright, VLC_MODULE_COPYRIGHT)
+#endif
+#ifdef VLC_MODULE_LICENSE
+# define VLC_LICENSE_EXPORT VLC_META_EXPORT(license, VLC_MODULE_LICENSE)
 #endif
 
 #define VLC_METADATA_EXPORTS \
