@@ -26,6 +26,7 @@
 #ifndef VLC_BITS_H
 #define VLC_BITS_H 1
 
+#include <vlc_common.h>
 #include <vlc_block.h>
 
 /**
@@ -204,135 +205,123 @@ static inline void bs_align_1( bs_t *s )
     }
 }
 
-static inline int bo_init(bo_t *p_bo, int i_size)
+static inline bool bo_init(bo_t *p_bo, int i_size)
 {
     p_bo->b = block_Alloc(i_size);
     if (!p_bo->b)
-        return VLC_ENOMEM;
+        return false;
 
     p_bo->b->i_buffer = 0;
     p_bo->basesize = i_size;
 
-    return VLC_SUCCESS;
+    return true;
 }
 
-static inline void bo_set_8(bo_t *p_bo, size_t i_offset, uint8_t i)
+static inline void bo_free(bo_t *p_bo)
 {
-    size_t i_size = p_bo->b->i_size - (p_bo->b->p_buffer - p_bo->b->p_start);
-    if (i_offset >= i_size)
+    if(!p_bo)
+        return;
+    if(p_bo->b)
+        block_Release(p_bo->b);
+    free(p_bo);
+}
+
+static inline int bo_extend(bo_t *p_bo, size_t i_total)
+{
+    if(!p_bo->b)
+        return false;
+    const size_t i_size = p_bo->b->i_size - (p_bo->b->p_buffer - p_bo->b->p_start);
+    if (i_total >= i_size)
     {
         int i_growth = p_bo->basesize;
-        while(i_offset >= i_size + i_growth)
+        while(i_total >= i_size + i_growth)
             i_growth += p_bo->basesize;
 
         int i = p_bo->b->i_buffer; /* Realloc would set payload size == buffer size */
         p_bo->b = block_Realloc(p_bo->b, 0, i_size + i_growth);
         if (!p_bo->b)
-            return;
+            return false;
         p_bo->b->i_buffer = i;
     }
+    return true;
+}
+
+#define BO_SET_DECL_S(func, handler, type) static inline bool func(bo_t *p_bo, size_t i_offset, type val)\
+    {\
+        if (!bo_extend(p_bo, i_offset + sizeof(type)))\
+            return false;\
+        handler(&p_bo->b->p_buffer[i_offset], val);\
+        return true;\
+    }
+
+#define BO_ADD_DECL_S(func, handler, type) static inline bool func(bo_t *p_bo, type val)\
+    {\
+        if(!p_bo->b || !handler(p_bo, p_bo->b->i_buffer, val))\
+            return false;\
+        p_bo->b->i_buffer += sizeof(type);\
+        return true;\
+    }
+
+#define BO_FUNC_DECL(suffix, handler, type ) \
+    BO_SET_DECL_S( bo_set_ ## suffix ## be, handler ## BE, type )\
+    BO_SET_DECL_S( bo_set_ ## suffix ## le, handler ## LE, type )\
+    BO_ADD_DECL_S( bo_add_ ## suffix ## be, bo_set_ ## suffix ## be, type )\
+    BO_ADD_DECL_S( bo_add_ ## suffix ## le, bo_set_ ## suffix ## le, type )
+
+static inline bool bo_set_8(bo_t *p_bo, size_t i_offset, uint8_t i)
+{
+    if (!bo_extend(p_bo, i_offset + 1))
+        return false;
     p_bo->b->p_buffer[i_offset] = i;
+    return true;
 }
 
-static inline void bo_add_8(bo_t *p_bo, uint8_t i)
+static inline bool bo_add_8(bo_t *p_bo, uint8_t i)
 {
-    bo_set_8( p_bo, p_bo->b->i_buffer, i );
+    if(!p_bo->b || !bo_set_8( p_bo, p_bo->b->i_buffer, i ))
+        return false;
     p_bo->b->i_buffer++;
+    return true;
 }
 
-static inline void bo_add_16be(bo_t *p_bo, uint16_t i)
+/* declares all bo_[set,add]_[16,32,64] */
+BO_FUNC_DECL( 16, SetW,  uint16_t )
+BO_FUNC_DECL( 32, SetDW, uint32_t )
+BO_FUNC_DECL( 64, SetQW, uint64_t )
+
+#undef BO_FUNC_DECL
+#undef BO_SET_DECL_S
+#undef BO_ADD_DECL_S
+
+static inline bool bo_add_24be(bo_t *p_bo, uint32_t i)
 {
-    bo_add_8(p_bo, ((i >> 8) &0xff));
-    bo_add_8(p_bo, i &0xff);
+    if(!p_bo->b || !bo_extend(p_bo, p_bo->b->i_buffer + 3))
+        return false;
+    p_bo->b->p_buffer[p_bo->b->i_buffer++] = ((i >> 16) & 0xff);
+    p_bo->b->p_buffer[p_bo->b->i_buffer++] = ((i >> 8) & 0xff);
+    p_bo->b->p_buffer[p_bo->b->i_buffer++] = (i & 0xff);
+    return true;
 }
 
-static inline void bo_add_16le(bo_t *p_bo, uint16_t i)
+static inline void bo_swap_32be (bo_t *p_bo, size_t i_pos, uint32_t i)
 {
-    bo_add_8(p_bo, i &0xff);
-    bo_add_8(p_bo, ((i >> 8) &0xff));
-}
-
-static inline void bo_set_16be(bo_t *p_bo, int i_offset, uint16_t i)
-{
-    bo_set_8(p_bo, i_offset, ((i >> 8) &0xff));
-    bo_set_8(p_bo, i_offset + 1, i &0xff);
-}
-
-static inline void bo_set_16le(bo_t *p_bo, int i_offset, uint16_t i)
-{
-    bo_set_8(p_bo, i_offset, i &0xff);
-    bo_set_8(p_bo, i_offset + 1, ((i >> 8) &0xff));
-}
-
-static inline void bo_add_24be(bo_t *p_bo, uint32_t i)
-{
-    bo_add_8(p_bo, ((i >> 16) &0xff));
-    bo_add_8(p_bo, ((i >> 8) &0xff));
-    bo_add_8(p_bo, (i &0xff));
-}
-
-static inline void bo_add_32be(bo_t *p_bo, uint32_t i)
-{
-    bo_add_16be(p_bo, ((i >> 16) &0xffff));
-    bo_add_16be(p_bo, i &0xffff);
-}
-
-static inline void bo_add_32le(bo_t *p_bo, uint32_t i)
-{
-    bo_add_16le(p_bo, i &0xffff);
-    bo_add_16le(p_bo, ((i >> 16) &0xffff));
-}
-
-static inline void bo_set_32be(bo_t *p_bo, int i_offset, uint32_t i)
-{
-    bo_set_16be(p_bo, i_offset, ((i >> 16) &0xffff));
-    bo_set_16be(p_bo, i_offset + 2, i &0xffff);
-}
-
-static inline void bo_set_32le(bo_t *p_bo, int i_offset, uint32_t i)
-{
-    bo_set_16le(p_bo, i_offset, i &0xffff);
-    bo_set_16le(p_bo, i_offset + 2, ((i >> 16) &0xffff));
-}
-
-static inline void bo_swap_32be (bo_t *p_bo, int i_pos, uint32_t i)
-{
+    if (!p_bo->b || p_bo->b->i_buffer < i_pos + 4)
+        return;
     p_bo->b->p_buffer[i_pos    ] = (i >> 24)&0xff;
     p_bo->b->p_buffer[i_pos + 1] = (i >> 16)&0xff;
     p_bo->b->p_buffer[i_pos + 2] = (i >>  8)&0xff;
     p_bo->b->p_buffer[i_pos + 3] = (i      )&0xff;
 }
 
-static inline void bo_set_64be(bo_t *p_bo, int i_offset, uint64_t i)
+static inline bool bo_add_mem(bo_t *p_bo, size_t i_size, const void *p_mem)
 {
-    bo_set_32be(p_bo, i_offset, ((i >> 32) &0xffffffff));
-    bo_set_32be(p_bo, i_offset + 4, i &0xffffffff);
+    if(!p_bo->b || !bo_extend(p_bo, p_bo->b->i_buffer + i_size))
+        return false;
+    memcpy(&p_bo->b->p_buffer[p_bo->b->i_buffer], p_mem, i_size);
+    p_bo->b->i_buffer += i_size;
+    return true;
 }
 
-static inline void bo_add_64be(bo_t *p_bo, uint64_t i)
-{
-    bo_add_32be(p_bo, ((i >> 32) &0xffffffff));
-    bo_add_32be(p_bo, i &0xffffffff);
-}
-
-static inline void bo_add_64le(bo_t *p_bo, uint64_t i)
-{
-    bo_add_32le(p_bo, i &0xffffffff);
-    bo_add_32le(p_bo, ((i >> 32) &0xffffffff));
-}
-
-static inline void bo_add_fourcc(bo_t *p_bo, const char *fcc)
-{
-    bo_add_8(p_bo, fcc[0]);
-    bo_add_8(p_bo, fcc[1]);
-    bo_add_8(p_bo, fcc[2]);
-    bo_add_8(p_bo, fcc[3]);
-}
-
-static inline void bo_add_mem(bo_t *p_bo, int i_size, const uint8_t *p_mem)
-{
-    for (int i = 0; i < i_size; i++)
-        bo_add_8(p_bo, p_mem[i]);
-}
+#define bo_add_fourcc(p_bo, fcc) bo_add_mem(p_bo, 4, fcc)
 
 #endif
