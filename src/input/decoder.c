@@ -62,6 +62,7 @@ static void      *DecoderThread( void * );
 static void       DecoderProcess( decoder_t *, block_t * );
 static void       DecoderFlush( decoder_t * );
 static void       DecoderSignalWait( decoder_t * );
+static void       DecoderUpdateFormatLocked( decoder_t * );
 
 static void       DecoderUnsupportedCodec( decoder_t *, vlc_fourcc_t );
 
@@ -1498,9 +1499,11 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
     {
         if( p_owner->p_sout_input == NULL )
         {
-            assert( !p_owner->b_fmt_description ); // no need for owner lock
+            vlc_mutex_lock( &p_owner->lock );
             es_format_Clean( &p_owner->fmt );
             es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
+            DecoderUpdateFormatLocked( p_dec );
+            vlc_mutex_unlock( &p_owner->lock );
 
             p_owner->fmt.i_group = p_dec->fmt_in.i_group;
             p_owner->fmt.i_id = p_dec->fmt_in.i_id;
