@@ -475,7 +475,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 tempValue = [[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue];
             else if (componentCount == 3)
                 tempValue = [[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
-            if (tempValue > 0)
+            if (tempValue != 0)
                 [o_options addObject: [NSString stringWithFormat:@"stop-time=%li", tempValue]];
         }
         if ([o_output_ckbox state] == NSOnState) {

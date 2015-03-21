@@ -1232,7 +1232,7 @@ static VLCWizard *_o_sharedInstance = nil;
                     time = 1000000 * ([[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue]);
                 else
                     msg_Err(VLCIntf, "Invalid string format for time");
-                input_item_AddOption(p_input, [[NSString stringWithFormat: @"stop-time=%lu", time] UTF8String], VLC_INPUT_OPTION_TRUSTED);
+                input_item_AddOption(p_input, [[NSString stringWithFormat: @"stop-time=%ld", time] UTF8String], VLC_INPUT_OPTION_TRUSTED);
             }
 
             input_item_AddOption( p_input, [[NSString stringWithFormat:

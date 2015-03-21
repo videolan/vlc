@@ -973,7 +973,7 @@
     /* allow the user to over-write the start/stop/run-time */
     if (var_GetFloat(p_input_thread, "run-time") > 0 ||
         var_GetFloat(p_input_thread, "start-time") > 0 ||
-        var_GetFloat(p_input_thread, "stop-time") > 0) {
+        var_GetFloat(p_input_thread, "stop-time") != 0) {
         return;
     }
 

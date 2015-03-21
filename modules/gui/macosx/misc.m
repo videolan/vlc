@@ -867,7 +867,7 @@ void _drawFrameInRect(NSRect frameRect)
 {
     self = [super init];
     NSMutableCharacterSet *nonNumbers = [[[NSCharacterSet decimalDigitCharacterSet] invertedSet] mutableCopy];
-    [nonNumbers removeCharactersInString:@":"];
+    [nonNumbers removeCharactersInString:@"-:"];
     o_forbidden_characters = [nonNumbers copy];
     [nonNumbers release];
 
