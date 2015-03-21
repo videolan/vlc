@@ -533,8 +533,6 @@ void input_DecoderStartWait( decoder_t *p_dec )
 
     assert( !p_owner->b_waiting );
 
-    input_DecoderFlush( p_dec );
-
     vlc_mutex_lock( &p_owner->lock );
     p_owner->b_first = true;
     p_owner->b_has_data = false;

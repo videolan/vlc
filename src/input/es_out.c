@@ -573,13 +573,16 @@ static void EsOutChangePosition( es_out_t *out )
     {
         es_out_id_t *p_es = p_sys->es[i];
 
-        if( !p_es->p_dec )
-            continue;
-
-        input_DecoderStartWait( p_es->p_dec );
-
-        if( p_es->p_dec_record )
-            input_DecoderStartWait( p_es->p_dec_record );
+        if( p_es->p_dec != NULL )
+        {
+            input_DecoderFlush( p_es->p_dec );
+            if( !p_sys->b_buffering )
+            {
+                input_DecoderStartWait( p_es->p_dec );
+                if( p_es->p_dec_record != NULL )
+                    input_DecoderStartWait( p_es->p_dec_record );
+            }
+        }
     }
 
     for( int i = 0; i < p_sys->i_pgrm; i++ )
