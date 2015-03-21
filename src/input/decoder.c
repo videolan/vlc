@@ -169,21 +169,6 @@ static bool DecoderIsFlushing( decoder_t *p_dec )
     return b_flushing;
 }
 
-static void DecoderSignalWait( decoder_t *p_dec )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    vlc_mutex_lock( &p_owner->lock );
-
-    if( p_owner->b_waiting )
-    {
-        p_owner->b_has_data = true;
-        vlc_cond_signal( &p_owner->wait_acknowledge );
-    }
-
-    vlc_mutex_unlock( &p_owner->lock );
-}
-
 static block_t *DecoderBlockFlushNew()
 {
     block_t *p_null = block_Alloc( 128 );
@@ -450,7 +435,13 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
             return p_picture;
 
         /* */
-        DecoderSignalWait( p_dec );
+        vlc_mutex_lock( &p_owner->lock );
+        if( p_owner->b_waiting )
+        {
+            p_owner->b_has_data = true;
+            vlc_cond_signal( &p_owner->wait_acknowledge );
+        }
+        vlc_mutex_unlock( &p_owner->lock );
 
         /* Check the decoder doesn't leak pictures */
         vout_FixLeaks( p_owner->p_vout );
