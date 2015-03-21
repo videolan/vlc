@@ -524,13 +524,10 @@ void updateProgressPanel (void *priv, const char *text, float value)
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
-    NSString *o_txt;
-    if (text != NULL)
-        o_txt = [NSString stringWithUTF8String:text];
-    else
-        o_txt = @"";
-
-    [[[VLCMain sharedInstance] coreDialogProvider] updateProgressPanelWithText: o_txt andNumber: (double)(value * 1000.)];
+    NSString *o_txt = toNSStr(text);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[[VLCMain sharedInstance] coreDialogProvider] updateProgressPanelWithText: o_txt andNumber: (double)(value * 1000.)];
+    });
 
     [o_pool release];
 }

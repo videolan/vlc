@@ -76,6 +76,8 @@
 }
 + (VLCCoreDialogProvider *)sharedInstance;
 
+@property (atomic,readwrite) BOOL progressCancelled;
+
 -(void)performEventWithObject: (NSValue *)o_value ofType: (const char*)type;
 
 -(void)showFatalDialog: (NSValue *)o_value;
@@ -88,7 +90,6 @@
 -(void)showProgressDialogOnMainThread: (NSValue *)o_value;
 -(void)showProgressDialog: (NSValue *)o_value;
 -(IBAction)progDialogAction:(id)sender;
--(BOOL)progressCancelled;
 -(void)updateProgressPanelWithText: (NSString *)string andNumber: (double)d_number;
 -(void)destroyProgressPanel;
 

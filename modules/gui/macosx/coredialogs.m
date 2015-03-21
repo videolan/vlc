@@ -36,6 +36,8 @@
 
 static VLCCoreDialogProvider *_o_sharedInstance = nil;
 
+@synthesize progressCancelled=b_progress_cancelled;
+
 + (VLCCoreDialogProvider *)sharedInstance
 {
     return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
@@ -153,10 +155,10 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 {
     /* we work-around a Cocoa limitation here, since you cannot delay an execution
      * on the main thread within a single call */
-    b_progress_cancelled = NO;
+    [self setProgressCancelled:NO];
 
     dialog_progress_bar_t *p_dialog = [o_value pointerValue];
-    if (!p_dialog || b_progress_cancelled)
+    if (!p_dialog)
         return;
 
     [o_prog_win setTitle: toNSStr(p_dialog->title)];
@@ -177,7 +179,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 {
     dialog_progress_bar_t *p_dialog = [o_value pointerValue];
 
-    if (!p_dialog || b_progress_cancelled)
+    if (!p_dialog || [self progressCancelled])
         return;
 
     [o_prog_bar setDoubleValue: 0];
@@ -197,19 +199,14 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 
 -(void)destroyProgressPanel
 {
-    b_progress_cancelled = YES;
+    [self setProgressCancelled:YES];
     [o_prog_bar performSelectorOnMainThread:@selector(stopAnimation:) withObject:self waitUntilDone:YES];
     [o_prog_win performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
 }
 
 -(IBAction)progDialogAction:(id)sender
 {
-    b_progress_cancelled = YES;
-}
-
--(BOOL)progressCancelled
-{
-    return b_progress_cancelled;
+    [self setProgressCancelled:YES];
 }
 
 -(id)errorPanel
