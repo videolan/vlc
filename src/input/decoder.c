@@ -112,6 +112,7 @@ struct decoder_owner_sys_t
 
     /* Flushing */
     bool b_flushing;
+    bool b_draining;
 
     /* CC */
     struct
@@ -1426,14 +1427,23 @@ static void *DecoderThread( void *p_data )
     for( ;; )
     {
         block_t *p_block;
+        bool draining = false;
 
         vlc_fifo_Lock( p_owner->p_fifo );
         vlc_fifo_CleanupPush( p_owner->p_fifo );
 
         while( vlc_fifo_IsEmpty( p_owner->p_fifo ) )
         {
-            if( p_owner->b_woken )
+            if( p_owner->b_draining )
+            {   /* We have emptied the FIFO and there is a pending request to
+                 * drain. Pass p_block = NULL to decoder just once. */
+                p_owner->b_draining = false;
+                draining = true;
                 break;
+            }
+            if( p_owner->b_woken )
+               break;
+
             vlc_fifo_Wait( p_owner->p_fifo );
             /* Make sure there is no cancellation point other than this one^^.
              * If you need one, be sure to push cleanup of p_block. */
@@ -1446,23 +1456,13 @@ static void *DecoderThread( void *p_data )
         p_owner->b_woken = false;
         vlc_cleanup_run();
 
-        if( p_block == NULL || p_block->i_flags & BLOCK_FLAG_CORE_EOS )
+        if( p_block == NULL )
             DecoderSignalWait( p_dec );
 
-        if( p_block )
+        if( p_block != NULL || draining )
         {
             int canc = vlc_savecancel();
-
-            if( p_block->i_flags & BLOCK_FLAG_CORE_EOS )
-            {
-                /* calling DecoderProcess() with NULL block will make
-                 * decoders/packetizers flush their buffers */
-                block_Release( p_block );
-                p_block = NULL;
-            }
-
             DecoderProcess( p_dec, p_block );
-
             vlc_restorecancel( canc );
         }
     }
@@ -1616,6 +1616,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->b_has_data = false;
 
     p_owner->b_flushing = false;
+    p_owner->b_draining = false;
 
     /* */
     p_owner->cc.b_supported = false;
@@ -1920,12 +1921,12 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
  */
 void input_DecoderDrain( decoder_t *p_dec )
 {
-    block_t *p_block = block_Alloc(0);
-    if( unlikely(p_block == NULL) )
-        return;
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    p_block->i_flags |= BLOCK_FLAG_CORE_EOS;
-    input_DecoderDecode( p_dec, p_block, false );
+    vlc_fifo_Lock( p_owner->p_fifo );
+    p_owner->b_draining = true;
+    vlc_fifo_Signal( p_owner->p_fifo );
+    vlc_fifo_Unlock( p_owner->p_fifo );
 }
 
 static void DecoderFlush( decoder_t *p_dec )
@@ -1934,8 +1935,11 @@ static void DecoderFlush( decoder_t *p_dec )
 
     vlc_assert_locked( &p_owner->lock );
 
+    vlc_fifo_Lock( p_owner->p_fifo );
     /* Empty the fifo */
-    block_FifoEmpty( p_owner->p_fifo );
+    block_ChainRelease( vlc_fifo_DequeueAllUnlocked( p_owner->p_fifo ) );
+    p_owner->b_draining = false; /* flush supersedes drain */
+    vlc_fifo_Unlock( p_owner->p_fifo );
 
     /* Monitor for flush end */
     p_owner->b_flushing = true;
