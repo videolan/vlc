@@ -139,12 +139,12 @@ static VLCMainMenu *_o_sharedInstance = nil;
     }
 
     [self setRateControlsEnabled:NO];
+
+    p_intf = VLCIntf;
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
 {
-    p_intf = VLCIntf;
-
     NSString* o_key;
     playlist_t *p_playlist;
     vlc_value_t val;
