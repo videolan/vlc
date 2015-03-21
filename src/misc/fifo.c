@@ -166,7 +166,7 @@ void vlc_fifo_QueueUnlocked(block_fifo_t *fifo, block_t *block)
     {
         fifo->pp_last = &block->p_next;
         fifo->i_depth++;
-        fifo->i_size += block->i_size;
+        fifo->i_size += block->i_buffer;
 
         block = block->p_next;
     }
