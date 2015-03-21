@@ -411,14 +411,14 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
     aout_OutputUnlock (aout);
 }
 
-void aout_DecFlush (audio_output_t *aout)
+void aout_DecFlush (audio_output_t *aout, bool wait)
 {
     aout_owner_t *owner = aout_owner (aout);
 
     aout_OutputLock (aout);
     owner->sync.end = VLC_TS_INVALID;
     if (owner->mixer_format.i_format)
-        aout_OutputFlush (aout, false);
+        aout_OutputFlush (aout, wait);
     aout_OutputUnlock (aout);
 }
 

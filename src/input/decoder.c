@@ -1152,7 +1152,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         {
             msg_Dbg( p_dec, "End of audio preroll" );
             if( p_owner->p_aout )
-                aout_DecFlush( p_owner->p_aout );
+                aout_DecFlush( p_owner->p_aout, false );
             /* */
             p_owner->i_preroll_end = VLC_TS_INVALID;
         }
@@ -1218,7 +1218,7 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
     }
 
     if( b_flush && p_owner->p_aout )
-        aout_DecFlush( p_owner->p_aout );
+        aout_DecFlush( p_owner->p_aout, false );
 }
 
 static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
@@ -1642,7 +1642,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     if( p_owner->p_aout )
     {
         /* TODO: REVISIT gap-less audio */
-        aout_DecFlush( p_owner->p_aout );
+        aout_DecFlush( p_owner->p_aout, false );
         aout_DecDelete( p_owner->p_aout );
         input_resource_PutAout( p_owner->p_resource, p_owner->p_aout );
         if( p_owner->p_input != NULL )
