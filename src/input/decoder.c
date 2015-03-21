@@ -89,6 +89,7 @@ struct decoder_owner_sys_t
     vlc_mutex_t lock;
     vlc_cond_t  wait_request;
     vlc_cond_t  wait_acknowledge;
+    vlc_cond_t  wait_fifo; /* TODO: merge with wait_acknowledge */
 
     /* -- These variables need locking on write(only) -- */
     audio_output_t *p_aout;
@@ -1432,6 +1433,8 @@ static void *DecoderThread( void *p_data )
         vlc_fifo_CleanupPush( p_owner->p_fifo );
 
         vlc_cond_signal( &p_owner->wait_acknowledge );
+        vlc_cond_signal( &p_owner->wait_fifo );
+
         while( vlc_fifo_IsEmpty( p_owner->p_fifo ) )
         {
             if( p_owner->b_draining )
@@ -1591,6 +1594,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     vlc_mutex_init( &p_owner->lock );
     vlc_cond_init( &p_owner->wait_request );
     vlc_cond_init( &p_owner->wait_acknowledge );
+    vlc_cond_init( &p_owner->wait_fifo );
 
     p_owner->b_fmt_description = false;
     p_owner->p_description = NULL;
@@ -1703,6 +1707,7 @@ static void DeleteDecoder( decoder_t * p_dec )
         vlc_object_release( p_owner->p_packetizer );
     }
 
+    vlc_cond_destroy( &p_owner->wait_fifo );
     vlc_cond_destroy( &p_owner->wait_acknowledge );
     vlc_cond_destroy( &p_owner->wait_request );
     vlc_mutex_destroy( &p_owner->lock );
@@ -1873,7 +1878,7 @@ void input_DecoderDecode( decoder_t *p_dec, block_t *p_block, bool b_do_pace )
          * Locking is not necessary as b_waiting is only read, not written by
          * the decoder thread. */
         while( vlc_fifo_GetCount( p_owner->p_fifo ) >= 10 )
-            vlc_fifo_WaitCond( p_owner->p_fifo, &p_owner->wait_acknowledge );
+            vlc_fifo_WaitCond( p_owner->p_fifo, &p_owner->wait_fifo );
     }
 
     vlc_fifo_QueueUnlocked( p_owner->p_fifo, p_block );
