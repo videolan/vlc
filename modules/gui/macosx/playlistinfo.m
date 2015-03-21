@@ -499,10 +499,10 @@ error:
 
 - (void)refresh
 {
-    input_item_t * oldItem = p_item;
+    if (p_item)
+        vlc_gc_decref(p_item);
+
     p_item = [(VLCInfo *)[[VLCMain sharedInstance] info] item];
-    if (oldItem && oldItem != p_item)
-        vlc_gc_decref(oldItem);
 
     [o_children release];
     o_children = nil;
