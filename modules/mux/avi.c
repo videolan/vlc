@@ -493,6 +493,9 @@ static int Mux      ( sout_mux_t *p_mux )
         int i_count;
         block_fifo_t *p_fifo;
 
+        if (!p_mux->pp_inputs[i]->p_sys)
+            continue;
+
         i_stream = *((int*)p_mux->pp_inputs[i]->p_sys );
         p_stream = &p_sys->stream[i_stream];
 
