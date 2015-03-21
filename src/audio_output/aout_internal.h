@@ -140,7 +140,6 @@ int aout_DecPlay(audio_output_t *, block_t *, int i_input_rate);
 int aout_DecGetResetLost(audio_output_t *);
 void aout_DecChangePause(audio_output_t *, bool b_paused, mtime_t i_date);
 void aout_DecFlush(audio_output_t *, bool wait);
-bool aout_DecIsEmpty(audio_output_t *);
 void aout_RequestRestart (audio_output_t *, unsigned);
 
 static inline void aout_InputRequestRestart(audio_output_t *aout)
