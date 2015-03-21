@@ -2056,30 +2056,31 @@ void input_DecoderChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    vlc_mutex_lock( &p_owner->lock );
     /* Normally, p_owner->b_paused != b_paused here. But if a track is added
      * while the input is paused (e.g. add sub file), then b_paused is
-     * (incorrectly) false. */
-    if( likely(p_owner->b_paused != b_paused) ) {
-        p_owner->b_paused = b_paused;
-        p_owner->pause.i_date = i_date;
-        p_owner->pause.i_ignore = 0;
-        vlc_cond_signal( &p_owner->wait_request );
+     * (incorrectly) false. FIXME: This is a bug in the decoder owner. */
+    if( unlikely(p_owner->b_paused == b_paused) )
+        return;
 
-        /* XXX only audio and video output have to be paused.
-         * - for sout it is useless
-         * - for subs, it is done by the vout
-         */
-        if( p_owner->fmt.i_cat == AUDIO_ES )
-        {
-            if( p_owner->p_aout )
-                aout_DecChangePause( p_owner->p_aout, b_paused, i_date );
-        }
-        else if( p_owner->fmt.i_cat == VIDEO_ES )
-        {
-            if( p_owner->p_vout )
-                vout_ChangePause( p_owner->p_vout, b_paused, i_date );
-        }
+    vlc_mutex_lock( &p_owner->lock );
+    p_owner->b_paused = b_paused;
+    p_owner->pause.i_date = i_date;
+    p_owner->pause.i_ignore = 0;
+    vlc_cond_signal( &p_owner->wait_request );
+
+    /* XXX only audio and video output have to be paused.
+     * - for sout it is useless
+     * - for subs, it is done by the vout
+     */
+    if( p_owner->fmt.i_cat == AUDIO_ES )
+    {
+        if( p_owner->p_aout )
+            aout_DecChangePause( p_owner->p_aout, b_paused, i_date );
+    }
+    else if( p_owner->fmt.i_cat == VIDEO_ES )
+    {
+        if( p_owner->p_vout )
+            vout_ChangePause( p_owner->p_vout, b_paused, i_date );
     }
     vlc_mutex_unlock( &p_owner->lock );
 }
