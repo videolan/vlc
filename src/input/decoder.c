@@ -1136,9 +1136,6 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     int i_lost = 0;
     int i_played = 0;
 
-    if( p_block == NULL )
-        return; /* TODO: remove this check, drain audio decoders properly */
-
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
     {
         if( DecoderIsFlushing( p_dec ) )
