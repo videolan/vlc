@@ -138,13 +138,19 @@ static void DecoderUpdateFormatLocked( decoder_t *p_dec )
 
     vlc_assert_locked( &p_owner->lock );
 
-    p_owner->b_fmt_description = true;
+    es_format_Clean( &p_owner->fmt );
+    es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
 
     /* Move p_description */
-    if( p_owner->p_description && p_dec->p_description )
-        vlc_meta_Delete( p_owner->p_description );
-    p_owner->p_description = p_dec->p_description;
-    p_dec->p_description = NULL;
+    if( p_dec->p_description != NULL )
+    {
+        if( p_owner->p_description != NULL )
+            vlc_meta_Delete( p_owner->p_description );
+        p_owner->p_description = p_dec->p_description;
+        p_dec->p_description = NULL;
+    }
+
+    p_owner->b_fmt_description = true;
 }
 
 static bool DecoderIsFlushing( decoder_t *p_dec )
@@ -273,11 +279,8 @@ static int aout_update_format( decoder_t *p_dec )
 
         p_owner->p_aout = p_aout;
 
-        es_format_Clean( &p_owner->fmt );
-        es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
-        aout_FormatPrepare( &p_owner->fmt.audio );
-
         DecoderUpdateFormatLocked( p_dec );
+        aout_FormatPrepare( &p_owner->fmt.audio );
 
         if( unlikely(p_owner->b_paused) && p_aout != NULL )
             /* fake pause if needed */
@@ -415,12 +418,8 @@ static int vout_update_format( decoder_t *p_dec )
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
 
-        es_format_Clean( &p_owner->fmt );
-        es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
-        p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
-
         DecoderUpdateFormatLocked( p_dec );
-
+        p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
         vlc_mutex_unlock( &p_owner->lock );
 
         if( p_owner->p_input != NULL )
@@ -779,8 +778,6 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
         if( p_owner->p_sout_input == NULL )
         {
             vlc_mutex_lock( &p_owner->lock );
-            es_format_Clean( &p_owner->fmt );
-            es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
             DecoderUpdateFormatLocked( p_dec );
             vlc_mutex_unlock( &p_owner->lock );
 
