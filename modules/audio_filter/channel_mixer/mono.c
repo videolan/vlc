@@ -31,6 +31,7 @@
 #include <math.h>                                        /* sqrt */
 #include <stdint.h>                                         /* int16_t .. */
 
+#define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_block.h>
