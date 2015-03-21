@@ -578,7 +578,7 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
     *pi_duration = 0;
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_dec->fmt_out.i_cat == VIDEO_ES )
+    if( p_owner->fmt.i_cat == VIDEO_ES )
     {
         if( p_owner->b_paused && p_owner->p_vout )
         {
