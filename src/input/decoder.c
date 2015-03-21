@@ -514,15 +514,28 @@ void input_DecoderChangeDelay( decoder_t *p_dec, mtime_t i_delay )
     vlc_mutex_unlock( &p_owner->lock );
 }
 
+/**
+ * Requests that the decoder immediately discard all pending buffers.
+ * This is useful at end of stream, when seeking or when deselecting a stream.
+ */
+void input_DecoderFlush( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+    DecoderFlush( p_dec );
+    vlc_mutex_unlock( &p_owner->lock );
+}
+
 void input_DecoderStartWait( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     assert( !p_owner->b_waiting );
 
-    vlc_mutex_lock( &p_owner->lock );
-    DecoderFlush( p_dec );
+    input_DecoderFlush( p_dec );
 
+    vlc_mutex_lock( &p_owner->lock );
     p_owner->b_first = true;
     p_owner->b_has_data = false;
     p_owner->b_waiting = true;
@@ -579,6 +592,7 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
     else
     {
         /* TODO subtitle should not be flushed */
+        p_owner->b_waiting = false;
         DecoderFlush( p_dec );
     }
     vlc_mutex_unlock( &p_owner->lock );
@@ -942,7 +956,6 @@ static void DecoderFlush( decoder_t *p_dec )
     /* Empty the fifo */
     block_FifoEmpty( p_owner->p_fifo );
 
-    p_owner->b_waiting = false;
     /* Monitor for flush end */
     p_owner->b_flushing = true;
     vlc_cond_signal( &p_owner->wait_request );

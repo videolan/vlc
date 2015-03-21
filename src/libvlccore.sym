@@ -174,9 +174,10 @@ input_Control
 input_Create
 input_CreateAndStart
 input_CreateFilename
-input_DecoderDecode
-input_DecoderDelete
 input_DecoderCreate
+input_DecoderDelete
+input_DecoderDecode
+input_DecoderFlush
 input_GetItem
 input_item_AddInfo
 input_item_AddOption
