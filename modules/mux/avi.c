@@ -210,8 +210,12 @@ static void Close( vlc_object_t * p_this )
 
     /* first create idx1 chunk (write at the end of the stream */
     p_idx1 = avi_HeaderCreateidx1( p_mux );
-    p_sys->i_idx1_size = p_idx1->i_buffer;
-    sout_AccessOutWrite( p_mux->p_access, p_idx1 );
+    if( p_idx1 )
+    {
+        p_sys->i_idx1_size = p_idx1->i_buffer;
+        sout_AccessOutWrite( p_mux->p_access, p_idx1 );
+    }
+    else p_sys->i_idx1_size = 0;
 
     /* calculate some value for headers creations */
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
@@ -245,8 +249,11 @@ static void Close( vlc_object_t * p_this )
     }
 
     p_hdr = avi_HeaderCreateRIFF( p_mux );
-    sout_AccessOutSeek( p_mux->p_access, 0 );
-    sout_AccessOutWrite( p_mux->p_access, p_hdr );
+    if ( p_hdr )
+    {
+        sout_AccessOutSeek( p_mux->p_access, 0 );
+        sout_AccessOutWrite( p_mux->p_access, p_hdr );
+    }
 
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
@@ -478,11 +485,11 @@ static int Mux      ( sout_mux_t *p_mux )
 
     if( p_sys->b_write_header )
     {
-        block_t *p_hdr;
-
         msg_Dbg( p_mux, "writing header" );
 
-        p_hdr = avi_HeaderCreateRIFF( p_mux );
+        block_t *p_hdr = avi_HeaderCreateRIFF( p_mux );
+        if ( !p_hdr )
+            return VLC_EGENERIC;
         sout_AccessOutWrite( p_mux->p_access, p_hdr );
 
         p_sys->b_write_header = false;
@@ -567,11 +574,15 @@ static int Mux      ( sout_mux_t *p_mux )
                 if( p_data->i_buffer & 0x01 )
                 {
                     p_data = block_Realloc( p_data, 0, p_data->i_buffer + 1 );
-                    p_data->p_buffer[ p_data->i_buffer - 1 ] = '\0';
+                    if ( p_data )
+                        p_data->p_buffer[ p_data->i_buffer - 1 ] = '\0';
                 }
 
-                p_sys->i_movi_size += p_data->i_buffer;
-                sout_AccessOutWrite( p_mux->p_access, p_data );
+                if ( p_data )
+                {
+                    p_sys->i_movi_size += p_data->i_buffer;
+                    sout_AccessOutWrite( p_mux->p_access, p_data );
+                }
             }
 
             i_count--;
@@ -850,7 +861,8 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
         int i_hdrldatastart;
     } offsets;
 
-    bo_init( &bo, HDR_BASE_SIZE );
+    if (! bo_init( &bo, HDR_BASE_SIZE ) )
+        return NULL;
 
     bo_add_fourcc( &bo, "RIFF" );
     offsets.i_riffsize = bo.b->i_buffer;
@@ -909,7 +921,8 @@ static block_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
 
     i_idx1_size = 16 * p_sys->idx1.i_entry_count + 8;
 
-    bo_init( &bo, i_idx1_size );
+    if (!i_idx1_size || !bo_init( &bo, i_idx1_size ) )
+        return NULL;
     memset( bo.b->p_buffer, 0, i_idx1_size);
 
     bo_add_fourcc( &bo, "idx1" );
