@@ -317,14 +317,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
             p_stream->p_bih = NULL;
 
-            p_stream->p_wf  = malloc( sizeof( WAVEFORMATEX ) +
-                                      p_input->p_fmt->i_extra );
-            if( !p_stream->p_wf )
+            WAVEFORMATEX *p_wf  = malloc( sizeof( WAVEFORMATEX ) +
+                                  p_input->p_fmt->i_extra );
+            if( !p_wf )
             {
                 free( p_input->p_sys );
+                p_input->p_sys = NULL;
                 return VLC_ENOMEM;
             }
-#define p_wf p_stream->p_wf
+
             p_wf->cbSize = p_input->p_fmt->i_extra;
             if( p_wf->cbSize > 0 )
             {
@@ -390,9 +391,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                                       p_wf->nSamplesPerSec * p_wf->nChannels;
                     break;
                 default:
+                    free( p_wf );
+                    free( p_input->p_sys );
+                    p_input->p_sys = NULL;
                     return VLC_EGENERIC;
             }
-#undef p_wf
+            p_stream->p_wf = p_wf;
             break;
         case VIDEO_ES:
             p_stream->i_cat = VIDEO_ES;
@@ -405,14 +409,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_sys->i_stream_video = p_sys->i_streams;
             }
             p_stream->p_wf  = NULL;
-            p_stream->p_bih = malloc( sizeof( VLC_BITMAPINFOHEADER ) +
-                                      p_input->p_fmt->i_extra );
-            if( !p_stream->p_bih )
+            VLC_BITMAPINFOHEADER *p_bih = malloc( sizeof( VLC_BITMAPINFOHEADER ) +
+                                                 p_input->p_fmt->i_extra );
+            if( !p_bih )
             {
                 free( p_input->p_sys );
+                p_input->p_sys = NULL;
                 return VLC_ENOMEM;
             }
-#define p_bih p_stream->p_bih
+
             p_bih->biSize  = sizeof( VLC_BITMAPINFOHEADER ) +
                              p_input->p_fmt->i_extra;
             if( p_input->p_fmt->i_extra > 0 )
@@ -439,9 +444,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_bih->biCompression = p_input->p_fmt->i_original_fourcc ?: p_input->p_fmt->i_codec;
                     break;
             }
-#undef p_bih
+            p_stream->p_bih = p_bih;
             break;
         default:
+            free( p_input->p_sys );
+            p_input->p_sys = NULL;
             return( VLC_EGENERIC );
     }
     p_stream->i_totalsize = 0;
