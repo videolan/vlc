@@ -1925,6 +1925,24 @@ bool input_DecoderIsEmpty( decoder_t * p_dec )
     return b_empty;
 }
 
+/**
+ * Signals that there are no further blocks to decode, and requests that the
+ * decoder drain all pending buffers. This is used to ensure that all
+ * intermediate buffers empty and no samples get lost at the end of the stream.
+ *
+ * @note The function does not actually wait for draining. It just signals that
+ * draining should be performed once the decoder has emptied FIFO.
+ */
+void input_DecoderDrain( decoder_t *p_dec )
+{
+    block_t *p_block = block_Alloc(0);
+    if( unlikely(p_block == NULL) )
+        return;
+
+    p_block->i_flags |= BLOCK_FLAG_CORE_EOS;
+    input_DecoderDecode( p_dec, p_block, false );
+}
+
 static void DecoderFlush( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -1951,7 +1969,7 @@ static void DecoderFlush( decoder_t *p_dec )
 
 /**
  * Requests that the decoder immediately discard all pending buffers.
- * This is useful at end of stream, when seeking or when deselecting a stream.
+ * This is useful when seeking or when deselecting a stream.
  */
 void input_DecoderFlush( decoder_t *p_dec )
 {

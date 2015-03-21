@@ -177,6 +177,7 @@ input_CreateFilename
 input_DecoderCreate
 input_DecoderDelete
 input_DecoderDecode
+input_DecoderDrain
 input_DecoderFlush
 input_GetItem
 input_item_AddInfo

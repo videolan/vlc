@@ -617,6 +617,7 @@ static inline int input_ModifyPcrSystem( input_thread_t *p_input, bool b_absolut
 VLC_API decoder_t * input_DecoderCreate( vlc_object_t *, const es_format_t *, input_resource_t * ) VLC_USED;
 VLC_API void input_DecoderDelete( decoder_t * );
 VLC_API void input_DecoderDecode( decoder_t *, block_t *, bool b_do_pace );
+VLC_API void input_DecoderDrain( decoder_t * );
 VLC_API void input_DecoderFlush( decoder_t * );
 
 /**
