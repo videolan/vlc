@@ -114,8 +114,6 @@ struct decoder_owner_sys_t
     vout_thread_t   *p_vout;
 
     /* -- Theses variables need locking on read *and* write -- */
-    bool b_exit;
-
     /* Pause */
     bool b_paused;
     struct
@@ -316,7 +314,6 @@ void input_DecoderDelete( decoder_t *p_dec )
     p_owner->b_paused = false;
     p_owner->b_waiting = false;
     p_owner->b_flushing = true;
-    p_owner->b_exit = true;
     vlc_cond_signal( &p_owner->wait_request );
     vlc_mutex_unlock( &p_owner->lock );
 
@@ -843,8 +840,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->b_fmt_description = false;
     p_owner->p_description = NULL;
 
-    p_owner->b_exit = false;
-
     p_owner->b_paused = false;
     p_owner->pause.i_date = VLC_TS_INVALID;
     p_owner->pause.i_ignore = 0;
@@ -1086,17 +1081,6 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
         *pi_rate = i_rate;
 }
 
-static bool DecoderIsExitRequested( decoder_t *p_dec )
-{
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    vlc_mutex_lock( &p_owner->lock );
-    bool b_exit = p_owner->b_exit;
-    vlc_mutex_unlock( &p_owner->lock );
-
-    return b_exit;
-}
-
 /**
  * If *pb_reject, it does nothing, otherwise it waits for the given
  * deadline or a flush request (in which case it set *pi_reject to true.
@@ -1113,7 +1097,7 @@ static void DecoderWaitDate( decoder_t *p_dec,
 
     do
     {
-        if( p_owner->b_flushing || p_owner->b_exit )
+        if( p_owner->b_flushing )
         {
             *pb_reject = true;
             break;
@@ -1210,7 +1194,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     }
     else while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
     {
-        if( DecoderIsExitRequested( p_dec ) )
+        if( DecoderIsFlushing( p_dec ) )
         {
             /* It prevent freezing VLC in case of broken decoder */
             block_Release( p_aout_buf );
@@ -1379,9 +1363,8 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
     while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
     {
         vout_thread_t  *p_vout = p_owner->p_vout;
-        if( DecoderIsExitRequested( p_dec ) )
-        {
-            /* It prevent freezing VLC in case of broken decoder */
+        if( DecoderIsFlushing( p_dec ) )
+        {   /* It prevent freezing VLC in case of broken decoder */
             picture_Release( p_pic );
             if( p_block )
                 block_Release( p_block );
@@ -2172,15 +2155,12 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
     for( ;; )
     {
-        if( DecoderIsExitRequested( p_dec ) || p_dec->b_error )
+        if( DecoderIsFlushing( p_dec ) || p_dec->b_error )
             return NULL;
 
         picture_t *p_picture = vout_GetPicture( p_owner->p_vout );
         if( p_picture )
             return p_picture;
-
-        if( DecoderIsFlushing( p_dec ) )
-            return NULL;
 
         /* */
         DecoderSignalWait( p_dec );
@@ -2203,8 +2183,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
     while( i_attempts-- )
     {
-        if( DecoderIsExitRequested( p_dec ) || DecoderIsFlushing( p_dec )
-         || p_dec->b_error )
+        if( DecoderIsFlushing( p_dec ) || p_dec->b_error )
             break;
 
         p_vout = input_resource_HoldVout( p_owner->p_resource );
