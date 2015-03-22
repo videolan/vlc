@@ -103,8 +103,10 @@ static picture_t *Decode(decoder_t *dec, block_t **pp_block)
 
     const void *iter = NULL;
     struct vpx_image *img = vpx_codec_get_frame(ctx, &iter);
-    if (!img)
+    if (!img) {
+        free(pkt_pts);
         return NULL;
+    }
 
     /* fetches back the PTS */
     pkt_pts = img->user_priv;
