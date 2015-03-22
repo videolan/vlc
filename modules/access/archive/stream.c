@@ -170,7 +170,7 @@ error:
 int StreamOpen(vlc_object_t *p_object)
 {
     stream_t *p_stream = (stream_t*) p_object;
-    stream_sys_t *p_sys = p_stream->p_sys;
+    stream_sys_t *p_sys;
 
     if (!ProbeArchiveFormat(p_stream->p_source))
         return VLC_EGENERIC;
