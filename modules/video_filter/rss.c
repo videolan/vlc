@@ -875,7 +875,6 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
     return true;
 
 end:
-    free( psz_eltname );
     return false;
 }
 
