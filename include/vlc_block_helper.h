@@ -227,7 +227,6 @@ static inline int block_WaitBytes( block_bytestream_t *p_bytestream,
     /* Check we have that much data */
     i_offset = p_bytestream->i_offset;
     i_size = i_data;
-    i_copy = 0;
     for( p_block = p_bytestream->p_block;
          p_block != NULL; p_block = p_block->p_next )
     {
@@ -286,7 +285,6 @@ static inline int block_PeekBytes( block_bytestream_t *p_bytestream,
     /* Check we have that much data */
     i_offset = p_bytestream->i_offset;
     i_size = i_data;
-    i_copy = 0;
     for( p_block = p_bytestream->p_block;
          p_block != NULL; p_block = p_block->p_next )
     {
@@ -306,7 +304,6 @@ static inline int block_PeekBytes( block_bytestream_t *p_bytestream,
     /* Copy the data */
     i_offset = p_bytestream->i_offset;
     i_size = i_data;
-    i_copy = 0;
     for( p_block = p_bytestream->p_block;
          p_block != NULL; p_block = p_block->p_next )
     {
@@ -336,7 +333,6 @@ static inline int block_GetBytes( block_bytestream_t *p_bytestream,
     /* Check we have that much data */
     i_offset = p_bytestream->i_offset;
     i_size = i_data;
-    i_copy = 0;
     for( p_block = p_bytestream->p_block;
          p_block != NULL; p_block = p_block->p_next )
     {
@@ -389,7 +385,6 @@ static inline int block_PeekOffsetBytes( block_bytestream_t *p_bytestream,
     /* Check we have that much data */
     i_offset = p_bytestream->i_offset;
     i_size = i_data + i_peek_offset;
-    i_copy = 0;
     for( p_block = p_bytestream->p_block;
          p_block != NULL; p_block = p_block->p_next )
     {
@@ -424,7 +419,6 @@ static inline int block_PeekOffsetBytes( block_bytestream_t *p_bytestream,
     /* Copy the data */
     i_offset += i_copy;
     i_size = i_data;
-    i_copy = 0;
     for( ; p_block != NULL; p_block = p_block->p_next )
     {
         i_copy = __MIN( i_size, p_block->i_buffer - i_offset );
