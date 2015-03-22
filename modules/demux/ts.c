@@ -2354,6 +2354,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 {
                     block_ChainAppend( &pid->u.p_pes->p_prepcr_outqueue, p_block );
                     p_block = pid->u.p_pes->p_prepcr_outqueue;
+                    p_next = p_block->p_next;
+                    p_block->p_next = NULL;
                     pid->u.p_pes->p_prepcr_outqueue = NULL;
                 }
 
