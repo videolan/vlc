@@ -71,7 +71,23 @@ static UINT64 GetQPC(void)
 static_assert(CLOCK_FREQ * 10 == 10000000,
               "REFERENCE_TIME conversion broken");
 
-static IAudioClient *GetClient(demux_t *demux)
+static EDataFlow GetDeviceFlow(IMMDevice *dev)
+{
+    void *pv;
+
+    if (FAILED(IMMDevice_QueryInterface(dev, &IID_IMMEndpoint, &pv)))
+        return false;
+
+    IMMEndpoint *ep = pv;
+    EDataFlow flow;
+
+    if (SUCCEEDED(IMMEndpoint_GetDataFlow(ep, &flow)))
+        flow = eAll;
+    IMMEndpoint_Release(ep);
+    return flow;
+}
+
+static IAudioClient *GetClient(demux_t *demux, bool *restrict loopbackp)
 {
     IMMDeviceEnumerator *e;
     IMMDevice *dev;
@@ -87,8 +103,11 @@ static IAudioClient *GetClient(demux_t *demux)
     }
     e = pv;
 
-    hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(e, eCapture,
-                                                     eCommunications, &dev);
+    bool loopback = var_InheritBool(demux, "wasapi-loopback");
+    EDataFlow flow = loopback ? eRender : eCapture;
+    ERole role = loopback ? eConsole : eCommunications;
+
+    hr = IMMDeviceEnumerator_GetDefaultAudioEndpoint(e, flow, role, &dev);
     IMMDeviceEnumerator_Release(e);
     if (FAILED(hr))
     {
@@ -97,6 +116,7 @@ static IAudioClient *GetClient(demux_t *demux)
     }
 
     hr = IMMDevice_Activate(dev, &IID_IAudioClient, CLSCTX_ALL, NULL, &pv);
+    *loopbackp = GetDeviceFlow(dev) == eRender;
     IMMDevice_Release(dev);
     if (FAILED(hr))
         msg_Err(demux, "cannot activate device (error 0x%lx)", hr);
@@ -203,7 +223,7 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
     return 0;
 }
 
-static es_out_id_t *CreateES(demux_t *demux, IAudioClient *client,
+static es_out_id_t *CreateES(demux_t *demux, IAudioClient *client, bool loop,
                              mtime_t caching, size_t *restrict frame_size)
 {
     es_format_t fmt;
@@ -230,7 +250,10 @@ static es_out_id_t *CreateES(demux_t *demux, IAudioClient *client,
                                               * fmt.audio.i_rate;
     *frame_size = fmt.audio.i_bitspersample * fmt.audio.i_channels / 8;
 
-    DWORD flags = AUDCLNT_STREAMFLAGS_EVENTCALLBACK; /* TODO: loopback */
+    DWORD flags = AUDCLNT_STREAMFLAGS_EVENTCALLBACK;
+    if (loop)
+        flags |= AUDCLNT_STREAMFLAGS_LOOPBACK;
+
     /* Request at least thrice the PTS delay */
     REFERENCE_TIME bufsize = caching * INT64_C(10) * 3;
 
@@ -388,13 +411,15 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
-    sys->client = GetClient(demux);
+    bool loopback;
+    sys->client = GetClient(demux, &loopback);
     if (sys->client == NULL) {
         CoUninitialize();
         goto error;
     }
 
-    sys->es = CreateES(demux, sys->client, sys->caching, &sys->frame_size);
+    sys->es = CreateES(demux, sys->client, loopback, sys->caching,
+                       &sys->frame_size);
     if (sys->es == NULL)
         goto error;
 
@@ -460,12 +485,17 @@ static void Close (vlc_object_t *obj)
     free(sys);
 }
 
+#define LOOPBACK_TEXT N_("Loopback mode")
+#define LOOPBACK_LONGTEXT N_("Record an audio rendering endpoint.")
+
 vlc_module_begin()
     set_shortname(N_("WASAPI"))
     set_description(N_("Windows Audio Session API input"))
     set_capability("access_demux", 0)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
+
+    add_bool("wasapi-loopback", false, LOOPBACK_TEXT, LOOPBACK_LONGTEXT, true)
 
     add_shortcut("wasapi")
     set_callbacks(Open, Close)
