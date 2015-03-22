@@ -176,6 +176,7 @@ static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
             i_buffer = p_sys->i_buffer;
             p_sys->i_buffer = 0;
             free( p_sys->p_buffer );
+            p_sys->p_buffer = NULL;
         }
 
         memcpy( p_pcm_block->p_buffer + i_buffer,
