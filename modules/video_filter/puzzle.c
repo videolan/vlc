@@ -289,9 +289,12 @@ picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
     /* assert no mismatch between sizes */
     if (    p_sys->s_current_param.i_pict_width  != p_sys->s_current_param.i_desk_width
          || p_sys->s_current_param.i_pict_height != p_sys->s_current_param.i_desk_height
-         || p_sys->s_current_param.i_pict_width  != (int) p_fmt_in->i_width
-         || p_sys->s_current_param.i_pict_height != (int) p_fmt_in->i_height )
+         || p_sys->s_current_param.i_pict_width  != (int) p_fmt_in->i_visible_width
+         || p_sys->s_current_param.i_pict_height != (int) p_fmt_in->i_visible_height ) {
+        picture_Release(p_pic_in);
+        picture_Release(p_pic_out);
         return NULL;
+    }
 
     vlc_mutex_lock( &p_sys->lock );
 
