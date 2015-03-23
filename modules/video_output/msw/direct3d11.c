@@ -284,8 +284,8 @@ static HINSTANCE Direct3D11LoadShaderLibrary(void)
     HINSTANCE instance = NULL;
     /* d3dcompiler_47 is the latest on windows 8.1 */
     for (int i = 47; i > 41; --i) {
-        TCHAR filename[18];
-        _sntprintf(filename, 18, TEXT("D3DCOMPILER_%d.dll"), i);
+        TCHAR filename[19];
+        _sntprintf(filename, 19, TEXT("D3DCOMPILER_%d.dll"), i);
         instance = LoadLibrary(filename);
         if (instance) break;
     }
