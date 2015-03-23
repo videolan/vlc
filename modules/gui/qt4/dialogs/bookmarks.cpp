@@ -179,20 +179,19 @@ void BookmarksDialog::del()
     input_thread_t *p_input = THEMIM->getInput();
     if( !p_input ) return;
 
-    QModelIndexList selected = bookmarksList->selectionModel()->selectedIndexes();
+    QModelIndexList selected = bookmarksList->selectionModel()->selectedRows();
     if ( !selected.empty() )
     {
         b_ignore_updates = true;
+        /* Sort needed to make sure that selected elements are deleted in descending
+           order, otherwise the indexes might change and wrong bookmarks are deleted. */
+        qSort( selected.begin(), selected.end() );
         QModelIndexList::Iterator it = selected.end();
         for( --it; it != selected.begin(); it-- )
         {
-            /* FIXME: Find out why selectedIndexes() doesn't follow the
-            SelectRows selectionBehavior() and returns all columns */
-            if ( (*it).column() == 0 )
-                input_Control( p_input, INPUT_DEL_BOOKMARK, (*it).row() );
-        }
-        if ( (*it).column() == 0 )
             input_Control( p_input, INPUT_DEL_BOOKMARK, (*it).row() );
+        }
+        input_Control( p_input, INPUT_DEL_BOOKMARK, (*it).row() );
         b_ignore_updates = false;
         update();
     }
