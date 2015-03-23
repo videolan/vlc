@@ -605,8 +605,10 @@ static void Direct3D11Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     Direct3D11DestroyResources(vd);
-    ID3D11DeviceContext_Release(sys->d3dcontext);
-    ID3D11Device_Release(sys->d3ddevice);
+    if ( sys->d3dcontext )
+        ID3D11DeviceContext_Release(sys->d3dcontext);
+    if ( sys->d3ddevice )
+        ID3D11Device_Release(sys->d3ddevice);
     msg_Dbg(vd, "Direct3D11 device adapter closed");
 }
 
