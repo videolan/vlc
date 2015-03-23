@@ -221,8 +221,6 @@ modules/access/mms/mmstu.c
 modules/access/mms/mmstu.h
 modules/access/mtp.c
 modules/access/oss.c
-modules/access_output/bonjour.c
-modules/access_output/bonjour.h
 modules/access_output/dummy.c
 modules/access_output/file.c
 modules/access_output/http.c
