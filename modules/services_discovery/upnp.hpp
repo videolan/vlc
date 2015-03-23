@@ -51,7 +51,7 @@ namespace SD
  */
 class UpnpInstanceWrapper
 {
-public:    
+public:
     // This increases the refcount before returning the instance
     static UpnpInstanceWrapper* get(vlc_object_t* p_obj, Upnp_FunPtr callback, SD::MediaServerList *opaque);
     void release(bool isSd);
