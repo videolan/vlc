@@ -192,10 +192,6 @@ static int Open(vlc_object_t *object)
     if (CommonInit(vd))
         goto error;
 
-    /* TODO : A fallback system */
-    vd->sys->d3dFormat = d3d_formats[0].format;
-    vd->sys->vlcFormat = d3d_formats[0].fourcc;
-
     video_format_t fmt;
     if (Direct3D11Open(vd, &fmt)) {
         msg_Err(vd, "Direct3D11 could not be opened");
@@ -585,6 +581,25 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 #  endif
 # endif
 #endif
+
+    for (unsigned i = 0; d3d_formats[i].name != 0; i++)
+    {
+        UINT i_formatSupport;
+        if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
+                                                       d3d_formats[i].format,
+                                                       &i_formatSupport)) &&
+                ( i_formatSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D ))
+        {
+            msg_Dbg(vd, "Using pixel format %s", d3d_formats[i].name );
+            sys->d3dFormat = d3d_formats[i].format;
+            sys->vlcFormat = d3d_formats[i].fourcc;
+            break;
+        }
+    }
+    if ( !sys->vlcFormat ) {
+       msg_Err(vd, "Could not get a suitable texture pixel format");
+       return VLC_EGENERIC;
+    }
 
     UpdateRects(vd, NULL, NULL, true);
 
