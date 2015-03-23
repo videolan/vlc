@@ -202,6 +202,8 @@ static const char *const psz_continue_list_text[] =
     { N_("Never"), N_("Ask"), N_("Always") };
 
 
+#define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
+
 /**********************************************************************/
 vlc_module_begin ()
     set_shortname( "Qt" )
