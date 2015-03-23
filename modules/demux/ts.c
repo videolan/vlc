@@ -263,6 +263,7 @@ typedef struct
         mtime_t i_first_dts;
         mtime_t i_pcroffset;
         bool    b_disable; /* ignore PCR field, use dts */
+        bool    b_fix_done;
     } pcr;
 
     mtime_t i_last_dts;
@@ -2345,7 +2346,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
             block_t *p_next = p_block->p_next;
             p_block->p_next = NULL;
 
-            if( p_pmt->pcr.i_first == -1 ) /* Not seen yet */
+            if( !p_pmt->pcr.b_fix_done ) /* Not seen yet */
                 PCRFixHandle( p_demux, p_pmt, p_block );
 
             if( pid->u.p_pes->es.id && (p_pmt->pcr.i_current > -1 || p_pmt->pcr.b_disable) )
@@ -2399,7 +2400,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
             }
             else
             {
-                if( p_pmt->pcr.i_first == -1 ) /* Not seen yet */
+                if( !p_pmt->pcr.b_fix_done ) /* Not seen yet */
                     PCRFixHandle( p_demux, p_pmt, p_block );
 
                 block_ChainAppend( &pid->u.p_pes->p_prepcr_outqueue, p_block );
@@ -2935,7 +2936,7 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
 
     /* Check if we have enqueued blocks waiting the/before the
        PCR barrier, and then adapt pcr so they have valid PCR when dequeuing */
-    if( p_pmt->pcr.i_current == -1 )
+    if( p_pmt->pcr.i_current == -1 && p_pmt->pcr.b_fix_done )
     {
         mtime_t i_mindts = -1;
 
@@ -3059,24 +3060,29 @@ static int FindPCRCandidate( ts_pmt_t *p_pmt )
         return 0x1FFF;
 }
 
+/* Tries to reselect a new PCR when none has been received */
 static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
 {
-    if( p_pmt->pcr.i_first > -1 || p_pmt->pcr.b_disable )
+    if ( p_pmt->pcr.b_disable || p_pmt->pcr.b_fix_done )
+    {
         return;
-
+    }
     /* Record the first data packet timestamp in case there wont be any PCR */
-    if( !p_pmt->pcr.i_first_dts )
+    else if( !p_pmt->pcr.i_first_dts )
     {
         p_pmt->pcr.i_first_dts = p_block->i_dts;
     }
-    else if( p_block->i_dts - p_pmt->pcr.i_first_dts > CLOCK_FREQ / 2 ) /* "shall not exceed 100ms" */
+    else if( p_block->i_dts - p_pmt->pcr.i_first_dts > CLOCK_FREQ / 2 ) /* "PCR repeat rate shall not exceed 100ms" */
     {
-        int i_cand = FindPCRCandidate( p_pmt );
-        p_pmt->i_pid_pcr = i_cand;
-        p_pmt->pcr.b_disable = true; /* So we do not wait packet PCR flag as there might be none on the pid */
-        msg_Warn( p_demux, "No PCR received for program %d, set up workaround using pid %d",
-                  p_pmt->i_number, i_cand );
-        UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
+        if( p_pmt->pcr.i_current < 0 )
+        {
+            int i_cand = FindPCRCandidate( p_pmt );
+            p_pmt->i_pid_pcr = i_cand;
+            msg_Warn( p_demux, "No PCR received for program %d, set up workaround using pid %d",
+                      p_pmt->i_number, i_cand );
+            UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
+            p_pmt->pcr.b_fix_done = true;
+        }
     }
 }
 
@@ -5717,6 +5723,8 @@ static ts_pmt_t *ts_pmt_New( demux_t *p_demux )
     pmt->pcr.b_disable = false;
     pmt->pcr.i_first_dts = VLC_TS_INVALID;
     pmt->pcr.i_pcroffset = -1;
+
+    pmt->pcr.b_fix_done = false;
 
     return pmt;
 }
