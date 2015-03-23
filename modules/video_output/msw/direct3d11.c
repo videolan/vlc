@@ -825,17 +825,17 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
     memset(&resviewDesc, 0, sizeof(resviewDesc));
-    resviewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    resviewDesc.Texture2D.MipLevels = texDesc.MipLevels;
-
     if (sys->vlcFormat == VLC_CODEC_NV12)
         resviewDesc.Format = DXGI_FORMAT_R8_UNORM;
+    else
+        resviewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    resviewDesc.Texture2D.MipLevels = texDesc.MipLevels;
 
     hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, (ID3D11Resource *)sys->d3dtexture, &resviewDesc, &sys->d3dresViewY);
     if (FAILED(hr)) {
         if(sys->d3dtexture) ID3D11Texture2D_Release(sys->d3dtexture);
-        msg_Err(vd, "Could not Create the Y D3d11 Texture ResoureView. (hr=0x%lX)", hr);
+        msg_Err(vd, "Could not Create the Y D3d11 Texture ResourceView. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
 
@@ -844,7 +844,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, (ID3D11Resource *)sys->d3dtexture, &resviewDesc, &sys->d3dresViewUV);
         if (FAILED(hr)) {
             if(sys->d3dtexture) ID3D11Texture2D_Release(sys->d3dtexture);
-            msg_Err(vd, "Could not Create the U D3d11 Texture ResoureView. (hr=0x%lX)", hr);
+            msg_Err(vd, "Could not Create the UV D3d11 Texture ResourceView. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
         }
     }
