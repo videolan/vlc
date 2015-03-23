@@ -258,9 +258,6 @@ static void* ThreadRead( void *data )
     access_t *access = data;
     access_sys_t *sys = access->p_sys;
 
-    vlc_fifo_Lock(sys->fifo);
-    vlc_fifo_CleanupPush(sys->fifo);
-
     for(;;)
     {
         block_t *pkt = block_Alloc(MTU);
@@ -283,16 +280,22 @@ static void* ThreadRead( void *data )
 
         pkt->i_buffer = len;
 
+        vlc_fifo_Lock(sys->fifo);
         /* Discard old buffers on overflow */
         while (vlc_fifo_GetBytes(sys->fifo) + len > sys->fifo_size)
+        {
+            int canc = vlc_savecancel();
             block_Release(vlc_fifo_DequeueUnlocked(sys->fifo));
+            vlc_restorecancel(canc);
+        }
 
         vlc_fifo_QueueUnlocked(sys->fifo, pkt);
+        vlc_fifo_Unlock(sys->fifo);
     }
 
+    vlc_fifo_Lock(sys->fifo);
     sys->running = false;
     vlc_fifo_Signal(sys->fifo);
-    vlc_cleanup_run();
-
+    vlc_fifo_Unlock(sys->fifo);
     return NULL;
 }
