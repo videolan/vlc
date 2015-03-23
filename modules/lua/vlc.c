@@ -32,6 +32,8 @@
 #include <assert.h>
 #include <sys/stat.h>
 
+#define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
+
 #include "vlc.h"
 
 #include <vlc_plugin.h>
