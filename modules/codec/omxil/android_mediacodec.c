@@ -849,179 +849,156 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong tim
 static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    while (1) {
-        int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_output_buffer,
-                                          p_sys->buffer_info, timeout);
+    int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_output_buffer,
+                                      p_sys->buffer_info, timeout);
+    if (CHECK_EXCEPTION()) {
+        msg_Err(p_dec, "Exception in MediaCodec.dequeueOutputBuffer (GetOutput)");
+        return -1;
+    }
+
+    if (index >= 0) {
+        if (!p_sys->pixel_format) {
+            msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
+            return ReleaseOutputBuffer(p_dec, env, index, false);
+        }
+
+        *pp_pic = decoder_NewPicture(p_dec);
+        if (!*pp_pic) {
+            msg_Warn(p_dec, "NewPicture failed");
+            return ReleaseOutputBuffer(p_dec, env, index, false);
+        }
+        picture_t *p_pic = *pp_pic;
+        /* If the oldest input block had no PTS, the timestamp
+         * of the frame returned by MediaCodec might be wrong
+         * so we overwrite it with the corresponding dts. */
+        int64_t forced_ts = timestamp_FifoGet(p_sys->timestamp_fifo);
+        if (forced_ts == VLC_TS_INVALID)
+            p_pic->date = (*env)->GetLongField(env, p_sys->buffer_info, p_sys->pts_field);
+        else
+            p_pic->date = forced_ts;
+
+        if (p_sys->direct_rendering) {
+            picture_sys_t *p_picsys = p_pic->p_sys;
+            p_picsys->pf_lock_pic = NULL;
+            p_picsys->pf_unlock_pic = UnlockPicture;
+            p_picsys->priv.hw.p_dec = p_dec;
+            p_picsys->priv.hw.i_index = index;
+            p_picsys->priv.hw.b_valid = true;
+
+            vlc_mutex_lock(get_android_opaque_mutex());
+            InsertInflightPicture(p_dec, p_pic, index);
+            vlc_mutex_unlock(get_android_opaque_mutex());
+        } else {
+            jobject buf;
+            if (p_sys->get_output_buffers)
+                buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers, index);
+            else
+                buf = (*env)->CallObjectMethod(env, p_sys->codec,
+                                               p_sys->get_output_buffer, index);
+            //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
+            uint8_t *ptr = (*env)->GetDirectBufferAddress(env, buf);
+
+            //int size = (*env)->GetIntField(env, p_sys->buffer_info, p_sys->size_field);
+            int offset = (*env)->GetIntField(env, p_sys->buffer_info, p_sys->offset_field);
+            ptr += offset; // Check the size parameter as well
+
+            unsigned int chroma_div;
+            GetVlcChromaSizes(p_dec->fmt_out.i_codec, p_dec->fmt_out.video.i_width,
+                              p_dec->fmt_out.video.i_height, NULL, NULL, &chroma_div);
+            CopyOmxPicture(p_sys->pixel_format, p_pic, p_sys->slice_height, p_sys->stride,
+                           ptr, chroma_div, &p_sys->architecture_specific_data);
+            (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
+
+            jthrowable exception = (*env)->ExceptionOccurred(env);
+            if (exception != NULL) {
+                jclass illegalStateException = (*env)->FindClass(env, "java/lang/IllegalStateException");
+                if((*env)->IsInstanceOf(env, exception, illegalStateException)) {
+                    msg_Err(p_dec, "Codec error (IllegalStateException) in MediaCodec.releaseOutputBuffer");
+                    (*env)->ExceptionClear(env);
+                    (*env)->DeleteLocalRef(env, illegalStateException);
+                    (*env)->DeleteLocalRef(env, buf);
+                    return -1;
+                }
+            }
+            (*env)->DeleteLocalRef(env, buf);
+        }
+    } else if (index == INFO_OUTPUT_BUFFERS_CHANGED) {
+        msg_Dbg(p_dec, "output buffers changed");
+        if (!p_sys->get_output_buffers)
+            return 0;
+        (*env)->DeleteGlobalRef(env, p_sys->output_buffers);
+
+        p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
+                                                         p_sys->get_output_buffers);
         if (CHECK_EXCEPTION()) {
-            msg_Err(p_dec, "Exception in MediaCodec.dequeueOutputBuffer (GetOutput)");
+            msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffer (GetOutput)");
+            p_sys->output_buffers = NULL;
             return -1;
         }
 
-        if (index >= 0) {
-            if (!p_sys->pixel_format) {
-                msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
-                if (ReleaseOutputBuffer(p_dec, env, index, false) != 0)
-                    return -1;
-                continue;
-            }
+        p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
+    } else if (index == INFO_OUTPUT_FORMAT_CHANGED) {
+        jobject format = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_format);
+        if (CHECK_EXCEPTION()) {
+            msg_Err(p_dec, "Exception in MediaCodec.getOutputFormat (GetOutput)");
+            return -1;
+        }
 
-            if (!*pp_pic) {
-                *pp_pic = decoder_NewPicture(p_dec);
-            } else if (p_sys->direct_rendering) {
-                picture_t *p_pic = *pp_pic;
-                picture_sys_t *p_picsys = p_pic->p_sys;
-                int i_prev_index = p_picsys->priv.hw.i_index;
-                if (ReleaseOutputBuffer(p_dec, env, i_prev_index, false) != 0)
-                    return -1;
+        jobject format_string = (*env)->CallObjectMethod(env, format, p_sys->tostring);
 
-                // No need to lock here since the previous picture was not sent.
-                InsertInflightPicture(p_dec, NULL, i_prev_index);
-            }
-            if (*pp_pic) {
+        jsize format_len = (*env)->GetStringUTFLength(env, format_string);
+        const char *format_ptr = (*env)->GetStringUTFChars(env, format_string, NULL);
+        msg_Dbg(p_dec, "output format changed: %.*s", format_len, format_ptr);
+        (*env)->ReleaseStringUTFChars(env, format_string, format_ptr);
 
-                picture_t *p_pic = *pp_pic;
-                /* If the oldest input block had no PTS, the timestamp
-                 * of the frame returned by MediaCodec might be wrong
-                 * so we overwrite it with the corresponding dts. */
-                int64_t forced_ts = timestamp_FifoGet(p_sys->timestamp_fifo);
-                if (forced_ts == VLC_TS_INVALID)
-                    p_pic->date = (*env)->GetLongField(env, p_sys->buffer_info, p_sys->pts_field);
-                else
-                    p_pic->date = forced_ts;
+        ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
 
-                if (p_sys->direct_rendering) {
-                    picture_sys_t *p_picsys = p_pic->p_sys;
-                    p_picsys->pf_lock_pic = NULL;
-                    p_picsys->pf_unlock_pic = UnlockPicture;
-                    p_picsys->priv.hw.p_dec = p_dec;
-                    p_picsys->priv.hw.i_index = index;
-                    p_picsys->priv.hw.b_valid = true;
+        int width           = GET_INTEGER(format, "width");
+        int height          = GET_INTEGER(format, "height");
+        p_sys->stride       = GET_INTEGER(format, "stride");
+        p_sys->slice_height = GET_INTEGER(format, "slice-height");
+        p_sys->pixel_format = GET_INTEGER(format, "color-format");
+        int crop_left       = GET_INTEGER(format, "crop-left");
+        int crop_top        = GET_INTEGER(format, "crop-top");
+        int crop_right      = GET_INTEGER(format, "crop-right");
+        int crop_bottom     = GET_INTEGER(format, "crop-bottom");
 
-                    vlc_mutex_lock(get_android_opaque_mutex());
-                    InsertInflightPicture(p_dec, p_pic, index);
-                    vlc_mutex_unlock(get_android_opaque_mutex());
-                } else {
-                    jobject buf;
-                    if (p_sys->get_output_buffers)
-                        buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers, index);
-                    else
-                        buf = (*env)->CallObjectMethod(env, p_sys->codec,
-                                                       p_sys->get_output_buffer, index);
-                    //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
-                    uint8_t *ptr = (*env)->GetDirectBufferAddress(env, buf);
-
-                    //int size = (*env)->GetIntField(env, p_sys->buffer_info, p_sys->size_field);
-                    int offset = (*env)->GetIntField(env, p_sys->buffer_info, p_sys->offset_field);
-                    ptr += offset; // Check the size parameter as well
-
-                    unsigned int chroma_div;
-                    GetVlcChromaSizes(p_dec->fmt_out.i_codec, p_dec->fmt_out.video.i_width,
-                                      p_dec->fmt_out.video.i_height, NULL, NULL, &chroma_div);
-                    CopyOmxPicture(p_sys->pixel_format, p_pic, p_sys->slice_height, p_sys->stride,
-                                   ptr, chroma_div, &p_sys->architecture_specific_data);
-                    (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
-
-                    jthrowable exception = (*env)->ExceptionOccurred(env);
-                    if (exception != NULL) {
-                        jclass illegalStateException = (*env)->FindClass(env, "java/lang/IllegalStateException");
-                        if((*env)->IsInstanceOf(env, exception, illegalStateException)) {
-                            msg_Err(p_dec, "Codec error (IllegalStateException) in MediaCodec.releaseOutputBuffer");
-                            (*env)->ExceptionClear(env);
-                            (*env)->DeleteLocalRef(env, illegalStateException);
-                            (*env)->DeleteLocalRef(env, buf);
-                            return -1;
-                        }
-                    }
-                    (*env)->DeleteLocalRef(env, buf);
-                }
-            } else {
-                msg_Warn(p_dec, "NewPicture failed");
-                if (ReleaseOutputBuffer(p_dec, env, index, false) != 0)
-                    return -1;
-            }
-            return 0;
-
-        } else if (index == INFO_OUTPUT_BUFFERS_CHANGED) {
-            msg_Dbg(p_dec, "output buffers changed");
-            if (!p_sys->get_output_buffers)
-                continue;
-            (*env)->DeleteGlobalRef(env, p_sys->output_buffers);
-
-            p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
-                                                             p_sys->get_output_buffers);
-            if (CHECK_EXCEPTION()) {
-                msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffer (GetOutput)");
-                p_sys->output_buffers = NULL;
+        const char *name = "unknown";
+        if (!p_sys->direct_rendering) {
+            if (!GetVlcChromaFormat(p_sys->pixel_format,
+                                    &p_dec->fmt_out.i_codec, &name)) {
+                msg_Err(p_dec, "color-format not recognized");
                 return -1;
             }
+        }
 
-            p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
-        } else if (index == INFO_OUTPUT_FORMAT_CHANGED) {
-            jobject format = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_format);
-            if (CHECK_EXCEPTION()) {
-                msg_Err(p_dec, "Exception in MediaCodec.getOutputFormat (GetOutput)");
-                return -1;
-            }
+        msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
+                p_sys->pixel_format, name, width, height, p_sys->stride, p_sys->slice_height,
+                crop_left, crop_top, crop_right, crop_bottom);
 
-            jobject format_string = (*env)->CallObjectMethod(env, format, p_sys->tostring);
+        p_dec->fmt_out.video.i_width = crop_right + 1 - crop_left;
+        p_dec->fmt_out.video.i_height = crop_bottom + 1 - crop_top;
+        if (p_dec->fmt_out.video.i_width <= 1
+            || p_dec->fmt_out.video.i_height <= 1) {
+            p_dec->fmt_out.video.i_width = width;
+            p_dec->fmt_out.video.i_height = height;
+        }
+        p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
+        p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
 
-            jsize format_len = (*env)->GetStringUTFLength(env, format_string);
-            const char *format_ptr = (*env)->GetStringUTFChars(env, format_string, NULL);
-            msg_Dbg(p_dec, "output format changed: %.*s", format_len, format_ptr);
-            (*env)->ReleaseStringUTFChars(env, format_string, format_ptr);
+        if (p_sys->stride <= 0)
+            p_sys->stride = width;
+        if (p_sys->slice_height <= 0)
+            p_sys->slice_height = height;
+        CHECK_EXCEPTION();
 
-            ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
-
-            int width           = GET_INTEGER(format, "width");
-            int height          = GET_INTEGER(format, "height");
-            p_sys->stride       = GET_INTEGER(format, "stride");
-            p_sys->slice_height = GET_INTEGER(format, "slice-height");
-            p_sys->pixel_format = GET_INTEGER(format, "color-format");
-            int crop_left       = GET_INTEGER(format, "crop-left");
-            int crop_top        = GET_INTEGER(format, "crop-top");
-            int crop_right      = GET_INTEGER(format, "crop-right");
-            int crop_bottom     = GET_INTEGER(format, "crop-bottom");
-
-            const char *name = "unknown";
-            if (!p_sys->direct_rendering) {
-                if (!GetVlcChromaFormat(p_sys->pixel_format,
-                                        &p_dec->fmt_out.i_codec, &name)) {
-                    msg_Err(p_dec, "color-format not recognized");
-                    return -1;
-                }
-            }
-
-            msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
-                    p_sys->pixel_format, name, width, height, p_sys->stride, p_sys->slice_height,
-                    crop_left, crop_top, crop_right, crop_bottom);
-
-            p_dec->fmt_out.video.i_width = crop_right + 1 - crop_left;
-            p_dec->fmt_out.video.i_height = crop_bottom + 1 - crop_top;
-            if (p_dec->fmt_out.video.i_width <= 1
-                || p_dec->fmt_out.video.i_height <= 1) {
-                p_dec->fmt_out.video.i_width = width;
-                p_dec->fmt_out.video.i_height = height;
-            }
-            p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
-            p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
-
-            if (p_sys->stride <= 0)
-                p_sys->stride = width;
-            if (p_sys->slice_height <= 0)
-                p_sys->slice_height = height;
-            CHECK_EXCEPTION();
-
-            ArchitectureSpecificCopyHooks(p_dec, p_sys->pixel_format, p_sys->slice_height,
-                                          p_sys->stride, &p_sys->architecture_specific_data);
-            if (p_sys->pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
-                p_sys->slice_height -= crop_top/2;
-            if (IgnoreOmxDecoderPadding(p_sys->name)) {
-                p_sys->slice_height = 0;
-                p_sys->stride = p_dec->fmt_out.video.i_width;
-            }
-
-        } else {
-            return 0;
+        ArchitectureSpecificCopyHooks(p_dec, p_sys->pixel_format, p_sys->slice_height,
+                                      p_sys->stride, &p_sys->architecture_specific_data);
+        if (p_sys->pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
+            p_sys->slice_height -= crop_top/2;
+        if (IgnoreOmxDecoderPadding(p_sys->name)) {
+            p_sys->slice_height = 0;
+            p_sys->stride = p_dec->fmt_out.video.i_width;
         }
     }
     return 0;
