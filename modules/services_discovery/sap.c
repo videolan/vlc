@@ -644,6 +644,7 @@ static int Demux( demux_t *p_demux )
     vlc_mutex_lock( &p_parent_input->lock );
 
     p_parent_input->i_type = ITEM_TYPE_STREAM;
+    p_parent_input->b_net = true;
 
     vlc_mutex_unlock( &p_parent_input->lock );
     vlc_object_release( p_input );

@@ -147,6 +147,7 @@ static void Preparse( vlc_object_t *obj, input_item_t *p_item,
 {
     vlc_mutex_lock( &p_item->lock );
     int i_type = p_item->i_type;
+    bool b_net = p_item->b_net;
     vlc_mutex_unlock( &p_item->lock );
 
     bool b_preparse = false;
@@ -155,10 +156,7 @@ static void Preparse( vlc_object_t *obj, input_item_t *p_item,
     case ITEM_TYPE_DIRECTORY:
     case ITEM_TYPE_PLAYLIST:
     case ITEM_TYPE_NODE:
-        b_preparse = true;
-        break;
-    case ITEM_TYPE_STREAM:
-        if (i_options & META_REQUEST_OPTION_SCOPE_NETWORK)
+        if (!b_net || i_options & META_REQUEST_OPTION_SCOPE_NETWORK)
             b_preparse = true;
         break;
     }

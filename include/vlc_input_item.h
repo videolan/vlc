@@ -85,6 +85,8 @@ struct input_item_t
     vlc_mutex_t lock;                 /**< Lock for the item */
 
     uint8_t     i_type;              /**< Type (file, disc, ... see input_item_type_e) */
+    bool        b_net;               /**< Net: always true for TYPE_STREAM, it
+                                          depends for others types */
     bool        b_error_when_reading;/**< Error When Reading */
 };
 
@@ -254,6 +256,16 @@ VLC_API void input_item_MergeInfos( input_item_t *, info_category_t * );
  * less arguments.
  */
 VLC_API input_item_t * input_item_NewWithType( const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type ) VLC_USED;
+
+/**
+ * This function creates a new input_item_t with the provided information.
+ *
+ * \param i_net 1/0: force b_net to true/false, -1: default (guess it)
+ *
+ * XXX You may also use input_item_New, input_item_NewExt, or
+ * input_item_NewWithType as they need less arguments.
+ */
+VLC_API input_item_t * input_item_NewWithTypeExt( const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type, int i_net ) VLC_USED;
 
 /**
  * This function creates a new input_item_t with the provided information.

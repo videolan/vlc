@@ -35,7 +35,7 @@
 #include "item.h"
 #include "info.h"
 
-static int GuessType( const input_item_t *p_item );
+static int GuessType( const input_item_t *p_item, bool *p_net );
 
 void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
 {
@@ -306,7 +306,7 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
     free( p_i->psz_uri );
     p_i->psz_uri = strdup( psz_uri );
 
-    p_i->i_type = GuessType( p_i );
+    p_i->i_type = GuessType( p_i, &p_i->b_net );
 
     if( p_i->psz_name )
         ;
@@ -831,9 +831,10 @@ input_item_t *input_item_NewExt( const char *psz_uri,
 
 
 input_item_t *
-input_item_NewWithType( const char *psz_uri, const char *psz_name,
-                        int i_options, const char *const *ppsz_options,
-                        unsigned flags, mtime_t duration, int type )
+input_item_NewWithTypeExt( const char *psz_uri, const char *psz_name,
+                           int i_options, const char *const *ppsz_options,
+                           unsigned flags, mtime_t duration, int type,
+                           int i_net )
 {
     static atomic_uint last_input_id = ATOMIC_VAR_INIT(0);
 
@@ -886,7 +887,22 @@ input_item_NewWithType( const char *psz_uri, const char *psz_name,
     if( type != ITEM_TYPE_UNKNOWN )
         p_input->i_type = type;
     p_input->b_error_when_reading = false;
+
+    if( i_net != -1 )
+        p_input->b_net = !!i_net;
+    else if( p_input->i_type == ITEM_TYPE_STREAM )
+        p_input->b_net = true;
     return p_input;
+}
+
+input_item_t *
+input_item_NewWithType( const char *psz_uri, const char *psz_name,
+                        int i_options, const char *const *ppsz_options,
+                        unsigned flags, mtime_t duration, int type )
+{
+    return input_item_NewWithTypeExt( psz_uri, psz_name, i_options,
+                                      ppsz_options, flags, duration, type,
+                                      -1 );
 }
 
 input_item_t *input_item_Copy( input_item_t *p_input )
@@ -923,6 +939,7 @@ struct item_type_entry
 {
     const char psz_scheme[7];
     uint8_t    i_type;
+    bool       b_net;
 };
 
 static int typecmp( const void *key, const void *entry )
@@ -934,61 +951,61 @@ static int typecmp( const void *key, const void *entry )
 }
 
 /* Guess the type of the item using the beginning of the mrl */
-static int GuessType( const input_item_t *p_item )
+static int GuessType( const input_item_t *p_item, bool *p_net )
 {
     static const struct item_type_entry tab[] =
     {   /* /!\ Alphabetical order /!\ */
         /* Short match work, not just exact match */
-        { "alsa",   ITEM_TYPE_CARD },
-        { "atsc",   ITEM_TYPE_CARD },
-        { "bd",     ITEM_TYPE_DISC },
-        { "cable",  ITEM_TYPE_CARD },
-        { "cdda",   ITEM_TYPE_CDDA },
-        { "cqam",   ITEM_TYPE_CARD },
-        { "dc1394", ITEM_TYPE_CARD },
-        { "dccp",   ITEM_TYPE_STREAM },
-        { "deckli", ITEM_TYPE_CARD }, /* decklink */
-        { "dir",    ITEM_TYPE_DIRECTORY },
-        { "dshow",  ITEM_TYPE_CARD },
-        { "dv",     ITEM_TYPE_CARD },
-        { "dvb",    ITEM_TYPE_CARD },
-        { "dvd",    ITEM_TYPE_DISC },
-        { "dtv",    ITEM_TYPE_CARD },
-        { "eyetv",  ITEM_TYPE_CARD },
-        { "fd",     ITEM_TYPE_UNKNOWN },
-        { "ftp",    ITEM_TYPE_STREAM },
-        { "http",   ITEM_TYPE_STREAM },
-        { "icyx",   ITEM_TYPE_STREAM },
-        { "imem",   ITEM_TYPE_UNKNOWN },
-        { "itpc",   ITEM_TYPE_STREAM },
-        { "jack",   ITEM_TYPE_CARD },
-        { "linsys", ITEM_TYPE_CARD },
-        { "live",   ITEM_TYPE_STREAM }, /* livedotcom */
-        { "mms",    ITEM_TYPE_STREAM },
-        { "mtp",    ITEM_TYPE_DISC },
-        { "ofdm",   ITEM_TYPE_CARD },
-        { "oss",    ITEM_TYPE_CARD },
-        { "pnm",    ITEM_TYPE_STREAM },
-        { "qam",    ITEM_TYPE_CARD },
-        { "qpsk",   ITEM_TYPE_CARD },
-        { "qtcapt", ITEM_TYPE_CARD }, /* qtcapture */
-        { "raw139", ITEM_TYPE_CARD }, /* raw1394 */
-        { "rt",     ITEM_TYPE_STREAM }, /* rtp, rtsp, rtmp */
-        { "satell", ITEM_TYPE_CARD }, /* sattelite */
-        { "screen", ITEM_TYPE_CARD },
-        { "sdp",    ITEM_TYPE_STREAM },
-        { "sftp",   ITEM_TYPE_STREAM },
-        { "shm",    ITEM_TYPE_CARD },
-        { "smb",    ITEM_TYPE_STREAM },
-        { "svcd",   ITEM_TYPE_DISC },
-        { "tcp",    ITEM_TYPE_STREAM },
-        { "terres", ITEM_TYPE_CARD }, /* terrestrial */
-        { "udp",    ITEM_TYPE_STREAM },  /* udplite too */
-        { "unsv",   ITEM_TYPE_STREAM },
-        { "usdigi", ITEM_TYPE_CARD }, /* usdigital */
-        { "v4l",    ITEM_TYPE_CARD },
-        { "vcd",    ITEM_TYPE_DISC },
-        { "window", ITEM_TYPE_CARD },
+        { "alsa",   ITEM_TYPE_CARD, false },
+        { "atsc",   ITEM_TYPE_CARD, false },
+        { "bd",     ITEM_TYPE_DISC, false },
+        { "cable",  ITEM_TYPE_CARD, false },
+        { "cdda",   ITEM_TYPE_CDDA, false },
+        { "cqam",   ITEM_TYPE_CARD, false },
+        { "dc1394", ITEM_TYPE_CARD, false },
+        { "dccp",   ITEM_TYPE_STREAM, true },
+        { "deckli", ITEM_TYPE_CARD, false }, /* decklink */
+        { "dir",    ITEM_TYPE_DIRECTORY, false },
+        { "dshow",  ITEM_TYPE_CARD, false },
+        { "dv",     ITEM_TYPE_CARD, false },
+        { "dvb",    ITEM_TYPE_CARD, false },
+        { "dvd",    ITEM_TYPE_DISC, false },
+        { "dtv",    ITEM_TYPE_CARD, false },
+        { "eyetv",  ITEM_TYPE_CARD, false },
+        { "fd",     ITEM_TYPE_UNKNOWN, false },
+        { "ftp",    ITEM_TYPE_FILE, true },
+        { "http",   ITEM_TYPE_FILE, true },
+        { "icyx",   ITEM_TYPE_STREAM, true },
+        { "imem",   ITEM_TYPE_UNKNOWN, false },
+        { "itpc",   ITEM_TYPE_PLAYLIST, true },
+        { "jack",   ITEM_TYPE_CARD, false },
+        { "linsys", ITEM_TYPE_CARD, false },
+        { "live",   ITEM_TYPE_STREAM, true }, /* livedotcom */
+        { "mms",    ITEM_TYPE_STREAM, true },
+        { "mtp",    ITEM_TYPE_DISC, false },
+        { "ofdm",   ITEM_TYPE_CARD, false },
+        { "oss",    ITEM_TYPE_CARD, false },
+        { "pnm",    ITEM_TYPE_STREAM, true },
+        { "qam",    ITEM_TYPE_CARD, false },
+        { "qpsk",   ITEM_TYPE_CARD, false },
+        { "qtcapt", ITEM_TYPE_CARD, false }, /* qtcapture */
+        { "raw139", ITEM_TYPE_CARD, false }, /* raw1394 */
+        { "rt",     ITEM_TYPE_STREAM, true }, /* rtp, rtsp, rtmp */
+        { "satell", ITEM_TYPE_CARD, false }, /* sattelite */
+        { "screen", ITEM_TYPE_CARD, false },
+        { "sdp",    ITEM_TYPE_STREAM, true },
+        { "sftp",   ITEM_TYPE_FILE, true },
+        { "shm",    ITEM_TYPE_CARD, false },
+        { "smb",    ITEM_TYPE_FILE, true },
+        { "svcd",   ITEM_TYPE_DISC, false },
+        { "tcp",    ITEM_TYPE_STREAM, true },
+        { "terres", ITEM_TYPE_CARD, false }, /* terrestrial */
+        { "udp",    ITEM_TYPE_STREAM, true },  /* udplite too */
+        { "unsv",   ITEM_TYPE_STREAM, true },
+        { "usdigi", ITEM_TYPE_CARD, false }, /* usdigital */
+        { "v4l",    ITEM_TYPE_CARD, false },
+        { "vcd",    ITEM_TYPE_DISC, false },
+        { "window", ITEM_TYPE_CARD, false },
     };
     const struct item_type_entry *e;
 
@@ -997,7 +1014,15 @@ static int GuessType( const input_item_t *p_item )
 
     e = bsearch( p_item->psz_uri, tab, sizeof( tab ) / sizeof( tab[0] ),
                  sizeof( tab[0] ), typecmp );
-    return e ? e->i_type : ITEM_TYPE_FILE;
+    if( e )
+    {
+        *p_net = e->b_net;
+        return e->i_type;
+    } else
+    {
+        *p_net = false;
+        return ITEM_TYPE_FILE;
+    }
 }
 
 input_item_node_t *input_item_node_Create( input_item_t *p_input )
