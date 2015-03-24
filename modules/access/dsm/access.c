@@ -108,7 +108,7 @@ static int login( access_t *p_access );
 static void backslash_path( vlc_url_t *p_url );
 static bool get_path( access_t *p_access );
 static int add_item( access_t *p_access,  input_item_node_t *p_node,
-                     const char *psz_name );
+                     const char *psz_name, int i_type );
 
 struct access_sys_t
 {
@@ -560,7 +560,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 }
 
 static int add_item( access_t *p_access, input_item_node_t *p_node,
-                     const char *psz_name )
+                     const char *psz_name, int i_type )
 {
     access_sys_t *p_sys = p_access->p_sys;
     input_item_t *p_item;
@@ -571,7 +571,8 @@ static int add_item( access_t *p_access, input_item_node_t *p_node,
     if( i_ret == -1 )
         return VLC_ENOMEM;
 
-    p_item = input_item_New( psz_uri, psz_name );
+    p_item = input_item_NewWithTypeExt( psz_uri, psz_name, 0, NULL, 0, -1,
+                                        i_type, 1 );
     free( psz_uri );
     if( p_item == NULL )
         return VLC_ENOMEM;
@@ -623,7 +624,7 @@ static int BrowseShare( access_t *p_access, input_item_node_t *p_node )
         if( psz_name[strlen( psz_name ) - 1] == '$')
             continue;
 
-        i_ret = add_item( p_access, p_node, psz_name );
+        i_ret = add_item( p_access, p_node, psz_name, ITEM_TYPE_DIRECTORY );
         if( i_ret != VLC_SUCCESS )
             goto error;
     }
@@ -662,6 +663,8 @@ static int BrowseDirectory( access_t *p_access, input_item_node_t *p_node )
     files_count = smb_stat_list_count( files );
     for( size_t i = 0; i < files_count; i++ )
     {
+        int i_type;
+
         st = smb_stat_list_at( files, i );
 
         if( st == NULL ) {
@@ -674,8 +677,9 @@ static int BrowseDirectory( access_t *p_access, input_item_node_t *p_node )
         /* Avoid infinite loop */
         if( !strcmp( psz_name, ".") || !strcmp( psz_name, "..") )
             continue;
-
-        i_ret = add_item( p_access, p_node, psz_name );
+        i_type = smb_stat_get( st, SMB_STAT_ISDIR ) ?
+                 ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
+        i_ret = add_item( p_access, p_node, psz_name, i_type );
         if( i_ret != VLC_SUCCESS )
             goto error;
     }
