@@ -999,3 +999,35 @@ void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks, unsigned i_co
     }
     free( p_tracks );
 }
+
+/**************************************************************************
+ * Get the media type of the media descriptor object
+ **************************************************************************/
+libvlc_media_type_t libvlc_media_get_type( libvlc_media_t *p_md )
+{
+    assert( p_md );
+
+    int i_type;
+    input_item_t *p_input_item = p_md->p_input_item;
+
+    vlc_mutex_lock( &p_input_item->lock );
+    i_type = p_md->p_input_item->i_type;
+    vlc_mutex_unlock( &p_input_item->lock );
+
+    switch( i_type )
+    {
+    case ITEM_TYPE_FILE:
+        return libvlc_media_type_file;
+    case ITEM_TYPE_NODE:
+    case ITEM_TYPE_DIRECTORY:
+        return libvlc_media_type_directory;
+    case ITEM_TYPE_DISC:
+        return libvlc_media_type_disc;
+    case ITEM_TYPE_STREAM:
+        return libvlc_media_type_stream;
+    case ITEM_TYPE_PLAYLIST:
+        return libvlc_media_type_playlist;
+    default:
+        return libvlc_media_type_unknown;
+    }
+}

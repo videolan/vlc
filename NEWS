@@ -105,6 +105,7 @@ libVLC:
  * Add libvlc_media_parse_with_options that uses a flag to specify parse options
  * Add libvlc_audio_output_device_get to get the currently selected audio output device
    identifier (if there is one available)
+ * Add libvlc_media_get_type to get the type of the media
 
 Logging
  * Support for the SystemD Journal

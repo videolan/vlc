@@ -223,6 +223,27 @@ typedef struct libvlc_media_track_t
 
 } libvlc_media_track_t;
 
+/** defgroup libvlc_media_type LibVLC media type
+ * \ingroup libvlc_media
+ * @{
+ */
+
+/**
+ * Media type
+ *
+ * \see libvlc_media_get_type
+ */
+typedef enum libvlc_media_type_t {
+    libvlc_media_type_unknown,
+    libvlc_media_type_file,
+    libvlc_media_type_directory,
+    libvlc_media_type_disc,
+    libvlc_media_type_stream,
+    libvlc_media_type_playlist,
+} libvlc_media_type_t;
+
+/** @}*/
+
 /**
  * Parse flags used by libvlc_media_parse_with_options()
  *
@@ -668,6 +689,20 @@ const char *libvlc_media_get_codec_description( libvlc_track_type_t i_type,
 LIBVLC_API
 void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks,
                                   unsigned i_count );
+
+/**
+ * Get the media type of the media descriptor object
+ *
+ * \version LibVLC 3.0.0 and later.
+ *
+ * \see libvlc_media_type_t
+ *
+ * \param p_md media descriptor object
+ *
+ * \return media type
+ */
+LIBVLC_API
+libvlc_media_type_t libvlc_media_get_type( libvlc_media_t *p_md );
 
 /** @}*/
 
