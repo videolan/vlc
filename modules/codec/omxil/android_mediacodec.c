@@ -174,6 +174,8 @@ struct decoder_sys_t
     unsigned int i_inflight_pictures;
 
     timestamp_fifo_t *timestamp_fifo;
+
+    int64_t i_preroll_end;
 };
 
 enum Types
@@ -832,6 +834,8 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong tim
     int64_t ts = p_block->i_pts;
     if (!ts && p_block->i_dts)
         ts = p_block->i_dts;
+    if (p_block->i_flags & BLOCK_FLAG_PREROLL )
+        p_sys->i_preroll_end = ts;
     timestamp_FifoPut(p_sys->timestamp_fifo, p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
     (*env)->CallVoidMethod(env, p_sys->codec, p_sys->queue_input_buffer, index, 0, size, ts, 0);
     (*env)->DeleteLocalRef(env, buf);
@@ -857,10 +861,16 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong ti
     }
 
     if (index >= 0) {
+        int64_t i_buffer_pts;
+
         if (!p_sys->pixel_format) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
             return ReleaseOutputBuffer(p_dec, env, index, false);
         }
+
+        i_buffer_pts = (*env)->GetLongField(env, p_sys->buffer_info, p_sys->pts_field);
+        if (i_buffer_pts <= p_sys->i_preroll_end)
+            return ReleaseOutputBuffer(p_dec, env, index, false);
 
         *pp_pic = decoder_NewPicture(p_dec);
         if (!*pp_pic) {
@@ -873,7 +883,7 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong ti
          * so we overwrite it with the corresponding dts. */
         int64_t forced_ts = timestamp_FifoGet(p_sys->timestamp_fifo);
         if (forced_ts == VLC_TS_INVALID)
-            p_pic->date = (*env)->GetLongField(env, p_sys->buffer_info, p_sys->pts_field);
+            p_pic->date = i_buffer_pts;
         else
             p_pic->date = forced_ts;
 
@@ -1023,6 +1033,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     if ((*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
         block_Release(*pp_block);
         *pp_block = NULL;
+        p_sys->i_preroll_end = 0;
         timestamp_FifoEmpty(p_sys->timestamp_fifo);
         if (p_sys->decoded) {
             /* Invalidate all pictures that are currently in flight
