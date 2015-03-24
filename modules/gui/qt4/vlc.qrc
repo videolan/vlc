@@ -79,7 +79,6 @@
     </qresource>
     <qresource prefix="/type">
         <file alias="capture-card">pixmaps/types/capture-card_16px.png</file>
-        <file alias="cdda">pixmaps/types/cdda_16px.png</file>
         <file alias="disc">pixmaps/types/disc_16px.png</file>
         <file alias="file-asym">pixmaps/types/file-asym_16px.png</file>
         <file alias="file-wide">pixmaps/types/file-wide_16px.png</file>

@@ -971,7 +971,7 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         { "atsc",   ITEM_TYPE_CARD, false },
         { "bd",     ITEM_TYPE_DISC, false },
         { "cable",  ITEM_TYPE_CARD, false },
-        { "cdda",   ITEM_TYPE_CDDA, false },
+        { "cdda",   ITEM_TYPE_DISC, false },
         { "cqam",   ITEM_TYPE_CARD, false },
         { "dc1394", ITEM_TYPE_CARD, false },
         { "dccp",   ITEM_TYPE_STREAM, true },

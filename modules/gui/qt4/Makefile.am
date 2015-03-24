@@ -384,7 +384,6 @@ DEPS_res = \
 	pixmaps/toolbar/volume-slider-inside.png \
 	pixmaps/toolbar/volume-slider-outside.png \
 	pixmaps/types/capture-card_16px.png \
-	pixmaps/types/cdda_16px.png \
 	pixmaps/types/disc_16px.png \
 	pixmaps/types/file-asym_16px.png \
 	pixmaps/types/file-wide_16px.png \
