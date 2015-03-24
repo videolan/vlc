@@ -93,7 +93,7 @@ static void Close(vlc_object_t *object);
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static void Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 
-static int  Direct3D11Create (vout_display_t *);
+static HINSTANCE Direct3D11LoadShaderLibrary(void);
 static void Direct3D11Destroy(vout_display_t *);
 
 static int  Direct3D11Open (vout_display_t *, video_format_t *);
@@ -179,15 +179,103 @@ static const char* globPixelShaderBiplanarYUV2RGB = "\
   }\
 ";
 
+
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
 
-    if (Direct3D11Create(vd)) {
-        msg_Err(vd, "Direct3D11 could not be initialized");
+#if !VLC_WINSTORE_APP
+    HINSTANCE hd3d11_dll = LoadLibrary(TEXT("D3D11.DLL"));
+    if (!hd3d11_dll) {
+        msg_Warn(vd, "cannot load d3d11.dll, aborting");
+        return VLC_EGENERIC;
+    }
+
+    HINSTANCE hd3dcompiler_dll = Direct3D11LoadShaderLibrary();
+    if (!hd3dcompiler_dll) {
+        msg_Err(vd, "cannot load d3dcompiler.dll, aborting");
+        FreeLibrary(hd3d11_dll);
+        return VLC_EGENERIC;
+    }
+
+# if 0
+    HINSTANCE hdxgi_dll = LoadLibrary(TEXT("DXGI.DLL"));
+    if (!hdxgi_dll) {
+        msg_Warn(vd, "cannot load dxgi.dll, aborting");
+        return VLC_EGENERIC;
+    }
+# endif
+
+#else
+    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-dxgiswapchain");
+    if (!dxgiswapChain)
+        return VLC_EGENERIC;
+    ID3D11Device* d3ddevice         = var_InheritInteger(vd, "winrt-d3ddevice");
+    if (!d3ddevice)
+        return VLC_EGENERIC;
+    ID3D11DeviceContext* d3dcontext = var_InheritInteger(vd, "winrt-d3dcontext");
+    if (!d3dcontext)
+        return VLC_EGENERIC;
+#endif
+
+    vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
+    if (!sys)
+        return VLC_ENOMEM;
+
+#if !VLC_WINSTORE_APP
+    sys->hd3d11_dll       = hd3d11_dll;
+    sys->hd3dcompiler_dll = hd3dcompiler_dll;
+
+    sys->OurD3DCompile = (void *)GetProcAddress(sys->hd3dcompiler_dll, "D3DCompile");
+    if (!sys->OurD3DCompile) {
+        msg_Err(vd, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
         Direct3D11Destroy(vd);
         return VLC_EGENERIC;
     }
+
+# if 0
+    sys->hdxgi_dll = hdxgi_dll;
+
+    /* TODO : enable all dxgi versions from 1.3 -> 1.1 */
+    PFN_CREATE_DXGI_FACTORY OurCreateDXGIFactory =
+        (void *)GetProcAddress(sys->hdxgi_dll, "CreateDXGIFactory");
+    if (!OurCreateDXGIFactory) {
+        msg_Err(vd, "Cannot locate reference to CreateDXGIFactory in dxgi DLL");
+        Direct3D11Destroy(vd);
+        return VLC_EGENERIC;
+    }
+
+    /* TODO : detect the directx version supported and use IID_IDXGIFactory3 or 2 */
+    HRESULT hr = OurCreateDXGIFactory(&IID_IDXGIFactory, (void **)&sys->dxgifactory);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Could not create dxgi factory. (hr=0x%lX)", hr);
+        Direct3D11Destroy(vd);
+        return VLC_EGENERIC;
+    }
+
+    sys->OurD3D11CreateDeviceAndSwapChain =
+        (void *)GetProcAddress(sys->hd3d11_dll, "D3D11CreateDeviceAndSwapChain");
+    if (!sys->OurD3D11CreateDeviceAndSwapChain) {
+        msg_Err(vd, "Cannot locate reference to D3D11CreateDeviceAndSwapChain in d3d11 DLL");
+        Direct3D11Destroy(vd);
+        return VLC_EGENERIC;
+    }
+
+# else
+    sys->OurD3D11CreateDevice =
+        (void *)GetProcAddress(sys->hd3d11_dll, "D3D11CreateDevice");
+    if (!sys->OurD3D11CreateDevice) {
+        msg_Err(vd, "Cannot locate reference to D3D11CreateDevice in d3d11 DLL");
+        Direct3D11Destroy(vd);
+        return VLC_EGENERIC;
+    }
+# endif
+
+#else
+    sys->dxgiswapChain = dxgiswapChain;
+    sys->d3ddevice     = d3ddevice;
+    sys->d3dcontext    = d3dcontext;
+#endif
 
     if (CommonInit(vd))
         goto error;
@@ -274,124 +362,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     CommonDisplay(vd);
 }
 
-#if !VLC_WINSTORE_APP
-static HINSTANCE Direct3D11LoadShaderLibrary(void)
-{
-    HINSTANCE instance = NULL;
-    /* d3dcompiler_47 is the latest on windows 8.1 */
-    for (int i = 47; i > 41; --i) {
-        TCHAR filename[19];
-        _sntprintf(filename, 19, TEXT("D3DCOMPILER_%d.dll"), i);
-        instance = LoadLibrary(filename);
-        if (instance) break;
-    }
-    return instance;
-}
-#endif
-
-static int Direct3D11Create(vout_display_t *vd)
-{
-
-#if !VLC_WINSTORE_APP
-
-    HINSTANCE hd3d11_dll = LoadLibrary(TEXT("D3D11.DLL"));
-    if (!hd3d11_dll) {
-        msg_Warn(vd, "cannot load d3d11.dll, aborting");
-        return VLC_EGENERIC;
-    }
-
-# if 0
-    HINSTANCE hdxgi_dll = LoadLibrary(TEXT("DXGI.DLL"));
-    if (!hdxgi_dll) {
-        msg_Warn(vd, "cannot load dxgi.dll, aborting");
-        return VLC_EGENERIC;
-    }
-# endif
-
-    HINSTANCE hd3dcompiler_dll = Direct3D11LoadShaderLibrary();
-    if (!hd3dcompiler_dll) {
-        msg_Err(vd, "cannot load d3dcompiler.dll, aborting");
-        return VLC_EGENERIC;
-    }
-
-#else
-
-    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-dxgiswapchain");
-    if (!dxgiswapChain)
-        return VLC_EGENERIC;
-    ID3D11Device* d3ddevice         = var_InheritInteger(vd, "winrt-d3ddevice");
-    if (!d3ddevice)
-        return VLC_EGENERIC;
-    ID3D11DeviceContext* d3dcontext = var_InheritInteger(vd, "winrt-d3dcontext");
-    if (!d3dcontext)
-        return VLC_EGENERIC;
-
-#endif
-
-    vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
-    if (!sys)
-        return VLC_ENOMEM;
-
-#if !VLC_WINSTORE_APP
-
-    sys->hd3d11_dll       = hd3d11_dll;
-    sys->hd3dcompiler_dll = hd3dcompiler_dll;
-
-    sys->OurD3DCompile = (void *)GetProcAddress(sys->hd3dcompiler_dll, "D3DCompile");
-    if (!sys->OurD3DCompile) {
-        msg_Err(vd, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
-        return VLC_EGENERIC;
-    }
-
-# if 0
-
-    sys->hdxgi_dll = hdxgi_dll;
-
-    /* TODO : enable all dxgi versions from 1.3 -> 1.1 */
-    PFN_CREATE_DXGI_FACTORY OurCreateDXGIFactory =
-        (void *)GetProcAddress(sys->hdxgi_dll, "CreateDXGIFactory");
-    if (!OurCreateDXGIFactory) {
-        msg_Err(vd, "Cannot locate reference to CreateDXGIFactory in dxgi DLL");
-        return VLC_EGENERIC;
-    }
-
-    /* TODO : detect the directx version supported and use IID_IDXGIFactory3 or 2 */
-    HRESULT hr = OurCreateDXGIFactory(&IID_IDXGIFactory, (void **)&sys->dxgifactory);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Could not create dxgi factory. (hr=0x%lX)", hr);
-        return VLC_EGENERIC;
-    }
-
-    sys->OurD3D11CreateDeviceAndSwapChain =
-        (void *)GetProcAddress(sys->hd3d11_dll, "D3D11CreateDeviceAndSwapChain");
-    if (!sys->OurD3D11CreateDeviceAndSwapChain) {
-        msg_Err(vd, "Cannot locate reference to D3D11CreateDeviceAndSwapChain in d3d11 DLL");
-        return VLC_EGENERIC;
-    }
-
-# else
-
-    sys->OurD3D11CreateDevice =
-        (void *)GetProcAddress(sys->hd3d11_dll, "D3D11CreateDevice");
-    if (!sys->OurD3D11CreateDevice) {
-        msg_Err(vd, "Cannot locate reference to D3D11CreateDevice in d3d11 DLL");
-        return VLC_EGENERIC;
-    }
-
-# endif
-
-#else
-
-    sys->dxgiswapChain = dxgiswapChain;
-    sys->d3ddevice     = d3ddevice;
-    sys->d3dcontext    = d3dcontext;
-
-#endif
-
-    return VLC_SUCCESS;
-}
-
-
 static void Direct3D11Destroy(vout_display_t *vd)
 {
 
@@ -422,8 +392,23 @@ static void Direct3D11Destroy(vout_display_t *vd)
     VLC_UNUSED(vd);
 
 #endif
-
 }
+
+#if !VLC_WINSTORE_APP
+static HINSTANCE Direct3D11LoadShaderLibrary(void)
+{
+    HINSTANCE instance = NULL;
+    /* d3dcompiler_47 is the latest on windows 8.1 */
+    for (int i = 47; i > 41; --i) {
+        TCHAR filename[19];
+        _sntprintf(filename, 19, TEXT("D3DCOMPILER_%d.dll"), i);
+        instance = LoadLibrary(filename);
+        if (instance) break;
+    }
+    return instance;
+}
+#endif
+
 
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 {
