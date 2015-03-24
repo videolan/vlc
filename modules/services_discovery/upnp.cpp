@@ -278,8 +278,8 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
     if( asprintf(&psz_mrl, "upnp://%s?ObjectID=%s", desc->location.c_str(), desc->UDN.c_str() ) < 0 )
         return false;
 
-    p_input_item = input_item_NewWithType( psz_mrl, desc->friendlyName.c_str(), 0,
-                                           NULL, 0, -1, ITEM_TYPE_NODE );
+    p_input_item = input_item_NewWithTypeExt( psz_mrl, desc->friendlyName.c_str(), 0,
+                                              NULL, 0, -1, ITEM_TYPE_NODE, 1);
     free( psz_mrl );
     if ( !p_input_item )
         return false;
@@ -549,8 +549,8 @@ void MediaServer::addItem(const char *objectID, const char *title )
     }
     vlc_UrlClean( &url );
 
-    input_item_t* p_item = input_item_NewWithType( psz_url, title, 0, NULL,
-                                                   0, -1, ITEM_TYPE_NODE );
+    input_item_t* p_item = input_item_NewWithTypeExt( psz_url, title, 0, NULL,
+                                                      0, -1, ITEM_TYPE_DIRECTORY, 1 );
     free( psz_url);
     if ( !p_item )
         return;
@@ -562,7 +562,8 @@ void MediaServer::addItem(const char *objectID, const char *title )
 void MediaServer::addItem(const char* title, const char*, const char*,
                           mtime_t duration, const char* psz_url)
 {
-    input_item_t* p_item = input_item_NewExt( psz_url, title, 0, NULL, 0, duration );
+    input_item_t* p_item = input_item_NewWithTypeExt( psz_url, title, 0, NULL, 0,
+                                                      duration, ITEM_TYPE_FILE, 1 );
     input_item_node_AppendItem( node_, p_item );
     input_item_Release( p_item );
 }
