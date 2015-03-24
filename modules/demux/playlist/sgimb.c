@@ -374,7 +374,7 @@ static int Demux ( demux_t *p_demux )
 
     p_child = input_item_NewWithType( p_sys->psz_uri,
                       p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri,
-                      0, NULL, 0, p_sys->i_duration, ITEM_TYPE_NET );
+                      0, NULL, 0, p_sys->i_duration, ITEM_TYPE_STREAM );
 
     if( !p_child )
     {

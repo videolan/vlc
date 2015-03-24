@@ -946,7 +946,7 @@ static int GuessType( const input_item_t *p_item )
         { "cdda",   ITEM_TYPE_CDDA },
         { "cqam",   ITEM_TYPE_CARD },
         { "dc1394", ITEM_TYPE_CARD },
-        { "dccp",   ITEM_TYPE_NET },
+        { "dccp",   ITEM_TYPE_STREAM },
         { "deckli", ITEM_TYPE_CARD }, /* decklink */
         { "dir",    ITEM_TYPE_DIRECTORY },
         { "dshow",  ITEM_TYPE_CARD },
@@ -956,35 +956,35 @@ static int GuessType( const input_item_t *p_item )
         { "dtv",    ITEM_TYPE_CARD },
         { "eyetv",  ITEM_TYPE_CARD },
         { "fd",     ITEM_TYPE_UNKNOWN },
-        { "ftp",    ITEM_TYPE_NET },
-        { "http",   ITEM_TYPE_NET },
-        { "icyx",   ITEM_TYPE_NET },
+        { "ftp",    ITEM_TYPE_STREAM },
+        { "http",   ITEM_TYPE_STREAM },
+        { "icyx",   ITEM_TYPE_STREAM },
         { "imem",   ITEM_TYPE_UNKNOWN },
-        { "itpc",   ITEM_TYPE_NET },
+        { "itpc",   ITEM_TYPE_STREAM },
         { "jack",   ITEM_TYPE_CARD },
         { "linsys", ITEM_TYPE_CARD },
-        { "live",   ITEM_TYPE_NET }, /* livedotcom */
-        { "mms",    ITEM_TYPE_NET },
+        { "live",   ITEM_TYPE_STREAM }, /* livedotcom */
+        { "mms",    ITEM_TYPE_STREAM },
         { "mtp",    ITEM_TYPE_DISC },
         { "ofdm",   ITEM_TYPE_CARD },
         { "oss",    ITEM_TYPE_CARD },
-        { "pnm",    ITEM_TYPE_NET },
+        { "pnm",    ITEM_TYPE_STREAM },
         { "qam",    ITEM_TYPE_CARD },
         { "qpsk",   ITEM_TYPE_CARD },
         { "qtcapt", ITEM_TYPE_CARD }, /* qtcapture */
         { "raw139", ITEM_TYPE_CARD }, /* raw1394 */
-        { "rt",     ITEM_TYPE_NET }, /* rtp, rtsp, rtmp */
+        { "rt",     ITEM_TYPE_STREAM }, /* rtp, rtsp, rtmp */
         { "satell", ITEM_TYPE_CARD }, /* sattelite */
         { "screen", ITEM_TYPE_CARD },
-        { "sdp",    ITEM_TYPE_NET },
-        { "sftp",   ITEM_TYPE_NET },
+        { "sdp",    ITEM_TYPE_STREAM },
+        { "sftp",   ITEM_TYPE_STREAM },
         { "shm",    ITEM_TYPE_CARD },
-        { "smb",    ITEM_TYPE_NET },
+        { "smb",    ITEM_TYPE_STREAM },
         { "svcd",   ITEM_TYPE_DISC },
-        { "tcp",    ITEM_TYPE_NET },
+        { "tcp",    ITEM_TYPE_STREAM },
         { "terres", ITEM_TYPE_CARD }, /* terrestrial */
-        { "udp",    ITEM_TYPE_NET },  /* udplite too */
-        { "unsv",   ITEM_TYPE_NET },
+        { "udp",    ITEM_TYPE_STREAM },  /* udplite too */
+        { "unsv",   ITEM_TYPE_STREAM },
         { "usdigi", ITEM_TYPE_CARD }, /* usdigital */
         { "v4l",    ITEM_TYPE_CARD },
         { "vcd",    ITEM_TYPE_DISC },

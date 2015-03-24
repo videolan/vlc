@@ -395,7 +395,7 @@ DEPS_res = \
 	pixmaps/types/tape_16px.png \
 	pixmaps/types/type_directory.png \
 	pixmaps/types/type_file.png \
-	pixmaps/types/type_net.png \
+	pixmaps/types/type_stream.png \
 	pixmaps/types/type_node.png \
 	pixmaps/types/type_playlist.png \
 	pixmaps/types/type_unknown.xpm \

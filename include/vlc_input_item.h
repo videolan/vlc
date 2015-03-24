@@ -98,7 +98,7 @@ enum input_item_type_e
     ITEM_TYPE_DISC,
     ITEM_TYPE_CDDA,
     ITEM_TYPE_CARD,
-    ITEM_TYPE_NET,
+    ITEM_TYPE_STREAM,
     ITEM_TYPE_PLAYLIST,
     ITEM_TYPE_NODE,
 

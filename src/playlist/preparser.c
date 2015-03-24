@@ -157,7 +157,7 @@ static void Preparse( vlc_object_t *obj, input_item_t *p_item,
     case ITEM_TYPE_NODE:
         b_preparse = true;
         break;
-    case ITEM_TYPE_NET:
+    case ITEM_TYPE_STREAM:
         if (i_options & META_REQUEST_OPTION_SCOPE_NETWORK)
             b_preparse = true;
         break;
