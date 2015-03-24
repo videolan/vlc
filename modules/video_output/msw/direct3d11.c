@@ -66,14 +66,30 @@ vlc_module_end ()
 typedef struct
 {
     const char   *name;
-    DXGI_FORMAT  format;
+    DXGI_FORMAT  formatTexture;
     vlc_fourcc_t fourcc;
+    DXGI_FORMAT  formatY;
+    DXGI_FORMAT  formatUV;
 } d3d_format_t;
 
 static const d3d_format_t d3d_formats[] = {
-    { "NV12",   DXGI_FORMAT_NV12,             VLC_CODEC_NV12  },
-    { "RGBA",   DXGI_FORMAT_R8G8B8A8_UNORM,   VLC_CODEC_RGBA  },
-    { NULL, 0, 0 }
+    { "NV12",     DXGI_FORMAT_NV12,           VLC_CODEC_NV12,     DXGI_FORMAT_R8_UNORM,           DXGI_FORMAT_R8G8_UNORM },
+#ifdef BROKEN_PIXEL
+    { "YUY2",     DXGI_FORMAT_YUY2,           VLC_CODEC_I422,     DXGI_FORMAT_R8G8B8A8_UNORM,     0 },
+    { "AYUV",     DXGI_FORMAT_AYUV,           VLC_CODEC_YUVA,     DXGI_FORMAT_R8G8B8A8_UNORM,     0 },
+    { "Y416",     DXGI_FORMAT_Y416,           VLC_CODEC_I444_16L, DXGI_FORMAT_R16G16B16A16_UINT,  0 },
+#endif
+#ifdef UNTESTED
+    { "P010",     DXGI_FORMAT_P010,           VLC_CODEC_I420_10L, DXGI_FORMAT_R16_UNORM,          DXGI_FORMAT_R16_UNORM },
+    { "Y210",     DXGI_FORMAT_Y210,           VLC_CODEC_I422_10L, DXGI_FORMAT_R16G16B16A16_UNORM, 0 },
+    { "Y410",     DXGI_FORMAT_Y410,           VLC_CODEC_I444_10L, DXGI_FORMAT_R10G10B10A2_UNORM,  0 },
+    { "NV11",     DXGI_FORMAT_NV11,           VLC_CODEC_I411,     DXGI_FORMAT_R8_UNORM,           DXGI_FORMAT_R8G8_UNORM },
+#endif
+    { "R8G8B8X8", DXGI_FORMAT_B8G8R8X8_UNORM, VLC_CODEC_RGB32,    DXGI_FORMAT_B8G8R8X8_UNORM,     0 },
+    { "B8G8R8A8", DXGI_FORMAT_B8G8R8A8_UNORM, VLC_CODEC_BGRA,     DXGI_FORMAT_B8G8R8A8_UNORM,     0 },
+    { "B5G6R5",   DXGI_FORMAT_B5G6R5_UNORM,   VLC_CODEC_RGB16,    DXGI_FORMAT_B5G6R5_UNORM,       0 },
+
+    { NULL, 0, 0, 0, 0}
 };
 
 static const vlc_fourcc_t d3d_subpicture_chromas[] = {
@@ -343,7 +359,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     ID3D11DeviceContext_PSSetShader(sys->d3dcontext, sys->d3dpixelShader, NULL, 0);
     ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, 1, &sys->d3dresViewY);
 
-    if (sys->vlcFormat == VLC_CODEC_NV12)
+    if( sys->d3dFormatUV )
         ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 1, 1, &sys->d3dresViewUV);
 
     ID3D11DeviceContext_PSSetSamplers(sys->d3dcontext, 0, 1, &sys->d3dsampState);
@@ -572,13 +588,15 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     {
         UINT i_formatSupport;
         if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
-                                                       d3d_formats[i].format,
+                                                       d3d_formats[i].formatTexture,
                                                        &i_formatSupport)) &&
                 ( i_formatSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D ))
         {
             msg_Dbg(vd, "Using pixel format %s", d3d_formats[i].name );
-            sys->d3dFormat = d3d_formats[i].format;
-            sys->vlcFormat = d3d_formats[i].fourcc;
+            sys->d3dFormatTex = d3d_formats[i].formatTexture;
+            sys->vlcFormat    = d3d_formats[i].fourcc;
+            sys->d3dFormatY   = d3d_formats[i].formatY;
+            sys->d3dFormatUV  = d3d_formats[i].formatUV;
             break;
         }
     }
@@ -729,7 +747,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     ID3DBlob* pPSBlob = NULL;
 
     /* TODO : Match the version to the D3D_FEATURE_LEVEL */
-    if (sys->vlcFormat == VLC_CODEC_NV12)
+    if( sys->d3dFormatUV )
         hr = D3DCompile(globPixelShaderBiplanarYUV2RGB, strlen(globPixelShaderBiplanarYUV2RGB),
                         NULL, NULL, NULL, "PS", "ps_4_0_level_9_1", 0, 0, &pPSBlob, NULL);
     else
@@ -813,7 +831,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     texDesc.Width = fmt->i_visible_width;
     texDesc.Height = fmt->i_visible_height;
     texDesc.MipLevels = texDesc.ArraySize = 1;
-    texDesc.Format = sys->d3dFormat;
+    texDesc.Format = sys->d3dFormatTex;
     texDesc.SampleDesc.Count = 1;
     texDesc.Usage = D3D11_USAGE_DYNAMIC;
     texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
@@ -828,10 +846,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
     memset(&resviewDesc, 0, sizeof(resviewDesc));
-    if (sys->vlcFormat == VLC_CODEC_NV12)
-        resviewDesc.Format = DXGI_FORMAT_R8_UNORM;
-    else
-        resviewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    resviewDesc.Format = sys->d3dFormatY;
     resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resviewDesc.Texture2D.MipLevels = texDesc.MipLevels;
 
@@ -842,8 +857,9 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    if (sys->vlcFormat == VLC_CODEC_NV12) {
-        resviewDesc.Format = DXGI_FORMAT_R8G8_UNORM;
+    if( sys->d3dFormatUV )
+    {
+        resviewDesc.Format = sys->d3dFormatUV;
         hr = ID3D11Device_CreateShaderResourceView(sys->d3ddevice, (ID3D11Resource *)sys->d3dtexture, &resviewDesc, &sys->d3dresViewUV);
         if (FAILED(hr)) {
             if(sys->d3dtexture) ID3D11Texture2D_Release(sys->d3dtexture);
