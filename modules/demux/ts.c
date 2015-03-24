@@ -348,7 +348,7 @@ enum
     FLAG_FILTERED = 4
 };
 
-#define SEEN(x) ((x).i_flags & FLAG_SEEN)
+#define SEEN(x) ((x)->i_flags & FLAG_SEEN)
 #define SCRAMBLED(x) ((x).i_flags & FLAG_SCRAMBLED)
 
 struct ts_pid_t
@@ -393,6 +393,8 @@ typedef struct
 #define FROM_SCALE(x) (VLC_TS_0 + ((x) * 100 / 9))
 #define TO_SCALE(x)   (((x) - VLC_TS_0) * 9 / 100)
 
+#define PID_ALLOC_CHUNK 16
+
 struct demux_sys_t
 {
     stream_t   *stream;
@@ -421,7 +423,18 @@ struct demux_sys_t
     } arib;
 
     /* All pid */
-    ts_pid_t    pid[8192];
+    struct
+    {
+        ts_pid_t pat;
+        ts_pid_t dummy;
+        /* all non commons ones, dynamically allocated */
+        ts_pid_t **pp_all;
+        int        i_all;
+        int        i_all_alloc;
+        /* last recently used */
+        uint16_t   i_last_pid;
+        ts_pid_t  *p_last;
+    } pids;
 
     bool        b_user_pmt;
     int         i_pmt_es;
@@ -499,6 +512,7 @@ static ts_psi_t *ts_psi_New( demux_t * );
 static void ts_psi_Del( demux_t *, ts_psi_t * );
 
 /* Helpers */
+static ts_pid_t *PID( demux_sys_t *, uint16_t i_pid );
 static ts_pmt_t * GetProgramByID( demux_sys_t *, int i_program );
 static bool ProgramIsSelected( demux_sys_t *, uint16_t i_pgrm );
 static void UpdatePESFilters( demux_t *p_demux, bool b_all );
@@ -897,23 +911,28 @@ static void MissingPATPMTFixup( demux_t *p_demux )
     int i_pcr_pid = 0x1FFF;
     int i_num_pes = 0;
 
-    if( SEEN(p_sys->pid[i_program_pid]) )
+    ts_pid_t *p_program_pid = PID( p_sys, i_program_pid );
+    if( SEEN(p_program_pid) )
     {
         /* Find a free one */
         for( i_program_pid = MIN_ES_PID;
-             i_program_pid <= MAX_ES_PID && SEEN(p_sys->pid[i_program_pid]);
-             i_program_pid++ );
+             i_program_pid <= MAX_ES_PID && SEEN(p_program_pid);
+             i_program_pid++ )
+        {
+            p_program_pid = PID( p_sys, i_program_pid );
+        }
     }
 
-    for( int i = MIN_ES_PID; i <= MAX_ES_PID; i++ )
+    for( int i=0; i<p_sys->pids.i_all; i++ )
     {
-        if( !SEEN(p_sys->pid[i]) ||
-            p_sys->pid[i].probed.i_type == -1 )
+        const ts_pid_t *p_pid = p_sys->pids.pp_all[i];
+        if( !SEEN(p_pid) ||
+            p_pid->probed.i_type == -1 )
             continue;
 
-        if( i_pcr_pid == 0x1FFF && ( p_sys->pid[i].probed.i_type == 0x03 ||
-                                     p_sys->pid[i].probed.i_pcr_count ) )
-            i_pcr_pid = p_sys->pid[i].i_pid;
+        if( i_pcr_pid == 0x1FFF && ( p_pid->probed.i_type == 0x03 ||
+                                     p_pid->probed.i_pcr_count ) )
+            i_pcr_pid = p_pid->i_pid;
 
         i_num_pes++;
     }
@@ -935,13 +954,14 @@ static void MissingPATPMTFixup( demux_t *p_demux )
         .b_discontinuity = false
     };
 
-    BuildPAT( p_sys->pid[0].u.p_pat->handle,
-            &p_sys->pid[0], BuildPATCallback,
+    BuildPAT( PID(p_sys, 0)->u.p_pat->handle,
+            &p_sys->pids.pat, BuildPATCallback,
             0, 1,
             &patstream,
             1, &pmtprogramstream, &i_program_number );
 
-    if( p_sys->pid[i_program_pid].type != TYPE_PMT )
+    /* PAT callback should have been triggered */
+    if( p_program_pid->type != TYPE_PMT )
     {
         msg_Err( p_demux, "PAT creation failed" );
         return;
@@ -958,23 +978,25 @@ static void MissingPATPMTFixup( demux_t *p_demux )
     if( esstreams && mapped )
     {
         int j=0;
-        for( int i = MIN_ES_PID; i <= MAX_ES_PID; i++ )
+        for( int i=0; i<p_sys->pids.i_all; i++ )
         {
-            if( !SEEN(p_sys->pid[i]) ||
-                p_sys->pid[i].probed.i_type == -1 )
+            const ts_pid_t *p_pid = p_sys->pids.pp_all[i];
+
+            if( !SEEN(p_pid) ||
+                p_pid->probed.i_type == -1 )
                 continue;
 
-            esstreams[j].pes.i_stream_type = p_sys->pid[i].probed.i_type;
-            esstreams[j].pes.i_stream_type = p_sys->pid[i].probed.i_type;
-            esstreams[j].ts.i_pid = p_sys->pid[i].i_pid;
+            esstreams[j].pes.i_stream_type = p_pid->probed.i_type;
+            esstreams[j].pes.i_stream_type = p_pid->probed.i_type;
+            esstreams[j].ts.i_pid = p_pid->i_pid;
             mapped[j].pes = &esstreams[j].pes;
             mapped[j].ts = &esstreams[j].ts;
             mapped[j].fmt = &esfmt;
             j++;
         }
 
-        BuildPMT( p_sys->pid[0].u.p_pat->handle, VLC_OBJECT(p_demux),
-                &p_sys->pid[i_program_pid], BuildPMTCallback,
+        BuildPMT( PID(p_sys, 0)->u.p_pat->handle, VLC_OBJECT(p_demux),
+                p_program_pid, BuildPMTCallback,
                 0, 1,
                 i_pcr_pid,
                 NULL,
@@ -1030,16 +1052,9 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_broken_charset = false;
 
-    for( int i = 0; i < 8192; i++ )
-    {
-        ts_pid_t *pid = &p_sys->pid[i];
-        pid->i_pid      = i;
-        pid->i_flags    = FLAGS_NONE;
-        pid->probed.i_fourcc = 0;
-        pid->probed.i_type = 0;
-    }
-    /* PID 8191 is padding */
-    p_sys->pid[8191].i_flags = FLAG_SEEN;
+    p_sys->pids.dummy.i_pid = 8191;
+    p_sys->pids.dummy.i_flags = FLAG_SEEN;
+
     p_sys->i_packet_size = i_packet_size;
     p_sys->i_packet_header_size = i_packet_header_size;
     p_sys->i_ts_read = 50;
@@ -1055,7 +1070,7 @@ static int Open( vlc_object_t *p_this )
     } while (0)
 
     /* Init PAT handler */
-    patpid = &p_sys->pid[0];
+    patpid = PID(p_sys, 0);
     if ( !PIDSetup( p_demux, TYPE_PAT, patpid, NULL ) )
     {
         vlc_mutex_destroy( &p_sys->csa_lock );
@@ -1072,24 +1087,24 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->b_dvb_meta )
     {
-          if( !PIDSetup( p_demux, TYPE_SDT, &p_sys->pid[0x11], NULL ) ||
-              !PIDSetup( p_demux, TYPE_EIT, &p_sys->pid[0x12], NULL ) ||
-              !PIDSetup( p_demux, TYPE_TDT, &p_sys->pid[0x14], NULL ) )
+          if( !PIDSetup( p_demux, TYPE_SDT, PID(p_sys, 0x11), NULL ) ||
+              !PIDSetup( p_demux, TYPE_EIT, PID(p_sys, 0x12), NULL ) ||
+              !PIDSetup( p_demux, TYPE_TDT, PID(p_sys, 0x14), NULL ) )
           {
-              PIDRelease( p_demux, &p_sys->pid[0x11] );
-              PIDRelease( p_demux, &p_sys->pid[0x12] );
-              PIDRelease( p_demux, &p_sys->pid[0x14] );
+              PIDRelease( p_demux, PID(p_sys, 0x11) );
+              PIDRelease( p_demux, PID(p_sys, 0x12) );
+              PIDRelease( p_demux, PID(p_sys, 0x14) );
               p_sys->b_dvb_meta = false;
           }
           else
           {
-              VLC_DVBPSI_DEMUX_TABLE_INIT(&p_sys->pid[0x11], p_demux);
-              VLC_DVBPSI_DEMUX_TABLE_INIT(&p_sys->pid[0x12], p_demux);
-              VLC_DVBPSI_DEMUX_TABLE_INIT(&p_sys->pid[0x14], p_demux);
+              VLC_DVBPSI_DEMUX_TABLE_INIT(PID(p_sys, 0x11), p_demux);
+              VLC_DVBPSI_DEMUX_TABLE_INIT(PID(p_sys, 0x12), p_demux);
+              VLC_DVBPSI_DEMUX_TABLE_INIT(PID(p_sys, 0x14), p_demux);
               if( p_sys->b_access_control &&
-                  ( SetPIDFilter( p_sys, &p_sys->pid[0x11], true ) ||
-                    SetPIDFilter( p_sys, &p_sys->pid[0x14], true ) ||
-                    SetPIDFilter( p_sys, &p_sys->pid[0x12], true ) )
+                  ( SetPIDFilter( p_sys, PID(p_sys, 0x11), true ) ||
+                    SetPIDFilter( p_sys, PID(p_sys, 0x14), true ) ||
+                    SetPIDFilter( p_sys, PID(p_sys, 0x12), true ) )
                  )
                      p_sys->b_access_control = false;
           }
@@ -1194,23 +1209,14 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    PIDRelease( p_demux, &p_sys->pid[0] );
+    PIDRelease( p_demux, PID(p_sys, 0) );
 
     if( p_sys->b_dvb_meta )
     {
-        PIDRelease( p_demux, &p_sys->pid[0x11] );
-        PIDRelease( p_demux, &p_sys->pid[0x12] );
-        PIDRelease( p_demux, &p_sys->pid[0x14] );
+        PIDRelease( p_demux, PID(p_sys, 0x11) );
+        PIDRelease( p_demux, PID(p_sys, 0x12) );
+        PIDRelease( p_demux, PID(p_sys, 0x14) );
     }
-
-#ifndef NDEBUG
-    for( int i = 0; i < 8192; i++ )
-    {
-        ts_pid_t *pid = &p_sys->pid[i];
-        if( pid->type != TYPE_FREE )
-            msg_Err( p_demux, "PID %d type %d not freed", pid->i_pid, pid->type );
-    }
-#endif
 
     vlc_mutex_lock( &p_sys->csa_lock );
     if( p_sys->csa )
@@ -1235,6 +1241,19 @@ static void Close( vlc_object_t *p_this )
     }
 
     vlc_mutex_destroy( &p_sys->csa_lock );
+
+    /* Release all non default pids */
+    for( int i = 0; i < p_sys->pids.i_all; i++ )
+    {
+        ts_pid_t *pid = p_sys->pids.pp_all[i];
+#ifndef NDEBUG
+        if( pid->type != TYPE_FREE )
+            msg_Err( p_demux, "PID %d type %d not freed", pid->i_pid, pid->type );
+#endif
+        free( pid );
+    }
+    free( p_sys->pids.pp_all );
+
     free( p_sys );
 }
 
@@ -1269,7 +1288,7 @@ static int Demux( demux_t *p_demux )
     bool b_wait_es = p_sys->i_pmt_es <= 0;
 
     /* If we had no PAT within MIN_PAT_INTERVAL, create PAT/PMT from probed streams */
-    if( p_sys->i_pmt_es == 0 && !SEEN(p_sys->pid[0]) && p_sys->patfix.b_pat_deadline )
+    if( p_sys->i_pmt_es == 0 && !SEEN(PID(p_sys, 0)) && p_sys->patfix.b_pat_deadline )
         MissingPATPMTFixup( p_demux );
 
     /* We read at most 100 TS packet or until a frame is completed */
@@ -1290,12 +1309,12 @@ static int Demux( demux_t *p_demux )
         }
 
         /* Parse the TS packet */
-        ts_pid_t *p_pid = &p_sys->pid[PIDGet( p_pkt )];
+        ts_pid_t *p_pid = PID( p_sys, PIDGet( p_pkt ) );
 
         if( SCRAMBLED(*p_pid) != !!(p_pkt->p_buffer[3] & 0x80) )
             UpdateScrambledState( p_demux, p_pid, p_pkt->p_buffer[3] & 0x80 );
 
-        if( !SEEN(*p_pid) )
+        if( !SEEN(p_pid) )
         {
             if( p_pid->type == TYPE_FREE )
                 msg_Dbg( p_demux, "pid[%d] unknown", p_pid->i_pid );
@@ -1309,7 +1328,7 @@ static int Demux( demux_t *p_demux )
         }
 
         /* Probe streams to build PAT/PMT after MIN_PAT_INTERVAL in case we don't see any PAT */
-        if( !SEEN(p_sys->pid[0]) &&
+        if( !SEEN( PID( p_sys, 0 ) ) &&
             (p_pid->probed.i_type == 0 || p_pid->i_pid == p_sys->patfix.i_timesourcepid) &&
             (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
             (p_pkt->p_buffer[3] & 0xD0) == 0x10 )  /* Has payload but is not encrypted */
@@ -1402,7 +1421,7 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
 static void UpdatePESFilters( demux_t *p_demux, bool b_all )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+    ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
     for( int i=0; i< p_pat->programs.i_size; i++ )
     {
         ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
@@ -1436,7 +1455,7 @@ static void UpdatePESFilters( demux_t *p_demux, bool b_all )
         /* Select pcr last in case it is handled by unselected ES */
         if( p_pmt->i_pid_pcr > 0 )
         {
-            SetPIDFilter( p_sys, &p_sys->pid[p_pmt->i_pid_pcr], b_program_selected );
+            SetPIDFilter( p_sys, PID(p_sys, p_pmt->i_pid_pcr), b_program_selected );
             if( b_program_selected )
                 msg_Dbg( p_demux, "enabling pcr pid %d from program %d", p_pmt->i_pid_pcr, p_pmt->i_number );
         }
@@ -1456,9 +1475,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     if( PREPARSING || !i_first_program || p_sys->b_default_selection )
     {
-        if( likely(p_sys->pid[0].type == TYPE_PAT) )
+        if( likely(PID(p_sys, 0)->type == TYPE_PAT) )
         {
-            ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+            ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
             /* Set default program for preparse time (no program has been selected) */
             for( int i = 0; i < p_pat->programs.i_size; i++ )
             {
@@ -1639,7 +1658,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else // All ES Mode
             {
                 p_sys->b_es_all = true;
-                ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+                ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
                 for( int i = 0; i < p_pat->programs.i_size; i++ )
                    ARRAY_APPEND( p_sys->programs, p_pat->programs.p_elems[i]->i_pid );
                 UpdatePESFilters( p_demux, true );
@@ -1729,10 +1748,10 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
         i_number = strtol( &psz[1], &psz, 0 );
 
     /* */
-    ts_pid_t *pmtpid = &p_sys->pid[i_pid];
+    ts_pid_t *pmtpid = PID(p_sys, i_pid);
 
     msg_Dbg( p_demux, "user pmt specified (pid=%d,number=%d)", i_pid, i_number );
-    if ( !PIDSetup( p_demux, TYPE_PMT, pmtpid, &p_sys->pid[0] ) )
+    if ( !PIDSetup( p_demux, TYPE_PMT, pmtpid, PID(p_sys, 0) ) )
         goto error;
 
     /* Dummy PMT */
@@ -1746,7 +1765,7 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
         goto error;
     }
 
-    ARRAY_APPEND( p_sys->pid[0].u.p_pat->programs, pmtpid );
+    ARRAY_APPEND( PID(p_sys, 0)->u.p_pat->programs, pmtpid );
 
     psz = strchr( psz, '=' );
     if( psz )
@@ -1768,9 +1787,9 @@ static int UserPmt( demux_t *p_demux, const char *psz_fmt )
         {
             p_pmt->i_pid_pcr = i_pid;
         }
-        else if( p_sys->pid[i_pid].type == TYPE_FREE )
+        else if( PID(p_sys, i_pid)->type == TYPE_FREE )
         {
-            ts_pid_t *pid = &p_sys->pid[i_pid];
+            ts_pid_t *pid = PID(p_sys, i_pid);
 
             char *psz_arg = strchr( psz_opt, '=' );
             if( psz_arg )
@@ -2628,7 +2647,7 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+    ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
     for( int i=0; i< p_pat->programs.i_size; i++ )
     {
         ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
@@ -2708,8 +2727,8 @@ static int SeekToTime( demux_t *p_demux, ts_pmt_t *p_pmt, int64_t i_scaledtime )
                 i_pos = stream_Tell( p_sys->stream );
 
             int i_pid = PIDGet( p_pkt );
-            if( i_pid != 0x1FFF && p_sys->pid[i_pid].type == TYPE_PES &&
-                p_sys->pid[i_pid].p_parent->u.p_pmt == p_pmt &&
+            if( i_pid != 0x1FFF && PID(p_sys, i_pid)->type == TYPE_PES &&
+                PID(p_sys, i_pid)->p_parent->u.p_pmt == p_pmt &&
                (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* Payload start but not corrupt */
                (p_pkt->p_buffer[3] & 0xD0) == 0x10    /* Has payload but is not encrypted */
             )
@@ -2763,12 +2782,62 @@ static int SeekToTime( demux_t *p_demux, ts_pmt_t *p_pmt, int64_t i_scaledtime )
     return VLC_SUCCESS;
 }
 
+static ts_pid_t *PID( demux_sys_t *p_sys, uint16_t i_pid )
+{
+    switch( i_pid )
+    {
+        case 0:
+            return &p_sys->pids.pat;
+        case 0x1FFF:
+            return &p_sys->pids.dummy;
+        default:
+            if( p_sys->pids.i_last_pid == i_pid )
+                return p_sys->pids.p_last;
+        break;
+    }
+
+    for( int i=0; i < p_sys->pids.i_all; i++ )
+    {
+        if( p_sys->pids.pp_all[i]->i_pid == i_pid )
+        {
+            p_sys->pids.p_last = p_sys->pids.pp_all[i];
+            p_sys->pids.i_last_pid = i_pid;
+            return p_sys->pids.p_last;
+        }
+    }
+
+    if( p_sys->pids.i_all >= p_sys->pids.i_all_alloc )
+    {
+        ts_pid_t **p_realloc = realloc( p_sys->pids.pp_all,
+                                       (p_sys->pids.i_all_alloc + PID_ALLOC_CHUNK) * sizeof(ts_pid_t *) );
+        if( !p_realloc )
+            return NULL;
+        p_sys->pids.pp_all = p_realloc;
+        p_sys->pids.i_all_alloc += PID_ALLOC_CHUNK;
+    }
+
+    ts_pid_t *p_pid = calloc( 1, sizeof(*p_pid) );
+    if( !p_pid )
+    {
+        abort();
+        //return NULL;
+    }
+
+    p_pid->i_pid = i_pid;
+    p_sys->pids.pp_all[p_sys->pids.i_all++] = p_pid;
+
+    p_sys->pids.p_last = p_pid;
+    p_sys->pids.i_last_pid = i_pid;
+
+    return p_pid;
+}
+
 static ts_pmt_t * GetProgramByID( demux_sys_t *p_sys, int i_program )
 {
-    if(unlikely(p_sys->pid[0].type != TYPE_PAT))
+    if(unlikely(PID(p_sys, 0)->type != TYPE_PAT))
         return NULL;
 
-    ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+    ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
     for( int i = 0; i < p_pat->programs.i_size; i++ )
     {
         assert(p_pat->programs.p_elems[i]->type == TYPE_PMT);
@@ -2797,7 +2866,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
         }
 
         const int i_pid = PIDGet( p_pkt );
-        ts_pid_t *p_pid = &p_sys->pid[i_pid];
+        ts_pid_t *p_pid = PID(p_sys, i_pid);
 
         p_pid->i_flags |= FLAG_SEEN;
 
@@ -2836,7 +2905,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
 
             if( *pi_pcr != -1 )
             {
-                ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+                ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
                 for( int i=0; i<p_pat->programs.i_size; i++ )
                 {
                     ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
@@ -2940,7 +3009,7 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
     {
         mtime_t i_mindts = -1;
 
-        ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+        ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
         for( int i=0; i< p_pat->programs.i_size; i++ )
         {
             ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
@@ -2990,11 +3059,11 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
     pid->probed.i_pcr_count++;
 
-    if(unlikely(p_sys->pid[0].type != TYPE_PAT))
+    if(unlikely(PID(p_sys, 0)->type != TYPE_PAT))
         return;
 
     /* Search program and set the PCR */
-    ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+    ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
     for( int i = 0; i < p_pat->programs.i_size; i++ )
     {
         ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
@@ -3029,7 +3098,7 @@ static int FindPCRCandidate( ts_pmt_t *p_pmt )
     for( int i=0; i<p_pmt->e_streams.i_size; i++ )
     {
         ts_pid_t *p_pid = p_pmt->e_streams.p_elems[i];
-        if( SEEN(*p_pid) &&
+        if( SEEN(p_pid) &&
             (!p_cand || p_cand->i_pid != i_previous) )
         {
             if( p_pid->probed.i_pcr_count ) /* check PCR frequency first */
@@ -3593,9 +3662,9 @@ static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
     /* This doesn't look like a DVB stream so don't try
      * parsing the SDT/EDT/TDT */
 
-    PIDRelease( p_demux, &p_sys->pid[0x11] );
-    PIDRelease( p_demux, &p_sys->pid[0x12] );
-    PIDRelease( p_demux, &p_sys->pid[0x14] );
+    PIDRelease( p_demux, PID(p_sys, 0x11) );
+    PIDRelease( p_demux, PID(p_sys, 0x12) );
+    PIDRelease( p_demux, PID(p_sys, 0x14) );
     p_sys->b_dvb_meta = false;
 }
 
@@ -3651,7 +3720,7 @@ static char *EITConvertToUTF8( demux_t *p_demux,
 static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 {
     demux_sys_t          *p_sys = p_demux->p_sys;
-    ts_pid_t             *sdt = &p_sys->pid[0x11];
+    ts_pid_t             *sdt = PID(p_sys, 0x11);
     dvbpsi_sdt_service_t *p_srv;
 
     msg_Dbg( p_demux, "SDTCallBack called" );
@@ -4086,7 +4155,7 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
     msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
              i_table_id, i_table_id, i_extension, i_extension );
 #endif
-    if( p_sys->pid[0].u.p_pat->i_version != -1 && i_table_id == 0x42 )
+    if( PID(p_sys, 0)->u.p_pat->i_version != -1 && i_table_id == 0x42 )
     {
         msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
@@ -4094,7 +4163,7 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
         if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_demux ) )
             msg_Err( p_demux, "PSINewTableCallback: failed attaching SDTCallback" );
     }
-    else if( p_sys->pid[0x11].u.p_psi->i_version != -1 &&
+    else if( PID(p_sys, 0x11)->u.p_psi->i_version != -1 &&
              ( i_table_id == 0x4e || /* Current/Following */
                (i_table_id >= 0x50 && i_table_id <= 0x5f) ) ) /* Schedule */
     {
@@ -4108,7 +4177,7 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
         if( !dvbpsi_eit_attach( h, i_table_id, i_extension, cb, p_demux ) )
             msg_Err( p_demux, "PSINewTableCallback: failed attaching EITCallback" );
     }
-    else if( p_demux->p_sys->pid[0x11].u.p_psi->i_version != -1 &&
+    else if( PID(p_sys, 0x11)->u.p_psi->i_version != -1 &&
             (i_table_id == 0x70 /* TDT */ || i_table_id == 0x73 /* TOT */) )
     {
          msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
@@ -5071,7 +5140,7 @@ static void AddAndCreateES( demux_t *p_demux, ts_pid_t *pid, bool b_create_delay
 
     if( b_create_delayed )
     {
-        ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+        ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
         for( int i=0; i< p_pat->programs.i_size; i++ )
         {
             ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
@@ -5106,13 +5175,13 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
     msg_Dbg( p_demux, "PMTCallBack called" );
 
-    if (unlikely(p_sys->pid[0].type != TYPE_PAT))
+    if (unlikely(PID(p_sys, 0)->type != TYPE_PAT))
     {
-        assert(p_sys->pid[0].type == TYPE_PAT);
+        assert(PID(p_sys, 0)->type == TYPE_PAT);
         dvbpsi_pmt_delete(p_dvbpsipmt);
     }
 
-    const ts_pat_t *p_pat = p_sys->pid[0].u.p_pat;
+    const ts_pat_t *p_pat = PID(p_sys, 0)->u.p_pat;
 
     /* First find this PMT declared in PAT */
     for( int i = 0; !pmtpid && i < p_pat->programs.i_size; i++ )
@@ -5164,7 +5233,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     ValidateDVBMeta( p_demux, p_pmt->i_pid_pcr );
 
     if( ProgramIsSelected( p_sys, p_pmt->i_number ) )
-        SetPIDFilter( p_sys, &p_sys->pid[p_pmt->i_pid_pcr], true ); /* Set demux filter */
+        SetPIDFilter( p_sys, PID(p_sys, p_pmt->i_pid_pcr), true ); /* Set demux filter */
 
     /* Parse PMT descriptors */
     ts_pmt_registration_type_t registration_type = TS_PMT_REGISTRATION_NONE;
@@ -5250,7 +5319,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         bool b_reusing_pid = false;
         ts_pes_t *p_pes;
 
-        ts_pid_t *pespid = &p_sys->pid[p_dvbpsies->i_pid];
+        ts_pid_t *pespid = PID(p_sys, p_dvbpsies->i_pid);
         if ( pespid->type == TYPE_PES && pespid->p_parent->u.p_pmt->i_number != p_pmt->i_number )
         {
             msg_Warn( p_demux, " * PMT wants to get a share or pid %d (unsupported)", pespid->i_pid );
@@ -5357,7 +5426,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
         PIDFillFormat( &p_pes->es.fmt, p_dvbpsies->i_type );
 
-        pespid->i_flags |= SEEN(p_sys->pid[p_dvbpsies->i_pid]);
+        pespid->i_flags |= SEEN(PID(p_sys, p_dvbpsies->i_pid));
 
         bool b_registration_applied = false;
         if ( p_dvbpsies->i_type >= 0x80 ) /* non standard, extensions */
@@ -5566,14 +5635,14 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
     demux_t              *p_demux = data;
     demux_sys_t          *p_sys = p_demux->p_sys;
     dvbpsi_pat_program_t *p_program;
-    ts_pid_t             *patpid = &p_sys->pid[0];
-    ts_pat_t             *p_pat = p_sys->pid[0].u.p_pat;
+    ts_pid_t             *patpid = PID(p_sys, 0);
+    ts_pat_t             *p_pat = PID(p_sys, 0)->u.p_pat;
 
     patpid->i_flags |= FLAG_SEEN;
 
     msg_Dbg( p_demux, "PATCallBack called" );
 
-    if(unlikely( p_sys->pid[0].type != TYPE_PAT ))
+    if(unlikely( PID(p_sys, 0)->type != TYPE_PAT ))
     {
         msg_Warn( p_demux, "PATCallBack called on invalid pid" );
         return;
@@ -5608,7 +5677,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
         if( p_program->i_number == 0 )
             continue;
 
-        ts_pid_t *pmtpid = &p_sys->pid[p_program->i_pid];
+        ts_pid_t *pmtpid = PID(p_sys, p_program->i_pid);
 
         ValidateDVBMeta( p_demux, p_program->i_pid );
 
