@@ -781,6 +781,58 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_t *p_pic,
     return 0;
 }
 
+static void PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong timeout)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block = *pp_block;
+    int index;
+    jobject buf;
+    jsize size;
+    uint8_t *bufptr;
+    struct H264ConvertState convert_state = { 0, 0 };
+
+    index = (*env)->CallIntMethod(env, p_sys->codec,
+                                  p_sys->dequeue_input_buffer, timeout);
+    if (CHECK_EXCEPTION()) {
+        msg_Err(p_dec, "Exception occurred in MediaCodec.dequeueInputBuffer");
+        p_sys->error_state = true;
+        return;
+    }
+    if (index < 0)
+        return;
+
+    if (p_sys->get_input_buffers)
+        buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers, index);
+    else
+        buf = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_input_buffer, index);
+    size = (*env)->GetDirectBufferCapacity(env, buf);
+    bufptr = (*env)->GetDirectBufferAddress(env, buf);
+    if (size < 0) {
+        msg_Err(p_dec, "Java buffer has invalid size");
+        p_sys->error_state = true;
+        return;
+    }
+    if ((size_t) size > p_block->i_buffer)
+        size = p_block->i_buffer;
+    memcpy(bufptr, p_block->p_buffer, size);
+
+    convert_h264_to_annexb(bufptr, size, p_sys->nal_size, &convert_state);
+
+    int64_t ts = p_block->i_pts;
+    if (!ts && p_block->i_dts)
+        ts = p_block->i_dts;
+    timestamp_FifoPut(p_sys->timestamp_fifo, p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
+    (*env)->CallVoidMethod(env, p_sys->codec, p_sys->queue_input_buffer, index, 0, size, ts, 0);
+    (*env)->DeleteLocalRef(env, buf);
+    if (CHECK_EXCEPTION()) {
+        msg_Err(p_dec, "Exception in MediaCodec.queueInputBuffer");
+        return;
+    }
+    block_Release(p_block);
+    *pp_block = NULL;
+    p_sys->decoded = true;
+}
+
 static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -981,27 +1033,20 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic = NULL;
     JNIEnv *env = NULL;
-    struct H264ConvertState convert_state = { 0, 0 };
 
     if (!pp_block || !*pp_block)
         return NULL;
 
-    block_t *p_block = *pp_block;
-
-    if (p_sys->error_state) {
-        block_Release(p_block);
-        if (!p_sys->error_event_sent) {
-            /* Signal the error to the Java. */
-            jni_EventHardwareAccelerationError();
-            p_sys->error_event_sent = true;
-        }
-        return NULL;
-    }
+    if (p_sys->error_state)
+        goto endclean;
 
     jni_attach_thread(&env, THREAD_NAME);
+    if (!env)
+        goto endclean;
 
-    if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        block_Release(p_block);
+    if ((*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+        block_Release(*pp_block);
+        *pp_block = NULL;
         timestamp_FifoEmpty(p_sys->timestamp_fifo);
         if (p_sys->decoded) {
             /* Invalidate all pictures that are currently in flight
@@ -1017,8 +1062,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             }
         }
         p_sys->decoded = false;
-        jni_detach_thread();
-        return NULL;
+        goto endclean;
     }
 
     /* Use the aspect ratio provided by the input (ie read from packetizer).
@@ -1032,37 +1076,30 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     jlong timeout = 0;
     const int max_polling_attempts = 50;
     int attempts = 0;
-    while (true) {
-        int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_input_buffer, (jlong) 0);
-        if (CHECK_EXCEPTION()) {
-            msg_Err(p_dec, "Exception occurred in MediaCodec.dequeueInputBuffer");
-            p_sys->error_state = true;
+    /* return when pp_block is processed */
+    while (*pp_block != NULL) {
+        if (*pp_block != NULL)
+            PutInput(p_dec, env, pp_block, (jlong) 0);
+        if (p_sys->error_state)
             break;
-        }
 
-        if (index < 0) {
+        if (p_pic == NULL) {
             GetOutput(p_dec, env, &p_pic, timeout);
             if (p_sys->error_state)
                 break;
-            if (p_pic) {
-                /* If we couldn't get an available input buffer but a
-                 * decoded frame is available, we return the frame
-                 * without assigning NULL to *pp_block. The next call
-                 * to DecodeVideo will try to send the input packet again.
-                 */
-                jni_detach_thread();
-                return p_pic;
-            }
+        }
+
+        if (p_pic == NULL && *pp_block != NULL) {
             timeout = 30 * 1000;
             ++attempts;
             /* With opaque DR the output buffers are released by the
                vout therefore we implement a timeout for polling in
                order to avoid being indefinitely stalled in this loop. */
             if (p_sys->direct_rendering && attempts == max_polling_attempts) {
-                picture_t *invalid_picture = decoder_NewPicture(p_dec);
-                if (invalid_picture) {
-                    invalid_picture->date = VLC_TS_INVALID;
-                    picture_sys_t *p_picsys = invalid_picture->p_sys;
+                p_pic = decoder_NewPicture(p_dec);
+                if (p_pic) {
+                    p_pic->date = VLC_TS_INVALID;
+                    picture_sys_t *p_picsys = p_pic->p_sys;
                     p_picsys->pf_lock_pic = NULL;
                     p_picsys->pf_unlock_pic = NULL;
                     p_picsys->priv.hw.p_dec = NULL;
@@ -1073,59 +1110,32 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                     /* If we cannot return a picture we must free the
                        block since the decoder will proceed with the
                        next block. */
-                    block_Release(p_block);
+                    block_Release(*pp_block);
                     *pp_block = NULL;
                 }
-                jni_detach_thread();
-                return invalid_picture;
             }
-            continue;
         }
-
-        jobject buf;
-        if (p_sys->get_input_buffers)
-            buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers, index);
-        else
-            buf = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_input_buffer, index);
-        jsize size = (*env)->GetDirectBufferCapacity(env, buf);
-        uint8_t *bufptr = (*env)->GetDirectBufferAddress(env, buf);
-        if (size < 0) {
-            msg_Err(p_dec, "Java buffer has invalid size");
-            p_sys->error_state = true;
-            break;
-        }
-        if ((size_t) size > p_block->i_buffer)
-            size = p_block->i_buffer;
-        memcpy(bufptr, p_block->p_buffer, size);
-
-        convert_h264_to_annexb(bufptr, size, p_sys->nal_size, &convert_state);
-
-        int64_t ts = p_block->i_pts;
-        if (!ts && p_block->i_dts)
-            ts = p_block->i_dts;
-        timestamp_FifoPut(p_sys->timestamp_fifo, p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
-        (*env)->CallVoidMethod(env, p_sys->codec, p_sys->queue_input_buffer, index, 0, size, ts, 0);
-        (*env)->DeleteLocalRef(env, buf);
-        if (CHECK_EXCEPTION()) {
-            msg_Err(p_dec, "Exception in MediaCodec.queueInputBuffer");
-            p_sys->error_state = true;
-            break;
-        }
-        p_sys->decoded = true;
-        break;
     }
+
+endclean:
     if (p_sys->error_state) {
+        if( pp_block && *pp_block )
+        {
+            block_Release(*pp_block);
+            *pp_block = NULL;
+        }
         if (p_pic)
             picture_Release(p_pic);
-        jni_detach_thread();
-        return NULL;
-    }
-    if (!p_pic)
-        GetOutput(p_dec, env, &p_pic, 0);
-    jni_detach_thread();
+        p_pic = NULL;
 
-    block_Release(p_block);
-    *pp_block = NULL;
+        if (!p_sys->error_event_sent) {
+            /* Signal the error to the Java. */
+            jni_EventHardwareAccelerationError();
+            p_sys->error_event_sent = true;
+        }
+    }
+    if (env != NULL)
+        jni_detach_thread();
 
     return p_pic;
 }
