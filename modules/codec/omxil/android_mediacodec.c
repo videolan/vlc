@@ -781,7 +781,7 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_t *p_pic,
     return 0;
 }
 
-static void PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong timeout)
+static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block = *pp_block;
@@ -795,11 +795,10 @@ static void PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong ti
                                   p_sys->dequeue_input_buffer, timeout);
     if (CHECK_EXCEPTION()) {
         msg_Err(p_dec, "Exception occurred in MediaCodec.dequeueInputBuffer");
-        p_sys->error_state = true;
-        return;
+        return -1;
     }
     if (index < 0)
-        return;
+        return 0;
 
     if (p_sys->get_input_buffers)
         buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers, index);
@@ -809,8 +808,7 @@ static void PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong ti
     bufptr = (*env)->GetDirectBufferAddress(env, buf);
     if (size < 0) {
         msg_Err(p_dec, "Java buffer has invalid size");
-        p_sys->error_state = true;
-        return;
+        return -1;
     }
     if ((size_t) size > p_block->i_buffer)
         size = p_block->i_buffer;
@@ -826,14 +824,16 @@ static void PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong ti
     (*env)->DeleteLocalRef(env, buf);
     if (CHECK_EXCEPTION()) {
         msg_Err(p_dec, "Exception in MediaCodec.queueInputBuffer");
-        return;
+        return -1;
     }
     block_Release(p_block);
     *pp_block = NULL;
     p_sys->decoded = true;
+
+    return 0;
 }
 
-static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong timeout)
+static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     while (1) {
@@ -841,8 +841,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                                           p_sys->buffer_info, timeout);
         if (CHECK_EXCEPTION()) {
             msg_Err(p_dec, "Exception in MediaCodec.dequeueOutputBuffer (GetOutput)");
-            p_sys->error_state = true;
-            return;
+            return -1;
         }
 
         if (index >= 0) {
@@ -851,8 +850,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
                 if (CHECK_EXCEPTION()) {
                     msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer");
-                    p_sys->error_state = true;
-                    return;
+                    return -1;
                 }
                 continue;
             }
@@ -867,8 +865,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 if (CHECK_EXCEPTION()) {
                     msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer " \
                             "(GetOutput, overwriting previous picture)");
-                    p_sys->error_state = true;
-                    return;
+                    return -1;
                 }
 
                 // No need to lock here since the previous picture was not sent.
@@ -925,7 +922,8 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                             msg_Err(p_dec, "Codec error (IllegalStateException) in MediaCodec.releaseOutputBuffer");
                             (*env)->ExceptionClear(env);
                             (*env)->DeleteLocalRef(env, illegalStateException);
-                            p_sys->error_state = true;
+                            (*env)->DeleteLocalRef(env, buf);
+                            return -1;
                         }
                     }
                     (*env)->DeleteLocalRef(env, buf);
@@ -935,10 +933,10 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
                 if (CHECK_EXCEPTION()) {
                     msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer (GetOutput)");
-                    p_sys->error_state = true;
+                    return -1;
                 }
             }
-            return;
+            return 0;
 
         } else if (index == INFO_OUTPUT_BUFFERS_CHANGED) {
             msg_Dbg(p_dec, "output buffers changed");
@@ -951,8 +949,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             if (CHECK_EXCEPTION()) {
                 msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffer (GetOutput)");
                 p_sys->output_buffers = NULL;
-                p_sys->error_state = true;
-                return;
+                return -1;
             }
 
             p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
@@ -960,8 +957,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             jobject format = (*env)->CallObjectMethod(env, p_sys->codec, p_sys->get_output_format);
             if (CHECK_EXCEPTION()) {
                 msg_Err(p_dec, "Exception in MediaCodec.getOutputFormat (GetOutput)");
-                p_sys->error_state = true;
-                return;
+                return -1;
             }
 
             jobject format_string = (*env)->CallObjectMethod(env, format, p_sys->tostring);
@@ -988,8 +984,7 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
                 if (!GetVlcChromaFormat(p_sys->pixel_format,
                                         &p_dec->fmt_out.i_codec, &name)) {
                     msg_Err(p_dec, "color-format not recognized");
-                    p_sys->error_state = true;
-                    return;
+                    return -1;
                 }
             }
 
@@ -1023,9 +1018,10 @@ static void GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong t
             }
 
         } else {
-            return;
+            return 0;
         }
     }
+    return 0;
 }
 
 static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
@@ -1078,15 +1074,14 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     int attempts = 0;
     /* return when pp_block is processed */
     while (*pp_block != NULL) {
-        if (*pp_block != NULL)
-            PutInput(p_dec, env, pp_block, (jlong) 0);
-        if (p_sys->error_state)
+        if (*pp_block != NULL && PutInput(p_dec, env, pp_block, (jlong) 0) != 0) {
+            p_sys->error_state = true;
             break;
+        }
 
-        if (p_pic == NULL) {
-            GetOutput(p_dec, env, &p_pic, timeout);
-            if (p_sys->error_state)
-                break;
+        if (p_pic == NULL && GetOutput(p_dec, env, &p_pic, timeout) != 0) {
+            p_sys->error_state = true;
+            break;
         }
 
         if (p_pic == NULL && *pp_block != NULL) {
