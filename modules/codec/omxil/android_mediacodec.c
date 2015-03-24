@@ -310,7 +310,7 @@ static inline bool check_exception( JNIEnv *env )
 }
 #define CHECK_EXCEPTION() check_exception( env )
 
-static bool codec_is_blacklisted( const char *p_name, int i_name_len )
+static bool codec_is_blacklisted( const char *p_name, unsigned int i_name_len )
 {
      static const char *blacklisted_codecs[] = {
         /* software decoders */
