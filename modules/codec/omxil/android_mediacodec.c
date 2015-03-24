@@ -710,13 +710,29 @@ static void CloseDecoder(vlc_object_t *p_this)
 }
 
 /*****************************************************************************
+ * ReleaseOutputBuffer
+ *****************************************************************************/
+static int ReleaseOutputBuffer(decoder_t *p_dec, JNIEnv *env, int i_index,
+                               bool b_render)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer,
+                           i_index, b_render);
+    if (CHECK_EXCEPTION()) {
+        msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer");
+        return -1;
+    }
+    return 0;
+}
+
+/*****************************************************************************
  * vout callbacks
  *****************************************************************************/
 static void UnlockPicture(picture_t* p_pic, bool b_render)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
     decoder_t *p_dec = p_picsys->priv.hw.p_dec;
-    decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (!p_picsys->priv.hw.b_valid)
         return;
@@ -735,10 +751,7 @@ static void UnlockPicture(picture_t* p_pic, bool b_render)
     /* Release the MediaCodec buffer. */
     JNIEnv *env = NULL;
     jni_attach_thread(&env, THREAD_NAME);
-    (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, i_index, b_render);
-    if (CHECK_EXCEPTION())
-        msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer (DisplayBuffer)");
-
+    ReleaseOutputBuffer(p_dec, env, i_index, b_render);
     jni_detach_thread();
     p_picsys->priv.hw.b_valid = false;
 
@@ -847,11 +860,8 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong ti
         if (index >= 0) {
             if (!p_sys->pixel_format) {
                 msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
-                (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
-                if (CHECK_EXCEPTION()) {
-                    msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer");
+                if (ReleaseOutputBuffer(p_dec, env, index, false) != 0)
                     return -1;
-                }
                 continue;
             }
 
@@ -861,12 +871,8 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong ti
                 picture_t *p_pic = *pp_pic;
                 picture_sys_t *p_picsys = p_pic->p_sys;
                 int i_prev_index = p_picsys->priv.hw.i_index;
-                (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, i_prev_index, false);
-                if (CHECK_EXCEPTION()) {
-                    msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer " \
-                            "(GetOutput, overwriting previous picture)");
+                if (ReleaseOutputBuffer(p_dec, env, i_prev_index, false) != 0)
                     return -1;
-                }
 
                 // No need to lock here since the previous picture was not sent.
                 InsertInflightPicture(p_dec, NULL, i_prev_index);
@@ -930,11 +936,8 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong ti
                 }
             } else {
                 msg_Warn(p_dec, "NewPicture failed");
-                (*env)->CallVoidMethod(env, p_sys->codec, p_sys->release_output_buffer, index, false);
-                if (CHECK_EXCEPTION()) {
-                    msg_Err(p_dec, "Exception in MediaCodec.releaseOutputBuffer (GetOutput)");
+                if (ReleaseOutputBuffer(p_dec, env, index, false) != 0)
                     return -1;
-                }
             }
             return 0;
 
