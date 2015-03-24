@@ -796,10 +796,9 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_t *p_pic,
     return 0;
 }
 
-static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong timeout)
+static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t *p_block, jlong timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t *p_block = *pp_block;
     int index;
     jobject buf;
     jsize size;
@@ -843,14 +842,12 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t **pp_block, jlong tim
         msg_Err(p_dec, "Exception in MediaCodec.queueInputBuffer");
         return -1;
     }
-    block_Release(p_block);
-    *pp_block = NULL;
     p_sys->decoded = true;
 
-    return 0;
+    return 1;
 }
 
-static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong timeout)
+static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int index = (*env)->CallIntMethod(env, p_sys->codec, p_sys->dequeue_output_buffer,
@@ -863,7 +860,7 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong ti
     if (index >= 0) {
         int64_t i_buffer_pts;
 
-        if (!p_sys->pixel_format) {
+        if (!p_sys->pixel_format || !p_pic) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
             return ReleaseOutputBuffer(p_dec, env, index, false);
         }
@@ -872,12 +869,6 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong ti
         if (i_buffer_pts <= p_sys->i_preroll_end)
             return ReleaseOutputBuffer(p_dec, env, index, false);
 
-        *pp_pic = decoder_NewPicture(p_dec);
-        if (!*pp_pic) {
-            msg_Warn(p_dec, "NewPicture failed");
-            return ReleaseOutputBuffer(p_dec, env, index, false);
-        }
-        picture_t *p_pic = *pp_pic;
         /* If the oldest input block had no PTS, the timestamp
          * of the frame returned by MediaCodec might be wrong
          * so we overwrite it with the corresponding dts. */
@@ -932,6 +923,7 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t **pp_pic, jlong ti
             }
             (*env)->DeleteLocalRef(env, buf);
         }
+        return 1;
     } else if (index == INFO_OUTPUT_BUFFERS_CHANGED) {
         msg_Dbg(p_dec, "output buffers changed");
         if (!p_sys->get_output_buffers)
@@ -1061,46 +1053,48 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     }
 
     jlong timeout = 0;
-    const int max_polling_attempts = 50;
-    int attempts = 0;
-    /* return when pp_block is processed */
-    while (*pp_block != NULL) {
-        if (*pp_block != NULL && PutInput(p_dec, env, pp_block, (jlong) 0) != 0) {
-            p_sys->error_state = true;
-            break;
-        }
-
-        if (p_pic == NULL && GetOutput(p_dec, env, &p_pic, timeout) != 0) {
-            p_sys->error_state = true;
-            break;
-        }
-
-        if (p_pic == NULL && *pp_block != NULL) {
-            timeout = 30 * 1000;
-            ++attempts;
-            /* With opaque DR the output buffers are released by the
-               vout therefore we implement a timeout for polling in
-               order to avoid being indefinitely stalled in this loop. */
-            if (p_sys->direct_rendering && attempts == max_polling_attempts) {
-                p_pic = decoder_NewPicture(p_dec);
-                if (p_pic) {
-                    p_pic->date = VLC_TS_INVALID;
-                    picture_sys_t *p_picsys = p_pic->p_sys;
-                    p_picsys->pf_lock_pic = NULL;
-                    p_picsys->pf_unlock_pic = NULL;
-                    p_picsys->priv.hw.p_dec = NULL;
-                    p_picsys->priv.hw.i_index = -1;
-                    p_picsys->priv.hw.b_valid = false;
-                }
-                else {
-                    /* If we cannot return a picture we must free the
-                       block since the decoder will proceed with the
-                       next block. */
-                    block_Release(*pp_block);
-                    *pp_block = NULL;
-                }
+    int i_output_ret = 0;
+    int i_input_ret = 0;
+    /* return when pp_block is processed or when we got an output pic */
+    while (i_input_ret != 1 && i_output_ret != 1) {
+        if (i_input_ret == 0) {
+            i_input_ret = PutInput(p_dec, env, *pp_block, timeout);
+            if (i_input_ret == 1) {
+                block_Release(*pp_block);
+                *pp_block = NULL;
+            } else if (i_input_ret == -1) {
+                p_sys->error_state = true;
+                break;
             }
         }
+
+        if (i_output_ret == 0) {
+            /* FIXME: A new picture shouldn't be created each time.
+             * If decoder_NewPicture fails because the decoder is
+             * flushing/exiting, GetOutput will either fail (or crash in
+             * function of devices), or never return an output buffer. Indeed,
+             * if the Decoder is flushing, MediaCodec can be stalled since the
+             * input is waiting for the output or vice-versa.  Therefore, call
+             * decoder_NewPicture before GetOutput as a safeguard. */
+
+            if (p_sys->pixel_format) {
+                p_pic = decoder_NewPicture(p_dec);
+                if (!p_pic) {
+                    msg_Warn(p_dec, "NewPicture failed");
+                    goto endclean;
+                }
+            }
+            i_output_ret = GetOutput(p_dec, env, p_pic, timeout);
+            msg_Err(p_dec, "i_output_ret: %d", i_output_ret);
+            if (i_output_ret == -1) {
+                p_sys->error_state = true;
+                break;
+            } else if (i_output_ret == 0 && p_pic) {
+                picture_Release(p_pic);
+                p_pic = NULL;
+            }
+        }
+        timeout = 10 * 1000;
     }
 
 endclean:
