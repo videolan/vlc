@@ -326,17 +326,6 @@ int DirInit (access_t *p_access, DIR *handle)
     p_access->p_sys = p_sys;
     p_sys->ignored_exts = var_InheritString (p_access, "ignore-filetypes");
 
-
-    /* Handle mode */
-    char *psz_rec = var_InheritString (p_access, "recursive");
-    if (psz_rec == NULL || !strcasecmp (psz_rec, "none"))
-        p_sys->mode = MODE_NONE;
-    else if (!strcasecmp (psz_rec, "collapse"))
-        p_sys->mode = MODE_COLLAPSE;
-    else
-        p_sys->mode = MODE_EXPAND;
-    free (psz_rec);
-
     p_access->pf_readdir = DirRead;
     p_access->pf_control = DirControl;
 
@@ -392,7 +381,6 @@ int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         i_res = directory_open (p_current, psz_entry, &handle);
 
         if (i_res == ENTRY_EACCESS
-            || (i_res == ENTRY_DIR && p_sys->mode == MODE_NONE)
             || (i_res == ENTRY_ENOTDIR && has_ext (p_sys->ignored_exts, psz_entry)))
             continue;
 
@@ -421,17 +409,7 @@ int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         }
 
         input_item_CopyOptions (p_current_node->p_item, p_new);
-        input_item_node_t *p_new_node = input_item_node_AppendItem (p_current_node, p_new);
-
-        /* Handle directory flags and recursion if in EXPAND mode  */
-        if (i_res == ENTRY_DIR)
-        {
-            if (p_sys->mode == MODE_EXPAND
-                && directory_push (p_sys, handle, psz_full_uri))
-            {
-                p_current_node = p_new_node;
-            }
-        }
+        input_item_node_AppendItem (p_current_node, p_new);
 
         free (psz_full_uri);
         input_item_Release (p_new);

@@ -88,6 +88,9 @@ struct input_item_t
     bool        b_net;               /**< Net: always true for TYPE_STREAM, it
                                           depends for others types */
     bool        b_error_when_reading;/**< Error When Reading */
+
+    int         i_preparse_depth;    /**< How many level of sub items can be preparsed:
+                                          -1: recursive, 0: none, >0: n levels */
 };
 
 TYPEDEF_ARRAY(input_item_t*, input_item_array_t)

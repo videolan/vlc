@@ -197,7 +197,8 @@ int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
          * demux_Demux in order to fetch sub items */
         bool b_is_playlist = false;
 
-        if ( demux_Control( p_input->p->input.p_demux,
+        if ( input_item_ShouldPreparseSubItems( p_item )
+          && demux_Control( p_input->p->input.p_demux,
                             DEMUX_IS_PLAYLIST,
                             &b_is_playlist ) )
             b_is_playlist = false;
@@ -364,6 +365,26 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     if( !p_item->p_stats )
         p_item->p_stats = stats_NewInputStats( p_input );
+
+    /* setup the preparse depth of the item
+     * if we are preparsing, use the i_preparse_depth of the parent item */
+    if( !p_input->b_preparsing )
+    {
+        char *psz_rec = var_InheritString( p_parent, "recursive" );
+
+        if( psz_rec != NULL )
+        {
+            if ( !strcasecmp( psz_rec, "none" ) )
+                p_item->i_preparse_depth = 0;
+            else if ( !strcasecmp( psz_rec, "collapse" ) )
+                p_item->i_preparse_depth = 1;
+            else
+                p_item->i_preparse_depth = -1; /* default is expand */
+            free (psz_rec);
+        } else
+            p_item->i_preparse_depth = -1;
+    }
+
     vlc_mutex_unlock( &p_item->lock );
 
     /* No slave */

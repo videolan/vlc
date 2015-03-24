@@ -423,6 +423,17 @@ bool input_item_IsArtFetched( input_item_t *p_item )
     return b_fetched;
 }
 
+bool input_item_ShouldPreparseSubItems( input_item_t *p_item )
+{
+    bool b_ret;
+
+    vlc_mutex_lock( &p_item->lock );
+    b_ret = p_item->i_preparse_depth == -1 ? true : p_item->i_preparse_depth > 0;
+    vlc_mutex_unlock( &p_item->lock );
+
+    return b_ret;
+}
+
 input_item_t *input_item_Hold( input_item_t *p_item )
 {
     input_item_owner_t *owner = item_owner(p_item);
@@ -1070,8 +1081,19 @@ void input_item_node_Delete( input_item_node_t *p_node )
 
 input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_item_t *p_item )
 {
+    int i_preparse_depth;
     input_item_node_t *p_new_child = input_item_node_Create( p_item );
     if( !p_new_child ) return NULL;
+
+    vlc_mutex_lock( &p_node->p_item->lock );
+    vlc_mutex_lock( &p_item->lock );
+    i_preparse_depth = p_node->p_item->i_preparse_depth;
+    p_item->i_preparse_depth = i_preparse_depth > 0 ?
+                               i_preparse_depth -1 :
+                               i_preparse_depth;
+    vlc_mutex_unlock( &p_item->lock );
+    vlc_mutex_unlock( &p_node->p_item->lock );
+
     input_item_node_AppendNode( p_node, p_new_child );
     return p_new_child;
 }
