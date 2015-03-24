@@ -166,6 +166,12 @@ CFLAGS := $(CFLAGS) $(EXTRA_CFLAGS) -g
 CXXFLAGS := $(CXXFLAGS) $(EXTRA_CFLAGS) -g
 EXTRA_LDFLAGS += -L$(PREFIX)/lib
 LDFLAGS := $(LDFLAGS) $(EXTRA_LDFLAGS)
+
+ifndef WITH_OPTIMIZATION
+CFLAGS := $(CFLAGS) -O0
+CXXFLAGS := $(CXXFLAGS) -O0
+endif
+
 # Do not export those! Use HOSTVARS.
 
 # Do the FPU detection, after we have figured out our compilers and flags.

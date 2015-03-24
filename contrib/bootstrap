@@ -31,6 +31,7 @@ usage()
 	echo "  --disable-sout   configure to not build stream output packages"
 	echo "  --enable-small   optimize libraries for size with slight speed decrease [DANGEROUS]"
 	echo "  --disable-gpl    configure to not build viral GPL code"
+	echo "  --disable-optim  disable optimization in libraries"
 }
 
 BUILD=
@@ -42,6 +43,7 @@ BUILD_ENCODERS="1"
 BUILD_NETWORK="1"
 BUILD_DISCS="1"
 GPL="1"
+WITH_OPTIMIZATION="1"
 
 if test ! -f "../../contrib/src/main.mak"
 then
@@ -73,6 +75,9 @@ do
 			;;
 		--disable-sout)
 			BUILD_ENCODERS=
+			;;
+		--disable-optim)
+			WITH_OPTIMIZATION=
 			;;
 		--enable-small)
 			ENABLE_SMALL=1
@@ -226,6 +231,7 @@ test -z "$BUILD_ENCODERS" || add_make_enabled "BUILD_ENCODERS"
 test -z "$BUILD_NETWORK" || add_make_enabled "BUILD_NETWORK"
 test -z "$ENABLE_SMALL" || add_make_enabled "ENABLE_SMALL"
 test -z "$GPL" || add_make_enabled "GPL"
+test -z "$WITH_OPTIMIZATION" || add_make_enabled "WITH_OPTIMIZATION"
 
 #
 # Checks
