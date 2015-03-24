@@ -104,9 +104,9 @@ static void Direct3D11DestroyResources(vout_display_t *);
 
 static int  Direct3D11MapTexture(picture_t *);
 
-/* All the #if 0 contain an alternative method to setup dx11
+/* All the #if USE_DXGI contain an alternative method to setup dx11
    They both need to be benchmarked to see which performs better */
-#if 0
+#if USE_DXGI
 /* I have no idea why MS decided dxgi headers do not define this
    As they do have prototypes for d3d11 functions */
 typedef HRESULT(WINAPI *PFN_CREATE_DXGI_FACTORY)(REFIID riid, void **ppFactory);
@@ -198,7 +198,7 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-# if 0
+# if USE_DXGI
     HINSTANCE hdxgi_dll = LoadLibrary(TEXT("DXGI.DLL"));
     if (!hdxgi_dll) {
         msg_Warn(vd, "cannot load dxgi.dll, aborting");
@@ -233,7 +233,7 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-# if 0
+# if USE_DXGI
     sys->hdxgi_dll = hdxgi_dll;
 
     /* TODO : enable all dxgi versions from 1.3 -> 1.1 */
@@ -369,7 +369,7 @@ static void Direct3D11Destroy(vout_display_t *vd)
 
     vout_display_sys_t *sys = vd->sys;
 
-# if 0
+# if USE_DXGI
     if (sys->hdxgi_dll)
         FreeLibrary(sys->hdxgi_dll);
 # endif
@@ -458,7 +458,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     scd.OutputWindow = sys->hvideownd;
 # endif
 
-# if 0
+# if USE_DXGI
 
     /* TODO : list adapters for the user to choose from */
     hr = IDXGIFactory_EnumAdapters(sys->dxgifactory, 0, &sys->dxgiadapter);
