@@ -314,21 +314,6 @@ typedef enum
     TS_PMT_REGISTRATION_HDMV
 } ts_pmt_registration_type_t;
 
-typedef struct
-{
-    es_format_t  fmt;
-    es_out_id_t *id;
-    ts_es_data_type_t data_type;
-    int         i_data_size;
-    int         i_data_gathered;
-    block_t     *p_data;
-    block_t    **pp_last;
-
-    es_mpeg4_descriptor_t *p_mpeg4desc;
-
-    block_t *   p_prepcr_outqueue;
-} ts_es_t;
-
 typedef enum
 {
     TYPE_FREE = 0,
