@@ -5208,6 +5208,8 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     {
         IODFree( p_pmt->iod );
         p_pmt->iod = NULL;
+        for( int i=0; i<old_es_rm.i_size; i++ )
+            old_es_rm.p_elems[i]->u.p_pes->es.p_mpeg4desc = NULL;
     }
 
     msg_Dbg( p_demux, "new PMT program number=%d version=%d pid_pcr=%d",
