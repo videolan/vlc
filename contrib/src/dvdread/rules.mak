@@ -1,5 +1,5 @@
 # DVDREAD
-LIBDVDREAD_VERSION := 5.0.2
+LIBDVDREAD_VERSION := 5.0.3
 LIBDVDREAD_URL := $(VIDEOLAN)/libdvdread/$(LIBDVDREAD_VERSION)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
@@ -7,7 +7,7 @@ ifdef GPL
 PKGS += dvdread
 endif
 endif
-ifeq ($(call need_pkg,"dvdread > 5.0.0 "),)
+ifeq ($(call need_pkg,"dvdread > 5.0.2 "),)
 PKGS_FOUND += dvdread
 endif
 
