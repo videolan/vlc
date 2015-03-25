@@ -274,7 +274,7 @@ typedef struct
 {
     es_format_t  fmt;
     es_out_id_t *id;
-    es_mpeg4_descriptor_t *p_mpeg4desc;
+    const es_mpeg4_descriptor_t *p_mpeg4desc;
 } ts_pes_es_t;
 
 typedef enum
@@ -2251,7 +2251,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     else if( pid->u.p_pes->es.fmt.i_codec == VLC_CODEC_SUBT &&
              pid->u.p_pes->es.p_mpeg4desc )
     {
-        decoder_config_descriptor_t *dcd = &pid->u.p_pes->es.p_mpeg4desc->dec_descr;
+        const decoder_config_descriptor_t *dcd = &pid->u.p_pes->es.p_mpeg4desc->dec_descr;
 
         if( dcd->i_extra > 2 &&
             dcd->p_extra[0] == 0x10 &&
@@ -5849,7 +5849,6 @@ static void ts_pes_Del( demux_t *p_demux, ts_pes_t *pes )
         block_ChainRelease( pes->p_prepcr_outqueue );
 
     es_format_Clean( &pes->es.fmt );
-    free( pes->es.p_mpeg4desc );
 
     for( int i = 0; i < pes->extra_es.i_size; i++ )
     {
