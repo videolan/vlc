@@ -117,6 +117,17 @@ struct decoder_sys_t
     /* Value from Picture Parameter Set */
     int i_pic_order_present_flag;
 
+    /* VUI */
+    bool b_timing_info_present_flag;
+    uint32_t i_num_units_in_tick;
+    uint32_t i_time_scale;
+    bool b_fixed_frame_rate;
+    bool b_pic_struct_present_flag;
+    uint8_t i_pic_struct;
+    bool b_cpb_dpb_delays_present_flag;
+    uint8_t i_cpb_removal_delay_length_minus1;
+    uint8_t i_dpb_output_delay_length_minus1;
+
     /* Useful values of the Slice Header */
     slice_t slice;
 
@@ -151,6 +162,7 @@ enum nal_unit_type_e
 /* Defined in H.264 annex D */
 enum sei_type_e
 {
+    SEI_PIC_TIMING = 1,
     SEI_USER_DATA_REGISTERED = 4,
     SEI_RECOVERY_POINT = 6
 };
@@ -230,6 +242,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->slice.i_bottom_field_flag = -1;
     p_sys->slice.i_pic_order_cnt_lsb = -1;
     p_sys->slice.i_delta_pic_order_cnt_bottom = -1;
+
+    p_sys->b_timing_info_present_flag = false;
+    p_sys->b_pic_struct_present_flag = false;
+    p_sys->b_cpb_dpb_delays_present_flag = false;
+    p_sys->i_cpb_removal_delay_length_minus1 = 0;
+    p_sys->i_dpb_output_delay_length_minus1 = 0;
 
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
@@ -946,6 +964,71 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
                 p_dec->fmt_out.video.i_sar_den = 1;
             }
         }
+
+        /* overscan */
+        i_tmp = bs_read( &s, 1 );
+        if ( i_tmp )
+            bs_read( &s, 1 );
+
+        /* video signal type */
+        i_tmp = bs_read( &s, 1 );
+        if( i_tmp )
+        {
+            bs_read( &s, 4 );
+            /* colour desc */
+            bs_read( &s, 1 );
+            if ( i_tmp )
+                bs_read( &s, 24 );
+        }
+
+        /* chroma loc info */
+        i_tmp = bs_read( &s, 1 );
+        if( i_tmp )
+        {
+            bs_read_ue( &s );
+            bs_read_ue( &s );
+        }
+
+        /* timing info */
+        p_sys->b_timing_info_present_flag = bs_read( &s, 1 );
+        if( p_sys->b_timing_info_present_flag )
+        {
+            p_sys->i_num_units_in_tick = bs_read( &s, 32 );
+            p_sys->i_time_scale = bs_read( &s, 32 );
+            p_sys->b_fixed_frame_rate = bs_read( &s, 1 );
+        }
+
+        /* Nal hrd & VC1 hrd parameters */
+        p_sys->b_cpb_dpb_delays_present_flag = false;
+        for ( int i=0; i<2; i++ )
+        {
+            i_tmp = bs_read( &s, 1 );
+            if( i_tmp )
+            {
+                p_sys->b_cpb_dpb_delays_present_flag = true;
+                uint32_t count = bs_read_ue( &s ) + 1;
+                bs_read( &s, 4 );
+                bs_read( &s, 4 );
+                for( uint32_t i=0; i<count; i++ )
+                {
+                    bs_read_ue( &s );
+                    bs_read_ue( &s );
+                    bs_read( &s, 1 );
+                }
+                bs_read( &s, 5 );
+                p_sys->i_cpb_removal_delay_length_minus1 = bs_read( &s, 5 );
+                p_sys->i_dpb_output_delay_length_minus1 = bs_read( &s, 5 );
+                bs_read( &s, 5 );
+            }
+        }
+
+        if( p_sys->b_cpb_dpb_delays_present_flag )
+            bs_read( &s, 1 );
+
+        /* pic struct info */
+        p_sys->b_pic_struct_present_flag = bs_read( &s, 1 );
+
+        /* + unparsed remains */
     }
 
     free( pb_dec );
@@ -1135,6 +1218,29 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
         /* Check room */
         if( i_used + i_size + 1 > i_dec )
             break;
+
+        /* Look for pic timing */
+        if( i_type == SEI_PIC_TIMING )
+        {
+            bs_t s;
+            const int      i_tim = i_size;
+            const uint8_t *p_tim = &pb_dec[i_used];
+
+            bs_init( &s, p_tim, i_tim );
+
+            if( p_sys->b_cpb_dpb_delays_present_flag )
+            {
+                bs_read( &s, p_sys->i_cpb_removal_delay_length_minus1 + 1 );
+                bs_read( &s, p_sys->i_dpb_output_delay_length_minus1 + 1 );
+            }
+
+            if( p_sys->b_pic_struct_present_flag )
+            {
+                p_sys->i_pic_struct = bs_read( &s, 4 );
+                msg_Err(p_dec, "PIC STRUCT %d", p_sys->i_pic_struct);
+            }
+            /* + unparsed remains */
+        }
 
         /* Look for user_data_registered_itu_t_t35 */
         if( i_type == SEI_USER_DATA_REGISTERED )
