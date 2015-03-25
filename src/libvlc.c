@@ -608,6 +608,10 @@ int libvlc_MetaRequest(libvlc_int_t *libvlc, input_item_t *item,
     if (unlikely(priv->parser == NULL))
         return VLC_ENOMEM;
 
+    vlc_mutex_lock( &item->lock );
+    if( item->i_preparse_depth == 0 )
+        item->i_preparse_depth = 1;
+    vlc_mutex_unlock( &item->lock );
     playlist_preparser_Push(priv->parser, item, i_options);
     return VLC_SUCCESS;
 }
