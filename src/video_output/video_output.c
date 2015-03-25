@@ -1558,16 +1558,23 @@ static void *Thread(void *object)
     };
 
     mtime_t deadline = VLC_TS_INVALID;
+    bool wait = false;
     for (;;) {
         vout_control_cmd_t cmd;
-        /* FIXME remove thoses ugly timeouts */
-        while (!vout_control_Pop(&sys->control, &cmd, deadline, 100000))
+
+        if (wait)
+        {
+            const mtime_t max_deadline = mdate() + 100000;
+            deadline = deadline <= VLC_TS_INVALID ? max_deadline : __MIN(deadline, max_deadline);
+        } else {
+            deadline = VLC_TS_INVALID;
+        }
+        while (!vout_control_Pop(&sys->control, &cmd, deadline))
             if (ThreadControl(vout, cmd))
                 return NULL;
 
         deadline = VLC_TS_INVALID;
-        while (!ThreadDisplayPicture(vout, &deadline))
-            ;
+        wait = ThreadDisplayPicture(vout, &deadline) != VLC_SUCCESS;
 
         const bool picture_interlaced = sys->displayed.is_interlaced;
 
