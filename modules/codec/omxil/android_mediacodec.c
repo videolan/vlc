@@ -1085,7 +1085,6 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                 }
             }
             i_output_ret = GetOutput(p_dec, env, p_pic, timeout);
-            msg_Err(p_dec, "i_output_ret: %d", i_output_ret);
             if (i_output_ret == -1) {
                 p_sys->error_state = true;
                 break;
