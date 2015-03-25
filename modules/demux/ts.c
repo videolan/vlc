@@ -4238,7 +4238,7 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pes_es_t *p_es,
     /* MPEG-4 stream: search FMC_DESCRIPTOR (SL Packetized stream) */
     dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x1f );
 
-    if( p_dr && p_dr->i_length == 2 )
+    if( p_dr && p_dr->i_length == 2 && p_pmt->iod )
     {
         const int i_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
 
