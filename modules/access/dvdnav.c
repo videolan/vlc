@@ -76,8 +76,13 @@
 
 #define LANGUAGE_DEFAULT ("en")
 
-static int  Open ( vlc_object_t * );
+static int  AccessDemuxOpen ( vlc_object_t * );
 static void Close( vlc_object_t * );
+
+#if DVDREAD_VERSION >= 50300
+#define HAVE_DVDNAV_DEMUX
+static int  DemuxOpen ( vlc_object_t * );
+#endif
 
 vlc_module_begin ()
     set_shortname( N_("DVD with menus") )
@@ -90,7 +95,16 @@ vlc_module_begin ()
         MENU_TEXT, MENU_LONGTEXT, false )
     set_capability( "access_demux", 5 )
     add_shortcut( "dvd", "dvdnav", "file" )
-    set_callbacks( Open, Close )
+    set_callbacks( AccessDemuxOpen, Close )
+#ifdef HAVE_DVDNAV_DEMUX
+    add_submodule()
+        set_description( N_("DVDnav demuxer") )
+        set_category( CAT_INPUT )
+        set_subcategory( SUBCAT_INPUT_DEMUX )
+        set_capability( "demux", 5 )
+        set_callbacks( DemuxOpen, Close )
+        add_shortcut( "dvd", "iso" )
+#endif
 vlc_module_end ()
 
 /* Shall we use libdvdnav's read ahead cache? */
@@ -109,6 +123,7 @@ struct demux_sys_t
 
     /* */
     bool        b_reset_pcr;
+    bool        b_readahead;
 
     struct
     {
@@ -173,66 +188,17 @@ static int EventIntf( vlc_object_t *, char const *,
                       vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
- * DemuxOpen:
+ * CommonOpen:
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int CommonOpen( vlc_object_t *p_this,
+                       dvdnav_t *p_dvdnav, bool b_readahead )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    dvdnav_t    *p_dvdnav;
     int         i_angle;
-    char        *psz_file;
     char        *psz_code;
-    bool forced = false;
 
-    if( p_demux->psz_access != NULL
-     && !strncmp(p_demux->psz_access, "dvd", 3) )
-        forced = true;
-
-    if( !p_demux->psz_file || !*p_demux->psz_file )
-    {
-        /* Only when selected */
-        if( !forced )
-            return VLC_EGENERIC;
-
-        psz_file = var_InheritString( p_this, "dvd" );
-    }
-    else
-        psz_file = strdup( p_demux->psz_file );
-
-#if defined( _WIN32 ) || defined( __OS2__ )
-    if( psz_file != NULL )
-    {
-        /* Remove trailing backslash, otherwise dvdnav_open will fail */
-        size_t flen = strlen( psz_file );
-        if( flen > 0 && psz_file[flen - 1] == '\\' )
-            psz_file[flen - 1] = '\0';
-    }
-    else
-        psz_file = strdup("");
-#endif
-    if( unlikely(psz_file == NULL) )
-        return VLC_EGENERIC;
-
-    /* Try some simple probing to avoid going through dvdnav_open too often */
-    if( !forced && ProbeDVD( psz_file ) != VLC_SUCCESS )
-    {
-        free( psz_file );
-        return VLC_EGENERIC;
-    }
-
-    /* Open dvdnav */
-    const char *psz_path = ToLocale( psz_file );
-    if( dvdnav_open( &p_dvdnav, psz_path ) != DVDNAV_STATUS_OK )
-        p_dvdnav = NULL;
-    LocaleFree( psz_path );
-    if( p_dvdnav == NULL )
-    {
-        msg_Warn( p_demux, "cannot open DVD (%s)", psz_file);
-        free( psz_file );
-        return VLC_EGENERIC;
-    }
-    free( psz_file );
+    assert( p_dvdnav );
 
     /* Fill p_demux field */
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
@@ -247,6 +213,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_spu_change = false;
     p_sys->i_vobu_index = 0;
     p_sys->i_vobu_flush = 0;
+    p_sys->b_readahead = b_readahead;
 
     if( 1 )
     {
@@ -266,7 +233,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Configure dvdnav */
-    if( dvdnav_set_readahead_flag( p_sys->dvdnav, DVD_READ_CACHE ) !=
+    if( dvdnav_set_readahead_flag( p_sys->dvdnav, p_sys->b_readahead ) !=
           DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "cannot set read-a-head flag" );
@@ -329,7 +296,6 @@ static int Open( vlc_object_t *p_this )
             dialog_Fatal( p_demux, _("Playback failure"), "%s",
                             _("VLC cannot set the DVD's title. It possibly "
                               "cannot decrypt the entire disc.") );
-            dvdnav_close( p_sys->dvdnav );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -368,6 +334,162 @@ static int Open( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * AccessDemuxOpen:
+ *****************************************************************************/
+static int AccessDemuxOpen ( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+    dvdnav_t *p_dvdnav = NULL;
+    char *psz_file = NULL;
+    const char *psz_path = NULL;
+    int i_ret = VLC_EGENERIC;
+    bool forced = false;
+
+    if( p_demux->psz_access != NULL
+     && !strncmp(p_demux->psz_access, "dvd", 3) )
+        forced = true;
+
+    if( !p_demux->psz_file || !*p_demux->psz_file )
+    {
+        /* Only when selected */
+        if( !forced )
+            return VLC_EGENERIC;
+
+        psz_file = var_InheritString( p_this, "dvd" );
+    }
+    else
+        psz_file = strdup( p_demux->psz_file );
+
+#if defined( _WIN32 ) || defined( __OS2__ )
+    if( psz_file != NULL )
+    {
+        /* Remove trailing backslash, otherwise dvdnav_open will fail */
+        size_t flen = strlen( psz_file );
+        if( flen > 0 && psz_file[flen - 1] == '\\' )
+            psz_file[flen - 1] = '\0';
+    }
+    else
+        psz_file = strdup("");
+#endif
+
+    if( unlikely(psz_file == NULL) )
+        return VLC_EGENERIC;
+
+    /* Try some simple probing to avoid going through dvdnav_open too often */
+    if( !forced && ProbeDVD( psz_file ) != VLC_SUCCESS )
+        goto bailout;
+
+    /* Open dvdnav */
+    psz_path = ToLocale( psz_file );
+    if( dvdnav_open( &p_dvdnav, psz_path ) != DVDNAV_STATUS_OK )
+    {
+        msg_Warn( p_demux, "cannot open DVD (%s)", psz_file);
+        goto bailout;
+    }
+
+    i_ret = CommonOpen( p_this, p_dvdnav, !!DVD_READ_CACHE );
+    if( i_ret != VLC_SUCCESS )
+        dvdnav_close( p_dvdnav );
+
+bailout:
+    free( psz_file );
+    if( psz_path )
+        LocaleFree( psz_path );
+    return i_ret;
+}
+
+#ifdef HAVE_DVDNAV_DEMUX
+/*****************************************************************************
+ * StreamProbeDVD: very weak probing that avoids going too often into a dvdnav_open()
+ *****************************************************************************/
+static int StreamProbeDVD( stream_t *s )
+{
+    /* ISO 9660 volume descriptor */
+    char iso_dsc[6];
+    if( stream_Seek( s, 0x8000 + 1 ) != VLC_SUCCESS
+     || stream_Read( s, iso_dsc, sizeof (iso_dsc) ) < (int)sizeof (iso_dsc)
+     || memcmp( iso_dsc, "CD001\x01", 6 ) )
+        return VLC_EGENERIC;
+
+    /* Try to find the anchor (2 bytes at LBA 256) */
+    uint16_t anchor;
+
+    if( stream_Seek( s, 256 * DVD_VIDEO_LB_LEN ) == VLC_SUCCESS
+     && stream_Read( s, &anchor, 2 ) == 2
+     && GetWLE( &anchor ) == 2 )
+        return VLC_SUCCESS;
+    else
+        return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * dvdnav stream callbacks
+ *****************************************************************************/
+static int stream_cb_seek( void *s, uint64_t pos )
+{
+    return stream_Seek( (stream_t *)s, pos );
+}
+
+static int stream_cb_read( void *s, void* buffer, int size )
+{
+    return stream_Read( (stream_t *)s, buffer, size );
+}
+
+/*****************************************************************************
+ * DemuxOpen:
+ *****************************************************************************/
+static int DemuxOpen ( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+    dvdnav_t *p_dvdnav = NULL;
+    int i_ret;
+    int64_t i_init_pos;
+    bool forced = false, b_seekable = false;
+
+    if( p_demux->psz_demux != NULL
+     && !strncmp(p_demux->psz_demux, "dvd", 3) )
+        forced = true;
+
+    /* StreamProbeDVD need FASTSEEK, but if dvd is forced, we don't probe thus
+     * don't need fastseek */
+    stream_Control( p_demux->s, forced ? STREAM_CAN_SEEK : STREAM_CAN_FASTSEEK,
+                    &b_seekable );
+    if( !b_seekable )
+        return VLC_EGENERIC;
+
+    i_init_pos = stream_Tell( p_demux->s );
+
+    /* Try some simple probing to avoid going through dvdnav_open too often */
+    if( !forced && (i_ret = StreamProbeDVD( p_demux->s )) != VLC_SUCCESS )
+        goto bailout;
+
+    static dvdnav_stream_cb stream_cb =
+    {
+        .pf_seek = stream_cb_seek,
+        .pf_read = stream_cb_read,
+        .pf_readv = NULL,
+    };
+
+    /* Open dvdnav with stream callbacks */
+    if( dvdnav_open_stream( &p_dvdnav, p_demux->s,
+                            &stream_cb ) != DVDNAV_STATUS_OK )
+    {
+        msg_Warn( p_demux, "cannot open DVD with open_stream" );
+        goto bailout;
+    }
+
+    i_ret = CommonOpen( p_this, p_dvdnav, false );
+    if( i_ret != VLC_SUCCESS )
+        dvdnav_close( p_dvdnav );
+
+bailout:
+    if( i_ret != VLC_SUCCESS )
+        stream_Seek( p_demux->s, i_init_pos );
+    return i_ret;
+}
+#endif
 
 /*****************************************************************************
  * Close:
@@ -636,14 +758,15 @@ static int Demux( demux_t *p_demux )
     uint8_t *packet = buffer;
     int i_event;
     int i_len;
+    dvdnav_status_t status;
 
-#if DVD_READ_CACHE
-    if( dvdnav_get_next_cache_block( p_sys->dvdnav, &packet, &i_event, &i_len )
-        == DVDNAV_STATUS_ERR )
-#else
-    if( dvdnav_get_next_block( p_sys->dvdnav, packet, &i_event, &i_len )
-        == DVDNAV_STATUS_ERR )
-#endif
+    if( p_sys->b_readahead )
+        status = dvdnav_get_next_cache_block( p_sys->dvdnav, &packet, &i_event,
+                                              &i_len );
+    else
+        status = dvdnav_get_next_block( p_sys->dvdnav, packet, &i_event,
+                                        &i_len );
+    if( status == DVDNAV_STATUS_ERR )
     {
         msg_Warn( p_demux, "cannot get next block (%s)",
                   dvdnav_err_to_string( p_sys->dvdnav ) );
@@ -902,9 +1025,8 @@ static int Demux( demux_t *p_demux )
     case DVDNAV_STOP:   /* EOF */
         msg_Dbg( p_demux, "DVDNAV_STOP" );
 
-#if DVD_READ_CACHE
-        dvdnav_free_cache_block( p_sys->dvdnav, packet );
-#endif
+        if( p_sys->b_readahead )
+            dvdnav_free_cache_block( p_sys->dvdnav, packet );
         return 0;
 
     case DVDNAV_HIGHLIGHT:
@@ -945,9 +1067,8 @@ static int Demux( demux_t *p_demux )
         break;
     }
 
-#if DVD_READ_CACHE
-    dvdnav_free_cache_block( p_sys->dvdnav, packet );
-#endif
+    if( p_sys->b_readahead )
+        dvdnav_free_cache_block( p_sys->dvdnav, packet );
 
     return 1;
 }
