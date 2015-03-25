@@ -26,6 +26,8 @@
 # include "config.h"
 #endif
 
+#define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
+
 #include <QApplication>
 #include <QDate>
 #include <QMutex>
@@ -201,8 +203,6 @@ static const int i_continue_list[] =
 static const char *const psz_continue_list_text[] =
     { N_("Never"), N_("Ask"), N_("Always") };
 
-
-#define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 
 /**********************************************************************/
 vlc_module_begin ()
