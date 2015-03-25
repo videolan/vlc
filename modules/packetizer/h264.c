@@ -134,6 +134,7 @@ struct decoder_sys_t
     /* */
     mtime_t i_frame_pts;
     mtime_t i_frame_dts;
+    int     i_fields_dts;
 
     /* */
     uint32_t i_cc_flags;
@@ -251,6 +252,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
+    p_sys->i_fields_dts = 0;
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -690,6 +692,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     {
         p_sys->i_frame_dts = i_frag_dts;
         p_sys->i_frame_pts = i_frag_pts;
+        p_sys->i_fields_dts = 2;
         *pb_ts_used = true;
     }
     return p_pic;
@@ -789,10 +792,20 @@ static block_t *OutputPicture( decoder_t *p_dec )
         }
     }
 
+    p_sys->i_fields_dts -= (1 + p_sys->b_frame_mbs_only);
+    if( p_sys->i_fields_dts <= 0 )
+    {
+        p_sys->i_frame_dts = VLC_TS_INVALID;
+        p_sys->i_frame_pts = VLC_TS_INVALID;
+    }
+    else if( p_sys->b_timing_info_present_flag )
+    {
+        p_sys->i_frame_pts += CLOCK_FREQ * p_sys->i_num_units_in_tick / p_sys->i_time_scale;
+    }
+    else p_sys->i_frame_pts = VLC_TS_INVALID;
+
     p_sys->slice.i_frame_type = 0;
     p_sys->p_frame = NULL;
-    p_sys->i_frame_dts = VLC_TS_INVALID;
-    p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->b_frame_sps = false;
     p_sys->b_frame_pps = false;
     p_sys->b_slice = false;
