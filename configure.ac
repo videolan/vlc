@@ -27,17 +27,8 @@ AC_PRESERVE_HELP_ORDER
 AM_INIT_AUTOMAKE(tar-ustar color-tests foreign)
 AC_CONFIG_HEADERS([config.h])
 
-# Disable with "./configure --disable-silent-rules" or "make V=1"
 AM_SILENT_RULES([yes])
-
-dnl Too many people are not aware of maintainer mode:
-dnl If you want to use it, you definitely know what you are doing, so
-dnl you can specify "--disable-maintainer-mode". But if you want the default
-dnl automake behavior, you've likely never heard of maintainer mode, so we
-dnl can't expect you to enable it manually.
-AS_IF([test "x${enable_maintainer_mode}" != "xno"],
-    [enable_maintainer_mode="yes"])
-AM_MAINTAINER_MODE
+AM_MAINTAINER_MODE([enable])
 
 dnl
 dnl Directories
