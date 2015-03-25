@@ -760,6 +760,35 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( !p_sys->b_header )
         p_pic->i_flags |= BLOCK_FLAG_PREROLL;
 
+    if( p_sys->b_frame_mbs_only == 0 && p_sys->b_pic_struct_present_flag )
+    {
+        switch( p_sys->i_pic_struct )
+        {
+        case 1:
+            if( p_sys->i_fields_dts == 2 )
+                p_pic->i_flags |= BLOCK_FLAG_TOP_FIELD_FIRST;
+            else
+                p_pic->i_flags |= BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            break;
+        case 3:
+        case 5:
+            p_pic->i_flags |= BLOCK_FLAG_TOP_FIELD_FIRST;
+            break;
+        case 2:
+            if( p_sys->i_fields_dts == 2 )
+                p_pic->i_flags |= BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            else
+                p_pic->i_flags |= BLOCK_FLAG_TOP_FIELD_FIRST;
+            break;
+        case 4:
+        case 6:
+            p_pic->i_flags |= BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            break;
+        default:
+            break;
+        }
+    }
+
     p_sys->slice.i_frame_type = 0;
     p_sys->p_frame = NULL;
     p_sys->i_frame_dts = VLC_TS_INVALID;
