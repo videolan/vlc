@@ -69,11 +69,10 @@ static int Demux( demux_t *p_demux )
 
     if( stream_ReadDir( p_demux->s, p_node ) )
     {
+        msg_Warn( p_demux, "unable to read directory" );
         input_item_node_Delete( p_node );
         return VLC_EGENERIC;
     }
-    else
-        msg_Warn( p_demux, "unable to read directory" );
 
     input_item_node_PostAndDelete( p_node );
     return VLC_SUCCESS;
