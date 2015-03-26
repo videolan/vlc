@@ -969,6 +969,7 @@ static int GuessType( const input_item_t *p_item, bool *p_net )
         /* Short match work, not just exact match */
         { "alsa",   ITEM_TYPE_CARD, false },
         { "atsc",   ITEM_TYPE_CARD, false },
+        { "bluray", ITEM_TYPE_DISC, false },
         { "bd",     ITEM_TYPE_DISC, false },
         { "cable",  ITEM_TYPE_CARD, false },
         { "cdda",   ITEM_TYPE_DISC, false },
