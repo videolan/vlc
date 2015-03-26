@@ -29,6 +29,8 @@
 #  else
 #    define DECLARE_ASM_CONST(n,t,v)    static const t __attribute__ ((aligned (n))) v
 #  endif
+#elif defined(_MSC_VER)
+#    define DECLARE_ASM_CONST(n,t,v)    __declspec(align(n)) static const t v
 #endif
 
 typedef intptr_t x86_reg;
