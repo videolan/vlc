@@ -70,18 +70,7 @@
 
 #include "opus.h"
 
-#undef TS_DEBUG
-VLC_FORMAT(1, 2) static void ts_debug(const char *format, ...)
-{
-#ifdef TS_DEBUG
-    va_list ap;
-    va_start(ap, format);
-    vfprintf(stderr, format, ap);
-    va_end(ap);
-#else
-    (void)format;
-#endif
-}
+#include "mpeg4_iod.h"
 
 #ifdef HAVE_ARIBB24
  #include <aribb24/aribb24.h>
@@ -203,37 +192,6 @@ static const char *const ppsz_teletext_type[] = {
 };
 
 typedef struct ts_pid_t ts_pid_t;
-
-typedef struct
-{
-    uint8_t                 i_objectTypeIndication;
-    uint8_t                 i_streamType;
-
-    unsigned                i_extra;
-    uint8_t                 *p_extra;
-
-} decoder_config_descriptor_t;
-
-typedef struct
-{
-    bool                    b_ok;
-    uint16_t                i_es_id;
-
-    char                    *psz_url;
-
-    decoder_config_descriptor_t    dec_descr;
-
-} es_mpeg4_descriptor_t;
-
-#define ES_DESCRIPTOR_COUNT 255
-typedef struct
-{
-    /* IOD */
-    char                    *psz_url;
-
-    es_mpeg4_descriptor_t   es_descr[ES_DESCRIPTOR_COUNT];
-
-} iod_descriptor_t;
 
 typedef struct
 {
@@ -520,8 +478,6 @@ static void ReadyQueuesPostSeek( demux_t *p_demux );
 static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 static int64_t TimeStampWrapAround( ts_pmt_t *, int64_t );
-
-static void              IODFree( iod_descriptor_t * );
 
 #define TS_USER_PMT_NUMBER (0)
 static int UserPmt( demux_t *p_demux, const char * );
@@ -3400,227 +3356,6 @@ static void PIDFillFormat( es_format_t *fmt, int i_stream_type )
     fmt->b_packetized = false;
 }
 
-/*****************************************************************************
- * MP4 specific functions (IOD parser)
- *****************************************************************************/
-static unsigned IODDescriptorLength( unsigned *pi_data, uint8_t **pp_data )
-{
-    unsigned int i_b;
-    unsigned int i_len = 0;
-    do
-    {
-        i_b = **pp_data;
-        (*pp_data)++;
-        (*pi_data)--;
-        i_len = ( i_len << 7 ) + ( i_b&0x7f );
-
-    } while( i_b&0x80 && *pi_data > 0 );
-
-    if (i_len > *pi_data)
-        i_len = *pi_data;
-
-    return i_len;
-}
-
-static unsigned IODGetBytes( unsigned *pi_data, uint8_t **pp_data, size_t bytes )
-{
-    unsigned res = 0;
-    while( *pi_data > 0 && bytes-- )
-    {
-        res <<= 8;
-        res |= **pp_data;
-        (*pp_data)++;
-        (*pi_data)--;
-    }
-
-    return res;
-}
-
-static char* IODGetURL( unsigned *pi_data, uint8_t **pp_data )
-{
-    unsigned len = IODGetBytes( pi_data, pp_data, 1 );
-    if (len > *pi_data)
-        len = *pi_data;
-    char *url = strndup( (char*)*pp_data, len );
-    *pp_data += len;
-    *pi_data -= len;
-    return url;
-}
-
-static iod_descriptor_t *IODNew( unsigned i_data, uint8_t *p_data )
-{
-    uint8_t i_iod_tag, i_iod_label, byte1, byte2, byte3;
-
-    iod_descriptor_t *p_iod = calloc( 1, sizeof( iod_descriptor_t ) );
-    if( !p_iod )
-        return NULL;
-
-    if( i_data < 3 )
-    {
-        return p_iod;
-    }
-
-    byte1 = IODGetBytes( &i_data, &p_data, 1 );
-    byte2 = IODGetBytes( &i_data, &p_data, 1 );
-    byte3 = IODGetBytes( &i_data, &p_data, 1 );
-    if( byte2 == 0x02 ) //old vlc's buggy implementation of the IOD_descriptor
-    {
-        i_iod_label = byte1;
-        i_iod_tag = byte2;
-    }
-    else  //correct implementation of the IOD_descriptor
-    {
-        i_iod_label = byte2;
-        i_iod_tag = byte3;
-    }
-
-    ts_debug( "\n* iod label:%d tag:0x%x", i_iod_label, i_iod_tag );
-
-    if( i_iod_tag != 0x02 )
-    {
-        ts_debug( "\n ERR: tag %02x != 0x02", i_iod_tag );
-        return p_iod;
-    }
-
-    IODDescriptorLength( &i_data, &p_data );
-
-    uint16_t i_od_id = ( IODGetBytes( &i_data, &p_data, 1 ) << 2 );
-    uint8_t i_flags = IODGetBytes( &i_data, &p_data, 1 );
-    i_od_id |= i_flags >> 6;
-    ts_debug( "\n* od_id:%d", i_od_id );
-    ts_debug( "\n* includeInlineProfileLevel flag:%d", ( i_flags >> 4 )&0x01 );
-    if ((i_flags >> 5) & 0x01)
-    {
-        p_iod->psz_url = IODGetURL( &i_data, &p_data );
-        ts_debug( "\n* url string:%s", p_iod->psz_url );
-        ts_debug( "\n*****************************\n" );
-        return p_iod;
-    }
-    else
-    {
-        p_iod->psz_url = NULL;
-    }
-
-    /* Profile Level Indication */
-    IODGetBytes( &i_data, &p_data, 1 ); /* OD */
-    IODGetBytes( &i_data, &p_data, 1 ); /* scene */
-    IODGetBytes( &i_data, &p_data, 1 ); /* audio */
-    IODGetBytes( &i_data, &p_data, 1 ); /* visual */
-    IODGetBytes( &i_data, &p_data, 1 ); /* graphics */
-
-    unsigned i_length = 0;
-    unsigned i_data_sav = i_data;
-    uint8_t *p_data_sav = p_data;
-    for (unsigned i = 0; i_data > 0 && i < ES_DESCRIPTOR_COUNT; i++)
-    {
-        es_mpeg4_descriptor_t *es_descr = &p_iod->es_descr[i];
-
-        p_data = p_data_sav + i_length;
-        i_data = i_data_sav - i_length;
-
-        uint8_t i_tag = IODGetBytes( &i_data, &p_data, 1 );
-        i_length = IODDescriptorLength( &i_data, &p_data );
-
-        i_data_sav = i_data;
-        p_data_sav = p_data;
-
-        i_data = i_length;
-
-        if ( i_tag != 0x03 )
-        {
-            ts_debug( "\n* - OD tag:0x%x Unsupported", i_tag );
-            continue;
-        }
-
-        es_descr->i_es_id = IODGetBytes( &i_data, &p_data, 2 );
-        uint8_t i_flags = IODGetBytes( &i_data, &p_data, 1 );
-        bool b_streamDependenceFlag = ( i_flags >> 7 )&0x01;
-        if( b_streamDependenceFlag )
-            IODGetBytes( &i_data, &p_data, 2 ); /* dependOn_es_id */
-
-        if( (i_flags >> 6) & 0x01 )
-            es_descr->psz_url = IODGetURL( &i_data, &p_data );
-
-        bool b_OCRStreamFlag = ( i_flags >> 5 )&0x01;
-        if( b_OCRStreamFlag )
-            IODGetBytes( &i_data, &p_data, 2 ); /* OCR_es_id */
-
-        if( IODGetBytes( &i_data, &p_data, 1 ) != 0x04 )
-        {
-            ts_debug( "\n* ERR missing DecoderConfigDescr" );
-            continue;
-        }
-        unsigned i_config_desc_length = IODDescriptorLength( &i_data, &p_data ); /* DecoderConfigDescr_length */
-        decoder_config_descriptor_t *dec_descr = &es_descr->dec_descr;
-        dec_descr->i_objectTypeIndication = IODGetBytes( &i_data, &p_data, 1 );
-        i_flags = IODGetBytes( &i_data, &p_data, 1 );
-        dec_descr->i_streamType = i_flags >> 2;
-
-        IODGetBytes( &i_data, &p_data, 3); /* bufferSizeDB */
-        IODGetBytes( &i_data, &p_data, 4); /* maxBitrate */
-        IODGetBytes( &i_data, &p_data, 4 ); /* avgBitrate */
-
-        if( i_config_desc_length > 13 && IODGetBytes( &i_data, &p_data, 1 ) == 0x05 )
-        {
-            dec_descr->i_extra = IODDescriptorLength( &i_data, &p_data );
-            if( dec_descr->i_extra > 0 )
-            {
-                dec_descr->p_extra = xmalloc( dec_descr->i_extra );
-                memcpy(dec_descr->p_extra, p_data, dec_descr->i_extra);
-                p_data += dec_descr->i_extra;
-                i_data -= dec_descr->i_extra;
-            }
-        }
-        else
-        {
-            dec_descr->i_extra = 0;
-            dec_descr->p_extra = NULL;
-        }
-
-        if( IODGetBytes( &i_data, &p_data, 1 ) != 0x06 )
-        {
-            ts_debug( "\n* ERR missing SLConfigDescr" );
-            continue;
-        }
-        IODDescriptorLength( &i_data, &p_data ); /* SLConfigDescr_length */
-        switch( IODGetBytes( &i_data, &p_data, 1 ) /* predefined */ )
-        {
-        default:
-            ts_debug( "\n* ERR unsupported SLConfigDescr predefined" );
-        case 0x01:
-            // FIXME
-            break;
-        }
-        es_descr->b_ok = true;
-    }
-
-    return p_iod;
-}
-
-static void IODFree( iod_descriptor_t *p_iod )
-{
-    if( p_iod->psz_url )
-    {
-        free( p_iod->psz_url );
-        free( p_iod );
-        return;
-    }
-
-    for( int i = 0; i < 255; i++ )
-    {
-#define es_descr p_iod->es_descr[i]
-        if( es_descr.b_ok )
-        {
-            if( es_descr.psz_url )
-                free( es_descr.psz_url );
-            else
-                free( es_descr.dec_descr.p_extra );
-        }
-#undef  es_descr
-    }
-    free( p_iod );
-}
-
 /****************************************************************************
  ****************************************************************************
  ** libdvbpsi callbacks
@@ -5301,7 +5036,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         {
         case 0x1d: /* We have found an IOD descriptor */
             msg_Dbg( p_demux, " * PMT descriptor : IOD (0x1d)" );
-            p_pmt->iod = IODNew( p_dr->i_length, p_dr->p_data );
+            p_pmt->iod = IODNew( VLC_OBJECT(p_demux), p_dr->i_length, p_dr->p_data );
             break;
 
         case 0x9:
