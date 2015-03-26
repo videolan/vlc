@@ -29,9 +29,12 @@ access_LTLIBRARIES += libfilesystem_plugin.la
 libidummy_plugin_la_SOURCES = access/idummy.c
 access_LTLIBRARIES += libidummy_plugin.la
 
-libimem_plugin_la_SOURCES = access/imem.c
+libimem_plugin_la_SOURCES = access/imem-access.c
 libimem_plugin_la_LIBADD = $(LIBM)
 access_LTLIBRARIES += libimem_plugin.la
+
+libaccess_imem_plugin_la_SOURCES = access/imem.c
+access_LTLIBRARIES += libaccess_imem_plugin.la
 
 librar_plugin_la_SOURCES = access/rar/rar.c access/rar/rar.h \
 	access/rar/access.c access/rar/stream.c access/rar/module.c

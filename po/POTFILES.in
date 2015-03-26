@@ -205,6 +205,7 @@ modules/access/gnomevfs.c
 modules/access/http.c
 modules/access/idummy.c
 modules/access/imem.c
+modules/access/imem-access.c
 modules/access/jack.c
 modules/access/linsys/linsys_hdsdi.c
 modules/access/linsys/linsys_sdi.c
