@@ -4215,35 +4215,75 @@ static bool PMTEsHasComponentTag( const dvbpsi_pmt_es_t *p_es,
     return p_si->i_component_tag == i_component_tag;
 }
 
+static const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const iod_descriptor_t *iod,
+                                                         uint16_t i_es_id )
+{
+    if( iod )
+    for( int i = 0; i < ES_DESCRIPTOR_COUNT; i++ )
+    {
+        if( iod->es_descr[i].i_es_id == i_es_id )
+        {
+            if ( iod->es_descr[i].b_ok )
+                return &iod->es_descr[i];
+        }
+    }
+    return NULL;
+}
+
 static void PMTSetupEsISO14496( demux_t *p_demux, ts_pes_es_t *p_es,
                                 const ts_pmt_t *p_pmt, const dvbpsi_pmt_es_t *p_dvbpsies )
 {
     es_format_t *p_fmt = &p_es->fmt;
 
-    /* MPEG-4 stream: search FMC_DESCRIPTOR (SL Packetized stream) */
-    dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_dvbpsies, 0x1f );
-
-    if( p_dr && p_dr->i_length == 2 && p_pmt->iod )
+    const dvbpsi_descriptor_t *p_dr = p_dvbpsies->p_first_descriptor;
+    while( p_dr )
     {
-        const int i_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
+        const es_mpeg4_descriptor_t *p_esdescr = NULL;
+        uint16_t i_es_id;
+        uint8_t i_length = p_dr->i_length;
 
-        msg_Dbg( p_demux, "found FMC_descriptor declaring sl packetization on es_id=%d", i_es_id );
-
-        p_es->p_mpeg4desc = NULL;
-
-        for( int i = 0; i < ES_DESCRIPTOR_COUNT; i++ )
+        switch( p_dr->i_tag )
         {
-            iod_descriptor_t *iod = p_pmt->iod;
-            if( iod->es_descr[i].i_es_id == i_es_id )
+            case 0x1f: /* FMC Descriptor */
+                while( i_length >= 3 && !p_esdescr )
+                {
+                    i_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
+                    p_esdescr = GetMPEG4DescByEsId( p_pmt->iod, i_es_id );
+                    /* FIXME: add flexmux channel */
+                    i_length -= 3;
+                    if( p_esdescr )
+                        msg_Dbg( p_demux, "found FMC_descriptor declaring sl packetization on es_id=%"PRIu16, i_es_id );
+                }
+                break;
+            case 0x1e: /* SL Descriptor */
+                if( i_length == 2 )
+                {
+                    i_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
+                    p_esdescr = GetMPEG4DescByEsId( p_pmt->iod, i_es_id );
+                    if( p_esdescr )
+                        msg_Dbg( p_demux, "found SL_descriptor declaring sl packetization on es_id=%"PRIu16, i_es_id );
+                }
+                break;
+            default:
+                break;
+        }
+
+        if( p_esdescr )
+        {
+            if( !p_esdescr->b_ok )
             {
-                if ( iod->es_descr[i].b_ok )
-                    p_es->p_mpeg4desc = &iod->es_descr[i];
-                else
-                    msg_Dbg( p_demux, "MPEG-4 descriptor not yet available on es_id=%d", i_es_id );
+                msg_Dbg( p_demux, "MPEG-4 descriptor not yet available on es_id=%"PRIu16, i_es_id );
+            }
+            else
+            {
+                p_es->p_mpeg4desc = p_esdescr;
                 break;
             }
         }
+
+        p_dr = p_dr->p_next;
     }
+
     if( !p_es->p_mpeg4desc )
     {
         switch( p_dvbpsies->i_type )
