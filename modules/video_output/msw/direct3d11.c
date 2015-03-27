@@ -168,7 +168,7 @@ static const char* globPixelShaderDefault = "\
   }\
 ";
 
-static const char* globPixelShaderBiplanarYUV2RGB = "\
+static const char *globPixelShaderBiplanarYUV_BT601_2RGB = "\
   Texture2D shaderTextureY;\
   Texture2D shaderTextureUV;\
   SamplerState SampleType;\
@@ -185,17 +185,44 @@ static const char* globPixelShaderBiplanarYUV2RGB = "\
     float4 rgba;\
     yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
     yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
-    yuv.x  = 1.164 * (yuv.x-0.0625);\
+    yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
     yuv.y  = yuv.y - 0.5;\
     yuv.z  = yuv.z - 0.5;\
-    rgba.x = saturate(yuv.x + 1.596 * yuv.z);\
-    rgba.y = saturate(yuv.x - 0.813 * yuv.z - 0.391 * yuv.y);\
-    rgba.z = saturate(yuv.x + 2.018 * yuv.y);\
+    rgba.x = saturate(yuv.x + 1.596026785714286 * yuv.z);\
+    rgba.y = saturate(yuv.x - 0.812967647237771 * yuv.z - 0.391762290094914 * yuv.y);\
+    rgba.z = saturate(yuv.x + 2.017232142857142 * yuv.y);\
     rgba.w = 1.0;\
     return rgba;\
   }\
 ";
 
+static const char *globPixelShaderBiplanarYUV_BT709_2RGB = "\
+  Texture2D shaderTextureY;\
+  Texture2D shaderTextureUV;\
+  SamplerState SampleType;\
+  \
+  struct PS_INPUT\
+  {\
+    float4 Position   : SV_POSITION;\
+    float2 Texture    : TEXCOORD0;\
+  };\
+  \
+  float4 PS( PS_INPUT In ) : SV_TARGET\
+  {\
+    float3 yuv;\
+    float4 rgba;\
+    yuv.x  = shaderTextureY.Sample(SampleType, In.Texture).x;\
+    yuv.yz = shaderTextureUV.Sample(SampleType, In.Texture).xy;\
+    yuv.x  = 1.164383561643836 * (yuv.x-0.0625);\
+    yuv.y  = yuv.y - 0.5;\
+    yuv.z  = yuv.z - 0.5;\
+    rgba.x = saturate(yuv.x + 1.792741071428571 * yuv.z);\
+    rgba.y = saturate(yuv.x - 0.532909328559444 * yuv.z - 0.21324861427373 * yuv.y);\
+    rgba.z = saturate(yuv.x + 2.112401785714286 * yuv.y);\
+    rgba.w = 1.0;\
+    return rgba;\
+  }\
+";
 
 static int Open(vlc_object_t *object)
 {
@@ -597,6 +624,21 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             sys->vlcFormat    = d3d_formats[i].fourcc;
             sys->d3dFormatY   = d3d_formats[i].formatY;
             sys->d3dFormatUV  = d3d_formats[i].formatUV;
+            switch (sys->vlcFormat)
+            {
+            case VLC_CODEC_NV12:
+                if( fmt->i_height > 576 )
+                    sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
+                else
+                    sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
+                break;
+            case VLC_CODEC_RGB32:
+            case VLC_CODEC_BGRA:
+            case VLC_CODEC_RGB16:
+            default:
+                sys->d3dPxShader = globPixelShaderDefault;
+                break;
+            }
             break;
         }
     }
@@ -747,16 +789,12 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     ID3DBlob* pPSBlob = NULL;
 
     /* TODO : Match the version to the D3D_FEATURE_LEVEL */
-    if( sys->d3dFormatUV )
-        hr = D3DCompile(globPixelShaderBiplanarYUV2RGB, strlen(globPixelShaderBiplanarYUV2RGB),
-                        NULL, NULL, NULL, "PS", "ps_4_0_level_9_1", 0, 0, &pPSBlob, NULL);
-    else
-        hr = D3DCompile(globPixelShaderDefault, strlen(globPixelShaderDefault),
-                        NULL, NULL, NULL, "PS", "ps_4_0_level_9_1", 0, 0, &pPSBlob, NULL);
+    hr = D3DCompile(sys->d3dPxShader, strlen(sys->d3dPxShader),
+                    NULL, NULL, NULL, "PS", "ps_4_0_level_9_1", 0, 0, &pPSBlob, NULL);
 
 
     if( FAILED(hr)) {
-      msg_Err(vd, "The Pixel Shader is invalid.");
+      msg_Err(vd, "The Pixel Shader is invalid. (hr=0x%lX)", hr );
       return VLC_EGENERIC;
     }
 

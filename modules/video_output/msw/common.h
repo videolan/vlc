@@ -177,6 +177,7 @@ struct vout_display_sys_t
     DXGI_FORMAT              d3dFormatY;
     DXGI_FORMAT              d3dFormatUV;
     vlc_fourcc_t             vlcFormat;
+    const char               *d3dPxShader;
 #endif
 
 #ifdef MODULE_NAME_IS_direct3d9
