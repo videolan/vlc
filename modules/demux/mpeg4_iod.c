@@ -131,7 +131,7 @@ static bool IOD_SLDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint
         sl_descr->i_flags = IODGetBytes( &i_data, &p_data, 1 );
         sl_descr->i_timestamp_resolution = IODGetBytes( &i_data, &p_data, 4 );
         sl_descr->i_OCR_resolution = IODGetBytes( &i_data, &p_data, 4 );
-        sl_descr->i_timestamp_length = IODGetBytes( &i_data, &p_data, 4 );
+        sl_descr->i_timestamp_length = IODGetBytes( &i_data, &p_data, 1 );
         sl_descr->i_OCR_length = IODGetBytes( &i_data, &p_data, 1 );
         sl_descr->i_AU_length = IODGetBytes( &i_data, &p_data, 1 );
         sl_descr->i_instant_bitrate_length = IODGetBytes( &i_data, &p_data, 1 );
