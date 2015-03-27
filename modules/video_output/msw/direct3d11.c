@@ -73,6 +73,7 @@ typedef struct
 } d3d_format_t;
 
 static const d3d_format_t d3d_formats[] = {
+    { "I420",     DXGI_FORMAT_NV12,           VLC_CODEC_I420,     DXGI_FORMAT_R8_UNORM,           DXGI_FORMAT_R8G8_UNORM },
     { "NV12",     DXGI_FORMAT_NV12,           VLC_CODEC_NV12,     DXGI_FORMAT_R8_UNORM,           DXGI_FORMAT_R8G8_UNORM },
 #ifdef BROKEN_PIXEL
     { "YUY2",     DXGI_FORMAT_YUY2,           VLC_CODEC_I422,     DXGI_FORMAT_R8G8B8A8_UNORM,     0 },
@@ -165,6 +166,88 @@ static const char* globPixelShaderDefault = "\
   float4 PS( PS_INPUT In ) : SV_TARGET\
   {\
     return shaderTexture.Sample(SampleType, In.Texture);\
+  }\
+";
+
+static const char *globPixelShaderBiplanarI420_BT601_2RGB = "\
+  Texture2D shaderTextureY;\
+  Texture2D shaderTextureUV;\
+  SamplerState SampleType;\
+  \
+  struct PS_INPUT\
+  {\
+    float4 Position   : SV_POSITION;\
+    float2 Texture    : TEXCOORD0;\
+  };\
+  \
+  float4 PS( PS_INPUT In ) : SV_TARGET\
+  {\
+    float Y;\
+    float UCb;\
+    float VCr;\
+    float2 UCbPos;\
+    float2 VCrPos;\
+    float4 rgba;\
+    \
+    Y  = shaderTextureY.Sample(SampleType, In.Texture).x;\
+    \
+    VCrPos = In.Texture / 2;\
+    VCr = shaderTextureUV.Sample(SampleType, VCrPos).x;\
+    \
+    UCbPos = In.Texture / 2;\
+    UCbPos.y = UCbPos.y + 0.5;\
+    UCb = shaderTextureUV.Sample(SampleType, UCbPos).x;\
+    \
+    Y = 1.164383561643836 * (Y - 0.0625);\
+    UCb = UCb - 0.5;\
+    VCr = VCr - 0.5;\
+    \
+    rgba.x = saturate(Y + 1.596026785714286 * VCr);\
+    rgba.y = saturate(Y - 0.812967647237771 * VCr - 0.391762290094914 * UCb);\
+    rgba.z = saturate(Y + 2.017232142857142 * UCb);\
+    rgba.w = 1.0;\
+    return rgba;\
+  }\
+";
+
+static const char *globPixelShaderBiplanarI420_BT709_2RGB = "\
+  Texture2D shaderTextureY;\
+  Texture2D shaderTextureUV;\
+  SamplerState SampleType;\
+  \
+  struct PS_INPUT\
+  {\
+    float4 Position   : SV_POSITION;\
+    float2 Texture    : TEXCOORD0;\
+  };\
+  \
+  float4 PS( PS_INPUT In ) : SV_TARGET\
+  {\
+    float Y;\
+    float UCb;\
+    float VCr;\
+    float2 UCbPos;\
+    float2 VCrPos;\
+    float4 rgba;\
+    \
+    Y  = shaderTextureY.Sample(SampleType, In.Texture).x;\
+    \
+    VCrPos = In.Texture / 2;\
+    VCr = shaderTextureUV.Sample(SampleType, VCrPos).x;\
+    \
+    UCbPos = In.Texture / 2;\
+    UCbPos.y = UCbPos.y + 0.5;\
+    UCb = shaderTextureUV.Sample(SampleType, UCbPos).x;\
+    \
+    Y = 1.164383561643836 * (Y - 0.0625);\
+    UCb = UCb - 0.5;\
+    VCr = VCr - 0.5;\
+    \
+    rgba.x = saturate(Y + 1.792741071428571 * VCr);\
+    rgba.y = saturate(Y - 0.532909328559444 * VCr - 0.21324861427373 * UCb);\
+    rgba.z = saturate(Y + 2.112401785714286 * UCb);\
+    rgba.w = 1.0;\
+    return rgba;\
   }\
 ";
 
@@ -631,6 +714,12 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                     sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
                 else
                     sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
+                break;
+            case VLC_CODEC_I420:
+                if( fmt->i_height > 576 )
+                    sys->d3dPxShader = globPixelShaderBiplanarI420_BT709_2RGB;
+                else
+                    sys->d3dPxShader = globPixelShaderBiplanarI420_BT601_2RGB;
                 break;
             case VLC_CODEC_RGB32:
             case VLC_CODEC_BGRA:
