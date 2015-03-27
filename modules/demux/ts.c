@@ -232,7 +232,7 @@ typedef struct
 {
     es_format_t  fmt;
     es_out_id_t *id;
-    const es_mpeg4_descriptor_t *p_mpeg4desc;
+    uint16_t i_sl_es_id;
 } ts_pes_es_t;
 
 typedef enum
@@ -478,6 +478,9 @@ static void ReadyQueuesPostSeek( demux_t *p_demux );
 static void PCRHandle( demux_t *p_demux, ts_pid_t *, block_t * );
 static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 static int64_t TimeStampWrapAround( ts_pmt_t *, int64_t );
+
+/* MPEG4 related */
+static const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const ts_pmt_t *, uint16_t );
 
 #define TS_USER_PMT_NUMBER (0)
 static int UserPmt( demux_t *p_demux, const char * );
@@ -2145,6 +2148,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     mtime_t i_dts = -1;
     mtime_t i_pts = -1;
     mtime_t i_length = 0;
+    const es_mpeg4_descriptor_t *p_mpeg4desc = NULL;
 
     assert(pid->type == TYPE_PES);
     assert(pid->p_parent && pid->p_parent->type == TYPE_PMT);
@@ -2178,6 +2182,10 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
             i_dts = TimeStampWrapAround( pid->p_parent->u.p_pmt, i_dts );
     }
 
+    if( pid->u.p_pes->es.i_sl_es_id )
+        p_mpeg4desc = GetMPEG4DescByEsId( pid->p_parent->u.p_pmt,
+                                          pid->u.p_pes->es.i_sl_es_id );
+
     if( pid->u.p_pes->es.fmt.i_codec == VLC_FOURCC( 'a', '5', '2', 'b' ) ||
         pid->u.p_pes->es.fmt.i_codec == VLC_FOURCC( 'd', 't', 's', 'b' ) )
     {
@@ -2189,10 +2197,9 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     {
         i_skip += 1;
     }
-    else if( pid->u.p_pes->es.fmt.i_codec == VLC_CODEC_SUBT &&
-             pid->u.p_pes->es.p_mpeg4desc )
+    else if( pid->u.p_pes->es.fmt.i_codec == VLC_CODEC_SUBT && p_mpeg4desc )
     {
-        const decoder_config_descriptor_t *dcd = &pid->u.p_pes->es.p_mpeg4desc->dec_descr;
+        const decoder_config_descriptor_t *dcd = &p_mpeg4desc->dec_descr;
 
         if( dcd->i_extra > 2 &&
             dcd->p_extra[0] == 0x10 &&
@@ -3951,94 +3958,26 @@ static bool PMTEsHasComponentTag( const dvbpsi_pmt_es_t *p_es,
     return p_si->i_component_tag == i_component_tag;
 }
 
-static const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const iod_descriptor_t *iod,
-                                                         uint16_t i_es_id )
+static const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const ts_pmt_t *pmt, uint16_t i_es_id )
 {
-    if( iod )
+    if( pmt->iod )
     for( int i = 0; i < ES_DESCRIPTOR_COUNT; i++ )
     {
-        if( iod->es_descr[i].i_es_id == i_es_id )
+        if( pmt->iod->es_descr[i].i_es_id == i_es_id )
         {
-            if ( iod->es_descr[i].b_ok )
-                return &iod->es_descr[i];
+            if ( pmt->iod->es_descr[i].b_ok )
+                return &pmt->iod->es_descr[i];
         }
     }
     return NULL;
 }
 
-static void PMTSetupEsISO14496( demux_t *p_demux, ts_pes_es_t *p_es,
-                                const ts_pmt_t *p_pmt, const dvbpsi_pmt_es_t *p_dvbpsies )
+static bool SetupISO14496LogicalStream( demux_t *p_demux, const decoder_config_descriptor_t *dcd,
+                                        es_format_t *p_fmt )
 {
-    es_format_t *p_fmt = &p_es->fmt;
+    msg_Dbg( p_demux, "     - IOD objecttype: %"PRIx8" streamtype:%"PRIx8,
+             dcd->i_objectTypeIndication, dcd->i_streamType );
 
-    const dvbpsi_descriptor_t *p_dr = p_dvbpsies->p_first_descriptor;
-    while( p_dr )
-    {
-        const es_mpeg4_descriptor_t *p_esdescr = NULL;
-        uint16_t i_es_id;
-        uint8_t i_length = p_dr->i_length;
-
-        switch( p_dr->i_tag )
-        {
-            case 0x1f: /* FMC Descriptor */
-                while( i_length >= 3 && !p_esdescr )
-                {
-                    i_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
-                    p_esdescr = GetMPEG4DescByEsId( p_pmt->iod, i_es_id );
-                    /* FIXME: add flexmux channel */
-                    i_length -= 3;
-                    if( p_esdescr )
-                        msg_Dbg( p_demux, "found FMC_descriptor declaring sl packetization on es_id=%"PRIu16, i_es_id );
-                }
-                break;
-            case 0x1e: /* SL Descriptor */
-                if( i_length == 2 )
-                {
-                    i_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
-                    p_esdescr = GetMPEG4DescByEsId( p_pmt->iod, i_es_id );
-                    if( p_esdescr )
-                        msg_Dbg( p_demux, "found SL_descriptor declaring sl packetization on es_id=%"PRIu16, i_es_id );
-                }
-                break;
-            default:
-                break;
-        }
-
-        if( p_esdescr )
-        {
-            if( !p_esdescr->b_ok )
-            {
-                msg_Dbg( p_demux, "MPEG-4 descriptor not yet available on es_id=%"PRIu16, i_es_id );
-            }
-            else
-            {
-                p_es->p_mpeg4desc = p_esdescr;
-                break;
-            }
-        }
-
-        p_dr = p_dr->p_next;
-    }
-
-    if( !p_es->p_mpeg4desc )
-    {
-        switch( p_dvbpsies->i_type )
-        {
-        /* non fatal, set by packetizer */
-        case 0x0f: /* ADTS */
-        case 0x11: /* LOAS */
-            msg_Info( p_demux, "MPEG-4 descriptor not found for pid 0x%x type 0x%x",
-                      p_dvbpsies->i_pid, p_dvbpsies->i_type );
-            break;
-        default:
-            msg_Err( p_demux, "MPEG-4 descriptor not found for pid 0x%x type 0x%x",
-                     p_dvbpsies->i_pid, p_dvbpsies->i_type );
-            break;
-        }
-        return;
-    }
-
-    const decoder_config_descriptor_t *dcd = &p_es->p_mpeg4desc->dec_descr;
     if( dcd->i_streamType == 0x04 )    /* VisualStream */
     {
         p_fmt->i_cat = VIDEO_ES;
@@ -4113,6 +4052,67 @@ static void PMTSetupEsISO14496( demux_t *p_demux, ts_pes_es_t *p_es,
                 memcpy( p_fmt->p_extra, dcd->p_extra, p_fmt->i_extra );
             else
                 p_fmt->i_extra = 0;
+        }
+    }
+
+    return true;
+}
+
+static void SetupISO14496Descriptors( demux_t *p_demux, ts_pes_es_t *p_es,
+                                      const ts_pmt_t *p_pmt, const dvbpsi_pmt_es_t *p_dvbpsies )
+{
+    const dvbpsi_descriptor_t *p_dr = p_dvbpsies->p_first_descriptor;
+
+    while( p_dr )
+    {
+        uint8_t i_length = p_dr->i_length;
+
+        switch( p_dr->i_tag )
+        {
+            case 0x1f: /* FMC Descriptor */
+                while( i_length >= 3 && !p_es->i_sl_es_id )
+                {
+                    p_es->i_sl_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
+                    /* FIXME: map all ids and flexmux channels */
+                    i_length -= 3;
+                    msg_Dbg( p_demux, "     - found FMC_descriptor mapping es_id=%"PRIu16, p_es->i_sl_es_id );
+                }
+                break;
+            case 0x1e: /* SL Descriptor */
+                if( i_length == 2 )
+                {
+                    p_es->i_sl_es_id = ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
+                    msg_Dbg( p_demux, "     - found SL_descriptor mapping es_id=%"PRIu16, p_es->i_sl_es_id );
+                }
+                break;
+            default:
+                break;
+        }
+
+        p_dr = p_dr->p_next;
+    }
+
+    if( p_es->i_sl_es_id )
+    {
+        const es_mpeg4_descriptor_t *p_mpeg4desc = GetMPEG4DescByEsId( p_pmt, p_es->i_sl_es_id );
+        if( p_mpeg4desc && p_mpeg4desc->b_ok )
+        {
+            if( !SetupISO14496LogicalStream( p_demux, &p_mpeg4desc->dec_descr, &p_es->fmt ) )
+                msg_Dbg( p_demux, "     - IOD not yet available for es_id=%"PRIu16, p_es->i_sl_es_id );
+        }
+    }
+    else
+    {
+        switch( p_dvbpsies->i_type )
+        {
+        /* non fatal, set by packetizer */
+        case 0x0f: /* ADTS */
+        case 0x11: /* LOAS */
+            msg_Info( p_demux, "     - SL/FMC descriptor not found/matched" );
+            break;
+        default:
+            msg_Err( p_demux, "      - SL/FMC descriptor not found/matched" );
+            break;
         }
     }
 }
@@ -4984,8 +4984,6 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     {
         IODFree( p_pmt->iod );
         p_pmt->iod = NULL;
-        for( int i=0; i<old_es_rm.i_size; i++ )
-            old_es_rm.p_elems[i]->u.p_pes->es.p_mpeg4desc = NULL;
     }
 
     msg_Dbg( p_demux, "new PMT program number=%d version=%d pid_pcr=%d",
@@ -5230,7 +5228,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             case 0x10:
             case 0x11:
             case 0x12:
-                PMTSetupEsISO14496( p_demux, &p_pes->es, p_pmt, p_dvbpsies );
+                SetupISO14496Descriptors( p_demux, &p_pes->es, p_pmt, p_dvbpsies );
                 break;
             case 0x83:
                 /* LPCM (audio) */
@@ -5583,7 +5581,7 @@ static ts_pes_t *ts_pes_New( demux_t *p_demux )
         return NULL;
 
     pes->es.id = NULL;
-    pes->es.p_mpeg4desc = NULL;
+    pes->es.i_sl_es_id = 0;
     es_format_Init( &pes->es.fmt, UNKNOWN_ES, 0 );
     ARRAY_INIT( pes->extra_es );
     pes->data_type = TS_ES_DATA_PES;
