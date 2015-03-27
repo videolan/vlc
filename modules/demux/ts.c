@@ -5226,6 +5226,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             case 0x10:
             case 0x11:
             case 0x12:
+            case 0x13:
                 PMTSetupEsISO14496( p_demux, &p_pes->es, p_pmt, p_dvbpsies );
                 break;
             case 0x83:
