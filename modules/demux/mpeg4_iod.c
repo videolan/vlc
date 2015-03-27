@@ -27,6 +27,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_bits.h>
 
 #include "mpeg4_iod.h"
 
@@ -108,17 +109,69 @@ typedef union
     iod_descriptor_t *p_iod;
     es_mpeg4_descriptor_t *es_descr;
     decoder_config_descriptor_t *p_dec_config;
+    sl_config_descriptor_t *sl_descr;
 } iod_read_params_t;
 
 static uint8_t IOD_Desc_Read( vlc_object_t *, unsigned *, const uint8_t **, uint8_t, uint8_t, iod_read_params_t params );
 
+#define SL_Predefined_Custom 0x00
+#define SL_Predefined_NULL   0x01
+#define SL_Predefined_MP4    0x02
 static bool IOD_SLDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
                              iod_read_params_t params )
 {
-    VLC_UNUSED(p_object);
-    VLC_UNUSED(i_data);
-    VLC_UNUSED(p_data);
-    VLC_UNUSED(params);
+    sl_config_descriptor_t *sl_descr = params.sl_descr;
+
+    uint8_t i_predefined = IODGetBytes( &i_data, &p_data, 1 );
+    switch( i_predefined )
+    {
+    case SL_Predefined_Custom:
+        if( i_data < 15 )
+            return false;
+        sl_descr->i_flags = IODGetBytes( &i_data, &p_data, 1 );
+        sl_descr->i_timestamp_resolution = IODGetBytes( &i_data, &p_data, 4 );
+        sl_descr->i_OCR_resolution = IODGetBytes( &i_data, &p_data, 4 );
+        sl_descr->i_timestamp_length = IODGetBytes( &i_data, &p_data, 4 );
+        sl_descr->i_OCR_length = IODGetBytes( &i_data, &p_data, 1 );
+        sl_descr->i_AU_length = IODGetBytes( &i_data, &p_data, 1 );
+        sl_descr->i_instant_bitrate_length = IODGetBytes( &i_data, &p_data, 1 );
+        uint16_t i16 = IODGetBytes( &i_data, &p_data, 2 );
+        sl_descr->i_degradation_priority_length = i16 >> 12;
+        sl_descr->i_AU_seqnum_length = (i16 >> 7) & 0x1f;
+        sl_descr->i_packet_seqnum_length = (i16 >> 2) & 0x1f;
+        break;
+    case SL_Predefined_NULL:
+        memset( sl_descr, 0, sizeof(*sl_descr) );
+        sl_descr->i_timestamp_resolution = 1000;
+        sl_descr->i_timestamp_length = 32;
+        break;
+    case SL_Predefined_MP4:
+        memset( sl_descr, 0, sizeof(*sl_descr) );
+        sl_descr->i_flags = USE_TIMESTAMPS_FLAG;
+        break;
+    default:
+        /* reserved */
+        return false;
+    }
+
+    if( sl_descr->i_flags & USE_DURATION_FLAG )
+    {
+        if( i_data < 8 )
+            return false;
+        sl_descr->i_timescale = IODGetBytes( &i_data, &p_data, 4 );
+        sl_descr->i_accessunit_duration = IODGetBytes( &i_data, &p_data, 2 );
+        sl_descr->i_compositionunit_duration = IODGetBytes( &i_data, &p_data, 2 );
+    }
+
+    if( (sl_descr->i_flags & USE_TIMESTAMPS_FLAG) == 0 )
+    {
+        bs_t s;
+        bs_init( &s, p_data, i_data );
+        sl_descr->i_startdecoding_timestamp = bs_read( &s, sl_descr->i_timestamp_length );
+        sl_descr->i_startcomposition_timestamp = bs_read( &s, sl_descr->i_timestamp_length );
+    }
+
+    iod_debug( p_object, "   * read sl desc predefined: 0x%x", i_predefined );
     return true;
 }
 
@@ -200,6 +253,7 @@ static bool IOD_ESDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint
         return false;
 
     /* SLDescr */
+    params.sl_descr = &es_descr->sl_descr;
     IOD_Desc_Read( p_object, &i_data, &p_data, IODTag_SLDescr, 1, params );
 
     /* IPI / IP / IPMP ... */
