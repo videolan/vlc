@@ -343,9 +343,10 @@ static uint8_t IOD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const u
             case IODTag_ESDescr: /**/
             {
                 iod_descriptor_t *p_iod = params.p_iod;
-                params.es_descr = &p_iod->es_descr[i_read_count];
+                iod_read_params_t childparams;
+                childparams.es_descr = &p_iod->es_descr[i_read_count];
                 if ( !IOD_ESDesc_Read( p_object, i_descriptor_data,
-                                       p_descriptor_data, params ) )
+                                       p_descriptor_data, childparams ) )
                 {};
                 break;
             }
