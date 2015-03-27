@@ -5147,6 +5147,12 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         case 0x0E:
             psz_typedesc = "ISO/IEC 13818-1 auxiliary";
             break;
+        case 0x12:
+            psz_typedesc = "ISO/IEC 14496-1 SL-packetized or FlexMux stream carried in PES packets";
+            break;
+        case 0x13:
+            psz_typedesc = "ISO/IEC 14496-1 SL-packetized or FlexMux stream carried in sections";
+            break;
         default:
             if (p_dvbpsies->i_type >= 0x0F && p_dvbpsies->i_type <=0x7F)
                 psz_typedesc = "ISO/IEC 13818-1 Reserved";
