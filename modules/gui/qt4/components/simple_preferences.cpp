@@ -1243,7 +1243,7 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
 #if !defined(__IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__)
 #define __IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__
     const GUID IID_IApplicationAssociationRegistrationUI = {0x1f76a169,0xf994,0x40ac, {0x8f,0xc8,0x09,0x59,0xe8,0x87,0x47,0x10}};
-    const GUID CLSID_ApplicationAssociationRegistrationUI = { 0x1968106d,0xf3b5,0x44cf,{0x89,0x0e,0x11,0x6f,0xcb,0x9e,0xce,0xf1}};
+    extern const GUID CLSID_ApplicationAssociationRegistrationUI;
     interface IApplicationAssociationRegistrationUI : public IUnknown
     {
         virtual HRESULT STDMETHODCALLTYPE LaunchAdvancedAssociationUI(
