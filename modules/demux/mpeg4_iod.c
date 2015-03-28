@@ -438,6 +438,26 @@ static uint8_t IOD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const u
     return i_read_count;
 }
 
+static iod_descriptor_t *ODInit( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
+                                 uint8_t i_start_tag, uint8_t i_min, uint8_t i_max )
+{
+    /* Initial Object Descriptor must follow */
+    iod_descriptor_t *p_iod = calloc( 1, sizeof( iod_descriptor_t ) );
+    if( !p_iod )
+        return NULL;
+
+    iod_read_params_t params;
+    params.p_iod = p_iod;
+    if ( IOD_Desc_Read( p_object, &i_data, &p_data, i_start_tag, i_max, params ) < i_min )
+    {
+        iod_debug( p_object, "   cannot read first tag 0x%"PRIx8, i_start_tag );
+        free( p_iod );
+        return NULL;
+    }
+
+    return p_iod;
+}
+
 iod_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data )
 {
     if( i_data < 4 )
@@ -461,23 +481,7 @@ iod_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t
         return NULL;
     }
 
-    /* Initial Object Descriptor must follow */
-    iod_descriptor_t *p_iod = calloc( 1, sizeof( iod_descriptor_t ) );
-    if( !p_iod )
-        return NULL;
-
-    /* IOD_InitialObjectDescrTag Parsing */
-    iod_read_params_t params;
-    params.p_iod = p_iod;
-    if ( 1 != IOD_Desc_Read( p_object, &i_data, &p_data,
-                             IODTag_InitialObjectDescr, 1, params ) )
-    {
-        iod_debug( p_object, "   cannot read InitialObjectDescr" );
-        free( p_iod );
-        return NULL;
-    }
-
-    return p_iod;
+    return ODInit( p_object, i_data, p_data, IODTag_InitialObjectDescr, 1, 1 );
 }
 
 void IODFree( iod_descriptor_t *p_iod )
