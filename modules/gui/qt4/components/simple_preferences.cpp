@@ -1240,38 +1240,42 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
     return b_temp;
 }
 
-void SPrefsPanel::assoDialog()
-{
 #if !defined(__IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__)
 #define __IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__
     const GUID IID_IApplicationAssociationRegistrationUI = {0x1f76a169,0xf994,0x40ac, {0x8f,0xc8,0x09,0x59,0xe8,0x87,0x47,0x10}};
     const GUID CLSID_ApplicationAssociationRegistrationUI = { 0x1968106d,0xf3b5,0x44cf,{0x89,0x0e,0x11,0x6f,0xcb,0x9e,0xce,0xf1}};
-#ifdef __cplusplus
     interface IApplicationAssociationRegistrationUI : public IUnknown
     {
         virtual HRESULT STDMETHODCALLTYPE LaunchAdvancedAssociationUI(
                 LPCWSTR pszAppRegName) = 0;
     };
-#endif /* __cplusplus */
 #endif /* __IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__ */
 
-    IApplicationAssociationRegistrationUI *p_appassoc;
-    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED )) )
-        vlc_assert_unreachable();
+void SPrefsPanel::assoDialog()
+{
+    HRESULT hr;
 
-    if( S_OK == CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
-                NULL, CLSCTX_INPROC_SERVER,
-                IID_IApplicationAssociationRegistrationUI,
-                (void **)&p_appassoc) )
+    hr = CoInitializeEx( NULL, COINIT_MULTITHREADED );
+    if( SUCCEEDED(hr) )
     {
-        if(S_OK == p_appassoc->LaunchAdvancedAssociationUI(L"VLC" ) )
+        void *p;
+
+        hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
+                              NULL, CLSCTX_INPROC_SERVER,
+                              IID_IApplicationAssociationRegistrationUI, &p);
+        if( SUCCEEDED(hr) )
         {
-            CoUninitialize();
-            return;
+            IApplicationAssociationRegistrationUI *p_regui =
+                (IApplicationAssociationRegistrationUI *)p;
+
+            hr = p_regui->LaunchAdvancedAssociationUI(L"VLC" );
+            p_regui->Release();
         }
+        CoUninitialize();
     }
 
-    CoUninitialize();
+    if( SUCCEEDED(hr) )
+        return;
 
     QDialog *d = new QDialog( this );
     d->setWindowTitle( qtr( "File associations" ) );
