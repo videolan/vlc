@@ -54,6 +54,15 @@ typedef struct
 
 typedef struct
 {
+    unsigned i_size;
+    bool b_au_start;
+    bool b_au_end;
+    mtime_t i_dts;
+    mtime_t i_pts;
+} sl_header_data;
+
+typedef struct
+{
     uint8_t                 i_objectTypeIndication;
     uint8_t                 i_streamType;
 
@@ -85,3 +94,6 @@ typedef struct
 
 iod_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data );
 void IODFree( iod_descriptor_t *p_iod );
+
+sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
+                               const sl_config_descriptor_t *sl );
