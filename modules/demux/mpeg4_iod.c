@@ -312,6 +312,46 @@ static bool IOD_InitialObjectDesc_Read( vlc_object_t *p_object, unsigned i_data,
     return true;
 }
 
+static bool IODObjectDescriptorRead( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
+                                  iod_read_params_t params )
+{
+    iod_descriptor_t *p_iod = params.p_iod;
+    if( i_data < 3 + 2 )
+        return false;
+
+    uint16_t i_object_descriptor_id = ( IODGetBytes( &i_data, &p_data, 1 ) << 2 );
+    uint8_t i_flags = IODGetBytes( &i_data, &p_data, 1 );
+    i_object_descriptor_id |= i_flags >> 6;
+
+    iod_debug( p_object, "  * ObjectDescriptorID: %"PRIu16, i_object_descriptor_id );
+    if ( (i_flags >> 5) & 0x01 )
+    {
+        p_iod->psz_url = IODGetURL( &i_data, &p_data );
+        iod_debug( p_object, "  * URL: %s", p_iod->psz_url );
+        return true;
+    }
+
+    if( i_data < 2 ) /* at least one ES desc */
+        return false;
+
+    /* 1..255 ESdescr */
+    uint8_t i_desc_count = IOD_Desc_Read( p_object, &i_data, &p_data,
+                                          IODTag_ESDescr, ES_DESCRIPTOR_COUNT, params );
+    if( i_desc_count == 0 )
+    {
+        iod_debug( p_object, "   * missing ES Descriptor" );
+        return false;
+    }
+
+    /* 0..255 OCIdescr */
+    /* 0..255 IPMPdescpointer */
+    /* 0..255 IPMPdesc */
+    /* 0..1   IPMPtoollistdesc */
+    /* 0..255 Extensiondescr */
+
+    return true;
+}
+
 static uint8_t IOD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const uint8_t **pp_data,
                               uint8_t i_target_tag, uint8_t i_max_desc, iod_read_params_t params )
 {
@@ -331,6 +371,15 @@ static uint8_t IOD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const u
                    i_target_tag, i_tag, *pi_data );
         switch( i_tag )
         {
+            case IODTag_ObjectDescr:
+            {
+                /* iod_descriptor_t *p_iod = (iod_descriptor_t *) param; */
+                if ( !IODObjectDescriptorRead( p_object, i_descriptor_data,
+                                               p_descriptor_data, params ) )
+                {};
+                break;
+            }
+
             case IODTag_InitialObjectDescr:
             {
                 /* iod_descriptor_t *p_iod = (iod_descriptor_t *) param; */
