@@ -2425,7 +2425,10 @@ static void ParseTableSection( demux_t *p_demux, ts_pid_t *pid, block_t *p_data 
         PCRFixHandle( p_demux, p_pmt, p_content );
     }
 
-    es_out_Send( p_demux->out, pid->u.p_pes->es.id, p_content );
+    if( pid->u.p_pes->es.id )
+        es_out_Send( p_demux->out, pid->u.p_pes->es.id, p_content );
+    else
+        block_Release( p_content );
 }
 
 static void ParseData( demux_t *p_demux, ts_pid_t *pid )
