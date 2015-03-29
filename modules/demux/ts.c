@@ -210,6 +210,7 @@ typedef struct
     int             i_pid_pcr;
     /* IOD stuff (mpeg4) */
     iod_descriptor_t *iod;
+    iod_descriptors_t od;
 
     DECL_ARRAY(ts_pid_t *) e_streams;
 
@@ -3960,13 +3961,20 @@ static bool PMTEsHasComponentTag( const dvbpsi_pmt_es_t *p_es,
 
 static const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const ts_pmt_t *pmt, uint16_t i_es_id )
 {
-    if( pmt->iod )
     for( int i = 0; i < ES_DESCRIPTOR_COUNT; i++ )
     {
-        if( pmt->iod->es_descr[i].i_es_id == i_es_id )
+        const es_mpeg4_descriptor_t *es_descr = &pmt->iod->es_descr[i];
+        if( es_descr->i_es_id == i_es_id && es_descr->b_ok )
+            return es_descr;
+    }
+    for( int i=0; i<pmt->od.objects.i_size; i++ )
+    {
+        const iod_descriptor_t *od = pmt->od.objects.p_elems[i];
+        for( int j = 0; j < ES_DESCRIPTOR_COUNT; j++ )
         {
-            if ( pmt->iod->es_descr[i].b_ok )
-                return &pmt->iod->es_descr[i];
+            const es_mpeg4_descriptor_t *es_descr = &od->es_descr[j];
+            if( es_descr->i_es_id == i_es_id && es_descr->b_ok )
+                return es_descr;
         }
     }
     return NULL;
@@ -5544,6 +5552,8 @@ static ts_pmt_t *ts_pmt_New( demux_t *p_demux )
     pmt->i_number   = -1;
     pmt->i_pid_pcr  = 0x1FFF;
     pmt->iod        = NULL;
+    pmt->od.i_version = -1;
+    ARRAY_INIT( pmt->od.objects );
 
     pmt->i_last_dts = -1;
 
@@ -5568,6 +5578,9 @@ static void ts_pmt_Del( demux_t *p_demux, ts_pmt_t *pmt )
     ARRAY_RESET( pmt->e_streams );
     if( pmt->iod )
         IODFree( pmt->iod );
+    for( int i=0; i<pmt->od.objects.i_size; i++ )
+        IODFree( pmt->od.objects.p_elems[i] );
+    ARRAY_RESET( pmt->od.objects );
     if( pmt->i_number > -1 )
         es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, pmt->i_number );
     free( pmt );

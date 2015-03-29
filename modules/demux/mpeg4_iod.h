@@ -92,6 +92,12 @@ typedef struct
 
 } iod_descriptor_t;
 
+typedef struct
+{
+    int i_version;
+    DECL_ARRAY(iod_descriptor_t *) objects;
+} od_descriptors_t;
+
 iod_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data );
 void IODFree( iod_descriptor_t *p_iod );
 
