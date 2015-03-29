@@ -380,13 +380,21 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
                 hdr.csum = hton16( metacube2_compute_crc( &hdr ) );
 
                 int i_header_size = p_sys->i_header_size + sizeof( hdr );
-                uint8_t *p_hdr_block = xmalloc( i_header_size );
-                memcpy( p_hdr_block, &hdr, sizeof( hdr ) );
-                memcpy( p_hdr_block + sizeof( hdr ), p_sys->p_header, p_sys->i_header_size );
+                block_t *p_hdr_block = block_Alloc( i_header_size );
+                if( p_hdr_block == NULL ) {
+                    block_ChainRelease( p_buffer );
+                    return VLC_ENOMEM;
+                }
+                p_hdr_block->i_flags = 0;
+                memcpy( p_hdr_block->p_buffer, &hdr, sizeof( hdr ) );
+                memcpy( p_hdr_block->p_buffer + sizeof( hdr ), p_sys->p_header, p_sys->i_header_size );
 
-                httpd_StreamHeader( p_sys->p_httpd_stream, p_hdr_block, i_header_size );
+                /* send the combined header here instead of sending them as regular
+                 * data, so that we get them as a single Metacube header block */
+                httpd_StreamHeader( p_sys->p_httpd_stream, p_hdr_block->p_buffer, p_hdr_block->i_buffer );
+                httpd_StreamSend( p_sys->p_httpd_stream, p_hdr_block );
 
-                free( p_hdr_block );
+                block_Release( p_hdr_block );
             }
             else
             {
@@ -406,6 +414,13 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
         if( p_sys->b_metacube )
         {
+            /* header data is combined into one packet and sent earlier */
+            if( p_buffer->i_flags & BLOCK_FLAG_HEADER ) {
+                block_Release( p_buffer );
+                p_buffer = p_next;
+                continue;
+            }
+
             /* prepend Metacube header */
             struct metacube2_block_header hdr;
             memcpy( hdr.sync, METACUBE2_SYNC, sizeof( METACUBE2_SYNC ) );
