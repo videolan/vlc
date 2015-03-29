@@ -1,5 +1,5 @@
 /*****************************************************************************
- * mpeg4_iod.c: ISO 14496-1 IOD and parsers
+ * mpeg4_iod.c: ISO 14496-1 IOD and OD parsers
  *****************************************************************************
  * Copyright (C) 2004-2015 VLC authors and VideoLAN
  *
@@ -31,10 +31,10 @@
 
 #include "mpeg4_iod.h"
 
-//#define IOD_DEBUG 1
-static void iod_debug( vlc_object_t *p_object, const char *format, ... )
+//#define OD_DEBUG 1
+static void od_debug( vlc_object_t *p_object, const char *format, ... )
 {
-#ifdef IOD_DEBUG
+#ifdef OD_DEBUG
     va_list ap;
     va_start(ap, format);
     msg_GenericVa( p_object, VLC_MSG_DBG, format, ap );
@@ -46,9 +46,9 @@ static void iod_debug( vlc_object_t *p_object, const char *format, ... )
 }
 
 /*****************************************************************************
- * MP4 specific functions (IOD parser)
+ * MP4 specific functions (OD parser)
  *****************************************************************************/
-static unsigned IODDescriptorLength( unsigned *pi_data, const uint8_t **pp_data )
+static unsigned ODDescriptorLength( unsigned *pi_data, const uint8_t **pp_data )
 {
     unsigned int i_b;
     unsigned int i_len = 0;
@@ -71,7 +71,7 @@ static unsigned IODDescriptorLength( unsigned *pi_data, const uint8_t **pp_data 
     return i_len;
 }
 
-static unsigned IODGetBytes( unsigned *pi_data, const uint8_t **pp_data, size_t bytes )
+static unsigned ODGetBytes( unsigned *pi_data, const uint8_t **pp_data, size_t bytes )
 {
     unsigned res = 0;
     while( *pi_data > 0 && bytes-- )
@@ -85,9 +85,9 @@ static unsigned IODGetBytes( unsigned *pi_data, const uint8_t **pp_data, size_t 
     return res;
 }
 
-static char* IODGetURL( unsigned *pi_data, const uint8_t **pp_data )
+static char* ODGetURL( unsigned *pi_data, const uint8_t **pp_data )
 {
-    unsigned len = IODGetBytes( pi_data, pp_data, 1 );
+    unsigned len = ODGetBytes( pi_data, pp_data, 1 );
     if (len > *pi_data)
         len = *pi_data;
     char *url = strndup( (char*)*pp_data, len );
@@ -96,46 +96,46 @@ static char* IODGetURL( unsigned *pi_data, const uint8_t **pp_data )
     return url;
 }
 
-#define IODTag_ObjectDescr           0x01
-#define IODTag_InitialObjectDescr    0x02
-#define IODTag_ESDescr               0x03
-#define IODTag_DecConfigDescr        0x04
-#define IODTag_DecSpecificDescr      0x05
-#define IODTag_SLDescr               0x06
+#define ODTag_ObjectDescr           0x01
+#define ODTag_InitialObjectDescr    0x02
+#define ODTag_ESDescr               0x03
+#define ODTag_DecConfigDescr        0x04
+#define ODTag_DecSpecificDescr      0x05
+#define ODTag_SLDescr               0x06
 
 /* Unified pointer for read helper */
 typedef union
 {
-    iod_descriptor_t *p_iod;
+    od_descriptor_t *p_od;
     es_mpeg4_descriptor_t *es_descr;
     decoder_config_descriptor_t *p_dec_config;
     sl_config_descriptor_t *sl_descr;
-} iod_read_params_t;
+} od_read_params_t;
 
-static uint8_t IOD_Desc_Read( vlc_object_t *, unsigned *, const uint8_t **, uint8_t, uint8_t, iod_read_params_t params );
+static uint8_t OD_Desc_Read( vlc_object_t *, unsigned *, const uint8_t **, uint8_t, uint8_t, od_read_params_t params );
 
 #define SL_Predefined_Custom 0x00
 #define SL_Predefined_NULL   0x01
 #define SL_Predefined_MP4    0x02
-static bool IOD_SLDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
-                             iod_read_params_t params )
+static bool OD_SLDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
+                             od_read_params_t params )
 {
     sl_config_descriptor_t *sl_descr = params.sl_descr;
 
-    uint8_t i_predefined = IODGetBytes( &i_data, &p_data, 1 );
+    uint8_t i_predefined = ODGetBytes( &i_data, &p_data, 1 );
     switch( i_predefined )
     {
     case SL_Predefined_Custom:
         if( i_data < 15 )
             return false;
-        sl_descr->i_flags = IODGetBytes( &i_data, &p_data, 1 );
-        sl_descr->i_timestamp_resolution = IODGetBytes( &i_data, &p_data, 4 );
-        sl_descr->i_OCR_resolution = IODGetBytes( &i_data, &p_data, 4 );
-        sl_descr->i_timestamp_length = IODGetBytes( &i_data, &p_data, 1 );
-        sl_descr->i_OCR_length = IODGetBytes( &i_data, &p_data, 1 );
-        sl_descr->i_AU_length = IODGetBytes( &i_data, &p_data, 1 );
-        sl_descr->i_instant_bitrate_length = IODGetBytes( &i_data, &p_data, 1 );
-        uint16_t i16 = IODGetBytes( &i_data, &p_data, 2 );
+        sl_descr->i_flags = ODGetBytes( &i_data, &p_data, 1 );
+        sl_descr->i_timestamp_resolution = ODGetBytes( &i_data, &p_data, 4 );
+        sl_descr->i_OCR_resolution = ODGetBytes( &i_data, &p_data, 4 );
+        sl_descr->i_timestamp_length = ODGetBytes( &i_data, &p_data, 1 );
+        sl_descr->i_OCR_length = ODGetBytes( &i_data, &p_data, 1 );
+        sl_descr->i_AU_length = ODGetBytes( &i_data, &p_data, 1 );
+        sl_descr->i_instant_bitrate_length = ODGetBytes( &i_data, &p_data, 1 );
+        uint16_t i16 = ODGetBytes( &i_data, &p_data, 2 );
         sl_descr->i_degradation_priority_length = i16 >> 12;
         sl_descr->i_AU_seqnum_length = (i16 >> 7) & 0x1f;
         sl_descr->i_packet_seqnum_length = (i16 >> 2) & 0x1f;
@@ -158,9 +158,9 @@ static bool IOD_SLDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint
     {
         if( i_data < 8 )
             return false;
-        sl_descr->i_timescale = IODGetBytes( &i_data, &p_data, 4 );
-        sl_descr->i_accessunit_duration = IODGetBytes( &i_data, &p_data, 2 );
-        sl_descr->i_compositionunit_duration = IODGetBytes( &i_data, &p_data, 2 );
+        sl_descr->i_timescale = ODGetBytes( &i_data, &p_data, 4 );
+        sl_descr->i_accessunit_duration = ODGetBytes( &i_data, &p_data, 2 );
+        sl_descr->i_compositionunit_duration = ODGetBytes( &i_data, &p_data, 2 );
     }
 
     if( (sl_descr->i_flags & USE_TIMESTAMPS_FLAG) == 0 )
@@ -171,12 +171,12 @@ static bool IOD_SLDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint
         sl_descr->i_startcomposition_timestamp = bs_read( &s, sl_descr->i_timestamp_length );
     }
 
-    iod_debug( p_object, "   * read sl desc predefined: 0x%x", i_predefined );
+    od_debug( p_object, "   * read sl desc predefined: 0x%x", i_predefined );
     return true;
 }
 
-static bool IOD_DecSpecificDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
-                                      iod_read_params_t params )
+static bool OD_DecSpecificDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
+                                      od_read_params_t params )
 {
     VLC_UNUSED(p_object);
     decoder_config_descriptor_t *p_dec_config = params.p_dec_config;
@@ -191,70 +191,70 @@ static bool IOD_DecSpecificDesc_Read( vlc_object_t *p_object, unsigned i_data, c
     return !!p_dec_config->i_extra;
 }
 
-static bool IOD_DecConfigDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
-                                    iod_read_params_t params )
+static bool OD_DecConfigDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
+                                    od_read_params_t params )
 {
     decoder_config_descriptor_t *p_dec_config = params.p_dec_config;
 
     if( i_data < 13 )
         return false;
 
-    p_dec_config->i_objectTypeIndication = IODGetBytes( &i_data, &p_data, 1 );
-    uint8_t i_flags = IODGetBytes( &i_data, &p_data, 1 );
+    p_dec_config->i_objectTypeIndication = ODGetBytes( &i_data, &p_data, 1 );
+    uint8_t i_flags = ODGetBytes( &i_data, &p_data, 1 );
     p_dec_config->i_streamType = i_flags >> 2;
 
-    IODGetBytes( &i_data, &p_data, 3 ); /* bufferSizeDB */
-    IODGetBytes( &i_data, &p_data, 4 ); /* maxBitrate */
-    IODGetBytes( &i_data, &p_data, 4 ); /* avgBitrate */
+    ODGetBytes( &i_data, &p_data, 3 ); /* bufferSizeDB */
+    ODGetBytes( &i_data, &p_data, 4 ); /* maxBitrate */
+    ODGetBytes( &i_data, &p_data, 4 ); /* avgBitrate */
 
     /* DecoderSpecificDescr */
-    IOD_Desc_Read( p_object, &i_data, &p_data,
-                   IODTag_DecSpecificDescr, 1, params );
+    OD_Desc_Read( p_object, &i_data, &p_data,
+                   ODTag_DecSpecificDescr, 1, params );
 
-    iod_debug( p_object, "   * read decoder objecttype: %x streamtype:%x extra: %u",
+    od_debug( p_object, "   * read decoder objecttype: %x streamtype:%x extra: %u",
                p_dec_config->i_objectTypeIndication, p_dec_config->i_streamType, p_dec_config->i_extra );
     /* ProfileLevelIndicator [0..255] */
     return true;
 }
 
-static bool IOD_ESDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
-                             iod_read_params_t params )
+static bool OD_ESDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
+                             od_read_params_t params )
 {
     es_mpeg4_descriptor_t *es_descr = params.es_descr;
 
     if ( i_data < 3 )
         return false;
-    es_descr->i_es_id = IODGetBytes( &i_data, &p_data, 2 );
-    uint8_t i_flags = IODGetBytes( &i_data, &p_data, 1 );
+    es_descr->i_es_id = ODGetBytes( &i_data, &p_data, 2 );
+    uint8_t i_flags = ODGetBytes( &i_data, &p_data, 1 );
 
     if( ( i_flags >> 7 )&0x01 )
     {
         if ( i_data < 2 )
             return false;
-        IODGetBytes( &i_data, &p_data, 2 ); /* dependOn_es_id */
+        ODGetBytes( &i_data, &p_data, 2 ); /* dependOn_es_id */
     }
 
     if( (i_flags >> 6) & 0x01 )
-        es_descr->psz_url = IODGetURL( &i_data, &p_data );
+        es_descr->psz_url = ODGetURL( &i_data, &p_data );
 
     if( ( i_flags >> 5 )&0x01 )
     {
         if ( i_data < 2 )
             return false;
-        IODGetBytes( &i_data, &p_data, 2 ); /* OCR_es_id */
+        ODGetBytes( &i_data, &p_data, 2 ); /* OCR_es_id */
     }
 
-    iod_debug( p_object, "   * read ES Descriptor for es id %"PRIx16, es_descr->i_es_id );
+    od_debug( p_object, "   * read ES Descriptor for es id %"PRIx16, es_descr->i_es_id );
 
     /* DecoderConfigDescr */
     params.p_dec_config = &es_descr->dec_descr;
-    if ( 1 != IOD_Desc_Read( p_object, &i_data, &p_data,
-                             IODTag_DecConfigDescr, 1, params ) )
+    if ( 1 != OD_Desc_Read( p_object, &i_data, &p_data,
+                             ODTag_DecConfigDescr, 1, params ) )
         return false;
 
     /* SLDescr */
     params.sl_descr = &es_descr->sl_descr;
-    IOD_Desc_Read( p_object, &i_data, &p_data, IODTag_SLDescr, 1, params );
+    OD_Desc_Read( p_object, &i_data, &p_data, ODTag_SLDescr, 1, params );
 
     /* IPI / IP / IPMP ... */
 
@@ -263,23 +263,23 @@ static bool IOD_ESDesc_Read( vlc_object_t *p_object, unsigned i_data, const uint
     return true;
 }
 
-static bool IOD_InitialObjectDesc_Read( vlc_object_t *p_object, unsigned i_data,
-                                        const uint8_t *p_data, iod_read_params_t params )
+static bool OD_InitialObjectDesc_Read( vlc_object_t *p_object, unsigned i_data,
+                                        const uint8_t *p_data, od_read_params_t params )
 {
-    iod_descriptor_t *p_iod = params.p_iod;
+    od_descriptor_t *p_iod = params.p_od;
     if( i_data < 3 + 5 + 2 )
         return false;
 
-    uint16_t i_object_descriptor_id = ( IODGetBytes( &i_data, &p_data, 1 ) << 2 );
-    uint8_t i_flags = IODGetBytes( &i_data, &p_data, 1 );
-    i_object_descriptor_id |= i_flags >> 6;
+    p_iod->i_ID = ( ODGetBytes( &i_data, &p_data, 1 ) << 2 );
+    uint8_t i_flags = ODGetBytes( &i_data, &p_data, 1 );
+    p_iod->i_ID |= i_flags >> 6;
 
-    iod_debug( p_object, "  * ObjectDescriptorID: %"PRIu16, i_object_descriptor_id );
-    iod_debug( p_object, "  * includeInlineProfileLevel flag: 0x%"PRIx8, ( i_flags >> 4 )&0x01 );
+    od_debug( p_object, "  * ObjectDescriptorID: %"PRIu16, p_iod->i_ID );
+    od_debug( p_object, "  * includeInlineProfileLevel flag: 0x%"PRIx8, ( i_flags >> 4 )&0x01 );
     if ( (i_flags >> 5) & 0x01 )
     {
-        p_iod->psz_url = IODGetURL( &i_data, &p_data );
-        iod_debug( p_object, "  * URL: %s", p_iod->psz_url );
+        p_iod->psz_url = ODGetURL( &i_data, &p_data );
+        od_debug( p_object, "  * URL: %s", p_iod->psz_url );
         return true; /* leaves out unparsed remaining extdescr */
     }
 
@@ -287,19 +287,19 @@ static bool IOD_InitialObjectDesc_Read( vlc_object_t *p_object, unsigned i_data,
         return false;
 
     /* Profile Level Indication */
-    IODGetBytes( &i_data, &p_data, 1 ); /* OD */
-    IODGetBytes( &i_data, &p_data, 1 ); /* scene */
-    IODGetBytes( &i_data, &p_data, 1 ); /* audio */
-    IODGetBytes( &i_data, &p_data, 1 ); /* visual */
-    IODGetBytes( &i_data, &p_data, 1 ); /* graphics */
+    ODGetBytes( &i_data, &p_data, 1 ); /* OD */
+    ODGetBytes( &i_data, &p_data, 1 ); /* scene */
+    ODGetBytes( &i_data, &p_data, 1 ); /* audio */
+    ODGetBytes( &i_data, &p_data, 1 ); /* visual */
+    ODGetBytes( &i_data, &p_data, 1 ); /* graphics */
 
     /* Now read */
     /* 1..255 ESdescr */
-    uint8_t i_desc_count = IOD_Desc_Read( p_object, &i_data, &p_data,
-                                          IODTag_ESDescr, ES_DESCRIPTOR_COUNT, params );
+    uint8_t i_desc_count = OD_Desc_Read( p_object, &i_data, &p_data,
+                                          ODTag_ESDescr, ES_DESCRIPTOR_COUNT, params );
     if( i_desc_count == 0 )
     {
-        iod_debug( p_object, "   * missing ES Descriptor" );
+        od_debug( p_object, "   * missing ES Descriptor" );
         return false;
     }
 
@@ -312,22 +312,22 @@ static bool IOD_InitialObjectDesc_Read( vlc_object_t *p_object, unsigned i_data,
     return true;
 }
 
-static bool IODObjectDescriptorRead( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
-                                  iod_read_params_t params )
+static bool ODObjectDescriptorRead( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
+                                  od_read_params_t params )
 {
-    iod_descriptor_t *p_iod = params.p_iod;
+    od_descriptor_t *p_iod = params.p_od;
     if( i_data < 3 + 2 )
         return false;
 
-    uint16_t i_object_descriptor_id = ( IODGetBytes( &i_data, &p_data, 1 ) << 2 );
-    uint8_t i_flags = IODGetBytes( &i_data, &p_data, 1 );
-    i_object_descriptor_id |= i_flags >> 6;
+    p_iod->i_ID = ( ODGetBytes( &i_data, &p_data, 1 ) << 2 );
+    uint8_t i_flags = ODGetBytes( &i_data, &p_data, 1 );
+    p_iod->i_ID |= i_flags >> 6;
 
-    iod_debug( p_object, "  * ObjectDescriptorID: %"PRIu16, i_object_descriptor_id );
+    od_debug( p_object, "  * ObjectDescriptorID: %"PRIu16, p_iod->i_ID );
     if ( (i_flags >> 5) & 0x01 )
     {
-        p_iod->psz_url = IODGetURL( &i_data, &p_data );
-        iod_debug( p_object, "  * URL: %s", p_iod->psz_url );
+        p_iod->psz_url = ODGetURL( &i_data, &p_data );
+        od_debug( p_object, "  * URL: %s", p_iod->psz_url );
         return true;
     }
 
@@ -335,11 +335,11 @@ static bool IODObjectDescriptorRead( vlc_object_t *p_object, unsigned i_data, co
         return false;
 
     /* 1..255 ESdescr */
-    uint8_t i_desc_count = IOD_Desc_Read( p_object, &i_data, &p_data,
-                                          IODTag_ESDescr, ES_DESCRIPTOR_COUNT, params );
+    uint8_t i_desc_count = OD_Desc_Read( p_object, &i_data, &p_data,
+                                          ODTag_ESDescr, ES_DESCRIPTOR_COUNT, params );
     if( i_desc_count == 0 )
     {
-        iod_debug( p_object, "   * missing ES Descriptor" );
+        od_debug( p_object, "   * missing ES Descriptor" );
         return false;
     }
 
@@ -352,80 +352,80 @@ static bool IODObjectDescriptorRead( vlc_object_t *p_object, unsigned i_data, co
     return true;
 }
 
-static uint8_t IOD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const uint8_t **pp_data,
-                              uint8_t i_target_tag, uint8_t i_max_desc, iod_read_params_t params )
+static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const uint8_t **pp_data,
+                              uint8_t i_target_tag, uint8_t i_max_desc, od_read_params_t params )
 {
     uint8_t i_read_count = 0;
 
     for (unsigned i = 0; *pi_data > 2 && i < i_max_desc; i++)
     {
-        const uint8_t i_tag = IODGetBytes( pi_data, pp_data, 1 );
-        const unsigned i_length = IODDescriptorLength( pi_data, pp_data );
+        const uint8_t i_tag = ODGetBytes( pi_data, pp_data, 1 );
+        const unsigned i_length = ODDescriptorLength( pi_data, pp_data );
         if( i_target_tag != i_tag || i_length > *pi_data )
             break;
 
         unsigned i_descriptor_data = i_length;
         const uint8_t *p_descriptor_data = *pp_data;
 
-        iod_debug( p_object, "  Reading descriptor 0x%"PRIx8": found tag 0x%"PRIx8" left %d",
+        od_debug( p_object, "  Reading descriptor 0x%"PRIx8": found tag 0x%"PRIx8" left %d",
                    i_target_tag, i_tag, *pi_data );
         switch( i_tag )
         {
-            case IODTag_ObjectDescr:
+            case ODTag_ObjectDescr:
             {
-                /* iod_descriptor_t *p_iod = (iod_descriptor_t *) param; */
-                if ( !IODObjectDescriptorRead( p_object, i_descriptor_data,
+                /* od_descriptor_t *p_iod = (od_descriptor_t *) param; */
+                if ( !ODObjectDescriptorRead( p_object, i_descriptor_data,
                                                p_descriptor_data, params ) )
                 {};
                 break;
             }
 
-            case IODTag_InitialObjectDescr:
+            case ODTag_InitialObjectDescr:
             {
-                /* iod_descriptor_t *p_iod = (iod_descriptor_t *) param; */
-                if ( !IOD_InitialObjectDesc_Read( p_object, i_descriptor_data,
+                /* od_descriptor_t *p_iod = (od_descriptor_t *) param; */
+                if ( !OD_InitialObjectDesc_Read( p_object, i_descriptor_data,
                                                   p_descriptor_data, params ) )
                 {};
                 break;
             }
 
-            case IODTag_ESDescr: /**/
+            case ODTag_ESDescr: /**/
             {
-                iod_descriptor_t *p_iod = params.p_iod;
-                iod_read_params_t childparams;
+                od_descriptor_t *p_iod = params.p_od;
+                od_read_params_t childparams;
                 childparams.es_descr = &p_iod->es_descr[i_read_count];
-                if ( !IOD_ESDesc_Read( p_object, i_descriptor_data,
+                if ( !OD_ESDesc_Read( p_object, i_descriptor_data,
                                        p_descriptor_data, childparams ) )
                 {};
                 break;
             }
 
-            case IODTag_DecConfigDescr:
+            case ODTag_DecConfigDescr:
             {
-                if ( !IOD_DecConfigDesc_Read( p_object, i_descriptor_data,
+                if ( !OD_DecConfigDesc_Read( p_object, i_descriptor_data,
                                               p_descriptor_data, params ) )
                 {};
                 break;
             }
 
-            case IODTag_DecSpecificDescr:
+            case ODTag_DecSpecificDescr:
             {
-                if ( !IOD_DecSpecificDesc_Read( p_object, i_descriptor_data,
+                if ( !OD_DecSpecificDesc_Read( p_object, i_descriptor_data,
                                                 p_descriptor_data, params ) )
                 {};
                 break;
             }
 
-            case IODTag_SLDescr:
+            case ODTag_SLDescr:
             {
-                if ( !IOD_SLDesc_Read( p_object, i_descriptor_data,
+                if ( !OD_SLDesc_Read( p_object, i_descriptor_data,
                                        p_descriptor_data, params ) )
                 {};
                 break;
             }
 
             default:
-                iod_debug( p_object, "trying to read unsupported descriptor" );
+                od_debug( p_object, "trying to read unsupported descriptor" );
                 break;
         }
 
@@ -438,19 +438,19 @@ static uint8_t IOD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const u
     return i_read_count;
 }
 
-static iod_descriptor_t *ODInit( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
+static od_descriptor_t *ODInit( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
                                  uint8_t i_start_tag, uint8_t i_min, uint8_t i_max )
 {
     /* Initial Object Descriptor must follow */
-    iod_descriptor_t *p_iod = calloc( 1, sizeof( iod_descriptor_t ) );
+    od_descriptor_t *p_iod = calloc( 1, sizeof( od_descriptor_t ) );
     if( !p_iod )
         return NULL;
 
-    iod_read_params_t params;
-    params.p_iod = p_iod;
-    if ( IOD_Desc_Read( p_object, &i_data, &p_data, i_start_tag, i_max, params ) < i_min )
+    od_read_params_t params;
+    params.p_od = p_iod;
+    if ( OD_Desc_Read( p_object, &i_data, &p_data, i_start_tag, i_max, params ) < i_min )
     {
-        iod_debug( p_object, "   cannot read first tag 0x%"PRIx8, i_start_tag );
+        od_debug( p_object, "   cannot read first tag 0x%"PRIx8, i_start_tag );
         free( p_iod );
         return NULL;
     }
@@ -458,33 +458,33 @@ static iod_descriptor_t *ODInit( vlc_object_t *p_object, unsigned i_data, const 
     return p_iod;
 }
 
-iod_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data )
+od_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data )
 {
     if( i_data < 4 )
         return NULL;
 
-    uint8_t i_iod_scope = IODGetBytes( &i_data, &p_data, 1 ); /* scope */
-    uint8_t i_iod_label = IODGetBytes( &i_data, &p_data, 1 );
-    if( i_iod_label == 0x02 ) /* old vlc's buggy implementation of the IOD_descriptor */
+    uint8_t i_iod_scope = ODGetBytes( &i_data, &p_data, 1 ); /* scope */
+    uint8_t i_iod_label = ODGetBytes( &i_data, &p_data, 1 );
+    if( i_iod_label == 0x02 ) /* old vlc's buggy implementation of the OD_descriptor */
     {
         i_iod_label = i_iod_scope;
         i_iod_scope = 0x10; /* Add the missing front iod scope byte */
         i_data++; p_data--; /* next byte must be tag */
     }
 
-    iod_debug( p_object, "  * iod label:0x%"PRIx8" scope:0x%"PRIx8,
+    od_debug( p_object, "  * iod label:0x%"PRIx8" scope:0x%"PRIx8,
                i_iod_label, i_iod_scope );
 
     if( i_iod_scope != 0x10 && i_iod_scope != 0x11 ) /* Uniqueness in program or transport */
     {
-        iod_debug( p_object, "  * can't handle reserved scope 0x%"PRIx8, i_iod_scope );
+        od_debug( p_object, "  * can't handle reserved scope 0x%"PRIx8, i_iod_scope );
         return NULL;
     }
 
-    return ODInit( p_object, i_data, p_data, IODTag_InitialObjectDescr, 1, 1 );
+    return ODInit( p_object, i_data, p_data, ODTag_InitialObjectDescr, 1, 1 );
 }
 
-void IODFree( iod_descriptor_t *p_iod )
+void ODFree( od_descriptor_t *p_iod )
 {
     if( p_iod->psz_url )
     {

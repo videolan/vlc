@@ -85,21 +85,21 @@ typedef struct
 
 typedef struct
 {
-    /* IOD */
+    uint16_t                i_ID;
     char                    *psz_url;
 
     es_mpeg4_descriptor_t   es_descr[ES_DESCRIPTOR_COUNT];
 
-} iod_descriptor_t;
+} od_descriptor_t;
 
 typedef struct
 {
     int i_version;
-    DECL_ARRAY(iod_descriptor_t *) objects;
+    DECL_ARRAY(od_descriptor_t *) objects;
 } od_descriptors_t;
 
-iod_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data );
-void IODFree( iod_descriptor_t *p_iod );
+od_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data );
+void ODFree( od_descriptor_t *p_od );
 
 sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
                                const sl_config_descriptor_t *sl );

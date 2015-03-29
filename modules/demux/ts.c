@@ -209,8 +209,8 @@ typedef struct
     int             i_number;
     int             i_pid_pcr;
     /* IOD stuff (mpeg4) */
-    iod_descriptor_t *iod;
-    iod_descriptors_t od;
+    od_descriptor_t *iod;
+    od_descriptors_t od;
 
     DECL_ARRAY(ts_pid_t *) e_streams;
 
@@ -3972,7 +3972,7 @@ static const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const ts_pmt_t *pmt, ui
     }
     for( int i=0; i<pmt->od.objects.i_size; i++ )
     {
-        const iod_descriptor_t *od = pmt->od.objects.p_elems[i];
+        const od_descriptor_t *od = pmt->od.objects.p_elems[i];
         for( int j = 0; j < ES_DESCRIPTOR_COUNT; j++ )
         {
             const es_mpeg4_descriptor_t *es_descr = &od->es_descr[j];
@@ -4993,7 +4993,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
     if( p_pmt->iod )
     {
-        IODFree( p_pmt->iod );
+        ODFree( p_pmt->iod );
         p_pmt->iod = NULL;
     }
 
@@ -5580,9 +5580,9 @@ static void ts_pmt_Del( demux_t *p_demux, ts_pmt_t *pmt )
         PIDRelease( p_demux, pmt->e_streams.p_elems[i] );
     ARRAY_RESET( pmt->e_streams );
     if( pmt->iod )
-        IODFree( pmt->iod );
+        ODFree( pmt->iod );
     for( int i=0; i<pmt->od.objects.i_size; i++ )
-        IODFree( pmt->od.objects.p_elems[i] );
+        ODFree( pmt->od.objects.p_elems[i] );
     ARRAY_RESET( pmt->od.objects );
     if( pmt->i_number > -1 )
         es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, pmt->i_number );
