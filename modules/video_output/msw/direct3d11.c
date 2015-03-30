@@ -694,46 +694,73 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 # endif
 #endif
 
+    // look for the request pixel format first
     for (unsigned i = 0; d3d_formats[i].name != 0; i++)
     {
-        UINT i_formatSupport;
-        if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
-                                                       d3d_formats[i].formatTexture,
-                                                       &i_formatSupport)) &&
-                ( i_formatSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D ))
+        if( fmt->i_chroma == d3d_formats[i].fourcc)
         {
-            msg_Dbg(vd, "Using pixel format %s", d3d_formats[i].name );
-            sys->d3dFormatTex = d3d_formats[i].formatTexture;
-            sys->vlcFormat    = d3d_formats[i].fourcc;
-            sys->d3dFormatY   = d3d_formats[i].formatY;
-            sys->d3dFormatUV  = d3d_formats[i].formatUV;
-            switch (sys->vlcFormat)
+            UINT i_formatSupport;
+            if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
+                                                           d3d_formats[i].formatTexture,
+                                                           &i_formatSupport)) &&
+                    ( i_formatSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D ))
             {
-            case VLC_CODEC_NV12:
-                if( fmt->i_height > 576 )
-                    sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
-                else
-                    sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
-                break;
-            case VLC_CODEC_I420:
-                if( fmt->i_height > 576 )
-                    sys->d3dPxShader = globPixelShaderBiplanarI420_BT709_2RGB;
-                else
-                    sys->d3dPxShader = globPixelShaderBiplanarI420_BT601_2RGB;
-                break;
-            case VLC_CODEC_RGB32:
-            case VLC_CODEC_BGRA:
-            case VLC_CODEC_RGB16:
-            default:
-                sys->d3dPxShader = globPixelShaderDefault;
+                msg_Dbg(vd, "Using pixel format %s", d3d_formats[i].name );
+                sys->d3dFormatTex = d3d_formats[i].formatTexture;
+                sys->vlcFormat    = d3d_formats[i].fourcc;
+                sys->d3dFormatY   = d3d_formats[i].formatY;
+                sys->d3dFormatUV  = d3d_formats[i].formatUV;
                 break;
             }
-            break;
         }
     }
-    if ( !sys->vlcFormat ) {
+
+    // look for any pixel format that we can handle
+    if ( !sys->vlcFormat )
+    {
+        for (unsigned i = 0; d3d_formats[i].name != 0; i++)
+        {
+            UINT i_formatSupport;
+            if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
+                                                           d3d_formats[i].formatTexture,
+                                                           &i_formatSupport)) &&
+                    ( i_formatSupport & D3D11_FORMAT_SUPPORT_TEXTURE2D ))
+            {
+                msg_Dbg(vd, "Using pixel format %s", d3d_formats[i].name );
+                sys->d3dFormatTex = d3d_formats[i].formatTexture;
+                sys->vlcFormat    = d3d_formats[i].fourcc;
+                sys->d3dFormatY   = d3d_formats[i].formatY;
+                sys->d3dFormatUV  = d3d_formats[i].formatUV;
+                break;
+            }
+        }
+    }
+    if ( !sys->vlcFormat )
+    {
        msg_Err(vd, "Could not get a suitable texture pixel format");
        return VLC_EGENERIC;
+    }
+
+    switch (sys->vlcFormat)
+    {
+    case VLC_CODEC_NV12:
+        if( fmt->i_height > 576 )
+            sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
+        else
+            sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
+        break;
+    case VLC_CODEC_I420:
+        if( fmt->i_height > 576 )
+            sys->d3dPxShader = globPixelShaderBiplanarI420_BT709_2RGB;
+        else
+            sys->d3dPxShader = globPixelShaderBiplanarI420_BT601_2RGB;
+        break;
+    case VLC_CODEC_RGB32:
+    case VLC_CODEC_BGRA:
+    case VLC_CODEC_RGB16:
+    default:
+        sys->d3dPxShader = globPixelShaderDefault;
+        break;
     }
 
     UpdateRects(vd, NULL, NULL, true);
