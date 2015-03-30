@@ -248,6 +248,8 @@ typedef struct
     /* Some private streams encapsulate several ES (eg. DVB subtitles)*/
     DECL_ARRAY( ts_pes_es_t * ) extra_es;
 
+    uint8_t i_stream_type;
+
     ts_es_data_type_t data_type;
     int         i_data_size;
     int         i_data_gathered;
@@ -2048,12 +2050,15 @@ static block_t *Opus_Parse(demux_t *demux, block_t *block)
  * gathering stuff
  ****************************************************************************/
 static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header, size_t i_header,
-                           unsigned *pi_skip, mtime_t *pi_dts, mtime_t *pi_pts )
+                           unsigned *pi_skip, mtime_t *pi_dts, mtime_t *pi_pts,
+                           uint8_t *pi_stream_id )
 {
     unsigned i_skip;
 
     if ( i_header < 9 )
         return VLC_EGENERIC;
+
+    *pi_stream_id = p_header[3];
 
     switch( p_header[3] )
     {
@@ -2149,6 +2154,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     mtime_t i_dts = -1;
     mtime_t i_pts = -1;
     mtime_t i_length = 0;
+    uint8_t i_stream_id;
     const es_mpeg4_descriptor_t *p_mpeg4desc = NULL;
 
     assert(pid->type == TYPE_PES);
@@ -2170,7 +2176,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
         return;
     }
 
-    if( ParsePESHeader( p_demux, (uint8_t*)&header, i_max, &i_skip, &i_dts, &i_pts ) == VLC_EGENERIC )
+    if( ParsePESHeader( p_demux, (uint8_t*)&header, i_max, &i_skip,
+                        &i_dts, &i_pts, &i_stream_id ) == VLC_EGENERIC )
     {
         block_ChainRelease( p_pes );
         return;
@@ -2698,8 +2705,10 @@ static int SeekToTime( demux_t *p_demux, ts_pmt_t *p_pmt, int64_t i_scaledtime )
                 {
                     mtime_t i_dts = -1;
                     mtime_t i_pts = -1;
+                    uint8_t i_stream_id;
                     if ( VLC_SUCCESS == ParsePESHeader( p_demux, &p_pkt->p_buffer[i_skip],
-                                                        p_pkt->i_buffer - i_skip, &i_skip, &i_dts, &i_pts ) )
+                                                        p_pkt->i_buffer - i_skip, &i_skip,
+                                                        &i_dts, &i_pts, &i_stream_id ) )
                     {
                         if( i_dts > -1 )
                             i_pcr = i_dts;
@@ -2840,13 +2849,14 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
                 b_pcrresult = false;
                 mtime_t i_dts = -1;
                 mtime_t i_pts = -1;
+                uint8_t i_stream_id;
                 unsigned i_skip = 4;
                 if ( b_adaptfield ) // adaptation field
                     i_skip += 1 + p_pkt->p_buffer[4];
 
                 if ( VLC_SUCCESS == ParsePESHeader( p_demux, &p_pkt->p_buffer[i_skip],
-                                                    p_pkt->i_buffer - i_skip,
-                                                    &i_skip, &i_dts, &i_pts ) )
+                                                    p_pkt->i_buffer - i_skip, &i_skip,
+                                                    &i_dts, &i_pts, &i_stream_id ) )
                 {
                     if( i_dts != -1 )
                         *pi_pcr = i_dts;
@@ -5204,6 +5214,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
 
         PIDFillFormat( &p_pes->es.fmt, p_dvbpsies->i_type, &p_pes->data_type );
 
+        p_pes->i_stream_type = p_dvbpsies->i_type;
         pespid->i_flags |= SEEN(PID(p_sys, p_dvbpsies->i_pid));
 
         bool b_registration_applied = false;
@@ -5600,6 +5611,7 @@ static ts_pes_t *ts_pes_New( demux_t *p_demux )
     pes->es.i_sl_es_id = 0;
     es_format_Init( &pes->es.fmt, UNKNOWN_ES, 0 );
     ARRAY_INIT( pes->extra_es );
+    pes->i_stream_type = 0;
     pes->data_type = TS_ES_DATA_PES;
     pes->i_data_size = 0;
     pes->i_data_gathered = 0;
