@@ -188,6 +188,8 @@ enum input_item_option_e
  */
 VLC_API int input_item_AddOption(input_item_t *, const char *, unsigned i_flags );
 
+void input_item_ApplyOptions(vlc_object_t *, input_item_t *);
+
 /* */
 VLC_API bool input_item_HasErrorWhenReading( input_item_t * );
 VLC_API void input_item_SetMeta( input_item_t *, vlc_meta_type_t meta_type, const char *psz_val );

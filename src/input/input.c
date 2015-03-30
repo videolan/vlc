@@ -318,12 +318,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     }
 
     /* Parse input options */
-    vlc_mutex_lock( &p_item->lock );
-    assert( (int)p_item->optflagc == p_item->i_options );
-    for( i = 0; i < p_item->i_options; i++ )
-        var_OptionParse( VLC_OBJECT(p_input), p_item->ppsz_options[i],
-                         !!(p_item->optflagv[i] & VLC_INPUT_OPTION_TRUSTED) );
-    vlc_mutex_unlock( &p_item->lock );
+    input_item_ApplyOptions( VLC_OBJECT(p_input), p_item );
 
     p_input->b_preparsing = b_quick;
     p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;

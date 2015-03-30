@@ -518,6 +518,17 @@ out:
     return err;
 }
 
+void input_item_ApplyOptions(vlc_object_t *obj, input_item_t *item)
+{
+    vlc_mutex_lock(&item->lock);
+    assert(item->optflagc == (unsigned)item->i_options);
+
+    for (unsigned i = 0; i < (unsigned)item->i_options; i++)
+        var_OptionParse(obj, item->ppsz_options[i],
+                        !!(item->optflagv[i] & VLC_INPUT_OPTION_TRUSTED));
+    vlc_mutex_unlock(&item->lock);
+}
+
 static info_category_t *InputItemFindCat( input_item_t *p_item,
                                           int *pi_index, const char *psz_cat )
 {
