@@ -36,9 +36,8 @@
 
 #include <string.h>
 
-/*****************************************************************************
- * input_item_t: Describes an input and is used to spawn input_thread_t objects
- *****************************************************************************/
+typedef struct input_item_opaque input_item_opaque_t;
+
 struct info_t
 {
     char *psz_name;            /**< Name of this info */
@@ -52,6 +51,9 @@ struct info_category_t
     struct info_t **pp_infos;     /**< Pointer to an array of infos */
 };
 
+/**
+ * Describes an input and is used to spawn input_thread_t objects.
+ */
 struct input_item_t
 {
     int        i_id;                 /**< Identifier of the item */
@@ -63,6 +65,7 @@ struct input_item_t
     char       **ppsz_options;       /**< Array of input options */
     uint8_t    *optflagv;            /**< Some flags of input options */
     unsigned   optflagc;
+    input_item_opaque_t *opaques;    /**< List of opaque pointer values */
 
     mtime_t    i_duration;           /**< Duration in microseconds */
 
@@ -187,6 +190,7 @@ enum input_item_option_e
  * This function allows to add an option to an existing input_item_t.
  */
 VLC_API int input_item_AddOption(input_item_t *, const char *, unsigned i_flags );
+VLC_API int input_item_AddOpaque(input_item_t *, const char *, void *);
 
 void input_item_ApplyOptions(vlc_object_t *, input_item_t *);
 

@@ -35,6 +35,13 @@
 #include "item.h"
 #include "info.h"
 
+struct input_item_opaque
+{
+    struct input_item_opaque *next;
+    void *value;
+    char name[1];
+};
+
 static int GuessType( const input_item_t *p_item, bool *p_net );
 
 void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
@@ -462,6 +469,12 @@ void input_item_Release( input_item_t *p_item )
     if( p_item->p_meta != NULL )
         vlc_meta_Delete( p_item->p_meta );
 
+    for( input_item_opaque_t *o = p_item->opaques, *next; o != NULL; o = next )
+    {
+        next = o->next;
+        free( o );
+    }
+
     for( int i = 0; i < p_item->i_options; i++ )
         free( p_item->ppsz_options[i] );
     TAB_CLEAN( p_item->i_options, p_item->ppsz_options );
@@ -518,6 +531,25 @@ out:
     return err;
 }
 
+int input_item_AddOpaque(input_item_t *item, const char *name, void *value)
+{
+    assert(name != NULL);
+
+    size_t namelen = strlen(name);
+    input_item_opaque_t *entry = malloc(sizeof (*entry) + namelen);
+    if (unlikely(entry == NULL))
+        return VLC_ENOMEM;
+
+    memcpy(entry->name, name, namelen + 1);
+    entry->value = value;
+
+    vlc_mutex_lock(&item->lock);
+    entry->next = item->opaques;
+    item->opaques = entry;
+    vlc_mutex_unlock(&item->lock);
+    return VLC_SUCCESS;
+}
+
 void input_item_ApplyOptions(vlc_object_t *obj, input_item_t *item)
 {
     vlc_mutex_lock(&item->lock);
@@ -526,6 +558,13 @@ void input_item_ApplyOptions(vlc_object_t *obj, input_item_t *item)
     for (unsigned i = 0; i < (unsigned)item->i_options; i++)
         var_OptionParse(obj, item->ppsz_options[i],
                         !!(item->optflagv[i] & VLC_INPUT_OPTION_TRUSTED));
+
+    for (const input_item_opaque_t *o = item->opaques; o != NULL; o = o->next)
+    {
+        var_Create(obj, o->name, VLC_VAR_ADDRESS);
+        var_SetAddress(obj, o->name, o->value);
+    }
+
     vlc_mutex_unlock(&item->lock);
 }
 
@@ -887,6 +926,7 @@ input_item_NewWithTypeExt( const char *psz_uri, const char *psz_name,
     p_input->optflagv = NULL;
     for( int i = 0; i < i_options; i++ )
         input_item_AddOption( p_input, ppsz_options[i], flags );
+    p_input->opaques = NULL;
 
     p_input->i_duration = duration;
     TAB_INIT( p_input->i_categories, p_input->pp_categories );
