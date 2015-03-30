@@ -860,6 +860,12 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
     if (index >= 0) {
         int64_t i_buffer_pts;
 
+        /* If the oldest input block had no PTS, the timestamp of the frame
+         * returned by MediaCodec might be wrong so we overwrite it with the
+         * corresponding dts. Call FifoGet first in order to avoid a gap if
+         * buffers are released due to an invalid format or a preroll */
+        int64_t forced_ts = timestamp_FifoGet(p_sys->timestamp_fifo);
+
         if (!p_sys->pixel_format || !p_pic) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
             return ReleaseOutputBuffer(p_dec, env, index, false);
@@ -869,10 +875,6 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
         if (i_buffer_pts <= p_sys->i_preroll_end)
             return ReleaseOutputBuffer(p_dec, env, index, false);
 
-        /* If the oldest input block had no PTS, the timestamp
-         * of the frame returned by MediaCodec might be wrong
-         * so we overwrite it with the corresponding dts. */
-        int64_t forced_ts = timestamp_FifoGet(p_sys->timestamp_fifo);
         if (forced_ts == VLC_TS_INVALID)
             p_pic->date = i_buffer_pts;
         else
