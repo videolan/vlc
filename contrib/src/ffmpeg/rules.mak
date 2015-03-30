@@ -50,6 +50,7 @@ FFMPEGCONF += --disable-encoders --disable-muxers
 endif
 
 # Small size
+ifdef WITH_OPTIMIZATION
 ifdef ENABLE_SMALL
 FFMPEGCONF += --enable-small
 endif
@@ -57,6 +58,9 @@ ifeq ($(ARCH),arm)
 ifdef HAVE_ARMV7A
 FFMPEGCONF += --enable-thumb
 endif
+endif
+else
+FFMPEGCONF += --optflags=-O0
 endif
 
 ifdef HAVE_CROSS_COMPILE
