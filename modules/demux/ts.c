@@ -258,6 +258,12 @@ typedef struct
 
     block_t *   p_prepcr_outqueue;
 
+    /* SL AU */
+    struct
+    {
+        block_t     *p_data;
+        block_t     **pp_last;
+    } sl;
 } ts_pes_t;
 
 
@@ -2599,6 +2605,13 @@ static inline void FlushESBuffer( ts_pes_t *p_pes )
         block_ChainRelease( p_pes->p_data );
         p_pes->p_data = NULL;
         p_pes->pp_last = &p_pes->p_data;
+    }
+
+    if( p_pes->sl.p_data )
+    {
+        block_ChainRelease( p_pes->sl.p_data );
+        p_pes->sl.p_data = NULL;
+        p_pes->sl.pp_last = &p_pes->sl.p_data;
     }
 }
 
@@ -5618,6 +5631,8 @@ static ts_pes_t *ts_pes_New( demux_t *p_demux )
     pes->p_data = NULL;
     pes->pp_last = &pes->p_data;
     pes->p_prepcr_outqueue = NULL;
+    pes->sl.p_data = NULL;
+    pes->sl.pp_last = &pes->sl.p_data;
 
     return pes;
 }
