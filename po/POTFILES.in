@@ -437,7 +437,7 @@ modules/control/lirc.c
 modules/control/motion.c
 modules/control/netsync.c
 modules/control/ntservice.c
-modules/control/rc.c
+modules/control/oldrc.c
 modules/control/unimotion.c
 modules/control/unimotion.h
 modules/demux/aiff.c

@@ -26,7 +26,7 @@ description=
 [============================================================================[
  Command Line Interface for VLC
 
- This is a modules/control/rc.c look alike (with a bunch of new features).
+ This is a modules/control/oldrc.c look alike (with a bunch of new features).
  It also provides a VLM interface copied from the telnet interface.
 
  Use on local term:
