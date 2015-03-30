@@ -426,6 +426,26 @@ libvlc_media_t *libvlc_media_new_fd( libvlc_instance_t *p_instance, int fd )
     return libvlc_media_new_location( p_instance, mrl );
 }
 
+libvlc_media_t *libvlc_media_new_callbacks(libvlc_instance_t *p_instance,
+                                           libvlc_media_open_cb open_cb,
+                                           libvlc_media_read_cb read_cb,
+                                           libvlc_media_seek_cb seek_cb,
+                                           libvlc_media_close_cb close_cb,
+                                           void *opaque)
+{
+    libvlc_media_t *m = libvlc_media_new_location(p_instance, "imem://");
+    if (unlikely(m == NULL))
+        return NULL;
+
+    assert(read_cb != NULL);
+    input_item_AddOpaque(m->p_input_item, "imem-data", opaque);
+    input_item_AddOpaque(m->p_input_item, "imem-open", open_cb);
+    input_item_AddOpaque(m->p_input_item, "imem-read", read_cb);
+    input_item_AddOpaque(m->p_input_item, "imem-seek", seek_cb);
+    input_item_AddOpaque(m->p_input_item, "imem-close", close_cb);
+    return m;
+}
+
 /**************************************************************************
  * Create a new media descriptor object
  **************************************************************************/

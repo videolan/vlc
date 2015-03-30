@@ -270,6 +270,64 @@ typedef enum libvlc_media_parse_flag_t
 } libvlc_media_parse_flag_t;
 
 /**
+ * Callback prototype to open a custom bitstream input media.
+ *
+ * The same media item can be opened multiple times. Each time, this callback
+ * is invoked. It should allocate and initialize any instance-specific
+ * resources, then store them in *datap. The instance resources can be freed
+ * in the @ref libvlc_close_cb callback.
+ *
+ * \param opaque private pointer as passed to libvlc_media_new_callbacks()
+ * \param datap storage space for a private data pointer [OUT]
+ * \param sizep byte length of the bitstream or 0 if unknown [OUT]
+ *
+ * \note For convenience, *datap is initially NULL and *sizep is initially 0.
+ *
+ * \return 0 on success, non-zero on error. In case of failure, the other
+ * callbacks will not be invoked and any value stored in *datap and *sizep is
+ * discarded.
+ */
+typedef int (*libvlc_media_open_cb)(void *opaque, void **datap,
+                                    uint64_t *sizep);
+
+/**
+ * Callback prototype to read data from a custom bitstream input media.
+ *
+ * \param opaque private pointer as set by the @ref libvlc_media_open_cb
+ *               callback
+ * \param buf start address of the buffer to read data into
+ * \param len bytes length of the buffer
+ *
+ * \return strictly positive number of bytes read, 0 on end-of-stream,
+ *         or -1 on non-recoverable error
+ *
+ * \note If no data is immediately available, then the callback should sleep.
+ * \warning The application is responsible for avoiding deadlock situations.
+ * In particular, the callback should return an error if playback is stopped;
+ * if it does not return, then libvlc_media_player_stop() will never return.
+ */
+typedef ssize_t (*libvlc_media_read_cb)(void *opaque, unsigned char *buf,
+                                        size_t len);
+
+/**
+ * Callback prototype to seek a custom bitstream input media.
+ *
+ * \param opaque private pointer as set by the @ref libvlc_media_open_cb
+ *               callback
+ * \param offset absolute byte offset to seek to
+ * \return 0 on success, -1 on error.
+ */
+typedef int (*libvlc_media_seek_cb)(void *opaque, uint64_t offset);
+
+/**
+ * Callback prototype to close a custom bitstream input media.
+ *
+ * \param opaque private pointer as set by the @ref libvlc_media_open_cb
+ *               callback
+ */
+typedef void (*libvlc_media_close_cb)(void *opaque);
+
+/**
  * Create a media with a certain given media resource location,
  * for instance a valid URL.
  *
@@ -329,6 +387,39 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_fd(
                                    libvlc_instance_t *p_instance,
                                    int fd );
 
+/**
+ * Create a media with custom callbacks to read the data from.
+ *
+ * \param instance LibVLC instance
+ * \param open_cb callback to open the custom bitstream input media
+ * \param read_cb callback to read data (must not be NULL)
+ * \param seek_cb callback to seek, or NULL if seeking is not supported
+ * \param close_cb callback to close the media, or NULL if unnecessary
+ * \param opaque data pointer for the open callback
+ *
+ * \return the newly created media or NULL on error
+ *
+ * \note If open_cb is NULL, the opaque pointer will be passed to read_cb,
+ * seek_cb and close_cb, and the stream size will be treated as unknown.
+ *
+ * \note The callbacks may be called asynchronously (from another thread).
+ * A single stream instance need not be reentrant. However the open_cb needs to
+ * be reentrant if the media is used by multiple player instances.
+ *
+ * \warning The callbacks may be used until all or any player instances
+ * that were supplied the media item are stopped.
+ *
+ * \see libvlc_media_release
+ *
+ * \version LibVLC 3.0.0 and later.
+ */
+LIBVLC_API libvlc_media_t *libvlc_media_new_callbacks(
+                                   libvlc_instance_t *instance,
+                                   libvlc_media_open_cb open_cb,
+                                   libvlc_media_read_cb read_cb,
+                                   libvlc_media_seek_cb seek_cb,
+                                   libvlc_media_close_cb close_cb,
+                                   void *opaque );
 
 /**
  * Create a media as an empty node with a given name.
