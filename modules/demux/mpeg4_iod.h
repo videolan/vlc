@@ -103,3 +103,5 @@ void ODFree( od_descriptor_t *p_od );
 
 sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
                                const sl_config_descriptor_t *sl );
+void DecodeODCommand( vlc_object_t *p_object, od_descriptors_t *,
+                      unsigned i_data, const uint8_t *p_data );

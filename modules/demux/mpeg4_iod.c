@@ -107,6 +107,7 @@ static char* ODGetURL( unsigned *pi_data, const uint8_t **pp_data )
 typedef union
 {
     od_descriptor_t *p_od;
+    od_descriptor_t **pp_ods;
     es_mpeg4_descriptor_t *es_descr;
     decoder_config_descriptor_t *p_dec_config;
     sl_config_descriptor_t *sl_descr;
@@ -373,18 +374,28 @@ static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const ui
         {
             case ODTag_ObjectDescr:
             {
+                od_descriptor_t *p_od = calloc( 1, sizeof( od_descriptor_t ) );
+                if( !p_od )
+                    break;
+                od_read_params_t childparams;
+                childparams.p_od = params.pp_ods[i_read_count] = p_od;
                 /* od_descriptor_t *p_iod = (od_descriptor_t *) param; */
                 if ( !ODObjectDescriptorRead( p_object, i_descriptor_data,
-                                               p_descriptor_data, params ) )
+                                               p_descriptor_data, childparams ) )
                 {};
                 break;
             }
 
             case ODTag_InitialObjectDescr:
             {
+                od_descriptor_t *p_iod = calloc( 1, sizeof( od_descriptor_t ) );
+                if( !p_iod )
+                    break;
+                od_read_params_t childparams;
+                childparams.p_od = params.pp_ods[i_read_count] = p_iod;
                 /* od_descriptor_t *p_iod = (od_descriptor_t *) param; */
                 if ( !OD_InitialObjectDesc_Read( p_object, i_descriptor_data,
-                                                  p_descriptor_data, params ) )
+                                                  p_descriptor_data, childparams ) )
                 {};
                 break;
             }
@@ -438,24 +449,19 @@ static uint8_t OD_Desc_Read( vlc_object_t *p_object, unsigned *pi_data, const ui
     return i_read_count;
 }
 
-static od_descriptor_t *ODInit( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
-                                 uint8_t i_start_tag, uint8_t i_min, uint8_t i_max )
+static uint8_t ODInit( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data,
+                       uint8_t i_start_tag, uint8_t i_min, uint8_t i_max, od_descriptor_t **pp_ods )
 {
-    /* Initial Object Descriptor must follow */
-    od_descriptor_t *p_iod = calloc( 1, sizeof( od_descriptor_t ) );
-    if( !p_iod )
-        return NULL;
-
     od_read_params_t params;
-    params.p_od = p_iod;
-    if ( OD_Desc_Read( p_object, &i_data, &p_data, i_start_tag, i_max, params ) < i_min )
+    params.pp_ods = pp_ods;
+    uint8_t i_read = OD_Desc_Read( p_object, &i_data, &p_data, i_start_tag, i_max, params );
+    if ( i_read < i_min )
     {
         od_debug( p_object, "   cannot read first tag 0x%"PRIx8, i_start_tag );
-        free( p_iod );
-        return NULL;
+        return 0;
     }
 
-    return p_iod;
+    return i_read;
 }
 
 od_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t *p_data )
@@ -481,7 +487,14 @@ od_descriptor_t *IODNew( vlc_object_t *p_object, unsigned i_data, const uint8_t 
         return NULL;
     }
 
-    return ODInit( p_object, i_data, p_data, ODTag_InitialObjectDescr, 1, 1 );
+    od_descriptor_t * ods[1];
+    uint8_t i_count = ODInit( p_object, i_data, p_data, ODTag_InitialObjectDescr, 1, 1, ods );
+    if( !i_count )
+    {
+        ODFree( ods[0] );
+        return NULL;
+    }
+    return ods[0];
 }
 
 void ODFree( od_descriptor_t *p_iod )
@@ -607,4 +620,74 @@ sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
         ret.i_size = (bs_pos( &s ) + 7) / 8;
 
     return ret;
+}
+
+/*****************************************************************************
+ * OD Commands Parser
+ *****************************************************************************/
+#define ODTag_ObjectDescrUpdate 0x01
+#define ODTag_ObjectDescrRemove 0x02
+
+static void ObjectDescrUpdateCommandRead( vlc_object_t *p_object, od_descriptors_t *p_ods,
+                                          unsigned i_data, const uint8_t *p_data )
+{
+    od_descriptor_t *p_odsread[255];
+    uint8_t i_count = ODInit( p_object, i_data, p_data, ODTag_ObjectDescr, 1, 255, p_odsread );
+    for( int i=0; i<i_count; i++ )
+    {
+        od_descriptor_t *p_od = p_odsread[i];
+        int i_pos = -1;
+        ARRAY_BSEARCH( p_ods->objects, ->i_ID, int, p_od->i_ID, i_pos );
+        if ( i_pos > -1 )
+        {
+            ODFree( p_ods->objects.p_elems[i_pos] );
+            p_ods->objects.p_elems[i_pos] = p_od;
+        }
+        else
+        {
+            ARRAY_APPEND( p_ods->objects, p_od );
+        }
+    }
+}
+
+static void ObjectDescrRemoveCommandRead( vlc_object_t *p_object, od_descriptors_t *p_ods,
+                                          unsigned i_data, const uint8_t *p_data )
+{
+    VLC_UNUSED(p_object);
+    bs_t s;
+    bs_init( &s, p_data, i_data );
+    for( unsigned i=0; i< (i_data * 8 / 10); i++ )
+    {
+        uint16_t i_id = bs_read( &s, 10 );
+        int i_pos = -1;
+        ARRAY_BSEARCH( p_ods->objects, ->i_ID, int, i_id, i_pos );
+        if( i_pos > -1 )
+            ARRAY_REMOVE( p_ods->objects, i_pos );
+    }
+}
+
+void DecodeODCommand( vlc_object_t *p_object, od_descriptors_t *p_ods,
+                      unsigned i_data, const uint8_t *p_data )
+{
+    while( i_data )
+    {
+        const uint8_t i_tag = ODGetBytes( &i_data, &p_data, 1 );
+        const unsigned i_length = ODDescriptorLength( &i_data, &p_data );
+        if( !i_length || i_length > i_data )
+            break;
+        od_debug( p_object, "Decode tag 0x%x length %d", i_tag, i_length );
+        switch( i_tag )
+        {
+            case ODTag_ObjectDescrUpdate:
+                ObjectDescrUpdateCommandRead( p_object, p_ods, i_data, p_data );
+                break;
+            case ODTag_ObjectDescrRemove:
+                ObjectDescrRemoveCommandRead( p_object, p_ods, i_data, p_data );
+                break;
+            default:
+                break;
+        }
+        p_data += i_length;
+        i_data -= i_data;
+    }
 }
