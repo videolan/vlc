@@ -49,6 +49,7 @@ Demuxers:
  * Fixed TS playback with PAT/PMT less recordings
  * Support for lame's replaygain extension in mpeg files
  * Fixes for DTS detection in WAV and MKV files
+ * Basic support for MPEG4-SL in TS and T-DMB
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder

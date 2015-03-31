@@ -490,6 +490,9 @@ static int64_t TimeStampWrapAround( ts_pmt_t *, int64_t );
 
 /* MPEG4 related */
 static const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const ts_pmt_t *, uint16_t );
+static ts_pes_es_t * GetPMTESBySLEsId( ts_pmt_t *, uint16_t );
+static bool SetupISO14496LogicalStream( demux_t *, const decoder_config_descriptor_t *,
+                                        es_format_t * );
 
 #define TS_USER_PMT_NUMBER (0)
 static int UserPmt( demux_t *p_demux, const char * );
@@ -1394,8 +1397,13 @@ static void UpdatePESFilters( demux_t *p_demux, bool b_all )
                 es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
                                 espid->u.p_pes->es.id, &b_stream_selected );
 
-            if( !p_sys->b_es_all && espid->u.p_pes->es.fmt.i_cat == UNKNOWN_ES )
-                b_stream_selected = false;
+            if( espid->u.p_pes->es.fmt.i_cat == UNKNOWN_ES )
+            {
+                if( espid->u.p_pes->i_stream_type == 0x13 ) /* Object channel */
+                    b_stream_selected = true;
+                else if( !p_sys->b_es_all )
+                    b_stream_selected = false;
+            }
 
             if( b_stream_selected )
                 msg_Dbg( p_demux, "enabling pid %d from program %d", espid->i_pid, p_pmt->i_number );
@@ -2371,13 +2379,54 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                         p_block->i_pts += (p_pmt->pcr.i_pcroffset * 100 / 9);
                 }
 
-                for( int i = 0; i < pid->u.p_pes->extra_es.i_size; i++ )
+                /* SL in PES */
+                if( pid->u.p_pes->i_stream_type == 0x12 &&
+                    ((i_stream_id & 0xFA) == 0xFA) /* 0xFA || 0xFB */ )
                 {
-                    es_out_Send( p_demux->out, pid->u.p_pes->extra_es.p_elems[i]->id,
-                            block_Duplicate( p_block ) );
+                    const es_mpeg4_descriptor_t *p_desc =
+                            GetMPEG4DescByEsId( p_pmt, pid->u.p_pes->es.i_sl_es_id );
+                    if(!p_desc)
+                    {
+                        block_Release( p_block );
+                        p_block = NULL;
+                    }
+                    else
+                    {
+                        sl_header_data header = DecodeSLHeader( p_block->i_buffer, p_block->p_buffer,
+                                                                &p_mpeg4desc->sl_descr );
+                        p_block->i_buffer -= header.i_size;
+                        p_block->p_buffer += header.i_size;
+                        p_block->i_dts = header.i_dts ? header.i_dts : p_block->i_dts;
+                        p_block->i_pts = header.i_pts ? header.i_pts : p_block->i_pts;
+
+                        /* Assemble access units */
+                        if( header.b_au_start && pid->u.p_pes->sl.p_data )
+                        {
+                            block_ChainRelease( pid->u.p_pes->sl.p_data );
+                            pid->u.p_pes->sl.p_data = NULL;
+                            pid->u.p_pes->sl.pp_last = &pid->u.p_pes->sl.p_data;
+                        }
+                        block_ChainLastAppend( &pid->u.p_pes->sl.pp_last, p_block );
+                        p_block = NULL;
+                        if( header.b_au_end )
+                        {
+                            p_block = block_ChainGather( pid->u.p_pes->sl.p_data );
+                            pid->u.p_pes->sl.p_data = NULL;
+                            pid->u.p_pes->sl.pp_last = &pid->u.p_pes->sl.p_data;
+                        }
+                    }
                 }
 
-                es_out_Send( p_demux->out, pid->u.p_pes->es.id, p_block );
+                if ( p_block )
+                {
+                    for( int i = 0; i < pid->u.p_pes->extra_es.i_size; i++ )
+                    {
+                        es_out_Send( p_demux->out, pid->u.p_pes->extra_es.p_elems[i]->id,
+                                block_Duplicate( p_block ) );
+                    }
+
+                    es_out_Send( p_demux->out, pid->u.p_pes->es.id, p_block );
+                }
             }
             else
             {
@@ -2400,42 +2449,106 @@ static void ParseTableSection( demux_t *p_demux, ts_pid_t *pid, block_t *p_data 
 {
     block_t *p_content = block_ChainGather( p_data );
 
-    if ( pid->p_parent && pid->p_parent->type == TYPE_PMT )
+    if( p_content->i_buffer <= 9 || pid->type != TYPE_PES )
     {
-        ts_pmt_t *p_pmt = pid->p_parent->u.p_pmt;
+        block_Release( p_content );
+        return;
+    }
+
+    const uint8_t i_table_id = p_content->p_buffer[0];
+    const uint8_t i_version = ( p_content->p_buffer[5] & 0x3F ) >> 1;
+    ts_pmt_t *p_pmt = pid->p_parent->u.p_pmt;
+
+    if ( pid->u.p_pes->i_stream_type == 0x82 && i_table_id == 0xC6 ) /* SCTE_27 */
+    {
+        assert( pid->u.p_pes->es.fmt.i_codec == VLC_CODEC_SCTE_27 );
         mtime_t i_date = p_pmt->pcr.i_current;
 
-        if( pid->u.p_pes->es.fmt.i_codec == VLC_CODEC_SCTE_27 )
+        /* We need to extract the truncated pts stored inside the payload */
+        int i_index = 0;
+        size_t i_offset = 4;
+        if( p_content->p_buffer[3] & 0x40 )
         {
-            /* We need to extract the truncated pts stored inside the payload */
-            if( p_content->i_buffer > 9 && p_content->p_buffer[0] == 0xc6 )
+            i_index = ((p_content->p_buffer[7] & 0x0f) << 8) |
+                    p_content->p_buffer[8];
+            i_offset = 9;
+        }
+        if( i_index == 0 && p_content->i_buffer > i_offset + 8 )
+        {
+            bool is_immediate = p_content->p_buffer[i_offset + 3] & 0x40;
+            if( !is_immediate )
             {
-                int i_index = 0;
-                size_t i_offset = 4;
-                if( p_content->p_buffer[3] & 0x40 )
-                {
-                    i_index = ((p_content->p_buffer[7] & 0x0f) << 8) |
-                             p_content->p_buffer[8];
-                    i_offset = 9;
-                }
-                if( i_index == 0 && p_content->i_buffer > i_offset + 8 )
-                {
-                    bool is_immediate = p_content->p_buffer[i_offset + 3] & 0x40;
-                    if( !is_immediate )
-                    {
-                        mtime_t i_display_in = GetDWBE( &p_content->p_buffer[i_offset + 4] );
-                        if( i_display_in < i_date )
-                            i_date = i_display_in + (1ll << 32);
-                        else
-                            i_date = i_display_in;
-                    }
-
-                }
+                mtime_t i_display_in = GetDWBE( &p_content->p_buffer[i_offset + 4] );
+                if( i_display_in < i_date )
+                    i_date = i_display_in + (1ll << 32);
+                else
+                    i_date = i_display_in;
             }
+
         }
 
         p_content->i_dts = p_content->i_pts = VLC_TS_0 + i_date * 100 / 9;
         PCRFixHandle( p_demux, p_pmt, p_content );
+    }
+    /* Object stream SL in table sections */
+    else if( pid->u.p_pes->i_stream_type == 0x13 && i_table_id == 0x05 &&
+             pid->u.p_pes->es.i_sl_es_id && p_content->i_buffer > 12 )
+    {
+        const es_mpeg4_descriptor_t *p_mpeg4desc = GetMPEG4DescByEsId( p_pmt, pid->u.p_pes->es.i_sl_es_id );
+        if( p_mpeg4desc && p_mpeg4desc->dec_descr.i_objectTypeIndication == 0x01 &&
+            p_mpeg4desc->dec_descr.i_streamType == 0x01 /* Object */ &&
+            p_pmt->od.i_version != i_version )
+        {
+            const uint8_t *p_data = p_content->p_buffer;
+            int i_data = p_content->i_buffer;
+
+            /* Forward into section */
+            uint16_t len = ((p_content->p_buffer[1] & 0x0f) << 8) | p_content->p_buffer[2];
+            p_data += 8; i_data -= 8; // SL in table
+            i_data = __MIN(i_data, len - 5);
+            i_data -= 4; // CRC
+
+            od_descriptors_t *p_ods = &p_pmt->od;
+            sl_header_data header = DecodeSLHeader( i_data, p_data, &p_mpeg4desc->sl_descr );
+
+            DecodeODCommand( VLC_OBJECT(p_demux), p_ods, i_data - header.i_size, &p_data[header.i_size] );
+            bool b_changed = false;
+
+            for( int i=0; i<p_ods->objects.i_size; i++ )
+            {
+                od_descriptor_t *p_od = p_ods->objects.p_elems[i];
+                for( int j = 0; j < ES_DESCRIPTOR_COUNT && p_od->es_descr[j].b_ok; j++ )
+                {
+                    p_mpeg4desc = &p_od->es_descr[j];
+                    ts_pes_es_t *p_es = GetPMTESBySLEsId( p_pmt, p_mpeg4desc->i_es_id );
+                    es_format_t fmt;
+                    es_format_Init( &fmt, UNKNOWN_ES, 0 );
+                    fmt.i_id = p_es->fmt.i_id;
+                    fmt.i_group = p_es->fmt.i_group;
+
+                    if ( p_mpeg4desc && p_mpeg4desc->b_ok && p_es &&
+                         SetupISO14496LogicalStream( p_demux, &p_mpeg4desc->dec_descr, &fmt ) &&
+                         !es_format_IsSimilar( &fmt, &p_es->fmt ) )
+                    {
+                        es_format_Clean( &p_es->fmt );
+                        p_es->fmt = fmt;
+
+                        es_out_Del( p_demux->out, p_es->id );
+                        p_es->fmt.b_packetized = true; /* Split by access unit, no sync code */
+                        FREENULL( p_es->fmt.psz_description );
+                        p_es->id = es_out_Add( p_demux->out, &p_es->fmt );
+                        b_changed = true;
+                    }
+                }
+            }
+
+            if( b_changed )
+                UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
+
+            p_ods->i_version = i_version;
+        }
+        block_Release( p_content );
+        return;
     }
 
     if( pid->u.p_pes->es.id )
@@ -4002,6 +4115,17 @@ static const es_mpeg4_descriptor_t * GetMPEG4DescByEsId( const ts_pmt_t *pmt, ui
             if( es_descr->i_es_id == i_es_id && es_descr->b_ok )
                 return es_descr;
         }
+    }
+    return NULL;
+}
+
+static ts_pes_es_t * GetPMTESBySLEsId( ts_pmt_t *pmt, uint16_t i_sl_es_id )
+{
+    for( int i=0; i< pmt->e_streams.i_size; i++ )
+    {
+        ts_pes_es_t *p_es = &pmt->e_streams.p_elems[i]->u.p_pes->es;
+        if( p_es->i_sl_es_id == i_sl_es_id )
+            return p_es;
     }
     return NULL;
 }
