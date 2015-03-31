@@ -1087,6 +1087,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
     }
 
+    unsigned int i_attempts = 0;
     jlong timeout = 0;
     int i_output_ret = 0;
     int i_input_ret = 0;
@@ -1123,12 +1124,22 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             if (i_output_ret == -1) {
                 p_sys->error_state = true;
                 break;
-            } else if (i_output_ret == 0 && p_pic) {
-                picture_Release(p_pic);
-                p_pic = NULL;
+            } else if (i_output_ret == 0) {
+                if (p_pic) {
+                    picture_Release(p_pic);
+                    p_pic = NULL;
+                } else if (++i_attempts > 100) {
+                    /* No p_pic, so no pixel_format, thereforce mediacodec
+                     * didn't produce any output or events yet. Don't wait
+                     * indefinitely and abort after 2seconds (100 * 2 * 10ms)
+                     * without any data. Indeed, MediaCodec can fail without
+                     * throwing any exception or error returns... */
+                    p_sys->error_state = true;
+                    break;
+                }
             }
         }
-        timeout = 10 * 1000;
+        timeout = 10 * 1000; // 10 ms
     }
 
 endclean:
