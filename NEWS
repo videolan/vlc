@@ -98,6 +98,7 @@ Skins2:
  * Support key accelerators
 
 libVLC:
+ * Add libvlc_media_new_callbacks for custom input byte streams
  * Add libvlc_audio_output_device_enum to enumerate devices of current aout
  * Split of libvlc_media_discoverer_new_from_name into libvlc_media_discoverer_new,
    libvlc_media_discoverer_new and libvlc_media_discoverer_start.
