@@ -526,19 +526,19 @@ inline void VLCProfileEditor::registerCodecs()
     ui.button->setProperty( "capstream", stream );\
     ui.button->setProperty( "capchaps", chaps );\
     CONNECT( ui.button, clicked(bool), this, muxSelected() );
-    SETMUX( PSMux, "ps", "ps",      true, true, false, true, false, true )
+    SETMUX( PSMux, "ps", "mux_ps",  true, true, false, true, false, true )
     SETMUX( TSMux, "ts", "mux_ts",  true, true, false, true, true, false )
     SETMUX( WEBMux, "webm", "avformat", true, true, false, false, true, false )
-    SETMUX( MPEG1Mux, "mpeg1", "ps", true, true, false, false, false, false )
-    SETMUX( OggMux, "ogg", "mux_ogg",true, true, false, false, true, true )
-    SETMUX( ASFMux, "asf", "asf",   true, true, false, true, true, true )
-    SETMUX( MOVMux, "mp4", "mp4",   true, true, true, true, true, false )
-    SETMUX( WAVMux, "wav", "wav",   false, true, false, false, false, false )
-    SETMUX( RAWMux, "raw", "dummy", true, true, false, false, false, false )
+    SETMUX( MPEG1Mux, "mpeg1", "mux_ps", true, true, false, false, false, false )
+    SETMUX( OggMux, "ogg", "mux_ogg", true, true, false, false, true, true )
+    SETMUX( ASFMux, "asf", "mux_asf", true, true, false, true, true, true )
+    SETMUX( MOVMux, "mp4", "mux_mp4", true, true, true, true, true, false )
+    SETMUX( WAVMux, "wav", "mux_wav", false, true, false, false, false, false )
+    SETMUX( RAWMux, "raw", "mux_dummy", true, true, false, false, false, false )
     SETMUX( FLVMux, "flv", "avformat", true, true, false, false, true, false )
     SETMUX( MKVMux, "mkv", "avformat", true, true, true, true, true, true )
-    SETMUX( AVIMux, "avi", "avi",   true, true, false, false, false, false )
-    SETMUX( MJPEGMux, "mpjpeg", "mpjpeg", true, false, false, false, false, false )
+    SETMUX( AVIMux, "avi", "mux_avi", true, true, false, false, false, false )
+    SETMUX( MJPEGMux, "mpjpeg", "mux_mpjpeg", true, false, false, false, false, false )
 #undef SETMUX
 
 #define ADD_VCODEC( name, fourcc ) \
