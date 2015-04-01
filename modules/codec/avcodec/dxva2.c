@@ -884,6 +884,7 @@ static int DxCreateVideoDecoder(vlc_va_t *va,
     sys->surface_height = (fmt->i_height + 15) & ~15;
     int surface_count;
     switch (codec_id) {
+    case AV_CODEC_ID_HEVC:
     case AV_CODEC_ID_H264:
         surface_count = 16 + sys->thread_count + 2;
         break;
