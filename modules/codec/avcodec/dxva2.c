@@ -50,6 +50,7 @@
 #include "avcodec.h"
 #include "va.h"
 #include "../../video_chroma/copy.h"
+#include "../../demux/asf/libasf_guid.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
 static void Close(vlc_va_t *, AVCodecContext *);
@@ -799,8 +800,7 @@ static int DxFindVideoServiceConversion(vlc_va_t *va, GUID *input, D3DFORMAT *ou
         if (mode) {
             msg_Dbg(va, "- '%s' is supported by hardware", mode->name);
         } else {
-            msg_Warn(va, "- Unknown GUID = %08X-%04x-%04x-XXXX",
-                     (unsigned)g->Data1, g->Data2, g->Data3);
+            msg_Warn(va, "- Unknown GUID = " GUID_FMT, GUID_PRINT( *g ) );
         }
     }
 
