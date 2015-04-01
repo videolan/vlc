@@ -2381,7 +2381,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
                 /* SL in PES */
                 if( pid->u.p_pes->i_stream_type == 0x12 &&
-                    ((i_stream_id & 0xFA) == 0xFA) /* 0xFA || 0xFB */ )
+                    ((i_stream_id & 0xFE) == 0xFA) /* 0xFA || 0xFB */ )
                 {
                     const es_mpeg4_descriptor_t *p_desc =
                             GetMPEG4DescByEsId( p_pmt, pid->u.p_pes->es.i_sl_es_id );
