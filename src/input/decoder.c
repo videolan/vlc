@@ -2127,20 +2127,18 @@ void input_DecoderWait( decoder_t *p_dec )
     assert( p_owner->b_waiting );
 
     vlc_mutex_lock( &p_owner->lock );
-    vlc_fifo_Lock( p_owner->p_fifo );
     while( !p_owner->b_has_data )
     {
+        vlc_fifo_Lock( p_owner->p_fifo );
         if( p_owner->b_idle && vlc_fifo_IsEmpty( p_owner->p_fifo ) )
         {
             msg_Warn( p_dec, "can't wait without data to decode" );
+            vlc_fifo_Unlock( p_owner->p_fifo );
             break;
         }
-        vlc_fifo_Signal( p_owner->p_fifo );
         vlc_fifo_Unlock( p_owner->p_fifo );
         vlc_cond_wait( &p_owner->wait_acknowledge, &p_owner->lock );
-        vlc_fifo_Lock( p_owner->p_fifo );
     }
-    vlc_fifo_Unlock( p_owner->p_fifo );
     vlc_mutex_unlock( &p_owner->lock );
 }
 
