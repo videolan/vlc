@@ -1821,6 +1821,9 @@ static const vlc_fourcc_t p_J420_fallback[] = {
 static const vlc_fourcc_t p_YV12_fallback[] = {
     VLC_CODEC_YV12, VLC_CODEC_I420, VLC_CODEC_J420, VLC_CODEC_FALLBACK_420, 0
 };
+static const vlc_fourcc_t p_NV12_fallback[] = {
+    VLC_CODEC_NV12, VLC_CODEC_I420, VLC_CODEC_J420, VLC_CODEC_FALLBACK_420, 0
+};
 
 #define VLC_CODEC_FALLBACK_420_16 \
     VLC_CODEC_I420, VLC_CODEC_YV12, VLC_CODEC_J420, VLC_CODEC_FALLBACK_420
@@ -1971,6 +1974,7 @@ static const vlc_fourcc_t *pp_YUV_fallback[] = {
     p_YVYU_fallback,
     p_UYVY_fallback,
     p_VYUY_fallback,
+    p_NV12_fallback,
 
 
     NULL,
