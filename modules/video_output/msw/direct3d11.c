@@ -74,6 +74,7 @@ typedef struct
 
 static const d3d_format_t d3d_formats[] = {
     { "I420",     DXGI_FORMAT_NV12,           VLC_CODEC_I420,     DXGI_FORMAT_R8_UNORM,           DXGI_FORMAT_R8G8_UNORM },
+    { "YV12",     DXGI_FORMAT_NV12,           VLC_CODEC_YV12,     DXGI_FORMAT_R8_UNORM,           DXGI_FORMAT_R8G8_UNORM },
     { "NV12",     DXGI_FORMAT_NV12,           VLC_CODEC_NV12,     DXGI_FORMAT_R8_UNORM,           DXGI_FORMAT_R8G8_UNORM },
 #ifdef BROKEN_PIXEL
     { "YUY2",     DXGI_FORMAT_YUY2,           VLC_CODEC_I422,     DXGI_FORMAT_R8G8B8A8_UNORM,     0 },
@@ -749,6 +750,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         else
             sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
         break;
+    case VLC_CODEC_YV12:
     case VLC_CODEC_I420:
         if( fmt->i_height > 576 )
             sys->d3dPxShader = globPixelShaderBiplanarI420_BT709_2RGB;
