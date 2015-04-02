@@ -1699,7 +1699,7 @@ static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
 
         msg_Dbg( s, "opening input `%s'", psz_name );
 
-        p_list_access = access_New( s, s->p_input, p_access->psz_access, "", psz_name );
+        p_list_access = access_New( s, p_access->p_input, p_access->psz_access, "", psz_name );
 
         if( !p_list_access ) return 0;
 
@@ -1765,7 +1765,7 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
 
         msg_Dbg( s, "opening input `%s'", psz_name );
 
-        p_list_access = access_New( s, s->p_input, p_access->psz_access, "", psz_name );
+        p_list_access = access_New( s, p_access->p_input, p_access->psz_access, "", psz_name );
 
         if( !p_list_access ) return 0;
 
@@ -1820,7 +1820,7 @@ static int ASeek( stream_t *s, uint64_t i_pos )
         if( i != p_sys->i_list_index && i != 0 )
         {
             p_list_access =
-                access_New( s, s->p_input, p_access->psz_access, "", psz_name );
+                access_New( s, p_access->p_input, p_access->psz_access, "", psz_name );
         }
         else if( i != p_sys->i_list_index )
         {
