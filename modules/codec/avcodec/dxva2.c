@@ -1007,6 +1007,10 @@ static int DxCreateVideoDecoder(vlc_va_t *va,
         return VLC_EGENERIC;
     }
     sys->decoder = decoder;
+
+    if (IsEqualGUID(&sys->input, &DXVADDI_Intel_ModeH264_E))
+        sys->hw.workaround |= FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
+
     msg_Dbg(va, "IDirectXVideoDecoderService_CreateVideoDecoder succeed");
     return VLC_SUCCESS;
 }
