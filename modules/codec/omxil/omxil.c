@@ -1109,40 +1109,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     for(i = 0; i < p_sys->components; i++)
     {
 #ifdef __ANDROID__
-        /* ignore OpenCore software codecs */
-        if (!strncmp(p_sys->ppsz_components[i], "OMX.PV.", 7))
-            continue;
-        /* The same sw codecs, renamed in ICS (perhaps also in honeycomb) */
-        if (!strncmp(p_sys->ppsz_components[i], "OMX.google.", 11))
-            continue;
-        /* This one has been seen on HTC One V - it behaves like it works,
-         * but FillBufferDone returns buffers filled with 0 bytes. The One V
-         * has got a working OMX.qcom.video.decoder.avc instead though. */
-        if (!strncmp(p_sys->ppsz_components[i], "OMX.ARICENT.", 12))
-            continue;
-        /* Codecs with DRM, that don't output plain YUV data but only
-         * support direct rendering where the output can't be intercepted. */
-        if (strstr(p_sys->ppsz_components[i], ".secure"))
-            continue;
-        /* Use VC1 decoder for WMV3 for now */
-        if (!strcmp(p_sys->ppsz_components[i], "OMX.SEC.WMV.Decoder"))
-            continue;
-        /* This decoder does work, but has an insane latency (leading to errors
-         * about "main audio output playback way too late" and dropped frames).
-         * At least Samsung Galaxy S III (where this decoder is present) has
-         * got another one, OMX.SEC.mp3.dec, that works well and has a
-         * sensible latency. (Also, even if that one isn't found, in general,
-         * using SW codecs is usually more than fast enough for MP3.) */
-        if (!strcmp(p_sys->ppsz_components[i], "OMX.SEC.MP3.Decoder"))
-            continue;
-        /* This codec should be able to handle both VC1 and WMV3, but
-         * for VC1 it doesn't output any buffers at all (in the way we use
-         * it) and for WMV3 it outputs plain black buffers. Thus ignore
-         * it until we can make it work properly. */
-        if (!strcmp(p_sys->ppsz_components[i], "OMX.Nvidia.vc1.decode"))
-            continue;
-        /* This codec doesn't work or crashes */
-        if (!strcmp(p_sys->ppsz_components[i], "OMX.SEC.vp8.dec"))
+        if (OMXCodec_IsBlacklisted(p_sys->ppsz_components[i], strlen(p_sys->ppsz_components[i])))
             continue;
 #endif
         omx_error = InitialiseComponent(p_dec, p_sys->ppsz_components[i],

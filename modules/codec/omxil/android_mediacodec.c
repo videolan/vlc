@@ -390,28 +390,6 @@ end:
     return ret;
 }
 
-static bool codec_is_blacklisted( const char *p_name, unsigned int i_name_len )
-{
-     static const char *blacklisted_codecs[] = {
-        /* software decoders */
-        "OMX.google.",
-        /* crashes mediaserver */
-        "OMX.MTK.VIDEO.DECODER.MPEG4",
-        /* Not working or crashing (Samsung) */
-        "OMX.SEC.vp8.dec",
-        NULL,
-     };
-
-     for( const char **pp_bl_codecs = blacklisted_codecs; *pp_bl_codecs != NULL;
-          pp_bl_codecs++ )
-     {
-        if( !strncmp( p_name, *pp_bl_codecs,
-            __MIN( strlen(*pp_bl_codecs), i_name_len ) ) )
-            return true;
-     }
-     return false;
-}
-
 /*****************************************************************************
  * OpenDecoder: Create the decoder instance
  *****************************************************************************/
@@ -499,7 +477,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         name_ptr = (*env)->GetStringUTFChars(env, name, NULL);
         found = false;
 
-        if (codec_is_blacklisted( name_ptr, name_len))
+        if (OMXCodec_IsBlacklisted( name_ptr, name_len))
             goto loopclean;
         for (int j = 0; j < num_types && !found; j++) {
             jobject type = (*env)->GetObjectArrayElement(env, types, j);

@@ -222,6 +222,11 @@ const char *ErrorToString(OMX_ERRORTYPE error);
 void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port);
 
 /*****************************************************************************
+ * Utility functions
+ *****************************************************************************/
+bool OMXCodec_IsBlacklisted( const char *p_name, unsigned int i_name_len );
+
+/*****************************************************************************
  * fourcc -> omx id mapping
  *****************************************************************************/
 int GetOmxVideoFormat( vlc_fourcc_t i_fourcc,

@@ -307,6 +307,72 @@ int IgnoreOmxDecoderPadding(const char *name)
 }
 
 /*****************************************************************************
+ * Utility functions
+ *****************************************************************************/
+bool OMXCodec_IsBlacklisted( const char *p_name, unsigned int i_name_len )
+{
+    static const char *blacklisted_prefix[] = {
+        /* ignore OpenCore software codecs */
+        "OMX.PV.",
+        /* The same sw codecs, renamed in ICS (perhaps also in honeycomb) */
+        "OMX.google.",
+        /* This one has been seen on HTC One V - it behaves like it works,
+         * but FillBufferDone returns buffers filled with 0 bytes. The One V
+         * has got a working OMX.qcom.video.decoder.avc instead though. */
+        "OMX.ARICENT.",
+        /* Use VC1 decoder for WMV3 for now */
+        "OMX.SEC.WMV.Decoder",
+        /* This decoder does work, but has an insane latency (leading to errors
+         * about "main audio output playback way too late" and dropped frames).
+         * At least Samsung Galaxy S III (where this decoder is present) has
+         * got another one, OMX.SEC.mp3.dec, that works well and has a
+         * sensible latency. (Also, even if that one isn't found, in general,
+         * using SW codecs is usually more than fast enough for MP3.) */
+        "OMX.SEC.MP3.Decoder",
+        /* This codec should be able to handle both VC1 and WMV3, but
+         * for VC1 it doesn't output any buffers at all (in the way we use
+         * it) and for WMV3 it outputs plain black buffers. Thus ignore
+         * it until we can make it work properly. */
+        "OMX.Nvidia.vc1.decode",
+        /* crashes mediaserver */
+        "OMX.MTK.VIDEO.DECODER.MPEG4",
+        /* Not working or crashing (Samsung) */
+        "OMX.SEC.vp8.dec",
+        NULL
+    };
+
+    static const char *blacklisted_suffix[] = {
+        /* Codecs with DRM, that don't output plain YUV data but only
+         * support direct rendering where the output can't be intercepted. */
+        ".secure",
+        NULL
+    };
+
+    /* p_name is not '\0' terminated */
+
+    for( const char **pp_bl_prefix = blacklisted_prefix; *pp_bl_prefix != NULL;
+          pp_bl_prefix++ )
+    {
+        if( !strncmp( p_name, *pp_bl_prefix,
+           __MIN( strlen(*pp_bl_prefix), i_name_len ) ) )
+           return true;
+    }
+
+    for( const char **pp_bl_suffix = blacklisted_suffix; *pp_bl_suffix != NULL;
+         pp_bl_suffix++ )
+    {
+       size_t i_suffix_len = strlen( *pp_bl_suffix );
+
+       if( i_name_len > i_suffix_len
+        && !strncmp( p_name + i_name_len - i_suffix_len, *pp_bl_suffix,
+                     i_suffix_len ) )
+           return true;
+    }
+
+    return false;
+}
+
+/*****************************************************************************
  * Logging utility functions
  *****************************************************************************/
 const char *StateToString(OMX_STATETYPE state)
