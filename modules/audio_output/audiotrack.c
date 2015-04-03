@@ -29,31 +29,21 @@
 #include <jni.h>
 #include <dlfcn.h>
 #include <stdbool.h>
-#include <sys/queue.h>
 
-#include <vlc_atomic.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_threads.h>
-
-/* Maximum VLC buffers queued by the internal queue in microseconds. This delay
- * doesn't include audiotrack delay */
-#define MAX_QUEUE_US INT64_C(1000000) // 1000ms
 
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
-static void JNIThread_Stop( JNIEnv *env, audio_output_t *p_aout );
-
-struct thread_cmd;
-typedef TAILQ_HEAD(, thread_cmd) THREAD_CMD_QUEUE;
+static void Stop( audio_output_t * );
+static int Start( audio_output_t *, audio_sample_format_t * );
 
 struct aout_sys_t {
     /* sw gain */
     float soft_gain;
     bool soft_mute;
 
-    /* Owned by JNIThread */
     jobject p_audiotrack; /* AudioTrack ref */
     jobject p_audioTimestamp; /* AudioTimestamp ref */
     jbyteArray p_bytearray; /* ByteArray ref (for Write) */
@@ -68,7 +58,7 @@ struct aout_sys_t {
     uint32_t i_max_audiotrack_samples;
     mtime_t i_play_time; /* time when play was called */
     bool b_audiotrack_exception; /* true if audiotrack throwed an exception */
-    int i_audiotrack_stuck_count;
+    bool b_error; /* generic error */
     bool b_spdif;
     uint8_t i_chans_to_reorder; /* do we need channel reordering */
     uint8_t p_chan_table[AOUT_CHAN_MAX];
@@ -77,16 +67,6 @@ struct aout_sys_t {
         WRITE_V21,
         WRITE_FLOAT
     } i_write_type;
-
-    /* JNIThread control */
-    vlc_mutex_t mutex;
-    vlc_cond_t cond;
-    vlc_thread_t thread;
-
-    /* Shared between two threads, must be locked */
-    bool b_thread_run; /* is thread alive */
-    THREAD_CMD_QUEUE thread_cmd_queue; /* thread cmd queue */
-    uint32_t i_samples_queued; /* number of samples queued */
 };
 
 /* Soft volume helper */
@@ -107,46 +87,6 @@ vlc_module_begin ()
     add_shortcut( "audiotrack" )
     set_callbacks( Open, Close )
 vlc_module_end ()
-
-struct thread_cmd
-{
-    TAILQ_ENTRY(thread_cmd) next;
-    enum {
-        CMD_START,
-        CMD_STOP,
-        CMD_PLAY,
-        CMD_PAUSE,
-        CMD_TIME_GET,
-        CMD_FLUSH,
-        CMD_DONE,
-    } id;
-    union {
-        struct {
-            audio_sample_format_t *p_fmt;
-        } start;
-        struct {
-            block_t *p_buffer;
-        } play;
-        struct {
-            bool b_pause;
-            mtime_t i_date;
-        } pause;
-        struct {
-            bool b_wait;
-        } flush;
-    } in;
-    union {
-        struct {
-            int i_ret;
-            audio_sample_format_t *p_fmt;
-        } start;
-        struct {
-            int i_ret;
-            mtime_t i_delay;
-        } time_get;
-    } out;
-    void ( *pf_destroy )( struct thread_cmd * );
-};
 
 #define THREAD_NAME "android_audiotrack"
 extern JNIEnv *jni_get_env(const char *name);
@@ -383,6 +323,7 @@ check_exception( JNIEnv *env, audio_output_t *p_aout,
         aout_sys_t *p_sys = p_aout->sys;
 
         p_sys->b_audiotrack_exception = true;
+        p_sys->b_error = true;
         (*env)->ExceptionClear( env );
         msg_Err( p_aout, "AudioTrack.%s triggered an exception !", method );
         return true;
@@ -433,57 +374,8 @@ frames_to_bytes( aout_sys_t *p_sys, uint32_t i_frames )
 }
 #define FRAMES_TO_BYTES(x) frames_to_bytes( p_sys, (x) )
 
-static struct thread_cmd *
-ThreadCmd_New( int id )
-{
-    struct thread_cmd *p_cmd = calloc( 1, sizeof(struct thread_cmd) );
-
-    if( p_cmd )
-        p_cmd->id = id;
-
-    return p_cmd;
-}
-
 static void
-ThreadCmd_InsertHead( aout_sys_t *p_sys, struct thread_cmd *p_cmd )
-{
-    TAILQ_INSERT_HEAD( &p_sys->thread_cmd_queue, p_cmd, next);
-    vlc_cond_signal( &p_sys->cond );
-}
-
-static void
-ThreadCmd_InsertTail( aout_sys_t *p_sys, struct thread_cmd *p_cmd )
-{
-    TAILQ_INSERT_TAIL( &p_sys->thread_cmd_queue, p_cmd, next);
-    vlc_cond_signal( &p_sys->cond );
-}
-
-static bool
-ThreadCmd_Wait( aout_sys_t *p_sys, struct thread_cmd *p_cmd )
-{
-    while( p_cmd->id != CMD_DONE )
-        vlc_cond_wait( &p_sys->cond, &p_sys->mutex );
-
-    return p_cmd->id == CMD_DONE;
-}
-
-static void
-ThreadCmd_FlushQueue( aout_sys_t *p_sys )
-{
-    struct thread_cmd *p_cmd, *p_cmd_next;
-
-    for ( p_cmd = TAILQ_FIRST( &p_sys->thread_cmd_queue );
-          p_cmd != NULL; p_cmd = p_cmd_next )
-    {
-        p_cmd_next = TAILQ_NEXT( p_cmd, next );
-        TAILQ_REMOVE( &p_sys->thread_cmd_queue, p_cmd, next );
-        if( p_cmd->pf_destroy )
-            p_cmd->pf_destroy( p_cmd );
-    }
-}
-
-static void
-JNIThread_InitDelay( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_InitDelay( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -504,11 +396,10 @@ JNIThread_InitDelay( JNIEnv *env, audio_output_t *p_aout )
         } while( p_sys->i_pos_initial != i_last_pos );
     }
     p_sys->i_samples_written = 0;
-    p_sys->i_samples_queued = 0;
 }
 
 static uint32_t
-JNIThread_GetAudioTrackPos( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_GetPos( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -526,13 +417,17 @@ JNIThread_GetAudioTrackPos( JNIEnv *env, audio_output_t *p_aout )
 }
 
 static int
-JNIThread_TimeGet( JNIEnv *env, audio_output_t *p_aout, mtime_t *p_delay )
+TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
 {
     aout_sys_t *p_sys = p_aout->sys;
     jlong i_frame_pos;
     uint32_t i_audiotrack_delay = 0;
+    JNIEnv *env;
 
-    if( p_sys->i_samples_queued == 0 || p_sys->b_spdif )
+    if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
+        return -1;
+
+    if( p_sys->b_spdif )
         return -1;
     if( p_sys->p_audioTimestamp )
     {
@@ -575,7 +470,7 @@ JNIThread_TimeGet( JNIEnv *env, audio_output_t *p_aout, mtime_t *p_delay )
     }
     if( i_audiotrack_delay == 0 )
     {
-        uint32_t i_audiotrack_pos = JNIThread_GetAudioTrackPos( env, p_aout );
+        uint32_t i_audiotrack_pos = AudioTrack_GetPos( env, p_aout );
 
         if( p_sys->i_samples_written > i_audiotrack_pos )
             i_audiotrack_delay = p_sys->i_samples_written - i_audiotrack_pos;
@@ -583,7 +478,7 @@ JNIThread_TimeGet( JNIEnv *env, audio_output_t *p_aout, mtime_t *p_delay )
 
     if( i_audiotrack_delay > 0 )
     {
-        *p_delay = FRAMES_TO_US( p_sys->i_samples_queued + i_audiotrack_delay );
+        *p_delay = FRAMES_TO_US( i_audiotrack_delay );
         return 0;
     } else
         return -1;
@@ -629,11 +524,11 @@ AudioTrack_GetChanOrder( uint16_t i_physical_channels, uint32_t p_chans_out[] )
  * returns NULL on configuration error
  */
 static jobject
-JNIThread_NewAudioTrack( JNIEnv *env, audio_output_t *p_aout,
-                         unsigned int i_rate,
-                         vlc_fourcc_t i_vlc_format,
-                         uint16_t i_physical_channels,
-                         int *p_audiotrack_size )
+AudioTrack_New( JNIEnv *env, audio_output_t *p_aout,
+                unsigned int i_rate,
+                vlc_fourcc_t i_vlc_format,
+                uint16_t i_physical_channels,
+                int *p_audiotrack_size )
 {
     int i_size, i_min_buffer_size, i_channel_config, i_format;
     jobject p_audiotrack;
@@ -712,11 +607,17 @@ JNIThread_NewAudioTrack( JNIEnv *env, audio_output_t *p_aout,
 }
 
 static int
-JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
+Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 {
     aout_sys_t *p_sys = p_aout->sys;
+    JNIEnv *env;
     jobject p_audiotrack = NULL;
     int i_nb_channels, i_audiotrack_size;
+
+    if( !( env = jni_get_env( THREAD_NAME ) ) )
+        return VLC_EGENERIC;
+
+    p_sys->fmt = *p_fmt;
 
     aout_FormatPrint( p_aout, "VLC is looking for:", &p_sys->fmt );
 
@@ -772,13 +673,13 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
     do
     {
         /* Try to create an AudioTrack with the most advanced channel and
-         * format configuration. If NewAudioTrack fails, try again with a less
+         * format configuration. If AudioTrack_New fails, try again with a less
          * advanced format (PCM S16N). If it fails again, try again with Stereo
          * channels. */
-        p_audiotrack = JNIThread_NewAudioTrack( env, p_aout, p_sys->fmt.i_rate,
-                                                p_sys->fmt.i_format,
-                                                p_sys->fmt.i_physical_channels,
-                                                &i_audiotrack_size );
+        p_audiotrack = AudioTrack_New( env, p_aout, p_sys->fmt.i_rate,
+                                       p_sys->fmt.i_format,
+                                       p_sys->fmt.i_physical_channels,
+                                       &i_audiotrack_size );
         if( !p_audiotrack )
         {
             if( p_sys->fmt.i_format == VLC_CODEC_SPDIFB )
@@ -846,16 +747,14 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
         jobject p_audioTimestamp = JNI_CALL( NewObject,
                                              jfields.AudioTimestamp.clazz,
                                              jfields.AudioTimestamp.ctor );
-        if( !p_audioTimestamp )
+        if( p_audioTimestamp )
         {
-            JNIThread_Stop( env, p_aout );
-            return VLC_EGENERIC;
+            p_sys->p_audioTimestamp = (*env)->NewGlobalRef( env, p_audioTimestamp );
+            (*env)->DeleteLocalRef( env, p_audioTimestamp );
         }
-        p_sys->p_audioTimestamp = (*env)->NewGlobalRef( env, p_audioTimestamp );
-        (*env)->DeleteLocalRef( env, p_audioTimestamp );
         if( !p_sys->p_audioTimestamp )
         {
-            JNIThread_Stop( env, p_aout );
+            Stop( p_aout );
             return VLC_EGENERIC;
         }
     }
@@ -881,15 +780,23 @@ JNIThread_Start( JNIEnv *env, audio_output_t *p_aout )
     CHECK_AT_EXCEPTION( "play" );
     p_sys->i_play_time = mdate();
 
+    AudioTrack_InitDelay( env, p_aout );
+    *p_fmt = p_sys->fmt;
+    aout_SoftVolumeStart( p_aout );
+
     aout_FormatPrint( p_aout, "VLC will output:", &p_sys->fmt );
 
     return VLC_SUCCESS;
 }
 
 static void
-JNIThread_Stop( JNIEnv *env, audio_output_t *p_aout )
+Stop( audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
+    JNIEnv *env;
+
+    if( !( env = jni_get_env( THREAD_NAME ) ) )
+        return;
 
     if( p_sys->p_audiotrack )
     {
@@ -902,13 +809,14 @@ JNIThread_Stop( JNIEnv *env, audio_output_t *p_aout )
         (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
         p_sys->p_audiotrack = NULL;
     }
-    p_sys->b_audiotrack_exception = false;
-
     if( p_sys->p_audioTimestamp )
     {
         (*env)->DeleteGlobalRef( env, p_sys->p_audioTimestamp );
         p_sys->p_audioTimestamp = NULL;
     }
+
+    p_sys->b_audiotrack_exception = false;
+    p_sys->b_error = false;
 }
 
 /**
@@ -917,8 +825,8 @@ JNIThread_Stop( JNIEnv *env, audio_output_t *p_aout )
  * that we won't wait in AudioTrack.write() method
  */
 static int
-JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
-                 size_t i_buffer_offset )
+AudioTrack_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
+                  size_t i_buffer_offset, bool b_force )
 {
     aout_sys_t *p_sys = p_aout->sys;
     size_t i_data;
@@ -927,36 +835,23 @@ JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
     uint32_t i_samples_pending;
 
     i_data = p_buffer->i_buffer - i_buffer_offset;
-    i_audiotrack_pos = JNIThread_GetAudioTrackPos( env, p_aout );
+    i_audiotrack_pos = AudioTrack_GetPos( env, p_aout );
     if( i_audiotrack_pos > p_sys->i_samples_written )
     {
         msg_Warn( p_aout, "audiotrack position is ahead. Should NOT happen" );
-        JNIThread_InitDelay( env, p_aout );
+        AudioTrack_InitDelay( env, p_aout );
         return 0;
     }
     i_samples_pending = p_sys->i_samples_written - i_audiotrack_pos;
 
     /* check if audiotrack buffer is not full before writing on it. */
-    if( i_samples_pending >= p_sys->i_max_audiotrack_samples )
+    if( b_force )
     {
+        msg_Warn( p_aout, "Force write. It may block..." );
+        i_samples_pending = 0;
+    } else if( i_samples_pending >= p_sys->i_max_audiotrack_samples )
+        return 0;
 
-        /* HACK: AudioFlinger can drop frames without notifying us and there is
-         * no way to know it. It it happens, i_audiotrack_pos won't move and
-         * the current code will be stuck because it'll assume that audiotrack
-         * internal buffer is full when it's not. It can happen only after
-         * Android 4.4.2 if we send frames too quickly. This HACK is just an
-         * other precaution since it shouldn't happen anymore thanks to the
-         * HACK in JNIThread_Play */
-
-        p_sys->i_audiotrack_stuck_count++;
-        if( p_sys->i_audiotrack_stuck_count > 100 )
-        {
-            msg_Warn( p_aout, "AudioFlinger underrun, force write" );
-            i_samples_pending = 0;
-            p_sys->i_audiotrack_stuck_count = 0;
-        }
-    } else
-        p_sys->i_audiotrack_stuck_count = 0;
     i_samples = __MIN( p_sys->i_max_audiotrack_samples - i_samples_pending,
                        BYTES_TO_FRAMES( i_data ) );
 
@@ -971,8 +866,8 @@ JNIThread_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
  * It calls a new write method with WRITE_NON_BLOCKING flags.
  */
 static int
-JNIThread_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
-                    size_t i_buffer_offset )
+AudioTrack_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
+                     size_t i_buffer_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
@@ -1015,8 +910,8 @@ JNIThread_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
  * It calls a new write method with WRITE_NON_BLOCKING flags.
  */
 static int
-JNIThread_WriteFloat( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
-                      size_t i_buffer_offset )
+AudioTrack_WriteFloat( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
+                       size_t i_buffer_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
@@ -1035,8 +930,8 @@ JNIThread_WriteFloat( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
 }
 
 static int
-JNIThread_PreparePlay( JNIEnv *env, audio_output_t *p_aout,
-                       block_t *p_buffer )
+AudioTrack_PreparePlay( JNIEnv *env, audio_output_t *p_aout,
+                         block_t *p_buffer )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -1115,8 +1010,9 @@ JNIThread_PreparePlay( JNIEnv *env, audio_output_t *p_aout,
 }
 
 static int
-JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
-                block_t *p_buffer, size_t *p_buffer_offset, mtime_t *p_wait )
+AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
+                 block_t *p_buffer, size_t *p_buffer_offset, mtime_t *p_wait,
+                 bool b_force )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
@@ -1124,13 +1020,14 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
     switch( p_sys->i_write_type )
     {
     case WRITE_V21:
-        i_ret = JNIThread_WriteV21( env, p_aout, p_buffer, *p_buffer_offset );
+        i_ret = AudioTrack_WriteV21( env, p_aout, p_buffer, *p_buffer_offset );
         break;
     case WRITE:
-        i_ret = JNIThread_Write( env, p_aout, p_buffer, *p_buffer_offset );
+        i_ret = AudioTrack_Write( env, p_aout, p_buffer, *p_buffer_offset,
+                                  b_force );
         break;
     case WRITE_FLOAT:
-        i_ret = JNIThread_WriteFloat( env, p_aout, p_buffer, *p_buffer_offset );
+        i_ret = AudioTrack_WriteFloat( env, p_aout, p_buffer, *p_buffer_offset );
         break;
     default:
         vlc_assert_unreachable();
@@ -1142,8 +1039,8 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
         {
             msg_Warn( p_aout, "ERROR_DEAD_OBJECT: "
                               "try recreating AudioTrack" );
-            JNIThread_Stop( env, p_aout );
-            i_ret = JNIThread_Start( env, p_aout );
+            Stop( p_aout );
+            i_ret = Start( p_aout, &p_sys->fmt );
         } else
         {
             const char *str;
@@ -1164,31 +1061,66 @@ JNIThread_Play( JNIEnv *env, audio_output_t *p_aout,
     {
         uint32_t i_samples = BYTES_TO_FRAMES( i_ret );
 
-        p_sys->i_samples_queued -= i_samples;
         p_sys->i_samples_written += i_samples;
 
         *p_buffer_offset += i_ret;
-
-        /* HACK: There is a known issue in audiotrack, "due to an internal
-         * timeout within the AudioTrackThread". It happens after android
-         * 4.4.2, it's not a problem for Android 5.0 since we use an other way
-         * to write samples. A working hack is to wait a little between each
-         * write. This hack is done only for API 19 (AudioTimestamp was added
-         * in API 19). */
-
-        if( p_sys->i_write_type == WRITE && jfields.AudioTimestamp.clazz )
-            *p_wait = FRAMES_TO_US( i_samples ) / 2;
     }
-    return i_ret >= 0 ? VLC_SUCCESS : VLC_EGENERIC;
+    return i_ret;
 }
 
 static void
-JNIThread_Pause( JNIEnv *env, audio_output_t *p_aout,
-                 bool b_pause, mtime_t i_date )
+Play( audio_output_t *p_aout, block_t *p_buffer )
 {
+    JNIEnv *env;
+    size_t i_buffer_offset = 0;
+    int i_nb_try = 0;
+    mtime_t i_play_wait = 0;
+    aout_sys_t *p_sys = p_aout->sys;
+
+    if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
+        goto bailout;
+
+    p_sys->b_error = AudioTrack_PreparePlay( env, p_aout, p_buffer )
+                        != VLC_SUCCESS;
+
+    while( i_buffer_offset < p_buffer->i_buffer && !p_sys->b_error )
+    {
+        int i_ret;
+
+        if( i_play_wait != 0 )
+            msleep( i_play_wait );
+
+        i_play_wait = 0;
+        i_ret = AudioTrack_Play( env, p_aout, p_buffer,
+                                 &i_buffer_offset,
+                                 &i_play_wait,
+                                 i_nb_try > 100 );
+        if( i_ret < 0 )
+            p_sys->b_error = true;
+        else if( p_sys->i_write_type == WRITE )
+        {
+            /* HACK: AudioFlinger can drop frames without notifying us and
+             * there is no way to know it. It it happens, i_audiotrack_pos
+             * won't move and the current code will be stuck because it'll
+             * assume that audiotrack internal buffer is full when it's not. It
+             * can happen only after Android 4.4.2 if we send frames too
+             * quickly. */
+            i_nb_try = i_ret == 0 ? i_nb_try + 1 : 0;
+        }
+    }
+bailout:
+    block_Release( p_buffer );
+}
+
+static void
+Pause( audio_output_t *p_aout, bool b_pause, mtime_t i_date )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    JNIEnv *env;
     VLC_UNUSED( i_date );
 
-    aout_sys_t *p_sys = p_aout->sys;
+    if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
+        return;
 
     if( b_pause )
     {
@@ -1203,10 +1135,13 @@ JNIThread_Pause( JNIEnv *env, audio_output_t *p_aout,
 }
 
 static void
-JNIThread_Flush( JNIEnv *env, audio_output_t *p_aout,
-                 bool b_wait )
+Flush( audio_output_t *p_aout, bool b_wait )
 {
     aout_sys_t *p_sys = p_aout->sys;
+    JNIEnv *env;
+
+    if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
+        return;
 
     /* Android doc:
      * stop(): Stops playing the audio data. When used on an instance created
@@ -1240,347 +1175,8 @@ JNIThread_Flush( JNIEnv *env, audio_output_t *p_aout,
         (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
         p_sys->p_bytebuffer = NULL;
     }
+    AudioTrack_InitDelay( env, p_aout );
 }
-
-static void *
-JNIThread( void *data )
-{
-    audio_output_t *p_aout = data;
-    aout_sys_t *p_sys = p_aout->sys;
-    bool b_error = false;
-    bool b_paused = false;
-    block_t *p_buffer = NULL;
-    size_t i_buffer_offset = 0;
-    mtime_t i_play_deadline = 0;
-    JNIEnv* env;
-
-    env = jni_get_env(THREAD_NAME);
-
-    vlc_mutex_lock( &p_sys->mutex );
-    if( !env )
-        goto end;
-
-    while( p_sys->b_thread_run )
-    {
-        struct thread_cmd *p_cmd;
-        bool b_remove_cmd = true;
-
-        /* wait to process a command */
-        while( ( p_cmd = TAILQ_FIRST( &p_sys->thread_cmd_queue ) ) == NULL
-               && p_sys->b_thread_run )
-            vlc_cond_wait( &p_sys->cond, &p_sys->mutex );
-
-        if( !p_sys->b_thread_run || p_cmd == NULL )
-            break;
-
-        if( b_paused && p_cmd->id == CMD_PLAY )
-        {
-            vlc_cond_wait( &p_sys->cond, &p_sys->mutex );
-            continue;
-        }
-
-        if( p_cmd->id == CMD_PLAY && i_play_deadline > 0 )
-        {
-            if( mdate() > i_play_deadline )
-                i_play_deadline = 0;
-            else
-            {
-                int i_ret = 0;
-                while( p_cmd == TAILQ_FIRST( &p_sys->thread_cmd_queue )
-                       && i_ret != ETIMEDOUT && p_sys->b_thread_run )
-                    i_ret = vlc_cond_timedwait( &p_sys->cond, &p_sys->mutex,
-                                                i_play_deadline );
-                continue;
-            }
-        }
-
-        /* process a command */
-        switch( p_cmd->id )
-        {
-            case CMD_START:
-                assert( !p_sys->p_audiotrack );
-                if( b_error ) {
-                    p_cmd->out.start.i_ret = -1;
-                    break;
-                }
-                p_sys->fmt = *p_cmd->in.start.p_fmt;
-                p_cmd->out.start.i_ret =
-                        JNIThread_Start( env, p_aout );
-                JNIThread_InitDelay( env, p_aout );
-                p_cmd->out.start.p_fmt = &p_sys->fmt;
-                b_paused = false;
-                break;
-            case CMD_STOP:
-                assert( p_sys->p_audiotrack );
-                JNIThread_Stop( env, p_aout );
-                JNIThread_InitDelay( env, p_aout );
-                b_paused = false;
-                b_error = false;
-                p_buffer = NULL;
-                break;
-            case CMD_PLAY:
-            {
-                mtime_t i_play_wait = 0;
-
-                assert( p_sys->p_audiotrack );
-                if( b_error )
-                    break;
-                if( p_buffer == NULL )
-                {
-                    if( !p_cmd->in.play.p_buffer->i_buffer )
-                        break;
-                    p_buffer = p_cmd->in.play.p_buffer;
-                    i_buffer_offset = 0;
-                    b_error = JNIThread_PreparePlay( env, p_aout, p_buffer )
-                              != VLC_SUCCESS;
-                    if( b_error )
-                        break;
-                }
-                b_error = JNIThread_Play( env, p_aout, p_buffer,
-                                          &i_buffer_offset,
-                                          &i_play_wait ) != VLC_SUCCESS;
-                if( i_buffer_offset < p_buffer->i_buffer )
-                {
-                    /* buffer is not fully processed, try again with the
-                     * same cmd and buffer */
-                    b_remove_cmd = false;
-                }
-                else
-                {
-                    p_buffer = NULL;
-                }
-                if( i_play_wait > 0 )
-                    i_play_deadline = mdate() + i_play_wait;
-                break;
-            }
-            case CMD_PAUSE:
-                assert( p_sys->p_audiotrack );
-                if( b_error )
-                    break;
-                JNIThread_Pause( env, p_aout,
-                                 p_cmd->in.pause.b_pause,
-                                 p_cmd->in.pause.i_date );
-                b_paused = p_cmd->in.pause.b_pause;
-                break;
-            case CMD_TIME_GET:
-                assert( p_sys->p_audiotrack );
-                if( b_error )
-                {
-                    p_cmd->out.time_get.i_ret = -1;
-                    break;
-                }
-                p_cmd->out.time_get.i_ret =
-                        JNIThread_TimeGet( env, p_aout,
-                                           &p_cmd->out.time_get.i_delay );
-                break;
-            case CMD_FLUSH:
-                assert( p_sys->p_audiotrack );
-                if( b_error )
-                    break;
-                JNIThread_Flush( env, p_aout,
-                                 p_cmd->in.flush.b_wait );
-                JNIThread_InitDelay( env, p_aout );
-                p_buffer = NULL;
-                break;
-            default:
-                vlc_assert_unreachable();
-        }
-        if( p_sys->b_audiotrack_exception )
-            b_error = true;
-        if( b_error )
-            p_sys->i_samples_queued = 0;
-
-        if( b_remove_cmd )
-        {
-            TAILQ_REMOVE( &p_sys->thread_cmd_queue, p_cmd, next );
-            p_cmd->id = CMD_DONE;
-            if( p_cmd->pf_destroy )
-                p_cmd->pf_destroy( p_cmd );
-        }
-
-        /* signal that command is processed */
-        vlc_cond_signal( &p_sys->cond );
-    }
-end:
-    if( env )
-    {
-        if( p_sys->p_bytearray )
-            (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );
-        if( p_sys->p_floatarray )
-            (*env)->DeleteGlobalRef( env, p_sys->p_floatarray );
-        if( p_sys->p_bytebuffer )
-            (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
-    }
-    vlc_mutex_unlock( &p_sys->mutex );
-    return NULL;
-}
-
-static int
-Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
-{
-    int i_ret = VLC_EGENERIC;
-    struct thread_cmd *p_cmd;
-    aout_sys_t *p_sys = p_aout->sys;
-
-    vlc_mutex_lock( &p_sys->mutex );
-
-    p_cmd = ThreadCmd_New( CMD_START );
-    if( p_cmd )
-    {
-        /* ask the thread to process the Start command */
-        p_cmd->in.start.p_fmt = p_fmt;
-
-        ThreadCmd_InsertHead( p_sys, p_cmd );
-        if( ThreadCmd_Wait( p_sys, p_cmd ) )
-        {
-            i_ret = p_cmd->out.start.i_ret;
-            if( i_ret == VLC_SUCCESS )
-                *p_fmt = *p_cmd->out.start.p_fmt;
-        }
-        free( p_cmd );
-    }
-
-    vlc_mutex_unlock( &p_sys->mutex );
-
-    if( i_ret == VLC_SUCCESS )
-        aout_SoftVolumeStart( p_aout );
-
-    return i_ret;
-}
-
-static void
-Stop( audio_output_t *p_aout )
-{
-    aout_sys_t *p_sys = p_aout->sys;
-    struct thread_cmd *p_cmd;
-
-    vlc_mutex_lock( &p_sys->mutex );
-
-    ThreadCmd_FlushQueue( p_sys );
-
-    p_cmd = ThreadCmd_New( CMD_STOP );
-    if( p_cmd )
-    {
-        /* ask the thread to process the Stop command */
-        ThreadCmd_InsertHead( p_sys, p_cmd );
-        ThreadCmd_Wait( p_sys, p_cmd );
-
-        free( p_cmd );
-    }
-
-    vlc_mutex_unlock( &p_sys->mutex );
-}
-
-static void
-PlayCmd_Destroy( struct thread_cmd *p_cmd )
-{
-    block_Release( p_cmd->in.play.p_buffer );
-    free( p_cmd );
-}
-
-static void
-Play( audio_output_t *p_aout, block_t *p_buffer )
-{
-    aout_sys_t *p_sys = p_aout->sys;
-    struct thread_cmd *p_cmd;
-
-    vlc_mutex_lock( &p_sys->mutex );
-
-    while( p_sys->i_samples_queued != 0
-           && FRAMES_TO_US( p_sys->i_samples_queued +
-                            p_buffer->i_nb_samples ) >= MAX_QUEUE_US )
-        vlc_cond_wait( &p_sys->cond, &p_sys->mutex );
-
-    p_cmd = ThreadCmd_New( CMD_PLAY );
-    if( p_cmd )
-    {
-        /* ask the thread to process the Play command */
-        p_cmd->in.play.p_buffer = p_buffer;
-        p_cmd->pf_destroy = PlayCmd_Destroy;
-
-        ThreadCmd_InsertTail( p_sys, p_cmd );
-
-        p_sys->i_samples_queued += p_buffer->i_nb_samples;
-    } else
-         block_Release( p_cmd->in.play.p_buffer );
-
-    vlc_mutex_unlock( &p_sys->mutex );
-}
-
-static void
-Pause( audio_output_t *p_aout, bool b_pause, mtime_t i_date )
-{
-    aout_sys_t *p_sys = p_aout->sys;
-    struct thread_cmd *p_cmd;
-
-    vlc_mutex_lock( &p_sys->mutex );
-
-    p_cmd = ThreadCmd_New( CMD_PAUSE );
-    if( p_cmd )
-    {
-        /* ask the thread to process the Pause command */
-        p_cmd->in.pause.b_pause = b_pause;
-        p_cmd->in.pause.i_date = i_date;
-
-        ThreadCmd_InsertHead( p_sys, p_cmd );
-        ThreadCmd_Wait( p_sys, p_cmd );
-
-        free( p_cmd );
-    }
-
-    vlc_mutex_unlock( &p_sys->mutex );
-}
-
-static void
-Flush( audio_output_t *p_aout, bool b_wait )
-{
-    aout_sys_t *p_sys = p_aout->sys;
-    struct thread_cmd *p_cmd;
-
-    vlc_mutex_lock( &p_sys->mutex );
-
-    ThreadCmd_FlushQueue( p_sys );
-
-    p_cmd = ThreadCmd_New( CMD_FLUSH );
-    if( p_cmd)
-    {
-        /* ask the thread to process the Flush command */
-        p_cmd->in.flush.b_wait = b_wait;
-
-        ThreadCmd_InsertHead( p_sys, p_cmd );
-        ThreadCmd_Wait( p_sys, p_cmd );
-
-        free( p_cmd );
-    }
-
-    vlc_mutex_unlock( &p_sys->mutex );
-}
-
-static int
-TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
-{
-    aout_sys_t *p_sys = p_aout->sys;
-    struct thread_cmd *p_cmd;
-    int i_ret = -1;
-
-    vlc_mutex_lock( &p_sys->mutex );
-
-    p_cmd = ThreadCmd_New( CMD_TIME_GET );
-    if( p_cmd)
-    {
-        ThreadCmd_InsertHead( p_sys, p_cmd );
-        ThreadCmd_Wait( p_sys, p_cmd );
-
-        i_ret = p_cmd->out.time_get.i_ret;
-        *p_delay = p_cmd->out.time_get.i_delay;
-        free( p_cmd );
-    }
-
-    vlc_mutex_unlock( &p_sys->mutex );
-
-    return i_ret;
-}
-
 
 static int
 Open( vlc_object_t *obj )
@@ -1596,10 +1192,6 @@ Open( vlc_object_t *obj )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    vlc_mutex_init( &p_sys->mutex );
-    vlc_cond_init( &p_sys->cond );
-    TAILQ_INIT( &p_sys->thread_cmd_queue );
-
     p_aout->sys = p_sys;
     p_aout->start = Start;
     p_aout->stop = Stop;
@@ -1610,17 +1202,6 @@ Open( vlc_object_t *obj )
 
     aout_SoftVolumeInit( p_aout );
 
-    /* create JNIThread */
-    p_sys->b_thread_run = true;
-    if( vlc_clone( &p_sys->thread,
-                   JNIThread, p_aout, VLC_THREAD_PRIORITY_AUDIO ) )
-    {
-        msg_Err( p_aout, "JNIThread creation failed" );
-        p_sys->b_thread_run = false;
-        Close( obj );
-        return VLC_EGENERIC;
-    }
-
     return VLC_SUCCESS;
 }
 
@@ -1629,20 +1210,17 @@ Close( vlc_object_t *obj )
 {
     audio_output_t *p_aout = (audio_output_t *) obj;
     aout_sys_t *p_sys = p_aout->sys;
+    JNIEnv *env;
 
-    /* kill the thread */
-    vlc_mutex_lock( &p_sys->mutex );
-    if( p_sys->b_thread_run )
+    if( ( env = jni_get_env( THREAD_NAME ) ) )
     {
-        p_sys->b_thread_run = false;
-        vlc_cond_signal( &p_sys->cond );
-        vlc_mutex_unlock( &p_sys->mutex );
-        vlc_join( p_sys->thread, NULL );
-    } else
-        vlc_mutex_unlock( &p_sys->mutex );
-
-    vlc_mutex_destroy( &p_sys->mutex );
-    vlc_cond_destroy( &p_sys->cond );
+        if( p_sys->p_bytearray )
+            (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );
+        if( p_sys->p_floatarray )
+            (*env)->DeleteGlobalRef( env, p_sys->p_floatarray );
+        if( p_sys->p_bytebuffer )
+            (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
+    }
 
     free( p_sys );
 }
