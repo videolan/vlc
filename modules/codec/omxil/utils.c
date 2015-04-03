@@ -345,6 +345,8 @@ bool OMXCodec_IsBlacklisted( const char *p_name, unsigned int i_name_len )
         /* Codecs with DRM, that don't output plain YUV data but only
          * support direct rendering where the output can't be intercepted. */
         ".secure",
+        /* Samsung sw decoders */
+        ".sw.dec",
         NULL
     };
 
