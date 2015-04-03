@@ -34,6 +34,9 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 
+#define MIN_AUDIOTRACK_BUFFER_US INT64_C(250000)  // 250ms
+#define MAX_AUDIOTRACK_BUFFER_US INT64_C(1000000) // 1000ms
+
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 static void Stop( audio_output_t * );
@@ -528,6 +531,7 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout,
                 unsigned int i_rate,
                 vlc_fourcc_t i_vlc_format,
                 uint16_t i_physical_channels,
+                int i_bytes_per_frame,
                 int *p_audiotrack_size )
 {
     int i_size, i_min_buffer_size, i_channel_config, i_format;
@@ -582,7 +586,19 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout,
     if( i_vlc_format == VLC_CODEC_SPDIFB )
         i_size = ( i_min_buffer_size / AOUT_SPDIF_SIZE + 1 ) * AOUT_SPDIF_SIZE;
     else
+    {
+        /* Optimal buffer size: i_min_buffer_size * 4 but between 250ms and
+         * 1000ms */
+        mtime_t i_time, i_clipped_time;
+
         i_size = i_min_buffer_size * 4;
+        i_time = (i_size / i_bytes_per_frame) * CLOCK_FREQ / i_rate;
+
+        i_clipped_time = VLC_CLIP( i_time, MIN_AUDIOTRACK_BUFFER_US,
+                         MAX_AUDIOTRACK_BUFFER_US );
+        if( i_clipped_time != i_time )
+            i_size = i_rate * i_clipped_time * i_bytes_per_frame / CLOCK_FREQ;
+    }
 
     /* create AudioTrack object */
     p_audiotrack = JNI_AT_NEW( jfields.AudioManager.STREAM_MUSIC, i_rate,
@@ -612,7 +628,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
     jobject p_audiotrack = NULL;
-    int i_nb_channels, i_audiotrack_size;
+    int i_nb_channels, i_audiotrack_size, i_bytes_per_frame;
 
     if( !( env = jni_get_env( THREAD_NAME ) ) )
         return VLC_EGENERIC;
@@ -672,6 +688,9 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 
     do
     {
+        i_bytes_per_frame = i_nb_channels *
+                            aout_BitsPerSample( p_sys->fmt.i_format ) / 8;
+
         /* Try to create an AudioTrack with the most advanced channel and
          * format configuration. If AudioTrack_New fails, try again with a less
          * advanced format (PCM S16N). If it fails again, try again with Stereo
@@ -679,6 +698,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
         p_audiotrack = AudioTrack_New( env, p_aout, p_sys->fmt.i_rate,
                                        p_sys->fmt.i_format,
                                        p_sys->fmt.i_physical_channels,
+                                       i_bytes_per_frame,
                                        &i_audiotrack_size );
         if( !p_audiotrack )
         {
@@ -734,9 +754,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             aout_CheckChannelReorder( NULL, p_chans_out,
                                       p_sys->fmt.i_physical_channels,
                                       p_sys->p_chan_table );
-        p_sys->i_bytes_per_frame = i_nb_channels *
-                                   aout_BitsPerSample( p_sys->fmt.i_format ) /
-                                   8;
+        p_sys->i_bytes_per_frame = i_bytes_per_frame;
     }
     p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( i_audiotrack_size );
 
