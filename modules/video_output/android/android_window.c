@@ -66,8 +66,7 @@ vlc_module_end()
  *****************************************************************************/
 
 #define THREAD_NAME "android_window"
-extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
-extern void jni_detach_thread();
+extern JNIEnv *jni_get_env(const char *name);
 
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern jobject jni_LockAndGetSubtitlesSurface();
@@ -368,11 +367,9 @@ static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
     if (!p_window->p_handle && !p_window->b_opaque) {
         JNIEnv *p_env;
 
-        jni_attach_thread(&p_env, THREAD_NAME);
-        if (!p_env)
+        if (!(p_env = jni_get_env(THREAD_NAME)))
             return -1;
         p_window->p_handle = sys->anw.winFromSurface(p_env, p_window->jsurf);
-        jni_detach_thread();
         if (!p_window->p_handle)
             return -1;
     }

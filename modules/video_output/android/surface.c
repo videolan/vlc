@@ -73,9 +73,6 @@ vlc_module_end()
  * JNI prototypes
  *****************************************************************************/
 
-#define THREAD_NAME "AndroidSurface"
-extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
-extern void jni_detach_thread();
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void  jni_UnlockAndroidSurface();
 extern void *jni_AndroidJavaSurfaceToNativeSurface(jobject surf);

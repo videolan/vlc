@@ -149,10 +149,7 @@ struct thread_cmd
 };
 
 #define THREAD_NAME "android_audiotrack"
-
-extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
-extern void jni_detach_thread();
-extern int jni_get_env(JNIEnv **env);
+extern JNIEnv *jni_get_env(const char *name);
 
 static struct
 {
@@ -220,7 +217,7 @@ InitJNIFields( audio_output_t *p_aout )
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static int i_init_state = -1;
-    bool ret, b_attached = false;
+    bool ret;
     jclass clazz;
     jfieldID field;
     JNIEnv* env = NULL;
@@ -230,15 +227,10 @@ InitJNIFields( audio_output_t *p_aout )
     if( i_init_state != -1 )
         goto end;
 
-    if( jni_get_env(&env) < 0 )
+    if (!(env = jni_get_env(THREAD_NAME)))
     {
-        jni_attach_thread( &env, THREAD_NAME );
-        if( !env )
-        {
-            i_init_state = 0;
-            goto end;
-        }
-        b_attached = true;
+        i_init_state = 0;
+        goto end;
     }
 
 #define CHECK_EXCEPTION( what, critical ) do { \
@@ -378,8 +370,6 @@ end:
     ret = i_init_state == 1;
     if( !ret )
         msg_Err( p_aout, "AudioTrack jni init failed" );
-    if( b_attached )
-        jni_detach_thread();
     vlc_mutex_unlock( &lock );
     return ret;
 }
@@ -1264,7 +1254,7 @@ JNIThread( void *data )
     mtime_t i_play_deadline = 0;
     JNIEnv* env;
 
-    jni_attach_thread( &env, THREAD_NAME );
+    env = jni_get_env(THREAD_NAME);
 
     vlc_mutex_lock( &p_sys->mutex );
     if( !env )
@@ -1420,7 +1410,6 @@ end:
             (*env)->DeleteGlobalRef( env, p_sys->p_floatarray );
         if( p_sys->p_bytebuffer )
             (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
-        jni_detach_thread();
     }
     vlc_mutex_unlock( &p_sys->mutex );
     return NULL;

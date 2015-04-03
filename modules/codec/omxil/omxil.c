@@ -68,8 +68,7 @@
 #if defined(USE_IOMX)
 /* JNI functions to get/set an Android Surface object. */
 #define THREAD_NAME "omxil"
-extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
-extern void jni_detach_thread();
+extern JNIEnv *jni_get_env(const char *name);
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
 extern bool jni_IsVideoPlayerActivityCreated();
@@ -2096,9 +2095,8 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
         goto error;
     }
 
-    jni_attach_thread( &p_env, THREAD_NAME );
-    p_port->p_hwbuf->window = p_port->p_hwbuf->native_window.winFromSurface( p_env, surf );
-    jni_detach_thread();
+    if ((p_env = jni_get_env(THREAD_NAME)))
+        p_port->p_hwbuf->window = p_port->p_hwbuf->native_window.winFromSurface( p_env, surf );
 
     jni_UnlockAndroidSurface();
     if( !p_port->p_hwbuf->window ) {

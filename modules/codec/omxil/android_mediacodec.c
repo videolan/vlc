@@ -49,9 +49,8 @@
 #define INFO_TRY_AGAIN_LATER        -1
 
 #define THREAD_NAME "android_mediacodec"
+extern JNIEnv *jni_get_env(const char *name);
 
-extern int jni_attach_thread(JNIEnv **env, const char *thread_name);
-extern void jni_detach_thread();
 /* JNI functions to get/set an Android Surface object. */
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
@@ -372,7 +371,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_dec->b_need_packetized = true;
 
     JNIEnv* env = NULL;
-    jni_attach_thread(&env, THREAD_NAME);
+    if (!(env = jni_get_env(THREAD_NAME)))
+        goto error;
 
     for (int i = 0; classes[i].name; i++) {
         *(jclass*)((uint8_t*)p_sys + classes[i].offset) =
@@ -651,8 +651,6 @@ loopclean:
     p_sys->buffer_info = (*env)->NewGlobalRef(env, p_sys->buffer_info);
     (*env)->DeleteLocalRef(env, format);
 
-    jni_detach_thread();
-
     const int timestamp_fifo_size = 32;
     p_sys->timestamp_fifo = timestamp_FifoNew(timestamp_fifo_size);
     if (!p_sys->timestamp_fifo)
@@ -661,7 +659,6 @@ loopclean:
     return VLC_SUCCESS;
 
  error:
-    jni_detach_thread();
     CloseDecoder(p_this);
     return VLC_EGENERIC;
 }
@@ -679,7 +676,10 @@ static void CloseDecoder(vlc_object_t *p_this)
      * to prevent the vout from using destroyed output buffers. */
     if (p_sys->direct_rendering)
         InvalidateAllPictures(p_dec);
-    jni_attach_thread(&env, THREAD_NAME);
+
+    if (!(env = jni_get_env(THREAD_NAME)))
+        goto cleanup;
+
     if (p_sys->input_buffers)
         (*env)->DeleteGlobalRef(env, p_sys->input_buffers);
     if (p_sys->output_buffers)
@@ -701,8 +701,8 @@ static void CloseDecoder(vlc_object_t *p_this)
     }
     if (p_sys->buffer_info)
         (*env)->DeleteGlobalRef(env, p_sys->buffer_info);
-    jni_detach_thread();
 
+cleanup:
     free(p_sys->name);
     ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
     free(p_sys->pp_inflight_pictures);
@@ -752,9 +752,8 @@ static void UnlockPicture(picture_t* p_pic, bool b_render)
 
     /* Release the MediaCodec buffer. */
     JNIEnv *env = NULL;
-    jni_attach_thread(&env, THREAD_NAME);
-    ReleaseOutputBuffer(p_dec, env, i_index, b_render);
-    jni_detach_thread();
+    if ((env = jni_get_env(THREAD_NAME)))
+        ReleaseOutputBuffer(p_dec, env, i_index, b_render);
     p_picsys->priv.hw.b_valid = false;
 
     vlc_mutex_unlock(get_android_opaque_mutex());
@@ -1020,8 +1019,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     if (p_sys->error_state)
         goto endclean;
 
-    jni_attach_thread(&env, THREAD_NAME);
-    if (!env)
+    if (!(env = jni_get_env(THREAD_NAME)))
         goto endclean;
 
     if ((*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
@@ -1115,8 +1113,6 @@ endclean:
             p_sys->error_event_sent = true;
         }
     }
-    if (env != NULL)
-        jni_detach_thread();
 
     return p_pic;
 }
