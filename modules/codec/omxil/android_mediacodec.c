@@ -397,6 +397,8 @@ static bool codec_is_blacklisted( const char *p_name, unsigned int i_name_len )
         "OMX.google.",
         /* crashes mediaserver */
         "OMX.MTK.VIDEO.DECODER.MPEG4",
+        /* Not working or crashing (Samsung) */
+        "OMX.SEC.vp8.dec",
         NULL,
      };
 

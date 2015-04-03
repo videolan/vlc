@@ -1141,6 +1141,9 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
          * it until we can make it work properly. */
         if (!strcmp(p_sys->ppsz_components[i], "OMX.Nvidia.vc1.decode"))
             continue;
+        /* This codec doesn't work or crashes */
+        if (!strcmp(p_sys->ppsz_components[i], "OMX.SEC.vp8.dec"))
+            continue;
 #endif
         omx_error = InitialiseComponent(p_dec, p_sys->ppsz_components[i],
                                         &p_sys->omx_handle);
