@@ -51,6 +51,7 @@ struct asf_packet_sys_s
 
     /* optional callbacks */
     bool (*pf_doskip)(asf_packet_sys_t *, uint8_t, bool);
+    void (*pf_updatesendtime)(asf_packet_sys_t *, mtime_t);
     void (*pf_updatetime)(asf_packet_sys_t *, uint8_t, mtime_t);
     void (*pf_setaspectratio)(asf_packet_sys_t *, uint8_t, uint8_t, uint8_t);
 };

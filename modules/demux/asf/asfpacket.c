@@ -245,7 +245,6 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     {
         /* optional DWORDS missing */
         i_base_pts = (mtime_t)pkt->send_time;
-        i_base_pts -= *p_packetsys->pi_preroll;
     }
     /* Compressed payload */
     else if( i_replicated_data_length == 1 )
@@ -298,24 +297,16 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
          p_packetsys->pf_doskip( p_packetsys, i_stream_number, b_packet_keyframe ) )
         goto skip;
 
-    bool b_hugedelay = ( *p_packetsys->pi_preroll * 1000 > CLOCK_FREQ * 3 );
-
-    if ( b_preroll_done || b_hugedelay )
+    if ( b_preroll_done )
     {
-        mtime_t i_track_time;
-        if ( !b_hugedelay )
-        {
-            i_track_time = INT64_C(1000) * pkt->send_time;
-            i_track_time -= *p_packetsys->pi_preroll * 1000;
-            if ( p_tkinfo->p_sp )
-                i_track_time -= p_tkinfo->p_sp->i_time_offset * 10;
-        }
-        else
-            i_track_time = i_base_pts;
+        mtime_t i_track_time = i_base_pts;
 
         if ( p_packetsys->pf_updatetime )
             p_packetsys->pf_updatetime( p_packetsys, i_stream_number, i_track_time );
     }
+
+    if( p_packetsys->pf_updatesendtime )
+        p_packetsys->pf_updatesendtime( p_packetsys, INT64_C(1000) * pkt->send_time );
 
     uint32_t i_subpayload_count = 0;
     while (i_payload_data_length)
@@ -333,13 +324,10 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         if ( p_tkinfo->p_sp )
             i_payload_pts -= p_tkinfo->p_sp->i_time_offset * 10;
 
-        mtime_t i_payload_dts = INT64_C(1000) * pkt->send_time;
-        i_payload_dts -= *p_packetsys->pi_preroll * 1000;
+        mtime_t i_payload_dts = i_base_pts;
+
         if ( p_tkinfo->p_sp )
             i_payload_dts -= p_tkinfo->p_sp->i_time_offset * 10;
-
-        if ( b_hugedelay )
-            i_payload_dts = i_base_pts;
 
         if ( i_sub_payload_data_length &&
              DemuxSubPayload( p_packetsys, i_stream_number, &p_tkinfo->p_frame,

@@ -71,7 +71,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
-static void FlushRemainingPackets( demux_t *p_demux );
+static void FlushQueues( demux_t *p_demux );
 
 #define MAX_ASF_TRACKS (ASF_MAX_STREAMNUMBER + 1)
 #define ASF_PREROLL_FROM_CURRENT -1
@@ -79,10 +79,12 @@ static void FlushRemainingPackets( demux_t *p_demux );
 /* callbacks for packet parser */
 static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
                                mtime_t i_time );
+static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, mtime_t i_time);
+static bool Block_Dequeue( demux_t *p_demux, mtime_t i_nexttime );
 static asf_track_info_t * Packet_GetTrackInfo( asf_packet_sys_t *p_packetsys,
                                                uint8_t i_stream_number );
 static bool Packet_DoSkip( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number, bool b_packet_keyframe );
-static void Packet_Send(asf_packet_sys_t *p_packetsys, uint8_t i_stream_number, block_t **pp_frame);
+static void Packet_Enqueue( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number, block_t **pp_frame );
 static void Packet_SetAR( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
                           uint8_t i_ratio_x, uint8_t i_ratio_y );
 
@@ -98,13 +100,22 @@ typedef struct
 
     asf_track_info_t info;
 
+    struct
+    {
+        block_t     *p_first;
+        block_t    **pp_last;
+    } queue;
+
 } asf_track_t;
 
 struct demux_sys_t
 {
     mtime_t             i_time;     /* s */
+    mtime_t             i_sendtime;
     mtime_t             i_length;   /* length of file file */
     uint64_t            i_bitrate;  /* global file bitrate */
+    bool                b_eos;      /* end of current stream */
+    bool                b_eof;      /* end of current media */
 
     asf_object_root_t            *p_root;
     asf_object_file_properties_t *p_fp;
@@ -128,7 +139,6 @@ struct demux_sys_t
     vlc_meta_t          *meta;
 };
 
-static mtime_t  GetMoviePTS( demux_sys_t * );
 static int      DemuxInit( demux_t * );
 static void     DemuxEnd( demux_t * );
 
@@ -162,9 +172,10 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->packet_sys.p_demux = p_demux;
     p_sys->packet_sys.pf_doskip = Packet_DoSkip;
-    p_sys->packet_sys.pf_send = Packet_Send;
+    p_sys->packet_sys.pf_send = Packet_Enqueue;
     p_sys->packet_sys.pf_gettrackinfo = Packet_GetTrackInfo;
     p_sys->packet_sys.pf_updatetime = Packet_UpdateTime;
+    p_sys->packet_sys.pf_updatesendtime = Packet_SetSendTime;
     p_sys->packet_sys.pf_setaspectratio = Packet_SetAR;
 
     return VLC_SUCCESS;
@@ -173,6 +184,7 @@ static int Open( vlc_object_t * p_this )
 /*****************************************************************************
  * Demux: read packet and send them to decoders
  *****************************************************************************/
+#define CHUNK (CLOCK_FREQ / 10)
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -198,30 +210,48 @@ static int Demux( demux_t *p_demux )
             tk->b_selected = false;
     }
 
-    for( ;; )
+    while( !p_sys->b_eos && p_sys->i_sendtime - p_sys->i_time < (mtime_t)p_sys->p_fp->i_preroll * 1000 + CHUNK )
     {
-        const uint8_t *p_peek;
-        mtime_t i_length;
-        mtime_t i_time_begin = GetMoviePTS( p_sys );
-        int i_result;
-
-#if 0
-        /* FIXME: returns EOF too early for some mms streams */
-        if( p_sys->i_data_end >= 0 &&
-                stream_Tell( p_demux->s ) >= p_sys->i_data_end )
-            return 0; /* EOF */
-#endif
-
-        /* Check if we have concatenated files */
-        if( stream_Peek( p_demux->s, &p_peek, 16 ) == 16 )
+        /* Read and demux a packet */
+        if( DemuxASFPacket( &p_sys->packet_sys,
+                             p_sys->p_fp->i_min_data_packet_size,
+                             p_sys->p_fp->i_max_data_packet_size ) <= 0 )
         {
-            guid_t guid;
-
-            ASF_GetGUID( &guid, p_peek );
-            if( guidcmp( &guid, &asf_object_header_guid ) )
+            p_sys->b_eos = true;
+            /* Check if we have concatenated files */
+            const uint8_t *p_peek;
+            if( stream_Peek( p_demux->s, &p_peek, 16 ) == 16 )
             {
-                msg_Warn( p_demux, "found a new ASF header" );
-                /* We end this stream */
+                guid_t guid;
+
+                ASF_GetGUID( &guid, p_peek );
+                p_sys->b_eof = !guidcmp( &guid, &asf_object_header_guid );
+                if( !p_sys->b_eof )
+                    msg_Warn( p_demux, "found a new ASF header" );
+            }
+            else
+                p_sys->b_eof = true;
+        }
+
+        if ( p_sys->i_time == -1 )
+            p_sys->i_time = p_sys->i_sendtime;
+    }
+
+    if( p_sys->b_eos ||
+       (p_sys->i_sendtime >= p_sys->i_time + (mtime_t)p_sys->p_fp->i_preroll * 1000 + CHUNK) )
+    {
+        bool b_data = Block_Dequeue( p_demux, p_sys->i_time + CHUNK );
+
+        p_sys->i_time += CHUNK;
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
+#ifdef ASF_DEBUG
+        msg_Dbg( p_demux, "Demux Loop Setting PCR to %"PRId64, VLC_TS_0 + p_sys->i_time );
+#endif
+        if ( !b_data && p_sys->b_eos )
+        {
+            /* We end this stream */
+            if( !p_sys->b_eof )
+            {
                 DemuxEnd( p_demux );
 
                 /* And we prepare to read the next one */
@@ -229,42 +259,14 @@ static int Demux( demux_t *p_demux )
                 {
                     msg_Err( p_demux, "failed to load the new header" );
                     dialog_Fatal( p_demux, _("Could not demux ASF stream"), "%s",
-                                    _("VLC failed to load the ASF header.") );
+                                  _("VLC failed to load the ASF header.") );
                     return 0;
                 }
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
-                continue;
             }
+            else
+                return VLC_DEMUXER_EOF;
         }
-
-        /* Read and demux a packet */
-        if( ( i_result = DemuxASFPacket( &p_sys->packet_sys,
-                                      p_sys->p_fp->i_min_data_packet_size,
-                                      p_sys->p_fp->i_max_data_packet_size ) ) <= 0 )
-        {
-            FlushRemainingPackets( p_demux );
-            return i_result;
-        }
-        if( i_time_begin == -1 )
-        {
-            i_time_begin = GetMoviePTS( p_sys );
-        }
-        else
-        {
-            i_length = GetMoviePTS( p_sys ) - i_time_begin;
-            if( i_length < 0 || i_length >= 40 * 1000 ) break;
-        }
-    }
-
-    /* Set the PCR */
-    /* WARN: Don't move it before the end of the whole chunk */
-    p_sys->i_time = GetMoviePTS( p_sys );
-    if( p_sys->i_time >= 0 )
-    {
-#ifdef ASF_DEBUG
-        msg_Dbg( p_demux, "Demux Loop Setting PCR to %"PRId64, VLC_TS_0 + p_sys->i_time );
-#endif
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
     }
 
     return 1;
@@ -382,18 +384,17 @@ static void SeekPrepare( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    p_sys->i_time = VLC_TS_INVALID;
+    p_sys->b_eof = false;
+    p_sys->b_eos = false;
+    p_sys->i_time = -1;
+    p_sys->i_sendtime = -1;
     p_sys->i_preroll_start = ASFPACKET_PREROLL_FROM_CURRENT;
+    FlushQueues( p_demux );
     for( int i = 0; i < MAX_ASF_TRACKS ; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
-        if( !tk )
-            continue;
-
-        tk->i_time = -1;
-        if( tk->info.p_frame )
-            block_ChainRelease( tk->info.p_frame );
-        tk->info.p_frame = NULL;
+        if( tk )
+            tk->i_time = -1;
     }
 
     es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
@@ -528,38 +529,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /*****************************************************************************
  *
  *****************************************************************************/
-static mtime_t GetMoviePTS( demux_sys_t *p_sys )
-{
-    mtime_t i_time = -1;
-    int     i;
-    /* As some tracks might have been deselected by access, the PCR might
-     * stop updating */
-    for( i = 0; i < MAX_ASF_TRACKS ; i++ )
-    {
-        const asf_track_t *tk = p_sys->track[i];
-
-        if( tk && tk->p_es && tk->b_selected )
-        {
-            /* Skip discrete tracks */
-            if ( tk->i_cat != VIDEO_ES && tk->i_cat != AUDIO_ES )
-                continue;
-
-            /* We need to have all ES seen once, as they might have lower DTS */
-            if ( tk->i_time + (int64_t)p_sys->p_fp->i_preroll * 1000 < 0 )
-            {
-                /* early fail */
-                return -1;
-            }
-            else if ( tk->i_time > -1 && ( i_time == -1 || i_time > tk->i_time ) )
-            {
-                i_time = tk->i_time;
-            }
-        }
-    }
-
-    return i_time;
-}
-
 static void Packet_SetAR( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
                           uint8_t i_ratio_x, uint8_t i_ratio_y )
 {
@@ -581,6 +550,11 @@ static void Packet_SetAR( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number
     }
     tk->p_fmt->video.i_sar_num = i_ratio_x;
     tk->p_fmt->video.i_sar_den = i_ratio_y;
+}
+
+static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, mtime_t i_time )
+{
+    p_packetsys->p_demux->p_sys->i_sendtime = i_time;
 }
 
 static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
@@ -635,30 +609,60 @@ static bool Packet_DoSkip( asf_packet_sys_t *p_packetsys, uint8_t i_stream_numbe
     return false;
 }
 
-static void Packet_Send(asf_packet_sys_t *p_packetsys, uint8_t i_stream_number, block_t **pp_frame)
+static void Packet_Enqueue( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number, block_t **pp_frame )
 {
     demux_t *p_demux = p_packetsys->p_demux;
     demux_sys_t *p_sys = p_demux->p_sys;
-    const asf_track_t *tk = p_sys->track[i_stream_number];
+    asf_track_t *tk = p_sys->track[i_stream_number];
     if ( !tk )
         return;
 
     block_t *p_gather = block_ChainGather( *pp_frame );
-
-    if( p_sys->i_time < VLC_TS_0 && tk->i_time > VLC_TS_INVALID )
+    if( p_gather )
     {
-        p_sys->i_time = tk->i_time;
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
+        block_ChainLastAppend( & tk->queue.pp_last, p_gather );
 #ifdef ASF_DEBUG
-        msg_Dbg( p_demux, "    setting PCR to %"PRId64, VLC_TS_0 + p_sys->i_time );
+        msg_Dbg( p_demux, "    enqueue packet dts %"PRId64" pts %"PRId64" pcr %"PRId64, p_gather->i_dts, p_gather->i_pts, p_sys->i_time );
 #endif
     }
 
-#ifdef ASF_DEBUG
-    msg_Dbg( p_demux, "    sending packet dts %"PRId64" pts %"PRId64" pcr %"PRId64, p_gather->i_dts, p_gather->i_pts, p_sys->i_time );
-#endif
-    es_out_Send( p_demux->out, tk->p_es, p_gather );
     *pp_frame = NULL;
+}
+
+static bool Block_Dequeue( demux_t *p_demux, mtime_t i_nexttime )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    bool b_tracks_have_data = false;
+    for( int i = 0; i < MAX_ASF_TRACKS; i++ )
+    {
+        asf_track_t *tk = p_sys->track[i];
+        if (!tk)
+            continue;
+        b_tracks_have_data |= (tk->queue.p_first != NULL);
+        while( tk->queue.p_first && tk->queue.p_first->i_dts <= i_nexttime )
+        {
+            block_t *p_block = tk->queue.p_first;
+            tk->queue.p_first = p_block->p_next;
+            if( tk->queue.p_first == NULL )
+                tk->queue.pp_last = &tk->queue.p_first;
+            else
+                p_block->p_next = NULL;
+
+            if( p_sys->i_time < VLC_TS_0 )
+            {
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
+#ifdef ASF_DEBUG
+                msg_Dbg( p_demux, "    dequeue setting PCR to %"PRId64, VLC_TS_0 + p_sys->i_time );
+#endif
+            }
+
+#ifdef ASF_DEBUG
+            msg_Dbg( p_demux, "    sending packet dts %"PRId64" pts %"PRId64" pcr %"PRId64, p_block->i_dts, p_block->i_pts, p_sys->i_time );
+#endif
+            es_out_Send( p_demux->out, tk->p_es, p_block );
+        }
+    }
+    return b_tracks_have_data;
 }
 
 /*****************************************************************************
@@ -743,7 +747,10 @@ static int DemuxInit( demux_t *p_demux )
 
     /* init context */
     p_sys->i_time   = -1;
+    p_sys->i_sendtime    = -1;
     p_sys->i_length = 0;
+    p_sys->b_eos = false;
+    p_sys->b_eof = false;
     p_sys->i_bitrate = 0;
     p_sys->p_root   = NULL;
     p_sys->p_fp     = NULL;
@@ -837,6 +844,8 @@ static int DemuxInit( demux_t *p_demux )
         tk->p_es = NULL;
         tk->info.p_esp = NULL;
         tk->info.p_frame = NULL;
+        tk->queue.p_first = NULL;
+        tk->queue.pp_last = &tk->queue.p_first;
 
         if ( strncmp( p_demux->psz_access, "mms", 3 ) )
         {
@@ -1228,17 +1237,28 @@ error:
 }
 
 /*****************************************************************************
- * FlushRemainingPackets: flushes tail packets
+ * FlushQueues: flushes tail packets and send queues
  *****************************************************************************/
 
-static void FlushRemainingPackets( demux_t *p_demux )
+static void FlushQueues( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     for ( unsigned int i = 0; i < MAX_ASF_TRACKS; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
-        if( tk && tk->info.p_frame )
-            Packet_Send( &p_sys->packet_sys, i, &tk->info.p_frame );
+        if( !tk )
+            continue;
+        if( tk->info.p_frame )
+        {
+            block_ChainRelease( tk->info.p_frame );
+            tk->info.p_frame = NULL;
+        }
+        if( tk->queue.p_first )
+        {
+            block_ChainRelease( tk->queue.p_first );
+            tk->queue.p_first = NULL;
+            tk->queue.pp_last = &tk->queue.p_first;
+        }
     }
 }
 
@@ -1260,15 +1280,14 @@ static void DemuxEnd( demux_t *p_demux )
         p_sys->meta = NULL;
     }
 
+    FlushQueues( p_demux );
+
     for( int i = 0; i < MAX_ASF_TRACKS; i++ )
     {
         asf_track_t *tk = p_sys->track[i];
 
         if( tk )
         {
-            if( tk->info.p_frame )
-                block_ChainRelease( tk->info.p_frame );
-
             if( tk->p_es )
             {
                 es_out_Del( p_demux->out, tk->p_es );
