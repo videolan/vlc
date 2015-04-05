@@ -341,7 +341,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
     /* Tooltip */
     if ( inputLength > 0 )
     {
-        int margin = handleLength() / 2;
+        int margin = handleLength();
         int posX = qMax( rect().left() + margin, qMin( rect().right() - margin, event->x() ) );
 
         QString chapterLabel;
@@ -352,7 +352,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
             int i_selected = -1;
             for( int i = 0 ; i < points.count() ; i++ )
             {
-                int x = points.at(i).time / 1000000.0 / inputLength * size().width();
+                int x = margin + points.at(i).time / 1000000.0 / inputLength * (size().width() - 2*margin);
                 if ( event->x() >= x )
                     i_selected = i;
             }
