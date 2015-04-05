@@ -255,6 +255,7 @@ fi
     --disable-aribb24 \
     --disable-aribb25 \
     --enable-vpx \
+    --enable-libdsm \
     --enable-taglib > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
