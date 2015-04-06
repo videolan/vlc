@@ -94,3 +94,45 @@ void text_style_Delete( text_style_t *p_style )
     free( p_style );
 }
 
+text_segment_t *text_segment_New( const char *psz_text )
+{
+    text_segment_t* segment = calloc( 1, sizeof(*segment) );
+    if( !segment )
+        return NULL;
+
+    segment->psz_text = strdup( psz_text );
+
+    return segment;
+}
+
+void text_segment_ChainDelete( text_segment_t *segment )
+{
+    while( segment != NULL )
+    {
+        text_segment_t *p_next = segment->p_next;
+
+        free( segment->psz_text );
+        //text_style_Delete( segment->style );
+        free( segment );
+
+        segment = p_next;
+    }
+}
+
+text_segment_t *text_segment_Copy( text_segment_t *p_src )
+{
+    text_segment_t *p_dst = NULL, *p_dst0 = NULL;
+
+    while( p_src && p_src->p_next ) {
+        text_segment_t *p_next = text_segment_New( p_src->psz_text );
+        p_src = p_src->p_next;
+
+        if( p_dst == NULL )
+            p_dst = p_dst0 = p_next;
+        else
+            p_dst->p_next = p_next;
+    }
+
+    return p_dst0;
+}
+

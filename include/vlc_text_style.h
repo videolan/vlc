@@ -89,6 +89,26 @@ typedef struct
 
 #define STYLE_DEFAULT_FONT_SIZE 22
 
+
+typedef struct text_segment_t text_segment_t;
+/**
+ * Text segment for subtitles
+ *
+ * This structure is used to store a formatted text, with mixed styles
+ * Every segment is comprised of one text and a unique style
+ *
+ * On style change, a new segment is created with the next part of text
+ * and the new style, and chained to the list
+ *
+ * Create with text_segment_New and clean the chain with
+ * text_segment_ChainDelete
+ */
+struct text_segment_t {
+    char *psz_text;                   /**< text string of the segment */
+    text_style_t *style;              /**< style applied to this segment */
+    text_segment_t *p_next;           /**< next segment */
+};
+
 /**
  * Create a default text style
  */
@@ -108,6 +128,31 @@ VLC_API text_style_t * text_style_Duplicate( const text_style_t * );
  * Delete a text style created by text_style_New or text_style_Duplicate
  */
 VLC_API void text_style_Delete( text_style_t * );
+
+/**
+ * This function will create a new text segment.
+ *
+ * You should use text_segment_ChainDelete to destroy it, to clean all
+ * the linked segments.
+ *
+ * This duplicates the string passed as argument
+ */
+VLC_API text_segment_t *text_segment_New( const char * );
+
+/**
+ * This function will destroy a list of text segments allocated
+ * by text_segment_New.
+ *
+ * You may pass it NULL.
+ */
+VLC_API void text_segment_ChainDelete( text_segment_t * );
+
+/**
+ * This function will copy a text_segment and its chain into a new one
+ *
+ * You may give it NULL, but it will return NULL.
+ */
+VLC_API text_segment_t * text_segment_Copy( text_segment_t * );
 
 #ifdef __cplusplus
 }
