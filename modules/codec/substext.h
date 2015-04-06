@@ -8,20 +8,13 @@ typedef struct
 
 typedef struct segment_t segment_t;
 
-typedef struct
-{
-    uint8_t i_fontsize;
-    uint32_t i_color;   //ARGB
-    uint8_t i_flags;
-} segment_style_t;
-
 struct segment_t
 {
     char *psz_string;
     unsigned int i_size;
     segment_t *p_next;
     /* styles applied to that segment */
-    segment_style_t styles;
+    text_style_t styles;
 };
 
 struct subpicture_updater_sys_t {
@@ -86,7 +79,7 @@ static void MakeHtmlNewLines( char **ppsz_src )
 }
 
 static void HtmlAppend( char **ppsz_dst, const char *psz_src,
-                        const segment_style_t *p_styles, const float f_scale )
+                        const text_style_t *p_styles, const float f_scale )
 {
     if ( !ppsz_dst ) return;
     int i_return;
@@ -99,28 +92,28 @@ static void HtmlAppend( char **ppsz_dst, const char *psz_src,
 
     MakeHtmlNewLines( &psz_encoded );
 
-    if ( p_styles->i_color & 0xFF000000 ) //ARGB
+    if ( p_styles->i_font_alpha > 0 ) //ARGB
     {
         i_return = asprintf( &psz_color, " color=\"#%6x\"",
-                             p_styles->i_color & 0x00FFFFFF );
+                             p_styles->i_font_color & 0x00FFFFFF );
         if ( i_return < 0 ) psz_color = NULL;
     }
 
-    if ( p_styles->i_fontsize > 0 && f_scale > 0 )
+    if ( p_styles->i_font_size > 0 && f_scale > 0 )
     {
         i_return = asprintf( &psz_fontsize, " size=\"%u\"",
-                             (unsigned) (f_scale * p_styles->i_fontsize) );
+                             (unsigned) (f_scale * p_styles->i_font_size) );
         if ( i_return < 0 ) psz_fontsize = NULL;
     }
 
     i_return = asprintf( &psz_subtext, "%s%s%s%s%s%s%s",
-                        ( p_styles->i_flags & STYLE_UNDERLINE ) ? "<u>" : "",
-                        ( p_styles->i_flags & STYLE_BOLD ) ? "<b>" : "",
-                        ( p_styles->i_flags & STYLE_ITALIC ) ? "<i>" : "",
+                        ( p_styles->i_style_flags & STYLE_UNDERLINE ) ? "<u>" : "",
+                        ( p_styles->i_style_flags & STYLE_BOLD ) ? "<b>" : "",
+                        ( p_styles->i_style_flags & STYLE_ITALIC ) ? "<i>" : "",
                           psz_encoded,
-                        ( p_styles->i_flags & STYLE_ITALIC ) ? "</i>" : "",
-                        ( p_styles->i_flags & STYLE_BOLD ) ? "</b>" : "",
-                        ( p_styles->i_flags & STYLE_UNDERLINE ) ? "</u>" : ""
+                        ( p_styles->i_style_flags & STYLE_ITALIC ) ? "</i>" : "",
+                        ( p_styles->i_style_flags & STYLE_BOLD ) ? "</b>" : "",
+                        ( p_styles->i_style_flags & STYLE_UNDERLINE ) ? "</u>" : ""
                         );
     if ( i_return < 0 ) psz_subtext = NULL;
 

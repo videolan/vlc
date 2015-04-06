@@ -134,14 +134,14 @@ static void SegmentDoSplit( segment_t *p_segment, uint16_t i_start, uint16_t i_e
     {
         p_segment_left = calloc( 1, sizeof(segment_t) );
         if ( !p_segment_left ) goto error;
-        memcpy( &p_segment_left->styles, &p_segment->styles, sizeof(segment_style_t) );
+        memcpy( &p_segment_left->styles, &p_segment->styles, sizeof(text_style_t) );
         p_segment_left->psz_string = str8indup( p_segment->psz_string, 0, i_start );
         p_segment_left->i_size = str8len( p_segment_left->psz_string );
     }
 
     p_segment_middle = calloc( 1, sizeof(segment_t) );
     if ( !p_segment_middle ) goto error;
-    memcpy( &p_segment_middle->styles, &p_segment->styles, sizeof(segment_style_t) );
+    memcpy( &p_segment_middle->styles, &p_segment->styles, sizeof(text_style_t) );
     p_segment_middle->psz_string = str8indup( p_segment->psz_string, i_start, i_end - i_start + 1 );
     p_segment_middle->i_size = str8len( p_segment_middle->psz_string );
 
@@ -149,7 +149,7 @@ static void SegmentDoSplit( segment_t *p_segment, uint16_t i_start, uint16_t i_e
     {
         p_segment_right = calloc( 1, sizeof(segment_t) );
         if ( !p_segment_right ) goto error;
-        memcpy( &p_segment_right->styles, &p_segment->styles, sizeof(segment_style_t) );
+        memcpy( &p_segment_right->styles, &p_segment->styles, sizeof(text_style_t) );
         p_segment_right->psz_string = str8indup( p_segment->psz_string, i_end + 1, p_segment->i_size - i_end - 1 );
         p_segment_right->i_size = str8len( p_segment_right->psz_string );
     }
@@ -171,7 +171,7 @@ error:
 
 static bool SegmentSplit( segment_t *p_prev, segment_t **pp_segment,
                           const uint16_t i_start, const uint16_t i_end,
-                          const segment_style_t *p_styles )
+                          const text_style_t *p_styles )
 {
     segment_t *p_segment_left = NULL, *p_segment_middle = NULL, *p_segment_right = NULL;
 
@@ -207,7 +207,7 @@ static bool SegmentSplit( segment_t *p_prev, segment_t **pp_segment,
 /* Creates a new segment using the given style and split existing ones according
    to the start & end offsets */
 static void ApplySegmentStyle( segment_t **pp_segment, const uint16_t i_absstart,
-                               const uint16_t i_absend, const segment_style_t *p_styles )
+                               const uint16_t i_absend, const text_style_t *p_styles )
 {
     /* find the matching segment */
     uint16_t i_curstart = 0;
@@ -288,11 +288,11 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_segment->i_size = str8len( psz_subtitle );
     if ( p_dec->fmt_in.subs.p_style )
     {
-        p_segment->styles.i_color = p_dec->fmt_in.subs.p_style->i_font_color;
-        p_segment->styles.i_color |= p_dec->fmt_in.subs.p_style->i_font_alpha << 24;
+        p_segment->styles.i_font_color = p_dec->fmt_in.subs.p_style->i_font_color;
+        p_segment->styles.i_font_alpha = p_dec->fmt_in.subs.p_style->i_font_alpha;
         if ( p_dec->fmt_in.subs.p_style->i_style_flags )
-            p_segment->styles.i_flags = p_dec->fmt_in.subs.p_style->i_style_flags;
-        p_segment->styles.i_fontsize = p_dec->fmt_in.subs.p_style->i_font_size;
+            p_segment->styles.i_style_flags = p_dec->fmt_in.subs.p_style->i_style_flags;
+        p_segment->styles.i_font_size = p_dec->fmt_in.subs.p_style->i_font_size;
     }
 
     if ( !p_segment->psz_string )
@@ -333,11 +333,11 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                 uint16_t i_start = __MIN( GetWBE(p_buf), i_psz_bytelength - 1 );
                 uint16_t i_end =  __MIN( GetWBE(p_buf + 2), i_psz_bytelength - 1 );
 
-                segment_style_t style;
-                style.i_flags = ConvertFlags( p_buf[6] );
-                style.i_fontsize = p_buf[7];
-                style.i_color = GetDWBE(p_buf+8) >> 8;// RGBA -> ARGB
-                style.i_color |= (GetDWBE(p_buf+8) & 0xFF) << 24;
+                text_style_t style;
+                style.i_style_flags = ConvertFlags( p_buf[6] );
+                style.i_font_size = p_buf[7];
+                style.i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> RGB
+                style.i_font_alpha = GetDWBE(p_buf+8) & 0xFF;
                 ApplySegmentStyle( &p_segment, i_start, i_end, &style );
 
                 if ( i_nbrecords == 1 )
