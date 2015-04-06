@@ -304,6 +304,7 @@ static int Demux( demux_t * p_demux )
             }
             Ogg_EndOfStream( p_demux );
             p_sys->b_chained_boundary = true;
+            p_sys->i_nzpcr_offset = p_sys->i_nzlast_pts;
         }
 
         if( Ogg_BeginningOfStream( p_demux ) != VLC_SUCCESS )
@@ -399,8 +400,7 @@ static int Demux( demux_t * p_demux )
             {
                 msg_Err( p_demux, "Broken Ogg stream (serialno) mismatch" );
                 Ogg_ResetStream( p_stream );
-                p_sys->i_nzpcr_offset = (p_sys->i_pcr >= VLC_TS_INVALID) ?
-                                         p_sys->i_pcr - VLC_TS_0 : 0;
+                p_sys->i_nzpcr_offset = p_sys->i_nzlast_pts;
                 ogg_stream_reset_serialno( &p_stream->os, ogg_page_serialno( &p_sys->current_page ) );
             }
 
@@ -1106,8 +1106,19 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
                 temp = temp->p_next;
                 tosend->p_next = NULL;
 
-                DemuxDebug( msg_Dbg( p_demux, "block sent from preparse > pts %"PRId64" spcr %"PRId64" pcr %"PRId64,
-                         tosend->i_pts, p_stream->i_pcr, p_ogg->i_pcr ); )
+                if( tosend->i_pts < VLC_TS_0 )
+                {
+                    /* Don't send metadata from chained streams */
+                    block_Release( tosend );
+                    continue;
+                }
+                else if( tosend->i_dts < VLC_TS_0 )
+                {
+                    tosend->i_dts = tosend->i_pts;
+                }
+
+                DemuxDebug( msg_Dbg( p_demux, "block sent from preparse > dts %"PRId64" pts %"PRId64" spcr %"PRId64" pcr %"PRId64,
+                         tosend->i_dts, tosend->i_pts, p_stream->i_pcr, p_ogg->i_pcr ); )
                 es_out_Send( p_demux->out, p_stream->p_es, tosend );
 
                 if ( p_ogg->i_pcr < VLC_TS_0 && i_firstpts > VLC_TS_INVALID )
@@ -1121,6 +1132,7 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
 
         if ( p_block )
         {
+            p_ogg->i_nzlast_pts = (p_block->i_pts > VLC_TS_INVALID) ? p_block->i_pts - VLC_TS_0 : 0;
             DemuxDebug( msg_Dbg( p_demux, "block sent directly > pts %"PRId64" spcr %"PRId64" pcr %"PRId64,
                      p_block->i_pts, p_stream->i_pcr, p_ogg->i_pcr ) );
             es_out_Send( p_demux->out, p_stream->p_es, p_block );

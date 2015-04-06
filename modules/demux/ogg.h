@@ -179,6 +179,7 @@ struct demux_sys_t
      * the sub-streams */
     mtime_t i_pcr;
     mtime_t i_nzpcr_offset;
+    mtime_t i_nzlast_pts;
     /* informative only */
     mtime_t i_pcr_jitter;
     int64_t i_access_delay;
