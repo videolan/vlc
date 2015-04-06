@@ -923,11 +923,11 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
         return VLC_EGENERIC;
     if( b_html && !p_region_in->psz_html )
         return VLC_EGENERIC;
-    if( !b_html && !p_region_in->psz_text )
+    if( !b_html && !p_region_in->p_text && !p_region_in->p_text->psz_text )
         return VLC_EGENERIC;
 
     const size_t i_text_max = strlen( b_html ? p_region_in->psz_html
-                                             : p_region_in->psz_text );
+                                             : p_region_in->p_text->psz_text );
 
     uni_char_t *psz_text = calloc( i_text_max, sizeof( *psz_text ) );
     text_style_t **pp_styles = calloc( i_text_max, sizeof( *pp_styles ) );
@@ -1041,7 +1041,7 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                    psz_text,
                                    pp_styles,
                                    NULL,
-                                   p_region_in->psz_text, p_style, 0 );
+                                   p_region_in->p_text->psz_text, p_style, 0 );
     }
 
     if( !rv && i_text_length > 0 )

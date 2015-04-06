@@ -311,10 +311,11 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     /* Sanity check */
     if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
-    if( !p_region_in->psz_text || !*p_region_in->psz_text )
+    if( !p_region_in->p_text ) return VLC_EGENERIC;
+    if( !p_region_in->p_text->psz_text || !*p_region_in->p_text->psz_text )
         return VLC_EGENERIC;
 
-    psz_string = ToT(p_region_in->psz_text);
+    psz_string = ToT(p_region_in->p_text->psz_text);
     if( psz_string == NULL )
         return VLC_EGENERIC;
     if( !*psz_string )

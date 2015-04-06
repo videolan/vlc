@@ -435,7 +435,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     /* Sanity check */
     if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
-    psz_string = p_region_in->psz_text;
+    if( !p_region_in->p_text ) return VLC_EGENERIC;
+    psz_string = p_region_in->p_text->psz_text;
     if( !psz_string || !*psz_string ) return VLC_EGENERIC;
 
     p_svg = malloc( sizeof( svg_rendition_t ) );
