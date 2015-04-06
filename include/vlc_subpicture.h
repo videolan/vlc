@@ -64,6 +64,7 @@ struct subpicture_region_t
     int             i_align;                  /**< alignment within a region */
     int             i_alpha;                               /**< transparency */
 
+    text_segment_t  *p_text;         /**< subtitle text, made of a list of segments */
     char            *psz_text;       /**< text string comprising this region */
     char            *psz_html;       /**< HTML version of subtitle (NULL = use psz_text) */
     text_style_t    *p_style;        /**< a description of the text style formatting */

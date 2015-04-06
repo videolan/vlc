@@ -113,7 +113,7 @@ static subpicture_region_t * vout_OSDEpgText(const char *text,
         return NULL;
 
     /* Set subpicture parameters */
-    region->psz_text = strdup(text);
+    region->p_text   = text_segment_New(text);
     region->i_align  = 0;
     region->i_x      = x;
     region->i_y      = y;

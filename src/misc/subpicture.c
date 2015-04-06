@@ -248,7 +248,7 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
 
     free( p_region->fmt.p_palette );
 
-    free( p_region->psz_text );
+    text_segment_ChainDelete( p_region->p_text );
     free( p_region->psz_html );
     if( p_region->p_style )
         text_style_Delete( p_region->p_style );
@@ -304,7 +304,7 @@ subpicture_region_t* subpicture_region_Copy( subpicture_region_t *p_region_src )
     p_region_dst->i_align  = p_region_src->i_align;
     p_region_dst->i_alpha  = p_region_src->i_alpha;
 
-    p_region_dst->psz_text = p_region_src->psz_text ? strdup(p_region_src->psz_text) : NULL;
+    p_region_dst->p_text = text_segment_Copy( p_region_src->p_text );
     p_region_dst->psz_html = p_region_src->psz_html ? strdup(p_region_src->psz_html) : NULL;
     if (p_region_src->p_style != NULL) {
         p_region_dst->p_style = text_style_New();
