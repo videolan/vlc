@@ -38,34 +38,43 @@ extern "C" {
  */
 typedef struct
 {
+    /* Family font names */
     char *     psz_fontname;      /**< The name of the font */
     char *     psz_monofontname;  /**< The name of the mono font */
+
+    /* Font style */
     int        i_font_size;       /**< The font size in pixels */
     int        i_font_color;      /**< The color of the text 0xRRGGBB
                                        (native endianness) */
-    unsigned   i_font_alpha;      /**< The transparency of the text.
+    uint8_t    i_font_alpha;      /**< The transparency of the text.
                                        0x00 is fully opaque,
                                        0xFF fully transparent */
     int        i_style_flags;     /**< Formatting style flags */
+    int        i_spacing;         /**< The spaceing between glyphs in pixels */
+
+    /* Outline */
     int        i_outline_color;   /**< The color of the outline 0xRRGGBB */
-    int        i_outline_alpha;   /**< The transparency of the outline.
-                                       0x00 is fully opaque,
-                                       0xFF fully transparent */
-    int        i_shadow_color;    /**< The color of the shadow 0xRRGGBB */
-    int        i_shadow_alpha;    /**< The transparency of the shadow.
-                                        0x00 is fully opaque,
-                                        0xFF fully transparent */
-    int        i_background_color;/**< The color of the background 0xRRGGBB */
-    int        i_background_alpha;/**< The transparency of the background.
-                                       0x00 is fully opaque,
-                                       0xFF fully transparent */
-    int        i_karaoke_background_color;/**< Background color for karaoke 0xRRGGBB */
-    int        i_karaoke_background_alpha;/**< The transparency of the karaoke bg.
+    uint8_t    i_outline_alpha;   /**< The transparency of the outline.
                                        0x00 is fully opaque,
                                        0xFF fully transparent */
     int        i_outline_width;   /**< The width of the outline in pixels */
+
+    /* Shadow */
+    int        i_shadow_color;    /**< The color of the shadow 0xRRGGBB */
+    uint8_t    i_shadow_alpha;    /**< The transparency of the shadow.
+                                        0x00 is fully opaque,
+                                        0xFF fully transparent */
     int        i_shadow_width;    /**< The width of the shadow in pixels */
-    int        i_spacing;         /**< The spaceing between glyphs in pixels */
+
+    /* Background (and karaoke) */
+    int        i_background_color;/**< The color of the background 0xRRGGBB */
+    uint8_t    i_background_alpha;/**< The transparency of the background.
+                                       0x00 is fully opaque,
+                                       0xFF fully transparent */
+    int        i_karaoke_background_color;/**< Background color for karaoke 0xRRGGBB */
+    uint8_t    i_karaoke_background_alpha;/**< The transparency of the karaoke bg.
+                                       0x00 is fully opaque,
+                                       0xFF fully transparent */
 } text_style_t;
 
 /* Style flags for \ref text_style_t */
