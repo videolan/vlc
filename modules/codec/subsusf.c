@@ -429,7 +429,6 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
     {
         ssa_style_t  *p_ssa_style = NULL;
 
-        p_text_region->psz_text = NULL;
         p_text_region->psz_html = strndup( psz_subtitle, i_len );
         if( ! p_text_region->psz_html )
         {
