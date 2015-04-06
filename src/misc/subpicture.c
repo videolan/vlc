@@ -307,7 +307,7 @@ subpicture_region_t* subpicture_region_Copy( subpicture_region_t *p_region_src )
     p_region_dst->psz_text = p_region_src->psz_text ? strdup(p_region_src->psz_text) : NULL;
     p_region_dst->psz_html = p_region_src->psz_html ? strdup(p_region_src->psz_html) : NULL;
     if (p_region_src->p_style != NULL) {
-        p_region_dst->p_style = malloc(sizeof(*p_region_dst->p_style));
+        p_region_dst->p_style = text_style_New();
         p_region_dst->p_style = text_style_Copy(p_region_dst->p_style,
                                                 p_region_src->p_style);
     }
