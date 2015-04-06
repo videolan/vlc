@@ -19,12 +19,12 @@ $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
 	cd $(UNPACK_DIR) && sed -i -e 's,Requires.private,Requires,g' misc/*.pc.in
-	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
 
 DEPS_dvdread = dvdcss
 
 .dvdread: dvdread .dvdcss
+	$(RECONF) -I m4
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-libdvdcss
 	cd $< && $(MAKE) install
 	touch $@
