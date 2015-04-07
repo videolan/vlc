@@ -773,7 +773,7 @@ static bool Eia608ParseData( eia608_t *h, uint8_t d1, uint8_t d2 )
         ON( 0x20, 0x2f, Eia608ParseCommand0x14( h, d2 ) );
         break;
     case 0x17:
-        ON( 0x21, 0x22, Eia608ParseCommand0x17( h, d2 ) );
+        ON( 0x21, 0x23, Eia608ParseCommand0x17( h, d2 ) );
         ON( 0x2e, 0x2f, Eia608ParseTextAttribute( h, d2 ) );
         break;
     }
