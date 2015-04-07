@@ -5456,7 +5456,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                     {
                         p_pes->es.id = NULL;
                         es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
-                                        pespid->u.p_pes->es.id, pespid->u.p_pes->es.fmt );
+                                        pespid->u.p_pes->es.id, &pespid->u.p_pes->es.fmt );
                     }
 
                     for( int i=0; i<pespid->u.p_pes->extra_es.i_size &&
@@ -5467,7 +5467,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                         {
                             es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
                                             pespid->u.p_pes->extra_es.p_elems[i]->id,
-                                            pespid->u.p_pes->extra_es.p_elems[i]->fmt );
+                                            &pespid->u.p_pes->extra_es.p_elems[i]->fmt );
                             p_pes->extra_es.p_elems[i]->id = NULL;
                         }
                     }
