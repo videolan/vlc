@@ -798,7 +798,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
         p_sys->i_frame_dts = VLC_TS_INVALID;
         p_sys->i_frame_pts = VLC_TS_INVALID;
     }
-    else if( p_sys->b_timing_info_present_flag )
+    else if( p_sys->b_timing_info_present_flag && p_sys->i_time_scale )
     {
         p_sys->i_frame_pts += CLOCK_FREQ * p_sys->i_num_units_in_tick / p_sys->i_time_scale;
     }
