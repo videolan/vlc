@@ -80,6 +80,11 @@ struct aout_sys_t {
 // TODO: activate getTimestamp for new android versions
 //#define AUDIOTRACK_USE_TIMESTAMP
 
+#define AUDIO_CHAN_TEXT N_("Audio output channels")
+#define AUDIO_CHAN_LONGTEXT N_("Channels available for audio output. " \
+    "If the input has more channels than the output, it will be down-mixed. " \
+    "This parameter is ignored when digital pass-through is active.")
+
 vlc_module_begin ()
     set_shortname( "AudioTrack" )
     set_description( N_( "Android AudioTrack audio output" ) )
@@ -88,6 +93,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_sw_gain()
     add_shortcut( "audiotrack" )
+    add_integer( "audiotrack-audio-channels", 2,
+                 AUDIO_CHAN_TEXT, AUDIO_CHAN_LONGTEXT, true)
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -631,9 +638,13 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
     jobject p_audiotrack = NULL;
-    int i_nb_channels, i_audiotrack_size, i_bytes_per_frame,
+    int i_nb_channels, i_max_channels, i_audiotrack_size, i_bytes_per_frame,
         i_native_rate;
     unsigned int i_rate;
+    bool b_spdif;
+
+    b_spdif = var_InheritBool( p_aout, "spdif" );
+    i_max_channels = var_InheritInteger( p_aout, "audiotrack-audio-channels" );
 
     if( !( env = jni_get_env( THREAD_NAME ) ) )
         return VLC_EGENERIC;
@@ -664,8 +675,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                 p_sys->fmt.i_format = VLC_CODEC_S16N;
             break;
         case VLC_CODEC_A52:
-            if( jfields.AudioFormat.has_ENCODING_AC3
-                && var_InheritBool( p_aout, "spdif" ) )
+            if( jfields.AudioFormat.has_ENCODING_AC3 && b_spdif )
                 p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
             else if( jfields.AudioFormat.has_ENCODING_PCM_FLOAT )
                 p_sys->fmt.i_format = VLC_CODEC_FL32;
@@ -681,6 +691,8 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
      * Android will downmix to stereo if audio output doesn't handle 5.1 or 7.1
      */
     i_nb_channels = aout_FormatNbChannels( &p_sys->fmt );
+    if( p_sys->fmt.i_format != VLC_CODEC_SPDIFB )
+        i_nb_channels = __MIN( i_max_channels, i_nb_channels );
     if( i_nb_channels > 5 )
     {
         if( i_nb_channels > 7 && jfields.AudioFormat.has_CHANNEL_OUT_SIDE )
