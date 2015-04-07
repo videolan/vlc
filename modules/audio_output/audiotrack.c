@@ -111,6 +111,7 @@ static struct
         jmethodID getPlaybackHeadPosition;
         jmethodID getTimestamp;
         jmethodID getMinBufferSize;
+        jmethodID getNativeOutputSampleRate;
         jint STATE_INITIALIZED;
         jint MODE_STREAM;
         jint ERROR;
@@ -237,6 +238,8 @@ InitJNIFields( audio_output_t *p_aout )
 
     GET_ID( GetStaticMethodID, AudioTrack.getMinBufferSize, "getMinBufferSize",
             "(III)I", true );
+    GET_ID( GetStaticMethodID, AudioTrack.getNativeOutputSampleRate,
+            "getNativeOutputSampleRate",  "(I)I", true );
     GET_CONST_INT( AudioTrack.STATE_INITIALIZED, "STATE_INITIALIZED", true );
     GET_CONST_INT( AudioTrack.MODE_STREAM, "MODE_STREAM", true );
     GET_CONST_INT( AudioTrack.ERROR, "ERROR", true );
@@ -628,7 +631,9 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
     jobject p_audiotrack = NULL;
-    int i_nb_channels, i_audiotrack_size, i_bytes_per_frame;
+    int i_nb_channels, i_audiotrack_size, i_bytes_per_frame,
+        i_native_rate;
+    unsigned int i_rate;
 
     if( !( env = jni_get_env( THREAD_NAME ) ) )
         return VLC_EGENERIC;
@@ -639,8 +644,13 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 
     p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
 
-    /* 4000 <= frequency <= 48000 */
-    p_sys->fmt.i_rate = VLC_CLIP( p_sys->fmt.i_rate, 4000, 48000 );
+    i_native_rate = JNI_AT_CALL_STATIC_INT( getNativeOutputSampleRate,
+                                            jfields.AudioManager.STREAM_MUSIC );
+    if( i_native_rate <= 0 )
+    {
+        msg_Warn( p_aout, "negative native rate ? Should not happen !" );
+        i_native_rate = VLC_CLIP( p_sys->fmt.i_rate, 4000, 48000 );
+    }
 
     /* We can only accept U8, S16N, FL32, and AC3 */
     switch( p_sys->fmt.i_format )
@@ -690,12 +700,15 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     {
         i_bytes_per_frame = i_nb_channels *
                             aout_BitsPerSample( p_sys->fmt.i_format ) / 8;
+        i_rate = p_sys->fmt.i_format == VLC_CODEC_SPDIFB ?
+                                        VLC_CLIP( p_sys->fmt.i_rate, 32000, 48000 )
+                                        : (unsigned int) i_native_rate;
 
         /* Try to create an AudioTrack with the most advanced channel and
          * format configuration. If AudioTrack_New fails, try again with a less
          * advanced format (PCM S16N). If it fails again, try again with Stereo
          * channels. */
-        p_audiotrack = AudioTrack_New( env, p_aout, p_sys->fmt.i_rate,
+        p_audiotrack = AudioTrack_New( env, p_aout, i_rate,
                                        p_sys->fmt.i_format,
                                        p_sys->fmt.i_physical_channels,
                                        i_bytes_per_frame,
@@ -737,6 +750,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     if( !p_sys->p_audiotrack )
         return VLC_EGENERIC;
 
+    p_sys->fmt.i_rate = i_rate;
     p_sys->b_spdif = p_sys->fmt.i_format == VLC_CODEC_SPDIFB;
     if( p_sys->b_spdif )
     {
