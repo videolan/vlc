@@ -37,7 +37,7 @@ demux_LTLIBRARIES += libnsv_plugin.la
 libreal_plugin_la_SOURCES = demux/real.c
 demux_LTLIBRARIES += libreal_plugin.la
 
-libps_plugin_la_SOURCES = demux/ps.c demux/ps.h
+libps_plugin_la_SOURCES = demux/mpeg/ps.c demux/mpeg/ps.h
 demux_LTLIBRARIES += libps_plugin.la
 
 libmod_plugin_la_SOURCES = demux/mod.c
@@ -226,12 +226,12 @@ libplaylist_plugin_la_SOURCES = \
 	demux/playlist/playlist.c demux/playlist/playlist.h
 demux_LTLIBRARIES += libplaylist_plugin.la
 
-libts_plugin_la_SOURCES = demux/ts.c \
-        demux/mpeg4_iod.c demux/mpeg4_iod.h \
+libts_plugin_la_SOURCES = demux/mpeg/ts.c \
+        demux/mpeg/mpeg4_iod.c demux/mpeg/mpeg4_iod.h \
 	mux/mpeg/csa.c mux/mpeg/dvbpsi_compat.h \
 	mux/mpeg/streams.h mux/mpeg/tables.c mux/mpeg/tables.h \
 	mux/mpeg/tsutil.c mux/mpeg/tsutil.h \
-	demux/dvb-text.h codec/opus_header.c demux/opus.h
+	demux/mpeg/dvb-text.h codec/opus_header.c demux/opus.h
 libts_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVBPSI_CFLAGS)
 libts_plugin_la_LIBADD = $(DVBPSI_LIBS) $(SOCKET_LIBS)
 if HAVE_ARIBB24

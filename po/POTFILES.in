@@ -491,6 +491,9 @@ modules/demux/mpeg/es.c
 modules/demux/mpeg/h264.c
 modules/demux/mpeg/hevc.c
 modules/demux/mpeg/mpgv.c
+modules/demux/mpeg/ps.c
+modules/demux/mpeg/ps.h
+modules/demux/mpeg/ts.c
 modules/demux/nsc.c
 modules/demux/nsv.c
 modules/demux/nuv.c
@@ -511,8 +514,6 @@ modules/demux/playlist/qtl.c
 modules/demux/playlist/sgimb.c
 modules/demux/playlist/shoutcast.c
 modules/demux/playlist/xspf.c
-modules/demux/ps.c
-modules/demux/ps.h
 modules/demux/pva.c
 modules/demux/rawaud.c
 modules/demux/rawdv.c
@@ -522,7 +523,6 @@ modules/demux/sid.cpp
 modules/demux/smf.c
 modules/demux/stl.c
 modules/demux/subtitle.c
-modules/demux/ts.c
 modules/demux/tta.c
 modules/demux/ty.c
 modules/demux/vc1.c

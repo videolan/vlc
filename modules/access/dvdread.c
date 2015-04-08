@@ -48,7 +48,7 @@
 
 #include <vlc_iso_lang.h>
 
-#include "../demux/ps.h"
+#include "../demux/mpeg/ps.h"
 
 #include <sys/types.h>
 #include <unistd.h>

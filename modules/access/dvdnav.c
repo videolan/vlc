@@ -60,7 +60,7 @@
 
 #include <dvdnav/dvdnav.h>
 
-#include "../demux/ps.h"
+#include "../demux/mpeg/ps.h"
 
 /*****************************************************************************
  * Module descriptor

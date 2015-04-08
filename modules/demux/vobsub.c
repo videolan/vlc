@@ -36,7 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 
-#include "ps.h"
+#include "mpeg/ps.h"
 #include "vobsub.h"
 
 /*****************************************************************************

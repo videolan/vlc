@@ -43,7 +43,7 @@
 #include <vlc_charset.h>   /* FromCharset, for EIT */
 #include <vlc_bits.h>
 
-#include "../mux/mpeg/csa.h"
+#include "../../mux/mpeg/csa.h"
 
 /* Include dvbpsi headers */
 # include <dvbpsi/dvbpsi.h>
@@ -61,14 +61,14 @@
 /* TDT support */
 # include <dvbpsi/tot.h>
 
-#include "../mux/mpeg/dvbpsi_compat.h"
-#include "../mux/mpeg/streams.h"
-#include "../mux/mpeg/tsutil.h"
-#include "../mux/mpeg/tables.h"
+#include "../../mux/mpeg/dvbpsi_compat.h"
+#include "../../mux/mpeg/streams.h"
+#include "../../mux/mpeg/tsutil.h"
+#include "../../mux/mpeg/tables.h"
 
-#include "../codec/opus_header.h"
+#include "../../codec/opus_header.h"
 
-#include "opus.h"
+#include "../opus.h"
 
 #include "mpeg4_iod.h"
 
@@ -3536,7 +3536,7 @@ static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
     p_sys->b_dvb_meta = false;
 }
 
-#include "dvb-text.h"
+#include "../dvb-text.h"
 
 static char *EITConvertToUTF8( demux_t *p_demux,
                                const unsigned char *psz_instring,
