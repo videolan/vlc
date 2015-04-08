@@ -1229,12 +1229,12 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
     if( strstr( qvReg->ReadRegistryString( psz_ext, "", "" ), psz_VLC ) )
     {
         current->setCheckState( 0, Qt::Checked );
-        b_temp = false;
+        b_temp = true;
     }
     else
     {
         current->setCheckState( 0, Qt::Unchecked );
-        b_temp = true;
+        b_temp = false;
     }
     listAsso.append( current );
     return b_temp;
@@ -1308,33 +1308,45 @@ void SPrefsPanel::assoDialog()
 #define aTv( name ) i_temp += addType( name, currentItem, videoType, qvReg )
 #define aTo( name ) i_temp += addType( name, currentItem, otherType, qvReg )
 
-    aTa( ".a52" ); aTa( ".aac" ); aTa( ".ac3" ); aTa( ".dts" ); aTa( ".flac" );
-    aTa( ".m4a" ); aTa( ".m4p" ); aTa( ".mka" ); aTa( ".mod" ); aTa( ".mp1" );
-    aTa( ".mp2" ); aTa( ".mp3" ); aTa( ".oma" ); aTa( ".oga" ); aTa( ".opus" );
-    aTa( ".spx" ); aTa( ".tta" ); aTa( ".wav" ); aTa( ".wma" ); aTa( ".xm" );
+    aTa( ".3ga" ); aTa( ".669" ); aTa( ".a52" ); aTa( ".aac" ); aTa( ".ac3" );
+    aTa( ".adt" ); aTa( ".adts" ); aTa( ".aif" ); aTa( ".aifc" ); aTa( ".aiff" );
+    aTa( ".au" ); aTa( ".amr" ); aTa( ".aob" ); aTa( ".ape" ); aTa( ".caf" );
+    aTa( ".cda" ); aTa( ".dts" ); aTa( ".flac" ); aTa( ".it" ); aTa( ".m4a" );
+    aTa( ".m4p" ); aTa( ".mid" ); aTa( ".mka" ); aTa( ".mlp" ); aTa( ".mod" );
+    aTa( ".mp1" ); aTa( ".mp2" ); aTa( ".mp3" ); aTa( ".mpc" ); aTa( ".mpga" );
+    aTa( ".oga" ); aTa( ".oma" ); aTa( ".opus" ); aTa( ".qcp" ); aTa( ".ra" );
+    aTa( ".rmi" ); aTa( ".snd" ); aTa( ".s3m" ); aTa( ".spx" ); aTa( ".tta" );
+    aTa( ".voc" ); aTa( ".vqf" ); aTa( ".w64" ); aTa( ".wav" ); aTa( ".wma" );
+    aTa( ".wv" ); aTa( ".xa" ); aTa( ".xm" );
     audioType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )
                             : Qt::Unchecked );
 
     i_temp = 0;
-    aTv( ".asf" ); aTv( ".avi" ); aTv( ".divx" ); aTv( ".dv" ); aTv( ".flv" );
-    aTv( ".gxf" ); aTv( ".m1v" ); aTv( ".m2v" ); aTv( ".m2ts" ); aTv( ".m4v" );
-    aTv( ".mkv" ); aTv( ".mov" ); aTv( ".mp2" ); aTv( ".mp4" ); aTv( ".mpeg" );
-    aTv( ".mpeg1" ); aTv( ".mpeg2" ); aTv( ".mpeg4" ); aTv( ".mpg" );
-    aTv( ".mts" ); aTv( ".mtv" ); aTv( ".mxf" );
-    aTv( ".ogg" ); aTv( ".ogm" ); aTv( ".ogx" ); aTv( ".ogv" );  aTv( ".ts" );
-    aTv( ".vob" ); aTv( ".vro" ); aTv( ".wmv" );
+    aTv( ".3g2" ); aTv( ".3gp" ); aTv( ".3gp2" ); aTv( ".3gpp" ); aTv( ".amv" );
+    aTv( ".asf" ); aTv( ".avi" ); aTv( ".bik" ); aTv( ".divx" ); aTv( ".drc" );
+    aTv( ".dv" ); aTv( ".f4v" ); aTv( ".flv" ); aTv( ".gvi" ); aTv( ".gxf" );
+    aTv( ".m1v" ); aTv( ".m2t" ); aTv( ".m2v" ); aTv( ".m2ts" ); aTv( ".m4v" );
+    aTv( ".mkv" ); aTv( ".mov" ); aTv( ".mp2" ); aTv( ".mp2v" ); aTv( ".mp4" );
+    aTv( ".mp4v" ); aTv( ".mpa" ); aTv( ".mpe" ); aTv( ".mpeg" ); aTv( ".mpeg1" );
+    aTv( ".mpeg2" ); aTv( ".mpeg4" ); aTv( ".mpg" ); aTv( ".mpv2" ); aTv( ".mts" );
+    aTv( ".mtv" ); aTv( ".mxf" ); aTv( ".nsv" ); aTv( ".nuv" ); aTv( ".ogg" );
+    aTv( ".ogm" ); aTv( ".ogx" ); aTv( ".ogv" ); aTv( ".rec" ); aTv( ".rm" );
+    aTv( ".rmvb" ); aTv( ".rpl" ); aTv( ".thp" ); aTv( ".tod" ); aTv( ".ts" );
+    aTv( ".tts" ); aTv( ".vob" ); aTv( ".vro" ); aTv( ".webm" ); aTv( ".wmv" );
+    aTv( ".xesc" );
     videoType->setCheckState( 0, ( i_temp > 0 ) ?
-                              ( ( i_temp == audioType->childCount() ) ?
+                              ( ( i_temp == videoType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )
                             : Qt::Unchecked );
 
     i_temp = 0;
-    aTo( ".asx" ); aTo( ".b4s" ); aTo( ".ifo" ); aTo( ".m3u" ); aTo( ".pls" );
-    aTo( ".sdp" ); aTo( ".vlc" ); aTo( ".xspf" );
+    aTo( ".asx" ); aTo( ".b4s" ); aTo( ".cue" ); aTo( ".ifo" ); aTo( ".m3u" );
+    aTo( ".m3u8" ); aTo( ".pls" ); aTo( ".ram" ); aTo( ".sdp" ); aTo( ".vlc" );
+    aTo( ".wvx" ); aTo( ".xspf" );
     otherType->setCheckState( 0, ( i_temp > 0 ) ?
-                              ( ( i_temp == audioType->childCount() ) ?
+                              ( ( i_temp == otherType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )
                             : Qt::Unchecked );
 
@@ -1366,7 +1378,7 @@ void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
     /* Save a backup if already assigned */
     char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
 
-    if( !EMPTY_STR(psz_value) )
+    if( !EMPTY_STR(psz_value) && strcmp( qtu(s_path), psz_value ) )
         qvReg->WriteRegistryString( psz_ext, "VLC.backup", psz_value );
     free( psz_value );
 
@@ -1408,17 +1420,16 @@ void delAsso( QVLCRegistry *qvReg, const char *psz_ext )
         if( psz_value )
             qvReg->WriteRegistryString( psz_ext, "", psz_value );
 
-        qvReg->DeleteKey( psz_ext, "VLC.backup" );
+        qvReg->DeleteValue( psz_ext, "VLC.backup" );
     }
     free( psz_value );
 }
 
 void SPrefsPanel::saveAsso()
 {
-    QVLCRegistry * qvReg = NULL;
+    QVLCRegistry * qvReg = new QVLCRegistry( HKEY_CLASSES_ROOT );
     for( int i = 0; i < listAsso.size(); i ++ )
     {
-        qvReg  = new QVLCRegistry( HKEY_CLASSES_ROOT );
         if( listAsso[i]->checkState( 0 ) > 0 )
         {
             addAsso( qvReg, qtu( listAsso[i]->text( 0 ) ) );
