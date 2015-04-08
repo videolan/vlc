@@ -1277,10 +1277,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
             }
 
             if( p_sys->b_pic_struct_present_flag )
-            {
                 p_sys->i_pic_struct = bs_read( &s, 4 );
-                msg_Err(p_dec, "PIC STRUCT %d", p_sys->i_pic_struct);
-            }
             /* + unparsed remains */
         }
 
