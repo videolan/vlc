@@ -453,6 +453,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     case VLC_CODEC_MP4A:
     case VLC_CODEC_MP4V:
     case VLC_CODEC_MPGA:
+    case VLC_CODEC_MP3:
     case VLC_CODEC_MPGV:
     case VLC_CODEC_MP2V:
     case VLC_CODEC_MP1V:
