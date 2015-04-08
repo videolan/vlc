@@ -70,6 +70,7 @@
 
 #include "../opus.h"
 
+#include "pes.h"
 #include "mpeg4_iod.h"
 
 #ifdef HAVE_ARIBB24
@@ -341,9 +342,6 @@ typedef struct
 #define MIN_ES_PID 4    /* Should be 32.. broken muxers */
 #define MAX_ES_PID 8190
 #define MIN_PAT_INTERVAL CLOCK_FREQ // DVB is 500ms
-
-#define FROM_SCALE(x) (VLC_TS_0 + ((x) * 100 / 9))
-#define TO_SCALE(x)   (((x) - VLC_TS_0) * 9 / 100)
 
 #define PID_ALLOC_CHUNK 16
 
@@ -650,15 +648,6 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
     }
 
     return DetectPacketSize( p_demux, pi_header_size, 0 );
-}
-
-static inline mtime_t ExtractPESTimestamp( const uint8_t *p_data )
-{
-    return ((mtime_t)(p_data[ 0]&0x0e ) << 29)|
-             (mtime_t)(p_data[1] << 22)|
-            ((mtime_t)(p_data[2]&0xfe) << 14)|
-             (mtime_t)(p_data[3] << 7)|
-             (mtime_t)(p_data[4] >> 1);
 }
 
 static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_t i_data, bool b_adaptfield )
@@ -2063,103 +2052,6 @@ static block_t *Opus_Parse(demux_t *demux, block_t *block)
 /****************************************************************************
  * gathering stuff
  ****************************************************************************/
-static int ParsePESHeader( demux_t *p_demux, const uint8_t *p_header, size_t i_header,
-                           unsigned *pi_skip, mtime_t *pi_dts, mtime_t *pi_pts,
-                           uint8_t *pi_stream_id )
-{
-    unsigned i_skip;
-
-    if ( i_header < 9 )
-        return VLC_EGENERIC;
-
-    *pi_stream_id = p_header[3];
-
-    switch( p_header[3] )
-    {
-    case 0xBC:  /* Program stream map */
-    case 0xBE:  /* Padding */
-    case 0xBF:  /* Private stream 2 */
-    case 0xF0:  /* ECM */
-    case 0xF1:  /* EMM */
-    case 0xFF:  /* Program stream directory */
-    case 0xF2:  /* DSMCC stream */
-    case 0xF8:  /* ITU-T H.222.1 type E stream */
-        i_skip = 6;
-        break;
-    default:
-        if( ( p_header[6]&0xC0 ) == 0x80 )
-        {
-            /* mpeg2 PES */
-            i_skip = p_header[8] + 9;
-
-            if( p_header[7]&0x80 )    /* has pts */
-            {
-                if( i_header < 9 + 5 )
-                    return VLC_EGENERIC;
-                *pi_pts = ExtractPESTimestamp( &p_header[9] );
-
-                if( p_header[7]&0x40 )    /* has dts */
-                {
-                    if( i_header < 14 + 5 )
-                        return VLC_EGENERIC;
-                    *pi_dts = ExtractPESTimestamp( &p_header[14] );
-                }
-            }
-        }
-        else
-        {
-            i_skip = 6;
-            if( i_header < i_skip + 1 )
-                return VLC_EGENERIC;
-            while( i_skip < 23 && p_header[i_skip] == 0xff )
-            {
-                i_skip++;
-                if( i_header < i_skip + 1 )
-                    return VLC_EGENERIC;
-            }
-            if( i_skip == 23 )
-            {
-                msg_Err( p_demux, "too much MPEG-1 stuffing" );
-                return VLC_EGENERIC;
-            }
-            if( ( p_header[i_skip] & 0xC0 ) == 0x40 )
-            {
-                i_skip += 2;
-            }
-
-            if( i_header < i_skip + 1 )
-                return VLC_EGENERIC;
-
-            if(  p_header[i_skip]&0x20 )
-            {
-                if( i_header < i_skip + 5 )
-                    return VLC_EGENERIC;
-                *pi_pts = ExtractPESTimestamp( &p_header[i_skip] );
-
-                if( p_header[i_skip]&0x10 )    /* has dts */
-                {
-                    if( i_header < i_skip + 10 )
-                        return VLC_EGENERIC;
-                    *pi_dts = ExtractPESTimestamp( &p_header[i_skip+5] );
-                    i_skip += 10;
-                }
-                else
-                {
-                    i_skip += 5;
-                }
-            }
-            else
-            {
-                i_skip += 1;
-            }
-        }
-        break;
-    }
-
-    *pi_skip = i_skip;
-    return VLC_SUCCESS;
-}
-
 static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 {
     uint8_t header[34];
@@ -2190,7 +2082,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
         return;
     }
 
-    if( ParsePESHeader( p_demux, (uint8_t*)&header, i_max, &i_skip,
+    if( ParsePESHeader( VLC_OBJECT(p_demux), (uint8_t*)&header, i_max, &i_skip,
                         &i_dts, &i_pts, &i_stream_id ) == VLC_EGENERIC )
     {
         block_ChainRelease( p_pes );
@@ -2832,7 +2724,7 @@ static int SeekToTime( demux_t *p_demux, ts_pmt_t *p_pmt, int64_t i_scaledtime )
                     mtime_t i_dts = -1;
                     mtime_t i_pts = -1;
                     uint8_t i_stream_id;
-                    if ( VLC_SUCCESS == ParsePESHeader( p_demux, &p_pkt->p_buffer[i_skip],
+                    if ( VLC_SUCCESS == ParsePESHeader( VLC_OBJECT(p_demux), &p_pkt->p_buffer[i_skip],
                                                         p_pkt->i_buffer - i_skip, &i_skip,
                                                         &i_dts, &i_pts, &i_stream_id ) )
                     {
@@ -2980,7 +2872,7 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
                 if ( b_adaptfield ) // adaptation field
                     i_skip += 1 + p_pkt->p_buffer[4];
 
-                if ( VLC_SUCCESS == ParsePESHeader( p_demux, &p_pkt->p_buffer[i_skip],
+                if ( VLC_SUCCESS == ParsePESHeader( VLC_OBJECT(p_demux), &p_pkt->p_buffer[i_skip],
                                                     p_pkt->i_buffer - i_skip, &i_skip,
                                                     &i_dts, &i_pts, &i_stream_id ) )
                 {

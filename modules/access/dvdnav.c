@@ -60,6 +60,7 @@
 
 #include <dvdnav/dvdnav.h>
 
+#include "../demux/mpeg/pes.h"
 #include "../demux/mpeg/ps.h"
 
 /*****************************************************************************
@@ -1353,7 +1354,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
                     ESNew( p_demux, i_id );
                 }
                 if( tk->b_seen && tk->es &&
-                    !ps_pkt_parse_pes( p_pkt, tk->i_skip ) )
+                    !ps_pkt_parse_pes( p_demux, p_pkt, tk->i_skip ) )
                 {
                     es_out_Send( p_demux->out, tk->es, p_pkt );
                 }

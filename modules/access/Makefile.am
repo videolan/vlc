@@ -295,7 +295,7 @@ endif
 EXTRA_LTLIBRARIES += libvcdx_plugin.la
 access_LTLIBRARIES += $(LTLIBvcdx)
 
-libdvdnav_plugin_la_SOURCES = access/dvdnav.c
+libdvdnav_plugin_la_SOURCES = access/dvdnav.c ../demux/mpeg/ps.h ../demux/mpeg/pes.h
 libdvdnav_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVDNAV_CFLAGS)
 libdvdnav_plugin_la_LIBADD = $(DVDNAV_LIBS)
 libdvdnav_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
@@ -305,7 +305,7 @@ endif
 access_LTLIBRARIES += $(LTLIBdvdnav)
 EXTRA_LTLIBRARIES += libdvdnav_plugin.la
 
-libdvdread_plugin_la_SOURCES = access/dvdread.c
+libdvdread_plugin_la_SOURCES = access/dvdread.c ../demux/mpeg/ps.h ../demux/mpeg/pes.h
 libdvdread_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVDREAD_CFLAGS)
 libdvdread_plugin_la_LIBADD = $(DVDREAD_LIBS)
 libdvdread_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'

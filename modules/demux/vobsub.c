@@ -36,6 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 
+#include "mpeg/pes.h"
 #include "mpeg/ps.h"
 #include "vobsub.h"
 
@@ -685,7 +686,7 @@ static int DemuxVobSub( demux_t *p_demux, block_t *p_bk )
 
         i_id = ps_pkt_id( p_pkt );
         if( (i_id&0xffe0) != 0xbd20 ||
-            ps_pkt_parse_pes( p_pkt, 1 ) )
+            ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, 1 ) )
         {
             block_Release( p_pkt );
             continue;

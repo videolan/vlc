@@ -37,7 +37,7 @@ demux_LTLIBRARIES += libnsv_plugin.la
 libreal_plugin_la_SOURCES = demux/real.c
 demux_LTLIBRARIES += libreal_plugin.la
 
-libps_plugin_la_SOURCES = demux/mpeg/ps.c demux/mpeg/ps.h
+libps_plugin_la_SOURCES = demux/mpeg/ps.c demux/mpeg/ps.h demux/mpeg/pes.h
 demux_LTLIBRARIES += libps_plugin.la
 
 libmod_plugin_la_SOURCES = demux/mod.c
@@ -63,7 +63,8 @@ demux_LTLIBRARIES += libsubtitle_plugin.la
 libty_plugin_la_SOURCES = demux/ty.c codec/cc.h
 demux_LTLIBRARIES += libty_plugin.la
 
-libvobsub_plugin_la_SOURCES = demux/vobsub.c demux/vobsub.h
+libvobsub_plugin_la_SOURCES = demux/vobsub.c demux/vobsub.h \
+                              demux/mpeg/ps.h demux/mpeg/pes.h
 demux_LTLIBRARIES += libvobsub_plugin.la
 
 libvoc_plugin_la_SOURCES = demux/voc.c
@@ -228,6 +229,7 @@ demux_LTLIBRARIES += libplaylist_plugin.la
 
 libts_plugin_la_SOURCES = demux/mpeg/ts.c \
         demux/mpeg/mpeg4_iod.c demux/mpeg/mpeg4_iod.h \
+        demux/mpeg/pes.h \
 	mux/mpeg/csa.c mux/mpeg/dvbpsi_compat.h \
 	mux/mpeg/streams.h mux/mpeg/tables.c mux/mpeg/tables.h \
 	mux/mpeg/tsutil.c mux/mpeg/tsutil.h \

@@ -48,6 +48,7 @@
 
 #include <vlc_iso_lang.h>
 
+#include "../demux/mpeg/pes.h"
 #include "../demux/mpeg/ps.h"
 
 #include <sys/types.h>
@@ -615,7 +616,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
                     ESNew( p_demux, i_id, 0 );
                 }
                 if( tk->b_seen && tk->es &&
-                    !ps_pkt_parse_pes( p_pkt, tk->i_skip ) )
+                    !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
                 {
                     es_out_Send( p_demux->out, tk->es, p_pkt );
                 }

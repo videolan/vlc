@@ -364,24 +364,12 @@ static inline int ps_pkt_parse_pack( block_t *p_pkt, int64_t *pi_scr,
     uint8_t *p = p_pkt->p_buffer;
     if( p_pkt->i_buffer >= 14 && (p[4] >> 6) == 0x01 )
     {
-        *pi_scr =((((int64_t)p[4]&0x38) << 27 )|
-                  (((int64_t)p[4]&0x03) << 28 )|
-                   ((int64_t)p[5] << 20 )|
-                  (((int64_t)p[6]&0xf8) << 12 )|
-                  (((int64_t)p[6]&0x03) << 13 )|
-                   ((int64_t)p[7] << 5 )|
-                   ((int64_t)p[8] >> 3 )) * 100 / 9;
-
+        *pi_scr = FROM_SCALE_NZ( ExtractMPEG1PESTimestamp( &p[4] ) );
         *pi_mux_rate = ( p[10] << 14 )|( p[11] << 6 )|( p[12] >> 2);
     }
     else if( p_pkt->i_buffer >= 12 && (p[4] >> 4) == 0x02 )
     {
-        *pi_scr =((((int64_t)p[4]&0x0e) << 29 )|
-                   ((int64_t)p[5] << 22 )|
-                  (((int64_t)p[6]&0xfe) << 14 )|
-                   ((int64_t)p[7] <<  7 )|
-                   ((int64_t)p[8] >> 1 )) * 100 / 9;
-
+        *pi_scr = FROM_SCALE_NZ( ExtractPESTimestamp( &p[4] ) );
         *pi_mux_rate = ( ( p[9]&0x7f )<< 15 )|( p[10] << 7 )|( p[11] >> 1);
     }
     else
@@ -424,97 +412,16 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 }
 
 /* Parse a PES (and skip i_skip_extra in the payload) */
-static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
+static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int i_skip_extra )
 {
-    uint8_t header[34];
     unsigned int i_skip  = 0;
-    int64_t i_pts = -1;
-    int64_t i_dts = -1;
+    mtime_t i_pts = -1;
+    mtime_t i_dts = -1;
+    uint8_t i_stream_id = 0;
 
-    memcpy( header, p_pes->p_buffer, __MIN( p_pes->i_buffer, 34 ) );
-
-    switch( header[3] )
-    {
-        case 0xBC:  /* Program stream map */
-        case 0xBE:  /* Padding */
-        case 0xBF:  /* Private stream 2 */
-        case 0xB0:  /* ECM */
-        case 0xB1:  /* EMM */
-        case 0xFF:  /* Program stream directory */
-        case 0xF2:  /* DSMCC stream */
-        case 0xF8:  /* ITU-T H.222.1 type E stream */
-            i_skip = 6;
-            break;
-
-        default:
-            if( ( header[6]&0xC0 ) == 0x80 )
-            {
-                /* mpeg2 PES */
-                i_skip = header[8] + 9;
-
-                if( header[7]&0x80 )    /* has pts */
-                {
-                    i_pts = ((mtime_t)(header[ 9]&0x0e ) << 29)|
-                             (mtime_t)(header[10] << 22)|
-                            ((mtime_t)(header[11]&0xfe) << 14)|
-                             (mtime_t)(header[12] << 7)|
-                             (mtime_t)(header[13] >> 1);
-
-                    if( header[7]&0x40 )    /* has dts */
-                    {
-                         i_dts = ((mtime_t)(header[14]&0x0e ) << 29)|
-                                  (mtime_t)(header[15] << 22)|
-                                 ((mtime_t)(header[16]&0xfe) << 14)|
-                                  (mtime_t)(header[17] << 7)|
-                                  (mtime_t)(header[18] >> 1);
-                    }
-                }
-            }
-            else
-            {
-                i_skip = 6;
-                while( i_skip < 23 && header[i_skip] == 0xff )
-                {
-                    i_skip++;
-                }
-                if( i_skip == 23 )
-                {
-                    /* msg_Err( p_demux, "too much MPEG-1 stuffing" ); */
-                    return VLC_EGENERIC;
-                }
-                if( ( header[i_skip] & 0xC0 ) == 0x40 )
-                {
-                    i_skip += 2;
-                }
-
-                if(  header[i_skip]&0x20 )
-                {
-                     i_pts = ((mtime_t)(header[i_skip]&0x0e ) << 29)|
-                              (mtime_t)(header[i_skip+1] << 22)|
-                             ((mtime_t)(header[i_skip+2]&0xfe) << 14)|
-                              (mtime_t)(header[i_skip+3] << 7)|
-                              (mtime_t)(header[i_skip+4] >> 1);
-
-                    if( header[i_skip]&0x10 )    /* has dts */
-                    {
-                         i_dts = ((mtime_t)(header[i_skip+5]&0x0e ) << 29)|
-                                  (mtime_t)(header[i_skip+6] << 22)|
-                                 ((mtime_t)(header[i_skip+7]&0xfe) << 14)|
-                                  (mtime_t)(header[i_skip+8] << 7)|
-                                  (mtime_t)(header[i_skip+9] >> 1);
-                         i_skip += 10;
-                    }
-                    else
-                    {
-                        i_skip += 5;
-                    }
-                }
-                else
-                {
-                    i_skip += 1;
-                }
-            }
-    }
+    if( ParsePESHeader( p_object, p_pes->p_buffer, p_pes->i_buffer,
+                        &i_skip, &i_dts, &i_pts, &i_stream_id ) != VLC_SUCCESS )
+        return VLC_EGENERIC;
 
     if( i_skip_extra >= 0 )
         i_skip += i_skip_extra;
@@ -531,9 +438,9 @@ static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
     p_pes->i_buffer -= i_skip;
 
     if( i_dts >= 0 )
-        p_pes->i_dts = VLC_TS_0 + 100 * i_dts / 9;
+        p_pes->i_dts = FROM_SCALE( i_dts );
     if( i_pts >= 0 )
-        p_pes->i_pts = VLC_TS_0 + 100 * i_pts / 9;
+        p_pes->i_pts = FROM_SCALE( i_pts );
 
     return VLC_SUCCESS;
 }
