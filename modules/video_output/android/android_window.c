@@ -327,13 +327,41 @@ static android_window *AndroidWindow_New(vout_display_sys_t *sys,
     return p_window;
 }
 
+static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
+                                    android_window *p_window,
+                                    jobject jsurf)
+{
+    if (jsurf != p_window->jsurf) {
+        if (p_window->p_handle_priv) {
+            sys->anwp.disconnect(p_window->p_handle_priv);
+            p_window->p_handle_priv = NULL;
+        }
+        if (p_window->p_handle) {
+            sys->anw.winRelease(p_window->p_handle);
+            p_window->p_handle = NULL;
+        }
+    }
+
+    p_window->jsurf = jsurf;
+    if (!p_window->jsurf )
+        return -1;
+    if (!p_window->p_handle && !p_window->b_opaque) {
+        JNIEnv *p_env;
+
+        if (!(p_env = jni_get_env(THREAD_NAME)))
+            return -1;
+        p_window->p_handle = sys->anw.winFromSurface(p_env, p_window->jsurf);
+        if (!p_window->p_handle)
+            return -1;
+    }
+
+    return 0;
+}
+
 static void AndroidWindow_Destroy(vout_display_sys_t *sys,
                                   android_window *p_window)
 {
-    if (p_window->p_handle_priv)
-        sys->anwp.disconnect(p_window->p_handle_priv);
-    if (p_window->p_handle)
-        sys->anw.winRelease(p_window->p_handle);
+    AndroidWindow_SetSurface(sys, p_window, NULL);
     free(p_window);
 }
 
@@ -348,33 +376,6 @@ static int AndroidWindow_UpdateCrop(vout_display_sys_t *sys,
                              p_window->fmt.i_y_offset,
                              p_window->fmt.i_visible_width,
                              p_window->fmt.i_visible_height);
-}
-
-static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
-                                    android_window *p_window,
-                                    jobject jsurf)
-{
-    if (p_window->p_handle && jsurf != p_window->jsurf) {
-        if (p_window->p_handle_priv) {
-            sys->anwp.disconnect(p_window->p_handle_priv);
-            p_window->p_handle_priv = NULL;
-        }
-        sys->anw.winRelease(p_window->p_handle);
-        p_window->p_handle = NULL;
-    }
-
-    p_window->jsurf = jsurf;
-    if (!p_window->p_handle && !p_window->b_opaque) {
-        JNIEnv *p_env;
-
-        if (!(p_env = jni_get_env(THREAD_NAME)))
-            return -1;
-        p_window->p_handle = sys->anw.winFromSurface(p_env, p_window->jsurf);
-        if (!p_window->p_handle)
-            return -1;
-    }
-
-    return 0;
 }
 
 static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
