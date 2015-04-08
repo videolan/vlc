@@ -71,7 +71,6 @@
 extern JNIEnv *jni_get_env(const char *name);
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
-extern bool jni_IsVideoPlayerActivityCreated();
 #endif
 
 /*****************************************************************************
@@ -1077,7 +1076,7 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     p_sys->in.p_fmt = &p_dec->fmt_in;
     OMX_FIFO_INIT (&p_sys->out.fifo, pInputPortPrivate );
 #if defined(USE_IOMX)
-    p_sys->out.b_direct = jni_IsVideoPlayerActivityCreated() && var_InheritBool(p_dec, CFG_PREFIX "dr");
+    p_sys->out.b_direct = var_InheritBool(p_dec, CFG_PREFIX "dr");
 #else
     p_sys->out.b_direct = false;
 #endif

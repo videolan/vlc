@@ -72,7 +72,6 @@ extern jobject jni_LockAndGetAndroidJavaSurface();
 extern jobject jni_LockAndGetSubtitlesSurface();
 extern void  jni_UnlockAndroidSurface();
 
-extern bool jni_IsVideoPlayerActivityCreated();
 extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 extern int jni_ConfigureSurface(jobject jsurf, int width, int height, int hal, bool *configured);
 extern int jni_GetWindowSize(int *width, int *height);
@@ -636,13 +635,6 @@ static int Open(vlc_object_t *p_this)
     video_format_t sub_fmt;
 
     if (vout_display_IsWindowed(vd))
-        return VLC_EGENERIC;
-
-    /* XXX: android_window use a surface created by VideoPlayerActivity to
-     * alloc pictures. Don't try to open the vout if this activity is not
-     * created. This need to be replaced by something like var_CreateGetAddress
-     * (vd, "drawable-android") in the future. */
-    if (!jni_IsVideoPlayerActivityCreated())
         return VLC_EGENERIC;
 
     /* Allocate structure */

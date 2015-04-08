@@ -55,7 +55,6 @@ extern JNIEnv *jni_get_env(const char *name);
 extern jobject jni_LockAndGetAndroidJavaSurface();
 extern void jni_UnlockAndroidSurface();
 extern void jni_EventHardwareAccelerationError();
-extern bool jni_IsVideoPlayerActivityCreated();
 
 /* Implementation of a circular buffer of timestamps with overwriting
  * of older values. MediaCodec has only one type of timestamp, if a
@@ -581,10 +580,7 @@ loopclean:
         (*env)->DeleteLocalRef(env, bytebuf);
     }
 
-    /* If the VideoPlayerActivity is not started, MediaCodec opaque
-       direct rendering should be disabled since no surface will be
-       attached to the JNI. */
-    p_sys->direct_rendering = jni_IsVideoPlayerActivityCreated() && var_InheritBool(p_dec, CFG_PREFIX "dr");
+    p_sys->direct_rendering = var_InheritBool(p_dec, CFG_PREFIX "dr");
 
     /* There is no way to rotate the video using direct rendering (and using a
      * SurfaceView) before  API 21 (Lollipop). Therefore, we deactivate direct
