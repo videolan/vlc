@@ -578,6 +578,8 @@ static int SetupWindowSurface(vout_display_sys_t *sys, unsigned i_pic_count)
 {
     int err;
     jobject jsurf = jni_LockAndGetAndroidJavaSurface();
+    if (!jsurf)
+        return -1;
     err = AndroidWindow_SetSurface(sys, sys->p_window, jsurf);
     jni_UnlockAndroidSurface();
     err = err == 0 ? AndroidWindow_Setup(sys, sys->p_window, i_pic_count) : err;
@@ -588,6 +590,8 @@ static int SetupWindowSubtitleSurface(vout_display_sys_t *sys)
 {
     int err;
     jobject jsurf = jni_LockAndGetSubtitlesSurface();
+    if (!jsurf)
+        return -1;
     err = AndroidWindow_SetSurface(sys, sys->p_sub_window, jsurf);
     jni_UnlockAndroidSurface();
     err = err == 0 ? AndroidWindow_Setup(sys, sys->p_sub_window, 1) : err;

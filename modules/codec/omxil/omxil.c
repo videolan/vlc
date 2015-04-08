@@ -2060,7 +2060,6 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
 
     surf = jni_LockAndGetAndroidJavaSurface();
     if( !surf ) {
-        jni_UnlockAndroidSurface();
         msg_Warn( p_dec, "jni_LockAndGetAndroidJavaSurface failed" );
         goto error;
     }

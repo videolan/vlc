@@ -628,11 +628,11 @@ loopclean:
                 goto error;
             }
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
+            jni_UnlockAndroidSurface();
         } else {
             msg_Warn(p_dec, "Failed to get the Android Surface, disabling direct rendering.");
             p_sys->direct_rendering = false;
         }
-        jni_UnlockAndroidSurface();
     }
     if (!p_sys->direct_rendering) {
         (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure, format, NULL, NULL, 0);
