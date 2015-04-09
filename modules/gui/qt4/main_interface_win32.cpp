@@ -117,10 +117,11 @@ void MainInterface::createTaskBarButtons()
     FIXME:the play button's picture doesn't changed to pause when clicked
     */
 
-    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED )) )
-        vlc_assert_unreachable();
+    HRESULT hr = CoInitializeEx( NULL, COINIT_MULTITHREADED );
+    if( hr == RPC_E_CHANGED_MODE )
+        hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
 
-    if( S_OK == CoCreateInstance( CLSID_TaskbarList,
+    if( SUCCEEDED(hr) && S_OK == CoCreateInstance( CLSID_TaskbarList,
                 NULL, CLSCTX_INPROC_SERVER,
                 IID_ITaskbarList3,
                 (void **)&p_taskbl) )
@@ -189,7 +190,6 @@ void MainInterface::createTaskBarButtons()
         himl = NULL;
         p_taskbl = NULL;
     }
-
 }
 
 bool MainInterface::winEvent ( MSG * msg, long * result )
