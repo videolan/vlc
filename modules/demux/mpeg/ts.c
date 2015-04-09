@@ -5326,16 +5326,15 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
             if( b_reusing_pid )
             {
                 /* p_pes points to a tmp pes */
-                if( pespid->u.p_pes->es.fmt.i_codec != p_pes->es.fmt.i_codec ||
+                if( !es_format_IsSimilar( &pespid->u.p_pes->es.fmt, &p_pes->es.fmt ) ||
                     pespid->u.p_pes->es.fmt.i_extra != p_pes->es.fmt.i_extra ||
-                    pespid->u.p_pes->es.fmt.i_extra != 0 ||
+                    memcmp( pespid->u.p_pes->es.fmt.p_extra, p_pes->es.fmt.p_extra,
+                            p_pes->es.fmt.i_extra ) ||
                     pespid->u.p_pes->extra_es.i_size != p_pes->extra_es.i_size ||
-                    !( ( !pespid->u.p_pes->es.fmt.psz_language &&
-                        !p_pes->es.fmt.psz_language ) ||
-                      ( pespid->u.p_pes->es.fmt.psz_language &&
-                        p_pes->es.fmt.psz_language &&
-                        !strcmp( pespid->u.p_pes->es.fmt.psz_language,
-                                 p_pes->es.fmt.psz_language ) ) ) )
+                    !!pespid->u.p_pes->es.fmt.psz_language != !!p_pes->es.fmt.psz_language ||
+                    ( pespid->u.p_pes->es.fmt.psz_language && p_pes->es.fmt.psz_language &&
+                      strcmp( pespid->u.p_pes->es.fmt.psz_language, p_pes->es.fmt.psz_language ) )
+                  )
                 {
                     /* Differs, swap then */
                     ts_pes_t *old = pespid->u.p_pes;
