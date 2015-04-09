@@ -455,6 +455,14 @@ static int OpenDecoder(vlc_object_t *p_this)
 
         info = (*env)->CallStaticObjectMethod(env, jfields.media_codec_list_class,
                                               jfields.get_codec_info_at, i);
+
+        name = (*env)->CallObjectMethod(env, info, jfields.get_name);
+        name_len = (*env)->GetStringUTFLength(env, name);
+        name_ptr = (*env)->GetStringUTFChars(env, name, NULL);
+
+        if (OMXCodec_IsBlacklisted( name_ptr, name_len))
+            goto loopclean;
+
         if ((*env)->CallBooleanMethod(env, info, jfields.is_encoder))
             goto loopclean;
 
@@ -472,13 +480,8 @@ static int OpenDecoder(vlc_object_t *p_this)
 
         types = (*env)->CallObjectMethod(env, info, jfields.get_supported_types);
         num_types = (*env)->GetArrayLength(env, types);
-        name = (*env)->CallObjectMethod(env, info, jfields.get_name);
-        name_len = (*env)->GetStringUTFLength(env, name);
-        name_ptr = (*env)->GetStringUTFChars(env, name, NULL);
         found = false;
 
-        if (OMXCodec_IsBlacklisted( name_ptr, name_len))
-            goto loopclean;
         for (int j = 0; j < num_types && !found; j++) {
             jobject type = (*env)->GetObjectArrayElement(env, types, j);
             if (!jstrcmp(env, type, mime)) {
