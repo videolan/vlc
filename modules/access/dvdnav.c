@@ -445,7 +445,7 @@ static int DemuxOpen ( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t*)p_this;
     dvdnav_t *p_dvdnav = NULL;
-    int i_ret;
+    int i_ret = VLC_EGENERIC;
     int64_t i_init_pos;
     bool forced = false, b_seekable = false;
 
@@ -463,7 +463,7 @@ static int DemuxOpen ( vlc_object_t *p_this )
     i_init_pos = stream_Tell( p_demux->s );
 
     /* Try some simple probing to avoid going through dvdnav_open too often */
-    if( !forced && (i_ret = StreamProbeDVD( p_demux->s )) != VLC_SUCCESS )
+    if( !forced && StreamProbeDVD( p_demux->s ) != VLC_SUCCESS )
         goto bailout;
 
     static dvdnav_stream_cb stream_cb =
