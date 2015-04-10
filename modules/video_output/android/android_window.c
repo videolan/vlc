@@ -996,7 +996,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
         if (!sys->p_sub_pic && SetupWindowSubtitleSurface(sys) == 0)
             sys->p_sub_pic = PictureAlloc(sys, &sys->p_sub_window->fmt);
-        if (!sys->p_spu_blend)
+        if (!sys->p_spu_blend && sys->p_sub_pic)
             sys->p_spu_blend = filter_NewBlend(VLC_OBJECT(vd),
                                                &sys->p_sub_pic->format);
 
