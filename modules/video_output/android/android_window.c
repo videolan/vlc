@@ -190,12 +190,16 @@ static picture_t *PictureAlloc(vout_display_sys_t *sys, video_format_t *fmt)
 
 static void FixSubtitleFormat(vout_display_sys_t *sys)
 {
-    video_format_t *p_subfmt = &sys->p_sub_window->fmt;
+    video_format_t *p_subfmt;
     video_format_t fmt;
     int i_width, i_height;
     int i_video_width, i_video_height;
     int i_display_width, i_display_height;
     double aspect;
+
+    if (!sys->p_sub_window)
+        return;
+    p_subfmt = &sys->p_sub_window->fmt;
 
     video_format_ApplyRotation(&fmt, &sys->p_window->fmt);
 
@@ -688,21 +692,23 @@ static int Open(vlc_object_t *p_this)
             (sys->p_window->b_use_priv ? "ANWP" : "ANW"));
 
     jsurf = jni_LockAndGetSubtitlesSurface();
-    if (!jsurf)
-        goto error;
-    video_format_ApplyRotation(&sub_fmt, &vd->fmt);
-    sub_fmt.i_chroma = subpicture_chromas[0];
-    SetRGBMask(&sub_fmt);
-    video_format_FixRgb(&sub_fmt);
-    sys->p_sub_window = AndroidWindow_New(sys, &sub_fmt, jsurf, false);
-    jni_UnlockAndroidSurface();
-    if (!sys->p_sub_window)
-        goto error;
-    FixSubtitleFormat(sys);
-    sys->i_sub_last_order = -1;
+    if (jsurf) {
+        video_format_ApplyRotation(&sub_fmt, &vd->fmt);
+        sub_fmt.i_chroma = subpicture_chromas[0];
+        SetRGBMask(&sub_fmt);
+        video_format_FixRgb(&sub_fmt);
 
-    /* Export the subpicture capability of this vout. */
-    vd->info.subpicture_chromas = subpicture_chromas;
+        sys->p_sub_window = AndroidWindow_New(sys, &sub_fmt, jsurf, false);
+        jni_UnlockAndroidSurface();
+        if (!sys->p_sub_window)
+            goto error;
+
+        FixSubtitleFormat(sys);
+        sys->i_sub_last_order = -1;
+
+        /* Export the subpicture capability of this vout. */
+        vd->info.subpicture_chromas = subpicture_chromas;
+    }
 
     /* Setup vout_display */
     vd->pool    = Pool;
@@ -971,7 +977,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     SendEventDisplaySize(vd);
 
-    if (subpicture) {
+    if (subpicture && sys->p_sub_window) {
         if (sys->b_sub_invalid) {
             sys->b_sub_invalid = false;
             if (sys->p_sub_pic) {
