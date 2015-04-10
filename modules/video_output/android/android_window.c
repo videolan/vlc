@@ -284,6 +284,37 @@ static void SetupPictureYV12(picture_t *p_picture, uint32_t i_in_stride)
     }
 }
 
+static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
+                                    android_window *p_window,
+                                    jobject jsurf)
+{
+    if (jsurf != p_window->jsurf) {
+        if (p_window->p_handle_priv) {
+            sys->anwp.disconnect(p_window->p_handle_priv);
+            p_window->p_handle_priv = NULL;
+        }
+        if (p_window->p_handle) {
+            sys->anw.winRelease(p_window->p_handle);
+            p_window->p_handle = NULL;
+        }
+    }
+
+    p_window->jsurf = jsurf;
+    if (!p_window->jsurf )
+        return -1;
+    if (!p_window->p_handle && !p_window->b_opaque) {
+        JNIEnv *p_env;
+
+        if (!(p_env = jni_get_env(THREAD_NAME)))
+            return -1;
+        p_window->p_handle = sys->anw.winFromSurface(p_env, p_window->jsurf);
+        if (!p_window->p_handle)
+            return -1;
+    }
+
+    return 0;
+}
+
 static android_window *AndroidWindow_New(vout_display_sys_t *sys,
                                          video_format_t *p_fmt,
                                          bool b_use_priv)
@@ -324,37 +355,6 @@ static android_window *AndroidWindow_New(vout_display_sys_t *sys,
         video_format_ApplyRotation(&p_window->fmt, p_fmt);
     p_window->i_pic_count = 1;
     return p_window;
-}
-
-static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
-                                    android_window *p_window,
-                                    jobject jsurf)
-{
-    if (jsurf != p_window->jsurf) {
-        if (p_window->p_handle_priv) {
-            sys->anwp.disconnect(p_window->p_handle_priv);
-            p_window->p_handle_priv = NULL;
-        }
-        if (p_window->p_handle) {
-            sys->anw.winRelease(p_window->p_handle);
-            p_window->p_handle = NULL;
-        }
-    }
-
-    p_window->jsurf = jsurf;
-    if (!p_window->jsurf )
-        return -1;
-    if (!p_window->p_handle && !p_window->b_opaque) {
-        JNIEnv *p_env;
-
-        if (!(p_env = jni_get_env(THREAD_NAME)))
-            return -1;
-        p_window->p_handle = sys->anw.winFromSurface(p_env, p_window->jsurf);
-        if (!p_window->p_handle)
-            return -1;
-    }
-
-    return 0;
 }
 
 static void AndroidWindow_Destroy(vout_display_sys_t *sys,
