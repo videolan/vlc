@@ -28,14 +28,6 @@
 /*****************************************************************************
  * Structure needed for decoder
  *****************************************************************************/
-#define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
-#define GUID_PRINT( guid )  \
-    (unsigned)(guid).Data1,              \
-    (guid).Data2,              \
-    (guid).Data3,              \
-    (guid).Data4[0],(guid).Data4[1],(guid).Data4[2],(guid).Data4[3],    \
-    (guid).Data4[4],(guid).Data4[5],(guid).Data4[6],(guid).Data4[7]
-
 enum
 {
     ASF_OBJECT_NULL = 0,

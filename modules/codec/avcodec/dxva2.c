@@ -41,6 +41,7 @@
 #include <vlc_fourcc.h>
 #include <vlc_cpu.h>
 #include <vlc_plugin.h>
+#include <vlc_codecs.h>
 
 #include <libavcodec/avcodec.h>
 #    define DXVA2API_USE_BITFIELDS
@@ -50,7 +51,6 @@
 #include "avcodec.h"
 #include "va.h"
 #include "../../video_chroma/copy.h"
-#include "../../demux/asf/libasf_guid.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
 static void Close(vlc_va_t *, AVCodecContext *);

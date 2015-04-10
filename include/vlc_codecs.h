@@ -471,6 +471,15 @@ static inline int guidcmp( const GUID *s1, const GUID *s2 )
             s1->Data3 == s2->Data3 && !memcmp( s1->Data4, s2->Data4, 8 ) );
 }
 
+#define GUID_FMT "0x%x-0x%x-0x%x-0x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x"
+#define GUID_PRINT( guid )  \
+    (unsigned)(guid).Data1,              \
+    (guid).Data2,              \
+    (guid).Data3,              \
+    (guid).Data4[0],(guid).Data4[1],(guid).Data4[2],(guid).Data4[3],    \
+    (guid).Data4[4],(guid).Data4[5],(guid).Data4[6],(guid).Data4[7]
+
+
 static inline void sf_tag_to_fourcc( GUID *guid_tag,
                                      vlc_fourcc_t *fcc, const char **ppsz_name )
 {

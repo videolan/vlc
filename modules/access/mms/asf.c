@@ -27,10 +27,10 @@
 
 #include <vlc_common.h>
 #include <vlc_rand.h>
-#include <vlc_codecs.h>
 
 #include "asf.h"
 #include "buffer.h"
+#include "../../demux/asf/libasf_guid.h"
 
 void  GenerateGuid ( guid_t *p_guid )
 {

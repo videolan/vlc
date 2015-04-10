@@ -31,7 +31,7 @@
 #ifndef _ASF_H_
 #define _ASF_H_ 1
 
-#include "../../demux/asf/libasf_guid.h"
+#include <vlc_codecs.h>
 
 #define ASF_CODEC_TYPE_VIDEO   0x0001
 #define ASF_CODEC_TYPE_AUDIO   0x0002
