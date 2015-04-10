@@ -132,9 +132,11 @@ struct decoder_sys_t
     slice_t slice;
 
     /* */
+    bool b_even_frame;
     mtime_t i_frame_pts;
     mtime_t i_frame_dts;
-    int     i_fields_dts;
+    mtime_t i_prev_pts;
+    mtime_t i_prev_dts;
 
     /* */
     uint32_t i_cc_flags;
@@ -250,9 +252,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_cpb_removal_delay_length_minus1 = 0;
     p_sys->i_dpb_output_delay_length_minus1 = 0;
 
+    p_sys->b_even_frame = false;
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
-    p_sys->i_fields_dts = 0;
+    p_sys->i_prev_dts = VLC_TS_INVALID;
+    p_sys->i_prev_pts = VLC_TS_INVALID;
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -536,6 +540,9 @@ static void PacketizeReset( void *p_private, bool b_broken )
     }
     p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->i_frame_dts = VLC_TS_INVALID;
+    p_sys->i_prev_dts = VLC_TS_INVALID;
+    p_sys->i_prev_pts = VLC_TS_INVALID;
+    p_sys->b_even_frame = false;
 }
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
 {
@@ -692,7 +699,6 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     {
         p_sys->i_frame_dts = i_frag_dts;
         p_sys->i_frame_pts = i_frag_pts;
-        p_sys->i_fields_dts = 2;
         *pb_ts_used = true;
     }
     return p_pic;
@@ -755,54 +761,75 @@ static block_t *OutputPicture( decoder_t *p_dec )
     {
         p_pic = block_ChainGather( p_sys->p_frame );
     }
-    p_pic->i_dts = p_sys->i_frame_dts;
-    p_pic->i_pts = p_sys->i_frame_pts;
-    p_pic->i_length = 0;    /* FIXME */
-    p_pic->i_flags |= p_sys->slice.i_frame_type;
-    p_pic->i_flags &= ~BLOCK_FLAG_PRIVATE_AUD;
-    if( !p_sys->b_header )
-        p_pic->i_flags |= BLOCK_FLAG_PREROLL;
+
+    unsigned i_num_clock_ts = 1;
+    if( p_sys->b_frame_mbs_only == 0 && p_sys->b_pic_struct_present_flag )
+    {
+        if( p_sys->i_pic_struct < 9 )
+        {
+            const uint8_t rgi_numclock[9] = { 1, 1, 1, 2, 2, 3, 3, 2, 3 };
+            i_num_clock_ts = rgi_numclock[ p_sys->i_pic_struct ];
+        }
+    }
+
+    if( p_sys->i_time_scale )
+    {
+        p_pic->i_length = CLOCK_FREQ * i_num_clock_ts *
+                          p_sys->i_num_units_in_tick / p_sys->i_time_scale;
+    }
 
     if( p_sys->b_frame_mbs_only == 0 && p_sys->b_pic_struct_present_flag )
     {
         switch( p_sys->i_pic_struct )
         {
         case 1:
-            if( p_sys->i_fields_dts == 2 )
-                p_pic->i_flags |= BLOCK_FLAG_TOP_FIELD_FIRST;
-            else
-                p_pic->i_flags |= BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+        case 2:
+            if( !p_sys->b_even_frame )
+            {
+                p_pic->i_flags |= (p_sys->i_pic_struct == 1) ? BLOCK_FLAG_TOP_FIELD_FIRST
+                                                             : BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            }
+            else if( p_pic->i_pts <= VLC_TS_INVALID && p_sys->i_prev_pts > VLC_TS_INVALID )
+            {
+                /* interpolate from even frame */
+                p_pic->i_pts = p_sys->i_prev_pts + p_pic->i_length;
+            }
+            p_sys->b_even_frame = !p_sys->b_even_frame;
             break;
         case 3:
+            p_pic->i_flags |= BLOCK_FLAG_TOP_FIELD_FIRST;
+            p_sys->b_even_frame = false;
+            break;
+        case 4:
+            p_pic->i_flags |= BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            p_sys->b_even_frame = false;
+            break;
         case 5:
             p_pic->i_flags |= BLOCK_FLAG_TOP_FIELD_FIRST;
             break;
-        case 2:
-            if( p_sys->i_fields_dts == 2 )
-                p_pic->i_flags |= BLOCK_FLAG_BOTTOM_FIELD_FIRST;
-            else
-                p_pic->i_flags |= BLOCK_FLAG_TOP_FIELD_FIRST;
-            break;
-        case 4:
         case 6:
             p_pic->i_flags |= BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             break;
         default:
+            p_sys->b_even_frame = false;
             break;
         }
     }
 
-    p_sys->i_fields_dts -= (1 + p_sys->b_frame_mbs_only);
-    if( p_sys->i_fields_dts <= 0 )
-    {
-        p_sys->i_frame_dts = VLC_TS_INVALID;
-        p_sys->i_frame_pts = VLC_TS_INVALID;
-    }
-    else if( p_sys->b_timing_info_present_flag && p_sys->i_time_scale )
-    {
-        p_sys->i_frame_pts += CLOCK_FREQ * p_sys->i_num_units_in_tick / p_sys->i_time_scale;
-    }
-    else p_sys->i_frame_pts = VLC_TS_INVALID;
+    if( p_sys->i_frame_dts <= VLC_TS_INVALID )
+        p_sys->i_frame_dts = p_sys->i_prev_dts;
+
+    p_pic->i_dts = p_sys->i_frame_dts;
+    p_pic->i_pts = p_sys->i_frame_pts;
+    p_pic->i_flags |= p_sys->slice.i_frame_type;
+    p_pic->i_flags &= ~BLOCK_FLAG_PRIVATE_AUD;
+    if( !p_sys->b_header )
+        p_pic->i_flags |= BLOCK_FLAG_PREROLL;
+
+    p_sys->i_prev_dts = p_sys->i_frame_dts;
+    p_sys->i_prev_pts = p_sys->i_frame_pts;
+    p_sys->i_frame_dts = VLC_TS_INVALID;
+    p_sys->i_frame_pts = VLC_TS_INVALID;
 
     p_sys->slice.i_frame_type = 0;
     p_sys->p_frame = NULL;
