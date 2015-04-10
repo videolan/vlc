@@ -42,10 +42,15 @@ FLACCONF += --disable-asm-optimizations
 endif
 endif
 
+FLAC_CFLAGS := $(CFLAGS)
+ifdef HAVE_WIN32
+FLAC_CFLAGS += -mstackrealign
+endif
+
 DEPS_flac = ogg $(DEPS_ogg)
 
 .flac: flac
-	cd $< && $(HOSTVARS) ./configure $(FLACCONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(FLAC_CFLAGS)" ./configure $(FLACCONF)
 	cd $</include && $(MAKE) install
 	cd $</src && $(MAKE) -C share install && $(MAKE) -C libFLAC install
 	touch $@
