@@ -157,6 +157,8 @@ static int Mux( sout_mux_t *p_mux )
             memcpy( p_data->p_buffer, p_mux->pp_inputs[i]->p_fmt->p_extra,
                     p_mux->pp_inputs[i]->p_fmt->i_extra );
 
+            p_data->i_flags |= BLOCK_FLAG_HEADER;
+
             msg_Dbg( p_mux, "writing header data" );
             sout_AccessOutWrite( p_mux->p_access, p_data );
         }
