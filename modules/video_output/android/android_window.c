@@ -317,6 +317,7 @@ static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
 
 static android_window *AndroidWindow_New(vout_display_sys_t *sys,
                                          video_format_t *p_fmt,
+                                         jobject jsurf,
                                          bool b_use_priv)
 {
     android_window *p_window = calloc(1, sizeof(android_window));
@@ -354,6 +355,12 @@ static android_window *AndroidWindow_New(vout_display_sys_t *sys,
     else
         video_format_ApplyRotation(&p_window->fmt, p_fmt);
     p_window->i_pic_count = 1;
+
+    if (AndroidWindow_SetSurface(sys, p_window, jsurf) != 0) {
+        free(p_window);
+        return NULL;
+    }
+
     return p_window;
 }
 
@@ -573,30 +580,6 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
     return 0;
 }
 
-static int SetupWindowSurface(vout_display_sys_t *sys, unsigned i_pic_count)
-{
-    int err;
-    jobject jsurf = jni_LockAndGetAndroidJavaSurface();
-    if (!jsurf)
-        return -1;
-    err = AndroidWindow_SetSurface(sys, sys->p_window, jsurf);
-    jni_UnlockAndroidSurface();
-    err = err == 0 ? AndroidWindow_Setup(sys, sys->p_window, i_pic_count) : err;
-    return err;
-}
-
-static int SetupWindowSubtitleSurface(vout_display_sys_t *sys)
-{
-    int err;
-    jobject jsurf = jni_LockAndGetSubtitlesSurface();
-    if (!jsurf)
-        return -1;
-    err = AndroidWindow_SetSurface(sys, sys->p_sub_window, jsurf);
-    jni_UnlockAndroidSurface();
-    err = err == 0 ? AndroidWindow_Setup(sys, sys->p_sub_window, 1) : err;
-    return err;
-}
-
 static void SetRGBMask(video_format_t *p_fmt)
 {
     switch(p_fmt->i_chroma) {
@@ -633,6 +616,7 @@ static int Open(vlc_object_t *p_this)
     vout_display_t *vd = (vout_display_t*)p_this;
     vout_display_sys_t *sys;
     video_format_t sub_fmt;
+    jobject jsurf;
 
     if (vout_display_IsWindowed(vd))
         return VLC_EGENERIC;
@@ -685,11 +669,15 @@ static int Open(vlc_object_t *p_this)
         }
     }
 
-    sys->p_window = AndroidWindow_New(sys, &vd->fmt, true);
+    jsurf = jni_LockAndGetAndroidJavaSurface();
+    if (!jsurf)
+        goto error;
+    sys->p_window = AndroidWindow_New(sys, &vd->fmt, jsurf, true);
+    jni_UnlockAndroidSurface();
     if (!sys->p_window)
         goto error;
 
-    if (SetupWindowSurface(sys, 0) != 0)
+    if (AndroidWindow_Setup(sys, sys->p_window, 0) != 0)
         goto error;
 
     /* use software rotation if we don't use private anw */
@@ -699,11 +687,15 @@ static int Open(vlc_object_t *p_this)
     msg_Dbg(vd, "using %s", sys->p_window->b_opaque ? "opaque" :
             (sys->p_window->b_use_priv ? "ANWP" : "ANW"));
 
+    jsurf = jni_LockAndGetSubtitlesSurface();
+    if (!jsurf)
+        goto error;
     video_format_ApplyRotation(&sub_fmt, &vd->fmt);
     sub_fmt.i_chroma = subpicture_chromas[0];
     SetRGBMask(&sub_fmt);
     video_format_FixRgb(&sub_fmt);
-    sys->p_sub_window = AndroidWindow_New(sys, &sub_fmt, false);
+    sys->p_sub_window = AndroidWindow_New(sys, &sub_fmt, jsurf, false);
+    jni_UnlockAndroidSurface();
     if (!sys->p_sub_window)
         goto error;
     FixSubtitleFormat(sys);
@@ -805,7 +797,7 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     unsigned int i = 0;
 
     msg_Dbg(vd, "PoolAlloc: request %d frames", requested_count);
-    if (SetupWindowSurface(sys, requested_count) != 0)
+    if (AndroidWindow_Setup(sys, sys->p_window, requested_count) != 0)
         goto error;
 
     requested_count = sys->p_window->i_pic_count;
@@ -994,7 +986,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             sys->p_sub_buffer_bounds = NULL;
         }
 
-        if (!sys->p_sub_pic && SetupWindowSubtitleSurface(sys) == 0)
+        if (!sys->p_sub_pic
+         && AndroidWindow_Setup(sys, sys->p_sub_window, 1) == 0)
             sys->p_sub_pic = PictureAlloc(sys, &sys->p_sub_window->fmt);
         if (!sys->p_spu_blend && sys->p_sub_pic)
             sys->p_spu_blend = filter_NewBlend(VLC_OBJECT(vd),
