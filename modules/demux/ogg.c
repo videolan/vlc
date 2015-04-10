@@ -580,7 +580,9 @@ static int Demux( demux_t * p_demux )
                     if ( p_stream->fmt.i_cat == VIDEO_ES )
                     {
                         pagestamp = pagestamp - ( CLOCK_FREQ / p_stream->f_rate );
-                        p_block->i_pts = p_sys->i_nzpcr_offset + pagestamp;
+                        if( pagestamp < 0 )
+                            pagestamp = 0;
+                        p_block->i_pts = VLC_TS_0 + p_sys->i_nzpcr_offset + pagestamp;
                         b_fixed = true;
                     }
                 }
