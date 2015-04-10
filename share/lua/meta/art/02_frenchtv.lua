@@ -38,11 +38,11 @@ function fetch_art()
         ["W9"] = "http://cyril.bourreau.free.fr/Vectoriel/W9.png",
 
         ["Arte"] = "http://www.artepro.com/fr_fichiers/upload/10594.jpg",
-        ["TMC"] = "http://upload.wikimedia.org/wikipedia/fr/4/4b/Logo_de_TMC.gif",
-        ["i> TELE"] = "http://upload.wikimedia.org/wikipedia/fr/5/56/Logo_I_tele.png",
-        ["BFM TV"] = "http://upload.wikimedia.org/wikipedia/fr/3/30/Bfm_tv.jpg",
+        ["TMC"] = "http://upload.wikimedia.org/wikipedia/fr/2/2e/TMC_new.svg",
+        ["i> TELE"] = "http://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_i_TELE_2013.png",
+        ["BFM TV"] = "http://upload.wikimedia.org/wikipedia/fr/c/c9/BFMTV_HD.png",
         ["Virgin 17"] = "http://upload.wikimedia.org/wikipedia/fr/3/39/Virgin17logo.png",
-        ["La Chaîne Parlementaire"] = "http://upload.wikimedia.org/wikipedia/fr/9/98/Public-Senat-LCP-An_logo_2010.png"
+        ["La Chaîne Parlementaire"] = "http://upload.wikimedia.org/wikipedia/fr/1/1f/LCP-Public_Senat_logo.png"
     }
     local meta = vlc.item:metas();
     local channel
