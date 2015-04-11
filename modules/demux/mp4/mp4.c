@@ -3006,7 +3006,7 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
  * 3 types: for audio
  *
  */
-#define QT_V0_MAX_SAMPLES 1024
+#define QT_V0_MAX_SAMPLES 2048
 static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samples )
 {
     uint32_t i_size = 0;
