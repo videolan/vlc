@@ -84,9 +84,14 @@ static int Open( vlc_object_t * p_this )
 
     if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
 
-    if( p_peek[0] != 0x00 || p_peek[1] != 0x00 ||
-        p_peek[2] != 0x00 || p_peek[3] != 0x01 ||
-        (p_peek[4]&0x1F) != 7 ) /* SPS */
+    const uint8_t i_nal_type = p_peek[4] & 0x1F;
+    const uint8_t i_ref_idc = p_peek[4] & 0x60;
+    if( memcmp( p_peek, "\x00\x00\x00\x01", 4 ) ||
+       (p_peek[4] & 0x80) || /* reserved 0 */
+        i_nal_type == 0 || i_nal_type > 12 ||
+       ( !i_ref_idc && (i_nal_type < 6 || i_nal_type == 7 || i_nal_type == 8) ) ||
+       (  i_ref_idc && (i_nal_type == 6 || i_nal_type >= 9) )
+      )
     {
         if( !p_demux->b_force )
         {
