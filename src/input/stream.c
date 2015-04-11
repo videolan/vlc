@@ -164,17 +164,10 @@ struct stream_sys_t
     /* Stat for both method */
     struct
     {
-        bool b_fastseek;  /* From access */
-
         /* Stat about reading data */
         uint64_t i_read_count;
         uint64_t i_bytes;
         uint64_t i_read_time;
-
-        /* Stat about seek */
-        unsigned i_seek_count;
-        uint64_t i_seek_time;
-
     } stat;
 
     /* Streams list */
@@ -309,12 +302,9 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
     p_sys->i_pos = p_access->info.i_pos;
 
     /* Stats */
-    access_Control( p_access, ACCESS_CAN_FASTSEEK, &p_sys->stat.b_fastseek );
     p_sys->stat.i_bytes = 0;
     p_sys->stat.i_read_time = 0;
     p_sys->stat.i_read_count = 0;
-    p_sys->stat.i_seek_count = 0;
-    p_sys->stat.i_seek_time = 0;
 
     TAB_INIT( p_sys->i_list, p_sys->list );
     p_sys->i_list_index = 0;
@@ -955,9 +945,6 @@ static int AStreamSeekBlock( stream_t *s, uint64_t i_pos )
         if( AStreamRefillBlock( s ) )
             return VLC_EGENERIC;
 
-        /* Update stat */
-        p_sys->stat.i_seek_time += i_end - i_start;
-        p_sys->stat.i_seek_count++;
         return VLC_SUCCESS;
     }
     else
