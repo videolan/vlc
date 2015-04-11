@@ -3097,6 +3097,9 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
             (*pi_nb_samples)++;
             if ( p_track->i_sample_size == 0 )
                 i_size += p_track->p_sample_size[i];
+            /* broken stsz sample size == 1 */
+            else if ( p_track->i_sample_size == 1 && p_soun->i_samplesize > p_track->i_sample_size * 8 )
+                i_size += p_soun->i_samplesize * p_soun->i_channelcount / 8;
             else
                 i_size += p_track->i_sample_size;
 
