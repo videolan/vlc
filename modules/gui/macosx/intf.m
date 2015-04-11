@@ -371,7 +371,9 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateMainWindow) withObject: nil waitUntilDone: NO];
             break;
         case INPUT_EVENT_STATISTICS:
-            [[[VLCMain sharedInstance] info] performSelectorOnMainThread:@selector(updateStatistics) withObject: nil waitUntilDone: NO];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[[VLCMain sharedInstance] info] updateStatistics];
+            });
             break;
         case INPUT_EVENT_ES:
             break;
