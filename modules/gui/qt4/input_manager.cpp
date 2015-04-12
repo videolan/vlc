@@ -145,6 +145,7 @@ void InputManager::setInput( input_thread_t *_p_input )
         // Save the latest URI to avoid asking to restore the
         // position on the same input file.
         lastURI = qfu( uri );
+        RecentsMRL::getInstance( p_intf )->addRecent( lastURI );
         free( uri );
     }
     else
