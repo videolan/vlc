@@ -640,6 +640,15 @@
 {
     if (b_fullscreen)
         [self recreateHideMouseTimer];
+    if (b_has_active_video && [self isKeyWindow]) {
+        if (NSPointInRect([theEvent locationInWindow],
+                          [[self videoView] convertRect:[[self videoView] bounds]
+                                                 toView:nil])) {
+            [self recreateHideMouseTimer];
+        } else {
+            [t_hide_mouse_timer invalidate];
+        }
+    }
 
     [super mouseMoved: theEvent];
 }
