@@ -23,7 +23,7 @@ daala: daala-$(DAALA_VERSION).tar.gz .sum-daala
 	mkdir -p $@/m4
 
 DAALACONF := $(HOSTCONF) \
-	--disable-player --disable-tools
+	--disable-player --disable-tools --disable-unit-tests
 
 DEPS_daala = ogg $(DEPS_ogg)
 
