@@ -3033,14 +3033,14 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
     demux_sys_t   *p_sys = p_demux->p_sys;
 
-    if( p_sys->i_pmt_es <= 0 )
-        return;
-
     mtime_t i_pcr = GetPCR( p_bk );
     if( i_pcr < 0 )
         return;
 
     pid->probed.i_pcr_count++;
+
+    if( p_sys->i_pmt_es <= 0 )
+        return;
 
     if(unlikely(GetPID(p_sys, 0)->type != TYPE_PAT))
         return;
@@ -3126,15 +3126,16 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
     }
     else if( p_block->i_dts - p_pmt->pcr.i_first_dts > CLOCK_FREQ / 2 ) /* "PCR repeat rate shall not exceed 100ms" */
     {
-        if( p_pmt->pcr.i_current < 0 )
+        if( p_pmt->pcr.i_current < 0 &&
+            GetPID( p_demux->p_sys, p_pmt->i_pid_pcr )->probed.i_pcr_count == 0 )
         {
             int i_cand = FindPCRCandidate( p_pmt );
             p_pmt->i_pid_pcr = i_cand;
             msg_Warn( p_demux, "No PCR received for program %d, set up workaround using pid %d",
                       p_pmt->i_number, i_cand );
             UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
-            p_pmt->pcr.b_fix_done = true;
         }
+        p_pmt->pcr.b_fix_done = true;
     }
 }
 
