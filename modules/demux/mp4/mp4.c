@@ -3124,8 +3124,18 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
                 break;
             }
 
-            if ( *pi_nb_samples == QT_V0_MAX_SAMPLES )
-                break;
+            switch( p_track->fmt.i_codec )
+            {
+                case VLC_CODEC_AMR_NB:
+                case VLC_CODEC_AMR_WB:
+                    if ( *pi_nb_samples == 16 )
+                        i = UINT32_MAX;
+                    break;
+                default:
+                    if ( *pi_nb_samples == QT_V0_MAX_SAMPLES )
+                        i = UINT32_MAX;
+                    break;
+            }
         }
     }
 
