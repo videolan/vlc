@@ -3006,7 +3006,24 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
  * 3 types: for audio
  *
  */
-#define QT_V0_MAX_SAMPLES 2048
+static inline uint32_t MP4_GetFixedSampleSize( const mp4_track_t *p_track,
+                                               const MP4_Box_data_sample_soun_t *p_soun )
+{
+    uint32_t i_size = 0;
+
+    assert( p_track->i_sample_size != 0 );
+
+    /* broken stsz sample size == 1 */
+    if ( p_track->fmt.i_cat == AUDIO_ES &&
+         p_track->i_sample_size == 1 && p_soun->i_samplesize > p_track->i_sample_size * 8 )
+        i_size = p_soun->i_samplesize * p_soun->i_channelcount / 8;
+    else
+        i_size = p_track->i_sample_size;
+
+    return i_size;
+}
+
+#define QT_V0_MAX_SAMPLES 1024
 static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samples )
 {
     uint32_t i_size = 0;
@@ -3097,11 +3114,8 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
             (*pi_nb_samples)++;
             if ( p_track->i_sample_size == 0 )
                 i_size += p_track->p_sample_size[i];
-            /* broken stsz sample size == 1 */
-            else if ( p_track->i_sample_size == 1 && p_soun->i_samplesize > p_track->i_sample_size * 8 )
-                i_size += p_soun->i_samplesize * p_soun->i_channelcount / 8;
             else
-                i_size += p_track->i_sample_size;
+                i_size += MP4_GetFixedSampleSize( p_track, p_soun );
 
             /* Try to detect compression in ISO */
             if(p_soun->i_compressionid != 0)
@@ -3137,7 +3151,7 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
         {
             i_pos += ( p_track->i_sample -
                        p_track->chunk[p_track->i_chunk].i_sample_first ) *
-                     p_track->i_sample_size;
+                     MP4_GetFixedSampleSize( p_track, p_soun );
         }
         else
         {
