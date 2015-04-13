@@ -1024,9 +1024,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic = NULL;
     JNIEnv *env = NULL;
-
-    if (!pp_block || !*pp_block)
-        return NULL;
+    block_t *p_block = pp_block ? *pp_block : NULL;
 
     if (p_sys->error_state)
         goto endclean;
@@ -1034,8 +1032,8 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     if (!(env = jni_get_env(THREAD_NAME)))
         goto endclean;
 
-    if ((*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        block_Release(*pp_block);
+    if (p_block && p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+        block_Release(p_block);
         *pp_block = NULL;
         p_sys->i_preroll_end = 0;
         timestamp_FifoEmpty(p_sys->timestamp_fifo);
@@ -1068,12 +1066,11 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     jlong timeout = 0;
     int i_output_ret = 0;
     int i_input_ret = 0;
-    /* return when pp_block is processed or when we got an output pic */
-    while (i_input_ret != 1 && i_output_ret != 1) {
-        if (i_input_ret == 0) {
-            i_input_ret = PutInput(p_dec, env, *pp_block, timeout);
+    do {
+        if (p_block && i_input_ret == 0) {
+            i_input_ret = PutInput(p_dec, env, p_block, timeout);
             if (i_input_ret == 1) {
-                block_Release(*pp_block);
+                block_Release(p_block);
                 *pp_block = NULL;
             } else if (i_input_ret == -1) {
                 p_sys->error_state = true;
@@ -1117,13 +1114,14 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             }
         }
         timeout = 10 * 1000; // 10 ms
-    }
+        /* loop until input is processed or when we got an output pic */
+    } while (p_block && i_input_ret != 1 && i_output_ret != 1);
 
 endclean:
     if (p_sys->error_state) {
-        if( pp_block && *pp_block )
+        if( p_block )
         {
-            block_Release(*pp_block);
+            block_Release(p_block);
             *pp_block = NULL;
         }
         if (p_pic)
