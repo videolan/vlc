@@ -3131,6 +3131,8 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
         {
             int i_cand = FindPCRCandidate( p_pmt );
             p_pmt->i_pid_pcr = i_cand;
+            if ( GetPID( p_demux->p_sys, p_pmt->i_pid_pcr )->probed.i_pcr_count == 0 )
+                p_pmt->pcr.b_disable = true;
             msg_Warn( p_demux, "No PCR received for program %d, set up workaround using pid %d",
                       p_pmt->i_number, i_cand );
             UpdatePESFilters( p_demux, p_demux->p_sys->b_es_all );
