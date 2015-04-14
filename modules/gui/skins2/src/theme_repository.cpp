@@ -113,7 +113,7 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
     // variable for opening a dialog box to change skins
     var_Create( pIntf, "intf-skins-interactive", VLC_VAR_VOID |
                 VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Open skin ...");
+    text.psz_string = _("Open skin...");
     var_Change( pIntf, "intf-skins-interactive", VLC_VAR_SETTEXT, &text, NULL );
 
     // Set the callback
