@@ -1,9 +1,10 @@
---- fluidsynth-1.1.6/fluidsynth.pc.in.orig	2015-04-14 14:38:13.724365611 +0200
-+++ fluidsynth-1.1.6/fluidsynth.pc.in	2015-04-14 14:38:12.737681738 +0200
+diff -ru fluidsynth.orig/fluidsynth.pc.in fluidsynth/fluidsynth.pc.in
+--- fluidsynth.orig/fluidsynth.pc.in	2011-08-03 10:45:08.000000000 +0300
++++ fluidsynth/fluidsynth.pc.in	2011-08-03 10:45:51.000000000 +0300
 @@ -6,5 +6,5 @@
  Name: FluidSynth
  Description: Software SoundFont synth
  Version: @VERSION@
--Libs: -L${libdir} -lfluidsynth -ldsound -lwinmm
-+Libs: -L${libdir} -lfluidsynth -ldsound -lwinmm -lgthread-2.0 -lglib-2.0 -lm
+-Libs: -L${libdir} -lfluidsynth
++Libs: -L${libdir} -lfluidsynth -lgthread-2.0 -lglib-2.0 -lm
  Cflags: -I${includedir}
