@@ -55,8 +55,15 @@ struct aout_sys_t {
     size_t i_floatarray_size; /* size of the FloatArray */
     jobject p_bytebuffer; /* ByteBuffer ref (for WriteV21) */
     audio_sample_format_t fmt; /* fmt setup by Start */
-    uint32_t i_pos_initial; /* initial position set by getPlaybackHeadPosition */
-    uint32_t i_samples_written; /* number of samples written since last flush */
+
+    /* Used by AudioTrack_GetPosition / AudioTrack_getPlaybackHeadPosition */
+    struct {
+        uint64_t i_initial;
+        uint32_t i_wrap_count;
+        uint32_t i_last;
+    } headpos;
+
+    uint64_t i_samples_written; /* number of samples written since last flush */
     uint32_t i_bytes_per_frame; /* byte per frame */
     uint32_t i_max_audiotrack_samples;
     mtime_t i_play_time; /* time when play was called */
@@ -361,13 +368,13 @@ check_exception( JNIEnv *env, audio_output_t *p_aout,
 #define JNI_AUDIOTIMESTAMP_GET_LONG( field ) JNI_CALL( GetLongField, p_sys->p_audioTimestamp, jfields.AudioTimestamp.field )
 
 static inline mtime_t
-frames_to_us( aout_sys_t *p_sys, uint32_t i_nb_frames )
+frames_to_us( aout_sys_t *p_sys, uint64_t i_nb_frames )
 {
     return  i_nb_frames * CLOCK_FREQ / p_sys->fmt.i_rate;
 }
 #define FRAMES_TO_US(x) frames_to_us( p_sys, (x) )
 
-static inline uint32_t
+static inline uint64_t
 bytes_to_frames( aout_sys_t *p_sys, size_t i_bytes )
 {
     if( p_sys->b_spdif )
@@ -378,7 +385,7 @@ bytes_to_frames( aout_sys_t *p_sys, size_t i_bytes )
 #define BYTES_TO_FRAMES(x) bytes_to_frames( p_sys, (x) )
 
 static inline size_t
-frames_to_bytes( aout_sys_t *p_sys, uint32_t i_frames )
+frames_to_bytes( aout_sys_t *p_sys, uint64_t i_frames )
 {
     if( p_sys->b_spdif )
         return i_frames * p_sys->i_bytes_per_frame / A52_FRAME_NB;
@@ -387,35 +394,15 @@ frames_to_bytes( aout_sys_t *p_sys, uint32_t i_frames )
 }
 #define FRAMES_TO_BYTES(x) frames_to_bytes( p_sys, (x) )
 
-static void
-AudioTrack_InitDelay( JNIEnv *env, audio_output_t *p_aout )
+/**
+ * Get the AudioTrack position
+ *
+ * The doc says that the position is reset to zero after flush but it's not
+ * true for all devices or Android versions. Use AudioTrack_GetPosition instead.
+ */
+static uint64_t
+AudioTrack_getPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
 {
-    aout_sys_t *p_sys = p_aout->sys;
-
-    if( p_sys->p_audiotrack )
-        p_sys->i_pos_initial = JNI_AT_CALL_INT( getPlaybackHeadPosition );
-    else
-        p_sys->i_pos_initial = 0;
-
-    /* HACK: On some broken devices, head position is still moving after a
-     * flush or a stop. So, wait for the head position to be stabilized. */
-    if( unlikely( p_sys->i_pos_initial != 0 ) )
-    {
-        uint32_t i_last_pos;
-        do {
-            i_last_pos = p_sys->i_pos_initial;
-            msleep( 50000 );
-            p_sys->i_pos_initial = JNI_AT_CALL_INT( getPlaybackHeadPosition );
-        } while( p_sys->i_pos_initial != i_last_pos );
-    }
-    p_sys->i_samples_written = 0;
-}
-
-static uint32_t
-AudioTrack_GetPos( JNIEnv *env, audio_output_t *p_aout )
-{
-    aout_sys_t *p_sys = p_aout->sys;
-
     /* Android doc:
      * getPlaybackHeadPosition: Returns the playback head position expressed in
      * frames. Though the "int" type is signed 32-bits, the value should be
@@ -426,7 +413,55 @@ AudioTrack_GetPos( JNIEnv *env, audio_output_t *p_aout )
      * zero by flush(), reload(), and stop().
      */
 
-    return JNI_AT_CALL_INT( getPlaybackHeadPosition ) - p_sys->i_pos_initial;
+    aout_sys_t *p_sys = p_aout->sys;
+    uint32_t i_pos;
+
+    /* int32_t to uint32_t */
+    i_pos = 0xFFFFFFFFL & JNI_AT_CALL_INT( getPlaybackHeadPosition );
+
+    /* uint32_t to uint64_t */
+    if( p_sys->headpos.i_last > i_pos )
+        p_sys->headpos.i_wrap_count++;
+    p_sys->headpos.i_last = i_pos;
+    return p_sys->headpos.i_last + ((uint64_t)p_sys->headpos.i_wrap_count << 32);
+}
+
+/**
+ * Get the AudioTrack position since the last flush or stop
+ */
+static uint64_t
+AudioTrack_GetPosition( JNIEnv *env, audio_output_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    return AudioTrack_getPlaybackHeadPosition( env, p_aout )
+        - p_sys->headpos.i_initial;
+}
+
+static void
+AudioTrack_InitDelay( JNIEnv *env, audio_output_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    if( p_sys->p_audiotrack )
+        p_sys->headpos.i_initial = AudioTrack_getPlaybackHeadPosition( env, p_aout );
+    else
+        p_sys->headpos.i_initial = 0;
+
+    /* HACK: On some broken devices, head position is still moving after a
+     * flush or a stop. So, wait for the head position to be stabilized. */
+    if( unlikely( p_sys->headpos.i_initial != 0 ) )
+    {
+        uint64_t i_last_pos;
+        do {
+            i_last_pos = p_sys->headpos.i_initial;
+            msleep( 50000 );
+            p_sys->headpos.i_initial = JNI_AT_CALL_INT( getPlaybackHeadPosition );
+        } while( p_sys->headpos.i_initial != i_last_pos );
+    }
+    p_sys->i_samples_written = 0;
+    p_sys->headpos.i_last = 0;
+    p_sys->headpos.i_wrap_count = 0;
 }
 
 static int
@@ -434,7 +469,7 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
 {
     aout_sys_t *p_sys = p_aout->sys;
     jlong i_frame_pos;
-    uint32_t i_audiotrack_delay = 0;
+    uint64_t i_audiotrack_delay = 0;
     JNIEnv *env;
 
     if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
@@ -476,14 +511,15 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
                                       / CLOCK_FREQ;
                 i_frame_pos = JNI_AUDIOTIMESTAMP_GET_LONG( framePosition )
                               + i_frames_diff;
-                if( p_sys->i_samples_written > i_frame_pos )
+                if( i_frame_pos > 0
+                 && p_sys->i_samples_written > (uint64_t) i_frame_pos )
                     i_audiotrack_delay =  p_sys->i_samples_written - i_frame_pos;
             }
         }
     }
     if( i_audiotrack_delay == 0 )
     {
-        uint32_t i_audiotrack_pos = AudioTrack_GetPos( env, p_aout );
+        uint64_t i_audiotrack_pos = AudioTrack_GetPosition( env, p_aout );
 
         if( p_sys->i_samples_written > i_audiotrack_pos )
             i_audiotrack_delay = p_sys->i_samples_written - i_audiotrack_pos;
@@ -874,12 +910,12 @@ AudioTrack_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
 {
     aout_sys_t *p_sys = p_aout->sys;
     size_t i_data;
-    uint32_t i_samples;
-    uint32_t i_audiotrack_pos;
-    uint32_t i_samples_pending;
+    uint64_t i_samples;
+    uint64_t i_audiotrack_pos;
+    uint64_t i_samples_pending;
 
     i_data = p_buffer->i_buffer - i_buffer_offset;
-    i_audiotrack_pos = AudioTrack_GetPos( env, p_aout );
+    i_audiotrack_pos = AudioTrack_GetPosition( env, p_aout );
     if( i_audiotrack_pos > p_sys->i_samples_written )
     {
         msg_Warn( p_aout, "audiotrack position is ahead. Should NOT happen" );
@@ -1103,7 +1139,7 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
         *p_wait = FRAMES_TO_US( p_sys->i_max_audiotrack_samples / 20 );
     } else
     {
-        uint32_t i_samples = BYTES_TO_FRAMES( i_ret );
+        uint64_t i_samples = BYTES_TO_FRAMES( i_ret );
 
         p_sys->i_samples_written += i_samples;
 
