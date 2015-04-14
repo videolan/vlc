@@ -58,7 +58,7 @@ static void Close(vlc_object_t *);
   "this VLC instance will act as the master clock for synchronization " \
   "for clients listening")
 
-#define MIP_TEXT N_("Master server ip address")
+#define MIP_TEXT N_("Master server IP address")
 #define MIP_LONGTEXT N_("The IP address of " \
   "the network master clock to use for clock synchronization.")
 
