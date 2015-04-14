@@ -37,6 +37,9 @@
 #define MIN_AUDIOTRACK_BUFFER_US INT64_C(250000)  // 250ms
 #define MAX_AUDIOTRACK_BUFFER_US INT64_C(1000000) // 1000ms
 
+#define SMOOTHPOS_SAMPLE_COUNT 10
+#define SMOOTHPOS_INTERVAL_US INT64_C(30000) // 30ms
+
 #define AUDIOTIMESTAMP_INTERVAL_US INT64_C(500000) // 500ms
 
 static int  Open( vlc_object_t * );
@@ -72,6 +75,15 @@ struct aout_sys_t {
         mtime_t i_play_time; /* time when play was called */
         mtime_t i_last_time;
     } timestamp;
+
+    /* Used by AudioTrack_GetSmoothPositionUs */
+    struct {
+        uint32_t i_idx;
+        uint32_t i_count;
+        mtime_t p_us[SMOOTHPOS_SAMPLE_COUNT];
+        mtime_t i_us;
+        mtime_t i_last_time;
+    } smoothpos;
 
     uint64_t i_samples_written; /* number of samples written since last flush */
     uint32_t i_bytes_per_frame; /* byte per frame */
@@ -478,7 +490,7 @@ AudioTrack_ResetPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
 }
 
 /**
- * Reset AudioTrack Position
+ * Reset AudioTrack SmoothPosition and TimestampPosition
  */
 static void
 AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
@@ -490,6 +502,50 @@ AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
     p_sys->timestamp.i_last_time = 0;
     p_sys->timestamp.i_frame_us = 0;
     p_sys->timestamp.i_frame_pos = 0;
+
+    p_sys->smoothpos.i_count = 0;
+    p_sys->smoothpos.i_idx = 0;
+    p_sys->smoothpos.i_last_time = 0;
+    p_sys->smoothpos.i_us = 0;
+}
+
+/**
+ * Get a smooth AudioTrack position
+ *
+ * This function smooth out the AudioTrack position since it has a very bad
+ * precision (+/- 20ms on old devices).
+ */
+static mtime_t
+AudioTrack_GetSmoothPositionUs( JNIEnv *env, audio_output_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    uint64_t i_audiotrack_us;
+    mtime_t i_now = mdate();
+
+    /* Fetch an AudioTrack position every SMOOTHPOS_INTERVAL_US (30ms) */
+    if( i_now - p_sys->smoothpos.i_last_time >= SMOOTHPOS_INTERVAL_US )
+    {
+        i_audiotrack_us = FRAMES_TO_US( AudioTrack_GetPosition( env, p_aout ) );
+
+        p_sys->smoothpos.i_last_time = i_now;
+
+        /* Base the position off the current time */
+        p_sys->smoothpos.p_us[p_sys->smoothpos.i_idx] = i_audiotrack_us - i_now;
+        p_sys->smoothpos.i_idx = (p_sys->smoothpos.i_idx + 1)
+                                 % SMOOTHPOS_SAMPLE_COUNT;
+        if( p_sys->smoothpos.i_count < SMOOTHPOS_SAMPLE_COUNT )
+            p_sys->smoothpos.i_count++;
+
+        /* Calculate the average position based off the current time */
+        p_sys->smoothpos.i_us = 0;
+        for( uint32_t i = 0; i < p_sys->smoothpos.i_count; ++i )
+            p_sys->smoothpos.i_us += p_sys->smoothpos.p_us[i];
+        p_sys->smoothpos.i_us /= p_sys->smoothpos.i_count;
+    }
+    if( p_sys->smoothpos.i_us != 0 )
+        return p_sys->smoothpos.i_us + i_now;
+    else
+        return 0;
 }
 
 static mtime_t
@@ -566,13 +622,8 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
 
     i_audiotrack_us = AudioTrack_GetTimestampPositionUs( env, p_aout );
 
-    if( i_audiotrack_us == 0 )
-    {
-        uint64_t i_audiotrack_pos = AudioTrack_GetPosition( env, p_aout );
-
-        if( p_sys->i_samples_written > i_audiotrack_pos )
-            i_audiotrack_us = FRAMES_TO_US( i_audiotrack_pos );
-    }
+    if( i_audiotrack_us <= 0 )
+        i_audiotrack_us = AudioTrack_GetSmoothPositionUs(env, p_aout );
 
     if( i_audiotrack_us > 0 )
     {
