@@ -1004,7 +1004,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
             ftp_RecvCommand( p_access, p_sys, NULL, &psz_arg ) > 2 )
         {
             msg_Err( p_access, "cannot list directory contents" );
-        return VLC_EGENERIC;
+            return VLC_EGENERIC;
         }
     }
     else
