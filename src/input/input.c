@@ -609,7 +609,7 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t i_
 static int MainLoopTryRepeat( input_thread_t *p_input, mtime_t *pi_start_mdate )
 {
     int i_repeat = var_GetInteger( p_input, "input-repeat" );
-    if( i_repeat == 0 )
+    if( i_repeat <= 0 )
         return VLC_EGENERIC;
 
     vlc_value_t val;

@@ -1686,6 +1686,7 @@ vlc_module_begin ()
     set_section( N_( "Playback control" ) , NULL)
     add_integer( "input-repeat", 0,
                  INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, false )
+        change_integer_range( 0, 65535 )
         change_safe ()
     add_float( "start-time", 0,
                START_TIME_TEXT, START_TIME_LONGTEXT, true )
