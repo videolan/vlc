@@ -135,7 +135,7 @@ struct demux_sys_t
     DeckLinkCaptureDelegate *delegate;
 
     /* We need to hold onto the IDeckLinkConfiguration object, or our settings will not apply.
-       See section 2.4.15 of the Blackmagic Decklink SDK documentation. */
+       See section 2.4.15 of the Blackmagic DeckLink SDK documentation. */
     IDeckLinkConfiguration *config;
     IDeckLinkAttributes *attributes;
 
