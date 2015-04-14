@@ -786,7 +786,7 @@ static const char *const ppsz_prefres[] = {
 
 #define TIMEOUT_TEXT N_("TCP connection timeout")
 #define TIMEOUT_LONGTEXT N_( \
-    "Default TCP connection timeout (in milliseconds). " )
+    "Default TCP connection timeout (in milliseconds)." )
 
 #define HTTP_HOST_TEXT N_( "HTTP server address" )
 #define HOST_LONGTEXT N_( \

@@ -1126,7 +1126,7 @@ static int DrawStatus(intf_thread_t *intf)
             }
         }
     } else {
-        mvnprintw(y++, 0, COLS, _(" Source: <no current item> "));
+        mvnprintw(y++, 0, COLS, _(" Source: <no current item>"));
         mvnprintw(y++, 0, COLS, " %s%s%s", repeat, random, loop);
         mvnprintw(y++, 0, COLS, _(" [ h for help ]"));
         DrawEmptyLine(y++, 0, COLS);
