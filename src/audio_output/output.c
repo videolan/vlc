@@ -238,7 +238,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     text.psz_string = _("Spectrum");
     var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
     val.psz_string = (char *)"vuMeter";
-    text.psz_string = _("Vu meter");
+    text.psz_string = _("VU meter");
     var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
     /* Look for goom plugin */
     if (module_exists ("goom"))
