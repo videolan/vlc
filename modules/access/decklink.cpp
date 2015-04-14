@@ -81,7 +81,7 @@ static const char *const ppsz_videoconns[] = {
     "sdi", "hdmi", "opticalsdi", "component", "composite", "svideo"
 };
 static const char *const ppsz_videoconns_text[] = {
-    N_("SDI"), N_("HDMI"), N_("Optical SDI"), N_("Component"), N_("Composite"), N_("S-video")
+    N_("SDI"), N_("HDMI"), N_("Optical SDI"), N_("Component"), N_("Composite"), N_("S-Video")
 };
 
 static const char *const ppsz_audioconns[] = {
