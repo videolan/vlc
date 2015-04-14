@@ -59,7 +59,7 @@ static void VlcPictureToIplImage( filter_t* p_filter, picture_t* p_in );
 
 static const char *const chroma_list[] = { "input", "I420", "RGB32"};
 static const char *const chroma_list_text[] = { N_("Use input chroma unaltered"),
-  N_("I420 - first plane is greyscale"), N_("RGB32")};
+  N_("I420 - first plane is grayscale"), N_("RGB32")};
 
 static const char *const output_list[] = { "none", "input", "processed"};
 static const char *const output_list_text[] = { N_("Don't display any video"),
