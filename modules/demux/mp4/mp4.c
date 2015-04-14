@@ -1541,7 +1541,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     }
 
                     if ( asprintf( &psz_filename, "%s/covr/data[%"PRIu64"]", psz_roots[i_index - 1],
-                                   i_box_count - 1 ) >= 0 )
+                                   (uint64_t) i_box_count - 1 ) >= 0 )
                     {
                         (*ppp_attach)[i_count++] =
                             vlc_input_attachment_New( psz_filename, psz_mime, "Cover picture",
