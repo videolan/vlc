@@ -593,7 +593,7 @@ static void* update_DownloadReal( void *obj )
         p_update->release.psz_url, "0.0", psz_size, 0.0 ) == -1 )
         goto end;
 
-    p_progress = dialog_ProgressCreate( p_udt, _( "Downloading ..."),
+    p_progress = dialog_ProgressCreate( p_udt, _( "Downloading..."),
                                         psz_status, _("Cancel") );
 
     free( psz_status );
