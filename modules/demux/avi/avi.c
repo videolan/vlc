@@ -451,6 +451,14 @@ static int Open( vlc_object_t * p_this )
                     tk->i_samplesize = 0; /* ADTS/AAC VBR */
                 }
 
+                /* Fix broken scale/rate */
+                if ( tk->i_codec == VLC_CODEC_ADPCM_IMA_WAV &&
+                     tk->i_samplesize && tk->i_samplesize > tk->i_rate )
+                {
+                    tk->i_scale = 1017;
+                    tk->i_rate = p_auds->p_wf->nSamplesPerSec;
+                }
+
                 es_format_Init( &fmt, AUDIO_ES, tk->i_codec );
 
                 fmt.audio.i_channels        = p_auds->p_wf->nChannels;
