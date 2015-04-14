@@ -107,7 +107,7 @@ typedef enum buttonType_e
 static const char* const nameL[BUTTON_MAX] = { N_("Play"), N_("Stop"), N_("Open"),
     N_("Previous / Backward"), N_("Next / Forward"), N_("Slower"), N_("Faster"), N_("Fullscreen"),
     N_("De-Fullscreen"), N_("Extended panel"), N_("Playlist"), N_("Snapshot"),
-    N_("Record"), N_("A->B Loop"), N_("Frame By Frame"), N_("Trickplay Reverse"),
+    N_("Record"), N_("A→B Loop"), N_("Frame By Frame"), N_("Trickplay Reverse"),
     N_("Step backward" ), N_("Step forward"), N_("Quit"), N_("Random"),
     N_("Loop / Repeat"), N_("Information"), N_("Previous"), N_("Next"),
     N_("Open subtitles"), N_("Dock fullscreen controller")
