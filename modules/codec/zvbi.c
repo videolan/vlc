@@ -59,7 +59,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 #define PAGE_TEXT N_("Teletext page")
-#define PAGE_LONGTEXT N_("Open the indicated Teletext page." \
+#define PAGE_LONGTEXT N_("Open the indicated Teletext page. " \
         "Default page is index 100")
 
 #define OPAQUE_TEXT N_("Teletext transparency")

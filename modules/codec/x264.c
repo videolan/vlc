@@ -114,7 +114,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 
 #define B_ADAPT_TEXT N_("Adaptive B-frame decision")
 #define B_ADAPT_LONGTEXT N_( "Force the specified number of " \
-    "consecutive B-frames to be used, except possibly before an I-frame." \
+    "consecutive B-frames to be used, except possibly before an I-frame. " \
     "Range 0 to 2." )
 
 #define B_BIAS_TEXT N_("Influence (bias) B-frames usage")
@@ -418,7 +418,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define TUNE_TEXT N_("Default tune setting used" )
 #define PRESET_TEXT N_("Default preset setting used" )
 
-#define X264_OPTIONS_TEXT N_("x264 advanced options.")
+#define X264_OPTIONS_TEXT N_("x264 advanced options")
 #define X264_OPTIONS_LONGTEXT N_("x264 advanced options, in the form {opt=val,op2=val2} .")
 
 static const char *const enc_me_list[] =

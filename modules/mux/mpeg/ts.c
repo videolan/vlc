@@ -112,7 +112,7 @@ static void    Close  ( vlc_object_t * );
                            "requires \"Set PID to ID of ES\" to be enabled." )
 
 #define SDTDESC_TEXT N_("SDT Descriptors (requires --sout-ts-es-id-pid)")
-#define SDTDESC_LONGTEXT N_("Defines the descriptors of each SDT. This" \
+#define SDTDESC_LONGTEXT N_("Defines the descriptors of each SDT. This " \
                         "requires \"Set PID to ID of ES\" to be enabled." )
 
 #define PID_TEXT N_("Set PID to ID of ES")

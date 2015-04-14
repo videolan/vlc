@@ -192,7 +192,7 @@ static const char *const ppsz_standards_list_text[] =
 
 #define AMTUNER_MODE_TEXT N_("AM Tuner mode")
 #define AMTUNER_MODE_LONGTEXT N_( \
-    "AM Tuner mode. Can be one of Default (0), TV (1)," \
+    "AM Tuner mode. Can be one of Default (0), TV (1), " \
      "AM Radio (2), FM Radio (3) or DSS (4).")
 
 #define AUDIO_CHANNELS_TEXT N_("Number of audio channels")
