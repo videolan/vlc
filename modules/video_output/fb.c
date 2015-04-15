@@ -68,10 +68,7 @@
     "the values 0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)")
 
 #define HW_ACCEL_TEXT N_("Framebuffer uses hw acceleration")
-#define HW_ACCEL_LONGTEXT N_(\
-    "If your framebuffer supports hardware acceleration or does double buffering " \
-    "in hardware then you must disable this option. It then does double buffering " \
-    "in software.")
+#define HW_ACCEL_LONGTEXT N_("Disable for double buffering in software.")
 
 #define CHROMA_TEXT N_("Image format (default RGB)")
 #define CHROMA_LONGTEXT N_("Chroma fourcc used by the framebuffer. Default is RGB since the fb device has no way to report its chroma.")
