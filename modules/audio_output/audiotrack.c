@@ -37,6 +37,8 @@
 #define MIN_AUDIOTRACK_BUFFER_US INT64_C(250000)  // 250ms
 #define MAX_AUDIOTRACK_BUFFER_US INT64_C(1000000) // 1000ms
 
+#define AUDIOTIMESTAMP_INTERVAL_US INT64_C(500000) // 500ms
+
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 static void Stop( audio_output_t * );
@@ -48,7 +50,6 @@ struct aout_sys_t {
     bool soft_mute;
 
     jobject p_audiotrack; /* AudioTrack ref */
-    jobject p_audioTimestamp; /* AudioTimestamp ref */
     jbyteArray p_bytearray; /* ByteArray ref (for Write) */
     size_t i_bytearray_size; /* size of the ByteArray */
     jfloatArray p_floatarray; /* FloatArray ref (for WriteFloat) */
@@ -63,10 +64,18 @@ struct aout_sys_t {
         uint32_t i_last;
     } headpos;
 
+    /* Used by AudioTrack_GetTimestampPositionUs */
+    struct {
+        jobject p_obj; /* AudioTimestamp ref */
+        jlong i_frame_us;
+        jlong i_frame_pos;
+        mtime_t i_play_time; /* time when play was called */
+        mtime_t i_last_time;
+    } timestamp;
+
     uint64_t i_samples_written; /* number of samples written since last flush */
     uint32_t i_bytes_per_frame; /* byte per frame */
     uint32_t i_max_audiotrack_samples;
-    mtime_t i_play_time; /* time when play was called */
     bool b_audiotrack_exception; /* true if audiotrack throwed an exception */
     bool b_error; /* generic error */
     bool b_spdif;
@@ -365,7 +374,7 @@ check_exception( JNIEnv *env, audio_output_t *p_aout,
 #define JNI_AT_CALL_VOID( method, ... ) JNI_CALL_VOID( p_sys->p_audiotrack, jfields.AudioTrack.method, ##__VA_ARGS__ )
 #define JNI_AT_CALL_STATIC_INT( method, ... ) JNI_CALL( CallStaticIntMethod, jfields.AudioTrack.clazz, jfields.AudioTrack.method, ##__VA_ARGS__ )
 
-#define JNI_AUDIOTIMESTAMP_GET_LONG( field ) JNI_CALL( GetLongField, p_sys->p_audioTimestamp, jfields.AudioTimestamp.field )
+#define JNI_AUDIOTIMESTAMP_GET_LONG( field ) JNI_CALL( GetLongField, p_sys->timestamp.p_obj, jfields.AudioTimestamp.field )
 
 static inline mtime_t
 frames_to_us( aout_sys_t *p_sys, uint64_t i_nb_frames )
@@ -468,12 +477,85 @@ AudioTrack_ResetPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
     p_sys->headpos.i_wrap_count = 0;
 }
 
+/**
+ * Reset AudioTrack Position
+ */
+static void
+AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    VLC_UNUSED( env );
+
+    p_sys->timestamp.i_play_time = mdate();
+    p_sys->timestamp.i_last_time = 0;
+    p_sys->timestamp.i_frame_us = 0;
+    p_sys->timestamp.i_frame_pos = 0;
+}
+
+static mtime_t
+AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    mtime_t i_now;
+
+    if( !p_sys->timestamp.p_obj )
+        return 0;
+
+    i_now = mdate();
+
+    /* Android doc:
+     * getTimestamp: Poll for a timestamp on demand.
+     *
+     * If you need to track timestamps during initial warmup or after a
+     * routing or mode change, you should request a new timestamp once per
+     * second until the reported timestamps show that the audio clock is
+     * stable. Thereafter, query for a new timestamp approximately once
+     * every 10 seconds to once per minute. Calling this method more often
+     * is inefficient. It is also counter-productive to call this method
+     * more often than recommended, because the short-term differences
+     * between successive timestamp reports are not meaningful. If you need
+     * a high-resolution mapping between frame position and presentation
+     * time, consider implementing that at application level, based on
+     * low-resolution timestamps.
+     */
+
+    /* Fetch an AudioTrack timestamp every AUDIOTIMESTAMP_INTERVAL_US (500ms) */
+    if( i_now - p_sys->timestamp.i_last_time >= AUDIOTIMESTAMP_INTERVAL_US )
+    {
+        p_sys->timestamp.i_last_time = i_now;
+
+        if( JNI_AT_CALL_BOOL( getTimestamp, p_sys->timestamp.p_obj ) )
+        {
+            p_sys->timestamp.i_frame_us = JNI_AUDIOTIMESTAMP_GET_LONG( nanoTime ) / 1000;
+            p_sys->timestamp.i_frame_pos = JNI_AUDIOTIMESTAMP_GET_LONG( framePosition );
+        }
+        else
+        {
+            p_sys->timestamp.i_frame_us = 0;
+            p_sys->timestamp.i_frame_pos = 0;
+        }
+    }
+
+    /* frame time should be after last play time
+     * frame time shouldn't be in the future
+     * frame time should be less than 10 seconds old */
+    if( p_sys->timestamp.i_frame_us != 0 && p_sys->timestamp.i_frame_pos != 0
+     && p_sys->timestamp.i_frame_us > p_sys->timestamp.i_play_time
+     && i_now > p_sys->timestamp.i_frame_us
+     && ( i_now - p_sys->timestamp.i_frame_us ) <= INT64_C(10000000) )
+    {
+        jlong i_time_diff = i_now - p_sys->timestamp.i_frame_us;
+        jlong i_frames_diff = i_time_diff * p_sys->fmt.i_rate / CLOCK_FREQ;
+        return FRAMES_TO_US( p_sys->timestamp.i_frame_pos + i_frames_diff );
+    } else
+        return 0;
+}
+
 static int
 TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    jlong i_frame_pos;
-    uint64_t i_audiotrack_delay = 0;
+    mtime_t i_audiotrack_us;
     JNIEnv *env;
 
     if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
@@ -481,60 +563,30 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
 
     if( p_sys->b_spdif )
         return -1;
-    if( p_sys->p_audioTimestamp )
-    {
-        mtime_t i_current_time = mdate();
-        /* Android doc:
-         * getTimestamp: Poll for a timestamp on demand.
-         *
-         * If you need to track timestamps during initial warmup or after a
-         * routing or mode change, you should request a new timestamp once per
-         * second until the reported timestamps show that the audio clock is
-         * stable. Thereafter, query for a new timestamp approximately once
-         * every 10 seconds to once per minute. Calling this method more often
-         * is inefficient. It is also counter-productive to call this method
-         * more often than recommended, because the short-term differences
-         * between successive timestamp reports are not meaningful. If you need
-         * a high-resolution mapping between frame position and presentation
-         * time, consider implementing that at application level, based on
-         * low-resolution timestamps.
-         */
 
-        if( JNI_AT_CALL_BOOL( getTimestamp, p_sys->p_audioTimestamp ) )
-        {
-            jlong i_frame_time = JNI_AUDIOTIMESTAMP_GET_LONG( nanoTime ) / 1000;
-            /* frame time should be after last play time
-             * frame time shouldn't be in the future
-             * frame time should be less than 10 seconds old */
-            if( i_frame_time > p_sys->i_play_time
-                && i_current_time > i_frame_time
-                && ( i_current_time - i_frame_time ) <= INT64_C(10000000) )
-            {
-                jlong i_time_diff = i_current_time - i_frame_time;
-                jlong i_frames_diff = i_time_diff *  p_sys->fmt.i_rate
-                                      / CLOCK_FREQ;
-                i_frame_pos = JNI_AUDIOTIMESTAMP_GET_LONG( framePosition )
-                              + i_frames_diff;
-                if( i_frame_pos > 0
-                 && p_sys->i_samples_written > (uint64_t) i_frame_pos )
-                    i_audiotrack_delay =  p_sys->i_samples_written - i_frame_pos;
-            }
-        }
-    }
-    if( i_audiotrack_delay == 0 )
+    i_audiotrack_us = AudioTrack_GetTimestampPositionUs( env, p_aout );
+
+    if( i_audiotrack_us == 0 )
     {
         uint64_t i_audiotrack_pos = AudioTrack_GetPosition( env, p_aout );
 
         if( p_sys->i_samples_written > i_audiotrack_pos )
-            i_audiotrack_delay = p_sys->i_samples_written - i_audiotrack_pos;
+            i_audiotrack_us = FRAMES_TO_US( i_audiotrack_pos );
     }
 
-    if( i_audiotrack_delay > 0 )
+    if( i_audiotrack_us > 0 )
     {
-        *p_delay = FRAMES_TO_US( i_audiotrack_delay );
-        return 0;
-    } else
-        return -1;
+        mtime_t i_delay = FRAMES_TO_US( p_sys->i_samples_written )
+                          - i_audiotrack_us;
+        if( i_delay >= 0 )
+        {
+            *p_delay = i_delay;
+            return 0;
+        }
+        else
+            msg_Warn( p_aout, "Negative delay, Should not happen !" );
+    }
+    return -1;
 }
 
 static void
@@ -828,15 +880,14 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     if( jfields.AudioTimestamp.clazz )
     {
         /* create AudioTimestamp object */
-        jobject p_audioTimestamp = JNI_CALL( NewObject,
-                                             jfields.AudioTimestamp.clazz,
-                                             jfields.AudioTimestamp.ctor );
-        if( p_audioTimestamp )
+        jobject p_obj = JNI_CALL( NewObject, jfields.AudioTimestamp.clazz,
+                                 jfields.AudioTimestamp.ctor );
+        if( p_obj )
         {
-            p_sys->p_audioTimestamp = (*env)->NewGlobalRef( env, p_audioTimestamp );
-            (*env)->DeleteLocalRef( env, p_audioTimestamp );
+            p_sys->timestamp.p_obj = (*env)->NewGlobalRef( env, p_obj );
+            (*env)->DeleteLocalRef( env, p_obj );
         }
-        if( !p_sys->p_audioTimestamp )
+        if( !p_sys->timestamp.p_obj )
         {
             Stop( p_aout );
             return VLC_EGENERIC;
@@ -862,8 +913,8 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
-    p_sys->i_play_time = mdate();
 
+    AudioTrack_ResetPositions( env, p_aout );
     AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
     p_sys->i_samples_written = 0;
     *p_fmt = p_sys->fmt;
@@ -894,10 +945,10 @@ Stop( audio_output_t *p_aout )
         (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
         p_sys->p_audiotrack = NULL;
     }
-    if( p_sys->p_audioTimestamp )
+    if( p_sys->timestamp.p_obj )
     {
-        (*env)->DeleteGlobalRef( env, p_sys->p_audioTimestamp );
-        p_sys->p_audioTimestamp = NULL;
+        (*env)->DeleteGlobalRef( env, p_sys->timestamp.p_obj );
+        p_sys->timestamp.p_obj = NULL;
     }
 
     p_sys->b_audiotrack_exception = false;
@@ -1216,7 +1267,7 @@ Pause( audio_output_t *p_aout, bool b_pause, mtime_t i_date )
     {
         JNI_AT_CALL_VOID( play );
         CHECK_AT_EXCEPTION( "play" );
-        p_sys->i_play_time = mdate();
+        AudioTrack_ResetPositions( env, p_aout );
     }
 }
 
@@ -1254,7 +1305,6 @@ Flush( audio_output_t *p_aout, bool b_wait )
     }
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
-    p_sys->i_play_time = mdate();
 
     if( p_sys->p_bytebuffer )
     {
@@ -1262,6 +1312,7 @@ Flush( audio_output_t *p_aout, bool b_wait )
         p_sys->p_bytebuffer = NULL;
     }
 
+    AudioTrack_ResetPositions( env, p_aout );
     AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
     p_sys->i_samples_written = 0;
 }
