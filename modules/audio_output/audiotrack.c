@@ -106,8 +106,7 @@ struct aout_sys_t {
 
 // Don't use Float for now since 5.1/7.1 Float is down sampled to Stereo Float
 //#define AUDIOTRACK_USE_FLOAT
-// TODO: activate getTimestamp for new android versions
-//#define AUDIOTRACK_USE_TIMESTAMP
+//#define AUDIOTRACK_HW_LATENCY
 
 #define AUDIO_CHAN_TEXT N_("Audio output channels")
 #define AUDIO_CHAN_LONGTEXT N_("Channels available for audio output. " \
@@ -271,8 +270,10 @@ InitJNIFields( audio_output_t *p_aout )
     } else
         GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
 
+#ifdef AUDIOTRACK_HW_LATENCY
     GET_ID( GetMethodID, AudioTrack.getTimestamp,
             "getTimestamp", "(Landroid/media/AudioTimestamp;)Z", false );
+#endif
     GET_ID( GetMethodID, AudioTrack.getPlaybackHeadPosition,
             "getPlaybackHeadPosition", "()I", true );
 
@@ -302,6 +303,7 @@ InitJNIFields( audio_output_t *p_aout )
                 "nanoTime", "J", true );
     }
 
+#ifdef AUDIOTRACK_HW_LATENCY
     /* AudioSystem class init */
     GET_CLASS( "android/media/AudioSystem", false );
     if( clazz )
@@ -310,6 +312,7 @@ InitJNIFields( audio_output_t *p_aout )
         GET_ID( GetStaticMethodID, AudioSystem.getOutputLatency,
                 "getOutputLatency", "(I)I", false );
     }
+#endif
 
     /* AudioFormat class init */
     GET_CLASS( "android/media/AudioFormat", true );
@@ -973,7 +976,6 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     }
     p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( i_audiotrack_size );
 
-#ifdef AUDIOTRACK_USE_TIMESTAMP
     if( jfields.AudioTimestamp.clazz )
     {
         /* create AudioTimestamp object */
@@ -990,7 +992,6 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             return VLC_EGENERIC;
         }
     }
-#endif
 
     if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
     {
