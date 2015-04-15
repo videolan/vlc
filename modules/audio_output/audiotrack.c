@@ -83,6 +83,7 @@ struct aout_sys_t {
         mtime_t p_us[SMOOTHPOS_SAMPLE_COUNT];
         mtime_t i_us;
         mtime_t i_last_time;
+        mtime_t i_latency_us;
     } smoothpos;
 
     uint64_t i_samples_written; /* number of samples written since last flush */
@@ -181,6 +182,10 @@ static struct
         bool has_ERROR_DEAD_OBJECT;
         jint STREAM_MUSIC;
     } AudioManager;
+    struct {
+        jclass clazz;
+        jmethodID getOutputLatency;
+    } AudioSystem;
     struct {
         jclass clazz;
         jmethodID ctor;
@@ -295,6 +300,15 @@ InitJNIFields( audio_output_t *p_aout )
                 "framePosition", "J", true );
         GET_ID( GetFieldID, AudioTimestamp.nanoTime,
                 "nanoTime", "J", true );
+    }
+
+    /* AudioSystem class init */
+    GET_CLASS( "android/media/AudioSystem", false );
+    if( clazz )
+    {
+        jfields.AudioSystem.clazz = (jclass) (*env)->NewGlobalRef( env, clazz );
+        GET_ID( GetStaticMethodID, AudioSystem.getOutputLatency,
+                "getOutputLatency", "(I)I", false );
     }
 
     /* AudioFormat class init */
@@ -507,6 +521,7 @@ AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
     p_sys->smoothpos.i_idx = 0;
     p_sys->smoothpos.i_last_time = 0;
     p_sys->smoothpos.i_us = 0;
+    p_sys->smoothpos.i_latency_us = 0;
 }
 
 /**
@@ -541,9 +556,20 @@ AudioTrack_GetSmoothPositionUs( JNIEnv *env, audio_output_t *p_aout )
         for( uint32_t i = 0; i < p_sys->smoothpos.i_count; ++i )
             p_sys->smoothpos.i_us += p_sys->smoothpos.p_us[i];
         p_sys->smoothpos.i_us /= p_sys->smoothpos.i_count;
+
+        if( jfields.AudioSystem.getOutputLatency )
+        {
+            int i_latency_ms = JNI_CALL( CallStaticIntMethod,
+                                         jfields.AudioSystem.clazz,
+                                         jfields.AudioSystem.getOutputLatency,
+                                         jfields.AudioManager.STREAM_MUSIC );
+
+            p_sys->smoothpos.i_latency_us = i_latency_ms > 0 ?
+                                            i_latency_ms * 1000L : 0;
+        }
     }
     if( p_sys->smoothpos.i_us != 0 )
-        return p_sys->smoothpos.i_us + i_now;
+        return p_sys->smoothpos.i_us + i_now - p_sys->smoothpos.i_latency_us;
     else
         return 0;
 }
