@@ -438,8 +438,13 @@ AudioTrack_GetPosition( JNIEnv *env, audio_output_t *p_aout )
         - p_sys->headpos.i_initial;
 }
 
+/**
+ * Reset AudioTrack position
+ *
+ * Called after flush, or start
+ */
 static void
-AudioTrack_InitDelay( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_ResetPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -459,7 +464,6 @@ AudioTrack_InitDelay( JNIEnv *env, audio_output_t *p_aout )
             p_sys->headpos.i_initial = JNI_AT_CALL_INT( getPlaybackHeadPosition );
         } while( p_sys->headpos.i_initial != i_last_pos );
     }
-    p_sys->i_samples_written = 0;
     p_sys->headpos.i_last = 0;
     p_sys->headpos.i_wrap_count = 0;
 }
@@ -860,7 +864,8 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     CHECK_AT_EXCEPTION( "play" );
     p_sys->i_play_time = mdate();
 
-    AudioTrack_InitDelay( env, p_aout );
+    AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
+    p_sys->i_samples_written = 0;
     *p_fmt = p_sys->fmt;
     aout_SoftVolumeStart( p_aout );
 
@@ -919,7 +924,8 @@ AudioTrack_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
     if( i_audiotrack_pos > p_sys->i_samples_written )
     {
         msg_Warn( p_aout, "audiotrack position is ahead. Should NOT happen" );
-        AudioTrack_InitDelay( env, p_aout );
+        AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
+        p_sys->i_samples_written = 0;
         return 0;
     }
     i_samples_pending = p_sys->i_samples_written - i_audiotrack_pos;
@@ -1255,7 +1261,9 @@ Flush( audio_output_t *p_aout, bool b_wait )
         (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
         p_sys->p_bytebuffer = NULL;
     }
-    AudioTrack_InitDelay( env, p_aout );
+
+    AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
+    p_sys->i_samples_written = 0;
 }
 
 static int
