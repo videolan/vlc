@@ -651,6 +651,26 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
     if( i_audiotrack_us <= 0 )
         i_audiotrack_us = AudioTrack_GetSmoothPositionUs(env, p_aout );
 
+/* Debug log for both delays */
+#if 0
+{
+    mtime_t i_written_us = FRAMES_TO_US( p_sys->i_samples_written );
+    mtime_t i_ts_us = AudioTrack_GetTimestampPositionUs( env, p_aout );
+    mtime_t i_smooth_us = 0;
+
+    if( i_ts_us > 0 )
+        i_smooth_us = AudioTrack_GetSmoothPositionUs(env, p_aout );
+    else if ( p_sys->smoothpos.i_us != 0 )
+        i_smooth_us = p_sys->smoothpos.i_us + mdate()
+            - p_sys->smoothpos.i_latency_us;
+
+    msg_Err( p_aout, "TimeGet: TimeStamp: %lld, Smooth: %lld (latency: %lld)",
+                    i_ts_us ? i_written_us - i_ts_us : 0,
+                    i_smooth_us ? i_written_us - i_smooth_us : 0,
+                    p_sys->smoothpos.i_latency_us );
+}
+#endif
+
     if( i_audiotrack_us > 0 )
     {
         mtime_t i_delay = FRAMES_TO_US( p_sys->i_samples_written )
