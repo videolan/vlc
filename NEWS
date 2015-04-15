@@ -50,6 +50,7 @@ Demuxers:
  * Support for lame's replaygain extension in mpeg files
  * Fixes for DTS detection in WAV and MKV files
  * Basic support for MPEG4-SL in TS and T-DMB
+ * Support for Creative ADPCM/alaw/ulaw/S16L in VOC files
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
