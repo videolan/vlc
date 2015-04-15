@@ -963,8 +963,9 @@ void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "vmem-unlock", unlock_cb );
     var_SetAddress( mp, "vmem-display", display_cb );
     var_SetAddress( mp, "vmem-data", opaque );
-    var_SetString( mp, "vout", "vmem" );
     var_SetString( mp, "avcodec-hw", "none" );
+    var_SetString( mp, "vout", "vmem" );
+    var_SetString( mp, "window", "none" );
 }
 
 void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
@@ -992,6 +993,9 @@ void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
 {
     assert (p_mi != NULL);
 #ifdef __APPLE__
+    var_SetString (p_mi, "avcodec-hw", "");
+    var_SetString (p_mi, "vout", "");
+    var_SetString (p_mi, "window", "");
     var_SetAddress (p_mi, "drawable-nsobject", drawable);
 #else
     (void) p_mi; (void)drawable;
@@ -1018,6 +1022,9 @@ void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
                                   uint32_t drawable )
 {
 #ifdef __APPLE__
+    var_SetString (p_mi, "avcodec-hw", "");
+    var_SetString (p_mi, "vout", "");
+    var_SetString (p_mi, "window", "none");
     var_SetInteger (p_mi, "drawable-agl", drawable);
 #else
     (void) p_mi; (void)drawable;
@@ -1046,8 +1053,8 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
     assert (p_mi != NULL);
 
     var_SetString (p_mi, "avcodec-hw", "");
-    var_SetString (p_mi, "vout", drawable ? "xid" : "any");
-    var_SetString (p_mi, "window", drawable ? "embed-xid,any" : "any");
+    var_SetString (p_mi, "vout", drawable ? "xid" : "");
+    var_SetString (p_mi, "window", drawable ? "embed-xid,any" : "");
     var_SetInteger (p_mi, "drawable-xid", drawable);
 }
 
@@ -1067,6 +1074,8 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
 {
     assert (p_mi != NULL);
 #if defined (_WIN32) || defined (__OS2__)
+    var_SetString (p_mi, "avcodec-hw", "");
+    var_SetString (p_mi, "vout", "");
     var_SetString (p_mi, "window",
                    (drawable != NULL) ? "embed-hwnd,any" : "");
     var_SetInteger (p_mi, "drawable-hwnd", (uintptr_t)drawable);
