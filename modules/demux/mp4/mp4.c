@@ -3023,7 +3023,6 @@ static inline uint32_t MP4_GetFixedSampleSize( const mp4_track_t *p_track,
     return i_size;
 }
 
-#define QT_V0_MAX_SAMPLES 1024
 static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samples )
 {
     uint32_t i_size = 0;
@@ -3105,6 +3104,24 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
         }
 
         /* uncompressed v0 (qt) or... not (ISO) */
+
+        uint32_t i_max_v0_samples;
+        switch( p_track->fmt.i_codec )
+        {
+            /* Compressed samples in V0 */
+            case VLC_CODEC_AMR_NB:
+            case VLC_CODEC_AMR_WB:
+                i_max_v0_samples = 16;
+                break;
+            default:
+                /* Read 25ms of samples (uncompressed) */
+                i_max_v0_samples = p_track->fmt.audio.i_rate / 40 *
+                                   p_track->fmt.audio.i_channels;
+                if( i_max_v0_samples < 1 )
+                    i_max_v0_samples = 1;
+                break;
+        }
+
         *pi_nb_samples = 0;
         for( uint32_t i=p_track->i_sample;
              i<p_chunk->i_sample_first+p_chunk->i_sample_count &&
@@ -3124,18 +3141,8 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
                 break;
             }
 
-            switch( p_track->fmt.i_codec )
-            {
-                case VLC_CODEC_AMR_NB:
-                case VLC_CODEC_AMR_WB:
-                    if ( *pi_nb_samples == 16 )
-                        i = UINT32_MAX;
-                    break;
-                default:
-                    if ( *pi_nb_samples == QT_V0_MAX_SAMPLES )
-                        i = UINT32_MAX;
-                    break;
-            }
+            if ( *pi_nb_samples == i_max_v0_samples )
+                break;
         }
     }
 
