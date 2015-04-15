@@ -395,6 +395,7 @@
 #define VLC_CODEC_ADPCM_YAMAHA               VLC_FOURCC('m','s',0x00,0x20)
 #define VLC_CODEC_ADPCM_DK3                  VLC_FOURCC('m','s',0x00,0x62)
 #define VLC_CODEC_ADPCM_DK4                  VLC_FOURCC('m','s',0x00,0x61)
+#define VLC_CODEC_ADPCM_CREATIVE             VLC_FOURCC('m','s',0x00,0xC0)
 #define VLC_CODEC_ADPCM_SBPRO_2              VLC_FOURCC('m','s',0x00,0xC2)
 #define VLC_CODEC_ADPCM_SBPRO_3              VLC_FOURCC('m','s',0x00,0xC3)
 #define VLC_CODEC_ADPCM_SBPRO_4              VLC_FOURCC('m','s',0x00,0xC4)

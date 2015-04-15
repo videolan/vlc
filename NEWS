@@ -51,6 +51,7 @@ Demuxers:
  * Fixes for DTS detection in WAV and MKV files
  * Basic support for MPEG4-SL in TS and T-DMB
  * Support for Creative ADPCM/alaw/ulaw/S16L in VOC files
+ * Support for Creative ADPCM in AVI
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder

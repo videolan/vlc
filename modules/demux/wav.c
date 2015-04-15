@@ -79,6 +79,7 @@ static int ChunkFind( demux_t *, const char *, unsigned int * );
 
 static int FrameInfo_IMA_ADPCM( unsigned int *, int *, const es_format_t * );
 static int FrameInfo_MS_ADPCM ( unsigned int *, int *, const es_format_t * );
+static int FrameInfo_Creative_ADPCM( unsigned int *, int *, const es_format_t * );
 static int FrameInfo_PCM      ( unsigned int *, int *, const es_format_t * );
 static int FrameInfo_MSGSM    ( unsigned int *, int *, const es_format_t * );
 
@@ -345,6 +346,11 @@ static int Open( vlc_object_t * p_this )
                                  &p_sys->fmt ) )
             goto error;
         break;
+    case VLC_CODEC_ADPCM_CREATIVE:
+        if( FrameInfo_Creative_ADPCM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
+                                      &p_sys->fmt ) )
+            goto error;
+        break;
     case VLC_CODEC_MPGA:
     case VLC_CODEC_A52:
         /* FIXME set end of area FIXME */
@@ -567,6 +573,19 @@ static int FrameInfo_IMA_ADPCM( unsigned int *pi_size, int *pi_samples,
 
     *pi_samples = 2 * ( p_fmt->audio.i_blockalign -
         4 * p_fmt->audio.i_channels ) / p_fmt->audio.i_channels;
+    *pi_size = p_fmt->audio.i_blockalign;
+
+    return VLC_SUCCESS;
+}
+
+static int FrameInfo_Creative_ADPCM( unsigned int *pi_size, int *pi_samples,
+                                     const es_format_t *p_fmt )
+{
+    if( p_fmt->audio.i_channels <= 0 )
+        return VLC_EGENERIC;
+
+    /* 4 bits / sample */
+    *pi_samples = p_fmt->audio.i_blockalign * 2 / p_fmt->audio.i_channels;
     *pi_size = p_fmt->audio.i_blockalign;
 
     return VLC_SUCCESS;
