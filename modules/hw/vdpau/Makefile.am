@@ -40,7 +40,10 @@ libvdpau_display_plugin_la_LIBADD = libvlc_vdpau.la libvlc_xcb_events.la \
 if HAVE_VDPAU
 pkglib_LTLIBRARIES = libvlc_vdpau.la
 vdpau_LTLIBRARIES = libvdpau_deinterlace_plugin.la libvdpau_adjust_plugin.la \
-	libvdpau_sharpen_plugin.la libvdpau_chroma_plugin.la libvdpau_display_plugin.la
+	libvdpau_sharpen_plugin.la libvdpau_chroma_plugin.la
+if HAVE_XCB
+vdpau_LTLIBRARIES += libvdpau_display_plugin.la
+endif
 if HAVE_AVCODEC_VDPAU
 vdpau_LTLIBRARIES += libvdpau_avcodec_plugin.la
 endif
