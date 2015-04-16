@@ -5,6 +5,7 @@
 
  Authors: Fabio Ritrovato <sephiroth87 at videolan dot org>
           Rémi Duraffort  <ivoire at videolan dot org>
+          Gian Marco Sibilla <techos at jamendo dot com>
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,106 +22,123 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
-require "simplexml"
+local xml = nil
+local playlist_tracks_url = "https://api.jamendo.com/v3.0/playlists/tracks/?client_id=3dce8b55&id=%s&track_type=single+albumtrack&order=track_position_desc&format=xml"
+local track_jamendo_url = "https://www.jamendo.com/track/%s"
+local album_jamendo_url = "https://www.jamendo.com/album/%s"
+local playlist_max_tracks = 100
 
 function descriptor()
-    return { title="Jamendo Selections" }
+    return { title = "Jamendo Selections", capabilities = {} }
+end
+
+function activate()
+    main()
 end
 
 function main()
-    add_top_tracks( "ratingweek_desc", "rock", 100 )
-    add_top_tracks( "ratingweek_desc", "pop", 100 )
-    add_top_tracks( "ratingweek_desc", "jazz", 100 )
-    add_top_tracks( "ratingweek_desc", "dance", 100 )
-    add_top_tracks( "ratingweek_desc", "hipop+rap", 100 )
-    add_top_tracks( "ratingweek_desc", "world+reggae", 100 )
-    add_top_tracks( "ratingweek_desc", "lounge+ambient", 100 )
-    add_top_tracks( "ratingweek_desc", nil, 100 )
-    add_top_albums( "ratingweek_desc", nil, 20 )
-    add_radio_from_id( "9", 20 )
-    add_radio_from_id( "8", 20 )
-    add_radio_from_id( "6", 20 )
-    add_radio_from_id( "5", 20 )
-    add_radio_from_id( "7", 20 )
-    add_radio_from_id( "4", 20 )
+    lazy_load_xml()
+
+    add_playlist( "Jamendo's Finest - Trending tracks", { "222810" } )
+    add_playlist( "Jamendo's Trending Lounge/Relaxation Tracks", { "211938", "213936" } )
+    add_playlist( "Jamendo's Trending Classical Tracks", { "214065" } )
+    add_playlist( "Jamendo's Trending Electronic Tracks", { "211555" } )
+    add_playlist( "Jamendo's Trending Jazz Tracks", { "211407" } )
+    add_playlist( "Jamendo's Trending Pop Tracks", { "211032" } )
+    add_playlist( "Jamendo's Trending Hip-Hop Tracks", { "211404" } )
+    add_playlist( "Jamendo's Trending Rock Tracks", { "211064" } )
+    add_playlist( "Jamendo's Trending Songwriter Tracks", { "211066" } )
+    add_playlist( "Jamendo's Trending World Tracks", { "212188" } )
+    add_playlist( "Jamendo's Trending Metal Tracks", { "226459" } )
+    add_playlist( "Jamendo's Trending Soundtracks", { "226468" } )
 end
 
+function lazy_load_xml()
+    if xml ~= nil then return nil end
 
-function add_top_albums( album_order, tag, max_results )
-    local url = "http://api.jamendo.com/get2/id+name+artist_name+album_image/album/xml/?imagesize=500&order=" .. album_order .. "&n=" .. max_results
-    if tag ~= nil then
-        url = url .. "&tag_idstr=" .. tag
+    xml = require("simplexml")
+end
+
+function add_playlist( node_title, ids )
+    local node = vlc.sd.add_node( { title=node_title } )
+    local subitems = {}
+    -- Used to detect duplicated
+    local added = {}
+    -- Compute the subitem position increment to interpolate different playlists tracks
+    local position_increment = #ids
+
+    for start, id in ipairs(ids) do
+        -- Compute starting position according to index in list
+        local position = start - 1
+        -- Build current playlist URL
+        local url = string.format( playlist_tracks_url, id )
+        -- Request & parse URL
+        local playlist = parse_xml( url )
+
+        if playlist ~= nil then
+            log( "Playlist for '" .. node_title .. "': " .. playlist.children_map["name"][1].children[1] )
+
+            -- Iterate through found tracks
+            for index, track in ipairs( playlist.children_map["tracks"][1].children ) do
+                local track_id = track.children_map["id"][1].children[1]
+                log( "Processing track #" .. index .. ": " .. track_id )
+
+                -- Create the item to be added to current node
+                local item = { path = track.children_map["audio"][1].children[1],
+                    title = track.children_map["artist_name"][1].children[1] .. " - " .. track.children_map["name"][1].children[1],
+                    name = track.children_map["name"][1].children[1],
+                    artist = track.children_map["artist_name"][1].children[1],
+                    duration = track.children_map["duration"][1].children[1],
+                    url = string.format( track_jamendo_url, track_id ),
+                    arturl = track.children_map["image"][1].children[1],
+                    meta = {
+                        ["Download URL"] = track.children_map["audiodownload"][1].children[1]
+                    } }
+                -- Add album title if not a single
+                local album = track.children_map["album_id"][1].children[1]
+                if album ~= nil then item["meta"]["Album URL"] = string.format( album_jamendo_url, album ) end
+
+                -- Check if track isn't already present
+                if not added[track_id] then
+                    -- Append item to subitem table in the correct position
+                    subitems[position] = item
+                    added[track_id] = true
+
+                    position = position + position_increment
+                end 
+
+                if position > playlist_max_tracks then
+                    log( position / position_increment .. " tracks added from playlist " .. id )
+                    break
+                end
+            end
+        else
+            log( "No result for playlist #" .. id )
+        end
+
     end
-    local tree = simplexml.parse_url( url )
-    local node_name = "Top " .. max_results
-    if album_order == "rating_desc" then node_name = node_name .. " most popular albums"
-    elseif album_order == "ratingmonth_desc" then node_name = node_name .. " most popular albums this month"
-    elseif album_order == "ratingweek_desc" then node_name = node_name .. " most popular albums this week"
-    elseif album_order == "releasedate_desc" then node_name = node_name .. " latest released albums"
-    elseif album_order == "downloaded_desc" then node_name = node_name .. " most downloaded albums"
-    elseif album_order == "listened_desc" then node_name = node_name .. " most listened to albums"
-    elseif album_order == "starred_desc" then node_name = node_name .. " most starred albums"
-    elseif album_order == "playlisted_desc" then node_name = node_name .. " most playlisted albums"
-    elseif album_order == "needreviews_desc" then node_name = node_name .. " albums requiring review"
-    end
-    if tag ~= nil then
-        node_name = tag .. " - " .. node_name
-    end
-    local node = vlc.sd.add_node( {title=node_name} )
-    for _, album in ipairs( tree.children ) do
-        simplexml.add_name_maps( album )
-        local album_node = node:add_subitem(
-                { path     = 'http://api.jamendo.com/get2/id+name+duration+artist_name+album_name+album_genre+album_dates+album_image/track/xml/track_album+album_artist/?album_id=' .. album.children_map["id"][1].children[1],
-                  title    = album.children_map["artist_name"][1].children[1] .. ' - ' .. album.children_map["name"][1].children[1],
-                  arturl   = album.children_map["album_image"][1].children[1] })
+
+    -- Add subitems under node for parsed tracks
+    for _, item in ipairs( subitems ) do
+        node:add_subitem( item )
     end
 end
 
-function add_top_tracks( track_order, tag, max_results )
-    local url = "http://api.jamendo.com/get2/id+name+duration+artist_name+album_name+genre+album_image+album_dates/track/xml/track_album+album_artist/?imagesize=500&order=" .. track_order .. "&n=" .. max_results
-    if tag ~= nil then
-        url = url .. "&tag_minweight=0.35&tag_idstr=" .. tag
-    end
+function parse_xml( url )
+    local response = xml.parse_url( url )
+    xml.add_name_maps( response )
 
-    local tree = simplexml.parse_url( url )
-    local node_name = "Top " .. max_results
-    if track_order == "rating_desc" then node_name = node_name .. " most popular tracks"
-    elseif track_order == "ratingmonth_desc" then node_name = node_name .. " most popular tracks this month"
-    elseif track_order == "ratingweek_desc" then node_name = node_name .. " most popular tracks this week"
-    elseif track_order == "releasedate_desc" then node_name = node_name .. " latest released tracks"
-    elseif track_order == "downloaded_desc" then node_name = node_name .. " most downloaded tracks"
-    elseif track_order == "listened_desc" then node_name = node_name .. " most listened to tracks"
-    elseif track_order == "starred_desc" then node_name = node_name .. " most starred tracks"
-    elseif track_order == "playlisted_desc" then node_name = node_name .. " most playlisted tracks"
-    elseif track_order == "needreviews_desc" then node_name = node_name .. " tracks requiring review"
-    end
-    if tag ~= nil then
-        node_name = string.upper(tag) .. " - " .. node_name
-    end
-    local node = vlc.sd.add_node( {title=node_name} )
-    for _, track in ipairs( tree.children ) do
-        simplexml.add_name_maps( track )
-        node:add_subitem( {path="http://api.jamendo.com/get2/stream/track/redirect/?id=" .. track.children_map["id"][1].children[1],
-                           title=track.children_map["artist_name"][1].children[1].." - "..track.children_map["name"][1].children[1],
-                           artist=track.children_map["artist_name"][1].children[1],
-                           album=track.children_map["album_name"][1].children[1],
-                           genre=track.children_map["genre"][1].children[1],
-                           date=track.children_map["album_dates"][1].children_map["year"][1].children[1],
-                           arturl=track.children_map["album_image"][1].children[1],
-                           duration=track.children_map["duration"][1].children[1]} )
+    if response == nil or #response.children < 2 then return nil end
+
+    if response.children[1].children_map["status"][1].children[1] == "success" 
+            and tonumber( response.children[1].children_map["results_count"][1].children[1] ) > 0 then
+        return response.children[2].children[1].children[1]
+    else
+        log( "No result found" )
+        return nil
     end
 end
 
-function add_radio_from_id( id, max_results )
-    local radio_name
-    if id == "9" then radio_name="Rock"
-    elseif id == "8" then radio_name="Pop / Songwriting"
-    elseif id == "6" then radio_name="Jazz"
-    elseif id == "5" then radio_name="Hip-Hop"
-    elseif id == "7" then radio_name="Lounge"
-    elseif id == "4" then radio_name="Dance / Electro"
-    end
-    vlc.sd.add_item( {path="http://api.jamendo.com/get2/id+name+artist_name+album_name+duration+album_genre+album_image+album_dates/track/xml/radio_track_inradioplaylist+track_album+album_artist/?imagesize=500&order=random_desc&radio_id=" .. id .. "&n=" .. max_results,
-                      title=radio_name} )
+function log( msg )
+    vlc.msg.dbg( "[JAMENDO] " .. msg )
 end
-
