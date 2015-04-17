@@ -275,7 +275,7 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
     msg_Dbg( p_sd_, "Adding server '%s' with uuid '%s'", desc->friendlyName.c_str(), desc->UDN.c_str() );
 
     char* psz_mrl;
-    if( asprintf(&psz_mrl, "upnp://%s?ObjectID=%s", desc->location.c_str(), desc->UDN.c_str() ) < 0 )
+    if( asprintf(&psz_mrl, "upnp://%s?ObjectID=0", desc->location.c_str() ) < 0 )
         return false;
 
     p_input_item = input_item_NewWithTypeExt( psz_mrl, desc->friendlyName.c_str(), 0,
