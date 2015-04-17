@@ -5382,6 +5382,22 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
         } else dvbpsi_pmt_delete( p_dvbpsipmt );
     }
 
+    /* see es_out.c:2045 */
+    for( int i = 0; i < old_es_rm.i_size; i++ )
+    {
+        bool b_reset = false;
+        if( old_es_rm.p_elems[i]->u.p_pes->es.id )
+        {
+            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                            old_es_rm.p_elems[i]->u.p_pes->es.id, &b_reset );
+        }
+        if( b_reset )
+        {
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+            break;
+        }
+    }
+
     /* Decref or clean now unused es */
     for( int i = 0; i < old_es_rm.i_size; i++ )
         PIDRelease( p_demux, old_es_rm.p_elems[i] );
