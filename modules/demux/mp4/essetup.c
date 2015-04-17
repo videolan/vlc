@@ -485,6 +485,9 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )
     {
+        case ATOM_agsm: /* Apple gsm 33 bytes != MS GSM (agsm fourcc, 65 bytes) */
+            p_track->fmt.i_codec = VLC_CODEC_GSM;
+            break;
         case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
         case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
         {

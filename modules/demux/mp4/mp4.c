@@ -3009,16 +3009,28 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
 static inline uint32_t MP4_GetFixedSampleSize( const mp4_track_t *p_track,
                                                const MP4_Box_data_sample_soun_t *p_soun )
 {
-    uint32_t i_size = 0;
+    uint32_t i_size = p_track->i_sample_size;
 
     assert( p_track->i_sample_size != 0 );
 
-    /* broken stsz sample size == 1 */
-    if ( p_track->fmt.i_cat == AUDIO_ES &&
-         p_track->i_sample_size == 1 && p_soun->i_samplesize > p_track->i_sample_size * 8 )
-        i_size = p_soun->i_samplesize * p_soun->i_channelcount / 8;
-    else
-        i_size = p_track->i_sample_size;
+     /* QuickTime "built-in" support case fixups */
+    if( p_track->fmt.i_cat == AUDIO_ES &&
+        p_soun->i_compressionid == 0 && p_track->i_sample_size == 1 )
+    {
+        switch( p_track->fmt.i_codec )
+        {
+        case VLC_CODEC_GSM:
+            i_size = p_soun->i_channelcount;
+            break;
+        case ATOM_twos:
+        case ATOM_sowt:
+        case ATOM_raw:
+            i_size = p_soun->i_samplesize * p_soun->i_channelcount / 8;
+            break;
+        default:
+            break;
+        }
+    }
 
     return i_size;
 }
@@ -3105,6 +3117,21 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
 
         /* uncompressed v0 (qt) or... not (ISO) */
 
+        /* Quicktime built-in support handling */
+        if( p_soun->i_compressionid == 0 && p_track->i_sample_size == 1 )
+        {
+            switch( p_track->fmt.i_codec )
+            {
+                /* sample size is not integer */
+                case VLC_CODEC_GSM:
+                    *pi_nb_samples = 160 * p_track->fmt.audio.i_channels;
+                    return 33 * p_track->fmt.audio.i_channels;
+                default:
+                    break;
+            }
+        }
+
+        /* More regular V0 cases */
         uint32_t i_max_v0_samples;
         switch( p_track->fmt.i_codec )
         {
@@ -3161,6 +3188,21 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
     {
         MP4_Box_data_sample_soun_t *p_soun =
             p_track->p_sample->data.p_sample_soun;
+
+        /* Quicktime builtin support, _must_ ignore sample tables */
+        if( p_track->fmt.i_cat == AUDIO_ES && p_soun->i_compressionid == 0 &&
+            p_track->i_sample_size == 1 )
+        {
+            switch( p_track->fmt.i_codec )
+            {
+            case VLC_CODEC_GSM: /* # Samples > data size */
+                i_pos += ( p_track->i_sample -
+                           p_track->chunk[p_track->i_chunk].i_sample_first ) / 160 * 33;
+                return i_pos;
+            default:
+                break;
+            }
+        }
 
         if( p_track->fmt.i_cat != AUDIO_ES || p_soun->i_qt_version == 0 ||
             p_track->fmt.audio.i_blockalign <= 1 ||
