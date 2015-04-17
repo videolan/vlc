@@ -561,6 +561,9 @@ static void Flush(audio_output_t *aout, bool wait)
         op = pa_stream_flush(s, NULL, NULL);
     if (op != NULL)
         pa_operation_unref(op);
+    sys->first_pts = VLC_TS_INVALID;
+    stream_stop(s, aout);
+
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
 
