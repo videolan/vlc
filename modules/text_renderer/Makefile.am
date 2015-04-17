@@ -6,7 +6,8 @@ text_LTLIBRARIES = libtdummy_plugin.la
 libfreetype_plugin_la_SOURCES = \
 	text_renderer/text_renderer.c text_renderer/text_renderer.h \
 	text_renderer/platform_fonts.c text_renderer/platform_fonts.h \
-	text_renderer/freetype.c
+	text_renderer/freetype.c text_renderer/freetype.h \
+	text_renderer/text_layout.c text_renderer/text_layout.h
 libfreetype_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(FREETYPE_CFLAGS)
 libfreetype_plugin_la_LIBADD = $(LIBM) $(FREETYPE_LIBS)
 if HAVE_FREETYPE
@@ -19,6 +20,10 @@ endif
 if HAVE_FRIBIDI
 libfreetype_plugin_la_CPPFLAGS += $(FRIBIDI_CFLAGS) -DHAVE_FRIBIDI
 libfreetype_plugin_la_LIBADD += $(FRIBIDI_LIBS)
+endif
+if HAVE_HARFBUZZ
+libfreetype_plugin_la_CPPFLAGS += $(HARFBUZZ_CFLAGS) -DHAVE_HARFBUZZ
+libfreetype_plugin_la_LIBADD += $(HARFBUZZ_LIBS)
 endif
 libfreetype_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(FREETYPE_LDFLAGS) -rpath '$(textdir)'
 if HAVE_DARWIN

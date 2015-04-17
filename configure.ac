@@ -3102,6 +3102,8 @@ AC_ARG_ENABLE(freetype,
   [  --enable-freetype       freetype support   (default auto)])
 AC_ARG_ENABLE(fribidi,
   [  --enable-fribidi        fribidi support    (default auto)])
+AC_ARG_ENABLE(harfbuzz,
+  [  --enable-harfbuzz       harfbuzz support   (default auto)])
 AC_ARG_ENABLE(fontconfig,
   [  --enable-fontconfig     fontconfig support (default auto)])
 
@@ -3130,6 +3132,7 @@ AC_ARG_WITH([default-monospace-font-family],
 have_freetype="no"
 have_fontconfig="no"
 have_fribidi="no"
+have_harfbuzz="no"
 
 if test "${enable_freetype}" != "no"; then
    PKG_CHECK_MODULES(FREETYPE, freetype2, [
@@ -3152,7 +3155,18 @@ if test "${enable_freetype}" != "no"; then
           have_fribidi="yes"
           VLC_ADD_CPPFLAGS([skins2], [${FRIBIDI_CFLAGS} -DHAVE_FRIBIDI])
           VLC_ADD_LIBS([skins2], [${FRIBIDI_LIBS}])
-        ],[AC_MSG_WARN([${FRIBIDI_PKG_ERRORS}. Bidirectional support will be disabled in FreeType.])])
+        ],[AC_MSG_WARN([${FRIBIDI_PKG_ERRORS}. Bidirectional text and complex scripts (Arabic, Farsi, Thai...) will be disabled in FreeType.])])
+      fi
+
+      dnl harfbuzz support
+      if test "${have_fribidi}" != "no"; then
+        if test "${enable_harfbuzz}" != "no"; then
+          PKG_CHECK_MODULES(HARFBUZZ, harfbuzz, [
+            have_harfbuzz="yes"
+            VLC_ADD_CPPFLAGS([skins2], [${HARFBUZZ_CFLAGS} -DHAVE_HARFBUZZ])
+            VLC_ADD_LIBS([skins2], [${HARFBUZZ_LIBS}])
+          ],[AC_MSG_WARN([${HARFBUZZ_PKG_ERRORS}. Support for complex scripts (Arabic, Farsi, Thai...) will be disabled in FreeType.])])
+        fi
       fi
   ],[
   AS_IF([test -n "${enable_freetype}"],[
@@ -3164,6 +3178,7 @@ fi
 AM_CONDITIONAL([HAVE_FREETYPE], [test "${have_freetype}" = "yes"])
 AM_CONDITIONAL([HAVE_FONTCONFIG], [test "${have_fontconfig}" = "yes"])
 AM_CONDITIONAL([HAVE_FRIBIDI], [test "${have_fribidi}" = "yes"])
+AM_CONDITIONAL([HAVE_HARFBUZZ], [test "${have_harfbuzz}" = "yes"])
 
 
 dnl
