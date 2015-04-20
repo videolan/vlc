@@ -239,10 +239,8 @@ static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
     log->meta.line = item->line;
     log->meta.func = item->func;
 
-    int canc = vlc_savecancel(); /* XXX: needed for vasprintf() ? */
     if (vasprintf(&log->msg, format, ap) == -1)
         log->msg = NULL;
-    vlc_restorecancel(canc);
 
     vlc_mutex_lock(&sys->lock);
     assert(sys->tailp != NULL);

@@ -44,8 +44,6 @@ static void Log(void *opaque, int type, const vlc_log_t *meta,
     char *str;
     int priority = priorities[type];
 
-    int canc = vlc_savecancel();
-
     if (vasprintf(&str, format, ap) == -1)
         str = (char *)default_msg;
 
@@ -54,7 +52,6 @@ static void Log(void *opaque, int type, const vlc_log_t *meta,
                str);
     else
         syslog(priority, "%s: %s", meta->psz_module, str);
-    vlc_restorecancel(canc);
 
     if (str != default_msg)
         free(str);

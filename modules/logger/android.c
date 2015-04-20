@@ -46,8 +46,6 @@ static void AndroidPrintMsg(void *opaque, int type, const vlc_log_t *p_item,
     if (verbose < type)
         return;
 
-    int canc = vlc_savecancel();
-
     if (asprintf(&format2, "[%0*"PRIxPTR"] %s %s: %s",
                  ptr_width, p_item->i_object_id, p_item->psz_module,
                  p_item->psz_object_type, format) < 0)
@@ -68,7 +66,6 @@ static void AndroidPrintMsg(void *opaque, int type, const vlc_log_t *p_item,
     }
     __android_log_vprint(prio, "VLC", format2, ap);
     free(format2);
-    vlc_restorecancel(canc);
 }
 
 static vlc_log_cb Open(vlc_object_t *obj, void **sysp)

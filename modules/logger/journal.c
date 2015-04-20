@@ -42,7 +42,6 @@ static void Log(void *opaque, int type, const vlc_log_t *meta,
 {
     static const char default_msg[] = "message lost";
     char *msg;
-    int canc = vlc_savecancel();
 
     if (vasprintf(&msg, format, ap) == -1)
         msg = (char *)default_msg;
@@ -58,8 +57,6 @@ static void Log(void *opaque, int type, const vlc_log_t *meta,
         "VLC_MODULE=%s", meta->psz_module,
         "VLC_HEADER=%s", (meta->psz_header != NULL) ? meta->psz_header : "",
         NULL);
-
-    vlc_restorecancel(canc);
 
     if (msg != default_msg)
         free(msg);

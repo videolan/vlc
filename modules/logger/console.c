@@ -52,8 +52,6 @@ static void LogConsoleColor(void *opaque, int type, const vlc_log_t *meta,
     if (verbose < type)
         return;
 
-    int canc = vlc_savecancel();
-
     flockfile(stream);
     fprintf(stream, "["GREEN"%0*"PRIxPTR GRAY"] ", ptr_width,
             meta->i_object_id);
@@ -64,8 +62,6 @@ static void LogConsoleColor(void *opaque, int type, const vlc_log_t *meta,
     vfprintf(stream, format, ap);
     fputs(GRAY"\n", stream);
     funlockfile(stream);
-
-    vlc_restorecancel(canc);
 }
 #endif /* !_WIN32 */
 
@@ -78,8 +74,6 @@ static void LogConsoleGray(void *opaque, int type, const vlc_log_t *meta,
     if (verbose < type)
         return;
 
-    int canc = vlc_savecancel();
-
     flockfile(stream);
     fprintf(stream, "[%0*"PRIxPTR"] ", ptr_width, meta->i_object_id);
     if (meta->psz_header != NULL)
@@ -89,8 +83,6 @@ static void LogConsoleGray(void *opaque, int type, const vlc_log_t *meta,
     vfprintf(stream, format, ap);
     putc_unlocked('\n', stream);
     funlockfile(stream);
-
-    vlc_restorecancel(canc);
 }
 
 static vlc_log_cb Open(vlc_object_t *obj, void **sysp)

@@ -58,15 +58,11 @@ static void LogText(void *opaque, int type, const vlc_log_t *meta,
     if (sys->verbosity < type)
         return;
 
-    int canc = vlc_savecancel();
-
     flockfile(stream);
     fprintf(stream, "%s%s: ", meta->psz_module, msg_type[type]);
     vfprintf(stream, format, ap);
     putc_unlocked('\n', stream);
     funlockfile(stream);
-
-    vlc_restorecancel(canc);
 }
 
 #define HTML_FILENAME "vlc-log.html"
@@ -100,8 +96,6 @@ static void LogHtml(void *opaque, int type, const vlc_log_t *meta,
     if (sys->verbosity < type)
         return;
 
-    int canc = vlc_savecancel();
-
     flockfile(stream);
     fprintf(stream, "%s%s: <span style=\"color: #%06x\">",
             meta->psz_module, msg_type[type], color[type]);
@@ -109,8 +103,6 @@ static void LogHtml(void *opaque, int type, const vlc_log_t *meta,
     vfprintf(stream, format, ap);
     fputs("</span>\n", stream);
     funlockfile(stream);
-
-    vlc_restorecancel(canc);
 }
 
 static vlc_log_cb Open(vlc_object_t *obj, void **restrict sysp)
