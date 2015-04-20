@@ -847,12 +847,19 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 
     p_sys->fmt.i_original_channels = p_sys->fmt.i_physical_channels;
 
-    i_native_rate = JNI_AT_CALL_STATIC_INT( getNativeOutputSampleRate,
-                                            jfields.AudioManager.STREAM_MUSIC );
-    if( i_native_rate <= 0 )
+    if( b_spdif )
     {
-        msg_Warn( p_aout, "negative native rate ? Should not happen !" );
-        i_native_rate = VLC_CLIP( p_sys->fmt.i_rate, 4000, 48000 );
+        i_native_rate = p_sys->fmt.i_rate;
+    }
+    else
+    {
+        i_native_rate = JNI_AT_CALL_STATIC_INT( getNativeOutputSampleRate,
+                                                jfields.AudioManager.STREAM_MUSIC );
+        if( i_native_rate <= 0 )
+        {
+            msg_Warn( p_aout, "negative native rate ? Should not happen !" );
+            i_native_rate = VLC_CLIP( p_sys->fmt.i_rate, 4000, 48000 );
+        }
     }
 
     /* We can only accept U8, S16N, FL32, and AC3 */
