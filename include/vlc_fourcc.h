@@ -176,6 +176,7 @@
 #define VLC_CODEC_HNM4_VIDEO      VLC_FOURCC('H','N','M','4')
 #define VLC_CODEC_TDSC            VLC_FOURCC('T','D','S','C')
 #define VLC_CODEC_HQX             VLC_FOURCC('C','H','Q','X')
+#define VLC_CODEC_HQ_HQA          VLC_FOURCC('C','U','V','C')
 
 /***********
  * Chromas

@@ -758,7 +758,9 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_TDSC, "TDSC"),
 
-    B(VLC_CODEC_HQX, "Canopux HQX"),
+    B(VLC_CODEC_HQX, "Canopus HQX"),
+
+    B(VLC_CODEC_HQ_HQA, "Canopus HQ"),
 
     /* */
     B(VLC_CODEC_YV12, "Planar 4:2:0 YVU"),
