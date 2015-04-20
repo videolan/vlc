@@ -1006,6 +1006,7 @@ static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
 
     picture_t *picture = picture_NewFromResource(fmt, &resource);
     if (!picture) {
+        msg_Err(vd, "Failed to create a picture from resources.");
         IDirect3DSurface9_Release(surface);
         free(picsys);
         return VLC_ENOMEM;
@@ -1483,7 +1484,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     hr = IDirect3DDevice9_StretchRect(sys->d3ddev, source, NULL, destination, NULL, D3DTEXF_LINEAR);
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%0lx", hr);
+        msg_Dbg(vd, "Failed IDirect3DDevice9_StretchRect: source 0x%p 0x%0lx", source, hr);
         return VLC_EGENERIC;
     }
 
