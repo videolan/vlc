@@ -270,6 +270,10 @@ static const struct
     { VLC_CODEC_TDSC, AV_CODEC_ID_TDSC, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_CHECK( 56, 23, 0, 35, 100 )
+    { VLC_CODEC_HQ_HQA, AV_CODEC_ID_HQ_HQA, VIDEO_ES },
+#endif
+
 
     /* ffmpeg only: AV_CODEC_ID_BRENDER_PIX */
     /* ffmpeg only: AV_CODEC_ID_Y41P */
