@@ -57,11 +57,14 @@ static void vlc_vaLogCallback(libvlc_int_t *vlc, int type,
                               va_list ap)
 {
     vlc_logger_t *logger = libvlc_priv(vlc)->logger;
+    int canc;
 
     assert(logger != NULL);
+    canc = vlc_savecancel();
     vlc_rwlock_rdlock(&logger->lock);
     logger->log(logger->sys, type, item, format, ap);
     vlc_rwlock_unlock(&logger->lock);
+    vlc_restorecancel(canc);
 }
 
 static void vlc_LogCallback(libvlc_int_t *vlc, int type, const vlc_log_t *item,
