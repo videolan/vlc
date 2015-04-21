@@ -9,8 +9,10 @@ fetch-npapi:
 		cd npapi-vlc && \
 		git fetch origin && \
 		git reset --hard origin/master; \
+		git submodule update; \
 	else \
 		git clone git://git.videolan.org/npapi-vlc.git npapi-vlc ; \
+		git submodule update --init; \
 	fi
 	git --git-dir=npapi-vlc/.git describe --long --always > stamp-npapi.tmp
 	if diff stamp-npapi.tmp stamp-npapi >/dev/null 2>&1; then \
