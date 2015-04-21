@@ -49,7 +49,6 @@ static void Close( vlc_va_t * , AVCodecContext *);
 static int Setup( vlc_va_t *, AVCodecContext *, vlc_fourcc_t *);
 static int Get( vlc_va_t *, picture_t *, uint8_t ** );
 static int Extract( vlc_va_t *, picture_t *, uint8_t * );
-static void Release( void *, uint8_t * );
 
 static void vda_Copy422YpCbCr8( picture_t *p_pic,
                                 CVPixelBufferRef buffer )
@@ -144,7 +143,7 @@ static int Open( vlc_va_t *va, AVCodecContext *ctx,
     va->pix_fmt = PIX_FMT_VDA_VLD;
     va->setup = Setup;
     va->get = Get;
-    va->release = Release;
+    va->release = NULL;
     va->extract = Extract;
 
     return VLC_SUCCESS;
@@ -299,18 +298,6 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
     return VLC_SUCCESS;
 }
 
-static void Release( void *opaque, uint8_t *data )
-{
-#if 0
-    CVPixelBufferRef cv_buffer = ( CVPixelBufferRef )p_ff->data[3];
-
-    if ( cv_buffer )
-        CVPixelBufferRelease( cv_buffer );
-#endif
-    picture_Release(opaque);
-    (void) data;
-}
-
 #else
 
 vlc_module_begin ()
@@ -329,7 +316,7 @@ static int Open( vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt )
     va->pix_fmt = AV_PIX_FMT_VDA;
     va->setup = Setup;
     va->get = Get;
-    va->release = Release;
+    va->release = NULL;
     va->extract = Extract;
     msg_Dbg( va, "VDA decoder Open success!");
 
@@ -383,11 +370,4 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 
     return VLC_SUCCESS;
 }
-
-static void Release( void *opaque, uint8_t *data )
-{
-    picture_Release(opaque);
-    (void) data;
-}
-
 #endif

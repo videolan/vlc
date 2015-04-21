@@ -945,6 +945,14 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
     }
 }
 
+static void lavc_ReleaseFrame(void *opaque, uint8_t *data)
+{
+    picture_t *picture = opaque;
+
+    picture_Release(picture);
+    (void) data;
+}
+
 static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
                             int flags)
 {
@@ -971,10 +979,14 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
      * data[3] actually contains the format-specific surface handle. */
     frame->data[3] = frame->data[0];
 
-    frame->buf[0] = av_buffer_create(frame->data[0], 0, va->release, pic, 0);
+    void (*release)(void *, uint8_t *) = va->release;
+    if (va->release == NULL)
+        release = lavc_ReleaseFrame;
+
+    frame->buf[0] = av_buffer_create(frame->data[0], 0, release, pic, 0);
     if (unlikely(frame->buf[0] == NULL))
     {
-        vlc_va_Release(va, pic, frame->data[0]);
+        release(pic, frame->data[0]);
         return -1;
     }
 
@@ -982,14 +994,6 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
     assert(frame->data[0] != NULL);
     (void) flags;
     return 0;
-}
-
-static void lavc_dr_ReleaseFrame(void *opaque, uint8_t *data)
-{
-    picture_t *picture = opaque;
-
-    picture_Release(picture);
-    (void) data;
 }
 
 static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
@@ -1054,11 +1058,11 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
         uint8_t *data = pic->p[i].p_pixels;
         int size = pic->p[i].i_pitch * pic->p[i].i_lines;
 
-        frame->buf[i] = av_buffer_create(data, size, lavc_dr_ReleaseFrame,
+        frame->buf[i] = av_buffer_create(data, size, lavc_ReleaseFrame,
                                          picture_Hold(pic), 0);
         if (unlikely(frame->buf[i] == NULL))
         {
-            lavc_dr_ReleaseFrame(pic, data);
+            lavc_ReleaseFrame(pic, data);
             goto error;
         }
     }

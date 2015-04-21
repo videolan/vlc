@@ -146,12 +146,6 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
     return VLC_SUCCESS;
 }
 
-static void Unlock(void *opaque, uint8_t *data)
-{
-    picture_Release(opaque);
-    (void) data;
-}
-
 static int Copy(vlc_va_t *va, picture_t *pic, uint8_t *data)
 {
     (void) va; (void) pic; (void) data;
@@ -389,7 +383,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
     va->pix_fmt = AV_PIX_FMT_VDPAU;
     va->setup = Setup;
     va->get = Lock;
-    va->release = Unlock;
+    va->release = NULL;
     va->extract = Copy;
     return VLC_SUCCESS;
 
