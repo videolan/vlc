@@ -127,7 +127,7 @@ static vlc_vdp_video_field_t *GetSurface(vlc_va_t *va)
     return CreateSurface(va);
 }
 
-static int Lock(vlc_va_t *va, void **opaque, uint8_t **data)
+static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
     vlc_vdp_video_field_t *field;
     unsigned tries = (CLOCK_FREQ + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
@@ -141,31 +141,19 @@ static int Lock(vlc_va_t *va, void **opaque, uint8_t **data)
         msleep(VOUT_OUTMEM_SLEEP);
     }
 
-    *opaque = field;
+    pic->context = field;
     *data = (void *)(uintptr_t)field->frame->surface;
     return VLC_SUCCESS;
 }
 
 static void Unlock(void *opaque, uint8_t *data)
 {
-    vlc_vdp_video_field_t *field = opaque;
-
-    DestroySurface(field);
-    (void) data;
+    (void) opaque; (void) data;
 }
 
-static int Copy(vlc_va_t *va, picture_t *pic, void *opaque, uint8_t *data)
+static int Copy(vlc_va_t *va, picture_t *pic, uint8_t *data)
 {
-    vlc_vdp_video_field_t *field = opaque;
-
-    assert(field != NULL);
-    field = vlc_vdp_video_copy(field);
-    if (unlikely(field == NULL))
-        return VLC_ENOMEM;
-
-    assert(pic->context == NULL);
-    pic->context = field;
-    (void) va; (void) data;
+    (void) va; (void) pic; (void) data;
     return VLC_SUCCESS;
 }
 

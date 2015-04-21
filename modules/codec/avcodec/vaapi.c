@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_fourcc.h>
+#include <vlc_picture.h>
 
 #ifdef VLC_VA_BACKEND_XLIB
 # include <vlc_xlib.h>
@@ -272,8 +273,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
-                    uint8_t *data )
+static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 {
     vlc_va_sys_t *sys = va->sys;
     VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)data;
@@ -346,11 +346,10 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
         vaDestroyImage( sys->p_display, sys->image.image_id );
         sys->image.image_id = VA_INVALID_ID;
     }
-    (void) opaque;
     return VLC_SUCCESS;
 }
 
-static int Get( vlc_va_t *va, void **opaque, uint8_t **data )
+static int Get( vlc_va_t *va, picture_t *pic, uint8_t **data )
 {
     vlc_va_sys_t *sys = va->sys;
     int i_old;
@@ -377,18 +376,21 @@ static int Get( vlc_va_t *va, void **opaque, uint8_t **data )
 
     p_surface->i_refcount = 1;
     p_surface->i_order = sys->i_surface_order++;
+    pic->context = p_surface;
     *data = (void *)(uintptr_t)p_surface->i_id;
-    *opaque = p_surface;
     return VLC_SUCCESS;
 }
 
 static void Release( void *opaque, uint8_t *data )
 {
-    vlc_va_surface_t *p_surface = opaque;
+    picture_t *pic = opaque;
+    vlc_va_surface_t *p_surface = pic->context;
 
     vlc_mutex_lock( p_surface->p_lock );
     p_surface->i_refcount--;
     vlc_mutex_unlock( p_surface->p_lock );
+
+    pic->context = NULL;
     (void) data;
 }
 

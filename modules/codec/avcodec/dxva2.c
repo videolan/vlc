@@ -380,8 +380,7 @@ ok:
     return VLC_SUCCESS;
 }
 
-static int Extract(vlc_va_t *va, picture_t *picture, void *opaque,
-                   uint8_t *data)
+static int Extract(vlc_va_t *va, picture_t *picture, uint8_t *data)
 {
     vlc_va_sys_t *sys = va->sys;
     LPDIRECT3DSURFACE9 d3d = (LPDIRECT3DSURFACE9)(uintptr_t)data;
@@ -440,12 +439,11 @@ static int Extract(vlc_va_t *va, picture_t *picture, void *opaque,
 
     /* */
     IDirect3DSurface9_UnlockRect(d3d);
-    (void) opaque;
     return VLC_SUCCESS;
 }
 
 /* FIXME it is nearly common with VAAPI */
-static int Get(vlc_va_t *va, void **opaque, uint8_t **data)
+static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
     vlc_va_sys_t *sys = va->sys;
 
@@ -479,15 +477,17 @@ static int Get(vlc_va_t *va, void **opaque, uint8_t **data)
     surface->refcount = 1;
     surface->order = sys->surface_order++;
     *data = (void *)surface->d3d;
-    *opaque = surface;
+    pic->context = surface;
     return VLC_SUCCESS;
 }
 
 static void Release(void *opaque, uint8_t *data)
 {
-    vlc_va_surface_t *surface = opaque;
+    picture_t *pic = opaque;
+    vlc_va_surface_t *surface = pic->context;
 
     surface->refcount--;
+    pic->context = NULL;
     (void) data;
 }
 

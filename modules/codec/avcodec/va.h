@@ -38,9 +38,9 @@ struct vlc_va_t {
     int pix_fmt;
 
     int  (*setup)(vlc_va_t *, AVCodecContext *, vlc_fourcc_t *output);
-    int  (*get)(vlc_va_t *, void **opaque, uint8_t **data);
-    void (*release)(void *opaque, uint8_t *surface);
-    int  (*extract)(vlc_va_t *, picture_t *dst, void *opaque, uint8_t *data);
+    int  (*get)(vlc_va_t *, picture_t *pic, uint8_t **data);
+    void (*release)(void *pic, uint8_t *surface);
+    int  (*extract)(vlc_va_t *, picture_t *pic, uint8_t *data);
 };
 
 /**
@@ -68,7 +68,7 @@ static inline int vlc_va_Setup(vlc_va_t *va, AVCodecContext *avctx,
  * The surface will be used as output for the hardware decoder, and possibly
  * also as a reference frame to decode other surfaces.
  *
- * @param opaque pointer to storage space for surface internal data [OUT]
+ * @param pic pointer to VLC picture being allocated [IN/OUT]
  * @param data pointer to the AVFrame data[0] and data[3] pointers [OUT]
  *
  * @note This function needs not be reentrant. However it may be called
@@ -77,25 +77,25 @@ static inline int vlc_va_Setup(vlc_va_t *va, AVCodecContext *avctx,
  *
  * @return VLC_SUCCESS on success, otherwise an error code.
  */
-static inline int vlc_va_Get(vlc_va_t *va, void **opaque, uint8_t **data)
+static inline int vlc_va_Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
-    return va->get(va, opaque, data);
+    return va->get(va, pic, data);
 }
 
 /**
  * Releases a hardware surface from a libavcodec frame.
  * The surface has been previously allocated with vlc_va_Get().
  *
- * @param opaque opaque data pointer of the AVFrame set by vlc_va_Get()
+ * @param pic VLC picture being released [IN/OUT]
  * @param data data[0] pointer of the AVFrame set by vlc_va_Get()
  *
  * @note This function needs not be reentrant. However it may be called
  * concurrently with vlc_va_Get() and/or vlc_va_Extract() from other threads
  * and other frames.
  */
-static inline void vlc_va_Release(vlc_va_t *va, void *opaque, uint8_t *data)
+static inline void vlc_va_Release(vlc_va_t *va, picture_t *pic, uint8_t *data)
 {
-    va->release(opaque, data);
+    va->release(pic, data);
 }
 
 /**
@@ -108,10 +108,9 @@ static inline void vlc_va_Release(vlc_va_t *va, void *opaque, uint8_t *data)
  * @note This function needs not be reentrant, but it may run concurrently with
  * vlc_va_Get() or vlc_va_Release() in other threads (with distinct frames).
  */
-static inline int vlc_va_Extract(vlc_va_t *va, picture_t *dst, void *opaque,
-                                 uint8_t *data)
+static inline int vlc_va_Extract(vlc_va_t *va, picture_t *pic, uint8_t *data)
 {
-    return va->extract(va, dst, opaque, data);
+    return va->extract(va, pic, data);
 }
 
 /**

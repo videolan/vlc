@@ -88,7 +88,6 @@ typedef struct
 {
     vlc_va_t *va;
     picture_t *pic;
-    void *opaque;
 } lavc_va_picture_t;
 
 #ifdef HAVE_AVCODEC_MT
@@ -813,8 +812,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             lavc_va_picture_t *vapic = p_sys->p_ff_pic->opaque;
 
             p_pic = vapic->pic;
-            vlc_va_Extract( p_sys->p_va, p_pic, vapic->opaque,
-                            p_sys->p_ff_pic->data[3] );
+            vlc_va_Extract( p_sys->p_va, p_pic, p_sys->p_ff_pic->data[3] );
             picture_Hold( p_pic );
         }
         else
@@ -965,7 +963,7 @@ static void lavc_va_ReleaseFrame(void *opaque, uint8_t *data)
 {
     lavc_va_picture_t *vapic = opaque;
 
-    vlc_va_Release(vapic->va, vapic->opaque, data);
+    vlc_va_Release(vapic->va, vapic->pic, data);
     picture_Release(vapic->pic);
     free(vapic);
 }
@@ -990,7 +988,7 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
 
     vapic->va = va;
     vapic->pic = pic;
-    if (vlc_va_Get(va, &vapic->opaque, &frame->data[0]))
+    if (vlc_va_Get(va, pic, &frame->data[0]))
     {
         msg_Err(dec, "hardware acceleration picture allocation failed");
         picture_Release(pic);

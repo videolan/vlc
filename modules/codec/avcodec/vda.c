@@ -47,8 +47,8 @@
 static int Open( vlc_va_t *, AVCodecContext *, const es_format_t * );
 static void Close( vlc_va_t * , AVCodecContext *);
 static int Setup( vlc_va_t *, AVCodecContext *, vlc_fourcc_t *);
-static int Get( vlc_va_t *, void **, uint8_t ** );
-static int Extract( vlc_va_t *, picture_t *, void *, uint8_t * );
+static int Get( vlc_va_t *, picture_t *, uint8_t ** );
+static int Extract( vlc_va_t *, picture_t *, uint8_t * );
 static void Release( void *, uint8_t * );
 
 static void vda_Copy422YpCbCr8( picture_t *p_pic,
@@ -256,17 +256,16 @@ static void vda_Copy420YpCbCr8Planar( picture_t *p_pic,
     CVPixelBufferUnlockBaseAddress( buffer, 0 );
 }
 
-static int Get( vlc_va_t *va, void **opaque, uint8_t **data )
+static int Get( vlc_va_t *va, picture_t *pic, uint8_t **data )
 {
     VLC_UNUSED( va );
 
+    (void) pic;
     *data = (uint8_t *)1; // dummy
-    (void) opaque;
     return VLC_SUCCESS;
 }
 
-static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
-                    uint8_t *data )
+static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 {
     vlc_va_vda_t *p_vda = vlc_va_vda_Get( va );
     CVPixelBufferRef cv_buffer = ( CVPixelBufferRef )data;
@@ -297,7 +296,6 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
     }
     else
         vda_Copy422YpCbCr8( p_picture, cv_buffer );
-    (void) opaque;
     return VLC_SUCCESS;
 }
 
@@ -357,16 +355,15 @@ static int Setup( vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *p_chroma )
 }
 
 // Never called
-static int Get( vlc_va_t *va, void **opaque, uint8_t **data )
+static int Get( vlc_va_t *va, picture_t *p_picture, uint8_t **data )
 {
     VLC_UNUSED( va );
+    (void) p_picture;
     (void) data;
-    (void) opaque;
     return VLC_SUCCESS;
 }
 
-static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
-                    uint8_t *data )
+static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 {
     CVPixelBufferRef cv_buffer = (CVPixelBufferRef)data;
 
@@ -383,7 +380,6 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, void *opaque,
 
     vda_Copy422YpCbCr8( p_picture, cv_buffer );
 
-    (void) opaque;
     return VLC_SUCCESS;
 }
 
