@@ -1383,8 +1383,18 @@ static void UpdatePESFilters( demux_t *p_demux, bool b_all )
             ts_pid_t *espid = p_pmt->e_streams.p_elems[j];
             bool b_stream_selected = b_program_selected;
             if( b_program_selected && !b_all && espid->u.p_pes->es.id )
+            {
                 es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
                                 espid->u.p_pes->es.id, &b_stream_selected );
+                for( int k=0; !b_stream_selected &&
+                               k< espid->u.p_pes->extra_es.i_size; k++ )
+                {
+                    if( espid->u.p_pes->extra_es.p_elems[k]->id )
+                        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                                        espid->u.p_pes->extra_es.p_elems[k]->id,
+                                        &b_stream_selected );
+                }
+            }
 
             if( espid->u.p_pes->es.fmt.i_cat == UNKNOWN_ES )
             {
