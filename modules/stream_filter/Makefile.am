@@ -30,7 +30,7 @@ stream_filter_LTLIBRARIES += libhds_plugin.la
 
 libhttplive_plugin_la_SOURCES = stream_filter/httplive.c
 libhttplive_plugin_la_CFLAGS = $(AM_CFLAGS) $(GCRYPT_CFLAGS)
-libhttplive_plugin_la_LIBADD = $(GCRYPT_LIBS) -lgpg-error
+libhttplive_plugin_la_LIBADD = $(GCRYPT_LIBS) -lgpg-error $(LIBPTHREAD)
 if HAVE_GCRYPT
 stream_filter_LTLIBRARIES += libhttplive_plugin.la
 endif
