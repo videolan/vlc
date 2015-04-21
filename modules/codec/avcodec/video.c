@@ -84,6 +84,13 @@ struct decoder_sys_t
     vlc_sem_t sem_mt;
 };
 
+typedef struct
+{
+    vlc_va_t *va;
+    picture_t *pic;
+    void *opaque;
+} lavc_va_picture_t;
+
 #ifdef HAVE_AVCODEC_MT
 #   define wait_mt(s) vlc_sem_wait( &s->sem_mt )
 #   define post_mt(s) vlc_sem_post( &s->sem_mt )
@@ -207,12 +214,6 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
 static void lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
 {
     decoder_sys_t *sys = dec->p_sys;
-
-    if (sys->p_va != NULL)
-    {
-        vlc_va_Extract(sys->p_va, pic, frame->opaque, frame->data[3]);
-        return;
-    }
 
     if (!FindVlcChroma(sys->p_context->pix_fmt))
     {
@@ -791,10 +792,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( !b_drawpicture || ( !p_sys->p_va && !p_sys->p_ff_pic->linesize[0] ) )
             continue;
 
-        if( p_sys->p_va != NULL || p_sys->p_ff_pic->opaque == NULL )
+        if( p_sys->p_ff_pic->opaque == NULL )
         {
             /* Get a new picture */
-            p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
+            if( p_sys->p_va == NULL )
+                p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
             if( !p_pic )
             {
                 if( p_block )
@@ -804,6 +806,16 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
             /* Fill picture_t from AVFrame */
             lavc_CopyPicture(p_dec, p_pic, p_sys->p_ff_pic);
+        }
+        else
+        if( p_sys->p_va != NULL )
+        {
+            lavc_va_picture_t *vapic = p_sys->p_ff_pic->opaque;
+
+            p_pic = vapic->pic;
+            vlc_va_Extract( p_sys->p_va, p_pic, vapic->opaque,
+                            p_sys->p_ff_pic->data[3] );
+            picture_Hold( p_pic );
         }
         else
         {
@@ -949,34 +961,54 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
     }
 }
 
+static void lavc_va_ReleaseFrame(void *opaque, uint8_t *data)
+{
+    lavc_va_picture_t *vapic = opaque;
+
+    vlc_va_Release(vapic->va, vapic->opaque, data);
+    picture_Release(vapic->pic);
+    free(vapic);
+}
+
 static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
                             int flags)
 {
     decoder_t *dec = ctx->opaque;
-    decoder_sys_t *sys = dec->p_sys;
-    vlc_va_t *va = sys->p_va;
+    vlc_va_t *va = dec->p_sys->p_va;
 
     if (vlc_va_Setup(va, ctx, &dec->fmt_out.video.i_chroma))
     {
         msg_Err(dec, "hardware acceleration setup failed");
         return -1;
     }
-    if (vlc_va_Get(va, &frame->opaque, &frame->data[0]))
+
+    picture_t *pic = ffmpeg_NewPictBuf(dec, ctx);
+    if (pic == NULL)
+        return -1;
+
+    lavc_va_picture_t *vapic = xmalloc(sizeof (*vapic));
+
+    vapic->va = va;
+    vapic->pic = pic;
+    if (vlc_va_Get(va, &vapic->opaque, &frame->data[0]))
     {
         msg_Err(dec, "hardware acceleration picture allocation failed");
+        picture_Release(pic);
         return -1;
     }
     /* data[0] must be non-NULL for libavcodec internal checks.
      * data[3] actually contains the format-specific surface handle. */
     frame->data[3] = frame->data[0];
 
-    frame->buf[0] = av_buffer_create(frame->data[0], 0, va->release,
-                                     frame->opaque, 0);
+    frame->buf[0] = av_buffer_create(frame->data[0], 0, lavc_va_ReleaseFrame,
+                                     vapic, 0);
     if (unlikely(frame->buf[0] == NULL))
     {
-        vlc_va_Release(va, frame->opaque, frame->data[0]);
+        lavc_va_ReleaseFrame(vapic, frame->data[0]);
         return -1;
     }
+
+    frame->opaque = vapic;
     assert(frame->data[0] != NULL);
     (void) flags;
     return 0;
