@@ -117,15 +117,17 @@ static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
  * Local Functions
  *****************************************************************************/
 
-/* Returns a new picture buffer */
-static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
-                                            AVCodecContext *p_context )
+/**
+ * Sets the decoder output format.
+ */
+static int lavc_UpdateVideoFormat( decoder_t *p_dec,
+                                   AVCodecContext *p_context )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
+    bool hwaccel = p_dec->p_sys->p_va != NULL;
     int width = p_context->coded_width;
     int height = p_context->coded_height;
 
-    if( p_sys->p_va == NULL )
+    if( !hwaccel )
     {
         int aligns[AV_NUM_DATA_POINTERS];
 
@@ -136,7 +138,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
     if( width == 0 || height == 0 || width > 8192 || height > 8192 )
     {
         msg_Err( p_dec, "Invalid frame size %dx%d.", width, height );
-        return NULL; /* invalid display size */
+        return -1; /* invalid display size */
     }
     p_dec->fmt_out.video.i_width = width;
     p_dec->fmt_out.video.i_height = height;
@@ -152,7 +154,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.video.i_visible_height = height;
     }
 
-    if( !p_sys->p_va && GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) )
+    if( !hwaccel && GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) )
     {
         /* we are doomed, but not really, because most codecs set their pix_fmt
          * much later
@@ -192,7 +194,15 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.video.i_frame_rate = p_context->time_base.den;
         p_dec->fmt_out.video.i_frame_rate_base = p_context->time_base.num * __MAX( p_context->ticks_per_frame, 1 );
     }
+    return decoder_UpdateVideoFormat( p_dec );
+}
 
+/* Returns a new picture buffer */
+static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
+                                            AVCodecContext *p_context )
+{
+    lavc_UpdateVideoFormat( p_dec, p_context );
+    /* FIXME: check for error ^^ and return NULL */
     return decoder_NewPicture( p_dec );
 }
 
