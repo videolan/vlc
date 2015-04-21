@@ -178,7 +178,7 @@ struct encoder_t
 /**
  * This function notifies the video output pipeline of a new video output
  * format (fmt_out.video). If there is currently no video output or if the
- * video output format has changed, a new audio video will be set up.
+ * video output format has changed, a new video output will be set up.
  * @return 0 if the video output is working, -1 if not. */
 static inline int decoder_UpdateVideoFormat( decoder_t *dec )
 {
