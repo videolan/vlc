@@ -1683,7 +1683,11 @@ static void* hls_Thread(void *p_this)
             vlc_mutex_unlock(&p_sys->download.lock_wait);
         }
 
-        vlc_testcancel();
+        vlc_mutex_lock(&p_sys->lock);
+        mutex_cleanup_push(&p_sys->lock); //C1
+        while (p_sys->paused)
+            vlc_cond_wait(&p_sys->wait, &p_sys->lock);
+        vlc_cleanup_run( ); //C1 vlc_mutex_unlock(&p_sys->lock);
 
         vlc_mutex_lock(&hls->lock);
         segment_t *segment = segment_GetSegment(hls, p_sys->download.segment);
@@ -1842,14 +1846,6 @@ static int hls_Download(stream_t *s, segment_t *segment)
 {
     stream_sys_t *p_sys = s->p_sys;
     assert(segment);
-
-    vlc_mutex_lock(&p_sys->lock);
-    while (p_sys->paused)
-        vlc_cond_wait(&p_sys->wait, &p_sys->lock);
-    vlc_mutex_unlock(&p_sys->lock);
-
-    if (atomic_load(&p_sys->closing))
-        return VLC_EGENERIC;
 
     stream_t *p_ts = stream_UrlNew(s, segment->url);
     if (p_ts == NULL)
