@@ -307,7 +307,8 @@ static void Release( void *opaque, uint8_t *data )
     if ( cv_buffer )
         CVPixelBufferRelease( cv_buffer );
 #endif
-    (void) opaque; (void) data;
+    picture_Release(opaque);
+    (void) data;
 }
 
 #else
@@ -385,7 +386,8 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 
 static void Release( void *opaque, uint8_t *data )
 {
-    (void) opaque; (void) data;
+    picture_Release(opaque);
+    (void) data;
 }
 
 #endif

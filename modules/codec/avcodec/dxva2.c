@@ -488,6 +488,7 @@ static void Release(void *opaque, uint8_t *data)
 
     surface->refcount--;
     pic->context = NULL;
+    picture_Release(pic);
     (void) data;
 }
 

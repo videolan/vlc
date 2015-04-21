@@ -148,7 +148,8 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
 
 static void Unlock(void *opaque, uint8_t *data)
 {
-    (void) opaque; (void) data;
+    picture_Release(opaque);
+    (void) data;
 }
 
 static int Copy(vlc_va_t *va, picture_t *pic, uint8_t *data)
