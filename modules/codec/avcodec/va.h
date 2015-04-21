@@ -75,7 +75,6 @@ static inline int vlc_va_Setup(vlc_va_t *va, AVCodecContext *avctx,
  * concurrently with vlc_va_Extract() and/or vlc_va_Release() from other
  * threads and other frames.
  *
- * @param frame libavcodec frame [IN/OUT]
  * @return VLC_SUCCESS on success, otherwise an error code.
  */
 static inline int vlc_va_Get(vlc_va_t *va, void **opaque, uint8_t **data)
@@ -93,8 +92,6 @@ static inline int vlc_va_Get(vlc_va_t *va, void **opaque, uint8_t **data)
  * @note This function needs not be reentrant. However it may be called
  * concurrently with vlc_va_Get() and/or vlc_va_Extract() from other threads
  * and other frames.
- *
- * @param frame libavcodec frame previously allocated by vlc_va_Get()
  */
 static inline void vlc_va_Release(vlc_va_t *va, void *opaque, uint8_t *data)
 {
@@ -110,8 +107,6 @@ static inline void vlc_va_Release(vlc_va_t *va, void *opaque, uint8_t *data)
  *
  * @note This function needs not be reentrant, but it may run concurrently with
  * vlc_va_Get() or vlc_va_Release() in other threads (with distinct frames).
- *
- * @param frame libavcodec frame previously allocated by vlc_va_Get()
  */
 static inline int vlc_va_Extract(vlc_va_t *va, picture_t *dst, void *opaque,
                                  uint8_t *data)
