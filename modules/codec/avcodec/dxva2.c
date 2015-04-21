@@ -329,7 +329,7 @@ static void DxDestroyVideoService(vlc_va_sys_t *);
 static int DxFindVideoServiceConversion(vlc_va_t *, GUID *input, D3DFORMAT *output);
 
 static int DxCreateVideoDecoder(vlc_va_t *,
-                                int codec_id, const video_format_t *);
+                                int codec_id, const video_format_t *, bool);
 static void DxDestroyVideoDecoder(vlc_va_sys_t *);
 static int DxResetVideoDecoder(vlc_va_t *);
 
@@ -360,7 +360,7 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chroma)
     fmt.i_width = avctx->coded_width;
     fmt.i_height = avctx->coded_height;
 
-    if (DxCreateVideoDecoder(va, sys->codec_id, &fmt))
+    if (DxCreateVideoDecoder(va, sys->codec_id, &fmt, avctx->active_thread_type & FF_THREAD_FRAME))
         return VLC_EGENERIC;
     /* */
     sys->hw.decoder = sys->decoder;
@@ -867,10 +867,12 @@ static int DxFindVideoServiceConversion(vlc_va_t *va, GUID *input, D3DFORMAT *ou
 /**
  * It creates a DXVA2 decoder using the given video format
  */
-static int DxCreateVideoDecoder(vlc_va_t *va,
-                                int codec_id, const video_format_t *fmt)
+static int DxCreateVideoDecoder(vlc_va_t *va, int codec_id,
+                                const video_format_t *fmt, bool b_threading)
 {
     vlc_va_sys_t *sys = va->sys;
+    int surface_alignment = 16;
+    int surface_count = 4;
 
     /* */
     msg_Dbg(va, "DxCreateVideoDecoder id %d %dx%d",
@@ -879,23 +881,34 @@ static int DxCreateVideoDecoder(vlc_va_t *va,
     sys->width  = fmt->i_width;
     sys->height = fmt->i_height;
 
-    /* Allocates all surfaces needed for the decoder */
-    sys->surface_width  = (fmt->i_width  + 15) & ~15;
-    sys->surface_height = (fmt->i_height + 15) & ~15;
-    int surface_count;
-    switch (codec_id) {
-    case AV_CODEC_ID_HEVC:
-    case AV_CODEC_ID_H264:
-        surface_count = 16 + sys->thread_count + 2;
-        break;
-    case AV_CODEC_ID_MPEG1VIDEO:
+    switch ( codec_id )
+    {
     case AV_CODEC_ID_MPEG2VIDEO:
-        surface_count = 2 + 2;
+        /* decoding MPEG-2 requires additional alignment on some Intel GPUs,
+           but it causes issues for H.264 on certain AMD GPUs..... */
+        surface_alignment = 32;
+        surface_count += 2;
+        break;
+    case AV_CODEC_ID_HEVC:
+        /* the HEVC DXVA2 spec asks for 128 pixel aligned surfaces to ensure
+           all coding features have enough room to work with */
+        surface_alignment = 128;
+        surface_count += 16;
+        break;
+    case AV_CODEC_ID_H264:
+        surface_count += 16;
         break;
     default:
-        surface_count = 2 + 1;
-        break;
+        surface_count += 2;
     }
+
+#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
+    sys->surface_width  = ALIGN(fmt->i_width, surface_alignment);
+    sys->surface_height = ALIGN(fmt->i_height, surface_alignment);
+
+    if ( b_threading )
+        surface_count += sys->thread_count;
+
     if (surface_count > VA_DXVA2_MAX_SURFACE_COUNT)
         return VLC_EGENERIC;
     sys->surface_count = surface_count;
