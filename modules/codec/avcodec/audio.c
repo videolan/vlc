@@ -151,7 +151,6 @@ static int OpenAudioCodec( decoder_t *p_dec )
 /**
  * Allocates decoded audio buffer for libavcodec to use.
  */
-#if (LIBAVCODEC_VERSION_MAJOR >= 55)
 typedef struct
 {
     block_t self;
@@ -186,49 +185,6 @@ static block_t *vlc_av_frame_Wrap(AVFrame *frame)
     b->frame = frame;
     return block;
 }
-#else
-static int GetAudioBuf( AVCodecContext *ctx, AVFrame *buf )
-{
-    block_t *block;
-    bool planar = av_sample_fmt_is_planar( ctx->sample_fmt );
-    unsigned channels = planar ? 1 : ctx->channels;
-    unsigned planes = planar ? ctx->channels : 1;
-
-    int bytes = av_samples_get_buffer_size( &buf->linesize[0], channels,
-                                            buf->nb_samples, ctx->sample_fmt,
-                                            16 );
-    assert( bytes >= 0 );
-    block = block_Alloc( bytes * planes );
-    if( unlikely(block == NULL) )
-        return AVERROR(ENOMEM);
-
-    block->i_nb_samples = buf->nb_samples;
-    buf->opaque = block;
-
-    if( planes > AV_NUM_DATA_POINTERS )
-    {
-        uint8_t **ext = malloc( sizeof( *ext ) * planes );
-        if( unlikely(ext == NULL) )
-        {
-            block_Release( block );
-            return AVERROR(ENOMEM);
-        }
-        buf->extended_data = ext;
-    }
-    else
-        buf->extended_data = buf->data;
-
-    uint8_t *buffer = block->p_buffer;
-    for( unsigned i = 0; i < planes; i++ )
-    {
-        buf->linesize[i] = buf->linesize[0];
-        buf->extended_data[i] = buffer;
-        buffer += bytes;
-    }
-
-    return 0;
-}
-#endif
 
 /*****************************************************************************
  * InitAudioDec: initialize audio decoder
@@ -246,11 +202,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         return VLC_ENOMEM;
     }
 
-#if (LIBAVCODEC_VERSION_MAJOR >= 55)
     p_context->refcounted_frames = true;
-#else
-    p_context->get_buffer = GetAudioBuf;
-#endif
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
     p_sys->b_delayed_open = true;
@@ -338,13 +290,9 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         p_block->i_flags |= BLOCK_FLAG_PRIVATE_REALLOCATED;
     }
 
-#if (LIBAVCODEC_VERSION_MAJOR >= 55)
     AVFrame *frame = av_frame_alloc();
     if (unlikely(frame == NULL))
         goto end;
-#else
-    AVFrame *frame = &(AVFrame) { };
-#endif
 
     for( int got_frame = 0; !got_frame; )
     {
@@ -391,17 +339,13 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         *pp_block = NULL;
     }
 
-#if (LIBAVCODEC_VERSION_MAJOR < 55)
     /* NOTE WELL: Beyond this point, p_block refers to the DECODED block! */
-    p_block = frame->opaque;
-#endif
     SetupOutputFormat( p_dec, true );
     if( decoder_UpdateAudioFormat( p_dec ) )
         goto drop;
 
     /* Interleave audio if required */
     if( av_sample_fmt_is_planar( ctx->sample_fmt ) )
-#if (LIBAVCODEC_VERSION_MAJOR >= 55)
     {
         p_block = block_Alloc(frame->linesize[0] * ctx->channels);
         if (unlikely(p_block == NULL))
@@ -422,25 +366,6 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         if (unlikely(p_block == NULL))
             goto drop;
     }
-#else
-    {
-        block_t *p_buffer = block_Alloc( p_block->i_buffer );
-        if( unlikely(p_buffer == NULL) )
-            goto drop;
-
-        const void *planes[ctx->channels];
-        for( int i = 0; i < ctx->channels; i++)
-            planes[i] = frame->extended_data[i];
-
-        aout_Interleave( p_buffer->p_buffer, planes, frame->nb_samples,
-                         ctx->channels, p_dec->fmt_out.audio.i_format );
-        if( ctx->channels > AV_NUM_DATA_POINTERS )
-            free( frame->extended_data );
-        block_Release( p_block );
-        p_block = p_buffer;
-    }
-    p_block->i_nb_samples = frame->nb_samples;
-#endif
 
     if (p_sys->b_extract)
     {   /* TODO: do not drop channels... at least not here */

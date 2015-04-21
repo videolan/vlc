@@ -96,12 +96,7 @@ struct decoder_sys_t
  * Local prototypes
  *****************************************************************************/
 static void ffmpeg_InitCodec      ( decoder_t * );
-#if LIBAVCODEC_VERSION_MAJOR >= 55
 static int lavc_GetFrame(struct AVCodecContext *, AVFrame *, int);
-#else
-static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
-static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
-#endif
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
                                           const enum PixelFormat * );
 static picture_t *DecodeVideo( decoder_t *, block_t ** );
@@ -351,9 +346,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         p_context->flags |= CODEC_FLAG_GRAY;
 
     /* ***** Output always the frames ***** */
-#if LIBAVCODEC_VERSION_CHECK(55, 23, 1, 40, 101)
     p_context->flags |= CODEC_FLAG_OUTPUT_CORRUPT;
-#endif
 
     i_val = var_CreateGetInteger( p_dec, "avcodec-skiploopfilter" );
     if( i_val >= 4 ) p_context->skip_loop_filter = AVDISCARD_ALL;
@@ -414,13 +407,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_context->get_format = ffmpeg_GetFormat;
     /* Always use our get_buffer wrapper so we can calculate the
      * PTS correctly */
-#if LIBAVCODEC_VERSION_MAJOR >= 55
     p_context->get_buffer2 = lavc_GetFrame;
-#else
-    p_context->get_buffer = ffmpeg_GetFrameBuf;
-    p_context->reget_buffer = avcodec_default_reget_buffer;
-    p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
-#endif
     p_context->opaque = p_dec;
 
 #ifdef HAVE_AVCODEC_MT
@@ -962,7 +949,6 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
     }
 }
 
-#if LIBAVCODEC_VERSION_MAJOR >= 55
 static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
                             int flags)
 {
@@ -1142,172 +1128,6 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     }
     return 0;
 }
-#else
-static int ffmpeg_va_GetFrameBuf( struct AVCodecContext *p_context, AVFrame *p_ff_pic )
-{
-    decoder_t *p_dec = (decoder_t *)p_context->opaque;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    vlc_va_t *p_va = p_sys->p_va;
-
-    /* hwaccel_context is not present in old ffmpeg version */
-    if( vlc_va_Setup( p_va, p_context, &p_dec->fmt_out.video.i_chroma ) )
-    {
-        msg_Err( p_dec, "vlc_va_Setup failed" );
-        return -1;
-    }
-
-    if( vlc_va_Get( p_va, &p_ff_pic->opaque, &p_ff_pic->data[0] ) )
-    {
-        msg_Err( p_dec, "vlc_va_Get failed" );
-        return -1;
-    }
-
-    p_ff_pic->data[3] = p_ff_pic->data[0];
-    p_ff_pic->type = FF_BUFFER_TYPE_USER;
-    return 0;
-}
-
-static picture_t *ffmpeg_dr_GetFrameBuf(struct AVCodecContext *p_context)
-{
-    decoder_t *p_dec = (decoder_t *)p_context->opaque;
-
-    int i_width = p_context->width;
-    int i_height = p_context->height;
-    avcodec_align_dimensions( p_context, &i_width, &i_height );
-
-    picture_t *p_pic = NULL;
-    if (GetVlcChroma(&p_dec->fmt_out.video, p_context->pix_fmt) != VLC_SUCCESS)
-        goto no_dr;
-
-    if (p_context->pix_fmt == PIX_FMT_PAL8)
-        goto no_dr;
-
-    p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
-
-    p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
-    if( !p_pic )
-        goto no_dr;
-
-    if( p_pic->p[0].i_pitch / p_pic->p[0].i_pixel_pitch < i_width ||
-        p_pic->p[0].i_lines < i_height )
-        goto no_dr;
-
-    for( int i = 0; i < p_pic->i_planes; i++ )
-    {
-        unsigned i_align;
-        switch( p_context->codec_id )
-        {
-        case AV_CODEC_ID_SVQ1:
-        case AV_CODEC_ID_VP5:
-        case AV_CODEC_ID_VP6:
-        case AV_CODEC_ID_VP6F:
-        case AV_CODEC_ID_VP6A:
-            i_align = 16;
-            break;
-        default:
-            i_align = i == 0 ? 16 : 8;
-            break;
-        }
-        if( p_pic->p[i].i_pitch % i_align )
-            goto no_dr;
-        if( (intptr_t)p_pic->p[i].p_pixels % i_align )
-            goto no_dr;
-    }
-
-    if( p_context->pix_fmt == PIX_FMT_YUV422P )
-    {
-        if( 2 * p_pic->p[1].i_pitch != p_pic->p[0].i_pitch ||
-            2 * p_pic->p[2].i_pitch != p_pic->p[0].i_pitch )
-            goto no_dr;
-    }
-
-    return p_pic;
-
-no_dr:
-    if (p_pic)
-        picture_Release( p_pic );
-
-    return NULL;
-}
-
-static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
-                               AVFrame *p_ff_pic )
-{
-    decoder_t *p_dec = (decoder_t *)p_context->opaque;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    /* */
-    p_ff_pic->opaque = NULL;
-#if ! LIBAVCODEC_VERSION_CHECK(54, 34, 0, 79, 101)
-    p_ff_pic->pkt_pts = p_context->pkt ? p_context->pkt->pts : AV_NOPTS_VALUE;
-#endif
-
-    if( p_sys->p_va )
-        return ffmpeg_va_GetFrameBuf(p_context, p_ff_pic);
-
-    if( !p_sys->b_direct_rendering )
-        return avcodec_default_get_buffer( p_context, p_ff_pic );
-
-    wait_mt( p_sys );
-    /* Some codecs set pix_fmt only after the 1st frame has been decoded,
-     * so we need to check for direct rendering again. */
-
-    picture_t *p_pic = ffmpeg_dr_GetFrameBuf(p_context);
-    if (!p_pic) {
-        if( p_sys->i_direct_rendering_used != 0 )
-        {
-            msg_Warn( p_dec, "disabling direct rendering" );
-            p_sys->i_direct_rendering_used = 0;
-        }
-
-        post_mt( p_sys );
-        return avcodec_default_get_buffer( p_context, p_ff_pic );
-    }
-
-    if( p_sys->i_direct_rendering_used != 1 ) {
-        msg_Dbg( p_dec, "using direct rendering" );
-        p_sys->i_direct_rendering_used = 1;
-    }
-
-    p_context->draw_horiz_band = NULL;
-    post_mt( p_sys );
-
-    p_ff_pic->opaque = (void*)p_pic;
-    p_ff_pic->type = FF_BUFFER_TYPE_USER;
-    p_ff_pic->data[0] = p_pic->p[0].p_pixels;
-    p_ff_pic->data[1] = p_pic->p[1].p_pixels;
-    p_ff_pic->data[2] = p_pic->p[2].p_pixels;
-    p_ff_pic->data[3] = NULL; /* alpha channel but I'm not sure */
-
-    p_ff_pic->linesize[0] = p_pic->p[0].i_pitch;
-    p_ff_pic->linesize[1] = p_pic->p[1].i_pitch;
-    p_ff_pic->linesize[2] = p_pic->p[2].i_pitch;
-    p_ff_pic->linesize[3] = 0;
-
-    return 0;
-}
-
-static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
-                                    AVFrame *p_ff_pic )
-{
-    decoder_t *p_dec = (decoder_t *)p_context->opaque;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( p_sys->p_va )
-        vlc_va_Release( p_sys->p_va, p_ff_pic->opaque, p_ff_pic->data[0] );
-    else if( p_ff_pic->opaque )
-        picture_Release( (picture_t*)p_ff_pic->opaque);
-    else if( p_ff_pic->type == FF_BUFFER_TYPE_INTERNAL )
-        /* We can end up here without the AVFrame being allocated by
-         * avcodec_default_get_buffer() if VA is used and the frame is
-         * released when the decoder is closed
-         */
-        avcodec_default_release_buffer( p_context, p_ff_pic );
-
-    for( int i = 0; i < 4; i++ )
-        p_ff_pic->data[i] = NULL;
-}
-#endif
 
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
                                           const enum PixelFormat *pi_fmt )

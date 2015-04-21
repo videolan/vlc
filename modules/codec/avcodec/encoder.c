@@ -147,9 +147,6 @@ struct encoder_sys_t
     bool       b_trellis;
     int        i_quality; /* for VBR */
     float      f_lumi_masking, f_dark_masking, f_p_masking, f_border_masking;
-#if (LIBAVCODEC_VERSION_MAJOR < 55)
-    int        i_luma_elim, i_chroma_elim;
-#endif
     int        i_aac_profile; /* AAC profile to use.*/
 
     AVFrame    *frame;
@@ -200,9 +197,6 @@ static const char *const ppsz_enc_options[] = {
     "interlace", "interlace-me", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
     "p-masking", "border-masking",
-#if (LIBAVCODEC_VERSION_MAJOR < 55)
-    "luma-elim-threshold", "chroma-elim-threshold",
-#endif
     "aac-profile", "options",
     NULL
 };
@@ -421,10 +415,6 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->f_dark_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "dark-masking" );
     p_sys->f_p_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "p-masking" );
     p_sys->f_border_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "border-masking" );
-#if (LIBAVCODEC_VERSION_MAJOR < 55)
-    p_sys->i_luma_elim = var_GetInteger( p_enc, ENC_CFG_PREFIX "luma-elim-threshold" );
-    p_sys->i_chroma_elim = var_GetInteger( p_enc, ENC_CFG_PREFIX "chroma-elim-threshold" );
-#endif
 
     psz_val = var_GetString( p_enc, ENC_CFG_PREFIX "aac-profile" );
     /* libavcodec uses faac encoder atm, and it has issues with
@@ -440,7 +430,6 @@ int OpenEncoder( vlc_object_t *p_this )
             p_sys->i_aac_profile = FF_PROFILE_AAC_SSR;
         else if( !strncmp( psz_val, "ltp", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
-#if LIBAVCODEC_VERSION_CHECK( 54, 19, 0, 35, 100 )
 /* These require libavcodec with libfdk-aac */
         else if( !strncmp( psz_val, "hev2", 4 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_HE_V2;
@@ -450,7 +439,6 @@ int OpenEncoder( vlc_object_t *p_this )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LD;
         else if( !strncmp( psz_val, "eld", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_ELD;
-#endif
         else
         {
             msg_Warn( p_enc, "unknown AAC profile requested, setting it to low" );
@@ -504,10 +492,6 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->dark_masking = p_sys->f_dark_masking;
         p_context->p_masking = p_sys->f_p_masking;
         p_context->border_masking = p_sys->f_border_masking;
-#if (LIBAVCODEC_VERSION_MAJOR < 55)
-        p_context->luma_elim_threshold = p_sys->i_luma_elim;
-        p_context->chroma_elim_threshold = p_sys->i_chroma_elim;
-#endif
 
         if( p_sys->i_key_int > 0 )
             p_context->gop_size = p_sys->i_key_int;
@@ -1408,12 +1392,7 @@ void CloseEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
-#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54, 28, 0))
     avcodec_free_frame( &p_sys->frame );
-#else
-    av_free( p_sys->frame );
-    p_sys->frame = NULL;
-#endif
 
     vlc_avcodec_lock();
     avcodec_close( p_sys->p_context );

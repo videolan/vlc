@@ -2277,7 +2277,7 @@ dnl
 AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec        libavcodec codec (default enabled)])
 AS_IF([test "${enable_avcodec}" != "no"], [
-  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 54.25.0 libavutil >= 52.0.0], [
+  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 55.0.0 libavutil >= 52.0.0], [
     dnl PKG_CHECK_EXISTS([libavcodec < 56],, [
     dnl   AC_MSG_ERROR([libavcodec versions 56 and later are not supported yet.])
     dnl ])
