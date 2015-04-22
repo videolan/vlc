@@ -258,7 +258,7 @@
 
     if((OSX_MAVERICKS || OSX_YOSEMITE) && b_inFullscreen && constrainedRect.size.width == screenRect.size.width
           && constrainedRect.size.height != screenRect.size.height
-          && abs(screenRect.size.height - constrainedRect.size.height) <= 25.) {
+          && fabs(screenRect.size.height - constrainedRect.size.height) <= 25.) {
 
         msg_Dbg(VLCIntf, "Contrain window height %.1f to screen height %.1f",
                 constrainedRect.size.height, screenRect.size.height);
@@ -475,10 +475,10 @@
     maxRect = [self customConstrainFrameRect: maxRect toScreen: [self screen]];
 
     // Compare the new frame with the current one
-    if ((abs(NSMaxX(maxRect) - NSMaxX(currentFrame)) < DIST)
-        && (abs(NSMaxY(maxRect) - NSMaxY(currentFrame)) < DIST)
-        && (abs(NSMinX(maxRect) - NSMinX(currentFrame)) < DIST)
-        && (abs(NSMinY(maxRect) - NSMinY(currentFrame)) < DIST)) {
+    if ((fabs(NSMaxX(maxRect) - NSMaxX(currentFrame)) < DIST)
+        && (fabs(NSMaxY(maxRect) - NSMaxY(currentFrame)) < DIST)
+        && (fabs(NSMinX(maxRect) - NSMinX(currentFrame)) < DIST)
+        && (fabs(NSMinY(maxRect) - NSMinY(currentFrame)) < DIST)) {
         // Already in zoomed mode, reset user frame, if stored
         if ([self frameAutosaveName] != nil) {
             [self setFrame: previousSavedFrame display: YES animate: YES];
