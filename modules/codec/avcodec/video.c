@@ -1005,32 +1005,19 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
     if (ctx->pix_fmt == PIX_FMT_PAL8)
         return NULL;
 
+    picture_t *pic = ffmpeg_NewPictBuf(dec, ctx);
+    if (pic == NULL)
+        return NULL;
+
     int width = frame->width;
     int height = frame->height;
     int aligns[AV_NUM_DATA_POINTERS];
 
     avcodec_align_dimensions2(ctx, &width, &height, aligns);
 
-    picture_t *pic = ffmpeg_NewPictBuf(dec, ctx);
-    if (pic == NULL)
-        return NULL;
-
     /* Check that the picture is suitable for libavcodec */
-    if (pic->p[0].i_pitch < width * pic->p[0].i_pixel_pitch)
-    {
-        if (sys->i_direct_rendering_used != 0)
-            msg_Dbg(dec, "plane 0: pitch too small (%d/%d*%d)",
-                    pic->p[0].i_pitch, width, pic->p[0].i_pixel_pitch);
-        goto no_dr;
-    }
-
-    if (pic->p[0].i_lines < height)
-    {
-        if (sys->i_direct_rendering_used != 0)
-            msg_Dbg(dec, "plane 0: lines too few (%d/%d)",
-                    pic->p[0].i_lines, height);
-        goto no_dr;
-    }
+    assert(pic->p[0].i_pitch >= width * pic->p[0].i_pixel_pitch);
+    assert(pic->p[0].i_lines >= height);
 
     for (int i = 0; i < pic->i_planes; i++)
     {
