@@ -64,8 +64,6 @@ struct decoder_sys_t
     bool b_direct_rendering;
     int  i_direct_rendering_used;
 
-    bool b_has_b_frames;
-
     /* Hack to force display of still pictures */
     bool b_first_frame;
 
@@ -459,7 +457,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* ***** misc init ***** */
     p_sys->i_pts = VLC_TS_INVALID;
-    p_sys->b_has_b_frames = false;
     p_sys->b_first_frame = true;
     p_sys->b_flush = false;
     p_sys->i_late_frames = 0;
@@ -726,12 +723,6 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             av_frame_unref(frame);
             if( i_used == 0 ) break;
             continue;
-        }
-
-        /* Sanity check (seems to be needed for some streams) */
-        if( frame->pict_type == AV_PICTURE_TYPE_B)
-        {
-            p_sys->b_has_b_frames = true;
         }
 
         /* Compute the PTS */
