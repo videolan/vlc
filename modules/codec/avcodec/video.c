@@ -33,6 +33,7 @@
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>
 #include <vlc_cpu.h>
+#include <vlc_atomic.h>
 #include <assert.h>
 
 #include <libavcodec/avcodec.h>
@@ -61,8 +62,8 @@ struct decoder_sys_t
     mtime_t i_late_frames_start;
 
     /* for direct rendering */
-    bool b_direct_rendering;
-    int  i_direct_rendering_used;
+    bool        b_direct_rendering;
+    atomic_bool b_dr_failure;
 
     /* Hack to force display of still pictures */
     bool b_first_frame;
@@ -368,7 +369,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* ***** libavcodec direct rendering ***** */
     p_sys->b_direct_rendering = false;
-    p_sys->i_direct_rendering_used = -1;
+    atomic_init(&p_sys->b_dr_failure, false);
     if( var_CreateGetBool( p_dec, "avcodec-dr" ) &&
        (p_codec->capabilities & CODEC_CAP_DR1) &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
@@ -995,15 +996,17 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
     {
         if (pic->p[i].i_pitch % aligns[i])
         {
-            if (sys->i_direct_rendering_used != 0)
-                msg_Dbg(dec, "plane %d: pitch not aligned (%d%%%d)",
-                        i, pic->p[i].i_pitch, aligns[i]);
+            if (!atomic_exchange(&sys->b_dr_failure, true))
+                msg_Warn(dec, "plane %d: pitch not aligned (%d%%%d): %s",
+                         i, pic->p[i].i_pitch, aligns[i],
+                         "disabling direct rendering");
             goto error;
         }
         if (((uintptr_t)pic->p[i].p_pixels) % aligns[i])
         {
-            if (sys->i_direct_rendering_used != 0)
-                msg_Warn(dec, "plane %d not aligned", i);
+            if (!atomic_exchange(&sys->b_dr_failure, true))
+                msg_Warn(dec, "plane %d not aligned: %s", i,
+                         "disabling direct rendering");
             goto error;
         }
     }
@@ -1077,40 +1080,18 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
 
     /* The semaphore protects updates to fmt_out */
     pic = ffmpeg_NewPictBuf(dec, ctx);
+    post_mt(sys);
     if (pic == NULL)
-    {
-        post_mt(sys);
         return -1;
-    }
 
     if (sys->p_va != NULL)
-    {
-        post_mt(sys);
         return lavc_va_GetFrame(ctx, frame, pic);
-    }
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
-    /* XXX: The semaphore is needed because of i_direct_rendering_used */
     int ret = lavc_dr_GetFrame(ctx, frame, pic);
     if (ret)
-    {
-        if (sys->i_direct_rendering_used != 0)
-        {
-            msg_Warn(dec, "disabling direct rendering");
-            sys->i_direct_rendering_used = 0;
-        }
         ret = avcodec_default_get_buffer2(ctx, frame, flags);
-    }
-    else
-    {
-        if (sys->i_direct_rendering_used != 1)
-        {
-            msg_Dbg(dec, "enabling direct rendering");
-            sys->i_direct_rendering_used = 1;
-        }
-    }
-    post_mt(sys);
     return ret;
 }
 
