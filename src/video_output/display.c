@@ -1263,10 +1263,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vout_display_t *p_display = vout_display_New(VLC_OBJECT(vout),
                                                  module, !is_wrapper,
                                                  source, cfg, &owner);
-    if (!p_display) {
-        free(osys);
-        return NULL;
-    }
+    if (!p_display)
+        goto error;
 
     VoutDisplayCreateRender(p_display);
 
@@ -1276,6 +1274,10 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         osys->ch_sar = true;
 
     return p_display;
+error:
+    vlc_mutex_destroy(&osys->lock);
+    free(osys);
+    return NULL;
 }
 
 void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
