@@ -954,20 +954,10 @@ static void lavc_ReleaseFrame(void *opaque, uint8_t *data)
 }
 
 static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
-                            int flags)
+                            picture_t *pic)
 {
     decoder_t *dec = ctx->opaque;
     vlc_va_t *va = dec->p_sys->p_va;
-
-    if (vlc_va_Setup(va, ctx, &dec->fmt_out.video.i_chroma))
-    {
-        msg_Err(dec, "hardware acceleration setup failed");
-        return -1;
-    }
-
-    picture_t *pic = ffmpeg_NewPictBuf(dec, ctx);
-    if (pic == NULL)
-        return -1;
 
     if (vlc_va_Get(va, pic, &frame->data[0]))
     {
@@ -992,22 +982,17 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
 
     frame->opaque = pic;
     assert(frame->data[0] != NULL);
-    (void) flags;
     return 0;
 }
 
-static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
-                                   AVFrame *frame, int flags)
+static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
+                            picture_t *pic)
 {
     decoder_t *dec = (decoder_t *)ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
 
     if (ctx->pix_fmt == PIX_FMT_PAL8)
-        return NULL;
-
-    picture_t *pic = ffmpeg_NewPictBuf(dec, ctx);
-    if (pic == NULL)
-        return NULL;
+        goto error;
 
     int width = frame->width;
     int height = frame->height;
@@ -1026,13 +1011,13 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
             if (sys->i_direct_rendering_used != 0)
                 msg_Dbg(dec, "plane %d: pitch not aligned (%d%%%d)",
                         i, pic->p[i].i_pitch, aligns[i]);
-            goto no_dr;
+            goto error;
         }
         if (((uintptr_t)pic->p[i].p_pixels) % aligns[i])
         {
             if (sys->i_direct_rendering_used != 0)
                 msg_Warn(dec, "plane %d not aligned", i);
-            goto no_dr;
+            goto error;
         }
     }
 
@@ -1048,25 +1033,23 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
         frame->data[i] = data;
         frame->linesize[i] = pic->p[i].i_pitch;
         frame->buf[i] = av_buffer_create(data, size, lavc_ReleaseFrame,
-                                         picture_Hold(pic), 0);
+                                         pic, 0);
         if (unlikely(frame->buf[i] == NULL))
         {
-            lavc_ReleaseFrame(pic, data);
+            while (i > 0)
+                av_buffer_unref(&frame->buf[--i]);
             goto error;
         }
+        picture_Hold(pic);
     }
 
     frame->opaque = pic;
     /* The loop above held one reference to the picture for each plane. */
     picture_Release(pic);
-    (void) flags;
-    return pic;
+    return 0;
 error:
-    for (unsigned i = 0; frame->buf[i] != NULL; i++)
-        av_buffer_unref(&frame->buf[i]);
-no_dr:
     picture_Release(pic);
-    return NULL;
+    return -1;
 }
 
 /**
@@ -1089,34 +1072,59 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     }
     frame->opaque = NULL;
 
+    wait_mt(sys);
     if (sys->p_va != NULL)
-        return lavc_va_GetFrame(ctx, frame, flags);
-
-    if (!sys->b_direct_rendering)
+    {   /* TODO: Move this to get_format(). We are screwed if it fails here. */
+        if (vlc_va_Setup(sys->p_va, ctx, &dec->fmt_out.video.i_chroma))
+        {
+            post_mt(sys);
+            msg_Err(dec, "hardware acceleration setup failed");
+            return -1;
+        }
+    }
+    else if (!sys->b_direct_rendering)
+    {
+        post_mt(sys);
         return avcodec_default_get_buffer2(ctx, frame, flags);
+    }
+
+    /* The semaphore protects updates to fmt_out */
+    pic = ffmpeg_NewPictBuf(dec, ctx);
+    if (pic == NULL)
+    {
+        post_mt(sys);
+        return -1;
+    }
+
+    if (sys->p_va != NULL)
+    {
+        post_mt(sys);
+        return lavc_va_GetFrame(ctx, frame, pic);
+    }
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
-    wait_mt(sys);
-    pic = lavc_dr_GetFrame(ctx, frame, flags);
-    if (pic == NULL)
+    /* XXX: The semaphore is needed because of i_direct_rendering_used */
+    int ret = lavc_dr_GetFrame(ctx, frame, pic);
+    if (ret)
     {
         if (sys->i_direct_rendering_used != 0)
         {
             msg_Warn(dec, "disabling direct rendering");
             sys->i_direct_rendering_used = 0;
         }
-        post_mt(sys);
-        return avcodec_default_get_buffer2(ctx, frame, flags);
+        ret = avcodec_default_get_buffer2(ctx, frame, flags);
     }
-
-    if (sys->i_direct_rendering_used != 1)
+    else
     {
-        msg_Dbg(dec, "enabling direct rendering");
-        sys->i_direct_rendering_used = 1;
+        if (sys->i_direct_rendering_used != 1)
+        {
+            msg_Dbg(dec, "enabling direct rendering");
+            sys->i_direct_rendering_used = 1;
+        }
     }
     post_mt(sys);
-    return 0;
+    return ret;
 }
 
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
