@@ -1887,7 +1887,8 @@ static int hls_Download(stream_t *s, segment_t *segment)
         }
 
         int i_canc = vlc_savecancel();
-        int i_length = stream_Read(p_ts, &p_segment_data->p_buffer[i_total_read], HLS_READ_SIZE);
+        int i_length = stream_Read(p_ts, &p_segment_data->p_buffer[i_total_read],
+                                   (i_toread >= HLS_READ_SIZE) ? HLS_READ_SIZE : i_toread);
         vlc_restorecancel(i_canc);
 
         if (i_length <= 0)
