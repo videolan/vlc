@@ -1036,12 +1036,17 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
         }
     }
 
-    /* Allocate buffer references */
+    /* Allocate buffer references and initialize planes */
+    assert(pic->i_planes < PICTURE_PLANE_MAX);
+    static_assert(PICTURE_PLANE_MAX <= AV_NUM_DATA_POINTERS, "Oops!");
+
     for (int i = 0; i < pic->i_planes; i++)
     {
         uint8_t *data = pic->p[i].p_pixels;
         int size = pic->p[i].i_pitch * pic->p[i].i_lines;
 
+        frame->data[i] = data;
+        frame->linesize[i] = pic->p[i].i_pitch;
         frame->buf[i] = av_buffer_create(data, size, lavc_ReleaseFrame,
                                          picture_Hold(pic), 0);
         if (unlikely(frame->buf[i] == NULL))
@@ -1050,6 +1055,9 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
             goto error;
         }
     }
+
+    frame->opaque = pic;
+    /* The loop above held one reference to the picture for each plane. */
     picture_Release(pic);
     (void) flags;
     return pic;
@@ -1079,11 +1087,11 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
         frame->linesize[i] = 0;
         frame->buf[i] = NULL;
     }
+    frame->opaque = NULL;
 
     if (sys->p_va != NULL)
         return lavc_va_GetFrame(ctx, frame, flags);
 
-    frame->opaque = NULL;
     if (!sys->b_direct_rendering)
         return avcodec_default_get_buffer2(ctx, frame, flags);
 
@@ -1108,14 +1116,6 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
         sys->i_direct_rendering_used = 1;
     }
     post_mt(sys);
-
-    frame->opaque = pic;
-    static_assert(PICTURE_PLANE_MAX <= AV_NUM_DATA_POINTERS, "Oops!");
-    for (unsigned i = 0; i < PICTURE_PLANE_MAX; i++)
-    {
-        frame->data[i] = pic->p[i].p_pixels;
-        frame->linesize[i] = pic->p[i].i_pitch;
-    }
     return 0;
 }
 
