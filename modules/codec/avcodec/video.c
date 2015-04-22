@@ -1002,9 +1002,6 @@ static picture_t *lavc_dr_GetFrame(struct AVCodecContext *ctx,
     decoder_t *dec = (decoder_t *)ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
 
-    if (GetVlcChroma(&dec->fmt_out.video, ctx->pix_fmt) != VLC_SUCCESS)
-        return NULL;
-    dec->fmt_out.i_codec = dec->fmt_out.video.i_chroma;
     if (ctx->pix_fmt == PIX_FMT_PAL8)
         return NULL;
 
