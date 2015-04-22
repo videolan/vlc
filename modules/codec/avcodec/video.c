@@ -1123,13 +1123,6 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     if (!can_hwaccel)
         goto end;
 
-    /* Profile and level information is needed now.
-     * TODO: avoid code duplication with avcodec.c */
-    if( p_context->profile != FF_PROFILE_UNKNOWN)
-        p_dec->fmt_in.i_profile = p_context->profile;
-    if( p_context->level != FF_LEVEL_UNKNOWN)
-        p_dec->fmt_in.i_level = p_context->level;
-
     p_va = vlc_va_New( VLC_OBJECT(p_dec), p_context, &p_dec->fmt_in );
     if( p_va == NULL )
         goto end;
