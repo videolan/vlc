@@ -707,8 +707,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 if( b_drawpicture )
                     msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
                             p_block->i_buffer );
-                block_Release( p_block );
-                return NULL;
+                break;
             }
             else if( (unsigned)i_used > p_block->i_buffer ||
                     p_context->thread_count > 1 )
@@ -799,9 +798,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if( !p_pic )
             {
                 av_frame_unref(frame);
-                if( p_block )
-                    block_Release( p_block );
-                return NULL;
+                break;
             }
 
             /* Fill picture_t from AVFrame */
