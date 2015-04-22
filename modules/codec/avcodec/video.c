@@ -52,8 +52,6 @@ struct decoder_sys_t
     /* Video decoder specific part */
     mtime_t i_pts;
 
-    AVFrame          *p_ff_pic;
-
     /* for frame skipping algo */
     bool b_hurry_up;
     enum AVDiscard i_skip_frame;
@@ -321,7 +319,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
-    p_sys->p_ff_pic = avcodec_alloc_frame();
     p_sys->b_delayed_open = true;
     p_sys->p_va = NULL;
     vlc_sem_init( &p_sys->sem_mt, 0 );
@@ -402,6 +399,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* Always use our get_buffer wrapper so we can calculate the
      * PTS correctly */
     p_context->get_buffer2 = lavc_GetFrame;
+    p_context->refcounted_frames = true;
     p_context->opaque = p_dec;
 
 #ifdef HAVE_AVCODEC_MT
@@ -491,7 +489,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** Open the codec ***** */
     if( OpenVideoCodec( p_dec ) < 0 )
     {
-        avcodec_free_frame( &p_sys->p_ff_pic );
         vlc_sem_destroy( &p_sys->sem_mt );
         free( p_sys );
         return VLC_EGENERIC;
@@ -650,6 +647,13 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         int i_used, b_gotpicture;
         AVPacket pkt;
 
+        AVFrame *frame = av_frame_alloc();
+        if (unlikely(frame == NULL))
+        {
+            p_dec->b_error = true;
+            break;
+        }
+
         post_mt( p_sys );
 
         av_init_packet( &pkt );
@@ -683,8 +687,8 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_block->i_dts = VLC_TS_INVALID;
         }
 
-        i_used = avcodec_decode_video2( p_context, p_sys->p_ff_pic,
-                                       &b_gotpicture, &pkt );
+        i_used = avcodec_decode_video2( p_context, frame, &b_gotpicture,
+                                        &pkt );
         av_free_packet( &pkt );
 
         wait_mt( p_sys );
@@ -699,6 +703,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
             if( i_used < 0 )
             {
+                av_frame_unref(frame);
                 if( b_drawpicture )
                     msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
                             p_block->i_buffer );
@@ -719,21 +724,21 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         /* Nothing to display */
         if( !b_gotpicture )
         {
+            av_frame_unref(frame);
             if( i_used == 0 ) break;
             continue;
         }
 
         /* Sanity check (seems to be needed for some streams) */
-        if( p_sys->p_ff_pic->pict_type == AV_PICTURE_TYPE_B)
+        if( frame->pict_type == AV_PICTURE_TYPE_B)
         {
             p_sys->b_has_b_frames = true;
         }
 
         /* Compute the PTS */
-        mtime_t i_pts =
-                    p_sys->p_ff_pic->pkt_pts;
+        mtime_t i_pts = frame->pkt_pts;
         if (i_pts <= VLC_TS_INVALID)
-            i_pts = p_sys->p_ff_pic->pkt_dts;
+            i_pts = frame->pkt_dts;
 
         if( i_pts <= VLC_TS_INVALID )
             i_pts = p_sys->i_pts;
@@ -747,8 +752,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if( p_dec->fmt_in.video.i_frame_rate > 0 &&
                 p_dec->fmt_in.video.i_frame_rate_base > 0 )
             {
-                p_sys->i_pts += CLOCK_FREQ *
-                    (2 + p_sys->p_ff_pic->repeat_pict) *
+                p_sys->i_pts += CLOCK_FREQ * (2 + frame->repeat_pict) *
                     p_dec->fmt_in.video.i_frame_rate_base /
                     (2 * p_dec->fmt_in.video.i_frame_rate);
             }
@@ -758,8 +762,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 if( i_tick <= 0 )
                     i_tick = 1;
 
-                p_sys->i_pts += CLOCK_FREQ *
-                    (2 + p_sys->p_ff_pic->repeat_pict) *
+                p_sys->i_pts += CLOCK_FREQ * (2 + frame->repeat_pict) *
                     i_tick * p_context->time_base.num /
                     (2 * p_context->time_base.den);
             }
@@ -781,10 +784,13 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_late_frames = 0;
         }
 
-        if( !b_drawpicture || ( !p_sys->p_va && !p_sys->p_ff_pic->linesize[0] ) )
+        if( !b_drawpicture || ( !p_sys->p_va && !frame->linesize[0] ) )
+        {
+            av_frame_unref(frame);
             continue;
+        }
 
-        picture_t *p_pic = p_sys->p_ff_pic->opaque;
+        picture_t *p_pic = frame->opaque;
         if( p_pic == NULL )
         {
             /* Get a new picture */
@@ -792,18 +798,19 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
             if( !p_pic )
             {
+                av_frame_unref(frame);
                 if( p_block )
                     block_Release( p_block );
                 return NULL;
             }
 
             /* Fill picture_t from AVFrame */
-            lavc_CopyPicture(p_dec, p_pic, p_sys->p_ff_pic);
+            lavc_CopyPicture(p_dec, p_pic, frame);
         }
         else
         {
             if( p_sys->p_va != NULL )
-                vlc_va_Extract( p_sys->p_va, p_pic, p_sys->p_ff_pic->data[3] );
+                vlc_va_Extract( p_sys->p_va, p_pic, frame->data[3] );
             picture_Hold( p_pic );
         }
 
@@ -822,28 +829,23 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             }
         }
 
+        p_pic->date = i_pts;
+        /* Hack to force display of still pictures */
+        p_pic->b_force = p_sys->b_first_frame;
+        p_pic->i_nb_fields = 2 + frame->repeat_pict;
+        p_pic->b_progressive = !frame->interlaced_frame;
+        p_pic->b_top_field_first = frame->top_field_first;
+
+        av_frame_unref(frame);
+
         /* Send decoded frame to vout */
-        if( i_pts > VLC_TS_INVALID)
+        if (i_pts > VLC_TS_INVALID)
         {
-            p_pic->date = i_pts;
-
-            if( p_sys->b_first_frame )
-            {
-                /* Hack to force display of still pictures */
-                p_sys->b_first_frame = false;
-                p_pic->b_force = true;
-            }
-
-            p_pic->i_nb_fields = 2 + p_sys->p_ff_pic->repeat_pict;
-            p_pic->b_progressive = !p_sys->p_ff_pic->interlaced_frame;
-            p_pic->b_top_field_first = p_sys->p_ff_pic->top_field_first;
-
+            p_sys->b_first_frame = false;
             return p_pic;
         }
         else
-        {
             picture_Release( p_pic );
-        }
     }
 
     if( p_block )
@@ -870,9 +872,6 @@ void EndVideoDec( decoder_t *p_dec )
     wait_mt( p_sys );
 
     ffmpeg_CloseCodec( p_dec );
-
-    if( p_sys->p_ff_pic )
-        avcodec_free_frame( &p_sys->p_ff_pic );
 
     if( p_sys->p_va )
         vlc_va_Delete( p_sys->p_va, p_sys->p_context );
