@@ -29,6 +29,7 @@
 
 #include <jni.h>
 #include <stdint.h>
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -260,6 +261,7 @@ static const struct member members[] = {
  *****************************************************************************/
 static int  OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
+static void CloseMediaCodec(decoder_t *p_dec, JNIEnv *env);
 
 static picture_t *DecodeVideo(decoder_t *, block_t **);
 
@@ -386,17 +388,14 @@ end:
 }
 
 /*****************************************************************************
- * OpenDecoder: Create the decoder instance
+ * OpenMediaCodec: Create the mediacodec instance
  *****************************************************************************/
-static int OpenDecoder(vlc_object_t *p_this)
+static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys;
-
-    if (p_dec->fmt_in.i_cat != VIDEO_ES && !p_dec->b_force)
-        return VLC_EGENERIC;
-
+    decoder_sys_t *p_sys = p_dec->p_sys;
     const char *mime = NULL;
+    size_t fmt_profile = 0;
+
     switch (p_dec->fmt_in.i_codec) {
     case VLC_CODEC_HEVC: mime = "video/hevc"; break;
     case VLC_CODEC_H264: mime = "video/avc"; break;
@@ -407,31 +406,11 @@ static int OpenDecoder(vlc_object_t *p_this)
     case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
     case VLC_CODEC_VP9:  mime = "video/x-vnd.on2.vp9"; break;
     default:
-        msg_Dbg(p_dec, "codec %4.4s not supported", (char *)&p_dec->fmt_in.i_codec);
-        return VLC_EGENERIC;
+        vlc_assert_unreachable();
     }
 
-    size_t fmt_profile = 0;
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         h264_get_profile_level(&p_dec->fmt_in, &fmt_profile, NULL, NULL);
-
-    /* Allocate the memory needed to store the decoder's structure */
-    if ((p_dec->p_sys = p_sys = calloc(1, sizeof(*p_sys))) == NULL)
-        return VLC_ENOMEM;
-
-    p_dec->pf_decode_video = DecodeVideo;
-
-    p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
-    p_dec->fmt_out.video = p_dec->fmt_in.video;
-    p_dec->fmt_out.audio = p_dec->fmt_in.audio;
-    p_dec->b_need_packetized = true;
-
-    JNIEnv* env = NULL;
-    if (!(env = jni_get_env(THREAD_NAME)))
-        goto error;
-
-    if (!InitJNIFields(p_dec, env))
-        goto error;
 
     int num_codecs = (*env)->CallStaticIntMethod(env, jfields.media_codec_list_class,
                                                  jfields.get_codec_count);
@@ -674,18 +653,123 @@ loopclean:
     p_sys->buffer_info = (*env)->NewGlobalRef(env, p_sys->buffer_info);
     (*env)->DeleteLocalRef(env, format);
 
-    const int timestamp_fifo_size = 32;
-    p_sys->timestamp_fifo = timestamp_FifoNew(timestamp_fifo_size);
-    if (!p_sys->timestamp_fifo)
+    return VLC_SUCCESS;
+
+ error:
+    CloseMediaCodec(p_dec, env);
+    return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * CloseMediaCodec: Close the mediacodec instance
+ *****************************************************************************/
+static void CloseMediaCodec(decoder_t *p_dec, JNIEnv *env)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (!p_sys)
+        return;
+
+    free(p_sys->name);
+    p_sys->name = NULL;
+
+    /* Invalidate all pictures that are currently in flight in order
+     * to prevent the vout from using destroyed output buffers. */
+    if (p_sys->direct_rendering) {
+        InvalidateAllPictures(p_dec);
+        p_sys->direct_rendering = false;
+    }
+
+    if (p_sys->input_buffers) {
+        (*env)->DeleteGlobalRef(env, p_sys->input_buffers);
+        p_sys->input_buffers = NULL;
+    }
+    if (p_sys->output_buffers) {
+        (*env)->DeleteGlobalRef(env, p_sys->output_buffers);
+        p_sys->output_buffers = NULL;
+    }
+    if (p_sys->codec) {
+        if (p_sys->started)
+        {
+            (*env)->CallVoidMethod(env, p_sys->codec, jfields.stop);
+            if (CHECK_EXCEPTION())
+                msg_Err(p_dec, "Exception in MediaCodec.stop");
+            p_sys->started = false;
+        }
+        if (p_sys->allocated)
+        {
+            (*env)->CallVoidMethod(env, p_sys->codec, jfields.release);
+            if (CHECK_EXCEPTION())
+                msg_Err(p_dec, "Exception in MediaCodec.release");
+            p_sys->allocated = false;
+        }
+        (*env)->DeleteGlobalRef(env, p_sys->codec);
+        p_sys->codec = NULL;
+    }
+    if (p_sys->buffer_info) {
+        (*env)->DeleteGlobalRef(env, p_sys->buffer_info);
+        p_sys->buffer_info = NULL;
+    }
+}
+
+/*****************************************************************************
+ * OpenDecoder: Create the decoder instance
+ *****************************************************************************/
+static int OpenDecoder(vlc_object_t *p_this)
+{
+    decoder_t *p_dec = (decoder_t*)p_this;
+    JNIEnv* env = NULL;
+
+    if (p_dec->fmt_in.i_cat != VIDEO_ES && !p_dec->b_force)
+        return VLC_EGENERIC;
+
+    switch (p_dec->fmt_in.i_codec) {
+    case VLC_CODEC_H264:
+    case VLC_CODEC_HEVC:
+    case VLC_CODEC_H263:
+    case VLC_CODEC_MP4V:
+    case VLC_CODEC_WMV3:
+    case VLC_CODEC_VC1:
+    case VLC_CODEC_VP8:
+    case VLC_CODEC_VP9:
+        break;
+    default:
+        msg_Dbg(p_dec, "codec %4.4s not supported",
+                (char *)&p_dec->fmt_in.i_codec);
+        return VLC_EGENERIC;
+    }
+
+    if (!(env = jni_get_env(THREAD_NAME)))
         goto error;
 
-    return VLC_SUCCESS;
+    if (!InitJNIFields(p_dec, env))
+        goto error;
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if ((p_dec->p_sys = calloc(1, sizeof(*p_dec->p_sys))) == NULL)
+        return VLC_ENOMEM;
+
+    p_dec->pf_decode_video = DecodeVideo;
+
+    p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
+    p_dec->fmt_out.video = p_dec->fmt_in.video;
+    p_dec->fmt_out.audio = p_dec->fmt_in.audio;
+    p_dec->b_need_packetized = true;
+
+    p_dec->p_sys->timestamp_fifo = timestamp_FifoNew(32);
+    if (!p_dec->p_sys->timestamp_fifo)
+        goto error;
+
+    return OpenMediaCodec(p_dec, env);
 
  error:
     CloseDecoder(p_this);
     return VLC_EGENERIC;
 }
 
+/*****************************************************************************
+ * CloseDecoder: Close the decoder instance
+ *****************************************************************************/
 static void CloseDecoder(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
@@ -695,37 +779,11 @@ static void CloseDecoder(vlc_object_t *p_this)
     if (!p_sys)
         return;
 
-    /* Invalidate all pictures that are currently in flight in order
-     * to prevent the vout from using destroyed output buffers. */
-    if (p_sys->direct_rendering)
-        InvalidateAllPictures(p_dec);
+    if ((env = jni_get_env(THREAD_NAME)))
+        CloseMediaCodec(p_dec, env);
+    else
+        msg_Warn(p_dec, "Can't get a JNIEnv, can't close mediacodec !");
 
-    if (!(env = jni_get_env(THREAD_NAME)))
-        goto cleanup;
-
-    if (p_sys->input_buffers)
-        (*env)->DeleteGlobalRef(env, p_sys->input_buffers);
-    if (p_sys->output_buffers)
-        (*env)->DeleteGlobalRef(env, p_sys->output_buffers);
-    if (p_sys->codec) {
-        if (p_sys->started)
-        {
-            (*env)->CallVoidMethod(env, p_sys->codec, jfields.stop);
-            if (CHECK_EXCEPTION())
-                msg_Err(p_dec, "Exception in MediaCodec.stop");
-        }
-        if (p_sys->allocated)
-        {
-            (*env)->CallVoidMethod(env, p_sys->codec, jfields.release);
-            if (CHECK_EXCEPTION())
-                msg_Err(p_dec, "Exception in MediaCodec.release");
-        }
-        (*env)->DeleteGlobalRef(env, p_sys->codec);
-    }
-    if (p_sys->buffer_info)
-        (*env)->DeleteGlobalRef(env, p_sys->buffer_info);
-
-cleanup:
     free(p_sys->p_extra_buffer);
     free(p_sys->name);
     ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
