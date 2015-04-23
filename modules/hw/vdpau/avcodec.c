@@ -258,12 +258,12 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
     VdpStatus err;
 #if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
     VdpDecoderProfile profile;
-    int level = fmt->i_level;
+    int level = avctx->level;
 
     if (av_vdpau_get_profile(avctx, &profile))
     {
         msg_Err(va, "unsupported codec %d or profile %d", avctx->codec_id,
-                fmt->i_profile);
+                avctx->profile);
         return VLC_EGENERIC;
     }
 
@@ -279,8 +279,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
             level = VDP_DECODER_LEVEL_MPEG4_PART2_ASP_L5;
             break;
         case AV_CODEC_ID_H264:
-            if ((fmt->i_profile & FF_PROFILE_H264_INTRA)
-             && (fmt->i_level == 11))
+            if ((avctx->profile & FF_PROFILE_H264_INTRA) && level == 11)
                 level = VDP_DECODER_LEVEL_H264_1b;
         default:
             break;
