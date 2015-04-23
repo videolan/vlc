@@ -122,9 +122,12 @@ static int lavc_UpdateVideoFormat( decoder_t *p_dec,
     {
         int aligns[AV_NUM_DATA_POINTERS];
 
+        if (GetVlcChroma(&p_dec->fmt_out.video, p_context->pix_fmt))
+            return -1;
+
         avcodec_align_dimensions2(p_context, &width, &height, aligns);
     }
-
+    p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     if( width == 0 || height == 0 || width > 8192 || height > 8192 )
     {
@@ -144,11 +147,6 @@ static int lavc_UpdateVideoFormat( decoder_t *p_dec,
         p_dec->fmt_out.video.i_visible_width = width;
         p_dec->fmt_out.video.i_visible_height = height;
     }
-
-    if( !hwaccel && GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) )
-        return -1;
-
-    p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* If an aspect-ratio was specified in the input format then force it */
     if( p_dec->fmt_in.video.i_sar_num > 0 && p_dec->fmt_in.video.i_sar_den > 0 )
