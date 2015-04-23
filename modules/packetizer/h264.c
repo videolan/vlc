@@ -84,8 +84,6 @@ typedef struct
     int i_delta_pic_order_cnt1;
 } slice_t;
 
-#define SPS_MAX (32)
-#define PPS_MAX (256)
 struct decoder_sys_t
 {
     /* */
@@ -558,17 +556,6 @@ static block_t *CreateAnnexbNAL( decoder_t *p_dec, const uint8_t *p, int i_size 
     return p_nal;
 }
 
-static void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
-                              const uint8_t *src, int i_src )
-{
-    uint8_t *dst = malloc( i_src );
-
-    *pp_ret = dst;
-
-    if( dst )
-        *pi_ret = nal_decode(src, dst, i_src);
-}
-
 /*****************************************************************************
  * ParseNALBlock: parses annexB type NALs
  * All p_frag blocks are required to start with 0 0 0 1 4-byte startcode
@@ -828,295 +815,74 @@ static block_t *OutputPicture( decoder_t *p_dec )
 static void PutSPS( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    struct nal_sps sps;
 
-    uint8_t *pb_dec = NULL;
-    int     i_dec = 0;
-    bs_t s;
-    int i_tmp;
-    int i_sps_id;
-
-    CreateDecodedNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5],
-                     p_frag->i_buffer - 5 );
-
-    bs_init( &s, pb_dec, i_dec );
-    int i_profile_idc = bs_read( &s, 8 );
-    p_dec->fmt_out.i_profile = i_profile_idc;
-    /* Skip constraint_set0123, reserved(4) */
-    bs_skip( &s, 1+1+1+1 + 4 );
-    p_dec->fmt_out.i_level = bs_read( &s, 8 );
-    /* sps id */
-    i_sps_id = bs_read_ue( &s );
-    if( i_sps_id >= SPS_MAX || i_sps_id < 0 )
+    if( h264_parse_sps( p_frag->p_buffer, p_frag->i_buffer, &sps ) != 0 )
     {
-        msg_Warn( p_dec, "invalid SPS (sps_id=%d)", i_sps_id );
-        free( pb_dec );
+        msg_Warn( p_dec, "invalid SPS (sps_id=%d)", sps.i_id );
         block_Release( p_frag );
         return;
     }
 
-    if( i_profile_idc == PROFILE_H264_HIGH || i_profile_idc == PROFILE_H264_HIGH_10 ||
-        i_profile_idc == PROFILE_H264_HIGH_422 || i_profile_idc == PROFILE_H264_HIGH_444_PREDICTIVE ||
-        i_profile_idc ==  PROFILE_H264_CAVLC_INTRA || i_profile_idc ==  PROFILE_H264_SVC_BASELINE ||
-        i_profile_idc ==  PROFILE_H264_SVC_HIGH )
+    p_dec->fmt_out.i_profile = sps.i_profile;
+    p_dec->fmt_out.i_level = sps.i_level;
+    p_dec->fmt_out.video.i_width  = sps.i_width;
+    p_dec->fmt_out.video.i_height = sps.i_height;
+    if( sps.vui.i_sar_num != 0 && sps.vui.i_sar_den != 0 )
     {
-        /* chroma_format_idc */
-        const int i_chroma_format_idc = bs_read_ue( &s );
-        if( i_chroma_format_idc == 3 )
-            bs_skip( &s, 1 ); /* separate_colour_plane_flag */
-        /* bit_depth_luma_minus8 */
-        bs_read_ue( &s );
-        /* bit_depth_chroma_minus8 */
-        bs_read_ue( &s );
-        /* qpprime_y_zero_transform_bypass_flag */
-        bs_skip( &s, 1 );
-        /* seq_scaling_matrix_present_flag */
-        i_tmp = bs_read( &s, 1 );
-        if( i_tmp )
-        {
-            for( int i = 0; i < ((3 != i_chroma_format_idc) ? 8 : 12); i++ )
-            {
-                /* seq_scaling_list_present_flag[i] */
-                i_tmp = bs_read( &s, 1 );
-                if( !i_tmp )
-                    continue;
-                const int i_size_of_scaling_list = (i < 6 ) ? 16 : 64;
-                /* scaling_list (...) */
-                int i_lastscale = 8;
-                int i_nextscale = 8;
-                for( int j = 0; j < i_size_of_scaling_list; j++ )
-                {
-                    if( i_nextscale != 0 )
-                    {
-                        /* delta_scale */
-                        i_tmp = bs_read_se( &s );
-                        i_nextscale = ( i_lastscale + i_tmp + 256 ) % 256;
-                        /* useDefaultScalingMatrixFlag = ... */
-                    }
-                    /* scalinglist[j] */
-                    i_lastscale = ( i_nextscale == 0 ) ? i_lastscale : i_nextscale;
-                }
-            }
-        }
+        p_dec->fmt_out.video.i_sar_num = sps.vui.i_sar_num;
+        p_dec->fmt_out.video.i_sar_den = sps.vui.i_sar_den;
     }
 
-    /* Skip i_log2_max_frame_num */
-    p_sys->i_log2_max_frame_num = bs_read_ue( &s );
-    if( p_sys->i_log2_max_frame_num > 12)
-        p_sys->i_log2_max_frame_num = 12;
-    /* Read poc_type */
-    p_sys->i_pic_order_cnt_type = bs_read_ue( &s );
-    if( p_sys->i_pic_order_cnt_type == 0 )
+    p_sys->i_log2_max_frame_num = sps.i_log2_max_frame_num;
+    p_sys->b_frame_mbs_only = sps.b_frame_mbs_only;
+    p_sys->i_pic_order_cnt_type = sps.i_pic_order_cnt_type;
+    p_sys->i_delta_pic_order_always_zero_flag = sps.i_delta_pic_order_always_zero_flag;
+    p_sys->i_log2_max_pic_order_cnt_lsb = sps.i_log2_max_pic_order_cnt_lsb;
+
+    if( sps.vui.b_valid )
     {
-        /* skip i_log2_max_poc_lsb */
-        p_sys->i_log2_max_pic_order_cnt_lsb = bs_read_ue( &s );
-        if( p_sys->i_log2_max_pic_order_cnt_lsb > 12 )
-            p_sys->i_log2_max_pic_order_cnt_lsb = 12;
+        p_sys->b_timing_info_present_flag = sps.vui.b_timing_info_present_flag;
+        p_sys->i_num_units_in_tick =  sps.vui.i_num_units_in_tick;
+        p_sys->i_time_scale = sps.vui.i_time_scale;
+        p_sys->b_fixed_frame_rate = sps.vui.b_fixed_frame_rate;
+        p_sys->b_pic_struct_present_flag = sps.vui.b_pic_struct_present_flag;
+        p_sys->b_cpb_dpb_delays_present_flag = sps.vui.b_cpb_dpb_delays_present_flag;
+        p_sys->i_cpb_removal_delay_length_minus1 = sps.vui.i_cpb_removal_delay_length_minus1;
+        p_sys->i_dpb_output_delay_length_minus1 = sps.vui.i_dpb_output_delay_length_minus1;
     }
-    else if( p_sys->i_pic_order_cnt_type == 1 )
-    {
-        int i_cycle;
-        /* skip b_delta_pic_order_always_zero */
-        p_sys->i_delta_pic_order_always_zero_flag = bs_read( &s, 1 );
-        /* skip i_offset_for_non_ref_pic */
-        bs_read_se( &s );
-        /* skip i_offset_for_top_to_bottom_field */
-        bs_read_se( &s );
-        /* read i_num_ref_frames_in_poc_cycle */
-        i_cycle = bs_read_ue( &s );
-        if( i_cycle > 256 ) i_cycle = 256;
-        while( i_cycle > 0 )
-        {
-            /* skip i_offset_for_ref_frame */
-            bs_read_se(&s );
-            i_cycle--;
-        }
-    }
-    /* i_num_ref_frames */
-    bs_read_ue( &s );
-    /* b_gaps_in_frame_num_value_allowed */
-    bs_skip( &s, 1 );
-
-    /* Read size */
-    p_dec->fmt_out.video.i_width  = 16 * ( bs_read_ue( &s ) + 1 );
-    p_dec->fmt_out.video.i_height = 16 * ( bs_read_ue( &s ) + 1 );
-
-    /* b_frame_mbs_only */
-    p_sys->b_frame_mbs_only = bs_read( &s, 1 );
-    p_dec->fmt_out.video.i_height *=  ( 2 - p_sys->b_frame_mbs_only );
-    if( p_sys->b_frame_mbs_only == 0 )
-    {
-        bs_skip( &s, 1 );
-    }
-    /* b_direct8x8_inference */
-    bs_skip( &s, 1 );
-
-    /* crop */
-    i_tmp = bs_read( &s, 1 );
-    if( i_tmp )
-    {
-        /* left */
-        bs_read_ue( &s );
-        /* right */
-        bs_read_ue( &s );
-        /* top */
-        bs_read_ue( &s );
-        /* bottom */
-        bs_read_ue( &s );
-    }
-
-    /* vui */
-    i_tmp = bs_read( &s, 1 );
-    if( i_tmp )
-    {
-        /* read the aspect ratio part if any */
-        i_tmp = bs_read( &s, 1 );
-        if( i_tmp )
-        {
-            static const struct { int w, h; } sar[17] =
-            {
-                { 0,   0 }, { 1,   1 }, { 12, 11 }, { 10, 11 },
-                { 16, 11 }, { 40, 33 }, { 24, 11 }, { 20, 11 },
-                { 32, 11 }, { 80, 33 }, { 18, 11 }, { 15, 11 },
-                { 64, 33 }, { 160,99 }, {  4,  3 }, {  3,  2 },
-                {  2,  1 },
-            };
-            int i_sar = bs_read( &s, 8 );
-            int w, h;
-
-            if( i_sar < 17 )
-            {
-                w = sar[i_sar].w;
-                h = sar[i_sar].h;
-            }
-            else if( i_sar == 255 )
-            {
-                w = bs_read( &s, 16 );
-                h = bs_read( &s, 16 );
-            }
-            else
-            {
-                w = 0;
-                h = 0;
-            }
-
-            if( w != 0 && h != 0 )
-            {
-                p_dec->fmt_out.video.i_sar_num = w;
-                p_dec->fmt_out.video.i_sar_den = h;
-            }
-            else
-            {
-                p_dec->fmt_out.video.i_sar_num = 1;
-                p_dec->fmt_out.video.i_sar_den = 1;
-            }
-        }
-
-        /* overscan */
-        i_tmp = bs_read( &s, 1 );
-        if ( i_tmp )
-            bs_read( &s, 1 );
-
-        /* video signal type */
-        i_tmp = bs_read( &s, 1 );
-        if( i_tmp )
-        {
-            bs_read( &s, 4 );
-            /* colour desc */
-            bs_read( &s, 1 );
-            if ( i_tmp )
-                bs_read( &s, 24 );
-        }
-
-        /* chroma loc info */
-        i_tmp = bs_read( &s, 1 );
-        if( i_tmp )
-        {
-            bs_read_ue( &s );
-            bs_read_ue( &s );
-        }
-
-        /* timing info */
-        p_sys->b_timing_info_present_flag = bs_read( &s, 1 );
-        if( p_sys->b_timing_info_present_flag )
-        {
-            p_sys->i_num_units_in_tick = bs_read( &s, 32 );
-            p_sys->i_time_scale = bs_read( &s, 32 );
-            p_sys->b_fixed_frame_rate = bs_read( &s, 1 );
-        }
-
-        /* Nal hrd & VC1 hrd parameters */
-        p_sys->b_cpb_dpb_delays_present_flag = false;
-        for ( int i=0; i<2; i++ )
-        {
-            i_tmp = bs_read( &s, 1 );
-            if( i_tmp )
-            {
-                p_sys->b_cpb_dpb_delays_present_flag = true;
-                uint32_t count = bs_read_ue( &s ) + 1;
-                bs_read( &s, 4 );
-                bs_read( &s, 4 );
-                for( uint32_t i=0; i<count; i++ )
-                {
-                    bs_read_ue( &s );
-                    bs_read_ue( &s );
-                    bs_read( &s, 1 );
-                }
-                bs_read( &s, 5 );
-                p_sys->i_cpb_removal_delay_length_minus1 = bs_read( &s, 5 );
-                p_sys->i_dpb_output_delay_length_minus1 = bs_read( &s, 5 );
-                bs_read( &s, 5 );
-            }
-        }
-
-        if( p_sys->b_cpb_dpb_delays_present_flag )
-            bs_read( &s, 1 );
-
-        /* pic struct info */
-        p_sys->b_pic_struct_present_flag = bs_read( &s, 1 );
-
-        /* + unparsed remains */
-    }
-
-    free( pb_dec );
 
     /* We have a new SPS */
     if( !p_sys->b_sps )
-        msg_Dbg( p_dec, "found NAL_SPS (sps_id=%d)", i_sps_id );
+        msg_Dbg( p_dec, "found NAL_SPS (sps_id=%d)", sps.i_id );
     p_sys->b_sps = true;
 
-    if( p_sys->pp_sps[i_sps_id] )
-        block_Release( p_sys->pp_sps[i_sps_id] );
-    p_sys->pp_sps[i_sps_id] = p_frag;
+    if( p_sys->pp_sps[sps.i_id] )
+        block_Release( p_sys->pp_sps[sps.i_id] );
+    p_sys->pp_sps[sps.i_id] = p_frag;
 }
 
 static void PutPPS( decoder_t *p_dec, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    bs_t s;
-    int i_pps_id;
-    int i_sps_id;
+    struct nal_pps pps;
 
-    bs_init( &s, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
-    i_pps_id = bs_read_ue( &s ); // pps id
-    i_sps_id = bs_read_ue( &s ); // sps id
-    if( i_pps_id >= PPS_MAX || i_sps_id >= SPS_MAX )
+    if( h264_parse_pps( p_frag->p_buffer, p_frag->i_buffer, &pps ) != 0 )
     {
-        msg_Warn( p_dec, "invalid PPS (pps_id=%d sps_id=%d)", i_pps_id, i_sps_id );
+        msg_Warn( p_dec, "invalid PPS (pps_id=%d sps_id=%d)", pps.i_id, pps.i_sps_id );
         block_Release( p_frag );
         return;
     }
-    bs_skip( &s, 1 ); // entropy coding mode flag
-    p_sys->i_pic_order_present_flag = bs_read( &s, 1 );
-    /* TODO */
+    p_sys->i_pic_order_present_flag = pps.i_pic_order_present_flag;
 
     /* We have a new PPS */
     if( !p_sys->b_pps )
-        msg_Dbg( p_dec, "found NAL_PPS (pps_id=%d sps_id=%d)", i_pps_id, i_sps_id );
+        msg_Dbg( p_dec, "found NAL_PPS (pps_id=%d sps_id=%d)", pps.i_id, pps.i_sps_id );
     p_sys->b_pps = true;
 
-    if( p_sys->pp_pps[i_pps_id] )
-        block_Release( p_sys->pp_pps[i_pps_id] );
-    p_sys->pp_pps[i_pps_id] = p_frag;
+    if( p_sys->pp_pps[pps.i_id] )
+        block_Release( p_sys->pp_pps[pps.i_id] );
+    p_sys->pp_pps[pps.i_id] = p_frag;
 }
 
 static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,

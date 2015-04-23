@@ -28,6 +28,8 @@
 # include <vlc_common.h>
 # include <vlc_codec.h>
 
+# include "../demux/mpeg/mpeg_parser_helpers.h"
+
 #define PROFILE_H264_BASELINE             66
 #define PROFILE_H264_MAIN                 77
 #define PROFILE_H264_EXTENDED             88
@@ -42,6 +44,9 @@
 #define PROFILE_H264_SVC_HIGH             86
 #define PROFILE_H264_MVC_STEREO_HIGH      128
 #define PROFILE_H264_MVC_MULTIVIEW_HIGH   118
+
+#define SPS_MAX (32)
+#define PPS_MAX (256)
 
 enum nal_unit_type_e
 {
@@ -66,6 +71,49 @@ enum sei_type_e
     SEI_RECOVERY_POINT = 6
 };
 
+struct nal_sps
+{
+    int i_id;
+    int i_profile, i_level;
+    int i_width, i_height;
+    int i_log2_max_frame_num;
+    int b_frame_mbs_only;
+    int i_pic_order_cnt_type;
+    int i_delta_pic_order_always_zero_flag;
+    int i_log2_max_pic_order_cnt_lsb;
+
+    struct {
+        bool b_valid;
+        int i_sar_num, i_sar_den;
+        bool b_timing_info_present_flag;
+        uint32_t i_num_units_in_tick;
+        uint32_t i_time_scale;
+        bool b_fixed_frame_rate;
+        bool b_pic_struct_present_flag;
+        bool b_cpb_dpb_delays_present_flag;
+        uint8_t i_cpb_removal_delay_length_minus1;
+        uint8_t i_dpb_output_delay_length_minus1;
+    } vui;
+};
+
+struct nal_pps
+{
+    int i_id;
+    int i_sps_id;
+    int i_pic_order_present_flag;
+};
+
+static inline void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
+                                     const uint8_t *src, int i_src )
+{
+    uint8_t *dst = malloc( i_src );
+
+    *pp_ret = dst;
+
+    if( dst )
+        *pi_ret = nal_decode(src, dst, i_src);
+}
+
 /* Parse the SPS/PPS Metadata and convert it to annex b format */
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,
@@ -87,6 +135,16 @@ void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
 int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
                      uint8_t **pp_sps, size_t *p_sps_size,
                      uint8_t **pp_pps, size_t *p_pps_size );
+
+/* Parse a SPS into the struct nal_sps
+ * Returns 0 in case of success */
+int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
+                    struct nal_sps *p_sps );
+
+/* Parse a PPS into the struct nal_pps
+ * Returns 0 in case of success */
+int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
+                    struct nal_pps *p_pps );
 
 /* Get level and Profile */
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
