@@ -157,6 +157,7 @@ struct stream_sys_t
     vlc_mutex_t  lock;
     bool         paused;
     atomic_bool  closing;
+    atomic_bool  eof;
 };
 
 /****************************************************************************
@@ -1667,6 +1668,13 @@ static void* hls_Thread(void *p_this)
                     (p_sys->download.segment >= count)) &&
                    (p_sys->download.seek == -1))
             {
+
+                if(!p_sys->b_live && p_sys->download.segment >= count)
+                {
+                    /* this was last segment to read */
+                    atomic_store(&p_sys->eof, true);
+                }
+
                 vlc_cond_wait(&p_sys->download.wait, &p_sys->download.lock_wait);
                 if (p_sys->b_live /*&& (mdate() >= p_sys->playlist.wakeup)*/)
                     break;
@@ -1678,6 +1686,7 @@ static void* hls_Thread(void *p_this)
             {
                 p_sys->download.segment = p_sys->download.seek;
                 p_sys->download.seek = -1;
+                atomic_store(&p_sys->eof, false);
             }
 
             vlc_mutex_unlock(&p_sys->download.lock_wait);
@@ -2071,6 +2080,7 @@ static int Open(vlc_object_t *p_this)
 
     p_sys->paused = false;
     atomic_init(&p_sys->closing, false);
+    atomic_init(&p_sys->eof, false);
 
     vlc_cond_init(&p_sys->wait);
     vlc_mutex_init(&p_sys->lock);
@@ -2426,6 +2436,12 @@ static int Read(stream_t *s, void *buffer, unsigned int i_read)
         // running this read operation is also responsible for closing the stream
         if (length == 0)
         {
+            if(atomic_load(&p_sys->eof)) /* finished reading last segment */
+            {
+                vlc_mutex_unlock(&p_sys->read.lock_wait);
+                return 0;
+            }
+
             mtime_t start = mdate();
 
             // Wait for 10 seconds
