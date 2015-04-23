@@ -143,6 +143,7 @@ struct decoder_sys_t
     char *name;
 
     void *p_extra_buffer;
+    size_t i_extra_buffer;
 
     bool allocated;
     bool started;
@@ -529,10 +530,9 @@ loopclean:
                          jfields.create_video_format, (*env)->NewStringUTF(env, mime),
                          p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
 
-    if (p_dec->fmt_in.i_extra) {
+    if (p_dec->fmt_in.i_extra && !p_sys->p_extra_buffer) {
         uint32_t size = p_dec->fmt_in.i_extra;
         int buf_size = p_dec->fmt_in.i_extra + 20;
-        jobject jextra_buffer;
 
         /* Don't free p_extra_buffer until Format use it, so until MediaCodec
          * is closed */
@@ -554,9 +554,15 @@ loopclean:
         } else {
             memcpy(p_sys->p_extra_buffer, p_dec->fmt_in.p_extra, size);
         }
+        p_sys->i_extra_buffer = size;
+    }
+    if (p_sys->p_extra_buffer)
+    {
+        jobject jextra_buffer;
+
         jextra_buffer = (*env)->NewDirectByteBuffer( env,
                                                      p_sys->p_extra_buffer,
-                                                     size);
+                                                     p_sys->i_extra_buffer);
         if (CHECK_EXCEPTION() || !jextra_buffer)
         {
             msg_Warn(p_dec, "java extra buffer allocation failed");
