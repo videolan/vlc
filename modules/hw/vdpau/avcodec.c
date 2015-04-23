@@ -39,18 +39,6 @@
 #include "vlc_vdpau.h"
 #include "../../codec/avcodec/va.h"
 
-static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
-static void Close(vlc_va_t *, AVCodecContext *);
-
-vlc_module_begin()
-    set_description(N_("VDPAU video decoder"))
-    set_capability("hw decoder", 100)
-    set_category(CAT_INPUT)
-    set_subcategory(SUBCAT_INPUT_VCODEC)
-    set_callbacks(Open, Close)
-    add_shortcut("vdpau")
-vlc_module_end()
-
 struct vlc_va_sys_t
 {
     vdp_t *vdp;
@@ -417,3 +405,12 @@ static void Close(vlc_va_t *va, AVCodecContext *avctx)
     av_freep(&avctx->hwaccel_context);
     free(sys);
 }
+
+vlc_module_begin()
+    set_description(N_("VDPAU video decoder"))
+    set_capability("hw decoder", 100)
+    set_category(CAT_INPUT)
+    set_subcategory(SUBCAT_INPUT_VCODEC)
+    set_callbacks(Open, Close)
+    add_shortcut("vdpau")
+vlc_module_end()
