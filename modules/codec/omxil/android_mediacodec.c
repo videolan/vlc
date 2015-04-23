@@ -147,7 +147,6 @@ struct decoder_sys_t
     bool started;
     bool decoded;
     bool error_state;
-    bool error_event_sent;
 
     ArchitectureSpecificCopyData architecture_specific_data;
 
@@ -1038,12 +1037,16 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     picture_t *p_pic = NULL;
     JNIEnv *env = NULL;
     block_t *p_block = pp_block ? *pp_block : NULL;
+    bool b_error = false;
 
     if (p_sys->error_state)
         goto endclean;
 
     if (!(env = jni_get_env(THREAD_NAME)))
+    {
+        b_error = true;
         goto endclean;
+    }
 
     if (p_block && p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
         block_Release(p_block);
@@ -1060,7 +1063,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             (*env)->CallVoidMethod(env, p_sys->codec, jfields.flush);
             if (CHECK_EXCEPTION()) {
                 msg_Warn(p_dec, "Exception occurred in MediaCodec.flush");
-                p_sys->error_state = true;
+                b_error = true;
             }
         }
         p_sys->decoded = false;
@@ -1086,7 +1089,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                 block_Release(p_block);
                 *pp_block = NULL;
             } else if (i_input_ret == -1) {
-                p_sys->error_state = true;
+                b_error = true;
                 break;
             }
         }
@@ -1109,7 +1112,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             }
             i_output_ret = GetOutput(p_dec, env, p_pic, timeout);
             if (i_output_ret == -1) {
-                p_sys->error_state = true;
+                b_error = true;
                 break;
             } else if (i_output_ret == 0) {
                 if (p_pic) {
@@ -1121,7 +1124,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                      * indefinitely and abort after 2seconds (100 * 2 * 10ms)
                      * without any data. Indeed, MediaCodec can fail without
                      * throwing any exception or error returns... */
-                    p_sys->error_state = true;
+                    b_error = true;
                     break;
                 }
             }
@@ -1131,20 +1134,23 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     } while (p_block && i_input_ret != 1 && i_output_ret != 1);
 
 endclean:
-    if (p_sys->error_state) {
+    if (p_sys->error_state || b_error)
+    {
         if( p_block )
         {
             block_Release(p_block);
             *pp_block = NULL;
         }
         if (p_pic)
+        {
             picture_Release(p_pic);
-        p_pic = NULL;
+            p_pic = NULL;
+        }
 
-        if (!p_sys->error_event_sent) {
+        if (b_error && !p_sys->error_state) {
             /* Signal the error to the Java. */
             jni_EventHardwareAccelerationError();
-            p_sys->error_event_sent = true;
+            p_sys->error_state = true;
         }
     }
 
