@@ -415,7 +415,6 @@ static int vout_update_format( decoder_t *p_dec )
         if( p_vout == NULL )
         {
             msg_Err( p_dec, "failed to create video output" );
-            p_dec->b_error = true;
             return -1;
         }
     }
