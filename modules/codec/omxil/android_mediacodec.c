@@ -732,10 +732,12 @@ static int OpenDecoder(vlc_object_t *p_this)
     case VLC_CODEC_VC1:
     case VLC_CODEC_VP8:
     case VLC_CODEC_VP9:
-        break;
+        if (p_dec->fmt_in.video.i_width && p_dec->fmt_in.video.i_height)
+            break;
     default:
-        msg_Dbg(p_dec, "codec %4.4s not supported",
-                (char *)&p_dec->fmt_in.i_codec);
+        msg_Dbg(p_dec, "codec %4.4s or resolution (%dx%d) not supported",
+                (char *)&p_dec->fmt_in.i_codec,
+                p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
         return VLC_EGENERIC;
     }
 
