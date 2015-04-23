@@ -37,7 +37,7 @@
 #include "omxil.h"
 #include "qcom.h"
 #include "../../video_chroma/copy.h"
-#include "../h264_nal.h"
+#include "../../packetizer/h264_nal.h"
 
 /*****************************************************************************
  * Events utility functions

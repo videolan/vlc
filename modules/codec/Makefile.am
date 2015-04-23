@@ -375,8 +375,8 @@ noinst_HEADERS += \
 
 libomxil_plugin_la_SOURCES = \
 	codec/omxil/utils.c codec/omxil/omxil_utils.h \
-	codec/h264_nal.c codec/h264_nal.h \
-	codec/hevc_nal.c codec/hevc_nal.h \
+	packetizer/h264_nal.c packetizer/h264_nal.h \
+	packetizer/hevc_nal.c packetizer/hevc_nal.h \
 	codec/omxil/qcom.c codec/omxil/qcom.h \
 	codec/omxil/omxil.c codec/omxil/omxil.h codec/omxil/omxil_core.c codec/omxil/omxil_core.h \
 	video_chroma/copy.c
@@ -396,7 +396,8 @@ libiomx_plugin_la_LIBADD = $(libomxil_plugin_la_LIBADD)
 libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/android_mediacodec.c codec/omxil/utils.c \
 	video_chroma/copy.c codec/omxil/android_opaque.c codec/omxil/android_opaque.h \
-	codec/h264_nal.c codec/h264_nal.h codec/hevc_nal.c codec/hevc_nal.h
+	packetizer/h264_nal.c packetizer/h264_nal.h
+	packetizer/hevc_nal.c packetizer/hevc_nal.h
 
 codec_LTLIBRARIES += $(LTLIBomxil) $(LTLIBomxil_vout)
 EXTRA_LTLIBRARIES += libomxil_plugin.la libomxil_vout_plugin.la
@@ -474,7 +475,7 @@ codec_LTLIBRARIES += $(LTLIBtwolame)
 
 ### Hardware encoders ###
 
-libcrystalhd_plugin_la_SOURCES = codec/crystalhd.c codec/h264_nal.c codec/h264_nal.h
+libcrystalhd_plugin_la_SOURCES = codec/crystalhd.c packetizer/h264_nal.c packetizer/h264_nal.h
 libcrystalhd_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libcrystalhd_plugin_la_LIBADD = $(LIBS_crystalhd)
 EXTRA_LTLIBRARIES += libcrystalhd_plugin.la
@@ -498,7 +499,7 @@ libdmo_plugin_la_LIBADD += -lole32 -luuid
 codec_LTLIBRARIES += libdmo_plugin.la
 endif
 
-libmft_plugin_la_SOURCES = codec/mft.c codec/h264_nal.c codec/h264_nal.h
+libmft_plugin_la_SOURCES = codec/mft.c packetizer/h264_nal.c packetizer/h264_nal.h
 if HAVE_WIN32
 libmft_plugin_la_LIBADD = -lole32 -luuid -lmfuuid -lmfplat
 codec_LTLIBRARIES += libmft_plugin.la

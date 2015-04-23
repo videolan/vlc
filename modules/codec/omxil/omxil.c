@@ -35,8 +35,8 @@
 #include <vlc_codec.h>
 #include <vlc_block_helper.h>
 #include <vlc_cpu.h>
-#include "../h264_nal.h"
-#include "../hevc_nal.h"
+#include "../../packetizer/h264_nal.h"
+#include "../../packetizer/hevc_nal.h"
 
 #include "omxil.h"
 #include "omxil_core.h"

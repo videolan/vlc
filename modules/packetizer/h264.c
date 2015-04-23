@@ -41,7 +41,7 @@
 #include <vlc_block_helper.h>
 #include <vlc_bits.h>
 #include "../codec/cc.h"
-#include "../codec/h264_nal.h"
+#include "h264_nal.h"
 #include "packetizer_helper.h"
 #include "../demux/mpeg/mpeg_parser_helpers.h"
 

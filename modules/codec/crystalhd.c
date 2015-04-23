@@ -39,7 +39,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include "h264_nal.h"
+#include "../packetizer/h264_nal.h"
 
 /* Workaround for some versions of libcrystalHD */
 #if !defined(_WIN32) && !defined(__APPLE__)
