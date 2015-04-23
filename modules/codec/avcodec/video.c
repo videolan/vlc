@@ -146,12 +146,8 @@ static int lavc_UpdateVideoFormat( decoder_t *p_dec,
     }
 
     if( !hwaccel && GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) )
-    {
-        /* we are doomed, but not really, because most codecs set their pix_fmt
-         * much later
-         * FIXME does it make sense here ? */
-        p_dec->fmt_out.video.i_chroma = VLC_CODEC_I420;
-    }
+        return -1;
+
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* If an aspect-ratio was specified in the input format then force it */
@@ -192,8 +188,8 @@ static int lavc_UpdateVideoFormat( decoder_t *p_dec,
 static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
                                             AVCodecContext *p_context )
 {
-    lavc_UpdateVideoFormat( p_dec, p_context );
-    /* FIXME: check for error ^^ and return NULL */
+    if (lavc_UpdateVideoFormat(p_dec, p_context))
+        return NULL;
     return decoder_NewPicture( p_dec );
 }
 
