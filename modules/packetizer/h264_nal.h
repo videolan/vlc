@@ -43,6 +43,29 @@
 #define PROFILE_H264_MVC_STEREO_HIGH      128
 #define PROFILE_H264_MVC_MULTIVIEW_HIGH   118
 
+enum nal_unit_type_e
+{
+    NAL_UNKNOWN = 0,
+    NAL_SLICE   = 1,
+    NAL_SLICE_DPA   = 2,
+    NAL_SLICE_DPB   = 3,
+    NAL_SLICE_DPC   = 4,
+    NAL_SLICE_IDR   = 5,    /* ref_idc != 0 */
+    NAL_SEI         = 6,    /* ref_idc == 0 */
+    NAL_SPS         = 7,
+    NAL_PPS         = 8,
+    NAL_AU_DELIMITER= 9
+    /* ref_idc == 0 for 6,9,10,11,12 */
+};
+
+/* Defined in H.264 annex D */
+enum sei_type_e
+{
+    SEI_PIC_TIMING = 1,
+    SEI_USER_DATA_REGISTERED = 4,
+    SEI_RECOVERY_POINT = 6
+};
+
 /* Parse the SPS/PPS Metadata and convert it to annex b format */
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,

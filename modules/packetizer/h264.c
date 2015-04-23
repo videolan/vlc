@@ -147,29 +147,6 @@ struct decoder_sys_t
     cc_data_t cc_next;
 };
 
-enum nal_unit_type_e
-{
-    NAL_UNKNOWN = 0,
-    NAL_SLICE   = 1,
-    NAL_SLICE_DPA   = 2,
-    NAL_SLICE_DPB   = 3,
-    NAL_SLICE_DPC   = 4,
-    NAL_SLICE_IDR   = 5,    /* ref_idc != 0 */
-    NAL_SEI         = 6,    /* ref_idc == 0 */
-    NAL_SPS         = 7,
-    NAL_PPS         = 8,
-    NAL_AU_DELIMITER= 9
-    /* ref_idc == 0 for 6,9,10,11,12 */
-};
-
-/* Defined in H.264 annex D */
-enum sei_type_e
-{
-    SEI_PIC_TIMING = 1,
-    SEI_USER_DATA_REGISTERED = 4,
-    SEI_RECOVERY_POINT = 6
-};
-
 #define BLOCK_FLAG_PRIVATE_AUD (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 static block_t *Packetize( decoder_t *, block_t ** );
