@@ -52,7 +52,8 @@
 #include "va.h"
 #include "../../video_chroma/copy.h"
 
-static int Open(vlc_va_t *, AVCodecContext *, const es_format_t *);
+static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
+                const es_format_t *);
 static void Close(vlc_va_t *, AVCodecContext *);
 
 vlc_module_begin()
@@ -544,8 +545,12 @@ static void Close(vlc_va_t *va, AVCodecContext *ctx)
     free(sys);
 }
 
-static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
+static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
+                const es_format_t *fmt)
 {
+    if (pix_fmt != AV_PIX_FMT_DXVA2_VLD)
+        return VLC_EGENERIC;
+
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -594,7 +599,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt)
 
     /* TODO print the hardware name/vendor for debugging purposes */
     va->description = DxDescribe(sys);
-    va->pix_fmt = PIX_FMT_DXVA2_VLD;
     va->setup   = Setup;
     va->get     = Get;
     va->release = Release;

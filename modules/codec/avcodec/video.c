@@ -1096,10 +1096,12 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
 {
     decoder_t *p_dec = p_context->opaque;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    vlc_va_t *p_va = p_sys->p_va;
 
-    if( p_va != NULL )
-        vlc_va_Delete( p_va, p_context );
+    if (p_sys->p_va != NULL)
+    {
+        vlc_va_Delete(p_sys->p_va, p_context);
+        p_sys->p_va = NULL;
+    }
 
     /* Enumerate available formats */
     bool can_hwaccel = false;
@@ -1119,41 +1121,36 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     if (!can_hwaccel)
         goto end;
 
-    p_va = vlc_va_New( VLC_OBJECT(p_dec), p_context, &p_dec->fmt_in );
-    if( p_va == NULL )
-        goto end;
-
     for( size_t i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
     {
-        if( p_va->pix_fmt != pi_fmt[i] )
+        vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, pi_fmt[i],
+                                  &p_dec->fmt_in);
+        if (va == NULL)
             continue;
 
         /* We try to call vlc_va_Setup when possible to detect errors when
          * possible (later is too late) */
         if( p_context->width > 0 && p_context->height > 0
-         && vlc_va_Setup( p_va, p_context, &p_dec->fmt_out.video.i_chroma ) )
+         && vlc_va_Setup(va, p_context, &p_dec->fmt_out.video.i_chroma))
         {
             msg_Err( p_dec, "acceleration setup failure" );
-            break;
+            vlc_va_Delete(va, p_context);
+            continue;
         }
 
-        if( p_va->description )
-            msg_Info( p_dec, "Using %s for hardware decoding.",
-                      p_va->description );
+        if (va->description != NULL)
+            msg_Info(p_dec, "Using %s for hardware decoding", va->description);
 
         /* FIXME this will disable direct rendering
          * even if a new pixel format is renegotiated
          */
         p_sys->b_direct_rendering = false;
-        p_sys->p_va = p_va;
+        p_sys->p_va = va;
         p_context->draw_horiz_band = NULL;
         return pi_fmt[i];
     }
 
-    vlc_va_Delete( p_va, p_context );
-
 end:
     /* Fallback to default behaviour */
-    p_sys->p_va = NULL;
     return avcodec_default_get_format( p_context, pi_fmt );
 }

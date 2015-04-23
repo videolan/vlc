@@ -439,8 +439,12 @@ static void Delete( vlc_va_t *va, AVCodecContext *avctx )
     free( sys );
 }
 
-static int Create( vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt )
+static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
+                   const es_format_t *fmt )
 {
+    if( pix_fmt != AV_PIX_FMT_VAAPI_VLD )
+        return VLC_EGENERIC;
+
     (void) fmt;
 #ifdef VLC_VA_BACKEND_XLIB
     if( !vlc_xlib_init( VLC_OBJECT(va) ) )
@@ -579,7 +583,6 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, const es_format_t *fmt )
 
     va->sys = sys;
     va->description = vaQueryVendorString( sys->p_display );
-    va->pix_fmt = PIX_FMT_VAAPI_VLD; /* Only VLD supported */
     va->setup = Setup;
     va->get = Get;
     va->release = Release;

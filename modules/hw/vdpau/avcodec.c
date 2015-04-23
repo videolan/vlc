@@ -240,8 +240,12 @@ static int Setup(vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *chromap)
     return VLC_SUCCESS;
 }
 
-static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
+static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
+                const es_format_t *fmt)
 {
+    if (pix_fmt != AV_PIX_FMT_VDPAU)
+        return VLC_EGENERIC;
+
     void *func;
     VdpStatus err;
 #if (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(56, 2, 0))
@@ -367,7 +371,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const es_format_t *fmt)
 
     va->sys = sys;
     va->description = infos;
-    va->pix_fmt = AV_PIX_FMT_VDPAU;
     va->setup = Setup;
     va->get = Lock;
     va->release = NULL;
