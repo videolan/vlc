@@ -141,6 +141,8 @@ struct decoder_sys_t
     int stride, slice_height;
     char *name;
 
+    void *p_extra_buffer;
+
     bool allocated;
     bool started;
     bool decoded;
@@ -175,7 +177,6 @@ struct jfields
     jmethodID release_output_buffer;
     jmethodID create_video_format, set_integer, set_bytebuffer, get_integer;
     jmethodID buffer_info_ctor;
-    jmethodID allocate_direct, limit;
     jfieldID size_field, offset_field, pts_field;
 };
 static struct jfields jfields;
@@ -250,10 +251,6 @@ static const struct member members[] = {
     { "size", "I", "android/media/MediaCodec$BufferInfo", OFF(size_field), FIELD, true },
     { "offset", "I", "android/media/MediaCodec$BufferInfo", OFF(offset_field), FIELD, true },
     { "presentationTimeUs", "J", "android/media/MediaCodec$BufferInfo", OFF(pts_field), FIELD, true },
-
-    { "allocateDirect", "(I)Ljava/nio/ByteBuffer;", "java/nio/ByteBuffer", OFF(allocate_direct), STATIC_METHOD, true },
-    { "limit", "(I)Ljava/nio/Buffer;", "java/nio/ByteBuffer", OFF(limit), METHOD, true },
-
     { NULL, NULL, NULL, 0, 0, false },
 };
 
@@ -555,29 +552,44 @@ loopclean:
                          p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
 
     if (p_dec->fmt_in.i_extra) {
-        // Allocate a byte buffer via allocateDirect in java instead of NewDirectByteBuffer,
-        // since the latter doesn't allocate storage of its own, and we don't know how long
-        // the codec uses the buffer.
-        int buf_size = p_dec->fmt_in.i_extra + 20;
-        jobject bytebuf = (*env)->CallStaticObjectMethod(env, jfields.byte_buffer_class,
-                                                         jfields.allocate_direct, buf_size);
         uint32_t size = p_dec->fmt_in.i_extra;
-        uint8_t *ptr = (*env)->GetDirectBufferAddress(env, bytebuf);
+        int buf_size = p_dec->fmt_in.i_extra + 20;
+        jobject jextra_buffer;
+
+        /* Don't free p_extra_buffer until Format use it, so until MediaCodec
+         * is closed */
+        p_sys->p_extra_buffer = malloc(buf_size);
+        if (!p_sys->p_extra_buffer)
+        {
+            msg_Warn(p_dec, "extra buffer allocation failed");
+            goto error;
+        }
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && ((uint8_t*)p_dec->fmt_in.p_extra)[0] == 1) {
             convert_sps_pps(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
-                            ptr, buf_size,
+                            p_sys->p_extra_buffer, buf_size,
                             &size, &p_sys->nal_size);
         } else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC) {
             convert_hevc_nal_units(p_dec, p_dec->fmt_in.p_extra,
-                                   p_dec->fmt_in.i_extra, ptr, buf_size,
+                                   p_dec->fmt_in.i_extra,
+                                   p_sys->p_extra_buffer, buf_size,
                                    &size, &p_sys->nal_size);
         } else {
-            memcpy(ptr, p_dec->fmt_in.p_extra, size);
+            memcpy(p_sys->p_extra_buffer, p_dec->fmt_in.p_extra, size);
         }
-        (*env)->CallObjectMethod(env, bytebuf, jfields.limit, size);
+        jextra_buffer = (*env)->NewDirectByteBuffer( env,
+                                                     p_sys->p_extra_buffer,
+                                                     size);
+        if (CHECK_EXCEPTION() || !jextra_buffer)
+        {
+            msg_Warn(p_dec, "java extra buffer allocation failed");
+            free(p_sys->p_extra_buffer);
+            p_sys->p_extra_buffer = NULL;
+            goto error;
+        }
         (*env)->CallVoidMethod(env, format, jfields.set_bytebuffer,
-                               (*env)->NewStringUTF(env, "csd-0"), bytebuf);
-        (*env)->DeleteLocalRef(env, bytebuf);
+                               (*env)->NewStringUTF(env, "csd-0"),
+                               jextra_buffer);
+        (*env)->DeleteLocalRef(env, jextra_buffer);
     }
 
     p_sys->direct_rendering = var_InheritBool(p_dec, CFG_PREFIX "dr");
@@ -715,6 +727,7 @@ static void CloseDecoder(vlc_object_t *p_this)
         (*env)->DeleteGlobalRef(env, p_sys->buffer_info);
 
 cleanup:
+    free(p_sys->p_extra_buffer);
     free(p_sys->name);
     ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
     free(p_sys->pp_inflight_pictures);
