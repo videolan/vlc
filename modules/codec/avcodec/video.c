@@ -111,10 +111,9 @@ static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 /**
  * Sets the decoder output format.
  */
-static int lavc_UpdateVideoFormat( decoder_t *p_dec,
-                                   AVCodecContext *p_context )
+static int lavc_UpdateVideoFormat( decoder_t *p_dec, AVCodecContext *p_context,
+                                   bool hwaccel )
 {
-    bool hwaccel = p_dec->p_sys->p_va != NULL;
     int width = p_context->coded_width;
     int height = p_context->coded_height;
 
@@ -186,7 +185,9 @@ static int lavc_UpdateVideoFormat( decoder_t *p_dec,
 static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
                                             AVCodecContext *p_context )
 {
-    if (lavc_UpdateVideoFormat(p_dec, p_context))
+    bool hwaccel = p_dec->p_sys->p_va != NULL;
+
+    if (lavc_UpdateVideoFormat(p_dec, p_context, hwaccel))
         return NULL;
     return decoder_NewPicture( p_dec );
 }
@@ -1102,7 +1103,9 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     }
 
     /* Enumerate available formats */
+    enum PixelFormat swfmt = avcodec_default_get_format(p_context, pi_fmt);
     bool can_hwaccel = false;
+
     for( size_t i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
     {
         const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(pi_fmt[i]);
@@ -1117,14 +1120,22 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     }
 
     if (!can_hwaccel)
-        goto end;
+        return swfmt;
 
     for( size_t i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
     {
-        vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, pi_fmt[i],
+        enum PixelFormat hwfmt = pi_fmt[i];
+
+        p_dec->fmt_out.video.i_chroma = vlc_va_GetChroma(hwfmt, swfmt);
+        if (p_dec->fmt_out.video.i_chroma == 0)
+            continue; /* Unknown brand of hardware acceleration */
+        if (lavc_UpdateVideoFormat(p_dec, p_context, true))
+            continue; /* Unsupported brand of hardware acceleration */
+
+        vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt,
                                   &p_dec->fmt_in);
         if (va == NULL)
-            continue;
+            continue; /* Unsupported codec profile or such */
 
         /* We try to call vlc_va_Setup when possible to detect errors when
          * possible (later is too late) */
@@ -1148,7 +1159,6 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         return pi_fmt[i];
     }
 
-end:
     /* Fallback to default behaviour */
-    return avcodec_default_get_format( p_context, pi_fmt );
+    return swfmt;
 }
