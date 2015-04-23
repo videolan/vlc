@@ -22,6 +22,8 @@
 
 #include <limits.h>
 
+static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x00, 0x01 };
+
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,
                      uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
@@ -136,6 +138,72 @@ void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
             state->nal_pos = 0;
         }
     }
+}
+
+int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
+                     uint8_t **pp_sps, size_t *p_sps_size,
+                     uint8_t **pp_pps, size_t *p_pps_size )
+{
+    uint8_t *p_sps = NULL, *p_pps = NULL;
+    size_t i_sps_size = 0, i_pps_size = 0;
+    int i_nal_type = NAL_UNKNOWN;
+
+    while( true )
+    {
+        int i_inc = 0;
+
+        if( i_buf > 5 && memcmp( p_buf, annexb_startcode, 4 ) == 0 )
+        {
+            i_nal_type = p_buf[4] & 0x1F;
+
+            /* size of startcode + nal_type */
+            i_inc = 5;
+
+            /* pointer to the beginning of the sps/pps  */
+            if( i_nal_type == NAL_SPS && !p_sps )
+                p_sps = p_buf;
+            if( i_nal_type == NAL_PPS && !p_pps )
+                p_pps = p_buf;
+        } else {
+            i_inc = 1;
+        }
+
+        /* cf. 7.4.1.2.3 */
+        if( i_nal_type == NAL_UNKNOWN || i_nal_type > 18
+         || (i_nal_type >= 10 && i_nal_type <= 12))
+            return -1;
+
+        /* update SPS/PPS size if the new NAL is different than the last one */
+        if( !i_sps_size && p_sps && i_nal_type != NAL_SPS )
+            i_sps_size = p_buf - p_sps;
+        if( !i_pps_size && p_pps && i_nal_type != NAL_PPS )
+            i_pps_size = p_buf - p_pps;
+
+        /* SPS/PPS are before the slices */
+        if (i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
+            break;
+
+        i_buf -= i_inc;
+        p_buf += i_inc;
+
+        if( i_buf == 0 )
+        {
+            /* update SPS/PPS size if we reach the end of the buffer */
+            if( !i_sps_size && p_sps )
+                i_sps_size = p_buf - p_sps;
+            if( !i_pps_size && p_pps )
+                i_pps_size = p_buf - p_pps;
+            break;
+        }
+    }
+    if( ( !p_sps || !i_sps_size ) && ( !p_pps || !i_pps_size ) )
+        return -1;
+    *pp_sps = p_sps;
+    *p_sps_size = i_sps_size;
+    *pp_pps = p_pps;
+    *p_pps_size = i_pps_size;
+
+    return 0;
 }
 
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,

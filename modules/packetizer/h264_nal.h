@@ -82,6 +82,12 @@ void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
                              size_t i_nal_size,
                              struct H264ConvertState *state );
 
+/* Get the SPS/PPS pointers from an Annex B buffer
+ * Returns 0 if a SPS and/or a PPS is found */
+int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
+                     uint8_t **pp_sps, size_t *p_sps_size,
+                     uint8_t **pp_pps, size_t *p_pps_size );
+
 /* Get level and Profile */
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
                             size_t *p_level, size_t *p_nal_size);
