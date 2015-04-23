@@ -1229,7 +1229,7 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     if( slice.i_frame_num != p_sys->slice.i_frame_num ||
         slice.i_pic_parameter_set_id != p_sys->slice.i_pic_parameter_set_id ||
         slice.i_field_pic_flag != p_sys->slice.i_field_pic_flag ||
-        slice.i_nal_ref_idc != p_sys->slice.i_nal_ref_idc )
+        !slice.i_nal_ref_idc != !p_sys->slice.i_nal_ref_idc )
         b_pic = true;
     if( (slice.i_bottom_field_flag != -1) &&
         (p_sys->slice.i_bottom_field_flag != -1) &&
