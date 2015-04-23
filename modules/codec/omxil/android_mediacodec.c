@@ -760,6 +760,17 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (!p_dec->p_sys->timestamp_fifo)
         goto error;
 
+    switch (p_dec->fmt_in.i_codec)
+    {
+    case VLC_CODEC_VC1:
+        if (!p_dec->fmt_in.i_extra)
+        {
+            msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
+                     (const char *)&p_dec->fmt_in.i_codec);
+            return VLC_SUCCESS;
+        }
+        break;
+    }
     return OpenMediaCodec(p_dec, env);
 
  error:
@@ -1128,6 +1139,28 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         goto endclean;
     }
 
+    /* try delayed opening if there is a new extra data */
+    if (!p_sys->codec)
+    {
+        bool b_delayed_open = false;
+
+        switch (p_dec->fmt_in.i_codec)
+        {
+        case VLC_CODEC_VC1:
+            if (p_dec->fmt_in.i_extra)
+                b_delayed_open = true;
+        default:
+            break;
+        }
+        if (b_delayed_open && OpenMediaCodec(p_dec, env) != VLC_SUCCESS)
+        {
+            b_error = true;
+            goto endclean;
+        }
+    }
+    if (!p_sys->codec)
+        goto endclean;
+
     /* Use the aspect ratio provided by the input (ie read from packetizer).
      * Don't check the current value of the aspect ratio in fmt_out, since we
      * want to allow changes in it to propagate. */
@@ -1192,7 +1225,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     } while (p_block && i_input_ret != 1 && i_output_ret != 1);
 
 endclean:
-    if (p_sys->error_state || b_error)
+    if (p_sys->error_state || b_error || !p_sys->codec)
     {
         if( p_block )
         {
