@@ -55,12 +55,6 @@
     vaCreateSurfaces(d, w, h, f, ns, s)
 #endif
 
-typedef struct
-{
-    VASurfaceID  i_id;
-    vlc_va_sys_t *sys;
-} vlc_va_surface_t;
-
 struct vlc_va_sys_t
 {
 #ifdef VLC_VA_BACKEND_XLIB
@@ -77,8 +71,6 @@ struct vlc_va_sys_t
     int          i_surface_height;
     vlc_fourcc_t i_surface_chroma;
 
-    vlc_va_surface_t *p_surface;
-
     VAImage      image;
     copy_cache_t image_cache;
 
@@ -86,6 +78,7 @@ struct vlc_va_sys_t
 
     uint8_t      count;
     uint32_t     available;
+    VASurfaceID  surfaces[32];
 };
 
 static void DestroySurfaces( vlc_va_sys_t *sys )
@@ -103,19 +96,9 @@ static void DestroySurfaces( vlc_va_sys_t *sys )
     if (sys->hw_ctx.context_id != VA_INVALID_ID)
         vaDestroyContext(sys->hw_ctx.display, sys->hw_ctx.context_id);
 
-    for( unsigned i = 0; i < sys->count && sys->p_surface; i++ )
-    {
-        vlc_va_surface_t *p_surface = &sys->p_surface[i];
-
-        if( p_surface->i_id != VA_INVALID_SURFACE )
-            vaDestroySurfaces(sys->hw_ctx.display, &p_surface->i_id, 1);
-    }
-    free( sys->p_surface );
-
     /* */
     sys->image.image_id = VA_INVALID_ID;
     sys->hw_ctx.context_id = VA_INVALID_ID;
-    sys->p_surface = NULL;
     sys->i_surface_width = 0;
     sys->i_surface_height = 0;
     vlc_mutex_destroy(&sys->lock);
@@ -127,36 +110,13 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
     assert( i_width > 0 && i_height > 0 );
 
     /* */
-    sys->p_surface = calloc( sys->count, sizeof(*sys->p_surface) );
-    if( !sys->p_surface )
-        return VLC_EGENERIC;
     sys->image.image_id = VA_INVALID_ID;
     sys->hw_ctx.context_id   = VA_INVALID_ID;
-
-    /* Create surfaces */
-    VASurfaceID pi_surface_id[sys->count];
-    if (vaCreateSurfaces(sys->hw_ctx.display, VA_RT_FORMAT_YUV420, i_width,
-                         i_height, pi_surface_id, sys->count, NULL, 0 ) )
-    {
-        for( unsigned i = 0; i < sys->count; i++ )
-            sys->p_surface[i].i_id = VA_INVALID_SURFACE;
-        goto error;
-    }
-
-    sys->available = (1 << sys->count) - 1;
-
-    for( unsigned i = 0; i < sys->count; i++ )
-    {
-        vlc_va_surface_t *p_surface = &sys->p_surface[i];
-
-        p_surface->i_id = pi_surface_id[i];
-        p_surface->sys = sys;
-    }
 
     /* Create a context */
     if (vaCreateContext(sys->hw_ctx.display, sys->hw_ctx.config_id,
                         i_width, i_height, VA_PROGRESSIVE,
-                        pi_surface_id, sys->count, &sys->hw_ctx.context_id))
+                        sys->surfaces, sys->count, &sys->hw_ctx.context_id))
     {
         sys->hw_ctx.context_id = VA_INVALID_ID;
         goto error;
@@ -176,7 +136,7 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
 
     VAImage test_image;
     vlc_fourcc_t  deriveImageFormat = 0;
-    if (vaDeriveImage(sys->hw_ctx.display, pi_surface_id[0], &test_image) == VA_STATUS_SUCCESS)
+    if (vaDeriveImage(sys->hw_ctx.display, sys->surfaces[0], &test_image) == VA_STATUS_SUCCESS)
     {
         sys->b_supports_derive = true;
         deriveImageFormat = test_image.format.fourcc;
@@ -197,7 +157,7 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
                 continue;
             }
             /* Validate that vaGetImage works with this format */
-            if (vaGetImage(sys->hw_ctx.display, pi_surface_id[0],
+            if (vaGetImage(sys->hw_ctx.display, sys->surfaces[0],
                            0, 0, i_width, i_height, sys->image.image_id))
             {
                 vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
@@ -354,19 +314,20 @@ static int Get( vlc_va_t *va, picture_t *pic, uint8_t **data )
     if( i >= sys->count )
         return VLC_ENOMEM;
 
-    vlc_va_surface_t *p_surface = &sys->p_surface[i];
+    VASurfaceID *surface = &sys->surfaces[i];
 
-    pic->context = p_surface;
-    *data = (void *)(uintptr_t)p_surface->i_id;
+    pic->context = surface;
+    *data = (void *)(uintptr_t)*surface;
     return VLC_SUCCESS;
 }
 
 static void Release( void *opaque, uint8_t *data )
 {
     picture_t *pic = opaque;
-    vlc_va_surface_t *p_surface = pic->context;
-    vlc_va_sys_t *sys = p_surface->sys;
-    unsigned i = p_surface - sys->p_surface;
+    VASurfaceID *surface = pic->context;
+    vlc_va_sys_t *sys = (void *)((((uintptr_t)surface)
+        - offsetof(vlc_va_sys_t, surfaces)) & ~(sizeof (sys->surfaces) - 1));
+    unsigned i = surface - sys->surfaces;
 
     vlc_mutex_lock( &sys->lock );
     assert(((sys->available >> i) & 1) == 0);
@@ -407,9 +368,8 @@ static void Delete( vlc_va_t *va, AVCodecContext *avctx )
     vlc_va_sys_t *sys = va->sys;
 
     (void) avctx;
-    if( sys->i_surface_width || sys->i_surface_height )
-        DestroySurfaces( sys );
 
+    vaDestroySurfaces(sys->hw_ctx.display, sys->surfaces, sys->count);
     vaDestroyConfig(sys->hw_ctx.display, sys->hw_ctx.config_id);
     vaTerminate(sys->hw_ctx.display);
 #ifdef VLC_VA_BACKEND_XLIB
@@ -467,9 +427,15 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     }
     count += ctx->thread_count;
 
-    vlc_va_sys_t *sys = calloc( 1, sizeof(*sys) );
-    if ( unlikely(sys == NULL) )
+    vlc_va_sys_t *sys;
+    void *mem;
+
+    assert(popcount(sizeof (sys->surfaces)) == 1);
+    if (unlikely(posix_memalign(&mem, sizeof (sys->surfaces), sizeof (*sys))))
        return VLC_ENOMEM;
+
+    sys = mem;
+    memset(sys, 0, sizeof (*sys));
 
     /* */
     sys->hw_ctx.display = NULL;
@@ -478,8 +444,9 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     sys->image.image_id = VA_INVALID_ID;
     sys->b_supports_derive = false;
     sys->count = count;
-    sys->available = 0;
+    sys->available = (1 << sys->count) - 1;
     assert(count < sizeof (sys->available) * CHAR_BIT);
+    assert(count * sizeof (sys->surfaces[0]) <= sizeof (sys->surfaces));
 
     /* Create a VA display */
 #ifdef VLC_VA_BACKEND_XLIB
@@ -558,6 +525,15 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         goto error;
     }
 
+    /* Create surfaces */
+    assert(ctx->coded_width > 0 && ctx->coded_height > 0);
+    if (vaCreateSurfaces(sys->hw_ctx.display, VA_RT_FORMAT_YUV420,
+                         ctx->coded_width, ctx->coded_height,
+                         sys->surfaces, sys->count, NULL, 0))
+    {
+        goto error;
+    }
+
     vlc_mutex_init(&sys->lock);
 
     va->sys = sys;
@@ -569,6 +545,8 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     return VLC_SUCCESS;
 
 error:
+    if (sys->hw_ctx.config_id != VA_INVALID_ID)
+        vaDestroyConfig(sys->hw_ctx.display, sys->hw_ctx.config_id);
     if (sys->hw_ctx.display != NULL)
         vaTerminate(sys->hw_ctx.display);
 #ifdef VLC_VA_BACKEND_XLIB
