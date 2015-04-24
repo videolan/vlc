@@ -293,7 +293,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                                input_resource_t *p_resource )
 {
     input_thread_t *p_input = NULL;                 /* thread descriptor */
-    int i;
 
     /* Allocate descriptor */
     p_input = vlc_custom_create( p_parent, sizeof( *p_input ), "input" );
