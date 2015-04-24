@@ -93,12 +93,8 @@ static void DestroySurfaces( vlc_va_sys_t *sys )
         CopyCleanCache( &sys->image_cache );
     }
 
-    if (sys->hw_ctx.context_id != VA_INVALID_ID)
-        vaDestroyContext(sys->hw_ctx.display, sys->hw_ctx.context_id);
-
     /* */
     sys->image.image_id = VA_INVALID_ID;
-    sys->hw_ctx.context_id = VA_INVALID_ID;
     sys->i_surface_width = 0;
     sys->i_surface_height = 0;
     vlc_mutex_destroy(&sys->lock);
@@ -111,16 +107,6 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
 
     /* */
     sys->image.image_id = VA_INVALID_ID;
-    sys->hw_ctx.context_id   = VA_INVALID_ID;
-
-    /* Create a context */
-    if (vaCreateContext(sys->hw_ctx.display, sys->hw_ctx.config_id,
-                        i_width, i_height, VA_PROGRESSIVE,
-                        sys->surfaces, sys->count, &sys->hw_ctx.context_id))
-    {
-        sys->hw_ctx.context_id = VA_INVALID_ID;
-        goto error;
-    }
 
     /* Find and create a supported image chroma */
     int i_fmt_count = vaMaxNumImageFormats(sys->hw_ctx.display);
@@ -369,6 +355,7 @@ static void Delete( vlc_va_t *va, AVCodecContext *avctx )
 
     (void) avctx;
 
+    vaDestroyContext(sys->hw_ctx.display, sys->hw_ctx.context_id);
     vaDestroySurfaces(sys->hw_ctx.display, sys->surfaces, sys->count);
     vaDestroyConfig(sys->hw_ctx.display, sys->hw_ctx.config_id);
     vaTerminate(sys->hw_ctx.display);
@@ -531,6 +518,16 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
                          ctx->coded_width, ctx->coded_height,
                          sys->surfaces, sys->count, NULL, 0))
     {
+        goto error;
+    }
+
+    /* Create a context */
+    if (vaCreateContext(sys->hw_ctx.display, sys->hw_ctx.config_id,
+                        ctx->coded_width, ctx->coded_height, VA_PROGRESSIVE,
+                        sys->surfaces, sys->count, &sys->hw_ctx.context_id))
+    {
+        sys->hw_ctx.context_id = VA_INVALID_ID;
+        vaDestroySurfaces(sys->hw_ctx.display, sys->surfaces, sys->count);
         goto error;
     }
 
