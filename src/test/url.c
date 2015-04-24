@@ -80,11 +80,12 @@ static inline void test_path (const char *in, const char *out)
 
 static inline void test_current_directory_path (const char *in, const char *cwd, const char *out)
 {
-    char * expected_result = NULL;
-    int val = asprintf(&expected_result, "file://%s/%s", cwd, out);
+    char *expected_result;
+    int val = asprintf (&expected_result, "file://%s/%s", cwd, out);
     assert (val != -1);
 
     test (make_URI_def, in, expected_result);
+    free(expected_result);
 }
 
 static void test_url_parse(const char* in, const char* protocol, const char* user,
