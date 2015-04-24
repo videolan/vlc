@@ -1114,6 +1114,10 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     picture_t *p_pic = NULL;
     JNIEnv *env = NULL;
     block_t *p_block = pp_block ? *pp_block : NULL;
+    unsigned int i_attempts = 0;
+    jlong timeout = 0;
+    int i_output_ret = 0;
+    int i_input_ret = 0;
     bool b_error = false;
 
     if (p_sys->error_state)
@@ -1126,8 +1130,6 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     }
 
     if (p_block && p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        block_Release(p_block);
-        *pp_block = NULL;
         p_sys->i_preroll_end = 0;
         timestamp_FifoEmpty(p_sys->timestamp_fifo);
         if (p_sys->decoded) {
@@ -1177,23 +1179,12 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
     }
 
-    unsigned int i_attempts = 0;
-    jlong timeout = 0;
-    int i_output_ret = 0;
-    int i_input_ret = 0;
     do {
-        if (p_block && i_input_ret == 0) {
+        if (p_block && i_input_ret == 0)
             i_input_ret = PutInput(p_dec, env, p_block, timeout);
-            if (i_input_ret == 1) {
-                block_Release(p_block);
-                *pp_block = NULL;
-            } else if (i_input_ret == -1) {
-                b_error = true;
-                break;
-            }
-        }
 
-        if (i_output_ret == 0) {
+        if (i_output_ret == 0)
+        {
             /* FIXME: A new picture shouldn't be created each time.
              * If decoder_NewPicture fails because the decoder is
              * flushing/exiting, GetOutput will either fail (or crash in
@@ -1202,7 +1193,8 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
              * input is waiting for the output or vice-versa.  Therefore, call
              * decoder_NewPicture before GetOutput as a safeguard. */
 
-            if (p_sys->pixel_format) {
+            if (p_sys->pixel_format)
+            {
                 p_pic = decoder_NewPicture(p_dec);
                 if (!p_pic) {
                     msg_Warn(p_dec, "NewPicture failed");
@@ -1210,14 +1202,16 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                 }
             }
             i_output_ret = GetOutput(p_dec, env, p_pic, timeout);
-            if (i_output_ret == -1) {
-                b_error = true;
-                break;
-            } else if (i_output_ret == 0) {
-                if (p_pic) {
+            if (p_pic)
+            {
+                if (i_output_ret != 1) {
                     picture_Release(p_pic);
                     p_pic = NULL;
-                } else if (++i_attempts > 100) {
+                }
+            } else
+            {
+                if (i_output_ret == 0 && i_input_ret == 0 && ++i_attempts > 100)
+                {
                     /* No p_pic, so no pixel_format, thereforce mediacodec
                      * didn't produce any output or events yet. Don't wait
                      * indefinitely and abort after 2seconds (100 * 2 * 10ms)
@@ -1229,28 +1223,30 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             }
         }
         timeout = 10 * 1000; // 10 ms
-        /* loop until input is processed or when we got an output pic */
-    } while (p_block && i_input_ret != 1 && i_output_ret != 1);
+        /* loop until either the input or the output are processed (i_input_ret
+         * or i_output_ret == 1 ) or caused an error (i_input_ret or
+         * i_output_ret == -1 )*/
+    } while (p_block && i_input_ret == 0 && i_output_ret == 0);
+
+    if (i_input_ret == -1 || i_output_ret == -1)
+        b_error = true;
 
 endclean:
-    if (p_sys->error_state || b_error || !p_sys->codec)
-    {
-        if( p_block )
-        {
-            block_Release(p_block);
-            *pp_block = NULL;
-        }
-        if (p_pic)
-        {
-            picture_Release(p_pic);
-            p_pic = NULL;
-        }
 
-        if (b_error && !p_sys->error_state) {
-            /* Signal the error to the Java. */
-            jni_EventHardwareAccelerationError();
-            p_sys->error_state = true;
-        }
+    /* If pf_decode returns NULL, we'll get a new p_block from the next
+     * pf_decode call. Therefore we need to release the current one even if we
+     * couldn't process it (it happens in case or error or if MediaCodec is
+     * still not opened). We also must release the current p_block if we were
+     * able to process it. */
+    if (p_block && (p_pic == NULL || i_input_ret != 0))
+    {
+        block_Release(p_block);
+        *pp_block = NULL;
+    }
+    if (b_error && !p_sys->error_state) {
+        /* Signal the error to the Java. */
+        jni_EventHardwareAccelerationError();
+        p_sys->error_state = true;
     }
 
     return p_pic;
