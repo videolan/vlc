@@ -58,8 +58,7 @@
 typedef struct
 {
     VASurfaceID  i_id;
-    int          i_refcount;
-    vlc_mutex_t *p_lock;
+    vlc_va_sys_t *sys;
 } vlc_va_surface_t;
 
 struct vlc_va_sys_t
@@ -79,7 +78,6 @@ struct vlc_va_sys_t
 
     /* */
     vlc_mutex_t  lock;
-    int          i_surface_count;
     int          i_surface_width;
     int          i_surface_height;
     vlc_fourcc_t i_surface_chroma;
@@ -90,6 +88,9 @@ struct vlc_va_sys_t
     copy_cache_t image_cache;
 
     bool b_supports_derive;
+
+    uint8_t      count;
+    uint32_t     available;
 };
 
 static void DestroySurfaces( vlc_va_sys_t *sys )
@@ -107,7 +108,7 @@ static void DestroySurfaces( vlc_va_sys_t *sys )
     if( sys->i_context_id != VA_INVALID_ID )
         vaDestroyContext( sys->p_display, sys->i_context_id );
 
-    for( int i = 0; i < sys->i_surface_count && sys->p_surface; i++ )
+    for( unsigned i = 0; i < sys->count && sys->p_surface; i++ )
     {
         vlc_va_surface_t *p_surface = &sys->p_surface[i];
 
@@ -131,35 +132,36 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
     assert( i_width > 0 && i_height > 0 );
 
     /* */
-    sys->p_surface = calloc( sys->i_surface_count, sizeof(*sys->p_surface) );
+    sys->p_surface = calloc( sys->count, sizeof(*sys->p_surface) );
     if( !sys->p_surface )
         return VLC_EGENERIC;
     sys->image.image_id = VA_INVALID_ID;
     sys->i_context_id   = VA_INVALID_ID;
 
     /* Create surfaces */
-    VASurfaceID pi_surface_id[sys->i_surface_count];
+    VASurfaceID pi_surface_id[sys->count];
     if( vaCreateSurfaces( sys->p_display, VA_RT_FORMAT_YUV420, i_width, i_height,
-                          pi_surface_id, sys->i_surface_count, NULL, 0 ) )
+                          pi_surface_id, sys->count, NULL, 0 ) )
     {
-        for( int i = 0; i < sys->i_surface_count; i++ )
+        for( unsigned i = 0; i < sys->count; i++ )
             sys->p_surface[i].i_id = VA_INVALID_SURFACE;
         goto error;
     }
 
-    for( int i = 0; i < sys->i_surface_count; i++ )
+    sys->available = (1 << sys->count) - 1;
+
+    for( unsigned i = 0; i < sys->count; i++ )
     {
         vlc_va_surface_t *p_surface = &sys->p_surface[i];
 
         p_surface->i_id = pi_surface_id[i];
-        p_surface->i_refcount = 0;
-        p_surface->p_lock = &sys->lock;
+        p_surface->sys = sys;
     }
 
     /* Create a context */
     if( vaCreateContext( sys->p_display, sys->i_config_id,
                          i_width, i_height, VA_PROGRESSIVE,
-                         pi_surface_id, sys->i_surface_count, &sys->i_context_id ) )
+                         pi_surface_id, sys->count, &sys->i_context_id ) )
     {
         sys->i_context_id = VA_INVALID_ID;
         goto error;
@@ -349,24 +351,21 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 static int Get( vlc_va_t *va, picture_t *pic, uint8_t **data )
 {
     vlc_va_sys_t *sys = va->sys;
-    int i;
+    unsigned i = sys->count;
 
     vlc_mutex_lock( &sys->lock );
-    for( i = 0; i < sys->i_surface_count; i++ )
+    if (sys->available)
     {
-        vlc_va_surface_t *p_surface = &sys->p_surface[i];
-
-        if( !p_surface->i_refcount )
-            break;
+        i = ctz(sys->available);
+        sys->available &= ~(1 << i);
     }
     vlc_mutex_unlock( &sys->lock );
 
-    if( i == sys->i_surface_count )
+    if( i >= sys->count )
         return VLC_ENOMEM;
 
     vlc_va_surface_t *p_surface = &sys->p_surface[i];
 
-    p_surface->i_refcount = 1;
     pic->context = p_surface;
     *data = (void *)(uintptr_t)p_surface->i_id;
     return VLC_SUCCESS;
@@ -376,10 +375,13 @@ static void Release( void *opaque, uint8_t *data )
 {
     picture_t *pic = opaque;
     vlc_va_surface_t *p_surface = pic->context;
+    vlc_va_sys_t *sys = p_surface->sys;
+    unsigned i = p_surface - sys->p_surface;
 
-    vlc_mutex_lock( p_surface->p_lock );
-    p_surface->i_refcount--;
-    vlc_mutex_unlock( p_surface->p_lock );
+    vlc_mutex_lock( &sys->lock );
+    assert(((sys->available >> i) & 1) == 0);
+    sys->available |= 1 << i;
+    vlc_mutex_unlock( &sys->lock );
 
     pic->context = NULL;
     picture_Release(pic);
@@ -445,14 +447,10 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     }
 #endif
 
-    vlc_va_sys_t *sys = calloc( 1, sizeof(*sys) );
-    if ( unlikely(sys == NULL) )
-       return VLC_ENOMEM;
-
     VAProfile i_profile, *p_profiles_list;
     bool b_supported_profile = false;
     int i_profiles_nb = 0;
-    int i_surface_count;
+    unsigned count = 3;
 
     /* */
     switch( ctx->codec_id )
@@ -460,33 +458,38 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     case AV_CODEC_ID_MPEG1VIDEO:
     case AV_CODEC_ID_MPEG2VIDEO:
         i_profile = VAProfileMPEG2Main;
-        i_surface_count = 2 + 2;
+        count = 4;
         break;
     case AV_CODEC_ID_MPEG4:
         i_profile = VAProfileMPEG4AdvancedSimple;
-        i_surface_count = 2+1;
         break;
     case AV_CODEC_ID_WMV3:
         i_profile = VAProfileVC1Main;
-        i_surface_count = 2+1;
         break;
     case AV_CODEC_ID_VC1:
         i_profile = VAProfileVC1Advanced;
-        i_surface_count = 2+1;
         break;
     case AV_CODEC_ID_H264:
         i_profile = VAProfileH264High;
-        i_surface_count = 16 + ctx->thread_count + 2;
+        count = 18;
         break;;
     default:
-        free( sys );
         return VLC_EGENERIC;
     }
+    count += ctx->thread_count;
+
+    vlc_va_sys_t *sys = calloc( 1, sizeof(*sys) );
+    if ( unlikely(sys == NULL) )
+       return VLC_ENOMEM;
 
     /* */
     sys->i_config_id  = VA_INVALID_ID;
     sys->i_context_id = VA_INVALID_ID;
     sys->image.image_id = VA_INVALID_ID;
+    sys->b_supports_derive = false;
+    sys->count = count;
+    sys->available = 0;
+    assert(count < sizeof (sys->available) * CHAR_BIT);
 
     /* Create a VA display */
 #ifdef VLC_VA_BACKEND_XLIB
@@ -565,10 +568,6 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         sys->i_config_id = VA_INVALID_ID;
         goto error;
     }
-
-    sys->i_surface_count = i_surface_count;
-
-    sys->b_supports_derive = false;
 
     vlc_mutex_init(&sys->lock);
 
