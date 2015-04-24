@@ -38,6 +38,9 @@ namespace dash
 {
     namespace mpd
     {
+        class Representation;
+        class Period;
+
         class IMPDParser
         {
             public:

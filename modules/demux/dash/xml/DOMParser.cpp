@@ -26,7 +26,7 @@
 #endif
 
 #include "DOMParser.h"
-#include "../Helper.h"
+#include "../adaptative/tools/Helper.h"
 
 #include <vector>
 #include <stack>
@@ -193,7 +193,7 @@ bool    DOMParser::isDash                   (stream_t *stream)
     std::string header((const char*)peek, peek_size);
     for( size_t i=0; i<ARRAY_SIZE(namespaces); i++ )
     {
-        if ( Helper::ifind(header, namespaces[i]) )
+        if ( adaptative::Helper::ifind(header, namespaces[i]) )
             return true;
     }
     return false;

@@ -30,12 +30,16 @@ extern "C" {
 #include "../../demux/mp4/libmp4.h"
 }
 
+namespace adaptative
+{
+    namespace playlist
+    {
+        class BaseRepresentation;
+    }
+}
+
 namespace dash
 {
-    namespace mpd
-    {
-        class Representation;
-    }
     namespace mp4
     {
         class AtomsReader
@@ -43,7 +47,7 @@ namespace dash
             public:
                 AtomsReader(vlc_object_t *);
                 ~AtomsReader();
-                bool parseBlock(void *, size_t, dash::mpd::Representation *);
+                bool parseBlock(void *, size_t, adaptative::playlist::BaseRepresentation *);
 
             protected:
                 vlc_object_t *object;

@@ -28,7 +28,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <iostream>
 
 namespace dash
 {

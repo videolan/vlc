@@ -245,37 +245,14 @@ demux_LTLIBRARIES += libts_plugin.la
 endif
 
 libdash_plugin_la_SOURCES = \
-    demux/dash/adaptationlogic/AbstractAdaptationLogic.cpp \
-    demux/dash/adaptationlogic/AbstractAdaptationLogic.h \
-    demux/dash/adaptationlogic/AdaptationLogicFactory.cpp \
-    demux/dash/adaptationlogic/AdaptationLogicFactory.h \
-    demux/dash/adaptationlogic/AlwaysBestAdaptationLogic.cpp \
-    demux/dash/adaptationlogic/AlwaysBestAdaptationLogic.h \
-    demux/dash/adaptationlogic/AlwaysLowestAdaptationLogic.cpp \
-    demux/dash/adaptationlogic/AlwaysLowestAdaptationLogic.hpp \
-    demux/dash/adaptationlogic/IDownloadRateObserver.h \
-    demux/dash/adaptationlogic/RateBasedAdaptationLogic.h \
-    demux/dash/adaptationlogic/RateBasedAdaptationLogic.cpp \
-    demux/dash/adaptationlogic/Representationselectors.hpp \
-    demux/dash/adaptationlogic/Representationselectors.cpp \
-    demux/dash/http/Chunk.cpp \
-    demux/dash/http/Chunk.h \
-    demux/dash/http/HTTPConnection.cpp \
-    demux/dash/http/HTTPConnection.h \
-    demux/dash/http/HTTPConnectionManager.cpp \
-    demux/dash/http/HTTPConnectionManager.h \
-    demux/dash/http/IHTTPConnection.cpp \
-    demux/dash/http/IHTTPConnection.h \
-    demux/dash/http/PersistentConnection.cpp \
-    demux/dash/http/PersistentConnection.h \
     demux/dash/mpd/AdaptationSet.cpp \
     demux/dash/mpd/AdaptationSet.h \
-    demux/dash/mpd/BaseUrl.h \
-    demux/dash/mpd/CommonAttributesElements.cpp \
-    demux/dash/mpd/CommonAttributesElements.h \
+    demux/dash/mpd/DASHCommonAttributesElements.cpp \
+    demux/dash/mpd/DASHCommonAttributesElements.h \
+    demux/dash/mpd/DASHSegment.cpp \
+    demux/dash/mpd/DASHSegment.h \
     demux/dash/mpd/ContentDescription.cpp \
     demux/dash/mpd/ContentDescription.h \
-    demux/dash/mpd/ICanonicalUrl.hpp \
     demux/dash/mpd/IMPDParser.cpp \
     demux/dash/mpd/IMPDParser.h \
     demux/dash/mpd/IsoffMainParser.cpp \
@@ -292,24 +269,8 @@ libdash_plugin_la_SOURCES = \
     demux/dash/mpd/ProgramInformation.h \
     demux/dash/mpd/Representation.cpp \
     demux/dash/mpd/Representation.h \
-    demux/dash/mpd/Segment.cpp \
-    demux/dash/mpd/Segment.h \
-    demux/dash/mpd/SegmentBase.cpp \
-    demux/dash/mpd/SegmentBase.h \
-    demux/dash/mpd/SegmentInfoCommon.cpp \
-    demux/dash/mpd/SegmentInfoCommon.h \
-    demux/dash/mpd/SegmentInformation.cpp \
-    demux/dash/mpd/SegmentInformation.hpp \
-    demux/dash/mpd/SegmentList.cpp \
-    demux/dash/mpd/SegmentList.h \
-    demux/dash/mpd/SegmentTemplate.cpp \
-    demux/dash/mpd/SegmentTemplate.h \
-    demux/dash/mpd/SegmentTimeline.cpp \
-    demux/dash/mpd/SegmentTimeline.h \
     demux/dash/mpd/TrickModeType.cpp \
     demux/dash/mpd/TrickModeType.h \
-    demux/dash/mpd/Url.cpp \
-    demux/dash/mpd/Url.hpp \
     demux/dash/mp4/AtomsReader.cpp \
     demux/dash/mp4/AtomsReader.hpp \
     demux/dash/xml/DOMHelper.cpp \
@@ -321,15 +282,68 @@ libdash_plugin_la_SOURCES = \
     demux/dash/dash.cpp \
     demux/dash/dash.hpp \
     demux/dash/DASHManager.cpp \
-    demux/dash/DASHManager.h \
-    demux/dash/Helper.cpp \
-    demux/dash/Helper.h \
-    demux/dash/Properties.hpp \
-    demux/dash/SegmentTracker.cpp \
-    demux/dash/SegmentTracker.hpp \
-    demux/dash/StreamsType.hpp \
-    demux/dash/Streams.cpp \
-    demux/dash/Streams.hpp
+    demux/dash/DASHManager.h
+
+libdash_plugin_la_SOURCES += \
+    demux/adaptative/playlist/AbstractPlaylist.cpp \
+    demux/adaptative/playlist/AbstractPlaylist.hpp \
+    demux/adaptative/playlist/BaseAdaptationSet.cpp \
+    demux/adaptative/playlist/BaseAdaptationSet.h \
+    demux/adaptative/playlist/BasePeriod.cpp \
+    demux/adaptative/playlist/BasePeriod.h \
+    demux/adaptative/playlist/BaseRepresentation.cpp \
+    demux/adaptative/playlist/BaseRepresentation.h \
+    demux/adaptative/playlist/BaseUrl.h \
+    demux/adaptative/playlist/CommonAttributesElements.cpp \
+    demux/adaptative/playlist/CommonAttributesElements.h \
+    demux/adaptative/playlist/ICanonicalUrl.hpp \
+    demux/adaptative/playlist/Segment.cpp \
+    demux/adaptative/playlist/Segment.h \
+    demux/adaptative/playlist/SegmentBase.cpp \
+    demux/adaptative/playlist/SegmentBase.h \
+    demux/adaptative/playlist/SegmentInfoCommon.cpp \
+    demux/adaptative/playlist/SegmentInfoCommon.h \
+    demux/adaptative/playlist/SegmentList.cpp \
+    demux/adaptative/playlist/SegmentList.h \
+    demux/adaptative/playlist/SegmentTimeline.cpp \
+    demux/adaptative/playlist/SegmentTimeline.h \
+    demux/adaptative/playlist/SegmentInformation.cpp \
+    demux/adaptative/playlist/SegmentInformation.hpp \
+    demux/adaptative/playlist/SegmentTemplate.cpp \
+    demux/adaptative/playlist/SegmentTemplate.h \
+    demux/adaptative/playlist/Url.cpp \
+    demux/adaptative/playlist/Url.hpp \
+    demux/adaptative/logic/AbstractAdaptationLogic.cpp \
+    demux/adaptative/logic/AbstractAdaptationLogic.h \
+    demux/adaptative/logic/AlwaysBestAdaptationLogic.cpp \
+    demux/adaptative/logic/AlwaysBestAdaptationLogic.h \
+    demux/adaptative/logic/AlwaysLowestAdaptationLogic.cpp \
+    demux/adaptative/logic/AlwaysLowestAdaptationLogic.hpp \
+    demux/adaptative/logic/IDownloadRateObserver.h \
+    demux/adaptative/logic/RateBasedAdaptationLogic.h \
+    demux/adaptative/logic/RateBasedAdaptationLogic.cpp \
+    demux/adaptative/logic/Representationselectors.hpp \
+    demux/adaptative/logic/Representationselectors.cpp \
+    demux/adaptative/http/Chunk.cpp \
+    demux/adaptative/http/Chunk.h \
+    demux/adaptative/http/HTTPConnection.cpp \
+    demux/adaptative/http/HTTPConnection.h \
+    demux/adaptative/http/HTTPConnectionManager.cpp \
+    demux/adaptative/http/HTTPConnectionManager.h \
+    demux/adaptative/http/IHTTPConnection.cpp \
+    demux/adaptative/http/IHTTPConnection.h \
+    demux/adaptative/http/PersistentConnection.cpp \
+    demux/adaptative/http/PersistentConnection.h \
+    demux/adaptative/PlaylistManager.cpp \
+    demux/adaptative/PlaylistManager.h \
+    demux/adaptative/SegmentTracker.cpp \
+    demux/adaptative/SegmentTracker.hpp \
+    demux/adaptative/Streams.cpp \
+    demux/adaptative/Streams.hpp \
+    demux/adaptative/StreamsType.hpp \
+    demux/adaptative/tools/Helper.cpp \
+    demux/adaptative/tools/Helper.h \
+    demux/adaptative/tools/Properties.hpp
 
 libdash_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
 

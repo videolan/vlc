@@ -27,9 +27,17 @@
 #endif
 
 #include "IsoffMainParser.h"
-#include "SegmentTemplate.h"
-#include "SegmentTimeline.h"
+#include "../adaptative/playlist/SegmentTemplate.h"
+#include "../adaptative/playlist/Segment.h"
+#include "../adaptative/playlist/SegmentBase.h"
+#include "../adaptative/playlist/SegmentList.h"
+#include "../adaptative/playlist/SegmentTimeline.h"
+#include "../adaptative/playlist/BaseUrl.h"
+#include "Representation.h"
+#include "Period.h"
+#include "AdaptationSet.h"
 #include "ProgramInformation.h"
+#include "DASHSegment.h"
 #include "xml/DOMHelper.h"
 #include <vlc_strings.h>
 #include <vlc_stream.h>
@@ -38,6 +46,7 @@
 
 using namespace dash::mpd;
 using namespace dash::xml;
+using namespace adaptative::playlist;
 
 IsoffMainParser::IsoffMainParser    (Node *root, stream_t *p_stream) :
                  IMPDParser(root, NULL, p_stream, NULL)
@@ -255,7 +264,7 @@ void IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformatio
         size_t start = 0, end = 0;
         if (std::sscanf(segmentBaseNode->getAttributeValue("indexRange").c_str(), "%zu-%zu", &start, &end) == 2)
         {
-            seg = new IndexSegment(info);
+            seg = new DashIndexSegment(info);
             seg->setByteRange(start, end);
             list->addSegment(seg);
             /* index must be before data, so data starts at index end */
@@ -427,7 +436,7 @@ void    IsoffMainParser::print              ()
                 mpd->minBufferTime.Get());
         msg_Dbg(p_stream, "BaseUrl=%s", mpd->getUrlSegment().toString().c_str());
 
-        std::vector<Period *>::const_iterator i;
+        std::vector<BasePeriod *>::const_iterator i;
         for(i = mpd->getPeriods().begin(); i != mpd->getPeriods().end(); i++)
         {
             std::vector<std::string> debug = (*i)->toString();

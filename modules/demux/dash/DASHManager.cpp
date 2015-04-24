@@ -36,186 +36,37 @@
 
 #include "DASHManager.h"
 #include "mpd/MPDFactory.h"
-#include "mpd/SegmentTimeline.h"
 #include "xml/DOMParser.h"
-#include "adaptationlogic/AdaptationLogicFactory.h"
-#include "SegmentTracker.hpp"
+#include "../adaptative/logic/RateBasedAdaptationLogic.h"
 #include <vlc_stream.h>
 
 #include <algorithm>
 
 using namespace dash;
-using namespace dash::http;
-using namespace dash::logic;
 using namespace dash::mpd;
+using namespace adaptative::logic;
 
-DASHManager::DASHManager    ( MPD *mpd,
-                              AbstractAdaptationLogic::LogicType type, stream_t *stream) :
-             conManager     ( NULL ),
-             logicType      ( type ),
-             mpd            ( mpd ),
-             stream         ( stream ),
-             nextMPDupdate  ( 0 )
+DASHManager::DASHManager(MPD *mpd,
+                         AbstractAdaptationLogic::LogicType type, stream_t *stream) :
+             PlaylistManager(mpd, type, stream)
 {
-    for(int i=0; i<Streams::count; i++)
-        streams[i] = NULL;
 }
 
 DASHManager::~DASHManager   ()
 {
-    delete conManager;
-    for(int i=0; i<Streams::count; i++)
-        delete streams[i];
 }
 
-bool DASHManager::start(demux_t *demux)
+bool DASHManager::updatePlaylist()
 {
-    const Period *period = mpd->getFirstPeriod();
-    if(!period)
-        return false;
-
-    for(int i=0; i<Streams::count; i++)
-    {
-        Streams::Type type = static_cast<Streams::Type>(i);
-        const AdaptationSet *set = period->getAdaptationSet(type);
-        if(set)
-        {
-            streams[type] = new (std::nothrow) Streams::Stream(set->getMimeType());
-            if(!streams[type])
-                continue;
-            AbstractAdaptationLogic *logic = AdaptationLogicFactory::create(logicType, mpd);
-            if(!logic)
-            {
-                delete streams[type];
-                streams[type] = NULL;
-                continue;
-            }
-
-            SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, mpd);
-            try
-            {
-                if(!tracker)
-                    throw VLC_ENOMEM;
-                streams[type]->create(demux, logic, tracker);
-            } catch (int) {
-                delete streams[type];
-                delete logic;
-                delete tracker;
-                streams[type] = NULL;
-            }
-        }
-    }
-
-    conManager = new (std::nothrow) HTTPConnectionManager(stream);
-    if(!conManager)
-        return false;
-
-    mpd->playbackStart.Set(time(NULL));
-    nextMPDupdate = mpd->playbackStart.Get();
-
-    return true;
-}
-
-size_t DASHManager::read()
-{
-    size_t i_ret = 0;
-    for(int type=0; type<Streams::count; type++)
-    {
-        if(!streams[type])
-            continue;
-        i_ret += streams[type]->read(conManager);
-    }
-    return i_ret;
-}
-
-mtime_t DASHManager::getPCR() const
-{
-    mtime_t pcr = VLC_TS_INVALID;
-    for(int type=0; type<Streams::count; type++)
-    {
-        if(!streams[type])
-            continue;
-        if(pcr == VLC_TS_INVALID || pcr > streams[type]->getPCR())
-            pcr = streams[type]->getPCR();
-    }
-    return pcr;
-}
-
-int DASHManager::getGroup() const
-{
-    for(int type=0; type<Streams::count; type++)
-    {
-        if(!streams[type])
-            continue;
-        return streams[type]->getGroup();
-    }
-    return -1;
-}
-
-int DASHManager::esCount() const
-{
-    int es = 0;
-    for(int type=0; type<Streams::count; type++)
-    {
-        if(!streams[type])
-            continue;
-        es += streams[type]->esCount();
-    }
-    return es;
-}
-
-mtime_t DASHManager::getDuration() const
-{
-    if (mpd->isLive())
-        return 0;
-    else
-        return CLOCK_FREQ * mpd->duration.Get();
-}
-
-bool DASHManager::setPosition(mtime_t time)
-{
-    bool ret = true;
-    for(int real = 0; real < 2; real++)
-    {
-        /* Always probe if we can seek first */
-        for(int type=0; type<Streams::count; type++)
-        {
-            if(!streams[type])
-                continue;
-            ret &= streams[type]->setPosition(time, !real);
-        }
-        if(!ret)
-            break;
-    }
-    return ret;
-}
-
-bool DASHManager::seekAble() const
-{
-    if(mpd->isLive())
-        return false;
-
-    for(int type=0; type<Streams::count; type++)
-    {
-        if(!streams[type])
-            continue;
-        if(!streams[type]->seekAble())
-            return false;
-    }
-    return true;
-}
-
-bool DASHManager::updateMPD()
-{
-    if(!mpd->isLive() || !mpd->minUpdatePeriod.Get())
+    if(!playlist->isLive() || !playlist->minUpdatePeriod.Get())
         return true;
 
     mtime_t now = time(NULL);
-    if(nextMPDupdate && now < nextMPDupdate)
+    if(nextPlaylistupdate && now < nextPlaylistupdate)
         return true;
 
     /* do update */
-    if(nextMPDupdate)
+    if(nextPlaylistupdate)
     {
         std::string url(stream->psz_access);
         url.append("://");
@@ -245,7 +96,7 @@ bool DASHManager::updateMPD()
         MPD *newmpd = MPDFactory::create(parser.getRootNode(), mpdstream, parser.getProfile());
         if(newmpd)
         {
-            mpd->mergeWith(newmpd, minsegmentTime);
+            playlist->mergeWith(newmpd, minsegmentTime);
             delete newmpd;
         }
         stream_Delete(mpdstream);
@@ -254,20 +105,41 @@ bool DASHManager::updateMPD()
     /* Compute new MPD update time */
     mtime_t mininterval = 0;
     mtime_t maxinterval = 0;
-    mpd->getTimeLinesBoundaries(&mininterval, &maxinterval);
+    playlist->getTimeLinesBoundaries(&mininterval, &maxinterval);
     if(maxinterval > mininterval)
         maxinterval = (maxinterval - mininterval) / CLOCK_FREQ;
     else
         maxinterval = 60;
     maxinterval = std::max(maxinterval, (mtime_t)60);
 
-    mininterval = std::max(mpd->minUpdatePeriod.Get(),
-                           mpd->maxSegmentDuration.Get());
+    mininterval = std::max(playlist->minUpdatePeriod.Get(),
+                           playlist->maxSegmentDuration.Get());
 
-    nextMPDupdate = now + (maxinterval - mininterval) / 2;
+    nextPlaylistupdate = now + (maxinterval - mininterval) / 2;
 
     msg_Dbg(stream, "Updated MPD, next update in %" PRId64 "s (%" PRId64 "..%" PRId64 ")",
-            nextMPDupdate - now, mininterval, maxinterval );
+            nextPlaylistupdate - now, mininterval, maxinterval );
 
     return true;
+}
+
+AbstractAdaptationLogic *DASHManager::createLogic(AbstractAdaptationLogic::LogicType type)
+{
+    switch(type)
+    {
+        case AbstractAdaptationLogic::FixedRate:
+        {
+            size_t bps = var_InheritInteger(stream, "dash-prefbw") * 8192;
+            return new (std::nothrow) FixedRateAdaptationLogic(bps);
+        }
+        case AbstractAdaptationLogic::Default:
+        case AbstractAdaptationLogic::RateBased:
+        {
+            int width = var_InheritInteger(stream, "dash-prefwidth");
+            int height = var_InheritInteger(stream, "dash-prefheight");
+            return new (std::nothrow) RateBasedAdaptationLogic(width, height);
+        }
+        default:
+            return PlaylistManager::createLogic(type);
+    }
 }

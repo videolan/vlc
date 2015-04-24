@@ -22,41 +22,31 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef REPRESENTATION_H_
-#define REPRESENTATION_H_
+#ifndef DASHREPRESENTATION_H_
+#define DASHREPRESENTATION_H_
 
-#include <string>
-
-#include "mpd/CommonAttributesElements.h"
-#include "mpd/TrickModeType.h"
-#include "mpd/SegmentBase.h"
-#include "mpd/SegmentList.h"
-#include "mpd/SegmentInformation.hpp"
-#include "mpd/BaseUrl.h"
+#include "DASHCommonAttributesElements.h"
+#include "../adaptative/playlist/SegmentInfoCommon.h"
+#include "../adaptative/playlist/BaseRepresentation.h"
 
 namespace dash
 {
     namespace mpd
     {
         class AdaptationSet;
+        class TrickModeType;
         class MPD;
 
-        class Representation : public CommonAttributesElements,
-                               public SegmentInformation,
+        using namespace adaptative::playlist;
+
+        class Representation : public BaseRepresentation,
+                               public DASHCommonAttributesElements,
                                public UniqueNess<Representation>
         {
             public:
                 Representation( AdaptationSet *, MPD *mpd );
                 virtual ~Representation ();
 
-                /*
-                 *  @return The bitrate required for this representation
-                 *          in bits per seconds.
-                 *          Will be a valid value, as the parser refuses Representation
-                 *          without bandwidth.
-                 */
-                uint64_t            getBandwidth            () const;
-                void                setBandwidth            ( uint64_t bandwidth );
                 int                 getQualityRanking       () const;
                 void                setQualityRanking       ( int qualityRanking );
                 const std::list<const Representation*>&     getDependencies() const;
@@ -70,28 +60,21 @@ namespace dash
 
                 void                setTrickMode( TrickModeType *trickModeType );
 
-                void                setWidth                (int width);
-                int                 getWidth                () const;
-                void                setHeight               (int height);
-                int                 getHeight               () const;
-                void                setBaseUrl              (BaseUrl *baseUrl);
-                MPD*                getMPD                  () const;
-
-                std::vector<std::string> toString(int = 0) const;
-                virtual Url         getUrlSegment           () const; /* impl */
+                /* for segment templates */
+                virtual std::string contextualize(size_t, const std::string &,
+                                                  const BaseSegmentTemplate *) const; // reimpl
 
             private:
                 MPD                                *mpd;
-                AdaptationSet                      *adaptationSet;
-                uint64_t                            bandwidth;
                 int                                 qualityRanking;
                 std::list<const Representation*>    dependencies;
                 TrickModeType                       *trickModeType;
-                BaseUrl                             *baseUrl;
-                int                                 width;
-                int                                 height;
+
+                /* for contextualize() */
+                mtime_t getScaledTimeBySegmentNumber(size_t, const MediaSegmentTemplate *) const;
+                size_t getSegmentNumber(size_t, const MediaSegmentTemplate *) const;
         };
     }
 }
 
-#endif /* REPRESENTATION_H_ */
+#endif /* DASHREPRESENTATION_H_ */

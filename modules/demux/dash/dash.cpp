@@ -43,6 +43,14 @@
 #include "dash.hpp"
 #include "xml/DOMParser.h"
 #include "mpd/MPDFactory.h"
+#include "mpd/Period.h"
+#include "mpd/ProgramInformation.h"
+
+using namespace adaptative::logic;
+using namespace adaptative::playlist;
+using namespace dash::mpd;
+using namespace dash::xml;
+using namespace dash;
 
 /*****************************************************************************
  * Module descriptor
@@ -61,10 +69,10 @@ static void Close   (vlc_object_t *);
 
 #define DASH_LOGIC_TEXT N_("Adaptation Logic")
 
-static const int pi_logics[] = {dash::logic::AbstractAdaptationLogic::RateBased,
-                                dash::logic::AbstractAdaptationLogic::FixedRate,
-                                dash::logic::AbstractAdaptationLogic::AlwaysLowest,
-                                dash::logic::AbstractAdaptationLogic::AlwaysBest};
+static const int pi_logics[] = {AbstractAdaptationLogic::RateBased,
+                                AbstractAdaptationLogic::FixedRate,
+                                AbstractAdaptationLogic::AlwaysLowest,
+                                AbstractAdaptationLogic::AlwaysBest};
 
 static const char *const ppsz_logics[] = { N_("Bandwidth Adaptive"),
                                            N_("Fixed Bandwidth"),
@@ -108,11 +116,11 @@ static int Open(vlc_object_t *p_obj)
         free(psz_mime);
     }
 
-    if(!b_mimematched && !dash::xml::DOMParser::isDash(p_demux->s))
+    if(!b_mimematched && !DOMParser::isDash(p_demux->s))
         return VLC_EGENERIC;
 
     //Build a XML tree
-    dash::xml::DOMParser        parser(p_demux->s);
+    DOMParser        parser(p_demux->s);
     if( !parser.parse() )
     {
         msg_Err( p_demux, "Could not parse MPD" );
@@ -120,7 +128,7 @@ static int Open(vlc_object_t *p_obj)
     }
 
     //Begin the actual MPD parsing:
-    dash::mpd::MPD *mpd = dash::mpd::MPDFactory::create(parser.getRootNode(), p_demux->s, parser.getProfile());
+    MPD *mpd = MPDFactory::create(parser.getRootNode(), p_demux->s, parser.getProfile());
     if(mpd == NULL)
     {
         msg_Err( p_demux, "Cannot create/unknown MPD for profile");
@@ -133,11 +141,11 @@ static int Open(vlc_object_t *p_obj)
 
     p_sys->p_mpd = mpd;
     int logic = var_InheritInteger( p_obj, "dash-logic" );
-    dash::DASHManager*p_dashManager = new dash::DASHManager(p_sys->p_mpd,
-            static_cast<dash::logic::AbstractAdaptationLogic::LogicType>(logic),
+    DASHManager*p_dashManager = new DASHManager(p_sys->p_mpd,
+            static_cast<AbstractAdaptationLogic::LogicType>(logic),
             p_demux->s);
 
-    dash::mpd::Period *period = mpd->getFirstPeriod();
+    BasePeriod *period = mpd->getFirstPeriod();
     if(period && !p_dashManager->start(p_demux))
     {
         delete p_dashManager;
@@ -160,7 +168,7 @@ static void Close(vlc_object_t *p_obj)
 {
     demux_t                            *p_demux       = (demux_t*) p_obj;
     demux_sys_t                        *p_sys          = (demux_sys_t *) p_demux->p_sys;
-    dash::DASHManager                   *p_dashManager  = p_sys->p_dashManager;
+    DASHManager                        *p_dashManager  = p_sys->p_dashManager;
 
     delete p_dashManager;
     free(p_sys);
@@ -183,7 +191,7 @@ static int Demux(demux_t *p_demux)
                 es_out_Control(p_demux->out, ES_OUT_SET_PCR, pcr);
         }
 
-        if( !p_sys->p_dashManager->updateMPD() )
+        if( !p_sys->p_dashManager->updatePlaylist() )
             return VLC_DEMUXER_EOF;
 
         return VLC_DEMUXER_SUCCESS;

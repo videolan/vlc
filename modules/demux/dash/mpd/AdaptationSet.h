@@ -29,39 +29,29 @@
 #include <string>
 #include <map>
 
-#include "mpd/Representation.h"
-#include "mpd/CommonAttributesElements.h"
-#include "mpd/SegmentInformation.hpp"
+#include "../adaptative/playlist/BaseAdaptationSet.h"
+#include "DASHCommonAttributesElements.h"
 
 namespace dash
 {
     namespace mpd
     {
         class Period;
-        class SegmentTemplate;
+        class Representation;
 
-        class AdaptationSet : public CommonAttributesElements,
-                              public SegmentInformation
+        class AdaptationSet : public adaptative::playlist::BaseAdaptationSet,
+                              public DASHCommonAttributesElements
         {
             public:
                 AdaptationSet(Period *);
                 virtual ~AdaptationSet();
 
-                virtual const std::string&      getMimeType() const; /*reimpl*/
                 bool                            getSubsegmentAlignmentFlag() const;
                 void                            setSubsegmentAlignmentFlag( bool alignment );
-                std::vector<Representation *>&  getRepresentations      ();
                 const Representation*           getRepresentationById   ( const std::string &id ) const;
-                void                            setBitstreamSwitching(bool value);
-                bool                            getBitstreamSwitching() const;
-                void                            addRepresentation( Representation *rep );
-                virtual Url                     getUrlSegment() const; /* reimpl */
-                std::vector<std::string>        toString(int = 0) const;
 
             private:
                 bool                            subsegmentAlignmentFlag;
-                std::vector<Representation *>   representations;
-                bool                            isBitstreamSwitching;
         };
     }
 }

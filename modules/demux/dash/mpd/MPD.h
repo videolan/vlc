@@ -25,60 +25,30 @@
 #ifndef MPD_H_
 #define MPD_H_
 
-#include <vector>
-#include <string>
-#include <map>
-
-#include "mpd/Period.h"
-#include "mpd/BaseUrl.h"
-#include "mpd/ICanonicalUrl.hpp"
-#include "mpd/ProgramInformation.h"
-#include "mpd/Profile.hpp"
-#include "Properties.hpp"
+#include "../adaptative/playlist/AbstractPlaylist.hpp"
+#include "Profile.hpp"
 
 namespace dash
 {
     namespace mpd
     {
-        class MPD : public ICanonicalUrl
+        using namespace adaptative::playlist;
+
+        class ProgramInformation;
+
+        class MPD : public AbstractPlaylist
         {
             public:
                 MPD(stream_t *, Profile);
                 virtual ~MPD();
 
                 Profile                         getProfile() const;
-                bool                            isLive() const;
-                void                            setType(const std::string &);
+                virtual bool                    isLive() const;
 
-                void    addPeriod               (Period *period);
-                void    addBaseUrl              (BaseUrl *url);
-
-                virtual Url         getUrlSegment() const; /* impl */
-                vlc_object_t *      getVLCObject()  const;
-
-                virtual const std::vector<Period *>&    getPeriods();
-                virtual Period*                         getFirstPeriod();
-                virtual Period*                         getNextPeriod(Period *period);
-
-                void                mergeWith(MPD *, mtime_t = 0);
-                void                getTimeLinesBoundaries(mtime_t *, mtime_t *) const;
-
-                Property<time_t>                    duration;
-                Property<time_t>                    playbackStart;
-                Property<time_t>                    availabilityEndTime;
-                Property<time_t>                    availabilityStartTime;
-                Property<time_t>                    minUpdatePeriod;
-                Property<time_t>                    maxSegmentDuration;
-                Property<time_t>                    minBufferTime;
-                Property<time_t>                    timeShiftBufferDepth;
                 Property<ProgramInformation *>      programInfo;
 
             private:
-                stream_t                           *stream;
                 Profile                             profile;
-                std::vector<Period *>               periods;
-                std::vector<BaseUrl *>              baseUrls;
-                std::string                         type;
         };
     }
 }

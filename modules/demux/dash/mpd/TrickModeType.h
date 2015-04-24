@@ -25,9 +25,6 @@
 #ifndef TRICKMODETYPE_H_
 #define TRICKMODETYPE_H_
 
-#include <string>
-#include <map>
-
 namespace dash
 {
     namespace mpd

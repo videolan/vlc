@@ -19,6 +19,7 @@
  *****************************************************************************/
 #include "IMPDParser.h"
 #include "xml/DOMHelper.h"
+#include "../adaptative/playlist/BaseUrl.h"
 
 using namespace dash::mpd;
 using namespace dash::xml;

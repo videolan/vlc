@@ -28,41 +28,26 @@
 #include <cstdlib>
 
 #include "Representation.h"
-#include "mpd/AdaptationSet.h"
-#include "mpd/MPD.h"
-#include "mpd/SegmentTemplate.h"
+#include "AdaptationSet.h"
+#include "MPD.h"
+#include "TrickModeType.h"
+#include "../adaptative/playlist/SegmentTemplate.h"
+#include "../adaptative/playlist/SegmentTimeline.h"
 
 using namespace dash::mpd;
 
 Representation::Representation  ( AdaptationSet *set, MPD *mpd_ ) :
-                SegmentInformation( set ),
+                BaseRepresentation( set, mpd_ ),
                 mpd             ( mpd_ ),
-                adaptationSet   ( set ),
-                bandwidth       (0),
                 qualityRanking  ( -1 ),
-                trickModeType   ( NULL ),
-                baseUrl         ( NULL ),
-                width           (0),
-                height          (0)
+                trickModeType   ( NULL )
 {
 }
 
 Representation::~Representation ()
 {
     delete(this->trickModeType);
-    delete baseUrl;
 }
-
-uint64_t     Representation::getBandwidth            () const
-{
-    return this->bandwidth;
-}
-
-void    Representation::setBandwidth( uint64_t bandwidth )
-{
-    this->bandwidth = bandwidth;
-}
-
 
 TrickModeType*      Representation::getTrickModeType        () const
 {
@@ -73,8 +58,6 @@ void                Representation::setTrickMode        (TrickModeType *trickMod
 {
     this->trickModeType = trickModeType;
 }
-
-
 
 int Representation::getQualityRanking() const
 {
@@ -98,52 +81,112 @@ void Representation::addDependency(const Representation *dep)
         this->dependencies.push_back( dep );
 }
 
+std::string Representation::contextualize(size_t index, const std::string &component,
+                                          const BaseSegmentTemplate *basetempl) const
+{
+    std::string ret(component);
+    size_t pos;
 
-void Representation::setBaseUrl(BaseUrl *base)
-{
-    baseUrl = base;
-}
+    const MediaSegmentTemplate *templ = dynamic_cast<const MediaSegmentTemplate *>(basetempl);
 
-void                Representation::setWidth                (int width)
-{
-    this->width = width;
-}
-int                 Representation::getWidth                () const
-{
-    return this->width;
-}
-void                Representation::setHeight               (int height)
-{
-    this->height = height;
-}
-int                 Representation::getHeight               () const
-{
-    return this->height;
-}
+    if(templ)
+    {
+        pos = ret.find("$Time$");
+        if(pos != std::string::npos)
+        {
+            std::stringstream ss;
+            ss << getScaledTimeBySegmentNumber(index, templ);
+            ret.replace(pos, std::string("$Time$").length(), ss.str());
+        }
 
-std::vector<std::string> Representation::toString(int indent) const
-{
-    std::vector<std::string> ret;
-    std::string text(indent, ' ');
-    text.append("Representation");
-    ret.push_back(text);
-    std::vector<ISegment *> list = getSegments();
-    std::vector<ISegment *>::const_iterator l;
-    for(l = list.begin(); l < list.end(); l++)
-        ret.push_back((*l)->toString(indent + 1));
+        pos = ret.find("$Number$");
+        if(pos != std::string::npos)
+        {
+            std::stringstream ss;
+            ss << getSegmentNumber(index, templ);
+            ret.replace(pos, std::string("$Number$").length(), ss.str());
+        }
+        else
+        {
+            pos = ret.find("$Number%");
+            size_t tokenlength = std::string("$Number%").length();
+            size_t fmtstart = pos + tokenlength;
+            if(pos != std::string::npos && fmtstart < ret.length())
+            {
+                size_t fmtend = ret.find('$', fmtstart);
+                if(fmtend != std::string::npos)
+                {
+                    std::istringstream iss(ret.substr(fmtstart, fmtend - fmtstart + 1));
+                    try
+                    {
+                        size_t width;
+                        iss >> width;
+                        if (iss.peek() != '$')
+                            throw VLC_EGENERIC;
+                        std::stringstream oss;
+                        oss.width(width); /* set format string length */
+                        oss.fill('0');
+                        oss << getSegmentNumber(index, templ);
+                        ret.replace(pos, fmtend - pos + 1, oss.str());
+                    } catch(int) {}
+                }
+            }
+        }
+    }
+
+    pos = ret.find("$Bandwidth$");
+    if(pos != std::string::npos)
+    {
+        std::stringstream ss;
+        ss << getBandwidth();
+        ret.replace(pos, std::string("$Bandwidth$").length(), ss.str());
+    }
+
+    pos = ret.find("$RepresentationID$");
+    if(pos != std::string::npos)
+    {
+        std::stringstream ss;
+        ss << getId();
+        ret.replace(pos, std::string("$RepresentationID$").length(), ss.str());
+    }
 
     return ret;
 }
 
-Url Representation::getUrlSegment() const
+mtime_t Representation::getScaledTimeBySegmentNumber(size_t index, const MediaSegmentTemplate *templ) const
 {
-    Url ret = getParentUrlSegment();
-    if (baseUrl)
-        ret.append(baseUrl->getUrl());
-    return ret;
+    mtime_t time = 0;
+    if(templ->segmentTimeline.Get())
+    {
+        time = templ->segmentTimeline.Get()->getScaledPlaybackTimeByElementNumber(index);
+    }
+    else if(templ->duration.Get())
+    {
+        time = templ->duration.Get() * index;
+    }
+    return time;
 }
 
-MPD * Representation::getMPD() const
+size_t Representation::getSegmentNumber(size_t index, const MediaSegmentTemplate *templ) const
 {
-    return mpd;
+    index += templ->startNumber.Get();
+    /* live streams / templated */
+    if(getPlaylist()->isLive())
+    {
+        if(templ->segmentTimeline.Get())
+        {
+            // do nothing ?
+        }
+        else if(templ->duration.Get())
+        {
+            mtime_t playbackstart = getPlaylist()->playbackStart.Get();
+            mtime_t streamstart = getPlaylist()->availabilityStartTime.Get();
+            streamstart += getPeriodStart();
+            mtime_t duration = templ->duration.Get();
+            uint64_t timescale = templ->inheritTimescale();
+            if(duration && timescale)
+                index += (playbackstart - streamstart) * timescale / duration;
+        }
+    }
+    return index;
 }

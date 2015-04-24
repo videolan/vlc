@@ -25,36 +25,24 @@
 #ifndef DASHMANAGER_H_
 #define DASHMANAGER_H_
 
-#include "http/HTTPConnectionManager.h"
-#include "adaptationlogic/AbstractAdaptationLogic.h"
+#include "../adaptative/PlaylistManager.h"
+#include "../adaptative/logic/AbstractAdaptationLogic.h"
 #include "mpd/MPD.h"
 
 namespace dash
 {
-    class DASHManager
+    using namespace adaptative;
+
+    class DASHManager : public PlaylistManager
     {
         public:
             DASHManager( mpd::MPD *mpd,
-                         logic::AbstractAdaptationLogic::LogicType type, stream_t *stream);
+                         logic::AbstractAdaptationLogic::LogicType type,
+                         stream_t *stream);
             virtual ~DASHManager    ();
 
-            bool    start         (demux_t *);
-            size_t  read();
-            mtime_t getDuration() const;
-            mtime_t getPCR() const;
-            int     getGroup() const;
-            int     esCount() const;
-            bool    setPosition(mtime_t);
-            bool    seekAble() const;
-            bool    updateMPD();
-
-        private:
-            http::HTTPConnectionManager         *conManager;
-            logic::AbstractAdaptationLogic::LogicType  logicType;
-            mpd::MPD                            *mpd;
-            stream_t                            *stream;
-            Streams::Stream                     *streams[Streams::count];
-            mtime_t                              nextMPDupdate;
+            virtual bool updatePlaylist(); //reimpl
+            virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType); //reimpl
     };
 
 }

@@ -41,7 +41,7 @@ AtomsReader::~AtomsReader()
     delete rootbox;
 }
 
-bool AtomsReader::parseBlock(void *buffer, size_t size, Representation *rep)
+bool AtomsReader::parseBlock(void *buffer, size_t size, BaseRepresentation *rep)
 {
     if(!rep)
         return false;

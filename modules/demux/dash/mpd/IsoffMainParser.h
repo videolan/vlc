@@ -25,21 +25,35 @@
 #ifndef ISOFFMAINPARSER_H_
 #define ISOFFMAINPARSER_H_
 
-#include "xml/Node.h"
-#include "mpd/IMPDParser.h"
-#include "mpd/AdaptationSet.h"
-#include "mpd/BaseUrl.h"
-#include "mpd/SegmentBase.h"
-#include "mpd/SegmentList.h"
-#include "mpd/Segment.h"
+#include "IMPDParser.h"
+#include "../adaptative/playlist/SegmentInfoCommon.h"
 
 #include <cstdlib>
 #include <sstream>
 
+namespace adaptative
+{
+    namespace playlist
+    {
+        class SegmentInformation;
+        class MediaSegmentTemplate;
+    }
+}
+
 namespace dash
 {
+    namespace xml
+    {
+        class Node;
+    }
+
     namespace mpd
     {
+        class Period;
+        class AdaptationSet;
+
+        using namespace adaptative::playlist;
+
         class IsoffMainParser : public IMPDParser
         {
             public:
