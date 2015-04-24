@@ -59,7 +59,6 @@ typedef struct
 {
     VASurfaceID  i_id;
     int          i_refcount;
-    unsigned int i_order;
     vlc_mutex_t *p_lock;
 } vlc_va_surface_t;
 
@@ -81,7 +80,6 @@ struct vlc_va_sys_t
     /* */
     vlc_mutex_t  lock;
     int          i_surface_count;
-    unsigned int i_surface_order;
     int          i_surface_width;
     int          i_surface_height;
     vlc_fourcc_t i_surface_chroma;
@@ -155,7 +153,6 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
 
         p_surface->i_id = pi_surface_id[i];
         p_surface->i_refcount = 0;
-        p_surface->i_order = 0;
         p_surface->p_lock = &sys->lock;
     }
 
@@ -352,30 +349,24 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 static int Get( vlc_va_t *va, picture_t *pic, uint8_t **data )
 {
     vlc_va_sys_t *sys = va->sys;
-    int i_old;
     int i;
 
     vlc_mutex_lock( &sys->lock );
-    /* Grab an unused surface, in case none are, try the oldest
-     * XXX using the oldest is a workaround in case a problem happens with ffmpeg */
-    for( i = 0, i_old = 0; i < sys->i_surface_count; i++ )
+    for( i = 0; i < sys->i_surface_count; i++ )
     {
         vlc_va_surface_t *p_surface = &sys->p_surface[i];
 
         if( !p_surface->i_refcount )
             break;
-
-        if( p_surface->i_order < sys->p_surface[i_old].i_order )
-            i_old = i;
     }
-    if( i >= sys->i_surface_count )
-        i = i_old;
     vlc_mutex_unlock( &sys->lock );
+
+    if( i == sys->i_surface_count )
+        return VLC_ENOMEM;
 
     vlc_va_surface_t *p_surface = &sys->p_surface[i];
 
     p_surface->i_refcount = 1;
-    p_surface->i_order = sys->i_surface_order++;
     pic->context = p_surface;
     *data = (void *)(uintptr_t)p_surface->i_id;
     return VLC_SUCCESS;
