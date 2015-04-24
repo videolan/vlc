@@ -69,11 +69,6 @@ struct vlc_va_sys_t
 #ifdef VLC_VA_BACKEND_DRM
         int       drm_fd;
 #endif
-    VADisplay     p_display;
-
-    VAConfigID    i_config_id;
-    VAContextID   i_context_id;
-
     struct vaapi_context hw_ctx;
 
     /* */
@@ -98,28 +93,28 @@ static void DestroySurfaces( vlc_va_sys_t *sys )
     if( sys->image.image_id != VA_INVALID_ID )
     {
         CopyCleanCache( &sys->image_cache );
-        vaDestroyImage( sys->p_display, sys->image.image_id );
+        vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
     }
     else if(sys->b_supports_derive)
     {
         CopyCleanCache( &sys->image_cache );
     }
 
-    if( sys->i_context_id != VA_INVALID_ID )
-        vaDestroyContext( sys->p_display, sys->i_context_id );
+    if (sys->hw_ctx.context_id != VA_INVALID_ID)
+        vaDestroyContext(sys->hw_ctx.display, sys->hw_ctx.context_id);
 
     for( unsigned i = 0; i < sys->count && sys->p_surface; i++ )
     {
         vlc_va_surface_t *p_surface = &sys->p_surface[i];
 
         if( p_surface->i_id != VA_INVALID_SURFACE )
-            vaDestroySurfaces( sys->p_display, &p_surface->i_id, 1 );
+            vaDestroySurfaces(sys->hw_ctx.display, &p_surface->i_id, 1);
     }
     free( sys->p_surface );
 
     /* */
     sys->image.image_id = VA_INVALID_ID;
-    sys->i_context_id = VA_INVALID_ID;
+    sys->hw_ctx.context_id = VA_INVALID_ID;
     sys->p_surface = NULL;
     sys->i_surface_width = 0;
     sys->i_surface_height = 0;
@@ -136,12 +131,12 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
     if( !sys->p_surface )
         return VLC_EGENERIC;
     sys->image.image_id = VA_INVALID_ID;
-    sys->i_context_id   = VA_INVALID_ID;
+    sys->hw_ctx.context_id   = VA_INVALID_ID;
 
     /* Create surfaces */
     VASurfaceID pi_surface_id[sys->count];
-    if( vaCreateSurfaces( sys->p_display, VA_RT_FORMAT_YUV420, i_width, i_height,
-                          pi_surface_id, sys->count, NULL, 0 ) )
+    if (vaCreateSurfaces(sys->hw_ctx.display, VA_RT_FORMAT_YUV420, i_width,
+                         i_height, pi_surface_id, sys->count, NULL, 0 ) )
     {
         for( unsigned i = 0; i < sys->count; i++ )
             sys->p_surface[i].i_id = VA_INVALID_SURFACE;
@@ -159,21 +154,21 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
     }
 
     /* Create a context */
-    if( vaCreateContext( sys->p_display, sys->i_config_id,
-                         i_width, i_height, VA_PROGRESSIVE,
-                         pi_surface_id, sys->count, &sys->i_context_id ) )
+    if (vaCreateContext(sys->hw_ctx.display, sys->hw_ctx.config_id,
+                        i_width, i_height, VA_PROGRESSIVE,
+                        pi_surface_id, sys->count, &sys->hw_ctx.context_id))
     {
-        sys->i_context_id = VA_INVALID_ID;
+        sys->hw_ctx.context_id = VA_INVALID_ID;
         goto error;
     }
 
     /* Find and create a supported image chroma */
-    int i_fmt_count = vaMaxNumImageFormats( sys->p_display );
+    int i_fmt_count = vaMaxNumImageFormats(sys->hw_ctx.display);
     VAImageFormat *p_fmt = calloc( i_fmt_count, sizeof(*p_fmt) );
     if( !p_fmt )
         goto error;
 
-    if( vaQueryImageFormats( sys->p_display, p_fmt, &i_fmt_count ) )
+    if (vaQueryImageFormats(sys->hw_ctx.display, p_fmt, &i_fmt_count))
     {
         free( p_fmt );
         goto error;
@@ -181,11 +176,11 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
 
     VAImage test_image;
     vlc_fourcc_t  deriveImageFormat = 0;
-    if(vaDeriveImage(sys->p_display, pi_surface_id[0], &test_image) == VA_STATUS_SUCCESS)
+    if (vaDeriveImage(sys->hw_ctx.display, pi_surface_id[0], &test_image) == VA_STATUS_SUCCESS)
     {
         sys->b_supports_derive = true;
         deriveImageFormat = test_image.format.fourcc;
-        vaDestroyImage(sys->p_display, test_image.image_id);
+        vaDestroyImage(sys->hw_ctx.display, test_image.image_id);
     }
 
     vlc_fourcc_t  i_chroma = 0;
@@ -196,17 +191,16 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
             p_fmt[i].fourcc == VA_FOURCC_IYUV ||
             p_fmt[i].fourcc == VA_FOURCC_NV12 )
         {
-            if( vaCreateImage(  sys->p_display, &p_fmt[i], i_width, i_height, &sys->image ) )
+            if (vaCreateImage(sys->hw_ctx.display, &p_fmt[i], i_width, i_height, &sys->image))
             {
                 sys->image.image_id = VA_INVALID_ID;
                 continue;
             }
             /* Validate that vaGetImage works with this format */
-            if( vaGetImage( sys->p_display, pi_surface_id[0],
-                            0, 0, i_width, i_height,
-                            sys->image.image_id) )
+            if (vaGetImage(sys->hw_ctx.display, pi_surface_id[0],
+                           0, 0, i_width, i_height, sys->image.image_id))
             {
-                vaDestroyImage( sys->p_display, sys->image.image_id );
+                vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
                 sys->image.image_id = VA_INVALID_ID;
                 continue;
             }
@@ -215,7 +209,7 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
             {
                 /* Mark NV12 as supported, but favor other formats first */
                 nv12support = i;
-                vaDestroyImage( sys->p_display, sys->image.image_id );
+                vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
                 sys->image.image_id = VA_INVALID_ID;
                 continue;
             }
@@ -227,7 +221,7 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
     if( !i_chroma && nv12support >= 0 )
     {
         /* only nv12 is supported, so use that format */
-        if( vaCreateImage(  sys->p_display, &p_fmt[nv12support], i_width, i_height, &sys->image ) )
+        if (vaCreateImage(sys->hw_ctx.display, &p_fmt[nv12support], i_width, i_height, &sys->image))
         {
             sys->image.image_id = VA_INVALID_ID;
         }
@@ -246,7 +240,7 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
 
     if(sys->b_supports_derive)
     {
-        vaDestroyImage( sys->p_display, sys->image.image_id );
+        vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
         sys->image.image_id = VA_INVALID_ID;
     }
 
@@ -255,11 +249,6 @@ static int CreateSurfaces( vlc_va_sys_t *sys, void **pp_hw_ctx, vlc_fourcc_t *pi
 
     /* Setup the ffmpeg hardware context */
     *pp_hw_ctx = &sys->hw_ctx;
-
-    memset( &sys->hw_ctx, 0, sizeof(sys->hw_ctx) );
-    sys->hw_ctx.display    = sys->p_display;
-    sys->hw_ctx.config_id  = sys->i_config_id;
-    sys->hw_ctx.context_id = sys->i_context_id;
 
     /* */
     sys->i_surface_chroma = i_chroma;
@@ -278,27 +267,28 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
     VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)data;
 
 #if VA_CHECK_VERSION(0,31,0)
-    if( vaSyncSurface( sys->p_display, i_surface_id ) )
+    if (vaSyncSurface(sys->hw_ctx.display, i_surface_id))
 #else
-    if( vaSyncSurface( sys->p_display, sys->i_context_id, i_surface_id ) )
+    if (vaSyncSurface(sys->hw_ctx.display, sys->hw_ctx.context_id,
+                      i_surface_id))
 #endif
         return VLC_EGENERIC;
 
     if(sys->b_supports_derive)
     {
-        if(vaDeriveImage(sys->p_display, i_surface_id, &(sys->image)) != VA_STATUS_SUCCESS)
+        if (vaDeriveImage(sys->hw_ctx.display, i_surface_id, &(sys->image)) != VA_STATUS_SUCCESS)
             return VLC_EGENERIC;
     }
     else
     {
-        if( vaGetImage( sys->p_display, i_surface_id,
-                        0, 0, sys->i_surface_width, sys->i_surface_height,
-                        sys->image.image_id) )
+        if (vaGetImage(sys->hw_ctx.display, i_surface_id, 0, 0,
+                       sys->i_surface_width, sys->i_surface_height,
+                       sys->image.image_id))
             return VLC_EGENERIC;
     }
 
     void *p_base;
-    if( vaMapBuffer( sys->p_display, sys->image.buf, &p_base ) )
+    if (vaMapBuffer(sys->hw_ctx.display, sys->image.buf, &p_base))
         return VLC_EGENERIC;
 
     const uint32_t i_fourcc = sys->image.format.fourcc;
@@ -337,12 +327,12 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
                       &sys->image_cache );
     }
 
-    if( vaUnmapBuffer( sys->p_display, sys->image.buf ) )
+    if (vaUnmapBuffer(sys->hw_ctx.display, sys->image.buf))
         return VLC_EGENERIC;
 
     if(sys->b_supports_derive)
     {
-        vaDestroyImage( sys->p_display, sys->image.image_id );
+        vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
         sys->image.image_id = VA_INVALID_ID;
     }
     return VLC_SUCCESS;
@@ -420,8 +410,8 @@ static void Delete( vlc_va_t *va, AVCodecContext *avctx )
     if( sys->i_surface_width || sys->i_surface_height )
         DestroySurfaces( sys );
 
-    vaDestroyConfig(sys->p_display, sys->i_config_id);
-    vaTerminate( sys->p_display );
+    vaDestroyConfig(sys->hw_ctx.display, sys->hw_ctx.config_id);
+    vaTerminate(sys->hw_ctx.display);
 #ifdef VLC_VA_BACKEND_XLIB
     XCloseDisplay( sys->p_display_x11 );
 #endif
@@ -482,8 +472,9 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
        return VLC_ENOMEM;
 
     /* */
-    sys->i_config_id  = VA_INVALID_ID;
-    sys->i_context_id = VA_INVALID_ID;
+    sys->hw_ctx.display = NULL;
+    sys->hw_ctx.config_id = VA_INVALID_ID;
+    sys->hw_ctx.context_id = VA_INVALID_ID;
     sys->image.image_id = VA_INVALID_ID;
     sys->b_supports_derive = false;
     sys->count = count;
@@ -499,7 +490,7 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         goto error;
     }
 
-    sys->p_display = vaGetDisplay( sys->p_display_x11 );
+    sys->hw_ctx.display = vaGetDisplay(sys->p_display_x11);
 #endif
 #ifdef VLC_VA_BACKEND_DRM
     sys->drm_fd = vlc_open("/dev/dri/card0", O_RDWR);
@@ -509,30 +500,29 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         goto error;
     }
 
-    sys->p_display = vaGetDisplayDRM( sys->drm_fd );
+    sys->hw_ctx.display = vaGetDisplayDRM(sys->drm_fd);
 #endif
-    if( !sys->p_display )
+    if (sys->hw_ctx.display == NULL)
     {
         msg_Err( va, "Could not get a VAAPI device" );
         goto error;
     }
 
     int major, minor;
-
-    if( vaInitialize( sys->p_display, &major, &minor ) )
+    if (vaInitialize(sys->hw_ctx.display, &major, &minor))
     {
         msg_Err( va, "Failed to initialize the VAAPI device" );
         goto error;
     }
 
     /* Check if the selected profile is supported */
-    i_profiles_nb = vaMaxNumProfiles( sys->p_display );
+    i_profiles_nb = vaMaxNumProfiles(sys->hw_ctx.display);
     p_profiles_list = calloc( i_profiles_nb, sizeof( VAProfile ) );
     if( !p_profiles_list )
         goto error;
 
-    VAStatus i_status = vaQueryConfigProfiles( sys->p_display, p_profiles_list, &i_profiles_nb );
-    if ( i_status == VA_STATUS_SUCCESS )
+    if (vaQueryConfigProfiles(sys->hw_ctx.display, p_profiles_list,
+                              &i_profiles_nb) == VA_STATUS_SUCCESS)
     {
         for( int i = 0; i < i_profiles_nb; i++ )
         {
@@ -554,24 +544,24 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     VAConfigAttrib attrib;
     memset( &attrib, 0, sizeof(attrib) );
     attrib.type = VAConfigAttribRTFormat;
-    if( vaGetConfigAttributes( sys->p_display,
-                               i_profile, VAEntrypointVLD, &attrib, 1 ) )
+    if (vaGetConfigAttributes(sys->hw_ctx.display, i_profile, VAEntrypointVLD,
+                              &attrib, 1))
         goto error;
 
     /* Not sure what to do if not, I don't have a way to test */
     if( (attrib.value & VA_RT_FORMAT_YUV420) == 0 )
         goto error;
-    if( vaCreateConfig( sys->p_display,
-                        i_profile, VAEntrypointVLD, &attrib, 1, &sys->i_config_id ) )
+    if (vaCreateConfig(sys->hw_ctx.display, i_profile, VAEntrypointVLD,
+                       &attrib, 1, &sys->hw_ctx.config_id))
     {
-        sys->i_config_id = VA_INVALID_ID;
+        sys->hw_ctx.config_id = VA_INVALID_ID;
         goto error;
     }
 
     vlc_mutex_init(&sys->lock);
 
     va->sys = sys;
-    va->description = vaQueryVendorString( sys->p_display );
+    va->description = vaQueryVendorString(sys->hw_ctx.display);
     va->setup = Setup;
     va->get = Get;
     va->release = Release;
@@ -579,8 +569,8 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     return VLC_SUCCESS;
 
 error:
-    if( sys->p_display != NULL )
-        vaTerminate( sys->p_display );
+    if (sys->hw_ctx.display != NULL)
+        vaTerminate(sys->hw_ctx.display);
 #ifdef VLC_VA_BACKEND_XLIB
     if( sys->p_display_x11 != NULL )
         XCloseDisplay( sys->p_display_x11 );
