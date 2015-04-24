@@ -11,7 +11,8 @@ fetch-npapi:
 		git reset --hard origin/master; \
 		git submodule update; \
 	else \
-		git clone git://git.videolan.org/npapi-vlc.git npapi-vlc ; \
+		git clone git://git.videolan.org/npapi-vlc.git npapi-vlc && \
+		cd npapi-vlc && \
 		git submodule update --init; \
 	fi
 	git --git-dir=npapi-vlc/.git describe --long --always > stamp-npapi.tmp
