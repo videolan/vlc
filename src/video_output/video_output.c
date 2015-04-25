@@ -193,6 +193,8 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* */
     if (vlc_clone(&vout->p->thread, Thread, vout,
                   VLC_THREAD_PRIORITY_OUTPUT)) {
+        if (vout->p->window != NULL)
+            vout_display_window_Delete(vout->p->window);
         spu_Destroy(vout->p->spu);
         vlc_object_release(vout);
         return NULL;
@@ -266,6 +268,9 @@ void vout_Close(vout_thread_t *vout)
 
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
     vlc_join(vout->p->thread, NULL);
+
+    if (vout->p->window != NULL)
+        vout_display_window_Delete(vout->p->window);
 
     vlc_mutex_lock(&vout->p->spu_lock);
     spu_Destroy(vout->p->spu);
@@ -1378,8 +1383,6 @@ static void ThreadInit(vout_thread_t *vout)
 
 static void ThreadClean(vout_thread_t *vout)
 {
-    if (vout->p->window != NULL)
-        vout_window_Delete(vout->p->window);
     vout_chrono_Clean(&vout->p->render);
     vout->p->dead = true;
     vout_control_Dead(&vout->p->control);
