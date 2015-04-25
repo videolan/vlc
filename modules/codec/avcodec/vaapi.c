@@ -69,131 +69,45 @@ struct vlc_va_sys_t
     vlc_mutex_t  lock;
     int          width;
     int          height;
+    VAImageFormat format;
 
-    VAImage      image;
     copy_cache_t image_cache;
 
-    bool b_supports_derive;
-
+    bool         do_derive;
     uint8_t      count;
     uint32_t     available;
     VASurfaceID  surfaces[32];
 };
 
-static int CreateSurfaces( vlc_va_sys_t *sys, int i_width, int i_height )
-{
-    /* Find and create a supported image chroma */
-    int i_fmt_count = vaMaxNumImageFormats(sys->hw_ctx.display);
-    VAImageFormat *p_fmt = calloc( i_fmt_count, sizeof(*p_fmt) );
-    if( !p_fmt )
-        return VLC_ENOMEM;
-
-    if (vaQueryImageFormats(sys->hw_ctx.display, p_fmt, &i_fmt_count))
-    {
-        free( p_fmt );
-        return VLC_EGENERIC;
-    }
-
-    VAImage test_image;
-    vlc_fourcc_t  deriveImageFormat = 0;
-    if (vaDeriveImage(sys->hw_ctx.display, sys->surfaces[0], &test_image) == VA_STATUS_SUCCESS)
-    {
-        sys->b_supports_derive = true;
-        deriveImageFormat = test_image.format.fourcc;
-        vaDestroyImage(sys->hw_ctx.display, test_image.image_id);
-    }
-
-    vlc_fourcc_t  i_chroma = 0;
-    int nv12support = -1;
-    for( int i = 0; i < i_fmt_count; i++ )
-    {
-        if( p_fmt[i].fourcc == VA_FOURCC_YV12 ||
-            p_fmt[i].fourcc == VA_FOURCC_IYUV ||
-            p_fmt[i].fourcc == VA_FOURCC_NV12 )
-        {
-            if (vaCreateImage(sys->hw_ctx.display, &p_fmt[i], i_width, i_height, &sys->image))
-            {
-                sys->image.image_id = VA_INVALID_ID;
-                continue;
-            }
-            /* Validate that vaGetImage works with this format */
-            if (vaGetImage(sys->hw_ctx.display, sys->surfaces[0],
-                           0, 0, i_width, i_height, sys->image.image_id))
-            {
-                vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
-                sys->image.image_id = VA_INVALID_ID;
-                continue;
-            }
-
-            if( p_fmt[i].fourcc == VA_FOURCC_NV12 )
-            {
-                /* Mark NV12 as supported, but favor other formats first */
-                nv12support = i;
-                vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
-                sys->image.image_id = VA_INVALID_ID;
-                continue;
-            }
-            i_chroma = VLC_CODEC_YV12;
-            break;
-        }
-    }
-
-    if( !i_chroma && nv12support >= 0 )
-    {
-        /* only nv12 is supported, so use that format */
-        if (vaCreateImage(sys->hw_ctx.display, &p_fmt[nv12support], i_width, i_height, &sys->image))
-        {
-            sys->image.image_id = VA_INVALID_ID;
-        }
-        i_chroma = VLC_CODEC_YV12;
-    }
-    else if( sys->b_supports_derive && deriveImageFormat != sys->image.format.fourcc )
-    {
-        /* only use vaDerive if it's giving us a format we handle natively */
-        sys->b_supports_derive = false;
-    }
-
-    free( p_fmt );
-
-    if (i_chroma == 0 || sys->b_supports_derive)
-    {
-        vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
-        sys->image.image_id = VA_INVALID_ID;
-    }
-
-    return i_chroma ? VLC_SUCCESS : VLC_EGENERIC;
-}
-
 static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 {
     vlc_va_sys_t *sys = va->sys;
-    VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)data;
+    VASurfaceID surface = (VASurfaceID)(uintptr_t)data;
+    VAImage image;
+    int ret = VLC_EGENERIC;
 
 #if VA_CHECK_VERSION(0,31,0)
-    if (vaSyncSurface(sys->hw_ctx.display, i_surface_id))
+    if (vaSyncSurface(sys->hw_ctx.display, surface))
 #else
-    if (vaSyncSurface(sys->hw_ctx.display, sys->hw_ctx.context_id,
-                      i_surface_id))
+    if (vaSyncSurface(sys->hw_ctx.display, sys->hw_ctx.context_id, surface))
 #endif
         return VLC_EGENERIC;
 
-    if(sys->b_supports_derive)
-    {
-        if (vaDeriveImage(sys->hw_ctx.display, i_surface_id, &(sys->image)) != VA_STATUS_SUCCESS)
+    if (!sys->do_derive || vaDeriveImage(sys->hw_ctx.display, surface, &image))
+    {   /* Fallback if image derivation is not supported */
+        if (vaCreateImage(sys->hw_ctx.display, &sys->format, sys->width,
+                          sys->height, &image))
             return VLC_EGENERIC;
-    }
-    else
-    {
-        if (vaGetImage(sys->hw_ctx.display, i_surface_id, 0, 0,
-                       sys->width, sys->height, sys->image.image_id))
-            return VLC_EGENERIC;
+        if (vaGetImage(sys->hw_ctx.display, surface, 0, 0, sys->width,
+                       sys->height, image.image_id))
+            goto error;
     }
 
     void *p_base;
-    if (vaMapBuffer(sys->hw_ctx.display, sys->image.buf, &p_base))
-        return VLC_EGENERIC;
+    if (vaMapBuffer(sys->hw_ctx.display, image.buf, &p_base))
+        goto error;
 
-    const uint32_t i_fourcc = sys->image.format.fourcc;
+    const unsigned i_fourcc = sys->format.fourcc;
     if( i_fourcc == VA_FOURCC_YV12 ||
         i_fourcc == VA_FOURCC_IYUV )
     {
@@ -204,8 +118,8 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
         for( int i = 0; i < 3; i++ )
         {
             const int i_src_plane = (b_swap_uv && i != 0) ?  (3 - i) : i;
-            pp_plane[i] = (uint8_t*)p_base + sys->image.offsets[i_src_plane];
-            pi_pitch[i] = sys->image.pitches[i_src_plane];
+            pp_plane[i] = (uint8_t*)p_base + image.offsets[i_src_plane];
+            pi_pitch[i] = image.pitches[i_src_plane];
         }
         CopyFromYv12( p_picture, pp_plane, pi_pitch, sys->width, sys->height,
                       &sys->image_cache );
@@ -218,22 +132,18 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 
         for( int i = 0; i < 2; i++ )
         {
-            pp_plane[i] = (uint8_t*)p_base + sys->image.offsets[i];
-            pi_pitch[i] = sys->image.pitches[i];
+            pp_plane[i] = (uint8_t*)p_base + image.offsets[i];
+            pi_pitch[i] = image.pitches[i];
         }
         CopyFromNv12( p_picture, pp_plane, pi_pitch, sys->width, sys->height,
                       &sys->image_cache );
     }
 
-    if (vaUnmapBuffer(sys->hw_ctx.display, sys->image.buf))
-        return VLC_EGENERIC;
-
-    if(sys->b_supports_derive)
-    {
-        vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
-        sys->image.image_id = VA_INVALID_ID;
-    }
-    return VLC_SUCCESS;
+    vaUnmapBuffer(sys->hw_ctx.display, image.buf);
+    ret = VLC_SUCCESS;
+error:
+    vaDestroyImage(sys->hw_ctx.display, image.image_id);
+    return ret;
 }
 
 static int Get( vlc_va_t *va, picture_t *pic, uint8_t **data )
@@ -297,9 +207,6 @@ static void Delete( vlc_va_t *va, AVCodecContext *avctx )
     vlc_mutex_destroy(&sys->lock);
     CopyCleanCache(&sys->image_cache);
 
-    if (sys->image.image_id != VA_INVALID_ID)
-        vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
-
     vaDestroyContext(sys->hw_ctx.display, sys->hw_ctx.context_id);
     vaDestroySurfaces(sys->hw_ctx.display, sys->surfaces, sys->count);
     vaDestroyConfig(sys->hw_ctx.display, sys->hw_ctx.config_id);
@@ -311,6 +218,76 @@ static void Delete( vlc_va_t *va, AVCodecContext *avctx )
     close( sys->drm_fd );
 #endif
     free( sys );
+}
+
+/** Finds a supported image chroma */
+static int FindFormat(vlc_va_sys_t *sys)
+{
+    int count = vaMaxNumImageFormats(sys->hw_ctx.display);
+
+    VAImageFormat *fmts = malloc(count * sizeof (*fmts));
+    if (unlikely(fmts == NULL))
+        return VLC_ENOMEM;
+
+    if (vaQueryImageFormats(sys->hw_ctx.display, fmts, &count))
+    {
+        free(fmts);
+        return VLC_EGENERIC;
+    }
+
+    sys->format.fourcc = 0;
+
+    for (int i = 0; i < count; i++)
+    {
+        unsigned fourcc = fmts[i].fourcc;
+
+        if (fourcc != VA_FOURCC_YV12 && fourcc != VA_FOURCC_IYUV
+         && fourcc != VA_FOURCC_NV12)
+            continue;
+
+        VAImage image;
+
+        if (vaCreateImage(sys->hw_ctx.display, &fmts[i], sys->width,
+                          sys->height, &image))
+            continue;
+
+        /* Validate that vaGetImage works with this format */
+        int val = vaGetImage(sys->hw_ctx.display, sys->surfaces[0], 0, 0,
+                             sys->width, sys->height, image.image_id);
+
+        vaDestroyImage(sys->hw_ctx.display, image.image_id);
+
+        if (val != VA_STATUS_SUCCESS)
+            continue;
+
+        /* Mark NV12 as supported, but favor other formats first */
+        sys->format = fmts[i];
+        if (fourcc != VA_FOURCC_NV12)
+            break;
+    }
+
+    free(fmts);
+
+    if (sys->format.fourcc == 0)
+        return VLC_EGENERIC; /* None of the formats work */
+
+    VAImage image;
+
+    /* Use vaDerive() iif it supports the best selected format */
+    sys->do_derive = false;
+
+    if (vaDeriveImage(sys->hw_ctx.display, sys->surfaces[0],
+                      &image) == VA_STATUS_SUCCESS)
+    {
+        if (image.format.fourcc == sys->format.fourcc)
+        {
+            sys->do_derive = true;
+            sys->format = image.format;
+        }
+        vaDestroyImage(sys->hw_ctx.display, image.image_id);
+    }
+
+    return VLC_SUCCESS;
 }
 
 static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
@@ -375,8 +352,6 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     sys->hw_ctx.context_id = VA_INVALID_ID;
     sys->width = ctx->coded_width;
     sys->height = ctx->coded_height;
-    sys->image.image_id = VA_INVALID_ID;
-    sys->b_supports_derive = false;
     sys->count = count;
     sys->available = (1 << sys->count) - 1;
     assert(count < sizeof (sys->available) * CHAR_BIT);
@@ -478,13 +453,16 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         goto error;
     }
 
-    if (CreateSurfaces(sys, ctx->coded_width, ctx->coded_height))
+    if (FindFormat(sys))
         goto error;
 
     if (unlikely(CopyInitCache(&sys->image_cache, ctx->coded_width)))
         goto error;
 
     vlc_mutex_init(&sys->lock);
+
+    msg_Dbg(va, "using %s image format 0x%08x",
+            sys->do_derive ? "derive" : "get", sys->format.fourcc);
 
     ctx->hwaccel_context = &sys->hw_ctx;
     va->sys = sys;
@@ -496,8 +474,6 @@ static int Create( vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     return VLC_SUCCESS;
 
 error:
-    if (sys->image.image_id != VA_INVALID_ID)
-        vaDestroyImage(sys->hw_ctx.display, sys->image.image_id);
     if (sys->hw_ctx.context_id != VA_INVALID_ID)
     {
         vaDestroyContext(sys->hw_ctx.display, sys->hw_ctx.context_id);
