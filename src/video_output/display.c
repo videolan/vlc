@@ -445,7 +445,8 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     };
 
     osys->filters = filter_chain_NewVideo(vd, false, &owner);
-    assert(osys->filters); /* TODO critical */
+    if (unlikely(osys->filters == NULL))
+        abort(); /* TODO critical */
 
     /* */
     es_format_t src;
