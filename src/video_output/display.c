@@ -470,6 +470,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
 
     if (filter == NULL) {
         msg_Err(vd, "Failed to adapt decoder format to display");
+        filter_chain_Delete(osys->filters);
         return -1;
     }
     return 0;
