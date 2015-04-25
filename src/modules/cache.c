@@ -217,6 +217,8 @@ error:
 static module_t *CacheLoadModule (FILE *file)
 {
     module_t *module = vlc_module_create (NULL);
+    if (unlikely(module == NULL))
+        return NULL;
 
     /* Load additional infos */
     LOAD_STRING(module->psz_shortname);
@@ -274,7 +276,8 @@ static module_t *CacheLoadModule (FILE *file)
 
     return module;
 error:
-    return NULL; /* FIXME: leaks */
+    vlc_module_destroy(module);
+    return NULL;
 }
 
 /**
