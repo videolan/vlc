@@ -1324,9 +1324,9 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
     }
 
     if (vout_OpenWrapper(vout, vout->p->splitter_name, state))
-        return VLC_EGENERIC;
+        goto error;
     if (vout_InitWrapper(vout))
-        return VLC_EGENERIC;
+        goto error;
     assert(vout->p->decoder_pool);
 
     vout->p->displayed.current       = NULL;
@@ -1344,6 +1344,15 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_state_t *state)
 
     video_format_Print(VLC_OBJECT(vout), "original format", &vout->p->original);
     return VLC_SUCCESS;
+error:
+    if (vout->p->filter.chain_interactive != NULL)
+        filter_chain_Delete(vout->p->filter.chain_interactive);
+    if (vout->p->filter.chain_static != NULL)
+        filter_chain_Delete(vout->p->filter.chain_static);
+    video_format_Clean(&vout->p->filter.format);
+    if (vout->p->decoder_fifo != NULL)
+        picture_fifo_Delete(vout->p->decoder_fifo);
+    return VLC_EGENERIC;
 }
 
 static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
@@ -1444,8 +1453,12 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     switch(cmd.type) {
     case VOUT_CONTROL_INIT:
         ThreadInit(vout);
-        if (!ThreadStart(vout, NULL))
-            break;
+        if (ThreadStart(vout, NULL))
+        {
+            ThreadClean(vout);
+            return 1;
+        }
+        break;
     case VOUT_CONTROL_CLEAN:
         ThreadStop(vout, NULL);
         ThreadClean(vout);
