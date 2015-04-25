@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">14B25</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
-		<string key="IBDocument.AppKitVersion">1343.16</string>
-		<string key="IBDocument.HIToolboxVersion">755.00</string>
+		<string key="IBDocument.SystemVersion">14D136</string>
+		<string key="IBDocument.InterfaceBuilderVersion">7702</string>
+		<string key="IBDocument.AppKitVersion">1347.57</string>
+		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6254</string>
+			<string key="NS.object.0">7702</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSButton</string>
@@ -53,7 +53,7 @@
 					<characters key="NS.bytes">View</characters>
 				</object>
 				<nil key="NSUserInterfaceItemIdentifier"/>
-				<string key="NSWindowContentMinSize">{213, 113}</string>
+				<string key="NSWindowContentMinSize">{260, 120}</string>
 				<object class="NSView" key="NSWindowView" id="927381863">
 					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
@@ -72,6 +72,7 @@
 											<string key="NSFrameSize">{396, 168}</string>
 											<reference key="NSSuperview" ref="502587650"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="106880244"/>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -143,7 +144,7 @@
 															<int key="NSColorSpace">6</int>
 															<string key="NSCatalogName">System</string>
 															<string key="NSColorName">textBackgroundColor</string>
-															<object class="NSColor" key="NSColor" id="1021950452">
+															<object class="NSColor" key="NSColor">
 																<int key="NSColorSpace">3</int>
 																<bytes key="NSWhite">MQA</bytes>
 															</object>
@@ -163,7 +164,15 @@
 											</array>
 											<double key="NSIntercellSpacingWidth">3</double>
 											<double key="NSIntercellSpacingHeight">2</double>
-											<reference key="NSBackgroundColor" ref="1021950452"/>
+											<object class="NSColor" key="NSBackgroundColor" id="50310571">
+												<int key="NSColorSpace">6</int>
+												<string key="NSCatalogName">System</string>
+												<string key="NSColorName">controlBackgroundColor</string>
+												<object class="NSColor" key="NSColor">
+													<int key="NSColorSpace">3</int>
+													<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
+												</object>
+											</object>
 											<object class="NSColor" key="NSGridColor">
 												<int key="NSColorSpace">6</int>
 												<string key="NSCatalogName">System</string>
@@ -190,15 +199,7 @@
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="523335037"/>
 									<reference key="NSDocView" ref="523335037"/>
-									<object class="NSColor" key="NSBGColor">
-										<int key="NSColorSpace">6</int>
-										<string key="NSCatalogName">System</string>
-										<string key="NSColorName">controlBackgroundColor</string>
-										<object class="NSColor" key="NSColor">
-											<int key="NSColorSpace">3</int>
-											<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
-										</object>
-									</object>
+									<reference key="NSBGColor" ref="50310571"/>
 									<int key="NScvFlags">4</int>
 									<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
 								</object>
@@ -208,6 +209,7 @@
 									<string key="NSFrame">{{-30, 1}, {15, 168}}</string>
 									<reference key="NSSuperview" ref="921986171"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="502587650"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<string key="NSControlAction">_doScroller:</string>
 									<reference key="NSControlTarget" ref="921986171"/>
@@ -221,6 +223,7 @@
 									<string key="NSFrame">{{1, -30}, {381, 15}}</string>
 									<reference key="NSSuperview" ref="921986171"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="671740945"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<string key="NSControlAction">_doScroller:</string>
 									<reference key="NSControlTarget" ref="921986171"/>
@@ -233,7 +236,7 @@
 							<string key="NSFrame">{{0, 39}, {398, 170}}</string>
 							<reference key="NSSuperview" ref="927381863"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="502587650"/>
+							<reference key="NSNextKeyView" ref="584787219"/>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="671740945"/>
 							<reference key="NSHScroller" ref="584787219"/>
@@ -245,10 +248,11 @@
 						</object>
 						<object class="NSButton" id="106880244">
 							<reference key="NSNextResponder" ref="927381863"/>
-							<int key="NSvFlags">289</int>
+							<int key="NSvFlags">292</int>
 							<string key="NSFrame">{{15, 7}, {94, 28}}</string>
 							<reference key="NSSuperview" ref="927381863"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="488199561">
 								<int key="NSCellFlags">67108864</int>
@@ -272,8 +276,9 @@
 					<string key="NSFrameSize">{397, 209}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="921986171"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1050}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1680, 1027}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">ErrorsAndWarnings</string>
