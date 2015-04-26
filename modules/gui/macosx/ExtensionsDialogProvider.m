@@ -203,7 +203,8 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             [popup removeAllItems];
             struct extension_widget_value_t *value;
             for (value = widget->p_values; value != NULL; value = value->p_next)
-                [popup addItemWithTitle:[NSString stringWithUTF8String:value->psz_text]];
+                [[popup menu] addItemWithTitle:toNSStr(value->psz_text) action:nil keyEquivalent:@""];
+
             [popup synchronizeTitleAndSelectedItem];
             [self popUpSelectionChanged:popup];
             break;
