@@ -111,6 +111,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             VLCDialogList *list = [[VLCDialogList alloc] init];
             [list setUsesAlternatingRowBackgroundColors:YES];
             [list setHeaderView:nil];
+            [list setAllowsMultipleSelection:YES];
             [scrollView setDocumentView:list];
             [scrollView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
@@ -366,8 +367,9 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
 
     struct extension_widget_value_t *value;
     unsigned i = 0;
+    NSIndexSet *selectedIndexes = [list selectedRowIndexes];
     for (value = [list widget]->p_values; value != NULL; value = value->p_next, i++)
-        value->b_selected = (i == [list selectedRow]);
+        value->b_selected = (YES == [selectedIndexes containsIndex:i]);
 }
 
 - (void)popUpSelectionChanged:(id)sender
