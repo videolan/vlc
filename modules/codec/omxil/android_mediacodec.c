@@ -433,50 +433,23 @@ static int H264GetSPSPPS(uint8_t *p_buf, size_t i_buf,
         return -1;
 }
 
-/*****************************************************************************
- * OpenMediaCodec: Create the mediacodec instance
- *****************************************************************************/
-static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
+static jstring GetMediaCodecName(decoder_t *p_dec, JNIEnv *env,
+                                 const char *mime, jstring jmime)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    const char *mime = NULL;
+    int num_codecs;
     size_t fmt_profile = 0;
-    int i_ret = VLC_EGENERIC;
-    jstring jmime = NULL;
     jstring jcodec_name = NULL;
-    jobject jcodec = NULL;
-    jobject jcsd0_buffer = NULL;
-    jstring jcsd0_string = NULL;
-    jobject jformat = NULL;
-    jstring jrotation_string = NULL;
-    jobject jinput_buffers = NULL;
-    jobject joutput_buffers = NULL;
-    jobject jbuffer_info = NULL;
-
-    switch (p_dec->fmt_in.i_codec) {
-    case VLC_CODEC_HEVC: mime = "video/hevc"; break;
-    case VLC_CODEC_H264: mime = "video/avc"; break;
-    case VLC_CODEC_H263: mime = "video/3gpp"; break;
-    case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
-    case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
-    case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
-    case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
-    case VLC_CODEC_VP9:  mime = "video/x-vnd.on2.vp9"; break;
-    default:
-        vlc_assert_unreachable();
-    }
-
-    jmime = (*env)->NewStringUTF(env, mime);
-    if (!jmime)
-        return VLC_EGENERIC;
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         h264_get_profile_level(&p_dec->fmt_in, &fmt_profile, NULL, NULL);
 
-    int num_codecs = (*env)->CallStaticIntMethod(env, jfields.media_codec_list_class,
-                                                 jfields.get_codec_count);
+    num_codecs = (*env)->CallStaticIntMethod(env,
+                                             jfields.media_codec_list_class,
+                                             jfields.get_codec_count);
 
-    for (int i = 0; i < num_codecs; i++) {
+    for (int i = 0; i < num_codecs; i++)
+    {
         jobject codec_capabilities = NULL;
         jobject profile_levels = NULL;
         jobject info = NULL;
@@ -500,7 +473,8 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
         if ((*env)->CallBooleanMethod(env, info, jfields.is_encoder))
             goto loopclean;
 
-        codec_capabilities = (*env)->CallObjectMethod(env, info, jfields.get_capabilities_for_type,
+        codec_capabilities = (*env)->CallObjectMethod(env, info,
+                                                      jfields.get_capabilities_for_type,
                                                       jmime);
         if (CHECK_EXCEPTION()) {
             msg_Warn(p_dec, "Exception occurred in MediaCodecInfo.getCapabilitiesForType");
@@ -571,7 +545,46 @@ loopclean:
         if (found)
             break;
     }
+    return jcodec_name;
+}
 
+/*****************************************************************************
+ * OpenMediaCodec: Create the mediacodec instance
+ *****************************************************************************/
+static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    const char *mime = NULL;
+    int i_ret = VLC_EGENERIC;
+    jstring jmime = NULL;
+    jstring jcodec_name = NULL;
+    jobject jcodec = NULL;
+    jobject jcsd0_buffer = NULL;
+    jstring jcsd0_string = NULL;
+    jobject jformat = NULL;
+    jstring jrotation_string = NULL;
+    jobject jinput_buffers = NULL;
+    jobject joutput_buffers = NULL;
+    jobject jbuffer_info = NULL;
+
+    switch (p_dec->fmt_in.i_codec) {
+    case VLC_CODEC_HEVC: mime = "video/hevc"; break;
+    case VLC_CODEC_H264: mime = "video/avc"; break;
+    case VLC_CODEC_H263: mime = "video/3gpp"; break;
+    case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
+    case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
+    case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
+    case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
+    case VLC_CODEC_VP9:  mime = "video/x-vnd.on2.vp9"; break;
+    default:
+        vlc_assert_unreachable();
+    }
+
+    jmime = (*env)->NewStringUTF(env, mime);
+    if (!jmime)
+        return VLC_EGENERIC;
+
+    jcodec_name = GetMediaCodecName(p_dec, env, mime, jmime);
     if (!jcodec_name) {
         msg_Dbg(p_dec, "No suitable codec matching %s was found", mime);
         goto error;
