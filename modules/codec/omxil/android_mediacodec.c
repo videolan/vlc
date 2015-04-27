@@ -266,8 +266,6 @@ static const struct member members[] = {
     { NULL, NULL, NULL, 0, 0, false },
 };
 
-#define GET_INTEGER(obj, name) (*env)->CallIntMethod(env, obj, jfields.get_integer, (*env)->NewStringUTF(env, name))
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -299,6 +297,16 @@ vlc_module_begin ()
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
     set_callbacks( OpenDecoder, CloseDecoder )
 vlc_module_end ()
+
+static inline int get_integer(JNIEnv *env, jobject obj, const char *psz_name)
+{
+    int i_ret;
+    jstring jname = (*env)->NewStringUTF(env, psz_name);
+    i_ret = (*env)->CallIntMethod(env, obj, jfields.get_integer, jname);
+    (*env)->DeleteLocalRef(env, jname);
+    return i_ret;
+}
+#define GET_INTEGER(obj, name) get_integer(env, obj, name)
 
 static int jstrcmp(JNIEnv* env, jobject str, const char* str2)
 {
@@ -433,6 +441,17 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
     decoder_sys_t *p_sys = p_dec->p_sys;
     const char *mime = NULL;
     size_t fmt_profile = 0;
+    int i_ret = VLC_EGENERIC;
+    jstring jmime = NULL;
+    jstring jcodec_name = NULL;
+    jobject jcodec = NULL;
+    jobject jcsd0_buffer = NULL;
+    jstring jcsd0_string = NULL;
+    jobject jformat = NULL;
+    jstring jrotation_string = NULL;
+    jobject jinput_buffers = NULL;
+    jobject joutput_buffers = NULL;
+    jobject jbuffer_info = NULL;
 
     switch (p_dec->fmt_in.i_codec) {
     case VLC_CODEC_HEVC: mime = "video/hevc"; break;
@@ -447,12 +466,15 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
         vlc_assert_unreachable();
     }
 
+    jmime = (*env)->NewStringUTF(env, mime);
+    if (!jmime)
+        return VLC_EGENERIC;
+
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         h264_get_profile_level(&p_dec->fmt_in, &fmt_profile, NULL, NULL);
 
     int num_codecs = (*env)->CallStaticIntMethod(env, jfields.media_codec_list_class,
                                                  jfields.get_codec_count);
-    jobject codec_name = NULL;
 
     for (int i = 0; i < num_codecs; i++) {
         jobject codec_capabilities = NULL;
@@ -479,7 +501,7 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
             goto loopclean;
 
         codec_capabilities = (*env)->CallObjectMethod(env, info, jfields.get_capabilities_for_type,
-                                                      (*env)->NewStringUTF(env, mime));
+                                                      jmime);
         if (CHECK_EXCEPTION()) {
             msg_Warn(p_dec, "Exception occurred in MediaCodecInfo.getCapabilitiesForType");
             goto loopclean;
@@ -529,11 +551,15 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
             p_sys->name = malloc(name_len + 1);
             memcpy(p_sys->name, name_ptr, name_len);
             p_sys->name[name_len] = '\0';
-            codec_name = name;
+            jcodec_name = name;
         }
 loopclean:
         if (name)
+        {
             (*env)->ReleaseStringUTFChars(env, name, name_ptr);
+            if (jcodec_name != name)
+                (*env)->DeleteLocalRef(env, name);
+        }
         if (profile_levels)
             (*env)->DeleteLocalRef(env, profile_levels);
         if (types)
@@ -546,7 +572,7 @@ loopclean:
             break;
     }
 
-    if (!codec_name) {
+    if (!jcodec_name) {
         msg_Dbg(p_dec, "No suitable codec matching %s was found", mime);
         goto error;
     }
@@ -554,14 +580,15 @@ loopclean:
     // This method doesn't handle errors nicely, it crashes if the codec isn't found.
     // (The same goes for createDecoderByType.) This is fixed in latest AOSP and in 4.2,
     // but not in 4.1 devices.
-    p_sys->codec = (*env)->CallStaticObjectMethod(env, jfields.media_codec_class,
-                                                  jfields.create_by_codec_name, codec_name);
+    jcodec = (*env)->CallStaticObjectMethod(env, jfields.media_codec_class,
+                                            jfields.create_by_codec_name,
+                                            jcodec_name);
     if (CHECK_EXCEPTION()) {
         msg_Warn(p_dec, "Exception occurred in MediaCodec.createByCodecName.");
         goto error;
     }
     p_sys->allocated = true;
-    p_sys->codec = (*env)->NewGlobalRef(env, p_sys->codec);
+    p_sys->codec = (*env)->NewGlobalRef(env, jcodec);
 
     /* Either we use a "csd-0" buffer that is provided before codec
      * initialisation via the MediaFormat class, or use a CODEC_CONFIG buffer
@@ -614,14 +641,12 @@ loopclean:
         msg_Err(p_dec, "invalid size, abort MediaCodec");
         goto error;
     }
-    jobject format = (*env)->CallStaticObjectMethod(env, jfields.media_format_class,
-                         jfields.create_video_format, (*env)->NewStringUTF(env, mime),
-                         p_sys->i_width, p_sys->i_height);
+    jformat = (*env)->CallStaticObjectMethod(env, jfields.media_format_class,
+                                             jfields.create_video_format, jmime,
+                                             p_sys->i_width, p_sys->i_height);
 
     if (p_sys->p_csd0_buffer)
     {
-        jobject jcsd0_buffer;
-
         jcsd0_buffer = (*env)->NewDirectByteBuffer( env,
                                                     p_sys->p_csd0_buffer,
                                                     p_sys->i_csd0_buffer);
@@ -632,10 +657,9 @@ loopclean:
             p_sys->p_csd0_buffer = NULL;
             goto error;
         }
-        (*env)->CallVoidMethod(env, format, jfields.set_bytebuffer,
-                               (*env)->NewStringUTF(env, "csd-0"),
-                               jcsd0_buffer);
-        (*env)->DeleteLocalRef(env, jcsd0_buffer);
+        jcsd0_string = (*env)->NewStringUTF(env, "csd-0");
+        (*env)->CallVoidMethod(env, jformat, jfields.set_bytebuffer,
+                               jcsd0_string, jcsd0_buffer);
     }
 
     p_sys->direct_rendering = var_InheritBool(p_dec, CFG_PREFIX "dr");
@@ -667,15 +691,16 @@ loopclean:
                 default:
                     i_angle = 0;
             }
-            (*env)->CallVoidMethod(env, format, jfields.set_integer,
-                                   (*env)->NewStringUTF(env, "rotation-degrees"),
-                                   i_angle);
+            jrotation_string = (*env)->NewStringUTF(env, "rotation-degrees");
+            (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
+                                   jrotation_string, i_angle);
         }
 
         jobject surf = jni_LockAndGetAndroidJavaSurface();
         if (surf) {
             // Configure MediaCodec with the Android surface.
-            (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure, format, surf, NULL, 0);
+            (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure,
+                                   jformat, surf, NULL, 0);
             if (CHECK_EXCEPTION()) {
                 msg_Warn(p_dec, "Exception occurred in MediaCodec.configure with an output surface.");
                 jni_UnlockAndroidSurface();
@@ -689,7 +714,8 @@ loopclean:
         }
     }
     if (!p_sys->direct_rendering) {
-        (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure, format, NULL, NULL, 0);
+        (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure,
+                               jformat, NULL, NULL, 0);
         if (CHECK_EXCEPTION()) {
             msg_Warn(p_dec, "Exception occurred in MediaCodec.configure");
             goto error;
@@ -704,28 +730,54 @@ loopclean:
     p_sys->started = true;
 
     if (jfields.get_input_buffers && jfields.get_output_buffers) {
-        p_sys->input_buffers = (*env)->CallObjectMethod(env, p_sys->codec, jfields.get_input_buffers);
+
+        jinput_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
+                                                  jfields.get_input_buffers);
         if (CHECK_EXCEPTION()) {
             msg_Err(p_dec, "Exception in MediaCodec.getInputBuffers (OpenDecoder)");
             goto error;
         }
-        p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec, jfields.get_output_buffers);
+        p_sys->input_buffers = (*env)->NewGlobalRef(env, jinput_buffers);
+
+        joutput_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
+                                                   jfields.get_output_buffers);
         if (CHECK_EXCEPTION()) {
             msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffers (OpenDecoder)");
             goto error;
         }
-        p_sys->input_buffers = (*env)->NewGlobalRef(env, p_sys->input_buffers);
-        p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
+        p_sys->output_buffers = (*env)->NewGlobalRef(env, joutput_buffers);
     }
-    p_sys->buffer_info = (*env)->NewObject(env, jfields.buffer_info_class, jfields.buffer_info_ctor);
-    p_sys->buffer_info = (*env)->NewGlobalRef(env, p_sys->buffer_info);
-    (*env)->DeleteLocalRef(env, format);
+    jbuffer_info = (*env)->NewObject(env, jfields.buffer_info_class,
+                                     jfields.buffer_info_ctor);
+    p_sys->buffer_info = (*env)->NewGlobalRef(env, jbuffer_info);
 
-    return VLC_SUCCESS;
+    i_ret = VLC_SUCCESS;
 
- error:
-    CloseMediaCodec(p_dec, env);
-    return VLC_EGENERIC;
+error:
+    if (jmime)
+        (*env)->DeleteLocalRef(env, jmime);
+    if (jcodec_name)
+        (*env)->DeleteLocalRef(env, jcodec_name);
+    if (jcodec)
+        (*env)->DeleteLocalRef(env, jcodec);
+    if (jcsd0_buffer)
+        (*env)->DeleteLocalRef(env, jcsd0_buffer);
+    if (jcsd0_string)
+        (*env)->DeleteLocalRef(env, jcsd0_string);
+    if (jformat)
+        (*env)->DeleteLocalRef(env, jformat);
+    if (jrotation_string)
+        (*env)->DeleteLocalRef(env, jrotation_string);
+    if (jinput_buffers)
+        (*env)->DeleteLocalRef(env, jinput_buffers);
+    if (joutput_buffers)
+        (*env)->DeleteLocalRef(env, joutput_buffers);
+    if (jbuffer_info)
+        (*env)->DeleteLocalRef(env, jbuffer_info);
+
+    if (i_ret != VLC_SUCCESS)
+        CloseMediaCodec(p_dec, env);
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -1016,6 +1068,7 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t *p_block, jlong timeo
     p_mc_buf = (*env)->GetDirectBufferAddress(env, j_mc_buf);
     if (j_mc_size < 0) {
         msg_Err(p_dec, "Java buffer has invalid size");
+        (*env)->DeleteLocalRef(env, j_mc_buf);
         return -1;
     }
     if ((size_t) j_mc_size > i_buf)
@@ -1129,31 +1182,39 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
         }
         return 1;
     } else if (index == INFO_OUTPUT_BUFFERS_CHANGED) {
+        jobject joutput_buffers;
+
         msg_Dbg(p_dec, "output buffers changed");
         if (!jfields.get_output_buffers)
             return 0;
         (*env)->DeleteGlobalRef(env, p_sys->output_buffers);
 
-        p_sys->output_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
-                                                         jfields.get_output_buffers);
+        joutput_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
+                                                   jfields.get_output_buffers);
         if (CHECK_EXCEPTION()) {
             msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffer (GetOutput)");
             p_sys->output_buffers = NULL;
             return -1;
         }
-
-        p_sys->output_buffers = (*env)->NewGlobalRef(env, p_sys->output_buffers);
+        p_sys->output_buffers = (*env)->NewGlobalRef(env, joutput_buffers);
+        (*env)->DeleteLocalRef(env, joutput_buffers);
     } else if (index == INFO_OUTPUT_FORMAT_CHANGED) {
-        jobject format = (*env)->CallObjectMethod(env, p_sys->codec, jfields.get_output_format);
+        jobject format = NULL;
+        jobject format_string = NULL;
+        jsize format_len;
+        const char *format_ptr;
+
+        format = (*env)->CallObjectMethod(env, p_sys->codec,
+                                          jfields.get_output_format);
         if (CHECK_EXCEPTION()) {
             msg_Err(p_dec, "Exception in MediaCodec.getOutputFormat (GetOutput)");
             return -1;
         }
 
-        jobject format_string = (*env)->CallObjectMethod(env, format, jfields.tostring);
+        format_string = (*env)->CallObjectMethod(env, format, jfields.tostring);
 
-        jsize format_len = (*env)->GetStringUTFLength(env, format_string);
-        const char *format_ptr = (*env)->GetStringUTFChars(env, format_string, NULL);
+        format_len = (*env)->GetStringUTFLength(env, format_string);
+        format_ptr = (*env)->GetStringUTFChars(env, format_string, NULL);
         msg_Dbg(p_dec, "output format changed: %.*s", format_len, format_ptr);
         (*env)->ReleaseStringUTFChars(env, format_string, format_ptr);
 
@@ -1168,6 +1229,7 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
         int crop_top        = GET_INTEGER(format, "crop-top");
         int crop_right      = GET_INTEGER(format, "crop-right");
         int crop_bottom     = GET_INTEGER(format, "crop-bottom");
+        (*env)->DeleteLocalRef(env, format);
 
         const char *name = "unknown";
         if (!p_sys->direct_rendering) {
