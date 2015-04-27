@@ -1396,6 +1396,14 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     if (p_sys->error_state)
         goto endclean;
 
+    /* Allow interlaced picture only after API 21 */
+    if (p_block && p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
+        && !(jfields.get_input_buffer && jfields.get_output_buffer))
+    {
+        b_error = true;
+        goto endclean;
+    }
+
     if (!(env = jni_get_env(THREAD_NAME)))
     {
         b_error = true;
