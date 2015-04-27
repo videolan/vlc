@@ -152,10 +152,14 @@ struct decoder_sys_t
     size_t i_config_buffer;
     bool b_config_resend;
 
+    int i_width;
+    int i_height;
+
     bool allocated;
     bool started;
     bool decoded;
     bool error_state;
+    bool b_new_block;
 
     ArchitectureSpecificCopyData architecture_specific_data;
 
@@ -395,6 +399,32 @@ end:
     return ret;
 }
 
+static int H264GetSPSPPS(uint8_t *p_buf, size_t i_buf,
+                         uint8_t **pp_sps_buf, size_t *p_sps_size,
+                         uint8_t **pp_pps_buf, size_t *p_pps_size,
+                         struct nal_sps *p_sps)
+{
+    uint8_t *p_sps_buf, *p_pps_buf;
+    size_t i_sps_size, i_pps_size;
+
+    if (h264_get_spspps(p_buf, i_buf, &p_sps_buf, &i_sps_size,
+                        &p_pps_buf, &i_pps_size) == 0)
+    {
+        if (pp_sps_buf && p_sps_size )
+        {
+            *pp_sps_buf = p_sps_buf;
+            *p_sps_size = i_sps_size;
+        }
+        if (pp_pps_buf && p_pps_size )
+        {
+            *pp_pps_buf = p_pps_buf;
+            *p_pps_size = i_pps_size;
+        }
+        return h264_parse_sps(p_sps_buf, i_sps_size, p_sps);
+    } else
+        return -1;
+}
+
 /*****************************************************************************
  * OpenMediaCodec: Create the mediacodec instance
  *****************************************************************************/
@@ -533,10 +563,6 @@ loopclean:
     p_sys->allocated = true;
     p_sys->codec = (*env)->NewGlobalRef(env, p_sys->codec);
 
-    jobject format = (*env)->CallStaticObjectMethod(env, jfields.media_format_class,
-                         jfields.create_video_format, (*env)->NewStringUTF(env, mime),
-                         p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
-
     /* Either we use a "csd-0" buffer that is provided before codec
      * initialisation via the MediaFormat class, or use a CODEC_CONFIG buffer
      * that can be provided during playback (and must be provided after a flush
@@ -566,7 +592,32 @@ loopclean:
             memcpy(p_sys->p_csd0_buffer, p_dec->fmt_in.p_extra, size);
         }
         p_sys->i_csd0_buffer = size;
+
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+        {
+            struct nal_sps sps;
+
+            if (H264GetSPSPPS(p_sys->p_csd0_buffer, p_sys->i_csd0_buffer,
+                              NULL, NULL, NULL, NULL, &sps) == 0)
+            {
+                msg_Warn(p_dec, "SPS found, id: %d size: %dx%d (vs %dx%d)",
+                         sps.i_id, sps.i_width, sps.i_height,
+                         p_sys->i_width, p_sys->i_height);
+                p_sys->i_width = sps.i_width;
+                p_sys->i_height = sps.i_height;
+            }
+        }
     }
+
+    if (!p_sys->i_width && !p_sys->i_height)
+    {
+        msg_Err(p_dec, "invalid size, abort MediaCodec");
+        goto error;
+    }
+    jobject format = (*env)->CallStaticObjectMethod(env, jfields.media_format_class,
+                         jfields.create_video_format, (*env)->NewStringUTF(env, mime),
+                         p_sys->i_width, p_sys->i_height);
+
     if (p_sys->p_csd0_buffer)
     {
         jobject jcsd0_buffer;
@@ -742,6 +793,8 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     switch (p_dec->fmt_in.i_codec) {
     case VLC_CODEC_H264:
+        /* We can handle h264 without a valid video size */
+        break;
     case VLC_CODEC_HEVC:
     case VLC_CODEC_H263:
     case VLC_CODEC_MP4V:
@@ -775,12 +828,24 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
     p_dec->b_need_packetized = true;
 
+    p_dec->p_sys->i_width = p_dec->fmt_in.video.i_width;
+    p_dec->p_sys->i_height = p_dec->fmt_in.video.i_height;
+
     p_dec->p_sys->timestamp_fifo = timestamp_FifoNew(32);
     if (!p_dec->p_sys->timestamp_fifo)
         goto error;
 
+    p_dec->p_sys->b_new_block = true;
+
     switch (p_dec->fmt_in.i_codec)
     {
+    case VLC_CODEC_H264:
+        if (!p_dec->p_sys->i_width || !p_dec->p_sys->i_height)
+        {
+            msg_Warn(p_dec, "waiting for sps/pps for codec %4.4s",
+                     (const char *)&p_dec->fmt_in.i_codec);
+            return VLC_SUCCESS;
+        }
     case VLC_CODEC_VC1:
         if (!p_dec->fmt_in.i_extra)
         {
@@ -1144,6 +1209,101 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
     return 0;
 }
 
+static bool spsppscmp(decoder_t *p_dec, uint8_t *p_sps_buf, size_t i_sps_size,
+                      uint8_t *p_pps_buf, size_t i_pps_size)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (p_sys->i_config_buffer != i_sps_size + i_pps_size)
+        return false;
+    if (p_sps_buf && memcmp(p_sys->p_config_buffer, p_sps_buf, i_sps_size) != 0)
+        return false;
+    if (p_pps_buf && memcmp(p_sys->p_config_buffer + i_sps_size,
+                            p_pps_buf, i_pps_size) != 0)
+        return false;
+    return true;
+}
+
+static void H264ProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
+                             bool *p_delayed_open)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    uint8_t *p_sps_buf, *p_pps_buf;
+    size_t i_sps_size, i_pps_size;
+    struct nal_sps sps;
+    struct H264ConvertState convert_state = { 0, 0 };
+
+    assert(p_dec->fmt_in.i_codec == VLC_CODEC_H264 && p_block);
+
+    if (p_sys->p_csd0_buffer)
+    {
+        convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
+                               p_sys->nal_size, &convert_state);
+    } else if (H264GetSPSPPS(p_block->p_buffer, p_block->i_buffer,
+                             &p_sps_buf, &i_sps_size,
+                             &p_pps_buf, &i_pps_size, &sps) == 0
+        && sps.i_width && sps.i_height
+        && !spsppscmp(p_dec, p_sps_buf, i_sps_size, p_pps_buf, i_pps_size))
+    {
+        void *p_config_buffer;
+
+        msg_Warn(p_dec, "New SPS/PPS found, id: %d size: %dx%d (vs %dx%d) %d %d",
+                 sps.i_id, sps.i_width, sps.i_height,
+                 p_sys->i_width, p_sys->i_height,
+                 i_sps_size, i_pps_size);
+
+        if (p_sys->codec && (sps.i_width != p_sys->i_width ||
+                             sps.i_height != p_sys->i_height))
+        {
+            msg_Err(p_dec, "SPS/PPS changed during the stream and "
+                    "MediaCodec configured with a different video size. "
+                    "Restart it !");
+            CloseMediaCodec(p_dec, env);
+        }
+        if (!p_sys->codec)
+            *p_delayed_open = true;
+
+        p_config_buffer = realloc(p_sys->p_config_buffer,
+                                  i_sps_size + i_pps_size);
+        if (!p_config_buffer)
+            free(p_sys->p_config_buffer);
+        p_sys->p_config_buffer = p_config_buffer;
+
+        if (p_sys->p_config_buffer)
+        {
+            if (p_sps_buf && i_sps_size)
+                memcpy(p_sys->p_config_buffer, p_sps_buf, i_sps_size);
+            if (p_pps_buf && i_pps_size)
+                memcpy(p_sys->p_config_buffer + i_sps_size,
+                       p_pps_buf, i_pps_size);
+            p_sys->i_config_buffer = i_sps_size + i_pps_size;
+            p_sys->b_config_resend = true;
+        }
+
+        p_sys->i_width = sps.i_width;
+        p_sys->i_height = sps.i_height;
+    }
+}
+
+static void HEVCProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
+                             bool *p_delayed_open)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct H264ConvertState convert_state = { 0, 0 };
+
+    assert(p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && p_block);
+
+    if (p_sys->p_csd0_buffer)
+    {
+        convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
+                               p_sys->nal_size, &convert_state);
+    }
+
+    /* TODO */
+    VLC_UNUSED(env);
+    VLC_UNUSED(p_delayed_open);
+}
+
 static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1155,6 +1315,8 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     int i_output_ret = 0;
     int i_input_ret = 0;
     bool b_error = false;
+    bool b_delayed_open = false;
+    bool b_new_block = p_block ? p_sys->b_new_block : false;
 
     if (p_sys->error_state)
         goto endclean;
@@ -1189,11 +1351,18 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         goto endclean;
     }
 
+    if (b_new_block)
+    {
+        p_sys->b_new_block = false;
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+            H264ProcessBlock(p_dec, env, p_block, &b_delayed_open);
+        else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
+            HEVCProcessBlock(p_dec, env, p_block, &b_delayed_open);
+    }
+
     /* try delayed opening if there is a new extra data */
     if (!p_sys->codec)
     {
-        bool b_delayed_open = false;
-
         switch (p_dec->fmt_in.i_codec)
         {
         case VLC_CODEC_VC1:
@@ -1282,6 +1451,7 @@ endclean:
     {
         block_Release(p_block);
         *pp_block = NULL;
+        p_sys->b_new_block = true;
     }
     if (b_error && !p_sys->error_state) {
         /* Signal the error to the Java. */
