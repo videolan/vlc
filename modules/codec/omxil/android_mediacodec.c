@@ -152,6 +152,7 @@ struct decoder_sys_t
     size_t i_config_buffer;
     bool b_config_resend;
 
+    bool b_update_format;
     int i_width;
     int i_height;
 
@@ -763,6 +764,7 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
     jbuffer_info = (*env)->NewObject(env, jfields.buffer_info_class,
                                      jfields.buffer_info_ctor);
     p_sys->buffer_info = (*env)->NewGlobalRef(env, jbuffer_info);
+    p_sys->b_update_format = true;
 
     i_ret = VLC_SUCCESS;
 
@@ -1280,6 +1282,7 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
             p_sys->slice_height = 0;
             p_sys->stride = p_dec->fmt_out.video.i_width;
         }
+        p_sys->b_update_format = true;
     }
     return 0;
 }
@@ -1466,9 +1469,13 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     /* Use the aspect ratio provided by the input (ie read from packetizer).
      * Don't check the current value of the aspect ratio in fmt_out, since we
      * want to allow changes in it to propagate. */
-    if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0) {
+    if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0
+     && (p_dec->fmt_out.video.i_sar_num != p_dec->fmt_in.video.i_sar_num ||
+         p_dec->fmt_out.video.i_sar_den != p_dec->fmt_in.video.i_sar_den))
+    {
         p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
         p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
+        p_sys->b_update_format = true;
     }
 
     do {
@@ -1487,10 +1494,20 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
             if (p_sys->pixel_format)
             {
+                if (p_sys->b_update_format)
+                {
+                    p_sys->b_update_format = false;
+                    if (decoder_UpdateVideoFormat(p_dec) != 0)
+                    {
+                        msg_Err(p_dec, "decoder_UpdateVideoFormat failed");
+                        b_error = true;
+                        break;
+                    }
+                }
                 p_pic = decoder_NewPicture(p_dec);
                 if (!p_pic) {
                     msg_Warn(p_dec, "NewPicture failed");
-                    goto endclean;
+                    break;
                 }
             }
             i_output_ret = GetOutput(p_dec, env, p_pic, timeout);
