@@ -1094,7 +1094,6 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
             p_sys->stride = width;
         if (p_sys->slice_height <= 0)
             p_sys->slice_height = height;
-        CHECK_EXCEPTION();
 
         ArchitectureSpecificCopyHooks(p_dec, p_sys->pixel_format, p_sys->slice_height,
                                       p_sys->stride, &p_sys->architecture_specific_data);
