@@ -142,8 +142,8 @@ struct decoder_sys_t
     int stride, slice_height;
     char *name;
 
-    void *p_extra_buffer;
-    size_t i_extra_buffer;
+    void *p_csd0_buffer;
+    size_t i_csd0_buffer;
 
     bool allocated;
     bool started;
@@ -530,50 +530,50 @@ loopclean:
                          jfields.create_video_format, (*env)->NewStringUTF(env, mime),
                          p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
 
-    if (p_dec->fmt_in.i_extra && !p_sys->p_extra_buffer) {
+    if (p_dec->fmt_in.i_extra && !p_sys->p_csd0_buffer) {
         uint32_t size = p_dec->fmt_in.i_extra;
         int buf_size = p_dec->fmt_in.i_extra + 20;
 
-        /* Don't free p_extra_buffer until Format use it, so until MediaCodec
+        /* Don't free p_csd0_buffer until Format use it, so until MediaCodec
          * is closed */
-        p_sys->p_extra_buffer = malloc(buf_size);
-        if (!p_sys->p_extra_buffer)
+        p_sys->p_csd0_buffer = malloc(buf_size);
+        if (!p_sys->p_csd0_buffer)
         {
             msg_Warn(p_dec, "extra buffer allocation failed");
             goto error;
         }
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && ((uint8_t*)p_dec->fmt_in.p_extra)[0] == 1) {
             convert_sps_pps(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
-                            p_sys->p_extra_buffer, buf_size,
+                            p_sys->p_csd0_buffer, buf_size,
                             &size, &p_sys->nal_size);
         } else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC) {
             convert_hevc_nal_units(p_dec, p_dec->fmt_in.p_extra,
                                    p_dec->fmt_in.i_extra,
-                                   p_sys->p_extra_buffer, buf_size,
+                                   p_sys->p_csd0_buffer, buf_size,
                                    &size, &p_sys->nal_size);
         } else {
-            memcpy(p_sys->p_extra_buffer, p_dec->fmt_in.p_extra, size);
+            memcpy(p_sys->p_csd0_buffer, p_dec->fmt_in.p_extra, size);
         }
-        p_sys->i_extra_buffer = size;
+        p_sys->i_csd0_buffer = size;
     }
-    if (p_sys->p_extra_buffer)
+    if (p_sys->p_csd0_buffer)
     {
-        jobject jextra_buffer;
+        jobject jcsd0_buffer;
 
-        jextra_buffer = (*env)->NewDirectByteBuffer( env,
-                                                     p_sys->p_extra_buffer,
-                                                     p_sys->i_extra_buffer);
-        if (CHECK_EXCEPTION() || !jextra_buffer)
+        jcsd0_buffer = (*env)->NewDirectByteBuffer( env,
+                                                    p_sys->p_csd0_buffer,
+                                                    p_sys->i_csd0_buffer);
+        if (CHECK_EXCEPTION() || !jcsd0_buffer)
         {
             msg_Warn(p_dec, "java extra buffer allocation failed");
-            free(p_sys->p_extra_buffer);
-            p_sys->p_extra_buffer = NULL;
+            free(p_sys->p_csd0_buffer);
+            p_sys->p_csd0_buffer = NULL;
             goto error;
         }
         (*env)->CallVoidMethod(env, format, jfields.set_bytebuffer,
                                (*env)->NewStringUTF(env, "csd-0"),
-                               jextra_buffer);
-        (*env)->DeleteLocalRef(env, jextra_buffer);
+                               jcsd0_buffer);
+        (*env)->DeleteLocalRef(env, jcsd0_buffer);
     }
 
     p_sys->direct_rendering = var_InheritBool(p_dec, CFG_PREFIX "dr");
@@ -803,7 +803,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     else
         msg_Warn(p_dec, "Can't get a JNIEnv, can't close mediacodec !");
 
-    free(p_sys->p_extra_buffer);
+    free(p_sys->p_csd0_buffer);
     free(p_sys->name);
     ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
     free(p_sys->pp_inflight_pictures);
