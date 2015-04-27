@@ -1134,8 +1134,13 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         if (lavc_UpdateVideoFormat(p_dec, p_context, true))
             continue; /* Unsupported brand of hardware acceleration */
 
+        picture_t *test_pic = decoder_NewPicture(p_dec);
+        assert(!test_pic || test_pic->format.i_chroma == p_dec->fmt_out.video.i_chroma);
         vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt,
-                                  &p_dec->fmt_in);
+                                  &p_dec->fmt_in,
+                                  test_pic ? test_pic->p_sys : NULL);
+        if (test_pic)
+            picture_Release(test_pic);
         if (va == NULL)
             continue; /* Unsupported codec profile or such */
 

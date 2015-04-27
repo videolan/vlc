@@ -54,7 +54,7 @@
 #include "../h264_nal.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
-                const es_format_t *);
+                const es_format_t *, picture_sys_t *p_sys);
 static void Close(vlc_va_t *, AVCodecContext *);
 
 vlc_module_begin()
@@ -575,10 +575,12 @@ static void Close(vlc_va_t *va, AVCodecContext *ctx)
 }
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
-                const es_format_t *fmt)
+                const es_format_t *fmt, picture_sys_t *p_sys)
 {
     if (pix_fmt != AV_PIX_FMT_DXVA2_VLD)
         return VLC_EGENERIC;
+
+    (void) p_sys;
 
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
