@@ -45,6 +45,8 @@
 #include "android_opaque.h"
 #include "../../video_output/android/android_window.h"
 
+#define BUFFER_FLAG_CODEC_CONFIG  2
+
 #define INFO_OUTPUT_BUFFERS_CHANGED -3
 #define INFO_OUTPUT_FORMAT_CHANGED  -2
 #define INFO_TRY_AGAIN_LATER        -1
@@ -142,8 +144,13 @@ struct decoder_sys_t
     int stride, slice_height;
     char *name;
 
+    /* "csd-0" buffer */
     void *p_csd0_buffer;
     size_t i_csd0_buffer;
+    /* or buffer sent via BUFFER_FLAG_CODEC_CONFIG flag */
+    uint8_t *p_config_buffer;
+    size_t i_config_buffer;
+    bool b_config_resend;
 
     bool allocated;
     bool started;
@@ -530,7 +537,11 @@ loopclean:
                          jfields.create_video_format, (*env)->NewStringUTF(env, mime),
                          p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
 
-    if (p_dec->fmt_in.i_extra && !p_sys->p_csd0_buffer) {
+    /* Either we use a "csd-0" buffer that is provided before codec
+     * initialisation via the MediaFormat class, or use a CODEC_CONFIG buffer
+     * that can be provided during playback (and must be provided after a flush
+     * and a start). */
+    if (p_dec->fmt_in.i_extra && !p_sys->p_config_buffer) {
         uint32_t size = p_dec->fmt_in.i_extra;
         int buf_size = p_dec->fmt_in.i_extra + 20;
 
@@ -804,6 +815,7 @@ static void CloseDecoder(vlc_object_t *p_this)
         msg_Warn(p_dec, "Can't get a JNIEnv, can't close mediacodec !");
 
     free(p_sys->p_csd0_buffer);
+    free(p_sys->p_config_buffer);
     free(p_sys->name);
     ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
     free(p_sys->pp_inflight_pictures);
@@ -900,10 +912,12 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t *p_block, jlong timeo
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int index;
-    jobject buf;
-    jsize size;
-    uint8_t *bufptr;
-    struct H264ConvertState convert_state = { 0, 0 };
+    int64_t ts = 0;
+    uint8_t *p_mc_buf, *p_buf;
+    size_t i_buf;
+    jobject j_mc_buf;
+    jsize j_mc_size;
+    jint j_flags = 0;
 
     index = (*env)->CallIntMethod(env, p_sys->codec,
                                   jfields.dequeue_input_buffer, timeout);
@@ -914,37 +928,60 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t *p_block, jlong timeo
     if (index < 0)
         return 0;
 
+    if (p_sys->b_config_resend)
+    {
+        p_buf = p_sys->p_config_buffer;
+        i_buf = p_sys->i_config_buffer;
+        j_flags = BUFFER_FLAG_CODEC_CONFIG;
+        msg_Dbg(p_dec, "sending codec specific data of size %d "
+                       "via BUFFER_FLAG_CODEC_CONFIG flag", i_buf);
+    } else
+    {
+        p_buf = p_block->p_buffer;
+        i_buf = p_block->i_buffer;
+    }
+
     if (jfields.get_input_buffers)
-        buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers, index);
+        j_mc_buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers,
+                                                 index);
     else
-        buf = (*env)->CallObjectMethod(env, p_sys->codec, jfields.get_input_buffer, index);
-    size = (*env)->GetDirectBufferCapacity(env, buf);
-    bufptr = (*env)->GetDirectBufferAddress(env, buf);
-    if (size < 0) {
+        j_mc_buf = (*env)->CallObjectMethod(env, p_sys->codec,
+                                            jfields.get_input_buffer, index);
+    j_mc_size = (*env)->GetDirectBufferCapacity(env, j_mc_buf);
+    p_mc_buf = (*env)->GetDirectBufferAddress(env, j_mc_buf);
+    if (j_mc_size < 0) {
         msg_Err(p_dec, "Java buffer has invalid size");
         return -1;
     }
-    if ((size_t) size > p_block->i_buffer)
-        size = p_block->i_buffer;
-    memcpy(bufptr, p_block->p_buffer, size);
+    if ((size_t) j_mc_size > i_buf)
+        j_mc_size = i_buf;
+    memcpy(p_mc_buf, p_buf, j_mc_size);
 
-    convert_h264_to_annexb(bufptr, size, p_sys->nal_size, &convert_state);
-
-    int64_t ts = p_block->i_pts;
-    if (!ts && p_block->i_dts)
-        ts = p_block->i_dts;
-    if (p_block->i_flags & BLOCK_FLAG_PREROLL )
-        p_sys->i_preroll_end = ts;
-    timestamp_FifoPut(p_sys->timestamp_fifo, p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
-    (*env)->CallVoidMethod(env, p_sys->codec, jfields.queue_input_buffer, index, 0, size, ts, 0);
-    (*env)->DeleteLocalRef(env, buf);
+    if (!p_sys->b_config_resend)
+    {
+        ts = p_block->i_pts;
+        if (!ts && p_block->i_dts)
+            ts = p_block->i_dts;
+        if (p_block->i_flags & BLOCK_FLAG_PREROLL )
+            p_sys->i_preroll_end = ts;
+        timestamp_FifoPut(p_sys->timestamp_fifo,
+                          p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
+    }
+    (*env)->CallVoidMethod(env, p_sys->codec, jfields.queue_input_buffer,
+                           index, 0, j_mc_size, ts, j_flags);
+    (*env)->DeleteLocalRef(env, j_mc_buf);
     if (CHECK_EXCEPTION()) {
         msg_Err(p_dec, "Exception in MediaCodec.queueInputBuffer");
         return -1;
     }
     p_sys->decoded = true;
 
-    return 1;
+    if (p_sys->b_config_resend)
+    {
+        p_sys->b_config_resend = false;
+        return 0; /* 0 since the p_block is not processed */
+    } else
+        return 1;
 }
 
 static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong timeout)
@@ -1145,6 +1182,10 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             }
         }
         p_sys->decoded = false;
+
+        /* resend CODEC_CONFIG buffer after a flush */
+        if (p_sys->p_config_buffer)
+            p_sys->b_config_resend = true;
         goto endclean;
     }
 
@@ -1179,7 +1220,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     }
 
     do {
-        if (p_block && i_input_ret == 0)
+        if ((p_sys->b_config_resend || p_block) && i_input_ret == 0)
             i_input_ret = PutInput(p_dec, env, p_block, timeout);
 
         if (i_input_ret != -1 && i_output_ret == 0)
