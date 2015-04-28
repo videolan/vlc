@@ -51,7 +51,7 @@
 #include "avcodec.h"
 #include "va.h"
 #include "../../video_chroma/copy.h"
-#include "../h264_nal.h"
+#include "../../packetizer/h264_nal.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
                 const es_format_t *, picture_sys_t *p_sys);
