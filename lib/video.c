@@ -552,6 +552,8 @@ int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track )
     {
         if( i_track == val_list.p_list->p_values[i].i_int )
         {
+            if( var_SetBool( p_input_thread, "video", true ) < 0)
+                break;
             if( var_SetInteger( p_input_thread, "video-es", i_track ) < 0 )
                 break;
             i_ret = 0;
