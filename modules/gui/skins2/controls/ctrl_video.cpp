@@ -113,6 +113,7 @@ void CtrlVideo::setLayout( GenericLayout *pLayout,
 {
     CtrlGeneric::setLayout( pLayout, rPosition );
     m_pLayout->getActiveVar().addObserver( this );
+    getWindow()->getVisibleVar().addObserver( this );
 
     // register Video Control
     VoutManager::instance( getIntf() )->registerCtrlVideo( this );
@@ -125,6 +126,7 @@ void CtrlVideo::setLayout( GenericLayout *pLayout,
 void CtrlVideo::unsetLayout()
 {
     m_pLayout->getActiveVar().delObserver( this );
+    getWindow()->getVisibleVar().delObserver( this );
     CtrlGeneric::unsetLayout();
 }
 
@@ -162,27 +164,28 @@ void CtrlVideo::resizeControl( int width, int height )
 void CtrlVideo::onUpdate( Subject<VarBool> &rVariable, void *arg  )
 {
     (void)arg;
+    VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
 
-    // Visibility changed
     if( &rVariable == m_pVisible )
     {
-        msg_Dbg( getIntf(), "VideoCtrl : Visibility changed (visible=%d)",
-                                  isVisible() );
+        msg_Dbg( getIntf(), "VideoCtrl(%p) : control visibility changed (%i)",
+                      this, isVisible() );
         notifyLayout();
     }
-
-    // Active Layout changed
-    if( &rVariable == &m_pLayout->getActiveVar() )
+    else if( &rVariable == &m_pLayout->getActiveVar() )
     {
-        msg_Dbg( getIntf(), "VideoCtrl : Active Layout changed (isActive=%d)",
-                      m_pLayout->getActiveVar().get() );
+        msg_Dbg( getIntf(), "VideoCtrl(%p) : Active Layout changed (%i)",
+                      this, m_pLayout->getActiveVar().get() );
     }
-
-    VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
-    if( &rVariable == &rFullscreen )
+    else if( &rVariable == &getWindow()->getVisibleVar() )
     {
-        msg_Dbg( getIntf(), "VideoCtrl : fullscreen toggled (fullscreen = %d)",
-                      rFullscreen.get() );
+        msg_Dbg( getIntf(), "VideoCtrl(%p) : Window visibility changed (%i)",
+                      this, getWindow()->getVisibleVar().get() );
+    }
+    else if( &rVariable == &rFullscreen )
+    {
+        msg_Dbg( getIntf(), "VideoCtrl(%p) : fullscreen toggled (%i)",
+                      this, rFullscreen.get() );
     }
 
     if( isUseable() && !isUsed() )
@@ -232,9 +235,10 @@ bool CtrlVideo::isUseable( ) const
 {
     VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
 
-    return isVisible() &&                 // video control is visible
-           m_pLayout->isVisible() &&      // layout is visible
-           !rFullscreen.get();            // fullscreen is off
+    return isVisible()                           // video control is visible
+           && m_pLayout->getActiveVar().get()    // layout is active
+           && getWindow()->getVisibleVar().get() // window is visible
+           && !rFullscreen.get();                // fullscreen is off
 }
 
 
