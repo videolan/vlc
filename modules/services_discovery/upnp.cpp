@@ -767,34 +767,28 @@ bool MediaServer::fetchContents()
 
             /* Try to extract all resources in DIDL */
             IXML_NodeList* p_resource_list = ixmlDocument_getElementsByTagName( (IXML_Document*) itemElement, "res" );
-            if ( p_resource_list )
+            if ( p_resource_list && ixmlNodeList_length( p_resource_list ) > 0 )
             {
-                int i_length = ixmlNodeList_length( p_resource_list );
-                for ( int i = 0; i < i_length; i++ )
+                mtime_t i_duration = -1;
+                int i_hours, i_minutes, i_seconds;
+                IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, 0 );
+                const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
+                if( !psz_resource_url )
+                    continue;
+                const char* psz_duration = ixmlElement_getAttribute( p_resource, "duration" );
+
+                if ( psz_duration )
                 {
-                    mtime_t i_duration = -1;
-                    int i_hours, i_minutes, i_seconds;
-                    IXML_Element* p_resource = ( IXML_Element* ) ixmlNodeList_item( p_resource_list, i );
-                    const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
-                    if( !psz_resource_url )
-                        continue;
-                    const char* psz_duration = ixmlElement_getAttribute( p_resource, "duration" );
-
-                    if ( psz_duration )
-                    {
-                        if( sscanf( psz_duration, "%d:%02d:%02d",
-                            &i_hours, &i_minutes, &i_seconds ) )
-                            i_duration = INT64_C(1000000) * ( i_hours*3600 +
-                                                              i_minutes*60 +
-                                                              i_seconds );
-                    }
-
-                    addItem( title, objectID, psz_subtitles, i_duration, psz_resource_url );
+                    if( sscanf( psz_duration, "%d:%02d:%02d",
+                        &i_hours, &i_minutes, &i_seconds ) )
+                        i_duration = INT64_C(1000000) * ( i_hours*3600 +
+                                                          i_minutes*60 +
+                                                          i_seconds );
                 }
-                ixmlNodeList_free( p_resource_list );
+
+                addItem( title, objectID, psz_subtitles, i_duration, psz_resource_url );
             }
-            else
-                continue;
+            ixmlNodeList_free( p_resource_list );
         }
         ixmlNodeList_free( itemNodeList );
     }
