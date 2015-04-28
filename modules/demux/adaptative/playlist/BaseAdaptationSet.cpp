@@ -79,11 +79,6 @@ bool BaseAdaptationSet::getBitstreamSwitching  () const
     return this->isBitstreamSwitching;
 }
 
-Url BaseAdaptationSet::getUrlSegment() const
-{
-    return getParentUrlSegment();
-}
-
 std::vector<std::string> BaseAdaptationSet::toString(int indent) const
 {
     std::vector<std::string> ret;

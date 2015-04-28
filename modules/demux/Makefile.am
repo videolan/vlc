@@ -293,7 +293,6 @@ libdash_plugin_la_SOURCES += \
     demux/adaptative/playlist/BasePeriod.h \
     demux/adaptative/playlist/BaseRepresentation.cpp \
     demux/adaptative/playlist/BaseRepresentation.h \
-    demux/adaptative/playlist/BaseUrl.h \
     demux/adaptative/playlist/CommonAttributesElements.cpp \
     demux/adaptative/playlist/CommonAttributesElements.h \
     demux/adaptative/playlist/ICanonicalUrl.hpp \

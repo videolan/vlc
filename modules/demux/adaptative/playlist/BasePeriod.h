@@ -48,10 +48,8 @@ namespace adaptative
                 void                                addAdaptationSet    (BaseAdaptationSet *AdaptationSet);
                 std::vector<std::string>            toString            (int = 0) const;
 
-                virtual Url getUrlSegment() const; /* reimpl */
                 virtual mtime_t getPeriodStart() const; /* reimpl */
 
-                Property<Url *> baseUrl;
                 Property<mtime_t> duration;
                 Property<mtime_t> startTime;
 

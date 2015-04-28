@@ -87,14 +87,6 @@ BaseAdaptationSet * BasePeriod::getAdaptationSet(Streams::Type type) const
     return NULL;
 }
 
-Url BasePeriod::getUrlSegment() const
-{
-    if( baseUrl.Get() )
-        return *(baseUrl.Get());
-    else
-        return getParentUrlSegment();
-}
-
 std::vector<std::string> BasePeriod::toString(int indent) const
 {
     std::vector<std::string> ret;

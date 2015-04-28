@@ -88,6 +88,8 @@ namespace adaptative
                 void setSegmentBase(SegmentBase *);
                 void setSegmentTemplate(MediaSegmentTemplate *);
                 void setBitstreamSwitching(bool);
+                virtual Url getUrlSegment() const; /* impl */
+                Property<Url *> baseUrl;
 
             private:
                 void init();

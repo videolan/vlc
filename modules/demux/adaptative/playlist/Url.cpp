@@ -37,6 +37,19 @@ Url::Url(const std::string &str)
     prepend(Component(str));
 }
 
+bool Url::hasScheme() const
+{
+    if(components.empty())
+        return false;
+
+    const Component *comp = &components[0];
+    if(comp->component.compare(0, 7, "http://") &&
+       comp->component.compare(0, 8, "https://"))
+        return false;
+
+    return true;
+}
+
 Url & Url::prepend(const Component & comp)
 {
     components.insert(components.begin(), comp);

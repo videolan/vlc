@@ -52,6 +52,7 @@ namespace adaptative
                 Url();
                 Url(const Component &);
                 explicit Url(const std::string &);
+                bool hasScheme() const;
                 Url & prepend(const Component &);
                 Url & append(const Component &);
                 Url & append(const Url &);

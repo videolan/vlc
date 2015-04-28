@@ -32,7 +32,6 @@
 #include "../adaptative/playlist/SegmentBase.h"
 #include "../adaptative/playlist/SegmentList.h"
 #include "../adaptative/playlist/SegmentTimeline.h"
-#include "../adaptative/playlist/BaseUrl.h"
 #include "Representation.h"
 #include "Period.h"
 #include "AdaptationSet.h"
@@ -196,6 +195,10 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
         if((*it)->hasAttribute("mimeType"))
             adaptationSet->setMimeType((*it)->getAttributeValue("mimeType"));
 
+        Node *baseUrl = DOMHelper::getFirstChildElementByName((*it), "BaseURL");
+        if(baseUrl)
+            adaptationSet->baseUrl.Set(new Url(baseUrl->getText()));
+
         parseSegmentInformation( *it, adaptationSet );
 
         setRepresentations((*it), adaptationSet);
@@ -213,7 +216,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
 
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");
         if(!baseUrls.empty())
-            currentRepresentation->setBaseUrl( new BaseUrl( baseUrls.front()->getText() ) );
+            currentRepresentation->baseUrl.Set(new Url(baseUrls.front()->getText()));
 
         if(repNode->hasAttribute("id"))
             currentRepresentation->setId(repNode->getAttributeValue("id"));

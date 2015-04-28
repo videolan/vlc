@@ -32,7 +32,6 @@ namespace adaptative
     namespace playlist
     {
         class BasePeriod;
-        class BaseUrl;
 
         class AbstractPlaylist : public ICanonicalUrl
         {
@@ -45,7 +44,7 @@ namespace adaptative
                 virtual void                    debug() = 0;
 
                 void    addPeriod               (BasePeriod *period);
-                void    addBaseUrl              (BaseUrl *url);
+                void    addBaseUrl              (const std::string &);
 
                 virtual Url         getUrlSegment() const; /* impl */
                 vlc_object_t *      getVLCObject()  const;
@@ -69,7 +68,7 @@ namespace adaptative
             protected:
                 stream_t                           *stream;
                 std::vector<BasePeriod *>           periods;
-                std::vector<BaseUrl *>              baseUrls;
+                std::vector<std::string>            baseUrls;
                 std::string                         type;
         };
     }

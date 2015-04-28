@@ -50,7 +50,6 @@ namespace adaptative
                 void                            setBitstreamSwitching(bool value);
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( BaseRepresentation *rep );
-                virtual Url                     getUrlSegment() const; /* reimpl */
                 std::vector<std::string>        toString(int = 0) const;
 
             protected:

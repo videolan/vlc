@@ -36,7 +36,6 @@ namespace adaptative
     {
         class BaseAdaptationSet;
         class AbstractPlaylist;
-        class BaseUrl;
         class BaseSegmentTemplate;
 
         class BaseRepresentation : public CommonAttributesElements,
@@ -55,11 +54,9 @@ namespace adaptative
                 uint64_t            getBandwidth            () const;
                 void                setBandwidth            ( uint64_t bandwidth );
 
-                void                setBaseUrl              (BaseUrl *baseUrl);
                 AbstractPlaylist*   getPlaylist             () const;
 
                 std::vector<std::string> toString(int = 0) const;
-                virtual Url         getUrlSegment           () const; /* impl */
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,
@@ -69,7 +66,6 @@ namespace adaptative
                 AbstractPlaylist                   *playlist;
                 BaseAdaptationSet                  *adaptationSet;
                 uint64_t                            bandwidth;
-                BaseUrl                             *baseUrl;
         };
     }
 }

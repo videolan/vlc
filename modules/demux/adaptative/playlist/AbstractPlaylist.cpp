@@ -26,7 +26,6 @@
 #include "../tools/Helper.h"
 #include "BasePeriod.h"
 #include "SegmentTimeline.h"
-#include "BaseUrl.h"
 #include <vlc_common.h>
 #include <vlc_stream.h>
 #include <sstream>
@@ -51,9 +50,6 @@ AbstractPlaylist::~AbstractPlaylist()
 {
     for(size_t i = 0; i < this->periods.size(); i++)
         delete(this->periods.at(i));
-
-    for(size_t i = 0; i < this->baseUrls.size(); i++)
-        delete(this->baseUrls.at(i));
 }
 
 const std::vector<BasePeriod *>& AbstractPlaylist::getPeriods()
@@ -61,7 +57,7 @@ const std::vector<BasePeriod *>& AbstractPlaylist::getPeriods()
     return periods;
 }
 
-void AbstractPlaylist::addBaseUrl(BaseUrl *url)
+void AbstractPlaylist::addBaseUrl(const std::string &url)
 {
     baseUrls.push_back(url);
 }
@@ -78,7 +74,7 @@ void AbstractPlaylist::setType(const std::string &type_)
 Url AbstractPlaylist::getUrlSegment() const
 {
     if (!baseUrls.empty())
-        return Url(baseUrls.front()->getUrl());
+        return Url(baseUrls.front());
     else
     {
         std::stringstream ss;

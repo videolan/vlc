@@ -29,7 +29,6 @@
 
 #include "BaseRepresentation.h"
 #include "BaseAdaptationSet.h"
-#include "BaseUrl.h"
 #include "SegmentTemplate.h"
 
 using namespace adaptative::playlist;
@@ -38,14 +37,12 @@ BaseRepresentation::BaseRepresentation( BaseAdaptationSet *set, AbstractPlaylist
                 SegmentInformation( set ),
                 playlist        ( playlist_ ),
                 adaptationSet   ( set ),
-                bandwidth       (0),
-                baseUrl         ( NULL )
+                bandwidth       (0)
 {
 }
 
 BaseRepresentation::~BaseRepresentation ()
 {
-    delete baseUrl;
 }
 
 uint64_t     BaseRepresentation::getBandwidth            () const
@@ -56,11 +53,6 @@ uint64_t     BaseRepresentation::getBandwidth            () const
 void    BaseRepresentation::setBandwidth( uint64_t bandwidth )
 {
     this->bandwidth = bandwidth;
-}
-
-void BaseRepresentation::setBaseUrl(BaseUrl *base)
-{
-    baseUrl = base;
 }
 
 std::vector<std::string> BaseRepresentation::toString(int indent) const
@@ -74,14 +66,6 @@ std::vector<std::string> BaseRepresentation::toString(int indent) const
     for(l = list.begin(); l < list.end(); l++)
         ret.push_back((*l)->toString(indent + 1));
 
-    return ret;
-}
-
-Url BaseRepresentation::getUrlSegment() const
-{
-    Url ret = getParentUrlSegment();
-    if (baseUrl)
-        ret.append(baseUrl->getUrl());
     return ret;
 }
 

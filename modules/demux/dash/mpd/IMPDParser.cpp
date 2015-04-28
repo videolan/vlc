@@ -19,7 +19,6 @@
  *****************************************************************************/
 #include "IMPDParser.h"
 #include "xml/DOMHelper.h"
-#include "../adaptative/playlist/BaseUrl.h"
 
 using namespace dash::mpd;
 using namespace dash::xml;
@@ -37,10 +36,7 @@ void IMPDParser::setMPDBaseUrl(Node *root)
     std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(root, "BaseURL");
 
     for(size_t i = 0; i < baseUrls.size(); i++)
-    {
-        BaseUrl *url = new BaseUrl(baseUrls.at(i)->getText());
-        mpd->addBaseUrl(url);
-    }
+        mpd->addBaseUrl(baseUrls.at(i)->getText());
 }
 
 MPD* IMPDParser::getMPD()

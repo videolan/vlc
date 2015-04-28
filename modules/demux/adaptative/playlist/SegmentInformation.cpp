@@ -327,6 +327,21 @@ void SegmentInformation::setBitstreamSwitching(bool bitswitch)
     bitswitch_policy = (bitswitch) ? BITSWITCH_YES : BITSWITCH_NO;
 }
 
+Url SegmentInformation::getUrlSegment() const
+{
+    if(baseUrl.Get() && baseUrl.Get()->hasScheme())
+    {
+        return *(baseUrl.Get());
+    }
+    else
+    {
+        Url ret = getParentUrlSegment();
+        if (baseUrl.Get())
+            ret.append(*(baseUrl.Get()));
+        return ret;
+    }
+}
+
 SegmentBase * SegmentInformation::inheritSegmentBase() const
 {
     if(segmentBase)
