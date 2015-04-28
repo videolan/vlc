@@ -78,6 +78,7 @@ bool AtomsReader::parseBlock(void *buffer, size_t size, BaseRepresentation *rep)
                     point.time += sidx->p_items[i].i_subsegment_duration;
                 }
                 rep->SplitUsingIndex(splitlist);
+                rep->getPlaylist()->debug();
             }
         }
         stream_Delete(stream);
