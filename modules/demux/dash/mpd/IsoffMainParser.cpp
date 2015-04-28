@@ -172,7 +172,7 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
 size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *info)
 {
     size_t total = 0;
-    parseSegmentBase(DOMHelper::getFirstChildElementByName(node, "SegmentBase"), info);
+    total += parseSegmentBase(DOMHelper::getFirstChildElementByName(node, "SegmentBase"), info);
     total += parseSegmentList(DOMHelper::getFirstChildElementByName(node, "SegmentList"), info);
     total += parseSegmentTemplate(DOMHelper::getFirstChildElementByName(node, "SegmentTemplate" ), info);
     if(node->hasAttribute("bitstreamSwitching"))
@@ -250,11 +250,12 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
         adaptationSet->addRepresentation(this->currentRepresentation);
     }
 }
-
-void IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformation *info)
+size_t IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformation *info)
 {
+    size_t list_count = 0;
+
     if(!segmentBaseNode)
-        return;
+        return 0;
 
     else if(segmentBaseNode->hasAttribute("indexRange"))
     {
@@ -276,6 +277,7 @@ void IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformatio
             seg = new Segment(info);
         }
 
+        list_count++;
         list->addSegment(seg);
         info->setSegmentList(list);
 
@@ -293,6 +295,8 @@ void IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformatio
         parseInitSegment(DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization"), base);
         info->setSegmentBase(base);
     }
+
+    return list_count;
 }
 
 size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation *info)

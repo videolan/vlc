@@ -71,7 +71,7 @@ namespace dash
                 void    parseTimeline       (dash::xml::Node *, MediaSegmentTemplate *);
                 void    parsePeriods        (dash::xml::Node *);
                 size_t  parseSegmentInformation(dash::xml::Node *, SegmentInformation *);
-                void    parseSegmentBase    (dash::xml::Node *, SegmentInformation *);
+                size_t  parseSegmentBase    (dash::xml::Node *, SegmentInformation *);
                 size_t  parseSegmentList    (dash::xml::Node *, SegmentInformation *);
                 size_t  parseSegmentTemplate(dash::xml::Node *, SegmentInformation *);
                 void    parseProgramInformation(dash::xml::Node *, MPD *);
