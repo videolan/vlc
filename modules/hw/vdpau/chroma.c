@@ -65,7 +65,7 @@ static VdpStatus MixerSetupColors(filter_t *filter, const VdpProcamp *procamp,
 {
     filter_sys_t *sys = filter->p_sys;
     VdpStatus err;
-    VdpColorStandard std = (filter->fmt_in.video.i_height > 576)
+    VdpColorStandard std = (filter->fmt_in.video.i_visible_height > 576)
                          ? VDP_COLOR_STANDARD_ITUR_BT_709
                          : VDP_COLOR_STANDARD_ITUR_BT_601;
 
@@ -187,7 +187,7 @@ static VdpVideoMixer MixerCreate(filter_t *filter)
         VDP_VIDEO_MIXER_PARAMETER_CHROMA_TYPE,
     };
     uint32_t width = filter->fmt_in.video.i_width;
-    uint32_t height = filter->fmt_in.video.i_height;
+    uint32_t height = filter->fmt_in.video.i_visible_height;
     const void *values[3] = { &width, &height, &sys->chroma, };
 
     err = vdp_video_mixer_create(sys->vdp, sys->device, featc, featv,
@@ -332,7 +332,8 @@ static picture_t *VideoImport(filter_t *filter, picture_t *src)
     /* Create surface (TODO: reuse?) */
     err = vdp_video_surface_create(sys->vdp, sys->device, sys->chroma,
                                    filter->fmt_in.video.i_width,
-                                   filter->fmt_in.video.i_height, &surface);
+                                   filter->fmt_in.video.i_visible_height,
+                                   &surface);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(filter, "video %s %s failure: %s", "surface", "creation",
