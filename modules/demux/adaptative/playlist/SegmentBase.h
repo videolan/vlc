@@ -32,7 +32,8 @@ namespace adaptative
 {
     namespace playlist
     {
-        class SegmentBase : public Initializable<Segment>
+        class SegmentBase : public Initializable<Segment>,
+                            public Indexable<Segment>
         {
             public:
                 SegmentBase             ();

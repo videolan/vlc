@@ -93,6 +93,14 @@ vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
                 }
             }
         }
+        break;
+
+        case INFOTYPE_INDEX:
+        {
+            ISegment *segment = getSegment( INFOTYPE_INDEX );
+            if( segment )
+                retSegments.push_back( segment );
+        }
 
         default:
         break;
@@ -150,7 +158,17 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
             break;
 
         case INFOTYPE_INDEX:
-            //returned with media for now;
+            if( segBase && segBase->indexSegment.Get() )
+            {
+                segment = segBase->indexSegment.Get();
+            }
+            else if( segList && segList->indexSegment.Get() )
+            {
+                segment = segList->indexSegment.Get();
+            }
+            // templated index ?
+            break;
+
         default:
             break;
     }

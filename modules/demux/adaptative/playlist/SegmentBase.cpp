@@ -27,7 +27,8 @@
 using namespace adaptative::playlist;
 
 SegmentBase::SegmentBase    () :
-             Initializable()
+             Initializable(),
+             Indexable()
 {
 }
 SegmentBase::~SegmentBase   ()

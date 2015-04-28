@@ -52,6 +52,20 @@ namespace adaptative
                 Property<T *> initialisationSegment;
         };
 
+        template<class T> class Indexable
+        {
+            public:
+                Indexable()
+                {
+                    indexSegment.Set(NULL);
+                }
+                ~Indexable()
+                {
+                    delete indexSegment.Get();
+                }
+                Property<T *> indexSegment;
+        };
+
         class Timelineable
         {
             public:
@@ -88,7 +102,8 @@ namespace adaptative
         };
 
         class SegmentInfoCommon : public ICanonicalUrl,
-                                  public Initializable<Segment>
+                                  public Initializable<Segment>,
+                                  public Indexable<Segment>
         {
             public:
                 SegmentInfoCommon( ICanonicalUrl *parent = NULL );

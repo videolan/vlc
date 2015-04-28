@@ -30,6 +30,7 @@ SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, AbstractPlaylist
 {
     count = 0;
     initializing = true;
+    indexed = false;
     prevRepresentation = NULL;
     setAdaptationLogic(logic_);
     playlist = playlist_;
@@ -78,6 +79,14 @@ Chunk * SegmentTracker::getNextChunk(Streams::Type type)
     {
         initializing = false;
         segment = rep->getSegment(BaseRepresentation::INFOTYPE_INIT);
+        if(segment)
+            return segment->toChunk(count, rep);
+    }
+
+    if(!indexed)
+    {
+        indexed = true;
+        segment = rep->getSegment(BaseRepresentation::INFOTYPE_INDEX);
         if(segment)
             return segment->toChunk(count, rep);
     }

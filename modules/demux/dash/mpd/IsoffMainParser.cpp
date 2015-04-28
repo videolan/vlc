@@ -265,9 +265,9 @@ size_t IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformat
         size_t start = 0, end = 0;
         if (std::sscanf(segmentBaseNode->getAttributeValue("indexRange").c_str(), "%zu-%zu", &start, &end) == 2)
         {
-            seg = new DashIndexSegment(info);
-            seg->setByteRange(start, end);
-            list->addSegment(seg);
+            IndexSegment *index = new DashIndexSegment(info);
+            index->setByteRange(start, end);
+            list->indexSegment.Set(index);
             /* index must be before data, so data starts at index end */
             seg = new Segment(info);
             seg->setByteRange(end + 1, 0);

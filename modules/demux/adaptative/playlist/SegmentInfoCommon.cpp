@@ -64,7 +64,7 @@ uint64_t TimescaleAble::inheritTimescale() const
 }
 
 SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
-    ICanonicalUrl( parent ), Initializable(),
+    ICanonicalUrl( parent ), Initializable(), Indexable(),
     duration( 0 ),
     startIndex( 0 )
 {

@@ -64,6 +64,7 @@ namespace adaptative
 
         private:
             bool initializing;
+            bool indexed;
             uint64_t count;
             AbstractAdaptationLogic *logic;
             AbstractPlaylist *playlist;
