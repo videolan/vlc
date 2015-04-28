@@ -182,15 +182,6 @@ CtrlVideo* VoutManager::getBestCtrlVideo( )
         }
     }
 
-    // as a fallback, look up any video control that is unused
-    for( it = m_pCtrlVideoVec.begin(); it != m_pCtrlVideoVec.end(); ++it )
-    {
-        if( !(*it)->isUsed() )
-        {
-            return (*it);
-        }
-    }
-
     return NULL;
 }
 
