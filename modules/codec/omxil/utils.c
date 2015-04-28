@@ -336,6 +336,8 @@ bool OMXCodec_IsBlacklisted( const char *p_name, unsigned int i_name_len )
         "OMX.Nvidia.vc1.decode",
         /* crashes mediaserver */
         "OMX.MTK.VIDEO.DECODER.MPEG4",
+        /* black screen */
+        "OMX.MTK.VIDEO.DECODER.VC1",
         /* Not working or crashing (Samsung) */
         "OMX.SEC.vp8.dec",
         NULL
