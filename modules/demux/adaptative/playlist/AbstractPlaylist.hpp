@@ -42,6 +42,7 @@ namespace adaptative
 
                 virtual bool                    isLive() const = 0;
                 void                            setType(const std::string &);
+                virtual void                    debug() = 0;
 
                 void    addPeriod               (BasePeriod *period);
                 void    addBaseUrl              (BaseUrl *url);

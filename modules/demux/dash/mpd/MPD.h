@@ -44,6 +44,7 @@ namespace dash
 
                 Profile                         getProfile() const;
                 virtual bool                    isLive() const;
+                virtual void                    debug();
 
                 Property<ProgramInformation *>      programInfo;
 

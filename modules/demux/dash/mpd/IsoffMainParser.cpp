@@ -64,7 +64,8 @@ bool    IsoffMainParser::parse              (Profile profile)
     setMPDBaseUrl(root);
     parsePeriods(root);
 
-    print();
+    if(mpd)
+        mpd->debug();
     return true;
 }
 
@@ -427,29 +428,6 @@ void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)
             info->setMoreInformationUrl(node->getAttributeValue("moreInformationURL"));
 
         mpd->programInfo.Set(info);
-    }
-}
-
-void    IsoffMainParser::print              ()
-{
-    if(mpd)
-    {
-        msg_Dbg(p_stream, "MPD profile=%s mediaPresentationDuration=%ld minBufferTime=%ld",
-                static_cast<std::string>(mpd->getProfile()).c_str(),
-                mpd->duration.Get(),
-                mpd->minBufferTime.Get());
-        msg_Dbg(p_stream, "BaseUrl=%s", mpd->getUrlSegment().toString().c_str());
-
-        std::vector<BasePeriod *>::const_iterator i;
-        for(i = mpd->getPeriods().begin(); i != mpd->getPeriods().end(); i++)
-        {
-            std::vector<std::string> debug = (*i)->toString();
-            std::vector<std::string>::const_iterator l;
-            for(l = debug.begin(); l < debug.end(); l++)
-            {
-                msg_Dbg(p_stream, "%s", (*l).c_str());
-            }
-        }
     }
 }
 
