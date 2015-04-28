@@ -2190,7 +2190,7 @@ static const struct
     { { VLC_CODEC_VDPAU_VIDEO_420, VLC_CODEC_VDPAU_VIDEO_422,
         VLC_CODEC_VDPAU_VIDEO_444, VLC_CODEC_VDPAU_OUTPUT },
                                                FAKE_FMT() },
-    { { VLC_CODEC_ANDROID_OPAQUE, VLC_CODEC_MMAL_OPAQUE, },
+    { { VLC_CODEC_ANDROID_OPAQUE, VLC_CODEC_MMAL_OPAQUE, VLC_CODEC_D3D9_OPAQUE, },
                                                FAKE_FMT() },
 
     { { 0 },                                   FAKE_FMT() }
