@@ -32,6 +32,7 @@
 #include "../adaptative/playlist/SegmentBase.h"
 #include "../adaptative/playlist/SegmentList.h"
 #include "../adaptative/playlist/SegmentTimeline.h"
+#include "MPD.h"
 #include "Representation.h"
 #include "Period.h"
 #include "AdaptationSet.h"
@@ -47,12 +48,29 @@ using namespace dash::mpd;
 using namespace dash::xml;
 using namespace adaptative::playlist;
 
-IsoffMainParser::IsoffMainParser    (Node *root, stream_t *p_stream) :
-                 IMPDParser(root, NULL, p_stream, NULL)
+IsoffMainParser::IsoffMainParser    (Node *root_, stream_t *stream)
 {
+    root = root_;
+    mpd = NULL;
+    currentRepresentation = NULL;
+    p_stream = stream;
 }
+
 IsoffMainParser::~IsoffMainParser   ()
 {
+}
+
+void IsoffMainParser::setMPDBaseUrl(Node *root)
+{
+    std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(root, "BaseURL");
+
+    for(size_t i = 0; i < baseUrls.size(); i++)
+        mpd->addBaseUrl(baseUrls.at(i)->getText());
+}
+
+MPD* IsoffMainParser::getMPD()
+{
+    return mpd;
 }
 
 bool    IsoffMainParser::parse              (Profile profile)

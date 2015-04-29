@@ -27,20 +27,21 @@
 #endif
 
 #include "MPDFactory.h"
+#include "mpd/IsoffMainParser.h"
 
 using namespace dash::xml;
 using namespace dash::mpd;
 
-MPD* MPDFactory::create             (dash::xml::Node *root, stream_t *p_stream, Profile profile)
+MPD* MPDFactory::create(Node *root, stream_t *p_stream, Profile profile)
 {
-    IMPDParser *parser = NULL;
+    IsoffMainParser *parser = NULL;
 
     switch( profile )
     {
         case Profile::Unknown:
             break;
         default:
-            parser = new IsoffMainParser(root, p_stream);
+            parser = new (std::nothrow) IsoffMainParser(root, p_stream);
             break;
     }
 

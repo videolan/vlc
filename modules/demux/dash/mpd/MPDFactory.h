@@ -21,21 +21,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
 #ifndef MPDFACTORY_H_
 #define MPDFACTORY_H_
 
 #include "mpd/MPD.h"
-#include "mpd/IsoffMainParser.h"
+#include "mpd/Profile.hpp"
 
 namespace dash
 {
+    namespace xml
+    {
+        class Node;
+    }
+
     namespace mpd
     {
         class MPDFactory
         {
             public:
-                static MPD* create(dash::xml::Node *root, stream_t *p_stream, Profile profile);
+                static MPD* create(xml::Node *root, stream_t *p_stream, Profile profile);
         };
     }
 }

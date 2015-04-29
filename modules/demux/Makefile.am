@@ -253,8 +253,6 @@ libdash_plugin_la_SOURCES = \
     demux/dash/mpd/DASHSegment.h \
     demux/dash/mpd/ContentDescription.cpp \
     demux/dash/mpd/ContentDescription.h \
-    demux/dash/mpd/IMPDParser.cpp \
-    demux/dash/mpd/IMPDParser.h \
     demux/dash/mpd/IsoffMainParser.cpp \
     demux/dash/mpd/IsoffMainParser.h \
     demux/dash/mpd/MPD.cpp \

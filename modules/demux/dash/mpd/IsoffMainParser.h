@@ -25,11 +25,17 @@
 #ifndef ISOFFMAINPARSER_H_
 #define ISOFFMAINPARSER_H_
 
-#include "IMPDParser.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "../adaptative/playlist/SegmentInfoCommon.h"
+#include "mpd/Profile.hpp"
 
 #include <cstdlib>
 #include <sstream>
+
+#include <vlc_common.h>
 
 namespace adaptative
 {
@@ -51,29 +57,38 @@ namespace dash
     {
         class Period;
         class AdaptationSet;
+        class Representation;
+        class MPD;
 
         using namespace adaptative::playlist;
 
-        class IsoffMainParser : public IMPDParser
+        class IsoffMainParser
         {
             public:
-                IsoffMainParser             (dash::xml::Node *root, stream_t *p_stream);
+                IsoffMainParser             (xml::Node *root, stream_t *p_stream);
                 virtual ~IsoffMainParser    ();
 
-                bool    parse  (Profile profile);
+                bool            parse  (Profile profile);
+                virtual MPD*    getMPD ();
+                virtual void    setMPDBaseUrl(xml::Node *root);
 
             private:
                 void    setMPDAttributes    ();
-                void    setAdaptationSets   (dash::xml::Node *periodNode, Period *period);
-                void    setRepresentations  (dash::xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
-                void    parseInitSegment    (dash::xml::Node *, Initializable<Segment> *);
-                void    parseTimeline       (dash::xml::Node *, MediaSegmentTemplate *);
-                void    parsePeriods        (dash::xml::Node *);
-                size_t  parseSegmentInformation(dash::xml::Node *, SegmentInformation *);
-                size_t  parseSegmentBase    (dash::xml::Node *, SegmentInformation *);
-                size_t  parseSegmentList    (dash::xml::Node *, SegmentInformation *);
-                size_t  parseSegmentTemplate(dash::xml::Node *, SegmentInformation *);
-                void    parseProgramInformation(dash::xml::Node *, MPD *);
+                void    setAdaptationSets   (xml::Node *periodNode, Period *period);
+                void    setRepresentations  (xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
+                void    parseInitSegment    (xml::Node *, Initializable<Segment> *);
+                void    parseTimeline       (xml::Node *, MediaSegmentTemplate *);
+                void    parsePeriods        (xml::Node *);
+                size_t  parseSegmentInformation(xml::Node *, SegmentInformation *);
+                size_t  parseSegmentBase    (xml::Node *, SegmentInformation *);
+                size_t  parseSegmentList    (xml::Node *, SegmentInformation *);
+                size_t  parseSegmentTemplate(xml::Node *, SegmentInformation *);
+                void    parseProgramInformation(xml::Node *, MPD *);
+
+                xml::Node       *root;
+                MPD             *mpd;
+                stream_t        *p_stream;
+                Representation  *currentRepresentation;
         };
 
         class IsoTime
