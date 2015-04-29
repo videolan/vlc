@@ -690,7 +690,10 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
             return 0;
         }
         else
-            msg_Warn( p_aout, "Negative delay, Should not happen !" );
+        {
+            msg_Warn( p_aout, "timing screwed, reset positions" );
+            AudioTrack_ResetPositions( env, p_aout );
+        }
     }
     return -1;
 }
