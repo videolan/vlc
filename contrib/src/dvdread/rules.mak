@@ -7,7 +7,7 @@ ifdef GPL
 PKGS += dvdread
 endif
 endif
-ifeq ($(call need_pkg,"dvdread > 5.0.2 "),)
+ifeq ($(call need_pkg,"dvdread >= 5.0.3"),)
 PKGS_FOUND += dvdread
 endif
 
