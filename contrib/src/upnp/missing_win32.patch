@@ -1,0 +1,13 @@
+--- upnp_clean/upnp/inc/upnp.h	2015-04-30 14:37:26.962425889 +0200
++++ upnp/upnp/inc/upnp.h	2015-04-30 14:41:48.099528162 +0200
+@@ -41,6 +41,10 @@
+  * \file
+  */
+ 
++#ifdef _WIN32
++# define WIN32
++#endif
++
+ #include "ixml.h"
+ #include "upnpconfig.h"
+ #include "UpnpGlobal.h"
