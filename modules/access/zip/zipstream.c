@@ -575,7 +575,10 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
     /* Encode the URI and append ZIP_SEP */
     char *psz_pathtozip;
     escapeToXml( &psz_pathtozip, psz_zippath );
-    if( astrcatf( &psz_pathtozip, "%s", ZIP_SEP ) < 0 ) return -1;
+    if( astrcatf( &psz_pathtozip, "%s", ZIP_SEP ) < 0 ) {
+        free_all_node( playlist );
+        return -1;
+    }
 
     int i_track = 0;
     for( int i = 0; i < vlc_array_count( p_filenames ); ++i )

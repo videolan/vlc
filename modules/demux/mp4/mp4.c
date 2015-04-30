@@ -4460,6 +4460,7 @@ static mp4_fragment_t * GetFragmentByTime( demux_t *p_demux, const mtime_t i_tim
         if ( i_time >= i_base_time &&
              i_time <= i_base_time + i_length )
         {
+            free( pi_tracks_duration_total );
             return p_fragment;
         }
         else

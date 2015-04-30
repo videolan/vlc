@@ -155,7 +155,10 @@ void on_run(GtkWidget *widget, gpointer data) {
     transcode = get_transcode_string(preset);
     free(preset);
     sout = malloc((strlen(transcode)+strlen(file_begin)+strlen(dest)+strlen(file_end)+1) * sizeof(char));
-    if(sout == NULL) return;
+    if(sout == NULL) {
+        free(handle);
+        return;
+    }
     strncpy(sout, transcode, strlen(transcode)+1);
     strncat(sout, file_begin, strlen(file_begin));
     strncat(sout, dest, strlen(dest));

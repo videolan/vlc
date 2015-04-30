@@ -3370,7 +3370,7 @@ IPin* BDAGraph::FindPinOnFilter( IBaseFilter* pBaseFilter, const char* pPinName)
                 else
                     pPin = NULL;      // no
 
-                delete pString;
+                delete[] pString;
 
             }
             else
