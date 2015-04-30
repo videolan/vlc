@@ -52,7 +52,6 @@ IsoffMainParser::IsoffMainParser    (Node *root_, stream_t *stream)
 {
     root = root_;
     mpd = NULL;
-    currentRepresentation = NULL;
     p_stream = stream;
 }
 
@@ -229,7 +228,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
 
     for(size_t i = 0; i < representations.size(); i++)
     {
-        this->currentRepresentation = new Representation(adaptationSet, getMPD());
+        Representation *currentRepresentation = new Representation(adaptationSet, getMPD());
         Node *repNode = representations.at(i);
 
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");
@@ -240,13 +239,13 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
             currentRepresentation->setId(repNode->getAttributeValue("id"));
 
         if(repNode->hasAttribute("width"))
-            this->currentRepresentation->setWidth(atoi(repNode->getAttributeValue("width").c_str()));
+            currentRepresentation->setWidth(atoi(repNode->getAttributeValue("width").c_str()));
 
         if(repNode->hasAttribute("height"))
-            this->currentRepresentation->setHeight(atoi(repNode->getAttributeValue("height").c_str()));
+            currentRepresentation->setHeight(atoi(repNode->getAttributeValue("height").c_str()));
 
         if(repNode->hasAttribute("bandwidth"))
-            this->currentRepresentation->setBandwidth(atoi(repNode->getAttributeValue("bandwidth").c_str()));
+            currentRepresentation->setBandwidth(atoi(repNode->getAttributeValue("bandwidth").c_str()));
 
         if(repNode->hasAttribute("mimeType"))
             currentRepresentation->setMimeType(repNode->getAttributeValue("mimeType"));
@@ -269,7 +268,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
             }
         }
 
-        adaptationSet->addRepresentation(this->currentRepresentation);
+        adaptationSet->addRepresentation(currentRepresentation);
     }
 }
 size_t IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformation *info)
@@ -307,14 +306,14 @@ size_t IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformat
         if(initSeg)
         {
             SegmentBase *base = new SegmentBase();
-            parseInitSegment(initSeg, base);
+            parseInitSegment(initSeg, base, info);
             info->setSegmentBase(base);
         }
     }
     else
     {
         SegmentBase *base = new SegmentBase();
-        parseInitSegment(DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization"), base);
+        parseInitSegment(DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization"), base, info);
         info->setSegmentBase(base);
     }
 
@@ -329,9 +328,9 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
     {
         std::vector<Node *> segments = DOMHelper::getElementByTagName(segListNode, "SegmentURL", false);
         SegmentList *list;
-        if(!segments.empty() && (list = new (std::nothrow) SegmentList()))
+        if((list = new (std::nothrow) SegmentList()))
         {
-            parseInitSegment(DOMHelper::getFirstChildElementByName(segListNode, "Initialization"), list);
+            parseInitSegment(DOMHelper::getFirstChildElementByName(segListNode, "Initialization"), list, info);
 
             if(segListNode->hasAttribute("duration"))
                 list->setDuration(Integer<mtime_t>(segListNode->getAttributeValue("duration")));
@@ -376,12 +375,12 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
     return total;
 }
 
-void IsoffMainParser::parseInitSegment(Node *initNode, Initializable<Segment> *init)
+void IsoffMainParser::parseInitSegment(Node *initNode, Initializable<Segment> *init, SegmentInformation *parent)
 {
     if(!initNode)
         return;
 
-    Segment *seg = new InitSegment( currentRepresentation );
+    Segment *seg = new InitSegment( parent );
     seg->setSourceUrl(initNode->getAttributeValue("sourceURL"));
 
     if(initNode->hasAttribute("range"))

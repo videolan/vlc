@@ -57,7 +57,6 @@ namespace dash
     {
         class Period;
         class AdaptationSet;
-        class Representation;
         class MPD;
 
         using namespace adaptative::playlist;
@@ -76,7 +75,7 @@ namespace dash
                 void    setMPDAttributes    ();
                 void    setAdaptationSets   (xml::Node *periodNode, Period *period);
                 void    setRepresentations  (xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
-                void    parseInitSegment    (xml::Node *, Initializable<Segment> *);
+                void    parseInitSegment    (xml::Node *, Initializable<Segment> *, SegmentInformation *);
                 void    parseTimeline       (xml::Node *, MediaSegmentTemplate *);
                 void    parsePeriods        (xml::Node *);
                 size_t  parseSegmentInformation(xml::Node *, SegmentInformation *);
@@ -88,7 +87,6 @@ namespace dash
                 xml::Node       *root;
                 MPD             *mpd;
                 stream_t        *p_stream;
-                Representation  *currentRepresentation;
         };
 
         class IsoTime
