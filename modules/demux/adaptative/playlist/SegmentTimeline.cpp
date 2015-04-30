@@ -108,6 +108,17 @@ mtime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) c
     return totalscaledtime;
 }
 
+size_t SegmentTimeline::maxElementNumber() const
+{
+    size_t count = 0;
+
+    std::list<Element *>::const_iterator it;
+    for(it = elements.begin(); it != elements.end(); it++)
+        count += (*it)->r + 1;
+
+    return pruned + count - 1;
+}
+
 size_t SegmentTimeline::prune(mtime_t time)
 {
     mtime_t scaled = time * inheritTimescale() / CLOCK_FREQ;

@@ -147,10 +147,12 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
     if( size )
     {
         /* check if that's a template (fixme: find a better way) */
-        BaseSegmentTemplate *templ;
-        if( size == 1 && (templ = dynamic_cast<BaseSegmentTemplate*>(retSegments[0])) )
+        MediaSegmentTemplate *templ;
+        if( size == 1 && (templ = dynamic_cast<MediaSegmentTemplate*>(retSegments[0])) )
         {
-            return templ;
+            if(templ->segmentTimeline.Get() == NULL ||
+               templ->segmentTimeline.Get()->maxElementNumber() > pos)
+                return templ;
         }
         else if( pos < size )
         {
