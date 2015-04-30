@@ -121,7 +121,7 @@ std::string Representation::contextualize(size_t index, const std::string &compo
                     {
                         size_t width;
                         iss >> width;
-                        if (iss.peek() != '$')
+                        if (iss.peek() != '$' && iss.peek() != 'd')
                             throw VLC_EGENERIC;
                         std::stringstream oss;
                         oss.width(width); /* set format string length */
