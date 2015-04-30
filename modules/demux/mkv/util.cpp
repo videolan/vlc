@@ -186,7 +186,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
 
         if ( !( p_blk->i_flags & BLOCK_FLAG_TYPE_I) )
         {
-            msg_Dbg( p_demux, "discard non-key preroll block in track %d at%"PRId64,
+            msg_Dbg( p_demux, "discard non-key preroll block in track %d at%" PRId64,
                      p_tk->i_number, i_pts );
             return;
         }
@@ -293,7 +293,7 @@ void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsig
     }
 
 #if 0
-msg_Dbg( p_demux, "block (track=%d) i_dts: %"PRId64" / i_pts: %"PRId64, p_tk->i_number, p_block->i_dts, p_block->i_pts);
+msg_Dbg( p_demux, "block (track=%d) i_dts: %" PRId64" / i_pts: %" PRId64, p_tk->i_number, p_block->i_dts, p_block->i_pts);
 #endif
 
     es_out_Send( p_demux->out, p_tk->p_es, p_block);
