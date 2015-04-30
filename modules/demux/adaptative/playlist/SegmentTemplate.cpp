@@ -53,7 +53,7 @@ MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
 {
     debugName = "SegmentTemplate";
     classId = Segment::CLASSID_SEGMENT;
-    startNumber.Set( 0 );
+    startNumber.Set( 1 );
     initialisationSegment.Set( NULL );
 }
 
