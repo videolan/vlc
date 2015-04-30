@@ -410,7 +410,8 @@ static void print_item(const module_t *m, const module_config_t *item,
                 size_t len = 0;
 
                 for (unsigned i = 0; i < item->list_count; i++)
-                    len += strlen(item->list_text[i]) + 4 * sizeof (int) + 5;
+                    len += strlen(module_gettext(m, item->list_text[i]))
+                           + 4 * sizeof (int) + 5;
 
                 typebuf = malloc(len);
                 if (typebuf == NULL)
