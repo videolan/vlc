@@ -239,7 +239,7 @@ static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 }
 #endif
 
-#if !defined (HAVE_STATIC_ASSERT)
+#if !defined (HAVE_STATIC_ASSERT) && !defined(__cpp_static_assert)
 # define _Static_assert(x, s) ((void) sizeof (struct { unsigned:-!(x); }))
 # define static_assert _Static_assert
 #endif
