@@ -250,23 +250,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
         if(repNode->hasAttribute("mimeType"))
             currentRepresentation->setMimeType(repNode->getAttributeValue("mimeType"));
 
-        size_t totalmediasegments = parseSegmentInformation(repNode, currentRepresentation);
-        if(!totalmediasegments)
-        {
-            /* unranged & segment less representation, add fake segment */
-            SegmentList *list = new SegmentList();
-            Segment *seg = new Segment(currentRepresentation);
-            if(list && seg)
-            {
-                list->addSegment(seg);
-                currentRepresentation->setSegmentList(list);
-            }
-            else
-            {
-                delete seg;
-                delete list;
-            }
-        }
+        parseSegmentInformation(repNode, currentRepresentation);
 
         adaptationSet->addRepresentation(currentRepresentation);
     }

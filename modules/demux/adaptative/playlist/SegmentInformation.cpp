@@ -69,24 +69,32 @@ vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
         case INFOTYPE_INIT:
         {
             /* init segments are always single segment */
-            ISegment *segment = getSegment( INFOTYPE_INIT );
-            if( segment )
-                retSegments.push_back( segment );
+            if( segmentBase && segmentBase->initialisationSegment.Get() )
+            {
+                retSegments.push_back( segmentBase->initialisationSegment.Get() );
+            }
+            else if( segmentList && segmentList->initialisationSegment.Get() )
+            {
+                retSegments.push_back( segmentList->initialisationSegment.Get() );
+            }
+            else if( mediaSegmentTemplate && mediaSegmentTemplate->initialisationSegment.Get() )
+            {
+                retSegments.push_back( mediaSegmentTemplate->initialisationSegment.Get() );
+            }
         }
         break;
 
         case INFOTYPE_MEDIA:
         {
-            SegmentList *segList = inheritSegmentList();
-            if( inheritSegmentTemplate() )
+            if( mediaSegmentTemplate )
             {
-                retSegments.push_back( inheritSegmentTemplate() );
+                retSegments.push_back( mediaSegmentTemplate );
             }
-            else if ( segList && !segList->getSegments().empty() )
+            else if ( segmentList && !segmentList->getSegments().empty() )
             {
                 std::vector<Segment *>::const_iterator it;
-                for(it=segList->getSegments().begin();
-                    it!=segList->getSegments().end(); it++)
+                for(it=segmentList->getSegments().begin();
+                    it!=segmentList->getSegments().end(); it++)
                 {
                     std::vector<ISegment *> list = (*it)->subSegments();
                     retSegments.insert( retSegments.end(), list.begin(), list.end() );
@@ -97,16 +105,26 @@ vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
 
         case INFOTYPE_INDEX:
         {
-            ISegment *segment = getSegment( INFOTYPE_INDEX );
-            if( segment )
-                retSegments.push_back( segment );
+            /* index segments are always single segment */
+            if( segmentBase && segmentBase->indexSegment.Get() )
+            {
+                retSegments.push_back( segmentBase->indexSegment.Get() );
+            }
+            else if( segmentList && segmentList->indexSegment.Get() )
+            {
+                retSegments.push_back( segmentList->indexSegment.Get() );
+            }
+            // templated index ?
         }
 
         default:
         break;
     }
 
-    return retSegments;
+    if( retSegments.empty() && parent )
+        return parent->getSegments( type );
+    else
+        return retSegments;
 }
 
 vector<ISegment *> SegmentInformation::getSegments() const
@@ -122,55 +140,22 @@ vector<ISegment *> SegmentInformation::getSegments() const
 
 ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) const
 {
-    SegmentBase *segBase = inheritSegmentBase();
-    SegmentList *segList = inheritSegmentList();
-
     ISegment *segment = NULL;
 
-    switch(type)
+    vector<ISegment *> retSegments = getSegments( type );
+    const size_t size = retSegments.size();
+    if( size )
     {
-        case INFOTYPE_INIT:
-            if( segBase && segBase->initialisationSegment.Get() )
-            {
-                segment = segBase->initialisationSegment.Get();
-            }
-            else if( segList && segList->initialisationSegment.Get() )
-            {
-                segment = segList->initialisationSegment.Get();
-            }
-            else if( inheritSegmentTemplate() )
-            {
-                segment = inheritSegmentTemplate()->initialisationSegment.Get();
-            }
-            break;
-
-        case INFOTYPE_MEDIA:
-            if( inheritSegmentTemplate() )
-            {
-                segment = inheritSegmentTemplate();
-            }
-            else if ( segList && !segList->getSegments().empty() )
-            {
-                std::vector<Segment *> list = segList->getSegments();
-                if(pos < list.size())
-                    segment = list.at(pos);
-            }
-            break;
-
-        case INFOTYPE_INDEX:
-            if( segBase && segBase->indexSegment.Get() )
-            {
-                segment = segBase->indexSegment.Get();
-            }
-            else if( segList && segList->indexSegment.Get() )
-            {
-                segment = segList->indexSegment.Get();
-            }
-            // templated index ?
-            break;
-
-        default:
-            break;
+        /* check if that's a template (fixme: find a better way) */
+        BaseSegmentTemplate *templ;
+        if( size == 1 && (templ = dynamic_cast<BaseSegmentTemplate*>(retSegments[0])) )
+        {
+            return templ;
+        }
+        else if( pos < size )
+        {
+            segment = retSegments[pos];
+        }
     }
 
     return segment;
