@@ -44,7 +44,6 @@ struct line_desc_t
     FT_BBox          bbox;
 };
 
-void FreeLine( line_desc_t *p_line );
 void FreeLines( line_desc_t *p_lines );
 line_desc_t *NewLine( int i_count );
 
