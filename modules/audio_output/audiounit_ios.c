@@ -252,13 +252,6 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
         return false;
     }
 
-    /* AU init */
-    status = AudioUnitInitialize(p_sys->au_unit);
-    if (status != noErr) {
-        msg_Err(p_aout, "failed to init AudioUnit (%i)", (int)status);
-        return false;
-    }
-
     /* setup circular buffer */
     TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate * fmt->i_bytes_per_frame);
 
@@ -268,10 +261,17 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
                             NULL,
                             NULL);
 
-	/* Set audio session to mediaplayback */
-	UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
-	AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
-	AudioSessionSetActive(true);
+    /* Set audio session to mediaplayback */
+    UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
+    AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
+    AudioSessionSetActive(true);
+
+    /* AU init */
+    status = AudioUnitInitialize(p_sys->au_unit);
+    if (status != noErr) {
+        msg_Err(p_aout, "failed to init AudioUnit (%i)", (int)status);
+        return false;
+    }
 
     /* start the unit */
     status = AudioOutputUnitStart(p_sys->au_unit);
