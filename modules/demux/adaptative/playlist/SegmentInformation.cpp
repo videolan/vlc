@@ -94,7 +94,7 @@ vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
             {
                 std::vector<Segment *>::const_iterator it;
                 for(it=segmentList->getSegments().begin();
-                    it!=segmentList->getSegments().end(); it++)
+                    it!=segmentList->getSegments().end(); ++it)
                 {
                     std::vector<ISegment *> list = (*it)->subSegments();
                     retSegments.insert( retSegments.end(), list.begin(), list.end() );
@@ -227,7 +227,7 @@ void SegmentInformation::collectTimelines(std::vector<SegmentTimeline *> *timeli
         timelines->push_back(mediaSegmentTemplate->segmentTimeline.Get());
 
     std::vector<SegmentInformation *>::const_iterator it;
-    for(it = childs.begin(); it != childs.end(); it++)
+    for(it = childs.begin(); it != childs.end(); ++it)
         (*it)->collectTimelines(timelines);
 }
 
@@ -266,7 +266,7 @@ static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
                               size_t end, mtime_t time)
 {
     std::vector<Segment *>::iterator segIt;
-    for(segIt = seglist.begin(); segIt < seglist.end(); segIt++)
+    for(segIt = seglist.begin(); segIt < seglist.end(); ++segIt)
     {
         Segment *segment = *segIt;
         if(segment->getClassId() == Segment::CLASSID_SEGMENT &&
@@ -289,7 +289,7 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
     size_t start = 0, end = 0;
     mtime_t time = 0;
 
-    for(splitIt = splitlist.begin(); splitIt < splitlist.end(); splitIt++)
+    for(splitIt = splitlist.begin(); splitIt < splitlist.end(); ++splitIt)
     {
         start = end;
         SplitPoint split = *splitIt;

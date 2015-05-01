@@ -53,14 +53,14 @@ void HTTPConnectionManager::closeAllConnections      ()
 void HTTPConnectionManager::releaseAllConnections()
 {
     std::vector<PersistentConnection *>::iterator it;
-    for(it = connectionPool.begin(); it != connectionPool.end(); it++)
+    for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
         (*it)->releaseChunk();
 }
 
 PersistentConnection * HTTPConnectionManager::getConnectionForHost(const std::string &hostname)
 {
     std::vector<PersistentConnection *>::const_iterator it;
-    for(it = connectionPool.begin(); it != connectionPool.end(); it++)
+    for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
     {
         if(!(*it)->getHostname().compare(hostname) && (*it)->isAvailable())
             return *it;

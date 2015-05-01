@@ -35,7 +35,7 @@ SegmentList::SegmentList( SegmentInformation *parent ):
 SegmentList::~SegmentList()
 {
     std::vector<Segment *>::iterator it;
-    for(it = segments.begin(); it != segments.end(); it++)
+    for(it = segments.begin(); it != segments.end(); ++it)
         delete(*it);
 }
 

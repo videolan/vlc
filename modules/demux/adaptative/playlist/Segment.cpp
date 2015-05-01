@@ -141,7 +141,7 @@ void Segment::addSubSegment(SubSegment *subsegment)
 Segment::~Segment()
 {
     std::vector<SubSegment*>::iterator it;
-    for(it=subsegments.begin();it!=subsegments.end();it++)
+    for(it=subsegments.begin();it!=subsegments.end();++it)
         delete *it;
 }
 
@@ -161,7 +161,7 @@ std::string Segment::toString(int indent) const
     {
         std::string ret;
         std::vector<SubSegment *>::const_iterator l;
-        for(l = subsegments.begin(); l != subsegments.end(); l++)
+        for(l = subsegments.begin(); l != subsegments.end(); ++l)
         {
             ret.append( (*l)->toString(indent + 1) );
         }
@@ -191,7 +191,7 @@ std::vector<ISegment*> Segment::subSegments()
     if(!subsegments.empty())
     {
         std::vector<SubSegment*>::iterator it;
-        for(it=subsegments.begin();it!=subsegments.end();it++)
+        for(it=subsegments.begin();it!=subsegments.end();++it)
             list.push_back(*it);
     }
     else

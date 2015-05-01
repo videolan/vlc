@@ -83,7 +83,7 @@ std::string Url::toString(size_t index, const BaseRepresentation *rep) const
 {
     std::string ret;
     std::vector<Component>::const_iterator it;
-    for(it = components.begin(); it != components.end(); it++)
+    for(it = components.begin(); it != components.end(); ++it)
     {
         const Component *comp = & (*it);
         if(rep)

@@ -42,7 +42,7 @@ BaseRepresentation * RepresentationSelector::select(BasePeriod *period, Streams:
     BaseRepresentation *best = NULL;
 
     std::vector<BaseAdaptationSet *>::const_iterator adaptIt;
-    for(adaptIt=adaptSets.begin(); adaptIt!=adaptSets.end(); adaptIt++)
+    for(adaptIt=adaptSets.begin(); adaptIt!=adaptSets.end(); ++adaptIt)
     {
         std::vector<BaseRepresentation *> reps = (*adaptIt)->getRepresentations();
         BaseRepresentation *candidate = select(reps, (best)?best->getBandwidth():0, bitrate);
@@ -67,11 +67,11 @@ BaseRepresentation * RepresentationSelector::select(BasePeriod *period, Streams:
     /* subset matching WxH */
     std::vector<BaseAdaptationSet *> adaptSets = period->getAdaptationSets(type);
     std::vector<BaseAdaptationSet *>::const_iterator adaptIt;
-    for(adaptIt=adaptSets.begin(); adaptIt!=adaptSets.end(); adaptIt++)
+    for(adaptIt=adaptSets.begin(); adaptIt!=adaptSets.end(); ++adaptIt)
     {
         std::vector<BaseRepresentation *> reps = (*adaptIt)->getRepresentations();
         std::vector<BaseRepresentation *>::const_iterator repIt;
-        for(repIt=reps.begin(); repIt!=reps.end(); repIt++)
+        for(repIt=reps.begin(); repIt!=reps.end(); ++repIt)
         {
             if((*repIt)->getWidth() == width && (*repIt)->getHeight() == height)
                 resMatchReps.push_back(*repIt);
@@ -89,7 +89,7 @@ BaseRepresentation * RepresentationSelector::select(std::vector<BaseRepresentati
 {
     BaseRepresentation  *candidate = NULL, *lowest = NULL;
     std::vector<BaseRepresentation *>::const_iterator repIt;
-    for(repIt=reps.begin(); repIt!=reps.end(); repIt++)
+    for(repIt=reps.begin(); repIt!=reps.end(); ++repIt)
     {
         if ( !lowest || (*repIt)->getBandwidth() < lowest->getBandwidth())
             lowest = *repIt;

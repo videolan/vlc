@@ -125,7 +125,7 @@ void IsoffMainParser::parsePeriods(Node *root)
     std::vector<Node *> periods = DOMHelper::getElementByTagName(root, "Period", false);
     std::vector<Node *>::const_iterator it;
 
-    for(it = periods.begin(); it != periods.end(); it++)
+    for(it = periods.begin(); it != periods.end(); ++it)
     {
         Period *period = new (std::nothrow) Period(mpd);
         if (!period)
@@ -204,7 +204,7 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
     std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", false);
     std::vector<Node *>::const_iterator it;
 
-    for(it = adaptationSets.begin(); it != adaptationSets.end(); it++)
+    for(it = adaptationSets.begin(); it != adaptationSets.end(); ++it)
     {
         AdaptationSet *adaptationSet = new AdaptationSet(period);
         if(!adaptationSet)
@@ -323,7 +323,7 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
                 list->timescale.Set(Integer<uint64_t>(segListNode->getAttributeValue("timescale")));
 
             std::vector<Node *>::const_iterator it;
-            for(it = segments.begin(); it != segments.end(); it++)
+            for(it = segments.begin(); it != segments.end(); ++it)
             {
                 Node *segmentURL = *it;
                 std::string mediaUrl = segmentURL->getAttributeValue("media");
@@ -387,7 +387,7 @@ void IsoffMainParser::parseTimeline(Node *node, MediaSegmentTemplate *templ)
     {
         std::vector<Node *> elements = DOMHelper::getElementByTagName(node, "S", false);
         std::vector<Node *>::const_iterator it;
-        for(it = elements.begin(); it != elements.end(); it++)
+        for(it = elements.begin(); it != elements.end(); ++it)
         {
             const Node *s = *it;
             if(!s->hasAttribute("d")) /* Mandatory */

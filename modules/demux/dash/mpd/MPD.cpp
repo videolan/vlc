@@ -71,11 +71,11 @@ void MPD::debug()
     msg_Dbg(stream, "BaseUrl=%s", getUrlSegment().toString().c_str());
 
     std::vector<BasePeriod *>::const_iterator i;
-    for(i = getPeriods().begin(); i != getPeriods().end(); i++)
+    for(i = getPeriods().begin(); i != getPeriods().end(); ++i)
     {
         std::vector<std::string> debug = (*i)->toString();
         std::vector<std::string>::const_iterator l;
-        for(l = debug.begin(); l < debug.end(); l++)
+        for(l = debug.begin(); l < debug.end(); ++l)
         {
             msg_Dbg(stream, "%s", (*l).c_str());
         }

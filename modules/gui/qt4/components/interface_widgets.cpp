@@ -375,7 +375,7 @@ void EasterEggBackgroundWidget::spawnFlakes()
             it = flakes->erase( it );
         }
         else
-            it++;
+            ++it;
     }
 
     if ( flakes->size() < MAX_FLAKES )

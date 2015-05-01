@@ -59,7 +59,7 @@ const std::vector<BaseAdaptationSet*>   BasePeriod::getAdaptationSets(Streams::T
 {
     std::vector<BaseAdaptationSet*> list;
     std::vector<BaseAdaptationSet*>::const_iterator it;
-    for(it = adaptationSets.begin(); it!= adaptationSets.end(); it++)
+    for(it = adaptationSets.begin(); it!= adaptationSets.end(); ++it)
     {
         if( Streams::Stream::mimeToType((*it)->getMimeType()) == type )
             list.push_back(*it);
@@ -79,7 +79,7 @@ void BasePeriod::addAdaptationSet(BaseAdaptationSet *adaptationSet)
 BaseAdaptationSet * BasePeriod::getAdaptationSet(Streams::Type type) const
 {
     std::vector<BaseAdaptationSet *>::const_iterator it;
-    for(it = adaptationSets.begin(); it != adaptationSets.end(); it++)
+    for(it = adaptationSets.begin(); it != adaptationSets.end(); ++it)
     {
         if ( Streams::Stream::mimeToType((*it)->getMimeType()) == type )
             return *it;
@@ -94,7 +94,7 @@ std::vector<std::string> BasePeriod::toString(int indent) const
     text.append("Period");
     ret.push_back(text);
     std::vector<BaseAdaptationSet *>::const_iterator k;
-    for(k = adaptationSets.begin(); k != adaptationSets.end(); k++)
+    for(k = adaptationSets.begin(); k != adaptationSets.end(); ++k)
     {
         std::vector<std::string> debug = (*k)->toString(indent + 1);
         ret.insert(ret.end(), debug.begin(), debug.end());

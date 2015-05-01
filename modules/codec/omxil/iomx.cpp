@@ -98,7 +98,7 @@ void OMXCodecObserver::onMessage(const omx_message &msg)
         node->callbacks.EventHandler(node->handle, node->app_data, msg.u.event_data.event, msg.u.event_data.data1, msg.u.event_data.data2, NULL);
         break;
     case omx_message::EMPTY_BUFFER_DONE:
-        for( List<OMX_BUFFERHEADERTYPE*>::iterator it = node->buffers.begin(); it != node->buffers.end(); it++ ) {
+        for( List<OMX_BUFFERHEADERTYPE*>::iterator it = node->buffers.begin(); it != node->buffers.end(); ++it ) {
             OMXBuffer* info = (OMXBuffer*) (*it)->pPlatformPrivate;
             if (msg.u.buffer_data.buffer == info->id) {
                 node->callbacks.EmptyBufferDone(node->handle, node->app_data, *it);
@@ -107,7 +107,7 @@ void OMXCodecObserver::onMessage(const omx_message &msg)
         }
         break;
     case omx_message::FILL_BUFFER_DONE:
-        for( List<OMX_BUFFERHEADERTYPE*>::iterator it = node->buffers.begin(); it != node->buffers.end(); it++ ) {
+        for( List<OMX_BUFFERHEADERTYPE*>::iterator it = node->buffers.begin(); it != node->buffers.end(); ++it ) {
             OMXBuffer* info = (OMXBuffer*) (*it)->pPlatformPrivate;
             if (msg.u.extended_buffer_data.buffer == info->id) {
                 OMX_BUFFERHEADERTYPE *buffer = *it;
@@ -217,7 +217,7 @@ static OMX_ERRORTYPE iomx_free_buffer(OMX_HANDLETYPE component, OMX_U32 port, OM
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
     OMXBuffer* info = (OMXBuffer*) buffer->pPlatformPrivate;
     status_t ret = ctx->iomx->freeBuffer(node->node, port, info->id);
-    for( List<OMX_BUFFERHEADERTYPE*>::iterator it = node->buffers.begin(); it != node->buffers.end(); it++ ) {
+    for( List<OMX_BUFFERHEADERTYPE*>::iterator it = node->buffers.begin(); it != node->buffers.end(); ++it ) {
         if (buffer == *it) {
             node->buffers.erase(it);
             break;
@@ -245,12 +245,12 @@ static OMX_ERRORTYPE iomx_fill_this_buffer(OMX_HANDLETYPE component, OMX_BUFFERH
 static OMX_ERRORTYPE iomx_component_role_enum(OMX_HANDLETYPE component, OMX_U8 *role, OMX_U32 index)
 {
     OMXNode* node = (OMXNode*) ((OMX_COMPONENTTYPE*)component)->pComponentPrivate;
-    for( List<IOMX::ComponentInfo>::iterator it = ctx->components.begin(); it != ctx->components.end(); it++ ) {
+    for( List<IOMX::ComponentInfo>::iterator it = ctx->components.begin(); it != ctx->components.end(); ++it ) {
         if (node->component_name == it->mName) {
             if (index >= it->mRoles.size())
                 return OMX_ErrorNoMore;
             List<String8>::iterator it2 = it->mRoles.begin();
-            for( OMX_U32 i = 0; it2 != it->mRoles.end() && i < index; i++, it2++ ) ;
+            for( OMX_U32 i = 0; it2 != it->mRoles.end() && i < index; i++, ++it2 ) ;
             strncpy((char*)role, it2->string(), OMX_MAX_STRINGNAME_SIZE);
             if (it2->length() >= OMX_MAX_STRINGNAME_SIZE)
                 role[OMX_MAX_STRINGNAME_SIZE - 1] = '\0';
@@ -360,7 +360,7 @@ OMX_ERRORTYPE PREFIX(OMX_ComponentNameEnum)(OMX_STRING component_name, OMX_U32 n
         return OMX_ErrorNoMore;
     List<IOMX::ComponentInfo>::iterator it = ctx->components.begin();
     for( OMX_U32 i = 0; i < index; i++ )
-        it++;
+        ++it;
     strncpy(component_name, it->mName.string(), name_length);
     component_name[name_length - 1] = '\0';
     return OMX_ErrorNone;
@@ -368,7 +368,7 @@ OMX_ERRORTYPE PREFIX(OMX_ComponentNameEnum)(OMX_STRING component_name, OMX_U32 n
 
 OMX_ERRORTYPE PREFIX(OMX_GetRolesOfComponent)(OMX_STRING component_name, OMX_U32 *num_roles, OMX_U8 **roles)
 {
-    for( List<IOMX::ComponentInfo>::iterator it = ctx->components.begin(); it != ctx->components.end(); it++ ) {
+    for( List<IOMX::ComponentInfo>::iterator it = ctx->components.begin(); it != ctx->components.end(); ++it ) {
         if (!strcmp(component_name, it->mName.string())) {
             if (!roles) {
                 *num_roles = it->mRoles.size();
@@ -378,7 +378,7 @@ OMX_ERRORTYPE PREFIX(OMX_GetRolesOfComponent)(OMX_STRING component_name, OMX_U32
                 return OMX_ErrorInsufficientResources;
             *num_roles = it->mRoles.size();
             OMX_U32 i = 0;
-            for( List<String8>::iterator it2 = it->mRoles.begin(); it2 != it->mRoles.end(); i++, it2++ ) {
+            for( List<String8>::iterator it2 = it->mRoles.begin(); it2 != it->mRoles.end(); i++, ++it2 ) {
                 strncpy((char*)roles[i], it2->string(), OMX_MAX_STRINGNAME_SIZE);
                 roles[i][OMX_MAX_STRINGNAME_SIZE - 1] = '\0';
             }
@@ -391,8 +391,8 @@ OMX_ERRORTYPE PREFIX(OMX_GetRolesOfComponent)(OMX_STRING component_name, OMX_U32
 OMX_ERRORTYPE PREFIX(OMX_GetComponentsOfRole)(OMX_STRING role, OMX_U32 *num_comps, OMX_U8 **comp_names)
 {
     OMX_U32 i = 0;
-    for( List<IOMX::ComponentInfo>::iterator it = ctx->components.begin(); it != ctx->components.end(); it++ ) {
-        for( List<String8>::iterator it2 = it->mRoles.begin(); it2 != it->mRoles.end(); it2++ ) {
+    for( List<IOMX::ComponentInfo>::iterator it = ctx->components.begin(); it != ctx->components.end(); ++it ) {
+        for( List<String8>::iterator it2 = it->mRoles.begin(); it2 != it->mRoles.end(); ++it2 ) {
             if (!strcmp(it2->string(), role)) {
                 if (comp_names) {
                     if (*num_comps < i)

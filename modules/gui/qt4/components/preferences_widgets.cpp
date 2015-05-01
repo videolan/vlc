@@ -1262,7 +1262,7 @@ void KeySelectorControl::finish()
         if( list.count() >= 2 )
             msg_Dbg( p_this, "This is probably wrong, %s", qtu(i.key()) );
 
-        i++;
+        ++i;
     }
 
     module_config_free (p_config);

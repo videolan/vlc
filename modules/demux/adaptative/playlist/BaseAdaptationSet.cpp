@@ -86,7 +86,7 @@ std::vector<std::string> BaseAdaptationSet::toString(int indent) const
     text.append("BaseAdaptationSet");
     ret.push_back(text);
     std::vector<BaseRepresentation *>::const_iterator k;
-    for(k = representations.begin(); k != representations.end(); k++)
+    for(k = representations.begin(); k != representations.end(); ++k)
     {
         std::vector<std::string> debug = (*k)->toString(indent + 1);
         ret.insert(ret.end(), debug.begin(), debug.end());

@@ -126,7 +126,7 @@ std::vector<std::string> Node::toString(int indent) const
     text.append(getName());
     ret.push_back(text);
     std::vector<Node *>::const_iterator l;
-    for(l = subNodes.begin(); l < subNodes.end(); l++)
+    for(l = subNodes.begin(); l < subNodes.end(); ++l)
     {
         std::vector<std::string> sub = (*l)->toString(indent + 1);
         ret.insert(ret.end(), sub.begin(), sub.end());

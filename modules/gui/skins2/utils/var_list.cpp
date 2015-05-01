@@ -56,12 +56,12 @@ void VarList::delSelected()
         if( (*it).m_selected )
         {
             Iterator oldIt = it;
-            it++;
+            ++it;
             m_list.erase( oldIt );
         }
         else
         {
-            it++;
+            ++it;
         }
     }
     notify();

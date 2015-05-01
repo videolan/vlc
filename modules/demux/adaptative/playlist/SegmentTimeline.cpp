@@ -37,7 +37,7 @@ SegmentTimeline::SegmentTimeline(TimescaleAble *parent)
 SegmentTimeline::~SegmentTimeline()
 {
     std::list<Element *>::iterator it;
-    for(it = elements.begin(); it != elements.end(); it++)
+    for(it = elements.begin(); it != elements.end(); ++it)
         delete *it;
 }
 
@@ -59,7 +59,7 @@ uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(time_t scaled) co
 {
     uint64_t count = 0;
     std::list<Element *>::const_iterator it;
-    for(it = elements.begin(); it != elements.end(); it++)
+    for(it = elements.begin(); it != elements.end(); ++it)
     {
         const Element *el = *it;
         for(uint64_t repeat = 1 + el->r; repeat; repeat--)
@@ -85,7 +85,7 @@ mtime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) c
     number -= pruned;
 
     std::list<Element *>::const_iterator it;
-    for(it = elements.begin(); it != elements.end(); it++)
+    for(it = elements.begin(); it != elements.end(); ++it)
     {
         const Element *el = *it;
 
@@ -113,7 +113,7 @@ size_t SegmentTimeline::maxElementNumber() const
     size_t count = 0;
 
     std::list<Element *>::const_iterator it;
-    for(it = elements.begin(); it != elements.end(); it++)
+    for(it = elements.begin(); it != elements.end(); ++it)
         count += (*it)->r + 1;
 
     return pruned + count - 1;
