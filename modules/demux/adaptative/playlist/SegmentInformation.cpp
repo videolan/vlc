@@ -47,6 +47,7 @@ SegmentInformation::SegmentInformation(AbstractPlaylist * parent_) :
 
 void SegmentInformation::init()
 {
+    baseUrl.Set(NULL);
     segmentBase = NULL;
     segmentList = NULL;
     mediaSegmentTemplate = NULL;
