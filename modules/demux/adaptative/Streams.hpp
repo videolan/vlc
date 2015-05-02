@@ -25,6 +25,7 @@
 #endif
 
 #include <string>
+#include <list>
 #include <vlc_common.h>
 #include "StreamsType.hpp"
 
@@ -93,11 +94,12 @@ namespace adaptative
                 int esCount() const;
                 bool seekAble() const;
                 void setPosition(mtime_t);
+                void sendToDecoder(mtime_t);
+                void dropQueues();
 
             protected:
                 mtime_t   pcr;
                 int       group;
-                int       escount;
                 es_out_t *fakeesout; /* to intercept/proxy what is sent from demuxstream */
                 stream_t *demuxstream;
                 bool      seekable;
@@ -109,6 +111,18 @@ namespace adaptative
                 static void esOutDel(es_out_t *, es_out_id_t *);
                 static int esOutControl(es_out_t *, int, va_list);
                 static void esOutDestroy(es_out_t *);
+
+                class Demuxed
+                {
+                    friend class AbstractStreamOutput;
+                    Demuxed();
+                    ~Demuxed();
+                    void drop();
+                    es_out_id_t *es_id;
+                    block_t  *p_queue;
+                    block_t **pp_queue_last;
+                };
+                std::list<Demuxed *> queues;
         };
 
         class MP4StreamOutput : public AbstractStreamOutput

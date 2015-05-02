@@ -216,6 +216,7 @@ size_t Stream::read(HTTPConnectionManager *connManager)
     readsize = block->i_buffer;
 
     output->pushBlock(block);
+    output->sendToDecoder(INT64_MAX - VLC_TS_0);
 
     return readsize;
 }
@@ -239,7 +240,6 @@ AbstractStreamOutput::AbstractStreamOutput(demux_t *demux)
     demuxstream = NULL;
     pcr = VLC_TS_0;
     group = -1;
-    escount = 0;
     seekable = true;
 
     fakeesout = new es_out_t;
@@ -273,7 +273,7 @@ int AbstractStreamOutput::getGroup() const
 
 int AbstractStreamOutput::esCount() const
 {
-    return escount;
+    return queues.size();
 }
 
 void AbstractStreamOutput::pushBlock(block_t *block)
@@ -288,28 +288,110 @@ bool AbstractStreamOutput::seekAble() const
 
 void AbstractStreamOutput::setPosition(mtime_t nztime)
 {
+    std::list<Demuxed *>::const_iterator it;
+    for(it=queues.begin(); it!=queues.end();++it)
+    {
+        Demuxed *pair = *it;
+        if(pair->p_queue && pair->p_queue->i_dts > VLC_TS_0 + nztime)
+            pair->drop();
+    }
+    pcr = VLC_TS_0;
     es_out_Control(realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                    VLC_TS_0 + nztime);
+}
+
+void AbstractStreamOutput::sendToDecoder(mtime_t nzdeadline)
+{
+    std::list<Demuxed *>::const_iterator it;
+    for(it=queues.begin(); it!=queues.end();++it)
+    {
+        Demuxed *pair = *it;
+        while(pair->p_queue && pair->p_queue->i_dts <= VLC_TS_0 + nzdeadline)
+        {
+            block_t *p_block = pair->p_queue;
+            pair->p_queue = pair->p_queue->p_next;
+            p_block->p_next = NULL;
+
+            if(pair->pp_queue_last == &p_block->p_next)
+                pair->pp_queue_last = &pair->p_queue;
+
+            realdemux->out->pf_send(realdemux->out, pair->es_id, p_block);
+        }
+    }
+}
+
+void AbstractStreamOutput::dropQueues()
+{
+    std::list<Demuxed *>::const_iterator it;
+    for(it=queues.begin(); it!=queues.end();++it)
+        (*it)->drop();
+}
+
+AbstractStreamOutput::Demuxed::Demuxed()
+{
+    p_queue = NULL;
+    pp_queue_last = &p_queue;
+    es_id = NULL;
+}
+
+AbstractStreamOutput::Demuxed::~Demuxed()
+{
+    drop();
+}
+
+void AbstractStreamOutput::Demuxed::drop()
+{
+    block_ChainRelease(p_queue);
+    p_queue = NULL;
+    pp_queue_last = &p_queue;
 }
 
 /* Static callbacks */
 es_out_id_t * AbstractStreamOutput::esOutAdd(es_out_t *fakees, const es_format_t *p_fmt)
 {
     AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
-    me->escount++;
-    return me->realdemux->out->pf_add(me->realdemux->out, p_fmt);
+    es_out_id_t *p_es = me->realdemux->out->pf_add(me->realdemux->out, p_fmt);
+    if(p_es)
+    {
+        Demuxed *pair = new (std::nothrow) Demuxed();
+        if(pair)
+        {
+            pair->es_id = p_es;
+            me->queues.push_back(pair);
+        }
+    }
+    return p_es;
 }
 
 int AbstractStreamOutput::esOutSend(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
 {
     AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
-    return me->realdemux->out->pf_send(me->realdemux->out, p_es, p_block);
+    std::list<Demuxed *>::const_iterator it;
+    for(it=me->queues.begin(); it!=me->queues.end();++it)
+    {
+        Demuxed *pair = *it;
+        if(pair->es_id == p_es)
+        {
+            block_ChainLastAppend(&pair->pp_queue_last, p_block);
+            break;
+        }
+    }
+    return VLC_SUCCESS;
 }
 
 void AbstractStreamOutput::esOutDel(es_out_t *fakees, es_out_id_t *p_es)
 {
     AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
-    me->escount--;
+    std::list<Demuxed *>::iterator it;
+    for(it=me->queues.begin(); it!=me->queues.end();++it)
+    {
+        if((*it)->es_id == p_es)
+        {
+            delete *it;
+            me->queues.erase(it);
+            break;
+        }
+    }
     me->realdemux->out->pf_del(me->realdemux->out, p_es);
 }
 
