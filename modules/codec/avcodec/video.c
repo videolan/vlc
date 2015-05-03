@@ -82,11 +82,18 @@ struct decoder_sys_t
 };
 
 #ifdef HAVE_AVCODEC_MT
-#   define wait_mt(s) vlc_sem_wait( &s->sem_mt )
-#   define post_mt(s) vlc_sem_post( &s->sem_mt )
+static inline void wait_mt(decoder_sys_t *sys)
+{
+    vlc_sem_wait(&sys->sem_mt);
+}
+
+static inline void post_mt(decoder_sys_t *sys)
+{
+    vlc_sem_post(&sys->sem_mt);
+}
 #else
-#   define wait_mt(s)
-#   define post_mt(s)
+# define wait_mt(s) ((void)s)
+# define post_mt(s) ((void)s)
 #endif
 
 /*****************************************************************************
