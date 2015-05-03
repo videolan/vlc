@@ -1511,6 +1511,23 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->p_sout_input = NULL;
     p_owner->p_packetizer = NULL;
     p_owner->b_packetizer = b_packetizer;
+
+    p_owner->b_fmt_description = false;
+    p_owner->p_description = NULL;
+
+    p_owner->b_paused = false;
+    p_owner->pause.i_date = VLC_TS_INVALID;
+    p_owner->pause.i_ignore = 0;
+
+    p_owner->b_waiting = false;
+    p_owner->b_first = true;
+    p_owner->b_has_data = false;
+
+    p_owner->b_flushing = false;
+    p_owner->b_draining = false;
+    p_owner->b_drained = false;
+    p_owner->b_idle = false;
+
     es_format_Init( &p_owner->fmt, UNKNOWN_ES, 0 );
 
     /* decoder fifo */
@@ -1521,6 +1538,11 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
         vlc_object_release( p_dec );
         return NULL;
     }
+
+    vlc_mutex_init( &p_owner->lock );
+    vlc_cond_init( &p_owner->wait_request );
+    vlc_cond_init( &p_owner->wait_acknowledge );
+    vlc_cond_init( &p_owner->wait_fifo );
 
     /* Set buffers allocation callbacks for the decoders */
     p_dec->pf_aout_format_update = aout_update_format;
@@ -1582,28 +1604,6 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
             }
         }
     }
-
-    /* */
-    vlc_mutex_init( &p_owner->lock );
-    vlc_cond_init( &p_owner->wait_request );
-    vlc_cond_init( &p_owner->wait_acknowledge );
-    vlc_cond_init( &p_owner->wait_fifo );
-
-    p_owner->b_fmt_description = false;
-    p_owner->p_description = NULL;
-
-    p_owner->b_paused = false;
-    p_owner->pause.i_date = VLC_TS_INVALID;
-    p_owner->pause.i_ignore = 0;
-
-    p_owner->b_waiting = false;
-    p_owner->b_first = true;
-    p_owner->b_has_data = false;
-
-    p_owner->b_flushing = false;
-    p_owner->b_draining = false;
-    p_owner->b_drained = false;
-    p_owner->b_idle = false;
 
     /* */
     p_owner->cc.b_supported = false;
