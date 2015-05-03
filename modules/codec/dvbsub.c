@@ -1644,7 +1644,7 @@ static subpicture_t *render( decoder_t *p_dec )
             fmt.i_x_offset = fmt.i_y_offset = 0;
             p_spu_region = subpicture_region_New( &fmt );
 
-            p_spu_region->psz_text = strdup( p_object_def->psz_text );
+            p_spu_region->p_text = text_segment_New( p_object_def->psz_text );
             p_spu_region->i_x = i_base_x + p_regiondef->i_x + p_object_def->i_x;
             p_spu_region->i_y = i_base_y + p_regiondef->i_y + p_object_def->i_y;
             p_spu_region->i_align = p_sys->i_spu_position;
@@ -2303,14 +2303,14 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         {
             int i_size, i;
 
-            if( !p_region->psz_text ) continue;
+            if( !p_region->p_text ) continue;
 
-            i_size = __MIN( strlen( p_region->psz_text ), 256 );
+            i_size = __MIN( strlen( p_region->p_text->psz_text ), 256 );
 
             bs_write( s, 8, i_size ); /* number of characters in string */
             for( i = 0; i < i_size; i++ )
             {
-                bs_write( s, 16, p_region->psz_text[i] );
+                bs_write( s, 16, p_region->p_text->psz_text[i] );
             }
 
             /* Update segment length */

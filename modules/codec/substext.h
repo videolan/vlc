@@ -206,7 +206,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     if (!r)
         return;
 
-    r->psz_text = sys->text ? strdup(sys->text) : NULL;
+    r->p_text = sys->text ? text_segment_New( sys->text ): NULL;
     if ( sys->p_htmlsegments )
         r->psz_html = SegmentsToHtml( sys->p_htmlsegments,
                                       (float) fmt_dst->i_height / fmt_src->i_height );

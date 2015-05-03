@@ -97,7 +97,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
             return;
         }
 
-        r->psz_text = p_region->psz_text ? strdup(p_region->psz_text) : NULL;
+        if( p_region->psz_text )
+            r->p_text = text_segment_New( p_region->psz_text );
         r->psz_html = p_region->psz_html ? strdup(p_region->psz_html) : NULL;
         r->i_align  = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
 

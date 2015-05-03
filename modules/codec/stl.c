@@ -143,9 +143,9 @@ static subpicture_t *Decode(decoder_t *dec, block_t **block)
     video_format_Clean(&fmt);
 
     if (sub->p_region) {
-        sub->p_region->psz_text = ParseText(payload,
+        sub->p_region->p_text = text_segment_New( ParseText(payload,
                                             payload_size,
-                                            cct_nums[dec->p_sys->cct - CCT_BEGIN].str);
+                                            cct_nums[dec->p_sys->cct - CCT_BEGIN].str) );
         sub->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
     }
 

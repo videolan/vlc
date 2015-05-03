@@ -94,13 +94,14 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
     p_region = p_spu->p_region;
     if( ( p_region == NULL )
      || ( p_region->fmt.i_chroma != VLC_CODEC_TEXT )
-     || ( p_region->psz_text == NULL ) )
+     || ( p_region->p_text == NULL )
+     || ( p_region->p_text->psz_text == NULL) )
         return NULL;
 
     /* This should already be UTF-8 encoded, so not much effort... */
-    len = strlen( p_region->psz_text );
+    len = strlen( p_region->p_text->psz_text );
     p_block = block_Alloc( len );
-    memcpy( p_block->p_buffer, p_region->psz_text, len );
+    memcpy( p_block->p_buffer, p_region->p_text->psz_text, len );
 
     p_block->i_pts = p_block->i_dts = p_spu->i_start;
     if( !p_spu->b_ephemer && ( p_spu->i_stop > p_spu->i_start ) )

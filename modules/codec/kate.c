@@ -702,7 +702,7 @@ static void SetupText( decoder_t *p_dec, subpicture_t *p_spu, const kate_event *
     switch( ev->text_markup_type )
     {
         case kate_markup_none:
-            p_spu->p_region->psz_text = strdup( ev->text ); /* no leak, this actually gets killed by the core */
+            p_spu->p_region->p_text = text_segment_New( ev->text ); /* no leak, this actually gets killed by the core */
             break;
         case kate_markup_simple:
             if( p_sys->b_formatted )
@@ -722,7 +722,7 @@ static void SetupText( decoder_t *p_dec, subpicture_t *p_spu, const kate_event *
                 char *copy = strdup( ev->text );
                 size_t len0 = strlen( copy ) + 1;
                 kate_text_remove_markup( ev->text_encoding, copy, &len0 );
-                p_spu->p_region->psz_text = copy;
+                p_spu->p_region->p_text = text_segment_New( copy );
             }
             break;
     }

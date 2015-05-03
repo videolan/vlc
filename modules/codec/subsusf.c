@@ -843,7 +843,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
 
                     if( p_text_region )
                     {
-                        p_text_region->psz_text = CreatePlainText( p_text_region->psz_html );
+                        p_text_region->p_text = text_segment_New( CreatePlainText( p_text_region->psz_html ) );
 
                         if( ! var_CreateGetBool( p_dec, "subsdec-formatted" ) )
                         {
@@ -941,7 +941,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                     SetupPositions( p_image_region, psz_subtitle );
 
                     p_image_region->p_next   = NULL;
-                    p_image_region->psz_text = NULL;
+                    p_image_region->p_text   = NULL;
                     p_image_region->psz_html = NULL;
 
                 }

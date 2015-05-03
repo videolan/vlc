@@ -707,7 +707,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
     p_spu->p_region->i_x = p_sys->i_align ? 20 : 0;
     p_spu->p_region->i_y = 10;
-    p_spu->p_region->psz_text = strdup(psz_text);
+    p_spu->p_region->p_text = text_segment_New(psz_text);
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
