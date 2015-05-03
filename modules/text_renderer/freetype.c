@@ -815,7 +815,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
             for( int i = 0; i < p_line->i_character_count; i++ )
             {
                 const line_character_t *ch = &p_line->p_character[i];
-                FT_BitmapGlyph p_glyph = g == 0 ? ch->p_shadow : g == 1 ? ch->p_outline : ch->p_glyph;
+                const FT_BitmapGlyph p_glyph = g == 0 ? ch->p_shadow : g == 1 ? ch->p_outline : ch->p_glyph;
                 if( !p_glyph )
                     continue;
 
@@ -1087,9 +1087,11 @@ static int RenderCommon( filter_t *p_filter, subpicture_region_t *p_region_out,
                                  FillRGBAPicture,
                                  BlendRGBAPixel );
             else if( *p_chroma == VLC_CODEC_ARGB )
-                rv = RenderAXYZ( p_filter, p_region_out, p_lines, &bbox,
-                                 i_margin, *p_chroma, RGBFromRGB,
-                                 FillARGBPicture, BlendARGBPixel );
+                rv = RenderAXYZ( p_filter, p_region_out, p_lines, &bbox, i_margin,
+                                 VLC_CODEC_ARGB,
+                                 RGBFromRGB,
+                                 FillARGBPicture,
+                                 BlendARGBPixel );
 
             if( !rv )
                 break;
