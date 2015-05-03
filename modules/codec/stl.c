@@ -147,7 +147,6 @@ static subpicture_t *Decode(decoder_t *dec, block_t **block)
                                             payload_size,
                                             cct_nums[dec->p_sys->cct - CCT_BEGIN].str);
         sub->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
-        sub->p_region->psz_html = NULL;
     }
 
     free(payload);
