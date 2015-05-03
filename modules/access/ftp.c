@@ -537,7 +537,8 @@ static int Connect( vlc_object_t *p_access, access_sys_t *p_sys )
             goto error;
     }
 
-    if( (p_sys->features.b_unicode ? IsUTF8 : IsASCII)(p_sys->url.psz_path) == NULL )
+    if( p_sys->url.psz_path &&
+        (p_sys->features.b_unicode ? IsUTF8 : IsASCII)(p_sys->url.psz_path) == NULL )
     {
         msg_Err( p_access, "unsupported path: \"%s\"", p_sys->url.psz_path );
         goto error;
