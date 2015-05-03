@@ -38,7 +38,7 @@ static void Close( demux_t* p_demux );
 vlc_module_begin ()
     set_shortname( N_("TTML") )
     set_description( N_("TTML demuxer") )
-    set_capability( "demux", 10 )
+    set_capability( "demux", 2 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_callbacks( Open, Close )
@@ -334,4 +334,6 @@ static void Close( demux_t* p_demux )
     }
     free( p_sys->subtitle );
     free( p_sys );
+
+    stream_Seek( p_demux->s, 0 );
 }
