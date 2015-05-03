@@ -243,6 +243,7 @@ static void lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
 static int OpenVideoCodec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    int ret;
 
     if( p_sys->p_context->extradata_size <= 0 )
     {
@@ -267,7 +268,9 @@ static int OpenVideoCodec( decoder_t *p_dec )
         p_sys->p_context->coded_height = p_dec->fmt_in.video.i_height;
     p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
 
-    int ret = ffmpeg_OpenCodec( p_dec );
+    post_mt( p_sys );
+    ret = ffmpeg_OpenCodec( p_dec );
+    wait_mt( p_sys );
     if( ret < 0 )
         return ret;
 
@@ -292,7 +295,7 @@ static int OpenVideoCodec( decoder_t *p_dec )
             break;
     }
 #endif
-    return VLC_SUCCESS;
+    return 0;
 }
 
 /*****************************************************************************
