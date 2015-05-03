@@ -842,11 +842,13 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
     {
         char *psz_uri;
 
-        if( asprintf( &psz_uri, "%s://%s:%d/%s/%s",
+        if( asprintf( &psz_uri, "%s://%s:%d%s%s/%s",
                       ( p_sys->tlsmode == NONE ) ? "ftp" :
                       ( ( p_sys->tlsmode == IMPLICIT ) ? "ftps" : "ftpes" ),
                       p_sys->url.psz_host, p_sys->url.i_port,
-                      p_sys->url.psz_path, psz_line ) != -1 )
+                      p_sys->url.psz_path ? "/" : "",
+                      p_sys->url.psz_path ? p_sys->url.psz_path : "",
+                      psz_line ) != -1 )
         {
             input_item_t *p_item;
 
