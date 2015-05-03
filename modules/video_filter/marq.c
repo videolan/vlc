@@ -310,7 +310,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     p_sys->last_time = date;
 
-    p_spu->p_region->psz_text = strdup( msg );
+    p_spu->p_region->p_text = text_segment_New( msg );
     p_spu->i_start = date;
     p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout * 1000;
     p_spu->b_ephemer = true;

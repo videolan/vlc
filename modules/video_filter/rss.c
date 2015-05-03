@@ -479,7 +479,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         free( a2 );
     }
 
-    p_spu->p_region->psz_text = strdup(p_sys->psz_marquee);
+    p_spu->p_region->p_text = text_segment_New(p_sys->psz_marquee);
     if( p_sys->p_style->i_font_size > 0 )
         p_spu->p_region->fmt.i_visible_height = p_sys->p_style->i_font_size;
     p_spu->i_start = date;

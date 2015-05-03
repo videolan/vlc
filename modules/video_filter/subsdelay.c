@@ -1053,7 +1053,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, mtime_t i_ts )
     if( p_entry->b_check_empty && p_subpic->p_region )
     {
         if( SubsdelayIsTextEmpty( p_subpic->p_region->psz_html ) ||
-            SubsdelayIsTextEmpty( p_subpic->p_region->psz_text ) )
+            SubsdelayIsTextEmpty( p_subpic->p_region->p_text->psz_text ) )
         {
             /* remove empty subtitle */
 
@@ -1117,7 +1117,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, mtime_t i_ts )
 static bool SubpicIsEmpty( subpicture_t* p_subpic )
 {
     return ( p_subpic->p_region && ( SubsdelayIsTextEmpty( p_subpic->p_region->psz_html ) ||
-                                     SubsdelayIsTextEmpty( p_subpic->p_region->psz_text ) ) );
+                                     SubsdelayIsTextEmpty( p_subpic->p_region->p_text->psz_text ) ) );
 }
 
 /*****************************************************************************
@@ -1180,12 +1180,12 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
 
     if( i_mode == SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT )
     {
-        if( p_entry->p_subpic && p_entry->p_subpic->p_region && ( p_entry->p_subpic->p_region->psz_text
+        if( p_entry->p_subpic && p_entry->p_subpic->p_region && ( p_entry->p_subpic->p_region->p_text->psz_text
                 || p_entry->p_subpic->p_region->psz_html ) )
         {
-            if( p_entry->p_subpic->p_region->psz_text )
+            if( p_entry->p_subpic->p_region->p_text->psz_text )
             {
-                i_rank = SubsdelayGetTextRank( p_entry->p_subpic->p_region->psz_text );
+                i_rank = SubsdelayGetTextRank( p_entry->p_subpic->p_region->p_text->psz_text );
             }
             else
             {
