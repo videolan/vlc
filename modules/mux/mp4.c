@@ -449,6 +449,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     switch(p_input->p_fmt->i_codec)
     {
     case VLC_CODEC_A52:
+    case VLC_CODEC_DTS:
     case VLC_CODEC_EAC3:
     case VLC_CODEC_MP4A:
     case VLC_CODEC_MP4V:
@@ -895,6 +896,9 @@ static bo_t *GetESDS(mp4_stream_t *p_stream)
     case VLC_CODEC_MPGA:
         i_object_type_indication =
             p_stream->fmt.audio.i_rate < 32000 ? 0x69 : 0x6b;
+        break;
+    case VLC_CODEC_DTS:
+        i_object_type_indication = 0xa9;
         break;
     default:
         i_object_type_indication = 0x00;
@@ -1578,6 +1582,8 @@ static bo_t *GetSounBox(sout_mux_t *p_mux, mp4_stream_t *p_stream)
         memcpy(fcc, "ac-3", 4);
     } else if (codec == VLC_CODEC_EAC3) {
         memcpy(fcc, "ec-3", 4);
+    } else if (codec == VLC_CODEC_DTS) {
+        memcpy(fcc, "DTS ", 4);
     } else
         vlc_fourcc_to_char(codec, fcc);
 
