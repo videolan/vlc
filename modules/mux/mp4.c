@@ -874,6 +874,12 @@ static bo_t *GetESDS(mp4_stream_t *p_stream)
     case VLC_CODEC_MP4V:
         i_object_type_indication = 0x20;
         break;
+    case VLC_CODEC_MPGV:
+        if(p_stream->fmt.i_original_fourcc == VLC_CODEC_MP1V)
+        {
+            i_object_type_indication = 0x6b;
+            break;
+        }
     case VLC_CODEC_MP2V:
         /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
         i_object_type_indication = 0x65;
