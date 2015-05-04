@@ -692,32 +692,6 @@ static int BrowseDirectory( access_t *p_access, input_item_node_t *p_node )
         return i_ret;
 }
 
-static int BrowserControl( access_t *p_access, int i_query, va_list args )
-{
-    VLC_UNUSED( p_access );
-
-    switch( i_query )
-    {
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-            *va_arg( args, bool* ) = false;
-            break;
-
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
-            *va_arg( args, bool* ) = true;
-            break;
-
-        case ACCESS_GET_PTS_DELAY:
-            *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY * 1000;
-            break;
-
-        default:
-            return VLC_EGENERIC;
-     }
-     return VLC_SUCCESS;
-}
-
 static int BrowserInit( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -726,7 +700,6 @@ static int BrowserInit( access_t *p_access )
         p_access->pf_readdir = BrowseShare;
     else
         p_access->pf_readdir = BrowseDirectory;
-    p_access->pf_control = BrowserControl;
 
     return VLC_SUCCESS;
 }

@@ -272,7 +272,6 @@ static int Open( vlc_object_t* p_this )
         p_sys->file = libssh2_sftp_opendir( p_sys->sftp_session, url.psz_path );
 
         p_access->pf_readdir = DirRead;
-        p_access->pf_control = DirControl;
 
         if( p_sys->file )
         {
@@ -504,32 +503,5 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
     }
 
     free( psz_file );
-    return VLC_SUCCESS;
-}
-
-
-static int DirControl( access_t *p_access, int i_query, va_list args )
-{
-    VLC_UNUSED( p_access );
-
-    switch( i_query )
-    {
-    case ACCESS_CAN_SEEK:
-    case ACCESS_CAN_FASTSEEK:
-        *va_arg( args, bool* ) = false;
-        break;
-
-    case ACCESS_CAN_PAUSE:
-    case ACCESS_CAN_CONTROL_PACE:
-        *va_arg( args, bool* ) = true;
-        break;
-
-    case ACCESS_GET_PTS_DELAY:
-        *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY * 1000;
-        break;
-
-    default:
-        return VLC_EGENERIC;
-    }
     return VLC_SUCCESS;
 }

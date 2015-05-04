@@ -25,6 +25,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include "access.h"
 #include <libvlc.h>
 #include <vlc_url.h>
@@ -88,6 +90,9 @@ access_t *access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_access->p_module = module_need( p_access, "access", psz_access, true );
     if( p_access->p_module == NULL )
         goto error;
+
+    /* if access has pf_readdir, pf_control is not mandatory */
+    assert( p_access->pf_control || p_access->pf_readdir );
 
     return p_access;
 

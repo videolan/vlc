@@ -806,36 +806,6 @@ static int ReadDirectory( access_t *p_access, input_item_node_t* p_node )
     return VLC_SUCCESS;
 }
 
-static int Control( access_t *, int i_query, va_list args )
-{
-    switch ( i_query )
-    {
-    case ACCESS_CAN_SEEK:
-    case ACCESS_CAN_FASTSEEK:
-    case ACCESS_CAN_PAUSE:
-    case ACCESS_CAN_CONTROL_PACE:
-        *va_arg( args, bool* ) = false;
-        break;
-
-    case ACCESS_GET_SIZE:
-    {
-        *va_arg( args, uint64_t * ) = 0;
-        break;
-    }
-    case ACCESS_GET_PTS_DELAY:
-        *va_arg( args, int64_t * ) = 0;
-        break;
-
-    case ACCESS_SET_PAUSE_STATE:
-        /* Nothing to do */
-        break;
-
-    default:
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
 static int Open( vlc_object_t *p_this )
 {
     access_t* p_access = (access_t*)p_this;
@@ -852,7 +822,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_access->pf_readdir = ReadDirectory;
-    ACCESS_SET_CALLBACKS( NULL, NULL, Control, NULL );
 
     return VLC_SUCCESS;
 }
