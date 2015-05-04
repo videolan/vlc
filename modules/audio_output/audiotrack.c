@@ -110,7 +110,7 @@ struct aout_sys_t {
 
 /* Get AudioTrack native sample rate: if activated, most of  the resampling
  * will be done by VLC */
-//#define AUDIOTRACK_NATIVE_SAMPLERATE
+#define AUDIOTRACK_NATIVE_SAMPLERATE
 
 #define AUDIO_CHAN_TEXT N_("Audio output channels")
 #define AUDIO_CHAN_LONGTEXT N_("Channels available for audio output. " \
