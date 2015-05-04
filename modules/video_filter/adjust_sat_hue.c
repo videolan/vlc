@@ -26,23 +26,28 @@
 #   include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_filter.h>
 #include "filter_picture.h"
 #include "adjust_sat_hue.h"
 
-#define PLANAR_WRITE_UV_CLIP() \
-    i_u = *p_in++ ; i_v = *p_in_v++ ; \
-    *p_out++ = clip_uint8_vlc( (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
-                           * i_sat) >> 8) + 128); \
-    *p_out_v++ = clip_uint8_vlc( (( ((i_v * i_cos - i_u * i_sin - i_y) >> 8) \
-                           * i_sat) >> 8) + 128)
+#define I_RANGE( i_bpp ) (1 << i_bpp)
+#define I_MAX( i_bpp ) (I_RANGE( i_bpp ) - 1)
+#define I_MID( i_bpp ) (I_RANGE( i_bpp ) >> 1)
 
-#define PLANAR_WRITE_UV() \
+#define PLANAR_WRITE_UV_CLIP( i_bpp ) \
     i_u = *p_in++ ; i_v = *p_in_v++ ; \
-    *p_out++ = (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
-                       * i_sat) >> 8) + 128; \
-    *p_out_v++ = (( ((i_v * i_cos - i_u * i_sin - i_y) >> 8) \
-                       * i_sat) >> 8) + 128
+    *p_out++ = VLC_CLIP( (( ((i_u * i_cos + i_v * i_sin - i_x) >> i_bpp) \
+                     * i_sat) >> i_bpp) + I_MID( i_bpp ), 0, I_MAX( i_bpp ) ); \
+    *p_out_v++ = VLC_CLIP( (( ((i_v * i_cos - i_u * i_sin - i_y) >> i_bpp) \
+                       * i_sat) >> i_bpp) + I_MID( i_bpp ), 0, I_MAX( i_bpp ) )
+
+#define PLANAR_WRITE_UV( i_bpp ) \
+    i_u = *p_in++ ; i_v = *p_in_v++ ; \
+    *p_out++ = (( ((i_u * i_cos + i_v * i_sin - i_x) >> i_bpp) \
+                       * i_sat) >> i_bpp) + I_MID( i_bpp ); \
+    *p_out_v++ = (( ((i_v * i_cos - i_u * i_sin - i_y) >> i_bpp) \
+                       * i_sat) >> i_bpp) + I_MID( i_bpp )
 
 #define PACKED_WRITE_UV_CLIP() \
     i_u = *p_in; p_in += 4; i_v = *p_in_v; p_in_v += 4; \
@@ -91,14 +96,14 @@ int planar_sat_hue_clip_C( picture_t * p_pic, picture_t * p_outpic, int i_sin, i
         for( ; p_in < p_line_end ; )
         {
             /* Do 8 pixels at a time */
-            ADJUST_8_TIMES( PLANAR_WRITE_UV_CLIP() );
+            ADJUST_8_TIMES( PLANAR_WRITE_UV_CLIP( 8 ) );
         }
 
         p_line_end += 8;
 
         for( ; p_in < p_line_end ; )
         {
-            PLANAR_WRITE_UV_CLIP();
+            PLANAR_WRITE_UV_CLIP( 8 );
         }
 
         p_in += p_pic->p[U_PLANE].i_pitch
@@ -137,14 +142,14 @@ int planar_sat_hue_C( picture_t * p_pic, picture_t * p_outpic, int i_sin, int i_
         for( ; p_in < p_line_end ; )
         {
             /* Do 8 pixels at a time */
-            ADJUST_8_TIMES( PLANAR_WRITE_UV() );
+            ADJUST_8_TIMES( PLANAR_WRITE_UV( 8 ) );
         }
 
         p_line_end += 8;
 
         for( ; p_in < p_line_end ; )
         {
-            PLANAR_WRITE_UV();
+            PLANAR_WRITE_UV( 8 );
         }
 
         p_in += p_pic->p[U_PLANE].i_pitch
@@ -155,6 +160,124 @@ int planar_sat_hue_C( picture_t * p_pic, picture_t * p_outpic, int i_sin, int i_
                 - p_outpic->p[U_PLANE].i_visible_pitch;
         p_out_v += p_outpic->p[V_PLANE].i_pitch
                     - p_outpic->p[V_PLANE].i_visible_pitch;
+    }
+
+    return VLC_SUCCESS;
+}
+
+int planar_sat_hue_clip_C_16( picture_t * p_pic, picture_t * p_outpic, int i_sin, int i_cos,
+                         int i_sat, int i_x, int i_y )
+{
+    uint16_t *p_in, *p_in_v, *p_in_end, *p_line_end;
+    uint16_t *p_out, *p_out_v;
+
+    int i_bpp;
+    switch( p_pic->format.i_chroma )
+    {
+        CASE_PLANAR_YUV10
+            i_bpp = 10;
+            break;
+        CASE_PLANAR_YUV9
+            i_bpp = 9;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    p_in = (uint16_t *) p_pic->p[U_PLANE].p_pixels;
+    p_in_v = (uint16_t *) p_pic->p[V_PLANE].p_pixels;
+    p_in_end = p_in + p_pic->p[U_PLANE].i_visible_lines
+        * (p_pic->p[U_PLANE].i_pitch >> 1) - 8;
+
+    p_out = (uint16_t *) p_outpic->p[U_PLANE].p_pixels;
+    p_out_v = (uint16_t *) p_outpic->p[V_PLANE].p_pixels;
+
+    uint16_t i_u, i_v;
+
+    for( ; p_in < p_in_end ; )
+    {
+        p_line_end = p_in + (p_pic->p[U_PLANE].i_visible_pitch >> 1) - 8;
+
+        for( ; p_in < p_line_end ; )
+        {
+            /* Do 8 pixels at a time */
+            ADJUST_8_TIMES( PLANAR_WRITE_UV_CLIP( i_bpp ) );
+        }
+
+        p_line_end += 8;
+
+        for( ; p_in < p_line_end ; )
+        {
+            PLANAR_WRITE_UV_CLIP( i_bpp );
+        }
+
+        p_in += (p_pic->p[U_PLANE].i_pitch >> 1)
+                - (p_pic->p[U_PLANE].i_visible_pitch >> 1);
+        p_in_v += (p_pic->p[V_PLANE].i_pitch >> 1)
+                - (p_pic->p[V_PLANE].i_visible_pitch >> 1);
+        p_out += (p_outpic->p[U_PLANE].i_pitch >> 1)
+                - (p_outpic->p[U_PLANE].i_visible_pitch >> 1);
+        p_out_v += (p_outpic->p[V_PLANE].i_pitch >> 1)
+                    - (p_outpic->p[V_PLANE].i_visible_pitch >> 1);
+    }
+
+    return VLC_SUCCESS;
+}
+
+int planar_sat_hue_C_16( picture_t * p_pic, picture_t * p_outpic, int i_sin, int i_cos,
+                            int i_sat, int i_x, int i_y )
+{
+    uint16_t *p_in, *p_in_v, *p_in_end, *p_line_end;
+    uint16_t *p_out, *p_out_v;
+
+    int i_bpp;
+    switch( p_pic->format.i_chroma )
+    {
+        CASE_PLANAR_YUV10
+            i_bpp = 10;
+            break;
+        CASE_PLANAR_YUV9
+            i_bpp = 9;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    p_in = (uint16_t *) p_pic->p[U_PLANE].p_pixels;
+    p_in_v = (uint16_t *) p_pic->p[V_PLANE].p_pixels;
+    p_in_end = (uint16_t *) p_in + p_pic->p[U_PLANE].i_visible_lines
+        * (p_pic->p[U_PLANE].i_pitch >> 1) - 8;
+
+    p_out = (uint16_t *) p_outpic->p[U_PLANE].p_pixels;
+    p_out_v = (uint16_t *) p_outpic->p[V_PLANE].p_pixels;
+
+    uint16_t i_u, i_v;
+
+    for( ; p_in < p_in_end ; )
+    {
+        p_line_end = p_in + (p_pic->p[U_PLANE].i_visible_pitch >> 1) - 8;
+
+        for( ; p_in < p_line_end ; )
+        {
+            /* Do 8 pixels at a time */
+            ADJUST_8_TIMES( PLANAR_WRITE_UV( i_bpp ) );
+        }
+
+        p_line_end += 8;
+
+        for( ; p_in < p_line_end ; )
+        {
+            PLANAR_WRITE_UV( i_bpp );
+        }
+
+        p_in += (p_pic->p[U_PLANE].i_pitch >> 1)
+              - (p_pic->p[U_PLANE].i_visible_pitch >> 1);
+        p_in_v += (p_pic->p[V_PLANE].i_pitch >> 1)
+                - (p_pic->p[V_PLANE].i_visible_pitch >> 1);
+        p_out += (p_outpic->p[U_PLANE].i_pitch >> 1)
+               - (p_outpic->p[U_PLANE].i_visible_pitch >> 1);
+        p_out_v += (p_outpic->p[V_PLANE].i_pitch >> 1)
+                 - (p_outpic->p[V_PLANE].i_visible_pitch >> 1);
     }
 
     return VLC_SUCCESS;
