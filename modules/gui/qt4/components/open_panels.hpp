@@ -68,13 +68,22 @@ public:
     OpenPanel( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
     {
         p_intf = _p_intf;
+        context = CONTEXT_INTERACTIVE;
     }
     virtual ~OpenPanel() {};
     virtual void clear() = 0;
     virtual void onFocus() {}
     virtual void onAccept() {}
+
+    static const int CONTEXT_INTERACTIVE = 0;
+    static const int CONTEXT_BATCH = 1;
+
+    virtual void updateContext(int c) { context = c; }
+
 protected:
     intf_thread_t *p_intf;
+    int context;
+
 public slots:
     virtual void updateMRL() = 0;
 signals:
@@ -166,6 +175,7 @@ public:
 #if defined( _WIN32 ) || defined( __OS2__ )
     virtual void onFocus();
 #endif
+    virtual void updateContext(int) Q_DECL_OVERRIDE;
 private:
     Ui::OpenDisk ui;
     char *psz_dvddiscpath, *psz_vcddiscpath, *psz_cddadiscpath;

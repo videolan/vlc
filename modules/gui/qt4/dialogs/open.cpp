@@ -297,6 +297,9 @@ void OpenDialog::signalCurrent( int i_tab )
         assert( panel );
         panel->onFocus();
         panel->updateMRL();
+        panel->updateContext( i_action_flag == OPEN_AND_PLAY ?
+                              OpenPanel::CONTEXT_INTERACTIVE :
+                              OpenPanel::CONTEXT_BATCH );
     }
 }
 

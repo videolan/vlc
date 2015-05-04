@@ -361,6 +361,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.chapterSpin, valueChanged( int ), this, updateMRL());
     CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
     CONNECT( ui.subtitlesSpin, valueChanged( int ), this, updateMRL());
+    CONNECT( ui.dvdsimple, toggled( bool ), this, updateMRL());
 
     /* Run once the updateButtons function in order to fill correctly the comboBoxes */
     updateButtons();
@@ -445,6 +446,12 @@ void DiscOpenPanel::onFocus()
     DosClose( hcd2 );
 }
 #endif
+
+void DiscOpenPanel::updateContext(int c)
+{
+    OpenPanel::updateContext(c);
+    ui.dvdsimple->setChecked( context == OpenPanel::CONTEXT_BATCH );
+}
 
 DiscOpenPanel::~DiscOpenPanel()
 {
