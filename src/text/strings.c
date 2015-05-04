@@ -604,6 +604,9 @@ char *str_format_meta(input_thread_t *input, const char *s)
             case 'n':
                 write_meta(stream, item, vlc_meta_TrackNumber);
                 break;
+            case 'o':
+                write_meta(stream, item, vlc_meta_TrackTotal);
+                break;
             case 'p':
                 if (item == NULL)
                     break;
