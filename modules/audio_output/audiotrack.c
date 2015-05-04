@@ -912,10 +912,10 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
         else
             p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
     }
-    i_nb_channels = aout_FormatNbChannels( &p_sys->fmt );
 
     do
     {
+        i_nb_channels = aout_FormatNbChannels( &p_sys->fmt );
         i_bytes_per_frame = i_nb_channels *
                             aout_BitsPerSample( p_sys->fmt.i_format ) / 8;
         i_rate = p_sys->fmt.i_format == VLC_CODEC_SPDIFB ?
@@ -953,7 +953,6 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                 msg_Warn( p_aout, "5.1 or 7.1 configuration failed, "
                                   "fallback to Stereo" );
                 p_sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
-                i_nb_channels = aout_FormatNbChannels( &p_sys->fmt );
             }
             else
                 break;
