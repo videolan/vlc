@@ -2199,7 +2199,7 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
             bo_add_32be(mdhd, i_timestamp);   // creation time
             bo_add_32be(mdhd, i_timestamp);   // modification time
             bo_add_32be(mdhd, p_stream->i_timescale); // timescale
-            bo_add_32be(mdhd, i_stream_duration);  // duration
+            bo_add_32be(mdhd, i_stream_duration * p_stream->i_timescale / i_movie_timescale);  // duration
         } else {
             mdhd = box_full_new("mdhd", 1, 0);
             if(!mdhd)
@@ -2211,7 +2211,7 @@ static bo_t *GetMoovBox(sout_mux_t *p_mux)
             bo_add_64be(mdhd, i_timestamp);   // creation time
             bo_add_64be(mdhd, i_timestamp);   // modification time
             bo_add_32be(mdhd, p_stream->i_timescale); // timescale
-            bo_add_64be(mdhd, i_stream_duration);  // duration
+            bo_add_64be(mdhd, i_stream_duration * p_stream->i_timescale / i_movie_timescale);  // duration
         }
 
         if (p_stream->fmt.psz_language) {
