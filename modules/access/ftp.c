@@ -854,9 +854,15 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
 
             p_item = input_item_NewWithTypeExt( psz_uri, psz_line, 0, NULL,
                                                 0, -1, ITEM_TYPE_UNKNOWN, 1 );
+            free( psz_uri );
+            if( !p_item )
+            {
+                free( psz_line );
+                return VLC_ENOMEM;
+            }
             input_item_CopyOptions( p_current_node->p_item, p_item );
             input_item_node_AppendItem( p_current_node, p_item );
-            free( psz_uri );
+            input_item_Release( p_item );
         }
         free( psz_line );
     }
