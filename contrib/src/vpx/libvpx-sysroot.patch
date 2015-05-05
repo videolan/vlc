@@ -8,24 +8,19 @@ correct sysroot.
 
 See also https://code.google.com/p/webm/issues/detail?id=809
 
-diff --git a/build/make/configure.sh b/build/make/configure.sh
-index d4124c7..c420d25 100755
---- a/build/make/configure.sh
-+++ b/build/make/configure.sh
-@@ -939,8 +939,11 @@ EOF
-                           awk '{ print $1 }' | tail -1`
-             fi
+--- libvpx-1.4.0/build/make/configure.sh.orig	2015-05-05 15:57:26.568321902 +0200
++++ libvpx-1.4.0/build/make/configure.sh	2015-05-05 15:59:04.860202562 +0200
+@@ -941,8 +941,11 @@
+                 awk '{ print $1 }' | tail -1`
+           fi
  
--            add_cflags "--sysroot=${alt_libc}"
--            add_ldflags "--sysroot=${alt_libc}"
-+            # this may happen if toolchain binaries are outside the ndk dir
-+            if [ "${alt_libc}" ]; then
-+                add_cflags "--sysroot=${alt_libc}"
-+                add_ldflags "--sysroot=${alt_libc}"
-+            fi
+-          add_cflags "--sysroot=${alt_libc}"
+-          add_ldflags "--sysroot=${alt_libc}"
++          # this may happen if toolchain binaries are outside the ndk dir
++          if [ "${alt_libc}" ]; then
++              add_cflags "--sysroot=${alt_libc}"
++              add_ldflags "--sysroot=${alt_libc}"
++          fi
  
-             # linker flag that routes around a CPU bug in some
-             # Cortex-A8 implementations (NDK Dev Guide)
--- 
-1.8.3.2
-
+           # linker flag that routes around a CPU bug in some
+           # Cortex-A8 implementations (NDK Dev Guide)

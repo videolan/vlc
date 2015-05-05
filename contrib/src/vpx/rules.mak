@@ -1,7 +1,7 @@
 # libvpx
 
-VPX_VERSION := v1.3.0
-VPX_URL := http://webm.googlecode.com/files/libvpx-$(VPX_VERSION).tar.bz2
+VPX_VERSION := 1.4.0
+VPX_URL := http://storage.googleapis.com/downloads.webmproject.org/releases/webm/libvpx-$(VPX_VERSION).tar.bz2
 
 $(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
 	$(call download,$(VPX_URL))

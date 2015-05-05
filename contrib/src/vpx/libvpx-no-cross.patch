@@ -1,10 +1,10 @@
---- libvpx-v1.0.0/build/make/configure.sh.orig	2012-01-29 04:59:36.976441000 -0500
-+++ libvpx-v1.0.0/build/make/configure.sh	2012-01-29 04:59:46.684441001 -0500
-@@ -680,7 +680,6 @@
+--- libvpx-1.4.0/build/make/configure.sh.orig	2015-05-05 16:00:58.682380921 +0200
++++ libvpx-1.4.0/build/make/configure.sh	2015-05-05 16:02:13.537147158 +0200
+@@ -831,7 +831,6 @@
  
-         case ${tgt_cc} in
+       case ${tgt_cc} in
          gcc)
--            CROSS=${CROSS:-arm-none-linux-gnueabi-}
-             link_with_cc=gcc
-             setup_gnu_toolchain
-             arch_int=${tgt_isa##armv}
+-          CROSS=${CROSS:-arm-none-linux-gnueabi-}
+           link_with_cc=gcc
+           setup_gnu_toolchain
+           arch_int=${tgt_isa##armv}
