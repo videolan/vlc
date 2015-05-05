@@ -244,7 +244,8 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         return 0;
     }
 
-    off_t i_end = p_container->i_pos + p_container->i_size;
+    uint64_t i_end = p_container->i_pos + p_container->i_size;
+    int i_tell;
 
     do
     {
@@ -263,7 +264,8 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         /* chain this box with the father and the other at same level */
         MP4_BoxAddChild( p_container, p_box );
 
-        if( p_container->i_size && stream_Tell( p_stream ) == i_end )
+        i_tell = stream_Tell( p_stream );
+        if( p_container->i_size && i_tell >= 0 && (unsigned)i_tell == i_end )
             break;
 
         if( p_box->i_type == i_last_child )
@@ -274,7 +276,8 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
 
     } while( MP4_NextBox( p_stream, p_box ) == 1 );
 
-    if ( p_container->i_size && stream_Tell( p_stream ) != i_end )
+    i_tell = stream_Tell( p_stream );
+    if ( p_container->i_size && i_tell >= 0 && (unsigned)i_tell != i_end )
         MP4_Seek( p_stream, i_end );
 
     return 1;
@@ -4003,7 +4006,7 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
 
     if( !(MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box ) )
     {
-        off_t i_end = p_box->i_pos + p_box->i_size;
+        uint64_t i_end = p_box->i_pos + p_box->i_size;
         MP4_BoxFree( p_stream, p_box );
         MP4_Seek( p_stream, i_end ); /* Skip the failed box */
         return NULL;

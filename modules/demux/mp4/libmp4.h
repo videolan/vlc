@@ -1489,7 +1489,7 @@ typedef struct MP4_Box_s MP4_Box_t;
 /* the most basic structure */
 struct MP4_Box_s
 {
-    off_t        i_pos;      /* absolute position */
+    uint64_t     i_pos;      /* absolute position */
 
     uint32_t     i_type;
     uint32_t     i_shortsize;
