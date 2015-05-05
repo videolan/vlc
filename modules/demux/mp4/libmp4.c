@@ -290,11 +290,6 @@ int MP4_ReadBoxContainerChildren( stream_t *p_stream, MP4_Box_t *p_container,
                                                 i_last_child, false );
 }
 
-static int MP4_ReadBoxContainerRaw( stream_t *p_stream, MP4_Box_t *p_container )
-{
-    return MP4_ReadBoxContainerChildren( p_stream, p_container, 0 );
-}
-
 static void MP4_BoxOffsetUp( MP4_Box_t *p_box, uint64_t i_offset )
 {
     while(p_box)
@@ -315,7 +310,7 @@ static int MP4_ReadBoxContainerRawInBox( stream_t *p_stream, MP4_Box_t *p_contai
     if( !p_substream )
         return 0;
     MP4_Box_t *p_last = p_container->p_last;
-    MP4_ReadBoxContainerRaw( p_substream, p_container );
+    MP4_ReadBoxContainerChildren( p_substream, p_container, 0 );
     stream_Delete( p_substream );
     /* do pos fixup */
     if( p_container )
@@ -340,7 +335,7 @@ static int MP4_ReadBoxContainer( stream_t *p_stream, MP4_Box_t *p_container )
     if ( MP4_Seek( p_stream, p_container->i_pos +
                       mp4_box_headersize( p_container ) ) )
         return 0;
-    return MP4_ReadBoxContainerRaw( p_stream, p_container );
+    return MP4_ReadBoxContainerChildren( p_stream, p_container, 0 );
 }
 
 static void MP4_FreeBox_Common( MP4_Box_t *p_box )
@@ -2195,7 +2190,7 @@ static int MP4_ReadBox_sample_mp4s( stream_t *p_stream, MP4_Box_t *p_box )
     if( i_read < 8 )
         MP4_READBOX_EXIT( 0 );
 
-    MP4_ReadBoxContainerRaw( p_stream, p_box );
+    MP4_ReadBoxContainerChildren( p_stream, p_box, 0 );
 
     if ( MP4_Seek( p_stream, p_box->i_pos + p_box->i_size ) )
         MP4_READBOX_EXIT( 0 );
@@ -3275,7 +3270,7 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
         return 0;
 
     /* then it behaves like a container */
-    return MP4_ReadBoxContainerRaw( p_stream, p_box );
+    return MP4_ReadBoxContainerChildren( p_stream, p_box, 0 );
 }
 
 static int MP4_ReadBox_iods( stream_t *p_stream, MP4_Box_t *p_box )
@@ -4191,7 +4186,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
     if( stream_Tell( s ) + 8 < stream_Size( s ) )
     {
         /* Get the rest of the file */
-        i_result = MP4_ReadBoxContainerRaw( p_stream, p_root );
+        i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, 0 );
 
         if( !i_result )
             goto error;
