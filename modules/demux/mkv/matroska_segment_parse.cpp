@@ -1405,7 +1405,7 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                                                    p_tk->p_extra_data,
                                                    p_tk->i_extra_data,
                                                    true );
-        if( MP4_ReadBoxCommon( p_mp4_stream, p_box ) &&
+        if( MP4_PeekBoxHeader( p_mp4_stream, p_box ) &&
             MP4_ReadBox_sample_vide( p_mp4_stream, p_box ) )
         {
             p_tk->fmt.i_codec = p_box->i_type;

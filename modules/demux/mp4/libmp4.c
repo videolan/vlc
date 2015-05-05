@@ -110,14 +110,14 @@ static void MP4_BoxAddChild( MP4_Box_t *p_parent, MP4_Box_t *p_childbox )
 #define stream_Seek(a,b) __NO__
 
 /*****************************************************************************
- * MP4_ReadBoxCommon : Load only common parameters for all boxes
+ * MP4_PeekBoxHeader : Load only common parameters for all boxes
  *****************************************************************************
  * p_box need to be an already allocated MP4_Box_t, and all data
  *  will only be peek not read
  *
  * RETURN : 0 if it fail, 1 otherwise
  *****************************************************************************/
-int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box )
+int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
 {
     int      i_read;
     const uint8_t  *p_peek;
@@ -186,7 +186,7 @@ static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( !p_box )
     {
-        if ( !MP4_ReadBoxCommon( p_stream, &box ) )
+        if ( !MP4_PeekBoxHeader( p_stream, &box ) )
             return 0;
         p_box = &box;
     }
@@ -3975,7 +3975,7 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
     if( p_box == NULL )
         return NULL;
 
-    if( !MP4_ReadBoxCommon( p_stream, p_box ) )
+    if( !MP4_PeekBoxHeader( p_stream, p_box ) )
     {
         msg_Warn( p_stream, "cannot read one box" );
         free( p_box );
@@ -4105,7 +4105,7 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
         return NULL;
 
     /* We might get a ftyp box or a SmooBox */
-    MP4_ReadBoxCommon( s, p_tmp_box );
+    MP4_PeekBoxHeader( s, p_tmp_box );
 
     if( (p_tmp_box->i_type == ATOM_uuid && !CmpUUID( &p_tmp_box->i_uuid, &SmooBoxUUID )) )
     {
