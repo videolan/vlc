@@ -1351,12 +1351,6 @@ typedef struct
 
 typedef struct
 {
-    uint32_t i_hvcC;
-    uint8_t *p_hvcC;
-} MP4_Box_data_hvcC_t;
-
-typedef struct
-{
     enum
     {
         DATA_WKT_RESERVED = 0,
@@ -1470,7 +1464,6 @@ typedef union MP4_Box_data_s
 
     MP4_Box_data_tfrf_t *p_tfrf;
     MP4_Box_data_tfxd_t *p_tfxd;
-    MP4_Box_data_hvcC_t *p_hvcC;
     MP4_Box_data_WMA2_t *p_WMA2; /* flip4mac Little endian audio config */
     MP4_Box_data_strf_t *p_strf; /* flip4mac Little endian video config */
     MP4_Box_data_ASF_t  *p_asf;  /* flip4mac asf streams indicator */

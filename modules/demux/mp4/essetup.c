@@ -334,14 +334,14 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         {
             MP4_Box_t *p_hvcC = MP4_BoxGet( p_sample, "hvcC" );
 
-            if( p_hvcC && BOXDATA(p_hvcC) )
+            if( p_hvcC && p_hvcC->data.p_binary )
             {
-                p_track->fmt.i_extra = BOXDATA(p_hvcC)->i_hvcC;
-                if( p_track->fmt.i_extra > 0 )
+                p_track->fmt.p_extra = malloc( p_hvcC->data.p_binary->i_blob );
+                if( p_track->fmt.p_extra )
                 {
-                    p_track->fmt.p_extra = malloc( BOXDATA(p_hvcC)->i_hvcC );
-                    memcpy( p_track->fmt.p_extra, BOXDATA(p_hvcC)->p_hvcC,
-                            p_track->fmt.i_extra );
+                    p_track->fmt.i_extra = p_hvcC->data.p_binary->i_blob;
+                    memcpy( p_track->fmt.p_extra, p_hvcC->data.p_binary->p_blob,
+                            p_hvcC->data.p_binary->i_blob );
                 }
                 p_track->fmt.i_codec = VLC_CODEC_HEVC;
             }

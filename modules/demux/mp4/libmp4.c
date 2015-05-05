@@ -1464,29 +1464,6 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
 #undef es_descriptor
 }
 
-static void MP4_FreeBox_hvcC(MP4_Box_t *p_box )
-{
-    MP4_Box_data_hvcC_t *p_hvcC =  p_box->data.p_hvcC;
-    if( p_hvcC->i_hvcC > 0 ) FREENULL( p_hvcC->p_hvcC) ;
-}
-
-static int MP4_ReadBox_hvcC( stream_t *p_stream, MP4_Box_t *p_box )
-{
-    MP4_Box_data_hvcC_t *p_hvcC;
-
-    MP4_READBOX_ENTER( MP4_Box_data_hvcC_t, MP4_FreeBox_hvcC );
-    p_hvcC = p_box->data.p_hvcC;
-
-    p_hvcC->i_hvcC = i_read;
-    if( p_hvcC->i_hvcC > 0 )
-    {
-        uint8_t * p = p_hvcC->p_hvcC = malloc( p_hvcC->i_hvcC );
-        if( p )
-            memcpy( p, p_peek, i_read );
-    }
-    MP4_READBOX_EXIT( 1 );
-}
-
 static void MP4_FreeBox_avcC( MP4_Box_t *p_box )
 {
     MP4_Box_data_avcC_t *p_avcC = p_box->data.p_avcC;
@@ -3682,7 +3659,7 @@ static const struct
     { ATOM_cmvd,    MP4_ReadBox_cmvd,         0 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc1 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc3 },
-    { ATOM_hvcC,    MP4_ReadBox_hvcC,         0 },
+    { ATOM_hvcC,    MP4_ReadBox_Binary,       0 },
     { ATOM_dac3,    MP4_ReadBox_dac3,         0 },
     { ATOM_dec3,    MP4_ReadBox_dec3,         0 },
     { ATOM_dvc1,    MP4_ReadBox_dvc1,         0 },
