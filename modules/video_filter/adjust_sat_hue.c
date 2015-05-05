@@ -62,8 +62,6 @@
                        * i_sat) >> 8) + 128; \
     p_out_v += 4
 
-#define ADJUST_2_TIMES(x) x; x
-#define ADJUST_4_TIMES(x) x; x; x; x
 #define ADJUST_8_TIMES(x) x; x; x; x; x; x; x; x
 
 /*****************************************************************************
