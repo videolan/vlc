@@ -21,6 +21,7 @@ ifdef HAVE_IOS
 endif
 
 .gpg-error: libgpg-error
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-nls --disable-shared --disable-languages
 	cd $< && $(MAKE) install
 	touch $@
