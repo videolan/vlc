@@ -1564,7 +1564,7 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
         p_str = NULL; \
     }
 
-#define MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, maxread ) \
+#define MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, maxread, release ) \
     int64_t i_read = p_box->i_size; \
     if( maxread < (uint64_t)i_read ) i_read = maxread;\
     uint8_t *p_peek, *p_buff; \
@@ -1587,10 +1587,11 @@ static inline size_t mp4_box_headersize( MP4_Box_t *p_box )
     { \
         free( p_buff ); \
         return( 0 ); \
-    }
+    }\
+    p_box->pf_free = release;
 
-#define MP4_READBOX_ENTER( MP4_Box_data_TYPE_t ) \
-    MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, p_box->i_size )
+#define MP4_READBOX_ENTER( MP4_Box_data_TYPE_t, release ) \
+    MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_TYPE_t, p_box->i_size, release )
 
 #define MP4_READBOX_EXIT( i_code ) \
     do \
