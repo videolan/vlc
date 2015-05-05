@@ -235,7 +235,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
 
     /* Size of root container is set to 0 when unknown, for exemple
      * with a DASH stream. In that case, we skip the following check */
-    if( p_container->i_size
+    if( (p_container->i_size || p_container->p_father)
             && ( stream_Tell( p_stream ) + ((b_indexed)?16:8) >
         (off_t)(p_container->i_pos + p_container->i_size) )
       )
