@@ -1,0 +1,22 @@
+--- libgpg-error/Makefile.am.orig	2015-05-05 16:59:07.513558034 +0200
++++ libgpg-error/Makefile.am	2015-05-05 16:59:18.150414495 +0200
+@@ -39,7 +39,7 @@
+ doc =
+ endif
+ 
+-SUBDIRS = m4 src $(doc) tests po $(lang_subdirs)
++SUBDIRS = m4 src $(doc) $(lang_subdirs)
+ 
+ 
+ dist-hook: gen-ChangeLog
+--- libgpg-error/src/Makefile.am.orig	2014-10-25 14:42:43.000000000 +0200
++++ libgpg-error/src/Makefile.am	2015-05-05 16:59:40.887486960 +0200
+@@ -31,7 +31,7 @@
+ 
+ localedir = $(datadir)/locale
+ 
+-bin_PROGRAMS = gpg-error
++bin_PROGRAMS = 
+ 
+ if HAVE_W32_SYSTEM
+ noinst_PROGRAMS = gen-w32-lock-obj
