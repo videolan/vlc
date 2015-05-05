@@ -74,6 +74,7 @@ Video ouput:
 Video filter:
  * Hardware deinterlacing on the rPI, using MMAL
  * New video filter to convert between fps rates
+ * Added 9-bit and 10-bit support to image adjust filter
 
 Stream Output:
  * Chromecast output module
