@@ -4091,22 +4091,14 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
     stream_t *p_stream;
     int i_result;
 
-    p_root = malloc( sizeof( MP4_Box_t ) );
+    p_root = calloc( 1, sizeof( MP4_Box_t ) );
     if( p_root == NULL )
         return NULL;
 
-    p_root->i_pos = 0;
     p_root->i_type = ATOM_root;
     p_root->i_shortsize = 1;
     /* could be a DASH stream for exemple, 0 means unknown or infinite size */
-    p_root->i_size = 0;
     CreateUUID( &p_root->i_uuid, p_root->i_type );
-
-    p_root->data.p_payload = NULL;
-    p_root->p_father    = NULL;
-    p_root->p_first     = NULL;
-    p_root->p_last      = NULL;
-    p_root->p_next      = NULL;
 
     p_stream = s;
 
