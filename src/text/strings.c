@@ -548,6 +548,8 @@ char *str_format_meta(input_thread_t *input, const char *s)
     bool b_is_format = false;
     bool b_empty_if_na = false;
 
+    assert(s != NULL);
+
     while ((c = *s) != '\0')
     {
         s++;
