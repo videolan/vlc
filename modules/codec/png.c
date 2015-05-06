@@ -372,6 +372,11 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
         return NULL;
     }
 
+    /* Disable filtering to speed-up encoding */
+    png_set_filter( p_png, 0, PNG_NO_FILTERS );
+    /* 1 == best speed */
+    png_set_compression_level( p_png, 1 );
+
     /* save buffer start */
     uint8_t *p_start = p_block->p_buffer;
     size_t i_start = p_block->i_buffer;
