@@ -111,8 +111,10 @@ static int Open( vlc_object_t* p_this )
 {
     access_t*   p_access = (access_t*)p_this;
     access_sys_t* p_sys;
+    const char* psz_path;
     char* psz_username = NULL;
     char* psz_password = NULL;
+    char* psz_remote_home = NULL;
     int i_port;
     int i_ret;
     vlc_url_t url;
@@ -129,8 +131,7 @@ static int Open( vlc_object_t* p_this )
     p_sys->i_socket = -1;
 
     /* Parse the URL */
-    const char* path = p_access->psz_location;
-    vlc_UrlParse( &url, path, 0 );
+    vlc_UrlParse( &url, p_access->psz_location, 0 );
 
     /* Check for some parameters */
     if( EMPTY_STR( url.psz_host ) )
@@ -250,18 +251,42 @@ static int Open( vlc_object_t* p_this )
         goto error;
     }
 
+    /* No path, default to user Home */
+    if( !url.psz_path )
+    {
+        const size_t i_size = 1024;
+        int i_ret;
+
+        psz_remote_home = malloc( i_size );
+        if( !psz_remote_home )
+            goto error;
+
+        i_ret = libssh2_sftp_symlink_ex( p_sys->sftp_session, ".", 1,
+                                         psz_remote_home, i_size - 1,
+                                         LIBSSH2_SFTP_REALPATH );
+        if( i_ret <= 0 )
+        {
+            msg_Err( p_access, "Impossible to get the Home directory" );
+            goto error;
+        }
+        psz_remote_home[i_ret] = '\0';
+        psz_path = psz_remote_home;
+    }
+    else
+        psz_path = url.psz_path;
+
     /* Get some information */
     LIBSSH2_SFTP_ATTRIBUTES attributes;
-    if( libssh2_sftp_stat( p_sys->sftp_session, url.psz_path, &attributes ) )
+    if( libssh2_sftp_stat( p_sys->sftp_session, psz_path, &attributes ) )
     {
-        msg_Err( p_access, "Impossible to get information about the remote path %s", url.psz_path );
+        msg_Err( p_access, "Impossible to get information about the remote path %s", psz_path );
         goto error;
     }
 
     if( !LIBSSH2_SFTP_S_ISDIR( attributes.permissions ))
     {
         /* Open the given file */
-        p_sys->file = libssh2_sftp_open( p_sys->sftp_session, url.psz_path, LIBSSH2_FXF_READ, 0 );
+        p_sys->file = libssh2_sftp_open( p_sys->sftp_session, psz_path, LIBSSH2_FXF_READ, 0 );
         p_sys->filesize = attributes.filesize;
 
         ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );
@@ -269,7 +294,7 @@ static int Open( vlc_object_t* p_this )
     else
     {
         /* Open the given directory */
-        p_sys->file = libssh2_sftp_opendir( p_sys->sftp_session, url.psz_path );
+        p_sys->file = libssh2_sftp_opendir( p_sys->sftp_session, psz_path );
 
         p_access->pf_readdir = DirRead;
 
@@ -284,7 +309,7 @@ static int Open( vlc_object_t* p_this )
 
     if( !p_sys->file )
     {
-        msg_Err( p_access, "Unable to open the remote path %s", url.psz_path );
+        msg_Err( p_access, "Unable to open the remote path %s", psz_path );
         goto error;
     }
 
@@ -292,6 +317,7 @@ static int Open( vlc_object_t* p_this )
 
     free( psz_password );
     free( psz_username );
+    free( psz_remote_home );
     vlc_UrlClean( &url );
     return VLC_SUCCESS;
 
@@ -302,6 +328,7 @@ error:
         libssh2_session_free( p_sys->ssh_session );
     free( psz_password );
     free( psz_username );
+    free( psz_remote_home );
     vlc_UrlClean( &url );
     net_Close( p_sys->i_socket );
     free( p_sys );
