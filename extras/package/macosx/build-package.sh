@@ -250,11 +250,10 @@ done
 # Build the lib folder
 vlc_install "lib/${prefix}" "libvlc.*.dylib" "${target_lib}" "library"
 vlc_install "src/${prefix}" "libvlccore.*.dylib" "${target_lib}" "library"
-pushd `pwd` > /dev/null
-cd ${target_lib}
-ln -sf libvlc.5.dylib libvlc.dylib
-ln -sf libvlccore.7.dylib libvlccore.dylib
-popd > /dev/null
+
+# copy symlinks
+cp -RP "lib/${prefix}/libvlc.dylib" "${target_lib}"
+cp -RP "src/${prefix}/libvlccore.dylib" "${target_lib}"
 
 ##########################
 # Build the share folder
