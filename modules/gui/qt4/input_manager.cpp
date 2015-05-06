@@ -512,10 +512,17 @@ void InputManager::UpdateName()
 
     /* Try to get the nowplaying */
     char *format = var_InheritString( p_intf, "input-title-format" );
-    char *formated = str_format_meta( p_input, format );
-    free( format );
-    name = qfu(formated);
-    free( formated );
+    char *formatted = NULL;
+    if (format != NULL)
+    {
+        formatted = str_format_meta( p_input, format );
+        free( format );
+        if( formatted != NULL )
+        {
+            name = qfu(formatted);
+            free( formatted );
+        }
+    }
 
     /* If we have Nothing */
     if( name.simplified().isEmpty() )
