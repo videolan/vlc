@@ -249,7 +249,7 @@ done
 ##########################
 # Build the lib folder
 vlc_install "lib/${prefix}" "libvlc.5.dylib" "${target_lib}" "library"
-vlc_install "src/${prefix}" "libvlccore.7.dylib" "${target_lib}" "library"
+vlc_install "src/${prefix}" "libvlccore.8.dylib" "${target_lib}" "library"
 pushd `pwd` > /dev/null
 cd ${target_lib}
 ln -sf libvlc.5.dylib libvlc.dylib
