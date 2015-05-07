@@ -257,51 +257,32 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
 }
 size_t IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformation *info)
 {
-    size_t list_count = 0;
+    SegmentBase *base;
 
-    if(!segmentBaseNode)
+    if(!segmentBaseNode || !(base = new (std::nothrow) SegmentBase(info)))
         return 0;
 
-    else if(segmentBaseNode->hasAttribute("indexRange"))
+    if(segmentBaseNode->hasAttribute("indexRange"))
     {
-        SegmentList *list = new SegmentList();
-        Segment *seg;
-
         size_t start = 0, end = 0;
         if (std::sscanf(segmentBaseNode->getAttributeValue("indexRange").c_str(), "%zu-%zu", &start, &end) == 2)
         {
-            IndexSegment *index = new DashIndexSegment(info);
-            index->setByteRange(start, end);
-            list->indexSegment.Set(index);
-            /* index must be before data, so data starts at index end */
-            seg = new Segment(info);
-            seg->setByteRange(end + 1, 0);
-        }
-        else
-        {
-            seg = new Segment(info);
-        }
-
-        list_count++;
-        list->addSegment(seg);
-        info->setSegmentList(list);
-
-        Node *initSeg = DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization");
-        if(initSeg)
-        {
-            SegmentBase *base = new SegmentBase();
-            parseInitSegment(initSeg, base, info);
-            info->setSegmentBase(base);
+            IndexSegment *index = new (std::nothrow) DashIndexSegment(info);
+            if(index)
+            {
+                index->setByteRange(start, end);
+                base->indexSegment.Set(index);
+                /* index must be before data, so data starts at index end */
+                base->setByteRange(end + 1, 0);
+            }
         }
     }
-    else
-    {
-        SegmentBase *base = new SegmentBase();
-        parseInitSegment(DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization"), base, info);
-        info->setSegmentBase(base);
-    }
 
-    return list_count;
+    parseInitSegment(DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization"), base, info);
+
+    info->setSegmentBase(base);
+
+    return 1;
 }
 
 size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation *info)

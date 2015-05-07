@@ -27,16 +27,19 @@
 
 #include "Segment.h"
 #include "SegmentInfoCommon.h"
+#include "../tools/Properties.hpp"
 
 namespace adaptative
 {
     namespace playlist
     {
-        class SegmentBase : public Initializable<Segment>,
+        /* SegmentBase can contain only one segment */
+        class SegmentBase : public Segment,
+                            public Initializable<Segment>,
                             public Indexable<Segment>
         {
             public:
-                SegmentBase             ();
+                SegmentBase             (ICanonicalUrl *);
                 virtual ~SegmentBase    ();
         };
     }

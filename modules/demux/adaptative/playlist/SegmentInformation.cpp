@@ -101,6 +101,10 @@ vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
                     retSegments.insert( retSegments.end(), list.begin(), list.end() );
                 }
             }
+            else if( segmentBase )
+            {
+                retSegments.push_back( segmentBase );
+            }
         }
         break;
 
