@@ -171,7 +171,7 @@ void vlc_fifo_QueueUnlocked(block_fifo_t *fifo, block_t *block)
         block = block->p_next;
     }
 
-    vlc_cond_signal(&fifo->wait);
+    vlc_fifo_Signal(fifo);
 }
 
 /**
