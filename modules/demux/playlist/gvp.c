@@ -73,6 +73,7 @@ int Import_GVP( vlc_object_t *p_this )
     int i_peek, i, b_found = false;
     const uint8_t *p_peek;
 
+    CHECK_FILE();
     i_peek = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
 
     for( i = 0; i < i_peek - (int)sizeof("gvp_version:"); i++ )

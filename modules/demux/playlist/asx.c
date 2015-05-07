@@ -145,6 +145,7 @@ int Import_ASX( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
+    CHECK_FILE();
     if( demux_IsPathExtension( p_demux, ".asx" ) ||
         demux_IsPathExtension( p_demux, ".wax" ) ||
         demux_IsPathExtension( p_demux, ".wvx" ) ||

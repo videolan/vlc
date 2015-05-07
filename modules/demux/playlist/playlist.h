@@ -82,24 +82,34 @@ extern input_item_t * GetCurrentItem(demux_t *p_demux);
 
 bool CheckContentType( stream_t * p_stream, const char * psz_ctype );
 
+#define CHECK_FILE() do { \
+    bool b_is_dir = false; \
+    stream_Control( ((demux_t *)p_this)->s, STREAM_IS_DIRECTORY, &b_is_dir ); \
+    if( b_is_dir ) \
+        return VLC_EGENERIC; \
+} while(0)
+
 #define STANDARD_DEMUX_INIT_MSG( msg ) do { \
     DEMUX_INIT_COMMON();                    \
     msg_Dbg( p_demux, "%s", msg ); } while(0)
 
 #define DEMUX_BY_EXTENSION_MSG( ext, msg ) \
     demux_t *p_demux = (demux_t *)p_this; \
+    CHECK_FILE(); \
     if( !demux_IsPathExtension( p_demux, ext ) ) \
         return VLC_EGENERIC; \
     STANDARD_DEMUX_INIT_MSG( msg );
 
 #define DEMUX_BY_EXTENSION_OR_FORCED_MSG( ext, module, msg ) \
     demux_t *p_demux = (demux_t *)p_this; \
+    CHECK_FILE(); \
     if( !demux_IsPathExtension( p_demux, ext ) && !demux_IsForced( p_demux, module ) ) \
         return VLC_EGENERIC; \
     STANDARD_DEMUX_INIT_MSG( msg );
 
 #define DEMUX_BY_EXTENSION_OR_MIMETYPE( ext, mime, msg ) \
     demux_t *p_demux = (demux_t *)p_this; \
+    CHECK_FILE(); \
     char* demux_mimetype = stream_ContentType( p_demux->s ); \
     if(!( demux_IsPathExtension( p_demux, ext ) || (demux_mimetype && !strcasecmp( mime, demux_mimetype )) )) { \
         free( demux_mimetype ); \

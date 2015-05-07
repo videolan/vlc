@@ -140,6 +140,7 @@ int Import_SGIMB( vlc_object_t * p_this )
     const uint8_t *p_peek;
     int i_size;
 
+    CHECK_FILE();
     /* Lets check the content to see if this is a sgi mediabase file */
     i_size = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
     i_size -= sizeof("sgiNameServerHost=") - 1;

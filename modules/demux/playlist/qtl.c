@@ -82,6 +82,7 @@ int Import_QTL( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
+    CHECK_FILE();
     if( !demux_IsPathExtension( p_demux, ".qtl" ) )
         return VLC_EGENERIC;
 

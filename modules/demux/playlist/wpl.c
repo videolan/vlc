@@ -172,6 +172,8 @@ void Close_WPL( vlc_object_t* p_this )
 int Import_WPL( vlc_object_t* p_this )
 {
     demux_t* p_demux = (demux_t*)p_this;
+
+    CHECK_FILE();
     if( !demux_IsPathExtension( p_demux, ".wpl" ) &&
         !demux_IsPathExtension( p_demux, ".zpl" ) )
         return VLC_EGENERIC;

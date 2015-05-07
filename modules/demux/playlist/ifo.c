@@ -47,6 +47,7 @@ int Import_IFO( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
+    CHECK_FILE();
     if( !p_demux->psz_file )
         return VLC_EGENERIC;
 

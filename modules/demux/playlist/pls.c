@@ -51,6 +51,7 @@ int Import_PLS( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
+    CHECK_FILE();
     CHECK_PEEK( p_peek, 10 );
 
     if( POKE( p_peek, "[playlist]", 10 ) || POKE( p_peek, "[Reference]", 10 ) ||

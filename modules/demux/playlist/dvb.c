@@ -42,10 +42,11 @@ static int Demux(demux_t *);
 static input_item_t *ParseLine(char *line);
 
 /** Detect dvb-utils zap channels.conf format */
-int Import_DVB(vlc_object_t *obj)
+int Import_DVB(vlc_object_t *p_this)
 {
-    demux_t *demux = (demux_t *)obj;
+    demux_t *demux = (demux_t *)p_this;
 
+    CHECK_FILE();
     if (!demux_IsPathExtension(demux, ".conf" ) && !demux->b_force )
         return VLC_EGENERIC;
 
