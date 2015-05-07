@@ -149,19 +149,23 @@ static int Demux( demux_t *p_demux )
     input_item_node_t *p_node;
     input_item_t *p_item;
     char *psz_ignored_exts;
+    bool b_show_hiddenfiles;
 
     p_input = GetCurrentItem( p_demux );
     p_node = input_item_node_Create( p_input );
     input_item_Release(p_input);
 
+    b_show_hiddenfiles = var_InheritBool( p_demux, "show-hiddenfiles" );
     psz_ignored_exts = var_InheritString( p_demux, "ignore-filetypes" );
 
     while( !i_ret && ( p_item = stream_ReadDir( p_demux->s ) ) )
     {
         int i_name_len = p_item->psz_name ? strlen( p_item->psz_name ) : 0;
 
-        /* skip "." and ".." items */
-        if( ( i_name_len == 1 && p_item->psz_name[0] == '.' ) ||
+        /* skip "." and ".." and hidden files if option is activated */
+        if( ( !b_show_hiddenfiles && i_name_len > 0 &&
+              p_item->psz_name[0] == '.' ) ||
+            ( i_name_len == 1 && p_item->psz_name[0] == '.' ) ||
             ( i_name_len == 2 && p_item->psz_name[0] == '.' &&
               p_item->psz_name[1] == '.' ) ||
             has_ext( psz_ignored_exts, p_item->psz_name ))

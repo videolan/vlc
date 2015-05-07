@@ -68,6 +68,10 @@ static const char *const psz_sort_list_text[] = {
         "This is useful if you add directories that contain playlist files " \
         "for instance. Use a comma-separated list of extensions." )
 
+#define SHOW_HIDDENFILES_TEXT N_("Show hidden files")
+#define SHOW_HIDDENFILES_LONGTEXT N_( \
+        "Ignore files starting with '.'" )
+
 vlc_module_begin ()
     add_shortcut( "playlist" )
     set_category( CAT_INPUT )
@@ -166,6 +170,8 @@ vlc_module_begin ()
                     IGNORE_TEXT, IGNORE_LONGTEXT, false )
         add_string( "directory-sort", "collate", SORT_TEXT, SORT_LONGTEXT, false )
           change_string_list( psz_sort_list, psz_sort_list_text )
+        add_bool( "show-hiddenfiles", false,
+                   SHOW_HIDDENFILES_TEXT, SHOW_HIDDENFILES_LONGTEXT, false )
 vlc_module_end ()
 
 int Control(demux_t *demux, int query, va_list args)
