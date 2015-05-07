@@ -23,4 +23,5 @@ struct demux_sys_t
 {
         dash::DASHManager   *p_dashManager;
         dash::mpd::MPD      *p_mpd;
+        mtime_t              i_nzpcr;
 };

@@ -112,16 +112,25 @@ bool PlaylistManager::start(demux_t *demux)
     return true;
 }
 
-size_t PlaylistManager::read()
+Streams::Stream::status PlaylistManager::demux(mtime_t nzdeadline)
 {
-    size_t i_ret = 0;
+    Streams::Stream::status i_return = Streams::Stream::status_demuxed;
+
     for(int type=0; type<Streams::count; type++)
     {
         if(!streams[type])
             continue;
-        i_ret += streams[type]->read(conManager);
+
+        Streams::Stream::status i_ret =
+                streams[type]->demux(conManager, nzdeadline);
+
+        if(i_ret < Streams::Stream::status_eof)
+            return i_ret;
+        else if (i_ret == Streams::Stream::status_buffering)
+            i_return = Streams::Stream::status_buffering;
     }
-    return i_ret;
+
+    return i_return;
 }
 
 mtime_t PlaylistManager::getPCR() const

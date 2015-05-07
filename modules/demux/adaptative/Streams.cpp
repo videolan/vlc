@@ -151,6 +151,22 @@ bool Stream::seekAble() const
     return (output && output->seekAble());
 }
 
+Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_deadline)
+{
+    if(nz_deadline + VLC_TS_0 > output->getPCR()) /* not already demuxed */
+    {
+        /* need to read, demuxer still buffering, ... */
+        if(read(connManager) <= 0)
+            return Stream::status_eof;
+
+        if(nz_deadline + VLC_TS_0 > output->getPCR()) /* need to read more */
+            return Stream::status_buffering;
+    }
+
+    output->sendToDecoder(nz_deadline);
+    return Stream::status_demuxed;
+}
+
 size_t Stream::read(HTTPConnectionManager *connManager)
 {
     Chunk *chunk = getChunk();
@@ -216,7 +232,6 @@ size_t Stream::read(HTTPConnectionManager *connManager)
     readsize = block->i_buffer;
 
     output->pushBlock(block);
-    output->sendToDecoder(INT64_MAX - VLC_TS_0);
 
     return readsize;
 }
@@ -239,7 +254,7 @@ AbstractStreamOutput::AbstractStreamOutput(demux_t *demux)
     realdemux = demux;
     demuxstream = NULL;
     pcr = VLC_TS_0;
-    group = -1;
+    group = 0;
     seekable = true;
 
     fakeesout = new es_out_t;
@@ -387,6 +402,7 @@ void AbstractStreamOutput::esOutDel(es_out_t *fakees, es_out_id_t *p_es)
     {
         if((*it)->es_id == p_es)
         {
+            me->sendToDecoder(INT64_MAX - VLC_TS_0);
             delete *it;
             me->queues.erase(it);
             break;

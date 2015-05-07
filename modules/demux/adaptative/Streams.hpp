@@ -66,13 +66,15 @@ namespace adaptative
                 int getGroup() const;
                 int esCount() const;
                 bool seekAble() const;
-                size_t read(HTTPConnectionManager *);
+                typedef enum {status_eof, status_buffering, status_demuxed} status;
+                status demux(HTTPConnectionManager *, mtime_t);
                 bool setPosition(mtime_t, bool);
                 mtime_t getPosition() const;
 
             private:
                 Chunk *getChunk();
                 void init(const Type, const Format);
+                size_t read(HTTPConnectionManager *);
                 Type type;
                 Format format;
                 AbstractStreamOutput *output;

@@ -48,8 +48,9 @@ namespace adaptative
                              AbstractAdaptationLogic::LogicType type, stream_t *stream);
             virtual ~PlaylistManager    ();
 
-            bool    start         (demux_t *);
-            size_t  read();
+            bool    start(demux_t *);
+
+            Streams::Stream::status demux(mtime_t);
             mtime_t getDuration() const;
             mtime_t getPCR() const;
             int     getGroup() const;

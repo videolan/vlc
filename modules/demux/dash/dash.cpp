@@ -157,6 +157,8 @@ static int Open(vlc_object_t *p_obj)
     p_demux->pf_demux      = Demux;
     p_demux->pf_control    = Control;
 
+    p_sys->i_nzpcr = 0;
+
     msg_Dbg(p_obj,"opening mpd file (%s)", p_demux->s->psz_path);
 
     return VLC_SUCCESS;
@@ -176,28 +178,30 @@ static void Close(vlc_object_t *p_obj)
 /*****************************************************************************
  * Callbacks:
  *****************************************************************************/
+#define DEMUX_INCREMENT (CLOCK_FREQ / 20)
 static int Demux(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    if ( p_sys->p_dashManager->read() > 0 )
+
+    Streams::Stream::status status =
+            p_sys->p_dashManager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT);
+    switch(status)
     {
-        if ( p_sys->p_dashManager->esCount() )
-        {
-            mtime_t pcr = p_sys->p_dashManager->getPCR();
-            int group = p_sys->p_dashManager->getGroup();
-            if(group > 0)
-                es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, pcr);
-            else
-                es_out_Control(p_demux->out, ES_OUT_SET_PCR, pcr);
-        }
-
-        if( !p_sys->p_dashManager->updatePlaylist() )
-            return VLC_DEMUXER_EOF;
-
-        return VLC_DEMUXER_SUCCESS;
-    }
-    else
+    case Streams::Stream::status_eof:
         return VLC_DEMUXER_EOF;
+    case Streams::Stream::status_buffering:
+        break;
+    case Streams::Stream::status_demuxed:
+        p_sys->i_nzpcr += DEMUX_INCREMENT;
+        int group = p_sys->p_dashManager->getGroup();
+        es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, VLC_TS_0 + p_sys->i_nzpcr);
+        break;
+    }
+
+    if( !p_sys->p_dashManager->updatePlaylist() )
+        return VLC_DEMUXER_EOF;
+
+    return VLC_DEMUXER_SUCCESS;
 }
 
 static int  Control         (demux_t *p_demux, int i_query, va_list args)
@@ -219,7 +223,7 @@ static int  Control         (demux_t *p_demux, int i_query, va_list args)
             break;
 
         case DEMUX_GET_TIME:
-            *(va_arg (args, int64_t *)) = p_sys->p_dashManager->getPCR();
+            *(va_arg (args, int64_t *)) = p_sys->i_nzpcr;
             break;
 
         case DEMUX_GET_LENGTH:
@@ -230,22 +234,30 @@ static int  Control         (demux_t *p_demux, int i_query, va_list args)
             if(!p_sys->p_dashManager->getDuration())
                 return VLC_EGENERIC;
 
-            *(va_arg (args, double *)) = (double) p_sys->p_dashManager->getPCR()
+            *(va_arg (args, double *)) = (double) p_sys->i_nzpcr
                                          / p_sys->p_dashManager->getDuration();
             break;
 
         case DEMUX_SET_POSITION:
+        {
+            int64_t time = p_sys->p_dashManager->getDuration() * va_arg(args, double);
             if(p_sys->p_mpd->isLive() ||
                !p_sys->p_dashManager->getDuration() ||
-               !p_sys->p_dashManager->setPosition( p_sys->p_dashManager->getDuration() * va_arg(args, double)))
+               !p_sys->p_dashManager->setPosition(time))
                 return VLC_EGENERIC;
+            p_sys->i_nzpcr = time;
             break;
+        }
 
         case DEMUX_SET_TIME:
+        {
+            int64_t time = va_arg(args, int64_t);
             if(p_sys->p_mpd->isLive() ||
-               !p_sys->p_dashManager->setPosition(va_arg(args, int64_t)))
+               !p_sys->p_dashManager->setPosition(time))
                 return VLC_EGENERIC;
+            p_sys->i_nzpcr = time;
             break;
+        }
 
         case DEMUX_GET_PTS_DELAY:
             *va_arg (args, int64_t *) = INT64_C(1000) *
