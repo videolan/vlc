@@ -1,7 +1,7 @@
 /*****************************************************************************
  * smb.c: SMB input module
  *****************************************************************************
- * Copyright (C) 2001-2009 VLC authors and VideoLAN
+ * Copyright (C) 2001-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -34,7 +34,7 @@
 #   include <sys/stat.h>
 #   include <io.h>
 #   define smbc_open(a,b,c) vlc_open(a,b,c)
-#   define smbc_fstat(a,b) _fstati64(a,b)
+#   define smbc_stat(a,b) _stati64(a,b)
 #   define smbc_read read
 #   define smbc_lseek _lseeki64
 #   define smbc_close close
@@ -46,6 +46,7 @@
 #include <vlc_fs.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
+#include <vlc_input_item.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -87,6 +88,9 @@ vlc_module_end ()
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
+#ifndef _WIN32
+static input_item_t* DirRead( access_t * );
+#endif
 
 struct access_sys_t
 {
@@ -112,6 +116,32 @@ static void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
 }
 #endif
 
+/* Build an SMB URI
+ * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */
+static int smb_get_uri( access_t *p_access, char **ppsz_uri,
+                        const char *psz_domain,
+                        const char *psz_user, const char *psz_pwd,
+                        const char *psz_location, const char *psz_name )
+{
+#define PSZ_NAME_OR_NULL psz_name ? "/" : "", psz_name ? psz_name : ""
+#ifdef _WIN32
+    if( psz_user )
+        Win32AddConnection( p_access, psz_location, psz_user, psz_pwd, psz_domain);
+    return asprintf( ppsz_uri, "//%s%s%s", psz_location, PSZ_NAME_OR_NULL );
+#else
+    (void) p_access;
+    if( psz_user )
+        return asprintf( ppsz_uri, "smb://%s%s%s%s%s@%s%s%s",
+                         psz_domain ? psz_domain : "", psz_domain ? ";" : "",
+                         psz_user, psz_pwd ? ":" : "",
+                         psz_pwd ? psz_pwd : "", psz_location,
+                         PSZ_NAME_OR_NULL );
+    else
+        return asprintf( ppsz_uri, "smb://%s%s%s", psz_location,
+                         PSZ_NAME_OR_NULL );
+#endif
+}
+
 /****************************************************************************
  * Open: connect to smb server and ask for file
  ****************************************************************************/
@@ -120,20 +150,19 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     struct stat  filestat;
-    char         *psz_location, *psz_uri;
+    char         *psz_location, *psz_uri = NULL;
     char         *psz_user = NULL, *psz_pwd = NULL, *psz_domain = NULL;
     int          i_ret;
     int          i_smb;
+    uint64_t     i_size;
 
     /* Parse input URI
-     * [[[domain;]user[:password@]]server[/share[/path[/file]]]] */
+     * [[[domain;]user[:password@]]server[/share[/path[/file]]]]
+     * No need to search a user/pwd if there is no '/', indeed, user/pwd are
+     * set for a FILE_SHARE. */
+
     psz_location = strchr( p_access->psz_location, '/' );
-    if( !psz_location )
-    {
-        msg_Err( p_access, "invalid SMB URI: smb://%s", psz_location );
-        return VLC_EGENERIC;
-    }
-    else
+    if( psz_location )
     {
         char *psz_tmp = strdup( p_access->psz_location );
         char *psz_parser;
@@ -168,31 +197,18 @@ static int Open( vlc_object_t *p_this )
         }
 
         free( psz_tmp );
-    }
 
-    /* Build an SMB URI
-     * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */
+        if( !psz_user ) psz_user = var_InheritString( p_access, "smb-user" );
+        if( psz_user && !*psz_user ) { free( psz_user ); psz_user = NULL; }
+        if( !psz_pwd ) psz_pwd = var_InheritString( p_access, "smb-pwd" );
+        if( psz_pwd && !*psz_pwd ) { free( psz_pwd ); psz_pwd = NULL; }
+        if( !psz_domain ) psz_domain = var_InheritString( p_access, "smb-domain" );
+        if( psz_domain && !*psz_domain ) { free( psz_domain ); psz_domain = NULL; }
+    } else
+        psz_location = p_access->psz_location;
 
-    if( !psz_user ) psz_user = var_InheritString( p_access, "smb-user" );
-    if( psz_user && !*psz_user ) { free( psz_user ); psz_user = NULL; }
-    if( !psz_pwd ) psz_pwd = var_InheritString( p_access, "smb-pwd" );
-    if( psz_pwd && !*psz_pwd ) { free( psz_pwd ); psz_pwd = NULL; }
-    if( !psz_domain ) psz_domain = var_InheritString( p_access, "smb-domain" );
-    if( psz_domain && !*psz_domain ) { free( psz_domain ); psz_domain = NULL; }
-
-#ifdef _WIN32
-    if( psz_user )
-        Win32AddConnection( p_access, psz_location, psz_user, psz_pwd, psz_domain);
-    i_ret = asprintf( &psz_uri, "//%s", psz_location );
-#else
-    if( psz_user )
-        i_ret = asprintf( &psz_uri, "smb://%s%s%s%s%s@%s",
-                          psz_domain ? psz_domain : "", psz_domain ? ";" : "",
-                          psz_user, psz_pwd ? ":" : "",
-                          psz_pwd ? psz_pwd : "", psz_location );
-    else
-        i_ret = asprintf( &psz_uri, "smb://%s", psz_location );
-#endif
+    i_ret = smb_get_uri( p_access, &psz_uri, psz_domain, psz_user, psz_pwd,
+                         psz_location, NULL );
 
     free( psz_user );
     free( psz_pwd );
@@ -217,28 +233,48 @@ static int Open( vlc_object_t *p_this )
 #if defined(smbc_open) && defined(open)
 # undef open
 #endif
-    if( (i_smb = smbc_open( psz_uri, O_RDONLY, 0 )) < 0 )
+
+    /* Init p_access */
+    access_InitFields( p_access );
+    p_sys =
+    p_access->p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
+    if( !p_sys )
+    {
+        free( psz_uri );
+        return VLC_ENOMEM;
+    }
+
+    i_ret = smbc_stat( psz_uri, &filestat );
+
+    /* smbc_stat fails with servers or shares. Assume they are directory */
+    if( i_ret || S_ISDIR( filestat.st_mode ) )
+    {
+#ifdef _WIN32
+        return VLC_EGENERIC;
+#else
+        p_access->pf_readdir = DirRead;
+        p_access->info.b_dir_can_loop = true;
+        i_smb = smbc_opendir( psz_uri );
+        i_size = 0;
+#endif
+    }
+    else
+    {
+        ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );
+        i_smb = smbc_open( psz_uri, O_RDONLY, 0 );
+        i_size = filestat.st_size;
+    }
+    free( psz_uri );
+
+    if( i_smb < 0 )
     {
         msg_Err( p_access, "open failed for '%s' (%s)",
                  p_access->psz_location, vlc_strerror_c(errno) );
-        free( psz_uri );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
-    /* Init p_access */
-    STANDARD_READ_ACCESS_INIT;
-
-    i_ret = smbc_fstat( i_smb, &filestat );
-    if( i_ret )
-    {
-        errno = i_ret;
-        msg_Err( p_access, "stat failed (%s)", vlc_strerror_c(errno) );
-    }
-    else
-        p_sys->size = filestat.st_size;
-
-    free( psz_uri );
-
+    p_sys->size = i_size;
     p_sys->i_smb = i_smb;
 
     return VLC_SUCCESS;
@@ -252,8 +288,12 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    smbc_close( p_sys->i_smb );
-    free( p_sys );
+#ifndef _WIN32
+    if( p_access->pf_readdir )
+        smbc_closedir( p_sys->i_smb );
+    else
+#endif
+        smbc_close( p_sys->i_smb );
 }
 
 /*****************************************************************************
@@ -304,6 +344,58 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
     return i_read;
 }
+
+#ifndef _WIN32
+/*****************************************************************************
+ * DirRead:
+ *****************************************************************************/
+static input_item_t* DirRead (access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    struct smbc_dirent *p_entry;
+    input_item_t *p_item = NULL;
+
+    while( !p_item && ( p_entry = smbc_readdir( p_sys->i_smb ) ) )
+    {
+        char *psz_uri;
+        const char *psz_location = p_access->psz_location;
+        const char *psz_name = p_entry->name;
+        int i_type;
+
+        switch( p_entry->smbc_type )
+        {
+        case SMBC_SERVER:
+        case SMBC_WORKGROUP:
+            psz_location = p_entry->name;
+            psz_name = NULL;
+        case SMBC_FILE_SHARE:
+        case SMBC_DIR:
+            i_type = ITEM_TYPE_DIRECTORY;
+            break;
+        case SMBC_FILE:
+            i_type = ITEM_TYPE_FILE;
+            break;
+        default:
+        case SMBC_PRINTER_SHARE:
+        case SMBC_COMMS_SHARE:
+        case SMBC_IPC_SHARE:
+        case SMBC_LINK:
+            continue;
+        }
+
+        if( smb_get_uri( p_access, &psz_uri, NULL, NULL, NULL,
+                         psz_location, psz_name ) < 0 )
+            return NULL;
+
+        p_item = input_item_NewWithTypeExt( psz_uri, p_entry->name, 0, NULL,
+                                            0, -1, i_type, 1 );
+        free( psz_uri );
+        if( !p_item )
+            return NULL;
+    }
+    return p_item;
+}
+#endif
 
 /*****************************************************************************
  * Control:
