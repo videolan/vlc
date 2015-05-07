@@ -80,7 +80,6 @@ struct directory
 struct access_sys_t
 {
     directory *current;
-    char      *ignored_exts;
     char       mode;
 };
 
@@ -89,45 +88,6 @@ static int visible (const char *name)
 {
     return name[0] != '.';
 }
-
-/**
- * Does the provided URI/path/stuff has one of the extension provided ?
- *
- * \param psz_exts A comma separated list of extension without dot, or only
- * one ext (ex: "avi,mkv,webm")
- * \param psz_uri The uri/path to check (ex: "file:///home/foo/bar.avi"). If
- * providing an URI, it must not contain a query string.
- *
- * \return true if the uri/path has one of the provided extension
- * false otherwise.
- */
-static bool has_ext (const char *psz_exts, const char *psz_uri)
-{
-    if (psz_exts == NULL)
-        return false;
-
-    const char *ext = strrchr (psz_uri, '.');
-    if (ext == NULL)
-        return false;
-
-    size_t extlen = strlen (++ext);
-
-    for (const char *type = psz_exts, *end; type[0]; type = end + 1)
-    {
-        end = strchr (type, ',');
-        if (end == NULL)
-            end = type + strlen (type);
-
-        if (type + extlen == end && !strncasecmp (ext, type, extlen))
-            return true;
-
-        if (*end == '\0')
-            break;
-    }
-
-    return false;
-}
-
 
 #ifdef HAVE_OPENAT
 /* Detect directories that recurse into themselves. */
@@ -298,7 +258,6 @@ int DirInit (access_t *p_access, DIR *handle)
     free (uri);
 
     p_access->p_sys = p_sys;
-    p_sys->ignored_exts = var_InheritString (p_access, "ignore-filetypes");
 
     p_access->pf_readdir = DirRead;
 
@@ -320,7 +279,6 @@ void DirClose( vlc_object_t * p_this )
     while (directory_pop (p_sys))
         ;
 
-    free (p_sys->ignored_exts);
     free (p_sys);
 }
 
@@ -344,10 +302,6 @@ input_item_t* DirRead (access_t *p_access)
 
         /* Check if it is a directory or even readable */
         i_res = directory_open (p_current, psz_entry, &handle);
-
-        if (i_res == ENTRY_EACCESS
-            || (i_res == ENTRY_ENOTDIR && has_ext (p_sys->ignored_exts, psz_entry)))
-            continue;
 
         /* Create an input item for the current entry */
         psz_uri = encode_URI_component (psz_entry);

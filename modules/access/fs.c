@@ -30,13 +30,6 @@
 #include "fs.h"
 #include <vlc_plugin.h>
 
-#define IGNORE_TEXT N_("Ignored extensions")
-#define IGNORE_LONGTEXT N_( \
-        "Files with these extensions will not be added to playlist when " \
-        "opening a directory.\n" \
-        "This is useful if you add directories that contain playlist files " \
-        "for instance. Use a comma-separated list of extensions." )
-
 vlc_module_begin ()
     set_description( N_("File input") )
     set_shortname( N_("File") )
@@ -50,8 +43,6 @@ vlc_module_begin ()
     add_submodule()
     set_section( N_("Directory" ), NULL )
     set_capability( "access", 55 )
-    add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,sub,idx,srt,cue,ssa",
-                IGNORE_TEXT, IGNORE_LONGTEXT, false )
 #ifndef HAVE_FDOPENDIR
     add_shortcut( "file", "directory", "dir" )
 #else

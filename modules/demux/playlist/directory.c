@@ -68,6 +68,44 @@ void Close_Dir ( vlc_object_t *p_this )
     free( p_demux->p_sys );
 }
 
+/**
+ * Does the provided URI/path/stuff has one of the extension provided ?
+ *
+ * \param psz_exts A comma separated list of extension without dot, or only
+ * one ext (ex: "avi,mkv,webm")
+ * \param psz_uri The uri/path to check (ex: "file:///home/foo/bar.avi"). If
+ * providing an URI, it must not contain a query string.
+ *
+ * \return true if the uri/path has one of the provided extension
+ * false otherwise.
+ */
+static bool has_ext( const char *psz_exts, const char *psz_uri )
+{
+    if( psz_exts == NULL )
+        return false;
+
+    const char *ext = strrchr( psz_uri, '.' );
+    if( ext == NULL )
+        return false;
+
+    size_t extlen = strlen( ++ext );
+
+    for( const char *type = psz_exts, *end; type[0]; type = end + 1 )
+    {
+        end = strchr( type, ',' );
+        if( end == NULL )
+            end = type + strlen( type );
+
+        if( type + extlen == end && !strncasecmp( ext, type, extlen ) )
+            return true;
+
+        if( *end == '\0' )
+            break;
+    }
+
+    return false;
+}
+
 static int compar_type( input_item_t *p1, input_item_t *p2 )
 {
     if( p1->i_type != p2->i_type )
@@ -110,10 +148,13 @@ static int Demux( demux_t *p_demux )
     input_item_t *p_input;
     input_item_node_t *p_node;
     input_item_t *p_item;
+    char *psz_ignored_exts;
 
     p_input = GetCurrentItem( p_demux );
     p_node = input_item_node_Create( p_input );
     input_item_Release(p_input);
+
+    psz_ignored_exts = var_InheritString( p_demux, "ignore-filetypes" );
 
     while( !i_ret && ( p_item = stream_ReadDir( p_demux->s ) ) )
     {
@@ -122,7 +163,8 @@ static int Demux( demux_t *p_demux )
         /* skip "." and ".." items */
         if( ( i_name_len == 1 && p_item->psz_name[0] == '.' ) ||
             ( i_name_len == 2 && p_item->psz_name[0] == '.' &&
-              p_item->psz_name[1] == '.' ) )
+              p_item->psz_name[1] == '.' ) ||
+            has_ext( psz_ignored_exts, p_item->psz_name ))
             goto skip_item;
 
         input_item_CopyOptions( p_node->p_item, p_item );
@@ -131,6 +173,7 @@ static int Demux( demux_t *p_demux )
 skip_item:
         input_item_Release( p_item );
     }
+    free( psz_ignored_exts );
 
     if( i_ret )
     {

@@ -61,6 +61,13 @@ static const char *const psz_sort_list_text[] = {
 #define SORT_LONGTEXT N_( \
     "Define the sort algorithm used when adding items from a directory." )
 
+#define IGNORE_TEXT N_("Ignored extensions")
+#define IGNORE_LONGTEXT N_( \
+        "Files with these extensions will not be added to playlist when " \
+        "opening a directory.\n" \
+        "This is useful if you add directories that contain playlist files " \
+        "for instance. Use a comma-separated list of extensions." )
+
 vlc_module_begin ()
     add_shortcut( "playlist" )
     set_category( CAT_INPUT )
@@ -155,6 +162,8 @@ vlc_module_begin ()
         add_shortcut( "playlist", "directory" )
         set_capability( "demux", 10 )
         set_callbacks( Import_Dir, Close_Dir )
+        add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,sub,idx,srt,cue,ssa",
+                    IGNORE_TEXT, IGNORE_LONGTEXT, false )
         add_string( "directory-sort", "collate", SORT_TEXT, SORT_LONGTEXT, false )
           change_string_list( psz_sort_list, psz_sort_list_text )
 vlc_module_end ()
