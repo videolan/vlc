@@ -967,11 +967,6 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     }
     for (host->nfd = 0; host->fds[host->nfd] != -1; host->nfd++);
 
-    if (vlc_object_waitpipe(VLC_OBJECT(host)) == -1) {
-        msg_Err(host, "signaling pipe error: %s", vlc_strerror_c(errno));
-        goto error;
-    }
-
     host->port     = port;
     host->i_url    = 0;
     host->url      = NULL;
