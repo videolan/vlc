@@ -84,7 +84,7 @@ bool CheckContentType( stream_t * p_stream, const char * psz_ctype );
 
 #define CHECK_FILE() do { \
     bool b_is_dir = false; \
-    stream_Control( ((demux_t *)p_this)->s, STREAM_IS_DIRECTORY, &b_is_dir ); \
+    stream_Control( ((demux_t *)p_this)->s, STREAM_IS_DIRECTORY, &b_is_dir, NULL, NULL ); \
     if( b_is_dir ) \
         return VLC_EGENERIC; \
 } while(0)

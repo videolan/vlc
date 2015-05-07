@@ -644,7 +644,13 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_IS_DIRECTORY:
         {
             bool *pb_canreaddir = va_arg( args, bool * );
+            bool *pb_dirsorted = va_arg( args, bool * );
+            bool *pb_dircanloop = va_arg( args, bool * );
             *pb_canreaddir = p_sys->method == STREAM_METHOD_READDIR;
+            if( pb_dirsorted )
+                *pb_dirsorted = p_access->info.b_dir_sorted;
+            if( pb_dircanloop )
+                *pb_dircanloop = p_access->info.b_dir_can_loop;
             return VLC_SUCCESS;
         }
 

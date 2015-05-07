@@ -309,7 +309,11 @@ int demux_vaControlHelper( stream_t *s,
             return stream_vaControl( s, STREAM_GET_META, args );
 
         case DEMUX_IS_PLAYLIST:
-            return stream_vaControl(s, STREAM_IS_DIRECTORY, args );
+        {
+            bool *pb_isplaylist = va_arg( args, bool * );
+            return stream_Control( s, STREAM_IS_DIRECTORY, pb_isplaylist,
+                                   NULL, NULL );
+        }
 
         case DEMUX_GET_PTS_DELAY:
         case DEMUX_GET_FPS:

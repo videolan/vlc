@@ -111,6 +111,13 @@ struct access_t
     {
         uint64_t     i_pos;     /* idem */
         bool         b_eof;     /* idem */
+
+        bool         b_dir_sorted; /* Set it to true if items returned by
+                                    * pf_readdir are already sorted. */
+
+        bool         b_dir_can_loop;  /* Set it to true if the access can't know
+                                       * if children can loop into their parents.
+                                       * It's the case for most network accesses. */
     } info;
     access_sys_t *p_sys;
 
