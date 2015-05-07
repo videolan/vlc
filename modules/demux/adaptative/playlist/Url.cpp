@@ -42,12 +42,7 @@ bool Url::hasScheme() const
     if(components.empty())
         return false;
 
-    const Component *comp = &components[0];
-    if(comp->component.compare(0, 7, "http://") &&
-       comp->component.compare(0, 8, "https://"))
-        return false;
-
-    return true;
+    return components[0].b_scheme;
 }
 
 Url & Url::prepend(const Component & comp)
@@ -58,6 +53,8 @@ Url & Url::prepend(const Component & comp)
 
 Url & Url::append(const Component & comp)
 {
+    if(!components.empty() && !components.back().b_dir)
+        components.pop_back();
     components.push_back(comp);
     return *this;
 }
@@ -70,6 +67,8 @@ Url & Url::prepend(const Url &url)
 
 Url & Url::append(const Url &url)
 {
+    if(!components.empty() && !components.back().b_dir)
+        components.pop_back();
     components.insert(components.end(), url.components.begin(), url.components.end());
     return *this;
 }
@@ -98,5 +97,10 @@ Url::Component::Component(const std::string & str, const MediaSegmentTemplate *t
 {
     component = str;
     templ = templ_;
+    if(!component.empty())
+    {
+        b_dir = (component.back()=='/');
+        b_scheme = !component.compare(0, 7, "http://") || !component.compare(0, 8, "https://");
+    }
 }
 

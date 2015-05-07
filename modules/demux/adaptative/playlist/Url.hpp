@@ -47,6 +47,10 @@ namespace adaptative
                     protected:
                         std::string component;
                         const MediaSegmentTemplate *templ;
+
+                    private:
+                        bool b_scheme;
+                        bool b_dir;
                 };
 
                 Url();
