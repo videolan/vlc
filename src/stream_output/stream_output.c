@@ -548,6 +548,8 @@ int sout_MuxGetStream( sout_mux_t *p_mux, unsigned i_blocks, mtime_t *pi_dts )
     mtime_t i_dts = 0;
     int     i_stream = -1;
 
+    assert( i_blocks > 0 );
+
     for( int i = 0; i < p_mux->i_nb_inputs; i++ )
     {
         sout_input_t *p_input = p_mux->pp_inputs[i];
