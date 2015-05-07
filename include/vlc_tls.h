@@ -52,11 +52,12 @@ int vlc_tls_SessionHandshake (vlc_tls_t *, const char *host, const char *serv,
                               char ** /*restrict*/ alp);
 VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
-/* NOTE: It is assumed that a->sock.p_sys = a */
-# define tls_Send( a, b, c ) (((vlc_tls_t *)a)->sock.pf_send (a, b, c))
+VLC_API int vlc_tls_Read(vlc_tls_t *, void *buf, size_t len, bool waitall);
+VLC_API char *vlc_tls_GetLine(vlc_tls_t *);
+VLC_API int vlc_tls_Write(vlc_tls_t *, const void *buf, size_t len);
 
-# define tls_Recv( a, b, c ) (((vlc_tls_t *)a)->sock.pf_recv (a, b, c))
-
+# define tls_Recv(a,b,c) vlc_tls_Read(a,b,c,false)
+# define tls_Send(a,b,c) vlc_tls_Write(a,b,c)
 
 /** TLS credentials (certificate, private and trust settings) */
 struct vlc_tls_creds

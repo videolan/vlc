@@ -34,6 +34,9 @@
 # include <poll.h>
 #endif
 #include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <vlc_common.h>
 #include "libvlc.h"
@@ -231,5 +234,128 @@ vlc_tls_t *vlc_tls_ClientSessionCreate (vlc_tls_creds_t *crd, int fd,
     return session;
 error:
     vlc_tls_SessionDelete (session);
+    return NULL;
+}
+
+int vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
+{
+    struct pollfd ufd[2];
+
+    ufd[0].fd = session->fd;
+    ufd[0].events = POLLIN;
+    ufd[1].fd = vlc_object_waitpipe(session->p_parent);
+    ufd[1].events = POLLIN;
+
+    if (unlikely(ufd[1].fd == -1))
+    {
+        vlc_testcancel();
+        return -1;
+    }
+
+    for (size_t rcvd = 0;;)
+    {
+        ssize_t val = session->sock.pf_recv(session, buf, len);
+        if (val > 0)
+        {
+            if (!waitall)
+                return val;
+            buf = ((char *)buf) + val;
+            len -= val;
+            rcvd += val;
+        }
+        if (len == 0 || val == 0)
+            return rcvd;
+        if (val == -1 && errno != EINTR && errno != EAGAIN)
+            return rcvd ? (ssize_t)rcvd : -1;
+
+        val = poll(ufd, 2, -1);
+        if (val == -1)
+            continue;
+
+        if (ufd[1].revents)
+        {
+            if (rcvd > 0)
+                return rcvd;
+
+            msg_Dbg(session, "socket %d polling interrupted", session->fd);
+            errno = EINTR;
+            return -1;
+        }
+    }
+}
+
+int vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
+{
+    struct pollfd ufd[2];
+
+    ufd[0].fd = session->fd;
+    ufd[0].events = POLLOUT;
+    ufd[1].fd = vlc_object_waitpipe(session->p_parent);
+    ufd[1].events = POLLIN;
+
+    if (unlikely(ufd[1].fd == -1))
+    {
+        vlc_testcancel();
+        return -1;
+    }
+
+    for (size_t sent = 0;;)
+    {
+        ssize_t val = session->sock.pf_send(session, buf, len);
+        if (val > 0)
+        {
+            buf = ((const char *)buf) + val;
+            len -= val;
+            sent += val;
+        }
+        if (len == 0 || val == 0)
+            return sent;
+        if (val == -1 && errno != EINTR && errno != EAGAIN)
+            return sent ? (ssize_t)sent : -1;
+
+        val = poll(ufd, 2, -1);
+        if (val == -1)
+            continue;
+
+        if (ufd[1].revents)
+        {
+            if (sent > 0)
+                return sent;
+
+            msg_Dbg(session, "socket %d polling interrupted", session->fd);
+            errno = EINTR;
+            return -1;
+        }
+    }
+}
+
+char *vlc_tls_GetLine(vlc_tls_t *session)
+{
+    char *line = NULL;
+    size_t linelen = 0, linesize = 0;
+
+    do
+    {
+        if (linelen == linesize)
+        {
+            linesize += 1024;
+
+            char *newline = realloc(line, linesize);
+            if (unlikely(newline == NULL))
+                goto error;
+            line = newline;
+        }
+
+        if (vlc_tls_Read(session, line + linelen, 1, false) <= 0)
+            goto error;
+    }
+    while (line[linelen++] != '\n');
+
+    if (linelen >= 2 && line[linelen - 2] == '\r')
+        line[linelen - 2] = '\0';
+    return line;
+
+error:
+    free(line);
     return NULL;
 }

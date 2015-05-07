@@ -421,6 +421,9 @@ vlc_tls_ClientCreate
 vlc_tls_Delete
 vlc_tls_ClientSessionCreate
 vlc_tls_SessionDelete
+vlc_tls_Read
+vlc_tls_Write
+vlc_tls_GetLine
 ToCharset
 update_Check
 update_Delete
