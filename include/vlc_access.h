@@ -92,7 +92,11 @@ struct access_t
      * XXX A access should set one and only one of them */
     ssize_t     (*pf_read)   ( access_t *, uint8_t *, size_t );  /* Return -1 if no data yet, 0 if no more data, else real data read */
     block_t    *(*pf_block)  ( access_t * );                     /* Return a block of data in his 'natural' size, NULL if not yet data or eof */
-    int         (*pf_readdir)( access_t *, input_item_node_t * );/* Fills the provided item_node, see doc/browsing.txt for details */
+
+    /* pf_readdir: Read the next input_item_t from the directory stream. It
+     * returns the next input item on success or NULL in case of error or end
+     * of stream. The item must be released with input_item_Release. */
+    input_item_t *(*pf_readdir)( access_t * );
 
     /* Called for each seek.
      * XXX can be null */

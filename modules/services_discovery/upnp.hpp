@@ -119,15 +119,17 @@ namespace Access
 class MediaServer
 {
 public:
-    MediaServer( const char* psz_url, access_t* p_access, input_item_node_t* node );
-    bool fetchContents();
+    MediaServer( const char* psz_url, access_t* p_access );
+    ~MediaServer();
+    input_item_t* getNextItem();
 
 private:
     MediaServer(const MediaServer&);
     MediaServer& operator=(const MediaServer&);
 
-    void addItem(const char* objectID, const char* title);
-    void addItem(const char* title, const char* psz_objectID, const char* psz_subtitles, mtime_t duration, const char* psz_url );
+    void fetchContents();
+    input_item_t* newItem(const char* objectID, const char* title);
+    input_item_t* newItem(const char* title, const char* psz_objectID, const char* psz_subtitles, mtime_t duration, const char* psz_url );
 
     IXML_Document* _browseAction(const char*, const char*,
             const char*, const char*, const char* );
@@ -135,7 +137,11 @@ private:
 private:
     const std::string url_;
     access_t* access_;
-    input_item_node_t* node_;
+    IXML_Document* xmlDocument_;
+    IXML_NodeList* containerNodeList_;
+    unsigned int   containerNodeIndex_;
+    IXML_NodeList* itemNodeList_;
+    unsigned int   itemNodeIndex_;
 };
 
 }

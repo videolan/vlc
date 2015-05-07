@@ -192,7 +192,7 @@ static void AStreamPrebufferStream( stream_t *s );
 static int  AReadStream( stream_t *s, void *p_read, unsigned int i_read );
 
 /* ReadDir */
-static int  AStreamReadDir( stream_t *s, input_item_node_t *p_node );
+static input_item_t *AStreamReadDir( stream_t *s );
 
 /* Common */
 static int  AStreamGenericError( ) { return VLC_EGENERIC; }
@@ -1840,11 +1840,11 @@ static int ASeek( stream_t *s, uint64_t i_pos )
     return p_access->pf_seek( p_access, i_pos );
 }
 
-static int AStreamReadDir( stream_t *s, input_item_node_t *p_node )
+static input_item_t *AStreamReadDir( stream_t *s )
 {
     access_t *p_access = s->p_sys->p_access;
 
-    return p_access->pf_readdir( p_access, p_node );
+    return p_access->pf_readdir( p_access );
 }
 
 /**
@@ -1979,10 +1979,11 @@ block_t *stream_BlockRemaining( stream_t *s, int i_max_size )
 }
 
 /**
- * Returns a node containing all the input_item of the directory pointer by
- * this stream. returns VLC_SUCCESS on success.
+ * Read the next input_item_t from the directory stream. It returns the next
+ * input item on success or NULL in case of error or end of stream. The item
+ * must be released with input_item_Release.
  */
-int stream_ReadDir( stream_t *s, input_item_node_t *p_node )
+input_item_t *stream_ReadDir( stream_t *s )
 {
-    return s->pf_readdir( s, p_node );
+    return s->pf_readdir( s );
 }

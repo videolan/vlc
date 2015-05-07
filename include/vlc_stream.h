@@ -67,7 +67,7 @@ struct stream_t
     /* */
     int         (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
     int         (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
-    int         (*pf_readdir)( stream_t *, input_item_node_t * );
+    input_item_t *(*pf_readdir)( stream_t * );
     int         (*pf_control)( stream_t *, int i_query, va_list );
 
     /* */
@@ -134,7 +134,7 @@ VLC_API int stream_Control( stream_t *s, int i_query, ... );
 VLC_API block_t * stream_Block( stream_t *s, int i_size );
 VLC_API block_t * stream_BlockRemaining( stream_t *s, int i_max_size );
 VLC_API char * stream_ReadLine( stream_t * );
-VLC_API int stream_ReadDir( stream_t *, input_item_node_t * );
+VLC_API input_item_t *stream_ReadDir( stream_t * );
 
 /**
  * Get the current position in a stream
@@ -230,7 +230,7 @@ VLC_API stream_t* stream_FilterNew( stream_t *p_source, const char *psz_stream_f
  * Default ReadDir implementation for stream Filter. This implementation just
  * forward the pf_readdir call to the p_source stream.
  */
-VLC_API int stream_FilterDefaultReadDir( stream_t *s, input_item_node_t *p_node );
+VLC_API input_item_t *stream_FilterDefaultReadDir( stream_t *s );
 
 /**
  * Sets stream_FilterDefaultReadDir as the pf_readdir callback for this stream filter

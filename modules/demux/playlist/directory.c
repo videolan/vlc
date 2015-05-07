@@ -63,17 +63,37 @@ void Close_Dir ( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
+    int i_ret = VLC_SUCCESS;
     input_item_t *p_input = GetCurrentItem(p_demux);
     input_item_node_t *p_node = input_item_node_Create( p_input );
+    input_item_t *p_item;
     input_item_Release(p_input);
 
-    if( stream_ReadDir( p_demux->s, p_node ) )
+    while( !i_ret && ( p_item = stream_ReadDir( p_demux->s ) ) )
+    {
+        int i_name_len = p_item->psz_name ? strlen( p_item->psz_name ) : 0;
+
+        /* skip "." and ".." items */
+        if( ( i_name_len == 1 && p_item->psz_name[0] == '.' ) ||
+            ( i_name_len == 2 && p_item->psz_name[0] == '.' &&
+              p_item->psz_name[1] == '.' ) )
+            goto skip_item;
+
+        input_item_CopyOptions( p_node->p_item, p_item );
+        if( !input_item_node_AppendItem( p_node, p_item ) )
+            i_ret = VLC_ENOMEM;
+skip_item:
+        input_item_Release( p_item );
+    }
+
+    if( i_ret )
     {
         msg_Warn( p_demux, "unable to read directory" );
         input_item_node_Delete( p_node );
-        return VLC_EGENERIC;
+        return i_ret;
+    } else
+    {
+        input_item_node_PostAndDelete( p_node );
+        return VLC_SUCCESS;
     }
-
-    input_item_node_PostAndDelete( p_node );
-    return VLC_SUCCESS;
 }

@@ -57,6 +57,7 @@ struct services_discovery_sys_t
 struct access_sys_t
 {
     UpnpInstanceWrapper* p_upnp;
+    Access::MediaServer* p_server;
 };
 
 UpnpInstanceWrapper* UpnpInstanceWrapper::s_instance;
@@ -523,14 +524,25 @@ int MediaServerList::Callback( Upnp_EventType event_type, void* p_event, void* p
 namespace Access
 {
 
-MediaServer::MediaServer(const char *psz_url, access_t *p_access, input_item_node_t *node)
+MediaServer::MediaServer(const char *psz_url, access_t *p_access)
     : url_( psz_url )
     , access_( p_access )
-    , node_( node )
+    , xmlDocument_( NULL )
+    , containerNodeList_( NULL )
+    , containerNodeIndex_( 0 )
+    , itemNodeList_( NULL )
+    , itemNodeIndex_( 0 )
 {
 }
 
-void MediaServer::addItem(const char *objectID, const char *title )
+MediaServer::~MediaServer()
+{
+    ixmlNodeList_free( containerNodeList_ );
+    ixmlNodeList_free( itemNodeList_ );
+    ixmlDocument_free( xmlDocument_ );
+}
+
+input_item_t* MediaServer::newItem(const char *objectID, const char *title )
 {
     vlc_url_t url;
     vlc_UrlParse( &url, url_.c_str(), '?' );
@@ -540,27 +552,21 @@ void MediaServer::addItem(const char *objectID, const char *title )
                   url.psz_host, url.i_port ? url.i_port : 80, url.psz_path, objectID ) < 0 )
     {
         vlc_UrlClean( &url );
-        return ;
+        return NULL;
     }
     vlc_UrlClean( &url );
 
     input_item_t* p_item = input_item_NewWithTypeExt( psz_url, title, 0, NULL,
                                                       0, -1, ITEM_TYPE_DIRECTORY, 1 );
     free( psz_url);
-    if ( !p_item )
-        return;
-    input_item_CopyOptions( node_->p_item, p_item );
-    input_item_node_AppendItem( node_, p_item );
-    input_item_Release( p_item );
+    return p_item;
 }
 
-void MediaServer::addItem(const char* title, const char*, const char*,
-                          mtime_t duration, const char* psz_url)
+input_item_t* MediaServer::newItem(const char* title, const char*, const char*,
+                                   mtime_t duration, const char* psz_url)
 {
-    input_item_t* p_item = input_item_NewWithTypeExt( psz_url, title, 0, NULL, 0,
-                                                      duration, ITEM_TYPE_FILE, 1 );
-    input_item_node_AppendItem( node_, p_item );
-    input_item_Release( p_item );
+    return input_item_NewWithTypeExt( psz_url, title, 0, NULL, 0,
+                                      duration, ITEM_TYPE_FILE, 1 );
 }
 
 /* Access part */
@@ -665,7 +671,7 @@ browseActionCleanup:
 /*
  * Fetches and parses the UPNP response
  */
-bool MediaServer::fetchContents()
+void MediaServer::fetchContents()
 {
     const char* objectID = "";
     vlc_url_t url;
@@ -688,31 +694,45 @@ bool MediaServer::fetchContents()
     if ( !p_response )
     {
         msg_Err( access_, "No response from browse() action" );
-        return false;
+        return;
     }
 
-    IXML_Document* p_result = parseBrowseResult( p_response );
+    xmlDocument_ = parseBrowseResult( p_response );
 
     ixmlDocument_free( p_response );
 
-    if ( !p_result )
+    if ( !xmlDocument_ )
     {
         msg_Err( access_, "browse() response parsing failed" );
-        return false;
+        return;
     }
 
 #ifndef NDEBUG
-    msg_Dbg( access_, "Got DIDL document: %s", ixmlPrintDocument( p_result ) );
+    msg_Dbg( access_, "Got DIDL document: %s", ixmlPrintDocument( xmlDocument_ ) );
 #endif
 
-    IXML_NodeList* containerNodeList =
-                ixmlDocument_getElementsByTagName( p_result, "container" );
+    containerNodeList_ = ixmlDocument_getElementsByTagName( xmlDocument_, "container" );
+    itemNodeList_ = ixmlDocument_getElementsByTagName( xmlDocument_, "item" );
+}
 
-    if ( containerNodeList )
+input_item_t* MediaServer::getNextItem()
+{
+    input_item_t *p_item = NULL;
+
+    if( !xmlDocument_ )
     {
-        for ( unsigned int i = 0; i < ixmlNodeList_length( containerNodeList ); i++ )
+        fetchContents();
+        if( !xmlDocument_ )
+            return NULL;
+    }
+
+    if ( containerNodeList_ )
+    {
+        for ( ; !p_item && containerNodeIndex_ < ixmlNodeList_length( containerNodeList_ )
+              ; containerNodeIndex_++ )
         {
-            IXML_Element* containerElement = (IXML_Element*)ixmlNodeList_item( containerNodeList, i );
+            IXML_Element* containerElement = (IXML_Element*)ixmlNodeList_item( containerNodeList_,
+                                                                                containerNodeIndex_ );
 
             const char* objectID = ixmlElement_getAttribute( containerElement,
                                                              "id" );
@@ -723,19 +743,18 @@ bool MediaServer::fetchContents()
                                                           "dc:title" );
             if ( !title )
                 continue;
-            addItem(objectID, title);
+            p_item = newItem(objectID, title);
         }
-        ixmlNodeList_free( containerNodeList );
     }
 
-    IXML_NodeList* itemNodeList = ixmlDocument_getElementsByTagName( p_result,
-                                                                     "item" );
-    if ( itemNodeList )
+    if( itemNodeList_ )
     {
-        for ( unsigned int i = 0; i < ixmlNodeList_length( itemNodeList ); i++ )
+        for ( ; !p_item && itemNodeIndex_ < ixmlNodeList_length( itemNodeList_ )
+              ; itemNodeIndex_++ )
         {
             IXML_Element* itemElement =
-                        ( IXML_Element* )ixmlNodeList_item( itemNodeList, i );
+                        ( IXML_Element* )ixmlNodeList_item( itemNodeList_,
+                                                            itemNodeIndex_ );
 
             const char* objectID =
                         ixmlElement_getAttribute( itemElement, "id" );
@@ -781,24 +800,19 @@ bool MediaServer::fetchContents()
                                                           i_seconds );
                 }
 
-                addItem( title, objectID, psz_subtitles, i_duration, psz_resource_url );
+                p_item = newItem( title, objectID, psz_subtitles, i_duration,
+                                  psz_resource_url );
             }
             ixmlNodeList_free( p_resource_list );
         }
-        ixmlNodeList_free( itemNodeList );
     }
 
-    ixmlDocument_free( p_result );
-    return true;
+    return p_item;
 }
 
-static int ReadDirectory( access_t *p_access, input_item_node_t* p_node )
+static input_item_t* ReadDirectory( access_t *p_access )
 {
-    MediaServer server( p_access->psz_location, p_access, p_node );
-
-    if ( !server.fetchContents() )
-        return VLC_EGENERIC;
-    return VLC_SUCCESS;
+    return p_access->p_sys->p_server->getNextItem();
 }
 
 static int Open( vlc_object_t *p_this )
@@ -809,9 +823,17 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_access->p_sys = p_sys;
+    p_sys->p_server = new(std::nothrow) MediaServer( p_access->psz_location,
+                                                     p_access );
+    if ( !p_sys->p_server )
+    {
+        delete p_sys;
+        return VLC_EGENERIC;
+    }
     p_sys->p_upnp = UpnpInstanceWrapper::get( p_this, NULL, NULL );
     if ( !p_sys->p_upnp )
     {
+        delete p_sys->p_server;
         delete p_sys;
         return VLC_EGENERIC;
     }
@@ -825,6 +847,7 @@ static void Close( vlc_object_t* p_this )
 {
     access_t* p_access = (access_t*)p_this;
     p_access->p_sys->p_upnp->release( false );
+    delete p_access->p_sys->p_server;
     delete p_access->p_sys;
 }
 

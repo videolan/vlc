@@ -353,27 +353,19 @@ void DirClose( vlc_object_t * p_this )
 /* This function is a little bit too complex for what it seems to do, but the
  * point is to de-recursify directory recusion to avoid overruning the stack
  * in case there's a high directory depth */
-int DirRead (access_t *p_access, input_item_node_t *p_current_node)
+input_item_t* DirRead (access_t *p_access)
 {
     access_sys_t *p_sys = p_access->p_sys;
+    input_item_t *p_item = NULL;
 
-    while (p_sys->current != NULL
+    while (!p_item && p_sys->current != NULL
            && p_sys->current->i <= p_sys->current->filec)
     {
         directory *p_current = p_sys->current;
 
-        /* End of the current folder, let's pop directory and node */
-        if (p_current->i == p_current->filec)
-        {
-            directory_pop (p_sys);
-            p_current_node = p_current_node->p_parent;
-            continue;
-        }
-
         char *psz_entry = p_current->filev[p_current->i++];
         char *psz_full_uri, *psz_uri;
         DIR *handle;
-        input_item_t *p_new = NULL;
         int i_res;
 
         /* Check if it is a directory or even readable */
@@ -382,7 +374,6 @@ int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         if (i_res == ENTRY_EACCESS
             || (i_res == ENTRY_ENOTDIR && has_ext (p_sys->ignored_exts, psz_entry)))
             continue;
-
 
         /* Create an input item for the current entry */
         psz_uri = encode_URI_component (psz_entry);
@@ -398,21 +389,16 @@ int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         }
 
         int i_type = i_res == ENTRY_DIR ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
-        p_new = input_item_NewWithType (psz_full_uri, psz_entry,
-                                        0, NULL, 0, 0, i_type);
-        if (p_new == NULL)
+        p_item = input_item_NewWithType (psz_full_uri, psz_entry,
+                                         0, NULL, 0, 0, i_type);
+        if (p_item == NULL)
         {
             free (psz_full_uri);
             closedir (handle);
             continue;
         }
 
-        input_item_CopyOptions (p_current_node->p_item, p_new);
-        input_item_node_AppendItem (p_current_node, p_new);
-
         free (psz_full_uri);
-        input_item_Release (p_new);
     }
-
-    return VLC_SUCCESS;
+    return p_item;
 }

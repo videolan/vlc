@@ -106,7 +106,7 @@ vlc_module_end ()
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
-static int DirRead( access_t *, input_item_node_t * );
+static input_item_t* DirRead( access_t * );
 #ifdef ENABLE_SOUT
 static int OutSeek( sout_access_out_t *, off_t );
 static ssize_t Write( sout_access_out_t *, block_t * );
@@ -839,9 +839,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 /*****************************************************************************
  * DirRead:
  *****************************************************************************/
-static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
+static input_item_t* DirRead( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    input_item_t *p_item = NULL;
 
     assert( p_sys->data.fd != -1 );
     assert( !p_sys->out );
@@ -863,23 +864,13 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
                       p_sys->url.psz_path ? p_sys->url.psz_path : "",
                       psz_line ) != -1 )
         {
-            input_item_t *p_item;
-
             p_item = input_item_NewWithTypeExt( psz_uri, psz_line, 0, NULL,
                                                 0, -1, ITEM_TYPE_UNKNOWN, 1 );
             free( psz_uri );
-            if( !p_item )
-            {
-                free( psz_line );
-                return VLC_ENOMEM;
-            }
-            input_item_CopyOptions( p_current_node->p_item, p_item );
-            input_item_node_AppendItem( p_current_node, p_item );
-            input_item_Release( p_item );
         }
         free( psz_line );
     }
-    return VLC_SUCCESS;
+    return p_item;
 }
 
 /*****************************************************************************

@@ -83,8 +83,7 @@ static block_t* Block( access_t * );
 static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 
-static int      DirControl( access_t *, int, va_list );
-static int      DirRead( access_t *p_access, input_item_node_t *p_current_node );
+static input_item_t* DirRead( access_t *p_access );
 
 struct access_sys_t
 {
@@ -451,10 +450,11 @@ static int Control( access_t* p_access, int i_query, va_list args )
  * Directory access
  *****************************************************************************/
 
-static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
+static input_item_t* DirRead( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     LIBSSH2_SFTP_ATTRIBUTES attrs;
+    input_item_t *p_item = NULL;
     int err;
     /* Allocate 1024 bytes for file name. Longer names are skipped.
      * libssh2 does not support seeking in directory streams.
@@ -465,9 +465,9 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
     char *psz_file = malloc( i_size );
 
     if( !psz_file )
-        return VLC_ENOMEM;
+        return NULL;
 
-    while( 0 != ( err = libssh2_sftp_readdir( p_sys->file, psz_file, i_size, &attrs ) ) )
+    while( !p_item && 0 != ( err = libssh2_sftp_readdir( p_sys->file, psz_file, i_size, &attrs ) ) )
     {
         if( err < 0 )
         {
@@ -506,29 +506,25 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         free( psz_uri );
 
         int i_type = LIBSSH2_SFTP_S_ISDIR( attrs.permissions ) ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
-        input_item_t *p_new = input_item_NewWithTypeExt( psz_full_uri, psz_file,
-                                                         0, NULL, 0, 0, i_type, 1 );
+        p_item = input_item_NewWithTypeExt( psz_full_uri, psz_file,
+                                            0, NULL, 0, 0, i_type, 1 );
 
-        if( p_new == NULL )
+        if( p_item == NULL )
         {
             free( psz_full_uri );
-            continue;
+            break;
         }
 
         /* Here we save on the node the credentials that allowed us to login.
          * That way the user isn't prompted more than once for credentials */
         if( p_sys->psz_password_opt )
-            input_item_AddOption( p_new, p_sys->psz_password_opt, VLC_INPUT_OPTION_TRUSTED );
+            input_item_AddOption( p_item, p_sys->psz_password_opt, VLC_INPUT_OPTION_TRUSTED );
         if( p_sys->psz_username_opt )
-            input_item_AddOption( p_new, p_sys->psz_username_opt, VLC_INPUT_OPTION_TRUSTED );
-
-        input_item_CopyOptions( p_current_node->p_item, p_new );
-        input_item_node_AppendItem( p_current_node, p_new );
+            input_item_AddOption( p_item, p_sys->psz_username_opt, VLC_INPUT_OPTION_TRUSTED );
 
         free( psz_full_uri );
-        input_item_Release( p_new );
     }
 
     free( psz_file );
-    return VLC_SUCCESS;
+    return p_item;
 }
