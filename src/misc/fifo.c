@@ -317,12 +317,12 @@ block_t *block_FifoGet(block_fifo_t *fifo)
 
 /**
  * Peeks the first block in the FIFO.
- * If necessary, wait until there is one block.
- * This function is (always) a cancellation point.
  *
  * @warning This function leaves the block in the FIFO.
  * You need to protect against concurrent threads who could dequeue the block.
  * Preferrably, there should be only one thread reading from the FIFO.
+ *
+ * @warning This function is undefined if the FIFO is empty.
  *
  * @return a valid block.
  */
@@ -330,17 +330,11 @@ block_t *block_FifoShow( block_fifo_t *p_fifo )
 {
     block_t *b;
 
-    vlc_testcancel( );
-
     vlc_mutex_lock( &p_fifo->lock );
-    mutex_cleanup_push( &p_fifo->lock );
-
-    while( p_fifo->p_first == NULL )
-        vlc_cond_wait( &p_fifo->wait, &p_fifo->lock );
-
+    assert(p_fifo->p_first != NULL);
     b = p_fifo->p_first;
+    vlc_mutex_unlock( &p_fifo->lock );
 
-    vlc_cleanup_run ();
     return b;
 }
 
