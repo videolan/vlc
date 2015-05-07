@@ -695,14 +695,16 @@ static VLCMainWindow *_o_sharedInstance = nil;
     input_thread_t * p_input;
     p_input = pl_CurrentInput(VLCIntf);
     if (p_input) {
-        NSString *aString;
+        NSString *aString = @"";
 
         if (!config_GetPsz(VLCIntf, "video-title")) {
             char *format = var_InheritString(VLCIntf, "input-title-format");
-            char *formated = str_format_meta(p_input, format);
-            free(format);
-            aString = [NSString stringWithUTF8String:formated];
-            free(formated);
+            if (format) {
+                char *formated = str_format_meta(p_input, format);
+                free(format);
+                aString = toNSStr(formated);
+                free(formated);
+            }
         } else
             aString = [NSString stringWithUTF8String:config_GetPsz(VLCIntf, "video-title")];
 

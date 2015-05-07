@@ -248,12 +248,14 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         return nil;
     }
 
-    NSString *o_name;
+    NSString *o_name = @"";
     char *format = var_InheritString(VLCIntf, "input-title-format");
-    char *formated = str_format_meta(p_input, format);
-    free(format);
-    o_name = [NSString stringWithUTF8String:formated];
-    free(formated);
+    if (format) {
+        char *formated = str_format_meta(p_input, format);
+        free(format);
+        o_name = toNSStr(formated);
+        free(formated);
+    }
 
     NSURL * o_url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_uri]];
     free(psz_uri);
