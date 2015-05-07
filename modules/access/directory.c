@@ -1,7 +1,7 @@
 /*****************************************************************************
  * directory.c: expands a directory (directory: access_browser plug-in)
  *****************************************************************************
- * Copyright (C) 2002-2008 VLC authors and VideoLAN
+ * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -47,169 +47,11 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 
-enum
-{
-    ENTRY_DIR       = 0,
-    ENTRY_ENOTDIR   = -1,
-    ENTRY_EACCESS   = -2,
-};
-
-enum
-{
-    MODE_NONE,
-    MODE_COLLAPSE,
-    MODE_EXPAND,
-};
-
-typedef struct directory directory;
-struct directory
-{
-    directory   *parent;
-    DIR         *handle;
-    char        *uri;
-    char       **filev;
-    int          filec, i;
-#ifdef HAVE_OPENAT
-    dev_t        device;
-    ino_t        inode;
-#else
-    char         *path;
-#endif
-};
-
 struct access_sys_t
 {
-    directory *current;
-    char       mode;
+    char *psz_base_uri;
+    DIR *p_dir;
 };
-
-/* Select non-hidden files only */
-static int visible (const char *name)
-{
-    return name[0] != '.';
-}
-
-#ifdef HAVE_OPENAT
-/* Detect directories that recurse into themselves. */
-static bool has_inode_loop (const directory *dir, dev_t dev, ino_t inode)
-{
-    while (dir != NULL)
-    {
-        if ((dir->device == dev) && (dir->inode == inode))
-            return true;
-        dir = dir->parent;
-    }
-    return false;
-}
-#endif
-
-/* success -> returns ENTRY_DIR and the handle parameter is set to the handle,
- * error -> return ENTRY_ENOTDIR or ENTRY_EACCESS */
-static int directory_open (directory *p_dir, char *psz_entry, DIR **handle)
-{
-    *handle = NULL;
-
-#ifdef HAVE_OPENAT
-    int fd = vlc_openat (dirfd (p_dir->handle), psz_entry,
-                         O_RDONLY | O_DIRECTORY);
-
-    if (fd == -1)
-    {
-        if (errno == ENOTDIR)
-            return ENTRY_ENOTDIR;
-        else
-            return ENTRY_EACCESS;
-    }
-
-    struct stat st;
-    if (fstat (fd, &st)
-        || has_inode_loop (p_dir, st.st_dev, st.st_ino)
-        || (*handle = fdopendir (fd)) == NULL)
-    {
-        close (fd);
-        return ENTRY_EACCESS;
-    }
-#else
-    char *path;
-    if (asprintf (&path, "%s/%s", p_dir->path, psz_entry) == -1)
-        return ENTRY_EACCESS;
-
-    *handle = vlc_opendir (path);
-
-    free(path);
-
-    if (*handle == NULL) {
-        return ENTRY_ENOTDIR;
-    }
-#endif
-
-    return ENTRY_DIR;
-}
-
-static bool directory_push (access_sys_t *p_sys, DIR *handle, char *psz_uri)
-{
-    directory *p_dir = malloc (sizeof (*p_dir));
-
-    psz_uri = strdup (psz_uri);
-    if (unlikely (p_dir == NULL || psz_uri == NULL))
-        goto error;
-
-    p_dir->parent = p_sys->current;
-    p_dir->handle = handle;
-    p_dir->uri = psz_uri;
-    p_dir->filec = vlc_loaddir (handle, &p_dir->filev, visible, NULL);
-    if (p_dir->filec < 0)
-        p_dir->filev = NULL;
-    p_dir->i = 0;
-
-#ifdef HAVE_OPENAT
-    struct stat st;
-    if (fstat (dirfd (handle), &st))
-        goto error_filev;
-    p_dir->device = st.st_dev;
-    p_dir->inode = st.st_ino;
-#else
-    p_dir->path = make_path (psz_uri);
-    if (p_dir->path == NULL)
-        goto error_filev;
-#endif
-
-    p_sys->current = p_dir;
-    return true;
-
-error_filev:
-    for (int i = 0; i < p_dir->filec; i++)
-        free (p_dir->filev[i]);
-    free (p_dir->filev);
-
-error:
-    closedir (handle);
-    free (p_dir);
-    free (psz_uri);
-    return false;
-}
-
-static bool directory_pop (access_sys_t *p_sys)
-{
-    directory *p_old = p_sys->current;
-
-    if (p_old == NULL)
-        return false;
-
-    p_sys->current = p_old->parent;
-    closedir (p_old->handle);
-    free (p_old->uri);
-    for (int i = 0; i < p_old->filec; i++)
-        free (p_old->filev[i]);
-    free (p_old->filev);
-#ifndef HAVE_OPENAT
-    free (p_old->path);
-#endif
-    free (p_old);
-
-    return p_sys->current != NULL;
-}
-
 
 /*****************************************************************************
  * Open: open the directory
@@ -217,55 +59,42 @@ static bool directory_pop (access_sys_t *p_sys)
 int DirOpen (vlc_object_t *p_this)
 {
     access_t *p_access = (access_t*)p_this;
+    DIR *p_dir;
+    char *psz_base_uri;
 
     if (!p_access->psz_filepath)
         return VLC_EGENERIC;
 
-    DIR *handle = vlc_opendir (p_access->psz_filepath);
-    if (handle == NULL)
+    p_dir = vlc_opendir (p_access->psz_filepath);
+    if (p_dir == NULL)
         return VLC_EGENERIC;
 
-    return DirInit (p_access, handle);
-}
-
-int DirInit (access_t *p_access, DIR *handle)
-{
-    access_sys_t *p_sys = malloc (sizeof (*p_sys));
-    if (unlikely (p_sys == NULL))
-        goto error;
-
-    char *uri;
     if (!strcmp (p_access->psz_access, "fd"))
     {
-        if (asprintf (&uri, "fd://%s", p_access->psz_location) == -1)
-            uri = NULL;
+        if (asprintf (&psz_base_uri, "fd://%s", p_access->psz_location) == -1)
+            psz_base_uri = NULL;
     }
     else
-        uri = vlc_path2uri (p_access->psz_filepath, "file");
-    if (unlikely (uri == NULL))
+        psz_base_uri = vlc_path2uri (p_access->psz_filepath, "file");
+    if (unlikely (psz_base_uri == NULL))
     {
-        closedir (handle);
-        goto error;
+        closedir (p_dir);
+        return VLC_ENOMEM;
     }
 
-    /* "Open" the base directory */
-    p_sys->current = NULL;
-    if (!directory_push (p_sys, handle, uri))
+
+    p_access->p_sys = calloc (1, sizeof(access_sys_t));
+    if (!p_access->p_sys)
     {
-        free (uri);
-        goto error;
+        closedir(p_dir);
+        free( psz_base_uri );
+        return VLC_ENOMEM;
     }
-    free (uri);
-
-    p_access->p_sys = p_sys;
-
+    p_access->p_sys->p_dir = p_dir;
+    p_access->p_sys->psz_base_uri = psz_base_uri;
     p_access->pf_readdir = DirRead;
 
     return VLC_SUCCESS;
-
-error:
-    free (p_sys);
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -276,57 +105,87 @@ void DirClose( vlc_object_t * p_this )
     access_t *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-    while (directory_pop (p_sys))
-        ;
+    free (p_sys->psz_base_uri);
+    closedir (p_sys->p_dir);
 
     free (p_sys);
 }
 
-/* This function is a little bit too complex for what it seems to do, but the
- * point is to de-recursify directory recusion to avoid overruning the stack
- * in case there's a high directory depth */
+static bool is_looping(access_t *p_access, const char *psz_uri)
+{
+#ifdef S_ISLNK
+    struct stat st;
+    bool b_looping = false;
+
+    if (vlc_lstat (psz_uri, &st) != 0)
+        return false;
+    if (S_ISLNK (st.st_mode))
+    {
+        char *psz_link = malloc(st.st_size + 1);
+        ssize_t i_ret;
+
+        if (psz_link)
+        {
+            i_ret = readlink(psz_uri, psz_link, st.st_size + 1);
+            if (i_ret > 0 && i_ret <= st.st_size)
+            {
+                psz_link[i_ret] = '\0';
+                if (strstr(p_access->psz_filepath, psz_link))
+                    b_looping = true;
+            }
+            free (psz_link);
+        }
+    }
+    return b_looping;
+#else
+    return false;
+#endif
+}
+
 input_item_t* DirRead (access_t *p_access)
 {
     access_sys_t *p_sys = p_access->p_sys;
+    DIR *p_dir = p_sys->p_dir;
     input_item_t *p_item = NULL;
+    const char *psz_entry;
 
-    while (!p_item && p_sys->current != NULL
-           && p_sys->current->i <= p_sys->current->filec)
+    while (!p_item && (psz_entry = vlc_readdir (p_dir)))
     {
-        directory *p_current = p_sys->current;
-
-        char *psz_entry = p_current->filev[p_current->i++];
-        char *psz_full_uri, *psz_uri;
-        DIR *handle;
-        int i_res;
+        char *psz_uri, *psz_encoded_entry;
+        struct stat st;
+        int i_type;
 
         /* Check if it is a directory or even readable */
-        i_res = directory_open (p_current, psz_entry, &handle);
+        if (asprintf (&psz_uri, "%s/%s",
+                      p_access->psz_filepath, psz_entry) == -1)
+            return NULL;
+        if (vlc_stat (psz_uri, &st) != 0)
+        {
+            free (psz_uri);
+            continue;
+        }
+        i_type = S_ISDIR (st.st_mode) ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
+        if (i_type == ITEM_TYPE_DIRECTORY && is_looping(p_access, psz_uri))
+        {
+            free (psz_uri);
+            continue;
+        }
+        free (psz_uri);
 
         /* Create an input item for the current entry */
-        psz_uri = encode_URI_component (psz_entry);
-        if (psz_uri == NULL
-         || asprintf (&psz_full_uri, "%s/%s", p_current->uri, psz_uri) == -1)
-            psz_full_uri = NULL;
-
-        free (psz_uri);
-        if (psz_full_uri == NULL)
-        {
-            closedir (handle);
+        psz_encoded_entry = encode_URI_component (psz_entry);
+        if (psz_encoded_entry == NULL)
             continue;
-        }
+        if (asprintf (&psz_uri, "%s/%s",
+                      p_sys->psz_base_uri, psz_encoded_entry) == -1)
+            return NULL;
+        free (psz_encoded_entry);
 
-        int i_type = i_res == ENTRY_DIR ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
-        p_item = input_item_NewWithType (psz_full_uri, psz_entry,
+        p_item = input_item_NewWithType (psz_uri, psz_entry,
                                          0, NULL, 0, 0, i_type);
-        if (p_item == NULL)
-        {
-            free (psz_full_uri);
-            closedir (handle);
-            continue;
-        }
-
-        free (psz_full_uri);
+        free (psz_uri);
+        if (!p_item)
+            return NULL;
     }
     return p_item;
 }
