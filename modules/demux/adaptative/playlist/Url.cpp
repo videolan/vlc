@@ -99,7 +99,7 @@ Url::Component::Component(const std::string & str, const MediaSegmentTemplate *t
     templ = templ_;
     if(!component.empty())
     {
-        b_dir = (component.back()=='/');
+        b_dir = (component[component.length()-1]=='/');
         b_scheme = !component.compare(0, 7, "http://") || !component.compare(0, 8, "https://");
     }
 }
