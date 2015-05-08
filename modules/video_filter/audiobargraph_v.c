@@ -53,12 +53,10 @@
   "Enforce the bargraph position on the video " \
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
   "also use combinations of these values, eg 6 = top-right).")
-#define BARWIDTH_TEXT N_("Bar width in pixel (default : 10)")
-#define BARWIDTH_LONGTEXT N_("Width in pixel of each bar in the BarGraph to be displayed " \
-                "(default : 10).")
-#define BARHEIGHT_TEXT N_("Bar Height in pixel (default : 400)")
-#define BARHEIGHT_LONGTEXT N_("Height in pixel of BarGraph to be displayed " \
-                "(default : 400).")
+#define BARWIDTH_TEXT N_("Bar width in pixel")
+#define BARWIDTH_LONGTEXT N_("Width in pixel of each bar in the BarGraph to be displayed." )
+#define BARHEIGHT_TEXT N_("Bar Height in pixel")
+#define BARHEIGHT_LONGTEXT N_("Height in pixel of BarGraph to be displayed." )
 
 #define CFG_PREFIX "audiobargraph_v-"
 
