@@ -175,6 +175,7 @@ $Id$
  * hevc: HEVC demuxer
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
+ * hls: HTTP Live Streaming demuxer
  * http: HTTP Network access module
  * httplive: HTTP Live streaming for playback
  * i420_rgb: planar YUV to packed RGB conversion functions

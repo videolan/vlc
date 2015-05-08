@@ -244,45 +244,7 @@ if HAVE_DVBPSI
 demux_LTLIBRARIES += libts_plugin.la
 endif
 
-libdash_plugin_la_SOURCES = \
-    demux/dash/mpd/AdaptationSet.cpp \
-    demux/dash/mpd/AdaptationSet.h \
-    demux/dash/mpd/DASHCommonAttributesElements.cpp \
-    demux/dash/mpd/DASHCommonAttributesElements.h \
-    demux/dash/mpd/DASHSegment.cpp \
-    demux/dash/mpd/DASHSegment.h \
-    demux/dash/mpd/ContentDescription.cpp \
-    demux/dash/mpd/ContentDescription.h \
-    demux/dash/mpd/IsoffMainParser.cpp \
-    demux/dash/mpd/IsoffMainParser.h \
-    demux/dash/mpd/MPD.cpp \
-    demux/dash/mpd/MPD.h \
-    demux/dash/mpd/MPDFactory.cpp \
-    demux/dash/mpd/MPDFactory.h \
-    demux/dash/mpd/Period.cpp \
-    demux/dash/mpd/Period.h \
-    demux/dash/mpd/Profile.cpp \
-    demux/dash/mpd/Profile.hpp \
-    demux/dash/mpd/ProgramInformation.cpp \
-    demux/dash/mpd/ProgramInformation.h \
-    demux/dash/mpd/Representation.cpp \
-    demux/dash/mpd/Representation.h \
-    demux/dash/mpd/TrickModeType.cpp \
-    demux/dash/mpd/TrickModeType.h \
-    demux/dash/mp4/AtomsReader.cpp \
-    demux/dash/mp4/AtomsReader.hpp \
-    demux/dash/xml/DOMHelper.cpp \
-    demux/dash/xml/DOMHelper.h \
-    demux/dash/xml/DOMParser.cpp \
-    demux/dash/xml/DOMParser.h \
-    demux/dash/xml/Node.cpp \
-    demux/dash/xml/Node.h \
-    demux/dash/dash.cpp \
-    demux/dash/dash.hpp \
-    demux/dash/DASHManager.cpp \
-    demux/dash/DASHManager.h
-
-libdash_plugin_la_SOURCES += \
+adaptative_SOURCES = \
     demux/adaptative/playlist/AbstractPlaylist.cpp \
     demux/adaptative/playlist/AbstractPlaylist.hpp \
     demux/adaptative/playlist/BaseAdaptationSet.cpp \
@@ -345,14 +307,82 @@ libdash_plugin_la_SOURCES += \
     demux/adaptative/tools/Retrieve.cpp \
     demux/adaptative/tools/Retrieve.hpp
 
-libdash_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
+libdash_plugin_la_SOURCES = \
+    demux/dash/mpd/AdaptationSet.cpp \
+    demux/dash/mpd/AdaptationSet.h \
+    demux/dash/mpd/DASHCommonAttributesElements.cpp \
+    demux/dash/mpd/DASHCommonAttributesElements.h \
+    demux/dash/mpd/DASHSegment.cpp \
+    demux/dash/mpd/DASHSegment.h \
+    demux/dash/mpd/ContentDescription.cpp \
+    demux/dash/mpd/ContentDescription.h \
+    demux/dash/mpd/IsoffMainParser.cpp \
+    demux/dash/mpd/IsoffMainParser.h \
+    demux/dash/mpd/MPD.cpp \
+    demux/dash/mpd/MPD.h \
+    demux/dash/mpd/MPDFactory.cpp \
+    demux/dash/mpd/MPDFactory.h \
+    demux/dash/mpd/Period.cpp \
+    demux/dash/mpd/Period.h \
+    demux/dash/mpd/Profile.cpp \
+    demux/dash/mpd/Profile.hpp \
+    demux/dash/mpd/ProgramInformation.cpp \
+    demux/dash/mpd/ProgramInformation.h \
+    demux/dash/mpd/Representation.cpp \
+    demux/dash/mpd/Representation.h \
+    demux/dash/mpd/TrickModeType.cpp \
+    demux/dash/mpd/TrickModeType.h \
+    demux/dash/mp4/AtomsReader.cpp \
+    demux/dash/mp4/AtomsReader.hpp \
+    demux/dash/xml/DOMHelper.cpp \
+    demux/dash/xml/DOMHelper.h \
+    demux/dash/xml/DOMParser.cpp \
+    demux/dash/xml/DOMParser.h \
+    demux/dash/xml/Node.cpp \
+    demux/dash/xml/Node.h \
+    demux/dash/dash.cpp \
+    demux/dash/dash.hpp \
+    demux/dash/DASHManager.cpp \
+    demux/dash/DASHManager.h
 
+libdash_plugin_la_SOURCES += $(adaptative_SOURCES)
+libdash_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
 libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/demux/dash
 libdash_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
 if HAVE_ZLIB
 libdash_plugin_la_LIBADD += -lz
 endif
 demux_LTLIBRARIES += libdash_plugin.la
+
+
+libhls_plugin_la_SOURCES = \
+    demux/hls/playlist/M3U8.hpp \
+    demux/hls/playlist/M3U8.cpp \
+    demux/hls/playlist/Parser.hpp \
+    demux/hls/playlist/Parser.cpp \
+    demux/hls/playlist/Representation.hpp \
+    demux/hls/playlist/Representation.cpp \
+    demux/hls/playlist/HLSSegment.hpp \
+    demux/hls/playlist/HLSSegment.cpp \
+    demux/hls/playlist/Tags.hpp \
+    demux/hls/playlist/Tags.cpp \
+    demux/hls/HLSManager.hpp \
+    demux/hls/HLSManager.cpp \
+    demux/hls/hls.cpp \
+    demux/hls/hls.hpp
+
+libhls_plugin_la_SOURCES += $(adaptative_SOURCES)
+libhls_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/demux/hls
+libhls_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
+if HAVE_ZLIB
+libhls_plugin_la_LIBADD += -lz
+endif
+if HAVE_GCRYPT
+libhls_plugin_la_CXXFLAGS += $(GCRYPT_CFLAGS)
+libhls_plugin_la_LIBADD += $(GCRYPT_LIBS)
+endif
+
+demux_LTLIBRARIES += libhls_plugin.la
 
 libttml_plugin_la_SOURCES = demux/ttml.c
 demux_LTLIBRARIES += libttml_plugin.la

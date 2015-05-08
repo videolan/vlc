@@ -57,6 +57,7 @@ Demuxers:
  * Support for Creative ADPCM/alaw/ulaw/S16L in VOC files
  * Support for Creative ADPCM in AVI
  * Directory Demux can now sort items, ignore extensions and hidden files
+ * Replaced httplive stream filter with new hls demuxer
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
