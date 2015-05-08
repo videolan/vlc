@@ -44,6 +44,142 @@
 #include <assert.h>
 #include <limits.h>
 
+#if VLC_WINSTORE_APP
+#define COBJMACROS
+#define INITGUID
+#include <winstring.h>
+#include <windows.storage.h>
+#include <roapi.h>
+
+DEFINE_GUID(IID_IStorageItem, 0x4207a996, 0xca2f, 0x42f7, 0xbd, 0xe8, 0x8b, 0x10, 0x45, 0x7a, 0x7f, 0x30);
+DEFINE_GUID(IID_IApplicationDataStatics, 0x5612147b, 0xe843, 0x45e3, 0x94, 0xd8, 0x06, 0x16, 0x9e, 0x3c, 0x8e, 0x17);
+DEFINE_GUID(IID_IKnownFoldersStatics, 0x5a2a7520, 0x4802, 0x452d, 0x9a, 0xd9, 0x43, 0x51, 0xad, 0xa7, 0xec, 0x35);
+
+static HRESULT WinRTSHGetFolderPath(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWSTR pszPath)
+{
+    VLC_UNUSED(hwnd);
+    VLC_UNUSED(hToken);
+
+    HRESULT hr;
+    IStorageFolder *folder;
+
+    if (dwFlags != SHGFP_TYPE_CURRENT)
+        return E_NOTIMPL;
+
+    folder = NULL;
+    csidl &= ~0xFF00; /* CSIDL_FLAG_MASK */
+
+    if (csidl == CSIDL_APPDATA) {
+        IApplicationDataStatics *appDataStatics = NULL;
+        IApplicationData *appData = NULL;
+        static const WCHAR *className = L"Windows.Storage.ApplicationData";
+        const UINT32 clen = wcslen(className);
+
+        HSTRING hClassName = NULL;
+        HSTRING_HEADER header;
+        hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
+        if (FAILED(hr))
+            goto end_appdata;
+
+        hr = RoGetActivationFactory(hClassName, &IID_IApplicationDataStatics, (void**)&appDataStatics);
+
+        if (FAILED(hr))
+            goto end_appdata;
+
+        if (!appDataStatics) {
+            hr = E_FAIL;
+            goto end_appdata;
+        }
+
+        hr = IApplicationDataStatics_get_Current(appDataStatics, &appData);
+
+        if (FAILED(hr))
+            goto end_appdata;
+
+        if (!appData) {
+            hr = E_FAIL;
+            goto end_appdata;
+        }
+
+        hr = IApplicationData_get_LocalFolder(appData, &folder);
+
+end_appdata:
+        WindowsDeleteString(hClassName);
+        if (appDataStatics)
+            IApplicationDataStatics_Release(appDataStatics);
+        if (appData)
+            IApplicationData_Release(appData);
+    }
+    else
+    {
+        IKnownFoldersStatics *knownFoldersStatics = NULL;
+        static const WCHAR *className = L"Windows.Storage.KnownFolders";
+        const UINT32 clen = wcslen(className);
+
+        HSTRING hClassName = NULL;
+        HSTRING_HEADER header;
+        hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
+        if (FAILED(hr))
+            goto end_other;
+
+        hr = RoGetActivationFactory(hClassName, &IID_IKnownFoldersStatics, (void**)&knownFoldersStatics);
+
+        if (FAILED(hr))
+            goto end_other;
+
+        if (!knownFoldersStatics) {
+            hr = E_FAIL;
+            goto end_other;
+        }
+
+        switch (csidl) {
+        case CSIDL_PERSONAL:
+            hr = IKnownFoldersStatics_get_DocumentsLibrary(knownFoldersStatics, &folder);
+            break;
+        case CSIDL_MYMUSIC:
+            hr = IKnownFoldersStatics_get_MusicLibrary(knownFoldersStatics, &folder);
+            break;
+        case CSIDL_MYPICTURES:
+            hr = IKnownFoldersStatics_get_PicturesLibrary(knownFoldersStatics, &folder);
+            break;
+        case CSIDL_MYVIDEO:
+            hr = IKnownFoldersStatics_get_VideosLibrary(knownFoldersStatics, &folder);
+            break;
+        default:
+            hr = E_NOTIMPL;
+        }
+
+end_other:
+        WindowsDeleteString(hClassName);
+        if (knownFoldersStatics)
+            IKnownFoldersStatics_Release(knownFoldersStatics);
+    }
+
+    if( SUCCEEDED(hr) && folder != NULL )
+    {
+        HSTRING path = NULL;
+        IStorageItem *item = NULL;
+        PCWSTR pszPathTemp;
+        hr = IStorageFolder_QueryInterface(folder, &IID_IStorageItem, (void**)&item);
+        if (FAILED(hr))
+            goto end_folder;
+        hr = IStorageItem_get_Path(item, &path);
+        if (FAILED(hr))
+            goto end_folder;
+        pszPathTemp = WindowsGetStringRawBuffer(path, NULL);
+        wcscpy(pszPath, pszPathTemp);
+end_folder:
+        WindowsDeleteString(path);
+        IStorageFolder_Release(folder);
+        if (item)
+            IStorageItem_Release(item);
+    }
+
+    return hr;
+}
+#define SHGetFolderPathW WinRTSHGetFolderPath
+#endif
+
 char *config_GetLibDir (void)
 {
 #if VLC_WINSTORE_APP
