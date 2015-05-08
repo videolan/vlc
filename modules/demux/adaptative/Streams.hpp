@@ -97,7 +97,6 @@ namespace adaptative
                 bool seekAble() const;
                 void setPosition(mtime_t);
                 void sendToDecoder(mtime_t);
-                void dropQueues();
 
             protected:
                 mtime_t   pcr;
@@ -125,6 +124,7 @@ namespace adaptative
                     block_t **pp_queue_last;
                 };
                 std::list<Demuxed *> queues;
+                vlc_mutex_t lock;
         };
 
         class MP4StreamOutput : public AbstractStreamOutput

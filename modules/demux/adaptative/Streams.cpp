@@ -261,6 +261,8 @@ AbstractStreamOutput::AbstractStreamOutput(demux_t *demux)
     if (!fakeesout)
         throw VLC_ENOMEM;
 
+    vlc_mutex_init(&lock);
+
     fakeesout->pf_add = esOutAdd;
     fakeesout->pf_control = esOutControl;
     fakeesout->pf_del = esOutDel;
@@ -274,6 +276,13 @@ AbstractStreamOutput::~AbstractStreamOutput()
     if (demuxstream)
         stream_Delete(demuxstream);
     delete fakeesout;
+
+    vlc_mutex_destroy(&lock);
+
+    /* shouldn't be any */
+    std::list<Demuxed *>::const_iterator it;
+    for(it=queues.begin(); it!=queues.end();++it)
+        delete *it;
 }
 
 mtime_t AbstractStreamOutput::getPCR() const
@@ -303,6 +312,7 @@ bool AbstractStreamOutput::seekAble() const
 
 void AbstractStreamOutput::setPosition(mtime_t nztime)
 {
+    vlc_mutex_lock(&lock);
     std::list<Demuxed *>::const_iterator it;
     for(it=queues.begin(); it!=queues.end();++it)
     {
@@ -311,12 +321,14 @@ void AbstractStreamOutput::setPosition(mtime_t nztime)
             pair->drop();
     }
     pcr = VLC_TS_0;
+    vlc_mutex_unlock(&lock);
     es_out_Control(realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                    VLC_TS_0 + nztime);
 }
 
 void AbstractStreamOutput::sendToDecoder(mtime_t nzdeadline)
 {
+    vlc_mutex_lock(&lock);
     std::list<Demuxed *>::const_iterator it;
     for(it=queues.begin(); it!=queues.end();++it)
     {
@@ -333,13 +345,7 @@ void AbstractStreamOutput::sendToDecoder(mtime_t nzdeadline)
             realdemux->out->pf_send(realdemux->out, pair->es_id, p_block);
         }
     }
-}
-
-void AbstractStreamOutput::dropQueues()
-{
-    std::list<Demuxed *>::const_iterator it;
-    for(it=queues.begin(); it!=queues.end();++it)
-        (*it)->drop();
+    vlc_mutex_unlock(&lock);
 }
 
 AbstractStreamOutput::Demuxed::Demuxed()
@@ -368,12 +374,14 @@ es_out_id_t * AbstractStreamOutput::esOutAdd(es_out_t *fakees, const es_format_t
     es_out_id_t *p_es = me->realdemux->out->pf_add(me->realdemux->out, p_fmt);
     if(p_es)
     {
+        vlc_mutex_lock(&me->lock);
         Demuxed *pair = new (std::nothrow) Demuxed();
         if(pair)
         {
             pair->es_id = p_es;
             me->queues.push_back(pair);
         }
+        vlc_mutex_unlock(&me->lock);
     }
     return p_es;
 }
@@ -381,6 +389,7 @@ es_out_id_t * AbstractStreamOutput::esOutAdd(es_out_t *fakees, const es_format_t
 int AbstractStreamOutput::esOutSend(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
 {
     AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
+    vlc_mutex_lock(&me->lock);
     std::list<Demuxed *>::const_iterator it;
     for(it=me->queues.begin(); it!=me->queues.end();++it)
     {
@@ -391,12 +400,14 @@ int AbstractStreamOutput::esOutSend(es_out_t *fakees, es_out_id_t *p_es, block_t
             break;
         }
     }
+    vlc_mutex_unlock(&me->lock);
     return VLC_SUCCESS;
 }
 
 void AbstractStreamOutput::esOutDel(es_out_t *fakees, es_out_id_t *p_es)
 {
     AbstractStreamOutput *me = (AbstractStreamOutput *) fakees->p_sys;
+    vlc_mutex_lock(&me->lock);
     std::list<Demuxed *>::iterator it;
     for(it=me->queues.begin(); it!=me->queues.end();++it)
     {
@@ -408,6 +419,7 @@ void AbstractStreamOutput::esOutDel(es_out_t *fakees, es_out_id_t *p_es)
             break;
         }
     }
+    vlc_mutex_unlock(&me->lock);
     me->realdemux->out->pf_del(me->realdemux->out, p_es);
 }
 
