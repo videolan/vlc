@@ -56,6 +56,9 @@
 #define BARWIDTH_TEXT N_("Bar width in pixel (default : 10)")
 #define BARWIDTH_LONGTEXT N_("Width in pixel of each bar in the BarGraph to be displayed " \
                 "(default : 10).")
+#define BARHEIGHT_TEXT N_("Bar Height in pixel (default : 400)")
+#define BARHEIGHT_LONGTEXT N_("Height in pixel of BarGraph to be displayed " \
+                "(default : 400).")
 
 #define CFG_PREFIX "audiobargraph_v-"
 
@@ -88,6 +91,7 @@ vlc_module_begin ()
         change_integer_list(pi_pos_values, ppsz_pos_descriptions)
     add_obsolete_integer(CFG_PREFIX "alarm")
     add_integer(CFG_PREFIX "barWidth", 10, BARWIDTH_TEXT, BARWIDTH_LONGTEXT, true)
+    add_integer(CFG_PREFIX "barHeight", 400, BARHEIGHT_TEXT, BARHEIGHT_LONGTEXT, true)
 
     /* video output filter submodule */
     add_submodule ()
@@ -139,7 +143,7 @@ struct filter_sys_t
 };
 
 static const char *const ppsz_filter_options[] = {
-    "x", "y", "transparency", "position", "barWidth", NULL
+    "x", "y", "transparency", "position", "barWidth", "barHeight", NULL
 };
 
 static const char *const ppsz_filter_callbacks[] = {
@@ -148,6 +152,7 @@ static const char *const ppsz_filter_callbacks[] = {
     "audiobargraph_v-transparency",
     "audiobargraph_v-position",
     "audiobargraph_v-barWidth",
+    "audiobargraph_v-barHeight",
     NULL
 };
 
@@ -347,6 +352,9 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
     } else if (!strcmp(psz_var, CFG_PREFIX "barWidth")) {
         p_BarGraph->barWidth = newval.i_int;
         Draw(p_BarGraph);
+    } else if (!strcmp(psz_var, CFG_PREFIX "barHeight")) {
+        p_BarGraph->scale = newval.i_int;
+        Draw(p_BarGraph);
     }
     p_sys->b_spu_update = true;
     vlc_mutex_unlock(&p_sys->lock);
@@ -536,7 +544,7 @@ static int OpenCommon(vlc_object_t *p_this, bool b_sub)
     p_BarGraph->alarm = false;
 
     p_BarGraph->barWidth = var_CreateGetInteger(p_filter, CFG_PREFIX "barWidth");
-    p_BarGraph->scale = 400;
+    p_BarGraph->scale = var_CreateGetInteger( p_filter, CFG_PREFIX "barHeight");
 
     /* Ignore aligment if a position is given for video filter */
     if (!b_sub && p_sys->i_pos_x >= 0 && p_sys->i_pos_y >= 0)
