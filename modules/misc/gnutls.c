@@ -104,17 +104,15 @@ static int gnutls_Error (vlc_object_t *obj, int val)
         case GNUTLS_E_AGAIN:
 #ifdef _WIN32
             WSASetLastError (WSAEWOULDBLOCK);
-#else
-            errno = EAGAIN;
 #endif
+            errno = EAGAIN;
             break;
 
         case GNUTLS_E_INTERRUPTED:
 #ifdef _WIN32
             WSASetLastError (WSAEINTR);
-#else
-            errno = EINTR;
 #endif
+            errno = EINTR;
             break;
 
         default:
@@ -125,9 +123,8 @@ static int gnutls_Error (vlc_object_t *obj, int val)
 #endif
 #ifdef _WIN32
             WSASetLastError (WSAECONNRESET);
-#else
-            errno = ECONNRESET;
 #endif
+            errno = ECONNRESET;
     }
     return -1;
 }
