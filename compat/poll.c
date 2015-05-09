@@ -26,41 +26,14 @@
 #include <string.h>
 #include <errno.h>
 
-#ifdef _WIN32
-# ifdef FD_SETSIZE
-/* Too late for #undef FD_SETSIZE to work: fd_set is already defined. */
-#  error Header inclusion order compromised!
-# endif
-# define FD_SETSIZE 0
-# include <winsock2.h>
-#else
+#ifndef _WIN32
 # include <sys/time.h>
 # include <sys/select.h>
 # include <fcntl.h>
-#endif
 
 int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
 {
-#ifdef _WIN32
-    size_t setsize = sizeof (fd_set) + nfds * sizeof (SOCKET);
-    fd_set *rdset = malloc (setsize);
-    fd_set *wrset = malloc (setsize);
-    fd_set *exset = malloc (setsize);
-
-    if (rdset == NULL || wrset == NULL || exset == NULL)
-    {
-        free (rdset);
-        free (wrset);
-        free (exset);
-        errno = ENOMEM;
-        return -1;
-    }
-/* Winsock FD_SET uses FD_SETSIZE in its expansion */
-# undef FD_SETSIZE
-# define FD_SETSIZE (nfds)
-#else
     fd_set rdset[1], wrset[1], exset[1];
-#endif
     struct timeval tv = { 0, 0 };
     int val = -1;
 
@@ -81,22 +54,12 @@ int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
          * default, such that it is quite feasible to get fd >= FD_SETSIZE.
          * The next instructions will result in a buffer overflow if run on
          * a POSIX system, and the later FD_ISSET would perform an undefined
-         * memory read.
-         *
-         * With Winsock, fd_set is a table of integers. This is awfully slow.
-         * However, FD_SET and FD_ISSET silently and safely discard excess
-         * entries. Here, overflow cannot happen anyway: fd_set of adequate
-         * size are allocated.
-         * Note that Vista has a much nicer WSAPoll(), but Mingw does not
-         * support it yet.
-         */
-#ifndef _WIN32
+         * memory read. */
         if ((unsigned)fd >= FD_SETSIZE)
         {
             errno = EINVAL;
             return -1;
         }
-#endif
         if (fds[i].events & POLLRDNORM)
             FD_SET (fd, rdset);
         if (fds[i].events & POLLWRNORM)
@@ -116,22 +79,13 @@ int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
                   (timeout >= 0) ? &tv : NULL);
     if (val == -1)
     {
-#ifndef _WIN32
         if (errno != EBADF)
-#else
-        if (WSAGetLastError () != WSAENOTSOCK)
-#endif
             return -1;
 
         val = 0;
 
         for (unsigned i = 0; i < nfds; i++)
-#ifndef _WIN32
             if (fcntl (fds[i].fd, F_GETFD) == -1)
-#else
-            if (getsockopt (fds[i].fd, SOL_SOCKET, SO_REUSEADDR,
-                            &(DWORD){ 0 }, &(int){ sizeof (DWORD) }) != 0)
-#endif
             {
                 fds[i].revents = POLLNVAL;
                 val++;
@@ -149,10 +103,151 @@ int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
                        | (FD_ISSET (fd, wrset) ? POLLWRNORM : 0)
                        | (FD_ISSET (fd, exset) ? POLLPRI : 0);
     }
-#ifdef _WIN32
-    free (exset);
-    free (wrset);
-    free (rdset);
-#endif
     return val;
 }
+#else
+# include <windows.h>
+# include <winsock2.h>
+
+int poll(struct pollfd *fds, unsigned nfds, int timeout)
+{
+    DWORD to = (timeout >= 0) ? (DWORD)timeout : INFINITE;
+
+    if (nfds == 0)
+    {    /* WSAWaitForMultipleEvents() does not allow zero events */
+        if (SleepEx(to, TRUE))
+        {
+            errno = EINTR;
+            return -1;
+        }
+        return 0;
+    }
+
+    WSAEVENT *evts = malloc(nfds * sizeof (WSAEVENT));
+    if (evts == NULL)
+        return -1; /* ENOMEM */
+
+    DWORD ret = WSA_WAIT_FAILED;
+    for (unsigned i = 0; i < nfds; i++)
+    {
+        SOCKET fd = fds[i].fd;
+        long mask = FD_CLOSE;
+        fd_set rdset, wrset, exset;
+
+        FD_ZERO(&rdset);
+        FD_ZERO(&wrset);
+        FD_ZERO(&exset);
+        FD_SET(fd, &exset);
+
+        if (fds[i].events & POLLRDNORM)
+        {
+            mask |= FD_READ | FD_ACCEPT;
+            FD_SET(fd, &rdset);
+        }
+        if (fds[i].events & POLLWRNORM)
+        {
+            mask |= FD_WRITE | FD_CONNECT;
+            FD_SET(fd, &wrset);
+        }
+        if (fds[i].events & POLLPRI)
+            mask |= FD_OOB;
+
+        fds[i].revents = 0;
+
+        evts[i] = WSACreateEvent();
+        if (evts[i] == WSA_INVALID_EVENT)
+        {
+            while (i > 0)
+                WSACloseEvent(evts[--i]);
+            free(evts);
+            errno = ENOMEM;
+            return -1;
+        }
+
+        if (WSAEventSelect(fds[i].fd, evts[i], mask)
+         && WSAGetLastError() == WSAENOTSOCK)
+            fds[i].revents |= POLLNVAL;
+
+        struct timeval tv = { 0, 0 };
+        /* By its horrible design, WSAEnumNetworkEvents() only enumerates
+         * events that were not already signaled (i.e. it is edge-triggered).
+         * WSAPoll() would be better in this respect, but worse in others.
+         * So use WSAEnumNetworkEvents() after manually checking for pending
+         * events. */
+        if (select(0, &rdset, &wrset, &exset, &tv) > 0)
+        {
+            if (FD_ISSET(fd, &rdset))
+                fds[i].revents |= fds[i].events & POLLRDNORM;
+            if (FD_ISSET(fd, &wrset))
+                fds[i].revents |= fds[i].events & POLLWRNORM;
+            if (FD_ISSET(fd, &exset))
+                /* To add pain to injury, POLLERR and POLLPRI cannot be
+                 * distinguished here. */
+                fds[i].revents |= POLLERR | (fds[i].events & POLLPRI);
+        }
+
+        if (fds[i].revents != 0 && ret == WSA_WAIT_FAILED)
+            ret = WSA_WAIT_EVENT_0 + i;
+    }
+
+    if (ret == WSA_WAIT_FAILED)
+        ret = WSAWaitForMultipleEvents(nfds, evts, FALSE, to, TRUE);
+
+    unsigned count = 0;
+    for (unsigned i = 0; i < nfds; i++)
+    {
+        WSANETWORKEVENTS ne;
+
+        if (WSAEnumNetworkEvents(fds[i].fd, evts[i], &ne))
+            memset(&ne, 0, sizeof (ne));
+        WSACloseEvent(evts[i]);
+
+        if (ne.lNetworkEvents & FD_CONNECT)
+        {
+            fds[i].revents |= POLLWRNORM;
+            if (ne.iErrorCode[FD_CONNECT_BIT] != 0)
+                fds[i].revents |= POLLERR;
+        }
+        if (ne.lNetworkEvents & FD_CLOSE)
+        {
+            fds[i].revents |= (fds[i].events & POLLRDNORM) | POLLHUP;
+            if (ne.iErrorCode[FD_CLOSE_BIT] != 0)
+                fds[i].revents |= POLLERR;
+        }
+        if (ne.lNetworkEvents & FD_ACCEPT)
+        {
+            fds[i].revents |= POLLRDNORM;
+            if (ne.iErrorCode[FD_ACCEPT_BIT] != 0)
+                fds[i].revents |= POLLERR;
+        }
+        if (ne.lNetworkEvents & FD_OOB)
+        {
+            fds[i].revents |= POLLPRI;
+            if (ne.iErrorCode[FD_OOB_BIT] != 0)
+                fds[i].revents |= POLLERR;
+        }
+        if (ne.lNetworkEvents & FD_READ)
+        {
+            fds[i].revents |= POLLRDNORM;
+            if (ne.iErrorCode[FD_READ_BIT] != 0)
+                fds[i].revents |= POLLERR;
+        }
+        if (ne.lNetworkEvents & FD_WRITE)
+        {
+            fds[i].revents |= POLLWRNORM;
+            if (ne.iErrorCode[FD_WRITE_BIT] != 0)
+                fds[i].revents |= POLLERR;
+        }
+        count += fds[i].revents != 0;
+    }
+
+    free(evts);
+
+    if (count == 0 && ret == WSA_WAIT_IO_COMPLETION)
+    {
+        errno = EINTR;
+        return -1;
+    }
+    return count;
+}
+#endif
