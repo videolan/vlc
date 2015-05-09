@@ -987,6 +987,26 @@ static int Control( access_t *p_access, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
+static int WriteHeaders( access_t *access, const char *fmt, ... )
+{
+    access_sys_t *sys = access->p_sys;
+    char *str;
+    va_list args;
+    int len;
+
+    va_start( args, fmt );
+    len = vasprintf( &str, fmt, args );
+    if( likely(len >= 0) )
+    {
+        if( net_Write( access, sys->fd, sys->p_tls ? &sys->p_tls->sock : NULL,
+                       str, len ) < len )
+            len = -1;
+        free( str );
+    }
+    va_end( args );
+    return len;
+}
+
 /*****************************************************************************
  * Connect:
  *****************************************************************************/
@@ -1049,11 +1069,11 @@ static int Connect( access_t *p_access, uint64_t i_tell )
                 return -1;
             }
 
-            net_Printf( p_access, p_sys->fd, NULL,
-                        "CONNECT %s:%d HTTP/1.%d\r\nHost: %s:%d\r\n\r\n",
-                        p_sys->url.psz_host, p_sys->url.i_port,
-                        p_sys->i_version,
-                        p_sys->url.psz_host, p_sys->url.i_port);
+            WriteHeaders( p_access,
+                          "CONNECT %s:%d HTTP/1.%d\r\nHost: %s:%d\r\n\r\n",
+                          p_sys->url.psz_host, p_sys->url.i_port,
+                          p_sys->i_version,
+                          p_sys->url.psz_host, p_sys->url.i_port);
 
             psz = net_Gets( p_access, p_sys->fd, NULL );
             if( psz == NULL )
@@ -1128,36 +1148,29 @@ static int Request( access_t *p_access, uint64_t i_tell )
     const char *psz_path = p_sys->url.psz_path;
     if( !psz_path || !*psz_path )
         psz_path = "/";
-    if( p_sys->b_proxy && pvs == NULL )
-        net_Printf( p_access, p_sys->fd, NULL,
-                    "GET http://%s:%d%s HTTP/1.%d\r\n",
-                    p_sys->url.psz_host, p_sys->url.i_port,
-                    psz_path, p_sys->i_version );
+    if( p_sys->b_proxy && p_sys->p_tls == NULL )
+        WriteHeaders( p_access, "GET http://%s:%d%s HTTP/1.%d\r\n",
+                      p_sys->url.psz_host, p_sys->url.i_port,
+                      psz_path, p_sys->i_version );
     else
-        net_Printf( p_access, p_sys->fd, pvs, "GET %s HTTP/1.%d\r\n",
-                    psz_path, p_sys->i_version );
-    if( p_sys->url.i_port != (pvs ? 443 : 80) )
-        net_Printf( p_access, p_sys->fd, pvs, "Host: %s:%d\r\n",
-                    p_sys->url.psz_host, p_sys->url.i_port );
+        WriteHeaders( p_access, "GET %s HTTP/1.%d\r\n",
+                      psz_path, p_sys->i_version );
+    if( p_sys->url.i_port != (p_sys->p_tls ? 443 : 80) )
+        WriteHeaders( p_access, "Host: %s:%d\r\n",
+                      p_sys->url.psz_host, p_sys->url.i_port );
     else
-        net_Printf( p_access, p_sys->fd, pvs, "Host: %s\r\n",
-                    p_sys->url.psz_host );
+        WriteHeaders( p_access, "Host: %s\r\n", p_sys->url.psz_host );
     /* User Agent */
-    net_Printf( p_access, p_sys->fd, pvs, "User-Agent: %s\r\n",
-                p_sys->psz_user_agent );
+    WriteHeaders( p_access, "User-Agent: %s\r\n", p_sys->psz_user_agent );
     /* Referrer */
     if (p_sys->psz_referrer)
-    {
-        net_Printf( p_access, p_sys->fd, pvs, "Referer: %s\r\n",
-                    p_sys->psz_referrer);
-    }
+        WriteHeaders( p_access, "Referer: %s\r\n", p_sys->psz_referrer );
     /* Offset */
     if( p_sys->i_version == 1 && ! p_sys->b_continuous )
     {
         p_sys->b_persist = true;
-        net_Printf( p_access, p_sys->fd, pvs,
-                    "Range: bytes=%"PRIu64"-\r\n", i_tell );
-        net_Printf( p_access, p_sys->fd, pvs, "Connection: close\r\n" );
+        WriteHeaders( p_access, "Range: bytes=%"PRIu64"-\r\n", i_tell );
+        WriteHeaders( p_access, "Connection: close\r\n" );
     }
 
     /* Cookies */
@@ -1167,8 +1180,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
         if ( psz_cookiestring )
         {
             msg_Dbg( p_access, "Sending Cookie %s", psz_cookiestring );
-            if( net_Printf( p_access, p_sys->fd, pvs, "Cookie: %s\r\n", psz_cookiestring ) < 0 )
-                msg_Err( p_access, "failed to send Cookie" );
+            WriteHeaders( p_access, "Cookie: %s\r\n", psz_cookiestring );
             free( psz_cookiestring );
         }
     }
@@ -1182,10 +1194,9 @@ static int Request( access_t *p_access, uint64_t i_tell )
         AuthReply( p_access, "Proxy-", &p_sys->proxy, &p_sys->proxy_auth );
 
     /* ICY meta data request */
-    net_Printf( p_access, p_sys->fd, pvs, "Icy-MetaData: 1\r\n" );
+    WriteHeaders( p_access, "Icy-MetaData: 1\r\n" );
 
-
-    if( net_Printf( p_access, p_sys->fd, pvs, "\r\n" ) < 0 )
+    if( WriteHeaders( p_access, "\r\n" ) < 0 )
     {
         msg_Err( p_access, "failed to send request" );
         Disconnect( p_access );
@@ -1551,7 +1562,6 @@ static void Disconnect( access_t *p_access )
 static void AuthReply( access_t *p_access, const char *psz_prefix,
                        vlc_url_t *p_url, http_auth_t *p_auth )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     char *psz_value;
 
     psz_value =
@@ -1562,8 +1572,7 @@ static void AuthReply( access_t *p_access, const char *psz_prefix,
     if ( psz_value == NULL )
         return;
 
-    net_Printf( p_access, p_sys->fd, p_sys->p_vs,
-                "%sAuthorization: %s\r\n", psz_prefix, psz_value );
+    WriteHeaders( p_access, "%sAuthorization: %s\r\n", psz_prefix, psz_value );
     free( psz_value );
 }
 
