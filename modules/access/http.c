@@ -647,7 +647,7 @@ static int ReadData( access_t *p_access, int *pi_read,
             if( p_sys->p_tls != NULL )
                 psz = vlc_tls_GetLine( p_sys->p_tls );
             else
-                psz = net_Gets( p_access, p_sys->fd, NULL );
+                psz = net_Gets( p_access, p_sys->fd );
             /* read the chunk header */
             if( psz == NULL )
             {
@@ -684,7 +684,7 @@ static int ReadData( access_t *p_access, int *pi_read,
             if( p_sys->p_tls != NULL )
                 free( vlc_tls_GetLine( p_sys->p_tls ) );
             else
-                free( net_Gets( p_access, p_sys->fd, NULL ) );
+                free( net_Gets( p_access, p_sys->fd ) );
         }
     }
     return VLC_SUCCESS;
@@ -1083,7 +1083,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
                           p_sys->i_version,
                           p_sys->url.psz_host, p_sys->url.i_port);
 
-            psz = net_Gets( p_access, p_sys->fd, NULL );
+            psz = net_Gets( p_access, p_sys->fd );
             if( psz == NULL )
             {
                 msg_Err( p_access, "cannot establish HTTP/TLS tunnel" );
@@ -1103,7 +1103,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
 
             do
             {
-                psz = net_Gets( p_access, p_sys->fd, NULL );
+                psz = net_Gets( p_access, p_sys->fd );
                 if( psz == NULL )
                 {
                     msg_Err( p_access, "HTTP proxy connection failed" );
@@ -1213,7 +1213,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
     if( p_sys->p_tls != NULL )
         psz = vlc_tls_GetLine( p_sys->p_tls );
     else
-        psz = net_Gets( p_access, p_sys->fd, NULL );
+        psz = net_Gets( p_access, p_sys->fd );
     if( psz == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
@@ -1267,7 +1267,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
         if( p_sys->p_tls != NULL )
             psz = vlc_tls_GetLine( p_sys->p_tls );
         else
-            psz = net_Gets( p_access, p_sys->fd, NULL );
+            psz = net_Gets( p_access, p_sys->fd );
         if( psz == NULL )
         {
             msg_Err( p_access, "failed to read answer" );

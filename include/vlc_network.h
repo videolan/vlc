@@ -147,8 +147,8 @@ VLC_API ssize_t net_Read( vlc_object_t *p_this, int fd, const v_socket_t *, void
 #define net_Read(a,b,c,d,e,f) net_Read(VLC_OBJECT(a),b,c,d,e,f)
 VLC_API ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *, const void *p_data, size_t i_data );
 #define net_Write(a,b,c,d,e) net_Write(VLC_OBJECT(a),b,c,d,e)
-VLC_API char * net_Gets( vlc_object_t *p_this, int fd, const v_socket_t * );
-#define net_Gets(a,b,c) net_Gets(VLC_OBJECT(a),b,c)
+VLC_API char * net_Gets( vlc_object_t *p_this, int fd );
+#define net_Gets(a,b) net_Gets(VLC_OBJECT(a),b)
 
 
 VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, ... ) VLC_FORMAT( 4, 5 );

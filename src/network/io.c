@@ -466,7 +466,7 @@ error:
  *
  * @return nul-terminated heap-allocated string, or NULL on I/O error.
  */
-char *net_Gets(vlc_object_t *obj, int fd, const v_socket_t *vs)
+char *net_Gets(vlc_object_t *obj, int fd)
 {
     char *buf = NULL;
     size_t bufsize = 0, buflen = 0;
@@ -485,7 +485,7 @@ char *net_Gets(vlc_object_t *obj, int fd, const v_socket_t *vs)
             bufsize += 1024;
         }
 
-        ssize_t val = net_Read(obj, fd, vs, buf + buflen, 1, false);
+        ssize_t val = net_Read(obj, fd, NULL, buf + buflen, 1, false);
         if (val < 1)
             goto error;
 

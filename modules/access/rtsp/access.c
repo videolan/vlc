@@ -114,7 +114,7 @@ static int RtspReadLine( void *p_userdata, uint8_t *p_buffer, int i_buffer )
     access_t *p_access = (access_t *)p_userdata;
     access_sys_t *p_sys = p_access->p_sys;
 
-    char *psz = net_Gets( p_access, p_sys->fd, 0 );
+    char *psz = net_Gets( p_access, p_sys->fd );
 
     //fprintf(stderr, "ReadLine: %s\n", psz);
 

@@ -70,7 +70,7 @@ ssize_t Socket::read(vlc_object_t *stream, void *p_buffer, size_t len)
 
 std::string Socket::readline(vlc_object_t *stream)
 {
-    char *line = ::net_Gets(stream, netfd, NULL);
+    char *line = ::net_Gets(stream, netfd);
     if(line == NULL)
         return "";
     std::string ret(line);

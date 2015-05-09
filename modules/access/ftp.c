@@ -208,7 +208,7 @@ static int ftp_RecvAnswer( vlc_object_t *obj, access_sys_t *sys,
     if( sys->cmd.p_tls != NULL )
         resp = vlc_tls_GetLine( sys->cmd.p_tls );
     else
-        resp = net_Gets( obj, sys->cmd.fd, NULL );
+        resp = net_Gets( obj, sys->cmd.fd );
     if( resp == NULL )
     {
         msg_Err( obj, "response failure" );
@@ -235,7 +235,7 @@ static int ftp_RecvAnswer( vlc_object_t *obj, access_sys_t *sys,
             if( sys->cmd.p_tls != NULL )
                 line = vlc_tls_GetLine( sys->cmd.p_tls );
             else
-                line = net_Gets( obj, sys->cmd.fd, NULL );
+                line = net_Gets( obj, sys->cmd.fd );
             if( line == NULL )
             {
                 msg_Err( obj, "response failure" );
@@ -852,7 +852,7 @@ static int DirRead (access_t *p_access, input_item_node_t *p_current_node)
         if( p_sys->data.p_tls != NULL )
             psz_line = vlc_tls_GetLine( p_sys->data.p_tls );
         else
-            psz_line = net_Gets( p_access, p_sys->data.fd, NULL );
+            psz_line = net_Gets( p_access, p_sys->data.fd );
 
         char *psz_uri;
         if( asprintf( &psz_uri, "%s://%s:%d%s%s/%s",

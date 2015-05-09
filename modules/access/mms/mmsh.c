@@ -609,7 +609,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     }
 
     /* Receive the http header */
-    if( ( psz = net_Gets( p_access, p_sys->fd, NULL ) ) == NULL )
+    if( ( psz = net_Gets( p_access, p_sys->fd ) ) == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
         goto error;
@@ -633,7 +633,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     free( psz );
     for( ;; )
     {
-        char *psz = net_Gets( p_access, p_sys->fd, NULL );
+        char *psz = net_Gets( p_access, p_sys->fd );
         char *p;
 
         if( psz == NULL )
@@ -864,7 +864,7 @@ static int Start( access_t *p_access, uint64_t i_pos )
         return VLC_EGENERIC;
     }
 
-    psz = net_Gets( p_access, p_sys->fd, NULL );
+    psz = net_Gets( p_access, p_sys->fd );
     if( psz == NULL )
     {
         msg_Err( p_access, "cannot read data 0" );
@@ -883,7 +883,7 @@ static int Start( access_t *p_access, uint64_t i_pos )
     /* FIXME check HTTP code */
     for( ;; )
     {
-        char *psz = net_Gets( p_access, p_sys->fd, NULL );
+        char *psz = net_Gets( p_access, p_sys->fd );
         if( psz == NULL )
         {
             msg_Err( p_access, "cannot read data 1" );

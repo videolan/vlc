@@ -632,8 +632,7 @@ static int ReadStatusLine( vlc_object_t *p_this )
     char *psz_next;
     int i_result = VLC_EGENERIC;
 
-    p_sys->psz_last_status_line = net_Gets( p_this, p_sys->i_control_fd,
-                                            NULL );
+    p_sys->psz_last_status_line = net_Gets( p_this, p_sys->i_control_fd );
     if ( !p_sys->psz_last_status_line )
         goto error;
 
@@ -681,7 +680,7 @@ static int ReadHeader( vlc_object_t *p_this,
     char *psz_value;
     int i_err = VLC_SUCCESS;
 
-    psz_line = net_Gets( p_this, p_sys->i_control_fd, NULL );
+    psz_line = net_Gets( p_this, p_sys->i_control_fd );
     if ( !psz_line )
     {
         i_err = VLC_EGENERIC;
