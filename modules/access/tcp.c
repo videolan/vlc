@@ -138,8 +138,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_access->info.b_eof )
         return 0;
 
-    i_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len,
-                       false );
+    i_read = net_Read( p_access, p_sys->fd, p_buffer, i_len, false );
     if( i_read == 0 )
         p_access->info.b_eof = true;
     else if( i_read > 0 )

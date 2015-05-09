@@ -672,7 +672,7 @@ static int ReadData( access_t *p_access, int *pi_read,
     if( p_sys->p_tls != NULL )
         *pi_read = vlc_tls_Read( p_sys->p_tls, p_buffer, i_len, false );
     else
-        *pi_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len, false );
+        *pi_read = net_Read( p_access, p_sys->fd, p_buffer, i_len, false );
     if( *pi_read <= 0 )
         return VLC_SUCCESS;
 

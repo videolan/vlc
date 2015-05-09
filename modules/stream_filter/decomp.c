@@ -216,7 +216,7 @@ static int Read (stream_t *stream, void *buf, unsigned int buflen)
     }
     assert ((buf != NULL) || (buflen == 0));
 
-    ssize_t val = net_Read (stream, sys->read_fd, NULL, buf, buflen, false);
+    ssize_t val = net_Read (stream, sys->read_fd, buf, buflen, false);
     if (val > 0)
     {
         sys->offset += val;
@@ -254,7 +254,7 @@ static int Peek (stream_t *stream, const uint8_t **pbuf, unsigned int len)
     {
         ssize_t val;
 
-        val = net_Read (stream, sys->read_fd, NULL,
+        val = net_Read (stream, sys->read_fd,
                         peeked->p_buffer + curlen, len - curlen, false);
         if (val <= 0)
             break;

@@ -260,8 +260,7 @@ static block_t *BlockRead(access_t *p_access)
 
     /* Read data */
     p_block = block_Alloc(MTU);
-    len = net_Read(p_access, p_sys->eyetvSock, NULL,
-                    p_block->p_buffer, MTU, false);
+    len = net_Read(p_access, p_sys->eyetvSock, p_block->p_buffer, MTU, false);
 
     if (len < 0) {
         block_Release(p_block);

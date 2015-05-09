@@ -106,7 +106,7 @@ static int RtspRead( void *p_userdata, uint8_t *p_buffer, int i_buffer )
     access_t *p_access = (access_t *)p_userdata;
     access_sys_t *p_sys = p_access->p_sys;
 
-    return net_Read( p_access, p_sys->fd, 0, p_buffer, i_buffer, true );
+    return net_Read( p_access, p_sys->fd, p_buffer, i_buffer, true );
 }
 
 static int RtspReadLine( void *p_userdata, uint8_t *p_buffer, int i_buffer )

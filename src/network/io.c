@@ -258,7 +258,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
  * object has been signaled.
  *****************************************************************************/
 ssize_t
-net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
+net_Read (vlc_object_t *restrict p_this, int fd,
           void *restrict p_buf, size_t i_buflen, bool waitall)
 {
     struct pollfd ufd[2];
@@ -274,30 +274,17 @@ net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
      * before poll() starts an asynchronous transfer and returns 0.
      * Always call poll() first.
      *
-     * However if we have a virtual socket handler, try to read() first.
      * See bug #8972 for details.
      */
-    if (vs == NULL)
-        goto do_poll;
+    goto do_poll;
 #endif
     do
     {
-        ssize_t n;
-        if (vs != NULL)
-        {
-            int canc = vlc_savecancel ();
-            n = vs->pf_recv (vs->p_sys, p_buf, i_buflen);
-            vlc_restorecancel (canc);
-        }
-        else
-        {
 #ifdef _WIN32
-            n = recv (fd, p_buf, i_buflen, 0);
+        ssize_t n = recv (fd, p_buf, i_buflen, 0);
 #else
-            n = read (fd, p_buf, i_buflen);
+        ssize_t n = read (fd, p_buf, i_buflen);
 #endif
-        }
-
         if (n < 0)
         {
             switch (net_errno)
@@ -485,7 +472,7 @@ char *net_Gets(vlc_object_t *obj, int fd)
             bufsize += 1024;
         }
 
-        ssize_t val = net_Read(obj, fd, NULL, buf + buflen, 1, false);
+        ssize_t val = net_Read(obj, fd, buf + buflen, 1, false);
         if (val < 1)
             goto error;
 

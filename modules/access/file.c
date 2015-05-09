@@ -342,7 +342,7 @@ static ssize_t StreamRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
     int fd = p_sys->fd;
 
 #if !defined (_WIN32) && !defined (__OS2__)
-    ssize_t val = net_Read (p_access, fd, NULL, p_buffer, i_len, false);
+    ssize_t val = net_Read (p_access, fd, p_buffer, i_len, false);
 #else
     ssize_t val = read (fd, p_buffer, i_len);
 #endif

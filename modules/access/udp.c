@@ -268,7 +268,7 @@ static void* ThreadRead( void *data )
 
         block_cleanup_push(pkt);
         do
-            len = net_Read(access, sys->fd, NULL, pkt->p_buffer, MTU, false);
+            len = net_Read(access, sys->fd, pkt->p_buffer, MTU, false);
         while (len == -1 && errno != EINTR);
         vlc_cleanup_pop();
 

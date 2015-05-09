@@ -827,7 +827,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_sys->data.p_tls != NULL )
         i_read = vlc_tls_Read( p_sys->data.p_tls, p_buffer, i_len, false );
     else
-        i_read = net_Read( p_access, p_sys->data.fd, NULL, p_buffer, i_len, false );
+        i_read = net_Read( p_access, p_sys->data.fd, p_buffer, i_len, false );
     if( i_read == 0 )
         p_access->info.b_eof = true;
     else if( i_read > 0 )

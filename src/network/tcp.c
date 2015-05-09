@@ -363,7 +363,7 @@ static int SocksNegotiate( vlc_object_t *p_obj,
 
     if( net_Write( p_obj, fd, NULL, buffer, i_len ) != i_len )
         return VLC_EGENERIC;
-    if( net_Read( p_obj, fd, NULL, buffer, 2, true ) != 2 )
+    if( net_Read( p_obj, fd, buffer, 2, true ) != 2 )
         return VLC_EGENERIC;
 
     msg_Dbg( p_obj, "socks: v=%d method=%x", buffer[0], buffer[1] );
@@ -390,7 +390,7 @@ static int SocksNegotiate( vlc_object_t *p_obj,
         if( net_Write( p_obj, fd, NULL, buffer, i_len ) != i_len )
             return VLC_EGENERIC;
 
-        if( net_Read( p_obj, fd, NULL, buffer, 2, true ) != 2 )
+        if( net_Read( p_obj, fd, buffer, 2, true ) != 2 )
             return VLC_EGENERIC;
 
         msg_Dbg( p_obj, "socks: v=%d status=%x", buffer[0], buffer[1] );
@@ -462,7 +462,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
         if( net_Write( p_obj, fd, NULL, buffer, 9 ) != 9 )
             return VLC_EGENERIC;
-        if( net_Read( p_obj, fd, NULL, buffer, 8, true ) != 8 )
+        if( net_Read( p_obj, fd, buffer, 8, true ) != 8 )
             return VLC_EGENERIC;
 
         msg_Dbg( p_obj, "socks: v=%d cd=%d",
@@ -492,7 +492,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
             return VLC_EGENERIC;
 
         /* Read the header */
-        if( net_Read( p_obj, fd, NULL, buffer, 5, true ) != 5 )
+        if( net_Read( p_obj, fd, buffer, 5, true ) != 5 )
             return VLC_EGENERIC;
 
         msg_Dbg( p_obj, "socks: v=%d rep=%d atyp=%d",
@@ -514,7 +514,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         else
             return VLC_EGENERIC;
 
-        if( net_Read( p_obj, fd, NULL, buffer, i_len, true ) != i_len )
+        if( net_Read( p_obj, fd, buffer, i_len, true ) != i_len )
             return VLC_EGENERIC;
     }
 
