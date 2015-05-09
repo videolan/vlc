@@ -221,7 +221,7 @@ static int   Read( stream_t *, void *, unsigned );
 static int   Peek( stream_t *, const uint8_t **, unsigned );
 static int   Control( stream_t *, int , va_list );
 
-static inline bool isFQUrl( char* url )
+static inline bool isFQUrl( const char* url )
 {
     return ( NULL != vlc_strcasestr( url, "https://") ||
              NULL != vlc_strcasestr( url, "http://" ) );
