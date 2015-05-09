@@ -97,9 +97,9 @@ int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
             return -1;
         }
 #endif
-        if (fds[i].events & POLLIN)
+        if (fds[i].events & POLLRDNORM)
             FD_SET (fd, rdset);
-        if (fds[i].events & POLLOUT)
+        if (fds[i].events & POLLWRNORM)
             FD_SET (fd, wrset);
         if (fds[i].events & POLLPRI)
             FD_SET (fd, exset);
@@ -145,8 +145,8 @@ int (poll) (struct pollfd *fds, unsigned nfds, int timeout)
     for (unsigned i = 0; i < nfds; i++)
     {
         int fd = fds[i].fd;
-        fds[i].revents = (FD_ISSET (fd, rdset) ? POLLIN : 0)
-                       | (FD_ISSET (fd, wrset) ? POLLOUT : 0)
+        fds[i].revents = (FD_ISSET (fd, rdset) ? POLLRDNORM : 0)
+                       | (FD_ISSET (fd, wrset) ? POLLWRNORM : 0)
                        | (FD_ISSET (fd, exset) ? POLLPRI : 0);
     }
 #ifdef _WIN32

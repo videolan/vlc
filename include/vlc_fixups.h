@@ -273,13 +273,17 @@ const char *inet_ntop(int, const void *, char *, int);
 #ifndef HAVE_STRUCT_POLLFD
 enum
 {
-    POLLIN=1,
-    POLLOUT=2,
-    POLLPRI=4,
-    POLLERR=8,  // unsupported stub
-    POLLHUP=16, // unsupported stub
-    POLLNVAL=32 // unsupported stub
+    POLLERR=0x1,
+    POLLHUP=0x2,
+    POLLNVAL=0x4,
+    POLLWRNORM=0x10,
+    POLLWRBAND=0x20,
+    POLLRDNORM=0x100,
+    POLLRDBAND=0x200,
+    POLLPRI=0x400,
 };
+#define POLLIN  (POLLRDNORM|POLLRDBAND)
+#define POLLOUT (POLLWRNORM|POLLWRBAND)
 
 struct pollfd
 {
