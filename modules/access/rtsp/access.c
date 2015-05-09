@@ -133,7 +133,7 @@ static int RtspWrite( void *p_userdata, uint8_t *p_buffer, int i_buffer )
 
     //fprintf(stderr, "Write: %s", p_buffer);
 
-    net_Printf( p_access, p_sys->fd, 0, "%s", p_buffer );
+    net_Printf( p_access, p_sys->fd, "%s", p_buffer );
 
     return 0;
 }

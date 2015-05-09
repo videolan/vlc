@@ -734,7 +734,7 @@ static int WriteAuxHeaders( vlc_object_t *p_this,
         psz_key = ppsz_keys[i];
         psz_value = vlc_dictionary_value_for_key( p_req_headers, psz_key );
 
-        i_rc = net_Printf( p_this, p_sys->i_control_fd, NULL,
+        i_rc = net_Printf( p_this, p_sys->i_control_fd,
                            "%s: %s\r\n", psz_key, psz_value );
         if ( i_rc < 0 )
         {
@@ -762,7 +762,7 @@ static int SendRequest( vlc_object_t *p_this, const char *psz_method,
     int i_err = VLC_SUCCESS;
     int i_rc;
 
-    i_rc = net_Printf( p_this, p_sys->i_control_fd, NULL,
+    i_rc = net_Printf( p_this, p_sys->i_control_fd,
                        "%s %s RTSP/1.0\r\n"
                        "User-Agent: " RAOP_USER_AGENT "\r\n"
                        "Client-Instance: %s\r\n"
@@ -778,7 +778,7 @@ static int SendRequest( vlc_object_t *p_this, const char *psz_method,
 
     if ( psz_content_type )
     {
-        i_rc = net_Printf( p_this, p_sys->i_control_fd, NULL,
+        i_rc = net_Printf( p_this, p_sys->i_control_fd,
                            "Content-Type: %s\r\n", psz_content_type );
         if ( i_rc < 0 )
         {
@@ -791,7 +791,7 @@ static int SendRequest( vlc_object_t *p_this, const char *psz_method,
     {
         i_body_length = strlen( psz_body );
 
-        i_rc = net_Printf( p_this, p_sys->i_control_fd, NULL,
+        i_rc = net_Printf( p_this, p_sys->i_control_fd,
                            "Content-Length: %u\r\n",
                            (unsigned int)i_body_length );
         if ( i_rc < 0 )

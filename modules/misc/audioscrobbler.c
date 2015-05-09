@@ -808,7 +808,7 @@ static void *Run(void *data)
         }
 
         /* we transmit the data */
-        int i_net_ret = net_Printf(p_intf, i_post_socket, NULL,
+        int i_net_ret = net_Printf(p_intf, i_post_socket,
             "POST %s HTTP/1.1\n"
             "Accept-Encoding: identity\n"
             "Content-length: %zu\n"
