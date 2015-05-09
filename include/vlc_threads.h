@@ -81,17 +81,10 @@ static inline int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout)
 {
     int val;
 
-    do
-    {
-        int ugly_timeout = ((unsigned)timeout >= 50) ? 50 : timeout;
-        if (timeout >= 0)
-            timeout -= ugly_timeout;
-
-        vlc_testcancel ();
-        val = poll (fds, nfds, ugly_timeout);
-    }
-    while (val == 0 && timeout != 0);
-
+    vlc_testcancel();
+    val = poll(fds, nfds, timeout);
+    if (val < 0)
+        vlc_testcancel();
     return val;
 }
 # define poll(u,n,t) vlc_poll(u, n, t)
