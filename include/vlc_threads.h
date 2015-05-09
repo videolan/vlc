@@ -34,6 +34,10 @@
  *
  */
 
+VLC_API int vlc_savecancel(void);
+VLC_API void vlc_restorecancel(int state);
+VLC_API void vlc_testcancel(void);
+
 #if defined (_WIN32)
 # include <process.h>
 # ifndef ETIMEDOUT
@@ -72,6 +76,25 @@ typedef struct vlc_timer *vlc_timer_t;
 # define VLC_THREAD_PRIORITY_VIDEO    0
 # define VLC_THREAD_PRIORITY_OUTPUT   THREAD_PRIORITY_ABOVE_NORMAL
 # define VLC_THREAD_PRIORITY_HIGHEST  THREAD_PRIORITY_TIME_CRITICAL
+
+static inline int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout)
+{
+    int val;
+
+    do
+    {
+        int ugly_timeout = ((unsigned)timeout >= 50) ? 50 : timeout;
+        if (timeout >= 0)
+            timeout -= ugly_timeout;
+
+        vlc_testcancel ();
+        val = poll (fds, nfds, ugly_timeout);
+    }
+    while (val == 0 && timeout != 0);
+
+    return val;
+}
+# define poll(u,n,t) vlc_poll(u, n, t)
 
 #elif defined (__OS2__)
 # include <errno.h>
@@ -113,6 +136,26 @@ typedef struct vlc_timer *vlc_timer_t;
 
 # define pthread_sigmask  sigprocmask
 
+static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
+{
+    static int (*vlc_poll_os2)(struct pollfd *, unsigned, int) = NULL;
+
+    if (!vlc_poll_os2)
+    {
+        HMODULE hmod;
+        CHAR szFailed[CCHMAXPATH];
+
+        if (DosLoadModule(szFailed, sizeof(szFailed), "vlccore", &hmod))
+            return -1;
+
+        if (DosQueryProcAddr(hmod, 0, "_vlc_poll_os2", (PFN *)&vlc_poll_os2))
+            return -1;
+    }
+
+    return (*vlc_poll_os2)(fds, nfds, timeout);
+}
+# define poll(u,n,t) vlc_poll(u, n, t)
+
 #elif defined (__ANDROID__)      /* pthreads subset without pthread_cancel() */
 # include <unistd.h>
 # include <pthread.h>
@@ -141,6 +184,26 @@ typedef struct vlc_timer *vlc_timer_t;
 # define VLC_THREAD_PRIORITY_OUTPUT   0
 # define VLC_THREAD_PRIORITY_HIGHEST  0
 
+static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
+{
+    int val;
+
+    do
+    {
+        int ugly_timeout = ((unsigned)timeout >= 50) ? 50 : timeout;
+        if (timeout >= 0)
+            timeout -= ugly_timeout;
+
+        vlc_testcancel ();
+        val = poll (fds, nfds, ugly_timeout);
+    }
+    while (val == 0 && timeout != 0);
+
+    return val;
+}
+
+# define poll(u,n,t) vlc_poll(u, n, t)
+
 #elif defined (__APPLE__)
 # define _APPLE_C_SOURCE    1 /* Proper pthread semantics on OSX */
 # include <unistd.h>
@@ -150,7 +213,6 @@ typedef struct vlc_timer *vlc_timer_t;
 # include <mach/task.h>
 # define LIBVLC_USE_PTHREAD           1
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
-# define LIBVLC_USE_PTHREAD_CANCEL    1
 
 typedef pthread_t       vlc_thread_t;
 typedef pthread_mutex_t vlc_mutex_t;
@@ -180,7 +242,6 @@ typedef struct vlc_timer *vlc_timer_t;
 # include <semaphore.h>
 # define LIBVLC_USE_PTHREAD           1
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
-# define LIBVLC_USE_PTHREAD_CANCEL    1
 
 typedef pthread_t       vlc_thread_t;
 typedef pthread_mutex_t vlc_mutex_t;
@@ -324,10 +385,6 @@ VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t) VLC_USED;
 
 VLC_API unsigned vlc_GetCPUCount(void);
 
-VLC_API int vlc_savecancel(void);
-VLC_API void vlc_restorecancel(int state);
-VLC_API void vlc_testcancel(void);
-
 #if defined (LIBVLC_USE_PTHREAD_CLEANUP)
 /**
  * Registers a new procedure to run if the thread is cancelled (or otherwise
@@ -387,51 +444,6 @@ struct vlc_cleanup_t
     } while (0)
 
 #endif /* !LIBVLC_USE_PTHREAD_CLEANUP */
-
-#ifndef LIBVLC_USE_PTHREAD_CANCEL
-/* poll() with cancellation */
-# ifdef __OS2__
-static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
-{
-    static int (*vlc_poll_os2)(struct pollfd *, unsigned, int) = NULL;
-
-    if (!vlc_poll_os2)
-    {
-        HMODULE hmod;
-        CHAR szFailed[CCHMAXPATH];
-
-        if (DosLoadModule(szFailed, sizeof(szFailed), "vlccore", &hmod))
-            return -1;
-
-        if (DosQueryProcAddr(hmod, 0, "_vlc_poll_os2", (PFN *)&vlc_poll_os2))
-            return -1;
-    }
-
-    return (*vlc_poll_os2)(fds, nfds, timeout);
-}
-# else
-static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
-{
-    int val;
-
-    do
-    {
-        int ugly_timeout = ((unsigned)timeout >= 50) ? 50 : timeout;
-        if (timeout >= 0)
-            timeout -= ugly_timeout;
-
-        vlc_testcancel ();
-        val = poll (fds, nfds, ugly_timeout);
-    }
-    while (val == 0 && timeout != 0);
-
-    return val;
-}
-# endif
-
-# define poll(u,n,t) vlc_poll(u, n, t)
-
-#endif /* LIBVLC_USE_PTHREAD_CANCEL */
 
 static inline void vlc_cleanup_lock (void *lock)
 {
