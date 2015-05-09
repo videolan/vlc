@@ -223,8 +223,8 @@ static int   Control( stream_t *, int , va_list );
 
 static inline bool isFQUrl( const char* url )
 {
-    return ( NULL != vlc_strcasestr( url, "https://") ||
-             NULL != vlc_strcasestr( url, "http://" ) );
+    return ( NULL != strcasestr( url, "https://") ||
+             NULL != strcasestr( url, "http://" ) );
 }
 
 static bool isHDS( stream_t *s )
