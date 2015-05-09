@@ -151,10 +151,13 @@ vlc_tls_t *vlc_tls_SessionCreate (vlc_tls_creds_t *crd, int fd,
     vlc_tls_t *session = vlc_custom_create (crd, sizeof (*session),
                                             "tls session");
     int val = crd->open (crd, session, fd, host, alpn);
-    if (val == VLC_SUCCESS)
-        return session;
-    vlc_object_release (session);
-    return NULL;
+    if (val != VLC_SUCCESS)
+    {
+        vlc_object_release (session);
+        return NULL;
+    }
+    session->fd = fd;
+    return session;
 }
 
 int vlc_tls_SessionHandshake (vlc_tls_t *session, const char *host,

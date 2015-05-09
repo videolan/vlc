@@ -38,6 +38,7 @@ struct vlc_tls
     VLC_COMMON_MEMBERS
 
     void *sys;
+    int fd;
 
     struct virtual_socket_t sock;
 };
