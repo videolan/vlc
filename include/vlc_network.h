@@ -153,8 +153,8 @@ VLC_API char * net_Gets( vlc_object_t *p_this, int fd );
 
 VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const char *psz_fmt, ... ) VLC_FORMAT( 3, 4 );
 #define net_Printf(o,fd,...) net_Printf(VLC_OBJECT(o),fd, __VA_ARGS__)
-VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args );
-#define net_vaPrintf(a,b,c,d,e) net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
+VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const char *psz_fmt, va_list args );
+#define net_vaPrintf(a,b,c,d) net_vaPrintf(VLC_OBJECT(a),b,c,d)
 
 #ifdef _WIN32
 /* Microsoft: same semantic, same value, different name... go figure */
