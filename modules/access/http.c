@@ -129,7 +129,6 @@ struct access_sys_t
     bool b_error;
     vlc_tls_creds_t *p_creds;
     vlc_tls_t *p_tls;
-    v_socket_t *p_vs;
 
     /* From uri */
     vlc_url_t url;
@@ -260,7 +259,6 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
     p_sys->inflate.p_buffer = NULL;
 #endif
     p_sys->p_tls = NULL;
-    p_sys->p_vs = NULL;
     p_sys->i_icy_meta = 0;
     p_sys->i_icy_offset = 0;
     p_sys->psz_icy_name = NULL;
@@ -645,7 +643,11 @@ static int ReadData( access_t *p_access, int *pi_read,
 
         if( p_sys->i_chunk <= 0 )
         {
-            char *psz = net_Gets( p_access, p_sys->fd, p_sys->p_vs );
+            char *psz;
+            if( p_sys->p_tls != NULL )
+                psz = vlc_tls_GetLine( p_sys->p_tls );
+            else
+                psz = net_Gets( p_access, p_sys->fd, NULL );
             /* read the chunk header */
             if( psz == NULL )
             {
@@ -666,7 +668,11 @@ static int ReadData( access_t *p_access, int *pi_read,
         if( i_len > p_sys->i_chunk )
             i_len = p_sys->i_chunk;
     }
-    *pi_read = net_Read( p_access, p_sys->fd, p_sys->p_vs, p_buffer, i_len, false );
+
+    if( p_sys->p_tls != NULL )
+        *pi_read = vlc_tls_Read( p_sys->p_tls, p_buffer, i_len, false );
+    else
+        *pi_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len, false );
     if( *pi_read <= 0 )
         return VLC_SUCCESS;
 
@@ -674,10 +680,11 @@ static int ReadData( access_t *p_access, int *pi_read,
     {
         p_sys->i_chunk -= *pi_read;
         if( p_sys->i_chunk <= 0 )
-        {
-            /* read the empty line */
-            char *psz = net_Gets( p_access, p_sys->fd, p_sys->p_vs );
-            free( psz );
+        {   /* read the empty line */
+            if( p_sys->p_tls != NULL )
+                free( vlc_tls_GetLine( p_sys->p_tls ) );
+            else
+                free( net_Gets( p_access, p_sys->fd, NULL ) );
         }
     }
     return VLC_SUCCESS;
@@ -998,8 +1005,9 @@ static int WriteHeaders( access_t *access, const char *fmt, ... )
     len = vasprintf( &str, fmt, args );
     if( likely(len >= 0) )
     {
-        if( net_Write( access, sys->fd, sys->p_tls ? &sys->p_tls->sock : NULL,
-                       str, len ) < len )
+        if( ((sys->p_tls != NULL)
+            ? vlc_tls_Write( sys->p_tls, str, len )
+            : net_Write( access, sys->fd, NULL, str, len )) < len )
             len = -1;
         free( str );
     }
@@ -1129,7 +1137,6 @@ static int Connect( access_t *p_access, uint64_t i_tell )
             Disconnect( p_access );
             return -1;
         }
-        p_sys->p_vs = &p_sys->p_tls->sock;
     }
 
     return Request( p_access, i_tell ) ? -2 : 0;
@@ -1140,7 +1147,6 @@ static int Request( access_t *p_access, uint64_t i_tell )
 {
     access_sys_t   *p_sys = p_access->p_sys;
     char           *psz ;
-    v_socket_t     *pvs = p_sys->p_vs;
     p_sys->b_persist = false;
 
     p_sys->i_remaining = 0;
@@ -1204,7 +1210,11 @@ static int Request( access_t *p_access, uint64_t i_tell )
     }
 
     /* Read Answer */
-    if( ( psz = net_Gets( p_access, p_sys->fd, pvs ) ) == NULL )
+    if( p_sys->p_tls != NULL )
+        psz = vlc_tls_GetLine( p_sys->p_tls );
+    else
+        psz = net_Gets( p_access, p_sys->fd, NULL );
+    if( psz == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
         goto error;
@@ -1252,10 +1262,12 @@ static int Request( access_t *p_access, uint64_t i_tell )
 
     for( ;; )
     {
-        char *psz = net_Gets( p_access, p_sys->fd, pvs );
-        char *p;
-        char *p_trailing;
+        char *psz, *p, *p_trailing;
 
+        if( p_sys->p_tls != NULL )
+            psz = vlc_tls_GetLine( p_sys->p_tls );
+        else
+            psz = net_Gets( p_access, p_sys->fd, NULL );
         if( psz == NULL )
         {
             msg_Err( p_access, "failed to read answer" );
@@ -1545,7 +1557,6 @@ static void Disconnect( access_t *p_access )
     {
         vlc_tls_SessionDelete( p_sys->p_tls );
         p_sys->p_tls = NULL;
-        p_sys->p_vs = NULL;
     }
     if( p_sys->fd != -1)
     {
