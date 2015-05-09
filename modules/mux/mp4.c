@@ -2950,7 +2950,7 @@ static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
  * This is the end boundary case. */
 static void LengthLocalFixup(sout_mux_t *p_mux, const mp4_stream_t *p_stream, block_t *p_entrydata)
 {
-    if ( p_stream->fmt.i_cat == VIDEO_ES )
+    if ( p_stream->fmt.i_cat == VIDEO_ES && p_stream->fmt.video.i_frame_rate )
     {
         p_entrydata->i_length = CLOCK_FREQ *
                 p_stream->fmt.video.i_frame_rate_base /
@@ -2960,7 +2960,7 @@ static void LengthLocalFixup(sout_mux_t *p_mux, const mp4_stream_t *p_stream, bl
     }
     else if (p_stream->fmt.i_cat == AUDIO_ES &&
              p_stream->fmt.audio.i_rate &&
-             p_entrydata->i_nb_samples)
+             p_entrydata->i_nb_samples && p_stream->fmt.audio.i_rate)
     {
         p_entrydata->i_length = CLOCK_FREQ * p_entrydata->i_nb_samples /
                 p_stream->fmt.audio.i_rate;
