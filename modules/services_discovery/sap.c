@@ -554,8 +554,7 @@ static void *Run( void *data )
                     uint8_t p_buffer[MAX_SAP_BUFFER+1];
                     ssize_t i_read;
 
-                    i_read = net_Read (p_sd, ufd[i].fd, NULL, p_buffer,
-                                       MAX_SAP_BUFFER, false);
+                    i_read = recv (ufd[i].fd, p_buffer, MAX_SAP_BUFFER, 0);
                     if (i_read < 0)
                         msg_Warn (p_sd, "receive error: %s",
                                   vlc_strerror_c(errno));
