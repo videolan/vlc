@@ -33,10 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
-
 #include <vlc_access.h>
-
 #include <vlc_dialog.h>
 #include <vlc_meta.h>
 #include <vlc_network.h>
@@ -45,7 +42,6 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 #include <vlc_input.h>
-#include <vlc_md5.h>
 #include <vlc_http.h>
 
 #ifdef HAVE_ZLIB_H
