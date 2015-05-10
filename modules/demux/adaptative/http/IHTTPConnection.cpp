@@ -144,22 +144,14 @@ bool IHTTPConnection::parseReply()
 std::string IHTTPConnection::readLine()
 {
     std::stringstream ss;
-    char c[1];
-    ssize_t size = net_Read(stream, httpSocket, NULL, c, 1, false);
 
-    while(size >= 0)
-    {
-        ss << c[0];
-        if(c[0] == '\n')
-            break;
+    char *line = ::net_Gets(stream, httpSocket, NULL);
+    if(line == NULL)
+       return "";
 
-        size = net_Read(stream, httpSocket, NULL, c, 1, false);
-    }
-
-    if(size > 0)
-        return ss.str();
-
-    return "";
+    ss << line << "\r\n";
+    ::free(line);
+    return ss.str();
 }
 
 std::string IHTTPConnection::buildRequestHeader(const std::string &path) const
