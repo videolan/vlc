@@ -255,13 +255,9 @@ void vlc_cond_wait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex)
 
     if (th != NULL)
     {
-        if (vlc_mutex_trylock (&th->lock) == 0)
-        {
-            thread->cond = NULL;
-            vlc_mutex_unlock (&th->lock);
-        }
-        /* Else: This thread was cancelled and is cancellable.
-                 vlc_testcancel() will take of it right there: */
+        vlc_mutex_lock(&th->lock);
+        th->cond = NULL;
+        vlc_mutex_unlock(&th->lock);
         vlc_testcancel();
     }
 }
@@ -316,13 +312,9 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
 
     if (th != NULL)
     {
-        if (vlc_mutex_trylock (&th->lock) == 0)
-        {
-            thread->cond = NULL;
-            vlc_mutex_unlock (&th->lock);
-        }
-        /* Else: This thread was cancelled and is cancellable.
-                 vlc_testcancel() will take of it right there: */
+        vlc_mutex_lock(&th->lock);
+        th->cond = NULL;
+        vlc_mutex_unlock(&th->lock);
         vlc_testcancel();
     }
     return val;
