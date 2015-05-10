@@ -50,7 +50,7 @@ namespace adaptative
 
             bool    start(demux_t *);
 
-            Streams::Stream::status demux(mtime_t);
+            Stream::status demux(mtime_t);
             mtime_t getDuration() const;
             mtime_t getPCR() const;
             int     getGroup() const;
@@ -66,7 +66,7 @@ namespace adaptative
             AbstractAdaptationLogic::LogicType  logicType;
             AbstractPlaylist                    *playlist;
             stream_t                            *stream;
-            Streams::Stream                     *streams[Streams::count];
+            Stream                              *streams[StreamTypeCount];
             mtime_t                              nextPlaylistupdate;
     };
 

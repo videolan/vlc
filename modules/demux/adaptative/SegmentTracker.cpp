@@ -53,7 +53,7 @@ void SegmentTracker::resetCounter()
     prevRepresentation = NULL;
 }
 
-Chunk * SegmentTracker::getNextChunk(Streams::Type type)
+Chunk * SegmentTracker::getNextChunk(StreamType type)
 {
     BaseRepresentation *rep;
     ISegment *segment;

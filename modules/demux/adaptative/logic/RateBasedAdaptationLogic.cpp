@@ -42,7 +42,7 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (int w, int h) :
     height = h;
 }
 
-BaseRepresentation *RateBasedAdaptationLogic::getCurrentRepresentation(Streams::Type type, BasePeriod *period) const
+BaseRepresentation *RateBasedAdaptationLogic::getCurrentRepresentation(StreamType type, BasePeriod *period) const
 {
     if(period == NULL)
         return NULL;
@@ -82,7 +82,7 @@ FixedRateAdaptationLogic::FixedRateAdaptationLogic(size_t bps) :
     currentBps = bps;
 }
 
-BaseRepresentation *FixedRateAdaptationLogic::getCurrentRepresentation(Streams::Type type, BasePeriod *period) const
+BaseRepresentation *FixedRateAdaptationLogic::getCurrentRepresentation(StreamType type, BasePeriod *period) const
 {
     if(period == NULL)
         return NULL;

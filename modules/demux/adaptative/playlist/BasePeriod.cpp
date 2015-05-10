@@ -55,13 +55,13 @@ const std::vector<BaseAdaptationSet*>&  BasePeriod::getAdaptationSets() const
     return adaptationSets;
 }
 
-const std::vector<BaseAdaptationSet*>   BasePeriod::getAdaptationSets(Streams::Type type) const
+const std::vector<BaseAdaptationSet*>   BasePeriod::getAdaptationSets(StreamType type) const
 {
     std::vector<BaseAdaptationSet*> list;
     std::vector<BaseAdaptationSet*>::const_iterator it;
     for(it = adaptationSets.begin(); it!= adaptationSets.end(); ++it)
     {
-        if( Streams::Stream::mimeToType((*it)->getMimeType()) == type )
+        if( Stream::mimeToType((*it)->getMimeType()) == type )
             list.push_back(*it);
     }
     return list;
@@ -76,12 +76,12 @@ void BasePeriod::addAdaptationSet(BaseAdaptationSet *adaptationSet)
     }
 }
 
-BaseAdaptationSet * BasePeriod::getAdaptationSet(Streams::Type type) const
+BaseAdaptationSet * BasePeriod::getAdaptationSet(StreamType type) const
 {
     std::vector<BaseAdaptationSet *>::const_iterator it;
     for(it = adaptationSets.begin(); it != adaptationSets.end(); ++it)
     {
-        if ( Streams::Stream::mimeToType((*it)->getMimeType()) == type )
+        if ( Stream::mimeToType((*it)->getMimeType()) == type )
             return *it;
     }
     return NULL;

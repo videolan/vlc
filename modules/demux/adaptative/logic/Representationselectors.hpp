@@ -40,9 +40,9 @@ namespace adaptative
         public:
             RepresentationSelector();
             virtual ~RepresentationSelector() {}
-            virtual BaseRepresentation * select(BasePeriod *period, Streams::Type) const;
-            virtual BaseRepresentation * select(BasePeriod *period, Streams::Type, uint64_t bitrate) const;
-            virtual BaseRepresentation * select(BasePeriod *period, Streams::Type, uint64_t bitrate,
+            virtual BaseRepresentation * select(BasePeriod *period, StreamType) const;
+            virtual BaseRepresentation * select(BasePeriod *period, StreamType, uint64_t bitrate) const;
+            virtual BaseRepresentation * select(BasePeriod *period, StreamType, uint64_t bitrate,
                                             int width, int height) const;
         protected:
             virtual BaseRepresentation * select(std::vector<BaseRepresentation *>&reps,

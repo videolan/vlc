@@ -39,7 +39,7 @@ namespace adaptative
             public:
                 RateBasedAdaptationLogic            (int, int);
 
-                BaseRepresentation *getCurrentRepresentation(Streams::Type, BasePeriod *) const;
+                BaseRepresentation *getCurrentRepresentation(StreamType, BasePeriod *) const;
                 virtual void updateDownloadRate(size_t, mtime_t);
 
             private:
@@ -55,7 +55,7 @@ namespace adaptative
             public:
                 FixedRateAdaptationLogic(size_t);
 
-                BaseRepresentation *getCurrentRepresentation(Streams::Type, BasePeriod *) const;
+                BaseRepresentation *getCurrentRepresentation(StreamType, BasePeriod *) const;
 
             private:
                 size_t                  currentBps;

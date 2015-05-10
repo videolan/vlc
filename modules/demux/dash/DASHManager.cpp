@@ -84,7 +84,7 @@ bool DASHManager::updatePlaylist()
         }
 
         mtime_t minsegmentTime = 0;
-        for(int type=0; type<Streams::count; type++)
+        for(int type=0; type<StreamTypeCount; type++)
         {
             if(!streams[type])
                 continue;

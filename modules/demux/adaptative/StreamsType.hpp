@@ -22,25 +22,24 @@
 
 namespace adaptative
 {
-    namespace Streams
+
+    enum StreamType
     {
-        enum Type
-        {
-            UNKNOWN = 0,
-            VIDEO,
-            AUDIO,
-            APPLICATION
-        };
+        UNKNOWN = 0,
+        VIDEO,
+        AUDIO,
+        APPLICATION
+    };
 
-        enum Format
-        {
-            UNSUPPORTED = 0,
-            MP4,
-            MPEG2TS
-        };
+    enum StreamFormat
+    {
+        UNSUPPORTED = 0,
+        MP4,
+        MPEG2TS
+    };
 
-        static const int count = APPLICATION + 1;
-    }
+    static const int StreamTypeCount = APPLICATION + 1;
+
 }
 
 #endif

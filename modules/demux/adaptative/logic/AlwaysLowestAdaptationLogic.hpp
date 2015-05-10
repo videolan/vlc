@@ -31,7 +31,7 @@ namespace adaptative
             public:
                 AlwaysLowestAdaptationLogic();
 
-                virtual BaseRepresentation* getCurrentRepresentation(Streams::Type, BasePeriod *) const;
+                virtual BaseRepresentation* getCurrentRepresentation(StreamType, BasePeriod *) const;
         };
     }
 }

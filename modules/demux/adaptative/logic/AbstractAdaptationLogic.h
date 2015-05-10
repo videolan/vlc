@@ -46,7 +46,7 @@ namespace adaptative
                 AbstractAdaptationLogic             ();
                 virtual ~AbstractAdaptationLogic    ();
 
-                virtual BaseRepresentation* getCurrentRepresentation(Streams::Type, BasePeriod *) const = 0;
+                virtual BaseRepresentation* getCurrentRepresentation(StreamType, BasePeriod *) const = 0;
                 virtual void                updateDownloadRate     (size_t, mtime_t);
 
                 enum LogicType

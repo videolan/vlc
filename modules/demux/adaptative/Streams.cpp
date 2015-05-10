@@ -28,23 +28,21 @@
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 
-using namespace adaptative::Streams;
+using namespace adaptative;
 using namespace adaptative::http;
 using namespace adaptative::logic;
-
-using namespace adaptative::Streams;
 
 Stream::Stream(const std::string &mime)
 {
     init(mimeToType(mime), mimeToFormat(mime));
 }
 
-Stream::Stream(const Type type, const Format format)
+Stream::Stream(const StreamType type, const StreamFormat format)
 {
     init(type, format);
 }
 
-void Stream::init(const Type type_, const Format format_)
+void Stream::init(const StreamType type_, const StreamFormat format_)
 {
     type = type_;
     format = format_;
@@ -63,31 +61,31 @@ Stream::~Stream()
     delete segmentTracker;
 }
 
-Type Stream::mimeToType(const std::string &mime)
+StreamType Stream::mimeToType(const std::string &mime)
 {
-    Type mimetype;
+    StreamType mimetype;
     if (!mime.compare(0, 6, "video/"))
-        mimetype = Streams::VIDEO;
+        mimetype = StreamType::VIDEO;
     else if (!mime.compare(0, 6, "audio/"))
-        mimetype = Streams::AUDIO;
+        mimetype = StreamType::AUDIO;
     else if (!mime.compare(0, 12, "application/"))
-        mimetype = Streams::APPLICATION;
+        mimetype = StreamType::APPLICATION;
     else /* unknown of unsupported */
-        mimetype = Streams::UNKNOWN;
+        mimetype = StreamType::UNKNOWN;
     return mimetype;
 }
 
-Format Stream::mimeToFormat(const std::string &mime)
+StreamFormat Stream::mimeToFormat(const std::string &mime)
 {
-    Format format = Streams::UNSUPPORTED;
+    StreamFormat format = StreamFormat::UNSUPPORTED;
     std::string::size_type pos = mime.find("/");
     if(pos != std::string::npos)
     {
         std::string tail = mime.substr(pos + 1);
         if(tail == "mp4")
-            format = Streams::MP4;
+            format = StreamFormat::MP4;
         else if (tail == "mp2t")
-            format = Streams::MPEG2TS;
+            format = StreamFormat::MPEG2TS;
     }
     return format;
 }
@@ -96,10 +94,10 @@ void Stream::create(demux_t *demux, AbstractAdaptationLogic *logic, SegmentTrack
 {
     switch(format)
     {
-        case adaptative::Streams::MP4:
+        case StreamFormat::MP4:
             output = new MP4StreamOutput(demux);
             break;
-        case adaptative::Streams::MPEG2TS:
+        case StreamFormat::MPEG2TS:
             output = new MPEG2TSStreamOutput(demux);
             break;
         default:

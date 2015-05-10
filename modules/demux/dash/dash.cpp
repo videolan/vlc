@@ -183,15 +183,15 @@ static int Demux(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    Streams::Stream::status status =
+    Stream::status status =
             p_sys->p_dashManager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT);
     switch(status)
     {
-    case Streams::Stream::status_eof:
+    case Stream::status_eof:
         return VLC_DEMUXER_EOF;
-    case Streams::Stream::status_buffering:
+    case Stream::status_buffering:
         break;
-    case Streams::Stream::status_demuxed:
+    case Stream::status_demuxed:
         p_sys->i_nzpcr += DEMUX_INCREMENT;
         int group = p_sys->p_dashManager->getGroup();
         es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, VLC_TS_0 + p_sys->i_nzpcr);

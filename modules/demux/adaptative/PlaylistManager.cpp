@@ -53,14 +53,14 @@ PlaylistManager::PlaylistManager( AbstractPlaylist *pl,
              stream         ( stream ),
              nextPlaylistupdate  ( 0 )
 {
-    for(int i=0; i<Streams::count; i++)
+    for(int i=0; i<StreamTypeCount; i++)
         streams[i] = NULL;
 }
 
 PlaylistManager::~PlaylistManager   ()
 {
     delete conManager;
-    for(int i=0; i<Streams::count; i++)
+    for(int i=0; i<StreamTypeCount; i++)
         delete streams[i];
 }
 
@@ -70,13 +70,13 @@ bool PlaylistManager::start(demux_t *demux)
     if(!period)
         return false;
 
-    for(int i=0; i<Streams::count; i++)
+    for(int i=0; i<StreamTypeCount; i++)
     {
-        Streams::Type type = static_cast<Streams::Type>(i);
+        StreamType type = static_cast<StreamType>(i);
         const BaseAdaptationSet *set = period->getAdaptationSet(type);
         if(set)
         {
-            streams[type] = new (std::nothrow) Streams::Stream(set->getMimeType());
+            streams[type] = new (std::nothrow) Stream(set->getMimeType());
             if(!streams[type])
                 continue;
             AbstractAdaptationLogic *logic = createLogic(logicType);
@@ -112,22 +112,22 @@ bool PlaylistManager::start(demux_t *demux)
     return true;
 }
 
-Streams::Stream::status PlaylistManager::demux(mtime_t nzdeadline)
+Stream::status PlaylistManager::demux(mtime_t nzdeadline)
 {
-    Streams::Stream::status i_return = Streams::Stream::status_demuxed;
+    Stream::status i_return = Stream::status_demuxed;
 
-    for(int type=0; type<Streams::count; type++)
+    for(int type=0; type<StreamTypeCount; type++)
     {
         if(!streams[type])
             continue;
 
-        Streams::Stream::status i_ret =
+        Stream::status i_ret =
                 streams[type]->demux(conManager, nzdeadline);
 
-        if(i_ret < Streams::Stream::status_eof)
+        if(i_ret < Stream::status_eof)
             return i_ret;
-        else if (i_ret == Streams::Stream::status_buffering)
-            i_return = Streams::Stream::status_buffering;
+        else if (i_ret == Stream::status_buffering)
+            i_return = Stream::status_buffering;
     }
 
     return i_return;
@@ -136,7 +136,7 @@ Streams::Stream::status PlaylistManager::demux(mtime_t nzdeadline)
 mtime_t PlaylistManager::getPCR() const
 {
     mtime_t pcr = VLC_TS_INVALID;
-    for(int type=0; type<Streams::count; type++)
+    for(int type=0; type<StreamTypeCount; type++)
     {
         if(!streams[type])
             continue;
@@ -148,7 +148,7 @@ mtime_t PlaylistManager::getPCR() const
 
 int PlaylistManager::getGroup() const
 {
-    for(int type=0; type<Streams::count; type++)
+    for(int type=0; type<StreamTypeCount; type++)
     {
         if(!streams[type])
             continue;
@@ -160,7 +160,7 @@ int PlaylistManager::getGroup() const
 int PlaylistManager::esCount() const
 {
     int es = 0;
-    for(int type=0; type<Streams::count; type++)
+    for(int type=0; type<StreamTypeCount; type++)
     {
         if(!streams[type])
             continue;
@@ -183,7 +183,7 @@ bool PlaylistManager::setPosition(mtime_t time)
     for(int real = 0; real < 2; real++)
     {
         /* Always probe if we can seek first */
-        for(int type=0; type<Streams::count; type++)
+        for(int type=0; type<StreamTypeCount; type++)
         {
             if(!streams[type])
                 continue;
@@ -200,7 +200,7 @@ bool PlaylistManager::seekAble() const
     if(playlist->isLive())
         return false;
 
-    for(int type=0; type<Streams::count; type++)
+    for(int type=0; type<StreamTypeCount; type++)
     {
         if(!streams[type])
             continue;

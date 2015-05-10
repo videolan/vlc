@@ -43,8 +43,8 @@ namespace adaptative
                 virtual ~BasePeriod ();
 
                 const std::vector<BaseAdaptationSet *>& getAdaptationSets   () const;
-                const std::vector<BaseAdaptationSet *>  getAdaptationSets   (Streams::Type) const;
-                BaseAdaptationSet *                 getAdaptationSet    (Streams::Type) const;
+                const std::vector<BaseAdaptationSet *>  getAdaptationSets   (StreamType) const;
+                BaseAdaptationSet *                 getAdaptationSet    (StreamType) const;
                 void                                addAdaptationSet    (BaseAdaptationSet *AdaptationSet);
                 std::vector<std::string>            toString            (int = 0) const;
 
