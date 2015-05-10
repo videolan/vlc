@@ -38,6 +38,9 @@
 
 #include <assert.h>
 #include <time.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
 
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 #include <vlc_common.h>
@@ -829,8 +832,13 @@ static void *Run(void *data)
             continue;
         }
 
-        i_net_ret = net_Read(p_intf, i_post_socket, NULL,
-                    p_buffer, sizeof(p_buffer) - 1, false);
+        /* FIXME: this might wait forever */
+        struct pollfd ufd = { .fd = i_post_socket, .events = POLLIN };
+        while( poll( &ufd, 1, -1 ) == -1 );
+
+        /* FIXME: With TCP, you should never assume that a single read will
+         * return the entire response... */
+        i_net_ret = recv(i_post_socket, p_buffer, sizeof(p_buffer) - 1, 0);
         if (i_net_ret <= 0)
         {
             /* if we get no answer, something went wrong : try again */
