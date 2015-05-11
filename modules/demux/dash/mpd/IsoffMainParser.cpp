@@ -307,15 +307,14 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
             for(it = segments.begin(); it != segments.end(); ++it)
             {
                 Node *segmentURL = *it;
-                std::string mediaUrl = segmentURL->getAttributeValue("media");
-                if(mediaUrl.empty())
-                    continue;
 
                 Segment *seg = new (std::nothrow) Segment(info);
                 if(!seg)
                     continue;
 
-                seg->setSourceUrl(segmentURL->getAttributeValue("media"));
+                std::string mediaUrl = segmentURL->getAttributeValue("media");
+                if(!mediaUrl.empty())
+                    seg->setSourceUrl(mediaUrl);
 
                 if(segmentURL->hasAttribute("mediaRange"))
                 {
