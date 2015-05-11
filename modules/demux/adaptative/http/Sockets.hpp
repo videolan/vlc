@@ -25,6 +25,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_tls.h>
 #include <string>
 
 namespace adaptative
@@ -47,6 +48,22 @@ namespace adaptative
                 int netfd;
         };
 
+        class TLSSocket : public Socket
+        {
+            public:
+                TLSSocket();
+                virtual ~TLSSocket();
+                virtual bool    connect     (vlc_object_t *, const std::string&, int port = 443);
+                virtual bool    connected   () const;
+                virtual bool    send        (vlc_object_t *, const void *buf, size_t size);
+                virtual ssize_t read        (vlc_object_t *, void *p_buffer, size_t len, bool);
+                virtual std::string readline(vlc_object_t *);
+                virtual void    disconnect  ();
+
+            private:
+                vlc_tls_creds_t *creds;
+                vlc_tls_t *tls;
+        };
     }
 }
 

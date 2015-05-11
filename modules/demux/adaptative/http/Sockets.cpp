@@ -96,3 +96,108 @@ bool Socket::send(vlc_object_t *stream, const void *buf, size_t size)
     return true;
 }
 
+TLSSocket::TLSSocket() : Socket()
+{
+    creds = NULL;
+    tls = NULL;
+}
+
+TLSSocket::~TLSSocket()
+{
+    disconnect();
+}
+
+bool TLSSocket::connect(vlc_object_t *stream, const std::string &hostname, int port)
+{
+    disconnect();
+    if(!Socket::connect(stream, hostname, port))
+        return false;
+
+    creds = vlc_tls_ClientCreate(stream);
+    if(!creds)
+    {
+        disconnect();
+        return false;
+    }
+
+    tls = vlc_tls_ClientSessionCreate(creds, netfd, hostname.c_str(), "https", NULL, NULL);
+    if(!tls)
+    {
+        disconnect();
+        return false;
+    }
+
+    return true;
+}
+
+bool TLSSocket::connected() const
+{
+    return Socket::connected() && tls;
+}
+
+ssize_t TLSSocket::read(vlc_object_t *, void *p_buffer, size_t len, bool)
+{
+    ssize_t size;
+    size_t totalread = 0;
+    do
+    {
+        size = tls_Recv(tls, (uint8_t*)p_buffer + totalread, len - totalread); /* only returns partial chunks */
+        if(size >= 0)
+        {
+            totalread += (size_t) size;
+        }
+        else if(errno != EINTR && errno!=EAGAIN)
+        {
+            break;
+        }
+    } while ( totalread < len );
+    return totalread;
+}
+
+std::string TLSSocket::readline(vlc_object_t *stream)
+{
+    std::string ret;
+    ret.reserve(256);
+    char c[2] = {0,0};
+    ssize_t size = TLSSocket::read(stream, c, 1, true);
+
+    while(size > 0)
+    {
+        ret.append( &c[0] );
+        if(c[0] == '\n')
+            break;
+
+        size = TLSSocket::read(stream, c, 1, true);
+    }
+
+    return ret;
+}
+
+bool TLSSocket::send(vlc_object_t *stream, const void *buf, size_t size)
+{
+    if (!connected())
+        return false;
+
+    if (size == 0)
+        return true;
+
+    ssize_t ret = tls_Send(tls, buf, size);
+    if (ret <= 0)
+        return false;
+
+    if ( (size_t)ret < size )
+        send( stream, ((uint8_t*)buf) + ret, size - ret );
+
+    return true;
+}
+
+void TLSSocket::disconnect()
+{
+    if(tls)
+        vlc_tls_SessionDelete(tls);
+    if(creds)
+        vlc_tls_Delete(creds);
+    tls = NULL;
+    creds = NULL;
+    Socket::disconnect();
+}

@@ -79,10 +79,12 @@ bool HTTPConnectionManager::connectChunk(Chunk *chunk)
     HTTPConnection *conn = getConnectionForHost(chunk->getHostname());
     if(!conn)
     {
-        Socket *socket = new (std::nothrow) Socket();
+        const bool tls = (chunk->getScheme() == "https");
+        Socket *socket = tls ? new (std::nothrow) TLSSocket(): new (std::nothrow) Socket();
         if(!socket)
             return false;
-        conn = new (std::nothrow) HTTPConnection(stream, socket, chunk, true);
+        /* disable pipelined tls until we have ticket/resume session support */
+        conn = new (std::nothrow) HTTPConnection(stream, socket, chunk, !tls);
         if(!conn)
         {
             delete socket;
