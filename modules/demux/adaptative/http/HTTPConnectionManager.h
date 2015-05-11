@@ -37,13 +37,13 @@ namespace adaptative
 {
     namespace http
     {
-        class PersistentConnection;
+        class HTTPConnection;
         class Chunk;
 
         class HTTPConnectionManager
         {
             public:
-                HTTPConnectionManager           (stream_t *stream);
+                HTTPConnectionManager           (vlc_object_t *stream);
                 virtual ~HTTPConnectionManager  ();
 
                 void    closeAllConnections ();
@@ -51,12 +51,12 @@ namespace adaptative
                 bool    connectChunk        (Chunk *chunk);
 
             private:
-                std::vector<PersistentConnection *>                 connectionPool;
-                stream_t                                            *stream;
+                std::vector<HTTPConnection *>                       connectionPool;
+                vlc_object_t                                       *stream;
 
                 static const uint64_t   CHUNKDEFAULTBITRATE;
 
-                PersistentConnection *                  getConnectionForHost    (const std::string &hostname);
+                HTTPConnection * getConnectionForHost    (const std::string &hostname);
         };
     }
 }

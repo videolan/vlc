@@ -327,10 +327,8 @@ libdash_plugin_la_SOURCES += \
     demux/adaptative/http/HTTPConnection.h \
     demux/adaptative/http/HTTPConnectionManager.cpp \
     demux/adaptative/http/HTTPConnectionManager.h \
-    demux/adaptative/http/IHTTPConnection.cpp \
-    demux/adaptative/http/IHTTPConnection.h \
-    demux/adaptative/http/PersistentConnection.cpp \
-    demux/adaptative/http/PersistentConnection.h \
+    demux/adaptative/http/Sockets.hpp \
+    demux/adaptative/http/Sockets.cpp \
     demux/adaptative/PlaylistManager.cpp \
     demux/adaptative/PlaylistManager.h \
     demux/adaptative/SegmentTracker.cpp \

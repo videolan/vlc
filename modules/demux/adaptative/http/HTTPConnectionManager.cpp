@@ -26,16 +26,15 @@
 #endif
 
 #include "HTTPConnectionManager.h"
-#include "PersistentConnection.h"
+#include "HTTPConnection.hpp"
 #include "Chunk.h"
-
-#include <vlc_stream.h>
+#include "Sockets.hpp"
 
 using namespace adaptative::http;
 
 const uint64_t  HTTPConnectionManager::CHUNKDEFAULTBITRATE    = 1;
 
-HTTPConnectionManager::HTTPConnectionManager    (stream_t *stream) :
+HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *stream) :
                        stream                   (stream)
 {
 }
@@ -52,14 +51,14 @@ void HTTPConnectionManager::closeAllConnections      ()
 
 void HTTPConnectionManager::releaseAllConnections()
 {
-    std::vector<PersistentConnection *>::iterator it;
+    std::vector<HTTPConnection *>::iterator it;
     for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
         (*it)->releaseChunk();
 }
 
-PersistentConnection * HTTPConnectionManager::getConnectionForHost(const std::string &hostname)
+HTTPConnection * HTTPConnectionManager::getConnectionForHost(const std::string &hostname)
 {
-    std::vector<PersistentConnection *>::const_iterator it;
+    std::vector<HTTPConnection *>::const_iterator it;
     for(it = connectionPool.begin(); it != connectionPool.end(); ++it)
     {
         if(!(*it)->getHostname().compare(hostname) && (*it)->isAvailable())
@@ -75,14 +74,20 @@ bool HTTPConnectionManager::connectChunk(Chunk *chunk)
     if(chunk->getConnection())
         return true;
 
-    msg_Dbg(stream, "Retrieving %s", chunk->getUrl().c_str());
+    msg_Dbg(stream, "Retrieving %s @%ld", chunk->getUrl().c_str(), chunk->getStartByte());
 
-    PersistentConnection *conn = getConnectionForHost(chunk->getHostname());
+    HTTPConnection *conn = getConnectionForHost(chunk->getHostname());
     if(!conn)
     {
-        conn = new PersistentConnection(stream, chunk);
-        if(!conn)
+        Socket *socket = new (std::nothrow) Socket();
+        if(!socket)
             return false;
+        conn = new (std::nothrow) HTTPConnection(stream, socket, chunk, true);
+        if(!conn)
+        {
+            delete socket;
+            return false;
+        }
         connectionPool.push_back(conn);
         if (!chunk->getConnection()->connect(chunk->getHostname(), chunk->getPort()))
             return false;

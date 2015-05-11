@@ -102,7 +102,7 @@ bool PlaylistManager::start(demux_t *demux)
         }
     }
 
-    conManager = new (std::nothrow) HTTPConnectionManager(stream);
+    conManager = new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(stream));
     if(!conManager)
         return false;
 

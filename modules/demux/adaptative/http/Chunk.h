@@ -44,6 +44,7 @@ namespace adaptative
                 size_t              getEndByte              () const;
                 size_t              getStartByte            () const;
                 const std::string&  getUrl                  () const;
+                const std::string&  getScheme               () const;
                 const std::string&  getHostname             () const;
                 const std::string&  getPath                 () const;
                 int                 getPort                 () const;
@@ -68,6 +69,7 @@ namespace adaptative
 
             private:
                 std::string                 url;
+                std::string                 scheme;
                 std::string                 path;
                 std::string                 hostname;
                 std::vector<std::string>    optionalUrls;

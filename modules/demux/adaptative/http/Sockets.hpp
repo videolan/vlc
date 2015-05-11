@@ -1,11 +1,7 @@
 /*
- * HTTPConnection.h
+ * Sockets.hpp
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
- *
- * Created on: Aug 10, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2015 - VideoLAN authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,38 +17,38 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef SOCKETS_HPP
+#define SOCKETS_HPP
 
-#ifndef HTTPCONNECTION_H_
-#define HTTPCONNECTION_H_
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
+#include <vlc_common.h>
 #include <string>
-
-#include "IHTTPConnection.h"
-//#include "Helper.h"
 
 namespace adaptative
 {
     namespace http
     {
-        class Chunk;
-        class HTTPConnection : public IHTTPConnection
+        class Socket
         {
             public:
-                HTTPConnection          (stream_t *stream, Chunk *chunk = NULL);
-                virtual void    bindChunk   (Chunk *chunk);
-                virtual void    onHeader    (const std::string &line,
-                                             const std::string &value);
-                virtual bool    isAvailable () const;
+                Socket();
+                virtual ~Socket();
+                virtual bool    connect     (vlc_object_t *, const std::string&, int port = 80);
+                virtual bool    connected   () const;
+                virtual bool    send        (vlc_object_t *, const void *buf, size_t size);
+                virtual ssize_t read        (vlc_object_t *, void *p_buffer, size_t len, bool);
+                virtual std::string readline(vlc_object_t *);
                 virtual void    disconnect  ();
-                virtual void    releaseChunk();
 
             protected:
-                size_t toRead;
-                Chunk *chunk;
-                virtual std::string extraRequestHeaders() const;
-                virtual std::string buildRequestHeader(const std::string &path) const;
+                int netfd;
         };
+
     }
 }
 
-#endif /* HTTPCONNECTION_H_ */
+
+#endif // SOCKETS_HPP

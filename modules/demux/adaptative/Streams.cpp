@@ -20,7 +20,7 @@
 #define __STDC_CONSTANT_MACROS
 #include "Streams.hpp"
 #include "StreamsType.hpp"
-#include "http/HTTPConnection.h"
+#include "http/HTTPConnection.hpp"
 #include "http/HTTPConnectionManager.h"
 #include "http/Chunk.h"
 #include "logic/AbstractAdaptationLogic.h"
@@ -179,21 +179,22 @@ size_t Stream::read(HTTPConnectionManager *connManager)
 
     size_t readsize = 0;
 
-    /* Because we don't know Chunk size at start, we need to get size
-       from content length */
+    /* New chunk, do query */
     if(chunk->getBytesRead() == 0)
     {
-        if(chunk->getConnection()->query(chunk->getPath()) == false)
-            readsize = 32768; /* we don't handle retry here :/ */
-        else
-            readsize = chunk->getBytesToRead();
-    }
-    else
-    {
-        readsize = chunk->getBytesToRead();
+        if(chunk->getConnection()->query(chunk->getPath()) != VLC_SUCCESS)
+        {
+            chunk->getConnection()->releaseChunk();
+            currentChunk = NULL;
+            delete chunk;
+            return 0;
+        }
     }
 
-    if (readsize > 128000)
+    /* Because we don't know Chunk size at start, we need to get size
+       from content length */
+    readsize = chunk->getBytesToRead();
+    if (readsize > 32768)
         readsize = 32768;
 
     block_t *block = block_Alloc(readsize);
@@ -204,7 +205,7 @@ size_t Stream::read(HTTPConnectionManager *connManager)
     ssize_t ret = chunk->getConnection()->read(block->p_buffer, readsize);
     time = mdate() - time;
 
-    if(ret <= 0)
+    if(ret < 0)
     {
         block_Release(block);
         chunk->getConnection()->releaseChunk();

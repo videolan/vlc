@@ -44,7 +44,13 @@ Chunk::Chunk        (const std::string& url) :
 {
     this->url = url;
 
-    if(url.compare(0, 7, "http://"))
+    std::size_t pos = url.find("://");
+    if(pos != std::string::npos)
+    {
+        scheme = url.substr(0, pos);
+    }
+
+    if(scheme != "http" && scheme != "https")
         throw VLC_EGENERIC;
 
     vlc_url_t url_components;
@@ -52,7 +58,8 @@ Chunk::Chunk        (const std::string& url) :
 
     if(url_components.psz_path)
         path = url_components.psz_path;
-    port = url_components.i_port ? url_components.i_port : 80;
+    port = url_components.i_port ? url_components.i_port :
+                         ((scheme == "https") ? 443 : 80);
     if(url_components.psz_host)
         hostname = url_components.psz_host;
 
@@ -103,6 +110,12 @@ int                 Chunk::getBitrate           ()
 {
     return this->bitrate;
 }
+
+const std::string&  Chunk::getScheme            () const
+{
+    return scheme;
+}
+
 const std::string&  Chunk::getHostname          () const
 {
     return hostname;
