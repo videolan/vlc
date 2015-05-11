@@ -215,7 +215,7 @@ IndexSegment::IndexSegment(ICanonicalUrl *parent) :
     classId = CLASSID_INDEXSEGMENT;
 }
 
-SubSegment::SubSegment(Segment *main, size_t start, size_t end) :
+SubSegment::SubSegment(ISegment *main, size_t start, size_t end) :
     ISegment(main), parent(main)
 {
     setByteRange(start, end);
@@ -233,4 +233,9 @@ std::vector<ISegment*> SubSegment::subSegments()
     std::vector<ISegment*> list;
     list.push_back(this);
     return list;
+}
+
+void SubSegment::addSubSegment(SubSegment *)
+{
+
 }

@@ -55,6 +55,7 @@ namespace adaptative
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual size_t                          getOffset       () const;
                 virtual std::vector<ISegment*>          subSegments     () = 0;
+                virtual void                            addSubSegment   (SubSegment *) = 0;
                 virtual std::string                     toString        (int = 0) const;
                 virtual bool                            contains        (size_t byte) const;
                 int                                     getClassId      () const;
@@ -121,12 +122,13 @@ namespace adaptative
         class SubSegment : public ISegment
         {
             public:
-                SubSegment(Segment *, size_t start, size_t end);
+                SubSegment(ISegment *, size_t start, size_t end);
                 virtual Url getUrlSegment() const; /* impl */
                 virtual std::vector<ISegment*> subSegments();
+                virtual void addSubSegment(SubSegment *);
                 static const int CLASSID_SUBSEGMENT = 4;
             private:
-                Segment *parent;
+                ISegment *parent;
         };
     }
 }

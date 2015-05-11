@@ -267,13 +267,13 @@ void SegmentInformation::setSegmentTemplate(MediaSegmentTemplate *templ)
     mediaSegmentTemplate = templ;
 }
 
-static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
+static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
                               size_t end, mtime_t time)
 {
-    std::vector<Segment *>::iterator segIt;
+    std::vector<ISegment *>::iterator segIt;
     for(segIt = seglist.begin(); segIt < seglist.end(); ++segIt)
     {
-        Segment *segment = *segIt;
+        ISegment *segment = *segIt;
         if(segment->getClassId() == Segment::CLASSID_SEGMENT &&
            segment->contains(end + segment->getOffset()))
         {
@@ -289,7 +289,7 @@ static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
 
 void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
 {
-    std::vector<Segment *> seglist = segmentList->getSegments();
+    std::vector<ISegment *> seglist = getSegments(INFOTYPE_MEDIA);
     std::vector<SplitPoint>::const_iterator splitIt;
     size_t start = 0, end = 0;
     mtime_t time = 0;
