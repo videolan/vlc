@@ -28,10 +28,6 @@
 
 #define __STDC_CONSTANT_MACROS 1
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "upnp.hpp"
 
 #include <vlc_access.h>
