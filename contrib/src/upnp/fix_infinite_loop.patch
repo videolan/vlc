@@ -1,0 +1,21 @@
+--- upnp_clean/upnp/src/api/upnpapi.c	2015-05-11 17:59:17.892347500 +0200
++++ upnp/upnp/src/api/upnpapi.c	2015-05-11 18:01:05.000083700 +0200
+@@ -3257,8 +3257,7 @@
+ 		strncpy(gIF_NAME, IfName, sizeof(gIF_NAME) - 1);
+ 		ifname_found = 1;
+ 	}
+-	adapts_item = adapts;
+-	while (adapts_item != NULL) {
++	for (adapts_item = adapts; adapts_item != NULL; adapts_item = adapts_item->Next) {
+ 		if (adapts_item->Flags & IP_ADAPTER_NO_MULTICAST) {
+ 			continue;
+ 		}
+@@ -3345,8 +3344,6 @@
+ 			gIF_INDEX = adapts_item->IfIndex;
+ 			break;
+ 		}
+-		/* Next adapter. */
+-		adapts_item = adapts_item->Next;
+ 	}
+ 	/* Failed to find a valid interface, or valid address. */
+ 	if (ifname_found == 0 || valid_addr_found == 0) {

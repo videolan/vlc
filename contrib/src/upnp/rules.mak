@@ -26,6 +26,8 @@ endif
 	$(APPLY) $(SRC)/upnp/libupnp-ipv6.patch
 	$(APPLY) $(SRC)/upnp/miniserver.patch
 	$(APPLY) $(SRC)/upnp/missing_win32.patch
+	$(APPLY) $(SRC)/upnp/fix_infinite_loop.patch
+	$(APPLY) $(SRC)/upnp/dont_use_down_intf.patch
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux/
 	$(MOVE)
 

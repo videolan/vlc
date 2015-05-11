@@ -1,0 +1,12 @@
+--- upnp_clean/upnp/src/api/upnpapi.c	2015-05-11 18:04:45.054340200 +0200
++++ libupnp-1.6.19/upnp/src/api/upnpapi.c	2015-05-11 18:11:37.438360600 +0200
+@@ -3258,7 +3258,8 @@
+		ifname_found = 1;
+	}
+	for (adapts_item = adapts; adapts_item != NULL; adapts_item = adapts_item->Next) {
+-		if (adapts_item->Flags & IP_ADAPTER_NO_MULTICAST) {
++		if (adapts_item->Flags & IP_ADAPTER_NO_MULTICAST ||
++			adapts_item->OperStatus != IfOperStatusUp) {
+			continue;
+        }
+		if (ifname_found == 0) {
