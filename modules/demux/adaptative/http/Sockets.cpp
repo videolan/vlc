@@ -130,7 +130,7 @@ bool TLSSocket::connected() const
 
 ssize_t TLSSocket::read(vlc_object_t *, void *p_buffer, size_t len)
 {
-    return vlc_tls_Read(tls, p_buffer, len, true) == (ssize_t)len;
+    return vlc_tls_Read(tls, p_buffer, len, true);
 }
 
 std::string TLSSocket::readline(vlc_object_t *)
