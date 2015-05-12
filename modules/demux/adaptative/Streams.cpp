@@ -327,6 +327,12 @@ void AbstractStreamOutput::setPosition(mtime_t nztime)
 void AbstractStreamOutput::sendToDecoder(mtime_t nzdeadline)
 {
     vlc_mutex_lock(&lock);
+    sendToDecoderUnlocked(nzdeadline);
+    vlc_mutex_unlock(&lock);
+}
+
+void AbstractStreamOutput::sendToDecoderUnlocked(mtime_t nzdeadline)
+{
     std::list<Demuxed *>::const_iterator it;
     for(it=queues.begin(); it!=queues.end();++it)
     {
@@ -343,7 +349,6 @@ void AbstractStreamOutput::sendToDecoder(mtime_t nzdeadline)
             realdemux->out->pf_send(realdemux->out, pair->es_id, p_block);
         }
     }
-    vlc_mutex_unlock(&lock);
 }
 
 AbstractStreamOutput::Demuxed::Demuxed()
@@ -411,7 +416,7 @@ void AbstractStreamOutput::esOutDel(es_out_t *fakees, es_out_id_t *p_es)
     {
         if((*it)->es_id == p_es)
         {
-            me->sendToDecoder(INT64_MAX - VLC_TS_0);
+            me->sendToDecoderUnlocked(INT64_MAX - VLC_TS_0);
             delete *it;
             me->queues.erase(it);
             break;

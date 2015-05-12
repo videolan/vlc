@@ -124,6 +124,7 @@ namespace adaptative
         };
         std::list<Demuxed *> queues;
         vlc_mutex_t lock;
+        void sendToDecoderUnlocked(mtime_t);
     };
 
     class MP4StreamOutput : public AbstractStreamOutput
