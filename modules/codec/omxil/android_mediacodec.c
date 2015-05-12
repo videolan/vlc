@@ -36,6 +36,7 @@
 #include <vlc_codec.h>
 #include <vlc_block_helper.h>
 #include <vlc_cpu.h>
+#include <vlc_memory.h>
 
 #include "../../packetizer/h264_nal.h"
 #include "../../packetizer/hevc_nal.h"
@@ -133,6 +134,13 @@ static int64_t timestamp_FifoGet(timestamp_fifo_t *fifo)
     return result;
 }
 
+/* Codec Specific Data */
+struct csd
+{
+    uint8_t *p_buf;
+    size_t i_size;
+};
+
 struct decoder_sys_t
 {
     uint32_t nal_size;
@@ -144,13 +152,11 @@ struct decoder_sys_t
     int stride, slice_height;
     char *name;
 
-    /* "csd-0" buffer */
-    void *p_csd0_buffer;
-    size_t i_csd0_buffer;
-    /* or buffer sent via BUFFER_FLAG_CODEC_CONFIG flag */
-    uint8_t *p_config_buffer;
-    size_t i_config_buffer;
-    bool b_config_resend;
+    /* Codec Specific Data buffer: sent in PutInput after a start or a flush
+     * with the BUFFER_FLAG_CODEC_CONFIG flag.*/
+    struct csd *p_csd;
+    size_t i_csd_count;
+    size_t i_csd_send;
 
     bool b_update_format;
     int i_width;
@@ -408,30 +414,127 @@ end:
     return ret;
 }
 
-static int H264GetSPSPPS(uint8_t *p_buf, size_t i_buf,
-                         uint8_t **pp_sps_buf, size_t *p_sps_size,
-                         uint8_t **pp_pps_buf, size_t *p_pps_size,
-                         struct nal_sps *p_sps)
+static void CSDFree(decoder_t *p_dec)
 {
-    uint8_t *p_sps_buf, *p_pps_buf;
-    size_t i_sps_size, i_pps_size;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (h264_get_spspps(p_buf, i_buf, &p_sps_buf, &i_sps_size,
-                        &p_pps_buf, &i_pps_size) == 0)
+    if (p_sys->p_csd)
     {
-        if (pp_sps_buf && p_sps_size )
+        for (unsigned int i = 0; i < p_sys->i_csd_count; ++i)
+            free(p_sys->p_csd[i].p_buf);
+        free(p_sys->p_csd);
+        p_sys->p_csd = NULL;
+    }
+    p_sys->i_csd_count = 0;
+}
+
+/* Create the p_sys->p_csd that will be sent via PutInput */
+static int CSDDup(decoder_t *p_dec, const struct csd *p_csd, size_t i_count)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    unsigned int i_last_csd_count = p_sys->i_csd_count;
+
+    p_sys->i_csd_count = i_count;
+    /* free previous p_buf if old count is bigger */
+    for (size_t i = p_sys->i_csd_count; i < i_last_csd_count; ++i)
+        free(p_sys->p_csd[i].p_buf);
+
+    p_sys->p_csd = realloc_or_free(p_sys->p_csd, p_sys->i_csd_count *
+                                   sizeof(struct csd));
+    if (!p_sys->p_csd)
+    {
+        CSDFree(p_dec);
+        return VLC_ENOMEM;
+    }
+
+    if (p_sys->i_csd_count > i_last_csd_count)
+        memset(&p_sys->p_csd[i_last_csd_count], 0,
+               (p_sys->i_csd_count - i_last_csd_count) * sizeof(struct csd));
+
+    for (size_t i = 0; i < p_sys->i_csd_count; ++i)
+    {
+        p_sys->p_csd[i].p_buf = realloc_or_free(p_sys->p_csd[i].p_buf,
+                                                p_csd[i].i_size);
+        if (!p_sys->p_csd[i].p_buf)
         {
-            *pp_sps_buf = p_sps_buf;
-            *p_sps_size = i_sps_size;
+            CSDFree(p_dec);
+            return VLC_ENOMEM;
         }
-        if (pp_pps_buf && p_pps_size )
+        memcpy(p_sys->p_csd[i].p_buf, p_csd[i].p_buf, p_csd[i].i_size);
+        p_sys->p_csd[i].i_size = p_csd[i].i_size;
+    }
+    return VLC_SUCCESS;
+}
+
+static bool CSDCmp(decoder_t *p_dec, struct csd *p_csd, size_t i_csd_count)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (p_sys->i_csd_count != i_csd_count)
+        return false;
+    for (size_t i = 0; i < i_csd_count; ++i)
+    {
+        if (p_sys->p_csd[i].i_size != p_csd[i].i_size
+         || memcmp(p_sys->p_csd[i].p_buf, p_csd[i].p_buf, p_csd[i].i_size) != 0)
+            return false;
+    }
+    return true;
+}
+
+/* Fill the p_sys->p_csd struct with H264 Parameter Sets */
+static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
+                      bool *p_size_changed)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct nal_sps sps;
+    uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
+    size_t i_sps_size = 0, i_pps_size = 0;
+
+    /* Check if p_buf contains a valid SPS PPS */
+    if (h264_get_spspps(p_buf, i_size, &p_sps_buf, &i_sps_size,
+                        &p_pps_buf, &i_pps_size) == 0
+     && h264_parse_sps(p_sps_buf, i_sps_size, &sps) == 0
+     && sps.i_width && sps.i_height)
+    {
+        struct csd csd[2];
+        int i_csd_count = 0;
+
+        if (i_sps_size)
         {
-            *pp_pps_buf = p_pps_buf;
-            *p_pps_size = i_pps_size;
+            csd[i_csd_count].p_buf = p_sps_buf;
+            csd[i_csd_count].i_size = i_sps_size;
+            i_csd_count++;
         }
-        return h264_parse_sps(p_sps_buf, i_sps_size, p_sps);
-    } else
-        return -1;
+        if (i_pps_size)
+        {
+            csd[i_csd_count].p_buf = p_pps_buf;
+            csd[i_csd_count].i_size = i_pps_size;
+            i_csd_count++;
+        }
+
+        /* Compare the SPS PPS with the old one */
+        if (!CSDCmp(p_dec, csd, i_csd_count))
+        {
+            msg_Warn(p_dec, "New SPS/PPS found, id: %d size: %dx%d sps: %d pps: %d",
+                     sps.i_id, sps.i_width, sps.i_height,
+                     i_sps_size, i_pps_size);
+
+            /* In most use cases, p_sys->p_csd[0] contains a SPS, and
+             * p_sys->p_csd[1] contains a PPS */
+            if (CSDDup(p_dec, csd, i_csd_count))
+                return VLC_ENOMEM;
+
+            if (p_size_changed)
+                *p_size_changed = (sps.i_width != p_sys->i_width
+                                || sps.i_height != p_sys->i_height);
+
+            p_sys->i_csd_send = 0;
+            p_sys->i_width = sps.i_width;
+            p_sys->i_height = sps.i_height;
+            return VLC_SUCCESS;
+        }
+    }
+    return VLC_EGENERIC;
 }
 
 static jstring GetMediaCodecName(decoder_t *p_dec, JNIEnv *env,
@@ -560,8 +663,6 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
     jstring jmime = NULL;
     jstring jcodec_name = NULL;
     jobject jcodec = NULL;
-    jobject jcsd0_buffer = NULL;
-    jstring jcsd0_string = NULL;
     jobject jformat = NULL;
     jstring jrotation_string = NULL;
     jobject jinput_buffers = NULL;
@@ -608,46 +709,55 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
      * initialisation via the MediaFormat class, or use a CODEC_CONFIG buffer
      * that can be provided during playback (and must be provided after a flush
      * and a start). */
-    if (p_dec->fmt_in.i_extra && !p_sys->p_config_buffer) {
-        uint32_t size = p_dec->fmt_in.i_extra;
-        int buf_size = p_dec->fmt_in.i_extra + 20;
-
-        /* Don't free p_csd0_buffer until Format use it, so until MediaCodec
-         * is closed */
-        p_sys->p_csd0_buffer = malloc(buf_size);
-        if (!p_sys->p_csd0_buffer)
+    if (p_dec->fmt_in.i_extra && !p_sys->p_csd)
+    {
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
+         || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
         {
-            msg_Warn(p_dec, "extra buffer allocation failed");
-            goto error;
-        }
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && ((uint8_t*)p_dec->fmt_in.p_extra)[0] == 1) {
-            convert_sps_pps(p_dec, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,
-                            p_sys->p_csd0_buffer, buf_size,
-                            &size, &p_sys->nal_size);
-        } else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC) {
-            convert_hevc_nal_units(p_dec, p_dec->fmt_in.p_extra,
-                                   p_dec->fmt_in.i_extra,
-                                   p_sys->p_csd0_buffer, buf_size,
-                                   &size, &p_sys->nal_size);
-        } else {
-            memcpy(p_sys->p_csd0_buffer, p_dec->fmt_in.p_extra, size);
-        }
-        p_sys->i_csd0_buffer = size;
+            int buf_size = p_dec->fmt_in.i_extra + 20;
+            uint32_t size = p_dec->fmt_in.i_extra;
+            void *p_buf = malloc(buf_size);
 
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-        {
-            struct nal_sps sps;
-
-            if (H264GetSPSPPS(p_sys->p_csd0_buffer, p_sys->i_csd0_buffer,
-                              NULL, NULL, NULL, NULL, &sps) == 0)
+            if (!p_buf)
             {
-                msg_Warn(p_dec, "SPS found, id: %d size: %dx%d (vs %dx%d)",
-                         sps.i_id, sps.i_width, sps.i_height,
-                         p_sys->i_width, p_sys->i_height);
-                p_sys->i_width = sps.i_width;
-                p_sys->i_height = sps.i_height;
+                msg_Warn(p_dec, "extra buffer allocation failed");
+                goto error;
             }
+
+            if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+            {
+                if (((uint8_t*)p_dec->fmt_in.p_extra)[0] == 1
+                 && convert_sps_pps(p_dec, p_dec->fmt_in.p_extra,
+                                    p_dec->fmt_in.i_extra,
+                                    p_buf, buf_size, &size,
+                                    &p_sys->nal_size) == VLC_SUCCESS)
+                    H264SetCSD(p_dec, p_buf, size, NULL);
+            } else
+            {
+                if (convert_hevc_nal_units(p_dec, p_dec->fmt_in.p_extra,
+                                           p_dec->fmt_in.i_extra,
+                                           p_buf, buf_size, &size,
+                                           &p_sys->nal_size) == VLC_SUCCESS)
+                {
+                    struct csd csd;
+
+                    csd.p_buf = p_buf;
+                    csd.i_size = size;
+                    CSDDup(p_dec, &csd, 1);
+                }
+            }
+            free(p_buf);
         }
+        if (!p_sys->p_csd)
+        {
+            struct csd csd;
+
+            csd.p_buf = p_dec->fmt_in.p_extra;
+            csd.i_size = p_dec->fmt_in.i_extra;
+            CSDDup(p_dec, &csd, 1);
+        }
+
+        p_sys->i_csd_send = 0;
     }
 
     if (!p_sys->i_width && !p_sys->i_height)
@@ -658,23 +768,6 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
     jformat = (*env)->CallStaticObjectMethod(env, jfields.media_format_class,
                                              jfields.create_video_format, jmime,
                                              p_sys->i_width, p_sys->i_height);
-
-    if (p_sys->p_csd0_buffer)
-    {
-        jcsd0_buffer = (*env)->NewDirectByteBuffer( env,
-                                                    p_sys->p_csd0_buffer,
-                                                    p_sys->i_csd0_buffer);
-        if (CHECK_EXCEPTION() || !jcsd0_buffer)
-        {
-            msg_Warn(p_dec, "java extra buffer allocation failed");
-            free(p_sys->p_csd0_buffer);
-            p_sys->p_csd0_buffer = NULL;
-            goto error;
-        }
-        jcsd0_string = (*env)->NewStringUTF(env, "csd-0");
-        (*env)->CallVoidMethod(env, jformat, jfields.set_bytebuffer,
-                               jcsd0_string, jcsd0_buffer);
-    }
 
     p_sys->direct_rendering = var_InheritBool(p_dec, CFG_PREFIX "dr");
 
@@ -775,10 +868,6 @@ error:
         (*env)->DeleteLocalRef(env, jcodec_name);
     if (jcodec)
         (*env)->DeleteLocalRef(env, jcodec);
-    if (jcsd0_buffer)
-        (*env)->DeleteLocalRef(env, jcsd0_buffer);
-    if (jcsd0_string)
-        (*env)->DeleteLocalRef(env, jcsd0_string);
     if (jformat)
         (*env)->DeleteLocalRef(env, jformat);
     if (jrotation_string)
@@ -946,8 +1035,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     else
         msg_Warn(p_dec, "Can't get a JNIEnv, can't close mediacodec !");
 
-    free(p_sys->p_csd0_buffer);
-    free(p_sys->p_config_buffer);
+    CSDFree(p_dec);
     free(p_sys->name);
     ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
     free(p_sys->pp_inflight_pictures);
@@ -1256,29 +1344,12 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
     return 0;
 }
 
-static bool spsppscmp(decoder_t *p_dec, uint8_t *p_sps_buf, size_t i_sps_size,
-                      uint8_t *p_pps_buf, size_t i_pps_size)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if (p_sys->i_config_buffer != i_sps_size + i_pps_size)
-        return false;
-    if (p_sps_buf && memcmp(p_sys->p_config_buffer, p_sps_buf, i_sps_size) != 0)
-        return false;
-    if (p_pps_buf && memcmp(p_sys->p_config_buffer + i_sps_size,
-                            p_pps_buf, i_pps_size) != 0)
-        return false;
-    return true;
-}
-
 static void H264ProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
                              bool *p_delayed_open)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t *p_sps_buf, *p_pps_buf;
-    size_t i_sps_size, i_pps_size;
-    struct nal_sps sps;
     struct H264ConvertState convert_state = { 0, 0 };
+    bool b_size_changed;
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_H264 && p_block);
 
@@ -1286,49 +1357,18 @@ static void H264ProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
     {
         convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
                                p_sys->nal_size, &convert_state);
-    } else if (H264GetSPSPPS(p_block->p_buffer, p_block->i_buffer,
-                             &p_sps_buf, &i_sps_size,
-                             &p_pps_buf, &i_pps_size, &sps) == 0
-        && sps.i_width && sps.i_height
-        && !spsppscmp(p_dec, p_sps_buf, i_sps_size, p_pps_buf, i_pps_size))
+    } else if (H264SetCSD(p_dec, p_block->p_buffer, p_block->i_buffer,
+                          &b_size_changed) == VLC_SUCCESS)
     {
-        void *p_config_buffer;
-
-        msg_Warn(p_dec, "New SPS/PPS found, id: %d size: %dx%d (vs %dx%d) %d %d",
-                 sps.i_id, sps.i_width, sps.i_height,
-                 p_sys->i_width, p_sys->i_height,
-                 i_sps_size, i_pps_size);
-
-        if (p_sys->codec && (sps.i_width != p_sys->i_width ||
-                             sps.i_height != p_sys->i_height))
+        if (p_sys->codec && b_size_changed)
         {
-            msg_Err(p_dec, "SPS/PPS changed during the stream and "
+            msg_Err(p_dec, "SPS/PPS changed during playback and "
                     "MediaCodec configured with a different video size. "
                     "Restart it !");
             CloseMediaCodec(p_dec, env);
         }
         if (!p_sys->codec)
             *p_delayed_open = true;
-
-        p_config_buffer = realloc(p_sys->p_config_buffer,
-                                  i_sps_size + i_pps_size);
-        if (!p_config_buffer)
-            free(p_sys->p_config_buffer);
-        p_sys->p_config_buffer = p_config_buffer;
-
-        if (p_sys->p_config_buffer)
-        {
-            if (p_sps_buf && i_sps_size)
-                memcpy(p_sys->p_config_buffer, p_sps_buf, i_sps_size);
-            if (p_pps_buf && i_pps_size)
-                memcpy(p_sys->p_config_buffer + i_sps_size,
-                       p_pps_buf, i_pps_size);
-            p_sys->i_config_buffer = i_sps_size + i_pps_size;
-            p_sys->b_config_resend = true;
-        }
-
-        p_sys->i_width = sps.i_width;
-        p_sys->i_height = sps.i_height;
     }
 }
 
@@ -1383,26 +1423,28 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     }
 
     if (p_block && p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        p_sys->i_preroll_end = 0;
-        timestamp_FifoEmpty(p_sys->timestamp_fifo);
-        if (p_sys->decoded) {
+        if (p_sys->decoded)
+        {
+            p_sys->i_preroll_end = 0;
+            timestamp_FifoEmpty(p_sys->timestamp_fifo);
             /* Invalidate all pictures that are currently in flight
              * since flushing make all previous indices returned by
              * MediaCodec invalid. */
             if (p_sys->direct_rendering)
                 InvalidateAllPictures(p_dec);
+        }
 
+        if (p_sys->decoded || p_sys->i_csd_send > 0)
+        {
             (*env)->CallVoidMethod(env, p_sys->codec, jfields.flush);
             if (CHECK_EXCEPTION()) {
                 msg_Warn(p_dec, "Exception occurred in MediaCodec.flush");
                 b_error = true;
             }
+            /* resend CODEC_CONFIG buffer after a flush */
+            p_sys->i_csd_send = 0;
         }
         p_sys->decoded = false;
-
-        /* resend CODEC_CONFIG buffer after a flush */
-        if (p_sys->p_config_buffer)
-            p_sys->b_config_resend = true;
         goto endclean;
     }
 
@@ -1449,22 +1491,23 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
     do
     {
-        if ((p_sys->b_config_resend || p_block) && i_input_ret == 0)
+        if ((p_sys->i_csd_send < p_sys->i_csd_count || p_block)
+         && i_input_ret == 0)
         {
             const void *p_buf;
             size_t i_size;
             jint jflags = 0;
             mtime_t i_ts = 0;
 
-            if (p_sys->b_config_resend)
+            if (p_sys->i_csd_send < p_sys->i_csd_count)
             {
-                p_buf = p_sys->p_config_buffer;
-                i_size = p_sys->i_config_buffer;
+                /* Try to send Codec Specific Data */
+                p_buf = p_sys->p_csd[p_sys->i_csd_send].p_buf;
+                i_size = p_sys->p_csd[p_sys->i_csd_send].i_size;
                 jflags = BUFFER_FLAG_CODEC_CONFIG;
-                msg_Dbg(p_dec, "sending codec specific data of size %d "
-                               "via BUFFER_FLAG_CODEC_CONFIG flag", i_size);
             } else
             {
+                /* Try to send p_block input buffer */
                 p_buf = p_block->p_buffer;
                 i_size = p_block->i_buffer;
                 i_ts = p_block->i_pts;
@@ -1477,11 +1520,18 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
             if (i_input_ret == 1)
             {
-                p_sys->decoded = true;
-                if (p_sys->b_config_resend)
-                    p_sys->b_config_resend = false;
+                if (p_sys->i_csd_send < p_sys->i_csd_count)
+                {
+                    msg_Dbg(p_dec, "sent codec specific data(%d) of size %d "
+                            "via BUFFER_FLAG_CODEC_CONFIG flag",
+                            p_sys->i_csd_send, i_size);
+                    p_sys->i_csd_send++;
+                    i_input_ret = 0;
+                    continue;
+                }
                 else
                 {
+                    p_sys->decoded = true;
                     if (p_block->i_flags & BLOCK_FLAG_PREROLL )
                         p_sys->i_preroll_end = i_ts;
                     timestamp_FifoPut(p_sys->timestamp_fifo,
@@ -1490,7 +1540,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             }
         }
 
-        if (i_input_ret != -1 && i_output_ret == 0)
+        if (i_input_ret != -1 && p_sys->decoded && i_output_ret == 0)
         {
             /* FIXME: A new picture shouldn't be created each time.
              * If decoder_NewPicture fails because the decoder is
