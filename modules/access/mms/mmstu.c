@@ -994,7 +994,7 @@ static int mms_CommandSend( access_t *p_access, int i_command,
 
     /* send it */
     vlc_mutex_lock( &p_sys->lock_netwrite );
-    i_ret = net_Write( p_access, p_sys->i_handle_tcp, NULL, buffer.p_data,
+    i_ret = net_Write( p_access, p_sys->i_handle_tcp, buffer.p_data,
                        buffer.i_data - ( 8 - ( i_data - i_data_old ) ) );
     vlc_mutex_unlock( &p_sys->lock_netwrite );
 

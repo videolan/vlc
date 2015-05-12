@@ -145,8 +145,8 @@ struct virtual_socket_t
 
 VLC_API ssize_t net_Read( vlc_object_t *p_this, int fd, void *p_data, size_t i_data, bool b_retry );
 #define net_Read(a,b,c,d,e) net_Read(VLC_OBJECT(a),b,c,d,e)
-VLC_API ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *, const void *p_data, size_t i_data );
-#define net_Write(a,b,c,d,e) net_Write(VLC_OBJECT(a),b,c,d,e)
+VLC_API ssize_t net_Write( vlc_object_t *p_this, int fd, const void *p_data, size_t i_data );
+#define net_Write(a,b,c,d) net_Write(VLC_OBJECT(a),b,c,d)
 VLC_API char * net_Gets( vlc_object_t *p_this, int fd );
 #define net_Gets(a,b) net_Gets(VLC_OBJECT(a),b)
 

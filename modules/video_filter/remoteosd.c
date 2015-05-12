@@ -392,8 +392,7 @@ static bool write_exact( filter_t *p_filter,
                          char* p_writebuf,
                          int i_bytes )
 {
-    return i_bytes == net_Write( p_filter, i_socket, NULL,
-                                  (unsigned char*)p_writebuf, i_bytes );
+    return i_bytes == net_Write( p_filter, i_socket, p_writebuf, i_bytes );
 }
 
 static bool open_vnc_connection ( filter_t *p_filter )

@@ -1007,7 +1007,7 @@ static int WriteHeaders( access_t *access, const char *fmt, ... )
     {
         if( ((sys->p_tls != NULL)
             ? vlc_tls_Write( sys->p_tls, str, len )
-            : net_Write( access, sys->fd, NULL, str, len )) < len )
+            : net_Write( access, sys->fd, str, len )) < len )
             len = -1;
         free( str );
     }

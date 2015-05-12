@@ -169,7 +169,7 @@ static int ftp_SendCommand( vlc_object_t *obj, access_sys_t *sys,
     msg_Dbg( obj, "sending request: \"%.*s\" (%d bytes)", val - 2, cmd, val );
     if( ((sys->cmd.p_tls != NULL)
             ? vlc_tls_Write( sys->cmd.p_tls, cmd, val )
-            : net_Write( obj, sys->cmd.fd, NULL, cmd, val )) != val )
+            : net_Write( obj, sys->cmd.fd, cmd, val )) != val )
     {
         msg_Err( obj, "request failure" );
         val = -1;
@@ -901,7 +901,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             i_write += vlc_tls_Write( p_sys->data.p_tls,
                                       p_buffer->p_buffer, p_buffer->i_buffer );
         else
-            i_write += net_Write( p_access, p_sys->data.fd, NULL,
+            i_write += net_Write( p_access, p_sys->data.fd,
                                   p_buffer->p_buffer, p_buffer->i_buffer );
         block_Release( p_buffer );
 

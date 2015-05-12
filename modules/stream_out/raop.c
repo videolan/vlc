@@ -805,7 +805,7 @@ static int SendRequest( vlc_object_t *p_this, const char *psz_method,
     if ( i_err != VLC_SUCCESS )
         goto error;
 
-    i_rc = net_Write( p_this, p_sys->i_control_fd, NULL,
+    i_rc = net_Write( p_this, p_sys->i_control_fd,
                       psz_headers_end, sizeof( psz_headers_end ) - 1 );
     if ( i_rc < 0 )
     {
@@ -814,8 +814,7 @@ static int SendRequest( vlc_object_t *p_this, const char *psz_method,
     }
 
     if ( psz_body )
-        net_Write( p_this, p_sys->i_control_fd, NULL,
-                   psz_body, i_body_length );
+        net_Write( p_this, p_sys->i_control_fd, psz_body, i_body_length );
 
 error:
     return i_err;
@@ -1349,8 +1348,7 @@ static void SendAudio( sout_stream_t *p_stream, block_t *p_buffer )
             goto error;
 
         /* Send data */
-        rc = net_Write( p_stream, p_sys->i_stream_fd, NULL,
-                        p_sys->p_sendbuf, i_len );
+        rc = net_Write( p_stream, p_sys->i_stream_fd, p_sys->p_sendbuf, i_len );
         if ( rc < 0 )
             goto error;
 

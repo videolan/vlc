@@ -357,13 +357,12 @@ error:
  * Writes data to a file descriptor.
  * This blocks until all data is written or an error occurs.
  *
- * This function is a cancellation point if p_vs is NULL.
- * This function is not cancellation-safe if p_vs is not NULL.
+ * This function is a cancellation point.
  *
  * @return the total number of bytes written, or -1 if an error occurs
  * before any data is written.
  */
-ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
+ssize_t net_Write( vlc_object_t *p_this, int fd,
                    const void *restrict p_data, size_t i_data )
 {
     size_t i_total = 0;
@@ -380,8 +379,6 @@ ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 
     while( i_data > 0 )
     {
-        ssize_t val;
-
         ufd[0].revents = ufd[1].revents = 0;
 
         if (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) == -1)
@@ -410,15 +407,11 @@ ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
             }
         }
 
-        if (p_vs != NULL)
-            val = p_vs->pf_send (p_vs->p_sys, p_data, i_data);
-        else
 #ifdef _WIN32
-            val = send (fd, p_data, i_data, 0);
+        ssize_t val = send (fd, p_data, i_data, 0);
 #else
-            val = write (fd, p_data, i_data);
+        ssize_t val = write (fd, p_data, i_data);
 #endif
-
         if (val == -1)
         {
             if (errno == EINTR)
@@ -513,7 +506,7 @@ ssize_t net_vaPrintf( vlc_object_t *p_this, int fd,
     int i_size = vasprintf( &psz, psz_fmt, args );
     if( i_size == -1 )
         return -1;
-    i_ret = net_Write( p_this, fd, NULL, psz, i_size ) < i_size
+    i_ret = net_Write( p_this, fd, psz, i_size ) < i_size
         ? -1 : i_size;
     free( psz );
 

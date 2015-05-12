@@ -361,7 +361,7 @@ static int SocksNegotiate( vlc_object_t *p_obj,
         i_len = 3;
     }
 
-    if( net_Write( p_obj, fd, NULL, buffer, i_len ) != i_len )
+    if( net_Write( p_obj, fd, buffer, i_len ) != i_len )
         return VLC_EGENERIC;
     if( net_Read( p_obj, fd, buffer, 2, true ) != 2 )
         return VLC_EGENERIC;
@@ -387,7 +387,7 @@ static int SocksNegotiate( vlc_object_t *p_obj,
 
         i_len = 3 + i_len1 + i_len2;
 
-        if( net_Write( p_obj, fd, NULL, buffer, i_len ) != i_len )
+        if( net_Write( p_obj, fd, buffer, i_len ) != i_len )
             return VLC_EGENERIC;
 
         if( net_Read( p_obj, fd, buffer, 2, true ) != 2 )
@@ -460,7 +460,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
         buffer[8] = 0;                  /* Empty user id */
 
-        if( net_Write( p_obj, fd, NULL, buffer, 9 ) != 9 )
+        if( net_Write( p_obj, fd, buffer, 9 ) != 9 )
             return VLC_EGENERIC;
         if( net_Read( p_obj, fd, buffer, 8, true ) != 8 )
             return VLC_EGENERIC;
@@ -488,7 +488,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         i_len = 5 + i_hlen + 2;
 
 
-        if( net_Write( p_obj, fd, NULL, buffer, i_len ) != i_len )
+        if( net_Write( p_obj, fd, buffer, i_len ) != i_len )
             return VLC_EGENERIC;
 
         /* Read the header */
