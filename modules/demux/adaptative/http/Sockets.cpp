@@ -86,14 +86,7 @@ bool Socket::send(vlc_object_t *stream, const void *buf, size_t size)
     if (size == 0)
         return true;
 
-    ssize_t ret = net_Write(stream, netfd, NULL, buf, size);
-    if (ret <= 0)
-        return false;
-
-    if ( (size_t)ret < size )
-        send( stream, ((uint8_t*)buf) + ret, size - ret );
-
-    return true;
+    return net_Write(stream, netfd, NULL, buf, size) == (ssize_t)size;
 }
 
 TLSSocket::TLSSocket() : Socket()
