@@ -179,19 +179,20 @@ line_desc_t *NewLine( int i_count )
 }
 
 static void FixGlyph( FT_Glyph glyph, FT_BBox *p_bbox,
-                      FT_Face face, const FT_Vector *p_pen )
+                      FT_Pos i_x_advance, FT_Pos i_y_advance,
+                      const FT_Vector *p_pen )
 {
     FT_BitmapGlyph glyph_bmp = (FT_BitmapGlyph)glyph;
     if( p_bbox->xMin >= p_bbox->xMax )
     {
         p_bbox->xMin = FT_CEIL(p_pen->x);
-        p_bbox->xMax = FT_CEIL(p_pen->x + face->glyph->advance.x);
+        p_bbox->xMax = FT_CEIL(p_pen->x + i_x_advance);
         glyph_bmp->left = p_bbox->xMin;
     }
     if( p_bbox->yMin >= p_bbox->yMax )
     {
         p_bbox->yMax = FT_CEIL(p_pen->y);
-        p_bbox->yMin = FT_CEIL(p_pen->y + face->glyph->advance.y);
+        p_bbox->yMin = FT_CEIL(p_pen->y + i_y_advance);
         glyph_bmp->top  = p_bbox->yMax;
     }
 }
@@ -983,13 +984,16 @@ static int NewLayoutLine( filter_t *p_filter,
         }
 
         FixGlyph( p_bitmaps->p_glyph, &p_bitmaps->glyph_bbox,
-                  p_face, &pen_new );
+                  p_bitmaps->i_x_advance, p_bitmaps->i_y_advance,
+                  &pen_new );
         if( p_bitmaps->p_outline )
             FixGlyph( p_bitmaps->p_outline, &p_bitmaps->outline_bbox,
-                      p_face, &pen_new );
+                      p_bitmaps->i_x_advance, p_bitmaps->i_y_advance,
+                      &pen_new );
         if( p_bitmaps->p_shadow )
             FixGlyph( p_bitmaps->p_shadow, &p_bitmaps->shadow_bbox,
-                      p_face, &pen_shadow );
+                      p_bitmaps->i_x_advance, p_bitmaps->i_y_advance,
+                      &pen_shadow );
 
         int i_line_offset    = 0;
         int i_line_thickness = 0;
