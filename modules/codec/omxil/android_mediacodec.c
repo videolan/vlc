@@ -1040,16 +1040,14 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_t *p_pic,
     return 0;
 }
 
-static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t *p_block, jlong timeout)
+static int PutInput(decoder_t *p_dec, JNIEnv *env, const void *p_buf,
+                    size_t i_size, mtime_t ts, jint jflags, jlong timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int index;
-    int64_t ts = 0;
-    uint8_t *p_mc_buf, *p_buf;
-    size_t i_buf;
+    uint8_t *p_mc_buf;
     jobject j_mc_buf;
     jsize j_mc_size;
-    jint j_flags = 0;
 
     index = (*env)->CallIntMethod(env, p_sys->codec,
                                   jfields.dequeue_input_buffer, timeout);
@@ -1059,19 +1057,6 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t *p_block, jlong timeo
     }
     if (index < 0)
         return 0;
-
-    if (p_sys->b_config_resend)
-    {
-        p_buf = p_sys->p_config_buffer;
-        i_buf = p_sys->i_config_buffer;
-        j_flags = BUFFER_FLAG_CODEC_CONFIG;
-        msg_Dbg(p_dec, "sending codec specific data of size %d "
-                       "via BUFFER_FLAG_CODEC_CONFIG flag", i_buf);
-    } else
-    {
-        p_buf = p_block->p_buffer;
-        i_buf = p_block->i_buffer;
-    }
 
     if (jfields.get_input_buffers)
         j_mc_buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers,
@@ -1086,35 +1071,19 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t *p_block, jlong timeo
         (*env)->DeleteLocalRef(env, j_mc_buf);
         return -1;
     }
-    if ((size_t) j_mc_size > i_buf)
-        j_mc_size = i_buf;
+    if ((size_t) j_mc_size > i_size)
+        j_mc_size = i_size;
     memcpy(p_mc_buf, p_buf, j_mc_size);
 
-    if (!p_sys->b_config_resend)
-    {
-        ts = p_block->i_pts;
-        if (!ts && p_block->i_dts)
-            ts = p_block->i_dts;
-        if (p_block->i_flags & BLOCK_FLAG_PREROLL )
-            p_sys->i_preroll_end = ts;
-        timestamp_FifoPut(p_sys->timestamp_fifo,
-                          p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
-    }
     (*env)->CallVoidMethod(env, p_sys->codec, jfields.queue_input_buffer,
-                           index, 0, j_mc_size, ts, j_flags);
+                           index, 0, j_mc_size, ts, jflags);
     (*env)->DeleteLocalRef(env, j_mc_buf);
     if (CHECK_EXCEPTION()) {
         msg_Err(p_dec, "Exception in MediaCodec.queueInputBuffer");
         return -1;
     }
-    p_sys->decoded = true;
 
-    if (p_sys->b_config_resend)
-    {
-        p_sys->b_config_resend = false;
-        return 0; /* 0 since the p_block is not processed */
-    } else
-        return 1;
+    return 1;
 }
 
 static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong timeout)
@@ -1478,9 +1447,48 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         p_sys->b_update_format = true;
     }
 
-    do {
+    do
+    {
         if ((p_sys->b_config_resend || p_block) && i_input_ret == 0)
-            i_input_ret = PutInput(p_dec, env, p_block, timeout);
+        {
+            const void *p_buf;
+            size_t i_size;
+            jint jflags = 0;
+            mtime_t i_ts = 0;
+
+            if (p_sys->b_config_resend)
+            {
+                p_buf = p_sys->p_config_buffer;
+                i_size = p_sys->i_config_buffer;
+                jflags = BUFFER_FLAG_CODEC_CONFIG;
+                msg_Dbg(p_dec, "sending codec specific data of size %d "
+                               "via BUFFER_FLAG_CODEC_CONFIG flag", i_size);
+            } else
+            {
+                p_buf = p_block->p_buffer;
+                i_size = p_block->i_buffer;
+                i_ts = p_block->i_pts;
+                if (!i_ts && p_block->i_dts)
+                    i_ts = p_block->i_dts;
+            }
+
+            i_input_ret = PutInput(p_dec, env, p_buf, i_size, i_ts, jflags,
+                                   timeout);
+
+            if (i_input_ret == 1)
+            {
+                p_sys->decoded = true;
+                if (p_sys->b_config_resend)
+                    p_sys->b_config_resend = false;
+                else
+                {
+                    if (p_block->i_flags & BLOCK_FLAG_PREROLL )
+                        p_sys->i_preroll_end = i_ts;
+                    timestamp_FifoPut(p_sys->timestamp_fifo,
+                                      p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
+                }
+            }
+        }
 
         if (i_input_ret != -1 && i_output_ret == 0)
         {
