@@ -88,13 +88,15 @@ size_t ISegment::getOffset() const
     return startByte;
 }
 
-std::string ISegment::toString(int indent) const
+std::vector<std::string> ISegment::toString(int indent) const
 {
+    std::vector<std::string> out;
     std::stringstream ss;
     ss << std::string(indent, ' ') << debugName << " url=" << getUrlSegment().toString();
     if(startByte!=endByte)
         ss << " @" << startByte << ".." << endByte;
-    return ss.str();
+    out.push_back(ss.str());
+    return out;
 }
 
 bool ISegment::contains(size_t byte) const
@@ -151,7 +153,7 @@ void                    Segment::setSourceUrl   ( const std::string &url )
         this->sourceUrl = url;
 }
 
-std::string Segment::toString(int indent) const
+std::vector<std::string> Segment::toString(int indent) const
 {
     if (subsegments.empty())
     {
@@ -159,11 +161,13 @@ std::string Segment::toString(int indent) const
     }
     else
     {
-        std::string ret;
+        std::vector<std::string> ret;
         std::vector<SubSegment *>::const_iterator l;
+        ret.push_back(std::string(indent, ' ').append("Segment"));
         for(l = subsegments.begin(); l != subsegments.end(); ++l)
         {
-            ret.append( (*l)->toString(indent + 1) );
+            std::vector<std::string> debug = (*l)->toString(indent + 1);
+            ret.insert(ret.end(), debug.begin(), debug.end());
         }
         return ret;
     }

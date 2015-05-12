@@ -63,8 +63,11 @@ std::vector<std::string> BaseRepresentation::toString(int indent) const
     ret.push_back(text);
     std::vector<ISegment *> list = getSegments();
     std::vector<ISegment *>::const_iterator l;
-    for(l = list.begin(); l < list.end(); l++)
-        ret.push_back((*l)->toString(indent + 1));
+    for(l = list.begin(); l < list.end(); ++l)
+    {
+        std::vector<std::string> debug = (*l)->toString(indent + 1);
+        ret.insert(ret.end(), debug.begin(), debug.end());
+    }
 
     return ret;
 }
