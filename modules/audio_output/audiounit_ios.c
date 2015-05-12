@@ -292,6 +292,10 @@ static void Stop(audio_output_t *p_aout)
         if (status != noErr)
             msg_Warn(p_aout, "failed to stop AudioUnit (%i)", (int)status);
 
+        status = AudioUnitUninitialize(p_sys->au_unit);
+        if (status != noErr)
+            msg_Warn(p_aout, "failed to uninit AudioUnit (%i)", (int)status);
+
         status = AudioComponentInstanceDispose(p_sys->au_unit);
         if (status != noErr)
             msg_Warn(p_aout, "failed to dispose Audio Component instance (%i)", (int)status);
@@ -340,10 +344,10 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
         AudioOutputUnitStop(p_sys->au_unit);
         AudioSessionSetActive(false);
     } else {
-        AudioOutputUnitStart(p_sys->au_unit);
         UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
         AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
         AudioSessionSetActive(true);
+        AudioOutputUnitStart(p_sys->au_unit);
     }
 }
 
@@ -411,11 +415,13 @@ static OSStatus RenderCallback(vlc_object_t *p_obj,
     /* Pull audio from buffer */
     int32_t availableBytes;
     Float32 *buffer = TPCircularBufferTail(&p_sys->circular_buffer, &availableBytes);
+    if (unlikely(bytesRequested == 0)) /* cannot be negative */
+        return noErr;
 
     /* check if we have enough data */
     if (!availableBytes || p_sys->b_paused) {
         /* return an empty buffer so silence is played until we have data */
-        memset(targetBuffer, 0, ioData->mBuffers[0].mDataByteSize);
+        memset(targetBuffer, 0, bytesRequested);
     } else {
         int32_t bytesToCopy = __MIN(bytesRequested, availableBytes);
 
