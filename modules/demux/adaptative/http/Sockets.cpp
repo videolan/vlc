@@ -130,43 +130,21 @@ bool TLSSocket::connected() const
 
 ssize_t TLSSocket::read(vlc_object_t *, void *p_buffer, size_t len)
 {
-    ssize_t size;
-    size_t totalread = 0;
-    do
-    {
-        size = tls_Recv(tls, (uint8_t*)p_buffer + totalread, len - totalread); /* only returns partial chunks */
-        if(size >= 0)
-        {
-            totalread += (size_t) size;
-        }
-        else if(errno != EINTR && errno!=EAGAIN)
-        {
-            break;
-        }
-    } while ( totalread < len );
-    return totalread;
+    return vlc_tls_Read(tls, p_buffer, len, true) == (ssize_t)len;
 }
 
-std::string TLSSocket::readline(vlc_object_t *stream)
+std::string TLSSocket::readline(vlc_object_t *)
 {
-    std::string ret;
-    ret.reserve(256);
-    char c[2] = {0,0};
-    ssize_t size = TLSSocket::read(stream, c, 1);
+    char *line = ::vlc_tls_GetLine(tls);
+    if(line == NULL)
+        return "";
 
-    while(size > 0)
-    {
-        ret.append( &c[0] );
-        if(c[0] == '\n')
-            break;
-
-        size = TLSSocket::read(stream, c, 1);
-    }
-
+    std::string ret(line);
+    ::free(line);
     return ret;
 }
 
-bool TLSSocket::send(vlc_object_t *stream, const void *buf, size_t size)
+bool TLSSocket::send(vlc_object_t *, const void *buf, size_t size)
 {
     if (!connected())
         return false;
@@ -174,14 +152,7 @@ bool TLSSocket::send(vlc_object_t *stream, const void *buf, size_t size)
     if (size == 0)
         return true;
 
-    ssize_t ret = tls_Send(tls, buf, size);
-    if (ret <= 0)
-        return false;
-
-    if ( (size_t)ret < size )
-        send( stream, ((uint8_t*)buf) + ret, size - ret );
-
-    return true;
+    return vlc_tls_Write(tls, buf, size) == (ssize_t)size;
 }
 
 void TLSSocket::disconnect()
