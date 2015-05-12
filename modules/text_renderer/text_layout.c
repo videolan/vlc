@@ -126,7 +126,7 @@ typedef struct paragraph_t
 
 } paragraph_t;
 
-void FreeLine( line_desc_t *p_line )
+static void FreeLine( line_desc_t *p_line )
 {
     for( int i = 0; i < p_line->i_character_count; i++ )
     {
@@ -1038,10 +1038,10 @@ static int LayoutLine( filter_t *p_filter,
 
         bool b_karaoke = p_paragraph->pi_karaoke_bar[ i_paragraph_index ] != 0;
         p_ch->i_color = b_karaoke ?
-            p_paragraph->pp_styles[ i_paragraph_index ]->i_karaoke_background_color
-          | p_paragraph->pp_styles[ i_paragraph_index ]->i_karaoke_background_alpha << 24
-          : p_paragraph->pp_styles[ i_paragraph_index ]->i_font_color
-          | p_paragraph->pp_styles[ i_paragraph_index ]->i_font_alpha << 24;
+                        ( uint32_t ) p_glyph_style->i_karaoke_background_color
+                      |              p_glyph_style->i_karaoke_background_alpha << 24
+                      : ( uint32_t ) p_glyph_style->i_font_color
+                      |              p_glyph_style->i_font_alpha << 24;
 
         p_ch->i_line_thickness = i_line_thickness;
         p_ch->i_line_offset = i_line_offset;
