@@ -517,18 +517,15 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
         {
             p_face = LoadFace( p_filter, p_style );
             if( !p_face )
+            {
                 p_face = p_sys->p_face;
+                p_style = &p_sys->style;
+                p_run->p_style = p_style;
+            }
             p_run->p_face = p_face;
         }
         else
             p_face = p_run->p_face;
-
-        int i_font_width = p_style->i_style_flags & STYLE_HALFWIDTH
-                         ? p_style->i_font_size / 2 : p_style->i_font_size;
-
-        if( FT_Set_Pixel_Sizes( p_face, i_font_width, p_style->i_font_size ) )
-            msg_Err( p_filter,
-                     "Failed to set font size to %d", p_style->i_font_size );
 
         p_run->p_hb_font = hb_ft_font_create( p_face, 0 );
         if( !p_run->p_hb_font )
@@ -773,23 +770,20 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
         run_desc_t *p_run = p_paragraph->p_runs + i;
         text_style_t *p_style = p_run->p_style;
 
-        FT_Face p_face;
+        FT_Face p_face = 0;
         if( !p_run->p_face )
         {
             p_face = LoadFace( p_filter, p_style );
             if( !p_face )
+            {
                 p_face = p_sys->p_face;
+                p_style = &p_sys->style;
+                p_run->p_style = p_style;
+            }
             p_run->p_face = p_face;
         }
         else
             p_face = p_run->p_face;
-
-        int i_font_width = p_style->i_style_flags & STYLE_HALFWIDTH ?
-                p_style->i_font_size / 2 : p_style->i_font_size;
-
-        if( FT_Set_Pixel_Sizes( p_face, i_font_width, p_style->i_font_size ) )
-            msg_Err( p_filter,
-                     "Failed to set font size to %d", p_style->i_font_size );
 
         if( p_sys->p_stroker )
         {

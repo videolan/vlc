@@ -1442,6 +1442,17 @@ FT_Face LoadFace( filter_t *p_filter,
         return NULL;
     }
 
+    int i_font_width = p_style->i_style_flags & STYLE_HALFWIDTH
+                     ? p_style->i_font_size / 2 : p_style->i_font_size;
+
+    if( FT_Set_Pixel_Sizes( p_face, i_font_width, p_style->i_font_size ) )
+    {
+        msg_Err( p_filter,
+                 "Failed to set font size to %d", p_style->i_font_size );
+        FT_Done_Face( p_face );
+        return NULL;
+    }
+
     if( p_cache->i_faces_count == p_cache->i_cache_size )
     {
         FT_Face *p_new_faces =
