@@ -236,7 +236,8 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
 
     if( !p_paragraph->p_code_points || !p_paragraph->pi_glyph_indices
      || !p_paragraph->pp_styles || !p_paragraph->pi_run_ids
-     || !p_paragraph->p_glyph_bitmaps || !p_paragraph->pi_karaoke_bar )
+     || !p_paragraph->p_glyph_bitmaps || !p_paragraph->pi_karaoke_bar
+     || !p_paragraph->p_runs )
         goto error;
 
     if( p_code_points )
@@ -402,6 +403,10 @@ static int AddRun( filter_t *p_filter,
                      p_paragraph->i_runs_size * 2 * sizeof( *p_new_runs ) );
         if( !p_new_runs )
             return VLC_ENOMEM;
+
+        memset( p_new_runs + p_paragraph->i_runs_size , 0,
+                p_paragraph->i_runs_size * sizeof( *p_new_runs ) );
+
         p_paragraph->p_runs = p_new_runs;
         p_paragraph->i_runs_size *= 2;
     }
@@ -532,7 +537,6 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
         {
             msg_Err( p_filter,
                      "ShapeParagraphHarfBuzz(): hb_ft_font_create() error" );
-            i_ret = VLC_EGENERIC;
             goto error;
         }
 
@@ -541,7 +545,6 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
         {
             msg_Err( p_filter,
                      "ShapeParagraphHarfBuzz(): hb_buffer_create() error" );
-            i_ret = VLC_EGENERIC;
             goto error;
         }
 
@@ -563,16 +566,15 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
             hb_buffer_get_glyph_infos( p_run->p_buffer, &p_run->i_glyph_count );
         p_run->p_glyph_positions =
             hb_buffer_get_glyph_positions( p_run->p_buffer, &p_run->i_glyph_count );
-        i_total_glyphs += p_run->i_glyph_count;
-    }
 
-    if( i_total_glyphs <= 0 )
-    {
-        msg_Err( p_filter,
-                 "ShapeParagraphHarfBuzz() error. Shaped glyphs' count: %d",
-                 i_total_glyphs );
-        i_ret = VLC_EGENERIC;
-        goto error;
+        if( p_run->i_glyph_count <= 0 )
+        {
+            msg_Err( p_filter,
+                     "ShapeParagraphHarfBuzz() invalid glyph count in shaped run" );
+            goto error;
+        }
+
+        i_total_glyphs += p_run->i_glyph_count;
     }
 
     p_new_paragraph = NewParagraph( p_filter, i_total_glyphs, 0, 0, 0,
@@ -594,7 +596,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
         {
             /*
              * HarfBuzz reverses the order of glyphs in RTL runs. We reverse
-             * it again here to keep the glyphs in theirs logical order.
+             * it again here to keep the glyphs in their logical order.
              * For line breaking of paragraphs to work correctly, visual
              * reordering should be done after line breaking has taken
              * place.
@@ -628,8 +630,9 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
 
             ++i_index;
         }
-        AddRun( p_filter, p_new_paragraph, i_index - p_run->i_glyph_count,
-                i_index, p_run->p_face );
+        if( AddRun( p_filter, p_new_paragraph, i_index - p_run->i_glyph_count,
+                    i_index, p_run->p_face ) )
+            goto error;
     }
 
     for( int i = 0; i < p_paragraph->i_runs_count; ++i )
@@ -879,6 +882,10 @@ static int NewLayoutLine( filter_t *p_filter,
     }
 
     line_desc_t *p_line = NewLine( i_end_offset - i_start_offset );
+
+    if( !p_line )
+        return VLC_ENOMEM;
+
     filter_sys_t *p_sys = p_filter->p_sys;
     int i_last_run = -1;
     run_desc_t *p_run = 0;
@@ -1168,6 +1175,13 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
     return VLC_SUCCESS;
 
 error:
+    for( int i = i_line_start; i < p_paragraph->i_size; ++i )
+    {
+        if( p_paragraph->p_glyph_bitmaps[ i ].p_glyph )
+            FT_Done_Glyph( p_paragraph->p_glyph_bitmaps[ i ].p_glyph );
+        if( p_paragraph->p_glyph_bitmaps[ i ].p_outline )
+            FT_Done_Glyph( p_paragraph->p_glyph_bitmaps[ i ].p_outline );
+    }
     if( p_first_line )
         FreeLines( p_first_line );
     return VLC_EGENERIC;
@@ -1245,6 +1259,9 @@ int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
             if( LayoutParagraph( p_filter, p_paragraph,
                                  i_max_width, pp_line ) )
                 goto error;
+
+            FreeParagraph( p_paragraph );
+            p_paragraph = 0;
 
             for( ; *pp_line; pp_line = &( *pp_line )->p_next )
                 i_max_height = __MAX( i_max_height, ( *pp_line )->i_height );
