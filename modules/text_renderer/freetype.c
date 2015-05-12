@@ -371,7 +371,8 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
 
     uint8_t *p_dst;
     video_format_t fmt;
-    int i, x, y, i_pitch;
+    int i, i_pitch;
+    unsigned int x, y;
     uint8_t i_y, i_u, i_v; /* YUV values, derived from incoming RGB */
 
     /* Create a new subpicture region */
@@ -459,13 +460,13 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
         uint8_t *p_top = p_dst; /* Use 1st line as a cache */
         uint8_t left, current;
 
-        for( y = 1; y < (int)fmt.i_height - 1; y++ )
+        for( y = 1; y < fmt.i_height - 1; y++ )
         {
             if( y > 1 ) memcpy( p_top, p_dst, fmt.i_width );
             p_dst += p_region->p_picture->Y_PITCH;
             left = 0;
 
-            for( x = 1; x < (int)fmt.i_width - 1; x++ )
+            for( x = 1; x < fmt.i_width - 1; x++ )
             {
                 current = p_dst[x];
                 p_dst[x] = ( 8 * (int)p_dst[x] + left + p_dst[x+1] + p_top[x -1]+ p_top[x] + p_top[x+1] +
@@ -629,9 +630,9 @@ static inline void BlendAXYZGlyph( picture_t *p_picture,
                                    void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
 
 {
-    for( int dy = 0; dy < p_glyph->bitmap.rows; dy++ )
+    for( unsigned int dy = 0; dy < p_glyph->bitmap.rows; dy++ )
     {
-        for( int dx = 0; dx < p_glyph->bitmap.width; dx++ )
+        for( unsigned int dx = 0; dx < p_glyph->bitmap.width; dx++ )
             BlendPixel( p_picture, i_picture_x + dx, i_picture_y + dy,
                         i_a, i_x, i_y, i_z,
                         p_glyph->bitmap.buffer[dy * p_glyph->bitmap.width + dx] );
