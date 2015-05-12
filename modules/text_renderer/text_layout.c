@@ -1078,7 +1078,7 @@ static int LayoutLine( filter_t *p_filter,
 }
 
 static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
-                            int i_max_width, line_desc_t **pp_lines )
+                            int i_max_pixel_width, line_desc_t **pp_lines )
 {
     if( p_paragraph->i_size <= 0 || p_paragraph->i_runs_count <= 0 )
     {
@@ -1090,14 +1090,24 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 
     int i_line_start = 0;
     FT_Pos i_width = 0;
+    FT_Pos i_max_width = i_max_pixel_width << 6;
+    FT_Pos i_preferred_width = 0;
+    FT_Pos i_total_width = 0;
+    FT_Pos i_last_space_width = 0;
     int i_last_space = -1;
     line_desc_t *p_first_line = 0;
     line_desc_t **pp_line = &p_first_line;
 
-#ifdef HAVE_FRIBIDI
     for( int i = 0; i < p_paragraph->i_size; ++i )
+    {
+#ifdef HAVE_FRIBIDI
         p_paragraph->pi_reordered_indices[ i ] = i;
 #endif
+        i_total_width += p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
+    }
+
+    int i_line_count = i_total_width / i_max_width + 1;
+    i_preferred_width = i_total_width / i_line_count;
 
     for( int i = 0; i <= p_paragraph->i_size; ++i )
     {
@@ -1141,11 +1151,13 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             }
 
             i_last_space = i;
+            i_last_space_width = i_width;
         }
 
         i_width += p_paragraph->p_glyph_bitmaps[ i ].i_x_advance;
 
-        if( FT_CEIL( i_width ) >= i_max_width )
+        if( i_last_space_width >= i_preferred_width
+         || i_width >= i_max_width )
         {
             if( i_line_start == i )
             {
@@ -1168,6 +1180,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             i_line_start = i_end_offset;
             i = i_line_start - 1;
             i_width = 0;
+            i_last_space_width = 0;
         }
     }
 
