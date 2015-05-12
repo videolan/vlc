@@ -40,7 +40,7 @@ namespace adaptative
                 virtual bool    connect     (vlc_object_t *, const std::string&, int port = 80);
                 virtual bool    connected   () const;
                 virtual bool    send        (vlc_object_t *, const void *buf, size_t size);
-                virtual ssize_t read        (vlc_object_t *, void *p_buffer, size_t len, bool);
+                virtual ssize_t read        (vlc_object_t *, void *p_buffer, size_t len);
                 virtual std::string readline(vlc_object_t *);
                 virtual void    disconnect  ();
 
@@ -56,7 +56,7 @@ namespace adaptative
                 virtual bool    connect     (vlc_object_t *, const std::string&, int port = 443);
                 virtual bool    connected   () const;
                 virtual bool    send        (vlc_object_t *, const void *buf, size_t size);
-                virtual ssize_t read        (vlc_object_t *, void *p_buffer, size_t len, bool);
+                virtual ssize_t read        (vlc_object_t *, void *p_buffer, size_t len);
                 virtual std::string readline(vlc_object_t *);
                 virtual void    disconnect  ();
 

@@ -58,12 +58,12 @@ void Socket::disconnect()
     }
 }
 
-ssize_t Socket::read(vlc_object_t *stream, void *p_buffer, size_t len, bool retry)
+ssize_t Socket::read(vlc_object_t *stream, void *p_buffer, size_t len)
 {
     ssize_t size;
     do
     {
-        size = net_Read(stream, netfd, NULL, p_buffer, len, retry);
+        size = net_Read(stream, netfd, NULL, p_buffer, len, true);
     } while (size < 0 && (errno == EINTR || errno==EAGAIN) );
     return size;
 }
@@ -135,7 +135,7 @@ bool TLSSocket::connected() const
     return Socket::connected() && tls;
 }
 
-ssize_t TLSSocket::read(vlc_object_t *, void *p_buffer, size_t len, bool)
+ssize_t TLSSocket::read(vlc_object_t *, void *p_buffer, size_t len)
 {
     ssize_t size;
     size_t totalread = 0;
@@ -159,7 +159,7 @@ std::string TLSSocket::readline(vlc_object_t *stream)
     std::string ret;
     ret.reserve(256);
     char c[2] = {0,0};
-    ssize_t size = TLSSocket::read(stream, c, 1, true);
+    ssize_t size = TLSSocket::read(stream, c, 1);
 
     while(size > 0)
     {
@@ -167,7 +167,7 @@ std::string TLSSocket::readline(vlc_object_t *stream)
         if(c[0] == '\n')
             break;
 
-        size = TLSSocket::read(stream, c, 1, true);
+        size = TLSSocket::read(stream, c, 1);
     }
 
     return ret;

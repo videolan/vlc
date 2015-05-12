@@ -132,7 +132,7 @@ ssize_t HTTPConnection::read(void *p_buffer, size_t len)
     if(len > chunk->getBytesToRead())
         len = chunk->getBytesToRead();
 
-    ssize_t ret = socket->read(stream, p_buffer, len, true);
+    ssize_t ret = socket->read(stream, p_buffer, len);
     if(ret >= 0)
         chunk->setBytesRead(chunk->getBytesRead() + ret);
 
