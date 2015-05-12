@@ -1344,12 +1344,11 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
     return 0;
 }
 
-static void H264ProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
-                             bool *p_delayed_open)
+static void H264ProcessBlock(decoder_t *p_dec, block_t *p_block,
+                             bool *p_csd_changed, bool *p_size_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct H264ConvertState convert_state = { 0, 0 };
-    bool b_size_changed;
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_H264 && p_block);
 
@@ -1358,22 +1357,14 @@ static void H264ProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
         convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
                                p_sys->nal_size, &convert_state);
     } else if (H264SetCSD(p_dec, p_block->p_buffer, p_block->i_buffer,
-                          &b_size_changed) == VLC_SUCCESS)
+                          p_size_changed) == VLC_SUCCESS)
     {
-        if (p_sys->codec && b_size_changed)
-        {
-            msg_Err(p_dec, "SPS/PPS changed during playback and "
-                    "MediaCodec configured with a different video size. "
-                    "Restart it !");
-            CloseMediaCodec(p_dec, env);
-        }
-        if (!p_sys->codec)
-            *p_delayed_open = true;
+        *p_csd_changed = true;
     }
 }
 
-static void HEVCProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
-                             bool *p_delayed_open)
+static void HEVCProcessBlock(decoder_t *p_dec, block_t *p_block,
+                             bool *p_csd_changed, bool *p_size_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct H264ConvertState convert_state = { 0, 0 };
@@ -1387,8 +1378,8 @@ static void HEVCProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
     }
 
     /* TODO */
-    VLC_UNUSED(env);
-    VLC_UNUSED(p_delayed_open);
+    VLC_UNUSED(p_csd_changed);
+    VLC_UNUSED(p_size_changed);
 }
 
 static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
@@ -1450,11 +1441,25 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
     if (b_new_block)
     {
+        bool b_csd_changed = false, b_size_changed = false;
+
         p_sys->b_new_block = false;
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-            H264ProcessBlock(p_dec, env, p_block, &b_delayed_open);
+            H264ProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
         else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
-            HEVCProcessBlock(p_dec, env, p_block, &b_delayed_open);
+            HEVCProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
+
+        if (p_sys->codec && b_csd_changed)
+        {
+            if (b_size_changed)
+            {
+                msg_Err(p_dec, "SPS/PPS changed during playback and "
+                        "video size are different. Restart it !");
+                CloseMediaCodec(p_dec, env);
+            }
+        }
+        if (!p_sys->codec)
+            b_delayed_open = true;
     }
 
     /* try delayed opening if there is a new extra data */
