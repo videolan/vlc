@@ -1282,7 +1282,7 @@ static void H264ProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_H264 && p_block);
 
-    if (p_sys->p_csd0_buffer)
+    if (p_sys->nal_size)
     {
         convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
                                p_sys->nal_size, &convert_state);
@@ -1340,7 +1340,7 @@ static void HEVCProcessBlock(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && p_block);
 
-    if (p_sys->p_csd0_buffer)
+    if (p_sys->nal_size)
     {
         convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
                                p_sys->nal_size, &convert_state);
