@@ -9,6 +9,7 @@
  *          Bernie Purcell <bitmap@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
  *          Felix Paul Kühne <fkuehne@videolan.org>
+ *          Salah-Eddin Shaban <salshaaban@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by

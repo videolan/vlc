@@ -4,7 +4,11 @@
  * Copyright (C) 2015 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Salah-Eddin Shaban <salshaaban@gmail.com>
+ * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
+ *          Gildas Bazin <gbazin@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Laurent Aimar <fenrir@videolan.org>
+ *          Salah-Eddin Shaban <salshaaban@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
