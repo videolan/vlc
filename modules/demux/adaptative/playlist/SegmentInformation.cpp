@@ -279,7 +279,7 @@ static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
         {
             SubSegment *subsegment = new SubSegment(segment,
                                                     start + segment->getOffset(),
-                                                    end + segment->getOffset());
+                                                    (end != 0) ? end + segment->getOffset() : 0);
             segment->addSubSegment(subsegment);
             segment->startTime.Set(time);
             break;
