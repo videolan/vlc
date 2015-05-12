@@ -1382,6 +1382,35 @@ static void HEVCProcessBlock(decoder_t *p_dec, block_t *p_block,
     VLC_UNUSED(p_size_changed);
 }
 
+static int DecodeFlush(decoder_t *p_dec, JNIEnv *env)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (p_sys->decoded)
+    {
+        p_sys->i_preroll_end = 0;
+        timestamp_FifoEmpty(p_sys->timestamp_fifo);
+        /* Invalidate all pictures that are currently in flight
+         * since flushing make all previous indices returned by
+         * MediaCodec invalid. */
+        if (p_sys->direct_rendering)
+            InvalidateAllPictures(p_dec);
+    }
+
+    if (p_sys->decoded || p_sys->i_csd_send > 0)
+    {
+        (*env)->CallVoidMethod(env, p_sys->codec, jfields.flush);
+        if (CHECK_EXCEPTION()) {
+            msg_Warn(p_dec, "Exception occurred in MediaCodec.flush");
+            return VLC_EGENERIC;
+        }
+        /* resend CODEC_CONFIG buffer after a flush */
+        p_sys->i_csd_send = 0;
+    }
+    p_sys->decoded = false;
+    return VLC_SUCCESS;
+}
+
 static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1414,28 +1443,8 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     }
 
     if (p_block && p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        if (p_sys->decoded)
-        {
-            p_sys->i_preroll_end = 0;
-            timestamp_FifoEmpty(p_sys->timestamp_fifo);
-            /* Invalidate all pictures that are currently in flight
-             * since flushing make all previous indices returned by
-             * MediaCodec invalid. */
-            if (p_sys->direct_rendering)
-                InvalidateAllPictures(p_dec);
-        }
-
-        if (p_sys->decoded || p_sys->i_csd_send > 0)
-        {
-            (*env)->CallVoidMethod(env, p_sys->codec, jfields.flush);
-            if (CHECK_EXCEPTION()) {
-                msg_Warn(p_dec, "Exception occurred in MediaCodec.flush");
-                b_error = true;
-            }
-            /* resend CODEC_CONFIG buffer after a flush */
-            p_sys->i_csd_send = 0;
-        }
-        p_sys->decoded = false;
+        if (DecodeFlush(p_dec, env) != VLC_SUCCESS)
+            b_error = true;
         goto endclean;
     }
 
@@ -1456,6 +1465,11 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                 msg_Err(p_dec, "SPS/PPS changed during playback and "
                         "video size are different. Restart it !");
                 CloseMediaCodec(p_dec, env);
+            } else
+            {
+                msg_Err(p_dec, "SPS/PPS changed during playback. Flush it");
+                if (DecodeFlush(p_dec, env) != VLC_SUCCESS)
+                    b_error = true;
             }
         }
         if (!p_sys->codec)
