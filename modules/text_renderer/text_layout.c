@@ -862,10 +862,10 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
     return VLC_SUCCESS;
 }
 
-static int NewLayoutLine( filter_t *p_filter,
-                          paragraph_t *p_paragraph,
-                          int i_start_offset, int i_end_offset,
-                          line_desc_t **pp_line )
+static int LayoutLine( filter_t *p_filter,
+                       paragraph_t *p_paragraph,
+                       int i_start_offset, int i_end_offset,
+                       line_desc_t **pp_line )
 {
     if( p_paragraph->i_size <= 0 || p_paragraph->i_runs_count <= 0
      || i_start_offset >= i_end_offset
@@ -873,7 +873,7 @@ static int NewLayoutLine( filter_t *p_filter,
      || i_end_offset <= 0  || i_end_offset > p_paragraph->i_size )
     {
         msg_Err( p_filter,
-                 "NewLayoutLine() invalid parameters. "
+                 "LayoutLine() invalid parameters. "
                  "Paragraph size: %d. Runs count: %d. "
                  "Start offset: %d. End offset: %d",
                  p_paragraph->i_size, p_paragraph->i_runs_count,
@@ -1104,8 +1104,8 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
         if( i == p_paragraph->i_size )
         {
             if( i_line_start < i )
-                if( NewLayoutLine( p_filter, p_paragraph,
-                                   i_line_start, i, pp_line ) )
+                if( LayoutLine( p_filter, p_paragraph,
+                                i_line_start, i, pp_line ) )
                     goto error;
 
             break;
@@ -1160,8 +1160,8 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             else
                 i_end_offset = i;
 
-            if( NewLayoutLine( p_filter, p_paragraph, i_line_start,
-                               i_end_offset, pp_line ) )
+            if( LayoutLine( p_filter, p_paragraph, i_line_start,
+                            i_end_offset, pp_line ) )
                 goto error;
 
             pp_line = &( *pp_line )->p_next;
