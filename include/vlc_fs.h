@@ -37,6 +37,7 @@
  *    dirent structure pointers to its callbacks.
  *  - vlc_accept() takes an extra boolean for nonblocking mode (compare with
  *    the flags parameter in POSIX.next accept4()).
+ *  - Writing functions do not emit a SIGPIPE signal in case of broken pipe.
  */
 
 #include <sys/types.h>
@@ -107,6 +108,7 @@ static inline void vlc_rewinddir( DIR *dir )
 #endif
 
 struct stat;
+struct iovec;
 
 VLC_API int vlc_stat( const char *filename, struct stat *buf );
 VLC_API int vlc_lstat( const char *filename, struct stat *buf );
@@ -115,4 +117,6 @@ VLC_API int vlc_mkstemp( char * );
 
 VLC_API int vlc_dup( int );
 VLC_API int vlc_pipe( int[2] );
+VLC_API ssize_t vlc_write( int, const void *, size_t );
+VLC_API ssize_t vlc_writev( int, const struct iovec *, int );
 #endif

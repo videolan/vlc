@@ -284,6 +284,16 @@ int vlc_pipe (int fds[2])
 #endif
 }
 
+ssize_t vlc_write(int fd, const void *buf, size_t len)
+{
+    return write(fd, buf, len);
+}
+
+ssize_t vlc_writev(int fd, const struct iovec *iov, int count)
+{
+    vlc_assert_unreachable();
+}
+
 #include <vlc_network.h>
 
 int vlc_socket (int pf, int type, int proto, bool nonblock)
