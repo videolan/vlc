@@ -51,6 +51,17 @@
 #define SKIP_ADS_LONGTEXT N_( "Use playlist options usually used to prevent " \
     "ads skipping to detect ads and prevent adding them to the playlist." )
 
+static const char *const psz_recursive_list[] = { "none", "collapse", "expand" };
+static const char *const psz_recursive_list_text[] = {
+    N_("None"), N_("Collapse"), N_("Expand"), N_("Expand distant files") };
+
+#define RECURSIVE_TEXT N_("Subdirectory behavior")
+#define RECURSIVE_LONGTEXT N_( \
+        "Select whether subdirectories must be expanded.\n" \
+        "none: subdirectories do not appear in the playlist.\n" \
+        "collapse: subdirectories appear but are expanded on first play.\n" \
+        "expand: all subdirectories are expanded.\n" )
+
 static const char *const psz_sort_list[] = { "collate", "version", "none" };
 static const char *const psz_sort_list_text[] = {
     N_("Sort alphabetically according to the current language's collation rules."),
@@ -166,6 +177,9 @@ vlc_module_begin ()
         add_shortcut( "playlist", "directory" )
         set_capability( "demux", 10 )
         set_callbacks( Import_Dir, Close_Dir )
+        add_string( "recursive", "collapse" , RECURSIVE_TEXT,
+                    RECURSIVE_LONGTEXT, false )
+          change_string_list( psz_recursive_list, psz_recursive_list_text )
         add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,sub,idx,srt,cue,ssa",
                     IGNORE_TEXT, IGNORE_LONGTEXT, false )
         add_string( "directory-sort", "collate", SORT_TEXT, SORT_LONGTEXT, false )

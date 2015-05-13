@@ -1091,17 +1091,6 @@ static const char *const ppsz_prefres[] = {
     "Automatically preparse files added to the playlist " \
     "(to retrieve some metadata)." )
 
-#define RECURSIVE_TEXT N_("Subdirectory behavior")
-#define RECURSIVE_LONGTEXT N_( \
-        "Select whether subdirectories must be expanded.\n" \
-        "none: subdirectories do not appear in the playlist.\n" \
-        "collapse: subdirectories appear but are expanded on first play.\n" \
-        "expand: all subdirectories are expanded.\n" )
-
-static const char *const psz_recursive_list[] = { "none", "collapse", "expand" };
-static const char *const psz_recursive_list_text[] = {
-    N_("None"), N_("Collapse"), N_("Expand"), N_("Expand distant files") };
-
 #define METADATA_NETWORK_TEXT N_( "Allow metadata network access" )
 
 #define SD_TEXT N_( "Services discovery modules")
@@ -2022,10 +2011,6 @@ vlc_module_begin ()
 
     add_bool( "auto-preparse", true, PREPARSE_TEXT,
               PREPARSE_LONGTEXT, false )
-
-    add_string( "recursive", "collapse" , RECURSIVE_TEXT,
-                RECURSIVE_LONGTEXT, false )
-      change_string_list( psz_recursive_list, psz_recursive_list_text )
 
     add_obsolete_integer( "album-art" )
     add_bool( "metadata-network-access", false, METADATA_NETWORK_TEXT,
