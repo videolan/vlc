@@ -39,9 +39,6 @@
 
 #include "filter_picture.h"
 
-#ifndef M_PI
-#   define M_PI 3.14159265358979323846
-#endif
 #ifndef TIME_UNIT_PER_S
 #   define TIME_UNIT_PER_S ( ((int64_t) 1) << 32 )
 #endif
