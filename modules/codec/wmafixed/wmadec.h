@@ -21,6 +21,7 @@
 #define _WMADEC_H
 
 #include <inttypes.h>
+#include <math.h>
 
 #include "asf.h"
 #include "bitstream.h" /* For GetBitContext */
@@ -42,8 +43,6 @@
 
 /* XXX: is it a suitable value ? */
 #define MAX_CODED_SUPERFRAME_SIZE 16384
-
-#define M_PI    3.14159265358979323846
 
 #define M_PI_F  0x3243f // in fixed 32 format
 #define TWO_M_PI_F  0x6487f   //in fixed 32
