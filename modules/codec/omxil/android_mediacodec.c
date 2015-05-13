@@ -1603,6 +1603,8 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                      * indefinitely and abort after 2seconds (100 * 2 * 10ms)
                      * without any data. Indeed, MediaCodec can fail without
                      * throwing any exception or error returns... */
+                    msg_Err(p_dec, "No output/input for %lld ms, abort",
+                                    i_attempts * timeout);
                     b_error = true;
                     break;
                 }
@@ -1615,7 +1617,11 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     } while (p_block && i_input_ret == 0 && i_output_ret == 0);
 
     if (i_input_ret == -1 || i_output_ret == -1)
+    {
+        msg_Err(p_dec, "%s failed",
+                i_input_ret == -1 ? "PutInput" : "GetOutput");
         b_error = true;
+    }
 
 endclean:
 
