@@ -148,6 +148,7 @@ static int Open(vlc_object_t *this)
 
     /* setup the actual OpenGL ES view */
     sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:[viewContainer bounds]];
+    sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
     if (!sys->glESView)
         goto bailout;
