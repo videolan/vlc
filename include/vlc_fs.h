@@ -23,9 +23,20 @@
 
 /**
  * \file
- * Those functions convert file paths from UTF-8 to the system-specific
- * encoding (especially UTF-16 on Windows). Also, they always mark file
- * descriptor with the close-on-exec flag.
+ * The functions in this file help with using low-level Unix-style file
+ * descriptors, BSD sockets and directories. In general, they retain the
+ * prototype and most semantics from their respective standard equivalents.
+ * However, there are a few differences:
+ *  - On Windows, file path arguments are expected in UTF-8 format.
+ *    They are converted to UTF-16 internally, thus enabling access to paths
+ *    outside of the local Windows ANSI code page.
+ *  - On POSIX systems, file descriptors are created with the close-on-exec
+ *    flag set (atomically where possible), so that they do not leak to
+ *    child process after fork-and-exec.
+ *  - vlc_scandir(), inspired by GNU scandir(), passes file names rather than
+ *    dirent structure pointers to its callbacks.
+ *  - vlc_accept() takes an extra boolean for nonblocking mode (compare with
+ *    the flags parameter in POSIX.next accept4()).
  */
 
 #include <sys/types.h>
