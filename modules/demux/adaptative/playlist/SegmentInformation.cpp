@@ -171,26 +171,32 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
 
 bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
 {
-    SegmentList *segList;
     MediaSegmentTemplate *mediaTemplate;
-    uint64_t timescale = 1;
-    mtime_t duration = 0;
-
     if( (mediaTemplate = inheritSegmentTemplate()) )
     {
-        timescale = mediaTemplate->inheritTimescale();
-        duration = mediaTemplate->duration.Get();
+        uint64_t timescale = mediaTemplate->inheritTimescale();
+        mtime_t duration = mediaTemplate->duration.Get();
+        if(duration)
+        {
+            *ret = time / (CLOCK_FREQ * duration / timescale);
+            return true;
+        }
     }
-    else if ( (segList = inheritSegmentList()) )
+    else
     {
-        timescale = segList->inheritTimescale();
-        duration = segList->duration.Get();
-    }
-
-    if(duration)
-    {
-        *ret = time / (CLOCK_FREQ * duration / timescale);
-        return true;
+        const std::vector<ISegment *> segments = getSegments(INFOTYPE_MEDIA);
+        std::vector<ISegment *>::const_iterator it;
+        *ret = 0;
+        for(it = segments.begin(); it != segments.end(); ++it)
+        {
+            if((*it)->startTime.Get() > VLC_TS_INVALID &&
+               (*it)->startTime.Get() > time &&
+                it != segments.begin())
+            {
+                return true;
+            }
+            (*ret)++;
+        }
     }
 
     return false;
