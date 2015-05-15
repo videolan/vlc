@@ -46,15 +46,13 @@ namespace adaptative
             public:
                 SegmentInfoCommon( ICanonicalUrl *parent = NULL );
                 virtual ~SegmentInfoCommon();
-                time_t                  getDuration() const;
-                void                    setDuration( time_t duration );
                 int                     getStartIndex() const;
                 void                    setStartIndex( int startIndex );
                 void                    appendBaseURL( const std::string& url );
                 virtual Url             getUrlSegment() const; /* impl */
+                Property<uint64_t>      duration;
 
             private:
-                time_t                  duration;
                 int                     startIndex;
                 std::list<std::string>  baseURLs;
         };

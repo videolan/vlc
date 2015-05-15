@@ -32,24 +32,13 @@ using namespace adaptative::playlist;
 
 SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
     ICanonicalUrl( parent ), Initializable(), Indexable(),
-    duration( 0 ),
     startIndex( 0 )
 {
+    duration.Set(0);
 }
 
 SegmentInfoCommon::~SegmentInfoCommon()
 {
-}
-
-time_t      SegmentInfoCommon::getDuration() const
-{
-    return this->duration;
-}
-
-void        SegmentInfoCommon::setDuration( time_t duration )
-{
-    if ( duration >= 0 )
-        this->duration = duration;
 }
 
 int         SegmentInfoCommon::getStartIndex() const

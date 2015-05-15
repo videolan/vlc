@@ -183,7 +183,7 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
     else if ( (segList = inheritSegmentList()) )
     {
         timescale = segList->inheritTimescale();
-        duration = segList->getDuration();
+        duration = segList->duration.Get();
     }
 
     if(duration)
@@ -217,7 +217,7 @@ mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) cons
     else if ( (segList = inheritSegmentList()) )
     {
         timescale = segList->inheritTimescale();
-        time = number * segList->getDuration();
+        time = number * segList->duration.Get();
     }
 
     if(time)
