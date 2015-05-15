@@ -344,8 +344,8 @@ endif
 endif
 
 libdxva2_plugin_la_SOURCES = \
-	video_chroma/copy.c video_chroma/copy.h \
-	codec/avcodec/dxva2.c packetizer/h264_nal.c packetizer/h264_nal.h
+	codec/avcodec/dxva2.c codec/avcodec/directx_va.c codec/avcodec/directx_va.h \
+	packetizer/h264_nal.c packetizer/h264_nal.h
 libdxva2_plugin_la_LIBADD = -lole32 -lshlwapi -luuid
 if HAVE_AVCODEC_DXVA2
 codec_LTLIBRARIES += libdxva2_plugin.la
