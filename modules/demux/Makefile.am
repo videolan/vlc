@@ -327,7 +327,7 @@ libdash_plugin_la_SOURCES += \
     demux/adaptative/http/Chunk.cpp \
     demux/adaptative/http/Chunk.h \
     demux/adaptative/http/HTTPConnection.cpp \
-    demux/adaptative/http/HTTPConnection.h \
+    demux/adaptative/http/HTTPConnection.hpp \
     demux/adaptative/http/HTTPConnectionManager.cpp \
     demux/adaptative/http/HTTPConnectionManager.h \
     demux/adaptative/http/Sockets.hpp \
