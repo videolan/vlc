@@ -303,6 +303,7 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
             if(segListNode->hasAttribute("timescale"))
                 list->timescale.Set(Integer<uint64_t>(segListNode->getAttributeValue("timescale")));
 
+            uint64_t nzStartTime = 0;
             std::vector<Node *>::const_iterator it;
             for(it = segments.begin(); it != segments.end(); ++it)
             {
@@ -328,6 +329,9 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
                     seg->startTime.Set(totaltime);
                     totaltime += list->duration.Get();
                 }
+
+                seg->startTime.Set(VLC_TS_0 + nzStartTime);
+                nzStartTime += CLOCK_FREQ * list->duration.Get();
 
                 list->addSegment(seg);
                 total++;
