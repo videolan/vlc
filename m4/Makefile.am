@@ -27,6 +27,7 @@ EXTRA_DIST = \
 	private.m4 \
 	progtest.m4 \
 	size_max.m4 \
+	stdcxx_11.m4 \
 	stdint_h.m4 \
 	uintmax_t.m4 \
 	visibility.m4 \
