@@ -71,11 +71,12 @@ bool AtomsReader::parseBlock(void *buffer, size_t size, BaseRepresentation *rep)
                 MP4_Box_data_sidx_t *sidx = sidxbox->data.p_sidx;
                 point.offset = sidx->i_first_offset;
                 point.time = 0;
-                for(uint16_t i=0; i<sidx->i_reference_count; i++)
+                for(uint16_t i=0; i<sidx->i_reference_count && sidx->i_timescale; i++)
                 {
                     splitlist.push_back(point);
                     point.offset += sidx->p_items[i].i_referenced_size;
-                    point.time += sidx->p_items[i].i_subsegment_duration;
+                    point.time += CLOCK_FREQ * sidx->p_items[i].i_subsegment_duration /
+                                  sidx->i_timescale;
                 }
                 rep->SplitUsingIndex(splitlist);
                 rep->getPlaylist()->debug();
