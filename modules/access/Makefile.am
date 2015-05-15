@@ -68,6 +68,7 @@ endif
 
 libaccess_archive_plugin_la_SOURCES = access/archive/access.c access/archive/stream.c \
 					access/archive/archive.h access/archive/archive.c
+libaccess_archive_plugin_la_CFLAGS = $(AM_CFLAGS) $(ARCHIVE_CFLAGS)
 libaccess_archive_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 libaccess_archive_plugin_la_LIBADD = $(ARCHIVE_LIBS)
 access_LTLIBRARIES += $(LTLIBaccess_archive)
