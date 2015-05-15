@@ -103,7 +103,8 @@ vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
             }
             else if( segmentBase )
             {
-                retSegments.push_back( segmentBase );
+                std::vector<ISegment *> list = segmentBase->subSegments();
+                retSegments.insert( retSegments.end(), list.begin(), list.end() );
             }
         }
         break;
