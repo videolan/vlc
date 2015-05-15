@@ -25,7 +25,6 @@
 #define BASEPERIOD_H_
 
 #include <vector>
-#include <string>
 
 #include "BaseAdaptationSet.h"
 #include "SegmentInformation.hpp"
@@ -46,7 +45,7 @@ namespace adaptative
                 const std::vector<BaseAdaptationSet *>  getAdaptationSets   (StreamType) const;
                 BaseAdaptationSet *                 getAdaptationSet    (StreamType) const;
                 void                                addAdaptationSet    (BaseAdaptationSet *AdaptationSet);
-                std::vector<std::string>            toString            (int = 0) const;
+                void                                debug               (vlc_object_t *,int = 0) const;
 
                 virtual mtime_t getPeriodStart() const; /* reimpl */
 

@@ -79,17 +79,12 @@ bool BaseAdaptationSet::getBitstreamSwitching  () const
     return this->isBitstreamSwitching;
 }
 
-std::vector<std::string> BaseAdaptationSet::toString(int indent) const
+void BaseAdaptationSet::debug(vlc_object_t *obj, int indent) const
 {
-    std::vector<std::string> ret;
     std::string text(indent, ' ');
     text.append("BaseAdaptationSet");
-    ret.push_back(text);
+    msg_Dbg(obj, "%s", text.c_str());
     std::vector<BaseRepresentation *>::const_iterator k;
     for(k = representations.begin(); k != representations.end(); ++k)
-    {
-        std::vector<std::string> debug = (*k)->toString(indent + 1);
-        ret.insert(ret.end(), debug.begin(), debug.end());
-    }
-    return ret;
+        (*k)->debug(obj, indent + 1);
 }

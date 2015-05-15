@@ -72,12 +72,5 @@ void MPD::debug()
 
     std::vector<BasePeriod *>::const_iterator i;
     for(i = getPeriods().begin(); i != getPeriods().end(); ++i)
-    {
-        std::vector<std::string> debug = (*i)->toString();
-        std::vector<std::string>::const_iterator l;
-        for(l = debug.begin(); l < debug.end(); ++l)
-        {
-            msg_Dbg(stream, "%s", (*l).c_str());
-        }
-    }
+        (*i)->debug(VLC_OBJECT(stream));
 }

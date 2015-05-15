@@ -55,21 +55,15 @@ void    BaseRepresentation::setBandwidth( uint64_t bandwidth )
     this->bandwidth = bandwidth;
 }
 
-std::vector<std::string> BaseRepresentation::toString(int indent) const
+void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
 {
-    std::vector<std::string> ret;
     std::string text(indent, ' ');
     text.append("Representation");
-    ret.push_back(text);
+    msg_Dbg(obj, "%s", text.c_str());
     std::vector<ISegment *> list = getSegments();
     std::vector<ISegment *>::const_iterator l;
     for(l = list.begin(); l < list.end(); ++l)
-    {
-        std::vector<std::string> debug = (*l)->toString(indent + 1);
-        ret.insert(ret.end(), debug.begin(), debug.end());
-    }
-
-    return ret;
+        (*l)->debug(obj, indent + 1);
 }
 
 AbstractPlaylist * BaseRepresentation::getPlaylist() const

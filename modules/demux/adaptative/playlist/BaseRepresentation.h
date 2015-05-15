@@ -56,7 +56,7 @@ namespace adaptative
 
                 AbstractPlaylist*   getPlaylist             () const;
 
-                std::vector<std::string> toString(int = 0) const;
+                void                debug                   (vlc_object_t *,int = 0) const;
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,

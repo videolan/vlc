@@ -88,15 +88,13 @@ size_t ISegment::getOffset() const
     return startByte;
 }
 
-std::vector<std::string> ISegment::toString(int indent) const
+void ISegment::debug(vlc_object_t *obj, int indent) const
 {
-    std::vector<std::string> out;
     std::stringstream ss;
     ss << std::string(indent, ' ') << debugName << " url=" << getUrlSegment().toString();
     if(startByte!=endByte)
         ss << " @" << startByte << ".." << endByte;
-    out.push_back(ss.str());
-    return out;
+    msg_Dbg(obj, "%s", ss.str().c_str());
 }
 
 bool ISegment::contains(size_t byte) const
@@ -153,23 +151,20 @@ void                    Segment::setSourceUrl   ( const std::string &url )
         this->sourceUrl = url;
 }
 
-std::vector<std::string> Segment::toString(int indent) const
+void Segment::debug(vlc_object_t *obj, int indent) const
 {
     if (subsegments.empty())
     {
-        return ISegment::toString(indent);
+        ISegment::debug(obj, indent);
     }
     else
     {
-        std::vector<std::string> ret;
+        std::string text(indent, ' ');
+        text.append("Segment");
+        msg_Dbg(obj, "%s", text.c_str());
         std::vector<SubSegment *>::const_iterator l;
-        ret.push_back(std::string(indent, ' ').append("Segment"));
         for(l = subsegments.begin(); l != subsegments.end(); ++l)
-        {
-            std::vector<std::string> debug = (*l)->toString(indent + 1);
-            ret.insert(ret.end(), debug.begin(), debug.end());
-        }
-        return ret;
+            (*l)->debug(obj, indent + 1);
     }
 }
 

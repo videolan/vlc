@@ -56,7 +56,7 @@ namespace adaptative
                 virtual size_t                          getOffset       () const;
                 virtual std::vector<ISegment*>          subSegments     () = 0;
                 virtual void                            addSubSegment   (SubSegment *) = 0;
-                virtual std::vector<std::string>        toString        (int = 0) const;
+                virtual void                            debug           (vlc_object_t *,int = 0) const;
                 virtual bool                            contains        (size_t byte) const;
                 int                                     getClassId      () const;
                 Property<mtime_t>       startTime;
@@ -95,7 +95,7 @@ namespace adaptative
                 virtual Url getUrlSegment() const; /* impl */
                 virtual Chunk* toChunk(size_t, BaseRepresentation * = NULL);
                 virtual std::vector<ISegment*> subSegments();
-                virtual std::vector<std::string> toString(int = 0) const;
+                virtual void debug(vlc_object_t *,int = 0) const;
                 virtual void addSubSegment(SubSegment *);
                 static const int CLASSID_SEGMENT = 1;
 
