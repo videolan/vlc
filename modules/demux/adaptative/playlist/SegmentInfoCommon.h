@@ -27,79 +27,17 @@
 
 #include <string>
 #include <list>
-#include <ctime>
-#include "ICanonicalUrl.hpp"
+#include "Inheritables.hpp"
+#include "Templates.hpp"
 #include "Segment.h"
+#include "ICanonicalUrl.hpp"
 #include "../tools/Properties.hpp"
 
 namespace adaptative
 {
     namespace playlist
     {
-        class SegmentTimeline;
-
-        template<class T> class Initializable
-        {
-            public:
-                Initializable()
-                {
-                    initialisationSegment.Set(NULL);
-                }
-                ~Initializable()
-                {
-                    delete initialisationSegment.Get();
-                }
-                Property<T *> initialisationSegment;
-        };
-
-        template<class T> class Indexable
-        {
-            public:
-                Indexable()
-                {
-                    indexSegment.Set(NULL);
-                }
-                ~Indexable()
-                {
-                    delete indexSegment.Get();
-                }
-                Property<T *> indexSegment;
-        };
-
-        class Timelineable
-        {
-            public:
-                Timelineable();
-                ~Timelineable();
-                Property<SegmentTimeline *> segmentTimeline;
-        };
-
-        class TimescaleAble
-        {
-            public:
-                TimescaleAble( TimescaleAble * = NULL );
-                ~TimescaleAble();
-                uint64_t inheritTimescale() const;
-                Property<uint64_t> timescale;
-
-            private:
-                TimescaleAble *parentTimescale;
-        };
-
-        template<class T> class UniqueNess
-        {
-            public:
-                UniqueNess(){}
-                ~UniqueNess() {}
-                void setId(const std::string &id_) {id = id_;}
-                const std::string & getId() const {return id;}
-                bool sameAs(const T &other) const
-                {
-                    return (!id.empty() && id == other.id);
-                }
-            private:
-                std::string id;
-        };
+        class Segment;
 
         class SegmentInfoCommon : public ICanonicalUrl,
                                   public Initializable<Segment>,

@@ -28,40 +28,7 @@
 
 #include "SegmentInfoCommon.h"
 
-#include "Segment.h"
-#include "SegmentTimeline.h"
-
 using namespace adaptative::playlist;
-
-Timelineable::Timelineable()
-{
-    segmentTimeline.Set(NULL);
-}
-
-Timelineable::~Timelineable()
-{
-    delete segmentTimeline.Get();
-}
-
-TimescaleAble::TimescaleAble(TimescaleAble *parent)
-{
-    timescale.Set(0);
-    parentTimescale = parent;
-}
-
-TimescaleAble::~TimescaleAble()
-{
-}
-
-uint64_t TimescaleAble::inheritTimescale() const
-{
-    if(timescale.Get())
-        return timescale.Get();
-    else if(parentTimescale)
-        return parentTimescale->inheritTimescale();
-    else
-        return 1;
-}
 
 SegmentInfoCommon::SegmentInfoCommon( ICanonicalUrl *parent ) :
     ICanonicalUrl( parent ), Initializable(), Indexable(),

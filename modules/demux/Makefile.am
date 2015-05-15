@@ -294,6 +294,8 @@ libdash_plugin_la_SOURCES += \
     demux/adaptative/playlist/CommonAttributesElements.cpp \
     demux/adaptative/playlist/CommonAttributesElements.h \
     demux/adaptative/playlist/ICanonicalUrl.hpp \
+    demux/adaptative/playlist/Inheritables.hpp \
+    demux/adaptative/playlist/Inheritables.cpp \
     demux/adaptative/playlist/Segment.cpp \
     demux/adaptative/playlist/Segment.h \
     demux/adaptative/playlist/SegmentBase.cpp \
@@ -310,6 +312,7 @@ libdash_plugin_la_SOURCES += \
     demux/adaptative/playlist/SegmentTemplate.h \
     demux/adaptative/playlist/Url.cpp \
     demux/adaptative/playlist/Url.hpp \
+    demux/adaptative/playlist/Templates.hpp \
     demux/adaptative/logic/AbstractAdaptationLogic.cpp \
     demux/adaptative/logic/AbstractAdaptationLogic.h \
     demux/adaptative/logic/AlwaysBestAdaptationLogic.cpp \

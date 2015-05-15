@@ -20,6 +20,7 @@
 #include "SegmentTracker.hpp"
 #include "playlist/AbstractPlaylist.hpp"
 #include "playlist/BaseRepresentation.h"
+#include "playlist/Segment.h"
 #include "logic/AbstractAdaptationLogic.h"
 
 using namespace adaptative;
