@@ -705,7 +705,7 @@ bool demux_sys_t::PreloadLinked()
                         }
 
                         if( !p_title->psz_name &&
-                            asprintf(&(p_title->psz_name), "%s %d", N_("Segment"), (int)ij) == -1 )
+                            asprintf(&(p_title->psz_name), "%s %d", "Segment", (int)ij) == -1 )
                             p_title->psz_name = NULL;
                     }
                 }
