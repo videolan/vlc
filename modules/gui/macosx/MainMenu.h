@@ -26,6 +26,7 @@
 #import <vlc_interface.h>
 
 @class AboutWindowController;
+@class AddonsWindowController;
 @class HelpWindowController;
 
 @interface VLCMainMenu : NSObject
@@ -37,7 +38,6 @@
     BOOL b_nib_tracksynchro_loaded;
     BOOL b_nib_bookmarks_loaded;
     BOOL b_nib_convertandsave_loaded;
-    BOOL b_nib_addonmanager_loaded;
 
     AboutWindowController *o_about;
     HelpWindowController  *o_helpWin;
@@ -46,7 +46,7 @@
     id o_trackSynchronization;  /* VLCTrackSynchronization */
     id o_bookmarks;             /* VLCBookmarks */
     id o_convertandsave;        /* VLCConvertAndSave */
-    id o_addonManager;          /* VLCAddonManager */
+    AddonsWindowController *o_addonsController;
 
     id o_extMgr;                /* Extensions Manager */
 

@@ -347,8 +347,8 @@
 		1CCB5F521A62A724004C3E90 /* about.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AFA0044465080059A3A7 /* about.m */; };
 		1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435E1972E26A0022B534 /* AddonListDataSource.h */; };
 		1CCB5F541A62A724004C3E90 /* AddonListDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435F1972E26A0022B534 /* AddonListDataSource.m */; };
-		1CCB5F551A62A724004C3E90 /* AddonManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5218ABD6380053B874 /* AddonManager.h */; };
-		1CCB5F561A62A724004C3E90 /* AddonManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5318ABD6380053B874 /* AddonManager.m */; };
+		1CCB5F551A62A724004C3E90 /* AddonsWindowController.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5218ABD6380053B874 /* AddonsWindowController.h */; };
+		1CCB5F561A62A724004C3E90 /* AddonsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB65D5318ABD6380053B874 /* AddonsWindowController.m */; };
 		1CCB5F571A62A724004C3E90 /* applescript.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6F6041643860059A3A7 /* applescript.h */; };
 		1CCB5F581A62A724004C3E90 /* applescript.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6F7041643860059A3A7 /* applescript.m */; };
 		1CCB5F591A62A724004C3E90 /* AudioEffects.h in Sources */ = {isa = PBXBuildFile; fileRef = CC5560231365CDC700D54038 /* AudioEffects.h */; };
@@ -1232,8 +1232,8 @@
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
 		7D8BB0B91830367200FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistMenu.xib; sourceTree = "<group>"; };
 		7D8BB0BF1830393300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MainWindow.xib; sourceTree = "<group>"; };
-		7DB65D5218ABD6380053B874 /* AddonManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonManager.h; path = ../../../modules/gui/macosx/AddonManager.h; sourceTree = SOURCE_ROOT; };
-		7DB65D5318ABD6380053B874 /* AddonManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonManager.m; path = ../../../modules/gui/macosx/AddonManager.m; sourceTree = SOURCE_ROOT; };
+		7DB65D5218ABD6380053B874 /* AddonsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonsWindowController.h; path = ../../../modules/gui/macosx/AddonsWindowController.h; sourceTree = SOURCE_ROOT; };
+		7DB65D5318ABD6380053B874 /* AddonsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonsWindowController.m; path = ../../../modules/gui/macosx/AddonsWindowController.m; sourceTree = SOURCE_ROOT; };
 		7DB65D5518ABD6490053B874 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AddonManager.xib; sourceTree = "<group>"; };
 		7DE88F291831396A00CD9DA2 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistAccessoryView.xib; sourceTree = "<group>"; };
 		7DF0435E1972E26A0022B534 /* AddonListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonListDataSource.h; path = ../../../modules/gui/macosx/AddonListDataSource.h; sourceTree = SOURCE_ROOT; };
@@ -1811,8 +1811,8 @@
 				8EE1AFA0044465080059A3A7 /* about.m */,
 				7DF0435E1972E26A0022B534 /* AddonListDataSource.h */,
 				7DF0435F1972E26A0022B534 /* AddonListDataSource.m */,
-				7DB65D5218ABD6380053B874 /* AddonManager.h */,
-				7DB65D5318ABD6380053B874 /* AddonManager.m */,
+				7DB65D5218ABD6380053B874 /* AddonsWindowController.h */,
+				7DB65D5318ABD6380053B874 /* AddonsWindowController.m */,
 				8E6BC6F6041643860059A3A7 /* applescript.h */,
 				8E6BC6F7041643860059A3A7 /* applescript.m */,
 				CC5560231365CDC700D54038 /* AudioEffects.h */,
@@ -3745,8 +3745,8 @@
 				1CCB5F521A62A724004C3E90 /* about.m in Sources */,
 				1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */,
 				1CCB5F541A62A724004C3E90 /* AddonListDataSource.m in Sources */,
-				1CCB5F551A62A724004C3E90 /* AddonManager.h in Sources */,
-				1CCB5F561A62A724004C3E90 /* AddonManager.m in Sources */,
+				1CCB5F551A62A724004C3E90 /* AddonsWindowController.h in Sources */,
+				1CCB5F561A62A724004C3E90 /* AddonsWindowController.m in Sources */,
 				1CCB5F571A62A724004C3E90 /* applescript.h in Sources */,
 				1CCB5F581A62A724004C3E90 /* applescript.m in Sources */,
 				1CCB5F591A62A724004C3E90 /* AudioEffects.h in Sources */,

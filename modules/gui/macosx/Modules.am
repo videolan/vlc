@@ -20,8 +20,8 @@ SOURCES_macosx = \
 	ExtensionsManager.m \
 	ExtensionsDialogProvider.h \
 	ExtensionsDialogProvider.m \
-	AddonManager.h \
-	AddonManager.m \
+	AddonsWindowController.h \
+	AddonsWindowController.m \
 	AddonListDataSource.h \
 	AddonListDataSource.m \
 	VLCUIWidgets.h \

@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">14B25</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
-		<string key="IBDocument.AppKitVersion">1343.16</string>
-		<string key="IBDocument.HIToolboxVersion">755.00</string>
+		<string key="IBDocument.SystemVersion">14D136</string>
+		<string key="IBDocument.InterfaceBuilderVersion">7702</string>
+		<string key="IBDocument.AppKitVersion">1347.57</string>
+		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6254</string>
+			<string key="NS.object.0">7702</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -40,7 +40,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">NSObject</string>
+				<string key="NSClassName">AddonsWindowController</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
@@ -52,7 +52,7 @@
 				<int key="NSWindowStyleMask">7</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{196, 194}, {568, 316}}</string>
-				<int key="NSWTFlags">544736256</int>
+				<int key="NSWTFlags">1618478080</int>
 				<string key="NSWindowTitle">Window</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
@@ -77,7 +77,7 @@
 											<string key="NSFrameSize">{258, 203}</string>
 											<reference key="NSSuperview" ref="1066761389"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="776493752"/>
+											<reference key="NSNextKeyView" ref="759639068"/>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -189,7 +189,7 @@
 											</array>
 											<double key="NSIntercellSpacingWidth">3</double>
 											<double key="NSIntercellSpacingHeight">2</double>
-											<reference key="NSBackgroundColor" ref="286474691"/>
+											<reference key="NSBackgroundColor" ref="601030471"/>
 											<object class="NSColor" key="NSGridColor">
 												<int key="NSColorSpace">6</int>
 												<string key="NSCatalogName">System</string>
@@ -250,7 +250,7 @@
 								<object class="NSScroller" id="674809192">
 									<reference key="NSNextResponder" ref="1067841408"/>
 									<int key="NSvFlags">-2147483392</int>
-									<string key="NSFrame">{{1, 233}, {261.7578125, 15}}</string>
+									<string key="NSFrame">{{1, 233}, {262, 15}}</string>
 									<reference key="NSSuperview" ref="1067841408"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="126651340"/>
@@ -266,7 +266,7 @@
 							<string key="NSFrame">{{20, 48}, {260, 221}}</string>
 							<reference key="NSSuperview" ref="868374226"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="1066761389"/>
+							<reference key="NSNextKeyView" ref="776493752"/>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="759639068"/>
 							<reference key="NSHScroller" ref="674809192"/>
@@ -395,6 +395,7 @@
 							<string key="NSFrame">{{124, 128}, {32, 32}}</string>
 							<reference key="NSSuperview" ref="868374226"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="326462144"/>
 							<string key="NSHuggingPriority">{750, 750}</string>
 							<int key="NSpiFlags">28686</int>
 							<double key="NSMaxValue">100</double>
@@ -493,7 +494,7 @@
 															<string key="NSFrameSize">{239, 147}</string>
 															<reference key="NSSuperview" ref="631481288"/>
 															<reference key="NSWindow"/>
-															<reference key="NSNextKeyView" ref="774675501"/>
+															<reference key="NSNextKeyView" ref="324719597"/>
 															<string key="NSReuseIdentifierKey">_NS:13</string>
 															<object class="NSTextContainer" key="NSTextContainer" id="797430951">
 																<object class="NSLayoutManager" key="NSLayoutManager">
@@ -561,7 +562,7 @@ ZQ</bytes>
 																<nil key="NSTextFinder"/>
 																<int key="NSPreferredTextFinderStyle">1</int>
 															</object>
-															<int key="NSTVFlags">6</int>
+															<int key="NSTVFlags">70</int>
 															<string key="NSMaxSize">{463, 10000000}</string>
 															<string key="NSMinize">{227, 147}</string>
 															<nil key="NSDelegate"/>
@@ -608,6 +609,7 @@ ZQ</bytes>
 													<string key="NSFrame">{{211, 0}, {16, 147}}</string>
 													<reference key="NSSuperview" ref="667463558"/>
 													<reference key="NSWindow"/>
+													<reference key="NSNextKeyView" ref="308859318"/>
 													<string key="NSReuseIdentifierKey">_NS:83</string>
 													<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 													<string key="NSControlAction">_doScroller:</string>
@@ -639,7 +641,7 @@ ZQ</bytes>
 											<string key="NSFrame">{{18, 54}, {227, 147}}</string>
 											<reference key="NSSuperview" ref="42699324"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="631481288"/>
+											<reference key="NSNextKeyView" ref="774675501"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<int key="NSsFlags">133264</int>
 											<reference key="NSVScroller" ref="324719597"/>
@@ -715,6 +717,7 @@ ZQ</bytes>
 							<string key="NSFrame">{{15, 15}, {271, 32}}</string>
 							<reference key="NSSuperview" ref="868374226"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="383895102"/>
 							<string key="NSReuseIdentifierKey">_NS:610</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="627379601">
@@ -744,147 +747,144 @@ ZQ</bytes>
 				<string key="NSMaxSize">{568, 338}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
-			<object class="NSCustomObject" id="341439621">
-				<string key="NSClassName">VLCAddonManager</string>
-			</object>
 		</array>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<array key="connectionRecords">
 				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">switchType:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="946926957"/>
+					</object>
+					<int key="connectionID">110</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_typeSwitcher</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="946926957"/>
+					</object>
+					<int key="connectionID">111</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_addonsTable</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="162216870"/>
+					</object>
+					<int key="connectionID">114</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_name</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="619442065"/>
+					</object>
+					<int key="connectionID">115</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_author</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="934631775"/>
+					</object>
+					<int key="connectionID">116</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_version</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="928729361"/>
+					</object>
+					<int key="connectionID">117</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_description</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="355978986"/>
+					</object>
+					<int key="connectionID">118</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_installButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="308859318"/>
+					</object>
+					<int key="connectionID">119</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">installSelection:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="308859318"/>
+					</object>
+					<int key="connectionID">120</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_downloadCatalogButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="326462144"/>
+					</object>
+					<int key="connectionID">121</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">downloadCatalog:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="326462144"/>
+					</object>
+					<int key="connectionID">122</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_localAddonsOnlyCheckbox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="383895102"/>
+					</object>
+					<int key="connectionID">123</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">toggleLocalCheckbox:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="383895102"/>
+					</object>
+					<int key="connectionID">124</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">_spinner</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="126651340"/>
+					</object>
+					<int key="connectionID">125</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">window</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1027075699"/>
+					</object>
+					<int key="connectionID">126</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">dataSource</string>
 						<reference key="source" ref="162216870"/>
-						<reference key="destination" ref="341439621"/>
+						<reference key="destination" ref="1001"/>
 					</object>
-					<int key="connectionID">97</int>
+					<int key="connectionID">112</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="162216870"/>
-						<reference key="destination" ref="341439621"/>
+						<reference key="destination" ref="1001"/>
 					</object>
-					<int key="connectionID">98</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_addonsTable</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="162216870"/>
-					</object>
-					<int key="connectionID">83</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_author</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="934631775"/>
-					</object>
-					<int key="connectionID">84</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_description</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="355978986"/>
-					</object>
-					<int key="connectionID">85</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_localAddonsOnlyCheckbox</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="383895102"/>
-					</object>
-					<int key="connectionID">86</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_name</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="619442065"/>
-					</object>
-					<int key="connectionID">87</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_spinner</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="126651340"/>
-					</object>
-					<int key="connectionID">88</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_typeSwitcher</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="946926957"/>
-					</object>
-					<int key="connectionID">89</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_version</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="928729361"/>
-					</object>
-					<int key="connectionID">90</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">switchType:</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="946926957"/>
-					</object>
-					<int key="connectionID">94</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">toggleLocalCheckbox:</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="383895102"/>
-					</object>
-					<int key="connectionID">95</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">installSelection:</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="308859318"/>
-					</object>
-					<int key="connectionID">103</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_installButton</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="308859318"/>
-					</object>
-					<int key="connectionID">104</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_downloadCatalogButton</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="326462144"/>
-					</object>
-					<int key="connectionID">105</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">downloadCatalog:</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="326462144"/>
-					</object>
-					<int key="connectionID">106</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_window</string>
-						<reference key="source" ref="341439621"/>
-						<reference key="destination" ref="1027075699"/>
-					</object>
-					<int key="connectionID">108</int>
+					<int key="connectionID">113</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1131,11 +1131,6 @@ ZQ</bytes>
 						<reference key="parent" ref="667463558"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">82</int>
-						<reference key="object" ref="341439621"/>
-						<reference key="parent" ref="0"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">99</int>
 						<reference key="object" ref="308859318"/>
 						<array class="NSMutableArray" key="children">
@@ -1249,7 +1244,6 @@ ZQ</bytes>
 				<string key="8.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="8.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="8.showNotes"/>
-				<string key="82.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="9.IBNSControlSetsMaxLayoutWidthAtFirstLayoutMetadataKey"/>
 				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="9.IBUserGuides" ref="0"/>
@@ -1260,13 +1254,13 @@ ZQ</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">108</int>
+			<int key="maxID">126</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
-					<string key="className">VLCAddonManager</string>
-					<string key="superclassName">NSObject</string>
+					<string key="className">AddonsWindowController</string>
+					<string key="superclassName">NSWindowController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="downloadCatalog:">id</string>
 						<string key="installSelection:">id</string>
@@ -1307,7 +1301,6 @@ ZQ</bytes>
 						<string key="_spinner">NSProgressIndicator</string>
 						<string key="_typeSwitcher">NSPopUpButton</string>
 						<string key="_version">NSTextField</string>
-						<string key="_window">NSWindow</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
 						<object class="IBToOneOutletInfo" key="_addonsTable">
@@ -1350,18 +1343,14 @@ ZQ</bytes>
 							<string key="name">_version</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="_window">
-							<string key="name">_window</string>
-							<string key="candidateClassName">NSWindow</string>
-						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../../../modules/gui/macosx/AddonManager.h</string>
+						<string key="minorKey">../../../../modules/gui/macosx/AddonsWindowController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">VLCAddonManager</string>
+					<string key="className">AddonsWindowController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="downloadCatalog:">id</string>
 						<string key="installSelection:">id</string>
@@ -1393,7 +1382,7 @@ ZQ</bytes>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../../../modules/gui/macosx/AddonManager.m</string>
+						<string key="minorKey">../../../../modules/gui/macosx/AddonsWindowController.m</string>
 					</object>
 				</object>
 			</array>
@@ -1604,6 +1593,25 @@ ZQ</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSWindow.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSWindowController</string>
+					<string key="superclassName">NSResponder</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">showWindow:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">showWindow:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSWindowController.h</string>
 					</object>
 				</object>
 			</array>

@@ -21,9 +21,8 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCAddonManager : NSObject <NSTableViewDataSource, NSTableViewDelegate>
+@interface AddonsWindowController : NSWindowController <NSTableViewDataSource, NSTableViewDelegate>
 {
-    IBOutlet NSWindow *_window;
     IBOutlet NSPopUpButton *_typeSwitcher;
     IBOutlet NSButton *_localAddonsOnlyCheckbox;
     IBOutlet NSButton *_downloadCatalogButton;
@@ -37,9 +36,7 @@
     IBOutlet NSButton *_installButton;
 
 }
-+ (VLCAddonManager *)sharedInstance;
 
-- (void)showWindow;
 - (IBAction)switchType:(id)sender;
 - (IBAction)toggleLocalCheckbox:(id)sender;
 - (IBAction)downloadCatalog:(id)sender;

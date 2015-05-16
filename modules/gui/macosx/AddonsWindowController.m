@@ -23,12 +23,12 @@
 #import <vlc_events.h>
 #import <vlc_addons.h>
 
-#import "AddonManager.h"
+#import "AddonsWindowController.h"
 #import "intf.h"
 #import "MainWindow.h"
 #import "AddonListDataSource.h"
 
-@interface VLCAddonManager ()
+@interface AddonsWindowController()
 {
     addons_manager_t *_manager;
     NSMutableArray *_addons;
@@ -39,55 +39,50 @@
 - (void)addAddon:(NSValue *)o_value;
 - (void)discoveryEnded;
 - (void)addonChanged:(NSValue *)o_value;
+
 @end
 
 static void addonsEventsCallback( const vlc_event_t *event, void *data )
 {
+    AddonsWindowController *controller = data;
+
     @autoreleasepool {
         if (event->type == vlc_AddonFound)
-            [[VLCAddonManager sharedInstance] performSelectorOnMainThread:@selector(addAddon:) withObject:[NSValue valueWithPointer:event->u.addon_generic_event.p_entry] waitUntilDone:NO];
+            [controller performSelectorOnMainThread:@selector(addAddon:) withObject:[NSValue valueWithPointer:event->u.addon_generic_event.p_entry] waitUntilDone:NO];
         else if (event->type == vlc_AddonsDiscoveryEnded)
-            [[VLCAddonManager sharedInstance] performSelectorOnMainThread:@selector(discoveryEnded) withObject:nil waitUntilDone:NO];
+            [controller performSelectorOnMainThread:@selector(discoveryEnded) withObject:nil waitUntilDone:NO];
         else if (event->type == vlc_AddonChanged)
-            [[VLCAddonManager sharedInstance] performSelectorOnMainThread:@selector(addonChanged:) withObject:[NSValue valueWithPointer:event->u.addon_generic_event.p_entry] waitUntilDone:NO];
+            [controller performSelectorOnMainThread:@selector(addonChanged:) withObject:[NSValue valueWithPointer:event->u.addon_generic_event.p_entry] waitUntilDone:NO];
     }
 }
 
-@implementation VLCAddonManager
-
-static VLCAddonManager *_o_sharedInstance = nil;
-
-+ (VLCAddonManager *)sharedInstance
-{
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
-}
+@implementation AddonsWindowController
 
 #pragma mark - object handling
 
 - (id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else {
-        _o_sharedInstance = [super init];
+    self = [super initWithWindowNibName:@"AddonManager"];
+    if (self) {
+        [self setWindowFrameAutosaveName:@"addons"];
         _addons = [[NSMutableArray alloc] init];
     }
 
-    return _o_sharedInstance;
+    return self;
 }
 
 - (void)dealloc
 {
     [_addons release];
     [_displayedAddons release];
-    if ( _manager )
+    if (_manager)
         addons_manager_Delete(_manager);
     [super dealloc];
 }
 
 #pragma mark - UI handling
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
     [_typeSwitcher removeAllItems];
     [_typeSwitcher addItemWithTitle:_NS("All")];
@@ -118,8 +113,7 @@ static VLCAddonManager *_o_sharedInstance = nil;
     [_author setStringValue:@""];
     [_version setStringValue:@""];
     [_description setString:@""];
-    [_window setTitle:_NS("Addons Manager")];
-    [_window setReleasedWhenClosed:NO];
+    [[self window] setTitle:_NS("Addons Manager")];
 
     [[[_addonsTable tableColumnWithIdentifier:@"installed"] headerCell] setStringValue:_NS("Installed")];
     [[[_addonsTable tableColumnWithIdentifier:@"name"] headerCell] setStringValue:_NS("Name")];
@@ -136,11 +130,6 @@ static VLCAddonManager *_o_sharedInstance = nil;
     vlc_event_attach(p_em, vlc_AddonChanged, addonsEventsCallback, self);
 
     [self _findInstalled];
-}
-
-- (void)showWindow
-{
-    [_window makeKeyAndOrderFront:nil];
 }
 
 - (IBAction)switchType:(id)sender
