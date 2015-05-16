@@ -536,8 +536,8 @@ modules/demux/xiph_metadata.h
 modules/demux/xiph_metadata.c
 modules/gui/macosx/about.h
 modules/gui/macosx/about.m
-modules/gui/macosx/AddonManager.h
-modules/gui/macosx/AddonManager.m
+modules/gui/macosx/AddonsWindowController.h
+modules/gui/macosx/AddonsWindowController.m
 modules/gui/macosx/AppleRemote.h
 modules/gui/macosx/AppleRemote.m
 modules/gui/macosx/applescript.h
