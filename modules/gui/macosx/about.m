@@ -38,23 +38,17 @@
 /*****************************************************************************
  * VLAboutBox implementation
  *****************************************************************************/
-@implementation VLAboutBox
-
-static VLAboutBox *_o_sharedInstance = nil;
-
-+ (VLAboutBox *)sharedInstance
-{
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
-}
+@implementation AboutWindowController
 
 - (id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else
-        _o_sharedInstance = [super init];
+    self = [super initWithWindowNibName:@"About"];
+    if (self) {
 
-    return _o_sharedInstance;
+        [self setWindowFrameAutosaveName:@"about"];
+    }
+
+    return self;
 }
 
 - (void) dealloc
@@ -64,113 +58,13 @@ static VLAboutBox *_o_sharedInstance = nil;
     [super dealloc];
 }
 
-- (void)awakeFromNib
-{
-    if (!OSX_SNOW_LEOPARD)
-        [o_about_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
-}
-
 /*****************************************************************************
 * VLC About Window
 *****************************************************************************/
 
 - (void)showAbout
 {
-    if (! b_isSetUp) {
-        /* Get the localized info dictionary (InfoPlist.strings) */
-        NSDictionary *o_local_dict;
-        o_local_dict = [[NSBundle mainBundle] localizedInfoDictionary];
-
-        /* Setup the copyright field */
-        [o_copyright_field setStringValue: [o_local_dict objectForKey:@"NSHumanReadableCopyright"]];
-
-        /* l10n */
-        [o_about_window setTitle: _NS("About VLC media player")];
-        NSDictionary *stringAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName, [NSColor colorWithCalibratedRed:0. green:0.3411 blue:0.6824 alpha:1.], NSForegroundColorAttributeName, [NSFont systemFontOfSize:13], NSFontAttributeName, nil];
-        NSAttributedString *attrStr;
-        attrStr = [[NSAttributedString alloc] initWithString:_NS("Credits") attributes:stringAttributes];
-        [o_credits_btn setAttributedTitle:attrStr];
-        [attrStr release];
-        attrStr = [[NSAttributedString alloc] initWithString:_NS("License") attributes:stringAttributes];
-        [o_gpl_btn setAttributedTitle:attrStr];
-        [attrStr release];
-        attrStr = [[NSAttributedString alloc] initWithString:_NS("Authors") attributes:stringAttributes];
-        [o_authors_btn setAttributedTitle:attrStr];
-        [attrStr release];
-        [o_trademarks_txt setStringValue:_NS("VLC media player and VideoLAN are trademarks of the VideoLAN Association.")];
-
-        /* setup the creator / revision field */
-        NSString *compiler;
-#ifdef __clang__
-        compiler = [NSString stringWithFormat:@"clang %s", __clang_version__];
-#else
-        compiler = [NSString stringWithFormat:@"llvm-gcc %s", __VERSION__];
-#endif
-        [o_revision_field setStringValue: [NSString stringWithFormat: _NS("Compiled by %s with %@"), VLC_CompileBy(), compiler]];
-
-        /* Setup the nameversion field */
-        [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VERSION_MESSAGE, PLATFORM]];
-
-        NSMutableArray *tmpArray = [NSMutableArray arrayWithArray: [[NSString stringWithUTF8String:psz_authors] componentsSeparatedByString:@"\n\n"]];
-        NSUInteger count = [tmpArray count];
-        for (NSUInteger i = 0; i < count; i++) {
-            [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@"\n" withString:@", "]];
-            [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@", -" withString:@"\n-" options:0 range:NSRangeFromString(@"0 30")]];
-            [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@"-, " withString:@"-\n" options:0 range:NSRangeFromString(@"0 30")]];
-            [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@","]]];
-        }
-        o_authors = [tmpArray componentsJoinedByString:@"\n\n"];
-        [o_authors retain];
-
-        /* setup join us! */
-        NSString *joinus = [NSString stringWithUTF8String:_(""
-                                                            "<p>VLC media player is a free and open source media player, encoder, and "
-                                                            "streamer made by the volunteers of the <a href=\"http://www.videolan.org/"
-                                                            "\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
-                                                            "span></a> community.</p><p>VLC uses its internal codecs, works on "
-                                                            "essentially every popular platform, and can read almost all files, CDs, "
-                                                            "DVDs, network streams, capture cards and other media formats!</p><p><a href="
-                                                            "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
-                                                            "underline; color:#0057ae;\">Help and join us!</span></a>")];
-        NSString *fontfamily;
-        if (OSX_YOSEMITE)
-            fontfamily = @"Helvetica Neue";
-        else
-            fontfamily = @"Lucida Grande";
-        NSString *joinUsWithStyle = [NSString stringWithFormat:@"<div style=\"text-align:left;font-family:%@;\">%@</div>",
-                                     fontfamily, joinus];
-        NSAttributedString *joinus_readytorender = [[NSAttributedString alloc] initWithHTML:[joinUsWithStyle dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES] options:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:NSUTF8StringEncoding] forKey:NSCharacterEncodingDocumentOption] documentAttributes:NULL];
-        [o_joinus_txt setAllowsEditingTextAttributes: YES];
-        [o_joinus_txt setSelectable: YES];
-        [o_joinus_txt setAttributedStringValue:joinus_readytorender];
-
-        [joinus_readytorender release];
-        [o_credits_textview setString: @""];
-
-        /* Setup the window */
-        [o_credits_textview setDrawsBackground: NO];
-        [o_credits_scrollview setDrawsBackground: NO];
-        [o_about_window setExcludedFromWindowsMenu:YES];
-        [o_about_window setMenu:nil];
-        [o_about_window center];
-        [o_about_window setBackgroundColor: [NSColor colorWithCalibratedWhite:.96 alpha:1.]];
-
-        if (config_GetInt(VLCIntf, "macosx-icon-change")) {
-            /* After day 354 of the year, the usual VLC cone is replaced by another cone
-             * wearing a Father Xmas hat.
-             * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
-             */
-            NSCalendar *gregorian =
-            [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-            NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSDayCalendarUnit inUnit:NSYearCalendarUnit forDate:[NSDate date]];
-            [gregorian release];
-
-            if (dayOfYear >= 354)
-                [o_icon_view setImage: [NSImage imageNamed:@"vlc-xmas"]];
-        }
-
-        b_isSetUp = YES;
-    }
+    [self window];
 
     /* Show the window */
     b_restart = YES;
@@ -181,7 +75,105 @@ static VLAboutBox *_o_sharedInstance = nil;
     [o_revision_field setHidden:NO];
     [o_name_version_field setHidden:NO];
     [o_credits_textview scrollPoint:NSMakePoint(0, 0)];
-    [o_about_window makeKeyAndOrderFront: nil];
+
+    [self showWindow:nil];
+}
+
+- (void)windowDidLoad
+{
+    if (!OSX_SNOW_LEOPARD)
+        [[self window] setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+
+    /* Get the localized info dictionary (InfoPlist.strings) */
+    NSDictionary *o_local_dict;
+    o_local_dict = [[NSBundle mainBundle] localizedInfoDictionary];
+
+    /* Setup the copyright field */
+    [o_copyright_field setStringValue: [o_local_dict objectForKey:@"NSHumanReadableCopyright"]];
+
+    /* l10n */
+    [[self window] setTitle: _NS("About VLC media player")];
+    NSDictionary *stringAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName, [NSColor colorWithCalibratedRed:0. green:0.3411 blue:0.6824 alpha:1.], NSForegroundColorAttributeName, [NSFont systemFontOfSize:13], NSFontAttributeName, nil];
+    NSAttributedString *attrStr;
+    attrStr = [[NSAttributedString alloc] initWithString:_NS("Credits") attributes:stringAttributes];
+    [o_credits_btn setAttributedTitle:attrStr];
+    [attrStr release];
+    attrStr = [[NSAttributedString alloc] initWithString:_NS("License") attributes:stringAttributes];
+    [o_gpl_btn setAttributedTitle:attrStr];
+    [attrStr release];
+    attrStr = [[NSAttributedString alloc] initWithString:_NS("Authors") attributes:stringAttributes];
+    [o_authors_btn setAttributedTitle:attrStr];
+    [attrStr release];
+    [o_trademarks_txt setStringValue:_NS("VLC media player and VideoLAN are trademarks of the VideoLAN Association.")];
+
+    /* setup the creator / revision field */
+    NSString *compiler;
+#ifdef __clang__
+    compiler = [NSString stringWithFormat:@"clang %s", __clang_version__];
+#else
+    compiler = [NSString stringWithFormat:@"llvm-gcc %s", __VERSION__];
+#endif
+    [o_revision_field setStringValue: [NSString stringWithFormat: _NS("Compiled by %s with %@"), VLC_CompileBy(), compiler]];
+
+    /* Setup the nameversion field */
+    [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VERSION_MESSAGE, PLATFORM]];
+
+    NSMutableArray *tmpArray = [NSMutableArray arrayWithArray: [[NSString stringWithUTF8String:psz_authors] componentsSeparatedByString:@"\n\n"]];
+    NSUInteger count = [tmpArray count];
+    for (NSUInteger i = 0; i < count; i++) {
+        [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@"\n" withString:@", "]];
+        [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@", -" withString:@"\n-" options:0 range:NSRangeFromString(@"0 30")]];
+        [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@"-, " withString:@"-\n" options:0 range:NSRangeFromString(@"0 30")]];
+        [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@","]]];
+    }
+    o_authors = [tmpArray componentsJoinedByString:@"\n\n"];
+    [o_authors retain];
+
+    /* setup join us! */
+    NSString *joinus = [NSString stringWithUTF8String:_(""
+                                                        "<p>VLC media player is a free and open source media player, encoder, and "
+                                                        "streamer made by the volunteers of the <a href=\"http://www.videolan.org/"
+                                                        "\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
+                                                        "span></a> community.</p><p>VLC uses its internal codecs, works on "
+                                                        "essentially every popular platform, and can read almost all files, CDs, "
+                                                        "DVDs, network streams, capture cards and other media formats!</p><p><a href="
+                                                        "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
+                                                        "underline; color:#0057ae;\">Help and join us!</span></a>")];
+    NSString *fontfamily;
+    if (OSX_YOSEMITE)
+        fontfamily = @"Helvetica Neue";
+    else
+        fontfamily = @"Lucida Grande";
+    NSString *joinUsWithStyle = [NSString stringWithFormat:@"<div style=\"text-align:left;font-family:%@;\">%@</div>",
+                                 fontfamily, joinus];
+    NSAttributedString *joinus_readytorender = [[NSAttributedString alloc] initWithHTML:[joinUsWithStyle dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES] options:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:NSUTF8StringEncoding] forKey:NSCharacterEncodingDocumentOption] documentAttributes:NULL];
+    [o_joinus_txt setAllowsEditingTextAttributes: YES];
+    [o_joinus_txt setSelectable: YES];
+    [o_joinus_txt setAttributedStringValue:joinus_readytorender];
+
+    [joinus_readytorender release];
+    [o_credits_textview setString: @""];
+
+    /* Setup the window */
+    [o_credits_textview setDrawsBackground: NO];
+    [o_credits_scrollview setDrawsBackground: NO];
+    [[self window] setExcludedFromWindowsMenu:YES];
+    [[self window] setMenu:nil];
+    [[self window] setBackgroundColor: [NSColor colorWithCalibratedWhite:.96 alpha:1.]];
+
+    if (config_GetInt(VLCIntf, "macosx-icon-change")) {
+        /* After day 354 of the year, the usual VLC cone is replaced by another cone
+         * wearing a Father Xmas hat.
+         * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
+         */
+        NSCalendar *gregorian =
+        [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSDayCalendarUnit inUnit:NSYearCalendarUnit forDate:[NSDate date]];
+        [gregorian release];
+
+        if (dayOfYear >= 354)
+            [o_icon_view setImage: [NSImage imageNamed:@"vlc-xmas"]];
+    }
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
@@ -258,21 +250,37 @@ static VLAboutBox *_o_sharedInstance = nil;
     [self buttonAction:nil];
 }
 
-/*****************************************************************************
-* VLC Generic Help Window
-*****************************************************************************/
+@end
 
-- (void)showHelp
+/*****************************************************************************
+ * VLC Help Window Controller
+ *****************************************************************************/
+
+@implementation HelpWindowController
+
+- (id)init
 {
-    [o_help_window setTitle: _NS("VLC media player Help")];
+    self = [super initWithWindowNibName:@"Help"];
+    if (self) {
+
+        [self setWindowFrameAutosaveName:@"help"];
+    }
+
+    return self;
+}
+
+- (void)windowDidLoad
+{
+    [[self window] setTitle: _NS("VLC media player Help")];
     [o_help_fwd_btn setToolTip: _NS("Next")];
     [o_help_bwd_btn setToolTip: _NS("Previous")];
     [o_help_home_btn setToolTip: _NS("Index")];
+}
 
-    [o_help_window makeKeyAndOrderFront: self];
-
-    [[o_help_web_view mainFrame] loadHTMLString: _NS(I_LONGHELP)
-                                        baseURL: [NSURL URLWithString:@"http://videolan.org"]];
+- (void)showHelp
+{
+    [self showWindow:nil];
+    [self helpGoHome:nil];
 }
 
 - (IBAction)helpGoHome:(id)sender

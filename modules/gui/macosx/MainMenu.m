@@ -94,8 +94,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
-    if (b_nib_about_loaded)
-        [o_about release];
+    [o_about release];
+    [o_helpWin release];
 
     if (b_nib_videoeffects_loaded)
         [o_videoeffects release];
@@ -1200,11 +1200,8 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)initAbout
 {
-    if (! o_about)
-        o_about = [[VLAboutBox alloc] init];
-
-    if (!b_nib_about_loaded)
-        b_nib_about_loaded = [NSBundle loadNibNamed:@"About" owner: NSApp];
+    if (!o_about)
+        o_about = [[AboutWindowController alloc] init];
 }
 
 - (IBAction)viewAbout:(id)sender
@@ -1221,8 +1218,10 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)viewHelp:(id)sender
 {
-    [self initAbout];
-    [o_about showHelp];
+    if (!o_helpWin)
+        o_helpWin = [[HelpWindowController alloc] init];
+
+    [o_helpWin showHelp];
 }
 
 - (IBAction)openReadMe:(id)sender

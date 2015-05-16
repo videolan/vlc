@@ -342,6 +342,7 @@
 		1C88BCC119DC7CB300645190 /* ys-fs_volume_slider_knob@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8B19DC7CB300645190 /* ys-fs_volume_slider_knob@2x.png */; };
 		1C88BCC219DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8C19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png */; };
 		1C88BCC319DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8D19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png */; };
+		1CBB2CC81B06A6DE00110ADA /* Help.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1CBB2CC61B06A6DE00110ADA /* Help.xib */; };
 		1CCB5F511A62A724004C3E90 /* about.h in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AF9F044465080059A3A7 /* about.h */; };
 		1CCB5F521A62A724004C3E90 /* about.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AFA0044465080059A3A7 /* about.m */; };
 		1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435E1972E26A0022B534 /* AddonListDataSource.h */; };
@@ -1204,6 +1205,7 @@
 		1C88BC8B19DC7CB300645190 /* ys-fs_volume_slider_knob@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob@2x.png"; sourceTree = "<group>"; };
 		1C88BC8C19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob_highlight.png"; sourceTree = "<group>"; };
 		1C88BC8D19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob_highlight@2x.png"; sourceTree = "<group>"; };
+		1CBB2CC71B06A6DE00110ADA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Help.xib; sourceTree = "<group>"; };
 		1CCB5F2F1A62A6A5004C3E90 /* pseudo-vlc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "pseudo-vlc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CE5ED1B19DD6AB700FCEFD3 /* lion-window-fullscreen-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-on.png"; sourceTree = "<group>"; };
 		1CE5ED1C19DD6AB700FCEFD3 /* lion-window-fullscreen-on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-on@2x.png"; sourceTree = "<group>"; };
@@ -2882,6 +2884,7 @@
 			children = (
 				E0FB95CC1615B6DF0005069A /* DetachedVideoWindow.xib */,
 				CCD83E2E13FEA143004F1652 /* About.xib */,
+				1CBB2CC61B06A6DE00110ADA /* Help.xib */,
 				CCD83E3013FEA143004F1652 /* AudioEffects.xib */,
 				CCD83E3213FEA143004F1652 /* Bookmarks.xib */,
 				CCD83E3413FEA143004F1652 /* CoreDialogs.xib */,
@@ -3691,6 +3694,7 @@
 				CC166FEC15F517660088201B /* backward-6btns@2x.png in Resources */,
 				CC166FF115F517720088201B /* forward-6btns-pressed.png in Resources */,
 				1C88BCB319DC7CB300645190 /* ys-fs_time_slider_knob@2x.png in Resources */,
+				1CBB2CC81B06A6DE00110ADA /* Help.xib in Resources */,
 				CC166FF215F517720088201B /* forward-6btns-pressed@2x.png in Resources */,
 				CC166FF315F517720088201B /* forward-6btns.png in Resources */,
 				CC166FF415F517720088201B /* forward-6btns@2x.png in Resources */,
@@ -3835,6 +3839,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		1CBB2CC61B06A6DE00110ADA /* Help.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1CBB2CC71B06A6DE00110ADA /* English */,
+			);
+			name = Help.xib;
+			sourceTree = "<group>";
+		};
 		7D3F6523188051F2005776C4 /* BWQuincyMain.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -4267,6 +4279,7 @@
 				1CCB5F4C1A62A6A5004C3E90 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
 		};
 		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
 			isa = XCConfigurationList;

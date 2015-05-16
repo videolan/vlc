@@ -145,6 +145,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.xib \
 	extras/package/macosx/Resources/English.lproj/FSPanel.xib \
 	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
+	extras/package/macosx/Resources/English.lproj/Help.xib \
 	extras/package/macosx/Resources/English.lproj/MainMenu.xib \
 	extras/package/macosx/Resources/English.lproj/MainWindow.xib \
 	extras/package/macosx/Resources/English.lproj/MediaInfo.xib \

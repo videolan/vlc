@@ -27,10 +27,9 @@
 /*****************************************************************************
  * VLAboutBox interface
  *****************************************************************************/
-@interface VLAboutBox : NSObject
+@interface AboutWindowController : NSWindowController<NSWindowDelegate>
 {
     /* main about panel and stuff related to its views */
-    IBOutlet id o_about_window;
     IBOutlet id o_name_version_field;
     IBOutlet id o_revision_field;
     IBOutlet id o_copyright_field;
@@ -49,23 +48,25 @@
     CGFloat f_end;
     NSTimeInterval i_start;
     BOOL b_restart;
-    BOOL b_isSetUp;
 
     NSString *o_authors;
+}
 
-    /* generic help window */
-    IBOutlet id o_help_window;
+- (void)showAbout;
+- (void)showGPL;
+- (IBAction)buttonAction:(id)sender;
+
+@end
+
+@interface HelpWindowController : NSWindowController
+{
     IBOutlet WebView *o_help_web_view; //we may _not_ use id here because of method name collisions
     IBOutlet id o_help_bwd_btn;
     IBOutlet id o_help_fwd_btn;
     IBOutlet id o_help_home_btn;
 }
 
-+ (VLAboutBox *)sharedInstance;
-- (void)showAbout;
-- (void)showHelp;
-- (void)showGPL;
-- (IBAction)buttonAction:(id)sender;
 - (IBAction)helpGoHome:(id)sender;
+- (void)showHelp;
 
 @end
