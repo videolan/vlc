@@ -25,35 +25,15 @@
 #import <vlc_dialog.h>
 #import <Cocoa/Cocoa.h>
 
-
-/*****************************************************************************
- * VLCErrorPanel interface
- *****************************************************************************/
-
-@interface VLCErrorPanel : NSObject
-{
-    IBOutlet id o_window;
-    IBOutlet id o_cleanup_button;
-    IBOutlet id o_error_table;
-
-    NSMutableArray * o_errors;
-    NSMutableArray * o_icons;
-
-    BOOL b_nib_loaded;
-}
-- (IBAction)cleanupTable:(id)sender;
-
--(void)showPanel;
--(void)addError: (NSString *)o_error withMsg:(NSString *)o_msg;
-
-@end
-
 /*****************************************************************************
  * VLCCoreDialogProvider interface
  *****************************************************************************/
+
+@class ErrorWindowController;
+
 @interface VLCCoreDialogProvider : NSObject
 {
-    VLCErrorPanel *o_error_panel;
+    ErrorWindowController *o_error_panel;
 
     /* authentication dialogue */
     IBOutlet id o_auth_cancel_btn;
@@ -94,5 +74,25 @@
 -(void)destroyProgressPanel;
 
 -(id)errorPanel;
+
+@end
+
+
+/*****************************************************************************
+ * VLCErrorPanel interface
+ *****************************************************************************/
+
+@interface ErrorWindowController : NSWindowController
+{
+    IBOutlet id o_cleanup_button;
+    IBOutlet id o_error_table;
+
+    NSMutableArray *o_errors;
+    NSMutableArray *o_icons;
+}
+
+- (IBAction)cleanupTable:(id)sender;
+
+-(void)addError:(NSString *)o_error withMsg:(NSString *)o_msg;
 
 @end

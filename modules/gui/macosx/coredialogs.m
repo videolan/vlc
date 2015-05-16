@@ -49,7 +49,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
         [self dealloc];
     else {
         _o_sharedInstance = [super init];
-        o_error_panel = [[VLCErrorPanel alloc] init];
         b_progress_cancelled = NO;
     }
 
@@ -89,8 +88,8 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 {
     dialog_fatal_t *p_dialog = [o_value pointerValue];
 
-    [o_error_panel addError: toNSStr(p_dialog->title) withMsg: toNSStr(p_dialog->message)];
-    [o_error_panel showPanel];
+    [[self errorPanel] addError: toNSStr(p_dialog->title) withMsg: toNSStr(p_dialog->message)];
+    [[self errorPanel] showWindow:self];
 }
 
 -(void)showFatalWaitDialog: (NSValue *)o_value
@@ -211,6 +210,9 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 
 -(id)errorPanel
 {
+    if (!o_error_panel)
+        o_error_panel = [[ErrorWindowController alloc] init];
+
     return o_error_panel;
 }
 
@@ -219,25 +221,25 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 /*****************************************************************************
  * VLCErrorPanel implementation
  *****************************************************************************/
-@implementation VLCErrorPanel
--(id)init
+
+@implementation ErrorWindowController
+
+- (id)init
 {
-    [super init];
-
-    if (!b_nib_loaded)
-        b_nib_loaded = [NSBundle loadNibNamed:@"ErrorPanel" owner:self];
-
-    /* init data sources */
-    o_errors = [[NSMutableArray alloc] init];
-    o_icons = [[NSMutableArray alloc] init];
+    self = [super initWithWindowNibName:@"ErrorPanel"];
+    if (self) {
+        /* init data sources */
+        o_errors = [[NSMutableArray alloc] init];
+        o_icons = [[NSMutableArray alloc] init];
+    }
 
     return self;
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
     /* init strings */
-    [o_window setTitle: _NS("Errors and Warnings")];
+    [[self window] setTitle: _NS("Errors and Warnings")];
     [o_cleanup_button setTitle: _NS("Clean up")];
 }
 
@@ -246,11 +248,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     [o_errors release];
     [o_icons release];
     [super dealloc];
-}
-
--(void)showPanel
-{
-    [o_window makeKeyAndOrderFront: self];
 }
 
 -(void)addError: (NSString *)o_error withMsg:(NSString *)o_msg

@@ -1262,7 +1262,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)viewErrorsAndWarnings:(id)sender
 {
-    [[[[VLCMain sharedInstance] coreDialogProvider] errorPanel] showPanel];
+    [[[[VLCMain sharedInstance] coreDialogProvider] errorPanel] showWindow:self];
 }
 
 - (IBAction)showInformationPanel:(id)sender
