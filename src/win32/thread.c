@@ -196,9 +196,8 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 /*** Condition variables ***/
 enum
 {
-    VLC_CLOCK_STATIC=0, /* must be zero for VLC_STATIC_COND */
+    VLC_CLOCK_REALTIME=0, /* must be zero for VLC_STATIC_COND */
     VLC_CLOCK_MONOTONIC,
-    VLC_CLOCK_REALTIME,
 };
 
 static void vlc_cond_init_common(vlc_cond_t *wait, unsigned clock)
@@ -243,7 +242,7 @@ static LONG InterlockedDecrementNonZero(LONG volatile *dst)
 
 void vlc_cond_signal(vlc_cond_t *wait)
 {
-    if (!wait->clock)
+    if (wait->semaphore == NULL)
         return;
 
     if (InterlockedDecrementNonZero(&wait->waiters) > 0)
@@ -252,7 +251,7 @@ void vlc_cond_signal(vlc_cond_t *wait)
 
 void vlc_cond_broadcast(vlc_cond_t *wait)
 {
-    if (!wait->clock)
+    if (wait->semaphore == NULL)
         return;
 
     LONG waiters = InterlockedExchange(&wait->waiters, 0);
@@ -266,15 +265,17 @@ void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
 
     vlc_testcancel();
 
-    if (!wait->clock)
+    if (wait->semaphore == NULL)
     {   /* FIXME FIXME FIXME */
-        msleep (50000);
-        return;
+        vlc_mutex_unlock(lock);
+        result = SleepEx(50, TRUE);
     }
-
-    InterlockedIncrement(&wait->waiters);
-    vlc_mutex_unlock(lock);
-    result = vlc_WaitForSingleObject(wait->semaphore, INFINITE);
+    else
+    {
+        InterlockedIncrement(&wait->waiters);
+        vlc_mutex_unlock(lock);
+        result = vlc_WaitForSingleObject(wait->semaphore, INFINITE);
+    }
     vlc_mutex_lock(lock);
 
     if (result == WAIT_IO_COMPLETION)
@@ -290,17 +291,14 @@ int vlc_cond_timedwait(vlc_cond_t *wait, vlc_mutex_t *lock, mtime_t deadline)
 
     switch (wait->clock)
     {
-        case VLC_CLOCK_MONOTONIC:
-            total = mdate();
-            break;
         case VLC_CLOCK_REALTIME: /* FIXME? sub-second precision */
             total = CLOCK_FREQ * time(NULL);
             break;
+        case VLC_CLOCK_MONOTONIC:
+            total = mdate();
+            break;
         default:
-            assert(!wait->clock);
-            /* FIXME FIXME FIXME */
-            msleep(50000);
-            return 0;
+            vlc_assert_unreachable();
     }
 
     total = (deadline - total) / 1000;
@@ -309,9 +307,17 @@ int vlc_cond_timedwait(vlc_cond_t *wait, vlc_mutex_t *lock, mtime_t deadline)
 
     DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
 
-    InterlockedIncrement(&wait->waiters);
-    vlc_mutex_unlock(lock);
-    result = vlc_WaitForSingleObject(wait->semaphore, delay);
+    if (wait->semaphore == NULL)
+    {   /* FIXME FIXME FIXME */
+        vlc_mutex_unlock(lock);
+        result = SleepEx((delay > 50) ? 50 : delay, TRUE);
+    }
+    else
+    {
+        InterlockedIncrement(&wait->waiters);
+        vlc_mutex_unlock(lock);
+        result = vlc_WaitForSingleObject(wait->semaphore, delay);
+    }
     vlc_mutex_lock(lock);
 
     if (result == WAIT_IO_COMPLETION)
