@@ -99,6 +99,7 @@ int screen_InitCapture( demux_t *p_demux )
     p_sys->fmt.video.i_visible_height =
     p_sys->fmt.video.i_height         = GetDeviceCaps( p_data->hdc_src, VERTRES );
     p_sys->fmt.video.i_bits_per_pixel = i_bits_per_pixel;
+    p_sys->fmt.video.i_sar_num = p_sys->fmt.video.i_sar_den = 1;
     p_sys->fmt.video.i_chroma         = i_chroma;
 
     switch( i_chroma )
