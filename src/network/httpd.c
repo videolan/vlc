@@ -1278,7 +1278,7 @@ ssize_t httpd_NetSend (httpd_client_t *cl, const uint8_t *p, size_t i_len)
     p_tls = cl->p_tls;
     do
         val = p_tls ? tls_Send(p_tls, p, i_len)
-                    : send (cl->fd, p, i_len, 0);
+                    : send (cl->fd, p, i_len, MSG_NOSIGNAL);
     while (val == -1 && errno == EINTR);
     return val;
 }

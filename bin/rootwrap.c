@@ -68,7 +68,7 @@ static inline int is_allowed_port (uint16_t port)
 
 static inline int send_err (int fd, int err)
 {
-    return send (fd, &err, sizeof (err), 0) == sizeof (err) ? 0 : -1;
+    return send(fd, &err, sizeof (err), MSG_NOSIGNAL) == sizeof (err) ? 0 : -1;
 }
 
 /**
@@ -99,7 +99,7 @@ static int send_fd (int p, int fd)
     memcpy (CMSG_DATA (cmsg), &fd, sizeof (fd));
     hdr.msg_controllen = cmsg->cmsg_len;
 
-    return sendmsg (p, &hdr, 0) == sizeof (val) ? 0 : -1;
+    return sendmsg(p, &hdr, MSG_NOSIGNAL) == sizeof (val) ? 0 : -1;
 }
 
 

@@ -78,6 +78,10 @@ struct msghdr
 #   undef IPV6_JOIN_GROUP
 #endif
 
+#ifndef MSG_NOSIGNAL
+# define MSG_NOSIGNAL 0
+#endif
+
 VLC_API int vlc_socket (int, int, int, bool nonblock) VLC_USED;
 
 struct sockaddr;
