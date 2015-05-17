@@ -61,10 +61,11 @@ typedef struct
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
 typedef struct
 {
-    HANDLE   handle;
+    HANDLE   semaphore;
+    LONG     waiters;
     unsigned clock;
 } vlc_cond_t;
-#define VLC_STATIC_COND { 0, 0 }
+#define VLC_STATIC_COND { NULL, 0, 0 }
 typedef HANDLE vlc_sem_t;
 #define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
