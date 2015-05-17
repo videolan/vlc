@@ -225,10 +225,29 @@ void vlc_cond_destroy(vlc_cond_t *wait)
     CloseHandle(wait->semaphore);
 }
 
-void vlc_cond_signal (vlc_cond_t *p_condvar)
+static LONG InterlockedDecrementNonZero(LONG volatile *dst)
 {
-    /* This is suboptimal but works. */
-    vlc_cond_broadcast (p_condvar);
+    LONG cmp, val = 1;
+
+    do
+    {
+        cmp = val;
+        val = InterlockedCompareExchange(dst, val - 1, val);
+        if (val == 0)
+            return 0;
+    }
+    while (cmp != val);
+
+    return val;
+}
+
+void vlc_cond_signal(vlc_cond_t *wait)
+{
+    if (!wait->clock)
+        return;
+
+    if (InterlockedDecrementNonZero(&wait->waiters) > 0)
+        ReleaseSemaphore(wait->semaphore, 1, NULL);
 }
 
 void vlc_cond_broadcast(vlc_cond_t *wait)
@@ -243,6 +262,8 @@ void vlc_cond_broadcast(vlc_cond_t *wait)
 
 void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
 {
+    DWORD result;
+
     vlc_testcancel();
 
     if (!wait->clock)
@@ -253,8 +274,11 @@ void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
 
     InterlockedIncrement(&wait->waiters);
     vlc_mutex_unlock(lock);
-    vlc_WaitForSingleObject(wait->semaphore, INFINITE);
+    result = vlc_WaitForSingleObject(wait->semaphore, INFINITE);
     vlc_mutex_lock(lock);
+
+    if (result == WAIT_IO_COMPLETION)
+        vlc_testcancel();
 }
 
 int vlc_cond_timedwait(vlc_cond_t *wait, vlc_mutex_t *lock, mtime_t deadline)
