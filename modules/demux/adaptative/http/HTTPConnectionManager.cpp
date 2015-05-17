@@ -74,7 +74,8 @@ bool HTTPConnectionManager::connectChunk(Chunk *chunk)
     if(chunk->getConnection())
         return true;
 
-    msg_Dbg(stream, "Retrieving %s @%ld", chunk->getUrl().c_str(), chunk->getStartByte());
+    msg_Dbg(stream, "Retrieving %s @%zu", chunk->getUrl().c_str(),
+            chunk->getStartByte());
 
     HTTPConnection *conn = getConnectionForHost(chunk->getHostname());
     if(!conn)
