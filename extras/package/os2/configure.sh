@@ -13,7 +13,6 @@ OPTIONS="
       --enable-realrtsp
       --enable-dvbpsi
       --enable-ogg
-      --enable-mux_ogg
       --enable-mkv
       --enable-mad
       --enable-merge-ffmpeg
@@ -29,7 +28,6 @@ OPTIONS="
       --enable-x264
       --disable-xcb
       --disable-xvideo
-      --disable-glx
       --enable-freetype
       --disable-fribidi
       --enable-fontconfig
