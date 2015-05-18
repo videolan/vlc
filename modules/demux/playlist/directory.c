@@ -36,6 +36,7 @@
 struct demux_sys_t
 {
     bool b_dir_sorted;
+    bool b_dir_can_loop;
 };
 
 /*****************************************************************************
@@ -50,14 +51,16 @@ int Import_Dir ( vlc_object_t *p_this)
 
     bool b_is_dir = false;
     bool b_dir_sorted = false;
+    bool b_dir_can_loop = false;
     int i_err = stream_Control( p_demux->s, STREAM_IS_DIRECTORY, &b_is_dir,
-                                &b_dir_sorted, NULL );
+                                &b_dir_sorted, &b_dir_can_loop );
 
     if ( !( i_err == VLC_SUCCESS && b_is_dir ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "reading directory content" );
     p_demux->p_sys->b_dir_sorted = b_dir_sorted;
+    p_demux->p_sys->b_dir_can_loop = b_dir_can_loop;
 
     return VLC_SUCCESS;
 }
@@ -153,6 +156,7 @@ static int Demux( demux_t *p_demux )
 
     p_input = GetCurrentItem( p_demux );
     p_node = input_item_node_Create( p_input );
+    p_node->b_can_loop = p_demux->p_sys->b_dir_can_loop;
     input_item_Release(p_input);
 
     b_show_hiddenfiles = var_InheritBool( p_demux, "show-hiddenfiles" );
