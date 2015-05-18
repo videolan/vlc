@@ -259,7 +259,8 @@ void vlc_cond_broadcast(vlc_cond_t *wait)
         ReleaseSemaphore(wait->semaphore, waiters, NULL);
 }
 
-void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
+static DWORD vlc_cond_wait_delay(vlc_cond_t *wait, vlc_mutex_t *lock,
+                                 DWORD delay)
 {
     DWORD result;
 
@@ -268,26 +269,29 @@ void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
     if (wait->semaphore == NULL)
     {   /* FIXME FIXME FIXME */
         vlc_mutex_unlock(lock);
-        result = SleepEx(50, TRUE);
+        result = SleepEx((delay > 50u) ? 50u : delay, TRUE);
     }
     else
     {
         InterlockedIncrement(&wait->waiters);
         vlc_mutex_unlock(lock);
-        result = vlc_WaitForSingleObject(wait->semaphore, INFINITE);
+        result = vlc_WaitForSingleObject(wait->semaphore, delay);
     }
     vlc_mutex_lock(lock);
 
     if (result == WAIT_IO_COMPLETION)
         vlc_testcancel();
+    return result;
+}
+
+void vlc_cond_wait(vlc_cond_t *wait, vlc_mutex_t *lock)
+{
+    vlc_cond_wait_delay(wait, lock, INFINITE);
 }
 
 int vlc_cond_timedwait(vlc_cond_t *wait, vlc_mutex_t *lock, mtime_t deadline)
 {
     mtime_t total;
-    DWORD result;
-
-    vlc_testcancel();
 
     switch (wait->clock)
     {
@@ -307,23 +311,9 @@ int vlc_cond_timedwait(vlc_cond_t *wait, vlc_mutex_t *lock, mtime_t deadline)
 
     DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
 
-    if (wait->semaphore == NULL)
-    {   /* FIXME FIXME FIXME */
-        vlc_mutex_unlock(lock);
-        result = SleepEx((delay > 50) ? 50 : delay, TRUE);
-    }
-    else
-    {
-        InterlockedIncrement(&wait->waiters);
-        vlc_mutex_unlock(lock);
-        result = vlc_WaitForSingleObject(wait->semaphore, delay);
-    }
-    vlc_mutex_lock(lock);
-
-    if (result == WAIT_IO_COMPLETION)
-        vlc_testcancel();
-
-    return (result == WAIT_TIMEOUT) ? ETIMEDOUT : 0;
+    if (vlc_cond_wait_delay(wait, lock, delay) == WAIT_TIMEOUT)
+        return ETIMEDOUT;
+    return 0;
 }
 
 /*** Semaphore ***/
