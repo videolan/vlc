@@ -150,6 +150,7 @@ struct decoder_sys_t
     jobject input_buffers, output_buffers;
     int pixel_format;
     int stride, slice_height;
+    const char *mime;
     char *name;
 
     /* Codec Specific Data buffer: sent in PutInput after a start or a flush
@@ -278,7 +279,7 @@ static const struct member members[] = {
  *****************************************************************************/
 static int  OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
-static void CloseMediaCodec(decoder_t *p_dec, JNIEnv *env);
+static void JniStopMediaCodec(decoder_t *p_dec, JNIEnv *env);
 
 static picture_t *DecodeVideo(decoder_t *, block_t **);
 
@@ -538,15 +539,12 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
 }
 
 static jstring GetMediaCodecName(decoder_t *p_dec, JNIEnv *env,
-                                 const char *mime, jstring jmime)
+                                 const char *mime, jstring jmime,
+                                 size_t h264_profile)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int num_codecs;
-    size_t fmt_profile = 0;
     jstring jcodec_name = NULL;
-
-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-        h264_get_profile_level(&p_dec->fmt_in, &fmt_profile, NULL, NULL);
 
     num_codecs = (*env)->CallStaticIntMethod(env,
                                              jfields.media_codec_list_class,
@@ -600,7 +598,7 @@ static jstring GetMediaCodecName(decoder_t *p_dec, JNIEnv *env,
                 /* The mime type is matching for this component. We
                    now check if the capabilities of the codec is
                    matching the video format. */
-                if (p_dec->fmt_in.i_codec == VLC_CODEC_H264 && fmt_profile) {
+                if (h264_profile) {
                     /* This decoder doesn't expose its profiles and is high
                      * profile capable */
                     if (!strncmp(name_ptr, "OMX.LUMEVideoDecoder", __MIN(20, name_len)))
@@ -612,7 +610,7 @@ static jstring GetMediaCodecName(decoder_t *p_dec, JNIEnv *env,
                         int omx_profile = (*env)->GetIntField(env, profile_level, jfields.profile_field);
                         size_t codec_profile = convert_omx_to_profile_idc(omx_profile);
                         (*env)->DeleteLocalRef(env, profile_level);
-                        if (codec_profile != fmt_profile)
+                        if (codec_profile != h264_profile)
                             continue;
                         /* Some encoders set the level too high, thus we ignore it for the moment.
                            We could try to guess the actual profile based on the resolution. */
@@ -652,13 +650,11 @@ loopclean:
     return jcodec_name;
 }
 
-/*****************************************************************************
- * OpenMediaCodec: Create the mediacodec instance
- *****************************************************************************/
-static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
+static int JniStartMediaCodec(decoder_t *p_dec, JNIEnv *env, jobject jsurface,
+                              const char *mime, int i_width, int i_height,
+                              size_t h264_profile, int i_angle)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    const char *mime = NULL;
     int i_ret = VLC_EGENERIC;
     jstring jmime = NULL;
     jstring jcodec_name = NULL;
@@ -669,24 +665,11 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
     jobject joutput_buffers = NULL;
     jobject jbuffer_info = NULL;
 
-    switch (p_dec->fmt_in.i_codec) {
-    case VLC_CODEC_HEVC: mime = "video/hevc"; break;
-    case VLC_CODEC_H264: mime = "video/avc"; break;
-    case VLC_CODEC_H263: mime = "video/3gpp"; break;
-    case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
-    case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
-    case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
-    case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
-    case VLC_CODEC_VP9:  mime = "video/x-vnd.on2.vp9"; break;
-    default:
-        vlc_assert_unreachable();
-    }
-
     jmime = (*env)->NewStringUTF(env, mime);
     if (!jmime)
         return VLC_EGENERIC;
 
-    jcodec_name = GetMediaCodecName(p_dec, env, mime, jmime);
+    jcodec_name = GetMediaCodecName(p_dec, env, mime, jmime, h264_profile);
     if (!jcodec_name) {
         msg_Dbg(p_dec, "No suitable codec matching %s was found", mime);
         goto error;
@@ -705,10 +688,108 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
     p_sys->allocated = true;
     p_sys->codec = (*env)->NewGlobalRef(env, jcodec);
 
-    /* Either we use a "csd-0" buffer that is provided before codec
-     * initialisation via the MediaFormat class, or use a CODEC_CONFIG buffer
-     * that can be provided during playback (and must be provided after a flush
-     * and a start). */
+    jformat = (*env)->CallStaticObjectMethod(env, jfields.media_format_class,
+                                             jfields.create_video_format, jmime,
+                                             i_width, i_height);
+
+    p_sys->direct_rendering = !!jsurface;
+
+    /* There is no way to rotate the video using direct rendering (and using a
+     * SurfaceView) before  API 21 (Lollipop). Therefore, we deactivate direct
+     * rendering if video doesn't have a normal rotation and if
+     * get_input_buffer method is not present (This method exists since API
+     * 21). */
+    if (p_sys->direct_rendering && i_angle != 0 && !jfields.get_input_buffer)
+        p_sys->direct_rendering = false;
+
+    if (p_sys->direct_rendering) {
+        if (i_angle != 0)
+        {
+            jrotation_string = (*env)->NewStringUTF(env, "rotation-degrees");
+            (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
+                                   jrotation_string, i_angle);
+        }
+
+        // Configure MediaCodec with the Android surface.
+        (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure,
+                               jformat, jsurface, NULL, 0);
+        if (CHECK_EXCEPTION()) {
+            msg_Warn(p_dec, "Exception occurred in MediaCodec.configure with an output surface.");
+            goto error;
+        }
+    } else {
+        (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure,
+                               jformat, NULL, NULL, 0);
+        if (CHECK_EXCEPTION()) {
+            msg_Warn(p_dec, "Exception occurred in MediaCodec.configure");
+            goto error;
+        }
+    }
+
+    (*env)->CallVoidMethod(env, p_sys->codec, jfields.start);
+    if (CHECK_EXCEPTION()) {
+        msg_Warn(p_dec, "Exception occurred in MediaCodec.start");
+        goto error;
+    }
+    p_sys->started = true;
+
+    if (jfields.get_input_buffers && jfields.get_output_buffers) {
+
+        jinput_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
+                                                  jfields.get_input_buffers);
+        if (CHECK_EXCEPTION()) {
+            msg_Err(p_dec, "Exception in MediaCodec.getInputBuffers (OpenDecoder)");
+            goto error;
+        }
+        p_sys->input_buffers = (*env)->NewGlobalRef(env, jinput_buffers);
+
+        joutput_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
+                                                   jfields.get_output_buffers);
+        if (CHECK_EXCEPTION()) {
+            msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffers (OpenDecoder)");
+            goto error;
+        }
+        p_sys->output_buffers = (*env)->NewGlobalRef(env, joutput_buffers);
+    }
+    jbuffer_info = (*env)->NewObject(env, jfields.buffer_info_class,
+                                     jfields.buffer_info_ctor);
+    p_sys->buffer_info = (*env)->NewGlobalRef(env, jbuffer_info);
+
+    i_ret = VLC_SUCCESS;
+
+error:
+    if (jmime)
+        (*env)->DeleteLocalRef(env, jmime);
+    if (jcodec_name)
+        (*env)->DeleteLocalRef(env, jcodec_name);
+    if (jcodec)
+        (*env)->DeleteLocalRef(env, jcodec);
+    if (jformat)
+        (*env)->DeleteLocalRef(env, jformat);
+    if (jrotation_string)
+        (*env)->DeleteLocalRef(env, jrotation_string);
+    if (jinput_buffers)
+        (*env)->DeleteLocalRef(env, jinput_buffers);
+    if (joutput_buffers)
+        (*env)->DeleteLocalRef(env, joutput_buffers);
+    if (jbuffer_info)
+        (*env)->DeleteLocalRef(env, jbuffer_info);
+
+    if (i_ret != VLC_SUCCESS)
+        JniStopMediaCodec(p_dec, env);
+    return i_ret;
+}
+
+/*****************************************************************************
+ * StartMediaCodec: Create the mediacodec instance
+ *****************************************************************************/
+static int StartMediaCodec(decoder_t *p_dec, JNIEnv *env)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    int i_angle = 0, i_ret;
+    size_t h264_profile = 0;
+    jobject jsurface = NULL;
+
     if (p_dec->fmt_in.i_extra && !p_sys->p_csd)
     {
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
@@ -721,7 +802,7 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
             if (!p_buf)
             {
                 msg_Warn(p_dec, "extra buffer allocation failed");
-                goto error;
+                return VLC_EGENERIC;
             }
 
             if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
@@ -759,150 +840,54 @@ static int OpenMediaCodec(decoder_t *p_dec, JNIEnv *env)
 
         p_sys->i_csd_send = 0;
     }
-
-    if (!p_sys->i_width && !p_sys->i_height)
+    if (!p_sys->i_width || !p_sys->i_height)
     {
         msg_Err(p_dec, "invalid size, abort MediaCodec");
-        goto error;
+        return VLC_EGENERIC;
     }
-    jformat = (*env)->CallStaticObjectMethod(env, jfields.media_format_class,
-                                             jfields.create_video_format, jmime,
-                                             p_sys->i_width, p_sys->i_height);
 
-    p_sys->direct_rendering = var_InheritBool(p_dec, CFG_PREFIX "dr");
-
-    /* There is no way to rotate the video using direct rendering (and using a
-     * SurfaceView) before  API 21 (Lollipop). Therefore, we deactivate direct
-     * rendering if video doesn't have a normal rotation and if
-     * get_input_buffer method is not present (This method exists since API
-     * 21). */
-    if (p_sys->direct_rendering
-        && p_dec->fmt_in.video.orientation != ORIENT_NORMAL
-        && !jfields.get_input_buffer)
-        p_sys->direct_rendering = false;
-
-    if (p_sys->direct_rendering) {
-        if (p_dec->fmt_in.video.orientation != ORIENT_NORMAL) {
-            int i_angle;
-
-            switch (p_dec->fmt_in.video.orientation) {
-                case ORIENT_ROTATED_90:
-                    i_angle = 90;
-                    break;
-                case ORIENT_ROTATED_180:
-                    i_angle = 180;
-                    break;
-                case ORIENT_ROTATED_270:
-                    i_angle = 270;
-                    break;
-                default:
-                    i_angle = 0;
-            }
-            jrotation_string = (*env)->NewStringUTF(env, "rotation-degrees");
-            (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
-                                   jrotation_string, i_angle);
+    if ( p_dec->fmt_in.video.orientation != ORIENT_NORMAL)
+    {
+        switch (p_dec->fmt_in.video.orientation)
+        {
+            case ORIENT_ROTATED_90:
+                i_angle = 90;
+                break;
+            case ORIENT_ROTATED_180:
+                i_angle = 180;
+                break;
+            case ORIENT_ROTATED_270:
+                i_angle = 270;
+                break;
+            default:
+                i_angle = 0;
         }
+    }
 
-        jobject surf = jni_LockAndGetAndroidJavaSurface();
-        if (surf) {
-            // Configure MediaCodec with the Android surface.
-            (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure,
-                                   jformat, surf, NULL, 0);
-            if (CHECK_EXCEPTION()) {
-                msg_Warn(p_dec, "Exception occurred in MediaCodec.configure with an output surface.");
-                jni_UnlockAndroidSurface();
-                goto error;
-            }
+    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+        h264_get_profile_level(&p_dec->fmt_in, &h264_profile, NULL, NULL);
+
+    if (var_InheritBool(p_dec, CFG_PREFIX "dr"))
+        jsurface = jni_LockAndGetAndroidJavaSurface();
+    i_ret = JniStartMediaCodec(p_dec, env, jsurface, p_sys->mime,
+                               p_sys->i_width, p_sys->i_height, h264_profile,
+                               i_angle);
+    if (jsurface)
+        jni_UnlockAndroidSurface();
+
+    if (i_ret == VLC_SUCCESS)
+    {
+        if (p_sys->direct_rendering)
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
-            jni_UnlockAndroidSurface();
-        } else {
-            msg_Warn(p_dec, "Failed to get the Android Surface, disabling direct rendering.");
-            p_sys->direct_rendering = false;
-        }
-    }
-    if (!p_sys->direct_rendering) {
-        (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure,
-                               jformat, NULL, NULL, 0);
-        if (CHECK_EXCEPTION()) {
-            msg_Warn(p_dec, "Exception occurred in MediaCodec.configure");
-            goto error;
-        }
-    }
-
-    (*env)->CallVoidMethod(env, p_sys->codec, jfields.start);
-    if (CHECK_EXCEPTION()) {
-        msg_Warn(p_dec, "Exception occurred in MediaCodec.start");
-        goto error;
-    }
-    p_sys->started = true;
-
-    if (jfields.get_input_buffers && jfields.get_output_buffers) {
-
-        jinput_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
-                                                  jfields.get_input_buffers);
-        if (CHECK_EXCEPTION()) {
-            msg_Err(p_dec, "Exception in MediaCodec.getInputBuffers (OpenDecoder)");
-            goto error;
-        }
-        p_sys->input_buffers = (*env)->NewGlobalRef(env, jinput_buffers);
-
-        joutput_buffers = (*env)->CallObjectMethod(env, p_sys->codec,
-                                                   jfields.get_output_buffers);
-        if (CHECK_EXCEPTION()) {
-            msg_Err(p_dec, "Exception in MediaCodec.getOutputBuffers (OpenDecoder)");
-            goto error;
-        }
-        p_sys->output_buffers = (*env)->NewGlobalRef(env, joutput_buffers);
-    }
-    jbuffer_info = (*env)->NewObject(env, jfields.buffer_info_class,
-                                     jfields.buffer_info_ctor);
-    p_sys->buffer_info = (*env)->NewGlobalRef(env, jbuffer_info);
-    p_sys->b_update_format = true;
-
-    i_ret = VLC_SUCCESS;
-
-error:
-    if (jmime)
-        (*env)->DeleteLocalRef(env, jmime);
-    if (jcodec_name)
-        (*env)->DeleteLocalRef(env, jcodec_name);
-    if (jcodec)
-        (*env)->DeleteLocalRef(env, jcodec);
-    if (jformat)
-        (*env)->DeleteLocalRef(env, jformat);
-    if (jrotation_string)
-        (*env)->DeleteLocalRef(env, jrotation_string);
-    if (jinput_buffers)
-        (*env)->DeleteLocalRef(env, jinput_buffers);
-    if (joutput_buffers)
-        (*env)->DeleteLocalRef(env, joutput_buffers);
-    if (jbuffer_info)
-        (*env)->DeleteLocalRef(env, jbuffer_info);
-
-    if (i_ret != VLC_SUCCESS)
-        CloseMediaCodec(p_dec, env);
-    return i_ret;
+        p_sys->b_update_format = true;
+        return VLC_SUCCESS;
+    } else
+        return VLC_EGENERIC;
 }
 
-/*****************************************************************************
- * CloseMediaCodec: Close the mediacodec instance
- *****************************************************************************/
-static void CloseMediaCodec(decoder_t *p_dec, JNIEnv *env)
+static void JniStopMediaCodec(decoder_t *p_dec, JNIEnv *env)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if (!p_sys)
-        return;
-
-    free(p_sys->name);
-    p_sys->name = NULL;
-
-    /* Invalidate all pictures that are currently in flight in order
-     * to prevent the vout from using destroyed output buffers. */
-    if (p_sys->direct_rendering) {
-        InvalidateAllPictures(p_dec);
-        p_sys->direct_rendering = false;
-    }
 
     if (p_sys->input_buffers) {
         (*env)->DeleteGlobalRef(env, p_sys->input_buffers);
@@ -937,34 +922,61 @@ static void CloseMediaCodec(decoder_t *p_dec, JNIEnv *env)
 }
 
 /*****************************************************************************
+ * StopMediaCodec: Close the mediacodec instance
+ *****************************************************************************/
+static void StopMediaCodec(decoder_t *p_dec, JNIEnv *env)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    free(p_sys->name);
+    p_sys->name = NULL;
+
+    /* Invalidate all pictures that are currently in flight in order
+     * to prevent the vout from using destroyed output buffers. */
+    if (p_sys->direct_rendering) {
+        InvalidateAllPictures(p_dec);
+        p_sys->direct_rendering = false;
+    }
+
+    JniStopMediaCodec(p_dec, env);
+}
+
+/*****************************************************************************
  * OpenDecoder: Create the decoder instance
  *****************************************************************************/
 static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     JNIEnv* env = NULL;
+    const char *mime;
 
     if (p_dec->fmt_in.i_cat != VIDEO_ES && !p_dec->b_force)
         return VLC_EGENERIC;
 
     switch (p_dec->fmt_in.i_codec) {
-    case VLC_CODEC_H264:
-        /* We can handle h264 without a valid video size */
-        break;
-    case VLC_CODEC_HEVC:
-    case VLC_CODEC_H263:
-    case VLC_CODEC_MP4V:
-    case VLC_CODEC_WMV3:
-    case VLC_CODEC_VC1:
-    case VLC_CODEC_VP8:
-    case VLC_CODEC_VP9:
-        if (p_dec->fmt_in.video.i_width && p_dec->fmt_in.video.i_height)
-            break;
+    case VLC_CODEC_HEVC: mime = "video/hevc"; break;
+    case VLC_CODEC_H264: mime = "video/avc"; break;
+    case VLC_CODEC_H263: mime = "video/3gpp"; break;
+    case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
+    case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
+    case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
+    case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
+    case VLC_CODEC_VP9:  mime = "video/x-vnd.on2.vp9"; break;
     default:
-        msg_Dbg(p_dec, "codec %4.4s or resolution (%dx%d) not supported",
-                (char *)&p_dec->fmt_in.i_codec,
-                p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
+        msg_Dbg(p_dec, "codec %4.4s not supported",
+                (char *)&p_dec->fmt_in.i_codec);
         return VLC_EGENERIC;
+    }
+
+    if (!p_dec->fmt_in.video.i_width || !p_dec->fmt_in.video.i_height)
+    {
+        /* We can handle h264 without a valid video size */
+        if (p_dec->fmt_in.i_codec != VLC_CODEC_H264)
+        {
+            msg_Dbg(p_dec, "resolution (%dx%d) not supported",
+                    p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
+            return VLC_EGENERIC;
+        }
     }
 
     if (!(env = jni_get_env(THREAD_NAME)))
@@ -991,6 +1003,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (!p_dec->p_sys->timestamp_fifo)
         goto error;
 
+    p_dec->p_sys->mime = mime;
     p_dec->p_sys->b_new_block = true;
 
     switch (p_dec->fmt_in.i_codec)
@@ -1011,7 +1024,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         }
         break;
     }
-    return OpenMediaCodec(p_dec, env);
+    return StartMediaCodec(p_dec, env);
 
  error:
     CloseDecoder(p_this);
@@ -1031,12 +1044,11 @@ static void CloseDecoder(vlc_object_t *p_this)
         return;
 
     if ((env = jni_get_env(THREAD_NAME)))
-        CloseMediaCodec(p_dec, env);
+        StopMediaCodec(p_dec, env);
     else
         msg_Warn(p_dec, "Can't get a JNIEnv, can't close mediacodec !");
 
     CSDFree(p_dec);
-    free(p_sys->name);
     ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
     free(p_sys->pp_inflight_pictures);
     if (p_sys->timestamp_fifo)
@@ -1422,7 +1434,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     int i_output_ret = 0;
     int i_input_ret = 0;
     bool b_error = false;
-    bool b_delayed_open = false;
+    bool b_delayed_start = false;
     bool b_new_block = p_block ? p_sys->b_new_block : false;
 
     if (p_sys->error_state)
@@ -1464,7 +1476,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             {
                 msg_Err(p_dec, "SPS/PPS changed during playback and "
                         "video size are different. Restart it !");
-                CloseMediaCodec(p_dec, env);
+                StopMediaCodec(p_dec, env);
             } else
             {
                 msg_Err(p_dec, "SPS/PPS changed during playback. Flush it");
@@ -1473,7 +1485,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             }
         }
         if (!p_sys->codec)
-            b_delayed_open = true;
+            b_delayed_start = true;
     }
 
     /* try delayed opening if there is a new extra data */
@@ -1483,11 +1495,11 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         {
         case VLC_CODEC_VC1:
             if (p_dec->fmt_in.i_extra)
-                b_delayed_open = true;
+                b_delayed_start = true;
         default:
             break;
         }
-        if (b_delayed_open && OpenMediaCodec(p_dec, env) != VLC_SUCCESS)
+        if (b_delayed_start && StartMediaCodec(p_dec, env) != VLC_SUCCESS)
         {
             b_error = true;
             goto endclean;
