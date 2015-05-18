@@ -1,5 +1,5 @@
 /*****************************************************************************
- * android_mediacodec.c: Video decoder module using the Android MediaCodec API
+ * mediacodec.c: Video decoder module using the Android MediaCodec API
  *****************************************************************************
  * Copyright (C) 2012 Martin Storsjo
  *
