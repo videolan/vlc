@@ -840,6 +840,7 @@ static int Open( vlc_object_t *p_this )
 
     p_access->pf_readdir = ReadDirectory;
     p_access->info.b_dir_sorted = true;
+    p_access->info.b_dir_can_loop = true;
 
     return VLC_SUCCESS;
 }

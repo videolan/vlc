@@ -666,8 +666,10 @@ static int InOpen( vlc_object_t *p_this )
         b_directory = true;
 
     if( b_directory )
+    {
         p_access->pf_readdir = DirRead;
-    else
+        p_access->info.b_dir_can_loop = true;
+    } else
         ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek ); \
 
     /* Start the 'stream' */
