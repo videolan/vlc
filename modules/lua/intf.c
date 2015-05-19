@@ -390,8 +390,8 @@ void Close_LuaIntf( vlc_object_t *p_this )
     vlclua_fd_interrupt( &p_sys->dtable );
     vlc_join( p_sys->thread, NULL );
 
-    vlclua_fd_cleanup( &p_sys->dtable );
     lua_close( p_sys->L );
+    vlclua_fd_cleanup( &p_sys->dtable );
     free( p_sys->psz_filename );
     free( p_sys );
 }
