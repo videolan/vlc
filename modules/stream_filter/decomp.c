@@ -111,6 +111,11 @@ static void *Thread (void *data)
 #endif
     int fd = p_sys->write_fd;
     bool error = false;
+    sigset_t set;
+
+    sigemptyset(&set);
+    sigaddset(&set, SIGPIPE);
+    pthread_sigmask(SIG_BLOCK, &set, NULL);
 
     do
     {
