@@ -354,7 +354,7 @@ error:
 
 #undef net_Write
 /**
- * Writes data to a file descriptor.
+ * Writes data to a socket.
  * This blocks until all data is written or an error occurs.
  *
  * This function is a cancellation point.
@@ -407,11 +407,7 @@ ssize_t net_Write( vlc_object_t *p_this, int fd,
             }
         }
 
-#ifdef _WIN32
-        ssize_t val = send (fd, p_data, i_data, 0);
-#else
-        ssize_t val = write (fd, p_data, i_data);
-#endif
+        ssize_t val = send (fd, p_data, i_data, MSG_NOSIGNAL);
         if (val == -1)
         {
             if (errno == EINTR)
