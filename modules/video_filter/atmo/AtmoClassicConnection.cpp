@@ -24,6 +24,7 @@
 #if !defined(_WIN32)
 #include <termios.h>
 #include <unistd.h>
+#include <vlc_fs.h>
 #endif
 
 
@@ -73,7 +74,7 @@ ATMO_BOOL CAtmoClassicConnection::OpenConnection() {
 #else
 
      int bconst = B38400;
-     m_hComport = open(serdevice,O_RDWR |O_NOCTTY);
+     m_hComport = vlc_open(serdevice,O_RDWR | O_NOCTTY);
      if(m_hComport < 0) {
 	    return ATMO_FALSE;
      }
