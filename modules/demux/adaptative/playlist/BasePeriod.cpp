@@ -35,12 +35,13 @@
 
 using namespace adaptative::playlist;
 
-BasePeriod::BasePeriod(AbstractPlaylist *playlist) :
-    SegmentInformation( playlist )
+BasePeriod::BasePeriod(AbstractPlaylist *playlist_) :
+    SegmentInformation( playlist_ )
 {
     duration.Set(0);
     startTime.Set(0);
     baseUrl.Set(NULL);
+    playlist = playlist_;
 }
 
 BasePeriod::~BasePeriod ()
@@ -48,6 +49,11 @@ BasePeriod::~BasePeriod ()
     vlc_delete_all( adaptationSets );
     delete baseUrl.Get();
     childs.clear();
+}
+
+AbstractPlaylist *BasePeriod::getPlaylist() const
+{
+    return playlist;
 }
 
 const std::vector<BaseAdaptationSet*>&  BasePeriod::getAdaptationSets() const

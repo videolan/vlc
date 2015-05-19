@@ -36,9 +36,8 @@
 
 using namespace dash::mpd;
 
-Representation::Representation  ( AdaptationSet *set, MPD *mpd_ ) :
-                BaseRepresentation( set, mpd_ ),
-                mpd             ( mpd_ ),
+Representation::Representation  ( AdaptationSet *set ) :
+                BaseRepresentation( set ),
                 qualityRanking  ( -1 ),
                 trickModeType   ( NULL )
 {

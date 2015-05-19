@@ -61,6 +61,14 @@ SegmentInformation::~SegmentInformation()
     delete mediaSegmentTemplate;
 }
 
+AbstractPlaylist * SegmentInformation::getPlaylist() const
+{
+    if(parent)
+        return parent->getPlaylist();
+    else
+        return NULL;
+}
+
 vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
 {
     vector<ISegment *> retSegments;

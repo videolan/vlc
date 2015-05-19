@@ -228,7 +228,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
 
     for(size_t i = 0; i < representations.size(); i++)
     {
-        Representation *currentRepresentation = new Representation(adaptationSet, getMPD());
+        Representation *currentRepresentation = new Representation(adaptationSet);
         Node *repNode = representations.at(i);
 
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");

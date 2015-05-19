@@ -44,7 +44,7 @@ namespace dash
                                public UniqueNess<Representation>
         {
             public:
-                Representation( AdaptationSet *, MPD *mpd );
+                Representation( AdaptationSet * );
                 virtual ~Representation ();
 
                 int                 getQualityRanking       () const;
@@ -65,7 +65,6 @@ namespace dash
                                                   const BaseSegmentTemplate *) const; // reimpl
 
             private:
-                MPD                                *mpd;
                 int                                 qualityRanking;
                 std::list<const Representation*>    dependencies;
                 TrickModeType                       *trickModeType;

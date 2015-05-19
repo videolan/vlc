@@ -42,7 +42,7 @@ namespace adaptative
                                    public SegmentInformation
         {
             public:
-                BaseRepresentation( BaseAdaptationSet *, AbstractPlaylist *playlist );
+                BaseRepresentation( BaseAdaptationSet * );
                 virtual ~BaseRepresentation ();
 
                 /*
@@ -54,8 +54,6 @@ namespace adaptative
                 uint64_t            getBandwidth            () const;
                 void                setBandwidth            ( uint64_t bandwidth );
 
-                AbstractPlaylist*   getPlaylist             () const;
-
                 void                debug                   (vlc_object_t *,int = 0) const;
 
                 /* for segment templates */
@@ -63,7 +61,6 @@ namespace adaptative
                                                   const BaseSegmentTemplate *) const;
 
             protected:
-                AbstractPlaylist                   *playlist;
                 BaseAdaptationSet                  *adaptationSet;
                 uint64_t                            bandwidth;
         };

@@ -56,6 +56,7 @@ namespace adaptative
                 virtual ~SegmentInformation();
                 bool canBitswitch() const;
                 virtual mtime_t getPeriodStart() const;
+                virtual AbstractPlaylist *getPlaylist() const;
 
                 class SplitPoint
                 {
@@ -82,6 +83,7 @@ namespace adaptative
                 std::vector<ISegment *> getSegments() const;
                 std::vector<ISegment *> getSegments(SegmentInfoType) const;
                 std::vector<SegmentInformation *> childs;
+                SegmentInformation *parent;
 
             public:
                 void setSegmentList(SegmentList *);
@@ -97,7 +99,6 @@ namespace adaptative
                 SegmentList *     inheritSegmentList() const;
                 MediaSegmentTemplate * inheritSegmentTemplate() const;
 
-                SegmentInformation *parent;
                 SegmentBase     *segmentBase;
                 SegmentList     *segmentList;
                 MediaSegmentTemplate *mediaSegmentTemplate;

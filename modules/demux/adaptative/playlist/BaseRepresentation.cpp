@@ -33,9 +33,8 @@
 
 using namespace adaptative::playlist;
 
-BaseRepresentation::BaseRepresentation( BaseAdaptationSet *set, AbstractPlaylist *playlist_ ) :
+BaseRepresentation::BaseRepresentation( BaseAdaptationSet *set ) :
                 SegmentInformation( set ),
-                playlist        ( playlist_ ),
                 adaptationSet   ( set ),
                 bandwidth       (0)
 {
@@ -64,11 +63,6 @@ void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
     std::vector<ISegment *>::const_iterator l;
     for(l = list.begin(); l < list.end(); ++l)
         (*l)->debug(obj, indent + 1);
-}
-
-AbstractPlaylist * BaseRepresentation::getPlaylist() const
-{
-    return playlist;
 }
 
 std::string BaseRepresentation::contextualize(size_t, const std::string &component,
