@@ -378,8 +378,9 @@ static const staticentry_t p_list_video[] = {
         A("FLJP"),
         A("FMJP"),
         A("SJPG"),
-        A("QIVG"),
-        A("qIVG"),
+        A("QIVG"), /* Probably QNAP */
+        A("qIVG"), /* Probably QNAP */
+        A("wIVG"), /* Probably QNAP */
         E("AVRn", "Avid Motion JPEG"),
         E("AVDJ", "Avid Motion JPEG"),
         E("ADJV", "Avid Motion JPEG"),
