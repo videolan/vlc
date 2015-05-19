@@ -141,6 +141,35 @@ struct csd
     size_t i_size;
 };
 
+struct mc_out
+{
+    enum {
+        MC_OUT_TYPE_BUF,
+        MC_OUT_TYPE_CONF,
+    } type;
+    union
+    {
+        struct
+        {
+            int i_index;
+            mtime_t i_ts;
+            const void *p_ptr;
+            int i_size;
+        } buf;
+        struct
+        {
+            int width, height;
+            int stride;
+            int slice_height;
+            int pixel_format;
+            int crop_left;
+            int crop_top;
+            int crop_right;
+            int crop_bottom;
+        } conf;
+    } u;
+};
+
 struct decoder_sys_t
 {
     uint32_t nal_size;
@@ -1238,7 +1267,8 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
     }
 }
 
-static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong timeout)
+static int JniGetOutput(decoder_t *p_dec, JNIEnv *env,
+                        struct mc_out *p_out, mtime_t timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int index = (*env)->CallIntMethod(env, p_sys->codec, jfields.dequeue_output_buffer,
@@ -1249,39 +1279,13 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
     }
 
     if (index >= 0) {
-        int64_t i_buffer_pts;
-
-        /* If the oldest input block had no PTS, the timestamp of the frame
-         * returned by MediaCodec might be wrong so we overwrite it with the
-         * corresponding dts. Call FifoGet first in order to avoid a gap if
-         * buffers are released due to an invalid format or a preroll */
-        int64_t forced_ts = timestamp_FifoGet(p_sys->timestamp_fifo);
-
-        if (!p_sys->pixel_format || !p_pic) {
-            msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
-            return ReleaseOutputBuffer(p_dec, env, index, false);
-        }
-
-        i_buffer_pts = (*env)->GetLongField(env, p_sys->buffer_info, jfields.pts_field);
-        if (i_buffer_pts <= p_sys->i_preroll_end)
-            return ReleaseOutputBuffer(p_dec, env, index, false);
-
-        if (forced_ts == VLC_TS_INVALID)
-            p_pic->date = i_buffer_pts;
-        else
-            p_pic->date = forced_ts;
+        p_out->type = MC_OUT_TYPE_BUF;
+        p_out->u.buf.i_index = index;
+        p_out->u.buf.i_ts = (*env)->GetLongField(env, p_sys->buffer_info, jfields.pts_field);
 
         if (p_sys->direct_rendering) {
-            picture_sys_t *p_picsys = p_pic->p_sys;
-            p_picsys->pf_lock_pic = NULL;
-            p_picsys->pf_unlock_pic = UnlockPicture;
-            p_picsys->priv.hw.p_dec = p_dec;
-            p_picsys->priv.hw.i_index = index;
-            p_picsys->priv.hw.b_valid = true;
-
-            vlc_mutex_lock(get_android_opaque_mutex());
-            InsertInflightPicture(p_dec, p_pic, index);
-            vlc_mutex_unlock(get_android_opaque_mutex());
+            p_out->u.buf.p_ptr = NULL;
+            p_out->u.buf.i_size = 0;
         } else {
             jobject buf;
             if (jfields.get_output_buffers)
@@ -1292,28 +1296,10 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
             //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
             uint8_t *ptr = (*env)->GetDirectBufferAddress(env, buf);
 
-            //int size = (*env)->GetIntField(env, p_sys->buffer_info, jfields.size_field);
             int offset = (*env)->GetIntField(env, p_sys->buffer_info, jfields.offset_field);
-            ptr += offset; // Check the size parameter as well
-
-            unsigned int chroma_div;
-            GetVlcChromaSizes(p_dec->fmt_out.i_codec, p_dec->fmt_out.video.i_width,
-                              p_dec->fmt_out.video.i_height, NULL, NULL, &chroma_div);
-            CopyOmxPicture(p_sys->pixel_format, p_pic, p_sys->slice_height, p_sys->stride,
-                           ptr, chroma_div, &p_sys->architecture_specific_data);
-            (*env)->CallVoidMethod(env, p_sys->codec, jfields.release_output_buffer, index, false);
-
-            jthrowable exception = (*env)->ExceptionOccurred(env);
-            if (exception != NULL) {
-                jclass illegalStateException = (*env)->FindClass(env, "java/lang/IllegalStateException");
-                if((*env)->IsInstanceOf(env, exception, illegalStateException)) {
-                    msg_Err(p_dec, "Codec error (IllegalStateException) in MediaCodec.releaseOutputBuffer");
-                    (*env)->ExceptionClear(env);
-                    (*env)->DeleteLocalRef(env, illegalStateException);
-                    (*env)->DeleteLocalRef(env, buf);
-                    return -1;
-                }
-            }
+            p_out->u.buf.p_ptr = ptr + offset;
+            p_out->u.buf.i_size = (*env)->GetIntField(env, p_sys->buffer_info,
+                                                       jfields.size_field);
             (*env)->DeleteLocalRef(env, buf);
         }
         return 1;
@@ -1354,18 +1340,85 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
         msg_Dbg(p_dec, "output format changed: %.*s", format_len, format_ptr);
         (*env)->ReleaseStringUTFChars(env, format_string, format_ptr);
 
-        ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format, &p_sys->architecture_specific_data);
+        p_out->type = MC_OUT_TYPE_CONF;
+        p_out->u.conf.width         = GET_INTEGER(format, "width");
+        p_out->u.conf.height        = GET_INTEGER(format, "height");
+        p_out->u.conf.stride        = GET_INTEGER(format, "stride");
+        p_out->u.conf.slice_height  = GET_INTEGER(format, "slice-height");
+        p_out->u.conf.pixel_format  = GET_INTEGER(format, "color-format");
+        p_out->u.conf.crop_left     = GET_INTEGER(format, "crop-left");
+        p_out->u.conf.crop_top      = GET_INTEGER(format, "crop-top");
+        p_out->u.conf.crop_right    = GET_INTEGER(format, "crop-right");
+        p_out->u.conf.crop_bottom   = GET_INTEGER(format, "crop-bottom");
 
-        int width           = GET_INTEGER(format, "width");
-        int height          = GET_INTEGER(format, "height");
-        p_sys->stride       = GET_INTEGER(format, "stride");
-        p_sys->slice_height = GET_INTEGER(format, "slice-height");
-        p_sys->pixel_format = GET_INTEGER(format, "color-format");
-        int crop_left       = GET_INTEGER(format, "crop-left");
-        int crop_top        = GET_INTEGER(format, "crop-top");
-        int crop_right      = GET_INTEGER(format, "crop-right");
-        int crop_bottom     = GET_INTEGER(format, "crop-bottom");
         (*env)->DeleteLocalRef(env, format);
+        return 1;
+    }
+    return 0;
+}
+
+static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic,
+                     mtime_t i_timeout)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct mc_out out;
+    int i_ret = JniGetOutput(p_dec, env, &out, i_timeout);
+
+    if (i_ret != 1)
+        return i_ret;
+    if (out.type == MC_OUT_TYPE_BUF)
+    {
+        /* If the oldest input block had no PTS, the timestamp of
+         * the frame returned by MediaCodec might be wrong so we
+         * overwrite it with the corresponding dts. Call FifoGet
+         * first in order to avoid a gap if buffers are released
+         * due to an invalid format or a preroll */
+        int64_t forced_ts = timestamp_FifoGet(p_sys->timestamp_fifo);
+
+        if (!p_sys->pixel_format || !p_pic) {
+            msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
+            return ReleaseOutputBuffer(p_dec, env, out.u.buf.i_index, false);
+        }
+
+        if (out.u.buf.i_ts <= p_sys->i_preroll_end)
+            return ReleaseOutputBuffer(p_dec, env, out.u.buf.i_index, false);
+
+        if (forced_ts == VLC_TS_INVALID)
+            p_pic->date = out.u.buf.i_ts;
+        else
+            p_pic->date = forced_ts;
+
+        if (p_sys->direct_rendering)
+        {
+            picture_sys_t *p_picsys = p_pic->p_sys;
+            p_picsys->pf_lock_pic = NULL;
+            p_picsys->pf_unlock_pic = UnlockPicture;
+            p_picsys->priv.hw.p_dec = p_dec;
+            p_picsys->priv.hw.i_index = out.u.buf.i_index;
+            p_picsys->priv.hw.b_valid = true;
+
+            vlc_mutex_lock(get_android_opaque_mutex());
+            InsertInflightPicture(p_dec, p_pic, out.u.buf.i_index);
+            vlc_mutex_unlock(get_android_opaque_mutex());
+        } else {
+            unsigned int chroma_div;
+            GetVlcChromaSizes(p_dec->fmt_out.i_codec,
+                              p_dec->fmt_out.video.i_width,
+                              p_dec->fmt_out.video.i_height,
+                              NULL, NULL, &chroma_div);
+            CopyOmxPicture(p_sys->pixel_format, p_pic,
+                           p_sys->slice_height, p_sys->stride,
+                           (uint8_t *)out.u.buf.p_ptr, chroma_div,
+                           &p_sys->architecture_specific_data);
+            if (ReleaseOutputBuffer(p_dec, env, out.u.buf.i_index, false) != 0)
+                return -1;
+        }
+        return 1;
+    } else {
+        assert(out.type == MC_OUT_TYPE_CONF);
+        p_sys->pixel_format = out.u.conf.pixel_format;
+        ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format,
+                                             &p_sys->architecture_specific_data);
 
         const char *name = "unknown";
         if (!p_sys->direct_rendering) {
@@ -1377,35 +1430,40 @@ static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong time
         }
 
         msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
-                p_sys->pixel_format, name, width, height, p_sys->stride, p_sys->slice_height,
-                crop_left, crop_top, crop_right, crop_bottom);
+                p_sys->pixel_format, name, out.u.conf.width, out.u.conf.height,
+                out.u.conf.stride, out.u.conf.slice_height,
+                out.u.conf.crop_left, out.u.conf.crop_top,
+                out.u.conf.crop_right, out.u.conf.crop_bottom);
 
-        p_dec->fmt_out.video.i_width = crop_right + 1 - crop_left;
-        p_dec->fmt_out.video.i_height = crop_bottom + 1 - crop_top;
+        p_dec->fmt_out.video.i_width = out.u.conf.crop_right + 1 - out.u.conf.crop_left;
+        p_dec->fmt_out.video.i_height = out.u.conf.crop_bottom + 1 - out.u.conf.crop_top;
         if (p_dec->fmt_out.video.i_width <= 1
             || p_dec->fmt_out.video.i_height <= 1) {
-            p_dec->fmt_out.video.i_width = width;
-            p_dec->fmt_out.video.i_height = height;
+            p_dec->fmt_out.video.i_width = out.u.conf.width;
+            p_dec->fmt_out.video.i_height = out.u.conf.height;
         }
         p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
         p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
 
+        p_sys->stride = out.u.conf.stride;
+        p_sys->slice_height = out.u.conf.slice_height;
         if (p_sys->stride <= 0)
-            p_sys->stride = width;
+            p_sys->stride = out.u.conf.width;
         if (p_sys->slice_height <= 0)
-            p_sys->slice_height = height;
+            p_sys->slice_height = out.u.conf.height;
 
-        ArchitectureSpecificCopyHooks(p_dec, p_sys->pixel_format, p_sys->slice_height,
+        ArchitectureSpecificCopyHooks(p_dec, out.u.conf.pixel_format,
+                                      out.u.conf.slice_height,
                                       p_sys->stride, &p_sys->architecture_specific_data);
         if (p_sys->pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
-            p_sys->slice_height -= crop_top/2;
+            p_sys->slice_height -= out.u.conf.crop_top/2;
         if (IgnoreOmxDecoderPadding(p_sys->name)) {
             p_sys->slice_height = 0;
             p_sys->stride = p_dec->fmt_out.video.i_width;
         }
         p_sys->b_update_format = true;
+        return 0;
     }
-    return 0;
 }
 
 static void H264ProcessBlock(decoder_t *p_dec, block_t *p_block,
