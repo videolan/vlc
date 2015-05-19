@@ -1140,14 +1140,15 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_t *p_pic,
     return 0;
 }
 
-static int PutInput(decoder_t *p_dec, JNIEnv *env, const void *p_buf,
-                    size_t i_size, mtime_t ts, jint jflags, jlong timeout)
+static int JniPutInput(decoder_t *p_dec, JNIEnv *env, const void *p_buf,
+                       size_t i_size, mtime_t ts, bool b_config, mtime_t timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int index;
     uint8_t *p_mc_buf;
     jobject j_mc_buf;
     jsize j_mc_size;
+    jint jflags = b_config ? BUFFER_FLAG_CODEC_CONFIG : 0;
 
     index = (*env)->CallIntMethod(env, p_sys->codec,
                                   jfields.dequeue_input_buffer, timeout);
@@ -1184,6 +1185,57 @@ static int PutInput(decoder_t *p_dec, JNIEnv *env, const void *p_buf,
     }
 
     return 1;
+}
+
+static int PutInput(decoder_t *p_dec, JNIEnv *env, block_t *p_block,
+                    mtime_t timeout)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    int i_ret;
+    const void *p_buf;
+    size_t i_size;
+    bool b_config = false;
+    mtime_t i_ts = 0;
+
+    assert(p_sys->i_csd_send < p_sys->i_csd_count || p_block);
+
+    if (p_sys->i_csd_send < p_sys->i_csd_count)
+    {
+        /* Try to send Codec Specific Data */
+        p_buf = p_sys->p_csd[p_sys->i_csd_send].p_buf;
+        i_size = p_sys->p_csd[p_sys->i_csd_send].i_size;
+        b_config = true;
+    } else
+    {
+        /* Try to send p_block input buffer */
+        p_buf = p_block->p_buffer;
+        i_size = p_block->i_buffer;
+        i_ts = p_block->i_pts;
+        if (!i_ts && p_block->i_dts)
+            i_ts = p_block->i_dts;
+    }
+
+    i_ret = JniPutInput(p_dec, env, p_buf, i_size, i_ts, b_config, timeout);
+    if (i_ret != 1)
+        return i_ret;
+
+    if (p_sys->i_csd_send < p_sys->i_csd_count)
+    {
+        msg_Dbg(p_dec, "sent codec specific data(%d) of size %d "
+                "via BUFFER_FLAG_CODEC_CONFIG flag",
+                p_sys->i_csd_send, i_size);
+        p_sys->i_csd_send++;
+        return 0;
+    }
+    else
+    {
+        p_sys->decoded = true;
+        if (p_block->i_flags & BLOCK_FLAG_PREROLL )
+            p_sys->i_preroll_end = i_ts;
+        timestamp_FifoPut(p_sys->timestamp_fifo,
+                          p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
+        return 1;
+    }
 }
 
 static int GetOutput(decoder_t *p_dec, JNIEnv *env, picture_t *p_pic, jlong timeout)
@@ -1525,50 +1577,9 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         if ((p_sys->i_csd_send < p_sys->i_csd_count || p_block)
          && i_input_ret == 0)
         {
-            const void *p_buf;
-            size_t i_size;
-            jint jflags = 0;
-            mtime_t i_ts = 0;
-
-            if (p_sys->i_csd_send < p_sys->i_csd_count)
-            {
-                /* Try to send Codec Specific Data */
-                p_buf = p_sys->p_csd[p_sys->i_csd_send].p_buf;
-                i_size = p_sys->p_csd[p_sys->i_csd_send].i_size;
-                jflags = BUFFER_FLAG_CODEC_CONFIG;
-            } else
-            {
-                /* Try to send p_block input buffer */
-                p_buf = p_block->p_buffer;
-                i_size = p_block->i_buffer;
-                i_ts = p_block->i_pts;
-                if (!i_ts && p_block->i_dts)
-                    i_ts = p_block->i_dts;
-            }
-
-            i_input_ret = PutInput(p_dec, env, p_buf, i_size, i_ts, jflags,
-                                   timeout);
-
-            if (i_input_ret == 1)
-            {
-                if (p_sys->i_csd_send < p_sys->i_csd_count)
-                {
-                    msg_Dbg(p_dec, "sent codec specific data(%d) of size %d "
-                            "via BUFFER_FLAG_CODEC_CONFIG flag",
-                            p_sys->i_csd_send, i_size);
-                    p_sys->i_csd_send++;
-                    i_input_ret = 0;
+            i_input_ret = PutInput(p_dec, env, p_block, timeout);
+            if (!p_sys->decoded)
                     continue;
-                }
-                else
-                {
-                    p_sys->decoded = true;
-                    if (p_block->i_flags & BLOCK_FLAG_PREROLL )
-                        p_sys->i_preroll_end = i_ts;
-                    timestamp_FifoPut(p_sys->timestamp_fifo,
-                                      p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
-                }
-            }
         }
 
         if (i_input_ret != -1 && p_sys->decoded && i_output_ret == 0)
