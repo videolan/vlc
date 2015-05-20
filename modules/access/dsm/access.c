@@ -385,8 +385,10 @@ static void login_dialog( access_t *p_access )
 static int smb_connect( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    const char *psz_domain = p_sys->creds.domain ?
+                             p_sys->creds.domain : p_sys->netbios_name;
 
-    smb_session_set_creds( p_sys->p_session, p_sys->creds.domain,
+    smb_session_set_creds( p_sys->p_session, psz_domain,
                            p_sys->creds.login, p_sys->creds.password );
     return smb_session_login( p_sys->p_session ) ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -401,8 +403,6 @@ static int login( access_t *p_access )
         p_sys->creds.login = strdup( "Guest" );
     if( p_sys->creds.password == NULL )
         p_sys->creds.password = strdup( "Guest" );
-    if( p_sys->creds.domain == NULL )
-        p_sys->creds.domain = strdup( "WORKGROUP" );
 
     /* Try to authenticate on the remote machine */
     if( smb_connect( p_access ) != VLC_SUCCESS )
@@ -414,7 +414,6 @@ static int login( access_t *p_access )
                 return VLC_SUCCESS;
         }
 
-        /* FIXME, Try to force netbios name as domain then WORKGROUP here */
         msg_Err( p_access, "Unable to login with username = %s, domain = %s",
                    p_sys->creds.login, p_sys->creds.domain );
         return VLC_EGENERIC;
