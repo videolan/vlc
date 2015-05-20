@@ -122,7 +122,7 @@ static void     Close(vlc_object_t *);
 #define MAX_BITRATE_TEXT N_("Maximum Bitrate")
 #define MAX_BITRATE_LONGTEXT N_("Defines the maximum bitrate in Kpbs " \
     "(1000 bits/s) for VBR rate control method. If not set, this parameter" \
-    ". is computed from other sources such as bitrate, profile, level, etc.")
+    " is computed from other sources such as bitrate, profile, level, etc.")
 
 #define ACCURACY_TEXT N_("Accuracy of RateControl")
 #define ACCURACY_LONGTEXT N_("Tolerance in percentage of the 'avbr' " \
