@@ -60,6 +60,7 @@ Demuxers:
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
+ * Removed HTTP Live streaming stream filter
 
 Audio output:
  * Complete rewrite of the AudioTrack Android module. This is now the default.
