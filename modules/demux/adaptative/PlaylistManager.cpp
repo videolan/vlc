@@ -52,6 +52,7 @@ PlaylistManager::PlaylistManager( AbstractPlaylist *pl,
              conManager     ( NULL ),
              logicType      ( type ),
              playlist       ( pl ),
+             streamOutputFactory( NULL ),
              stream         ( stream ),
              nextPlaylistupdate  ( 0 )
 {
@@ -90,11 +91,13 @@ bool PlaylistManager::start(demux_t *demux)
             }
 
             SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, playlist);
+            DefaultStreamOutputFactory defaultfactory;
             try
             {
                 if(!tracker)
                     throw VLC_ENOMEM;
-                streams[type]->create(demux, logic, tracker);
+                streams[type]->create(demux, logic, tracker,
+                                      (streamOutputFactory) ? *streamOutputFactory : defaultfactory );
             } catch (int) {
                 delete streams[type];
                 delete logic;

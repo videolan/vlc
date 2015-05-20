@@ -41,6 +41,8 @@ namespace adaptative
     using namespace logic;
     using namespace http;
 
+    class AbstractStreamFactory;
+
     class PlaylistManager
     {
         public:
@@ -60,11 +62,13 @@ namespace adaptative
             virtual bool updatePlaylist();
 
         protected:
+            /* local factories */
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType);
 
             HTTPConnectionManager              *conManager;
             AbstractAdaptationLogic::LogicType  logicType;
             AbstractPlaylist                    *playlist;
+            AbstractStreamOutputFactory         *streamOutputFactory;
             stream_t                            *stream;
             Stream                              *streams[StreamTypeCount];
             mtime_t                              nextPlaylistupdate;

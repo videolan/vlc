@@ -46,6 +46,7 @@ namespace adaptative
 
 
     class AbstractStreamOutput;
+    class AbstractStreamOutputFactory;
 
     using namespace http;
     using namespace logic;
@@ -59,7 +60,8 @@ namespace adaptative
         bool operator==(const Stream &) const;
         static StreamType mimeToType(const std::string &mime);
         static StreamFormat mimeToFormat(const std::string &mime);
-        void create(demux_t *, AbstractAdaptationLogic *, SegmentTracker *);
+        void create(demux_t *, AbstractAdaptationLogic *,
+                    SegmentTracker *, AbstractStreamOutputFactory &);
         bool isEOF() const;
         mtime_t getPCR() const;
         int getGroup() const;
@@ -125,6 +127,18 @@ namespace adaptative
         std::list<Demuxed *> queues;
         vlc_mutex_t lock;
         void sendToDecoderUnlocked(mtime_t);
+    };
+
+    class AbstractStreamOutputFactory
+    {
+        public:
+            virtual AbstractStreamOutput *create(demux_t*, int streamType) const = 0;
+    };
+
+    class DefaultStreamOutputFactory : public AbstractStreamOutputFactory
+    {
+        public:
+            virtual AbstractStreamOutput *create(demux_t*, int streamType) const;
     };
 
     class MP4StreamOutput : public AbstractStreamOutput

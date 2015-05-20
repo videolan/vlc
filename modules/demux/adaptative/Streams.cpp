@@ -90,20 +90,10 @@ StreamFormat Stream::mimeToFormat(const std::string &mime)
     return format;
 }
 
-void Stream::create(demux_t *demux, AbstractAdaptationLogic *logic, SegmentTracker *tracker)
+void Stream::create(demux_t *demux, AbstractAdaptationLogic *logic,
+                    SegmentTracker *tracker, AbstractStreamOutputFactory &factory)
 {
-    switch(format)
-    {
-        case StreamFormat::MP4:
-            output = new MP4StreamOutput(demux);
-            break;
-        case StreamFormat::MPEG2TS:
-            output = new MPEG2TSStreamOutput(demux);
-            break;
-        default:
-            throw VLC_EBADVAR;
-            break;
-    }
+    output = factory.create(demux, format);
     adaptationLogic = logic;
     segmentTracker = tracker;
 }
@@ -451,6 +441,24 @@ void AbstractStreamOutput::esOutDestroy(es_out_t *fakees)
     me->realdemux->out->pf_destroy(me->realdemux->out);
 }
 /* !Static callbacks */
+
+AbstractStreamOutput *DefaultStreamOutputFactory::create(demux_t *demux, int format) const
+{
+    switch(format)
+    {
+        case StreamFormat::MP4:
+            return new MP4StreamOutput(demux);
+
+        case StreamFormat::MPEG2TS:
+            return new MPEG2TSStreamOutput(demux);
+
+        default:
+            throw VLC_EBADVAR;
+            break;
+    }
+    return NULL;
+}
+
 
 MP4StreamOutput::MP4StreamOutput(demux_t *demux) :
     AbstractStreamOutput(demux)
