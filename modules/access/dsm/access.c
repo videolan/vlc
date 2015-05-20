@@ -124,7 +124,6 @@ struct access_sys_t
 
     smb_fd              i_fd;               /**< SMB fd for the file we're reading */
     smb_tid             i_tid;              /**< SMB Tree ID we're connected to */
-    bool                b_is_browsing;
 
     size_t              i_browse_count;
     size_t              i_browse_idx;
@@ -185,10 +184,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
 
     if( !get_path( p_access ) )
-    {
-        p_sys->b_is_browsing = true;
         return BrowserInit( p_access );
-    }
 
     msg_Dbg( p_access, "Path: Share name = %s, path = %s", p_sys->psz_share,
              p_sys->psz_path );
@@ -215,7 +211,6 @@ static int Open( vlc_object_t *p_this )
     if( smb_stat_get( st, SMB_STAT_ISDIR ) )
     {
         smb_fclose( p_sys->p_session, p_sys->i_fd );
-        p_sys->b_is_browsing = true;
         return BrowserInit( p_access );
     }
 
