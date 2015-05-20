@@ -382,6 +382,15 @@ static void login_dialog( access_t *p_access )
     }
 }
 
+static int smb_connect( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    smb_session_set_creds( p_sys->p_session, p_sys->creds.domain,
+                           p_sys->creds.login, p_sys->creds.password );
+    return smb_session_login( p_sys->p_session ) ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
 /* Performs login with existing credentials and ask the user for new ones on
    failure */
 static int login( access_t *p_access )
@@ -396,16 +405,12 @@ static int login( access_t *p_access )
         p_sys->creds.domain = strdup( "WORKGROUP" );
 
     /* Try to authenticate on the remote machine */
-    smb_session_set_creds( p_sys->p_session, p_sys->creds.domain,
-                           p_sys->creds.login, p_sys->creds.password );
-    if( !smb_session_login( p_sys->p_session ) )
+    if( smb_connect( p_access ) != VLC_SUCCESS )
     {
         for( int i = 0; i < BDSM_LOGIN_DIALOG_RETRY; i++ )
         {
             login_dialog( p_access );
-            smb_session_set_creds( p_sys->p_session, p_sys->creds.domain,
-                                   p_sys->creds.login, p_sys->creds.password );
-            if( smb_session_login( p_sys->p_session ) )
+            if( smb_connect( p_access ) == VLC_SUCCESS )
                 return VLC_SUCCESS;
         }
 
