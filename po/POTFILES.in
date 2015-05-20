@@ -384,7 +384,10 @@ modules/codec/lpcm.c
 modules/codec/mft.c
 modules/codec/mpeg_audio.c
 modules/codec/mpg123.c
-modules/codec/omxil/android_mediacodec.c
+modules/codec/omxil/mediacodec.c
+modules/codec/omxil/mediacodec_jni.c
+modules/codec/omxil/mediacodec_ndk.c
+modules/codec/omxil/mediacodec.h
 modules/codec/omxil/omxil.c
 modules/codec/omxil/omxil.h
 modules/codec/omxil/omxil_utils.h
