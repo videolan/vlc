@@ -82,27 +82,12 @@ struct access_sys_t
     directory *current;
     char      *ignored_exts;
     char       mode;
-    int        (*compar) (const char **a, const char **b);
 };
 
 /* Select non-hidden files only */
 static int visible (const char *name)
 {
     return name[0] != '.';
-}
-
-static int collate (const char **a, const char **b)
-{
-#ifdef HAVE_STRCOLL
-    return strcoll (*a, *b);
-#else
-    return strcmp  (*a, *b);
-#endif
-}
-
-static int version (const char **a, const char **b)
-{
-    return strverscmp (*a, *b);
 }
 
 /**
@@ -212,7 +197,7 @@ static bool directory_push (access_sys_t *p_sys, DIR *handle, char *psz_uri)
     p_dir->parent = p_sys->current;
     p_dir->handle = handle;
     p_dir->uri = psz_uri;
-    p_dir->filec = vlc_loaddir (handle, &p_dir->filev, visible, p_sys->compar);
+    p_dir->filec = vlc_loaddir (handle, &p_dir->filev, visible, NULL);
     if (p_dir->filec < 0)
         p_dir->filev = NULL;
     p_dir->i = 0;
@@ -288,17 +273,6 @@ int DirInit (access_t *p_access, DIR *handle)
     access_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (unlikely (p_sys == NULL))
         goto error;
-
-    char *psz_sort = var_InheritString (p_access, "directory-sort");
-    if (!psz_sort)
-        p_sys->compar = collate;
-    else if (!strcasecmp ( psz_sort, "version"))
-        p_sys->compar = version;
-    else if (!strcasecmp (psz_sort, "none"))
-        p_sys->compar = NULL;
-    else
-        p_sys->compar = collate;
-    free(psz_sort);
 
     char *uri;
     if (!strcmp (p_access->psz_access, "fd"))

@@ -37,16 +37,6 @@
         "This is useful if you add directories that contain playlist files " \
         "for instance. Use a comma-separated list of extensions." )
 
-static const char *const psz_sort_list[] = { "collate", "version", "none" };
-static const char *const psz_sort_list_text[] = {
-    N_("Sort alphabetically according to the current language's collation rules."),
-    N_("Sort items in a natural order (for example: 1.ogg 2.ogg 10.ogg). This method does not take the current language's collation rules into account."),
-    N_("Do not sort the items.") };
-
-#define SORT_TEXT N_("Directory sort order")
-#define SORT_LONGTEXT N_( \
-    "Define the sort algorithm used when adding items from a directory." )
-
 vlc_module_begin ()
     set_description( N_("File input") )
     set_shortname( N_("File") )
@@ -62,8 +52,6 @@ vlc_module_begin ()
     set_capability( "access", 55 )
     add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,sub,idx,srt,cue,ssa",
                 IGNORE_TEXT, IGNORE_LONGTEXT, false )
-    add_string( "directory-sort", "collate", SORT_TEXT, SORT_LONGTEXT, false )
-      change_string_list( psz_sort_list, psz_sort_list_text )
 #ifndef HAVE_FDOPENDIR
     add_shortcut( "file", "directory", "dir" )
 #else

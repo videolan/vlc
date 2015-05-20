@@ -51,6 +51,16 @@
 #define SKIP_ADS_LONGTEXT N_( "Use playlist options usually used to prevent " \
     "ads skipping to detect ads and prevent adding them to the playlist." )
 
+static const char *const psz_sort_list[] = { "collate", "version", "none" };
+static const char *const psz_sort_list_text[] = {
+    N_("Sort alphabetically according to the current language's collation rules."),
+    N_("Sort items in a natural order (for example: 1.ogg 2.ogg 10.ogg). This method does not take the current language's collation rules into account."),
+    N_("Do not sort the items.") };
+
+#define SORT_TEXT N_("Directory sort order")
+#define SORT_LONGTEXT N_( \
+    "Define the sort algorithm used when adding items from a directory." )
+
 vlc_module_begin ()
     add_shortcut( "playlist" )
     set_category( CAT_INPUT )
@@ -145,6 +155,8 @@ vlc_module_begin ()
         add_shortcut( "playlist", "directory" )
         set_capability( "demux", 10 )
         set_callbacks( Import_Dir, Close_Dir )
+        add_string( "directory-sort", "collate", SORT_TEXT, SORT_LONGTEXT, false )
+          change_string_list( psz_sort_list, psz_sort_list_text )
 vlc_module_end ()
 
 int Control(demux_t *demux, int query, va_list args)
