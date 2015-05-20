@@ -419,7 +419,7 @@ static int login( access_t *p_access )
                    p_sys->creds.login, p_sys->creds.domain );
         return VLC_EGENERIC;
     }
-    else if( smb_session_is_guest( p_sys->p_session ) == 1 )
+    else if( smb_session_is_guest( p_sys->p_session )  )
         msg_Warn( p_access, "Login failure but you were logged in as a Guest");
 
     return VLC_SUCCESS;
