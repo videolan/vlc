@@ -35,9 +35,6 @@
 #include <float.h>
 #include <math.h>
 #include <limits.h>
-#ifdef __GLIBC__
-# include <dlfcn.h>
-#endif
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
@@ -155,25 +152,6 @@ static void Destroy( variable_t *p_var )
         free( p_var->choices.p_values );
         free( p_var->choices_text.p_values );
     }
-#if 0 // ndef NDEBUG
-    callback_table_t *p_table = &p_var->value_callbacks;
-    for (int i = 0; i < p_table->i_entries; i++)
-    {
-        const char *file = "?", *symbol = "?";
-        const void *addr = p_table->p_entries[i].pf_callback;
-# ifdef __GLIBC__
-        Dl_info info;
-
-        if (dladdr (addr, &info))
-        {
-            if (info.dli_fname) file = info.dli_fname;
-            if (info.dli_sname) symbol = info.dli_sname;
-        }
-# endif
-        fprintf (stderr, "Error: callback on \"%s\" dangling %s(%s)[%p]\n",
-                 p_var->psz_name, file, symbol, addr);
-    }
-#endif
 
     free( p_var->psz_name );
     free( p_var->psz_text );
