@@ -180,22 +180,20 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
+    get_path( p_access );
+
     if( login( p_access ) != VLC_SUCCESS )
-        goto error;
-
-    if( !get_path( p_access ) )
-        return BrowserInit( p_access );
-
-    msg_Dbg( p_access, "Path: Share name = %s, path = %s", p_sys->psz_share,
-             p_sys->psz_path );
-
-    /* Connect to the share */
-    p_sys->i_tid = smb_tree_connect( p_sys->p_session, p_sys->psz_share );
-    if( !p_sys->i_tid )
     {
         msg_Err( p_access, "Unable to connect to share %s", p_sys->psz_share );
         goto error;
     }
+
+    /* If there is no shares, browse them */
+    if( !p_sys->psz_share )
+        return BrowserInit( p_access );
+
+    msg_Dbg( p_access, "Path: Share name = %s, path = %s", p_sys->psz_share,
+             p_sys->psz_path );
 
     /* Let's finally ask a handle to the file we wanna read ! */
     p_sys->i_fd = smb_fopen( p_sys->p_session, p_sys->i_tid, p_sys->psz_path,
@@ -390,7 +388,19 @@ static int smb_connect( access_t *p_access )
 
     smb_session_set_creds( p_sys->p_session, psz_domain,
                            p_sys->creds.login, p_sys->creds.password );
-    return smb_session_login( p_sys->p_session ) ? VLC_SUCCESS : VLC_EGENERIC;
+    if( smb_session_login( p_sys->p_session ) )
+    {
+        if( p_sys->psz_share )
+        {
+            /* Connect to the share */
+            p_sys->i_tid = smb_tree_connect( p_sys->p_session, p_sys->psz_share );
+            if( !p_sys->i_tid )
+                return VLC_EGENERIC;
+        }
+        return VLC_SUCCESS;
+    }
+    else
+        return VLC_EGENERIC;
 }
 
 /* Performs login with existing credentials and ask the user for new ones on
