@@ -30,6 +30,7 @@ typedef struct mc_api_out mc_api_out;
 typedef int (*pf_MediaCodecApi_init)(mc_api*);
 
 int MediaCodecJni_Init(mc_api*);
+int MediaCodecNdk_Init(mc_api*);
 
 struct mc_api_out
 {

@@ -398,7 +398,7 @@ libiomx_plugin_la_LIBADD = $(libomxil_plugin_la_LIBADD)
 
 libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacodec.h \
-	codec/omxil/mediacodec_jni.c codec/omxil/utils.c \
+	codec/omxil/mediacodec_jni.c codec/omxil/mediacodec_ndk.c codec/omxil/utils.c \
 	video_chroma/copy.c codec/omxil/android_opaque.c codec/omxil/android_opaque.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h
 	packetizer/hevc_nal.c packetizer/hevc_nal.h

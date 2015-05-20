@@ -173,6 +173,7 @@ struct decoder_sys_t
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoderJni(vlc_object_t *);
+static int  OpenDecoderNdk(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
 static picture_t *DecodeVideo(decoder_t *, block_t **);
@@ -197,8 +198,12 @@ vlc_module_begin ()
     set_capability( "decoder", 0 ) /* Only enabled via commandline arguments */
     add_bool(CFG_PREFIX "dr", true,
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
-    set_callbacks( OpenDecoderJni, CloseDecoder )
-    add_shortcut( "mediacodec_jni" )
+    set_callbacks( OpenDecoderNdk, CloseDecoder )
+    add_shortcut( "mediacodec_ndk" )
+    add_submodule ()
+        set_capability( "decoder", 0 )
+        set_callbacks( OpenDecoderJni, CloseDecoder )
+        add_shortcut( "mediacodec_jni" )
 vlc_module_end ()
 
 
@@ -540,6 +545,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         break;
     }
     return StartMediaCodec(p_dec);
+}
+
+static int OpenDecoderNdk(vlc_object_t *p_this)
+{
+    return OpenDecoder(p_this, MediaCodecNdk_Init);
 }
 
 static int OpenDecoderJni(vlc_object_t *p_this)
