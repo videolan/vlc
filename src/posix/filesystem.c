@@ -304,6 +304,9 @@ int vlc_socket (int pf, int type, int proto, bool nonblock)
     fcntl (fd, F_SETFD, FD_CLOEXEC);
     if (nonblock)
         fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
+#ifdef SO_NOSIGPIPE
+    setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+#endif
     return fd;
 }
 
@@ -328,6 +331,10 @@ int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
         fd = accept4 (lfd, addr, alen, flags);
     while (fd == -1 && errno == EINTR);
 
+# ifdef SO_NOSIGPIPE
+    if (fd != -1)
+        setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+# endif
     if (fd != -1 || errno != ENOSYS)
         return fd;
 #endif
@@ -341,6 +348,9 @@ int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
         fcntl (fd, F_SETFD, FD_CLOEXEC);
         if (nonblock)
             fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
+#ifdef SO_NOSIGPIPE
+        setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+#endif
     }
     return fd;
 }
