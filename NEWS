@@ -20,6 +20,7 @@ Access:
  * Support sftp username and passwords options and URL
  * New UPnP access module, to list directories without infinite recursions
  * New WASAPI audio capture module on Windows
+ * SMB/FTP/SFTP accesses can list directories
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
@@ -28,6 +29,7 @@ Decoder:
  * Support for Daala video
  * Important improvements for the MMAL decoder and output for rPI
  * Support HEVC hardware decoding using OMX and MediaCodec
+ * Use MediaCodec via NDK native API after Android Lollipop
  * Support VP9 and WMV3 decoding using OMX and performance improvements
  * New MPEG-1 & 2 audio layer I, II, III + MPEG 2.5 decoder based on libmpg123
  * New BPG decoder based on libbpg
@@ -53,6 +55,7 @@ Demuxers:
  * Basic support for MPEG4-SL in TS and T-DMB
  * Support for Creative ADPCM/alaw/ulaw/S16L in VOC files
  * Support for Creative ADPCM in AVI
+ * Directory Demux can now sort items, ignore extensions and hidden files
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
