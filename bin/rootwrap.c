@@ -193,6 +193,10 @@ int main (int argc, char *argv[])
     if (pair[0] < 3)
         goto error; /* we want 0, 1 and 2 open */
 
+#ifdef SO_NOSIGPIPE
+    setsockopt(pair[1], SOL_SOCKET, SO_NOSIGPIPE, &(int){ 1 }, sizeof (int));
+#endif
+
     pid_t pid = fork ();
     switch (pid)
     {
