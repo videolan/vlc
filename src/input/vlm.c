@@ -1028,7 +1028,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             if( input_Start( p_instance->p_input ) != VLC_SUCCESS )
             {
                 var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
-                vlc_object_release( p_instance->p_input );
+                input_Close( p_instance->p_input );
                 p_instance->p_input = NULL;
             }
         }

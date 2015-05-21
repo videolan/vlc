@@ -871,7 +871,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         var_DelCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
         var_DelCallback( p_input_thread, "program-scrambled", input_scrambled_changed, p_mi );
         var_DelCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
-        vlc_object_release( p_input_thread );
+        input_Close( p_input_thread );
         libvlc_printerr( "Input initialization failure" );
         return -1;
     }
