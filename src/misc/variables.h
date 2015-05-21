@@ -58,60 +58,6 @@ struct vlc_object_internals
 
 void DumpVariables(vlc_object_t *obj);
 
-typedef struct callback_entry_t callback_entry_t;
-
-typedef struct variable_ops_t
-{
-    int  (*pf_cmp) ( vlc_value_t, vlc_value_t );
-    void (*pf_dup) ( vlc_value_t * );
-    void (*pf_free) ( vlc_value_t * );
-} variable_ops_t;
-
-typedef struct callback_table_t
-{
-    int                i_entries;
-    callback_entry_t * p_entries;
-} callback_table_t;
-
-/**
- * The structure describing a variable.
- * \note vlc_value_t is the common union for variable values
- */
-struct variable_t
-{
-    char *       psz_name; /**< The variable unique name (must be first) */
-
-    /** The variable's exported value */
-    vlc_value_t  val;
-
-    /** The variable display name, mainly for use by the interfaces */
-    char *       psz_text;
-
-    const variable_ops_t *ops;
-
-    int          i_type;   /**< The type of the variable */
-    unsigned     i_usage;  /**< Reference count */
-
-    /** If the variable has min/max/step values */
-    vlc_value_t  min, max, step;
-
-    /** Index of the default choice, if the variable is to be chosen in
-     * a list */
-    int          i_default;
-    /** List of choices */
-    vlc_list_t   choices;
-    /** List of friendly names for the choices */
-    vlc_list_t   choices_text;
-
-    /** Set to TRUE if the variable is in a callback */
-    bool   b_incallback;
-
-    /** Registered value callbacks */
-    callback_table_t    value_callbacks;
-    /** Registered list callbacks */
-    callback_table_t    list_callbacks;
-};
-
 extern void var_DestroyAll( vlc_object_t * );
 
 #endif
