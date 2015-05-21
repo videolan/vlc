@@ -362,16 +362,14 @@ static void login_dialog( access_t *p_access )
 
     if( psz_login != NULL )
     {
-        if( p_sys->creds.login != NULL )
-            free( p_sys->creds.login );
+        free( p_sys->creds.login );
         p_sys->creds.login = psz_login;
         split_domain_login( &p_sys->creds.login, &p_sys->creds.domain );
     }
 
     if( psz_pass != NULL )
     {
-        if( p_sys->creds.password != NULL )
-            free( p_sys->creds.password );
+        free( p_sys->creds.password );
         p_sys->creds.password = psz_pass;
     }
 }
