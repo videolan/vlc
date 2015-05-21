@@ -285,11 +285,7 @@ static void get_credentials( access_t *p_access )
         split_domain_login( &p_sys->creds.login, &p_sys->creds.domain );
     }
     else
-    {
         p_sys->creds.login = var_InheritString( p_access, "smb-user" );
-        if( p_sys->creds.login == NULL )
-            p_sys->creds.login = strdup( "Guest" );
-    }
 
     if( p_sys->creds.domain == NULL )
         p_sys->creds.domain = var_InheritString( p_access, "smb-domain" );
@@ -383,11 +379,15 @@ static void login_dialog( access_t *p_access )
 static int smb_connect( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    const char *psz_login = p_sys->creds.login ?
+                            p_sys->creds.login : "Guest";
+    const char *psz_password = p_sys->creds.password ?
+                               p_sys->creds.password : "Guest";
     const char *psz_domain = p_sys->creds.domain ?
                              p_sys->creds.domain : p_sys->netbios_name;
 
     smb_session_set_creds( p_sys->p_session, psz_domain,
-                           p_sys->creds.login, p_sys->creds.password );
+                           psz_login, psz_password );
     if( smb_session_login( p_sys->p_session ) )
     {
         if( p_sys->psz_share )
@@ -408,11 +408,6 @@ static int smb_connect( access_t *p_access )
 static int login( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-
-    if( p_sys->creds.login == NULL )
-        p_sys->creds.login = strdup( "Guest" );
-    if( p_sys->creds.password == NULL )
-        p_sys->creds.password = strdup( "Guest" );
 
     /* Try to authenticate on the remote machine */
     if( smb_connect( p_access ) != VLC_SUCCESS )
@@ -596,23 +591,32 @@ static input_item_t *new_item( access_t *p_access, const char *psz_name,
 
     /* Here we save on the node the credentials that allowed us to login.
      * That way the user isn't prompted more than once for credentials */
-    i_ret = asprintf( &psz_option, "smb-user=%s", p_sys->creds.login );
-    if( i_ret == -1 )
-        goto bailout;
-    input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
-    free( psz_option );
+    if( p_sys->creds.login )
+    {
+        i_ret = asprintf( &psz_option, "smb-user=%s", p_sys->creds.login );
+        if( i_ret == -1 )
+            goto bailout;
+        input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
+        free( psz_option );
+    }
 
-    i_ret = asprintf( &psz_option, "smb-pwd=%s", p_sys->creds.password );
-    if( i_ret == -1 )
-        goto bailout;
-    input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
-    free( psz_option );
+    if( p_sys->creds.password )
+    {
+        i_ret = asprintf( &psz_option, "smb-pwd=%s", p_sys->creds.password );
+        if( i_ret == -1 )
+            goto bailout;
+        input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
+        free( psz_option );
+    }
 
-    i_ret = asprintf( &psz_option, "smb-domain=%s", p_sys->creds.domain );
-    if( i_ret == -1 )
-        goto bailout;
-    input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
-    free( psz_option );
+    if( p_sys->creds.domain )
+    {
+        i_ret = asprintf( &psz_option, "smb-domain=%s", p_sys->creds.domain );
+        if( i_ret == -1 )
+            goto bailout;
+        input_item_AddOption( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
+        free( psz_option );
+    }
 
     return p_item;
 bailout:
