@@ -318,35 +318,29 @@ int vlc_socket (int pf, int type, int proto, bool nonblock)
  */
 int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
 {
+    int fd;
 #ifdef HAVE_ACCEPT4
     int flags = SOCK_CLOEXEC;
     if (nonblock)
         flags |= SOCK_NONBLOCK;
 
     do
-    {
-        int fd = accept4 (lfd, addr, alen, flags);
-        if (fd != -1)
-            return fd;
-    }
-    while (errno == EINTR);
+        fd = accept4 (lfd, addr, alen, flags);
+    while (fd == -1 && errno == EINTR);
 
-    if (errno != ENOSYS)
-        return -1;
+    if (fd != -1 || errno != ENOSYS)
+        return fd;
 #endif
 
     do
-    {
-        int fd = accept (lfd, addr, alen);
-        if (fd != -1)
-        {
-            fcntl (fd, F_SETFD, FD_CLOEXEC);
-            if (nonblock)
-                fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
-            return fd;
-        }
-    }
-    while (errno == EINTR);
+        fd = accept (lfd, addr, alen);
+    while (fd == -1 && errno == EINTR);
 
-    return -1;
+    if (fd != -1)
+    {
+        fcntl (fd, F_SETFD, FD_CLOEXEC);
+        if (nonblock)
+            fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
+    }
+    return fd;
 }
