@@ -46,6 +46,8 @@
 # undef HAVE_VMSPLICE
 #endif
 
+#include <signal.h>
+
 static int  OpenGzip (vlc_object_t *);
 static int  OpenBzip2 (vlc_object_t *);
 static int  OpenXZ (vlc_object_t *);
