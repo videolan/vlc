@@ -44,9 +44,11 @@
 # warning Uho, your IPv6 support is broken and has been disabled. Fix your C library.
 # undef AF_INET6
 #endif
-
 #ifndef AF_LOCAL
 # define AF_LOCAL AF_UNIX
+#endif
+#if !defined(MSG_NOSIGNAL) && defined(SO_NOSIGPIPE)
+# define MSG_NOSIGNAL 0
 #endif
 /* Required yet non-standard cmsg functions */
 #ifndef CMSG_ALIGN

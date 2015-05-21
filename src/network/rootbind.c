@@ -57,6 +57,12 @@ int rootwrap_bind (int, int, int, const struct sockaddr *, size_t);
 #ifndef CMSG_LEN
 # define CMSG_LEN(len) (CMSG_ALIGN(sizeof(struct cmsghdr)) + (len))
 #endif
+#if !defined(MSG_NOSIGNAL)
+/* If the other end of the pipe hangs up and MSG_NOSIGNAL is missing, the
+ * process will get a (likely fatal) SIGPIPE signal. Then again, the other end
+ * can screw us up in various ways already (e.g. not answer to deadlock). */
+# define MSG_NOSIGNAL 0
+#endif
 
 #if defined(__OS2__) && !defined(ALIGN)
 /* CMSG_NXTHDR requires this */
