@@ -41,6 +41,7 @@ live555: $(LIVE555_FILE) .sum-live555
 	rm -Rf live
 	$(UNPACK)
 	chmod -R u+w live
+	(cd live && patch -fp1) < $(SRC)/live555/live555-nosignal.patch
 	cd live && sed -e 's%cc%$(CC)%' -e 's%c++%$(CXX)%' -e 's%LIBRARY_LINK =.*ar%LIBRARY_LINK = $(AR)%' -i.orig config.$(LIVE_TARGET)
 	cd live && sed -i.orig -e s/"libtool -s -o"/"ar cr"/g config.macosx*
 	cd live && sed -i.orig \
