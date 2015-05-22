@@ -47,6 +47,8 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
 static int TimeCallback    ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
+static int TimeOffsetCallback( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void * );
 static int ProgramCallback ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void * );
 static int TitleCallback   ( vlc_object_t *p_this, char const *psz_cmd,
@@ -91,7 +93,7 @@ static const vlc_input_callback_t p_input_callbacks[] =
     CALLBACK( "position", PositionCallback ),
     CALLBACK( "position-offset", PositionCallback ),
     CALLBACK( "time", TimeCallback ),
-    CALLBACK( "time-offset", TimeCallback ),
+    CALLBACK( "time-offset", TimeOffsetCallback ),
     CALLBACK( "bookmark", BookmarkCallback ),
     CALLBACK( "program", ProgramCallback ),
     CALLBACK( "title", TitleCallback ),
@@ -611,35 +613,36 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    if( !strcmp( psz_cmd, "time-offset" ) )
+    /* Update "position" for better intf behavour */
+    const mtime_t i_length = var_GetTime( p_input, "length" );
+    if( i_length > 0 && newval.i_time >= 0 && newval.i_time <= i_length )
     {
-        mtime_t i_time = var_GetTime( p_input, "time" ) + newval.i_time;
-        if( i_time < 0 )
-            i_time = 0;
-        var_SetTime( p_this, "time", i_time );
-    }
-    else
-    {
-        /* Update "position" for better intf behavour */
-        const mtime_t i_length = var_GetTime( p_input, "length" );
-        if( i_length > 0 && newval.i_time >= 0 && newval.i_time <= i_length )
-        {
-            vlc_value_t val;
+        vlc_value_t val;
 
-            val.f_float = (double)newval.i_time/(double)i_length;
-            var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
-            /*
-             * Notify the intf that a new event has been occurred.
-             * XXX this is a bit hackish but it's the only way to do it now.
-             */
-            var_SetInteger( p_input, "intf-event", INPUT_EVENT_POSITION );
-        }
-
-        /* */
-        input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &newval );
+        val.f_float = (double)newval.i_time/(double)i_length;
+        var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
+        /*
+         * Notify the intf that a new event has been occurred.
+         * XXX this is a bit hackish but it's the only way to do it now.
+         */
+        var_SetInteger( p_input, "intf-event", INPUT_EVENT_POSITION );
     }
+
+    input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &newval );
+    return VLC_SUCCESS;
+}
+
+static int TimeOffsetCallback( vlc_object_t *obj, char const *varname,
+                               vlc_value_t prev, vlc_value_t cur, void *data )
+{
+    VLC_UNUSED(varname); VLC_UNUSED(prev); VLC_UNUSED(data);
+
+    mtime_t i_time = var_GetTime( obj, "time" ) + cur.i_time;
+    if( i_time < 0 )
+        i_time = 0;
+    var_SetTime( obj, "time", i_time );
     return VLC_SUCCESS;
 }
 
