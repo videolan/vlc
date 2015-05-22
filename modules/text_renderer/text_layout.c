@@ -248,7 +248,7 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
                 i_size * sizeof( *pp_styles ) );
     if( pi_k_dates )
     {
-        int64_t i_elapsed  = var_GetTime( p_filter, "spu-elapsed" ) / 1000;
+        int64_t i_elapsed  = var_GetInteger( p_filter, "spu-elapsed" ) / 1000;
         for( int i = 0; i < i_size; ++i )
         {
             p_paragraph->pi_karaoke_bar[ i ] = pi_k_dates[ i ] >= i_elapsed;

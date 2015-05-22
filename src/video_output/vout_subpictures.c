@@ -205,7 +205,7 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     text->p_module = module_need(text, "text renderer", "$text-renderer", false);
 
     /* Create a few variables used for enhanced text rendering */
-    var_Create(text, "spu-elapsed",   VLC_VAR_TIME);
+    var_Create(text, "spu-elapsed",   VLC_VAR_INTEGER);
     var_Create(text, "text-rerender", VLC_VAR_BOOL);
 
     return text;
@@ -272,7 +272,7 @@ static void SpuRenderText(spu_t *spu, bool *rerender_text,
      * least show up on screen, but the effect won't change
      * the text over time.
      */
-    var_SetTime(text, "spu-elapsed", elapsed_time);
+    var_SetInteger(text, "spu-elapsed", elapsed_time);
     var_SetBool(text, "text-rerender", false);
 
     if (text->pf_render_html && region->psz_html)
