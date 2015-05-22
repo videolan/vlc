@@ -49,7 +49,7 @@ Chunk * ISegment::getChunk(const std::string &url)
     return new (std::nothrow) SegmentChunk(this, url);
 }
 
-void ISegment::onChunkDownload(void *, size_t, Chunk *, BaseRepresentation *)
+void ISegment::onChunkDownload(block_t **, Chunk *, BaseRepresentation *)
 {
 
 }
@@ -121,9 +121,9 @@ void ISegment::SegmentChunk::setRepresentation(BaseRepresentation *rep_)
     rep = rep_;
 }
 
-void ISegment::SegmentChunk::onDownload(void *data, size_t size)
+void ISegment::SegmentChunk::onDownload(block_t **pp_block)
 {
-    segment->onChunkDownload(data, size, this, rep);
+    segment->onChunkDownload(pp_block, this, rep);
 }
 
 Segment::Segment(ICanonicalUrl *parent) :

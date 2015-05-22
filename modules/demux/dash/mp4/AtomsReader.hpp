@@ -49,7 +49,7 @@ namespace dash
             public:
                 AtomsReader(vlc_object_t *);
                 ~AtomsReader();
-                bool parseBlock(void *, size_t, adaptative::playlist::BaseRepresentation *);
+                bool parseBlock(block_t *, adaptative::playlist::BaseRepresentation *);
 
             protected:
                 vlc_object_t *object;

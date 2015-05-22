@@ -221,7 +221,7 @@ size_t Stream::read(HTTPConnectionManager *connManager)
 
         if (chunk->getBytesToRead() == 0)
         {
-            chunk->onDownload(block->p_buffer, block->i_buffer);
+            chunk->onDownload(&block);
             chunk->getConnection()->releaseChunk();
             currentChunk = NULL;
             delete chunk;

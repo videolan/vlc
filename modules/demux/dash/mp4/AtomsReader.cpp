@@ -41,12 +41,12 @@ AtomsReader::~AtomsReader()
     delete rootbox;
 }
 
-bool AtomsReader::parseBlock(void *buffer, size_t size, BaseRepresentation *rep)
+bool AtomsReader::parseBlock(block_t *p_block, BaseRepresentation *rep)
 {
     if(!rep)
         return false;
 
-    stream_t *stream = stream_MemoryNew( object, (uint8_t *)buffer, size, true);
+    stream_t *stream = stream_MemoryNew( object, p_block->p_buffer, p_block->i_buffer, true);
     if (stream)
     {
         rootbox = new MP4_Box_t;
@@ -57,7 +57,7 @@ bool AtomsReader::parseBlock(void *buffer, size_t size, BaseRepresentation *rep)
         }
         memset(rootbox, 0, sizeof(*rootbox));
         rootbox->i_type = ATOM_root;
-        rootbox->i_size = size;
+        rootbox->i_size = p_block->i_buffer;
         if ( MP4_ReadBoxContainerChildren( stream, rootbox, 0 ) == 1 )
         {
 #ifndef NDEBUG

@@ -29,6 +29,8 @@
 #include <string>
 #include <stdint.h>
 
+typedef struct block_t block_t;
+
 namespace adaptative
 {
     namespace http
@@ -65,7 +67,7 @@ namespace adaptative
                 void                setBitrate      (uint64_t bitrate);
                 int                 getBitrate      ();
 
-                virtual void        onDownload      (void *, size_t) {}
+                virtual void        onDownload      (block_t **) {}
 
             private:
                 std::string                 url;

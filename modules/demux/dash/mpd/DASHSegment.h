@@ -41,7 +41,7 @@ namespace dash
                 virtual Chunk* toChunk(size_t, BaseRepresentation * = NULL); //reimpl
 
             protected:
-                virtual void onChunkDownload(void *, size_t, Chunk *, BaseRepresentation *); //reimpl
+                virtual void onChunkDownload(block_t **, Chunk *, BaseRepresentation *); //reimpl
         };
 
     }

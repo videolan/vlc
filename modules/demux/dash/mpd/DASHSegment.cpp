@@ -49,11 +49,11 @@ Chunk* DashIndexSegment::toChunk(size_t index, BaseRepresentation *ctxrep)
     return chunk;
 }
 
-void DashIndexSegment::onChunkDownload(void *data, size_t size, Chunk *, BaseRepresentation *rep)
+void DashIndexSegment::onChunkDownload(block_t **pp_block, Chunk *, BaseRepresentation *rep)
 {
     if(!rep)
         return;
 
     AtomsReader br(rep->getPlaylist()->getVLCObject());
-    br.parseBlock(data, size, rep);
+    br.parseBlock(*pp_block, rep);
 }

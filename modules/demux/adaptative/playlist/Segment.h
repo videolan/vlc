@@ -75,7 +75,7 @@ namespace adaptative
                     public:
                         SegmentChunk(ISegment *segment, const std::string &url);
                         void setRepresentation(BaseRepresentation *);
-                        virtual void onDownload(void *, size_t); // reimpl
+                        virtual void onDownload(block_t **); // reimpl
 
                     protected:
                         ISegment *segment;
@@ -83,7 +83,7 @@ namespace adaptative
                 };
 
                 virtual Chunk * getChunk(const std::string &);
-                virtual void onChunkDownload(void *, size_t, Chunk *, BaseRepresentation *);
+                virtual void onChunkDownload(block_t **, Chunk *, BaseRepresentation *);
         };
 
         class Segment : public ISegment
