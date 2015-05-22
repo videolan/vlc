@@ -185,8 +185,8 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     /* Delay */
     var_Create( p_input, "audio-delay", VLC_VAR_TIME );
-    val.i_time = INT64_C(1000) * var_GetInteger( p_input, "audio-desync" );
-    var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
+    var_SetTime( p_input, "audio-delay",
+                 1000 * var_GetInteger( p_input, "audio-desync" ) );
     var_Create( p_input, "spu-delay", VLC_VAR_TIME );
 
     /* Video ES */
@@ -205,8 +205,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
 
     var_Create( p_input, "spu-choice", VLC_VAR_INTEGER );
-    val.i_int = -1;
-    var_Change( p_input, "spu-choice", VLC_VAR_SETVALUE, &val, NULL );
+    var_SetInteger( p_input, "spu-choice", -1 );
 
     /* Special read only objects variables for intf */
     var_Create( p_input, "bookmarks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
