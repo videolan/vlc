@@ -434,7 +434,7 @@ void MainInterface::hideResumePanel()
 void MainInterface::resumePlayback()
 {
     if( THEMIM->getIM()->hasInput() ) {
-        var_SetTime( THEMIM->getInput(), "time", i_resumeTime );
+        var_SetInteger( THEMIM->getInput(), "time", i_resumeTime );
     }
     hideResumePanel();
 }

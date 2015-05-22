@@ -160,9 +160,9 @@ function seek(value)
         else
             local posTime = parsetime(value)
             if string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
-                vlc.var.set(input,"time",vlc.var.get(input,"time") + posTime)
+                vlc.var.set(input,"time",vlc.var.get(input,"time") + (posTime * 1000000))
             else
-                vlc.var.set(input,"time",posTime)
+                vlc.var.set(input,"time",posTime * 1000000)
             end
         end
     end

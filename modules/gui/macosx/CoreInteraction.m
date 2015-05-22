@@ -433,13 +433,13 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (!timeA) {
         input_thread_t * p_input = pl_CurrentInput(VLCIntf);
         if (p_input) {
-            timeA = var_GetTime(p_input, "time");
+            timeA = var_GetInteger(p_input, "time");
             vlc_object_release(p_input);
         }
     } else if (!timeB) {
         input_thread_t * p_input = pl_CurrentInput(VLCIntf);
         if (p_input) {
-            timeB = var_GetTime(p_input, "time");
+            timeB = var_GetInteger(p_input, "time");
             vlc_object_release(p_input);
         }
     } else
@@ -457,9 +457,9 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
     if (timeB) {
         input_thread_t * p_input = pl_CurrentInput(VLCIntf);
         if (p_input) {
-            mtime_t currentTime = var_GetTime(p_input, "time");
+            mtime_t currentTime = var_GetInteger(p_input, "time");
             if ( currentTime >= timeB || currentTime < timeA)
-                var_SetTime(p_input, "time", timeA);
+                var_SetInteger(p_input, "time", timeA);
             vlc_object_release(p_input);
         }
     }

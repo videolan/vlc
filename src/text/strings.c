@@ -690,7 +690,7 @@ char *str_format_meta(input_thread_t *input, const char *s)
                 {
                     assert(input != NULL);
                     write_duration(stream, input_item_GetDuration(item)
-                                   - var_GetTime(input, "time"));
+                                   - var_GetInteger(input, "time"));
                 }
                 else if (!b_empty_if_na)
                     fputs("--:--:--", stream);
@@ -747,7 +747,7 @@ char *str_format_meta(input_thread_t *input, const char *s)
                 break;
             case 'T':
                 if (input != NULL)
-                    write_duration(stream, var_GetTime(input, "time"));
+                    write_duration(stream, var_GetInteger(input, "time"));
                 else if (!b_empty_if_na)
                     fputs("--:--:--", stream);
                 break;

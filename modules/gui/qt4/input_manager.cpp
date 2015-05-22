@@ -171,8 +171,8 @@ void InputManager::delInput()
         int64_t i_time = -1;
 
         if( f_pos >= 0.05f && f_pos <= 0.95f
-         && var_GetTime( p_input, "length" ) >= 60 * CLOCK_FREQ )
-            i_time = var_GetTime( p_input, "time");
+         && var_GetInteger( p_input, "length" ) >= 60 * CLOCK_FREQ )
+            i_time = var_GetInteger( p_input, "time");
 
         RecentsMRL::getInstance( p_intf )->setTime( qfu(uri), i_time );
         free(uri);
@@ -445,13 +445,10 @@ static int VbiEvent( vlc_object_t *, const char *,
 void InputManager::UpdatePosition()
 {
     /* Update position */
-    int i_length;
-    int64_t i_time;
-    float f_pos;
-    i_length = var_GetTime(  p_input , "length" ) / CLOCK_FREQ;
-    i_time = var_GetTime(  p_input , "time");
-    f_pos = var_GetFloat(  p_input , "position" );
-    emit positionUpdated( f_pos, i_time, i_length );
+    int64_t i_length = var_GetInteger(  p_input , "length" );
+    int64_t i_time = var_GetInteger(  p_input , "time");
+    float f_pos = var_GetFloat(  p_input , "position" );
+    emit positionUpdated( f_pos, i_time, i_length / CLOCK_FREQ );
 }
 
 void InputManager::UpdateNavigation()
@@ -982,12 +979,12 @@ void InputManager::setAtoB()
 {
     if( !timeA )
     {
-        timeA = var_GetTime( THEMIM->getInput(), "time"  );
+        timeA = var_GetInteger( THEMIM->getInput(), "time"  );
     }
     else if( !timeB )
     {
-        timeB = var_GetTime( THEMIM->getInput(), "time"  );
-        var_SetTime( THEMIM->getInput(), "time" , timeA );
+        timeB = var_GetInteger( THEMIM->getInput(), "time"  );
+        var_SetInteger( THEMIM->getInput(), "time" , timeA );
         CONNECT( this, positionUpdated( float, int64_t, int ),
                  this, AtoBLoop( float, int64_t, int ) );
     }
@@ -1005,7 +1002,7 @@ void InputManager::setAtoB()
 void InputManager::AtoBLoop( float, int64_t i_time, int )
 {
     if( timeB && i_time >= timeB )
-        var_SetTime( THEMIM->getInput(), "time" , timeA );
+        var_SetInteger( THEMIM->getInput(), "time" , timeA );
 }
 
 /**********************************************************************
@@ -1128,7 +1125,7 @@ void MainInputManager::prev()
 
 void MainInputManager::prevOrReset()
 {
-    if( !p_input || var_GetTime(  p_input , "time") < 10000 )
+    if( !p_input || var_GetInteger( p_input, "time") < INT64_C(10000) )
         playlist_Prev( THEPL );
     else
         getIM()->sliderUpdate( 0.0 );

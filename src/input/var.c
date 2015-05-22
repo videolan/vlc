@@ -147,7 +147,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "position-offset",  VLC_VAR_FLOAT );
 
     /* Time */
-    var_Create( p_input, "time",  VLC_VAR_TIME );
+    var_Create( p_input, "time", VLC_VAR_INTEGER );
     var_Create( p_input, "time-offset",  VLC_VAR_TIME );    /* relative */
 
     /* Bookmark */
@@ -212,7 +212,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
     /* Special read only objects variables for intf */
     var_Create( p_input, "bookmarks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
-    var_Create( p_input, "length",  VLC_VAR_TIME );
+    var_Create( p_input, "length", VLC_VAR_INTEGER );
 
     var_Create( p_input, "bit-rate", VLC_VAR_INTEGER );
     var_Create( p_input, "sample-rate", VLC_VAR_INTEGER );
@@ -594,12 +594,12 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
     else
     {
         /* Update "length" for better intf behavour */
-        const mtime_t i_length = var_GetTime( p_input, "length" );
+        const int64_t i_length = var_GetInteger( p_input, "length" );
         if( i_length > 0 && newval.f_float >= 0.f && newval.f_float <= 1.f )
         {
             vlc_value_t val;
 
-            val.i_time = i_length * newval.f_float;
+            val.i_int = i_length * newval.f_float;
             var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
         }
 
@@ -616,12 +616,12 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     /* Update "position" for better intf behavour */
-    const mtime_t i_length = var_GetTime( p_input, "length" );
-    if( i_length > 0 && newval.i_time >= 0 && newval.i_time <= i_length )
+    const int64_t i_length = var_GetInteger( p_input, "length" );
+    if( i_length > 0 && newval.i_int >= 0 && newval.i_int <= i_length )
     {
         vlc_value_t val;
 
-        val.f_float = (double)newval.i_time/(double)i_length;
+        val.f_float = (double)newval.i_int/(double)i_length;
         var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
         /*
          * Notify the intf that a new event has been occurred.

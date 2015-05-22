@@ -117,19 +117,17 @@ static VLCStringUtility *_o_sharedInstance = nil;
 {
     assert(p_input != nil);
 
-    vlc_value_t time;
     char psz_time[MSTRTIME_MAX_SIZE];
-
-    var_Get(p_input, "time", &time);
+    int64_t t = var_GetInteger(p_input, "time");
 
     mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
     if (b_negative && dur > 0) {
         mtime_t remaining = 0;
-        if (dur > time.i_time)
-            remaining = dur - time.i_time;
+        if (dur > t)
+            remaining = dur - t;
         return [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];
     } else
-        return [NSString stringWithUTF8String:secstotimestr(psz_time, (time.i_time / 1000000))];
+        return [NSString stringWithUTF8String:secstotimestr(psz_time, t / CLOCK_FREQ )];
 }
 
 - (NSString *)stringForTime:(long long int)time

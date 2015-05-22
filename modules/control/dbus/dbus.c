@@ -923,7 +923,7 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
 
             /* Detect seeks
              * XXX: This is way more convoluted than it should be... */
-            i_pos = var_GetTime( p_input, "time" );
+            i_pos = var_GetInteger( p_input, "time" );
 
             if( !p_intf->p_sys->i_last_input_pos_event ||
                 !( var_GetInteger( p_input, "state" ) == PLAYING_S ) )

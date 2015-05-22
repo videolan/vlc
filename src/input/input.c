@@ -627,7 +627,7 @@ static int MainLoopTryRepeat( input_thread_t *p_input, mtime_t *pi_start_mdate )
     /* Seek to start position */
     if( p_input->p->i_start > 0 )
     {
-        val.i_time = p_input->p->i_start;
+        val.i_int = p_input->p->i_start;
         input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &val );
     }
     else
@@ -920,7 +920,7 @@ static void StartTitle( input_thread_t * p_input )
         msg_Dbg( p_input, "starting at time: %ds",
                  (int)( p_input->p->i_start / CLOCK_FREQ ) );
 
-        s.i_time = p_input->p->i_start;
+        s.i_int = p_input->p->i_start;
         input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &s );
     }
     if( p_input->p->i_stop > 0 && p_input->p->i_stop <= p_input->p->i_start )
@@ -1674,7 +1674,7 @@ static bool Control( input_thread_t *p_input,
                 break;
             }
 
-            i_time = val.i_time;
+            i_time = val.i_int;
             if( i_time < 0 )
                 i_time = 0;
 
@@ -1894,7 +1894,7 @@ static bool Control( input_thread_t *p_input,
             if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
             {
                 int64_t i_seekpoint_time = p_input->p->input.title[i_title]->seekpoint[i_seekpoint]->i_time_offset;
-                int64_t i_input_time = var_GetTime( p_input, "time" );
+                int64_t i_input_time = var_GetInteger( p_input, "time" );
                 if( i_seekpoint_time >= 0 && i_input_time >= 0 )
                 {
                     if( i_input_time < i_seekpoint_time + 3000000 )
@@ -2023,7 +2023,7 @@ static bool Control( input_thread_t *p_input,
                 break;
             }
 
-            val.i_time = time_offset;
+            val.i_int = time_offset;
             b_force_update = Control( p_input, INPUT_CONTROL_SET_TIME, val );
             break;
         }

@@ -1026,7 +1026,7 @@
 
     mtime_t lastPos = (mtime_t)lastPosition.intValue * 1000000;
     msg_Dbg(VLCIntf, "continuing playback at %lld", lastPos);
-    var_SetTime(p_input_thread, "time", lastPos);
+    var_SetInteger(p_input_thread, "time", lastPos);
 
     if (returnValue == NSAlertOtherReturn)
         config_PutInt(VLCIntf, "macosx-continue-playback", 1);
@@ -1054,7 +1054,7 @@
     NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
 
     float relativePos = var_GetFloat(p_input_thread, "position");
-    mtime_t pos = var_GetTime(p_input_thread, "time") / 1000000;
+    mtime_t pos = var_GetInteger(p_input_thread, "time") / CLOCK_FREQ;
     mtime_t dur = input_item_GetDuration(p_item) / 1000000;
 
     NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];

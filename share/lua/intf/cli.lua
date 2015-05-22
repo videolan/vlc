@@ -430,7 +430,7 @@ function get_time(var)
     return function(name,client)
         local input = vlc.object.input()
 	if input then
-	    client:append(math.floor(vlc.var.get( input, var )))
+	    client:append(math.floor(vlc.var.get( input, var ) / 1000000))
 	else
 	    client:append("")
 	end

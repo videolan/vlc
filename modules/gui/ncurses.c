@@ -1098,10 +1098,10 @@ static int DrawStatus(intf_thread_t *intf)
                         repeat, random, loop);
 
         default:
-            var_Get(p_input, "time", &val);
-            secstotimestr(buf1, val.i_time / CLOCK_FREQ);
-            var_Get(p_input, "length", &val);
-            secstotimestr(buf2, val.i_time / CLOCK_FREQ);
+            val.i_int = var_GetInteger(p_input, "time");
+            secstotimestr(buf1, val.i_int / CLOCK_FREQ);
+            val.i_int = var_GetInteger(p_input, "length");
+            secstotimestr(buf2, val.i_int / CLOCK_FREQ);
 
             mvnprintw(y++, 0, COLS, _(" Position : %s/%s"), buf1, buf2);
 

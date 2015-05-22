@@ -545,10 +545,9 @@
         f_updated = 10000. * pos.f_float;
         [o_fs_timeSlider setFloatValue: f_updated];
 
-        vlc_value_t time;
         char psz_time[MSTRTIME_MAX_SIZE];
 
-        var_Get(p_input, "time", &time);
+        int64_t t = var_GetInteger(p_input, "time");
         mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
 
         // update total duration (right field)
@@ -560,8 +559,8 @@
             NSString *o_total_time;
             if ([o_streamLength_txt timeRemaining]) {
                 mtime_t remaining = 0;
-                if (dur > time.i_time)
-                    remaining = dur - time.i_time;
+                if (dur > t)
+                    remaining = dur - t;
                 o_total_time = [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];
             } else
                 o_total_time = [NSString stringWithUTF8String:secstotimestr(psz_time, (dur / 1000000))];
@@ -570,7 +569,7 @@
         }
 
         // update current position (left field)
-        NSString *o_playback_pos = [NSString stringWithUTF8String:secstotimestr(psz_time, (time.i_time / 1000000))];
+        NSString *o_playback_pos = [NSString stringWithUTF8String:secstotimestr(psz_time, t / CLOCK_FREQ)];
                
         [o_streamPosition_txt setStringValue: o_playback_pos];
         vlc_object_release(p_input);

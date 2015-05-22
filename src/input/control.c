@@ -87,17 +87,17 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_GET_LENGTH:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetTime( p_input, "length" );
+            *pi_64 = var_GetInteger( p_input, "length" );
             return VLC_SUCCESS;
 
         case INPUT_GET_TIME:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetTime( p_input, "time" );
+            *pi_64 = var_GetInteger( p_input, "time" );
             return VLC_SUCCESS;
 
         case INPUT_SET_TIME:
             i_64 = (int64_t)va_arg( args, int64_t );
-            return var_SetTime( p_input, "time", i_64 );
+            return var_SetInteger( p_input, "time", i_64 );
 
         case INPUT_GET_RATE:
             pi_int = (int*)va_arg( args, int * );

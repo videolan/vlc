@@ -683,29 +683,17 @@ static void *Run( void *data )
         }
         else if( !strcmp( psz_cmd, "get_time" ) )
         {
-            if( p_sys->p_input == NULL )
-            {
-                msg_rc("0");
-            }
-            else
-            {
-                vlc_value_t time;
-                var_Get( p_sys->p_input, "time", &time );
-                msg_rc( "%"PRIu64, time.i_time / 1000000);
-            }
+            int64_t t = 0;
+            if( p_sys->p_input != NULL )
+                t = var_GetInteger( p_sys->p_input, "time" ) / CLOCK_FREQ;
+            msg_rc( "%"PRIu64, t );
         }
         else if( !strcmp( psz_cmd, "get_length" ) )
         {
-            if( p_sys->p_input == NULL )
-            {
-                msg_rc("0");
-            }
-            else
-            {
-                vlc_value_t time;
-                var_Get( p_sys->p_input, "length", &time );
-                msg_rc( "%"PRIu64, time.i_time / 1000000);
-            }
+            int64_t l = 0;
+            if( p_sys->p_input != NULL )
+                l = var_GetInteger( p_sys->p_input, "length" ) / CLOCK_FREQ;
+            msg_rc( "%"PRIu64, l );
         }
         else if( !strcmp( psz_cmd, "get_title" ) )
         {
@@ -905,7 +893,7 @@ static void PositionChanged( intf_thread_t *p_intf,
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
     if( p_intf->p_sys->b_input_buffering )
         msg_rc( STATUS_CHANGE "( time: %"PRId64"s )",
-                (var_GetTime( p_input, "time" )/1000000) );
+                (var_GetInteger( p_input, "time" ) / CLOCK_FREQ) );
     p_intf->p_sys->b_input_buffering = false;
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
 }
@@ -983,8 +971,8 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            mtime_t t = ((int64_t)atoi( newval.psz_string )) * CLOCK_FREQ;
-            var_SetTime( p_input, "time", t );
+            mtime_t t = atoi( newval.psz_string );
+            var_SetInteger( p_input, "time", CLOCK_FREQ * t );
         }
         i_error = VLC_SUCCESS;
     }

@@ -233,11 +233,11 @@
         input_thread_t * p_input = pl_CurrentInput(VLCIntf);
         if (p_input) {
             /* we can obviously only do that if an input is available */
-            vlc_value_t pos, length;
-            var_Get(p_input, "length", &length);
-            [o_specificTime_stepper setMaxValue: (length.i_time / 1000000)];
-            var_Get(p_input, "time", &pos);
-            [self setJumpTimeValue: (pos.i_time / 1000000)];
+            int64_t pos, length;
+            length = var_GetInteger(p_input, "length");
+            [o_specificTime_stepper setMaxValue: (length / CLOCK_FREQ)];
+            pos = var_GetInteger(p_input, "time");
+            [self setJumpTimeValue: (pos / CLOCK_FREQ)];
             [NSApp beginSheet: o_specificTime_win modalForWindow: \
                 [NSApp mainWindow] modalDelegate: self didEndSelector: nil \
                 contextInfo: nil];
