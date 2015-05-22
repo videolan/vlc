@@ -1,0 +1,27 @@
+From a189efa30ad57c874997dc3ea2a3cef402b6a4ea Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Fri, 22 May 2015 14:44:28 +0200
+Subject: [PATCH] Fix build failure without STATVFS
+
+---
+ libarchive/archive_read_disk_posix.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/libarchive/archive_read_disk_posix.c b/libarchive/archive_read_disk_posix.c
+index a13dbbf..b93c198 100644
+--- a/libarchive/archive_read_disk_posix.c
++++ b/libarchive/archive_read_disk_posix.c
+@@ -1640,7 +1640,9 @@ setup_current_filesystem(struct archive_read_disk *a)
+ }
+ 
+ #elif defined(HAVE_SYS_STATFS_H) && defined(HAVE_LINUX_MAGIC_H) &&\
+-	defined(HAVE_STATFS) && defined(HAVE_FSTATFS)
++	defined(HAVE_STATFS) && defined(HAVE_FSTATFS) &&\
++	defined(HAVE_SYS_STATVFS_H) &&\
++	(defined(HAVE_STATVFS) || defined(HAVE_FSTATVFS))
+ /*
+  * Note: statfs is deprecated since LSB 3.2
+  */
+-- 
+2.1.4
+
