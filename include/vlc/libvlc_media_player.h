@@ -1425,7 +1425,7 @@ typedef enum libvlc_audio_output_channel_t {
  * Gets the list of available audio output modules.
  *
  * \param p_instance libvlc instance
- * \return list of available audio outputs. It must be freed it with
+ * \return list of available audio outputs. It must be freed with
 *          \see libvlc_audio_output_list_release \see libvlc_audio_output_t .
  *         In case of error, NULL is returned.
  */
@@ -1493,7 +1493,7 @@ char *libvlc_audio_output_device_id( libvlc_instance_t *, const char *, int );
  *
  * \param mp media player
  * \return A NULL-terminated linked list of potential audio output devices.
- * It must be freed it with libvlc_audio_output_device_list_release()
+ * It must be freed with libvlc_audio_output_device_list_release()
  * \version LibVLC 2.2.0 or later.
  */
 LIBVLC_API libvlc_audio_output_device_t *
@@ -1517,7 +1517,7 @@ libvlc_audio_output_device_enum( libvlc_media_player_t *mp );
  * \param psz_aout audio output name
  *                 (as returned by libvlc_audio_output_list_get())
  * \return A NULL-terminated linked list of potential audio output devices.
- * It must be freed it with libvlc_audio_output_device_list_release()
+ * It must be freed with libvlc_audio_output_device_list_release()
  * \version LibVLC 2.1.0 or later.
  */
 LIBVLC_API libvlc_audio_output_device_t *
