@@ -148,7 +148,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     /* Time */
     var_Create( p_input, "time", VLC_VAR_INTEGER );
-    var_Create( p_input, "time-offset",  VLC_VAR_TIME );    /* relative */
+    var_Create( p_input, "time-offset", VLC_VAR_INTEGER );    /* relative */
 
     /* Bookmark */
     var_Create( p_input, "bookmark", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
@@ -639,10 +639,10 @@ static int TimeOffsetCallback( vlc_object_t *obj, char const *varname,
 {
     VLC_UNUSED(varname); VLC_UNUSED(prev); VLC_UNUSED(data);
 
-    mtime_t i_time = var_GetTime( obj, "time" ) + cur.i_time;
+    int64_t i_time = var_GetInteger( obj, "time" ) + cur.i_int;
     if( i_time < 0 )
         i_time = 0;
-    var_SetTime( obj, "time", i_time );
+    var_SetInteger( obj, "time", i_time );
     return VLC_SUCCESS;
 }
 

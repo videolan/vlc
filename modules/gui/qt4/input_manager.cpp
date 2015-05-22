@@ -961,7 +961,7 @@ void InputManager::jumpFwd()
     if( i_interval > 0 && hasInput() )
     {
         mtime_t val = CLOCK_FREQ * i_interval;
-        var_SetTime( p_input, "time-offset", val );
+        var_SetInteger( p_input, "time-offset", val );
     }
 }
 
@@ -971,7 +971,7 @@ void InputManager::jumpBwd()
     if( i_interval > 0 && hasInput() )
     {
         mtime_t val = -CLOCK_FREQ * i_interval;
-        var_SetTime( p_input, "time-offset", val );
+        var_SetInteger( p_input, "time-offset", val );
     }
 }
 

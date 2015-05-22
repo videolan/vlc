@@ -201,7 +201,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
 
             int it = var_InheritInteger( p_intf , "short-jump-size" );
             if( it > 0 )
-                var_SetTime( p_input, "time-offset", -CLOCK_FREQ * it );
+                var_SetInteger( p_input, "time-offset", -CLOCK_FREQ * it );
             vlc_object_release( p_input );
             break;
         }
@@ -216,7 +216,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
 
             int it = var_InheritInteger( p_intf , "short-jump-size" );
             if( it > 0 )
-                var_SetTime( p_input, "time-offset", CLOCK_FREQ * it );
+                var_SetInteger( p_input, "time-offset", CLOCK_FREQ * it );
             vlc_object_release( p_input );
             break;
         }

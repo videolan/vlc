@@ -293,7 +293,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
         mtime_t val = CLOCK_FREQ * i_interval;
         if (!b_value)
             val = val * -1;
-        var_SetTime( p_input, "time-offset", val );
+        var_SetInteger( p_input, "time-offset", val );
     }
     vlc_object_release(p_input);
 }

@@ -739,7 +739,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             mtime_t it = var_InheritInteger( p_input, varname );
             if( it < 0 )
                 break;
-            var_SetTime( p_input, "time-offset", it * sign * CLOCK_FREQ );
+            var_SetInteger( p_input, "time-offset", it * sign * CLOCK_FREQ );
             DisplayPosition( p_intf, p_vout, p_input );
             break;
         }
