@@ -1072,7 +1072,8 @@ LIBVLC_API int libvlc_video_get_spu_count( libvlc_media_player_t *p_mi );
  * Get the description of available video subtitles.
  *
  * \param p_mi the media player
- * \return list containing description of available video subtitles
+ * \return list containing description of available video subtitles.
+ * It must be freed with libvlc_track_description_list_release()
  */
 LIBVLC_API libvlc_track_description_t *
         libvlc_video_get_spu_description( libvlc_media_player_t *p_mi );
@@ -1123,7 +1124,8 @@ LIBVLC_API int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi, int64_t 
  * Get the description of available titles.
  *
  * \param p_mi the media player
- * \return list containing description of available titles
+ * \return list containing description of available titles.
+ * It must be freed with libvlc_track_description_list_release()
  */
 LIBVLC_API libvlc_track_description_t *
         libvlc_video_get_title_description( libvlc_media_player_t *p_mi );
@@ -1133,7 +1135,8 @@ LIBVLC_API libvlc_track_description_t *
  *
  * \param p_mi the media player
  * \param i_title selected title
- * \return list containing description of available chapter for title i_title
+ * \return list containing description of available chapter for title i_title.
+ * It must be freed with libvlc_track_description_list_release()
  */
 LIBVLC_API libvlc_track_description_t *
         libvlc_video_get_chapter_description( libvlc_media_player_t *p_mi, int i_title );
@@ -1190,7 +1193,8 @@ LIBVLC_API int libvlc_video_get_track_count( libvlc_media_player_t *p_mi );
  * Get the description of available video tracks.
  *
  * \param p_mi media player
- * \return list with description of available video tracks, or NULL on error
+ * \return list with description of available video tracks, or NULL on error.
+ * It must be freed with libvlc_track_description_list_release()
  */
 LIBVLC_API libvlc_track_description_t *
         libvlc_video_get_track_description( libvlc_media_player_t *p_mi );
@@ -1672,7 +1676,8 @@ LIBVLC_API int libvlc_audio_get_track_count( libvlc_media_player_t *p_mi );
  * Get the description of available audio tracks.
  *
  * \param p_mi media player
- * \return list with description of available audio tracks, or NULL
+ * \return list with description of available audio tracks, or NULL.
+ * It must be freed with libvlc_track_description_list_release()
  */
 LIBVLC_API libvlc_track_description_t *
         libvlc_audio_get_track_description( libvlc_media_player_t *p_mi );
