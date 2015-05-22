@@ -56,7 +56,6 @@
 #define VLC_VAR_STRING    0x0040
 #define VLC_VAR_VARIABLE  0x0044
 #define VLC_VAR_FLOAT     0x0050
-#define VLC_VAR_TIME      0x0060
 #define VLC_VAR_ADDRESS   0x0070
 #define VLC_VAR_COORDS    0x00A0
 /**@}*/
@@ -225,20 +224,6 @@ static inline int var_SetBool( vlc_object_t *p_obj, const char *psz_name, bool b
     return var_SetChecked( p_obj, psz_name, VLC_VAR_BOOL, val );
 }
 
-/**
- * Set the value of a time variable
- *
- * \param p_obj The object that holds the variable
- * \param psz_name The name of the variable
- * \param i The new time value of this variable
- */
-static inline int var_SetTime( vlc_object_t *p_obj, const char *psz_name, int64_t i )
-{
-    vlc_value_t val;
-    val.i_time = i;
-    return var_SetChecked( p_obj, psz_name, VLC_VAR_TIME, val );
-}
-
 static inline int var_SetCoords( vlc_object_t *obj, const char *name,
                                  int32_t x, int32_t y )
 {
@@ -294,7 +279,6 @@ int var_SetAddress( vlc_object_t *p_obj, const char *psz_name, void *ptr )
 
 #define var_SetInteger(a,b,c)   var_SetInteger( VLC_OBJECT(a),b,c)
 #define var_SetBool(a,b,c)      var_SetBool( VLC_OBJECT(a),b,c)
-#define var_SetTime(a,b,c)      var_SetTime( VLC_OBJECT(a),b,c)
 #define var_SetFloat(a,b,c)     var_SetFloat( VLC_OBJECT(a),b,c)
 #define var_SetString(a,b,c)    var_SetString( VLC_OBJECT(a),b,c)
 #define var_SetAddress(o, n, p) var_SetAddress(VLC_OBJECT(o), n, p)
@@ -331,22 +315,6 @@ static inline bool var_GetBool( vlc_object_t *p_obj, const char *psz_name )
         return val.b_bool;
     else
         return false;
-}
-
-/**
- * Get a time value
- *
- * \param p_obj The object that holds the variable
- * \param psz_name The name of the variable
- */
-VLC_USED
-static inline int64_t var_GetTime( vlc_object_t *p_obj, const char *psz_name )
-{
-    vlc_value_t val; val.i_time = 0L;
-    if( !var_GetChecked( p_obj, psz_name, VLC_VAR_TIME, &val ) )
-        return val.i_time;
-    else
-        return 0;
 }
 
 static inline void var_GetCoords( vlc_object_t *obj, const char *name,
@@ -497,19 +465,6 @@ static inline bool var_CreateGetBool( vlc_object_t *p_obj, const char *psz_name 
 }
 
 /**
- * Create a time variable with inherit and get its value.
- *
- * \param p_obj The object that holds the variable
- * \param psz_name The name of the variable
- */
-VLC_USED
-static inline int64_t var_CreateGetTime( vlc_object_t *p_obj, const char *psz_name )
-{
-    var_Create( p_obj, psz_name, VLC_VAR_TIME | VLC_VAR_DOINHERIT );
-    return var_GetTime( p_obj, psz_name );
-}
-
-/**
  * Create a float variable with inherit and get its value.
  *
  * \param p_obj The object that holds the variable
@@ -560,7 +515,6 @@ static inline void *var_CreateGetAddress( vlc_object_t *p_obj,
 
 #define var_CreateGetInteger(a,b)   var_CreateGetInteger( VLC_OBJECT(a),b)
 #define var_CreateGetBool(a,b)   var_CreateGetBool( VLC_OBJECT(a),b)
-#define var_CreateGetTime(a,b)   var_CreateGetTime( VLC_OBJECT(a),b)
 #define var_CreateGetFloat(a,b)   var_CreateGetFloat( VLC_OBJECT(a),b)
 #define var_CreateGetString(a,b)   var_CreateGetString( VLC_OBJECT(a),b)
 #define var_CreateGetNonEmptyString(a,b)   var_CreateGetNonEmptyString( VLC_OBJECT(a),b)
@@ -592,20 +546,6 @@ static inline bool var_CreateGetBoolCommand( vlc_object_t *p_obj, const char *ps
     var_Create( p_obj, psz_name, VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                                    | VLC_VAR_ISCOMMAND );
     return var_GetBool( p_obj, psz_name );
-}
-
-/**
- * Create a time command variable with inherit and get its value.
- *
- * \param p_obj The object that holds the variable
- * \param psz_name The name of the variable
- */
-VLC_USED
-static inline int64_t var_CreateGetTimeCommand( vlc_object_t *p_obj, const char *psz_name )
-{
-    var_Create( p_obj, psz_name, VLC_VAR_TIME | VLC_VAR_DOINHERIT
-                                   | VLC_VAR_ISCOMMAND );
-    return var_GetTime( p_obj, psz_name );
 }
 
 /**
@@ -648,7 +588,6 @@ static inline char *var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
 
 #define var_CreateGetIntegerCommand(a,b)   var_CreateGetIntegerCommand( VLC_OBJECT(a),b)
 #define var_CreateGetBoolCommand(a,b)   var_CreateGetBoolCommand( VLC_OBJECT(a),b)
-#define var_CreateGetTimeCommand(a,b)   var_CreateGetTimeCommand( VLC_OBJECT(a),b)
 #define var_CreateGetFloatCommand(a,b)   var_CreateGetFloatCommand( VLC_OBJECT(a),b)
 #define var_CreateGetStringCommand(a,b)   var_CreateGetStringCommand( VLC_OBJECT(a),b)
 #define var_CreateGetNonEmptyStringCommand(a,b)   var_CreateGetNonEmptyStringCommand( VLC_OBJECT(a),b)
@@ -724,17 +663,6 @@ static inline char *var_InheritString( vlc_object_t *obj, const char *name )
 #define var_InheritString(o, n) var_InheritString(VLC_OBJECT(o), n)
 
 VLC_USED
-static inline mtime_t var_InheritTime( vlc_object_t *obj, const char *name )
-{
-    vlc_value_t val;
-
-    if( var_Inherit( obj, name, VLC_VAR_TIME, &val ) )
-        val.i_time = 0;
-    return val.i_time;
-}
-#define var_InheritTime(o, n) var_InheritTime(VLC_OBJECT(o), n)
-
-VLC_USED
 static inline void *var_InheritAddress( vlc_object_t *obj, const char *name )
 {
     vlc_value_t val;
@@ -750,7 +678,6 @@ VLC_API int var_InheritURational( vlc_object_t *, unsigned *num, unsigned *den, 
 
 #define var_GetInteger(a,b)   var_GetInteger( VLC_OBJECT(a),b)
 #define var_GetBool(a,b)   var_GetBool( VLC_OBJECT(a),b)
-#define var_GetTime(a,b)   var_GetTime( VLC_OBJECT(a),b)
 #define var_GetFloat(a,b)   var_GetFloat( VLC_OBJECT(a),b)
 #define var_GetString(a,b)   var_GetString( VLC_OBJECT(a),b)
 #define var_GetNonEmptyString(a,b)   var_GetNonEmptyString( VLC_OBJECT(a),b)

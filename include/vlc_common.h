@@ -341,7 +341,6 @@ typedef union
     char *          psz_string;
     void *          p_address;
     vlc_list_t *    p_list;
-    mtime_t         i_time;
     struct { int32_t x; int32_t y; } coords;
 
 } vlc_value_t;

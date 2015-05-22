@@ -122,11 +122,6 @@ static int CmpInt( vlc_value_t v, vlc_value_t w )
     return v.i_int == w.i_int ? 0 : v.i_int > w.i_int ? 1 : -1;
 }
 
-static int CmpTime( vlc_value_t v, vlc_value_t w )
-{
-    return v.i_time == w.i_time ? 0 : v.i_time > w.i_time ? 1 : -1;
-}
-
 static int CmpString( vlc_value_t v, vlc_value_t w )
 {
     if( !v.psz_string )
@@ -156,7 +151,6 @@ bool_ops   = { CmpBool,    DupDummy,  FreeDummy,  },
 float_ops  = { CmpFloat,   DupDummy,  FreeDummy,  },
 int_ops    = { CmpInt,     DupDummy,  FreeDummy,  },
 string_ops = { CmpString,  DupString, FreeString, },
-time_ops   = { CmpTime,    DupDummy,  FreeDummy,  },
 coords_ops = { NULL,       DupDummy,  FreeDummy,  };
 
 /*****************************************************************************
@@ -269,10 +263,6 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         case VLC_VAR_FLOAT:
             p_var->ops = &float_ops;
             p_var->val.f_float = 0.0;
-            break;
-        case VLC_VAR_TIME:
-            p_var->ops = &time_ops;
-            p_var->val.i_time = 0;
             break;
         case VLC_VAR_COORDS:
             p_var->ops = &coords_ops;
@@ -1267,9 +1257,6 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
                 p_val->f_float = p_var->max.f_float;
             }
             break;
-        case VLC_VAR_TIME:
-            /* FIXME: TODO */
-            break;
     }
 }
 
@@ -1492,7 +1479,6 @@ static void DumpVariable(const void *data, const VISIT which, const int depth)
         case VLC_VAR_STRING:   typename = "string";      break;
         case VLC_VAR_VARIABLE: typename = "variable";    break;
         case VLC_VAR_FLOAT:    typename = "float";       break;
-        case VLC_VAR_TIME:     typename = "time";        break;
         case VLC_VAR_COORDS:   typename = "coordinates"; break;
         case VLC_VAR_ADDRESS:  typename = "address";     break;
         default:               typename = "unknown";     break;
@@ -1524,9 +1510,6 @@ static void DumpVariable(const void *data, const VISIT which, const int depth)
             break;
         case VLC_VAR_FLOAT:
             printf(": %f", var->val.f_float );
-            break;
-        case VLC_VAR_TIME:
-            printf(": %"PRId64, var->val.i_time);
             break;
         case VLC_VAR_COORDS:
             printf(": %"PRId32"x%"PRId32,

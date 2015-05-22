@@ -64,10 +64,6 @@ static int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val, bool b_e
         case VLC_VAR_FLOAT:
             lua_pushnumber( L, val.f_float );
             break;
-        case VLC_VAR_TIME:
-            /* FIXME? (we're losing some precision, but does it really matter?) */
-            lua_pushnumber( L, ((double)val.i_time)/1000000. );
-            break;
         case VLC_VAR_ADDRESS:
             vlclua_error( L );
             break;
@@ -109,12 +105,6 @@ static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
             break;
         case VLC_VAR_FLOAT:
             val->f_float = luaL_checknumber( L, -1 );
-            break;
-        case VLC_VAR_TIME:
-            {
-                double f = luaL_checknumber( L, -1 );
-                val->i_time = (int64_t)(f*1000000.);
-            }
             break;
         case VLC_VAR_ADDRESS:
             vlclua_error( L );

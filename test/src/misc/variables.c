@@ -81,25 +81,6 @@ static void test_booleans( libvlc_int_t *p_libvlc )
         var_Destroy( p_libvlc, psz_var_name[i] );
 }
 
-static void test_times( libvlc_int_t *p_libvlc )
-{
-    int i;
-    for( i = 0; i < i_var_count; i++ )
-         var_Create( p_libvlc, psz_var_name[i], VLC_VAR_TIME );
-
-    for( i = 0; i < i_var_count; i++ )
-    {
-        var_value[i].i_time = rand();
-        var_SetTime( p_libvlc, psz_var_name[i], var_value[i].i_time );
-    }
-
-    for( i = 0; i < i_var_count; i++ )
-        assert( var_GetTime( p_libvlc, psz_var_name[i] ) == var_value[i].i_time );
-
-    for( i = 0; i < i_var_count; i++ )
-        var_Destroy( p_libvlc, psz_var_name[i] );
-}
-
 static void test_floats( libvlc_int_t *p_libvlc )
 {
     int i;
@@ -411,9 +392,6 @@ static void test_variables( libvlc_instance_t *p_vlc )
 
     log( "Testing for booleans\n" );
     test_booleans( p_libvlc );
-
-    log( "Testing for times\n" );
-    test_times( p_libvlc );
 
     log( "Testing for floats\n" );
     test_floats( p_libvlc );
