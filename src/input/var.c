@@ -143,14 +143,10 @@ void input_ControlVarInit ( input_thread_t *p_input )
     /* Position */
     var_Create( p_input, "position",  VLC_VAR_FLOAT );
     var_Create( p_input, "position-offset",  VLC_VAR_FLOAT );
-    val.f_float = 0.0;
-    var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
 
     /* Time */
     var_Create( p_input, "time",  VLC_VAR_TIME );
     var_Create( p_input, "time-offset",  VLC_VAR_TIME );    /* relative */
-    val.i_time = 0;
-    var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
 
     /* Bookmark */
     var_Create( p_input, "bookmark", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
@@ -192,8 +188,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
     val.i_time = INT64_C(1000) * var_GetInteger( p_input, "audio-desync" );
     var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
     var_Create( p_input, "spu-delay", VLC_VAR_TIME );
-    val.i_time = 0;
-    var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
 
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
@@ -218,8 +212,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "bookmarks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "length",  VLC_VAR_TIME );
-    val.i_time = 0;
-    var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 
     var_Create( p_input, "bit-rate", VLC_VAR_INTEGER );
     var_Create( p_input, "sample-rate", VLC_VAR_INTEGER );
