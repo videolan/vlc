@@ -952,7 +952,7 @@ static void LoadSubtitles( input_thread_t *p_input )
 
     const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
     if( i_delay != 0 )
-        var_SetTime( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
+        var_SetInteger( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
 
     /* Look for and add subtitle files */
     unsigned i_flags = SUB_FORCED;
@@ -1076,8 +1076,8 @@ static void UpdatePtsDelay( input_thread_t *p_input )
         i_pts_delay = 0;
 
     /* Take care of audio/spu delay */
-    const mtime_t i_audio_delay = var_GetTime( p_input, "audio-delay" );
-    const mtime_t i_spu_delay   = var_GetTime( p_input, "spu-delay" );
+    const mtime_t i_audio_delay = var_GetInteger( p_input, "audio-delay" );
+    const mtime_t i_spu_delay   = var_GetInteger( p_input, "spu-delay" );
     const mtime_t i_extra_delay = __MIN( i_audio_delay, i_spu_delay );
     if( i_extra_delay < 0 )
         i_pts_delay -= i_extra_delay;
@@ -1837,12 +1837,12 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
-            input_SendEventAudioDelay( p_input, val.i_time );
+            input_SendEventAudioDelay( p_input, val.i_int );
             UpdatePtsDelay( p_input );
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
-            input_SendEventSubtitleDelay( p_input, val.i_time );
+            input_SendEventSubtitleDelay( p_input, val.i_int );
             UpdatePtsDelay( p_input );
             break;
 

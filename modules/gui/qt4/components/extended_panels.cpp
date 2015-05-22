@@ -1587,10 +1587,10 @@ void SyncControls::update()
     int64_t i_delay;
     if( THEMIM->getInput() )
     {
-        i_delay = var_GetTime( THEMIM->getInput(), "audio-delay" );
-        AVSpin->setValue( ( (double)i_delay ) / 1000000 );
-        i_delay = var_GetTime( THEMIM->getInput(), "spu-delay" );
-        subsSpin->setValue( ( (double)i_delay ) / 1000000 );
+        i_delay = var_GetInteger( THEMIM->getInput(), "audio-delay" );
+        AVSpin->setValue( ( (double)i_delay ) / CLOCK_FREQ );
+        i_delay = var_GetInteger( THEMIM->getInput(), "spu-delay" );
+        subsSpin->setValue( ( (double)i_delay ) / CLOCK_FREQ );
         subSpeedSpin->setValue( var_GetFloat( THEMIM->getInput(), "sub-fps" ) );
         subDurationSpin->setValue( var_InheritFloat( p_intf, SUBSDELAY_CFG_FACTOR ) );
     }
@@ -1601,8 +1601,8 @@ void SyncControls::advanceAudio( double f_advance )
 {
     if( THEMIM->getInput() && b_userAction )
     {
-        int64_t i_delay = f_advance * 1000000;
-        var_SetTime( THEMIM->getInput(), "audio-delay", i_delay );
+        int64_t i_delay = f_advance * CLOCK_FREQ;
+        var_SetInteger( THEMIM->getInput(), "audio-delay", i_delay );
     }
 }
 
@@ -1610,8 +1610,8 @@ void SyncControls::advanceSubs( double f_advance )
 {
     if( THEMIM->getInput() && b_userAction )
     {
-        int64_t i_delay = f_advance * 1000000;
-        var_SetTime( THEMIM->getInput(), "spu-delay", i_delay );
+        int64_t i_delay = f_advance * CLOCK_FREQ;
+        var_SetInteger( THEMIM->getInput(), "spu-delay", i_delay );
     }
 }
 

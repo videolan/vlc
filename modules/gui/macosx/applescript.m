@@ -215,7 +215,7 @@
     if(!p_input)
         return i_delay;
 
-    i_delay = var_GetTime(p_input, "audio-delay");
+    i_delay = var_GetInteger(p_input, "audio-delay");
     vlc_object_release(p_input);
 
     return (i_delay / 1000);
@@ -226,7 +226,7 @@
     if(!p_input)
         return;
 
-    var_SetTime(p_input, "audio-delay", i_audioDesync * 1000);
+    var_SetInteger(p_input, "audio-delay", i_audioDesync * 1000);
     vlc_object_release(p_input);
 }
 

@@ -695,7 +695,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_subtitle >= p_sys->i_subtitles )
         return 0;
 
-    i_maxdate = p_sys->i_next_demux_date - var_GetTime( p_demux->p_parent, "spu-delay" );;
+    i_maxdate = p_sys->i_next_demux_date - var_GetInteger( p_demux->p_parent, "spu-delay" );;
     if( i_maxdate <= 0 && p_sys->i_subtitle < p_sys->i_subtitles )
     {
         /* Should not happen */

@@ -128,8 +128,8 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     input_thread_t * p_input = pl_CurrentInput(p_intf);
 
     if (p_input) {
-        var_SetTime(p_input, "audio-delay", 0.0);
-        var_SetTime(p_input, "spu-delay", 0.0);
+        var_SetInteger(p_input, "audio-delay", 0.0);
+        var_SetInteger(p_input, "spu-delay", 0.0);
         var_SetFloat(p_input, "sub-fps", 1.0);
         [self svDurationValueChanged:nil];
         vlc_object_release(p_input);
@@ -141,8 +141,8 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     input_thread_t * p_input = pl_CurrentInput(p_intf);
 
     if (p_input) {
-        [o_av_value_fld setDoubleValue: var_GetTime(p_input, "audio-delay") / 1000000.];
-        [o_sv_advance_value_fld setDoubleValue: var_GetTime(p_input, "spu-delay") / 1000000.];
+        [o_av_value_fld setDoubleValue: var_GetInteger(p_input, "audio-delay") / 1000000.];
+        [o_sv_advance_value_fld setDoubleValue: var_GetInteger(p_input, "spu-delay") / 1000000.];
         [o_sv_speed_value_fld setFloatValue: var_GetFloat(p_input, "sub-fps")];
         vlc_object_release(p_input);
     }
@@ -161,7 +161,7 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     input_thread_t * p_input = pl_CurrentInput(p_intf);
 
     if (p_input) {
-        var_SetTime(p_input, "audio-delay", [o_av_value_fld doubleValue] * 1000000.);
+        var_SetInteger(p_input, "audio-delay", [o_av_value_fld doubleValue] * 1000000.);
 
         vlc_object_release(p_input);
     }
@@ -177,7 +177,7 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
     input_thread_t * p_input = pl_CurrentInput(p_intf);
 
     if (p_input) {
-        var_SetTime(p_input, "spu-delay", [o_sv_advance_value_fld doubleValue] * 1000000.);
+        var_SetInteger(p_input, "spu-delay", [o_sv_advance_value_fld doubleValue] * 1000000.);
 
         vlc_object_release(p_input);
     }

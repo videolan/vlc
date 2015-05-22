@@ -120,21 +120,21 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_GET_AUDIO_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetTime( p_input, "audio-delay" );
+            *pi_64 = var_GetInteger( p_input, "audio-delay" );
             return VLC_SUCCESS;
 
         case INPUT_GET_SPU_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetTime( p_input, "spu-delay" );
+            *pi_64 = var_GetInteger( p_input, "spu-delay" );
             return VLC_SUCCESS;
 
         case INPUT_SET_AUDIO_DELAY:
             i_64 = (int64_t)va_arg( args, int64_t );
-            return var_SetTime( p_input, "audio-delay", i_64 );
+            return var_SetInteger( p_input, "audio-delay", i_64 );
 
         case INPUT_SET_SPU_DELAY:
             i_64 = (int64_t)va_arg( args, int64_t );
-            return var_SetTime( p_input, "spu-delay", i_64 );
+            return var_SetInteger( p_input, "spu-delay", i_64 );
 
         case INPUT_NAV_ACTIVATE:
         case INPUT_NAV_UP:

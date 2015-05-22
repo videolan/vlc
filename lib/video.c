@@ -364,7 +364,7 @@ int64_t libvlc_video_get_spu_delay( libvlc_media_player_t *p_mi )
 
     if( p_input_thread )
     {
-        val = var_GetTime( p_input_thread, "spu-delay" );
+        val = var_GetInteger( p_input_thread, "spu-delay" );
         vlc_object_release( p_input_thread );
     }
     else
@@ -383,7 +383,7 @@ int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi,
 
     if( p_input_thread )
     {
-        var_SetTime( p_input_thread, "spu-delay", i_delay );
+        var_SetInteger( p_input_thread, "spu-delay", i_delay );
         vlc_object_release( p_input_thread );
         ret = 0;
     }

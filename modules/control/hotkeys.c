@@ -450,10 +450,10 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 }
                 else
                 {
-                    int64_t i_current_subdelay = var_GetTime( p_input, "spu-delay" );
+                    int64_t i_current_subdelay = var_GetInteger( p_input, "spu-delay" );
                     int64_t i_additional_subdelay = p_sys->subtitle_delaybookmarks.i_time_audio - p_sys->subtitle_delaybookmarks.i_time_subtitle;
                     int64_t i_total_subdelay = i_current_subdelay + i_additional_subdelay;
-                    var_SetTime( p_input, "spu-delay", i_total_subdelay);
+                    var_SetInteger( p_input, "spu-delay", i_total_subdelay);
                     ClearChannels( p_intf, p_vout );
                     DisplayMessage( p_vout, _( "Sub sync: corrected %i ms (total delay = %i ms)" ),
                                             (int)(i_additional_subdelay / 1000),
@@ -466,7 +466,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         }
         case ACTIONID_SUBSYNC_RESET:
         {
-            var_SetTime( p_input, "spu-delay", 0);
+            var_SetInteger( p_input, "spu-delay", 0);
             ClearChannels( p_intf, p_vout );
             DisplayMessage( p_vout, _( "Sub sync: delay reset" ) );
             p_sys->subtitle_delaybookmarks.i_time_audio = 0;
@@ -493,9 +493,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                     var_FreeList( &list, &list2 );
                     break;
                 }
-                int64_t i_delay = var_GetTime( p_input, "spu-delay" ) + diff;
+                int64_t i_delay = var_GetInteger( p_input, "spu-delay" ) + diff;
 
-                var_SetTime( p_input, "spu-delay", i_delay );
+                var_SetInteger( p_input, "spu-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
                 DisplayMessage( p_vout, _( "Subtitle delay %i ms" ),
                                 (int)(i_delay/1000) );
@@ -509,9 +509,10 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             int diff = (i_action == ACTIONID_AUDIODELAY_UP) ? 50000 : -50000;
             if( p_input )
             {
-                int64_t i_delay = var_GetTime( p_input, "audio-delay" ) + diff;
+                int64_t i_delay = var_GetInteger( p_input, "audio-delay" )
+                                  + diff;
 
-                var_SetTime( p_input, "audio-delay", i_delay );
+                var_SetInteger( p_input, "audio-delay", i_delay );
                 ClearChannels( p_intf, p_vout );
                 DisplayMessage( p_vout, _( "Audio delay %i ms" ),
                                  (int)(i_delay/1000) );

@@ -186,10 +186,10 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Change( p_input, "navigation", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Delay */
-    var_Create( p_input, "audio-delay", VLC_VAR_TIME );
-    var_SetTime( p_input, "audio-delay",
-                 1000 * var_GetInteger( p_input, "audio-desync" ) );
-    var_Create( p_input, "spu-delay", VLC_VAR_TIME );
+    var_Create( p_input, "audio-delay", VLC_VAR_INTEGER );
+    var_SetInteger( p_input, "audio-delay",
+                    1000 * var_GetInteger( p_input, "audio-desync" ) );
+    var_Create( p_input, "spu-delay", VLC_VAR_INTEGER );
 
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
