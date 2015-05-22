@@ -53,7 +53,6 @@
 #define VLC_VAR_VOID      0x0010
 #define VLC_VAR_BOOL      0x0020
 #define VLC_VAR_INTEGER   0x0030
-#define VLC_VAR_HOTKEY    0x0031
 #define VLC_VAR_STRING    0x0040
 #define VLC_VAR_VARIABLE  0x0044
 #define VLC_VAR_FLOAT     0x0050
