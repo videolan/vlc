@@ -40,6 +40,8 @@
 #include "logic/AlwaysLowestAdaptationLogic.hpp"
 #include <vlc_stream.h>
 
+#include <ctime>
+
 using namespace adaptative::http;
 using namespace adaptative::logic;
 using namespace adaptative;

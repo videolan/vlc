@@ -41,6 +41,7 @@
 #include <vlc_stream.h>
 
 #include <algorithm>
+#include <ctime>
 
 using namespace dash;
 using namespace dash::mpd;
