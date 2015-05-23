@@ -684,7 +684,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
         ControlPause( p_input, i_start_mdate );
 
     bool b_pause_after_eof = b_interactive &&
-                             var_CreateGetBool( p_input, "play-and-pause" );
+                             var_InheritBool( p_input, "play-and-pause" );
 
     while( vlc_object_alive( p_input ) && !p_input->b_error )
     {
@@ -728,7 +728,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             {
                 if( MainLoopTryRepeat( p_input, &i_start_mdate ) )
                     break;
-                b_pause_after_eof = var_GetBool( p_input, "play-and-pause" );
             }
 
             /* Update interface and statistics */
