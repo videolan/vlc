@@ -930,11 +930,8 @@ static int AStreamSeekBlock( stream_t *s, uint64_t i_pos )
 
     if( b_seek )
     {
-        int64_t i_start, i_end;
         /* Do the access seek */
-        i_start = mdate();
         if( ASeek( s, i_pos ) ) return VLC_EGENERIC;
-        i_end = mdate();
 
         /* Release data */
         block_ChainRelease( p_sys->block.p_first );
