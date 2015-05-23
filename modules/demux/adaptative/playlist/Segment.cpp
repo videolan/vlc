@@ -112,6 +112,26 @@ bool ISegment::contains(size_t byte) const
             (!endByte || byte <= endByte) );
 }
 
+int ISegment::compare(ISegment *other) const
+{
+    if(startTime.Get() != VLC_TS_INVALID)
+    {
+        int64_t diff = startTime.Get() - other->startTime.Get();
+        if(diff)
+            return diff / diff;
+    }
+
+    size_t diff = startByte - other->startByte;
+    if(diff)
+        return diff / diff;
+
+    diff = endByte - other->endByte;
+    if(diff)
+        return diff / diff;
+
+    return 0;
+}
+
 int ISegment::getClassId() const
 {
     return classId;

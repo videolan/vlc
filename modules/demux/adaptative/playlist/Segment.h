@@ -58,6 +58,7 @@ namespace adaptative
                 virtual void                            addSubSegment   (SubSegment *) = 0;
                 virtual void                            debug           (vlc_object_t *,int = 0) const;
                 virtual bool                            contains        (size_t byte) const;
+                virtual int                             compare         (ISegment *) const;
                 int                                     getClassId      () const;
                 Property<mtime_t>       startTime;
                 Property<mtime_t>       duration;
