@@ -273,6 +273,8 @@ static void transform_GetBasicOps( video_transform_t transform,
         case TRANSFORM_IDENTITY:
             *angle = 0;
             break;
+        default:
+            vlc_assert_unreachable ();
     }
 }
 
