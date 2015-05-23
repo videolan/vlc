@@ -133,20 +133,8 @@ void AbstractPlaylist::getTimeLinesBoundaries(mtime_t *min, mtime_t *max) const
 void AbstractPlaylist::mergeWith(AbstractPlaylist *updatedAbstractPlaylist, mtime_t prunebarrier)
 {
     availabilityEndTime.Set(updatedAbstractPlaylist->availabilityEndTime.Get());
-    /* Only merge timelines for now */
-    for(size_t i = 0; i < periods.size() && i < updatedAbstractPlaylist->periods.size(); i++)
-    {
-        std::vector<SegmentTimeline *> timelines;
-        std::vector<SegmentTimeline *> timelinesUpdate;
-        periods.at(i)->collectTimelines(&timelines);
-        updatedAbstractPlaylist->periods.at(i)->collectTimelines(&timelinesUpdate);
 
-        for(size_t j = 0; j < timelines.size() && j < timelinesUpdate.size(); j++)
-        {
-            timelines.at(j)->mergeWith(*timelinesUpdate.at(j));
-            if(prunebarrier)
-                timelines.at(j)->prune(prunebarrier);
-        }
-    }
+    for(size_t i = 0; i < periods.size() && i < updatedAbstractPlaylist->periods.size(); i++)
+        periods.at(i)->mergeWith(updatedAbstractPlaylist->periods.at(i), prunebarrier);
 }
 

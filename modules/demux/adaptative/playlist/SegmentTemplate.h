@@ -50,6 +50,7 @@ namespace adaptative
         {
             public:
                 MediaSegmentTemplate( SegmentInformation * = NULL );
+                void mergeWith( MediaSegmentTemplate *, mtime_t );
                 Property<size_t>        startNumber;
         };
 

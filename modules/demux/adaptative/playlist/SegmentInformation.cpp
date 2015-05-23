@@ -251,6 +251,21 @@ void SegmentInformation::collectTimelines(std::vector<SegmentTimeline *> *timeli
         (*it)->collectTimelines(timelines);
 }
 
+void SegmentInformation::mergeWith(SegmentInformation *updated, mtime_t prunetime)
+{
+    /* Support Segment List for now */
+    if(segmentList && updated->segmentList)
+        segmentList->mergeWith(updated->segmentList);
+
+    if(mediaSegmentTemplate && updated->mediaSegmentTemplate)
+        mediaSegmentTemplate->mergeWith(updated->mediaSegmentTemplate, prunetime);
+
+    for(size_t i=0; i<childs.size() && i<updated->childs.size(); i++)
+    {
+        childs.at(i)->mergeWith(updated->childs.at(i), prunetime);
+    }
+}
+
 bool SegmentInformation::canBitswitch() const
 {
     if(bitswitch_policy == BITSWITCH_INHERIT)

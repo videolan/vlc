@@ -46,5 +46,21 @@ const std::vector<Segment*>& SegmentList::getSegments() const
 
 void SegmentList::addSegment(Segment *seg)
 {
+    seg->setParent(this);
     segments.push_back(seg);
+}
+
+void SegmentList::mergeWith(SegmentList *updated)
+{
+    const Segment * lastSegment = (segments.empty()) ? NULL : segments.back();
+
+    std::vector<Segment *>::iterator it;
+    for(it = updated->segments.begin(); it != updated->segments.end(); ++it)
+    {
+        if( !lastSegment || lastSegment->compare( *it ) < 0 )
+            addSegment(*it);
+        else
+            delete *it;
+    }
+    updated->segments.clear();
 }

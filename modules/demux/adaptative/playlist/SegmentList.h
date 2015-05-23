@@ -47,6 +47,7 @@ namespace adaptative
 
                 const std::vector<Segment *>&   getSegments() const;
                 void                    addSegment(Segment *seg);
+                void                    mergeWith(SegmentList *);
 
             private:
                 std::vector<Segment *>  segments;

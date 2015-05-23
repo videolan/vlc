@@ -57,6 +57,16 @@ MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
     initialisationSegment.Set( NULL );
 }
 
+void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, mtime_t prunebarrier)
+{
+    if(segmentTimeline.Get() && updated->segmentTimeline.Get())
+    {
+        segmentTimeline.Get()->mergeWith(*updated->segmentTimeline.Get());
+        if(prunebarrier)
+            segmentTimeline.Get()->prune(prunebarrier);
+    }
+}
+
 InitSegmentTemplate::InitSegmentTemplate( ICanonicalUrl *parent ) :
     BaseSegmentTemplate(parent)
 {
