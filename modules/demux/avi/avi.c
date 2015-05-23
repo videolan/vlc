@@ -145,7 +145,7 @@ typedef struct
     unsigned int    i_cat; /* AUDIO_ES, VIDEO_ES */
     vlc_fourcc_t    i_codec;
 
-    int             i_rate;
+    unsigned int    i_rate;
     int             i_scale;
     unsigned int    i_samplesize;
 
@@ -784,7 +784,7 @@ aviindex:
         p_auds = AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0 );
 
         if( p_auds->p_wf->wFormatTag != WAVE_FORMAT_PCM &&
-            (unsigned int)tk->i_rate == p_auds->p_wf->nSamplesPerSec )
+            tk->i_rate == p_auds->p_wf->nSamplesPerSec )
         {
             int64_t i_track_length =
                 tk->idx.p_entry[tk->idx.i_size-1].i_length +
