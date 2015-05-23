@@ -1326,7 +1326,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     switch(i_type & VLC_VAR_TYPE) {
         case VLC_VAR_VOID:
         case VLC_VAR_BOOL:
-        case VLC_VAR_VARIABLE:
         case VLC_VAR_STRING:
         case VLC_VAR_INTEGER:
             break;
@@ -1410,9 +1409,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     /* Make sure we want to display the variable */
     if (i_type & VLC_VAR_HASCHOICE) {
         var_Change(p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL);
-        if (val.i_int == 0)
-            return;
-        if ((i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1)
+        if (val.i_int == 0 || val.i_int == 1)
             return;
     }
     else
@@ -1421,7 +1418,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
     switch(i_type & VLC_VAR_TYPE) {
         case VLC_VAR_VOID:
         case VLC_VAR_BOOL:
-        case VLC_VAR_VARIABLE:
         case VLC_VAR_STRING:
         case VLC_VAR_INTEGER:
             break;

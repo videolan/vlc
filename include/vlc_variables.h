@@ -54,7 +54,6 @@
 #define VLC_VAR_BOOL      0x0020
 #define VLC_VAR_INTEGER   0x0030
 #define VLC_VAR_STRING    0x0040
-#define VLC_VAR_VARIABLE  0x0044
 #define VLC_VAR_FLOAT     0x0050
 #define VLC_VAR_ADDRESS   0x0070
 #define VLC_VAR_COORDS    0x00A0

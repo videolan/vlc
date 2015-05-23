@@ -1477,7 +1477,6 @@ static void DumpVariable(const void *data, const VISIT which, const int depth)
         case VLC_VAR_BOOL:     typename = "bool";        break;
         case VLC_VAR_INTEGER:  typename = "integer";     break;
         case VLC_VAR_STRING:   typename = "string";      break;
-        case VLC_VAR_VARIABLE: typename = "variable";    break;
         case VLC_VAR_FLOAT:    typename = "float";       break;
         case VLC_VAR_COORDS:   typename = "coordinates"; break;
         case VLC_VAR_ADDRESS:  typename = "address";     break;

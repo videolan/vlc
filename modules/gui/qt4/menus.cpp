@@ -1224,44 +1224,13 @@ static bool IsMenuEmpty( const char *psz_var,
                          vlc_object_t *p_object,
                          bool b_root = true )
 {
-    vlc_value_t val, val_list;
-    int i_type, i_result, i;
-
-    /* Check the type of the object variable */
-    i_type = var_Type( p_object, psz_var );
-
     /* Check if we want to display the variable */
-    if( !( i_type & VLC_VAR_HASCHOICE ) ) return false;
+    if( !(var_Type( p_object, psz_var) & VLC_VAR_HASCHOICE) )
+        return false;
 
+    vlc_value_t val;
     var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
-    if( val.i_int == 0 ) return true;
-
-    if( ( i_type & VLC_VAR_TYPE ) != VLC_VAR_VARIABLE )
-    {
-        if( val.i_int == 1 && b_root ) return true;
-        else return false;
-    }
-
-    /* Check children variables in case of VLC_VAR_VARIABLE */
-    if( var_Change( p_object, psz_var, VLC_VAR_GETCHOICES, &val_list, NULL ) < 0 )
-    {
-        return true;
-    }
-
-    for( i = 0, i_result = true; i < val_list.p_list->i_count; i++ )
-    {
-        if( !IsMenuEmpty( val_list.p_list->p_values[i].psz_string,
-                    p_object, false ) )
-        {
-            i_result = false;
-            break;
-        }
-    }
-
-    /* clean up everything */
-    var_FreeList( &val_list, NULL );
-
-    return i_result;
+    return val.i_int == 0 || (val.i_int == 1 && b_root);
 }
 
 #define TEXT_OR_VAR qfue ( text.psz_string ? text.psz_string : psz_var )
@@ -1296,7 +1265,6 @@ void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     {
         case VLC_VAR_VOID:
         case VLC_VAR_BOOL:
-        case VLC_VAR_VARIABLE:
         case VLC_VAR_STRING:
         case VLC_VAR_INTEGER:
         case VLC_VAR_FLOAT:
@@ -1418,7 +1386,6 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     {
         case VLC_VAR_VOID:
         case VLC_VAR_BOOL:
-        case VLC_VAR_VARIABLE:
         case VLC_VAR_STRING:
         case VLC_VAR_INTEGER:
         case VLC_VAR_FLOAT:
@@ -1442,16 +1409,9 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     {
         vlc_value_t another_val;
         QString menutext;
-        QMenu *subsubmenu = new QMenu( submenu );
 
         switch( i_type & VLC_VAR_TYPE )
         {
-            case VLC_VAR_VARIABLE:
-                CreateChoicesMenu( subsubmenu, CURVAL.psz_string, p_object, false );
-                subsubmenu->setTitle( qfue( CURTEXT ? CURTEXT :CURVAL.psz_string ) );
-                submenu->addMenu( subsubmenu );
-                break;
-
             case VLC_VAR_STRING:
                 var_Get( p_object, psz_var, &val );
                 another_val.psz_string = strdup( CURVAL.psz_string );
