@@ -292,13 +292,15 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         var_AddCallback( p_input, val.psz_string,
                          NavigationCallback, (void *)(intptr_t)i );
 
-        char psz_length[MSTRTIME_MAX_SIZE + sizeof(" []")] = "";
+        char psz_length[MSTRTIME_MAX_SIZE + sizeof(" []")];
         if( p_input->p->title[i]->i_length > 0 )
         {
             strcpy( psz_length, " [" );
             secstotimestr( &psz_length[2], p_input->p->title[i]->i_length / CLOCK_FREQ );
             strcat( psz_length, "]" );
         }
+        else
+            psz_length[0] = '\0';
 
         if( p_input->p->title[i]->psz_name == NULL ||
             *p_input->p->title[i]->psz_name == '\0' )
