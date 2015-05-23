@@ -180,11 +180,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
     text.psz_string = _("Chapter");
     var_Change( p_input, "chapter", VLC_VAR_SETTEXT, &text, NULL );
 
-    /* Navigation The callback is added after */
-    var_Create( p_input, "navigation", VLC_VAR_VARIABLE | VLC_VAR_HASCHOICE );
-    text.psz_string = _("Navigation");
-    var_Change( p_input, "navigation", VLC_VAR_SETTEXT, &text, NULL );
-
     /* Delay */
     var_Create( p_input, "audio-delay", VLC_VAR_INTEGER );
     var_SetInteger( p_input, "audio-delay",
@@ -318,7 +313,6 @@ void input_ControlVarNavigation( input_thread_t *p_input )
                           p_input->p->title[i]->psz_name, psz_length ) == -1 )
                 continue;
         }
-        var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val, &text );
 
         /* Add title choice */
         val2.i_int = i;
