@@ -138,6 +138,8 @@ static bool is_looping(access_t *p_access, const char *psz_uri)
     }
     return b_looping;
 #else
+    VLC_UNUSED(p_access);
+    VLC_UNUSED(psz_uri);
     return false;
 #endif
 }

@@ -268,6 +268,7 @@ static void FindMountPoint(char **file)
     }
 #else
 # warning Disc device to mount point not implemented
+    VLC_UNUSED( device );
 #endif
 }
 
