@@ -376,16 +376,6 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt)
         return -1;
     }
 
-    if (!var_Type (aout, "stereo-mode"))
-    {
-        var_Create (aout, "stereo-mode",
-                    VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT);
-
-        vlc_value_t txt;
-        txt.psz_string = _("Stereo audio mode");
-        var_Change (aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
-    }
-
     /* The user may have selected a different channels configuration. */
     var_AddCallback (aout, "stereo-mode", aout_ChannelsRestart, NULL);
     switch (var_GetInteger (aout, "stereo-mode"))

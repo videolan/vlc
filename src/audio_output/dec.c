@@ -65,12 +65,16 @@ int aout_DecNew( audio_output_t *p_aout,
         return -1;
     }
 
+    var_Create (p_aout, "stereo-mode",
+                VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT);
+    vlc_value_t txt;
+    txt.psz_string = _("Stereo audio mode");
+    var_Change (p_aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
+
     aout_owner_t *owner = aout_owner(p_aout);
 
     /* TODO: reduce lock scope depending on decoder's real need */
     aout_OutputLock (p_aout);
-
-    var_Destroy( p_aout, "stereo-mode" );
 
     /* Create the audio output stream */
     owner->volume = aout_volume_New (p_aout, p_replay_gain);
@@ -93,6 +97,7 @@ int aout_DecNew( audio_output_t *p_aout,
 error:
         aout_volume_Delete (owner->volume);
         aout_OutputUnlock (p_aout);
+        var_Destroy (p_aout, "stereo-mode");
         return -1;
     }
 
