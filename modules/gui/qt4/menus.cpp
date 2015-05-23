@@ -1220,9 +1220,7 @@ QMenu * VLCMenuBar::Populate( intf_thread_t *p_intf,
  * Private methods.
  *****************************************************************************/
 
-static bool IsMenuEmpty( const char *psz_var,
-                         vlc_object_t *p_object,
-                         bool b_root = true )
+static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object )
 {
     /* Check if we want to display the variable */
     if( !(var_Type( p_object, psz_var) & VLC_VAR_HASCHOICE) )
@@ -1230,7 +1228,7 @@ static bool IsMenuEmpty( const char *psz_var,
 
     vlc_value_t val;
     var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
-    return val.i_int == 0 || (val.i_int == 1 && b_root);
+    return val.i_int == 0 || val.i_int == 1;
 }
 
 #define TEXT_OR_VAR qfue ( text.psz_string ? text.psz_string : psz_var )
@@ -1322,14 +1320,14 @@ void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
             }
 
             action->setEnabled(
-               CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0 );
+                CreateChoicesMenu( submenu, psz_var, p_object ) == 0 );
             if( forceDisabled )
                 action->setEnabled( false );
         }
         else
         {
             action->setEnabled(
-                CreateChoicesMenu( menu, psz_var, p_object, true ) == 0 );
+                CreateChoicesMenu( menu, psz_var, p_object ) == 0 );
         }
         FREENULL( text.psz_string );
         return;
@@ -1370,7 +1368,7 @@ static bool CheckTitle( vlc_object_t *p_object, const char *psz_var )
 
 
 int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
-        vlc_object_t *p_object, bool b_root )
+                                   vlc_object_t *p_object )
 {
     vlc_value_t val, val_list, text_list;
     int i_type, i;
@@ -1379,7 +1377,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     i_type = var_Type( p_object, psz_var );
 
     /* Make sure we want to display the variable */
-    if( submenu->isEmpty() && IsMenuEmpty( psz_var, p_object, b_root ) )
+    if( submenu->isEmpty() && IsMenuEmpty( psz_var, p_object ) )
         return VLC_EGENERIC;
 
     switch( i_type & VLC_VAR_TYPE )
