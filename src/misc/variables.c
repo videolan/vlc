@@ -418,7 +418,6 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     return ret;
 }
 
-#undef var_Destroy
 /**
  * Destroy a vlc variable
  *
@@ -428,7 +427,7 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
  * \param p_this The object that holds the variable
  * \param psz_name The name of the variable
  */
-int var_Destroy( vlc_object_t *p_this, const char *psz_name )
+void (var_Destroy)(vlc_object_t *p_this, const char *psz_name)
 {
     variable_t *p_var;
 
@@ -440,7 +439,7 @@ int var_Destroy( vlc_object_t *p_this, const char *psz_name )
     if( p_var == NULL )
     {
         vlc_mutex_unlock( &p_priv->var_lock );
-        return VLC_ENOVAR;
+        return;
     }
 
     WaitUnused( p_this, p_var );
@@ -453,7 +452,6 @@ int var_Destroy( vlc_object_t *p_this, const char *psz_name )
 
     if( p_var != NULL )
         Destroy( p_var );
-    return VLC_SUCCESS;
 }
 
 static void CleanupVar( void *var )

@@ -141,7 +141,7 @@ enum {
 VLC_API int var_Create( vlc_object_t *, const char *, int );
 #define var_Create(a,b,c) var_Create( VLC_OBJECT(a), b, c )
 
-VLC_API int var_Destroy( vlc_object_t *, const char * );
+VLC_API void var_Destroy( vlc_object_t *, const char * );
 #define var_Destroy(a,b) var_Destroy( VLC_OBJECT(a), b )
 
 VLC_API int var_Change( vlc_object_t *, const char *, int, vlc_value_t *, vlc_value_t * );
