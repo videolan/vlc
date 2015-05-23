@@ -157,7 +157,7 @@ static variable_t *Lookup( vlc_object_t *obj, const char *psz_name )
     vlc_object_internals_t *priv = vlc_internals( obj );
     variable_t **pp_var;
 
-    vlc_assert_locked( &priv->var_lock );
+    vlc_mutex_lock(&priv->var_lock);
     pp_var = tfind( &psz_name, &priv->var_root, varcmp );
     return (pp_var != NULL) ? *pp_var : NULL;
 }
@@ -436,8 +436,6 @@ int var_Destroy( vlc_object_t *p_this, const char *psz_name )
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_mutex_lock( &p_priv->var_lock );
-
     p_var = Lookup( p_this, psz_name );
     if( p_var == NULL )
     {
@@ -492,8 +490,6 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
     assert( p_this );
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    vlc_mutex_lock( &p_priv->var_lock );
 
     p_var = Lookup( p_this, psz_name );
     if( p_var == NULL )
@@ -716,7 +712,6 @@ int var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_mutex_lock( &p_priv->var_lock );
     p_var = Lookup( p_this, psz_name );
     if( p_var == NULL )
     {
@@ -784,8 +779,6 @@ int var_Type( vlc_object_t *p_this, const char *psz_name )
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    vlc_mutex_lock( &p_priv->var_lock );
-
     p_var = Lookup( p_this, psz_name );
     if( p_var != NULL )
     {
@@ -808,8 +801,6 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
     assert( p_this );
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    vlc_mutex_lock( &p_priv->var_lock );
 
     p_var = Lookup( p_this, psz_name );
     if( p_var == NULL )
@@ -869,8 +860,6 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
     variable_t *p_var;
     int err = VLC_SUCCESS;
 
-    vlc_mutex_lock( &p_priv->var_lock );
-
     p_var = Lookup( p_this, psz_name );
     if( p_var != NULL )
     {
@@ -913,8 +902,6 @@ static int AddCallback( vlc_object_t *p_this, const char *psz_name,
     assert( p_this );
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    vlc_mutex_lock( &p_priv->var_lock );
 
     p_var = Lookup( p_this, psz_name );
     if( p_var == NULL )
@@ -981,8 +968,6 @@ static int DelCallback( vlc_object_t *p_this, const char *psz_name,
     assert( p_this );
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    vlc_mutex_lock( &p_priv->var_lock );
 
     p_var = Lookup( p_this, psz_name );
     if( p_var == NULL )
@@ -1062,8 +1047,6 @@ int var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
     assert( p_this );
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    vlc_mutex_lock( &p_priv->var_lock );
 
     p_var = Lookup( p_this, psz_name );
     if( p_var == NULL )
