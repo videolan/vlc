@@ -255,8 +255,7 @@ void input_ControlVarStop( input_thread_t *p_input )
  *****************************************************************************/
 void input_ControlVarNavigation( input_thread_t *p_input )
 {
-    vlc_value_t val, text;
-    int  i;
+    vlc_value_t text;
 
     /* Create more command variables */
     if( p_input->p->i_title > 1 )
@@ -272,24 +271,20 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         var_AddCallback( p_input, "prev-title", TitleCallback, NULL );
     }
 
-    /* Create title and navigation */
-    val.psz_string = malloc( sizeof("title ") + 5 );
-    if( !val.psz_string )
-        return;
-
+    /* Create titles and chapters */
     var_Change( p_input, "title", VLC_VAR_CLEARCHOICES, NULL, NULL );
 
-    for( i = 0; i < p_input->p->i_title; i++ )
+    for( int i = 0; i < p_input->p->i_title; i++ )
     {
         vlc_value_t val2, text2;
-        int j;
+        char title[sizeof("title ") + 3 * sizeof (int)];
 
         /* Add Navigation entries */
-        sprintf( val.psz_string,  "title %2i", i );
-        var_Destroy( p_input, val.psz_string );
-        var_Create( p_input, val.psz_string,
+        sprintf( title, "title %2u", i );
+        var_Destroy( p_input, title );
+        var_Create( p_input, title,
                     VLC_VAR_INTEGER|VLC_VAR_HASCHOICE|VLC_VAR_ISCOMMAND );
-        var_AddCallback( p_input, val.psz_string,
+        var_AddCallback( p_input, title,
                          NavigationCallback, (void *)(intptr_t)i );
 
         char psz_length[MSTRTIME_MAX_SIZE + sizeof(" []")];
@@ -322,7 +317,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
 
         free( text.psz_string );
 
-        for( j = 0; j < p_input->p->title[i]->i_seekpoint; j++ )
+        for( int j = 0; j < p_input->p->title[i]->i_seekpoint; j++ )
         {
             val2.i_int = j;
 
@@ -340,13 +335,11 @@ void input_ControlVarNavigation( input_thread_t *p_input )
                     strdup( p_input->p->title[i]->seekpoint[j]->psz_name );
             }
 
-            var_Change( p_input, val.psz_string, VLC_VAR_ADDCHOICE,
-                        &val2, &text2 );
+            var_Change( p_input, title, VLC_VAR_ADDCHOICE, &val2, &text2 );
             free( text2.psz_string );
         }
 
     }
-    free( val.psz_string );
 }
 
 /*****************************************************************************
