@@ -149,9 +149,9 @@ void input_SendEventSeekpoint( input_thread_t *p_input, int i_title, int i_seekp
     val.i_int = i_seekpoint;
     var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
 
-    /* "title %2i" */
-    char psz_title[10];
-    snprintf( psz_title, sizeof(psz_title), "title %2i", i_title );
+    /* "title %2u" */
+    char psz_title[sizeof ("title ") + 3 * sizeof (int)];
+    sprintf( psz_title, "title %2u", i_title );
     var_Change( p_input, psz_title, VLC_VAR_SETVALUE, &val, NULL );
 
     /* */

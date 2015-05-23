@@ -1354,15 +1354,15 @@ void VLCMenuBar::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
 #undef TEXT_OR_VAR
 
 /** HACK for the navigation submenu:
- * "title %2i" variables take the value 0 if not set
+ * "title %2u" variables take the value 0 if not set
  */
 static bool CheckTitle( vlc_object_t *p_object, const char *psz_var )
 {
-    int i_title = 0;
-    if( sscanf( psz_var, "title %2i", &i_title ) <= 0 )
+    unsigned i_title = 0;
+    if( sscanf( psz_var, "title %2u", &i_title ) <= 0 )
         return true;
 
-    int i_current_title = var_GetInteger( p_object, "title" );
+    unsigned i_current_title = var_GetInteger( p_object, "title" );
     return ( i_title == i_current_title );
 }
 

@@ -1266,19 +1266,15 @@ int libvlc_media_player_get_chapter_count_for_title(
                                  libvlc_media_player_t *p_mi,
                                  int i_title )
 {
-    input_thread_t *p_input_thread;
     vlc_value_t val;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi );
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
     if( !p_input_thread )
         return -1;
 
-    char *psz_name;
-    if( asprintf( &psz_name,  "title %2i", i_title ) == -1 )
-    {
-        vlc_object_release( p_input_thread );
-        return -1;
-    }
+    char psz_name[sizeof ("title ") + 3 * sizeof (int)];
+    sprintf( psz_name, "title %2u", i_title );
+
     int i_ret = var_Change( p_input_thread, psz_name, VLC_VAR_CHOICESCOUNT, &val, NULL );
     vlc_object_release( p_input_thread );
     free( psz_name );

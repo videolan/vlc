@@ -405,8 +405,8 @@ libvlc_track_description_t *
         libvlc_video_get_chapter_description( libvlc_media_player_t *p_mi,
                                               int i_title )
 {
-    char psz_title[12];
-    sprintf( psz_title,  "title %2i", i_title );
+    char psz_title[sizeof ("title ") + 3 * sizeof (int)];
+    sprintf( psz_title,  "title %2u", i_title );
     return libvlc_get_track_description( p_mi, psz_title );
 }
 
