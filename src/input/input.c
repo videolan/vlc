@@ -524,12 +524,6 @@ static void *Run( void *obj )
 
     if( !Init( p_input ) )
     {
-        if( var_InheritBool( p_input, "start-paused" ) )
-        {
-            const mtime_t i_control_date = mdate();
-            ControlPause( p_input, i_control_date );
-        }
-
         MainLoop( p_input, true ); /* FIXME it can be wrong (like with VLM) */
 
         /* Clean up */
@@ -685,6 +679,10 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     mtime_t i_start_mdate = mdate();
     mtime_t i_intf_update = 0;
     mtime_t i_last_seek_mdate = 0;
+
+    if( b_interactive && var_InheritBool( p_input, "start-paused" ) )
+        ControlPause( p_input, i_start_mdate );
+
     bool b_pause_after_eof = b_interactive &&
                              var_CreateGetBool( p_input, "play-and-pause" );
 
