@@ -192,7 +192,10 @@ static int Demux(demux_t *p_demux)
     case Stream::status_buffering:
         break;
     case Stream::status_demuxed:
-        p_sys->i_nzpcr += DEMUX_INCREMENT;
+        if(p_sys->i_nzpcr == VLC_TS_INVALID)
+            p_sys->i_nzpcr = p_sys->p_dashManager->getPCR();
+        else
+            p_sys->i_nzpcr += DEMUX_INCREMENT;
         int group = p_sys->p_dashManager->getGroup();
         es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, VLC_TS_0 + p_sys->i_nzpcr);
         break;
