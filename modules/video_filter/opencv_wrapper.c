@@ -39,8 +39,8 @@
 #include <vlc_image.h>
 #include "filter_picture.h"
 
-#include <cxcore.h>
-#include <cv.h>
+#include <opencv2/core/core_c.h>
+#include <opencv2/core/types_c.h>
 
 /*****************************************************************************
  * Local prototypes
