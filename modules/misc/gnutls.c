@@ -22,6 +22,7 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -130,6 +131,35 @@ static int gnutls_Error (vlc_object_t *obj, int val)
 }
 #define gnutls_Error(o, val) gnutls_Error(VLC_OBJECT(o), val)
 
+#ifdef IOV_MAX
+static ssize_t vlc_gnutls_writev (gnutls_transport_ptr_t ptr,
+                                  const giovec_t *giov, int iovcnt)
+{
+    if (unlikely((unsigned)iovcnt > IOV_MAX))
+    {
+        errno = EINVAL;
+        return -1;
+    }
+    if (unlikely(iovcnt == 0))
+        return 0;
+
+    struct iovec iov[iovcnt];
+    struct msghdr msg = {
+        .msg_iov = iov,
+        .msg_iovlen = iovcnt,
+    };
+    int fd = (intptr_t)ptr;
+
+    for (int i = 0; i < iovcnt; i++)
+    {
+        iov[i].iov_base = giov[i].iov_base;
+        iov[i].iov_len = giov[i].iov_len;
+    }
+
+    return sendmsg (fd, &msg, MSG_NOSIGNAL);
+}
+#endif
+
 /**
  * Sends data through a TLS session.
  */
@@ -221,7 +251,9 @@ static int gnutls_SessionOpen (vlc_tls_t *tls, int type,
     }
 
     gnutls_transport_set_int (session, fd);
-
+#ifdef IOV_MAX
+    gnutls_transport_set_vec_push_function (session, vlc_gnutls_writev);
+#endif
     tls->sys = session;
     tls->sock.p_sys = NULL;
     tls->sock.pf_send = gnutls_Send;
