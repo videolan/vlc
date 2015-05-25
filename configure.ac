@@ -3959,6 +3959,7 @@ AS_IF([test "${enable_libgcrypt}" != "no"], [
         AC_MSG_ERROR([gcrypt.h present but libgcrypt-config could not be found])
     AC_CHECK_LIB(gcrypt, gcry_control, [
       have_libgcrypt="yes"
+      AC_DEFINE([HAVE_GCRYPT], 1, [Defined if having gcrypt])
       GCRYPT_CFLAGS="`libgcrypt-config --cflags`"
       GCRYPT_LIBS="`libgcrypt-config --libs`"
     ], [
