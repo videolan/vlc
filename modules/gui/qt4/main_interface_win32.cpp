@@ -116,80 +116,88 @@ void MainInterface::createTaskBarButtons()
     FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
     FIXME:the play button's picture doesn't changed to pause when clicked
     */
+    p_taskbl = NULL;
+    himl = NULL;
 
     HRESULT hr = CoInitializeEx( NULL, COINIT_MULTITHREADED );
     if( hr == RPC_E_CHANGED_MODE )
         hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    if( FAILED(hr) )
+        return;
 
-    if( SUCCEEDED(hr) && S_OK == CoCreateInstance( CLSID_TaskbarList,
-                NULL, CLSCTX_INPROC_SERVER,
-                IID_ITaskbarList3,
-                (void **)&p_taskbl) )
+    void *pv;
+    hr = CoCreateInstance( CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER,
+                           IID_ITaskbarList3, &pv);
+    if( FAILED(hr) )
     {
-        p_taskbl->HrInit();
-
-        if( (himl = ImageList_Create( 16, //cx
-                        16, //cy
-                        ILC_COLOR32,//flags
-                        4,//initial nb of images
-                        0//nb of images that can be added
-                        ) ) != NULL )
-        {
-            QPixmap img   = QPixmap(":/win7/prev");
-            QPixmap img2  = QPixmap(":/win7/pause");
-            QPixmap img3  = QPixmap(":/win7/play");
-            QPixmap img4  = QPixmap(":/win7/next");
-            QBitmap mask  = img.createMaskFromColor(Qt::transparent);
-            QBitmap mask2 = img2.createMaskFromColor(Qt::transparent);
-            QBitmap mask3 = img3.createMaskFromColor(Qt::transparent);
-            QBitmap mask4 = img4.createMaskFromColor(Qt::transparent);
-
-            if(-1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask)))
-                msg_Err( p_intf, "First ImageList_Add failed" );
-            if(-1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img2, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask2)))
-                msg_Err( p_intf, "Second ImageList_Add failed" );
-            if(-1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img3, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask3)))
-                msg_Err( p_intf, "Third ImageList_Add failed" );
-            if(-1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img4, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask4)))
-                msg_Err( p_intf, "Fourth ImageList_Add failed" );
-        }
-
-        // Define an array of two buttons. These buttons provide images through an
-        // image list and also provide tooltips.
-        THUMBBUTTONMASK dwMask = THUMBBUTTONMASK(THB_BITMAP | THB_FLAGS);
-
-        THUMBBUTTON thbButtons[3];
-        thbButtons[0].dwMask = dwMask;
-        thbButtons[0].iId = 0;
-        thbButtons[0].iBitmap = 0;
-        thbButtons[0].dwFlags = THBF_HIDDEN;
-
-        thbButtons[1].dwMask = dwMask;
-        thbButtons[1].iId = 1;
-        thbButtons[1].iBitmap = 2;
-        thbButtons[1].dwFlags = THBF_HIDDEN;
-
-        thbButtons[2].dwMask = dwMask;
-        thbButtons[2].iId = 2;
-        thbButtons[2].iBitmap = 3;
-        thbButtons[2].dwFlags = THBF_HIDDEN;
-
-        HRESULT hr = p_taskbl->ThumbBarSetImageList(WinId(this), himl );
-        if(S_OK != hr)
-            msg_Err( p_intf, "ThumbBarSetImageList failed with error %08lx", hr );
-        else
-        {
-            hr = p_taskbl->ThumbBarAddButtons(WinId(this), 3, thbButtons);
-            if(S_OK != hr)
-                msg_Err( p_intf, "ThumbBarAddButtons failed with error %08lx", hr );
-        }
-        CONNECT( THEMIM->getIM(), playingStatusChanged( int ), this, changeThumbbarButtons( int ) );
+        CoUninitialize();
+        return;
     }
+
+    p_taskbl = (ITaskbarList3 *)pv;
+    p_taskbl->HrInit();
+
+    himl = ImageList_Create( 16 /*cx*/, 16 /*cy*/, ILC_COLOR32 /*flags*/,
+                             4 /*cInitial*/, 0 /*cGrow*/);
+    if( himl == NULL )
+    {
+        p_taskbl->Release();
+        p_taskbl = NULL;
+        CoUninitialize();
+        return;
+    }
+
+    QPixmap img   = QPixmap(":/win7/prev");
+    QPixmap img2  = QPixmap(":/win7/pause");
+    QPixmap img3  = QPixmap(":/win7/play");
+    QPixmap img4  = QPixmap(":/win7/next");
+    QBitmap mask  = img.createMaskFromColor(Qt::transparent);
+    QBitmap mask2 = img2.createMaskFromColor(Qt::transparent);
+    QBitmap mask3 = img3.createMaskFromColor(Qt::transparent);
+    QBitmap mask4 = img4.createMaskFromColor(Qt::transparent);
+
+    if( -1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask)))
+        msg_Err( p_intf, "%s ImageList_Add failed", "First" );
+    if( -1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img2, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask2)))
+        msg_Err( p_intf, "%s ImageList_Add failed", "Second" );
+    if( -1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img3, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask3)))
+        msg_Err( p_intf, "%s ImageList_Add failed", "Third" );
+    if( -1 == ImageList_Add(himl, qt_pixmapToWinHBITMAP(img4, PremultipliedAlpha), qt_pixmapToWinHBITMAP(mask4)))
+        msg_Err( p_intf, "%s ImageList_Add failed", "Fourth" );
+
+    // Define an array of two buttons. These buttons provide images through an
+    // image list and also provide tooltips.
+    THUMBBUTTONMASK dwMask = THUMBBUTTONMASK(THB_BITMAP | THB_FLAGS);
+    THUMBBUTTON thbButtons[3];
+
+    thbButtons[0].dwMask = dwMask;
+    thbButtons[0].iId = 0;
+    thbButtons[0].iBitmap = 0;
+    thbButtons[0].dwFlags = THBF_HIDDEN;
+
+    thbButtons[1].dwMask = dwMask;
+    thbButtons[1].iId = 1;
+    thbButtons[1].iBitmap = 2;
+    thbButtons[1].dwFlags = THBF_HIDDEN;
+
+    thbButtons[2].dwMask = dwMask;
+    thbButtons[2].iId = 2;
+    thbButtons[2].iBitmap = 3;
+    thbButtons[2].dwFlags = THBF_HIDDEN;
+
+    hr = p_taskbl->ThumbBarSetImageList( WinId(this), himl );
+    if( FAILED(hr) )
+        msg_Err( p_intf, "%s failed with error %08lx", "ThumbBarSetImageList",
+                 hr );
     else
     {
-        himl = NULL;
-        p_taskbl = NULL;
+        hr = p_taskbl->ThumbBarAddButtons( WinId(this), 3, thbButtons);
+        if( FAILED(hr) )
+            msg_Err( p_intf, "%s failed with error %08lx",
+                     "ThumbBarAddButtons", hr );
     }
+    CONNECT( THEMIM->getIM(), playingStatusChanged( int ),
+             this, changeThumbbarButtons( int ) );
 }
 
 bool MainInterface::winEvent ( MSG * msg, long * result )
