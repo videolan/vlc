@@ -598,6 +598,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     hr = IDXGIAdapter_EnumOutputs(dxgiadapter, 0, &output);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not Enumerate DXGI Outputs. (hr=0x%lX)", hr);
+       IDXGIAdapter_Release(dxgiadapter);
        return VLC_EGENERIC;
     }
 
@@ -611,6 +612,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     hr = IDXGIOutput_FindClosestMatchingMode(output, &md, &scd.BufferDesc, NULL);
     if (FAILED(hr)) {
        msg_Err(vd, "Failed to find a supported video mode. (hr=0x%lX)", hr);
+       IDXGIAdapter_Release(dxgiadapter);
        return VLC_EGENERIC;
     }
 
@@ -623,6 +625,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                     featureLevels, ARRAYSIZE(featureLevels),
                     D3D11_SDK_VERSION, &scd, &sys->dxgiswapChain,
                     &sys->d3ddevice, NULL, &sys->d3dcontext);
+    IDXGIAdapter_Release(dxgiadapter);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not Create the D3D11 device and SwapChain. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
@@ -656,19 +659,21 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     }
 
     hr = IDXGIDevice_GetAdapter(pDXGIDevice, &dxgiadapter);
+    IDXGIAdapter_Release(pDXGIDevice);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not get the DXGI Adapter. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
 
     hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory, (void **)&sys->dxgifactory);
+    IDXGIAdapter_Release(dxgiadapter);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
 
     hr = IDXGIFactory_CreateSwapChain(sys->dxgifactory, (IUnknown *)sys->d3ddevice, &scd, &sys->dxgiswapChain);
-
+    IDXGIFactory_Release(sys->dxgifactory);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not create the SwapChain. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
@@ -783,6 +788,8 @@ static void Direct3D11Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     Direct3D11DestroyResources(vd);
+    if (sys->dxgiswapChain)
+        IDXGISwapChain_Release(sys->dxgiswapChain);
     if ( sys->d3dcontext )
         ID3D11DeviceContext_Release(sys->d3dcontext);
     if ( sys->d3ddevice )
@@ -886,6 +893,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
       return VLC_EGENERIC;
     }
     ID3D11DeviceContext_VSSetShader(sys->d3dcontext, d3dvertexShader, NULL, 0);
+    ID3D11VertexShader_Release(d3dvertexShader);
 
     D3D11_INPUT_ELEMENT_DESC layout[] = {
     { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -904,6 +912,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     }
 
     ID3D11DeviceContext_IASetInputLayout(sys->d3dcontext, pVertexLayout);
+    ID3D11SamplerState_Release(pVertexLayout);
 
     /* create the index of the vertices */
     WORD indices[] = {
@@ -929,6 +938,8 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         return VLC_EGENERIC;
     }
     ID3D11DeviceContext_IASetIndexBuffer(sys->d3dcontext, pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    ID3D11Buffer_Release(pIndexBuffer);
+
     ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     ID3DBlob* pPSBlob = NULL;
@@ -1048,6 +1059,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
       return VLC_EGENERIC;
     }
     ID3D11DeviceContext_PSSetSamplers(sys->d3dcontext, 0, 1, &d3dsampState);
+    ID3D11SamplerState_Release(d3dsampState);
 
     picture_sys_t *picsys = malloc(sizeof(*picsys));
     if (unlikely(picsys == NULL)) {
@@ -1069,6 +1081,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         free(picsys);
         return VLC_ENOMEM;
     }
+    ID3D11DeviceContext_AddRef(picsys->context);
     sys->picsys = picsys;
 
     picture_pool_configuration_t pool_cfg;
@@ -1096,9 +1109,14 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     if (sys->pool) {
         picture_sys_t *picsys = sys->picsys;
         ID3D11Texture2D_Release(picsys->texture);
+        ID3D11DeviceContext_Release(picsys->context);
         picture_pool_Release(sys->pool);
     }
     sys->pool = NULL;
+    if (sys->d3drenderTargetView)
+        ID3D11RenderTargetView_Release(sys->d3drenderTargetView);
+    if (sys->d3ddepthStencilView)
+        ID3D11DepthStencilView_Release(sys->d3ddepthStencilView);
 
     msg_Dbg(vd, "Direct3D11 resources destroyed");
 }
