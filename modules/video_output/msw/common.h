@@ -186,6 +186,14 @@ struct vout_display_sys_t
     picture_sys_t            *picsys;
     vlc_fourcc_t             vlcFormat;
     const char               *d3dPxShader;
+
+    // SPU
+    vlc_fourcc_t             pSubpictureChromas[2];
+    const char               *psz_rgbaPxShader;
+    ID3D11PixelShader        *pSPUPixelShader;
+    DXGI_FORMAT              d3dregion_format;
+    int                      d3dregion_count;
+    picture_t                **d3dregions;
 #endif
 
 #ifdef MODULE_NAME_IS_direct3d9
