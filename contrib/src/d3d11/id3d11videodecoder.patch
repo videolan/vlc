@@ -1,0 +1,221 @@
+diff --git a/d3d11.idl b/d3d11.idl
+--- a/d3d11.idl
++++ b/d3d11.idl
+@@ -2125,6 +2125,214 @@ interface ID3D11Device : IUnknown
+     UINT GetExceptionMode();
+ }
+
++typedef enum D3D11_VDOV_DIMENSION
++{
++    D3D11_VDOV_DIMENSION_UNKNOWN = 0,
++    D3D11_VDOV_DIMENSION_TEXTURE2D
++} D3D11_VDOV_DIMENSION;
++
++typedef struct D3D11_TEX2D_VDOV
++{
++    UINT ArraySlice;
++} D3D11_TEX2D_VDOV;
++
++typedef struct D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC
++{
++    GUID DecodeProfile;
++    D3D11_VDOV_DIMENSION ViewDimension;
++
++    union
++    {
++        D3D11_TEX2D_VDOV Texture2D;
++    };
++} D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC;
++
++[
++    object,
++    local,
++    uuid(c2931aea-2a85-4f20-860f-fba1fd256e18)
++]
++interface ID3D11VideoDecoderOutputView : ID3D11View
++{
++    void GetDesc(
++        [out] D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC *pDesc );
++}
++
++[
++    object,
++    local,
++    uuid(3c9c5b51-995d-48d1-9b8d-fa5caeded65c)
++]
++interface ID3D11VideoDecoder : ID3D11DeviceChild
++{
++}
++
++typedef enum D3D11_VIDEO_DECODER_BUFFER_TYPE
++{
++    D3D11_VIDEO_DECODER_BUFFER_PICTURE_PARAMETERS = 0,
++    D3D11_VIDEO_DECODER_BUFFER_MACROBLOCK_CONTROL,
++    D3D11_VIDEO_DECODER_BUFFER_RESIDUAL_DIFFERENCE,
++    D3D11_VIDEO_DECODER_BUFFER_DEBLOCKING_CONTROL,
++    D3D11_VIDEO_DECODER_BUFFER_INVERSE_QUANTIZATION_MATRIX,
++    D3D11_VIDEO_DECODER_BUFFER_SLICE_CONTROL,
++    D3D11_VIDEO_DECODER_BUFFER_BITSTREAM,
++    D3D11_VIDEO_DECODER_BUFFER_MOTION_VECTOR,
++    D3D11_VIDEO_DECODER_BUFFER_FILM_GRAIN
++} D3D11_VIDEO_DECODER_BUFFER_TYPE;
++
++typedef struct D3D11_ENCRYPTED_BLOCK_INFO
++{
++    UINT NumEncryptedBytesAtBeginning;
++    UINT NumBytesInSkipPattern;
++    UINT NumBytesInEncryptPattern;
++} D3D11_ENCRYPTED_BLOCK_INFO;
++
++typedef struct D3D11_VIDEO_DECODER_BUFFER_DESC
++{
++    D3D11_VIDEO_DECODER_BUFFER_TYPE BufferType;
++    UINT BufferIndex;
++    UINT DataOffset;
++    UINT DataSize;
++    UINT FirstMBaddress;
++    UINT NumMBsInBuffer;
++    UINT Width;
++    UINT Height;
++    UINT Stride;
++    UINT ReservedBits;
++    void *pIV;
++    UINT IVSize;
++    BOOL PartialEncryption;
++    D3D11_ENCRYPTED_BLOCK_INFO EncryptedBlockInfo;
++} D3D11_VIDEO_DECODER_BUFFER_DESC;
++
++[
++    object,
++    local,
++    uuid(61f21c45-3c0e-4a74-9cea-67100d9ad5e4)
++]
++interface ID3D11VideoContext : ID3D11DeviceChild
++{
++    HRESULT GetDecoderBuffer(
++        [in] ID3D11VideoDecoder *pDecoder,
++        [in] D3D11_VIDEO_DECODER_BUFFER_TYPE BufferType,
++        [out] UINT *pBufferSize,
++        [out] void **ppBuffer);
++    HRESULT ReleaseDecoderBuffer(
++        [in] ID3D11VideoDecoder *pDecoder,
++        [in] D3D11_VIDEO_DECODER_BUFFER_TYPE BufferType);
++    HRESULT DecoderBeginFrame(
++        [in] ID3D11VideoDecoder *pDecoder,
++        [in] ID3D11VideoDecoderOutputView *pVideoDecoderOutputView,
++        [in] UINT ContentKeySize,
++        [in] const void *pContentKey);
++    HRESULT DecoderEndFrame(
++        [in] ID3D11VideoDecoder *pDecoder);
++    HRESULT SubmitDecoderBuffers(
++        [in] ID3D11VideoDecoder *pDecoder,
++        [in] UINT NumBuffers,
++        [in] const D3D11_VIDEO_DECODER_BUFFER_DESC *pBufferDesc);
++}
++
++typedef struct D3D11_VIDEO_DECODER_DESC
++{
++    GUID Guid;
++    UINT SampleWidth;
++    UINT SampleHeight;
++    DXGI_FORMAT OutputFormat;
++} D3D11_VIDEO_DECODER_DESC;
++
++typedef struct D3D11_VIDEO_DECODER_CONFIG
++{
++    GUID guidConfigBitstreamEncryption;
++    GUID guidConfigMBcontrolEncryption;
++    GUID guidConfigResidDiffEncryption;
++    UINT ConfigBitstreamRaw;
++    UINT ConfigMBcontrolRasterOrder;
++    UINT ConfigResidDiffHost;
++    UINT ConfigSpatialResid8;
++    UINT ConfigResid8Subtraction;
++    UINT ConfigSpatialHost8or9Clipping;
++    UINT ConfigSpatialResidInterleaved;
++    UINT ConfigIntraResidUnsigned;
++    UINT ConfigResidDiffAccelerator;
++    UINT ConfigHostInverseScan;
++    UINT ConfigSpecificIDCT;
++    UINT Config4GroupedCoefs;
++    USHORT ConfigMinRenderTargetBuffCount;
++    USHORT ConfigDecoderSpecific;
++} D3D11_VIDEO_DECODER_CONFIG;
++
++typedef enum D3D11_AUTHENTICATED_CHANNEL_TYPE
++{
++    D3D11_AUTHENTICATED_CHANNEL_D3D11 = 1,
++    D3D11_AUTHENTICATED_CHANNEL_DRIVER_SOFTWARE,
++    D3D11_AUTHENTICATED_CHANNEL_DRIVER_HARDWARE
++} D3D11_AUTHENTICATED_CHANNEL_TYPE;
++
++interface ID3D11VideoProcessorEnumerator;
++interface ID3D11VideoProcessor;
++interface ID3D11VideoProcessorInputView;
++interface ID3D11VideoProcessorOutputView;
++interface ID3D11AuthenticatedChannel;
++interface ID3D11CryptoSession;
++
++[
++    object,
++    local,
++    uuid(10ec4d5b-975a-4689-b9e4-d0aac30fe333)
++]
++interface ID3D11VideoDevice : IUnknown
++{
++    HRESULT CreateVideoDecoder(
++        [in] const D3D11_VIDEO_DECODER_DESC *pVideoDesc,
++        [in] const D3D11_VIDEO_DECODER_CONFIG *pConfig,
++        [out] ID3D11VideoDecoder **ppVideoDecoder);
++    HRESULT CreateVideoProcessor(
++        [in] ID3D11VideoProcessorEnumerator *ppProcEnumerator,
++        [in] UINT RateConversionIndex,
++        [out] ID3D11VideoProcessor **ppVideoProcessor);
++    HRESULT CreateAuthenticatedChannel(
++        [in] D3D11_AUTHENTICATED_CHANNEL_TYPE ChannelType,
++        [out] ID3D11AuthenticatedChannel **ppAuthenticatedChannel);
++    HRESULT CreateCryptoSession(
++        [in] const GUID *pCryptoType,
++        [in] const GUID *pDecoderProfile,
++        [in] const GUID *pKeyExchangeType,
++        [out] ID3D11CryptoSession **ppCryptoSession);
++    HRESULT CreateVideoDecoderOutputView(
++        [in] ID3D11Resource *pResource,
++        [in] const D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC *pDesc,
++        [out] ID3D11VideoDecoderOutputView **ppVideoDecoderOutputView);
++    HRESULT CreateVideoProcessorInputView(
++        [in] ID3D11Resource *pResource,
++        [in] ID3D11VideoProcessorEnumerator *ppProcEnumerator,
++        [in] const void *pInputDesc,   /*D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC */
++        [out] ID3D11VideoProcessorInputView **ppVideoProcInputView);
++    HRESULT CreateVideoProcessorOutputView(
++        [in] ID3D11Resource *pResource,
++        [in] ID3D11VideoProcessorEnumerator *pEnumerator,
++        [in] const void *pOutputDesc,  /*D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC */
++        [out] ID3D11VideoProcessorOutputView **ppVideoProcOutputView);
++    HRESULT CreateVideoProcessorEnumerator(
++        [in] const void *pContentDesc, /*D3D11_VIDEO_PROCESSOR_CONTENT_DESC */
++        [out] ID3D11VideoProcessorEnumerator **ppProcEnumerator);
++    UINT GetVideoDecoderProfileCount(void);
++    HRESULT GetVideoDecoderProfile(
++        [in] UINT DecoderIndex,
++        [out] GUID *pDecoderProfile);
++    HRESULT CheckVideoDecoderFormat(
++        [in] const GUID *pDecoderProfile,
++        [in] DXGI_FORMAT Format,
++        [out] BOOL *pSupported);
++    HRESULT GetVideoDecoderConfigCount(
++        [in] const D3D11_VIDEO_DECODER_DESC *pDesc,
++        [out] UINT *pCount);
++    HRESULT GetVideoDecoderConfig(
++        [in] const D3D11_VIDEO_DECODER_DESC *pDesc,
++        [in] UINT DecoderIndex,
++        [out] D3D11_VIDEO_DECODER_CONFIG *pConfig);
++}
++
+ typedef enum D3D11_CREATE_DEVICE_FLAG {
+     D3D11_CREATE_DEVICE_SINGLETHREADED  = 0x0001,
+     D3D11_CREATE_DEVICE_DEBUG           = 0x0002,
+--
+1.9.5.msysgit.0
+

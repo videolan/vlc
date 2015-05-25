@@ -1,0 +1,51 @@
+diff --git a/dxgidebug.idl b/dxgidebug.idl
+--- /dev/null
++++ b/dxgidebug.idl
+@@ -0,0 +1,44 @@
++/*
++ * Copyright 2015 Steve Lhomme
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA02110-1301, USA
++ */
++
++import "oaidl.idl";
++
++cpp_quote("DEFINE_GUID(DXGI_DEBUG_ALL,   0xe48ae283, 0xda80, 0x490b,0x87, 0xe6, 0x43, 0xe9, 0xa9, 0xcf, 0xda, 0x08);")
++cpp_quote("DEFINE_GUID(DXGI_DEBUG_DX,    0x35cdd7fc, 0x13b2, 0x421d,0xa5, 0xd7, 0x7e, 0x44, 0x51, 0x28, 0x7d, 0x64);")
++cpp_quote("DEFINE_GUID(DXGI_DEBUG_DXGI,  0x25cddaa4, 0xb1c6, 0x47e1,0xac, 0x3e, 0x98, 0x87, 0x5b, 0x5a, 0x2e, 0x2a);")
++cpp_quote("DEFINE_GUID(DXGI_DEBUG_APP,   0x06cd6e01, 0x4219, 0x4ebd,0x87, 0x90, 0x27, 0xed, 0x23, 0x36, 0x0c, 0x62);")
++
++typedef enum DXGI_DEBUG_RLO_FLAGS {
++    DXGI_DEBUG_RLO_SUMMARY         = 0x0001,
++    DXGI_DEBUG_RLO_DETAIL          = 0x0002,
++    DXGI_DEBUG_RLO_IGNORE_INTERNAL = 0x0004,
++    DXGI_DEBUG_RLO_ALL             = 0x0007
++} DXGI_DEBUG_RLO_FLAGS;
++
++[
++    object,
++    local,
++    uuid(119e7452-de9e-40fe-8806-88f90c12b441)
++]
++interface IDXGIDebug : IUnknown
++{
++    HRESULT ReportLiveObjects(
++        [in] GUID apiid,
++        [in] DXGI_DEBUG_RLO_FLAGS flags);
++}
++
+--
+1.9.5.msysgit.0
+
