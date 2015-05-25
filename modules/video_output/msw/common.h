@@ -150,7 +150,6 @@ struct vout_display_sys_t
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
     HINSTANCE                hd3d11_dll;       /* handle of the opened d3d11 dll */
     HINSTANCE                hd3dcompiler_dll; /* handle of the opened d3dcompiler dll */
-    IDXGIAdapter             *dxgiadapter;     /* DXGI adapter */
     IDXGIFactory             *dxgifactory;     /* DXGI factory */
     IDXGISwapChain           *dxgiswapChain;   /* DXGI 1.0 swap chain */
     /* We should find a better way to store this or atleast a shorter name */
@@ -167,12 +166,8 @@ struct vout_display_sys_t
     ID3D11ShaderResourceView *d3dresViewUV;
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
-    ID3D11VertexShader       *d3dvertexShader;
     ID3D11PixelShader        *d3dpixelShader;
-    ID3D11InputLayout        *d3dvertexLayout;
-    ID3D11SamplerState       *d3dsampState;
     picture_sys_t            *picsys;
-    D3D_FEATURE_LEVEL        d3dfeaturelevel;
     DXGI_FORMAT              d3dFormatTex;
     DXGI_FORMAT              d3dFormatY;
     DXGI_FORMAT              d3dFormatUV;

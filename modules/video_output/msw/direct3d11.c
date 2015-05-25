@@ -467,14 +467,12 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext,sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
     /* Render the quad */
-    ID3D11DeviceContext_VSSetShader(sys->d3dcontext, sys->d3dvertexShader, NULL, 0);
     ID3D11DeviceContext_PSSetShader(sys->d3dcontext, sys->d3dpixelShader, NULL, 0);
     ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 0, 1, &sys->d3dresViewY);
 
     if( sys->d3dFormatUV )
         ID3D11DeviceContext_PSSetShaderResources(sys->d3dcontext, 1, 1, &sys->d3dresViewUV);
 
-    ID3D11DeviceContext_PSSetSamplers(sys->d3dcontext, 0, 1, &sys->d3dsampState);
     ID3D11DeviceContext_DrawIndexed(sys->d3dcontext, 6, 0, 0);
 }
 
@@ -549,17 +547,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     UINT creationFlags = 0;
     HRESULT hr = S_OK;
 
-    static const D3D_FEATURE_LEVEL featureLevels[] =
-    {
-        D3D_FEATURE_LEVEL_11_1,
-        D3D_FEATURE_LEVEL_11_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_10_0,
-        D3D_FEATURE_LEVEL_9_3,
-        D3D_FEATURE_LEVEL_9_2,
-        D3D_FEATURE_LEVEL_9_1
-    };
-
 # if !defined(NDEBUG) && defined(_MSC_VER)
     creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 # endif
@@ -587,17 +574,28 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     scd.OutputWindow = sys->hvideownd;
 # endif
 
+    IDXGIAdapter *dxgiadapter;
 # if USE_DXGI
+    static const D3D_FEATURE_LEVEL featureLevels[] =
+    {
+        D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1,
+        D3D_FEATURE_LEVEL_10_0,
+        D3D_FEATURE_LEVEL_9_3,
+        D3D_FEATURE_LEVEL_9_2,
+        D3D_FEATURE_LEVEL_9_1
+    };
 
     /* TODO : list adapters for the user to choose from */
-    hr = IDXGIFactory_EnumAdapters(sys->dxgifactory, 0, &sys->dxgiadapter);
+    hr = IDXGIFactory_EnumAdapters(sys->dxgifactory, 0, &dxgiadapter);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not create find factory. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
 
     IDXGIOutput* output;
-    hr = IDXGIAdapter_EnumOutputs(sys->dxgiadapter, 0, &output);
+    hr = IDXGIAdapter_EnumOutputs(dxgiadapter, 0, &output);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not Enumerate DXGI Outputs. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
@@ -620,11 +618,11 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     scd.BufferDesc.Width = fmt->i_visible_width;
     scd.BufferDesc.Height = fmt->i_visible_height;
 
-    hr = D3D11CreateDeviceAndSwapChain(sys->dxgiadapter,
+    hr = D3D11CreateDeviceAndSwapChain(dxgiadapter,
                     D3D_DRIVER_TYPE_UNKNOWN, NULL, creationFlags,
                     featureLevels, ARRAYSIZE(featureLevels),
                     D3D11_SDK_VERSION, &scd, &sys->dxgiswapChain,
-                    &sys->d3ddevice, &sys->d3dfeaturelevel, &sys->d3dcontext);
+                    &sys->d3ddevice, NULL, &sys->d3dcontext);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not Create the D3D11 device and SwapChain. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
@@ -640,8 +638,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 
     for (UINT driver = 0; driver < ARRAYSIZE(driverAttempts); driver++) {
         hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
-                    featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION,
-                    &sys->d3ddevice, &sys->d3dfeaturelevel, &sys->d3dcontext);
+                    NULL, 0, D3D11_SDK_VERSION,
+                    &sys->d3ddevice, NULL, &sys->d3dcontext);
         if (SUCCEEDED(hr)) break;
     }
 
@@ -657,13 +655,13 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 
-    hr = IDXGIDevice_GetAdapter(pDXGIDevice, &sys->dxgiadapter);
+    hr = IDXGIDevice_GetAdapter(pDXGIDevice, &dxgiadapter);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not get the DXGI Adapter. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
 
-    hr = IDXGIAdapter_GetParent(sys->dxgiadapter, &IID_IDXGIFactory, (void **)&sys->dxgifactory);
+    hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory, (void **)&sys->dxgifactory);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
@@ -878,14 +876,16 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
       return VLC_EGENERIC;
     }
 
+    ID3D11VertexShader *d3dvertexShader;
     hr = ID3D11Device_CreateVertexShader(sys->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->d3dvertexShader);
+                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &d3dvertexShader);
 
     if(FAILED(hr)) {
       ID3D11Device_Release(pVSBlob);
       msg_Err(vd, "Failed to create the vertex shader.");
       return VLC_EGENERIC;
     }
+    ID3D11DeviceContext_VSSetShader(sys->d3dcontext, d3dvertexShader, NULL, 0);
 
     D3D11_INPUT_ELEMENT_DESC layout[] = {
     { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -904,6 +904,32 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     }
 
     ID3D11DeviceContext_IASetInputLayout(sys->d3dcontext, pVertexLayout);
+
+    /* create the index of the vertices */
+    WORD indices[] = {
+      3, 1, 0,
+      2, 1, 3,
+    };
+
+    D3D11_BUFFER_DESC quadDesc = {
+        .Usage = D3D11_USAGE_DEFAULT,
+        .ByteWidth = sizeof(WORD) * 6,
+        .BindFlags = D3D11_BIND_INDEX_BUFFER,
+        .CPUAccessFlags = 0,
+    };
+
+    D3D11_SUBRESOURCE_DATA quadIndicesInit = {
+        .pSysMem = indices,
+    };
+
+    ID3D11Buffer* pIndexBuffer = NULL;
+    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &quadDesc, &quadIndicesInit, &pIndexBuffer);
+    if(FAILED(hr)) {
+        msg_Err(vd, "Could not Create the common quad indices. (hr=0x%lX)", hr);
+        return VLC_EGENERIC;
+    }
+    ID3D11DeviceContext_IASetIndexBuffer(sys->d3dcontext, pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+    ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     ID3DBlob* pPSBlob = NULL;
 
@@ -959,29 +985,7 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
     ID3D11Buffer_Release(pVertexBuffer);
 
-    WORD indices[] = {
-      3, 1, 0,
-      2, 1, 3,
-    };
-
-    bd.Usage = D3D11_USAGE_DEFAULT;
-    bd.ByteWidth = sizeof(WORD)*6;
-    bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    bd.CPUAccessFlags = 0;
-    InitData.pSysMem = indices;
-
-    ID3D11Buffer* pIndexBuffer = NULL;
-    hr = ID3D11Device_CreateBuffer(sys->d3ddevice, &bd, &InitData, &pIndexBuffer);
-    if(FAILED(hr)) {
-      msg_Err(vd, "Failed to create index buffer.");
-      return VLC_EGENERIC;
-    }
-
-    ID3D11DeviceContext_IASetIndexBuffer(sys->d3dcontext, pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
     ID3D11Buffer_Release(pVertexBuffer);
-
-    ID3D11DeviceContext_IASetPrimitiveTopology(sys->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     D3D11_TEXTURE2D_DESC texDesc;
     memset(&texDesc, 0, sizeof(texDesc));
@@ -1035,13 +1039,15 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
     sampDesc.MinLOD = 0;
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-    hr = ID3D11Device_CreateSamplerState(sys->d3ddevice, &sampDesc, &sys->d3dsampState);
+    ID3D11SamplerState *d3dsampState;
+    hr = ID3D11Device_CreateSamplerState(sys->d3ddevice, &sampDesc, &d3dsampState);
 
     if (FAILED(hr)) {
       if(sys->d3dtexture) ID3D11Texture2D_Release(sys->d3dtexture);
       msg_Err(vd, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
+    ID3D11DeviceContext_PSSetSamplers(sys->d3dcontext, 0, 1, &d3dsampState);
 
     picture_sys_t *picsys = malloc(sizeof(*picsys));
     if (unlikely(picsys == NULL)) {
