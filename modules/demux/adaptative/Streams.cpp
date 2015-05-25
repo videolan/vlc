@@ -218,10 +218,10 @@ size_t Stream::read(HTTPConnectionManager *connManager)
         block->i_buffer = (size_t)ret;
 
         adaptationLogic->updateDownloadRate(block->i_buffer, time);
+        chunk->onDownload(&block);
 
         if (chunk->getBytesToRead() == 0)
         {
-            chunk->onDownload(&block);
             chunk->getConnection()->releaseChunk();
             currentChunk = NULL;
             delete chunk;
