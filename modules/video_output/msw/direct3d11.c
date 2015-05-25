@@ -115,6 +115,9 @@ typedef struct d3d_vertex_t {
     D3DXVECTOR2 texture;
 } d3d_vertex_t;
 
+#define RECTWidth(r)   (int)(r.right - r.left)
+#define RECTHeight(r)  (int)(r.bottom - r.top)
+
 static int  Open(vlc_object_t *);
 static void Close(vlc_object_t *object);
 
@@ -136,6 +139,8 @@ static int AllocQuad(vout_display_t *, const video_format_t *, d3d_quad_t *,
                      d3d_quad_cfg_t *, ID3D11PixelShader *,
                      const float vertices[4 * sizeof(d3d_vertex_t)]);
 static void ReleaseQuad(d3d_quad_t *);
+
+static void Manage(vout_display_t *vd);
 
 /* All the #if USE_DXGI contain an alternative method to setup dx11
    They both need to be benchmarked to see which performs better */
@@ -446,7 +451,7 @@ static int Open(vlc_object_t *object)
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = CommonControl;
-    vd->manage  = CommonManage;
+    vd->manage  = Manage;
 
     msg_Dbg(vd, "Direct3D11 Open Succeeded");
 
@@ -467,6 +472,106 @@ static void Close(vlc_object_t *object)
     CommonClean(vd);
     Direct3D11Destroy(vd);
     free(vd->sys);
+}
+
+static HRESULT UpdateBackBuffer(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+    ID3D11Texture2D* pDepthStencil;
+    ID3D11Texture2D* pBackBuffer;
+
+    if (sys->d3drenderTargetView) {
+        ID3D11RenderTargetView_Release(sys->d3drenderTargetView);
+        sys->d3drenderTargetView = NULL;
+    }
+    if (sys->d3ddepthStencilView) {
+        ID3D11DepthStencilView_Release(sys->d3ddepthStencilView);
+        sys->d3ddepthStencilView = NULL;
+    }
+
+    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 1, RECTWidth(sys->rect_dest_clipped),
+                                 RECTHeight(sys->rect_dest_clipped),
+                                 DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Failed to resize the backbuffer. (hr=0x%lX)", hr);
+       return hr;
+    }
+
+    hr = IDXGISwapChain_GetBuffer(sys->dxgiswapChain, 0, &IID_ID3D11Texture2D, (LPVOID *)&pBackBuffer);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not get the backbuffer for the Swapchain. (hr=0x%lX)", hr);
+       return hr;
+    }
+
+    hr = ID3D11Device_CreateRenderTargetView(sys->d3ddevice, (ID3D11Resource *)pBackBuffer, NULL, &sys->d3drenderTargetView);
+    ID3D11Texture2D_Release(pBackBuffer);
+
+    D3D11_TEXTURE2D_DESC deptTexDesc;
+    memset(&deptTexDesc, 0,sizeof(deptTexDesc));
+    deptTexDesc.ArraySize = 1;
+    deptTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    deptTexDesc.CPUAccessFlags = 0;
+    deptTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    deptTexDesc.Width = RECTWidth(sys->rect_dest_clipped);
+    deptTexDesc.Height = RECTHeight(sys->rect_dest_clipped);
+    deptTexDesc.MipLevels = 1;
+    deptTexDesc.MiscFlags = 0;
+    deptTexDesc.SampleDesc.Count = 1;
+    deptTexDesc.SampleDesc.Quality = 0;
+    deptTexDesc.Usage = D3D11_USAGE_DEFAULT;
+
+    hr = ID3D11Device_CreateTexture2D(sys->d3ddevice, &deptTexDesc, NULL, &pDepthStencil);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not create the depth stencil texture. (hr=0x%lX)", hr);
+       return hr;
+    }
+
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc;
+    memset(&depthViewDesc, 0, sizeof(depthViewDesc));
+
+    depthViewDesc.Format = deptTexDesc.Format;
+    depthViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    depthViewDesc.Texture2D.MipSlice = 0;
+
+    hr = ID3D11Device_CreateDepthStencilView(sys->d3ddevice, (ID3D11Resource *)pDepthStencil, &depthViewDesc, &sys->d3ddepthStencilView);
+    ID3D11Texture2D_Release(pDepthStencil);
+
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not create the depth stencil view. (hr=0x%lX)", hr);
+       return hr;
+    }
+
+    ID3D11DeviceContext_OMSetRenderTargets(sys->d3dcontext, 1, &sys->d3drenderTargetView, sys->d3ddepthStencilView);
+
+    D3D11_VIEWPORT vp;
+    vp.Width = (FLOAT)RECTWidth(sys->rect_dest_clipped);
+    vp.Height = (FLOAT)RECTHeight(sys->rect_dest_clipped);
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    vp.TopLeftX = 0;
+    vp.TopLeftY = 0;
+
+    ID3D11DeviceContext_RSSetViewports(sys->d3dcontext, 1, &vp);
+
+    return S_OK;
+}
+
+static void Manage(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    RECT size_before = sys->rect_dest_clipped;
+
+    CommonManage(vd);
+
+    if (RECTWidth(size_before)  != RECTWidth(sys->rect_dest_clipped) ||
+        RECTHeight(size_before) != RECTHeight(sys->rect_dest_clipped))
+    {
+        msg_Dbg(vd, "Manage detected size change %dx%d", RECTWidth(sys->rect_dest_clipped),
+                RECTHeight(sys->rect_dest_clipped));
+
+        UpdateBackBuffer(vd);
+    }
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
@@ -827,65 +932,16 @@ static void Direct3D11Close(vout_display_t *vd)
 static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
-    ID3D11Texture2D* pBackBuffer = NULL;
-    ID3D11Texture2D* pDepthStencil= NULL;
     HRESULT hr;
 
     fmt->i_chroma = sys->vlcFormat;
 
-    hr = IDXGISwapChain_GetBuffer(sys->dxgiswapChain, 0, &IID_ID3D11Texture2D, (LPVOID *)&pBackBuffer);
+    hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {
-       msg_Err(vd, "Could not get the backbuffer from the Swapchain. (hr=0x%lX)", hr);
+       msg_Err(vd, "Could not update the backbuffer. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
 
-    hr = ID3D11Device_CreateRenderTargetView(sys->d3ddevice, (ID3D11Resource *)pBackBuffer, NULL, &sys->d3drenderTargetView);
-
-    ID3D11Texture2D_Release(pBackBuffer);
-
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not create the render view target. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
-
-    D3D11_TEXTURE2D_DESC deptTexDesc;
-    memset(&deptTexDesc, 0,sizeof(deptTexDesc));
-    deptTexDesc.ArraySize = 1;
-    deptTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    deptTexDesc.CPUAccessFlags = 0;
-    deptTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    deptTexDesc.Width = fmt->i_visible_width;
-    deptTexDesc.Height = fmt->i_visible_height;
-    deptTexDesc.MipLevels = 1;
-    deptTexDesc.MiscFlags = 0;
-    deptTexDesc.SampleDesc.Count = 1;
-    deptTexDesc.SampleDesc.Quality = 0;
-    deptTexDesc.Usage = D3D11_USAGE_DEFAULT;
-
-    hr = ID3D11Device_CreateTexture2D(sys->d3ddevice, &deptTexDesc, NULL, &pDepthStencil);
-
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not create the depth stencil texture. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
-
-    D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc;
-    memset(&depthViewDesc, 0, sizeof(depthViewDesc));
-
-    depthViewDesc.Format = deptTexDesc.Format;
-    depthViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-    depthViewDesc.Texture2D.MipSlice = 0;
-
-    hr = ID3D11Device_CreateDepthStencilView(sys->d3ddevice, (ID3D11Resource *)pDepthStencil, &depthViewDesc, &sys->d3ddepthStencilView);
-
-    ID3D11Texture2D_Release(pDepthStencil);
-
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not create the depth stencil view. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
-
-    ID3D11DeviceContext_OMSetRenderTargets(sys->d3dcontext, 1, &sys->d3drenderTargetView, sys->d3ddepthStencilView);
 
     D3D11_VIEWPORT vp;
     vp.Width = (FLOAT)fmt->i_visible_width;
@@ -1006,11 +1062,11 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 
     D3D11_SAMPLER_DESC sampDesc;
     memset(&sampDesc, 0, sizeof(sampDesc));
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
     sampDesc.MinLOD = 0;
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
