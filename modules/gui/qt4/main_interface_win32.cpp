@@ -119,9 +119,7 @@ void MainInterface::createTaskBarButtons()
     p_taskbl = NULL;
     himl = NULL;
 
-    HRESULT hr = CoInitializeEx( NULL, COINIT_MULTITHREADED );
-    if( hr == RPC_E_CHANGED_MODE )
-        hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    HRESULT hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
     if( FAILED(hr) )
         return;
 

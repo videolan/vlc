@@ -1255,9 +1255,7 @@ void SPrefsPanel::assoDialog()
 {
     HRESULT hr;
 
-    hr = CoInitializeEx( NULL, COINIT_MULTITHREADED );
-    if( hr == RPC_E_CHANGED_MODE )
-        hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
     if( SUCCEEDED(hr) )
     {
         void *p;
