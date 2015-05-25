@@ -133,7 +133,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_mutex_init (&priv->var_lock);
     vlc_cond_init (&priv->var_wait);
     priv->pipes[0] = priv->pipes[1] = -1;
-    atomic_init (&priv->alive, true);
     atomic_init (&priv->refs, 1);
     priv->pf_destructor = NULL;
     priv->prev = NULL;
@@ -157,6 +156,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
 
         /* Attach the parent to its child (structure lock needed) */
         libvlc_lock (obj->p_libvlc);
+        atomic_init (&priv->alive, atomic_load (&papriv->alive));
         priv->next = papriv->first;
         if (priv->next != NULL)
             priv->next->prev = priv;
@@ -170,6 +170,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         obj->i_flags = 0;
         obj->p_libvlc = self;
         obj->p_parent = NULL;
+        atomic_init (&priv->alive, true);
         priv->next = NULL;
         vlc_mutex_init (&(libvlc_priv (self)->structure_lock));
 
