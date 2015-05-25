@@ -51,6 +51,24 @@
  *****************************************************************************/
 #include "events.h"
 
+#ifdef MODULE_NAME_IS_direct3d11
+typedef struct
+{
+    DXGI_FORMAT   textureFormat;
+    DXGI_FORMAT   resourceFormatYRGB;
+    DXGI_FORMAT   resourceFormatUV;
+} d3d_quad_cfg_t;
+
+typedef struct
+{
+    ID3D11Buffer              *pVertexBuffer;
+    ID3D11Texture2D           *pTexture;
+    ID3D11ShaderResourceView  *d3dresViewY;
+    ID3D11ShaderResourceView  *d3dresViewUV;
+    ID3D11PixelShader         *d3dpixelShader;
+} d3d_quad_t;
+#endif
+
 /*****************************************************************************
  * vout_sys_t: video output method descriptor
  *****************************************************************************
@@ -161,16 +179,11 @@ struct vout_display_sys_t
 #endif
     ID3D11Device             *d3ddevice;       /* D3D device */
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
-    ID3D11Texture2D          *d3dtexture;
-    ID3D11ShaderResourceView *d3dresViewY;
-    ID3D11ShaderResourceView *d3dresViewUV;
+    d3d_quad_t               picQuad;
+    d3d_quad_cfg_t           picQuadConfig;
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
-    ID3D11PixelShader        *d3dpixelShader;
     picture_sys_t            *picsys;
-    DXGI_FORMAT              d3dFormatTex;
-    DXGI_FORMAT              d3dFormatY;
-    DXGI_FORMAT              d3dFormatUV;
     vlc_fourcc_t             vlcFormat;
     const char               *d3dPxShader;
 #endif
