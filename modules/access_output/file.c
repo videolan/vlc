@@ -30,11 +30,10 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <sys/types.h>
-#include <time.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -43,6 +42,7 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_fs.h>
+#include <vlc_network.h>
 #include <vlc_strings.h>
 #include <vlc_dialog.h>
 
@@ -101,6 +101,43 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     }
     return i_write;
 }
+
+#ifdef S_ISSOCK
+static ssize_t Send(sout_access_out_t *access, block_t *block)
+{
+    int fd = (intptr_t)access->p_sys;
+    size_t total = 0;
+
+    while (block != NULL)
+    {
+        if (block->i_buffer == 0)
+        {
+            block_t *next = block->p_next;
+            block_Release(block);
+            block = next;
+            continue;
+        }
+
+        /* TODO: vectorized I/O with sendmsg() */
+        ssize_t val = send(fd, block->p_buffer, block->i_buffer, MSG_NOSIGNAL);
+        if (val <= 0)
+        {   /* FIXME: errno is meaningless if val is zero */
+            if (errno == EINTR)
+                continue;
+            block_ChainRelease(block);
+            msg_Err(access, "cannot write: %s", vlc_strerror_c(errno));
+            return -1;
+        }
+
+        total += val;
+
+        assert((size_t)val <= block->i_buffer);
+        block->p_buffer += val;
+        block->i_buffer -= val;
+    }
+    return total;
+}
+#endif
 
 /*****************************************************************************
  * Seek: seek to a specific location in a file
@@ -256,15 +293,23 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_access->pf_write = Write;
     p_access->pf_read  = Read;
 
     if (S_ISREG(st.st_mode) || S_ISBLK(st.st_mode))
     {
+        p_access->pf_write = Write;
         p_access->pf_seek  = Seek;
     }
+#ifdef S_ISSOCK
+    else if (S_ISSOCK(st.st_mode))
+    {
+        p_access->pf_write = Send;
+        p_access->pf_seek = NoSeek;
+    }
+#endif
     else
     {
+        p_access->pf_write = Write;
         p_access->pf_seek = NoSeek;
     }
     p_access->pf_control = Control;
