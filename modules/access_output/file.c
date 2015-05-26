@@ -110,6 +110,12 @@ static int Seek( sout_access_out_t *p_access, off_t i_pos )
     return lseek( (intptr_t)p_access->p_sys, i_pos, SEEK_SET );
 }
 
+static int NoSeek(sout_access_out_t *access, off_t pos)
+{
+    (void) access; (void) pos;
+    return -1;
+}
+
 static int Control( sout_access_out_t *p_access, int i_query, va_list args )
 {
     switch( i_query )
@@ -124,11 +130,7 @@ static int Control( sout_access_out_t *p_access, int i_query, va_list args )
         case ACCESS_OUT_CAN_SEEK:
         {
             bool *pb = va_arg( args, bool * );
-            struct stat st;
-            if( fstat( (intptr_t)p_access->p_sys, &st ) == -1 )
-                *pb = false;
-            else
-                *pb = S_ISREG( st.st_mode ) || S_ISBLK( st.st_mode );
+            *pb = p_access->pf_seek == Seek;
             break;
         }
 
@@ -245,9 +247,26 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
     }
 
+    struct stat st;
+
+    if (fstat (fd, &st))
+    {
+        msg_Err (p_access, "write error: %s", vlc_strerror_c(errno));
+        close (fd);
+        return VLC_EGENERIC;
+    }
+
     p_access->pf_write = Write;
     p_access->pf_read  = Read;
-    p_access->pf_seek  = Seek;
+
+    if (S_ISREG(st.st_mode) || S_ISBLK(st.st_mode))
+    {
+        p_access->pf_seek  = Seek;
+    }
+    else
+    {
+        p_access->pf_seek = NoSeek;
+    }
     p_access->pf_control = Control;
     p_access->p_sys    = (void *)(intptr_t)fd;
 
