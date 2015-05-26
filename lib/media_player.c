@@ -1277,7 +1277,6 @@ int libvlc_media_player_get_chapter_count_for_title(
 
     int i_ret = var_Change( p_input_thread, psz_name, VLC_VAR_CHOICESCOUNT, &val, NULL );
     vlc_object_release( p_input_thread );
-    free( psz_name );
 
     return i_ret == VLC_SUCCESS ? val.i_int : -1;
 }
