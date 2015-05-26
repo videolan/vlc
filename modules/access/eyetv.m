@@ -170,7 +170,7 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    publicSock = socket(PF_UNIX, SOCK_STREAM, 0);
+    publicSock = vlc_socket(PF_UNIX, SOCK_STREAM, 0);
     if (publicSock == -1) {
         msg_Err(p_access, "create local socket failed (errno=%d)", errno);
         free(p_sys);
