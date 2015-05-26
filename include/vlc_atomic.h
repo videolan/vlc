@@ -32,7 +32,8 @@
 /*** Native C11 atomics ***/
 #  include <stdatomic.h>
 
-# elif defined (__cplusplus) && (__cplusplus >= 201103L)
+# elif defined (__cplusplus) && (__cplusplus >= 201103L) \
+  && VLC_GCC_VERSION(5, 0)
 #   include <atomic>
 using std::atomic_is_lock_free;
 using std::atomic_init;
