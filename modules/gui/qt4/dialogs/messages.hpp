@@ -49,7 +49,7 @@ private:
     void sinkMessage( const MsgEvent * );
     bool matchFilter( const QString& );
 
-    atomic_uint verbosity;
+    atomic_int verbosity;
     static void MsgCallback( void *, int, const vlc_log_t *, const char *,
                              va_list );
 
