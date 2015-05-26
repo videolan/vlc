@@ -328,8 +328,10 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
 {
     vout_display_sys_t *sys = vd->sys;
     sys->has_first_frame = true;
-    if (likely([sys->glESView isAppActive]))
-        vout_display_opengl_Display(sys->vgl, &vd->source);
+    @synchronized (sys->glESView) {
+        if (likely([sys->glESView isAppActive]))
+            vout_display_opengl_Display(sys->vgl, &vd->source);
+    }
 
     picture_Release(pic);
 
@@ -404,7 +406,9 @@ static void OpenglESSwap(vlc_gl_t *gl)
     [self performSelectorOnMainThread:@selector(reshape) withObject:nil waitUntilDone:NO];
     [self setAutoresizingMask: UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
 
-    _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
+    @synchronized (self) {
+        _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
+    }
 
     return self;
 }
@@ -485,7 +489,7 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
     vout_display_place_t place;
 
-    @synchronized(self) {
+    @synchronized (self) {
         if (_voutDisplay) {
             vout_display_cfg_t cfg_tmp = *(_voutDisplay->cfg);
             CGFloat scaleFactor = self.contentScaleFactor;
@@ -519,12 +523,14 @@ static void OpenglESSwap(vlc_gl_t *gl)
 
 - (void)applicationStateChanged:(NSNotification *)notification
 {
+    @synchronized (self) {
     if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification]
         || [[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification]
         || [[notification name] isEqualToString:UIApplicationWillTerminateNotification])
         _appActive = NO;
     else
         _appActive = YES;
+    }
 }
 
 - (void)updateConstraints
