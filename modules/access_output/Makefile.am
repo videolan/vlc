@@ -2,6 +2,7 @@ access_outdir = $(pluginsdir)/access_output
 
 libaccess_output_dummy_plugin_la_SOURCES = access_output/dummy.c
 libaccess_output_file_plugin_la_SOURCES = access_output/file.c
+libaccess_output_file_plugin_la_LIBADD = $(LIBPTHREAD)
 libaccess_output_http_plugin_la_SOURCES = access_output/http.c
 libaccess_output_udp_plugin_la_SOURCES = access_output/udp.c
 libaccess_output_udp_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)

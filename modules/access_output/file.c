@@ -31,6 +31,7 @@
 #endif
 
 #include <assert.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -103,6 +104,59 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 }
 
 #ifdef S_ISSOCK
+static ssize_t WritePipe(sout_access_out_t *access, block_t *block)
+{
+    int fd = (intptr_t)access->p_sys;
+    ssize_t total = 0;
+    sigset_t set, oldset;
+
+    sigemptyset(&set);
+    sigaddset(&set, SIGPIPE);
+    pthread_sigmask(SIG_BLOCK, &set, &oldset);
+
+    while (block != NULL)
+    {
+        if (block->i_buffer == 0)
+        {
+            block_t *next = block->p_next;
+            block_Release(block);
+            block = next;
+            continue;
+        }
+
+        /* TODO: vectorized I/O with writev() */
+        ssize_t val = write(fd, block->p_buffer, block->i_buffer);
+        if (val < 0)
+        {
+            if (errno == EINTR)
+                continue;
+
+            if (errno == EPIPE)
+            {
+                siginfo_t info;
+                struct timespec ts = { 0, 0 };
+                while (sigtimedwait(&set, &info, &ts) > 0);
+            }
+
+            block_ChainRelease(block);
+            msg_Err(access, "cannot write: %s", vlc_strerror_c(errno));
+            total = -1;
+            break;
+        }
+
+        total += val;
+
+        assert((size_t)val <= block->i_buffer);
+        block->p_buffer += val;
+        block->i_buffer -= val;
+    }
+
+    if (!sigismember(&oldset, SIGPIPE))
+        pthread_sigmask(SIG_SETMASK, &oldset, NULL);
+
+    return total;
+}
+
 static ssize_t Send(sout_access_out_t *access, block_t *block)
 {
     int fd = (intptr_t)access->p_sys;
@@ -137,6 +191,8 @@ static ssize_t Send(sout_access_out_t *access, block_t *block)
     }
     return total;
 }
+#else
+# define WritePipe Write
 #endif
 
 /*****************************************************************************
@@ -309,7 +365,7 @@ static int Open( vlc_object_t *p_this )
 #endif
     else
     {
-        p_access->pf_write = Write;
+        p_access->pf_write = WritePipe;
         p_access->pf_seek = NoSeek;
     }
     p_access->pf_control = Control;
