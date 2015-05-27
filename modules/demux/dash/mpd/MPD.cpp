@@ -71,6 +71,6 @@ void MPD::debug()
     msg_Dbg(stream, "BaseUrl=%s", getUrlSegment().toString().c_str());
 
     std::vector<BasePeriod *>::const_iterator i;
-    for(i = getPeriods().begin(); i != getPeriods().end(); ++i)
+    for(i = periods.begin(); i != periods.end(); ++i)
         (*i)->debug(VLC_OBJECT(stream));
 }
