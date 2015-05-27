@@ -502,6 +502,7 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys, const
     if (err != VLC_SUCCESS)
         return err;
 
+    err = VLC_EGENERIC;
     /* Retreive supported modes from the decoder service */
     for (unsigned i = 0; i < p_list.count; i++) {
         const GUID *g = &p_list.list[i];
