@@ -39,6 +39,7 @@
 #include "xml/DOMParser.h"
 #include "../adaptative/logic/RateBasedAdaptationLogic.h"
 #include <vlc_stream.h>
+#include "../adaptative/tools/Retrieve.hpp"
 
 #include <algorithm>
 #include <ctime>
@@ -73,9 +74,17 @@ bool DASHManager::updatePlaylist()
         url.append("://");
         url.append(stream->psz_path);
 
-        stream_t *mpdstream = stream_UrlNew(stream, url.c_str());
-        if(!mpdstream)
+        uint8_t *p_data = NULL;
+        size_t i_data = Retrieve::HTTP(VLC_OBJECT(stream), url, (void**) &p_data);
+        if(!p_data)
             return false;
+
+        stream_t *mpdstream = stream_MemoryNew(stream, p_data, i_data, false);
+        if(!mpdstream)
+        {
+            free(p_data);
+            return false;
+        }
 
         xml::DOMParser parser(mpdstream);
         if(!parser.parse())
