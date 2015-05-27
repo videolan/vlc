@@ -78,6 +78,7 @@ namespace adaptative
                 bool getSegmentNumberByTime(mtime_t, uint64_t *) const;
                 mtime_t getPlaybackTimeBySegmentNumber(uint64_t) const;
                 void collectTimelines(std::vector<SegmentTimeline *> *) const;
+                void getDurationsRange(mtime_t *, mtime_t *) const;
                 virtual void mergeWith(SegmentInformation *, mtime_t);
 
             protected:

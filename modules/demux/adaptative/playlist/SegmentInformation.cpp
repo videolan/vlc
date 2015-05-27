@@ -251,6 +251,31 @@ void SegmentInformation::collectTimelines(std::vector<SegmentTimeline *> *timeli
         (*it)->collectTimelines(timelines);
 }
 
+void SegmentInformation::getDurationsRange(mtime_t *min, mtime_t *max) const
+{
+    /* FIXME: cache stuff in segment holders */
+    std::vector<ISegment *> seglist = getSegments(INFOTYPE_MEDIA);
+    std::vector<ISegment *>::const_iterator it;
+    mtime_t total = 0;
+    for(it = seglist.begin(); it != seglist.end(); ++it)
+    {
+        const mtime_t duration = (*it)->duration.Get();
+        if(duration)
+        {
+            total += duration;
+
+            if (!*min || duration < *min)
+                *min = duration;
+        }
+    }
+
+    if(total > *max)
+        *max = total;
+
+    for(size_t i=0; i<childs.size(); i++)
+        childs.at(i)->getDurationsRange(min, max);
+}
+
 void SegmentInformation::mergeWith(SegmentInformation *updated, mtime_t prunetime)
 {
     /* Support Segment List for now */

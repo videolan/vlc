@@ -130,6 +130,13 @@ void AbstractPlaylist::getTimeLinesBoundaries(mtime_t *min, mtime_t *max) const
     }
 }
 
+void AbstractPlaylist::getPlaylistDurationsRange(mtime_t *min, mtime_t *max) const
+{
+    *min = *max = 0;
+    for(size_t i = 0; i < periods.size(); i++)
+        periods.at(i)->getDurationsRange(min, max);
+}
+
 void AbstractPlaylist::mergeWith(AbstractPlaylist *updatedAbstractPlaylist, mtime_t prunebarrier)
 {
     availabilityEndTime.Set(updatedAbstractPlaylist->availabilityEndTime.Get());
