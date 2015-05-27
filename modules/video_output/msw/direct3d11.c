@@ -870,7 +870,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
                                                            d3d_formats[i].formatTexture,
                                                            &i_formatSupport)) &&
-                    ( i_formatSupport & i_quadSupportFlags ))
+                    ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
             {
                 msg_Dbg(vd, "Using pixel format %s", d3d_formats[i].name );
                 sys->vlcFormat = d3d_formats[i].fourcc;
@@ -890,7 +890,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
                                                            d3d_formats[i].formatTexture,
                                                            &i_formatSupport)) &&
-                    ( i_formatSupport & i_quadSupportFlags ))
+                    ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
             {
                 msg_Dbg(vd, "Using pixel format %s", d3d_formats[i].name );
                 sys->vlcFormat = d3d_formats[i].fourcc;
@@ -912,14 +912,14 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
                                                    DXGI_FORMAT_R8G8B8A8_UNORM,
                                                    &i_formatSupport)) &&
-            ( i_formatSupport & i_quadSupportFlags )) {
+            ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags) {
         sys->d3dregion_format = DXGI_FORMAT_R8G8B8A8_UNORM;
         sys->pSubpictureChromas[0] = VLC_CODEC_RGBA;
         sys->pSubpictureChromas[1] = 0;
     } else if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
                                                           DXGI_FORMAT_B8G8R8A8_UNORM,
                                                           &i_formatSupport)) &&
-                   ( i_formatSupport & i_quadSupportFlags )) {
+                   ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags) {
         sys->d3dregion_format = DXGI_FORMAT_B8G8R8A8_UNORM;
         sys->pSubpictureChromas[0] = VLC_CODEC_BGRA;
         sys->pSubpictureChromas[1] = 0;
