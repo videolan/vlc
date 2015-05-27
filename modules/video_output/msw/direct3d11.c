@@ -44,7 +44,6 @@
 # define D3D11CreateDevice(args...)             sys->OurD3D11CreateDevice(args)
 # define D3DCompile(args...)                    sys->OurD3DCompile(args)
 #else
-# define IDXGISwapChain_Present(args...)        IDXGISwapChain_Present1(args)
 # define IDXGIFactory_CreateSwapChain(a,b,c,d)  IDXGIFactory2_CreateSwapChainForComposition(a,b,c,NULL,d)
 # define DXGI_SWAP_CHAIN_DESC                   DXGI_SWAP_CHAIN_DESC1
 #endif
@@ -598,8 +597,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
 
-    /* float ClearColor[4] = { 1.0f, 0.125f, 0.3f, 1.0f }; */
-    /* ID3D11DeviceContext_ClearRenderTargetView(sys->d3dcontext,sys->d3drenderTargetView, ClearColor); */
+#if VLC_WINSTORE_APP /* TODO: Choose the WinRT app background clear color */
+    float ClearColor[4] = { 1.0f, 0.125f, 0.3f, 1.0f };
+    ID3D11DeviceContext_ClearRenderTargetView(sys->d3dcontext,sys->d3drenderTargetView, ClearColor);
+#endif
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext,sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
     if (subpicture) {
@@ -655,9 +656,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
 static void Direct3D11Destroy(vout_display_t *vd)
 {
-
 #if !VLC_WINSTORE_APP
-
     vout_display_sys_t *sys = vd->sys;
 
 # if USE_DXGI
@@ -679,9 +678,7 @@ static void Direct3D11Destroy(vout_display_t *vd)
     sys->hd3d11_dll = NULL;
     sys->hd3dcompiler_dll = NULL;
 #else
-
     VLC_UNUSED(vd);
-
 #endif
 }
 
@@ -965,7 +962,9 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         return VLC_EGENERIC;
     }
 
+#if !VLC_WINSTORE_APP
     EventThreadUpdateTitle(sys->event, VOUT_TITLE " (Direct3D11 output)");
+#endif
 
     msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
     return VLC_SUCCESS;
@@ -976,12 +975,21 @@ static void Direct3D11Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     Direct3D11DestroyResources(vd);
+#if !VLC_WINSTORE_APP
     if (sys->dxgiswapChain)
         IDXGISwapChain_Release(sys->dxgiswapChain);
     if ( sys->d3dcontext )
         ID3D11DeviceContext_Release(sys->d3dcontext);
     if ( sys->d3ddevice )
         ID3D11Device_Release(sys->d3ddevice);
+#else
+    if ( sys->d3dcontext )
+        ID3D11DeviceContext_Flush(sys->d3dcontext);
+
+    sys->d3dcontext = NULL;
+    sys->d3ddevice = NULL;
+    sys->dxgiswapChain = NULL;
+#endif
     msg_Dbg(vd, "Direct3D11 device adapter closed");
 }
 

@@ -42,11 +42,13 @@
 
 #include <vlc_windows_interfaces.h>
 
+#if !VLC_WINSTORE_APP
 static void CommonChangeThumbnailClip(vout_display_t *, bool show);
 static int  CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
 
 static void DisableScreensaver(vout_display_t *);
 static void RestoreScreensaver(vout_display_t *);
+#endif
 
 /* */
 int CommonInit(vout_display_t *vd)
@@ -58,10 +60,12 @@ int CommonInit(vout_display_t *vd)
     sys->hparent   = NULL;
     sys->hfswnd    = NULL;
     sys->changes   = 0;
+    sys->is_first_display = true;
+    sys->is_on_top        = false;
+
+#if !VLC_WINSTORE_APP
     SetRectEmpty(&sys->rect_display);
     SetRectEmpty(&sys->rect_parent);
-    sys->is_first_display = true;
-    sys->is_on_top = false;
 
     var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
@@ -70,6 +74,7 @@ int CommonInit(vout_display_t *vd)
     sys->event = EventThreadCreate(vd);
     if (!sys->event)
         return VLC_EGENERIC;
+#endif
 
     event_cfg_t cfg;
     memset(&cfg, 0, sizeof(cfg));
@@ -84,6 +89,7 @@ int CommonInit(vout_display_t *vd)
     cfg.width  = vd->cfg->display.width;
     cfg.height = vd->cfg->display.height;
 
+#if !VLC_WINSTORE_APP
     event_hwnd_t hwnd;
     if (EventThreadStart(sys->event, &hwnd, &cfg))
         return VLC_EGENERIC;
@@ -100,22 +106,9 @@ int CommonInit(vout_display_t *vd)
     }
 
     DisableScreensaver (vd);
+#endif
 
     return VLC_SUCCESS;
-}
-
-/* */
-void CommonClean(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->event) {
-        CommonChangeThumbnailClip(vd, false);
-        EventThreadStop(sys->event);
-        EventThreadDestroy(sys->event);
-    }
-
-    RestoreScreensaver(vd);
 }
 
 /* */
@@ -123,6 +116,21 @@ picture_pool_t *CommonPool(vout_display_t *vd, unsigned count)
 {
     VLC_UNUSED(count);
     return vd->sys->pool;
+}
+
+
+#if !VLC_WINSTORE_APP
+/* */
+void CommonClean(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    if (sys->event) {
+        CommonChangeThumbnailClip(vd, false);
+        EventThreadStop(sys->event);
+        EventThreadDestroy(sys->event);
+    }
+
+    RestoreScreensaver(vd);
 }
 
 void CommonManage(vout_display_t *vd)
@@ -133,7 +141,6 @@ void CommonManage(vout_display_t *vd)
      * messages. But since window can stay blocked into this function for a
      * long time (for example when you move your window on the screen), I
      * decided to isolate PeekMessage in another thread. */
-
     /* If we do not control our window, we check for geometry changes
      * ourselves because the parent might not send us its events. */
     if (sys->hparent) {
@@ -179,7 +186,6 @@ void CommonManage(vout_display_t *vd)
 void CommonDisplay(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-
     if (!sys->is_first_display)
         return;
 
@@ -195,6 +201,7 @@ void CommonDisplay(vout_display_t *vd)
                  SWP_NOZORDER);
     sys->is_first_display = false;
 }
+#endif
 
 /**
  * It updates a picture data/pitches.
@@ -272,6 +279,7 @@ void AlignRect(RECT *r, int align_boundary, int align_size)
         r->right = ((r->right - r->left + align_size/2) & ~align_size) + r->left;
 }
 
+#if !VLC_WINSTORE_APP
 /* */
 static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
 {
@@ -710,3 +718,23 @@ static void RestoreScreensaver(vout_display_t *vd)
                              sys->i_spi_screensaveactive, NULL, 0);
     }
 }
+
+#else
+
+int CommonControl(vout_display_t *vd, int query, va_list args)
+{
+    switch (query) {
+    default:
+        return VLC_EGENERIC;
+    }
+}
+
+void CommonManage(vout_display_t *vd) {};
+void CommonClean(vout_display_t *vd) {};
+void CommonDisplay(vout_display_t *vd) {};
+void UpdateRects(vout_display_t *vd,
+                  const vout_display_cfg_t *cfg,
+                  const video_format_t *source,
+                  bool is_forced)
+{};
+#endif
