@@ -1,9 +1,13 @@
---- libvpx-1.4.0/build/make/configure.sh.orig	2015-05-05 16:10:54.667129298 +0200
-+++ libvpx-1.4.0/build/make/configure.sh	2015-05-05 16:13:53.650560142 +0200
-@@ -745,58 +745,6 @@
-   # Minimum iOS version for all target platforms (darwin and iphonesimulator).
-   IOS_VERSION_MIN="6.0"
+diff -ru libvpx/build/make/configure.sh libvpx-fixed/build/make/configure.sh
+--- libvpx/build/make/configure.sh	2015-05-27 14:40:33.000000000 +0200
++++ libvpx-fixed/build/make/configure.sh	2015-05-27 14:40:09.000000000 +0200
+@@ -742,61 +742,6 @@
+   # PIC is probably what we want when building shared libs
+   enabled shared && soft_enable pic
  
+-  # Minimum iOS version for all target platforms (darwin and iphonesimulator).
+-  IOS_VERSION_MIN="6.0"
+-
 -  # Handle darwin variants. Newer SDKs allow targeting older
 -  # platforms, so use the newest one available.
 -  case ${toolchain} in
@@ -59,7 +63,20 @@
    # Handle Solaris variants. Solaris 10 needs -lposix4
    case ${toolchain} in
      sparc-solaris-*)
-@@ -1149,6 +1097,13 @@
+@@ -1002,12 +947,6 @@
+             add_cflags -isysroot ${alt_libc}
+           fi
+ 
+-          if [ "${LD}" = "${CXX}" ]; then
+-            add_ldflags -miphoneos-version-min="${IOS_VERSION_MIN}"
+-          else
+-            add_ldflags -ios_version_min "${IOS_VERSION_MIN}"
+-          fi
+-
+           for d in lib usr/lib usr/lib/system; do
+             try_dir="${alt_libc}/${d}"
+             [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
+@@ -1149,6 +1088,13 @@
        case ${tgt_cc} in
          gcc*)
            add_cflags -m${bits}
