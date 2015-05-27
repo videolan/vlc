@@ -341,7 +341,9 @@ libdash_plugin_la_SOURCES += \
     demux/adaptative/StreamsType.hpp \
     demux/adaptative/tools/Helper.cpp \
     demux/adaptative/tools/Helper.h \
-    demux/adaptative/tools/Properties.hpp
+    demux/adaptative/tools/Properties.hpp \
+    demux/adaptative/tools/Retrieve.cpp \
+    demux/adaptative/tools/Retrieve.hpp
 
 libdash_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
 
