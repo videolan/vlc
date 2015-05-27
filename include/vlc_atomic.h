@@ -182,7 +182,7 @@ typedef         ptrdiff_t atomic_ptrdiff_t;
 typedef          intmax_t atomic_intmax_t;
 typedef         uintmax_t atomic_uintmax_t;
 
-# if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) || (defined (__clang__) && (defined (__x86_64__) || defined (__i386__)))
+# if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) || (defined (__clang__))
 
 /*** Intel/GCC atomics ***/
 
