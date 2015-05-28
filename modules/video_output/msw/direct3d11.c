@@ -860,12 +860,15 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
 # endif
 #endif
 
+    vlc_fourcc_t i_src_chroma = fmt->i_chroma;
+    fmt->i_chroma = 0;
+
     // look for the request pixel format first
     UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     UINT i_formatSupport;
     for (unsigned i = 0; d3d_formats[i].name != 0; i++)
     {
-        if( fmt->i_chroma == d3d_formats[i].fourcc)
+        if( i_src_chroma == d3d_formats[i].fourcc)
         {
             if( SUCCEEDED( ID3D11Device_CheckFormatSupport(sys->d3ddevice,
                                                            d3d_formats[i].formatTexture,
@@ -873,7 +876,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                     ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
             {
                 msg_Dbg(vd, "Using pixel format %s", d3d_formats[i].name );
-                sys->vlcFormat = d3d_formats[i].fourcc;
+                fmt->i_chroma = d3d_formats[i].fourcc;
                 sys->picQuadConfig.textureFormat      = d3d_formats[i].formatTexture;
                 sys->picQuadConfig.resourceFormatYRGB = d3d_formats[i].formatY;
                 sys->picQuadConfig.resourceFormatUV   = d3d_formats[i].formatUV;
@@ -883,7 +886,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     }
 
     // look for any pixel format that we can handle
-    if ( !sys->vlcFormat )
+    if ( !fmt->i_chroma )
     {
         for (unsigned i = 0; d3d_formats[i].name != 0; i++)
         {
@@ -893,7 +896,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
                     ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
             {
                 msg_Dbg(vd, "Using pixel format %s", d3d_formats[i].name );
-                sys->vlcFormat = d3d_formats[i].fourcc;
+                fmt->i_chroma = d3d_formats[i].fourcc;
                 sys->picQuadConfig.textureFormat      = d3d_formats[i].formatTexture;
                 sys->picQuadConfig.resourceFormatYRGB = d3d_formats[i].formatY;
                 sys->picQuadConfig.resourceFormatUV   = d3d_formats[i].formatUV;
@@ -901,7 +904,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
             }
         }
     }
-    if ( !sys->vlcFormat )
+    if ( !fmt->i_chroma )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
        return VLC_EGENERIC;
@@ -927,7 +930,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         sys->d3dregion_format = DXGI_FORMAT_UNKNOWN;
     }
 
-    switch (sys->vlcFormat)
+    switch (fmt->i_chroma)
     {
     case VLC_CODEC_NV12:
         if( fmt->i_height > 576 )
@@ -999,8 +1002,6 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
-
-    fmt->i_chroma = sys->vlcFormat;
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {
