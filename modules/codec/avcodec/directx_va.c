@@ -423,16 +423,12 @@ int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys,
     }
     msg_Dbg(va, "DLLs loaded");
 
-    if (dx_sys->d3ddev) {
-        msg_Dbg(va, "Reusing DirectX device");
-    } else {
-        /* */
-        if (dx_sys->pf_create_device(va)) {
-            msg_Err(va, "Failed to create DirectX device");
-            goto error;
-        }
-        msg_Dbg(va, "CreateDevice succeed");
+    /* */
+    if (dx_sys->pf_create_device(va)) {
+        msg_Err(va, "Failed to create DirectX device");
+        goto error;
     }
+    msg_Dbg(va, "CreateDevice succeed");
 
     if (dx_sys->pf_create_device_manager(va)) {
         msg_Err(va, "D3dCreateDeviceManager failed");
