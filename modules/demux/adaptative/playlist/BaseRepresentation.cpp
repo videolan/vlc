@@ -61,7 +61,7 @@ void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
     msg_Dbg(obj, "%s", text.c_str());
     std::vector<ISegment *> list = getSegments();
     std::vector<ISegment *>::const_iterator l;
-    for(l = list.begin(); l < list.end(); ++l)
+    for(l = list.begin(); l != list.end(); ++l)
         (*l)->debug(obj, indent + 1);
 }
 
