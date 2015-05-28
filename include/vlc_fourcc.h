@@ -335,6 +335,9 @@
 /* DXVA2 opaque video surface for use with D3D9 */
 #define VLC_CODEC_D3D9_OPAQUE     VLC_FOURCC('D','X','A','9')
 
+/* D3D11VA opaque video surface for use with D3D11 */
+#define VLC_CODEC_D3D11_OPAQUE    VLC_FOURCC('D','X','1','1')
+
 /* Image codec (video) */
 #define VLC_CODEC_PNG             VLC_FOURCC('p','n','g',' ')
 #define VLC_CODEC_PPM             VLC_FOURCC('p','p','m',' ')
