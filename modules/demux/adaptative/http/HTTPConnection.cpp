@@ -253,6 +253,7 @@ std::string HTTPConnection::buildRequestHeader(const std::string &path) const
     std::stringstream req;
     req << "GET " << path << " HTTP/1.1\r\n" <<
            "Host: " << hostname << "\r\n" <<
+           "Cache-Control: no-cache" << "\r\n" <<
            "User-Agent: " << std::string(psz_useragent) << "\r\n";
     req << extraRequestHeaders();
     return req.str();
