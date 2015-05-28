@@ -40,6 +40,7 @@
 {
     self = [super init];
     o_vout_dict = [[NSMutableDictionary alloc] init];
+    o_keyboard_backlight = [[KeyboardBacklight alloc] init];
     i_currentWindowLevel = NSNormalWindowLevel;
     i_currentFloatingWindowLevel = NSFloatingWindowLevel;
     return self;
@@ -51,6 +52,11 @@
     for (NSValue *key in keys)
         [self removeVoutforDisplay:key];
 
+    if (var_InheritBool(VLCIntf, "macosx-dim-keyboard")) {
+        [o_keyboard_backlight switchLightsInstantly:YES];
+    }
+
+    [o_keyboard_backlight release];
     [o_vout_dict release];
     [super dealloc];
 }
@@ -338,6 +344,10 @@
     VLCVideoWindowCommon *o_current_window = nil;
     if(p_wnd)
         o_current_window = [o_vout_dict objectForKey:[NSValue valueWithPointer:p_wnd]];
+
+    if (var_InheritBool(p_intf, "macosx-dim-keyboard")) {
+        [o_keyboard_backlight switchLightsAsync:!b_fullscreen];
+    }
 
     if (b_nativeFullscreenMode) {
         if(!o_current_window)

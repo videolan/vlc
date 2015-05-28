@@ -107,6 +107,9 @@ void WindowClose  (vout_window_t *);
 
 #define LOCK_ASPECT_RATIO_TEXT N_("Lock Aspect Ratio")
 
+#define DIM_KEYBOARD_PLAYBACK_TEXT N_("Dim keyboard backlight during fullscreen playback")
+#define DIM_KEYBOARD_PLAYBACK_LONGTEXT N_("Turn off the MacBook keyboard backlight while a video is playing in fullscreen. Automatic brightness adjustment should be disabled in System Preferences.")
+
 #define JUMPBUTTONS_TEXT N_("Show Previous & Next Buttons")
 #define JUMPBUTTONS_LONGTEXT N_("Shows the previous and next buttons in the main window.")
 
@@ -168,6 +171,7 @@ vlc_module_begin()
         add_bool("macosx-video-autoresize", true, KEEPSIZE_TEXT, KEEPSIZE_LONGTEXT, false)
         add_bool("macosx-pause-minimized", false, PAUSE_MINIMIZED_TEXT, PAUSE_MINIMIZED_LONGTEXT, false)
         add_bool("macosx-lock-aspect-ratio", true, LOCK_ASPECT_RATIO_TEXT, LOCK_ASPECT_RATIO_TEXT, true)
+        add_bool("macosx-dim-keyboard", false, DIM_KEYBOARD_PLAYBACK_TEXT, DIM_KEYBOARD_PLAYBACK_LONGTEXT, false)
         add_integer("macosx-control-itunes", 1, ITUNES_TEXT, ITUNES_LONGTEXT, false)
         change_integer_list(itunes_list, itunes_list_text)
         add_integer("macosx-continue-playback", 0, CONTINUE_PLAYBACK_TEXT, CONTINUE_PLAYBACK_LONGTEXT, false)

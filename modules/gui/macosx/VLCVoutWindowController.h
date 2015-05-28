@@ -25,6 +25,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import <vlc_vout_window.h>
+#import "KeyboardBacklight.h"
 
 @class VLCVideoWindowCommon;
 @class VLCVoutView;
@@ -32,6 +33,7 @@
 @interface VLCVoutWindowController : NSObject
 {
     NSMutableDictionary *o_vout_dict;
+    KeyboardBacklight *o_keyboard_backlight;
 
     NSPoint top_left_point;
 
