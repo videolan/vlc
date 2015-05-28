@@ -447,10 +447,10 @@ AbstractStreamOutput *DefaultStreamOutputFactory::create(demux_t *demux, int for
     switch(format)
     {
         case StreamFormat::MP4:
-            return new MP4StreamOutput(demux);
+            return new BaseStreamOutput(demux, "mp4");
 
         case StreamFormat::MPEG2TS:
-            return new MPEG2TSStreamOutput(demux);
+            return new BaseStreamOutput(demux, "ts");
 
         default:
             throw VLC_EBADVAR;
@@ -460,18 +460,10 @@ AbstractStreamOutput *DefaultStreamOutputFactory::create(demux_t *demux, int for
 }
 
 
-MP4StreamOutput::MP4StreamOutput(demux_t *demux) :
+BaseStreamOutput::BaseStreamOutput(demux_t *demux, const std::string &name) :
     AbstractStreamOutput(demux)
 {
-    demuxstream = stream_DemuxNew(demux, "mp4", fakeesout);
-    if(!demuxstream)
-        throw VLC_EGENERIC;
-}
-
-MPEG2TSStreamOutput::MPEG2TSStreamOutput(demux_t *demux) :
-    AbstractStreamOutput(demux)
-{
-    demuxstream = stream_DemuxNew(demux, "ts", fakeesout);
+    demuxstream = stream_DemuxNew(demux, name.c_str(), fakeesout);
     if(!demuxstream)
         throw VLC_EGENERIC;
 }

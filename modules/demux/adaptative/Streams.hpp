@@ -141,18 +141,11 @@ namespace adaptative
             virtual AbstractStreamOutput *create(demux_t*, int streamType) const;
     };
 
-    class MP4StreamOutput : public AbstractStreamOutput
+    class BaseStreamOutput : public AbstractStreamOutput
     {
     public:
-        MP4StreamOutput(demux_t *);
-        virtual ~MP4StreamOutput(){}
-    };
-
-    class MPEG2TSStreamOutput : public AbstractStreamOutput
-    {
-    public:
-        MPEG2TSStreamOutput(demux_t *);
-        virtual ~MPEG2TSStreamOutput(){}
+        BaseStreamOutput(demux_t *, const std::string &);
+        virtual ~BaseStreamOutput(){}
     };
 
 }
