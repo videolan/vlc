@@ -16,7 +16,9 @@ AM_CPPFLAGS += -DHAVE_DBUS
 endif
 
 if !HAVE_WIN32
+if !HAVE_OS2
 bin_PROGRAMS += vlc-wrapper
+endif
 vlc_SOURCES = vlc.c override.c
 endif
 
