@@ -37,6 +37,9 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#ifdef __OS2__
+#   include <io.h>      /* setmode() */
+#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
