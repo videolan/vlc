@@ -319,7 +319,6 @@ ${VLCROOT}/configure \
     --enable-macosx-quartztext \
     --enable-mkv \
     --enable-opus \
-    --disable-sout \
     --disable-faad \
     --disable-lua \
     --disable-a52 \
@@ -444,6 +443,11 @@ oldmovie
 vhs
 demuxdump
 fingerprinter
+output_udp
+output_http
+output_livehttp
+libmux
+stream_out
 "
 
 if [ "$SCARY" = "no" ]; then
