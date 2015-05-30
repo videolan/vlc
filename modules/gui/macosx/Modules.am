@@ -1,5 +1,4 @@
 AM_LIBTOOLFLAGS=--tag=CC
-AM_LDFLAGS=-framework IOKit
 
 SOURCES_macosx = \
 	CompatibilityFixes.h \
