@@ -50,6 +50,9 @@
 #ifndef O_LARGEFILE
 #   define O_LARGEFILE 0
 #endif
+#ifndef _POSIX_REALTIME_SIGNALS
+# define _POSIX_REALTIME_SIGNALS (-1)
+#endif
 
 #define SOUT_CFG_PREFIX "sout-file-"
 
@@ -103,7 +106,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     return i_write;
 }
 
-#ifdef S_ISSOCK
+#if (_POSIX_REALTIME_SIGNALS > 0)
 static ssize_t WritePipe(sout_access_out_t *access, block_t *block)
 {
     int fd = (intptr_t)access->p_sys;
@@ -156,7 +159,11 @@ static ssize_t WritePipe(sout_access_out_t *access, block_t *block)
 
     return total;
 }
+#else
+# define WritePipe Write
+#endif
 
+#ifdef S_ISSOCK
 static ssize_t Send(sout_access_out_t *access, block_t *block)
 {
     int fd = (intptr_t)access->p_sys;
@@ -191,8 +198,6 @@ static ssize_t Send(sout_access_out_t *access, block_t *block)
     }
     return total;
 }
-#else
-# define WritePipe Write
 #endif
 
 /*****************************************************************************
