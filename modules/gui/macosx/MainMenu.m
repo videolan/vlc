@@ -49,6 +49,10 @@
 #import "DebugMessageVisualizer.h"
 #import "AddonsWindowController.h"
 
+#ifdef UPDATE_CHECK
+#import <Sparkle/Sparkle.h>
+#endif
+
 @implementation VLCMainMenu
 static VLCMainMenu *_o_sharedInstance = nil;
 
@@ -143,6 +147,13 @@ static VLCMainMenu *_o_sharedInstance = nil;
     [self setRateControlsEnabled:NO];
 
     p_intf = VLCIntf;
+
+#ifdef UPDATE_CHECK
+    [o_mi_checkForUpdate setAction:@selector(checkForUpdates:)];
+    [o_mi_checkForUpdate setTarget:[SUUpdater sharedUpdater]];
+#else
+    [o_mi_checkForUpdate setEnabled:NO];
+#endif
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification

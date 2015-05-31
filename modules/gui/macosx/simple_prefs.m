@@ -38,7 +38,9 @@
 #import "AppleRemote.h"
 #import "CoreInteraction.h"
 
+#ifdef UPDATE_CHECK
 #import <Sparkle/Sparkle.h>                        //for o_intf_last_update_lbl
+#endif
 
 static const char *const ppsz_language[] =
 {
@@ -217,6 +219,16 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     [self initStrings];
+
+#ifdef UPDATE_CHECK
+    [o_intf_update_ckb bind:@"value"
+                   toObject:[SUUpdater sharedUpdater]
+                withKeyPath:@"automaticallyChecksForUpdates"
+                    options:nil];
+#else
+    [o_intf_update_ckb setState:NSOffState];
+    [o_intf_update_ckb setEnabled:NO];
+#endif
 
     /* setup the toolbar */
     NSToolbar * o_sprefs_toolbar = [[[NSToolbar alloc] initWithIdentifier: VLCSPrefsToolbarIdentifier] autorelease];
@@ -578,10 +590,14 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [self setupButton: o_intf_appleremote_sysvol_ckb forBoolValue: "macosx-appleremote-sysvol"];
 
     [self setupButton: o_intf_mediakeys_ckb forBoolValue: "macosx-mediakeys"];
+
+#ifdef UPDATE_CHECK
     if ([[SUUpdater sharedUpdater] lastUpdateCheckDate] != NULL)
         [o_intf_last_update_lbl setStringValue: [NSString stringWithFormat: _NS("Last check on: %@"), [[[SUUpdater sharedUpdater] lastUpdateCheckDate] descriptionWithLocale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]]]];
     else
         [o_intf_last_update_lbl setStringValue: _NS("No check was performed yet.")];
+#endif
+
     psz_tmp = config_GetPsz(p_intf, "control");
     if (psz_tmp) {
         [o_intf_enableGrowl_ckb setState: (NSInteger)strstr(psz_tmp, "growl")];

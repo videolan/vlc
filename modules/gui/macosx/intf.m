@@ -67,7 +67,9 @@
 #import "VideoEffects.h"
 #import "AudioEffects.h"
 
+#ifdef UPDATE_CHECK
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
+#endif
 
 #import "iTunes.h"
 #import "Spotify.h"
@@ -789,7 +791,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     // So lets enqueue it into the loop for later execution.
     [o_mainwindow performSelector:@selector(makeKeyAndOrderFront:) withObject:nil afterDelay:0];
 
+#ifdef UPDATE_CHECK
     [[SUUpdater sharedUpdater] setDelegate:self];
+#endif
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -975,6 +979,8 @@ static bool f_appExit = false;
 
 #pragma mark -
 #pragma mark Sparkle delegate
+
+#ifdef UPDATE_CHECK
 /* received directly before the update gets installed, so let's shut down a bit */
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
 {
@@ -991,6 +997,7 @@ static bool f_appExit = false;
 
     return YES;
 }
+#endif
 
 #pragma mark -
 #pragma mark Media Key support
