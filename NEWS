@@ -96,8 +96,9 @@ Service Discovery:
  * Rewrite of the UPnP service discovery
 
 Mac OS X Interface
+ * Add support for keyboard blacklight dimming during fullscreen video playback
  * new AppleScript API giving access to audio desynchronization
- * Port to Yosemite X.10
+ * Support for building with disabled sparkle update mechanism
 
 Qt interface:
  * Batch convert support
