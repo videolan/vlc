@@ -16,6 +16,7 @@ esac
 
 OPTIONS="
         --prefix=`pwd`/vlc_install_dir
+        --enable-update-check
         --enable-macosx
         --enable-merge-ffmpeg
         --enable-growl
