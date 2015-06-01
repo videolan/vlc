@@ -136,6 +136,7 @@ struct csd
 struct decoder_sys_t
 {
     mc_api *api;
+    char *psz_name;
     uint32_t nal_size;
 
     int pixel_format;
@@ -338,6 +339,7 @@ static int StartMediaCodec(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_angle = 0, i_ret;
     size_t h264_profile = 0;
+    char *psz_name = NULL;
     jobject jsurface = NULL;
 
     if (p_dec->fmt_in.i_extra && !p_sys->p_csd)
@@ -417,21 +419,30 @@ static int StartMediaCodec(decoder_t *p_dec)
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         h264_get_profile_level(&p_dec->fmt_in, &h264_profile, NULL, NULL);
 
+    psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, h264_profile);
+    if (!psz_name)
+        return VLC_EGENERIC;
+
     if (var_InheritBool(p_dec, CFG_PREFIX "dr"))
         jsurface = jni_LockAndGetAndroidJavaSurface();
-    i_ret = p_sys->api->start(p_sys->api, jsurface, p_sys->mime, p_sys->i_width,
-                              p_sys->i_height, h264_profile, i_angle);
+    i_ret = p_sys->api->start(p_sys->api, jsurface, psz_name, p_sys->mime,
+                              p_sys->i_width, p_sys->i_height, i_angle);
     if (jsurface)
         jni_UnlockAndroidSurface();
 
     if (i_ret == VLC_SUCCESS)
     {
+        p_sys->psz_name = psz_name;
         if (p_sys->api->b_direct_rendering)
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
         p_sys->b_update_format = true;
         return VLC_SUCCESS;
-    } else
+    }
+    else
+    {
+        free(psz_name);
         return VLC_EGENERIC;
+    }
 }
 
 /*****************************************************************************
@@ -445,6 +456,9 @@ static void StopMediaCodec(decoder_t *p_dec)
      * to prevent the vout from using destroyed output buffers. */
     if (p_sys->api->b_direct_rendering)
         InvalidateAllPictures(p_dec);
+
+    free(p_sys->psz_name);
+    p_sys->psz_name = NULL;
 
     p_sys->api->stop(p_sys->api);
 }
@@ -798,7 +812,7 @@ static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
                                       p_sys->stride, &p_sys->architecture_specific_data);
         if (p_sys->pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
             p_sys->slice_height -= out.u.conf.crop_top/2;
-        if (IgnoreOmxDecoderPadding(p_sys->api->psz_name)) {
+        if (IgnoreOmxDecoderPadding(p_sys->psz_name)) {
             p_sys->slice_height = 0;
             p_sys->stride = p_dec->fmt_out.video.i_width;
         }

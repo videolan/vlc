@@ -29,6 +29,8 @@ typedef struct mc_api_out mc_api_out;
 
 typedef int (*pf_MediaCodecApi_init)(mc_api*);
 
+char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
+                         size_t h264_profile);
 int MediaCodecJni_Init(mc_api*);
 int MediaCodecNdk_Init(mc_api*);
 
@@ -67,15 +69,13 @@ struct mc_api
 
     mc_api_sys *p_sys;
 
-    const char *psz_name;
     bool b_started;
     bool b_direct_rendering;
     bool b_support_interlaced;
 
     void (*clean)(mc_api *);
-    int (*start)(mc_api *, jobject jsurface, const char *psz_mime,
-                 int i_width, int i_height,
-                 size_t h264_profile, int i_angle);
+    int (*start)(mc_api *, jobject jsurface, const char *psz_name,
+                 const char *psz_mime, int i_width, int i_height, int i_angle);
     int (*stop)(mc_api *);
     int (*flush)(mc_api *);
     int (*put_in)(mc_api *, const void *p_buf, size_t i_size,

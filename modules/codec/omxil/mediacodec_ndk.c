@@ -106,7 +106,7 @@ typedef struct AMediaCrypto AMediaCrypto;
  * Ndk symbols
  *****************************************************************************/
 
-typedef AMediaCodec* (*pf_AMediaCodec_createDecoderByType)(const char *mime_type);
+typedef AMediaCodec* (*pf_AMediaCodec_createCodecByName)(const char *name);
 
 typedef media_status_t (*pf_AMediaCodec_configure)(AMediaCodec*,
         const AMediaFormat* format,
@@ -157,7 +157,7 @@ typedef bool (*pf_AMediaFormat_getInt32)(AMediaFormat*,
 struct syms
 {
     struct {
-        pf_AMediaCodec_createDecoderByType createDecoderByType;
+        pf_AMediaCodec_createCodecByName createCodecByName;
         pf_AMediaCodec_configure configure;
         pf_AMediaCodec_start start;
         pf_AMediaCodec_stop stop;
@@ -191,7 +191,7 @@ struct members
 static struct members members[] =
 {
 #define OFF(x) offsetof(struct syms, AMediaCodec.x)
-    { "AMediaCodec_createDecoderByType", OFF(createDecoderByType), true },
+    { "AMediaCodec_createCodecByName", OFF(createCodecByName), true },
     { "AMediaCodec_configure", OFF(configure), true },
     { "AMediaCodec_start", OFF(start), true },
     { "AMediaCodec_stop", OFF(stop), true },
@@ -283,7 +283,6 @@ static int Stop(mc_api *api)
 
     api->b_direct_rendering = false;
     api->b_support_interlaced = false;
-    api->psz_name = NULL;
 
     if (p_sys->p_codec)
     {
@@ -313,17 +312,16 @@ static int Stop(mc_api *api)
 /*****************************************************************************
  * Start
  *****************************************************************************/
-static int Start(mc_api *api, jobject jsurface, const char *psz_mime,
-                 int i_width, int i_height, size_t h264_profile, int i_angle)
+static int Start(mc_api *api, jobject jsurface, const char *psz_name,
+                 const char *psz_mime, int i_width, int i_height, int i_angle)
 {
     mc_api_sys *p_sys = api->p_sys;
     int i_ret = VLC_EGENERIC;
-    (void) h264_profile;
 
-    p_sys->p_codec = syms.AMediaCodec.createDecoderByType(psz_mime);
+    p_sys->p_codec = syms.AMediaCodec.createCodecByName(psz_name);
     if (!p_sys->p_codec)
     {
-        msg_Err(api->p_obj, "AMediaCodec.createDecoderByType for %s failed", psz_mime);
+        msg_Err(api->p_obj, "AMediaCodec.createCodecByName for %s failed", psz_name);
         goto error;
     }
 
@@ -338,6 +336,7 @@ static int Start(mc_api *api, jobject jsurface, const char *psz_mime,
     syms.AMediaFormat.setInt32(p_sys->p_format, "width", i_width);
     syms.AMediaFormat.setInt32(p_sys->p_format, "height", i_height);
     syms.AMediaFormat.setInt32(p_sys->p_format, "rotation-degrees", i_angle);
+    syms.AMediaFormat.setInt32(p_sys->p_format, "encoder", 0);
 
     if (jsurface)
     {
@@ -363,7 +362,6 @@ static int Start(mc_api *api, jobject jsurface, const char *psz_mime,
     api->b_started = true;
     api->b_direct_rendering = !!p_sys->p_anw;
     api->b_support_interlaced = true;
-    api->psz_name = ""; // TODO
     i_ret = VLC_SUCCESS;
 
     msg_Dbg(api->p_obj, "MediaCodec via NDK opened");

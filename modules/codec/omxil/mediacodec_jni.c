@@ -179,7 +179,7 @@ static inline bool check_exception(JNIEnv *env)
 /* Initialize all jni fields.
  * Done only one time during the first initialisation */
 static bool
-InitJNIFields (mc_api *api, JNIEnv *env)
+InitJNIFields (vlc_object_t *p_obj, JNIEnv *env)
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static int i_init_state = -1;
@@ -197,7 +197,7 @@ InitJNIFields (mc_api *api, JNIEnv *env)
         jclass clazz = (*env)->FindClass(env, classes[i].name);
         if (CHECK_EXCEPTION())
         {
-            msg_Warn(api->p_obj, "Unable to find class %s", classes[i].name);
+            msg_Warn(p_obj, "Unable to find class %s", classes[i].name);
             goto end;
         }
         *(jclass*)((uint8_t*)&jfields + classes[i].offset) =
@@ -212,7 +212,7 @@ InitJNIFields (mc_api *api, JNIEnv *env)
 
         if (CHECK_EXCEPTION())
         {
-            msg_Warn(api->p_obj, "Unable to find class %s", members[i].class);
+            msg_Warn(p_obj, "Unable to find class %s", members[i].class);
             goto end;
         }
 
@@ -232,7 +232,7 @@ InitJNIFields (mc_api *api, JNIEnv *env)
         }
         if (CHECK_EXCEPTION())
         {
-            msg_Warn(api->p_obj, "Unable to find the member %s in %s",
+            msg_Warn(p_obj, "Unable to find the member %s in %s",
                      members[i].name, members[i].class);
             if (members[i].critical)
                 goto end;
@@ -247,7 +247,7 @@ InitJNIFields (mc_api *api, JNIEnv *env)
     }
     else if (!jfields.get_output_buffers && !jfields.get_input_buffers)
     {
-        msg_Err(api->p_obj, "Unable to find get Output/Input Buffer/Buffers");
+        msg_Err(p_obj, "Unable to find get Output/Input Buffer/Buffers");
         goto end;
     }
 
@@ -255,7 +255,7 @@ InitJNIFields (mc_api *api, JNIEnv *env)
 end:
     ret = i_init_state == 1;
     if( !ret )
-        msg_Err( api->p_obj, "MediaCodec jni init failed" );
+        msg_Err(p_obj, "MediaCodec jni init failed");
 
     vlc_mutex_unlock( &lock );
     return ret;
@@ -270,20 +270,28 @@ struct mc_api_sys
     jobject codec;
     jobject buffer_info;
     jobject input_buffers, output_buffers;
-
-    char *psz_name;
 };
 
 /*****************************************************************************
- * GetMediaCodecName
+ * MediaCodec_GetName
  *****************************************************************************/
-static jstring GetMediaCodecName(mc_api *api, JNIEnv *env,
-                                 const char *psz_mime, jstring jmime,
-                                 size_t h264_profile)
+char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
+                         size_t h264_profile)
 {
-    mc_api_sys *p_sys = api->p_sys;
+    JNIEnv *env;
     int num_codecs;
-    jstring jcodec_name = NULL;
+    jstring jmime;
+    char *psz_name = NULL;
+
+    if (!(env = jni_get_env(THREAD_NAME)))
+        return NULL;
+
+    if (!InitJNIFields(p_obj, env))
+        return NULL;
+
+    jmime = (*env)->NewStringUTF(env, psz_mime);
+    if (!jmime)
+        return NULL;
 
     num_codecs = (*env)->CallStaticIntMethod(env,
                                              jfields.media_codec_list_class,
@@ -319,7 +327,7 @@ static jstring GetMediaCodecName(mc_api *api, JNIEnv *env,
                                                       jmime);
         if (CHECK_EXCEPTION())
         {
-            msg_Warn(api->p_obj, "Exception occurred in MediaCodecInfo.getCapabilitiesForType");
+            msg_Warn(p_obj, "Exception occurred in MediaCodecInfo.getCapabilitiesForType");
             goto loopclean;
         }
         else if (codec_capabilities)
@@ -328,7 +336,7 @@ static jstring GetMediaCodecName(mc_api *api, JNIEnv *env,
             if (profile_levels)
                 profile_levels_len = (*env)->GetArrayLength(env, profile_levels);
         }
-        msg_Dbg(api->p_obj, "Number of profile levels: %d", profile_levels_len);
+        msg_Dbg(p_obj, "Number of profile levels: %d", profile_levels_len);
 
         types = (*env)->CallObjectMethod(env, info, jfields.get_supported_types);
         num_types = (*env)->GetArrayLength(env, types);
@@ -370,18 +378,19 @@ static jstring GetMediaCodecName(mc_api *api, JNIEnv *env,
         }
         if (found)
         {
-            msg_Dbg(api->p_obj, "using %.*s", name_len, name_ptr);
-            p_sys->psz_name = malloc(name_len + 1);
-            memcpy(p_sys->psz_name, name_ptr, name_len);
-            p_sys->psz_name[name_len] = '\0';
-            jcodec_name = name;
+            msg_Dbg(p_obj, "using %.*s", name_len, name_ptr);
+            psz_name = malloc(name_len + 1);
+            if (psz_name)
+            {
+                memcpy(psz_name, name_ptr, name_len);
+                psz_name[name_len] = '\0';
+            }
         }
 loopclean:
         if (name)
         {
             (*env)->ReleaseStringUTFChars(env, name, name_ptr);
-            if (jcodec_name != name)
-                (*env)->DeleteLocalRef(env, name);
+            (*env)->DeleteLocalRef(env, name);
         }
         if (profile_levels)
             (*env)->DeleteLocalRef(env, profile_levels);
@@ -394,7 +403,9 @@ loopclean:
         if (found)
             break;
     }
-    return jcodec_name;
+    (*env)->DeleteLocalRef(env, jmime);
+
+    return psz_name;
 }
 
 /*****************************************************************************
@@ -407,9 +418,6 @@ static int Stop(mc_api *api)
 
     api->b_direct_rendering = false;
     api->b_support_interlaced = false;
-    api->psz_name = NULL;
-
-    free(p_sys->psz_name);
 
     GET_ENV();
 
@@ -451,8 +459,8 @@ static int Stop(mc_api *api)
 /*****************************************************************************
  * Start
  *****************************************************************************/
-static int Start(mc_api *api, jobject jsurface, const char *psz_mime,
-                 int i_width, int i_height, size_t h264_profile, int i_angle)
+static int Start(mc_api *api, jobject jsurface, const char *psz_name,
+                 const char *psz_mime, int i_width, int i_height, int i_angle)
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv* env = NULL;
@@ -470,15 +478,9 @@ static int Start(mc_api *api, jobject jsurface, const char *psz_mime,
     GET_ENV();
 
     jmime = (*env)->NewStringUTF(env, psz_mime);
-    if (!jmime)
-        return VLC_EGENERIC;
-
-    jcodec_name = GetMediaCodecName(api, env, psz_mime, jmime, h264_profile);
-    if (!jcodec_name)
-    {
-        msg_Dbg(api->p_obj, "No suitable codec matching %s was found", psz_mime);
+    jcodec_name = (*env)->NewStringUTF(env, psz_name);
+    if (!jmime || !jcodec_name)
         goto error;
-    }
 
     /* This method doesn't handle errors nicely, it crashes if the codec isn't
      * found.  (The same goes for createDecoderByType.) This is fixed in latest
@@ -573,7 +575,6 @@ static int Start(mc_api *api, jobject jsurface, const char *psz_mime,
     /* Allow interlaced picture only after API 21 */
     api->b_direct_rendering = b_direct_rendering;
     api->b_support_interlaced = jfields.get_input_buffer && jfields.get_output_buffer;
-    api->psz_name = p_sys->psz_name;
     i_ret = VLC_SUCCESS;
     msg_Dbg(api->p_obj, "MediaCodec via JNI opened");
 
@@ -828,7 +829,7 @@ int MediaCodecJni_Init(mc_api *api)
 
     GET_ENV();
 
-    if (!InitJNIFields(api, env))
+    if (!InitJNIFields(api->p_obj, env))
         return VLC_EGENERIC;
 
     api->p_sys = calloc(1, sizeof(mc_api_sys));
