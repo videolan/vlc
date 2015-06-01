@@ -42,6 +42,10 @@
 #define THREAD_NAME "mediacodec_ndk"
 extern JNIEnv *jni_get_env(const char *name);
 
+/* Not in NdkMedia API but we need it since we send config data via input
+ * buffers and not via "csd-*" buffers from AMediaFormat */
+#define AMEDIACODEC_FLAG_CODEC_CONFIG 2
+
 /*****************************************************************************
  * NdkMediaError.h
  *****************************************************************************/
@@ -392,7 +396,7 @@ static int PutInput(mc_api *api, const void *p_buf, size_t i_size,
     ssize_t i_index;
     uint8_t *p_mc_buf;
     size_t i_mc_size;
-    (void) b_config;
+    int i_flags = b_config ? AMEDIACODEC_FLAG_CODEC_CONFIG : 0;
 
     i_index = syms.AMediaCodec.dequeueInputBuffer(p_sys->p_codec, i_timeout);
     if (i_index < 0)
@@ -416,7 +420,7 @@ static int PutInput(mc_api *api, const void *p_buf, size_t i_size,
     memcpy(p_mc_buf, p_buf, i_mc_size);
 
     if (syms.AMediaCodec.queueInputBuffer(p_sys->p_codec, i_index, 0, i_mc_size,
-                                          i_ts, 0) == AMEDIA_OK)
+                                          i_ts, i_flags) == AMEDIA_OK)
         return 1;
     else
     {
