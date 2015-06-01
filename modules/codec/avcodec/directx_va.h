@@ -41,13 +41,6 @@
 
 #include <unknwn.h>
 
-typedef struct {
-    const char   *name;
-    const GUID   *guid;
-    int          codec;
-    const int    *p_profiles; // NULL or ends with 0
-} directx_va_mode_t;
-
 /* */
 typedef struct {
     int                refcount;
