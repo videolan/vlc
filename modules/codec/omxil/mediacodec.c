@@ -192,7 +192,7 @@ static int InsertInflightPicture(decoder_t *, picture_t *, unsigned int );
 #define CFG_PREFIX "mediacodec-"
 
 vlc_module_begin ()
-    set_description( N_("Video decoder using Android MediaCodec") )
+    set_description( N_("Video decoder using Android MediaCodec via NDK") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_section( N_("Decoding") , NULL )
@@ -202,6 +202,7 @@ vlc_module_begin ()
     set_callbacks( OpenDecoderNdk, CloseDecoder )
     add_shortcut( "mediacodec_ndk" )
     add_submodule ()
+        set_description( N_("Video decoder using Android MediaCodec via JNI") )
         set_capability( "decoder", 0 )
         set_callbacks( OpenDecoderJni, CloseDecoder )
         add_shortcut( "mediacodec_jni" )
