@@ -941,7 +941,12 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
                     NULL, 0, D3D11_SDK_VERSION,
                     &sys->d3ddevice, NULL, &sys->d3dcontext);
-        if (SUCCEEDED(hr)) break;
+        if (SUCCEEDED(hr)) {
+#ifndef NDEBUG
+            msg_Dbg(vd, "Created the D3D11 device 0x%p ctx 0x%p type %d.", sys->d3ddevice, sys->d3dcontext, driverAttempts[driver]);
+#endif
+            break;
+        }
     }
 
     if (FAILED(hr)) {
