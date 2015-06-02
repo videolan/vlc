@@ -46,6 +46,7 @@ typedef struct {
     int                refcount;
     unsigned int       order;
     vlc_mutex_t        *p_lock;
+    picture_t          *p_pic;
 } vlc_va_surface_t;
 
 typedef struct input_list_t {
@@ -124,6 +125,12 @@ typedef struct
      * Set the avcodec hw context after the decoder is created
      */
     void (*pf_setup_avcodec_ctx)(vlc_va_t *);
+    /**
+     * @brief pf_alloc_surface_pic
+     * @param fmt
+     * @return
+     */
+    picture_t *(*pf_alloc_surface_pic)(vlc_va_t *, const video_format_t *, unsigned);
 
 } directx_sys_t;
 

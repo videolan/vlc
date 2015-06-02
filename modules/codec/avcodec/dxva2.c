@@ -133,6 +133,9 @@ struct picture_sys_t
     LPDIRECT3DSURFACE9 surface;
 };
 
+static picture_t *DxAllocPicture(vlc_va_t *, const video_format_t *, unsigned index);
+
+
 /* */
 static int D3dCreateDevice(vlc_va_t *);
 static void D3dDestroyDevice(vlc_va_t *);
@@ -281,6 +284,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     dx_sys->pf_setup_avcodec_ctx       = SetupAVCodecContext;
     dx_sys->pf_get_input_list          = DxGetInputList;
     dx_sys->pf_setup_output            = DxSetupOutput;
+    dx_sys->pf_alloc_surface_pic       = DxAllocPicture;
     dx_sys->psz_decoder_dll            = TEXT("DXVA2.DLL");
 
     va->sys = sys;
@@ -713,3 +717,23 @@ static int DxResetVideoDecoder(vlc_va_t *va)
     return VLC_EGENERIC;
 }
 
+static picture_t *DxAllocPicture(vlc_va_t *va, const video_format_t *fmt, unsigned index)
+{
+    video_format_t src_fmt = *fmt;
+    src_fmt.i_chroma = VLC_CODEC_D3D9_OPAQUE;
+    picture_sys_t *pic_sys = calloc(1, sizeof(*pic_sys));
+    if (unlikely(pic_sys == NULL))
+        return NULL;
+    pic_sys->surface = (LPDIRECT3DSURFACE9) va->sys->dx_sys.hw_surface[index];
+
+    picture_resource_t res = {
+        .p_sys = pic_sys,
+    };
+    picture_t *pic = picture_NewFromResource(&src_fmt, &res);
+    if (unlikely(pic == NULL))
+    {
+        free(pic_sys);
+        return NULL;
+    }
+    return pic;
+}
