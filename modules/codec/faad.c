@@ -40,7 +40,7 @@
 #include <vlc_codec.h>
 #include <vlc_cpu.h>
 
-#include <faad.h>
+#include <neaacdec.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -67,7 +67,7 @@ static void DoReordering( uint32_t *, uint32_t *, int, int, uint32_t * );
 struct decoder_sys_t
 {
     /* faad handler */
-    faacDecHandle *hfaad;
+    NeAACDecHandle *hfaad;
 
     /* samples */
     date_t date;
@@ -123,7 +123,7 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
-    faacDecConfiguration *cfg;
+    NeAACDecConfiguration *cfg;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_MP4A )
     {
@@ -135,7 +135,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Open a faad context */
-    if( ( p_sys->hfaad = faacDecOpen() ) == NULL )
+    if( ( p_sys->hfaad = NeAACDecOpen() ) == NULL )
     {
         msg_Err( p_dec, "cannot initialize faad" );
         free( p_sys );
@@ -157,12 +157,12 @@ static int Open( vlc_object_t *p_this )
         unsigned long i_rate;
         unsigned char i_channels;
 
-        if( faacDecInit2( p_sys->hfaad, p_dec->fmt_in.p_extra,
-                          p_dec->fmt_in.i_extra,
-                          &i_rate, &i_channels ) < 0 )
+        if( NeAACDecInit2( p_sys->hfaad, p_dec->fmt_in.p_extra,
+                           p_dec->fmt_in.i_extra,
+                           &i_rate, &i_channels ) < 0 )
         {
             msg_Err( p_dec, "Failed to initialize faad using extra data" );
-            faacDecClose( p_sys->hfaad );
+            NeAACDecClose( p_sys->hfaad );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -182,11 +182,11 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set the faad config */
-    cfg = faacDecGetCurrentConfiguration( p_sys->hfaad );
+    cfg = NeAACDecGetCurrentConfiguration( p_sys->hfaad );
     if( p_dec->fmt_in.audio.i_rate )
         cfg->defSampleRate = p_dec->fmt_in.audio.i_rate;
     cfg->outputFormat = HAVE_FPU ? FAAD_FMT_FLOAT : FAAD_FMT_16BIT;
-    faacDecSetConfiguration( p_sys->hfaad, cfg );
+    NeAACDecSetConfiguration( p_sys->hfaad, cfg );
 
     /* buffer */
     p_sys->i_buffer = p_sys->i_buffer_size = 0;
@@ -266,9 +266,9 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         unsigned long i_rate;
         unsigned char i_channels;
 
-        if( faacDecInit2( p_sys->hfaad, p_dec->fmt_in.p_extra,
-                          p_dec->fmt_in.i_extra,
-                          &i_rate, &i_channels ) >= 0 )
+        if( NeAACDecInit2( p_sys->hfaad, p_dec->fmt_in.p_extra,
+                           p_dec->fmt_in.i_extra,
+                           &i_rate, &i_channels ) >= 0 )
         {
             p_dec->fmt_out.audio.i_rate = i_rate;
             p_dec->fmt_out.audio.i_channels = i_channels;
@@ -286,9 +286,9 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         unsigned char i_channels;
 
         /* Init faad with the first frame */
-        if( faacDecInit( p_sys->hfaad,
-                         p_sys->p_buffer, p_sys->i_buffer,
-                         &i_rate, &i_channels ) < 0 )
+        if( NeAACDecInit( p_sys->hfaad,
+                          p_sys->p_buffer, p_sys->i_buffer,
+                          &i_rate, &i_channels ) < 0 )
         {
             block_Release( p_block );
             return NULL;
@@ -318,15 +318,15 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->i_buffer > 1)
     {
         void *samples;
-        faacDecFrameInfo frame;
+        NeAACDecFrameInfo frame;
         block_t *p_out;
 
-        samples = faacDecDecode( p_sys->hfaad, &frame,
-                                 p_sys->p_buffer, p_sys->i_buffer );
+        samples = NeAACDecDecode( p_sys->hfaad, &frame,
+                                  p_sys->p_buffer, p_sys->i_buffer );
 
         if( frame.error > 0 )
         {
-            msg_Warn( p_dec, "%s", faacDecGetErrorMessage( frame.error ) );
+            msg_Warn( p_dec, "%s", NeAACDecGetErrorMessage( frame.error ) );
 
             if( frame.error == 21 || frame.error == 12 )
             {
@@ -338,28 +338,28 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                  */
                 unsigned long i_rate;
                 unsigned char i_channels;
-                faacDecHandle *hfaad;
-                faacDecConfiguration *cfg,*oldcfg;
+                NeAACDecHandle *hfaad;
+                NeAACDecConfiguration *cfg,*oldcfg;
 
-                oldcfg = faacDecGetCurrentConfiguration( p_sys->hfaad );
-                hfaad = faacDecOpen();
-                cfg = faacDecGetCurrentConfiguration( hfaad );
+                oldcfg = NeAACDecGetCurrentConfiguration( p_sys->hfaad );
+                hfaad = NeAACDecOpen();
+                cfg = NeAACDecGetCurrentConfiguration( hfaad );
                 if( oldcfg->defSampleRate )
                     cfg->defSampleRate = oldcfg->defSampleRate;
                 cfg->defObjectType = oldcfg->defObjectType;
                 cfg->outputFormat = oldcfg->outputFormat;
-                faacDecSetConfiguration( hfaad, cfg );
+                NeAACDecSetConfiguration( hfaad, cfg );
 
-                if( faacDecInit( hfaad, p_sys->p_buffer, p_sys->i_buffer,
-                                &i_rate,&i_channels ) < 0 )
+                if( NeAACDecInit( hfaad, p_sys->p_buffer, p_sys->i_buffer,
+                                  &i_rate,&i_channels ) < 0 )
                 {
                     /* reinitialization failed */
-                    faacDecClose( hfaad );
-                    faacDecSetConfiguration( p_sys->hfaad, oldcfg );
+                    NeAACDecClose( hfaad );
+                    NeAACDecSetConfiguration( p_sys->hfaad, oldcfg );
                 }
                 else
                 {
-                    faacDecClose( p_sys->hfaad );
+                    NeAACDecClose( p_sys->hfaad );
                     p_sys->hfaad = hfaad;
                     p_dec->fmt_out.audio.i_rate = i_rate;
                     p_dec->fmt_out.audio.i_channels = i_channels;
@@ -522,7 +522,7 @@ static void Close( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    faacDecClose( p_sys->hfaad );
+    NeAACDecClose( p_sys->hfaad );
     free( p_sys->p_buffer );
     free( p_sys );
 }

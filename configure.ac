@@ -2512,8 +2512,7 @@ AC_ARG_ENABLE(faad,
 [  --enable-faad           faad codec (default auto)])
 have_faad="no"
 AS_IF([test "${enable_faad}" != "no"], [
-  AC_CHECK_HEADERS([faad.h], [
-    AC_CHECK_LIB(faad, faacDecOpen, [have_faad="yes"],, [$LIBM])
+  AC_CHECK_HEADERS([neaacdec.h], [
     AC_CHECK_LIB(faad, NeAACDecOpen, [have_faad="yes"],, [$LIBM])
 
     AS_IF([test "${have_faad}" = "yes"], [
