@@ -330,6 +330,7 @@ static int Open( vlc_va_t *va, AVCodecContext *avctx,
 
     (void) fmt;
     (void) avctx;
+    (void) p_sys;
 
     return VLC_SUCCESS;
 }
