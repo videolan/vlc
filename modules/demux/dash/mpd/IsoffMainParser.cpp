@@ -297,7 +297,7 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
     {
         std::vector<Node *> segments = DOMHelper::getElementByTagName(segListNode, "SegmentURL", false);
         SegmentList *list;
-        if((list = new (std::nothrow) SegmentList()))
+        if((list = new (std::nothrow) SegmentList(info)))
         {
             parseInitSegment(DOMHelper::getFirstChildElementByName(segListNode, "Initialization"), list, info);
 
