@@ -721,7 +721,8 @@ static void closeCurrentSegment( sout_access_out_t *p_access, sout_access_out_sy
             if( err ) {
                msg_Err( p_access, "Couldn't encrypt 16 bytes: %s", gpg_strerror(err) );
             } else {
-            int ret = write( p_sys->i_handle, p_sys->stuffing_bytes, 16 );
+
+            int ret = vlc_write( p_sys->i_handle, p_sys->stuffing_bytes, 16 );
             if( ret != 16 )
                 msg_Err( p_access, "Couldn't write 16 bytes" );
             }
@@ -984,7 +985,8 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
             crypted=true;
 
         }
-        ssize_t val = write( p_sys->i_handle, output->p_buffer, output->i_buffer );
+
+        ssize_t val = vlc_write( p_sys->i_handle, output->p_buffer, output->i_buffer );
         if ( val == -1 )
         {
            if ( errno == EINTR )

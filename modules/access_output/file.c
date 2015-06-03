@@ -106,16 +106,10 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     return i_write;
 }
 
-#if (_POSIX_REALTIME_SIGNALS > 0)
 static ssize_t WritePipe(sout_access_out_t *access, block_t *block)
 {
     int fd = (intptr_t)access->p_sys;
     ssize_t total = 0;
-    sigset_t set, oldset;
-
-    sigemptyset(&set);
-    sigaddset(&set, SIGPIPE);
-    pthread_sigmask(SIG_BLOCK, &set, &oldset);
 
     while (block != NULL)
     {
@@ -128,18 +122,11 @@ static ssize_t WritePipe(sout_access_out_t *access, block_t *block)
         }
 
         /* TODO: vectorized I/O with writev() */
-        ssize_t val = write(fd, block->p_buffer, block->i_buffer);
+        ssize_t val = vlc_write(fd, block->p_buffer, block->i_buffer);
         if (val < 0)
         {
             if (errno == EINTR)
                 continue;
-
-            if (errno == EPIPE)
-            {
-                siginfo_t info;
-                struct timespec ts = { 0, 0 };
-                while (sigtimedwait(&set, &info, &ts) > 0);
-            }
 
             block_ChainRelease(block);
             msg_Err(access, "cannot write: %s", vlc_strerror_c(errno));
@@ -154,14 +141,8 @@ static ssize_t WritePipe(sout_access_out_t *access, block_t *block)
         block->i_buffer -= val;
     }
 
-    if (!sigismember(&oldset, SIGPIPE))
-        pthread_sigmask(SIG_SETMASK, &oldset, NULL);
-
     return total;
 }
-#else
-# define WritePipe Write
-#endif
 
 #ifdef S_ISSOCK
 static ssize_t Send(sout_access_out_t *access, block_t *block)

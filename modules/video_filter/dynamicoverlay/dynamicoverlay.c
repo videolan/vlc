@@ -315,8 +315,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     /* Try emptying the output buffer */
     if( p_sys->i_outputfd != -1 )
     {
-        ssize_t i_len = write( p_sys->i_outputfd, p_sys->output.p_begin,
-                              p_sys->output.i_length );
+        ssize_t i_len = vlc_write( p_sys->i_outputfd, p_sys->output.p_begin,
+                                   p_sys->output.i_length );
         if( i_len == -1 )
         {
             /* We hit an error */

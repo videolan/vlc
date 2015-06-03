@@ -388,7 +388,7 @@ static int vlclua_fd_write( lua_State *L )
     const char *psz_buffer = luaL_checklstring( L, 2, &i_len );
 
     i_len = luaL_optint( L, 3, i_len );
-    lua_pushinteger( L, (fd != -1) ? write( fd, psz_buffer, i_len ) : -1 );
+    lua_pushinteger( L, (fd != -1) ? vlc_write( fd, psz_buffer, i_len ) : -1 );
     return 1;
 }
 
