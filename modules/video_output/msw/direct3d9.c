@@ -1650,12 +1650,18 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
                                    r->fmt.i_x_offset * r->p_picture->p->i_pixel_pitch;
             uint8_t  *src_data   = &r->p_picture->p->p_pixels[src_offset];
             int       src_pitch  = r->p_picture->p->i_pitch;
-            for (unsigned y = 0; y < r->fmt.i_visible_height; y++) {
-                int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_visible_pitch);
-                if (d3dr->format == D3DFMT_A8B8G8R8) {
-                    memcpy(&dst_data[y * dst_pitch], &src_data[y * src_pitch],
-                           copy_pitch);
+            if (d3dr->format == D3DFMT_A8B8G8R8) {
+                if (dst_pitch == r->p_picture->p->i_visible_pitch) {
+                    memcpy(dst_data, src_data, r->fmt.i_visible_height * dst_pitch);
                 } else {
+                    int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_visible_pitch);
+                    for (unsigned y = 0; y < r->fmt.i_visible_height; y++) {
+                        memcpy(&dst_data[y * dst_pitch], &src_data[y * src_pitch], copy_pitch);
+                    }
+                }
+            } else {
+                int copy_pitch = __MIN(dst_pitch, r->p_picture->p->i_visible_pitch);
+                for (unsigned y = 0; y < r->fmt.i_visible_height; y++) {
                     for (int x = 0; x < copy_pitch; x += 4) {
                         dst_data[y * dst_pitch + x + 0] = src_data[y * src_pitch + x + 2];
                         dst_data[y * dst_pitch + x + 1] = src_data[y * src_pitch + x + 1];
