@@ -272,7 +272,7 @@ static void CloseDecoder(decoder_t *dec)
 
     /* Free pictures which are decoded but have not yet been sent
      * out to the core */
-    while (buffer = mmal_queue_get(sys->decoded_pictures)) {
+    while ((buffer = mmal_queue_get(sys->decoded_pictures))) {
         picture_t *pic = (picture_t *)buffer->user_data;
         picture_Release(pic);
 
@@ -421,7 +421,7 @@ static int send_output_buffer(decoder_t *dec)
     picture_sys_t *p_sys;
     picture_t *picture;
     MMAL_STATUS_T status;
-    int buffer_size = 0;
+    unsigned buffer_size = 0;
     int ret = 0;
 
     if (!sys->output->is_enabled)
