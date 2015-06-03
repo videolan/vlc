@@ -491,33 +491,13 @@ static void fill_output_port(decoder_t *dec)
 static int flush_decoder(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
-    MMAL_STATUS_T status;
     int ret = 0;
 
     msg_Dbg(dec, "Flushing decoder ports...");
-    mmal_port_disable(sys->output);
-    mmal_port_disable(sys->input);
     mmal_port_flush(sys->output);
     mmal_port_flush(sys->input);
     msg_Dbg(dec, "Ports flushed, returning to normal operation");
-    status = mmal_port_enable(sys->input, input_port_cb);
-    if (status != MMAL_SUCCESS) {
-        msg_Err(dec, "Failed to enable input port %s (status=%"PRIx32" %s)",
-                sys->input->name, status, mmal_status_to_string(status));
-        ret = VLC_EGENERIC;
-        goto out;
-    }
-    msg_Dbg(dec, "Input enabled");
-    status = mmal_port_enable(sys->output, output_port_cb);
-    if (status != MMAL_SUCCESS) {
-        msg_Err(dec, "Failed to enable output port %s (status=%"PRIx32" %s)",
-                sys->output->name, status, mmal_status_to_string(status));
-        ret = VLC_EGENERIC;
-        goto out;
-    }
-    msg_Dbg(dec, "Output enabled");
 
-out:
     return ret;
 }
 
