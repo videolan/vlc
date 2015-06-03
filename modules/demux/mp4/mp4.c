@@ -117,7 +117,7 @@ struct demux_sys_t
  *****************************************************************************/
 static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *, bool b_force_enable );
 static int MP4_frg_TrackCreate( demux_t *, mp4_track_t *, MP4_Box_t *);
-static void MP4_TrackDestroy(  mp4_track_t * );
+static void MP4_TrackDestroy( demux_t *, mp4_track_t * );
 
 static block_t * MP4_Block_Read( demux_t *, const mp4_track_t *, int );
 static void MP4_Block_Send( demux_t *, mp4_track_t *, block_t * );
@@ -1714,7 +1714,7 @@ static void Close ( vlc_object_t * p_this )
     MP4_BoxFree( p_demux->s, p_sys->p_root );
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
-        MP4_TrackDestroy(  &p_sys->track[i_track] );
+        MP4_TrackDestroy( p_demux, &p_sys->track[i_track] );
     }
     FREENULL( p_sys->track );
 
@@ -2902,7 +2902,7 @@ static void FreeAndResetChunk( mp4_chunk_t *ck )
  ****************************************************************************
  * Destroy a track created by MP4_TrackCreate.
  ****************************************************************************/
-static void MP4_TrackDestroy( mp4_track_t *p_track )
+static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
 {
     unsigned int i_chunk;
 
@@ -2911,6 +2911,9 @@ static void MP4_TrackDestroy( mp4_track_t *p_track )
     p_track->b_selected = false;
 
     es_format_Clean( &p_track->fmt );
+
+    if( p_track->p_es )
+        es_out_Del( p_demux->out, p_track->p_es );
 
     for( i_chunk = 0; i_chunk < p_track->i_chunk_count; i_chunk++ )
     {
