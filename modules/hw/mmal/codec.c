@@ -168,7 +168,7 @@ static int OpenDecoder(decoder_t *dec)
         goto out;
     }
     sys->input->buffer_size = sys->input->buffer_size_recommended;
-    sys->input->buffer_num = __MAX(sys->input->buffer_num_recommended, 80);
+    sys->input->buffer_num = sys->input->buffer_num_recommended;
 
     status = mmal_port_enable(sys->input, input_port_cb);
     if (status != MMAL_SUCCESS) {
