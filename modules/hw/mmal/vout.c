@@ -587,10 +587,12 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
         maintain_phase_sync(vd);
     sys->next_phase_check = (sys->next_phase_check + 1) % PHASE_CHECK_INTERVAL;
 
-    vlc_mutex_lock(&sys->buffer_mutex);
-    while (atomic_load(&sys->buffers_in_transit) >= MAX_BUFFERS_IN_TRANSIT)
-        vlc_cond_wait(&sys->buffer_cond, &sys->buffer_mutex);
-    vlc_mutex_unlock(&sys->buffer_mutex);
+    if (sys->opaque) {
+        vlc_mutex_lock(&sys->buffer_mutex);
+        while (atomic_load(&sys->buffers_in_transit) >= MAX_BUFFERS_IN_TRANSIT)
+            vlc_cond_wait(&sys->buffer_cond, &sys->buffer_mutex);
+        vlc_mutex_unlock(&sys->buffer_mutex);
+    }
 }
 
 static int vd_control(vout_display_t *vd, int query, va_list args)
