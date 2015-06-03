@@ -456,44 +456,40 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
     buffer->length = sys->input->buffer_size;
     buffer->data = picture->p[0].p_pixels;
 
+    vlc_mutex_lock(&sys->buffer_cond_mutex);
     status = mmal_port_send_buffer(sys->input, buffer);
     if (status != MMAL_SUCCESS) {
         msg_Err(filter, "Failed to send buffer to input port (status=%"PRIx32" %s)",
                 status, mmal_status_to_string(status));
+    } else {
+        sys->input_in_transit++;
+        vlc_cond_signal(&sys->buffer_cond);
     }
-    sys->input_in_transit++;
+    vlc_mutex_unlock(&sys->buffer_cond_mutex);
 
 out:
-    vlc_mutex_unlock(&sys->mutex);
     return ret;
 }
 
 static void flush(filter_t *filter)
 {
     filter_sys_t *sys = filter->p_sys;
-    MMAL_STATUS_T status;
 
-    mmal_port_disable(sys->output);
-    mmal_port_disable(sys->input);
+    if (!sys->input_in_transit && !sys->output_in_transit)
+        return;
+
+    msg_Dbg(filter, "flush: Disable port (%d, %d in transit)",
+            sys->input_in_transit, sys->output_in_transit);
     mmal_port_flush(sys->output);
     mmal_port_flush(sys->input);
-    status = mmal_port_enable(sys->input, input_port_cb);
-    if (status != MMAL_SUCCESS) {
-        msg_Err(filter, "Failed to enable input port %s (status=%"PRIx32" %s)",
-                sys->input->name, status, mmal_status_to_string(status));
-        return;
-    }
-    status = mmal_port_enable(sys->output, output_port_cb);
-    if (status != MMAL_SUCCESS) {
-        msg_Err(filter, "Failed to enable output port %s (status=%"PRIx32" %s)",
-                sys->output->name, status, mmal_status_to_string(status));
-    }
 
     msg_Dbg(filter, "flush: wait for all buffers to be returned");
     vlc_mutex_lock(&sys->mutex);
     while (sys->input_in_transit || sys->output_in_transit)
         vlc_cond_wait(&sys->buffer_cond, &sys->mutex);
     vlc_mutex_unlock(&sys->mutex);
+
+    msg_Dbg(filter, "flush: done");
 }
 
 static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
