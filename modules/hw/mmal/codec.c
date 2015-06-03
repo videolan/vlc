@@ -389,11 +389,13 @@ static int send_output_buffer(decoder_t *dec)
     int buffer_size = 0;
     int ret = 0;
 
+    if (!sys->output->is_enabled)
+        return VLC_EGENERIC;
+
     buffer = mmal_queue_get(sys->output_pool->queue);
     if (!buffer) {
         msg_Warn(dec, "Failed to get new buffer");
-        ret = -1;
-        goto out;
+        return VLC_EGENERIC;
     }
 
     picture = decoder_NewPicture(dec);
@@ -438,7 +440,6 @@ static int send_output_buffer(decoder_t *dec)
     }
     sys->output_in_transit++;
 
-out:
     return ret;
 
 err:
