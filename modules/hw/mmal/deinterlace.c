@@ -57,9 +57,7 @@ vlc_module_end()
 struct filter_sys_t {
     MMAL_COMPONENT_T *component;
     MMAL_PORT_T *input;
-    MMAL_POOL_T *input_pool;
     MMAL_PORT_T *output;
-    MMAL_POOL_T *output_pool;
 
     MMAL_QUEUE_T *filtered_pictures;
     vlc_mutex_t mutex;
@@ -201,13 +199,6 @@ static int Open(filter_t *filter)
         goto out;
     }
 
-    sys->output_pool = mmal_pool_create(sys->output->buffer_num, 0);
-    if (!sys->output_pool) {
-        msg_Err(filter, "Failed to create MMAL pool for %u buffers of size %"PRIu32,
-                        sys->output->buffer_num, sys->output->buffer_size);
-        goto out;
-    }
-    sys->input_pool = mmal_pool_create(sys->input->buffer_num, 0);
     sys->filtered_pictures = mmal_queue_create();
 
     filter->pf_video_filter = deinterlace;
@@ -246,21 +237,10 @@ static void Close(filter_t *filter)
     while ((buffer = mmal_queue_get(sys->filtered_pictures))) {
         picture_t *pic = (picture_t *)buffer->user_data;
         picture_Release(pic);
-
-        buffer->user_data = NULL;
-        buffer->alloc_size = 0;
-        buffer->data = NULL;
-        mmal_buffer_header_release(buffer);
     }
 
     if (sys->filtered_pictures)
         mmal_queue_destroy(sys->filtered_pictures);
-
-    if (sys->input_pool)
-        mmal_pool_destroy(sys->input_pool);
-
-    if (sys->output_pool)
-        mmal_pool_destroy(sys->output_pool);
 
     if (sys->component)
         mmal_component_release(sys->component);
@@ -286,27 +266,17 @@ static int send_output_buffer(filter_t *filter)
         goto out;
     }
 
-    buffer = mmal_queue_timedwait(sys->output_pool->queue, 2);
-    if (!buffer) {
-        msg_Warn(filter, "Failed to get buffer for output");
-        ret = VLC_EGENERIC;
-        goto out;
-    }
-
     picture = filter_NewPicture(filter);
     if (!picture) {
         msg_Warn(filter, "Failed to get new picture");
-        mmal_buffer_header_release(buffer);
         ret = -1;
         goto out;
     }
     picture->format.i_frame_rate = filter->fmt_out.video.i_frame_rate;
     picture->format.i_frame_rate_base = filter->fmt_out.video.i_frame_rate_base;
 
+    buffer = picture->p_sys->buffer;
     buffer->cmd = 0;
-    buffer->alloc_size = sys->output->buffer_size;
-    buffer->user_data = picture;
-    buffer->data = picture->p_sys->buffer->data;
 
     mmal_picture_lock(picture);
 
@@ -333,7 +303,7 @@ static void fill_output_port(filter_t *filter)
     filter_sys_t *sys = filter->p_sys;
     /* allow at least 2 buffers in transit */
     unsigned max_buffers_in_transit = __MAX(sys->output->buffer_num, MIN_NUM_BUFFERS_IN_TRANSIT);
-    unsigned buffers_available = mmal_queue_length(sys->output_pool->queue);
+    unsigned buffers_available = max_buffers_in_transit - atomic_load(&sys->output_in_transit);
     unsigned buffers_to_send = max_buffers_in_transit - sys->output_in_transit;
     unsigned i;
 
@@ -360,22 +330,12 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
     MMAL_STATUS_T status;
     unsigned i = 0;
 
-    buffer = mmal_queue_timedwait(sys->input_pool->queue, 2);
-    if (!buffer) {
-        picture_Release(picture);
-        msg_Err(filter, "Failed to retrieve buffer header for input picture");
-        goto out;
-    }
-
     fill_output_port(filter);
 
-    mmal_buffer_header_reset(buffer);
+    buffer = picture->p_sys->buffer;
     buffer->user_data = picture;
     buffer->pts = picture->date;
     buffer->cmd = 0;
-    buffer->alloc_size = sys->input->buffer_size;
-    buffer->length = sys->input->buffer_size;
-    buffer->data = picture->p[0].p_pixels;
 
     vlc_mutex_lock(&sys->buffer_cond_mutex);
     status = mmal_port_send_buffer(sys->input, buffer);
@@ -402,11 +362,6 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
                 out_picture = out_picture->p_next;
             }
             out_picture->date = buffer->pts;
-
-            buffer->user_data = NULL;
-            buffer->alloc_size = 0;
-            buffer->data = NULL;
-            mmal_buffer_header_release(buffer);
         } else {
             msg_Dbg(filter, "Failed waiting for filtered picture");
             break;
@@ -446,11 +401,6 @@ static void flush(filter_t *filter)
         picture_t *pic = (picture_t *)buffer->user_data;
         msg_Dbg(filter, "flush: release already filtered pic %p", pic);
         picture_Release(pic);
-
-        buffer->user_data = NULL;
-        buffer->alloc_size = 0;
-        buffer->data = NULL;
-        mmal_buffer_header_release(buffer);
     }
     msg_Dbg(filter, "flush: done");
 }
@@ -476,10 +426,6 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     filter_sys_t *sys = filter->p_sys;
 
     vlc_mutex_lock(&sys->buffer_cond_mutex);
-    buffer->user_data = NULL;
-    buffer->alloc_size = 0;
-    buffer->data = NULL;
-    mmal_buffer_header_release(buffer);
     if (picture)
         picture_Release(picture);
 
@@ -503,11 +449,6 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
         } else {
             picture = (picture_t *)buffer->user_data;
             picture_Release(picture);
-            buffer->user_data = NULL;
-            buffer->alloc_size = 0;
-            buffer->data = NULL;
-            mmal_buffer_header_reset(buffer);
-            mmal_buffer_header_release(buffer);
         }
 
         atomic_fetch_sub(&sys->output_in_transit, 1);
