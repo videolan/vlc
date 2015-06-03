@@ -356,6 +356,11 @@ static int send_output_buffer(filter_t *filter)
     picture_t *picture;
     int ret = 0;
 
+    if (!sys->output->is_enabled) {
+        ret = VLC_EGENERIC;
+        goto out;
+    }
+
     picture = picture_pool_Get(sys->picture_pool);
     if (!picture) {
         msg_Warn(filter, "Failed to get new picture");
