@@ -46,9 +46,9 @@
 
 #define MIN_NUM_BUFFERS_IN_TRANSIT 2
 
-#define MMAL_ZEROCOPY_NAME "mmal-zerocopy"
-#define MMAL_ZEROCOPY_TEXT N_("Decode frames directly into RPI VideoCore instead of host memory.")
-#define MMAL_ZEROCOPY_LONGTEXT N_("Decode frames directly into RPI VideoCore instead of host memory. This option must only be used with the MMAL video output plugin.")
+#define MMAL_OPAQUE_NAME "mmal-opaque"
+#define MMAL_OPAQUE_TEXT N_("Decode frames directly into RPI VideoCore instead of host memory.")
+#define MMAL_OPAQUE_LONGTEXT N_("Decode frames directly into RPI VideoCore instead of host memory. This option must only be used with the MMAL video output plugin.")
 
 static int OpenDecoder(decoder_t *dec);
 static void CloseDecoder(decoder_t *dec);
@@ -58,7 +58,7 @@ vlc_module_begin()
     set_description(N_("MMAL-based decoder plugin for Raspberry Pi"))
     set_capability("decoder", 90)
     add_shortcut("mmal_decoder")
-    add_bool(MMAL_ZEROCOPY_NAME, true, MMAL_ZEROCOPY_TEXT, MMAL_ZEROCOPY_LONGTEXT, false)
+    add_bool(MMAL_OPAQUE_NAME, true, MMAL_OPAQUE_TEXT, MMAL_OPAQUE_LONGTEXT, false)
     set_callbacks(OpenDecoder, CloseDecoder)
 vlc_module_end()
 
@@ -115,7 +115,7 @@ static int OpenDecoder(decoder_t *dec)
     dec->p_sys = sys;
     dec->b_need_packetized = true;
 
-    sys->opaque = var_InheritBool(dec, MMAL_ZEROCOPY_NAME);
+    sys->opaque = var_InheritBool(dec, MMAL_OPAQUE_NAME);
     bcm_host_init();
 
     status = mmal_component_create(MMAL_COMPONENT_DEFAULT_VIDEO_DECODER, &sys->component);
