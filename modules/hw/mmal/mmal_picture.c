@@ -30,43 +30,14 @@
 int mmal_picture_lock(picture_t *picture)
 {
     picture_sys_t *pic_sys = picture->p_sys;
-    int ret = VLC_SUCCESS;
+    MMAL_BUFFER_HEADER_T *buffer = pic_sys->buffer;
 
-    vlc_mutex_lock(pic_sys->mutex);
-
-    MMAL_BUFFER_HEADER_T *buffer = mmal_queue_timedwait(pic_sys->queue, 2);
-    if (!buffer) {
-        ret = VLC_EGENERIC;
-        goto out;
-    }
-
-    mmal_buffer_header_reset(buffer);
     buffer->user_data = picture;
     picture->p[0].p_pixels = buffer->data;
     picture->p[1].p_pixels += (ptrdiff_t)buffer->data;
     picture->p[2].p_pixels += (ptrdiff_t)buffer->data;
 
-    pic_sys->buffer = buffer;
-
     pic_sys->displayed = false;
 
-out:
-    vlc_mutex_unlock(pic_sys->mutex);
-    return ret;
-}
-
-void mmal_picture_unlock(picture_t *picture)
-{
-    picture_sys_t *pic_sys = picture->p_sys;
-    MMAL_BUFFER_HEADER_T *buffer = pic_sys->buffer;
-
-    vlc_mutex_lock(pic_sys->mutex);
-
-    pic_sys->buffer = NULL;
-    if (buffer) {
-        buffer->user_data = NULL;
-        mmal_buffer_header_release(buffer);
-    }
-
-    vlc_mutex_unlock(pic_sys->mutex);
+    return VLC_SUCCESS;
 }

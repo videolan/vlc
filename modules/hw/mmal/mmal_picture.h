@@ -34,13 +34,9 @@ struct picture_sys_t {
     vlc_object_t *owner;
 
     MMAL_BUFFER_HEADER_T *buffer;
-    MMAL_QUEUE_T *queue;
-    vlc_mutex_t *mutex;
     bool displayed;
 };
 
-vlc_mutex_t* get_mmal_opaque_mutex(void);
 int mmal_picture_lock(picture_t *picture);
-void mmal_picture_unlock(picture_t *picture);
 
 #endif

@@ -351,8 +351,10 @@ static void Close(vlc_object_t *object)
         picture_pool_Release(sys->picture_pool);
     else
         for (i = 0; i < sys->num_buffers; ++i)
-            if (sys->pictures[i])
+            if (sys->pictures[i]) {
+                mmal_buffer_header_release(sys->pictures[i]->p_sys->buffer);
                 picture_Release(sys->pictures[i]);
+            }
 
     vlc_mutex_destroy(&sys->buffer_mutex);
     vlc_cond_destroy(&sys->buffer_cond);
@@ -497,8 +499,7 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     for (i = 0; i < sys->num_buffers; ++i) {
         picture_res.p_sys = calloc(1, sizeof(picture_sys_t));
         picture_res.p_sys->owner = (vlc_object_t *)vd;
-        picture_res.p_sys->queue = sys->pool->queue;
-        picture_res.p_sys->mutex = &sys->buffer_mutex;
+        picture_res.p_sys->buffer = mmal_queue_get(sys->pool->queue);
 
         sys->pictures[i] = picture_NewFromResource(&fmt, &picture_res);
         if (!sys->pictures[i]) {
@@ -515,7 +516,6 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     picture_pool_cfg.picture_count = sys->num_buffers;
     picture_pool_cfg.picture = sys->pictures;
     picture_pool_cfg.lock = mmal_picture_lock;
-    picture_pool_cfg.unlock = mmal_picture_unlock;
 
     sys->picture_pool = picture_pool_NewExtended(&picture_pool_cfg);
     if (!sys->picture_pool) {
