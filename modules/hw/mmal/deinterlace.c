@@ -331,10 +331,12 @@ static void fill_output_port(filter_t *filter)
 {
     filter_sys_t *sys = filter->p_sys;
     /* allow at least 2 buffers in transit */
-    unsigned max_buffers_in_transit = __MAX(sys->output->buffer_num, MIN_NUM_BUFFERS_IN_TRANSIT);
-    unsigned buffers_available = max_buffers_in_transit - atomic_load(&sys->output_in_transit);
-    unsigned buffers_to_send = max_buffers_in_transit - sys->output_in_transit;
-    unsigned i;
+    unsigned max_buffers_in_transit = __MAX(2, MIN_NUM_BUFFERS_IN_TRANSIT);
+    int buffers_available = sys->output->buffer_num -
+        atomic_load(&sys->output_in_transit) -
+        mmal_queue_length(sys->filtered_pictures);
+    int buffers_to_send = max_buffers_in_transit - sys->output_in_transit;
+    int i;
 
     if (buffers_to_send > buffers_available)
         buffers_to_send = buffers_available;
