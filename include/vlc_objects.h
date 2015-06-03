@@ -56,8 +56,6 @@ VLC_API void vlc_list_release( vlc_list_t * );
 VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 #define vlc_object_get_name(o) vlc_object_get_name(VLC_OBJECT(o))
 
-/**}@*/
-
 #define vlc_object_create(a,b) vlc_object_create( VLC_OBJECT(a), b )
 
 #define vlc_object_find_name(a,b) \
