@@ -432,8 +432,12 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     filter_sys_t *sys = filter->p_sys;
 
     vlc_mutex_lock(&sys->buffer_cond_mutex);
-    if (picture)
+    if (picture) {
         picture_Release(picture);
+    } else {
+        msg_Warn(filter, "Got buffer without picture on input port - OOOPS");
+        mmal_buffer_header_release(buffer);
+    }
 
     atomic_fetch_sub(&sys->input_in_transit, 1);
     vlc_cond_signal(&sys->buffer_cond);
