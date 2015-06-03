@@ -240,7 +240,7 @@ static block_t *BlockUDP( access_t *p_access )
         return NULL;
 
     vlc_fifo_Lock(sys->fifo);
-    while (vlc_fifo_IsEmpty(sys->fifo) && sys->running)
+    if (vlc_fifo_IsEmpty(sys->fifo) && sys->running)
        vlc_fifo_Wait(sys->fifo);
 
     block = vlc_fifo_DequeueUnlocked(sys->fifo);
