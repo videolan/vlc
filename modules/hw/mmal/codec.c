@@ -460,6 +460,7 @@ static int send_output_buffer(decoder_t *dec)
 err:
     if (picture)
         picture_Release(picture);
+    buffer->data = NULL;
     mmal_buffer_header_release(buffer);
     return ret;
 }
@@ -549,6 +550,7 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
             ret->b_progressive = sys->b_progressive;
             ret->b_top_field_first = sys->b_top_field_first;
 
+            buffer->data = NULL;
             mmal_buffer_header_reset(buffer);
             mmal_buffer_header_release(buffer);
         }
