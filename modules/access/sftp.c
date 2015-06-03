@@ -296,6 +296,7 @@ static int Open( vlc_object_t* p_this )
         p_sys->file = libssh2_sftp_opendir( p_sys->sftp_session, psz_path );
 
         p_access->pf_readdir = DirRead;
+        p_access->pf_control = access_vaDirectoryControlHelper;
         p_access->info.b_dir_can_loop = true;
 
         if( p_sys->file )

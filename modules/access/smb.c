@@ -253,6 +253,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 #else
         p_access->pf_readdir = DirRead;
+        p_access->pf_control = access_vaDirectoryControlHelper;
         p_access->info.b_dir_can_loop = true;
         i_smb = smbc_opendir( psz_uri );
         i_size = 0;

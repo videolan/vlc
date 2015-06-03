@@ -1,4 +1,5 @@
 access_GetParentInput
+access_vaDirectoryControlHelper
 AddMD5
 aout_BitsPerSample
 aout_ChannelExtract

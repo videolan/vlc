@@ -128,3 +128,26 @@ input_thread_t * access_GetParentInput( access_t *p_access )
     return p_access->p_input ? vlc_object_hold((vlc_object_t *)p_access->p_input) : NULL;
 }
 
+/*****************************************************************************
+ * access_vaDirectoryControlHelper:
+ *****************************************************************************/
+int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list args )
+{
+    VLC_UNUSED( p_access );
+
+    switch( i_query )
+    {
+        case ACCESS_CAN_SEEK:
+        case ACCESS_CAN_FASTSEEK:
+        case ACCESS_CAN_PAUSE:
+        case ACCESS_CAN_CONTROL_PACE:
+            *va_arg( args, bool* ) = false;
+            break;
+        case ACCESS_GET_PTS_DELAY:
+            *va_arg( args, int64_t * ) = 0;
+            break;
+        default:
+            return VLC_EGENERIC;
+     }
+     return VLC_SUCCESS;
+}

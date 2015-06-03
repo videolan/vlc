@@ -93,6 +93,7 @@ int DirOpen (vlc_object_t *p_this)
     p_access->p_sys->p_dir = p_dir;
     p_access->p_sys->psz_base_uri = psz_base_uri;
     p_access->pf_readdir = DirRead;
+    p_access->pf_control = access_vaDirectoryControlHelper;
 
     return VLC_SUCCESS;
 }

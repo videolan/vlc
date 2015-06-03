@@ -668,6 +668,7 @@ static int InOpen( vlc_object_t *p_this )
     if( b_directory )
     {
         p_access->pf_readdir = DirRead;
+        p_access->pf_control = access_vaDirectoryControlHelper;
         p_access->info.b_dir_can_loop = true;
     } else
         ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek ); \

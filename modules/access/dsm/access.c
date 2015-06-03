@@ -705,6 +705,7 @@ static int BrowserInit( access_t *p_access )
         p_access->pf_readdir = BrowseDirectory;
         p_access->info.b_dir_can_loop = true;
     }
+    p_access->pf_control = access_vaDirectoryControlHelper;
 
     return VLC_SUCCESS;
 }
