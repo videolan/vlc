@@ -66,6 +66,7 @@ struct filter_sys_t {
 
     MMAL_QUEUE_T *filtered_pictures;
     vlc_mutex_t mutex;
+    vlc_mutex_t buffer_cond_mutex;
     vlc_cond_t buffer_cond;
 
     /* statistics */
@@ -283,6 +284,7 @@ static int Open(filter_t *filter)
     filter->pf_video_filter = deinterlace;
     filter->pf_video_flush = flush;
     vlc_mutex_init_recursive(&sys->mutex);
+    vlc_mutex_init(&sys->buffer_cond_mutex);
     vlc_cond_init(&sys->buffer_cond);
 
 out:
@@ -338,6 +340,7 @@ static void Close(filter_t *filter)
         picture_pool_Release(sys->picture_pool);
 
     vlc_mutex_destroy(&sys->mutex);
+    vlc_mutex_destroy(&sys->buffer_cond_mutex);
     vlc_cond_destroy(&sys->buffer_cond);
     free(sys->pictures);
     free(sys);
@@ -366,15 +369,18 @@ static int send_output_buffer(filter_t *filter)
     buffer->cmd = 0;
     buffer->alloc_size = sys->output->buffer_size;
 
+    vlc_mutex_lock(&sys->buffer_cond_mutex);
     status = mmal_port_send_buffer(sys->output, buffer);
     if (status != MMAL_SUCCESS) {
         msg_Err(filter, "Failed to send buffer to output port (status=%"PRIx32" %s)",
                 status, mmal_status_to_string(status));
         picture_Release(picture);
         ret = -1;
-        goto out;
+    } else {
+        sys->output_in_transit++;
+        vlc_cond_signal(&sys->buffer_cond);
     }
-    sys->output_in_transit++;
+    vlc_mutex_unlock(&sys->buffer_cond_mutex);
 
 out:
     return ret;
@@ -417,7 +423,6 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
      */
     if (sys->output_pool) {
         int i = 0;
-        vlc_mutex_lock(&sys->mutex);
         while((buffer = mmal_queue_get(sys->filtered_pictures))) {
             i++;
             if (!out_picture) {
@@ -431,8 +436,6 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
         }
         if (out_picture)
             out_picture->p_next = NULL;
-        fill_output_port(filter);
-        vlc_mutex_unlock(&sys->mutex);
     }
 
     /*
@@ -441,12 +444,13 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
     if (!picture)
         return ret;
 
-    vlc_mutex_lock(&sys->mutex);
     buffer = mmal_queue_timedwait(sys->input_pool->queue, 2);
     if (!buffer) {
         msg_Err(filter, "Failed to retrieve buffer header for input picture");
         goto out;
     }
+
+    fill_output_port(filter);
 
     mmal_buffer_header_reset(buffer);
     buffer->user_data = picture;
@@ -484,10 +488,10 @@ static void flush(filter_t *filter)
     mmal_port_flush(sys->input);
 
     msg_Dbg(filter, "flush: wait for all buffers to be returned");
-    vlc_mutex_lock(&sys->mutex);
+    vlc_mutex_lock(&sys->buffer_cond_mutex);
     while (sys->input_in_transit || sys->output_in_transit)
-        vlc_cond_wait(&sys->buffer_cond, &sys->mutex);
-    vlc_mutex_unlock(&sys->mutex);
+        vlc_cond_wait(&sys->buffer_cond, &sys->buffer_cond_mutex);
+    vlc_mutex_unlock(&sys->buffer_cond_mutex);
 
     msg_Dbg(filter, "flush: done");
 }
@@ -513,13 +517,14 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     filter_sys_t *sys = filter->p_sys;
 
     buffer->user_data = NULL;
-    vlc_mutex_lock(&sys->mutex);
+    vlc_mutex_lock(&sys->buffer_cond_mutex);
     mmal_buffer_header_release(buffer);
     if (picture)
         picture_Release(picture);
+
     sys->input_in_transit--;
     vlc_cond_signal(&sys->buffer_cond);
-    vlc_mutex_unlock(&sys->mutex);
+    vlc_mutex_unlock(&sys->buffer_cond_mutex);
 }
 
 static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
@@ -528,23 +533,23 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     filter_sys_t *sys = filter->p_sys;
     picture_t *picture;
 
-    vlc_mutex_lock(&sys->mutex);
     if (buffer->cmd == 0) {
+        vlc_mutex_lock(&sys->buffer_cond_mutex);
         if (buffer->length > 0) {
             mmal_queue_put(sys->filtered_pictures, buffer);
-            fill_output_port(filter);
         } else {
             picture = (picture_t *)buffer->user_data;
             picture_Release(picture);
             buffer->user_data = NULL;
         }
+
         sys->output_in_transit--;
         vlc_cond_signal(&sys->buffer_cond);
+        vlc_mutex_unlock(&sys->buffer_cond_mutex);
     } else if (buffer->cmd == MMAL_EVENT_FORMAT_CHANGED) {
         msg_Warn(filter, "MMAL_EVENT_FORMAT_CHANGED seen but not handled");
         mmal_buffer_header_release(buffer);
     } else {
         mmal_buffer_header_release(buffer);
     }
-    vlc_mutex_unlock(&sys->mutex);
 }
