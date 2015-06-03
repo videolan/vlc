@@ -1451,7 +1451,6 @@ static int mms_ReceiveCommand( access_t *p_access )
 }
 
 #define MMS_RETRY_MAX       10
-#define MMS_RETRY_SLEEP     50000
 
 static int mms_CommandRead( access_t *p_access, int i_command1,
                             int i_command2 )
@@ -1466,7 +1465,6 @@ static int mms_CommandRead( access_t *p_access, int i_command1,
         if( i_status < 0 || p_sys->i_command == 0 )
         {
             i_count++;
-            msleep( MMS_RETRY_SLEEP );
         }
         else if( i_command1 == 0 && i_command2 == 0)
         {
@@ -1519,7 +1517,6 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
             i_count++;
             msg_Warn( p_access, "cannot receive header (%d/%d)",
                       i_count, MMS_RETRY_MAX );
-            msleep( MMS_RETRY_SLEEP );
         }
         else if( i_status == i_type || i_type == MMS_PACKET_ANY )
         {
