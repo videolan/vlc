@@ -337,16 +337,22 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
     buffer->pts = picture->date;
     buffer->cmd = 0;
 
-    vlc_mutex_lock(&sys->buffer_cond_mutex);
-    status = mmal_port_send_buffer(sys->input, buffer);
-    if (status != MMAL_SUCCESS) {
-        msg_Err(filter, "Failed to send buffer to input port (status=%"PRIx32" %s)",
-                status, mmal_status_to_string(status));
+    if (!picture->p_sys->displayed) {
+        vlc_mutex_lock(&sys->buffer_cond_mutex);
+        status = mmal_port_send_buffer(sys->input, buffer);
+        if (status != MMAL_SUCCESS) {
+            msg_Err(filter, "Failed to send buffer to input port (status=%"PRIx32" %s)",
+                    status, mmal_status_to_string(status));
+            picture_Release(picture);
+        } else {
+            picture->p_sys->displayed = true;
+            atomic_fetch_add(&sys->input_in_transit, 1);
+            vlc_cond_signal(&sys->buffer_cond);
+        }
+        vlc_mutex_unlock(&sys->buffer_cond_mutex);
     } else {
-        atomic_fetch_add(&sys->input_in_transit, 1);
-        vlc_cond_signal(&sys->buffer_cond);
+        picture_Release(picture);
     }
-    vlc_mutex_unlock(&sys->buffer_cond_mutex);
 
     /*
      * Send output buffers
