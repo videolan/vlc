@@ -21,6 +21,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _MMAL_PICTURE_H
+#define _MMAL_PICTURE_H
+
 #include <vlc_common.h>
 #include <interface/mmal/mmal.h>
 
@@ -39,3 +42,5 @@ struct picture_sys_t {
 vlc_mutex_t* get_mmal_opaque_mutex(void);
 int mmal_picture_lock(picture_t *picture);
 void mmal_picture_unlock(picture_t *picture);
+
+#endif
