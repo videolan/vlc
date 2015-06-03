@@ -342,7 +342,7 @@ static void Close(vlc_object_t *object)
         mmal_component_disable(sys->component);
 
     if (sys->pool)
-        mmal_pool_destroy(sys->pool);
+        mmal_port_pool_destroy(sys->input, sys->pool);
 
     if (sys->component)
         mmal_component_release(sys->component);
@@ -487,7 +487,8 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     }
 
     sys->num_buffers = count;
-    sys->pool = mmal_pool_create(sys->num_buffers, sys->input->buffer_size);
+    sys->pool = mmal_port_pool_create(sys->input, sys->num_buffers,
+            sys->input->buffer_size);
     if (!sys->pool) {
         msg_Err(vd, "Failed to create MMAL pool for %u buffers of size %"PRIu32,
                         count, sys->input->buffer_size);
