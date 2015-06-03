@@ -190,6 +190,19 @@ static int OpenDecoder(decoder_t *dec)
             ret = VLC_EGENERIC;
             goto out;
         }
+
+        msg_Dbg(dec, "Activate zero-copy for output port");
+        MMAL_PARAMETER_BOOLEAN_T zero_copy = {
+            { MMAL_PARAMETER_ZERO_COPY, sizeof(MMAL_PARAMETER_BOOLEAN_T) },
+            1
+        };
+
+        status = mmal_port_parameter_set(sys->output, &zero_copy.hdr);
+        if (status != MMAL_SUCCESS) {
+           msg_Err(dec, "Failed to set zero copy on port %s (status=%"PRIx32" %s)",
+                    sys->output->name, status, mmal_status_to_string(status));
+           goto out;
+        }
     }
 
     status = mmal_port_enable(sys->output, output_port_cb);

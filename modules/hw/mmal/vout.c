@@ -462,6 +462,18 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     if (sys->opaque) {
         if (count <= NUM_ACTUAL_OPAQUE_BUFFERS)
             count = NUM_ACTUAL_OPAQUE_BUFFERS;
+
+        MMAL_PARAMETER_BOOLEAN_T zero_copy = {
+            { MMAL_PARAMETER_ZERO_COPY, sizeof(MMAL_PARAMETER_BOOLEAN_T) },
+            1
+        };
+
+        status = mmal_port_parameter_set(sys->input, &zero_copy.hdr);
+        if (status != MMAL_SUCCESS) {
+           msg_Err(vd, "Failed to set zero copy on port %s (status=%"PRIx32" %s)",
+                    sys->input->name, status, mmal_status_to_string(status));
+           goto out;
+        }
     }
 
     if (count < sys->input->buffer_num_recommended)
