@@ -290,6 +290,20 @@ static int change_output_format(decoder_t *dec)
     int pool_size;
     int ret = 0;
 
+    if (sys->output_pool) {
+        mmal_format_full_copy(sys->output->format, sys->output_format);
+        status = mmal_port_format_commit(sys->output);
+        if (status != MMAL_SUCCESS) {
+            msg_Err(dec, "Failed to commit output format (status=%"PRIx32" %s)",
+                    status, mmal_status_to_string(status));
+            ret = -1;
+            goto port_reset;
+        }
+        goto apply_fmt;
+    }
+
+port_reset:
+    msg_Dbg(dec, "%s: Do full port reset", __func__);
     status = mmal_port_disable(sys->output);
     if (status != MMAL_SUCCESS) {
         msg_Err(dec, "Failed to disable output port (status=%"PRIx32" %s)",
@@ -344,6 +358,7 @@ static int change_output_format(decoder_t *dec)
         msg_Dbg(dec, "Request %d extra pictures", dec->i_extra_picture_buffers);
     }
 
+apply_fmt:
     dec->fmt_out.video.i_width = sys->output->format->es->video.width;
     dec->fmt_out.video.i_height = sys->output->format->es->video.height;
     dec->fmt_out.video.i_x_offset = sys->output->format->es->video.crop.x;
