@@ -527,7 +527,6 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
      * Send output buffers
      */
     if (sys->output_pool) {
-        vlc_mutex_lock(&sys->mutex);
         buffer = mmal_queue_get(sys->decoded_pictures);
         if (buffer) {
             ret = (picture_t *)buffer->user_data;
@@ -540,7 +539,6 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
         }
 
         fill_output_port(dec);
-        vlc_mutex_unlock(&sys->mutex);
     }
 
     if (ret)
@@ -647,11 +645,9 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     MMAL_EVENT_FORMAT_CHANGED_T *fmt;
     MMAL_ES_FORMAT_T *format;
 
-    vlc_mutex_lock(&sys->mutex);
     if (buffer->cmd == 0) {
         if (buffer->length > 0) {
             mmal_queue_put(sys->decoded_pictures, buffer);
-            fill_output_port(dec);
         } else {
             picture = (picture_t *)buffer->user_data;
             picture_Release(picture);
@@ -676,5 +672,4 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     } else {
         mmal_buffer_header_release(buffer);
     }
-    vlc_mutex_unlock(&sys->mutex);
 }
