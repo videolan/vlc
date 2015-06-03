@@ -68,7 +68,7 @@ struct decoder_sys_t {
     MMAL_PORT_T *input;
     MMAL_POOL_T *input_pool;
     MMAL_PORT_T *output;
-    MMAL_POOL_T *output_pool;
+    MMAL_POOL_T *output_pool; /* only used for non-opaque mode */
     MMAL_ES_FORMAT_T *output_format;
     MMAL_QUEUE_T *decoded_pictures;
     vlc_mutex_t mutex;
@@ -78,6 +78,7 @@ struct decoder_sys_t {
 
     /* statistics */
     int output_in_transit;
+    atomic_bool started;
 };
 
 /* Utilities */
@@ -262,10 +263,12 @@ static void CloseDecoder(decoder_t *dec)
         picture_t *pic = (picture_t *)buffer->user_data;
         picture_Release(pic);
 
-        buffer->user_data = NULL;
-        buffer->alloc_size = 0;
-        buffer->data = NULL;
-        mmal_buffer_header_release(buffer);
+        if (sys->output_pool) {
+            buffer->user_data = NULL;
+            buffer->alloc_size = 0;
+            buffer->data = NULL;
+            mmal_buffer_header_release(buffer);
+        }
     }
 
     if (sys->decoded_pictures)
@@ -290,7 +293,7 @@ static int change_output_format(decoder_t *dec)
     int pool_size;
     int ret = 0;
 
-    if (sys->output_pool) {
+    if (atomic_load(&sys->started)) {
         mmal_format_full_copy(sys->output->format, sys->output_format);
         status = mmal_port_format_commit(sys->output);
         if (status != MMAL_SUCCESS) {
@@ -340,9 +343,13 @@ port_reset:
         goto out;
     }
 
-    if (!sys->output_pool) {
-        sys->output_pool = mmal_pool_create(pool_size, 0);
-        msg_Dbg(dec, "Created output pool with %d pictures", sys->output_pool->headers_num);
+    if (!atomic_load(&sys->started)) {
+        if (!sys->opaque) {
+            sys->output_pool = mmal_port_pool_create(sys->output, pool_size, 0);
+            msg_Dbg(dec, "Created output pool with %d pictures", sys->output_pool->headers_num);
+        }
+
+        atomic_store(&sys->started, true);
 
         /* we need one picture from vout for each buffer header on the output
          * port */
@@ -407,10 +414,14 @@ static int send_output_buffer(decoder_t *dec)
     if (!sys->output->is_enabled)
         return VLC_EGENERIC;
 
-    buffer = mmal_queue_get(sys->output_pool->queue);
-    if (!buffer) {
-        msg_Warn(dec, "Failed to get new buffer");
-        return VLC_EGENERIC;
+    /* If local output pool is allocated, use it - this is only the case for
+     * non-opaque modes */
+    if (sys->output_pool) {
+        buffer = mmal_queue_get(sys->output_pool->queue);
+        if (!buffer) {
+            msg_Warn(dec, "Failed to get new buffer");
+            return VLC_EGENERIC;
+        }
     }
 
     picture = decoder_NewPicture(dec);
@@ -424,27 +435,29 @@ static int send_output_buffer(decoder_t *dec)
     for (int i = 0; i < picture->i_planes; i++)
         buffer_size += picture->p[i].i_lines * picture->p[i].i_pitch;
 
-    mmal_buffer_header_reset(buffer);
-    buffer->user_data = picture;
-    buffer->cmd = 0;
-    buffer->alloc_size = sys->output->buffer_size;
-
-    if (sys->opaque) {
-        if (p_sys->buffer == NULL) {
-            msg_Err(dec, "Retrieved picture without opaque handle");
-            ret = VLC_EGENERIC;
-            goto err;
-        }
-        buffer->data = p_sys->buffer->data;
-    } else {
+    if (sys->output_pool) {
+        mmal_buffer_header_reset(buffer);
+        buffer->user_data = picture;
+        buffer->alloc_size = sys->output->buffer_size;
         if (buffer_size < sys->output->buffer_size) {
             msg_Err(dec, "Retrieved picture with too small data block (%d < %d)",
                     buffer_size, sys->output->buffer_size);
             ret = VLC_EGENERIC;
             goto err;
         }
-        buffer->data = picture->p[0].p_pixels;
+
+        if (!sys->opaque)
+            buffer->data = picture->p[0].p_pixels;
+    } else {
+        buffer = p_sys->buffer;
+        if (!buffer) {
+            msg_Warn(dec, "Picture has no buffer attached");
+            picture_Release(picture);
+            return VLC_EGENERIC;
+        }
+        buffer->data = p_sys->buffer->data;
     }
+    buffer->cmd = 0;
 
     status = mmal_port_send_buffer(sys->output, buffer);
     if (status != MMAL_SUCCESS) {
@@ -460,27 +473,42 @@ static int send_output_buffer(decoder_t *dec)
 err:
     if (picture)
         picture_Release(picture);
-    buffer->data = NULL;
-    mmal_buffer_header_release(buffer);
+    if (sys->output_pool && buffer) {
+        buffer->data = NULL;
+        mmal_buffer_header_release(buffer);
+    }
     return ret;
 }
 
 static void fill_output_port(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
-    /* allow at least 2 buffers in transit */
-    unsigned max_buffers_in_transit = __MAX(sys->output_pool->headers_num,
-            MIN_NUM_BUFFERS_IN_TRANSIT);
-    unsigned buffers_available = mmal_queue_length(sys->output_pool->queue);
-    unsigned buffers_to_send = max_buffers_in_transit - atomic_load(&sys->output_in_transit);
-    unsigned i;
+
+    unsigned max_buffers_in_transit = 0;
+    int buffers_available = 0;
+    int buffers_to_send = 0;
+    int i;
+
+    if (sys->output_pool) {
+        max_buffers_in_transit = __MAX(sys->output_pool->headers_num,
+                MIN_NUM_BUFFERS_IN_TRANSIT);
+        buffers_available = mmal_queue_length(sys->output_pool->queue);
+    } else {
+        max_buffers_in_transit = __MAX(sys->output->buffer_num, MIN_NUM_BUFFERS_IN_TRANSIT);
+        buffers_available = NUM_DECODER_BUFFER_HEADERS - atomic_load(&sys->output_in_transit) -
+            mmal_queue_length(sys->decoded_pictures);
+    }
+    buffers_to_send = max_buffers_in_transit - atomic_load(&sys->output_in_transit);
 
     if (buffers_to_send > buffers_available)
         buffers_to_send = buffers_available;
 
 #ifndef NDEBUG
-    msg_Dbg(dec, "Send %d buffers to output port (available: %d, in_transit: %d, buffer_num: %d)",
-                    buffers_to_send, buffers_available, atomic_load(&sys->output_in_transit),
+    msg_Dbg(dec, "Send %d buffers to output port (available: %d, "
+                    "in_transit: %d, decoded: %d, buffer_num: %d)",
+                    buffers_to_send, buffers_available,
+                    atomic_load(&sys->output_in_transit),
+                    mmal_queue_length(sys->decoded_pictures),
                     sys->output->buffer_num);
 #endif
     for (i = 0; i < buffers_to_send; ++i)
@@ -522,7 +550,7 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
     /*
      * Send output buffers
      */
-    if (sys->output_pool) {
+    if (atomic_load(&sys->started)) {
         buffer = mmal_queue_get(sys->decoded_pictures);
         if (buffer) {
             ret = (picture_t *)buffer->user_data;
@@ -530,9 +558,11 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
             ret->b_progressive = sys->b_progressive;
             ret->b_top_field_first = sys->b_top_field_first;
 
-            buffer->data = NULL;
-            mmal_buffer_header_reset(buffer);
-            mmal_buffer_header_release(buffer);
+            if (sys->output_pool) {
+                buffer->data = NULL;
+                mmal_buffer_header_reset(buffer);
+                mmal_buffer_header_release(buffer);
+            }
         }
 
         fill_output_port(dec);
@@ -648,10 +678,12 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
         } else {
             picture = (picture_t *)buffer->user_data;
             picture_Release(picture);
-            buffer->user_data = NULL;
-            buffer->alloc_size = 0;
-            buffer->data = NULL;
-            mmal_buffer_header_release(buffer);
+            if (sys->output_pool) {
+                buffer->user_data = NULL;
+                buffer->alloc_size = 0;
+                buffer->data = NULL;
+                mmal_buffer_header_release(buffer);
+            }
         }
         atomic_fetch_sub(&sys->output_in_transit, 1);
     } else if (buffer->cmd == MMAL_EVENT_FORMAT_CHANGED) {
