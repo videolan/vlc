@@ -136,11 +136,9 @@ int  MMSTUOpen( access_t *p_access )
     /* connect */
     if( i_proto == MMS_PROTO_AUTO )
     {   /* first try with TCP and then UDP*/
-        if( ( i_status = MMSOpen( p_access, &p_sys->url, MMS_PROTO_TCP ) ) )
-        {
-            if( vlc_object_alive(p_access) )
-                i_status = MMSOpen( p_access, &p_sys->url, MMS_PROTO_UDP );
-        }
+        i_status = MMSOpen( p_access, &p_sys->url, MMS_PROTO_TCP );
+        if( i_status )
+            i_status = MMSOpen( p_access, &p_sys->url, MMS_PROTO_UDP );
     }
     else
     {
@@ -341,7 +339,7 @@ static int Seek( access_t * p_access, uint64_t i_pos )
     var_buffer_free( &buffer );
 
 
-    while( vlc_object_alive (p_access) )
+    for( ;; )
     {
         if( mms_HeaderMediaRead( p_access, MMS_PACKET_CMD ) < 0 )
         {
@@ -356,7 +354,7 @@ static int Seek( access_t * p_access, uint64_t i_pos )
         }
     }
 
-    while( vlc_object_alive (p_access) )
+    for( ;; )
     {
         if( mms_HeaderMediaRead( p_access, MMS_PACKET_CMD ) < 0 )
         {
@@ -1507,9 +1505,6 @@ static int mms_HeaderMediaRead( access_t *p_access, int i_type )
     for( i_count = 0; i_count < MMS_RETRY_MAX; )
     {
         int i_status;
-
-        if( !vlc_object_alive (p_access) )
-            return -1;
 
         i_status = mms_ReceivePacket( p_access );
         if( i_status < 0 )

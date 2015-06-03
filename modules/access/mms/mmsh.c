@@ -331,7 +331,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     Stop( p_access );
     Start( p_access, i_packet * p_sys->asfh.i_min_data_packet_size );
 
-    while( vlc_object_alive (p_access) )
+    for( ;; )
     {
         if( GetPacket( p_access, &ck ) )
             break;
