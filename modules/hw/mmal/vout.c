@@ -564,12 +564,10 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
         buffer->cmd = 0;
         buffer->length = sys->input->buffer_size;
 
-        vlc_mutex_lock(&sys->buffer_mutex);
         status = mmal_port_send_buffer(sys->input, buffer);
         if (status == MMAL_SUCCESS)
-            ++sys->buffers_in_transit;
+            atomic_fetch_add(&sys->buffers_in_transit, 1);
 
-        vlc_mutex_unlock(&sys->buffer_mutex);
         if (status != MMAL_SUCCESS) {
             msg_Err(vd, "Failed to send buffer to input port. Frame dropped");
             picture_Release(picture);
@@ -590,7 +588,7 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
     sys->next_phase_check = (sys->next_phase_check + 1) % PHASE_CHECK_INTERVAL;
 
     vlc_mutex_lock(&sys->buffer_mutex);
-    while (sys->buffers_in_transit >= MAX_BUFFERS_IN_TRANSIT)
+    while (atomic_load(&sys->buffers_in_transit) >= MAX_BUFFERS_IN_TRANSIT)
         vlc_cond_wait(&sys->buffer_cond, &sys->buffer_mutex);
     vlc_mutex_unlock(&sys->buffer_mutex);
 }
@@ -688,7 +686,7 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
         picture_Release(picture);
 
     vlc_mutex_lock(&sys->buffer_mutex);
-    --sys->buffers_in_transit;
+    atomic_fetch_sub(&sys->buffers_in_transit, 1);
     vlc_cond_signal(&sys->buffer_cond);
     vlc_mutex_unlock(&sys->buffer_mutex);
 }

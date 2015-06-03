@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_atomic.h>
 
 #include "mmal_picture.h"
 
@@ -382,7 +383,7 @@ static int send_output_buffer(filter_t *filter)
         picture_Release(picture);
         ret = -1;
     } else {
-        sys->output_in_transit++;
+        atomic_fetch_add(&sys->output_in_transit, 1);
         vlc_cond_signal(&sys->buffer_cond);
     }
     vlc_mutex_unlock(&sys->buffer_cond_mutex);
@@ -471,7 +472,7 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
         msg_Err(filter, "Failed to send buffer to input port (status=%"PRIx32" %s)",
                 status, mmal_status_to_string(status));
     } else {
-        sys->input_in_transit++;
+        atomic_fetch_add(&sys->input_in_transit, 1);
         vlc_cond_signal(&sys->buffer_cond);
     }
     vlc_mutex_unlock(&sys->buffer_cond_mutex);
@@ -527,7 +528,7 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     if (picture)
         picture_Release(picture);
 
-    sys->input_in_transit--;
+    atomic_fetch_sub(&sys->input_in_transit, 1);
     vlc_cond_signal(&sys->buffer_cond);
     vlc_mutex_unlock(&sys->buffer_cond_mutex);
 }
@@ -548,7 +549,7 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
             buffer->user_data = NULL;
         }
 
-        sys->output_in_transit--;
+        atomic_fetch_sub(&sys->output_in_transit, 1);
         vlc_cond_signal(&sys->buffer_cond);
         vlc_mutex_unlock(&sys->buffer_cond_mutex);
     } else if (buffer->cmd == MMAL_EVENT_FORMAT_CHANGED) {
