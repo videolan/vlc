@@ -91,42 +91,19 @@ namespace adaptative
         AbstractStreamOutput(demux_t *);
         virtual ~AbstractStreamOutput();
 
-        virtual void pushBlock(block_t *);
-        mtime_t getPCR() const;
-        int getGroup() const;
-        int esCount() const;
-        bool seekAble() const;
-        void setPosition(mtime_t);
-        void sendToDecoder(mtime_t);
+        virtual void pushBlock(block_t *) = 0;
+        virtual mtime_t getPCR() const;
+        virtual int getGroup() const;
+        virtual int esCount() const = 0;
+        virtual bool seekAble() const = 0;
+        virtual void setPosition(mtime_t) = 0;
+        virtual void sendToDecoder(mtime_t) = 0;
+        virtual bool reinitsOnSeek() const = 0;
 
     protected:
+        demux_t  *realdemux;
         mtime_t   pcr;
         int       group;
-        es_out_t *fakeesout; /* to intercept/proxy what is sent from demuxstream */
-        stream_t *demuxstream;
-        bool      seekable;
-
-    private:
-        demux_t  *realdemux;
-        static es_out_id_t *esOutAdd(es_out_t *, const es_format_t *);
-        static int esOutSend(es_out_t *, es_out_id_t *, block_t *);
-        static void esOutDel(es_out_t *, es_out_id_t *);
-        static int esOutControl(es_out_t *, int, va_list);
-        static void esOutDestroy(es_out_t *);
-
-        class Demuxed
-        {
-            friend class AbstractStreamOutput;
-            Demuxed();
-            ~Demuxed();
-            void drop();
-            es_out_id_t *es_id;
-            block_t  *p_queue;
-            block_t **pp_queue_last;
-        };
-        std::list<Demuxed *> queues;
-        vlc_mutex_t lock;
-        void sendToDecoderUnlocked(mtime_t);
     };
 
     class AbstractStreamOutputFactory
@@ -145,7 +122,41 @@ namespace adaptative
     {
     public:
         BaseStreamOutput(demux_t *, const std::string &);
-        virtual ~BaseStreamOutput(){}
+        virtual ~BaseStreamOutput();
+        virtual void pushBlock(block_t *); /* reimpl */
+        virtual int esCount() const; /* reimpl */
+        virtual bool seekAble() const; /* reimpl */
+        virtual void setPosition(mtime_t); /* reimpl */
+        virtual void sendToDecoder(mtime_t); /* reimpl */
+        virtual bool reinitsOnSeek() const; /* reimpl */
+
+    protected:
+        es_out_t *fakeesout; /* to intercept/proxy what is sent from demuxstream */
+        stream_t *demuxstream;
+        bool      seekable;
+        std::string name;
+
+    private:
+        static es_out_id_t *esOutAdd(es_out_t *, const es_format_t *);
+        static int esOutSend(es_out_t *, es_out_id_t *, block_t *);
+        static void esOutDel(es_out_t *, es_out_id_t *);
+        static int esOutControl(es_out_t *, int, va_list);
+        static void esOutDestroy(es_out_t *);
+
+        class Demuxed
+        {
+            friend class BaseStreamOutput;
+            Demuxed();
+            ~Demuxed();
+            void drop();
+            es_out_id_t *es_id;
+            block_t  *p_queue;
+            block_t **pp_queue_last;
+        };
+        std::list<Demuxed *> queues;
+        vlc_mutex_t lock;
+        void sendToDecoderUnlocked(mtime_t);
+        bool restart();
     };
 
 }

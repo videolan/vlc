@@ -59,7 +59,7 @@ namespace adaptative
             void setAdaptationLogic(AbstractAdaptationLogic *);
             void resetCounter();
             Chunk* getNextChunk(StreamType);
-            bool setPosition(mtime_t, bool);
+            bool setPosition(mtime_t, bool, bool);
             mtime_t getSegmentStart() const;
 
         private:

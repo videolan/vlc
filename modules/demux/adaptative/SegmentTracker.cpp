@@ -107,14 +107,18 @@ Chunk * SegmentTracker::getNextChunk(StreamType type)
     return chunk;
 }
 
-bool SegmentTracker::setPosition(mtime_t time, bool tryonly)
+bool SegmentTracker::setPosition(mtime_t time, bool restarted, bool tryonly)
 {
     uint64_t segcount;
     if(prevRepresentation &&
        prevRepresentation->getSegmentNumberByTime(time, &segcount))
     {
         if(!tryonly)
+        {
+            if(restarted)
+                initializing = true;
             count = segcount;
+        }
         return true;
     }
     return false;
