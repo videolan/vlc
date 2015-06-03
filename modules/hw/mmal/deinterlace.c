@@ -452,6 +452,7 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
 
     buffer = mmal_queue_timedwait(sys->input_pool->queue, 2);
     if (!buffer) {
+        picture_Release(picture);
         msg_Err(filter, "Failed to retrieve buffer header for input picture");
         goto out;
     }
