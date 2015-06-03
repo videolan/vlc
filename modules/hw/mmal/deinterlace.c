@@ -522,8 +522,10 @@ static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     filter_t *filter = (filter_t *)port->userdata;
     filter_sys_t *sys = filter->p_sys;
 
-    buffer->user_data = NULL;
     vlc_mutex_lock(&sys->buffer_cond_mutex);
+    buffer->user_data = NULL;
+    buffer->alloc_size = 0;
+    buffer->data = NULL;
     mmal_buffer_header_release(buffer);
     if (picture)
         picture_Release(picture);
@@ -547,6 +549,10 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
             picture = (picture_t *)buffer->user_data;
             picture_Release(picture);
             buffer->user_data = NULL;
+            buffer->alloc_size = 0;
+            buffer->data = NULL;
+            mmal_buffer_header_reset(buffer);
+            mmal_buffer_header_release(buffer);
         }
 
         atomic_fetch_sub(&sys->output_in_transit, 1);
