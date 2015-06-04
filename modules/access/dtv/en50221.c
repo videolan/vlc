@@ -112,7 +112,6 @@ typedef struct en50221_mmi_object_t
 
 
 #undef DEBUG_TPDU
-#define HLCI_WAIT_CAM_READY 0
 #define CAM_PROG_MAX MAX_PROGRAMS
 //#define CAPMT_WAIT 100             /* uncomment this for slow CAMs */
 
@@ -2052,33 +2051,11 @@ cam_t *en50221_Init( vlc_object_t *obj, int fd )
             goto error;
         }
 
-#if HLCI_WAIT_CAM_READY
-        while( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
-        {
-            if( !vlc_object_alive (obj) )
-                goto error;
-            msleep(1);
-            msg_Dbg( obj, "CAM: please wait" );
-            APDUSend( p_cam, 1, AOT_APPLICATION_INFO_ENQ, NULL, 0 );
-            ca_msg.length=3;
-            ca_msg.msg[0] = ( AOT_APPLICATION_INFO & 0xFF0000 ) >> 16;
-            ca_msg.msg[1] = ( AOT_APPLICATION_INFO & 0x00FF00 ) >> 8;
-            ca_msg.msg[2] = ( AOT_APPLICATION_INFO & 0x0000FF ) >> 0;
-            memset( &ca_msg.msg[3], 0, 253 );
-            if ( ioctl( fd, CA_GET_MSG, &ca_msg ) < 0 )
-            {
-                msg_Err( obj, "en50221_Init: failed getting message" );
-                goto error;
-            }
-            msg_Dbg( p_cam->obj, "en50221_Init: Got length: %d, tag: 0x%x", ca_msg.length, APDUGetTag( ca_msg.msg, ca_msg.length ) );
-        }
-#else
         if( ca_msg.msg[8] == 0xff && ca_msg.msg[9] == 0xff )
         {
             msg_Err( obj, "CAM returns garbage as application info!" );
             goto error;
         }
-#endif
         msg_Dbg( obj, "found CAM %s using id 0x%x", &ca_msg.msg[12],
                  (ca_msg.msg[8]<<8)|ca_msg.msg[9] );
     }
