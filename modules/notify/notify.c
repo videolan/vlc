@@ -170,10 +170,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( !p_input )
         return VLC_SUCCESS;
 
-    if( p_input->b_dead )
-        /* Not playing anything ... */
-        return VLC_SUCCESS;
-
     /* Playing something ... */
     input_item_t *p_input_item = input_GetItem( p_input );
     psz_title = input_item_GetTitleFbName( p_input_item );

@@ -1064,7 +1064,7 @@ static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
     random = var_GetBool(p_playlist, "random") ? _("[Random] ") : "";
     loop   = var_GetBool(p_playlist, "loop")   ? _("[Loop]")    : "";
 
-    if (p_input && !p_input->b_dead) {
+    if (p_input) {
         vlc_value_t val;
         char *path, *uri;
 

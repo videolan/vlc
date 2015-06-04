@@ -130,12 +130,7 @@ public:
     virtual ~InputManager();
 
     void delInput();
-    bool hasInput()
-    {
-        return p_input /* We have an input */
-            && !p_input->b_dead /* not dead yet, */
-            && !p_input->b_eof  /* not EOF either */;
-    }
+    bool hasInput() const { return p_input != NULL; }
 
     int playingStatus();
     bool hasAudio();
