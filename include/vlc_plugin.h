@@ -484,9 +484,6 @@ VLC_METADATA_EXPORTS
 #define change_float_range( minv, maxv ) \
     vlc_config_set (VLC_CONFIG_RANGE, (double)(minv), (double)(maxv));
 
-#define change_action_add( pf_action, text ) \
-    (void)(pf_action, text);
-
 /* For options that are saved but hidden from the preferences panel */
 #define change_private() \
     vlc_config_set (VLC_CONFIG_PRIVATE);

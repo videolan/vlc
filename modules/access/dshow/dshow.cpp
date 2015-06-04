@@ -74,8 +74,6 @@ static size_t EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
 static bool ConnectFilters( vlc_object_t *, access_sys_t *,
                             IBaseFilter *, CaptureFilter * );
 static int FindDevices( vlc_object_t *, const char *, char ***, char *** );
-static int ConfigDevicesCallback( vlc_object_t *, char const *,
-                                  vlc_value_t, vlc_value_t, void * );
 
 static void ShowPropertyPage( IUnknown * );
 static void ShowDeviceProperties( vlc_object_t *, ICaptureGraphBuilder2 *,
@@ -224,11 +222,9 @@ vlc_module_begin ()
 
     add_string( CFG_PREFIX "vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
         change_string_cb( FindDevices )
-        change_action_add( ConfigDevicesCallback, N_("Configure") )
 
     add_string( CFG_PREFIX "adev", NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
         change_string_cb( FindDevices )
-        change_action_add( ConfigDevicesCallback, N_("Configure") )
 
     add_string( CFG_PREFIX "size", NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
         change_safe()
@@ -2020,72 +2016,6 @@ static int FindDevices( vlc_object_t *p_this, const char *psz_name,
     *vp = values;
     *tp = texts;
     return count;
-}
-
-static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
-                                  vlc_value_t newval, vlc_value_t, void * )
-{
-    module_config_t *p_item;
-    bool b_audio = false;
-    char *psz_device = NULL;
-    int i_ret = VLC_SUCCESS;
-
-    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED ))
-     && FAILED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
-        return VLC_EGENERIC;
-
-    if( !EMPTY_STR( newval.psz_string ) )
-        psz_device = strdup( newval.psz_string );
-
-
-    p_item = config_FindConfig( p_this, psz_name );
-
-    if( !p_item )
-    {
-        free( psz_device );
-        CoUninitialize();
-        return VLC_SUCCESS;
-    }
-
-    if( !strcmp( psz_name, CFG_PREFIX "adev" ) ) b_audio = true;
-
-    string devicename;
-
-    if( psz_device )
-    {
-        devicename = psz_device ;
-    }
-    else
-    {
-        /* If no device name was specified, pick the 1st one */
-        list<string> list_devices;
-
-        /* Enumerate devices */
-        FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
-        if( list_devices.empty() )
-        {
-            CoUninitialize();
-            return VLC_EGENERIC;
-        }
-        devicename = *list_devices.begin();
-    }
-
-    IBaseFilter *p_device_filter =
-        FindCaptureDevice( p_this, &devicename, NULL, b_audio );
-    if( p_device_filter )
-    {
-        ShowPropertyPage( p_device_filter );
-        p_device_filter->Release();
-    }
-    else
-    {
-        msg_Err( p_this, "didn't find device: %s", devicename.c_str() );
-        i_ret = VLC_EGENERIC;
-    }
-
-    CoUninitialize();
-    free( psz_device );
-    return i_ret;
 }
 
 /*****************************************************************************
