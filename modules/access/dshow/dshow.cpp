@@ -1777,55 +1777,45 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
 static block_t *ReadCompressed( access_t *p_access )
 {
     access_sys_t   *p_sys = p_access->p_sys;
-    dshow_stream_t *p_stream = NULL;
+    /* There must be only 1 elementary stream to produce a valid stream
+     * of MPEG or DV data */
+    dshow_stream_t *p_stream = p_sys->pp_streams[0];
     VLCMediaSample sample;
 
     /* Read 1 DV/MPEG frame (they contain the video and audio data) */
 
-    /* There must be only 1 elementary stream to produce a valid stream
-     * of MPEG or DV data */
-    p_stream = p_sys->pp_streams[0];
+    /* Get new sample/frame from the elementary stream (blocking). */
+    vlc_mutex_lock( &p_sys->lock );
 
-    while( 1 )
-    {
-        if( !vlc_object_alive (p_access) ) return NULL;
+    CaptureFilter *p_filter = p_stream->p_capture_filter;
 
-        /* Get new sample/frame from the elementary stream (blocking). */
-        vlc_mutex_lock( &p_sys->lock );
-
-        if( p_stream->p_capture_filter->CustomGetPin()
-              ->CustomGetSample( &sample ) != S_OK )
-        {
-            /* No data available. Wait until some data has arrived */
-            vlc_cond_wait( &p_sys->wait, &p_sys->lock );
-            vlc_mutex_unlock( &p_sys->lock );
-            continue;
-        }
-
+    if( p_filter->CustomGetPin()->CustomGetSample(&sample) != S_OK )
+    {   /* No data available. Wait until some data has arrived */
+        vlc_cond_wait( &p_sys->wait, &p_sys->lock );
         vlc_mutex_unlock( &p_sys->lock );
-
-        /*
-         * We got our sample
-         */
-        block_t *p_block;
-        uint8_t *p_data;
-        int i_data_size = sample.p_sample->GetActualDataLength();
-
-        if( !i_data_size || !(p_block = block_Alloc( i_data_size )) )
-        {
-            sample.p_sample->Release();
-            continue;
-        }
-
-        sample.p_sample->GetPointer( &p_data );
-        memcpy( p_block->p_buffer, p_data, i_data_size );
-        sample.p_sample->Release();
-
-        /* The caller got what he wanted */
-        return p_block;
+        return NULL;
     }
+    vlc_mutex_unlock( &p_sys->lock );
 
-    return NULL; /* never reached */
+    /*
+     * We got our sample
+     */
+    block_t *p_block = NULL;
+    uint8_t *p_data;
+    int i_data_size = sample.p_sample->GetActualDataLength();
+    if( i_data_size == 0 )
+        goto out;
+
+    p_block = block_Alloc( i_data_size );
+    if( unlikely(p_block == NULL) )
+        goto out;
+
+    sample.p_sample->GetPointer( &p_data );
+    memcpy( p_block->p_buffer, p_data, i_data_size );
+    /* The caller got what he wanted */
+out:
+    sample.p_sample->Release();
+    return p_block;
 }
 
 /****************************************************************************
