@@ -416,7 +416,7 @@ connect:
             p_sys->i_version = 0;
             p_sys->b_seekable = false;
 
-            if( !vlc_object_alive (p_access) || Connect( p_access, 0 ) )
+            if( Connect( p_access, 0 ) )
                 goto error;
 
         case 0:
@@ -750,7 +750,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             p_sys->b_continuous = true;
         }
         Disconnect( p_access );
-        if( p_sys->b_reconnect && vlc_object_alive( p_access ) )
+        if( p_sys->b_reconnect )
         {
             msg_Dbg( p_access, "got disconnected, trying to reconnect" );
             if( Connect( p_access, p_access->info.i_pos ) )
@@ -1116,7 +1116,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
 
                 free( psz );
 
-                if( !vlc_object_alive (p_access) || p_sys->b_error )
+                if( p_sys->b_error )
                 {
                     Disconnect( p_access );
                     return -1;
@@ -1274,7 +1274,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
             goto error;
         }
 
-        if( !vlc_object_alive (p_access) || p_sys->b_error )
+        if( p_sys->b_error )
         {
             free( psz );
             goto error;
