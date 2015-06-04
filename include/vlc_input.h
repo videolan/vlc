@@ -219,17 +219,16 @@ typedef struct input_resource_t input_resource_t;
 
 /**
  * Main structure representing an input thread. This structure is mostly
- * private. The only public fields are READ-ONLY. You must use the helpers
- * to modify them
+ * private. The only public fields are read-only and constant.
  */
 struct input_thread_t
 {
     VLC_COMMON_MEMBERS
 
-    bool b_error;
-    bool b_eof;
+    bool b_error VLC_DEPRECATED;
+    bool b_eof VLC_DEPRECATED;
     bool b_preparsing;
-    bool b_dead;
+    bool b_dead VLC_DEPRECATED;
 
     /* All other data is input_thread is PRIVATE. You can't access it
      * outside of src/input */
