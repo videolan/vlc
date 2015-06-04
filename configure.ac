@@ -3795,13 +3795,6 @@ then
 
   VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit -Wl,-framework,CoreAudio -Wl,-framework,SystemConfiguration -Wl,-framework,ScriptingBridge])
 
-  if test ! -d ${CONTRIB_DIR}/Sparkle.framework
-  then
-    AC_MSG_ERROR([Sparkle framework is required and was not found in ${CONTRIB_DIR}])
-  fi
-  VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR} -Wl,-framework,Sparkle])
-  VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
-
   if test ! -d ${CONTRIB_DIR}/BGHUDAppKit.framework
   then
     AC_MSG_ERROR([BGHUDAppKit framework is required and was not found in ${CONTRIB_DIR}])
@@ -3810,6 +3803,24 @@ then
   VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
 fi
 AM_CONDITIONAL(ENABLE_MACOSX_UI, [test "$enable_macosx" != "no"])
+
+dnl
+dnl  MacOS X sparkle update support
+dnl
+AC_ARG_ENABLE(sparkle,
+  [  --enable-sparkle        Sparkle update support for OS X (default enabled on Mac OS X)])
+if test "x${enable_sparkle}" != "xno" -a "${SYS}" = "darwin"
+then
+  if test ! -d ${CONTRIB_DIR}/Sparkle.framework
+  then
+    AC_MSG_ERROR([Sparkle framework is required and was not found in ${CONTRIB_DIR}])
+  fi
+  VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR} -Wl,-framework,Sparkle])
+  VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
+  AC_DEFINE([HAVE_SPARKLE], [1], [Define to 1 if sparkle is enabled.])
+fi
+AM_CONDITIONAL(HAVE_SPARKLE, [test "$enable_sparkle" != "no"])
+
 
 dnl
 dnl  Minimal Mac OS X module

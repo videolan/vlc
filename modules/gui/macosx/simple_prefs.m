@@ -38,7 +38,7 @@
 #import "AppleRemote.h"
 #import "CoreInteraction.h"
 
-#ifdef UPDATE_CHECK
+#ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                        //for o_intf_last_update_lbl
 #endif
 
@@ -220,7 +220,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 {
     [self initStrings];
 
-#ifdef UPDATE_CHECK
+#ifdef HAVE_SPARKLE
     [o_intf_update_ckb bind:@"value"
                    toObject:[SUUpdater sharedUpdater]
                 withKeyPath:@"automaticallyChecksForUpdates"
@@ -591,7 +591,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
     [self setupButton: o_intf_mediakeys_ckb forBoolValue: "macosx-mediakeys"];
 
-#ifdef UPDATE_CHECK
+#ifdef HAVE_SPARKLE
     if ([[SUUpdater sharedUpdater] lastUpdateCheckDate] != NULL)
         [o_intf_last_update_lbl setStringValue: [NSString stringWithFormat: _NS("Last check on: %@"), [[[SUUpdater sharedUpdater] lastUpdateCheckDate] descriptionWithLocale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]]]];
     else

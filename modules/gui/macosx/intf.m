@@ -67,7 +67,7 @@
 #import "VideoEffects.h"
 #import "AudioEffects.h"
 
-#ifdef UPDATE_CHECK
+#ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
 #endif
 
@@ -791,7 +791,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     // So lets enqueue it into the loop for later execution.
     [o_mainwindow performSelector:@selector(makeKeyAndOrderFront:) withObject:nil afterDelay:0];
 
-#ifdef UPDATE_CHECK
+#ifdef HAVE_SPARKLE
     [[SUUpdater sharedUpdater] setDelegate:self];
 #endif
 }
@@ -980,7 +980,7 @@ static bool f_appExit = false;
 #pragma mark -
 #pragma mark Sparkle delegate
 
-#ifdef UPDATE_CHECK
+#ifdef HAVE_SPARKLE
 /* received directly before the update gets installed, so let's shut down a bit */
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
 {

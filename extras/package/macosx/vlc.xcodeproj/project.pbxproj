@@ -682,7 +682,6 @@
 		CC402F430E00ABBB006A4BA4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC1941240B9C1F8400635F6B /* QTKit.framework */; };
 		CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
 		CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
-		CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC461F75160084A10022423C /* SharedDialogs.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC461F73160084A10022423C /* SharedDialogs.xib */; };
 		CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4EFC2C13E96BD00091D19A /* dropzone.png */; };
 		CC68B0331544C1AE00FD9C7F /* vlc-xmas.png in Resources */ = {isa = PBXBuildFile; fileRef = CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */; };
@@ -859,7 +858,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				CC84FB481300843200816D38 /* BGHUDAppKit.framework in Copy Frameworks */,
-				CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;

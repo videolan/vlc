@@ -48,6 +48,9 @@ VLC-tmp: vlc
 		xcodebuild -target vlc SYMROOT=../../../build DSTROOT=../../../build $(silentstd)
 	cp -R $(top_builddir)/tmp/build/Default/VLC.bundle $@
 	mkdir -p $@/Contents/Frameworks && cp -R $(CONTRIB_DIR)/Growl.framework $@/Contents/Frameworks/
+if HAVE_SPARKLE
+	cp -R $(CONTRIB_DIR)/Sparkle.framework $@/Contents/Frameworks/
+endif
 	mkdir -p $@/Contents/MacOS/share/locale/
 	cp -r "$(prefix)/lib/vlc/lua" "$(prefix)/share/vlc/lua" $@/Contents/MacOS/share/
 	mkdir -p $@/Contents/MacOS/include/

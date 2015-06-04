@@ -49,7 +49,7 @@
 #import "DebugMessageVisualizer.h"
 #import "AddonsWindowController.h"
 
-#ifdef UPDATE_CHECK
+#ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>
 #endif
 
@@ -148,7 +148,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     p_intf = VLCIntf;
 
-#ifdef UPDATE_CHECK
+#ifdef HAVE_SPARKLE
     [o_mi_checkForUpdate setAction:@selector(checkForUpdates:)];
     [o_mi_checkForUpdate setTarget:[SUUpdater sharedUpdater]];
 #else
