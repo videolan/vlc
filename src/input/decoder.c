@@ -880,7 +880,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
 
     bool b_reject = DecoderWaitUnblock( p_dec );
 
-    if( p_owner->b_waiting )
+    if( !b_reject && p_owner->b_waiting )
     {
         assert( p_owner->b_first );
         msg_Dbg( p_dec, "Received first picture" );
