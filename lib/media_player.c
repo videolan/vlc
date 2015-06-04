@@ -1408,6 +1408,92 @@ void libvlc_title_descriptions_release( libvlc_title_description_t **p_titles,
     free( p_titles );
 }
 
+int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_mi,
+                                                      int i_chapters_of_title,
+                                                      libvlc_chapter_description_t *** pp_chapters )
+{
+    assert( p_mi );
+
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
+
+    if( !p_input_thread )
+        return -1;
+
+    seekpoint_t **p_seekpoint = NULL;
+
+    /* fetch data */
+    int ret = input_Control(p_input_thread, INPUT_GET_SEEKPOINTS, &p_seekpoint, &i_chapters_of_title);
+    vlc_object_release( p_input_thread );
+
+    if( ret != VLC_SUCCESS)
+    {
+        return -1;
+    }
+
+    if (i_chapters_of_title == 0 || p_seekpoint == NULL)
+    {
+        return 0;
+    }
+
+    const int ci_chapter_count = (const int)i_chapters_of_title;
+
+    *pp_chapters = calloc( ci_chapter_count, sizeof(**pp_chapters) );
+    if( !*pp_chapters )
+    {
+        return -1;
+    }
+
+    /* fill array */
+    for( int i = 0; i < ci_chapter_count; i++)
+    {
+        libvlc_chapter_description_t *p_chapter = calloc( 1, sizeof(*p_chapter) );
+        if( unlikely(p_chapter == NULL) )
+        {
+            libvlc_chapter_descriptions_release( *pp_chapters, ci_chapter_count );
+            free( p_chapter );
+            return -1;
+        }
+        (*pp_chapters)[i] = p_chapter;
+
+        p_chapter->i_time_offset = p_seekpoint[i]->i_time_offset / 1000;
+
+        if( i > 0 )
+        {
+            p_chapter->i_duration = p_chapter->i_time_offset - (*pp_chapters)[i-1]->i_time_offset;
+        }
+        else
+        {
+            p_chapter->i_duration = p_chapter->i_time_offset;
+        }
+
+        if( p_seekpoint[i]->psz_name )
+        {
+            p_chapter->psz_name = strdup( p_seekpoint[i]->psz_name );
+        }
+        else
+        {
+            p_chapter->psz_name = NULL;
+        }
+        vlc_seekpoint_Delete( p_seekpoint[i] );
+    }
+
+    return ci_chapter_count;
+}
+
+void libvlc_chapter_descriptions_release( libvlc_chapter_description_t **p_chapters,
+                                          unsigned i_count )
+{
+    for (unsigned i = 0; i < i_count; i++ )
+    {
+        if ( !p_chapters[i] )
+            continue;
+
+        free( p_chapters[i]->psz_name );
+        free( p_chapters[i] );
+    }
+    free( p_chapters );
+}
+
 void libvlc_media_player_next_chapter( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;

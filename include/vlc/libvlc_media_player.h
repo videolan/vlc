@@ -73,6 +73,18 @@ typedef struct libvlc_title_description_t
 } libvlc_title_description_t;
 
 /**
+ * Description for chapters.
+ * It contains information about time offset, duration
+ * (both in milliseconds) as well as name (description string).
+ */
+typedef struct libvlc_chapter_description_t
+{
+    int64_t i_time_offset;
+    int64_t i_duration;
+    char *psz_name;
+} libvlc_chapter_description_t;
+
+/**
  * Description for audio output. It contains
  * name, description and pointer to next record.
  */
@@ -1170,6 +1182,35 @@ LIBVLC_API
                                             unsigned i_count );
 
 /**
+ * Get the full description of available chapters
+ *
+ * \version LibVLC 3.0.0 and later.
+ *
+ * \param p_mi the media player
+ * \param index of the title to query for chapters
+ * \param address to store an allocated array of chapter descriptions
+ *        descriptions (must be freed with libvlc_chapter_descriptions_release()
+ *        by the caller) [OUT]
+ *
+ * \return the number of chapters (-1 on error)
+ */
+LIBVLC_API int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_mi,
+                                                                  int i_chapters_of_title,
+                                                                  libvlc_chapter_description_t *** pp_chapters );
+
+/**
+ * Release a chapter description
+ *
+ * \version LibVLC 3.0.0 and later
+ *
+ * \param chapter description array to release
+ * \param number of chapter descriptions to release
+ */
+LIBVLC_API
+void libvlc_chapter_descriptions_release( libvlc_chapter_description_t **p_chapters,
+                                          unsigned i_count );
+
+/**
  * Get the description of available chapters for specific title.
  *
  * \param p_mi the media player
@@ -1177,7 +1218,7 @@ LIBVLC_API
  * \return list containing description of available chapter for title i_title.
  * It must be freed with libvlc_track_description_list_release()
  */
-LIBVLC_API libvlc_track_description_t *
+LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
         libvlc_video_get_chapter_description( libvlc_media_player_t *p_mi, int i_title );
 
 /**

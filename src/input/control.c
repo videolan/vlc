@@ -391,6 +391,50 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
+        case INPUT_GET_SEEKPOINTS:
+        {
+            seekpoint_t ***array = (seekpoint_t ***)va_arg( args, seekpoint_t *** );
+            int *pi_title_to_fetch = (int *) va_arg( args, int * );
+
+            vlc_mutex_lock( &p_input->p->p_item->lock );
+
+            if ( *pi_title_to_fetch < 0 ) /* query current title if -1 */
+                *pi_title_to_fetch = var_GetInteger( p_input, "title" );
+
+            if( !p_input->p->i_title || p_input->p->i_title < *pi_title_to_fetch )
+            {
+                vlc_mutex_unlock( &p_input->p->p_item->lock );
+                return VLC_EGENERIC;
+            }
+
+            input_title_t *p_title = vlc_input_title_Duplicate( p_input->p->title[*pi_title_to_fetch] );
+
+            /* set arg2 to the number of seekpoints we found */
+            const int i_chapters = p_title->i_seekpoint;
+            *pi_title_to_fetch = i_chapters;
+
+            if ( i_chapters == 0 )
+            {
+                vlc_mutex_unlock( &p_input->p->p_item->lock );
+                return VLC_SUCCESS;
+            }
+
+            *array = calloc( p_title->i_seekpoint, sizeof(**array) );
+            if( !array )
+            {
+                vlc_mutex_unlock( &p_input->p->p_item->lock );
+                return VLC_ENOMEM;
+            }
+            for( int i = 0; i < i_chapters; i++ )
+            {
+                (*array)[i] = vlc_seekpoint_Duplicate( p_title->seekpoint[i] );
+            }
+
+            vlc_mutex_unlock( &p_input->p->p_item->lock );
+
+            return VLC_SUCCESS;
+        }
+
         case INPUT_GET_VIDEO_FPS:
             pf = (double*)va_arg( args, double * );
 
