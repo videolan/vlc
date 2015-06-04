@@ -181,7 +181,6 @@ struct pl_item_t
 struct intf_sys_t
 {
     vlc_thread_t    thread;
-    input_thread_t *p_input;
 
     bool            color;
     bool            exit;
@@ -726,15 +725,15 @@ static int SubDrawObject(intf_sys_t *sys, int l, vlc_object_t *p_obj, int i_leve
     return l;
 }
 
-static int DrawObjects(intf_thread_t *intf)
+static int DrawObjects(intf_thread_t *intf, input_thread_t *input)
 {
+    (void) input;
     return SubDrawObject(intf->p_sys, 0, VLC_OBJECT(intf->p_libvlc), 0, "");
 }
 
-static int DrawMeta(intf_thread_t *intf)
+static int DrawMeta(intf_thread_t *intf, input_thread_t *p_input)
 {
     intf_sys_t *sys = intf->p_sys;
-    input_thread_t *p_input = sys->p_input;
     input_item_t *item;
     int l = 0;
 
@@ -758,10 +757,9 @@ static int DrawMeta(intf_thread_t *intf)
     return l;
 }
 
-static int DrawInfo(intf_thread_t *intf)
+static int DrawInfo(intf_thread_t *intf, input_thread_t *p_input)
 {
     intf_sys_t *sys = intf->p_sys;
-    input_thread_t *p_input = sys->p_input;
     input_item_t *item;
     int l = 0;
 
@@ -786,10 +784,9 @@ static int DrawInfo(intf_thread_t *intf)
     return l;
 }
 
-static int DrawStats(intf_thread_t *intf)
+static int DrawStats(intf_thread_t *intf, input_thread_t *p_input)
 {
     intf_sys_t *sys = intf->p_sys;
-    input_thread_t *p_input = sys->p_input;
     input_item_t *item;
     input_stats_t *p_stats;
     int l = 0, i_audio = 0, i_video = 0;
@@ -863,7 +860,7 @@ static int DrawStats(intf_thread_t *intf)
     return l;
 }
 
-static int DrawHelp(intf_thread_t *intf)
+static int DrawHelp(intf_thread_t *intf, input_thread_t *input)
 {
     intf_sys_t *sys = intf->p_sys;
     int l = 0;
@@ -942,10 +939,11 @@ static int DrawHelp(intf_thread_t *intf)
     H(_(" <up>,<down>            Seek +/-5%%"));
 
 #undef H
+    (void) input;
     return l;
 }
 
-static int DrawBrowse(intf_thread_t *intf)
+static int DrawBrowse(intf_thread_t *intf, input_thread_t *input)
 {
     intf_sys_t *sys = intf->p_sys;
 
@@ -958,10 +956,11 @@ static int DrawBrowse(intf_thread_t *intf)
         MainBoxWrite(sys, i, " %c %s", type, dir_entry->path);
     }
 
+    (void) input;
     return sys->n_dir_entries;
 }
 
-static int DrawPlaylist(intf_thread_t *intf)
+static int DrawPlaylist(intf_thread_t *intf, input_thread_t *input)
 {
     intf_sys_t *sys = intf->p_sys;
     playlist_t *p_playlist = pl_Get(intf);
@@ -1003,10 +1002,11 @@ static int DrawPlaylist(intf_thread_t *intf)
         if (sys->color) color_set(C_DEFAULT, NULL);
     }
 
+    (void) input;
     return sys->plist_entries;
 }
 
-static int DrawMessages(intf_thread_t *intf)
+static int DrawMessages(intf_thread_t *intf, input_thread_t *input)
 {
     intf_sys_t *sys = intf->p_sys;
     int l = 0;
@@ -1031,13 +1031,14 @@ static int DrawMessages(intf_thread_t *intf)
     vlc_mutex_unlock(&sys->msg_lock);
     if (sys->color)
         color_set(C_DEFAULT, NULL);
+
+    (void) input;
     return l;
 }
 
-static int DrawStatus(intf_thread_t *intf)
+static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
 {
     intf_sys_t     *sys = intf->p_sys;
-    input_thread_t *p_input = sys->p_input;
     playlist_t     *p_playlist = pl_Get(intf);
     char *name = _("VLC media player");
     const size_t name_len = strlen(name) + sizeof(PACKAGE_VERSION);
@@ -1154,10 +1155,10 @@ static void FillTextBox(intf_sys_t *sys)
         mvnprintw(7, 1, width, _("Find: %s"), sys->search_chain);
 }
 
-static void FillBox(intf_thread_t *intf)
+static void FillBox(intf_thread_t *intf, input_thread_t *input)
 {
     intf_sys_t *sys = intf->p_sys;
-    static int (* const draw[]) (intf_thread_t *) = {
+    static int (* const draw[]) (intf_thread_t *, input_thread_t *) = {
         [BOX_HELP]      = DrawHelp,
         [BOX_INFO]      = DrawInfo,
         [BOX_META]      = DrawMeta,
@@ -1170,17 +1171,17 @@ static void FillBox(intf_thread_t *intf)
         [BOX_LOG]       = DrawMessages,
     };
 
-    sys->box_lines_total = draw[sys->box_type](intf);
+    sys->box_lines_total = draw[sys->box_type](intf, input);
 
     if (sys->box_type == BOX_SEARCH || sys->box_type == BOX_OPEN)
         FillTextBox(sys);
 }
 
-static void Redraw(intf_thread_t *intf)
+static void Redraw(intf_thread_t *intf, input_thread_t *input)
 {
     intf_sys_t *sys   = intf->p_sys;
-    int         box     = sys->box_type;
-    int         y       = DrawStatus(intf);
+    int         box   = sys->box_type;
+    int         y     = DrawStatus(intf, input);
 
     sys->box_height = LINES - y - 2;
     DrawBox(y++, sys->box_height, sys->color, _(box_title[box]));
@@ -1188,7 +1189,7 @@ static void Redraw(intf_thread_t *intf)
     sys->box_y = y;
 
     if (box != BOX_NONE) {
-        FillBox(intf);
+        FillBox(intf, input);
 
         if (sys->box_lines_total == 0)
             sys->box_start = 0;
@@ -1204,10 +1205,8 @@ static void Redraw(intf_thread_t *intf)
     refresh();
 }
 
-static void ChangePosition(intf_thread_t *intf, float increment)
+static void ChangePosition(input_thread_t *p_input, float increment)
 {
-    intf_sys_t     *sys = intf->p_sys;
-    input_thread_t *p_input = sys->p_input;
     float pos;
 
     if (!p_input || var_GetInteger(p_input, "state") != PLAYING_S)
@@ -1256,13 +1255,13 @@ static char *GetDiscDevice(intf_thread_t *intf, const char *name)
     return device;
 }
 
-static void Eject(intf_thread_t *intf)
+static void Eject(intf_thread_t *intf, input_thread_t *p_input)
 {
     char *device, *name;
     playlist_t * p_playlist = pl_Get(intf);
 
     /* If there's a stream playing, we aren't allowed to eject ! */
-    if (intf->p_sys->p_input)
+    if (p_input)
         return;
 
     PL_LOCK;
@@ -1283,10 +1282,8 @@ static void Eject(intf_thread_t *intf)
     }
 }
 
-static void PlayPause(intf_thread_t *intf)
+static void PlayPause(intf_thread_t *intf, input_thread_t *p_input)
 {
-    input_thread_t *p_input = intf->p_sys->p_input;
-
     if (p_input) {
         int64_t state = var_GetInteger( p_input, "state" );
         state = (state != PLAYING_S) ? PLAYING_S : PAUSE_S;
@@ -1560,10 +1557,8 @@ static void InputNavigate(input_thread_t* p_input, const char *var)
         var_TriggerCallback(p_input, var);
 }
 
-static void CycleESTrack(intf_sys_t *sys, const char *var)
+static void CycleESTrack(input_thread_t *input, const char *var)
 {
-    input_thread_t *input = sys->p_input;
-
     if (!input)
         return;
 
@@ -1584,7 +1579,8 @@ static void CycleESTrack(intf_sys_t *sys, const char *var)
     var_SetInteger(input, var, list->p_values[i].i_int);
 }
 
-static void HandleCommonKey(intf_thread_t *intf, int key)
+static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
+                            int key)
 {
     intf_sys_t *sys = intf->p_sys;
     playlist_t *p_playlist = pl_Get(intf);
@@ -1622,13 +1618,13 @@ static void HandleCommonKey(intf_thread_t *intf, int key)
         return;
 
     /* Navigation */
-    case KEY_RIGHT: ChangePosition(intf, +0.01); return;
-    case KEY_LEFT:  ChangePosition(intf, -0.01); return;
+    case KEY_RIGHT: ChangePosition(input, +0.01); return;
+    case KEY_LEFT:  ChangePosition(input, -0.01); return;
 
     /* Common control */
     case 'f':
-        if (sys->p_input) {
-            vout_thread_t *p_vout = input_GetVout(sys->p_input);
+        if (input) {
+            vout_thread_t *p_vout = input_GetVout(input);
             if (p_vout) {
                 bool fs = var_ToggleBool(p_playlist, "fullscreen");
                 var_SetBool(p_vout, "fullscreen", fs);
@@ -1637,14 +1633,14 @@ static void HandleCommonKey(intf_thread_t *intf, int key)
         }
         return;
 
-    case ' ': PlayPause(intf);            return;
+    case ' ': PlayPause(intf, input);       return;
     case 's': playlist_Stop(p_playlist);    return;
-    case 'e': Eject(intf);                return;
+    case 'e': Eject(intf, input);           return;
 
-    case '[': InputNavigate(sys->p_input, "prev-title");      return;
-    case ']': InputNavigate(sys->p_input, "next-title");      return;
-    case '<': InputNavigate(sys->p_input, "prev-chapter");    return;
-    case '>': InputNavigate(sys->p_input, "next-chapter");    return;
+    case '[': InputNavigate(input, "prev-title");      return;
+    case ']': InputNavigate(input, "next-title");      return;
+    case '<': InputNavigate(input, "prev-chapter");    return;
+    case '>': InputNavigate(input, "next-chapter");    return;
 
     case 'p': playlist_Prev(p_playlist);            break;
     case 'n': playlist_Next(p_playlist);            break;
@@ -1652,9 +1648,9 @@ static void HandleCommonKey(intf_thread_t *intf, int key)
     case 'z': playlist_VolumeDown(p_playlist, 1, NULL); break;
     case 'm': playlist_MuteToggle(p_playlist); break;
 
-    case 'c': CycleESTrack(sys, "audio-es"); break;
-    case 'v': CycleESTrack(sys, "spu-es");   break;
-    case 'b': CycleESTrack(sys, "video-es"); break;
+    case 'c': CycleESTrack(input, "audio-es"); break;
+    case 'v': CycleESTrack(input, "spu-es");   break;
+    case 'b': CycleESTrack(input, "video-es"); break;
 
     case 0x0c:  /* ^l */
     case KEY_CLEAR:
@@ -1701,7 +1697,7 @@ static bool HandleListKey(intf_thread_t *intf, int key)
     return true;
 }
 
-static void HandleKey(intf_thread_t *intf)
+static void HandleKey(intf_thread_t *intf, input_thread_t *input)
 {
     intf_sys_t *sys = intf->p_sys;
     int key = getch();
@@ -1721,11 +1717,11 @@ static void HandleKey(intf_thread_t *intf)
 #ifdef __FreeBSD__
         case KEY_SELECT:
 #endif
-        case KEY_END:   ChangePosition(intf, +.99);   return;
-        case KEY_HOME:  ChangePosition(intf, -1.0);   return;
-        case KEY_UP:    ChangePosition(intf, +0.05);  return;
-        case KEY_DOWN:  ChangePosition(intf, -0.05);  return;
-        default:        HandleCommonKey(intf, key);   return;
+        case KEY_END:   ChangePosition(input, +.99);       return;
+        case KEY_HOME:  ChangePosition(input, -1.0);       return;
+        case KEY_UP:    ChangePosition(input, +0.05);      return;
+        case KEY_DOWN:  ChangePosition(input, -0.05);      return;
+        default:        HandleCommonKey(intf, input, key); return;
         }
 
     if (box == BOX_BROWSE   && HandleBrowseKey(intf, key))
@@ -1737,7 +1733,7 @@ static void HandleKey(intf_thread_t *intf)
     if (HandleListKey(intf, key))
         return;
 
-    HandleCommonKey(intf, key);
+    HandleCommonKey(intf, input, key);
 }
 
 /*
@@ -1786,16 +1782,6 @@ static void MsgCallback(void *data, int type, const vlc_log_t *msg,
     vlc_mutex_unlock(&sys->msg_lock);
 }
 
-static inline void UpdateInput(intf_sys_t *sys, playlist_t *p_playlist)
-{
-    if (!sys->p_input) {
-        sys->p_input = playlist_CurrentInput(p_playlist);
-    } else if (sys->p_input->b_dead) {
-        vlc_object_release(sys->p_input);
-        sys->p_input = NULL;
-    }
-}
-
 static void cleanup_run(void *data)
 {
     intf_thread_t *intf = data;
@@ -1820,9 +1806,11 @@ static void *Run(void *data)
 
     vlc_cleanup_push(cleanup_run, data);
     while (!sys->exit) {
-        UpdateInput(sys, p_playlist);
-        Redraw(intf);
-        HandleKey(intf);
+        input_thread_t *input = playlist_CurrentInput(p_playlist);
+
+        Redraw(intf, input);
+        HandleKey(intf, input);
+        vlc_object_release(input);
     }
     vlc_cleanup_pop();
 
@@ -1897,9 +1885,6 @@ static void Close(vlc_object_t *p_this)
     DirsDestroy(sys);
 
     free(sys->current_dir);
-
-    if (sys->p_input)
-        vlc_object_release(sys->p_input);
 
     if (can_change_color())
         /* Restore yellow to its original color */
