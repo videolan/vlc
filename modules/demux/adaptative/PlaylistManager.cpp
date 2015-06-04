@@ -116,7 +116,7 @@ bool PlaylistManager::start(demux_t *demux)
 
 Stream::status PlaylistManager::demux(mtime_t nzdeadline)
 {
-    Stream::status i_return = Stream::status_demuxed;
+    Stream::status i_return = Stream::status_eof;
 
     for(int type=0; type<StreamTypeCount; type++)
     {
@@ -126,10 +126,15 @@ Stream::status PlaylistManager::demux(mtime_t nzdeadline)
         Stream::status i_ret =
                 streams[type]->demux(conManager, nzdeadline);
 
-        if(i_ret < Stream::status_eof)
-            return i_ret;
-        else if (i_ret == Stream::status_buffering)
+        if(i_ret == Stream::status_buffering)
+        {
             i_return = Stream::status_buffering;
+        }
+        else if(i_ret == Stream::status_demuxed &&
+                i_return != Stream::status_buffering)
+        {
+            i_return = Stream::status_demuxed;
+        }
     }
 
     return i_return;
