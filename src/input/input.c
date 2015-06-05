@@ -313,7 +313,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
 
     /* Init Common fields */
-    p_input->b_eof = false;
     p_input->p->b_can_pace_control = true;
     p_input->p->i_start = 0;
     p_input->p->i_time  = 0;
@@ -2816,8 +2815,6 @@ static void input_ChangeState( input_thread_t *p_input, int i_state )
     p_input->p->i_state = i_state;
     if( i_state == ERROR_S )
         p_input->b_error = true;
-    else if( i_state == END_S )
-        p_input->b_eof = true;
 
     if( b_changed )
     {

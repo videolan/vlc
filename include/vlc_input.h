@@ -226,7 +226,6 @@ struct input_thread_t
     VLC_COMMON_MEMBERS
 
     bool b_error VLC_DEPRECATED;
-    bool b_eof VLC_DEPRECATED;
     bool b_preparsing;
     bool b_dead VLC_DEPRECATED;
 
