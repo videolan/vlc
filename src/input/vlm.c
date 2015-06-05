@@ -424,8 +424,11 @@ static void* Manage( void* p_object )
             for( j = 0; j < p_media->i_instance; )
             {
                 vlm_media_instance_sys_t *p_instance = p_media->instance[j];
+                int state = INIT_S;
 
-                if( p_instance->p_input && ( p_instance->p_input->b_eof || p_instance->p_input->b_error ) )
+                if( p_instance->p_input != NULL )
+                    state = var_GetInteger( p_instance->p_input, "state" );
+                if( state == END_S || state == ERROR_S )
                 {
                     int i_new_input_index;
 
@@ -985,14 +988,13 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     input_thread_t *p_input = p_instance->p_input;
     if( p_input )
     {
-        if( p_instance->i_index == i_input_index &&
-            !p_input->b_eof && !p_input->b_error )
+        if( p_instance->i_index == i_input_index )
         {
-            if( var_GetInteger( p_input, "state" ) == PAUSE_S )
+            int state = var_GetInteger( p_input, "state" );
+            if( state == PAUSE_S )
                 var_SetInteger( p_input, "state",  PLAYING_S );
             return VLC_SUCCESS;
         }
-
 
         input_Stop( p_input );
         input_Close( p_input );
