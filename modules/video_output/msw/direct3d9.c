@@ -202,10 +202,10 @@ static int Open(vlc_object_t *object)
 
     /* */
     vout_display_info_t info = vd->info;
-    info.is_slow = true;
+    info.is_slow = fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE;
     info.has_double_click = true;
     info.has_hide_mouse = false;
-    info.has_pictures_invalid = true;
+    info.has_pictures_invalid = fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE;
     info.has_event_thread = true;
     if (var_InheritBool(vd, "direct3d9-hw-blending") &&
         sys->d3dregion_format != D3DFMT_UNKNOWN &&
@@ -271,10 +271,77 @@ static void Close(vlc_object_t *object)
     free(vd->sys);
 }
 
+static void DestroyPicture(picture_t *picture)
+{
+    LPDIRECT3DDEVICE9 d3ddev;
+    if (!FAILED(IDirect3DSurface9_GetDevice(picture->p_sys->surface, &d3ddev)))
+        IDirect3DDevice9_Release(d3ddev);
+
+    IDirect3DSurface9_Release(picture->p_sys->surface);
+
+    free(picture->p_sys);
+    free(picture);
+}
+
 /* */
 static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
-    VLC_UNUSED(count);
+    if ( vd->sys->pool != NULL )
+        return vd->sys->pool;
+
+    picture_t**       pictures = NULL;
+    unsigned          picture_count = 0;
+
+    pictures = calloc(count, sizeof(*pictures));
+    if (!pictures)
+        goto error;
+    for (picture_count = 0; picture_count < count; ++picture_count)
+    {
+        picture_sys_t *picsys = malloc(sizeof(*picsys));
+        if (unlikely(picsys == NULL))
+            goto error;
+
+        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(vd->sys->d3ddev,
+                                                          vd->fmt.i_visible_width,
+                                                          vd->fmt.i_visible_height,
+                                                          MAKEFOURCC('N','V','1','2'),
+                                                          D3DPOOL_DEFAULT,
+                                                          &picsys->surface,
+                                                          NULL);
+        if (FAILED(hr)) {
+           msg_Err(vd, "Failed to allocate surface %d (hr=0x%0lx)", picture_count, hr);
+           goto error;
+        }
+
+        picture_resource_t resource = {
+            .p_sys = picsys,
+            .pf_destroy = DestroyPicture,
+        };
+
+        picture_t *picture = picture_NewFromResource(&vd->fmt, &resource);
+        if (unlikely(picture == NULL)) {
+            free(picsys);
+            goto error;
+        }
+
+        pictures[picture_count] = picture;
+        /* each picture_t holds a ref to the device and release it on Destroy */
+        IDirect3DDevice9_AddRef(vd->sys->d3ddev);
+    }
+
+    picture_pool_configuration_t pool_cfg;
+    memset(&pool_cfg, 0, sizeof(pool_cfg));
+    pool_cfg.picture_count = count;
+    pool_cfg.picture       = pictures;
+
+    vd->sys->pool = picture_pool_NewExtended( &pool_cfg );
+
+error:
+    if (vd->sys->pool == NULL && pictures) {
+        for (unsigned i=0;i<picture_count; ++i)
+            DestroyPicture(pictures[i]);
+        free(pictures);
+    }
     return vd->sys->pool;
 }
 
@@ -285,19 +352,14 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
     LPDIRECT3DSURFACE9 surface = picture->p_sys->surface;
-#if 0
-    picture_Release(picture);
-    VLC_UNUSED(subpicture);
-#else
+
     /* FIXME it is a bit ugly, we need the surface to be unlocked for
      * rendering.
      *  The clean way would be to release the picture (and ensure that
      * the vout doesn't keep a reference). But because of the vout
      * wrapper, we can't */
-
-    Direct3D9UnlockSurface(picture);
-    VLC_UNUSED(subpicture);
-#endif
+    if ( picture->format.i_chroma != VLC_CODEC_D3D9_OPAQUE )
+        Direct3D9UnlockSurface(picture);
 
     /* check if device is still available */
     HRESULT hr = IDirect3DDevice9_TestCooperativeLevel(sys->d3ddev);
@@ -354,14 +416,10 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         msg_Dbg(vd, "Failed IDirect3DDevice9_Present: 0x%0lx", hr);
     }
 
-#if 0
-    VLC_UNUSED(picture);
-    VLC_UNUSED(subpicture);
-#else
     /* XXX See Prepare() */
-    Direct3D9LockSurface(picture);
+    if ( picture->format.i_chroma != VLC_CODEC_D3D9_OPAQUE )
+        Direct3D9LockSurface(picture);
     picture_Release(picture);
-#endif
     if (subpicture)
         subpicture_Delete(subpicture);
 
@@ -860,6 +918,7 @@ static const d3d_format_t d3d_formats[] = {
     { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_I420,  0,0,0 },
     { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_J420,  0,0,0 },
     { "NV12",       MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12,  0,0,0 },
+    { "DXA9",       MAKEFOURCC('N','V','1','2'),    VLC_CODEC_D3D9_OPAQUE,  0,0,0 },
     { "UYVY",       D3DFMT_UYVY,    VLC_CODEC_UYVY,  0,0,0 },
     { "YUY2",       D3DFMT_YUY2,    VLC_CODEC_YUYV,  0,0,0 },
     { "X8R8G8B8",   D3DFMT_X8R8G8B8,VLC_CODEC_RGB32, 0xff0000, 0x00ff00, 0x0000ff },
@@ -879,8 +938,11 @@ static const d3d_format_t *Direct3DFindFormat(vout_display_t *vd, vlc_fourcc_t c
 
     for (unsigned pass = 0; pass < 2; pass++) {
         const vlc_fourcc_t *list;
+        const vlc_fourcc_t dxva_chroma[] = {chroma, 0};
 
-        if (pass == 0 && sys->allow_hw_yuv && vlc_fourcc_IsYUV(chroma))
+        if (pass == 0 && chroma == VLC_CODEC_D3D9_OPAQUE)
+            list = dxva_chroma;
+        else if (pass == 0 && sys->allow_hw_yuv && vlc_fourcc_IsYUV(chroma))
             list = vlc_fourcc_GetYUVFallback(chroma);
         else if (pass == 1)
             list = vlc_fourcc_GetRGBFallback(chroma);
@@ -966,6 +1028,10 @@ static int Direct3D9CreatePool(vout_display_t *vd, video_format_t *fmt)
     fmt->i_gmask  = d3dfmt->gmask;
     fmt->i_bmask  = d3dfmt->bmask;
 
+    if ( fmt->i_chroma == VLC_CODEC_D3D9_OPAQUE )
+        /* a DXA9 pool will be created when needed */
+        return VLC_SUCCESS;
+
     /* We create one picture.
      * It is useless to create more as we can't be used for direct rendering */
 
@@ -1038,9 +1104,11 @@ static void Direct3D9DestroyPool(vout_display_t *vd)
 
     if (sys->pool) {
         picture_sys_t *picsys = sys->picsys;
-        IDirect3DSurface9_Release(picsys->surface);
-        if (picsys->fallback)
-            picture_Release(picsys->fallback);
+        if ( picsys != NULL ) {
+            IDirect3DSurface9_Release(picsys->surface);
+            if (picsys->fallback)
+                picture_Release(picsys->fallback);
+        }
         picture_pool_Release(sys->pool);
     }
     sys->pool = NULL;
