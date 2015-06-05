@@ -524,8 +524,11 @@ static void *Run( void *data )
                 var_AddCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
             }
         }
-#warning This is not reliable...
-        else if( p_sys->p_input->b_dead )
+
+        int state;
+        if( p_sys->p_input != NULL
+         && ((state = var_GetInteger( p_sys->p_input, "state")) == ERROR_S
+          || state == END_S) )
         {
             var_DelCallback( p_sys->p_input, "intf-event", InputEvent, p_intf );
             vlc_object_release( p_sys->p_input );
