@@ -27,6 +27,7 @@
 #include <string>
 #include <list>
 #include <vlc_common.h>
+#include <vlc_es.h>
 #include "StreamsType.hpp"
 
 namespace adaptative
@@ -100,6 +101,7 @@ namespace adaptative
         virtual void setPosition(mtime_t) = 0;
         virtual void sendToDecoder(mtime_t) = 0;
         virtual bool reinitsOnSeek() const = 0;
+        virtual bool switchAllowed() const = 0;
 
     protected:
         demux_t  *realdemux;
@@ -130,12 +132,14 @@ namespace adaptative
         virtual void setPosition(mtime_t); /* reimpl */
         virtual void sendToDecoder(mtime_t); /* reimpl */
         virtual bool reinitsOnSeek() const; /* reimpl */
+        virtual bool switchAllowed() const; /* reimpl */
 
     protected:
         es_out_t *fakeesout; /* to intercept/proxy what is sent from demuxstream */
         stream_t *demuxstream;
         bool      seekable;
         std::string name;
+        bool      restarting;
 
     private:
         static es_out_id_t *esOutAdd(es_out_t *, const es_format_t *);
@@ -147,12 +151,14 @@ namespace adaptative
         class Demuxed
         {
             friend class BaseStreamOutput;
-            Demuxed();
+            Demuxed(es_out_id_t *, const es_format_t *);
             ~Demuxed();
             void drop();
             es_out_id_t *es_id;
             block_t  *p_queue;
             block_t **pp_queue_last;
+            bool recycle;
+            es_format_t fmtcpy;
         };
         std::list<Demuxed *> queues;
         vlc_mutex_t lock;

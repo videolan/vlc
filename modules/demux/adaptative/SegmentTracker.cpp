@@ -54,7 +54,7 @@ void SegmentTracker::resetCounter()
     prevRepresentation = NULL;
 }
 
-Chunk * SegmentTracker::getNextChunk(StreamType type)
+Chunk * SegmentTracker::getNextChunk(StreamType type, bool switch_allowed)
 {
     BaseRepresentation *rep;
     ISegment *segment;
@@ -62,7 +62,8 @@ Chunk * SegmentTracker::getNextChunk(StreamType type)
     if(!currentPeriod)
         return NULL;
 
-    if(prevRepresentation && prevRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE)
+    if( !switch_allowed ||
+       (prevRepresentation && prevRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE) )
         rep = prevRepresentation;
     else
         rep = logic->getCurrentRepresentation(type, currentPeriod);
@@ -97,7 +98,7 @@ Chunk * SegmentTracker::getNextChunk(StreamType type)
     {
         currentPeriod = playlist->getNextPeriod(currentPeriod);
         resetCounter();
-        return getNextChunk(type);
+        return getNextChunk(type, switch_allowed);
     }
 
     Chunk *chunk = segment->toChunk(count, rep);
