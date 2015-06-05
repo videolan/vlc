@@ -97,3 +97,12 @@ chroma_LTLIBRARIES += \
 	libi420_yuy2_sse2_plugin.la \
 	libi422_yuy2_sse2_plugin.la
 endif
+
+# DXVA2
+libdxa9_plugin_la_SOURCES = video_chroma/dxa9.c \
+	video_chroma/copy.c video_chroma/copy.h
+
+if HAVE_AVCODEC_DXVA2
+chroma_LTLIBRARIES += \
+	libdxa9_plugin.la
+endif
