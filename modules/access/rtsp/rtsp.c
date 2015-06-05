@@ -284,7 +284,7 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
 
 int rtsp_send_ok( rtsp_client_t *rtsp )
 {
-    char cseq[16];
+    char cseq[17];
 
     rtsp_put( rtsp, "RTSP/1.0 200 OK" );
     sprintf( cseq, "CSeq: %u", rtsp->p_private->cseq );
