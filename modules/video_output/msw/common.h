@@ -183,7 +183,6 @@ struct vout_display_sys_t
     d3d_quad_cfg_t           picQuadConfig;
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
-    picture_sys_t            *picsys;
     const char               *d3dPxShader;
 
     // SPU
