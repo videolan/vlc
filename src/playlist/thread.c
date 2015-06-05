@@ -442,10 +442,11 @@ static void LoopInput( playlist_t *p_playlist )
         input_Stop( p_input );
     }
 
-#warning Unsynchronized access to *p_input flags...
-    /* This input is dead. Remove it ! */
-    if( p_input->b_dead )
+    switch( var_GetInteger( p_input, "state" ) )
     {
+    case END_S:
+    case ERROR_S:
+    /* This input is dead. Remove it ! */
         p_sys->p_input = NULL;
         PL_DEBUG( "dead input" );
         PL_UNLOCK;
@@ -460,10 +461,10 @@ static void LoopInput( playlist_t *p_playlist )
 
         input_Close( p_input );
         PL_LOCK;
-        return;
+        break;
+    default:
+        vlc_cond_wait( &p_sys->signal, &p_sys->lock );
     }
-
-    vlc_cond_wait( &p_sys->signal, &p_sys->lock );
 }
 
 static bool Next( playlist_t *p_playlist )
