@@ -350,6 +350,7 @@ modules/codec/avcodec/audio.c
 modules/codec/avcodec/avcodec.c
 modules/codec/avcodec/avcodec.h
 modules/codec/avcodec/chroma.c
+modules/codec/avcodec/d3d11va.c
 modules/codec/avcodec/dxva2.c
 modules/codec/avcodec/encoder.c
 modules/codec/avcodec/fourcc.c
@@ -1060,6 +1061,7 @@ modules/text_renderer/svg.c
 modules/text_renderer/tdummy.c
 modules/text_renderer/win32text.c
 modules/video_chroma/chain.c
+modules/video_chroma/d3d11_surface.c
 modules/video_chroma/dxa9.c
 modules/video_chroma/grey_yuv.c
 modules/video_chroma/i420_rgb16.c
