@@ -1377,7 +1377,7 @@ static bool f_appExit = false;
 {
     input_thread_t *p_input_changed = NULL;
 
-    if (p_current_input && (p_current_input->b_dead || !vlc_object_alive(p_current_input))) {
+    if (p_current_input && p_current_input->b_dead) {
         var_DelCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
         vlc_object_release(p_current_input);
         p_current_input = NULL;
