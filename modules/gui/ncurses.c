@@ -1810,7 +1810,8 @@ static void *Run(void *data)
 
         Redraw(intf, input);
         HandleKey(intf, input);
-        vlc_object_release(input);
+        if (input)
+            vlc_object_release(input);
     }
     vlc_cleanup_pop();
 
