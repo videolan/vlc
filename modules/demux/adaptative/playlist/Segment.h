@@ -45,7 +45,7 @@ namespace adaptative
         {
             public:
                 ISegment(const ICanonicalUrl *parent);
-                virtual ~ISegment(){}
+                virtual ~ISegment();
                 /**
                  *  @return true if the segment should be dropped after being read.
                  *          That is basically true when using an Url, and false
@@ -61,6 +61,7 @@ namespace adaptative
                 int                                     getClassId      () const;
                 Property<mtime_t>       startTime;
                 Property<mtime_t>       duration;
+                Property<unsigned>      chunksuse;
 
                 static const int CLASSID_ISEGMENT = 0;
 
@@ -74,6 +75,7 @@ namespace adaptative
                 {
                     public:
                         SegmentChunk(ISegment *segment, const std::string &url);
+                        virtual ~SegmentChunk();
                         void setRepresentation(BaseRepresentation *);
                         virtual void onDownload(block_t **); // reimpl
 

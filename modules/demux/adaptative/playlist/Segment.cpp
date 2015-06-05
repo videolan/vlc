@@ -29,6 +29,7 @@
 
 #include "Segment.h"
 #include "BaseRepresentation.h"
+#include <cassert>
 
 using namespace adaptative::http;
 using namespace adaptative::playlist;
@@ -42,6 +43,12 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     classId = CLASSID_ISEGMENT;
     startTime.Set(VLC_TS_INVALID);
     duration.Set(0);
+    chunksuse.Set(0);
+}
+
+ISegment::~ISegment()
+{
+    assert(chunksuse.Get() == 0);
 }
 
 Chunk * ISegment::getChunk(const std::string &url)
@@ -114,6 +121,13 @@ ISegment::SegmentChunk::SegmentChunk(ISegment *segment_, const std::string &url)
     Chunk(url)
 {
     segment = segment_;
+    segment->chunksuse.Set(segment->chunksuse.Get() + 1);
+}
+
+ISegment::SegmentChunk::~SegmentChunk()
+{
+    assert(segment->chunksuse.Get() > 0);
+    segment->chunksuse.Set(segment->chunksuse.Get() - 1);
 }
 
 void ISegment::SegmentChunk::setRepresentation(BaseRepresentation *rep_)
