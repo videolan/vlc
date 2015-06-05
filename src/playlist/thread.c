@@ -462,12 +462,6 @@ static void LoopInput( playlist_t *p_playlist )
         PL_LOCK;
         return;
     }
-    /* This input has finished, ask it to die ! */
-    else if( p_input->b_error || p_input->b_eof )
-    {
-        PL_DEBUG( "finished input" );
-        input_Stop( p_input );
-    }
 
     vlc_cond_wait( &p_sys->signal, &p_sys->lock );
 }
