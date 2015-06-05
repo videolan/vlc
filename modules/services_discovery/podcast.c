@@ -235,8 +235,9 @@ static void *Run( void *data )
         for( int i = 0; i < p_sd->p_sys->i_input; i++ )
         {
             input_thread_t *p_input = p_sd->p_sys->pp_input[i];
+            int state = var_GetInteger( p_input, "state" );
 
-            if( p_input->b_eof || p_input->b_error )
+            if( state == END_S || state == ERROR_S )
             {
                 input_Stop( p_input );
                 input_Close( p_input );
