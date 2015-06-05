@@ -685,7 +685,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     bool b_pause_after_eof = b_interactive &&
                              var_InheritBool( p_input, "play-and-pause" );
 
-    while( vlc_object_alive( p_input ) && !p_input->b_error )
+    while( vlc_object_alive( p_input ) && p_input->p->i_state != ERROR_S )
     {
         mtime_t i_wakeup = -1;
         bool b_paused = p_input->p->i_state == PAUSE_S;
@@ -2810,17 +2810,13 @@ static void InputGetExtraFiles( input_thread_t *p_input,
 /* */
 static void input_ChangeState( input_thread_t *p_input, int i_state )
 {
-    const bool b_changed = p_input->p->i_state != i_state;
+    if( p_input->p->i_state == i_state )
+        return;
 
     p_input->p->i_state = i_state;
     if( i_state == ERROR_S )
-        p_input->b_error = true;
-
-    if( b_changed )
-    {
-        input_item_SetErrorWhenReading( p_input->p->p_item, p_input->b_error );
-        input_SendEventState( p_input, i_state );
-    }
+        input_item_SetErrorWhenReading( p_input->p->p_item, true );
+    input_SendEventState( p_input, i_state );
 }
 
 
