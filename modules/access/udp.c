@@ -262,7 +262,11 @@ static void* ThreadRead( void *data )
     {
         block_t *pkt = block_Alloc(MTU);
         if (unlikely(pkt == NULL))
-            break;
+        {   /* OOM - dequeue and discard one packet */
+            char dummy;
+            net_Read(access, sys->fd, &dummy, 1, false);
+            continue;
+        }
 
         ssize_t len;
 
