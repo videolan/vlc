@@ -785,9 +785,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
         }
     }
-
-    if( !p_input->b_error )
-        input_ChangeState( p_input, END_S );
 }
 
 static void InitStatistics( input_thread_t * p_input )
