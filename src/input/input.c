@@ -58,8 +58,6 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void Destructor( input_thread_t * p_input );
-
 static  void *Run            ( void * );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
@@ -258,6 +256,41 @@ void input_Close( input_thread_t *p_input )
     if( p_input->p->is_running )
         vlc_join( p_input->p->thread, NULL );
     vlc_object_release( p_input );
+}
+
+/**
+ * Input destructor (called when the object's refcount reaches 0).
+ */
+static void input_Destructor( vlc_object_t *obj )
+{
+    input_thread_t *p_input = (input_thread_t *)obj;
+#ifndef NDEBUG
+    char * psz_name = input_item_GetName( p_input->p->p_item );
+    msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
+    free( psz_name );
+#endif
+
+    if( p_input->p->p_es_out_display )
+        es_out_Delete( p_input->p->p_es_out_display );
+
+    if( p_input->p->p_resource )
+        input_resource_Release( p_input->p->p_resource );
+    if( p_input->p->p_resource_private )
+        input_resource_Release( p_input->p->p_resource_private );
+
+    vlc_gc_decref( p_input->p->p_item );
+
+    vlc_mutex_destroy( &p_input->p->counters.counters_lock );
+
+    for( int i = 0; i < p_input->p->i_control; i++ )
+    {
+        input_control_t *p_ctrl = &p_input->p->control[i];
+        ControlRelease( p_ctrl->i_type, p_ctrl->val );
+    }
+
+    vlc_cond_destroy( &p_input->p->wait_control );
+    vlc_mutex_destroy( &p_input->p->lock_control );
+    free( p_input->p );
 }
 
 /**
@@ -472,43 +505,9 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->p_es_out = NULL;
 
     /* Set the destructor when we are sure we are initialized */
-    vlc_object_set_destructor( p_input, (vlc_destructor_t)Destructor );
+    vlc_object_set_destructor( p_input, input_Destructor );
 
     return p_input;
-}
-
-/**
- * Input destructor (called when the object's refcount reaches 0).
- */
-static void Destructor( input_thread_t * p_input )
-{
-#ifndef NDEBUG
-    char * psz_name = input_item_GetName( p_input->p->p_item );
-    msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
-    free( psz_name );
-#endif
-
-    if( p_input->p->p_es_out_display )
-        es_out_Delete( p_input->p->p_es_out_display );
-
-    if( p_input->p->p_resource )
-        input_resource_Release( p_input->p->p_resource );
-    if( p_input->p->p_resource_private )
-        input_resource_Release( p_input->p->p_resource_private );
-
-    vlc_gc_decref( p_input->p->p_item );
-
-    vlc_mutex_destroy( &p_input->p->counters.counters_lock );
-
-    for( int i = 0; i < p_input->p->i_control; i++ )
-    {
-        input_control_t *p_ctrl = &p_input->p->control[i];
-        ControlRelease( p_ctrl->i_type, p_ctrl->val );
-    }
-
-    vlc_cond_destroy( &p_input->p->wait_control );
-    vlc_mutex_destroy( &p_input->p->lock_control );
-    free( p_input->p );
 }
 
 /*****************************************************************************
