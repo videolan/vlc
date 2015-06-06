@@ -69,10 +69,8 @@ AbstractPlaylist * SegmentInformation::getPlaylist() const
         return NULL;
 }
 
-vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
+std::size_t SegmentInformation::getSegments(SegmentInfoType type, vector<ISegment *> &retSegments) const
 {
-    vector<ISegment *> retSegments;
-
     switch (type)
     {
         case INFOTYPE_INIT:
@@ -136,28 +134,28 @@ vector<ISegment *> SegmentInformation::getSegments(SegmentInfoType type) const
     }
 
     if( retSegments.empty() && parent )
-        return parent->getSegments( type );
+        return parent->getSegments( type, retSegments );
     else
-        return retSegments;
+        return retSegments.size();
 }
 
-vector<ISegment *> SegmentInformation::getSegments() const
+std::size_t SegmentInformation::getSegments(vector<ISegment *> &retSegments) const
 {
-    vector<ISegment *> retSegments;
     for(int i=0; i<InfoTypeCount; i++)
     {
-        vector<ISegment *> segs = getSegments(static_cast<SegmentInfoType>(i));
-        retSegments.insert( retSegments.end(), segs.begin(), segs.end() );
+        vector<ISegment *> segs;
+        if( getSegments(static_cast<SegmentInfoType>(i), segs) )
+            retSegments.insert( retSegments.end(), segs.begin(), segs.end() );
     }
-    return retSegments;
+    return retSegments.size();
 }
 
 ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) const
 {
     ISegment *segment = NULL;
 
-    vector<ISegment *> retSegments = getSegments( type );
-    const size_t size = retSegments.size();
+    vector<ISegment *> retSegments;
+    const size_t size = getSegments( type, retSegments );
     if( size )
     {
         /* check if that's a template (fixme: find a better way) */
@@ -192,7 +190,8 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
     }
     else
     {
-        const std::vector<ISegment *> segments = getSegments(INFOTYPE_MEDIA);
+        std::vector<ISegment *> segments;
+        getSegments(INFOTYPE_MEDIA, segments);
         std::vector<ISegment *>::const_iterator it;
         *ret = 0;
         for(it = segments.begin(); it != segments.end(); ++it)
@@ -254,7 +253,8 @@ void SegmentInformation::collectTimelines(std::vector<SegmentTimeline *> *timeli
 void SegmentInformation::getDurationsRange(mtime_t *min, mtime_t *max) const
 {
     /* FIXME: cache stuff in segment holders */
-    std::vector<ISegment *> seglist = getSegments(INFOTYPE_MEDIA);
+    std::vector<ISegment *> seglist;
+    getSegments(INFOTYPE_MEDIA, seglist);
     std::vector<ISegment *>::const_iterator it;
     mtime_t total = 0;
     for(it = seglist.begin(); it != seglist.end(); ++it)
@@ -344,7 +344,8 @@ static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
 
 void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
 {
-    std::vector<ISegment *> seglist = getSegments(INFOTYPE_MEDIA);
+    std::vector<ISegment *> seglist;
+    getSegments(INFOTYPE_MEDIA, seglist);
     std::vector<SplitPoint>::const_iterator splitIt;
     size_t start = 0, end = 0;
     mtime_t time = 0;
