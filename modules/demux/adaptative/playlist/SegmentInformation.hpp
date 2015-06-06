@@ -82,7 +82,7 @@ namespace adaptative
                 virtual void mergeWith(SegmentInformation *, mtime_t);
 
             protected:
-                std::size_t getSegments(std::vector<ISegment *> &) const;
+                std::size_t getAllSegments(std::vector<ISegment *> &) const;
                 std::size_t getSegments(SegmentInfoType, std::vector<ISegment *>&) const;
                 std::vector<SegmentInformation *> childs;
                 SegmentInformation *parent;

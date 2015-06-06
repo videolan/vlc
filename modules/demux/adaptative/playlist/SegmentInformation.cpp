@@ -139,7 +139,7 @@ std::size_t SegmentInformation::getSegments(SegmentInfoType type, vector<ISegmen
         return retSegments.size();
 }
 
-std::size_t SegmentInformation::getSegments(vector<ISegment *> &retSegments) const
+std::size_t SegmentInformation::getAllSegments(vector<ISegment *> &retSegments) const
 {
     for(int i=0; i<InfoTypeCount; i++)
     {
