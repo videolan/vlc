@@ -220,6 +220,7 @@ int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
  */
 int input_Start( input_thread_t *p_input )
 {
+    assert( !p_input->p->is_running );
     /* Create thread and wait for its readiness. */
     p_input->p->is_running = !vlc_clone( &p_input->p->thread,
                                          Run, p_input, VLC_THREAD_PRIORITY_INPUT );
