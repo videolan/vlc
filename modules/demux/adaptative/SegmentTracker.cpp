@@ -62,7 +62,7 @@ Chunk * SegmentTracker::getNextChunk(StreamType type)
     if(!currentPeriod)
         return NULL;
 
-    if(prevRepresentation && !prevRepresentation->canBitswitch())
+    if(prevRepresentation && prevRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE)
         rep = prevRepresentation;
     else
         rep = logic->getCurrentRepresentation(type, currentPeriod);

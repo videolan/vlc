@@ -54,7 +54,14 @@ namespace adaptative
                 SegmentInformation( SegmentInformation * = 0 );
                 explicit SegmentInformation( AbstractPlaylist * );
                 virtual ~SegmentInformation();
-                bool canBitswitch() const;
+                typedef enum SwitchPolicy
+                {
+                    SWITCH_UNKNOWN,
+                    SWITCH_UNAVAILABLE,
+                    SWITCH_SEGMENT_ALIGNED,
+                    SWITCH_BITSWITCHEABLE
+                } SwitchPolicy;
+                SwitchPolicy getSwitchPolicy() const;
                 virtual mtime_t getPeriodStart() const;
                 virtual AbstractPlaylist *getPlaylist() const;
 
@@ -87,12 +94,13 @@ namespace adaptative
                 std::size_t getSegments(SegmentInfoType, std::vector<ISegment *>&, std::size_t * = NULL) const;
                 std::vector<SegmentInformation *> childs;
                 SegmentInformation *parent;
+                SwitchPolicy switchpolicy;
 
             public:
                 void setSegmentList(SegmentList *);
                 void setSegmentBase(SegmentBase *);
                 void setSegmentTemplate(MediaSegmentTemplate *);
-                void setBitstreamSwitching(bool);
+                void setSwitchPolicy(SwitchPolicy);
                 virtual Url getUrlSegment() const; /* impl */
                 Property<Url *> baseUrl;
 
@@ -105,13 +113,6 @@ namespace adaptative
                 SegmentBase     *segmentBase;
                 SegmentList     *segmentList;
                 MediaSegmentTemplate *mediaSegmentTemplate;
-
-                enum BitswitchPolicy
-                {
-                    BITSWITCH_INHERIT,
-                    BITSWITCH_YES,
-                    BITSWITCH_NO
-                } bitswitch_policy;
         };
     }
 }

@@ -51,7 +51,7 @@ void SegmentInformation::init()
     segmentBase = NULL;
     segmentList = NULL;
     mediaSegmentTemplate = NULL;
-    bitswitch_policy = BITSWITCH_INHERIT;
+    switchpolicy = SWITCH_UNKNOWN;
 }
 
 SegmentInformation::~SegmentInformation()
@@ -306,12 +306,12 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
         childs.at(i)->pruneBySegmentNumber(num);
 }
 
-bool SegmentInformation::canBitswitch() const
+SegmentInformation::SwitchPolicy SegmentInformation::getSwitchPolicy() const
 {
-    if(bitswitch_policy == BITSWITCH_INHERIT)
-        return (parent) ? parent->canBitswitch() : false;
+    if(switchpolicy == SWITCH_UNKNOWN)
+        return (parent) ? parent->getSwitchPolicy() : SWITCH_UNAVAILABLE;
     else
-        return (bitswitch_policy == BITSWITCH_YES);
+        return switchpolicy;
 }
 
 mtime_t SegmentInformation::getPeriodStart() const
@@ -385,9 +385,9 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
     }
 }
 
-void SegmentInformation::setBitstreamSwitching(bool bitswitch)
+void SegmentInformation::setSwitchPolicy(SegmentInformation::SwitchPolicy policy)
 {
-    bitswitch_policy = (bitswitch) ? BITSWITCH_YES : BITSWITCH_NO;
+    switchpolicy = policy;
 }
 
 Url SegmentInformation::getUrlSegment() const

@@ -69,7 +69,7 @@ void BaseAdaptationSet::addRepresentation(BaseRepresentation *rep)
     childs.push_back(rep);
 }
 
-void BaseAdaptationSet::setBitstreamSwitching  (bool value)
+void BaseAdaptationSet::setSwitchPolicy  (bool value)
 {
     this->isBitstreamSwitching = value;
 }

@@ -47,7 +47,7 @@ namespace adaptative
 
                 virtual const std::string&      getMimeType() const; /*reimpl*/
                 std::vector<BaseRepresentation *>&  getRepresentations      ();
-                void                            setBitstreamSwitching(bool value);
+                void                            setSwitchPolicy(bool value);
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( BaseRepresentation *rep );
                 void                            debug(vlc_object_t *,int = 0) const;
