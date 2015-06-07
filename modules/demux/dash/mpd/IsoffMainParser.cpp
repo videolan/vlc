@@ -101,7 +101,11 @@ void    IsoffMainParser::setMPDAttributes   ()
 
     it = attr.find("minimumUpdatePeriod");
     if(it != attr.end())
-        mpd->minUpdatePeriod.Set(IsoTime(it->second));
+    {
+        mtime_t minupdate = IsoTime(it->second);
+        if(minupdate > 0)
+            mpd->minUpdatePeriod.Set(minupdate);
+    }
 
     it = attr.find("maxSegmentDuration");
     if(it != attr.end())
