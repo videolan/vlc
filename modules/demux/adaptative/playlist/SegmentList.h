@@ -48,9 +48,12 @@ namespace adaptative
                 const std::vector<Segment *>&   getSegments() const;
                 void                    addSegment(Segment *seg);
                 void                    mergeWith(SegmentList *);
+                void                    pruneBySegmentNumber(uint64_t);
+                std::size_t             getOffset() const;
 
             private:
                 std::vector<Segment *>  segments;
+                std::size_t pruned;
         };
     }
 }

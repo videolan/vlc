@@ -71,6 +71,7 @@ namespace adaptative
         status demux(HTTPConnectionManager *, mtime_t);
         bool setPosition(mtime_t, bool);
         mtime_t getPosition() const;
+        void prune();
 
     private:
         Chunk *getChunk();

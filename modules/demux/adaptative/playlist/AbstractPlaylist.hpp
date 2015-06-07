@@ -54,6 +54,7 @@ namespace adaptative
                 virtual BasePeriod*                      getNextPeriod(BasePeriod *period);
 
                 void                mergeWith(AbstractPlaylist *, mtime_t = 0);
+                void                pruneBySegmentNumber(uint64_t);
                 void                getTimeLinesBoundaries(mtime_t *, mtime_t *) const;
                 void                getPlaylistDurationsRange(mtime_t *, mtime_t *) const;
 

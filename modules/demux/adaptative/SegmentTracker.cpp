@@ -131,3 +131,9 @@ mtime_t SegmentTracker::getSegmentStart() const
     else
         return 0;
 }
+
+void SegmentTracker::pruneFromCurrent()
+{
+    if(playlist->isLive())
+        playlist->pruneBySegmentNumber(count);
+}

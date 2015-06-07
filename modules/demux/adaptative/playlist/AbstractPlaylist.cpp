@@ -145,3 +145,9 @@ void AbstractPlaylist::mergeWith(AbstractPlaylist *updatedAbstractPlaylist, mtim
         periods.at(i)->mergeWith(updatedAbstractPlaylist->periods.at(i), prunebarrier);
 }
 
+void AbstractPlaylist::pruneBySegmentNumber(uint64_t num)
+{
+    for(size_t i = 0; i < periods.size(); i++)
+        periods.at(i)->pruneBySegmentNumber(num);
+}
+

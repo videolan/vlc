@@ -80,10 +80,11 @@ namespace adaptative
                 void collectTimelines(std::vector<SegmentTimeline *> *) const;
                 void getDurationsRange(mtime_t *, mtime_t *) const;
                 virtual void mergeWith(SegmentInformation *, mtime_t);
+                virtual void pruneBySegmentNumber(uint64_t);
 
             protected:
                 std::size_t getAllSegments(std::vector<ISegment *> &) const;
-                std::size_t getSegments(SegmentInfoType, std::vector<ISegment *>&) const;
+                std::size_t getSegments(SegmentInfoType, std::vector<ISegment *>&, std::size_t * = NULL) const;
                 std::vector<SegmentInformation *> childs;
                 SegmentInformation *parent;
 

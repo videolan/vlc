@@ -69,8 +69,10 @@ AbstractPlaylist * SegmentInformation::getPlaylist() const
         return NULL;
 }
 
-std::size_t SegmentInformation::getSegments(SegmentInfoType type, vector<ISegment *> &retSegments) const
+std::size_t SegmentInformation::getSegments(SegmentInfoType type, vector<ISegment *> &retSegments,
+                                            std::size_t *offset) const
 {
+    std::size_t off = 0;
     switch (type)
     {
         case INFOTYPE_INIT:
@@ -106,6 +108,7 @@ std::size_t SegmentInformation::getSegments(SegmentInfoType type, vector<ISegmen
                     std::vector<ISegment *> list = (*it)->subSegments();
                     retSegments.insert( retSegments.end(), list.begin(), list.end() );
                 }
+                off = segmentList->getOffset();
             }
             else if( segmentBase )
             {
@@ -134,9 +137,15 @@ std::size_t SegmentInformation::getSegments(SegmentInfoType type, vector<ISegmen
     }
 
     if( retSegments.empty() && parent )
-        return parent->getSegments( type, retSegments );
+    {
+        return parent->getSegments( type, retSegments, offset );
+    }
     else
+    {
+        if( offset )
+            *offset = off;
         return retSegments.size();
+    }
 }
 
 std::size_t SegmentInformation::getAllSegments(vector<ISegment *> &retSegments) const
@@ -155,7 +164,8 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
     ISegment *segment = NULL;
 
     vector<ISegment *> retSegments;
-    const size_t size = getSegments( type, retSegments );
+    std::size_t offset = 0;
+    const size_t size = getSegments( type, retSegments, &offset );
     if( size )
     {
         /* check if that's a template (fixme: find a better way) */
@@ -166,9 +176,9 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
                templ->segmentTimeline.Get()->maxElementNumber() > pos)
                 return templ;
         }
-        else if( pos < size )
+        else if( pos < size + offset && pos >= offset )
         {
-            segment = retSegments[pos];
+            segment = retSegments[pos - offset];
         }
     }
 
@@ -289,6 +299,15 @@ void SegmentInformation::mergeWith(SegmentInformation *updated, mtime_t prunetim
     {
         childs.at(i)->mergeWith(updated->childs.at(i), prunetime);
     }
+}
+
+void SegmentInformation::pruneBySegmentNumber(uint64_t num)
+{
+    if(segmentList)
+        segmentList->pruneBySegmentNumber(num);
+
+    for(size_t i=0; i<childs.size(); i++)
+        childs.at(i)->pruneBySegmentNumber(num);
 }
 
 bool SegmentInformation::canBitswitch() const

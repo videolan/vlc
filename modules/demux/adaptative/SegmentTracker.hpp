@@ -61,6 +61,7 @@ namespace adaptative
             Chunk* getNextChunk(StreamType);
             bool setPosition(mtime_t, bool, bool);
             mtime_t getSegmentStart() const;
+            void pruneFromCurrent();
 
         private:
             bool initializing;

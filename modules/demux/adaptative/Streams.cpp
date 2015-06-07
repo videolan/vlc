@@ -249,6 +249,11 @@ mtime_t Stream::getPosition() const
     return segmentTracker->getSegmentStart();
 }
 
+void Stream::prune()
+{
+    segmentTracker->pruneFromCurrent();
+}
+
 AbstractStreamOutput::AbstractStreamOutput(demux_t *demux)
 {
     realdemux = demux;

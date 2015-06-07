@@ -31,6 +31,7 @@ using namespace adaptative::playlist;
 SegmentList::SegmentList( SegmentInformation *parent ):
     SegmentInfoCommon( parent ), TimescaleAble( parent )
 {
+    pruned = 0;
 }
 SegmentList::~SegmentList()
 {
@@ -63,4 +64,29 @@ void SegmentList::mergeWith(SegmentList *updated)
             delete *it;
     }
     updated->segments.clear();
+}
+
+void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
+{
+    if(tobelownum < pruned)
+        return;
+
+    uint64_t current = pruned;
+    std::vector<Segment *>::iterator it = segments.begin();
+    while(it != segments.end() && current < tobelownum)
+    {
+        Segment *seg = *it;
+        if(seg->chunksuse.Get()) /* can't prune from here, still in use */
+            break;
+        delete *it;
+        it = segments.erase(it);
+
+        current++;
+        pruned++;
+    }
+}
+
+std::size_t SegmentList::getOffset() const
+{
+    return pruned;
 }
