@@ -241,10 +241,22 @@ int input_Start( input_thread_t *p_input )
 void input_Stop( input_thread_t *p_input )
 {
     /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
-     * It is needed here even if it is done in INPUT_CONTROL_SET_DIE handler to
-     * unlock the control loop */
+     */
     ObjectKillChildrens( VLC_OBJECT(p_input) );
-    input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
+
+    input_thread_private_t *sys = p_input->p;
+
+    vlc_mutex_lock( &sys->lock_control );
+    /* Discard all pending controls */
+    for( int i = 0; i < sys->i_control; i++ )
+    {
+        input_control_t *ctrl = &sys->control[i];
+        ControlRelease( ctrl->i_type, ctrl->val );
+    }
+    sys->i_control = 0;
+    sys->is_stopped = true;
+    vlc_cond_signal( &sys->wait_control );
+    vlc_mutex_unlock( &sys->lock_control );
 }
 
 /**
@@ -356,8 +368,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->title = NULL;
     p_input->p->i_title_offset = p_input->p->i_seekpoint_offset = 0;
     p_input->p->i_state = INIT_S;
-    p_input->p->i_rate = INPUT_RATE_DEFAULT;
+    p_input->p->is_running = false;
+    p_input->p->is_stopped = false;
     p_input->p->b_recording = false;
+    p_input->p->i_rate = INPUT_RATE_DEFAULT;
     memset( &p_input->p->bookmark, 0, sizeof(p_input->p->bookmark) );
     TAB_INIT( p_input->p->i_bookmark, p_input->p->pp_bookmark );
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
@@ -426,7 +440,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     vlc_mutex_init( &p_input->p->lock_control );
     vlc_cond_init( &p_input->p->wait_control );
     p_input->p->i_control = 0;
-    p_input->p->is_running = false;
 
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
@@ -1390,19 +1403,12 @@ static void End( input_thread_t * p_input )
 void input_ControlPush( input_thread_t *p_input,
                         int i_type, vlc_value_t *p_val )
 {
-    vlc_mutex_lock( &p_input->p->lock_control );
-    if( i_type == INPUT_CONTROL_SET_DIE )
-    {
-        /* Special case, empty the control */
-        for( int i = 0; i < p_input->p->i_control; i++ )
-        {
-            input_control_t *p_ctrl = &p_input->p->control[i];
-            ControlRelease( p_ctrl->i_type, p_ctrl->val );
-        }
-        p_input->p->i_control = 0;
-    }
+    input_thread_private_t *sys = p_input->p;
 
-    if( p_input->p->i_control >= INPUT_CONTROL_FIFO_SIZE )
+    vlc_mutex_lock( &sys->lock_control );
+    if( sys->is_stopped )
+        ;
+    else if( sys->i_control >= INPUT_CONTROL_FIFO_SIZE )
     {
         msg_Err( p_input, "input control fifo overflow, trashing type=%d",
                  i_type );
@@ -1418,10 +1424,10 @@ void input_ControlPush( input_thread_t *p_input,
         else
             memset( &c.val, 0, sizeof(c.val) );
 
-        p_input->p->control[p_input->p->i_control++] = c;
+        sys->control[sys->i_control++] = c;
     }
-    vlc_cond_signal( &p_input->p->wait_control );
-    vlc_mutex_unlock( &p_input->p->lock_control );
+    vlc_cond_signal( &sys->wait_control );
+    vlc_mutex_unlock( &sys->lock_control );
 }
 
 static int ControlGetReducedIndexLocked( input_thread_t *p_input )
@@ -1469,7 +1475,7 @@ static inline int ControlPop( input_thread_t *p_input,
     while( p_sys->i_control <= 0 ||
            ( b_postpone_seek && ControlIsSeekRequest( p_sys->control[0].i_type ) ) )
     {
-        if( !vlc_object_alive( p_input ) )
+        if( p_sys->is_stopped )
         {
             vlc_mutex_unlock( &p_sys->lock_control );
             return VLC_EGENERIC;
@@ -1613,13 +1619,6 @@ static bool Control( input_thread_t *p_input,
 
     switch( i_type )
     {
-        case INPUT_CONTROL_SET_DIE:
-            msg_Dbg( p_input, "control: stopping input" );
-
-            /* Mark all submodules to die */
-            ObjectKillChildrens( VLC_OBJECT(p_input) );
-            break;
-
         case INPUT_CONTROL_SET_POSITION:
         {
             if( p_input->p->b_recording )

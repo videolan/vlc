@@ -79,12 +79,14 @@ struct input_thread_private_t
 {
     /* Global properties */
     double      f_fps;
-    int         i_state;
     bool        b_can_pause;
     bool        b_can_rate_control;
     bool        b_can_pace_control;
 
     /* Current state */
+    int         i_state;
+    bool        is_running;
+    bool        is_stopped;
     bool        b_recording;
     int         i_rate;
 
@@ -161,7 +163,6 @@ struct input_thread_private_t
     int i_control;
     input_control_t control[INPUT_CONTROL_FIFO_SIZE];
 
-    bool is_running;
     vlc_thread_t thread;
 };
 
@@ -170,8 +171,6 @@ struct input_thread_private_t
  ***************************************************************************/
 enum input_control_e
 {
-    INPUT_CONTROL_SET_DIE,
-
     INPUT_CONTROL_SET_STATE,
 
     INPUT_CONTROL_SET_RATE,
