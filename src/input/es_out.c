@@ -2036,8 +2036,10 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
 
     /* We don't try to reselect */
     if( es->p_dec )
-    {
-        while( vlc_object_alive(p_sys->p_input) && !p_sys->b_buffering )
+    {   /* FIXME: This might hold the ES output caller (i.e. the demux), and
+         * the corresponding thread (typically the input thread), for a little
+         * bit too long if the ES is deleted in the middle of a stream. */
+        while( !input_Stopped(p_sys->p_input) && !p_sys->b_buffering )
         {
             if( input_DecoderIsEmpty( es->p_dec ) &&
                 ( !es->p_dec_record || input_DecoderIsEmpty( es->p_dec_record ) ))

@@ -548,6 +548,17 @@ static void *Run( void *obj )
     return NULL;
 }
 
+bool input_Stopped( input_thread_t *input )
+{
+    input_thread_private_t *sys = input->p;
+    bool ret;
+
+    vlc_mutex_lock( &sys->lock_control );
+    ret = sys->is_stopped;
+    vlc_mutex_unlock( &sys->lock_control );
+    return ret;
+}
+
 /*****************************************************************************
  * Main loop: Fill buffers from access, and demux
  *****************************************************************************/
@@ -698,7 +709,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     bool b_pause_after_eof = b_interactive &&
                              var_InheritBool( p_input, "play-and-pause" );
 
-    while( vlc_object_alive( p_input ) && p_input->p->i_state != ERROR_S )
+    while( !input_Stopped( p_input ) && p_input->p->i_state != ERROR_S )
     {
         mtime_t i_wakeup = -1;
         bool b_paused = p_input->p->i_state == PAUSE_S;
@@ -2247,14 +2258,11 @@ static int InputSourceInit( input_thread_t *p_input,
                                          psz_access, psz_demux, psz_path );
         if( p_access == NULL )
         {
-            if( vlc_object_alive( p_input ) )
-            {
-                msg_Err( p_input, "open of `%s' failed", psz_mrl );
-                if( !b_in_can_fail )
-                    dialog_Fatal( p_input, _("Your input can't be opened"),
-                                   _("VLC is unable to open the MRL '%s'."
-                                     " Check the log for details."), psz_mrl );
-            }
+            msg_Err( p_input, "open of `%s' failed", psz_mrl );
+            if( !b_in_can_fail && !input_Stopped( p_input ) )
+                dialog_Fatal( p_input, _("Your input can't be opened"),
+                              _("VLC is unable to open the MRL '%s'."
+                                " Check the log for details."), psz_mrl );
             goto error;
         }
 
@@ -2358,16 +2366,14 @@ static int InputSourceInit( input_thread_t *p_input,
 
         if( in->p_demux == NULL )
         {
-            if( vlc_object_alive( p_input ) )
-            {
-                msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
-                         psz_access, psz_demux, psz_path );
-                if( !b_in_can_fail )
-                    dialog_Fatal( VLC_OBJECT( p_input ),
-                                  _("VLC can't recognize the input's format"),
-                                  _("The format of '%s' cannot be detected. "
-                                    "Have a look at the log for details."), psz_mrl );
-            }
+            msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
+                     psz_access, psz_demux, psz_path );
+            if( !b_in_can_fail && !input_Stopped( p_input ) )
+                dialog_Fatal( VLC_OBJECT( p_input ),
+                              _("VLC can't recognize the input's format"),
+                              _("The format of '%s' cannot be detected. "
+                                "Have a look at the log for details."),
+                              psz_mrl );
             stream_Delete( p_stream );
             goto error;
         }
