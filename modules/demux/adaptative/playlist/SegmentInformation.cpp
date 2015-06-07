@@ -223,11 +223,10 @@ mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) cons
 {
     SegmentList *segList;
     MediaSegmentTemplate *mediaTemplate;
-    uint64_t timescale = 1;
     mtime_t time = 0;
     if( (mediaTemplate = inheritSegmentTemplate()) )
     {
-        timescale = mediaTemplate->inheritTimescale();
+        uint64_t timescale = mediaTemplate->inheritTimescale();
         if(mediaTemplate->segmentTimeline.Get())
         {
             time = mediaTemplate->segmentTimeline.Get()->
@@ -237,15 +236,12 @@ mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) cons
         {
             time = number * mediaTemplate->duration.Get();
         }
+        time = CLOCK_FREQ * time / timescale;
     }
     else if ( (segList = inheritSegmentList()) )
     {
-        timescale = segList->inheritTimescale();
-        time = number * segList->duration.Get();
+        time = segList->getPlaybackTimeBySegmentNumber(number);
     }
-
-    if(time)
-        time = CLOCK_FREQ * time / timescale;
 
     return time;
 }

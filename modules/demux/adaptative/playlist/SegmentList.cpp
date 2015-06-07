@@ -86,6 +86,29 @@ void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
     }
 }
 
+mtime_t SegmentList::getPlaybackTimeBySegmentNumber(uint64_t number)
+{
+    if(number < pruned || segments.empty())
+        return 0;
+
+    uint64_t timescale = inheritTimescale();
+    mtime_t time = segments.at(0)->startTime.Get();
+
+    if(segments.at(0)->duration.Get())
+    {
+        number -= pruned;
+
+        for(size_t i=0; i<number && i<segments.size(); i++)
+            time += segments.at(i)->duration.Get();
+    }
+    else
+    {
+        time = number * duration.Get();
+    }
+
+    return CLOCK_FREQ * time / timescale;
+}
+
 std::size_t SegmentList::getOffset() const
 {
     return pruned;
