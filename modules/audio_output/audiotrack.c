@@ -388,6 +388,7 @@ check_exception( JNIEnv *env, audio_output_t *p_aout,
 
         p_sys->b_audiotrack_exception = true;
         p_sys->b_error = true;
+        (*env)->ExceptionDescribe( env );
         (*env)->ExceptionClear( env );
         msg_Err( p_aout, "AudioTrack.%s triggered an exception !", method );
         return true;
