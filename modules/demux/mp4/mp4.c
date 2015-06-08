@@ -3615,6 +3615,7 @@ static int ReInitDecoder( demux_t *p_demux, mp4_track_t *p_track )
 
     i_sample = p_track->i_sample;
     es_out_Del( p_demux->out, p_track->p_es );
+    p_track->p_es = NULL;
     es_format_Clean( &p_track->fmt );
 
     if( b_smooth )
@@ -3628,8 +3629,8 @@ static int ReInitDecoder( demux_t *p_demux, mp4_track_t *p_track )
     p_track->b_selected = true;
     p_track->b_ok = true;
     p_track->b_enable = true;
-
-    p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
+    if(!p_track->p_es)
+        p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
     p_track->b_codec_need_restart = false;
 
     return VLC_SUCCESS;
