@@ -64,3 +64,29 @@ Url SegmentInfoCommon::getUrlSegment() const
         ret.append(baseURLs.front());
     return ret;
 }
+
+bool SegmentInfoCommon::getSegmentNumberByTime(const std::vector<ISegment *> &segments,
+                                                      mtime_t time, uint64_t *ret)
+{
+    if(segments.empty() || segments.front()->duration.Get() == 0)
+        return false;
+
+    std::vector<ISegment *>::const_iterator it = segments.begin();
+    while(it != segments.end())
+    {
+        const ISegment *seg = *it;
+        if(seg->startTime.Get() > time)
+        {
+            if(it == segments.begin())
+                return false;
+            else
+                break;
+        }
+
+        (*ret)++;
+        it++;
+    }
+
+    (*ret)--;
+    return true;
+}

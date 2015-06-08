@@ -41,7 +41,7 @@ ISegment::ISegment(const ICanonicalUrl *parent):
 {
     debugName = "Segment";
     classId = CLASSID_ISEGMENT;
-    startTime.Set(VLC_TS_INVALID);
+    startTime.Set(0);
     duration.Set(0);
     chunksuse.Set(0);
 }
@@ -114,7 +114,7 @@ bool ISegment::contains(size_t byte) const
 
 int ISegment::compare(ISegment *other) const
 {
-    if(startTime.Get() != VLC_TS_INVALID)
+    if(duration.Get())
     {
         int64_t diff = startTime.Get() - other->startTime.Get();
         if(diff)

@@ -35,17 +35,17 @@ SegmentList::SegmentList( SegmentInformation *parent ):
 }
 SegmentList::~SegmentList()
 {
-    std::vector<Segment *>::iterator it;
+    std::vector<ISegment *>::iterator it;
     for(it = segments.begin(); it != segments.end(); ++it)
         delete(*it);
 }
 
-const std::vector<Segment*>& SegmentList::getSegments() const
+const std::vector<ISegment*>& SegmentList::getSegments() const
 {
     return segments;
 }
 
-void SegmentList::addSegment(Segment *seg)
+void SegmentList::addSegment(ISegment *seg)
 {
     seg->setParent(this);
     segments.push_back(seg);
@@ -53,9 +53,9 @@ void SegmentList::addSegment(Segment *seg)
 
 void SegmentList::mergeWith(SegmentList *updated)
 {
-    const Segment * lastSegment = (segments.empty()) ? NULL : segments.back();
+    const ISegment * lastSegment = (segments.empty()) ? NULL : segments.back();
 
-    std::vector<Segment *>::iterator it;
+    std::vector<ISegment *>::iterator it;
     for(it = updated->segments.begin(); it != updated->segments.end(); ++it)
     {
         if( !lastSegment || lastSegment->compare( *it ) < 0 )
@@ -72,10 +72,10 @@ void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
         return;
 
     uint64_t current = pruned;
-    std::vector<Segment *>::iterator it = segments.begin();
+    std::vector<ISegment *>::iterator it = segments.begin();
     while(it != segments.end() && current < tobelownum)
     {
-        Segment *seg = *it;
+        ISegment *seg = *it;
         if(seg->chunksuse.Get()) /* can't prune from here, still in use */
             break;
         delete *it;
@@ -86,10 +86,18 @@ void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
     }
 }
 
+bool SegmentList::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
+{
+    const uint64_t timescale = inheritTimescale();
+    time = time * timescale / CLOCK_FREQ;
+    *ret = pruned;
+    return SegmentInfoCommon::getSegmentNumberByTime(segments, time, ret);
+}
+
 mtime_t SegmentList::getPlaybackTimeBySegmentNumber(uint64_t number)
 {
     if(number < pruned || segments.empty())
-        return 0;
+        return VLC_TS_INVALID;
 
     uint64_t timescale = inheritTimescale();
     mtime_t time = segments.at(0)->startTime.Get();
@@ -106,7 +114,7 @@ mtime_t SegmentList::getPlaybackTimeBySegmentNumber(uint64_t number)
         time = number * duration.Get();
     }
 
-    return CLOCK_FREQ * time / timescale;
+    return VLC_TS_0 + CLOCK_FREQ * time / timescale;
 }
 
 std::size_t SegmentList::getOffset() const

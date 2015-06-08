@@ -101,7 +101,7 @@ std::size_t SegmentInformation::getSegments(SegmentInfoType type, vector<ISegmen
             }
             else if ( segmentList && !segmentList->getSegments().empty() )
             {
-                std::vector<Segment *>::const_iterator it;
+                std::vector<ISegment *>::const_iterator it;
                 for(it=segmentList->getSegments().begin();
                     it!=segmentList->getSegments().end(); ++it)
                 {
@@ -187,36 +187,33 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
 
 bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
 {
-    MediaSegmentTemplate *mediaTemplate;
-    if( (mediaTemplate = inheritSegmentTemplate()) )
+    if( mediaSegmentTemplate )
     {
-        uint64_t timescale = mediaTemplate->inheritTimescale();
-        mtime_t duration = mediaTemplate->duration.Get();
+        const uint64_t timescale = mediaSegmentTemplate->inheritTimescale();
+        const mtime_t duration = mediaSegmentTemplate->duration.Get();
         if(duration)
         {
             *ret = time / (CLOCK_FREQ * duration / timescale);
             return true;
         }
     }
-    else
+    else if ( segmentList && !segmentList->getSegments().empty() )
     {
-        std::vector<ISegment *> segments;
-        getSegments(INFOTYPE_MEDIA, segments);
-        std::vector<ISegment *>::const_iterator it;
+        return segmentList->getSegmentNumberByTime(time, ret);
+    }
+    else if( segmentBase )
+    {
+        const uint64_t timescale = inheritTimescale();
+        time = time * timescale / CLOCK_FREQ;
         *ret = 0;
-        for(it = segments.begin(); it != segments.end(); ++it)
-        {
-            if((*it)->startTime.Get() > VLC_TS_INVALID &&
-               (*it)->startTime.Get() > time &&
-                it != segments.begin())
-            {
-                return true;
-            }
-            (*ret)++;
-        }
+        const std::vector<ISegment *> list = segmentBase->subSegments();
+        return SegmentInfoCommon::getSegmentNumberByTime(list, time, ret);
     }
 
-    return false;
+    if(parent)
+        return parent->getSegmentNumberByTime(time, ret);
+    else
+        return false;
 }
 
 mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) const

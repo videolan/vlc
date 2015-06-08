@@ -301,7 +301,6 @@ size_t IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformat
 size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation *info)
 {
     size_t total = 0;
-    mtime_t totaltime = 0;
     if(segListNode)
     {
         std::vector<Node *> segments = DOMHelper::getElementByTagName(segListNode, "SegmentURL", false);
@@ -337,14 +336,12 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
                     seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
                 }
 
-                if(totaltime || list->duration.Get())
+                if(list->duration.Get())
                 {
-                    seg->startTime.Set(totaltime);
-                    totaltime += list->duration.Get();
+                    seg->startTime.Set(nzStartTime);
+                    seg->duration.Set(list->duration.Get());
+                    nzStartTime += list->duration.Get();
                 }
-
-                seg->startTime.Set(VLC_TS_0 + nzStartTime);
-                nzStartTime += CLOCK_FREQ * list->duration.Get();
 
                 list->addSegment(seg);
                 total++;

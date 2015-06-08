@@ -51,6 +51,8 @@ namespace adaptative
                 void                    appendBaseURL( const std::string& url );
                 virtual Url             getUrlSegment() const; /* impl */
                 Property<uint64_t>      duration;
+                static bool             getSegmentNumberByTime(const std::vector<ISegment *> &,
+                                                               mtime_t, uint64_t *);
 
             private:
                 int                     startIndex;

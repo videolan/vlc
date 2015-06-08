@@ -248,7 +248,7 @@ static int  Control         (demux_t *p_demux, int i_query, va_list args)
                !p_sys->p_dashManager->getDuration() ||
                !p_sys->p_dashManager->setPosition(time))
                 return VLC_EGENERIC;
-            p_sys->i_nzpcr = time;
+            p_sys->i_nzpcr = VLC_TS_INVALID;
             break;
         }
 
@@ -258,7 +258,7 @@ static int  Control         (demux_t *p_demux, int i_query, va_list args)
             if(p_sys->p_mpd->isLive() ||
                !p_sys->p_dashManager->setPosition(time))
                 return VLC_EGENERIC;
-            p_sys->i_nzpcr = time;
+            p_sys->i_nzpcr = VLC_TS_INVALID;
             break;
         }
 
