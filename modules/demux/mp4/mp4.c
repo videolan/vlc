@@ -953,6 +953,9 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
+    if( stream_Tell( p_demux->s ) > 0 )
+        stream_Seek( p_demux->s, 0 );
+
     if( p_sys->p_root )
     {
         MP4_BoxFree( p_demux->s, p_sys->p_root );
