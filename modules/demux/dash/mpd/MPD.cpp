@@ -66,7 +66,7 @@ void MPD::debug()
 {
     msg_Dbg(stream, "MPD profile=%s mediaPresentationDuration=%ld minBufferTime=%ld",
             static_cast<std::string>(getProfile()).c_str(),
-            duration.Get(),
+            duration.Get() / CLOCK_FREQ,
             minBufferTime.Get());
     msg_Dbg(stream, "BaseUrl=%s", getUrlSegment().toString().c_str());
 

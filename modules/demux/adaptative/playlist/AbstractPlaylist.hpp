@@ -58,12 +58,12 @@ namespace adaptative
                 void                getTimeLinesBoundaries(mtime_t *, mtime_t *) const;
                 void                getPlaylistDurationsRange(mtime_t *, mtime_t *) const;
 
-                Property<time_t>                    duration;
+                Property<mtime_t>                   duration;
                 Property<time_t>                    playbackStart;
                 Property<time_t>                    availabilityEndTime;
                 Property<time_t>                    availabilityStartTime;
                 Property<time_t>                    minUpdatePeriod;
-                Property<time_t>                    maxSegmentDuration;
+                Property<mtime_t>                   maxSegmentDuration;
                 Property<time_t>                    minBufferTime;
                 Property<time_t>                    timeShiftBufferDepth;
 

@@ -93,7 +93,7 @@ void    IsoffMainParser::setMPDAttributes   ()
 
     it = attr.find("mediaPresentationDuration");
     if(it != attr.end())
-        this->mpd->duration.Set(IsoTime(it->second));
+        this->mpd->duration.Set(IsoTime(it->second) * CLOCK_FREQ);
 
     it = attr.find("minBufferTime");
     if(it != attr.end())
@@ -109,7 +109,7 @@ void    IsoffMainParser::setMPDAttributes   ()
 
     it = attr.find("maxSegmentDuration");
     if(it != attr.end())
-        mpd->maxSegmentDuration.Set(IsoTime(it->second));
+        mpd->maxSegmentDuration.Set(IsoTime(it->second) * CLOCK_FREQ);
 
     it = attr.find("type");
     if(it != attr.end())

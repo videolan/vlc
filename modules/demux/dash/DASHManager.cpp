@@ -117,15 +117,15 @@ bool DASHManager::updatePlaylist()
     mtime_t maxinterval = 0;
     playlist->getTimeLinesBoundaries(&mininterval, &maxinterval);
     if(maxinterval > mininterval)
-        maxinterval = (maxinterval - mininterval) / CLOCK_FREQ;
+        maxinterval = (maxinterval - mininterval);
     else
-        maxinterval = 60;
-    maxinterval = std::max(maxinterval, (mtime_t)60);
+        maxinterval = 60 * CLOCK_FREQ;
+    maxinterval = std::max(maxinterval, (mtime_t)60 * CLOCK_FREQ);
 
-    mininterval = std::max(playlist->minUpdatePeriod.Get(),
+    mininterval = std::max(playlist->minUpdatePeriod.Get() * CLOCK_FREQ,
                            playlist->maxSegmentDuration.Get());
 
-    nextPlaylistupdate = now + (maxinterval - mininterval) / 2;
+    nextPlaylistupdate = now + (maxinterval - mininterval) / (2 * CLOCK_FREQ);
 
     msg_Dbg(stream, "Updated MPD, next update in %" PRId64 "s (%" PRId64 "..%" PRId64 ")",
             nextPlaylistupdate - now, mininterval, maxinterval );

@@ -184,7 +184,7 @@ mtime_t PlaylistManager::getDuration() const
     if (playlist->isLive())
         return 0;
     else
-        return CLOCK_FREQ * playlist->duration.Get();
+        return playlist->duration.Get();
 }
 
 bool PlaylistManager::setPosition(mtime_t time)
