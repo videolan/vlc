@@ -247,8 +247,12 @@ void Close (vlc_object_t *this)
     [sys->glESView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
 
     if (sys->gl.sys != NULL) {
-        msg_Dbg(this, "deleting display");
-        vout_display_opengl_Delete(sys->vgl);
+        @synchronized (sys->glESView) {
+            msg_Dbg(this, "deleting display");
+
+            if (likely([sys->glESView isAppActive]))
+                vout_display_opengl_Delete(sys->vgl);
+        }
     }
 
     [sys->glESView release];
