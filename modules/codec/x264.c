@@ -271,7 +271,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 /* Analysis */
 
 #define ANALYSE_TEXT N_("Partitions to consider")
-#define ANALYSE_LONGTEXT N_( "Partitions to consider in analyse mode: \n" \
+#define ANALYSE_LONGTEXT N_( "Partitions to consider in analyse mode:\n" \
     " - none  : \n" \
     " - fast  : i4x4\n" \
     " - normal: i4x4,p8x8,(i8x8)\n" \
@@ -283,7 +283,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define DIRECT_PRED_LONGTEXT DIRECT_PRED_TEXT
 
 #define DIRECT_PRED_SIZE_TEXT N_("Direct prediction size")
-#define DIRECT_PRED_SIZE_LONGTEXT N_( "Direct prediction size: "\
+#define DIRECT_PRED_SIZE_LONGTEXT N_( "Direct prediction size:\n"\
     " -  0: 4x4\n" \
     " -  1: 8x8\n" \
     " - -1: smallest possible according to level\n" )
@@ -292,13 +292,13 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
 #define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
 
 #define WEIGHTP_TEXT N_("Weighted prediction for P-frames")
-#define WEIGHTP_LONGTEXT N_(" Weighted prediction for P-frames: "\
+#define WEIGHTP_LONGTEXT N_(" Weighted prediction for P-frames:\n"\
     " - 0: Disabled\n"\
     " - 1: Blind offset\n"\
     " - 2: Smart analysis\n" )
 
 #define ME_TEXT N_("Integer pixel motion estimation method")
-#define ME_LONGTEXT N_( "Selects the motion estimation algorithm: "\
+#define ME_LONGTEXT N_( "Selects the motion estimation algorithm:\n"\
     " - dia: diamond search, radius 1 (fast)\n" \
     " - hex: hexagonal search, radius 2\n" \
     " - umh: uneven multi-hexagon search (better but slower)\n" \
@@ -349,7 +349,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     "SATD-based decision for 8x8 transform in inter-MBs.")
 
 #define TRELLIS_TEXT N_("Trellis RD quantization" )
-#define TRELLIS_LONGTEXT N_( "Trellis RD quantization: \n" \
+#define TRELLIS_LONGTEXT N_( "Trellis RD quantization:\n" \
     " - 0: disabled\n" \
     " - 1: enabled only on the final encode of a MB\n" \
     " - 2: enabled on all mode decisions\n" \
