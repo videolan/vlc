@@ -54,6 +54,16 @@ void    BaseRepresentation::setBandwidth( uint64_t bandwidth )
     this->bandwidth = bandwidth;
 }
 
+const std::list<std::string> & BaseRepresentation::getCodecs() const
+{
+    return codecs;
+}
+
+void BaseRepresentation::addCodec(const std::string &codec)
+{
+    codecs.push_back(codec);
+}
+
 void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
 {
     std::string text(indent, ' ');
@@ -70,4 +80,9 @@ std::string BaseRepresentation::contextualize(size_t, const std::string &compone
                                               const BaseSegmentTemplate *) const
 {
     return component;
+}
+
+bool BaseRepresentation::validateCodec(const std::string &) const
+{
+    return true;
 }

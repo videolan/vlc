@@ -26,6 +26,7 @@
 #define BASEREPRESENTATION_H_
 
 #include <string>
+#include <list>
 
 #include "CommonAttributesElements.h"
 #include "SegmentInformation.hpp"
@@ -53,6 +54,8 @@ namespace adaptative
                  */
                 uint64_t            getBandwidth            () const;
                 void                setBandwidth            ( uint64_t bandwidth );
+                const std::list<std::string> & getCodecs    () const;
+                void                addCodec                (const std::string &);
 
                 void                debug                   (vlc_object_t *,int = 0) const;
 
@@ -61,8 +64,10 @@ namespace adaptative
                                                   const BaseSegmentTemplate *) const;
 
             protected:
+                virtual bool        validateCodec(const std::string &) const;
                 BaseAdaptationSet                  *adaptationSet;
                 uint64_t                            bandwidth;
+                std::list<std::string>              codecs;
         };
     }
 }
