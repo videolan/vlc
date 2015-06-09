@@ -809,7 +809,7 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout,
         i_clipped_time = VLC_CLIP( i_time, MIN_AUDIOTRACK_BUFFER_US,
                          MAX_AUDIOTRACK_BUFFER_US );
         if( i_clipped_time != i_time )
-            i_size = i_rate * i_clipped_time * i_bytes_per_frame / CLOCK_FREQ;
+            i_size = (int)i_rate * i_clipped_time * i_bytes_per_frame / CLOCK_FREQ;
     }
 
     /* create AudioTrack object */
