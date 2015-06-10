@@ -104,7 +104,7 @@ namespace adaptative
 
             protected:
                 std::vector<SubSegment *> subsegments;
-                std::string sourceUrl;
+                Url sourceUrl;
                 int size;
         };
 

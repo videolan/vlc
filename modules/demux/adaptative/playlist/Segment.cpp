@@ -182,7 +182,7 @@ Segment::~Segment()
 void                    Segment::setSourceUrl   ( const std::string &url )
 {
     if ( url.empty() == false )
-        this->sourceUrl = url;
+        this->sourceUrl = Url(url);
 }
 
 void Segment::debug(vlc_object_t *obj, int indent) const
@@ -204,10 +204,17 @@ void Segment::debug(vlc_object_t *obj, int indent) const
 
 Url Segment::getUrlSegment() const
 {
-    Url ret = getParentUrlSegment();
-    if (!sourceUrl.empty())
-        ret.append(sourceUrl);
-    return ret;
+    if(sourceUrl.hasScheme())
+    {
+        return sourceUrl;
+    }
+    else
+    {
+        Url ret = getParentUrlSegment();
+        if (!sourceUrl.empty())
+            ret.append(sourceUrl);
+        return ret;
+    }
 }
 
 Chunk* Segment::toChunk(size_t index, BaseRepresentation *ctxrep)

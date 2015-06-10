@@ -35,18 +35,6 @@ BaseSegmentTemplate::BaseSegmentTemplate( ICanonicalUrl *parent ) :
 {
 }
 
-Url BaseSegmentTemplate::getUrlSegment() const
-{
-    Url ret = getParentUrlSegment();
-    if (!sourceUrl.empty())
-    {
-        ret.append(Url::Component(
-                     sourceUrl,
-                     dynamic_cast<const MediaSegmentTemplate *>(this)) /* casts to NULL if != */
-        );
-    }
-    return ret;
-}
 
 MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
     BaseSegmentTemplate( parent ), Timelineable(), TimescaleAble( parent )
@@ -65,6 +53,11 @@ void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, mtime_t prun
         if(prunebarrier)
             segmentTimeline.Get()->prune(prunebarrier);
     }
+}
+
+void MediaSegmentTemplate::setSourceUrl(const std::string &url)
+{
+    sourceUrl = Url(Url::Component(url, this));
 }
 
 InitSegmentTemplate::InitSegmentTemplate( ICanonicalUrl *parent ) :

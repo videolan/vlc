@@ -40,7 +40,6 @@ namespace adaptative
         {
             public:
                 BaseSegmentTemplate( ICanonicalUrl * = NULL );
-                virtual Url             getUrlSegment() const; /* reimpl */
         };
 
         class MediaSegmentTemplate : public BaseSegmentTemplate,
@@ -50,6 +49,7 @@ namespace adaptative
         {
             public:
                 MediaSegmentTemplate( SegmentInformation * = NULL );
+                virtual void setSourceUrl( const std::string &url ); /* reimpl */
                 void mergeWith( MediaSegmentTemplate *, mtime_t );
                 Property<size_t>        startNumber;
         };

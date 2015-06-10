@@ -45,6 +45,11 @@ bool Url::hasScheme() const
     return components[0].b_scheme;
 }
 
+bool Url::empty() const
+{
+    return components.empty();
+}
+
 Url & Url::prepend(const Component & comp)
 {
     components.insert(components.begin(), comp);
