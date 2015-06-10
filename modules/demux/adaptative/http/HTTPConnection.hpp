@@ -2,7 +2,7 @@
  * HTTPConnection.hpp
  *****************************************************************************
  * Copyright (C) 2010 - 2011 Klagenfurt University
- *               2014 - 2015 VideoLAN Authors
+ *               2014 - 2015 VideoLAN and VLC Authors
  *
  * Created on: Aug 10, 2010
  * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>

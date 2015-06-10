@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rdp.c: libfreeRDP based Remote Desktop access
  *****************************************************************************
- * Copyright (C) 2013 VideoLAN Authors
+ * Copyright (C) 2013 VideoLAN and VLC Authors
  *****************************************************************************
  *
  * This program is free software; you can redistribute it and/or modify it
