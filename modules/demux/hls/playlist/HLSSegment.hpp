@@ -20,9 +20,15 @@
 #ifndef HLSSEGMENT_HPP
 #define HLSSEGMENT_HPP
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "../adaptative/playlist/Segment.h"
 #include <vector>
-#include <gcrypt.h>
+#ifdef HAVE_GCRYPT
+ #include <gcrypt.h>
+#endif
 
 namespace hls
 {
