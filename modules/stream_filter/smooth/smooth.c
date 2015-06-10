@@ -825,7 +825,10 @@ static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned i_peek )
     chunk_t *chunk = get_chunk( s, true, NULL );
     if( !chunk || !chunk->data )
     {
-        msg_Err( s, "peek %"PRIu64" or no data", (uint64_t) chunk );
+        if(!chunk)
+            msg_Err( s, "cannot peek: no data" );
+        else
+            msg_Err( s, "cannot peek: chunk pos %"PRIu64"", chunk->read_pos );
         return 0;
     }
 
