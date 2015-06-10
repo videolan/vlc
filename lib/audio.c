@@ -86,6 +86,8 @@ libvlc_audio_output_t *
         item->psz_description = strdup( module_get_name( module, true ) );
         if( unlikely(item->psz_name == NULL || item->psz_description == NULL) )
         {
+            free( item->psz_name );
+            free( item->psz_description );
             free( item );
             goto error;
         }
