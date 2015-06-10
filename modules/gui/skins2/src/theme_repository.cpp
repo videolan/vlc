@@ -92,7 +92,7 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
     free( psz_current );
 
     // check if skins exists and is readable
-    bool b_readable = !ifstream( current.c_str() ).fail();
+    bool b_readable = !ifstream( sToLocale(current).c_str() ).fail();
 
     msg_Dbg( getIntf(), "requested skins %s is %s accessible",
                          current.c_str(), b_readable ? "" : "NOT" );
