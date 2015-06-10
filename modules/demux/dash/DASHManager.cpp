@@ -83,6 +83,7 @@ bool DASHManager::updatePlaylist()
         if(!mpdstream)
         {
             free(p_data);
+            nextPlaylistupdate = now + playlist->minUpdatePeriod.Get();
             return false;
         }
 
@@ -90,6 +91,7 @@ bool DASHManager::updatePlaylist()
         if(!parser.parse())
         {
             stream_Delete(mpdstream);
+            nextPlaylistupdate = now + playlist->minUpdatePeriod.Get();
             return false;
         }
 

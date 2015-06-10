@@ -202,7 +202,7 @@ static int Demux(demux_t *p_demux)
     }
 
     if( !p_sys->p_dashManager->updatePlaylist() )
-        return VLC_DEMUXER_EOF;
+        msg_Warn(p_demux, "Can't update MPD");
 
     return VLC_DEMUXER_SUCCESS;
 }
