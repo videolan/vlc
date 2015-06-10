@@ -111,9 +111,12 @@ typedef struct
 typedef struct
 {
     HEV      hev;
+    unsigned waiters;
+    HEV      hevAck;
+    unsigned signaled;
     unsigned clock;
 } vlc_cond_t;
-#define VLC_STATIC_COND { 0, 0 }
+#define VLC_STATIC_COND { NULLHANDLE, 0, NULLHANDLE, 0, 0 }
 #define LIBVLC_NEED_SEMAPHORE
 #define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;

@@ -45,6 +45,8 @@
 #include <sys/time.h>
 #include <sys/select.h>
 
+#include <386/builtin.h>
+
 static vlc_threadvar_t thread_key;
 
 /**
@@ -261,9 +263,12 @@ enum
 
 static void vlc_cond_init_common (vlc_cond_t *p_condvar, unsigned clock)
 {
-    /* Create a manual-reset event (manual reset is needed for broadcast). */
-    if (DosCreateEventSem (NULL, &p_condvar->hev, 0, FALSE))
+    if (DosCreateEventSem (NULL, &p_condvar->hev, 0, FALSE) ||
+        DosCreateEventSem (NULL, &p_condvar->hevAck, 0, FALSE))
         abort();
+
+    p_condvar->waiters = 0;
+    p_condvar->signaled = 0;
     p_condvar->clock = clock;
 }
 
@@ -280,6 +285,7 @@ void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
 void vlc_cond_destroy (vlc_cond_t *p_condvar)
 {
     DosCloseEventSem( p_condvar->hev );
+    DosCloseEventSem( p_condvar->hevAck );
 }
 
 void vlc_cond_signal (vlc_cond_t *p_condvar)
@@ -287,8 +293,28 @@ void vlc_cond_signal (vlc_cond_t *p_condvar)
     if (!p_condvar->hev)
         return;
 
-    /* This is suboptimal but works. */
-    vlc_cond_broadcast (p_condvar);
+    if (!__atomic_cmpxchg32 (&p_condvar->waiters, 0, 0))
+    {
+        ULONG ulPost;
+
+        __atomic_xchg (&p_condvar->signaled, 1);
+        DosPostEventSem (p_condvar->hev);
+
+        DosWaitEventSem (p_condvar->hevAck, SEM_INDEFINITE_WAIT);
+        DosResetEventSem (p_condvar->hevAck, &ulPost);
+
+        while (ulPost-- > 0)
+            __atomic_decrement (&p_condvar->waiters);
+
+        /* Already timed out ? */
+        if (__atomic_cmpxchg32 (&p_condvar->waiters, 0, 0) &&
+            __atomic_cmpxchg32 (&p_condvar->signaled, 1, 1))
+        {
+            /* Clear signaled status */
+            __atomic_xchg (&p_condvar->signaled, 0);
+            DosResetEventSem (p_condvar->hev, &ulPost);
+        }
+    }
 }
 
 void vlc_cond_broadcast (vlc_cond_t *p_condvar)
@@ -296,39 +322,55 @@ void vlc_cond_broadcast (vlc_cond_t *p_condvar)
     if (!p_condvar->hev)
         return;
 
-    /* Wake all threads up (as the event HANDLE has manual reset) */
-    DosPostEventSem( p_condvar->hev );
+    while (!__atomic_cmpxchg32 (&p_condvar->waiters, 0, 0))
+        vlc_cond_signal (p_condvar);
 }
 
-void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
+static int vlc_cond_wait_common (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
+                                 ULONG ulTimeout)
 {
     ULONG ulPost;
     ULONG rc;
 
-    if (!p_condvar->hev)
-    {   /* FIXME FIXME FIXME */
-        msleep (50000);
-        return;
-    }
+    __atomic_increment (&p_condvar->waiters);
 
     do
     {
         vlc_testcancel();
 
         vlc_mutex_unlock (p_mutex);
-        rc = vlc_WaitForSingleObject( p_condvar->hev, SEM_INDEFINITE_WAIT );
+
+        do
+        {
+            rc = vlc_WaitForSingleObject( p_condvar->hev, ulTimeout );
+            if (rc == NO_ERROR)
+                DosResetEventSem (p_condvar->hev, &ulPost);
+        } while (rc == NO_ERROR &&
+                 __atomic_cmpxchg32 (&p_condvar->signaled, 0, 1) == 0);
+
+        DosPostEventSem (p_condvar->hevAck);
+
         vlc_mutex_lock (p_mutex);
     } while( rc == ERROR_INTERRUPT );
 
-    DosResetEventSem( p_condvar->hev, &ulPost );
+    return rc ? ETIMEDOUT : 0;
+}
+
+void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
+{
+    if (!p_condvar->hev)
+    {   /* FIXME FIXME FIXME */
+        msleep (50000);
+        return;
+    }
+
+    vlc_cond_wait_common (p_condvar, p_mutex, SEM_INDEFINITE_WAIT);
 }
 
 int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
     ULONG   ulTimeout;
-    ULONG   ulPost;
-    ULONG   rc;
 
     if (!p_condvar->hev)
     {   /* FIXME FIXME FIXME */
@@ -336,41 +378,30 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
         return 0;
     }
 
-    do
+    mtime_t total;
+    switch (p_condvar->clock)
     {
-        vlc_testcancel();
-
-        mtime_t total;
-        switch (p_condvar->clock)
+        case CLOCK_REALTIME:
         {
-            case CLOCK_REALTIME:
-            {
-                struct timeval tv;
-                gettimeofday (&tv, NULL);
+            struct timeval tv;
+            gettimeofday (&tv, NULL);
 
-                total = CLOCK_FREQ * tv.tv_sec +
-                        CLOCK_FREQ * tv.tv_usec / 1000000L;
-                break;
-            }
-            default:
-                assert (p_condvar->clock == CLOCK_MONOTONIC);
-                total = mdate();
-                break;
+            total = CLOCK_FREQ * tv.tv_sec +
+                    CLOCK_FREQ * tv.tv_usec / 1000000L;
+            break;
         }
-        total = (deadline - total) / 1000;
-        if( total < 0 )
-            total = 0;
+        default:
+            assert (p_condvar->clock == CLOCK_MONOTONIC);
+            total = mdate();
+            break;
+    }
+    total = (deadline - total) / 1000;
+    if( total < 0 )
+        total = 0;
 
-        ulTimeout = ( total > 0x7fffffff ) ? 0x7fffffff : total;
+    ulTimeout = ( total > 0x7fffffff ) ? 0x7fffffff : total;
 
-        vlc_mutex_unlock (p_mutex);
-        rc = vlc_WaitForSingleObject( p_condvar->hev, ulTimeout );
-        vlc_mutex_lock (p_mutex);
-    } while( rc == ERROR_INTERRUPT );
-
-    DosResetEventSem( p_condvar->hev, &ulPost );
-
-    return rc ? ETIMEDOUT : 0;
+    return vlc_cond_wait_common (p_condvar, p_mutex, ulTimeout);
 }
 
 /*** Thread-specific variables (TLS) ***/
