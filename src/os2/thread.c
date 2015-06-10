@@ -343,9 +343,15 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
         mtime_t total;
         switch (p_condvar->clock)
         {
-            case CLOCK_REALTIME: /* FIXME? sub-second precision */
-                total = CLOCK_FREQ * time (NULL);
+            case CLOCK_REALTIME:
+            {
+                struct timeval tv;
+                gettimeofday (&tv, NULL);
+
+                total = CLOCK_FREQ * tv.tv_sec +
+                        CLOCK_FREQ * tv.tv_usec / 1000000L;
                 break;
+            }
             default:
                 assert (p_condvar->clock == CLOCK_MONOTONIC);
                 total = mdate();
