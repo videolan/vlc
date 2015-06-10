@@ -466,6 +466,9 @@ endif
 
 ### Misc ###
 
+libaccess_concat_plugin_la_SOURCES = access/concat.c
+access_LTLIBRARIES += libaccess_concat_plugin.la
+
 libgnomevfs_plugin_la_SOURCES = access/gnomevfs.c
 libgnomevfs_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNOMEVFS_CFLAGS)
 libgnomevfs_plugin_la_LIBADD = $(GNOMEVFS_LIBS)

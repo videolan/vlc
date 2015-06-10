@@ -26,6 +26,7 @@ Access:
  * New WASAPI audio capture module on Windows
  * SMB/FTP/SFTP accesses can list directories
  * Support for SAT>IP server dialect for RTSP (satip://)
+ * New "concat" access module for concatenating byte streams
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
