@@ -132,6 +132,8 @@ static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
 extern vlc_rwlock_t config_lock;
 
+static void vlc_static_cond_destroy_all(void);
+
 int _CRT_init(void);
 void _CRT_term(void);
 
@@ -160,6 +162,7 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
             vlc_threadvar_delete (&thread_key);
             vlc_cond_destroy (&super_variable);
             vlc_mutex_destroy (&super_mutex);
+            vlc_static_cond_destroy_all ();
 
             _CRT_term();
 
@@ -272,6 +275,54 @@ static void vlc_cond_init_common (vlc_cond_t *p_condvar, unsigned clock)
     p_condvar->clock = clock;
 }
 
+typedef struct vlc_static_cond_t vlc_static_cond_t;
+
+struct vlc_static_cond_t
+{
+    vlc_cond_t condvar;
+    vlc_static_cond_t *next;
+};
+
+static vlc_static_cond_t *static_condvar_start = NULL;
+
+static void vlc_static_cond_init (vlc_cond_t *p_condvar)
+{
+    vlc_mutex_lock (&super_mutex);
+
+    if (p_condvar->hev == NULLHANDLE)
+    {
+        vlc_cond_init_common (p_condvar, p_condvar->clock);
+
+        vlc_static_cond_t *new_static_condvar;
+
+        new_static_condvar = malloc (sizeof (*new_static_condvar));
+        if (unlikely (!new_static_condvar))
+            abort();
+
+        memcpy (&new_static_condvar->condvar, p_condvar, sizeof (*p_condvar));
+        new_static_condvar->next = static_condvar_start;
+        static_condvar_start = new_static_condvar;
+    }
+
+    vlc_mutex_unlock (&super_mutex);
+}
+
+static void vlc_static_cond_destroy_all (void)
+{
+    vlc_static_cond_t *static_condvar;
+    vlc_static_cond_t *static_condvar_next;
+
+
+    for (static_condvar = static_condvar_start; static_condvar;
+         static_condvar = static_condvar_next)
+    {
+        static_condvar_next = static_condvar->next;
+
+        vlc_cond_destroy (&static_condvar->condvar);
+        free (static_condvar);
+    }
+}
+
 void vlc_cond_init (vlc_cond_t *p_condvar)
 {
     vlc_cond_init_common (p_condvar, CLOCK_MONOTONIC);
@@ -290,8 +341,8 @@ void vlc_cond_destroy (vlc_cond_t *p_condvar)
 
 void vlc_cond_signal (vlc_cond_t *p_condvar)
 {
-    if (!p_condvar->hev)
-        return;
+    if (p_condvar->hev == NULLHANDLE)
+        vlc_static_cond_init (p_condvar);
 
     if (!__atomic_cmpxchg32 (&p_condvar->waiters, 0, 0))
     {
@@ -319,8 +370,8 @@ void vlc_cond_signal (vlc_cond_t *p_condvar)
 
 void vlc_cond_broadcast (vlc_cond_t *p_condvar)
 {
-    if (!p_condvar->hev)
-        return;
+    if (p_condvar->hev == NULLHANDLE)
+        vlc_static_cond_init (p_condvar);
 
     while (!__atomic_cmpxchg32 (&p_condvar->waiters, 0, 0))
         vlc_cond_signal (p_condvar);
@@ -358,11 +409,8 @@ static int vlc_cond_wait_common (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 
 void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 {
-    if (!p_condvar->hev)
-    {   /* FIXME FIXME FIXME */
-        msleep (50000);
-        return;
-    }
+    if (p_condvar->hev == NULLHANDLE)
+        vlc_static_cond_init (p_condvar);
 
     vlc_cond_wait_common (p_condvar, p_mutex, SEM_INDEFINITE_WAIT);
 }
@@ -372,11 +420,8 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 {
     ULONG   ulTimeout;
 
-    if (!p_condvar->hev)
-    {   /* FIXME FIXME FIXME */
-        msleep (50000);
-        return 0;
-    }
+    if (p_condvar->hev == NULLHANDLE)
+        vlc_static_cond_init (p_condvar);
 
     mtime_t total;
     switch (p_condvar->clock)
