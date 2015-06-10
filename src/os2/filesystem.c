@@ -39,6 +39,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <sys/socket.h>
+#include <signal.h>
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
@@ -344,6 +345,46 @@ int vlc_pipe (int fds[2])
     fcntl (fds[0], F_SETFD, FD_CLOEXEC);
     fcntl (fds[1], F_SETFD, FD_CLOEXEC);
     return 0;
+}
+
+/**
+ * Writes data to a file descriptor. Unlike write(), if EPIPE error occurs,
+ * this function does not generate a SIGPIPE signal.
+ * @note If the file descriptor is known to be neither a pipe/FIFO nor a
+ * connection-oriented socket, the normal write() should be used.
+ */
+ssize_t vlc_write(int fd, const void *buf, size_t len)
+{
+    struct iovec iov = { .iov_base = (void *)buf, .iov_len = len };
+
+    return vlc_writev(fd, &iov, 1);
+}
+
+/**
+ * Writes data from an iovec structure to a file descriptor. Unlike writev(),
+ * if EPIPE error occurs, this function does not generate a SIGPIPE signal.
+ */
+ssize_t vlc_writev(int fd, const struct iovec *iov, int count)
+{
+    sigset_t set, oset;
+
+    sigemptyset(&set);
+    sigaddset(&set, SIGPIPE);
+    pthread_sigmask(SIG_BLOCK, &set, &oset);
+
+    ssize_t val = writev(fd, iov, count);
+    if (val < 0 && errno == EPIPE)
+    {
+        siginfo_t info;
+        struct timespec ts = { 0, 0 };
+
+        while (sigtimedwait(&set, &info, &ts) >= 0 || errno != EAGAIN);
+    }
+
+    if (!sigismember(&oset, SIGPIPE)) /* Restore the signal mask if changed */
+        pthread_sigmask(SIG_SETMASK, &oset, NULL);
+
+    return val;
 }
 
 #include <vlc_network.h>
