@@ -34,6 +34,7 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <io.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -336,6 +337,9 @@ int vlc_pipe (int fds[2])
 {
     if (pipe (fds))
         return -1;
+
+    setmode (fds[0], O_BINARY);
+    setmode (fds[1], O_BINARY);
 
     fcntl (fds[0], F_SETFD, FD_CLOEXEC);
     fcntl (fds[1], F_SETFD, FD_CLOEXEC);
