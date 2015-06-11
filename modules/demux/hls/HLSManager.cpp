@@ -137,7 +137,9 @@ bool HLSManager::updatePlaylist()
 
     nextPlaylistupdate = now + (mininterval + maxinterval) / (2 * CLOCK_FREQ);
 
-    msg_Dbg(stream, "Updated playlist, next update in %" PRId64 "s %ld %ld", nextPlaylistupdate - now, mininterval, maxinterval );
+    msg_Dbg(stream, "Updated playlist, next update in %" PRId64 "s "
+            "%" PRId64 " %" PRId64, nextPlaylistupdate - now, mininterval,
+            maxinterval);
 
     return true;
 }
