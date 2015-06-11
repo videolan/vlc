@@ -421,7 +421,6 @@ static int CreateTracksFromSmooBox( demux_t *p_demux )
         {
             mp4_track_t *p_track = &p_sys->track[j++];
             MP4_SmoothTrackCreate( p_demux, p_track, p_stra );
-            p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
         }
         p_stra = p_stra->p_next;
     }
@@ -3509,6 +3508,7 @@ static int MP4_SmoothFormatFill( const MP4_Box_data_stra_t *p_data, const mp4_tr
 static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, const MP4_Box_t *p_stra )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    es_format_t *fmt = &p_track->fmt;
 
     p_track->b_ok       = false;
     p_track->b_selected = false;
@@ -3521,16 +3521,36 @@ static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, const 
 
     p_track->i_timescale = p_sys->i_timescale;
     p_track->i_track_ID = p_data->i_track_ID;
+    p_track->i_width = 0;
+    p_track->i_height = 0;
 
-    es_format_t *fmt = &p_track->fmt;
-    es_format_Init( &p_track->fmt, p_data->i_es_cat, 0 );
-
-    if( MP4_SmoothFormatFill( p_data, p_track, fmt ) != VLC_SUCCESS )
+    es_format_t newfmt;
+    es_format_Init( &newfmt, p_data->i_es_cat, 0 );
+    if( MP4_SmoothFormatFill( BOXDATA(p_stra), p_track, &newfmt ) != VLC_SUCCESS )
     {
-        es_format_Clean( fmt );
+        es_format_Clean(&newfmt);
+        if( p_track->p_es )
+        {
+            es_out_Del( p_demux->out, p_track->p_es );
+            p_track->p_es = NULL;
+        }
         return VLC_EGENERIC;
     }
-    else if( fmt->i_cat == VIDEO_ES )
+
+    /* If format now differs from current (new or updated) */
+    if( !es_format_IsSimilar( &newfmt, fmt ) ||
+        newfmt.i_extra != fmt->i_extra ||
+        memcmp( &newfmt.p_extra, fmt->p_extra, newfmt.i_extra ) )
+    {
+        es_format_Clean( fmt );
+        es_format_Copy( fmt, &newfmt );
+        if( p_track->p_es )
+            es_out_Del( p_demux->out, p_track->p_es );
+        p_track->p_es = es_out_Add( p_demux->out, fmt );
+    }
+    es_format_Clean( &newfmt );
+
+    if( fmt->i_cat == VIDEO_ES )
     {
         p_track->i_width = fmt->video.i_visible_width;
         p_track->i_height = fmt->video.i_visible_height;
@@ -3544,7 +3564,7 @@ static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, const 
             p_demux->p_sys->f_fps = 24;
     }
 
-    p_track->b_ok = true;
+    p_track->b_ok = !!p_track->p_es;
 
     return VLC_SUCCESS;
 }
@@ -3615,44 +3635,35 @@ static int ReInitDecoder( demux_t *p_demux, mp4_track_t *p_track )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    uint32_t i_sample = 0;
-    bool b_smooth = false;
-    MP4_Box_t *p_stra = NULL, *p_trak = NULL;
+    uint32_t i_sample = p_track->i_sample;
 
-    if( !CmpUUID( &p_sys->p_root->p_first->i_uuid, &SmooBoxUUID ) )
-        b_smooth = true;
-
-    if( b_smooth )
+    if( p_sys->b_smooth )
     {
-        p_stra = MP4_BoxGet( p_sys->p_root, "uuid/uuid[0]" );
-        if( !p_stra || CmpUUID( &p_stra->i_uuid, &StraBoxUUID ) )
+        MP4_Box_t *p_stra = MP4_BoxGet( p_sys->p_root, "uuid/uuid[0]" );
+        if( !p_stra || CmpUUID( &p_stra->i_uuid, &StraBoxUUID ) ||
+            MP4_SmoothTrackCreate( p_demux, p_track, p_stra ) != VLC_SUCCESS )
             return VLC_EGENERIC;
     }
     else /* DASH */
     {
-        p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[0]" );
+        MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[0]" );
         if( !p_trak )
             return VLC_EGENERIC;
-    }
 
-    i_sample = p_track->i_sample;
-    es_out_Del( p_demux->out, p_track->p_es );
-    p_track->p_es = NULL;
-    es_format_Clean( &p_track->fmt );
-
-    if( b_smooth )
-        MP4_SmoothTrackCreate( p_demux, p_track, p_stra );
-    else /* DASH */
+        es_out_Del( p_demux->out, p_track->p_es );
+        p_track->p_es = NULL;
+        es_format_Clean( &p_track->fmt );
         MP4_TrackCreate( p_demux, p_track, p_trak, true );
+        if(!p_track->p_es)
+            p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
+        p_track->b_ok = !!p_track->p_es;
+    }
 
     p_track->i_sample = i_sample;
 
     /* Temporary hack until we support track selection */
     p_track->b_selected = true;
-    p_track->b_ok = true;
     p_track->b_enable = true;
-    if(!p_track->p_es)
-        p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
     p_track->b_codec_need_restart = false;
 
     return VLC_SUCCESS;
