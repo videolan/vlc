@@ -192,9 +192,9 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
         {
             assert([control isKindOfClass:[NSButton class]]);
             NSButton *button = (NSButton *)control;
-            if (!widget->psz_text)
-                break;
-            [button setTitle:[NSString stringWithUTF8String:widget->psz_text]];
+            [button setTitle:toNSStr(widget->psz_text)];
+            if (widget->type == EXTENSION_WIDGET_CHECK_BOX)
+                [button setState:widget->b_checked ? NSOnState : NSOffState];
             break;
         }
         case EXTENSION_WIDGET_DROPDOWN:
@@ -342,7 +342,10 @@ static ExtensionsDialogProvider *_o_sharedInstance = nil;
     extension_widget_t *widget = [button widget];
 
     vlc_mutex_lock(&widget->p_dialog->lock);
-    extension_WidgetClicked(widget->p_dialog, widget);
+    if (widget->type == EXTENSION_WIDGET_BUTTON)
+        extension_WidgetClicked(widget->p_dialog, widget);
+    else
+        widget->b_checked = [button state] == NSOnState;
     vlc_mutex_unlock(&widget->p_dialog->lock);
 }
 
