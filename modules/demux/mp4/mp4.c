@@ -833,23 +833,6 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    if ( p_sys->i_overall_duration == 0 )
-    {
-        /* Try in mehd if fragmented */
-        MP4_Box_t *p_mehd = MP4_BoxGet( p_demux->p_sys->p_root, "moov/mvex/mehd");
-        if ( p_mehd && p_mehd->data.p_mehd )
-            p_sys->i_overall_duration = p_mehd->data.p_mehd->i_fragment_duration;
-        else
-        {
-            for( i = 0; i < p_sys->i_tracks; i++ )
-            {
-                mtime_t i_duration = GetTrackDurationInFragment( &p_sys->moovfragment,
-                                                                 p_sys->track[i].i_track_ID );
-                p_sys->i_overall_duration = __MAX( p_sys->i_overall_duration, (uint64_t)i_duration );
-            }
-        }
-    }
-
     const unsigned i_tracks = MP4_BoxCount( p_sys->p_root, "/moov/trak" );
     if( i_tracks < 1 )
     {
@@ -923,6 +906,23 @@ static int Open( vlc_object_t * p_this )
         {
             msg_Dbg( p_demux, "ignoring track[Id 0x%x]",
                      p_sys->track[i].i_track_ID );
+        }
+    }
+
+    if ( p_sys->i_overall_duration == 0 )
+    {
+        /* Try in mehd if fragmented */
+        MP4_Box_t *p_mehd = MP4_BoxGet( p_demux->p_sys->p_root, "moov/mvex/mehd");
+        if ( p_mehd && p_mehd->data.p_mehd )
+            p_sys->i_overall_duration = p_mehd->data.p_mehd->i_fragment_duration;
+        else
+        {
+            for( i = 0; i < p_sys->i_tracks; i++ )
+            {
+                mtime_t i_duration = GetTrackDurationInFragment( &p_sys->moovfragment,
+                                                                 p_sys->track[i].i_track_ID );
+                p_sys->i_overall_duration = __MAX( p_sys->i_overall_duration, (uint64_t)i_duration );
+            }
         }
     }
 
