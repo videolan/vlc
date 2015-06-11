@@ -23,6 +23,7 @@
 #include "../adaptative/tools/Retrieve.hpp"
 #include "playlist/Parser.hpp"
 #include <vlc_stream.h>
+#include <time.h>
 
 using namespace adaptative;
 using namespace adaptative::logic;
