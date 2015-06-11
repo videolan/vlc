@@ -444,6 +444,7 @@ SOURCES_libvlc_common = \
 	misc/block.c \
 	misc/fifo.c \
 	misc/fourcc.c \
+	misc/fourcc_list.h \
 	misc/es_format.c \
 	misc/picture.c \
 	misc/picture_fifo.c \
