@@ -31,7 +31,6 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_MPGV, "MPEG-1/2 Video"),
     B(VLC_CODEC_MP2V, "MPEG-2 Video"),
-        A("mpgv"),
         A("mpeg"),
         A("mp2v"),
         A("MPEG"),
@@ -280,7 +279,6 @@ static const staticentry_t p_list_video[] = {
         A("VX1K"),
         A("s263"),
         A("S263"),
-        A("U263"),
         A("u263"),
         A("lsvm"),
         E("D263", "DEC H263"),
@@ -327,11 +325,9 @@ static const staticentry_t p_list_video[] = {
         A("mJPG"),
         A("mjpa"),
         A("jpeg"),
-        A("JPEG"),
         A("JFIF"),
         A("JPGL"),
         A("LJPG"),
-        A("AVDJ"),
         A("MMJP"),
         A("FLJP"),
         A("FMJP"),
@@ -762,7 +758,6 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_YUV422A, "Planar YUV 4:2:2 Y:U:V:A"),
         A("I42A"),
     B(VLC_CODEC_YUVA_444_10L, "Planar YUV 4:4:4 Y:U:V:A 10bits"),
-        A("YUVA"),
 
     B(VLC_CODEC_RGBP, "Palettized RGB with palette element R:G:B"),
         A("RGBP"),
@@ -1004,7 +999,6 @@ static const staticentry_t p_list_video[] = {
         A("MSA1"),
 
     B(VLC_CODEC_TSC2, "TechSmith Screen Codec 2"),
-        A("MSA1"),
         A("tsc2"),
 
     B(VLC_CODEC_MTS2, "Microsoft Expression Encoder Screen"),
