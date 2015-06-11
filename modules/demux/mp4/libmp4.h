@@ -1696,7 +1696,7 @@ MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, const char *psz_fmt, ... );
  * ex: /moov/trak
  *     ../mdia
  *****************************************************************************/
-int MP4_BoxCount( MP4_Box_t *p_box, const char *psz_fmt, ... );
+unsigned MP4_BoxCount( MP4_Box_t *p_box, const char *psz_fmt, ... );
 
 /* Internal functions exposed for MKV demux */
 int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box );

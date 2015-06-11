@@ -4405,10 +4405,10 @@ MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, const char *psz_fmt, ... )
  * ex: /moov/trak[12]
  *     ../mdia
  *****************************************************************************/
-int MP4_BoxCount( MP4_Box_t *p_box, const char *psz_fmt, ... )
+unsigned MP4_BoxCount( MP4_Box_t *p_box, const char *psz_fmt, ... )
 {
     va_list args;
-    int     i_count;
+    unsigned i_count;
     MP4_Box_t *p_result, *p_next;
 
     va_start( args, psz_fmt );
