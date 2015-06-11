@@ -33,115 +33,89 @@
 #include <vlc_es.h>
 #include <assert.h>
 
+#include "fourcc_tables.h"
 
-typedef struct
+static int fourcc_cmp(const void *key, const void *ent)
 {
-    char p_class[4];
-    char p_fourcc[4];
-    char psz_description[56];
-} staticentry_t;
-
-typedef struct
-{
-    char p_class[4];
-    char p_fourcc[4];
-    const char *psz_description;
-} entry_t;
-
-#define NULL4 "\x00\x00\x00\x00"
-
-/* XXX You don't want to see the preprocessor generated code ;) */
-#ifdef WORDS_BIGENDIAN
-#   define FCC2STR(f) { ((f)>>24)&0xff, ((f)>>16)&0xff, ((f)>>8)&0xff, ((f)>>0)&0xff }
-#else
-#   define FCC2STR(f) { ((f)>>0)&0xff, ((f)>>8)&0xff, ((f)>>16)&0xff, ((f)>>24)&0xff }
-#endif
-/* Begin a new class */
-#define B(a, c) { .p_class = FCC2STR(a), .p_fourcc = FCC2STR(a), .psz_description = c }
-/* Create a sub-class entry with description */
-#define E(b, c) { .p_class = NULL4, .p_fourcc = b, .psz_description = c }
-/* Create a sub-class entry without description (alias) */
-#define A(b) E(b, NULL4)
-
-#include "misc/fourcc_list.h"
-
-/* Create a fourcc from a string.
- * XXX it assumes that the string is at least four bytes */
-static inline vlc_fourcc_t CreateFourcc( const char *psz_fourcc )
-{
-    return VLC_FOURCC( psz_fourcc[0], psz_fourcc[1],
-                       psz_fourcc[2], psz_fourcc[3] );
+    return memcmp(key, ent, 4);
 }
 
-/* */
-static entry_t Lookup( const staticentry_t p_list[], vlc_fourcc_t i_fourcc )
+static vlc_fourcc_t Lookup(vlc_fourcc_t fourcc, const char **restrict dsc,
+                           const struct fourcc_mapping *mapv, size_t mapc,
+                           const struct fourcc_desc *dscv, size_t dscc)
 {
-    const char *p_class = NULL;
-    const char *psz_description = NULL;
+    const struct fourcc_mapping *mapping;
+    const struct fourcc_desc *desc;
 
-    entry_t e = B(0, "");
-
-    for( int i = 0; ; i++ )
+    mapping = bsearch(&fourcc, mapv, mapc, sizeof (*mapv), fourcc_cmp);
+    if (mapping != NULL)
     {
-        const staticentry_t *p = &p_list[i];
-        const vlc_fourcc_t i_entry_fourcc = CreateFourcc( p->p_fourcc );
-        const vlc_fourcc_t i_entry_class = CreateFourcc( p->p_class );
-
-        if( i_entry_fourcc == 0 )
-            break;
-
-        if( i_entry_class != 0 )
+        if (dsc != NULL)
         {
-            p_class = p->p_class;
-            psz_description = p->psz_description;
+            desc = bsearch(&fourcc, dscv, dscc, sizeof (*dscv), fourcc_cmp);
+            if (desc != NULL)
+            {
+                *dsc = desc->desc;
+                return mapping->fourcc;
+            }
         }
-
-        if( i_entry_fourcc == i_fourcc )
-        {
-            assert( p_class != NULL );
-
-            memcpy( e.p_class, p_class, 4 );
-            memcpy( e.p_fourcc, p->p_fourcc, 4 );
-            e.psz_description = p->psz_description[0] != '\0' ?
-                                p->psz_description : psz_description;
-            break;
-        }
+        fourcc = mapping->fourcc;
     }
-    return e;
+
+    desc = bsearch(&fourcc, dscv, dscc, sizeof (*dscv), fourcc_cmp);
+    if (desc == NULL)
+        return 0; /* Unknown FourCC */
+    if (dsc != NULL)
+        *dsc = desc->desc;
+    return fourcc; /* Known FourCC (has a description) */
 }
 
-/* */
-static entry_t Find( int i_cat, vlc_fourcc_t i_fourcc )
+static vlc_fourcc_t LookupVideo(vlc_fourcc_t fourcc, const char **restrict dsc)
 {
-    entry_t e;
+    return Lookup(fourcc, dsc, mapping_video,
+                  sizeof (mapping_video) / sizeof (mapping_video[0]),
+                  desc_video, sizeof (desc_video) / sizeof (desc_video[0]));
+}
 
-    switch( i_cat )
+static vlc_fourcc_t LookupAudio(vlc_fourcc_t fourcc, const char **restrict dsc)
+{
+    return Lookup(fourcc, dsc, mapping_audio,
+                  sizeof (mapping_audio) / sizeof (mapping_audio[0]),
+                  desc_audio, sizeof (desc_audio) / sizeof (desc_audio[0]));
+}
+
+static vlc_fourcc_t LookupSpu(vlc_fourcc_t fourcc, const char **restrict dsc)
+{
+    return Lookup(fourcc, dsc, mapping_spu,
+                  sizeof (mapping_spu) / sizeof (mapping_spu[0]),
+                  desc_spu, sizeof (desc_spu) / sizeof (desc_spu[0]));
+}
+
+static vlc_fourcc_t LookupCat(vlc_fourcc_t fourcc, const char **restrict dsc,
+                              int cat)
+{
+    switch (cat)
     {
-    case VIDEO_ES:
-        return Lookup( p_list_video, i_fourcc );
-    case AUDIO_ES:
-        return Lookup( p_list_audio, i_fourcc );
-    case SPU_ES:
-        return Lookup( p_list_spu, i_fourcc );
-
-    default:
-        e = Lookup( p_list_video, i_fourcc );
-        if( CreateFourcc( e.p_class ) == 0 )
-            e = Lookup( p_list_audio, i_fourcc );
-        if( CreateFourcc( e.p_class ) == 0 )
-            e = Lookup( p_list_spu, i_fourcc );
-        return e;
+        case VIDEO_ES:
+            return LookupVideo(fourcc, dsc);
+        case AUDIO_ES:
+            return LookupAudio(fourcc, dsc);
+        case SPU_ES:
+            return LookupSpu(fourcc, dsc);
     }
+
+    vlc_fourcc_t ret = LookupVideo(fourcc, dsc);
+    if (!ret)
+        ret = LookupAudio(fourcc, dsc);
+    if (!ret)
+        ret = LookupSpu(fourcc, dsc);
+    return ret;
 }
 
-/* */
-vlc_fourcc_t vlc_fourcc_GetCodec( int i_cat, vlc_fourcc_t i_fourcc )
+vlc_fourcc_t vlc_fourcc_GetCodec(int cat, vlc_fourcc_t fourcc)
 {
-    entry_t e = Find( i_cat, i_fourcc );
-
-    if( CreateFourcc( e.p_class ) == 0 )
-        return i_fourcc;
-    return CreateFourcc( e.p_class );
+    vlc_fourcc_t codec = LookupCat(fourcc, NULL, cat);
+    return codec ? codec : fourcc;
 }
 
 vlc_fourcc_t vlc_fourcc_GetCodecFromString( int i_cat, const char *psz_fourcc )
@@ -224,12 +198,11 @@ vlc_fourcc_t vlc_fourcc_GetCodecAudio( vlc_fourcc_t i_fourcc, int i_bits )
     }
 }
 
-/* */
-const char *vlc_fourcc_GetDescription( int i_cat, vlc_fourcc_t i_fourcc )
+const char *vlc_fourcc_GetDescription(int cat, vlc_fourcc_t fourcc)
 {
-    entry_t e = Find( i_cat, i_fourcc );
+    const char *ret;
 
-    return e.psz_description;
+    return LookupCat(fourcc, &ret, cat) ? ret : "";
 }
 
 
