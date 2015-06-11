@@ -376,50 +376,57 @@ LoadInitFragError:
     return VLC_EGENERIC;
 }
 
-static int InitTracks( demux_t *p_demux )
+static int AllocateTracks( demux_t *p_demux, unsigned i_tracks )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    p_sys->track = calloc( p_sys->i_tracks, sizeof( mp4_track_t ) );
+    p_sys->track = calloc( i_tracks, sizeof( mp4_track_t ) );
     if( p_sys->track == NULL )
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
+    p_sys->i_tracks = i_tracks;
 
     if( p_sys->b_fragmented )
     {
-        mp4_track_t *p_track;
-        for( uint16_t i = 0; i < p_sys->i_tracks; i++ )
+        for( unsigned i = 0; i < i_tracks; i++ )
         {
-            p_track = &p_sys->track[i];
+            mp4_track_t *p_track = &p_sys->track[i];
             p_track->cchunk = calloc( 1, sizeof( mp4_chunk_t ) );
             if( unlikely( !p_track->cchunk ) )
-            {
-                free( p_sys->track );
-                return VLC_EGENERIC;
-            }
+                return VLC_ENOMEM;
         }
     }
     return VLC_SUCCESS;
 }
 
-static void CreateTracksFromSmooBox( demux_t *p_demux )
+static int CreateTracksFromSmooBox( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
     MP4_Box_t *p_smoo = MP4_BoxGet( p_sys->p_root, "uuid" );
-    mp4_track_t *p_track;
-    int j = 0;
-    for( int i = 0; i < 3; i++ )
+    if( CmpUUID( &p_smoo->i_uuid, &SmooBoxUUID ) )
+        return VLC_EGENERIC;
+
+    /* Smooth tracks are stra UUID box below smooth UUID box */
+    const unsigned i_tracks = MP4_BoxCount( p_smoo, "uuid" );
+
+    if( AllocateTracks( p_demux, i_tracks ) != VLC_SUCCESS )
+        return VLC_EGENERIC;
+
+    unsigned j = 0;
+    MP4_Box_t *p_stra = MP4_BoxGet( p_smoo, "uuid" );
+    while( p_stra && j < p_sys->i_tracks )
     {
-        MP4_Box_t *p_stra = MP4_BoxGet( p_smoo, "uuid[%d]", i );
-        if( !p_stra || !BOXDATA(p_stra) || BOXDATA(p_stra)->i_track_ID == 0 )
-            continue;
-        else
+        if( !CmpUUID( &p_stra->i_uuid, &StraBoxUUID ) &&
+            BOXDATA(p_stra) && BOXDATA(p_stra)->i_track_ID > 0 )
         {
-            p_track = &p_sys->track[j]; j++;
+            mp4_track_t *p_track = &p_sys->track[j++];
             MP4_frg_TrackCreate( p_demux, p_track, p_stra );
             p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
         }
+        p_stra = p_stra->p_next;
     }
+
+    return VLC_SUCCESS;
 }
 
 static block_t * MP4_EIA608_Convert( block_t * p_block )
@@ -689,9 +696,9 @@ static int Open( vlc_object_t * p_this )
 
     if( p_sys->b_smooth )
     {
-        if( InitTracks( p_demux ) != VLC_SUCCESS )
+        if( CreateTracksFromSmooBox( p_demux ) != VLC_SUCCESS )
             goto error;
-        CreateTracksFromSmooBox( p_demux );
+
         p_demux->pf_demux = DemuxFrg;
         msg_Dbg( p_demux, "Set DemuxFrg mode" );
         return VLC_SUCCESS;
@@ -843,16 +850,15 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    if( !( p_sys->i_tracks = MP4_BoxCount( p_sys->p_root, "/moov/trak" ) ) )
+    const unsigned i_tracks = MP4_BoxCount( p_sys->p_root, "/moov/trak" );
+    if( i_tracks < 1 )
     {
         msg_Err( p_demux, "cannot find any /moov/trak" );
         goto error;
     }
-    msg_Dbg( p_demux, "found %d track%c",
-                        p_sys->i_tracks,
-                        p_sys->i_tracks ? 's':' ' );
+    msg_Dbg( p_demux, "found %u track%c", i_tracks, i_tracks ? 's':' ' );
 
-    if( InitTracks( p_demux ) != VLC_SUCCESS )
+    if( AllocateTracks( p_demux, i_tracks ) != VLC_SUCCESS )
         goto error;
 
     /* Search the first chap reference (like quicktime) and
