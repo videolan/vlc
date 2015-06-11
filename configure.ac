@@ -70,7 +70,7 @@ AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [Validator for desktop entry files])
 AC_CHECK_PROGS(DESKTOP_FILE_VALIDATE, [${DESKTOP_FILE_VALIDATE} desktop-file-validate], :)
 AC_PATH_PROG(YASM, yasm)
 AC_ARG_VAR([BUILDCC], [Build system C99 compiler command])
-AC_PATH_PROG(BUILDCC, [c99-gcc c99])
+AC_PATH_PROGS(BUILDCC, [c99-gcc c99])
 
 dnl Check for compiler properties
 AC_C_CONST
