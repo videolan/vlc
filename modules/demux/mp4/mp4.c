@@ -3454,7 +3454,7 @@ static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Bo
     if( !p_data )
         return VLC_EGENERIC;
 
-    p_track->b_ok       = true;
+    p_track->b_ok       = false;
     p_track->b_selected = false;
     p_track->i_sample_count = UINT32_MAX;
 
@@ -3532,6 +3532,8 @@ static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Bo
         default:
             break;
     }
+
+    p_track->b_ok = true;
 
     return VLC_SUCCESS;
 }
