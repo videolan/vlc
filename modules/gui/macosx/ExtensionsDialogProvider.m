@@ -161,18 +161,6 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             break;
 
         }
-        {
-            assert([control isKindOfClass:[NSTextView class]]);
-            NSTextView *textView = (NSTextView *)control;
-            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
-            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding: NSISOLatin1StringEncoding] documentAttributes:NULL];
-            [[textView textStorage] setAttributedString:attrString];
-            [textView setNeedsDisplay:YES];
-            [textView scrollRangeToVisible:NSMakeRange(0, 0)];
-            [attrString release];
-            break;
-
-        }
         case EXTENSION_WIDGET_LABEL:
         case EXTENSION_WIDGET_PASSWORD:
         case EXTENSION_WIDGET_TEXT_FIELD:
