@@ -115,6 +115,8 @@ bool ThemeLoader::extractTarGz( const string &tarFile, const string &rootDir )
     if( tar_open( &t, (char *)tarFile.c_str(), O_RDONLY ) == -1 )
 #endif
     {
+        msg_Dbg( getIntf(), "failed to open %s as a gzip tar file",
+                            tarFile.c_str() );
         return false;
     }
 
@@ -139,10 +141,18 @@ bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
 
     // Try to open the ZIP file
     unzFile file = unzOpen( zipFile.c_str() );
+    if( file == 0 )
+    {
+        msg_Dbg( getIntf(), "failed to open %s as a zip file",
+                 zipFile.c_str() );
+        return false;
+    }
     unz_global_info info;
-
     if( unzGetGlobalInfo( file, &info ) != UNZ_OK )
     {
+        msg_Dbg( getIntf(), "failed to read zip info from %s",
+                 zipFile.c_str() );
+        unzClose( file );
         return false;
     }
     // Extract all the files in the archive
@@ -159,7 +169,7 @@ bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
         if( i < info.number_entry - 1 )
         {
             // Go the next file in the archive
-            if( unzGoToNextFile( file ) !=UNZ_OK )
+            if( unzGoToNextFile( file ) != UNZ_OK )
             {
                 msg_Warn( getIntf(), "error while unzipping %s",
                           zipFile.c_str() );
