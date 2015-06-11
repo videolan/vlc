@@ -63,9 +63,6 @@ static int cmp_entry(const void *a, const void *b)
 
 static void process_list(const char *name, const staticentry_t *list, size_t n)
 {
-    assert(n > 0);
-    n--; /* discard final nul entry  */
-
     struct entry *entries = malloc(sizeof (*entries) * n);
     if (entries == NULL)
         abort();

@@ -1075,8 +1075,6 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_DFA, "Chronomaster DFA"),
 
     B(VLC_CODEC_HNM4_VIDEO, "Cryo Interactive Entertainment HNM4"),
-
-    B(VLC_FOURCC(0,0,0,0), "")
 };
 
 static const staticentry_t p_list_audio[] = {
@@ -1482,8 +1480,6 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_ADPCM_EA_R1, "ADPCM Electronic Arts R1"),
 
     B(VLC_CODEC_ADPCM_IMA_APC, "ADPCM APC"),
-
-    B(VLC_FOURCC(0,0,0,0), "")
 };
 
 static const staticentry_t p_list_spu[] = {
@@ -1554,6 +1550,4 @@ static const staticentry_t p_list_spu[] = {
 
     B(VLC_CODEC_TTML, "TTML subtitles"),
         A("ttml"),
-
-    B(VLC_FOURCC(0,0,0,0), "")
 };
