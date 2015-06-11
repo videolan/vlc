@@ -116,7 +116,7 @@ struct demux_sys_t
  * Declaration of local function
  *****************************************************************************/
 static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *, bool b_force_enable );
-static int  MP4_SmoothTrackCreate( demux_t *, mp4_track_t *, MP4_Box_t *);
+static int  MP4_SmoothTrackCreate( demux_t *, mp4_track_t *, const MP4_Box_t *);
 static void MP4_TrackDestroy( demux_t *, mp4_track_t * );
 
 static block_t * MP4_Block_Read( demux_t *, const mp4_track_t *, int );
@@ -3436,7 +3436,7 @@ static int build_raw_avcC( uint8_t **p_extra, const uint8_t *CodecPrivateData,
  * Build a mp4_track_t from a StraBox
  */
 
-static inline int MP4_SetCodecExtraData( es_format_t *fmt, MP4_Box_data_stra_t *p_data )
+static inline int MP4_SetCodecExtraData( es_format_t *fmt, const MP4_Box_data_stra_t *p_data )
 {
     fmt->p_extra = malloc( p_data->cpd_len );
     if( unlikely( !fmt->p_extra ) )
@@ -3446,29 +3446,9 @@ static inline int MP4_SetCodecExtraData( es_format_t *fmt, MP4_Box_data_stra_t *
     return VLC_SUCCESS;
   }
 
-static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_stra )
+static int MP4_SmoothFormatFill( const MP4_Box_data_stra_t *p_data, const mp4_track_t *p_track,
+                                 es_format_t *fmt )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    int ret;
-    MP4_Box_data_stra_t *p_data = BOXDATA(p_stra);
-    if( !p_data )
-        return VLC_EGENERIC;
-
-    p_track->b_ok       = false;
-    p_track->b_selected = false;
-    p_track->i_sample_count = UINT32_MAX;
-
-    p_track->i_timescale = p_sys->i_timescale;
-    p_track->i_width = p_data->MaxWidth;
-    p_track->i_height = p_data->MaxHeight;
-    p_track->i_track_ID = p_data->i_track_ID;
-
-    es_format_t *fmt = &p_track->fmt;
-    if( fmt == NULL )
-        return VLC_EGENERIC;
-
-    es_format_Init( fmt, p_data->i_es_cat, 0 );
-
     /* Set language FIXME */
     fmt->psz_language = strdup( "en" );
 
@@ -3490,9 +3470,8 @@ static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Bo
             }
             else
             {
-                ret = MP4_SetCodecExtraData( fmt, p_data );
-                if( ret != VLC_SUCCESS )
-                    return ret;
+                if ( MP4_SetCodecExtraData( fmt, p_data ) != VLC_SUCCESS )
+                    return VLC_EGENERIC;
             }
 
             fmt->video.i_width = p_data->MaxWidth;
@@ -3505,14 +3484,6 @@ static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Bo
             ChunkGetESSampleRate( &fmt->video.i_frame_rate,
                                   &fmt->video.i_frame_rate_base, p_track );
 
-            if( fmt->video.i_frame_rate_base != 0 )
-            {
-                p_demux->p_sys->f_fps = (float)fmt->video.i_frame_rate /
-                                        (float)fmt->video.i_frame_rate_base;
-            }
-            else
-                p_demux->p_sys->f_fps = 24;
-
             break;
 
         case AUDIO_ES:
@@ -3523,14 +3494,54 @@ static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Bo
 
             fmt->i_bitrate = p_data->Bitrate;
 
-            ret = MP4_SetCodecExtraData( fmt, p_data );
-            if( ret != VLC_SUCCESS )
-                return ret;
+            if ( MP4_SetCodecExtraData( fmt, p_data ) != VLC_SUCCESS )
+                return VLC_EGENERIC;
 
             break;
 
         default:
             break;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, const MP4_Box_t *p_stra )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_track->b_ok       = false;
+    p_track->b_selected = false;
+
+    MP4_Box_data_stra_t *p_data = BOXDATA(p_stra);
+    if( !p_data )
+        return VLC_EGENERIC;
+
+    p_track->i_sample_count = UINT32_MAX;
+
+    p_track->i_timescale = p_sys->i_timescale;
+    p_track->i_track_ID = p_data->i_track_ID;
+
+    es_format_t *fmt = &p_track->fmt;
+    es_format_Init( &p_track->fmt, p_data->i_es_cat, 0 );
+
+    if( MP4_SmoothFormatFill( p_data, p_track, fmt ) != VLC_SUCCESS )
+    {
+        es_format_Clean( fmt );
+        return VLC_EGENERIC;
+    }
+    else if( fmt->i_cat == VIDEO_ES )
+    {
+        p_track->i_width = fmt->video.i_visible_width;
+        p_track->i_height = fmt->video.i_visible_height;
+
+        if( fmt->video.i_frame_rate_base != 0 )
+        {
+            p_demux->p_sys->f_fps = (float)fmt->video.i_frame_rate /
+                                    (float)fmt->video.i_frame_rate_base;
+        }
+        else
+            p_demux->p_sys->f_fps = 24;
     }
 
     p_track->b_ok = true;
