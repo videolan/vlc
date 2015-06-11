@@ -1,4 +1,6 @@
 test_*
+fourcc_gen
+fourcc_tables.h
 libvlc_win32_rc.rc
 revision.c
 revision.txt

@@ -515,6 +515,20 @@ SOURCES_libvlc = \
 	$(SOURCES_libvlc_common) \
 	$(NULL)
 
+# FourCC tables
+BUILT_SOURCES += fourcc_tables.h
+EXTRA_DIST += misc/fourcc_gen.c
+MOSTLYCLEANFILES = fourcc_gen
+
+fourcc_gen: misc/fourcc_gen.c misc/fourcc_list.h ../include/vlc_fourcc.h
+	$(AM_V_at)rm -f -- $@
+	$(AM_V_CC)$(BUILDCC) -I$(srcdir) -o $@ $<
+
+fourcc_tables.h: fourcc_gen
+	$(AM_V_at)rm -f -- $@.tmp
+	$(AM_V_GEN)$(builddir)/fourcc_gen > $@.tmp
+	$(AM_V_at)mv -f -- $@.tmp $@
+
 # Unit/regression tests
 #
 check_PROGRAMS = \

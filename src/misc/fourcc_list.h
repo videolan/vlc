@@ -1076,8 +1076,9 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_HNM4_VIDEO, "Cryo Interactive Entertainment HNM4"),
 
-    B(0, "")
+    B(VLC_FOURCC(0,0,0,0), "")
 };
+
 static const staticentry_t p_list_audio[] = {
 
     /* Windows Media Audio 1 */
@@ -1482,8 +1483,9 @@ static const staticentry_t p_list_audio[] = {
 
     B(VLC_CODEC_ADPCM_IMA_APC, "ADPCM APC"),
 
-    B(0, "")
+    B(VLC_FOURCC(0,0,0,0), "")
 };
+
 static const staticentry_t p_list_spu[] = {
 
     B(VLC_CODEC_SPU, "DVD Subtitles"),
@@ -1553,5 +1555,5 @@ static const staticentry_t p_list_spu[] = {
     B(VLC_CODEC_TTML, "TTML subtitles"),
         A("ttml"),
 
-    B(0, "")
+    B(VLC_FOURCC(0,0,0,0), "")
 };

@@ -24,6 +24,7 @@
 #ifndef VLC_ES_H
 #define VLC_ES_H 1
 
+#include <vlc_common.h>
 #include <vlc_fourcc.h>
 #include <vlc_text_style.h>
 
