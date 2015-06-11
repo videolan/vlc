@@ -287,6 +287,7 @@ static const staticentry_t p_list_video[] = {
         /* avc1: special case h264 */
         A("avc1"),
         A("AVC1"),
+        A("AVCB"), /* smooth streaming alias */
         A("avc3"),
         E("ai5p", "AVC-Intra  50M 720p24/30/60"),
         E("ai5q", "AVC-Intra  50M 720p25/50"),
@@ -1235,6 +1236,7 @@ static const staticentry_t p_list_audio[] = {
         A("aac "),
         A("AACL"),
         A("AACH"),
+        A("AACP"), /* smooth streaming alias */
 
     /* ALS audio */
     B(VLC_CODEC_ALS, "MPEG-4 Audio Lossless (ALS)"),
