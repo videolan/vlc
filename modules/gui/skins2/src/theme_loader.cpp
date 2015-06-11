@@ -78,7 +78,7 @@ bool ThemeLoader::load( const string &fileName )
     // file...
 
 #if defined( HAVE_ZLIB_H )
-    if( ! extract( sToLocale( fileName ) ) && ! parse( path, fileName ) )
+    if( ! extract( fileName ) && ! parse( path, fileName ) )
         return false;
 #else
     if( ! parse( path, fileName ) )
@@ -134,13 +134,28 @@ bool ThemeLoader::extractTarGz( const string &tarFile, const string &rootDir )
     return true;
 }
 
+static voidpf ZCALLBACK open_vlc( voidpf opaque, const char *filename, int mode)
+{
+    (void)mode;
+    intf_thread_t *pIntf = (intf_thread_t *)opaque;
+
+    FILE *stream = vlc_fopen( filename, "rb" );
+    if( stream == NULL )
+        msg_Dbg( pIntf, "vlc_fopen failed for %s", filename );
+    return stream;
+}
 
 bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
 {
     bool b_isWsz = strstr( zipFile.c_str(), ".wsz" );
 
     // Try to open the ZIP file
-    unzFile file = unzOpen( zipFile.c_str() );
+    zlib_filefunc_def descr;
+    fill_fopen_filefunc( &descr );
+    descr.zopen_file = open_vlc;
+    descr.opaque = getIntf();
+
+    unzFile file = unzOpen2( zipFile.c_str(), &descr );
     if( file == 0 )
     {
         msg_Dbg( getIntf(), "failed to open %s as a zip file",
