@@ -3438,10 +3438,10 @@ static int build_raw_avcC( uint8_t **p_extra, const uint8_t *CodecPrivateData,
 
 static inline int MP4_SetCodecExtraData( es_format_t *fmt, MP4_Box_data_stra_t *p_data )
 {
-    fmt->i_extra = p_data->cpd_len;
     fmt->p_extra = malloc( p_data->cpd_len );
     if( unlikely( !fmt->p_extra ) )
         return VLC_ENOMEM;
+    fmt->i_extra = p_data->cpd_len;
     memcpy( fmt->p_extra, p_data->CodecPrivateData, p_data->cpd_len );
     return VLC_SUCCESS;
   }
