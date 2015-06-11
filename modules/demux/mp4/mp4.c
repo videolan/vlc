@@ -116,7 +116,7 @@ struct demux_sys_t
  * Declaration of local function
  *****************************************************************************/
 static void MP4_TrackCreate ( demux_t *, mp4_track_t *, MP4_Box_t  *, bool b_force_enable );
-static int MP4_frg_TrackCreate( demux_t *, mp4_track_t *, MP4_Box_t *);
+static int  MP4_SmoothTrackCreate( demux_t *, mp4_track_t *, MP4_Box_t *);
 static void MP4_TrackDestroy( demux_t *, mp4_track_t * );
 
 static block_t * MP4_Block_Read( demux_t *, const mp4_track_t *, int );
@@ -420,7 +420,7 @@ static int CreateTracksFromSmooBox( demux_t *p_demux )
             BOXDATA(p_stra) && BOXDATA(p_stra)->i_track_ID > 0 )
         {
             mp4_track_t *p_track = &p_sys->track[j++];
-            MP4_frg_TrackCreate( p_demux, p_track, p_stra );
+            MP4_SmoothTrackCreate( p_demux, p_track, p_stra );
             p_track->p_es = es_out_Add( p_demux->out, &p_track->fmt );
         }
         p_stra = p_stra->p_next;
@@ -3446,7 +3446,7 @@ static inline int MP4_SetCodecExtraData( es_format_t *fmt, MP4_Box_data_stra_t *
     return VLC_SUCCESS;
   }
 
-static int MP4_frg_TrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_stra )
+static int MP4_SmoothTrackCreate( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_stra )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int ret;
@@ -3628,7 +3628,7 @@ static int ReInitDecoder( demux_t *p_demux, mp4_track_t *p_track )
     es_format_Clean( &p_track->fmt );
 
     if( b_smooth )
-        MP4_frg_TrackCreate( p_demux, p_track, p_stra );
+        MP4_SmoothTrackCreate( p_demux, p_track, p_stra );
     else /* DASH */
         MP4_TrackCreate( p_demux, p_track, p_trak, true );
 
