@@ -71,7 +71,7 @@ d:add_label( text, ... ): Create a text label with caption "text" (string).
 d:add_html( text, ... ): Create a rich text label with caption "text" (string), that supports basic HTML formatting (such as <i> or <h1> for instance).
 d:add_text_input( text, ... ): Create an editable text field, in order to read user input.
 d:add_password( text, ... ): Create an editable text field, in order to read user input. Text entered in this box will not be readable (replaced by asterisks).
-d:add_check_box( text, ... ): Create a check box with a text. They have a boolean state (true/false).
+d:add_check_box( text, state, ... ): Create a check box with a text. They have a boolean state (true/false).
 d:add_dropdown( ... ): Create a drop-down widget. Only 1 element can be selected the same time.
 d:add_list( ... ): Create a list widget. Allows multiple or empty selections.
 d:add_image( path, ... ): Create an image label. path is a relative or absolute path to the image on the local computer.
