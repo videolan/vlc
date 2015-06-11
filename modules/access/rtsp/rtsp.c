@@ -187,9 +187,9 @@ static int rtsp_send_request( rtsp_client_t *rtsp, const char *psz_type,
 
 static void rtsp_schedule_standard( rtsp_client_t *rtsp )
 {
-    char tmp[17];
+    char tmp[sizeof("CSeq: ") + 3 * sizeof(int)];
 
-    sprintf( tmp, "Cseq: %u", rtsp->p_private->cseq);
+    sprintf( tmp, "CSeq: %u", rtsp->p_private->cseq);
     rtsp_schedule_field( rtsp, tmp );
 
     if( rtsp->p_private->session )
@@ -226,7 +226,7 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
       answer = rtsp_get( rtsp );
       if( !answer ) return 0;
 
-      if( !strncasecmp( answer, "Cseq:", 5 ) )
+      if( !strncasecmp( answer, "CSeq:", 5 ) )
       {
           sscanf( answer, "%*s %u", &answer_seq );
           if( rtsp->p_private->cseq != answer_seq )
@@ -284,7 +284,7 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
 
 int rtsp_send_ok( rtsp_client_t *rtsp )
 {
-    char cseq[17];
+    char cseq[sizeof("CSeq: ") + 3 * sizeof(int)];
 
     rtsp_put( rtsp, "RTSP/1.0 200 OK" );
     sprintf( cseq, "CSeq: %u", rtsp->p_private->cseq );
@@ -418,7 +418,7 @@ int rtsp_read_data( rtsp_client_t *rtsp, uint8_t *buffer, unsigned int size )
                 rest = rtsp_get( rtsp );
                 if( !rest ) return -1;
 
-                if( !strncasecmp( rest, "Cseq:", 5 ) )
+                if( !strncasecmp( rest, "CSeq:", 5 ) )
                     sscanf( rest, "%*s %u", &seq );
             } while( *rest );
             free( rest );
@@ -431,7 +431,7 @@ int rtsp_read_data( rtsp_client_t *rtsp, uint8_t *buffer, unsigned int size )
 
             /* lets make the server happy */
             rtsp_put( rtsp, "RTSP/1.0 451 Parameter Not Understood" );
-            rest = xmalloc(17);
+            rest = xmalloc(sizeof("Cseq: ") + 3 * sizeof(int));
             sprintf( rest,"CSeq: %u", seq );
             rtsp_put( rtsp, rest );
             rtsp_put( rtsp, "" );
