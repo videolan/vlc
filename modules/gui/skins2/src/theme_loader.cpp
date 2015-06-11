@@ -516,14 +516,26 @@ int tar_open( TAR **t, char *pathname, int oflags )
 {
     (void)oflags;
 
-    gzFile f = gzopen( pathname, "rb" );
+    int fd = vlc_open( pathname, O_BINARY | O_RDONLY );
+    if( !fd )
+    {
+        fprintf( stderr, "Couldn't open %s\n", pathname );
+        return -1;
+    }
+    gzFile f = gzdopen( fd, "rb" );
     if( f == NULL )
     {
         fprintf( stderr, "Couldn't gzopen %s\n", pathname );
+        close( fd );
         return -1;
     }
 
     *t = (gzFile *)malloc( sizeof(gzFile) );
+    if( *t == NULL )
+    {
+        gzclose( f );
+        return -1;
+    }
     **t = f;
     return 0;
 }
@@ -750,11 +762,17 @@ int gzopen_frontend( const char *pathname, int oflags, int mode )
         errno = EINVAL;
         return -1;
     }
-
-    gzf = gzopen( pathname, gzflags );
+    int fd = vlc_open( pathname, oflags );
+    if( !fd )
+    {
+        fprintf( stderr, "Couldn't open %s\n", pathname );
+        return -1;
+    }
+    gzf = gzdopen( fd, gzflags );
     if( !gzf )
     {
         errno = ENOMEM;
+        close( fd );
         return -1;
     }
 
