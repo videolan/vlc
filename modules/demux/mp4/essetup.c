@@ -422,11 +422,6 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                 p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
                 p_soun->i_bytes_per_sample  = 2;
                 break;
-            case VLC_CODEC_ALAW:
-            case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
-                p_soun->i_samplesize = 8;
-                p_track->i_sample_size = p_soun->i_channelcount;
-                break;
             case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             case VLC_FOURCC( 'r', 'a', 'w', ' ' ):
             case VLC_FOURCC( 't', 'w', 'o', 's' ):

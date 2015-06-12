@@ -3038,6 +3038,10 @@ static inline uint32_t MP4_GetFixedSampleSize( const mp4_track_t *p_track,
         case ATOM_raw:
             i_size = ((p_soun->i_samplesize+7)/8) * p_soun->i_channelcount;
             break;
+        case VLC_CODEC_ALAW:
+        case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
+            i_size = p_soun->i_channelcount;
+            break;
         default:
             break;
         }
