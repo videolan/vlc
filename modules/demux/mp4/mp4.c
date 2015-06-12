@@ -109,7 +109,6 @@ struct demux_sys_t
     asf_packet_sys_t asfpacketsys;
     uint64_t i_preroll;         /* foobar */
     int64_t  i_preroll_start;
-    mp4_track_t *p_current_track; /* avoids matching stream_number */
 };
 
 /*****************************************************************************

@@ -90,7 +90,6 @@ typedef struct
 
     /* more internal data */
     uint32_t        i_timescale;    /* time scale for this track only */
-    uint16_t        current_qid;    /* Smooth Streaming quality level ID */
 
     /* elst */
     int             i_elst;         /* current elst */
@@ -124,11 +123,8 @@ typedef struct
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
     MP4_Box_t *p_sample;/* point on actual sdsd */
 
-    bool b_drms;
     bool b_has_non_empty_cchunk;
     bool b_codec_need_restart;
-    void      *p_drms;
-    MP4_Box_t *p_skcr;
 
     mtime_t i_time; // track scaled
 
