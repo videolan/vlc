@@ -65,7 +65,7 @@ int vlc_open (const char *filename, int flags, ...)
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
-    const char *local_name = ToLocale (filename);
+    const char *local_name = ToLocaleDup (filename);
 
     if (local_name == NULL)
     {
@@ -77,7 +77,7 @@ int vlc_open (const char *filename, int flags, ...)
     if (fd != -1)
         fcntl (fd, F_SETFD, FD_CLOEXEC);
 
-    LocaleFree (local_name);
+    free (local_name);
     return fd;
 }
 
@@ -109,7 +109,7 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
  */
 int vlc_mkdir (const char *dirname, mode_t mode)
 {
-    char *locname = ToLocale (dirname);
+    char *locname = ToLocaleDup (dirname);
     if (unlikely(locname == NULL))
     {
         errno = ENOENT;
@@ -117,7 +117,7 @@ int vlc_mkdir (const char *dirname, mode_t mode)
     }
 
     int res = mkdir (locname, mode);
-    LocaleFree (locname);
+    free (locname);
     return res;
 }
 
@@ -130,7 +130,7 @@ int vlc_mkdir (const char *dirname, mode_t mode)
  */
 DIR *vlc_opendir (const char *dirname)
 {
-    const char *locname = ToLocale (dirname);
+    const char *locname = ToLocaleDup (dirname);
     if (unlikely(locname == NULL))
     {
         errno = ENOENT;
@@ -139,7 +139,7 @@ DIR *vlc_opendir (const char *dirname)
 
     DIR *dir = opendir (locname);
 
-    LocaleFree (locname);
+    free (locname);
 
     return dir;
 }
@@ -180,14 +180,14 @@ char *vlc_readdir( DIR *dir )
     if (val != 0)
         errno = val;
     else if (ent != NULL)
-        path = FromLocaleDup (ent->d_name);
+        path = FromCharset ("", ent->d_name, strlen(ent->d_name));
     free (buf);
     return path;
 }
 
 static int vlc_statEx (const char *filename, struct stat *buf, bool deref)
 {
-    const char *local_name = ToLocale (filename);
+    const char *local_name = ToLocaleDup (filename);
     if (unlikely(local_name == NULL))
     {
         errno = ENOENT;
@@ -196,7 +196,7 @@ static int vlc_statEx (const char *filename, struct stat *buf, bool deref)
 
     int res = deref ? stat (local_name, buf)
                     : lstat (local_name, buf);
-    LocaleFree (local_name);
+    free (local_name);
     return res;
 }
 
@@ -231,7 +231,7 @@ int vlc_lstat (const char *filename, struct stat *buf)
  */
 int vlc_unlink (const char *filename)
 {
-    const char *local_name = ToLocale (filename);
+    const char *local_name = ToLocaleDup (filename);
     if (unlikely(local_name == NULL))
     {
         errno = ENOENT;
@@ -239,7 +239,7 @@ int vlc_unlink (const char *filename)
     }
 
     int ret = unlink (local_name);
-    LocaleFree (local_name);
+    free (local_name);
     return ret;
 }
 
@@ -253,22 +253,22 @@ int vlc_unlink (const char *filename)
  */
 int vlc_rename (const char *oldpath, const char *newpath)
 {
-    const char *lo = ToLocale (oldpath);
+    const char *lo = ToLocaleDup (oldpath);
     if (lo == NULL)
         goto error;
 
-    const char *ln = ToLocale (newpath);
+    const char *ln = ToLocaleDup (newpath);
     if (ln == NULL)
     {
-        LocaleFree (lo);
+        free (lo);
 error:
         errno = ENOENT;
         return -1;
     }
 
     int ret = rename (lo, ln);
-    LocaleFree (lo);
-    LocaleFree (ln);
+    free (lo);
+    free (ln);
     return ret;
 }
 

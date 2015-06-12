@@ -49,16 +49,16 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
                  module_handle_t *p_handle, bool lazy )
 {
     const int flags = lazy ? RTLD_LAZY : RTLD_NOW;
-    char *path = ToLocale( psz_file );
+    char *path = ToLocaleDup( psz_file );
 
     module_handle_t handle = dlopen( path, flags );
     if( handle == NULL )
     {
         msg_Warn( p_this, "cannot load module `%s' (%s)", path, dlerror() );
-        LocaleFree( path );
+        free( path );
         return -1;
     }
-    LocaleFree( path );
+    free( path );
     *p_handle = handle;
     return 0;
 }
