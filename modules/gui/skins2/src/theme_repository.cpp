@@ -26,8 +26,9 @@
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include <unistd.h>
+#include <sys/stat.h>
 
-#include <fstream>
+#include <vlc_fs.h>
 
 
 ThemeRepository *ThemeRepository::instance( intf_thread_t *pIntf )
@@ -88,17 +89,17 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
 
     // retrieve last skins stored or skins requested by user
     char* psz_current = var_InheritString( getIntf(), "skins2-last" );
-    string current = string( psz_current ? psz_current : "" );
+    string current( psz_current ? psz_current : "" );
     free( psz_current );
 
-    // check if skins exists and is readable
-    bool b_readable = !ifstream( sToLocale(current).c_str() ).fail();
-
+    // check if skin exists
+    struct stat stat;
+    bool b_exists = !vlc_stat( current.c_str(), &stat );
     msg_Dbg( getIntf(), "requested skins %s is %s accessible",
-                         current.c_str(), b_readable ? "" : "NOT" );
+                         current.c_str(), b_exists ? "" : "NOT" );
 
     // set the default skins if given skins not accessible
-    if( !b_readable && b_default_found )
+    if( !b_exists && b_default_found )
         current = itdefault->second;
 
     // save this valid skins for reuse
