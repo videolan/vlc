@@ -26,6 +26,7 @@
 #include <vlc_url.h>
 
 #include <sys/stat.h>
+#include <vlc_fs.h>
 
 XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName )
     : SkinObject( pIntf ), m_pXML( NULL ), m_pReader( NULL ), m_pStream( NULL )
@@ -84,7 +85,7 @@ void XMLParser::LoadCatalog()
     for( it = resPath.begin(); it != resPath.end(); ++it )
     {
         string catalog_path = (*it) + sep + "skin.catalog";
-        if( !stat( catalog_path.c_str(), &statBuf ) )
+        if( !vlc_stat( catalog_path.c_str(), &statBuf ) )
         {
             msg_Dbg( getIntf(), "Using catalog %s", catalog_path.c_str() );
             xml_CatalogLoad( m_pXML, catalog_path.c_str() );
@@ -100,7 +101,7 @@ void XMLParser::LoadCatalog()
     for( it = resPath.begin(); it != resPath.end(); ++it )
     {
         string path = (*it) + sep + "skin.dtd";
-        if( !stat( path.c_str(), &statBuf ) )
+        if( !vlc_stat( path.c_str(), &statBuf ) )
         {
             // DTD found
             msg_Dbg( getIntf(), "using DTD %s", path.c_str() );
