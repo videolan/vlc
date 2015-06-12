@@ -1259,7 +1259,7 @@ string Builder::getFilePath( const string &rFileName ) const
        file.replace( pos, 1, sep );
 #endif
 
-    string full_path = m_path + sep + sFromLocale( file );
+    string full_path = m_path + sep + file;
 
     // check that the file exists
     struct stat stat;
