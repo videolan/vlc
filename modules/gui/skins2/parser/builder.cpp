@@ -57,8 +57,9 @@
 #include "../utils/var_bool.hpp"
 #include "../utils/var_text.hpp"
 
+#include <sys/stat.h>
+#include <vlc_fs.h>
 #include <vlc_image.h>
-#include <fstream>
 
 
 Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData,
@@ -1260,8 +1261,9 @@ string Builder::getFilePath( const string &rFileName ) const
 
     string full_path = m_path + sep + sFromLocale( file );
 
-    // check that the file exists and can be read
-    if( ifstream( full_path.c_str() ).fail() )
+    // check that the file exists
+    struct stat stat;
+    if( vlc_stat( full_path.c_str(), &stat ) )
     {
         msg_Err( getIntf(), "missing file: %s", file.c_str() );
         full_path = "";
