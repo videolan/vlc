@@ -326,7 +326,6 @@ static const staticentry_t p_list_video[] = {
         A("mjpa"),
         A("JFIF"),
         A("JPGL"),
-        A("LJPG"),
         A("MMJP"),
         A("FLJP"),
         A("FMJP"),
@@ -349,9 +348,6 @@ static const staticentry_t p_list_video[] = {
 
     B(VLC_CODEC_LJPG, "Lead Motion JPEG Video"),
         E("Ljpg", "Lead Motion JPEG"),
-
-    // ? from avcodec/fourcc.c but makes not sense.
-    //{ VLC_FOURCC( 'L','J','P','G' ), CODEC_ID_MJPEG,       VIDEO_ES, "Lead Motion JPEG Video" },
 
     /* SP5x */
     B(VLC_CODEC_SP5X, "Sunplus Motion JPEG Video"),
