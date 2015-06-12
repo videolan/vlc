@@ -288,9 +288,9 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir,
 bool ThemeLoader::extract( const string &fileName )
 {
     bool result = true;
-    char *tmpdir = tempnam( NULL, "vlt" );
-    string tempPath = sFromLocale( tmpdir );
-    free( tmpdir );
+    string tempPath = getTmpDir();
+    if( tempPath.empty() )
+        return false;
 
     // Extract the file in a temporary directory
     if( ! extractTarGz( fileName, tempPath ) &&
@@ -810,6 +810,36 @@ int gzwrite_frontend( int fd, const void * p_buffer, size_t i_length )
         return gzwrite( (gzFile) currentGzVp, const_cast<void*>(p_buffer), i_length );
     }
     return -1;
+}
+
+// FIXME: could become a skins2 OS factory function or a vlc core function
+string ThemeLoader::getTmpDir( )
+{
+#if defined( _WIN32 )
+    wchar_t *tmpdir = _wtempnam( NULL, L"vlt" );
+#else
+    char *tmpdir = tempnam( NULL, "vlt" );
+#endif
+    if( tmpdir == NULL )
+        return "";
+
+#if defined( _WIN32 )
+    char* utf8 = FromWide( tmpdir );
+    if( utf8 == NULL )
+    {
+        free( tmpdir );
+        return "";
+    }
+    string tempPath( utf8 );
+    free( utf8 );
+#elif defined( __OS2__ )
+    string tempPath( sFromLocale( tmpdir ));
+#else
+    string tempPath( tmpdir );
+#endif
+
+    free( tmpdir );
+    return tempPath;
 }
 
 #endif

@@ -71,6 +71,9 @@ private:
      * Expects a string from the current locale.
      */
     void deleteTempFiles( const string &path );
+
+    /// Get a unique temporary directory
+    string getTmpDir( );
 #endif
 
     /// Parse the XML file given as a parameter and build the skin
