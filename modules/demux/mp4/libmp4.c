@@ -4155,10 +4155,10 @@ error:
 }
 
 
-static void MP4_BoxDumpStructure_Internal( stream_t *s,
-                                    MP4_Box_t *p_box, unsigned int i_level )
+static void MP4_BoxDumpStructure_Internal( stream_t *s, const MP4_Box_t *p_box,
+                                           unsigned int i_level )
 {
-    MP4_Box_t *p_child;
+    const MP4_Box_t *p_child;
     uint32_t i_displayedtype = p_box->i_type;
     if( ! MP4_BOX_TYPE_ASCII() ) ((char*)&i_displayedtype)[0] = 'c';
 
@@ -4194,7 +4194,7 @@ static void MP4_BoxDumpStructure_Internal( stream_t *s,
     }
 }
 
-void MP4_BoxDumpStructure( stream_t *s, MP4_Box_t *p_box )
+void MP4_BoxDumpStructure( stream_t *s, const MP4_Box_t *p_box )
 {
     MP4_BoxDumpStructure_Internal( s, p_box, 0 );
 }
@@ -4250,8 +4250,8 @@ static void get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
     }
 }
 
-static void MP4_BoxGet_Internal( MP4_Box_t **pp_result,
-                          MP4_Box_t *p_box, const char *psz_fmt, va_list args)
+static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p_box,
+                                 const char *psz_fmt, va_list args)
 {
     char *psz_dup;
     char *psz_path;
@@ -4384,16 +4384,16 @@ error_box:
  * ex: /moov/trak[12]
  *     ../mdia
  *****************************************************************************/
-MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, const char *psz_fmt, ... )
+MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt, ... )
 {
     va_list args;
-    MP4_Box_t *p_result;
+    const MP4_Box_t *p_result;
 
     va_start( args, psz_fmt );
     MP4_BoxGet_Internal( &p_result, p_box, psz_fmt, args );
     va_end( args );
 
-    return( p_result );
+    return( (MP4_Box_t *) p_result );
 }
 
 /*****************************************************************************
@@ -4405,11 +4405,11 @@ MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, const char *psz_fmt, ... )
  * ex: /moov/trak[12]
  *     ../mdia
  *****************************************************************************/
-unsigned MP4_BoxCount( MP4_Box_t *p_box, const char *psz_fmt, ... )
+unsigned MP4_BoxCount( const MP4_Box_t *p_box, const char *psz_fmt, ... )
 {
     va_list args;
     unsigned i_count;
-    MP4_Box_t *p_result, *p_next;
+    const MP4_Box_t *p_result, *p_next;
 
     va_start( args, psz_fmt );
     MP4_BoxGet_Internal( &p_result, p_box, psz_fmt, args );

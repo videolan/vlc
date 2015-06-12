@@ -1674,7 +1674,7 @@ void MP4_BoxFree( stream_t *, MP4_Box_t *p_box );
  *****************************************************************************
  * Useful while debugging
  *****************************************************************************/
-void MP4_BoxDumpStructure( stream_t *p_input, MP4_Box_t *p_box );
+void MP4_BoxDumpStructure( stream_t *p_input, const MP4_Box_t *p_box );
 
 /*****************************************************************************
  * MP4_BoxGet: find a box given a path relative to p_box
@@ -1685,7 +1685,7 @@ void MP4_BoxDumpStructure( stream_t *p_input, MP4_Box_t *p_box );
  * ex: /moov/trak[12]
  *     ../mdia
  *****************************************************************************/
-MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, const char *psz_fmt, ... );
+MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt, ... );
 
 /*****************************************************************************
  * MP4_BoxCount: find number of box given a path relative to p_box
@@ -1696,7 +1696,7 @@ MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, const char *psz_fmt, ... );
  * ex: /moov/trak
  *     ../mdia
  *****************************************************************************/
-unsigned MP4_BoxCount( MP4_Box_t *p_box, const char *psz_fmt, ... );
+unsigned MP4_BoxCount( const MP4_Box_t *p_box, const char *psz_fmt, ... );
 
 /* Internal functions exposed for MKV demux */
 int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box );
