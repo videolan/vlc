@@ -238,7 +238,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir,
             return false;
         }
         makedir( basePath.c_str() );
-        FILE *fout = fopen( fullPath.c_str(), "wb" );
+        FILE *fout = vlc_fopen( fullPath.c_str(), "wb" );
         if( fout == NULL )
         {
             msg_Err( getIntf(), "error opening %s", fullPath.c_str() );
@@ -600,7 +600,7 @@ int tar_extract_all( TAR *t, char *prefix )
                 remaining = getoct( buffer.header.size, 12 );
                 if( !remaining ) outfile = NULL; else
                 {
-                    outfile = fopen( fname, "wb" );
+                    outfile = vlc_fopen( fname, "wb" );
                     if( outfile == NULL )
                     {
                         /* try creating directory */
@@ -610,7 +610,7 @@ int tar_extract_all( TAR *t, char *prefix )
                             *p = '\0';
                             makedir( fname );
                             *p = '/';
-                            outfile = fopen( fname, "wb" );
+                            outfile = vlc_fopen( fname, "wb" );
                             if( !outfile )
                             {
                                 fprintf( stderr, "tar couldn't create %s\n",

@@ -62,7 +62,7 @@ bool FT2Font::init()
         return false;
     }
 
-    FILE *file = fopen( m_name.c_str(), "rb" );
+    FILE *file = vlc_fopen( m_name.c_str(), "rb" );
     if( !file )
     {
         msg_Dbg( getIntf(), "failed to open font %s (%s)",
