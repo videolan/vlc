@@ -3811,7 +3811,7 @@ dnl  MacOS X sparkle update support
 dnl
 AC_ARG_ENABLE(sparkle,
   [  --enable-sparkle        Sparkle update support for OS X (default enabled on Mac OS X)])
-if test "x${enable_sparkle}" != "xno" -a "${SYS}" = "darwin"
+if test "x${enable_sparkle}" != "xno" -a "${HAVE_OSX}" = "1"
 then
   if test ! -d ${CONTRIB_DIR}/Sparkle.framework
   then
