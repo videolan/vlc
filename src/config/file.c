@@ -174,16 +174,10 @@ int config_LoadConfigFile( vlc_object_t *p_this )
     if (file == NULL)
         return VLC_EGENERIC;
 
-    /* Look for UTF-8 Byte Order Mark */
-    char * (*convert) (const char *) = strdupnull;
+    /* Skip UTF-8 Byte Order Mark if present */
     char bom[3];
-
-    if ((fread (bom, 1, 3, file) != 3)
-     || memcmp (bom, "\xEF\xBB\xBF", 3))
-    {
-        convert = FromLocaleDup;
+    if (fread (bom, 1, 3, file) != 3 || memcmp (bom, "\xEF\xBB\xBF", 3))
         rewind (file); /* no BOM, rewind */
-    }
 
     char *line = NULL;
     size_t bufsize;
@@ -243,7 +237,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
 
             default:
                 free ((char *)item->value.psz);
-                item->value.psz = convert (psz_option_value);
+                item->value.psz = strdupnull (psz_option_value);
                 break;
         }
     }
