@@ -92,16 +92,14 @@ static void process_list(const char *name, const staticentry_t *list, size_t n)
 
     size_t dups = 0;
     for (size_t i = 1; i < n; i++)
-    {
-        if (!memcmp(entries[i].fourcc, entries[i].alias, 4))
-            continue;
-        if (!memcmp(entries[i - 1].alias, entries[i].alias, 4))
+        if (!memcmp(entries[i - 1].alias, entries[i].alias, 4)
+         && memcmp(entries[i - 1].fourcc, entries[i].fourcc, 4))
         {
-            fprintf(stderr, "Error: FourCC \"%.4s\" (alias of \"%.4s\") "
-                    "duplicated!\n", entries[i].alias, entries[i].fourcc);
+            fprintf(stderr, "Error: FourCC alias \"%.4s\" conflict: "
+                    "\"%.4s\" and \"%.4s\"\n", entries[i].alias,
+                    entries[i - 1].fourcc, entries[i].fourcc);
             dups++;
         }
-    }
 
     if (dups > 0)
         exit(1);
