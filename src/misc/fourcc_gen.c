@@ -57,8 +57,10 @@ struct entry
 static int cmp_entry(const void *a, const void *b)
 {
     const struct entry *ea = a, *eb = b;
-
-    return memcmp(ea->alias, eb->alias, 4);
+    int d = memcmp(ea->alias, eb->alias, 4);
+    if (d == 0)
+        d = memcmp(ea->fourcc, eb->fourcc, 4);
+    return d;
 }
 
 static void process_list(const char *name, const staticentry_t *list, size_t n)
