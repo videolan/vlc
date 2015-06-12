@@ -135,17 +135,14 @@ ThemeRepository::~ThemeRepository()
 }
 
 
-void ThemeRepository::parseDirectory( const string &rDir_locale )
+void ThemeRepository::parseDirectory( const string &rDir )
 {
     const char *pszDirContent;
     // Path separator
     const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
 
     // Open the dir
-    // FIXME: parseDirectory should be invoked with UTF-8 input instead!!
-    string rDir = sFromLocale( rDir_locale );
     DIR *pDir = vlc_opendir( rDir.c_str() );
-
     if( pDir == NULL )
     {
         // An error occurred
