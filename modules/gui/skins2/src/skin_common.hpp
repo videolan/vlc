@@ -87,16 +87,6 @@ static inline string sFromWide( const wstring &rWide )
 }
 #endif
 
-/// Wrapper around ToLocale, to avoid the need to call LocaleFree()
-static inline string sToLocale( const string &rUTF8 )
-{
-    const char *s = ToLocale( rUTF8.c_str() );
-    string res = s;
-    LocaleFree( s );
-    return res;
-}
-
-
 //---------------------------------------------------------------------------
 // intf_sys_t: description and status of skin interface
 //---------------------------------------------------------------------------
