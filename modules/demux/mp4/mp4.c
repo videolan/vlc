@@ -74,7 +74,6 @@ struct demux_sys_t
     uint64_t     i_time;         /* time position of the presentation
                                   * in movie timescale */
     uint32_t     i_timescale;    /* movie time scale */
-    uint64_t     i_duration;     /* movie duration */
     unsigned int i_tracks;       /* number of tracks */
     mp4_track_t  *track;         /* array of track */
     float        f_fps;          /* number of frame per seconds */
@@ -348,7 +347,6 @@ static int LoadInitFrag( demux_t *p_demux )
                     if ( p_stra && BOXDATA(p_stra) )
                     {
                         p_sys->i_timescale = BOXDATA(p_stra)->i_timescale;
-                        p_sys->i_duration = BOXDATA(p_stra)->i_duration;
                         p_sys->i_overall_duration = BOXDATA(p_stra)->i_duration;
                     }
                     if( p_sys->i_timescale == 0 )
