@@ -316,6 +316,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
                              avctx->refs, &hwctx->decoder);
     if (err != VDP_STATUS_OK)
     {
+        hwctx->decoder = VDP_INVALID_HANDLE;
         msg_Err(va, "%s creation failure: %s", "decoder",
                 vdp_get_error_string(sys->vdp, err));
         goto error;
