@@ -7,8 +7,6 @@ ifeq ($(call need_pkg,"libarchive >= 3.1.0"),)
 PKGS_FOUND += libarchive
 endif
 
-DEPS_libarchive = libxml2
-
 $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 	$(call download,$(LIBARCHIVE_URL))
 
@@ -21,6 +19,7 @@ libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 
 .libarchive: libarchive
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) \
-		--disable-bsdcpio --disable-bsdtar --without-nettle
+		--disable-bsdcpio --disable-bsdtar --without-nettle --without-bz2lib \
+		--without-xml2 --without-lzmadec --without-iconv --without-expat
 	cd $< && $(MAKE) install
 	touch $@
