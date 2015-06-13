@@ -640,7 +640,7 @@ int tar_extract_all( TAR *t, char *prefix )
                     fprintf( stderr, "error writing %s skipping...\n", fname );
                     fclose( outfile );
                     outfile = NULL;
-                    unlink( fname );
+                    vlc_unlink( fname );
                 }
             }
             remaining -= bytes;
