@@ -2631,17 +2631,6 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 
     p_track->p_track = p_box_trak;
 
-    MP4_Box_t *p_tkhd = MP4_BoxGet( p_box_trak, "tkhd" );
-    MP4_Box_t *p_tref = MP4_BoxGet( p_box_trak, "tref" );
-    MP4_Box_t *p_elst;
-
-    MP4_Box_t *p_mdhd;
-    MP4_Box_t *p_udta;
-    MP4_Box_t *p_hdlr;
-
-    MP4_Box_t *p_vmhd;
-    MP4_Box_t *p_smhd;
-
     char language[4] = { '\0' };
 
     /* hint track unsupported */
@@ -2655,6 +2644,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
 
     es_format_Init( &p_track->fmt, UNKNOWN_ES, 0 );
 
+    const MP4_Box_t *p_tkhd = MP4_BoxGet( p_box_trak, "tkhd" );
     if( !p_tkhd )
     {
         return;
@@ -2672,13 +2662,10 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     p_track->i_height = BOXDATA(p_tkhd)->i_height / BLOCK16x16;
     p_track->f_rotation = BOXDATA(p_tkhd)->f_rotation;
 
-    if( p_tref )
-    {
-/*        msg_Warn( p_demux, "unhandled box: tref --> FIXME" ); */
-    }
+    /* FIXME: unhandled box: tref */
 
-    p_mdhd = MP4_BoxGet( p_box_trak, "mdia/mdhd" );
-    p_hdlr = MP4_BoxGet( p_box_trak, "mdia/hdlr" );
+    const MP4_Box_t *p_mdhd = MP4_BoxGet( p_box_trak, "mdia/mdhd" );
+    const MP4_Box_t *p_hdlr = MP4_BoxGet( p_box_trak, "mdia/hdlr" );
 
     if( ( !p_mdhd )||( !p_hdlr ) )
     {
@@ -2695,7 +2682,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     switch( p_hdlr->data.p_hdlr->i_handler_type )
     {
         case( ATOM_soun ):
-            if( !( p_smhd = MP4_BoxGet( p_box_trak, "mdia/minf/smhd" ) ) )
+            if( !MP4_BoxGet( p_box_trak, "mdia/minf/smhd" ) )
             {
                 return;
             }
@@ -2703,7 +2690,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
             break;
 
         case( ATOM_vide ):
-            if( !( p_vmhd = MP4_BoxGet( p_box_trak, "mdia/minf/vmhd" ) ) )
+            if( !MP4_BoxGet( p_box_trak, "mdia/minf/vmhd") )
             {
                 return;
             }
@@ -2726,6 +2713,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
             return;
     }
 
+    const MP4_Box_t *p_elst;
     p_track->i_elst = 0;
     p_track->i_elst_time = 0;
     if( ( p_track->p_elst = p_elst = MP4_BoxGet( p_box_trak, "edts/elst" ) ) )
@@ -2764,10 +2752,10 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         p_track->fmt.psz_language = strdup( language );
     }
 
-    p_udta = MP4_BoxGet( p_box_trak, "udta" );
+    const MP4_Box_t *p_udta = MP4_BoxGet( p_box_trak, "udta" );
     if( p_udta )
     {
-        MP4_Box_t *p_box_iter;
+        const MP4_Box_t *p_box_iter;
         for( p_box_iter = p_udta->p_first; p_box_iter != NULL;
                  p_box_iter = p_box_iter->p_next )
         {
@@ -2871,19 +2859,8 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
                  p_track->i_track_ID );
         return;
     }
-    p_track->b_ok = true;
-#if 0
-    {
-        int i;
-        for( i = 0; i < p_track->i_chunk_count; i++ )
-        {
-            fprintf( stderr, "%-5d sample_count=%d pts=%lld\n",
-                     i, p_track->chunk[i].i_sample_count,
-                     p_track->chunk[i].i_first_dts );
 
-        }
-    }
-#endif
+    p_track->b_ok = p_track->b_chapter || !!p_track->p_es;
 }
 
 static void FreeAndResetChunk( mp4_chunk_t *ck )
