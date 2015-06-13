@@ -2381,7 +2381,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     switch( p_track->fmt.i_cat )
     {
     case VIDEO_ES:
-        if ( !p_sample->data.p_sample_vide || p_sample->i_handler != ATOM_vide )
+        if ( !p_sample->data.p_sample_vide )
             return VLC_EGENERIC;
         SetupVideoES( p_demux, p_track, p_sample );
 
@@ -2397,13 +2397,13 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         break;
 
     case AUDIO_ES:
-        if ( !p_sample->data.p_sample_soun || p_sample->i_handler != ATOM_soun )
+        if ( !p_sample->data.p_sample_soun )
             return VLC_EGENERIC;
         SetupAudioES( p_demux, p_track, p_sample );
         break;
 
     case SPU_ES:
-        if ( !p_sample->data.p_sample_text || p_sample->i_handler != ATOM_text )
+        if ( !p_sample->data.p_sample_text )
             return VLC_EGENERIC;
         SetupSpuES( p_demux, p_track, p_sample );
 
