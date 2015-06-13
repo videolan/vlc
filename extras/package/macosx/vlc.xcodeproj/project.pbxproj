@@ -3024,9 +3024,9 @@
 			productReference = 1CCB5F2F1A62A6A5004C3E90 /* pseudo-vlc.app */;
 			productType = "com.apple.product-type.application";
 		};
-		CC402EAE0E00ABBB006A4BA4 /* vlc */ = {
+		CC402EAE0E00ABBB006A4BA4 /* vlc-bundle-helper */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CC402F460E00ABBB006A4BA4 /* Build configuration list for PBXNativeTarget "vlc" */;
+			buildConfigurationList = CC402F460E00ABBB006A4BA4 /* Build configuration list for PBXNativeTarget "vlc-bundle-helper" */;
 			buildPhases = (
 				CC402EAF0E00ABBB006A4BA4 /* Resources */,
 				CC402F400E00ABBB006A4BA4 /* Frameworks */,
@@ -3036,7 +3036,7 @@
 			);
 			dependencies = (
 			);
-			name = vlc;
+			name = "vlc-bundle-helper";
 			productInstallPath = "$(HOME)/Library/Bundles";
 			productName = vlc;
 			productReference = CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */;
@@ -3085,7 +3085,7 @@
 			projectDirPath = "";
 			projectRoot = ../../..;
 			targets = (
-				CC402EAE0E00ABBB006A4BA4 /* vlc */,
+				CC402EAE0E00ABBB006A4BA4 /* vlc-bundle-helper */,
 				1CCB5F2E1A62A6A5004C3E90 /* pseudo-vlc */,
 				1C42A6DF1B19F597007D87B2 /* Build deps */,
 				1C07EDFD1B1CD6B300A0BBDB /* Bootstrap project */,
@@ -5015,7 +5015,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		CC402F460E00ABBB006A4BA4 /* Build configuration list for PBXNativeTarget "vlc" */ = {
+		CC402F460E00ABBB006A4BA4 /* Build configuration list for PBXNativeTarget "vlc-bundle-helper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CC402F470E00ABBB006A4BA4 /* Development */,
