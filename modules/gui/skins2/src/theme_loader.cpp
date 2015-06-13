@@ -64,6 +64,9 @@ int makedir( const char *newdir );
 #define WINAMP2_XML_FILE "winamp2.xml"
 #define ZIP_BUFFER_SIZE 4096
 
+#ifndef O_BINARY
+#   define O_BINARY 0
+#endif
 
 bool ThemeLoader::load( const string &fileName )
 {
