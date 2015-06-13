@@ -817,29 +817,27 @@ string ThemeLoader::getTmpDir( )
 {
 #if defined( _WIN32 )
     wchar_t *tmpdir = _wtempnam( NULL, L"vlt" );
-#else
-    char *tmpdir = tempnam( NULL, "vlt" );
-#endif
     if( tmpdir == NULL )
         return "";
-
-#if defined( _WIN32 )
     char* utf8 = FromWide( tmpdir );
-    if( utf8 == NULL )
-    {
-        free( tmpdir );
-        return "";
-    }
-    string tempPath( utf8 );
+    free( tmpdir );
+    string tempPath( utf8 ? utf8 : "" );
     free( utf8 );
-#elif defined( __OS2__ )
-    string tempPath( sFromLocale( tmpdir ));
-#else
-    string tempPath( tmpdir );
-#endif
+    return tempPath;
 
+#elif defined( __OS2__ )
+    char *tmpdir = tempnam( NULL, "vlt" );
+    if( tmpdir == NULL )
+        return "";
+    string tempPath( sFromLocale( tmpdir ));
     free( tmpdir );
     return tempPath;
+
+#else
+    char templ[] = "/tmp/vltXXXXXX";
+    char *tmpdir = mkdtemp( templ );
+    return string( tmpdir ? tmpdir : "");
+#endif
 }
 
 #endif
