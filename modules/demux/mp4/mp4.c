@@ -1718,7 +1718,7 @@ static void Close ( vlc_object_t * p_this )
     {
         MP4_TrackDestroy( p_demux, &p_sys->track[i_track] );
     }
-    FREENULL( p_sys->track );
+    free( p_sys->track );
 
     if( p_sys->p_title )
         vlc_input_title_Delete( p_sys->p_title );
@@ -2863,17 +2863,20 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
     p_track->b_ok = p_track->b_chapter || !!p_track->p_es;
 }
 
-static void FreeAndResetChunk( mp4_chunk_t *ck )
+static void DestroyChunk( mp4_chunk_t *ck )
 {
     free( ck->p_sample_count_dts );
     free( ck->p_sample_delta_dts );
     free( ck->p_sample_count_pts );
     free( ck->p_sample_offset_pts );
+
+    if( ck->p_sample_data )
+    {
+        for( uint32_t i = 0; i < ck->i_sample_count; i++ )
+            free( ck->p_sample_data[i] );
+        free( ck->p_sample_data );
+    }
     free( ck->p_sample_size );
-    for( uint32_t i = 0; i < ck->i_sample_count; i++ )
-        free( ck->p_sample_data[i] );
-    free( ck->p_sample_data );
-    memset( ck, 0, sizeof( mp4_chunk_t ) );
 }
 
 /****************************************************************************
@@ -2883,38 +2886,27 @@ static void FreeAndResetChunk( mp4_chunk_t *ck )
  ****************************************************************************/
 static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
 {
-    unsigned int i_chunk;
-
-    p_track->b_ok = false;
-    p_track->b_enable   = false;
-    p_track->b_selected = false;
-
     es_format_Clean( &p_track->fmt );
 
     if( p_track->p_es )
         es_out_Del( p_demux->out, p_track->p_es );
 
-    for( i_chunk = 0; i_chunk < p_track->i_chunk_count; i_chunk++ )
+    if( p_track->chunk )
     {
-        if( p_track->chunk )
-        {
-           FREENULL(p_track->chunk[i_chunk].p_sample_count_dts);
-           FREENULL(p_track->chunk[i_chunk].p_sample_delta_dts );
-
-           FREENULL(p_track->chunk[i_chunk].p_sample_count_pts);
-           FREENULL(p_track->chunk[i_chunk].p_sample_offset_pts );
-        }
+        for( unsigned int i_chunk = 0; i_chunk < p_track->i_chunk_count; i_chunk++ )
+            DestroyChunk( &p_track->chunk[i_chunk] );
     }
-    FREENULL( p_track->chunk );
-    if( p_track->cchunk ) {
-        FreeAndResetChunk( p_track->cchunk );
-        FREENULL( p_track->cchunk );
+    free( p_track->chunk );
+
+    if( p_track->cchunk )
+    {
+        assert( p_demux->p_sys->b_fragmented );
+        DestroyChunk( p_track->cchunk );
+        free( p_track->cchunk );
     }
 
     if( !p_track->i_sample_size )
-    {
-        FREENULL( p_track->p_sample_size );
-    }
+        free( p_track->p_sample_size );
 
     if ( p_track->asfinfo.p_frame )
         block_ChainRelease( p_track->asfinfo.p_frame );
@@ -3700,7 +3692,10 @@ static int MP4_frg_GetChunk( demux_t *p_demux, MP4_Box_t *p_chunk, unsigned *i_t
         FlushChunk( p_demux, p_track );
 
     if( ret->i_sample_count )
-        FreeAndResetChunk( ret );
+    {
+        DestroyChunk( ret );
+        memset( ret, 0, sizeof(*ret) );
+    }
 
     MP4_Box_t *p_trun = MP4_BoxGet( p_traf, "trun");
     if( p_trun == NULL)
