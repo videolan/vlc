@@ -672,7 +672,7 @@ int aout_DeviceSet (audio_output_t *aout, const char *id)
  * The function will heap-allocate two tables of heap-allocated strings;
  * the caller is responsible for freeing all strings and both tables.
  *
- * \param ids pointer to a table of device identifiers [OUT]
+ * \param ids pointer to a table of device identifiers [OUT]
  * \param names pointer to a table of device human-readable descriptions [OUT]
  * \return the number of devices, or negative on error.
  * \note In case of error, *ids and *names are undefined.
