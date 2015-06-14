@@ -430,13 +430,14 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
 {
     /* Rebuild codec data from encap */
     size_t i_copied = 0;
-    size_t i_remaining = p_block->i_buffer;
+    size_t i_remaining = __MIN(p_block->i_buffer, INT64_MAX / 3);
     uint32_t i_bytes = 0;
     block_t *p_newblock;
 
+    /* always need at least 10 bytes (atom size+header+1pair)*/
     if ( i_remaining < 10 ||
          !(i_bytes = GetDWBE(p_block->p_buffer)) ||
-         (i_bytes + 8 > i_remaining) ||
+         (i_bytes > i_remaining) ||
          memcmp("cdat", &p_block->p_buffer[4], 4) ||
          !(p_newblock = block_Alloc( i_remaining * 3 - 8 )) )
     {
@@ -459,9 +460,10 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
         i_remaining -= 2;
     } while( i_bytes >= 2 );
 
+    /* cdt2 is optional */
     if ( i_remaining >= 10 &&
          (i_bytes = GetDWBE(p_read)) &&
-         (i_bytes + 8 <= i_remaining) &&
+         (i_bytes <= i_remaining) &&
          !memcmp("cdt2", &p_read[4], 4) )
     {
         p_read += 8;
