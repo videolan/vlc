@@ -631,4 +631,4 @@ static inline int64_t libvlc_delay(int64_t pts)
 }
 # endif
 
-#endif /* <vlc/libvlc.h> */
+#endif /** @} */
