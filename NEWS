@@ -4,6 +4,10 @@ Changes between 2.2.x and 3.0.0-git:
 Core:
  * Support wayland surface type
  * Allow to start the video paused on the first frame
+ * Support portable version of Windows build
+ * Support network browsing for distant file system (SMB, FTP, SFTP, ...)
+   and rewrite the parsing of those files
+ * VLC now assumes vlcrc config file is in UTF-8
 
 Access:
  * Support HDS (Http Dynamic Streaming) from Adobe (f4m, f4v, etc.)
@@ -27,7 +31,7 @@ Decoder:
  * Support 4:4:4 and 4:2:2 chroma samplings with VDPAU hw acceleration
  * Support for ARIB STD-B24 subtitles
  * Support for Daala video
- * Important improvements for the MMAL decoder and output for rPI
+ * Important improvements for the MMAL decoder and output for rPI and rPI2
  * Support HEVC hardware decoding using OMX and MediaCodec
  * Use MediaCodec via NDK native API after Android Lollipop
  * Support VP9 and WMV3 decoding using OMX and performance improvements
@@ -38,26 +42,29 @@ Decoder:
  * Support TDSC, Canopus HQX
  * Support HEVC hardware decoding on Windows, using DxVA2
  * Basic TTML subtitles support
- * Support hardware decoding using Direct3D11
+ * Support hardware decoding using Direct3D11, including GPU-zerocopy mode
+ * DxVA2 GPU-zerocopy for hardware decoding and displaying on Windows
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
  * Support Opus in MPEG Transport Stream
  * Support Daala in Ogg
- * Important rework of the MP4 demuxer
+ * Important rework of the MP4 demuxer, including fragments
  * Support EIA-608 subtitles in MP4/mov
  * Support WMV and WMAV in MP4/mov, aka Flip4Mac files
  * Support bitmap audio channel reordering in MP4/mov
  * Support AlbumArtist and DiscNumber metadata
- * Fixed program selection with recorded TS (TopField, DreamBox and others)
- * Fixed TS playback with PAT/PMT less recordings
+ * Important rework of the TS demuxer, including:
+    * Fixed program selection with recorded TS (TopField, DreamBox and others)
+    * Fixed TS playback with PAT/PMT less recordings
+    * Basic support for MPEG4-SL in TS and T-DMB
  * Support for lame's replaygain extension in mpeg files
  * Fixes for DTS detection in WAV and MKV files
- * Basic support for MPEG4-SL in TS and T-DMB
  * Support for Creative ADPCM/alaw/ulaw/S16L in VOC files
  * Support for Creative ADPCM in AVI
  * Directory Demux can now sort items, ignore extensions and hidden files
- * Replaced httplive stream filter with new hls demuxer
+ * Replaced httplive stream filter with new HLS demuxer, using the same core
+   as the DASH module
 
 Stream filter:
  * Added ARIB STD-B25 TS streams decoder
@@ -75,7 +82,11 @@ Video ouput:
    NativeWindow (2.3+, supports hw rotation, subpicture blending, opaque)
  * Support rotation in Android NativeWindow output and hardware decoders
  * Renamed the Direct3D output module to Direct3D9
- * Added Direct3D11 video mode supporting both Windows desktop and WinRT modes.
+ * Added Direct3D11 video mode supporting both Windows desktop and WinRT modes,
+   supporting subpicture blending and hardware acceleration
+
+Text renderer:
+ * CTL support through Harfbuzz in the Freetype module
 
 Video filter:
  * Hardware deinterlacing on the rPI, using MMAL
@@ -102,6 +113,7 @@ Mac OS X Interface
  * Add support for keyboard blacklight dimming during fullscreen video playback
  * new AppleScript API giving access to audio desynchronization
  * Support for building with disabled sparkle update mechanism
+ * New configure flag to disable automatic updates
 
 Qt interface:
  * Batch convert support
@@ -134,6 +146,7 @@ Logging
 Misc
  * remove langfromtelx
  * remove ZPL playlist format
+ * Update libVLC doxygen modules
 
 
 Changes between 2.2.0 and 2.2.1:
