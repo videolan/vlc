@@ -26,6 +26,7 @@
 
 /**
  * \defgroup es_out ES output
+ * \ingroup input
  * Elementary streams output
  * @{
  * \file

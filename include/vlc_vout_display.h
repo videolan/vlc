@@ -24,11 +24,6 @@
 #ifndef VLC_VOUT_DISPLAY_H
 #define VLC_VOUT_DISPLAY_H 1
 
-/**
- * \file
- * This file defines vout display structures and functions in vlc
- */
-
 #include <vlc_es.h>
 #include <vlc_picture.h>
 #include <vlc_picture_pool.h>
@@ -36,6 +31,16 @@
 #include <vlc_keys.h>
 #include <vlc_mouse.h>
 #include <vlc_vout_window.h>
+
+/**
+ * \defgroup video_display Video output display
+ * Video output display: output buffers and rendering
+ *
+ * \ingroup video_output
+ * @{
+ * \file
+ * Video output display modules interface
+ */
 
 /* XXX
  * Do NOT use video_format_t::i_aspect but i_sar_num/den everywhere. i_aspect
@@ -456,5 +461,6 @@ VLC_API void vout_display_PlacePicture(vout_display_place_t *place, const video_
  */
 VLC_API void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, video_orientation_t orient_display, int m_x, int m_y,
                                                            vout_display_place_t *place);
-#endif /* VLC_VOUT_DISPLAY_H */
 
+/** @} */
+#endif /* VLC_VOUT_DISPLAY_H */

@@ -23,6 +23,8 @@
 # include <stdarg.h>
 
 /**
+ * \ingroup interaction
+ * @{
  * \file vlc_dialog.h
  * User interaction dialog APIs
  */
@@ -120,5 +122,7 @@ VLC_API int dialog_Register(vlc_object_t *);
 VLC_API int dialog_Unregister(vlc_object_t *);
 #define dialog_Register(o) dialog_Register(VLC_OBJECT(o))
 #define dialog_Unregister(o) dialog_Unregister(VLC_OBJECT(o))
+
+/** @} */
 
 #endif

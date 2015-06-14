@@ -33,7 +33,7 @@ extern "C" {
 typedef struct intf_dialog_args_t intf_dialog_args_t;
 
 /**
- * \defgroup vlc_interface Interface
+ * \defgroup interface Interface
  * VLC user interfaces
  * @{
  * \file
@@ -241,8 +241,8 @@ typedef enum vlc_dialog {
                             "*.dks;*.pjs;*.mpl2;*.mks;" \
                             "*.vtt"
 
-/** \defgroup vlc_interaction Interaction
- * \ingroup vlc_interface
+/** \defgroup interaction Interaction
+ * \ingroup interface
  * Interaction between user and modules
  * @{
  */

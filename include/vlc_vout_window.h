@@ -25,15 +25,18 @@
 #ifndef VLC_VOUT_WINDOW_H
 #define VLC_VOUT_WINDOW_H 1
 
-/**
- * \file
- * This file defines vout windows structures and functions in vlc
- */
-
 #include <stdarg.h>
 #include <vlc_common.h>
 
-/* */
+/**
+ * \defgroup video_window Video window
+ * \ingroup video_output
+ * Video output window management
+ * @{
+ * \file
+ * Video output window modules interface
+ */
+
 typedef struct vout_window_t vout_window_t;
 typedef struct vout_window_sys_t vout_window_sys_t;
 
@@ -207,4 +210,5 @@ static inline void vout_window_ReportClose(vout_window_t *window)
         window->owner.closed(window);
 }
 
+/** @} */
 #endif /* VLC_VOUT_WINDOW_H */

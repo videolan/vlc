@@ -34,9 +34,9 @@ extern "C" {
 
 /**
  * \defgroup spu Sub-picture channels
- * \ingroup subpicture
- * \file
+ * \ingroup video_output
  * @{
+ * \file
  */
 
 typedef struct spu_private_t spu_private_t;

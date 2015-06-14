@@ -24,8 +24,11 @@
 #define VLC_AOUT_H 1
 
 /**
+ * \defgroup audio_output Audio output
+ * \ingroup output
+ * @{
  * \file
- * This file defines functions, structures and macros for audio output object
+ * Audio output modules interface
  */
 
 /* Buffers which arrive in advance of more than AOUT_MAX_ADVANCE_TIME
@@ -335,5 +338,7 @@ VLC_API bool aout_FiltersAdjustResampling(aout_filters_t *, int);
 VLC_API block_t *aout_FiltersPlay(aout_filters_t *, block_t *, int rate);
 
 VLC_API vout_thread_t * aout_filter_RequestVout( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt );
+
+/** @} */
 
 #endif /* VLC_AOUT_H */

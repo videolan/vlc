@@ -32,6 +32,7 @@
 
 /**
  * \defgroup filter Filters
+ * \ingroup output
  * Audio, video, text filters
  * @{
  * \file

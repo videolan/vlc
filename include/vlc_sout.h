@@ -28,17 +28,20 @@
 #ifndef VLC_SOUT_H_
 #define VLC_SOUT_H_
 
-/**
- * \file
- * This file defines structures and functions for stream output in vlc
- */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <sys/types.h>
 #include <vlc_es.h>
+
+/**
+ * \defgroup sout Stream output
+ * \ingroup output
+ * @{
+ * \file
+ * Stream output modules interface
+ */
 
 /** Stream output instance (FIXME: should be private to src/ to avoid
  * invalid unsynchronized access) */
@@ -59,6 +62,12 @@ struct sout_instance_t
  * sout_stream_id_sys_t: opaque (private for all sout_stream_t)
  ****************************************************************************/
 typedef struct sout_stream_id_sys_t  sout_stream_id_sys_t;
+
+/**
+ * \defgroup sout_access Access output
+ * Raw output byte streams
+ * @{
+ */
 
 /** Stream output access_output */
 struct sout_access_out_t
@@ -100,6 +109,13 @@ static inline bool sout_AccessOutCanControlPace( sout_access_out_t *p_ao )
         return true;
     return b;
 }
+
+/**
+ * @}
+ * \defgroup sout_mux Multiplexer
+ * Multiplexers (file formatters)
+ * @{
+ */
 
 /** Muxer structure */
 struct  sout_mux_t
@@ -171,9 +187,8 @@ static inline int sout_MuxControl( sout_mux_t *p_mux, int i_query, ... )
     return i_result;
 }
 
-/****************************************************************************
- * sout_stream:
- ****************************************************************************/
+/** @} */
+
 struct sout_stream_t
 {
     VLC_COMMON_MEMBERS
@@ -249,6 +264,8 @@ typedef struct sout_description_data_t
     es_format_t **es;
     vlc_sem_t *sem;
 } sout_description_data_t;
+
+/** @} */
 
 #ifdef __cplusplus
 }

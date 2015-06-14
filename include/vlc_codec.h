@@ -29,8 +29,6 @@
 #include <vlc_picture.h>
 #include <vlc_subpicture.h>
 
-typedef struct decoder_owner_sys_t decoder_owner_sys_t;
-
 /**
  * \defgroup codec Codec
  * Decoders and encoders
@@ -42,6 +40,8 @@ typedef struct decoder_owner_sys_t decoder_owner_sys_t;
  * Audio, video and text decoders
  * @{
  */
+
+typedef struct decoder_owner_sys_t decoder_owner_sys_t;
 
 /*
  * BIG FAT WARNING : the code relies in the first 4 members of filter_t

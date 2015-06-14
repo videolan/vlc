@@ -31,7 +31,9 @@
 #include <vlc_subpicture.h>
 
 /**
+ * \defgroup output Output
  * \defgroup video_output Video output
+ * \ingroup output
  * Video rendering, output and window management
  *
  * This module describes the programming interface for video output threads.

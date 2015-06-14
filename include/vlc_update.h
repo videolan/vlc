@@ -27,10 +27,11 @@
 
 /**
  * \defgroup update Software updates
+ * \ingroup interface
  * Over-the-air VLC software updates
+ * @{
  * \file
  *VLC software update interface
- * @{
  */
 
 #ifdef UPDATE_CHECK

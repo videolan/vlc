@@ -34,6 +34,7 @@ extern "C" {
  * \defgroup stream Stream
  * \ingroup input
  * Buffered input byte streams
+ * @{
  * \file
  * Byte streams and byte stream filter modules interface
  */
