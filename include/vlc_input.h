@@ -22,13 +22,15 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* __ is need because conflict with <vlc/input.h> */
 #ifndef VLC_INPUT_H
 #define VLC_INPUT_H 1
 
 /**
+ * \defgroup input Input
+ * Input thread
+ * @{
  * \file
- * This file defines functions, structures and enums for input objects in vlc
+ * Input thread interface
  */
 
 #include <vlc_es.h>
@@ -671,4 +673,5 @@ VLC_API void input_resource_PutAout( input_resource_t *, audio_output_t * );
  */
 VLC_API void input_resource_ResetAout( input_resource_t * );
 
+/** @} */
 #endif

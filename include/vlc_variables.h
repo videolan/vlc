@@ -26,19 +26,14 @@
 #define VLC_VARIABLES_H 1
 
 /**
- * \file
- * This file defines functions and structures for dynamic variables in vlc
- */
-
-/**
  * \defgroup variables Variables
+ * \ingroup vlc_object
  *
- * Functions for using the object variables in vlc.
- *
- * Vlc have a very powerful "object variable" infrastructure useful
- * for many things.
+ * VLC object variables and callbacks
  *
  * @{
+ * \file
+ * VLC object variables and callbacks interface
  */
 
 #define VLC_VAR_TYPE      0x00ff

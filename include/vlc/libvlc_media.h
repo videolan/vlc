@@ -23,11 +23,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/**
- * \file
- * This file defines libvlc_media external API
- */
-
 #ifndef VLC_LIBVLC_MEDIA_H
 #define VLC_LIBVLC_MEDIA_H 1
 
@@ -40,6 +35,8 @@ extern "C" {
  * @ref libvlc_media_t is an abstract representation of a playable media.
  * It consists of a media location and various optional meta data.
  * @{
+ * \file
+ * LibVLC media item/descriptor external API
  */
 
 typedef struct libvlc_media_t libvlc_media_t;

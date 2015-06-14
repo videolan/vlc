@@ -26,25 +26,20 @@
 #ifndef VLC_VOUT_H_
 #define VLC_VOUT_H_ 1
 
-/**
- * \file
- * This file defines common video output structures and functions in vlc
- */
-
 #include <vlc_picture.h>
 #include <vlc_filter.h>
 #include <vlc_subpicture.h>
 
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-
 /**
- * \defgroup video_output Video Output
+ * \defgroup video_output Video output
+ * Video rendering, output and window management
+ *
  * This module describes the programming interface for video output threads.
  * It includes functions allowing to open a new thread, send pictures to a
  * thread, and destroy a previously opened video output thread.
  * @{
+ * \file
+ * Video output thread interface
  */
 
 /**

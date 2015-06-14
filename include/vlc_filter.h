@@ -31,8 +31,11 @@
 #include <vlc_mouse.h>
 
 /**
+ * \defgroup filter Filters
+ * Audio, video, text filters
+ * @{
  * \file
- * This file defines the structure and types used by video and audio filters
+ * Filter modules interface
  */
 
 typedef struct filter_owner_sys_t filter_owner_sys_t;

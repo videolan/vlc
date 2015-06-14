@@ -25,19 +25,18 @@
 #ifndef VLC_VLM_H
 #define VLC_VLM_H 1
 
-/**
- * \file
- * This file defines VLM core functions and structures in vlc
- */
-
 #include <vlc_input.h>
 
 /**
  * \defgroup server VLM
+ * VLC stream manager
+ *
  * VLM is the server core in vlc that allows streaming of multiple media streams
  * at the same time. It provides broadcast, schedule and video on demand features
  * for streaming using several streaming and network protocols.
  * @{
+ * \file
+ * VLC stream manager interface
  */
 
 /** VLM media */

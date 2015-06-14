@@ -24,15 +24,12 @@
  *****************************************************************************/
 
 /**
- * \file
- * This file defines libvlc external API
- */
-
-/**
  * \defgroup libvlc LibVLC
  * LibVLC is the external programming interface of the VLC media player.
  * It is used to embed VLC into other applications or frameworks.
  * @{
+ * \file
+ * LibVLC core external API
  */
 
 #ifndef VLC_LIBVLC_H

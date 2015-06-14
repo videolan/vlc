@@ -26,13 +26,10 @@
 #define VLC_UPDATE_H
 
 /**
+ * \defgroup update Software updates
+ * Over-the-air VLC software updates
  * \file
- * This file defines update API in vlc
- */
-
-/**
- * \defgroup update Update
- *
+ *VLC software update interface
  * @{
  */
 

@@ -24,11 +24,6 @@
 #ifndef LIBVLC_MEDIA_LIST_H
 #define LIBVLC_MEDIA_LIST_H 1
 
-/**
- * \file
- * This file defines libvlc_media_list API
- */
-
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -37,6 +32,8 @@ extern "C" {
  * \ingroup libvlc
  * A LibVLC media list holds multiple @ref libvlc_media_t media descriptors.
  * @{
+ * \file
+ * LibVLC media list (playlist) external API
  */
 
 typedef struct libvlc_media_list_t libvlc_media_list_t;

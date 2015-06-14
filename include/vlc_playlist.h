@@ -35,11 +35,11 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t)
 struct intf_thread_t;
 
 /**
+ * \defgroup vlc_playlist VLC playlist
+ * VLC playlist controls
+ * @{
  * \file
- * This file contain structures and function prototypes related
- * to the playlist in vlc
- *
- * \defgroup vlc_playlist Playlist
+ * VLC playlist control interface
  *
  * The VLC playlist system has a tree structure. This allows advanced
  * categorization, like for SAP streams (which are grouped by "sap groups").
@@ -115,10 +115,8 @@ struct intf_thread_t;
  * The playlist contains rate-variable which is propagated to current input if available
  * also rate-slower/rate-faster is in use
  *
- * XXX Be really carefull, playlist_item_t->i_id and input_item_t->i_id are not
- * the same. Yes, the situation is pretty bad.
- *
- * @{
+ * \warning Be really carefull, playlist_item_t->i_id and input_item_t->i_id
+ * are not the same. Yes, the situation is pretty bad.
  */
 
 /** Helper structure to export to file part of the playlist */

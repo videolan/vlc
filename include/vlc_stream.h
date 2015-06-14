@@ -26,20 +26,16 @@
 
 #include <vlc_block.h>
 
-/**
- * \file
- * This file defines structures and functions for stream (between access and demux) descriptor in vlc
- */
-
 # ifdef __cplusplus
 extern "C" {
 # endif
 
 /**
  * \defgroup stream Stream
- *
- *  This will allow you to easily handle read/seek in demuxer modules.
- * @{
+ * \ingroup input
+ * Buffered input byte streams
+ * \file
+ * Byte streams and byte stream filter modules interface
  */
 
 /* Opaque definition for text reader context */

@@ -27,19 +27,17 @@
 #ifndef VLC_MESSAGES_H_
 #define VLC_MESSAGES_H_
 
-/**
- * \file
- * This file defines structures and functions to handle messages and statistics gathering
- */
-
 #include <stdarg.h>
 
 /**
- * \defgroup messages Messages
- * This library provides basic functions for threads to interact with user
- * interface, such as message output.
+ * \defgroup messages Logging
+ * \brief Message logs
+ *
+ * Functions for modules to emit log messages.
  *
  * @{
+ * \file
+ * Logging functions
  */
 
 /** Message types */

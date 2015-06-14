@@ -22,13 +22,10 @@
  *****************************************************************************/
 
 /**
- * \file
- * This file defines the vlc_object_t structure and object types.
- */
-
-/**
- * \defgroup vlc_object Objects
+ * \defgroup vlc_object VLC objects
  * @{
+ * \file
+ * Common VLC object defintions
  */
 
 /* Object flags */

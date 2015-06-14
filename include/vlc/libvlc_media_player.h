@@ -23,11 +23,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/**
- * \file
- * This file defines libvlc_media_player external API
- */
-
 #ifndef VLC_LIBVLC_MEDIA_PLAYER_H
 #define VLC_LIBVLC_MEDIA_PLAYER_H 1
 
@@ -37,13 +32,12 @@ extern "C" {
 #  include <stdbool.h>
 # endif
 
-/*****************************************************************************
- * Media Player
- *****************************************************************************/
 /** \defgroup libvlc_media_player LibVLC media player
  * \ingroup libvlc
  * A LibVLC media player plays one media (usually in a custom drawable).
  * @{
+ * \file
+ * LibVLC simple media player external API
  */
 
 typedef struct libvlc_media_player_t libvlc_media_player_t;

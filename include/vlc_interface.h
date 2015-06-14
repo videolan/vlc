@@ -33,15 +33,11 @@ extern "C" {
 typedef struct intf_dialog_args_t intf_dialog_args_t;
 
 /**
- * \file
- * This file contains structures and function prototypes for
- * interface management in vlc
- */
-
-/**
  * \defgroup vlc_interface Interface
- * These functions and structures are for interface management
+ * VLC user interfaces
  * @{
+ * \file
+ * VLC user interface modules
  */
 
 typedef struct intf_sys_t intf_sys_t;

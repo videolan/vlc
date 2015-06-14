@@ -24,18 +24,10 @@
 #ifndef LIBVLC_MEDIA_LIST_PLAYER_H
 #define LIBVLC_MEDIA_LIST_PLAYER_H 1
 
-/**
- * \file
- * This file defines libvlc_media_list_player API
- */
-
 # ifdef __cplusplus
 extern "C" {
 # endif
 
-/*****************************************************************************
- * Media List Player
- *****************************************************************************/
 /** \defgroup libvlc_media_list_player LibVLC media list player
  * \ingroup libvlc
  * The LibVLC media list player plays a @ref libvlc_media_list_t list of media,
@@ -44,6 +36,8 @@ extern "C" {
  * The normal @ref libvlc_media_player_t LibVLC media player can only play a
  * single media, and does not handle playlist files properly.
  * @{
+ * \file
+ * LibVLC media list player external API
  */
 
 typedef struct libvlc_media_list_player_t libvlc_media_list_player_t;

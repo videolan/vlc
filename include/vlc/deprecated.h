@@ -25,22 +25,16 @@
 #ifndef LIBVLC_DEPRECATED_H
 #define LIBVLC_DEPRECATED_H 1
 
-/**
- * \file
- * This file defines libvlc deprecated API
- */
-
 # ifdef __cplusplus
 extern "C" {
 # endif
 
-/*****************************************************************************
- * Playlist (Deprecated)
- *****************************************************************************/
 /** \defgroup libvlc_playlist LibVLC playlist (legacy)
  * \ingroup libvlc
  * @deprecated Use @ref libvlc_media_list instead.
  * @{
+ * \file
+ * LibVLC deprecated playlist API
  */
 
 /**

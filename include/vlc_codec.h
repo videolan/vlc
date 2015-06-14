@@ -29,18 +29,17 @@
 #include <vlc_picture.h>
 #include <vlc_subpicture.h>
 
-/**
- * \file
- * This file defines the structure and types used by decoders and encoders
- */
-
 typedef struct decoder_owner_sys_t decoder_owner_sys_t;
 
 /**
+ * \defgroup codec Codec
+ * Decoders and encoders
+ * @{
+ * \file
+ * Decoder and encoder modules interface
+ *
  * \defgroup decoder Decoder
- *
- * The structure describing a decoder
- *
+ * Audio, video and text decoders
  * @{
  */
 
@@ -136,9 +135,7 @@ struct decoder_t
 
 /**
  * \defgroup encoder Encoder
- *
- * The structure describing a Encoder
- *
+ * Audio, video and text encoders
  * @{
  */
 
@@ -172,8 +169,10 @@ struct encoder_t
 
 /**
  * @}
+ *
+ * \ingroup decoder
+ * @{
  */
-
 
 /**
  * This function notifies the video output pipeline of a new video output
@@ -242,4 +241,6 @@ VLC_API mtime_t decoder_GetDisplayDate( decoder_t *, mtime_t ) VLC_USED;
  */
 VLC_API int decoder_GetDisplayRate( decoder_t * ) VLC_USED;
 
+/** @} */
+/** @} */
 #endif /* _VLC_CODEC_H */

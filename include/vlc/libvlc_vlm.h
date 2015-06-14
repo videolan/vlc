@@ -25,23 +25,16 @@
 #ifndef LIBVLC_VLM_H
 #define LIBVLC_VLM_H 1
 
-/**
- * \file
- * This file defines libvlc_vlm_* external API
- */
-
 # ifdef __cplusplus
 extern "C" {
 # endif
 
-/*****************************************************************************
- * VLM
- *****************************************************************************/
 /** \defgroup libvlc_vlm LibVLC VLM
  * \ingroup libvlc
  * @{
+ * \file
+ * LibVLC stream output manager external API
  */
-
 
 /**
  * Release the vlm instance related to the given libvlc_instance_t

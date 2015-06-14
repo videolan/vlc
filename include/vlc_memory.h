@@ -26,13 +26,10 @@
 #include <stdlib.h>
 
 /**
- * \file
- * This file deals with memory fixups
- */
-
-/**
  * \defgroup memory Memory
  * @{
+ * \file
+ * Memory fixups
  */
 
 /**

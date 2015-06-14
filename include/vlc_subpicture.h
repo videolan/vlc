@@ -27,19 +27,19 @@
 #define VLC_SUBPICTURE_H 1
 
 /**
- * \file
- * This file defines subpicture structures and functions in vlc
  */
 
 #include <vlc_picture.h>
 #include <vlc_text_style.h>
 
 /**
- * \defgroup subpicture Video Subpictures
+ * \defgroup subpicture Video sub-pictures
+ * \ingroup video_output
  * Subpictures are pictures that should be displayed on top of the video, like
  * subtitles and OSD
- * \ingroup video_output
  * @{
+ * \file
+ * Subpictures functions
  */
 
 /**

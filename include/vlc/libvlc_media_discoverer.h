@@ -23,11 +23,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/**
- * \file
- * This file defines libvlc_media_discoverer external API
- */
-
 #ifndef VLC_LIBVLC_MEDIA_DISCOVERER_H
 #define VLC_LIBVLC_MEDIA_DISCOVERER_H 1
 
@@ -43,6 +38,8 @@ extern "C" {
  * from peripherals (e.g. video capture device), on the local network
  * (e.g. SAP) or on the Internet (e.g. Internet radios).
  * @{
+ * \file
+ * LibVLC media discovery external API
  */
 
 typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;

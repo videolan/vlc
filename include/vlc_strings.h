@@ -25,13 +25,10 @@
 #define VLC_STRINGS_H 1
 
 /**
- * \file
- * This file defines functions and structures handling misc strings
- */
-
-/**
- * \defgroup strings Strings
+ * \defgroup strings String helpers
  * @{
+ * \file
+ * Helper functions for nul-terminated strings
  */
 
 static inline int vlc_ascii_toupper( int c )

@@ -25,13 +25,11 @@
 #define VLC_ES_OUT_H 1
 
 /**
- * \file
- * This file defines functions and structures for handling es_out in stream output
- */
-
-/**
- * \defgroup es out Es Out
+ * \defgroup es_out ES output
+ * Elementary streams output
  * @{
+ * \file
+ * Elementary streams output interface
  */
 
 enum es_out_query_e
