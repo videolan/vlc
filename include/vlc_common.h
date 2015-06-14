@@ -191,9 +191,6 @@ static inline void vlc_fourcc_to_char( vlc_fourcc_t fcc, char *psz_fourcc )
     memcpy( psz_fourcc, &fcc, 4 );
 }
 
-#define vlc_fourcc_to_char( a, b ) \
-        vlc_fourcc_to_char( (vlc_fourcc_t)(a), (char *)(b) )
-
 /*****************************************************************************
  * Classes declaration
  *****************************************************************************/
