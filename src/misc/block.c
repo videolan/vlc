@@ -275,7 +275,7 @@ static void block_heap_Release (block_t *block)
  *
  * When block_Release() is called, VLC will free() the specified pointer.
  *
- * @param ptr base address of the heap allocation (will be free()'d)
+ * @param addr base address of the heap allocation (will be free()'d)
  * @param length bytes length of the heap allocation
  * @return NULL in case of error (ptr free()'d in that case), or a valid
  * block_t pointer.

@@ -314,58 +314,60 @@ VLC_API void filter_chain_Reset( filter_chain_t *, const es_format_t *, const es
 /**
  * Append filter to the end of the chain.
  *
- * \param p_chain pointer to filter chain
- * \param psz_name name of filter
- * \param p_cfg
- * \param p_fmt_in input es_format_t
- * \param p_fmt_out output es_format_t
- * \return pointer to filter chain
+ * \param chain filter chain to append a filter to
+ * \param name filter name
+ * \param fmt_in filter input format
+ * \param fmt_out filter output format
+ * \return a pointer to the filter or NULL on error
  */
-VLC_API filter_t * filter_chain_AppendFilter( filter_chain_t *, const char *, config_chain_t *, const es_format_t *, const es_format_t * );
+VLC_API filter_t *filter_chain_AppendFilter(filter_chain_t *chain,
+    const char *name, config_chain_t *cfg, const es_format_t *fmt_in,
+    const es_format_t *fmt_out);
 
 /**
  * Append new filter to filter chain from string.
  *
- * \param p_chain pointer to filter chain
- * \param psz_string string of filters
- * \return 0 for success
+ * \param chain filter chain to append a filter to
+ * \param str filters chain nul-terminated string
  */
-VLC_API int filter_chain_AppendFromString( filter_chain_t *, const char * );
+VLC_API int filter_chain_AppendFromString(filter_chain_t *chain,
+                                          const char *str);
 
 /**
  * Delete filter from filter chain. This function also releases the filter
  * object and unloads the filter modules. The pointer to p_filter is no
  * longer valid after this function successfully returns.
  *
- * \param p_chain pointer to filter chain
- * \param p_filter pointer to filter object
+ * \param chain filter chain to remove the filter from
+ * \param filter filter to remove from the chain and delete
  */
-VLC_API void filter_chain_DeleteFilter( filter_chain_t *, filter_t * );
+VLC_API void filter_chain_DeleteFilter(filter_chain_t *chain,
+                                       filter_t *filter);
 
 /**
  * Get the number of filters in the filter chain.
  *
- * \param p_chain pointer to filter chain
+ * \param chain pointer to filter chain
  * \return number of filters in this filter chain
  */
-VLC_API int filter_chain_GetLength( filter_chain_t * );
+VLC_API int filter_chain_GetLength(filter_chain_t *chain);
 
 /**
- * Get last p_fmt_out in the chain.
+ * Get last output format of the last element in the filter chain.
  *
- * \param p_chain pointer to filter chain
- * \return last p_fmt (es_format_t) of this filter chain
+ * \param chain filter chain
  */
-VLC_API const es_format_t * filter_chain_GetFmtOut( filter_chain_t * );
+VLC_API const es_format_t *filter_chain_GetFmtOut(filter_chain_t *chain);
 
 /**
  * Apply the filter chain to a video picture.
  *
- * \param p_chain pointer to filter chain
- * \param p_picture picture to apply filters on
+ * \param chain pointer to filter chain
+ * \param pic picture to apply filters to
  * \return modified picture after applying all video filters
  */
-VLC_API picture_t * filter_chain_VideoFilter( filter_chain_t *, picture_t * );
+VLC_API picture_t *filter_chain_VideoFilter(filter_chain_t *chain,
+                                            picture_t *pic);
 
 /**
  * Flush a video filter chain.
@@ -374,29 +376,33 @@ VLC_API void filter_chain_VideoFlush( filter_chain_t * );
 
 /**
  * Apply the filter chain to a audio block.
+ * \bug Deal with block chains and document.
  *
- * \param p_chain pointer to filter chain
- * \param p_block audio frame to apply filters on
+ * \param chain pointer to filter chain
+ * \param block audio frame to apply filters on
  * \return modified audio frame after applying all audio filters
  */
-VLC_API block_t * filter_chain_AudioFilter( filter_chain_t *, block_t * );
+VLC_API block_t *filter_chain_AudioFilter(filter_chain_t *chain,
+                                          block_t *block);
 
 /**
- * Apply filter chain to subpictures.
+ * Generate subpictures from a chain of subpicture source "filters".
  *
- * \param p_chain pointer to filter chain
+ * \param chain filter chain
  * \param display_date of subpictures
  */
-void filter_chain_SubSource( filter_chain_t *, spu_t *, mtime_t );
+void filter_chain_SubSource(filter_chain_t *chain, spu_t *,
+                            mtime_t display_date);
 
 /**
  * Apply filter chain to subpictures.
  *
- * \param p_chain pointer to filter chain
- * \param p_subpicture subpicture to apply filters on
+ * \param chain filter chain
+ * \param subpic subpicture to apply filters on
  * \return modified subpicture after applying all subpicture filters
  */
-VLC_API subpicture_t * filter_chain_SubFilter( filter_chain_t *, subpicture_t * );
+VLC_API subpicture_t *filter_chain_SubFilter(filter_chain_t *chain,
+                                             subpicture_t *subpic);
 
 /**
  * Apply the filter chain to a mouse state.
@@ -418,5 +424,5 @@ VLC_API int filter_chain_MouseEvent( filter_chain_t *, const vlc_mouse_t *, cons
 int filter_chain_ForEach( filter_chain_t *chain,
                           int (*cb)( filter_t *, void * ), void *opaque );
 
+/** @} */
 #endif /* _VLC_FILTER_H */
-
