@@ -32,14 +32,10 @@
 extern "C" {
 #endif
 
-/**********************************************************************
- * Base SPU structures
- **********************************************************************/
 /**
- * \defgroup spu Subpicture Unit
- * This module describes the programming interface for the subpicture unit.
- * It includes functions allowing to create/destroy an spu, and render
- * subpictures.
+ * \defgroup spu Sub-picture channels
+ * \ingroup subpicture
+ * \file
  * @{
  */
 
