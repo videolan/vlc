@@ -670,6 +670,13 @@ typedef struct
     // TODO to complete
 } MP4_Box_data_sample_text_t;
 
+typedef struct
+{
+    uint8_t  i_reserved1[6];
+    uint16_t i_data_reference_index;
+
+} MP4_Box_data_sample_clcp_t;
+
 typedef struct MP4_Box_data_sample_hint_s
 {
     uint8_t  i_reserved1[6];
@@ -1410,6 +1417,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_sample_vide_t *p_sample_vide;
     MP4_Box_data_sample_soun_t *p_sample_soun;
     MP4_Box_data_sample_text_t *p_sample_text;
+    MP4_Box_data_sample_clcp_t *p_sample_clcp;
     MP4_Box_data_sample_hint_t *p_sample_hint;
 
     MP4_Box_data_esds_t *p_esds;

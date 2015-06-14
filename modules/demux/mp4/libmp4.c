@@ -2206,6 +2206,24 @@ static int MP4_ReadBox_sample_text( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_sample_clcp( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    p_box->i_handler = ATOM_clcp;
+    MP4_READBOX_ENTER( MP4_Box_data_sample_clcp_t, NULL );
+
+    if( i_read < 8 )
+        MP4_READBOX_EXIT( 0 );
+
+    for( int i=0; i<6; i++ )
+        MP4_GET1BYTE( p_box->data.p_sample_clcp->i_reserved1[i] );
+    MP4_GET2BYTES( p_box->data.p_sample_clcp->i_data_reference_index );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "read box: \"clcp\" in stsd" );
+#endif
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_sample_tx3g( stream_t *p_stream, MP4_Box_t *p_box )
 {
     p_box->i_handler = ATOM_text;
@@ -3684,6 +3702,7 @@ static const struct
 
     /* Subtitles */
     { ATOM_tx3g,    MP4_ReadBox_sample_tx3g,      0 },
+    { ATOM_c608,    MP4_ReadBox_sample_clcp,      ATOM_stsd },
     //{ ATOM_text,    MP4_ReadBox_sample_text,    0 },
 
     /* for codecs */
