@@ -154,6 +154,8 @@ static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descrip
 int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 {
     MP4_Box_data_sample_vide_t *p_vide = p_sample->data.p_sample_vide;
+    if(!p_vide)
+        return 0;
 
     p_track->fmt.video.i_width = p_vide->i_width;
     p_track->fmt.video.i_height = p_vide->i_height;
@@ -386,6 +388,8 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 {
     MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
+    if(!p_soun)
+        return 0;
 
     p_track->fmt.audio.i_channels = p_soun->i_channelcount;
     p_track->fmt.audio.i_rate = p_soun->i_sampleratehi;
@@ -746,12 +750,10 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     return 1;
 }
 
-
-int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
+int SetupCCES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 {
-    MP4_Box_data_sample_text_t *p_text = p_sample->data.p_sample_text;
+    VLC_UNUSED(p_demux);
 
-    /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )
     {
         case( ATOM_c608 ): /* EIA608 closed captions */
@@ -759,7 +761,22 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             p_track->fmt.i_codec = VLC_CODEC_EIA608_1;
             p_track->fmt.i_cat = SPU_ES;
             break;
+        default:
+            return 0;
+    }
 
+    return 1;
+}
+
+int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
+{
+    MP4_Box_data_sample_text_t *p_text = p_sample->data.p_sample_text;
+    if(!p_text)
+        return 0;
+
+    /* It's a little ugly but .. there are special cases */
+    switch( p_sample->i_type )
+    {
         case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):
         case( VLC_FOURCC( 't', 'x', '3', 'g' ) ):
         {
