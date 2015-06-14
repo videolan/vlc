@@ -267,7 +267,7 @@ static inline void aout_MuteReport(audio_output_t *aout, bool mute)
 
 /**
  * Report audio policy status.
- * \parm cork true to request a cork, false to undo any pending cork.
+ * \param cork true to request a cork, false to undo any pending cork.
  */
 static inline void aout_PolicyReport(audio_output_t *aout, bool cork)
 {

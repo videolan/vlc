@@ -87,8 +87,8 @@ VLC_API bool vlc_http_cookies_append( vlc_http_cookie_jar_t * p_jar, const char 
 /**
  * Returns a cookie value that match the given URL.
  *
- * @params p_jar a cookie jar
- * @params p_url the URL for which the cookies are returned
+ * @param p_jar a cookie jar
+ * @param p_url the URL for which the cookies are returned
  * @return A string consisting of semicolon-separated cookie NAME=VALUE pairs.
  */
 VLC_API char *vlc_http_cookies_for_url( vlc_http_cookie_jar_t * p_jar, const vlc_url_t * p_url );
