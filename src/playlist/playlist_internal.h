@@ -28,6 +28,8 @@
 /**
  * \defgroup playlist_internals VLC playlist internals
  * \ingroup playlist
+ *
+ * @{
  * \file
  * VLC playlist internal interface
  */
