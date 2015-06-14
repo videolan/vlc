@@ -1201,7 +1201,7 @@ cleanup:
 #undef var_LocationParse
 /**
  * Parses a set of colon-separated or semicolon-separated
- * <variable name>=<value> pairs.
+ * <code>name=value</code> pairs.
  * Some access (or access_demux) plugins uses this scheme
  * in media resource location.
  * @note Only trusted/safe variables are allowed. This is intended.
