@@ -272,7 +272,7 @@ typedef enum libvlc_media_parse_flag_t
  * The same media item can be opened multiple times. Each time, this callback
  * is invoked. It should allocate and initialize any instance-specific
  * resources, then store them in *datap. The instance resources can be freed
- * in the @ref libvlc_close_cb callback.
+ * in the @ref libvlc_media_close_cb callback.
  *
  * \param opaque private pointer as passed to libvlc_media_new_callbacks()
  * \param datap storage space for a private data pointer [OUT]

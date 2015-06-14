@@ -395,7 +395,7 @@ LIBVLC_API void libvlc_log_get_object(const libvlc_log_t *ctx,
 /**
  * Callback prototype for LibVLC log message handler.
  * \param data data pointer as given to libvlc_log_set()
- * \param level message level (@ref enum libvlc_log_level)
+ * \param level message level (@ref libvlc_log_level)
  * \param ctx message context (meta-information about the message)
  * \param fmt printf() format string (as defined by ISO C11)
  * \param args variable argument list for the format
