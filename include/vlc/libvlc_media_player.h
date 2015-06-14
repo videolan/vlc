@@ -424,7 +424,7 @@ void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
  * The drawable is an NSObject that follow the VLCOpenGLVideoViewEmbedding
  * protocol:
  *
- * @begincode
+ * @code{.m}
  * \@protocol VLCOpenGLVideoViewEmbedding <NSObject>
  * - (void)addVoutSubview:(NSView *)view;
  * - (void)removeVoutSubview:(NSView *)view;
@@ -435,7 +435,7 @@ void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
  *
  * If you want to use it along with Qt4 see the QMacCocoaViewContainer. Then
  * the following code should work:
- * @begincode
+ * @code{.mm}
  * {
  *     NSView *video = [[NSView alloc] init];
  *     QMacCocoaViewContainer *container = new QMacCocoaViewContainer(video, parent);
