@@ -32,7 +32,7 @@ vlc_SOURCES = winvlc.c
 noinst_DATA += vlc_win32_rc.rc
 endif
 if HAVE_DARWIN
-vlc_osx_SOURCES = darwinvlc.m override.c
+vlc_osx_SOURCES = darwinvlc.m
 vlc_osx_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,CoreFoundation,-framework,Cocoa
 vlc_osx_LDADD = ../lib/libvlc.la
 endif

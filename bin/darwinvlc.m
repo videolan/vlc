@@ -1,14 +1,11 @@
 /*****************************************************************************
- * darwinvlc.c: the darwin-specific VLC player
+ * darwinvlc.m: OS X specific main executable for VLC media player
  *****************************************************************************
- * Copyright (C) 1998-2013 the VideoLAN team
+ * Copyright (C) 2013-2015 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Vincent Seguin <seguin@via.ecp.fr>
- *          Samuel Hocevar <sam@zoy.org>
- *          Gildas Bazin <gbazin@videolan.org>
- *          Derk-Jan Hartman <hartman at videolan dot org>
- *          Lots of other people, see the libvlc AUTHORS file
+ * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <dfuhrmann at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,70 +27,81 @@
 #endif
 
 #include <vlc/vlc.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
 #include <locale.h>
 #include <signal.h>
-#ifdef HAVE_PTHREAD_H
-# include <pthread.h>
-#endif
-#include <unistd.h>
-#include <TargetConditionals.h>
+#include <string.h>
+
 #import <CoreFoundation/CoreFoundation.h>
+#import <Cocoa/Cocoa.h>
 
-extern void vlc_enable_override (void);
 
-static bool signal_ignored (int signum)
+/**
+ * Handler called when VLC asks to terminate the program.
+ */
+static void vlc_terminate(void *data)
 {
-    struct sigaction sa;
+    (void)data;
 
-    if (sigaction (signum, NULL, &sa))
-        return false;
-    return ((sa.sa_flags & SA_SIGINFO)
-            ? (void *)sa.sa_sigaction : (void *)sa.sa_handler) == SIG_IGN;
-}
+    dispatch_async(dispatch_get_main_queue(), ^{
+        /*
+         * Stop the main loop. When using the CoreFoundation mainloop, simply
+         * CFRunLoopStop can be used.
+         *
+         * But this does not work when having an interface.
+         * In this case, [NSApp stop:nil] needs to be used, but the used flag is only
+         * evaluated at the end of main loop event processing. This is always true
+         * in the case of code inside a action method. But here, this is
+         * not true and thus we need to send an dummy event to make sure the stop
+         * flag is actually processed by the main loop.
+         */
+        if (NSApp == nil) {
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        } else {
 
-static void vlc_kill (void *data)
-{
-    pthread_t *ps = data;
-    pthread_kill (*ps, SIGTERM);
-}
+            [NSApp stop:nil];
+            NSEvent* event = [NSEvent otherEventWithType:NSApplicationDefined
+                                                location:NSMakePoint(0,0)
+                                           modifierFlags:0
+                                               timestamp:0.0
+                                            windowNumber:0
+                                                 context:nil
+                                                 subtype:0
+                                                   data1:0
+                                                   data2:0];
+            [NSApp postEvent:event atStart:YES];
+        }
 
-static void exit_timeout (int signum)
-{
-    (void) signum;
-    signal (SIGINT, SIG_DFL);
+    });
 }
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
  *****************************************************************************/
-int main( int i_argc, const char *ppsz_argv[] )
+int main(int i_argc, const char *ppsz_argv[])
 {
     /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
      * if it is blocked in all thread.
      * Note: this is NOT an excuse for not protecting against SIGPIPE. If
      * LibVLC runs outside of VLC, we cannot rely on this code snippet. */
-    signal (SIGPIPE, SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
     /* Restore SIGCHLD in case our parent process ignores it. */
-    signal (SIGCHLD, SIG_DFL);
+    signal(SIGCHLD, SIG_DFL);
 
 #ifndef NDEBUG
     /* Activate malloc checking routines to detect heap corruptions. */
-    setenv ("MALLOC_CHECK_", "2", 1);
+    setenv("MALLOC_CHECK_", "2", 1);
 #endif
 
 #ifdef TOP_BUILDDIR
-    setenv ("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
-    setenv ("VLC_DATA_PATH", TOP_SRCDIR"/share", 1);
+    setenv("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
+    setenv("VLC_DATA_PATH", TOP_SRCDIR"/share", 1);
 #endif
 
 #ifndef ALLOW_RUN_AS_ROOT
-    if (geteuid () == 0)
+    if (geteuid() == 0)
     {
-        fprintf (stderr, "VLC is not supposed to be run as root. Sorry.\n"
+        fprintf(stderr, "VLC is not supposed to be run as root. Sorry.\n"
         "If you need to use real-time priorities and/or privileged TCP ports\n"
         "you can use %s-wrapper (make sure it is Set-UID root and\n"
         "cannot be run by non-trusted users first).\n", ppsz_argv[0]);
@@ -101,34 +109,31 @@ int main( int i_argc, const char *ppsz_argv[] )
     }
 #endif
 
-    setlocale (LC_ALL, "");
+    setlocale(LC_ALL, "");
 
-    if (isatty (STDERR_FILENO))
+    if (isatty(STDERR_FILENO))
         /* This message clutters error logs. It is printed only on a TTY.
          * Fortunately, LibVLC prints version info with -vv anyway. */
-        fprintf (stderr, "VLC media player %s (revision %s)\n",
+        fprintf(stderr, "VLC media player %s (revision %s)\n",
                  libvlc_get_version(), libvlc_get_changeset());
 
     sigset_t set;
 
-    sigemptyset (&set);
-    /* VLC uses sigwait() to dequeue interesting signals.
-     * For this to work, those signals must be blocked in all threads,
-     * including the thread calling sigwait() (see the man page for details).
+    sigemptyset(&set);
+    /*
+     * The darwin version of VLC used GCD to dequeue interesting signals.
+     * For this to work, those signals must be blocked.
      *
-     * There are two advantages to sigwait() over traditional signal handlers:
-     *  - delivery is synchronous: no need to worry about async-safety,
+     * There are two advantages over traditional signal handlers:
+     *  - handling is done on a separate thread: no need to worry about async-safety,
      *  - EINTR is not generated: other threads need not handle that error.
      * That being said, some LibVLC programs do not use sigwait(). Therefore
      * EINTR must still be handled cleanly, notably from poll() calls.
      *
-     * Signals that request a clean shutdown, and force an unclean shutdown
-     * if they are triggered again 2+ seconds later.
+     * Signals that request a clean shutdown.
      * We have to handle SIGTERM cleanly because of daemon mode. */
-    sigaddset (&set, SIGINT);
-    sigaddset (&set, SIGHUP);
-    sigaddset (&set, SIGQUIT);
-    sigaddset (&set, SIGTERM);
+    sigaddset(&set, SIGINT);
+    sigaddset(&set, SIGTERM);
 
     /* SIGPIPE can happen and would crash the process. On modern systems,
      * the MSG_NOSIGNAL flag protects socket write operations against SIGPIPE.
@@ -138,18 +143,46 @@ int main( int i_argc, const char *ppsz_argv[] )
      * LibVLC code assumes that SIGPIPE is blocked. Other LibVLC applications
      * shall block it (or handle it somehow) too.
      */
-    sigaddset (&set, SIGPIPE);
+    sigaddset(&set, SIGPIPE);
 
     /* SIGCHLD must be dequeued to clean up zombie child processes.
      * Furthermore the handler must not be set to SIG_IGN (see above).
      * We cannot pragmatically handle EINTR, short reads and short writes
      * in every code paths (including underlying libraries). So we just
      * block SIGCHLD in all threads, and dequeue it below. */
-    sigaddset (&set, SIGCHLD);
+    sigaddset(&set, SIGCHLD);
 
     /* Block all these signals */
-    pthread_sigmask (SIG_SETMASK, &set, NULL);
+    pthread_sigmask(SIG_SETMASK, &set, NULL);
 
+    /* Handle signals with GCD */
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_source_t sigIntSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGINT, 0, queue);
+    dispatch_source_t sigTermSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGTERM, 0, queue);
+    dispatch_source_t sigChldSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGCHLD, 0, queue);
+
+    if (!sigIntSource || !sigTermSource || !sigChldSource)
+        abort();
+
+    dispatch_source_set_event_handler(sigIntSource, ^{
+        vlc_terminate(nil);
+    });
+    dispatch_source_set_event_handler(sigTermSource, ^{
+        vlc_terminate(nil);
+    });
+
+    dispatch_source_set_event_handler(sigChldSource, ^{
+        int status;
+        while(waitpid(-1, &status, WNOHANG) > 0)
+            ;
+    });
+
+    dispatch_resume(sigIntSource);
+    dispatch_resume(sigTermSource);
+    dispatch_resume(sigChldSource);
+
+
+    /* Handle parameters */
     const char *argv[i_argc + 2];
     int argc = 0;
 
@@ -157,7 +190,6 @@ int main( int i_argc, const char *ppsz_argv[] )
     argv[argc++] = "--media-library";
 
     /* overwrite system language on Mac */
-#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR // TARGET_OS_MAC is unspecific
     char *lang = NULL;
 
     for (int i = 0; i < i_argc; i++) {
@@ -192,7 +224,6 @@ int main( int i_argc, const char *ppsz_argv[] )
             CFRelease(language);
         }
     }
-#endif
 
     ppsz_argv++; i_argc--; /* skip executable path */
 
@@ -200,60 +231,51 @@ int main( int i_argc, const char *ppsz_argv[] )
      * is the PSN - process serial number (a unique PID-ish thingie)
      * still ok for real Darwin & when run from command line
      * for example -psn_0_9306113 */
-    if (i_argc >= 1 && !strncmp (*ppsz_argv, "-psn" , 4))
+    if (i_argc >= 1 && !strncmp(*ppsz_argv, "-psn" , 4))
         ppsz_argv++, i_argc--;
 
-    memcpy (argv + argc, ppsz_argv, i_argc * sizeof (*argv));
+    memcpy (argv + argc, ppsz_argv, i_argc * sizeof(*argv));
     argc += i_argc;
     argv[argc] = NULL;
 
-    vlc_enable_override ();
-
-    pthread_t self = pthread_self ();
-
     /* Initialize libvlc */
-    libvlc_instance_t *vlc = libvlc_new (argc, argv);
+    libvlc_instance_t *vlc = libvlc_new(argc, argv);
     if (vlc == NULL)
         return 1;
 
     int ret = 1;
-    libvlc_set_exit_handler (vlc, vlc_kill, &self);
-    libvlc_set_app_id (vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
-    libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
+    libvlc_set_exit_handler(vlc, vlc_terminate, NULL);
+    libvlc_set_app_id(vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
+    libvlc_set_user_agent(vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
-    libvlc_add_intf (vlc, "hotkeys,none");
+    libvlc_add_intf(vlc, "hotkeys,none");
 
-    libvlc_playlist_play (vlc, -1, 0, NULL);
-    if (libvlc_add_intf (vlc, NULL))
+    if (libvlc_add_intf(vlc, NULL))
         goto out;
+    libvlc_playlist_play(vlc, -1, 0, NULL);
 
-    /* Qt4 insists on catching SIGCHLD via signal handler. To work around that,
-     * unblock it after all our child threads are created. */
-    sigdelset (&set, SIGCHLD);
-    pthread_sigmask (SIG_SETMASK, &set, NULL);
+    /*
+     * Run the main loop. If the mac interface is not initialized, only the CoreFoundation
+     * runloop is used. Otherwise, [NSApp run] needs to be called, which setups more stuff
+     * before actually starting the loop.
+     */
+    @autoreleasepool {
+        if(NSApp == nil) {
+            CFRunLoopRun();
 
-    /* Do not dequeue SIGHUP if it is ignored (nohup) */
-    if (signal_ignored (SIGHUP))
-        sigdelset (&set, SIGHUP);
-    /* Ignore SIGPIPE */
-    sigdelset (&set, SIGPIPE);
-
-    int signum;
-    sigwait (&set, &signum);
-
-    /* Restore default signal behaviour after 3 seconds */
-    sigemptyset (&set);
-    sigaddset (&set, SIGINT);
-    sigaddset (&set, SIGALRM);
-    signal (SIGINT, SIG_IGN);
-    signal (SIGALRM, exit_timeout);
-    pthread_sigmask (SIG_UNBLOCK, &set, NULL);
-    alarm (3);
+        } else {
+            [NSApp run];
+        }
+    }
 
     ret = 0;
     /* Cleanup */
 out:
-    libvlc_release (vlc);
+    dispatch_release(sigIntSource);
+    dispatch_release(sigTermSource);
+    dispatch_release(sigChldSource);
+
+    libvlc_release(vlc);
 
     return ret;
 }
