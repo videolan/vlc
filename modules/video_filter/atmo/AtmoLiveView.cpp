@@ -12,8 +12,6 @@
 # include "config.h"
 #endif
 
-#define __STDC_FORMAT_MACROS 1
-
 #include "AtmoDefs.h"
 #include "AtmoLiveView.h"
 #include "AtmoOutputFilter.h"

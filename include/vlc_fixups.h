@@ -26,6 +26,20 @@
 #ifndef LIBVLC_FIXUPS_H
 # define LIBVLC_FIXUPS_H 1
 
+/* C++11 says there's no need to define __STDC_*_MACROS when including
+ * inttypes.h and stdint.h. */
+#if defined (__cplusplus) && !defined(HAVE_CXX11)
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS 1
+#endif
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS 1
+#endif
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS 1
+#endif
+#endif
+
 #if !defined (HAVE_GMTIME_R) || !defined (HAVE_LOCALTIME_R)
 # include <time.h> /* time_t */
 #endif

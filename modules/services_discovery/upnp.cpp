@@ -26,8 +26,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define __STDC_CONSTANT_MACROS 1
-
 #include "upnp.hpp"
 
 #include <vlc_access.h>

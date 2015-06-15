@@ -22,12 +22,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* config.h may include inttypes.h, so make sure we define that option
- * early enough. */
-#define __STDC_FORMAT_MACROS 1
-#define __STDC_CONSTANT_MACROS 1
-#define __STDC_LIMIT_MACROS 1
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif

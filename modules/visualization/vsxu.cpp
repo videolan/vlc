@@ -28,9 +28,6 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-#ifndef __STDC_CONSTANT_MACROS
-# define __STDC_CONSTANT_MACROS
-#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>

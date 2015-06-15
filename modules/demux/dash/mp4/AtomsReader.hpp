@@ -20,8 +20,6 @@
 #ifndef ATOMSREADER_HPP
 #define ATOMSREADER_HPP
 
-#define __STDC_CONSTANT_MACROS
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif

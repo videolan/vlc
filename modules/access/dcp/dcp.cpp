@@ -40,7 +40,6 @@
 # include "config.h"
 #endif
 
-#define __STDC_CONSTANT_MACROS 1
 #define KDM_HELP_TEXT          "KDM file"
 #define KDM_HELP_LONG_TEXT     "Path to Key Delivery Message XML file"
 

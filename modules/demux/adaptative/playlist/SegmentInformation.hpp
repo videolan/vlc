@@ -20,10 +20,6 @@
 #ifndef SEGMENTINFORMATION_HPP
 #define SEGMENTINFORMATION_HPP
 
-#ifndef __STDC_CONSTANT_MACROS
-  #define __STDC_CONSTANT_MACROS
-#endif
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif

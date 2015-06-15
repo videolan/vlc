@@ -33,11 +33,6 @@
 # include <config.h>
 #endif
 
-/* INT64_C and UINT64_C are only exposed to c++ if this is defined */
-#ifndef __STDC_CONSTANT_MACROS
-# define __STDC_CONSTANT_MACROS
-#endif
-
 #include <vlc_common.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>

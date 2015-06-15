@@ -26,9 +26,6 @@
  * TODO: test non stereo audio
  */
 
-#define __STDC_FORMAT_MACROS
-#define __STDC_CONSTANT_MACROS
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif

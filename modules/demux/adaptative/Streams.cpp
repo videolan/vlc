@@ -17,7 +17,6 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#define __STDC_CONSTANT_MACROS
 #include "Streams.hpp"
 #include "StreamsType.hpp"
 #include "http/HTTPConnection.hpp"
