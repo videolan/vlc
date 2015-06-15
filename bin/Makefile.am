@@ -1,7 +1,11 @@
 # Building vlc
 #
+if HAVE_DARWIN
+bin_PROGRAMS = vlc-osx
+else
 bin_PROGRAMS = vlc
 noinst_PROGRAMS = vlc-static
+endif
 noinst_DATA =
 vlclib_PROGRAMS = vlc-cache-gen
 EXTRA_PROGRAMS = vlc-wrapper
@@ -22,22 +26,21 @@ endif
 vlc_SOURCES = vlc.c override.c
 endif
 
-EXTRA_vlc_SOURCES = vlc.c winvlc.c darwinvlc.c
+EXTRA_vlc_SOURCES = vlc.c winvlc.c
 if HAVE_WIN32
 vlc_SOURCES = winvlc.c
 noinst_DATA += vlc_win32_rc.rc
 endif
 if HAVE_DARWIN
-vlc_SOURCES = darwinvlc.c override.c
+vlc_osx_SOURCES = darwinvlc.m override.c
+vlc_osx_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,CoreFoundation,-framework,Cocoa
+vlc_osx_LDADD = ../lib/libvlc.la
 endif
 
 vlc_wrapper_SOURCES = rootwrap.c
 vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
 vlc_LDFLAGS = $(LDFLAGS_vlc)
-if HAVE_DARWIN
-vlc_LDFLAGS += -Wl,-framework,CoreFoundation
-endif
 vlc_LDADD = ../lib/libvlc.la $(LIBPTHREAD)
 
 vlc_static_SOURCES = $(vlc_SOURCES)
@@ -79,6 +82,12 @@ endif
 #
 noinst_DATA += ../modules/plugins.dat
 MOSTLYCLEANFILES = $(noinst_DATA)
+
+if HAVE_DARWIN
+install-data-local:
+	cd $(bindir); mv vlc-osx vlc
+
+endif
 
 .PHONY: ../modules/plugins.dat
 

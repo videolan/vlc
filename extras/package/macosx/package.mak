@@ -10,7 +10,7 @@ endif
 VLC-dev.app: VLC-tmp
 	rm -Rf $@
 	cp -R VLC-tmp $@
-	$(INSTALL) -m 0755 $(top_builddir)/bin/.libs/vlc $@/Contents/MacOS/VLC
+	$(INSTALL) -m 0755 $(top_builddir)/bin/.libs/vlc-osx $@/Contents/MacOS/VLC
 	$(LN_S) -f ../../../modules $@/Contents/MacOS/plugins
 
 # VLC.app for packaging and giving it to your friends

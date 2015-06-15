@@ -358,6 +358,7 @@
 		1C88BCC219DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8C19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png */; };
 		1C88BCC319DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8D19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png */; };
 		1CBB2CC81B06A6DE00110ADA /* Help.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1CBB2CC61B06A6DE00110ADA /* Help.xib */; };
+		1CC25CA81B2C585D0003F994 /* darwinvlc.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CC25CA71B2C585D0003F994 /* darwinvlc.m */; };
 		1CCB5F511A62A724004C3E90 /* about.h in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AF9F044465080059A3A7 /* about.h */; };
 		1CCB5F521A62A724004C3E90 /* about.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AFA0044465080059A3A7 /* about.m */; };
 		1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435E1972E26A0022B534 /* AddonListDataSource.h */; };
@@ -1231,6 +1232,7 @@
 		1C88BC8C19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob_highlight.png"; sourceTree = "<group>"; };
 		1C88BC8D19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob_highlight@2x.png"; sourceTree = "<group>"; };
 		1CBB2CC71B06A6DE00110ADA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Help.xib; sourceTree = "<group>"; };
+		1CC25CA71B2C585D0003F994 /* darwinvlc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = darwinvlc.m; path = ../../../bin/darwinvlc.m; sourceTree = "<group>"; };
 		1CCB5F2F1A62A6A5004C3E90 /* pseudo-vlc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "pseudo-vlc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CE5ED1B19DD6AB700FCEFD3 /* lion-window-fullscreen-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-on.png"; sourceTree = "<group>"; };
 		1CE5ED1C19DD6AB700FCEFD3 /* lion-window-fullscreen-on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-on@2x.png"; sourceTree = "<group>"; };
@@ -1251,7 +1253,6 @@
 		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyManager.m; path = ../../../modules/gui/macosx/BWQuincyManager.m; sourceTree = SOURCE_ROOT; };
 		7D3F652818805297005776C4 /* BWQuincyUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BWQuincyUI.h; path = ../../../modules/gui/macosx/BWQuincyUI.h; sourceTree = SOURCE_ROOT; };
 		7D3F652918805297005776C4 /* BWQuincyUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyUI.m; path = ../../../modules/gui/macosx/BWQuincyUI.m; sourceTree = SOURCE_ROOT; };
-		7D7DC2CA182E86D9008C9E3E /* darwinvlc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = darwinvlc.c; path = ../../../bin/darwinvlc.c; sourceTree = "<group>"; };
 		7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugMessageVisualizer.h; path = ../../../modules/gui/macosx/DebugMessageVisualizer.h; sourceTree = SOURCE_ROOT; };
 		7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugMessageVisualizer.m; path = ../../../modules/gui/macosx/DebugMessageVisualizer.m; sourceTree = SOURCE_ROOT; };
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
@@ -2877,7 +2878,7 @@
 		CCDDF1AF172FF4D6007729A1 /* core */ = {
 			isa = PBXGroup;
 			children = (
-				7D7DC2CA182E86D9008C9E3E /* darwinvlc.c */,
+				1CC25CA71B2C585D0003F994 /* darwinvlc.m */,
 				CC4D67F71348F601003FCC5B /* specific.c */,
 				CCDDF1AC172FF4C4007729A1 /* netconf.c */,
 				CCDDF1AD172FF4C4007729A1 /* dirs.c */,
@@ -3931,6 +3932,7 @@
 				1CCB5F791A62A724004C3E90 /* open.h in Sources */,
 				1CCB5F7A1A62A724004C3E90 /* open.m in Sources */,
 				1CCB5F7B1A62A724004C3E90 /* output.h in Sources */,
+				1CC25CA81B2C585D0003F994 /* darwinvlc.m in Sources */,
 				1CCB5F7C1A62A724004C3E90 /* output.m in Sources */,
 				1CCB5F7D1A62A724004C3E90 /* playlist.h in Sources */,
 				1CCB5F7E1A62A724004C3E90 /* playlist.m in Sources */,

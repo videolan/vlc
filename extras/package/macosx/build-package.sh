@@ -228,8 +228,8 @@ fi
 ##########################
 # Hack for VLC.app
 if [ "$FULL_PRODUCT_NAME" = "VLC.app" ] ; then
-    vlc_install "bin/${prefix}" "vlc" "${target}" "bin" "@loader_path/lib"
-    mv ${target}/vlc ${target}/VLC
+    vlc_install "bin/${prefix}" "vlc-osx" "${target}" "bin" "@loader_path/lib"
+    mv "${target}/vlc-osx" "${target}/VLC"
     chmod +x ${target}/VLC
 else
     vlc_install "bin/${prefix}" "vlc" "${target}/bin" "bin" "@loader_path/../lib"
