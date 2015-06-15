@@ -1352,6 +1352,8 @@ void SPrefsPanel::assoDialog()
 #undef aTv
 #undef aTa
 
+    CONNECT( filetypeList, itemChanged(QTreeWidgetItem*, int), this, updateCheckBoxes(QTreeWidgetItem*, int) );
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox( d );
     QPushButton *closeButton = new QPushButton( qtr( "&Apply" ) );
     QPushButton *clearButton = new QPushButton( qtr( "&Cancel" ) );
@@ -1366,6 +1368,47 @@ void SPrefsPanel::assoDialog()
     d->exec();
     delete qvReg;
     listAsso.clear();
+}
+
+void SPrefsPanel::updateCheckBoxes(QTreeWidgetItem* item, int column)
+{
+    if( column != 0 )
+        return;
+
+    /* temporarily block signals to avoid signal loops */
+    bool b_signalsBlocked = item->treeWidget()->blockSignals(true);
+
+    /* A parent checkbox was changed */
+    if( item->parent() == 0 )
+    {
+        Qt::CheckState checkState = item->checkState(0);
+        for( int i = 0; i < item->childCount(); i++ )
+        {
+            item->child(i)->setCheckState(0, checkState);
+        }
+    }
+
+    /* A child checkbox was changed */
+    else
+    {
+        bool b_diff = false;
+        for( int i = 0; i < item->parent()->childCount(); i++ )
+        {
+            if( i != item->parent()->indexOfChild(item) && item->checkState(0) != item->parent()->child(i)->checkState(0) )
+            {
+                b_diff = true;
+                break;
+            }
+        }
+
+        if( b_diff )
+            item->parent()->setCheckState(0, Qt::PartiallyChecked);
+        else
+            item->parent()->setCheckState(0, item->checkState(0));
+    }
+
+    /* Stop signal blocking */
+    item->treeWidget()->blockSignals(b_signalsBlocked);
 }
 
 void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
