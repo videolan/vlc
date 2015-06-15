@@ -3966,22 +3966,23 @@ dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
   [  --disable-libgcrypt     gcrypt support (default enabled)])
+# require libgcrypt >= 1.6.0
 AS_IF([test "${enable_libgcrypt}" != "no"], [
-  AC_CHECK_DECL([GCRYCTL_SET_THREAD_CBS], [
-    libgcrypt-config --version >/dev/null || \
-        AC_MSG_ERROR([gcrypt.h present but libgcrypt-config could not be found])
-    AC_CHECK_LIB(gcrypt, gcry_control, [
-      have_libgcrypt="yes"
-      AC_DEFINE([HAVE_GCRYPT], 1, [Defined if having gcrypt])
-      GCRYPT_CFLAGS="`libgcrypt-config --cflags`"
-      GCRYPT_LIBS="`libgcrypt-config --libs`"
-    ], [
-      AC_MSG_ERROR([libgcrypt not found. Install libgcrypt or pass --disable-libgcrypt.])
-    ], [`libgcrypt-config --libs`])
+  AC_TRY_COMPILE([
+#include <gcrypt.h>
+#if GCRYPT_VERSION_NUMBER < 0x010600
+#error
+#endif],
+  [], [
+    have_libgcrypt="yes"
+    AC_DEFINE([HAVE_GCRYPT], 1, [Defined if having gcrypt])
+    GCRYPT_CFLAGS="`libgcrypt-config --cflags`"
+    GCRYPT_LIBS="`libgcrypt-config --libs`"
   ], [
-    AC_MSG_ERROR([libgcrypt version 1.1.94 or higher not found. Install libgcrypt or pass --disable-libgcrypt.])
-  ], [#include <gcrypt.h>]
-  )
+    AS_IF([test "${enable_libgcrypt}" == "yes"], [
+      AC_MSG_ERROR([libgcrypt version 1.6.0 or higher not found. Install libgcrypt or pass --disable-libgcrypt.])
+    ])
+  ])
 ])
 
 AC_SUBST(GCRYPT_CFLAGS)
