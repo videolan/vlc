@@ -393,8 +393,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_GET_SEEKPOINTS:
         {
-            seekpoint_t ***array = (seekpoint_t ***)va_arg( args, seekpoint_t *** );
-            int *pi_title_to_fetch = (int *) va_arg( args, int * );
+            seekpoint_t ***array = va_arg( args, seekpoint_t *** );
+            int *pi_title_to_fetch = va_arg( args, int * );
 
             vlc_mutex_lock( &p_input->p->p_item->lock );
 
@@ -420,7 +420,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             }
 
             *array = calloc( p_title->i_seekpoint, sizeof(**array) );
-            if( !array )
+            if( unlikely(array == NULL) )
             {
                 vlc_mutex_unlock( &p_input->p->p_item->lock );
                 return VLC_ENOMEM;

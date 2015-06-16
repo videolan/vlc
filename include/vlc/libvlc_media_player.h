@@ -55,27 +55,23 @@ typedef struct libvlc_track_description_t
 } libvlc_track_description_t;
 
 /**
- * Description for titles. It contains name (description string),
- * duration in milliseconds if known,
- * and information if it was recognized as a menu by the demuxer.
+ * Description for titles
  */
 typedef struct libvlc_title_description_t
 {
-    int64_t i_duration;
-    char *psz_name;
-    bool b_menu;
+    int64_t i_duration; /**< duration in milliseconds */
+    char *psz_name; /**< title name */
+    bool b_menu; /**< info if item was recognized as a menu by the demuxer */
 } libvlc_title_description_t;
 
 /**
- * Description for chapters.
- * It contains information about time offset, duration
- * (both in milliseconds) as well as name (description string).
+ * Description for chapters
  */
 typedef struct libvlc_chapter_description_t
 {
-    int64_t i_time_offset;
-    int64_t i_duration;
-    char *psz_name;
+    int64_t i_time_offset; /**< time-offset of the chapter in milliseconds */
+    int64_t i_duration; /**< duration of the chapter in milliseconds */
+    char *psz_name; /**< chapter name */
 } libvlc_chapter_description_t;
 
 /**
