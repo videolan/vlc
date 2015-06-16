@@ -205,6 +205,7 @@ int FileOpen( vlc_object_t *p_this )
     if (S_ISDIR (st.st_mode))
     {
 #ifdef HAVE_FDOPENDIR
+        close(fd);
         return DirOpen (VLC_OBJECT(p_access));
 #else
         msg_Dbg (p_access, "ignoring directory");
