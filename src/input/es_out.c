@@ -2407,25 +2407,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         if( es == NULL )
             return VLC_EGENERIC;
 
-        if( p_fmt->i_extra )
+        es_format_Clean( &es->fmt );
+        es_format_Copy( &es->fmt, p_fmt );
+
+        if( es->p_dec )
         {
-            es->fmt.i_extra = p_fmt->i_extra;
-            es->fmt.p_extra = xrealloc( es->fmt.p_extra, p_fmt->i_extra );
-            memcpy( es->fmt.p_extra, p_fmt->p_extra, p_fmt->i_extra );
-
-            if( !es->p_dec )
-                return VLC_SUCCESS;
-#if 1
             EsDestroyDecoder( out, es );
-
             EsCreateDecoder( out, es );
-#else
-            es->p_dec->fmt_in.i_extra = p_fmt->i_extra;
-            es->p_dec->fmt_in.p_extra =
-              xrealloc( es->p_dec->fmt_in.p_extra, p_fmt->i_extra );
-            memcpy( es->p_dec->fmt_in.p_extra,
-                    p_fmt->p_extra, p_fmt->i_extra );
-#endif
         }
 
         return VLC_SUCCESS;
