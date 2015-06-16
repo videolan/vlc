@@ -2227,7 +2227,15 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             {
                 if( es == p_sys->es[i] )
                 {
-                    EsOutSelect( out, es, true );
+                    if( i_query == ES_OUT_RESTART_ES && p_sys->es[i]->p_dec )
+                    {
+                        EsDestroyDecoder( out, p_sys->es[i] );
+                        EsCreateDecoder( out, p_sys->es[i] );
+                    }
+                    else if( i_query == ES_OUT_SET_ES )
+                    {
+                        EsOutSelect( out, es, true );
+                    }
                     break;
                 }
             }
