@@ -109,6 +109,7 @@ static const d3d_format_t d3d_formats[] = {
     { NULL, 0, 0, 0, 0}
 };
 
+#ifdef HAVE_ID3D11VIDEODECODER 
 /* VLC_CODEC_D3D11_OPAQUE */
 struct picture_sys_t
 {
@@ -116,6 +117,7 @@ struct picture_sys_t
     ID3D11Texture2D               *texture;
     ID3D11DeviceContext           *context;
 };
+#endif
 
 /* internal picture_t pool  */
 typedef struct
@@ -526,6 +528,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     if ( vd->sys->pool != NULL )
         return vd->sys->pool;
 
+#ifdef HAVE_ID3D11VIDEODECODER 
     picture_t**       pictures = NULL;
     unsigned          picture_count = 0;
     HRESULT           hr;
@@ -599,9 +602,11 @@ error:
             DestroyDisplayPoolPicture(pictures[i]);
         free(pictures);
     }
+#endif
     return vd->sys->pool;
 }
 
+#ifdef HAVE_ID3D11VIDEODECODER 
 static void DestroyDisplayPoolPicture(picture_t *picture)
 {
     picture_sys_t *p_sys = (picture_sys_t*) picture->p_sys;
@@ -612,7 +617,7 @@ static void DestroyDisplayPoolPicture(picture_t *picture)
     free(p_sys);
     free(picture);
 }
-
+#endif
 
 static void DestroyDisplayPicture(picture_t *picture)
 {
@@ -739,6 +744,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
 
+#ifdef HAVE_ID3D11VIDEODECODER 
     if (picture->format.i_chroma == VLC_CODEC_D3D11_OPAQUE) {
         D3D11_BOX box;
         box.left = 0;
@@ -755,6 +761,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                                                   (ID3D11Resource*) p_sys->texture,
                                                   0, &box);
     }
+#endif
 
     if (subpicture) {
         int subpicture_region_count    = 0;
