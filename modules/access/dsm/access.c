@@ -83,6 +83,8 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_submodule()
+        add_shortcut( "dsm-sd" )
+        set_description( N_("libdsm NETBIOS discovery module") )
         set_category( CAT_PLAYLIST )
         set_subcategory( SUBCAT_PLAYLIST_SD )
         set_capability( "services_discovery", 0 )

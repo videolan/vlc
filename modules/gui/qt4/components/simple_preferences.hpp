@@ -122,6 +122,7 @@ private slots:
     void langChanged( int );
 #ifdef _WIN32
     void assoDialog();
+    void updateCheckBoxes( QTreeWidgetItem*, int );
     void saveAsso();
 #endif
     void configML();

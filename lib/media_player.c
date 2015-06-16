@@ -1368,7 +1368,7 @@ int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi
     /* fill array */
     for( int i = 0; i < ci_title_count; i++)
     {
-        libvlc_title_description_t *p_title = calloc( 1, sizeof(*p_title) );
+        libvlc_title_description_t *p_title = malloc( sizeof(*p_title) );
         if( unlikely(p_title == NULL) )
         {
             libvlc_title_descriptions_release( *pp_titles, ci_title_count );
@@ -1446,11 +1446,10 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
     /* fill array */
     for( int i = 0; i < ci_chapter_count; i++)
     {
-        libvlc_chapter_description_t *p_chapter = calloc( 1, sizeof(*p_chapter) );
+        libvlc_chapter_description_t *p_chapter = malloc( sizeof(*p_chapter) );
         if( unlikely(p_chapter == NULL) )
         {
             libvlc_chapter_descriptions_release( *pp_chapters, ci_chapter_count );
-            free( p_chapter );
             return -1;
         }
         (*pp_chapters)[i] = p_chapter;
