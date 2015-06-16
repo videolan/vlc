@@ -54,18 +54,17 @@ struct access_sys_t
 };
 
 /*****************************************************************************
- * Open: open the directory
+ * DirInit: Init the directory access with a directory stream
  *****************************************************************************/
-int DirOpen (vlc_object_t *p_this)
+int DirInit (access_t *p_access, DIR *p_dir)
 {
-    access_t *p_access = (access_t*)p_this;
-    DIR *p_dir;
     char *psz_base_uri;
 
     if (!p_access->psz_filepath)
         return VLC_EGENERIC;
 
-    p_dir = vlc_opendir (p_access->psz_filepath);
+    if (!p_dir)
+        p_dir = vlc_opendir (p_access->psz_filepath);
     if (p_dir == NULL)
         return VLC_EGENERIC;
 
@@ -96,6 +95,14 @@ int DirOpen (vlc_object_t *p_this)
     p_access->pf_control = access_vaDirectoryControlHelper;
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * DirOpen: Open the directory access
+ *****************************************************************************/
+int DirOpen (vlc_object_t *p_this)
+{
+    return DirInit ((access_t*)p_this, NULL);
 }
 
 /*****************************************************************************

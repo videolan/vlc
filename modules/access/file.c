@@ -205,8 +205,12 @@ int FileOpen( vlc_object_t *p_this )
     if (S_ISDIR (st.st_mode))
     {
 #ifdef HAVE_FDOPENDIR
-        close(fd);
-        return DirOpen (VLC_OBJECT(p_access));
+        DIR *p_dir = fdopendir(fd);
+        if (!p_dir) {
+            msg_Err (p_access, "fdopendir error: %s", vlc_strerror_c(errno));
+            goto error;
+        }
+        return DirInit (p_access, p_dir);
 #else
         msg_Dbg (p_access, "ignoring directory");
         goto error;
