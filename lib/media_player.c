@@ -1374,6 +1374,7 @@ int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi
             title->psz_name = NULL;
         vlc_input_title_Delete( p_input_title[i] );
     }
+    free( p_input_title );
 
     *pp_titles = titles;
     return count;
