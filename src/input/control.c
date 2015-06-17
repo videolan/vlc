@@ -360,34 +360,26 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_GET_FULL_TITLE_INFO:
         {
-            input_title_t ***array = (input_title_t ***)va_arg( args, input_title_t *** );
-            int *count = (int *) va_arg( args, int * );
+            input_title_t **array;
+            unsigned count;
 
             vlc_mutex_lock( &p_input->p->p_item->lock );
+            count = p_input->p->i_title;
+            array = malloc( count * sizeof (*array) );
 
-            const int i_titles = p_input->p->i_title;
-            *count = i_titles;
-
-            if( i_titles == 0 )
-            {
-                vlc_mutex_unlock( &p_input->p->p_item->lock );
-                return VLC_EGENERIC;
-            }
-
-            *array = calloc( i_titles, sizeof(**array) );
-            if (!array )
+            if( count > 0 && unlikely(array == NULL) )
             {
                 vlc_mutex_unlock( &p_input->p->p_item->lock );
                 return VLC_ENOMEM;
             }
 
-            for( int i = 0; i < i_titles; i++ )
-            {
-                (*array)[i] = vlc_input_title_Duplicate( p_input->p->title[i] );
-            }
+            for( unsigned i = 0; i < count; i++ )
+                array[i] = vlc_input_title_Duplicate( p_input->p->title[i] );
 
             vlc_mutex_unlock( &p_input->p->p_item->lock );
 
+            *va_arg( args, input_title_t *** ) = array;
+            *va_arg( args, int * ) = count;
             return VLC_SUCCESS;
         }
 
