@@ -40,12 +40,12 @@
 #include "common.h"
 
 #if !VLC_WINSTORE_APP
-# define D3D11CreateDeviceAndSwapChain(args...) sys->OurD3D11CreateDeviceAndSwapChain(args)
-# define D3D11CreateDevice(args...)             sys->OurD3D11CreateDevice(args)
+# if USE_DXGI
+#  define D3D11CreateDeviceAndSwapChain(args...) sys->OurD3D11CreateDeviceAndSwapChain(args)
+# else
+#  define D3D11CreateDevice(args...)             sys->OurD3D11CreateDevice(args)
+# endif
 # define D3DCompile(args...)                    sys->OurD3DCompile(args)
-#else
-# define IDXGIFactory_CreateSwapChain(a,b,c,d)  IDXGIFactory2_CreateSwapChainForComposition(a,b,c,NULL,d)
-# define DXGI_SWAP_CHAIN_DESC                   DXGI_SWAP_CHAIN_DESC1
 #endif
 
 static int  Open(vlc_object_t *);
@@ -64,6 +64,12 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     add_bool("direct3d11-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT, true)
+
+#if VLC_WINSTORE_APP
+    add_integer("winrt-d3ddevice",     0x0, NULL, NULL, true);
+    add_integer("winrt-d3dcontext",    0x0, NULL, NULL, true);
+    add_integer("winrt-dxgiswapchain", 0x0, NULL, NULL, true);
+#endif
 
     set_capability("vout display", 240)
     add_shortcut("direct3d11")
@@ -456,6 +462,9 @@ static int Open(vlc_object_t *object)
     sys->dxgiswapChain = dxgiswapChain;
     sys->d3ddevice     = d3ddevice;
     sys->d3dcontext    = d3dcontext;
+    IDXGISwapChain_AddRef     (sys->dxgiswapChain);
+    ID3D11Device_AddRef       (sys->d3ddevice);
+    ID3D11DeviceContext_AddRef(sys->d3dcontext);
 #endif
 
     if (CommonInit(vd))
@@ -622,6 +631,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     HRESULT hr;
     ID3D11Texture2D* pDepthStencil;
     ID3D11Texture2D* pBackBuffer;
+    int i_width  = RECTWidth(sys->rect_dest_clipped);
+    int i_height = RECTHeight(sys->rect_dest_clipped);
 
     if (sys->d3drenderTargetView) {
         ID3D11RenderTargetView_Release(sys->d3drenderTargetView);
@@ -631,6 +642,13 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
         ID3D11DepthStencilView_Release(sys->d3ddepthStencilView);
         sys->d3ddepthStencilView = NULL;
     }
+
+#if VLC_WINSTORE_APP
+    DXGI_SWAP_CHAIN_DESC1 swapDesc;
+    hr = IDXGISwapChain1_GetDesc1(sys->dxgiswapChain, &swapDesc);
+    i_width = swapDesc.Width;
+    i_height = swapDesc.Height;
+#endif
 
     hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
         DXGI_FORMAT_UNKNOWN, 0);
@@ -658,8 +676,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     deptTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     deptTexDesc.CPUAccessFlags = 0;
     deptTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    deptTexDesc.Width = RECTWidth(sys->rect_dest_clipped);
-    deptTexDesc.Height = RECTHeight(sys->rect_dest_clipped);
+    deptTexDesc.Width = i_width;
+    deptTexDesc.Height = i_height;
     deptTexDesc.MipLevels = 1;
     deptTexDesc.MiscFlags = 0;
     deptTexDesc.SampleDesc.Count = 1;
@@ -688,8 +706,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     }
 
     D3D11_VIEWPORT vp;
-    vp.Width = (FLOAT)RECTWidth(sys->rect_dest_clipped);
-    vp.Height = (FLOAT)RECTHeight(sys->rect_dest_clipped);
+    vp.Width = (FLOAT)i_width;
+    vp.Height = (FLOAT)i_height;
     vp.MinDepth = 0.0f;
     vp.MaxDepth = 1.0f;
     vp.TopLeftX = 0;
@@ -865,18 +883,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
     scd.BufferDesc.Height = fmt->i_visible_height;
     scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-# if VLC_WINSTORE_APP
-    /* TODO : check different values for performance */
-    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    scd.BufferCount = 2;
-    scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-    scd.Flags = DXGI_SWAP_CHAIN_FLAG_FOREGROUND_LAYER;
-    scd.AlphaMode = DXGI_ALPHA_MODE_PREMULTIPLIED;
-    scd.Scaling = DXGI_SCALING_NONE;
-# else
     scd.Windowed = TRUE;
     scd.OutputWindow = sys->hvideownd;
-# endif
 
     IDXGIAdapter *dxgiadapter;
 # if USE_DXGI
@@ -988,23 +996,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 
-#  if VLC_WINSTORE_APP /* avoided until we can pass ISwapchainPanel without c++/cx mode */
-    /* TODO: figure out how to get "ISwapChainPanel ^panel" into brokenpanel in gcc */
-    ISwapChainPanel *brokenpanel;
-    ISwapChainPanelNative *panelNative;
-    hr = ISwapChainPanelNative_QueryInterface(brokenpanel, &IID_ISwapChainPanelNative, (void **)&pDXGIDevice);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not get the Native Panel. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
-
-    hr = ISwapChainPanelNative_SetSwapChain(panelNative, sys->dxgiswapChain);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not link the SwapChain with the Native Panel. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
-
-#  endif
 # endif
 #endif
 
@@ -1127,21 +1118,23 @@ static void Direct3D11Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     Direct3D11DestroyResources(vd);
-#if !VLC_WINSTORE_APP
-    if (sys->dxgiswapChain)
-        IDXGISwapChain_Release(sys->dxgiswapChain);
-    if ( sys->d3dcontext )
-        ID3D11DeviceContext_Release(sys->d3dcontext);
-    if ( sys->d3ddevice )
-        ID3D11Device_Release(sys->d3ddevice);
-#else
-    if ( sys->d3dcontext )
+    if (sys->d3dcontext)
+    {
         ID3D11DeviceContext_Flush(sys->d3dcontext);
+        ID3D11DeviceContext_Release(sys->d3dcontext);
+        sys->d3dcontext = NULL;
+    }
+    if (sys->d3ddevice)
+    {
+        ID3D11Device_Release(sys->d3ddevice);
+        sys->d3ddevice = NULL;
+    }
+    if (sys->dxgiswapChain)
+    {
+        IDXGISwapChain_Release(sys->dxgiswapChain);
+        sys->dxgiswapChain = NULL;
+    }
 
-    sys->d3dcontext = NULL;
-    sys->d3ddevice = NULL;
-    sys->dxgiswapChain = NULL;
-#endif
     msg_Dbg(vd, "Direct3D11 device adapter closed");
 }
 
