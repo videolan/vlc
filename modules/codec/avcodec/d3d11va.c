@@ -424,8 +424,8 @@ static int D3dCreateDevice(vlc_va_t *va)
 
 #if defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HRESULT (WINAPI  * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
-    if (sys->dxgidebug_dll) {
-        pf_DXGIGetDebugInterface = (void *)GetProcAddress(sys->dxgidebug_dll, "DXGIGetDebugInterface");
+    if (va->sys->dxgidebug_dll) {
+        pf_DXGIGetDebugInterface = (void *)GetProcAddress(va->sys->dxgidebug_dll, "DXGIGetDebugInterface");
         if (pf_DXGIGetDebugInterface) {
             IDXGIDebug *pDXGIDebug = NULL;
             hr = pf_DXGIGetDebugInterface(&IID_IDXGIDebug, (void**)&pDXGIDebug);
