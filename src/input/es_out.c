@@ -168,6 +168,9 @@ struct es_out_sys_t
 
     /* Record */
     sout_instance_t *p_sout_record;
+
+    /* Used only to limit debugging output */
+    int         i_prev_stream_level;
 };
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, const es_format_t * );
@@ -294,6 +297,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 
     p_sys->b_buffering = true;
     p_sys->i_preroll_end = -1;
+    p_sys->i_prev_stream_level = -1;
 
     return out;
 }
@@ -593,6 +597,7 @@ static void EsOutChangePosition( es_out_t *out )
     p_sys->i_buffering_extra_stream = 0;
     p_sys->i_buffering_extra_system = 0;
     p_sys->i_preroll_end = -1;
+    p_sys->i_prev_stream_level = -1;
 }
 
 
@@ -627,7 +632,13 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
             f_level = __MAX( (double)i_stream_duration / i_buffering_duration, 0 );
         input_SendEventCache( p_sys->p_input, f_level );
 
-        msg_Dbg( p_sys->p_input, "Buffering %d%%", (int)(100 * f_level) );
+        int i_level = (int)(100 * f_level);
+        if( p_sys->i_prev_stream_level != i_level )
+        {
+            msg_Dbg( p_sys->p_input, "Buffering %d%%", i_level );
+            p_sys->i_prev_stream_level = i_level;
+        }
+
         return;
     }
     input_SendEventCache( p_sys->p_input, 1.0 );
@@ -636,6 +647,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
               (int)(i_stream_duration/1000), (int)(i_system_duration/1000) );
     p_sys->b_buffering = false;
     p_sys->i_preroll_end = -1;
+    p_sys->i_prev_stream_level = -1;
 
     if( p_sys->i_buffering_extra_initial > 0 )
     {
@@ -823,6 +835,7 @@ static void EsOutFrameNext( es_out_t *out )
                                                 INPUT_RATE_DEFAULT / i_rate;
 
     p_sys->i_preroll_end = -1;
+    p_sys->i_prev_stream_level = -1;
 }
 static mtime_t EsOutGetBuffering( es_out_t *out )
 {
