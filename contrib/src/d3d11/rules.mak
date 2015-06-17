@@ -1,7 +1,11 @@
 # generate Direct3D11 temporary include
 
+ifdef HAVE_CROSS_COMPILE
+IDL_INC_PATH = /usr/include/wine/windows/
+else
 #ugly way to get the default location of standard idl files
 IDL_INC_PATH = /`echo $(MSYSTEM) | tr A-Z a-z`/$(BUILD)/include
+endif
 
 D3D11_IDL_URL :=http://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/direct-x/include/d3d11.idl?format=raw
 DST_D3D11_H = $(PREFIX)/include/d3d11.h
