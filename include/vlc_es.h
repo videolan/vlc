@@ -400,8 +400,8 @@ struct es_format_t
                                          when no other stream
                                     >=0: priority */
 
-    char            *psz_language;        /**< human readible language name */
-    char            *psz_description;     /**< human readible description of language */
+    char            *psz_language;        /**< human-readable language name */
+    char            *psz_description;     /**< human-readable description of language */
     unsigned        i_extra_languages;    /**< length in bytes of extra language data pointer */
     extra_languages_t *p_extra_languages; /**< extra language data needed by some decoders */
 

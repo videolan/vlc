@@ -223,7 +223,7 @@ void rmff_scan_pheader(rmff_pheader_t *h, char *data);
 rmff_header_t *rmff_scan_header_stream(int fd);
 
 /*
- * prints header information in human readible form to stdout
+ * prints header information in human-readable form to stdout
  */
 void rmff_print_header(rmff_header_t *h);
 

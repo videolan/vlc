@@ -83,7 +83,7 @@
  * DeliveryService=cds
  *     Simulcasted (scheduled unicast) content. (Green dot in Kasenna web interface)
  * sgiShowingName=A nice name that everyone likes
- *     A human readible descriptive title for this stream.
+ *     A human-readable descriptive title for this stream.
  * sgiSid=2311
  *     Looks like this is the ID of the scheduled asset?
  * sgiUserAccount=pid=1724&time=1078527309&displayText=You%20are%20logged%20as%20guest&
