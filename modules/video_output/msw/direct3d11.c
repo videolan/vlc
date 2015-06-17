@@ -632,9 +632,8 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
         sys->d3ddepthStencilView = NULL;
     }
 
-    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 1, RECTWidth(sys->rect_dest_clipped),
-                                 RECTHeight(sys->rect_dest_clipped),
-                                 DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
+        DXGI_FORMAT_UNKNOWN, 0);
     if (FAILED(hr)) {
        msg_Err(vd, "Failed to resize the backbuffer. (hr=0x%lX)", hr);
        return hr;
