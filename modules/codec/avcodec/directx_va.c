@@ -422,20 +422,22 @@ void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
 }
 
 int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys,
-                    AVCodecContext *ctx, const es_format_t *fmt)
+                    AVCodecContext *ctx, const es_format_t *fmt, bool b_dll)
 {
     // TODO va->sys = sys;
     dx_sys->codec_id = ctx->codec_id;
 
     vlc_mutex_init( &dx_sys->surface_lock );
 
-    /* Load dll*/
-    dx_sys->hdecoder_dll = LoadLibrary(dx_sys->psz_decoder_dll);
-    if (!dx_sys->hdecoder_dll) {
-        msg_Warn(va, "cannot load DirectX decoder DLL");
-        goto error;
+    if (b_dll) {
+        /* Load dll*/
+        dx_sys->hdecoder_dll = LoadLibrary(dx_sys->psz_decoder_dll);
+        if (!dx_sys->hdecoder_dll) {
+            msg_Warn(va, "cannot load DirectX decoder DLL");
+            goto error;
+        }
+        msg_Dbg(va, "DLLs loaded");
     }
-    msg_Dbg(va, "DLLs loaded");
 
     /* */
     if (dx_sys->pf_create_device(va)) {

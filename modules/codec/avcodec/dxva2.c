@@ -357,7 +357,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (p_sys!=NULL)
         IDirect3DSurface9_GetDevice(p_sys->surface, (IDirect3DDevice9**) &dx_sys->d3ddev );
 
-    err = directx_va_Open(va, &sys->dx_sys, ctx, fmt);
+    err = directx_va_Open(va, &sys->dx_sys, ctx, fmt, dx_sys->d3ddev==NULL);
     if (err!=VLC_SUCCESS)
         goto error;
 
