@@ -648,6 +648,10 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 
     hr = ID3D11Device_CreateRenderTargetView(sys->d3ddevice, (ID3D11Resource *)pBackBuffer, NULL, &sys->d3drenderTargetView);
     ID3D11Texture2D_Release(pBackBuffer);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Failed to create the target view. (hr=0x%lX)", hr);
+        return hr;
+    }
 
     D3D11_TEXTURE2D_DESC deptTexDesc;
     memset(&deptTexDesc, 0,sizeof(deptTexDesc));
@@ -785,7 +789,11 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         }
     }
 
-    IDXGISwapChain_Present(sys->dxgiswapChain, 0, 0);
+    HRESULT hr = IDXGISwapChain_Present(sys->dxgiswapChain, 0, 0);
+    if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+    {
+        /* TODO device lost */
+    }
 
     picture_Release(picture);
     if (subpicture)
