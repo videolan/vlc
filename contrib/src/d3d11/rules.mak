@@ -20,10 +20,10 @@ $(TARBALLS)/dxgidebug.idl:
 	(cd $(TARBALLS) && patch -fp1) < $(SRC)/d3d11/dxgidebug.patch
 
 $(DST_D3D11_H): $(TARBALLS)/d3d11.idl
-	widl -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
 
 $(DST_DXGIDEBUG_H): $(TARBALLS)/dxgidebug.idl
-	widl -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
 
 .d3d11: $(DST_D3D11_H) $(DST_DXGIDEBUG_H)
 	touch $@

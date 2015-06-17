@@ -69,6 +69,9 @@ endif
 ifneq ($(findstring $(origin STRIP),undefined default),)
 STRIP := strip
 endif
+ifneq ($(findstring $(origin WIDL),undefined default),)
+WIDL := widl
+endif
 else
 ifneq ($(findstring $(origin CC),undefined default),)
 CC := $(HOST)-gcc
@@ -87,6 +90,9 @@ RANLIB := $(HOST)-ranlib
 endif
 ifneq ($(findstring $(origin STRIP),undefined default),)
 STRIP := $(HOST)-strip
+endif
+ifneq ($(findstring $(origin WIDL),undefined default),)
+WIDL := $(HOST)-widl
 endif
 endif
 
