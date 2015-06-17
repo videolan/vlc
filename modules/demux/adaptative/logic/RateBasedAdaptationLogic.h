@@ -48,6 +48,8 @@ namespace adaptative
                 size_t                  bpsAvg;
                 size_t                  bpsSamplecount;
                 size_t                  currentBps;
+                mtime_t                 cumulatedTime;
+                int                     stabilizer;
         };
 
         class FixedRateAdaptationLogic : public AbstractAdaptationLogic

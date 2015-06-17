@@ -21,6 +21,9 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
+#define __STDC_CONSTANT_MACROS
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -40,6 +43,8 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (int w, int h) :
 {
     width  = w;
     height = h;
+    cumulatedTime = 0;
+    stabilizer = 16;
 }
 
 BaseRepresentation *RateBasedAdaptationLogic::getCurrentRepresentation(StreamType type, BasePeriod *period) const
@@ -66,14 +71,25 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
     size_t current = size * 8000 / time;
 
     if (current >= bpsAvg)
-        bpsAvg = bpsAvg + (current - bpsAvg) / (bpsSamplecount + 1);
+        bpsAvg = bpsAvg + (current - bpsAvg) / ++bpsSamplecount;
     else
-        bpsAvg = bpsAvg - (bpsAvg - current) / (bpsSamplecount + 1);
+        bpsAvg = bpsAvg - (bpsAvg - current) / ++bpsSamplecount;
 
-    bpsSamplecount++;
+    cumulatedTime += time;
+    if(cumulatedTime > 4 * CLOCK_FREQ / stabilizer)
+    {
+        if( currentBps <= bpsAvg * 3/4 && stabilizer < 16 )
+        {
+            stabilizer++;
+        }
+        else if( currentBps > bpsAvg * 3/4 && stabilizer > 1 )
+        {
+            stabilizer /= 2;
+        }
 
-    if(bpsSamplecount % 5 == 0)
-        currentBps = bpsAvg;
+        currentBps = bpsAvg * 3/4;
+        cumulatedTime = 0;
+    }
 }
 
 FixedRateAdaptationLogic::FixedRateAdaptationLogic(size_t bps) :
