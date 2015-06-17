@@ -1221,16 +1221,6 @@ static int Direct3D11CreateResources(vout_display_t *vd, video_format_t *fmt)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    D3D11_VIEWPORT vp;
-    vp.Width = (FLOAT)fmt->i_visible_width;
-    vp.Height = (FLOAT)fmt->i_visible_height;
-    vp.MinDepth = 0.0f;
-    vp.MaxDepth = 1.0f;
-    vp.TopLeftX = 0;
-    vp.TopLeftY = 0;
-
-    ID3D11DeviceContext_RSSetViewports(sys->d3dcontext, 1, &vp);
-
     ID3DBlob* pVSBlob = NULL;
 
     /* TODO : Match the version to the D3D_FEATURE_LEVEL */
