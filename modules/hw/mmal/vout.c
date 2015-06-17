@@ -180,7 +180,6 @@ static int Open(vlc_object_t *object)
     uint32_t buffer_pitch, buffer_height;
     vout_display_place_t place;
     MMAL_DISPLAYREGION_T display_region;
-    uint32_t offsets[3];
     MMAL_STATUS_T status;
     int ret = VLC_SUCCESS;
     unsigned i;
@@ -273,7 +272,6 @@ static int Open(vlc_object_t *object)
         goto out;
     }
 
-    offsets[0] = 0;
     for (i = 0; i < sys->i_planes; ++i) {
         sys->planes[i].i_lines = buffer_height;
         sys->planes[i].i_pitch = buffer_pitch;
@@ -281,14 +279,11 @@ static int Open(vlc_object_t *object)
         sys->planes[i].i_visible_pitch = vd->fmt.i_visible_width;
 
         if (i > 0) {
-            offsets[i] = offsets[i - 1] + sys->planes[i - 1].i_pitch * sys->planes[i - 1].i_lines;
             sys->planes[i].i_lines /= 2;
             sys->planes[i].i_pitch /= 2;
             sys->planes[i].i_visible_lines /= 2;
             sys->planes[i].i_visible_pitch /= 2;
         }
-
-        sys->planes[i].p_pixels = (uint8_t *)offsets[i];
     }
 
     vlc_mutex_init(&sys->buffer_mutex);

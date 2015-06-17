@@ -33,9 +33,13 @@ int mmal_picture_lock(picture_t *picture)
     MMAL_BUFFER_HEADER_T *buffer = pic_sys->buffer;
 
     buffer->user_data = picture;
+
+    int offset = 0;
     picture->p[0].p_pixels = buffer->data;
-    picture->p[1].p_pixels += (ptrdiff_t)buffer->data;
-    picture->p[2].p_pixels += (ptrdiff_t)buffer->data;
+    for (int i = 1; i < picture->i_planes; i++) {
+        offset = offset + picture->p[i - 1].i_pitch * picture->p[i - 1].i_lines;
+        picture->p[i].p_pixels = (ptrdiff_t)buffer->data + offset;
+    }
 
     pic_sys->displayed = false;
 
