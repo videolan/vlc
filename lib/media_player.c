@@ -1372,7 +1372,6 @@ int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi
         if( unlikely(p_title == NULL) )
         {
             libvlc_title_descriptions_release( *pp_titles, ci_title_count );
-            free( p_title );
             return -1;
         }
         (*pp_titles)[i] = p_title;
