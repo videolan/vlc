@@ -671,7 +671,7 @@ static picture_t *decode(decoder_t *dec, block_t **pblock)
         }
         mmal_buffer_header_reset(buffer);
         buffer->cmd = 0;
-        buffer->pts = block->i_pts;
+        buffer->pts = block->i_pts != 0 ? block->i_pts : block->i_dts;
         buffer->dts = block->i_dts;
         buffer->alloc_size = sys->input->buffer_size;
 
