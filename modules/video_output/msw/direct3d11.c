@@ -32,7 +32,7 @@
 #define COBJMACROS
 #define INITGUID
 #include <d3d11.h>
-#include <d3dx9math.h>
+#include <d3dtypes.h>
 
 /* avoided until we can pass ISwapchainPanel without c++/cx mode
 # include <windows.ui.xaml.media.dxinterop.h> */
@@ -120,8 +120,11 @@ typedef struct
 
 /* matches the D3D11_INPUT_ELEMENT_DESC we setup */
 typedef struct d3d_vertex_t {
-    D3DXVECTOR3 position;
-    D3DXVECTOR2 texture;
+    D3DVECTOR   position;
+    struct {
+        D3DVALUE x;
+        D3DVALUE y;
+    } texture;
     FLOAT       opacity;
 } d3d_vertex_t;
 
