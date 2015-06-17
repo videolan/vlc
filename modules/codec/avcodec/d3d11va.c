@@ -79,8 +79,8 @@ vlc_module_end()
 
 #endif /* __MINGW32__ */
 
-#if defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-#include <dxgidebug.h>
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+# include <dxgidebug.h>
 #endif
 
 DEFINE_GUID(IID_ID3D11VideoDevice,   0x10EC4D5B, 0x975A, 0x4689, 0xB9, 0xE4, 0xD0, 0xAA, 0xC3, 0x0F, 0xE3, 0x33);
@@ -94,7 +94,7 @@ struct vlc_va_sys_t
 {
     directx_sys_t                dx_sys;
 
-#if defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                    dxgidebug_dll;
 #endif
 
@@ -284,7 +284,7 @@ static void Close(vlc_va_t *va, AVCodecContext *ctx)
 
     directx_va_Close(va, &sys->dx_sys);
 
-#if defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     if (sys->dxgidebug_dll)
         FreeLibrary(sys->dxgidebug_dll);
 #endif
@@ -306,7 +306,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-#if defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
 #endif
 
@@ -397,9 +397,9 @@ static int D3dCreateDevice(vlc_va_t *va)
     }
 
     UINT creationFlags = D3D11_CREATE_DEVICE_VIDEO_SUPPORT;
-# if !defined(NDEBUG) //&& defined(_MSC_VER)
+#if !defined(NDEBUG) //&& defined(_MSC_VER)
     creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
-# endif
+#endif
 
     /* */
     ID3D11Device *d3ddev;
@@ -422,7 +422,7 @@ static int D3dCreateDevice(vlc_va_t *va)
     }
     va->sys->d3dvidctx = d3dvidctx;
 
-#if defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HRESULT (WINAPI  * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
     if (va->sys->dxgidebug_dll) {
         pf_DXGIGetDebugInterface = (void *)GetProcAddress(va->sys->dxgidebug_dll, "DXGIGetDebugInterface");
