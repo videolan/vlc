@@ -687,8 +687,6 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
        return hr;
     }
 
-    ID3D11DeviceContext_OMSetRenderTargets(sys->d3dcontext, 1, &sys->d3drenderTargetView, sys->d3ddepthStencilView);
-
     D3D11_VIEWPORT vp;
     vp.Width = (FLOAT)RECTWidth(sys->rect_dest_clipped);
     vp.Height = (FLOAT)RECTHeight(sys->rect_dest_clipped);
@@ -740,12 +738,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                                                   0, &box);
     }
 
-#if VLC_WINSTORE_APP /* TODO: Choose the WinRT app background clear color */
-    float ClearColor[4] = { 1.0f, 0.125f, 0.3f, 1.0f };
-    ID3D11DeviceContext_ClearRenderTargetView(sys->d3dcontext,sys->d3drenderTargetView, ClearColor);
-#endif
-    ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext,sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-
     if (subpicture) {
         int subpicture_region_count    = 0;
         picture_t **subpicture_regions = NULL;
@@ -777,6 +769,10 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     vout_display_sys_t *sys = vd->sys;
 
     /* no ID3D11Device operations should come here */
+
+    ID3D11DeviceContext_OMSetRenderTargets(sys->d3dcontext, 1, &sys->d3drenderTargetView, sys->d3ddepthStencilView);
+
+    ID3D11DeviceContext_ClearDepthStencilView(sys->d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     /* Render the quad */
     DisplayD3DPicture(sys, &sys->picQuad);
