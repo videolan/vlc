@@ -130,6 +130,7 @@ static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
 static uint32_t MP4_TrackGetReadSize( mp4_track_t *, uint32_t * );
 static int      MP4_TrackNextSample( demux_t *, mp4_track_t *, uint32_t );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
+static bool     MP4_TrackIsInterleaved( const mp4_track_t * );
 
 static void     MP4_UpdateSeekpoint( demux_t * );
 
@@ -943,6 +944,20 @@ static int Open( vlc_object_t * p_this )
     }
 #endif
 
+    if( !p_sys->b_fragmented && p_sys->i_tracks > 1 && p_sys->b_seekable && !p_sys->b_seekmode )
+    {
+        for( unsigned i = 0; i < p_sys->i_tracks; i++ )
+        {
+            mp4_track_t *tk = &p_sys->track[i];
+            if( !MP4_TrackIsInterleaved( tk ) )
+            {
+                msg_Warn( p_demux, "that media doesn't look interleaved, will need to seek");
+                p_sys->b_seekmode = true;
+                break;
+            }
+        }
+    }
+
     /* */
     LoadChapter( p_demux );
 
@@ -1161,13 +1176,6 @@ end:
 
             mtime_t i_dts = MP4_TrackGetDTS( p_demux, tk );
             p_sys->i_pcr = __MIN( i_dts, p_sys->i_pcr );
-
-            if ( !p_sys->b_seekmode && i_dts > p_sys->i_pcr + 2*CLOCK_FREQ )
-            {
-                msg_Dbg( p_demux, "that media doesn't look interleaved, will need to seek");
-                p_sys->b_seekmode = true;
-            }
-
             p_sys->i_time = p_sys->i_pcr * p_sys->i_timescale / CLOCK_FREQ;
         }
     }
@@ -1838,6 +1846,21 @@ static void LoadChapter( demux_t  *p_demux )
         p_sys->p_title->i_length = CLOCK_FREQ *
                        (uint64_t)p_sys->i_overall_duration / (uint64_t)p_sys->i_timescale;
     }
+}
+
+static bool MP4_TrackIsInterleaved( const mp4_track_t *p_track )
+{
+    const MP4_Box_t *p_stsc = MP4_BoxGet( p_track->p_stbl, "stsc" );
+    const MP4_Box_t *p_stsz = MP4_BoxGet( p_track->p_stbl, "stsz" );
+    if( p_stsc && BOXDATA(p_stsc) && p_stsz && BOXDATA(p_stsz) )
+    {
+        if( BOXDATA(p_stsc)->i_entry_count == 1 &&
+            BOXDATA(p_stsz)->i_sample_count > 1 &&
+            BOXDATA(p_stsc)->i_samples_per_chunk[0] == BOXDATA(p_stsz)->i_sample_count )
+            return false;
+    }
+
+    return true;
 }
 
 /* now create basic chunk data, the rest will be filled by MP4_CreateSamplesIndex */
