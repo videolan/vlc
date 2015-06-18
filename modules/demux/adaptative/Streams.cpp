@@ -584,13 +584,17 @@ int BaseStreamOutput::esOutControl(es_out_t *fakees, int i_query, va_list args)
     BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
     if (i_query == ES_OUT_SET_PCR )
     {
+        vlc_mutex_lock(&me->lock);
         me->pcr = (int64_t)va_arg( args, int64_t );
+        vlc_mutex_unlock(&me->lock);
         return VLC_SUCCESS;
     }
     else if( i_query == ES_OUT_SET_GROUP_PCR )
     {
+        vlc_mutex_lock(&me->lock);
         me->group = (int) va_arg( args, int );
         me->pcr = (int64_t)va_arg( args, int64_t );
+        vlc_mutex_unlock(&me->lock);
         return VLC_SUCCESS;
     }
     else if( i_query == ES_OUT_GET_ES_STATE )
@@ -600,7 +604,12 @@ int BaseStreamOutput::esOutControl(es_out_t *fakees, int i_query, va_list args)
         *pb = true;
         return VLC_SUCCESS;
     }
-    else if( me->restarting )
+
+    vlc_mutex_lock(&me->lock);
+    bool b_restarting = me->restarting;
+    vlc_mutex_unlock(&me->lock);
+
+    if( b_restarting )
     {
         return VLC_EGENERIC;
     }
