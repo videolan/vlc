@@ -65,6 +65,7 @@ namespace adaptative
                     SegmentTracker *, AbstractStreamOutputFactory &);
         bool isEOF() const;
         mtime_t getPCR() const;
+        mtime_t getFirstDTS() const;
         int getGroup() const;
         int esCount() const;
         bool seekAble() const;
@@ -95,6 +96,7 @@ namespace adaptative
 
         virtual void pushBlock(block_t *) = 0;
         virtual mtime_t getPCR() const;
+        virtual mtime_t getFirstDTS() const = 0;
         virtual int getGroup() const;
         virtual int esCount() const = 0;
         virtual bool seekAble() const = 0;
@@ -127,6 +129,7 @@ namespace adaptative
         BaseStreamOutput(demux_t *, const std::string &);
         virtual ~BaseStreamOutput();
         virtual void pushBlock(block_t *); /* reimpl */
+        virtual mtime_t getFirstDTS() const; /* reimpl */
         virtual int esCount() const; /* reimpl */
         virtual bool seekAble() const; /* reimpl */
         virtual void setPosition(mtime_t); /* reimpl */

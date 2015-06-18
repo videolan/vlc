@@ -150,6 +150,19 @@ mtime_t PlaylistManager::getPCR() const
     return pcr;
 }
 
+mtime_t PlaylistManager::getFirstDTS() const
+{
+    mtime_t dts = VLC_TS_INVALID;
+    for(int type=0; type<StreamTypeCount; type++)
+    {
+        if(!streams[type])
+            continue;
+        if(dts == VLC_TS_INVALID || dts > streams[type]->getFirstDTS())
+            dts = streams[type]->getFirstDTS();
+    }
+    return dts;
+}
+
 int PlaylistManager::getGroup() const
 {
     for(int type=0; type<StreamTypeCount; type++)

@@ -107,6 +107,11 @@ mtime_t Stream::getPCR() const
     return output->getPCR();
 }
 
+mtime_t Stream::getFirstDTS() const
+{
+    return output->getFirstDTS();
+}
+
 int Stream::getGroup() const
 {
     return output->getGroup();
@@ -312,6 +317,30 @@ BaseStreamOutput::~BaseStreamOutput()
 
     delete fakeesout;
     vlc_mutex_destroy(&lock);
+}
+
+mtime_t BaseStreamOutput::getFirstDTS() const
+{
+    mtime_t ret = VLC_TS_INVALID;
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    std::list<Demuxed *>::const_iterator it;
+    for(it=queues.begin(); it!=queues.end();++it)
+    {
+        const Demuxed *pair = *it;
+        const block_t *p_block = pair->p_queue;
+        while( p_block && p_block->i_dts == VLC_TS_INVALID )
+        {
+            p_block = p_block->p_next;
+        }
+
+        if(p_block)
+        {
+            ret = p_block->i_dts;
+            break;
+        }
+    }
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return ret;
 }
 
 int BaseStreamOutput::esCount() const
