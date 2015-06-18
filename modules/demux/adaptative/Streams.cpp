@@ -287,6 +287,7 @@ BaseStreamOutput::BaseStreamOutput(demux_t *demux, const std::string &name) :
     seekable = true;
     restarting = false;
     demuxstream = NULL;
+    b_drop = false;
 
     fakeesout = new es_out_t;
     if (!fakeesout)
@@ -370,12 +371,20 @@ void BaseStreamOutput::setPosition(mtime_t nztime)
         if(pair->p_queue && pair->p_queue->i_dts > VLC_TS_0 + nztime)
             pair->drop();
     }
-    pcr = VLC_TS_INVALID;
+    /* disable appending until restarted */
+    b_drop = true;
     vlc_mutex_unlock(&lock);
-    es_out_Control(realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                   VLC_TS_0 + nztime);
+
     if(reinitsOnSeek())
         restart();
+
+    vlc_mutex_lock(&lock);
+    b_drop = false;
+    pcr = VLC_TS_INVALID;
+    vlc_mutex_unlock(&lock);
+
+    es_out_Control(realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+                   VLC_TS_0 + nztime);
 }
 
 bool BaseStreamOutput::restart()
@@ -516,14 +525,21 @@ int BaseStreamOutput::esOutSend(es_out_t *fakees, es_out_id_t *p_es, block_t *p_
 {
     BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
     vlc_mutex_lock(&me->lock);
-    std::list<Demuxed *>::const_iterator it;
-    for(it=me->queues.begin(); it!=me->queues.end();++it)
+    if(me->b_drop)
     {
-        Demuxed *pair = *it;
-        if(pair->es_id == p_es)
+        block_ChainRelease( p_block );
+    }
+    else
+    {
+        std::list<Demuxed *>::const_iterator it;
+        for(it=me->queues.begin(); it!=me->queues.end();++it)
         {
-            block_ChainLastAppend(&pair->pp_queue_last, p_block);
-            break;
+            Demuxed *pair = *it;
+            if(pair->es_id == p_es)
+            {
+                block_ChainLastAppend(&pair->pp_queue_last, p_block);
+                break;
+            }
         }
     }
     vlc_mutex_unlock(&me->lock);

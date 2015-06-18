@@ -164,6 +164,7 @@ namespace adaptative
             es_format_t fmtcpy;
         };
         std::list<Demuxed *> queues;
+        bool b_drop;
         vlc_mutex_t lock;
         void sendToDecoderUnlocked(mtime_t);
         bool restart();
