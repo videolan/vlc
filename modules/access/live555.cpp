@@ -1228,9 +1228,9 @@ static int Play( demux_t *p_demux )
         if( p_sys->i_timeout <= 0 )
             p_sys->i_timeout = 60; /* default value from RFC2326 */
 
-        /* start timeout-thread only if GET_PARAMETER is supported by the server */
-        /* or start it if wmserver dialect, since they don't report that GET_PARAMETER is supported correctly */
-        if( !p_sys->p_timeout && ( p_sys->b_get_param || var_InheritBool( p_demux, "rtsp-wmserver" ) ) )
+        /* start timeout-thread. GET_PARAMETER will be used if supported by
+         * the server. OPTIONS will be used as a fallback */
+        if( !p_sys->p_timeout )
         {
             msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
             p_sys->p_timeout = (timeout_thread_t *)malloc( sizeof(timeout_thread_t) );
@@ -1279,7 +1279,13 @@ static int Demux( demux_t *p_demux )
     if( p_sys->b_timeout_call && p_sys->rtsp && p_sys->ms )
     {
         char *psz_bye = NULL;
-        p_sys->rtsp->sendGetParameterCommand( *p_sys->ms, NULL, psz_bye );
+        /* Use GET_PARAMETERS if supported. wmserver dialect supports
+         * it, but does not report this properly. */
+        if( p_sys->b_get_param || var_GetBool( p_demux, "rtsp-wmserver" ) )
+            p_sys->rtsp->sendGetParameterCommand( *p_sys->ms, NULL, psz_bye );
+        else
+            p_sys->rtsp->sendOptionsCommand(NULL, NULL);
+
         p_sys->b_timeout_call = false;
     }
 
