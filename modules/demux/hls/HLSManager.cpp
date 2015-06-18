@@ -46,7 +46,6 @@ HLSManager::~HLSManager()
 
 AbstractAdaptationLogic *HLSManager::createLogic(AbstractAdaptationLogic::LogicType type)
 {
-    size_t bps = var_InheritInteger(stream, "hls-prefbw") * 8192;
     switch(type)
     {
         case AbstractAdaptationLogic::FixedRate:
