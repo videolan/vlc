@@ -111,7 +111,7 @@ bool PlaylistManager::start(demux_t *demux)
     return true;
 }
 
-Stream::status PlaylistManager::demux(mtime_t nzdeadline)
+Stream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
 {
     Stream::status i_return = Stream::status_eof;
 
@@ -121,7 +121,7 @@ Stream::status PlaylistManager::demux(mtime_t nzdeadline)
             continue;
 
         Stream::status i_ret =
-                streams[type]->demux(conManager, nzdeadline);
+                streams[type]->demux(conManager, nzdeadline, send);
 
         if(i_ret == Stream::status_buffering)
         {

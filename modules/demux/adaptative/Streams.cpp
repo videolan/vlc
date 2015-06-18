@@ -143,7 +143,7 @@ bool Stream::seekAble() const
     return (output && output->seekAble());
 }
 
-Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_deadline)
+Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_deadline, bool send)
 {
     if(nz_deadline + VLC_TS_0 > output->getPCR()) /* not already demuxed */
     {
@@ -155,7 +155,8 @@ Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_dead
             return Stream::status_buffering;
     }
 
-    output->sendToDecoder(nz_deadline);
+    if(send)
+        output->sendToDecoder(nz_deadline);
     return Stream::status_demuxed;
 }
 

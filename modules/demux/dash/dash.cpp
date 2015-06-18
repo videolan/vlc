@@ -182,8 +182,19 @@ static int Demux(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    if(p_sys->i_nzpcr == VLC_TS_INVALID)
+    {
+        if( Stream::status_eof ==
+            p_sys->p_dashManager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT, false) )
+        {
+            return VLC_DEMUXER_EOF;
+        }
+        mtime_t i_dts = p_sys->p_dashManager->getFirstDTS();
+        p_sys->i_nzpcr = i_dts;
+    }
+
     Stream::status status =
-            p_sys->p_dashManager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT);
+            p_sys->p_dashManager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT, true);
     switch(status)
     {
     case Stream::status_eof:
@@ -191,12 +202,12 @@ static int Demux(demux_t *p_demux)
     case Stream::status_buffering:
         break;
     case Stream::status_demuxed:
-        if(p_sys->i_nzpcr == VLC_TS_INVALID)
-            p_sys->i_nzpcr = p_sys->p_dashManager->getPCR();
-        else
+        if( p_sys->i_nzpcr != VLC_TS_INVALID )
+        {
             p_sys->i_nzpcr += DEMUX_INCREMENT;
-        int group = p_sys->p_dashManager->getGroup();
-        es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, VLC_TS_0 + p_sys->i_nzpcr);
+            int group = p_sys->p_dashManager->getGroup();
+            es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, VLC_TS_0 + p_sys->i_nzpcr);
+        }
         break;
     }
 

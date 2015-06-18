@@ -70,7 +70,7 @@ namespace adaptative
         int esCount() const;
         bool seekAble() const;
         typedef enum {status_eof, status_buffering, status_demuxed} status;
-        status demux(HTTPConnectionManager *, mtime_t);
+        status demux(HTTPConnectionManager *, mtime_t, bool);
         bool setPosition(mtime_t, bool);
         mtime_t getPosition() const;
         void prune();
