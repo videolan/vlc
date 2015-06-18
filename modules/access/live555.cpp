@@ -102,7 +102,7 @@ vlc_module_begin ()
 
     add_submodule ()
         set_description( N_("RTSP/RTP access and demux") )
-        add_shortcut( "rtsp", "pnm", "live", "livedotcom" )
+        add_shortcut( "rtsp", "pnm", "live", "livedotcom", "satip" )
         set_capability( "access_demux", 0 )
         set_callbacks( Open, Close )
         add_bool( "rtsp-tcp", false,
@@ -332,6 +332,17 @@ static int  Open ( vlc_object_t *p_this )
         while( (p = strchr( p, ' ' )) != NULL ) *p = '+';
     }
 
+    if( strcasecmp( p_demux->psz_access, "satip" ) == 0 )
+    {
+        asprintf(&p_sys->p_sdp, "v=0\r\n"
+                "o=- 0 %s\r\n"
+                "s=SATIP:stream\r\n"
+                "i=SATIP RTP Stream\r\n"
+                "m=video 0 RTP/AVP 33\r\n"
+                "a=control:rtsp://%s\r\n\r\n",
+                p_sys->url.psz_host, p_sys->psz_path);
+    }
+
     if( p_demux->s != NULL )
     {
         /* Gather the complete sdp file */
@@ -524,7 +535,15 @@ static void continueAfterOPTIONS( RTSPClient* client, int result_code,
       result_code == 0
       && result_string != NULL
       && strstr( result_string, "GET_PARAMETER" ) != NULL;
-    client->sendDescribeCommand( continueAfterDESCRIBE );
+    if( p_sys->p_sdp == NULL )
+    {
+        client->sendDescribeCommand( continueAfterDESCRIBE );
+    }
+    else
+    {
+        p_sys->b_error = false;
+        p_sys->event_rtsp = 1;
+    }
     delete[] result_string;
 }
 
