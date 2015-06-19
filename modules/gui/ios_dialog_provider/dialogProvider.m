@@ -226,6 +226,7 @@ static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t prev
         [dict setObject:@(no) forKey:@"no"];
     if (cancel)
         [dict setObject:@(cancel) forKey:@"cancel"];
+    [dict retain];
 
     return dict;
 }
@@ -238,6 +239,7 @@ static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t prev
     VLCBlockingAlertView *alert = [[VLCBlockingAlertView alloc] initWithTitle:[dialog objectForKey:@"title"] message:[dialog objectForKey:@"message"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     alert.completion = ^(BOOL cancelled, NSInteger buttonIndex) {
         [alert release];
+        [dialog release];
     };
     [alert show];
 }
@@ -249,6 +251,7 @@ static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t prev
     VLCBlockingAlertView *alert = [[VLCBlockingAlertView alloc] initWithTitle:[dialog objectForKey:@"title"] message:[dialog objectForKey:@"message"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     alert.completion = ^(BOOL cancelled, NSInteger buttonIndex) {
         [alert release];
+        [dialog release];
     };
     [alert show];
 }
@@ -276,6 +279,7 @@ static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t prev
 
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     [alert release];
+    [dialog release];
 
     return @(ret);
 }
@@ -309,6 +313,7 @@ static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t prev
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
     [alert release];
+    [dialog release];
     return dict;
 }
 
