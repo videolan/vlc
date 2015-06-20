@@ -25,7 +25,7 @@ VLC.app: VLC-tmp
 	rm -Rf $@/Contents/Frameworks/BGHUDAppKit.framework/Versions/A/Resources/README.textile
 
 
-VLC-tmp: vlc
+VLC-tmp:
 	$(AM_V_GEN)for i in src lib share; do \
 		(cd $$i && $(MAKE) $(AM_MAKEFLAGS) install $(silentstd)); \
 	done
