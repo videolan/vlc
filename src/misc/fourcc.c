@@ -590,6 +590,10 @@ static const struct
     { { VLC_CODEC_YUV422A },                   PLANAR_8(4, 2, 1) },
 
     { { VLC_CODEC_GBR_PLANAR },                PLANAR_8(3, 1, 1) },
+    { { VLC_CODEC_GBR_PLANAR_9L,
+        VLC_CODEC_GBR_PLANAR_9B },             PLANAR_16(3, 1, 1, 9) },
+    { { VLC_CODEC_GBR_PLANAR_10L,
+        VLC_CODEC_GBR_PLANAR_10B },            PLANAR_16(3, 1, 1, 10) },
 
     { { VLC_CODEC_I420_10L,
         VLC_CODEC_I420_10B },                  PLANAR_16(3, 2, 2, 10) },

@@ -45,6 +45,7 @@ Decoder:
  * Basic TTML subtitles support
  * Support hardware decoding using Direct3D11, including GPU-zerocopy mode
  * DxVA2 GPU-zerocopy for hardware decoding and displaying on Windows
+ * Support 9-bit and 10-bit GBR planar formats
 
 Demuxers:
  * Support HD-DVD .evo (H.264, VC-1, MPEG-2, PCM, AC-3, E-AC3, MLP, DTS)
