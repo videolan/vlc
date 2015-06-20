@@ -132,6 +132,9 @@ int OpenIntf (vlc_object_t *p_this)
 
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
+    [NSBundle loadNibNamed:@"MainWindow" owner: [VLCMain sharedInstance]];
+    [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
+
     [o_pool release];
     return VLC_SUCCESS;
 }
@@ -768,12 +771,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     PL_LOCK;
     items_at_launch = p_playlist->p_local_category->i_children;
     PL_UNLOCK;
-
-    [NSBundle loadNibNamed:@"MainWindow" owner: self];
-
-    // This cannot be called directly here, as the main loop is not running yet so it would have no effect.
-    // So lets enqueue it into the loop for later execution.
-    [o_mainwindow performSelector:@selector(makeKeyAndOrderFront:) withObject:nil afterDelay:0];
 
 #ifdef HAVE_SPARKLE
     [[SUUpdater sharedUpdater] setDelegate:self];
