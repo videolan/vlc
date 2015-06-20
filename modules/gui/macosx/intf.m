@@ -35,6 +35,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_keys.h>
 #include <vlc_dialog.h>
 #include <vlc_url.h>
@@ -99,9 +100,7 @@ static int BossCallback(vlc_object_t *, const char *,
 #pragma mark -
 #pragma mark VLC Interface Object Callbacks
 
-static bool b_intf_starting = false;
-static vlc_mutex_t start_mutex = VLC_STATIC_MUTEX;
-static vlc_cond_t  start_cond = VLC_STATIC_COND;
+static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
 
 static NSLock * o_appLock = nil;    // controls access to f_appExit
 static NSLock * o_vout_provider_lock = nil;
@@ -125,15 +124,12 @@ int OpenIntf (vlc_object_t *p_this)
 
     [[VLCMain sharedInstance] setIntf: p_intf];
 
-    vlc_mutex_lock(&start_mutex);
-    b_intf_starting = true;
-    vlc_cond_signal(&start_cond);
-    vlc_mutex_unlock(&start_mutex);
-
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
     [NSBundle loadNibNamed:@"MainWindow" owner: [VLCMain sharedInstance]];
     [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
+
+    atomic_store(&b_intf_starting, true);
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -161,29 +157,10 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
     msg_Dbg(p_wnd, "Opening video window");
 
-    /*
-     * HACK: Wait 200ms for the interface to come up.
-     * WindowOpen might be called before the mac intf is started. Lets wait until OpenIntf gets called
-     * and does basic initialization. Enqueuing the vout controller request into the main loop later on
-     * ensures that the actual window is created after the interface is fully initialized
-     * (applicationDidFinishLaunching).
-     *
-     * Timeout is needed as the mac intf is not always started at all.
-     */
-    mtime_t deadline = mdate() + 200000;
-    vlc_mutex_lock(&start_mutex);
-    while (!b_intf_starting) {
-        if (vlc_cond_timedwait(&start_cond, &start_mutex, deadline)) {
-            break; // timeout
-        }
-    }
-
-    if (!b_intf_starting) {
+    if (!atomic_load(&b_intf_starting)) {
         msg_Err(p_wnd, "Cannot create vout as Mac OS X interface was not found");
-        vlc_mutex_unlock(&start_mutex);
         return VLC_EGENERIC;
     }
-    vlc_mutex_unlock(&start_mutex);
 
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
