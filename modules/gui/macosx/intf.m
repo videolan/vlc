@@ -102,7 +102,6 @@ static int BossCallback(vlc_object_t *, const char *,
 
 static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
 
-static NSLock * o_appLock = nil;    // controls access to f_appExit
 static NSLock * o_vout_provider_lock = nil;
 
 
@@ -119,7 +118,6 @@ int OpenIntf (vlc_object_t *p_this)
 
     [VLCApplication sharedApplication];
 
-    o_appLock = [[NSLock alloc] init];
     o_vout_provider_lock = [[NSLock alloc] init];
 
     [[VLCMain sharedInstance] setIntf: p_intf];
@@ -141,7 +139,6 @@ void CloseIntf (vlc_object_t *p_this)
 
     msg_Dbg(p_this, "Closing macosx interface");
     [[VLCMain sharedInstance] applicationWillTerminate:nil];
-    [o_appLock release];
     [o_vout_provider_lock release];
     o_vout_provider_lock = nil;
     [o_pool release];
@@ -812,29 +809,19 @@ static VLCMain *_o_sharedMainInstance = nil;
     PL_UNLOCK;
 }
 
-/* don't allow a double termination call. If the user has
- * already invoked the quit then simply return this time. */
-static bool f_appExit = false;
-
 #pragma mark -
 #pragma mark Termination
 
 - (BOOL)isTerminating
 {
-    return f_appExit;
+    return b_intf_terminating;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    bool isTerminating;
-
-    [o_appLock lock];
-    isTerminating = f_appExit;
-    f_appExit = true;
-    [o_appLock unlock];
-
-    if (isTerminating)
+    if (b_intf_terminating)
         return;
+    b_intf_terminating = true;
 
     [self resumeItunesPlayback:nil];
 

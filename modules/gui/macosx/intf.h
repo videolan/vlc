@@ -98,6 +98,8 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
     IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
 
+    bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
+
     AppleRemote * o_remote;
     BOOL b_remote_button_hold; /* true as long as the user holds the left,right,plus or minus on the remote control */
 
