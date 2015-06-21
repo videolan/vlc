@@ -69,8 +69,10 @@ AM_PROG_AS
 AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [Validator for desktop entry files])
 AC_CHECK_PROGS(DESKTOP_FILE_VALIDATE, [${DESKTOP_FILE_VALIDATE} desktop-file-validate], :)
 AC_PATH_PROG(YASM, yasm)
-AC_ARG_VAR([BUILDCC], [Build system C99 compiler command])
-AC_PATH_PROGS(BUILDCC, [c99-gcc c99])
+AC_ARG_VAR([BUILDCC], [Build system C11 or C99 compiler command])
+AC_PATH_PROGS(BUILDCC, [c11-gcc c11 c99-gcc c99], [
+  AC_MSG_ERROR([Cannot find native C99 compiler: please define BUILDCC.])
+])
 
 dnl Check for compiler properties
 AC_C_CONST
