@@ -29,6 +29,7 @@
 #   Copyright (c) 2013 Roy Stogner <roystgnr@ices.utexas.edu>
 #   Copyright (c) 2014 Alexey Sokolov <sokolov@google.com>
 #   Copyright (c) 2014, 2015 Google Inc.
+#   Copyright (c) 2015 VLC authors and VideoLAN
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice
@@ -81,6 +82,9 @@ m4_define([_AX_CXX_COMPILE_STDCXX_11_testbody], [[
             func<foo>(0);
         }
     }
+
+    #include <cinttypes>
+    constexpr uint64_t constantname = UINT64_C(0x100000000);
 ]])
 
 AC_DEFUN([AX_CXX_COMPILE_STDCXX_11], [dnl
