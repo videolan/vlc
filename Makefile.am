@@ -973,7 +973,11 @@ noinst_SCRIPTS = vlc$(EXEEXT)
 endif
 
 vlc$(EXEEXT):
+if HAVE_DARWIN
+	$(AM_V_GEN)$(LN_S) -f bin/vlc-osx-static vlc
+else
 	$(AM_V_GEN)$(LN_S) -f bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
+endif
 
 TESTS = test/run_vlc.sh
 dist_noinst_SCRIPTS += test/run_vlc.sh
