@@ -47,7 +47,7 @@
 #define CHROMA_LONGTEXT N_(\
     "Force use of a specific chroma for output. Default is RGB32.")
 
-#define CFG_PREFIX "androidsurface-"
+#define CFG_PREFIX "androidwindow-"
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -58,6 +58,7 @@ vlc_module_begin()
     set_description(N_("Android video output"))
     set_capability("vout display", 260)
     add_shortcut("androidwindow", "android")
+    add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
     set_callbacks(Open, Close)
 vlc_module_end()
 
