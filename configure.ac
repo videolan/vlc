@@ -166,11 +166,11 @@ case "${host_os}" in
     esac
 
     SYS=darwin
-    CFLAGS="${CFLAGS} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"
-    CXXFLAGS="${CXXFLAGS} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"
+    CFLAGS="${CFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu11 ${ARCH_flag}"
+    CXXFLAGS="${CXXFLAGS} -D_INTL_REDIRECT_MACROS -stdlib=libc++ ${ARCH_flag}"
     CPPFLAGS="${CPPFLAGS} ${ARCH_flag}"
-    OBJCFLAGS="${OBJCFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu99 ${ARCH_flag}"
-    LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names ${ARCH_flag}"
+    OBJCFLAGS="${OBJCFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu11 ${ARCH_flag}"
+    LDFLAGS="${LDFLAGS} -lc++ -Wl,-headerpad_max_install_names ${ARCH_flag}"
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation,-framework,CoreServices])
 
