@@ -25,6 +25,7 @@ Access:
  * New UPnP access module, to list directories without infinite recursions
  * New WASAPI audio capture module on Windows
  * SMB/FTP/SFTP accesses can list directories
+ * Support for SAT>IP server dialect for RTSP (satip://)
 
 Decoder:
  * OMX GPU-zerocopy support for decoding and display on Android using OpenMax IL
