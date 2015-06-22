@@ -274,10 +274,9 @@ libandroid_window_plugin_la_SOURCES = video_output/android/android_window.c vide
 libandroid_window_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_window_plugin_la_LIBADD = $(LIBDL)
 libandroid_window_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-EXTRA_LTLIBRARIES += libandroid_window_plugin.la
 
 if HAVE_ANDROID
-vout_LTLIBRARIES += libandroid_native_window_plugin.la
+vout_LTLIBRARIES += libandroid_native_window_plugin.la libandroid_window_plugin.la
 vout_LTLIBRARIES += $(LTLIBandroid_window)
 if HAVE_EGL
 vout_LTLIBRARIES += libegl_android_plugin.la
