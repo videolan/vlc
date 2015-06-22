@@ -42,17 +42,17 @@ void StreamTime::set( float percentage, bool updateVLC )
 }
 
 
-string StreamTime::getAsStringPercent() const
+std::string StreamTime::getAsStringPercent() const
 {
     int value = (int)(100. * get());
     // 0 <= value <= 100, so we need 4 chars
     char str[4];
     snprintf( str, 4, "%d", value );
-    return string(str);
+    return std::string(str);
 }
 
 
-string StreamTime::formatTime( int seconds, bool bShortFormat ) const
+std::string StreamTime::formatTime( int seconds, bool bShortFormat ) const
 {
     char psz_time[MSTRTIME_MAX_SIZE];
     if( bShortFormat && (seconds < 60 * 60) )
@@ -68,11 +68,11 @@ string StreamTime::formatTime( int seconds, bool bShortFormat ) const
                   (int) (seconds / 60 % 60),
                   (int) (seconds % 60) );
     }
-    return string(psz_time);
+    return std::string(psz_time);
 }
 
 
-string StreamTime::getAsStringCurrTime( bool bShortFormat ) const
+std::string StreamTime::getAsStringCurrTime( bool bShortFormat ) const
 {
     if( !havePosition() )
         return "-:--:--";
@@ -82,7 +82,7 @@ string StreamTime::getAsStringCurrTime( bool bShortFormat ) const
 }
 
 
-string StreamTime::getAsStringTimeLeft( bool bShortFormat ) const
+std::string StreamTime::getAsStringTimeLeft( bool bShortFormat ) const
 {
     if( !havePosition() )
         return "-:--:--";
@@ -94,7 +94,7 @@ string StreamTime::getAsStringTimeLeft( bool bShortFormat ) const
 }
 
 
-string StreamTime::getAsStringDuration( bool bShortFormat ) const
+std::string StreamTime::getAsStringDuration( bool bShortFormat ) const
 {
     if( !havePosition() )
         return "-:--:--";

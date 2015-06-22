@@ -140,7 +140,7 @@ void Interpreter::destroy( intf_thread_t *pIntf )
 }
 
 
-CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
+CmdGeneric *Interpreter::parseAction( const std::string &rAction, Theme *pTheme )
 {
     // Try to find the command in the global command map
     if( m_commandMap.find( rAction ) != m_commandMap.end() )
@@ -150,15 +150,15 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
 
     CmdGeneric *pCommand = NULL;
 
-    if( rAction.find( ";" ) != string::npos )
+    if( rAction.find( ";" ) != std::string::npos )
     {
         // Several actions are defined...
-        list<CmdGeneric *> actionList;
-        string rightPart = rAction;
-        string::size_type pos = rightPart.find( ";" );
-        while( pos != string::npos )
+        std::list<CmdGeneric *> actionList;
+        std::string rightPart = rAction;
+        std::string::size_type pos = rightPart.find( ";" );
+        while( pos != std::string::npos )
         {
-            string leftPart = rightPart.substr( 0, pos );
+            std::string leftPart = rightPart.substr( 0, pos );
             // Remove any whitespace at the end of the left part, and parse it
             leftPart =
                 leftPart.substr( 0, leftPart.find_last_not_of( " \t" ) + 1 );
@@ -166,7 +166,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
             // Now remove any whitespace at the beginning of the right part,
             // and go on checking for further actions in it...
             rightPart = rightPart.substr( pos, rightPart.size() );
-            if ( rightPart.find_first_not_of( " \t;" ) == string::npos )
+            if ( rightPart.find_first_not_of( " \t;" ) == std::string::npos )
             {
                 // The right part is completely buggy, it's time to leave the
                 // loop...
@@ -186,13 +186,13 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
 
         pCommand = new CmdMuxer( getIntf(), actionList );
     }
-    else if( rAction.find( ".setLayout(" ) != string::npos )
+    else if( rAction.find( ".setLayout(" ) != std::string::npos )
     {
         int leftPos = rAction.find( ".setLayout(" );
-        string windowId = rAction.substr( 0, leftPos );
+        std::string windowId = rAction.substr( 0, leftPos );
         // 11 is the size of ".setLayout("
         int rightPos = rAction.find( ")", windowId.size() + 11 );
-        string layoutId = rAction.substr( windowId.size() + 11,
+        std::string layoutId = rAction.substr( windowId.size() + 11,
                                           rightPos - (windowId.size() + 11) );
 
         TopWindow *pWin = pTheme->getWindowById( windowId );
@@ -216,10 +216,10 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
             pCommand = new CmdLayout( getIntf(), *pWin, *pLayout );
         }
     }
-    else if( rAction.find( ".maximize()" ) != string::npos )
+    else if( rAction.find( ".maximize()" ) != std::string::npos )
     {
         int leftPos = rAction.find( ".maximize()" );
-        string windowId = rAction.substr( 0, leftPos );
+        std::string windowId = rAction.substr( 0, leftPos );
 
         TopWindow *pWin = pTheme->getWindowById( windowId );
         if( !pWin )
@@ -233,10 +233,10 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
                                         *pWin );
         }
     }
-    else if( rAction.find( ".unmaximize()" ) != string::npos )
+    else if( rAction.find( ".unmaximize()" ) != std::string::npos )
     {
         int leftPos = rAction.find( ".unmaximize()" );
-        string windowId = rAction.substr( 0, leftPos );
+        std::string windowId = rAction.substr( 0, leftPos );
 
         TopWindow *pWin = pTheme->getWindowById( windowId );
         if( !pWin )
@@ -250,15 +250,15 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
                                           *pWin );
         }
     }
-    else if( rAction.find( ".show()" ) != string::npos )
+    else if( rAction.find( ".show()" ) != std::string::npos )
     {
         int leftPos = rAction.find( ".show()" );
-        string windowId = rAction.substr( 0, leftPos );
+        std::string windowId = rAction.substr( 0, leftPos );
 
         if( windowId == "playlist_window" &&
             !var_InheritBool( getIntf(), "skinned-playlist") )
         {
-            list<CmdGeneric *> list;
+            std::list<CmdGeneric *> list;
             list.push_back( new CmdDlgPlaylist( getIntf() ) );
             TopWindow *pWin = pTheme->getWindowById( windowId );
             if( pWin )
@@ -292,14 +292,14 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
             }
         }
     }
-    else if( rAction.find( ".hide()" ) != string::npos )
+    else if( rAction.find( ".hide()" ) != std::string::npos )
     {
         int leftPos = rAction.find( ".hide()" );
-        string windowId = rAction.substr( 0, leftPos );
+        std::string windowId = rAction.substr( 0, leftPos );
         if( windowId == "playlist_window" &&
            !var_InheritBool( getIntf(), "skinned-playlist") )
         {
-            list<CmdGeneric *> list;
+            std::list<CmdGeneric *> list;
             list.push_back( new CmdDlgPlaylist( getIntf() ) );
             TopWindow *pWin = pTheme->getWindowById( windowId );
             if( pWin )
@@ -338,7 +338,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
 }
 
 
-VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
+VarBool *Interpreter::getVarBool( const std::string &rName, Theme *pTheme )
 {
     VarManager *pVarManager = VarManager::instance( getIntf() );
 
@@ -346,10 +346,10 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
     ExprEvaluator evaluator( getIntf() );
     evaluator.parse( rName );
 
-    list<VarBool*> varStack;
+    std::list<VarBool*> varStack;
 
     // Get the first token from the RPN stack
-    string token = evaluator.getToken();
+    std::string token = evaluator.getToken();
     while( !token.empty() )
     {
         if( token == "and" )
@@ -433,10 +433,10 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
             {
                 varStack.push_back( pVar );
             }
-            else if( token.find( ".isVisible" ) != string::npos )
+            else if( token.find( ".isVisible" ) != std::string::npos )
             {
                 int leftPos = token.find( ".isVisible" );
-                string windowId = token.substr( 0, leftPos );
+                std::string windowId = token.substr( 0, leftPos );
                 TopWindow *pWin = pTheme->getWindowById( windowId );
                 if( pWin )
                 {
@@ -450,10 +450,10 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
                     return NULL;
                 }
             }
-            else if( token.find( ".isMaximized" ) != string::npos )
+            else if( token.find( ".isMaximized" ) != std::string::npos )
             {
                 int leftPos = token.find( ".isMaximized" );
-                string windowId = token.substr( 0, leftPos );
+                std::string windowId = token.substr( 0, leftPos );
                 TopWindow *pWin = pTheme->getWindowById( windowId );
                 if( pWin )
                 {
@@ -467,10 +467,10 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
                     return NULL;
                 }
             }
-            else if( token.find( ".isActive" ) != string::npos )
+            else if( token.find( ".isActive" ) != std::string::npos )
             {
                 int leftPos = token.find( ".isActive" );
-                string layoutId = token.substr( 0, leftPos );
+                std::string layoutId = token.substr( 0, leftPos );
                 GenericLayout *pLayout = pTheme->getLayoutById( layoutId );
                 if( pLayout )
                 {
@@ -505,7 +505,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
 }
 
 
-VarPercent *Interpreter::getVarPercent( const string &rName, Theme *pTheme )
+VarPercent *Interpreter::getVarPercent( const std::string &rName, Theme *pTheme )
 {
     (void)pTheme;
     VarManager *pVarManager = VarManager::instance( getIntf() );
@@ -513,7 +513,7 @@ VarPercent *Interpreter::getVarPercent( const string &rName, Theme *pTheme )
 }
 
 
-VarList *Interpreter::getVarList( const string &rName, Theme *pTheme )
+VarList *Interpreter::getVarList( const std::string &rName, Theme *pTheme )
 {
     (void)pTheme;
     VarManager *pVarManager = VarManager::instance( getIntf() );
@@ -521,7 +521,7 @@ VarList *Interpreter::getVarList( const string &rName, Theme *pTheme )
 }
 
 
-VarTree *Interpreter::getVarTree( const string &rName, Theme *pTheme )
+VarTree *Interpreter::getVarTree( const std::string &rName, Theme *pTheme )
 {
     (void)pTheme;
     VarManager *pVarManager = VarManager::instance( getIntf() );
@@ -529,10 +529,10 @@ VarTree *Interpreter::getVarTree( const string &rName, Theme *pTheme )
 }
 
 
-string Interpreter::getConstant( const string &rValue )
+std::string Interpreter::getConstant( const std::string &rValue )
 {
     // Check if the value is a registered constant; if not, keep as is.
-    string val = VarManager::instance( getIntf() )->getConst( rValue );
+    std::string val = VarManager::instance( getIntf() )->getConst( rValue );
     return val.empty() ? rValue : val;
 }
 

@@ -44,7 +44,7 @@ public:
     virtual void hide() = 0;
 
     /// Append a new menu item with the given label to the popup menu
-    virtual void addItem( const string &rLabel, int pos ) = 0;
+    virtual void addItem( const std::string &rLabel, int pos ) = 0;
 
     /// Create a dummy menu item to separate sections
     virtual void addSeparator( int pos ) = 0;

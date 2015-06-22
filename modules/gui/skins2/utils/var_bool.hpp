@@ -34,7 +34,7 @@ class VarBool: public Variable, public Subject<VarBool>
 {
 public:
     /// Get the variable type
-    virtual const string &getType() const { return m_type; }
+    virtual const std::string &getType() const { return m_type; }
 
     /// Get the boolean value
     virtual bool get() const = 0;
@@ -45,7 +45,7 @@ protected:
 
 private:
     /// Variable type
-    static const string m_type;
+    static const std::string m_type;
 };
 
 

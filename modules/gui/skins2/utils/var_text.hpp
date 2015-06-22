@@ -42,7 +42,7 @@ public:
     virtual ~VarText();
 
     /// Get the variable type
-    virtual const string &getType() const { return m_type; }
+    virtual const std::string &getType() const { return m_type; }
 
     /// Set the internal value
     virtual void set( const UString &rText );
@@ -57,7 +57,7 @@ private:
     void delObservers();
 
     /// Variable type
-    static const string m_type;
+    static const std::string m_type;
     /// The text of the variable
     UString m_text;
     /// Actual text after having replaced the variables

@@ -40,17 +40,17 @@ public:
     virtual void set( float percentage ) { set( percentage, true ); }
 
     /// Return a string containing a value from 0 to 100
-    virtual string getAsStringPercent() const;
+    virtual std::string getAsStringPercent() const;
     /// Return the current time formatted as a time display (h:mm:ss)
-    virtual string getAsStringCurrTime( bool bShortFormat = false ) const;
+    virtual std::string getAsStringCurrTime( bool bShortFormat = false ) const;
     /// Return the time left formatted as a time display (h:mm:ss)
-    virtual string getAsStringTimeLeft( bool bShortFormat = false ) const;
+    virtual std::string getAsStringTimeLeft( bool bShortFormat = false ) const;
     /// Return the duration formatted as a time display (h:mm:ss)
-    virtual string getAsStringDuration( bool bShortFormat = false ) const;
+    virtual std::string getAsStringDuration( bool bShortFormat = false ) const;
 
 private:
     /// Convert a number of seconds into "h:mm:ss" format
-    string formatTime( int seconds, bool bShortFormat ) const;
+    std::string formatTime( int seconds, bool bShortFormat ) const;
     /// Return true when there is a non-null input and its position is not 0.0.
     bool havePosition() const;
 };

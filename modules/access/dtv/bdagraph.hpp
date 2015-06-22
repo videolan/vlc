@@ -24,8 +24,6 @@
  * Preamble
  *****************************************************************************/
 
-using namespace std;
-
 #include <wtypes.h>
 #include <unknwn.h>
 #include <ole2.h>

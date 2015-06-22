@@ -46,7 +46,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 {
     XSetWindowAttributes attr;
     unsigned long valuemask;
-    string name_type;
+    std::string name_type;
 
     if( type == GenericWindow::FullscreenWindow )
     {
@@ -164,7 +164,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     }
 
     // Change the window title
-    string name_window = "VLC (" + name_type + ")";
+    std::string name_window = "VLC (" + name_type + ")";
     XStoreName( XDISPLAY, m_wnd, name_window.c_str() );
 
     // Set the WM_TRANSIENT_FOR property

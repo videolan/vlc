@@ -117,10 +117,10 @@ public:
     virtual OSPopup *createOSPopup();
 
     /// Get the directory separator
-    virtual const string &getDirSeparator() const { return m_dirSep; }
+    virtual const std::string &getDirSeparator() const { return m_dirSep; }
 
     /// Get the resource path
-    virtual const list<string> &getResourcePath() const
+    virtual const std::list<std::string> &getResourcePath() const
         { return m_resourcePath; }
 
     /// Get the screen size
@@ -148,7 +148,7 @@ public:
         { /*TODO*/ (void)type; }
 
     /// Delete a directory recursively
-    virtual void rmDir( const string &rPath );
+    virtual void rmDir( const std::string &rPath );
 
     /// Get the timer loop
     X11TimerLoop *getTimerLoop() const { return m_pTimerLoop; }
@@ -159,9 +159,9 @@ private:
     /// Timer loop
     X11TimerLoop *m_pTimerLoop;
     /// Directory separator
-    const string m_dirSep;
+    const std::string m_dirSep;
     /// Resource path
-    list<string> m_resourcePath;
+    std::list<std::string> m_resourcePath;
     /// Monitor geometry
     int m_screenWidth, m_screenHeight;
 };

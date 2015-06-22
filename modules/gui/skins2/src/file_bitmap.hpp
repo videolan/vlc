@@ -36,7 +36,7 @@ public:
     /// Load a bitmap from a file. aColor is the transparency
     /// color, in the format 0xRRGGBB
     FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
-                string fileName, uint32_t aColor, int nbFrames = 1,
+                std::string fileName, uint32_t aColor, int nbFrames = 1,
                 int fps = 0, int nbLoops = 0 );
 
     virtual ~FileBitmap();

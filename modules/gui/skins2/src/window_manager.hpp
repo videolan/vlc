@@ -170,8 +170,8 @@ public:
 
 private:
     /// Some useful typedefs for lazy people like me
-    typedef set<TopWindow*> WinSet_t;
-    typedef list<Anchor*> AncList_t;
+    typedef std::set<TopWindow*> WinSet_t;
+    typedef std::list<Anchor*> AncList_t;
 
     /// Dependencies map
     /**
@@ -181,7 +181,7 @@ private:
      * m_dep[c], it doesn't mean that a is in m_dep[c] (in fact, it
      * would be extremely rare...)
      */
-    map<TopWindow*, WinSet_t> m_dependencies;
+    std::map<TopWindow*, WinSet_t> m_dependencies;
     /// Store all the windows
     WinSet_t m_allWindows;
     /**

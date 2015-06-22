@@ -59,7 +59,6 @@
 #include "dcpparser.h"
 
 using namespace ASDCP;
-using namespace std;
 
 #define FRAME_BUFFER_SIZE 1302083 /* maximum frame length, in bytes, after
                                      "Digital Cinema System Specification Version 1.2
@@ -124,10 +123,10 @@ class demux_sys_t
     EssenceType_t PictureEssType;
 
     /* ASDCP Video MXF Reader */
-    vector<videoReader_t> v_videoReader;
+    std::vector<videoReader_t> v_videoReader;
 
     /* ASDCP Audio MXF Reader */
-    vector<audioReader_t> v_audioReader;
+    std::vector<audioReader_t> v_audioReader;
 
     /* audio buffer size */
     uint32_t i_audio_buffer;
@@ -953,12 +952,12 @@ int dcpInit ( demux_t *p_demux )
  * Function to retrieve the path to the ASSETMAP file.
  * @param p_demux DCP access_demux.
  */
-static string assetmapPath( demux_t * p_demux )
+static std::string assetmapPath( demux_t * p_demux )
 {
     DIR *dir = NULL;
     struct dirent *ent = NULL;
     dcp_t *p_dcp = p_demux->p_sys->p_dcp;
-    string result;
+    std::string result;
 
     if( ( dir = opendir (p_dcp->path.c_str() ) ) != NULL )
     {
@@ -995,7 +994,7 @@ int parseXML ( demux_t * p_demux )
 {
     int retval;
 
-    string assetmap_path = assetmapPath( p_demux );
+    std::string assetmap_path = assetmapPath( p_demux );
     /* We get the ASSETMAP file path */
     if( assetmap_path.empty() )
         return VLC_EGENERIC;

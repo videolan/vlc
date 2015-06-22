@@ -43,7 +43,7 @@ public:
     EvtSpecial( intf_thread_t *pIntf, ActionType_t action )
               : EvtGeneric( pIntf ), m_action( action ) { }
     virtual ~EvtSpecial() { }
-    virtual const string getAsString() const;
+    virtual const std::string getAsString() const;
 
 private:
     /// Type of action

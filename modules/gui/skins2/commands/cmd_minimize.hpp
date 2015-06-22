@@ -42,7 +42,7 @@ public:
                  TopWindow &rWindow );
     virtual ~CmdMaximize() { }
     virtual void execute();
-    virtual string getType() const { return "maximize"; }
+    virtual std::string getType() const { return "maximize"; }
 
 private:
     WindowManager &m_rWindowManager;
@@ -59,7 +59,7 @@ public:
                  TopWindow &rWindow );
     virtual ~CmdUnmaximize() { }
     virtual void execute();
-    virtual string getType() const { return "unmaximize"; }
+    virtual std::string getType() const { return "unmaximize"; }
 
 private:
     WindowManager &m_rWindowManager;

@@ -25,7 +25,7 @@
 #include "var_list.hpp"
 
 
-const string VarList::m_type = "list";
+const std::string VarList::m_type = "list";
 
 
 VarList::VarList( intf_thread_t *pIntf ): Variable( pIntf )

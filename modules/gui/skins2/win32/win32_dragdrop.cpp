@@ -162,7 +162,7 @@ STDMETHODIMP Win32DragDrop::Drop( LPDATAOBJECT pDataObj, DWORD grfKeyState,
 
 void Win32DragDrop::HandleDrop( HDROP HDrop, int x, int y )
 {
-    list<string> files;
+    std::list<std::string> files;
 
     // Get the number of dropped files
     int nbFiles = DragQueryFileW( HDrop, 0xFFFFFFFF, NULL, 0 );

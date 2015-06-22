@@ -24,10 +24,10 @@
 #include "var_string.hpp"
 
 
-const string VarString::m_type = "string";
+const std::string VarString::m_type = "string";
 
 
-void VarString::set( string str )
+void VarString::set( std::string str )
 {
     // If the value has changed, notify the observers
     if( m_value != str )

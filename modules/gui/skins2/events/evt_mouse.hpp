@@ -51,7 +51,7 @@ public:
             : EvtInput( pIntf, mod ), m_xPos( xPos ), m_yPos( yPos ),
               m_button( button ), m_action( action ) { }
     virtual ~EvtMouse() { }
-    virtual const string getAsString() const;
+    virtual const std::string getAsString() const;
 
     // Return the event coordinates
     int getXPos() const { return m_xPos; }

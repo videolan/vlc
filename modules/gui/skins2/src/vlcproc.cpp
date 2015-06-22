@@ -141,7 +141,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // Register the equalizer bands
     for( int i = 0; i < EqualizerBands::kNbBands; i++)
     {
-        stringstream ss;
+        std::stringstream ss;
         ss << "equalizer.band(" << i << ")";
         pVarManager->registerVar( m_varEqBands.getBand( i ), ss.str() );
     }
@@ -355,7 +355,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     { \
     if( strcmp( pVariable, var ) == 0 ) \
     { \
-        string label = var; \
+        std::string label = var; \
         CmdGeneric *pCmd = new CmdCallback( pThis->getIntf(), pObj, newVal, \
                                             &VlcProc::func, label ); \
         if( pCmd ) \
@@ -406,7 +406,7 @@ int VlcProc::onGenericCallback2( vlc_object_t *pObj, const char *pVariable,
      **/
     if( strcmp( pVariable, "intf-event" ) == 0 )
     {
-        stringstream label;
+        std::stringstream label;
         bool b_remove;
         switch( newVal.i_int )
         {
@@ -761,7 +761,7 @@ void VlcProc::update_current_input()
 
         // Update art uri
         char *psz_art = input_item_GetArtURL( pItem );
-        SET_STRING( m_cVarStreamArt, string( psz_art ? psz_art : "" ) );
+        SET_STRING( m_cVarStreamArt, std::string( psz_art ? psz_art : "" ) );
         free( psz_art );
     }
 }

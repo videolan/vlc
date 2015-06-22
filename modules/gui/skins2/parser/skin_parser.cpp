@@ -26,8 +26,8 @@
 #include "interpreter.hpp"
 #include <math.h>
 
-SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
-                        const string &rPath, BuilderData *pData ):
+SkinParser::SkinParser( intf_thread_t *pIntf, const std::string &rFileName,
+                        const std::string &rPath, BuilderData *pData ):
     XMLParser( pIntf, rFileName ), m_path( rPath ), m_pData( pData ),
     m_ownData( pData == NULL ), m_xOffset( 0 ), m_yOffset( 0 )
 {
@@ -52,7 +52,7 @@ SkinParser::~SkinParser()
     }
 }
 
-inline bool SkinParser::MissingAttr( AttrList_t &attr, const string &name,
+inline bool SkinParser::MissingAttr( AttrList_t &attr, const std::string &name,
                                      const char *a )
 {
     if( attr.find(a) == attr.end() )
@@ -64,7 +64,7 @@ inline bool SkinParser::MissingAttr( AttrList_t &attr, const string &name,
     return false;
 }
 
-void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
+void SkinParser::handleBeginElement( const std::string &rName, AttrList_t &attr )
 {
 #define RequireAttr( attr, name, a ) \
     if( MissingAttr( attr, name, a ) ) return;
@@ -74,7 +74,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         RequireAttr( attr, rName, "file" );
 
         OSFactory *pFactory = OSFactory::instance( getIntf() );
-        string fullPath = m_path + pFactory->getDirSeparator() + attr["file"];
+        std::string fullPath = m_path + pFactory->getDirSeparator() + attr["file"];
         msg_Dbg( getIntf(), "opening included XML file: %s", fullPath.c_str() );
         SkinParser subParser( getIntf(), fullPath.c_str(), m_path, m_pData );
         subParser.parse();
@@ -377,7 +377,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                          attr["xmargin"], attr["ymargin"],
                          width, height, refWidth, refHeight, &x, &y );
 
-        string panelId = uniqueId( "none" );
+        std::string panelId = uniqueId( "none" );
         const BuilderData::Panel panel( panelId,
                 x + m_xOffset, y + m_yOffset,
                 attr["lefttop"], attr["rightbottom"],
@@ -569,7 +569,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         DefaultAttr( attr, "tooltiptext", "" );
         DefaultAttr( attr, "help", "" );
 
-        string newValue = attr["value"];
+        std::string newValue = attr["value"];
         if( m_curTreeId != "" )
         {
             // Slider associated to a tree
@@ -765,7 +765,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 }
 
 
-void SkinParser::handleEndElement( const string &rName )
+void SkinParser::handleEndElement( const std::string &rName )
 {
     if( rName == "Group" )
     {
@@ -807,7 +807,7 @@ int SkinParser::convertColor( const char *transcolor )
 
 
 int SkinParser::convertInRange( const char *value, int minValue, int maxValue,
-                                const string &rAttribute ) const
+                                const std::string &rAttribute ) const
 {
     int intValue = atoi( value );
 
@@ -832,22 +832,22 @@ int SkinParser::convertInRange( const char *value, int minValue, int maxValue,
 }
 
 
-const string SkinParser::generateId() const
+const std::string SkinParser::generateId() const
 {
     static int i = 1;
 
     char genId[5];
     snprintf( genId, 4, "%i", i++ );
 
-    string base = "_ReservedId_" + (string)genId;
+    std::string base = "_ReservedId_" + (std::string)genId;
 
     return base;
 }
 
 
-const string SkinParser::uniqueId( const string &id )
+const std::string SkinParser::uniqueId( const std::string &id )
 {
-    string newId;
+    std::string newId;
 
     if( m_idSet.find( id ) != m_idSet.end() )
     {
@@ -880,10 +880,10 @@ void SkinParser::getRefDimensions( int &rWidth, int &rHeight, bool toScreen )
         return;
     }
 
-    string panelId = m_panelStack.back();
+    std::string panelId = m_panelStack.back();
     if( panelId != "none" )
     {
-        list<BuilderData::Panel>::const_iterator it;
+        std::list<BuilderData::Panel>::const_iterator it;
         for( it = m_pData->m_listPanel.begin();
              it != m_pData->m_listPanel.end(); ++it )
         {
@@ -906,19 +906,19 @@ void SkinParser::getRefDimensions( int &rWidth, int &rHeight, bool toScreen )
 }
 
 
-int SkinParser::getDimension( string value, int refDimension )
+int SkinParser::getDimension( std::string value, int refDimension )
 {
-    string::size_type leftPos;
+    std::string::size_type leftPos;
 
     leftPos = value.find( "%" );
-    if( leftPos != string::npos )
+    if( leftPos != std::string::npos )
     {
         int val = atoi( value.substr( 0, leftPos ).c_str() );
         return  val * refDimension / 100;
     }
 
     leftPos = value.find( "px" );
-    if( leftPos != string::npos )
+    if( leftPos != std::string::npos )
     {
         int val = atoi( value.substr( 0, leftPos ).c_str() );
         return val;
@@ -928,7 +928,7 @@ int SkinParser::getDimension( string value, int refDimension )
 }
 
 
-int SkinParser::getPosition( string position )
+int SkinParser::getPosition( std::string position )
 {
     if( position == "-1" )
         return POS_UNDEF;
@@ -957,9 +957,9 @@ int SkinParser::getPosition( string position )
 }
 
 
-void SkinParser::convertPosition( string position, string xOffset,
-                          string yOffset, string xMargin,
-                          string yMargin, int width, int height,
+void SkinParser::convertPosition( std::string position, std::string xOffset,
+                          std::string yOffset, std::string xMargin,
+                          std::string yMargin, int width, int height,
                           int refWidth, int refHeight, int* p_x, int* p_y )
 {
     int iPosition = getPosition( position );

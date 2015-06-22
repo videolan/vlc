@@ -27,7 +27,6 @@
  *****************************************************************************/
 
 #include <deque>
-using namespace std;
 
 typedef struct VLCMediaSample
 {
@@ -62,7 +61,7 @@ class CapturePin: public IPin, public IMemInputPin
 
     AM_MEDIA_TYPE cx_media_type;
 
-    deque<VLCMediaSample> samples_queue;
+    std::deque<VLCMediaSample> samples_queue;
 
     long i_ref;
 
@@ -108,7 +107,7 @@ class CapturePin: public IPin, public IMemInputPin
 
     /* Custom methods */
     HRESULT CustomGetSample( VLCMediaSample * );
-    HRESULT CustomGetSamples( deque<VLCMediaSample> &external_queue );
+    HRESULT CustomGetSamples( std::deque<VLCMediaSample> &external_queue );
 
     AM_MEDIA_TYPE &CustomGetMediaType();
 };

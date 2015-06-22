@@ -33,16 +33,16 @@
 class IniFile: public SkinObject
 {
 public:
-    IniFile( intf_thread_t *pIntf, const string &rName,
-             const string &rPath );
+    IniFile( intf_thread_t *pIntf, const std::string &rName,
+             const std::string &rPath );
     virtual ~IniFile() { }
 
     /// Parse the INI file and fill the VarManager
     void parseFile();
 
 private:
-    string m_name;
-    string m_path;
+    std::string m_name;
+    std::string m_path;
 };
 
 

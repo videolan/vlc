@@ -38,7 +38,7 @@ public:
                   : CmdGeneric( pIntf ), m_rTree( rTree ) { }
     virtual ~CmdPlaytreeDel() { }
     virtual void execute();
-    virtual string getType() const { return "playtree del"; }
+    virtual std::string getType() const { return "playtree del"; }
 
 private:
     /// Tree

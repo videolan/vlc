@@ -56,7 +56,7 @@ void Popup::hide()
 }
 
 
-void Popup::addItem( const string &rLabel, CmdGeneric &rCmd, int pos )
+void Popup::addItem( const std::string &rLabel, CmdGeneric &rCmd, int pos )
 {
     m_pOsPopup->addItem( rLabel, pos );
     m_actions[pos] = &rCmd;

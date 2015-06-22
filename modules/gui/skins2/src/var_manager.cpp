@@ -36,7 +36,7 @@ VarManager::VarManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
 VarManager::~VarManager()
 {
     // Delete the variables in the reverse order they were added
-    list<string>::const_iterator it1;
+    std::list<std::string>::const_iterator it1;
     for( it1 = m_varList.begin(); it1 != m_varList.end(); ++it1 )
     {
         m_varMap.erase(*it1);
@@ -79,7 +79,7 @@ void VarManager::destroy( intf_thread_t *pIntf )
 }
 
 
-void VarManager::registerVar( const VariablePtr &rcVar, const string &rName )
+void VarManager::registerVar( const VariablePtr &rcVar, const std::string &rName )
 {
     m_varMap[rName] = rcVar;
     m_varList.push_front( rName );
@@ -94,7 +94,7 @@ void VarManager::registerVar( const VariablePtr &rcVar )
 }
 
 
-Variable *VarManager::getVar( const string &rName )
+Variable *VarManager::getVar( const std::string &rName )
 {
     if( m_varMap.find( rName ) != m_varMap.end() )
     {
@@ -107,7 +107,7 @@ Variable *VarManager::getVar( const string &rName )
 }
 
 
-Variable *VarManager::getVar( const string &rName, const string &rType )
+Variable *VarManager::getVar( const std::string &rName, const std::string &rType )
 {
     if( m_varMap.find( rName ) != m_varMap.end() )
     {
@@ -132,13 +132,13 @@ Variable *VarManager::getVar( const string &rName, const string &rType )
 }
 
 
-void VarManager::registerConst( const string &rName, const string &rValue)
+void VarManager::registerConst( const std::string &rName, const std::string &rValue)
 {
     m_constMap[rName] = rValue;
 }
 
 
-string VarManager::getConst( const string &rName )
+std::string VarManager::getConst( const std::string &rName )
 {
     return m_constMap[rName];
 }

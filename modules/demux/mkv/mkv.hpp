@@ -115,7 +115,6 @@ enum
 
 
 using namespace LIBMATROSKA_NAMESPACE;
-using namespace std;
 
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
                   mtime_t i_pts, mtime_t i_duration, bool b_key_picture,

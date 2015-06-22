@@ -38,7 +38,7 @@ public:
         : CmdGeneric( pIntf ), m_ontop( b_ontop ) { }
     virtual ~CmdSetOnTop() { }
     virtual void execute();
-    virtual string getType() const { return "set on top"; }
+    virtual std::string getType() const { return "set on top"; }
 
 private:
     bool m_ontop;

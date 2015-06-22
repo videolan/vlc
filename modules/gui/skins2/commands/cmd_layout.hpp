@@ -38,7 +38,7 @@ public:
                GenericLayout &rLayout );
     virtual ~CmdLayout() { }
     virtual void execute();
-    virtual string getType() const { return "change layout"; }
+    virtual std::string getType() const { return "change layout"; }
 
 private:
     TopWindow &m_rWindow;

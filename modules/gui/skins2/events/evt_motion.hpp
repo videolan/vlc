@@ -35,7 +35,7 @@ public:
     EvtMotion( intf_thread_t *pIntf, int xPos, int yPos )
              : EvtInput( pIntf ), m_xPos( xPos ), m_yPos( yPos ) { }
     virtual ~EvtMotion() { }
-    virtual const string getAsString() const { return "motion"; }
+    virtual const std::string getAsString() const { return "motion"; }
 
     // Getters
     int getXPos() const { return m_xPos; }

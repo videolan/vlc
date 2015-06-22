@@ -109,7 +109,7 @@ public:
     VarBool &getVisibleVar() { return *m_pVarVisible; }
 
     /// Window type, mainly useful when overloaded (for VoutWindow)
-    virtual string getType() const { return "Generic"; }
+    virtual std::string getType() const { return "Generic"; }
 
     /// windows handle
     vlc_wnd_type getOSHandle() const;

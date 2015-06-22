@@ -58,10 +58,10 @@ EqualizerBands::~EqualizerBands()
 }
 
 
-void EqualizerBands::set( string bands )
+void EqualizerBands::set( std::string bands )
 {
     float val;
-    stringstream ss( bands );
+    std::stringstream ss( bands );
 
     m_isUpdating = true;
     // Parse the string
@@ -91,9 +91,9 @@ void EqualizerBands::onUpdate( Subject<VarPercent> &rBand, void *arg )
     if (!m_isUpdating)
     {
         float val;
-        stringstream ss;
+        std::stringstream ss;
         // Write one digit after the floating point
-        ss << setprecision( 1 ) << setiosflags( ios::fixed );
+        ss << std::setprecision( 1 ) << std::setiosflags( std::ios::fixed );
 
         // Convert the band values to a string
         val = 40 * ((VarPercent*)m_cBands[0].get())->get() - 20;
@@ -104,7 +104,7 @@ void EqualizerBands::onUpdate( Subject<VarPercent> &rBand, void *arg )
             ss << " " << val;
         }
 
-        string bands = ss.str();
+        std::string bands = ss.str();
 
         config_PutPsz( getIntf(), "equalizer-bands", bands.c_str() );
         if( pAout )

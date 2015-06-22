@@ -108,8 +108,8 @@ void CtrlGeneric::notifyLayoutMaxSize( const Box *pImg1, const Box *pImg2 )
         }
         else
         {
-            notifyLayout( max( pImg1->getWidth(), pImg2->getWidth() ),
-                          max( pImg1->getHeight(), pImg2->getHeight() ) );
+            notifyLayout( std::max( pImg1->getWidth(), pImg2->getWidth() ),
+                          std::max( pImg1->getHeight(), pImg2->getHeight() ) );
         }
     }
 }

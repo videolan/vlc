@@ -72,12 +72,12 @@ float Volume::getVolume() const
 }
 
 
-string Volume::getAsStringPercent() const
+std::string Volume::getAsStringPercent() const
 {
     int value = lround( getVolume() * 100. );
     // 0 <= value <= 200, so we need 4 chars
     char str[4];
     snprintf( str, 4, "%i", value );
-    return string(str);
+    return std::string(str);
 }
 

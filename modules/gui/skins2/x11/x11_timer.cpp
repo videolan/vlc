@@ -109,7 +109,7 @@ void X11TimerLoop::waitNextTimer()
     X11Timer *nextTimer = NULL;
 
     // Find the next timer to execute
-    list<X11Timer*>::const_iterator timer;
+    std::list<X11Timer*>::const_iterator timer;
     for( timer = m_timers.begin(); timer != m_timers.end(); ++timer )
     {
         mtime_t timerDate = (*timer)->getNextDate();

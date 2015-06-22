@@ -37,7 +37,7 @@ EvtInput::EvtInput( intf_thread_t *pIntf, int mod )
     : EvtGeneric( pIntf), m_mod( mod ) { }
 
 
-void EvtInput::addModifier( string &rEvtString ) const
+void EvtInput::addModifier( std::string &rEvtString ) const
 {
     if( m_mod == kModNone )
     {
@@ -45,7 +45,7 @@ void EvtInput::addModifier( string &rEvtString ) const
     }
     else
     {
-        string m = ":";
+        std::string m = ":";
         if( m_mod & kModAlt )
             m += "alt,";
         if( m_mod & kModCtrl )

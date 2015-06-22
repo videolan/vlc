@@ -72,7 +72,7 @@ public:
     /// Resize the window
     virtual void resize( int width, int height );
 
-    virtual string getType() const { return "Vout"; }
+    virtual std::string getType() const { return "Vout"; }
 
 private:
 

@@ -67,14 +67,14 @@ ArtManager::~ArtManager( )
         m_pImageHandler = NULL;
     }
 
-    list<ArtBitmap*>::const_iterator it;
+    std::list<ArtBitmap*>::const_iterator it;
     for( it = m_listBitmap.begin(); it != m_listBitmap.end(); ++it )
         delete *it;
     m_listBitmap.clear();
 }
 
 
-ArtBitmap* ArtManager::getArtBitmap( string uriName )
+ArtBitmap* ArtManager::getArtBitmap( std::string uriName )
 {
     if( !uriName.size() )
         return NULL;
@@ -83,7 +83,7 @@ ArtBitmap* ArtManager::getArtBitmap( string uriName )
         return NULL;
 
     // check whether art is already loaded
-    list<ArtBitmap*>::const_iterator it;
+    std::list<ArtBitmap*>::const_iterator it;
     for( it = m_listBitmap.begin(); it != m_listBitmap.end(); ++it )
     {
         if( (*it)->getUriName() == uriName )

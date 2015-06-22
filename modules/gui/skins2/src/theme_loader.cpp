@@ -68,9 +68,9 @@ int makedir( const char *newdir );
 #   define O_BINARY 0
 #endif
 
-bool ThemeLoader::load( const string &fileName )
+bool ThemeLoader::load( const std::string &fileName )
 {
-    string path = getFilePath( fileName );
+    std::string path = getFilePath( fileName );
 
     //Before all, let's see if the file is present
     struct stat p_stat;
@@ -103,7 +103,7 @@ bool ThemeLoader::load( const string &fileName )
 
 
 #if defined( HAVE_ZLIB_H )
-bool ThemeLoader::extractTarGz( const string &tarFile, const string &rootDir )
+bool ThemeLoader::extractTarGz( const std::string &tarFile, const std::string &rootDir )
 {
     TAR *t;
 #if defined( HAVE_LIBTAR_H )
@@ -148,7 +148,7 @@ static voidpf ZCALLBACK open_vlc( voidpf opaque, const char *filename, int mode)
     return stream;
 }
 
-bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
+bool ThemeLoader::extractZip( const std::string &zipFile, const std::string &rootDir )
 {
     bool b_isWsz = strstr( zipFile.c_str(), ".wsz" );
 
@@ -201,7 +201,7 @@ bool ThemeLoader::extractZip( const string &zipFile, const string &rootDir )
 }
 
 
-bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir,
+bool ThemeLoader::extractFileInZip( unzFile file, const std::string &rootDir,
                                     bool isWsz )
 {
     // Read info for the current file
@@ -227,10 +227,10 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir,
 
     // Get the path of the file
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-    string fullPath = rootDir
+    std::string fullPath = rootDir
         + pOsFactory->getDirSeparator()
         + fixDirSeparators( filenameInZip );
-    string basePath = getFilePath( fullPath );
+    std::string basePath = getFilePath( fullPath );
 
     // Extract the file if is not a directory
     if( basePath != fullPath )
@@ -288,10 +288,10 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir,
 }
 
 
-bool ThemeLoader::extract( const string &fileName )
+bool ThemeLoader::extract( const std::string &fileName )
 {
     bool result = true;
-    string tempPath = getTmpDir();
+    std::string tempPath = getTmpDir();
     if( tempPath.empty() )
         return false;
 
@@ -303,8 +303,8 @@ bool ThemeLoader::extract( const string &fileName )
         return false;
     }
 
-    string path;
-    string xmlFile;
+    std::string path;
+    std::string xmlFile;
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
     // Find the XML file in the theme
     if( findFile( tempPath, DEFAULT_XML_FILE, xmlFile ) )
@@ -314,15 +314,15 @@ bool ThemeLoader::extract( const string &fileName )
     else
     {
         // No XML file, check if it is a winamp2 skin
-        string mainBmp;
+        std::string mainBmp;
         if( findFile( tempPath, "main.bmp", mainBmp ) )
         {
             msg_Dbg( getIntf(), "trying to load a winamp2 skin" );
             path = getFilePath( mainBmp );
 
             // Look for winamp2.xml in the resource path
-            list<string> resPath = pOsFactory->getResourcePath();
-            list<string>::const_iterator it;
+            std::list<std::string> resPath = pOsFactory->getResourcePath();
+            std::list<std::string>::const_iterator it;
             for( it = resPath.begin(); it != resPath.end(); ++it )
             {
                 if( findFile( *it, WINAMP2_XML_FILE, xmlFile ) )
@@ -352,14 +352,14 @@ bool ThemeLoader::extract( const string &fileName )
 }
 
 
-void ThemeLoader::deleteTempFiles( const string &path )
+void ThemeLoader::deleteTempFiles( const std::string &path )
 {
     OSFactory::instance( getIntf() )->rmDir( path );
 }
 #endif // HAVE_ZLIB_H
 
 
-bool ThemeLoader::parse( const string &path, const string &xmlFile )
+bool ThemeLoader::parse( const std::string &path, const std::string &xmlFile )
 {
     // File loaded
     msg_Dbg( getIntf(), "using skin file: %s", xmlFile.c_str() );
@@ -377,14 +377,14 @@ bool ThemeLoader::parse( const string &path, const string &xmlFile )
 }
 
 
-string ThemeLoader::getFilePath( const string &rFullPath )
+std::string ThemeLoader::getFilePath( const std::string &rFullPath )
 {
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-    const string &sep = pOsFactory->getDirSeparator();
+    const std::string &sep = pOsFactory->getDirSeparator();
     // Find the last separator ('/' or '\')
-    string::size_type p = rFullPath.rfind( sep, rFullPath.size() );
-    string basePath;
-    if( p != string::npos )
+    std::string::size_type p = rFullPath.rfind( sep, rFullPath.size() );
+    std::string basePath;
+    if( p != std::string::npos )
     {
         if( p < rFullPath.size() - 1)
         {
@@ -399,13 +399,13 @@ string ThemeLoader::getFilePath( const string &rFullPath )
 }
 
 
-string ThemeLoader::fixDirSeparators( const string &rPath )
+std::string ThemeLoader::fixDirSeparators( const std::string &rPath )
 {
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-    const string &sep = pOsFactory->getDirSeparator();
-    string::size_type p = rPath.find( "/", 0 );
-    string newPath = rPath;
-    while( p != string::npos )
+    const std::string &sep = pOsFactory->getDirSeparator();
+    std::string::size_type p = rPath.find( "/", 0 );
+    std::string newPath = rPath;
+    while( p != std::string::npos )
     {
         newPath = newPath.replace( p, 1, sep );
         p = newPath.find( "/", p + 1 );
@@ -414,11 +414,11 @@ string ThemeLoader::fixDirSeparators( const string &rPath )
 }
 
 
-bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
-                            string &themeFilePath )
+bool ThemeLoader::findFile( const std::string &rootDir, const std::string &rFileName,
+                            std::string &themeFilePath )
 {
     // Path separator
-    const string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
+    const std::string &sep = OSFactory::instance( getIntf() )->getDirSeparator();
 
     const char *pszDirContent;
 
@@ -435,11 +435,11 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
     // While we still have entries in the directory
     while( ( pszDirContent = vlc_readdir( pCurrDir ) ) != NULL )
     {
-        string newURI = rootDir + sep + pszDirContent;
+        std::string newURI = rootDir + sep + pszDirContent;
 
         // Skip . and ..
-        if( string( pszDirContent ) != "." &&
-            string( pszDirContent ) != ".." )
+        if( std::string( pszDirContent ) != "." &&
+            std::string( pszDirContent ) != ".." )
         {
 #if defined( S_ISDIR )
             struct stat stat_data;
@@ -462,7 +462,7 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
             else
             {
                 // Found the theme file?
-                if( rFileName == string( pszDirContent ) )
+                if( rFileName == std::string( pszDirContent ) )
                 {
                     themeFilePath = newURI;
                     closedir( pCurrDir );
@@ -816,7 +816,7 @@ int gzwrite_frontend( int fd, const void * p_buffer, size_t i_length )
 }
 
 // FIXME: could become a skins2 OS factory function or a vlc core function
-string ThemeLoader::getTmpDir( )
+std::string ThemeLoader::getTmpDir( )
 {
 #if defined( _WIN32 )
     wchar_t *tmpdir = _wtempnam( NULL, L"vlt" );
@@ -824,7 +824,7 @@ string ThemeLoader::getTmpDir( )
         return "";
     char* utf8 = FromWide( tmpdir );
     free( tmpdir );
-    string tempPath( utf8 ? utf8 : "" );
+    std::string tempPath( utf8 ? utf8 : "" );
     free( utf8 );
     return tempPath;
 
@@ -832,14 +832,14 @@ string ThemeLoader::getTmpDir( )
     char *tmpdir = tempnam( NULL, "vlt" );
     if( tmpdir == NULL )
         return "";
-    string tempPath( sFromLocale( tmpdir ));
+    std::string tempPath( sFromLocale( tmpdir ));
     free( tmpdir );
     return tempPath;
 
 #else
     char templ[] = "/tmp/vltXXXXXX";
     char *tmpdir = mkdtemp( templ );
-    return string( tmpdir ? tmpdir : "");
+    return std::string( tmpdir ? tmpdir : "");
 #endif
 }
 

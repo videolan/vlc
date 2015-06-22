@@ -178,7 +178,7 @@ bool Dialogs::init()
 }
 
 
-void Dialogs::showFileGeneric( const string &rTitle, const string &rExtensions,
+void Dialogs::showFileGeneric( const std::string &rTitle, const std::string &rExtensions,
                                DlgCallback callback, int flags )
 {
     if( m_pProvider && m_pProvider->pf_show_dialog )

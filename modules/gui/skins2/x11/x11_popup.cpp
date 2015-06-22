@@ -53,7 +53,7 @@ void X11Popup::hide()
 }
 
 
-void X11Popup::addItem( const string &rLabel, int pos )
+void X11Popup::addItem( const std::string &rLabel, int pos )
 {
     // TODO
     (void)rLabel; (void)pos;

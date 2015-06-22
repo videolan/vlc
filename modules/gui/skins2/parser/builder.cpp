@@ -63,7 +63,7 @@
 
 
 Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData,
-                  const string &rPath ):
+                  const std::string &rPath ):
     SkinObject( pIntf ), m_rData( rData ), m_path( rPath ), m_pTheme( NULL )
 {
     m_pImageHandler = image_HandlerCreate( pIntf );
@@ -74,7 +74,7 @@ Builder::~Builder()
     if( m_pImageHandler ) image_HandlerDelete( m_pImageHandler );
 }
 
-CmdGeneric *Builder::parseAction( const string &rAction )
+CmdGeneric *Builder::parseAction( const std::string &rAction )
 {
     return Interpreter::instance( getIntf() )->parseAction( rAction, m_pTheme );
 }
@@ -210,7 +210,7 @@ void Builder::addTheme( const BuilderData::Theme &rData )
 void Builder::addIniFile( const BuilderData::IniFile &rData )
 {
     // Parse the INI file
-    string full_path = getFilePath( rData.m_file );
+    std::string full_path = getFilePath( rData.m_file );
     if( !full_path.size() )
         return;
 
@@ -221,7 +221,7 @@ void Builder::addIniFile( const BuilderData::IniFile &rData )
 
 void Builder::addBitmap( const BuilderData::Bitmap &rData )
 {
-    string full_path = getFilePath( rData.m_fileName );
+    std::string full_path = getFilePath( rData.m_fileName );
     if( !full_path.size() )
         return;
 
@@ -276,7 +276,7 @@ void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
         return;
     }
 
-    string full_path = getFilePath( rData.m_file );
+    std::string full_path = getFilePath( rData.m_file );
     if( !full_path.size() )
         return;
 
@@ -306,7 +306,7 @@ void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
 void Builder::addFont( const BuilderData::Font &rData )
 {
     // Try to load the font from the theme directory
-    string full_path = getFilePath( rData.m_fontFile );
+    std::string full_path = getFilePath( rData.m_fontFile );
     if( full_path.size() )
     {
         GenericFont *pFont = new FT2Font( getIntf(), full_path, rData.m_size );
@@ -320,13 +320,13 @@ void Builder::addFont( const BuilderData::Font &rData )
 
     // Font not found; try in the resource path
     OSFactory *pOSFactory = OSFactory::instance( getIntf() );
-    const list<string> &resPath = pOSFactory->getResourcePath();
-    const string &sep = pOSFactory->getDirSeparator();
+    const std::list<std::string> &resPath = pOSFactory->getResourcePath();
+    const std::string &sep = pOSFactory->getDirSeparator();
 
-    list<string>::const_iterator it;
+    std::list<std::string>::const_iterator it;
     for( it = resPath.begin(); it != resPath.end(); ++it )
     {
-        string path = (*it) + sep + "fonts" + sep + rData.m_fontFile;
+        std::string path = (*it) + sep + "fonts" + sep + rData.m_fontFile;
         GenericFont *pFont = new FT2Font( getIntf(), path, rData.m_size );
         if( pFont->init() )
         {
@@ -499,8 +499,8 @@ void Builder::addButton( const BuilderData::Button &rData )
     int height = pBmpUp->getHeight() / pBmpUp->getNbFrames();
     bool xkeepratio = rData.m_xKeepRatio;
     bool ykeepratio = rData.m_yKeepRatio;
-    string lefttop( rData.m_leftTop );
-    string rightbottom( rData.m_rightBottom );
+    std::string lefttop( rData.m_leftTop );
+    std::string rightbottom( rData.m_rightBottom );
 
     // various checks to help skin developers debug their skin
     CHECK_BMP( pBmpDown, pBmpUp, rData.m_id );
@@ -580,8 +580,8 @@ void Builder::addCheckbox( const BuilderData::Checkbox &rData )
     int height = pBmpUp1->getHeight() / pBmpUp1->getNbFrames();
     bool xkeepratio = rData.m_xKeepRatio;
     bool ykeepratio = rData.m_yKeepRatio;
-    string lefttop( rData.m_leftTop );
-    string rightbottom( rData.m_rightBottom );
+    std::string lefttop( rData.m_leftTop );
+    std::string rightbottom( rData.m_rightBottom );
 
 
     // various checks to help skin developers debug their skin
@@ -1121,8 +1121,8 @@ void Builder::addVideo( const BuilderData::Video &rData )
 }
 
 
-const Position Builder::makePosition( const string &rLeftTop,
-                                      const string &rRightBottom,
+const Position Builder::makePosition( const std::string &rLeftTop,
+                                      const std::string &rRightBottom,
                                       int xPos, int yPos, int width,
                                       int height, const GenericRect &rRect,
                                       bool xKeepRatio, bool yKeepRatio ) const
@@ -1206,20 +1206,20 @@ const Position Builder::makePosition( const string &rLeftTop,
 }
 
 
-GenericFont *Builder::getFont( const string &fontId )
+GenericFont *Builder::getFont( const std::string &fontId )
 {
     GenericFont *pFont = m_pTheme->getFontById(fontId);
     if( !pFont && fontId == "defaultfont" )
     {
         // Get the resource path and try to load the default font
         OSFactory *pOSFactory = OSFactory::instance( getIntf() );
-        const list<string> &resPath = pOSFactory->getResourcePath();
-        const string &sep = pOSFactory->getDirSeparator();
+        const std::list<std::string> &resPath = pOSFactory->getResourcePath();
+        const std::string &sep = pOSFactory->getDirSeparator();
 
-        list<string>::const_iterator it;
+        std::list<std::string>::const_iterator it;
         for( it = resPath.begin(); it != resPath.end(); ++it )
         {
-            string path = (*it) + sep + "fonts" + sep + "FreeSans.ttf";
+            std::string path = (*it) + sep + "fonts" + sep + "FreeSans.ttf";
             pFont = new FT2Font( getIntf(), path, 12 );
             if( pFont->init() )
             {
@@ -1242,29 +1242,29 @@ GenericFont *Builder::getFont( const string &fontId )
 }
 
 
-string Builder::getFilePath( const string &rFileName ) const
+std::string Builder::getFilePath( const std::string &rFileName ) const
 {
     OSFactory *pFactory = OSFactory::instance( getIntf() );
-    const string &sep = pFactory->getDirSeparator();
+    const std::string &sep = pFactory->getDirSeparator();
 
-    string file = rFileName;
-    if( file.find( "\\" ) != string::npos )
+    std::string file = rFileName;
+    if( file.find( "\\" ) != std::string::npos )
     {
         // For skins to be valid on both Linux and Win32,
         // slash should be used as path separator for both OSs.
         msg_Warn( getIntf(), "use of '/' is preferred to '\\' for paths" );
-        string::size_type pos;
-        while( ( pos = file.find( "\\" ) ) != string::npos )
+        std::string::size_type pos;
+        while( ( pos = file.find( "\\" ) ) != std::string::npos )
            file[pos] = '/';
     }
 
 #if defined( _WIN32 ) || defined( __OS2__ )
-    string::size_type pos;
-    while( ( pos = file.find( "/" ) ) != string::npos )
+    std::string::size_type pos;
+    while( ( pos = file.find( "/" ) ) != std::string::npos )
        file.replace( pos, 1, sep );
 #endif
 
-    string full_path = m_path + sep + file;
+    std::string full_path = m_path + sep + file;
 
     // check that the file exists
     struct stat stat;
@@ -1281,7 +1281,7 @@ string Builder::getFilePath( const string &rFileName ) const
 
 Bezier *Builder::getPoints( const char *pTag ) const
 {
-    vector<float> xBez, yBez;
+    std::vector<float> xBez, yBez;
     int x, y, n;
     while( 1 )
     {
@@ -1308,11 +1308,11 @@ Bezier *Builder::getPoints( const char *pTag ) const
 }
 
 
-uint32_t Builder::getColor( const string &rVal ) const
+uint32_t Builder::getColor( const std::string &rVal ) const
 {
     // Check it the value is a registered constant
     Interpreter *pInterpreter = Interpreter::instance( getIntf() );
-    string val = pInterpreter->getConstant( rVal );
+    std::string val = pInterpreter->getConstant( rVal );
 
     // Convert to an int value
     return SkinParser::convertColor( val.c_str() );

@@ -40,7 +40,7 @@ public:
     virtual ~VarPercent() { }
 
     /// Get the variable type
-    virtual const string &getType() const { return m_type; }
+    virtual const std::string &getType() const { return m_type; }
 
     /// Set the internal value
     virtual void set( float percentage );
@@ -55,7 +55,7 @@ public:
 
 private:
     /// Variable type
-    static const string m_type;
+    static const std::string m_type;
     /// Percent value
     float m_value;
     /// preferred step (for scrolling)

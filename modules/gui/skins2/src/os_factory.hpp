@@ -111,10 +111,10 @@ public:
     virtual OSPopup *createOSPopup() = 0;
 
     /// Get the directory separator
-    virtual const string &getDirSeparator() const = 0;
+    virtual const std::string &getDirSeparator() const = 0;
 
     /// Get the resource path
-    virtual const list<string> &getResourcePath() const = 0;
+    virtual const std::list<std::string> &getResourcePath() const = 0;
 
     /// Get the screen size
     virtual int getScreenWidth() const = 0;
@@ -139,7 +139,7 @@ public:
     virtual void changeCursor( CursorType_t type ) const = 0;
 
     /// Delete a directory recursively
-    virtual void rmDir( const string &rPath ) = 0;
+    virtual void rmDir( const std::string &rPath ) = 0;
 
 protected:
     // Protected because it's a singleton

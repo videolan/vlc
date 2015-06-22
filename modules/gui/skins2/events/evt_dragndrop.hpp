@@ -34,7 +34,7 @@ class EvtDrag: public EvtGeneric
 public:
     EvtDrag( intf_thread_t *pIntf ): EvtGeneric( pIntf ) { }
     virtual ~EvtDrag() { }
-    virtual const string getAsString() const { return "drag"; }
+    virtual const std::string getAsString() const { return "drag"; }
 };
 
 
@@ -43,7 +43,7 @@ class EvtDragEnter: public EvtDrag
 public:
     EvtDragEnter( intf_thread_t *pIntf ): EvtDrag( pIntf ) { }
     virtual ~EvtDragEnter() { }
-    virtual const string getAsString() const { return "drag:enter"; }
+    virtual const std::string getAsString() const { return "drag:enter"; }
 };
 
 
@@ -52,7 +52,7 @@ class EvtDragLeave: public EvtDrag
 public:
     EvtDragLeave( intf_thread_t *pIntf ): EvtDrag( pIntf ) { }
     virtual ~EvtDragLeave() { }
-    virtual const string getAsString() const { return "drag:leave"; }
+    virtual const std::string getAsString() const { return "drag:leave"; }
 };
 
 
@@ -62,7 +62,7 @@ public:
     EvtDragOver( intf_thread_t *pIntf, int x, int y )
         : EvtDrag( pIntf ), m_xPos( x ), m_yPos( y ) { }
     virtual ~EvtDragOver() { }
-    virtual const string getAsString() const { return "drag:over"; }
+    virtual const std::string getAsString() const { return "drag:over"; }
     // Return the event coordinates
     int getXPos() const { return m_xPos; }
     int getYPos() const { return m_yPos; }
@@ -74,16 +74,16 @@ private:
 class EvtDragDrop: public EvtDrag
 {
 public:
-    EvtDragDrop( intf_thread_t *pIntf, int x, int y, const list<string>& files )
+    EvtDragDrop( intf_thread_t *pIntf, int x, int y, const std::list<std::string>& files )
         : EvtDrag( pIntf ), m_files( files ), m_xPos( x ), m_yPos( y ) { }
     virtual ~EvtDragDrop() { }
-    virtual const string getAsString() const { return "drag:drop"; }
+    virtual const std::string getAsString() const { return "drag:drop"; }
     // Return the event coordinates
     int getXPos() const { return m_xPos; }
     int getYPos() const { return m_yPos; }
-    const list<string>& getFiles() const { return m_files; }
+    const std::list<std::string>& getFiles() const { return m_files; }
 private:
-    list<string> m_files;
+    std::list<std::string> m_files;
     int m_xPos;
     int m_yPos;
 };

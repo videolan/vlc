@@ -63,9 +63,9 @@ static int AccessControl ( access_t *, int, va_list );
 static int Demux       ( demux_t * );
 static int DemuxControl( demux_t *, int, va_list );
 
-static int OpenDevice( vlc_object_t *, access_sys_t *, string, bool );
-static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
-                                       list<string> *, bool );
+static int OpenDevice( vlc_object_t *, access_sys_t *, std::string, bool );
+static IBaseFilter *FindCaptureDevice( vlc_object_t *, std::string *,
+                                       std::list<std::string> *, bool );
 static size_t EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
                               int, int, int, int, int, int,
                               AM_MEDIA_TYPE *mt, size_t );
@@ -305,7 +305,7 @@ vlc_module_end ()
  *****************************************************************************/
 typedef struct dshow_stream_t
 {
-    string          devicename;
+    std::string          devicename;
     IBaseFilter     *p_device_filter;
     CaptureFilter   *p_capture_filter;
     AM_MEDIA_TYPE   mt;
@@ -322,7 +322,7 @@ typedef struct dshow_stream_t
 
     bool      b_pts;
 
-    deque<VLCMediaSample> samples_queue;
+    std::deque<VLCMediaSample> samples_queue;
 } dshow_stream_t;
 
 /*****************************************************************************
@@ -397,7 +397,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     char *psz_val;
 
     /* Get/parse options and open device(s) */
-    string vdevname, adevname;
+    std::string vdevname, adevname;
     int i_width = 0, i_height = 0;
     vlc_fourcc_t i_chroma = 0;
     bool b_use_audio = true;
@@ -415,7 +415,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
         msg_Dbg( p_this, "dshow-vdev: %s", psz_val ) ;
         /* skip none device */
         if ( strncasecmp( psz_val, "none", 4 ) != 0 )
-            vdevname = string( psz_val );
+            vdevname = std::string( psz_val );
         else
             b_use_video = false ;
     }
@@ -427,7 +427,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
         msg_Dbg( p_this, "dshow-adev: %s", psz_val ) ;
         /* skip none device */
         if ( strncasecmp( psz_val, "none", 4 ) != 0 )
-            adevname = string( psz_val );
+            adevname = std::string( psz_val );
         else
             b_use_audio = false ;
     }
@@ -989,7 +989,7 @@ static int GetFourCCPriority( int i_fourcc )
 #define MAX_MEDIA_TYPES 32
 
 static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
-                       string devicename, bool b_audio )
+                       std::string devicename, bool b_audio )
 {
     /* See if device is already opened */
     for( int i = 0; i < p_sys->i_streams; i++ )
@@ -1002,14 +1002,14 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         }
     }
 
-    list<string> list_devices;
+    std::list<std::string> list_devices;
 
     /* Enumerate devices and display their names */
     FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
     if( list_devices.empty() )
         return VLC_EGENERIC;
 
-    list<string>::iterator iter;
+    std::list<std::string>::iterator iter;
     for( iter = list_devices.begin(); iter != list_devices.end(); ++iter )
         msg_Dbg( p_this, "found device: %s", iter->c_str() );
 
@@ -1203,14 +1203,14 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
    These actions *may* be requested whith a single call.
 */
 static IBaseFilter *
-FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
-                   list<string> *p_listdevices, bool b_audio )
+FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
+                   std::list<std::string> *p_listdevices, bool b_audio )
 {
     IBaseFilter *p_base_filter = NULL;
     IMoniker *p_moniker = NULL;
     ULONG i_fetched;
     HRESULT hr;
-    list<string> devicelist;
+    std::list<std::string> devicelist;
 
     /* Create the system device enumerator */
     ICreateDevEnum *p_dev_enum = NULL;
@@ -1267,14 +1267,14 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
             if( SUCCEEDED(hr) )
             {
                 char *p_buf = FromWide( var.bstrVal );
-                string devname = string(p_buf);
+                std::string devname(p_buf);
                 free( p_buf) ;
 
                 int dup = 0;
                 /* find out if this name is already used by a previously found device */
-                list<string>::const_iterator iter = devicelist.begin();
-                list<string>::const_iterator end = devicelist.end();
-                string ordevname = devname ;
+                std::list<std::string>::const_iterator iter = devicelist.begin();
+                std::list<std::string>::const_iterator end = devicelist.end();
+                std::string ordevname = devname ;
                 while ( iter != end )
                 {
                     if( 0 == (*iter).compare( devname ) )
@@ -1982,7 +1982,7 @@ static int FindDevices( vlc_object_t *p_this, const char *psz_name,
                             char ***vp, char ***tp )
 {
     /* Find list of devices */
-    list<string> list_devices;
+    std::list<std::string> list_devices;
     if( SUCCEEDED(CoInitializeEx( NULL, COINIT_MULTITHREADED ))
      || SUCCEEDED(CoInitializeEx( NULL, COINIT_APARTMENTTHREADED )) )
     {
@@ -2001,7 +2001,7 @@ static int FindDevices( vlc_object_t *p_this, const char *psz_name,
     values[1] = strdup( "none" );
     texts[1] = strdup( N_("None") );
 
-    for( list<string>::iterator iter = list_devices.begin();
+    for( std::list<std::string>::iterator iter = list_devices.begin();
          iter != list_devices.end();
          ++iter )
     {

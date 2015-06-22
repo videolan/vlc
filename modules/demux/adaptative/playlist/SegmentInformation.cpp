@@ -27,7 +27,6 @@
 #include "AbstractPlaylist.hpp"
 
 using namespace adaptative::playlist;
-using namespace std;
 
 SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
     ICanonicalUrl( parent_ ),
@@ -69,7 +68,7 @@ AbstractPlaylist * SegmentInformation::getPlaylist() const
         return NULL;
 }
 
-std::size_t SegmentInformation::getSegments(SegmentInfoType type, vector<ISegment *> &retSegments,
+std::size_t SegmentInformation::getSegments(SegmentInfoType type, std::vector<ISegment *> &retSegments,
                                             std::size_t *offset) const
 {
     std::size_t off = 0;
@@ -148,11 +147,11 @@ std::size_t SegmentInformation::getSegments(SegmentInfoType type, vector<ISegmen
     }
 }
 
-std::size_t SegmentInformation::getAllSegments(vector<ISegment *> &retSegments) const
+std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegments) const
 {
     for(int i=0; i<InfoTypeCount; i++)
     {
-        vector<ISegment *> segs;
+        std::vector<ISegment *> segs;
         if( getSegments(static_cast<SegmentInfoType>(i), segs) )
             retSegments.insert( retSegments.end(), segs.begin(), segs.end() );
     }
@@ -163,7 +162,7 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
 {
     ISegment *segment = NULL;
 
-    vector<ISegment *> retSegments;
+    std::vector<ISegment *> retSegments;
     std::size_t offset = 0;
     const size_t size = getSegments( type, retSegments, &offset );
     if( size )

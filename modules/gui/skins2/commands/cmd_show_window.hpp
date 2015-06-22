@@ -41,7 +41,7 @@ public:
         CmdGeneric( pIntf ), m_rWinManager( rWinManager ), m_rWin( rWin ) { }
     virtual ~CmdShowWindow() { }
     virtual void execute() { m_rWinManager.show( m_rWin ); }
-    virtual string getType() const { return "show window"; }
+    virtual std::string getType() const { return "show window"; }
 
 private:
     /// Reference to the window manager
@@ -60,7 +60,7 @@ public:
         CmdGeneric( pIntf ), m_rWinManager( rWinManager ), m_rWin( rWin ) { }
     virtual ~CmdHideWindow() { }
     virtual void execute() { m_rWinManager.hide( m_rWin ); }
-    virtual string getType() const { return "hide window"; }
+    virtual std::string getType() const { return "hide window"; }
 
 private:
     /// Reference to the window manager
@@ -78,7 +78,7 @@ public:
         CmdGeneric( pIntf ), m_rWinManager( rWinManager ) { }
     virtual ~CmdRaiseAll() { }
     virtual void execute() { m_rWinManager.raiseAll(); }
-    virtual string getType() const { return "raise all windows"; }
+    virtual std::string getType() const { return "raise all windows"; }
 
 private:
     /// Reference to the window manager
@@ -101,7 +101,7 @@ public:
         m_rPopup.show( x, y );
     }
 
-    virtual string getType() const { return "show popup"; }
+    virtual std::string getType() const { return "show popup"; }
 
 private:
     /// Reference to the popup

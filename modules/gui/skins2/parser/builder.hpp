@@ -49,7 +49,7 @@ class Builder: public SkinObject
 {
 public:
     Builder( intf_thread_t *pIntf, const BuilderData &rData,
-             const string &rPath );
+             const std::string &rPath );
     virtual ~Builder();
 
     /// Create a Theme object, ready to use.
@@ -57,13 +57,13 @@ public:
     Theme *build();
 
     /// Parse an action tag and returns a command
-    CmdGeneric *parseAction( const string &rAction );
+    CmdGeneric *parseAction( const std::string &rAction );
 
 private:
     /// Data from the XML
     const BuilderData &m_rData;
     /// Path of the theme
-    const string m_path;
+    const std::string m_path;
 
     /// Theme under construction
     Theme *m_pTheme;
@@ -96,24 +96,24 @@ private:
                                        void (Builder::*addfn)(const T &));
 
     /// Compute the position of a control
-    const Position makePosition( const string &rLeftTop,
-                                 const string &rRightBottom,
+    const Position makePosition( const std::string &rLeftTop,
+                                 const std::string &rRightBottom,
                                  int xPos, int yPos, int width, int height,
                                  const GenericRect &rRect,
                                  bool xKeepRatio = false,
                                  bool yKeepRatio = false ) const;
 
     // Build the full path of a file
-    string getFilePath( const string &fileName ) const;
+    std::string getFilePath( const std::string &fileName ) const;
 
     /// Get a font from its id
-    GenericFont *getFont( const string &fontId );
+    GenericFont *getFont( const std::string &fontId );
 
     /// Function to parse "points" tags
     Bezier *getPoints( const char *pTag ) const;
 
     /// Compute a color value
-    uint32_t getColor( const string &rVal ) const;
+    uint32_t getColor( const std::string &rVal ) const;
 
     /// Image handler (used to load image files)
     image_handler_t *m_pImageHandler;

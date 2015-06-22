@@ -26,14 +26,14 @@
 #include "../commands/cmd_generic.hpp"
 
 
-void FSM::addState( const string &state )
+void FSM::addState( const std::string &state )
 {
     m_states.insert( state );
 }
 
 
-void FSM::addTransition( const string &state1, const string &event,
-                         const string &state2, CmdGeneric *pCmd )
+void FSM::addTransition( const std::string &state1, const std::string &event,
+                         const std::string &state2, CmdGeneric *pCmd )
 {
     // Check that we already know the states
     if( m_states.find( state1 ) == m_states.end() ||
@@ -58,7 +58,7 @@ void FSM::addTransition( const string &state1, const string &event,
 }
 
 
-void FSM::setState( const string &state )
+void FSM::setState( const std::string &state )
 {
     if( m_states.find( state ) == m_states.end() )
     {
@@ -69,11 +69,11 @@ void FSM::setState( const string &state )
 }
 
 
-void FSM::handleTransition( const string &event )
+void FSM::handleTransition( const std::string &event )
 {
-    string tmpEvent = event;
+    std::string tmpEvent = event;
     Key_t key( m_currentState, event );
-    map<Key_t, Data_t>::const_iterator it;
+    std::map<Key_t, Data_t>::const_iterator it;
 
     // Find a transition
     it = m_transitions.find( key );
@@ -81,7 +81,7 @@ void FSM::handleTransition( const string &event )
     // While the matching fails, try to match a more generic transition
     // For example, if "key:up:F" isn't a transition, "key:up" or "key" may be
     while( it == m_transitions.end() &&
-           tmpEvent.rfind( ":", tmpEvent.size() ) != string::npos )
+           tmpEvent.rfind( ":", tmpEvent.size() ) != std::string::npos )
     {
         // Cut the last part
         tmpEvent = tmpEvent.substr( 0, tmpEvent.rfind( ":", tmpEvent.size() ) );

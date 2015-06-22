@@ -49,7 +49,7 @@ protected:
 
 private:
     /// Look for themes in a directory
-    void parseDirectory( const string &rDir );
+    void parseDirectory( const std::string &rDir );
 
     /// Callback for menu item selection
     static int changeSkin( vlc_object_t *pThis, char const *pVariable,
@@ -57,7 +57,7 @@ private:
                            void *pData );
 
     /// list of skins available
-    map<string,string> m_skinsMap;
+    std::map<std::string,std::string> m_skinsMap;
 };
 
 

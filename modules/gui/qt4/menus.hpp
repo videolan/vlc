@@ -31,8 +31,6 @@
 #include <QMenu>
 #include <QVector>
 
-using namespace std;
-
 class MenuItemData : public QObject
 {
     Q_OBJECT

@@ -75,7 +75,7 @@ public:
     virtual bool isScrollable() const { return true; }
 
     /// Get the type of control (custom RTTI)
-    virtual string getType() const { return "tree"; }
+    virtual std::string getType() const { return "tree"; }
 
     /// Make sure an item is visible
     /// \param item an iterator to a tree item

@@ -275,7 +275,7 @@ void Playtree::onUpdateSlider()
     notify( &descr );
 }
 
-void Playtree::insertItems( VarTree& elem, const list<string>& files, bool start )
+void Playtree::insertItems( VarTree& elem, const std::list<std::string>& files, bool start )
 {
     bool first = true;
     VarTree* p_elem = &elem;
@@ -324,7 +324,7 @@ void Playtree::insertItems( VarTree& elem, const list<string>& files, bool start
     if( !p_node )
         goto fin;
 
-    for( list<string>::const_iterator it = files.begin();
+    for( std::list<std::string>::const_iterator it = files.begin();
          it != files.end(); ++it, i_pos++, first = false )
     {
         input_item_t *pItem;
@@ -367,7 +367,7 @@ UString* Playtree::getTitle( input_item_t *pItem )
 
 VarTree::Iterator Playtree::findById( int id )
 {
-    map<int,VarTree*>::iterator it = m_allItems.find( id );
+    std::map<int,VarTree*>::iterator it = m_allItems.find( id );
     if( it == m_allItems.end() )
         return m_children.end();
     else

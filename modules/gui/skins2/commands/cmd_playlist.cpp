@@ -86,11 +86,11 @@ void CmdPlaylistSave::execute()
     if( pPlaylist != NULL )
     {
         const char *psz_module;
-        if( m_file.find( ".xsp", 0 ) != string::npos )
+        if( m_file.find( ".xsp", 0 ) != std::string::npos )
             psz_module = "export-xspf";
-        else if( m_file.find( "m3u", 0 ) != string::npos )
+        else if( m_file.find( "m3u", 0 ) != std::string::npos )
             psz_module = "export-m3u";
-        else if( m_file.find( "html", 0 ) != string::npos )
+        else if( m_file.find( "html", 0 ) != std::string::npos )
             psz_module = "export-html";
         else
         {

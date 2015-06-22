@@ -157,9 +157,9 @@ protected:
 
 private:
 
-    vector<CtrlVideo *> m_pCtrlVideoVec;
-    vector<CtrlVideo *> m_pCtrlVideoVecBackup;
-    vector<SavedWnd> m_SavedWndVec;
+    std::vector<CtrlVideo *> m_pCtrlVideoVec;
+    std::vector<CtrlVideo *> m_pCtrlVideoVecBackup;
+    std::vector<SavedWnd> m_SavedWndVec;
 
     VoutMainWindow* m_pVoutMainWindow;
 

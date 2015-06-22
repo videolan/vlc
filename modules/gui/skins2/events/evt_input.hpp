@@ -44,7 +44,7 @@ protected:
     EvtInput( intf_thread_t *pIntf, int mod = kModNone );
 
     /// Add the modifier to the event string
-    void addModifier( string &rEvtString ) const;
+    void addModifier( std::string &rEvtString ) const;
 
 private:
     /// Modifiers (special key(s) pressed during the mouse event)

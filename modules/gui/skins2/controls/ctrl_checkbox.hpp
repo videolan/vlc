@@ -67,7 +67,7 @@ public:
     virtual UString getTooltipText() const { return *m_pTooltip; }
 
     /// Get the type of control (custom RTTI)
-    virtual string getType() const { return "checkbox"; }
+    virtual std::string getType() const { return "checkbox"; }
 
 private:
     /// Finite state machine of the control

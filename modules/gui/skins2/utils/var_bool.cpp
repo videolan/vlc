@@ -25,7 +25,7 @@
 #include "var_bool.hpp"
 
 
-const string VarBool::m_type = "bool";
+const std::string VarBool::m_type = "bool";
 
 
 VarBoolImpl::VarBoolImpl( intf_thread_t *pIntf ):

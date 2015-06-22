@@ -84,11 +84,11 @@ bool X11Factory::init()
 
     // Initialize the resource path
     char *datadir = config_GetUserDir( VLC_DATA_DIR );
-    m_resourcePath.push_back( (string)datadir + "/skins2" );
+    m_resourcePath.push_back( (std::string)datadir + "/skins2" );
     free( datadir );
-    m_resourcePath.push_back( (string)"share/skins2" );
+    m_resourcePath.push_back( (std::string)"share/skins2" );
     datadir = config_GetDataDir();
-    m_resourcePath.push_back( (string)datadir + "/skins2" );
+    m_resourcePath.push_back( (std::string)datadir + "/skins2" );
     free( datadir );
 
     // Determine the monitor geometry
@@ -338,7 +338,7 @@ void X11Factory::getMousePos( int &rXPos, int &rYPos ) const
 }
 
 
-void X11Factory::rmDir( const string &rPath )
+void X11Factory::rmDir( const std::string &rPath )
 {
     struct dirent *file;
     DIR *dir;
@@ -350,7 +350,7 @@ void X11Factory::rmDir( const string &rPath )
     while( (file = readdir( dir )) )
     {
         struct stat statbuf;
-        string filename = file->d_name;
+        std::string filename = file->d_name;
 
         // Skip "." and ".."
         if( filename == "." || filename == ".." )

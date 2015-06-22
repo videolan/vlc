@@ -34,7 +34,7 @@ class EvtLeave: public EvtInput
 public:
     EvtLeave( intf_thread_t *pIntf ): EvtInput( pIntf ) { }
     virtual ~EvtLeave() { }
-    virtual const string getAsString() const { return "leave"; }
+    virtual const std::string getAsString() const { return "leave"; }
 };
 
 

@@ -65,7 +65,7 @@ public:
     virtual bool isScrollable() const { return true; }
 
     /// Get the type of control (custom RTTI)
-    virtual string getType() const { return "list"; }
+    virtual std::string getType() const { return "list"; }
 
 private:
     /// List associated to the control

@@ -321,7 +321,7 @@ SimpleTag * matroska_segment_c::ParseSimpleTags( KaxTagSimple *tag, int target_t
             {
                 KaxTagLangue &language = *(KaxTagLangue*) el;
                 language.ReadData( es.I_O(), SCOPE_ALL_DATA );
-                p_simple->psz_lang = strdup( string( language ).c_str());
+                p_simple->psz_lang = strdup( std::string( language ).c_str());
             }
             else if(  MKV_IS_ID( el, KaxTagDefault ) )
             {
@@ -1268,7 +1268,7 @@ void matroska_segment_c::EnsureDuration()
             {
                 KaxSimpleBlock *block = (KaxSimpleBlock*)l;
                 block->SetParent( *p_last_cluster );
-                i_last_timecode = max(i_last_timecode, block->GlobalTimecode());
+                i_last_timecode = std::max(i_last_timecode, block->GlobalTimecode());
             }
             else if( MKV_IS_ID( l, KaxBlockGroup ) )
             {
@@ -1290,7 +1290,7 @@ void matroska_segment_c::EnsureDuration()
                         i_group_timecode += uint64( dur );
                     }
                 }
-                i_last_timecode = max(i_last_timecode, i_group_timecode);
+                i_last_timecode = std::max(i_last_timecode, i_group_timecode);
             }
         }
 

@@ -121,7 +121,7 @@ private:
      *  parameters
      *  The 'flags' parameter is a logical or of the flags_t values
      */
-    void showFileGeneric( const string &rTitle, const string &rExtensions,
+    void showFileGeneric( const std::string &rTitle, const std::string &rExtensions,
                           DlgCallback callback, int flags );
 
     /// Callback for the Change Skin dialog

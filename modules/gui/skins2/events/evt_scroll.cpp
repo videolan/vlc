@@ -25,9 +25,9 @@
 #include "evt_scroll.hpp"
 
 
-const string EvtScroll::getAsString() const
+const std::string EvtScroll::getAsString() const
 {
-    string event = "scroll";
+    std::string event = "scroll";
 
     // Add the direction
     if( m_direction == kUp )

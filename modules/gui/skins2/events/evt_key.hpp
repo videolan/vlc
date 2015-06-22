@@ -41,7 +41,7 @@ public:
     EvtKey( intf_thread_t *I, int key, ActionType_t actn, int mod = kModNone )
           : EvtInput( I, mod ), m_key( key ), m_action( actn ) { }
     virtual ~EvtKey() { }
-    virtual const string getAsString() const;
+    virtual const std::string getAsString() const;
 
     int getKey() const { return m_key; }
     int getModKey() const { return m_key | getMod(); }

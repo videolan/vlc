@@ -90,7 +90,7 @@ private:
     /// Connection number of the X11 display
     int m_connectionNumber;
     /// List of timers
-    list<X11Timer*> m_timers;
+    std::list<X11Timer*> m_timers;
 
     /// Sleep for delay milliseconds, unless an X11 event is received.
     /// Returns true if the sleep has been interupted.

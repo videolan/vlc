@@ -236,7 +236,7 @@ CapturePin::~CapturePin()
  * @return S_OK if a sample was available, S_FALSE if no sample was
  * available
  */
-HRESULT CapturePin::CustomGetSamples( deque<VLCMediaSample> &external_queue )
+HRESULT CapturePin::CustomGetSamples( std::deque<VLCMediaSample> &external_queue )
 {
 #if 0 //def DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::CustomGetSamples: %d samples in the queue", samples_queue.size());

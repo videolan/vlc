@@ -39,7 +39,7 @@ public:
                                      m_width( width ), m_height( height ) { }
 
     virtual ~EvtRefresh() { }
-    virtual const string getAsString() const { return "refresh"; }
+    virtual const std::string getAsString() const { return "refresh"; }
 
     /// Getters
     int getXStart() const { return m_xStart; }

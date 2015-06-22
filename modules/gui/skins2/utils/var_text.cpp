@@ -29,7 +29,7 @@
 #include "../vars/volume.hpp"
 
 
-const string VarText::m_type = "text";
+const std::string VarText::m_type = "text";
 
 
 VarText::VarText( intf_thread_t *pIntf, bool substVars ): Variable( pIntf ),

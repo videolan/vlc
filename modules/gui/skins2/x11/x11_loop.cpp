@@ -340,7 +340,7 @@ void X11Loop::handleX11Event()
         case ClientMessage:
         {
             // Get the message type
-            string type = XGetAtomName( XDISPLAY, event.xclient.message_type );
+            std::string type = XGetAtomName( XDISPLAY, event.xclient.message_type );
 
             // Find the DnD object for this window
             X11DragDrop *pDnd =

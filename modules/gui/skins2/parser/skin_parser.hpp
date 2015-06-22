@@ -43,8 +43,8 @@ public:
         POS_BOTTOM = 16,
     };
 
-    SkinParser( intf_thread_t *pIntf, const string &rFileName,
-                const string &rPath, BuilderData *pData = NULL );
+    SkinParser( intf_thread_t *pIntf, const std::string &rFileName,
+                const std::string &rPath, BuilderData *pData = NULL );
     virtual ~SkinParser();
 
     const BuilderData &getData() const { return *m_pData; }
@@ -53,34 +53,34 @@ public:
 
 private:
     /// Path of the theme
-    const string m_path;
+    const std::string m_path;
     /// Container for mapping data from the XML
     BuilderData *m_pData;
     /// Indicate whether the class owns the data
     bool m_ownData;
     /// Current IDs
-    string m_curBitmapId;
-    string m_curWindowId;
-    string m_curLayoutId;
-    string m_curPopupId;
-    string m_curListId;
-    string m_curTreeId;
+    std::string m_curBitmapId;
+    std::string m_curWindowId;
+    std::string m_curLayoutId;
+    std::string m_curPopupId;
+    std::string m_curListId;
+    std::string m_curTreeId;
     /// Current position of menu items in the popups
-    list<int> m_popupPosList;
+    std::list<int> m_popupPosList;
     /// Current offset of the controls
     int m_xOffset, m_yOffset;
-    list<int> m_xOffsetList, m_yOffsetList;
+    std::list<int> m_xOffsetList, m_yOffsetList;
     /// Stack of panel ids
-    list<string> m_panelStack;
+    std::list<std::string> m_panelStack;
     /// Layer of the current control in the layout
     int m_curLayer;
     /// Set of used id
-    set<string> m_idSet;
+    std::set<std::string> m_idSet;
 
     /// Callbacks
-    virtual void handleBeginElement( const string &rName,
+    virtual void handleBeginElement( const std::string &rName,
                                      AttrList_t &attr );
-    virtual void handleEndElement( const string &rName );
+    virtual void handleEndElement( const std::string &rName );
 
     /// Helper functions
     //@{
@@ -88,24 +88,24 @@ private:
     /// Transform to int, and check that it is in the given range (if not,
     /// the closest range boundary will be used)
     int convertInRange( const char *value, int minValue, int maxValue,
-                        const string &rAttribute ) const;
+                        const std::string &rAttribute ) const;
     //@}
 
     /// Generate a new id
-    const string generateId() const;
+    const std::string generateId() const;
 
     /// Check if the id is unique, and if not generate a new one
-    const string uniqueId( const string &id );
+    const std::string uniqueId( const std::string &id );
 
     /// Management of relative positions
     void getRefDimensions( int &rWidth, int &rHeight, bool toScreen );
-    int getDimension( string value, int refDimension );
-    int getPosition( string value );
+    int getDimension( std::string value, int refDimension );
+    int getPosition( std::string value );
     void updateWindowPos( int width, int height );
 
-    void convertPosition( string position,
-                          string xOffset, string yOffset,
-                          string xMargin, string yMargin,
+    void convertPosition( std::string position,
+                          std::string xOffset, std::string yOffset,
+                          std::string xMargin, std::string yMargin,
                           int width, int height, int refWidth, int refHeight,
                           int* p_x, int* p_y );
 
@@ -115,7 +115,7 @@ private:
         if( attr.find(a) == attr.end() ) attr[strdup(a)] = strdup(b);
     }
     /// Helper for handleBeginElement: Complain if a named attribute is missing.
-    bool MissingAttr( AttrList_t &attr, const string &name, const char *a );
+    bool MissingAttr( AttrList_t &attr, const std::string &name, const char *a );
 
 };
 

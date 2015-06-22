@@ -40,16 +40,16 @@ public:
     static void destroy( intf_thread_t *pIntf );
 
     /// Register a named variable in the manager
-    void registerVar( const VariablePtr &rcVar, const string &rName );
+    void registerVar( const VariablePtr &rcVar, const std::string &rName );
 
     /// Register an anonymous variable in the manager
     void registerVar( const VariablePtr &rcVar );
 
     /// Get a variable by its name (NULL if not found)
-    Variable *getVar( const string &rName );
+    Variable *getVar( const std::string &rName );
 
     /// Get a variable by its name and check the type (NULL if not found)
-    Variable *getVar( const string &rName, const string &rType );
+    Variable *getVar( const std::string &rName, const std::string &rType );
 
     /// Get the tooltip text variable
     VarText &getTooltipText() { return *m_pTooltipText; }
@@ -58,10 +58,10 @@ public:
     VarText &getHelpText() { return *m_pHelpText; }
 
     /// Register a constant value
-    void registerConst( const string &rName, const string &rValue);
+    void registerConst( const std::string &rName, const std::string &rValue);
 
     /// Get a constant value by its name
-    string getConst( const string &rName );
+    std::string getConst( const std::string &rName );
 
 private:
     /// Tooltip text
@@ -69,13 +69,13 @@ private:
     /// Help text
     VarText *m_pHelpText;
     /// Map of named registered variables
-    map<string, VariablePtr> m_varMap;
+    std::map<std::string, VariablePtr> m_varMap;
     /// List of named registed variables
-    list<string> m_varList;
+    std::list<std::string> m_varList;
     /// List of anonymous registed variables
-    list<VariablePtr> m_anonVarList;
+    std::list<VariablePtr> m_anonVarList;
     /// Map of constant values
-    map<string, string> m_constMap;
+    std::map<std::string, std::string> m_constMap;
 
     /// Private because it is a singleton
     VarManager( intf_thread_t *pIntf );

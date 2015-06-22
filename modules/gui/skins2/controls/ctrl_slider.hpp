@@ -79,7 +79,7 @@ public:
     virtual UString getTooltipText() const { return m_tooltip; }
 
     /// Get the type of control (custom RTTI)
-    virtual string getType() const { return "slider_cursor"; }
+    virtual std::string getType() const { return "slider_cursor"; }
 
 private:
     /// Finite state machine of the control
@@ -162,7 +162,7 @@ public:
                                int xOffSet = 0, int yOffSet = 0 );
 
     /// Get the type of control (custom RTTI)
-    virtual string getType() const { return "slider_bg"; }
+    virtual std::string getType() const { return "slider_bg"; }
 
     /// Associate a cursor to this background
     void associateCursor( CtrlSliderCursor &rCursor );

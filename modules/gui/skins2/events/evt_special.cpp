@@ -25,9 +25,9 @@
 #include "evt_special.hpp"
 
 
-const string EvtSpecial::getAsString() const
+const std::string EvtSpecial::getAsString() const
 {
-    string event = "special";
+    std::string event = "special";
 
     // Add the action
     if( m_action == kShow )

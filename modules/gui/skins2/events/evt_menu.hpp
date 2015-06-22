@@ -34,7 +34,7 @@ public:
     EvtMenu( intf_thread_t *pIntf, int itemId )
            : EvtGeneric( pIntf ), m_itemId( itemId ) { }
     virtual ~EvtMenu() { }
-    virtual const string getAsString() const { return "menu"; }
+    virtual const std::string getAsString() const { return "menu"; }
 
     int getItemId() const { return m_itemId; }
 

@@ -59,13 +59,13 @@ GenericLayout::~GenericLayout()
 {
     delete m_pImage;
 
-    list<Anchor*>::const_iterator it;
+    std::list<Anchor*>::const_iterator it;
     for( it = m_anchorList.begin(); it != m_anchorList.end(); ++it )
     {
         delete *it;
     }
 
-    list<LayeredControl>::const_iterator iter;
+    std::list<LayeredControl>::const_iterator iter;
     for( iter = m_controlList.begin(); iter != m_controlList.end(); ++iter )
     {
         CtrlGeneric *pCtrl = (*iter).m_pControl;
@@ -113,7 +113,7 @@ void GenericLayout::addControl( CtrlGeneric *pControl,
 
         // Add the control in the list.
         // This list must remain sorted by layer order
-        list<LayeredControl>::iterator it;
+        std::list<LayeredControl>::iterator it;
         for( it = m_controlList.begin(); it != m_controlList.end(); ++it )
         {
             if( layer < (*it).m_layer )
@@ -141,7 +141,7 @@ void GenericLayout::addControl( CtrlGeneric *pControl,
 }
 
 
-const list<LayeredControl> &GenericLayout::getControlList() const
+const std::list<LayeredControl> &GenericLayout::getControlList() const
 {
     return m_controlList;
 }
@@ -190,7 +190,7 @@ void GenericLayout::resize( int width, int height )
     }
 
     // Notify all the controls that the size has changed and redraw them
-    list<LayeredControl>::const_iterator iter;
+    std::list<LayeredControl>::const_iterator iter;
     for( iter = m_controlList.begin(); iter != m_controlList.end(); ++iter )
     {
         iter->m_pControl->onResize();
@@ -214,7 +214,7 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
     m_pImage->clear( x, y, width, height );
 
     // Draw all the controls of the layout
-    list<LayeredControl>::const_iterator iter;
+    std::list<LayeredControl>::const_iterator iter;
     for( iter = m_controlList.begin(); iter != m_controlList.end(); ++iter )
     {
         CtrlGeneric *pCtrl = (*iter).m_pControl;
@@ -235,7 +235,7 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
 }
 
 
-const list<Anchor*>& GenericLayout::getAnchorList() const
+const std::list<Anchor*>& GenericLayout::getAnchorList() const
 {
     return m_anchorList;
 }

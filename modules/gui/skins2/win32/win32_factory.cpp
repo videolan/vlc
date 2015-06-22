@@ -133,7 +133,7 @@ BOOL CALLBACK Win32Factory::MonitorEnumProc( HMONITOR hMonitor, HDC hdcMonitor,
                                              LPRECT lprcMonitor, LPARAM dwData )
 {
     (void)hdcMonitor; (void)lprcMonitor;
-    list<HMONITOR>* pList = (list<HMONITOR>*)dwData;
+    std::list<HMONITOR>* pList = (std::list<HMONITOR>*)dwData;
     pList->push_back( hMonitor );
 
     return TRUE;
@@ -234,19 +234,19 @@ bool Win32Factory::init()
 
     // Initialize the resource path
     char *datadir = config_GetUserDir( VLC_DATA_DIR );
-    m_resourcePath.push_back( (string)datadir + "\\skins" );
+    m_resourcePath.push_back( (std::string)datadir + "\\skins" );
     free( datadir );
     datadir = config_GetDataDir();
-    m_resourcePath.push_back( (string)datadir + "\\skins" );
-    m_resourcePath.push_back( (string)datadir + "\\skins2" );
-    m_resourcePath.push_back( (string)datadir + "\\share\\skins" );
-    m_resourcePath.push_back( (string)datadir + "\\share\\skins2" );
+    m_resourcePath.push_back( (std::string)datadir + "\\skins" );
+    m_resourcePath.push_back( (std::string)datadir + "\\skins2" );
+    m_resourcePath.push_back( (std::string)datadir + "\\share\\skins" );
+    m_resourcePath.push_back( (std::string)datadir + "\\share\\skins2" );
     free( datadir );
 
     // Enumerate all monitors available
     EnumDisplayMonitors( NULL, NULL, MonitorEnumProc, (LPARAM)&m_monitorList );
     int num = 0;
-    for( list<HMONITOR>::iterator it = m_monitorList.begin();
+    for( std::list<HMONITOR>::iterator it = m_monitorList.begin();
          it != m_monitorList.end(); ++it, num++ )
     {
         MONITORINFO mi;
@@ -413,7 +413,7 @@ void Win32Factory::getMonitorInfo( int numScreen, int* p_x, int* p_y,
                                    int* p_width, int* p_height ) const
 {
     HMONITOR hmon = NULL;
-    list<HMONITOR>::const_iterator it = m_monitorList.begin();
+    std::list<HMONITOR>::const_iterator it = m_monitorList.begin();
     for( int i = 0; it != m_monitorList.end(); ++it, i++ )
     {
         if( i == numScreen )
@@ -477,7 +477,7 @@ void Win32Factory::changeCursor( CursorType_t type ) const
 }
 
 
-void Win32Factory::rmDir( const string &rPath )
+void Win32Factory::rmDir( const std::string &rPath )
 {
     LPWSTR dir_temp = ToWide( rPath.c_str() );
     size_t len = wcslen( dir_temp );

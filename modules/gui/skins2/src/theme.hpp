@@ -58,10 +58,10 @@ public:
     void saveConfig();
     void applyConfig();
 
-    GenericBitmap *getBitmapById( const string &id ) const;
-    GenericFont *getFontById( const string &id ) const;
+    GenericBitmap *getBitmapById( const std::string &id ) const;
+    GenericFont *getFontById( const std::string &id ) const;
 
-#   define ObjByID( var ) ( const string &id ) const \
+#   define ObjByID( var ) ( const std::string &id ) const \
         { return var.find_object( id ); }
     Popup         *getPopupById    ObjByID( m_popups    )
     TopWindow     *getWindowById   ObjByID( m_windows   )
@@ -73,16 +73,16 @@ public:
     WindowManager &getWindowManager() { return m_windowManager; }
 
 private:
-    template<class T> class IDmap: public std::map<string, T> {
+    template<class T> class IDmap: public std::map<std::string, T> {
     private:
-        typedef typename std::map<string, T> parent;
+        typedef typename std::map<std::string, T> parent;
     public:
-        typename T::pointer find_object(const string &id) const
+        typename T::pointer find_object(const std::string &id) const
         {
             typename parent::const_iterator it = parent::find( id );
             return it!=parent::end() ? it->second.get() : NULL;
         }
-        typename T::pointer find_first_object(const string &id) const;
+        typename T::pointer find_first_object(const std::string &id) const;
     };
 
     struct save_t {
@@ -110,13 +110,13 @@ private:
     /// Store the panel positions by ID
     IDmap<PositionPtr> m_positions;
     /// Store the commands
-    list<CmdGenericPtr> m_commands;
+    std::list<CmdGenericPtr> m_commands;
     /// Store the Bezier curves
-    list<BezierPtr> m_curves;
+    std::list<BezierPtr> m_curves;
     /// Store the variables
-    list<VariablePtr> m_vars;
+    std::list<VariablePtr> m_vars;
     /// List saved windows/layouts
-    list<save_t> m_saved;
+    std::list<save_t> m_saved;
 
     WindowManager m_windowManager;
 };

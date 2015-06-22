@@ -87,7 +87,7 @@ void AsyncQueue::push( const CmdGenericPtr &rcCommand, bool removePrev )
 }
 
 
-void AsyncQueue::remove( const string &rType, const CmdGenericPtr &rcCommand )
+void AsyncQueue::remove( const std::string &rType, const CmdGenericPtr &rcCommand )
 {
     cmdList_t::iterator it;
     for( it = m_cmdList.begin(); it != m_cmdList.end(); /* nothing */ )

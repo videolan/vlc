@@ -32,11 +32,11 @@
 class CmdMuxer: public CmdGeneric
 {
 public:
-    CmdMuxer( intf_thread_t *pIntf, const list<CmdGeneric*> &rList )
+    CmdMuxer( intf_thread_t *pIntf, const std::list<CmdGeneric*> &rList )
         : CmdGeneric( pIntf ), m_list( rList ) { }
     virtual ~CmdMuxer() { }
     virtual void execute();
-    virtual string getType() const { return "muxer"; }
+    virtual std::string getType() const { return "muxer"; }
 
 private:
     /// List of commands we will execute sequentially

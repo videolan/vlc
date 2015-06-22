@@ -35,7 +35,6 @@
 #include <vlc_fs.h>
 
 #include <string>
-using namespace std;
 
 class AsyncQueue;
 class Logger;
@@ -68,20 +67,20 @@ typedef void* vlc_wnd_type;
 #endif
 
 /// Wrapper around FromLocale, to avoid the need to call LocaleFree()
-static inline string sFromLocale( const string &rLocale )
+static inline std::string sFromLocale( const std::string &rLocale )
 {
     const char *s = FromLocale( rLocale.c_str() );
-    string res = s;
+    std::string res = s;
     LocaleFree( s );
     return res;
 }
 
 #ifdef _WIN32
 /// Wrapper around FromWide, to avoid the need to call free()
-static inline string sFromWide( const wstring &rWide )
+static inline std::string sFromWide( const std::wstring &rWide )
 {
     char *s = FromWide( rWide.c_str() );
-    string res = s;
+    std::string res = s;
     free( s );
     return res;
 }

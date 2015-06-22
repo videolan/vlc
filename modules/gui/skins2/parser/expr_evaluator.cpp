@@ -24,13 +24,13 @@
 #include "expr_evaluator.hpp"
 
 
-void ExprEvaluator::parse( const string &rExpr )
+void ExprEvaluator::parse( const std::string &rExpr )
 {
     m_stack.clear();
 
     const char *pString = rExpr.c_str();
-    list<string> opStack;   // operator stack
-    string token;
+    std::list<std::string> opStack;   // operator stack
+    std::string token;
 
     // Tokenize the expression
     int begin = 0, end = 0;
@@ -54,7 +54,7 @@ void ExprEvaluator::parse( const string &rExpr )
             while( !opStack.empty() )
             {
                 // Pop the stack
-                string lastOp = opStack.back();
+                std::string lastOp = opStack.back();
                 opStack.pop_back();
                 if( lastOp == "(" )
                 {
@@ -86,7 +86,7 @@ void ExprEvaluator::parse( const string &rExpr )
                        hasPrecedency( token, opStack.back() ) )
                 {
                     // Pop the stack
-                    string lastOp = opStack.back();
+                    std::string lastOp = opStack.back();
                     opStack.pop_back();
                     m_stack.push_back( lastOp );
                 }
@@ -101,18 +101,18 @@ void ExprEvaluator::parse( const string &rExpr )
     // Finish popping the operator stack
     while( !opStack.empty() )
     {
-        string lastOp = opStack.back();
+        std::string lastOp = opStack.back();
         opStack.pop_back();
         m_stack.push_back( lastOp );
     }
 }
 
 
-string ExprEvaluator::getToken()
+std::string ExprEvaluator::getToken()
 {
     if( !m_stack.empty() )
     {
-        string token = m_stack.front();
+        std::string token = m_stack.front();
         m_stack.pop_front();
         return token;
     }
@@ -120,7 +120,7 @@ string ExprEvaluator::getToken()
 }
 
 
-bool ExprEvaluator::hasPrecedency( const string &op1, const string &op2 ) const
+bool ExprEvaluator::hasPrecedency( const std::string &op1, const std::string &op2 ) const
 {
     // FIXME
     if( op1 == "(" )

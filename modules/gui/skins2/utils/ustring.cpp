@@ -326,7 +326,7 @@ UString UString::substr( uint32_t position, uint32_t n) const
 
 UString UString::fromInt( intf_thread_t *pIntf, int number)
 {
-    stringstream ss;
+    std::stringstream ss;
     ss << number;
     return UString( pIntf, ss.str().c_str() );
 }

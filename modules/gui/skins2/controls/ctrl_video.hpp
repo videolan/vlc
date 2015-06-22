@@ -54,7 +54,7 @@ public:
     virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
 
     /// Get the type of control (custom RTTI)
-    virtual string getType() const { return "video"; }
+    virtual std::string getType() const { return "video"; }
 
     /// Method called when visibility or ActiveLayout is updated
     virtual void onUpdate( Subject<VarBool> &rVariable , void* );

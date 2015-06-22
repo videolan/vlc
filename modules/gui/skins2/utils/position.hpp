@@ -145,7 +145,7 @@ public:
     virtual ~VarBox() { }
 
     /// Get the variable type
-    virtual const string &getType() const { return m_type; }
+    virtual const std::string &getType() const { return m_type; }
 
     /// Get the size of the box
     virtual int getWidth() const;
@@ -156,7 +156,7 @@ public:
 
 private:
     /// Variable type
-    static const string m_type;
+    static const std::string m_type;
     /// Size
     int m_width, m_height;
 };

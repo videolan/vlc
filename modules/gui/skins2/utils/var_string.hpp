@@ -38,17 +38,17 @@ public:
     virtual ~VarString() { }
 
     /// Get the variable type
-    virtual const string &getType() const { return m_type; }
+    virtual const std::string &getType() const { return m_type; }
 
     /// Set the internal value
-    virtual void set( string str );
-    virtual string get() const { return m_value; }
+    virtual void set( std::string str );
+    virtual std::string get() const { return m_value; }
 
 private:
     /// Variable type
-    static const string m_type;
+    static const std::string m_type;
     /// string value
-    string m_value;
+    std::string m_value;
 };
 
 #endif

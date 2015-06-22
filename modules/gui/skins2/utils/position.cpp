@@ -25,7 +25,7 @@
 #include "position.hpp"
 
 
-const string VarBox::m_type = "box";
+const std::string VarBox::m_type = "box";
 
 
 SkinsRect::SkinsRect( int left, int top, int right, int bottom ):

@@ -66,7 +66,7 @@ void Win32Popup::hide()
 }
 
 
-void Win32Popup::addItem( const string &rLabel, int pos )
+void Win32Popup::addItem( const std::string &rLabel, int pos )
 {
     MENUITEMINFO menuItem;
     menuItem.cbSize = sizeof( MENUITEMINFO );

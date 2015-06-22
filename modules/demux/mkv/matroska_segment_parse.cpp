@@ -366,7 +366,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
             KaxTrackLanguage &lang = *(KaxTrackLanguage*)l;
 
             free( tk->fmt.psz_language );
-            tk->fmt.psz_language = strdup( string( lang ).c_str() );
+            tk->fmt.psz_language = strdup( std::string( lang ).c_str() );
             msg_Dbg( &sys.demuxer,
                      "|   |   |   + Track Language=`%s'", tk->fmt.psz_language );
         }
@@ -374,8 +374,8 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         {
             KaxCodecID &codecid = *(KaxCodecID*)l;
 
-            tk->psz_codec = strdup( string( codecid ).c_str() );
-            msg_Dbg( &sys.demuxer, "|   |   |   + Track CodecId=%s", string( codecid ).c_str() );
+            tk->psz_codec = strdup( std::string( codecid ).c_str() );
+            msg_Dbg( &sys.demuxer, "|   |   |   + Track CodecId=%s", std::string( codecid ).c_str() );
         }
         else  if( MKV_IS_ID( l, KaxCodecPrivate ) )
         {
@@ -1042,13 +1042,13 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                 {
                     KaxChapterLanguage &lang =*(KaxChapterLanguage*)l;
                     msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterLanguage '%s'",
-                             string( lang ).c_str() );
+                             std::string( lang ).c_str() );
                 }
                 else if( MKV_IS_ID( l, KaxChapterCountry ) )
                 {
                     KaxChapterCountry &ct =*(KaxChapterCountry*)l;
                     msg_Dbg( &sys.demuxer, "|   |   |   |   |    + ChapterCountry '%s'",
-                             string( ct ).c_str() );
+                             std::string( ct ).c_str() );
                 }
             }
         }

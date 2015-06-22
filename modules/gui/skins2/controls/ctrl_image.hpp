@@ -63,7 +63,7 @@ public:
     virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
 
     /// Get the type of control (custom RTTI)
-    virtual string getType() const { return "image"; }
+    virtual std::string getType() const { return "image"; }
 
 private:
     /// Bitmap

@@ -92,7 +92,7 @@ void VoutManager::saveVoutConfig( )
 {
     // Save width/height to be consistent across themes
     // and detach Video Controls
-    vector<SavedWnd>::iterator it;
+    std::vector<SavedWnd>::iterator it;
     for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         if( it->pCtrlVideo )
@@ -122,7 +122,7 @@ void VoutManager::restoreVoutConfig( bool b_success )
     }
 
     // reattach vout(s) to Video Controls
-    vector<SavedWnd>::iterator it;
+    std::vector<SavedWnd>::iterator it;
     for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         CtrlVideo* pCtrlVideo = getBestCtrlVideo();
@@ -137,7 +137,7 @@ void VoutManager::restoreVoutConfig( bool b_success )
 
 void VoutManager::discardVout( CtrlVideo* pCtrlVideo )
 {
-    vector<SavedWnd>::iterator it;
+    std::vector<SavedWnd>::iterator it;
     for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         if( it->pCtrlVideo == pCtrlVideo )
@@ -155,7 +155,7 @@ void VoutManager::discardVout( CtrlVideo* pCtrlVideo )
 
 void VoutManager::requestVout( CtrlVideo* pCtrlVideo )
 {
-    vector<SavedWnd>::iterator it;
+    std::vector<SavedWnd>::iterator it;
     for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         if( it->pCtrlVideo == NULL )
@@ -171,7 +171,7 @@ void VoutManager::requestVout( CtrlVideo* pCtrlVideo )
 
 CtrlVideo* VoutManager::getBestCtrlVideo( )
 {
-    vector<CtrlVideo*>::const_iterator it;
+    std::vector<CtrlVideo*>::const_iterator it;
 
     // first, look up a video control that is visible and unused
     for( it = m_pCtrlVideoVec.begin(); it != m_pCtrlVideoVec.end(); ++it )
@@ -220,7 +220,7 @@ void VoutManager::acceptWnd( vout_window_t* pWnd, int width, int height )
 void VoutManager::releaseWnd( vout_window_t* pWnd )
 {
     // remove vout thread from savedVec
-    vector<SavedWnd>::iterator it;
+    std::vector<SavedWnd>::iterator it;
     for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
     {
         if( it->pWnd == pWnd )
@@ -251,7 +251,7 @@ void VoutManager::setSizeWnd( vout_window_t *pWnd, int width, int height )
    msg_Dbg( pWnd, "setSize (%ix%i) received from vout thread",
                   width, height );
 
-   vector<SavedWnd>::iterator it;
+   std::vector<SavedWnd>::iterator it;
    for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
    {
        if( it->pWnd == pWnd )
@@ -280,7 +280,7 @@ void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
     // reconfigure the fullscreen window (multiple screens)
     if( b_fullscreen )
     {
-        vector<SavedWnd>::iterator it;
+        std::vector<SavedWnd>::iterator it;
         for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); ++it )
         {
             if( it->pWnd == pWnd )

@@ -26,8 +26,8 @@
 #include <fstream>
 
 
-IniFile::IniFile( intf_thread_t *pIntf, const string &rName,
-                  const string &rPath ):
+IniFile::IniFile( intf_thread_t *pIntf, const std::string &rName,
+                  const std::string &rPath ):
     SkinObject( pIntf ), m_name( rName ), m_path( rPath )
 {
 }
@@ -38,11 +38,11 @@ void IniFile::parseFile()
     VarManager *pVarManager = VarManager::instance( getIntf() );
 
     // Open the file
-    fstream fs( m_path.c_str(), fstream::in );
+    std::fstream fs( m_path.c_str(), std::fstream::in );
     if( fs.is_open() )
     {
-        string section;
-        string line;
+        std::string section;
+        std::string line;
         while( !fs.eof() )
         {
             // Read the next line
@@ -63,10 +63,10 @@ void IniFile::parseFile()
             // Variable declaration
             default:
                 size_t eqPos = line.find( '=' );
-                string var = line.substr( 0, eqPos );
-                string val = line.substr( eqPos + 1, line.size() - eqPos - 1);
+                std::string var = line.substr( 0, eqPos );
+                std::string val = line.substr( eqPos + 1, line.size() - eqPos - 1);
 
-                string name = m_name + "." + section + "." + var;
+                std::string name = m_name + "." + section + "." + var;
 
                 // Convert to lower case because of some buggy winamp2 skins
                 for( size_t i = 0; i < name.size(); i++ )
