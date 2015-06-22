@@ -3252,16 +3252,6 @@ PKG_ENABLE_MODULES_VLC([SVG], [], [librsvg-2.0 >= 2.9.0], [SVG rendering library
 PKG_ENABLE_MODULES_VLC([SVGDEC], [], [librsvg-2.0 >= 2.9.0 cairo >= 1.13.1], [SVG image decoder library],[auto])
 
 dnl
-dnl  android surface module
-dnl
-AC_ARG_ENABLE(android-surface,
-  [  --enable-android-surface   Android Surface video output module (default disabled)])
-if test "${enable_android_surface}" = "yes"; then
-     VLC_ADD_PLUGIN([android_surface])
-     VLC_ADD_PLUGIN([android_window])
-fi
-
-dnl
 dnl  Windows DirectX module
 dnl
 

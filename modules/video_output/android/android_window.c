@@ -75,6 +75,7 @@ extern void  jni_UnlockAndroidSurface();
 extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 extern int jni_ConfigureSurface(jobject jsurf, int width, int height, int hal, bool *configured);
 extern int jni_GetWindowSize(int *width, int *height);
+extern void jni_getMouseCoordinates(int *, int *, int *, int *);
 
 static const vlc_fourcc_t subpicture_chromas[] =
 {
@@ -85,6 +86,7 @@ static const vlc_fourcc_t subpicture_chromas[] =
 static picture_pool_t   *Pool  (vout_display_t *, unsigned);
 static void             Prepare(vout_display_t *, picture_t *, subpicture_t *);
 static void             Display(vout_display_t *, picture_t *, subpicture_t *);
+static void             Manage(vout_display_t *vd);
 static int              Control(vout_display_t *, int, va_list);
 
 typedef struct android_window android_window;
@@ -136,6 +138,25 @@ struct vout_display_sys_t
 
     uint8_t hash[16];
 };
+
+#define PRIV_WINDOW_FORMAT_YV12 0x32315659
+
+static inline int ChromaToAndroidHal(vlc_fourcc_t i_chroma)
+{
+    switch (i_chroma) {
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_I420:
+            return PRIV_WINDOW_FORMAT_YV12;
+        case VLC_CODEC_RGB16:
+            return WINDOW_FORMAT_RGB_565;
+        case VLC_CODEC_RGB32:
+            return WINDOW_FORMAT_RGBX_8888;
+        case VLC_CODEC_RGBA:
+            return WINDOW_FORMAT_RGBA_8888;
+        default:
+            return -1;
+    }
+}
 
 static int UpdateWindowSize(video_format_t *p_fmt, bool b_cropped)
 {
@@ -479,7 +500,7 @@ static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
     p_window->i_pic_count = 1;
     p_window->i_min_undequeued = 0;
 
-    if (!b_java_configured)
+    if (!b_java_configured && sys->anw.setBuffersGeometry)
         return sys->anw.setBuffersGeometry(p_window->p_handle,
                                            p_window->fmt.i_width,
                                            p_window->fmt.i_height,
@@ -631,9 +652,10 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
 
     sys->p_library = LoadNativeWindowAPI(&sys->anw);
-    if (!sys->p_library) {
-        msg_Err(vd, "Could not initialize NativeWindow API.");
-        goto error;
+    if (!sys->p_library)
+    {
+        msg_Warn(vd, "Using old Android Surface");
+        LoadNativeSurfaceAPI(&sys->anw);
     }
 
 #ifdef USE_ANWP
@@ -1103,3 +1125,24 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_EGENERIC;
     }
 }
+
+static void Manage(vout_display_t *vd)
+{
+    int x, y, button, action;
+    jni_getMouseCoordinates(&action, &button, &x, &y);
+    if (x >= 0 && y >= 0)
+    {
+        switch( action )
+        {
+            case AMOTION_EVENT_ACTION_DOWN:
+                vout_display_SendEventMouseMoved(vd, x, y);
+                vout_display_SendEventMousePressed(vd, button); break;
+            case AMOTION_EVENT_ACTION_UP:
+                vout_display_SendEventMouseMoved(vd, x, y);
+                vout_display_SendEventMouseReleased(vd, button); break;
+            case AMOTION_EVENT_ACTION_MOVE:
+                vout_display_SendEventMouseMoved(vd, x, y); break;
+        }
+    }
+}
+

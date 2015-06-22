@@ -22,6 +22,151 @@
 #include "utils.h"
 #include <dlfcn.h>
 
+/*
+ * Android Surface (pre android 2.3)
+ */
+
+extern void *jni_AndroidJavaSurfaceToNativeSurface(jobject surf);
+#ifndef ANDROID_SYM_S_LOCK
+# define ANDROID_SYM_S_LOCK "_ZN7android7Surface4lockEPNS0_11SurfaceInfoEb"
+#endif
+#ifndef ANDROID_SYM_S_LOCK2
+# define ANDROID_SYM_S_LOCK2 "_ZN7android7Surface4lockEPNS0_11SurfaceInfoEPNS_6RegionE"
+#endif
+#ifndef ANDROID_SYM_S_UNLOCK
+# define ANDROID_SYM_S_UNLOCK "_ZN7android7Surface13unlockAndPostEv"
+#endif
+typedef void (*AndroidSurface_lock)(void *, void *, int);
+typedef void (*AndroidSurface_lock2)(void *, void *, void *);
+typedef void (*AndroidSurface_unlockAndPost)(void *);
+
+typedef struct {
+    void *p_dl_handle;
+    void *p_surface_handle;
+    AndroidSurface_lock pf_lock;
+    AndroidSurface_lock2 pf_lock2;
+    AndroidSurface_unlockAndPost pf_unlockAndPost;
+} NativeSurface;
+
+static inline void *
+NativeSurface_Load(const char *psz_lib, NativeSurface *p_ns)
+{
+    void *p_lib = dlopen(psz_lib, RTLD_NOW);
+    if (!p_lib)
+        return NULL;
+
+    p_ns->pf_lock = (AndroidSurface_lock)(dlsym(p_lib, ANDROID_SYM_S_LOCK));
+    p_ns->pf_lock2 = (AndroidSurface_lock2)(dlsym(p_lib, ANDROID_SYM_S_LOCK2));
+    p_ns->pf_unlockAndPost =
+        (AndroidSurface_unlockAndPost)(dlsym(p_lib, ANDROID_SYM_S_UNLOCK));
+
+    if ((p_ns->pf_lock || p_ns->pf_lock2) && p_ns->pf_unlockAndPost)
+        return p_lib;
+
+    dlclose(p_lib);
+    return NULL;
+}
+
+
+static ANativeWindow*
+NativeSurface_fromSurface(JNIEnv *env, jobject jsurf)
+{
+    (void) env;
+    void *p_surface_handle;
+    NativeSurface *p_ns;
+
+    static const char *libs[] = {
+        "libsurfaceflinger_client.so",
+        "libgui.so",
+        "libui.so"
+    };
+    p_surface_handle = jni_AndroidJavaSurfaceToNativeSurface(jsurf);
+    if (!p_surface_handle)
+        return NULL;
+    p_ns = malloc(sizeof(NativeSurface));
+    if (!p_ns)
+        return NULL;
+    p_ns->p_surface_handle = p_surface_handle;
+
+    for (size_t i = 0; i < sizeof(libs) / sizeof(*libs); i++)
+    {
+        void *p_dl_handle = NativeSurface_Load(libs[i], p_ns);
+        if (p_dl_handle)
+        {
+            p_ns->p_dl_handle = p_dl_handle;
+            return (ANativeWindow*)p_ns;
+        }
+    }
+    free(p_ns);
+    return NULL;
+}
+
+static void
+NativeSurface_release(ANativeWindow* p_anw)
+{
+    NativeSurface *p_ns = (NativeSurface *)p_anw;
+
+    dlclose(p_ns->p_dl_handle);
+    free(p_ns);
+}
+
+static int32_t
+NativeSurface_lock(ANativeWindow *p_anw, ANativeWindow_Buffer *p_anb,
+                   ARect *p_rect)
+{
+    (void) p_rect;
+    NativeSurface *p_ns = (NativeSurface *)p_anw;
+    struct {
+        uint32_t    w;
+        uint32_t    h;
+        uint32_t    s;
+        uint32_t    usage;
+        uint32_t    format;
+        uint32_t*   bits;
+        uint32_t    reserved[2];
+    } info = { 0 };
+
+    if (p_ns->pf_lock)
+        p_ns->pf_lock(p_ns->p_surface_handle, &info, 1);
+    else
+        p_ns->pf_lock2(p_ns->p_surface_handle, &info, NULL);
+
+    if (!info.w || !info.h) {
+        p_ns->pf_unlockAndPost(p_ns->p_surface_handle);
+        return -1;
+    }
+
+    if (p_anb) {
+        p_anb->bits = info.bits;
+        p_anb->width = info.w;
+        p_anb->height = info.h;
+        p_anb->stride = info.s;
+        p_anb->format = info.format;
+    }
+    return 0;
+}
+
+static void
+NativeSurface_unlockAndPost(ANativeWindow *p_anw)
+{
+    NativeSurface *p_ns = (NativeSurface *)p_anw;
+
+    p_ns->pf_unlockAndPost(p_ns->p_surface_handle);
+}
+
+void LoadNativeSurfaceAPI(native_window_api_t *native)
+{
+    native->winFromSurface = NativeSurface_fromSurface;
+    native->winRelease = NativeSurface_release;
+    native->winLock = NativeSurface_lock;
+    native->unlockAndPost = NativeSurface_unlockAndPost;
+    native->setBuffersGeometry = NULL;
+}
+
+/*
+ * Android NativeWindow (post android 2.3)
+ */
+
 void *LoadNativeWindowAPI(native_window_api_t *native)
 {
     void *p_library = dlopen("libandroid.so", RTLD_NOW);
@@ -53,6 +198,10 @@ void *LoadNativeWindowAPI(native_window_api_t *native)
     return NULL;
 }
 
+/*
+ * Android private NativeWindow (post android 2.3)
+ */
+
 int LoadNativeWindowPrivAPI(native_window_priv_api_t *native)
 {
     native->connect = dlsym(RTLD_DEFAULT, "ANativeWindowPriv_connect");
@@ -77,26 +226,3 @@ int LoadNativeWindowPrivAPI(native_window_priv_api_t *native)
         native->dequeue && native->lock && native->lockData && native->unlockData &&
         native->queue && native->cancel && native->setOrientation ? 0 : -1;
 }
-
-extern void jni_getMouseCoordinates(int *, int *, int *, int *);
-
-void Manage(vout_display_t *vd)
-{
-    int x, y, button, action;
-    jni_getMouseCoordinates(&action, &button, &x, &y);
-    if (x >= 0 && y >= 0)
-    {
-        switch( action )
-        {
-            case AMOTION_EVENT_ACTION_DOWN:
-                vout_display_SendEventMouseMoved(vd, x, y);
-                vout_display_SendEventMousePressed(vd, button); break;
-            case AMOTION_EVENT_ACTION_UP:
-                vout_display_SendEventMouseMoved(vd, x, y);
-                vout_display_SendEventMouseReleased(vd, button); break;
-            case AMOTION_EVENT_ACTION_MOVE:
-                vout_display_SendEventMouseMoved(vd, x, y); break;
-        }
-    }
-}
-

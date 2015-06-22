@@ -43,32 +43,16 @@ typedef struct
     ptr_ANativeWindow_release winRelease;
     ptr_ANativeWindow_lock winLock;
     ptr_ANativeWindow_unlockAndPost unlockAndPost;
-    ptr_ANativeWindow_setBuffersGeometry setBuffersGeometry;
+    ptr_ANativeWindow_setBuffersGeometry setBuffersGeometry; /* can be NULL */
 } native_window_api_t;
 
 /* Fill the structure passed as parameter and return a library handle
    that should be destroyed with dlclose. */
 void *LoadNativeWindowAPI(native_window_api_t *native);
-void Manage(vout_display_t *);
 
-#define PRIV_WINDOW_FORMAT_YV12 0x32315659
-
-static inline int ChromaToAndroidHal(vlc_fourcc_t i_chroma)
-{
-    switch (i_chroma) {
-        case VLC_CODEC_YV12:
-        case VLC_CODEC_I420:
-            return PRIV_WINDOW_FORMAT_YV12;
-        case VLC_CODEC_RGB16:
-            return WINDOW_FORMAT_RGB_565;
-        case VLC_CODEC_RGB32:
-            return WINDOW_FORMAT_RGBX_8888;
-        case VLC_CODEC_RGBA:
-            return WINDOW_FORMAT_RGBA_8888;
-        default:
-            return -1;
-    }
-}
+/* Pre Android 2.3 NativeSurface, no need to free a handle,
+ * native->sys->anwp.setBuffersGeometry will be NULL. */
+void LoadNativeSurfaceAPI(native_window_api_t *native);
 
 typedef struct native_window_priv native_window_priv;
 typedef native_window_priv *(*ptr_ANativeWindowPriv_connect) (void *);
