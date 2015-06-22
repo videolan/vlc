@@ -115,12 +115,7 @@ static inline void vlc_atomic_init_float(vlc_atomic_float *var, float f)
 {
     union { float f; uint32_t i; } u;
     u.f = f;
-#if defined(__cplusplus) && defined(HAVE_CXX11)
-    vlc_atomic_float a(u.i)
-    *var = a;
-#else
     atomic_init(var, u.i);
-#endif
 }
 
 /** Helper to retrieve a single precision from an atom. */
