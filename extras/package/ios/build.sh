@@ -165,8 +165,7 @@ else
 export CFLAGS="${CFLAGS} -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
 fi
 
-export CXXFLAGS="${CFLAGS} -stdlib=libstdc++"
-
+export CXXFLAGS="${CFLAGS}"
 export CPPFLAGS="${CFLAGS}"
 
 export CPP="xcrun cc -E"
