@@ -35,7 +35,7 @@ OPTIONS="
         --disable-caca
         --disable-sdl
         --disable-macosx-dialog-provider
-        --with-macosx-version-min=10.6
+        --with-macosx-version-min=10.7
 "
 
 export CFLAGS
