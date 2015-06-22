@@ -2,28 +2,6 @@ Copyright (C) 2015 Rémi Denis-Courmont
 
 Licensed under the terms of the GNU LGPL version 2.1 or later.
 
-diff -ru live555.orig/groupsock/GroupsockHelper.cpp live555/groupsock/GroupsockHelper.cpp
---- live555.orig/groupsock/GroupsockHelper.cpp	2015-05-21 20:34:45.854307019 +0300
-+++ live555/groupsock/GroupsockHelper.cpp	2015-05-21 20:36:36.003306022 +0300
-@@ -30,6 +30,9 @@
- #define initializeWinsockIfNecessary() 1
- #endif
- #include <stdio.h>
-+#ifndef MSG_NOSIGNAL
-+# define MSG_NOSIGNAL 0
-+#endif
- 
- // By default, use INADDR_ANY for the sending and receiving interfaces:
- netAddressBits SendingInterfaceAddr = INADDR_ANY;
-@@ -337,7 +340,7 @@
- 		    unsigned char* buffer, unsigned bufferSize) {
-   do {
-     MAKE_SOCKADDR_IN(dest, address.s_addr, port.num());
--    int bytesSent = sendto(socket, (char*)buffer, bufferSize, 0,
-+    int bytesSent = sendto(socket, (char*)buffer, bufferSize, MSG_NOSIGNAL,
- 			   (struct sockaddr*)&dest, sizeof dest);
-     if (bytesSent != (int)bufferSize) {
-       char tmpBuf[100];
 diff -ru live555.orig/liveMedia/RTPInterface.cpp live555/liveMedia/RTPInterface.cpp
 --- live555.orig/liveMedia/RTPInterface.cpp	2015-05-21 20:34:45.855307019 +0300
 +++ live555/liveMedia/RTPInterface.cpp	2015-05-21 20:38:10.383305167 +0300
@@ -117,13 +95,33 @@ diff -ru live555.orig/liveMedia/RTSPServerSupportingHTTPStreaming.cpp live555/li
    fResponseBuffer[0] = '\0'; // We've already sent the response.  This tells the calling code not to send it again.
  
    // Then, send the playlist.  Because it's large, we don't do so using "send()", because that might not send it all at once.
-diff -ru live555.orig/liveMedia/TCPStreamSink.cpp live555/liveMedia/TCPStreamSink.cpp
---- live555.orig/liveMedia/TCPStreamSink.cpp	2015-05-21 20:34:45.857307019 +0300
-+++ live555/liveMedia/TCPStreamSink.cpp	2015-05-21 20:39:34.599304405 +0300
+--- live/groupsock/GroupsockHelper.cpp.orig	2015-06-22 00:09:17.000000000 +0200
++++ live/groupsock/GroupsockHelper.cpp	2015-06-22 10:56:08.673912904 +0200
+@@ -35,6 +35,9 @@
+ #define USE_SIGNALS 1
+ #endif
+ #include <stdio.h>
++#ifndef MSG_NOSIGNAL
++# define MSG_NOSIGNAL 0
++#endif
+ 
+ // By default, use INADDR_ANY for the sending and receiving interfaces:
+ netAddressBits SendingInterfaceAddr = INADDR_ANY;
+@@ -342,7 +345,7 @@
+ 		    unsigned char* buffer, unsigned bufferSize) {
+   do {
+     MAKE_SOCKADDR_IN(dest, address.s_addr, portNum);
+-    int bytesSent = sendto(socket, (char*)buffer, bufferSize, 0,
++    int bytesSent = sendto(socket, (char*)buffer, bufferSize, MSG_NOSIGNAL,
+ 			   (struct sockaddr*)&dest, sizeof dest);
+     if (bytesSent != (int)bufferSize) {
+       char tmpBuf[100];
+--- live/liveMedia/TCPStreamSink.cpp.orig	2015-06-22 00:09:17.000000000 +0200
++++ live/liveMedia/TCPStreamSink.cpp	2015-06-22 11:01:32.669268927 +0200
 @@ -20,6 +20,9 @@
  
  #include "TCPStreamSink.hh"
- #include "RTSPCommon.hh" // for "ignoreSigPipeOnSocket()"
+ #include <GroupsockHelper.hh> // for "ignoreSigPipeOnSocket()"
 +#ifndef MSG_NOSIGNAL
 +# define MSG_NOSIGNAL 0
 +#endif
