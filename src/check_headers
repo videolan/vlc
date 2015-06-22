@@ -5,14 +5,23 @@ cd "$(dirname "$0")" || exit $?
 
 # Look for configure #defines in public headers.
 # There are incorrect, as external users don't have our <config.h>.
-regexp="$(cat ../config.h.in | \
-	sed -n -e 's/^#undef \([[:upper:][:digit:]_]*\)$/\1/p' | \
-	grep -v 'WORDS_BIGENDIAN' | \
-	grep -v 'UNICODE' | \
-	grep -v '__LIBVLC__' | \
-	xargs | \
-    sed -e 's/ /\\\(\\s\\\|$\\\)\\\| /g')"
-regexp=" $regexp\$"
+regexp=""
+
+while read l; do
+	d=$(echo "$l" | sed -n -e 's/^#undef \([[:upper:][:digit:]_]*\)$/\1/p')
+	test -z "$d" && continue
+	test "$d" = "WORDS_BIGENDIAN" && continue
+	test "$d" = "UNICODE" && continue
+	test "$d" = "__LIBVLC__" && continue
+
+	if test -z "$regexp"; then
+		regexp="[^A-Za-z0-9_]\("
+	else
+		regexp="${regexp}\|"
+	fi
+	regexp="${regexp}${d}"
+done < ../config.h.in
+regexp="${regexp}\)\([^A-Za-z0-9_]\|\$\)"
 
 echo Looking for private defines in public headers...
 ! grep -- "$regexp" "$@" || exit $?
