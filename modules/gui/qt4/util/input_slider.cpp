@@ -144,7 +144,7 @@ SeekSlider::SeekSlider( Qt::Orientation q, QWidget *_parent, bool _static )
     animLoadingOut->setEndValue( 0.0 );
     animLoadingOut->setEasingCurve( QEasingCurve::OutBounce );
 
-    animLoading = new QSequentialAnimationGroup();
+    animLoading = new QSequentialAnimationGroup( this );
     animLoading->addAnimation( animLoadingIn );
     animLoading->addAnimation( animLoadingOut );
     animLoading->setLoopCount( -1 );

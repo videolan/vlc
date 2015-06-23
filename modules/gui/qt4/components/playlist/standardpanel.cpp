@@ -401,7 +401,7 @@ void StandardPLPanel::popupAction( QAction *action )
 
 QMenu* StandardPLPanel::viewSelectionMenu( StandardPLPanel *panel )
 {
-    QMenu *viewMenu = new QMenu( qtr( "Playlist View Mode" ) );
+    QMenu *viewMenu = new QMenu( qtr( "Playlist View Mode" ), panel );
     QSignalMapper *viewSelectionMapper = new QSignalMapper( viewMenu );
     CONNECT( viewSelectionMapper, mapped( int ), panel, showView( int ) );
 
