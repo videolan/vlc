@@ -180,7 +180,6 @@ FunctionEnd
   !insertmacro ${_action} Video ".m4v"
   !insertmacro ${_action} Video ".mkv"
   !insertmacro ${_action} Video ".mov"
-  !insertmacro ${_action} Video ".mp2"
   !insertmacro ${_action} Video ".mp2v"
   !insertmacro ${_action} Video ".mp4"
   !insertmacro ${_action} Video ".mp4v"
