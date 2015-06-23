@@ -7,7 +7,7 @@
  
      // This sucks big time
 -    openmode createAtrr = std::ios::in;
-+    std::_Ios_Openmode createAtrr = std::ios::in;
++    std::ios_base::openmode createAtrr = std::ios::in;
  #ifdef HAVE_IOS_NOCREATE
      createAtrr |= std::ios::nocreate;
  #endif
@@ -16,7 +16,7 @@
      {
          // Open binary output file stream.
 -        openmode createAttr = std::ios::out;
-+        std::_Ios_Openmode createAttr = std::ios::out;
++        std::ios_base::openmode createAttr = std::ios::out;
  #if defined(HAVE_IOS_BIN)
          createAttr |= std::ios::bin;
  #else
@@ -25,7 +25,7 @@
      {
          // Open ASCII output file stream.
 -        openmode createAttr = std::ios::out;
-+        std::_Ios_Openmode createAttr = std::ios::out;
++        std::ios_base::openmode createAttr = std::ios::out;
          if ( overWriteFlag )
              createAttr |= std::ios::trunc;
          else
@@ -34,7 +34,7 @@
      {
          // Open binary output file stream.
 -        openmode createAttr = std::ios::out;
-+        std::_Ios_Openmode createAttr = std::ios::out;
++        std::ios_base::openmode createAttr = std::ios::out;
  #if defined(HAVE_IOS_BIN)
          createAttr |= std::ios::bin;
  #else
