@@ -195,8 +195,21 @@ static int  AReadStream( stream_t *s, void *p_read, unsigned int i_read );
 static input_item_t *AStreamReadDir( stream_t *s );
 
 /* Common */
-static int  AStreamGenericError( ) { return VLC_EGENERIC; }
-static input_item_t * AStreamDirGenericError( ) { return NULL; }
+static int  AStreamReadError( stream_t *s, void *p_read, unsigned int i_read )
+{
+    (void) s; (void) p_read; (void) i_read;
+    return VLC_EGENERIC;
+}
+static int  AStreamPeekError( stream_t *s, const uint8_t **pp_peek, unsigned int i_read )
+{
+    (void) s; (void) pp_peek; (void) i_read;
+    return VLC_EGENERIC;
+}
+static input_item_t * AStreamReadDirError( stream_t *s )
+{
+    (void) s;
+    return NULL;
+}
 static int AStreamControl( stream_t *s, int i_query, va_list );
 static void AStreamDestroy( stream_t *s );
 static int  ASeek( stream_t *s, uint64_t i_pos );
@@ -284,9 +297,9 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
         return NULL;
     }
 
-    s->pf_read    = AStreamGenericError;    /* Replaced later */
-    s->pf_peek    = AStreamGenericError;
-    s->pf_readdir = AStreamDirGenericError;
+    s->pf_read    = AStreamReadError;    /* Replaced later */
+    s->pf_peek    = AStreamPeekError;    /* Replaced later */
+    s->pf_readdir = AStreamReadDirError; /* Replaced later */
     s->pf_control = AStreamControl;
     s->pf_destroy = AStreamDestroy;
 
