@@ -38,12 +38,14 @@
 #include <windows.h>
 #include <assert.h>
 
+#define COBJMACROS
+
 #include "common.h"
 
 #include <vlc_windows_interfaces.h>
 
-#if !VLC_WINSTORE_APP
 static void CommonChangeThumbnailClip(vout_display_t *, bool show);
+#if !VLC_WINSTORE_APP
 static int  CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
 
 static void DisableScreensaver(vout_display_t *);
@@ -118,6 +120,229 @@ picture_pool_t *CommonPool(vout_display_t *vd, unsigned count)
     return vd->sys->pool;
 }
 
+/*****************************************************************************
+* UpdateRects: update clipping rectangles
+*****************************************************************************
+* This function is called when the window position or size are changed, and
+* its job is to update the source and destination RECTs used to display the
+* picture.
+*****************************************************************************/
+void UpdateRects(vout_display_t *vd,
+    const vout_display_cfg_t *cfg,
+    const video_format_t *source,
+    bool is_forced)
+{
+    vout_display_sys_t *sys = vd->sys;
+#define rect_src sys->rect_src
+#define rect_src_clipped sys->rect_src_clipped
+#define rect_dest sys->rect_dest
+#define rect_dest_clipped sys->rect_dest_clipped
+
+    RECT  rect;
+    POINT point;
+
+    /* */
+    if (!cfg)
+        cfg = vd->cfg;
+    if (!source)
+        source = &vd->source;
+
+    /* Retrieve the window size */
+#if VLC_WINSTORE_APP
+    rect.left   = 0;
+    rect.top    = 0;
+    uint32_t i_width;
+    uint32_t i_height;
+    UINT dataSize = sizeof(i_width);
+    HRESULT hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Can't get swapchain width, size %d. (hr=0x%lX)", hr, dataSize);
+        return;
+    }
+    dataSize = sizeof(i_height);
+    hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Can't get swapchain height, size %d. (hr=0x%lX)", hr, dataSize);
+        return;
+    }
+    rect.right  = i_width;
+    rect.bottom = i_height;
+#else
+    GetClientRect(sys->hwnd, &rect);
+#endif
+
+    /* Retrieve the window position */
+    point.x = point.y = 0;
+#if !VLC_WINSTORE_APP
+    ClientToScreen(sys->hwnd, &point);
+#endif
+
+    /* If nothing changed, we can return */
+    bool has_moved;
+    bool is_resized;
+#if VLC_WINSTORE_APP
+    has_moved = false;
+    is_resized = rect.right != (sys->rect_display.right - sys->rect_display.left) ||
+        rect.bottom != (sys->rect_display.bottom - sys->rect_display.top);
+    sys->rect_display = rect;
+#else
+    EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
+        point.x, point.y,
+        rect.right, rect.bottom);
+#endif
+    if (is_resized)
+        vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom);
+    if (!is_forced && !has_moved && !is_resized)
+        return;
+
+    /* Update the window position and size */
+    vout_display_cfg_t place_cfg = *cfg;
+    place_cfg.display.width = rect.right;
+    place_cfg.display.height = rect.bottom;
+
+    vout_display_place_t place;
+    vout_display_PlacePicture(&place, source, &place_cfg, false);
+
+#if !VLC_WINSTORE_APP
+    EventThreadUpdateSourceAndPlace(sys->event, source, &place);
+
+    if (sys->hvideownd)
+        SetWindowPos(sys->hvideownd, 0,
+            place.x, place.y, place.width, place.height,
+            SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS);
+#endif
+
+    /* Destination image position and dimensions */
+#if (defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11) || defined(MODULE_NAME_IS_direct2d)) && !VLC_WINSTORE_APP
+    rect_dest.left = 0;
+    rect_dest.right = place.width;
+    rect_dest.top = 0;
+    rect_dest.bottom = place.height;
+#else
+    rect_dest.left = point.x + place.x;
+    rect_dest.right = rect_dest.left + place.width;
+    rect_dest.top = point.y + place.y;
+    rect_dest.bottom = rect_dest.top + place.height;
+
+#ifdef MODULE_NAME_IS_directdraw
+    /* Apply overlay hardware constraints */
+    if (sys->use_overlay)
+        AlignRect(&rect_dest, sys->i_align_dest_boundary, sys->i_align_dest_size);
+#endif
+
+#endif
+
+#if defined(MODULE_NAME_IS_directdraw)
+    /* UpdateOverlay directdraw function doesn't automatically clip to the
+    * display size so we need to do it otherwise it will fail */
+
+    /* Clip the destination window */
+    if (!IntersectRect(&rect_dest_clipped, &rect_dest,
+        &sys->rect_display)) {
+        SetRectEmpty(&rect_src_clipped);
+        goto exit;
+    }
+
+#ifndef NDEBUG
+    msg_Dbg(vd, "DirectXUpdateRects image_dst_clipped coords:"
+        " %li,%li,%li,%li",
+        rect_dest_clipped.left, rect_dest_clipped.top,
+        rect_dest_clipped.right, rect_dest_clipped.bottom);
+#endif
+
+#else
+
+    /* AFAIK, there are no clipping constraints in Direct3D, OpenGL and GDI */
+    rect_dest_clipped = rect_dest;
+
+#endif
+
+    /* the 2 following lines are to fix a bug when clicking on the desktop */
+    if ((rect_dest_clipped.right - rect_dest_clipped.left) == 0 ||
+        (rect_dest_clipped.bottom - rect_dest_clipped.top) == 0) {
+#if !VLC_WINSTORE_APP
+        SetRectEmpty(&rect_src_clipped);
+#endif
+        goto exit;
+    }
+
+    /* src image dimensions */
+    rect_src.left = 0;
+    rect_src.top = 0;
+    rect_src.right = vd->fmt.i_visible_width;
+    rect_src.bottom = vd->fmt.i_visible_height;
+
+    /* Clip the source image */
+    rect_src_clipped.left = source->i_x_offset +
+        (rect_dest_clipped.left - rect_dest.left) *
+        source->i_visible_width / (rect_dest.right - rect_dest.left);
+    rect_src_clipped.right = source->i_x_offset +
+        source->i_visible_width -
+        (rect_dest.right - rect_dest_clipped.right) *
+        source->i_visible_width / (rect_dest.right - rect_dest.left);
+    rect_src_clipped.top = source->i_y_offset +
+        (rect_dest_clipped.top - rect_dest.top) *
+        source->i_visible_height / (rect_dest.bottom - rect_dest.top);
+    rect_src_clipped.bottom = source->i_y_offset +
+        source->i_visible_height -
+        (rect_dest.bottom - rect_dest_clipped.bottom) *
+        source->i_visible_height / (rect_dest.bottom - rect_dest.top);
+
+#ifdef MODULE_NAME_IS_directdraw
+    /* Apply overlay hardware constraints */
+    if (sys->use_overlay)
+        AlignRect(&rect_src_clipped, sys->i_align_src_boundary, sys->i_align_src_size);
+#elif defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11) || defined(MODULE_NAME_IS_direct2d)
+    /* Needed at least with YUV content */
+    rect_src_clipped.left &= ~1;
+    rect_src_clipped.right &= ~1;
+    rect_src_clipped.top &= ~1;
+    rect_src_clipped.bottom &= ~1;
+#endif
+
+#ifndef NDEBUG
+    msg_Dbg(vd, "DirectXUpdateRects souce"
+        " offset: %i,%i visible: %ix%i",
+        source->i_x_offset, source->i_y_offset,
+        source->i_visible_width, source->i_visible_height);
+    msg_Dbg(vd, "DirectXUpdateRects image_src"
+        " coords: %li,%li,%li,%li",
+        rect_src.left, rect_src.top,
+        rect_src.right, rect_src.bottom);
+    msg_Dbg(vd, "DirectXUpdateRects image_src_clipped"
+        " coords: %li,%li,%li,%li",
+        rect_src_clipped.left, rect_src_clipped.top,
+        rect_src_clipped.right, rect_src_clipped.bottom);
+    msg_Dbg(vd, "DirectXUpdateRects image_dst"
+        " coords: %li,%li,%li,%li",
+        rect_dest.left, rect_dest.top,
+        rect_dest.right, rect_dest.bottom);
+    msg_Dbg(vd, "DirectXUpdateRects image_dst_clipped"
+        " coords: %li,%li,%li,%li",
+        rect_dest_clipped.left, rect_dest_clipped.top,
+        rect_dest_clipped.right, rect_dest_clipped.bottom);
+#endif
+
+#ifdef MODULE_NAME_IS_directdraw
+    /* The destination coordinates need to be relative to the current
+    * directdraw primary surface (display) */
+    rect_dest_clipped.left -= sys->rect_display.left;
+    rect_dest_clipped.right -= sys->rect_display.left;
+    rect_dest_clipped.top -= sys->rect_display.top;
+    rect_dest_clipped.bottom -= sys->rect_display.top;
+#endif
+
+    CommonChangeThumbnailClip(vd, true);
+
+exit:
+    /* Signal the change in size/position */
+    sys->changes |= DX_POSITION_CHANGE;
+
+#undef rect_src
+#undef rect_src_clipped
+#undef rect_dest
+#undef rect_dest_clipped
+}
 
 #if !VLC_WINSTORE_APP
 /* */
@@ -321,196 +546,6 @@ static void CommonChangeThumbnailClip(vout_display_t *vd, bool show)
         taskbl->lpVtbl->Release(taskbl);
     }
     CoUninitialize();
-}
-
-/*****************************************************************************
- * UpdateRects: update clipping rectangles
- *****************************************************************************
- * This function is called when the window position or size are changed, and
- * its job is to update the source and destination RECTs used to display the
- * picture.
- *****************************************************************************/
-void UpdateRects(vout_display_t *vd,
-                  const vout_display_cfg_t *cfg,
-                  const video_format_t *source,
-                  bool is_forced)
-{
-    vout_display_sys_t *sys = vd->sys;
-#define rect_src sys->rect_src
-#define rect_src_clipped sys->rect_src_clipped
-#define rect_dest sys->rect_dest
-#define rect_dest_clipped sys->rect_dest_clipped
-
-    RECT  rect;
-    POINT point;
-
-    /* */
-    if (!cfg)
-        cfg = vd->cfg;
-    if (!source)
-        source = &vd->source;
-
-    /* Retrieve the window size */
-    GetClientRect(sys->hwnd, &rect);
-
-    /* Retrieve the window position */
-    point.x = point.y = 0;
-    ClientToScreen(sys->hwnd, &point);
-
-    /* If nothing changed, we can return */
-    bool has_moved;
-    bool is_resized;
-    EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
-                                    point.x, point.y,
-                                    rect.right, rect.bottom);
-    if (is_resized)
-        vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom);
-    if (!is_forced && !has_moved && !is_resized)
-        return;
-
-    /* Update the window position and size */
-    vout_display_cfg_t place_cfg = *cfg;
-    place_cfg.display.width  = rect.right;
-    place_cfg.display.height = rect.bottom;
-
-    vout_display_place_t place;
-    vout_display_PlacePicture(&place, source, &place_cfg, false);
-
-    EventThreadUpdateSourceAndPlace(sys->event, source, &place);
-
-    if (sys->hvideownd)
-        SetWindowPos(sys->hvideownd, 0,
-                     place.x, place.y, place.width, place.height,
-                     SWP_NOCOPYBITS|SWP_NOZORDER|SWP_ASYNCWINDOWPOS);
-
-    /* Destination image position and dimensions */
-#if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11) || defined(MODULE_NAME_IS_direct2d)
-    rect_dest.left   = 0;
-    rect_dest.right  = place.width;
-    rect_dest.top    = 0;
-    rect_dest.bottom = place.height;
-#else
-    rect_dest.left = point.x + place.x;
-    rect_dest.right = rect_dest.left + place.width;
-    rect_dest.top = point.y + place.y;
-    rect_dest.bottom = rect_dest.top + place.height;
-
-#ifdef MODULE_NAME_IS_directdraw
-    /* Apply overlay hardware constraints */
-    if (sys->use_overlay)
-        AlignRect(&rect_dest, sys->i_align_dest_boundary, sys->i_align_dest_size);
-#endif
-
-#endif
-
-#if defined(MODULE_NAME_IS_directdraw)
-    /* UpdateOverlay directdraw function doesn't automatically clip to the
-     * display size so we need to do it otherwise it will fail */
-
-    /* Clip the destination window */
-    if (!IntersectRect(&rect_dest_clipped, &rect_dest,
-                       &sys->rect_display)) {
-        SetRectEmpty(&rect_src_clipped);
-        goto exit;
-    }
-
-#ifndef NDEBUG
-    msg_Dbg(vd, "DirectXUpdateRects image_dst_clipped coords:"
-                " %li,%li,%li,%li",
-                rect_dest_clipped.left, rect_dest_clipped.top,
-                rect_dest_clipped.right, rect_dest_clipped.bottom);
-#endif
-
-#else
-
-    /* AFAIK, there are no clipping constraints in Direct3D, OpenGL and GDI */
-    rect_dest_clipped = rect_dest;
-
-#endif
-
-    /* the 2 following lines are to fix a bug when clicking on the desktop */
-    if ((rect_dest_clipped.right - rect_dest_clipped.left) == 0 ||
-        (rect_dest_clipped.bottom - rect_dest_clipped.top) == 0) {
-        SetRectEmpty(&rect_src_clipped);
-        goto exit;
-    }
-
-    /* src image dimensions */
-    rect_src.left   = 0;
-    rect_src.top    = 0;
-    rect_src.right  = vd->fmt.i_visible_width;
-    rect_src.bottom = vd->fmt.i_visible_height;
-
-    /* Clip the source image */
-    rect_src_clipped.left = source->i_x_offset +
-      (rect_dest_clipped.left - rect_dest.left) *
-      source->i_visible_width / (rect_dest.right - rect_dest.left);
-    rect_src_clipped.right = source->i_x_offset +
-      source->i_visible_width -
-      (rect_dest.right - rect_dest_clipped.right) *
-      source->i_visible_width / (rect_dest.right - rect_dest.left);
-    rect_src_clipped.top = source->i_y_offset +
-      (rect_dest_clipped.top - rect_dest.top) *
-      source->i_visible_height / (rect_dest.bottom - rect_dest.top);
-    rect_src_clipped.bottom = source->i_y_offset +
-      source->i_visible_height -
-      (rect_dest.bottom - rect_dest_clipped.bottom) *
-      source->i_visible_height / (rect_dest.bottom - rect_dest.top);
-
-#ifdef MODULE_NAME_IS_directdraw
-    /* Apply overlay hardware constraints */
-    if (sys->use_overlay)
-        AlignRect(&rect_src_clipped, sys->i_align_src_boundary, sys->i_align_src_size);
-#elif defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11) || defined(MODULE_NAME_IS_direct2d)
-    /* Needed at least with YUV content */
-    rect_src_clipped.left &= ~1;
-    rect_src_clipped.right &= ~1;
-    rect_src_clipped.top &= ~1;
-    rect_src_clipped.bottom &= ~1;
-#endif
-
-#ifndef NDEBUG
-    msg_Dbg(vd, "DirectXUpdateRects souce"
-                " offset: %i,%i visible: %ix%i",
-                source->i_x_offset, source->i_y_offset,
-                source->i_visible_width, source->i_visible_height);
-    msg_Dbg(vd, "DirectXUpdateRects image_src"
-                " coords: %li,%li,%li,%li",
-                rect_src.left, rect_src.top,
-                rect_src.right, rect_src.bottom);
-    msg_Dbg(vd, "DirectXUpdateRects image_src_clipped"
-                " coords: %li,%li,%li,%li",
-                rect_src_clipped.left, rect_src_clipped.top,
-                rect_src_clipped.right, rect_src_clipped.bottom);
-    msg_Dbg(vd, "DirectXUpdateRects image_dst"
-                " coords: %li,%li,%li,%li",
-                rect_dest.left, rect_dest.top,
-                rect_dest.right, rect_dest.bottom);
-    msg_Dbg(vd, "DirectXUpdateRects image_dst_clipped"
-                " coords: %li,%li,%li,%li",
-                rect_dest_clipped.left, rect_dest_clipped.top,
-                rect_dest_clipped.right, rect_dest_clipped.bottom);
-#endif
-
-#ifdef MODULE_NAME_IS_directdraw
-    /* The destination coordinates need to be relative to the current
-     * directdraw primary surface (display) */
-    rect_dest_clipped.left -= sys->rect_display.left;
-    rect_dest_clipped.right -= sys->rect_display.left;
-    rect_dest_clipped.top -= sys->rect_display.top;
-    rect_dest_clipped.bottom -= sys->rect_display.top;
-#endif
-
-    CommonChangeThumbnailClip(vd, true);
-
-exit:
-    /* Signal the change in size/position */
-    sys->changes |= DX_POSITION_CHANGE;
-
-#undef rect_src
-#undef rect_src_clipped
-#undef rect_dest
-#undef rect_dest_clipped
 }
 
 static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
@@ -729,12 +764,10 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
     }
 }
 
-void CommonManage(vout_display_t *vd) {};
-void CommonClean(vout_display_t *vd) {};
-void CommonDisplay(vout_display_t *vd) {};
-void UpdateRects(vout_display_t *vd,
-                  const vout_display_cfg_t *cfg,
-                  const video_format_t *source,
-                  bool is_forced)
-{};
+void CommonManage(vout_display_t *vd) {
+    UpdateRects(vd, NULL, NULL, false);
+}
+void CommonClean(vout_display_t *vd) {}
+void CommonDisplay(vout_display_t *vd) {}
+void CommonChangeThumbnailClip(vout_display_t *vd, bool show) {}
 #endif

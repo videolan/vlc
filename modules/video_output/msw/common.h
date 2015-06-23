@@ -69,6 +69,11 @@ typedef struct
 } d3d_quad_t;
 #endif
 
+#if VLC_WINSTORE_APP
+extern const GUID GUID_SWAPCHAIN_WIDTH;
+extern const GUID GUID_SWAPCHAIN_HEIGHT;
+#endif
+
 /*****************************************************************************
  * vout_sys_t: video output method descriptor
  *****************************************************************************
