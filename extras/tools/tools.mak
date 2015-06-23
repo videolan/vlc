@@ -121,7 +121,7 @@ xz: xz-$(XZ_VERSION).tar.bz2
 	$(MOVE)
 
 .xz: xz
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install && rm $(PREFIX)/lib/pkgconfig/liblzma.pc)
 	touch $@
 
 CLEAN_PKG += xz
