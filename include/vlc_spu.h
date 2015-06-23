@@ -41,9 +41,6 @@ extern "C" {
 
 typedef struct spu_private_t spu_private_t;
 
-/* Default subpicture channel ID */
-#define SPU_DEFAULT_CHANNEL (1)
-
 /**
  * Subpicture unit descriptor
  */

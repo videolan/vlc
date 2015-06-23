@@ -26,8 +26,6 @@
 #ifndef VLC_VOUT_OSD_H
 #define VLC_VOUT_OSD_H 1
 
-#include <vlc_spu.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,6 +37,9 @@ extern "C" {
  * \file
  * Overlay text and widgets
  */
+
+//* Default subpicture channel ID */
+#define SPU_DEFAULT_CHANNEL (1)
 
 /**
  * OSD menu position and picture type defines
