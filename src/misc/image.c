@@ -658,7 +658,9 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
     p_enc->fmt_in.video = *fmt_in;
 
     if( p_enc->fmt_in.video.i_visible_width == 0 ||
-        p_enc->fmt_in.video.i_visible_height == 0 )
+        p_enc->fmt_in.video.i_visible_height == 0 ||
+        p_enc->fmt_out.video.i_visible_width == 0 ||
+        p_enc->fmt_out.video.i_visible_height == 0 )
     {
         if( fmt_out->i_width > 0 && fmt_out->i_height > 0 )
         {
