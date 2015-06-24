@@ -203,6 +203,18 @@ VLC_API subpicture_t * subpicture_NewFromPicture( vlc_object_t *, picture_t *, v
  */
 VLC_API void subpicture_Update( subpicture_t *, const video_format_t *src, const video_format_t *, mtime_t );
 
+/**
+ * This function will blend a given subpicture onto a picture.
+ *
+ * The subpicture and all its region must:
+ *  - be absolute.
+ *  - not be ephemere.
+ *  - not have the fade flag.
+ *  - contains only picture (no text rendering).
+ * \return the number of region(s) succesfully blent
+ */
+VLC_API unsigned picture_BlendSubpicture( picture_t *, filter_t *p_blend, subpicture_t * );
+
 /**@}*/
 
 #endif /* _VLC_VIDEO_H */

@@ -238,19 +238,6 @@ VLC_API int picture_Export( vlc_object_t *p_obj, block_t **pp_image, video_forma
 VLC_API int picture_Setup( picture_t *, const video_format_t * );
 
 
-/**
- * This function will blend a given subpicture onto a picture.
- *
- * The subpicture and all its region must:
- *  - be absolute.
- *  - not be ephemere.
- *  - not have the fade flag.
- *  - contains only picture (no text rendering).
- * \return the number of region(s) succesfully blent
- */
-VLC_API unsigned picture_BlendSubpicture( picture_t *, filter_t *p_blend, subpicture_t * );
-
-
 /*****************************************************************************
  * Shortcuts to access image components
  *****************************************************************************/
