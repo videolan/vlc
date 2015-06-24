@@ -33,8 +33,9 @@
 #endif
 #include <unistd.h>
 
-#import <vlc_playlist.h>
-#import <vlc_vout_window.h>
+#include <vlc_common.h>
+#include <vlc_playlist.h>
+#include <vlc_vout_window.h>
 
 #import "intf.h"
 #import "VLCMinimalVoutWindow.h"
@@ -50,6 +51,7 @@ static void Run (intf_thread_t *p_intf);
 int OpenIntf (vlc_object_t *p_this)
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
+    msg_Dbg(p_intf, "Using minimal macosx interface");
 
     p_intf->p_sys = malloc(sizeof(intf_sys_t));
     if (p_intf->p_sys == NULL)
@@ -83,43 +85,12 @@ extern OSErr    CPSGetCurrentProcess(CPSProcessSerNum *psn);
 extern OSErr    CPSEnableForegroundOperation(CPSProcessSerNum *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
 extern OSErr    CPSSetFrontProcess(CPSProcessSerNum *psn);
 
-/*****************************************************************************
- * KillerThread: Thread that kill the application
- *****************************************************************************/
-static void * KillerThread(void *user_data)
-{
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-
-    intf_thread_t *p_intf = user_data;
-
-    for(;;)
-        pause();
-
-    /* We are dead, terminate */
-    [NSApp terminate: nil];
-    [o_pool release];
-    return NULL;
-}
 
 /*****************************************************************************
  * Run: main loop
  *****************************************************************************/
 static void Run(intf_thread_t *p_intf)
 {
-    sigset_t set;
-
-    /* Make sure the "force quit" menu item does quit instantly.
-     * VLC overrides SIGTERM which is sent by the "force quit"
-     * menu item to make sure deamon mode quits gracefully, so
-     * we un-override SIGTERM here. */
-    sigemptyset(&set);
-    sigaddset(&set, SIGTERM);
-    pthread_sigmask(SIG_UNBLOCK, &set, NULL);
-
-    /* Setup a thread that will monitor the module killing */
-    pthread_t killer_thread;
-    pthread_create(&killer_thread, NULL, KillerThread, p_intf);
-
     CPSProcessSerNum PSN;
     NSAutoreleasePool   *pool = [[NSAutoreleasePool alloc] init];
     [NSApplication sharedApplication];
@@ -127,9 +98,6 @@ static void Run(intf_thread_t *p_intf)
         if (!CPSEnableForegroundOperation(&PSN,0x03,0x3C,0x2C,0x1103))
             if (!CPSSetFrontProcess(&PSN))
                 [NSApplication sharedApplication];
-    [NSApp run];
-
-    pthread_join(killer_thread, NULL);
 
     [pool release];
 }
@@ -160,10 +128,6 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
     msg_Dbg(p_wnd, "returning video window with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
     p_wnd->handle.nsobject = [o_window contentView];
-
-    // TODO: find a cleaner way for "start in fullscreen"
-    if (var_GetBool(pl_Get(p_wnd), "fullscreen"))
-        [o_window performSelectorOnMainThread:@selector(enterFullscreen) withObject:nil waitUntilDone:NO];
 
     p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
     p_wnd->control = WindowControl;
