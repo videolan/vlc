@@ -248,8 +248,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     (double)fmt->video.i_frame_rate/(double)fmt->video.i_frame_rate_base );
 
         codec->codec_type = AVMEDIA_TYPE_VIDEO;
-        codec->width = fmt->video.i_width;
-        codec->height = fmt->video.i_height;
+        codec->width = fmt->video.i_visible_width;
+        codec->height = fmt->video.i_visible_height;
         av_reduce( &codec->sample_aspect_ratio.num,
                    &codec->sample_aspect_ratio.den,
                    fmt->video.i_sar_num,
