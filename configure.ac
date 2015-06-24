@@ -3817,11 +3817,8 @@ AC_ARG_ENABLE(minimal-macosx,
   [  --enable-minimal-macosx Minimal Mac OS X support (default disabled)])
 if test "${enable_minimal_macosx}" = "yes" -a "${SYS}" = "darwin"
 then
-  VLC_ADD_LIBS([minimal_macosx], [-Wl,-framework,Cocoa])
-  VLC_ADD_OBJCFLAGS([minimal_macosx], [-fobjc-exceptions] )
   VLC_ADD_PLUGIN([minimal_macosx])
 fi
-AM_CONDITIONAL(ENABLE_MINIMAL_MACOSX, [test "$enable_minimal_macosx" != "no"])
 
 dnl
 dnl  MacOS X dialog provider
@@ -4155,7 +4152,6 @@ AC_CONFIG_FILES([
   test/Makefile
   modules/gui/ios_dialog_provider/Makefile
   modules/gui/macosx/Makefile
-  modules/gui/minimal_macosx/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
   modules/hw/mmal/Makefile
