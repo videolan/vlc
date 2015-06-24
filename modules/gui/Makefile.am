@@ -1,13 +1,10 @@
 guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
 
-DIST_SUBDIRS += gui/macosx gui/minimal_macosx gui/qt4 gui/skins2 gui/macosx_dialog_provider gui/ios_dialog_provider
+DIST_SUBDIRS += gui/macosx gui/minimal_macosx gui/qt4 gui/skins2 gui/ios_dialog_provider
 
 if ENABLE_MACOSX_UI
 SUBDIRS += gui/macosx
-endif
-if ENABLE_MACOSX_DIALOG_PROVIDER
-SUBDIRS += gui/macosx_dialog_provider
 endif
 if HAVE_IOS
 SUBDIRS += gui/ios_dialog_provider
@@ -30,3 +27,14 @@ gui_LTLIBRARIES += libncurses_plugin.la
 endif
 
 EXTRA_DIST += gui/eject.c
+
+
+libmacosx_dialog_provider_plugin_la_SOURCES = \
+	gui/macosx_dialog_provider/VLCLoginPanel.h gui/macosx_dialog_provider/VLCLoginPanel.m \
+	gui/macosx_dialog_provider/VLCProgressPanel.h gui/macosx_dialog_provider/VLCProgressPanel.m \
+	gui/macosx_dialog_provider/VLCUIWidgets.h gui/macosx_dialog_provider/VLCUIWidgets.m \
+	gui/macosx_dialog_provider/dialogProvider.h gui/macosx_dialog_provider/dialogProvider.m
+libmacosx_dialog_provider_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' -Wl,-framework,Cocoa
+
+EXTRA_LTLIBRARIES += libmacosx_dialog_provider_plugin.la
+gui_LTLIBRARIES += $(LTLIBmacosx_dialog_provider)

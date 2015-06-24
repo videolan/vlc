@@ -3831,10 +3831,8 @@ AC_ARG_ENABLE(macosx-dialog-provider,
 if test "x${enable_macosx_dialog_provider}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_dialog_provider}" = "yes")
 then
-  VLC_ADD_LIBS([macosx_dialog_provider],[-Wl,-framework,Cocoa])
   VLC_ADD_PLUGIN([macosx_dialog_provider])
 fi
-AM_CONDITIONAL(ENABLE_MACOSX_DIALOG_PROVIDER, [test "$enable_macosx_dialog_provider" != "no"])
 
 dnl
 dnl  ncurses module
@@ -4158,7 +4156,6 @@ AC_CONFIG_FILES([
   modules/gui/ios_dialog_provider/Makefile
   modules/gui/macosx/Makefile
   modules/gui/minimal_macosx/Makefile
-  modules/gui/macosx_dialog_provider/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
   modules/hw/mmal/Makefile
