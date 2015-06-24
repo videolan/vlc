@@ -1,13 +1,10 @@
 guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
 
-DIST_SUBDIRS += gui/macosx gui/qt4 gui/skins2 gui/ios_dialog_provider
+DIST_SUBDIRS += gui/macosx gui/qt4 gui/skins2
 
 if ENABLE_MACOSX_UI
 SUBDIRS += gui/macosx
-endif
-if HAVE_IOS
-SUBDIRS += gui/ios_dialog_provider
 endif
 if ENABLE_QT4
 SUBDIRS += gui/qt4
@@ -46,3 +43,11 @@ libminimal_macosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions
 libminimal_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' -Wl,-framework,Cocoa
 EXTRA_LTLIBRARIES += libminimal_macosx_plugin.la
 gui_LTLIBRARIES += $(LTLIBminimal_macosx)
+
+
+libios_dialog_provider_plugin_la_SOURCES = gui/ios_dialog_provider/dialogProvider.m
+libios_dialog_provider_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS)
+libios_dialog_provider_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,UIKit
+if HAVE_IOS
+gui_LTLIBRARIES += libios_dialog_provider_plugin.la
+endif

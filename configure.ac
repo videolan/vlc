@@ -4150,7 +4150,6 @@ AC_CONFIG_FILES([
   lib/Makefile
   bin/Makefile
   test/Makefile
-  modules/gui/ios_dialog_provider/Makefile
   modules/gui/macosx/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
