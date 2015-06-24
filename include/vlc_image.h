@@ -24,12 +24,12 @@
 #ifndef VLC_IMAGE_H
 #define VLC_IMAGE_H 1
 
+# include <vlc_picture.h>
+
 /**
  * \file
  * This file defines functions and structures for image conversions in vlc
  */
-
-#include <vlc_vout.h>
 
 # ifdef __cplusplus
 extern "C" {
