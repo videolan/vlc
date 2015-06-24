@@ -30,8 +30,8 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_vout.h>
-#include <vlc_aout.h>
+#include <vlc_picture.h>
+#include <vlc_block.h>
 
 #include "visual.h"
 #include <math.h>
