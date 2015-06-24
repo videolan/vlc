@@ -3784,18 +3784,12 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx         Mac OS X gui support (default enabled on Mac OS X)])
 if test "x${enable_macosx}" != "xno" -a "${SYS}" = "darwin"
 then
-  VLC_ADD_LIBS([macosx], [-Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreServices])
-  VLC_ADD_OBJCFLAGS([macosx], [-fobjc-exceptions] )
   VLC_ADD_PLUGIN([macosx])
-
-  VLC_ADD_LIBS([macosx], [-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook -Wl,-framework,WebKit -Wl,-framework,CoreAudio -Wl,-framework,SystemConfiguration -Wl,-framework,ScriptingBridge])
 
   if test ! -d ${CONTRIB_DIR}/BGHUDAppKit.framework
   then
     AC_MSG_ERROR([BGHUDAppKit framework is required and was not found in ${CONTRIB_DIR}])
   fi
-  VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR} -Wl,-framework,BGHUDAppKit])
-  VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
 fi
 AM_CONDITIONAL(ENABLE_MACOSX_UI, [test "$enable_macosx" != "no"])
 
@@ -3810,8 +3804,7 @@ then
   then
     AC_MSG_ERROR([Sparkle framework is required and was not found in ${CONTRIB_DIR}])
   fi
-  VLC_ADD_LIBS([macosx], [-F${CONTRIB_DIR} -Wl,-framework,Sparkle])
-  VLC_ADD_OBJCFLAGS([macosx], [-F${CONTRIB_DIR}])
+
   AC_DEFINE([HAVE_SPARKLE], [1], [Define to 1 if sparkle is enabled.])
 fi
 AM_CONDITIONAL(HAVE_SPARKLE, [test "$enable_sparkle" != "no"])
