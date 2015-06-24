@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>            /* aout_FormatNbChannels, AOUT_FMTS_SIMILAR */
 #include <vlc_vout.h>              /* vout_*Picture, aout_filter_RequestVout */
+#include <vlc_filter.h>
 
 #include <goom/goom.h>
 
