@@ -51,7 +51,17 @@ static audio_output_t *GetAOut( libvlc_media_player_t *mp )
 
     audio_output_t *p_aout = input_resource_HoldAout( mp->input.p_resource );
     if( p_aout == NULL )
-        libvlc_printerr( "No active audio output" );
+    {
+        p_aout = input_resource_GetAout( mp->input.p_resource );
+        if( p_aout != NULL )
+        {
+            input_resource_PutAout( mp->input.p_resource, p_aout );
+            p_aout = input_resource_HoldAout( mp->input.p_resource );
+        }
+        else
+            libvlc_printerr( "No active audio output" );
+    }
+
     return p_aout;
 }
 
@@ -132,11 +142,6 @@ int libvlc_audio_output_set( libvlc_media_player_t *mp, const char *psz_name )
 
     /* Forget the existing audio output */
     input_resource_ResetAout(mp->input.p_resource);
-
-    /* Create a new audio output */
-    audio_output_t *aout = input_resource_GetAout(mp->input.p_resource);
-    if( aout != NULL )
-        input_resource_PutAout(mp->input.p_resource, aout);
 
     return 0;
 }

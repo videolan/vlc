@@ -595,10 +595,6 @@ libvlc_media_player_new( libvlc_instance_t *instance )
         vlc_object_release(mp);
         return NULL;
     }
-    audio_output_t *aout = input_resource_GetAout(mp->input.p_resource);
-    if( aout != NULL )
-        input_resource_PutAout(mp->input.p_resource, aout);
-
     vlc_mutex_init (&mp->input.lock);
     mp->i_refcount = 1;
     mp->p_event_manager = libvlc_event_manager_new(mp, instance);
