@@ -173,7 +173,7 @@ typedef struct
 
 struct timeout_thread_t
 {
-    demux_sys_t  *p_sys;
+    demux_t     *p_demux;
     vlc_thread_t handle;
     bool         b_handle_keep_alive;
 };
@@ -210,6 +210,7 @@ struct demux_sys_t
     int              i_timeout;     /* session timeout value in seconds */
     bool             b_timeout_call;/* mark to send an RTSP call to prevent server timeout */
     timeout_thread_t *p_timeout;    /* the actual thread that makes sure we don't timeout */
+    vlc_mutex_t      timeout_mutex; /* Serialise calls to live555 in timeout thread w.r.t. Demux()/Control() */
 
     /* */
     bool             b_force_mcast;
@@ -310,6 +311,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->psz_path = strdup( p_demux->psz_location );
     p_sys->b_force_mcast = var_InheritBool( p_demux, "rtsp-mcast" );
     p_sys->f_seek_request = -1;
+    vlc_mutex_init(&p_sys->timeout_mutex);
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
@@ -456,6 +458,7 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_path );
 
     vlc_UrlClean( &p_sys->url );
+    vlc_mutex_destroy(&p_sys->timeout_mutex);
 
     free( p_sys );
 }
@@ -1238,7 +1241,7 @@ static int Play( demux_t *p_demux )
             if( p_sys->p_timeout )
             {
                 memset( p_sys->p_timeout, 0, sizeof(timeout_thread_t) );
-                p_sys->p_timeout->p_sys = p_demux->p_sys; /* lol, object recursion :D */
+                p_sys->p_timeout->p_demux = p_demux;
                 if( vlc_clone( &p_sys->p_timeout->handle,  TimeoutPrevention,
                                p_sys->p_timeout, VLC_THREAD_PRIORITY_LOW ) )
                 {
@@ -1275,6 +1278,10 @@ static int Demux( demux_t *p_demux )
 
     bool            b_send_pcr = true;
     int             i;
+
+    /* Protect Live555 from simultaneous calls in TimeoutPrevention()
+       during pause */
+    vlc_mutex_locker locker(&p_sys->timeout_mutex);
 
     /* Check if we need to send the server a Keep-A-Live signal */
     if( p_sys->b_timeout_call && p_sys->rtsp && p_sys->ms )
@@ -1430,6 +1437,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     double  *pf, f;
     bool *pb, *pb2;
     int *pi_int;
+
+    vlc_mutex_locker locker(&p_sys->timeout_mutex); /* (see same in Demux) */
 
     switch( i_query )
     {
@@ -2111,21 +2120,35 @@ VLC_NORETURN
 static void* TimeoutPrevention( void *p_data )
 {
     timeout_thread_t *p_timeout = (timeout_thread_t *)p_data;
+    demux_t *p_demux = p_timeout->p_demux;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     for( ;; )
     {
         /* Voodoo (= no) thread safety here! *Ahem* */
         if( p_timeout->b_handle_keep_alive )
         {
+            /* Protect Live555 from us calling their functions simultaneously
+               with Demux() or Control() */
+            vlc_mutex_locker locker(&p_sys->timeout_mutex);
+
             char *psz_bye = NULL;
             int canc = vlc_savecancel ();
 
-            p_timeout->p_sys->rtsp->sendGetParameterCommand( *p_timeout->p_sys->ms, NULL, psz_bye );
+            p_sys->rtsp->sendGetParameterCommand( *p_sys->ms, default_live555_callback, psz_bye );
+
+            if( !wait_Live555_response( p_demux ) )
+            {
+              msg_Err( p_demux, "GET_PARAMETER keepalive failed: %s",
+                       p_sys->env->getResultMsg() );
+              /* Just continue, worst case is we get timed out later */
+            }
+
             vlc_restorecancel (canc);
         }
-        p_timeout->p_sys->b_timeout_call = !p_timeout->b_handle_keep_alive;
+        p_sys->b_timeout_call = !p_timeout->b_handle_keep_alive;
 
-        msleep (((int64_t)p_timeout->p_sys->i_timeout - 2) * CLOCK_FREQ);
+        msleep (((int64_t)p_sys->i_timeout - 2) * CLOCK_FREQ);
     }
     vlc_assert_unreachable(); /* dead code */
 }
