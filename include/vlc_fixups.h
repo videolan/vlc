@@ -379,6 +379,8 @@ struct addrinfo
     char *ai_canonname;
     struct addrinfo *ai_next;
 };
+
+void freeaddrinfo (struct addrinfo *res);
 #endif
 
 /* math.h */
