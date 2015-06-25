@@ -515,6 +515,10 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "drawable-agl", VLC_VAR_INTEGER);
     var_Create (mp, "drawable-nsobject", VLC_VAR_ADDRESS);
 #endif
+#ifdef __ANDROID__
+    var_Create (mp, "android-jvm", VLC_VAR_ADDRESS);
+    var_Create (mp, "drawable-androidwindow", VLC_VAR_ADDRESS);
+#endif
 
     var_Create (mp, "keyboard-events", VLC_VAR_BOOL);
     var_SetBool (mp, "keyboard-events", true);
@@ -1090,6 +1094,22 @@ void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
     return (void *)(uintptr_t)var_GetInteger (p_mi, "drawable-hwnd");
 #else
     return NULL;
+#endif
+}
+
+/**************************************************************************
+ * set_android_context
+ **************************************************************************/
+void libvlc_media_player_set_android_context( libvlc_media_player_t *p_mi,
+                                              void *p_jvm,
+                                              void *p_awindow_handler )
+{
+    assert (p_mi != NULL);
+#ifdef __ANDROID__
+    var_SetAddress (p_mi, "android-jvm", p_jvm);
+    var_SetAddress (p_mi, "drawable-androidwindow", p_awindow_handler);
+#else
+    (void) p_mi; (void) p_jvm; (void) p_awindow_handler;
 #endif
 }
 
