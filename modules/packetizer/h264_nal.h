@@ -74,7 +74,7 @@ enum sei_type_e
 struct nal_sps
 {
     int i_id;
-    int i_profile, i_level;
+    int i_profile, i_profile_compatibility, i_level;
     int i_width, i_height;
     int i_log2_max_frame_num;
     int b_frame_mbs_only;

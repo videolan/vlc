@@ -224,8 +224,7 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
     bs_init( &s, pb_dec, i_dec );
     int i_profile_idc = bs_read( &s, 8 );
     p_sps->i_profile = i_profile_idc;
-    /* Skip constraint_set0123, reserved(4) */
-    bs_skip( &s, 1+1+1+1 + 4 );
+    p_sps->i_profile_compatibility = bs_read( &s, 8 );
     p_sps->i_level = bs_read( &s, 8 );
     /* sps id */
     p_sps->i_id = bs_read_ue( &s );
