@@ -695,7 +695,7 @@ typedef struct
 {
     filter_t *p_filter;
     vlc_thread_t thread;
-    atomic_bool abort;
+    std::atomic_bool abort;
 
     /* tell the thread which color should be the target of fading */
     uint8_t ui_red;
@@ -1105,7 +1105,7 @@ static void Atmo_Shutdown(filter_t *p_filter)
           p_sys->p_fadethread->i_steps  = 1;
         else
           p_sys->p_fadethread->i_steps  = p_sys->i_endfadesteps;
-        atomic_store(&p_sys->p_fadethread->abort, false);
+        p_sys->p_fadethread->abort.store(false);
 
         if( vlc_clone( &p_sys->p_fadethread->thread,
                        FadeToColorThread,
@@ -2347,7 +2347,7 @@ static void *FadeToColorThread(void *obj)
             /* send the same pixel data again... to unlock the buffer! */
             AtmoSendPixelData( p_fadethread->p_filter );
 
-            while( (!atomic_load (&p_fadethread->abort)) &&
+            while( !p_fadethread->abort.load() &&
                 (i_steps_done < p_fadethread->i_steps))
             {
                 p_transfer = AtmoLockTransferBuffer( p_fadethread->p_filter );
@@ -2360,7 +2360,7 @@ static void *FadeToColorThread(void *obj)
                 thread improvements wellcome!
                 */
                 for(i_index = 0;
-                    (i_index < i_size) && (!atomic_load (&p_fadethread->abort));
+                    (i_index < i_size) && !p_fadethread->abort.load();
                     i_index+=4)
                 {
                     i_src_blue  = p_source[i_index+0];
@@ -2416,7 +2416,7 @@ static void CheckAndStopFadeThread(filter_t *p_filter)
     {
         msg_Dbg(p_filter, "kill still running fadeing thread...");
 
-        atomic_store(&p_sys->p_fadethread->abort, true);
+        p_sys->p_fadethread->abort.store(true);
 
         vlc_join(p_sys->p_fadethread->thread, NULL);
         free(p_sys->p_fadethread);
