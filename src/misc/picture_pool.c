@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2009 VLC authors and VideoLAN
  * Copyright (C) 2009 Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
- * $Id$
+ * Copyright (C) 2013-2015 Rémi Denis-Courmont
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
@@ -30,6 +30,8 @@
 # include "config.h"
 #endif
 #include <assert.h>
+#include <limits.h>
+#include <stdlib.h>
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
@@ -41,7 +43,7 @@
 struct picture_gc_sys_t {
     picture_pool_t *pool;
     picture_t *picture;
-    bool in_use;
+    unsigned offset;
 };
 
 struct picture_pool_t {
@@ -49,6 +51,7 @@ struct picture_pool_t {
     void      (*pic_unlock)(picture_t *);
     vlc_mutex_t lock;
 
+    unsigned long long available;
     unsigned    refs;
     unsigned    picture_count;
     picture_t  *picture[];
@@ -89,15 +92,16 @@ static void picture_pool_ReleasePicture(picture_t *picture)
         pool->pic_unlock(picture);
 
     vlc_mutex_lock(&pool->lock);
-    assert(sys->in_use);
-    sys->in_use = false;
+    assert(!(pool->available & (1ULL << sys->offset)));
+    pool->available |= 1ULL << sys->offset;
     vlc_mutex_unlock(&pool->lock);
 
     picture_pool_Release(pool);
 }
 
 static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
-                                            picture_t *picture)
+                                            picture_t *picture,
+                                            unsigned offset)
 {
     picture_gc_sys_t *sys = malloc(sizeof(*sys));
     if (unlikely(sys == NULL))
@@ -105,7 +109,7 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
 
     sys->pool = pool;
     sys->picture = picture;
-    sys->in_use = false;
+    sys->offset = offset;
 
     picture_resource_t res = {
         .p_sys = picture->p_sys,
@@ -129,6 +133,9 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
 
 picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
 {
+    if (unlikely(cfg->picture_count > CHAR_BIT * sizeof (unsigned long long)))
+        return NULL;
+
     picture_pool_t *pool = malloc(sizeof (*pool)
                                   + cfg->picture_count * sizeof (picture_t *));
     if (unlikely(pool == NULL))
@@ -137,11 +144,12 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     pool->pic_lock   = cfg->lock;
     pool->pic_unlock = cfg->unlock;
     vlc_mutex_init(&pool->lock);
+    pool->available = (1ULL << cfg->picture_count) - 1;
     pool->refs = 1;
     pool->picture_count = cfg->picture_count;
 
     for (unsigned i = 0; i < cfg->picture_count; i++) {
-        picture_t *picture = picture_pool_ClonePicture(pool, cfg->picture[i]);
+        picture_t *picture = picture_pool_ClonePicture(pool, cfg->picture[i], i);
         if (unlikely(picture == NULL))
             abort();
 
@@ -217,19 +225,17 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
 
     for (unsigned i = 0; i < pool->picture_count; i++) {
         picture_t *picture = pool->picture[i];
-        picture_priv_t *priv = (picture_priv_t *)picture;
-        picture_gc_sys_t *sys = priv->gc.opaque;
 
-        if (sys->in_use)
+        if (!(pool->available & (1ULL << i)))
             continue;
 
+        pool->available &= ~(1ULL << i);
         pool->refs++;
-        sys->in_use = true;
         vlc_mutex_unlock(&pool->lock);
 
         if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0) {
             vlc_mutex_lock(&pool->lock);
-            sys->in_use = false;
+            pool->available |= 1ULL << i;
             pool->refs--;
             continue;
         }
@@ -253,10 +259,8 @@ retry:
 
     for (unsigned i = 0; i < pool->picture_count; i++) {
         picture_t *picture = pool->picture[i];
-        picture_priv_t *priv = (picture_priv_t *)picture;
-        picture_gc_sys_t *sys = priv->gc.opaque;
 
-        if (sys->in_use) {
+        if (!(pool->available & (1ULL << i))) {
             vlc_mutex_unlock(&pool->lock);
             picture_Release(picture);
             ret++;
