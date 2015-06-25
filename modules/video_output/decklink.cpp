@@ -41,7 +41,6 @@
 
 #include <vlc_block.h>
 #include <vlc_image.h>
-#include <vlc_atomic.h>
 #include <vlc_aout.h>
 #include <arpa/inet.h>
 
