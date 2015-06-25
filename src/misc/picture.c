@@ -34,7 +34,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_picture.h>
+#include "picture.h"
 #include <vlc_image.h>
 #include <vlc_block.h>
 
@@ -148,9 +148,6 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
         p->i_pixel_pitch = 0;
     }
 
-    atomic_init( &p_picture->gc.refcount, 0 );
-    p_picture->gc.p_sys = NULL;
-
     p_picture->i_nb_fields = 2;
 
     video_format_Setup( &p_picture->format, fmt->i_chroma, fmt->i_width, fmt->i_height,
@@ -219,9 +216,14 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
         video_format_CopyCrop( &fmt, p_fmt );
 
     /* */
-    picture_t *p_picture = calloc( 1, sizeof(*p_picture) );
-    if( !p_picture )
+    picture_priv_t *priv = malloc( sizeof (*priv) );
+    if( unlikely(priv == NULL) )
         return NULL;
+
+    picture_t *p_picture = &priv->picture;
+
+    memset( p_picture, 0, sizeof( *p_picture ) );
+    p_picture->format = fmt;
 
     /* Make sure the real dimensions are a multiple of 16 */
     if( picture_Setup( p_picture, &fmt ) )
@@ -230,12 +232,17 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
         return NULL;
     }
 
+    atomic_init( &priv->gc.refs, 1 );
+    priv->gc.opaque = NULL;
+
     if( p_resource )
     {
         p_picture->p_sys = p_resource->p_sys;
-        p_picture->gc.pf_destroy = p_resource->pf_destroy;
-        if( p_picture->gc.pf_destroy == NULL )
-            p_picture->gc.pf_destroy = picture_DestroyFromResource;
+
+        if( p_resource->pf_destroy != NULL )
+            priv->gc.destroy = p_resource->pf_destroy;
+        else
+            priv->gc.destroy = picture_DestroyFromResource;
 
         for( int i = 0; i < p_picture->i_planes; i++ )
         {
@@ -251,13 +258,8 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
             free( p_picture );
             return NULL;
         }
-        p_picture->gc.pf_destroy = picture_Destroy;
+        priv->gc.destroy = picture_Destroy;
     }
-
-    /* */
-    p_picture->format = fmt;
-
-    atomic_init( &p_picture->gc.refcount, 1 );
 
     return p_picture;
 }
@@ -284,7 +286,10 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
 
 picture_t *picture_Hold( picture_t *p_picture )
 {
-    uintptr_t refs = atomic_fetch_add( &p_picture->gc.refcount, 1 );
+    assert( p_picture != NULL );
+
+    picture_priv_t *priv = (picture_priv_t *)p_picture;
+    uintptr_t refs = atomic_fetch_add( &priv->gc.refs, 1 );
     assert( refs > 0 );
     return p_picture;
 }
@@ -293,19 +298,22 @@ void picture_Release( picture_t *p_picture )
 {
     assert( p_picture != NULL );
 
-    uintptr_t refs = atomic_fetch_sub( &p_picture->gc.refcount, 1 );
+    picture_priv_t *priv = (picture_priv_t *)p_picture;
+    uintptr_t refs = atomic_fetch_sub( &priv->gc.refs, 1 );
     assert( refs != 0 );
     if( refs > 1 )
         return;
 
     PictureDestroyContext( p_picture );
-    assert( p_picture->gc.pf_destroy != NULL );
-    p_picture->gc.pf_destroy( p_picture );
+    assert( priv->gc.destroy != NULL );
+    priv->gc.destroy( p_picture );
 }
 
 bool picture_IsReferenced( picture_t *p_picture )
 {
-    return atomic_load( &p_picture->gc.refcount ) > 1;
+    picture_priv_t *priv = (picture_priv_t *)p_picture;
+
+    return atomic_load( &priv->gc.refs ) > 1;
 }
 
 /*****************************************************************************
