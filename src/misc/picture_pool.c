@@ -159,11 +159,10 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
 
 picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
 {
-    picture_pool_configuration_t cfg;
-
-    memset(&cfg, 0, sizeof(cfg));
-    cfg.picture_count = count;
-    cfg.picture       = tab;
+    picture_pool_configuration_t cfg = {
+        .picture_count = count,
+        .picture = tab,
+    };
 
     return picture_pool_NewExtended(&cfg);
 }
