@@ -42,11 +42,9 @@ struct picture_gc_sys_t {
     picture_pool_t *pool;
     picture_t *picture;
     bool in_use;
-    uint64_t tick;
 };
 
 struct picture_pool_t {
-    uint64_t    tick;
     int       (*pic_lock)(picture_t *);
     void      (*pic_unlock)(picture_t *);
     vlc_mutex_t lock;
@@ -108,7 +106,6 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
     sys->pool = pool;
     sys->picture = picture;
     sys->in_use = false;
-    sys->tick = 0;
 
     picture_resource_t res = {
         .p_sys = picture->p_sys,
@@ -137,7 +134,6 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     if (unlikely(pool == NULL))
         return NULL;
 
-    pool->tick = 1;
     pool->pic_lock   = cfg->lock;
     pool->pic_unlock = cfg->unlock;
     vlc_mutex_init(&pool->lock);
@@ -223,13 +219,11 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
         picture_t *picture = pool->picture[i];
         picture_priv_t *priv = (picture_priv_t *)picture;
         picture_gc_sys_t *sys = priv->gc.opaque;
-        uint64_t tick;
 
         if (sys->in_use)
             continue;
 
         pool->refs++;
-        tick = ++pool->tick;
         sys->in_use = true;
         vlc_mutex_unlock(&pool->lock);
 
@@ -239,8 +233,6 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
             pool->refs--;
             continue;
         }
-
-        sys->tick = tick;
 
         assert(atomic_load(&((picture_priv_t *)picture)->gc.refs) == 0);
         atomic_init(&((picture_priv_t *)picture)->gc.refs, 1);
