@@ -132,33 +132,24 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
     return clone;
 }
 
-static picture_pool_t *Create(int picture_count)
+picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
 {
-    picture_pool_t *pool = calloc(1, sizeof(*pool));
-    if (!pool)
+    picture_pool_t *pool = malloc(sizeof (*pool));
+    if (unlikely(pool == NULL))
         return NULL;
 
     pool->tick = 1;
-    pool->picture_count = picture_count;
-    pool->picture = calloc(pool->picture_count, sizeof(*pool->picture));
-    if (!pool->picture) {
-        free(pool->picture);
+    pool->picture_count = cfg->picture_count;
+    pool->picture = calloc(pool->picture_count, sizeof (*pool->picture));
+    if (unlikely(pool->picture == NULL)) {
         free(pool);
         return NULL;
     }
+
     pool->refs = 1;
-    vlc_mutex_init(&pool->lock);
-    return pool;
-}
-
-picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
-{
-    picture_pool_t *pool = Create(cfg->picture_count);
-    if (!pool)
-        return NULL;
-
     pool->pic_lock   = cfg->lock;
     pool->pic_unlock = cfg->unlock;
+    vlc_mutex_init(&pool->lock);
 
     for (unsigned i = 0; i < cfg->picture_count; i++) {
         picture_t *picture = picture_pool_ClonePicture(pool, cfg->picture[i]);
