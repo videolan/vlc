@@ -38,10 +38,6 @@
 #include "utils.h"
 
 #define THREAD_NAME "ANativeWindow"
-extern JNIEnv *jni_get_env(const char *name);
-extern jobject jni_LockAndGetAndroidJavaSurface();
-extern void jni_UnlockAndroidSurface();
-extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
 
 static int Open(vout_window_t *, const vout_window_cfg_t *);
 static void Close(vout_window_t *);
@@ -62,10 +58,7 @@ vlc_module_end()
 
 struct vout_window_sys_t
 {
-    void *p_library;
-    native_window_api_t native_window;
-
-    ANativeWindow *window;
+    AWindowHandler *p_awh;
 };
 
 /**
@@ -73,6 +66,8 @@ struct vout_window_sys_t
  */
 static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
+    ANativeWindow *p_anw;
+
     if (cfg->type != VOUT_WINDOW_TYPE_INVALID
      && cfg->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
         return VLC_EGENERIC;
@@ -81,40 +76,27 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
-    p_sys->p_library = LoadNativeWindowAPI(&p_sys->native_window);
-    if (p_sys->p_library == NULL)
-    {
-        free(p_sys);
-        return VLC_EGENERIC;
-    }
-
-    // Create the native window by first getting the Java surface.
-    jobject javaSurface = jni_LockAndGetAndroidJavaSurface();
-    if (javaSurface == NULL)
+    p_sys->p_awh = AWindowHandler_new(VLC_OBJECT(wnd));
+    if (!p_sys->p_awh)
         goto error;
-
-    JNIEnv *p_env;
-    if (!(p_env = jni_get_env(THREAD_NAME)))
-        goto error;
-    p_sys->window = p_sys->native_window.winFromSurface(p_env, javaSurface); // ANativeWindow_fromSurface call.
-
-    jni_UnlockAndroidSurface();
-
-    if (p_sys->window == NULL)
+    p_anw = AWindowHandler_getANativeWindow(p_sys->p_awh, AWindow_Video);
+    if (!p_anw)
         goto error;
 
     wnd->type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
-    wnd->handle.anativewindow = p_sys->window;
+    wnd->handle.anativewindow = p_anw;
     wnd->control = Control;
     wnd->sys = p_sys;
 
     // Set the Java surface size.
-    jni_SetSurfaceLayout(cfg->width, cfg->height, cfg->width, cfg->height, 1, 1);
+    AWindowHandler_setWindowLayout(p_sys->p_awh, cfg->width, cfg->height,
+                                   cfg->width, cfg->height, 1, 1);
 
     return VLC_SUCCESS;
 
 error:
-    dlclose(p_sys->p_library);
+    if (p_sys->p_awh)
+        AWindowHandler_destroy(p_sys->p_awh);
     free(p_sys);
     return VLC_EGENERIC;
 }
@@ -126,8 +108,7 @@ error:
 static void Close(vout_window_t *wnd)
 {
     vout_window_sys_t *p_sys = wnd->sys;
-    p_sys->native_window.winRelease(p_sys->window); // Release the native window.
-    dlclose(p_sys->p_library); // Close the library.
+    AWindowHandler_destroy(p_sys->p_awh);
     free (p_sys);
 }
 
@@ -143,7 +124,8 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
         {
             unsigned width = va_arg(ap, unsigned);
             unsigned height = va_arg(ap, unsigned);
-            jni_SetSurfaceLayout(width, height, width, height, 1, 1);
+            AWindowHandler_setWindowLayout(wnd->sys->p_awh, width, height,
+                                           width, height, 1, 1);
             break;
         }
         case VOUT_WINDOW_SET_STATE:

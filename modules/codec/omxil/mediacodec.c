@@ -48,9 +48,7 @@
 #include "../../video_output/android/android_window.h"
 
 /* JNI functions to get/set an Android Surface object. */
-extern jobject jni_LockAndGetAndroidJavaSurface();
-extern void jni_UnlockAndroidSurface();
-extern void jni_EventHardwareAccelerationError();
+extern void jni_EventHardwareAccelerationError(); // TODO REMOVE
 
 /* Implementation of a circular buffer of timestamps with overwriting
  * of older values. MediaCodec has only one type of timestamp, if a
@@ -136,6 +134,7 @@ struct csd
 struct decoder_sys_t
 {
     mc_api *api;
+    AWindowHandler *p_awh;
     char *psz_name;
     uint32_t nal_size;
 
@@ -341,7 +340,6 @@ static int StartMediaCodec(decoder_t *p_dec)
     int i_angle = 0, i_ret;
     size_t h264_profile = 0;
     char *psz_name = NULL;
-    jobject jsurface = NULL;
 
     if (p_dec->fmt_in.i_extra && !p_sys->p_csd)
     {
@@ -424,12 +422,10 @@ static int StartMediaCodec(decoder_t *p_dec)
     if (!psz_name)
         return VLC_EGENERIC;
 
-    if (var_InheritBool(p_dec, CFG_PREFIX "dr"))
-        jsurface = jni_LockAndGetAndroidJavaSurface();
-    i_ret = p_sys->api->start(p_sys->api, jsurface, psz_name, p_sys->mime,
+    if (!p_sys->p_awh && var_InheritBool(p_dec, CFG_PREFIX "dr"))
+        p_sys->p_awh = AWindowHandler_new(VLC_OBJECT(p_dec));
+    i_ret = p_sys->api->start(p_sys->api, p_sys->p_awh, psz_name, p_sys->mime,
                               p_sys->i_width, p_sys->i_height, i_angle);
-    if (jsurface)
-        jni_UnlockAndroidSurface();
 
     if (i_ret == VLC_SUCCESS)
     {
@@ -462,6 +458,11 @@ static void StopMediaCodec(decoder_t *p_dec)
     p_sys->psz_name = NULL;
 
     p_sys->api->stop(p_sys->api);
+    if (p_sys->p_awh)
+    {
+        AWindowHandler_releaseANativeWindow(p_sys->p_awh, AWindow_Video);
+        AWindowHandler_releaseSurface(p_sys->p_awh, AWindow_Video);
+    }
 }
 
 /*****************************************************************************
@@ -592,6 +593,8 @@ static void CloseDecoder(vlc_object_t *p_this)
         timestamp_FifoRelease(p_sys->timestamp_fifo);
     p_sys->api->clean(p_sys->api);
     free(p_sys->api);
+    if (p_sys->p_awh)
+        AWindowHandler_destroy(p_sys->p_awh);
     free(p_sys);
 }
 

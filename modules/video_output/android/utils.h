@@ -1,9 +1,10 @@
 /*****************************************************************************
  * utils.h: shared code between Android vout modules.
  *****************************************************************************
- * Copyright (C) 2014 VLC authors and VideoLAN
+ * Copyright (C) 2014-2015 VLC authors and VideoLAN
  *
  * Authors: Felix Abecassis <felix.abecassis@gmail.com>
+ *          Thomas Guillem <thomas@gllm.fr>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -24,38 +25,43 @@
 # include "config.h"
 #endif
 
-#include <android/native_window.h>
 #include <jni.h>
+#include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <android/input.h>
 
 #include <vlc_vout_display.h>
+#include <vlc_common.h>
 
-typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
-typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
+typedef struct AWindowHandler AWindowHandler;
+
+enum AWindow_ID {
+    AWindow_Video,
+    AWindow_Subtitles,
+    AWindow_Max,
+};
+
+/**
+ * native_window_api_t. See android/native_window.h in NDK
+ */
+
 typedef int32_t (*ptr_ANativeWindow_lock)(ANativeWindow*, ANativeWindow_Buffer*, ARect*);
 typedef void (*ptr_ANativeWindow_unlockAndPost)(ANativeWindow*);
 typedef int32_t (*ptr_ANativeWindow_setBuffersGeometry)(ANativeWindow*, int32_t, int32_t, int32_t);
 
 typedef struct
 {
-    ptr_ANativeWindow_fromSurface winFromSurface;
-    ptr_ANativeWindow_release winRelease;
     ptr_ANativeWindow_lock winLock;
     ptr_ANativeWindow_unlockAndPost unlockAndPost;
     ptr_ANativeWindow_setBuffersGeometry setBuffersGeometry; /* can be NULL */
 } native_window_api_t;
 
-/* Fill the structure passed as parameter and return a library handle
-   that should be destroyed with dlclose. */
-void *LoadNativeWindowAPI(native_window_api_t *native);
-
-/* Pre Android 2.3 NativeSurface, no need to free a handle,
- * native->sys->anwp.setBuffersGeometry will be NULL. */
-void LoadNativeSurfaceAPI(native_window_api_t *native);
+/**
+ * native_window_priv_api_t. See system/core/include/system/window.h in AOSP.
+ */
 
 typedef struct native_window_priv native_window_priv;
-typedef native_window_priv *(*ptr_ANativeWindowPriv_connect) (void *);
+typedef native_window_priv *(*ptr_ANativeWindowPriv_connect) (ANativeWindow *);
 typedef int (*ptr_ANativeWindowPriv_disconnect) (native_window_priv *);
 typedef int (*ptr_ANativeWindowPriv_setUsage) (native_window_priv *, bool, int );
 typedef int (*ptr_ANativeWindowPriv_setBuffersGeometry) (native_window_priv *, int, int, int );
@@ -90,6 +96,77 @@ typedef struct
     ptr_ANativeWindowPriv_setOrientation setOrientation;
 } native_window_priv_api_t;
 
-/* Fill the structure passed as parameter and return 0 if all symbols are
-   found. Don't need to call dlclose, the lib is already loaded. */
-int LoadNativeWindowPrivAPI(native_window_priv_api_t *native);
+/**
+ * This function returns a JNIEnv* created from the android JavaVM attached to
+ * the VLC object var. it doesn't need to be released.
+ */
+JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
+
+/**
+ * This function return a new AWindowHandler created from a
+ * IAWindowNativeHandler jobject attached to the VLC object var. It must be
+ * released with AWindowHandler_destroy.
+ */
+AWindowHandler *AWindowHandler_new(vlc_object_t *p_obj);
+void AWindowHandler_destroy(AWindowHandler *p_awh);
+
+/**
+ * This functions returns a native_window_api_t that can be used to access the
+ * public ANativeWindow API. It can't be NULL and shouldn't be released
+ */
+native_window_api_t *AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh);
+
+/**
+ * This function returns a native_window_priv_api_t that can be used to access
+ * the private ANativeWindow API. It can be NULL and shouldn't be released
+ */
+native_window_priv_api_t *AWindowHandler_getANativeWindowPrivAPI(AWindowHandler *p_awh);
+
+/**
+ * This function retrieves the mouse coordinates sent by the Android
+ * MediaPlayer. It returns true if the coordinates are valid.
+ */
+bool AWindowHandler_getMouseCoordinates(AWindowHandler *p_awh,
+                                        int *p_action, int *p_button,
+                                        int *p_x, int *p_y);
+
+/**
+ * This function retrieves the window size sent by the Android MediaPlayer.  It
+ * returns true if the size is valid.
+ */
+bool AWindowHandler_getWindowSize(AWindowHandler *p_awh,
+                                  int *p_width, int *p_height);
+
+/**
+ * This function returns the Video or the Subtitles Android Surface attached to
+ * the MediaPlayer. It can be released with AWindowHandler_releaseSurface or by
+ * AWindowHandler_destroy.
+ */
+jobject AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id);
+void AWindowHandler_releaseSurface(AWindowHandler *p_awh, enum AWindow_ID id);
+
+/**
+ * This function returns the Video or the Subtitles ANativeWindow attached to
+ * the Android Surface. It can be released with
+ * AWindowHandler_releaseANativeWindow or by AWindowHandler_destroy.
+ */
+ANativeWindow *AWindowHandler_getANativeWindow(AWindowHandler *p_awh,
+                                               enum AWindow_ID id);
+void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
+                                         enum AWindow_ID id);
+/**
+ * This function is a fix up of ANativeWindow_setBuffersGeometry that doesn't
+ * work before Android ICS. It configures the Surface from the Android
+ * MainThread via a SurfaceHolder. It returns VLC_SUCCESS if the Surface was
+ * configured (it returns VLC_EGENERIC after Android ICS).
+ */
+int AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
+                                      int i_width, int i_height, int i_format);
+
+/**
+ * This function set the window layout.
+ */
+int AWindowHandler_setWindowLayout(AWindowHandler *p_awh,
+                                   int i_width, int i_height,
+                                   int i_visible_width, int i_visible_height,
+                                   int i_sar_num, int i_sar_den);

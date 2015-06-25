@@ -391,6 +391,9 @@ libomxil_plugin_la_SOURCES = \
 	codec/omxil/qcom.c codec/omxil/qcom.h \
 	codec/omxil/omxil.c codec/omxil/omxil.h codec/omxil/omxil_core.c codec/omxil/omxil_core.h \
 	video_chroma/copy.c
+if HAVE_ANDROID
+libomxil_plugin_la_SOURCES += video_output/android/utils.c video_output/android/utils.h
+endif
 libomxil_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil $(CFLAGS_omxil)
 libomxil_plugin_la_LIBADD = $(LIBDL)
 libomxil_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
@@ -408,6 +411,7 @@ libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacodec.h \
 	codec/omxil/mediacodec_jni.c codec/omxil/mediacodec_ndk.c codec/omxil/utils.c \
 	video_chroma/copy.c codec/omxil/android_opaque.c codec/omxil/android_opaque.h \
+	video_output/android/utils.c video_output/android/utils.h
 	packetizer/h264_nal.c packetizer/h264_nal.h
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
 

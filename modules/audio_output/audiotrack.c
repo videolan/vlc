@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include "../video_output/android/utils.h"
 
 #define MIN_AUDIOTRACK_BUFFER_US INT64_C(250000)  // 250ms
 #define MAX_AUDIOTRACK_BUFFER_US INT64_C(1000000) // 1000ms
@@ -131,7 +132,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 #define THREAD_NAME "android_audiotrack"
-extern JNIEnv *jni_get_env(const char *name);
+#define GET_ENV() android_getEnv( VLC_OBJECT(p_aout), THREAD_NAME )
 
 static struct
 {
@@ -200,25 +201,18 @@ static struct
 /* init all jni fields.
  * Done only one time during the first initialisation */
 static bool
-InitJNIFields( audio_output_t *p_aout )
+InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static int i_init_state = -1;
     bool ret;
     jclass clazz;
     jfieldID field;
-    JNIEnv* env = NULL;
 
     vlc_mutex_lock( &lock );
 
     if( i_init_state != -1 )
         goto end;
-
-    if (!(env = jni_get_env(THREAD_NAME)))
-    {
-        i_init_state = 0;
-        goto end;
-    }
 
 #define CHECK_EXCEPTION( what, critical ) do { \
     if( (*env)->ExceptionOccurred( env ) ) \
@@ -650,7 +644,7 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
     mtime_t i_audiotrack_us;
     JNIEnv *env;
 
-    if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
+    if( p_sys->b_error || !( env = GET_ENV() ) )
         return -1;
 
     if( p_sys->b_spdif )
@@ -848,7 +842,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     b_spdif = var_InheritBool( p_aout, "spdif" );
     i_max_channels = var_InheritInteger( p_aout, "audiotrack-audio-channels" );
 
-    if( !( env = jni_get_env( THREAD_NAME ) ) )
+    if( !( env = GET_ENV() ) )
         return VLC_EGENERIC;
 
     p_sys->fmt = *p_fmt;
@@ -1043,7 +1037,7 @@ Stop( audio_output_t *p_aout )
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
 
-    if( !( env = jni_get_env( THREAD_NAME ) ) )
+    if( !( env = GET_ENV() ) )
         return;
 
     if( p_sys->p_audiotrack )
@@ -1326,7 +1320,7 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
     mtime_t i_play_wait = 0;
     aout_sys_t *p_sys = p_aout->sys;
 
-    if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
+    if( p_sys->b_error || !( env = GET_ENV() ) )
         goto bailout;
 
     p_sys->b_error = AudioTrack_PreparePlay( env, p_aout, p_buffer )
@@ -1368,7 +1362,7 @@ Pause( audio_output_t *p_aout, bool b_pause, mtime_t i_date )
     JNIEnv *env;
     VLC_UNUSED( i_date );
 
-    if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
+    if( p_sys->b_error || !( env = GET_ENV() ) )
         return;
 
     if( b_pause )
@@ -1389,7 +1383,7 @@ Flush( audio_output_t *p_aout, bool b_wait )
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
 
-    if( p_sys->b_error || !( env = jni_get_env( THREAD_NAME ) ) )
+    if( p_sys->b_error || !( env = GET_ENV() ) )
         return;
 
     /* Android doc:
@@ -1434,8 +1428,9 @@ Open( vlc_object_t *obj )
 {
     audio_output_t *p_aout = (audio_output_t *) obj;
     aout_sys_t *p_sys;
+    JNIEnv *env = GET_ENV();
 
-    if( !InitJNIFields( p_aout ) )
+    if( !env || !InitJNIFields( p_aout, env ) )
         return VLC_EGENERIC;
 
     p_sys = calloc( 1, sizeof (aout_sys_t) );
@@ -1463,7 +1458,7 @@ Close( vlc_object_t *obj )
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
 
-    if( ( env = jni_get_env( THREAD_NAME ) ) )
+    if( ( env = GET_ENV() ) )
     {
         if( p_sys->p_bytearray )
             (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );

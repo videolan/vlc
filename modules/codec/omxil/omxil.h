@@ -74,11 +74,9 @@ typedef struct HwBuffer
     unsigned int    i_max_owned;
     unsigned int    i_owned;
 
-    void            *p_library;
-    void            *window;
 #if defined(USE_IOMX)
-    native_window_api_t native_window;
-    native_window_priv_api_t anwpriv;
+    AWindowHandler *p_awh;
+    native_window_priv_api_t *anwpriv;
     native_window_priv *window_priv;
 #endif
 

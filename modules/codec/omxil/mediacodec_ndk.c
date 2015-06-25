@@ -37,10 +37,8 @@
 #include "omxil_utils.h"
 
 #include "mediacodec.h"
-#include "../../video_output/android/utils.h"
 
 #define THREAD_NAME "mediacodec_ndk"
-extern JNIEnv *jni_get_env(const char *name);
 
 /* Not in NdkMedia API but we need it since we send config data via input
  * buffers and not via "csd-*" buffers from AMediaFormat */
@@ -180,7 +178,6 @@ struct syms
     } AMediaFormat;
 };
 static struct syms syms;
-static native_window_api_t anw_syms;
 
 struct members
 {
@@ -246,12 +243,6 @@ InitSymbols(mc_api *api)
         }
         *(void **)((uint8_t*)&syms + members[i].offset) = sym;
     }
-    void *anw_handle = LoadNativeWindowAPI(&anw_syms);
-    if (!anw_handle)
-    {
-        dlclose(ndk_handle);
-        goto end;
-    }
 
     i_init_state = 1;
 end:
@@ -271,7 +262,6 @@ struct mc_api_sys
 {
     AMediaCodec* p_codec;
     AMediaFormat* p_format;
-    ANativeWindow* p_anw;
 };
 
 /*****************************************************************************
@@ -299,11 +289,6 @@ static int Stop(mc_api *api)
         syms.AMediaFormat.delete(p_sys->p_format);
         p_sys->p_format = NULL;
     }
-    if (p_sys->p_anw)
-    {
-        anw_syms.winRelease(p_sys->p_anw);
-        p_sys->p_anw = NULL;
-    }
 
     msg_Dbg(api->p_obj, "MediaCodec via NDK closed");
     return VLC_SUCCESS;
@@ -312,11 +297,12 @@ static int Stop(mc_api *api)
 /*****************************************************************************
  * Start
  *****************************************************************************/
-static int Start(mc_api *api, jobject jsurface, const char *psz_name,
+static int Start(mc_api *api, AWindowHandler *p_awh, const char *psz_name,
                  const char *psz_mime, int i_width, int i_height, int i_angle)
 {
     mc_api_sys *p_sys = api->p_sys;
     int i_ret = VLC_EGENERIC;
+    ANativeWindow *p_anw = NULL;
 
     p_sys->p_codec = syms.AMediaCodec.createCodecByName(psz_name);
     if (!p_sys->p_codec)
@@ -338,17 +324,11 @@ static int Start(mc_api *api, jobject jsurface, const char *psz_name,
     syms.AMediaFormat.setInt32(p_sys->p_format, "rotation-degrees", i_angle);
     syms.AMediaFormat.setInt32(p_sys->p_format, "encoder", 0);
 
-    if (jsurface)
-    {
-        JNIEnv *env;
-
-        if (!(env = jni_get_env(THREAD_NAME)))
-            goto error;
-        p_sys->p_anw = anw_syms.winFromSurface(env, jsurface);
-    }
+    if (p_awh)
+        p_anw = AWindowHandler_getANativeWindow(p_awh, AWindow_Video);
 
     if (syms.AMediaCodec.configure(p_sys->p_codec, p_sys->p_format,
-                                   p_sys->p_anw, NULL, 0) != AMEDIA_OK)
+                                   p_anw, NULL, 0) != AMEDIA_OK)
     {
         msg_Err(api->p_obj, "AMediaCodec.configure failed");
         goto error;
@@ -360,7 +340,7 @@ static int Start(mc_api *api, jobject jsurface, const char *psz_name,
     }
 
     api->b_started = true;
-    api->b_direct_rendering = !!p_sys->p_anw;
+    api->b_direct_rendering = !!p_anw;
     api->b_support_interlaced = true;
     i_ret = VLC_SUCCESS;
 

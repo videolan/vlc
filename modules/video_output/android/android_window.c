@@ -67,16 +67,6 @@ vlc_module_end()
  *****************************************************************************/
 
 #define THREAD_NAME "android_window"
-extern JNIEnv *jni_get_env(const char *name);
-
-extern jobject jni_LockAndGetAndroidJavaSurface();
-extern jobject jni_LockAndGetSubtitlesSurface();
-extern void  jni_UnlockAndroidSurface();
-
-extern void  jni_SetSurfaceLayout(int width, int height, int visible_width, int visible_height, int sar_num, int sar_den);
-extern int jni_ConfigureSurface(jobject jsurf, int width, int height, int hal, bool *configured);
-extern int jni_GetWindowSize(int *width, int *height);
-extern void jni_getMouseCoordinates(int *, int *, int *, int *);
 
 static const vlc_fourcc_t subpicture_chromas[] =
 {
@@ -101,7 +91,7 @@ struct android_window
     bool b_use_priv;
     bool b_opaque;
 
-    jobject jsurf;
+    enum AWindow_ID id;
     ANativeWindow *p_handle;
     native_window_priv *p_handle_priv;
 };
@@ -120,10 +110,9 @@ struct vout_display_sys_t
     int i_display_width;
     int i_display_height;
 
-    void *p_library;
-    native_window_api_t anw;
-    native_window_priv_api_t anwp;
-    bool b_has_anwp;
+    AWindowHandler *p_awh;
+    native_window_api_t *anw;
+    native_window_priv_api_t *anwp;
 
     android_window *p_window;
     android_window *p_sub_window;
@@ -159,7 +148,8 @@ static inline int ChromaToAndroidHal(vlc_fourcc_t i_chroma)
     }
 }
 
-static int UpdateWindowSize(video_format_t *p_fmt, bool b_cropped)
+static int UpdateWindowSize(vout_display_sys_t *sys, video_format_t *p_fmt,
+                            bool b_cropped)
 {
     unsigned int i_width, i_height;
     unsigned int i_sar_num = 1, i_sar_den = 1;
@@ -179,11 +169,10 @@ static int UpdateWindowSize(video_format_t *p_fmt, bool b_cropped)
         i_height = rot_fmt.i_height;
     }
 
-    jni_SetSurfaceLayout(i_width, i_height,
-                         rot_fmt.i_visible_width,
-                         rot_fmt.i_visible_height,
-                         i_sar_num,
-                         i_sar_den);
+    AWindowHandler_setWindowLayout(sys->p_awh, i_width, i_height,
+                                   rot_fmt.i_visible_width,
+                                   rot_fmt.i_visible_height,
+                                   i_sar_num, i_sar_den);
     return 0;
 }
 
@@ -310,30 +299,25 @@ static void SetupPictureYV12(picture_t *p_picture, uint32_t i_in_stride)
     }
 }
 
-static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
-                                    android_window *p_window,
-                                    jobject jsurf)
+static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,
+                                            android_window *p_window)
 {
-    if (jsurf != p_window->jsurf) {
-        if (p_window->p_handle_priv) {
-            sys->anwp.disconnect(p_window->p_handle_priv);
-            p_window->p_handle_priv = NULL;
-        }
-        if (p_window->p_handle) {
-            sys->anw.winRelease(p_window->p_handle);
-            p_window->p_handle = NULL;
-        }
+    if (p_window->p_handle_priv) {
+        sys->anwp->disconnect(p_window->p_handle_priv);
+        p_window->p_handle_priv = NULL;
     }
+    if (p_window->p_handle) {
+        AWindowHandler_releaseANativeWindow(sys->p_awh, p_window->id);
+        p_window->p_handle = NULL;
+    }
+}
 
-    p_window->jsurf = jsurf;
-    if (!p_window->jsurf )
-        return -1;
+static int AndroidWindow_ConnectSurface(vout_display_sys_t *sys,
+                                        android_window *p_window)
+{
     if (!p_window->p_handle && !p_window->b_opaque) {
-        JNIEnv *p_env;
-
-        if (!(p_env = jni_get_env(THREAD_NAME)))
-            return -1;
-        p_window->p_handle = sys->anw.winFromSurface(p_env, p_window->jsurf);
+        p_window->p_handle = AWindowHandler_getANativeWindow(sys->p_awh,
+                                                             p_window->id);
         if (!p_window->p_handle)
             return -1;
     }
@@ -341,25 +325,26 @@ static int AndroidWindow_SetSurface(vout_display_sys_t *sys,
     return 0;
 }
 
-static android_window *AndroidWindow_New(vout_display_sys_t *sys,
+static android_window *AndroidWindow_New(vout_display_t *vd,
                                          video_format_t *p_fmt,
-                                         jobject jsurf,
+                                         enum AWindow_ID id,
                                          bool b_use_priv)
 {
-    android_window *p_window = calloc(1, sizeof(android_window));
+    vout_display_sys_t *sys = vd->sys;
+    android_window *p_window = NULL;
 
+    p_window = calloc(1, sizeof(android_window));
     if (!p_window)
-        return NULL;
+        goto error;
 
+    p_window->id = id;
     p_window->b_opaque = p_fmt->i_chroma == VLC_CODEC_ANDROID_OPAQUE;
     if (!p_window->b_opaque) {
-        p_window->b_use_priv = sys->b_has_anwp && b_use_priv;
+        p_window->b_use_priv = sys->anwp && b_use_priv;
 
         p_window->i_android_hal = ChromaToAndroidHal(p_fmt->i_chroma);
-        if (p_window->i_android_hal == -1) {
-            free(p_window);
-            return NULL;
-        }
+        if (p_window->i_android_hal == -1)
+            goto error;
     }
 
     switch (p_fmt->orientation)
@@ -382,18 +367,23 @@ static android_window *AndroidWindow_New(vout_display_sys_t *sys,
         video_format_ApplyRotation(&p_window->fmt, p_fmt);
     p_window->i_pic_count = 1;
 
-    if (AndroidWindow_SetSurface(sys, p_window, jsurf) != 0) {
-        free(p_window);
-        return NULL;
+    if (AndroidWindow_ConnectSurface(sys, p_window) != 0)
+    {
+        if (id == AWindow_Video)
+            msg_Err(vd, "can't get Video Surface");
+        goto error;
     }
 
     return p_window;
+error:
+    free(p_window);
+    return NULL;
 }
 
-static void AndroidWindow_Destroy(vout_display_sys_t *sys,
+static void AndroidWindow_Destroy(vout_display_t *vd,
                                   android_window *p_window)
 {
-    AndroidWindow_SetSurface(sys, p_window, NULL);
+    AndroidWindow_DisconnectSurface(vd->sys, p_window);
     free(p_window);
 }
 
@@ -403,11 +393,11 @@ static int AndroidWindow_UpdateCrop(vout_display_sys_t *sys,
     if (!p_window->p_handle_priv)
         return -1;
 
-    return sys->anwp.setCrop(p_window->p_handle_priv,
-                             p_window->fmt.i_x_offset,
-                             p_window->fmt.i_y_offset,
-                             p_window->fmt.i_visible_width,
-                             p_window->fmt.i_visible_height);
+    return sys->anwp->setCrop(p_window->p_handle_priv,
+                              p_window->fmt.i_x_offset,
+                              p_window->fmt.i_y_offset,
+                              p_window->fmt.i_visible_width,
+                              p_window->fmt.i_visible_height);
 }
 
 static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
@@ -417,37 +407,37 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
     unsigned int i_max_buffer_count = 0;
 
     if (!p_window->p_handle_priv)
-        p_window->p_handle_priv = sys->anwp.connect(p_window->p_handle);
+        p_window->p_handle_priv = sys->anwp->connect(p_window->p_handle);
 
     if (!p_window->p_handle_priv)
         goto error;
 
-    if (sys->anwp.setUsage(p_window->p_handle_priv, false, 0) != 0)
+    if (sys->anwp->setUsage(p_window->p_handle_priv, false, 0) != 0)
         goto error;
 
     if (!b_java_configured
-        && sys->anwp.setBuffersGeometry(p_window->p_handle_priv,
-                                        p_window->fmt.i_width,
-                                        p_window->fmt.i_height,
-                                        p_window->i_android_hal) != 0)
+        && sys->anwp->setBuffersGeometry(p_window->p_handle_priv,
+                                         p_window->fmt.i_width,
+                                         p_window->fmt.i_height,
+                                         p_window->i_android_hal) != 0)
         goto error;
 
-    sys->anwp.getMinUndequeued(p_window->p_handle_priv,
-                               &p_window->i_min_undequeued);
+    sys->anwp->getMinUndequeued(p_window->p_handle_priv,
+                                &p_window->i_min_undequeued);
 
-    sys->anwp.getMaxBufferCount(p_window->p_handle_priv, &i_max_buffer_count);
+    sys->anwp->getMaxBufferCount(p_window->p_handle_priv, &i_max_buffer_count);
 
     if ((p_window->i_min_undequeued + p_window->i_pic_count) >
          i_max_buffer_count)
         p_window->i_pic_count = i_max_buffer_count - p_window->i_min_undequeued;
 
-    if (sys->anwp.setBufferCount(p_window->p_handle_priv,
-                                 p_window->i_pic_count +
-                                 p_window->i_min_undequeued) != 0)
+    if (sys->anwp->setBufferCount(p_window->p_handle_priv,
+                                  p_window->i_pic_count +
+                                  p_window->i_min_undequeued) != 0)
         goto error;
 
-    if (sys->anwp.setOrientation(p_window->p_handle_priv,
-                                 p_window->i_angle) != 0)
+    if (sys->anwp->setOrientation(p_window->p_handle_priv,
+                                  p_window->i_angle) != 0)
         goto error;
 
     AndroidWindow_UpdateCrop(sys, p_window);
@@ -455,7 +445,7 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
     return 0;
 error:
     if (p_window->p_handle_priv) {
-        sys->anwp.disconnect(p_window->p_handle_priv);
+        sys->anwp->disconnect(p_window->p_handle_priv);
         p_window->p_handle_priv = NULL;
     }
     p_window->b_use_priv = false;
@@ -468,29 +458,24 @@ static int AndroidWindow_ConfigureJavaSurface(vout_display_sys_t *sys,
                                               android_window *p_window,
                                               bool *p_java_configured)
 {
-    int err;
-    bool configured = false;
-
-    /* setBuffersGeometry is broken before ics. Use jni_ConfigureSurface to
-     * configure the surface on the java side synchronously.
-     * jni_ConfigureSurface return -1 when you don't need to call it (ie, after
-     * ics). if jni_ConfigureSurface succeed, you need to get a new surface
-     * handle. That's why AndroidWindow_SetSurface is called again here. */
-    err = jni_ConfigureSurface(p_window->jsurf,
-                               p_window->fmt.i_width,
-                               p_window->fmt.i_height,
-                               p_window->i_android_hal,
-                               &configured);
-    if (err == 0) {
-        if (configured) {
-            jobject jsurf = p_window->jsurf;
-            p_window->jsurf = NULL;
-            if (AndroidWindow_SetSurface(sys, p_window, jsurf) != 0)
-                return -1;
-        } else
+    /* setBuffersGeometry is broken before ics. Use
+     * AJavaWindow_setBuffersGeometry to configure the surface on the java side
+     * synchronously.  AJavaWindow_setBuffersGeometry return en error when you
+     * don't need to call it (ie, after ics). if this call succeed, you need to
+     * get a new surface handle. That's why AndroidWindow_DisconnectSurface is
+     * called here. */
+    if (AWindowHandler_setBuffersGeometry(sys->p_awh, p_window->id,
+                                          p_window->fmt.i_width,
+                                          p_window->fmt.i_height,
+                                          p_window->i_android_hal) == VLC_SUCCESS)
+    {
+        *p_java_configured = true;
+        AndroidWindow_DisconnectSurface(sys, p_window);
+        if (AndroidWindow_ConnectSurface(sys, p_window) != 0)
             return -1;
-    }
-    *p_java_configured = configured;
+    } else
+        *p_java_configured = false;
+
     return 0;
 }
 
@@ -501,18 +486,18 @@ static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
     p_window->i_pic_count = 1;
     p_window->i_min_undequeued = 0;
 
-    if (!b_java_configured && sys->anw.setBuffersGeometry)
-        return sys->anw.setBuffersGeometry(p_window->p_handle,
-                                           p_window->fmt.i_width,
-                                           p_window->fmt.i_height,
-                                           p_window->i_android_hal);
+    if (!b_java_configured && sys->anw->setBuffersGeometry)
+        return sys->anw->setBuffersGeometry(p_window->p_handle,
+                                            p_window->fmt.i_width,
+                                            p_window->fmt.i_height,
+                                            p_window->i_android_hal);
     else
         return 0;
 }
 
 static int AndroidWindow_Setup(vout_display_sys_t *sys,
-                                    android_window *p_window,
-                                    unsigned int i_pic_count)
+                               android_window *p_window,
+                               unsigned int i_pic_count)
 {
     bool b_java_configured = false;
 
@@ -562,9 +547,9 @@ static void AndroidWindow_UnlockPicture(vout_display_sys_t *sys,
         if (p_handle == NULL)
             return;
 
-        sys->anwp.unlockData(p_window->p_handle_priv, p_handle, b_render);
+        sys->anwp->unlockData(p_window->p_handle_priv, p_handle, b_render);
     } else
-        sys->anw.unlockAndPost(p_window->p_handle);
+        sys->anw->unlockAndPost(p_window->p_handle);
 }
 
 static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
@@ -577,15 +562,15 @@ static int AndroidWindow_LockPicture(vout_display_sys_t *sys,
         void *p_handle;
         int err;
 
-        err = sys->anwp.lockData(p_window->p_handle_priv,
-                                 &p_handle,
-                                 &p_picsys->priv.sw.buf);
+        err = sys->anwp->lockData(p_window->p_handle_priv,
+                                  &p_handle,
+                                  &p_picsys->priv.sw.buf);
         if (err != 0)
             return -1;
         p_picsys->priv.sw.p_handle = p_handle;
     } else {
-        if (sys->anw.winLock(p_window->p_handle,
-                             &p_picsys->priv.sw.buf, NULL) != 0)
+        if (sys->anw->winLock(p_window->p_handle,
+                              &p_picsys->priv.sw.buf, NULL) != 0)
             return -1;
     }
     if (p_picsys->priv.sw.buf.width < 0 ||
@@ -629,7 +614,7 @@ static void SendEventDisplaySize(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
     int i_display_width, i_display_height;
 
-    if (jni_GetWindowSize(&i_display_width, &i_display_height) == 0
+    if (AWindowHandler_getWindowSize(sys->p_awh, &i_display_width, &i_display_height)
         && i_display_width != 0 && i_display_height != 0
         && (i_display_width != sys->i_display_width
          || i_display_height != sys->i_display_height))
@@ -642,7 +627,6 @@ static int Open(vlc_object_t *p_this)
     vout_display_t *vd = (vout_display_t*)p_this;
     vout_display_sys_t *sys;
     video_format_t sub_fmt;
-    jobject jsurf;
 
     if (vout_display_IsWindowed(vd))
         return VLC_EGENERIC;
@@ -652,17 +636,18 @@ static int Open(vlc_object_t *p_this)
     if (!sys)
         return VLC_ENOMEM;
 
-    sys->p_library = LoadNativeWindowAPI(&sys->anw);
-    if (!sys->p_library)
+    sys->p_awh = AWindowHandler_new(p_this);
+    if (!sys->p_awh)
     {
-        msg_Warn(vd, "Using old Android Surface");
-        LoadNativeSurfaceAPI(&sys->anw);
+        free(sys);
+        msg_Err(vd, "AWindowHandler_new failed");
+        return VLC_EGENERIC;
     }
+    sys->anw = AWindowHandler_getANativeWindowAPI(sys->p_awh);
 
 #ifdef USE_ANWP
-    if (LoadNativeWindowPrivAPI(&sys->anwp) == 0)
-        sys->b_has_anwp = true;
-    else
+    sys->anwp = AWindowHandler_getANativeWindowPrivAPI(sys->p_awh);
+    if (!sys->anwp)
         msg_Warn(vd, "Could not initialize NativeWindow Priv API.");
 #endif
 
@@ -696,11 +681,7 @@ static int Open(vlc_object_t *p_this)
         }
     }
 
-    jsurf = jni_LockAndGetAndroidJavaSurface();
-    if (!jsurf)
-        goto error;
-    sys->p_window = AndroidWindow_New(sys, &vd->fmt, jsurf, true);
-    jni_UnlockAndroidSurface();
+    sys->p_window = AndroidWindow_New(vd, &vd->fmt, AWindow_Video, true);
     if (!sys->p_window)
         goto error;
 
@@ -714,17 +695,12 @@ static int Open(vlc_object_t *p_this)
     msg_Dbg(vd, "using %s", sys->p_window->b_opaque ? "opaque" :
             (sys->p_window->b_use_priv ? "ANWP" : "ANW"));
 
-    jsurf = jni_LockAndGetSubtitlesSurface();
-    if (jsurf) {
-        video_format_ApplyRotation(&sub_fmt, &vd->fmt);
-        sub_fmt.i_chroma = subpicture_chromas[0];
-        SetRGBMask(&sub_fmt);
-        video_format_FixRgb(&sub_fmt);
-
-        sys->p_sub_window = AndroidWindow_New(sys, &sub_fmt, jsurf, false);
-        jni_UnlockAndroidSurface();
-        if (!sys->p_sub_window)
-            goto error;
+    video_format_ApplyRotation(&sub_fmt, &vd->fmt);
+    sub_fmt.i_chroma = subpicture_chromas[0];
+    SetRGBMask(&sub_fmt);
+    video_format_FixRgb(&sub_fmt);
+    sys->p_sub_window = AndroidWindow_New(vd, &sub_fmt, AWindow_Subtitles, false);
+    if (sys->p_sub_window) {
 
         FixSubtitleFormat(sys);
         sys->i_sub_last_order = -1;
@@ -762,7 +738,7 @@ static void Close(vlc_object_t *p_this)
     if (sys->pool)
         picture_pool_Release(sys->pool);
     if (sys->p_window)
-        AndroidWindow_Destroy(sys, sys->p_window);
+        AndroidWindow_Destroy(vd, sys->p_window);
 
     if (sys->p_sub_pic)
         picture_Release(sys->p_sub_pic);
@@ -770,10 +746,10 @@ static void Close(vlc_object_t *p_this)
         filter_DeleteBlend(sys->p_spu_blend);
     free(sys->p_sub_buffer_bounds);
     if (sys->p_sub_window)
-        AndroidWindow_Destroy(sys, sys->p_sub_window);
+        AndroidWindow_Destroy(vd, sys->p_sub_window);
 
-    if (sys->p_library)
-        dlclose(sys->p_library);
+    if (sys->p_awh)
+        AWindowHandler_destroy(sys->p_awh);
 
     free(sys);
 }
@@ -832,7 +808,7 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     requested_count = sys->p_window->i_pic_count;
     msg_Dbg(vd, "PoolAlloc: got %d frames", requested_count);
 
-    UpdateWindowSize(&sys->p_window->fmt, sys->p_window->b_use_priv);
+    UpdateWindowSize(sys, &sys->p_window->fmt, sys->p_window->b_use_priv);
 
     pp_pics = calloc(requested_count, sizeof(picture_t));
 
@@ -1104,7 +1080,8 @@ static int Control(vout_display_t *vd, int query, va_list args)
             } else
                 CopySourceAspect(&sys->p_window->fmt, source);
 
-            UpdateWindowSize(&sys->p_window->fmt, sys->p_window->b_use_priv);
+            UpdateWindowSize(sys, &sys->p_window->fmt,
+                             sys->p_window->b_use_priv);
         } else {
             const vout_display_cfg_t *cfg;
 
@@ -1129,9 +1106,11 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
 static void Manage(vout_display_t *vd)
 {
+    vout_display_sys_t *sys = vd->sys;
     int x, y, button, action;
-    jni_getMouseCoordinates(&action, &button, &x, &y);
-    if (x >= 0 && y >= 0)
+
+    if (AWindowHandler_getMouseCoordinates(sys->p_awh,
+                                           &action, &button, &x, &y))
     {
         switch( action )
         {

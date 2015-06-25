@@ -266,7 +266,8 @@ libegl_android_plugin_la_SOURCES = video_output/egl.c
 libegl_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_ANDROID=1
 libegl_android_plugin_la_LIBADD = $(EGL_LIBS)
 
-libandroid_native_window_plugin_la_SOURCES = video_output/android/nativewindow.c video_output/android/utils.c
+libandroid_native_window_plugin_la_SOURCES = video_output/android/nativewindow.c \
+	video_output/android/utils.c video_output/android/utils.h
 libandroid_native_window_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_native_window_plugin_la_LIBADD = $(LIBDL)
 

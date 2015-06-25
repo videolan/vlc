@@ -22,6 +22,7 @@
 #define VLC_MEDIACODEC_H
 
 #include <vlc_common.h>
+#include "../../video_output/android/utils.h"
 
 typedef struct mc_api mc_api;
 typedef struct mc_api_sys mc_api_sys;
@@ -74,7 +75,7 @@ struct mc_api
     bool b_support_interlaced;
 
     void (*clean)(mc_api *);
-    int (*start)(mc_api *, jobject jsurface, const char *psz_name,
+    int (*start)(mc_api *, AWindowHandler *p_awh, const char *psz_name,
                  const char *psz_mime, int i_width, int i_height, int i_angle);
     int (*stop)(mc_api *);
     int (*flush)(mc_api *);

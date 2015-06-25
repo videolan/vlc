@@ -38,7 +38,6 @@
 #include "mediacodec.h"
 
 #define THREAD_NAME "mediacodec_jni"
-extern JNIEnv *jni_get_env(const char *name);
 
 #define BUFFER_FLAG_CODEC_CONFIG  2
 #define INFO_OUTPUT_BUFFERS_CHANGED -3
@@ -174,7 +173,7 @@ static inline bool check_exception(JNIEnv *env)
         return false;
 }
 #define CHECK_EXCEPTION() check_exception( env )
-#define GET_ENV() if (!(env = jni_get_env(THREAD_NAME))) return VLC_EGENERIC;
+#define GET_ENV() if (!(env = android_getEnv(api->p_obj, THREAD_NAME))) return VLC_EGENERIC;
 
 /* Initialize all jni fields.
  * Done only one time during the first initialisation */
@@ -283,7 +282,7 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
     jstring jmime;
     char *psz_name = NULL;
 
-    if (!(env = jni_get_env(THREAD_NAME)))
+    if (!(env = android_getEnv(p_obj, THREAD_NAME)))
         return NULL;
 
     if (!InitJNIFields(p_obj, env))
@@ -459,7 +458,7 @@ static int Stop(mc_api *api)
 /*****************************************************************************
  * Start
  *****************************************************************************/
-static int Start(mc_api *api, jobject jsurface, const char *psz_name,
+static int Start(mc_api *api, AWindowHandler *p_awh, const char *psz_name,
                  const char *psz_mime, int i_width, int i_height, int i_angle)
 {
     mc_api_sys *p_sys = api->p_sys;
@@ -474,6 +473,7 @@ static int Start(mc_api *api, jobject jsurface, const char *psz_name,
     jobject jinput_buffers = NULL;
     jobject joutput_buffers = NULL;
     jobject jbuffer_info = NULL;
+    jobject jsurface = NULL;
 
     GET_ENV();
 
@@ -499,6 +499,8 @@ static int Start(mc_api *api, jobject jsurface, const char *psz_name,
                                              jfields.create_video_format, jmime,
                                              i_width, i_height);
 
+    if (p_awh)
+        jsurface = AWindowHandler_getSurface(p_awh, AWindow_Video);
     b_direct_rendering = !!jsurface;
 
     /* There is no way to rotate the video using direct rendering (and using a
@@ -825,7 +827,7 @@ static void Clean(mc_api *api)
  *****************************************************************************/
 int MediaCodecJni_Init(mc_api *api)
 {
-    JNIEnv* env = NULL;
+    JNIEnv *env;
 
     GET_ENV();
 
