@@ -208,7 +208,7 @@ static inline void bs_align_1( bs_t *s )
 static inline bool bo_init(bo_t *p_bo, int i_size)
 {
     p_bo->b = block_Alloc(i_size);
-    if (!p_bo->b)
+    if (p_bo->b == NULL)
         return false;
 
     p_bo->b->i_buffer = 0;
