@@ -28,7 +28,7 @@ AlwaysLowestAdaptationLogic::AlwaysLowestAdaptationLogic():
 {
 }
 
-BaseRepresentation *AlwaysLowestAdaptationLogic::getCurrentRepresentation(StreamType type, BasePeriod *period) const
+BaseRepresentation *AlwaysLowestAdaptationLogic::getCurrentRepresentation(adaptative::StreamType type, BasePeriod *period) const
 {
     RepresentationSelector selector;
     return selector.select(period, type, 0);

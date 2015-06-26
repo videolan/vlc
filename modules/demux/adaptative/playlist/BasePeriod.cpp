@@ -61,7 +61,7 @@ const std::vector<BaseAdaptationSet*>&  BasePeriod::getAdaptationSets() const
     return adaptationSets;
 }
 
-const std::vector<BaseAdaptationSet*>   BasePeriod::getAdaptationSets(StreamType type) const
+const std::vector<BaseAdaptationSet*>   BasePeriod::getAdaptationSets(adaptative::StreamType type) const
 {
     std::vector<BaseAdaptationSet*> list;
     std::vector<BaseAdaptationSet*>::const_iterator it;
@@ -82,7 +82,7 @@ void BasePeriod::addAdaptationSet(BaseAdaptationSet *adaptationSet)
     }
 }
 
-BaseAdaptationSet * BasePeriod::getAdaptationSet(StreamType type) const
+BaseAdaptationSet * BasePeriod::getAdaptationSet(adaptative::StreamType type) const
 {
     std::vector<BaseAdaptationSet *>::const_iterator it;
     for(it = adaptationSets.begin(); it != adaptationSets.end(); ++it)
