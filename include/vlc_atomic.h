@@ -27,8 +27,10 @@
  */
 
 /* clang version < 7 lacks the header but supports atomics - work-around */
-#if __clang__ && __clang_major__ >= 4 && !__has_include(<stdatomic.h>)
+#if defined(__clang__)
+#if __clang_major__ >= 4 && !__has_include(<stdatomic.h>)
 #define __STDC_NO_ATOMICS__ 1
+#endif
 #endif
 
 # ifndef __cplusplus
