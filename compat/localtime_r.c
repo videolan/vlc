@@ -18,8 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if (__STDC_VERSION__ >= 201112L)
+#if defined(__STDC_LIB_EXT1__) && (__STDC_LIB_EXT1__ >= 20112L)
 # define __STDC_WANT_LIB_EXT1__ 1
+#else
+# define __STDC_WANT_LIB_EXT1__ 0
 #endif
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -32,7 +34,7 @@
  * thread-specific storage. */
 struct tm *localtime_r (const time_t *timep, struct tm *result)
 {
-#if (__STDC_VERSION__ >= 201112L)
+#if (__STDC_WANT_LIB_EXT1__)
     return localtime_s(timep, result);
 #elif defined (_WIN32)
     return ((errno = localtime_s(result, timep)) == 0) ? result : NULL;
