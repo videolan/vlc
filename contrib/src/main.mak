@@ -445,7 +445,7 @@ endif
 ifdef HAVE_DARWIN_OS
 	echo "set(CMAKE_SYSTEM_NAME Darwin)" >> $@
 	echo "set(CMAKE_C_FLAGS $(CFLAGS))" >> $@
-	echo "set(CMAKE_CXX_FLAGS $(CFLAGS))" >> $@
+	echo "set(CMAKE_CXX_FLAGS $(CFLAGS) $(EXTRA_CXXFLAGS))" >> $@
 	echo "set(CMAKE_LD_FLAGS $(LDFLAGS))" >> $@
 	echo "set(CMAKE_AR ar CACHE FILEPATH "Archiver")" >> $@
 ifdef HAVE_IOS
