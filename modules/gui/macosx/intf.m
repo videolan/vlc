@@ -85,7 +85,7 @@ static void destroyProgressPanel (void *);
 
 static int InputEvent(vlc_object_t *, const char *,
                       vlc_value_t, vlc_value_t, void *);
-static int PLItemChanged(vlc_object_t *, const char *,
+static int InputThreadChanged(vlc_object_t *, const char *,
                          vlc_value_t, vlc_value_t, void *);
 static int PLItemUpdated(vlc_object_t *, const char *,
                          vlc_value_t, vlc_value_t, void *);
@@ -387,12 +387,12 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-static int PLItemChanged(vlc_object_t *p_this, const char *psz_var,
+static int InputThreadChanged(vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
-    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(PlaylistItemChanged) withObject:nil waitUntilDone:NO];
+    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(inputThreadChanged) withObject:nil waitUntilDone:NO];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -680,7 +680,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback(p_intf->p_libvlc, "intf-show", ShowController, self);
     var_AddCallback(p_intf->p_libvlc, "intf-boss", BossCallback, self);
     var_AddCallback(p_playlist, "item-change", PLItemUpdated, self);
-    var_AddCallback(p_playlist, "input-current", PLItemChanged, self);
+    var_AddCallback(p_playlist, "input-current", InputThreadChanged, self);
     var_AddCallback(p_playlist, "playlist-item-append", PLItemAppended, self);
     var_AddCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, self);
     var_AddCallback(p_playlist, "random", PlaybackModeUpdated, self);
@@ -796,7 +796,7 @@ static VLCMain *_o_sharedMainInstance = nil;
      * Thus, call additional updaters as we might miss these events if posted before
      * the callbacks are registered.
      */
-    [self PlaylistItemChanged];
+    [self inputThreadChanged];
     [self playbackModeUpdated];
 
     // respect playlist-autostart
@@ -849,7 +849,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_DelCallback(p_intf, "dialog-question", DialogCallback, self);
     var_DelCallback(p_intf, "dialog-progress-bar", DialogCallback, self);
     var_DelCallback(p_playlist, "item-change", PLItemUpdated, self);
-    var_DelCallback(p_playlist, "input-current", PLItemChanged, self);
+    var_DelCallback(p_playlist, "input-current", InputThreadChanged, self);
     var_DelCallback(p_playlist, "playlist-item-append", PLItemAppended, self);
     var_DelCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, self);
     var_DelCallback(p_playlist, "random", PlaybackModeUpdated, self);
@@ -1318,7 +1318,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 }
 
 // This must be called on main thread
-- (void)PlaylistItemChanged
+- (void)inputThreadChanged
 {
     if (p_current_input) {
         var_DelCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
