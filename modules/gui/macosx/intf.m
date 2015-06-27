@@ -82,15 +82,6 @@ static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
 
-static int PLItemUpdated(vlc_object_t *, const char *,
-                         vlc_value_t, vlc_value_t, void *);
-
-static int PlaybackModeUpdated(vlc_object_t *, const char *,
-                               vlc_value_t, vlc_value_t, void *);
-static int VolumeUpdated(vlc_object_t *, const char *,
-                         vlc_value_t, vlc_value_t, void *);
-static int BossCallback(vlc_object_t *, const char *,
-                         vlc_value_t, vlc_value_t, void *);
 
 #pragma mark -
 #pragma mark VLC Interface Object Callbacks
