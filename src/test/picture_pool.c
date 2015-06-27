@@ -60,8 +60,13 @@ static void test(bool zombie)
         picture_Release(pics[i]);
 
     for (unsigned i = 0; i < PICTURES; i++) {
+        void *plane = pics[i]->p[0].p_pixels;
+        assert(plane != NULL);
         picture_Release(pics[i]);
-        assert(picture_pool_Get(pool) == pics[i]);
+
+        pics[i] = picture_pool_Get(pool);
+        assert(pics[i] != NULL);
+        assert(pics[i]->p[0].p_pixels == plane);
     }
 
     for (unsigned i = 0; i < PICTURES; i++)

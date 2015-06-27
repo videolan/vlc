@@ -137,9 +137,10 @@ VLC_API void picture_pool_Enum( picture_pool_t *,
 /**
  * Forcefully return all pictures in the pool to free/unallocated state.
  *
- * @warning This can only be called when it is known that all pending
- * references to the picture pool are stale, e.g. a decoder failed to
- * release pictures properly when it terminated.
+ * @warning If any picture in the pool is not free, this function will leak
+ * and may eventually cause invalid memory accesses.
+ *
+ * @note This function has no effects if all pictures in the pool are free.
  *
  * @return the number of picture references that were freed
  */
