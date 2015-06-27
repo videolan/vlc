@@ -42,7 +42,6 @@
  *****************************************************************************/
 struct picture_gc_sys_t {
     picture_pool_t *pool;
-    picture_t *picture;
     unsigned offset;
 };
 
@@ -83,7 +82,7 @@ static void picture_pool_ReleasePicture(picture_t *picture)
     picture_pool_t *pool = sys->pool;
 
     if (pool->pic_unlock != NULL)
-        pool->pic_unlock(sys->picture);
+        pool->pic_unlock(pool->picture[sys->offset]);
 
     vlc_mutex_lock(&pool->lock);
     assert(!(pool->available & (1ULL << sys->offset)));
@@ -97,15 +96,14 @@ static void picture_pool_ReleasePicture(picture_t *picture)
 }
 
 static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
-                                            picture_t *picture,
                                             unsigned offset)
 {
+    picture_t *picture = pool->picture[offset];
     picture_gc_sys_t *sys = malloc(sizeof(*sys));
     if (unlikely(sys == NULL))
         return NULL;
 
     sys->pool = pool;
-    sys->picture = picture;
     sys->offset = offset;
 
     picture_resource_t res = {
@@ -229,7 +227,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
             continue;
         }
 
-        picture_t *clone = picture_pool_ClonePicture(pool, picture, i);
+        picture_t *clone = picture_pool_ClonePicture(pool, i);
         assert(unlikely(clone == NULL) || clone->p_next == NULL);
         return clone;
     }
