@@ -359,22 +359,21 @@ static int PlaybackModeUpdated(vlc_object_t *p_this, const char *psz_var,
 static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(updateVolume) withObject:nil waitUntilDone:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[[VLCMain sharedInstance] mainWindow] updateVolumeSlider];
+    });
 
-    [o_pool release];
     return VLC_SUCCESS;
 }
 
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[VLCCoreInteraction sharedInstance] pause];
+        [[VLCApplication sharedApplication] hide:nil];
+    });
 
-    [[VLCCoreInteraction sharedInstance] performSelectorOnMainThread:@selector(pause) withObject:nil waitUntilDone:NO];
-    [[VLCApplication sharedApplication] hide:nil];
-
-    [o_pool release];
     return VLC_SUCCESS;
 }
 
@@ -386,15 +385,21 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 static int ShowController(vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param)
 {
-    intf_thread_t * p_intf = VLCIntf;
-    if (p_intf) {
-        playlist_t * p_playlist = pl_Get(p_intf);
-        BOOL b_fullscreen = var_GetBool(p_playlist, "fullscreen");
-        if (b_fullscreen)
-            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
-        else if (!strcmp(psz_variable, "intf-show"))
-            [[VLCMain sharedInstance] performSelectorOnMainThread:@selector(showMainWindow) withObject:nil waitUntilDone:NO];
-    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+
+        intf_thread_t * p_intf = VLCIntf;
+        if (p_intf) {
+            playlist_t * p_playlist = pl_Get(p_intf);
+            BOOL b_fullscreen = var_GetBool(p_playlist, "fullscreen");
+            if (b_fullscreen)
+                [[VLCMain sharedInstance] showFullscreenController];
+
+            else if (!strcmp(psz_variable, "intf-show"))
+                [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
+        }
+
+    });
 
     return VLC_SUCCESS;
 }
@@ -1225,21 +1230,11 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_info updateMetadata];
 }
 
-- (void)showMainWindow
-{
-    [o_mainwindow performSelectorOnMainThread:@selector(makeKeyAndOrderFront:) withObject:nil waitUntilDone:NO];
-}
-
 - (void)showFullscreenController
 {
     // defer selector here (possibly another time) to ensure that keyWindow is set properly
     // (needed for NSApplicationDidBecomeActiveNotification)
     [o_mainwindow performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
-}
-
-- (void)updateVolume
-{
-    [o_mainwindow updateVolumeSlider];
 }
 
 - (void)playbackModeUpdated
@@ -1262,9 +1257,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [[o_mainwindow controlsBar] setShuffle];
     [o_mainmenu setShuffle];
 }
-
-#pragma mark -
-#pragma mark Window updater
 
 - (void)setActiveVideoPlayback:(BOOL)b_value
 {

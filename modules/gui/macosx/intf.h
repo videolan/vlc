@@ -145,8 +145,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
 - (void)plItemUpdated;
 - (void)playbackModeUpdated;
-- (void)updateVolume;
-- (void)showMainWindow;
 - (void)showFullscreenController;
 
 - (void)updateTogglePlaylistState;
