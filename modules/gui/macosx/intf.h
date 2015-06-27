@@ -44,8 +44,6 @@
 #import "VLCVoutWindowController.h"
 #import "StringUtility.h"
 
-#import <IOKit/pwr_mgt/IOPMLib.h>           /* for sleep prevention */
-
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -63,22 +61,24 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
  * VLCMain interface
  *****************************************************************************/
 @class AppleRemote;
+@class VLCInfo;
 @class VLCControls;
+@class VLCMainMenu;
 @class VLCPlaylist;
+@class InputManager;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {
     intf_thread_t *p_intf;      /* The main intf object */
-    input_thread_t *p_current_input;
     BOOL launched;              /* finishedLaunching */
     int items_at_launch;        /* items in playlist after launch */
-    id o_mainmenu;              /* VLCMainMenu */
+    VLCMainMenu *o_mainmenu;    /* VLCMainMenu */
     id o_prefs;                 /* VLCPrefs       */
     id o_sprefs;                /* VLCSimplePrefs */
     id o_open;                  /* VLCOpen        */
     id o_wizard;                /* VLCWizard      */
     id o_coredialogs;           /* VLCCoreDialogProvider */
-    id o_info;                  /* VLCInformation */
+    VLCInfo *o_info;            /* VLCInformation */
     id o_eyetv;                 /* VLCEyeTVController */
     id o_bookmarks;             /* VLCBookmarks */
     id o_coreinteraction;       /* VLCCoreInteraction */
@@ -111,18 +111,9 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
     NSArray *o_usedHotkeys;
 
-    /* sleep management */
-    IOPMAssertionID systemSleepAssertionID;
-    IOPMAssertionID userActivityAssertionID;
-
     VLCVoutWindowController *o_vout_controller;
 
-    /* iTunes/Spotify play/pause support */
-    BOOL b_has_itunes_paused;
-    BOOL b_has_spotify_paused;
-    NSTimer *o_itunes_play_timer;
-
-    dispatch_queue_t informInputChangedQueue;
+    InputManager *o_input_manager;
 }
 
 @property (readonly) VLCVoutWindowController* voutController;
@@ -133,15 +124,15 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (intf_thread_t *)intf;
 - (void)setIntf:(intf_thread_t *)p_mainintf;
 
-- (id)mainMenu;
+- (VLCMainMenu *)mainMenu;
 - (VLCMainWindow *)mainWindow;
 - (id)controls;
 - (id)bookmarks;
 - (id)open;
 - (id)simplePreferences;
 - (id)preferences;
-- (id)playlist;
-- (id)info;
+- (VLCPlaylist *)playlist;
+- (VLCInfo *)info;
 - (id)wizard;
 - (id)coreDialogProvider;
 - (id)eyeTVController;
@@ -152,16 +143,12 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (void)updateCurrentlyUsedHotkeys;
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
 
-- (void)inputThreadChanged;
 - (void)plItemUpdated;
-- (void)playbackStatusUpdated;
-- (void)sendDistributedNotificationWithUpdatedPlaybackStatus;
 - (void)playbackModeUpdated;
 - (void)updateVolume;
 - (void)updatePlaybackPosition;
 - (void)updateName;
 - (void)updateRecordState: (BOOL)b_value;
-- (void)updateMetaAndInfo;
 - (void)updateMainMenu;
 - (void)updateMainWindow;
 - (void)showMainWindow;

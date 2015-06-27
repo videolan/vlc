@@ -38,7 +38,8 @@ libmacosx_plugin_la_SOURCES = \
 	ExtensionsManager.h ExtensionsManager.m \
 	eyetv.h eyetv.m \
 	fspanel.h fspanel.m \
-	intf.m intf.h \
+	intf.h intf.m \
+	InputManager.h InputManager.m \
 	iTunes.h \
 	KeyboardBacklight.h KeyboardBacklight.m \
 	macosx.m \
