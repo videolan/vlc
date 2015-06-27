@@ -28,6 +28,6 @@ typedef struct
     {
         atomic_uintptr_t refs;
         void (*destroy)(picture_t *);
-        picture_gc_sys_t *opaque;
+        void *opaque;
     } gc;
 } picture_priv_t;

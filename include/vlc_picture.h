@@ -56,12 +56,6 @@ typedef struct plane_t
  */
 #define PICTURE_PLANE_MAX (VOUT_MAX_PLANES)
 
-
-/**
- * A private definition to help overloading picture release
- */
-typedef struct picture_gc_sys_t picture_gc_sys_t;
-
 /**
  * Video picture
  */

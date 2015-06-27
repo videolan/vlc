@@ -22,10 +22,6 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -37,13 +33,7 @@
 #include <vlc_picture_pool.h>
 #include "picture.h"
 
-/*****************************************************************************
- *
- *****************************************************************************/
-struct picture_gc_sys_t {
-    picture_pool_t *pool;
-    unsigned offset;
-};
+static const uintptr_t pool_max = CHAR_BIT * sizeof (unsigned long long);
 
 struct picture_pool_t {
     int       (*pic_lock)(picture_t *);
@@ -72,26 +62,26 @@ void picture_pool_Release(picture_pool_t *pool)
         picture_Release(pool->picture[i]);
 
     vlc_mutex_destroy(&pool->lock);
-    free(pool);
+    vlc_free(pool);
 }
 
 static void picture_pool_ReleasePicture(picture_t *picture)
 {
     picture_priv_t *priv = (picture_priv_t *)picture;
-    picture_gc_sys_t *sys = priv->gc.opaque;
-    picture_pool_t *pool = sys->pool;
+    uintptr_t sys = (uintptr_t)priv->gc.opaque;
+    picture_pool_t *pool = (void *)(sys & ~(pool_max - 1));
+    unsigned offset = sys & (pool_max - 1);
 
     if (pool->pic_unlock != NULL)
-        pool->pic_unlock(pool->picture[sys->offset]);
+        pool->pic_unlock(pool->picture[offset]);
 
     vlc_mutex_lock(&pool->lock);
-    assert(!(pool->available & (1ULL << sys->offset)));
-    pool->available |= 1ULL << sys->offset;
+    assert(!(pool->available & (1ULL << offset)));
+    pool->available |= 1ULL << offset;
     vlc_mutex_unlock(&pool->lock);
 
     picture_pool_Release(pool);
 
-    free(sys);
     free(picture);
 }
 
@@ -99,13 +89,7 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
                                             unsigned offset)
 {
     picture_t *picture = pool->picture[offset];
-    picture_gc_sys_t *sys = malloc(sizeof(*sys));
-    if (unlikely(sys == NULL))
-        return NULL;
-
-    sys->pool = pool;
-    sys->offset = offset;
-
+    uintptr_t sys = ((uintptr_t)pool) + offset;
     picture_resource_t res = {
         .p_sys = picture->p_sys,
         .pf_destroy = picture_pool_ReleasePicture,
@@ -119,20 +103,17 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
 
     picture_t *clone = picture_NewFromResource(&picture->format, &res);
     if (likely(clone != NULL))
-        ((picture_priv_t *)clone)->gc.opaque = sys;
-    else
-        free(sys);
-
+        ((picture_priv_t *)clone)->gc.opaque = (void *)sys;
     return clone;
 }
 
 picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
 {
-    if (unlikely(cfg->picture_count > CHAR_BIT * sizeof (unsigned long long)))
+    if (unlikely(cfg->picture_count > pool_max))
         return NULL;
 
-    picture_pool_t *pool = malloc(sizeof (*pool)
-                                  + cfg->picture_count * sizeof (picture_t *));
+    picture_pool_t *pool = vlc_memalign(pool_max,
+        sizeof (*pool) + cfg->picture_count * sizeof (picture_t *));
     if (unlikely(pool == NULL))
         return NULL;
 
