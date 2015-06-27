@@ -212,8 +212,8 @@
 
     if (b_nonembedded) {
         // events might be posted before window is created, so call them again
-        [[VLCMain sharedInstance] updateName];
-        [[VLCMain sharedInstance] updateMainWindow]; // update controls bar
+        [[[VLCMain sharedInstance] mainWindow] updateName];
+        [[[VLCMain sharedInstance] mainWindow] updateWindow]; // update controls bar
     }
 
     // TODO: find a cleaner way for "start in fullscreen"

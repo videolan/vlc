@@ -642,7 +642,7 @@
         var_Set(p_input, "position", pos);
         vlc_object_release(p_input);
     }
-    [[VLCMain sharedInstance] updatePlaybackPosition];
+    [[[VLCMain sharedInstance] mainWindow] updateTimeSlider];
 }
 
 - (IBAction)fsVolumeSliderUpdate:(id)sender

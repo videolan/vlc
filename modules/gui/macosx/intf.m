@@ -1225,18 +1225,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_info updateMetadata];
 }
 
-- (void)updateMainMenu
-{
-    [o_mainmenu setupMenus];
-    [o_mainmenu updatePlaybackRate];
-    [[VLCCoreInteraction sharedInstance] resetAtoB];
-}
-
-- (void)updateMainWindow
-{
-    [o_mainwindow updateWindow];
-}
-
 - (void)showMainWindow
 {
     [o_mainwindow performSelectorOnMainThread:@selector(makeKeyAndOrderFront:) withObject:nil waitUntilDone:NO];
@@ -1249,30 +1237,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mainwindow performSelectorOnMainThread:@selector(showFullscreenController) withObject:nil waitUntilDone:NO];
 }
 
-- (void)updateDelays
-{
-    [[VLCTrackSynchronization sharedInstance] performSelectorOnMainThread: @selector(updateValues) withObject: nil waitUntilDone:NO];
-}
-
-- (void)updateName
-{
-    [o_mainwindow updateName];
-}
-
-- (void)updatePlaybackPosition
-{
-    [o_mainwindow updateTimeSlider];
-    [[VLCCoreInteraction sharedInstance] updateAtoB];
-}
-
 - (void)updateVolume
 {
     [o_mainwindow updateVolumeSlider];
-}
-
-- (void)updateRecordState: (BOOL)b_value
-{
-    [o_mainmenu updateRecordState:b_value];
 }
 
 - (void)playbackModeUpdated

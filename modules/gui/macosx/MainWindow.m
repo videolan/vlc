@@ -688,6 +688,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [o_fspanel updatePositionAndTime];
 
     [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(updateTimeSlider)];
+
+    [[VLCCoreInteraction sharedInstance] updateAtoB];
 }
 
 - (void)updateName
