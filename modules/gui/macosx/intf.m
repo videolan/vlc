@@ -1320,9 +1320,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 // This must be called on main thread
 - (void)PlaylistItemChanged
 {
-    input_thread_t *p_input_changed = NULL;
-
-    if (p_current_input && p_current_input->b_dead) {
+    if (p_current_input) {
         var_DelCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
         vlc_object_release(p_current_input);
         p_current_input = NULL;
@@ -1332,27 +1330,28 @@ static VLCMain *_o_sharedMainInstance = nil;
         [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
                                                             object:nil];
     }
-    else if (!p_current_input) {
-        // object is hold here and released then it is dead
-        p_current_input = playlist_CurrentInput(pl_Get(VLCIntf));
-        if (p_current_input) {
-            var_AddCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
-            [self playbackStatusUpdated];
-            [o_mainmenu setRateControlsEnabled: YES];
 
-            if ([self activeVideoPlayback] && [[o_mainwindow videoView] isHidden]) {
-                [o_mainwindow changePlaylistState: psPlaylistItemChangedEvent];
-            }
+    input_thread_t *p_input_changed = NULL;
 
-            p_input_changed = vlc_object_hold(p_current_input);
+    // object is hold here and released then it is dead
+    p_current_input = playlist_CurrentInput(pl_Get(VLCIntf));
+    if (p_current_input) {
+        var_AddCallback(p_current_input, "intf-event", InputEvent, [VLCMain sharedInstance]);
+        [self playbackStatusUpdated];
+        [o_mainmenu setRateControlsEnabled: YES];
 
-            [[self playlist] currentlyPlayingItemChanged];
-
-            [[self playlist] continuePlaybackWhereYouLeftOff:p_current_input];
-
-            [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
-                                                                object:nil];
+        if ([self activeVideoPlayback] && [[o_mainwindow videoView] isHidden]) {
+            [o_mainwindow changePlaylistState: psPlaylistItemChangedEvent];
         }
+
+        p_input_changed = vlc_object_hold(p_current_input);
+
+        [[self playlist] currentlyPlayingItemChanged];
+
+        [[self playlist] continuePlaybackWhereYouLeftOff:p_current_input];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:VLCInputChangedNotification
+                                                            object:nil];
     }
 
     [self updateMetaAndInfo];
