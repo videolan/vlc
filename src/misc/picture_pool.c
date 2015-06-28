@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
+#include <vlc_atomic.h>
 #include "picture.h"
 
 static const uintptr_t pool_max = CHAR_BIT * sizeof (unsigned long long);
@@ -41,21 +42,14 @@ struct picture_pool_t {
     vlc_mutex_t lock;
 
     unsigned long long available;
-    unsigned    refs;
-    unsigned    picture_count;
+    atomic_ushort      refs;
+    unsigned short     picture_count;
     picture_t  *picture[];
 };
 
 static void picture_pool_Destroy(picture_pool_t *pool)
 {
-    bool destroy;
-
-    vlc_mutex_lock(&pool->lock);
-    assert(pool->refs > 0);
-    destroy = --pool->refs == 0;
-    vlc_mutex_unlock(&pool->lock);
-
-    if (likely(!destroy))
+    if (atomic_fetch_sub(&pool->refs, 1) != 1)
         return;
 
     vlc_mutex_destroy(&pool->lock);
@@ -129,7 +123,7 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     pool->pic_unlock = cfg->unlock;
     vlc_mutex_init(&pool->lock);
     pool->available = (1ULL << cfg->picture_count) - 1;
-    pool->refs = 1;
+    atomic_init(&pool->refs,  1);
     pool->picture_count = cfg->picture_count;
     memcpy(pool->picture, cfg->picture,
            cfg->picture_count * sizeof (picture_t *));
@@ -203,7 +197,6 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
             continue;
 
         pool->available &= ~(1ULL << i);
-        pool->refs++;
         vlc_mutex_unlock(&pool->lock);
 
         picture_t *picture = pool->picture[i];
@@ -211,12 +204,14 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
         if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0) {
             vlc_mutex_lock(&pool->lock);
             pool->available |= 1ULL << i;
-            pool->refs--;
             continue;
         }
 
         picture_t *clone = picture_pool_ClonePicture(pool, i);
-        assert(unlikely(clone == NULL) || clone->p_next == NULL);
+        if (clone != NULL) {
+            assert(clone->p_next == NULL);
+            atomic_fetch_add(&pool->refs, 1);
+        }
         return clone;
     }
 
