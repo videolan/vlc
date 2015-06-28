@@ -511,7 +511,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 static void *Run( void *obj )
 {
     input_thread_t *p_input = (input_thread_t *)obj;
-    const int canc = vlc_savecancel();
 
     if( !Init( p_input ) )
     {
@@ -522,8 +521,6 @@ static void *Run( void *obj )
     }
 
     input_SendEventDead( p_input );
-
-    vlc_restorecancel( canc );
     return NULL;
 }
 
