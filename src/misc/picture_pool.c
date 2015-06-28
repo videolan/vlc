@@ -46,7 +46,7 @@ struct picture_pool_t {
     picture_t  *picture[];
 };
 
-void picture_pool_Release(picture_pool_t *pool)
+static void picture_pool_Destroy(picture_pool_t *pool)
 {
     bool destroy;
 
@@ -58,31 +58,37 @@ void picture_pool_Release(picture_pool_t *pool)
     if (likely(!destroy))
         return;
 
-    for (unsigned i = 0; i < pool->picture_count; i++)
-        picture_Release(pool->picture[i]);
-
     vlc_mutex_destroy(&pool->lock);
     vlc_free(pool);
 }
 
-static void picture_pool_ReleasePicture(picture_t *picture)
+void picture_pool_Release(picture_pool_t *pool)
 {
-    picture_priv_t *priv = (picture_priv_t *)picture;
+    for (unsigned i = 0; i < pool->picture_count; i++)
+        picture_Release(pool->picture[i]);
+    picture_pool_Destroy(pool);
+}
+
+static void picture_pool_ReleasePicture(picture_t *clone)
+{
+    picture_priv_t *priv = (picture_priv_t *)clone;
     uintptr_t sys = (uintptr_t)priv->gc.opaque;
     picture_pool_t *pool = (void *)(sys & ~(pool_max - 1));
     unsigned offset = sys & (pool_max - 1);
+    picture_t *picture = pool->picture[offset];
+
+    free(clone);
 
     if (pool->pic_unlock != NULL)
-        pool->pic_unlock(pool->picture[offset]);
+        pool->pic_unlock(picture);
+    picture_Release(picture);
 
     vlc_mutex_lock(&pool->lock);
     assert(!(pool->available & (1ULL << offset)));
     pool->available |= 1ULL << offset;
     vlc_mutex_unlock(&pool->lock);
 
-    picture_pool_Release(pool);
-
-    free(picture);
+    picture_pool_Destroy(pool);
 }
 
 static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
@@ -102,8 +108,10 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
     }
 
     picture_t *clone = picture_NewFromResource(&picture->format, &res);
-    if (likely(clone != NULL))
+    if (likely(clone != NULL)) {
         ((picture_priv_t *)clone)->gc.opaque = (void *)sys;
+        picture_Hold(picture);
+    }
     return clone;
 }
 
@@ -126,7 +134,6 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     memcpy(pool->picture, cfg->picture,
            cfg->picture_count * sizeof (picture_t *));
     return pool;
-
 }
 
 picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
