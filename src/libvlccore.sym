@@ -173,7 +173,6 @@ image_Type2Fourcc
 InitMD5
 input_Control
 input_Create
-input_CreateAndStart
 input_CreateFilename
 input_DecoderCreate
 input_DecoderDelete

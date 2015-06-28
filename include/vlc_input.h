@@ -495,9 +495,6 @@ enum input_query_e
 VLC_API input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) VLC_USED;
 #define input_Create(a,b,c,d) input_Create(VLC_OBJECT(a),b,c,d)
 
-VLC_API input_thread_t * input_CreateAndStart( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) VLC_USED;
-#define input_CreateAndStart(a,b,c) input_CreateAndStart(VLC_OBJECT(a),b,c)
-
 VLC_API int input_Start( input_thread_t * );
 
 VLC_API void input_Stop( input_thread_t * );
@@ -510,6 +507,27 @@ VLC_API int input_vaControl( input_thread_t *, int i_query, va_list  );
 VLC_API int input_Control( input_thread_t *, int i_query, ...  );
 
 VLC_API void input_Close( input_thread_t * );
+
+/**
+ * Create a new input_thread_t and start it.
+ *
+ * Provided for convenience.
+ *
+ * \see input_Create
+ */
+static inline
+input_thread_t *input_CreateAndStart( vlc_object_t *parent,
+                                      input_item_t *item, const char *log )
+{
+    input_thread_t *input = input_Create( parent, item, log, NULL );
+    if( input != NULL && input_Start( input ) )
+    {
+        vlc_object_release( input );
+        input = NULL;
+    }
+    return input;
+}
+#define input_CreateAndStart(a,b,c) input_CreateAndStart(VLC_OBJECT(a),b,c)
 
 /**
  * Get the input item for an input thread
