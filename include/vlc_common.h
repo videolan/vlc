@@ -557,6 +557,23 @@ static inline unsigned popcount (unsigned x)
 #endif
 }
 
+/** Bit weight of long long */
+VLC_USED
+static inline int popcountll(unsigned long long x)
+{
+#if VLC_GCC_VERSION(3,4)
+    return __builtin_popcountll(x);
+#else
+    int count = 0;
+    while (x)
+    {
+        count += x & 1;
+        x = x >> 1;
+    }
+    return count;
+#endif
+}
+
 VLC_USED
 static inline unsigned parity (unsigned x)
 {
