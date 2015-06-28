@@ -187,27 +187,33 @@ error:
     return NULL;
 }
 
+/** Find next (bit) set */
+static int fnsll(unsigned long long x, unsigned i)
+{
+    if (i >= CHAR_BIT * sizeof (x))
+        return 0;
+    return ffsll(x & ~((1ULL << i) - 1));
+}
+
 picture_t *picture_pool_Get(picture_pool_t *pool)
 {
     vlc_mutex_lock(&pool->lock);
     assert(pool->refs > 0);
 
-    for (unsigned i = 0; i < pool->picture_count; i++) {
-        if (!(pool->available & (1ULL << i)))
-            continue;
-
-        pool->available &= ~(1ULL << i);
+    for (unsigned i = ffsll(pool->available); i; i = fnsll(pool->available, i))
+    {
+        pool->available &= ~(1ULL << (i - 1));
         vlc_mutex_unlock(&pool->lock);
 
-        picture_t *picture = pool->picture[i];
+        picture_t *picture = pool->picture[i - 1];
 
         if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0) {
             vlc_mutex_lock(&pool->lock);
-            pool->available |= 1ULL << i;
+            pool->available |= 1ULL << (i - 1);
             continue;
         }
 
-        picture_t *clone = picture_pool_ClonePicture(pool, i);
+        picture_t *clone = picture_pool_ClonePicture(pool, i - 1);
         if (clone != NULL) {
             assert(clone->p_next == NULL);
             atomic_fetch_add(&pool->refs, 1);
