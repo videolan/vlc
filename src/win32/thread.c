@@ -420,6 +420,26 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
     return value;
 }
 
+static void vlc_threadvars_cleanup(void)
+{
+    vlc_threadvar_t key;
+retry:
+    /* TODO: use RW lock or something similar */
+    vlc_mutex_lock(&super_mutex);
+    for (key = vlc_threadvar_last; key != NULL; key = key->prev)
+    {
+        void *value = vlc_threadvar_get(key);
+        if (value != NULL && key->destroy != NULL)
+        {
+            vlc_mutex_unlock(&super_mutex);
+            vlc_threadvar_set(key, NULL);
+            key->destroy(value);
+            goto retry;
+        }
+    }
+    vlc_mutex_unlock(&super_mutex);
+}
+
 /*** Threads ***/
 static DWORD thread_key;
 
@@ -451,30 +471,6 @@ static bool isCancelled(void)
 }
 #endif
 
-static void vlc_thread_cleanup (struct vlc_thread *th)
-{
-    vlc_threadvar_t key;
-
-retry:
-    /* TODO: use RW lock or something similar */
-    vlc_mutex_lock (&super_mutex);
-    for (key = vlc_threadvar_last; key != NULL; key = key->prev)
-    {
-        void *value = vlc_threadvar_get (key);
-        if (value != NULL && key->destroy != NULL)
-        {
-            vlc_mutex_unlock (&super_mutex);
-            vlc_threadvar_set (key, NULL);
-            key->destroy (value);
-            goto retry;
-        }
-    }
-    vlc_mutex_unlock (&super_mutex);
-
-    if (th->id == NULL) /* Detached thread */
-        free (th);
-}
-
 static unsigned __stdcall vlc_entry (void *p)
 {
     struct vlc_thread *th = p;
@@ -482,7 +478,10 @@ static unsigned __stdcall vlc_entry (void *p)
     TlsSetValue(thread_key, th);
     th->killable = true;
     th->data = th->entry (th->data);
-    vlc_thread_cleanup (th);
+    TlsSetValue(thread_key, NULL);
+
+    if (th->id == NULL) /* Detached thread */
+        free(th);
     return 0;
 }
 
@@ -630,7 +629,9 @@ void vlc_testcancel (void)
         p->proc (p->data);
 
     th->data = NULL; /* TODO: special value? */
-    vlc_thread_cleanup (th);
+    TlsSetValue(thread_key, NULL);
+    if (th->id == NULL) /* Detached thread */
+        free(th);
     _endthreadex(0);
 }
 
@@ -1038,6 +1039,10 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             vlc_mutex_destroy (&super_mutex);
             DeleteCriticalSection (&clock_lock);
             TlsFree(thread_key);
+            break;
+
+        case DLL_THREAD_DETACH:
+            vlc_threadvars_cleanup();
             break;
     }
     return TRUE;
