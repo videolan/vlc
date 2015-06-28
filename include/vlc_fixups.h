@@ -120,6 +120,10 @@ int vasprintf (char **, const char *, va_list);
 #endif
 
 /* string.h */
+#ifndef HAVE_FFSLL
+int ffsll(unsigned long long);
+#endif
+
 #ifndef HAVE_STRCASECMP
 int strcasecmp (const char *, const char *);
 #endif
