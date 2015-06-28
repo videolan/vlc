@@ -421,7 +421,7 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
 }
 
 /*** Threads ***/
-static vlc_threadvar_t thread_key;
+static DWORD thread_key;
 
 /** Per-thread data */
 struct vlc_thread
@@ -443,7 +443,7 @@ struct vlc_thread
 #if VLC_WINSTORE_APP
 static bool isCancelled(void)
 {
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = TlsGetValue(thread_key);
     if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
@@ -479,7 +479,7 @@ static unsigned __stdcall vlc_entry (void *p)
 {
     struct vlc_thread *th = p;
 
-    vlc_threadvar_set (thread_key, th);
+    TlsSetValue(thread_key, th);
     th->killable = true;
     th->data = th->entry (th->data);
     vlc_thread_cleanup (th);
@@ -590,7 +590,7 @@ void vlc_cancel (vlc_thread_t th)
 
 int vlc_savecancel (void)
 {
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = TlsGetValue(thread_key);
     if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
@@ -601,7 +601,7 @@ int vlc_savecancel (void)
 
 void vlc_restorecancel (int state)
 {
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = TlsGetValue(thread_key);
     assert (state == false || state == true);
 
     if (th == NULL)
@@ -613,7 +613,7 @@ void vlc_restorecancel (int state)
 
 void vlc_testcancel (void)
 {
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = TlsGetValue(thread_key);
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
     if (!th->killable)
@@ -640,7 +640,7 @@ void vlc_control_cancel (int cmd, ...)
      * need to lock anything. */
     va_list ap;
 
-    struct vlc_thread *th = vlc_threadvar_get (thread_key);
+    struct vlc_thread *th = TlsGetValue(thread_key);
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
@@ -1022,20 +1022,22 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
+            thread_key = TlsAlloc();
+            if (unlikely(thread_key == TLS_OUT_OF_INDEXES))
+                return FALSE;
             InitializeCriticalSection (&clock_lock);
             vlc_mutex_init (&super_mutex);
             vlc_cond_init (&super_variable);
-            vlc_threadvar_create (&thread_key, NULL);
             vlc_rwlock_init (&config_lock);
             vlc_CPU_init ();
             break;
 
         case DLL_PROCESS_DETACH:
             vlc_rwlock_destroy (&config_lock);
-            vlc_threadvar_delete (&thread_key);
             vlc_cond_destroy (&super_variable);
             vlc_mutex_destroy (&super_mutex);
             DeleteCriticalSection (&clock_lock);
+            TlsFree(thread_key);
             break;
     }
     return TRUE;
