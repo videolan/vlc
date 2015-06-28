@@ -691,7 +691,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
             if( i_used < 0 )
             {
-                av_frame_unref(frame);
+                av_frame_free(&frame);
                 if( b_drawpicture )
                     msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
                             p_block->i_buffer );
@@ -711,7 +711,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         /* Nothing to display */
         if( !b_gotpicture )
         {
-            av_frame_unref(frame);
+            av_frame_free(&frame);
             if( i_used == 0 ) break;
             continue;
         }
@@ -767,7 +767,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         if( !b_drawpicture || ( !p_sys->p_va && !frame->linesize[0] ) )
         {
-            av_frame_unref(frame);
+            av_frame_free(&frame);
             continue;
         }
 
@@ -779,7 +779,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 p_pic = ffmpeg_NewPictBuf( p_dec, p_context );
             if( !p_pic )
             {
-                av_frame_unref(frame);
+                av_frame_free(&frame);
                 break;
             }
 
@@ -815,7 +815,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         p_pic->b_progressive = !frame->interlaced_frame;
         p_pic->b_top_field_first = frame->top_field_first;
 
-        av_frame_unref(frame);
+        av_frame_free(&frame);
 
         /* Send decoded frame to vout */
         if (i_pts > VLC_TS_INVALID)
