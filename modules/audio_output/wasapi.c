@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#define _WIN32_WINNT 0x600
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
@@ -35,24 +36,13 @@
 #include <vlc_plugin.h>
 #include "audio_output/mmdevice.h"
 
-static LARGE_INTEGER freq; /* performance counters frequency */
-
-BOOL WINAPI DllMain(HINSTANCE, DWORD, LPVOID); /* avoid warning */
-
-BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID reserved)
+static BOOL CALLBACK InitFreq(INIT_ONCE *once, void *param, void **context)
 {
-    (void) dll;
-    (void) reserved;
-
-    switch (reason)
-    {
-        case DLL_PROCESS_ATTACH:
-            if (!QueryPerformanceFrequency(&freq))
-                return FALSE;
-            break;
-    }
-    return TRUE;
+    (void) once; (void) context;
+    return QueryPerformanceFrequency(param);
 }
+
+static LARGE_INTEGER freq; /* performance counters frequency */
 
 static UINT64 GetQPC(void)
 {
@@ -354,6 +344,11 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict fmt,
     if (!s->b_force && var_InheritBool(s, "spdif") && AOUT_FMT_SPDIF(fmt))
         /* Fallback to other plugin until pass-through is implemented */
         return E_NOTIMPL;
+
+    static INIT_ONCE freq_once = INIT_ONCE_STATIC_INIT;
+
+    if (!InitOnceExecuteOnce(&freq_once, InitFreq, &freq, NULL))
+        return E_FAIL;
 
     aout_stream_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
