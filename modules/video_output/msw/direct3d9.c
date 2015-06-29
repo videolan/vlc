@@ -340,8 +340,8 @@ error:
     if (vd->sys->pool == NULL && pictures) {
         for (unsigned i=0;i<picture_count; ++i)
             DestroyPicture(pictures[i]);
-        free(pictures);
     }
+    free(pictures);
     return vd->sys->pool;
 }
 
