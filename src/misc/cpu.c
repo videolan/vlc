@@ -73,12 +73,10 @@ static bool vlc_CPU_check (const char *name, void (*func) (void))
         case 0:
             signal (SIGILL, SIG_DFL);
             func ();
-            //__asm__ __volatile__ ( code : : input );
             _exit (0);
         case -1:
             return false;
     }
-    //i_capabilities |= (flag);
 
     int status;
     while( waitpid( pid, &status, 0 ) == -1 );
