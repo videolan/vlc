@@ -404,7 +404,9 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
     es_fmt.video.i_frame_rate_base = parm.parm.capture.timeperframe.numerator;
     GetAR (fd, &es_fmt.video.i_sar_num, &es_fmt.video.i_sar_den);
 
-    msg_Dbg (demux, "added new video ES %4.4s %ux%u", (char *)&es_fmt.i_codec,
+    msg_Dbg (demux, "added new video ES %4.4s %ux%u (%ux%u)",
+             (char *)&es_fmt.i_codec,
+             es_fmt.video.i_visible_width, es_fmt.video.i_visible_height,
              es_fmt.video.i_width, es_fmt.video.i_height);
     msg_Dbg (demux, " frame rate: %u/%u", es_fmt.video.i_frame_rate,
              es_fmt.video.i_frame_rate_base);
