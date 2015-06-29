@@ -48,6 +48,7 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
             return VLC_CODEC_D3D11_OPAQUE;
 #endif
 #if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(53, 14, 0))
+        case AV_PIX_FMT_VDA:
         case AV_PIX_FMT_VDA_VLD:
             return VLC_CODEC_UYVY;
 #endif
