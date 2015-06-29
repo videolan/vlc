@@ -367,6 +367,7 @@ endif
 
 libvda_plugin_la_SOURCES = \
 	video_chroma/copy.c video_chroma/copy.h \
+	packetizer/h264_nal.c packetizer/h264_nal.h \
 	codec/avcodec/vda.c
 libvda_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
 libvda_plugin_la_LDFLAGS = -Wl,-framework,CoreFoundation,-framework,VideoDecodeAcceleration,-framework,QuartzCore
