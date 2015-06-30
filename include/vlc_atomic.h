@@ -26,11 +26,9 @@
  * Atomic operations do not require locking, but they are not very powerful.
  */
 
-/* clang version < 7 lacks the header but supports atomics - work-around */
-#if defined(__clang__)
-#if __clang_major__ >= 4 && !__has_include(<stdatomic.h>)
-#define __STDC_NO_ATOMICS__ 1
-#endif
+/* Clang version < 7 lacks the stdatomic.h header but supports atomics */
+#if defined(__clang__) && __clang_major__ >= 4 && !__has_include(<stdatomic.h>)
+# define __STDC_NO_ATOMICS__ 1
 #endif
 
 # ifndef __cplusplus
