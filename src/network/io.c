@@ -336,37 +336,47 @@ ssize_t (net_Write)(vlc_object_t *obj, int fd, const void *buf, size_t len)
 char *net_Gets(vlc_object_t *obj, int fd)
 {
     char *buf = NULL;
-    size_t bufsize = 0, buflen = 0;
+    size_t size = 0, len = 0;
 
     for (;;)
     {
-        if (buflen == bufsize)
+        if (len == size)
         {
-            if (unlikely(bufsize >= (1 << 16)))
+            if (unlikely(size >= (1 << 16)))
+            {
+                errno = EMSGSIZE;
                 goto error; /* put sane buffer size limit */
+            }
 
-            char *newbuf = realloc(buf, bufsize + 1024);
+            char *newbuf = realloc(buf, size + 1024);
             if (unlikely(newbuf == NULL))
                 goto error;
             buf = newbuf;
-            bufsize += 1024;
+            size += 1024;
         }
+        assert(len < size);
 
-        ssize_t val = net_Read(obj, fd, buf + buflen, 1);
-        if (val < 1)
+        ssize_t val = vlc_recv_i11e(fd, buf + len, size - len, MSG_PEEK);
+        if (val <= 0)
             goto error;
 
-        if (buf[buflen] == '\n')
+        char *end = memchr(buf + len, '\n', val);
+        if (end != NULL)
+            val = (end + 1) - (buf + len);
+        if (recv(fd, buf + len, val, 0) != val)
+            goto error;
+        len += val;
+        if (end != NULL)
             break;
-
-        buflen++;
     }
 
-    buf[buflen] = '\0';
-    if (buflen > 0 && buf[buflen - 1] == '\r')
-        buf[buflen - 1] = '\0';
+    assert(len > 0);
+    buf[--len] = '\0';
+    if (len > 0 && buf[--len] == '\r')
+        buf[len] = '\0';
     return buf;
 error:
+    msg_Err(obj, "read error: %s", vlc_strerror_c(errno));
     free(buf);
     return NULL;
 }
