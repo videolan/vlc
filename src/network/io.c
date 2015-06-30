@@ -224,13 +224,12 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
     return sockv;
 }
 
-/*****************************************************************************
- * net_Read:
- *****************************************************************************
- * Reads from a network socket. Cancellation point.
- * We repeat until we have read the right amount of data;
- * a short count means EOF has been reached or an error.
- *****************************************************************************/
+/**
+ * Reads data from a socket, blocking until all requested data is received or
+ * the end of the stream is reached.
+ * This function is a cancellation point.
+ * @return -1 on error, or the number of bytes of read.
+ */
 ssize_t (net_Read)(vlc_object_t *restrict obj, int fd,
                    void *restrict buf, size_t len)
 {
@@ -245,11 +244,7 @@ ssize_t (net_Read)(vlc_object_t *restrict obj, int fd,
             return -1;
         }
 
-#ifndef _WIN32
-        ssize_t val = vlc_read_i11e(fd, buf, len);
-#else
         ssize_t val = vlc_recv_i11e(fd, buf, len, 0);
-#endif
         if (val < 0)
         {
             if (errno == EINTR || errno == EAGAIN)
