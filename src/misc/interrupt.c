@@ -360,6 +360,75 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
     return ret;
 }
 
+# include <fcntl.h>
+# include <sys/uio.h>
+
+/* There are currently no ways to atomically force a non-blocking read or write
+ * operations. Even for sockets, the MSG_DONTWAIT flag is non-standard.
+ *
+ * So in the event that more than one thread tries to read or write on the same
+ * file at the same time, there is a race condition where these functions might
+ * block inspite of an interruption. This should never happen in practice.
+ */
+
+/**
+ * Wrapper for readv() that returns the EINTR error upon VLC I/O interruption.
+ * @warning This function ignores the non-blocking file flag.
+ */
+ssize_t vlc_readv_i11e(int fd, struct iovec *iov, int count)
+{
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = POLLIN;
+
+    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+        return -1;
+    return readv(fd, iov, count);
+}
+
+/**
+ * Wrapper for writev() that returns the EINTR error upon VLC I/O interruption.
+ *
+ * @note Like writev(), once some but not all bytes are written, the function
+ * might wait for write completion, regardless of signals and interruptions.
+ * @warning This function ignores the non-blocking file flag.
+ */
+ssize_t vlc_writev_i11e(int fd, const struct iovec *iov, int count)
+{
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = POLLOUT;
+
+    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+        return -1;
+    return writev(fd, iov, count);
+}
+
+/**
+ * Wrapper for read() that returns the EINTR error upon VLC I/O interruption.
+ * @warning This function ignores the non-blocking file flag.
+ */
+ssize_t vlc_read_i11e(int fd, void *buf, size_t count)
+{
+    struct iovec iov = { buf, count };
+    return vlc_readv_i11e(fd, &iov, 1);
+}
+
+/**
+ * Wrapper for write() that returns the EINTR error upon VLC I/O interruption.
+ *
+ * @note Like write(), once some but not all bytes are written, the function
+ * might wait for write completion, regardless of signals and interruptions.
+ * @warning This function ignores the non-blocking file flag.
+ */
+ssize_t vlc_write_i11e(int fd, const void *buf, size_t count)
+{
+    struct iovec iov = { (void *)buf, count };
+    return writev(fd, &iov, 1);
+}
+
 #else /* _WIN32 */
 
 static void CALLBACK vlc_poll_i11e_wake_self(ULONG_PTR data)
@@ -422,4 +491,27 @@ out:
     CloseHandle(th);
     return ret;
 }
+
+ssize_t vlc_readv_i11e(int fd, struct iovec *iov, int count)
+{
+    (void) fd; (void) iov; (void) count;
+    vlc_assert_unreachable();
+}
+
+ssize_t vlc_writev_i11e(int fd, const struct iovec *iov, int count)
+{
+    (void) fd; (void) iov; (void) count;
+    vlc_assert_unreachable();
+}
+
+ssize_t vlc_read_i11e(int fd, void *buf, size_t count)
+{
+    return read(fd, buf, count);
+}
+
+ssize_t vlc_write_i11e(int fd, const void *buf, size_t count)
+{
+    return write(fd, buf, count);
+}
+
 #endif

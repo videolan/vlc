@@ -28,6 +28,7 @@
 # include <vlc_threads.h>
 
 struct pollfd;
+struct iovec;
 
 /**
  * @defgroup interrupt Interruptible sleep
@@ -70,6 +71,11 @@ VLC_API int vlc_sem_wait_i11e(vlc_sem_t *);
  * or if an error occurs.
  */
 VLC_API int vlc_poll_i11e(struct pollfd *, unsigned, int);
+
+VLC_API ssize_t vlc_readv_i11e(int fd, struct iovec *, int);
+VLC_API ssize_t vlc_writev_i11e(int fd, const struct iovec *, int);
+VLC_API ssize_t vlc_read_i11e(int fd, void *, size_t);
+VLC_API ssize_t vlc_write_i11e(int fd, const void *, size_t);
 
 /**
  * @}

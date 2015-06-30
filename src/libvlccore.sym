@@ -540,6 +540,10 @@ vlc_iconv
 vlc_iconv_close
 vlc_iconv_open
 vlc_poll_i11e
+vlc_read_i11e
+vlc_readv_i11e
+vlc_write_i11e
+vlc_writev_i11e
 vlc_sem_wait_i11e
 vlc_interrupt_create
 vlc_interrupt_destroy
