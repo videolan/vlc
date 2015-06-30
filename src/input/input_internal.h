@@ -29,6 +29,7 @@
 #include <vlc_input.h>
 #include <libvlc.h>
 #include "input_interface.h"
+#include "misc/interrupt.h"
 
 /*****************************************************************************
  *  Private input fields
@@ -164,6 +165,7 @@ struct input_thread_private_t
     input_control_t control[INPUT_CONTROL_FIFO_SIZE];
 
     vlc_thread_t thread;
+    vlc_interrupt_t interrupt;
 };
 
 /***************************************************************************

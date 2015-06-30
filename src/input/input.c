@@ -236,6 +236,9 @@ void input_Stop( input_thread_t *p_input )
     sys->is_stopped = true;
     vlc_cond_signal( &sys->wait_control );
     vlc_mutex_unlock( &sys->lock_control );
+    /* Interrupt access/stream/demux/etc *after* the input is stopped.
+     * Otherwise the interruption could be mistreated as a spurious wake-up. */
+    vlc_interrupt_raise( &sys->interrupt );
 }
 
 /**
@@ -247,6 +250,7 @@ void input_Close( input_thread_t *p_input )
 {
     if( p_input->p->is_running )
         vlc_join( p_input->p->thread, NULL );
+    vlc_interrupt_deinit( &p_input->p->interrupt );
     vlc_object_release( p_input );
 }
 
@@ -419,6 +423,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     vlc_mutex_init( &p_input->p->lock_control );
     vlc_cond_init( &p_input->p->wait_control );
     p_input->p->i_control = 0;
+    vlc_interrupt_init(&p_input->p->interrupt);
 
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
@@ -511,6 +516,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 static void *Run( void *obj )
 {
     input_thread_t *p_input = (input_thread_t *)obj;
+
+    vlc_interrupt_set(&p_input->p->interrupt);
 
     if( !Init( p_input ) )
     {
