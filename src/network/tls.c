@@ -43,6 +43,7 @@
 
 #include <vlc_tls.h>
 #include <vlc_modules.h>
+#include <vlc_interrupt.h>
 
 /*** TLS credentials ***/
 
@@ -239,21 +240,19 @@ error:
 
 int vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
 {
-    struct pollfd ufd[2];
+    struct pollfd ufd;
 
-    ufd[0].fd = session->fd;
-    ufd[0].events = POLLIN;
-    ufd[1].fd = vlc_object_waitpipe(session->p_parent);
-    ufd[1].events = POLLIN;
-
-    if (unlikely(ufd[1].fd == -1))
-    {
-        vlc_testcancel();
-        return -1;
-    }
+    ufd.fd = session->fd;
+    ufd.events = POLLIN;
 
     for (size_t rcvd = 0;;)
     {
+        if (!vlc_object_alive(session->p_parent))
+        {
+            errno = EINTR;
+            return -1;
+        }
+
         ssize_t val = session->sock.pf_recv(session, buf, len);
         if (val > 0)
         {
@@ -268,39 +267,25 @@ int vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
         if (val == -1 && errno != EINTR && errno != EAGAIN)
             return rcvd ? (ssize_t)rcvd : -1;
 
-        val = poll(ufd, 2, -1);
-        if (val == -1)
-            continue;
-
-        if (ufd[1].revents)
-        {
-            if (rcvd > 0)
-                return rcvd;
-
-            msg_Dbg(session, "socket %d polling interrupted", session->fd);
-            errno = EINTR;
-            return -1;
-        }
+        vlc_poll_i11e(&ufd, 1, -1);
     }
 }
 
 int vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
 {
-    struct pollfd ufd[2];
+    struct pollfd ufd;
 
-    ufd[0].fd = session->fd;
-    ufd[0].events = POLLOUT;
-    ufd[1].fd = vlc_object_waitpipe(session->p_parent);
-    ufd[1].events = POLLIN;
-
-    if (unlikely(ufd[1].fd == -1))
-    {
-        vlc_testcancel();
-        return -1;
-    }
+    ufd.fd = session->fd;
+    ufd.events = POLLOUT;
 
     for (size_t sent = 0;;)
     {
+        if (!vlc_object_alive(session->p_parent))
+        {
+            errno = EINTR;
+            return -1;
+        }
+
         ssize_t val = session->sock.pf_send(session, buf, len);
         if (val > 0)
         {
@@ -313,19 +298,7 @@ int vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
         if (val == -1 && errno != EINTR && errno != EAGAIN)
             return sent ? (ssize_t)sent : -1;
 
-        val = poll(ufd, 2, -1);
-        if (val == -1)
-            continue;
-
-        if (ufd[1].revents)
-        {
-            if (sent > 0)
-                return sent;
-
-            msg_Dbg(session, "socket %d polling interrupted", session->fd);
-            errno = EINTR;
-            return -1;
-        }
+        vlc_poll_i11e(&ufd, 1, -1);
     }
 }
 
