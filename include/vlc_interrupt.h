@@ -103,6 +103,8 @@ ssize_t vlc_send_i11e(int fd, const void *buf, size_t len, int flags)
     return vlc_sendto_i11e(fd, buf, len, flags, NULL, 0);
 }
 
+VLC_API int vlc_accept_i11e(int fd, struct sockaddr *, socklen_t *, bool);
+
 /**
  * @}
  * @defgroup interrupt_context Interrupt context signaling and manipulation

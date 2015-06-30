@@ -38,6 +38,7 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h> /* vlc_pipe */
+#include <vlc_network.h> /* vlc_accept */
 
 #include "interrupt.h"
 #include "libvlc.h"
@@ -489,6 +490,20 @@ ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
     return vlc_sendmsg_i11e(fd, &msg, flags);
 }
 
+int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
+                  bool blocking)
+{
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = POLLIN;
+
+    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+        return -1;
+
+    return vlc_accept(fd, addr, addrlen, blocking);
+}
+
 #else /* _WIN32 */
 
 static void CALLBACK vlc_poll_i11e_wake_self(ULONG_PTR data)
@@ -618,6 +633,23 @@ ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
     if (ret < 0 && WSAGetLastError() == WSAEWOULDBLOCK)
         errno = EAGAIN;
     return ret;
+}
+
+int vlc_accept_i11e(int fd, struct sockaddr *addr, socklen_t *addrlen,
+                  bool blocking)
+{
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = POLLIN;
+
+    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+        return -1;
+
+    int cfd = vlc_accept(fd, addr, addrlen, blocking);
+    if (cfd < 0 && WSAGetLastError() == WSAEWOULDBLOCK)
+        errno = EAGAIN;
+    return cfd;
 }
 
 #endif
