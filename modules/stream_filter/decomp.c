@@ -45,6 +45,7 @@
 #else
 # undef HAVE_VMSPLICE
 #endif
+#include <vlc_interrupt.h>
 
 #include <signal.h>
 
@@ -223,7 +224,7 @@ static int Read (stream_t *stream, void *buf, unsigned int buflen)
     }
     assert ((buf != NULL) || (buflen == 0));
 
-    ssize_t val = net_Read (stream, sys->read_fd, buf, buflen, false);
+    ssize_t val = vlc_read_i11e (sys->read_fd, buf, buflen);
     if (val > 0)
     {
         sys->offset += val;
@@ -261,8 +262,8 @@ static int Peek (stream_t *stream, const uint8_t **pbuf, unsigned int len)
     {
         ssize_t val;
 
-        val = net_Read (stream, sys->read_fd,
-                        peeked->p_buffer + curlen, len - curlen, false);
+        val = vlc_read_i11e (sys->read_fd, peeked->p_buffer + curlen,
+                           len - curlen);
         if (val <= 0)
             break;
         curlen += val;
