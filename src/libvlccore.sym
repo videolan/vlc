@@ -539,6 +539,11 @@ vlc_ngettext
 vlc_iconv
 vlc_iconv_close
 vlc_iconv_open
+vlc_sem_wait_i11e
+vlc_interrupt_create
+vlc_interrupt_destroy
+vlc_interrupt_set
+vlc_interrupt_raise
 vlc_join
 vlc_list_children
 vlc_list_release
