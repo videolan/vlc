@@ -142,5 +142,16 @@ VLC_API vlc_interrupt_t *vlc_interrupt_set(vlc_interrupt_t *);
  */
 VLC_API void vlc_interrupt_raise(vlc_interrupt_t *);
 
+/**
+ * Marks the interruption context as "killed". This is not reversible.
+ */
+VLC_API void vlc_interrupt_kill(vlc_interrupt_t *);
+
+/**
+ * Indicates whether the interruption context of the calling thread (if any)
+ * was killed with vlc_interrupt_kill().
+ */
+VLC_API bool vlc_killed(void) VLC_USED;
+
 /** @} @} */
 #endif

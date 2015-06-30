@@ -236,9 +236,7 @@ void input_Stop( input_thread_t *p_input )
     sys->is_stopped = true;
     vlc_cond_signal( &sys->wait_control );
     vlc_mutex_unlock( &sys->lock_control );
-    /* Interrupt access/stream/demux/etc *after* the input is stopped.
-     * Otherwise the interruption could be mistreated as a spurious wake-up. */
-    vlc_interrupt_raise( &sys->interrupt );
+    vlc_interrupt_kill( &sys->interrupt );
 }
 
 /**

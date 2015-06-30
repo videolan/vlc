@@ -554,6 +554,8 @@ vlc_interrupt_create
 vlc_interrupt_destroy
 vlc_interrupt_set
 vlc_interrupt_raise
+vlc_interrupt_kill
+vlc_killed
 vlc_join
 vlc_list_children
 vlc_list_release

@@ -74,6 +74,7 @@ void vlc_interrupt_init(vlc_interrupt_t *ctx)
 
     vlc_mutex_init(&ctx->lock);
     ctx->interrupted = false;
+    atomic_init(&ctx->killed, false);
 #ifndef NDEBUG
     ctx->attached = false;
 #endif
@@ -215,6 +216,21 @@ static int vlc_interrupt_finish(vlc_interrupt_t *ctx)
 static void vlc_interrupt_cleanup(void *opaque)
 {
     vlc_interrupt_finish(opaque);
+}
+
+void vlc_interrupt_kill(vlc_interrupt_t *ctx)
+{
+    assert(ctx != NULL);
+
+    atomic_store(&ctx->killed, true);
+    vlc_interrupt_raise(ctx);
+}
+
+bool vlc_killed(void)
+{
+    vlc_interrupt_t *ctx = vlc_threadvar_get(vlc_interrupt_var);
+
+    return (ctx != NULL) && atomic_load(&ctx->killed);
 }
 
 static void vlc_interrupt_sem(void *opaque)
