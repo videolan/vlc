@@ -30,20 +30,20 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+#include <errno.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
-#include <assert.h>
-
 #include <vlc_access.h>
 #include <vlc_dialog.h>
 #include <vlc_input_item.h>
-
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_tls.h>
 #include <vlc_sout.h>
 #include <vlc_charset.h>
+#include <vlc_interrupt.h>
 
 #ifndef IPPORT_FTP
 # define IPPORT_FTP 21u
@@ -830,11 +830,17 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_sys->data.p_tls != NULL )
         i_read = vlc_tls_Read( p_sys->data.p_tls, p_buffer, i_len, false );
     else
-        i_read = net_Read( p_access, p_sys->data.fd, p_buffer, i_len, false );
+        i_read = vlc_recv_i11e( p_sys->data.fd, p_buffer, i_len, 0 );
+
     if( i_read == 0 )
         p_access->info.b_eof = true;
     else if( i_read > 0 )
         p_access->info.i_pos += i_read;
+    else if( errno != EINTR && errno != EAGAIN )
+    {
+        msg_Err( p_access, "receive error: %s", vlc_strerror_c(errno) );
+        p_access->info.b_eof = true;
+    }
 
     return i_read;
 }
