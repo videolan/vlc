@@ -219,10 +219,6 @@ int input_Start( input_thread_t *p_input )
  */
 void input_Stop( input_thread_t *p_input )
 {
-    /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
-     */
-    ObjectKillChildrens( VLC_OBJECT(p_input) );
-
     input_thread_private_t *sys = p_input->p;
 
     vlc_mutex_lock( &sys->lock_control );

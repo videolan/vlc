@@ -128,7 +128,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
 
         /* Attach the parent to its child (structure lock needed) */
         libvlc_lock (obj->p_libvlc);
-        atomic_init (&priv->alive, atomic_load (&papriv->alive));
         priv->next = papriv->first;
         if (priv->next != NULL)
             priv->next->prev = priv;
@@ -142,7 +141,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         obj->i_flags = 0;
         obj->p_libvlc = self;
         obj->p_parent = NULL;
-        atomic_init (&priv->alive, true);
         priv->next = NULL;
         vlc_mutex_init (&(libvlc_priv (self)->structure_lock));
 
@@ -253,24 +251,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
         vlc_mutex_destroy (&(libvlc_priv ((libvlc_int_t *)p_this)->structure_lock));
 
     free( p_priv );
-}
-
-
-/**
- * Hack for input objects. Should be removed eventually.
- */
-void ObjectKillChildrens( vlc_object_t *p_obj )
-{
-    /* FIXME ObjectKillChildrens seems a very bad idea in fact */
-    /*if( p_obj == VLC_OBJECT(p_input->p->p_sout) ) return;*/
-
-    vlc_object_internals_t *priv = vlc_internals (p_obj);
-    atomic_store(&priv->alive, false);
-
-    vlc_list_t *p_list = vlc_list_children( p_obj );
-    for( int i = 0; i < p_list->i_count; i++ )
-        ObjectKillChildrens( p_list->p_values[i].p_address );
-    vlc_list_release( p_list );
 }
 
 
@@ -394,17 +374,6 @@ void vlc_object_release( vlc_object_t *p_this )
         if (parent)
             vlc_object_release (parent);
     }
-}
-
-#undef vlc_object_alive
-/**
- * This function returns true, except when it returns false.
- * \warning Do not use this function. Ever. You were warned.
- */
-bool vlc_object_alive(vlc_object_t *obj)
-{
-    vlc_object_internals_t *internals = vlc_internals (obj);
-    return atomic_load (&internals->alive);
 }
 
 #undef vlc_list_children

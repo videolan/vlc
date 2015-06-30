@@ -67,8 +67,4 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 #define vlc_list_children(a) \
     vlc_list_children( VLC_OBJECT(a) )
 
-/* Objects and threading */
-VLC_API VLC_USED VLC_DEPRECATED bool vlc_object_alive (vlc_object_t *);
-#define vlc_object_alive(a) vlc_object_alive( VLC_OBJECT(a) )
-
 /** @} */
