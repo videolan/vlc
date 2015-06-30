@@ -932,7 +932,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
      * (4 bytes), decode and then read up to 8 additional bytes to get the
      * entire header.
      */
-    if( net_Read( p_access, p_sys->fd, p_sys->buffer, 4, true ) < 4 )
+    if( net_Read( p_access, p_sys->fd, p_sys->buffer, 4 ) < 4 )
     {
        msg_Err( p_access, "cannot read data 2" );
        return VLC_EGENERIC;
@@ -945,7 +945,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
     if( restsize > 8 )
         restsize = 8;
 
-    if( net_Read( p_access, p_sys->fd, p_sys->buffer + 4, restsize, true ) < restsize )
+    if( net_Read( p_access, p_sys->fd, p_sys->buffer + 4, restsize ) < restsize )
     {
         msg_Err( p_access, "cannot read data 3" );
         return VLC_EGENERIC;
@@ -997,7 +997,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
 
     if( (p_ck->i_data > 0) &&
         (net_Read( p_access, p_sys->fd, &p_sys->buffer[12],
-                   p_ck->i_data, true ) < p_ck->i_data) )
+                   p_ck->i_data ) < p_ck->i_data) )
     {
         msg_Err( p_access, "cannot read data 4" );
         return VLC_EGENERIC;

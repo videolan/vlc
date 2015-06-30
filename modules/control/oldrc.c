@@ -1864,7 +1864,6 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     }
 #endif
 
-
     while( *pi_size < MAX_LINE_LENGTH )
     {
         if( p_intf->p_sys->i_socket == -1 )
@@ -1880,7 +1879,7 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
         else
         {   /* Connection closed */
             if( net_Read( p_intf, p_intf->p_sys->i_socket, p_buffer + *pi_size,
-                          1, false ) <= 0 )
+                          1 ) <= 0 )
             {
                 net_Close( p_intf->p_sys->i_socket );
                 p_intf->p_sys->i_socket = -1;

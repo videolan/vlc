@@ -248,18 +248,15 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
     return sockv;
 }
 
-#undef net_Read
 /*****************************************************************************
  * net_Read:
  *****************************************************************************
  * Reads from a network socket. Cancellation point.
- * If waitall is true, then we repeat until we have read the right amount of
- * data; in that case, a short count means EOF has been reached or the VLC
- * object has been signaled.
+ * We repeat until we have read the right amount of data;
+ * a short count means EOF has been reached or an error.
  *****************************************************************************/
-ssize_t
-net_Read (vlc_object_t *restrict p_this, int fd,
-          void *restrict p_buf, size_t i_buflen, bool waitall)
+ssize_t (net_Read)(vlc_object_t *restrict p_this, int fd,
+                   void *restrict p_buf, size_t i_buflen)
 {
     struct pollfd ufd[2];
 
@@ -304,7 +301,7 @@ net_Read (vlc_object_t *restrict p_this, int fd,
             p_buf = (char *)p_buf + n;
             i_buflen -= n;
 
-            if (!waitall || i_buflen == 0)
+            if (i_buflen == 0)
                 break;
         }
         else /* n == 0 */
@@ -449,7 +446,7 @@ char *net_Gets(vlc_object_t *obj, int fd)
             bufsize += 1024;
         }
 
-        ssize_t val = net_Read(obj, fd, buf + buflen, 1, false);
+        ssize_t val = net_Read(obj, fd, buf + buflen, 1);
         if (val < 1)
             goto error;
 
