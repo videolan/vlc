@@ -34,6 +34,7 @@
 #include <vlc_access.h>
 
 #include <vlc_network.h>
+#include <vlc_interrupt.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -260,7 +261,7 @@ static block_t *BlockRead(access_t *p_access)
 
     /* Read data */
     p_block = block_Alloc(MTU);
-    len = net_Read(p_access, p_sys->eyetvSock, p_block->p_buffer, MTU, false);
+    len = vlc_read_i11e(p_sys->eyetvSock, p_block->p_buffer, MTU);
 
     if (len < 0) {
         block_Release(p_block);
