@@ -328,14 +328,23 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
 
     int ret;
 
-    struct pollfd *ufd = malloc((nfds + 1) * sizeof (*ufd));
-    if (unlikely(ufd == NULL))
-        return -1; /* ENOMEM */
+    if (likely(nfds < 255))
+    {   /* Fast path with stack allocation */
+        struct pollfd ufd[nfds + 1];
 
-    vlc_cleanup_push(free, ufd);
-    ret = vlc_poll_i11e_inner(fds, nfds, timeout, ctx, ufd);
-    vlc_cleanup_pop();
-    free(ufd);
+        ret = vlc_poll_i11e_inner(fds, nfds, timeout, ctx, ufd);
+    }
+    else
+    {   /* Slow path but poll() is slow with large nfds anyway. */
+        struct pollfd *ufd = malloc((nfds + 1) * sizeof (*ufd));
+        if (unlikely(ufd == NULL))
+            return -1; /* ENOMEM */
+
+        vlc_cleanup_push(free, ufd);
+        ret = vlc_poll_i11e_inner(fds, nfds, timeout, ctx, ufd);
+        vlc_cleanup_pop();
+        free(ufd);
+    }
     return ret;
 }
 
