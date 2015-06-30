@@ -544,6 +544,10 @@ vlc_read_i11e
 vlc_readv_i11e
 vlc_write_i11e
 vlc_writev_i11e
+vlc_recvmsg_i11e
+vlc_recvfrom_i11e
+vlc_sendmsg_i11e
+vlc_sendto_i11e
 vlc_sem_wait_i11e
 vlc_interrupt_create
 vlc_interrupt_destroy

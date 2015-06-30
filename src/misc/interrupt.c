@@ -362,6 +362,8 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
 
 # include <fcntl.h>
 # include <sys/uio.h>
+# include <sys/socket.h>
+
 
 /* There are currently no ways to atomically force a non-blocking read or write
  * operations. Even for sockets, the MSG_DONTWAIT flag is non-standard.
@@ -427,6 +429,64 @@ ssize_t vlc_write_i11e(int fd, const void *buf, size_t count)
 {
     struct iovec iov = { (void *)buf, count };
     return writev(fd, &iov, 1);
+}
+
+ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
+{
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = POLLIN;
+
+    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+        return -1;
+    /* NOTE: MSG_OOB and MSG_PEEK should work fine here.
+     * MSG_WAITALL is not supported at this point. */
+    return recvmsg(fd, msg, flags);
+}
+
+ssize_t vlc_recvfrom_i11e(int fd, void *buf, size_t len, int flags,
+                        struct sockaddr *addr, socklen_t *addrlen)
+{
+    struct iovec iov = { .iov_base = buf, .iov_len = len };
+    struct msghdr msg = {
+        .msg_name = addr,
+        .msg_namelen = (addrlen != NULL) ? *addrlen : 0,
+        .msg_iov = &iov,
+        .msg_iovlen = 1,
+    };
+
+    ssize_t ret = vlc_recvmsg_i11e(fd, &msg, flags);
+    if (ret >= 0 && addrlen != NULL)
+        *addrlen = msg.msg_namelen;
+    return ret;
+}
+
+ssize_t vlc_sendmsg_i11e(int fd, const struct msghdr *msg, int flags)
+{
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = POLLOUT;
+
+    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+        return -1;
+    /* NOTE: MSG_EOR, MSG_OOB and MSG_NOSIGNAL should all work fine here. */
+    return sendmsg(fd, msg, flags);
+}
+
+ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
+                      const struct sockaddr *addr, socklen_t addrlen)
+{
+    struct iovec iov = { .iov_base = (void *)buf, .iov_len = len };
+    struct msghdr msg = {
+        .msg_name = (struct sockaddr *)addr,
+        .msg_namelen = addrlen,
+        .msg_iov = &iov,
+        .msg_iovlen = 1,
+    };
+
+    return vlc_sendmsg_i11e(fd, &msg, flags);
 }
 
 #else /* _WIN32 */
@@ -512,6 +572,52 @@ ssize_t vlc_read_i11e(int fd, void *buf, size_t count)
 ssize_t vlc_write_i11e(int fd, const void *buf, size_t count)
 {
     return write(fd, buf, count);
+}
+
+ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *msg, int flags)
+{
+    (void) fd; (void) msg; (void) flags;
+    vlc_assert_unreachable();
+}
+
+ssize_t vlc_recvfrom_i11e(int fd, void *buf, size_t len, int flags,
+                        struct sockaddr *addr, socklen_t *addrlen)
+{
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = POLLIN;
+
+    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+        return -1;
+
+    ssize_t ret = recvfrom(fd, buf, len, flags, addr, addrlen);
+    if (ret < 0 && WSAGetLastError() == WSAEWOULDBLOCK)
+        errno = EAGAIN;
+    return ret;
+}
+
+ssize_t vlc_sendmsg_i11e(int fd, const struct msghdr *msg, int flags)
+{
+    (void) fd; (void) msg; (void) flags;
+    vlc_assert_unreachable();
+}
+
+ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
+                      const struct sockaddr *addr, socklen_t addrlen)
+{
+    struct pollfd ufd;
+
+    ufd.fd = fd;
+    ufd.events = POLLOUT;
+
+    if (vlc_poll_i11e(&ufd, 1, -1) < 0)
+        return -1;
+
+    ssize_t ret = sendto(fd, buf, len, flags, addr, addrlen);
+    if (ret < 0 && WSAGetLastError() == WSAEWOULDBLOCK)
+        errno = EAGAIN;
+    return ret;
 }
 
 #endif

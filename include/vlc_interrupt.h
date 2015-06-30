@@ -26,9 +26,16 @@
 #ifndef VLC_INTERRUPT_H
 # define VLC_INTERRUPT_H 1
 # include <vlc_threads.h>
+# ifndef _WIN32
+#  include <sys/socket.h> /* socklen_t */
+# else
+#  include <ws2tcpip.h>
+# endif
 
 struct pollfd;
 struct iovec;
+struct sockaddr;
+struct msghdr;
 
 /**
  * @defgroup interrupt Interruptible sleep
@@ -76,6 +83,25 @@ VLC_API ssize_t vlc_readv_i11e(int fd, struct iovec *, int);
 VLC_API ssize_t vlc_writev_i11e(int fd, const struct iovec *, int);
 VLC_API ssize_t vlc_read_i11e(int fd, void *, size_t);
 VLC_API ssize_t vlc_write_i11e(int fd, const void *, size_t);
+
+VLC_API ssize_t vlc_recvmsg_i11e(int fd, struct msghdr *, int flags);
+VLC_API ssize_t vlc_sendmsg_i11e(int fd, const struct msghdr *, int flags);
+
+VLC_API ssize_t vlc_recvfrom_i11e(int fd, void *, size_t, int flags,
+                                struct sockaddr *, socklen_t *);
+VLC_API ssize_t vlc_sendto_i11e(int fd, const void *, size_t, int flags,
+                              const struct sockaddr *, socklen_t);
+
+static inline ssize_t vlc_recv_i11e(int fd, void *buf, size_t len, int flags)
+{
+    return vlc_recvfrom_i11e(fd, buf, len, flags, NULL, NULL);
+}
+
+static inline
+ssize_t vlc_send_i11e(int fd, const void *buf, size_t len, int flags)
+{
+    return vlc_sendto_i11e(fd, buf, len, flags, NULL, 0);
+}
 
 /**
  * @}
