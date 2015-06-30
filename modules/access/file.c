@@ -63,6 +63,7 @@
 #endif
 #include <vlc_fs.h>
 #include <vlc_url.h>
+#include <vlc_interrupt.h>
 
 struct access_sys_t
 {
@@ -190,14 +191,8 @@ int FileOpen( vlc_object_t *p_this )
     }
 
 #if O_NONBLOCK
-    int flags = fcntl (fd, F_GETFL);
-    if (S_ISFIFO (st.st_mode) || S_ISSOCK (st.st_mode))
-        /* Force non-blocking mode where applicable (fd://) */
-        flags |= O_NONBLOCK;
-    else
-        /* Force blocking mode when not useful or not specified */
-        flags &= ~O_NONBLOCK;
-    fcntl (fd, F_SETFL, flags);
+    /* Force blocking mode back */
+    fcntl (fd, fcntl (fd, F_GETFL) & ~O_NONBLOCK);
 #endif
 
     /* Directories can be opened and read from, but only readdir() knows
@@ -282,42 +277,23 @@ void FileClose (vlc_object_t * p_this)
 }
 
 
-#include <vlc_network.h>
-
 /**
  * Reads from a regular file.
  */
 static ssize_t FileRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
 {
+    ssize_t val = StreamRead (p_access, p_buffer, i_len);
+
     access_sys_t *p_sys = p_access->p_sys;
-    int fd = p_sys->fd;
-    ssize_t val = read (fd, p_buffer, i_len);
 
-    if (val < 0)
-    {
-        switch (errno)
-        {
-            case EINTR:
-            case EAGAIN:
-                return -1;
-        }
-
-        msg_Err (p_access, "read error: %s", vlc_strerror_c(errno));
-        dialog_Fatal (p_access, _("File reading failed"),
-                      _("VLC could not read the file (%s)."),
-                      vlc_strerror(errno));
-        val = 0;
-    }
-
-    p_access->info.i_pos += val;
-    p_access->info.b_eof = !val;
     if (p_access->info.i_pos >= p_sys->size)
     {
         struct stat st;
 
-        if (fstat (fd, &st) == 0)
-            p_sys->size = st.st_size;
+        if (fstat (p_sys->fd, &st) == 0)
+           p_sys->size = st.st_size;
     }
+
     return val;
 }
 
@@ -343,12 +319,7 @@ static ssize_t StreamRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
     access_sys_t *p_sys = p_access->p_sys;
     int fd = p_sys->fd;
 
-#if !defined (_WIN32) && !defined (__OS2__)
-    ssize_t val = net_Read (p_access, fd, p_buffer, i_len, false);
-#else
-    ssize_t val = read (fd, p_buffer, i_len);
-#endif
-
+    ssize_t val = vlc_read_i11e (fd, p_buffer, i_len);
     if (val < 0)
     {
         switch (errno)
@@ -357,7 +328,11 @@ static ssize_t StreamRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
             case EAGAIN:
                 return -1;
         }
+
         msg_Err (p_access, "read error: %s", vlc_strerror_c(errno));
+        dialog_Fatal (p_access, _("File reading failed"),
+                      _("VLC could not read the file (%s)."),
+                      vlc_strerror(errno));
         val = 0;
     }
 
