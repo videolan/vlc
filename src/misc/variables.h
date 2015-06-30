@@ -40,7 +40,6 @@ struct vlc_object_internals
     vlc_cond_t      var_wait;
 
     /* Objects thread synchronization */
-    int             pipes[2];
     atomic_bool     alive;
 
     /* Objects management */

@@ -52,35 +52,8 @@
 # include <search.h>
 #endif
 
-#ifdef __OS2__
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <unistd.h>    // close(), write()
-#elif defined(_WIN32)
-# include <io.h>
-# include <winsock2.h>
-# include <ws2tcpip.h>
-# undef  read
-# define read( a, b, c )  recv (a, b, c, 0)
-# undef  write
-# define write( a, b, c ) send (a, b, c, 0)
-# undef  close
-# define close( a )       closesocket (a)
-#else
-# include <vlc_fs.h>
-# include <unistd.h>
-#endif
-
 #include <limits.h>
 #include <assert.h>
-
-#if defined (HAVE_SYS_EVENTFD_H)
-# include <sys/eventfd.h>
-# ifndef EFD_CLOEXEC
-#  define EFD_CLOEXEC 0
-#  warning EFD_CLOEXEC missing. Consider updating libc.
-# endif
-#endif
 
 
 /*****************************************************************************
@@ -132,7 +105,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     priv->var_root = NULL;
     vlc_mutex_init (&priv->var_lock);
     vlc_cond_init (&priv->var_wait);
-    priv->pipes[0] = priv->pipes[1] = -1;
     atomic_init (&priv->refs, 1);
     priv->pf_destructor = NULL;
     priv->prev = NULL;
@@ -277,107 +249,12 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     free( p_priv->psz_name );
 
-    if( p_priv->pipes[1] != -1 && p_priv->pipes[1] != p_priv->pipes[0] )
-        close( p_priv->pipes[1] );
-    if( p_priv->pipes[0] != -1 )
-        close( p_priv->pipes[0] );
     if( VLC_OBJECT(p_this->p_libvlc) == p_this )
         vlc_mutex_destroy (&(libvlc_priv ((libvlc_int_t *)p_this)->structure_lock));
 
     free( p_priv );
 }
 
-
-#if defined(_WIN32) || defined(__OS2__)
-/**
- * select()-able pipes emulated using Winsock
- */
-# define vlc_pipe selectable_pipe
-static int selectable_pipe (int fd[2])
-{
-    struct sockaddr_in addr;
-    int addrlen = sizeof (addr);
-
-    int l = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP),
-        c = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (l == -1 || c == -1)
-        goto error;
-
-    memset (&addr, 0, sizeof (addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-    if (bind (l, (struct sockaddr *)&addr, sizeof (addr))
-     || getsockname (l, (struct sockaddr *)&addr, &addrlen)
-     || listen (l, 1)
-     || connect (c, (struct sockaddr *)&addr, addrlen))
-        goto error;
-
-    int a = accept (l, NULL, NULL);
-    if (a == -1)
-        goto error;
-
-    close (l);
-    //shutdown (a, 0);
-    //shutdown (c, 1);
-    fd[0] = c;
-    fd[1] = a;
-    return 0;
-
-error:
-    if (l != -1)
-        close (l);
-    if (c != -1)
-        close (c);
-    return -1;
-}
-#endif /* _WIN32 || __OS2__ */
-
-static vlc_mutex_t pipe_lock = VLC_STATIC_MUTEX;
-
-/**
- * Returns the readable end of a pipe that becomes readable once termination
- * of the object is requested (vlc_object_kill()).
- * This can be used to wake-up out of a select() or poll() event loop, such
- * typically when doing network I/O.
- *
- * Note that the pipe will remain the same for the lifetime of the object.
- * DO NOT read the pipe nor close it yourself. Ever.
- *
- * @param obj object that would be "killed"
- * @return a readable pipe descriptor, or -1 on error.
- */
-int vlc_object_waitpipe( vlc_object_t *obj )
-{
-    vlc_object_internals_t *internals = vlc_internals( obj );
-
-    vlc_mutex_lock (&pipe_lock);
-    if (internals->pipes[0] == -1)
-    {
-        /* This can only ever happen if someone killed us without locking: */
-        assert (internals->pipes[1] == -1);
-
-        /* pipe() is not a cancellation point, but write() is and eventfd() is
-         * unspecified (not in POSIX). */
-        int canc = vlc_savecancel ();
-#if defined (HAVE_SYS_EVENTFD_H)
-        internals->pipes[0] = internals->pipes[1] = eventfd (0, EFD_CLOEXEC);
-        if (internals->pipes[0] == -1)
-#endif
-        {
-            if (vlc_pipe (internals->pipes))
-                internals->pipes[0] = internals->pipes[1] = -1;
-        }
-
-        if (internals->pipes[0] != -1 && !atomic_load (&internals->alive))
-        {   /* Race condition: vlc_object_kill() already invoked! */
-            msg_Dbg (obj, "waitpipe: object already dying");
-            write (internals->pipes[1], &(uint64_t){ 1 }, sizeof (uint64_t));
-        }
-        vlc_restorecancel (canc);
-    }
-    vlc_mutex_unlock (&pipe_lock);
-    return internals->pipes[0];
-}
 
 /**
  * Hack for input objects. Should be removed eventually.
@@ -388,19 +265,7 @@ void ObjectKillChildrens( vlc_object_t *p_obj )
     /*if( p_obj == VLC_OBJECT(p_input->p->p_sout) ) return;*/
 
     vlc_object_internals_t *priv = vlc_internals (p_obj);
-    if (atomic_exchange (&priv->alive, false))
-    {
-        int fd;
-
-        vlc_mutex_lock (&pipe_lock);
-        fd = priv->pipes[1];
-        vlc_mutex_unlock (&pipe_lock);
-        if (fd != -1)
-        {
-            write (fd, &(uint64_t){ 1 }, sizeof (uint64_t));
-            msg_Dbg (p_obj, "object waitpipe triggered");
-        }
-    }
+    atomic_store(&priv->alive, false);
 
     vlc_list_t *p_list = vlc_list_children( p_obj );
     for( int i = 0; i < p_list->i_count; i++ )

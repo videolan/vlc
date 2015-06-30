@@ -57,7 +57,6 @@ void vlc_CPU_dump(vlc_object_t *);
 /* This cannot be used as is from plugins yet: */
 int vlc_clone_detach (vlc_thread_t *, void *(*)(void *), void *, int);
 
-int vlc_object_waitpipe (vlc_object_t *obj);
 void ObjectKillChildrens (vlc_object_t *);
 
 int vlc_set_priority( vlc_thread_t, int );
