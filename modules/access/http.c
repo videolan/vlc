@@ -31,6 +31,8 @@
 # include "config.h"
 #endif
 
+#include <errno.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
@@ -43,6 +45,7 @@
 #include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_http.h>
+#include <vlc_interrupt.h>
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
@@ -672,7 +675,9 @@ static int ReadData( access_t *p_access, int *pi_read,
     if( p_sys->p_tls != NULL )
         *pi_read = vlc_tls_Read( p_sys->p_tls, p_buffer, i_len, false );
     else
-        *pi_read = net_Read( p_access, p_sys->fd, p_buffer, i_len, false );
+        *pi_read = vlc_recv_i11e( p_sys->fd, p_buffer, i_len, 0 );
+    if( *pi_read < 0 && errno != EINTR && errno != EAGAIN )
+        return VLC_EGENERIC;
     if( *pi_read <= 0 )
         return VLC_SUCCESS;
 
