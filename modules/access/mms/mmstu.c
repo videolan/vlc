@@ -43,6 +43,7 @@
 
 #include <vlc_network.h>
 #include <vlc_url.h>
+#include <vlc_interrupt.h>
 #include "asf.h"
 #include "buffer.h"
 
@@ -1012,12 +1013,11 @@ static int NetFillBuffer( access_t *p_access )
     access_sys_t    *p_sys = p_access->p_sys;
     int             i_ret;
     struct pollfd   ufd[2];
-    unsigned        timeout, nfd;
+    unsigned        timeout = p_sys->i_timeout, nfd = 0;
 
     /* FIXME when using udp */
     ssize_t i_tcp, i_udp;
     ssize_t i_tcp_read, i_udp_read;
-    int i_try = 0;
 
     i_tcp = MMS_BUFFER_SIZE/2 - p_sys->i_buffer_tcp;
 
@@ -1040,49 +1040,38 @@ static int NetFillBuffer( access_t *p_access )
         /* msg_Warn( p_access, "ask for tcp:%d udp:%d", i_tcp, i_udp ); */
     }
 
+    /* Initialize file descriptor set */
+    if( i_tcp > 0 )
+    {
+        ufd[nfd].fd = p_sys->i_handle_tcp;
+        ufd[nfd].events = POLLIN;
+        nfd++;
+    }
+    if( i_udp > 0 )
+    {
+        ufd[nfd].fd = p_sys->i_handle_udp;
+        ufd[nfd].events = POLLIN;
+        nfd++;
+    }
+
     /* Find if some data is available */
+    if( p_sys->i_buffer_tcp > 0 || p_sys->i_buffer_udp > 0 )
+        timeout = 2000;
+
     do
     {
-        i_try++;
-
-        /* Initialize file descriptor set */
-        memset (ufd, 0, sizeof (ufd));
-        nfd = 0;
-
-        if( i_tcp > 0 )
-        {
-            ufd[nfd].fd = p_sys->i_handle_tcp;
-            ufd[nfd].events = POLLIN;
-            nfd++;
-        }
-        if( i_udp > 0 )
-        {
-            ufd[nfd].fd = p_sys->i_handle_udp;
-            ufd[nfd].events = POLLIN;
-            nfd++;
-        }
-
-        /* We'll wait 0.5 second if nothing happens */
-        timeout = __MIN( 500, p_sys->i_timeout );
-
-        if( i_try * timeout > p_sys->i_timeout )
-        {
-            msg_Err(p_access, "no data received");
-            return -1;
-        }
-
-        if( i_try > 3 && (p_sys->i_buffer_tcp > 0 || p_sys->i_buffer_udp > 0) )
-        {
-            return -1;
-        }
-
         if( !vlc_object_alive (p_access) )
             return -1;
 
-        //msg_Dbg( p_access, "NetFillBuffer: trying again (select)" );
+        i_ret = vlc_poll_i11e(ufd, nfd, timeout);
+    }
+    while( i_ret < 0 && errno == EINTR ); /* FIXME: recompute timeout */
 
-    } while( !(i_ret = poll( ufd, nfd, timeout)) ||
-             (i_ret < 0 && errno == EINTR) );
+    if( i_ret == 0 )
+    {
+        msg_Err(p_access, "no data received");
+        return -1;
+    }
 
     if( i_ret < 0 )
     {
