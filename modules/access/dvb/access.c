@@ -36,6 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 #include <vlc_input.h>
+#include <vlc_interrupt.h>
 
 #include <sys/types.h>
 #include <poll.h>
@@ -251,54 +252,60 @@ static block_t *BlockScan( access_t *p_access )
     bool b_has_lock = false;
     int i_best_snr = -1;
 
+    /* Initialize file descriptor sets */
+    struct pollfd ufds[2];
+
+    ufds[0].fd = p_sys->i_handle;
+    ufds[0].events = POLLIN;
+    ufds[1].fd = p_sys->i_frontend_handle;
+    ufds[1].events = POLLPRI;
+
     for ( ; ; )
     {
-        struct pollfd ufds[2];
+        frontend_status_t status;
+
+        FrontendGetStatus( p_access, &status );
+        b_has_dvb_signal |= status.b_has_carrier;
+        b_has_lock |= status.b_has_lock;
+
+        int64_t i_scan_end = i_scan_start;
+        if( !b_has_dvb_signal )
+            i_scan_end += DVB_SCAN_MAX_SIGNAL_TIME;
+        else if( !b_has_lock )
+            i_scan_end += DVB_SCAN_MAX_LOCK_TIME;
+        else
+            i_scan_end += DVB_SCAN_MAX_PROBE_TIME;
+
+        /* Find if some data is available */
         int i_ret;
 
-        /* Initialize file descriptor sets */
-        memset (ufds, 0, sizeof (ufds));
-        ufds[0].fd = p_sys->i_handle;
-        ufds[0].events = POLLIN;
-        ufds[1].fd = p_sys->i_frontend_handle;
-        ufds[1].events = POLLPRI;
-
-        /* We'll wait 0.1 second if nothing happens */
-        /* Find if some data is available */
-        i_ret = poll( ufds, 2, 100 );
-
-        if( !vlc_object_alive (p_access) || scan_IsCancelled( p_scan ) )
-            break;
-
-        if( i_ret <= 0 )
+        do
         {
-            const mtime_t i_scan_time = mdate() - i_scan_start;
-            frontend_status_t status;
+            int64_t timeout = i_scan_end - mdate();
 
-            FrontendGetStatus( p_access, &status );
+            i_ret = 0;
 
-            b_has_dvb_signal |= status.b_has_carrier;
-            b_has_lock |= status.b_has_lock;
-
-            if( ( !b_has_dvb_signal && i_scan_time > DVB_SCAN_MAX_SIGNAL_TIME ) ||
-                ( !b_has_lock && i_scan_time > DVB_SCAN_MAX_LOCK_TIME ) ||
-                ( i_scan_time > DVB_SCAN_MAX_PROBE_TIME ) )
-            {
-                msg_Dbg( p_access, "timed out scanning current frequency (s=%d l=%d)", b_has_dvb_signal, b_has_lock );
+            if( !vlc_object_alive (p_access) || scan_IsCancelled( p_scan ) )
                 break;
-            }
+
+            if( timeout >= 0 )
+                i_ret = vlc_poll_i11e( ufds, 2, timeout / 1000 );
         }
+        while( i_ret < 0 && errno == EINTR );
 
         if( i_ret < 0 )
         {
-            if( errno == EINTR )
-                continue;
-
             msg_Err( p_access, "poll error: %s", vlc_strerror_c(errno) );
-            scan_session_Destroy( p_scan, session );
-
             p_access->info.b_eof = true;
-            return NULL;
+            break;
+        }
+
+        if( i_ret == 0 )
+        {
+            msg_Dbg( p_access,
+                     "timed out scanning current frequency (s=%d l=%d)",
+                     b_has_dvb_signal, b_has_lock );
+            break;
         }
 
         if( ufds[1].revents )
