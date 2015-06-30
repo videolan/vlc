@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
+#include <vlc_interrupt.h>
 
 #include <errno.h>
 #include <assert.h>
@@ -343,7 +344,7 @@ ssize_t dvb_read (dvb_device_t *d, void *buf, size_t len)
     else
         n = 1;
 
-    if (poll (ufd, n, 500 /* FIXME */) < 0)
+    if (vlc_poll_i11e (ufd, n, -1) < 0)
         return -1;
 
     if (d->frontend != -1 && ufd[1].revents)
