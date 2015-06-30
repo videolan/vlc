@@ -29,7 +29,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifdef HAVE_POLL
+#include <poll.h>
+#endif
+
 #include <vlc_common.h>
+#include <vlc_fs.h> /* vlc_pipe */
+
 #include "interrupt.h"
 #include "libvlc.h"
 
@@ -231,3 +237,168 @@ int vlc_sem_wait_i11e(vlc_sem_t *sem)
 
     return vlc_interrupt_finish(ctx);
 }
+
+#ifndef _WIN32
+static void vlc_poll_i11e_wake(void *opaque)
+{
+    uint64_t value = 1;
+    int *fd = opaque;
+    int canc;
+
+    canc = vlc_savecancel();
+    write(fd[1], &value, sizeof (value));
+    vlc_restorecancel(canc);
+}
+
+static void vlc_poll_i11e_cleanup(void *opaque)
+{
+    vlc_interrupt_t *ctx = opaque;
+    int *fd = ctx->data;
+
+    vlc_interrupt_finish(ctx);
+    close(fd[1]);
+    close(fd[0]);
+}
+
+static int vlc_poll_i11e_inner(struct pollfd *restrict fds, unsigned nfds,
+                               int timeout, vlc_interrupt_t *ctx,
+                               struct pollfd *restrict ufd)
+{
+    int fd[2];
+    int ret = -1;
+    int canc;
+
+    /* TODO: cache this */
+    /* TODO: use eventfd on Linux */
+    if (vlc_pipe(fd))
+    {
+        vlc_testcancel();
+        errno = ENOMEM;
+        return -1;
+    }
+
+    for (unsigned i = 0; i < nfds; i++)
+    {
+        ufd[i].fd = fds[i].fd;
+        ufd[i].events = fds[i].events;
+    }
+    ufd[nfds].fd = fd[0];
+    ufd[nfds].events = POLLIN;
+
+    if (vlc_interrupt_prepare(ctx, vlc_poll_i11e_wake, fd))
+    {
+        vlc_testcancel();
+        errno = EINTR;
+        goto out;
+    }
+
+    vlc_cleanup_push(vlc_poll_i11e_cleanup, ctx);
+    ret = poll(ufd, nfds + 1, timeout);
+
+    for (unsigned i = 0; i < nfds; i++)
+        fds[i].revents = ufd[i].revents;
+
+    if (ret > 0 && ufd[nfds].revents)
+    {
+        uint64_t dummy;
+
+        read(fd[0], &dummy, sizeof (dummy));
+        ret--;
+    }
+    vlc_cleanup_pop();
+
+    if (vlc_interrupt_finish(ctx))
+    {
+        errno = EINTR;
+        ret = -1;
+    }
+out:
+    canc = vlc_savecancel();
+    close(fd[1]);
+    close(fd[0]);
+    vlc_restorecancel(canc);
+    return ret;
+}
+
+int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
+{
+    vlc_interrupt_t *ctx = vlc_threadvar_get(vlc_interrupt_var);
+    if (ctx == NULL)
+        return poll(fds, nfds, timeout);
+
+    int ret;
+
+    struct pollfd *ufd = malloc((nfds + 1) * sizeof (*ufd));
+    if (unlikely(ufd == NULL))
+        return -1; /* ENOMEM */
+
+    vlc_cleanup_push(free, ufd);
+    ret = vlc_poll_i11e_inner(fds, nfds, timeout, ctx, ufd);
+    vlc_cleanup_pop();
+    free(ufd);
+    return ret;
+}
+
+#else /* _WIN32 */
+
+static void CALLBACK vlc_poll_i11e_wake_self(ULONG_PTR data)
+{
+    (void) data; /* Nothing to do */
+}
+
+static void vlc_poll_i11e_wake(void *opaque)
+{
+#if !VLC_WINSTORE_APP
+    HANDLE th = opaque;
+    QueueUserAPC(vlc_poll_i11e_wake_self, th, 0);
+#else
+    (void) opaque;
+#endif
+}
+
+static void vlc_poll_i11e_cleanup(void *opaque)
+{
+    vlc_interrupt_t *ctx = opaque;
+    HANDLE th = ctx->data;
+
+    vlc_interrupt_finish(ctx);
+    CloseHandle(th);
+}
+
+int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
+{
+    vlc_interrupt_t *ctx = vlc_threadvar_get(vlc_interrupt_var);
+    if (ctx == NULL)
+        return vlc_poll(fds, nfds, timeout);
+
+    int ret = -1;
+    HANDLE th;
+
+    if (!DuplicateHandle(GetCurrentProcess(), GetCurrentThread(),
+                         GetCurrentProcess(), &th, 0, FALSE,
+                         DUPLICATE_SAME_ACCESS))
+    {
+        errno = ENOMEM;
+        return -1;
+    }
+
+    if (vlc_interrupt_prepare(ctx, vlc_poll_i11e_wake, th))
+    {
+        errno = EINTR;
+        goto out;
+    }
+
+    vlc_cleanup_push(vlc_poll_i11e_cleanup, th);
+    ret = vlc_poll(fds, nfds, timeout);
+    vlc_cleanup_pop();
+
+    if (vlc_interrupt_finish(ctx))
+    {
+        errno = EINTR;
+        ret = -1;
+    }
+out:
+    CloseHandle(th);
+    return ret;
+}
+#endif

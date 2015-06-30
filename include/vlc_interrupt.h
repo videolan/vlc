@@ -26,6 +26,9 @@
 #ifndef VLC_INTERRUPT_H
 # define VLC_INTERRUPT_H 1
 # include <vlc_threads.h>
+
+struct pollfd;
+
 /**
  * @defgroup interrupt Interruptible sleep
  * @{
@@ -48,6 +51,25 @@
  * otherwise zero.
  */
 VLC_API int vlc_sem_wait_i11e(vlc_sem_t *);
+
+/**
+ * Waits for file descriptors I/O events, a timeout, a signal or a VLC I/O
+ * interruption. Except for VLC I/O interruptions, this function behaves
+ * just like the standard poll().
+ *
+ * @note This function is always a cancellation point (as poll()).
+ * @see poll() manual page
+ *
+ * @param fds table of events to wait for
+ * @param nfds number of entries in the table
+ * @param timeout time to wait in milliseconds or -1 for infinite
+ *
+ * @return A strictly positive result represent the number of pending events.
+ * 0 is returned if the time-out is reached without events.
+ * -1 is returned if a VLC I/O interrupt occurs (and errno is set to EINTR)
+ * or if an error occurs.
+ */
+VLC_API int vlc_poll_i11e(struct pollfd *, unsigned, int);
 
 /**
  * @}
