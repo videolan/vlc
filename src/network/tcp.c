@@ -167,7 +167,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
             do  /* NOTE: timeout screwed up if we catch a signal (EINTR) */
             {
-                if (!vlc_object_alive(p_this))
+                if (vlc_killed())
                     goto next_ai;
 
                 val = vlc_poll_i11e(&ufd, 1, timeout);

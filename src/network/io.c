@@ -237,7 +237,7 @@ ssize_t (net_Read)(vlc_object_t *restrict obj, int fd,
 
     do
     {
-        if (!vlc_object_alive(obj))
+        if (vlc_killed())
         {
             vlc_testcancel();
             errno = EINTR;
@@ -292,7 +292,7 @@ ssize_t (net_Write)(vlc_object_t *obj, int fd, const void *buf, size_t len)
 
     do
     {
-        if (!vlc_object_alive(obj))
+        if (vlc_killed())
         {
             vlc_testcancel();
             errno = EINTR;

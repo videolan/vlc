@@ -247,7 +247,7 @@ int vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
 
     for (size_t rcvd = 0;;)
     {
-        if (!vlc_object_alive(session->p_parent))
+        if (vlc_killed())
         {
             errno = EINTR;
             return -1;
@@ -280,7 +280,7 @@ int vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
 
     for (size_t sent = 0;;)
     {
-        if (!vlc_object_alive(session->p_parent))
+        if (vlc_killed())
         {
             errno = EINTR;
             return -1;
