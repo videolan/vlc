@@ -47,11 +47,8 @@
 #   define EWOULDBLOCK WSAEWOULDBLOCK
 #   undef EAGAIN
 #   define EAGAIN WSAEWOULDBLOCK
-#   undef EINTR
-#   define EINTR WSAEINTR
 #endif
-
-#include "libvlc.h" /* vlc_object_waitpipe */
+#include <vlc_interrupt.h>
 
 static int SocksNegotiate( vlc_object_t *, int fd, int i_socks_version,
                            const char *psz_user, const char *psz_passwd );
@@ -75,10 +72,6 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     const char      *psz_realhost;
     char            *psz_socks;
     int             i_realport, i_handle = -1;
-
-    int evfd = vlc_object_waitpipe (p_this);
-    if (evfd == -1)
-        return -1;
 
     psz_socks = var_InheritString( p_this, "socks" );
     if( psz_socks != NULL )
@@ -160,22 +153,26 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
         if( connect( fd, ptr->ai_addr, ptr->ai_addrlen ) )
         {
-            if( net_errno != EINPROGRESS && net_errno != EINTR )
+            if( net_errno != EINPROGRESS && errno != EINTR )
             {
                 msg_Err( p_this, "connection failed: %s",
                          vlc_strerror_c(net_errno) );
                 goto next_ai;
             }
 
-            struct pollfd ufd[2] = {
-                { .fd = fd,   .events = POLLOUT },
-                { .fd = evfd, .events = POLLIN },
-            };
+            struct pollfd ufd;
 
-            do
-                /* NOTE: timeout screwed up if we catch a signal (EINTR) */
-                val = poll (ufd, sizeof (ufd) / sizeof (ufd[0]), timeout);
-            while ((val == -1) && (net_errno == EINTR));
+            ufd.fd = fd;
+            ufd.events = POLLOUT;
+
+            do  /* NOTE: timeout screwed up if we catch a signal (EINTR) */
+            {
+                if (!vlc_object_alive(p_this))
+                    goto next_ai;
+
+                val = vlc_poll_i11e(&ufd, 1, timeout);
+            }
+            while (val == -1 && errno == EINTR);
 
             switch (val)
             {
@@ -187,10 +184,6 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                  case 0: /* timeout */
                      msg_Warn (p_this, "connection timed out");
                      goto next_ai;
-
-                 default: /* something happended */
-                     if (ufd[1].revents)
-                         goto next_ai; /* LibVLC object killed */
             }
 
             /* There is NO WAY around checking SO_ERROR.
