@@ -29,11 +29,13 @@
 # include "config.h"
 #endif
 
+#include <errno.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
-
 #include <vlc_network.h>
+#include <vlc_interrupt.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -138,11 +140,16 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_access->info.b_eof )
         return 0;
 
-    i_read = net_Read( p_access, p_sys->fd, p_buffer, i_len, false );
+    i_read = vlc_recv_i11e( p_sys->fd, p_buffer, i_len, 0 );
     if( i_read == 0 )
         p_access->info.b_eof = true;
     else if( i_read > 0 )
         p_access->info.i_pos += i_read;
+    else if( errno != EINTR && errno != EAGAIN )
+    {
+        msg_Err( p_access, "receive error: %s", vlc_strerror_c(errno) );
+        p_access->info.b_eof = true;
+    }
 
     return i_read;
 }
