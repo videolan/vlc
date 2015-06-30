@@ -32,6 +32,9 @@
 #ifdef HAVE_POLL
 #include <poll.h>
 #endif
+#ifdef HAVE_SYS_EVENTFD_H
+# include <sys/eventfd.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_fs.h> /* vlc_pipe */
@@ -256,7 +259,8 @@ static void vlc_poll_i11e_cleanup(void *opaque)
     int *fd = ctx->data;
 
     vlc_interrupt_finish(ctx);
-    close(fd[1]);
+    if (fd[1] != fd[0])
+        close(fd[1]);
     close(fd[0]);
 }
 
@@ -269,7 +273,14 @@ static int vlc_poll_i11e_inner(struct pollfd *restrict fds, unsigned nfds,
     int canc;
 
     /* TODO: cache this */
-    /* TODO: use eventfd on Linux */
+# if defined (HAVE_SYS_EVENTFD_H) && defined (EFD_CLOEXEC)
+    canc = vlc_savecancel();
+    fd[0] = eventfd(0, EFD_CLOEXEC);
+    vlc_restorecancel(canc);
+    if (fd[0] != -1)
+        fd[1] = fd[0];
+    else
+# endif
     if (vlc_pipe(fd))
     {
         vlc_testcancel();
@@ -314,7 +325,8 @@ static int vlc_poll_i11e_inner(struct pollfd *restrict fds, unsigned nfds,
     }
 out:
     canc = vlc_savecancel();
-    close(fd[1]);
+    if (fd[1] != fd[0])
+        close(fd[1]);
     close(fd[0]);
     vlc_restorecancel(canc);
     return ret;
