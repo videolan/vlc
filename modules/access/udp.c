@@ -42,6 +42,8 @@
 #include <vlc_access.h>
 #include <vlc_network.h>
 #include <vlc_block.h>
+#include <vlc_interrupt.h>
+#include <fcntl.h>
 
 #define MTU 65535
 
@@ -72,9 +74,9 @@ vlc_module_end ()
 struct access_sys_t
 {
     int fd;
-    bool running;
     size_t fifo_size;
     block_fifo_t *fifo;
+    vlc_sem_t semaphore;
     vlc_thread_t thread;
 };
 
@@ -160,6 +162,15 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
+    /* Revert to blocking I/O */
+#ifndef _WIN32
+    fcntl(sys->fd, F_SETFL, fcntl(sys->fd, F_GETFL) & ~O_NONBLOCK);
+#else
+    ioctlsocket(sys->fd, FIONBIO, &(unsigned long){ 0 });
+#endif
+
+    /* FIXME: There are no particular reasons to create a FIFO and thread here.
+     * Those are just working around bugs in the stream cache. */
     sys->fifo = block_FifoNew();
     if( unlikely( sys->fifo == NULL ) )
     {
@@ -167,12 +178,13 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    sys->running = true;
     sys->fifo_size = var_InheritInteger( p_access, "udp-buffer");
+    vlc_sem_init( &sys->semaphore, 0 );
 
     if( vlc_clone( &sys->thread, ThreadRead, p_access,
                    VLC_THREAD_PRIORITY_INPUT ) )
     {
+        vlc_sem_destroy( &sys->semaphore );
         block_FifoRelease( sys->fifo );
         net_Close( sys->fd );
 error:
@@ -193,6 +205,7 @@ static void Close( vlc_object_t *p_this )
 
     vlc_cancel( sys->thread );
     vlc_join( sys->thread, NULL );
+    vlc_sem_destroy( &sys->semaphore );
     block_FifoRelease( sys->fifo );
     net_Close( sys->fd );
     free( sys );
@@ -239,12 +252,9 @@ static block_t *BlockUDP( access_t *p_access )
     if (p_access->info.b_eof)
         return NULL;
 
+    vlc_sem_wait_i11e(&sys->semaphore);
     vlc_fifo_Lock(sys->fifo);
-    if (vlc_fifo_IsEmpty(sys->fifo) && sys->running)
-       vlc_fifo_Wait(sys->fifo);
-
     block = vlc_fifo_DequeueUnlocked(sys->fifo);
-    p_access->info.b_eof = !sys->running;
     vlc_fifo_Unlock(sys->fifo);
 
     return block;
@@ -264,7 +274,7 @@ static void* ThreadRead( void *data )
         if (unlikely(pkt == NULL))
         {   /* OOM - dequeue and discard one packet */
             char dummy;
-            net_Read(access, sys->fd, &dummy, 1, false);
+            recv(sys->fd, &dummy, 1, 0);
             continue;
         }
 
@@ -272,15 +282,15 @@ static void* ThreadRead( void *data )
 
         block_cleanup_push(pkt);
         do
-            len = net_Read(access, sys->fd, pkt->p_buffer, MTU, false);
-        while (len == -1 && errno != EINTR);
-        vlc_cleanup_pop();
-
-        if (len == -1)
         {
-            block_Release(pkt);
-            break;
+#ifndef LIBVLC_USE_PTHREAD
+            struct pollfd ufd = { .fd = sys->fd, .events = POLLIN };
+            while (poll(&ufd, 1, -1) <= 0); /* cancellation point */
+#endif
+            len = recv(sys->fd, pkt->p_buffer, MTU, 0);
         }
+        while (len == -1);
+        vlc_cleanup_pop();
 
         pkt->i_buffer = len;
 
@@ -295,11 +305,8 @@ static void* ThreadRead( void *data )
 
         vlc_fifo_QueueUnlocked(sys->fifo, pkt);
         vlc_fifo_Unlock(sys->fifo);
+        vlc_sem_post(&sys->semaphore);
     }
 
-    vlc_fifo_Lock(sys->fifo);
-    sys->running = false;
-    vlc_fifo_Signal(sys->fifo);
-    vlc_fifo_Unlock(sys->fifo);
     return NULL;
 }
