@@ -41,6 +41,7 @@
 #include <vlc_dialog.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
+#include <vlc_interrupt.h>
 
 #include <limits.h>
 #include <assert.h>
@@ -584,7 +585,9 @@ static int Connect( demux_t *p_demux )
     }
 
 createnew:
-    if( !vlc_object_alive (p_demux) )
+    /* FIXME: This is naive and incorrect; it does not prevent the thread
+     * getting stuck in blocking socket operations. */
+    if( vlc_killed() )
     {
         i_ret = VLC_EGENERIC;
         goto bailout;

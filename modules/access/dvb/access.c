@@ -285,7 +285,7 @@ static block_t *BlockScan( access_t *p_access )
 
             i_ret = 0;
 
-            if( !vlc_object_alive (p_access) || scan_IsCancelled( p_scan ) )
+            if( vlc_killed() || scan_IsCancelled( p_scan ) )
                 break;
 
             if( timeout >= 0 )

@@ -31,6 +31,7 @@
 #include <vlc_access.h>
 #include <vlc_sout.h>
 #include <vlc_avcodec.h>
+#include <vlc_interrupt.h>
 
 #include "avio.h"
 #include "../codec/avcodec/avcommon.h"
@@ -70,7 +71,12 @@ static int     OutSeek (sout_access_out_t *, off_t);
 
 static int UrlInterruptCallback(void *access)
 {
-    return !vlc_object_alive((access_t *)access);
+    /* NOTE: This works so long as libavformat invokes the callback from the
+     * same thread that invokes libavformat. Currently libavformat does not
+     * create internal threads at all. This is not proper event handling in any
+     * case; libavformat needs fixing. */
+    (void) access;
+    return vlc_killed();
 }
 
 struct access_sys_t

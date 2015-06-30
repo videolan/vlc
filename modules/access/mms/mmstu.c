@@ -1060,7 +1060,7 @@ static int NetFillBuffer( access_t *p_access )
 
     do
     {
-        if( !vlc_object_alive (p_access) )
+        if( vlc_killed() )
             return -1;
 
         i_ret = vlc_poll_i11e(ufd, nfd, timeout);
