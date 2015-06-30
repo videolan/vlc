@@ -165,14 +165,16 @@ int vlclua_playlist_add_internal( vlc_object_t *, lua_State *, playlist_t *,
 
 int vlclua_add_modules_path( lua_State *, const char *psz_filename );
 
+struct vlc_interrupt;
+
 /**
  * File descriptors table
  */
 typedef struct
 {
+    struct vlc_interrupt *interrupt;
     int *fdv;
     unsigned fdc;
-    int fd[2];
 } vlclua_dtable_t;
 
 int vlclua_fd_init( lua_State *, vlclua_dtable_t * );

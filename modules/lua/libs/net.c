@@ -42,6 +42,7 @@
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_fs.h>
+#include <vlc_interrupt.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -319,11 +320,9 @@ static int vlclua_net_recv( lua_State *L )
 /* Takes a { fd : events } table as first arg and modifies it to { fd : revents } */
 static int vlclua_net_poll( lua_State *L )
 {
-    vlclua_dtable_t *dt = vlclua_get_dtable( L );
-
     luaL_checktype( L, 1, LUA_TTABLE );
 
-    int i_fds = 1;
+    int i_fds = 0;
     lua_pushnil( L );
     while( lua_next( L, 1 ) )
     {
@@ -335,40 +334,43 @@ static int vlclua_net_poll( lua_State *L )
     int *luafds = xmalloc( i_fds * sizeof( *luafds ) );
 
     lua_pushnil( L );
-    int i = 1;
-    p_fds[0].fd = dt->fd[0];
-    p_fds[0].events = POLLIN;
-    while( lua_next( L, 1 ) )
+    for( int i = 0; lua_next( L, 1 ); i++ )
     {
         luafds[i] = luaL_checkinteger( L, -2 );
         p_fds[i].fd = vlclua_fd_get( L, luafds[i] );
         p_fds[i].events = luaL_checkinteger( L, -1 );
         p_fds[i].events &= POLLIN | POLLOUT | POLLPRI;
         lua_pop( L, 1 );
-        i++;
     }
 
-    int i_ret;
-    do
-        i_ret = poll( p_fds, i_fds, -1 );
-    while( i_ret == -1 && errno == EINTR );
+    vlclua_dtable_t *dt = vlclua_get_dtable( L );
+    vlc_interrupt_t *oint = vlc_interrupt_set( dt->interrupt );
+    int ret = 1, val;
 
-    for( i = 1; i < i_fds; i++ )
+    do
+    {
+        if( vlc_killed() )
+        {
+            ret = luaL_error( L, "Interrupted." );
+            break;
+        }
+        val = vlc_poll_i11e( p_fds, i_fds, -1 );
+    }
+    while( val == -1 && errno == EINTR );
+
+    vlc_interrupt_set( oint );
+
+    for( int i = 0; i < i_fds; i++ )
     {
         lua_pushinteger( L, luafds[i] );
         lua_pushinteger( L, p_fds[i].revents );
         lua_settable( L, 1 );
     }
-    lua_pushinteger( L, i_ret );
+    lua_pushinteger( L, val );
 
-    if( p_fds[0].revents )
-        i_ret = luaL_error( L, "Interrupted." );
-    else
-        i_ret = 1;
     free( luafds );
     free( p_fds );
-
-    return i_ret;
+    return ret;
 }
 
 /*****************************************************************************
@@ -522,41 +524,11 @@ static void luaopen_net_intf( lua_State *L )
     lua_setfield( L, -2, "net" );
 }
 
-#ifdef _WIN32
-static int vlc_socket_pair( int fds[2] )
-{
-    struct sockaddr_in inaddr;
-    struct sockaddr addr;
-    SOCKET lst = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
-    memset( &inaddr, 0, sizeof( inaddr ) );
-    memset( &addr, 0, sizeof( addr ) );
-    inaddr.sin_family = AF_INET;
-    inaddr.sin_addr.s_addr = htonl( INADDR_LOOPBACK );
-    inaddr.sin_port = 0;
-    int yes = 1;
-    setsockopt( lst, SOL_SOCKET, SO_REUSEADDR, (char*)&yes, sizeof( yes ) );
-    bind( lst, (struct sockaddr *)&inaddr, sizeof( inaddr ) );
-    listen( lst, 1 );
-    int len = sizeof( inaddr );
-    getsockname( lst, &addr, &len );
-    fds[0] = socket( AF_INET, SOCK_STREAM, 0 );
-    connect( fds[0], &addr, len );
-    fds[1] = accept( lst, 0, 0 );
-    closesocket( lst );
-
-    return 0;
-}
-#endif
-
 int vlclua_fd_init( lua_State *L, vlclua_dtable_t *dt )
 {
-#ifndef _WIN32
-    if( vlc_pipe( dt->fd ) )
+    dt->interrupt = vlc_interrupt_create();
+    if( unlikely(dt->interrupt == NULL) )
         return -1;
-#else
-    if( vlc_socket_pair( dt->fd ) )
-        return -1;
-#endif
     dt->fdv = NULL;
     dt->fdc = 0;
     vlclua_set_object( L, vlclua_get_dtable, dt );
@@ -566,13 +538,7 @@ int vlclua_fd_init( lua_State *L, vlclua_dtable_t *dt )
 
 void vlclua_fd_interrupt( vlclua_dtable_t *dt )
 {
-#ifndef _WIN32
-    close( dt->fd[1] );
-    dt->fd[1] = -1;
-#else
-    closesocket( dt->fd[0] );
-    dt->fd[0] = -1;
-#endif
+    vlc_interrupt_kill( dt->interrupt );
 }
 
 /** Releases all (leaked) VLC Lua file descriptors. */
@@ -582,12 +548,5 @@ void vlclua_fd_cleanup( vlclua_dtable_t *dt )
         if( dt->fdv[i] != -1 )
             net_Close( dt->fdv[i] );
     free( dt->fdv );
-#ifndef _WIN32
-    if( dt->fd[1] != -1 )
-        close( dt->fd[1] );
-    close( dt->fd[0] );
-#else
-    if( dt->fd[0] != -1 )
-        closesocket( dt->fd[0] );
-#endif
+    vlc_interrupt_destroy(dt->interrupt);
 }
