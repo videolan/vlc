@@ -315,9 +315,6 @@ net_Read (vlc_object_t *restrict p_this, int fd,
             errno = EINTR;
             return -1;
         }
-#if VLC_WINSTORE_APP
-do_poll:
-#endif
         /* Wait for more data */
         if (poll (ufd, sizeof (ufd) / sizeof (ufd[0]), -1) < 0)
         {
