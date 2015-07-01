@@ -139,7 +139,10 @@ static int Open(vlc_object_t *this)
 
     /* get the object we will draw into */
     UIView* viewContainer = var_CreateGetAddress (vd, "drawable-nsobject");
-    if (!viewContainer)
+    if (unlikely(viewContainer == nil))
+        goto bailout;
+
+    if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)]))
         goto bailout;
 
     if (![viewContainer isKindOfClass:[UIView class]])
@@ -400,21 +403,23 @@ static void OpenglESSwap(vlc_gl_t *gl)
     if (!self)
         return nil;
 
-    CAEAGLLayer * layer = (CAEAGLLayer *)self.layer;
-    layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
-    layer.opaque = YES;
-
-    _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    if (!_eaglContext)
-        return nil;
-    [EAGLContext setCurrentContext:_eaglContext];
-
-    [self performSelectorOnMainThread:@selector(createBuffers) withObject:nil waitUntilDone:YES];
-    [self performSelectorOnMainThread:@selector(reshape) withObject:nil waitUntilDone:NO];
-    [self setAutoresizingMask: UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-
     @synchronized (self) {
         _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
+        if (unlikely(!_appActive))
+            return nil;
+
+        CAEAGLLayer * layer = (CAEAGLLayer *)self.layer;
+        layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
+        layer.opaque = YES;
+
+        _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        if (!_eaglContext)
+            return nil;
+        [EAGLContext setCurrentContext:_eaglContext];
+
+        [self performSelectorOnMainThread:@selector(createBuffers) withObject:nil waitUntilDone:YES];
+        [self performSelectorOnMainThread:@selector(reshape) withObject:nil waitUntilDone:NO];
+        [self setAutoresizingMask: UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
     }
 
     return self;
