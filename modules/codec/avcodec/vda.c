@@ -53,31 +53,27 @@ static int Get( vlc_va_t *, picture_t *, uint8_t ** );
 static int Extract( vlc_va_t *, picture_t *, uint8_t * );
 static void Release( void *opaque, uint8_t *data );
 
-static void vda_Copy422YpCbCr8( picture_t *p_pic,
-                                CVPixelBufferRef buffer )
+static void copy420YpCbCr8Planar(picture_t *p_pic,
+                                 CVPixelBufferRef buffer,
+                                 unsigned i_width,
+                                 unsigned i_height)
 {
-    int i_dst_stride, i_src_stride;
-    uint8_t *p_dst, *p_src;
+    uint8_t *pp_plane[2];
+    size_t pi_pitch[2];
 
-    CVPixelBufferLockBaseAddress( buffer, 0 );
+    if (!buffer)
+        return;
 
-    for( int i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-    {
-        p_dst = p_pic->p[i_plane].p_pixels;
-        p_src = CVPixelBufferGetBaseAddressOfPlane( buffer, i_plane );
-        i_dst_stride  = p_pic->p[i_plane].i_pitch;
-        i_src_stride  = CVPixelBufferGetBytesPerRowOfPlane( buffer, i_plane );
+    CVPixelBufferLockBaseAddress(buffer, 0);
 
-        for( int i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines ; i_line++ )
-        {
-            memcpy( p_dst, p_src, i_src_stride );
-
-            p_src += i_src_stride;
-            p_dst += i_dst_stride;
-        }
+    for (int i = 0; i < 2; i++) {
+        pp_plane[i] = CVPixelBufferGetBaseAddressOfPlane(buffer, i);
+        pi_pitch[i] = CVPixelBufferGetBytesPerRowOfPlane(buffer, i);
     }
 
-    CVPixelBufferUnlockBaseAddress( buffer, 0 );
+    CopyFromNv12ToI420(p_pic, pp_plane, pi_pitch, i_width, i_height);
+
+    CVPixelBufferUnlockBaseAddress(buffer, 0);
 }
 
 vlc_module_begin ()
@@ -91,7 +87,9 @@ vlc_module_end ()
 
 struct vlc_va_sys_t
 {
-    struct vda_context  hw_ctx;
+    AVVDAContext *vdactx;
+    int i_width;
+    int i_height;
 };
 
 static int Open(vlc_va_t *va,
@@ -146,6 +144,11 @@ static int Open(vlc_va_t *va,
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    sys->vdactx = av_vda_alloc_context();
+    sys->vdactx->cv_pix_fmt_type = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
+    sys->i_width = avctx->width;
+    sys->i_height = avctx->height;
+
     va->sys = sys;
     va->description = (char *)"VDA";
     va->setup = Setup;
@@ -164,14 +167,17 @@ static void Close( vlc_va_t *va, AVCodecContext *avctx )
 
 static int Setup( vlc_va_t *va, AVCodecContext *avctx, vlc_fourcc_t *pi_chroma )
 {
-    int i_ret = av_vda_default_init(avctx);
+
+    vlc_va_sys_t *sys = va->sys;
+
+    int i_ret = av_vda_default_init2(avctx, sys->vdactx);
 
     msg_Dbg(va, "Creating VDA decoder %i", i_ret);
 
     if (i_ret != 0)
         return VLC_EGENERIC;
 
-    *pi_chroma = VLC_CODEC_UYVY;
+    *pi_chroma = VLC_CODEC_I420;
 
     return VLC_SUCCESS;
 }
@@ -194,6 +200,8 @@ static void Release( void *opaque, uint8_t *data )
 
 static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
 {
+    vlc_va_sys_t *sys = va->sys;
+
     CVPixelBufferRef cv_buffer = (CVPixelBufferRef)data;
 
     if( !cv_buffer )
@@ -207,7 +215,7 @@ static int Extract( vlc_va_t *va, picture_t *p_picture, uint8_t *data )
         return VLC_EGENERIC;
     }
 
-    vda_Copy422YpCbCr8( p_picture, cv_buffer );
+    copy420YpCbCr8Planar( p_picture, cv_buffer, sys->i_width, sys->i_height );
 
     return VLC_SUCCESS;
 }
