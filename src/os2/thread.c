@@ -49,9 +49,6 @@
 
 static vlc_threadvar_t thread_key;
 
-/**
- * Per-thread data
- */
 struct vlc_thread
 {
     TID            tid;

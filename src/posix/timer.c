@@ -98,17 +98,6 @@ static void *vlc_timer_thread (void *data)
     vlc_assert_unreachable ();
 }
 
-/**
- * Initializes an asynchronous timer.
- * @warning Asynchronous timers are processed from an unspecified thread.
- * Multiple occurences of a single interval timer are serialized; they cannot
- * run concurrently.
- *
- * @param id pointer to timer to be initialized
- * @param func function that the timer will call
- * @param data parameter for the timer function
- * @return 0 on success, a system error code otherwise.
- */
 int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
     struct vlc_timer *timer = malloc (sizeof (*timer));
@@ -137,15 +126,6 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
     return 0;
 }
 
-/**
- * Destroys an initialized timer. If needed, the timer is first disarmed.
- * This function is undefined if the specified timer is not initialized.
- *
- * @warning This function <b>must</b> be called before the timer data can be
- * freed and before the timer callback function can be unloaded.
- *
- * @param timer timer to destroy
- */
 void vlc_timer_destroy (vlc_timer_t timer)
 {
     vlc_cancel (timer->thread);
@@ -155,23 +135,6 @@ void vlc_timer_destroy (vlc_timer_t timer)
     free (timer);
 }
 
-/**
- * Arm or disarm an initialized timer.
- * This functions overrides any previous call to itself.
- *
- * @note A timer can fire later than requested due to system scheduling
- * limitations. An interval timer can fail to trigger sometimes, either because
- * the system is busy or suspended, or because a previous iteration of the
- * timer is still running. See also vlc_timer_getoverrun().
- *
- * @param timer initialized timer
- * @param absolute the timer value origin is the same as mdate() if true,
- *                 the timer value is relative to now if false.
- * @param value zero to disarm the timer, otherwise the initial time to wait
- *              before firing the timer.
- * @param interval zero to fire the timer just once, otherwise the timer
- *                 repetition interval.
- */
 void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          mtime_t value, mtime_t interval)
 {
@@ -185,13 +148,6 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
     vlc_mutex_unlock (&timer->lock);
 }
 
-/**
- * Fetch and reset the overrun counter for a timer.
- * @param timer initialized timer
- * @return the timer overrun counter, i.e. the number of times that the timer
- * should have run but did not since the last actual run. If all is well, this
- * is zero.
- */
 unsigned vlc_timer_getoverrun (vlc_timer_t timer)
 {
     return atomic_exchange_explicit (&timer->overruns, 0,

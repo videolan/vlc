@@ -443,7 +443,6 @@ retry:
 /*** Threads ***/
 static DWORD thread_key;
 
-/** Per-thread data */
 struct vlc_thread
 {
     HANDLE         id;
