@@ -355,6 +355,10 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
      * For more details, see: https://devforums.apple.com/message/931605
      */
 
+    /* according to POSIX standards, cond_timedwait should be a cancellation point
+     * Of course, Darwin does not care */
+    pthread_testcancel();
+
     if (p_condvar->clock == VLC_CLOCK_MONOTONIC) {
 
         /* 
