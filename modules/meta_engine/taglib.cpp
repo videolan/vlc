@@ -141,7 +141,7 @@ static void ReadMetaFromAPE( APE::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
     iter = fields.find("COVER ART (FRONT)");
     if( iter != fields.end()
         && !iter->second.isEmpty()
-        && !iter->second.type() == APE::Item::Binary)
+        && iter->second.type() == APE::Item::Binary)
     {
         input_attachment_t *p_attachment;
 
