@@ -48,29 +48,15 @@ static const luaL_Reg vlclua_xml_reg[] = {
     { NULL, NULL }
 };
 
-static int vlclua_xml_delete( lua_State *L )
-{
-    xml_t *p_xml = *(xml_t**)luaL_checkudata( L, 1, "xml" );
-    xml_Delete( p_xml );
-    return 0;
-}
-
 static int vlclua_xml_create( lua_State *L )
 {
-    xml_t *p_xml = xml_Create( vlclua_get_this( L ) );
-    if( !p_xml )
-        return luaL_error( L, "XML module creation failed." );
-
-    xml_t **pp_xml = lua_newuserdata( L, sizeof( xml_t * ) );
-    *pp_xml = p_xml;
+    lua_newuserdata( L, 0 );
 
     if( luaL_newmetatable( L, "xml" ) )
     {
         lua_newtable( L );
         luaL_register( L, NULL, vlclua_xml_reg );
         lua_setfield( L, -2, "__index" );
-        lua_pushcfunction( L, vlclua_xml_delete );
-        lua_setfield( L, -2, "__gc" );
     }
 
     lua_setmetatable( L, -2 );
@@ -98,10 +84,10 @@ static int vlclua_xml_reader_delete( lua_State *L )
 
 static int vlclua_xml_create_reader( lua_State *L )
 {
-    xml_t *p_xml = *(xml_t**)luaL_checkudata( L, 1, "xml" );
+    vlc_object_t *obj = vlclua_get_this( L );
     stream_t *p_stream = *(stream_t **)luaL_checkudata( L, 2, "stream" );
 
-    xml_reader_t *p_reader = xml_ReaderCreate( p_xml, p_stream );
+    xml_reader_t *p_reader = xml_ReaderCreate( obj, p_stream );
     if( !p_reader )
         return luaL_error( L, "XML reader creation failed." );
 
