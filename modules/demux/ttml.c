@@ -55,7 +55,6 @@ typedef struct
 
 struct demux_sys_t
 {
-    xml_t* p_xml;
     xml_reader_t* p_reader;
     subtitle_t* subtitle;
     es_out_id_t* p_es;
@@ -283,14 +282,7 @@ static int Open( vlc_object_t* p_this )
     if ( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_sys->p_xml = xml_Create( p_demux );
-    if ( !p_sys->p_xml )
-    {
-        Close( p_demux );
-        return VLC_EGENERIC;
-    }
-
-    p_sys->p_reader = xml_ReaderCreate( p_sys->p_xml, p_demux->s );
+    p_sys->p_reader = xml_ReaderCreate( p_this, p_demux->s );
     if ( !p_sys->p_reader )
     {
         Close( p_demux );
@@ -326,8 +318,6 @@ static void Close( demux_t* p_demux )
         es_out_Del( p_demux->out, p_sys->p_es );
     if ( p_sys->p_reader )
         xml_ReaderDelete( p_sys->p_reader );
-    if ( p_sys->p_xml )
-        xml_Delete( p_sys->p_xml );
     for ( int i = 0; i < p_sys->i_subtitles; ++i )
     {
         free( p_sys->subtitle[i].psz_text );
