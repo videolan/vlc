@@ -128,7 +128,6 @@ protected:
     string       s_path;
     stream_t     *p_stream;
 
-    xml_t        *p_xml;
     xml_reader_t *p_xmlReader;
 
     int OpenXml();
