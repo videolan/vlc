@@ -123,25 +123,16 @@ static void cleanup_attributes(custom_attrs_t **cp)
 static int parse_Manifest( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
-    xml_t *vlc_xml = NULL;
     xml_reader_t *vlc_reader = NULL;
     int type = UNKNOWN_ES;
     const char *name, *value;
     stream_t *st = s->p_source;
     msg_Dbg( s, "Manifest parsing\n" );
 
-    vlc_xml = xml_Create( st );
-    if( !vlc_xml )
-    {
-        msg_Err( s, "Failed to open XML parser" );
-        return VLC_EGENERIC;
-    }
-
-    vlc_reader = xml_ReaderCreate( vlc_xml, st );
+    vlc_reader = xml_ReaderCreate( st, st );
     if( !vlc_reader )
     {
         msg_Err( s, "Failed to open source for parsing" );
-        xml_Delete( vlc_xml );
         return VLC_EGENERIC;
     }
 
@@ -432,7 +423,6 @@ cleanup:
     cleanup_attributes( &cp );
     sms_Free( sms );
     xml_ReaderDelete( vlc_reader );
-    xml_Delete( vlc_xml );
 
     return ret;
 }
