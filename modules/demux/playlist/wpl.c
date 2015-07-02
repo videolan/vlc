@@ -32,7 +32,6 @@
 
 struct demux_sys_t
 {
-    xml_t* p_xml;
     xml_reader_t* p_reader;
     char* psz_prefix;
 };
@@ -164,8 +163,6 @@ void Close_WPL( vlc_object_t* p_this )
     free( p_sys->psz_prefix );
     if ( p_sys->p_reader )
         xml_ReaderDelete( p_sys->p_reader );
-    if ( p_sys->p_xml )
-        xml_Delete( p_sys->p_xml );
     free( p_sys );
 }
 
@@ -182,15 +179,7 @@ int Import_WPL( vlc_object_t* p_this )
 
     demux_sys_t* p_sys = p_demux->p_sys;
 
-    p_sys->p_xml = xml_Create( p_demux );
-    if ( !p_sys->p_xml )
-    {
-        msg_Err( p_demux, "Failed to create an XML parser" );
-        Close_WPL( p_this );
-        return VLC_EGENERIC;
-    }
-
-    p_sys->p_reader = xml_ReaderCreate( p_sys->p_xml, p_demux->s );
+    p_sys->p_reader = xml_ReaderCreate( p_this, p_demux->s );
     if ( !p_sys->p_reader )
     {
         msg_Err( p_demux, "Failed to create an XML reader" );
