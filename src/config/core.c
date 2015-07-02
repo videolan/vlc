@@ -387,6 +387,7 @@ static ssize_t config_ListModules (const char *cap, char ***restrict values,
     if (n <= 0)
     {
         *values = *texts = NULL;
+        module_list_free (list);
         return n;
     }
 
@@ -408,6 +409,7 @@ static ssize_t config_ListModules (const char *cap, char ***restrict values,
 
     *values = vals;
     *texts = txts;
+    module_list_free (list);
     return n + 2;
 }
 
