@@ -526,9 +526,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
 #ifdef __APPLE__
 #if USE_OPENGL_ES
-    /* work-around an iOS 6 bug */
-    if (kCFCoreFoundationVersionNumber >= 786.)
-        max_texture_units = 8;
     supports_shaders = true;
 #endif
 #endif
