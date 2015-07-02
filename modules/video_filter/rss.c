@@ -887,7 +887,6 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     stream_t *p_stream;
-    xml_t *p_xml;
     xml_reader_t *p_xml_reader;
     int i_feed;
 
@@ -900,14 +899,6 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
     rss_feed_t *p_feeds = malloc( i_feeds * sizeof( rss_feed_t ) );
     if( !p_feeds )
         return NULL;
-
-    p_xml = xml_Create( p_filter );
-    if( !p_xml )
-    {
-        msg_Err( p_filter, "Failed to open XML parser" );
-        free( p_feeds );
-        return NULL;
-    }
 
     /* Fetch all feeds and parse them */
     for( i_feed = 0; i_feed < i_feeds; i_feed++ )
@@ -937,7 +928,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
             goto error;
         }
 
-        p_xml_reader = xml_ReaderCreate( p_xml, p_stream );
+        p_xml_reader = xml_ReaderCreate( p_filter, p_stream );
         if( !p_xml_reader )
         {
             msg_Err( p_filter, "Failed to open %s for parsing", p_feed->psz_url );
@@ -959,7 +950,6 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
         stream_Delete( p_stream );
     }
 
-    xml_Delete( p_xml );
     return p_feeds;
 
 error:
@@ -968,8 +958,6 @@ error:
         xml_ReaderDelete( p_xml_reader );
     if( p_stream )
         stream_Delete( p_stream );
-    if( p_xml )
-        xml_Delete( p_xml );
 
     return NULL;
 }
