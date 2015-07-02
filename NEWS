@@ -115,10 +115,14 @@ Service Discovery:
  * Rewrite of the UPnP service discovery
 
 Mac OS X Interface
+ * Dropped support for Mac OS X 10.6 Snow Leopard
  * Add support for keyboard blacklight dimming during fullscreen video playback
  * new AppleScript API giving access to audio desynchronization
  * Support for building with disabled sparkle update mechanism
  * New configure flag to disable automatic updates
+
+iOS:
+ * Dropped support for iOS 6.x
 
 Qt interface:
  * Batch convert support
