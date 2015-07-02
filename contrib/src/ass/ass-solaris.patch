@@ -1,0 +1,11 @@
+--- libass/configure.ac.ORIG	Wed Jan  7 14:00:15 2015
++++ libass/configure.ac	Thu Jul  2 18:57:07 2015
+@@ -70,7 +70,7 @@
+     AS_CASE([$host],
+         [*darwin*], [
+             ASFLAGS="$ASFLAGS -f macho$BITS -DPREFIX -DHAVE_ALIGNED_STACK=1" ],
+-        [*linux*|*dragonfly*|*bsd*], [
++        [*linux*|*dragonfly*|*bsd*|*solaris*], [
+             ASFLAGS="$ASFLAGS -f elf -DHAVE_ALIGNED_STACK=1" ],
+         [*cygwin*|*mingw*], [
+             ASFLAGS="$ASFLAGS -f win$BITS"

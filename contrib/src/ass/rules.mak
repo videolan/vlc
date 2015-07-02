@@ -33,6 +33,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
 	$(APPLY) $(SRC)/ass/ass-macosx.patch
+	$(APPLY) $(SRC)/ass/ass-solaris.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
@@ -53,6 +54,7 @@ ASS_CONF += --disable-harfbuzz
 endif
 
 .ass: libass
+	$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) $(ASS_CONF)
 	cd $< && $(MAKE) install
 	touch $@
