@@ -54,7 +54,6 @@ namespace dash
                 Node                *root;
                 stream_t            *stream;
 
-                xml_t               *vlc_xml;
                 xml_reader_t        *vlc_reader;
 
                 Node*   processNode             ();

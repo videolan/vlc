@@ -39,7 +39,6 @@ using namespace dash::mpd;
 DOMParser::DOMParser    (stream_t *stream) :
     root( NULL ),
     stream( stream ),
-    vlc_xml( NULL ),
     vlc_reader( NULL )
 {
 }
@@ -49,8 +48,6 @@ DOMParser::~DOMParser   ()
     delete this->root;
     if(this->vlc_reader)
         xml_ReaderDelete(this->vlc_reader);
-    if ( this->vlc_xml )
-        xml_Delete( this->vlc_xml );
 }
 
 Node*   DOMParser::getRootNode              ()
@@ -59,12 +56,7 @@ Node*   DOMParser::getRootNode              ()
 }
 bool    DOMParser::parse                    ()
 {
-    this->vlc_xml = xml_Create(this->stream);
-
-    if(!this->vlc_xml)
-        return false;
-
-    this->vlc_reader = xml_ReaderCreate(this->vlc_xml, this->stream);
+    this->vlc_reader = xml_ReaderCreate(this->stream, this->stream);
 
     if(!this->vlc_reader)
         return false;
