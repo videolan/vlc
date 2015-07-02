@@ -176,7 +176,6 @@ typedef struct _manifest {
     bootstrap_info bootstraps[MAX_BOOTSTRAP_INFO];
     media_info medias[MAX_MEDIA_ELEMENTS];
     xml_reader_t *vlc_reader;
-    xml_t *vlc_xml;
 } manifest_t;
 
 static unsigned char flv_header_bytes[] = {
@@ -1186,14 +1185,8 @@ static int init_Manifest( stream_t *s, manifest_t *m )
 {
     memset(m, 0, sizeof(*m));
     stream_t *st = s->p_source;
-    m->vlc_xml = xml_Create( st );
-    if( !m->vlc_xml )
-    {
-        msg_Err( s, "Failed to open XML parser" );
-        return VLC_EGENERIC;
-    }
 
-    m->vlc_reader = xml_ReaderCreate( m->vlc_xml, st );
+    m->vlc_reader = xml_ReaderCreate( st, st );
     if( !m->vlc_reader )
     {
         msg_Err( s, "Failed to open source for parsing" );
@@ -1226,8 +1219,6 @@ static void cleanup_Manifest( manifest_t *m )
 
     if( m->vlc_reader )
         xml_ReaderDelete( m->vlc_reader );
-    if( m->vlc_xml )
-        xml_Delete( m->vlc_xml );
 }
 
 static void cleanup_threading( hds_stream_t *stream )
