@@ -268,10 +268,8 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     } else
         GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
 
-#ifdef AUDIOTRACK_HW_LATENCY
     GET_ID( GetMethodID, AudioTrack.getTimestamp,
             "getTimestamp", "(Landroid/media/AudioTimestamp;)Z", false );
-#endif
     GET_ID( GetMethodID, AudioTrack.getPlaybackHeadPosition,
             "getPlaybackHeadPosition", "()I", true );
 
@@ -984,6 +982,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     }
     p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( i_audiotrack_size );
 
+#ifdef AUDIOTRACK_HW_LATENCY
     if( jfields.AudioTimestamp.clazz )
     {
         /* create AudioTimestamp object */
@@ -1000,6 +999,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             return VLC_EGENERIC;
         }
     }
+#endif
 
     if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
     {
