@@ -68,9 +68,8 @@ struct aout_sys_t {
         int i_size;
     } audiotrack_args;
 
-    /* Used by AudioTrack_GetPosition / AudioTrack_getPlaybackHeadPosition */
+    /* Used by AudioTrack_getPlaybackHeadPosition */
     struct {
-        uint64_t i_initial;
         uint32_t i_wrap_count;
         uint32_t i_last;
     } headpos;
@@ -442,7 +441,7 @@ frames_to_bytes( aout_sys_t *p_sys, uint64_t i_frames )
  * Get the AudioTrack position
  *
  * The doc says that the position is reset to zero after flush but it's not
- * true for all devices or Android versions. Use AudioTrack_GetPosition instead.
+ * true for all devices or Android versions.
  */
 static uint64_t
 AudioTrack_getPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
@@ -471,18 +470,6 @@ AudioTrack_getPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
 }
 
 /**
- * Get the AudioTrack position since the last flush or stop
- */
-static uint64_t
-AudioTrack_GetPosition( JNIEnv *env, audio_output_t *p_aout )
-{
-    aout_sys_t *p_sys = p_aout->sys;
-
-    return AudioTrack_getPlaybackHeadPosition( env, p_aout )
-        - p_sys->headpos.i_initial;
-}
-
-/**
  * Reset AudioTrack position
  *
  * Called after flush, or start
@@ -490,24 +477,9 @@ AudioTrack_GetPosition( JNIEnv *env, audio_output_t *p_aout )
 static void
 AudioTrack_ResetPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
 {
+    (void) env;
     aout_sys_t *p_sys = p_aout->sys;
 
-    if( p_sys->p_audiotrack )
-        p_sys->headpos.i_initial = AudioTrack_getPlaybackHeadPosition( env, p_aout );
-    else
-        p_sys->headpos.i_initial = 0;
-
-    /* HACK: On some broken devices, head position is still moving after a
-     * flush or a stop. So, wait for the head position to be stabilized. */
-    if( unlikely( p_sys->headpos.i_initial != 0 ) )
-    {
-        uint64_t i_last_pos;
-        do {
-            i_last_pos = p_sys->headpos.i_initial;
-            msleep( 50000 );
-            p_sys->headpos.i_initial = JNI_AT_CALL_INT( getPlaybackHeadPosition );
-        } while( p_sys->headpos.i_initial != i_last_pos );
-    }
     p_sys->headpos.i_last = 0;
     p_sys->headpos.i_wrap_count = 0;
 }
@@ -549,7 +521,7 @@ AudioTrack_GetSmoothPositionUs( JNIEnv *env, audio_output_t *p_aout )
     /* Fetch an AudioTrack position every SMOOTHPOS_INTERVAL_US (30ms) */
     if( i_now - p_sys->smoothpos.i_last_time >= SMOOTHPOS_INTERVAL_US )
     {
-        i_audiotrack_us = FRAMES_TO_US( AudioTrack_GetPosition( env, p_aout ) );
+        i_audiotrack_us = FRAMES_TO_US( AudioTrack_getPlaybackHeadPosition( env, p_aout ) );
 
         p_sys->smoothpos.i_last_time = i_now;
 
@@ -1117,12 +1089,14 @@ AudioTrack_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
     uint64_t i_samples_pending;
 
     i_data = p_buffer->i_buffer - i_buffer_offset;
-    i_audiotrack_pos = AudioTrack_GetPosition( env, p_aout );
+    i_audiotrack_pos = AudioTrack_getPlaybackHeadPosition( env, p_aout );
+
+    assert( i_audiotrack_pos <= p_sys->i_samples_written );
     if( i_audiotrack_pos > p_sys->i_samples_written )
     {
-        msg_Warn( p_aout, "audiotrack position is ahead. Should NOT happen" );
-        AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
+        msg_Err( p_aout, "audiotrack position is ahead. Should NOT happen" );
         p_sys->i_samples_written = 0;
+        p_sys->b_error = true;
         return 0;
     }
     i_samples_pending = p_sys->i_samples_written - i_audiotrack_pos;
@@ -1448,6 +1422,22 @@ Flush( audio_output_t *p_aout, bool b_wait )
             return;
         JNI_AT_CALL_VOID( flush );
     }
+
+    /* HACK: Before Android 4.4, the head position is not reset to zero and is
+     * still moving after a flush or a stop. This prevents to get a precise
+     * head position and there is no way to know when it stabilizes. Therefore
+     * recreate an AudioTrack object in that case. The AudioTimestamp class was
+     * added in API Level 19, so if this class is not found, the Android
+     * Version is 4.3 or before */
+    if( !jfields.AudioTimestamp.clazz && p_sys->i_samples_written > 0 )
+    {
+        if( AudioTrack_Reset( env, p_aout ) != 0 )
+        {
+            p_sys->b_error = true;
+            return;
+        }
+    }
+
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
 
