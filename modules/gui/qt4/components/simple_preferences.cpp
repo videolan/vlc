@@ -1009,6 +1009,7 @@ void SPrefsPanel::updateAudioOptions( int number)
 SPrefsPanel::~SPrefsPanel()
 {
     qDeleteAll( controls ); controls.clear();
+    free( lang );
 }
 
 void SPrefsPanel::updateAudioVolume( int volume )
@@ -1182,6 +1183,7 @@ void SPrefsPanel::changeStyle( QString s_style )
 
 void SPrefsPanel::langChanged( int i )
 {
+    free( lang );
     lang = strdup( ppsz_language[i] );
 }
 
