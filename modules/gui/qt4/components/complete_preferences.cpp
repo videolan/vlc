@@ -101,7 +101,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             if( p_item->value.i == -1 ) break;
 
             /* PrefsItemData Init */
-            data = new PrefsItemData();
+            data = new PrefsItemData( this );
             data->name = qtr( config_CategoryNameGet( p_item->value.i ) );
             psz_help = config_CategoryHelpGet( p_item->value.i );
             if( psz_help )
@@ -167,7 +167,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
             /* Normal Subcategories */
 
             /* Process the Data */
-            data_sub = new PrefsItemData();
+            data_sub = new PrefsItemData( this );
             data_sub->name = qtr( config_CategoryNameGet( p_item->value.i) );
             psz_help = config_CategoryHelpGet( p_item->value.i );
             if( psz_help )
@@ -268,7 +268,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         }
         if( !b_found ) continue;
 
-        PrefsItemData *module_data = new PrefsItemData();
+        PrefsItemData *module_data = new PrefsItemData( this );
         module_data->i_type = PrefsItemData::TYPE_MODULE;
         module_data->psz_shortcut = strdup( module_get_object( p_module ) );
         module_data->name = qtr( module_get_name( p_module, false ) );
@@ -478,7 +478,7 @@ void PrefsTree::resizeColumns()
     resizeColumnToContents( 0 );
 }
 
-PrefsItemData::PrefsItemData()
+PrefsItemData::PrefsItemData( QObject *_parent ) : QObject( _parent )
 {
     panel = NULL;
     i_object_id = 0;

@@ -41,7 +41,7 @@ class PrefsItemData : public QObject
 {
     Q_OBJECT
 public:
-    PrefsItemData();
+    PrefsItemData( QObject * );
     virtual ~PrefsItemData() { free( psz_shortcut ); };
     bool contains( const QString &text, Qt::CaseSensitivity cs );
     AdvPrefsPanel *panel;
