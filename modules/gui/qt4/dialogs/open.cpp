@@ -111,7 +111,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     selectButton = new QPushButton( qtr( "&Select" ) );
 
     /* Menu for the Play button */
-    QMenu * openButtonMenu = new QMenu( "Open" );
+    QMenu * openButtonMenu = new QMenu( "Open", playButton );
     openButtonMenu->addAction( qtr( "&Enqueue" ), this, SLOT( enqueue() ),
                                     QKeySequence( "Alt+E" ) );
     openButtonMenu->addAction( qtr( "&Play" ), this, SLOT( play() ),
