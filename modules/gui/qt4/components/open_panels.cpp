@@ -1117,6 +1117,8 @@ void CaptureOpenPanel::initialize()
 
 CaptureOpenPanel::~CaptureOpenPanel()
 {
+    delete vdevDshowW;
+    delete adevDshowW;
 }
 
 void CaptureOpenPanel::clear()
