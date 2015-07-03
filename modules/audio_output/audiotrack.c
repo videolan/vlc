@@ -61,6 +61,13 @@ struct aout_sys_t {
     jobject p_bytebuffer; /* ByteBuffer ref (for WriteV21) */
     audio_sample_format_t fmt; /* fmt setup by Start */
 
+    struct {
+        unsigned int i_rate;
+        int i_channel_config;
+        int i_format;
+        int i_size;
+    } audiotrack_args;
+
     /* Used by AudioTrack_GetPosition / AudioTrack_getPlaybackHeadPosition */
     struct {
         uint64_t i_initial;
@@ -727,19 +734,69 @@ AudioTrack_GetChanOrder( uint16_t i_physical_channels, uint32_t p_chans_out[] )
 }
 
 /**
- * Configure and create an Android AudioTrack.
- * returns NULL on configuration error
+ * Create an Android AudioTrack.
+ * returns -1 on error, 0 on success.
  */
-static jobject
-AudioTrack_New( JNIEnv *env, audio_output_t *p_aout,
-                unsigned int i_rate,
-                vlc_fourcc_t i_vlc_format,
-                uint16_t i_physical_channels,
-                int i_bytes_per_frame,
-                int *p_audiotrack_size )
+static int
+AudioTrack_New( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
+                int i_channel_config, int i_format, int i_size )
 {
+    aout_sys_t *p_sys = p_aout->sys;
+    jobject p_audiotrack = JNI_AT_NEW( jfields.AudioManager.STREAM_MUSIC,
+                                       i_rate, i_channel_config, i_format,
+                                       i_size, jfields.AudioTrack.MODE_STREAM );
+    if( CHECK_AT_EXCEPTION( "AudioTrack<init>" ) || !p_audiotrack )
+    {
+        msg_Warn( p_aout, "AudioTrack Init failed" ) ;
+        return -1;
+    }
+    if( JNI_CALL_INT( p_audiotrack, jfields.AudioTrack.getState )
+        != jfields.AudioTrack.STATE_INITIALIZED )
+    {
+        JNI_CALL_VOID( p_audiotrack, jfields.AudioTrack.release );
+        (*env)->DeleteLocalRef( env, p_audiotrack );
+        msg_Err( p_aout, "AudioTrack getState failed" );
+        return -1;
+    }
+
+    p_sys->p_audiotrack = (*env)->NewGlobalRef( env, p_audiotrack );
+    (*env)->DeleteLocalRef( env, p_audiotrack );
+    if( !p_sys->p_audiotrack )
+        return -1;
+
+    return 0;
+}
+
+/**
+ * Destroy and recreate an Android AudioTrack using the same arguments.
+ * returns -1 on error, 0 on success.
+ */
+static int
+AudioTrack_Reset( JNIEnv *env, audio_output_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    JNI_AT_CALL_VOID( release );
+    (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
+    return AudioTrack_New( env, p_aout, p_sys->audiotrack_args.i_rate,
+                           p_sys->audiotrack_args.i_channel_config,
+                           p_sys->audiotrack_args.i_format,
+                           p_sys->audiotrack_args.i_size );
+}
+
+/**
+ * Configure and create an Android AudioTrack.
+ * returns -1 on configuration error, 0 on success.
+ */
+static int
+AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
+                   unsigned int i_rate,
+                   vlc_fourcc_t i_vlc_format,
+                   uint16_t i_physical_channels,
+                   int i_bytes_per_frame )
+{
+    aout_sys_t *p_sys = p_aout->sys;
     int i_size, i_min_buffer_size, i_channel_config, i_format;
-    jobject p_audiotrack;
 
     switch( i_vlc_format )
     {
@@ -785,7 +842,7 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout,
     if( i_min_buffer_size <= 0 )
     {
         msg_Warn( p_aout, "getMinBufferSize returned an invalid size" ) ;
-        return NULL;
+        return -1;
     }
     if( i_vlc_format == VLC_CODEC_SPDIFB )
         i_size = ( i_min_buffer_size / AOUT_SPDIF_SIZE + 1 ) * AOUT_SPDIF_SIZE;
@@ -805,25 +862,16 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout,
     }
 
     /* create AudioTrack object */
-    p_audiotrack = JNI_AT_NEW( jfields.AudioManager.STREAM_MUSIC, i_rate,
-                               i_channel_config, i_format, i_size,
-                               jfields.AudioTrack.MODE_STREAM );
-    if( CHECK_AT_EXCEPTION( "AudioTrack<init>" ) || !p_audiotrack )
-    {
-        msg_Warn( p_aout, "AudioTrack Init failed" ) ;
-        return NULL;
-    }
-    if( JNI_CALL_INT( p_audiotrack, jfields.AudioTrack.getState )
-        != jfields.AudioTrack.STATE_INITIALIZED )
-    {
-        JNI_CALL_VOID( p_audiotrack, jfields.AudioTrack.release );
-        (*env)->DeleteLocalRef( env, p_audiotrack );
-        msg_Err( p_aout, "AudioTrack getState failed" );
-        return NULL;
-    }
-    *p_audiotrack_size = i_size;
+    if( AudioTrack_New( env, p_aout, i_rate, i_channel_config,
+                        i_format , i_size ) != 0 )
+        return -1;
 
-    return p_audiotrack;
+    p_sys->audiotrack_args.i_rate = i_rate;
+    p_sys->audiotrack_args.i_channel_config = i_channel_config;
+    p_sys->audiotrack_args.i_format = i_format;
+    p_sys->audiotrack_args.i_size = i_size;
+
+    return 0;
 }
 
 static int
@@ -831,9 +879,8 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
-    jobject p_audiotrack = NULL;
-    int i_nb_channels, i_max_channels, i_audiotrack_size, i_bytes_per_frame,
-        i_native_rate = 0;
+    int i_nb_channels, i_max_channels, i_bytes_per_frame, i_native_rate = 0,
+        i_ret;
     unsigned int i_rate;
     bool b_spdif;
 
@@ -916,15 +963,13 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                                         : (unsigned int) i_native_rate;
 
         /* Try to create an AudioTrack with the most advanced channel and
-         * format configuration. If AudioTrack_New fails, try again with a less
-         * advanced format (PCM S16N). If it fails again, try again with Stereo
-         * channels. */
-        p_audiotrack = AudioTrack_New( env, p_aout, i_rate,
-                                       p_sys->fmt.i_format,
-                                       p_sys->fmt.i_physical_channels,
-                                       i_bytes_per_frame,
-                                       &i_audiotrack_size );
-        if( !p_audiotrack )
+         * format configuration. If AudioTrack_Create fails, try again with a
+         * less advanced format (PCM S16N). If it fails again, try again with
+         * Stereo channels. */
+        i_ret = AudioTrack_Create( env, p_aout, i_rate, p_sys->fmt.i_format,
+                                   p_sys->fmt.i_physical_channels,
+                                   i_bytes_per_frame );
+        if( i_ret != 0 )
         {
             if( p_sys->fmt.i_format == VLC_CODEC_SPDIFB )
             {
@@ -950,14 +995,9 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             else
                 break;
         }
-    } while( !p_audiotrack );
+    } while( i_ret != 0 );
 
-    if( !p_audiotrack )
-        return VLC_EGENERIC;
-
-    p_sys->p_audiotrack = (*env)->NewGlobalRef( env, p_audiotrack );
-    (*env)->DeleteLocalRef( env, p_audiotrack );
-    if( !p_sys->p_audiotrack )
+    if( i_ret != 0 )
         return VLC_EGENERIC;
 
     p_sys->fmt.i_rate = i_rate;
@@ -980,7 +1020,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
                                       p_sys->p_chan_table );
         p_sys->i_bytes_per_frame = i_bytes_per_frame;
     }
-    p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( i_audiotrack_size );
+    p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( p_sys->audiotrack_args.i_size );
 
 #ifdef AUDIOTRACK_HW_LATENCY
     if( jfields.AudioTimestamp.clazz )
@@ -1282,8 +1322,7 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
         {
             msg_Warn( p_aout, "ERROR_DEAD_OBJECT: "
                               "try recreating AudioTrack" );
-            Stop( p_aout );
-            i_ret = Start( p_aout, &p_sys->fmt );
+            i_ret = AudioTrack_Reset( env, p_aout );
         } else
         {
             const char *str;
