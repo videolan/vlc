@@ -228,16 +228,16 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
 } while( 0 )
 #define GET_CLASS( str, critical ) do { \
     clazz = (*env)->FindClass( env, (str) ); \
-    CHECK_EXCEPTION( str, critical ); \
+    CHECK_EXCEPTION( "FindClass(" str ")", critical ); \
 } while( 0 )
 #define GET_ID( get, id, str, args, critical ) do { \
     jfields.id = (*env)->get( env, clazz, (str), (args) ); \
-    CHECK_EXCEPTION( #get, critical ); \
+    CHECK_EXCEPTION( #get "(" #id ")", critical ); \
 } while( 0 )
 #define GET_CONST_INT( id, str, critical ) do { \
     field = NULL; \
     field = (*env)->GetStaticFieldID( env, clazz, (str), "I" ); \
-    CHECK_EXCEPTION( #id, critical ); \
+    CHECK_EXCEPTION( "GetStaticFieldID(" #id ")", critical ); \
     if( field ) \
     { \
         jfields.id = (*env)->GetStaticIntField( env, clazz, field ); \
