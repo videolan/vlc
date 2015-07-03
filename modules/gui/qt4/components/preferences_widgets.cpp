@@ -504,6 +504,7 @@ void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
             free( texts[i] );
         }
         free( texts );
+        free( values );
     }
 
     if( p_config->psz_longtext != NULL )
