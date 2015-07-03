@@ -112,7 +112,6 @@ public:
     XmlFile( demux_t * p_demux, string s_path):
     p_demux(p_demux), s_path(s_path),
     p_stream(NULL),
-    p_xml(NULL),
     p_xmlReader(NULL) {}
 
     virtual ~XmlFile( );
