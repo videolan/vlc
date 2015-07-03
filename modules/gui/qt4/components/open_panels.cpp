@@ -386,13 +386,15 @@ void DiscOpenPanel::onFocus()
                 wchar_t psz_name[512] = L"";
                 GetVolumeInformationW( drive, psz_name, 511, NULL, NULL, NULL, NULL, 0 );
 
-                QString displayName = FromWide( drive );
+                char *psz_drive = FromWide( drive );
+                QString displayName = psz_drive;
                 char *psz_title = FromWide( psz_name );
                 if( !EMPTY_STR(psz_title)) {
                     displayName = displayName + " - "  + psz_title;
                 }
 
-                ui.deviceCombo->addItem( displayName, FromWide( drive ) );
+                ui.deviceCombo->addItem( displayName, psz_drive );
+                free( psz_drive );
                 free( psz_title );
             }
 
