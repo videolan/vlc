@@ -518,7 +518,7 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
         goto error;
     id->p_decoder->p_module = NULL;
     id->p_decoder->fmt_in = *p_fmt;
-    id->p_decoder->b_pace_control = true;
+    id->p_decoder->b_frame_drop_allowed = false;
 
     /* Create encoder object */
     id->p_encoder = sout_EncoderCreate( p_stream );

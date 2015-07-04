@@ -286,7 +286,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p
         return NULL;
     p_sys->p_decoder->p_module = NULL;
     p_sys->p_decoder->fmt_in = *p_fmt;
-    p_sys->p_decoder->b_pace_control = false;
+    p_sys->p_decoder->b_frame_drop_allowed = true;
     p_sys->p_decoder->fmt_out = p_sys->p_decoder->fmt_in;
     p_sys->p_decoder->fmt_out.i_extra = 0;
     p_sys->p_decoder->fmt_out.p_extra = 0;

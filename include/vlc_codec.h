@@ -66,7 +66,7 @@ struct decoder_t
     bool                b_need_packetized;
 
     /* Tell the decoder if it is allowed to drop frames */
-    bool                b_pace_control;
+    bool                b_frame_drop_allowed;
 
     /* */
     picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );

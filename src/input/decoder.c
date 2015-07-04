@@ -1476,6 +1476,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     if( p_dec == NULL )
         return NULL;
 
+    p_dec->b_frame_drop_allowed = true;
     p_dec->pf_decode_audio = NULL;
     p_dec->pf_decode_video = NULL;
     p_dec->pf_decode_sub = NULL;

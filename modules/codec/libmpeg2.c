@@ -388,7 +388,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             picture_t *p_pic;
 
-            if( !p_dec->b_pace_control && !p_sys->b_preroll &&
+            if( p_dec->b_frame_drop_allowed && !p_sys->b_preroll &&
                 !(p_sys->b_slice_i
                    && ((p_current->flags
                          & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P))
