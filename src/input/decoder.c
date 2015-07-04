@@ -934,9 +934,11 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
     int i_lost = 0;
     int i_decoded = 0;
     int i_displayed = 0;
+    bool b_lost = !!p_block;
 
     while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
     {
+        b_lost = false;
         vout_thread_t  *p_vout = p_owner->p_vout;
         if( DecoderIsFlushing( p_dec ) )
         {   /* It prevent freezing VLC in case of broken decoder */
@@ -969,6 +971,9 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         DecoderPlayVideo( p_dec, p_pic, &i_displayed, &i_lost );
     }
+
+    if( b_lost )
+        i_lost++;
 
     /* Update ugly stat */
     input_thread_t *p_input = p_owner->p_input;
