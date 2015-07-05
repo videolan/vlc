@@ -141,6 +141,7 @@ static int Open(vlc_object_t *p_obj)
     p_sys->p_mpd = mpd;
     int logic = var_InheritInteger( p_obj, "dash-logic" );
     DASHManager*p_dashManager = new DASHManager(p_sys->p_mpd,
+            new (std::nothrow) DASHStreamOutputFactory,
             static_cast<AbstractAdaptationLogic::LogicType>(logic),
             p_demux->s);
 

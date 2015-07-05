@@ -33,10 +33,17 @@ namespace dash
 {
     using namespace adaptative;
 
+    class DASHStreamOutputFactory : public AbstractStreamOutputFactory
+    {
+        public:
+            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &) const;
+    };
+
     class DASHManager : public PlaylistManager
     {
         public:
             DASHManager( mpd::MPD *mpd,
+                         AbstractStreamOutputFactory *,
                          logic::AbstractAdaptationLogic::LogicType type,
                          stream_t *stream);
             virtual ~DASHManager    ();

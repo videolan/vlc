@@ -113,8 +113,6 @@ void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTa
     Representation *rep = new (std::nothrow) Representation(adaptSet);
     if(rep)
     {
-        rep->setMimeType("video/mp2t");
-
         if(uriAttr)
         {
             size_t pos = uriAttr->value.find_last_of('/');

@@ -39,6 +39,8 @@ namespace dash
         class Period;
         class Representation;
 
+        using namespace adaptative;
+
         class AdaptationSet : public adaptative::playlist::BaseAdaptationSet,
                               public DASHCommonAttributesElements
         {
@@ -46,6 +48,7 @@ namespace dash
                 AdaptationSet(Period *);
                 virtual ~AdaptationSet();
 
+                virtual StreamFormat            getStreamFormat() const; /* reimpl */
                 bool                            getSubsegmentAlignmentFlag() const;
                 void                            setSubsegmentAlignmentFlag( bool alignment );
                 const Representation*           getRepresentationById   ( const std::string &id ) const;

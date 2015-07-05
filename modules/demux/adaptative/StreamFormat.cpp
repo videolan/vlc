@@ -1,7 +1,7 @@
 /*
- * StreamsType.hpp
+ * StreamFormat.cpp
  *****************************************************************************
- * Copyright (C) 2014 - VideoLAN authors
+ * Copyright (C) 2015 - VideoLAN authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,22 +17,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef STREAMSTYPE_HPP
-#define STREAMSTYPE_HPP
+#include "StreamFormat.hpp"
 
-namespace adaptative
+using namespace adaptative;
+
+StreamFormat::operator unsigned() const
 {
+    return formatid;
+}
 
-    enum StreamType
-    {
-        UNKNOWN = 0,
-        VIDEO,
-        AUDIO,
-        APPLICATION
-    };
+StreamFormat::StreamFormat( int formatid_ )
+{
+    formatid = formatid_;
+}
 
-    static const int StreamTypeCount = APPLICATION + 1;
+StreamFormat::~StreamFormat()
+{
 
 }
 
-#endif
+bool StreamFormat::operator ==(const StreamFormat &other) const
+{
+    return formatid == other.formatid;
+}

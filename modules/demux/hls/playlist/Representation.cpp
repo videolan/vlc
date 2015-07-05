@@ -28,7 +28,9 @@
 #include "../adaptative/playlist/BasePeriod.h"
 #include "../adaptative/playlist/BaseAdaptationSet.h"
 #include "../adaptative/playlist/SegmentList.h"
+#include "../HLSStreamFormat.hpp"
 
+using namespace hls;
 using namespace hls::playlist;
 
 Representation::Representation  ( BaseAdaptationSet *set ) :
@@ -39,6 +41,11 @@ Representation::Representation  ( BaseAdaptationSet *set ) :
 
 Representation::~Representation ()
 {
+}
+
+StreamFormat Representation::getStreamFormat() const
+{
+    return StreamFormat(HLSStreamFormat::MPEG2TS);
 }
 
 bool Representation::isLive() const

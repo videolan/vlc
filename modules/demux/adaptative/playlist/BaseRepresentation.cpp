@@ -31,6 +31,7 @@
 #include "BaseAdaptationSet.h"
 #include "SegmentTemplate.h"
 
+using namespace adaptative;
 using namespace adaptative::playlist;
 
 BaseRepresentation::BaseRepresentation( BaseAdaptationSet *set ) :
@@ -42,6 +43,11 @@ BaseRepresentation::BaseRepresentation( BaseAdaptationSet *set ) :
 
 BaseRepresentation::~BaseRepresentation ()
 {
+}
+
+StreamFormat BaseRepresentation::getStreamFormat() const
+{
+    return StreamFormat();
 }
 
 uint64_t     BaseRepresentation::getBandwidth            () const

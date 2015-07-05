@@ -31,17 +31,12 @@ using namespace adaptative;
 using namespace adaptative::http;
 using namespace adaptative::logic;
 
-Stream::Stream(const std::string &mime)
-{
-    init(mimeToType(mime), mimeToFormat(mime));
-}
-
-Stream::Stream(const StreamType type, const StreamFormat format)
+Stream::Stream(const StreamType type, const StreamFormat &format)
 {
     init(type, format);
 }
 
-void Stream::init(const StreamType type_, const StreamFormat format_)
+void Stream::init(const StreamType type_, const StreamFormat &format_)
 {
     type = type_;
     format = format_;
@@ -74,27 +69,24 @@ StreamType Stream::mimeToType(const std::string &mime)
     return mimetype;
 }
 
-StreamFormat Stream::mimeToFormat(const std::string &mime)
-{
-    StreamFormat format = StreamFormat::UNSUPPORTED;
-    std::string::size_type pos = mime.find("/");
-    if(pos != std::string::npos)
-    {
-        std::string tail = mime.substr(pos + 1);
-        if(tail == "mp4")
-            format = StreamFormat::MP4;
-        else if (tail == "mp2t")
-            format = StreamFormat::MPEG2TS;
-    }
-    return format;
-}
-
 void Stream::create(demux_t *demux, AbstractAdaptationLogic *logic,
-                    SegmentTracker *tracker, AbstractStreamOutputFactory &factory)
+                    SegmentTracker *tracker, const AbstractStreamOutputFactory *factory)
 {
-    output = factory.create(demux, format);
+    updateFormat(demux, format, factory);
     adaptationLogic = logic;
     segmentTracker = tracker;
+}
+
+void Stream::updateFormat(demux_t *demux, StreamFormat &newformat, const AbstractStreamOutputFactory *factory)
+{
+    if( format == newformat && output )
+        return;
+
+    delete output;
+    format = newformat;
+    output = factory->create(demux, format);
+    if(!output)
+        throw VLC_EGENERIC;
 }
 
 bool Stream::isEOF() const
@@ -104,21 +96,29 @@ bool Stream::isEOF() const
 
 mtime_t Stream::getPCR() const
 {
+    if(!output)
+        return 0;
     return output->getPCR();
 }
 
 mtime_t Stream::getFirstDTS() const
 {
+    if(!output)
+        return 0;
     return output->getFirstDTS();
 }
 
 int Stream::getGroup() const
 {
+    if(!output)
+        return 0;
     return output->getGroup();
 }
 
 int Stream::esCount() const
 {
+    if(!output)
+        return 0;
     return output->esCount();
 }
 
@@ -129,7 +129,7 @@ bool Stream::operator ==(const Stream &stream) const
 
 Chunk * Stream::getChunk()
 {
-    if (currentChunk == NULL)
+    if (currentChunk == NULL && output)
     {
         currentChunk = segmentTracker->getNextChunk(type, output->switchAllowed());
         if (currentChunk == NULL)
@@ -145,6 +145,9 @@ bool Stream::seekAble() const
 
 Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_deadline, bool send)
 {
+    if(!output)
+        return Stream::status_eof;
+
     if(nz_deadline + VLC_TS_0 > output->getPCR()) /* not already demuxed */
     {
         /* need to read, demuxer still buffering, ... */
@@ -225,13 +228,19 @@ size_t Stream::read(HTTPConnectionManager *connManager)
 
     readsize = block->i_buffer;
 
-    output->pushBlock(block);
+    if(output)
+        output->pushBlock(block);
+    else
+        block_Release(block);
 
     return readsize;
 }
 
 bool Stream::setPosition(mtime_t time, bool tryonly)
 {
+    if(!output)
+        return false;
+
     bool ret = segmentTracker->setPosition(time, output->reinitsOnSeek(), tryonly);
     if(!tryonly && ret)
     {
@@ -623,21 +632,3 @@ void BaseStreamOutput::esOutDestroy(es_out_t *fakees)
     me->realdemux->out->pf_destroy(me->realdemux->out);
 }
 /* !Static callbacks */
-
-AbstractStreamOutput *DefaultStreamOutputFactory::create(demux_t *demux, int format) const
-{
-    switch(format)
-    {
-        case StreamFormat::MP4:
-            return new BaseStreamOutput(demux, "mp4");
-
-        case StreamFormat::MPEG2TS:
-            return new BaseStreamOutput(demux, "ts");
-
-        default:
-            throw VLC_EBADVAR;
-            break;
-    }
-    return NULL;
-}
-

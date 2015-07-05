@@ -298,6 +298,8 @@ adaptative_SOURCES = \
     demux/adaptative/PlaylistManager.h \
     demux/adaptative/SegmentTracker.cpp \
     demux/adaptative/SegmentTracker.hpp \
+    demux/adaptative/StreamFormat.cpp \
+    demux/adaptative/StreamFormat.hpp \
     demux/adaptative/Streams.cpp \
     demux/adaptative/Streams.hpp \
     demux/adaptative/StreamsType.hpp \
@@ -343,7 +345,8 @@ libdash_plugin_la_SOURCES = \
     demux/dash/dash.cpp \
     demux/dash/dash.hpp \
     demux/dash/DASHManager.cpp \
-    demux/dash/DASHManager.h
+    demux/dash/DASHManager.h \
+    demux/dash/DASHStreamFormat.hpp
 
 libdash_plugin_la_SOURCES += $(adaptative_SOURCES)
 libdash_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
@@ -368,6 +371,7 @@ libhls_plugin_la_SOURCES = \
     demux/hls/playlist/Tags.cpp \
     demux/hls/HLSManager.hpp \
     demux/hls/HLSManager.cpp \
+    demux/hls/HLSStreamFormat.hpp \
     demux/hls/hls.cpp \
     demux/hls/hls.hpp
 

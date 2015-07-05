@@ -1,7 +1,7 @@
 /*
- * HLSManager.hpp
+ * StreamFormat.hpp
  *****************************************************************************
- * Copyright © 2015 - VideoLAN authors
+ * Copyright (C) 2015 - VideoLAN authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,35 +17,26 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef HLSMANAGER_HPP
-#define HLSMANAGER_HPP
+#ifndef STREAMFORMAT_HPP
+#define STREAMFORMAT_HPP
 
-#include "../adaptative/PlaylistManager.h"
-#include "../adaptative/logic/AbstractAdaptationLogic.h"
-#include "playlist/M3U8.hpp"
-
-namespace hls
+namespace adaptative
 {
-    using namespace adaptative;
 
-    class HLSStreamOutputFactory : public AbstractStreamOutputFactory
+    class StreamFormat
     {
         public:
-            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &) const;
-    };
+            static const unsigned UNSUPPORTED = 0;
 
-    class HLSManager : public PlaylistManager
-    {
-        public:
-            HLSManager( playlist::M3U8 *,
-                        AbstractStreamOutputFactory *,
-                        logic::AbstractAdaptationLogic::LogicType type,
-                        stream_t *stream );
-            virtual ~HLSManager();
-            virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType);
-            virtual bool updatePlaylist();
+            StreamFormat( int = UNSUPPORTED );
+            ~StreamFormat();
+            operator unsigned() const;
+            bool operator==(const StreamFormat &) const;
+
+        private:
+            unsigned formatid;
     };
 
 }
 
-#endif // HLSMANAGER_HPP
+#endif // STREAMFORMAT_HPP

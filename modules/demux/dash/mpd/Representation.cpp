@@ -33,6 +33,7 @@
 #include "TrickModeType.h"
 #include "../adaptative/playlist/SegmentTemplate.h"
 #include "../adaptative/playlist/SegmentTimeline.h"
+#include "../DASHStreamFormat.hpp"
 
 using namespace dash::mpd;
 
@@ -46,6 +47,14 @@ Representation::Representation  ( AdaptationSet *set ) :
 Representation::~Representation ()
 {
     delete(this->trickModeType);
+}
+
+StreamFormat Representation::getStreamFormat() const
+{
+    if(getMimeType().empty())
+        return DASHStreamFormat::mimeToFormat(adaptationSet->getMimeType());
+    else
+        return DASHStreamFormat::mimeToFormat(getMimeType());
 }
 
 TrickModeType*      Representation::getTrickModeType        () const

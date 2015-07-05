@@ -30,6 +30,7 @@
 
 #include "CommonAttributesElements.h"
 #include "SegmentInformation.hpp"
+#include "../StreamFormat.hpp"
 
 namespace adaptative
 {
@@ -45,7 +46,7 @@ namespace adaptative
                 BaseAdaptationSet(BasePeriod *);
                 virtual ~BaseAdaptationSet();
 
-                virtual const std::string&      getMimeType() const; /*reimpl*/
+                virtual StreamFormat            getStreamFormat() const; /*reimpl*/
                 std::vector<BaseRepresentation *>&  getRepresentations      ();
                 void                            setSwitchPolicy(bool value);
                 bool                            getBitstreamSwitching() const;

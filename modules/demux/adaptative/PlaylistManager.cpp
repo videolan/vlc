@@ -41,12 +41,13 @@ using namespace adaptative::logic;
 using namespace adaptative;
 
 PlaylistManager::PlaylistManager( AbstractPlaylist *pl,
+                                  AbstractStreamOutputFactory *factory,
                                   AbstractAdaptationLogic::LogicType type,
                                   stream_t *stream) :
              conManager     ( NULL ),
              logicType      ( type ),
              playlist       ( pl ),
-             streamOutputFactory( NULL ),
+             streamOutputFactory( factory ),
              stream         ( stream ),
              nextPlaylistupdate  ( 0 )
 {
@@ -57,6 +58,7 @@ PlaylistManager::PlaylistManager( AbstractPlaylist *pl,
 PlaylistManager::~PlaylistManager   ()
 {
     delete conManager;
+    delete streamOutputFactory;
     for(int i=0; i<StreamTypeCount; i++)
         delete streams[i];
 }
@@ -73,7 +75,7 @@ bool PlaylistManager::start(demux_t *demux)
         const BaseAdaptationSet *set = period->getAdaptationSet(type);
         if(set)
         {
-            streams[type] = new (std::nothrow) Stream(set->getMimeType());
+            streams[type] = new (std::nothrow) Stream(type, set->getStreamFormat());
             if(!streams[type])
                 continue;
             AbstractAdaptationLogic *logic = createLogic(logicType);
@@ -85,13 +87,11 @@ bool PlaylistManager::start(demux_t *demux)
             }
 
             SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, playlist);
-            DefaultStreamOutputFactory defaultfactory;
             try
             {
-                if(!tracker)
+                if(!tracker || !streamOutputFactory)
                     throw VLC_ENOMEM;
-                streams[type]->create(demux, logic, tracker,
-                                      (streamOutputFactory) ? *streamOutputFactory : defaultfactory );
+                streams[type]->create(demux, logic, tracker, streamOutputFactory);
             } catch (int) {
                 delete streams[type];
                 delete logic;

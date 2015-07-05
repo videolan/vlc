@@ -29,6 +29,7 @@
 #include <inttypes.h>
 
 #include "DASHManager.h"
+#include "DASHStreamFormat.hpp"
 #include "mpd/MPDFactory.h"
 #include "xml/DOMParser.h"
 #include "../adaptative/logic/RateBasedAdaptationLogic.h"
@@ -42,9 +43,25 @@ using namespace dash;
 using namespace dash::mpd;
 using namespace adaptative::logic;
 
+
+AbstractStreamOutput *DASHStreamOutputFactory::create(demux_t *demux, const StreamFormat &format) const
+{
+    unsigned fmt = format;
+    switch(fmt)
+    {
+        case DASHStreamFormat::MP4:
+            return new BaseStreamOutput(demux, "mp4");
+
+        case DASHStreamFormat::MPEG2TS:
+            return new BaseStreamOutput(demux, "ts");
+    }
+    return NULL;
+}
+
 DASHManager::DASHManager(MPD *mpd,
+                         AbstractStreamOutputFactory *factory,
                          AbstractAdaptationLogic::LogicType type, stream_t *stream) :
-             PlaylistManager(mpd, type, stream)
+             PlaylistManager(mpd, factory, type, stream)
 {
 }
 

@@ -25,6 +25,7 @@
 #include "AdaptationSet.h"
 #include "Representation.h"
 #include "Period.h"
+#include "../DASHStreamFormat.hpp"
 
 using namespace dash::mpd;
 
@@ -37,6 +38,22 @@ AdaptationSet::AdaptationSet(Period *period) :
 
 AdaptationSet::~AdaptationSet()
 {
+}
+
+StreamFormat AdaptationSet::getStreamFormat() const
+{
+    if(!getMimeType().empty())
+    {
+        return DASHStreamFormat::mimeToFormat(getMimeType());
+    }
+    else if (!representations.empty())
+    {
+        return representations.front()->getStreamFormat();
+    }
+    else
+    {
+        return StreamFormat();
+    }
 }
 
 bool AdaptationSet::getSubsegmentAlignmentFlag() const

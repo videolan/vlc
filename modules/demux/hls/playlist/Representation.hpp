@@ -30,6 +30,7 @@ namespace hls
     {
         class M3U8;
 
+        using namespace adaptative;
         using namespace adaptative::playlist;
 
         class Representation : public BaseRepresentation
@@ -39,6 +40,8 @@ namespace hls
             public:
                 Representation( BaseAdaptationSet * );
                 virtual ~Representation ();
+                virtual StreamFormat getStreamFormat() const; /* reimpl */
+
                 void localMergeWithPlaylist(M3U8 *, mtime_t);
                 bool isLive() const;
                 virtual void mergeWith(SegmentInformation *, mtime_t); /* reimpl */

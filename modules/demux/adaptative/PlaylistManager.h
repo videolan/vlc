@@ -42,12 +42,15 @@ namespace adaptative
     using namespace http;
 
     class AbstractStreamFactory;
+    class AbstractStreamOutputFactory;
 
     class PlaylistManager
     {
         public:
             PlaylistManager( AbstractPlaylist *,
-                             AbstractAdaptationLogic::LogicType type, stream_t *stream);
+                             AbstractStreamOutputFactory *,
+                             AbstractAdaptationLogic::LogicType type,
+                             stream_t *stream);
             virtual ~PlaylistManager    ();
 
             bool    start(demux_t *);

@@ -37,6 +37,7 @@ namespace dash
         class TrickModeType;
         class MPD;
 
+        using namespace adaptative;
         using namespace adaptative::playlist;
 
         class Representation : public BaseRepresentation,
@@ -47,6 +48,7 @@ namespace dash
                 Representation( AdaptationSet * );
                 virtual ~Representation ();
 
+                virtual StreamFormat getStreamFormat() const; /* reimpl */
                 int                 getQualityRanking       () const;
                 void                setQualityRanking       ( int qualityRanking );
                 const std::list<const Representation*>&     getDependencies() const;

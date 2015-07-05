@@ -30,6 +30,7 @@
 
 #include "CommonAttributesElements.h"
 #include "SegmentInformation.hpp"
+#include "../StreamFormat.hpp"
 
 namespace adaptative
 {
@@ -46,6 +47,7 @@ namespace adaptative
                 BaseRepresentation( BaseAdaptationSet * );
                 virtual ~BaseRepresentation ();
 
+                virtual StreamFormat getStreamFormat() const;
                 /*
                  *  @return The bitrate required for this representation
                  *          in bits per seconds.

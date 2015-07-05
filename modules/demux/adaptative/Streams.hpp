@@ -29,6 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_es.h>
 #include "StreamsType.hpp"
+#include "StreamFormat.hpp"
 
 namespace adaptative
 {
@@ -55,14 +56,13 @@ namespace adaptative
     class Stream
     {
     public:
-        Stream(const std::string &mime);
-        Stream(const StreamType, const StreamFormat);
+        Stream(const StreamType, const StreamFormat &);
         ~Stream();
         bool operator==(const Stream &) const;
         static StreamType mimeToType(const std::string &mime);
-        static StreamFormat mimeToFormat(const std::string &mime);
         void create(demux_t *, AbstractAdaptationLogic *,
-                    SegmentTracker *, AbstractStreamOutputFactory &);
+                    SegmentTracker *, const AbstractStreamOutputFactory *);
+        void updateFormat(demux_t *, StreamFormat &, const AbstractStreamOutputFactory *);
         bool isEOF() const;
         mtime_t getPCR() const;
         mtime_t getFirstDTS() const;
@@ -77,7 +77,7 @@ namespace adaptative
 
     private:
         Chunk *getChunk();
-        void init(const StreamType, const StreamFormat);
+        void init(const StreamType, const StreamFormat &);
         size_t read(HTTPConnectionManager *);
         StreamType type;
         StreamFormat format;
@@ -114,13 +114,8 @@ namespace adaptative
     class AbstractStreamOutputFactory
     {
         public:
-            virtual AbstractStreamOutput *create(demux_t*, int streamType) const = 0;
-    };
-
-    class DefaultStreamOutputFactory : public AbstractStreamOutputFactory
-    {
-        public:
-            virtual AbstractStreamOutput *create(demux_t*, int streamType) const;
+            virtual ~AbstractStreamOutputFactory() {}
+            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &) const = 0;
     };
 
     class BaseStreamOutput : public AbstractStreamOutput

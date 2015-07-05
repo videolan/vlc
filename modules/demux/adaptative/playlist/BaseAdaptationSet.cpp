@@ -35,6 +35,7 @@
 #include "SegmentTemplate.h"
 #include "BasePeriod.h"
 
+using namespace adaptative;
 using namespace adaptative::playlist;
 
 BaseAdaptationSet::BaseAdaptationSet(BasePeriod *period) :
@@ -50,12 +51,9 @@ BaseAdaptationSet::~BaseAdaptationSet   ()
     childs.clear();
 }
 
-const std::string& BaseAdaptationSet::getMimeType() const
+StreamFormat BaseAdaptationSet::getStreamFormat() const
 {
-    if (mimeType.empty() && !representations.empty())
-        return representations.front()->getMimeType();
-    else
-        return mimeType;
+    return StreamFormat();
 }
 
 std::vector<BaseRepresentation*>& BaseAdaptationSet::getRepresentations()

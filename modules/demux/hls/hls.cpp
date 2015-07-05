@@ -178,6 +178,7 @@ static int Open(vlc_object_t *p_obj)
 
     HLSManager *p_manager =
             new (std::nothrow) HLSManager(p_sys->p_playlist,
+            new (std::nothrow) HLSStreamOutputFactory,
             static_cast<AbstractAdaptationLogic::LogicType>(logic),
             p_demux->s);
 
