@@ -45,6 +45,8 @@ struct msghdr;
  */
 
 /**
+ * Interruptible variant of vlc_sem_wait().
+ *
  * Waits on a semaphore like vlc_sem_wait(). If the calling thread has an
  * interruption context (as set by vlc_interrupt_set()), and another thread
  * invokes vlc_interrupt_raise() on that context, the semaphore is incremented.
@@ -61,6 +63,8 @@ struct msghdr;
 VLC_API int vlc_sem_wait_i11e(vlc_sem_t *);
 
 /**
+ * Interruptible variant of poll().
+ *
  * Waits for file descriptors I/O events, a timeout, a signal or a VLC I/O
  * interruption. Except for VLC I/O interruptions, this function behaves
  * just like the standard poll().
@@ -133,9 +137,10 @@ VLC_API void vlc_interrupt_destroy(vlc_interrupt_t *);
 VLC_API vlc_interrupt_t *vlc_interrupt_set(vlc_interrupt_t *);
 
 /**
- * Raises an interruption through a specified context. This is used to
- * asynchronously wake a thread up while it is waiting on some other events
- * (typically I/O events).
+ * Raises an interruption through a specified context.
+ *
+ * This is used to asynchronously wake a thread up while it is waiting on some
+ * other events (typically I/O events).
  *
  * @note This function is thread-safe.
  * @note This function is not a cancellation point.
@@ -143,11 +148,15 @@ VLC_API vlc_interrupt_t *vlc_interrupt_set(vlc_interrupt_t *);
 VLC_API void vlc_interrupt_raise(vlc_interrupt_t *);
 
 /**
- * Marks the interruption context as "killed". This is not reversible.
+ * Marks the interruption context as "killed".
+ *
+ * This is not reversible.
  */
 VLC_API void vlc_interrupt_kill(vlc_interrupt_t *);
 
 /**
+ * Checks if the interruption context was "killed".
+ *
  * Indicates whether the interruption context of the calling thread (if any)
  * was killed with vlc_interrupt_kill().
  */
