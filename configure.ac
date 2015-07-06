@@ -291,9 +291,6 @@ case "${host_os}" in
   hpux*)
     SYS=hpux
     ;;
-  symbian*)
-    SYS=symbian
-    ;;
   *os2*)
     SYS=os2
     LDFLAGS="${LDFLAGS} -Zomf -Zbin-files -Zargs-wild -Zhigh-mem"
@@ -308,7 +305,6 @@ AM_CONDITIONAL(HAVE_LINUX,   test "${SYS}" = "linux")
 AM_CONDITIONAL(HAVE_OS2,     test "${SYS}" = "os2")
 AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
-AM_CONDITIONAL(HAVE_SYMBIAN, test "${SYS}" = "symbian")
 AM_CONDITIONAL(HAVE_IOS,   test "${HAVE_IOS}" = "1")
 AM_CONDITIONAL(HAVE_OSX,   test "${HAVE_OSX}" = "1")
 
@@ -3002,7 +2998,7 @@ dnl  X C Bindings modules
 dnl
 AC_ARG_ENABLE(xcb,
   [  --enable-xcb            X11 support with XCB (default enabled)],, [
-  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" -a "${SYS}" != "symbian"], [
+  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "darwin"], [
     enable_xcb="yes"
   ], [
     enable_xcb="no"

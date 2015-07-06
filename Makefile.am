@@ -18,7 +18,6 @@ EXTRA_DIST = \
 	extras/package/win32/libvlc.dll.manifest \
 	extras/package/win32/change-contribs-directory.sh \
 	extras/package/win32/configure.sh \
-	extras/package/symbian/configure.sh \
 	extras/package/npapi.am \
 	extras/package/win32/NSIS/vlc.win32.nsi.in \
 	extras/package/win32/NSIS/spad.nsi.in \

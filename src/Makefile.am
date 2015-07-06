@@ -227,14 +227,10 @@ else
 if HAVE_WIN32
 libvlccore_la_SOURCES += $(SOURCES_libvlc_win32)
 else
-if HAVE_SYMBIAN
-#libvlccore_la_SOURCES += $(SOURCES_libvlc_symbian)
-else
 if HAVE_OS2
 libvlccore_la_SOURCES += $(SOURCES_libvlc_os2)
 else
 libvlccore_la_SOURCES += $(SOURCES_libvlc_other)
-endif
 endif
 endif
 endif
@@ -300,13 +296,6 @@ SOURCES_libvlc_win32 = \
 	win32/specific.c \
 	win32/winsock.c \
 	win32/rand.c \
-	$(NULL)
-
-SOURCES_libvlc_symbian = \
-	symbian/path.cpp \
-	symbian/dirs.c \
-	win32/plugin.c \
-	posix/rand.c \
 	$(NULL)
 
 SOURCES_libvlc_os2 = \

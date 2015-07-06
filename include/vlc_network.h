@@ -68,16 +68,6 @@ struct msghdr
 #   define net_errno errno
 #endif
 
-#if defined( __SYMBIAN32__ )
-#   undef AF_INET6
-#   undef IN6_IS_ADDR_MULTICAST
-#   undef IPV6_V6ONLY
-#   undef IPV6_MULTICAST_HOPS
-#   undef IPV6_MULTICAST_IF
-#   undef IPV6_TCLASS
-#   undef IPV6_JOIN_GROUP
-#endif
-
 #ifndef MSG_NOSIGNAL
 # define MSG_NOSIGNAL 0
 #endif

@@ -400,10 +400,6 @@ typedef enum
 #   include <windows.h>
 #endif
 
-#ifdef __SYMBIAN32__
- #include <sys/syslimits.h>
-#endif
-
 #ifdef __OS2__
 #   define OS2EMX_PLAIN_CHAR
 #   define INCL_BASE
@@ -927,7 +923,7 @@ VLC_API const char * VLC_Compiler( void ) VLC_USED;
 #include "vlc_main.h"
 #include "vlc_configuration.h"
 
-#if defined( _WIN32 ) || defined( __SYMBIAN32__ ) || defined( __OS2__ )
+#if defined( _WIN32 ) || defined( __OS2__ )
 #   define DIR_SEP_CHAR '\\'
 #   define DIR_SEP "\\"
 #   define PATH_SEP_CHAR ';'
