@@ -746,12 +746,6 @@ static int SessionsSetup( demux_t *p_demux )
             ;
         else continue;
 
-        if( i_client_port != -1 )
-        {
-            sub->setClientPortNum( i_client_port );
-            i_client_port += 2;
-        }
-
         if( strcasestr( sub->codecName(), "REAL" ) )
         {
             msg_Info( p_demux, "real codec detected, using real-RTSP instead" );
@@ -789,6 +783,13 @@ static int SessionsSetup( demux_t *p_demux )
             /* Issue the SETUP */
             if( p_sys->rtsp )
             {
+
+                if( i_client_port != -1 )
+                {
+                    sub->setClientPortNum( i_client_port );
+                    i_client_port += 2;
+                }
+
                 p_sys->rtsp->sendSetupCommand( *sub, default_live555_callback, False,
                                                toBool( b_rtsp_tcp ),
                                                toBool( p_sys->b_force_mcast && !b_rtsp_tcp ) );
