@@ -218,15 +218,15 @@ bool OS2Factory::init()
 
     // Initialize the resource path
     char *datadir = config_GetUserDir( VLC_DATA_DIR );
-    m_resourcePath.push_back( (string)datadir + "\\skins" );
+    m_resourcePath.push_back( (std::string)datadir + "\\skins" );
     free( datadir );
     datadir = config_GetDataDir();
-    m_resourcePath.push_back( (string)datadir + "\\skins" );
-    m_resourcePath.push_back( (string)datadir + "\\skins2" );
-    m_resourcePath.push_back( (string)datadir + "\\share\\skins" );
-    m_resourcePath.push_back( (string)datadir + "\\share\\skins2" );
-    m_resourcePath.push_back( (string)datadir + "\\vlc\\skins" );
-    m_resourcePath.push_back( (string)datadir + "\\vlc\\skins2" );
+    m_resourcePath.push_back( (std::string)datadir + "\\skins" );
+    m_resourcePath.push_back( (std::string)datadir + "\\skins2" );
+    m_resourcePath.push_back( (std::string)datadir + "\\share\\skins" );
+    m_resourcePath.push_back( (std::string)datadir + "\\share\\skins2" );
+    m_resourcePath.push_back( (std::string)datadir + "\\vlc\\skins" );
+    m_resourcePath.push_back( (std::string)datadir + "\\vlc\\skins2" );
     free( datadir );
 
     // All went well
@@ -424,7 +424,7 @@ void OS2Factory::changeCursor( CursorType_t type ) const
 }
 
 
-void OS2Factory::rmDir( const string &rPath )
+void OS2Factory::rmDir( const std::string &rPath )
 {
     struct dirent *file;
     DIR *dir;
@@ -436,7 +436,7 @@ void OS2Factory::rmDir( const string &rPath )
     while( (file = readdir( dir )) )
     {
         struct stat statbuf;
-        string filename = file->d_name;
+        std::string filename = file->d_name;
 
         // Skip "." and ".."
         if( filename == "." || filename == ".." )

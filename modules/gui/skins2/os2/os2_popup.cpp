@@ -78,7 +78,7 @@ void OS2Popup::hide()
 }
 
 
-void OS2Popup::addItem( const string &rLabel, int pos )
+void OS2Popup::addItem( const std::string &rLabel, int pos )
 {
     MENUITEM mi;
 
