@@ -1201,11 +1201,10 @@ void SPrefsPanel::configML()
 #include "util/registry.hpp"
 
 void SPrefsPanel::cleanLang() {
-    QVLCRegistry *qvReg = new QVLCRegistry( HKEY_CURRENT_USER );
-    qvReg->DeleteValue( "Software\\VideoLAN\\VLC\\", "Lang" );
-    qvReg->DeleteKey( "Software\\VideoLAN\\", "VLC" );
-    qvReg->DeleteKey( "Software\\", "VideoLAN" );
-    delete qvReg;
+    QVLCRegistry qvReg( HKEY_CURRENT_USER );
+    qvReg.DeleteValue( "Software\\VideoLAN\\VLC\\", "Lang" );
+    qvReg.DeleteKey( "Software\\VideoLAN\\", "VLC" );
+    qvReg.DeleteKey( "Software\\", "VideoLAN" );
 }
 
 void SPrefsPanel::saveLang() {
@@ -1216,8 +1215,8 @@ void SPrefsPanel::saveLang() {
     }
     else
     {
-        QVLCRegistry *qvReg = new QVLCRegistry( HKEY_CURRENT_USER );
-        qvReg->WriteRegistryString( "Software\\VideoLAN\\VLC\\", "Lang", lang );
+        QVLCRegistry qvReg( HKEY_CURRENT_USER );
+        qvReg.WriteRegistryString( "Software\\VideoLAN\\VLC\\", "Lang", lang );
     }
 }
 
@@ -1287,7 +1286,7 @@ void SPrefsPanel::assoDialog()
     assoLayout->addWidget( filetypeList, 0, 0, 1, 4 );
     filetypeList->header()->hide();
 
-    QVLCRegistry * qvReg = new QVLCRegistry( HKEY_CLASSES_ROOT );
+    QVLCRegistry qvReg( HKEY_CLASSES_ROOT );
 
     QTreeWidgetItem *audioType = new QTreeWidgetItem( QStringList( qtr( "Audio Files" ) ) );
     QTreeWidgetItem *videoType = new QTreeWidgetItem( QStringList( qtr( "Video Files" ) ) );
@@ -1304,9 +1303,9 @@ void SPrefsPanel::assoDialog()
     QTreeWidgetItem *currentItem = NULL;
 
     int i_temp = 0;
-#define aTa( name ) i_temp += addType( name, currentItem, audioType, qvReg )
-#define aTv( name ) i_temp += addType( name, currentItem, videoType, qvReg )
-#define aTo( name ) i_temp += addType( name, currentItem, otherType, qvReg )
+#define aTa( name ) i_temp += addType( name, currentItem, audioType, &qvReg )
+#define aTv( name ) i_temp += addType( name, currentItem, videoType, &qvReg )
+#define aTo( name ) i_temp += addType( name, currentItem, otherType, &qvReg )
 
     aTa( ".3ga" ); aTa( ".669" ); aTa( ".a52" ); aTa( ".aac" ); aTa( ".ac3" );
     aTa( ".adt" ); aTa( ".adts" ); aTa( ".aif" ); aTa( ".aifc" ); aTa( ".aiff" );
@@ -1367,7 +1366,6 @@ void SPrefsPanel::assoDialog()
     CONNECT( clearButton, clicked(), d, reject() );
     d->resize( 300, 400 );
     d->exec();
-    delete qvReg;
     listAsso.clear();
 }
 
@@ -1435,8 +1433,8 @@ void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
         qvReg->WriteRegistryString( qtu( s_path.append( "\\shell" ) ), "", "Play" );
 
         /* Get the installer path */
-        QVLCRegistry *qvReg2 = new QVLCRegistry( HKEY_LOCAL_MACHINE );
-        QString str_temp = qvReg2->ReadRegistryString( "Software\\VideoLAN\\VLC", "", "" );
+        QVLCRegistry qvReg2( HKEY_LOCAL_MACHINE );
+        QString str_temp = qvReg2.ReadRegistryString( "Software\\VideoLAN\\VLC", "", "" );
 
         if( str_temp.size() )
         {
@@ -1446,7 +1444,6 @@ void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
             qvReg->WriteRegistryString( qtu( s_path2.append( "\\DefaultIcon" ) ),
                         "", qtu( str_temp.append(",0") ) );
         }
-        delete qvReg2;
     }
 }
 
@@ -1469,21 +1466,20 @@ void delAsso( QVLCRegistry *qvReg, const char *psz_ext )
 
 void SPrefsPanel::saveAsso()
 {
-    QVLCRegistry * qvReg = new QVLCRegistry( HKEY_CLASSES_ROOT );
+    QVLCRegistry qvReg( HKEY_CLASSES_ROOT );
     for( int i = 0; i < listAsso.size(); i ++ )
     {
         if( listAsso[i]->checkState( 0 ) > 0 )
         {
-            addAsso( qvReg, qtu( listAsso[i]->text( 0 ) ) );
+            addAsso( &qvReg, qtu( listAsso[i]->text( 0 ) ) );
         }
         else
         {
-            delAsso( qvReg, qtu( listAsso[i]->text( 0 ) ) );
+            delAsso( &qvReg, qtu( listAsso[i]->text( 0 ) ) );
         }
     }
     /* Gruik ? Naaah */
     qobject_cast<QDialog *>(listAsso[0]->treeWidget()->parent())->accept();
-    delete qvReg;
 }
 
 #endif /* _WIN32 */
