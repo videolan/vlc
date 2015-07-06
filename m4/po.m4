@@ -1,4 +1,4 @@
-# po.m4 serial 22 (gettext-0.19)
+# po.m4 serial 24 (gettext-0.19)
 dnl Copyright (C) 1995-2014 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,

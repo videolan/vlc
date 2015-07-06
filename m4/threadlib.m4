@@ -1,4 +1,4 @@
-# threadlib.m4 serial 10 (gettext-0.18.2)
+# threadlib.m4 serial 11 (gettext-0.18.2)
 dnl Copyright (C) 2005-2014 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -22,7 +22,7 @@ dnl libtool).
 dnl Sets the variables LIBMULTITHREAD and LTLIBMULTITHREAD similarly, for
 dnl programs that really need multithread functionality. The difference
 dnl between LIBTHREAD and LIBMULTITHREAD is that on platforms supporting weak
-dnl symbols, typically LIBTHREAD="" whereas LIBMULTITHREAD="-lpthread".
+dnl symbols, typically LIBTHREAD is empty whereas LIBMULTITHREAD is not.
 dnl Adds to CPPFLAGS the flag -D_REENTRANT or -D_THREAD_SAFE if needed for
 dnl multithread-safe programs.
 
@@ -162,15 +162,31 @@ int main ()
         # Test whether both pthread_mutex_lock and pthread_mutexattr_init exist
         # in libc. IRIX 6.5 has the first one in both libc and libpthread, but
         # the second one only in libpthread, and lock.c needs it.
-        AC_LINK_IFELSE(
-          [AC_LANG_PROGRAM(
-             [[#include <pthread.h>]],
-             [[pthread_mutex_lock((pthread_mutex_t*)0);
-               pthread_mutexattr_init((pthread_mutexattr_t*)0);]])],
-          [gl_have_pthread=yes])
+        #
+        # If -pthread works, prefer it to -lpthread, since Ubuntu 14.04
+        # needs -pthread for some reason.  See:
+        # http://lists.gnu.org/archive/html/bug-gnulib/2014-09/msg00023.html
+        save_LIBS=$LIBS
+        for gl_pthread in '' '-pthread'; do
+          LIBS="$LIBS $gl_pthread"
+          AC_LINK_IFELSE(
+            [AC_LANG_PROGRAM(
+               [[#include <pthread.h>
+                 pthread_mutex_t m;
+                 pthread_mutexattr_t ma;
+               ]],
+               [[pthread_mutex_lock (&m);
+                 pthread_mutexattr_init (&ma);]])],
+            [gl_have_pthread=yes
+             LIBTHREAD=$gl_pthread LTLIBTHREAD=$gl_pthread
+             LIBMULTITHREAD=$gl_pthread LTLIBMULTITHREAD=$gl_pthread])
+          LIBS=$save_LIBS
+          test -n "$gl_have_pthread" && break
+        done
+
         # Test for libpthread by looking for pthread_kill. (Not pthread_self,
         # since it is defined as a macro on OSF/1.)
-        if test -n "$gl_have_pthread"; then
+        if test -n "$gl_have_pthread" && test -z "$LIBTHREAD"; then
           # The program links fine without libpthread. But it may actually
           # need to link with libpthread in order to create multiple threads.
           AC_CHECK_LIB([pthread], [pthread_kill],
@@ -185,7 +201,7 @@ int main ()
                    [Define if the pthread_in_use() detection is hard.])
              esac
             ])
-        else
+        elif test -z "$gl_have_pthread"; then
           # Some library is needed. Try libpthread and libc_r.
           AC_CHECK_LIB([pthread], [pthread_kill],
             [gl_have_pthread=yes
@@ -325,6 +341,8 @@ dnl ---------------    ---------  ---------   --------   ---------
 dnl Linux 2.4/glibc    posix      -lpthread       Y      OK
 dnl
 dnl GNU Hurd/glibc     posix
+dnl
+dnl Ubuntu 14.04       posix      -pthread        Y      OK
 dnl
 dnl FreeBSD 5.3        posix      -lc_r           Y
 dnl                    posix      -lkse ?         Y
