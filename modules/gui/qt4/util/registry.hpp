@@ -29,7 +29,6 @@ class QVLCRegistry
 {
 private:
     const HKEY m_RootKey;
-    char m_pathBuffer[256];
 public:
     QVLCRegistry(HKEY rootKey);
     ~QVLCRegistry(void) {}
