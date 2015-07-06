@@ -109,6 +109,7 @@ void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTa
 {
     const Attribute *uriAttr = streaminftag->getAttributeByName("URI");
     const Attribute *bwAttr = streaminftag->getAttributeByName("BANDWIDTH");
+    const Attribute *codecsAttr = streaminftag->getAttributeByName("CODECS");
 
     Representation *rep = new (std::nothrow) Representation(adaptSet);
     if(rep)
@@ -122,6 +123,10 @@ void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTa
 
         if(bwAttr)
             rep->setBandwidth(bwAttr->decimal());
+
+        /* if more than 1 codec, don't probe, can't be packed audio */
+        if(codecsAttr && codecsAttr->quotedString().find(',') != std::string::npos)
+            rep->setMimeType("video/mp2t");
 
         parseSegments(rep, tagslist);
 
