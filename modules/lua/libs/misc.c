@@ -34,11 +34,14 @@
 # include "config.h"
 #endif
 
+#include <math.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_meta.h>
 #include <vlc_interface.h>
 #include <vlc_keys.h>
+#include <vlc_interrupt.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -132,7 +135,13 @@ static int vlclua_mdate( lua_State *L )
 static int vlclua_mwait( lua_State *L )
 {
     double f = luaL_checknumber( L, 1 );
-    mwait( (int64_t)f );
+
+    vlc_interrupt_t *oint = vlclua_set_interrupt( L );
+    int ret = vlc_mwait_i11e( llround(f) );
+
+    vlc_interrupt_set( oint );
+    if( ret )
+        return luaL_error( L, "Interrupted." );
     return 0;
 }
 
