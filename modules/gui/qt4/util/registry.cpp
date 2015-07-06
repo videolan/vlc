@@ -31,9 +31,8 @@
 #include "registry.hpp"
 
 QVLCRegistry::QVLCRegistry( HKEY rootKey )
-{
-    m_RootKey = rootKey;
-}
+    : m_RootKey( rootKey )
+{}
 
 bool QVLCRegistry::RegistryKeyExists( const char *path )
 {
