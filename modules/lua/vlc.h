@@ -180,6 +180,7 @@ typedef struct
 int vlclua_fd_init( lua_State *, vlclua_dtable_t * );
 void vlclua_fd_interrupt( vlclua_dtable_t * );
 void vlclua_fd_cleanup( vlclua_dtable_t * );
+struct vlc_interrupt *vlclua_set_interrupt( lua_State *L );
 
 /**
  * Per-interface private state

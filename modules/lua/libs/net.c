@@ -53,6 +53,12 @@ static vlclua_dtable_t *vlclua_get_dtable( lua_State *L )
     return vlclua_get_object( L, vlclua_get_dtable );
 }
 
+vlc_interrupt_t *vlclua_set_interrupt( lua_State *L )
+{
+    vlclua_dtable_t *dt = vlclua_get_dtable( L );
+    return vlc_interrupt_set( dt->interrupt );
+}
+
 /** Maps an OS file descriptor to a VLC Lua file descriptor */
 static int vlclua_fd_map( lua_State *L, int fd )
 {
@@ -343,8 +349,7 @@ static int vlclua_net_poll( lua_State *L )
         lua_pop( L, 1 );
     }
 
-    vlclua_dtable_t *dt = vlclua_get_dtable( L );
-    vlc_interrupt_t *oint = vlc_interrupt_set( dt->interrupt );
+    vlc_interrupt_t *oint = vlclua_set_interrupt( L );
     int ret = 1, val;
 
     do
