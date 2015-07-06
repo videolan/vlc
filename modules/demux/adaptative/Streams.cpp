@@ -21,8 +21,8 @@
 #include "StreamsType.hpp"
 #include "http/HTTPConnection.hpp"
 #include "http/HTTPConnectionManager.h"
-#include "http/Chunk.h"
 #include "logic/AbstractAdaptationLogic.h"
+#include "playlist/SegmentChunk.hpp"
 #include "SegmentTracker.hpp"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
@@ -127,7 +127,7 @@ bool Stream::operator ==(const Stream &stream) const
     return stream.type == type;
 }
 
-Chunk * Stream::getChunk()
+SegmentChunk * Stream::getChunk()
 {
     if (currentChunk == NULL && output)
     {
@@ -165,7 +165,7 @@ Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_dead
 
 size_t Stream::read(HTTPConnectionManager *connManager)
 {
-    Chunk *chunk = getChunk();
+    SegmentChunk *chunk = getChunk();
     if(!chunk)
         return 0;
 

@@ -1,11 +1,7 @@
 /*
- * Segment.cpp
+ * SegmentChunk.cpp
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
- *
- * Created on: Aug 10, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2014 - 2015 VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,31 +17,32 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include "DASHSegment.h"
-#include "../adaptative/playlist/BaseRepresentation.h"
-#include "../mp4/AtomsReader.hpp"
-#include "../adaptative/playlist/AbstractPlaylist.hpp"
-#include "../adaptative/playlist/SegmentChunk.hpp"
+#include "SegmentChunk.hpp"
+#include "Segment.h"
+#include <cassert>
 
 using namespace adaptative::playlist;
-using namespace dash::mpd;
-using namespace dash::mp4;
 
-DashIndexSegment::DashIndexSegment(ICanonicalUrl *parent) :
-    IndexSegment(parent)
+SegmentChunk::SegmentChunk(ISegment *segment_, const std::string &url) :
+    Chunk(url)
 {
+    segment = segment_;
+    segment->chunksuse.Set(segment->chunksuse.Get() + 1);
+    rep = NULL;
 }
 
-void DashIndexSegment::onChunkDownload(block_t **pp_block, SegmentChunk *, BaseRepresentation *rep)
+SegmentChunk::~SegmentChunk()
 {
-    if(!rep)
-        return;
+    assert(segment->chunksuse.Get() > 0);
+    segment->chunksuse.Set(segment->chunksuse.Get() - 1);
+}
 
-    AtomsReader br(rep->getPlaylist()->getVLCObject());
-    br.parseBlock(*pp_block, rep);
+void SegmentChunk::setRepresentation(BaseRepresentation *rep_)
+{
+    rep = rep_;
+}
+
+void SegmentChunk::onDownload(block_t **pp_block)
+{
+    segment->onChunkDownload(pp_block, this, rep);
 }

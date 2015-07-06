@@ -262,6 +262,8 @@ adaptative_SOURCES = \
     demux/adaptative/playlist/Segment.h \
     demux/adaptative/playlist/SegmentBase.cpp \
     demux/adaptative/playlist/SegmentBase.h \
+    demux/adaptative/playlist/SegmentChunk.cpp \
+    demux/adaptative/playlist/SegmentChunk.hpp \
     demux/adaptative/playlist/SegmentInfoCommon.cpp \
     demux/adaptative/playlist/SegmentInfoCommon.h \
     demux/adaptative/playlist/SegmentList.cpp \

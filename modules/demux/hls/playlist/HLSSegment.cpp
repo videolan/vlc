@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "HLSSegment.hpp"
+#include "../adaptative/playlist/SegmentChunk.hpp"
 
 #include <vlc_common.h>
 #include <vlc_block.h>
@@ -49,7 +50,7 @@ HLSSegment::~HLSSegment()
 #endif
 }
 
-void HLSSegment::onChunkDownload(block_t **pp_block, Chunk *chunk, BaseRepresentation *)
+void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRepresentation *)
 {
     block_t *p_block = *pp_block;
 #ifdef HAVE_GCRYPT

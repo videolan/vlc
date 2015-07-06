@@ -38,12 +38,16 @@ namespace adaptative
     namespace http
     {
         class HTTPConnectionManager;
-        class Chunk;
     }
 
     namespace logic
     {
         class AbstractAdaptationLogic;
+    }
+
+    namespace playlist
+    {
+        class SegmentChunk;
     }
 
 
@@ -52,6 +56,7 @@ namespace adaptative
 
     using namespace http;
     using namespace logic;
+    using namespace playlist;
 
     class Stream
     {
@@ -76,7 +81,7 @@ namespace adaptative
         void prune();
 
     private:
-        Chunk *getChunk();
+        SegmentChunk *getChunk();
         void init(const StreamType, const StreamFormat &);
         size_t read(HTTPConnectionManager *);
         StreamType type;
@@ -84,7 +89,7 @@ namespace adaptative
         AbstractStreamOutput *output;
         AbstractAdaptationLogic *adaptationLogic;
         SegmentTracker *segmentTracker;
-        http::Chunk *currentChunk;
+        SegmentChunk *currentChunk;
         bool eof;
     };
 

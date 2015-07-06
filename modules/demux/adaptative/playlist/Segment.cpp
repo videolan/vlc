@@ -28,6 +28,7 @@
 
 #include "Segment.h"
 #include "BaseRepresentation.h"
+#include "SegmentChunk.hpp"
 #include <cassert>
 
 using namespace adaptative::http;
@@ -50,19 +51,19 @@ ISegment::~ISegment()
     assert(chunksuse.Get() == 0);
 }
 
-Chunk * ISegment::getChunk(const std::string &url)
+SegmentChunk * ISegment::getChunk(const std::string &url)
 {
     return new (std::nothrow) SegmentChunk(this, url);
 }
 
-void ISegment::onChunkDownload(block_t **, Chunk *, BaseRepresentation *)
+void ISegment::onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *)
 {
 
 }
 
-Chunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep)
+SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep)
 {
-    Chunk *chunk;
+    SegmentChunk *chunk;
     try
     {
         chunk = getChunk(getUrlSegment().toString(index, ctxrep));
@@ -79,6 +80,8 @@ Chunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep)
         chunk->setStartByte(startByte);
         chunk->setEndByte(endByte);
     }
+
+    chunk->setRepresentation(ctxrep);
 
     return chunk;
 }
@@ -134,30 +137,6 @@ int ISegment::compare(ISegment *other) const
 int ISegment::getClassId() const
 {
     return classId;
-}
-
-ISegment::SegmentChunk::SegmentChunk(ISegment *segment_, const std::string &url) :
-    Chunk(url)
-{
-    segment = segment_;
-    segment->chunksuse.Set(segment->chunksuse.Get() + 1);
-    rep = NULL;
-}
-
-ISegment::SegmentChunk::~SegmentChunk()
-{
-    assert(segment->chunksuse.Get() > 0);
-    segment->chunksuse.Set(segment->chunksuse.Get() - 1);
-}
-
-void ISegment::SegmentChunk::setRepresentation(BaseRepresentation *rep_)
-{
-    rep = rep_;
-}
-
-void ISegment::SegmentChunk::onDownload(block_t **pp_block)
-{
-    segment->onChunkDownload(pp_block, this, rep);
 }
 
 Segment::Segment(ICanonicalUrl *parent) :
@@ -217,9 +196,9 @@ Url Segment::getUrlSegment() const
     }
 }
 
-Chunk* Segment::toChunk(size_t index, BaseRepresentation *ctxrep)
+SegmentChunk* Segment::toChunk(size_t index, BaseRepresentation *ctxrep)
 {
-    Chunk *chunk = ISegment::toChunk(index, ctxrep);
+    SegmentChunk *chunk = ISegment::toChunk(index, ctxrep);
     if (chunk && ctxrep)
         chunk->setBitrate(ctxrep->getBandwidth());
     return chunk;

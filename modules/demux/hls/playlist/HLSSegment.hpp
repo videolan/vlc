@@ -60,7 +60,7 @@ namespace hls
                 virtual int compare(ISegment *) const; /* reimpl */
 
             protected:
-                virtual void onChunkDownload(block_t **, Chunk *, BaseRepresentation *); /* reimpl */
+                virtual void onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *); /* reimpl */
 
                 uint64_t sequence;
                 SegmentEncryption encryption;

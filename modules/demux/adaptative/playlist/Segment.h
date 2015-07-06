@@ -38,6 +38,7 @@ namespace adaptative
     {
         class BaseRepresentation;
         class SubSegment;
+        class SegmentChunk;
 
         using namespace http;
 
@@ -51,7 +52,7 @@ namespace adaptative
                  *          That is basically true when using an Url, and false
                  *          when using an UrlTemplate
                  */
-                virtual Chunk*                          toChunk         (size_t, BaseRepresentation * = NULL);
+                virtual SegmentChunk*                   toChunk         (size_t, BaseRepresentation * = NULL);
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual size_t                          getOffset       () const;
                 virtual std::vector<ISegment*>          subSegments     () = 0;
@@ -65,6 +66,8 @@ namespace adaptative
                 Property<unsigned>      chunksuse;
 
                 static const int CLASSID_ISEGMENT = 0;
+                /* callbacks */
+                virtual void                            onChunkDownload (block_t **, SegmentChunk *, BaseRepresentation *);
 
             protected:
                 size_t                  startByte;
@@ -72,21 +75,7 @@ namespace adaptative
                 std::string             debugName;
                 int                     classId;
 
-                class SegmentChunk : public Chunk
-                {
-                    public:
-                        SegmentChunk(ISegment *segment, const std::string &url);
-                        virtual ~SegmentChunk();
-                        void setRepresentation(BaseRepresentation *);
-                        virtual void onDownload(block_t **); // reimpl
-
-                    protected:
-                        ISegment *segment;
-                        BaseRepresentation *rep;
-                };
-
-                virtual Chunk * getChunk(const std::string &);
-                virtual void onChunkDownload(block_t **, Chunk *, BaseRepresentation *);
+                virtual SegmentChunk * getChunk(const std::string &);
         };
 
         class Segment : public ISegment
@@ -96,7 +85,7 @@ namespace adaptative
                 ~Segment();
                 virtual void setSourceUrl( const std::string &url );
                 virtual Url getUrlSegment() const; /* impl */
-                virtual Chunk* toChunk(size_t, BaseRepresentation * = NULL);
+                virtual SegmentChunk* toChunk(size_t, BaseRepresentation * = NULL);
                 virtual std::vector<ISegment*> subSegments();
                 virtual void debug(vlc_object_t *,int = 0) const;
                 virtual void addSubSegment(SubSegment *);

@@ -34,21 +34,16 @@ namespace adaptative
         class AbstractAdaptationLogic;
     }
 
-    namespace http
-    {
-        class Chunk;
-    }
-
     namespace playlist
     {
         class AbstractPlaylist;
         class BasePeriod;
         class BaseRepresentation;
+        class SegmentChunk;
     }
 
     using namespace playlist;
     using namespace logic;
-    using namespace http;
 
     class SegmentTracker
     {
@@ -58,7 +53,7 @@ namespace adaptative
 
             void setAdaptationLogic(AbstractAdaptationLogic *);
             void resetCounter();
-            Chunk* getNextChunk(StreamType, bool);
+            SegmentChunk* getNextChunk(StreamType, bool);
             bool setPosition(mtime_t, bool, bool);
             mtime_t getSegmentStart() const;
             void pruneFromCurrent();

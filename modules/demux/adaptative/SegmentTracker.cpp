@@ -54,7 +54,7 @@ void SegmentTracker::resetCounter()
     prevRepresentation = NULL;
 }
 
-Chunk * SegmentTracker::getNextChunk(StreamType type, bool switch_allowed)
+SegmentChunk * SegmentTracker::getNextChunk(StreamType type, bool switch_allowed)
 {
     BaseRepresentation *rep;
     ISegment *segment;
@@ -101,7 +101,7 @@ Chunk * SegmentTracker::getNextChunk(StreamType type, bool switch_allowed)
         return getNextChunk(type, switch_allowed);
     }
 
-    Chunk *chunk = segment->toChunk(count, rep);
+    SegmentChunk *chunk = segment->toChunk(count, rep);
     if(chunk)
         count++;
 

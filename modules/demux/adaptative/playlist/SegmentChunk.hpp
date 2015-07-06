@@ -1,11 +1,7 @@
 /*
- * Segment.h
+ * SegmentChunk.hpp
  *****************************************************************************
- * Copyright (C) 2010 - 2011 Klagenfurt University
- *
- * Created on: Aug 10, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright (C) 2014 - 2015 VideoLAN Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,29 +17,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef SEGMENTCHUNK_HPP
+#define SEGMENTCHUNK_HPP
 
-#ifndef DASHSEGMENT_H_
-#define DASHSEGMENT_H_
+#include <string>
+#include "ICanonicalUrl.hpp"
+#include "../http/Chunk.h"
 
-#include "../adaptative/playlist/Segment.h"
-
-namespace dash
+namespace adaptative
 {
-    namespace mpd
+    namespace playlist
     {
-        using namespace adaptative::playlist;
-        using namespace adaptative::http;
+        using namespace http;
 
-        class DashIndexSegment : public IndexSegment
+        class BaseRepresentation;
+        class ISegment;
+
+        class SegmentChunk : public Chunk
         {
-            public:
-                DashIndexSegment( ICanonicalUrl *parent );
+        public:
+            SegmentChunk(ISegment *segment, const std::string &url);
+            virtual ~SegmentChunk();
+            void setRepresentation(BaseRepresentation *);
+            virtual void onDownload(block_t **); // reimpl
 
-            protected:
-                virtual void onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *); //reimpl
+        protected:
+            ISegment *segment;
+            BaseRepresentation *rep;
         };
 
     }
 }
-
-#endif /* DASHSEGMENT_H_ */
+#endif // SEGMENTCHUNK_HPP
