@@ -1682,10 +1682,6 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 if (texDesc.Format == sys->d3dregion_format &&
                     texDesc.Width  == r->fmt.i_visible_width &&
                     texDesc.Height == r->fmt.i_visible_height) {
-#ifndef NDEBUG
-                    msg_Dbg(vd, "Reusing %dx%d texture for OSD",
-                            texDesc.Width, texDesc.Height);
-#endif
                     (*region)[i] = cache;
                     memset(&sys->d3dregions[j], 0, sizeof(cache)); // do not reuse this cached value
                     break;
