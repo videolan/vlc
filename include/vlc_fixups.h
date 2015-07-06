@@ -365,10 +365,6 @@ long jrand48 (unsigned short subi[3]);
 long nrand48 (unsigned short subi[3]);
 #endif
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
 #ifdef __OS2__
 # undef HAVE_FORK   /* Implementation of fork() is imperfect on OS/2 */
 
@@ -395,6 +391,10 @@ void freeaddrinfo (struct addrinfo *res);
 
 #ifdef _WIN32
 FILE *vlc_win32_tmpfile(void);
+#endif
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
 #endif /* !LIBVLC_FIXUPS_H */
