@@ -63,6 +63,33 @@ struct msghdr;
 VLC_API int vlc_sem_wait_i11e(vlc_sem_t *);
 
 /**
+ * Interruptible variant of mwait().
+ *
+ * Waits for a specified timestamp or, if the calling thread has an
+ * interruption context, an interruption.
+ *
+ * @return EINTR if an interruption occurred, otherwise 0 once the timestamp is
+ * reached.
+ */
+VLC_API int vlc_mwait_i11e(mtime_t);
+
+/**
+ * Interruptible variant of msleep().
+ *
+ * Waits for a specified timeout duration or, if the calling thread has an
+ * interruption context, an interruption.
+ *
+ * @param delay timeout value (in microseconds)
+ *
+ * @return EINTR if an interruption occurred, otherwise 0 once the timeout
+ * expired.
+ */
+static inline int vlc_msleep_i11e(mtime_t delay)
+{
+    return vlc_mwait_i11e(mdate() + delay);
+}
+
+/**
  * Interruptible variant of poll().
  *
  * Waits for file descriptors I/O events, a timeout, a signal or a VLC I/O

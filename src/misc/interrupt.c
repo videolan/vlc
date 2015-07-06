@@ -258,6 +258,50 @@ int vlc_sem_wait_i11e(vlc_sem_t *sem)
     return vlc_interrupt_finish(ctx);
 }
 
+static void vlc_mwait_i11e_wake(void *opaque)
+{
+    vlc_cond_signal(opaque);
+}
+
+static void vlc_mwait_i11e_cleanup(void *opaque)
+{
+    vlc_interrupt_t *ctx = opaque;
+    vlc_cond_t *cond = ctx->data;
+
+    vlc_mutex_unlock(&ctx->lock);
+    vlc_interrupt_finish(ctx);
+    vlc_cond_destroy(cond);
+}
+
+int vlc_mwait_i11e(mtime_t deadline)
+{
+    vlc_interrupt_t *ctx = vlc_threadvar_get(vlc_interrupt_var);
+    if (ctx == NULL)
+        return mwait(deadline), 0;
+
+    vlc_cond_t wait;
+    vlc_cond_init(&wait);
+
+    int ret = vlc_interrupt_prepare(ctx, vlc_mwait_i11e_wake, &wait);
+    if (ret)
+    {
+        vlc_cond_destroy(&wait);
+        vlc_testcancel();
+        return ret;
+    }
+
+    vlc_mutex_lock(&ctx->lock);
+    vlc_cleanup_push(vlc_mwait_i11e_cleanup, ctx);
+    while (!ctx->interrupted
+        && vlc_cond_timedwait(&wait, &ctx->lock, deadline) == 0);
+    vlc_cleanup_pop();
+    vlc_mutex_unlock(&ctx->lock);
+
+    ret = vlc_interrupt_finish(ctx);
+    vlc_cond_destroy(&wait);
+    return ret;
+}
+
 #ifndef _WIN32
 static void vlc_poll_i11e_wake(void *opaque)
 {

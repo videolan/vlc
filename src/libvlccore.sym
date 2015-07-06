@@ -550,6 +550,7 @@ vlc_sendmsg_i11e
 vlc_sendto_i11e
 vlc_accept_i11e
 vlc_sem_wait_i11e
+vlc_mwait_i11e
 vlc_interrupt_create
 vlc_interrupt_destroy
 vlc_interrupt_set
