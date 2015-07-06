@@ -64,7 +64,7 @@ bool QVLCRegistry::RegistryValueExists( const char *path, const char *valueName 
     return temp;
 }
 
-void QVLCRegistry::WriteRegistryInt( const char *path, const char *valueName, int value )
+void QVLCRegistry::WriteRegistry( const char *path, const char *valueName, int value )
 {
     HKEY keyHandle;
 
@@ -77,7 +77,7 @@ void QVLCRegistry::WriteRegistryInt( const char *path, const char *valueName, in
     }
 }
 
-void QVLCRegistry::WriteRegistryString( const char *path, const char *valueName, const char *value )
+void QVLCRegistry::WriteRegistry( const char *path, const char *valueName, const char *value )
 {
     HKEY keyHandle;
 
@@ -90,7 +90,7 @@ void QVLCRegistry::WriteRegistryString( const char *path, const char *valueName,
     }
 }
 
-void QVLCRegistry::WriteRegistryDouble( const char *path, const char *valueName, double value )
+void QVLCRegistry::WriteRegistry( const char *path, const char *valueName, double value )
 {
     HKEY keyHandle;
     if( RegCreateKeyExA( m_RootKey, path, 0, NULL, REG_OPTION_NON_VOLATILE,
@@ -101,7 +101,7 @@ void QVLCRegistry::WriteRegistryDouble( const char *path, const char *valueName,
     }
 }
 
-int QVLCRegistry::ReadRegistryInt( const char *path, const char *valueName, int default_value ) {
+int QVLCRegistry::ReadRegistry( const char *path, const char *valueName, int default_value ) {
     HKEY keyHandle;
     int tempValue;
     DWORD size1;
@@ -124,7 +124,7 @@ int QVLCRegistry::ReadRegistryInt( const char *path, const char *valueName, int 
     return default_value;
 }
 
-char * QVLCRegistry::ReadRegistryString( const char *path, const char *valueName, const char *default_value )
+char * QVLCRegistry::ReadRegistry( const char *path, const char *valueName, const char *default_value )
 {
     HKEY keyHandle;
     char *tempValue = NULL;
@@ -153,7 +153,7 @@ char * QVLCRegistry::ReadRegistryString( const char *path, const char *valueName
     return tempValue == NULL ? strdup( default_value ) : tempValue2;
 }
 
-double QVLCRegistry::ReadRegistryDouble( const char *path, const char *valueName, double default_value )
+double QVLCRegistry::ReadRegistry( const char *path, const char *valueName, double default_value )
 {
     HKEY keyHandle;
     double tempValue;

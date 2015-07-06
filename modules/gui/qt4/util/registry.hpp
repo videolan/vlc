@@ -33,13 +33,13 @@ public:
     QVLCRegistry(HKEY rootKey);
     ~QVLCRegistry(void) {}
 
-    void WriteRegistryInt( const char *path, const char *valueName, int value);
-    void WriteRegistryString( const char *path, const char *valueName, const char *value);
-    void WriteRegistryDouble( const char *path, const char *valueName, double value);
+    void WriteRegistry( const char *path, const char *valueName, int value);
+    void WriteRegistry( const char *path, const char *valueName, const char *value);
+    void WriteRegistry( const char *path, const char *valueName, double value);
 
-    int ReadRegistryInt( const char *path, const char *valueName, int default_value);
-    char * ReadRegistryString( const char *path, const char *valueName, const char *default_value);
-    double ReadRegistryDouble( const char *path, const char *valueName, double default_value);
+    int ReadRegistry( const char *path, const char *valueName, int default_value);
+    char * ReadRegistry( const char *path, const char *valueName, const char *default_value);
+    double ReadRegistry( const char *path, const char *valueName, double default_value);
 
     bool RegistryKeyExists( const char *path);
     bool RegistryValueExists( const char *path, const char *valueName);

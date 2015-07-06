@@ -1216,7 +1216,7 @@ void SPrefsPanel::saveLang() {
     else
     {
         QVLCRegistry qvReg( HKEY_CURRENT_USER );
-        qvReg.WriteRegistryString( "Software\\VideoLAN\\VLC\\", "Lang", lang );
+        qvReg.WriteRegistry( "Software\\VideoLAN\\VLC\\", "Lang", lang );
     }
 }
 
@@ -1227,7 +1227,7 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
     const char* psz_VLC = "VLC";
     current = new QTreeWidgetItem( parent, QStringList( psz_ext ) );
 
-    if( strstr( qvReg->ReadRegistryString( psz_ext, "", "" ), psz_VLC ) )
+    if( strstr( qvReg->ReadRegistry( psz_ext, "", "" ), psz_VLC ) )
     {
         current->setCheckState( 0, Qt::Checked );
         b_temp = true;
@@ -1416,32 +1416,32 @@ void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
     QString s_path2 = s_path;
 
     /* Save a backup if already assigned */
-    char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
+    char *psz_value = qvReg->ReadRegistry( psz_ext, "", ""  );
 
     if( !EMPTY_STR(psz_value) && strcmp( qtu(s_path), psz_value ) )
-        qvReg->WriteRegistryString( psz_ext, "VLC.backup", psz_value );
+        qvReg->WriteRegistry( psz_ext, "VLC.backup", psz_value );
     free( psz_value );
 
     /* Put a "link" to VLC.EXT as default */
-    qvReg->WriteRegistryString( psz_ext, "", qtu( s_path ) );
+    qvReg->WriteRegistry( psz_ext, "", qtu( s_path ) );
 
     /* Create the needed Key if they weren't done in the installer */
     if( !qvReg->RegistryKeyExists( qtu( s_path ) ) )
     {
-        qvReg->WriteRegistryString( psz_ext, "", qtu( s_path ) );
-        qvReg->WriteRegistryString( qtu( s_path ), "", "Media file" );
-        qvReg->WriteRegistryString( qtu( s_path.append( "\\shell" ) ), "", "Play" );
+        qvReg->WriteRegistry( psz_ext, "", qtu( s_path ) );
+        qvReg->WriteRegistry( qtu( s_path ), "", "Media file" );
+        qvReg->WriteRegistry( qtu( s_path.append( "\\shell" ) ), "", "Play" );
 
         /* Get the installer path */
         QVLCRegistry qvReg2( HKEY_LOCAL_MACHINE );
-        QString str_temp = qvReg2.ReadRegistryString( "Software\\VideoLAN\\VLC", "", "" );
+        QString str_temp = qvReg2.ReadRegistry( "Software\\VideoLAN\\VLC", "", "" );
 
         if( str_temp.size() )
         {
-            qvReg->WriteRegistryString( qtu( s_path.append( "\\Play\\command" ) ),
+            qvReg->WriteRegistry( qtu( s_path.append( "\\Play\\command" ) ),
                 "", qtu( str_temp.append(" --started-from-file \"%1\"" ) ) );
 
-            qvReg->WriteRegistryString( qtu( s_path2.append( "\\DefaultIcon" ) ),
+            qvReg->WriteRegistry( qtu( s_path2.append( "\\DefaultIcon" ) ),
                         "", qtu( str_temp.append(",0") ) );
         }
     }
@@ -1450,14 +1450,14 @@ void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
 void delAsso( QVLCRegistry *qvReg, const char *psz_ext )
 {
     QString s_path( "VLC"); s_path += psz_ext;
-    char *psz_value = qvReg->ReadRegistryString( psz_ext, "", "" );
+    char *psz_value = qvReg->ReadRegistry( psz_ext, "", "" );
 
     if( psz_value && !strcmp( qtu(s_path), psz_value ) )
     {
         free( psz_value );
-        psz_value = qvReg->ReadRegistryString( psz_ext, "VLC.backup", "" );
+        psz_value = qvReg->ReadRegistry( psz_ext, "VLC.backup", "" );
         if( psz_value )
-            qvReg->WriteRegistryString( psz_ext, "", psz_value );
+            qvReg->WriteRegistry( psz_ext, "", psz_value );
 
         qvReg->DeleteValue( psz_ext, "VLC.backup" );
     }
