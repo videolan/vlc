@@ -1886,7 +1886,7 @@ static int Demux( demux_t *p_demux )
             else
                 i_pts = VLC_TS_INVALID;
 #if 0
-            msg_Dbg( p_demux, "Read() stream: %i, size: %i, PTS: %"PRId64,
+            msg_Dbg( p_demux, "Read() stream: %i, size: %i, PTS: %" PRId64,
                      i_stream, i_data_size, i_pts );
 #endif
 

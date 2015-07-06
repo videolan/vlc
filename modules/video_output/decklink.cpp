@@ -652,7 +652,7 @@ static void DisplayVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
         picture->date, length, CLOCK_FREQ);
 
     if (result != S_OK) {
-        msg_Err(vd, "Dropped Video frame %"PRId64 ": 0x%x",
+        msg_Err(vd, "Dropped Video frame %" PRId64 ": 0x%x",
             picture->date, result);
         goto end;
     }
@@ -666,7 +666,7 @@ static void DisplayVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
     if ((now - decklink_now) > 400000) {
         /* XXX: workaround card clock drift */
         decklink_sys->offset += 50000;
-        msg_Err(vd, "Delaying: offset now %"PRId64"", decklink_sys->offset);
+        msg_Err(vd, "Delaying: offset now %" PRId64, decklink_sys->offset);
     }
 
 end:

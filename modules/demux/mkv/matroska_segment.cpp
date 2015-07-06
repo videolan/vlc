@@ -224,7 +224,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             ep->Up();
 
 #if 0
-            msg_Dbg( &sys.demuxer, " * added time=%"PRId64" pos=%"PRId64
+            msg_Dbg( &sys.demuxer, " * added time=%" PRId64 " pos=%" PRId64
                      " track=%d bnum=%d", idx.i_time, idx.i_position,
                      idx.i_track, idx.i_block_number );
 #endif

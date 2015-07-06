@@ -614,7 +614,7 @@ bool virtual_chapter_c::Leave( bool b_do_subs )
 #ifdef MKV_DEBUG
 void virtual_chapter_c::print()
 {
-    msg_Dbg( &p_segment->sys.demuxer, "*** chapter %"PRId64" - %"PRId64" (%u)",
+    msg_Dbg( &p_segment->sys.demuxer, "*** chapter %" PRId64 " - %" PRId64 " (%u)",
              i_mk_virtual_start_time, i_mk_virtual_stop_time, sub_chapters.size() );
     for( size_t i = 0; i < sub_chapters.size(); i++ )
         sub_chapters[i]->print();
