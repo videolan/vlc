@@ -334,7 +334,7 @@ static int vlc_poll_i11e_inner(struct pollfd *restrict fds, unsigned nfds,
     int canc;
 
     /* TODO: cache this */
-# if defined (HAVE_SYS_EVENTFD_H) && defined (EFD_CLOEXEC)
+# if defined (HAVE_EVENTFD) && defined (EFD_CLOEXEC)
     canc = vlc_savecancel();
     fd[0] = eventfd(0, EFD_CLOEXEC);
     vlc_restorecancel(canc);
