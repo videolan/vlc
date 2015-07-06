@@ -59,13 +59,13 @@ StreamType Stream::mimeToType(const std::string &mime)
 {
     StreamType mimetype;
     if (!mime.compare(0, 6, "video/"))
-        mimetype = StreamType::VIDEO;
+        mimetype = VIDEO;
     else if (!mime.compare(0, 6, "audio/"))
-        mimetype = StreamType::AUDIO;
+        mimetype = AUDIO;
     else if (!mime.compare(0, 12, "application/"))
-        mimetype = StreamType::APPLICATION;
+        mimetype = APPLICATION;
     else /* unknown of unsupported */
-        mimetype = StreamType::UNKNOWN;
+        mimetype = UNKNOWN;
     return mimetype;
 }
 
