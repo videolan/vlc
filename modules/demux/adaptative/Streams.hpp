@@ -61,13 +61,13 @@ namespace adaptative
     class Stream
     {
     public:
-        Stream(const StreamType, const StreamFormat &);
+        Stream(demux_t *, const StreamType, const StreamFormat &);
         ~Stream();
         bool operator==(const Stream &) const;
         static StreamType mimeToType(const std::string &mime);
-        void create(demux_t *, AbstractAdaptationLogic *,
-                    SegmentTracker *, const AbstractStreamOutputFactory *);
-        void updateFormat(demux_t *, StreamFormat &, const AbstractStreamOutputFactory *);
+        void create(AbstractAdaptationLogic *, SegmentTracker *,
+                    const AbstractStreamOutputFactory *);
+        void updateFormat(StreamFormat &);
         bool isEOF() const;
         mtime_t getPCR() const;
         mtime_t getFirstDTS() const;
@@ -82,8 +82,8 @@ namespace adaptative
 
     private:
         SegmentChunk *getChunk();
-        void init(const StreamType, const StreamFormat &);
         size_t read(HTTPConnectionManager *);
+        demux_t *p_demux;
         StreamType type;
         StreamFormat format;
         AbstractStreamOutput *output;
@@ -91,14 +91,17 @@ namespace adaptative
         SegmentTracker *segmentTracker;
         SegmentChunk *currentChunk;
         bool eof;
+
+        const AbstractStreamOutputFactory *streamOutputFactory;
     };
 
     class AbstractStreamOutput
     {
     public:
-        AbstractStreamOutput(demux_t *);
+        AbstractStreamOutput(demux_t *, const StreamFormat &);
         virtual ~AbstractStreamOutput();
 
+        const StreamFormat & getStreamFormat() const;
         virtual void pushBlock(block_t *) = 0;
         virtual mtime_t getPCR() const;
         virtual mtime_t getFirstDTS() const = 0;
@@ -114,6 +117,9 @@ namespace adaptative
         demux_t  *realdemux;
         mtime_t   pcr;
         int       group;
+
+    private:
+        StreamFormat format;
     };
 
     class AbstractStreamOutputFactory
@@ -126,7 +132,7 @@ namespace adaptative
     class BaseStreamOutput : public AbstractStreamOutput
     {
     public:
-        BaseStreamOutput(demux_t *, const std::string &);
+        BaseStreamOutput(demux_t *, const StreamFormat &, const std::string &);
         virtual ~BaseStreamOutput();
         virtual void pushBlock(block_t *); /* reimpl */
         virtual mtime_t getFirstDTS() const; /* reimpl */

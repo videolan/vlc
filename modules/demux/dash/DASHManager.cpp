@@ -50,10 +50,10 @@ AbstractStreamOutput *DASHStreamOutputFactory::create(demux_t *demux, const Stre
     switch(fmt)
     {
         case DASHStreamFormat::MP4:
-            return new BaseStreamOutput(demux, "mp4");
+            return new BaseStreamOutput(demux, format, "mp4");
 
         case DASHStreamFormat::MPEG2TS:
-            return new BaseStreamOutput(demux, "ts");
+            return new BaseStreamOutput(demux, format, "ts");
     }
     return NULL;
 }

@@ -40,3 +40,8 @@ bool StreamFormat::operator ==(const StreamFormat &other) const
 {
     return formatid == other.formatid;
 }
+
+bool StreamFormat::operator !=(const StreamFormat &other) const
+{
+    return formatid != other.formatid;
+}

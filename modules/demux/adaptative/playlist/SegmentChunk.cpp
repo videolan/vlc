@@ -19,9 +19,11 @@
  *****************************************************************************/
 #include "SegmentChunk.hpp"
 #include "Segment.h"
+#include "BaseRepresentation.h"
 #include <cassert>
 
 using namespace adaptative::playlist;
+using namespace adaptative;
 
 SegmentChunk::SegmentChunk(ISegment *segment_, const std::string &url) :
     Chunk(url)
@@ -45,4 +47,12 @@ void SegmentChunk::setRepresentation(BaseRepresentation *rep_)
 void SegmentChunk::onDownload(block_t **pp_block)
 {
     segment->onChunkDownload(pp_block, this, rep);
+}
+
+StreamFormat SegmentChunk::getStreamFormat() const
+{
+    if(rep)
+        return rep->getStreamFormat();
+    else
+        return StreamFormat();
 }

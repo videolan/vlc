@@ -45,7 +45,10 @@ Representation::~Representation ()
 
 StreamFormat Representation::getStreamFormat() const
 {
-    return StreamFormat(HLSStreamFormat::MPEG2TS);
+    if(getMimeType().empty())
+        return StreamFormat(HLSStreamFormat::UNKNOWN);
+    else
+        return HLSStreamFormat::mimeToFormat(getMimeType());
 }
 
 bool Representation::isLive() const

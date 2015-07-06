@@ -31,13 +31,9 @@ using namespace adaptative;
 using namespace adaptative::http;
 using namespace adaptative::logic;
 
-Stream::Stream(const StreamType type, const StreamFormat &format)
+Stream::Stream(demux_t * demux_,const StreamType type_, const StreamFormat &format_)
 {
-    init(type, format);
-}
-
-void Stream::init(const StreamType type_, const StreamFormat &format_)
-{
+    p_demux = demux_;
     type = type_;
     format = format_;
     output = NULL;
@@ -45,6 +41,7 @@ void Stream::init(const StreamType type_, const StreamFormat &format_)
     currentChunk = NULL;
     eof = false;
     segmentTracker = NULL;
+    streamOutputFactory = NULL;
 }
 
 Stream::~Stream()
@@ -69,22 +66,23 @@ StreamType Stream::mimeToType(const std::string &mime)
     return mimetype;
 }
 
-void Stream::create(demux_t *demux, AbstractAdaptationLogic *logic,
-                    SegmentTracker *tracker, const AbstractStreamOutputFactory *factory)
+void Stream::create(AbstractAdaptationLogic *logic, SegmentTracker *tracker,
+                    const AbstractStreamOutputFactory *factory)
 {
-    updateFormat(demux, format, factory);
     adaptationLogic = logic;
     segmentTracker = tracker;
+    streamOutputFactory = factory;
+    updateFormat(format);
 }
 
-void Stream::updateFormat(demux_t *demux, StreamFormat &newformat, const AbstractStreamOutputFactory *factory)
+void Stream::updateFormat(StreamFormat &newformat)
 {
     if( format == newformat && output )
         return;
 
     delete output;
     format = newformat;
-    output = factory->create(demux, format);
+    output = streamOutputFactory->create(p_demux, format);
     if(!output)
         throw VLC_EGENERIC;
 }
@@ -218,6 +216,13 @@ size_t Stream::read(HTTPConnectionManager *connManager)
         adaptationLogic->updateDownloadRate(block->i_buffer, time);
         chunk->onDownload(&block);
 
+        StreamFormat chunkStreamFormat = chunk->getStreamFormat();
+        if(output && chunkStreamFormat != output->getStreamFormat())
+        {
+            msg_Info(p_demux, "Changing stream format");
+            updateFormat(chunkStreamFormat);
+        }
+
         if (chunk->getBytesToRead() == 0)
         {
             chunk->getConnection()->releaseChunk();
@@ -268,11 +273,17 @@ void Stream::prune()
     segmentTracker->pruneFromCurrent();
 }
 
-AbstractStreamOutput::AbstractStreamOutput(demux_t *demux)
+AbstractStreamOutput::AbstractStreamOutput(demux_t *demux, const StreamFormat &format_)
 {
     realdemux = demux;
     pcr = VLC_TS_0;
     group = 0;
+    format = format_;
+}
+
+const StreamFormat & AbstractStreamOutput::getStreamFormat() const
+{
+    return format;
 }
 
 AbstractStreamOutput::~AbstractStreamOutput()
@@ -289,8 +300,8 @@ int AbstractStreamOutput::getGroup() const
     return group;
 }
 
-BaseStreamOutput::BaseStreamOutput(demux_t *demux, const std::string &name) :
-    AbstractStreamOutput(demux)
+BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, const std::string &name) :
+    AbstractStreamOutput(demux, format)
 {
     this->name = name;
     seekable = true;

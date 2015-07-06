@@ -32,6 +32,7 @@ namespace adaptative
             ~StreamFormat();
             operator unsigned() const;
             bool operator==(const StreamFormat &) const;
+            bool operator!=(const StreamFormat &) const;
 
         private:
             unsigned formatid;

@@ -75,7 +75,7 @@ bool PlaylistManager::start(demux_t *demux)
         const BaseAdaptationSet *set = period->getAdaptationSet(type);
         if(set)
         {
-            streams[type] = new (std::nothrow) Stream(type, set->getStreamFormat());
+            streams[type] = new (std::nothrow) Stream(demux, type, set->getStreamFormat());
             if(!streams[type])
                 continue;
             AbstractAdaptationLogic *logic = createLogic(logicType);
@@ -91,7 +91,7 @@ bool PlaylistManager::start(demux_t *demux)
             {
                 if(!tracker || !streamOutputFactory)
                     throw VLC_ENOMEM;
-                streams[type]->create(demux, logic, tracker, streamOutputFactory);
+                streams[type]->create(logic, tracker, streamOutputFactory);
             } catch (int) {
                 delete streams[type];
                 delete logic;

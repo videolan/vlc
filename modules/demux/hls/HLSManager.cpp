@@ -40,9 +40,14 @@ AbstractStreamOutput *HLSStreamOutputFactory::create(demux_t *demux, const Strea
     unsigned fmt = format;
     switch(fmt)
     {
+        case HLSStreamFormat::PACKEDAAC:
+            return new BaseStreamOutput(demux, format, "any");
+            break;
+
         default:
+        case HLSStreamFormat::UNKNOWN:
         case HLSStreamFormat::MPEG2TS:
-            return new BaseStreamOutput(demux, "ts");
+            return new BaseStreamOutput(demux, format, "ts");
     }
     return NULL;
 }

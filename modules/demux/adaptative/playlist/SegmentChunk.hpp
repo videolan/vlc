@@ -23,6 +23,7 @@
 #include <string>
 #include "ICanonicalUrl.hpp"
 #include "../http/Chunk.h"
+#include "../StreamFormat.hpp"
 
 namespace adaptative
 {
@@ -40,6 +41,7 @@ namespace adaptative
             virtual ~SegmentChunk();
             void setRepresentation(BaseRepresentation *);
             virtual void onDownload(block_t **); // reimpl
+            StreamFormat getStreamFormat() const;
 
         protected:
             ISegment *segment;
