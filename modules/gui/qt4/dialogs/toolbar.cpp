@@ -888,6 +888,8 @@ bool DroppingController::eventFilter( QObject *obj, QEvent *event )
             /* Start the effective drag */
             drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::MoveAction);
             b_draging = false;
+
+            delete dI;
             }
             return true;
 
