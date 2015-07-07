@@ -807,7 +807,8 @@ static void* update_request_thread( void *obj )
                 break;
             }
         }
-        vlc_cleanup_run();
+        vlc_cleanup_pop();
+        p_filter->p_sys->b_continue = false;
     }
     else
     {

@@ -169,7 +169,12 @@ static void *Thread (void *data)
                 break;
             }
         }
-        vlc_cleanup_run (); /* free (buf) */
+        vlc_cleanup_pop ();
+#ifdef HAVE_VMSPLICE
+        munmap (buf, bufsize);
+#else
+        free (buf);
+#endif
     }
     while (!error);
 

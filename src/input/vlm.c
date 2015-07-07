@@ -412,7 +412,8 @@ static void* Manage( void* p_object )
                 vlc_cond_wait( &vlm->wait_manage, &vlm->lock_manage );
         }
         vlm->input_state_changed = false;
-        vlc_cleanup_run( );
+        vlc_cleanup_pop( );
+        vlc_mutex_unlock( &vlm->lock_manage );
 
         int canc = vlc_savecancel ();
         /* destroy the inputs that wants to die, and launch the next input */

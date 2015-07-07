@@ -336,7 +336,8 @@ static void *FinderThread( void *p_data )
         }
         psz_uri = p_manager->p_priv->finder.uris.p_elems[0];
         ARRAY_REMOVE( p_manager->p_priv->finder.uris, 0 );
-        vlc_cleanup_run();
+        vlc_cleanup_pop();
+        vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
 
         addons_finder_t *p_finder =
                 vlc_custom_create( p_manager->p_priv->p_parent, sizeof( *p_finder ), "entries finder" );

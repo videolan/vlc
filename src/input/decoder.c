@@ -1435,7 +1435,8 @@ static void *DecoderThread( void *p_data )
         }
 
         p_block = vlc_fifo_DequeueUnlocked( p_owner->p_fifo );
-        vlc_cleanup_run();
+        vlc_cleanup_pop();
+        vlc_fifo_Unlock( p_owner->p_fifo );
 
         int canc = vlc_savecancel();
         DecoderProcess( p_dec, p_block );

@@ -457,7 +457,8 @@ VLC_API void vlc_cond_broadcast(vlc_cond_t *);
 
    // -- foobar is now true, do something about it here --
 
-   vlc_cleanup_run(); // release the mutex
+   vlc_cleanup_pop();
+   vlc_mutex_unlock(&lock);
   @endcode
  *
  * \note This function is a cancellation point. In case of thread cancellation,

@@ -323,11 +323,11 @@ int vlc_cond_timedwait (vlc_cond_t *condvar, vlc_mutex_t *p_mutex,
 /* pthread */
 static void clean_detached_thread(void *data)
 {
-    struct vlc_thread *thread = data;
+    struct vlc_thread *th = data;
 
     /* release thread handle */
-    vlc_mutex_destroy(&thread->lock);
-    free(thread);
+    vlc_mutex_destroy(&th->lock);
+    free(th);
 }
 
 static void *detached_thread(void *data)
@@ -336,9 +336,11 @@ static void *detached_thread(void *data)
 
     thread = th;
 
-    vlc_cleanup_push(clean_detached_thread, data);
+    vlc_cleanup_push(clean_detached_thread, th);
     th->entry(th->data);
-    vlc_cleanup_run();
+    vlc_cleanup_pop();
+    vlc_mutex_destroy(&th->lock);
+    free(th);
 
     return NULL;
 }
@@ -358,7 +360,8 @@ static void *joinable_thread(void *data)
     vlc_cleanup_push(finish_joinable_thread, th);
     thread = th;
     ret = th->entry(th->data);
-    vlc_cleanup_run();
+    vlc_cleanup_pop();
+    vlc_sem_post(&th->finished);
 
     return ret;
 }
@@ -531,7 +534,8 @@ void mwait (mtime_t deadline)
     vlc_mutex_lock (&lock);
     mutex_cleanup_push (&lock);
     while (!vlc_cond_timedwait (&wait, &lock, deadline));
-    vlc_cleanup_run ();
+    vlc_cleanup_pop ();
+    vlc_mutex_unlock (&lock);
 
     vlc_cond_destroy (&wait);
     vlc_mutex_destroy (&lock);

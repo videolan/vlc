@@ -428,7 +428,8 @@ static void* Run( void *data )
         vlc_mutex_lock( &p_ext->p_sys->command_lock );
     }
 
-    vlc_cleanup_run( );
+    vlc_cleanup_pop( );
+    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
     msg_Dbg( p_mgr, "Extension thread end: '%s'", p_ext->psz_title );
 
     // Note: At this point, the extension should be deactivated

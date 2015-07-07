@@ -1011,7 +1011,8 @@ static void *TsRun( void *p_data )
         }
         i_deadline = cmd.i_date + p_ts->i_cmd_delay + p_ts->i_rate_delay + p_ts->i_buffering_delay;
 
-        vlc_cleanup_run();
+        vlc_cleanup_pop();
+        vlc_mutex_unlock( &p_ts->lock );
 
         /* Regulate the speed of command processing to the same one than
          * reading  */
