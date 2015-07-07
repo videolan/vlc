@@ -1352,6 +1352,7 @@ static void EsOutProgramUpdateScrambled( es_out_t *p_out, es_out_pgrm_t *p_pgrm 
         input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Scrambled"), _("Yes") );
     else
         input_Control( p_input, INPUT_DEL_INFO, psz_cat, _("Scrambled") );
+    free( psz_cat );
 
     input_SendEventProgramScrambled( p_input, p_pgrm->i_id, b_scrambled );
 }
