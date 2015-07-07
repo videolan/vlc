@@ -162,10 +162,8 @@ static void cancelDoAcoustIdWebRequest( void *p_arg )
     struct webrequest_t *p_request = (struct webrequest_t *) p_arg;
     if ( p_request->p_stream )
         stream_Delete( p_request->p_stream );
-    if ( p_request->psz_url )
-        free( p_request->psz_url );
-    if ( p_request->p_buffer )
-        free( p_request->p_buffer );
+    free( p_request->psz_url );
+    free( p_request->p_buffer );
 }
 
 int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
