@@ -92,7 +92,7 @@ export OSX_VERSION
 export SDKROOT
 export PATH="${vlcroot}/extras/tools/build/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin"
 
-TRIPLET=$ARCH-apple-darwin10
+TRIPLET=$ARCH-apple-darwin11
 
 
 #
