@@ -346,8 +346,8 @@ static void* Raw1394EventThread( void *obj )
         }
     }
 
-    vlc_cleanup_run();
-    return NULL;
+    vlc_cleanup_pop();
+    vlc_assert_unreachable();
 }
 
 static enum raw1394_iso_disposition
