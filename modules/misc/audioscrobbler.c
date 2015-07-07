@@ -685,7 +685,7 @@ static void *Run(void *data)
     bool                    b_handshaked = false;
 
     /* data about audioscrobbler session */
-    mtime_t                 next_exchange = -1; /**< when can we send data  */
+    mtime_t                 next_exchange = 0; /**< when can we send data  */
     unsigned int            i_interval = 0;     /**< waiting interval (secs)*/
 
     intf_sys_t *p_sys = p_intf->p_sys;
@@ -694,14 +694,16 @@ static void *Run(void *data)
     for (;;)
     {
         vlc_restorecancel(canc);
+        mwait(next_exchange);
+
         vlc_mutex_lock(&p_sys->lock);
         mutex_cleanup_push(&p_sys->lock);
 
-        do
+        while (p_sys->i_songs == 0)
             vlc_cond_wait(&p_sys->wait, &p_sys->lock);
-        while (mdate() < next_exchange);
 
-        vlc_cleanup_run();
+        vlc_cleanup_pop();
+        vlc_mutex_unlock(&p_sys->lock);
         canc = vlc_savecancel();
 
         /* handshake if needed */
@@ -727,7 +729,7 @@ static void *Run(void *data)
                     msg_Dbg(p_intf, "Handshake successful :)");
                     b_handshaked = true;
                     i_interval = 0;
-                    next_exchange = mdate();
+                    next_exchange = 0;
                     break;
 
                 case VLC_AUDIOSCROBBLER_EFATAL:
@@ -870,7 +872,7 @@ static void *Run(void *data)
                 DeleteSong(&p_sys->p_queue[i]);
             p_sys->i_songs = 0;
             i_interval = 0;
-            next_exchange = mdate();
+            next_exchange = 0;
             msg_Dbg(p_intf, "Submission successful!");
         }
         else
