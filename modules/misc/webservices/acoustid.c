@@ -150,50 +150,31 @@ error:
     return false;
 }
 
-struct webrequest_t
-{
-    stream_t *p_stream;
-    char *psz_url;
-    char *p_buffer;
-};
-
-static void cancelDoAcoustIdWebRequest( void *p_arg )
-{
-    struct webrequest_t *p_request = (struct webrequest_t *) p_arg;
-    if ( p_request->p_stream )
-        stream_Delete( p_request->p_stream );
-    free( p_request->psz_url );
-    free( p_request->p_buffer );
-}
-
 int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
 {
-    int i_ret;
-    int i_status;
-    struct webrequest_t request = { NULL, NULL, NULL };
-
     if ( !p_data->psz_fingerprint ) return VLC_SUCCESS;
 
-    i_ret = asprintf( & request.psz_url,
-              "http://fingerprint.videolan.org/acoustid.php?meta=recordings+tracks+usermeta+releases&duration=%d&fingerprint=%s",
-              p_data->i_duration, p_data->psz_fingerprint );
-    if ( i_ret < 1 ) return VLC_EGENERIC;
+    char *psz_url;
+    if( unlikely(asprintf( &psz_url, "http://fingerprint.videolan.org/"
+                           "acoustid.php?meta=recordings+tracks+usermeta+"
+                           "releases&duration=%d&fingerprint=%s",
+                           p_data->i_duration, p_data->psz_fingerprint )) )
+         return VLC_EGENERIC;
 
-    vlc_cleanup_push( cancelDoAcoustIdWebRequest, &request );
-
-    msg_Dbg( p_obj, "Querying AcoustID from %s", request.psz_url );
+    msg_Dbg( p_obj, "Querying AcoustID from %s", psz_url );
     int i_saved_flags = p_obj->i_flags;
     p_obj->i_flags |= OBJECT_FLAGS_NOINTERACT;
-    request.p_stream = stream_UrlNew( p_obj, request.psz_url );
+
+    stream_t *p_stream = stream_UrlNew( p_obj, psz_url );
+
+    free( psz_url );
     p_obj->i_flags = i_saved_flags;
-    if ( !request.p_stream )
-    {
-        i_status = VLC_EGENERIC;
-        goto cleanup;
-    }
+    if ( p_stream == NULL )
+        return VLC_EGENERIC;
 
     /* read answer */
-    i_ret = 0;
+    char *p_buffer = NULL;
+    int i_ret = 0;
     for( ;; )
     {
         int i_read = 65536;
@@ -201,34 +182,26 @@ int DoAcoustIdWebRequest( vlc_object_t *p_obj, acoustid_fingerprint_t *p_data )
         if( i_ret >= INT_MAX - i_read )
             break;
 
-        request.p_buffer = realloc_or_free( request.p_buffer, 1 + i_ret + i_read );
-        if( !request.p_buffer )
+        p_buffer = realloc_or_free( p_buffer, 1 + i_ret + i_read );
+        if( unlikely(p_buffer == NULL) )
         {
-            i_status = VLC_ENOMEM;
-            goto cleanup;
+            stream_Delete( p_stream );
+            return VLC_ENOMEM;
         }
 
-        i_read = stream_Read( request.p_stream, &request.p_buffer[i_ret], i_read );
+        i_read = stream_Read( p_stream, &p_buffer[i_ret], i_read );
         if( i_read <= 0 )
             break;
 
         i_ret += i_read;
     }
-    stream_Delete( request.p_stream );
-    request.p_stream = NULL;
-    request.p_buffer[ i_ret ] = 0;
+    stream_Delete( p_stream );
+    p_buffer[i_ret] = 0;
 
-    int i_canc = vlc_savecancel();
-    if ( ParseJson( p_obj, request.p_buffer, & p_data->results ) )
-    {
+    if ( ParseJson( p_obj, p_buffer, & p_data->results ) )
         msg_Dbg( p_obj, "results count == %d", p_data->results.count );
-    } else {
+    else
         msg_Dbg( p_obj, "No results" );
-    }
-    vlc_restorecancel( i_canc );
-    i_status = VLC_SUCCESS;
 
-cleanup:
-    vlc_cleanup_run( );
-    return i_status;
+    return VLC_SUCCESS;
 }
