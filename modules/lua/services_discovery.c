@@ -25,6 +25,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
 
@@ -231,9 +232,8 @@ static void* Run( void *data )
 
         vlc_mutex_lock( &p_sys->lock );
     }
-    vlc_cleanup_run();
-
-    return NULL;
+    vlc_cleanup_pop();
+    vlc_assert_unreachable();
 }
 
 /*****************************************************************************
