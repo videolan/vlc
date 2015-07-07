@@ -48,10 +48,36 @@ static void Close( vlc_object_t * );
 static void Stop( audio_output_t * );
 static int Start( audio_output_t *, audio_sample_format_t * );
 
+/* There is an undefined behavior when configuring AudioTrack with SPDIF or
+ * more than 2 channels when there is no HDMI out. It may succeed and the
+ * Android ressampler will be used to downmix to stereo. It may fails cleanly,
+ * and this module will be able to recover and fallback to stereo. Finally, in
+ * some rare cases, it may crash during init or while ressampling. Because of
+ * the last case we don't try up to 8 channels and we use AT_DEV_STEREO device
+ * per default */
+enum at_dev {
+    AT_DEV_STEREO = 0,
+    AT_DEV_HDMI,
+};
+#define AT_DEV_DEFAULT AT_DEV_STEREO
+#define AT_DEV_MAX_CHANNELS 8
+
+static const struct {
+    const char *id;
+    const char *name;
+    enum at_dev at_dev;
+} at_devs[] = {
+    { "stereo", "Up to 2 channels (compat mode).", AT_DEV_STEREO },
+    { "hdmi", "Up to 8 channels, SPDIF if available.", AT_DEV_HDMI },
+    {  NULL, NULL, AT_DEV_DEFAULT },
+};
+
 struct aout_sys_t {
     /* sw gain */
     float soft_gain;
     bool soft_mute;
+
+    enum at_dev at_dev;
 
     jobject p_audiotrack; /* AudioTrack ref */
     jbyteArray p_bytearray; /* ByteArray ref (for Write) */
@@ -119,11 +145,6 @@ struct aout_sys_t {
  * will be done by VLC */
 #define AUDIOTRACK_NATIVE_SAMPLERATE
 
-#define AUDIO_CHAN_TEXT N_("Audio output channels")
-#define AUDIO_CHAN_LONGTEXT N_("Channels available for audio output. " \
-    "If the input has more channels than the output, it will be down-mixed. " \
-    "This parameter is ignored when digital pass-through is active.")
-
 vlc_module_begin ()
     set_shortname( "AudioTrack" )
     set_description( N_( "Android AudioTrack audio output" ) )
@@ -132,8 +153,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_sw_gain()
     add_shortcut( "audiotrack" )
-    add_integer( "audiotrack-audio-channels", 2,
-                 AUDIO_CHAN_TEXT, AUDIO_CHAN_LONGTEXT, true)
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -876,8 +895,16 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     unsigned int i_rate;
     bool b_spdif;
 
-    b_spdif = var_InheritBool( p_aout, "spdif" );
-    i_max_channels = var_InheritInteger( p_aout, "audiotrack-audio-channels" );
+    if( p_sys->at_dev == AT_DEV_HDMI )
+    {
+        b_spdif = true;
+        i_max_channels = AT_DEV_MAX_CHANNELS;
+    }
+    else
+    {
+        b_spdif = var_InheritBool( p_aout, "spdif" );
+        i_max_channels = 2;
+    }
 
     if( !( env = GET_ENV() ) )
         return VLC_EGENERIC;
@@ -1465,6 +1492,33 @@ Flush( audio_output_t *p_aout, bool b_wait )
     CHECK_AT_EXCEPTION( "play" );
 }
 
+static int DeviceSelect(audio_output_t *p_aout, const char *p_id)
+{
+    aout_sys_t *p_sys = p_aout->sys;
+    enum at_dev at_dev = AT_DEV_DEFAULT;
+
+    if( p_id )
+    {
+        for( unsigned int i = 0; at_devs[i].id; ++i )
+        {
+            if( !strcmp( p_id, at_devs[i].id ) )
+            {
+                at_dev = at_devs[i].at_dev;
+                break;
+            }
+        }
+    }
+
+    if( at_dev != p_sys->at_dev )
+    {
+        p_sys->at_dev = at_dev;
+        aout_RestartRequest( p_aout, AOUT_RESTART_OUTPUT );
+        msg_Dbg(p_aout, "selected audiotrack device: %s", p_id);
+    }
+    aout_DeviceReport( p_aout, p_id );
+    return VLC_SUCCESS;
+}
+
 static int
 Open( vlc_object_t *obj )
 {
@@ -1480,6 +1534,8 @@ Open( vlc_object_t *obj )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
+    p_sys->at_dev = AT_DEV_DEFAULT;
+
     p_aout->sys = p_sys;
     p_aout->start = Start;
     p_aout->stop = Stop;
@@ -1487,6 +1543,10 @@ Open( vlc_object_t *obj )
     p_aout->pause = Pause;
     p_aout->flush = Flush;
     p_aout->time_get = TimeGet;
+    p_aout->device_select = DeviceSelect;
+
+    for( unsigned int i = 0; at_devs[i].id; ++i )
+        aout_HotplugReport(p_aout, at_devs[i].id, at_devs[i].name);
 
     aout_SoftVolumeInit( p_aout );
 
