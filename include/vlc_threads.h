@@ -659,7 +659,7 @@ VLC_API void vlc_restorecancel(int state);
  * Internal handler for thread cancellation.
  *
  * Do not call this function directly. Use wrapper macros instead:
- * vlc_cleanup_push(), vlc_cleanup_pop(), vlc_cleanup_run().
+ * vlc_cleanup_push(), vlc_cleanup_pop().
  */
 VLC_API void vlc_control_cancel(int cmd, ...);
 
@@ -830,7 +830,7 @@ VLC_API unsigned vlc_GetCPUCount(void);
  * they are handled in last-in first-out order.
  *
  * \note Any call to vlc_cleanup_push() <b>must</b> paired with a call to
- * either vlc_cleanup_pop() or vlc_cleanup_run().
+ * vlc_cleanup_pop().
  * \warning Branching into or out of the block between these two function calls
  * is not allowed (read: it will likely crash the whole process).
  *
@@ -846,14 +846,6 @@ VLC_API unsigned vlc_GetCPUCount(void);
  * vlc_cleanup_push() in the calling thread.
  */
 # define vlc_cleanup_pop( ) pthread_cleanup_pop (0)
-
-/**
- * Unregisters a cancellation handler and run it.
- *
- * This pops the last cancellation handler (like vlc_cleanup_pop()), but
- * additionally executes it.
- */
-# define vlc_cleanup_run( ) pthread_cleanup_pop (1)
 
 #else
 enum
@@ -880,11 +872,6 @@ struct vlc_cleanup_t
 
 # define vlc_cleanup_pop( ) \
         vlc_control_cancel (VLC_CLEANUP_POP); \
-    } while (0)
-
-# define vlc_cleanup_run( ) \
-        vlc_control_cancel (VLC_CLEANUP_POP); \
-        vlc_cleanup_data.proc (vlc_cleanup_data.data); \
     } while (0)
 
 #endif /* !LIBVLC_USE_PTHREAD_CLEANUP */
