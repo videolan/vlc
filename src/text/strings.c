@@ -312,10 +312,6 @@ char *convert_xml_special_chars (const char *str)
             return NULL;
         }
 
-        if ((cp & ~0x0080) < 32 /* C0/C1 control codes */
-         && memchr ("\x09\x0A\x0D\x85", cp, 4) == NULL)
-            ptr += sprintf (ptr, "&#%"PRIu32";", cp);
-        else
         switch (cp)
         {
             case '\"': strcpy (ptr, "&quot;"); ptr += 6; break;
@@ -323,7 +319,22 @@ char *convert_xml_special_chars (const char *str)
             case '\'': strcpy (ptr, "&#39;");  ptr += 5; break;
             case '<':  strcpy (ptr, "&lt;");   ptr += 4; break;
             case '>':  strcpy (ptr, "&gt;");   ptr += 4; break;
-            default:   memcpy (ptr, str, n);   ptr += n; break;
+            default:
+                if (cp < 32) /* C0 code not allowed (except 9, 10 and 13) */
+                    break;
+                if (cp >= 128 && cp < 160) /* C1 code encoded (except 133) */
+                {
+                    ptr += sprintf (ptr, "&#%"PRIu32";", cp);
+                    break;
+                }
+                /* fall through */
+            case 9:
+            case 10:
+            case 13:
+            case 133:
+                memcpy (ptr, str, n);
+                ptr += n;
+                break;
         }
         str += n;
     }
