@@ -56,7 +56,6 @@ struct fingerprinter_sys_t
     } processing;
 
     /* clobberable by cleanups */
-    int                     i_cancel_state;
     int                     i;
 };
 
