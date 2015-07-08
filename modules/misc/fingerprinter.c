@@ -336,13 +336,6 @@ static void fill_metas_with_results( fingerprint_request_t *p_r, acoustid_finger
 /*****************************************************************************
  * Run :
  *****************************************************************************/
-static void cancelRun( void * p_arg )
-{
-    fingerprinter_sys_t *p_sys = ( fingerprinter_sys_t * ) p_arg;
-    if ( vlc_array_count( p_sys->processing.queue ) )
-        vlc_array_clear( p_sys->processing.queue );
-}
-
 static void Run( fingerprinter_thread_t *p_fingerprinter )
 {
     fingerprinter_sys_t *p_sys = p_fingerprinter->p_sys;
@@ -359,7 +352,6 @@ static void Run( fingerprinter_thread_t *p_fingerprinter )
 
         vlc_mutex_lock( &p_sys->processing.lock ); // L0
         mutex_cleanup_push( &p_sys->processing.lock );
-        vlc_cleanup_push( cancelRun, p_sys ); // C1
 //**
         for ( p_sys->i = 0 ; p_sys->i < vlc_array_count( p_sys->processing.queue ); p_sys->i++ )
         {
@@ -405,7 +397,6 @@ static void Run( fingerprinter_thread_t *p_fingerprinter )
             var_TriggerCallback( p_fingerprinter, "results-available" );
             vlc_array_clear( p_sys->processing.queue );
         }
-        vlc_cleanup_pop( ); // C1
 //**
         vlc_cleanup_run(); // L0
     }
