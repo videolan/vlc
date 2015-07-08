@@ -343,8 +343,7 @@ static void cancelRun( void * p_arg )
     fingerprinter_sys_t *p_sys = ( fingerprinter_sys_t * ) p_arg;
     if ( vlc_array_count( p_sys->processing.queue ) )
         vlc_array_clear( p_sys->processing.queue );
-    if ( p_sys->psz_uri )
-        free( p_sys->psz_uri );
+    free( p_sys->psz_uri );
 }
 
 static void clearPrint( void * p_arg )
@@ -354,8 +353,7 @@ static void clearPrint( void * p_arg )
         free_acoustid_result_t( &acoustid_print->results.p_results[j] );
     if ( acoustid_print->results.count )
         free( acoustid_print->results.p_results );
-    if ( acoustid_print->psz_fingerprint )
-        free( acoustid_print->psz_fingerprint );
+    free( acoustid_print->psz_fingerprint );
 }
 
 static void Run( fingerprinter_thread_t *p_fingerprinter )
