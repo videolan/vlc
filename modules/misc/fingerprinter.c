@@ -21,6 +21,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
@@ -72,7 +74,7 @@ struct fingerprinter_sys_t
 
 static int  Open            (vlc_object_t *);
 static void Close           (vlc_object_t *);
-static void Run             (fingerprinter_thread_t *);
+static void *Run(void *);
 
 /*****************************************************************************
  * Module descriptor
@@ -256,16 +258,13 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init( &p_sys->condwait.lock );
     vlc_cond_init( &p_sys->condwait.wait );
 
-    p_fingerprinter->pf_run = Run;
     p_fingerprinter->pf_enqueue = EnqueueRequest;
     p_fingerprinter->pf_getresults = GetResult;
     p_fingerprinter->pf_apply = ApplyResult;
 
     var_Create( p_fingerprinter, "results-available", VLC_VAR_BOOL );
-    if( p_fingerprinter->pf_run
-     && vlc_clone( &p_sys->thread,
-                   (void *(*) (void *)) p_fingerprinter->pf_run,
-                   p_fingerprinter, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Run, p_fingerprinter,
+                   VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_fingerprinter, "cannot spawn fingerprinter thread" );
         goto error;
@@ -332,8 +331,9 @@ static void fill_metas_with_results( fingerprint_request_t *p_r, acoustid_finger
 /*****************************************************************************
  * Run :
  *****************************************************************************/
-static void Run( fingerprinter_thread_t *p_fingerprinter )
+static void *Run( void *opaque )
 {
+    fingerprinter_thread_t *p_fingerprinter = opaque;
     fingerprinter_sys_t *p_sys = p_fingerprinter->p_sys;
 
     /* main loop */
@@ -388,4 +388,5 @@ static void Run( fingerprinter_thread_t *p_fingerprinter )
             vlc_array_clear( p_sys->processing.queue );
         }
     }
+    vlc_assert_unreachable();
 }

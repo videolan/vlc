@@ -74,7 +74,6 @@ struct fingerprinter_thread_t
     fingerprinter_sys_t * p_sys;
 
     module_t *   p_module;
-    void ( *pf_run ) ( struct fingerprinter_thread_t * );
 
     void ( *pf_enqueue ) ( struct fingerprinter_thread_t *f, fingerprint_request_t *r );
     fingerprint_request_t * ( *pf_getresults ) ( struct fingerprinter_thread_t *f );
