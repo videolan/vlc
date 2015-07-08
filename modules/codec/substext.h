@@ -1,4 +1,5 @@
 #include <vlc_strings.h>
+#include <vlc_text_style.h>
 
 typedef struct
 {
@@ -6,21 +7,10 @@ typedef struct
     unsigned int i_value;
 } subpicture_updater_sys_option_t;
 
-typedef struct segment_t segment_t;
-
-struct segment_t
-{
-    char *psz_string;
-    unsigned int i_size;
-    segment_t *p_next;
-    /* styles applied to that segment */
-    text_style_t styles;
-};
-
 struct subpicture_updater_sys_t {
     char *text;
     char *html;
-    segment_t *p_htmlsegments;
+    text_segment_t *p_htmlsegments;
 
     int  align;
     int  x;
@@ -41,15 +31,6 @@ struct subpicture_updater_sys_t {
     int16_t i_drop_shadow;
     int16_t i_drop_shadow_alpha;
 };
-
-static void SegmentFree( segment_t *p_segment )
-{
-    if ( p_segment )
-    {
-        free( p_segment->psz_string );
-        free( p_segment );
-    }
-}
 
 static void MakeHtmlNewLines( char **ppsz_src )
 {
@@ -146,13 +127,13 @@ static void HtmlAppend( char **ppsz_dst, const char *psz_src,
         *ppsz_dst = psz_text;
 }
 
-static char *SegmentsToHtml( segment_t *p_head, const float f_scale )
+static char *SegmentsToHtml( text_segment_t *p_head, const float f_scale )
 {
     char *psz_dst = NULL;
     char *psz_ret = NULL;
     while( p_head )
     {
-        HtmlAppend( &psz_dst, p_head->psz_string, &p_head->styles, f_scale );
+        HtmlAppend( &psz_dst, p_head->psz_text, p_head->style, f_scale );
         p_head = p_head->p_next;
     }
     int i_ret = asprintf( &psz_ret, "<text>%s</text>", psz_dst );
@@ -280,9 +261,9 @@ static void SubpictureTextDestroy(subpicture_t *subpic)
     free(sys->html);
     while( sys->p_htmlsegments )
     {
-        segment_t *p_segment = sys->p_htmlsegments;
-        sys->p_htmlsegments = sys->p_htmlsegments->p_next;
-        SegmentFree( p_segment );
+        text_segment_t *p_segment = sys->p_htmlsegments;
+        sys->p_htmlsegments = p_segment->p_next;
+        text_segment_Delete( p_segment );
     }
     free(sys);
 }

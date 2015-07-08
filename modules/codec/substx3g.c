@@ -117,14 +117,14 @@ static char * str8indup( const char *psz_string, size_t i_skip, size_t n )
     return strndup( psz_string, psz_tmp - psz_string );
 }
 
-static void SegmentDoSplit( segment_t *p_segment, uint16_t i_start, uint16_t i_end,
-                            segment_t **pp_segment_left,
-                            segment_t **pp_segment_middle,
-                            segment_t **pp_segment_right )
+static void SegmentDoSplit( text_segment_t *p_segment, uint16_t i_start, uint16_t i_end,
+                            text_segment_t **pp_segment_left,
+                            text_segment_t **pp_segment_middle,
+                            text_segment_t **pp_segment_right )
 {
-    segment_t *p_segment_left = *pp_segment_left;
-    segment_t *p_segment_right = *pp_segment_right;
-    segment_t *p_segment_middle = *pp_segment_middle;
+    text_segment_t *p_segment_left = *pp_segment_left;
+    text_segment_t *p_segment_right = *pp_segment_right;
+    text_segment_t *p_segment_middle = *pp_segment_middle;
     p_segment_left = p_segment_middle = p_segment_right = NULL;
 
     if ( (p_segment->i_size - i_start < 1) || (p_segment->i_size - i_end < 1) )
@@ -132,26 +132,29 @@ static void SegmentDoSplit( segment_t *p_segment, uint16_t i_start, uint16_t i_e
 
     if ( i_start > 0 )
     {
-        p_segment_left = calloc( 1, sizeof(segment_t) );
+        char* psz_text = str8indup( p_segment->psz_text, 0, i_start );
+        p_segment_left = text_segment_New( psz_text );
+        free( psz_text );
         if ( !p_segment_left ) goto error;
-        memcpy( &p_segment_left->styles, &p_segment->styles, sizeof(text_style_t) );
-        p_segment_left->psz_string = str8indup( p_segment->psz_string, 0, i_start );
-        p_segment_left->i_size = str8len( p_segment_left->psz_string );
+        p_segment_left->style = text_style_Duplicate( p_segment->style );
+        p_segment_left->i_size = str8len( p_segment_left->psz_text );
     }
 
-    p_segment_middle = calloc( 1, sizeof(segment_t) );
+    char* psz_text = str8indup( p_segment->psz_text, i_start, i_end - i_start + 1 );
+    p_segment_middle = text_segment_New( psz_text );
+    free( psz_text );
     if ( !p_segment_middle ) goto error;
-    memcpy( &p_segment_middle->styles, &p_segment->styles, sizeof(text_style_t) );
-    p_segment_middle->psz_string = str8indup( p_segment->psz_string, i_start, i_end - i_start + 1 );
-    p_segment_middle->i_size = str8len( p_segment_middle->psz_string );
+    p_segment_middle->style = text_style_Duplicate( p_segment->style );
+    p_segment_middle->i_size = str8len( p_segment_middle->psz_text );
 
     if ( i_end < (p_segment->i_size - 1) )
     {
-        p_segment_right = calloc( 1, sizeof(segment_t) );
+        char* psz_text = str8indup( p_segment->psz_text, i_end + 1, p_segment->i_size - i_end - 1 );
+        p_segment_right = text_segment_New( psz_text );
+        free( psz_text );
         if ( !p_segment_right ) goto error;
-        memcpy( &p_segment_right->styles, &p_segment->styles, sizeof(text_style_t) );
-        p_segment_right->psz_string = str8indup( p_segment->psz_string, i_end + 1, p_segment->i_size - i_end - 1 );
-        p_segment_right->i_size = str8len( p_segment_right->psz_string );
+        p_segment_right->style = text_style_Duplicate( p_segment->style );
+        p_segment_right->i_size = str8len( p_segment_right->psz_text );
     }
 
     if ( p_segment_left ) p_segment_left->p_next = p_segment_middle;
@@ -164,16 +167,16 @@ static void SegmentDoSplit( segment_t *p_segment, uint16_t i_start, uint16_t i_e
     return;
 
 error:
-    SegmentFree( p_segment_left );
-    SegmentFree( p_segment_middle );
-    SegmentFree( p_segment_right );
+    text_segment_Delete( p_segment_left );
+    text_segment_Delete( p_segment_middle );
+    text_segment_Delete( p_segment_right );
 }
 
-static bool SegmentSplit( segment_t *p_prev, segment_t **pp_segment,
+static bool SegmentSplit( text_segment_t *p_prev, text_segment_t **pp_segment,
                           const uint16_t i_start, const uint16_t i_end,
                           const text_style_t *p_styles )
 {
-    segment_t *p_segment_left = NULL, *p_segment_middle = NULL, *p_segment_right = NULL;
+    text_segment_t *p_segment_left = NULL, *p_segment_middle = NULL, *p_segment_right = NULL;
 
     if ( (*pp_segment)->i_size == 0 ) return false;
     if ( i_start > i_end ) return false;
@@ -184,13 +187,13 @@ static bool SegmentSplit( segment_t *p_prev, segment_t **pp_segment,
     if ( !p_segment_middle )
     {
         /* Failed */
-        SegmentFree( p_segment_left );
-        SegmentFree( p_segment_right );
+        text_segment_Delete( p_segment_left );
+        text_segment_Delete( p_segment_right );
         return false;
     }
 
-    segment_t *p_next = (*pp_segment)->p_next;
-    SegmentFree( *pp_segment );
+    text_segment_t *p_next = (*pp_segment)->p_next;
+    text_segment_Delete( *pp_segment );
     *pp_segment = ( p_segment_left ) ? p_segment_left : p_segment_middle ;
     if ( p_prev ) p_prev->p_next = *pp_segment;
 
@@ -199,20 +202,21 @@ static bool SegmentSplit( segment_t *p_prev, segment_t **pp_segment,
     else
         p_segment_middle->p_next = p_next;
 
-    p_segment_middle->styles = *p_styles;
+    text_style_Delete( p_segment_middle->style );
+    p_segment_middle->style = text_style_Duplicate( p_styles );
 
     return true;
 }
 
 /* Creates a new segment using the given style and split existing ones according
    to the start & end offsets */
-static void ApplySegmentStyle( segment_t **pp_segment, const uint16_t i_absstart,
+static void ApplySegmentStyle( text_segment_t **pp_segment, const uint16_t i_absstart,
                                const uint16_t i_absend, const text_style_t *p_styles )
 {
     /* find the matching segment */
     uint16_t i_curstart = 0;
-    segment_t *p_prev = NULL;
-    segment_t *p_cur = *pp_segment;
+    text_segment_t *p_prev = NULL;
+    text_segment_t *p_cur = *pp_segment;
     while ( p_cur )
     {
         uint16_t i_curend = i_curstart + p_cur->i_size - 1;
@@ -278,26 +282,21 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     for( uint16_t i=0; i < i_psz_bytelength; i++ )
      if ( psz_subtitle[i] == '\r' ) psz_subtitle[i] = '\n';
 
-    segment_t *p_segment = calloc( 1, sizeof(segment_t) );
-    if ( !p_segment )
-    {
-        free( psz_subtitle );
-        return NULL;
-    }
-    p_segment->psz_string = strdup( psz_subtitle );
+    text_segment_t *p_segment = text_segment_New( psz_subtitle );
     p_segment->i_size = str8len( psz_subtitle );
     if ( p_dec->fmt_in.subs.p_style )
     {
-        p_segment->styles.i_font_color = p_dec->fmt_in.subs.p_style->i_font_color;
-        p_segment->styles.i_font_alpha = p_dec->fmt_in.subs.p_style->i_font_alpha;
+        p_segment->style = text_style_New();
+        p_segment->style->i_font_color = p_dec->fmt_in.subs.p_style->i_font_color;
+        p_segment->style->i_font_alpha = p_dec->fmt_in.subs.p_style->i_font_alpha;
         if ( p_dec->fmt_in.subs.p_style->i_style_flags )
-            p_segment->styles.i_style_flags = p_dec->fmt_in.subs.p_style->i_style_flags;
-        p_segment->styles.i_font_size = p_dec->fmt_in.subs.p_style->i_font_size;
+            p_segment->style->i_style_flags = p_dec->fmt_in.subs.p_style->i_style_flags;
+        p_segment->style->i_font_size = p_dec->fmt_in.subs.p_style->i_font_size;
     }
 
-    if ( !p_segment->psz_string )
+    if ( !p_segment->psz_text )
     {
-        SegmentFree( p_segment );
+        text_segment_Delete( p_segment );
         free( psz_subtitle );
         return NULL;
     }
@@ -307,7 +306,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( !p_spu )
     {
         free( psz_subtitle );
-        SegmentFree( p_segment );
+        text_segment_Delete( p_segment );
         return NULL;
     }
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;

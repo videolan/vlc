@@ -107,6 +107,8 @@ struct text_segment_t {
     char *psz_text;                   /**< text string of the segment */
     text_style_t *style;              /**< style applied to this segment */
     text_segment_t *p_next;           /**< next segment */
+
+    size_t i_size; //FIXME: substx3g specific
 };
 
 /**
