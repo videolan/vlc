@@ -55,11 +55,6 @@ struct fingerprinter_sys_t
         vlc_array_t         *queue;
     } processing;
 
-    /* tracked in sys for cancelability */
-    input_item_t            *p_item;
-    input_thread_t          *p_input;
-    chromaprint_fingerprint_t chroma_fingerprint;
-
     /* clobberable by cleanups */
     int                     i_cancel_state;
     int                     i;
@@ -132,30 +127,12 @@ static void ApplyResult( fingerprint_request_t *p_r, int i_resultid )
     vlc_mutex_unlock( &p_item->lock );
 }
 
-static void cancelDoFingerprint( void *p_arg )
+static void DoFingerprint( vlc_object_t *p_this, acoustid_fingerprint_t *fp,
+                           const char *psz_uri )
 {
-    fingerprinter_sys_t *p_sys = ( fingerprinter_sys_t * ) p_arg;
-    if ( p_sys->p_input )
-    {
-        input_Close( p_sys->p_input );
-    }
-    /* cleanup temporary result */
-    if ( p_sys->chroma_fingerprint.psz_fingerprint )
-        FREENULL( p_sys->chroma_fingerprint.psz_fingerprint );
-    if ( p_sys->p_item )
-        input_item_Release( p_sys->p_item );
-}
-
-static void DoFingerprint( vlc_object_t *p_this, fingerprinter_sys_t *p_sys,
-                           acoustid_fingerprint_t *fp, const char *psz_uri )
-{
-    p_sys->p_input = NULL;
-    p_sys->p_item = NULL;
-    p_sys->chroma_fingerprint.psz_fingerprint = NULL;
-    vlc_cleanup_push( cancelDoFingerprint, p_sys );
-
-    p_sys->p_item = input_item_New( NULL, NULL );
-    if ( ! p_sys->p_item ) goto end;
+    input_item_t *p_item = input_item_New( NULL, NULL );
+    if ( unlikely(p_item == NULL) )
+         return;
 
     char *psz_sout_option;
     /* Note: need at -max- 2 channels, but we can't guess it before playing */
@@ -163,40 +140,49 @@ static void DoFingerprint( vlc_object_t *p_this, fingerprinter_sys_t *p_sys,
     if ( asprintf( &psz_sout_option,
                    "sout=#transcode{acodec=%s,channels=2}:chromaprint",
                    ( VLC_CODEC_S16L == VLC_CODEC_S16N ) ? "s16l" : "s16b" )
-         == -1 ) goto end;
-    input_item_AddOption( p_sys->p_item, psz_sout_option, VLC_INPUT_OPTION_TRUSTED );
+         == -1 )
+    {
+        input_item_Release( p_item );
+        return;
+    }
+
+    input_item_AddOption( p_item, psz_sout_option, VLC_INPUT_OPTION_TRUSTED );
     free( psz_sout_option );
-    input_item_AddOption( p_sys->p_item, "vout=dummy", VLC_INPUT_OPTION_TRUSTED );
-    input_item_AddOption( p_sys->p_item, "aout=dummy", VLC_INPUT_OPTION_TRUSTED );
+    input_item_AddOption( p_item, "vout=dummy", VLC_INPUT_OPTION_TRUSTED );
+    input_item_AddOption( p_item, "aout=dummy", VLC_INPUT_OPTION_TRUSTED );
     if ( fp->i_duration )
     {
-        if ( asprintf( &psz_sout_option, "stop-time=%u", fp->i_duration ) == -1 ) goto end;
-        input_item_AddOption( p_sys->p_item, psz_sout_option, VLC_INPUT_OPTION_TRUSTED );
+        if ( asprintf( &psz_sout_option, "stop-time=%u", fp->i_duration ) == -1 )
+        {
+            input_item_Release( p_item );
+            return;
+        }
+        input_item_AddOption( p_item, psz_sout_option, VLC_INPUT_OPTION_TRUSTED );
         free( psz_sout_option );
     }
-    input_item_SetURI( p_sys->p_item, psz_uri ) ;
+    input_item_SetURI( p_item, psz_uri ) ;
 
-    p_sys->p_input = input_Create( p_this, p_sys->p_item, "fingerprinter", NULL );
-    if ( p_sys->p_input )
-    {
-        p_sys->chroma_fingerprint.i_duration = fp->i_duration;
-        var_Create( p_sys->p_input, "fingerprint-data", VLC_VAR_ADDRESS );
-        var_SetAddress( p_sys->p_input, "fingerprint-data", & p_sys->chroma_fingerprint );
+    input_thread_t *p_input = input_Create( p_this, p_item, "fingerprinter", NULL );
+    input_item_Release( p_item );
 
-        input_Start( p_sys->p_input );
-        input_Stop( p_sys->p_input );
-        input_Close( p_sys->p_input );
-        p_sys->p_input = NULL;
+    if( p_input == NULL )
+        return;
 
-        if ( p_sys->chroma_fingerprint.psz_fingerprint )
-        {
-            fp->psz_fingerprint = strdup( p_sys->chroma_fingerprint.psz_fingerprint );
-            if ( ! fp->i_duration ) /* had not given hint */
-                fp->i_duration = p_sys->chroma_fingerprint.i_duration;
-        }
-    }
-end:
-    vlc_cleanup_run( );
+    chromaprint_fingerprint_t chroma_fingerprint;
+
+    chroma_fingerprint.psz_fingerprint = NULL;
+    chroma_fingerprint.i_duration = fp->i_duration;
+
+    var_Create( p_input, "fingerprint-data", VLC_VAR_ADDRESS );
+    var_SetAddress( p_input, "fingerprint-data", &chroma_fingerprint );
+
+    input_Start( p_input );
+    input_Stop( p_input );
+    input_Close( p_input );
+
+    fp->psz_fingerprint = chroma_fingerprint.psz_fingerprint;
+    if( !fp->i_duration ) /* had not given hint */
+        fp->i_duration = chroma_fingerprint.i_duration;
 }
 
 /*****************************************************************************
@@ -318,7 +304,7 @@ static void *Run( void *opaque )
                 if ( p_data->i_duration )
                      acoustid_print.i_duration = p_data->i_duration;
 
-                DoFingerprint( VLC_OBJECT(p_fingerprinter), p_sys,
+                DoFingerprint( VLC_OBJECT(p_fingerprinter),
                                &acoustid_print, psz_uri );
                 free( psz_uri );
 
