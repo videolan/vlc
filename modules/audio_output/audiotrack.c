@@ -744,12 +744,13 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
  * returns -1 on error, 0 on success.
  */
 static int
-AudioTrack_Reset( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_Recreate( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
     JNI_AT_CALL_VOID( release );
     (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
+    p_sys->p_audiotrack = NULL;
     return AudioTrack_New( env, p_aout, p_sys->audiotrack_args.i_rate,
                            p_sys->audiotrack_args.i_channel_config,
                            p_sys->audiotrack_args.i_format,
@@ -1296,7 +1297,7 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
         {
             msg_Warn( p_aout, "ERROR_DEAD_OBJECT: "
                               "try recreating AudioTrack" );
-            i_ret = AudioTrack_Reset( env, p_aout );
+            i_ret = AudioTrack_Recreate( env, p_aout );
         } else
         {
             const char *str;
@@ -1431,7 +1432,7 @@ Flush( audio_output_t *p_aout, bool b_wait )
      * Version is 4.3 or before */
     if( !jfields.AudioTimestamp.clazz && p_sys->i_samples_written > 0 )
     {
-        if( AudioTrack_Reset( env, p_aout ) != 0 )
+        if( AudioTrack_Recreate( env, p_aout ) != 0 )
         {
             p_sys->b_error = true;
             return;
