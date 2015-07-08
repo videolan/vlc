@@ -346,16 +346,6 @@ static void cancelRun( void * p_arg )
     free( p_sys->psz_uri );
 }
 
-static void clearPrint( void * p_arg )
-{
-    acoustid_fingerprint_t *acoustid_print = ( acoustid_fingerprint_t * ) p_arg;
-    for( unsigned int j=0 ; j < acoustid_print->results.count; j++ )
-        free_acoustid_result_t( &acoustid_print->results.p_results[j] );
-    if ( acoustid_print->results.count )
-        free( acoustid_print->results.p_results );
-    free( acoustid_print->psz_fingerprint );
-}
-
 static void Run( fingerprinter_thread_t *p_fingerprinter )
 {
     fingerprinter_sys_t *p_sys = p_fingerprinter->p_sys;
@@ -379,7 +369,7 @@ static void Run( fingerprinter_thread_t *p_fingerprinter )
             fingerprint_request_t *p_data = vlc_array_item_at_index( p_sys->processing.queue, p_sys->i );
             acoustid_fingerprint_t acoustid_print;
             memset( &acoustid_print , 0, sizeof(acoustid_fingerprint_t) );
-            vlc_cleanup_push( clearPrint, &acoustid_print ); // C2
+
             p_sys->psz_uri = input_item_GetURI( p_data->p_item );
             if ( p_sys->psz_uri )
             {
@@ -394,9 +384,14 @@ static void Run( fingerprinter_thread_t *p_fingerprinter )
                 fill_metas_with_results( p_data, &acoustid_print );
                 FREENULL( p_sys->psz_uri );
 
+                for( unsigned j = 0; j < acoustid_print.results.count; j++ )
+                     free_acoustid_result_t( &acoustid_print.results.p_results[j] );
+                if( acoustid_print.results.count )
+                    free( acoustid_print.results.p_results );
+                free( acoustid_print.psz_fingerprint );
+
                 vlc_restorecancel(canc);
             }
-            vlc_cleanup_run( ); // C2
 
             /* copy results */
             vlc_mutex_lock( &p_sys->results.lock );
