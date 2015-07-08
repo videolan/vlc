@@ -506,6 +506,25 @@ AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
 }
 
 /**
+ * Reset all AudioTrack positions and internal state
+ */
+static void
+AudioTrack_Reset( JNIEnv *env, audio_output_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    if( p_sys->p_bytebuffer )
+    {
+        (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
+        p_sys->p_bytebuffer = NULL;
+    }
+
+    AudioTrack_ResetPositions( env, p_aout );
+    AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
+    p_sys->i_samples_written = 0;
+}
+
+/**
  * Get a smooth AudioTrack position
  *
  * This function smooth out the AudioTrack position since it has a very bad
@@ -1030,12 +1049,10 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
         p_sys->i_write_type = WRITE;
     }
 
+    AudioTrack_Reset( env, p_aout );
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
 
-    AudioTrack_ResetPositions( env, p_aout );
-    AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
-    p_sys->i_samples_written = 0;
     *p_fmt = p_sys->fmt;
     aout_SoftVolumeStart( p_aout );
 
@@ -1385,9 +1402,9 @@ Pause( audio_output_t *p_aout, bool b_pause, mtime_t i_date )
         CHECK_AT_EXCEPTION( "pause" );
     } else
     {
+        AudioTrack_ResetPositions( env, p_aout );
         JNI_AT_CALL_VOID( play );
         CHECK_AT_EXCEPTION( "play" );
-        AudioTrack_ResetPositions( env, p_aout );
     }
 }
 
@@ -1438,19 +1455,9 @@ Flush( audio_output_t *p_aout, bool b_wait )
             return;
         }
     }
-
+    AudioTrack_Reset( env, p_aout );
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
-
-    if( p_sys->p_bytebuffer )
-    {
-        (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
-        p_sys->p_bytebuffer = NULL;
-    }
-
-    AudioTrack_ResetPositions( env, p_aout );
-    AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
-    p_sys->i_samples_written = 0;
 }
 
 static int
