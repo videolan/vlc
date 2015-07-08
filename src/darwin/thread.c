@@ -404,24 +404,9 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
     return pthread_getspecific (key);
 }
 
-static bool rt_priorities = false;
-static int rt_offset;
-
 void vlc_threads_setup (libvlc_int_t *p_libvlc)
 {
-    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
-    static bool initialized = false;
-
-    vlc_mutex_lock (&lock);
-    /* Initializes real-time priorities before any thread is created,
-     * just once per process. */
-    if (!initialized)
-    {
-        rt_offset = var_InheritInteger (p_libvlc, "rt-offset");
-        rt_priorities = true;
-        initialized = true;
-    }
-    vlc_mutex_unlock (&lock);
+    (void) p_libvlc;
 }
 
 static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
