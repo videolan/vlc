@@ -148,6 +148,9 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
     size_t i_sps_size = 0, i_pps_size = 0;
     int i_nal_type = NAL_UNKNOWN;
 
+    if (unlikely(p_buf == NULL || i_buf == 0))
+        return -1;
+
     while( true )
     {
         int i_inc = 0;
