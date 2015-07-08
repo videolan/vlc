@@ -55,13 +55,6 @@ struct fingerprinter_sys_t
         vlc_array_t         *queue;
     } processing;
 
-    struct
-    {
-        vlc_mutex_t         lock;
-        vlc_cond_t          wait;
-        int                 i_input_state;
-    } condwait;
-
     /* tracked in sys for cancelability */
     input_item_t            *p_item;
     input_thread_t          *p_input;
@@ -144,7 +137,6 @@ static void cancelDoFingerprint( void *p_arg )
     fingerprinter_sys_t *p_sys = ( fingerprinter_sys_t * ) p_arg;
     if ( p_sys->p_input )
     {
-        input_Stop( p_sys->p_input );
         input_Close( p_sys->p_input );
     }
     /* cleanup temporary result */
@@ -152,17 +144,6 @@ static void cancelDoFingerprint( void *p_arg )
         FREENULL( p_sys->chroma_fingerprint.psz_fingerprint );
     if ( p_sys->p_item )
         input_item_Release( p_sys->p_item );
-}
-
-static int inputStateCallback( vlc_object_t *obj, const char *var,
-                               vlc_value_t old, vlc_value_t cur, void *p_data )
-{
-    VLC_UNUSED(obj);VLC_UNUSED(var);VLC_UNUSED(old);
-    fingerprinter_sys_t *p_sys = (fingerprinter_sys_t *) p_data;
-    if ( cur.i_int != INPUT_EVENT_STATE ) return VLC_SUCCESS;
-    p_sys->condwait.i_input_state = var_GetInteger( p_sys->p_input, "state" );
-    vlc_cond_signal( & p_sys->condwait.wait );
-    return VLC_SUCCESS;
 }
 
 static void DoFingerprint( vlc_object_t *p_this, fingerprinter_sys_t *p_sys,
@@ -203,22 +184,6 @@ static void DoFingerprint( vlc_object_t *p_this, fingerprinter_sys_t *p_sys,
         var_SetAddress( p_sys->p_input, "fingerprint-data", & p_sys->chroma_fingerprint );
 
         input_Start( p_sys->p_input );
-
-        /* Wait for input to start && end */
-        p_sys->condwait.i_input_state = var_GetInteger( p_sys->p_input, "state" );
-
-        if ( likely( var_AddCallback( p_sys->p_input, "intf-event",
-                            inputStateCallback, p_sys ) == VLC_SUCCESS ) )
-        {
-            while( p_sys->condwait.i_input_state <= PAUSE_S )
-            {
-                vlc_mutex_lock( &p_sys->condwait.lock );
-                mutex_cleanup_push( &p_sys->condwait.lock );
-                vlc_cond_wait( &p_sys->condwait.wait, &p_sys->condwait.lock );
-                vlc_cleanup_run();
-            }
-            var_DelCallback( p_sys->p_input, "intf-event", inputStateCallback, p_sys );
-        }
         input_Stop( p_sys->p_input );
         input_Close( p_sys->p_input );
         p_sys->p_input = NULL;
@@ -255,9 +220,6 @@ static int Open(vlc_object_t *p_this)
     p_sys->results.queue = vlc_array_new();
     vlc_mutex_init( &p_sys->results.lock );
 
-    vlc_mutex_init( &p_sys->condwait.lock );
-    vlc_cond_init( &p_sys->condwait.wait );
-
     p_fingerprinter->pf_enqueue = EnqueueRequest;
     p_fingerprinter->pf_getresults = GetResult;
     p_fingerprinter->pf_apply = ApplyResult;
@@ -287,9 +249,6 @@ static void Close(vlc_object_t *p_this)
 
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
-
-    vlc_mutex_destroy( &p_sys->condwait.lock );
-    vlc_cond_destroy( &p_sys->condwait.wait );
 
     for ( int i = 0; i < vlc_array_count( p_sys->incoming.queue ); i++ )
         fingerprint_request_Delete( vlc_array_item_at_index( p_sys->incoming.queue, i ) );
