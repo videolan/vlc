@@ -512,13 +512,13 @@ SOURCES_libvlc = \
 # FourCC tables
 BUILT_SOURCES += fourcc_tables.h
 EXTRA_DIST += misc/fourcc_gen.c
-MOSTLYCLEANFILES = fourcc_gen
+MOSTLYCLEANFILES = fourcc_gen$(BUILDEXEEXT)
 
-fourcc_gen: misc/fourcc_gen.c misc/fourcc_list.h ../include/vlc_fourcc.h
+fourcc_gen$(BUILDEXEEXT): misc/fourcc_gen.c misc/fourcc_list.h ../include/vlc_fourcc.h
 	$(AM_V_at)rm -f -- $@
 	$(AM_V_CC)$(BUILDCC) -I$(srcdir) -o $@ $<
 
-fourcc_tables.h: fourcc_gen
+fourcc_tables.h: fourcc_gen$(BUILDEXEEXT)
 	$(AM_V_at)rm -f -- $@.tmp
 	$(AM_V_GEN)$(builddir)/fourcc_gen > $@.tmp
 	$(AM_V_at)mv -f -- $@.tmp $@

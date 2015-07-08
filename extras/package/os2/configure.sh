@@ -44,5 +44,6 @@ OPTIONS="
 export ARCHFLAGS=${ARCHFLAGS-"-march=i486"}
 export CFLAGS="${CFLAGS} ${ARCHFLAGS}"
 export CXXFLAGS="${CXXFLAGS} ${ARCHFLAGS}"
+export BUILDCC="gcc -std=c99"
 
-sh "$(dirname $0)"/../../../configure ${OPTIONS} $*
+sh "$(dirname $0)"/../../../configure ${OPTIONS} "$@"

@@ -299,9 +299,13 @@ case "${build_os}" in
     cygwin|msys)
         ac_executable_extensions=".exe"
     ;;
+    os2*)
+        BUILDEXEEXT=".exe"
+    ;;
     *)
     ;;
 esac
+AC_SUBST(BUILDEXEEXT)
 
 dnl Android is linux, but a bit different
 AS_IF([test "$SYS" = linux],[
