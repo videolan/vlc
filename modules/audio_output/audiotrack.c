@@ -1314,7 +1314,12 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
         {
             msg_Warn( p_aout, "ERROR_DEAD_OBJECT: "
                               "try recreating AudioTrack" );
-            i_ret = AudioTrack_Recreate( env, p_aout );
+            if( ( i_ret = AudioTrack_Recreate( env, p_aout ) ) == 0 )
+            {
+                AudioTrack_Reset( env, p_aout );
+                JNI_AT_CALL_VOID( play );
+                CHECK_AT_EXCEPTION( "play" );
+            }
         } else
         {
             const char *str;
