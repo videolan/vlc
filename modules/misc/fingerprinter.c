@@ -386,11 +386,15 @@ static void Run( fingerprinter_thread_t *p_fingerprinter )
                 /* overwrite with hint, as in this case, fingerprint's session will be truncated */
                 if ( p_data->i_duration ) acoustid_print.i_duration = p_data->i_duration;
 
+                int canc = vlc_savecancel();
+
                 DoFingerprint( VLC_OBJECT(p_fingerprinter), p_sys, &acoustid_print );
 
                 DoAcoustIdWebRequest( VLC_OBJECT(p_fingerprinter), &acoustid_print );
                 fill_metas_with_results( p_data, &acoustid_print );
                 FREENULL( p_sys->psz_uri );
+
+                vlc_restorecancel(canc);
             }
             vlc_cleanup_run( ); // C2
 
