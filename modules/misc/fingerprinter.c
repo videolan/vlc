@@ -54,9 +54,6 @@ struct fingerprinter_sys_t
     {
         vlc_array_t         *queue;
     } processing;
-
-    /* clobberable by cleanups */
-    int                     i;
 };
 
 static int  Open            (vlc_object_t *);
@@ -287,11 +284,10 @@ static void *Run( void *opaque )
 
         QueueIncomingRequests( p_sys );
 
-        for ( p_sys->i = 0 ; p_sys->i < vlc_array_count( p_sys->processing.queue ); p_sys->i++ )
+        for ( int i = 0 ; i < vlc_array_count( p_sys->processing.queue ); i++ )
         {
-            fingerprint_request_t *p_data = vlc_array_item_at_index( p_sys->processing.queue, p_sys->i );
-
             int canc = vlc_savecancel();
+            fingerprint_request_t *p_data = vlc_array_item_at_index( p_sys->processing.queue, i );
 
             char *psz_uri = input_item_GetURI( p_data->p_item );
             if ( psz_uri != NULL )
