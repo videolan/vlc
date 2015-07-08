@@ -105,15 +105,23 @@ text_segment_t *text_segment_New( const char *psz_text )
     return segment;
 }
 
+void text_segment_Delete( text_segment_t* segment )
+{
+    if ( segment != NULL )
+    {
+        free( segment->psz_text );
+        free( segment );
+        text_style_Delete( segment->style );
+    }
+}
+
 void text_segment_ChainDelete( text_segment_t *segment )
 {
     while( segment != NULL )
     {
         text_segment_t *p_next = segment->p_next;
 
-        free( segment->psz_text );
-        //text_style_Delete( segment->style );
-        free( segment );
+        text_segment_Delete( segment );
 
         segment = p_next;
     }
