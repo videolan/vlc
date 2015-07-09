@@ -133,7 +133,6 @@ struct stream_sys_t
         } init;
         vlc_mutex_t lock;
         vlc_cond_t  wait;         /* some condition to wait on */
-        bool        b_underrun;   /* did we ran out of data recently */
     } playback;
 
     /* state */

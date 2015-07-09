@@ -489,10 +489,7 @@ static int Download( stream_t *s, sms_stream_t *sms )
     if( sms->p_chunks == NULL || sms->p_chunks == sms->p_lastchunk )
         return VLC_SUCCESS;
 
-    vlc_mutex_lock( &p_sys->playback.lock );
-    p_sys->playback.b_underrun = false;
     bw_stats_underrun( sms );
-    vlc_mutex_unlock( &p_sys->playback.lock );
 
     quality_level_t *new_qlevel = BandwidthAdaptation( s, sms, sms->i_obw,
                                                        duration );

@@ -690,9 +690,6 @@ static chunk_t *get_chunk( stream_t *s, const bool wait, bool *pb_isinit )
         }
 
         msg_Dbg( s, "get_chunk is waiting for chunk %"PRId64"!!!", p_chunk->start_time );
-        vlc_mutex_lock( &p_sys->playback.lock );
-        p_sys->playback.b_underrun = true;
-        vlc_mutex_unlock( &p_sys->playback.lock );
         vlc_cond_timedwait( &p_sys->playback.wait,
                 &p_sys->p_current_stream->chunks_lock, mdate() + CLOCK_FREQ/2 );
     }
