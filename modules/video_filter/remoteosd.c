@@ -201,7 +201,6 @@ struct filter_sys_t
 
     char          *psz_passwd;         /* VNC password */
 
-    bool          b_vnc_mouse_events;  /* Send MouseEvents ? */
     bool          b_vnc_key_events;    /* Send KeyEvents ? */
 
     vlc_mutex_t   lock;                /* To lock for read/write on picture */
@@ -265,15 +264,11 @@ static int CreateFilter ( vlc_object_t *p_this )
         p_sys->ar_color_table_yuv[i][3] = 255;
     }
 
-    p_sys->b_vnc_mouse_events = var_CreateGetBoolCommand( p_this,
-                                            RMTOSD_CFG "mouse-events" );
-
     /* Keep track of OSD Events */
     p_sys->b_need_update  = false;
 
     /* Attach subpicture source callback */
     p_filter->pf_sub_source = Filter;
-    p_filter->pf_sub_mouse  = MouseEvent;
 
     es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_CODEC_SPU );
     p_filter->fmt_out.i_priority = ES_PRIORITY_SELECTABLE_MIN;
@@ -287,6 +282,9 @@ static int CreateFilter ( vlc_object_t *p_this )
         msg_Err( p_filter, "cannot spawn vnc message reader thread" );
         goto error;
     }
+
+    if( var_InheritBool( p_this, RMTOSD_CFG "mouse-events" ) )
+        p_filter->pf_sub_mouse = MouseEvent;
 
     p_sys->b_vnc_key_events = var_InheritBool( p_this,
                                                RMTOSD_CFG "key-events" );
@@ -326,7 +324,6 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     var_Destroy( p_this, RMTOSD_CFG "host" );
     var_Destroy( p_this, RMTOSD_CFG "password" );
-    var_Destroy( p_this, RMTOSD_CFG "mouse-events" );
     var_Destroy( p_this, RMTOSD_CFG "alpha" );
 
     vlc_mutex_destroy( &p_sys->lock );
@@ -1202,9 +1199,6 @@ static int MouseEvent( filter_t *p_filter,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     VLC_UNUSED(p_old);
-
-    if( !p_sys->b_vnc_mouse_events )
-        return VLC_SUCCESS;
 
     int i_v = p_new->i_pressed;
     int i_x = p_new->i_x;
