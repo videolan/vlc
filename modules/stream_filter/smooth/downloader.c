@@ -609,7 +609,6 @@ void* sms_Thread( void *p_this )
     p_sys->playback.init.p_datachunk = init_ck;
     p_sys->playback.init.p_startchunk = NULL; /* before any */
     vlc_mutex_unlock( &p_sys->playback.lock );
-    vlc_cond_signal( &p_sys->playback.wait ); /* demuxer in Open() can start reading */
 
     int64_t i_pts_delay = 0;
 
