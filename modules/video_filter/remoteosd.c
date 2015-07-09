@@ -312,6 +312,11 @@ static void DestroyFilter( vlc_object_t *p_this )
     vlc_cancel( p_sys->worker_thread );
     vlc_join( p_sys->worker_thread, NULL );
 
+    if( p_sys->p_pic != NULL )
+        picture_Release( p_sys->p_pic );
+    if( p_sys->i_socket >= 0 )
+        net_Close( p_sys->i_socket );
+
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->psz_host );
     free( p_sys->psz_passwd );
@@ -667,16 +672,6 @@ static void* vnc_worker_thread( void *obj )
     }
 
 exit:
-
-    vlc_mutex_lock( &p_sys->lock );
-    p_sys->i_socket = -1;
-
-    if( p_sys->p_pic )
-        picture_Release( p_sys->p_pic );
-
-    p_sys->b_need_update = true;
-    vlc_mutex_unlock( &p_sys->lock );
-    net_Close( fd );
 
     msg_Dbg( p_filter, "VNC message reader thread ended" );
     vlc_restorecancel (canc);
