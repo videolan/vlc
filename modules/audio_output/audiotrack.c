@@ -1313,8 +1313,7 @@ AudioTrack_PreparePlay( JNIEnv *env, audio_output_t *p_aout,
 
 static int
 AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
-                 block_t *p_buffer, size_t *p_buffer_offset, mtime_t *p_wait,
-                 bool b_force )
+                 block_t *p_buffer, size_t *p_buffer_offset, bool b_force )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
@@ -1358,11 +1357,6 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
                 str = "ERROR";
             msg_Err( p_aout, "Write failed: %s", str );
         }
-    } else if( i_ret == 0 )
-    {
-        /* audiotrack internal buffer is full, wait a little: between 10ms and
-         * 20ms depending on devices or rate */
-        *p_wait = FRAMES_TO_US( p_sys->i_max_audiotrack_samples / 20 );
     } else
     {
         uint64_t i_samples = BYTES_TO_FRAMES( i_ret );
@@ -1396,10 +1390,7 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
         if( i_play_wait != 0 )
             msleep( i_play_wait );
 
-        i_play_wait = 0;
-        i_ret = AudioTrack_Play( env, p_aout, p_buffer,
-                                 &i_buffer_offset,
-                                 &i_play_wait,
+        i_ret = AudioTrack_Play( env, p_aout, p_buffer, &i_buffer_offset,
                                  i_nb_try > 100 );
         if( i_ret < 0 )
             p_sys->b_error = true;
@@ -1413,6 +1404,14 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
              * quickly. */
             i_nb_try = i_ret == 0 ? i_nb_try + 1 : 0;
         }
+
+        if( p_buffer->i_buffer - i_buffer_offset > 0 )
+        {
+            i_play_wait = FRAMES_TO_US( BYTES_TO_FRAMES( p_buffer->i_buffer
+                                                         - i_buffer_offset ) );
+            i_play_wait = __MAX( 10000, i_play_wait );
+        }
+
     }
 bailout:
     block_Release( p_buffer );
