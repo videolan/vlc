@@ -708,12 +708,6 @@ static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read 
 
         if( chunk->read_pos >= chunk->size )
         {
-            if( chunk->type == VIDEO_ES ||
-                ( !SMS_GET_SELECTED_ST( VIDEO_ES ) && chunk->type == AUDIO_ES ) )
-            {
-                vlc_cond_signal( &p_sys->download.wait );
-            }
-
             if ( b_isinitchunk )
             {
                 assert( chunk->read_pos == chunk->size );
