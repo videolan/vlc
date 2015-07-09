@@ -201,8 +201,6 @@ static void vnc_encrypt_bytes( unsigned char *bytes, char *passwd );
 struct filter_sys_t
 {
     bool          b_need_update;       /* VNC picture is updated, do update the OSD*/
-    mtime_t       i_vnc_poll_interval; /* Update the OSD menu every n ms */
-
     uint8_t       i_alpha;             /* alpha transparency value */
 
     char          *psz_host;           /* VNC host */
@@ -210,7 +208,6 @@ struct filter_sys_t
 
     char          *psz_passwd;         /* VNC password */
 
-    bool          b_vnc_poll;          /* Activate VNC polling ? */
     bool          b_vnc_mouse_events;  /* Send MouseEvents ? */
     bool          b_vnc_key_events;    /* Send KeyEvents ? */
 
@@ -272,14 +269,6 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     p_sys->i_alpha = var_CreateGetIntegerCommand( p_this, RMTOSD_CFG "alpha" );
 
-    /* in milliseconds, 0 disables polling, should not be lower than 100 */
-    p_sys->i_vnc_poll_interval  = var_CreateGetIntegerCommand( p_this,
-                                                       RMTOSD_CFG "update" );
-    if ( p_sys->i_vnc_poll_interval < 100)
-    {
-       p_sys->i_vnc_poll_interval = 100;
-    }
-
     for ( int i = 0; i < 256; i++ )
     {
         p_sys->ar_color_table_yuv[i][0] = 255;
@@ -288,8 +277,6 @@ static int CreateFilter ( vlc_object_t *p_this )
         p_sys->ar_color_table_yuv[i][3] = 255;
     }
 
-    p_sys->b_vnc_poll = var_CreateGetBoolCommand( p_this,
-                                            RMTOSD_CFG "vnc-polling" );
     p_sys->b_vnc_mouse_events = var_CreateGetBoolCommand( p_this,
                                             RMTOSD_CFG "mouse-events" );
     p_sys->b_vnc_key_events = var_CreateGetBoolCommand( p_this,
@@ -351,8 +338,6 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_this, RMTOSD_CFG "host" );
     var_Destroy( p_this, RMTOSD_CFG "port" );
     var_Destroy( p_this, RMTOSD_CFG "password" );
-    var_Destroy( p_this, RMTOSD_CFG "update" );
-    var_Destroy( p_this, RMTOSD_CFG "vnc-polling" );
     var_Destroy( p_this, RMTOSD_CFG "mouse-events" );
     var_Destroy( p_this, RMTOSD_CFG "key-events" );
     var_Destroy( p_this, RMTOSD_CFG "alpha" );
@@ -681,13 +666,16 @@ static void* vnc_worker_thread( void *obj )
 
     vlc_mutex_unlock( &p_sys->lock );
 
+    write_update_request( p_filter, false );
+
     /* create the update request thread */
-    if( vlc_clone( &update_request_thread_handle,
-                   update_request_thread, p_filter,
-                   VLC_THREAD_PRIORITY_LOW ) )
+    bool polling = var_InheritBool( p_filter, RMTOSD_CFG "vnc-polling" );
+    if( polling
+     && vlc_clone( &update_request_thread_handle, update_request_thread,
+                   p_filter, VLC_THREAD_PRIORITY_LOW ) )
     {
-        msg_Err( p_filter, "cannot spawn vnc update request thread" );
-        goto exit;
+        msg_Err( p_filter, "cannot spawn VNC update request thread" );
+        polling = false;
     }
 
     /* connection is initialized, now read and handle server messages */
@@ -747,10 +735,11 @@ static void* vnc_worker_thread( void *obj )
     }
     canc = vlc_savecancel ();
 
-    msg_Dbg( p_filter, "joining update_request_thread" );
-    vlc_cancel( update_request_thread_handle );
-    vlc_join( update_request_thread_handle, NULL );
-    msg_Dbg( p_filter, "released update_request_thread" );
+    if( polling )
+    {
+        vlc_cancel( update_request_thread_handle );
+        vlc_join( update_request_thread_handle, NULL );
+    }
 
 exit:
 
@@ -774,27 +763,18 @@ exit:
 static void* update_request_thread( void *obj )
 {
     filter_t* p_filter = (filter_t*)obj;
-    filter_sys_t *p_sys = p_filter->p_sys;
+    int canc = vlc_savecancel();
+    mtime_t interval = var_InheritInteger( p_filter, RMTOSD_CFG "update" );
+    vlc_restorecancel(canc);
 
-    msg_Dbg( p_filter, "VNC update request thread started" );
-    if( !write_update_request( p_filter, false ) )
-        return NULL;
+    if( interval < 100 )
+        interval = 100;
+    interval *= 1000; /* ms -> µs */
 
-    if( p_sys->b_vnc_poll)
-    {
-        for( ;; )
-        {
-            msleep( p_sys->i_vnc_poll_interval * 1000 );
-            if( !write_update_request( p_filter, true ) )
-                return NULL;
-        }
-    }
-    else
-    {
-        msg_Dbg( p_filter, "VNC polling disabled." );
-    }
+    do
+        msleep( interval );
+    while( write_update_request( p_filter, true ) );
 
-    msg_Dbg( p_filter, "VNC update request thread ended" );
     return NULL;
 }
 
