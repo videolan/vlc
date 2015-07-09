@@ -662,7 +662,7 @@ static chunk_t *get_chunk( stream_t *s, const bool wait, bool *pb_isinit )
          * that's why vlc_object_alive() has been deprecated. But if I
          * understood well, there is no good solution with a stream_filter
          * module anyaway. */
-        if( !wait || p_sys->b_error )
+        if( !wait )
         {
             msg_Warn( s, "get_chunk failed! (starttime %"PRId64")", p_chunk->start_time );
             vlc_mutex_unlock( &p_sys->p_current_stream->chunks_lock );
@@ -771,12 +771,8 @@ static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read 
 
 static int Read( stream_t *s, void *buffer, unsigned i_read )
 {
-    stream_sys_t *p_sys = s->p_sys;
     int length = 0;
     i_read = __MIN(INT_MAX, i_read);
-
-    if( p_sys->b_error )
-        return 0;
 
     length = sms_Read( s, (uint8_t*) buffer, i_read );
     if( length == 0 )

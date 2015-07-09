@@ -687,7 +687,6 @@ void* sms_Thread( void *p_this )
     }
 
 cancel:
-    p_sys->b_error = true;
     msg_Dbg(s, "Canceling download thread!");
     vlc_restorecancel( canc );
     return NULL;
