@@ -320,11 +320,11 @@ static void LoadLocalStorage( addons_manager_t *p_manager )
 static void *FinderThread( void *p_data )
 {
     addons_manager_t *p_manager = p_data;
-    int i_cancel;
-    char *psz_uri;
 
     for( ;; )
     {
+        char *psz_uri;
+
         vlc_mutex_lock( &p_manager->p_priv->finder.lock );
         mutex_cleanup_push( &p_manager->p_priv->finder.lock );
         while( p_manager->p_priv->finder.uris.i_size == 0 )
@@ -337,10 +337,11 @@ static void *FinderThread( void *p_data )
         vlc_cleanup_pop();
         vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
 
+        int i_cancel = vlc_savecancel();
+
         addons_finder_t *p_finder =
                 vlc_custom_create( p_manager->p_priv->p_parent, sizeof( *p_finder ), "entries finder" );
 
-        i_cancel = vlc_savecancel();
         if( p_finder != NULL )
         {
             p_finder->i_flags |= OBJECT_FLAGS_NOINTERACT;
