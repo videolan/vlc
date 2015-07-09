@@ -960,18 +960,14 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_t *p_spu;
     subpicture_region_t *p_region;
     video_format_t fmt;
-    picture_t *p_pic;
-
-    if( !p_sys->b_need_update )
-    {
-        return NULL;
-    }
+    picture_t *p_pic = NULL;
 
     vlc_mutex_lock( &p_sys->lock );
 
-    p_pic = p_sys->p_pic;
+    if( p_sys->b_need_update )
+        p_pic = p_sys->p_pic;
 
-    if( !p_pic )
+    if( p_pic == NULL )
     {
         vlc_mutex_unlock( &p_sys->lock );
         return NULL;
