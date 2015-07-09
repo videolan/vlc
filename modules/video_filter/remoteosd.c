@@ -164,8 +164,6 @@ static void* vnc_worker_thread ( void * );
 
 static void* update_request_thread( void * );
 
-static bool open_vnc_connection ( filter_t *p_filter );
-
 static bool handshaking ( filter_t *p_filter );
 
 static bool process_server_message ( filter_t *p_filter,
@@ -204,7 +202,6 @@ struct filter_sys_t
     uint8_t       i_alpha;             /* alpha transparency value */
 
     char          *psz_host;           /* VNC host */
-    int           i_port;
 
     char          *psz_passwd;         /* VNC password */
 
@@ -263,8 +260,6 @@ static int CreateFilter ( vlc_object_t *p_this )
         msg_Err( p_filter, "unable to get vnc password" );
         goto error;
     }
-
-    p_sys->i_port = var_CreateGetIntegerCommand( p_this, RMTOSD_CFG "port" );
 
     p_sys->i_alpha = var_CreateGetIntegerCommand( p_this, RMTOSD_CFG "alpha" );
 
@@ -335,7 +330,6 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_DelCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
 
     var_Destroy( p_this, RMTOSD_CFG "host" );
-    var_Destroy( p_this, RMTOSD_CFG "port" );
     var_Destroy( p_this, RMTOSD_CFG "password" );
     var_Destroy( p_this, RMTOSD_CFG "mouse-events" );
     var_Destroy( p_this, RMTOSD_CFG "key-events" );
@@ -374,26 +368,6 @@ static bool write_exact( filter_t *p_filter,
                          int i_bytes )
 {
     return i_bytes == net_Write( p_filter, i_socket, p_writebuf, i_bytes );
-}
-
-static bool open_vnc_connection ( filter_t *p_filter )
-{
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    msg_Dbg( p_filter, "Open socket to vnc server on %s:%u.",
-              p_sys->psz_host, p_sys->i_port );
-
-    p_sys->i_socket = net_ConnectTCP( p_filter, p_sys->psz_host, p_sys->i_port );
-
-    if( p_sys->i_socket < 0 )
-    {
-        msg_Err( p_filter, "Could not open socket" );
-        return false;
-    }
-
-    msg_Dbg( p_filter, "socket is open." );
-
-    return true;
 }
 
 static bool handshaking ( filter_t *p_filter )
@@ -637,10 +611,13 @@ static void* vnc_worker_thread( void *obj )
 
     msg_Dbg( p_filter, "VNC worker thread started" );
 
-    if( !open_vnc_connection ( p_filter ) )
+    int i_port = var_InheritInteger( p_filter, RMTOSD_CFG "port" );
+
+    p_sys->i_socket = net_ConnectTCP( p_filter, p_sys->psz_host, i_port );
+    if( p_sys->i_socket == -1 )
     {
-        msg_Err( p_filter, "Could not connect to vnc host" );
-        goto exit;
+        msg_Err( p_filter, "Could not connect to VNC host" );
+        return NULL;
     }
 
     if( !handshaking ( p_filter ) )
@@ -742,8 +719,7 @@ exit:
     vlc_mutex_lock( &p_sys->lock );
     p_sys->b_connection_active = false;
 
-    if (p_sys->i_socket >= 0)
-        net_Close(p_sys->i_socket);
+    net_Close(p_sys->i_socket);
 
     if( p_sys->p_pic )
         picture_Release( p_sys->p_pic );
