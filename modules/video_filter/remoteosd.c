@@ -221,7 +221,6 @@ struct filter_sys_t
 
     uint16_t      i_vnc_width;          /* The with of the VNC screen */
     uint16_t      i_vnc_height;         /* The height of the VNC screen */
-    uint32_t      i_vnc_pixels;         /* The pixels of the VNC screen */
 
     bool    b_alpha_from_vnc;    /* Special ffnetdev alpha feature enabled ? */
 
@@ -657,14 +656,11 @@ static void* vnc_worker_thread( void *obj )
     vlc_mutex_lock( &p_sys->lock );
     p_sys->p_pic = picture_New( VLC_CODEC_YUVA,
                                 p_sys->i_vnc_width, p_sys->i_vnc_height, 1, 1 );
+    vlc_mutex_unlock( &p_sys->lock );
     if( !p_sys->p_pic )
     {
-        vlc_mutex_unlock( &p_sys->lock );
         goto exit;
     }
-    p_sys->i_vnc_pixels = p_sys->i_vnc_width * p_sys->i_vnc_height;
-
-    vlc_mutex_unlock( &p_sys->lock );
 
     write_update_request( p_filter, false );
 
