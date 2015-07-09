@@ -601,8 +601,6 @@ void* sms_Thread( void *p_this )
     stream_t *s = (stream_t *)p_this;
     stream_sys_t *p_sys = s->p_sys;
 
-    int canc = vlc_savecancel();
-
     chunk_t *init_ck = build_init_chunk( s );
     if( !init_ck )
         goto cancel;
@@ -682,12 +680,9 @@ void* sms_Thread( void *p_this )
         }
         else
             vlc_mutex_unlock( &p_sys->lock );
-
-        vlc_testcancel();
     }
 
 cancel:
     msg_Dbg(s, "Canceling download thread!");
-    vlc_restorecancel( canc );
     return NULL;
 }
