@@ -158,8 +158,6 @@ static int MouseEvent( filter_t *,
 static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
-static void stop_osdvnc ( filter_t *p_filter );
-
 static void* vnc_worker_thread ( void * );
 
 static void* update_request_thread( void * );
@@ -305,8 +303,6 @@ static int CreateFilter ( vlc_object_t *p_this )
 error:
     msg_Err( p_filter, "osdvnc filter discarded" );
 
-    stop_osdvnc( p_filter );
-
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->psz_host );
     free( p_sys->psz_passwd );
@@ -325,7 +321,8 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     msg_Dbg( p_filter, "DestroyFilter called." );
 
-    stop_osdvnc( p_filter );
+    vlc_cancel( p_sys->worker_thread );
+    vlc_join( p_sys->worker_thread, NULL );
 
     var_DelCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
 
@@ -339,18 +336,6 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys->psz_host );
     free( p_sys->psz_passwd );
     free( p_sys );
-}
-
-static void stop_osdvnc ( filter_t *p_filter )
-{
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    msg_Dbg( p_filter, "joining worker_thread" );
-    vlc_cancel( p_sys->worker_thread );
-    vlc_join( p_sys->worker_thread, NULL );
-    msg_Dbg( p_filter, "released worker_thread" );
-
-    msg_Dbg( p_filter, "osdvnc stopped" );
 }
 
 static bool read_exact( filter_t *p_filter,
