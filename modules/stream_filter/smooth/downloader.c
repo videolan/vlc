@@ -175,21 +175,18 @@ static int sms_Download( stream_t *s, chunk_t *chunk, char *url )
 #ifdef DISABLE_BANDWIDTH_ADAPTATION
 static quality_level_t *
 BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
-                     uint64_t obw, uint64_t i_duration,
-                     bool b_starved )
+                     uint64_t obw, uint64_t i_duration )
 {
     VLC_UNUSED(obw);
     VLC_UNUSED(s);
     VLC_UNUSED(i_duration);
-    VLC_UNUSED(b_starved);
     return sms->current_qlvl;
 }
 #else
 
 static quality_level_t *
 BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
-                     uint64_t obw, uint64_t i_duration,
-                     bool b_starved )
+                     uint64_t obw, uint64_t i_duration )
 {
     quality_level_t *ret = NULL;
 
@@ -197,11 +194,8 @@ BandwidthAdaptation( stream_t *s, sms_stream_t *sms,
     if ( sms->qlevels.i_size < 2 )
         return sms->qlevels.p_elems[0];
 
-    if ( b_starved )
-    {
-        //TODO: do something on starvation post first buffering
-        //   s->p_sys->i_probe_length *= 2;
-    }
+    //TODO: do something on starvation post first buffering
+    //   s->p_sys->i_probe_length *= 2;
 
     /* PASS 1 */
     quality_level_t *lowest = sms->qlevels.p_elems[0];
@@ -495,18 +489,13 @@ static int Download( stream_t *s, sms_stream_t *sms )
     if( sms->p_chunks == NULL || sms->p_chunks == sms->p_lastchunk )
         return VLC_SUCCESS;
 
-    bool b_starved = false;
     vlc_mutex_lock( &p_sys->playback.lock );
-    if ( &p_sys->playback.b_underrun )
-    {
-        p_sys->playback.b_underrun = false;
-        bw_stats_underrun( sms );
-        b_starved = true;
-    }
+    p_sys->playback.b_underrun = false;
+    bw_stats_underrun( sms );
     vlc_mutex_unlock( &p_sys->playback.lock );
 
     quality_level_t *new_qlevel = BandwidthAdaptation( s, sms, sms->i_obw,
-                                                       duration, b_starved );
+                                                       duration );
     assert(new_qlevel);
 
     if( sms->qlevels.i_size < 2 )
