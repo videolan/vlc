@@ -540,11 +540,8 @@ static int Open( vlc_object_t *p_this )
     s->pf_peek = Peek;
     s->pf_control = Control;
 
-    vlc_mutex_lock( &p_sys->playback.lock );
-
     if( vlc_clone( &p_sys->download.thread, sms_Thread, s, VLC_THREAD_PRIORITY_INPUT ) )
     {
-        vlc_mutex_unlock( &p_sys->playback.lock );
         SysCleanup( p_sys );
         vlc_mutex_destroy( &p_sys->lock );
         vlc_cond_destroy( &p_sys->download.wait );
@@ -553,11 +550,6 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-
-    /* avoid race condition where the first init chunk isn't there yet
-       and a non waiting get_chunk() is done (would return empty stream)*/
-    vlc_cond_wait( &p_sys->playback.wait, &p_sys->playback.lock );
-    vlc_mutex_unlock( &p_sys->playback.lock );
 
     return VLC_SUCCESS;
 }
