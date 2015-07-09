@@ -526,7 +526,6 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    p_sys->playback.toffset = p_sys->p_current_stream->p_playback->start_time;
     p_sys->playback.next_chunk_offset = CHUNK_OFFSET_UNSET;
     p_sys->i_probe_length = SMS_PROBE_LENGTH;
 
@@ -561,10 +560,6 @@ static void Close( vlc_object_t *p_this )
 
     p_sys->b_close = true;
     vlc_cond_signal(&p_sys->download.wait);
-
-    vlc_mutex_lock( &p_sys->playback.lock );
-    p_sys->playback.toffset = 0;
-    vlc_mutex_unlock( &p_sys->playback.lock );
 
     vlc_join( p_sys->download.thread, NULL );
     vlc_mutex_destroy( &p_sys->lock );
@@ -719,7 +714,6 @@ static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read 
             if( chunk->type == VIDEO_ES ||
                 ( !SMS_GET_SELECTED_ST( VIDEO_ES ) && chunk->type == AUDIO_ES ) )
             {
-                p_sys->playback.toffset += chunk->duration;
                 vlc_cond_signal( &p_sys->download.wait );
             }
 
@@ -873,7 +867,6 @@ static int chunk_Seek( stream_t *s, const uint64_t pos )
 
         vlc_mutex_lock( &p_sys->lock );
         resetChunksState( p_sys );
-        p_sys->playback.toffset = p_sys->time_pos;
         p_sys->playback.next_chunk_offset = 0;
         p_sys->playback.boffset = 0;
         p_sys->time_pos = p_sys->vod_duration * pos / FAKE_STREAM_SIZE;

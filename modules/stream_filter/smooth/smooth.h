@@ -124,7 +124,6 @@ struct stream_sys_t
     struct
     {
         uint64_t    boffset;     /* current byte offset in media */
-        uint64_t    toffset;     /* current time offset in media */
         uint64_t    next_chunk_offset;
         struct
         {
