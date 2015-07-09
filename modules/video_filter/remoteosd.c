@@ -230,8 +230,6 @@ struct filter_sys_t
 
     char          read_buffer[READ_BUFFER_SIZE];
 
-    bool          b_continue;
-
     vlc_thread_t  worker_thread;
 
     uint8_t       ar_color_table_yuv[256][4];
@@ -253,7 +251,6 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     /* Populating struct */
     vlc_mutex_init( &p_sys->lock );
-    p_sys->b_continue = true;
     p_sys->i_socket = -1;
     p_sys->p_pic = NULL;
 
@@ -747,21 +744,12 @@ exit:
     if( p_sys->p_pic )
         picture_Release( p_sys->p_pic );
 
-    /* It will hide the subtitle */
-    p_sys->b_continue = false;
     p_sys->b_need_update = true;
     vlc_mutex_unlock( &p_sys->lock );
 
     msg_Dbg( p_filter, "VNC message reader thread ended" );
     vlc_restorecancel (canc);
     return NULL;
-}
-
-static void update_request_thread_cleanup( void *obj )
-{
-    filter_t* p_filter = (filter_t*)obj;
-
-    p_filter->p_sys->b_continue = false;
 }
 
 static void* update_request_thread( void *obj )
@@ -779,16 +767,12 @@ static void* update_request_thread( void *obj )
     udr.w = htons(p_sys->i_vnc_width);
     udr.h = htons(p_sys->i_vnc_height);
 
-    int w;
-    vlc_cleanup_push( update_request_thread_cleanup, p_filter );
-    w = write_exact(p_filter, p_sys->i_socket, (char*)&udr,
-                    sz_rfbFramebufferUpdateRequestMsg);
-    vlc_cleanup_pop();
+    int w = write_exact(p_filter, p_sys->i_socket, (char*)&udr,
+                        sz_rfbFramebufferUpdateRequestMsg);
 
     if( !w )
     {
         msg_Err( p_filter, "Could not write rfbFramebufferUpdateRequestMsg." );
-        update_request_thread_cleanup( p_filter );
         return NULL;
     }
 
@@ -796,7 +780,6 @@ static void* update_request_thread( void *obj )
 
     if( p_sys->b_vnc_poll)
     {
-        vlc_cleanup_push( update_request_thread_cleanup, p_filter );
         for( ;; )
         {
             msleep( p_sys->i_vnc_poll_interval * 1000 );
@@ -807,8 +790,6 @@ static void* update_request_thread( void *obj )
                 break;
             }
         }
-        vlc_cleanup_pop();
-        p_filter->p_sys->b_continue = false;
     }
     else
     {
@@ -1114,9 +1095,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_start = date;
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;
-
-    if( !p_sys->b_continue )
-        p_spu->i_stop = p_spu->i_start + 1;
 
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
