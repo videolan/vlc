@@ -532,12 +532,6 @@ AudioTrack_Reset( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    if( p_sys->p_bytebuffer )
-    {
-        (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
-        p_sys->p_bytebuffer = NULL;
-    }
-
     AudioTrack_ResetPositions( env, p_aout );
     AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
     p_sys->i_samples_written = 0;
@@ -1172,39 +1166,10 @@ AudioTrack_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
                      size_t i_buffer_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    int i_ret;
-    size_t i_data = p_buffer->i_buffer - i_buffer_offset;
-    uint8_t *p_data = p_buffer->p_buffer + i_buffer_offset;
 
-    if( !p_sys->p_bytebuffer )
-    {
-        jobject p_bytebuffer;
-
-        p_bytebuffer = (*env)->NewDirectByteBuffer( env, p_data, i_data );
-        if( !p_bytebuffer )
-            return jfields.AudioTrack.ERROR_BAD_VALUE;
-
-        p_sys->p_bytebuffer = (*env)->NewGlobalRef( env, p_bytebuffer );
-        (*env)->DeleteLocalRef( env, p_bytebuffer );
-
-        if( !p_sys->p_bytebuffer || (*env)->ExceptionOccurred( env ) )
-        {
-            p_sys->p_bytebuffer = NULL;
-            (*env)->ExceptionClear( env );
-            return jfields.AudioTrack.ERROR_BAD_VALUE;
-        }
-    }
-
-    i_ret = JNI_AT_CALL_INT( writeV21, p_sys->p_bytebuffer, i_data,
-                             jfields.AudioTrack.WRITE_NON_BLOCKING );
-    if( i_ret > 0 )
-    {
-        /* don't delete the bytebuffer if we wrote nothing, keep it for next
-         * call */
-        (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
-        p_sys->p_bytebuffer = NULL;
-    }
-    return i_ret;
+    return JNI_AT_CALL_INT( writeV21, p_sys->p_bytebuffer,
+                            p_buffer->i_buffer - i_buffer_offset,
+                            jfields.AudioTrack.WRITE_NON_BLOCKING );
 }
 
 /**
@@ -1305,6 +1270,17 @@ AudioTrack_PreparePlay( JNIEnv *env, audio_output_t *p_aout,
         break;
     }
     case WRITE_V21:
+        /* No need to get a global ref, this object will be only used from the
+         * same Play call */
+        p_sys->p_bytebuffer = (*env)->NewDirectByteBuffer( env,
+                                                           p_buffer->p_buffer,
+                                                           p_buffer->i_buffer );
+        if( !p_sys->p_bytebuffer )
+        {
+            if( (*env)->ExceptionOccurred( env ) )
+                (*env)->ExceptionClear( env );
+            return VLC_EGENERIC;
+        }
         break;
     }
 
@@ -1371,7 +1347,7 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
 static void
 Play( audio_output_t *p_aout, block_t *p_buffer )
 {
-    JNIEnv *env;
+    JNIEnv *env = NULL;
     size_t i_buffer_offset = 0;
     mtime_t i_last_time_blocked = 0;
     mtime_t i_play_wait = 0;
@@ -1426,6 +1402,11 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
 
     }
 bailout:
+    if( p_sys->p_bytebuffer && env )
+    {
+        (*env)->DeleteLocalRef( env, p_sys->p_bytebuffer );
+        p_sys->p_bytebuffer = NULL;
+    }
     block_Release( p_buffer );
 }
 
@@ -1577,8 +1558,6 @@ Close( vlc_object_t *obj )
             (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );
         if( p_sys->p_floatarray )
             (*env)->DeleteGlobalRef( env, p_sys->p_floatarray );
-        if( p_sys->p_bytebuffer )
-            (*env)->DeleteGlobalRef( env, p_sys->p_bytebuffer );
     }
 
     free( p_sys );
