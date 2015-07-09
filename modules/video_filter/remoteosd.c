@@ -256,13 +256,8 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     p_sys->i_alpha = var_CreateGetIntegerCommand( p_this, RMTOSD_CFG "alpha" );
 
-    for ( int i = 0; i < 256; i++ )
-    {
-        p_sys->ar_color_table_yuv[i][0] = 255;
-        p_sys->ar_color_table_yuv[i][1] = 255;
-        p_sys->ar_color_table_yuv[i][2] = 255;
-        p_sys->ar_color_table_yuv[i][3] = 255;
-    }
+    memset( p_sys->ar_color_table_yuv, 255,
+            sizeof( p_sys->ar_color_table_yuv ) );
 
     /* Keep track of OSD Events */
     p_sys->b_need_update  = false;
