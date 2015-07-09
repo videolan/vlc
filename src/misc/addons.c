@@ -475,7 +475,6 @@ static void *InstallerThread( void *p_data )
             vlc_mutex_lock( &p_entry->lock );
             p_entry->e_state = ( i_ret == VLC_SUCCESS ) ? ADDON_NOTINSTALLED
                                                         : ADDON_INSTALLED;
-            vlc_mutex_unlock( &p_entry->lock );
         }
         else if ( p_entry->e_state == ADDON_NOTINSTALLED )
         {
@@ -491,10 +490,8 @@ static void *InstallerThread( void *p_data )
             vlc_mutex_lock( &p_entry->lock );
             p_entry->e_state = ( i_ret == VLC_SUCCESS ) ? ADDON_INSTALLED
                                                         : ADDON_NOTINSTALLED;
-            vlc_mutex_unlock( &p_entry->lock );
         }
-        else
-            vlc_mutex_unlock( &p_entry->lock );
+        vlc_mutex_unlock( &p_entry->lock );
         /* !DO WORK */
 
         event.u.addon_generic_event.p_entry = p_entry;
