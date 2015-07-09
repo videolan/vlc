@@ -267,8 +267,6 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     p_sys->b_vnc_mouse_events = var_CreateGetBoolCommand( p_this,
                                             RMTOSD_CFG "mouse-events" );
-    p_sys->b_vnc_key_events = var_CreateGetBoolCommand( p_this,
-                                            RMTOSD_CFG "key-events" );
 
     /* Keep track of OSD Events */
     p_sys->b_need_update  = false;
@@ -276,8 +274,6 @@ static int CreateFilter ( vlc_object_t *p_this )
     /* Attach subpicture source callback */
     p_filter->pf_sub_source = Filter;
     p_filter->pf_sub_mouse  = MouseEvent;
-
-    var_AddCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
 
     es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_CODEC_SPU );
     p_filter->fmt_out.i_priority = ES_PRIORITY_SELECTABLE_MIN;
@@ -291,6 +287,11 @@ static int CreateFilter ( vlc_object_t *p_this )
         msg_Err( p_filter, "cannot spawn vnc message reader thread" );
         goto error;
     }
+
+    p_sys->b_vnc_key_events = var_InheritBool( p_this,
+                                               RMTOSD_CFG "key-events" );
+    if( p_sys->b_vnc_key_events )
+        var_AddCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
 
     msg_Dbg( p_filter, "osdvnc filter started" );
 
@@ -317,15 +318,15 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     msg_Dbg( p_filter, "DestroyFilter called." );
 
+    if( p_sys->b_vnc_key_events )
+        var_DelCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
+
     vlc_cancel( p_sys->worker_thread );
     vlc_join( p_sys->worker_thread, NULL );
-
-    var_DelCallback( p_filter->p_libvlc, "key-pressed", KeyEvent, p_this );
 
     var_Destroy( p_this, RMTOSD_CFG "host" );
     var_Destroy( p_this, RMTOSD_CFG "password" );
     var_Destroy( p_this, RMTOSD_CFG "mouse-events" );
-    var_Destroy( p_this, RMTOSD_CFG "key-events" );
     var_Destroy( p_this, RMTOSD_CFG "alpha" );
 
     vlc_mutex_destroy( &p_sys->lock );
@@ -1262,9 +1263,6 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
 
     filter_t *p_filter = (filter_t *)p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    if( !p_sys->b_vnc_key_events )
-        return VLC_SUCCESS;
 
     msg_Dbg( p_this, "key pressed (%"PRId64") ", newval.i_int );
 
