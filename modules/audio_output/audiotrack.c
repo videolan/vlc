@@ -1373,7 +1373,7 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     JNIEnv *env;
     size_t i_buffer_offset = 0;
-    int i_nb_try = 0;
+    mtime_t i_last_time_blocked = 0;
     mtime_t i_play_wait = 0;
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -1386,23 +1386,35 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
     while( i_buffer_offset < p_buffer->i_buffer && !p_sys->b_error )
     {
         int i_ret;
+        bool b_forced;
 
         if( i_play_wait != 0 )
             msleep( i_play_wait );
 
+        /* HACK: AudioFlinger can drop frames without notifying us and there is
+         * no way to know it. If it happens, i_audiotrack_pos won't move and
+         * the current code will be stuck because it'll assume that audiotrack
+         * internal buffer is full when it's not. It may happen only after
+         * Android 4.4.2 if we send frames too quickly. To fix this issue,
+         * force the writting of the buffer after a certain delay. */
+        if( i_last_time_blocked != 0 )
+        {
+            b_forced = mdate() - i_last_time_blocked >
+                       FRAMES_TO_US( p_sys->i_max_audiotrack_samples ) * 2;
+        }
+        else
+            b_forced = false;
+
         i_ret = AudioTrack_Play( env, p_aout, p_buffer, &i_buffer_offset,
-                                 i_nb_try > 100 );
+                                 b_forced );
         if( i_ret < 0 )
             p_sys->b_error = true;
         else if( p_sys->i_write_type == WRITE )
         {
-            /* HACK: AudioFlinger can drop frames without notifying us and
-             * there is no way to know it. It it happens, i_audiotrack_pos
-             * won't move and the current code will be stuck because it'll
-             * assume that audiotrack internal buffer is full when it's not. It
-             * can happen only after Android 4.4.2 if we send frames too
-             * quickly. */
-            i_nb_try = i_ret == 0 ? i_nb_try + 1 : 0;
+            if( i_ret != 0 )
+                i_last_time_blocked = 0;
+            else if( i_last_time_blocked == 0 )
+                i_last_time_blocked = mdate();
         }
 
         if( p_buffer->i_buffer - i_buffer_offset > 0 )
