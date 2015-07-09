@@ -100,7 +100,8 @@ text_segment_t *text_segment_New( const char *psz_text )
     if( !segment )
         return NULL;
 
-    segment->psz_text = strdup( psz_text );
+    if ( psz_text )
+        segment->psz_text = strdup( psz_text );
 
     return segment;
 }
