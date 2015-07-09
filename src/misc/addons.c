@@ -437,7 +437,7 @@ static int installOrRemoveAddon( addons_manager_t *p_manager, addon_entry_t *p_e
 static void *InstallerThread( void *p_data )
 {
     addons_manager_t *p_manager = p_data;
-    int i_ret, i_cancel;
+    int i_ret;
     vlc_event_t event;
     event.type = vlc_AddonChanged;
 
@@ -458,6 +458,7 @@ static void *InstallerThread( void *p_data )
         addon_entry_Hold( p_entry );
         vlc_mutex_unlock( &p_manager->p_priv->installer.lock );
 
+        int i_cancel = vlc_savecancel();
         vlc_mutex_lock( &p_entry->lock );
         /* DO WORK */
         if ( p_entry->e_state == ADDON_INSTALLED )
@@ -466,12 +467,10 @@ static void *InstallerThread( void *p_data )
             vlc_mutex_unlock( &p_entry->lock );
 
             /* notify */
-            i_cancel = vlc_savecancel();
             event.u.addon_generic_event.p_entry = p_entry;
             vlc_event_send( p_manager->p_event_manager, &event );
 
             i_ret = installOrRemoveAddon( p_manager, p_entry, false );
-            vlc_restorecancel( i_cancel );
 
             vlc_mutex_lock( &p_entry->lock );
             p_entry->e_state = ( i_ret == VLC_SUCCESS ) ? ADDON_NOTINSTALLED
@@ -484,12 +483,10 @@ static void *InstallerThread( void *p_data )
             vlc_mutex_unlock( &p_entry->lock );
 
             /* notify */
-            i_cancel = vlc_savecancel();
             event.u.addon_generic_event.p_entry = p_entry;
             vlc_event_send( p_manager->p_event_manager, &event );
 
             i_ret = installOrRemoveAddon( p_manager, p_entry, true );
-            vlc_restorecancel( i_cancel );
 
             vlc_mutex_lock( &p_entry->lock );
             p_entry->e_state = ( i_ret == VLC_SUCCESS ) ? ADDON_INSTALLED
@@ -500,14 +497,11 @@ static void *InstallerThread( void *p_data )
             vlc_mutex_unlock( &p_entry->lock );
         /* !DO WORK */
 
-        i_cancel = vlc_savecancel();
         event.u.addon_generic_event.p_entry = p_entry;
         vlc_event_send( p_manager->p_event_manager, &event );
-        vlc_restorecancel( i_cancel );
 
         addon_entry_Release( p_entry );
 
-        i_cancel = vlc_savecancel();
         addons_manager_WriteCatalog( p_manager );
         vlc_restorecancel( i_cancel );
     }
