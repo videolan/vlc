@@ -318,21 +318,15 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static bool read_exact( filter_t *p_filter,
-                        int i_socket,
-                        char* p_readbuf,
-                        int i_bytes )
+static bool read_exact( filter_t *obj, int fd, void *buf, size_t len )
 {
-    return i_bytes == net_Read( p_filter, i_socket, p_readbuf, i_bytes );
+    return (ssize_t)len == net_Read( obj, fd, buf, len );
 }
 
 
-static bool write_exact( filter_t *p_filter,
-                         int i_socket,
-                         char* p_writebuf,
-                         int i_bytes )
+static bool write_exact( filter_t *obj, int fd, const void *buf, size_t len )
 {
-    return i_bytes == net_Write( p_filter, i_socket, p_writebuf, i_bytes );
+    return (ssize_t)len == net_Write( obj, fd, buf, len );
 }
 
 static int vnc_connect( filter_t *p_filter )
@@ -370,7 +364,7 @@ static int vnc_connect( filter_t *p_filter )
 
     msg_Dbg( p_filter, "Reading authentication scheme" );
     uint32_t i_authScheme;
-    if( !read_exact( p_filter, fd, (char*)&i_authScheme, 4 ) )
+    if( !read_exact( p_filter, fd, &i_authScheme, 4 ) )
     {
         msg_Err( p_filter, "Could not read authentication scheme" );
         goto error;
@@ -386,7 +380,7 @@ static int vnc_connect( filter_t *p_filter )
     if (i_authScheme == rfbVncAuth)
     {
         unsigned char challenge[CHALLENGESIZE];
-        if ( !read_exact( p_filter, fd, (char*)challenge, CHALLENGESIZE ) )
+        if ( !read_exact( p_filter, fd, challenge, CHALLENGESIZE ) )
         {
             msg_Err( p_filter, "Could not read password challenge" );
             goto error;
@@ -394,13 +388,13 @@ static int vnc_connect( filter_t *p_filter )
 
         vnc_encrypt_bytes( challenge, p_sys->psz_passwd );
 
-        if( !write_exact(p_filter, fd, (char*)challenge, CHALLENGESIZE ) )
+        if( !write_exact(p_filter, fd, challenge, CHALLENGESIZE ) )
         {
             msg_Err( p_filter, "Could not write password" );
             goto error;
         }
         uint32_t i_authResult;
-        if( !read_exact( p_filter, fd, (char*)&i_authResult, 4 ) )
+        if( !read_exact( p_filter, fd, &i_authResult, 4 ) )
         {
             msg_Err( p_filter, "Could not read authentication result" );
             goto error;
@@ -416,7 +410,7 @@ static int vnc_connect( filter_t *p_filter )
     msg_Dbg( p_filter, "Writing client init message" );
     rfbClientInitMsg ci;
     ci.shared = 1;
-    if( !write_exact( p_filter, fd, (char*)&ci, sz_rfbClientInitMsg ) )
+    if( !write_exact( p_filter, fd, &ci, sz_rfbClientInitMsg ) )
     {
         msg_Err( p_filter, "Could not write client init message" );
         goto error;
@@ -424,7 +418,7 @@ static int vnc_connect( filter_t *p_filter )
 
     msg_Dbg( p_filter, "Reading server init message" );
     rfbServerInitMsg si;
-    if( !read_exact( p_filter, fd, (char*)&si, sz_rfbServerInitMsg ) )
+    if( !read_exact( p_filter, fd, &si, sz_rfbServerInitMsg ) )
     {
         msg_Err( p_filter, "Could not read server init message" );
         goto error;
@@ -497,7 +491,7 @@ static int vnc_connect( filter_t *p_filter )
     sp.format.blueShift = 0;
     sp.format.pad1 = sp.format.pad2 = 0;
 
-    if( !write_exact( p_filter, fd, (char*)&sp, sz_rfbSetPixelFormatMsg) )
+    if( !write_exact( p_filter, fd, &sp, sz_rfbSetPixelFormatMsg) )
     {
         msg_Err( p_filter, "Could not write SetPixelFormat message" );
         goto error;
@@ -510,7 +504,7 @@ static int vnc_connect( filter_t *p_filter )
     se.pad = 0;
     se.nEncodings = htons( p_sys->b_alpha_from_vnc ? 3 : 2 );
 
-    if( !write_exact( p_filter, fd, (char*)&se, sz_rfbSetEncodingsMsg) )
+    if( !write_exact( p_filter, fd, &se, sz_rfbSetEncodingsMsg) )
     {
         msg_Err( p_filter, "Could not write SetEncodings message begin" );
         goto error;
@@ -520,7 +514,7 @@ static int vnc_connect( filter_t *p_filter )
 
     msg_Dbg( p_filter, "Writing SetEncodings rfbEncodingCopyRect" );
     i_encoding = htonl(rfbEncodingCopyRect);
-    if( !write_exact( p_filter, fd, (char*)&i_encoding, 4) )
+    if( !write_exact( p_filter, fd, &i_encoding, 4) )
     {
         msg_Err( p_filter, "Could not write encoding type rfbEncodingCopyRect." );
         goto error;
@@ -528,7 +522,7 @@ static int vnc_connect( filter_t *p_filter )
 
     msg_Dbg( p_filter, "Writing SetEncodings rfbEncodingRRE" );
     i_encoding = htonl(rfbEncodingRRE);
-    if( !write_exact(p_filter, fd, (char*)&i_encoding, 4) )
+    if( !write_exact(p_filter, fd, &i_encoding, 4) )
     {
         msg_Err( p_filter, "Could not write encoding type rfbEncodingRRE." );
         goto error;
@@ -539,7 +533,7 @@ static int vnc_connect( filter_t *p_filter )
         msg_Dbg( p_filter, "Writing SetEncodings rfbEncSpecialUseAlpha" );
         i_encoding = 0x00F0FFFF; /* rfbEncSpecialUseAlpha is 0xFFFFF000
                                   * before we swap it */
-        if( !write_exact(p_filter, fd, (char*)&i_encoding, 4) )
+        if( !write_exact(p_filter, fd, &i_encoding, 4) )
         {
             msg_Err( p_filter, "Could not write encoding type rfbEncSpecialUseAlpha." );
             goto error;
@@ -564,7 +558,7 @@ static int write_update_request(filter_t *p_filter, bool incremental)
     udr.w = htons(p_sys->i_vnc_width);
     udr.h = htons(p_sys->i_vnc_height);
 
-    int w = write_exact(p_filter, p_sys->i_socket, (char*)&udr,
+    int w = write_exact(p_filter, p_sys->i_socket, &udr,
                         sz_rfbFramebufferUpdateRequestMsg);
     if( !w )
         msg_Err( p_filter, "Could not write rfbFramebufferUpdateRequestMsg." );
@@ -619,7 +613,7 @@ static void* vnc_worker_thread( void *obj )
 
         memset( &msg, 0, sizeof(msg) );
 
-        if( !read_exact(p_filter, fd, (char*)&msg, 1 ) )
+        if( !read_exact(p_filter, fd, &msg, 1 ) )
         {
             msg_Err( p_filter, "Error while waiting for next server message");
             break;
@@ -652,7 +646,7 @@ static void* vnc_worker_thread( void *obj )
 
         if( --i_msgSize > 0 )
         {
-            if ( !read_exact( p_filter, fd, ((char*)&msg)+1, i_msgSize ) )
+            if ( !read_exact( p_filter, fd, ((char *)&msg) + 1, i_msgSize ) )
             {
                 msg_Err( p_filter, "Error while reading message of type %u",
                          msg.type );
@@ -721,8 +715,8 @@ static bool process_server_message ( filter_t *p_filter,
 
             for (int i_rect = 0; i_rect < msg->fu.nRects; i_rect++)
             {
-                if (!read_exact(p_filter, p_sys->i_socket, (char*)&hdr,
-                    sz_rfbFramebufferUpdateRectHeader ) )
+                if (!read_exact(p_filter, p_sys->i_socket, &hdr,
+                                sz_rfbFramebufferUpdateRectHeader ) )
                 {
                     msg_Err( p_filter, "Could not read FrameBufferUpdate header" );
                     return false;
@@ -766,8 +760,7 @@ static bool process_server_message ( filter_t *p_filter,
                         rfbCopyRect rect;
 
                         if ( !read_exact( p_filter, p_sys->i_socket,
-                                          (char*)&rect,
-                                          sz_rfbCopyRect ) )
+                                          &rect, sz_rfbCopyRect ) )
                         {
                             msg_Err( p_filter, "Could not read rfbCopyRect" );
                             return false;
@@ -793,15 +786,14 @@ static bool process_server_message ( filter_t *p_filter,
                     {
                         rfbRREHeader rrehdr;
                         if ( !read_exact( p_filter, p_sys->i_socket,
-                                          (char*)&rrehdr,
-                                          sz_rfbRREHeader ) )
+                                          &rrehdr, sz_rfbRREHeader ) )
                         {
                             msg_Err( p_filter, "Could not read rfbRREHeader" );
                             return false;
                         }
                         uint8_t i_pixcolor;
-                        if ( !read_exact(p_filter, p_sys->i_socket,
-                                         (char*)&i_pixcolor, 1 ) )
+                        if ( !read_exact( p_filter, p_sys->i_socket,
+                                          &i_pixcolor, 1 ) )
                         {
                             msg_Err( p_filter, "Could not read RRE pixcolor" );
                             return false;
@@ -830,7 +822,7 @@ static bool process_server_message ( filter_t *p_filter,
                             return false;
                         }
                         if ( !read_exact( p_filter, p_sys->i_socket,
-                                       p_sys->read_buffer, i_datasize ) )
+                                          p_sys->read_buffer, i_datasize ) )
                         {
                             msg_Err( p_filter,
                                      "Could not read RRE subrect data" );
@@ -943,8 +935,8 @@ static bool process_server_message ( filter_t *p_filter,
             msg_Err( p_filter, "Buffer too small, need %u bytes", msg->sct.length );
             return false;
         }
-        if ( !read_exact(p_filter, p_sys->i_socket,
-                         p_sys->read_buffer, msg->sct.length ) )
+        if ( !read_exact( p_filter, p_sys->i_socket,
+                          p_sys->read_buffer, msg->sct.length ) )
         {
             msg_Err( p_filter, "Could not read Reading rfbServerCutText data" );
             return false;
@@ -1226,8 +1218,7 @@ static int MouseEvent( filter_t *p_filter,
     ev.x = htons(i_x);
     ev.y = htons(i_y);
 
-    write_exact( p_filter, p_sys->i_socket,
-                 (char*)&ev, sz_rfbPointerEventMsg);
+    write_exact( p_filter, p_sys->i_socket, &ev, sz_rfbPointerEventMsg);
     vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_EGENERIC;
@@ -1271,51 +1262,43 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     if (newval.i_int & KEY_MODIFIER_CTRL)
     {
         ev.key = 0xffe3;
-        write_exact( p_filter, p_sys->i_socket,
-                     (char*)&ev, sz_rfbKeyEventMsg);
+        write_exact( p_filter, p_sys->i_socket, &ev, sz_rfbKeyEventMsg );
     }
     if (newval.i_int & KEY_MODIFIER_SHIFT)
     {
         ev.key = 0xffe1;
-        write_exact( p_filter, p_sys->i_socket,
-                     (char*)&ev, sz_rfbKeyEventMsg);
+        write_exact( p_filter, p_sys->i_socket, &ev, sz_rfbKeyEventMsg );
     }
     if (newval.i_int & KEY_MODIFIER_ALT)
     {
         ev.key = 0xffe9;
-        write_exact( p_filter, p_sys->i_socket,
-                     (char*)&ev, sz_rfbKeyEventMsg);
+        write_exact( p_filter, p_sys->i_socket, &ev, sz_rfbKeyEventMsg );
     }
 
     /* then key-down for the pressed key */
     ev.key = i_key32;
-    write_exact( p_filter, p_sys->i_socket,
-                 (char*)&ev, sz_rfbKeyEventMsg);
+    write_exact( p_filter, p_sys->i_socket, &ev, sz_rfbKeyEventMsg );
 
     ev.down = 0;
 
     /* then key-up for the pressed key */
-    write_exact( p_filter, p_sys->i_socket,
-                 (char*)&ev, sz_rfbKeyEventMsg);
+    write_exact( p_filter, p_sys->i_socket, &ev, sz_rfbKeyEventMsg );
 
     /* last key-down for modifier-keys */
     if (newval.i_int & KEY_MODIFIER_CTRL)
     {
         ev.key = 0xffe3;
-        write_exact( p_filter, p_sys->i_socket,
-                     (char*)&ev, sz_rfbKeyEventMsg);
+        write_exact( p_filter, p_sys->i_socket, &ev, sz_rfbKeyEventMsg );
     }
     if (newval.i_int & KEY_MODIFIER_SHIFT)
     {
         ev.key = 0xffe1;
-        write_exact( p_filter, p_sys->i_socket,
-                     (char*)&ev, sz_rfbKeyEventMsg);
+        write_exact( p_filter, p_sys->i_socket, &ev, sz_rfbKeyEventMsg );
     }
     if (newval.i_int & KEY_MODIFIER_ALT)
     {
        ev.key = 0xffe9;
-       write_exact( p_filter, p_sys->i_socket,
-                    (char*)&ev, sz_rfbKeyEventMsg);
+       write_exact( p_filter, p_sys->i_socket, &ev, sz_rfbKeyEventMsg );
     }
     vlc_mutex_unlock( &p_sys->lock );
 
