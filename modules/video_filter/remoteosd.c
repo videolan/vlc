@@ -587,14 +587,19 @@ static void* vnc_worker_thread( void *obj )
     }
 
     /* Create an empty picture for VNC the data */
-    vlc_mutex_lock( &p_sys->lock );
-    p_sys->i_socket = fd;
-    p_sys->p_pic = picture_New( VLC_CODEC_YUVA,
-                                p_sys->i_vnc_width, p_sys->i_vnc_height, 1, 1 );
-    vlc_mutex_unlock( &p_sys->lock );
-    if( !p_sys->p_pic )
+    picture_t *pic =  picture_New( VLC_CODEC_YUVA, p_sys->i_vnc_width,
+                                   p_sys->i_vnc_height, 1, 1 );
+    if( likely(pic != NULL) )
     {
-        goto exit;
+        vlc_mutex_lock( &p_sys->lock );
+        p_sys->i_socket = fd;
+        p_sys->p_pic = pic;
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+    else
+    {
+        net_Close( fd );
+        return NULL;
     }
 
     write_update_request( p_filter, false );
@@ -670,8 +675,6 @@ static void* vnc_worker_thread( void *obj )
         vlc_cancel( update_request_thread_handle );
         vlc_join( update_request_thread_handle, NULL );
     }
-
-exit:
 
     msg_Dbg( p_filter, "VNC message reader thread ended" );
     vlc_restorecancel (canc);
