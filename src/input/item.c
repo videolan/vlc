@@ -1176,7 +1176,7 @@ static int compar_node( const void *p1, const void *p2 )
 static void sort_subitems( input_item_node_t *p_node,
                            input_item_compar_cb compar_cb )
 {
-    if( p_node->i_children < 0 || !compar_cb )
+    if( p_node->i_children <= 0 || !compar_cb )
         return;
 
     p_node->compar_cb = compar_cb;
