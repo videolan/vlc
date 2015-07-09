@@ -347,9 +347,7 @@ static void *FinderThread( void *p_data )
             p_finder->i_flags |= OBJECT_FLAGS_NOINTERACT;
             module_t *p_module;
             ARRAY_INIT( p_finder->entries );
-            vlc_mutex_lock( &p_manager->p_priv->finder.lock );
             p_finder->psz_uri = psz_uri;
-            vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
 
             p_module = module_need( p_finder, "addons finder", NULL, false );
             if( p_module )
