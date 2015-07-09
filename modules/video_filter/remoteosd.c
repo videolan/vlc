@@ -615,13 +615,13 @@ static void* vnc_worker_thread( void *obj )
     }
 
     /* connection is initialized, now read and handle server messages */
-    vlc_restorecancel (canc);
     for( ;; )
     {
         rfbServerToClientMsg msg;
         int i_msgSize;
 
         memset( &msg, 0, sizeof(msg) );
+        vlc_restorecancel (canc);
 
         if( !read_exact(p_filter, fd, &msg, 1 ) )
         {
@@ -666,9 +666,7 @@ static void* vnc_worker_thread( void *obj )
 
         canc = vlc_savecancel ();
         process_server_message( p_filter, &msg);
-        vlc_restorecancel (canc);
     }
-    canc = vlc_savecancel ();
 
     if( polling )
     {
