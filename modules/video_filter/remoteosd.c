@@ -570,11 +570,24 @@ static int write_update_request(filter_t *p_filter, bool incremental)
     return w;
 }
 
+static void update_thread_cleanup( void *p )
+{
+    vlc_thread_t *th = p;
+
+    vlc_cancel( *th );
+    vlc_join( *th, NULL );
+}
+
+static void dummy_cleanup( void *p )
+{
+    (void) p;
+}
+
 static void* vnc_worker_thread( void *obj )
 {
     filter_t* p_filter = (filter_t*)obj;
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_thread_t update_request_thread_handle;
+    vlc_thread_t update_thread;
     int canc = vlc_savecancel ();
 
     msg_Dbg( p_filter, "VNC worker thread started" );
@@ -607,12 +620,15 @@ static void* vnc_worker_thread( void *obj )
     /* create the update request thread */
     bool polling = var_InheritBool( p_filter, RMTOSD_CFG "vnc-polling" );
     if( polling
-     && vlc_clone( &update_request_thread_handle, update_request_thread,
+     && vlc_clone( &update_thread, update_request_thread,
                    p_filter, VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_filter, "cannot spawn VNC update request thread" );
         polling = false;
     }
+
+    vlc_cleanup_push( polling ? update_thread_cleanup : dummy_cleanup,
+                      &update_thread );
 
     /* connection is initialized, now read and handle server messages */
     for( ;; )
@@ -668,11 +684,9 @@ static void* vnc_worker_thread( void *obj )
         process_server_message( p_filter, &msg);
     }
 
+    vlc_cleanup_pop();
     if( polling )
-    {
-        vlc_cancel( update_request_thread_handle );
-        vlc_join( update_request_thread_handle, NULL );
-    }
+        update_thread_cleanup( &update_thread );
 
     msg_Dbg( p_filter, "VNC message reader thread ended" );
     vlc_restorecancel (canc);
