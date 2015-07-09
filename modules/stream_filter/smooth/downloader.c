@@ -639,7 +639,7 @@ void* sms_Thread( void *p_this )
     }
     vlc_cond_signal( &p_sys->playback.wait );
 
-    while( !p_sys->b_close )
+    for( ;; )
     {
         if ( !p_sys->b_live || !p_sys->download.lookahead_count )
             stream_Control( s, STREAM_GET_PTS_DELAY, &i_pts_delay );
@@ -650,14 +650,6 @@ void* sms_Thread( void *p_this )
                                            i_pts_delay ) )
         {
             vlc_cond_wait( &p_sys->download.wait, &p_sys->lock );
-            if( p_sys->b_close )
-                break;
-        }
-
-        if( p_sys->b_close )
-        {
-            vlc_mutex_unlock( &p_sys->lock );
-            break;
         }
 
         sms_stream_t *sms = next_download_stream( p_sys );

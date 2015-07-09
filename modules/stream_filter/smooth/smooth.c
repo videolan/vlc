@@ -558,7 +558,6 @@ static void Close( vlc_object_t *p_this )
     stream_t *s = (stream_t*)p_this;
     stream_sys_t *p_sys = s->p_sys;
 
-    p_sys->b_close = true;
     vlc_cond_signal(&p_sys->download.wait);
 
     vlc_join( p_sys->download.thread, NULL );

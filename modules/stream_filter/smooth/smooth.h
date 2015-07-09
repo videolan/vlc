@@ -136,7 +136,6 @@ struct stream_sys_t
 
     /* state */
     bool        b_live;      /* live stream? or vod? */
-    bool        b_close;     /* set by Close() */
 };
 
 #define SMS_GET_SELECTED_ST( cat ) \
