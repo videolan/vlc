@@ -194,16 +194,14 @@ static void vnc_encrypt_bytes( unsigned char *bytes, char *passwd );
  *****************************************************************************/
 struct filter_sys_t
 {
+    vlc_mutex_t   lock;                /* To lock for read/write on picture */
+
     bool          b_need_update;       /* VNC picture is updated, do update the OSD*/
     uint8_t       i_alpha;             /* alpha transparency value */
 
     char          *psz_host;           /* VNC host */
 
     char          *psz_passwd;         /* VNC password */
-
-    bool          b_vnc_key_events;    /* Send KeyEvents ? */
-
-    vlc_mutex_t   lock;                /* To lock for read/write on picture */
 
     picture_t     *p_pic;              /* The picture with OSD data from VNC */
 
@@ -212,6 +210,7 @@ struct filter_sys_t
     uint16_t      i_vnc_width;          /* The with of the VNC screen */
     uint16_t      i_vnc_height;         /* The height of the VNC screen */
 
+    bool          b_vnc_key_events;    /* Send KeyEvents ? */
     bool    b_alpha_from_vnc;    /* Special ffnetdev alpha feature enabled ? */
 
     char          read_buffer[READ_BUFFER_SIZE];
@@ -227,46 +226,36 @@ struct filter_sys_t
 static int CreateFilter ( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = NULL;
 
-    msg_Dbg( p_filter, "Creating vnc osd filter..." );
-
-    p_filter->p_sys = p_sys = calloc( 1, sizeof(*p_sys) );
-    if( !p_filter->p_sys )
+    filter_sys_t *p_sys = malloc( sizeof (*p_sys) );
+    if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
     /* Populating struct */
     vlc_mutex_init( &p_sys->lock );
-    p_sys->i_socket = -1;
+    p_sys->b_need_update = false;
+    p_sys->psz_host = var_InheritString( p_this, RMTOSD_CFG "host" );
+    p_sys->psz_passwd = var_InheritString( p_this, RMTOSD_CFG "password" );
+    p_sys->i_alpha = var_InheritInteger( p_this, RMTOSD_CFG "alpha" );
     p_sys->p_pic = NULL;
+    p_sys->i_socket = -1;
 
-    p_sys->psz_host = var_CreateGetString( p_this, RMTOSD_CFG "host" );
-    if( EMPTY_STR(p_sys->psz_host) )
+    memset( p_sys->ar_color_table_yuv, 255,
+            sizeof( p_sys->ar_color_table_yuv ) );
+
+    if( p_sys->psz_host == NULL )
     {
         msg_Err( p_filter, "unable to get vnc host" );
         goto error;
     }
 
-    p_sys->psz_passwd = var_CreateGetString( p_this, RMTOSD_CFG "password" );
-    if( !p_sys->psz_passwd )
+    if( p_sys->psz_passwd == NULL )
     {
         msg_Err( p_filter, "unable to get vnc password" );
         goto error;
     }
 
-    p_sys->i_alpha = var_CreateGetIntegerCommand( p_this, RMTOSD_CFG "alpha" );
-
-    memset( p_sys->ar_color_table_yuv, 255,
-            sizeof( p_sys->ar_color_table_yuv ) );
-
-    /* Keep track of OSD Events */
-    p_sys->b_need_update  = false;
-
-    /* Attach subpicture source callback */
-    p_filter->pf_sub_source = Filter;
-
-    es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_CODEC_SPU );
-    p_filter->fmt_out.i_priority = ES_PRIORITY_SELECTABLE_MIN;
+    p_filter->p_sys = p_sys;
 
     vlc_gcrypt_init();
 
@@ -277,6 +266,12 @@ static int CreateFilter ( vlc_object_t *p_this )
         msg_Err( p_filter, "cannot spawn vnc message reader thread" );
         goto error;
     }
+
+    /* Attach subpicture source callback */
+    p_filter->pf_sub_source = Filter;
+
+    es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_CODEC_SPU );
+    p_filter->fmt_out.i_priority = ES_PRIORITY_SELECTABLE_MIN;
 
     if( var_InheritBool( p_this, RMTOSD_CFG "mouse-events" ) )
         p_filter->pf_sub_mouse = MouseEvent;
@@ -316,10 +311,6 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     vlc_cancel( p_sys->worker_thread );
     vlc_join( p_sys->worker_thread, NULL );
-
-    var_Destroy( p_this, RMTOSD_CFG "host" );
-    var_Destroy( p_this, RMTOSD_CFG "password" );
-    var_Destroy( p_this, RMTOSD_CFG "alpha" );
 
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->psz_host );
