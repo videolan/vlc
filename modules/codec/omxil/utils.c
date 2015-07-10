@@ -81,13 +81,14 @@ OMX_ERRORTYPE WaitForOmxEvent(OmxEventQueue *queue, OMX_EVENTTYPE *event,
     OMX_U32 *data_1, OMX_U32 *data_2, OMX_PTR *event_data)
 {
     OmxEvent *p_event;
+    mtime_t deadline = mdate() + CLOCK_FREQ;
 
     vlc_mutex_lock(&queue->mutex);
 
-    if(!queue->p_events)
-        vlc_cond_timedwait(&queue->cond, &queue->mutex, mdate()+CLOCK_FREQ);
+    while ((p_event = queue->p_events) == NULL)
+        if (vlc_cond_timedwait(&queue->cond, &queue->mutex, deadline))
+            break;
 
-    p_event = queue->p_events;
     if(p_event)
     {
         queue->p_events = p_event->next;
