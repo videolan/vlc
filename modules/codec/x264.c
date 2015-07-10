@@ -298,7 +298,7 @@ static void x264_log( void *, int i_level, const char *psz, va_list );
     " - 2: Smart analysis\n" )
 
 #define ME_TEXT N_("Integer pixel motion estimation method")
-#define ME_LONGTEXT N_( "Selects the motion estimation algorithm: "\
+#define ME_LONGTEXT N_( "Selects the motion estimation algorithm:\n"\
     " - dia: diamond search, radius 1 (fast)\n" \
     " - hex: hexagonal search, radius 2\n" \
     " - umh: uneven multi-hexagon search (better but slower)\n" \
