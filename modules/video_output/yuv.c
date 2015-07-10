@@ -43,12 +43,11 @@
 
 #define CHROMA_TEXT N_("Chroma used")
 #define CHROMA_LONGTEXT N_(\
-    "Force use of a specific chroma for output. Default is I420.")
+    "Force use of a specific chroma for output.")
 
-#define YUV4MPEG2_TEXT N_("YUV4MPEG2 header (default disabled)")
+#define YUV4MPEG2_TEXT N_("Add a YUV4MPEG2 header")
 #define YUV4MPEG2_LONGTEXT N_("The YUV4MPEG2 header is compatible " \
-    "with mplayer yuv video output and requires YV12/I420 fourcc. By default "\
-    "vlc writes the fourcc of the picture frame into the output destination.")
+    "with mplayer yuv video output and requires YV12/I420 fourcc.")
 
 #define CFG_PREFIX "yuv-"
 
