@@ -3902,18 +3902,6 @@ AS_IF([test "${enable_vsxu}" != "no"],
     ])
   ])
 
-dnl
-dnl  AtmoLight (homemade Philips Ambilight clone)
-dnl
-AC_ARG_ENABLE(atmo,
-AS_HELP_STRING([--disable-atmo],[AtmoLight (homemade Philips Ambilight clone)
-                (default enabled)]),, [enable_atmo="yes"])
-AS_IF([test "${enable_atmo}" != no], [
-  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "linux"], [
-    VLC_ADD_PLUGIN([atmo])
-  ])
-])
-
 EXTEND_HELP_STRING([Service Discovery plugins:])
 dnl
 dnl  Bonjour services discovery

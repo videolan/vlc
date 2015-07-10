@@ -157,6 +157,9 @@ Misc
  * remove ZPL playlist format
  * Update libVLC doxygen modules
 
+Removed modules
+ * Atmo video filter
+
 
 Changes between 2.2.0 and 2.2.1:
 --------------------------------
