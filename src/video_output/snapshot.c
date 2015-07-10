@@ -78,15 +78,16 @@ void vout_snapshot_End(vout_snapshot_t *snap)
 /* */
 picture_t *vout_snapshot_Get(vout_snapshot_t *snap, mtime_t timeout)
 {
+    const mtime_t deadline = mdate() + timeout;
+
     vlc_mutex_lock(&snap->lock);
 
     /* */
     snap->request_count++;
 
     /* */
-    const mtime_t deadline = mdate() + timeout;
-    while (snap->is_available && !snap->picture && mdate() < deadline)
-        vlc_cond_timedwait(&snap->wait, &snap->lock, deadline);
+    while (snap->is_available && !snap->picture &&
+        vlc_cond_timedwait(&snap->wait, &snap->lock, deadline) == 0);
 
     /* */
     picture_t *picture = snap->picture;
