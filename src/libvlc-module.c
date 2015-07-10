@@ -995,7 +995,7 @@ static const char *const ppsz_prefres[] = {
 #define VOD_SERVER_TEXT N_("VoD server module")
 #define VOD_SERVER_LONGTEXT N_( \
     "You can select which VoD server module you want to use. Set this " \
-    "to `vod_rtsp' to switch back to the old, legacy module." )
+    "to 'vod_rtsp' to switch back to the old, legacy module." )
 
 #define RT_PRIORITY_TEXT N_("Allow real-time priority")
 #define RT_PRIORITY_LONGTEXT N_( \
