@@ -1192,7 +1192,7 @@ LIBVLC_API
  * \version LibVLC 3.0.0 and later.
  *
  * \param p_mi the media player
- * \param index of the title to query for chapters
+ * \param index of the title to query for chapters (uses current title if set to -1)
  * \param address to store an allocated array of chapter descriptions
  *        descriptions (must be freed with libvlc_chapter_descriptions_release()
  *        by the caller) [OUT]
