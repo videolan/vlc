@@ -214,23 +214,6 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( hqdn3dChromaTempSlider, valueChanged( int ) )
 
 
-    if( module_exists( "atmo" ) )
-    {
-        SETUP_VFILTER( atmo )
-        SETUP_VFILTER_OPTION( atmoEdgeweightningSlider, valueChanged( int ) )
-        SETUP_VFILTER_OPTION( atmoBrightnessSlider, valueChanged( int ) )
-        SETUP_VFILTER_OPTION( atmoDarknesslimitSlider, valueChanged( int ) )
-        SETUP_VFILTER_OPTION( atmoMeanlengthSlider, valueChanged( int ) )
-        SETUP_VFILTER_OPTION( atmoMeanthresholdSlider, valueChanged( int ) )
-        SETUP_VFILTER_OPTION( atmoPercentnewSlider, valueChanged( int ) )
-        SETUP_VFILTER_OPTION( atmoFiltermodeCombo, currentIndexChanged( int ) )
-        SETUP_VFILTER_OPTION( atmoShowdotsCheck, stateChanged( int ) )
-    }
-    else
-    {
-        _parent->removeTab( _parent->indexOf( ui.tab_atmo ) );
-    }
-
     SETUP_VFILTER( anaglyph )
 
 #undef SETUP_VFILTER
