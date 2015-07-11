@@ -22,6 +22,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1C15C7DC1B5146DB003AB729 /* ResumeDialogController.h in Sources */ = {isa = PBXBuildFile; fileRef = 633121CA1B51122700E636DA /* ResumeDialogController.h */; };
+		1C15C7DD1B5146DB003AB729 /* ResumeDialogController.m in Sources */ = {isa = PBXBuildFile; fileRef = 633121CB1B51122700E636DA /* ResumeDialogController.m */; };
 		1C57690E19DC93620099F5A6 /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C57690D19DC93620099F5A6 /* topbar_background.png */; };
 		1C88BA5419DC7B2200645190 /* yosemite-window-close-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */; };
 		1C88BA5519DC7B2200645190 /* yosemite-window-close-graphite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */; };
@@ -457,6 +459,7 @@
 		1CE5ED2419DD6AB700FCEFD3 /* lion-window-fullscreen-over@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED1E19DD6AB700FCEFD3 /* lion-window-fullscreen-over@2x.png */; };
 		1CE5ED2519DD6AB700FCEFD3 /* lion-window-fullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED1F19DD6AB700FCEFD3 /* lion-window-fullscreen.png */; };
 		1CE5ED2619DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED2019DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png */; };
+		633121D01B5112C300E636DA /* ResumeDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 633121CE1B5112C300E636DA /* ResumeDialog.xib */; };
 		7D3F6525188051F2005776C4 /* BWQuincyMain.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D3F6523188051F2005776C4 /* BWQuincyMain.xib */; };
 		7D8BB0B71830311300FAE9B7 /* DebugMessageVisualizer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */; };
 		7D8BB0BA1830367200FAE9B7 /* PlaylistMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */; };
@@ -1248,6 +1251,9 @@
 		5CCED71314C0D4A90057F8D1 /* ExtensionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExtensionsManager.m; path = ../../../modules/gui/macosx/ExtensionsManager.m; sourceTree = SOURCE_ROOT; };
 		5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCUIWidgets.h; path = ../../../modules/gui/macosx/VLCUIWidgets.h; sourceTree = SOURCE_ROOT; };
 		5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCUIWidgets.m; path = ../../../modules/gui/macosx/VLCUIWidgets.m; sourceTree = SOURCE_ROOT; };
+		633121CA1B51122700E636DA /* ResumeDialogController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResumeDialogController.h; path = ../../../modules/gui/macosx/ResumeDialogController.h; sourceTree = "<group>"; };
+		633121CB1B51122700E636DA /* ResumeDialogController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ResumeDialogController.m; path = ../../../modules/gui/macosx/ResumeDialogController.m; sourceTree = "<group>"; };
+		633121CF1B5112C300E636DA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ResumeDialog.xib; sourceTree = "<group>"; };
 		7D3F6524188051F2005776C4 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/BWQuincyMain.xib; sourceTree = "<group>"; };
 		7D3F652618805297005776C4 /* BWQuincyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BWQuincyManager.h; path = ../../../modules/gui/macosx/BWQuincyManager.h; sourceTree = SOURCE_ROOT; };
 		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyManager.m; path = ../../../modules/gui/macosx/BWQuincyManager.m; sourceTree = SOURCE_ROOT; };
@@ -1886,6 +1892,8 @@
 				8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */,
 				8ED6C28503E2EB1C0059A3A7 /* prefs.h */,
 				8ED6C28603E2EB1C0059A3A7 /* prefs.m */,
+				633121CA1B51122700E636DA /* ResumeDialogController.h */,
+				633121CB1B51122700E636DA /* ResumeDialogController.m */,
 				CC461F6C160078340022423C /* SharedDialogs.h */,
 				CC461F6D160078340022423C /* SharedDialogs.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
@@ -2934,6 +2942,7 @@
 				CCD83E4213FEA143004F1652 /* Wizard.xib */,
 				CCD83E2B13FE9B90004F1652 /* MainMenu.xib */,
 				CC0663371566CD5A003A411C /* ConvertAndSave.xib */,
+				633121CE1B5112C300E636DA /* ResumeDialog.xib */,
 				CC461F73160084A10022423C /* SharedDialogs.xib */,
 				7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */,
 				7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */,
@@ -3848,6 +3857,7 @@
 				1CE5ED2119DD6AB700FCEFD3 /* lion-window-fullscreen-on.png in Resources */,
 				1C88BC9019DC7CB300645190 /* ys-fs_exit_fullscreen.png in Resources */,
 				1C88BB2A19DC7C7800645190 /* ys-fullscreen-one-button.png in Resources */,
+				633121D01B5112C300E636DA /* ResumeDialog.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3889,6 +3899,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C15C7DC1B5146DB003AB729 /* ResumeDialogController.h in Sources */,
+				1C15C7DD1B5146DB003AB729 /* ResumeDialogController.m in Sources */,
 				1CCB5F511A62A724004C3E90 /* about.h in Sources */,
 				1CCB5F521A62A724004C3E90 /* about.m in Sources */,
 				1CCB5F531A62A724004C3E90 /* AddonListDataSource.h in Sources */,
@@ -4002,6 +4014,14 @@
 				1CBB2CC71B06A6DE00110ADA /* English */,
 			);
 			name = Help.xib;
+			sourceTree = "<group>";
+		};
+		633121CE1B5112C300E636DA /* ResumeDialog.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				633121CF1B5112C300E636DA /* English */,
+			);
+			name = ResumeDialog.xib;
 			sourceTree = "<group>";
 		};
 		7D3F6523188051F2005776C4 /* BWQuincyMain.xib */ = {

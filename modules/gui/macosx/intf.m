@@ -66,6 +66,7 @@
 #import "ExtensionsManager.h"
 #import "BWQuincyManager.h"
 #import "ControlsBar.h"
+#import "ResumeDialogController.h"
 
 #import "VideoEffects.h"
 #import "AudioEffects.h"
@@ -795,6 +796,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     if (!o_bookmarks)
         [o_bookmarks release];
 
+    [o_resume_dialog release];
+
     [o_coredialogs release];
     [o_eyetv release];
     [o_remote release];
@@ -1357,6 +1360,14 @@ static VLCMain *_o_sharedMainInstance = nil;
     }
 
     return o_coredialogs;
+}
+
+- (ResumeDialogController *)resumeDialog
+{
+    if (!o_resume_dialog)
+        o_resume_dialog = [[ResumeDialogController alloc] init];
+
+    return o_resume_dialog;
 }
 
 - (id)eyeTVController

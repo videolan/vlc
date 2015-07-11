@@ -66,6 +66,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCMainMenu;
 @class VLCPlaylist;
 @class InputManager;
+@class ResumeDialogController;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {
@@ -82,6 +83,8 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
     id o_eyetv;                 /* VLCEyeTVController */
     id o_bookmarks;             /* VLCBookmarks */
     id o_coreinteraction;       /* VLCCoreInteraction */
+    ResumeDialogController *o_resume_dialog;
+
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_open_loaded;       /* open nibfile */
     BOOL nib_about_loaded;      /* about nibfile */
@@ -135,6 +138,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (VLCInfo *)info;
 - (id)wizard;
 - (id)coreDialogProvider;
+- (ResumeDialogController *)resumeDialog;
 - (id)eyeTVController;
 - (id)appleRemoteController;
 - (void)setActiveVideoPlayback:(BOOL)b_value;
