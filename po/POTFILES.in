@@ -600,6 +600,8 @@ modules/gui/macosx/prefs.h
 modules/gui/macosx/prefs.m
 modules/gui/macosx/prefs_widgets.h
 modules/gui/macosx/prefs_widgets.m
+modules/gui/macosx/ResumeDialogController.h
+modules/gui/macosx/ResumeDialogController.m
 modules/gui/macosx/simple_prefs.h
 modules/gui/macosx/simple_prefs.m
 modules/gui/macosx/StringUtility.h

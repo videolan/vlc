@@ -152,6 +152,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/PlaylistAccessoryView.xib \
 	extras/package/macosx/Resources/English.lproj/PlaylistMenu.xib \
 	extras/package/macosx/Resources/English.lproj/Preferences.xib \
+	extras/package/macosx/Resources/English.lproj/ResumeDialog.xib \
 	extras/package/macosx/Resources/English.lproj/SharedDialogs.xib \
 	extras/package/macosx/Resources/English.lproj/SyncTracks.xib \
 	extras/package/macosx/Resources/English.lproj/VideoEffects.xib \
