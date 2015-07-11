@@ -779,22 +779,13 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on */
-    if (o_sprefs)
-        [o_sprefs release];
-
-    if (o_prefs)
-        [o_prefs release];
+    [o_sprefs release];
+    [o_prefs release];
 
     [o_open release];
-
-    if (o_info)
-        [o_info release];
-
-    if (o_wizard)
-        [o_wizard release];
-
-    if (!o_bookmarks)
-        [o_bookmarks release];
+    [o_info release];
+    [o_wizard release];
+    [o_bookmarks release];
 
     [o_resume_dialog release];
 
