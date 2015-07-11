@@ -946,22 +946,6 @@
     return YES;
 }
 
-- (void)updateAlertWindow:(NSTimer *)timer
-{
-    NSAlert *alert = [timer userInfo];
-
-    --currentResumeTimeout;
-    if (currentResumeTimeout <= 0) {
-        [[alert window] close];
-        [NSApp abortModal];
-    }
-
-    NSString *buttonLabel = _NS("Restart playback");
-    buttonLabel = [buttonLabel stringByAppendingFormat:@" (%d)", currentResumeTimeout];
-
-    [[[alert buttons] objectAtIndex:2] setTitle:buttonLabel];
-}
-
 - (void)continuePlaybackWhereYouLeftOff:(input_thread_t *)p_input_thread
 {
     NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"recentlyPlayedMedia"];

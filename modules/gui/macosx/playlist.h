@@ -75,8 +75,6 @@
 
     IBOutlet id o_playlist_header;
 
-    int currentResumeTimeout;
-
     PLModel *o_model;
 }
 
