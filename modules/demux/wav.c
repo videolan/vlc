@@ -360,6 +360,7 @@ static int Open( vlc_object_t * p_this )
     case VLC_CODEC_GSM_MS:
     case VLC_CODEC_ADPCM_G726:
     case VLC_CODEC_TRUESPEECH:
+    case VLC_CODEC_ATRAC3P:
     case VLC_CODEC_ATRAC3:
     case VLC_CODEC_G723_1:
     case VLC_CODEC_WMA2:
