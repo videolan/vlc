@@ -215,6 +215,8 @@ static int Open( vlc_object_t * p_this )
 
         sf_tag_to_fourcc( &guid_subformat, &p_sys->fmt.i_codec, &psz_name );
 
+        msg_Dbg( p_demux, "extensible format guid " GUID_FMT, GUID_PRINT(guid_subformat) );
+
         i_extended = sizeof( WAVEFORMATEXTENSIBLE ) - sizeof( WAVEFORMATEX );
         p_sys->fmt.i_extra -= i_extended;
 
