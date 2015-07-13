@@ -104,11 +104,12 @@ static bool isHTTPLiveStreaming(stream_t *s)
 {
     const uint8_t *peek;
 
-    int size = stream_Peek(s, &peek, 46);
-    if (size < 7)
+    int size = stream_Peek(s, &peek, 7);
+    if (size < 7 || memcmp(peek, "#EXTM3U", 7))
         return false;
 
-    if (memcmp(peek, "#EXTM3U", 7) != 0)
+    size = stream_Peek(s, &peek, 512);
+    if (size < 7)
         return false;
 
     peek += 7;
