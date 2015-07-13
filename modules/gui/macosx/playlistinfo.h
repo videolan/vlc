@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlistinfo.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
@@ -94,15 +94,8 @@
     IBOutlet id o_video_lbl;
     IBOutlet id o_video_decoded_lbl;
     IBOutlet id o_video_decoded_txt;
-
-    VLCInfoTreeItem * rootItem;
-
-    input_item_t * p_item;
-
-    BOOL b_awakeFromNib;
-    BOOL b_stats;
 }
-@property (readonly) input_item_t * item;
+@property (readonly) input_item_t *item;
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (void)initPanel;
@@ -112,7 +105,7 @@
 - (IBAction)downloadCoverArt:(id)sender;
 - (void)initMediaPanelStats;
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
-- (void)setMeta: (char *)meta forLabel: (id)theItem;
+- (void)setMeta:(char *)meta forLabel:(id)theItem;
 - (void)updateMetadata;
 - (void)updateStatistics;
 
@@ -120,21 +113,12 @@
 @end
 
 @interface VLCInfoTreeItem : NSObject
-{
-    NSString *o_name;
-    NSString *o_value;
-    int i_object_id;
-    input_item_t * p_item;
-    VLCInfoTreeItem *o_parent;
-    NSMutableArray *o_children;
-}
 
 @property (readonly) int numberOfChildren;
-@property (readonly) NSString * name;
-@property (readonly) NSString * value;
+@property (readonly) NSString *name;
+@property (readonly) NSString *value;
 
 - (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index;
 - (void)refresh;
 
 @end
-

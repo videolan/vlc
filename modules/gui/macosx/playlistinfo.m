@@ -1,7 +1,7 @@
 /*****************************************************************************
  r playlistinfo.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
@@ -35,6 +35,17 @@
 /*****************************************************************************
  * VLCPlaylistInfo Implementation
  *****************************************************************************/
+
+@interface VLCInfo ()
+{
+    VLCInfoTreeItem *rootItem;
+
+    input_item_t *p_item;
+
+    BOOL b_awakeFromNib;
+    BOOL b_stats;
+}
+@end
 
 @implementation VLCInfo
 
@@ -423,24 +434,36 @@ error:
 
 @end
 
+@interface VLCInfoTreeItem ()
+{
+    NSString *_name;
+    NSString *_value;
+    int i_object_id;
+    input_item_t * p_item;
+    VLCInfoTreeItem *_parent;
+    NSMutableArray *_children;
+    BOOL _isALeafNode;
+}
+
+@end
+
 @implementation VLCInfoTreeItem
 
-@synthesize name = o_name, value = o_value;
+@synthesize name = _name, value = _value;
 
-#define IsALeafNode ((id)-1)
-
-- (id)initWithName: (NSString *)o_item_name value: (NSString *)o_item_value ID: (int)i_id
-       parent:(VLCInfoTreeItem *)o_parent_item
+- (id)initWithName:(NSString *)item_name
+             value:(NSString *)item_value
+                ID:(int)i_id
+            parent:(VLCInfoTreeItem *)parent_item
 {
     self = [super init];
 
     if (self != nil) {
-        o_name = [o_item_name copy];
-        o_value = [o_item_value copy];
+        _name = [item_name copy];
+        _value = [item_value copy];
         i_object_id = i_id;
-        o_parent = o_parent_item;
+        _parent = parent_item;
         p_item = [(VLCInfo *)[[VLCMain sharedInstance] info] item];
-        o_children = nil;
     }
     return self;
 }
@@ -452,48 +475,60 @@ error:
 
 - (void)dealloc
 {
-    if (o_children != IsALeafNode) [o_children release];
-    [o_name release];
-    [o_value release];
-    if (p_item) vlc_gc_decref(p_item);
+    if (_children)
+        [_children release];
+    [_name release];
+    [_value release];
+    if (p_item)
+        vlc_gc_decref(p_item);
     [super dealloc];
 }
 
 /* Creates and returns the array of children
  * Loads children incrementally */
-- (NSArray *)children
+- (void)_updateChildren
 {
     if (!p_item)
-        return nil;
+        return;
 
-    if (o_children == NULL) {
-        o_children = [[NSMutableArray alloc] init];
-        if (i_object_id == -1) {
-            vlc_mutex_lock(&p_item->lock);
-            for (int i = 0 ; i < p_item->i_categories ; i++) {
-                NSString * name = [NSString stringWithUTF8String:p_item->pp_categories[i]->psz_name];
-                VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc] initWithName:name value:@"" ID:i parent:self];
-                [item autorelease];
-                [o_children addObject:item];
-            }
-            vlc_mutex_unlock(&p_item->lock);
+    if (_children != nil)
+        return;
+
+    _children = [[NSMutableArray alloc] init];
+    if (i_object_id == -1) {
+        vlc_mutex_lock(&p_item->lock);
+        for (int i = 0 ; i < p_item->i_categories ; i++) {
+            NSString * name = [NSString stringWithUTF8String:p_item->pp_categories[i]->psz_name];
+            VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc]
+                                      initWithName:name
+                                      value:@""
+                                      ID:i
+                                      parent:self];
+            [item autorelease];
+            [_children addObject:item];
         }
-        else if (o_parent->i_object_id == -1) {
-            vlc_mutex_lock(&p_item->lock);
-            info_category_t * cat = p_item->pp_categories[i_object_id];
-            for (int i = 0 ; i < cat->i_infos ; i++) {
-                NSString * name = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_name];
-                NSString * value = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_value ? : ""];
-                VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc] initWithName:name value:value ID:i parent:self];
-                [item autorelease];
-                [o_children addObject:item];
-            }
-            vlc_mutex_unlock(&p_item->lock);
-        }
-        else
-            o_children = IsALeafNode;
+        vlc_mutex_unlock(&p_item->lock);
+        _isALeafNode = NO;
     }
-    return o_children;
+    else if (_parent->i_object_id == -1) {
+        vlc_mutex_lock(&p_item->lock);
+        info_category_t * cat = p_item->pp_categories[i_object_id];
+        for (int i = 0 ; i < cat->i_infos ; i++) {
+            NSString * name = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_name];
+            NSString * value = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_value ? : ""];
+            VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc]
+                                      initWithName:name
+                                      value:value
+                                      ID:i
+                                      parent:self];
+            [item autorelease];
+            [_children addObject:item];
+        }
+        vlc_mutex_unlock(&p_item->lock);
+        _isALeafNode = NO;
+    }
+    else
+        _isALeafNode = YES;
 }
 
 - (void)refresh
@@ -501,20 +536,25 @@ error:
     if (p_item)
         vlc_gc_decref(p_item);
 
-    p_item = [(VLCInfo *)[[VLCMain sharedInstance] info] item];
+    p_item = [[VLCInfo sharedInstance] item];
 
-    [o_children release];
-    o_children = nil;
+    [_children release];
+    _children = nil;
 }
 
-- (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index {
-    return [[self children] objectAtIndex:i_index];
+- (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index
+{
+    return [_children objectAtIndex:i_index];
 }
 
-- (int)numberOfChildren {
+- (int)numberOfChildren
+{
+    [self _updateChildren];
 
-    id i_tmp = [self children];
-    return (i_tmp == IsALeafNode) ? (-1) : (int)[i_tmp count];
+    if (_isALeafNode)
+        return -1;
+
+    return [_children count];
 }
 
 @end
