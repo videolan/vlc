@@ -69,7 +69,6 @@ vlc_module_end()
 
 #pragma mark - local prototypes
 
-static CFDataRef avvCCreate(decoder_t *, uint8_t *, uint32_t);
 static CFDataRef ESDSCreate(decoder_t *, uint8_t *, uint32_t);
 static picture_t *DecodeBlock(decoder_t *, block_t **);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
@@ -188,8 +187,8 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
             if (codec != 0)
                 break;
 #endif
-            /* mpgv / mp2v needs fixing, so disabled in non-debug builds */
-#ifndef NDEBUG
+            /* mpgv / mp2v needs fixing, so disable it for now */
+#if 0
         case VLC_CODEC_MPGV:
             codec = kCMVideoCodecType_MPEG1Video;
             break;
@@ -242,6 +241,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     if (p_sys->codec == kCMVideoCodecType_H264) {
         if ((p_dec->fmt_in.video.i_width == 0 || p_dec->fmt_in.video.i_height == 0) && p_block == NULL) {
             msg_Dbg(p_dec, "waiting for H264 SPS/PPS, extra data %i", p_dec->fmt_in.i_extra);
+
             return VLC_SUCCESS; // return VLC_GENERIC to leave the waiting to someone else
         }
 
@@ -250,18 +250,10 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         int i_ret = 0;
 
         if (p_block == NULL) {
-            /* we are not mid-stream but at the beginning of playback
-             * therefore, the demuxer gives us an avvC atom, which can
-             * be passed to the decoder with slight or no modifications
-             * at all */
-            extradata = avvCCreate(p_dec,
-                                   (uint8_t*)p_dec->fmt_in.p_extra,
-                                   p_dec->fmt_in.i_extra);
-
             int buf_size = p_dec->fmt_in.i_extra + 20;
             size = p_dec->fmt_in.i_extra;
-            p_buf = malloc(buf_size);
 
+            p_buf = malloc(buf_size);
             if (!p_buf)
             {
                 msg_Warn(p_dec, "extra buffer allocation failed");
@@ -269,7 +261,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             }
 
             /* we need to convert the SPS and PPS units we received from the
-             * demxuer's avvC atom so we can process them further */
+             * demuxer's avvC atom so we can process them further */
             i_ret = convert_sps_pps(p_dec,
                                     p_dec->fmt_in.p_extra,
                                     p_dec->fmt_in.i_extra,
@@ -285,91 +277,96 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             i_ret = VLC_SUCCESS;
         }
 
-        if (i_ret == VLC_SUCCESS) {
-            uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
-            size_t i_sps_size = 0, i_pps_size = 0;
-
-            /* get the SPS and PPS units from the NAL unit which is either
-             * part of the demuxer's avvC atom or the mid stream data block */
-            i_ret = h264_get_spspps(p_buf,
-                                    size,
-                                    &p_sps_buf,
-                                    &i_sps_size,
-                                    &p_pps_buf,
-                                    &i_pps_size);
-
-            if (i_ret == VLC_SUCCESS) {
-                struct nal_sps sps_data;
-                i_ret = h264_parse_sps(p_sps_buf,
-                                       i_sps_size,
-                                       &sps_data);
-
-                if (i_ret == VLC_SUCCESS) {
-                    /* this data is more trust-worthy than what we receive
-                     * from the demuxer, so we will use it to over-write
-                     * the current values */
-                    i_video_width = sps_data.i_width;
-                    i_video_height = sps_data.i_height;
-                    i_sar_den = sps_data.vui.i_sar_den;
-                    i_sar_num = sps_data.vui.i_sar_num;
-
-                    /* no evaluation here as this is done in the precheck */
-                    p_sys->codec_profile = sps_data.i_profile;
-                    p_sys->codec_level = sps_data.i_level;
-
-                    if (p_block != NULL) {
-                        /* on mid stream changes, we have a block and need to
-                         * glue our own avvC atom together to give it to the
-                         * decoder */
-
-                        bo_t bo;
-                        bool status = bo_init(&bo, 1024);
-
-                        if (status != true)
-                            return VLC_ENOMEM;
-
-                        bo_add_8(&bo, 1);      /* configuration version */
-                        bo_add_8(&bo, sps_data.i_profile);
-                        bo_add_8(&bo, sps_data.i_profile_compatibility);
-                        bo_add_8(&bo, sps_data.i_level);
-                        bo_add_8(&bo, 0xff);   /* 0b11111100 | lengthsize = 0x11 */
-
-                        bo_add_8(&bo, 0xe0 | (i_sps_size > 0 ? 1 : 0));   /* 0b11100000 | sps_count */
-
-                        if (i_sps_size > 4) {
-                            /* the SPS data we have got includes 4 leading
-                             * bytes which we need to remove */
-                            uint8_t *fixed_sps = malloc(i_sps_size - 4);
-                            for (int i = 0; i < i_sps_size - 4; i++) {
-                                fixed_sps[i] = p_sps_buf[i+4];
-                            }
-
-                            bo_add_16be(&bo, i_sps_size - 4);
-                            bo_add_mem(&bo, i_sps_size - 4, fixed_sps);
-                            free(fixed_sps);
-                        }
-
-                        bo_add_8(&bo, (i_pps_size > 0 ? 1 : 0));   /* pps_count */
-                        if (i_pps_size > 4) {
-                            /* the PPS data we have got includes 4 leading
-                             * bytes which we need to remove */
-                            uint8_t *fixed_pps = malloc(i_pps_size - 4);
-                            for (int i = 0; i < i_pps_size - 4; i++) {
-                                fixed_pps[i] = p_pps_buf[i+4];
-                            }
-
-                            bo_add_16be(&bo, i_pps_size - 4);
-                            bo_add_mem(&bo, i_pps_size - 4, fixed_pps);
-                            free(fixed_pps);
-                        }
-
-                        extradata = CFDataCreate(kCFAllocatorDefault,
-                                                 bo.b->p_buffer,
-                                                 bo.b->i_buffer);
-                    }
-                }
-            }
+        if (i_ret != VLC_SUCCESS) {
+            return VLC_EGENERIC;
         }
+
+        uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
+        size_t i_sps_size = 0, i_pps_size = 0;
+        if (!p_buf) {
+            return VLC_EGENERIC;
+        }
+
+        /* get the SPS and PPS units from the NAL unit which is either
+         * part of the demuxer's avvC atom or the mid stream data block */
+        i_ret = h264_get_spspps(p_buf,
+                                size,
+                                &p_sps_buf,
+                                &i_sps_size,
+                                &p_pps_buf,
+                                &i_pps_size);
+        if (i_ret != VLC_SUCCESS)
+        {
+            msg_Warn(p_dec, "sps pps parsing failed");
+            return VLC_EGENERIC;
+        }
+
+        struct nal_sps sps_data;
+        i_ret = h264_parse_sps(p_sps_buf,
+                               i_sps_size,
+                               &sps_data);
+
+        if (i_ret != VLC_SUCCESS)
+        {
+            return VLC_EGENERIC;
+        }
+        /* this data is more trust-worthy than what we receive
+         * from the demuxer, so we will use it to over-write
+         * the current values */
+        i_video_width = sps_data.i_width;
+        i_video_height = sps_data.i_height;
+        i_sar_den = sps_data.vui.i_sar_den;
+        i_sar_num = sps_data.vui.i_sar_num;
+
+        /* no evaluation here as this is done in the precheck */
+        p_sys->codec_profile = sps_data.i_profile;
+        p_sys->codec_level = sps_data.i_level;
+
+        /* create avvC atom to forward to the HW decoder */
+        bo_t bo;
+        bool status = bo_init(&bo, 1024);
+
+        if (status != true)
+            return VLC_ENOMEM;
+
+        bo_add_8(&bo, 1);      /* configuration version */
+        bo_add_8(&bo, sps_data.i_profile);
+        bo_add_8(&bo, sps_data.i_profile_compatibility);
+        bo_add_8(&bo, sps_data.i_level);
+        bo_add_8(&bo, 0xff);   /* 0b11111100 | lengthsize = 0x11 */
+
+        bo_add_8(&bo, 0xe0 | (i_sps_size > 0 ? 1 : 0));   /* 0b11100000 | sps_count */
+
+        if (i_sps_size > 4) {
+            /* the SPS data we have got includes 4 leading
+             * bytes which we need to remove */
+            uint8_t *fixed_sps = malloc(i_sps_size - 4);
+            for (int i = 0; i < i_sps_size - 4; i++) {
+                fixed_sps[i] = p_sps_buf[i+4];
+            }
+
+            bo_add_16be(&bo, i_sps_size - 4);
+            bo_add_mem(&bo, i_sps_size - 4, fixed_sps);
+            free(fixed_sps);
+        }
+
+        bo_add_8(&bo, (i_pps_size > 0 ? 1 : 0));   /* pps_count */
+        if (i_pps_size > 4) {
+            /* the PPS data we have got includes 4 leading
+             * bytes which we need to remove */
+            uint8_t *fixed_pps = malloc(i_pps_size - 4);
+            for (int i = 0; i < i_pps_size - 4; i++) {
+                fixed_pps[i] = p_pps_buf[i+4];
+            }
+
+            bo_add_16be(&bo, i_pps_size - 4);
+            bo_add_mem(&bo, i_pps_size - 4, fixed_pps);
+            free(fixed_pps);
+        }
+
+        extradata = CFDataCreate(kCFAllocatorDefault,
+                                 bo.b->p_buffer,
+                                 bo.b->i_buffer);
 
         if (extradata)
             CFDictionarySetValue(extradata_info, CFSTR("avcC"), extradata);
@@ -562,7 +559,6 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     if (p_block) {
         /* this is a mid stream change so we need to tell the core about it */
         decoder_UpdateVideoFormat(p_dec);
-        block_Release(p_block);
     }
 
     p_sys->b_started = YES;
@@ -576,15 +572,17 @@ static void StopVideoToolbox(decoder_t *p_dec)
 
     if (p_sys->b_started) {
         p_sys->b_started = false;
-        if (p_sys->session != NULL) {
+        if (p_sys->session != nil) {
             VTDecompressionSessionInvalidate(p_sys->session);
             CFRelease(p_sys->session);
-            p_sys->session = NULL;
+            p_sys->session = nil;
         }
     }
 
-    if (p_sys->videoFormatDescription != NULL)
+    if (p_sys->videoFormatDescription != nil) {
         CFRelease(p_sys->videoFormatDescription);
+        p_sys->videoFormatDescription = nil;
+    }
 }
 
 #pragma mark - module open and close
@@ -673,34 +671,6 @@ static inline void bo_add_mp4_tag_descr(bo_t *p_bo, uint8_t tag, uint32_t size)
     bo_add_8(p_bo, size & 0x7F);
 }
 
-static CFDataRef avvCCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
-{
-    VLC_UNUSED(p_dec);
-    CFDataRef data;
-
-    /* each NAL sent to the decoder is preceded by a 4 byte header
-     * we need to change the avcC header to signal headers of 4 bytes, if needed */
-    if (i_buf_size >= 4 && (p_buf[4] & 0x03) != 0x03) {
-        uint8_t *p_fixed_buf;
-        p_fixed_buf = malloc(i_buf_size);
-        if (!p_fixed_buf)
-            return NULL;
-
-        memcpy(p_fixed_buf, p_buf, i_buf_size);
-        p_fixed_buf[4] |= 0x03;
-
-        data = CFDataCreate(kCFAllocatorDefault,
-                            p_fixed_buf,
-                            i_buf_size);
-    } else {
-        data = CFDataCreate(kCFAllocatorDefault,
-                            p_buf,
-                            i_buf_size);
-    }
-
-    return data;
-}
-
 static CFDataRef ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_size)
 {
     int full_size = 3 + 5 +13 + 5 + i_buf_size + 3;
@@ -746,16 +716,12 @@ static CFDataRef ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_siz
 static bool H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (!p_block->p_buffer)
+        return false;
+
     int buf_size = p_dec->fmt_in.i_extra + 20;
     uint32_t size = p_dec->fmt_in.i_extra;
-    void *p_buf = malloc(buf_size);
-
-    if (!p_buf)
-    {
-        msg_Warn(p_dec, "extra buffer allocation failed");
-        return false;
-    }
-
     uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
     size_t i_sps_size = 0, i_pps_size = 0;
     int i_ret = 0;
@@ -811,7 +777,7 @@ static bool H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
                                               CMFormatDescriptionRef fmt_desc,
                                               void *buffer,
-                                              int size,
+                                              size_t size,
                                               mtime_t i_pts,
                                               mtime_t i_dts,
                                               mtime_t i_length)
@@ -923,12 +889,16 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                 p_sys->codec = kCMVideoCodecType_H264;
                 i_ret = StartVideoToolbox(p_dec, p_block);
             }
-            if (i_ret != VLC_SUCCESS || !p_sys->b_started)
+            if (i_ret != VLC_SUCCESS || !p_sys->b_started) {
+                *pp_block = NULL;
                 return NULL;
+            }
 
             if (p_sys->codec == kCMVideoCodecType_H264) {
-                if (!H264ProcessBlock(p_dec, p_block))
+                if (!H264ProcessBlock(p_dec, p_block)) {
+                    *pp_block = NULL;
                     return NULL;
+                }
             }
 
             CMSampleBufferRef sampleBuffer;
@@ -957,7 +927,11 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                         p_dec->b_error = true;
                     } else if (status == -8969 || status == -12909) {
                         msg_Err(p_dec, "decoder failure: bad data");
-                        p_dec->b_error = true;
+                        StopVideoToolbox(p_dec);
+                        CFRelease(sampleBuffer);
+                        block_Release(p_block);
+                        *pp_block = NULL;
+                        return NULL;
                     } else if (status == -12911 || status == -8960) {
                         msg_Err(p_dec, "decoder failure: internal malfunction");
                         p_dec->b_error = true;
