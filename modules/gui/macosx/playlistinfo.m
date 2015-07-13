@@ -498,8 +498,12 @@ error:
     if (i_object_id == -1) {
         vlc_mutex_lock(&p_item->lock);
         for (int i = 0 ; i < p_item->i_categories ; i++) {
-            NSString * name = [NSString stringWithUTF8String:p_item->pp_categories[i]->psz_name];
-            VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc]
+            NSString *name;
+            if (p_item->pp_categories[i]->psz_name)
+                name = [NSString stringWithUTF8String:p_item->pp_categories[i]->psz_name];
+            else
+                name = @"";
+            VLCInfoTreeItem *item = [[VLCInfoTreeItem alloc]
                                       initWithName:name
                                       value:@""
                                       ID:i
@@ -514,13 +518,21 @@ error:
         vlc_mutex_lock(&p_item->lock);
         info_category_t * cat = p_item->pp_categories[i_object_id];
         for (int i = 0 ; i < cat->i_infos ; i++) {
-            NSString * name = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_name];
-            NSString * value = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_value ? : ""];
-            VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc]
-                                      initWithName:name
-                                      value:value
-                                      ID:i
-                                      parent:self];
+            NSString *name;
+            NSString *value;
+            if (cat->pp_infos[i]->psz_name != NULL)
+                name = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_name];
+            else
+                name = @"";
+            if (cat->pp_infos[i]->psz_value != NULL)
+                value = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_value];
+            else
+                value = @"";
+            VLCInfoTreeItem *item = [[VLCInfoTreeItem alloc]
+                                     initWithName:name
+                                     value:value
+                                     ID:i
+                                     parent:self];
             [item autorelease];
             [_children addObject:item];
         }
