@@ -57,6 +57,17 @@ int main (void)
 
     val = vlc_timer_create (&data.timer, callback, &data);
     assert (val == 0);
+    vlc_timer_destroy (data.timer);
+    assert (data.count == 0);
+
+    val = vlc_timer_create (&data.timer, callback, &data);
+    assert (val == 0);
+    vlc_timer_schedule (data.timer, false, CLOCK_FREQ << 20, CLOCK_FREQ);
+    vlc_timer_destroy (data.timer);
+    assert (data.count == 0);
+
+    val = vlc_timer_create (&data.timer, callback, &data);
+    assert (val == 0);
 
     /* Relative timer */
     vlc_timer_schedule (data.timer, false, 1, CLOCK_FREQ / 100);
