@@ -35,9 +35,6 @@
 #include <vlc_aout.h>
 #include "../video_output/android/utils.h"
 
-#define MIN_AUDIOTRACK_BUFFER_US INT64_C(250000)  // 250ms
-#define MAX_AUDIOTRACK_BUFFER_US INT64_C(1000000) // 1000ms
-
 #define SMOOTHPOS_SAMPLE_COUNT 10
 #define SMOOTHPOS_INTERVAL_US INT64_C(30000) // 30ms
 
@@ -47,6 +44,7 @@ static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 static void Stop( audio_output_t * );
 static int Start( audio_output_t *, audio_sample_format_t * );
+static void *AudioTrack_Thread( void * );
 
 /* There is an undefined behavior when configuring AudioTrack with SPDIF or
  * more than 2 channels when there is no HDMI out. It may succeed and the
@@ -80,11 +78,7 @@ struct aout_sys_t {
     enum at_dev at_dev;
 
     jobject p_audiotrack; /* AudioTrack ref */
-    jbyteArray p_bytearray; /* ByteArray ref (for Write) */
-    size_t i_bytearray_size; /* size of the ByteArray */
-    jfloatArray p_floatarray; /* FloatArray ref (for WriteFloat) */
-    size_t i_floatarray_size; /* size of the FloatArray */
-    jobject p_bytebuffer; /* ByteBuffer ref (for WriteV21) */
+
     audio_sample_format_t fmt; /* fmt setup by Start */
 
     struct {
@@ -119,19 +113,47 @@ struct aout_sys_t {
         mtime_t i_latency_us;
     } smoothpos;
 
-    uint64_t i_samples_written; /* number of samples written since last flush */
     uint32_t i_bytes_per_frame; /* byte per frame */
     uint32_t i_max_audiotrack_samples;
-    bool b_audiotrack_exception; /* true if audiotrack throwed an exception */
-    bool b_error; /* generic error */
     bool b_spdif;
     uint8_t i_chans_to_reorder; /* do we need channel reordering */
     uint8_t p_chan_table[AOUT_CHAN_MAX];
+
     enum {
-        WRITE,
-        WRITE_V21,
-        WRITE_FLOAT
+        WRITE_BYTEARRAY,
+        WRITE_BYTEBUFFER,
+        WRITE_FLOATARRAY
     } i_write_type;
+
+    vlc_thread_t thread;    /* AudioTrack_Thread */
+    vlc_mutex_t lock;
+    vlc_cond_t aout_cond;   /* cond owned by aout */
+    vlc_cond_t thread_cond; /* cond owned by AudioTrack_Thread */
+
+    /* These variables need locking on read and write */
+    bool b_thread_running;  /* Set to false by aout to stop the thread */
+    bool b_thread_paused;   /* If true, the thread won't process any data, see
+                             * Pause() */
+    bool b_thread_waiting;  /* If true, the thread is waiting for enough spaces
+                             * in AudioTrack internal buffers */
+
+    uint64_t i_samples_written; /* Number of samples written since last flush */
+    bool b_audiotrack_exception; /* True if audiotrack threw an exception */
+    bool b_error; /* generic error */
+
+    struct {
+        uint64_t i_read;    /* Number of bytes read */
+        uint64_t i_write;   /* Number of bytes written */
+        size_t i_size;      /* Size of the circular buffer in bytes */
+        union {
+            jbyteArray p_bytearray;
+            jfloatArray p_floatarray;
+            struct {
+                uint8_t *p_data;
+                jobject p_obj;
+            } bytebuffer;
+        } u;
+    } circular;
 };
 
 /* Soft volume helper */
@@ -445,6 +467,7 @@ bytes_to_frames( aout_sys_t *p_sys, size_t i_bytes )
         return i_bytes / p_sys->i_bytes_per_frame;
 }
 #define BYTES_TO_FRAMES(x) bytes_to_frames( p_sys, (x) )
+#define BYTES_TO_US(x) frames_to_us( p_sys, bytes_to_frames( p_sys, (x) ) )
 
 static inline size_t
 frames_to_bytes( aout_sys_t *p_sys, uint64_t i_frames )
@@ -653,11 +676,13 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
     mtime_t i_audiotrack_us;
     JNIEnv *env;
 
-    if( p_sys->b_error || !( env = GET_ENV() ) )
-        return -1;
-
     if( p_sys->b_spdif )
         return -1;
+
+    vlc_mutex_lock( &p_sys->lock );
+
+    if( p_sys->b_error || !p_sys->i_samples_written || !( env = GET_ENV() ) )
+        goto bailout;
 
     i_audiotrack_us = AudioTrack_GetTimestampPositionUs( env, p_aout );
 
@@ -686,11 +711,16 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
 
     if( i_audiotrack_us > 0 )
     {
-        mtime_t i_delay = FRAMES_TO_US( p_sys->i_samples_written )
-                          - i_audiotrack_us;
+        /* AudioTrack delay */
+        mtime_t i_delay = FRAMES_TO_US( p_sys->i_samples_written ) 
+                        - i_audiotrack_us;
         if( i_delay >= 0 )
         {
+            /* Circular buffer delay */
+            i_delay += BYTES_TO_US( p_sys->circular.i_write
+                                    - p_sys->circular.i_read );
             *p_delay = i_delay;
+            vlc_mutex_unlock( &p_sys->lock );
             return 0;
         }
         else
@@ -699,6 +729,9 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
             AudioTrack_ResetPositions( env, p_aout );
         }
     }
+
+bailout:
+    vlc_mutex_unlock( &p_sys->lock );
     return -1;
 }
 
@@ -797,8 +830,7 @@ static int
 AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
                    unsigned int i_rate,
                    vlc_fourcc_t i_vlc_format,
-                   uint16_t i_physical_channels,
-                   int i_bytes_per_frame )
+                   uint16_t i_physical_channels )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_size, i_min_buffer_size, i_channel_config, i_format;
@@ -852,19 +884,7 @@ AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
     if( i_vlc_format == VLC_CODEC_SPDIFB )
         i_size = ( i_min_buffer_size / AOUT_SPDIF_SIZE + 1 ) * AOUT_SPDIF_SIZE;
     else
-    {
-        /* Optimal buffer size: i_min_buffer_size * 4 but between 250ms and
-         * 1000ms */
-        mtime_t i_time, i_clipped_time;
-
-        i_size = i_min_buffer_size * 4;
-        i_time = (i_size / i_bytes_per_frame) * CLOCK_FREQ / i_rate;
-
-        i_clipped_time = VLC_CLIP( i_time, MIN_AUDIOTRACK_BUFFER_US,
-                         MAX_AUDIOTRACK_BUFFER_US );
-        if( i_clipped_time != i_time )
-            i_size = (int)i_rate * i_clipped_time * i_bytes_per_frame / CLOCK_FREQ;
-    }
+        i_size = i_min_buffer_size * 2;
 
     /* create AudioTrack object */
     if( AudioTrack_New( env, p_aout, i_rate, i_channel_config,
@@ -980,8 +1000,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
          * less advanced format (PCM S16N). If it fails again, try again with
          * Stereo channels. */
         i_ret = AudioTrack_Create( env, p_aout, i_rate, p_sys->fmt.i_format,
-                                   p_sys->fmt.i_physical_channels,
-                                   i_bytes_per_frame );
+                                   p_sys->fmt.i_physical_channels );
         if( i_ret != 0 )
         {
             if( p_sys->fmt.i_format == VLC_CODEC_SPDIFB )
@@ -1047,30 +1066,92 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             (*env)->DeleteLocalRef( env, p_obj );
         }
         if( !p_sys->timestamp.p_obj )
-        {
-            Stop( p_aout );
-            return VLC_EGENERIC;
-        }
+            goto error;
     }
 #endif
 
+    AudioTrack_Reset( env, p_aout );
+
     if( p_sys->fmt.i_format == VLC_CODEC_FL32 )
     {
-        msg_Dbg( p_aout, "using WRITE_FLOAT");
-        p_sys->i_write_type = WRITE_FLOAT;
+        msg_Dbg( p_aout, "using WRITE_FLOATARRAY");
+        p_sys->i_write_type = WRITE_FLOATARRAY;
     }
     else if( jfields.AudioTrack.writeV21 )
     {
-        msg_Dbg( p_aout, "using WRITE_V21");
-        p_sys->i_write_type = WRITE_V21;
+        msg_Dbg( p_aout, "using WRITE_BYTEBUFFER");
+        p_sys->i_write_type = WRITE_BYTEBUFFER;
     }
     else
     {
-        msg_Dbg( p_aout, "using WRITE");
-        p_sys->i_write_type = WRITE;
+        msg_Dbg( p_aout, "using WRITE_BYTEARRAY");
+        p_sys->i_write_type = WRITE_BYTEARRAY;
     }
 
-    AudioTrack_Reset( env, p_aout );
+    p_sys->circular.i_read = p_sys->circular.i_write = 0;
+    /* 2 seconds of buffering */
+    p_sys->circular.i_size = (int)i_rate * AOUT_MAX_PREPARE_TIME
+                           * i_bytes_per_frame / CLOCK_FREQ;
+
+    /* Allocate circular buffer */
+    switch( p_sys->i_write_type )
+    {
+        case WRITE_BYTEARRAY:
+        {
+            jbyteArray p_bytearray;
+
+            p_bytearray = (*env)->NewByteArray( env, p_sys->circular.i_size );
+            if( p_bytearray )
+            {
+                p_sys->circular.u.p_bytearray = (*env)->NewGlobalRef( env, p_bytearray );
+                (*env)->DeleteLocalRef( env, p_bytearray );
+            }
+
+            if( !p_sys->circular.u.p_bytearray )
+            {
+                msg_Err(p_aout, "byte array allocation failed");
+                goto error;
+            }
+            break;
+        }
+        case WRITE_FLOATARRAY:
+        {
+            jfloatArray p_floatarray;
+
+            p_floatarray = (*env)->NewFloatArray( env,
+                                                  p_sys->circular.i_size / 4 );
+            if( p_floatarray )
+            {
+                p_sys->circular.u.p_floatarray = (*env)->NewGlobalRef( env, p_floatarray );
+                (*env)->DeleteLocalRef( env, p_floatarray );
+            }
+            if( !p_sys->circular.u.p_floatarray )
+            {
+                msg_Err(p_aout, "float array allocation failed");
+                goto error;
+            }
+            break;
+        }
+        case WRITE_BYTEBUFFER:
+            p_sys->circular.u.bytebuffer.p_data = malloc( p_sys->circular.i_size );
+            if( !p_sys->circular.u.bytebuffer.p_data )
+            {
+                msg_Err(p_aout, "bytebuffer allocation failed");
+                goto error;
+            }
+            break;
+    }
+
+    /* Run AudioTrack_Thread */
+    p_sys->b_thread_running = true;
+    p_sys->b_thread_paused = false;
+    if ( vlc_clone( &p_sys->thread, AudioTrack_Thread, p_aout,
+                    VLC_THREAD_PRIORITY_LOW ) )
+    {
+        msg_Err(p_aout, "vlc clone failed");
+        goto error;
+    }
+
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
 
@@ -1080,6 +1161,10 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     aout_FormatPrint( p_aout, "VLC will output:", &p_sys->fmt );
 
     return VLC_SUCCESS;
+
+error:
+    Stop( p_aout );
+    return VLC_EGENERIC;
 }
 
 static void
@@ -1091,6 +1176,19 @@ Stop( audio_output_t *p_aout )
     if( !( env = GET_ENV() ) )
         return;
 
+    /* Stop the AudioTrack thread */
+    vlc_mutex_lock( &p_sys->lock );
+    if( p_sys->b_thread_running )
+    {
+        p_sys->b_thread_running = false;
+        vlc_cond_signal( &p_sys->thread_cond );
+        vlc_mutex_unlock( &p_sys->lock );
+        vlc_join( p_sys->thread, NULL );
+    }
+    else
+        vlc_mutex_unlock(  &p_sys->lock );
+
+    /* Release the AudioTrack object */
     if( p_sys->p_audiotrack )
     {
         if( !p_sys->b_audiotrack_exception )
@@ -1102,10 +1200,34 @@ Stop( audio_output_t *p_aout )
         (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
         p_sys->p_audiotrack = NULL;
     }
+
+    /* Release the timestamp object */
     if( p_sys->timestamp.p_obj )
     {
         (*env)->DeleteGlobalRef( env, p_sys->timestamp.p_obj );
         p_sys->timestamp.p_obj = NULL;
+    }
+
+    /* Release the Circular buffer data */
+    switch( p_sys->i_write_type )
+    {
+    case WRITE_BYTEARRAY:
+        if( p_sys->circular.u.p_bytearray )
+        {
+            (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_bytearray );
+            p_sys->circular.u.p_bytearray = NULL;
+        }
+        break;
+    case WRITE_FLOATARRAY:
+        if( p_sys->circular.u.p_floatarray )
+        {
+            (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_floatarray );
+            p_sys->circular.u.p_floatarray = NULL;
+        }
+    case WRITE_BYTEBUFFER:
+        free( p_sys->circular.u.bytebuffer.p_data );
+        p_sys->circular.u.bytebuffer.p_data = NULL;
+        break;
     }
 
     p_sys->b_audiotrack_exception = false;
@@ -1113,21 +1235,20 @@ Stop( audio_output_t *p_aout )
 }
 
 /**
- * Non blocking write function.
+ * Non blocking write function, run from AudioTrack_Thread.
  * Do a calculation between current position and audiotrack position and assure
- * that we won't wait in AudioTrack.write() method
+ * that we won't wait in AudioTrack.write() method.
  */
 static int
-AudioTrack_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
-                  size_t i_buffer_offset, bool b_force )
+AudioTrack_PlayByteArray( JNIEnv *env, audio_output_t *p_aout,
+                          size_t i_data_size, size_t i_data_offset,
+                          bool b_force )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    size_t i_data;
     uint64_t i_samples;
     uint64_t i_audiotrack_pos;
     uint64_t i_samples_pending;
 
-    i_data = p_buffer->i_buffer - i_buffer_offset;
     i_audiotrack_pos = AudioTrack_getPlaybackHeadPosition( env, p_aout );
 
     assert( i_audiotrack_pos <= p_sys->i_samples_written );
@@ -1149,46 +1270,64 @@ AudioTrack_Write( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
         return 0;
 
     i_samples = __MIN( p_sys->i_max_audiotrack_samples - i_samples_pending,
-                       BYTES_TO_FRAMES( i_data ) );
+                       BYTES_TO_FRAMES( i_data_size ) );
 
-    i_data = FRAMES_TO_BYTES( i_samples );
+    i_data_size = FRAMES_TO_BYTES( i_samples );
 
-    return JNI_AT_CALL_INT( write, p_sys->p_bytearray,
-                            i_buffer_offset, i_data );
+    return JNI_AT_CALL_INT( write, p_sys->circular.u.p_bytearray,
+                            i_data_offset, i_data_size );
 }
 
 /**
- * Non blocking write function for Lollipop and after.
- * It calls a new write method with WRITE_NON_BLOCKING flags.
+ * Non blocking play function for Lollipop and after, run from
+ * AudioTrack_Thread. It calls a new write method with WRITE_NON_BLOCKING
+ * flags.
  */
 static int
-AudioTrack_WriteV21( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
-                     size_t i_buffer_offset )
+AudioTrack_PlayByteBuffer( JNIEnv *env, audio_output_t *p_aout,
+                           size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    return JNI_AT_CALL_INT( writeV21, p_sys->p_bytebuffer,
-                            p_buffer->i_buffer - i_buffer_offset,
+    /* The same DirectByteBuffer will be used until the data_offset reaches 0.
+     * The internal position of this buffer is moved by the writeV21 wall. */
+    if( i_data_offset == 0 )
+    {
+        /* No need to get a global ref, this object will be only used from the
+         * same Thread */
+        if( p_sys->circular.u.bytebuffer.p_obj )
+            (*env)->DeleteLocalRef( env, p_sys->circular.u.bytebuffer.p_obj );
+
+        p_sys->circular.u.bytebuffer.p_obj = (*env)->NewDirectByteBuffer( env,
+                                            p_sys->circular.u.bytebuffer.p_data,
+                                            p_sys->circular.i_size );
+        if( !p_sys->circular.u.bytebuffer.p_obj )
+        {
+            if( (*env)->ExceptionOccurred( env ) )
+                (*env)->ExceptionClear( env );
+            return jfields.AudioTrack.ERROR;
+        }
+    }
+
+    return JNI_AT_CALL_INT( writeV21, p_sys->circular.u.bytebuffer.p_obj,
+                            i_data_size,
                             jfields.AudioTrack.WRITE_NON_BLOCKING );
 }
 
 /**
- * Non blocking write float function for Lollipop and after.
- * It calls a new write method with WRITE_NON_BLOCKING flags.
+ * Non blocking play float function for Lollipop and after, run from
+ * AudioTrack_Thread. It calls a new write method with WRITE_NON_BLOCKING
+ * flags.
  */
 static int
-AudioTrack_WriteFloat( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
-                       size_t i_buffer_offset )
+AudioTrack_PlayFloatArray( JNIEnv *env, audio_output_t *p_aout,
+                           size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
-    size_t i_data;
 
-    i_buffer_offset /= 4;
-    i_data = p_buffer->i_buffer / 4 - i_buffer_offset;
-
-    i_ret = JNI_AT_CALL_INT( writeFloat, p_sys->p_floatarray,
-                             i_buffer_offset, i_data,
+    i_ret = JNI_AT_CALL_INT( writeFloat, p_sys->circular.u.p_floatarray,
+                             i_data_offset / 4, i_data_size / 4,
                              jfields.AudioTrack.WRITE_NON_BLOCKING );
     if( i_ret < 0 )
         return i_ret;
@@ -1197,114 +1336,25 @@ AudioTrack_WriteFloat( JNIEnv *env, audio_output_t *p_aout, block_t *p_buffer,
 }
 
 static int
-AudioTrack_PreparePlay( JNIEnv *env, audio_output_t *p_aout,
-                         block_t *p_buffer )
-{
-    aout_sys_t *p_sys = p_aout->sys;
-
-    if( p_sys->i_chans_to_reorder )
-       aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_buffer,
-                            p_sys->i_chans_to_reorder, p_sys->p_chan_table,
-                            p_sys->fmt.i_format );
-
-    switch( p_sys->i_write_type )
-    {
-    case WRITE:
-        /* check if we need to realloc a ByteArray */
-        if( p_buffer->i_buffer > p_sys->i_bytearray_size )
-        {
-            jbyteArray p_bytearray;
-
-            if( p_sys->p_bytearray )
-            {
-                (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );
-                p_sys->p_bytearray = NULL;
-            }
-
-            p_bytearray = (*env)->NewByteArray( env, p_buffer->i_buffer );
-            if( p_bytearray )
-            {
-                p_sys->p_bytearray = (*env)->NewGlobalRef( env, p_bytearray );
-                (*env)->DeleteLocalRef( env, p_bytearray );
-            }
-            p_sys->i_bytearray_size = p_buffer->i_buffer;
-        }
-        if( !p_sys->p_bytearray )
-            return VLC_EGENERIC;
-
-        /* copy p_buffer in to ByteArray */
-        (*env)->SetByteArrayRegion( env, p_sys->p_bytearray, 0,
-                                    p_buffer->i_buffer,
-                                    (jbyte *)p_buffer->p_buffer);
-        break;
-    case WRITE_FLOAT:
-    {
-        size_t i_data = p_buffer->i_buffer / 4;
-
-        /* check if we need to realloc a floatArray */
-        if( i_data > p_sys->i_floatarray_size )
-        {
-            jfloatArray p_floatarray;
-
-            if( p_sys->p_floatarray )
-            {
-                (*env)->DeleteGlobalRef( env, p_sys->p_floatarray );
-                p_sys->p_floatarray = NULL;
-            }
-
-            p_floatarray = (*env)->NewFloatArray( env, i_data );
-            if( p_floatarray )
-            {
-                p_sys->p_floatarray = (*env)->NewGlobalRef( env, p_floatarray );
-                (*env)->DeleteLocalRef( env, p_floatarray );
-            }
-            p_sys->i_floatarray_size = i_data;
-        }
-        if( !p_sys->p_floatarray )
-            return VLC_EGENERIC;
-
-        /* copy p_buffer in to FloatArray */
-        (*env)->SetFloatArrayRegion( env, p_sys->p_floatarray, 0, i_data,
-                                    (jfloat *)p_buffer->p_buffer);
-
-        break;
-    }
-    case WRITE_V21:
-        /* No need to get a global ref, this object will be only used from the
-         * same Play call */
-        p_sys->p_bytebuffer = (*env)->NewDirectByteBuffer( env,
-                                                           p_buffer->p_buffer,
-                                                           p_buffer->i_buffer );
-        if( !p_sys->p_bytebuffer )
-        {
-            if( (*env)->ExceptionOccurred( env ) )
-                (*env)->ExceptionClear( env );
-            return VLC_EGENERIC;
-        }
-        break;
-    }
-
-    return VLC_SUCCESS;
-}
-
-static int
-AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
-                 block_t *p_buffer, size_t *p_buffer_offset, bool b_force )
+AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout, size_t i_data_size,
+                 size_t i_data_offset, bool b_force )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
 
     switch( p_sys->i_write_type )
     {
-    case WRITE_V21:
-        i_ret = AudioTrack_WriteV21( env, p_aout, p_buffer, *p_buffer_offset );
+    case WRITE_BYTEBUFFER:
+        i_ret = AudioTrack_PlayByteBuffer( env, p_aout, i_data_size,
+                                           i_data_offset );
         break;
-    case WRITE:
-        i_ret = AudioTrack_Write( env, p_aout, p_buffer, *p_buffer_offset,
-                                  b_force );
+    case WRITE_BYTEARRAY:
+        i_ret = AudioTrack_PlayByteArray( env, p_aout, i_data_size,
+                                          i_data_offset, b_force );
         break;
-    case WRITE_FLOAT:
-        i_ret = AudioTrack_WriteFloat( env, p_aout, p_buffer, *p_buffer_offset );
+    case WRITE_FLOATARRAY:
+        i_ret = AudioTrack_PlayFloatArray( env, p_aout, i_data_size,
+                                           i_data_offset );
         break;
     default:
         vlc_assert_unreachable();
@@ -1332,16 +1382,115 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout,
             else
                 str = "ERROR";
             msg_Err( p_aout, "Write failed: %s", str );
+            p_sys->b_error = true;
         }
     } else
-    {
-        uint64_t i_samples = BYTES_TO_FRAMES( i_ret );
-
-        p_sys->i_samples_written += i_samples;
-
-        *p_buffer_offset += i_ret;
-    }
+        p_sys->i_samples_written += BYTES_TO_FRAMES( i_ret );
     return i_ret;
+}
+
+/**
+ * This thread will play the data coming from the circular buffer.
+ */
+static void *
+AudioTrack_Thread( void *p_data )
+{
+    audio_output_t *p_aout = p_data;
+    aout_sys_t *p_sys = p_aout->sys;
+    JNIEnv *env = GET_ENV();
+    mtime_t i_play_deadline = 0;
+    mtime_t i_last_time_blocked = 0;
+
+    if( !env )
+        return NULL;
+
+    for( ;; )
+    {
+        int i_ret = 0;
+        bool b_forced;
+        size_t i_data_offset;
+        size_t i_data_size;
+
+        vlc_mutex_lock( &p_sys->lock );
+
+        /* Wait for free space in Audiotrack internal buffer */
+        if( i_play_deadline != 0 && mdate() < i_play_deadline )
+        {
+            /* Don't wake up the thread when there is new data since we are
+             * waiting for more space */
+            p_sys->b_thread_waiting = true;
+            while( p_sys->b_thread_running && i_ret != ETIMEDOUT )
+                i_ret = vlc_cond_timedwait( &p_sys->thread_cond,
+                                            &p_sys->lock,
+                                            i_play_deadline );
+            i_play_deadline = 0;
+            p_sys->b_thread_waiting = false;
+        }
+
+        /* Wait for not paused state */
+        while( p_sys->b_thread_running && p_sys->b_thread_paused )
+        {
+            i_last_time_blocked = 0;
+            vlc_cond_wait( &p_sys->thread_cond, &p_sys->lock );
+        }
+
+        /* Wait for more data in the circular buffer */
+        while( p_sys->b_thread_running
+            && p_sys->circular.i_read >= p_sys->circular.i_write )
+            vlc_cond_wait( &p_sys->thread_cond, &p_sys->lock );
+
+        if( !p_sys->b_thread_running || p_sys->b_error )
+        {
+            vlc_mutex_unlock( &p_sys->lock );
+            break;
+        }
+
+        /* HACK: AudioFlinger can drop frames without notifying us and there is
+         * no way to know it. If it happens, i_audiotrack_pos won't move and
+         * the current code will be stuck because it'll assume that audiotrack
+         * internal buffer is full when it's not. It may happen only after
+         * Android 4.4.2 if we send frames too quickly. To fix this issue,
+         * force the writing of the buffer after a certain delay. */
+        if( i_last_time_blocked != 0 )
+            b_forced = mdate() - i_last_time_blocked >
+                       FRAMES_TO_US( p_sys->i_max_audiotrack_samples ) * 2;
+        else
+            b_forced = false;
+
+        i_data_offset = p_sys->circular.i_read % p_sys->circular.i_size;
+        i_data_size = __MIN( p_sys->circular.i_size - i_data_offset,
+                             p_sys->circular.i_write - p_sys->circular.i_read );
+
+        i_ret = AudioTrack_Play( env, p_aout, i_data_size, i_data_offset,
+                                 b_forced );
+        if( i_ret >= 0 )
+        {
+            if( p_sys->i_write_type == WRITE_BYTEARRAY )
+            {
+                if( i_ret != 0 )
+                    i_last_time_blocked = 0;
+                else if( i_last_time_blocked == 0 )
+                    i_last_time_blocked = mdate();
+            }
+
+            if( i_ret == 0 )
+                i_play_deadline = mdate() + __MAX( 10000, FRAMES_TO_US(
+                                  p_sys->i_max_audiotrack_samples / 5 ) );
+            else
+                p_sys->circular.i_read += i_ret;
+        }
+
+        vlc_cond_signal( &p_sys->aout_cond );
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+
+    if( p_sys->circular.u.bytebuffer.p_obj )
+    {
+        (*env)->DeleteLocalRef( env, p_sys->circular.u.bytebuffer.p_obj );
+        p_sys->circular.u.bytebuffer.p_obj = NULL;
+    }
+
+    return NULL;
 }
 
 static void
@@ -1349,64 +1498,68 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     JNIEnv *env = NULL;
     size_t i_buffer_offset = 0;
-    mtime_t i_last_time_blocked = 0;
-    mtime_t i_play_wait = 0;
     aout_sys_t *p_sys = p_aout->sys;
+
+    vlc_mutex_lock( &p_sys->lock );
 
     if( p_sys->b_error || !( env = GET_ENV() ) )
         goto bailout;
 
-    p_sys->b_error = AudioTrack_PreparePlay( env, p_aout, p_buffer )
-                        != VLC_SUCCESS;
+    if( p_sys->i_chans_to_reorder )
+       aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_buffer,
+                            p_sys->i_chans_to_reorder, p_sys->p_chan_table,
+                            p_sys->fmt.i_format );
 
     while( i_buffer_offset < p_buffer->i_buffer && !p_sys->b_error )
     {
-        int i_ret;
-        bool b_forced;
+        size_t i_circular_free;
+        size_t i_data_offset;
+        size_t i_data_size;
 
-        if( i_play_wait != 0 )
-            msleep( i_play_wait );
+        /* Wait for enough room in circular buffer */
+        while( !p_sys->b_error && ( i_circular_free = p_sys->circular.i_size -
+               ( p_sys->circular.i_write - p_sys->circular.i_read ) ) == 0 )
+            vlc_cond_wait( &p_sys->aout_cond, &p_sys->lock );
+        if( p_sys->b_error )
+            goto bailout;
 
-        /* HACK: AudioFlinger can drop frames without notifying us and there is
-         * no way to know it. If it happens, i_audiotrack_pos won't move and
-         * the current code will be stuck because it'll assume that audiotrack
-         * internal buffer is full when it's not. It may happen only after
-         * Android 4.4.2 if we send frames too quickly. To fix this issue,
-         * force the writting of the buffer after a certain delay. */
-        if( i_last_time_blocked != 0 )
+        i_data_offset = p_sys->circular.i_write % p_sys->circular.i_size;
+        i_data_size = __MIN( p_buffer->i_buffer - i_buffer_offset,
+                             p_sys->circular.i_size - i_data_offset );
+        i_data_size = __MIN( i_data_size, i_circular_free );
+
+        switch( p_sys->i_write_type )
         {
-            b_forced = mdate() - i_last_time_blocked >
-                       FRAMES_TO_US( p_sys->i_max_audiotrack_samples ) * 2;
-        }
-        else
-            b_forced = false;
+        case WRITE_BYTEARRAY:
+            (*env)->SetByteArrayRegion( env, p_sys->circular.u.p_bytearray,
+                                        i_data_offset, i_data_size,
+                                        (jbyte *)p_buffer->p_buffer
+                                        + i_buffer_offset);
+            break;
+        case WRITE_FLOATARRAY:
+            i_data_offset &= ~3;
+            i_data_size &= ~3;
+            (*env)->SetFloatArrayRegion( env, p_sys->circular.u.p_floatarray,
+                                         i_data_offset / 4, i_data_size / 4,
+                                         (jfloat *)p_buffer->p_buffer
+                                         + i_buffer_offset / 4);
 
-        i_ret = AudioTrack_Play( env, p_aout, p_buffer, &i_buffer_offset,
-                                 b_forced );
-        if( i_ret < 0 )
-            p_sys->b_error = true;
-        else if( p_sys->i_write_type == WRITE )
-        {
-            if( i_ret != 0 )
-                i_last_time_blocked = 0;
-            else if( i_last_time_blocked == 0 )
-                i_last_time_blocked = mdate();
-        }
-
-        if( p_buffer->i_buffer - i_buffer_offset > 0 )
-        {
-            i_play_wait = FRAMES_TO_US( BYTES_TO_FRAMES( p_buffer->i_buffer
-                                                         - i_buffer_offset ) );
-            i_play_wait = __MAX( 10000, i_play_wait );
+            break;
+        case WRITE_BYTEBUFFER:
+            memcpy( p_sys->circular.u.bytebuffer.p_data + i_data_offset,
+                    p_buffer->p_buffer + i_buffer_offset, i_data_size );
+            break;
         }
 
+        i_buffer_offset += i_data_size;
+        p_sys->circular.i_write += i_data_size;
+
+        if( !p_sys->b_thread_waiting )
+            vlc_cond_signal( &p_sys->thread_cond );
     }
+
 bailout:
-    if( p_sys->p_bytebuffer && env )
-    {
-        (*env)->DeleteLocalRef( env, p_sys->p_bytebuffer );
-        p_sys->p_bytebuffer = NULL;
-    }
+    vlc_mutex_unlock( &p_sys->lock );
     block_Release( p_buffer );
 }
 
@@ -1417,19 +1570,26 @@ Pause( audio_output_t *p_aout, bool b_pause, mtime_t i_date )
     JNIEnv *env;
     VLC_UNUSED( i_date );
 
+    vlc_mutex_lock( &p_sys->lock );
+
     if( p_sys->b_error || !( env = GET_ENV() ) )
-        return;
+        goto bailout;
 
     if( b_pause )
     {
+        p_sys->b_thread_paused = true;
         JNI_AT_CALL_VOID( pause );
         CHECK_AT_EXCEPTION( "pause" );
     } else
     {
+        p_sys->b_thread_paused = false;
         AudioTrack_ResetPositions( env, p_aout );
         JNI_AT_CALL_VOID( play );
         CHECK_AT_EXCEPTION( "play" );
     }
+
+bailout:
+    vlc_mutex_unlock( &p_sys->lock );
 }
 
 static void
@@ -1438,8 +1598,10 @@ Flush( audio_output_t *p_aout, bool b_wait )
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
 
+    vlc_mutex_lock( &p_sys->lock );
+
     if( p_sys->b_error || !( env = GET_ENV() ) )
-        return;
+        goto bailout;
 
     /* Android doc:
      * stop(): Stops playing the audio data. When used on an instance created
@@ -1454,16 +1616,24 @@ Flush( audio_output_t *p_aout, bool b_wait )
      */
     if( b_wait )
     {
+        /* Wait for the thread to process the circular buffer */
+        while( !p_sys->b_error
+            && p_sys->circular.i_read != p_sys->circular.i_write )
+            vlc_cond_wait( &p_sys->aout_cond, &p_sys->lock );
+        if( p_sys->b_error )
+            goto bailout;
+
         JNI_AT_CALL_VOID( stop );
         if( CHECK_AT_EXCEPTION( "stop" ) )
-            return;
+            goto bailout;
     } else
     {
         JNI_AT_CALL_VOID( pause );
         if( CHECK_AT_EXCEPTION( "pause" ) )
-            return;
+            goto bailout;
         JNI_AT_CALL_VOID( flush );
     }
+    p_sys->circular.i_read = p_sys->circular.i_write = 0;
 
     /* HACK: Before Android 4.4, the head position is not reset to zero and is
      * still moving after a flush or a stop. This prevents to get a precise
@@ -1476,12 +1646,15 @@ Flush( audio_output_t *p_aout, bool b_wait )
         if( AudioTrack_Recreate( env, p_aout ) != 0 )
         {
             p_sys->b_error = true;
-            return;
+            goto bailout;
         }
     }
     AudioTrack_Reset( env, p_aout );
     JNI_AT_CALL_VOID( play );
     CHECK_AT_EXCEPTION( "play" );
+
+bailout:
+    vlc_mutex_unlock( &p_sys->lock );
 }
 
 static int DeviceSelect(audio_output_t *p_aout, const char *p_id)
@@ -1527,6 +1700,9 @@ Open( vlc_object_t *obj )
         return VLC_ENOMEM;
 
     p_sys->at_dev = AT_DEV_DEFAULT;
+    vlc_mutex_init(&p_sys->lock);
+    vlc_cond_init(&p_sys->aout_cond);
+    vlc_cond_init(&p_sys->thread_cond);
 
     p_aout->sys = p_sys;
     p_aout->start = Start;
@@ -1550,15 +1726,9 @@ Close( vlc_object_t *obj )
 {
     audio_output_t *p_aout = (audio_output_t *) obj;
     aout_sys_t *p_sys = p_aout->sys;
-    JNIEnv *env;
 
-    if( ( env = GET_ENV() ) )
-    {
-        if( p_sys->p_bytearray )
-            (*env)->DeleteGlobalRef( env, p_sys->p_bytearray );
-        if( p_sys->p_floatarray )
-            (*env)->DeleteGlobalRef( env, p_sys->p_floatarray );
-    }
-
+    vlc_mutex_destroy(&p_sys->lock);
+    vlc_cond_destroy(&p_sys->aout_cond);
+    vlc_cond_destroy(&p_sys->thread_cond);
     free( p_sys );
 }
