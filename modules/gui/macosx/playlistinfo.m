@@ -467,9 +467,9 @@ error:
         return nil;
 
     if (o_children == NULL) {
+        o_children = [[NSMutableArray alloc] init];
         if (i_object_id == -1) {
             vlc_mutex_lock(&p_item->lock);
-            o_children = [[NSMutableArray alloc] initWithCapacity: p_item->i_categories];
             for (int i = 0 ; i < p_item->i_categories ; i++) {
                 NSString * name = [NSString stringWithUTF8String:p_item->pp_categories[i]->psz_name];
                 VLCInfoTreeItem * item = [[VLCInfoTreeItem alloc] initWithName:name value:@"" ID:i parent:self];
@@ -481,7 +481,6 @@ error:
         else if (o_parent->i_object_id == -1) {
             vlc_mutex_lock(&p_item->lock);
             info_category_t * cat = p_item->pp_categories[i_object_id];
-            o_children = [[NSMutableArray alloc] initWithCapacity: cat->i_infos];
             for (int i = 0 ; i < cat->i_infos ; i++) {
                 NSString * name = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_name];
                 NSString * value = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_value ? : ""];
