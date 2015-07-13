@@ -22,7 +22,7 @@
 
 #include <limits.h>
 
-static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x00, 0x01 };
+static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x01 };
 
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,
@@ -147,57 +147,79 @@ int h264_get_spspps( uint8_t *p_buf, size_t i_buf,
     uint8_t *p_sps = NULL, *p_pps = NULL;
     size_t i_sps_size = 0, i_pps_size = 0;
     int i_nal_type = NAL_UNKNOWN;
+    bool b_first_nal = true;
+    bool b_has_zero_byte = false;
 
-    if (unlikely(p_buf == NULL || i_buf == 0))
-        return -1;
-
-    while( true )
+    while( i_buf > 0 )
     {
-        int i_inc = 0;
+        unsigned int i_move = 1;
 
-        if( i_buf > 5 && memcmp( p_buf, annexb_startcode, 4 ) == 0 )
+        if( i_nal_type == NAL_UNKNOWN )
         {
-            i_nal_type = p_buf[4] & 0x1F;
+            if( i_buf > 4 && !memcmp( p_buf, annexb_startcode, 3 ) )
+            {
+                i_nal_type = p_buf[3] & 0x1F;
+                i_move = 4;
 
-            /* size of startcode + nal_type */
-            i_inc = 5;
+                /* The start prefix is always 0x00000001 (annexb_startcode + a
+                 * leading zero byte) for SPS, PPS or the first NAL */
+                if( !b_has_zero_byte && ( b_first_nal || i_nal_type == NAL_SPS
+                 || i_nal_type == NAL_PPS ) )
+                    return -1;
+                b_first_nal = false;
 
-            /* pointer to the beginning of the sps/pps  */
-            if( i_nal_type == NAL_SPS && !p_sps )
-                p_sps = p_buf;
-            if( i_nal_type == NAL_PPS && !p_pps )
-                p_pps = p_buf;
-        } else {
-            i_inc = 1;
+                /* Pointer to the beginning of the SPS/PPS starting with the
+                 * leading zero byte */
+                if( i_nal_type == NAL_SPS && !p_sps )
+                    p_sps = p_buf - 1;
+                if( i_nal_type == NAL_PPS && !p_pps )
+                    p_pps = p_buf - 1;
+
+                /* cf. 7.4.1.2.3 */
+                if( i_nal_type > 18 || ( i_nal_type >= 10 && i_nal_type <= 12 ) )
+                    return -1;
+
+                /* SPS/PPS are before the slices */
+                if ( i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
+                    break;
+
+            } else if( b_first_nal && p_buf[0] != 0 )
+            {
+                /* leading_zero_8bits only before the first NAL */
+                return -1;
+            }
         }
+        else
+        {
+            /* cf B.3-3: a NAL unit ends with 0x000000, 0x000001 or with the
+             * end of the bytestream */
+            if( i_buf > 3 && p_buf[0] == 0 && p_buf[1] == 0
+             && ( p_buf[2] == 0 || p_buf[2] == 1 ) )
+            {
+                /* update SPS/PPS size */
+                if( i_nal_type == NAL_SPS )
+                    i_sps_size = p_buf - p_sps;
+                if( i_nal_type == NAL_PPS )
+                    i_pps_size = p_buf - p_pps;
 
-        /* cf. 7.4.1.2.3 */
-        if( i_nal_type == NAL_UNKNOWN || i_nal_type > 18
-         || (i_nal_type >= 10 && i_nal_type <= 12))
-            return -1;
+                if( i_sps_size && i_pps_size )
+                    break;
+                i_nal_type = NAL_UNKNOWN;
+                i_move = 0;
+            }
+        }
+        b_has_zero_byte = *p_buf == 0;
+        i_buf -= i_move;
+        p_buf += i_move;
+    }
 
-        /* update SPS/PPS size if the new NAL is different than the last one */
-        if( !i_sps_size && p_sps && i_nal_type != NAL_SPS )
+    if( i_buf == 0 )
+    {
+        /* update SPS/PPS size if we reach the end of the bytestream */
+        if( !i_sps_size && i_nal_type == NAL_SPS )
             i_sps_size = p_buf - p_sps;
-        if( !i_pps_size && p_pps && i_nal_type != NAL_PPS )
+        if( !i_pps_size && i_nal_type == NAL_PPS )
             i_pps_size = p_buf - p_pps;
-
-        /* SPS/PPS are before the slices */
-        if (i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
-            break;
-
-        i_buf -= i_inc;
-        p_buf += i_inc;
-
-        if( i_buf == 0 )
-        {
-            /* update SPS/PPS size if we reach the end of the buffer */
-            if( !i_sps_size && p_sps )
-                i_sps_size = p_buf - p_sps;
-            if( !i_pps_size && p_pps )
-                i_pps_size = p_buf - p_pps;
-            break;
-        }
     }
     if( ( !p_sps || !i_sps_size ) && ( !p_pps || !i_pps_size ) )
         return -1;
