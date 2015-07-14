@@ -174,6 +174,9 @@ void stats_Update( counter_t *p_counter, uint64_t val, uint64_t *new_val )
         p_counter->last_update = now;
         /* Insert the new one at the beginning */
         p_new = (counter_sample_t*)malloc( sizeof( counter_sample_t ) );
+        if (unlikely(p_new == NULL))
+            return; /* NOTE: Losing sample here */
+
         p_new->value = val;
         p_new->date = p_counter->last_update;
         INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
@@ -192,6 +195,9 @@ void stats_Update( counter_t *p_counter, uint64_t val, uint64_t *new_val )
         {
             counter_sample_t *p_new = (counter_sample_t*)malloc(
                                                sizeof( counter_sample_t ) );
+            if (unlikely(p_new == NULL))
+                return; /* NOTE: Losing sample here */
+
             p_new->value = 0;
 
             INSERT_ELEM( p_counter->pp_samples, p_counter->i_samples,
