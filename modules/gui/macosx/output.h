@@ -52,7 +52,7 @@
     IBOutlet id o_stream_type_lbl;
 
     IBOutlet id o_mux_lbl;
-    IBOutlet id o_mux_selector;
+    IBOutlet NSPopUpButton *o_mux_selector;
 
     IBOutlet id o_transcode_audio_bitrate;
     IBOutlet id o_transcode_audio_bitrate_lbl;

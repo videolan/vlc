@@ -85,9 +85,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedMainInstance)
-        [self dealloc];
-    else
+    if (!_o_sharedMainInstance)
         _o_sharedMainInstance = [super init];
 
     return _o_sharedMainInstance;
@@ -95,25 +93,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)dealloc
 {
-    [o_allMediaDevices release];
-    [o_specialMediaFolders release];
-    if (o_opticalDevices)
-        [o_opticalDevices release];
-    if (o_file_slave_path)
-        [o_file_slave_path release];
-    [o_mrl release];
-    if (o_sub_path)
-        [o_sub_path release];
-    [o_currentOpticalMediaIconView release];
-    [o_currentOpticalMediaView release];
     for (int i = 0; i < [o_displayInfos count]; i ++) {
         NSValue *v = [o_displayInfos objectAtIndex:i];
         free([v pointerValue]);
     }
-    [o_displayInfos removeAllObjects];
-    [o_displayInfos release];
-
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -220,8 +203,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_capture_height_lbl setStringValue: [NSString stringWithFormat:@"%@:",_NS("Image height")]];
 
     // setup start / stop time fields
-    [o_file_starttime_fld setFormatter:[[[PositionFormatter alloc] init] autorelease]];
-    [o_file_stoptime_fld setFormatter:[[[PositionFormatter alloc] init] autorelease]];
+    [o_file_starttime_fld setFormatter:[[PositionFormatter alloc] init]];
+    [o_file_stoptime_fld setFormatter:[[PositionFormatter alloc] init]];
 
     [self qtkvideoDevices];
     [o_qtk_video_device_pop removeAllItems];
@@ -244,7 +227,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
         }
     } else {
         [o_qtk_video_device_pop addItemWithTitle: _NS("None")];
-        [qtk_currdevice_uid release];
     }
 
     [self qtkaudioDevices];
@@ -273,7 +255,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     } else {
         [o_qtk_audio_device_pop addItemWithTitle: _NS("None")];
         [o_screen_qtk_audio_pop addItemWithTitle: _NS("None")];
-        [qtkaudio_currdevice_uid release];
     }
 
     [self setSubPanel];
@@ -332,11 +313,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if (!newMRL)
         newMRL = @"";
 
-    if (o_mrl)
-        [o_mrl release];
-
     o_mrl = newMRL;
-    [o_mrl retain];
     [o_mrl_fld performSelectorOnMainThread:@selector(setStringValue:) withObject:o_mrl waitUntilDone:NO];
     if ([o_mrl length] > 0)
         [o_btn_ok setEnabled: YES];
@@ -736,10 +713,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_open_panel setPrompt: _NS("Open")];
     [o_open_panel beginSheetModalForWindow:[sender window] completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSFileHandlingPanelOKButton) {
-            if (o_file_path)
-                [o_file_path release];
             o_file_path = [[[o_open_panel URLs] objectAtIndex:0] path];
-            [o_file_path retain];
             [self openFilePathChanged: nil];
         }
     }];
@@ -760,10 +734,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_open_panel setCanChooseFiles: YES];
         [o_open_panel setCanChooseDirectories: NO];
         if ([o_open_panel runModal] == NSOKButton) {
-            if (o_file_slave_path)
-                [o_file_slave_path release];
             o_file_slave_path = [[[o_open_panel URLs] objectAtIndex:0] path];
-            [o_file_slave_path retain];
         }
     }
     if (o_file_slave_path && [o_file_slave_ckbox state] == NSOnState) {
@@ -795,12 +766,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [theView setAutoresizesSubviews: YES];
     if (o_currentOpticalMediaView) {
         [[[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] replaceSubview: o_currentOpticalMediaView with: theView];
-        [o_currentOpticalMediaView release];
     }
     else
         [[[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] addSubview: theView];
     o_currentOpticalMediaView = theView;
-    [o_currentOpticalMediaView retain];
 
     NSImageView *imageView;
     imageView = [[NSImageView alloc] init];
@@ -809,12 +778,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [imageView setImage: icon];
     if (o_currentOpticalMediaIconView) {
         [[[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] replaceSubview: o_currentOpticalMediaIconView with: imageView];
-        [o_currentOpticalMediaIconView release];
     }
     else
          [[[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] animator] addSubview: imageView];
     o_currentOpticalMediaIconView = imageView;
-    [o_currentOpticalMediaIconView retain];
     [o_currentOpticalMediaView setNeedsDisplay: YES];
     [o_currentOpticalMediaIconView setNeedsDisplay: YES];
     [[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] setNeedsDisplay: YES];
@@ -861,6 +828,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     OSStatus err;
     FSRef ref;
     FSVolumeRefNum actualVolume;
+    NSString *returnValue;
     err = FSPathMakeRef ((const UInt8 *) [mountPath fileSystemRepresentation], &ref, NULL);
 
     // get a FSVolumeRefNum from mountPath
@@ -894,8 +862,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, volumeParms.vMDeviceID);
     service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
 
-
-    NSString *returnValue = nil;
     if (IO_OBJECT_NULL != service) {
         if (IOObjectConformsTo(service, kIOCDMediaClass))
             returnValue = kVLCMediaAudioCD;
@@ -944,8 +910,6 @@ out:
                 }
             }
         }
-
-        [fm release];
 
         if (!returnValue)
             returnValue = kVLCMediaVideoTSFolder;
@@ -1026,35 +990,31 @@ out:
 
 - (void)scanDevicesWithPaths:(NSArray *)o_paths
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
+        NSUInteger count = [o_paths count];
+        NSMutableArray *o_result = [NSMutableArray arrayWithCapacity:count];
+        for (NSUInteger i = 0; i < count; i++)
+            [o_result addObject: [self scanPath:[o_paths objectAtIndex:i]]];
 
-    NSUInteger count = [o_paths count];
-    NSMutableArray *o_result = [NSMutableArray arrayWithCapacity:count];
-    for (NSUInteger i = 0; i < count; i++)
-        [o_result addObject: [self scanPath:[o_paths objectAtIndex:i]]];
+        @synchronized (self) {
+            o_opticalDevices = [[NSArray alloc] initWithArray: o_result];
+        }
 
-    @synchronized (self) {
-        if (o_opticalDevices)
-            [o_opticalDevices release];
-        o_opticalDevices = [[NSArray alloc] initWithArray: o_result];
+        [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:nil waitUntilDone:NO];
     }
-
-    [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:nil waitUntilDone:NO];
-    [o_pool release];
 }
 
 - (void)scanSpecialPath:(NSString *)o_path
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
+        NSDictionary *o_dict = [self scanPath:o_path];
 
-    NSDictionary *o_dict = [self scanPath:o_path];
+        @synchronized (self) {
+            [o_specialMediaFolders addObject:o_dict];
+        }
 
-    @synchronized (self) {
-        [o_specialMediaFolders addObject:o_dict];
+        [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:[NSNumber numberWithBool:YES] waitUntilDone:NO];
     }
-
-    [self performSelectorOnMainThread:@selector(updateMediaSelector:) withObject:[NSNumber numberWithBool:YES] waitUntilDone:NO];
-    [o_pool release];
 }
 
 - (void)scanOpticalMedia:(NSNotification *)o_notification
@@ -1321,12 +1281,10 @@ out:
     [theView setAutoresizesSubviews: YES];
     if (o_currentCaptureView) {
         [[[[o_tabview tabViewItemAtIndex: 3] view] animator] replaceSubview: o_currentCaptureView with: theView];
-        [o_currentCaptureView release];
     } else {
         [[[[o_tabview tabViewItemAtIndex: 3] view] animator] addSubview: theView];
     }
     o_currentCaptureView = theView;
-    [o_currentCaptureView retain];
 }
 
 - (IBAction)openCaptureModeChanged:(id)sender
@@ -1548,7 +1506,6 @@ out:
 
     if ([o_open_panel runModal] == NSOKButton) {
         o_sub_path = [[[o_open_panel URLs] objectAtIndex:0] path];
-        [o_sub_path retain];
         [o_file_subtitles_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_sub_path]];
         [o_file_sub_path_fld setStringValue: [o_file_subtitles_filename_lbl stringValue]];
         [o_file_sub_path_lbl setHidden: YES];
@@ -1597,8 +1554,7 @@ out:
 
 - (void)qtkrefreshVideoDevices
 {
-    [qtkvideoDevices release];
-    qtkvideoDevices = [[[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]] retain];
+    qtkvideoDevices = [[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]];
 }
 
 - (NSArray *)qtkaudioDevices
@@ -1610,8 +1566,7 @@ out:
 
 - (void)qtkrefreshAudioDevices
 {
-    [qtkaudioDevices release];
-    qtkaudioDevices = [[[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeSound] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]] retain];
+    qtkaudioDevices = [[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeSound] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]];
 }
 
 @end

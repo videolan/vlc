@@ -57,10 +57,6 @@
     if (var_InheritBool(VLCIntf, "macosx-dim-keyboard")) {
         [o_keyboard_backlight switchLightsInstantly:YES];
     }
-
-    [o_keyboard_backlight release];
-    [o_vout_dict release];
-    [super dealloc];
 }
 
 #pragma mark -
@@ -140,16 +136,15 @@
     } else {
         if ((var_InheritBool(VLCIntf, "embedded-video") && !b_mainwindow_has_video)) {
             // setup embedded video
-            o_vout_view = [[[VLCMainWindow sharedInstance] videoView] retain];
-            o_new_video_window = [[VLCMainWindow sharedInstance] retain];
+            o_new_video_window = [VLCMainWindow sharedInstance];
+            o_vout_view = [o_new_video_window videoView];
             b_mainwindow_has_video = YES;
             b_nonembedded = NO;
         } else {
             // setup detached window with controls
             NSWindowController *o_controller = [[NSWindowController alloc] initWithWindowNibName:@"DetachedVideoWindow"];
             [o_controller loadWindow];
-            o_new_video_window = [(VLCDetachedVideoWindow *)[o_controller window] retain];
-            [o_controller release];
+            o_new_video_window = (VLCDetachedVideoWindow *)[o_controller window];
 
             // no frame autosave for additional vout windows
             if (b_multiple_vout_windows)
@@ -158,7 +153,7 @@
             [o_new_video_window setDelegate: o_new_video_window];
             [o_new_video_window setLevel:NSNormalWindowLevel];
             [o_new_video_window useOptimizedDrawing: YES];
-            o_vout_view = [[o_new_video_window videoView] retain];
+            o_vout_view = [o_new_video_window videoView];
             b_nonembedded = YES;
         }
     }
@@ -203,7 +198,7 @@
 
     [o_vout_view setVoutThread:(vout_thread_t *)p_wnd->p_parent];
     [o_new_video_window setHasActiveVideo: YES];
-    [o_vout_dict setObject:[o_new_video_window autorelease] forKey:[NSValue valueWithPointer:p_wnd]];
+    [o_vout_dict setObject:o_new_video_window forKey:[NSValue valueWithPointer:p_wnd]];
 
     [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
     [[VLCMainWindow sharedInstance] setNonembedded:!b_mainwindow_has_video];
@@ -235,7 +230,7 @@
 
     NSEnableScreenUpdates();
 
-    return [o_vout_view autorelease];
+    return o_vout_view;
 }
 
 - (void)removeVoutforDisplay:(NSValue *)o_key
@@ -271,7 +266,6 @@
     }
     NSEnableScreenUpdates();
 
-    [o_window retain];
     [o_vout_dict removeObjectForKey:o_key];
     if ([o_vout_dict count] == 0) {
         [[VLCMain sharedInstance] setActiveVideoPlayback:NO];
@@ -288,8 +282,6 @@
         // beware of order, setActiveVideoPlayback:, setHasActiveVideo: and setNonembedded: must be called before
         [[VLCMainWindow sharedInstance] changePlaylistState: psVideoStartedOrStoppedEvent];
     }
-
-    [o_window release];
 }
 
 

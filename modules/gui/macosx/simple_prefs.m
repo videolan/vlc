@@ -192,28 +192,12 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else {
+    if (!_o_sharedInstance) {
         _o_sharedInstance = [super init];
         p_intf = VLCIntf;
     }
 
     return _o_sharedInstance;
-}
-
-- (void)dealloc
-{
-    [o_currentlyShownCategoryView release];
-
-    [o_hotkeySettings release];
-    [o_hotkeyDescriptions release];
-    [o_hotkeyNames release];
-    [o_hotkeysNonUseableKeys release];
-
-    [o_keyInTransition release];
-
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -231,7 +215,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 #endif
 
     /* setup the toolbar */
-    NSToolbar * o_sprefs_toolbar = [[[NSToolbar alloc] initWithIdentifier: VLCSPrefsToolbarIdentifier] autorelease];
+    NSToolbar * o_sprefs_toolbar = [[NSToolbar alloc] initWithIdentifier: VLCSPrefsToolbarIdentifier];
     [o_sprefs_toolbar setAllowsUserCustomization: NO];
     [o_sprefs_toolbar setAutosavesConfiguration: NO];
     [o_sprefs_toolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
@@ -247,7 +231,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     [o_hotkeys_listbox setDoubleAction:@selector(hotkeyTableDoubleClick:)];
 
     /* setup useful stuff */
-    o_hotkeysNonUseableKeys = [[NSArray arrayWithObjects:@"Command-c", @"Command-x", @"Command-v", @"Command-a", @"Command-," , @"Command-h", @"Command-Alt-h", @"Command-Shift-o", @"Command-o", @"Command-d", @"Command-n", @"Command-s", @"Command-l", @"Command-r", @"Command-3", @"Command-m", @"Command-w", @"Command-Shift-w", @"Command-Shift-c", @"Command-Shift-p", @"Command-i", @"Command-e", @"Command-Shift-e", @"Command-b", @"Command-Shift-m", @"Command-Ctrl-m", @"Command-?", @"Command-Alt-?", nil] retain];
+    o_hotkeysNonUseableKeys = [NSArray arrayWithObjects:@"Command-c", @"Command-x", @"Command-v", @"Command-a", @"Command-," , @"Command-h", @"Command-Alt-h", @"Command-Shift-o", @"Command-o", @"Command-d", @"Command-n", @"Command-s", @"Command-l", @"Command-r", @"Command-3", @"Command-m", @"Command-w", @"Command-Shift-w", @"Command-Shift-c", @"Command-Shift-p", @"Command-i", @"Command-e", @"Command-Shift-e", @"Command-b", @"Command-Shift-m", @"Command-Ctrl-m", @"Command-?", @"Command-Alt-?", nil];
 }
 
 #define CreateToolbarItem(o_name, o_desc, o_img, sel) \
@@ -255,7 +239,7 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
 static inline NSToolbarItem *
 create_toolbar_item(NSString * o_itemIdent, NSString * o_name, NSString * o_desc, NSString * o_img, id target, SEL selector)
 {
-    NSToolbarItem *o_toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent] autorelease]; \
+    NSToolbarItem *o_toolbarItem = [[NSToolbarItem alloc] initWithItemIdentifier: o_itemIdent];
 
     [o_toolbarItem setLabel: o_name];
     [o_toolbarItem setPaletteLabel: o_desc];
@@ -480,7 +464,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
         if (strcmp(texts[i], "") != 0) {
             NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
             [mi setRepresentedObject: toNSStr(values[i])];
-            [[object menu] addItem: [mi autorelease]];
+            [[object menu] addItem:mi];
 
             if (p_item->value.psz && !strcmp(p_item->value.psz, values[i]))
                 [object selectItem: [object lastItem]];
@@ -522,7 +506,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     for (ssize_t i = 0; i < count; i++) {
         NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
         [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];
-        [[object menu] addItem: [mi autorelease]];
+        [[object menu] addItem:mi];
 
         if (p_item->value.i == values[i])
             [object selectItem:[object lastItem]];
@@ -771,7 +755,6 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
      * hotkeys settings *
      ********************/
     const struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
-    [o_hotkeySettings release];
     o_hotkeySettings = [[NSMutableArray alloc] init];
     NSMutableArray *o_tempArray_desc = [[NSMutableArray alloc] init];
     NSMutableArray *o_tempArray_names = [[NSMutableArray alloc] init];
@@ -800,12 +783,9 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     }
     module_config_free (p_config);
 
-    [o_hotkeyDescriptions release];
     o_hotkeyDescriptions = [[NSArray alloc] initWithArray: o_tempArray_desc copyItems: YES];
-    [o_tempArray_desc release];
-    [o_hotkeyNames release];
     o_hotkeyNames = [[NSArray alloc] initWithArray: o_tempArray_names copyItems: YES];
-    [o_tempArray_names release];
+
     [o_hotkeys_listbox reloadData];
 }
 
@@ -1124,7 +1104,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     [o_new_category_view setAutoresizesSubviews: YES];
     if (o_currentlyShownCategoryView) {
         [[[o_sprefs_win contentView] animator] replaceSubview: o_currentlyShownCategoryView with: o_new_category_view];
-        [o_currentlyShownCategoryView release];
         [[o_sprefs_win animator] setFrame: o_win_rect display:YES];
     } else {
         [[o_sprefs_win contentView] addSubview: o_new_category_view];
@@ -1133,7 +1112,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
     /* keep our current category for further reference */
     o_currentlyShownCategoryView = o_new_category_view;
-    [o_currentlyShownCategoryView retain];
 }
 
 #pragma mark -
@@ -1221,7 +1199,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
                 b_videoSettingChanged = YES;
             }
         }];
-        [o_selectFolderPanel release];
     } else
         b_videoSettingChanged = YES;
 }
@@ -1322,7 +1299,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
                 b_inputSettingChanged = YES;
             }
         }];
-        [o_selectFolderPanel release];
 
         return;
     }
@@ -1372,7 +1348,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         NSUInteger count;
 
 #define fillUrlHandlerPopup( protocol, object ) \
-        handlers = (NSArray *)LSCopyAllHandlersForURLScheme(CFSTR( protocol )); \
+        handlers = (__bridge NSArray *)LSCopyAllHandlersForURLScheme(CFSTR( protocol )); \
         rawHandlers = [[NSMutableArray alloc] init]; \
         [object removeAllItems]; \
         count = [handlers count]; \
@@ -1385,8 +1361,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
                 [rawHandlers addObject: rawhandler]; \
             } \
         } \
-        [object selectItemAtIndex: [rawHandlers indexOfObject:(id)LSCopyDefaultHandlerForURLScheme(CFSTR( protocol ))]]; \
-        [rawHandlers release]
+        [object selectItemAtIndex: [rawHandlers indexOfObject:(__bridge id)LSCopyDefaultHandlerForURLScheme(CFSTR( protocol ))]];
 
         fillUrlHandlerPopup( "ftp", o_urlhandler_ftp_pop);
         fillUrlHandlerPopup( "mms", o_urlhandler_mms_pop);
@@ -1405,15 +1380,15 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [NSApp endSheet: o_urlhandler_win];
 
         if (sender == o_urlhandler_save_btn) {
-            LSSetDefaultHandlerForURLScheme(CFSTR("ftp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_ftp_pop selectedItem] title]]);
-            LSSetDefaultHandlerForURLScheme(CFSTR("mms"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_mms_pop selectedItem] title]]);
-            LSSetDefaultHandlerForURLScheme(CFSTR("mmsh"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_mms_pop selectedItem] title]]);
-            LSSetDefaultHandlerForURLScheme(CFSTR("rtmp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_rtmp_pop selectedItem] title]]);
-            LSSetDefaultHandlerForURLScheme(CFSTR("rtp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_rtp_pop selectedItem] title]]);
-            LSSetDefaultHandlerForURLScheme(CFSTR("rtsp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_rtsp_pop selectedItem] title]]);
-            LSSetDefaultHandlerForURLScheme(CFSTR("sftp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_sftp_pop selectedItem] title]]);
-            LSSetDefaultHandlerForURLScheme(CFSTR("smb"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_smb_pop selectedItem] title]]);
-            LSSetDefaultHandlerForURLScheme(CFSTR("udp"), (CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_udp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("ftp"), (__bridge CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_ftp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("mms"), (__bridge CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_mms_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("mmsh"), (__bridge CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_mms_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("rtmp"), (__bridge CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_rtmp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("rtp"), (__bridge CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_rtp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("rtsp"), (__bridge CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_rtsp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("sftp"), (__bridge CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_sftp_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("smb"), (__bridge CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_smb_pop selectedItem] title]]);
+            LSSetDefaultHandlerForURLScheme(CFSTR("udp"), (__bridge CFStringRef)[self bundleIdentifierForApplicationName:[[o_urlhandler_udp_pop selectedItem] title]]);
         }
     }
 }
@@ -1461,7 +1436,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         if (i_returnValue != NSNotFound)
             [o_hotkeySettings replaceObjectAtIndex: i_returnValue withObject: [NSString string]];
 
-        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject: [o_keyInTransition retain]];
+        [o_hotkeySettings replaceObjectAtIndex: [o_hotkeys_listbox selectedRow] withObject:o_keyInTransition];
 
         [NSApp stopModal];
         [o_hotkeys_change_win close];
@@ -1525,9 +1500,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
             [o_hotkeys_change_taken_lbl setStringValue: @""];
 
         [o_hotkeys_change_ok_btn setEnabled: YES];
-        [o_keyInTransition release];
         o_keyInTransition = theKey;
-        [o_keyInTransition retain];
         return YES;
     }
 }
@@ -1558,7 +1531,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_theEvent
 {
-    NSMutableString *tempString = [[[NSMutableString alloc] init] autorelease];
+    NSMutableString *tempString = [[NSMutableString alloc] init];
     NSString *keyString = [o_theEvent characters];
 
     unichar key = [keyString characterAtIndex:0];

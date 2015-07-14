@@ -58,9 +58,7 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else {
+    if (!_o_sharedInstance) {
         _o_sharedInstance = [super init];
 
         if (_o_sharedInstance != nil) {
@@ -136,12 +134,8 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
-    [rootItem release];
-
     if (p_item)
         vlc_gc_decref(p_item);
-
-    [super dealloc];
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
@@ -200,91 +194,90 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (void)updatePanelWithItem:(input_item_t *)_p_item;
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    if (_p_item != p_item) {
-        if (p_item) vlc_gc_decref(p_item);
-        [o_saveMetaData_btn setEnabled: NO];
-        if (_p_item) vlc_gc_incref(_p_item);
-        p_item = _p_item;
+    @autoreleasepool {
+        if (_p_item != p_item) {
+            if (p_item) vlc_gc_decref(p_item);
+            [o_saveMetaData_btn setEnabled: NO];
+            if (_p_item) vlc_gc_incref(_p_item);
+            p_item = _p_item;
+        }
+
+        if (!p_item) {
+            /* Erase */
+        #define SET( foo ) \
+            [self setMeta: "" forLabel: o_##foo##_txt];
+            SET( uri );
+            SET( title );
+            SET( author );
+            SET( collection );
+            SET( seqNum );
+            SET( genre );
+            SET( copyright );
+            SET( publisher );
+            SET( nowPlaying );
+            SET( language );
+            SET( date );
+            SET( description );
+            SET( encodedby );
+        #undef SET
+            [o_image_well setImage: [NSImage imageNamed: @"noart.png"]];
+        } else {
+            if (!input_item_IsPreparsed(p_item))
+                libvlc_MetaRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
+
+            /* fill uri info */
+            char * psz_url = decode_URI(input_item_GetURI(p_item));
+            [o_uri_txt setStringValue: [NSString stringWithUTF8String:psz_url ? psz_url : ""]];
+            free(psz_url);
+
+            /* fill title info */
+            char * psz_title = input_item_GetTitle(p_item);
+            if (!psz_title)
+                psz_title = input_item_GetName(p_item);
+            [o_title_txt setStringValue: [NSString stringWithUTF8String:psz_title ? : ""]];
+            free(psz_title);
+
+        #define SET( foo, bar ) \
+            char *psz_##foo = input_item_Get##bar ( p_item ); \
+            [self setMeta: psz_##foo forLabel: o_##foo##_txt]; \
+            FREENULL( psz_##foo );
+
+            /* fill the other fields */
+            SET( author, Artist );
+            SET( collection, Album );
+            SET( seqNum, TrackNum );
+            SET( genre, Genre );
+            SET( copyright, Copyright );
+            SET( publisher, Publisher );
+            SET( nowPlaying, NowPlaying );
+            SET( language, Language );
+            SET( date, Date );
+            SET( description, Description );
+            SET( encodedby, EncodedBy );
+
+        #undef SET
+
+            char *psz_meta;
+            NSImage *o_image;
+            psz_meta = input_item_GetArtURL(p_item);
+
+            /* FIXME Can also be attachment:// */
+            if (psz_meta && strncmp(psz_meta, "attachment://", 13))
+                o_image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:[NSString stringWithUTF8String:psz_meta]]];
+            else
+                o_image = [NSImage imageNamed: @"noart.png"];
+            [o_image_well setImage: o_image];
+            FREENULL(psz_meta);
+        }
+
+        /* reload the advanced table */
+        [rootItem refresh];
+        [o_outline_view reloadData];
+        [o_outline_view expandItem:nil expandChildren:YES];
+
+        /* update the stats once to display p_item change faster */
+        [self updateStatistics];
     }
-
-    if (!p_item) {
-        /* Erase */
-    #define SET( foo ) \
-        [self setMeta: "" forLabel: o_##foo##_txt];
-        SET( uri );
-        SET( title );
-        SET( author );
-        SET( collection );
-        SET( seqNum );
-        SET( genre );
-        SET( copyright );
-        SET( publisher );
-        SET( nowPlaying );
-        SET( language );
-        SET( date );
-        SET( description );
-        SET( encodedby );
-    #undef SET
-        [o_image_well setImage: [NSImage imageNamed: @"noart.png"]];
-    } else {
-        if (!input_item_IsPreparsed(p_item))
-            libvlc_MetaRequest(VLCIntf->p_libvlc, p_item, META_REQUEST_OPTION_NONE);
-
-        /* fill uri info */
-        char * psz_url = decode_URI(input_item_GetURI(p_item));
-        [o_uri_txt setStringValue: [NSString stringWithUTF8String:psz_url ? psz_url : ""]];
-        free(psz_url);
-
-        /* fill title info */
-        char * psz_title = input_item_GetTitle(p_item);
-        if (!psz_title)
-            psz_title = input_item_GetName(p_item);
-        [o_title_txt setStringValue: [NSString stringWithUTF8String:psz_title ? : ""]];
-        free(psz_title);
-
-    #define SET( foo, bar ) \
-        char *psz_##foo = input_item_Get##bar ( p_item ); \
-        [self setMeta: psz_##foo forLabel: o_##foo##_txt]; \
-        FREENULL( psz_##foo );
-
-        /* fill the other fields */
-        SET( author, Artist );
-        SET( collection, Album );
-        SET( seqNum, TrackNum );
-        SET( genre, Genre );
-        SET( copyright, Copyright );
-        SET( publisher, Publisher );
-        SET( nowPlaying, NowPlaying );
-        SET( language, Language );
-        SET( date, Date );
-        SET( description, Description );
-        SET( encodedby, EncodedBy );
-
-    #undef SET
-
-        char *psz_meta;
-        NSImage *o_image;
-        psz_meta = input_item_GetArtURL(p_item);
-
-        /* FIXME Can also be attachment:// */
-        if (psz_meta && strncmp(psz_meta, "attachment://", 13))
-            o_image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:[NSString stringWithUTF8String:psz_meta]]];
-        else
-            o_image = [[NSImage imageNamed: @"noart.png"] retain];
-        [o_image_well setImage: o_image];
-        [o_image release];
-        FREENULL(psz_meta);
-    }
-
-    /* reload the advanced table */
-    [rootItem refresh];
-    [o_outline_view reloadData];
-    [o_outline_view expandItem:nil expandChildren:YES];
-
-    /* update the stats once to display p_item change faster */
-    [self updateStatistics];
-    [o_pool release];
 }
 
 - (void)setMeta: (char *)psz_meta forLabel: (id)theItem
@@ -475,13 +468,8 @@ error:
 
 - (void)dealloc
 {
-    if (_children)
-        [_children release];
-    [_name release];
-    [_value release];
     if (p_item)
         vlc_gc_decref(p_item);
-    [super dealloc];
 }
 
 /* Creates and returns the array of children
@@ -508,7 +496,6 @@ error:
                                       value:@""
                                       ID:i
                                       parent:self];
-            [item autorelease];
             [_children addObject:item];
         }
         vlc_mutex_unlock(&p_item->lock);
@@ -533,7 +520,6 @@ error:
                                      value:value
                                      ID:i
                                      parent:self];
-            [item autorelease];
             [_children addObject:item];
         }
         vlc_mutex_unlock(&p_item->lock);
@@ -550,7 +536,6 @@ error:
 
     p_item = [[VLCInfo sharedInstance] item];
 
-    [_children release];
     _children = nil;
 }
 

@@ -44,9 +44,7 @@ static VLCTrackSynchronization *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else {
+    if (!_o_sharedInstance) {
         p_intf = VLCIntf;
         _o_sharedInstance = [super init];
     }

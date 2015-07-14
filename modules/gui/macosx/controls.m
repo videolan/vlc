@@ -56,14 +56,12 @@
     [o_specificTime_sec_lbl setStringValue: _NS("sec.")];
     [o_specificTime_goTo_lbl setStringValue: _NS("Jump to Time")];
 
-    [o_specificTime_enter_fld setFormatter:[[[PositionFormatter alloc] init] autorelease]];
+    [o_specificTime_enter_fld setFormatter:[[PositionFormatter alloc] init]];
 }
 
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
-    [super dealloc];
 }
 
 - (IBAction)play:(id)sender

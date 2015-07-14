@@ -42,9 +42,7 @@ static VLCStringUtility *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else
+    if (!_o_sharedInstance)
         _o_sharedInstance = [super init];
 
     return _o_sharedInstance;
@@ -87,9 +85,7 @@ static VLCStringUtility *_o_sharedInstance = nil;
                                     initWithContainerSize: NSMakeSize(i_width, 2000)];
 
     [o_layout_manager addTextContainer: o_container];
-    [o_container release];
     [o_storage addLayoutManager: o_layout_manager];
-    [o_layout_manager release];
 
     o_wrapped = [o_in_string mutableCopy];
     glyphRange = [o_layout_manager glyphRangeForTextContainer: o_container];
@@ -107,8 +103,6 @@ static VLCStringUtility *_o_sharedInstance = nil;
         }
     }
     o_out_string = [NSString stringWithString: o_wrapped];
-    [o_wrapped release];
-    [o_storage release];
 
     return o_out_string;
 }

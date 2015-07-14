@@ -34,9 +34,7 @@ static VLCSelectItemInPopupPanel *_selectItemPanelInstance = nil;
 
 - (id)init
 {
-    if (_textPanelInstance)
-        [self dealloc];
-    else
+    if (!_textPanelInstance)
         _textPanelInstance = [super init];
 
     return _textPanelInstance;
@@ -87,9 +85,7 @@ static VLCSelectItemInPopupPanel *_selectItemPanelInstance = nil;
 
 - (id)init
 {
-    if (_selectItemPanelInstance)
-        [self dealloc];
-    else
+    if (!_selectItemPanelInstance)
         _selectItemPanelInstance = [super init];
 
     return _selectItemPanelInstance;

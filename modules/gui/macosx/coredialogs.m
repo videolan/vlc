@@ -45,9 +45,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 
 -(id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else {
+    if (!_o_sharedInstance) {
         _o_sharedInstance = [super init];
         b_progress_cancelled = NO;
     }
@@ -243,13 +241,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     [o_cleanup_button setTitle: _NS("Clean up")];
 }
 
--(void)dealloc
-{
-    [o_errors release];
-    [o_icons release];
-    [super dealloc];
-}
-
 -(void)addError: (NSString *)o_error withMsg:(NSString *)o_msg
 {
     /* format our string as desired */
@@ -263,7 +254,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
         value: [NSFont boldSystemFontOfSize:11]
         range: NSMakeRange(0, [o_error length])];
     [o_errors addObject: ourError];
-    [ourError release];
 
     [o_icons addObject: [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kAlertStopIcon)]];
 

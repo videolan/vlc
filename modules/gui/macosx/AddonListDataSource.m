@@ -39,8 +39,6 @@
 -(void)dealloc
 {
     addon_entry_Release(p_addon_entry);
-
-    [super dealloc];
 }
 
 - (NSData *)uuid

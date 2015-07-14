@@ -42,7 +42,7 @@ static ExtensionsManager* instance = nil;
 + (ExtensionsManager *)getInstance:(intf_thread_t *)_p_intf
 {
     if (!instance)
-        instance = [[[ExtensionsManager alloc] initWithIntf:_p_intf] autorelease];
+        instance = [[ExtensionsManager alloc] initWithIntf:_p_intf];
     return instance;
 }
 
@@ -88,7 +88,6 @@ static ExtensionsManager* instance = nil;
                                                   keyEquivalent:@""];
 
             [extMenu setSubmenu:submenu forItem:submenuItem];
-            [submenu release];
 
             char **ppsz_titles = NULL;
             uint16_t *pi_ids = NULL;
@@ -178,7 +177,6 @@ static ExtensionsManager* instance = nil;
 
         /* Initialize dialog provider */
         p_edp = [ExtensionsDialogProvider sharedInstance:p_intf];
-        [p_edp retain];
 
         if (!p_edp) {
             msg_Err(p_intf, "Unable to create dialogs provider for extensions");
@@ -202,7 +200,6 @@ static ExtensionsManager* instance = nil;
     if (!p_extensions_manager)
         return;
     b_unloading = true;
-    [p_edp release];
     module_unneed(p_extensions_manager, p_extensions_manager->p_module);
     vlc_object_release(p_extensions_manager);
     p_extensions_manager = NULL;
@@ -315,10 +312,6 @@ static ExtensionsManager* instance = nil;
 
     if (p_extensions_manager)
         vlc_object_release(p_extensions_manager);
-
-    [p_extDict release];
-
-    [super dealloc];
 }
 
 - (BOOL)isLoaded

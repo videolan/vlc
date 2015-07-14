@@ -238,7 +238,7 @@
     s_rc.size.height = 17;                                                  \
     s_rc.origin.x = x_offset - 3;                                           \
     s_rc.origin.y = superFrame.size.height - 17 + my_y_offset;              \
-    o_label = [[[NSTextField alloc] initWithFrame: s_rc] retain];           \
+    o_label = [[NSTextField alloc] initWithFrame: s_rc];                    \
     [o_label setDrawsBackground: NO];                                       \
     [o_label setBordered: NO];                                              \
     [o_label setEditable: NO];                                              \
@@ -257,7 +257,7 @@
     s_rc.origin.y = my_y_offset;                                            \
     s_rc.size.height = 22;                                                  \
     s_rc.size.width = my_width;                                             \
-    o_textfield = [[[NSTextField alloc] initWithFrame: s_rc] retain];       \
+    o_textfield = [[NSTextField alloc] initWithFrame: s_rc];                \
     [o_textfield setFont:[NSFont systemFontOfSize:0]];                      \
     [o_textfield setToolTip: tooltip];                                      \
     [o_textfield setStringValue: init_value];                               \
@@ -271,7 +271,7 @@ s_rc.origin.x = x_offset;                                                   \
 s_rc.origin.y = my_y_offset;                                                \
 s_rc.size.height = 22;                                                      \
 s_rc.size.width = my_width;                                                 \
-o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
+o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 [o_textfield setFont:[NSFont systemFontOfSize:0]];                          \
 [o_textfield setToolTip: tooltip];                                          \
 [o_textfield setStringValue: init_value];                                   \
@@ -286,7 +286,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     s_rc.size.height = 26;                                                  \
     s_rc.size.width = superFrame.size.width + 2 - s_rc.origin.x -           \
         (x2_offset);                                                        \
-    o_combo = [[[NSComboBox alloc] initWithFrame: s_rc] retain];            \
+    o_combo = [[NSComboBox alloc] initWithFrame: s_rc];                     \
     [o_combo setFont:[NSFont systemFontOfSize:0]];                          \
     [o_combo setToolTip: tooltip];                                          \
     [o_combo setUsesDataSource:TRUE];                                       \
@@ -299,7 +299,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     tooltip, title)                                                         \
 {                                                                           \
     NSRect s_rc = superFrame;                                               \
-    o_button = [[[NSButton alloc] initWithFrame: s_rc] retain];             \
+    o_button = [[NSButton alloc] initWithFrame: s_rc];                      \
     [o_button setButtonType: NSMomentaryPushInButton];                      \
     [o_button setBezelStyle: NSRoundedBezelStyle];                          \
     [o_button setTitle: title];                                             \
@@ -324,7 +324,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     s_rc.size.height = 26;                                                  \
     s_rc.size.width = superFrame.size.width + 2 - s_rc.origin.x -           \
         (x2_offset);                                                        \
-    o_popup = [[[NSPopUpButton alloc] initWithFrame: s_rc] retain];         \
+    o_popup = [[NSPopUpButton alloc] initWithFrame: s_rc];                  \
     [o_popup setFont:[NSFont systemFontOfSize:0]];                          \
     [o_popup setToolTip: tooltip];                                          \
 }
@@ -337,7 +337,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     s_rc.origin.y = my_y_offset;                                            \
     s_rc.size.height = 23;                                                  \
     s_rc.size.width = 23;                                                   \
-    o_stepper = [[[NSStepper alloc] initWithFrame: s_rc] retain];           \
+    o_stepper = [[NSStepper alloc] initWithFrame: s_rc];                    \
     [o_stepper setFont:[NSFont systemFontOfSize:0]];                        \
     [o_stepper setToolTip: tooltip];                                        \
     [o_stepper setMaxValue: higher];                                        \
@@ -356,7 +356,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     s_rc.origin.y = my_y_offset;                                            \
     s_rc.size.height = 21;                                                  \
     s_rc.size.width = my_width;                                             \
-    o_slider = [[[NSSlider alloc] initWithFrame: s_rc] retain];             \
+    o_slider = [[NSSlider alloc] initWithFrame: s_rc];                      \
     [o_slider setFont:[NSFont systemFontOfSize:0]];                         \
     [o_slider setToolTip: tooltip];                                         \
     [o_slider setMaxValue: higher];                                         \
@@ -370,7 +370,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     s_rc.size.height = 18;                                                  \
     s_rc.origin.x = x_offset - 2;                                           \
     s_rc.origin.y = superFrame.size.height - 18 + my_y_offset;              \
-    o_checkbox = [[[NSButton alloc] initWithFrame: s_rc] retain];           \
+    o_checkbox = [[NSButton alloc] initWithFrame: s_rc];                    \
     [o_checkbox setFont:[NSFont systemFontOfSize:0]];                       \
     [o_checkbox setButtonType: NSSwitchButton];                             \
     [o_checkbox setImagePosition: position];                                \
@@ -415,9 +415,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
 
 - (void)dealloc
 {
-    if (o_label) [o_label release];
     free(psz_name);
-    [super dealloc];
 }
 
 + (int)calcVerticalMargin: (int)i_curItem lastItem: (int)i_lastItem
@@ -962,12 +960,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     [o_textfield setFrame:frame];
 }
 
-- (void)dealloc
-{
-    [o_textfield release];
-    [super dealloc];
-}
-
 - (char *)stringValue
 {
     return strdup([[o_textfield stringValue] UTF8String]);
@@ -1039,12 +1031,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     frame.origin.x = i_xPos + 2;
     frame.size.width = superFrame.size.width - frame.origin.x + 2;
     [o_popup setFrame:frame];
-}
-
-- (void)dealloc
-{
-    [o_popup release];
-    [super dealloc];
 }
 
 - (char *)stringValue
@@ -1141,13 +1127,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     ;
 }
 
-- (void)dealloc
-{
-    [o_textfield release];
-    [o_button release];
-    [super dealloc];
-}
-
 - (IBAction)openFileDialog: (id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
@@ -1240,12 +1219,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     frame.origin.x = i_xPos - 1;
     frame.size.width = superFrame.size.width - frame.origin.x + 2;
     [o_popup setFrame:frame];
-}
-
-- (void)dealloc
-{
-    [o_popup release];
-    [super dealloc];
 }
 
 - (char *)stringValue
@@ -1384,13 +1357,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     [o_stepper setFrame:frame];
 }
 
-- (void)dealloc
-{
-    [o_stepper release];
-    [o_textfield release];
-    [super dealloc];
-}
-
 - (IBAction)stepperChanged:(id)sender
 {
     [o_textfield setIntValue: [o_stepper intValue]];
@@ -1467,12 +1433,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     [o_popup setFrame:frame];
 }
 
-- (void)dealloc
-{
-    [o_popup release];
-    [super dealloc];
-}
-
 - (int)intValue
 {
     NSNumber *p_valueobject = (NSNumber *)[[o_popup selectedItem] representedObject];
@@ -1494,7 +1454,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     for (ssize_t i = 0; i < count; i++) {
         NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
         [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];
-        [[o_popup menu] addItem: [mi autorelease]];
+        [[o_popup menu] addItem:mi];
 
         if (i_current_selection == values[i])
             [o_popup selectItem:[o_popup lastItem]];
@@ -1587,15 +1547,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     [o_textfield setFrame:frame];
 }
 
-- (void)dealloc
-{
-    [o_textfield release];
-    [o_textfield_min release];
-    [o_textfield_max release];
-    [o_slider release];
-    [super dealloc];
-}
-
 - (IBAction)sliderChanged:(id)sender
 {
     [o_textfield setIntValue: [o_slider intValue]];
@@ -1681,13 +1632,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     frame = [o_stepper frame];
     frame.origin.x = i_xPos + [o_textfield frame].size.width + 5;
     [o_stepper setFrame:frame];
-}
-
-- (void)dealloc
-{
-    [o_stepper release];
-    [o_textfield release];
-    [super dealloc];
 }
 
 - (IBAction)stepperChanged:(id)sender
@@ -1794,15 +1738,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     [o_textfield setFrame:frame];
 }
 
-- (void)dealloc
-{
-    [o_textfield release];
-    [o_textfield_min release];
-    [o_textfield_max release];
-    [o_slider release];
-    [super dealloc];
-}
-
 - (IBAction)sliderChanged:(id)sender
 {
     [o_textfield setFloatValue: [o_slider floatValue]];
@@ -1855,12 +1790,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
         [self addSubview: o_checkbox];
     }
     return self;
-}
-
-- (void)dealloc
-{
-    [o_checkbox release];
-    [super dealloc];
 }
 
 - (int)intValue
@@ -1938,12 +1867,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];     \
     frame.origin.x = i_xPos - 1;
     frame.size.width = superFrame.size.width - frame.origin.x + 2;
     [o_popup setFrame:frame];
-}
-
-- (void)dealloc
-{
-    [o_popup release];
-    [super dealloc];
 }
 
 - (int)intValue
@@ -2153,13 +2076,6 @@ else\
         substringToIndex: ([o_newstring length])?[o_newstring length] - 1:0]];
 }
 
-- (void)dealloc
-{
-    [o_tableview release];
-    [super dealloc];
-}
-
-
 - (char *)stringValue
 {
     return strdup([[o_textfield stringValue] UTF8String]);
@@ -2315,8 +2231,6 @@ else\
         ADD_LABEL(o_label, mainFrame, 1, 0, @"", @"")
         [o_label setAttributedStringValue: o_bold_string];
         [o_label sizeToFit];
-
-        [o_bold_string release];
         
         [o_label setAutoresizingMask:NSViewNotSizable];
         [self addSubview: o_label];

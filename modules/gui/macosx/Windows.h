@@ -88,7 +88,7 @@ static const float f_min_video_height = 70.0;
     BOOL b_dark_interface;
 
     IBOutlet VLCMainWindowTitleView *o_titlebar_view; // only set in main or detached window
-    IBOutlet VLCVoutView *o_video_view;
+    IBOutlet __unsafe_unretained VLCVoutView *o_video_view;
 
     IBOutlet VLCControlsBarCommon *o_controls_bar;
 

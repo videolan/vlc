@@ -154,9 +154,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedMainInstance)
-        [self dealloc];
-    else {
+    if (!_o_sharedMainInstance) {
         _o_sharedMainInstance = [super init];
         p_intf = VLCIntf;
         o_empty_view = [[NSView alloc] init];
@@ -164,13 +162,6 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     }
 
     return _o_sharedMainInstance;
-}
-
-- (void)dealloc
-{
-    [o_empty_view release];
-    [_rootTreeItem release];
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -387,7 +378,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 + (VLCTreeCategoryItem *)categoryTreeItemWithCategory:(int)category
 {
     if (!config_CategoryNameGet(category)) return nil;
-    return [[[[self class] alloc] initWithCategory:category] autorelease];
+    return [[[self class] alloc] initWithCategory:category];
 }
 
 - (id)initWithCategory:(int)category
@@ -434,7 +425,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     if (!config_CategoryNameGet(subCategory))
         return nil;
-    return [[[[self class] alloc] initWithSubCategory:subCategory] autorelease];
+    return [[[self class] alloc] initWithSubCategory:subCategory];
 }
 
 - (int)subCategory
@@ -459,13 +450,12 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 + (VLCTreePluginItem *)pluginTreeItemWithPlugin:(module_t *)plugin
 {
-    return [[[[self class] alloc] initWithPlugin:plugin] autorelease];
+    return [[[self class] alloc] initWithPlugin:plugin];
 }
 
 - (void)dealloc
 {
     module_config_free(_configItems);
-    [super dealloc];
 }
 
 - (module_config_t *)configItems
@@ -507,18 +497,9 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     self = [super init];
     if (self != nil)
-        _name = [name retain];
+        _name = name;
 
     return self;
-}
-
-- (void)dealloc
-{
-    [_children release];
-    [_options release];
-    [_name release];
-    [_subviews release];
-    [super dealloc];
 }
 
 - (VLCTreeItem *)childAtIndex:(NSInteger)i_index
@@ -533,7 +514,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (NSString *)name
 {
-    return [[_name retain] autorelease];
+    return _name;
 }
 
 - (void)showView:(NSScrollView *)prefsView

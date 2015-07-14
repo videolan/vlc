@@ -136,6 +136,7 @@
     /* Only reload the outlineview if the wizard window is open since this can
        be quite long on big playlists */
 
+#warning dead code
 
     // to be removed
 }
@@ -192,7 +193,6 @@
                                  [NSDictionary dictionary], @"recentlyPlayedMedia", nil];
 
     [defaults registerDefaults:appDefaults];
-    [o_columnArray release];
 }
 
 - (PLModel *)model
@@ -217,11 +217,6 @@
     for (NSUInteger x = 0; x < count; x++)
         [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
     [o_outline_view setRowHeight:rowHeight];
-}
-
-- (void)dealloc
-{
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -896,7 +891,6 @@
         }
 
         [o_outline_view addTableColumn: o_work_tc];
-        [o_work_tc release];
         [o_outline_view reloadData];
         [o_outline_view setNeedsDisplay: YES];
     }
@@ -918,8 +912,6 @@
     }
     [[NSUserDefaults standardUserDefaults] setObject: o_arrayToSave forKey:@"PlaylistColumnSelection"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [o_columns release];
-    [o_arrayToSave release];
 }
 
 - (BOOL)isValidResumeItem:(input_item_t *)p_item
@@ -1051,9 +1043,6 @@
     [defaults setObject:mutDict forKey:@"recentlyPlayedMedia"];
     [defaults setObject:mediaList forKey:@"recentlyPlayedMediaList"];
     [defaults synchronize];
-
-    [mutDict release];
-    [mediaList release];
 }
 
 @end

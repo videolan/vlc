@@ -90,7 +90,7 @@
     }
 
     // TODO this callback stuff does not work and is not needed
-    invoc = [[[NSInvocation alloc] init] autorelease];
+    invoc = [[NSInvocation alloc] init];
     [invoc setSelector:@selector(close)];
     [invoc setTarget: self];
 
@@ -104,10 +104,10 @@
 
 - (void)orderOut: (id)sender animate: (BOOL)animate
 {
-    NSInvocation *invoc = [[[NSInvocation alloc] init] autorelease];
+    NSInvocation *invoc = [[NSInvocation alloc] init];
     [invoc setSelector:@selector(orderOut:)];
     [invoc setTarget: self];
-    [invoc setArgument: sender atIndex: 2];
+    [invoc setArgument:(__bridge void * __nonnull)sender atIndex:2];
     [self orderOut: sender animate: animate callback: invoc];
 }
 
@@ -128,26 +128,21 @@
 
     [dict setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
     anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
-    [dict release];
 
     [anim setAnimationBlockingMode:NSAnimationNonblocking];
     [anim setDuration:0.9];
     [anim setFrameRate:30];
-    [anim setUserInfo:callback];
+    [anim setUserInfo:(__bridge void *)callback];
     [anim setDelegate:self];
 
     @synchronized(self) {
         current_anim = self->o_current_animation;
 
-        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating]) {
-            [anim release];
-        } else {
+        if (!([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating])) {
             if (current_anim) {
                 [current_anim stopAnimation];
                 [anim setCurrentProgress:1.0 - [current_anim currentProgress]];
-                [current_anim release];
-            }
-            else
+            } else
                 [anim setCurrentProgress:1.0 - [self alphaValue]];
             self->o_current_animation = anim;
             [anim startAnimation];
@@ -182,7 +177,6 @@
 
     [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
     anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
-    [dict release];
 
     [anim setAnimationBlockingMode:NSAnimationNonblocking];
     [anim setDuration:0.5];
@@ -192,13 +186,10 @@
     @synchronized(self) {
         current_anim = self->o_current_animation;
 
-        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating]) {
-            [anim release];
-        } else {
+        if (!([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating])) {
             if (current_anim) {
                 [current_anim stopAnimation];
                 [anim setCurrentProgress:1.0 - [current_anim currentProgress]];
-                [current_anim release];
             }
             else
                 [anim setCurrentProgress:[self alphaValue]];
@@ -317,12 +308,6 @@
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
     return self;
-}
-
-- (void)dealloc
-{
-    [o_temp_view release];
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -624,7 +609,6 @@
 {
     if (t_hide_mouse_timer != nil) {
         [t_hide_mouse_timer invalidate];
-        [t_hide_mouse_timer release];
     }
 
     t_hide_mouse_timer = [NSTimer scheduledTimerWithTimeInterval:2
@@ -632,7 +616,6 @@
                                                         selector:@selector(hideMouseCursor:)
                                                         userInfo:nil
                                                          repeats:NO];
-    [t_hide_mouse_timer retain];
 }
 
 //  Called automatically if window's acceptsMouseMovedEvents property is true
@@ -922,12 +905,10 @@
             }
 
             NSDisableScreenUpdates();
-            [o_video_view retain];
             [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
             [o_temp_view setFrame:[o_video_view frame]];
             [[o_fullscreen_window contentView] addSubview:o_video_view];
             [o_video_view setFrame: [[o_fullscreen_window contentView] frame]];
-            [o_video_view release];
             NSEnableScreenUpdates();
 
             [screen setFullscreenPresentationOptions];
@@ -951,12 +932,10 @@
 
         /* Make sure we don't see the o_video_view disappearing of the screen during this operation */
         NSDisableScreenUpdates();
-        [o_video_view retain];
         [[o_video_view superview] replaceSubview:o_video_view with:o_temp_view];
         [o_temp_view setFrame:[o_video_view frame]];
         [[o_fullscreen_window contentView] addSubview:o_video_view];
         [o_video_view setFrame: [[o_fullscreen_window contentView] frame]];
-        [o_video_view release];
         [o_fullscreen_window makeKeyAndOrderFront:self];
         NSEnableScreenUpdates();
     }
@@ -971,11 +950,9 @@
 
     if (o_fullscreen_anim1) {
         [o_fullscreen_anim1 stopAnimation];
-        [o_fullscreen_anim1 release];
     }
     if (o_fullscreen_anim2) {
         [o_fullscreen_anim2 stopAnimation];
-        [o_fullscreen_anim2 release];
     }
 
     [screen setFullscreenPresentationOptions];
@@ -996,9 +973,6 @@
      */
     o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict1]];
     o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict2]];
-
-    [dict1 release];
-    [dict2 release];
 
     [o_fullscreen_anim1 setAnimationBlockingMode: NSAnimationNonblocking];
     [o_fullscreen_anim1 setDuration: 0.3];
@@ -1060,12 +1034,10 @@
 
     if (o_fullscreen_anim1) {
         [o_fullscreen_anim1 stopAnimation];
-        [o_fullscreen_anim1 release];
         o_fullscreen_anim1 = nil;
     }
     if (o_fullscreen_anim2) {
         [o_fullscreen_anim2 stopAnimation];
-        [o_fullscreen_anim2 release];
         o_fullscreen_anim2 = nil;
     }
 
@@ -1109,7 +1081,6 @@
     [dict2 setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
 
     o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict2]];
-    [dict2 release];
 
     [o_fullscreen_anim2 setAnimationBlockingMode: NSAnimationNonblocking];
     [o_fullscreen_anim2 setDuration: 0.3];
@@ -1124,7 +1095,6 @@
     [dict1 setObject:[NSValue valueWithRect:frame] forKey:NSViewAnimationEndFrameKey];
 
     o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict1]];
-    [dict1 release];
 
     [o_fullscreen_anim1 setAnimationBlockingMode: NSAnimationNonblocking];
     [o_fullscreen_anim1 setDuration: 0.2];
@@ -1145,10 +1115,8 @@
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
     /* Make sure we don't see the o_video_view disappearing of the screen during this operation */
     NSDisableScreenUpdates();
-    [o_video_view retain];
     [o_video_view removeFromSuperviewWithoutNeedingDisplay];
     [[o_temp_view superview] replaceSubview:o_temp_view with:o_video_view];
-    [o_video_view release];
     [o_video_view setFrame:[o_temp_view frame]];
     if ([[o_video_view subviews] count] > 0)
         [self makeFirstResponder: [[o_video_view subviews] objectAtIndex:0]];
@@ -1160,7 +1128,6 @@
     [o_fullscreen_window orderOut: self];
     NSEnableScreenUpdates();
 
-    [o_fullscreen_window release];
     o_fullscreen_window = nil;
 
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];

@@ -53,9 +53,7 @@
 
 - (void) dealloc
 {
-    [o_authors release];
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    [super dealloc];
 }
 
 /*****************************************************************************
@@ -97,13 +95,11 @@
     NSAttributedString *attrStr;
     attrStr = [[NSAttributedString alloc] initWithString:_NS("Credits") attributes:stringAttributes];
     [o_credits_btn setAttributedTitle:attrStr];
-    [attrStr release];
     attrStr = [[NSAttributedString alloc] initWithString:_NS("License") attributes:stringAttributes];
     [o_gpl_btn setAttributedTitle:attrStr];
-    [attrStr release];
     attrStr = [[NSAttributedString alloc] initWithString:_NS("Authors") attributes:stringAttributes];
     [o_authors_btn setAttributedTitle:attrStr];
-    [attrStr release];
+    attrStr = nil;
     [o_trademarks_txt setStringValue:_NS("VLC media player and VideoLAN are trademarks of the VideoLAN Association.")];
 
     /* setup the creator / revision field */
@@ -127,7 +123,6 @@
         [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@","]]];
     }
     o_authors = [tmpArray componentsJoinedByString:@"\n\n"];
-    [o_authors retain];
 
     /* setup join us! */
     NSString *joinus = [NSString stringWithUTF8String:_(""
@@ -151,7 +146,6 @@
     [o_joinus_txt setSelectable: YES];
     [o_joinus_txt setAttributedStringValue:joinus_readytorender];
 
-    [joinus_readytorender release];
     [o_credits_textview setString: @""];
 
     /* Setup the window */
@@ -169,7 +163,6 @@
         NSCalendar *gregorian =
         [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
         NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSDayCalendarUnit inUnit:NSYearCalendarUnit forDate:[NSDate date]];
-        [gregorian release];
 
         if (dayOfYear >= 354)
             [o_icon_view setImage: [NSImage imageNamed:@"vlc-xmas"]];

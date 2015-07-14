@@ -30,6 +30,7 @@
 #import "playlist.h"
 #import "playlistinfo.h"
 #import "TrackSynchronization.h"
+#import "VideoView.h"
 
 #import "iTunes.h"
 #import "Spotify.h"
@@ -40,7 +41,7 @@ static int InputThreadChanged(vlc_object_t *p_this, const char *psz_var,
                               vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     @autoreleasepool {
-        InputManager *inputManager = param;
+        InputManager *inputManager = (__bridge InputManager *)param;
         [inputManager performSelectorOnMainThread:@selector(inputThreadChanged) withObject:nil waitUntilDone:NO];
     }
 
@@ -51,80 +52,80 @@ static int InputThreadChanged(vlc_object_t *p_this, const char *psz_var,
 static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                       vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    InputManager *inputManager = param;
+    @autoreleasepool {
+        InputManager *inputManager = (__bridge InputManager *)param;
 
-    switch (new_val.i_int) {
-        case INPUT_EVENT_STATE:
-            [inputManager performSelectorOnMainThread:@selector(playbackStatusUpdated) withObject: nil waitUntilDone:NO];
-            break;
-        case INPUT_EVENT_RATE:
-            [[[VLCMain sharedInstance] mainMenu] performSelectorOnMainThread:@selector(updatePlaybackRate) withObject: nil waitUntilDone:NO];
-            break;
-        case INPUT_EVENT_POSITION:
-            [[[VLCMain sharedInstance] mainWindow] performSelectorOnMainThread:@selector(updateTimeSlider) withObject: nil waitUntilDone:NO];
-            break;
-        case INPUT_EVENT_TITLE:
-        case INPUT_EVENT_CHAPTER:
-            [inputManager performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
-            break;
-        case INPUT_EVENT_CACHE:
-            [inputManager performSelectorOnMainThread:@selector(updateMainWindow) withObject:nil waitUntilDone:NO];
-            break;
-        case INPUT_EVENT_STATISTICS:
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[[VLCMain sharedInstance] info] updateStatistics];
-            });
-            break;
-        case INPUT_EVENT_ES:
-            break;
-        case INPUT_EVENT_TELETEXT:
-            break;
-        case INPUT_EVENT_AOUT:
-            break;
-        case INPUT_EVENT_VOUT:
-            break;
-        case INPUT_EVENT_ITEM_META:
-        case INPUT_EVENT_ITEM_INFO:
-            [inputManager performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
-            [inputManager performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-            [inputManager performSelectorOnMainThread:@selector(updateMetaAndInfo) withObject: nil waitUntilDone:NO];
-            break;
-        case INPUT_EVENT_BOOKMARK:
-            break;
-        case INPUT_EVENT_RECORD:
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[[VLCMain sharedInstance] mainMenu] updateRecordState: var_InheritBool(p_this, "record")];
-            });
-            break;
-        case INPUT_EVENT_PROGRAM:
-            [inputManager performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
-            break;
-        case INPUT_EVENT_ITEM_EPG:
-            break;
-        case INPUT_EVENT_SIGNAL:
-            break;
+        switch (new_val.i_int) {
+            case INPUT_EVENT_STATE:
+                [inputManager performSelectorOnMainThread:@selector(playbackStatusUpdated) withObject: nil waitUntilDone:NO];
+                break;
+            case INPUT_EVENT_RATE:
+                [[[VLCMain sharedInstance] mainMenu] performSelectorOnMainThread:@selector(updatePlaybackRate) withObject: nil waitUntilDone:NO];
+                break;
+            case INPUT_EVENT_POSITION:
+                [[[VLCMain sharedInstance] mainWindow] performSelectorOnMainThread:@selector(updateTimeSlider) withObject: nil waitUntilDone:NO];
+                break;
+            case INPUT_EVENT_TITLE:
+            case INPUT_EVENT_CHAPTER:
+                [inputManager performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
+                break;
+            case INPUT_EVENT_CACHE:
+                [inputManager performSelectorOnMainThread:@selector(updateMainWindow) withObject:nil waitUntilDone:NO];
+                break;
+            case INPUT_EVENT_STATISTICS:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[[VLCMain sharedInstance] info] updateStatistics];
+                });
+                break;
+            case INPUT_EVENT_ES:
+                break;
+            case INPUT_EVENT_TELETEXT:
+                break;
+            case INPUT_EVENT_AOUT:
+                break;
+            case INPUT_EVENT_VOUT:
+                break;
+            case INPUT_EVENT_ITEM_META:
+            case INPUT_EVENT_ITEM_INFO:
+                [inputManager performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
+                [inputManager performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
+                [inputManager performSelectorOnMainThread:@selector(updateMetaAndInfo) withObject: nil waitUntilDone:NO];
+                break;
+            case INPUT_EVENT_BOOKMARK:
+                break;
+            case INPUT_EVENT_RECORD:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[[VLCMain sharedInstance] mainMenu] updateRecordState: var_InheritBool(p_this, "record")];
+                });
+                break;
+            case INPUT_EVENT_PROGRAM:
+                [inputManager performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
+                break;
+            case INPUT_EVENT_ITEM_EPG:
+                break;
+            case INPUT_EVENT_SIGNAL:
+                break;
 
-        case INPUT_EVENT_ITEM_NAME:
-            [inputManager performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-            break;
+            case INPUT_EVENT_ITEM_NAME:
+                [inputManager performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
+                break;
 
-        case INPUT_EVENT_AUDIO_DELAY:
-        case INPUT_EVENT_SUBTITLE_DELAY:
-            [inputManager performSelectorOnMainThread:@selector(updateDelays) withObject:nil waitUntilDone:NO];
-            break;
+            case INPUT_EVENT_AUDIO_DELAY:
+            case INPUT_EVENT_SUBTITLE_DELAY:
+                [inputManager performSelectorOnMainThread:@selector(updateDelays) withObject:nil waitUntilDone:NO];
+                break;
 
-        case INPUT_EVENT_DEAD:
-            [inputManager performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-            [[[VLCMain sharedInstance] mainWindow] performSelectorOnMainThread:@selector(updateTimeSlider) withObject:nil waitUntilDone:NO];
-            break;
+            case INPUT_EVENT_DEAD:
+                [inputManager performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
+                [[[VLCMain sharedInstance] mainWindow] performSelectorOnMainThread:@selector(updateTimeSlider) withObject:nil waitUntilDone:NO];
+                break;
 
-        default:
-            break;
+            default:
+                break;
+        }
+
+        return VLC_SUCCESS;
     }
-
-    [o_pool release];
-    return VLC_SUCCESS;
 }
 
 #pragma mark -
@@ -138,7 +139,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     if(self) {
         p_intf = VLCIntf;
         o_main = o_mainObj;
-        var_AddCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, self);
+        var_AddCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, (__bridge void *)self);
 
         informInputChangedQueue = dispatch_queue_create("org.videolan.vlc.inputChangedQueue", DISPATCH_QUEUE_SERIAL);
 
@@ -152,22 +153,20 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         /* continue playback where you left off */
         [[o_main playlist] storePlaybackPositionForItem:p_current_input];
 
-        var_DelCallback(p_current_input, "intf-event", InputEvent, self);
+        var_DelCallback(p_current_input, "intf-event", InputEvent, (__bridge void *)self);
         vlc_object_release(p_current_input);
         p_current_input = NULL;
     }
 
-    var_DelCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, self);
+    var_DelCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, (__bridge void *)self);
 
     dispatch_release(informInputChangedQueue);
-
-    [super dealloc];
 }
 
 - (void)inputThreadChanged
 {
     if (p_current_input) {
-        var_DelCallback(p_current_input, "intf-event", InputEvent, self);
+        var_DelCallback(p_current_input, "intf-event", InputEvent, (__bridge void *)self);
         vlc_object_release(p_current_input);
         p_current_input = NULL;
 
@@ -182,7 +181,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     // object is hold here and released then it is dead
     p_current_input = playlist_CurrentInput(pl_Get(VLCIntf));
     if (p_current_input) {
-        var_AddCallback(p_current_input, "intf-event", InputEvent, self);
+        var_AddCallback(p_current_input, "intf-event", InputEvent, (__bridge void *)self);
         [self playbackStatusUpdated];
         [[o_main mainMenu] setRateControlsEnabled: YES];
 
@@ -269,7 +268,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
          This wakes the display if it is off, and postpones display sleep according to the users system preferences
          Available from 10.7.3 */
 #ifdef MAC_OS_X_VERSION_10_7
-        if ([o_main activeVideoPlayback] && IOPMAssertionDeclareUserActivity)
+        if ([o_main activeVideoPlayback] && &IOPMAssertionDeclareUserActivity)
         {
             CFStringRef reasonForActivity = CFStringCreateWithCString(kCFAllocatorDefault, _("VLC media playback"), kCFStringEncodingUTF8);
             IOPMAssertionDeclareUserActivity(reasonForActivity,

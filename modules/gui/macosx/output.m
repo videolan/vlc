@@ -48,16 +48,8 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [o_mrl release];
-    [o_transcode release];
-    [super dealloc];
-}
-
 - (void)setTranscode:(NSString *)o_transcode_string
 {
-    [o_transcode autorelease];
     o_transcode = [o_transcode_string copy];
 }
 
@@ -372,7 +364,7 @@
              * port correctly. Not need, if there isn't any path following the
              * hostname. */
             NSArray * o_urlItems = [[o_stream_address stringValue] componentsSeparatedByString: @"/"];
-            NSMutableString * o_finalStreamAddress = [[[NSMutableString alloc] init] autorelease];
+            NSMutableString * o_finalStreamAddress = [[NSMutableString alloc] init];
 
             if ([o_urlItems count] == 1)
                 [o_finalStreamAddress appendFormat: @"\"%@:%@\"", [o_stream_address stringValue],[o_stream_port stringValue]];

@@ -120,7 +120,7 @@ typedef enum CrashReportStatus {
 
   NSMutableString   *_contentOfProperty;
 
-  id<BWQuincyManagerDelegate> _delegate;
+  id<BWQuincyManagerDelegate> __weak _delegate;
 
   NSString   *_submissionURL;
   NSString   *_companyName;
@@ -143,7 +143,7 @@ typedef enum CrashReportStatus {
 @property (nonatomic, retain) NSString *companyName;
 
 // delegate is required
-@property (nonatomic, assign) id <BWQuincyManagerDelegate> delegate;
+@property (nonatomic, weak) id <BWQuincyManagerDelegate> delegate;
 
 // if YES, the crash report will be submitted without asking the user
 // if NO, the user will be asked if the crash report can be submitted (default)

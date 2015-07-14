@@ -48,8 +48,6 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 {
     [self stopWatchingMediaKeys];
     [self stopWatchingAppSwitching];
-    [_mediaKeyAppList release];
-    [super dealloc];
 }
 
 -(void)startWatchingAppSwitching;
@@ -57,11 +55,11 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     // Listen to "app switched" event, so that we don't intercept media keys if we
     // weren't the last "media key listening" app to be active
     EventTypeSpec eventType = { kEventClassApplication, kEventAppFrontSwitched };
-    OSStatus err = InstallApplicationEventHandler(NewEventHandlerUPP(appSwitched), 1, &eventType, self, &_app_switching_ref);
+    OSStatus err = InstallApplicationEventHandler(NewEventHandlerUPP(appSwitched), 1, &eventType, (__bridge void*)(self), &_app_switching_ref);
     assert(err == noErr);
 
     eventType.eventKind = kEventAppTerminated;
-    err = InstallApplicationEventHandler(NewEventHandlerUPP(appTerminated), 1, &eventType, self, &_app_terminating_ref);
+    err = InstallApplicationEventHandler(NewEventHandlerUPP(appTerminated), 1, &eventType, (__bridge void *)(self), &_app_terminating_ref);
     assert(err == noErr);
 }
 -(void)stopWatchingAppSwitching;
@@ -83,7 +81,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
                                   kCGEventTapOptionDefault,
                                   CGEventMaskBit(NX_SYSDEFINED),
                                   tapEventCallback,
-                                  self);
+                                  (__bridge void * __nullable)(self));
     assert(_eventPort != NULL);
 
     _eventPortSource = CFMachPortCreateRunLoopSource(kCFAllocatorSystemDefault, _eventPort, 0);
@@ -204,7 +202,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)
 {
-    SPMediaKeyTap *self = refcon;
+    SPMediaKeyTap *self = (__bridge SPMediaKeyTap *)refcon;
 
     if(type == kCGEventTapDisabledByTimeout) {
         NSLog(@"Media key event tap was disabled by timeout");
@@ -234,7 +232,6 @@ static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGE
     if (![self shouldInterceptMediaKeyEvents])
         return event;
 
-    [nsEvent retain]; // matched in handleAndReleaseMediaKeyEvent:
     [self performSelectorOnMainThread:@selector(handleAndReleaseMediaKeyEvent:) withObject:nsEvent waitUntilDone:NO];
 
     return NULL;
@@ -242,17 +239,13 @@ static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGE
 
 static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)
 {
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    CGEventRef ret = tapEventCallback2(proxy, type, event, refcon);
-    [pool drain];
-    return ret;
+    @autoreleasepool {
+        CGEventRef ret = tapEventCallback2(proxy, type, event, refcon);
+        return ret;
+    }
 }
 
-
-// event will have been retained in the other thread
 -(void)handleAndReleaseMediaKeyEvent:(NSEvent *)event {
-    [event autorelease];
-
     [_delegate mediaKeyTap:self receivedMediaKeyEvent:event];
 }
 
@@ -278,10 +271,10 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
     int i = 0;
     for (NSValue *psnv in _mediaKeyAppList) {
         ProcessSerialNumber psn; [psnv getValue:&psn];
-        NSDictionary *processInfo = [(id)ProcessInformationCopyDictionary(
+        NSDictionary *processInfo = (id)ProcessInformationCopyDictionary(
             &psn,
             kProcessDictionaryIncludeAllInformationMask
-        ) autorelease];
+        );
         NSString *bundleIdentifier = [processInfo objectForKey:(id)kCFBundleIdentifierKey];
         NSLog(@"%d: %@", i++, bundleIdentifier);
     }*/
@@ -298,10 +291,10 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
 {
     NSValue *psnv = [NSValue valueWithBytes:&psn objCType:@encode(ProcessSerialNumber)];
 
-    NSDictionary *processInfo = [(id)ProcessInformationCopyDictionary(
+    NSDictionary *processInfo = (__bridge NSDictionary *)ProcessInformationCopyDictionary(
         &psn,
         kProcessDictionaryIncludeAllInformationMask
-    ) autorelease];
+    );
     NSString *bundleIdentifier = [processInfo objectForKey:(id)kCFBundleIdentifierKey];
 
     NSArray *whitelistIdentifiers = [[NSUserDefaults standardUserDefaults] arrayForKey:kMediaKeyUsingBundleIdentifiersDefaultsKey];
@@ -320,7 +313,7 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
 
 static pascal OSStatus appSwitched (EventHandlerCallRef nextHandler, EventRef evt, void* userData)
 {
-    SPMediaKeyTap *self = (id)userData;
+    SPMediaKeyTap *self = (__bridge id)userData;
 
     ProcessSerialNumber newSerial;
     GetFrontProcess(&newSerial);
@@ -332,7 +325,7 @@ static pascal OSStatus appSwitched (EventHandlerCallRef nextHandler, EventRef ev
 
 static pascal OSStatus appTerminated (EventHandlerCallRef nextHandler, EventRef evt, void* userData)
 {
-    SPMediaKeyTap *self = (id)userData;
+    SPMediaKeyTap *self = (__bridge id)userData;
 
     ProcessSerialNumber deadPSN;
 

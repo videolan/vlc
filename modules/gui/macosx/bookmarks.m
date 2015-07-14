@@ -53,9 +53,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else
+    if (!_o_sharedInstance)
         _o_sharedInstance = [super init];
 
     return _o_sharedInstance;
@@ -84,8 +82,6 @@ static VLCBookmarks *_o_sharedInstance = nil;
         vlc_object_release(p_old_input);
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-    [super dealloc];
 }
 
 - (void)initStrings

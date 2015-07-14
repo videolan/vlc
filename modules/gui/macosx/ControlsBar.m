@@ -77,10 +77,10 @@
 
         [o_bwd_btn setImage: imageFromRes(@"backward-3btns")];
         [o_bwd_btn setAlternateImage: imageFromRes(@"backward-3btns-pressed")];
-        o_play_img = [imageFromRes(@"play") retain];
-        o_play_pressed_img = [imageFromRes(@"play-pressed") retain];
-        o_pause_img = [imageFromRes(@"pause") retain];
-        o_pause_pressed_img = [imageFromRes(@"pause-pressed") retain];
+        o_play_img = imageFromRes(@"play");
+        o_play_pressed_img = imageFromRes(@"play-pressed");
+        o_pause_img = imageFromRes(@"pause");
+        o_pause_pressed_img = imageFromRes(@"pause-pressed");
         [o_fwd_btn setImage: imageFromRes(@"forward-3btns")];
         [o_fwd_btn setAlternateImage: imageFromRes(@"forward-3btns-pressed")];
 
@@ -94,10 +94,10 @@
 
         [o_bwd_btn setImage: imageFromRes(@"backward-3btns-dark")];
         [o_bwd_btn setAlternateImage: imageFromRes(@"backward-3btns-dark-pressed")];
-        o_play_img = [imageFromRes(@"play_dark") retain];
-        o_play_pressed_img = [imageFromRes(@"play-pressed_dark") retain];
-        o_pause_img = [imageFromRes(@"pause_dark") retain];
-        o_pause_pressed_img = [imageFromRes(@"pause-pressed_dark") retain];
+        o_play_img = imageFromRes(@"play_dark");
+        o_play_pressed_img = imageFromRes(@"play-pressed_dark");
+        o_pause_img = imageFromRes(@"pause_dark");
+        o_pause_pressed_img = imageFromRes(@"pause-pressed_dark");
         [o_fwd_btn setImage: imageFromRes(@"forward-3btns-dark")];
         [o_fwd_btn setAlternateImage: imageFromRes(@"forward-3btns-dark-pressed")];
 
@@ -360,7 +360,6 @@
 
 - (void)drawFancyGradientEffectForTimeSlider
 {
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     CGFloat f_value = [o_time_sld knobPosition];
     if (f_value > 7.5) {
         NSRect oldFrame = [o_time_sld_fancygradient_view frame];
@@ -378,7 +377,6 @@
         }
         [o_time_sld_fancygradient_view setHidden: YES];
     }
-    [o_pool release];
 }
 
 - (void)updateControls
@@ -447,14 +445,6 @@
         [o_fullscreen_btn setState:b_fullscreen];
 }
 
-- (void)dealloc {
-    [o_play_img release];
-    [o_play_pressed_img release];
-    [o_pause_img release];
-    [o_pause_pressed_img release];
-    [super dealloc];
-}
-
 @end
 
 
@@ -514,16 +504,16 @@
 
         [o_playlist_btn setImage: imageFromRes(@"playlist-btn")];
         [o_playlist_btn setAlternateImage: imageFromRes(@"playlist-btn-pressed")];
-        o_repeat_img = [imageFromRes(@"repeat") retain];
-        o_repeat_pressed_img = [imageFromRes(@"repeat-pressed") retain];
-        o_repeat_all_img  = [imageFromRes(@"repeat-all") retain];
-        o_repeat_all_pressed_img = [imageFromRes(@"repeat-all-pressed") retain];
-        o_repeat_one_img = [imageFromRes(@"repeat-one") retain];
-        o_repeat_one_pressed_img = [imageFromRes(@"repeat-one-pressed") retain];
-        o_shuffle_img = [imageFromRes(@"shuffle") retain];
-        o_shuffle_pressed_img = [imageFromRes(@"shuffle-pressed") retain];
-        o_shuffle_on_img = [imageFromRes(@"shuffle-blue") retain];
-        o_shuffle_on_pressed_img = [imageFromRes(@"shuffle-blue-pressed") retain];
+        o_repeat_img = imageFromRes(@"repeat");
+        o_repeat_pressed_img = imageFromRes(@"repeat-pressed");
+        o_repeat_all_img  = imageFromRes(@"repeat-all");
+        o_repeat_all_pressed_img = imageFromRes(@"repeat-all-pressed");
+        o_repeat_one_img = imageFromRes(@"repeat-one");
+        o_repeat_one_pressed_img = imageFromRes(@"repeat-one-pressed");
+        o_shuffle_img = imageFromRes(@"shuffle");
+        o_shuffle_pressed_img = imageFromRes(@"shuffle-pressed");
+        o_shuffle_on_img = imageFromRes(@"shuffle-blue");
+        o_shuffle_on_pressed_img = imageFromRes(@"shuffle-blue-pressed");
 
         [o_volume_down_btn setImage: imageFromRes(@"volume-low")];
         [o_volume_track_view setImage: imageFromRes(@"volume-slider-track")];
@@ -546,16 +536,16 @@
 
         [o_playlist_btn setImage: imageFromRes(@"playlist_dark")];
         [o_playlist_btn setAlternateImage: imageFromRes(@"playlist-pressed_dark")];
-        o_repeat_img = [imageFromRes(@"repeat_dark") retain];
-        o_repeat_pressed_img = [imageFromRes(@"repeat-pressed_dark") retain];
-        o_repeat_all_img  = [imageFromRes(@"repeat-all-blue_dark") retain];
-        o_repeat_all_pressed_img = [imageFromRes(@"repeat-all-blue-pressed_dark") retain];
-        o_repeat_one_img = [imageFromRes(@"repeat-one-blue_dark") retain];
-        o_repeat_one_pressed_img = [imageFromRes(@"repeat-one-blue-pressed_dark") retain];
-        o_shuffle_img = [imageFromRes(@"shuffle_dark") retain];
-        o_shuffle_pressed_img = [imageFromRes(@"shuffle-pressed_dark") retain];
-        o_shuffle_on_img = [imageFromRes(@"shuffle-blue_dark") retain];
-        o_shuffle_on_pressed_img = [imageFromRes(@"shuffle-blue-pressed_dark") retain];
+        o_repeat_img = imageFromRes(@"repeat_dark");
+        o_repeat_pressed_img = imageFromRes(@"repeat-pressed_dark");
+        o_repeat_all_img  = imageFromRes(@"repeat-all-blue_dark");
+        o_repeat_all_pressed_img = imageFromRes(@"repeat-all-blue-pressed_dark");
+        o_repeat_one_img = imageFromRes(@"repeat-one-blue_dark");
+        o_repeat_one_pressed_img = imageFromRes(@"repeat-one-blue-pressed_dark");
+        o_shuffle_img = imageFromRes(@"shuffle_dark");
+        o_shuffle_pressed_img = imageFromRes(@"shuffle-pressed_dark");
+        o_shuffle_on_img = imageFromRes(@"shuffle-blue_dark");
+        o_shuffle_on_pressed_img = imageFromRes(@"shuffle-blue-pressed_dark");
 
         [o_volume_down_btn setImage: imageFromRes(@"volume-low_dark")];
         [o_volume_track_view setImage: imageFromRes(@"volume-slider-track_dark")];
@@ -862,10 +852,8 @@ else \
     }
     [o_prev_btn removeFromSuperviewWithoutNeedingDisplay];
     [o_next_btn removeFromSuperviewWithoutNeedingDisplay];
-    [o_prev_btn release];
-    o_prev_btn = NULL;
-    [o_next_btn release];
-    o_next_btn = NULL;
+    o_prev_btn = nil;
+    o_next_btn = nil;
 
     NSRect frame;
     frame = [o_bwd_btn frame];
@@ -1148,20 +1136,6 @@ else \
     }
 
     [[VLCMainMenu sharedInstance] setRateControlsEnabled: b_control];
-}
-
-- (void)dealloc {
-    [o_repeat_img release];
-    [o_repeat_pressed_img release];
-    [o_repeat_all_img release];
-    [o_repeat_all_pressed_img release];
-    [o_repeat_one_img release];
-    [o_repeat_one_pressed_img release];
-    [o_shuffle_img release];
-    [o_shuffle_pressed_img release];
-    [o_shuffle_on_img release];
-    [o_shuffle_on_pressed_img release];
-    [super dealloc];
 }
 
 @end

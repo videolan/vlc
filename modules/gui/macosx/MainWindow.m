@@ -74,10 +74,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance) {
-        [self dealloc];
-        return _o_sharedInstance;
-    } else
+    if (!_o_sharedInstance)
         _o_sharedInstance = [super init];
 
     return _o_sharedInstance;
@@ -142,14 +139,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)dealloc
 {
-    if (b_dark_interface)
-        [o_color_backdrop release];
-
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    [o_sidebaritems release];
-    [o_fspanel release];
-
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -319,10 +309,8 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)reloadSidebar
 {
     BOOL isAReload = NO;
-    if (o_sidebaritems) {
-        [o_sidebaritems release];
+    if (o_sidebaritems)
         isAReload = YES;
-    }
 
     o_sidebaritems = [[NSMutableArray alloc] init];
     SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
@@ -394,10 +382,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [devicesItem setChildren: [NSArray arrayWithArray: devicesItems]];
     [lanItem setChildren: [NSArray arrayWithArray: lanItems]];
     [internetItem setChildren: [NSArray arrayWithArray: internetItems]];
-    [mycompItems release];
-    [devicesItems release];
-    [lanItems release];
-    [internetItems release];
     free(ppsz_names);
     free(ppsz_longnames);
     free(p_categories);
@@ -984,9 +968,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [formatter setDateFormat:@"HH:mm:ss"];
     [formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 
-    NSString *playbackDuration = [NSString stringWithFormat:@" — %@",[formatter stringFromDate:date]];
-    [formatter release];
-    return playbackDuration;
+    return [NSString stringWithFormat:@" — %@",[formatter stringFromDate:date]];
 }
 
 #pragma mark -
@@ -1087,8 +1069,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
                 else
                     [m addItemWithTitle:_NS("Disable") action:@selector(sdmenuhandler:) keyEquivalent:@""];
                 [[m itemAtIndex:0] setRepresentedObject: [item identifier]];
-
-                return [m autorelease];
+                return m;
             }
         }
     }
@@ -1288,7 +1269,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [podcastConf appendString: [o_podcast_subscribe_url_fld stringValue]];
         config_PutPsz(VLCIntf, "podcast-urls", [podcastConf UTF8String]);
         var_SetString(pl_Get(VLCIntf), "podcast-urls", [podcastConf UTF8String]);
-        [podcastConf release];
     }
 }
 
@@ -1317,7 +1297,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
         const char *psz_new_urls = [[urls componentsJoinedByString:@"|"] UTF8String];
         var_SetString(pl_Get(VLCIntf), "podcast-urls", psz_new_urls);
         config_PutPsz(VLCIntf, "podcast-urls", psz_new_urls);
-        [urls release];
 
         free(psz_urls);
 
@@ -1408,14 +1387,6 @@ static VLCMainWindow *_o_sharedInstance = nil;
     } else {
         [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height])];
     }
-}
-
-- (void)dealloc
-{
-    if (b_dark_interface)
-        [o_color_backdrop release];
-
-    [super dealloc];
 }
 
 @end

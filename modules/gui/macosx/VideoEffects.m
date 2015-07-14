@@ -58,9 +58,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else {
+    if (!_o_sharedInstance) {
         p_intf = VLCIntf;
         i_old_profile_index = -1;
         _o_sharedInstance = [super init];
@@ -218,8 +216,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-    [super dealloc];
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
@@ -565,7 +561,6 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
     [workArray replaceObjectAtIndex:i_old_profile_index withObject:newProfile];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
-    [workArray release];
     [defaults synchronize];
 }
 
@@ -709,7 +704,7 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     if ([text length] == 0 || [profileNames containsObject:text]) {
         [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
 
-        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        NSAlert *alert = [[NSAlert alloc] init];
         [alert setAlertStyle:NSCriticalAlertStyle];
         [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
         [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
@@ -730,12 +725,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     [workArray addObject:newProfile];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
     [defaults setInteger:[workArray count] - 1 forKey:@"VideoEffectSelectedProfile"];
-    [workArray release];
 
     workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfileNames"]];
     [workArray addObject:text];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
-    [workArray release];
 
     /* save defaults */
     [defaults synchronize];
@@ -771,12 +764,10 @@ static VLCVideoEffects *_o_sharedInstance = nil;
     NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray: [defaults objectForKey:@"VideoEffectProfiles"]];
     [workArray removeObjectAtIndex:item];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
-    [workArray release];
 
     workArray = [[NSMutableArray alloc] initWithArray: [defaults objectForKey:@"VideoEffectProfileNames"]];
     [workArray removeObjectAtIndex:item];
     [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
-    [workArray release];
 
     if (i_old_profile_index >= item)
         [defaults setInteger:i_old_profile_index - 1 forKey:@"VideoEffectSelectedProfile"];

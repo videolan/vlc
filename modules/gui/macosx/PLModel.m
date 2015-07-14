@@ -51,7 +51,7 @@
     self = [super init];
     if(self) {
         p_playlist = pl;
-        _outlineView = [outlineView retain];
+        _outlineView = outlineView;
         _playlist = plObj;
 
         PL_LOCK;
@@ -68,7 +68,6 @@
 {
     NSLog(@"change root item to %p", p_root);
     PL_ASSERT_LOCKED;
-    [_rootItem release];
     _rootItem = [[PLItem alloc] initWithPlaylistItem:p_root];
     [self rebuildPLItem:_rootItem];
 
@@ -110,7 +109,7 @@
             if (p_child->i_flags & PLAYLIST_DBL_FLAG)
                 continue;
 
-            PLItem *o_child = [[[PLItem alloc] initWithPlaylistItem:p_child] autorelease];
+            PLItem *o_child = [[PLItem alloc] initWithPlaylistItem:p_child];
             [o_item addChild:o_child atPos:currPos++];
 
             if (p_child->i_children >= 0) {
@@ -174,7 +173,7 @@
         if(p_item->p_parent->pp_children[pos] == p_item)
             break;
 
-    PLItem *o_new_item = [[[PLItem alloc] initWithPlaylistItem:p_item] autorelease];
+    PLItem *o_new_item = [[PLItem alloc] initWithPlaylistItem:p_item];
     PL_UNLOCK;
     if (pos < 0)
         return;
@@ -430,7 +429,6 @@
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
     NSUInteger itemCount = [items count];
-    [_draggedItems release];
     _draggedItems = [[NSMutableArray alloc] initWithArray:items];
 
     /* Add the data to the pasteboard object. */
@@ -559,7 +557,6 @@
             [selectedIndexes addIndex:[_outlineView rowForItem:targetItem]];
 
         [_outlineView selectRowIndexes:selectedIndexes byExtendingSelection:NO];
-        [selectedIndexes release];
 
         return YES;
     }

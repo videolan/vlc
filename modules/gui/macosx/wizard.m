@@ -53,22 +53,11 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance) {
-        [self dealloc];
-    } else {
+    if (!_o_sharedInstance) {
         _o_sharedInstance = [super init];
     }
 
     return _o_sharedInstance;
-}
-
-- (void)dealloc
-{
-    [o_userSelections release];
-    [o_videoCodecs release];
-    [o_audioCodecs release];
-    [o_encapFormats release];
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -561,7 +550,6 @@ static VLCWizard *_o_sharedInstance = nil;
                         stop = YES;
                 }
                 [o_userSelections setObject:[NSArray arrayWithArray: tempArray] forKey:@"pathToStrm"];
-                [tempArray release];
             }
             else
             {
@@ -1157,13 +1145,11 @@ static VLCWizard *_o_sharedInstance = nil;
                                 "already present in the destination directory. "
                                 "Delete these files or choose a different directory.");
                     }
-                    [tempArray addObject: [tempString retain]];
+                    [tempArray addObject:tempString];
                     x += 1;
                 }
                 [o_userSelections setObject: [NSArray arrayWithArray:tempArray]
                     forKey: @"trnscdFilePath"];
-                [tempArray release];
-                [tempString release];
             }
             else
             {
@@ -1537,7 +1523,6 @@ static VLCWizard *_o_sharedInstance = nil;
         x += 1;
     }
     [o_userSelections setObject:[NSArray arrayWithArray: tempArray] forKey:@"opts"];
-    [tempArray release];
 }
 
 - (IBAction)prevTab:(id)sender
@@ -1833,7 +1818,6 @@ static VLCWizard *_o_sharedInstance = nil;
             if (returnCode == NSOKButton)
                 [o_t7_fld_filePath setStringValue: [NSString stringWithFormat: @"%@/", [[saveFolderPanel URL] path]]];
         }];
-        [saveFolderPanel release];
     }
     else
     {
@@ -1856,7 +1840,6 @@ static VLCWizard *_o_sharedInstance = nil;
             if (returnCode == NSOKButton)
                 [o_t7_fld_filePath setStringValue:[[saveFilePanel URL] path]];
         }];
-        [saveFilePanel release];
     }
 }
 

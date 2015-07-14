@@ -32,9 +32,6 @@
 - (id)init
 {
     self = [super initWithWindowNibName:@"ResumeDialog"];
-    if (self) {
-
-    }
 
     return self;
 }
@@ -112,7 +109,6 @@
 
     if (completionBlock) {
         completionBlock(resumeResult);
-        [completionBlock release];
         completionBlock = nil;
     }
 }

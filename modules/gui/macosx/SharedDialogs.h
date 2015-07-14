@@ -32,11 +32,11 @@
     IBOutlet id _cancel_btn;
     IBOutlet id _ok_btn;
 
-    NSString * _title;
-    NSString * _subtitle;
-    NSString * _okTitle;
-    NSString * _cancelTitle;
-    id _target;
+    __unsafe_unretained NSString * _title;
+    __unsafe_unretained NSString * _subtitle;
+    __unsafe_unretained NSString * _okTitle;
+    __unsafe_unretained NSString * _cancelTitle;
+    __unsafe_unretained id _target;
 }
 + (VLCEnterTextPanel *)sharedInstance;
 
@@ -67,13 +67,13 @@
     IBOutlet id _cancel_btn;
     IBOutlet id _ok_btn;
 
-    NSString * _title;
-    NSString * _subtitle;
-    NSString * _okTitle;
-    NSString * _cancelTitle;
-    NSArray * _popData;
+    __unsafe_unretained NSString * _title;
+    __unsafe_unretained NSString * _subtitle;
+    __unsafe_unretained NSString * _okTitle;
+    __unsafe_unretained NSString * _cancelTitle;
+    __unsafe_unretained NSArray * _popData;
 
-    id _target;
+    __unsafe_unretained id _target;
 }
 + (VLCSelectItemInPopupPanel *)sharedInstance;
 

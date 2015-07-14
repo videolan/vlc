@@ -44,7 +44,7 @@
 
 static void addonsEventsCallback( const vlc_event_t *event, void *data )
 {
-    AddonsWindowController *controller = data;
+    AddonsWindowController *controller = (__bridge AddonsWindowController *)data;
 
     @autoreleasepool {
         if (event->type == vlc_AddonFound)
@@ -73,11 +73,8 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
 
 - (void)dealloc
 {
-    [_addons release];
-    [_displayedAddons release];
     if (_manager)
         addons_manager_Delete(_manager);
-    [super dealloc];
 }
 
 #pragma mark - UI handling
@@ -125,9 +122,9 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
         return;
 
     vlc_event_manager_t *p_em = _manager->p_event_manager;
-    vlc_event_attach(p_em, vlc_AddonFound, addonsEventsCallback, self);
-    vlc_event_attach(p_em, vlc_AddonsDiscoveryEnded, addonsEventsCallback, self);
-    vlc_event_attach(p_em, vlc_AddonChanged, addonsEventsCallback, self);
+    vlc_event_attach(p_em, vlc_AddonFound, addonsEventsCallback, (__bridge void *)self);
+    vlc_event_attach(p_em, vlc_AddonsDiscoveryEnded, addonsEventsCallback, (__bridge void *)self);
+    vlc_event_attach(p_em, vlc_AddonChanged, addonsEventsCallback, (__bridge void *)self);
 
     [self _findInstalled];
 }
@@ -231,7 +228,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
     addon_entry_t *p_entry = [o_value pointerValue];
     /* no skin support on OS X so far */
     if (p_entry->e_type != ADDON_SKIN2)
-        [_addons addObject:[[[VLCAddon alloc] initWithAddon:p_entry] autorelease]];
+        [_addons addObject:[[VLCAddon alloc] initWithAddon:p_entry]];
 }
 
 - (void)discoveryEnded
@@ -277,11 +274,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
         }
     }
 
-    if (_displayedAddons)
-        [_displayedAddons release];
     _displayedAddons = [NSArray arrayWithArray:filteredItems];
-    [_displayedAddons retain];
-    [filteredItems release];
 
     // update ui
     [_addonsTable reloadData];

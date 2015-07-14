@@ -46,20 +46,20 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 static void MsgCallback(void *data, int type, const vlc_log_t *item, const char *format, va_list ap)
 {
-    int canc = vlc_savecancel();
-    char *str;
+    @autoreleasepool {
+        int canc = vlc_savecancel();
+        char *str;
 
-    if (vasprintf(&str, format, ap) == -1) {
+        if (vasprintf(&str, format, ap) == -1) {
+            vlc_restorecancel(canc);
+            return;
+        }
+
+        [[VLCDebugMessageVisualizer sharedInstance] processReceivedlibvlcMessage: item ofType: type withStr: str];
+
         vlc_restorecancel(canc);
-        return;
+        free(str);
     }
-
-    NSAutoreleasePool *_pool = [[NSAutoreleasePool alloc] init];
-    [[VLCDebugMessageVisualizer sharedInstance] processReceivedlibvlcMessage: item ofType: type withStr: str];
-    [_pool release];
-
-    vlc_restorecancel(canc);
-    free(str);
 }
 
 @implementation VLCDebugMessageVisualizer
@@ -73,12 +73,10 @@ static VLCDebugMessageVisualizer *_sharedMainInstance = nil;
 
 - (id)init
 {
-    if (_sharedMainInstance)
-        [self dealloc];
-    else {
+    if (!_sharedMainInstance) {
         _sharedMainInstance = [super init];
         _msg_lock = [[NSLock alloc] init];
-        _msg_arr = [[NSMutableArray arrayWithCapacity:600] retain];
+        _msg_arr = [NSMutableArray arrayWithCapacity:600];
         BOOL loaded = [NSBundle loadNibNamed:@"DebugMessageVisualizer" owner:self];
     }
 
@@ -92,17 +90,6 @@ static VLCDebugMessageVisualizer *_sharedMainInstance = nil;
     [_msgs_panel setTitle: _NS("Messages")];
     [_msgs_save_btn setTitle: _NS("Save this Log...")];
     [_msgs_refresh_btn setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
-}
-
-- (void)dealloc
-{
-    [_msg_arr removeAllObjects];
-    [_msg_arr release];
-    _msg_arr = NULL;
-
-    [_msg_lock release];
-
-    [super dealloc];
 }
 
 #pragma mark - UI interaction
@@ -153,11 +140,8 @@ static VLCDebugMessageVisualizer *_sharedMainInstance = nil;
 
             if ([data writeToFile: [[saveFolderPanel URL] path] atomically: YES] == NO)
                 msg_Warn(VLCIntf, "Error while saving the debug log");
-
-            [string release];
         }
     }];
-    [saveFolderPanel release];
 }
 
 #pragma mark - data handling
@@ -217,7 +201,7 @@ static VLCDebugMessageVisualizer *_sharedMainInstance = nil;
         _msg_color = [[NSMutableAttributedString alloc] initWithString: secondString attributes: _attr];
         _attr = [NSDictionary dictionaryWithObject: pp_color[3] forKey: NSForegroundColorAttributeName];
         [_msg_color setAttributes: _attr range: NSMakeRange(0, [firstString length])];
-        [_msg_arr addObject: [_msg_color autorelease]];
+        [_msg_arr addObject:_msg_color];
 
         [_msg_lock unlock];
     }

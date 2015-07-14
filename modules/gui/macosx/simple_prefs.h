@@ -27,7 +27,7 @@
 
 @interface VLCSimplePrefs : NSObject <NSToolbarDelegate, NSWindowDelegate>
 {
-    IBOutlet id o_audio_dolby_pop;
+    IBOutlet NSPopUpButton *o_audio_dolby_pop;
     IBOutlet id o_audio_dolby_txt;
     IBOutlet id o_audio_effects_box;
     IBOutlet id o_audio_enable_ckb;
@@ -42,7 +42,7 @@
     IBOutlet id o_audio_lastuser_txt;
     IBOutlet id o_audio_spdif_ckb;
     IBOutlet id o_audio_view;
-    IBOutlet id o_audio_visual_pop;
+    IBOutlet NSPopUpButton *o_audio_visual_pop;
     IBOutlet id o_audio_visual_txt;
     IBOutlet id o_audio_vol_fld;
     IBOutlet id o_audio_vol_sld;
@@ -65,26 +65,26 @@
     IBOutlet id o_input_record_box;
     IBOutlet id o_input_record_fld;
     IBOutlet id o_input_record_btn;
-    IBOutlet id o_input_avi_pop;
+    IBOutlet NSPopUpButton *o_input_avi_pop;
     IBOutlet id o_input_avi_txt;
-    IBOutlet id o_input_cachelevel_pop;
+    IBOutlet NSPopUpButton *o_input_cachelevel_pop;
     IBOutlet id o_input_cachelevel_txt;
     IBOutlet id o_input_cachelevel_custom_txt;
     IBOutlet id o_input_caching_box;
     IBOutlet id o_input_mux_box;
     IBOutlet id o_input_net_box;
     IBOutlet id o_input_avcodec_hw_txt;
-    IBOutlet id o_input_avcodec_hw_pop;
+    IBOutlet NSPopUpButton *o_input_avcodec_hw_pop;
     IBOutlet id o_input_postproc_fld;
     IBOutlet id o_input_postproc_txt;
     IBOutlet id o_input_rtsp_ckb;
     IBOutlet id o_input_skipLoop_txt;
-    IBOutlet id o_input_skipLoop_pop;
+    IBOutlet NSPopUpButton *o_input_skipLoop_pop;
     IBOutlet id o_input_mkv_preload_dir_ckb;
     IBOutlet id o_input_urlhandler_btn;
     IBOutlet id o_input_view;
 
-    IBOutlet id o_intf_language_pop;
+    IBOutlet NSPopUpButton *o_intf_language_pop;
     IBOutlet id o_intf_language_txt;
     IBOutlet id o_intf_style_txt;
     IBOutlet id o_intf_style_dark_bcell;
@@ -107,18 +107,18 @@
     IBOutlet id o_intf_luahttppwd_lbl;
     IBOutlet id o_intf_luahttppwd_fld;
     IBOutlet id o_intf_pauseitunes_lbl;
-    IBOutlet id o_intf_pauseitunes_pop;
+    IBOutlet NSPopUpButton *o_intf_pauseitunes_pop;
     IBOutlet id o_intf_continueplayback_lbl;
-    IBOutlet id o_intf_continueplayback_pop;
+    IBOutlet NSPopUpButton *o_intf_continueplayback_pop;
 
-    IBOutlet id o_osd_encoding_pop;
+    IBOutlet NSPopUpButton *o_osd_encoding_pop;
     IBOutlet id o_osd_encoding_txt;
     IBOutlet id o_osd_font_box;
     IBOutlet id o_osd_font_btn;
-    IBOutlet id o_osd_font_color_pop;
+    IBOutlet NSPopUpButton *o_osd_font_color_pop;
     IBOutlet id o_osd_font_color_txt;
     IBOutlet id o_osd_font_fld;
-    IBOutlet id o_osd_font_size_pop;
+    IBOutlet NSPopUpButton *o_osd_font_size_pop;
     IBOutlet id o_osd_font_size_txt;
     IBOutlet id o_osd_font_txt;
     IBOutlet id o_osd_lang_box;
@@ -127,9 +127,9 @@
     IBOutlet id o_osd_opacity_txt;
     IBOutlet id o_osd_opacity_fld;
     IBOutlet id o_osd_opacity_sld;
-    IBOutlet id o_osd_outline_color_pop;
+    IBOutlet NSPopUpButton *o_osd_outline_color_pop;
     IBOutlet id o_osd_outline_color_txt;
-    IBOutlet id o_osd_outline_thickness_pop;
+    IBOutlet NSPopUpButton *o_osd_outline_thickness_pop;
     IBOutlet id o_osd_outline_thickness_txt;
     IBOutlet id o_osd_forcebold_ckb;
     IBOutlet id o_osd_osd_box;
@@ -144,7 +144,7 @@
     IBOutlet id o_sprefs_win;
 
     IBOutlet id o_video_black_ckb;
-    IBOutlet id o_video_device_pop;
+    IBOutlet NSPopUpButton *o_video_device_pop;
     IBOutlet id o_video_device_txt;
     IBOutlet id o_video_display_box;
     IBOutlet id o_video_enable_ckb;
@@ -156,15 +156,15 @@
     IBOutlet id o_video_snap_folder_btn;
     IBOutlet id o_video_snap_folder_fld;
     IBOutlet id o_video_snap_folder_txt;
-    IBOutlet id o_video_snap_format_pop;
+    IBOutlet NSPopUpButton *o_video_snap_format_pop;
     IBOutlet id o_video_snap_format_txt;
     IBOutlet id o_video_snap_prefix_fld;
     IBOutlet id o_video_snap_prefix_txt;
     IBOutlet id o_video_snap_seqnum_ckb;
     IBOutlet id o_video_deinterlace_txt;
-    IBOutlet id o_video_deinterlace_pop;
+    IBOutlet NSPopUpButton *o_video_deinterlace_pop;
     IBOutlet id o_video_deinterlace_mode_txt;
-    IBOutlet id o_video_deinterlace_mode_pop;
+    IBOutlet NSPopUpButton *o_video_deinterlace_mode_pop;
     IBOutlet id o_video_video_box;
     IBOutlet id o_video_view;
 
@@ -172,14 +172,14 @@
     IBOutlet id o_urlhandler_subtitle_txt;
     IBOutlet id o_urlhandler_save_btn;
     IBOutlet id o_urlhandler_cancel_btn;
-    IBOutlet id o_urlhandler_ftp_pop;
-    IBOutlet id o_urlhandler_mms_pop;
-    IBOutlet id o_urlhandler_rtmp_pop;
-    IBOutlet id o_urlhandler_rtp_pop;
-    IBOutlet id o_urlhandler_rtsp_pop;
-    IBOutlet id o_urlhandler_sftp_pop;
-    IBOutlet id o_urlhandler_smb_pop;
-    IBOutlet id o_urlhandler_udp_pop;
+    IBOutlet NSPopUpButton *o_urlhandler_ftp_pop;
+    IBOutlet NSPopUpButton *o_urlhandler_mms_pop;
+    IBOutlet NSPopUpButton *o_urlhandler_rtmp_pop;
+    IBOutlet NSPopUpButton *o_urlhandler_rtp_pop;
+    IBOutlet NSPopUpButton *o_urlhandler_rtsp_pop;
+    IBOutlet NSPopUpButton *o_urlhandler_sftp_pop;
+    IBOutlet NSPopUpButton *o_urlhandler_smb_pop;
+    IBOutlet NSPopUpButton *o_urlhandler_udp_pop;
     IBOutlet id o_urlhandler_win;
 
     BOOL b_audioSettingChanged;

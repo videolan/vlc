@@ -36,8 +36,8 @@ static float lastBrightnessLevel;
 }
 
 - (void)dealloc {
-    if (dataPort) { IOServiceClose(dataPort); }
-    [super dealloc];
+    if (dataPort)
+        IOServiceClose(dataPort);
 }
 
 - (io_connect_t)getDataPort {

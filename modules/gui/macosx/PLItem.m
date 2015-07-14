@@ -50,10 +50,6 @@
 - (void)dealloc
 {
     input_item_Release(p_input);
-    [_children release];
-    [_parent release];
-
-    [super dealloc];
 }
 
 // own hash and isEqual methods are important to retain expandable state

@@ -141,18 +141,17 @@ static NSMapTable *VLCAdditions_userInfo = NULL;
 
 - (void)dealloc
 {
-    NSMapRemove(VLCAdditions_userInfo, self);
-    [super dealloc];
+    NSMapRemove(VLCAdditions_userInfo, (__bridge const void * __nullable)(self));
 }
 
 - (void)setUserInfo: (void *)userInfo
 {
-    NSMapInsert(VLCAdditions_userInfo, self, (void*)userInfo);
+    NSMapInsert(VLCAdditions_userInfo, (__bridge const void * __nullable)(self), (void*)userInfo);
 }
 
 - (void *)userInfo
 {
-    return NSMapGet(VLCAdditions_userInfo, self);
+    return NSMapGet(VLCAdditions_userInfo, (__bridge const void * __nullable)(self));
 }
 @end
 
@@ -180,7 +179,6 @@ static bool b_old_spaces_style = YES;
         NSNumber *o_span_displays = [userDefaults objectForKey:@"spans-displays"];
 
         b_old_spaces_style = [o_span_displays boolValue];
-        [userDefaults release];
     }
 }
 
@@ -261,7 +259,6 @@ static bool b_old_spaces_style = YES;
         [blackoutWindow orderFront: self animate: YES];
 
         [blackoutWindows addObject: blackoutWindow];
-        [blackoutWindow release];
 
         [screen setFullscreenPresentationOptions];
     }
@@ -346,7 +343,6 @@ static bool b_old_spaces_style = YES;
 - (void)dealloc
 {
     [self unregisterDraggedTypes];
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -541,12 +537,6 @@ void _drawFrameInRect(NSRect frameRect)
     }
     img_rect.size = [o_knob_img size];
     img_rect.origin.x = img_rect.origin.y = 0;
-}
-
-- (void)dealloc
-{
-    [o_knob_img release];
-    [super dealloc];
 }
 
 - (CGFloat)knobPosition
@@ -754,12 +744,6 @@ void _drawFrameInRect(NSRect frameRect)
     [self setStringValue:[self stringValue]];
 }
 
-- (void)dealloc
-{
-    [o_string_shadow release];
-    [super dealloc];
-}
-
 - (void)setStringValue:(NSString *)string
 {
     if (!o_string_shadow) {
@@ -775,7 +759,6 @@ void _drawFrameInRect(NSRect frameRect)
     [o_attributed_string addAttribute: NSShadowAttributeName value: o_string_shadow range: NSMakeRange(0, i_stringLength)];
     [o_attributed_string setAlignment: textAlignment range: NSMakeRange(0, i_stringLength)];
     [self setAttributedStringValue: o_attributed_string];
-    [o_attributed_string release];
 }
 
 - (void)mouseDown: (NSEvent *)ourEvent
@@ -829,27 +812,11 @@ void _drawFrameInRect(NSRect frameRect)
  *****************************************************************************/
 @implementation VLCThreePartImageView
 
-- (void)dealloc
-{
-    [o_left_img release];
-    [o_middle_img release];
-    [o_right_img release];
-
-    [super dealloc];
-}
-
 - (void)setImagesLeft:(NSImage *)left middle: (NSImage *)middle right:(NSImage *)right
 {
-    if (o_left_img)
-        [o_left_img release];
-    if (o_middle_img)
-        [o_middle_img release];
-    if (o_right_img)
-        [o_right_img release];
-
-    o_left_img = [left retain];
-    o_middle_img = [middle retain];
-    o_right_img = [right retain];
+    o_left_img = left;
+    o_middle_img = middle;
+    o_right_img = right;
 }
 
 - (void)drawRect:(NSRect)rect
@@ -860,7 +827,6 @@ void _drawFrameInRect(NSRect frameRect)
 
 @end
 
-
 @implementation PositionFormatter
 
 - (id)init
@@ -869,15 +835,8 @@ void _drawFrameInRect(NSRect frameRect)
     NSMutableCharacterSet *nonNumbers = [[[NSCharacterSet decimalDigitCharacterSet] invertedSet] mutableCopy];
     [nonNumbers removeCharactersInString:@"-:"];
     o_forbidden_characters = [nonNumbers copy];
-    [nonNumbers release];
 
     return self;
-}
-
-- (void)dealloc
-{
-    [o_forbidden_characters release];
-    [super dealloc];
 }
 
 - (NSString*)stringForObjectValue:(id)obj
@@ -892,7 +851,7 @@ void _drawFrameInRect(NSRect frameRect)
 
 - (BOOL)getObjectValue:(id*)obj forString:(NSString*)string errorDescription:(NSString**)error
 {
-    *obj = [[string copy] autorelease];
+    *obj = [string copy];
     return YES;
 }
 
@@ -994,7 +953,6 @@ void _drawFrameInRect(NSRect frameRect)
 
 end:
     returnString = [NSString stringWithFormat:@"%@ %@", [theFormatter stringFromNumber:[NSNumber numberWithFloat:returnValue]], suffix];
-    [theFormatter release];
 
     return returnString;
 }

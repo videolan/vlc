@@ -77,9 +77,7 @@ static AppleRemote *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance) {
-        [self dealloc];
-    } else {
+    if (!_o_sharedInstance) {
         _o_sharedInstance = [super init];
         _openInExclusiveMode = YES;
         queue = NULL;
@@ -107,7 +105,6 @@ static AppleRemote *_o_sharedInstance = nil;
             [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]     forKey:@"42_33_23_21_20_2_33_23_21_20_2_"];
 
         _cookieToButtonMapping = [[NSDictionary alloc] initWithDictionary: mutableCookieToButtonMapping];
-        [mutableCookieToButtonMapping release];
 
         /* defaults */
         _simulatePlusMinusHold = YES;
@@ -119,8 +116,6 @@ static AppleRemote *_o_sharedInstance = nil;
 
 - (void) dealloc {
     [self stopListening:self];
-    [_cookieToButtonMapping release];
-    [super dealloc];
 }
 
 - (int) remoteId {
@@ -189,7 +184,6 @@ static AppleRemote *_o_sharedInstance = nil;
         AppleRemoteApplicationDelegate* appDelegate = (AppleRemoteApplicationDelegate*)[NSApp delegate];
         id previousAppDelegate = [appDelegate applicationDelegate];
         [NSApp setDelegate: previousAppDelegate];
-        [appDelegate release];
     }
 }
 
@@ -238,7 +232,6 @@ cleanup:
     }
 
     if (_allCookies != nil) {
-        [_allCookies autorelease];
         _allCookies = nil;
     }
 
@@ -276,18 +269,6 @@ static AppleRemote* sharedInstance=nil;
     return sharedInstance;
 }
 - (id)copyWithZone:(NSZone *)zone {
-    return self;
-}
-- (id)retain {
-    return self;
-}
-- (NSUInteger)retainCount {
-    return UINT_MAX;  //denotes an object that cannot be released
-}
-- (void)release {
-    //do nothing
-}
-- (id)autorelease {
     return self;
 }
 
@@ -450,7 +431,7 @@ static AppleRemote* sharedInstance=nil;
 Will be called for any event of any type (cookie) to which we subscribe
 */
 static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, void* sender) {
-    AppleRemote* remote = (AppleRemote*)target;
+    AppleRemote* remote = (__bridge AppleRemote*)target;
 
     IOHIDEventStruct event;
     AbsoluteTime     zeroTime = {0,0};
@@ -544,8 +525,8 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
     long                    usage;
     long                    usagePage;
     id                      object;
-    NSArray*                elements;
     NSDictionary*           element;
+    CFArrayRef              elementsRef;
     IOReturn success;
 
     if (!handle || !(*handle)) return NO;
@@ -554,9 +535,11 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
      * for this device anyway, and thus, it's faster to iterate them
      * ourselves. When grabbing only one or two elements, a matching
      * dictionary should be passed in here instead of NULL. */
-    success = (*handle)->copyMatchingElements(handle, NULL, (CFArrayRef*)&elements);
+    success = (*handle)->copyMatchingElements(handle, NULL, &elementsRef);
 
     if (success == kIOReturnSuccess) {
+        NSArray *elements = (__bridge NSArray *)elementsRef;
+
         /*
         cookies = calloc(NUMBER_OF_APPLE_REMOTE_ACTIONS, sizeof(IOHIDElementCookie));
         memset(cookies, 0, sizeof(IOHIDElementCookie) * NUMBER_OF_APPLE_REMOTE_ACTIONS);
@@ -569,7 +552,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
             //Get cookie
             object = [element valueForKey: (NSString*)CFSTR(kIOHIDElementCookieKey) ];
             if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;
-            if (object == 0 || CFGetTypeID(object) != CFNumberGetTypeID()) continue;
+            if (object == 0 || CFGetTypeID((__bridge CFTypeRef)(object)) != CFNumberGetTypeID()) continue;
             cookie = (IOHIDElementCookie) [object longValue];
 
             //Get usage
@@ -585,14 +568,14 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
             [mutableAllCookies addObject: [NSNumber numberWithInt:(int)cookie]];
         }
         _allCookies = [[NSArray alloc] initWithArray: mutableAllCookies];
-        [mutableAllCookies release];
-        [elements release];
     } else {
-        if (elements)
-            [elements release];
+        if (elementsRef)
+            CFRelease(elementsRef);
         return NO;
     }
 
+    if (elementsRef)
+        CFRelease(elementsRef);
     return YES;
 }
 
@@ -617,7 +600,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
             // add callback for async events
             ioReturnValue = (*queue)->createAsyncEventSource(queue, &eventSource);
             if (ioReturnValue == KERN_SUCCESS) {
-                ioReturnValue = (*queue)->setEventCallout(queue,QueueCallbackFunction, self, NULL);
+                ioReturnValue = (*queue)->setEventCallout(queue,QueueCallbackFunction, (__bridge void *)(self), NULL);
                 if (ioReturnValue == KERN_SUCCESS) {
                     CFRunLoopAddSource(CFRunLoopGetCurrent(), eventSource, kCFRunLoopDefaultMode);
                     //start data delivery to queue
@@ -642,13 +625,8 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
 - (id) initWithApplicationDelegate: (id) delegate {
     if((self = [super init]))
-        applicationDelegate = [delegate retain];
+        applicationDelegate = delegate;
     return self;
-}
-
-- (void) dealloc {
-    [applicationDelegate release];
-    [super dealloc];
 }
 
 - (id) applicationDelegate {

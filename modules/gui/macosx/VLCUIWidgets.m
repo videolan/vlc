@@ -81,11 +81,6 @@
 
     return self;
 }
-- (void)dealloc
-{
-    [_griddedViews release];
-    [super dealloc];
-}
 
 - (void)recomputeCount
 {

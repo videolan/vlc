@@ -49,33 +49,13 @@
 + (id)itemWithTitle:(NSString*)aTitle identifier:(NSString*)anIdentifier icon:(NSImage*)anIcon
 {
 
-    SideBarItem *item = [[[SideBarItem alloc] init] autorelease];
+    SideBarItem *item = [[SideBarItem alloc] init];
 
     [item setTitle:aTitle];
     [item setIdentifier:anIdentifier];
     [item setIcon:anIcon];
 
     return item;
-}
-
-- (void)dealloc
-{
-    [title release];
-    [identifier release];
-    [icon release];
-    [children release];
-
-    [super dealloc];
-}
-
-- (void)finalize
-{
-    title = nil;
-    identifier = nil;
-    icon = nil;
-    children = nil;
-
-    [super finalize];
 }
 
 #pragma mark -

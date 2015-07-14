@@ -50,10 +50,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance) {
-        [self dealloc];
-        return _o_sharedInstance;
-    } else
+    if (!_o_sharedInstance)
         _o_sharedInstance = [super init];
 
     return _o_sharedInstance;
@@ -62,7 +59,6 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    [super dealloc];
 }
 
 
@@ -656,8 +652,7 @@ static VLCCoreInteraction *_o_sharedInstance = nil;
             config_PutPsz(VLCIntf, pref, [o_workString UTF8String]); \
             b_needsRestart = YES; \
         } \
-    } \
-    [o_workString release]
+    }
 
     fixpref("control");
     fixpref("extraintf");

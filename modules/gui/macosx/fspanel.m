@@ -112,14 +112,9 @@
 
     if (hideAgainTimer) {
         [hideAgainTimer invalidate];
-        [hideAgainTimer release];
     }
 
-    if (o_vout_window)
-        [o_vout_window release];
-
     [self setFadeTimer:nil];
-    [super dealloc];
 }
 
 -(void)center
@@ -308,14 +303,13 @@
         i_timeToKeepVisibleInSec = var_CreateGetInteger(VLCIntf, "mouse-hide-timeout") / 500;
         if (hideAgainTimer) {
             [hideAgainTimer invalidate];
-            [hideAgainTimer autorelease];
         }
         /* released in -autoHide and -dealloc */
-        hideAgainTimer = [[NSTimer scheduledTimerWithTimeInterval: 0.5
+        hideAgainTimer = [NSTimer scheduledTimerWithTimeInterval: 0.5
                                                           target: self
                                                         selector: @selector(keepVisible:)
                                                         userInfo: nil
-                                                         repeats: YES] retain];
+                                                         repeats: YES];
         b_alreadyCounting = YES;
     }
 }
@@ -343,9 +337,7 @@
 
 - (void)setFadeTimer:(NSTimer *)timer
 {
-    [timer retain];
     [fadeTimer invalidate];
-    [fadeTimer autorelease];
     fadeTimer=timer;
 }
 
@@ -365,9 +357,7 @@
 - (void)setVoutWasUpdated: (VLCWindow *)o_window
 {
     b_voutWasUpdated = YES;
-    if (o_vout_window)
-        [o_vout_window release];
-    o_vout_window = [o_window retain];
+    o_vout_window = o_window;
     int i_newdevice = (int)[[o_vout_window screen] displayID];
     if ((i_newdevice != i_device && i_device != 0) || i_newdevice != [[self screen] displayID]) {
         i_device = i_newdevice;
@@ -415,7 +405,7 @@
 - (id)initWithFrame:(NSRect)frameRect
 {
     id view = [super initWithFrame:frameRect];
-    fillColor = [[NSColor clearColor] retain];
+    fillColor = [NSColor clearColor];
     NSRect s_rc = [self frame];
     addButton(o_prev, @"fs_skip_previous_highlight" , @"fs_skip_previous", 174, 15, prev, _NS("Click to go to the previous playlist item."), _NS("Previous"));
     addButton(o_bwd, @"fs_rewind_highlight"        , @"fs_rewind"       , 211, 14, backward, _NS("Click and hold to skip backward through the current media."), _NS("Backward"));
@@ -486,33 +476,13 @@
     addTextfield(VLCTimeField, o_streamLength_txt, NSRightTextAlignment, systemFontOfSize, whiteColor);
     [o_streamLength_txt setRemainingIdentifier: @"DisplayFullscreenTimeAsTimeRemaining"];
 
-    o_background_img = [imageFromRes(@"fs_background") retain];
-    o_vol_sld_img = [imageFromRes(@"fs_volume_slider_bar") retain];
-    o_vol_mute_img = [imageFromRes(@"fs_volume_mute_highlight") retain];
-    o_vol_max_img = [imageFromRes(@"fs_volume_max_highlight") retain];
-    o_time_sld_img = [imageFromRes(@"fs_time_slider") retain];
+    o_background_img = imageFromRes(@"fs_background");
+    o_vol_sld_img = imageFromRes(@"fs_volume_slider_bar");
+    o_vol_mute_img = imageFromRes(@"fs_volume_mute_highlight");
+    o_vol_max_img = imageFromRes(@"fs_volume_max_highlight");
+    o_time_sld_img = imageFromRes(@"fs_time_slider");
 
     return view;
-}
-
-- (void)dealloc
-{
-    [o_background_img release];
-    [o_vol_sld_img release];
-    [o_vol_mute_img release];
-    [o_vol_max_img release];
-    [o_time_sld_img release];
-    [o_fs_timeSlider release];
-    [o_fs_volumeSlider release];
-    [o_prev release];
-    [o_next release];
-    [o_bwd release];
-    [o_play release];
-    [o_fwd release];
-    [o_fullscreen release];
-    [o_streamTitle_txt release];
-    [o_streamPosition_txt release];
-    [super dealloc];
 }
 
 - (void)setPlay
@@ -717,7 +687,7 @@
 {
     self = [super initWithFrame:frame];
     if(self) {
-        [self setCell:[[[VolumeSliderCell alloc] init] autorelease]];
+        [self setCell:[[VolumeSliderCell alloc] init]];
     }
 
     return self;

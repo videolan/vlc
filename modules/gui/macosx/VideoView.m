@@ -54,7 +54,6 @@
         vlc_object_release(p_vout);
 
     [self unregisterDraggedTypes];
-    [super dealloc];
 }
 
 -(id)initWithFrame:(NSRect)frameRect

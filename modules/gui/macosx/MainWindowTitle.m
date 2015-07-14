@@ -39,7 +39,7 @@
 @implementation VLCMainWindowTitleView
 - (id)init
 {
-    o_window_title_attributes_dict = [[NSDictionary dictionaryWithObjectsAndKeys: [NSColor whiteColor], NSForegroundColorAttributeName, [NSFont titleBarFontOfSize:12.0], NSFontAttributeName, nil] retain];
+    o_window_title_attributes_dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSColor whiteColor], NSForegroundColorAttributeName, [NSFont titleBarFontOfSize:12.0], NSFontAttributeName, nil];
 
     return [super init];
 }
@@ -47,27 +47,6 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
-    [o_red_img release];
-    [o_red_over_img release];
-    [o_red_on_img release];
-    [o_yellow_img release];
-    [o_yellow_over_img release];
-    [o_yellow_on_img release];
-    [o_green_img release];
-    [o_green_over_img release];
-    [o_green_on_img release];
-    [o_fullscreen_img release];
-    [o_fullscreen_over_img release];
-    [o_fullscreen_on_img release];
-    [o_old_fullscreen_img release];
-    [o_old_fullscreen_over_img release];
-    [o_old_fullscreen_on_img release];
-
-    [o_window_title_shadow release];
-    [o_window_title_attributes_dict release];
-
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -131,44 +110,28 @@
 
 - (void)loadButtonIcons
 {
-    [o_red_img release];
-    [o_red_over_img release];
-    [o_red_on_img release];
-    [o_yellow_img release];
-    [o_yellow_over_img release];
-    [o_yellow_on_img release];
-    [o_green_img release];
-    [o_green_over_img release];
-    [o_green_on_img release];
-    [o_fullscreen_img release];
-    [o_fullscreen_over_img release];
-    [o_fullscreen_on_img release];
-    [o_old_fullscreen_img release];
-    [o_old_fullscreen_over_img release];
-    [o_old_fullscreen_on_img release];
-
-    o_red_img = [[self getButtonImage:@"window-close"] retain];
-    o_red_over_img = [[self getButtonImage:@"window-close-over"] retain];
-    o_red_on_img = [[self getButtonImage:@"window-close-on"] retain];
-    o_yellow_img = [[self getButtonImage:@"window-minimize"] retain];
-    o_yellow_over_img = [[self getButtonImage:@"window-minimize-over"] retain];
-    o_yellow_on_img = [[self getButtonImage:@"window-minimize-on"] retain];
-    o_green_img = [[self getButtonImage:@"window-zoom"] retain];
-    o_green_over_img = [[self getButtonImage:@"window-zoom-over"] retain];
-    o_green_on_img = [[self getButtonImage:@"window-zoom-on"] retain];
+    o_red_img = [self getButtonImage:@"window-close"];
+    o_red_over_img = [self getButtonImage:@"window-close-over"];
+    o_red_on_img = [self getButtonImage:@"window-close-on"];
+    o_yellow_img = [self getButtonImage:@"window-minimize"];
+    o_yellow_over_img = [self getButtonImage:@"window-minimize-over"];
+    o_yellow_on_img = [self getButtonImage:@"window-minimize-on"];
+    o_green_img = [self getButtonImage:@"window-zoom"];
+    o_green_over_img = [self getButtonImage:@"window-zoom-over"];
+    o_green_on_img = [self getButtonImage:@"window-zoom-on"];
 
     // these files are only available in the yosemite variant
     if (OSX_YOSEMITE) {
-        o_fullscreen_img = [[self getButtonImage:@"window-fullscreen"] retain];
-        o_fullscreen_over_img = [[self getButtonImage:@"window-fullscreen-over"] retain];
-        o_fullscreen_on_img = [[self getButtonImage:@"window-fullscreen-on"] retain];
+        o_fullscreen_img = [self getButtonImage:@"window-fullscreen"];
+        o_fullscreen_over_img = [self getButtonImage:@"window-fullscreen-over"];
+        o_fullscreen_on_img = [self getButtonImage:@"window-fullscreen-on"];
     }
 
     // old native fullscreen images are not available in graphite style
     // thus they are loaded directly here
-    o_old_fullscreen_img = [[NSImage imageNamed:@"lion-window-fullscreen"] retain];
-    o_old_fullscreen_on_img = [[NSImage imageNamed:@"lion-window-fullscreen-on"] retain];
-    o_old_fullscreen_over_img = [[NSImage imageNamed:@"lion-window-fullscreen-over"] retain];
+    o_old_fullscreen_img = [NSImage imageNamed:@"lion-window-fullscreen"];
+    o_old_fullscreen_on_img = [NSImage imageNamed:@"lion-window-fullscreen-on"];
+    o_old_fullscreen_over_img = [NSImage imageNamed:@"lion-window-fullscreen-over"];
 
     [o_red_btn setImage: o_red_img];
     [o_red_btn setAlternateImage: o_red_on_img];
@@ -249,7 +212,6 @@
         [o_window_title_shadow setShadowColor:[NSColor colorWithCalibratedWhite:1.0 alpha:0.5]];
         [o_window_title_shadow setShadowOffset:NSMakeSize(0.0, -1.5)];
         [o_window_title_shadow setShadowBlurRadius:0.5];
-        [o_window_title_shadow retain];
     }
 
     NSMutableAttributedString *o_attributed_title = [[NSMutableAttributedString alloc] initWithString:title attributes: o_window_title_attributes_dict];
@@ -258,7 +220,6 @@
     [o_attributed_title addAttribute:NSShadowAttributeName value:o_window_title_shadow range:NSMakeRange(0, i_titleLength)];
     [o_attributed_title setAlignment: NSCenterTextAlignment range:NSMakeRange(0, i_titleLength)];
     [o_title_lbl setAttributedStringValue:o_attributed_title];
-    [o_attributed_title release];
 }
 
 - (void)setWindowButtonOver:(BOOL)b_value
@@ -514,19 +475,8 @@
 
 @implementation VLCWindowTitleTextField
 
-- (void)dealloc
-{
-    if (contextMenu)
-        [contextMenu release];
-
-    [super dealloc];
-}
-
 - (void)showRightClickMenuWithEvent:(NSEvent *)o_event
 {
-    if (contextMenu)
-        [contextMenu release];
-
     NSURL * representedURL = [[self window] representedURL];
     if (!representedURL)
         return;
@@ -574,7 +524,7 @@
     }
 
     /* add the computer item */
-    [contextMenu addItemWithTitle: [(NSString*)SCDynamicStoreCopyComputerName(NULL, NULL) autorelease] action:@selector(revealInFinder:) keyEquivalent:@""];
+    [contextMenu addItemWithTitle:(NSString*)CFBridgingRelease(SCDynamicStoreCopyComputerName(NULL, NULL)) action:@selector(revealInFinder:) keyEquivalent:@""];
     currentItem = [contextMenu itemAtIndex: [contextMenu numberOfItems] - 1];
     icon = [NSImage imageNamed: NSImageNameComputer];
     [icon setSize: iconSize];

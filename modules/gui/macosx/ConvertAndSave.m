@@ -113,8 +113,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:defaultProfiles, @"CASProfiles", defaultProfileNames, @"CASProfileNames", nil];
 
     [defaults registerDefaults:appDefaults];
-    [defaultProfiles release];
-    [defaultProfileNames release];
 }
 
 + (VLCConvertAndSave *)sharedInstance
@@ -124,27 +122,10 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance) {
-        [self dealloc];
-    } else {
+    if (!_o_sharedInstance)
         _o_sharedInstance = [super init];
-    }
 
     return _o_sharedInstance;
-}
-
-- (void)dealloc
-{
-    if (_currentProfile)
-        [_currentProfile release];
-
-    [_profileNames release];
-    [_profileValueList release];
-    [_videoCodecs release];
-    [_audioCodecs release];
-    [_subsCodecs release];
-
-    [super dealloc];
 }
 
 - (void)awakeFromNib
@@ -209,7 +190,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [_stream_sdp_matrix setEnabled:NO];
 
     /* there is no way to hide single cells, so replace the existing ones with empty cells.. */
-    id blankCell = [[[NSCell alloc] init] autorelease];
+    id blankCell = [[NSCell alloc] init];
     [blankCell setEnabled:NO];
     [_customize_encap_matrix putCell:blankCell atRow:3 column:1];
     [_customize_encap_matrix putCell:blankCell atRow:3 column:2];
@@ -475,7 +456,6 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [labelContent appendFormat:@" (\"%@\")", [_stream_channel_fld stringValue]];
 
     [_destination_stream_lbl setStringValue:labelContent];
-    [labelContent release];
 
     /* catch obvious errors */
     if (![[_stream_address_fld stringValue] length] > 0) {
@@ -608,13 +588,11 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
             /* add profile to arrays */
             NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:self.profileNames];
             [workArray addObject:text];
-            [self setProfileNames:[[[NSArray alloc] initWithArray:workArray] autorelease]];
-            [workArray release];
+            [self setProfileNames:[[NSArray alloc] initWithArray:workArray]];
 
             workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
             [workArray addObject:[self.currentProfile componentsJoinedByString:@";"]];
-            [self setProfileValueList:[[[NSArray alloc] initWithArray:workArray] autorelease]];
-            [workArray release];
+            [self setProfileValueList:[[NSArray alloc] initWithArray:workArray]];
 
             /* update UI */
             [self recreateProfilePopup];
@@ -633,12 +611,10 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         /* remove requested profile from the arrays */
         NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:self.profileNames];
         [workArray removeObjectAtIndex:item];
-        [self setProfileNames:[[[NSArray alloc] initWithArray:workArray] autorelease]];
-        [workArray release];
+        [self setProfileNames:[[NSArray alloc] initWithArray:workArray]];
         workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
         [workArray removeObjectAtIndex:item];
-        [self setProfileValueList:[[[NSArray alloc] initWithArray:workArray] autorelease]];
-        [workArray release];
+        [self setProfileValueList:[[NSArray alloc] initWithArray:workArray]];
 
         /* update UI */
         [self recreateProfilePopup];
@@ -783,7 +759,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
     [self audioSettingsChanged:nil];
     [self subSettingsChanged:nil];
 
-    [self setCurrentProfile: [[[NSMutableArray alloc] initWithArray: [profileString componentsSeparatedByString:@";"]] autorelease]];
+    [self setCurrentProfile: [[NSMutableArray alloc] initWithArray:[profileString componentsSeparatedByString:@";"]]];
 }
 
 - (void)selectCellByEncapsulationFormat:(NSString *)format
@@ -984,10 +960,7 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
         [composedOptions appendString:@"} :sout-keep"];
     }
 
-    NSString * returnString = [NSString stringWithString:composedOptions];
-    [composedOptions release];
-
-    return returnString;
+    return [NSString stringWithString:composedOptions];
 }
 
 - (void)updateCurrentProfile

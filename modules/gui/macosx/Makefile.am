@@ -3,7 +3,7 @@ include $(top_srcdir)/modules/common.am
 guidir = $(pluginsdir)/gui
 
 
-libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -F${CONTRIB_DIR}
+libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc -F${CONTRIB_DIR}
 libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreServices \
 	-Wl,-framework,QTKit -Wl,-framework,IOKit -Wl,-framework,AddressBook \

@@ -41,9 +41,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance)
-        [self dealloc];
-    else {
+    if (!_o_sharedInstance) {
         _o_sharedInstance = [super init];
 
         [[NSDistributedNotificationCenter defaultCenter]
@@ -84,7 +82,6 @@ static VLCEyeTVController *_o_sharedInstance = nil;
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
         NSLog(@"opening EyeTV failed with error status '%@'", errorString);
     }
-    [script release];
 }
 
 - (int)channel
@@ -99,7 +96,6 @@ static VLCEyeTVController *_o_sharedInstance = nil;
         NSLog(@"EyeTV channel inventory failed with error status '%@'", errorString);
     } else
         currentChannel = (int)[descriptor int32Value];
-    [script release];
     return currentChannel;
 }
 
@@ -133,7 +129,6 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     } else
         currentChannel = (int)[descriptor int32Value];
 
-    [script release];
     return currentChannel;
 }
 
@@ -179,7 +174,6 @@ static VLCEyeTVController *_o_sharedInstance = nil;
         NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
         NSLog(@"EyeTV source change failed with error status '%@'", errorString);
     }
-    [script release];
 }
 
 - (NSEnumerator *)allChannels
@@ -201,7 +195,6 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 
         channels = [channelArray objectEnumerator];
     }
-    [script release];
     return channels;
 }
 

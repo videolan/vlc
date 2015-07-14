@@ -89,7 +89,7 @@
 {
     bool b_activeDragAndDrop;
 
-    id _dropHandler;
+    __unsafe_unretained id _dropHandler;
 }
 
 @property (nonatomic, assign) id dropHandler;
