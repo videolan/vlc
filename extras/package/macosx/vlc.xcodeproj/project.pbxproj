@@ -1270,6 +1270,14 @@
 		7DE88F291831396A00CD9DA2 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistAccessoryView.xib; sourceTree = "<group>"; };
 		7DF0435E1972E26A0022B534 /* AddonListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonListDataSource.h; path = ../../../modules/gui/macosx/AddonListDataSource.h; sourceTree = SOURCE_ROOT; };
 		7DF0435F1972E26A0022B534 /* AddonListDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonListDataSource.m; path = ../../../modules/gui/macosx/AddonListDataSource.m; sourceTree = SOURCE_ROOT; };
+		7DF812ED1B555A340052293C /* InputManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InputManager.h; path = ../../../modules/gui/macosx/InputManager.h; sourceTree = "<group>"; };
+		7DF812EE1B555A340052293C /* InputManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = InputManager.m; path = ../../../modules/gui/macosx/InputManager.m; sourceTree = "<group>"; };
+		7DF812EF1B555C8E0052293C /* KeyboardBacklight.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeyboardBacklight.h; path = ../../../modules/gui/macosx/KeyboardBacklight.h; sourceTree = "<group>"; };
+		7DF812F01B555C8E0052293C /* KeyboardBacklight.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeyboardBacklight.m; path = ../../../modules/gui/macosx/KeyboardBacklight.m; sourceTree = "<group>"; };
+		7DF812F11B5599E40052293C /* PLItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PLItem.h; path = ../../../modules/gui/macosx/PLItem.h; sourceTree = "<group>"; };
+		7DF812F21B5599E40052293C /* PLItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PLItem.m; path = ../../../modules/gui/macosx/PLItem.m; sourceTree = "<group>"; };
+		7DF812F31B5599E40052293C /* PLModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PLModel.h; path = ../../../modules/gui/macosx/PLModel.h; sourceTree = "<group>"; };
+		7DF812F41B5599E40052293C /* PLModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PLModel.m; path = ../../../modules/gui/macosx/PLModel.m; sourceTree = "<group>"; };
 		7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark.png"; sourceTree = "<group>"; };
 		7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "effects-one-button-pressed-dark@2x.png"; path = "Resources/mainwindow_dark/effects-one-button-pressed-dark@2x.png"; sourceTree = "<group>"; };
 		8E49720006417F6800370C9F /* playlistinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = playlistinfo.h; path = ../../../modules/gui/macosx/playlistinfo.h; sourceTree = SOURCE_ROOT; };
@@ -1875,6 +1883,10 @@
 				2AEF857709A5FEC900130822 /* fspanel.m */,
 				8ED6C27C03E2EB1C0059A3A7 /* intf.h */,
 				8ED6C27D03E2EB1C0059A3A7 /* intf.m */,
+				7DF812ED1B555A340052293C /* InputManager.h */,
+				7DF812EE1B555A340052293C /* InputManager.m */,
+				7DF812EF1B555C8E0052293C /* KeyboardBacklight.h */,
+				7DF812F01B555C8E0052293C /* KeyboardBacklight.m */,
 				8ED6C27E03E2EB1C0059A3A7 /* macosx.m */,
 				CC448A5A13B61D49009F72E0 /* MainMenu.h */,
 				CC448A5B13B61D49009F72E0 /* MainMenu.m */,
@@ -1888,10 +1900,14 @@
 				8ED6C28403E2EB1C0059A3A7 /* playlist.m */,
 				8E49720006417F6800370C9F /* playlistinfo.h */,
 				8E49720106417F6800370C9F /* playlistinfo.m */,
-				8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */,
-				8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */,
+				7DF812F11B5599E40052293C /* PLItem.h */,
+				7DF812F21B5599E40052293C /* PLItem.m */,
+				7DF812F31B5599E40052293C /* PLModel.h */,
+				7DF812F41B5599E40052293C /* PLModel.m */,
 				8ED6C28503E2EB1C0059A3A7 /* prefs.h */,
 				8ED6C28603E2EB1C0059A3A7 /* prefs.m */,
+				8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */,
+				8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */,
 				633121CA1B51122700E636DA /* ResumeDialogController.h */,
 				633121CB1B51122700E636DA /* ResumeDialogController.m */,
 				CC461F6C160078340022423C /* SharedDialogs.h */,
