@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bookmarks.h: MacOS X Bookmarks window
  *****************************************************************************
- * Copyright (C) 2005, 2007 VLC authors and VideoLAN
+ * Copyright (C) 2005, 2007, 2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Kühne <fkuehne at videolan dot org>
@@ -26,26 +26,26 @@
 #import <vlc_common.h>
 
 @interface VLCBookmarks : NSObject
-{
-    /* main window */
-    IBOutlet id o_bookmarks_window;
-    IBOutlet id o_btn_add;
-    IBOutlet id o_btn_clear;
-    IBOutlet id o_btn_edit;
-    IBOutlet id o_btn_extract;
-    IBOutlet id o_btn_rm;
-    IBOutlet id o_tbl_dataTable;
 
-    /* edit window */
-    IBOutlet id o_edit_window;
-    IBOutlet id o_edit_btn_ok;
-    IBOutlet id o_edit_btn_cancel;
-    IBOutlet id o_edit_lbl_name;
-    IBOutlet id o_edit_lbl_time;
-    IBOutlet id o_edit_fld_name;
-    IBOutlet id o_edit_fld_time;
-}
 + (VLCBookmarks *)sharedInstance;
+
+/* main window */
+@property (readwrite, weak) IBOutlet NSWindow *bookmarksWindow;
+@property (readwrite, weak) IBOutlet NSButton *addButton;
+@property (readwrite, weak) IBOutlet NSButton *clearButton;
+@property (readwrite, weak) IBOutlet NSButton *editButton;
+@property (readwrite, weak) IBOutlet NSButton *extractButton;
+@property (readwrite, weak) IBOutlet NSButton *removeButton;
+@property (readwrite, weak) IBOutlet NSTableView *dataTable;
+
+/* edit window */
+@property (readwrite, weak) IBOutlet NSWindow *editBookmarksWindow;
+@property (readwrite, weak) IBOutlet NSButton *editOKButton;
+@property (readwrite, weak) IBOutlet NSButton *editCancelButton;
+@property (readwrite, weak) IBOutlet NSTextField *editNameLabel;
+@property (readwrite, weak) IBOutlet NSTextField *editTimeLabel;
+@property (readwrite, weak) IBOutlet NSTextField *editNameTextField;
+@property (readwrite, weak) IBOutlet NSTextField *editTimeTextField;
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
 

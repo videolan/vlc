@@ -1276,7 +1276,7 @@ audio_output_t *getAout(void)
         o_bookmarks = [[VLCBookmarks alloc] init];
 
     if (!nib_bookmarks_loaded)
-        nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner: NSApp];
+        nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner:o_bookmarks];
 
     return o_bookmarks;
 }

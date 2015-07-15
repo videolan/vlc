@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">14B25</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
-		<string key="IBDocument.AppKitVersion">1343.16</string>
-		<string key="IBDocument.HIToolboxVersion">755.00</string>
+		<string key="IBDocument.SystemVersion">14E46</string>
+		<string key="IBDocument.InterfaceBuilderVersion">7706</string>
+		<string key="IBDocument.AppKitVersion">1348.17</string>
+		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6254</string>
+			<string key="NS.object.0">7706</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSButton</string>
@@ -33,16 +33,13 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="894285478">
 			<object class="NSCustomObject" id="33654090">
-				<string key="NSClassName">NSObject</string>
+				<string key="NSClassName">VLCBookmarks</string>
 			</object>
 			<object class="NSCustomObject" id="222688530">
 				<string key="NSClassName">FirstResponder</string>
 			</object>
 			<object class="NSCustomObject" id="901686818">
 				<string key="NSClassName">NSApplication</string>
-			</object>
-			<object class="NSCustomObject" id="269740084">
-				<string key="NSClassName">VLCBookmarks</string>
 			</object>
 			<object class="NSWindowTemplate" id="483319126">
 				<int key="NSWindowStyleMask">8223</int>
@@ -432,7 +429,7 @@
 					<reference key="NSNextKeyView" ref="923291537"/>
 					<string key="NSReuseIdentifierKey">_NS:93</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1417}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">bookmarks</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
@@ -447,7 +444,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="350014962">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSTextField" id="749910442">
@@ -455,6 +452,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{74, 83}, {204, 22}}</string>
 							<reference key="NSSuperview" ref="350014962"/>
+							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:76</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="744738909">
@@ -475,6 +473,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{74, 51}, {204, 22}}</string>
 							<reference key="NSSuperview" ref="350014962"/>
+							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:76</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="1071274495">
@@ -495,6 +494,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{180, 18}, {98, 19}}</string>
 							<reference key="NSSuperview" ref="350014962"/>
+							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:125</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="504886597">
@@ -519,6 +519,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{74, 18}, {98, 19}}</string>
 							<reference key="NSSuperview" ref="350014962"/>
+							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:125</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="826635909">
@@ -543,6 +544,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 85}, {52, 17}}</string>
 							<reference key="NSSuperview" ref="350014962"/>
+							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:637</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="593608671">
@@ -568,6 +570,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 53}, {52, 17}}</string>
 							<reference key="NSSuperview" ref="350014962"/>
+							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:637</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="18448839">
@@ -585,9 +588,11 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{298, 125}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 					<string key="NSReuseIdentifierKey">_NS:93</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1417}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
 			</object>
@@ -596,195 +601,171 @@
 			<array key="connectionRecords">
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_btn_add</string>
-						<reference key="source" ref="269740084"/>
+						<string key="label">addButton</string>
+						<reference key="source" ref="33654090"/>
 						<reference key="destination" ref="923291537"/>
 					</object>
-					<int key="connectionID">118</int>
+					<int key="connectionID">163</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_btn_clear</string>
-						<reference key="source" ref="269740084"/>
+						<string key="label">bookmarksWindow</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="483319126"/>
+					</object>
+					<int key="connectionID">164</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">clearButton</string>
+						<reference key="source" ref="33654090"/>
 						<reference key="destination" ref="136520628"/>
 					</object>
-					<int key="connectionID">119</int>
+					<int key="connectionID">165</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_btn_edit</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="185425397"/>
-					</object>
-					<int key="connectionID">120</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_btn_extract</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="865621523"/>
-					</object>
-					<int key="connectionID">121</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_btn_rm</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="990537356"/>
-					</object>
-					<int key="connectionID">122</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_tbl_dataTable</string>
-						<reference key="source" ref="269740084"/>
+						<string key="label">dataTable</string>
+						<reference key="source" ref="33654090"/>
 						<reference key="destination" ref="360561587"/>
 					</object>
-					<int key="connectionID">124</int>
+					<int key="connectionID">166</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">editButton</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="185425397"/>
+					</object>
+					<int key="connectionID">167</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">extractButton</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="865621523"/>
+					</object>
+					<int key="connectionID">168</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">removeButton</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="990537356"/>
+					</object>
+					<int key="connectionID">169</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">editBookmarksWindow</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="233169904"/>
+					</object>
+					<int key="connectionID">170</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">editCancelButton</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="44348677"/>
+					</object>
+					<int key="connectionID">171</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">editOKButton</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="965200594"/>
+					</object>
+					<int key="connectionID">172</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">editNameTextField</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="749910442"/>
+					</object>
+					<int key="connectionID">173</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">editTimeTextField</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="741026146"/>
+					</object>
+					<int key="connectionID">174</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">editNameLabel</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="219133204"/>
+					</object>
+					<int key="connectionID">175</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">editTimeLabel</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="879550076"/>
+					</object>
+					<int key="connectionID">176</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">add:</string>
-						<reference key="source" ref="269740084"/>
+						<reference key="source" ref="33654090"/>
 						<reference key="destination" ref="923291537"/>
 					</object>
-					<int key="connectionID">127</int>
+					<int key="connectionID">177</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">clear:</string>
-						<reference key="source" ref="269740084"/>
+						<reference key="source" ref="33654090"/>
 						<reference key="destination" ref="136520628"/>
 					</object>
-					<int key="connectionID">128</int>
+					<int key="connectionID">178</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">edit:</string>
-						<reference key="source" ref="269740084"/>
+						<reference key="source" ref="33654090"/>
 						<reference key="destination" ref="185425397"/>
 					</object>
-					<int key="connectionID">129</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">extract:</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="865621523"/>
-					</object>
-					<int key="connectionID">130</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">goToBookmark:</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="360561587"/>
-					</object>
-					<int key="connectionID">131</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">remove:</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="990537356"/>
-					</object>
-					<int key="connectionID">132</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_edit_btn_cancel</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="44348677"/>
-					</object>
-					<int key="connectionID">151</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_edit_btn_ok</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="965200594"/>
-					</object>
-					<int key="connectionID">152</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_edit_fld_name</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="749910442"/>
-					</object>
-					<int key="connectionID">154</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_edit_fld_time</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="741026146"/>
-					</object>
-					<int key="connectionID">155</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_edit_lbl_name</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="219133204"/>
-					</object>
-					<int key="connectionID">157</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_edit_lbl_time</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="879550076"/>
-					</object>
-					<int key="connectionID">158</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_edit_window</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="233169904"/>
-					</object>
-					<int key="connectionID">159</int>
+					<int key="connectionID">179</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">edit_cancel:</string>
-						<reference key="source" ref="269740084"/>
+						<reference key="source" ref="33654090"/>
 						<reference key="destination" ref="44348677"/>
 					</object>
-					<int key="connectionID">160</int>
+					<int key="connectionID">180</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">edit_ok:</string>
-						<reference key="source" ref="269740084"/>
+						<reference key="source" ref="33654090"/>
 						<reference key="destination" ref="965200594"/>
 					</object>
-					<int key="connectionID">161</int>
+					<int key="connectionID">181</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_bookmarks_window</string>
-						<reference key="source" ref="269740084"/>
-						<reference key="destination" ref="483319126"/>
+					<object class="IBActionConnection" key="connection">
+						<string key="label">extract:</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="865621523"/>
 					</object>
-					<int key="connectionID">162</int>
+					<int key="connectionID">182</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="360561587"/>
-						<reference key="destination" ref="269740084"/>
+					<object class="IBActionConnection" key="connection">
+						<string key="label">remove:</string>
+						<reference key="source" ref="33654090"/>
+						<reference key="destination" ref="990537356"/>
 					</object>
-					<int key="connectionID">125</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">dataSource</string>
-						<reference key="source" ref="360561587"/>
-						<reference key="destination" ref="269740084"/>
-					</object>
-					<int key="connectionID">126</int>
+					<int key="connectionID">183</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -806,12 +787,6 @@
 						<reference key="object" ref="222688530"/>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">First Responder</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">17</int>
-						<reference key="object" ref="269740084"/>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">VLCBookmarks</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">-3</int>
@@ -1248,7 +1223,6 @@
 				</object>
 				<string key="147.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="148.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="17.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="84.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="84.IBWindowTemplateEditedContentRect">{{622, 244}, {540, 307}}</string>
 				<boolean value="NO" key="84.NSWindowTemplate.visibleAtLaunch"/>
@@ -1343,7 +1317,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">162</int>
+			<int key="maxID">183</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1395,77 +1369,77 @@
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="o_bookmarks_window">id</string>
-						<string key="o_btn_add">id</string>
-						<string key="o_btn_clear">id</string>
-						<string key="o_btn_edit">id</string>
-						<string key="o_btn_extract">id</string>
-						<string key="o_btn_rm">id</string>
-						<string key="o_edit_btn_cancel">id</string>
-						<string key="o_edit_btn_ok">id</string>
-						<string key="o_edit_fld_name">id</string>
-						<string key="o_edit_fld_time">id</string>
-						<string key="o_edit_lbl_name">id</string>
-						<string key="o_edit_lbl_time">id</string>
-						<string key="o_edit_window">id</string>
-						<string key="o_tbl_dataTable">id</string>
+						<string key="addButton">NSButton</string>
+						<string key="bookmarksWindow">NSWindow</string>
+						<string key="clearButton">NSButton</string>
+						<string key="dataTable">NSTableView</string>
+						<string key="editBookmarksWindow">NSWindow</string>
+						<string key="editButton">NSButton</string>
+						<string key="editCancelButton">NSButton</string>
+						<string key="editNameLabel">NSTextField</string>
+						<string key="editNameTextField">NSTextField</string>
+						<string key="editOKButton">NSButton</string>
+						<string key="editTimeLabel">NSTextField</string>
+						<string key="editTimeTextField">NSTextField</string>
+						<string key="extractButton">NSButton</string>
+						<string key="removeButton">NSButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="o_bookmarks_window">
-							<string key="name">o_bookmarks_window</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="addButton">
+							<string key="name">addButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_btn_add">
-							<string key="name">o_btn_add</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="bookmarksWindow">
+							<string key="name">bookmarksWindow</string>
+							<string key="candidateClassName">NSWindow</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_btn_clear">
-							<string key="name">o_btn_clear</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="clearButton">
+							<string key="name">clearButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_btn_edit">
-							<string key="name">o_btn_edit</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="dataTable">
+							<string key="name">dataTable</string>
+							<string key="candidateClassName">NSTableView</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_btn_extract">
-							<string key="name">o_btn_extract</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="editBookmarksWindow">
+							<string key="name">editBookmarksWindow</string>
+							<string key="candidateClassName">NSWindow</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_btn_rm">
-							<string key="name">o_btn_rm</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="editButton">
+							<string key="name">editButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_edit_btn_cancel">
-							<string key="name">o_edit_btn_cancel</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="editCancelButton">
+							<string key="name">editCancelButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_edit_btn_ok">
-							<string key="name">o_edit_btn_ok</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="editNameLabel">
+							<string key="name">editNameLabel</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_edit_fld_name">
-							<string key="name">o_edit_fld_name</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="editNameTextField">
+							<string key="name">editNameTextField</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_edit_fld_time">
-							<string key="name">o_edit_fld_time</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="editOKButton">
+							<string key="name">editOKButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_edit_lbl_name">
-							<string key="name">o_edit_lbl_name</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="editTimeLabel">
+							<string key="name">editTimeLabel</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_edit_lbl_time">
-							<string key="name">o_edit_lbl_time</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="editTimeTextField">
+							<string key="name">editTimeTextField</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_edit_window">
-							<string key="name">o_edit_window</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="extractButton">
+							<string key="name">extractButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_tbl_dataTable">
-							<string key="name">o_tbl_dataTable</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="removeButton">
+							<string key="name">removeButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -1612,6 +1586,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSTableHeaderView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSTableView</string>
+					<string key="superclassName">NSControl</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSTableView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

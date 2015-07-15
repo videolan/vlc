@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bookmarks.m: MacOS X Bookmarks window
  *****************************************************************************
- * Copyright (C) 2005 - 2012 VLC authors and VideoLAN
+ * Copyright (C) 2005 - 2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -38,11 +38,10 @@
 #import "wizard.h"
 #import "CompatibilityFixes.h"
 
-@interface VLCBookmarks()
+@interface VLCBookmarks() <NSTableViewDataSource, NSTableViewDelegate>
 {
     input_thread_t *p_old_input;
 }
-- (void)initStrings;
 @end
 
 @implementation VLCBookmarks
@@ -66,9 +65,30 @@
 - (void)awakeFromNib
 {
     if (!OSX_SNOW_LEOPARD)
-        [o_bookmarks_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+        [_bookmarksWindow setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    [self initStrings];
+    _dataTable.dataSource = self;
+    _dataTable.delegate = self;
+    _dataTable.action = @selector(goToBookmark:);
+    _dataTable.target = self;
+
+    /* main window */
+    [_bookmarksWindow setTitle: _NS("Bookmarks")];
+    [_addButton setTitle: _NS("Add")];
+    [_clearButton setTitle: _NS("Clear")];
+    [_editButton setTitle: _NS("Edit")];
+    [_extractButton setTitle: _NS("Extract")];
+    [_removeButton setTitle: _NS("Remove")];
+    [[[_dataTable tableColumnWithIdentifier:@"description"] headerCell]
+     setStringValue: _NS("Description")];
+    [[[_dataTable tableColumnWithIdentifier:@"time_offset"] headerCell]
+     setStringValue: _NS("Time")];
+
+    /* edit window */
+    [_editOKButton setTitle: _NS("OK")];
+    [_editCancelButton setTitle: _NS("Cancel")];
+    [_editNameLabel setStringValue: _NS("Name")];
+    [_editTimeLabel setStringValue: _NS("Time")];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(inputChangedEvent:)
@@ -84,46 +104,23 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)initStrings
-{
-    /* localise the items */
-
-    /* main window */
-    [o_bookmarks_window setTitle: _NS("Bookmarks")];
-    [o_btn_add setTitle: _NS("Add")];
-    [o_btn_clear setTitle: _NS("Clear")];
-    [o_btn_edit setTitle: _NS("Edit")];
-    [o_btn_extract setTitle: _NS("Extract")];
-    [o_btn_rm setTitle: _NS("Remove")];
-    [[[o_tbl_dataTable tableColumnWithIdentifier:@"description"] headerCell]
-        setStringValue: _NS("Description")];
-    [[[o_tbl_dataTable tableColumnWithIdentifier:@"time_offset"] headerCell]
-        setStringValue: _NS("Time")];
-
-    /* edit window */
-    [o_edit_btn_ok setTitle: _NS("OK")];
-    [o_edit_btn_cancel setTitle: _NS("Cancel")];
-    [o_edit_lbl_name setStringValue: _NS("Name")];
-    [o_edit_lbl_time setStringValue: _NS("Time")];
-}
-
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (o_bookmarks_window && [o_bookmarks_window isVisible] && [o_bookmarks_window level] != i_level)
-        [o_bookmarks_window setLevel: i_level];
+    if (_bookmarksWindow && [_bookmarksWindow isVisible] && [_bookmarksWindow level] != i_level)
+        [_bookmarksWindow setLevel: i_level];
 }
 
 - (void)showBookmarks
 {
     /* show the window, called from intf.m */
-    [o_bookmarks_window displayIfNeeded];
-    [o_bookmarks_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
-    [o_bookmarks_window makeKeyAndOrderFront:nil];
+    [_bookmarksWindow displayIfNeeded];
+    [_bookmarksWindow setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+    [_bookmarksWindow makeKeyAndOrderFront:nil];
 }
 
 -(void)inputChangedEvent:(NSNotification *)o_notification
 {
-    [o_tbl_dataTable reloadData];
+    [_dataTable reloadData];
 }
 
 - (IBAction)add:(id)sender
@@ -143,7 +140,7 @@
 
     vlc_object_release(p_input);
 
-    [o_tbl_dataTable reloadData];
+    [_dataTable reloadData];
 }
 
 - (IBAction)clear:(id)sender
@@ -158,7 +155,7 @@
 
     vlc_object_release(p_input);
 
-    [o_tbl_dataTable reloadData];
+    [_dataTable reloadData];
 }
 
 - (IBAction)edit:(id)sender
@@ -170,7 +167,7 @@
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
     int row;
-    row = [o_tbl_dataTable selectedRow];
+    row = [_dataTable selectedRow];
 
     if (!p_input)
         return;
@@ -185,12 +182,12 @@
         return;
     }
 
-    [o_edit_fld_name setStringValue: toNSStr(pp_bookmarks[row]->psz_name)];
+    [_editNameTextField setStringValue: toNSStr(pp_bookmarks[row]->psz_name)];
     int total = pp_bookmarks[row]->i_time_offset/ 1000000;
     int hour = total / (60*60);
     int min = (total - hour*60*60) / 60;
     int sec = total - hour*60*60 - min*60;
-    [o_edit_fld_time setStringValue: [NSString stringWithFormat:@"%02d:%02d:%02d", hour, min, sec]];
+    [_editTimeTextField setStringValue: [NSString stringWithFormat:@"%02d:%02d:%02d", hour, min, sec]];
 
     /* Just keep the pointer value to check if it
      * changes. Note, we don't need to keep a reference to the object.
@@ -198,7 +195,7 @@
     p_old_input = p_input;
     vlc_object_release(p_input);
 
-    [NSApp beginSheet: o_edit_window modalForWindow: o_bookmarks_window modalDelegate: o_edit_window didEndSelector: nil contextInfo: nil];
+    [NSApp beginSheet: _editBookmarksWindow modalForWindow: _bookmarksWindow modalDelegate: _editBookmarksWindow didEndSelector: nil contextInfo: nil];
 
     // Clear the bookmark list
     for (int i = 0; i < i_bookmarks; i++)
@@ -209,8 +206,8 @@
 - (IBAction)edit_cancel:(id)sender
 {
     /* close sheet */
-    [NSApp endSheet:o_edit_window];
-    [o_edit_window close];
+    [NSApp endSheet:_editBookmarksWindow];
+    [_editBookmarksWindow close];
 }
 
 - (IBAction)edit_ok:(id)sender
@@ -221,11 +218,11 @@
     input_thread_t * p_input = pl_CurrentInput(VLCIntf);
 
     if (!p_input) {
-        NSBeginCriticalAlertSheet(_NS("No input"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, @"%@",_NS("No input found. A stream must be playing or paused for bookmarks to work."));
+        NSBeginCriticalAlertSheet(_NS("No input"), _NS("OK"), @"", @"", _bookmarksWindow, nil, nil, nil, nil, @"%@",_NS("No input found. A stream must be playing or paused for bookmarks to work."));
         return;
     }
     if (p_old_input != p_input) {
-        NSBeginCriticalAlertSheet(_NS("Input has changed"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, @"%@",_NS("Input has changed, unable to save bookmark. Suspending playback with \"Pause\" while editing bookmarks to ensure to keep the same input."));
+        NSBeginCriticalAlertSheet(_NS("Input has changed"), _NS("OK"), @"", @"", _bookmarksWindow, nil, nil, nil, nil, @"%@",_NS("Input has changed, unable to save bookmark. Suspending playback with \"Pause\" while editing bookmarks to ensure to keep the same input."));
         vlc_object_release(p_input);
         return;
     }
@@ -235,13 +232,13 @@
         return;
     }
 
-    i = [o_tbl_dataTable selectedRow];
+    i = [_dataTable selectedRow];
 
     free(pp_bookmarks[i]->psz_name);
 
-    pp_bookmarks[i]->psz_name = strdup([[o_edit_fld_name stringValue] UTF8String]);
+    pp_bookmarks[i]->psz_name = strdup([[_editNameTextField stringValue] UTF8String]);
 
-    NSArray * components = [[o_edit_fld_time stringValue] componentsSeparatedByString:@":"];
+    NSArray * components = [[_editTimeTextField stringValue] componentsSeparatedByString:@":"];
     NSUInteger componentCount = [components count];
     if (componentCount == 1)
         pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components objectAtIndex:0] longLongValue]);
@@ -259,11 +256,11 @@
         goto clear;
     }
 
-    [o_tbl_dataTable reloadData];
+    [_dataTable reloadData];
     vlc_object_release(p_input);
 
-    [NSApp endSheet: o_edit_window];
-    [o_edit_window close];
+    [NSApp endSheet: _editBookmarksWindow];
+    [_editBookmarksWindow close];
 
 clear:
     // Clear the bookmark list
@@ -274,13 +271,13 @@ clear:
 
 - (IBAction)extract:(id)sender
 {
-    if ([o_tbl_dataTable numberOfSelectedRows] < 2) {
-        NSBeginAlertSheet(_NS("Invalid selection"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, @"%@",_NS("Two bookmarks have to be selected."));
+    if ([_dataTable numberOfSelectedRows] < 2) {
+        NSBeginAlertSheet(_NS("Invalid selection"), _NS("OK"), @"", @"", _bookmarksWindow, nil, nil, nil, nil, @"%@",_NS("Two bookmarks have to be selected."));
         return;
     }
     input_thread_t * p_input = pl_CurrentInput(VLCIntf);
     if (!p_input) {
-        NSBeginCriticalAlertSheet(_NS("No input found"), _NS("OK"), @"", @"", o_bookmarks_window, nil, nil, nil, nil, @"%@",_NS("The stream must be playing or paused for bookmarks to work."));
+        NSBeginCriticalAlertSheet(_NS("No input found"), _NS("OK"), @"", @"", _bookmarksWindow, nil, nil, nil, nil, @"%@",_NS("The stream must be playing or paused for bookmarks to work."));
         return;
     }
 
@@ -290,7 +287,7 @@ clear:
     int i_second = -1;
     int c = 0;
     for (NSUInteger x = 0; c != 2; x++) {
-        if ([o_tbl_dataTable isRowSelected:x]) {
+        if ([_dataTable isRowSelected:x]) {
             if (i_first == -1) {
                 i_first = x;
                 c = 1;
@@ -325,7 +322,7 @@ clear:
     if (!p_input)
         return;
 
-    input_Control(p_input, INPUT_SET_BOOKMARK, [o_tbl_dataTable selectedRow]);
+    input_Control(p_input, INPUT_SET_BOOKMARK, [_dataTable selectedRow]);
 
     vlc_object_release(p_input);
 }
@@ -337,14 +334,14 @@ clear:
     if (!p_input)
         return;
 
-    int i_focused = [o_tbl_dataTable selectedRow];
+    int i_focused = [_dataTable selectedRow];
 
     if (i_focused >= 0)
         input_Control(p_input, INPUT_DEL_BOOKMARK, i_focused);
 
     vlc_object_release(p_input);
 
-    [o_tbl_dataTable reloadData];
+    [_dataTable reloadData];
 }
 
 /*****************************************************************************
@@ -416,17 +413,17 @@ clear:
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
     /* check whether a row is selected and en-/disable the edit/remove buttons */
-    if ([o_tbl_dataTable selectedRow] == -1) {
+    if ([_dataTable selectedRow] == -1) {
         /* no row is selected */
-        [o_btn_edit setEnabled: NO];
-        [o_btn_rm setEnabled: NO];
-        [o_btn_extract setEnabled: NO];
+        [_editButton setEnabled: NO];
+        [_removeButton setEnabled: NO];
+        [_extractButton setEnabled: NO];
     } else {
         /* a row is selected */
-        [o_btn_edit setEnabled: YES];
-        [o_btn_rm setEnabled: YES];
-        if ([o_tbl_dataTable numberOfSelectedRows] == 2)
-            [o_btn_extract setEnabled: YES];
+        [_editButton setEnabled: YES];
+        [_removeButton setEnabled: YES];
+        if ([_dataTable numberOfSelectedRows] == 2)
+            [_extractButton setEnabled: YES];
     }
 }
 
