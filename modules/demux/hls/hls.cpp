@@ -37,6 +37,7 @@
 
 #include "../adaptative/logic/AbstractAdaptationLogic.h"
 #include "HLSManager.hpp"
+#include "HLSStreams.hpp"
 
 #include "playlist/Parser.hpp"
 #include "playlist/M3U8.hpp"

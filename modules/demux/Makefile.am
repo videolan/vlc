@@ -374,6 +374,8 @@ libhls_plugin_la_SOURCES = \
     demux/hls/HLSManager.hpp \
     demux/hls/HLSManager.cpp \
     demux/hls/HLSStreamFormat.hpp \
+    demux/hls/HLSStreams.hpp \
+    demux/hls/HLSStreams.cpp \
     demux/hls/hls.cpp \
     demux/hls/hls.hpp
 

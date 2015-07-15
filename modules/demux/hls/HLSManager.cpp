@@ -23,7 +23,6 @@
 #endif
 
 #include "HLSManager.hpp"
-#include "HLSStreamFormat.hpp"
 #include "../adaptative/logic/RateBasedAdaptationLogic.h"
 #include "../adaptative/tools/Retrieve.hpp"
 #include "playlist/Parser.hpp"
@@ -34,23 +33,6 @@ using namespace adaptative;
 using namespace adaptative::logic;
 using namespace hls;
 using namespace hls::playlist;
-
-AbstractStreamOutput *HLSStreamOutputFactory::create(demux_t *demux, const StreamFormat &format) const
-{
-    unsigned fmt = format;
-    switch(fmt)
-    {
-        case HLSStreamFormat::PACKEDAAC:
-            return new BaseStreamOutput(demux, format, "any");
-            break;
-
-        default:
-        case HLSStreamFormat::UNKNOWN:
-        case HLSStreamFormat::MPEG2TS:
-            return new BaseStreamOutput(demux, format, "ts");
-    }
-    return NULL;
-}
 
 HLSManager::HLSManager(M3U8 *playlist,
                        AbstractStreamOutputFactory *factory,
