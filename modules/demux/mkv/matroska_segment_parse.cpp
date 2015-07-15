@@ -1828,6 +1828,11 @@ int32_t matroska_segment_c::TrackInit( mkv_track_t * p_tk )
     {
         p_tk->fmt.i_codec = VLC_CODEC_BD_PG;
     }
+    else if( !strcmp( p_tk->psz_codec, "D_WEBVTT/SUBTITLES" ) )
+    {
+        p_tk->fmt.i_codec = VLC_CODEC_SUBT;
+        p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
+    }
     else if( !strcmp( p_tk->psz_codec, "B_VOBBTN" ) )
     {
         p_tk->fmt.i_cat = NAV_ES;
