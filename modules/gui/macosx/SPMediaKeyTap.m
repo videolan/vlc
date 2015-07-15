@@ -190,7 +190,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
         id grab = [self grab];
         [grab pauseTapOnTapThread:newSetting];
         NSTimer *timer = [NSTimer timerWithTimeInterval:0 invocation:[grab invocation] repeats:NO];
-        CFRunLoopAddTimer(_tapThreadRL, (CFRunLoopTimerRef)timer, kCFRunLoopCommonModes);
+        CFRunLoopAddTimer(_tapThreadRL, (CFRunLoopTimerRef)CFBridgingRetain(timer), kCFRunLoopCommonModes);
     }
 }
 
