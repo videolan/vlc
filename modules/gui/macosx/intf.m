@@ -513,7 +513,6 @@ audio_output_t *getAout(void)
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
     BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
     BOOL b_active_videoplayback;
-    BOOL b_nativeFullscreenMode;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
 
@@ -528,8 +527,6 @@ audio_output_t *getAout(void)
 
     NSArray *o_usedHotkeys;
 
-    VLCVoutWindowController *o_vout_controller;
-
     InputManager *o_input_manager;
 }
 
@@ -543,9 +540,6 @@ audio_output_t *getAout(void)
  * VLCMain implementation
  *****************************************************************************/
 @implementation VLCMain
-
-@synthesize voutController=o_vout_controller;
-@synthesize nativeFullscreenMode=b_nativeFullscreenMode;
 
 #pragma mark -
 #pragma mark Initialization
@@ -580,7 +574,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"NO" forKey:@"LiveUpdateTheMessagesPanel"];
     [defaults registerDefaults:appDefaults];
 
-    o_vout_controller = [[VLCVoutWindowController alloc] init];
+    _voutController = [[VLCVoutWindowController alloc] init];
 
     return _o_sharedMainInstance;
 }
@@ -650,10 +644,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_remote setDelegate: _o_sharedMainInstance];
 
     /* yeah, we are done */
-    b_nativeFullscreenMode = NO;
+    _nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
     if (!OSX_SNOW_LEOPARD)
-        b_nativeFullscreenMode = var_InheritBool(p_intf, "macosx-nativefullscreenmode");
+        _nativeFullscreenMode = var_InheritBool(p_intf, "macosx-nativefullscreenmode");
 #endif
 
     if (config_GetInt(VLCIntf, "macosx-icon-change")) {
@@ -798,7 +792,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [o_vout_provider_lock lock];
     // closes all open vouts
-    o_vout_controller = nil;
+    _voutController = nil;
     [o_vout_provider_lock unlock];
 
     /* unsubscribe from libvlc's debug messages */
@@ -1224,18 +1218,20 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     bool loop = var_GetBool(p_playlist, "loop");
     bool repeat = var_GetBool(p_playlist, "repeat");
+
+    VLCMainWindowControlsBar *controlsBar = (VLCMainWindowControlsBar *)[o_mainwindow controlsBar];
     if (repeat) {
-        [[o_mainwindow controlsBar] setRepeatOne];
+        [controlsBar setRepeatOne];
         [o_mainmenu setRepeatOne];
     } else if (loop) {
-        [[o_mainwindow controlsBar] setRepeatAll];
+        [controlsBar setRepeatAll];
         [o_mainmenu setRepeatAll];
     } else {
-        [[o_mainwindow controlsBar] setRepeatOff];
+        [controlsBar setRepeatOff];
         [o_mainmenu setRepeatOff];
     }
 
-    [[o_mainwindow controlsBar] setShuffle];
+    [controlsBar setShuffle];
     [o_mainmenu setShuffle];
 }
 

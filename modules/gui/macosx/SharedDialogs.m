@@ -26,16 +26,6 @@
 static VLCEnterTextPanel *_textPanelInstance = nil;
 static VLCSelectItemInPopupPanel *_selectItemPanelInstance = nil;
 
-@interface VLCEnterTextPanel()
-{
-    __unsafe_unretained NSString * _title;
-    __unsafe_unretained NSString * _subtitle;
-    __unsafe_unretained NSString * _okTitle;
-    __unsafe_unretained NSString * _cancelTitle;
-    __unsafe_unretained id _target;
-}
-@end
-
 @implementation VLCEnterTextPanel
 + (VLCEnterTextPanel *)sharedInstance
 {
@@ -49,8 +39,6 @@ static VLCSelectItemInPopupPanel *_selectItemPanelInstance = nil;
 
     return _textPanelInstance;
 }
-
-@synthesize title=_title, subTitle=_subtitle, OKButtonLabel=_okTitle, CancelButtonLabel=_cancelTitle, target=_target;
 
 - (IBAction)windowElementAction:(id)sender
 {
@@ -85,20 +73,7 @@ static VLCSelectItemInPopupPanel *_selectItemPanelInstance = nil;
 
 @end
 
-@interface VLCSelectItemInPopupPanel()
-{
-    __unsafe_unretained NSString * _title;
-    __unsafe_unretained NSString * _subtitle;
-    __unsafe_unretained NSString * _okTitle;
-    __unsafe_unretained NSString * _cancelTitle;
-    __unsafe_unretained NSArray * _popData;
-
-    __unsafe_unretained id _target;
-}
-@end
-
 @implementation VLCSelectItemInPopupPanel
-@synthesize title=_title, subTitle=_subtitle, OKButtonLabel=_okTitle, CancelButtonLabel=_cancelTitle, popupButtonContent=_popData, target=_target;
 
 + (VLCSelectItemInPopupPanel *)sharedInstance
 {

@@ -40,13 +40,8 @@
 
 @interface PLModel ()
 {
-    PLItem *_rootItem;
-
     playlist_t *p_playlist;
     NSOutlineView *_outlineView;
-
-    // TODO: write these objects to the pastboard properly?
-    NSMutableArray *_draggedItems;
 
     // TODO: for transition
     VLCPlaylist *_playlist;
@@ -54,9 +49,6 @@
 @end
 
 @implementation PLModel
-
-@synthesize rootItem=_rootItem;
-@synthesize draggedItems=_draggedItems;
 
 #pragma mark -
 #pragma mark Init and Stuff

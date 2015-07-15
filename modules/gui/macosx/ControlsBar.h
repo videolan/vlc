@@ -36,7 +36,6 @@
 
 @interface VLCControlsBarCommon : NSObject
 {
-    IBOutlet id o_bottombar_view;
     IBOutlet VLCDragDropView *o_drop_view;
 
     IBOutlet id o_play_btn;
@@ -54,7 +53,7 @@
     IBOutlet id o_resize_view;
 }
 
-@property (readonly) id bottomBarView;
+@property (readwrite, strong) IBOutlet id bottomBarView;
 @property (readonly) BOOL darkInterface;
 @property (readonly) BOOL nativeFullscreenMode;
 

@@ -93,18 +93,12 @@ The class is not thread safe
     NSDictionary*   _cookieToButtonMapping;
     CFRunLoopSourceRef     eventSource;
 
-    BOOL _openInExclusiveMode;
-    BOOL _simulatePlusMinusHold;
-    BOOL _processesBacklog;
-
     /* state for simulating plus/minus hold */
     BOOL lastEventSimulatedHold;
     AppleRemoteEventIdentifier lastPlusMinusEvent;
     NSTimeInterval lastPlusMinusEventTime;
 
     int remoteId;
-    unsigned int _clickCountEnabledButtons;
-    NSTimeInterval _maxClickTimeDifference;
     NSTimeInterval lastClickCountEventTime;
     AppleRemoteEventIdentifier lastClickCountEvent;
     unsigned int eventClickCount;

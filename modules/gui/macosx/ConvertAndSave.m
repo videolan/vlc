@@ -46,15 +46,9 @@
 
 @interface VLCConvertAndSave()
 {
-    NSString * _MRL;
-    NSString * _outputDestination;
-    NSArray * _profileNames;
-    NSArray * _profileValueList;
-    NSArray * _videoCodecs;
-    NSArray * _audioCodecs;
-    NSArray * _subsCodecs;
-    NSMutableArray * _currentProfile;
-
+    NSArray *_videoCodecs;
+    NSArray *_audioCodecs;
+    NSArray *_subsCodecs;
     BOOL b_streaming;
 }
 
@@ -70,10 +64,6 @@
 @end
 
 @implementation VLCConvertAndSave
-
-@synthesize MRL=_MRL, outputDestination=_outputDestination, profileNames=_profileNames, profileValueList=_profileValueList, currentProfile=_currentProfile;
-
-@synthesize vidBitrate, vidFramerate, audBitrate, audChannels;
 
 static VLCConvertAndSave *_o_sharedInstance = nil;
 

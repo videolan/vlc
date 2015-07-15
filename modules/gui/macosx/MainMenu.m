@@ -725,7 +725,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-effects-button");
     config_PutInt(VLCIntf, "macosx-show-effects-button", b_value);
-    [[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleEffectsButton];
+    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleEffectsButton];
     [o_mi_toggleEffectsButton setState: b_value];
 }
 
@@ -734,7 +734,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-playback-buttons");
     config_PutInt(VLCIntf, "macosx-show-playback-buttons", b_value);
 
-    [[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleJumpButtons];
+    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleJumpButtons];
     [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
         [[o_window controlsBar] toggleForwardBackwardMode: b_value];
     }];
@@ -746,7 +746,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 {
     BOOL b_value = !config_GetInt(VLCIntf, "macosx-show-playmode-buttons");
     config_PutInt(VLCIntf, "macosx-show-playmode-buttons", b_value);
-    [[[[VLCMain sharedInstance] mainWindow] controlsBar] togglePlaymodeButtons];
+    [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] togglePlaymodeButtons];
     [o_mi_togglePlaymodeButtons setState: b_value];
 }
 

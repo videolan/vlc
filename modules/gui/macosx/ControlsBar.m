@@ -52,8 +52,6 @@
 
 @implementation VLCControlsBarCommon
 
-@synthesize bottomBarView=o_bottombar_view;
-
 - (void)awakeFromNib
 {
     _darkInterface = config_GetInt(VLCIntf, "macosx-interfacestyle");
@@ -87,7 +85,7 @@
     [[o_fullscreen_btn cell] accessibilitySetOverrideValue:[o_fullscreen_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
     if (!_darkInterface) {
-        [o_bottombar_view setImagesLeft: imageFromRes(@"bottom-background") middle: imageFromRes(@"bottom-background") right: imageFromRes(@"bottom-background")];
+        [self.bottomBarView setImagesLeft: imageFromRes(@"bottom-background") middle: imageFromRes(@"bottom-background") right: imageFromRes(@"bottom-background")];
 
         [o_bwd_btn setImage: imageFromRes(@"backward-3btns")];
         [o_bwd_btn setAlternateImage: imageFromRes(@"backward-3btns-pressed")];
@@ -104,7 +102,7 @@
         [o_fullscreen_btn setImage: imageFromRes(@"fullscreen-one-button")];
         [o_fullscreen_btn setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
     } else {
-        [o_bottombar_view setImagesLeft: imageFromRes(@"bottomdark-left") middle: imageFromRes(@"bottom-background_dark") right: imageFromRes(@"bottomdark-right")];
+        [self.bottomBarView setImagesLeft: imageFromRes(@"bottomdark-left") middle: imageFromRes(@"bottom-background_dark") right: imageFromRes(@"bottomdark-right")];
 
         [o_bwd_btn setImage: imageFromRes(@"backward-3btns-dark")];
         [o_bwd_btn setAlternateImage: imageFromRes(@"backward-3btns-dark-pressed")];
@@ -154,7 +152,7 @@
     if (!OSX_SNOW_LEOPARD)
         [o_resize_view setImage: NULL];
 
-    if ([[o_bottombar_view window] styleMask] & NSResizableWindowMask)
+    if ([[self.bottomBarView window] styleMask] & NSResizableWindowMask)
         [o_resize_view removeFromSuperviewWithoutNeedingDisplay];
 
 
@@ -180,7 +178,7 @@
 
 - (CGFloat)height
 {
-    return [o_bottombar_view frame].size.height;
+    return [self.bottomBarView frame].size.height;
 }
 
 - (void)toggleForwardBackwardMode:(BOOL)b_alt
@@ -707,7 +705,7 @@ else \
         }
     }
 
-    [o_bottombar_view setNeedsDisplay:YES];
+    [self.bottomBarView setNeedsDisplay:YES];
 }
 
 - (void)removeEffectsButton:(BOOL)b_fast
@@ -756,7 +754,7 @@ else \
         }
     }
 
-    [o_bottombar_view setNeedsDisplay:YES];
+    [self.bottomBarView setNeedsDisplay:YES];
 }
 
 - (void)toggleJumpButtons
@@ -861,11 +859,11 @@ else \
 
     // wait until the animation is done, if displayed
     if (b_fast) {
-        [o_bottombar_view addSubview:o_prev_btn];
-        [o_bottombar_view addSubview:o_next_btn];
+        [self.bottomBarView addSubview:o_prev_btn];
+        [self.bottomBarView addSubview:o_next_btn];
     } else {
-        [o_bottombar_view performSelector:@selector(addSubview:) withObject:o_prev_btn afterDelay:.2];
-        [o_bottombar_view performSelector:@selector(addSubview:) withObject:o_next_btn afterDelay:.2];
+        [self.bottomBarView performSelector:@selector(addSubview:) withObject:o_prev_btn afterDelay:.2];
+        [self.bottomBarView performSelector:@selector(addSubview:) withObject:o_next_btn afterDelay:.2];
     }
 
     [self toggleForwardBackwardMode: YES];
@@ -938,7 +936,7 @@ else \
 
     [self toggleForwardBackwardMode: NO];
 
-    [o_bottombar_view setNeedsDisplay:YES];
+    [self.bottomBarView setNeedsDisplay:YES];
 }
 
 - (void)togglePlaymodeButtons

@@ -49,7 +49,6 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
 #pragma mark -
 @implementation PXSourceList
 
-@synthesize iconSize = _iconSize;
 @dynamic dataSource;
 @dynamic delegate;
 

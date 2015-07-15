@@ -79,9 +79,7 @@
     IBOutlet id o_http_chkbox;
     IBOutlet id o_file_chkbox;
 }
-@property (readwrite, retain) NSArray * soutMRL;
-
-- (void)setTranscode:(NSString *)o_transcode_string;
+@property (readwrite, retain) NSArray *soutMRL;
 
 - (void)initStrings;
 

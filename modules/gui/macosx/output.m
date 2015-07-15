@@ -40,18 +40,16 @@
 
 @interface VLCOutput()
 {
-    NSArray *o_mrl;
     NSString *o_transcode;
 }
 @end
 
 @implementation VLCOutput
-@synthesize soutMRL=o_mrl;
 
 - (id)init
 {
     self = [super init];
-    o_mrl = [[NSArray alloc] init];
+    _soutMRL = [[NSArray alloc] init];
     o_transcode = [[NSString alloc] init];
     return self;
 }

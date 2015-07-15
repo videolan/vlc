@@ -388,13 +388,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 @interface VLCConfigControl()
 {
     char            *psz_name;
-    int             i_type;
-    bool      b_advanced;
 }
 @end
 
 @implementation VLCConfigControl
-@synthesize type = i_type, advanced = b_advanced;
 
 - (id)initWithFrame:(NSRect)frame
 {
@@ -410,8 +407,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self != nil) {
         _p_item = p_item;
         psz_name = p_item->psz_name;
-        i_type = p_item->i_type;
-        b_advanced = p_item->b_advanced;
+        _type = p_item->i_type;
+        _advanced = p_item->b_advanced;
         [self setAutoresizingMask:NSViewWidthSizable | NSViewMinYMargin ];
     }
     return (self);

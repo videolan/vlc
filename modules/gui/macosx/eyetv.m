@@ -28,16 +28,7 @@
 /* for various VLC core related calls */
 #import "intf.h"
 
-@interface VLCEyeTVController()
-{
-    BOOL b_eyeTVactive;
-    BOOL b_deviceConnected;
-}
-@end
-
 @implementation VLCEyeTVController
-
-@synthesize eyeTVRunning = b_eyeTVactive, deviceConnected = b_deviceConnected;
 
 static VLCEyeTVController *_o_sharedInstance = nil;
 
@@ -66,15 +57,15 @@ static VLCEyeTVController *_o_sharedInstance = nil;
 {
     /* update our info on the used device */
     if ([[theNotification name] isEqualToString: @"DeviceAdded"])
-        b_deviceConnected = YES;
+        _deviceConnected = YES;
     if ([[theNotification name] isEqualToString: @"DeviceRemoved"])
-        b_deviceConnected = NO;
+        _deviceConnected = NO;
 
     /* is eyetv running? */
     if ([[theNotification name] isEqualToString: @"PluginInit"])
-        b_eyeTVactive = YES;
+        _eyeTVRunning = YES;
     if ([[theNotification name] isEqualToString: @"PluginQuit"])
-        b_eyeTVactive = NO;
+        _eyeTVRunning = NO;
 }
 
 - (void)launchEyeTV

@@ -64,8 +64,6 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 @implementation AppleRemote
 
-@synthesize openInExclusiveMode = _openInExclusiveMode, clickCountEnabledButtons = _clickCountEnabledButtons, maximumClickCountTimeDifference = _maxClickTimeDifference, processesBacklog=_processesBacklog, simulatesPlusMinusHold = _simulatePlusMinusHold;
-
 #pragma public interface
 
 static AppleRemote *_o_sharedInstance = nil;
@@ -107,8 +105,8 @@ static AppleRemote *_o_sharedInstance = nil;
         _cookieToButtonMapping = [[NSDictionary alloc] initWithDictionary: mutableCookieToButtonMapping];
 
         /* defaults */
-        _simulatePlusMinusHold = YES;
-        _maxClickTimeDifference = DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE;
+        _simulatesPlusMinusHold = YES;
+        _maximumClickCountTimeDifference = DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE;
     }
 
     return _o_sharedInstance;
@@ -361,7 +359,7 @@ static AppleRemote* sharedInstance=nil;
             }
             [self performSelector: @selector(executeClickCountEvent:)
                        withObject: [NSArray arrayWithObjects: eventNumber, timeNumber, nil]
-                       afterDelay: _maxClickTimeDifference];
+                       afterDelay: _maximumClickCountTimeDifference];
         } else {
             [delegate appleRemoteButton:event pressedDown: pressedDown clickCount:1];
         }

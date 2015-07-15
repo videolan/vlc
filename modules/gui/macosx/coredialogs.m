@@ -35,15 +35,12 @@
 @interface VLCCoreDialogProvider()
 {
     ErrorWindowController *o_error_panel;
-    BOOL b_progress_cancelled;
 }
 @end
 
 @implementation VLCCoreDialogProvider
 
 static VLCCoreDialogProvider *_o_sharedInstance = nil;
-
-@synthesize progressCancelled=b_progress_cancelled;
 
 + (VLCCoreDialogProvider *)sharedInstance
 {
@@ -54,7 +51,7 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 {
     if (!_o_sharedInstance) {
         _o_sharedInstance = [super init];
-        b_progress_cancelled = NO;
+        _progressCancelled = NO;
     }
 
     return _o_sharedInstance;

@@ -15,23 +15,14 @@
 
 @implementation SideBarItem
 
-@synthesize title;
-@synthesize untranslatedTitle;
-@synthesize identifier;
-@synthesize icon;
-@synthesize badgeValue;
-@synthesize children;
-@synthesize sdtype;
-
 #pragma mark -
 #pragma mark Init/Dealloc/Finalize
 
 - (id)init
 {
-    if(self=[super init])
-    {
-        badgeValue = -1; //We don't want a badge value by default
-        sdtype = -1; //no sd type set
+    if (self=[super init]) {
+        _badgeValue = -1; //We don't want a badge value by default
+        _sdtype = -1; //no sd type set
     }
 
     return self;
@@ -63,17 +54,17 @@
 
 - (BOOL)hasBadge
 {
-    return badgeValue!=-1;
+    return _badgeValue!=-1;
 }
 
 - (BOOL)hasChildren
 {
-    return [children count]>0;
+    return [_children count]>0;
 }
 
 - (BOOL)hasIcon
 {
-    return icon!=nil;
+    return _icon!=nil;
 }
 
 @end

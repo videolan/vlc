@@ -317,15 +317,10 @@ static bool b_old_spaces_style = YES;
 @interface VLCDragDropView()
 {
     bool b_activeDragAndDrop;
-
-    __unsafe_unretained id _dropHandler;
 }
 @end
 
 @implementation VLCDragDropView
-
-@synthesize dropHandler=_dropHandler;
-@synthesize drawBorder;
 
 - (id)initWithFrame:(NSRect)frame
 {
@@ -592,15 +587,7 @@ void _drawFrameInRect(NSRect frameRect)
  * VLCVolumeSliderCommon
  *****************************************************************************/
 
-@interface VLCVolumeSliderCommon()
-{
-    BOOL _usesBrightArtwork;
-}
-@end
-
 @implementation VLCVolumeSliderCommon : NSSlider
-
-@synthesize usesBrightArtwork = _usesBrightArtwork;
 
 - (void)scrollWheel:(NSEvent *)o_event
 {

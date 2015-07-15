@@ -41,13 +41,6 @@
 @implementation VLCVideoEffects
 static VLCVideoEffects *_o_sharedInstance = nil;
 
-@synthesize cropLeftValue, cropTopValue, cropRightValue, cropBottomValue;
-@synthesize puzzleRowsValue, puzzleColumnsValue;
-@synthesize wallRowsValue, wallColumnsValue;
-@synthesize cloneValue;
-@synthesize sepiaValue;
-@synthesize posterizeValue;
-
 + (VLCVideoEffects *)sharedInstance
 {
     return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];

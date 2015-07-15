@@ -86,9 +86,7 @@ typedef enum {
 @property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;
 
-@property (readonly) VLCFSPanel* fsPanel;
-
-- (VLCMainWindowControlsBar *)controlsBar;
+@property (readonly) VLCFSPanel* fspanel;
 
 - (void)changePlaylistState:(VLCPlaylistStateEvent)event;
 

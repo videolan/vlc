@@ -69,19 +69,15 @@ static const float f_min_video_height = 70.0;
  *****************************************************************************/
 
 @interface VLCVideoWindowCommon : VLCWindow <NSWindowDelegate, NSAnimationDelegate>
-{
-    IBOutlet VLCMainWindowTitleView *o_titlebar_view; // only set in main or detached window
-    IBOutlet __unsafe_unretained VLCVoutView *o_video_view;
-    IBOutlet VLCControlsBarCommon *o_controls_bar;
-}
 
-@property (nonatomic, assign) VLCVoutView* videoView;
-@property (readonly) VLCControlsBarCommon* controlsBar;
+@property (nonatomic, weak) IBOutlet VLCMainWindowTitleView *titlebarView; // only set in main or detached window
+@property (nonatomic, weak) IBOutlet VLCVoutView* videoView;
+@property (nonatomic, weak) IBOutlet VLCControlsBarCommon* controlsBar;
 @property (readonly) BOOL inFullscreenTransition;
 @property (readonly) BOOL darkInterface;
 @property (readonly) BOOL windowShouldExitFullscreenWhenFinished;
 @property (readwrite, assign) NSRect previousSavedFrame;
-@property (readwrite, assign) NSSize nativeVideoSize;
+@property (nonatomic, readwrite, assign) NSSize nativeVideoSize;
 
 - (void)setWindowLevel:(NSInteger)i_state;
 - (void)resizeWindow;

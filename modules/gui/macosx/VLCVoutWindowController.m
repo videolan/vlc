@@ -46,7 +46,6 @@
     // save the status level if at least one video window is on status level
     NSUInteger i_statusLevelWindowCounter;
     NSInteger i_currentWindowLevel;
-    NSInteger i_currentFloatingWindowLevel;
 
     BOOL b_mainwindow_has_video;
 }
@@ -60,7 +59,7 @@
     o_vout_dict = [[NSMutableDictionary alloc] init];
     o_keyboard_backlight = [[KeyboardBacklight alloc] init];
     i_currentWindowLevel = NSNormalWindowLevel;
-    i_currentFloatingWindowLevel = NSFloatingWindowLevel;
+    _currentStatusWindowLevel = NSFloatingWindowLevel;
     return self;
 }
 
@@ -420,22 +419,21 @@
 
     i_currentWindowLevel = i_level;
     if (i_level == NSNormalWindowLevel) {
-        i_currentFloatingWindowLevel = NSFloatingWindowLevel;
+        _currentStatusWindowLevel = NSFloatingWindowLevel;
     } else {
-        i_currentFloatingWindowLevel = i_level + 1;
+        _currentStatusWindowLevel = i_level + 1;
     }
+
+    NSInteger currentStatusWindowLevel = self.currentStatusWindowLevel;
 
     [[VLCMainWindow sharedInstance] setWindowLevel:i_level];
 
-    [[VLCVideoEffects sharedInstance] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
-    [[VLCAudioEffects sharedInstance] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
-    [[[VLCMain sharedInstance] info] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
-    [[VLCBookmarks sharedInstance] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
-    [[VLCTrackSynchronization sharedInstance] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
-
-    [[[VLCMain sharedInstance] resumeDialog] updateCocoaWindowLevel:i_currentFloatingWindowLevel];
+    [[VLCVideoEffects sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[VLCAudioEffects sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[[VLCMain sharedInstance] info] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[VLCBookmarks sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[VLCTrackSynchronization sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[[VLCMain sharedInstance] resumeDialog] updateCocoaWindowLevel:currentStatusWindowLevel];
 }
-
-@synthesize currentStatusWindowLevel=i_currentFloatingWindowLevel;
 
 @end

@@ -94,8 +94,6 @@ struct display_info_t
 
 @implementation VLCOpen
 
-@synthesize fileSubDelay, fileSubFps;
-
 #pragma mark -
 #pragma mark Init
 

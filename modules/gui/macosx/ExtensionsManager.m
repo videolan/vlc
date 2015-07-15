@@ -41,7 +41,6 @@
 
     NSMutableDictionary *p_extDict;
 
-    BOOL b_unloading;  ///< Work around threads + emit issues, see isUnloading
     BOOL b_failed; ///< Flag set to true if we could not load the module
 
     id <ExtensionsDelegate> delegate;
@@ -51,8 +50,6 @@
 @implementation ExtensionsManager
 
 static ExtensionsManager* instance = nil;
-
-@synthesize isUnloading = b_unloading;
 
 + (ExtensionsManager *)getInstance:(intf_thread_t *)_p_intf
 {
@@ -70,7 +67,7 @@ static ExtensionsManager* instance = nil;
 
         p_extDict = [[NSMutableDictionary alloc] init];
 
-        b_unloading = false;
+        _isUnloading = false;
         b_failed = false;
 
         delegate = nil;
@@ -203,7 +200,7 @@ static ExtensionsManager* instance = nil;
             [delegate extensionsUpdated];
             return false;
         }
-        b_unloading = false;
+        _isUnloading = false;
     }
     b_failed = false;
     [delegate extensionsUpdated];
@@ -214,7 +211,7 @@ static ExtensionsManager* instance = nil;
 {
     if (!p_extensions_manager)
         return;
-    b_unloading = true;
+    _isUnloading = true;
     module_unneed(p_extensions_manager, p_extensions_manager->p_module);
     vlc_object_release(p_extensions_manager);
     p_extensions_manager = NULL;
@@ -336,7 +333,7 @@ static ExtensionsManager* instance = nil;
 
 - (BOOL)cannotLoad
 {
-    return b_unloading || b_failed;
+    return self.isUnloading || b_failed;
 }
 
 @end

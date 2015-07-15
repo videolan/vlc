@@ -429,8 +429,6 @@ error:
 
 @interface VLCInfoTreeItem ()
 {
-    NSString *_name;
-    NSString *_value;
     int i_object_id;
     input_item_t * p_item;
     VLCInfoTreeItem *_parent;
@@ -441,8 +439,6 @@ error:
 @end
 
 @implementation VLCInfoTreeItem
-
-@synthesize name = _name, value = _value;
 
 - (id)initWithName:(NSString *)item_name
              value:(NSString *)item_value

@@ -46,8 +46,6 @@
  *****************************************************************************/
 @implementation VLCControls
 
-@synthesize jumpTimeValue;
-
 - (void)awakeFromNib
 {
     [o_specificTime_mi setTitle: _NS("Jump to Time")];

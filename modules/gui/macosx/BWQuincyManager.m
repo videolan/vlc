@@ -54,11 +54,6 @@
 
 @implementation BWQuincyManager
 
-@synthesize submissionURL = _submissionURL;
-@synthesize companyName = _companyName;
-@synthesize appIdentifier = _appIdentifier;
-@synthesize autoSubmitCrashReport = _autoSubmitCrashReport;
-
 + (BWQuincyManager *)sharedQuincyManager {
   static BWQuincyManager *quincyManager = nil;
 
