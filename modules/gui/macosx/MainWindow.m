@@ -244,9 +244,10 @@ static VLCMainWindow *sharedInstance = nil;
     // select playlist item by default
     [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
 
+    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
     if (self.darkInterface) {
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidResizeNotification object: nil];
-        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidMoveNotification object: nil];
+        [defaultCenter addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidResizeNotification object: nil];
+        [defaultCenter addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidMoveNotification object: nil];
 
         [self setBackgroundColor: [NSColor clearColor]];
         [self setOpaque: NO];
@@ -280,10 +281,10 @@ static VLCMainWindow *sharedInstance = nil;
         [o_sidebar_scrollview setBorderType: NSNoBorder];
     }
 
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(mainSplitViewDidResizeSubviews:) name: NSSplitViewDidResizeSubviewsNotification object:o_split_view];
+    [defaultCenter addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
+    [defaultCenter addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
+    [defaultCenter addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
+    [defaultCenter addObserver: self selector: @selector(mainSplitViewDidResizeSubviews:) name: NSSplitViewDidResizeSubviewsNotification object:o_split_view];
 
     if (b_splitviewShouldBeHidden) {
         [self hideSplitView: YES];
@@ -291,7 +292,7 @@ static VLCMainWindow *sharedInstance = nil;
     }
 
     /* sanity check for the window size */
-    NSRect frame = [self frame];
+    frame = [self frame];
     NSSize screenSize = [[self screen] frame].size;
     if (screenSize.width <= frame.size.width || screenSize.height <= frame.size.height) {
         self.nativeVideoSize = screenSize;
