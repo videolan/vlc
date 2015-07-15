@@ -616,8 +616,6 @@ modules/gui/macosx/VLCVoutWindowController.h
 modules/gui/macosx/VLCVoutWindowController.m
 modules/gui/macosx/Windows.h
 modules/gui/macosx/Windows.m
-modules/gui/macosx/wizard.h
-modules/gui/macosx/wizard.m
 modules/gui/minimal_macosx/intf.h
 modules/gui/minimal_macosx/intf.m
 modules/gui/minimal_macosx/macosx.c
