@@ -142,6 +142,7 @@ namespace adaptative
         virtual void sendToDecoder(mtime_t); /* reimpl */
         virtual bool reinitsOnSeek() const; /* reimpl */
         virtual bool switchAllowed() const; /* reimpl */
+        void setTimestampOffset(mtime_t);
 
     protected:
         es_out_t *fakeesout; /* to intercept/proxy what is sent from demuxstream */
@@ -149,6 +150,7 @@ namespace adaptative
         bool      seekable;
         std::string name;
         bool      restarting;
+        mtime_t   timestamps_offset;
 
     private:
         static es_out_id_t *esOutAdd(es_out_t *, const es_format_t *);

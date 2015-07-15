@@ -308,6 +308,7 @@ BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, c
     restarting = false;
     demuxstream = NULL;
     b_drop = false;
+    timestamps_offset = VLC_TS_INVALID;
 
     fakeesout = new es_out_t;
     if (!fakeesout)
@@ -466,6 +467,13 @@ void BaseStreamOutput::sendToDecoderUnlocked(mtime_t nzdeadline)
     }
 }
 
+void BaseStreamOutput::setTimestampOffset(mtime_t offset)
+{
+    vlc_mutex_lock(&lock);
+    timestamps_offset = VLC_TS_0 + offset;
+    vlc_mutex_unlock(&lock);
+}
+
 BaseStreamOutput::Demuxed::Demuxed(es_out_id_t *id, const es_format_t *fmt)
 {
     p_queue = NULL;
@@ -551,6 +559,15 @@ int BaseStreamOutput::esOutSend(es_out_t *fakees, es_out_id_t *p_es, block_t *p_
     }
     else
     {
+        if( me->timestamps_offset > VLC_TS_INVALID )
+        {
+            if(p_block->i_dts > VLC_TS_INVALID)
+                p_block->i_dts += (me->timestamps_offset - VLC_TS_0);
+
+            if(p_block->i_pts > VLC_TS_INVALID)
+                p_block->i_pts += (me->timestamps_offset - VLC_TS_0);
+        }
+
         std::list<Demuxed *>::const_iterator it;
         for(it=me->queues.begin(); it!=me->queues.end();++it)
         {
@@ -604,17 +621,21 @@ int BaseStreamOutput::esOutControl(es_out_t *fakees, int i_query, va_list args)
     BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
     if (i_query == ES_OUT_SET_PCR )
     {
-        vlc_mutex_lock(&me->lock);
-        me->pcr = (int64_t)va_arg( args, int64_t );
-        vlc_mutex_unlock(&me->lock);
+        vlc_mutex_lock(&lock);
+        pcr = (int64_t)va_arg( args, int64_t );
+        if(me->pcr > VLC_TS_INVALID && me->timestamps_offset > VLC_TS_INVALID)
+            me->pcr += (me->timestamps_offset - VLC_TS_0);
+        vlc_mutex_unlock(&lock);
         return VLC_SUCCESS;
     }
     else if( i_query == ES_OUT_SET_GROUP_PCR )
     {
-        vlc_mutex_lock(&me->lock);
+        vlc_mutex_lock(&lock);
         me->group = (int) va_arg( args, int );
         me->pcr = (int64_t)va_arg( args, int64_t );
-        vlc_mutex_unlock(&me->lock);
+        if(me->pcr > VLC_TS_INVALID && me->timestamps_offset > VLC_TS_INVALID)
+            me->pcr += (me->timestamps_offset - VLC_TS_0);
+        vlc_mutex_unlock(&lock);
         return VLC_SUCCESS;
     }
     else if( i_query == ES_OUT_GET_ES_STATE )
