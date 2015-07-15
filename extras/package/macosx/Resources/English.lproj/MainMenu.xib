@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">14D136</string>
+		<string key="IBDocument.SystemVersion">14E46</string>
 		<string key="IBDocument.InterfaceBuilderVersion">7706</string>
-		<string key="IBDocument.AppKitVersion">1347.57</string>
+		<string key="IBDocument.AppKitVersion">1348.17</string>
 		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -381,15 +381,6 @@
 									<bool key="NSIsSeparator">YES</bool>
 									<string key="NSTitle"/>
 									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="447396056"/>
-									<reference key="NSMixedImage" ref="100133332"/>
-								</object>
-								<object class="NSMenuItem" id="630566305">
-									<reference key="NSMenu" ref="1050252183"/>
-									<string key="NSTitle">Streaming/Exporting Wizard...</string>
-									<string key="NSKeyEquiv">W</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="447396056"/>
@@ -1755,7 +1746,7 @@
 				</object>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="500944643">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSTextField" id="855729941">
@@ -1763,7 +1754,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{-3, 79}, {240, 17}}</string>
 							<reference key="NSSuperview" ref="500944643"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="255325351">
 								<int key="NSCellFlags">67108864</int>
@@ -1802,7 +1792,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{20, 52}, {159, 19}}</string>
 							<reference key="NSSuperview" ref="500944643"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="14047052">
 								<int key="NSCellFlags">-1804599231</int>
@@ -1839,7 +1828,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{150, 13}, {84, 28}}</string>
 							<reference key="NSSuperview" ref="500944643"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="96901269">
 								<int key="NSCellFlags">67108864</int>
@@ -1862,7 +1850,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{185, 50}, {15, 22}}</string>
 							<reference key="NSSuperview" ref="500944643"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSStepperCell" key="NSCell" id="789174514">
 								<int key="NSCellFlags">786464</int>
@@ -1880,7 +1867,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{68, 13}, {84, 28}}</string>
 							<reference key="NSSuperview" ref="500944643"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="20272293">
 								<int key="NSCellFlags">67108864</int>
@@ -1903,7 +1889,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{203, 54}, {34, 14}}</string>
 							<reference key="NSSuperview" ref="500944643"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="621474557">
 								<int key="NSCellFlags">67108864</int>
@@ -1919,8 +1904,6 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{249, 103}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 777}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
@@ -2061,7 +2044,7 @@
 				<string key="NSClassName">VLCMainMenu</string>
 			</object>
 			<object class="NSCustomView" id="560875128">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSTextField" id="103751139">
@@ -2069,7 +2052,6 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{19, 35}, {271, 18}}</string>
 						<reference key="NSSuperview" ref="560875128"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="385075814">
 							<int key="NSCellFlags">68157504</int>
@@ -2092,7 +2074,6 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{19, 35}, {273, 18}}</string>
 						<reference key="NSSuperview" ref="560875128"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="678671392">
 							<int key="NSCellFlags">605028416</int>
@@ -2115,7 +2096,6 @@
 						<int key="NSvFlags">12</int>
 						<string key="NSFrame">{{156, 11}, {5, 8}}</string>
 						<reference key="NSSuperview" ref="560875128"/>
-						<reference key="NSWindow"/>
 						<string key="NSOffsets">{0, 0}</string>
 						<object class="NSTextFieldCell" key="NSTitleCell">
 							<int key="NSCellFlags">67108864</int>
@@ -2144,7 +2124,6 @@
 						<int key="NSvFlags">265</int>
 						<string key="NSFrame">{{101.5, 19}, {115.5, 14}}</string>
 						<reference key="NSSuperview" ref="560875128"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="923605742">
 							<int key="NSCellFlags">68157504</int>
@@ -2163,7 +2142,6 @@
 						<int key="NSvFlags">265</int>
 						<string key="NSFrame">{{211, 19}, {79, 14}}</string>
 						<reference key="NSSuperview" ref="560875128"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="908114002">
 							<int key="NSCellFlags">68157504</int>
@@ -2182,7 +2160,6 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{27, 19}, {77, 14}}</string>
 						<reference key="NSSuperview" ref="560875128"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="647762012">
 							<int key="NSCellFlags">605028416</int>
@@ -2201,7 +2178,6 @@
 						<int key="NSvFlags">298</int>
 						<string key="NSFrame">{{28, 3}, {261, 16}}</string>
 						<reference key="NSSuperview" ref="560875128"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSliderCell" key="NSCell" id="819871674">
 							<int key="NSCellFlags">-1543241472</int>
@@ -2221,8 +2197,6 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{307, 53}</string>
-				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomView" id="455649453">
@@ -3121,14 +3095,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_mi_open_wizard</string>
-						<reference key="source" ref="651263286"/>
-						<reference key="destination" ref="630566305"/>
-					</object>
-					<int key="connectionID">4500</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_mi_paste</string>
 						<reference key="source" ref="651263286"/>
 						<reference key="destination" ref="73532346"/>
@@ -3614,14 +3580,6 @@
 						<reference key="destination" ref="803013150"/>
 					</object>
 					<int key="connectionID">4588</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">showWizard:</string>
-						<reference key="source" ref="651263286"/>
-						<reference key="destination" ref="630566305"/>
-					</object>
-					<int key="connectionID">4589</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -4671,7 +4629,6 @@
 							<reference ref="935741430"/>
 							<reference ref="47280649"/>
 							<reference ref="754650504"/>
-							<reference ref="630566305"/>
 							<reference ref="502289002"/>
 							<reference ref="571184165"/>
 							<reference ref="252497091"/>
@@ -4715,11 +4672,6 @@
 					<object class="IBObjectRecord">
 						<int key="objectID">1600</int>
 						<reference key="object" ref="754650504"/>
-						<reference key="parent" ref="1050252183"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">2306</int>
-						<reference key="object" ref="630566305"/>
 						<reference key="parent" ref="1050252183"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -6210,7 +6162,6 @@
 				<string key="2249.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="2298.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="2300.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="2306.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="2307.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="234.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="2390.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -6666,7 +6617,7 @@
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="o_bottombar_view">id</string>
+						<string key="bottomBarView">id</string>
 						<string key="o_bwd_btn">id</string>
 						<string key="o_drop_view">VLCDragDropView</string>
 						<string key="o_fullscreen_btn">id</string>
@@ -6681,8 +6632,8 @@
 						<string key="o_time_sld_fancygradient_view">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="o_bottombar_view">
-							<string key="name">o_bottombar_view</string>
+						<object class="IBToOneOutletInfo" key="bottomBarView">
+							<string key="name">bottomBarView</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="o_bwd_btn">
@@ -6850,7 +6801,6 @@
 						<string key="showPlaylist:">id</string>
 						<string key="showTrackSynchronization:">id</string>
 						<string key="showVideoEffects:">id</string>
-						<string key="showWizard:">id</string>
 						<string key="switchSubtitleBackgroundOpacity:">id</string>
 						<string key="switchSubtitleOption:">id</string>
 						<string key="telxNavLink:">id</string>
@@ -6987,10 +6937,6 @@
 						</object>
 						<object class="IBActionInfo" key="showVideoEffects:">
 							<string key="name">showVideoEffects:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="showWizard:">
-							<string key="name">showWizard:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="switchSubtitleBackgroundOpacity:">
@@ -7133,7 +7079,6 @@
 						<string key="o_mi_open_generic">NSMenuItem</string>
 						<string key="o_mi_open_net">NSMenuItem</string>
 						<string key="o_mi_open_recent">NSMenuItem</string>
-						<string key="o_mi_open_wizard">NSMenuItem</string>
 						<string key="o_mi_paste">NSMenuItem</string>
 						<string key="o_mi_play">NSMenuItem</string>
 						<string key="o_mi_player">NSMenuItem</string>
@@ -7467,10 +7412,6 @@
 						</object>
 						<object class="IBToOneOutletInfo" key="o_mi_open_recent">
 							<string key="name">o_mi_open_recent</string>
-							<string key="candidateClassName">NSMenuItem</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_mi_open_wizard">
-							<string key="name">o_mi_open_wizard</string>
 							<string key="candidateClassName">NSMenuItem</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="o_mi_paste">
@@ -7915,7 +7856,6 @@
 						<string key="showPlaylist:">id</string>
 						<string key="showTrackSynchronization:">id</string>
 						<string key="showVideoEffects:">id</string>
-						<string key="showWizard:">id</string>
 						<string key="switchSubtitleBackgroundOpacity:">id</string>
 						<string key="switchSubtitleOption:">id</string>
 						<string key="telxNavLink:">id</string>
@@ -8052,10 +7992,6 @@
 						</object>
 						<object class="IBActionInfo" key="showVideoEffects:">
 							<string key="name">showVideoEffects:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="showWizard:">
-							<string key="name">showWizard:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="switchSubtitleBackgroundOpacity:">
@@ -8718,21 +8654,21 @@
 					<string key="className">VLCVideoWindowCommon</string>
 					<string key="superclassName">VLCWindow</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="o_controls_bar">VLCControlsBarCommon</string>
-						<string key="o_titlebar_view">VLCMainWindowTitleView</string>
-						<string key="o_video_view">VLCVoutView</string>
+						<string key="controlsBar">VLCControlsBarCommon</string>
+						<string key="titlebarView">VLCMainWindowTitleView</string>
+						<string key="videoView">VLCVoutView</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="o_controls_bar">
-							<string key="name">o_controls_bar</string>
+						<object class="IBToOneOutletInfo" key="controlsBar">
+							<string key="name">controlsBar</string>
 							<string key="candidateClassName">VLCControlsBarCommon</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_titlebar_view">
-							<string key="name">o_titlebar_view</string>
+						<object class="IBToOneOutletInfo" key="titlebarView">
+							<string key="name">titlebarView</string>
 							<string key="candidateClassName">VLCMainWindowTitleView</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_video_view">
-							<string key="name">o_video_view</string>
+						<object class="IBToOneOutletInfo" key="videoView">
+							<string key="name">videoView</string>
 							<string key="candidateClassName">VLCVoutView</string>
 						</object>
 					</dictionary>

@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">14B25</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
-		<string key="IBDocument.AppKitVersion">1343.16</string>
-		<string key="IBDocument.HIToolboxVersion">755.00</string>
+		<string key="IBDocument.SystemVersion">14E46</string>
+		<string key="IBDocument.InterfaceBuilderVersion">7706</string>
+		<string key="IBDocument.AppKitVersion">1348.17</string>
+		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6254</string>
+			<string key="NS.object.0">7706</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -29,7 +29,7 @@
 		<dictionary class="NSMutableDictionary" key="IBDocument.Metadata"/>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">NSObject</string>
+				<string key="NSClassName">VLCTrackSynchronization</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
@@ -47,7 +47,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="1006">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSBox" id="416275888">
@@ -63,7 +63,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{15, 16}, {239, 14}}</string>
 											<reference key="NSSuperview" ref="103010271"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="498497333"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="827348791">
@@ -96,9 +95,8 @@
 										<object class="NSTextField" id="498497333">
 											<reference key="NSNextResponder" ref="103010271"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{259, 14}, {76, 19}}</string>
+											<string key="NSFrame">{{261, 14}, {76, 19}}</string>
 											<reference key="NSSuperview" ref="103010271"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="483165134"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="339403913">
@@ -179,9 +177,8 @@
 										<object class="NSStepper" id="483165134">
 											<reference key="NSNextResponder" ref="103010271"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{341, 12}, {15, 22}}</string>
+											<string key="NSFrame">{{343, 12}, {15, 22}}</string>
 											<reference key="NSSuperview" ref="103010271"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="623990527"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSStepperCell" key="NSCell" id="251177671">
@@ -199,13 +196,11 @@
 									</array>
 									<string key="NSFrame">{{1, 1}, {372, 45}}</string>
 									<reference key="NSSuperview" ref="416275888"/>
-									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="927318749"/>
 								</object>
 							</array>
 							<string key="NSFrame">{{13, 156}, {374, 47}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="103010271"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
@@ -243,7 +238,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{15, 79}, {241, 14}}</string>
 											<reference key="NSSuperview" ref="327003328"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="217063425"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="53850351">
@@ -263,7 +257,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{261, 76}, {76, 19}}</string>
 											<reference key="NSSuperview" ref="327003328"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="488437164"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="843835699">
@@ -327,7 +320,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{343, 74}, {15, 22}}</string>
 											<reference key="NSSuperview" ref="327003328"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="1031205444"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSStepperCell" key="NSCell" id="200523684">
@@ -347,7 +339,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{15, 47}, {241, 14}}</string>
 											<reference key="NSSuperview" ref="327003328"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="23746054"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="432856306">
@@ -367,7 +358,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{261, 45}, {76, 19}}</string>
 											<reference key="NSSuperview" ref="327003328"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="88930968"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="646109661">
@@ -429,7 +419,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{15, 16}, {241, 14}}</string>
 											<reference key="NSSuperview" ref="327003328"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="1063711207"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="888222676">
@@ -449,7 +438,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{261, 14}, {76, 19}}</string>
 											<reference key="NSSuperview" ref="327003328"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="928847853"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="336699547">
@@ -512,7 +500,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{343, 43}, {15, 22}}</string>
 											<reference key="NSSuperview" ref="327003328"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="934030007"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSStepperCell" key="NSCell" id="914650403">
@@ -532,7 +519,6 @@
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{343, 13}, {15, 22}}</string>
 											<reference key="NSSuperview" ref="327003328"/>
-											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="935777657"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSStepperCell" key="NSCell" id="482735072">
@@ -549,13 +535,11 @@
 									</array>
 									<string key="NSFrame">{{1, 1}, {374, 107}}</string>
 									<reference key="NSSuperview" ref="729041203"/>
-									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="662764430"/>
 								</object>
 							</array>
 							<string key="NSFrame">{{13, 32}, {376, 109}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="327003328"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
@@ -577,7 +561,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{21, 140}, {366, 14}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="857991618"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="486082572">
@@ -597,7 +580,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{21, 201}, {366, 14}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="729041203"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="8830534">
@@ -617,7 +599,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{16, 12}, {73, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="176843412">
 								<int key="NSCellFlags">67108864</int>
@@ -684,252 +665,215 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 						</object>
 					</array>
 					<string key="NSFrameSize">{399, 224}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="416275888"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1027}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1417}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">SyncTracks</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
-			</object>
-			<object class="NSCustomObject" id="104752597">
-				<string key="NSClassName">VLCTrackSynchronization</string>
 			</object>
 		</array>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<array key="connectionRecords">
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="498497333"/>
-						<reference key="destination" ref="104752597"/>
-					</object>
-					<int key="connectionID">82</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="217063425"/>
-						<reference key="destination" ref="104752597"/>
-					</object>
-					<int key="connectionID">83</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="23746054"/>
-						<reference key="destination" ref="104752597"/>
-					</object>
-					<int key="connectionID">84</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_reset_btn</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="857991618"/>
-					</object>
-					<int key="connectionID">53</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_av_lbl</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="623990527"/>
-					</object>
-					<int key="connectionID">54</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_av_advance_lbl</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="927318749"/>
-					</object>
-					<int key="connectionID">55</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_av_value_fld</string>
-						<reference key="source" ref="104752597"/>
+						<string key="label">av_advanceTextField</string>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="498497333"/>
 					</object>
-					<int key="connectionID">58</int>
+					<int key="connectionID">114</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_advance_lbl</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="662764430"/>
+						<string key="label">avStepper</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="483165134"/>
 					</object>
-					<int key="connectionID">60</int>
+					<int key="connectionID">115</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_lbl</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="935777657"/>
-					</object>
-					<int key="connectionID">61</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_speed_lbl</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="1031205444"/>
-					</object>
-					<int key="connectionID">62</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_advance_value_fld</string>
-						<reference key="source" ref="104752597"/>
+						<string key="label">sv_advanceTextField</string>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="217063425"/>
 					</object>
-					<int key="connectionID">65</int>
+					<int key="connectionID">117</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_speed_value_fld</string>
-						<reference key="source" ref="104752597"/>
+						<string key="label">sv_durStepper</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="928847853"/>
+					</object>
+					<int key="connectionID">118</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sv_durTextField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1063711207"/>
+					</object>
+					<int key="connectionID">119</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sv_speedStepper</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="88930968"/>
+					</object>
+					<int key="connectionID">120</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sv_speedTextField</string>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="23746054"/>
 					</object>
-					<int key="connectionID">68</int>
+					<int key="connectionID">121</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">window</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1005"/>
+					</object>
+					<int key="connectionID">122</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">resetButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="857991618"/>
+					</object>
+					<int key="connectionID">123</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">avValueChanged:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="483165134"/>
+					</object>
+					<int key="connectionID">124</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">avValueChanged:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="498497333"/>
+					</object>
+					<int key="connectionID">125</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">resetValues:</string>
-						<reference key="source" ref="104752597"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="857991618"/>
 					</object>
-					<int key="connectionID">74</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">avValueChanged:</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="483165134"/>
-					</object>
-					<int key="connectionID">85</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">avValueChanged:</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="498497333"/>
-					</object>
-					<int key="connectionID">86</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_av_stp</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="483165134"/>
-					</object>
-					<int key="connectionID">87</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_advance_stp</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="488437164"/>
-					</object>
-					<int key="connectionID">88</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_speed_stp</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="88930968"/>
-					</object>
-					<int key="connectionID">89</int>
+					<int key="connectionID">126</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">svAdvanceValueChanged:</string>
-						<reference key="source" ref="104752597"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="217063425"/>
 					</object>
-					<int key="connectionID">90</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">svSpeedValueChanged:</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="23746054"/>
-					</object>
-					<int key="connectionID">91</int>
+					<int key="connectionID">127</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">svAdvanceValueChanged:</string>
-						<reference key="source" ref="104752597"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="488437164"/>
 					</object>
-					<int key="connectionID">92</int>
+					<int key="connectionID">128</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">svDurationValueChanged:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1063711207"/>
+					</object>
+					<int key="connectionID">129</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">svDurationValueChanged:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="928847853"/>
+					</object>
+					<int key="connectionID">130</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">svSpeedValueChanged:</string>
-						<reference key="source" ref="104752597"/>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="23746054"/>
+					</object>
+					<int key="connectionID">131</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">svSpeedValueChanged:</string>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="88930968"/>
 					</object>
-					<int key="connectionID">93</int>
+					<int key="connectionID">132</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_dur_lbl</string>
-						<reference key="source" ref="104752597"/>
+						<string key="label">av_advanceLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="927318749"/>
+					</object>
+					<int key="connectionID">133</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">avLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="623990527"/>
+					</object>
+					<int key="connectionID">134</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sv_advanceLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="662764430"/>
+					</object>
+					<int key="connectionID">135</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sv_advanceStepper</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="488437164"/>
+					</object>
+					<int key="connectionID">136</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sv_durLabel</string>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="934030007"/>
 					</object>
-					<int key="connectionID">108</int>
+					<int key="connectionID">137</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_dur_stp</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="928847853"/>
+						<string key="label">sv_speedLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1031205444"/>
 					</object>
-					<int key="connectionID">109</int>
+					<int key="connectionID">138</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sv_dur_value_fld</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="1063711207"/>
+						<string key="label">svLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="935777657"/>
 					</object>
-					<int key="connectionID">110</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">svDurationValueChanged:</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="1063711207"/>
-					</object>
-					<int key="connectionID">111</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">svDurationValueChanged:</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="928847853"/>
-					</object>
-					<int key="connectionID">112</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_window</string>
-						<reference key="source" ref="104752597"/>
-						<reference key="destination" ref="1005"/>
-					</object>
-					<int key="connectionID">113</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="1063711207"/>
-						<reference key="destination" ref="104752597"/>
-					</object>
-					<int key="connectionID">104</int>
+					<int key="connectionID">139</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1170,11 +1114,6 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 						<reference key="parent" ref="857991618"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">52</int>
-						<reference key="object" ref="104752597"/>
-						<reference key="parent" ref="0"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">95</int>
 						<reference key="object" ref="548152202"/>
 						<reference key="parent" ref="843835699"/>
@@ -1399,7 +1338,6 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 				</object>
 				<string key="42.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="52.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="6.CustomClassName">BGHUDLabel</string>
 				<object class="NSMutableDictionary" key="6.IBAttributePlaceholdersKey">
 					<string key="NS.key.0">IBUserDefinedRuntimeAttributesPlaceholderName</string>
@@ -1466,309 +1404,9 @@ AADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AAA</bytes>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">113</int>
+			<int key="maxID">139</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes">
-			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<object class="IBPartialClassDescription">
-					<string key="className">VLCTrackSynchronization</string>
-					<string key="superclassName">NSObject</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="avValueChanged:">id</string>
-						<string key="resetValues:">id</string>
-						<string key="svAdvanceValueChanged:">id</string>
-						<string key="svDurationValueChanged:">id</string>
-						<string key="svSpeedValueChanged:">id</string>
-						<string key="toggleWindow:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="avValueChanged:">
-							<string key="name">avValueChanged:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="resetValues:">
-							<string key="name">resetValues:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="svAdvanceValueChanged:">
-							<string key="name">svAdvanceValueChanged:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="svDurationValueChanged:">
-							<string key="name">svDurationValueChanged:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="svSpeedValueChanged:">
-							<string key="name">svSpeedValueChanged:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="toggleWindow:">
-							<string key="name">toggleWindow:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="o_av_advance_lbl">id</string>
-						<string key="o_av_lbl">id</string>
-						<string key="o_av_stp">id</string>
-						<string key="o_av_value_fld">id</string>
-						<string key="o_reset_btn">id</string>
-						<string key="o_sv_advance_lbl">id</string>
-						<string key="o_sv_advance_stp">id</string>
-						<string key="o_sv_advance_value_fld">id</string>
-						<string key="o_sv_dur_lbl">id</string>
-						<string key="o_sv_dur_stp">id</string>
-						<string key="o_sv_dur_value_fld">id</string>
-						<string key="o_sv_lbl">id</string>
-						<string key="o_sv_speed_lbl">id</string>
-						<string key="o_sv_speed_stp">id</string>
-						<string key="o_sv_speed_value_fld">id</string>
-						<string key="o_window">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="o_av_advance_lbl">
-							<string key="name">o_av_advance_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_av_lbl">
-							<string key="name">o_av_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_av_stp">
-							<string key="name">o_av_stp</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_av_value_fld">
-							<string key="name">o_av_value_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_reset_btn">
-							<string key="name">o_reset_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_advance_lbl">
-							<string key="name">o_sv_advance_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_advance_stp">
-							<string key="name">o_sv_advance_stp</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_advance_value_fld">
-							<string key="name">o_sv_advance_value_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_dur_lbl">
-							<string key="name">o_sv_dur_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_dur_stp">
-							<string key="name">o_sv_dur_stp</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_dur_value_fld">
-							<string key="name">o_sv_dur_value_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_lbl">
-							<string key="name">o_sv_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_speed_lbl">
-							<string key="name">o_sv_speed_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_speed_stp">
-							<string key="name">o_sv_speed_stp</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sv_speed_value_fld">
-							<string key="name">o_sv_speed_value_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_window">
-							<string key="name">o_window</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../../../modules/gui/macosx/TrackSynchronization.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">VLCTrackSynchronization</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="avValueChanged:">id</string>
-						<string key="resetValues:">id</string>
-						<string key="svAdvanceValueChanged:">id</string>
-						<string key="svDurationValueChanged:">id</string>
-						<string key="svSpeedValueChanged:">id</string>
-						<string key="toggleWindow:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="avValueChanged:">
-							<string key="name">avValueChanged:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="resetValues:">
-							<string key="name">resetValues:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="svAdvanceValueChanged:">
-							<string key="name">svAdvanceValueChanged:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="svDurationValueChanged:">
-							<string key="name">svDurationValueChanged:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="svSpeedValueChanged:">
-							<string key="name">svSpeedValueChanged:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="toggleWindow:">
-							<string key="name">toggleWindow:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">../../../../modules/gui/macosx/TrackSynchronization.m</string>
-					</object>
-				</object>
-			</array>
-			<array class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">
-				<object class="IBPartialClassDescription">
-					<string key="className">NSActionCell</string>
-					<string key="superclassName">NSCell</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSActionCell.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSApplication</string>
-					<string key="superclassName">NSResponder</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSApplication.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSBox</string>
-					<string key="superclassName">NSView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSBox.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSButton</string>
-					<string key="superclassName">NSControl</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSButton.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSCell</string>
-					<string key="superclassName">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSCell.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSControl</string>
-					<string key="superclassName">NSView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSControl.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSFormatter</string>
-					<string key="superclassName">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">Foundation.framework/Headers/NSFormatter.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSMenu</string>
-					<string key="superclassName">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSMenu.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSNumberFormatter</string>
-					<string key="superclassName">NSFormatter</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">Foundation.framework/Headers/NSNumberFormatter.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSPanel</string>
-					<string key="superclassName">NSWindow</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSPanel.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSResponder</string>
-					<string key="superclassName">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSResponder.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSStepper</string>
-					<string key="superclassName">NSControl</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSStepper.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSTextField</string>
-					<string key="superclassName">NSControl</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSTextField.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSTextFieldCell</string>
-					<string key="superclassName">NSActionCell</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSTextFieldCell.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSView</string>
-					<string key="superclassName">NSResponder</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSWindow</string>
-					<string key="superclassName">NSResponder</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">AppKit.framework/Headers/NSWindow.h</string>
-					</object>
-				</object>
-			</array>
-		</object>
+		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<bool key="IBDocument.previouslyAttemptedUpgradeToXcode5">NO</bool>

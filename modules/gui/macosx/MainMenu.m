@@ -1142,7 +1142,7 @@
         o_trackSynchronization = [[VLCTrackSynchronization alloc] init];
 
     if (!b_nib_tracksynchro_loaded)
-        b_nib_tracksynchro_loaded = [NSBundle loadNibNamed:@"SyncTracks" owner:NSApp];
+        b_nib_tracksynchro_loaded = [NSBundle loadNibNamed:@"SyncTracks" owner:o_trackSynchronization];
 
     [o_trackSynchronization toggleWindow:sender];
 }

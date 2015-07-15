@@ -2,7 +2,7 @@
  * TrackSynchronization.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2011-2014 VLC authors and VideoLAN
- * Copyright (C) 2011-2014 Felix Paul Kühne
+ * Copyright (C) 2011-2015 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -34,12 +34,6 @@
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY   1
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT 2
 
-@interface VLCTrackSynchronization()
-{
-    intf_thread_t *p_intf;
-}
-@end
-
 @implementation VLCTrackSynchronization
 
 + (VLCTrackSynchronization *)sharedInstance
@@ -54,30 +48,23 @@
     return sharedInstance;
 }
 
-- (id)init
-{
-    self = [super init];
-    p_intf = VLCIntf;
-    return self;
-}
-
 - (void)awakeFromNib
 {
-    [o_window setTitle:_NS("Track Synchronization")];
-    [o_reset_btn setTitle:_NS("Reset")];
-    [o_av_lbl setStringValue:_NS("Audio/Video")];
-    [o_av_advance_lbl setStringValue: _NS("Audio track synchronization:")];
-    [[o_av_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("s")]];
-    [o_av_value_fld setToolTip: _NS("A positive value means that the audio is ahead of the video")];
-    [o_sv_lbl setStringValue: _NS("Subtitles/Video")];
-    [o_sv_advance_lbl setStringValue: _NS("Subtitle track synchronization:")];
-    [[o_sv_advance_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("s")]];
-    [o_sv_advance_value_fld setToolTip: _NS("A positive value means that the subtitles are ahead of the video")];
-    [o_sv_speed_lbl setStringValue: _NS("Subtitle speed:")];
-    [[o_sv_speed_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("fps")]];
-    [o_sv_dur_lbl setStringValue: _NS("Subtitle duration factor:")];
+    [_window setTitle:_NS("Track Synchronization")];
+    [_resetButton setTitle:_NS("Reset")];
+    [_avLabel setStringValue:_NS("Audio/Video")];
+    [_av_advanceLabel setStringValue: _NS("Audio track synchronization:")];
+    [[_av_advanceTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("s")]];
+    [_av_advanceTextField setToolTip: _NS("A positive value means that the audio is ahead of the video")];
+    [_svLabel setStringValue: _NS("Subtitles/Video")];
+    [_sv_advanceLabel setStringValue: _NS("Subtitle track synchronization:")];
+    [[_sv_advanceTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("s")]];
+    [_sv_advanceTextField setToolTip: _NS("A positive value means that the subtitles are ahead of the video")];
+    [_sv_speedLabel setStringValue: _NS("Subtitle speed:")];
+    [[_sv_speedTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("fps")]];
+    [_sv_durLabel setStringValue: _NS("Subtitle duration factor:")];
 
-    int i_mode = var_InheritInteger(p_intf, SUBSDELAY_CFG_MODE);
+    int i_mode = var_InheritInteger(VLCIntf, SUBSDELAY_CFG_MODE);
     NSString * o_toolTip, * o_suffix;
 
     switch (i_mode) {
@@ -96,43 +83,43 @@
             break;
     }
 
-    [[o_sv_dur_value_fld formatter] setFormat:[NSString stringWithFormat:@"#,##0.000%@", o_suffix]];
-    [o_sv_dur_value_fld setToolTip: o_toolTip];
+    [[_sv_durTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000%@", o_suffix]];
+    [_sv_durTextField setToolTip: o_toolTip];
 
     if (!OSX_SNOW_LEOPARD)
-        [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+        [_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self resetValues:self];
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (o_window && [o_window isVisible] && [o_window level] != i_level)
-        [o_window setLevel: i_level];
+    if (_window && [_window isVisible] && [_window level] != i_level)
+        [_window setLevel: i_level];
 }
 
 - (IBAction)toggleWindow:(id)sender
 {
-    if ([o_window isVisible])
-        [o_window orderOut:sender];
+    if ([_window isVisible])
+        [_window orderOut:sender];
     else {
-        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
-        [o_window makeKeyAndOrderFront:sender];
+        [_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+        [_window makeKeyAndOrderFront:sender];
     }
 }
 
 - (IBAction)resetValues:(id)sender
 {
-    [o_av_value_fld setFloatValue:0.0];
-    [o_sv_advance_value_fld setFloatValue:0.0];
-    [o_sv_speed_value_fld setFloatValue:1.0];
-    [o_sv_dur_value_fld setFloatValue:0.0];
-    [o_av_stp setFloatValue:0.0];
-    [o_sv_advance_stp setFloatValue:0.0];
-    [o_sv_speed_stp setFloatValue:1.0];
-    [o_sv_dur_stp setFloatValue:0.0];
+    [_av_advanceTextField setFloatValue:0.0];
+    [_sv_advanceTextField setFloatValue:0.0];
+    [_sv_speedTextField setFloatValue:1.0];
+    [_sv_durTextField setFloatValue:0.0];
+    [_avStepper setFloatValue:0.0];
+    [_sv_advanceStepper setFloatValue:0.0];
+    [_sv_speedStepper setFloatValue:1.0];
+    [_sv_durStepper setFloatValue:0.0];
 
-    input_thread_t * p_input = pl_CurrentInput(p_intf);
+    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
 
     if (p_input) {
         var_SetInteger(p_input, "audio-delay", 0.0);
@@ -145,82 +132,79 @@
 
 - (void)updateValues
 {
-    input_thread_t * p_input = pl_CurrentInput(p_intf);
+    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
 
     if (p_input) {
-        [o_av_value_fld setDoubleValue: var_GetInteger(p_input, "audio-delay") / 1000000.];
-        [o_sv_advance_value_fld setDoubleValue: var_GetInteger(p_input, "spu-delay") / 1000000.];
-        [o_sv_speed_value_fld setFloatValue: var_GetFloat(p_input, "sub-fps")];
+        [_av_advanceTextField setDoubleValue: var_GetInteger(p_input, "audio-delay") / 1000000.];
+        [_sv_advanceTextField setDoubleValue: var_GetInteger(p_input, "spu-delay") / 1000000.];
+        [_sv_speedTextField setFloatValue: var_GetFloat(p_input, "sub-fps")];
         vlc_object_release(p_input);
     }
-    [o_av_stp setDoubleValue: [o_av_value_fld doubleValue]];
-    [o_sv_advance_stp setDoubleValue: [o_sv_advance_value_fld doubleValue]];
-    [o_sv_speed_stp setDoubleValue: [o_sv_speed_value_fld doubleValue]];
+    [_avStepper setDoubleValue: [_av_advanceTextField doubleValue]];
+    [_sv_advanceStepper setDoubleValue: [_sv_advanceTextField doubleValue]];
+    [_sv_speedStepper setDoubleValue: [_sv_speedTextField doubleValue]];
 }
 
 - (IBAction)avValueChanged:(id)sender
 {
-    if (sender == o_av_stp)
-        [o_av_value_fld setDoubleValue: [o_av_stp doubleValue]];
+    if (sender == _avStepper)
+        [_av_advanceTextField setDoubleValue: [_avStepper doubleValue]];
     else
-        [o_av_stp setDoubleValue: [o_av_value_fld doubleValue]];
+        [_avStepper setDoubleValue: [_av_advanceTextField doubleValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(p_intf);
+    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
 
     if (p_input) {
-        var_SetInteger(p_input, "audio-delay", [o_av_value_fld doubleValue] * 1000000.);
-
+        var_SetInteger(p_input, "audio-delay", [_av_advanceTextField doubleValue] * 1000000.);
         vlc_object_release(p_input);
     }
 }
 
 - (IBAction)svAdvanceValueChanged:(id)sender
 {
-    if (sender == o_sv_advance_stp)
-        [o_sv_advance_value_fld setDoubleValue: [o_sv_advance_stp doubleValue]];
+    if (sender == _sv_advanceStepper)
+        [_sv_advanceTextField setDoubleValue: [_sv_advanceStepper doubleValue]];
     else
-        [o_sv_advance_stp setDoubleValue: [o_sv_advance_value_fld doubleValue]];
+        [_sv_advanceStepper setDoubleValue: [_sv_advanceTextField doubleValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(p_intf);
+    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
 
     if (p_input) {
-        var_SetInteger(p_input, "spu-delay", [o_sv_advance_value_fld doubleValue] * 1000000.);
-
+        var_SetInteger(p_input, "spu-delay", [_sv_advanceTextField doubleValue] * 1000000.);
         vlc_object_release(p_input);
     }
 }
 
 - (IBAction)svSpeedValueChanged:(id)sender
 {
-    if (sender == o_sv_speed_stp)
-        [o_sv_speed_value_fld setFloatValue: [o_sv_speed_stp floatValue]];
+    if (sender == _sv_speedStepper)
+        [_sv_speedTextField setFloatValue: [_sv_speedStepper floatValue]];
     else
-        [o_sv_speed_stp setFloatValue: [o_sv_speed_value_fld floatValue]];
+        [_sv_speedStepper setFloatValue: [_sv_speedTextField floatValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(p_intf);
+    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
 
     if (p_input) {
-        var_SetFloat(p_input, "sub-fps", [o_sv_speed_value_fld floatValue]);
-
+        var_SetFloat(p_input, "sub-fps", [_sv_speedTextField floatValue]);
         vlc_object_release(p_input);
     }
 }
 
 - (IBAction)svDurationValueChanged:(id)sender
 {
-    if (sender == o_sv_dur_stp)
-        [o_sv_dur_value_fld setFloatValue: [o_sv_dur_stp floatValue]];
+    if (sender == _sv_durStepper)
+        [_sv_durTextField setFloatValue: [_sv_durStepper floatValue]];
     else
-        [o_sv_dur_stp setFloatValue: [o_sv_dur_value_fld floatValue]];
+        [_sv_durStepper setFloatValue: [_sv_durTextField floatValue]];
 
-    input_thread_t * p_input = pl_CurrentInput(p_intf);
+    input_thread_t * p_input = pl_CurrentInput(VLCIntf);
 
     if (p_input) {
-        float f_factor = [o_sv_dur_value_fld floatValue];
-        config_PutFloat(p_intf, SUBSDELAY_CFG_FACTOR, f_factor);
+        float f_factor = [_sv_durTextField floatValue];
+        config_PutFloat(VLCIntf, SUBSDELAY_CFG_FACTOR, f_factor);
 
         /* Try to find an instance of subsdelay, and set its factor */
-        vlc_object_t *p_obj = (vlc_object_t *) vlc_object_find_name(p_intf->p_libvlc, "subsdelay");
+        vlc_object_t *p_obj = (vlc_object_t *) vlc_object_find_name(VLCIntf->p_libvlc, "subsdelay");
         if (p_obj) {
             var_SetFloat(p_obj, SUBSDELAY_CFG_FACTOR, f_factor);
             vlc_object_release(p_obj);
