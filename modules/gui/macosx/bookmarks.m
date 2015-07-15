@@ -35,7 +35,6 @@
  *****************************************************************************/
 
 #import "bookmarks.h"
-#import "wizard.h"
 #import "CompatibilityFixes.h"
 
 @interface VLCBookmarks() <NSTableViewDataSource, NSTableViewDelegate>
@@ -271,6 +270,8 @@ clear:
 
 - (IBAction)extract:(id)sender
 {
+#warning this does not work anymore
+#if 0
     if ([_dataTable numberOfSelectedRows] < 2) {
         NSBeginAlertSheet(_NS("Invalid selection"), _NS("OK"), @"", @"", _bookmarksWindow, nil, nil, nil, nil, @"%@",_NS("Two bookmarks have to be selected."));
         return;
@@ -313,6 +314,7 @@ clear:
     for (int i = 0; i < i_bookmarks; i++)
         vlc_seekpoint_Delete(pp_bookmarks[i]);
     free(pp_bookmarks);
+#endif
 }
 
 - (IBAction)goToBookmark:(id)sender

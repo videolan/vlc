@@ -70,5 +70,4 @@ libmacosx_plugin_la_SOURCES = \
 	VideoView.h VideoView.m \
 	VLCUIWidgets.h VLCUIWidgets.m \
 	VLCVoutWindowController.h VLCVoutWindowController.m \
-	Windows.h Windows.m \
-	wizard.h wizard.m
+	Windows.h Windows.m

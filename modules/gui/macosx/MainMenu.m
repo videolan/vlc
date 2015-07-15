@@ -29,7 +29,6 @@
 #import <vlc_input.h>
 
 #import "open.h"
-#import "wizard.h"
 #import "about.h"
 #import "AudioEffects.h"
 #import "TrackSynchronization.h"
@@ -386,7 +385,6 @@
     [o_mi_open_capture setTitle: _NS("Open Capture Device...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
     [o_mi_close_window setTitle: _NS("Close Window")];
-    [o_mi_open_wizard setTitle: _NS("Streaming/Exporting Wizard...")];
     [o_mi_convertandsave setTitle: _NS("Convert / Stream...")];
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
     [o_mi_revealInFinder setTitle: _NS("Reveal in Finder")];
@@ -1104,12 +1102,6 @@
 - (IBAction)intfOpenCapture:(id)sender
 {
     [[[VLCMain sharedInstance] open] openCapture];
-}
-
-- (IBAction)showWizard:(id)sender
-{
-    [[[VLCMain sharedInstance] wizard] resetWizard];
-    [[[VLCMain sharedInstance] wizard] showWizard];
 }
 
 - (IBAction)savePlaylist:(id)sender

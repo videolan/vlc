@@ -34,14 +34,6 @@
 @end
 
 /*****************************************************************************
- * VLCPlaylistWizard interface
- *****************************************************************************/
-@interface VLCPlaylistWizard : NSObject
-- (IBAction)reloadOutlineView;
-
-@end
-
-/*****************************************************************************
  * VLCPlaylist interface
  *****************************************************************************/
 @interface VLCPlaylist : NSObject<NSOutlineViewDataSource, NSOutlineViewDelegate>
@@ -49,7 +41,6 @@
     IBOutlet VLCPlaylistView* o_outline_view;
 
     IBOutlet id o_controller;
-    IBOutlet id o_playlist_wizard;
 
     IBOutlet id o_btn_playlist;
     IBOutlet id o_playlist_view;

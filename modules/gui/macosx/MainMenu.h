@@ -55,7 +55,6 @@
     IBOutlet NSMenuItem * o_mi_open_capture;
     IBOutlet NSMenuItem * o_mi_open_recent;
     IBOutlet NSMenuItem * o_mi_close_window;
-    IBOutlet NSMenuItem * o_mi_open_wizard;
     IBOutlet NSMenuItem * o_mi_convertandsave;
     IBOutlet NSMenuItem * o_mi_save_playlist;
     IBOutlet NSMenuItem * o_mi_revealInFinder;
@@ -259,7 +258,6 @@
 - (IBAction)telxNavLink:(id)sender;
 - (IBAction)togglePostProcessing:(id)sender;
 
-- (IBAction)showWizard:(id)sender;
 - (IBAction)showConvertAndSave:(id)sender;
 - (IBAction)showVideoEffects:(id)sender;
 - (IBAction)showAudioEffects:(id)sender;

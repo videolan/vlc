@@ -42,7 +42,6 @@
 #import "CompatibilityFixes.h"
 
 #import "intf.h"
-#import "wizard.h"
 #import "bookmarks.h"
 #import "playlistinfo.h"
 #import "playlist.h"
@@ -122,23 +121,6 @@
 - (IBAction)delete:(id)sender
 {
     [[[VLCMain sharedInstance] playlist] deleteItem: sender];
-}
-
-@end
-
-/*****************************************************************************
- * VLCPlaylistWizard implementation
- *****************************************************************************/
-@implementation VLCPlaylistWizard
-
-- (IBAction)reloadOutlineView
-{
-    /* Only reload the outlineview if the wizard window is open since this can
-       be quite long on big playlists */
-
-#warning dead code
-
-    // to be removed
 }
 
 @end

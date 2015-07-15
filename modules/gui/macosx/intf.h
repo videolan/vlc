@@ -92,7 +92,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (id)simplePreferences;
 - (id)preferences;
 - (VLCPlaylist *)playlist;
-- (id)wizard;
 - (id)coreDialogProvider;
 - (ResumeDialogController *)resumeDialog;
 - (id)eyeTVController;

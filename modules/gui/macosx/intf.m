@@ -55,7 +55,6 @@
 #import "playlistinfo.h"
 #import "controls.h"
 #import "open.h"
-#import "wizard.h"
 #import "bookmarks.h"
 #import "coredialogs.h"
 #import "AppleRemote.h"
@@ -496,7 +495,6 @@ audio_output_t *getAout(void)
     id o_prefs;                 /* VLCPrefs       */
     id o_sprefs;                /* VLCSimplePrefs */
     id o_open;                  /* VLCOpen        */
-    id o_wizard;                /* VLCWizard      */
     id o_coredialogs;           /* VLCCoreDialogProvider */
     VLCInfo *o_info;            /* VLCInformation */
     id o_eyetv;                 /* VLCEyeTVController */
@@ -507,7 +505,6 @@ audio_output_t *getAout(void)
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_open_loaded;       /* open nibfile */
     BOOL nib_about_loaded;      /* about nibfile */
-    BOOL nib_wizard_loaded;     /* wizard nibfile */
     BOOL nib_prefs_loaded;      /* preferences nibfile */
     BOOL nib_info_loaded;       /* information panel nibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
@@ -1314,19 +1311,6 @@ audio_output_t *getAout(void)
 - (VLCPlaylist *)playlist
 {
     return o_playlist;
-}
-
-- (id)wizard
-{
-    if (!o_wizard)
-        o_wizard = [[VLCWizard alloc] init];
-
-    if (!nib_wizard_loaded) {
-        nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner: NSApp];
-        [o_wizard initStrings];
-    }
-
-    return o_wizard;
 }
 
 - (id)coreDialogProvider
