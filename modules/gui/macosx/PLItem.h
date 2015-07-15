@@ -28,7 +28,7 @@
 @property(readonly, copy) NSMutableArray *children;
 @property(readonly) int plItemId;
 @property(readonly) input_item_t *input;
-@property(readwrite, retain) PLItem *parent;
+@property(readwrite, weak) PLItem *parent;
 
 - (id)initWithPlaylistItem:(playlist_item_t *)p_item;
 
