@@ -143,7 +143,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{37, 18}, {468, 19}}</string>
 												<reference key="NSSuperview" ref="537375861"/>
-												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="604389831">
 													<int key="NSCellFlags">-2073034687</int>
@@ -820,7 +819,6 @@
 														<int key="NSvFlags">-2147483392</int>
 														<string key="NSFrame">{{1, 420}, {501, 15}}</string>
 														<reference key="NSSuperview" ref="788794540"/>
-														<reference key="NSNextKeyView"/>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 														<string key="NSControlAction">_doScroller:</string>
 														<reference key="NSControlTarget" ref="788794540"/>
@@ -2078,14 +2076,6 @@
 						<reference key="destination" ref="232197245"/>
 					</object>
 					<int key="connectionID">708</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">video_decodedTextField</string>
-						<reference key="source" ref="933980713"/>
-						<reference key="destination" ref="638896850"/>
-					</object>
-					<int key="connectionID">710</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -4428,7 +4418,7 @@
 						<string key="encodedbyTextField">NSTextField</string>
 						<string key="genreLabel">NSTextField</string>
 						<string key="genreTextField">NSTextField</string>
-						<string key="imageWell">NSTextField</string>
+						<string key="imageWell">NSImageView</string>
 						<string key="infoPanel">NSPanel</string>
 						<string key="inputBitrateLabel">NSTextField</string>
 						<string key="inputBitrateTextField">NSTextField</string>
@@ -4463,8 +4453,8 @@
 						<string key="titleTextField">NSTextField</string>
 						<string key="uriLabel">NSTextField</string>
 						<string key="uriTextField">NSTextField</string>
-						<string key="videoDecodedLabel">id</string>
-						<string key="videoDecodedTextField">id</string>
+						<string key="videoDecodedLabel">NSTextField</string>
+						<string key="videoDecodedTextField">NSTextField</string>
 						<string key="videoLabel">NSTextField</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -4562,7 +4552,7 @@
 						</object>
 						<object class="IBToOneOutletInfo" key="imageWell">
 							<string key="name">imageWell</string>
-							<string key="candidateClassName">NSTextField</string>
+							<string key="candidateClassName">NSImageView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="infoPanel">
 							<string key="name">infoPanel</string>
@@ -4702,11 +4692,11 @@
 						</object>
 						<object class="IBToOneOutletInfo" key="videoDecodedLabel">
 							<string key="name">videoDecodedLabel</string>
-							<string key="candidateClassName">id</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="videoDecodedTextField">
 							<string key="name">videoDecodedTextField</string>
-							<string key="candidateClassName">id</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="videoLabel">
 							<string key="name">videoLabel</string>
