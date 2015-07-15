@@ -1871,7 +1871,7 @@ static int Demux( demux_t *p_demux )
 
             REFERENCE_TIME i_pts, i_end_date;
             HRESULT hr = sample.p_sample->GetTime( &i_pts, &i_end_date );
-            if( hr == S_OK || hr == VFW_S_NO_STOP_TIME )
+            if( hr != S_OK && hr != VFW_S_NO_STOP_TIME )
             {
                 if( p_stream->mt.majortype == MEDIATYPE_Video || !p_stream->b_pts )
                 {
@@ -1879,12 +1879,15 @@ static int Demux( demux_t *p_demux )
                     i_pts = sample.i_timestamp;
                     p_stream->b_pts = true;
                 }
+                else
+                    i_pts = VLC_TS_INVALID;
+            }
+
+            if( i_pts > VLC_TS_INVALID ) {
                 i_pts += (i_pts >= 0) ? +5 : -4;
                 i_pts /= 10; /* 100-ns to µs conversion */
                 i_pts += VLC_TS_0;
             }
-            else
-                i_pts = VLC_TS_INVALID;
 #if 0
             msg_Dbg( p_demux, "Read() stream: %i, size: %i, PTS: %" PRId64,
                      i_stream, i_data_size, i_pts );
