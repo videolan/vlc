@@ -770,7 +770,7 @@ static const staticentry_t p_list_video[] = {
         A("RV32"),
     B(VLC_CODEC_RGBA, "32 bits RGBA"),
         A("RGBA"),
-    B(VLC_CODEC_RGBA, "32 bits ARGB"),
+    B(VLC_CODEC_ARGB, "32 bits ARGB"),
         A("ARGB"),
         A("AV32"),
     B(VLC_CODEC_BGRA, "32 bits BGRA"),
@@ -1448,7 +1448,7 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_F64L, "64 bits float LE"),
         A("f64l"),
 
-    B(VLC_CODEC_F64L, "64 bits float BE"),
+    B(VLC_CODEC_F64B, "64 bits float BE"),
         A("f64b"),
 
     B(VLC_CODEC_TWINVQ, "TwinVQ"),
