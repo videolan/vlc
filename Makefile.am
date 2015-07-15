@@ -156,7 +156,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/SharedDialogs.xib \
 	extras/package/macosx/Resources/English.lproj/SyncTracks.xib \
 	extras/package/macosx/Resources/English.lproj/VideoEffects.xib \
-	extras/package/macosx/Resources/English.lproj/Wizard.xib \
 	extras/package/macosx/Resources/fspanel/fs_background.png \
 	extras/package/macosx/Resources/fspanel/fs_background@2x.png \
 	extras/package/macosx/Resources/fspanel/fs_exit_fullscreen.png \
@@ -537,24 +536,6 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom-over@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/lion/lion-window-zoom@2x.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-graphite.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-on-graphite.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-on.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-over-graphite.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close-over.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-close.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-graphite.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-on-graphite.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-on.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-over-graphite.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize-over.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-minimize.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom-graphite.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom-on-graphite.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom-on.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom-over-graphite.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom-over.png \
-	extras/package/macosx/Resources/mainwindow_dark/titlebar/snowleo/snowleo-window-zoom.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/yosemite/yosemite-window-close-graphite.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/yosemite/yosemite-window-close-graphite@2x.png \
 	extras/package/macosx/Resources/mainwindow_dark/titlebar/yosemite/yosemite-window-close-on-graphite.png \

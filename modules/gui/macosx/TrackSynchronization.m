@@ -86,8 +86,7 @@
     [[_sv_durTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000%@", o_suffix]];
     [_sv_durTextField setToolTip: o_toolTip];
 
-    if (!OSX_SNOW_LEOPARD)
-        [_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self resetValues:self];
 }

@@ -72,8 +72,7 @@
 {
     [o_window setTitle: _NS("Video Effects")];
     [o_window setExcludedFromWindowsMenu:YES];
-    if (!OSX_SNOW_LEOPARD)
-        [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"basic"]] setLabel:_NS("Basic")];
     [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"crop"]] setLabel:_NS("Crop")];

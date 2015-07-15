@@ -57,8 +57,7 @@
 - (void)awakeFromNib
 {
     [_infoPanel setExcludedFromWindowsMenu: YES];
-    if (!OSX_SNOW_LEOPARD)
-        [_infoPanel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [_infoPanel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [_infoPanel setTitle: _NS("Media Information")];
 

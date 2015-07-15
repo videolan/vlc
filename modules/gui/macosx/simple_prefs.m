@@ -246,8 +246,7 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
     [o_sprefs_toolbar setDelegate: self];
     [o_sprefs_win setToolbar: o_sprefs_toolbar];
 
-    if (!OSX_SNOW_LEOPARD)
-        [o_sprefs_win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [o_sprefs_win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     [o_sprefs_win setHidesOnDeactivate:YES];
 
     [o_hotkeys_listbox setTarget:self];
@@ -582,14 +581,9 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     [self setupButton: o_intf_fspanel_ckb forBoolValue: "macosx-fspanel"];
 
     [self setupButton: o_intf_nativefullscreen_ckb forBoolValue: "macosx-nativefullscreenmode"];
-    BOOL b_correct_sdk = NO;
-#ifdef MAC_OS_X_VERSION_10_7
-    b_correct_sdk = YES;
-#endif
-    if (!(b_correct_sdk && !OSX_SNOW_LEOPARD)) {
-        [o_intf_nativefullscreen_ckb setState: NSOffState];
-        [o_intf_nativefullscreen_ckb setEnabled: NO];
-    }
+
+    [o_intf_nativefullscreen_ckb setState: NSOffState];
+    [o_intf_nativefullscreen_ckb setEnabled: NO];
 
     [self setupButton: o_intf_embedded_ckb forBoolValue: "embedded-video"];
 

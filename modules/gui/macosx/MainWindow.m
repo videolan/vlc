@@ -162,16 +162,11 @@ static VLCMainWindow *sharedInstance = nil;
 
     BOOL b_splitviewShouldBeHidden = NO;
 
-    if (!OSX_SNOW_LEOPARD)
-        [self setRestorable: NO];
+    [self setRestorable: NO];
     [self setFrameAutosaveName:@"mainwindow"];
 
     /* setup the styled interface */
-    _nativeFullscreenMode = NO;
-#ifdef MAC_OS_X_VERSION_10_7
-    if (!OSX_SNOW_LEOPARD)
-        _nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
-#endif
+    _nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
     [self useOptimizedDrawing: YES];
 
     [[o_search_fld cell] setPlaceholderString: _NS("Search")];
@@ -215,14 +210,12 @@ static VLCMainWindow *sharedInstance = nil;
     [o_dropzone_view setFrame: [o_playlist_table frame]];
     [o_left_split_view setFrame: [o_sidebar_view frame]];
 
-    if (!OSX_SNOW_LEOPARD) {
-        /* the default small size of the search field is slightly different on Lion, let's work-around that */
-        NSRect frame;
-        frame = [o_search_fld frame];
-        frame.origin.y = frame.origin.y + 2.0;
-        frame.size.height = frame.size.height - 1.0;
-        [o_search_fld setFrame: frame];
-    }
+    /* the default small size of the search field is slightly different on Lion, let's work-around that */
+    NSRect frame;
+    frame = [o_search_fld frame];
+    frame.origin.y = frame.origin.y + 2.0;
+    frame.size.height = frame.size.height - 1.0;
+    [o_search_fld setFrame: frame];
 
     /* reload the sidebar */
     [self reloadSidebar];

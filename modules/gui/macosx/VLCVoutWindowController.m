@@ -110,7 +110,7 @@
             window_rect = [[VLCMainWindow sharedInstance] frame];
 
         NSUInteger mask = NSBorderlessWindowMask;
-        if (!OSX_SNOW_LEOPARD && !b_video_deco)
+        if (!b_video_deco)
             mask |= NSResizableWindowMask;
 
         BOOL b_no_video_deco_only = !b_video_wallpaper;

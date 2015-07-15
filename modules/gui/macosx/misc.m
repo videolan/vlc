@@ -491,7 +491,7 @@ void _drawFrameInRect(NSRect frameRect)
     CGFloat f_deltaY = [o_event deltaY];
     CGFloat f_deltaX = [o_event deltaX];
 
-    if (!OSX_SNOW_LEOPARD && [o_event isDirectionInvertedFromDevice])
+    if ([o_event isDirectionInvertedFromDevice])
         f_deltaX = -f_deltaX; // optimisation, actually double invertion of f_deltaY here
     else
         f_deltaY = -f_deltaY;
@@ -595,7 +595,7 @@ void _drawFrameInRect(NSRect frameRect)
     CGFloat f_deltaY = [o_event deltaY];
     CGFloat f_deltaX = [o_event deltaX];
 
-    if (!OSX_SNOW_LEOPARD && [o_event isDirectionInvertedFromDevice])
+    if ([o_event isDirectionInvertedFromDevice])
         f_deltaX = -f_deltaX; // optimisation, actually double invertion of f_deltaY here
     else
         f_deltaY = -f_deltaY;

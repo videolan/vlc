@@ -657,28 +657,10 @@
 		CC206B4714ACFEAC007935C6 /* lion-window-zoom-over-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2214ACFEAC007935C6 /* lion-window-zoom-over-graphite.png */; };
 		CC206B4814ACFEAC007935C6 /* lion-window-zoom-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2314ACFEAC007935C6 /* lion-window-zoom-over.png */; };
 		CC206B4914ACFEAC007935C6 /* lion-window-zoom.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2414ACFEAC007935C6 /* lion-window-zoom.png */; };
-		CC206B4A14ACFEAC007935C6 /* snowleo-window-close-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2614ACFEAC007935C6 /* snowleo-window-close-graphite.png */; };
-		CC206B4B14ACFEAC007935C6 /* snowleo-window-close-on-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2714ACFEAC007935C6 /* snowleo-window-close-on-graphite.png */; };
-		CC206B4C14ACFEAC007935C6 /* snowleo-window-close-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2814ACFEAC007935C6 /* snowleo-window-close-on.png */; };
-		CC206B4D14ACFEAC007935C6 /* snowleo-window-close-over-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2914ACFEAC007935C6 /* snowleo-window-close-over-graphite.png */; };
-		CC206B4E14ACFEAC007935C6 /* snowleo-window-close-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2A14ACFEAC007935C6 /* snowleo-window-close-over.png */; };
-		CC206B4F14ACFEAC007935C6 /* snowleo-window-close.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2B14ACFEAC007935C6 /* snowleo-window-close.png */; };
-		CC206B5014ACFEAC007935C6 /* snowleo-window-minimize-on-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2C14ACFEAC007935C6 /* snowleo-window-minimize-on-graphite.png */; };
-		CC206B5114ACFEAC007935C6 /* snowleo-window-minimize-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2D14ACFEAC007935C6 /* snowleo-window-minimize-on.png */; };
-		CC206B5214ACFEAC007935C6 /* snowleo-window-minimize-over-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2E14ACFEAC007935C6 /* snowleo-window-minimize-over-graphite.png */; };
-		CC206B5314ACFEAC007935C6 /* snowleo-window-minimize-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B2F14ACFEAC007935C6 /* snowleo-window-minimize-over.png */; };
-		CC206B5614ACFEAC007935C6 /* snowleo-window-zoom-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B3214ACFEAC007935C6 /* snowleo-window-zoom-graphite.png */; };
-		CC206B5714ACFEAC007935C6 /* snowleo-window-zoom-on-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B3314ACFEAC007935C6 /* snowleo-window-zoom-on-graphite.png */; };
-		CC206B5814ACFEAC007935C6 /* snowleo-window-zoom-on.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B3414ACFEAC007935C6 /* snowleo-window-zoom-on.png */; };
-		CC206B5914ACFEAC007935C6 /* snowleo-window-zoom-over-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B3514ACFEAC007935C6 /* snowleo-window-zoom-over-graphite.png */; };
-		CC206B5A14ACFEAC007935C6 /* snowleo-window-zoom-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B3614ACFEAC007935C6 /* snowleo-window-zoom-over.png */; };
-		CC206B5B14ACFEAC007935C6 /* snowleo-window-zoom.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B3714ACFEAC007935C6 /* snowleo-window-zoom.png */; };
 		CC206B6014ACFEB8007935C6 /* topbar-dark-center-fill.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B5D14ACFEB8007935C6 /* topbar-dark-center-fill.png */; };
 		CC206B6114ACFEB8007935C6 /* topbar-dark-left.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B5E14ACFEB8007935C6 /* topbar-dark-left.png */; };
 		CC206B6214ACFEB8007935C6 /* topbar-dark-right.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B5F14ACFEB8007935C6 /* topbar-dark-right.png */; };
 		CC206B6414AD044A007935C6 /* lion-window-minimize-over.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B6314AD044A007935C6 /* lion-window-minimize-over.png */; };
-		CC206B6714AD046C007935C6 /* snowleo-window-minimize-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B6514AD046C007935C6 /* snowleo-window-minimize-graphite.png */; };
-		CC206B6814AD046C007935C6 /* snowleo-window-minimize.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B6614AD046C007935C6 /* snowleo-window-minimize.png */; };
 		CC206B6A14AD0A52007935C6 /* window-resize.png in Resources */ = {isa = PBXBuildFile; fileRef = CC206B6914AD0A52007935C6 /* window-resize.png */; };
 		CC3F2E8C15F5038F009D7F39 /* playlist-1btn-pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = CC3F2E8815F5038F009D7F39 /* playlist-1btn-pressed.png */; };
 		CC3F2E8D15F5038F009D7F39 /* playlist-1btn-pressed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC3F2E8915F5038F009D7F39 /* playlist-1btn-pressed@2x.png */; };
@@ -1504,28 +1486,10 @@
 		CC206B2214ACFEAC007935C6 /* lion-window-zoom-over-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-zoom-over-graphite.png"; sourceTree = "<group>"; };
 		CC206B2314ACFEAC007935C6 /* lion-window-zoom-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-zoom-over.png"; sourceTree = "<group>"; };
 		CC206B2414ACFEAC007935C6 /* lion-window-zoom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-zoom.png"; sourceTree = "<group>"; };
-		CC206B2614ACFEAC007935C6 /* snowleo-window-close-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-close-graphite.png"; sourceTree = "<group>"; };
-		CC206B2714ACFEAC007935C6 /* snowleo-window-close-on-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-close-on-graphite.png"; sourceTree = "<group>"; };
-		CC206B2814ACFEAC007935C6 /* snowleo-window-close-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-close-on.png"; sourceTree = "<group>"; };
-		CC206B2914ACFEAC007935C6 /* snowleo-window-close-over-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-close-over-graphite.png"; sourceTree = "<group>"; };
-		CC206B2A14ACFEAC007935C6 /* snowleo-window-close-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-close-over.png"; sourceTree = "<group>"; };
-		CC206B2B14ACFEAC007935C6 /* snowleo-window-close.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-close.png"; sourceTree = "<group>"; };
-		CC206B2C14ACFEAC007935C6 /* snowleo-window-minimize-on-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-minimize-on-graphite.png"; sourceTree = "<group>"; };
-		CC206B2D14ACFEAC007935C6 /* snowleo-window-minimize-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-minimize-on.png"; sourceTree = "<group>"; };
-		CC206B2E14ACFEAC007935C6 /* snowleo-window-minimize-over-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-minimize-over-graphite.png"; sourceTree = "<group>"; };
-		CC206B2F14ACFEAC007935C6 /* snowleo-window-minimize-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-minimize-over.png"; sourceTree = "<group>"; };
-		CC206B3214ACFEAC007935C6 /* snowleo-window-zoom-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-zoom-graphite.png"; sourceTree = "<group>"; };
-		CC206B3314ACFEAC007935C6 /* snowleo-window-zoom-on-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-zoom-on-graphite.png"; sourceTree = "<group>"; };
-		CC206B3414ACFEAC007935C6 /* snowleo-window-zoom-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-zoom-on.png"; sourceTree = "<group>"; };
-		CC206B3514ACFEAC007935C6 /* snowleo-window-zoom-over-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-zoom-over-graphite.png"; sourceTree = "<group>"; };
-		CC206B3614ACFEAC007935C6 /* snowleo-window-zoom-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-zoom-over.png"; sourceTree = "<group>"; };
-		CC206B3714ACFEAC007935C6 /* snowleo-window-zoom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-zoom.png"; sourceTree = "<group>"; };
 		CC206B5D14ACFEB8007935C6 /* topbar-dark-center-fill.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "topbar-dark-center-fill.png"; path = "Resources/mainwindow_dark/topbar-dark-center-fill.png"; sourceTree = SOURCE_ROOT; };
 		CC206B5E14ACFEB8007935C6 /* topbar-dark-left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "topbar-dark-left.png"; path = "Resources/mainwindow_dark/topbar-dark-left.png"; sourceTree = SOURCE_ROOT; };
 		CC206B5F14ACFEB8007935C6 /* topbar-dark-right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "topbar-dark-right.png"; path = "Resources/mainwindow_dark/topbar-dark-right.png"; sourceTree = SOURCE_ROOT; };
 		CC206B6314AD044A007935C6 /* lion-window-minimize-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-minimize-over.png"; sourceTree = "<group>"; };
-		CC206B6514AD046C007935C6 /* snowleo-window-minimize-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-minimize-graphite.png"; sourceTree = "<group>"; };
-		CC206B6614AD046C007935C6 /* snowleo-window-minimize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "snowleo-window-minimize.png"; sourceTree = "<group>"; };
 		CC206B6914AD0A52007935C6 /* window-resize.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "window-resize.png"; path = "Resources/mainwindow_dark/window-resize.png"; sourceTree = "<group>"; };
 		CC269A4615E7947F00F2FDC9 /* StringUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringUtility.h; path = ../../../modules/gui/macosx/StringUtility.h; sourceTree = SOURCE_ROOT; };
 		CC269A4715E7947F00F2FDC9 /* StringUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = StringUtility.m; path = ../../../modules/gui/macosx/StringUtility.m; sourceTree = SOURCE_ROOT; };
@@ -2692,7 +2656,6 @@
 				CC91904A159B4BB800E634A7 /* topbar-dark-right@2x.png */,
 				1C88BA2319DC7B2200645190 /* yosemite */,
 				CC206B1214ACFEAC007935C6 /* lion */,
-				CC206B2514ACFEAC007935C6 /* snowleo */,
 			);
 			name = titlebar;
 			path = Resources/mainwindow_dark/titlebar;
@@ -2745,31 +2708,6 @@
 				1CE5ED2019DD6AB700FCEFD3 /* lion-window-fullscreen@2x.png */,
 			);
 			path = lion;
-			sourceTree = "<group>";
-		};
-		CC206B2514ACFEAC007935C6 /* snowleo */ = {
-			isa = PBXGroup;
-			children = (
-				CC206B2614ACFEAC007935C6 /* snowleo-window-close-graphite.png */,
-				CC206B2714ACFEAC007935C6 /* snowleo-window-close-on-graphite.png */,
-				CC206B2814ACFEAC007935C6 /* snowleo-window-close-on.png */,
-				CC206B2914ACFEAC007935C6 /* snowleo-window-close-over-graphite.png */,
-				CC206B2A14ACFEAC007935C6 /* snowleo-window-close-over.png */,
-				CC206B2B14ACFEAC007935C6 /* snowleo-window-close.png */,
-				CC206B2C14ACFEAC007935C6 /* snowleo-window-minimize-on-graphite.png */,
-				CC206B2D14ACFEAC007935C6 /* snowleo-window-minimize-on.png */,
-				CC206B2E14ACFEAC007935C6 /* snowleo-window-minimize-over-graphite.png */,
-				CC206B2F14ACFEAC007935C6 /* snowleo-window-minimize-over.png */,
-				CC206B6514AD046C007935C6 /* snowleo-window-minimize-graphite.png */,
-				CC206B6614AD046C007935C6 /* snowleo-window-minimize.png */,
-				CC206B3214ACFEAC007935C6 /* snowleo-window-zoom-graphite.png */,
-				CC206B3314ACFEAC007935C6 /* snowleo-window-zoom-on-graphite.png */,
-				CC206B3414ACFEAC007935C6 /* snowleo-window-zoom-on.png */,
-				CC206B3514ACFEAC007935C6 /* snowleo-window-zoom-over-graphite.png */,
-				CC206B3614ACFEAC007935C6 /* snowleo-window-zoom-over.png */,
-				CC206B3714ACFEAC007935C6 /* snowleo-window-zoom.png */,
-			);
-			path = snowleo;
 			sourceTree = "<group>";
 		};
 		CC6C01A40DDF3E7800C7D754 /* Minimal Mac OS X Classes */ = {
@@ -3449,50 +3387,32 @@
 				CC206B4914ACFEAC007935C6 /* lion-window-zoom.png in Resources */,
 				1C88BC2919DC7C8100645190 /* ys-progression-knob_dark.png in Resources */,
 				1C88BC3219DC7C8100645190 /* ys-repeat-all-blue-pressed_dark@2x.png in Resources */,
-				CC206B4A14ACFEAC007935C6 /* snowleo-window-close-graphite.png in Resources */,
-				CC206B4B14ACFEAC007935C6 /* snowleo-window-close-on-graphite.png in Resources */,
 				1C88BB1119DC7C7800645190 /* ys-bottom-background@2x.png in Resources */,
 				1C88BA7319DC7B2200645190 /* yosemite-window-minimize-over-graphite@2x.png in Resources */,
 				1C88BBF919DC7C8100645190 /* ys-effects-one-button_dark.png in Resources */,
-				CC206B4C14ACFEAC007935C6 /* snowleo-window-close-on.png in Resources */,
 				1C88BA5519DC7B2200645190 /* yosemite-window-close-graphite@2x.png in Resources */,
 				1C88BC3D19DC7C8100645190 /* ys-shuffle-blue-pressed_dark.png in Resources */,
 				1C88BA8119DC7B2200645190 /* yosemite-window-zoom-over@2x.png in Resources */,
 				1C88BC9619DC7CB300645190 /* ys-fs_forward_highlight.png in Resources */,
 				1C88BBF319DC7C8100645190 /* ys-effects-double-buttons-pressed_dark.png in Resources */,
 				1C88BB3819DC7C7800645190 /* ys-playlist-1btn-pressed.png in Resources */,
-				CC206B4D14ACFEAC007935C6 /* snowleo-window-close-over-graphite.png in Resources */,
 				1C88BBEA19DC7C8100645190 /* ys-backward-6btns-dark-pressed@2x.png in Resources */,
 				1C88BA6B19DC7B2200645190 /* yosemite-window-fullscreen@2x.png in Resources */,
-				CC206B4E14ACFEAC007935C6 /* snowleo-window-close-over.png in Resources */,
 				1C88BC5219DC7C8100645190 /* ys-volume-low_dark@2x.png in Resources */,
 				1C88BB6C19DC7C7800645190 /* ys-volume-low.png in Resources */,
 				1C88BC2019DC7C8100645190 /* ys-previous-6btns-dark-pressed@2x.png in Resources */,
-				CC206B4F14ACFEAC007935C6 /* snowleo-window-close.png in Resources */,
 				1C88BB1819DC7C7800645190 /* ys-effects-one-button-pressed.png in Resources */,
-				CC206B5014ACFEAC007935C6 /* snowleo-window-minimize-on-graphite.png in Resources */,
-				CC206B5114ACFEAC007935C6 /* snowleo-window-minimize-on.png in Resources */,
-				CC206B5214ACFEAC007935C6 /* snowleo-window-minimize-over-graphite.png in Resources */,
 				1C88BA6619DC7B2200645190 /* yosemite-window-fullscreen-over-graphite.png in Resources */,
 				1C88BC2319DC7C8100645190 /* ys-progressbar-fill-left_dark.png in Resources */,
 				1C88BC0819DC7C8100645190 /* ys-fullscreen-one-button-pressed_dark@2x.png in Resources */,
 				1C88BB2419DC7C7800645190 /* ys-fullscreen-double-buttons-pressed.png in Resources */,
 				1C88BB1719DC7C7800645190 /* ys-effects-double-buttons@2x.png in Resources */,
-				CC206B5314ACFEAC007935C6 /* snowleo-window-minimize-over.png in Resources */,
-				CC206B5614ACFEAC007935C6 /* snowleo-window-zoom-graphite.png in Resources */,
-				CC206B5714ACFEAC007935C6 /* snowleo-window-zoom-on-graphite.png in Resources */,
-				CC206B5814ACFEAC007935C6 /* snowleo-window-zoom-on.png in Resources */,
-				CC206B5914ACFEAC007935C6 /* snowleo-window-zoom-over-graphite.png in Resources */,
-				CC206B5A14ACFEAC007935C6 /* snowleo-window-zoom-over.png in Resources */,
-				CC206B5B14ACFEAC007935C6 /* snowleo-window-zoom.png in Resources */,
 				CC206B6014ACFEB8007935C6 /* topbar-dark-center-fill.png in Resources */,
 				CC206B6114ACFEB8007935C6 /* topbar-dark-left.png in Resources */,
 				CC206B6214ACFEB8007935C6 /* topbar-dark-right.png in Resources */,
 				CC206B6414AD044A007935C6 /* lion-window-minimize-over.png in Resources */,
-				CC206B6714AD046C007935C6 /* snowleo-window-minimize-graphite.png in Resources */,
 				1C88BB3F19DC7C7800645190 /* ys-playlist-btn@2x.png in Resources */,
 				1C88BB3D19DC7C7800645190 /* ys-playlist-btn-pressed@2x.png in Resources */,
-				CC206B6814AD046C007935C6 /* snowleo-window-minimize.png in Resources */,
 				CC206B6A14AD0A52007935C6 /* window-resize.png in Resources */,
 				1C88BC3819DC7C8100645190 /* ys-repeat-one-blue_dark@2x.png in Resources */,
 				1C88BA6819DC7B2200645190 /* yosemite-window-fullscreen-over.png in Resources */,

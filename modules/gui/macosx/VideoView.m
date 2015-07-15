@@ -210,7 +210,7 @@
     CGFloat f_deltaX = [theEvent deltaX];
     CGFloat f_deltaY = [theEvent deltaY];
 
-    if (!OSX_SNOW_LEOPARD && [theEvent isDirectionInvertedFromDevice]) {
+    if ([theEvent isDirectionInvertedFromDevice]) {
         f_deltaX = -f_deltaX;
         f_deltaY = -f_deltaY;
     }

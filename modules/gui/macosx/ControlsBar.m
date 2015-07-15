@@ -57,11 +57,6 @@
     _darkInterface = config_GetInt(VLCIntf, "macosx-interfacestyle");
     _nativeFullscreenMode = NO;
 
-#ifdef MAC_OS_X_VERSION_10_7
-    if (!OSX_SNOW_LEOPARD)
-        _nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
-#endif
-
     [o_drop_view setDrawBorder: NO];
 
     [o_play_btn setToolTip: _NS("Play/Pause")];
@@ -149,8 +144,7 @@
     [o_time_sld_fancygradient_view setFrame: frame];
 
     // hide resize view if necessary
-    if (!OSX_SNOW_LEOPARD)
-        [o_resize_view setImage: NULL];
+    [o_resize_view setImage: NULL];
 
     if ([[self.bottomBarView window] styleMask] & NSResizableWindowMask)
         [o_resize_view removeFromSuperviewWithoutNeedingDisplay];

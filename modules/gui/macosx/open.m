@@ -119,8 +119,7 @@ struct display_info_t
 
 - (void)awakeFromNib
 {
-    if (!OSX_SNOW_LEOPARD)
-        [o_panel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [o_panel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setStringValue: _NS("Media Resource Locator (MRL)")];

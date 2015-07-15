@@ -183,8 +183,7 @@
 {
     p_intf = VLCIntf;
 
-    if (!OSX_SNOW_LEOPARD)
-        [o_prefs_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [o_prefs_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     [o_prefs_window setHidesOnDeactivate:YES];
 
     [self initStrings];

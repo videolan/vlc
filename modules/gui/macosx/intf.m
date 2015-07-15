@@ -618,10 +618,8 @@ audio_output_t *getAout(void)
     var_AddCallback(p_playlist, "volume", VolumeUpdated, (__bridge void *)self);
     var_AddCallback(p_playlist, "mute", VolumeUpdated, (__bridge void *)self);
 
-    if (!OSX_SNOW_LEOPARD) {
-        if ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)
-            var_SetBool(p_playlist, "fullscreen", YES);
-    }
+    if ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)
+        var_SetBool(p_playlist, "fullscreen", YES);
 
     /* load our Shared Dialogs nib */
     [NSBundle loadNibNamed:@"SharedDialogs" owner: NSApp];
@@ -644,12 +642,7 @@ audio_output_t *getAout(void)
     [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: self];
 
-    /* yeah, we are done */
-    _nativeFullscreenMode = NO;
-#ifdef MAC_OS_X_VERSION_10_7
-    if (!OSX_SNOW_LEOPARD)
-        _nativeFullscreenMode = var_InheritBool(p_intf, "macosx-nativefullscreenmode");
-#endif
+    _nativeFullscreenMode = var_InheritBool(p_intf, "macosx-nativefullscreenmode");
 
     if (config_GetInt(VLCIntf, "macosx-icon-change")) {
         /* After day 354 of the year, the usual VLC cone is replaced by another cone

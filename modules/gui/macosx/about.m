@@ -91,8 +91,7 @@
 
 - (void)windowDidLoad
 {
-    if (!OSX_SNOW_LEOPARD)
-        [[self window] setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [[self window] setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     /* Get the localized info dictionary (InfoPlist.strings) */
     NSDictionary *o_local_dict;

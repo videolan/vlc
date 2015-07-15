@@ -63,8 +63,7 @@
 
 - (void)awakeFromNib
 {
-    if (!OSX_SNOW_LEOPARD)
-        [_bookmarksWindow setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [_bookmarksWindow setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     _dataTable.dataSource = self;
     _dataTable.delegate = self;

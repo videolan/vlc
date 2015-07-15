@@ -82,11 +82,7 @@
 
 - (void)awakeFromNib
 {
-    b_nativeFullscreenMode = NO;
-#ifdef MAC_OS_X_VERSION_10_7
-    if (!OSX_SNOW_LEOPARD)
-        b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
-#endif
+    b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
 
     if (!b_nativeFullscreenMode || OSX_YOSEMITE) {
         [o_fullscreen_btn setHidden: YES];
@@ -122,9 +118,7 @@
 - (NSImage *)getButtonImage:(NSString *)o_id
 {
     NSString *o_name = @"";
-    if (OSX_SNOW_LEOPARD) {
-        o_name = @"snowleo-";
-    } else if (OSX_YOSEMITE) {
+    if (OSX_YOSEMITE) {
         o_name = @"yosemite-";
     } else { // OSX_LION, OSX_MOUNTAIN_LION, OSX_MAVERICKS
         o_name = @"lion-";

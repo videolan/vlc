@@ -58,8 +58,7 @@
     self = [super initWithContentRect:contentRect styleMask:styleMask backing:backingType defer:flag];
     if (self) {
         /* we don't want this window to be restored on relaunch */
-        if (!OSX_SNOW_LEOPARD)
-            [self setRestorable:NO];
+        [self setRestorable:NO];
     }
     return self;
 }
@@ -313,11 +312,7 @@
     _darkInterface = config_GetInt(VLCIntf, "macosx-interfacestyle");
 
     if (_darkInterface) {
-        styleMask = NSBorderlessWindowMask;
-#ifdef MAC_OS_X_VERSION_10_7
-        if (!OSX_SNOW_LEOPARD)
-            styleMask |= NSResizableWindowMask;
-#endif
+        styleMask = NSBorderlessWindowMask | NSResizableWindowMask;
     }
 
     self = [super initWithContentRect:contentRect styleMask:styleMask
@@ -335,16 +330,11 @@
 
 - (void)awakeFromNib
 {
-    BOOL b_nativeFullscreenMode = NO;
-#ifdef MAC_OS_X_VERSION_10_7
-    if (!OSX_SNOW_LEOPARD)
-        b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
-#endif
+    BOOL b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
 
     if (b_nativeFullscreenMode) {
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenPrimary];
     }
-
 
     [super awakeFromNib];
 }

@@ -72,8 +72,7 @@
     [win setOpaque:NO];
     [win setHasShadow: NO];
     [win setBackgroundColor:[NSColor clearColor]];
-    if (!OSX_SNOW_LEOPARD)
-        [win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [win setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     /* let the window sit on top of everything else and start out completely transparent */
     [win setLevel:NSModalPanelWindowLevel];
@@ -90,8 +89,7 @@
     if (!isInside)
         [self mouseExited:NULL];
 
-    if (!OSX_SNOW_LEOPARD)
-        [self setAnimationBehavior:NSWindowAnimationBehaviorNone];
+    [self setAnimationBehavior:NSWindowAnimationBehaviorNone];
 
     /* get a notification if VLC isn't the active app anymore */
     [[NSNotificationCenter defaultCenter]
