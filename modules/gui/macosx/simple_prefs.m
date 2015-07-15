@@ -582,9 +582,6 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
     [self setupButton: o_intf_nativefullscreen_ckb forBoolValue: "macosx-nativefullscreenmode"];
 
-    [o_intf_nativefullscreen_ckb setState: NSOffState];
-    [o_intf_nativefullscreen_ckb setEnabled: NO];
-
     [self setupButton: o_intf_embedded_ckb forBoolValue: "embedded-video"];
 
     [self setupButton: o_intf_appleremote_ckb forBoolValue: "macosx-appleremote"];
