@@ -200,6 +200,7 @@ int poll(struct pollfd *fds, unsigned nfds, int timeout)
 
         if (WSAEnumNetworkEvents(fds[i].fd, evts[i], &ne))
             memset(&ne, 0, sizeof (ne));
+        WSAEventSelect(fds[i].fd, evts[i], 0);
         WSACloseEvent(evts[i]);
 
         if (ne.lNetworkEvents & FD_CONNECT)
