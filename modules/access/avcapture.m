@@ -93,8 +93,6 @@ vlc_module_end ()
 
 @implementation VLCAVDecompressedVideoOutput : AVCaptureVideoDataOutput
 
-@synthesize videoDimensions;
-
 - (id)initWithDemux:(demux_t *)p_demux
 {
     if (self = [super init])
