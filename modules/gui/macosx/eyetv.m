@@ -30,27 +30,30 @@
 
 @implementation VLCEyeTVController
 
-static VLCEyeTVController *_o_sharedInstance = nil;
-
 + (VLCEyeTVController *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
+    static VLCEyeTVController *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCEyeTVController new];
+    });
+
+    return sharedInstance;
 }
 
 - (id)init
 {
-    if (!_o_sharedInstance) {
-        _o_sharedInstance = [super init];
-
+    self = [super init];
+    if (self) {
         [[NSDistributedNotificationCenter defaultCenter]
-                    addObserver: self
-                       selector: @selector(globalNotificationReceived:)
-                           name: NULL
-                         object: @"VLCEyeTVSupport"
-             suspensionBehavior: NSNotificationSuspensionBehaviorDeliverImmediately];
+         addObserver:self
+         selector:@selector(globalNotificationReceived:)
+         name:NULL
+         object:@"VLCEyeTVSupport"
+         suspensionBehavior:NSNotificationSuspensionBehaviorDeliverImmediately];
     }
-
-    return _o_sharedInstance;
+    return self;
 }
 
 - (void)globalNotificationReceived: (NSNotification *)theNotification

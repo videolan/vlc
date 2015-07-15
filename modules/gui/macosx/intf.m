@@ -544,17 +544,21 @@ audio_output_t *getAout(void)
 #pragma mark -
 #pragma mark Initialization
 
-static VLCMain *_o_sharedMainInstance = nil;
-
 + (VLCMain *)sharedInstance
 {
-    return _o_sharedMainInstance ? _o_sharedMainInstance : [[self alloc] init];
+    static VLCMain *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCMain new];
+    });
+
+    return sharedInstance;
 }
 
 - (id)init
 {
-    if (!_o_sharedMainInstance)
-        _o_sharedMainInstance = [super init];
+    self = [super init];
 
     p_intf = NULL;
 
@@ -576,7 +580,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     _voutController = [[VLCVoutWindowController alloc] init];
 
-    return _o_sharedMainInstance;
+    return self;
 }
 
 - (void)setIntf: (intf_thread_t *)p_mainintf
@@ -641,7 +645,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* init Apple Remote support */
     o_remote = [[AppleRemote alloc] init];
     [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
-    [o_remote setDelegate: _o_sharedMainInstance];
+    [o_remote setDelegate: self];
 
     /* yeah, we are done */
     _nativeFullscreenMode = NO;
@@ -1310,17 +1314,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (VLCPlaylist *)playlist
 {
     return o_playlist;
-}
-
-- (VLCInfo *)info
-{
-    if (!o_info)
-        o_info = [[VLCInfo alloc] init];
-
-    if (! nib_info_loaded)
-        nib_info_loaded = [NSBundle loadNibNamed:@"MediaInfo" owner: NSApp];
-
-    return o_info;
 }
 
 - (id)wizard

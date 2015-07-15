@@ -97,19 +97,16 @@ struct display_info_t
 #pragma mark -
 #pragma mark Init
 
-static VLCOpen *_o_sharedMainInstance = nil;
-
 + (VLCOpen *)sharedInstance
 {
-    return _o_sharedMainInstance ? _o_sharedMainInstance : [[self alloc] init];
-}
+    static VLCOpen *sharedInstance = nil;
+    static dispatch_once_t pred;
 
-- (id)init
-{
-    if (!_o_sharedMainInstance)
-        _o_sharedMainInstance = [super init];
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCOpen new];
+    });
 
-    return _o_sharedMainInstance;
+    return sharedInstance;
 }
 
 - (void)dealloc

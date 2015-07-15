@@ -47,19 +47,16 @@
 
 @implementation VLCBookmarks
 
-static VLCBookmarks *_o_sharedInstance = nil;
-
 + (VLCBookmarks *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
-}
+    static VLCBookmarks *sharedInstance = nil;
+    static dispatch_once_t pred;
 
-- (id)init
-{
-    if (!_o_sharedInstance)
-        _o_sharedInstance = [super init];
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCBookmarks new];
+    });
 
-    return _o_sharedInstance;
+    return sharedInstance;
 }
 
 /*****************************************************************************

@@ -64,23 +64,27 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 @implementation VLCDebugMessageVisualizer
 
-static VLCDebugMessageVisualizer *_sharedMainInstance = nil;
-
 + (VLCDebugMessageVisualizer *)sharedInstance
 {
-    return _sharedMainInstance ? _sharedMainInstance : [[self alloc] init];
+    static VLCDebugMessageVisualizer *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCDebugMessageVisualizer new];
+    });
+
+    return sharedInstance;
 }
 
 - (id)init
 {
-    if (!_sharedMainInstance) {
-        _sharedMainInstance = [super init];
+    self = [super init];
+    if (self) {
         _msg_lock = [[NSLock alloc] init];
         _msg_arr = [NSMutableArray arrayWithCapacity:600];
         BOOL loaded = [NSBundle loadNibNamed:@"DebugMessageVisualizer" owner:self];
     }
-
-    return _sharedMainInstance;
+    return self;
 }
 
 - (void)awakeFromNib

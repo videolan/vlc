@@ -51,11 +51,17 @@
 #pragma mark Initialization
 
 @implementation VLCAudioEffects
-static VLCAudioEffects *_o_sharedInstance = nil;
 
 + (VLCAudioEffects *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
+    static VLCAudioEffects *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCAudioEffects new];
+    });
+
+    return sharedInstance;
 }
 
 + (void)initialize{
@@ -94,13 +100,10 @@ static VLCAudioEffects *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (!_o_sharedInstance) {
-        p_intf = VLCIntf;
-        i_old_profile_index = -1;
-        _o_sharedInstance = [super init];
-    }
-
-    return _o_sharedInstance;
+    self = [super init];
+    p_intf = VLCIntf;
+    i_old_profile_index = -1;
+    return self;
 }
 
 - (void)awakeFromNib

@@ -23,21 +23,17 @@
 
 #import "SharedDialogs.h"
 
-static VLCEnterTextPanel *_textPanelInstance = nil;
-static VLCSelectItemInPopupPanel *_selectItemPanelInstance = nil;
-
 @implementation VLCEnterTextPanel
 + (VLCEnterTextPanel *)sharedInstance
 {
-    return _textPanelInstance ? _textPanelInstance : [[self alloc] init];
-}
+    static VLCEnterTextPanel *sharedInstance = nil;
+    static dispatch_once_t pred;
 
-- (id)init
-{
-    if (!_textPanelInstance)
-        _textPanelInstance = [super init];
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCEnterTextPanel new];
+    });
 
-    return _textPanelInstance;
+    return sharedInstance;
 }
 
 - (IBAction)windowElementAction:(id)sender
@@ -77,15 +73,14 @@ static VLCSelectItemInPopupPanel *_selectItemPanelInstance = nil;
 
 + (VLCSelectItemInPopupPanel *)sharedInstance
 {
-    return _selectItemPanelInstance ? _selectItemPanelInstance : [[self alloc] init];
-}
+    static VLCSelectItemInPopupPanel *sharedInstance = nil;
+    static dispatch_once_t pred;
 
-- (id)init
-{
-    if (!_selectItemPanelInstance)
-        _selectItemPanelInstance = [super init];
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCSelectItemInPopupPanel new];
+    });
 
-    return _selectItemPanelInstance;
+    return sharedInstance;
 }
 
 - (IBAction)windowElementAction:(id)sender

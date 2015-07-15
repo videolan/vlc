@@ -330,7 +330,7 @@
 //        }
 //
 //        /* update our info-panel to reflect the new item */
-//        [[[VLCMain sharedInstance] info] updatePanelWithItem:p_item->p_input];
+//        [[VLCInfo sharedInstance] updatePanelWithItem:p_item->p_input];
 //    }
 }
 
@@ -542,7 +542,7 @@
 
 - (IBAction)showInfoPanel:(id)sender
 {
-    [[[VLCMain sharedInstance] info] initPanel];
+    [[VLCInfo sharedInstance] initPanel];
 }
 
 - (void)deletionCompleted

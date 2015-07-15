@@ -55,7 +55,6 @@
 
 @interface VLCMainMenu()
 {
-    intf_thread_t *p_intf;
     BOOL b_mainMenu_setup;
     BOOL b_nib_videoeffects_loaded;
     BOOL b_nib_audioeffects_loaded;
@@ -81,20 +80,25 @@
 @end
 
 @implementation VLCMainMenu
-static VLCMainMenu *_o_sharedInstance = nil;
 
 + (VLCMainMenu *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
+    static VLCMainMenu *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCMainMenu new];
+    });
+
+    return sharedInstance;
 }
 
 #pragma mark - Initialization
 
 - (id)init
 {
-    if (!_o_sharedInstance) {
-        _o_sharedInstance = [super init];
-
+    self = [super init];
+    if (self) {
         o_ptc_translation_dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                       _NS("Track Number"),  TRACKNUM_COLUMN,
                       _NS("Title"),         TITLE_COLUMN,
@@ -114,8 +118,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
                            DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN,
                            FILESIZE_COLUMN,nil];
     }
-
-    return _o_sharedInstance;
+    return self;
 }
 
 - (void)dealloc
@@ -143,8 +146,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
     [self setRateControlsEnabled:NO];
 
-    p_intf = VLCIntf;
-
 #ifdef HAVE_SPARKLE
     [o_mi_checkForUpdate setAction:@selector(checkForUpdates:)];
     [o_mi_checkForUpdate setTarget:[SUUpdater sharedUpdater]];
@@ -167,6 +168,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         return;
 
     /* Get ExtensionsManager */
+    intf_thread_t *p_intf = VLCIntf;
     o_extMgr = [ExtensionsManager getInstance:p_intf];
 
     [self initStrings];
@@ -332,7 +334,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     module_config_t *p_item;
 
     [menu removeAllItems];
-    p_item = config_FindConfig(VLC_OBJECT(p_intf), psz_name);
+    p_item = config_FindConfig(VLC_OBJECT(VLCIntf), psz_name);
 
     /* serious problem, if no item found */
     assert(p_item);
@@ -344,7 +346,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         else if (p_item->list.i[i])
             mi = [[NSMenuItem alloc] initWithTitle: [NSString stringWithFormat: @"%d", p_item->list.i[i]] action:NULL keyEquivalent: @""];
         else {
-            msg_Err(p_intf, "item %d of pref %s failed to be created", i, psz_name);
+            msg_Err(VLCIntf, "item %d of pref %s failed to be created", i, psz_name);
             continue;
         }
 
@@ -566,8 +568,6 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)releaseRepresentedObjects:(NSMenu *)the_menu
 {
-    if (!p_intf) return;
-
     NSArray *menuitems_array = [the_menu itemArray];
     NSUInteger menuItemCount = [menuitems_array count];
     for (NSUInteger i=0; i < menuItemCount; i++) {
@@ -583,7 +583,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (void)setupMenus
 {
-    playlist_t * p_playlist = pl_Get(p_intf);
+    playlist_t * p_playlist = pl_Get(VLCIntf);
     input_thread_t * p_input = playlist_CurrentInput(p_playlist);
     if (p_input != NULL) {
         [self setupVarMenuItem: o_mi_program target: (vlc_object_t *)p_input
@@ -792,7 +792,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     playlist_t *p_playlist = pl_Get(VLCIntf);
     bool b_value = !var_CreateGetBool(p_playlist, "play-and-exit");
     var_SetBool(p_playlist, "play-and-exit", b_value);
-    config_PutInt(p_intf, "play-and-exit", b_value);
+    config_PutInt(VLCIntf, "play-and-exit", b_value);
 }
 
 - (IBAction)toggleRecord:(id)sender
@@ -926,7 +926,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
         vout_thread_t *p_vout = getVoutForActiveWindow();
         if (p_vout) {
             BOOL b_fs = var_ToggleBool(p_vout, "video-on-top");
-            var_SetBool(pl_Get(p_intf), "video-on-top", b_fs);
+            var_SetBool(pl_Get(VLCIntf), "video-on-top", b_fs);
 
             vlc_object_release(p_vout);
         }
@@ -1030,7 +1030,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     int intValue = [sender tag];
     NSString *representedObject = [sender representedObject];
 
-    config_PutInt(p_intf, [representedObject UTF8String], intValue);
+    config_PutInt(VLCIntf, [representedObject UTF8String], intValue);
 
     NSMenu *menu = [sender menu];
     NSUInteger count = (NSUInteger) [menu numberOfItems];
@@ -1041,7 +1041,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender
 {
-    config_PutInt(p_intf, "freetype-background-opacity", [sender intValue]);
+    config_PutInt(VLCIntf, "freetype-background-opacity", [sender intValue]);
 }
 
 - (IBAction)telxTransparent:(id)sender
@@ -1272,7 +1272,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
 
 - (IBAction)showInformationPanel:(id)sender
 {
-    [[[VLCMain sharedInstance] info] initPanel];
+    [[VLCInfo sharedInstance] initPanel];
 }
 
 #pragma mark - convinience stuff for other objects
@@ -1528,7 +1528,7 @@ static VLCMainMenu *_o_sharedInstance = nil;
     NSString *o_title = [o_mi title];
     BOOL bEnabled = TRUE;
     vlc_value_t val;
-    playlist_t * p_playlist = pl_Get(p_intf);
+    playlist_t * p_playlist = pl_Get(VLCIntf);
     input_thread_t * p_input = playlist_CurrentInput(p_playlist);
 
     if ([o_title isEqualToString: _NS("Stop")]) {

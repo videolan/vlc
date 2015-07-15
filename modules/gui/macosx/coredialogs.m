@@ -40,32 +40,27 @@
 
 @implementation VLCCoreDialogProvider
 
-static VLCCoreDialogProvider *_o_sharedInstance = nil;
-
 + (VLCCoreDialogProvider *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
-}
+    static VLCCoreDialogProvider *sharedInstance = nil;
+    static dispatch_once_t pred;
 
--(id)init
-{
-    if (!_o_sharedInstance) {
-        _o_sharedInstance = [super init];
-        _progressCancelled = NO;
-    }
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCCoreDialogProvider new];
+    });
 
-    return _o_sharedInstance;
+    return sharedInstance;
 }
 
 -(void)awakeFromNib
 {
+    _progressCancelled = NO;
     [o_auth_login_txt setStringValue: _NS("Username")];
     [o_auth_pw_txt setStringValue: _NS("Password")];
     [o_auth_cancel_btn setTitle: _NS("Cancel")];
     [o_auth_ok_btn setTitle: _NS("OK")];
     [o_prog_cancel_btn setTitle: _NS("Cancel")];
     [o_prog_bar setUsesThreadedAnimation: YES];
-
 }
 
 -(void)performEventWithObject: (NSValue *)o_value ofType: (const char*)type

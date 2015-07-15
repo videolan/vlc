@@ -33,19 +33,17 @@
 
 @implementation VLCStringUtility
 
-static VLCStringUtility *_o_sharedInstance = nil;
 
 + (VLCStringUtility *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
-}
+    static VLCStringUtility *sharedInstance = nil;
+    static dispatch_once_t pred;
 
-- (id)init
-{
-    if (!_o_sharedInstance)
-        _o_sharedInstance = [super init];
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCStringUtility new];
+    });
 
-    return _o_sharedInstance;
+    return sharedInstance;
 }
 
 #pragma mark -

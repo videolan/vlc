@@ -65,8 +65,6 @@
 
 @implementation VLCConvertAndSave
 
-static VLCConvertAndSave *_o_sharedInstance = nil;
-
 #pragma mark -
 #pragma mark Initialization
 
@@ -120,15 +118,14 @@ static VLCConvertAndSave *_o_sharedInstance = nil;
 
 + (VLCConvertAndSave *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
-}
+    static VLCConvertAndSave *sharedInstance = nil;
+    static dispatch_once_t pred;
 
-- (id)init
-{
-    if (!_o_sharedInstance)
-        _o_sharedInstance = [super init];
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCConvertAndSave new];
+    });
 
-    return _o_sharedInstance;
+    return sharedInstance;
 }
 
 - (void)awakeFromNib

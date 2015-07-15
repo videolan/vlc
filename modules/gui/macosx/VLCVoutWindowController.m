@@ -430,7 +430,7 @@
 
     [[VLCVideoEffects sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[VLCAudioEffects sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[[VLCMain sharedInstance] info] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[VLCInfo sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[VLCBookmarks sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[VLCTrackSynchronization sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[[VLCMain sharedInstance] resumeDialog] updateCocoaWindowLevel:currentStatusWindowLevel];

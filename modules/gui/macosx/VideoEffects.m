@@ -39,11 +39,17 @@
 #pragma mark Initialization
 
 @implementation VLCVideoEffects
-static VLCVideoEffects *_o_sharedInstance = nil;
 
 + (VLCVideoEffects *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
+    static VLCVideoEffects *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCVideoEffects new];
+    });
+
+    return sharedInstance;
 }
 
 + (void)initialize
@@ -55,13 +61,11 @@ static VLCVideoEffects *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (!_o_sharedInstance) {
-        p_intf = VLCIntf;
-        i_old_profile_index = -1;
-        _o_sharedInstance = [super init];
-    }
+    self = [super init];
+    p_intf = VLCIntf;
+    i_old_profile_index = -1;
 
-    return _o_sharedInstance;
+    return self;
 }
 
 - (void)awakeFromNib

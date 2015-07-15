@@ -202,23 +202,25 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 
 @implementation VLCSimplePrefs
 
-static VLCSimplePrefs *_o_sharedInstance = nil;
-
 #pragma mark Initialisation
 
 + (VLCSimplePrefs *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
+    static VLCSimplePrefs *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCSimplePrefs new];
+    });
+
+    return sharedInstance;
 }
 
 - (id)init
 {
-    if (!_o_sharedInstance) {
-        _o_sharedInstance = [super init];
-        p_intf = VLCIntf;
-    }
-
-    return _o_sharedInstance;
+    self = [super init];
+    p_intf = VLCIntf;
+    return self;
 }
 
 - (void)awakeFromNib

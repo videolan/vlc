@@ -77,34 +77,32 @@ static const float f_min_window_height = 307.;
 
 @implementation VLCMainWindow
 
-static VLCMainWindow *_o_sharedInstance = nil;
-
-+ (VLCMainWindow *)sharedInstance
-{
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
-}
-
 #pragma mark -
 #pragma mark Initialization
 
-- (id)init
+static VLCMainWindow *sharedInstance = nil;
++ (VLCMainWindow *)sharedInstance
 {
-    if (!_o_sharedInstance)
-        _o_sharedInstance = [super init];
-
-    return _o_sharedInstance;
+    return sharedInstance;
 }
 
-- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
-                  backing:(NSBackingStoreType)backingType defer:(BOOL)flag
+- (id)initWithContentRect:(NSRect)contentRect
+                styleMask:(NSUInteger)styleMask
+                  backing:(NSBackingStoreType)backingType
+                    defer:(BOOL)flag
 {
-    self = [super initWithContentRect:contentRect styleMask:styleMask
-                              backing:backingType defer:flag];
-    _o_sharedInstance = self;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [super initWithContentRect:contentRect
+                                          styleMask:styleMask
+                                            backing:backingType
+                                              defer:flag];
+    });
 
     [[VLCMain sharedInstance] updateTogglePlaylistState];
 
-    return self;
+    return sharedInstance;
 }
 
 - (BOOL)isEvent:(NSEvent *)o_event forKey:(const char *)keyString

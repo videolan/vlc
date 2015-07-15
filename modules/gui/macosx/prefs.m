@@ -156,23 +156,27 @@
 
 @implementation VLCPrefs
 
-static VLCPrefs *_o_sharedMainInstance = nil;
-
 + (VLCPrefs *)sharedInstance
 {
-    return _o_sharedMainInstance ? _o_sharedMainInstance : [[self alloc] init];
+    static VLCPrefs *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCPrefs new];
+    });
+
+    return sharedInstance;
 }
 
 - (id)init
 {
-    if (!_o_sharedMainInstance) {
-        _o_sharedMainInstance = [super init];
+    self = [super init];
+    if (self) {
         p_intf = VLCIntf;
         o_empty_view = [[NSView alloc] init];
         _rootTreeItem = [[VLCTreeMainItem alloc] init];
     }
-
-    return _o_sharedMainInstance;
+    return self;
 }
 
 - (void)awakeFromNib

@@ -55,20 +55,16 @@
 
 @implementation VLCWizard
 
-static VLCWizard *_o_sharedInstance = nil;
-
 + (VLCWizard *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
-}
+    static VLCWizard *sharedInstance = nil;
+    static dispatch_once_t pred;
 
-- (id)init
-{
-    if (!_o_sharedInstance) {
-        _o_sharedInstance = [super init];
-    }
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCWizard new];
+    });
 
-    return _o_sharedInstance;
+    return sharedInstance;
 }
 
 - (void)awakeFromNib

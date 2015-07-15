@@ -74,7 +74,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                 break;
             case INPUT_EVENT_STATISTICS:
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [[[VLCMain sharedInstance] info] updateStatistics];
+                    [[VLCInfo sharedInstance] updateStatistics];
                 });
                 break;
             case INPUT_EVENT_ES:
@@ -395,14 +395,14 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (void)updateMetaAndInfo
 {
     if (!p_current_input) {
-        [[o_main info] updatePanelWithItem:nil];
+        [[VLCInfo sharedInstance] updatePanelWithItem:nil];
         return;
     }
 
     input_item_t *p_input_item = input_GetItem(p_current_input);
 
     [[[o_main playlist] model] updateItem:p_input_item];
-    [[o_main info] updatePanelWithItem:p_input_item];
+    [[VLCInfo sharedInstance] updatePanelWithItem:p_input_item];
 }
 
 - (void)updateMainWindow

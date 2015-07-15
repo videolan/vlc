@@ -41,21 +41,24 @@
 @end
 
 @implementation VLCTrackSynchronization
-static VLCTrackSynchronization *_o_sharedInstance = nil;
 
 + (VLCTrackSynchronization *)sharedInstance
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
+    static VLCTrackSynchronization *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCTrackSynchronization new];
+    });
+
+    return sharedInstance;
 }
 
 - (id)init
 {
-    if (!_o_sharedInstance) {
-        p_intf = VLCIntf;
-        _o_sharedInstance = [super init];
-    }
-
-    return _o_sharedInstance;
+    self = [super init];
+    p_intf = VLCIntf;
+    return self;
 }
 
 - (void)awakeFromNib

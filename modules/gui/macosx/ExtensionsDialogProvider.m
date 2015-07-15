@@ -276,30 +276,36 @@ static int dialogCallback(vlc_object_t *p_this, const char *psz_variable,
 
 @implementation ExtensionsDialogProvider
 
-static ExtensionsDialogProvider *_o_sharedInstance = nil;
+static ExtensionsDialogProvider *sharedInstance = nil;
 
 + (ExtensionsDialogProvider *)sharedInstance:(intf_thread_t *)_p_intf
 {
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] initWithIntf:_p_intf];
+
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [[ExtensionsDialogProvider alloc] initWithIntf:_p_intf];
+    });
+
+    return sharedInstance;
 }
 
 + (void)killInstance
 {
-    _o_sharedInstance = nil;
+    sharedInstance = nil;
 }
 
 - (id)initWithIntf:(intf_thread_t *)_p_intf
 {
-    if (!_o_sharedInstance) {
-        _o_sharedInstance = [super init];
+    self = [super init];
+    if (self) {
         p_intf = _p_intf;
 
         // The Cocoa interface already called dialog_Register()
         var_Create(p_intf, "dialog-extension", VLC_VAR_ADDRESS);
         var_AddCallback(p_intf, "dialog-extension", dialogCallback, NULL);
     }
-
-    return _o_sharedInstance;
+    return self;
 }
 
 - (void)dealloc

@@ -47,21 +47,19 @@
 @end
 
 @implementation VLCCoreInteraction
-static VLCCoreInteraction *_o_sharedInstance = nil;
-
-+ (VLCCoreInteraction *)sharedInstance
-{
-    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
-}
 
 #pragma mark - Initialization
 
-- (id)init
++ (VLCCoreInteraction *)sharedInstance
 {
-    if (!_o_sharedInstance)
-        _o_sharedInstance = [super init];
+    static VLCCoreInteraction *sharedInstance = nil;
+    static dispatch_once_t pred;
 
-    return _o_sharedInstance;
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCCoreInteraction new];
+    });
+
+    return sharedInstance;
 }
 
 - (void)dealloc
