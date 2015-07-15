@@ -152,12 +152,19 @@ namespace adaptative
         bool      restarting;
         mtime_t   timestamps_offset;
 
+        virtual es_out_id_t *esOutAdd(const es_format_t *);
+        virtual int esOutSend(es_out_id_t *, block_t *);
+        virtual void esOutDel(es_out_id_t *);
+        virtual int esOutControl(int, va_list);
+        virtual void esOutDestroy();
+
     private:
-        static es_out_id_t *esOutAdd(es_out_t *, const es_format_t *);
-        static int esOutSend(es_out_t *, es_out_id_t *, block_t *);
-        static void esOutDel(es_out_t *, es_out_id_t *);
-        static int esOutControl(es_out_t *, int, va_list);
-        static void esOutDestroy(es_out_t *);
+        /* static callbacks for demuxer */
+        static es_out_id_t *esOutAdd_Callback(es_out_t *, const es_format_t *);
+        static int esOutSend_Callback(es_out_t *, es_out_id_t *, block_t *);
+        static void esOutDel_Callback(es_out_t *, es_out_id_t *);
+        static int esOutControl_Callback(es_out_t *, int, va_list);
+        static void esOutDestroy_Callback(es_out_t *);
 
         class Demuxed
         {

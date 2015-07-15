@@ -316,11 +316,11 @@ BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, c
 
     vlc_mutex_init(&lock);
 
-    fakeesout->pf_add = esOutAdd;
-    fakeesout->pf_control = esOutControl;
-    fakeesout->pf_del = esOutDel;
-    fakeesout->pf_destroy = esOutDestroy;
-    fakeesout->pf_send = esOutSend;
+    fakeesout->pf_add = esOutAdd_Callback;
+    fakeesout->pf_control = esOutControl_Callback;
+    fakeesout->pf_del = esOutDel_Callback;
+    fakeesout->pf_destroy = esOutDestroy_Callback;
+    fakeesout->pf_send = esOutSend_Callback;
     fakeesout->p_sys = (es_out_sys_t*) this;
 
     demuxstream = stream_DemuxNew(realdemux, name.c_str(), fakeesout);
@@ -497,17 +497,46 @@ void BaseStreamOutput::Demuxed::drop()
 }
 
 /* Static callbacks */
-es_out_id_t * BaseStreamOutput::esOutAdd(es_out_t *fakees, const es_format_t *p_fmt)
+es_out_id_t * BaseStreamOutput::esOutAdd_Callback(es_out_t *fakees, const es_format_t *p_fmt)
 {
     BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
+    return me->esOutAdd(p_fmt);
+}
 
+int BaseStreamOutput::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
+{
+    BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
+    return me->esOutSend(p_es, p_block);
+}
+
+void BaseStreamOutput::esOutDel_Callback(es_out_t *fakees, es_out_id_t *p_es)
+{
+    BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
+    me->esOutDel(p_es);
+}
+
+int BaseStreamOutput::esOutControl_Callback(es_out_t *fakees, int i_query, va_list ap)
+{
+    BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
+    return me->esOutControl(i_query, ap);
+}
+
+void BaseStreamOutput::esOutDestroy_Callback(es_out_t *fakees)
+{
+    BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
+    me->esOutDestroy();
+}
+/* !Static callbacks */
+
+es_out_id_t * BaseStreamOutput::esOutAdd(const es_format_t *p_fmt)
+{
     es_out_id_t *p_es = NULL;
 
-    vlc_mutex_lock(&me->lock);
+    vlc_mutex_lock(&lock);
 
     std::list<Demuxed *>::iterator it;
     bool b_hasestorecyle = false;
-    for(it=me->queues.begin(); it!=me->queues.end();++it)
+    for(it=queues.begin(); it!=queues.end();++it)
     {
         Demuxed *pair = *it;
         b_hasestorecyle |= pair->recycle;
@@ -515,14 +544,14 @@ es_out_id_t * BaseStreamOutput::esOutAdd(es_out_t *fakees, const es_format_t *p_
         if( p_es )
             continue;
 
-        if( me->restarting )
+        if( restarting )
         {
             /* If we're recycling from same format */
             if( es_format_IsSimilar(p_fmt, &pair->fmtcpy) &&
                     p_fmt->i_extra == pair->fmtcpy.i_extra &&
                     !memcmp(p_fmt->p_extra, pair->fmtcpy.p_extra, p_fmt->i_extra) )
             {
-                msg_Err(me->realdemux, "using recycled");
+                msg_Err(realdemux, "using recycled");
                 pair->recycle = false;
                 p_es = pair->es_id;
             }
@@ -531,45 +560,44 @@ es_out_id_t * BaseStreamOutput::esOutAdd(es_out_t *fakees, const es_format_t *p_
 
     if(!b_hasestorecyle)
     {
-        me->restarting = false;
+        restarting = false;
     }
 
     if(!p_es)
     {
-        p_es = me->realdemux->out->pf_add(me->realdemux->out, p_fmt);
+        p_es = realdemux->out->pf_add(realdemux->out, p_fmt);
         if(p_es)
         {
             Demuxed *pair = new (std::nothrow) Demuxed(p_es, p_fmt);
             if(pair)
-                me->queues.push_back(pair);
+                queues.push_back(pair);
         }
     }
-    vlc_mutex_unlock(&me->lock);
+    vlc_mutex_unlock(&lock);
 
     return p_es;
 }
 
-int BaseStreamOutput::esOutSend(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
+int BaseStreamOutput::esOutSend(es_out_id_t *p_es, block_t *p_block)
 {
-    BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
-    vlc_mutex_lock(&me->lock);
-    if(me->b_drop)
+    vlc_mutex_lock(&lock);
+    if(b_drop)
     {
         block_ChainRelease( p_block );
     }
     else
     {
-        if( me->timestamps_offset > VLC_TS_INVALID )
+        if( timestamps_offset > VLC_TS_INVALID )
         {
             if(p_block->i_dts > VLC_TS_INVALID)
-                p_block->i_dts += (me->timestamps_offset - VLC_TS_0);
+                p_block->i_dts += (timestamps_offset - VLC_TS_0);
 
             if(p_block->i_pts > VLC_TS_INVALID)
-                p_block->i_pts += (me->timestamps_offset - VLC_TS_0);
+                p_block->i_pts += (timestamps_offset - VLC_TS_0);
         }
 
         std::list<Demuxed *>::const_iterator it;
-        for(it=me->queues.begin(); it!=me->queues.end();++it)
+        for(it=queues.begin(); it!=queues.end();++it)
         {
             Demuxed *pair = *it;
             if(pair->es_id == p_es)
@@ -579,62 +607,60 @@ int BaseStreamOutput::esOutSend(es_out_t *fakees, es_out_id_t *p_es, block_t *p_
             }
         }
     }
-    vlc_mutex_unlock(&me->lock);
+    vlc_mutex_unlock(&lock);
     return VLC_SUCCESS;
 }
 
-void BaseStreamOutput::esOutDel(es_out_t *fakees, es_out_id_t *p_es)
+void BaseStreamOutput::esOutDel(es_out_id_t *p_es)
 {
-    BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
-    vlc_mutex_lock(&me->lock);
+    vlc_mutex_lock(&lock);
     std::list<Demuxed *>::iterator it;
-    for(it=me->queues.begin(); it!=me->queues.end();++it)
+    for(it=queues.begin(); it!=queues.end();++it)
     {
         if((*it)->es_id == p_es)
         {
-            me->sendToDecoderUnlocked(INT64_MAX - VLC_TS_0);
+            sendToDecoderUnlocked(INT64_MAX - VLC_TS_0);
             break;
         }
     }
 
-    if(it != me->queues.end())
+    if(it != queues.end())
     {
-        if(me->restarting)
+        if(restarting)
         {
             (*it)->recycle = true;
         }
         else
         {
             delete *it;
-            me->queues.erase(it);
+            queues.erase(it);
         }
     }
 
-    if(!me->restarting)
-        me->realdemux->out->pf_del(me->realdemux->out, p_es);
+    if(!restarting)
+        realdemux->out->pf_del(realdemux->out, p_es);
 
-    vlc_mutex_unlock(&me->lock);
+    vlc_mutex_unlock(&lock);
 }
 
-int BaseStreamOutput::esOutControl(es_out_t *fakees, int i_query, va_list args)
+int BaseStreamOutput::esOutControl(int i_query, va_list args)
 {
-    BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
     if (i_query == ES_OUT_SET_PCR )
     {
         vlc_mutex_lock(&lock);
         pcr = (int64_t)va_arg( args, int64_t );
-        if(me->pcr > VLC_TS_INVALID && me->timestamps_offset > VLC_TS_INVALID)
-            me->pcr += (me->timestamps_offset - VLC_TS_0);
+        if(pcr > VLC_TS_INVALID && timestamps_offset > VLC_TS_INVALID)
+            pcr += (timestamps_offset - VLC_TS_0);
         vlc_mutex_unlock(&lock);
         return VLC_SUCCESS;
     }
     else if( i_query == ES_OUT_SET_GROUP_PCR )
     {
         vlc_mutex_lock(&lock);
-        me->group = (int) va_arg( args, int );
-        me->pcr = (int64_t)va_arg( args, int64_t );
-        if(me->pcr > VLC_TS_INVALID && me->timestamps_offset > VLC_TS_INVALID)
-            me->pcr += (me->timestamps_offset - VLC_TS_0);
+        group = (int) va_arg( args, int );
+        pcr = (int64_t)va_arg( args, int64_t );
+        if(pcr > VLC_TS_INVALID && timestamps_offset > VLC_TS_INVALID)
+            pcr += (timestamps_offset - VLC_TS_0);
         vlc_mutex_unlock(&lock);
         return VLC_SUCCESS;
     }
@@ -646,21 +672,20 @@ int BaseStreamOutput::esOutControl(es_out_t *fakees, int i_query, va_list args)
         return VLC_SUCCESS;
     }
 
-    vlc_mutex_lock(&me->lock);
-    bool b_restarting = me->restarting;
-    vlc_mutex_unlock(&me->lock);
+    vlc_mutex_lock(&lock);
+    bool b_restarting = restarting;
+    vlc_mutex_unlock(&lock);
 
     if( b_restarting )
     {
         return VLC_EGENERIC;
     }
 
-    return me->realdemux->out->pf_control(me->realdemux->out, i_query, args);
+    return realdemux->out->pf_control(realdemux->out, i_query, args);
 }
 
-void BaseStreamOutput::esOutDestroy(es_out_t *fakees)
+void BaseStreamOutput::esOutDestroy()
 {
-    BaseStreamOutput *me = (BaseStreamOutput *) fakees->p_sys;
-    me->realdemux->out->pf_destroy(me->realdemux->out);
+    realdemux->out->pf_destroy(realdemux->out);
 }
-/* !Static callbacks */
+
