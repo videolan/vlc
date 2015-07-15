@@ -25,7 +25,18 @@
 #include <vlc_input_item.h>
 
 #pragma mark -
-;
+
+@interface PLItem()
+{
+    input_item_t *p_input;
+
+    int _playlistId;
+    NSMutableArray *_children;
+
+    PLItem *_parent;
+}
+@end
+
 @implementation PLItem
 
 @synthesize children=_children;

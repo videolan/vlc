@@ -28,7 +28,7 @@
 #import "MainWindow.h"
 #import "AddonListDataSource.h"
 
-@interface AddonsWindowController()
+@interface AddonsWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
     addons_manager_t *_manager;
     NSMutableArray *_addons;

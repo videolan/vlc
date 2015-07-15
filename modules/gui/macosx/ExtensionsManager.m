@@ -33,6 +33,21 @@
 #define MENU_GET_ACTION(a) ((uint16_t)(((uint32_t)a) >> 16))
 #define MENU_GET_EXTENSION(a) ((uint16_t)(((uint32_t)a) & 0xFFFF))
 
+@interface ExtensionsManager()
+{
+    intf_thread_t *p_intf;
+    extensions_manager_t *p_extensions_manager;
+    ExtensionsDialogProvider *p_edp;
+
+    NSMutableDictionary *p_extDict;
+
+    BOOL b_unloading;  ///< Work around threads + emit issues, see isUnloading
+    BOOL b_failed; ///< Flag set to true if we could not load the module
+
+    id <ExtensionsDelegate> delegate;
+}
+@end
+
 @implementation ExtensionsManager
 
 static ExtensionsManager* instance = nil;

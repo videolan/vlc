@@ -28,9 +28,7 @@
     /* generic */
     IBOutlet id o_tableView;
     IBOutlet id o_window;
-    intf_thread_t *p_intf;
     IBOutlet id o_profile_pop;
-    BOOL b_genericAudioProfileInInteraction;
 
     /* Equalizer */
     IBOutlet id o_eq_view;
@@ -102,8 +100,6 @@
     IBOutlet id o_filter_normLevel_sld;
     IBOutlet id o_filter_normLevel_lbl;
     IBOutlet id o_filter_karaoke_ckb;
-
-    NSInteger i_old_profile_index;
 }
 
 /* generic */

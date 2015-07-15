@@ -42,6 +42,17 @@
  * VLCWizard implementation
  *****************************************************************************/
 
+@interface VLCWizard()
+{
+    NSMutableDictionary * o_userSelections;
+    NSArray * o_videoCodecs;
+    NSArray * o_audioCodecs;
+    NSArray * o_encapFormats;
+    NSArray * o_strmgMthds;
+    NSString * o_opts;
+}
+@end
+
 @implementation VLCWizard
 
 static VLCWizard *_o_sharedInstance = nil;

@@ -40,6 +40,11 @@
 #include "intf.h"
 #include "prefs_widgets.h"
 
+#define CONFIG_ITEM_STRING_LIST (CONFIG_ITEM_STRING + 10)
+#define CONFIG_ITEM_RANGED_INTEGER (CONFIG_ITEM_INTEGER + 10)
+
+#define LEFTMARGIN  18
+#define RIGHTMARGIN 18
 #define PREFS_WRAP 300
 #define OFFSET_RIGHT 20
 #define OFFSET_BETWEEN 2
@@ -380,30 +385,42 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     [o_checkbox sizeToFit];                                                 \
 }
 
-@implementation VLCConfigControl
-@synthesize type = i_type, viewType = i_view_type, advanced = b_advanced;
+@interface VLCConfigControl()
+{
+    char            *psz_name;
+    int             i_type;
+    bool      b_advanced;
+}
+@end
 
-- (id)initWithFrame: (NSRect)frame
+@implementation VLCConfigControl
+@synthesize type = i_type, advanced = b_advanced;
+
+- (id)initWithFrame:(NSRect)frame
 {
     return [self initWithFrame: frame
-                    item: nil];
+                          item: nil];
 }
 
-- (id)initWithFrame: (NSRect)frame
-        item: (module_config_t *)_p_item
+- (id)initWithFrame:(NSRect)frame
+               item:(module_config_t *)p_item
 {
     self = [super initWithFrame: frame];
 
     if (self != nil) {
-        p_item = _p_item;
+        _p_item = p_item;
         psz_name = p_item->psz_name;
-        o_label = NULL;
         i_type = p_item->i_type;
-        i_view_type = 0;
         b_advanced = p_item->b_advanced;
         [self setAutoresizingMask:NSViewWidthSizable | NSViewMinYMargin ];
     }
     return (self);
+}
+
+- (id)initWithItem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view;
+{
+    return nil; // implemented by children only
 }
 
 - (void)setYPos:(int)i_yPos
@@ -418,414 +435,420 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     free(psz_name);
 }
 
-+ (int)calcVerticalMargin: (int)i_curItem lastItem: (int)i_lastItem
++ (int)calcVerticalMargin:(int)i_curItem lastItem:(int)i_lastItem
 {
     int i_margin;
     switch(i_curItem) {
-    case CONFIG_ITEM_STRING:
-    case CONFIG_ITEM_PASSWORD:
-        switch(i_lastItem) {
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_PASSWORD:
-            i_margin = 8;
+            switch(i_lastItem) {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_STRING_LIST:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_MODULE:
+                    i_margin = 4;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_RANGED_INTEGER:
+                    i_margin = 5;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_KEY:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_MODULE_LIST:
+                    i_margin = 8;
+                    break;
+                default:
+                    i_margin = 20;
+                    break;
+            }
             break;
         case CONFIG_ITEM_STRING_LIST:
-            i_margin = 7;
+            switch(i_lastItem) {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_STRING_LIST:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_MODULE:
+                    i_margin = 4;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_RANGED_INTEGER:
+                    i_margin = 5;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_KEY:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_MODULE_LIST:
+                    i_margin = 8;
+                    break;
+                default:
+                    i_margin = 20;
+                    break;
+            }
             break;
         case CONFIG_ITEM_LOADFILE:
         case CONFIG_ITEM_SAVEFILE:
-            i_margin = 8;
+            switch(i_lastItem) {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
+                    i_margin = 13;
+                    break;
+                case CONFIG_ITEM_STRING_LIST:
+                    i_margin = 10;
+                    break;
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
+                    i_margin = 9;
+                    break;
+                case CONFIG_ITEM_MODULE:
+                    i_margin = 9;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_margin = 10;
+                    break;
+                case CONFIG_ITEM_RANGED_INTEGER:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    i_margin = 10;
+                    break;
+                case CONFIG_ITEM_KEY:
+                    i_margin = 9;
+                    break;
+                case CONFIG_ITEM_MODULE_LIST:
+                    i_margin = 11;
+                    break;
+                default:
+                    i_margin = 23;
+                    break;
+            }
             break;
         case CONFIG_ITEM_MODULE:
-            i_margin = 4;
+            switch(i_lastItem) {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_STRING_LIST:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_MODULE:
+                    i_margin = 5;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_RANGED_INTEGER:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_KEY:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_MODULE_LIST:
+                    i_margin = 9;
+                    break;
+                default:
+                    i_margin = 20;
+                    break;
+            }
             break;
         case CONFIG_ITEM_INTEGER:
-            i_margin = 7;
+            switch(i_lastItem) {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_STRING_LIST:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_MODULE:
+                    i_margin = 4;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_RANGED_INTEGER:
+                    i_margin = 5;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_KEY:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_MODULE_LIST:
+                    i_margin = 8;
+                    break;
+                default:
+                    i_margin = 20;
+                    break;
+            }
             break;
         case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 5;
+            switch(i_lastItem) {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_STRING_LIST:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_MODULE:
+                    i_margin = 4;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_RANGED_INTEGER:
+                    i_margin = 5;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_KEY:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_MODULE_LIST:
+                    i_margin = 8;
+                    break;
+                default:
+                    i_margin = 20;
+                    break;
+            }
             break;
         case CONFIG_ITEM_BOOL:
-            i_margin = 7;
+            switch(i_lastItem) {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
+                    i_margin = 10;
+                    break;
+                case CONFIG_ITEM_STRING_LIST:
+                    i_margin = 9;
+                    break;
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_MODULE:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_margin = 9;
+                    break;
+                case CONFIG_ITEM_RANGED_INTEGER:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_KEY:
+                    i_margin = 5;
+                    break;
+                case CONFIG_ITEM_MODULE_LIST:
+                    i_margin = 10;
+                    break;
+                default:
+                    i_margin = 20;
+                    break;
+            }
             break;
         case CONFIG_ITEM_KEY:
-            i_margin = 6;
+            switch(i_lastItem) {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_STRING_LIST:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_MODULE:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_RANGED_INTEGER:
+                    i_margin = 5;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_KEY:
+                    i_margin = 8;
+                    break;
+                case CONFIG_ITEM_MODULE_LIST:
+                    i_margin = 10;
+                    break;
+                default:
+                    i_margin = 20;
+                    break;
+            }
             break;
         case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 8;
+            switch(i_lastItem) {
+                case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
+                    i_margin = 10;
+                    break;
+                case CONFIG_ITEM_STRING_LIST:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_LOADFILE:
+                case CONFIG_ITEM_SAVEFILE:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_MODULE:
+                    i_margin = 6;
+                    break;
+                case CONFIG_ITEM_INTEGER:
+                    i_margin = 9;
+                    break;
+                case CONFIG_ITEM_RANGED_INTEGER:
+                    i_margin = 5;
+                    break;
+                case CONFIG_ITEM_BOOL:
+                    i_margin = 7;
+                    break;
+                case CONFIG_ITEM_KEY:
+                    i_margin = 5;
+                    break;
+                case CONFIG_ITEM_MODULE_LIST:
+                    i_margin = 8;
+                    break;
+                default:
+                    i_margin = 20;
+                    break;
+            }
             break;
         default:
             i_margin = 20;
             break;
-        }
-        break;
-    case CONFIG_ITEM_STRING_LIST:
-        switch(i_lastItem) {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_LOADFILE:
-        case CONFIG_ITEM_SAVEFILE:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 4;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 8;
-            break;
-        default:
-            i_margin = 20;
-            break;
-        }
-        break;
-    case CONFIG_ITEM_LOADFILE:
-    case CONFIG_ITEM_SAVEFILE:
-        switch(i_lastItem) {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 13;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 10;
-            break;
-        case CONFIG_ITEM_LOADFILE:
-        case CONFIG_ITEM_SAVEFILE:
-            i_margin = 9;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 9;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 10;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 10;
-            break;
-        case CONFIG_ITEM_KEY:
-            i_margin = 9;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 11;
-            break;
-        default:
-            i_margin = 23;
-            break;
-        }
-        break;
-    case CONFIG_ITEM_MODULE:
-        switch(i_lastItem) {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_LOADFILE:
-        case CONFIG_ITEM_SAVEFILE:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_KEY:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 9;
-            break;
-        default:
-            i_margin = 20;
-            break;
-        }
-        break;
-    case CONFIG_ITEM_INTEGER:
-        switch(i_lastItem) {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_LOADFILE:
-        case CONFIG_ITEM_SAVEFILE:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 4;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 8;
-            break;
-        default:
-            i_margin = 20;
-            break;
-        }
-        break;
-    case CONFIG_ITEM_RANGED_INTEGER:
-        switch(i_lastItem) {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_LOADFILE:
-        case CONFIG_ITEM_SAVEFILE:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 4;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 8;
-            break;
-        default:
-            i_margin = 20;
-            break;
-        }
-        break;
-    case CONFIG_ITEM_BOOL:
-        switch(i_lastItem) {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 10;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 9;
-            break;
-        case CONFIG_ITEM_LOADFILE:
-        case CONFIG_ITEM_SAVEFILE:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 9;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 10;
-            break;
-        default:
-            i_margin = 20;
-            break;
-        }
-        break;
-    case CONFIG_ITEM_KEY:
-        switch(i_lastItem) {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_LOADFILE:
-        case CONFIG_ITEM_SAVEFILE:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY:
-            i_margin = 8;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 10;
-            break;
-        default:
-            i_margin = 20;
-            break;
-        }
-        break;
-    case CONFIG_ITEM_MODULE_LIST:
-        switch(i_lastItem) {
-        case CONFIG_ITEM_STRING:
-        case CONFIG_ITEM_PASSWORD:
-            i_margin = 10;
-            break;
-        case CONFIG_ITEM_STRING_LIST:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_LOADFILE:
-        case CONFIG_ITEM_SAVEFILE:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_MODULE:
-            i_margin = 6;
-            break;
-        case CONFIG_ITEM_INTEGER:
-            i_margin = 9;
-            break;
-        case CONFIG_ITEM_RANGED_INTEGER:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_BOOL:
-            i_margin = 7;
-            break;
-        case CONFIG_ITEM_KEY:
-            i_margin = 5;
-            break;
-        case CONFIG_ITEM_MODULE_LIST:
-            i_margin = 8;
-            break;
-        default:
-            i_margin = 20;
-            break;
-        }
-        break;
-    default:
-        i_margin = 20;
-        break;
     }
     return i_margin;
 }
 
-+ (VLCConfigControl *)newControl: (module_config_t *)_p_item
-                      withView: (NSView *)o_parent_view
++ (VLCConfigControl *)newControl:(module_config_t *)_p_item
+                        withView:(NSView *)o_parent_view
 {
     VLCConfigControl *p_control = NULL;
 
     switch(_p_item->i_type) {
-    case CONFIG_ITEM_STRING:
-    case CONFIG_ITEM_PASSWORD:
-        if (!_p_item->list_count) {
-            p_control = [[StringConfigControl alloc]
-                    initWithItem: _p_item
-                    withView: o_parent_view];
-        } else {
-            p_control = [[StringListConfigControl alloc]
-                    initWithItem: _p_item
-                    withView: o_parent_view];
-        }
-        break;
-    case CONFIG_ITEM_LOADFILE:
-    case CONFIG_ITEM_SAVEFILE:
-    case CONFIG_ITEM_DIRECTORY:
-        p_control = [[FileConfigControl alloc]
-                    initWithItem: _p_item
-                    withView: o_parent_view];
-        break;
-    case CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_STRING:
+        case CONFIG_ITEM_PASSWORD:
+            if (!_p_item->list_count) {
+                p_control = [[StringConfigControl alloc]
+                             initWithItem: _p_item
+                             withView: o_parent_view];
+            } else {
+                p_control = [[StringListConfigControl alloc]
+                             initWithItem: _p_item
+                             withView: o_parent_view];
+            }
+            break;
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
+        case CONFIG_ITEM_DIRECTORY:
+            p_control = [[FileConfigControl alloc]
+                         initWithItem: _p_item
+                         withView: o_parent_view];
+            break;
+        case CONFIG_ITEM_MODULE:
             p_control = [[StringListConfigControl alloc]
                          initWithItem: _p_item
                          withView: o_parent_view];
             break;
-    case CONFIG_ITEM_MODULE_CAT:
-        p_control = [[ModuleConfigControl alloc]
-                    initWithItem: _p_item
-                    withView: o_parent_view];
-        break;
-    case CONFIG_ITEM_INTEGER:
-        if (_p_item->list_count)
-            p_control = [[IntegerListConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
-        else if ((_p_item->min.i != 0 || _p_item->max.i != 0) && (_p_item->min.i != INT_MIN || _p_item->max.i != INT_MAX))
-            p_control = [[RangedIntegerConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
-        else
-            p_control = [[IntegerConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
-        break;
-    case CONFIG_ITEM_BOOL:
-        p_control = [[BoolConfigControl alloc]
-                    initWithItem: _p_item
-                    withView: o_parent_view];
-        break;
-    case CONFIG_ITEM_FLOAT:
-        if ((_p_item->min.i != 0 || _p_item->max.i != 0) && (_p_item->min.i != INT_MIN || _p_item->max.i != INT_MAX))
-            p_control = [[RangedFloatConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
-        else
-            p_control = [[FloatConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
-        break;
-    /* don't display keys in the advanced settings, since the current controls
-    are broken by design. The user is required to change hotkeys in the sprefs
-    and can only change really advanced stuff here..
-    case CONFIG_ITEM_KEY:
-        p_control = [[KeyConfigControl alloc]
-                        initWithItem: _p_item
-                        withView: o_parent_view];
-        break; */
-    case CONFIG_ITEM_MODULE_LIST:
-    case CONFIG_ITEM_MODULE_LIST_CAT:
-        p_control = [[ModuleListConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
-        break;
-    case CONFIG_SECTION:
-        p_control = [[SectionControl alloc] initWithItem: _p_item withView: o_parent_view];
-        break;
-    default:
-        break;
+        case CONFIG_ITEM_MODULE_CAT:
+            p_control = [[ModuleConfigControl alloc]
+                         initWithItem: _p_item
+                         withView: o_parent_view];
+            break;
+        case CONFIG_ITEM_INTEGER:
+            if (_p_item->list_count)
+                p_control = [[IntegerListConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
+            else if ((_p_item->min.i != 0 ||
+                      _p_item->max.i != 0) &&
+                     (_p_item->min.i != INT_MIN ||
+                      _p_item->max.i != INT_MAX))
+                p_control = [[RangedIntegerConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
+            else
+                p_control = [[IntegerConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
+            break;
+        case CONFIG_ITEM_BOOL:
+            p_control = [[BoolConfigControl alloc]
+                         initWithItem: _p_item
+                         withView: o_parent_view];
+            break;
+        case CONFIG_ITEM_FLOAT:
+            if ((_p_item->min.i != 0 ||
+                 _p_item->max.i != 0) &&
+                (_p_item->min.i != INT_MIN ||
+                 _p_item->max.i != INT_MAX))
+                p_control = [[RangedFloatConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
+            else
+                p_control = [[FloatConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
+            break;
+            /* don't display keys in the advanced settings, since the current controls
+             are broken by design. The user is required to change hotkeys in the sprefs
+             and can only change really advanced stuff here..
+             case CONFIG_ITEM_KEY:
+             p_control = [[KeyConfigControl alloc]
+             initWithItem: _p_item
+             withView: o_parent_view];
+             break; */
+        case CONFIG_ITEM_MODULE_LIST:
+        case CONFIG_ITEM_MODULE_LIST_CAT:
+            p_control = [[ModuleListConfigControl alloc] initWithItem: _p_item withView: o_parent_view];
+            break;
+        case CONFIG_SECTION:
+            p_control = [[SectionControl alloc] initWithItem: _p_item withView: o_parent_view];
+            break;
+        default:
+            break;
     }
     return p_control;
 }
@@ -853,31 +876,31 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 - (void)applyChanges
 {
     vlc_value_t val;
-    switch(p_item->i_type) {
-    case CONFIG_ITEM_STRING:
-    case CONFIG_ITEM_PASSWORD:
-    case CONFIG_ITEM_LOADFILE:
-    case CONFIG_ITEM_SAVEFILE:
-    case CONFIG_ITEM_DIRECTORY:
-    case CONFIG_ITEM_MODULE:
-    case CONFIG_ITEM_MODULE_LIST:
-    case CONFIG_ITEM_MODULE_LIST_CAT: {
-        char *psz_val = [self stringValue];
-        config_PutPsz(VLCIntf, psz_name, psz_val);
-        free(psz_val);
-        break;
-    }
-    case CONFIG_ITEM_KEY:
-        /* So you don't need to restart to have the changes take effect */
-        val.i_int = [self intValue];
-        var_Set(VLCIntf->p_libvlc, psz_name, val);
-    case CONFIG_ITEM_INTEGER:
-    case CONFIG_ITEM_BOOL:
-        config_PutInt(VLCIntf, psz_name, [self intValue]);
-        break;
-    case CONFIG_ITEM_FLOAT:
-        config_PutFloat(VLCIntf, psz_name, [self floatValue]);
-        break;
+    switch(self.p_item->i_type) {
+        case CONFIG_ITEM_STRING:
+        case CONFIG_ITEM_PASSWORD:
+        case CONFIG_ITEM_LOADFILE:
+        case CONFIG_ITEM_SAVEFILE:
+        case CONFIG_ITEM_DIRECTORY:
+        case CONFIG_ITEM_MODULE:
+        case CONFIG_ITEM_MODULE_LIST:
+        case CONFIG_ITEM_MODULE_LIST_CAT: {
+            char *psz_val = [self stringValue];
+            config_PutPsz(VLCIntf, psz_name, psz_val);
+            free(psz_val);
+            break;
+        }
+        case CONFIG_ITEM_KEY:
+            /* So you don't need to restart to have the changes take effect */
+            val.i_int = [self intValue];
+            var_Set(VLCIntf->p_libvlc, psz_name, val);
+        case CONFIG_ITEM_INTEGER:
+        case CONFIG_ITEM_BOOL:
+            config_PutInt(VLCIntf, psz_name, [self intValue]);
+            break;
+        case CONFIG_ITEM_FLOAT:
+            config_PutFloat(VLCIntf, psz_name, [self floatValue]);
+            break;
     }
 }
 
@@ -887,7 +910,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (int)labelSize
 {
-    return [o_label frame].size.width;
+    return self.label.frame.size.width;
 }
 
 - (void) alignWithXPosition:(int)i_xPos;
@@ -897,9 +920,15 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 }
 @end
 
+@interface StringConfigControl()
+{
+    NSTextField     *o_textfield;
+}
+@end
+
 @implementation StringConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldString, *o_textfieldTooltip;
@@ -908,11 +937,11 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
         if (p_item->i_type == CONFIG_ITEM_PASSWORD)
-            i_view_type = CONFIG_ITEM_PASSWORD;
+            self.viewType = CONFIG_ITEM_PASSWORD;
         else
-            i_view_type = CONFIG_ITEM_STRING;
+            self.viewType = CONFIG_ITEM_STRING;
 
         o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -921,9 +950,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the textfield */
         if (p_item->value.psz)
@@ -931,13 +960,13 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         else
             o_textfieldString = @"";
         if (p_item->i_type == CONFIG_ITEM_PASSWORD) {
-            ADD_SECURETEXTFIELD(o_textfield, mainFrame, [o_label frame].size.width + 2,
-                          0, mainFrame.size.width - [o_label frame].size.width -
-                          2, o_textfieldTooltip, o_textfieldString)
+            ADD_SECURETEXTFIELD(o_textfield, mainFrame, [self.label frame].size.width + 2,
+                                0, mainFrame.size.width - [self.label frame].size.width -
+                                2, o_textfieldTooltip, o_textfieldString)
         } else {
-            ADD_TEXTFIELD(o_textfield, mainFrame, [o_label frame].size.width + 2,
-                            0, mainFrame.size.width - [o_label frame].size.width -
-                            2, o_textfieldTooltip, o_textfieldString)
+            ADD_TEXTFIELD(o_textfield, mainFrame, [self.label frame].size.width + 2,
+                          0, mainFrame.size.width - [self.label frame].size.width -
+                          2, o_textfieldTooltip, o_textfieldString)
         }
         [o_textfield setAutoresizingMask:NSViewWidthSizable ];
 
@@ -950,9 +979,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     NSRect frame;
     NSRect superFrame = [self frame];
-    frame = [o_label frame];
+    frame = [self.label frame];
     frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
+    [self.label setFrame:frame];
 
     frame = [o_textfield frame];
     frame.origin.x = i_xPos + 2;
@@ -968,7 +997,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 - (void)resetValues
 {
     NSString *o_textfieldString;
-    char *psz_value = config_GetPsz(VLCIntf, p_item->psz_name);
+    char *psz_value = config_GetPsz(VLCIntf, self.p_item->psz_name);
     if (psz_value)
         o_textfieldString = _NS(psz_value);
     else
@@ -978,9 +1007,15 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 }
 @end
 
+@interface StringListConfigControl()
+{
+    NSPopUpButton      *o_popup;
+}
+@end
+
 @implementation StringListConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldTooltip;
@@ -989,11 +1024,11 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
+    if ([super initWithFrame: mainFrame item:p_item] != nil) {
         if (p_item->i_type == CONFIG_ITEM_STRING)
-            i_view_type = CONFIG_ITEM_STRING_LIST;
+            self.viewType = CONFIG_ITEM_STRING_LIST;
         else
-            i_view_type = CONFIG_ITEM_MODULE;
+            self.viewType = CONFIG_ITEM_MODULE;
 
         o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1002,13 +1037,13 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the textfield */
-        ADD_POPUP(o_popup, mainFrame, [o_label frame].size.width,
-            -2, 0, o_textfieldTooltip)
+        ADD_POPUP(o_popup, mainFrame, [self.label frame].size.width,
+                  -2, 0, o_textfieldTooltip)
         [o_popup setAutoresizingMask:NSViewWidthSizable];
 
         /* add items */
@@ -1023,9 +1058,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     NSRect frame;
     NSRect superFrame = [self frame];
-    frame = [o_label frame];
+    frame = [self.label frame];
     frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
+    [self.label setFrame:frame];
 
     frame = [o_popup frame];
     frame.origin.x = i_xPos + 2;
@@ -1046,10 +1081,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     [o_popup removeAllItems];
 
-    char *psz_value = config_GetPsz(VLCIntf, p_item->psz_name);
+    char *psz_value = config_GetPsz(VLCIntf, self.p_item->psz_name);
 
     char **values, **texts;
-    ssize_t count = config_GetPszChoices(VLC_OBJECT(VLCIntf), p_item->psz_name,
+    ssize_t count = config_GetPszChoices(VLC_OBJECT(VLCIntf), self.p_item->psz_name,
                                          &values, &texts);
     for (ssize_t i = 0; i < count && texts; i++) {
         if (texts[i] == NULL || values[i] == NULL)
@@ -1074,9 +1109,17 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 }
 @end
 
+@interface FileConfigControl()
+{
+    NSTextField     *o_textfield;
+    NSButton        *o_button;
+    BOOL            b_directory;
+}
+@end
+
 @implementation FileConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_itemTooltip, *o_textfieldString;
@@ -1085,8 +1128,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_LOADFILE;
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_LOADFILE;
 
         o_itemTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1098,13 +1141,13 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, 3, o_labelString, o_itemTooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, 3, o_labelString, o_itemTooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the button */
         ADD_RIGHT_BUTTON(o_button, mainFrame, 0, 0, o_itemTooltip,
-                            _NS("Browse..."))
+                         _NS("Browse..."))
         [o_button setAutoresizingMask:NSViewMinXMargin ];
         [self addSubview: o_button];
 
@@ -1114,8 +1157,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         else
             o_textfieldString = @"";
         ADD_TEXTFIELD(o_textfield, mainFrame, 12, 2, mainFrame.size.width -
-                        8 - [o_button frame].size.width,
-                        o_itemTooltip, o_textfieldString)
+                      8 - [o_button frame].size.width,
+                      o_itemTooltip, o_textfieldString)
         [o_textfield setAutoresizingMask:NSViewWidthSizable ];
         [self addSubview: o_textfield];
     }
@@ -1127,12 +1170,12 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     ;
 }
 
-- (IBAction)openFileDialog: (id)sender
+- (IBAction)openFileDialog:(id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
 
-    [o_open_panel setTitle: (b_directory)?
-        _NS("Select a directory"):_NS("Select a file")];
+    [o_open_panel setTitle:(b_directory)?
+     _NS("Select a directory"):_NS("Select a file")];
     [o_open_panel setPrompt: _NS("Select")];
     [o_open_panel setAllowsMultipleSelection: NO];
     [o_open_panel setCanChooseFiles: !b_directory];
@@ -1141,7 +1184,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         if (returnCode == NSOKButton) {
             NSString *o_path = [[[o_open_panel URLs] objectAtIndex:0] path];
             [o_textfield setStringValue: o_path];
-        }        
+        }
     }];
 }
 
@@ -1156,7 +1199,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 -(void)resetValues
 {
     NSString *o_textfieldString;
-    char *psz_value = config_GetPsz(VLCIntf, p_item->psz_name);
+    char *psz_value = config_GetPsz(VLCIntf, self.p_item->psz_name);
     if (psz_value)
         o_textfieldString = [NSString stringWithFormat: @"%s", psz_value];
     else
@@ -1167,9 +1210,15 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 }
 @end
 
+@interface ModuleConfigControl()
+{
+    NSPopUpButton   *o_popup;
+}
+@end
+
 @implementation ModuleConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_popupTooltip;
@@ -1178,8 +1227,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_MODULE;
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_MODULE;
 
         o_popupTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1189,13 +1238,13 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         else
             o_labelString = @"";
 
-        ADD_LABEL(o_label, mainFrame, 0, -1, o_labelString, o_popupTooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -1, o_labelString, o_popupTooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the popup */
-        ADD_POPUP(o_popup, mainFrame, [o_label frame].size.width,
-            -2, 0, o_popupTooltip)
+        ADD_POPUP(o_popup, mainFrame, [self.label frame].size.width,
+                  -2, 0, o_popupTooltip)
         [o_popup setAutoresizingMask:NSViewWidthSizable ];
         [o_popup addItemWithTitle: _NS("Default")];
         [[o_popup lastItem] setTag: -1];
@@ -1211,9 +1260,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     NSRect frame;
     NSRect superFrame = [self frame];
-    frame = [o_label frame];
+    frame = [self.label frame];
     frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
+    [self.label setFrame:frame];
 
     frame = [o_popup frame];
     frame.origin.x = i_xPos - 1;
@@ -1254,8 +1303,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     }
     module_list_free(p_list);
 
-    if(returnval == NULL && [newval isEqualToString: _NS("Default")] && p_item->orig.psz != NULL) {
-        returnval = strdup(p_item->orig.psz);
+    if(returnval == NULL && [newval isEqualToString: _NS("Default")] && self.p_item->orig.psz != NULL) {
+        returnval = strdup(self.p_item->orig.psz);
     }
     return returnval;
 }
@@ -1279,12 +1328,12 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             module_config_t *p_config = &p_configlist[i];
             /* Hack: required subcategory is stored in i_min */
             if (p_config->i_type == CONFIG_SUBCATEGORY &&
-                p_config->value.i == p_item->min.i) {
+                p_config->value.i == self.p_item->min.i) {
                 NSString *o_description = _NS(module_get_name(p_parser, TRUE));
                 [o_popup addItemWithTitle: o_description];
 
-                if (p_item->value.psz && !strcmp(p_item->value.psz,
-                                                 module_get_object(p_parser)))
+                if (self.p_item->value.psz && !strcmp(self.p_item->value.psz,
+                                                      module_get_object(p_parser)))
                     [o_popup selectItem:[o_popup lastItem]];
             }
         }
@@ -1295,9 +1344,16 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 }
 @end
 
+@interface IntegerConfigControl() <NSTextFieldDelegate>
+{
+    NSTextField     *o_textfield;
+    NSStepper       *o_stepper;
+}
+@end
+
 @implementation IntegerConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1306,8 +1362,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_INTEGER;
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_INTEGER;
 
         o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1316,25 +1372,25 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, -3, o_labelString, o_tooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -3, o_labelString, o_tooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the stepper */
         ADD_STEPPER(o_stepper, mainFrame, mainFrame.size.width - 19,
-            0, o_tooltip, -100000, 100000)
+                    0, o_tooltip, -100000, 100000)
         [o_stepper setIntValue: p_item->value.i];
         [o_stepper setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_stepper];
 
         ADD_TEXTFIELD(o_textfield, mainFrame, mainFrame.size.width - 19 - 52,
-            1, 49, o_tooltip, @"")
+                      1, 49, o_tooltip, @"")
         [o_textfield setIntValue: p_item->value.i];
         [o_textfield setDelegate: self];
         [[NSNotificationCenter defaultCenter] addObserver: self
-            selector: @selector(textfieldChanged:)
-            name: NSControlTextDidChangeNotification
-            object: o_textfield];
+                                                 selector: @selector(textfieldChanged:)
+                                                     name: NSControlTextDidChangeNotification
+                                                   object: o_textfield];
         [o_textfield setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_textfield];
     }
@@ -1344,9 +1400,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 - (void) alignWithXPosition:(int)i_xPos
 {
     NSRect frame;
-    frame = [o_label frame];
+    frame = [self.label frame];
     frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
+    [self.label setFrame:frame];
 
     frame = [o_textfield frame];
     frame.origin.x = i_xPos + 2;
@@ -1374,16 +1430,22 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 -(void)resetValues
 {
-    [o_textfield setIntValue: config_GetInt(VLCIntf, p_item->psz_name)];
+    [o_textfield setIntValue: config_GetInt(VLCIntf, self.p_item->psz_name)];
     [super resetValues];
 }
 
 @end
 
+@interface IntegerListConfigControl()
+{
+    NSPopUpButton      *o_popup;
+}
+@end
+
 @implementation IntegerListConfigControl
 
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldTooltip;
@@ -1392,8 +1454,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_STRING_LIST;
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_STRING_LIST;
 
         o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1402,18 +1464,18 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -3, o_labelString, o_textfieldTooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the textfield */
-        ADD_POPUP(o_popup, mainFrame, [o_label frame].size.width,
-            -2, 0, o_textfieldTooltip)
+        ADD_POPUP(o_popup, mainFrame, [self.label frame].size.width,
+                  -2, 0, o_textfieldTooltip)
         [o_popup setAutoresizingMask:NSViewWidthSizable ];
 
         /* add items */
         [self resetValues];
-        
+
         [self addSubview: o_popup];
     }
     return self;
@@ -1423,9 +1485,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     NSRect frame;
     NSRect superFrame = [self frame];
-    frame = [o_label frame];
+    frame = [self.label frame];
     frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
+    [self.label setFrame:frame];
 
     frame = [o_popup frame];
     frame.origin.x = i_xPos + 2;
@@ -1447,10 +1509,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     [o_popup removeAllItems];
 
-    int i_current_selection = config_GetInt(VLCIntf, p_item->psz_name);
+    int i_current_selection = config_GetInt(VLCIntf, self.p_item->psz_name);
     int64_t *values;
     char **texts;
-    ssize_t count = config_GetIntChoices(VLC_OBJECT(VLCIntf), p_item->psz_name, &values, &texts);
+    ssize_t count = config_GetIntChoices(VLC_OBJECT(VLCIntf), self.p_item->psz_name, &values, &texts);
     for (ssize_t i = 0; i < count; i++) {
         NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
         [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];
@@ -1465,9 +1527,18 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 }
 @end
 
+@interface RangedIntegerConfigControl() <NSTextFieldDelegate>
+{
+    NSSlider        *o_slider;
+    NSTextField     *o_textfield;
+    NSTextField     *o_textfield_min;
+    NSTextField     *o_textfield_max;
+}
+@end
+
 @implementation RangedIntegerConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1476,8 +1547,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_RANGED_INTEGER;
+    if ([super initWithFrame: mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_RANGED_INTEGER;
 
         o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1486,20 +1557,20 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, -3, o_labelString, o_tooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -3, o_labelString, o_tooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the textfield */
-        ADD_TEXTFIELD(o_textfield, mainFrame, [o_label frame].size.width + 2,
-            28, 49, o_tooltip, @"")
+        ADD_TEXTFIELD(o_textfield, mainFrame, [self.label frame].size.width + 2,
+                      28, 49, o_tooltip, @"")
         [o_textfield setIntValue: p_item->value.i];
         [o_textfield setAutoresizingMask:NSViewMaxXMargin ];
         [o_textfield setDelegate: self];
         [[NSNotificationCenter defaultCenter] addObserver: self
-            selector: @selector(textfieldChanged:)
-            name: NSControlTextDidChangeNotification
-            object: o_textfield];
+                                                 selector: @selector(textfieldChanged:)
+                                                     name: NSControlTextDidChangeNotification
+                                                   object: o_textfield];
         [self addSubview: o_textfield];
 
         /* build the mintextfield */
@@ -1511,24 +1582,24 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
         /* build the maxtextfield */
         ADD_LABEL(o_textfield_max, mainFrame,
-                    mainFrame.size.width - 31, -30, @"8888", @"")
+                  mainFrame.size.width - 31, -30, @"8888", @"")
         [o_textfield_max setIntValue: p_item->max.i];
         [o_textfield_max setAutoresizingMask:NSViewMinXMargin ];
         [self addSubview: o_textfield_max];
 
         /* build the slider */
         ADD_SLIDER(o_slider, mainFrame, [o_textfield_min frame].origin.x +
-            [o_textfield_min frame].size.width + 6, -1, mainFrame.size.width -
-            [o_textfield_max frame].size.width -
-            [o_textfield_max frame].size.width - 14 -
-            [o_textfield_min frame].origin.x, o_tooltip,
-            p_item->min.i, p_item->max.i)
+                   [o_textfield_min frame].size.width + 6, -1, mainFrame.size.width -
+                   [o_textfield_max frame].size.width -
+                   [o_textfield_max frame].size.width - 14 -
+                   [o_textfield_min frame].origin.x, o_tooltip,
+                   p_item->min.i, p_item->max.i)
         [o_slider setIntValue: p_item->value.i];
         [o_slider setAutoresizingMask:NSViewWidthSizable ];
         [o_slider setTarget: self];
         [o_slider setAction: @selector(sliderChanged:)];
         [o_slider sendActionOn:NSLeftMouseUpMask | NSLeftMouseDownMask |
-            NSLeftMouseDraggedMask];
+         NSLeftMouseDraggedMask];
         [self addSubview: o_slider];
 
     }
@@ -1538,9 +1609,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 - (void) alignWithXPosition:(int)i_xPos
 {
     NSRect frame;
-    frame = [o_label frame];
+    frame = [self.label frame];
     frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
+    [self.label setFrame:frame];
 
     frame = [o_textfield frame];
     frame.origin.x = i_xPos + 2;
@@ -1564,16 +1635,23 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    int value = config_GetInt(VLCIntf, p_item->psz_name);
+    int value = config_GetInt(VLCIntf, self.p_item->psz_name);
     [o_textfield setIntValue:value];
     [o_slider setIntValue:value];
     [super resetValues];
 }
 @end
 
+@interface FloatConfigControl() <NSTextFieldDelegate>
+{
+    NSTextField     *o_textfield;
+    NSStepper       *o_stepper;
+}
+@end
+
 @implementation FloatConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1582,8 +1660,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_INTEGER;
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_INTEGER;
 
         o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1592,26 +1670,26 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, -2, o_labelString, o_tooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -2, o_labelString, o_tooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the stepper */
         ADD_STEPPER(o_stepper, mainFrame, mainFrame.size.width - 19,
-            0, o_tooltip, -100000, 100000)
+                    0, o_tooltip, -100000, 100000)
         [o_stepper setFloatValue: p_item->value.f];
         [o_stepper setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_stepper];
 
         /* build the textfield */
         ADD_TEXTFIELD(o_textfield, mainFrame, mainFrame.size.width - 19 - 52,
-            1, 49, o_tooltip, @"")
+                      1, 49, o_tooltip, @"")
         [o_textfield setFloatValue: p_item->value.f];
         [o_textfield setDelegate: self];
         [[NSNotificationCenter defaultCenter] addObserver: self
-            selector: @selector(textfieldChanged:)
-            name: NSControlTextDidChangeNotification
-            object: o_textfield];
+                                                 selector: @selector(textfieldChanged:)
+                                                     name: NSControlTextDidChangeNotification
+                                                   object: o_textfield];
         [o_textfield setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_textfield];
     }
@@ -1621,9 +1699,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 - (void) alignWithXPosition:(int)i_xPos
 {
     NSRect frame;
-    frame = [o_label frame];
+    frame = [self.label frame];
     frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
+    [self.label setFrame:frame];
 
     frame = [o_textfield frame];
     frame.origin.x = i_xPos + 2;
@@ -1651,14 +1729,23 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    [o_textfield setFloatValue: config_GetFloat(VLCIntf, p_item->psz_name)];
+    [o_textfield setFloatValue: config_GetFloat(VLCIntf, self.p_item->psz_name)];
     [super resetValues];
 }
 @end
 
+@interface RangedFloatConfigControl() <NSTextFieldDelegate>
+{
+    NSSlider        *o_slider;
+    NSTextField     *o_textfield;
+    NSTextField     *o_textfield_min;
+    NSTextField     *o_textfield_max;
+}
+@end
+
 @implementation RangedFloatConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1667,8 +1754,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_RANGED_INTEGER;
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_RANGED_INTEGER;
 
         o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1677,20 +1764,20 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, -3, o_labelString, o_tooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -3, o_labelString, o_tooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the textfield */
-        ADD_TEXTFIELD(o_textfield, mainFrame, [o_label frame].size.width + 2,
-            28, 49, o_tooltip, @"")
+        ADD_TEXTFIELD(o_textfield, mainFrame, [self.label frame].size.width + 2,
+                      28, 49, o_tooltip, @"")
         [o_textfield setFloatValue: p_item->value.f];
         [o_textfield setAutoresizingMask:NSViewMaxXMargin ];
         [o_textfield setDelegate: self];
         [[NSNotificationCenter defaultCenter] addObserver: self
-            selector: @selector(textfieldChanged:)
-            name: NSControlTextDidChangeNotification
-            object: o_textfield];
+                                                 selector: @selector(textfieldChanged:)
+                                                     name: NSControlTextDidChangeNotification
+                                                   object: o_textfield];
         [self addSubview: o_textfield];
 
         /* build the mintextfield */
@@ -1702,24 +1789,24 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
         /* build the maxtextfield */
         ADD_LABEL(o_textfield_max, mainFrame, mainFrame.size.width - 31,
-            -30, @"8888", @"")
+                  -30, @"8888", @"")
         [o_textfield_max setFloatValue: p_item->max.f];
         [o_textfield_max setAutoresizingMask:NSViewMinXMargin ];
         [self addSubview: o_textfield_max];
 
         /* build the slider */
         ADD_SLIDER(o_slider, mainFrame, [o_textfield_min frame].origin.x +
-            [o_textfield_min frame].size.width + 6, -1, mainFrame.size.width -
-            [o_textfield_max frame].size.width -
-            [o_textfield_max frame].size.width - 14 -
-            [o_textfield_min frame].origin.x, o_tooltip, p_item->min.f,
-            p_item->max.f)
+                   [o_textfield_min frame].size.width + 6, -1, mainFrame.size.width -
+                   [o_textfield_max frame].size.width -
+                   [o_textfield_max frame].size.width - 14 -
+                   [o_textfield_min frame].origin.x, o_tooltip, p_item->min.f,
+                   p_item->max.f)
         [o_slider setFloatValue: p_item->value.f];
         [o_slider setAutoresizingMask:NSViewWidthSizable ];
         [o_slider setTarget: self];
         [o_slider setAction: @selector(sliderChanged:)];
         [o_slider sendActionOn:NSLeftMouseUpMask | NSLeftMouseDownMask |
-            NSLeftMouseDraggedMask];
+         NSLeftMouseDraggedMask];
         [self addSubview: o_slider];
 
     }
@@ -1729,9 +1816,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 - (void) alignWithXPosition:(int)i_xPos
 {
     NSRect frame;
-    frame = [o_label frame];
+    frame = [self.label frame];
     frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
+    [self.label setFrame:frame];
 
     frame = [o_textfield frame];
     frame.origin.x = i_xPos + 2;
@@ -1755,16 +1842,22 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    [o_textfield setFloatValue: config_GetFloat(VLCIntf, p_item->psz_name)];
-    [o_slider setFloatValue: config_GetFloat(VLCIntf, p_item->psz_name)];
+    [o_textfield setFloatValue: config_GetFloat(VLCIntf, self.p_item->psz_name)];
+    [o_slider setFloatValue: config_GetFloat(VLCIntf, self.p_item->psz_name)];
     [super resetValues];
+}
+@end
+
+@interface BoolConfigControl()
+{
+    NSButton        *o_checkbox;
 }
 @end
 
 @implementation BoolConfigControl
 
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1773,8 +1866,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_BOOL;
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_BOOL;
 
         if (p_item->psz_text)
             o_labelString = _NS((char *)p_item->psz_text);
@@ -1785,7 +1878,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
         /* add the checkbox */
         ADD_CHECKBOX(o_checkbox, mainFrame, 0,
-                        0, o_labelString, o_tooltip, p_item->value.i, NSImageLeft)
+                     0, o_labelString, o_tooltip, p_item->value.i, NSImageLeft)
         [o_checkbox setAutoresizingMask:NSViewNotSizable ];
         [self addSubview: o_checkbox];
     }
@@ -1799,14 +1892,20 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    [o_checkbox setState: config_GetInt(VLCIntf, p_item->psz_name)];
+    [o_checkbox setState: config_GetInt(VLCIntf, self.p_item->psz_name)];
     [super resetValues];
 }
 @end
 
+@interface KeyConfigControl()
+{
+    NSPopUpButton   *o_popup;
+}
+@end
+
 @implementation KeyConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -1815,8 +1914,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_KEY;
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_KEY;
 
         o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -1825,14 +1924,14 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, -1, o_labelString, o_tooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -1, o_labelString, o_tooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the popup */
-        ADD_POPUP(o_popup, mainFrame, [o_label frame].origin.x +
-            [o_label frame].size.width + 3,
-            -2, 0, o_tooltip)
+        ADD_POPUP(o_popup, mainFrame, [self.label frame].origin.x +
+                  [self.label frame].size.width + 3,
+                  -2, 0, o_tooltip)
         [o_popup setAutoresizingMask:NSViewWidthSizable ];
 
         if (o_keys_menu == nil) {
@@ -1843,10 +1942,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             for (i = 0; i < sizeof(vlc_key) / sizeof(key_descriptor_t); i++)
                 if (vlc_key[i].psz_key_string)
                     POPULATE_A_KEY(o_keys_menu,
-                        [NSString stringWithUTF8String:vlc_key[i].psz_key_string],
+                                   [NSString stringWithUTF8String:vlc_key[i].psz_key_string],
                                    vlc_key[i].i_key_code)
 #endif
-        }
+                    }
         [o_popup setMenu:[o_keys_menu copyWithZone:nil]];
         [o_popup selectItem:[[o_popup menu] itemWithTag:p_item->value.i]];
         [self addSubview: o_popup];
@@ -1859,9 +1958,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     NSRect frame;
     NSRect superFrame = [self frame];
-    frame = [o_label frame];
+    frame = [self.label frame];
     frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
+    [self.label setFrame:frame];
 
     frame = [o_popup frame];
     frame.origin.x = i_xPos - 1;
@@ -1876,16 +1975,24 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    [o_popup selectItem:[[o_popup menu] itemWithTag:config_GetInt(VLCIntf, p_item->psz_name)]];
+    [o_popup selectItem:[[o_popup menu] itemWithTag:config_GetInt(VLCIntf, self.p_item->psz_name)]];
     [super resetValues];
 }
 @end
 
-@implementation ModuleListConfigControl
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+@interface ModuleListConfigControl() <NSTextFieldDelegate, NSTableViewDataSource>
 {
-    BOOL b_by_cat = _p_item->i_type == CONFIG_ITEM_MODULE_LIST_CAT;
+    NSTextField     *o_textfield;
+    NSTableView     *o_tableview;
+    NSMutableArray  *o_modulearray;
+}
+@end
+
+@implementation ModuleListConfigControl
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
+{
+    BOOL b_by_cat = p_item->i_type == CONFIG_ITEM_MODULE_LIST_CAT;
 
     //Fill our array to know how may items we have...
     module_t *p_parser, **p_list;
@@ -1916,13 +2023,13 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
                 /* Hack: required subcategory is stored in i_min */
                 if (p_config->i_type == CONFIG_SUBCATEGORY &&
-                    p_config->value.i == _p_item->min.i) {
+                    p_config->value.i == p_item->min.i) {
 
                     o_modulelongname = [NSString stringWithUTF8String:module_get_name(p_parser, TRUE)];
                     o_modulename = [NSString stringWithUTF8String:module_get_object(p_parser)];
 
-                    if (_p_item->value.psz &&
-                        strstr(_p_item->value.psz, module_get_object(p_parser)))
+                    if (p_item->value.psz &&
+                        strstr(p_item->value.psz, module_get_object(p_parser)))
                         o_moduleenabled = [NSNumber numberWithBool:YES];
                     else
                         o_moduleenabled = [NSNumber numberWithBool:NO];
@@ -1937,15 +2044,15 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
                  * since they are just the lua interface module */
                 if (p_config->i_type == CONFIG_SUBCATEGORY &&
                     !strcmp(module_get_object(p_parser), "lua") &&
-                    !strcmp(_p_item->psz_name, "extraintf") &&
-                    p_config->value.i == _p_item->min.i) {
+                    !strcmp(p_item->psz_name, "extraintf") &&
+                    p_config->value.i == p_item->min.i) {
 
 #define addLuaIntf(shortname, longname) \
-if (_p_item->value.psz && strstr(_p_item->value.psz, shortname))\
-    o_moduleenabled = [NSNumber numberWithBool:YES];\
-else\
-    o_moduleenabled = [NSNumber numberWithBool:NO];\
-    [o_modulearray addObject:[NSMutableArray arrayWithObjects: @shortname, _NS(longname), o_moduleenabled, nil]]
+if (p_item->value.psz && strstr(p_item->value.psz, shortname))\
+o_moduleenabled = [NSNumber numberWithBool:YES];\
+else \
+o_moduleenabled = [NSNumber numberWithBool:NO];\
+[o_modulearray addObject:[NSMutableArray arrayWithObjects: @shortname, _NS(longname), o_moduleenabled, nil]]
 
                     addLuaIntf("http", "Web");
                     addLuaIntf("telnet", "Telnet");
@@ -1957,14 +2064,14 @@ else\
             module_config_free(p_configlist);
 
 
-        } else if (module_provides(p_parser, _p_item->psz_type)) {
+        } else if (module_provides(p_parser, p_item->psz_type)) {
 
             NSString *o_modulelongname = toNSStr(module_get_name(p_parser, TRUE));
             NSString *o_modulename = toNSStr(module_get_object(p_parser));
 
             NSNumber *o_moduleenabled = nil;
-            if (_p_item->value.psz &&
-                strstr(_p_item->value.psz, module_get_object(p_parser)))
+            if (p_item->value.psz &&
+                strstr(p_item->value.psz, module_get_object(p_parser)))
                 o_moduleenabled = [NSNumber numberWithBool:YES];
             else
                 o_moduleenabled = [NSNumber numberWithBool:NO];
@@ -2025,8 +2132,8 @@ else\
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        i_view_type = CONFIG_ITEM_MODULE_LIST;
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+        self.viewType = CONFIG_ITEM_MODULE_LIST;
 
         o_tooltip = [[VLCStringUtility sharedInstance] wrapString: _NS((char *)p_item->psz_longtext) toWidth: PREFS_WRAP];
 
@@ -2035,18 +2142,18 @@ else\
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-        ADD_LABEL(o_label, mainFrame, 0, -3, o_labelString, o_tooltip)
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
+        ADD_LABEL(self.label, mainFrame, 0, -3, o_labelString, o_tooltip)
+        [self.label setAutoresizingMask:NSViewNotSizable ];
+        [self addSubview: self.label];
 
         /* build the textfield */
         if (p_item->value.psz)
             o_textfieldString = _NS((char *)p_item->value.psz);
         else
             o_textfieldString = @"";
-        ADD_TEXTFIELD(o_textfield, mainFrame, [o_label frame].size.width + 2,
+        ADD_TEXTFIELD(o_textfield, mainFrame, [self.label frame].size.width + 2,
                       mainFrame.size.height - 22, mainFrame.size.width -
-                      [o_label frame].size.width - 2, o_tooltip, o_textfieldString)
+                      [self.label frame].size.width - 2, o_tooltip, o_textfieldString)
         [o_textfield setAutoresizingMask:NSViewWidthSizable ];
         [self addSubview: o_textfield];
 
@@ -2066,14 +2173,14 @@ else\
     NSUInteger count = [o_modulearray count];
     for (NSUInteger i = 0 ; i < count ; i++)
         if ([[[o_modulearray objectAtIndex:i] objectAtIndex:2]
-            boolValue] != NO) {
+             boolValue] != NO) {
             o_newstring = [o_newstring stringByAppendingString:
-                [[o_modulearray objectAtIndex:i] objectAtIndex:0]];
+                           [[o_modulearray objectAtIndex:i] objectAtIndex:0]];
             o_newstring = [o_newstring stringByAppendingString:@":"];
         }
 
     [o_textfield setStringValue: [o_newstring
-        substringToIndex: ([o_newstring length])?[o_newstring length] - 1:0]];
+                                  substringToIndex:([o_newstring length])?[o_newstring length] - 1:0]];
 }
 
 - (char *)stringValue
@@ -2093,7 +2200,7 @@ else\
 @implementation ModuleListConfigControl (NSTableDataSource)
 
 - (BOOL)tableView:(NSTableView*)table writeRows:(NSArray*)rows
-    toPasteboard:(NSPasteboard*)pb
+     toPasteboard:(NSPasteboard*)pb
 {
     // We only want to allow dragging of selected rows.
     NSEnumerator    *iter = [rows objectEnumerator];
@@ -2109,8 +2216,8 @@ else\
 }
 
 - (NSDragOperation)tableView:(NSTableView*)table
-    validateDrop:(id <NSDraggingInfo>)info proposedRow:(NSInteger)row
-    proposedDropOperation:(NSTableViewDropOperation)op
+                validateDrop:(id <NSDraggingInfo>)info proposedRow:(NSInteger)row
+       proposedDropOperation:(NSTableViewDropOperation)op
 {
     // Make drops at the end of the table go to the end.
     if (row == -1) {
@@ -2126,7 +2233,7 @@ else\
 }
 
 - (BOOL)tableView:(NSTableView*)table acceptDrop:(id <NSDraggingInfo>)info
-    row:(NSInteger)dropRow dropOperation:(NSTableViewDropOperation)op;
+              row:(NSInteger)dropRow dropOperation:(NSTableViewDropOperation)op;
 {
     NSPasteboard    *pb = [info draggingPasteboard];
     NSDragOperation srcMask = [info draggingSourceOperationMask];
@@ -2134,45 +2241,45 @@ else\
 
     NS_DURING
 
-        NSArray *array;
+    NSArray *array;
 
-        // Intra-table drag - data is the array of rows.
-        if (!accepted && (array =
-            [pb propertyListForType:@"VLC media player module"]) != NULL) {
-            NSEnumerator *iter = nil;
-            id val;
-            BOOL isCopy = (srcMask & NSDragOperationMove) ? NO:YES;
-            // Move the modules
-            iter = [array objectEnumerator];
-            while ((val = [iter nextObject]) != NULL) {
-                NSArray *o_tmp = [[o_modulearray objectAtIndex:
-                    [val intValue]] mutableCopyWithZone:nil];
-                [o_modulearray removeObject:o_tmp];
-                [o_modulearray insertObject:o_tmp
-                    atIndex:(dropRow>[val intValue]) ? dropRow - 1 : dropRow];
-                dropRow++;
-            }
-
-            // Select the newly-dragged items.
-            iter = [array objectEnumerator];
-//TODO...
-            [table deselectAll:self];
-
-            [self tableChanged:self];
-            [table setNeedsDisplay:YES];
-            // Indicate that we finished the drag.
-            accepted = YES;
+    // Intra-table drag - data is the array of rows.
+    if (!accepted && (array =
+                      [pb propertyListForType:@"VLC media player module"]) != NULL) {
+        NSEnumerator *iter = nil;
+        id val;
+        BOOL isCopy = (srcMask & NSDragOperationMove) ? NO:YES;
+        // Move the modules
+        iter = [array objectEnumerator];
+        while ((val = [iter nextObject]) != NULL) {
+            NSArray *o_tmp = [[o_modulearray objectAtIndex:
+                               [val intValue]] mutableCopyWithZone:nil];
+            [o_modulearray removeObject:o_tmp];
+            [o_modulearray insertObject:o_tmp
+                                atIndex:(dropRow>[val intValue]) ? dropRow - 1 : dropRow];
+            dropRow++;
         }
-        [table reloadData];
+
+        // Select the newly-dragged items.
+        iter = [array objectEnumerator];
+        //TODO...
+        [table deselectAll:self];
+
+        [self tableChanged:self];
         [table setNeedsDisplay:YES];
+        // Indicate that we finished the drag.
+        accepted = YES;
+    }
+    [table reloadData];
+    [table setNeedsDisplay:YES];
 
-        NS_HANDLER
+    NS_HANDLER
 
-            // An exception occurred. Uh-oh. Update the track table so that
-            // it stays consistent, and re-raise the exception.
-            [table reloadData];
-            [localException raise];
-            [table setNeedsDisplay:YES];
+    // An exception occurred. Uh-oh. Update the track table so that
+    // it stays consistent, and re-raise the exception.
+    [table reloadData];
+    [localException raise];
+    [table setNeedsDisplay:YES];
     NS_ENDHANDLER
 
     return accepted;
@@ -2184,7 +2291,7 @@ else\
 }
 
 - (id)tableView:(NSTableView *)aTableView
-    objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if ([[aTableColumn identifier] isEqualToString: @"Enabled"])
         return [[o_modulearray objectAtIndex:rowIndex] objectAtIndex:2];
@@ -2195,17 +2302,17 @@ else\
 }
 
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject
-    forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+   forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     [[o_modulearray objectAtIndex:rowIndex] replaceObjectAtIndex:2
-        withObject: anObject];
+                                                      withObject: anObject];
 }
 @end
 
 @implementation SectionControl
 
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
+- (id)initWithitem:(module_config_t *)p_item
+          withView:(NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_tooltip;
@@ -2214,29 +2321,30 @@ else\
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item: _p_item] != nil) {
-        
+    if ([super initWithFrame:mainFrame item:p_item] != nil) {
         /* add the label */
         if (p_item->psz_text)
             o_labelString = _NS((char *)p_item->psz_text);
         else
             o_labelString = @"";
-
+        
         NSDictionary *boldAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                        [NSFont boldSystemFontOfSize:[NSFont systemFontSize]],
-                        NSFontAttributeName,
-                        nil];
+                                        [NSFont boldSystemFontOfSize:[NSFont systemFontSize]],
+                                        NSFontAttributeName,
+                                        nil];
         NSAttributedString *o_bold_string = [[NSAttributedString alloc] initWithString: o_labelString attributes: boldAttributes];
 
-        ADD_LABEL(o_label, mainFrame, 1, 0, @"", @"")
-        [o_label setAttributedStringValue: o_bold_string];
-        [o_label sizeToFit];
+        ADD_LABEL(self.label, mainFrame, 1, 0, @"", @"")
+        [self.label setAttributedStringValue: o_bold_string];
+        [self.label sizeToFit];
         
-        [o_label setAutoresizingMask:NSViewNotSizable];
-        [self addSubview: o_label];
+        [self.label setAutoresizingMask:NSViewNotSizable];
+        [self addSubview: self.label];
     }
     return self;
 }
 
 @end
 
+//#undef CONFIG_ITEM_LIST_STRING
+//#undef CONFIG_ITEM_RANGED_INTEGER

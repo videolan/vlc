@@ -22,15 +22,9 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <vlc_common.h>
-#import <vlc_interface.h>
 
-@interface VLCCoreInteraction : NSObject {
-    int i_currentPlaybackRate;
-    mtime_t timeA, timeB;
+@interface VLCCoreInteraction : NSObject
 
-    float f_maxVolume;
-}
 + (VLCCoreInteraction *)sharedInstance;
 @property (readwrite) int volume;
 @property (readonly, nonatomic) float maxVolume;
@@ -85,4 +79,5 @@
 - (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter float: (float)f_value;
 - (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter string: (const char *)psz_value;
 - (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter boolean: (BOOL)b_value;
+
 @end

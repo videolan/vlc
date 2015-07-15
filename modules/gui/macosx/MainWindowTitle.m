@@ -36,6 +36,37 @@
  * states, since we can't capture the mouse-moved events here correctly
  *****************************************************************************/
 
+@interface VLCMainWindowTitleView()
+{
+    NSImage * o_red_img;
+    NSImage * o_red_over_img;
+    NSImage * o_red_on_img;
+    NSImage * o_yellow_img;
+    NSImage * o_yellow_over_img;
+    NSImage * o_yellow_on_img;
+    NSImage * o_green_img;
+    NSImage * o_green_over_img;
+    NSImage * o_green_on_img;
+    // yosemite fullscreen images
+    NSImage * o_fullscreen_img;
+    NSImage * o_fullscreen_over_img;
+    NSImage * o_fullscreen_on_img;
+    // old native fullscreen images
+    NSImage * o_old_fullscreen_img;
+    NSImage * o_old_fullscreen_over_img;
+    NSImage * o_old_fullscreen_on_img;
+
+    NSShadow * o_window_title_shadow;
+    NSDictionary * o_window_title_attributes_dict;
+
+    BOOL b_nativeFullscreenMode;
+
+    // state to determine correct image for green bubble
+    BOOL b_alt_pressed;
+    BOOL b_mouse_over;
+}
+@end
+
 @implementation VLCMainWindowTitleView
 - (id)init
 {
@@ -473,6 +504,12 @@
 @end
 
 
+@interface VLCWindowTitleTextField()
+{
+    NSMenu *_contextMenu;
+}
+@end
+
 @implementation VLCWindowTitleTextField
 
 - (void)showRightClickMenuWithEvent:(NSEvent *)o_event
@@ -487,7 +524,7 @@
     if (!pathComponents)
         return;
 
-    contextMenu = [[NSMenu alloc] initWithTitle: [[NSFileManager defaultManager] displayNameAtPath: [representedURL path]]];
+    _contextMenu = [[NSMenu alloc] initWithTitle: [[NSFileManager defaultManager] displayNameAtPath: [representedURL path]]];
 
     NSUInteger count = [pathComponents count];
     NSImage * icon;
@@ -499,8 +536,8 @@
         for (NSUInteger y = 0; y < i; y++)
             [currentPath appendFormat: @"/%@", [pathComponents objectAtIndex:y + 1]];
 
-        [contextMenu addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath: currentPath] action:@selector(revealInFinder:) keyEquivalent:@""];
-        currentItem = [contextMenu itemAtIndex:[contextMenu numberOfItems] - 1];
+        [_contextMenu addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath: currentPath] action:@selector(revealInFinder:) keyEquivalent:@""];
+        currentItem = [_contextMenu itemAtIndex:[_contextMenu numberOfItems] - 1];
         [currentItem setTarget: self];
 
         icon = [[NSWorkspace sharedWorkspace] iconForFile:currentPath];
@@ -510,13 +547,13 @@
 
     if ([[pathComponents objectAtIndex:1] isEqualToString:@"Volumes"]) {
         /* we don't want to show the Volumes item, since the Cocoa does it neither */
-        currentItem = [contextMenu itemWithTitle:[[NSFileManager defaultManager] displayNameAtPath: @"/Volumes"]];
+        currentItem = [_contextMenu itemWithTitle:[[NSFileManager defaultManager] displayNameAtPath: @"/Volumes"]];
         if (currentItem)
-            [contextMenu removeItem: currentItem];
+            [_contextMenu removeItem: currentItem];
     } else {
         /* we're on the boot drive, so add it since it isn't part of the components */
-        [contextMenu addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:@"/"] action:@selector(revealInFinder:) keyEquivalent:@""];
-        currentItem = [contextMenu itemAtIndex: [contextMenu numberOfItems] - 1];
+        [_contextMenu addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:@"/"] action:@selector(revealInFinder:) keyEquivalent:@""];
+        currentItem = [_contextMenu itemAtIndex: [_contextMenu numberOfItems] - 1];
         icon = [[NSWorkspace sharedWorkspace] iconForFile:@"/"];
         [icon setSize: iconSize];
         [currentItem setImage: icon];
@@ -524,15 +561,15 @@
     }
 
     /* add the computer item */
-    [contextMenu addItemWithTitle:(NSString*)CFBridgingRelease(SCDynamicStoreCopyComputerName(NULL, NULL)) action:@selector(revealInFinder:) keyEquivalent:@""];
-    currentItem = [contextMenu itemAtIndex: [contextMenu numberOfItems] - 1];
+    [_contextMenu addItemWithTitle:(NSString*)CFBridgingRelease(SCDynamicStoreCopyComputerName(NULL, NULL)) action:@selector(revealInFinder:) keyEquivalent:@""];
+    currentItem = [_contextMenu itemAtIndex: [_contextMenu numberOfItems] - 1];
     icon = [NSImage imageNamed: NSImageNameComputer];
     [icon setSize: iconSize];
     [currentItem setImage: icon];
     [currentItem setTarget: self];
 
     // center the context menu similar to the white interface
-    CGFloat menuWidth = [contextMenu size].width;
+    CGFloat menuWidth = [_contextMenu size].width;
     NSRect windowFrame = [[self window] frame];
     NSPoint point;
 
@@ -555,13 +592,13 @@
                                               eventNumber:0
                                                clickCount:0
                                                  pressure:0];
-    [NSMenu popUpContextMenu: contextMenu withEvent: fakeMouseEvent forView: [self superview]];
+    [NSMenu popUpContextMenu: _contextMenu withEvent: fakeMouseEvent forView: [self superview]];
 }
 
 - (IBAction)revealInFinder:(id)sender
 {
-    NSUInteger count = [contextMenu numberOfItems];
-    NSUInteger selectedItem = [contextMenu indexOfItem: sender];
+    NSUInteger count = [_contextMenu numberOfItems];
+    NSUInteger selectedItem = [_contextMenu indexOfItem: sender];
 
     if (selectedItem == count - 1) { // the fake computer item
         [[NSWorkspace sharedWorkspace] selectFile: @"/" inFileViewerRootedAtPath: @""];

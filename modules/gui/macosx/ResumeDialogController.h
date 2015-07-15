@@ -42,10 +42,6 @@ typedef void(^CompletionBlock)(enum ResumeResult);
     IBOutlet id o_restart_btn;
     IBOutlet id o_resume_btn;
     IBOutlet id o_always_resume_btn;
-
-    int currentResumeTimeout;
-
-    CompletionBlock completionBlock;
 }
 
 - (IBAction)buttonClicked:(id)sender;

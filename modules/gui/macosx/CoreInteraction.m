@@ -37,6 +37,14 @@
 #import <vlc_modules.h>
 #import <vlc_charset.h>
 
+@interface VLCCoreInteraction ()
+{
+    int i_currentPlaybackRate;
+    mtime_t timeA, timeB;
+
+    float f_maxVolume;
+}
+@end
 
 @implementation VLCCoreInteraction
 static VLCCoreInteraction *_o_sharedInstance = nil;

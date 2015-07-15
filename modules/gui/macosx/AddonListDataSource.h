@@ -26,9 +26,6 @@
 #import <vlc_addons.h>
 
 @interface VLCAddon : NSObject
-{
-    addon_entry_t *p_addon_entry;
-}
 
 - (id)initWithAddon:(addon_entry_t *)p_entry;
 

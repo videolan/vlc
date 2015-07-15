@@ -36,7 +36,12 @@
 
 #import <math.h>
 
-@interface VLCAudioEffects (Internal)
+@interface VLCAudioEffects ()
+{
+    intf_thread_t *p_intf;
+    BOOL b_genericAudioProfileInInteraction;
+    NSInteger i_old_profile_index;
+}
 - (void)resetProfileSelector;
 - (void)updatePresetSelector;
 - (void)setBandSliderValuesForPreset:(NSInteger)presetID;

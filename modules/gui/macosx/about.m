@@ -36,8 +36,20 @@
 #define PLATFORM "Intel 64bit"
 
 /*****************************************************************************
- * VLAboutBox implementation
+ * AboutWindowController implementation
  *****************************************************************************/
+@interface AboutWindowController ()
+{
+    NSTimer *o_scroll_timer;
+    float f_current;
+    CGFloat f_end;
+    NSTimeInterval i_start;
+    BOOL b_restart;
+
+    NSString *o_authors;
+}
+@end
+
 @implementation AboutWindowController
 
 - (id)init

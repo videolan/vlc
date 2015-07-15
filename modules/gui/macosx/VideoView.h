@@ -28,22 +28,13 @@
 
 #import <vlc_vout.h>
 
-
 /*****************************************************************************
  * VLCVoutView interface
  *****************************************************************************/
 @interface VLCVoutView : NSView
-{
-    NSInteger i_lastScrollWheelDirection;
-    NSTimeInterval t_lastScrollEvent;
 
-    CGFloat f_cumulated_magnification;
+@property (readwrite, assign) vout_thread_t * voutThread;
 
-    vout_thread_t *p_vout;
-}
-
-- (void)setVoutThread:(vout_thread_t *)p_vout_thread;
-- (vout_thread_t *)voutThread;
 - (void)releaseVoutThread;
 
 @end

@@ -26,21 +26,7 @@
 @class VLCWindow;
 
 @interface VLCFSPanel : NSWindow
-{
-    NSTimer *fadeTimer,*hideAgainTimer;
-    NSPoint mouseClic;
-    BOOL b_fadeQueued;
-    BOOL b_keptVisible;
-    BOOL b_alreadyCounting;
-    int i_timeToKeepVisibleInSec;
 
-    BOOL b_nonActive;
-    BOOL b_displayed;
-    BOOL b_voutWasUpdated;
-    int i_device;
-
-    VLCWindow *o_vout_window;
-}
 - (id)initWithContentRect: (NSRect)contentRect
                 styleMask: (NSUInteger)aStyle
                   backing: (NSBackingStoreType)bufferingType
@@ -74,26 +60,13 @@
 - (void)mouseDragged: (NSEvent *)theEvent;
 
 - (void)setVoutWasUpdated: (VLCWindow *)o_window;
+
 @end
 
 @class VLCProgressView;
 @class VLCFSVolumeSlider;
 
 @interface VLCFSPanelView : NSView
-{
-    NSColor *fillColor;
-    NSButton *o_prev, *o_next, *o_bwd, *o_fwd, *o_play, *o_fullscreen;
-    NSTextField *o_streamTitle_txt;
-    VLCTimeField *o_streamPosition_txt, *o_streamLength_txt;
-    NSSlider *o_fs_timeSlider;
-    VLCFSVolumeSlider *o_fs_volumeSlider;
-    VLCProgressView *o_progress_view;
-    NSImage *o_background_img, *o_vol_sld_img, *o_vol_mute_img, *o_vol_max_img, *o_time_sld_img;
-    NSTimeInterval last_fwd_event;
-    NSTimeInterval last_bwd_event;
-}
-- (id)initWithFrame: (NSRect)frameRect;
-- (void)drawRect: (NSRect)rect;
 
 - (void)setPlay;
 - (void)setPause;
@@ -112,16 +85,14 @@
 @end
 
 @interface VLCFSTimeSlider : NSSlider
-{
-}
+
 - (void)drawKnobInRect: (NSRect)knobRect;
 - (void)drawRect: (NSRect)rect;
 
 @end
 
 @interface VLCFSVolumeSlider : VLCVolumeSliderCommon
-{
-}
+
 - (void)drawKnobInRect: (NSRect)knobRect;
 - (void)drawRect: (NSRect)rect;
 

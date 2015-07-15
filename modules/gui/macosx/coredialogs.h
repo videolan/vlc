@@ -33,8 +33,6 @@
 
 @interface VLCCoreDialogProvider : NSObject
 {
-    ErrorWindowController *o_error_panel;
-
     /* authentication dialogue */
     IBOutlet id o_auth_cancel_btn;
     IBOutlet id o_auth_description_txt;
@@ -52,7 +50,6 @@
     IBOutlet id o_prog_description_txt;
     IBOutlet id o_prog_title_txt;
     IBOutlet id o_prog_win;
-    BOOL b_progress_cancelled;
 }
 + (VLCCoreDialogProvider *)sharedInstance;
 

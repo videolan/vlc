@@ -30,22 +30,6 @@
 @class VLCMain;
 
 @interface InputManager : NSObject
-{
-    intf_thread_t *p_intf;
-    VLCMain *o_main;
-
-    input_thread_t *p_current_input;
-    dispatch_queue_t informInputChangedQueue;
-
-    /* sleep management */
-    IOPMAssertionID systemSleepAssertionID;
-    IOPMAssertionID userActivityAssertionID;
-
-    /* iTunes/Spotify play/pause support */
-    BOOL b_has_itunes_paused;
-    BOOL b_has_spotify_paused;
-    NSTimer *o_itunes_play_timer;
-}
 
 - (id)initWithMain:(VLCMain *)o_mainObj;
 
@@ -55,8 +39,6 @@
 
 - (void)resumeItunesPlayback:(id)sender;
 
-
 - (BOOL)hasInput;
 
 @end
-

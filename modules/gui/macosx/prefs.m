@@ -63,6 +63,9 @@
 #import <vlc_modules.h>
 #import <vlc_plugin.h>
 
+#define LEFTMARGIN  18
+#define RIGHTMARGIN 18
+
 /* /!\ Warning: Unreadable code :/ */
 
 @interface VLCTreeItem : NSObject
@@ -133,8 +136,6 @@
 @end
 
 @interface VLCTreeMainItem : VLCTreePluginItem
-{
-}
 - (VLCTreeCategoryItem *)itemRepresentingCategory:(int)category;
 @end
 
@@ -143,6 +144,16 @@
 /*****************************************************************************
  * VLCPrefs implementation
  *****************************************************************************/
+
+@interface VLCPrefs()
+{
+    intf_thread_t *p_intf;
+    VLCTreeMainItem * _rootTreeItem;
+    NSView *o_empty_view;
+    NSMutableDictionary *o_save_prefs;
+}
+@end
+
 @implementation VLCPrefs
 
 static VLCPrefs *_o_sharedMainInstance = nil;

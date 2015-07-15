@@ -43,6 +43,17 @@
 /*****************************************************************************
  * VLCVoutView implementation
  *****************************************************************************/
+@interface VLCVoutView()
+{
+    NSInteger i_lastScrollWheelDirection;
+    NSTimeInterval t_lastScrollEvent;
+
+    CGFloat f_cumulated_magnification;
+
+    vout_thread_t *p_vout;
+}
+@end
+
 @implementation VLCVoutView
 
 #pragma mark -

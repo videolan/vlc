@@ -144,14 +144,17 @@
     IBOutlet id o_t8_txt_ttl;
     IBOutlet id o_t8_txt_mrl;
     IBOutlet id o_t8_txt_local;
-
-    NSMutableDictionary * o_userSelections;
-    NSArray * o_videoCodecs;
-    NSArray * o_audioCodecs;
-    NSArray * o_encapFormats;
-    NSArray * o_strmgMthds;
-    NSString * o_opts;
 }
++ (VLCWizard *)sharedInstance;
+
+- (void)showWizard;
+- (void)resetWizard;
+
+- (id)playlistWizard;
+- (void)initWithExtractValuesFrom:(NSString *)from
+                               to:(NSString *)to
+                           ofItem:(NSString *)item;
+
 - (IBAction)cancelRun:(id)sender;
 - (IBAction)nextTab:(id)sender;
 - (IBAction)prevTab:(id)sender;
@@ -170,15 +173,5 @@
 - (IBAction)t6_mrInfo_sap:(id)sender;
 - (IBAction)t67_mrInfo_local:(id)sender;
 - (IBAction)t7_selectTrnscdDestFile:(id)sender;
-
-+ (VLCWizard *)sharedInstance;
-
-- (void)showWizard;
-- (void)showSummary;
-- (void)resetWizard;
-- (void)createOpts;
-- (void)rebuildCodecMenus;
-- (id)playlistWizard;
-- (void)initWithExtractValuesFrom: (NSString *)from to: (NSString *)to ofItem: (NSString *)item;
 
 @end

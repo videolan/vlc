@@ -21,7 +21,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface AddonsWindowController : NSWindowController <NSTableViewDataSource, NSTableViewDelegate>
+@interface AddonsWindowController : NSWindowController
 {
     IBOutlet NSPopUpButton *_typeSwitcher;
     IBOutlet NSButton *_localAddonsOnlyCheckbox;
@@ -34,7 +34,6 @@
     IBOutlet NSTextField *_version;
     IBOutlet NSTextView *_description;
     IBOutlet NSButton *_installButton;
-
 }
 
 - (IBAction)switchType:(id)sender;

@@ -27,6 +27,13 @@
 #import "intf.h"
 #import "StringUtility.h"
 
+@interface ResumeDialogController()
+{
+    int currentResumeTimeout;
+    CompletionBlock completionBlock;
+}
+@end
+
 @implementation ResumeDialogController
 
 - (id)init

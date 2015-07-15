@@ -25,10 +25,7 @@
 
 
 @interface VLCEyeTVController : NSObject
-{
-    BOOL b_eyeTVactive;
-    BOOL b_deviceConnected;
-}
+
 @property (readonly) BOOL eyeTVRunning;
 @property (readonly) BOOL deviceConnected;
 @property (readwrite) int channel;

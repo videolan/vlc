@@ -27,7 +27,11 @@
 #import "SharedDialogs.h"
 #import "CoreInteraction.h"
 
-@interface VLCVideoEffects (Internal)
+@interface VLCVideoEffects()
+{
+    intf_thread_t *p_intf;
+    NSInteger i_old_profile_index;
+}
 - (void)resetProfileSelector;
 @end
 

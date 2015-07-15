@@ -28,6 +28,13 @@
 /* for various VLC core related calls */
 #import "intf.h"
 
+@interface VLCEyeTVController()
+{
+    BOOL b_eyeTVactive;
+    BOOL b_deviceConnected;
+}
+@end
+
 @implementation VLCEyeTVController
 
 @synthesize eyeTVRunning = b_eyeTVactive, deviceConnected = b_deviceConnected;

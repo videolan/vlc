@@ -44,7 +44,20 @@
 #define ASF 12
 /* 13-15 are present, but not set */
 
-@interface VLCConvertAndSave (Internal)
+@interface VLCConvertAndSave()
+{
+    NSString * _MRL;
+    NSString * _outputDestination;
+    NSArray * _profileNames;
+    NSArray * _profileValueList;
+    NSArray * _videoCodecs;
+    NSArray * _audioCodecs;
+    NSArray * _subsCodecs;
+    NSMutableArray * _currentProfile;
+
+    BOOL b_streaming;
+}
+
 - (void)updateDropView;
 - (void)updateOKButton;
 - (void)resetCustomizationSheetBasedOnProfile:(NSString *)profileString;

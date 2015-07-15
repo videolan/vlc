@@ -46,7 +46,30 @@
 #import "VLCVoutWindowController.h"
 
 
-@interface VLCMainWindow (Internal)
+@interface VLCMainWindow() <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate>
+{
+    VLCFSPanel *o_fspanel;
+
+    BOOL b_nativeFullscreenMode;
+    BOOL b_video_playback_enabled;
+    BOOL b_dropzone_active;
+    BOOL b_splitview_removed;
+    BOOL b_minimized_view;
+
+    CGFloat f_lastSplitViewHeight;
+    CGFloat f_lastLeftSplitViewWidth;
+
+    NSMutableArray *o_sidebaritems;
+
+    /* this is only true, when we have NO video playing inside the main window */
+    BOOL b_nonembedded;
+
+    BOOL b_podcastView_displayed;
+
+    VLCColorView * o_color_backdrop;
+
+    NSRect frameBeforePlayback;
+}
 - (void)resizePlaylistAfterCollapse;
 - (void)makeSplitViewVisible;
 - (void)makeSplitViewHidden;
@@ -182,7 +205,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
     /* interface builder action */
     CGFloat f_threshold_height = f_min_video_height + [o_controls_bar height];
-    if (b_dark_interface)
+    if (self.darkInterface)
         f_threshold_height += [o_titlebar_view frame].size.height;
     if ([[self contentView] frame].size.height < f_threshold_height)
         b_splitviewShouldBeHidden = YES;
@@ -191,7 +214,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [self setExcludedFromWindowsMenu: YES];
     [self setAcceptsMouseMovedEvents: YES];
     // Set that here as IB seems to be buggy
-    if (b_dark_interface)
+    if (self.darkInterface)
         [self setContentMinSize:NSMakeSize(604., f_min_window_height + [o_titlebar_view frame].size.height)];
     else
         [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
@@ -238,7 +261,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     // select playlist item by default
     [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
 
-    if (b_dark_interface) {
+    if (self.darkInterface) {
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidResizeNotification object: nil];
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidMoveNotification object: nil];
 
@@ -257,7 +280,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
         if (winrect.size.height > 100) {
             [self setFrame: winrect display:YES animate:YES];
-            previousSavedFrame = winrect;
+            self.previousSavedFrame = winrect;
         }
 
         winrect = [o_split_view frame];
@@ -288,7 +311,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     NSRect frame = [self frame];
     NSSize screenSize = [[self screen] frame].size;
     if (screenSize.width <= frame.size.width || screenSize.height <= frame.size.height) {
-        nativeVideoSize = screenSize;
+        self.nativeVideoSize = screenSize;
         [self resizeWindow];
     }
 
@@ -449,7 +472,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)makeSplitViewVisible
 {
-    if (b_dark_interface)
+    if (self.darkInterface)
         [self setContentMinSize: NSMakeSize(604., f_min_window_height + [o_titlebar_view frame].size.height)];
     else
         [self setContentMinSize: NSMakeSize(604., f_min_window_height)];
@@ -476,7 +499,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)makeSplitViewHidden
 {
-    if (b_dark_interface)
+    if (self.darkInterface)
         [self setContentMinSize: NSMakeSize(604., f_min_video_height + [o_titlebar_view frame].size.height)];
     else
         [self setContentMinSize: NSMakeSize(604., f_min_video_height)];
@@ -520,7 +543,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         return;
     }
 
-    if (!(b_nativeFullscreenMode && b_fullscreen) && !b_splitview_removed && ((b_have_alt_key && b_activeVideo)
+    if (!(b_nativeFullscreenMode && self.fullscreen) && !b_splitview_removed && ((b_have_alt_key && b_activeVideo)
                                                                               || (b_nonembedded && event == psUserEvent)
                                                                               || (!b_activeVideo && event == psUserEvent)
                                                                               || (b_minimized_view && event == psVideoStartedOrStoppedEvent))) {
@@ -631,7 +654,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
         [self setFrame: winrect display: YES animate: YES];
     }
 
-    if (b_dark_interface) {
+    if (self.darkInterface) {
         [self setContentMinSize: NSMakeSize(604., [o_controls_bar height] + [o_titlebar_view frame].size.height)];
         [self setContentMaxSize: NSMakeSize(FLT_MAX, [o_controls_bar height] + [o_titlebar_view frame].size.height)];
     } else {
@@ -645,7 +668,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 - (void)showSplitView:(BOOL)b_with_resize
 {
     [self updateWindow];
-    if (b_dark_interface)
+    if (self.darkInterface)
         [self setContentMinSize:NSMakeSize(604., f_min_window_height + [o_titlebar_view frame].size.height)];
     else
         [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
@@ -795,7 +818,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 - (void)videoplayWillBeStarted
 {
-    if (!b_fullscreen)
+    if (!self.fullscreen)
         frameBeforePlayback = [self frame];
 }
 
@@ -804,7 +827,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     BOOL b_videoPlayback = [[VLCMain sharedInstance] activeVideoPlayback];
         
     if (!b_videoPlayback) {
-        if (!b_nonembedded && (!b_nativeFullscreenMode || (b_nativeFullscreenMode && !b_fullscreen)) && frameBeforePlayback.size.width > 0 && frameBeforePlayback.size.height > 0) {
+        if (!b_nonembedded && (!b_nativeFullscreenMode || (b_nativeFullscreenMode && !self.fullscreen)) && frameBeforePlayback.size.width > 0 && frameBeforePlayback.size.height > 0) {
 
             // only resize back to minimum view of this is still desired final state
             CGFloat f_threshold_height = f_min_video_height + [o_controls_bar height];
@@ -850,7 +873,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [super windowWillEnterFullScreen:notification];
 
     // update split view frame after removing title bar
-    if (b_dark_interface) {
+    if (self.darkInterface) {
         NSRect frame = [[self contentView] frame];
         frame.origin.y += [o_controls_bar height];
         frame.size.height -= [o_controls_bar height];
@@ -863,7 +886,7 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [super windowWillExitFullScreen: notification];
 
     // update split view frame after readding title bar
-    if (b_dark_interface) {
+    if (self.darkInterface) {
         NSRect frame = [o_split_view frame];
         frame.size.height -= [o_titlebar_view frame].size.height;
         [o_split_view setFrame:frame];
@@ -1343,6 +1366,12 @@ static VLCMainWindow *_o_sharedInstance = nil;
 
 @end
 
+@interface VLCDetachedVideoWindow ()
+{
+    VLCColorView * o_color_backdrop;
+}
+@end
+
 @implementation VLCDetachedVideoWindow
 
 - (void)awakeFromNib
@@ -1351,7 +1380,9 @@ static VLCMainWindow *_o_sharedInstance = nil;
     [super awakeFromNib];
     [self setAcceptsMouseMovedEvents: YES];
 
-    if (b_dark_interface) {
+    BOOL darkInterface = config_GetInt(VLCIntf, "macosx-interfacestyle");
+
+    if (darkInterface) {
         [self setBackgroundColor: [NSColor clearColor]];
 
         [self setOpaque: NO];
@@ -1371,14 +1402,14 @@ static VLCMainWindow *_o_sharedInstance = nil;
     }
 
     NSRect videoViewRect = [[self contentView] bounds];
-    if (b_dark_interface)
+    if (darkInterface)
         videoViewRect.size.height -= [o_titlebar_view frame].size.height;
     CGFloat f_bottomBarHeight = [[self controlsBar] height];
     videoViewRect.size.height -= f_bottomBarHeight;
     videoViewRect.origin.y = f_bottomBarHeight;
     [o_video_view setFrame: videoViewRect];
 
-    if (b_dark_interface) {
+    if (darkInterface) {
         o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_video_view frame]];
         [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_video_view];
         [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];

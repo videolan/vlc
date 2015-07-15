@@ -488,12 +488,55 @@ audio_output_t *getAout(void)
 #pragma mark Private
 
 @interface VLCMain () <BWQuincyManagerDelegate>
-- (void)removeOldPreferences;
-@end
+{
+    intf_thread_t *p_intf;      /* The main intf object */
+    BOOL launched;              /* finishedLaunching */
+    int items_at_launch;        /* items in playlist after launch */
+    VLCMainMenu *o_mainmenu;    /* VLCMainMenu */
+    id o_prefs;                 /* VLCPrefs       */
+    id o_sprefs;                /* VLCSimplePrefs */
+    id o_open;                  /* VLCOpen        */
+    id o_wizard;                /* VLCWizard      */
+    id o_coredialogs;           /* VLCCoreDialogProvider */
+    VLCInfo *o_info;            /* VLCInformation */
+    id o_eyetv;                 /* VLCEyeTVController */
+    id o_bookmarks;             /* VLCBookmarks */
+    id o_coreinteraction;       /* VLCCoreInteraction */
+    ResumeDialogController *o_resume_dialog;
 
-@interface VLCMain (Internal)
+    BOOL nib_main_loaded;       /* main nibfile */
+    BOOL nib_open_loaded;       /* open nibfile */
+    BOOL nib_about_loaded;      /* about nibfile */
+    BOOL nib_wizard_loaded;     /* wizard nibfile */
+    BOOL nib_prefs_loaded;      /* preferences nibfile */
+    BOOL nib_info_loaded;       /* information panel nibfile */
+    BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
+    BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
+    BOOL b_active_videoplayback;
+    BOOL b_nativeFullscreenMode;
+
+    bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
+
+    AppleRemote * o_remote;
+    BOOL b_remote_button_hold; /* true as long as the user holds the left,right,plus or minus on the remote control */
+
+    /* media key support */
+    BOOL b_mediaKeySupport;
+    BOOL b_mediakeyJustJumped;
+    SPMediaKeyTap * o_mediaKeyController;
+    BOOL b_mediaKeyTrapEnabled;
+
+    NSArray *o_usedHotkeys;
+
+    VLCVoutWindowController *o_vout_controller;
+
+    InputManager *o_input_manager;
+}
+
+- (void)removeOldPreferences;
 - (void)resetMediaKeyJump;
 - (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification;
+
 @end
 
 /*****************************************************************************
@@ -1428,11 +1471,7 @@ static const int kCurrentPreferencesVersion = 3;
     [[self playlist] outlineViewSelectionDidChange: NULL];
 }
 
-#pragma mark -
-
-@end
-
-@implementation VLCMain (Internal)
+#pragma mark - media keys
 
 - (void)resetMediaKeyJump
 {

@@ -26,7 +26,6 @@
 
 @interface VLCVideoEffects : NSObject {
     /* generic */
-    intf_thread_t *p_intf;
     IBOutlet id o_window;
     IBOutlet id o_tableView;
     IBOutlet id o_profile_pop;
@@ -142,15 +141,30 @@
     IBOutlet id o_addlogo_transparency_lbl;
     IBOutlet id o_addlogo_transparency_sld;
     IBOutlet id o_anaglyph_ckb;
-
-    NSInteger i_old_profile_index;
 }
+
+/* text field / stepper binding values */
+/* use setter to modify gui elements */
+@property (nonatomic) int cropLeftValue;
+@property (nonatomic) int cropTopValue;
+@property (nonatomic) int cropRightValue;
+@property (nonatomic) int cropBottomValue;
+
+@property (nonatomic) int puzzleRowsValue;
+@property (nonatomic) int puzzleColumnsValue;
+
+@property (nonatomic) int wallRowsValue;
+@property (nonatomic) int wallColumnsValue;
+
+@property (nonatomic) int cloneValue;
+
+@property (nonatomic) int sepiaValue;
+
+@property (nonatomic) int posterizeValue;
 
 /* generic */
 + (VLCVideoEffects *)sharedInstance;
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
-
-- (void)resetValues;
 
 - (void)saveCurrentProfile;
 
@@ -158,7 +172,6 @@
 - (IBAction)profileSelectorAction:(id)sender;
 - (IBAction)addProfile:(id)sender;
 - (IBAction)removeProfile:(id)sender;
-
 
 /* basic */
 - (IBAction)enableAdjust:(id)sender;
@@ -211,24 +224,5 @@
 - (IBAction)enableAddLogo:(id)sender;
 - (IBAction)addLogoModifierChanged:(id)sender;
 - (IBAction)enableAnaglyph:(id)sender;
-
-/* text field / stepper binding values */
-/* use setter to modify gui elements */
-@property (nonatomic) int cropLeftValue;
-@property (nonatomic) int cropTopValue;
-@property (nonatomic) int cropRightValue;
-@property (nonatomic) int cropBottomValue;
-
-@property (nonatomic) int puzzleRowsValue;
-@property (nonatomic) int puzzleColumnsValue;
-
-@property (nonatomic) int wallRowsValue;
-@property (nonatomic) int wallColumnsValue;
-
-@property (nonatomic) int cloneValue;
-
-@property (nonatomic) int sepiaValue;
-
-@property (nonatomic) int posterizeValue;
 
 @end

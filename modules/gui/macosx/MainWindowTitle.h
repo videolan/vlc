@@ -30,38 +30,11 @@
 
 @interface VLCMainWindowTitleView : VLCThreePartImageView
 {
-    NSImage * o_red_img;
-    NSImage * o_red_over_img;
-    NSImage * o_red_on_img;
-    NSImage * o_yellow_img;
-    NSImage * o_yellow_over_img;
-    NSImage * o_yellow_on_img;
-    NSImage * o_green_img;
-    NSImage * o_green_over_img;
-    NSImage * o_green_on_img;
-    // yosemite fullscreen images
-    NSImage * o_fullscreen_img;
-    NSImage * o_fullscreen_over_img;
-    NSImage * o_fullscreen_on_img;
-    // old native fullscreen images
-    NSImage * o_old_fullscreen_img;
-    NSImage * o_old_fullscreen_over_img;
-    NSImage * o_old_fullscreen_on_img;
-
-    NSShadow * o_window_title_shadow;
-    NSDictionary * o_window_title_attributes_dict;
-
     IBOutlet id o_red_btn;
     IBOutlet id o_yellow_btn;
     IBOutlet id o_green_btn;
     IBOutlet id o_fullscreen_btn;
     IBOutlet id o_title_lbl;
-
-    BOOL b_nativeFullscreenMode;
-
-    // state to determine correct image for green bubble
-    BOOL b_alt_pressed;
-    BOOL b_mouse_over;
 }
 @property (readonly) NSButton * closeButton;
 @property (readonly) NSButton * minimizeButton;
@@ -88,24 +61,25 @@
 
 @end
 
-@interface VLCCustomWindowButtonPrototype: NSButton
+@interface VLCCustomWindowButtonPrototype : NSButton
+
 - (NSArray*)extendedAccessibilityAttributeNames: (NSArray*)theAttributeNames;
 - (id)extendedAccessibilityAttributeValue: (NSString*)theAttributeName;
 - (NSNumber*)extendedAccessibilityIsAttributeSettable: (NSString*)theAttributeName;
 
 @end
 
-@interface VLCCustomWindowCloseButton: VLCCustomWindowButtonPrototype
+@interface VLCCustomWindowCloseButton : VLCCustomWindowButtonPrototype
 
 @end
 
 
-@interface VLCCustomWindowMinimizeButton: VLCCustomWindowButtonPrototype
+@interface VLCCustomWindowMinimizeButton : VLCCustomWindowButtonPrototype
 
 @end
 
 
-@interface VLCCustomWindowZoomButton: VLCCustomWindowButtonPrototype
+@interface VLCCustomWindowZoomButton : VLCCustomWindowButtonPrototype
 
 @end
 
@@ -114,8 +88,5 @@
 @end
 
 @interface VLCWindowTitleTextField : NSTextField
-{
-    NSMenu * contextMenu;
-}
 
 @end

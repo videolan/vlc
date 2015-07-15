@@ -78,9 +78,6 @@
     IBOutlet id o_rtsp_chkbox;
     IBOutlet id o_http_chkbox;
     IBOutlet id o_file_chkbox;
-
-    NSArray *o_mrl;
-    NSString *o_transcode;
 }
 @property (readwrite, retain) NSArray * soutMRL;
 

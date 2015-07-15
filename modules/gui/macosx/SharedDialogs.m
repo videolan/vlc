@@ -26,6 +26,16 @@
 static VLCEnterTextPanel *_textPanelInstance = nil;
 static VLCSelectItemInPopupPanel *_selectItemPanelInstance = nil;
 
+@interface VLCEnterTextPanel()
+{
+    __unsafe_unretained NSString * _title;
+    __unsafe_unretained NSString * _subtitle;
+    __unsafe_unretained NSString * _okTitle;
+    __unsafe_unretained NSString * _cancelTitle;
+    __unsafe_unretained id _target;
+}
+@end
+
 @implementation VLCEnterTextPanel
 + (VLCEnterTextPanel *)sharedInstance
 {
@@ -73,6 +83,18 @@ static VLCSelectItemInPopupPanel *_selectItemPanelInstance = nil;
     return [_text_fld stringValue];
 }
 
+@end
+
+@interface VLCSelectItemInPopupPanel()
+{
+    __unsafe_unretained NSString * _title;
+    __unsafe_unretained NSString * _subtitle;
+    __unsafe_unretained NSString * _okTitle;
+    __unsafe_unretained NSString * _cancelTitle;
+    __unsafe_unretained NSArray * _popData;
+
+    __unsafe_unretained id _target;
+}
 @end
 
 @implementation VLCSelectItemInPopupPanel

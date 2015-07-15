@@ -34,6 +34,12 @@
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY   1
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT 2
 
+@interface VLCTrackSynchronization()
+{
+    intf_thread_t *p_intf;
+}
+@end
+
 @implementation VLCTrackSynchronization
 static VLCTrackSynchronization *_o_sharedInstance = nil;
 

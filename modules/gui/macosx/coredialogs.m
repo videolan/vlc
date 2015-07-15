@@ -32,6 +32,13 @@
 /*****************************************************************************
  * VLCCoreDialogProvider implementation
  *****************************************************************************/
+@interface VLCCoreDialogProvider()
+{
+    ErrorWindowController *o_error_panel;
+    BOOL b_progress_cancelled;
+}
+@end
+
 @implementation VLCCoreDialogProvider
 
 static VLCCoreDialogProvider *_o_sharedInstance = nil;

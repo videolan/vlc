@@ -36,18 +36,32 @@
  *  and in main window.
  *****************************************************************************/
 
+@interface VLCControlsBarCommon ()
+{
+    NSImage * o_pause_img;
+    NSImage * o_pause_pressed_img;
+    NSImage * o_play_img;
+    NSImage * o_play_pressed_img;
+
+    NSTimeInterval last_fwd_event;
+    NSTimeInterval last_bwd_event;
+    BOOL just_triggered_next;
+    BOOL just_triggered_previous;
+}
+@end
+
 @implementation VLCControlsBarCommon
 
 @synthesize bottomBarView=o_bottombar_view;
 
 - (void)awakeFromNib
 {
-    b_dark_interface = config_GetInt(VLCIntf, "macosx-interfacestyle");
+    _darkInterface = config_GetInt(VLCIntf, "macosx-interfacestyle");
+    _nativeFullscreenMode = NO;
 
-    b_nativeFullscreenMode = NO;
 #ifdef MAC_OS_X_VERSION_10_7
     if (!OSX_SNOW_LEOPARD)
-        b_nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
+        _nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
 #endif
 
     [o_drop_view setDrawBorder: NO];
@@ -72,7 +86,7 @@
     [[o_fullscreen_btn cell] accessibilitySetOverrideValue:_NS("Click to enable fullscreen video playback.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[o_fullscreen_btn cell] accessibilitySetOverrideValue:[o_fullscreen_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    if (!b_dark_interface) {
+    if (!_darkInterface) {
         [o_bottombar_view setImagesLeft: imageFromRes(@"bottom-background") middle: imageFromRes(@"bottom-background") right: imageFromRes(@"bottom-background")];
 
         [o_bwd_btn setImage: imageFromRes(@"backward-3btns")];
@@ -123,7 +137,7 @@
     [o_time_fld setRemainingIdentifier:@"DisplayTimeAsTimeRemaining"];
 
     // prepare time slider fance gradient view
-    if (!b_dark_interface) {
+    if (!_darkInterface) {
         NSRect frame;
         frame = [o_time_sld_fancygradient_view frame];
         frame.size.height = frame.size.height - 1;
@@ -145,7 +159,7 @@
 
 
     // remove fullscreen button for lion fullscreen
-    if (b_nativeFullscreenMode) {
+    if (_nativeFullscreenMode) {
         CGFloat f_width = [o_fullscreen_btn frame].size.width;
 
         NSRect frame = [o_time_fld frame];
@@ -441,7 +455,7 @@
 
 - (void)setFullscreenState:(BOOL)b_fullscreen
 {
-    if (!b_nativeFullscreenMode)
+    if (!self.nativeFullscreenMode)
         [o_fullscreen_btn setState:b_fullscreen];
 }
 
@@ -454,11 +468,31 @@
  *  Holds all specific outlets, actions and code for the main window controls bar.
  *****************************************************************************/
 
-@interface VLCMainWindowControlsBar (Internal)
+@interface VLCMainWindowControlsBar()
+{
+    NSImage * o_repeat_img;
+    NSImage * o_repeat_pressed_img;
+    NSImage * o_repeat_all_img;
+    NSImage * o_repeat_all_pressed_img;
+    NSImage * o_repeat_one_img;
+    NSImage * o_repeat_one_pressed_img;
+    NSImage * o_shuffle_img;
+    NSImage * o_shuffle_pressed_img;
+    NSImage * o_shuffle_on_img;
+    NSImage * o_shuffle_on_pressed_img;
+
+    NSButton * o_prev_btn;
+    NSButton * o_next_btn;
+
+    BOOL b_show_jump_buttons;
+    BOOL b_show_playmode_buttons;
+}
+
 - (void)addJumpButtons:(BOOL)b_fast;
 - (void)removeJumpButtons:(BOOL)b_fast;
 - (void)addPlaymodeButtons:(BOOL)b_fast;
 - (void)removePlaymodeButtons:(BOOL)b_fast;
+
 @end
 
 @implementation VLCMainWindowControlsBar
@@ -466,7 +500,6 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-
 
     [o_stop_btn setToolTip: _NS("Stop")];
     [[o_stop_btn cell] accessibilitySetOverrideValue:_NS("Click to stop playback.") forAttribute:NSAccessibilityDescriptionAttribute];
@@ -498,7 +531,7 @@
     [[o_effects_btn cell] accessibilitySetOverrideValue:_NS("Click to show an Audio Effects panel featuring an equalizer and further filters.") forAttribute:NSAccessibilityDescriptionAttribute];
     [[o_effects_btn cell] accessibilitySetOverrideValue:[o_effects_btn toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    if (!b_dark_interface) {
+    if (!self.darkInterface) {
         [o_stop_btn setImage: imageFromRes(@"stop")];
         [o_stop_btn setAlternateImage: imageFromRes(@"stop-pressed")];
 
@@ -520,7 +553,7 @@
         [o_volume_up_btn setImage: imageFromRes(@"volume-high")];
         [o_volume_sld setUsesBrightArtwork: YES];
 
-        if (b_nativeFullscreenMode) {
+        if (self.nativeFullscreenMode) {
             [o_effects_btn setImage: imageFromRes(@"effects-one-button")];
             [o_effects_btn setAlternateImage: imageFromRes(@"effects-one-button-pressed")];
         } else {
@@ -552,7 +585,7 @@
         [o_volume_up_btn setImage: imageFromRes(@"volume-high_dark")];
         [o_volume_sld setUsesBrightArtwork: NO];
 
-        if (b_nativeFullscreenMode) {
+        if (self.nativeFullscreenMode) {
             [o_effects_btn setImage: imageFromRes(@"effects-one-button_dark")];
             [o_effects_btn setAlternateImage: imageFromRes(@"effects-one-button-pressed-dark")];
         } else {
@@ -574,7 +607,7 @@
     [o_volume_up_btn setEnabled: b_mute];
 
     // remove fullscreen button for lion fullscreen
-    if (b_nativeFullscreenMode) {
+    if (self.nativeFullscreenMode) {
         NSRect frame;
 
         // == [o_fullscreen_btn frame].size.width;
@@ -645,7 +678,7 @@ else \
     NSRect frame;
     CGFloat f_space = [o_effects_btn frame].size.width;
     // extra margin between button and volume up button
-    if (b_nativeFullscreenMode)
+    if (self.nativeFullscreenMode)
         f_space += 2;
 
 
@@ -664,8 +697,8 @@ else \
     else
         [[o_progress_view animator] setFrame: frame];
 
-    if (!b_nativeFullscreenMode) {
-        if (b_dark_interface) {
+    if (!self.nativeFullscreenMode) {
+        if (self.darkInterface) {
             [o_fullscreen_btn setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
             [o_fullscreen_btn setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
         } else {
@@ -695,7 +728,7 @@ else \
     NSRect frame;
     CGFloat f_space = [o_effects_btn frame].size.width;
     // extra margin between button and volume up button
-    if (b_nativeFullscreenMode)
+    if (self.nativeFullscreenMode)
         f_space += 2;
 
     moveItem(o_volume_up_btn);
@@ -713,8 +746,8 @@ else \
     else
         [[o_progress_view animator] setFrame: frame];
 
-    if (!b_nativeFullscreenMode) {
-        if (b_dark_interface) {
+    if (!self.nativeFullscreenMode) {
+        if (self.darkInterface) {
             [[o_fullscreen_btn animator] setImage: imageFromRes(@"fullscreen-one-button_dark")];
             [[o_fullscreen_btn animator] setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
         } else {
@@ -763,7 +796,7 @@ else \
     [[o_next_btn cell] accessibilitySetOverrideValue:_NS("Click to go to the next playlist item.") forAttribute:NSAccessibilityDescriptionAttribute];
     [o_next_btn setEnabled: b_enabled];
 
-    if (b_dark_interface) {
+    if (self.darkInterface) {
         [o_prev_btn setImage: imageFromRes(@"previous-6btns-dark")];
         [o_prev_btn setAlternateImage: imageFromRes(@"previous-6btns-dark-pressed")];
         [o_next_btn setImage: imageFromRes(@"next-6btns-dark")];
@@ -811,7 +844,7 @@ else \
     else
         [[o_progress_view animator] setFrame: frame];
 
-    if (b_dark_interface) {
+    if (self.darkInterface) {
         [[o_fwd_btn animator] setImage:imageFromRes(@"forward-6btns-dark")];
         [[o_fwd_btn animator] setAlternateImage:imageFromRes(@"forward-6btns-dark-pressed")];
         [[o_bwd_btn animator] setImage:imageFromRes(@"backward-6btns-dark")];
@@ -891,7 +924,7 @@ else \
     else
         [[o_progress_view animator] setFrame: frame];
 
-    if (b_dark_interface) {
+    if (self.darkInterface) {
         [[o_fwd_btn animator] setImage:imageFromRes(@"forward-3btns-dark")];
         [[o_fwd_btn animator] setAlternateImage:imageFromRes(@"forward-3btns-dark-pressed")];
         [[o_bwd_btn animator] setImage:imageFromRes(@"backward-3btns-dark")];
@@ -923,7 +956,7 @@ else \
     NSRect frame;
     CGFloat f_space = [o_repeat_btn frame].size.width + [o_shuffle_btn frame].size.width - 6.;
 
-    if (b_dark_interface) {
+    if (self.darkInterface) {
         [[o_playlist_btn animator] setImage:imageFromRes(@"playlist_dark")];
         [[o_playlist_btn animator] setAlternateImage:imageFromRes(@"playlist-pressed_dark")];
     } else {
@@ -958,7 +991,7 @@ else \
     [o_repeat_btn setHidden: YES];
     [o_shuffle_btn setHidden: YES];
 
-    if (b_dark_interface) {
+    if (self.darkInterface) {
         [[o_playlist_btn animator] setImage:imageFromRes(@"playlist-1btn-dark")];
         [[o_playlist_btn animator] setAlternateImage:imageFromRes(@"playlist-1btn-dark-pressed")];
     } else {

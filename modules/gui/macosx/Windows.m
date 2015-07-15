@@ -35,10 +35,22 @@
  *  Missing extension to NSWindow
  *****************************************************************************/
 
-@implementation VLCWindow
+@interface VLCWindow()
+{
+    BOOL b_canBecomeKeyWindow;
+    BOOL b_isset_canBecomeKeyWindow;
+    BOOL b_canBecomeMainWindow;
+    BOOL b_isset_canBecomeMainWindow;
+    NSViewAnimation *o_current_animation;
 
-@synthesize hasActiveVideo=b_has_active_video;
-@synthesize fullscreen=b_fullscreen;
+    /*
+     * YES when all animations are over
+     * for fullscreen window: always YES
+     */
+}
+@end
+
+@implementation VLCWindow
 
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
@@ -268,7 +280,29 @@
  *  Common code for main window, detached window and extra video window
  *****************************************************************************/
 
-@interface VLCVideoWindowCommon (Internal)
+@interface VLCVideoWindowCommon()
+{
+    // variables for fullscreen handling
+    VLCVideoWindowCommon *o_current_video_window;
+    VLCWindow       * o_fullscreen_window;
+    NSViewAnimation * o_fullscreen_anim1;
+    NSViewAnimation * o_fullscreen_anim2;
+    NSView          * o_temp_view;
+
+    NSInteger i_originalLevel;
+
+    BOOL b_video_view_was_hidden;
+
+    NSTimer *t_hide_mouse_timer;
+
+    // true when the window is in transition for entering or exiting fullscreen
+    BOOL b_in_fullscreen_transition;
+
+    NSRect frameBeforeLionFullscreen;
+
+    BOOL b_windowShouldExitFullscreenWhenFinished;
+}
+
 - (void)customZoom:(id)sender;
 - (void)hasBecomeFullscreen;
 - (void)hasEndedFullscreen;
@@ -287,9 +321,9 @@
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
-    b_dark_interface = config_GetInt(VLCIntf, "macosx-interfacestyle");
+    _darkInterface = config_GetInt(VLCIntf, "macosx-interfacestyle");
 
-    if (b_dark_interface) {
+    if (_darkInterface) {
         styleMask = NSBorderlessWindowMask;
 #ifdef MAC_OS_X_VERSION_10_7
         if (!OSX_SNOW_LEOPARD)
@@ -331,7 +365,7 @@
     if (!title || [title length] < 1)
         return;
 
-    if (b_dark_interface && o_titlebar_view)
+    if (_darkInterface && o_titlebar_view)
         [o_titlebar_view setWindowTitle: title];
 
     [super setTitle: title];
@@ -466,7 +500,7 @@
         && (fabs(NSMinY(maxRect) - NSMinY(currentFrame)) < DIST)) {
         // Already in zoomed mode, reset user frame, if stored
         if ([self frameAutosaveName] != nil) {
-            [self setFrame: previousSavedFrame display: YES animate: YES];
+            [self setFrame: self.previousSavedFrame display: YES animate: YES];
             [self saveFrameUsingName: [self frameAutosaveName]];
         }
         return;
@@ -474,7 +508,7 @@
 
     if ([self frameAutosaveName] != nil) {
         [self saveFrameUsingName: [self frameAutosaveName]];
-        previousSavedFrame = [self frame];
+        self.previousSavedFrame = [self frame];
     }
 
     [self setFrame: maxRect display: YES animate: YES];
@@ -488,7 +522,7 @@
     if (var_InheritBool(VLCIntf, "video-wallpaper") || [self level] < NSNormalWindowLevel)
         return;
 
-    if (!b_fullscreen && !b_in_fullscreen_transition)
+    if (!self.fullscreen && !b_in_fullscreen_transition)
         [self setLevel: i_state];
 
     // save it for restore if window is currently minimized or in fullscreen
@@ -544,13 +578,13 @@
     if ([self fullscreen] || b_in_fullscreen_transition)
         return;
 
-    NSRect window_rect = [self getWindowRectForProposedVideoViewSize:nativeVideoSize];
+    NSRect window_rect = [self getWindowRectForProposedVideoViewSize:self.nativeVideoSize];
     [[self animator] setFrame:window_rect display:YES];
 }
 
 - (void)setNativeVideoSize:(NSSize)size
 {
-    nativeVideoSize = size;
+    _nativeVideoSize = size;
 
     if (var_InheritBool(VLCIntf, "macosx-video-autoresize") && !var_InheritBool(VLCIntf, "video-wallpaper"))
         [self resizeWindow];
@@ -558,7 +592,7 @@
 
 - (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize
 {
-    if (![[VLCMain sharedInstance] activeVideoPlayback] || nativeVideoSize.width == 0. || nativeVideoSize.height == 0. || window != self)
+    if (![[VLCMain sharedInstance] activeVideoPlayback] || self.nativeVideoSize.width == 0. || self.nativeVideoSize.height == 0. || window != self)
         return proposedFrameSize;
 
     // needed when entering lion fullscreen mode
@@ -574,10 +608,10 @@
         NSRect contentRect = [self contentRectForFrameRect:videoWindowFrame];
         CGFloat marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
         CGFloat marginx = contentRect.size.width - viewRect.size.width;
-        if (o_titlebar_view && b_dark_interface)
+        if (o_titlebar_view && _darkInterface)
             marginy += [o_titlebar_view frame].size.height;
 
-        proposedFrameSize.height = (proposedFrameSize.width - marginx) * nativeVideoSize.height / nativeVideoSize.width + marginy;
+        proposedFrameSize.height = (proposedFrameSize.width - marginx) * self.nativeVideoSize.height / self.nativeVideoSize.width + marginy;
     }
 
     return proposedFrameSize;
@@ -621,9 +655,9 @@
 //  Called automatically if window's acceptsMouseMovedEvents property is true
 - (void)mouseMoved:(NSEvent *)theEvent
 {
-    if (b_fullscreen)
+    if (self.fullscreen)
         [self recreateHideMouseTimer];
-    if (b_has_active_video && [self isKeyWindow]) {
+    if (self.hasActiveVideo && [self isKeyWindow]) {
         if (NSPointInRect([theEvent locationInWindow],
                           [[self videoView] convertRect:[[self videoView] bounds]
                                                  toView:nil])) {
@@ -715,7 +749,7 @@
     b_windowShouldExitFullscreenWhenFinished = [[VLCMain sharedInstance] activeVideoPlayback];
 
     NSInteger i_currLevel = [self level];
-    // b_fullscreen and b_in_fullscreen_transition must not be true yet
+    // self.fullscreen and b_in_fullscreen_transition must not be true yet
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
     i_originalLevel = i_currLevel;
@@ -737,7 +771,7 @@
     if ([self hasActiveVideo])
         [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
 
-    if (b_dark_interface) {
+    if (_darkInterface) {
         [o_titlebar_view removeFromSuperviewWithoutNeedingDisplay];
 
         NSRect winrect;
@@ -799,7 +833,7 @@
     [[[VLCMainWindow sharedInstance] fsPanel] setNonActive: nil];
 
 
-    if (b_dark_interface) {
+    if (_darkInterface) {
         NSRect winrect;
         CGFloat f_titleBarHeight = [o_titlebar_view frame].size.height;
 
@@ -871,7 +905,7 @@
 
     /* Make sure we don't see the window flashes in float-on-top mode */
     NSInteger i_currLevel = [self level];
-    // b_fullscreen must not be true yet
+    // self.fullscreen must not be true yet
     [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
     i_originalLevel = i_currLevel; // would be overwritten by previous call
@@ -1158,7 +1192,7 @@
 
 - (NSArray *)accessibilityAttributeNames
 {
-    if (!b_dark_interface || !o_titlebar_view)
+    if (!_darkInterface || !o_titlebar_view)
         return [super accessibilityAttributeNames];
 
     static NSMutableArray *attributes = nil;
@@ -1179,7 +1213,7 @@
 
 - (id)accessibilityAttributeValue: (NSString*)o_attribute_name
 {
-    if (b_dark_interface && o_titlebar_view) {
+    if (_darkInterface && o_titlebar_view) {
         VLCMainWindowTitleView *o_tbv = o_titlebar_view;
 
         if ([o_attribute_name isEqualTo: NSAccessibilitySubroleAttribute])

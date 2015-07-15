@@ -172,6 +172,8 @@
 
     BOOL b_playlistmenu_nib_loaded;
     BOOL b_view_setup;
+
+    PLModel *o_model;
 }
 
 - (void)saveTableColumns;

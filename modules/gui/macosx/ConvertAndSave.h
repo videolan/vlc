@@ -116,17 +116,6 @@
     IBOutlet id _stream_sdp_matrix;
     IBOutlet id _stream_sdp_fld;
     IBOutlet id _stream_sdp_browsefile_btn;
-
-    NSString * _MRL;
-    NSString * _outputDestination;
-    NSArray * _profileNames;
-    NSArray * _profileValueList;
-    NSArray * _videoCodecs;
-    NSArray * _audioCodecs;
-    NSArray * _subsCodecs;
-    NSMutableArray * _currentProfile;
-
-    BOOL b_streaming;
 }
 @property (readwrite, nonatomic, retain) NSString * MRL;
 @property (readwrite, nonatomic, retain) NSString * outputDestination;

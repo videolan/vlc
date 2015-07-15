@@ -37,6 +37,14 @@
 /*****************************************************************************
  * VLCOutput implementation
  *****************************************************************************/
+
+@interface VLCOutput()
+{
+    NSArray *o_mrl;
+    NSString *o_transcode;
+}
+@end
+
 @implementation VLCOutput
 @synthesize soutMRL=o_mrl;
 

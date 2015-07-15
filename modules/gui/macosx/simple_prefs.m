@@ -179,6 +179,27 @@ static NSString* VLCOSDSettingToolbarIdentifier = @"Subtitles Settings Item Iden
 static NSString* VLCInputSettingToolbarIdentifier = @"Input Settings Item Identifier";
 static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Identifier";
 
+@interface VLCSimplePrefs()
+{
+    BOOL b_audioSettingChanged;
+    BOOL b_intfSettingChanged;
+    BOOL b_videoSettingChanged;
+    BOOL b_osdSettingChanged;
+    BOOL b_inputSettingChanged;
+    BOOL b_hotkeyChanged;
+    id o_currentlyShownCategoryView;
+
+    NSOpenPanel *o_selectFolderPanel;
+    NSArray *o_hotkeyDescriptions;
+    NSArray *o_hotkeyNames;
+    NSArray *o_hotkeysNonUseableKeys;
+    NSMutableArray *o_hotkeySettings;
+    NSString *o_keyInTransition;
+
+    intf_thread_t *p_intf;
+}
+@end
+
 @implementation VLCSimplePrefs
 
 static VLCSimplePrefs *_o_sharedInstance = nil;

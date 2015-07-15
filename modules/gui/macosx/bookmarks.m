@@ -38,7 +38,10 @@
 #import "wizard.h"
 #import "CompatibilityFixes.h"
 
-@interface VLCBookmarks (Internal)
+@interface VLCBookmarks()
+{
+    input_thread_t *p_old_input;
+}
 - (void)initStrings;
 @end
 

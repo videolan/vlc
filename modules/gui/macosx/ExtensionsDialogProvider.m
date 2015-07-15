@@ -268,6 +268,12 @@ static int dialogCallback(vlc_object_t *p_this, const char *psz_variable,
     }
 }
 
+@interface ExtensionsDialogProvider ()
+{
+    intf_thread_t *p_intf;
+}
+@end
+
 @implementation ExtensionsDialogProvider
 
 static ExtensionsDialogProvider *_o_sharedInstance = nil;

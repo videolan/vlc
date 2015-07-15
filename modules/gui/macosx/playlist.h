@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #import "PXSourceList.h"
+#import "PLModel.h"
 
 /*****************************************************************************
  * VLCPlaylistView interface
@@ -39,8 +40,6 @@
 - (IBAction)reloadOutlineView;
 
 @end
-
-#import "PLModel.h"
 
 /*****************************************************************************
  * VLCPlaylist interface
@@ -74,8 +73,6 @@
     IBOutlet id o_save_accessory_text;
 
     IBOutlet id o_playlist_header;
-
-    PLModel *o_model;
 }
 
 - (PLModel *)model;

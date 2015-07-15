@@ -69,6 +69,29 @@ struct display_info_t
 /*****************************************************************************
  * VLCOpen implementation
  *****************************************************************************/
+@interface VLCOpen()
+{
+    NSArray         *qtkvideoDevices;
+    NSArray         *qtkaudioDevices;
+    NSString        *qtk_currdevice_uid;
+    NSString        *qtkaudio_currdevice_uid;
+
+    BOOL b_autoplay;
+    BOOL b_nodvdmenus;
+    id o_currentOpticalMediaView;
+    id o_currentOpticalMediaIconView;
+    NSMutableArray *o_allMediaDevices;
+    NSArray *o_opticalDevices;
+    NSMutableArray *o_specialMediaFolders;
+    NSString *o_file_path;
+    id o_currentCaptureView;
+    NSString *o_file_slave_path;
+    NSString *o_sub_path;
+    NSString *o_mrl;
+    NSMutableArray *o_displayInfos;
+}
+@end
+
 @implementation VLCOpen
 
 @synthesize fileSubDelay, fileSubFps;

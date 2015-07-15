@@ -48,8 +48,8 @@ typedef enum {
     psPlaylistItemChangedEvent
 } VLCPlaylistStateEvent;
 
-@interface VLCMainWindow : VLCVideoWindowCommon <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate> {
-
+@interface VLCMainWindow : VLCVideoWindowCommon
+{
     IBOutlet id o_search_fld;
 
     IBOutlet id o_playlist_table;
@@ -66,8 +66,6 @@ typedef enum {
     IBOutlet id o_dropzone_box;
     IBOutlet id o_dropzone_img;
 
-    VLCFSPanel *o_fspanel;
-
     IBOutlet id o_podcast_view;
     IBOutlet id o_podcast_add_btn;
     IBOutlet id o_podcast_remove_btn;
@@ -83,26 +81,6 @@ typedef enum {
     IBOutlet id o_podcast_unsubscribe_pop;
     IBOutlet id o_podcast_unsubscribe_ok_btn;
     IBOutlet id o_podcast_unsubscribe_cancel_btn;
-
-    BOOL b_nativeFullscreenMode;
-    BOOL b_video_playback_enabled;
-    BOOL b_dropzone_active;
-    BOOL b_splitview_removed;
-    BOOL b_minimized_view;
-
-    CGFloat f_lastSplitViewHeight;
-    CGFloat f_lastLeftSplitViewWidth;
-
-    NSMutableArray *o_sidebaritems;
-
-    /* this is only true, when we have NO video playing inside the main window */
-    BOOL b_nonembedded;
-
-    BOOL b_podcastView_displayed;
-
-    VLCColorView * o_color_backdrop;
-
-    NSRect frameBeforePlayback;
 }
 + (VLCMainWindow *)sharedInstance;
 @property (readonly) BOOL nativeFullscreenMode;
@@ -143,8 +121,5 @@ typedef enum {
 @end
 
 @interface VLCDetachedVideoWindow : VLCVideoWindowCommon
-{
-    VLCColorView * o_color_backdrop;
-}
 
 @end

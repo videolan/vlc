@@ -28,59 +28,29 @@
 @class VLCDialogGridView;
 
 @interface VLCDialogButton : NSButton
-{
-    extension_widget_t *widget;
-}
-
 @property (readwrite) extension_widget_t *widget;
 @end
-
 
 @interface VLCDialogPopUpButton : NSPopUpButton
-{
-    extension_widget_t *widget;
-}
-
 @property (readwrite) extension_widget_t *widget;
 @end
-
 
 @interface VLCDialogTextField : NSTextField
-{
-    extension_widget_t *widget;
-}
-
 @property (readwrite) extension_widget_t *widget;
 @end
 
-
 @interface VLCDialogWindow : NSWindow
-{
-    extension_dialog_t *dialog;
-    BOOL has_lock;
-}
-
 @property (readwrite) extension_dialog_t *dialog;
 @property (readwrite) BOOL has_lock;
 @end
 
 
 @interface VLCDialogList : NSTableView <NSTableViewDataSource>
-{
-    extension_widget_t *widget;
-    NSMutableArray *contentArray;
-}
-
 @property (readwrite) extension_widget_t *widget;
 @property (readwrite, retain) NSMutableArray *contentArray;
 @end
 
-
 @interface VLCDialogGridView : NSView
-{
-    NSUInteger _rowCount, _colCount;
-    NSMutableArray *_griddedViews;
-}
 
 - (void)addSubview:(NSView *)view atRow:(NSUInteger)row column:(NSUInteger)column rowSpan:(NSUInteger)rowSpan colSpan:(NSUInteger)colSpan;
 - (NSSize)flexSize:(NSSize)size;

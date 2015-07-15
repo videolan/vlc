@@ -28,7 +28,6 @@
 @interface VLCTrackSynchronization : NSObject {
     /* generic */
     IBOutlet id o_window;
-    intf_thread_t *p_intf;
     IBOutlet id o_reset_btn;
 
     /* Audio / Video */

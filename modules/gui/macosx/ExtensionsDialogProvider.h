@@ -37,9 +37,6 @@
  * ExtensionsDialogProvider interface
  *****************************************************************************/
 @interface ExtensionsDialogProvider : NSObject <NSWindowDelegate>
-{
-    intf_thread_t *p_intf;
-}
 
 + (ExtensionsDialogProvider *)sharedInstance:(intf_thread_t *)_p_intf;
 + (void)killInstance;

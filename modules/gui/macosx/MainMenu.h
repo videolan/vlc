@@ -31,25 +31,6 @@
 
 @interface VLCMainMenu : NSObject
 {
-    intf_thread_t *p_intf;
-    BOOL b_mainMenu_setup;
-    BOOL b_nib_videoeffects_loaded;
-    BOOL b_nib_audioeffects_loaded;
-    BOOL b_nib_tracksynchro_loaded;
-    BOOL b_nib_bookmarks_loaded;
-    BOOL b_nib_convertandsave_loaded;
-
-    AboutWindowController *o_about;
-    HelpWindowController  *o_helpWin;
-    id o_videoeffects;          /* VLCVideoEffects */
-    id o_audioeffects;          /* VLCAudioEffects */
-    id o_trackSynchronization;  /* VLCTrackSynchronization */
-    id o_bookmarks;             /* VLCBookmarks */
-    id o_convertandsave;        /* VLCConvertAndSave */
-    AddonsWindowController *o_addonsController;
-
-    id o_extMgr;                /* Extensions Manager */
-
     /* main menu */
 
     IBOutlet NSMenuItem * o_mi_about;
@@ -226,10 +207,6 @@
     IBOutlet NSMenuItem * o_vmi_mute;
     IBOutlet NSMenuItem * o_vmi_fullscreen;
     IBOutlet NSMenuItem * o_vmi_snapshot;
-
-    // information for playlist table columns menu
-    NSDictionary * o_ptc_translation_dict;
-    NSArray * o_ptc_menuorder;
 }
 + (VLCMainMenu *)sharedInstance;
 

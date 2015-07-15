@@ -314,6 +314,14 @@ static bool b_old_spaces_style = YES;
  * VLCDragDropView
  *****************************************************************************/
 
+@interface VLCDragDropView()
+{
+    bool b_activeDragAndDrop;
+
+    __unsafe_unretained id _dropHandler;
+}
+@end
+
 @implementation VLCDragDropView
 
 @synthesize dropHandler=_dropHandler;
@@ -524,6 +532,14 @@ void _drawFrameInRect(NSRect frameRect)
  * TimeLineSlider
  *****************************************************************************/
 
+@interface TimeLineSlider()
+{
+    NSImage *o_knob_img;
+    NSRect img_rect;
+    BOOL b_dark;
+}
+@end
+
 @implementation TimeLineSlider
 
 - (void)awakeFromNib
@@ -575,6 +591,12 @@ void _drawFrameInRect(NSRect frameRect)
 /*****************************************************************************
  * VLCVolumeSliderCommon
  *****************************************************************************/
+
+@interface VLCVolumeSliderCommon()
+{
+    BOOL _usesBrightArtwork;
+}
+@end
 
 @implementation VLCVolumeSliderCommon : NSSlider
 
@@ -670,6 +692,13 @@ void _drawFrameInRect(NSRect frameRect)
  * ITSlider
  *****************************************************************************/
 
+@interface ITSlider()
+{
+    NSImage *img;
+    NSRect image_rect;
+}
+@end
+
 @implementation ITSlider
 
 - (void)awakeFromNib
@@ -719,6 +748,16 @@ void _drawFrameInRect(NSRect frameRect)
  *****************************************************************************
  * we need this to catch our click-event in the controller window
  *****************************************************************************/
+
+@interface VLCTimeField()
+{
+    NSShadow * o_string_shadow;
+    NSTextAlignment textAlignment;
+
+    NSString *o_remaining_identifier;
+    BOOL b_time_remaining;
+}
+@end
 
 @implementation VLCTimeField
 + (void)initialize
@@ -810,21 +849,36 @@ void _drawFrameInRect(NSRect frameRect)
 /*****************************************************************************
  * VLCThreePartImageView interface
  *****************************************************************************/
+
+@interface VLCThreePartImageView()
+{
+    NSImage *_left_img;
+    NSImage *_middle_img;
+    NSImage *_right_img;
+}
+@end
+
 @implementation VLCThreePartImageView
 
 - (void)setImagesLeft:(NSImage *)left middle: (NSImage *)middle right:(NSImage *)right
 {
-    o_left_img = left;
-    o_middle_img = middle;
-    o_right_img = right;
+    _left_img = left;
+    _middle_img = middle;
+    _right_img = right;
 }
 
 - (void)drawRect:(NSRect)rect
 {
     NSRect bnds = [self bounds];
-    NSDrawThreePartImage( bnds, o_left_img, o_middle_img, o_right_img, NO, NSCompositeSourceOver, 1, NO );
+    NSDrawThreePartImage( bnds, _left_img, _middle_img, _right_img, NO, NSCompositeSourceOver, 1, NO );
 }
 
+@end
+
+@interface PositionFormatter()
+{
+    NSCharacterSet *o_forbidden_characters;
+}
 @end
 
 @implementation PositionFormatter

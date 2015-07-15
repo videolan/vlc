@@ -181,35 +181,16 @@
     IBOutlet NSPopUpButton *o_urlhandler_smb_pop;
     IBOutlet NSPopUpButton *o_urlhandler_udp_pop;
     IBOutlet id o_urlhandler_win;
-
-    BOOL b_audioSettingChanged;
-    BOOL b_intfSettingChanged;
-    BOOL b_videoSettingChanged;
-    BOOL b_osdSettingChanged;
-    BOOL b_inputSettingChanged;
-    BOOL b_hotkeyChanged;
-    id o_currentlyShownCategoryView;
-
-    NSOpenPanel *o_selectFolderPanel;
-    NSArray *o_hotkeyDescriptions;
-    NSArray *o_hotkeyNames;
-    NSArray *o_hotkeysNonUseableKeys;
-    NSMutableArray *o_hotkeySettings;
-    NSString *o_keyInTransition;
-
-    intf_thread_t *p_intf;
 }
 + (VLCSimplePrefs *)sharedInstance;
 
 /* toolbar */
-- (NSToolbarItem *) toolbar: (NSToolbar *)o_toolbar
-      itemForItemIdentifier: (NSString *)o_itemIdent
-  willBeInsertedIntoToolbar: (BOOL)b_willBeInserted;
-- (NSArray *)toolbarDefaultItemIdentifiers: (NSToolbar *)toolbar;
-- (NSArray *)toolbarAllowedItemIdentifiers: (NSToolbar *)toolbar;
+- (NSToolbarItem *)toolbar:(NSToolbar *)o_toolbar
+     itemForItemIdentifier:(NSString *)o_itemIdent
+ willBeInsertedIntoToolbar:(BOOL)b_willBeInserted;
+- (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar;
+- (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar;
 
-- (void)initStrings;
-- (void)resetControls;
 - (void)showSimplePrefs;
 - (void)showSimplePrefsWithLevel:(NSInteger)i_window_level;
 
@@ -219,36 +200,26 @@
          returnCode:(int)i_return
         contextInfo:(void *)o_context;
 
-- (void)saveChangedSettings;
-
 /* interface */
 - (IBAction)interfaceSettingChanged:(id)sender;
-- (void)showInterfaceSettings;
 
 /* audio */
 - (IBAction)audioSettingChanged:(id)sender;
-- (void)showAudioSettings;
 
 /* video */
 - (IBAction)videoSettingChanged:(id)sender;
-- (void)showVideoSettings;
 
 /* OSD / subtitles */
 - (IBAction)osdSettingChanged:(id)sender;
 - (IBAction)showFontPicker:(id)sender;
-- (void)showOSDSettings;
 - (void)changeFont:(id)sender;
 
 /* input & codecs */
 - (IBAction)inputSettingChanged:(id)sender;
-- (void)showInputSettings;
 - (IBAction)urlHandlerAction:(id)sender;
 
 /* hotkeys */
 - (IBAction)hotkeySettingChanged:(id)sender;
-- (void)showHotkeySettings;
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
 - (BOOL)changeHotkeyTo: (NSString *)theKey;
 
 @end

@@ -39,18 +39,6 @@
 @end
 
 @interface ExtensionsManager : NSObject
-{
-    intf_thread_t *p_intf;
-    extensions_manager_t *p_extensions_manager;
-    ExtensionsDialogProvider *p_edp;
-
-    NSMutableDictionary *p_extDict;
-
-    BOOL b_unloading;  ///< Work around threads + emit issues, see isUnloading
-    BOOL b_failed; ///< Flag set to true if we could not load the module
-
-    id <ExtensionsDelegate> delegate;
-};
 
 + (ExtensionsManager *)getInstance:(intf_thread_t *)_p_intf;
 

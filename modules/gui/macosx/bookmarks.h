@@ -44,8 +44,6 @@
     IBOutlet id o_edit_lbl_time;
     IBOutlet id o_edit_fld_name;
     IBOutlet id o_edit_fld_time;
-
-    input_thread_t *p_old_input;
 }
 + (VLCBookmarks *)sharedInstance;
 
