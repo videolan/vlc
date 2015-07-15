@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">14B25</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
-		<string key="IBDocument.AppKitVersion">1343.16</string>
-		<string key="IBDocument.HIToolboxVersion">755.00</string>
+		<string key="IBDocument.SystemVersion">14E46</string>
+		<string key="IBDocument.InterfaceBuilderVersion">7706</string>
+		<string key="IBDocument.AppKitVersion">1348.17</string>
+		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6254</string>
+			<string key="NS.object.0">7706</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -37,16 +37,13 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="731515038">
 			<object class="NSCustomObject" id="933980713">
-				<string key="NSClassName">NSObject</string>
+				<string key="NSClassName">VLCInfo</string>
 			</object>
 			<object class="NSCustomObject" id="228883915">
 				<string key="NSClassName">FirstResponder</string>
 			</object>
 			<object class="NSCustomObject" id="197177957">
 				<string key="NSClassName">NSApplication</string>
-			</object>
-			<object class="NSCustomObject" id="345087178">
-				<string key="NSClassName">VLCInfo</string>
 			</object>
 			<object class="NSWindowTemplate" id="391253886">
 				<int key="NSWindowStyleMask">8215</int>
@@ -64,6 +61,9 @@
 						<object class="NSTabView" id="267010932">
 							<reference key="NSNextResponder" ref="718606605"/>
 							<int key="NSvFlags">268</int>
+							<set class="NSMutableSet" key="NSDragTypes">
+								<string>public.item</string>
+							</set>
 							<string key="NSFrame">{{-28, -11}, {562, 482}}</string>
 							<reference key="NSSuperview" ref="718606605"/>
 							<reference key="NSWindow"/>
@@ -78,6 +78,7 @@
 											<object class="NSTextField" id="197505283">
 												<reference key="NSNextResponder" ref="537375861"/>
 												<int key="NSvFlags">268</int>
+												<array class="NSMutableArray" key="NSSubviews"/>
 												<string key="NSFrame">{{37, 396}, {468, 19}}</string>
 												<reference key="NSSuperview" ref="537375861"/>
 												<reference key="NSNextKeyView" ref="1001995492"/>
@@ -142,7 +143,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{37, 18}, {468, 19}}</string>
 												<reference key="NSSuperview" ref="537375861"/>
-												<reference key="NSNextKeyView" ref="267010932"/>
+												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="604389831">
 													<int key="NSCellFlags">-2073034687</int>
@@ -819,7 +820,7 @@
 														<int key="NSvFlags">-2147483392</int>
 														<string key="NSFrame">{{1, 420}, {501, 15}}</string>
 														<reference key="NSSuperview" ref="788794540"/>
-														<reference key="NSNextKeyView" ref="267010932"/>
+														<reference key="NSNextKeyView"/>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 														<string key="NSControlAction">_doScroller:</string>
 														<reference key="NSControlTarget" ref="788794540"/>
@@ -1535,7 +1536,7 @@
 																<string key="NSFrame">{{135, 15}, {89, 14}}</string>
 																<reference key="NSSuperview" ref="199826627"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="267010932"/>
+																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="717744051">
 																	<int key="NSCellFlags">68157504</int>
@@ -1611,6 +1612,7 @@
 							<int key="NSTvFlags">0</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
+							<reference key="NSDelegate"/>
 							<array class="NSMutableArray" key="NSSubviews">
 								<reference ref="571784830"/>
 							</array>
@@ -1619,8 +1621,9 @@
 					<string key="NSFrameSize">{506, 476}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="267010932"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1050}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1417}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">mediainfo</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -1630,611 +1633,603 @@
 			<array key="connectionRecords">
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_info_window</string>
-						<reference key="source" ref="345087178"/>
+						<string key="label">infoPanel</string>
+						<reference key="source" ref="933980713"/>
 						<reference key="destination" ref="391253886"/>
 					</object>
-					<int key="connectionID">232</int>
+					<int key="connectionID">651</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_image_well</string>
-						<reference key="source" ref="345087178"/>
+						<string key="label">authorLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="1001995492"/>
+					</object>
+					<int key="connectionID">652</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">authorTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="960295893"/>
+					</object>
+					<int key="connectionID">653</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dateTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="219116650"/>
+					</object>
+					<int key="connectionID">655</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dateLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="396874405"/>
+					</object>
+					<int key="connectionID">656</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">copyrightLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="198650750"/>
+					</object>
+					<int key="connectionID">658</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">copyrightTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="26897698"/>
+					</object>
+					<int key="connectionID">659</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">encodedbyLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="489091867"/>
+					</object>
+					<int key="connectionID">660</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">encodedbyTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="741803865"/>
+					</object>
+					<int key="connectionID">661</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">genreLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="287058532"/>
+					</object>
+					<int key="connectionID">662</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">genreTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="196139401"/>
+					</object>
+					<int key="connectionID">663</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">imageWell</string>
+						<reference key="source" ref="933980713"/>
 						<reference key="destination" ref="433583698"/>
 					</object>
-					<int key="connectionID">345</int>
+					<int key="connectionID">664</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">languageLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="867392108"/>
+					</object>
+					<int key="connectionID">665</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">languageTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="634179593"/>
+					</object>
+					<int key="connectionID">666</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">nowPlayingLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="324707670"/>
+					</object>
+					<int key="connectionID">667</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">nowPlayingTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="784351663"/>
+					</object>
+					<int key="connectionID">668</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">publisherLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="238409727"/>
+					</object>
+					<int key="connectionID">669</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">publisherTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="563490969"/>
+					</object>
+					<int key="connectionID">670</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">saveMetaDataButton</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="33949750"/>
+					</object>
+					<int key="connectionID">671</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">seqNumLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="469251612"/>
+					</object>
+					<int key="connectionID">672</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">seqNumTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="478086893"/>
+					</object>
+					<int key="connectionID">673</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">tabView</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="267010932"/>
+					</object>
+					<int key="connectionID">674</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">titleLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="384274076"/>
+					</object>
+					<int key="connectionID">675</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">titleTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="197505283"/>
+					</object>
+					<int key="connectionID">676</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">uriLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="824286379"/>
+					</object>
+					<int key="connectionID">677</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">uriTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="290294541"/>
+					</object>
+					<int key="connectionID">678</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">descriptionLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="945582426"/>
+					</object>
+					<int key="connectionID">679</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">descriptionTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="249789211"/>
+					</object>
+					<int key="connectionID">680</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">collectionLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="564085294"/>
+					</object>
+					<int key="connectionID">681</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">collectionTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="196139401"/>
+					</object>
+					<int key="connectionID">682</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">outlineView</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="744158692"/>
+					</object>
+					<int key="connectionID">683</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">audioDecodedLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="121157325"/>
+					</object>
+					<int key="connectionID">684</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">audioDecodedTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="928992652"/>
+					</object>
+					<int key="connectionID">685</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">audioLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="393432656"/>
+					</object>
+					<int key="connectionID">686</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">demuxBytesLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="907635383"/>
+					</object>
+					<int key="connectionID">687</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">demuxBytesTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="642436902"/>
+					</object>
+					<int key="connectionID">688</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">inputBitrateLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="446298501"/>
+					</object>
+					<int key="connectionID">689</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">inputBitrateTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="373001305"/>
+					</object>
+					<int key="connectionID">690</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">inputLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="967143573"/>
+					</object>
+					<int key="connectionID">691</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">lostAudioBuffersLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="301549329"/>
+					</object>
+					<int key="connectionID">692</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">demuxBitrateLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="660058837"/>
+					</object>
+					<int key="connectionID">693</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">demuxBitrateTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="618243223"/>
+					</object>
+					<int key="connectionID">694</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">lostAudioBuffersTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="467739347"/>
+					</object>
+					<int key="connectionID">695</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">lostFramesLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="888685062"/>
+					</object>
+					<int key="connectionID">696</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">lostFramesTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="755389250"/>
+					</object>
+					<int key="connectionID">697</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">playedAudioBuffersLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="94739041"/>
+					</object>
+					<int key="connectionID">698</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">playedAudioBuffersTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="559541096"/>
+					</object>
+					<int key="connectionID">699</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">readBytesLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="968656237"/>
+					</object>
+					<int key="connectionID">700</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">readBytesTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="438384771"/>
+					</object>
+					<int key="connectionID">701</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sentBitrateLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="309941063"/>
+					</object>
+					<int key="connectionID">702</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sentBitrateTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="701785620"/>
+					</object>
+					<int key="connectionID">703</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sentBytesLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="16553861"/>
+					</object>
+					<int key="connectionID">704</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sentBytesTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="271488835"/>
+					</object>
+					<int key="connectionID">705</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sentPacketsLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="601071967"/>
+					</object>
+					<int key="connectionID">706</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">sentPacketsTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="397386062"/>
+					</object>
+					<int key="connectionID">707</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">soutLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="232197245"/>
+					</object>
+					<int key="connectionID">708</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">video_decodedTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="638896850"/>
+					</object>
+					<int key="connectionID">710</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">videoLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="394289136"/>
+					</object>
+					<int key="connectionID">711</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">displayedLabel</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="883548649"/>
+					</object>
+					<int key="connectionID">712</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">displayedTextField</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="833853365"/>
+					</object>
+					<int key="connectionID">713</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">saveMetaData:</string>
-						<reference key="source" ref="345087178"/>
+						<reference key="source" ref="933980713"/>
 						<reference key="destination" ref="33949750"/>
 					</object>
-					<int key="connectionID">416</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_saveMetaData_btn</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="33949750"/>
-					</object>
-					<int key="connectionID">417</int>
+					<int key="connectionID">714</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="197505283"/>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="563490969"/>
 					</object>
-					<int key="connectionID">447</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_title_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="197505283"/>
-					</object>
-					<int key="connectionID">448</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_title_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="384274076"/>
-					</object>
-					<int key="connectionID">449</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_author_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="960295893"/>
-					</object>
-					<int key="connectionID">450</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_author_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="1001995492"/>
-					</object>
-					<int key="connectionID">451</int>
+					<int key="connectionID">715</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="960295893"/>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="741803865"/>
 					</object>
-					<int key="connectionID">452</int>
+					<int key="connectionID">716</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="26897698"/>
+					</object>
+					<int key="connectionID">717</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">metaFieldChanged:</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="249789211"/>
+					</object>
+					<int key="connectionID">718</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">metaFieldChanged:</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="784351663"/>
+					</object>
+					<int key="connectionID">719</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">metaFieldChanged:</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="196139401"/>
+					</object>
+					<int key="connectionID">720</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">metaFieldChanged:</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="634179593"/>
+					</object>
+					<int key="connectionID">721</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">metaFieldChanged:</string>
+						<reference key="source" ref="933980713"/>
 						<reference key="destination" ref="549422693"/>
 					</object>
-					<int key="connectionID">453</int>
+					<int key="connectionID">722</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_collection_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="564085294"/>
+					<object class="IBActionConnection" key="connection">
+						<string key="label">metaFieldChanged:</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="478086893"/>
 					</object>
-					<int key="connectionID">454</int>
+					<int key="connectionID">723</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_collection_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="549422693"/>
+					<object class="IBActionConnection" key="connection">
+						<string key="label">metaFieldChanged:</string>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="960295893"/>
 					</object>
-					<int key="connectionID">455</int>
+					<int key="connectionID">724</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_date_txt</string>
-						<reference key="source" ref="345087178"/>
+					<object class="IBActionConnection" key="connection">
+						<string key="label">metaFieldChanged:</string>
+						<reference key="source" ref="933980713"/>
 						<reference key="destination" ref="219116650"/>
 					</object>
-					<int key="connectionID">456</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_date_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="396874405"/>
-					</object>
-					<int key="connectionID">457</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_seqNum_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="478086893"/>
-					</object>
-					<int key="connectionID">458</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_seqNum_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="469251612"/>
-					</object>
-					<int key="connectionID">459</int>
+					<int key="connectionID">725</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="478086893"/>
+						<reference key="source" ref="933980713"/>
+						<reference key="destination" ref="197505283"/>
 					</object>
-					<int key="connectionID">460</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="634179593"/>
-					</object>
-					<int key="connectionID">470</int>
+					<int key="connectionID">726</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_genre_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="196139401"/>
-					</object>
-					<int key="connectionID">471</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_genre_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="287058532"/>
-					</object>
-					<int key="connectionID">472</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_language_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="634179593"/>
-					</object>
-					<int key="connectionID">473</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_language_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="867392108"/>
-					</object>
-					<int key="connectionID">474</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="196139401"/>
-					</object>
-					<int key="connectionID">475</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="784351663"/>
-					</object>
-					<int key="connectionID">480</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="563490969"/>
-					</object>
-					<int key="connectionID">485</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="26897698"/>
-					</object>
-					<int key="connectionID">490</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_publisher_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="238409727"/>
-					</object>
-					<int key="connectionID">491</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_publisher_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="563490969"/>
-					</object>
-					<int key="connectionID">492</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_nowPlaying_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="324707670"/>
-					</object>
-					<int key="connectionID">493</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_nowPlaying_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="784351663"/>
-					</object>
-					<int key="connectionID">494</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_copyright_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="198650750"/>
-					</object>
-					<int key="connectionID">495</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_copyright_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="26897698"/>
-					</object>
-					<int key="connectionID">496</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="249789211"/>
-					</object>
-					<int key="connectionID">501</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_description_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="945582426"/>
-					</object>
-					<int key="connectionID">502</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_description_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="249789211"/>
-					</object>
-					<int key="connectionID">503</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">metaFieldChanged:</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="741803865"/>
-					</object>
-					<int key="connectionID">508</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_uri_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="290294541"/>
-					</object>
-					<int key="connectionID">514</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_uri_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="824286379"/>
-					</object>
-					<int key="connectionID">515</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_outline_view</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="744158692"/>
-					</object>
-					<int key="connectionID">525</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_audio_decoded_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="121157325"/>
-					</object>
-					<int key="connectionID">609</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_audio_decoded_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="928992652"/>
-					</object>
-					<int key="connectionID">610</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_demux_bytes_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="907635383"/>
-					</object>
-					<int key="connectionID">611</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_demux_bytes_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="642436902"/>
-					</object>
-					<int key="connectionID">612</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_demux_bitrate_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="660058837"/>
-					</object>
-					<int key="connectionID">613</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_displayed_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="883548649"/>
-					</object>
-					<int key="connectionID">615</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_displayed_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="833853365"/>
-					</object>
-					<int key="connectionID">616</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_input_bitrate_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="446298501"/>
-					</object>
-					<int key="connectionID">619</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_input_bitrate_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="373001305"/>
-					</object>
-					<int key="connectionID">620</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_lost_abuffers_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="301549329"/>
-					</object>
-					<int key="connectionID">621</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_lost_abuffers_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="467739347"/>
-					</object>
-					<int key="connectionID">622</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_lost_frames_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="888685062"/>
-					</object>
-					<int key="connectionID">623</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_lost_frames_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="755389250"/>
-					</object>
-					<int key="connectionID">624</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_played_abuffers_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="94739041"/>
-					</object>
-					<int key="connectionID">625</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_played_abuffers_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="559541096"/>
-					</object>
-					<int key="connectionID">626</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_read_bytes_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="968656237"/>
-					</object>
-					<int key="connectionID">627</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_read_bytes_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="438384771"/>
-					</object>
-					<int key="connectionID">628</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sent_bitrate_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="309941063"/>
-					</object>
-					<int key="connectionID">629</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sent_bitrate_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="701785620"/>
-					</object>
-					<int key="connectionID">630</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sent_bytes_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="16553861"/>
-					</object>
-					<int key="connectionID">631</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sent_bytes_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="271488835"/>
-					</object>
-					<int key="connectionID">632</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sent_packets_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="601071967"/>
-					</object>
-					<int key="connectionID">633</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sent_packets_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="397386062"/>
-					</object>
-					<int key="connectionID">634</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_video_decoded_lbl</string>
-						<reference key="source" ref="345087178"/>
+						<string key="label">videoDecodedLabel</string>
+						<reference key="source" ref="933980713"/>
 						<reference key="destination" ref="635203615"/>
 					</object>
-					<int key="connectionID">635</int>
+					<int key="connectionID">727</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_video_decoded_txt</string>
-						<reference key="source" ref="345087178"/>
+						<string key="label">videoDecodedTextField</string>
+						<reference key="source" ref="933980713"/>
 						<reference key="destination" ref="638896850"/>
 					</object>
-					<int key="connectionID">636</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_tab_view</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="267010932"/>
-					</object>
-					<int key="connectionID">637</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_sout_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="232197245"/>
-					</object>
-					<int key="connectionID">638</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_video_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="394289136"/>
-					</object>
-					<int key="connectionID">639</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_input_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="967143573"/>
-					</object>
-					<int key="connectionID">640</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_audio_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="393432656"/>
-					</object>
-					<int key="connectionID">641</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_demux_bitrate_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="618243223"/>
-					</object>
-					<int key="connectionID">646</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_encodedby_lbl</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="489091867"/>
-					</object>
-					<int key="connectionID">647</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_encodedby_txt</string>
-						<reference key="source" ref="345087178"/>
-						<reference key="destination" ref="741803865"/>
-					</object>
-					<int key="connectionID">648</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="391253886"/>
-						<reference key="destination" ref="744158692"/>
-					</object>
-					<int key="connectionID">528</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">dataSource</string>
-						<reference key="source" ref="744158692"/>
-						<reference key="destination" ref="345087178"/>
-					</object>
-					<int key="connectionID">526</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="744158692"/>
-						<reference key="destination" ref="345087178"/>
-					</object>
-					<int key="connectionID">527</int>
+					<int key="connectionID">728</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2262,12 +2257,6 @@
 						<reference key="object" ref="197177957"/>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Application</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1</int>
-						<reference key="object" ref="345087178"/>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">VLCInfo</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">2</int>
@@ -3247,7 +3236,6 @@
 				<string key="-1.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="-2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="-3.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="1.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="2.IBWindowTemplateEditedContentRect">{{357, 196}, {506, 476}}</string>
 				<string key="3.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4390,7 +4378,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">648</int>
+			<int key="maxID">728</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4417,312 +4405,312 @@
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="o_audio_decoded_lbl">id</string>
-						<string key="o_audio_decoded_txt">id</string>
-						<string key="o_audio_lbl">id</string>
-						<string key="o_author_lbl">id</string>
-						<string key="o_author_txt">id</string>
-						<string key="o_collection_lbl">id</string>
-						<string key="o_collection_txt">id</string>
-						<string key="o_copyright_lbl">id</string>
-						<string key="o_copyright_txt">id</string>
-						<string key="o_date_lbl">id</string>
-						<string key="o_date_txt">id</string>
-						<string key="o_demux_bitrate_lbl">id</string>
-						<string key="o_demux_bitrate_txt">id</string>
-						<string key="o_demux_bytes_lbl">id</string>
-						<string key="o_demux_bytes_txt">id</string>
-						<string key="o_description_lbl">id</string>
-						<string key="o_description_txt">id</string>
-						<string key="o_displayed_lbl">id</string>
-						<string key="o_displayed_txt">id</string>
-						<string key="o_encodedby_lbl">id</string>
-						<string key="o_encodedby_txt">id</string>
-						<string key="o_genre_lbl">id</string>
-						<string key="o_genre_txt">id</string>
-						<string key="o_image_well">id</string>
-						<string key="o_info_window">id</string>
-						<string key="o_input_bitrate_lbl">id</string>
-						<string key="o_input_bitrate_txt">id</string>
-						<string key="o_input_lbl">id</string>
-						<string key="o_language_lbl">id</string>
-						<string key="o_language_txt">id</string>
-						<string key="o_lost_abuffers_lbl">id</string>
-						<string key="o_lost_abuffers_txt">id</string>
-						<string key="o_lost_frames_lbl">id</string>
-						<string key="o_lost_frames_txt">id</string>
-						<string key="o_nowPlaying_lbl">id</string>
-						<string key="o_nowPlaying_txt">id</string>
-						<string key="o_outline_view">id</string>
-						<string key="o_played_abuffers_lbl">id</string>
-						<string key="o_played_abuffers_txt">id</string>
-						<string key="o_publisher_lbl">id</string>
-						<string key="o_publisher_txt">id</string>
-						<string key="o_read_bytes_lbl">id</string>
-						<string key="o_read_bytes_txt">id</string>
-						<string key="o_saveMetaData_btn">id</string>
-						<string key="o_sent_bitrate_lbl">id</string>
-						<string key="o_sent_bitrate_txt">id</string>
-						<string key="o_sent_bytes_lbl">id</string>
-						<string key="o_sent_bytes_txt">id</string>
-						<string key="o_sent_packets_lbl">id</string>
-						<string key="o_sent_packets_txt">id</string>
-						<string key="o_seqNum_lbl">id</string>
-						<string key="o_seqNum_txt">id</string>
-						<string key="o_sout_lbl">id</string>
-						<string key="o_tab_view">id</string>
-						<string key="o_title_lbl">id</string>
-						<string key="o_title_txt">id</string>
-						<string key="o_uri_lbl">id</string>
-						<string key="o_uri_txt">id</string>
-						<string key="o_video_decoded_lbl">id</string>
-						<string key="o_video_decoded_txt">id</string>
-						<string key="o_video_lbl">id</string>
+						<string key="audioDecodedLabel">NSTextField</string>
+						<string key="audioDecodedTextField">NSTextField</string>
+						<string key="audioLabel">NSTextField</string>
+						<string key="authorLabel">NSTextField</string>
+						<string key="authorTextField">NSTextField</string>
+						<string key="collectionLabel">NSTextField</string>
+						<string key="collectionTextField">NSTextField</string>
+						<string key="copyrightLabel">NSTextField</string>
+						<string key="copyrightTextField">NSTextField</string>
+						<string key="dateLabel">NSTextField</string>
+						<string key="dateTextField">NSTextField</string>
+						<string key="demuxBitrateLabel">NSTextField</string>
+						<string key="demuxBitrateTextField">NSTextField</string>
+						<string key="demuxBytesLabel">NSTextField</string>
+						<string key="demuxBytesTextField">NSTextField</string>
+						<string key="descriptionLabel">NSTextField</string>
+						<string key="descriptionTextField">NSTextField</string>
+						<string key="displayedLabel">NSTextField</string>
+						<string key="displayedTextField">NSTextField</string>
+						<string key="encodedbyLabel">NSTextField</string>
+						<string key="encodedbyTextField">NSTextField</string>
+						<string key="genreLabel">NSTextField</string>
+						<string key="genreTextField">NSTextField</string>
+						<string key="imageWell">NSTextField</string>
+						<string key="infoPanel">NSPanel</string>
+						<string key="inputBitrateLabel">NSTextField</string>
+						<string key="inputBitrateTextField">NSTextField</string>
+						<string key="inputLabel">NSTextField</string>
+						<string key="languageLabel">NSTextField</string>
+						<string key="languageTextField">NSTextField</string>
+						<string key="lostAudioBuffersLabel">NSTextField</string>
+						<string key="lostAudioBuffersTextField">NSTextField</string>
+						<string key="lostFramesLabel">NSTextField</string>
+						<string key="lostFramesTextField">NSTextField</string>
+						<string key="nowPlayingLabel">NSTextField</string>
+						<string key="nowPlayingTextField">NSTextField</string>
+						<string key="outlineView">NSOutlineView</string>
+						<string key="playedAudioBuffersLabel">NSTextField</string>
+						<string key="playedAudioBuffersTextField">NSTextField</string>
+						<string key="publisherLabel">NSTextField</string>
+						<string key="publisherTextField">NSTextField</string>
+						<string key="readBytesLabel">NSTextField</string>
+						<string key="readBytesTextField">NSTextField</string>
+						<string key="saveMetaDataButton">NSButton</string>
+						<string key="sentBitrateLabel">NSTextField</string>
+						<string key="sentBitrateTextField">NSTextField</string>
+						<string key="sentBytesLabel">NSTextField</string>
+						<string key="sentBytesTextField">NSTextField</string>
+						<string key="sentPacketsLabel">NSTextField</string>
+						<string key="sentPacketsTextField">NSTextField</string>
+						<string key="seqNumLabel">NSTextField</string>
+						<string key="seqNumTextField">NSTextField</string>
+						<string key="soutLabel">NSTextField</string>
+						<string key="tabView">NSTabView</string>
+						<string key="titleLabel">NSTextField</string>
+						<string key="titleTextField">NSTextField</string>
+						<string key="uriLabel">NSTextField</string>
+						<string key="uriTextField">NSTextField</string>
+						<string key="videoDecodedLabel">id</string>
+						<string key="videoDecodedTextField">id</string>
+						<string key="videoLabel">NSTextField</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="o_audio_decoded_lbl">
-							<string key="name">o_audio_decoded_lbl</string>
+						<object class="IBToOneOutletInfo" key="audioDecodedLabel">
+							<string key="name">audioDecodedLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="audioDecodedTextField">
+							<string key="name">audioDecodedTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="audioLabel">
+							<string key="name">audioLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="authorLabel">
+							<string key="name">authorLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="authorTextField">
+							<string key="name">authorTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="collectionLabel">
+							<string key="name">collectionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="collectionTextField">
+							<string key="name">collectionTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="copyrightLabel">
+							<string key="name">copyrightLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="copyrightTextField">
+							<string key="name">copyrightTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dateLabel">
+							<string key="name">dateLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dateTextField">
+							<string key="name">dateTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="demuxBitrateLabel">
+							<string key="name">demuxBitrateLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="demuxBitrateTextField">
+							<string key="name">demuxBitrateTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="demuxBytesLabel">
+							<string key="name">demuxBytesLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="demuxBytesTextField">
+							<string key="name">demuxBytesTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="descriptionLabel">
+							<string key="name">descriptionLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="descriptionTextField">
+							<string key="name">descriptionTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="displayedLabel">
+							<string key="name">displayedLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="displayedTextField">
+							<string key="name">displayedTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="encodedbyLabel">
+							<string key="name">encodedbyLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="encodedbyTextField">
+							<string key="name">encodedbyTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="genreLabel">
+							<string key="name">genreLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="genreTextField">
+							<string key="name">genreTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="imageWell">
+							<string key="name">imageWell</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="infoPanel">
+							<string key="name">infoPanel</string>
+							<string key="candidateClassName">NSPanel</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="inputBitrateLabel">
+							<string key="name">inputBitrateLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="inputBitrateTextField">
+							<string key="name">inputBitrateTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="inputLabel">
+							<string key="name">inputLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="languageLabel">
+							<string key="name">languageLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="languageTextField">
+							<string key="name">languageTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="lostAudioBuffersLabel">
+							<string key="name">lostAudioBuffersLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="lostAudioBuffersTextField">
+							<string key="name">lostAudioBuffersTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="lostFramesLabel">
+							<string key="name">lostFramesLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="lostFramesTextField">
+							<string key="name">lostFramesTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="nowPlayingLabel">
+							<string key="name">nowPlayingLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="nowPlayingTextField">
+							<string key="name">nowPlayingTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="outlineView">
+							<string key="name">outlineView</string>
+							<string key="candidateClassName">NSOutlineView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="playedAudioBuffersLabel">
+							<string key="name">playedAudioBuffersLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="playedAudioBuffersTextField">
+							<string key="name">playedAudioBuffersTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="publisherLabel">
+							<string key="name">publisherLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="publisherTextField">
+							<string key="name">publisherTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="readBytesLabel">
+							<string key="name">readBytesLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="readBytesTextField">
+							<string key="name">readBytesTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="saveMetaDataButton">
+							<string key="name">saveMetaDataButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sentBitrateLabel">
+							<string key="name">sentBitrateLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sentBitrateTextField">
+							<string key="name">sentBitrateTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sentBytesLabel">
+							<string key="name">sentBytesLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sentBytesTextField">
+							<string key="name">sentBytesTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sentPacketsLabel">
+							<string key="name">sentPacketsLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sentPacketsTextField">
+							<string key="name">sentPacketsTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="seqNumLabel">
+							<string key="name">seqNumLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="seqNumTextField">
+							<string key="name">seqNumTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="soutLabel">
+							<string key="name">soutLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="tabView">
+							<string key="name">tabView</string>
+							<string key="candidateClassName">NSTabView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="titleLabel">
+							<string key="name">titleLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="titleTextField">
+							<string key="name">titleTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="uriLabel">
+							<string key="name">uriLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="uriTextField">
+							<string key="name">uriTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="videoDecodedLabel">
+							<string key="name">videoDecodedLabel</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_audio_decoded_txt">
-							<string key="name">o_audio_decoded_txt</string>
+						<object class="IBToOneOutletInfo" key="videoDecodedTextField">
+							<string key="name">videoDecodedTextField</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="o_audio_lbl">
-							<string key="name">o_audio_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_author_lbl">
-							<string key="name">o_author_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_author_txt">
-							<string key="name">o_author_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_collection_lbl">
-							<string key="name">o_collection_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_collection_txt">
-							<string key="name">o_collection_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_copyright_lbl">
-							<string key="name">o_copyright_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_copyright_txt">
-							<string key="name">o_copyright_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_date_lbl">
-							<string key="name">o_date_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_date_txt">
-							<string key="name">o_date_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_demux_bitrate_lbl">
-							<string key="name">o_demux_bitrate_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_demux_bitrate_txt">
-							<string key="name">o_demux_bitrate_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_demux_bytes_lbl">
-							<string key="name">o_demux_bytes_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_demux_bytes_txt">
-							<string key="name">o_demux_bytes_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_description_lbl">
-							<string key="name">o_description_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_description_txt">
-							<string key="name">o_description_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_displayed_lbl">
-							<string key="name">o_displayed_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_displayed_txt">
-							<string key="name">o_displayed_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_encodedby_lbl">
-							<string key="name">o_encodedby_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_encodedby_txt">
-							<string key="name">o_encodedby_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_genre_lbl">
-							<string key="name">o_genre_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_genre_txt">
-							<string key="name">o_genre_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_image_well">
-							<string key="name">o_image_well</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_info_window">
-							<string key="name">o_info_window</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_input_bitrate_lbl">
-							<string key="name">o_input_bitrate_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_input_bitrate_txt">
-							<string key="name">o_input_bitrate_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_input_lbl">
-							<string key="name">o_input_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_language_lbl">
-							<string key="name">o_language_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_language_txt">
-							<string key="name">o_language_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_lost_abuffers_lbl">
-							<string key="name">o_lost_abuffers_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_lost_abuffers_txt">
-							<string key="name">o_lost_abuffers_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_lost_frames_lbl">
-							<string key="name">o_lost_frames_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_lost_frames_txt">
-							<string key="name">o_lost_frames_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_nowPlaying_lbl">
-							<string key="name">o_nowPlaying_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_nowPlaying_txt">
-							<string key="name">o_nowPlaying_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_outline_view">
-							<string key="name">o_outline_view</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_played_abuffers_lbl">
-							<string key="name">o_played_abuffers_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_played_abuffers_txt">
-							<string key="name">o_played_abuffers_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_publisher_lbl">
-							<string key="name">o_publisher_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_publisher_txt">
-							<string key="name">o_publisher_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_read_bytes_lbl">
-							<string key="name">o_read_bytes_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_read_bytes_txt">
-							<string key="name">o_read_bytes_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_saveMetaData_btn">
-							<string key="name">o_saveMetaData_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sent_bitrate_lbl">
-							<string key="name">o_sent_bitrate_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sent_bitrate_txt">
-							<string key="name">o_sent_bitrate_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sent_bytes_lbl">
-							<string key="name">o_sent_bytes_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sent_bytes_txt">
-							<string key="name">o_sent_bytes_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sent_packets_lbl">
-							<string key="name">o_sent_packets_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sent_packets_txt">
-							<string key="name">o_sent_packets_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_seqNum_lbl">
-							<string key="name">o_seqNum_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_seqNum_txt">
-							<string key="name">o_seqNum_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_sout_lbl">
-							<string key="name">o_sout_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_tab_view">
-							<string key="name">o_tab_view</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_title_lbl">
-							<string key="name">o_title_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_title_txt">
-							<string key="name">o_title_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_uri_lbl">
-							<string key="name">o_uri_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_uri_txt">
-							<string key="name">o_uri_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_video_decoded_lbl">
-							<string key="name">o_video_decoded_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_video_decoded_txt">
-							<string key="name">o_video_decoded_txt</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="o_video_lbl">
-							<string key="name">o_video_lbl</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="videoLabel">
+							<string key="name">videoLabel</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -4831,6 +4819,14 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">NSOutlineView</string>
+					<string key="superclassName">NSTableView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSOutlineView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">NSPanel</string>
 					<string key="superclassName">NSWindow</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -4847,11 +4843,27 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">NSTabView</string>
+					<string key="superclassName">NSView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSTabView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">NSTableColumn</string>
 					<string key="superclassName">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSTableColumn.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSTableView</string>
+					<string key="superclassName">NSControl</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">AppKit.framework/Headers/NSTableView.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
