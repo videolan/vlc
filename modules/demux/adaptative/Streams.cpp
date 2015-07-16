@@ -390,9 +390,7 @@ void BaseStreamOutput::setPosition(mtime_t nztime)
     std::list<Demuxed *>::const_iterator it;
     for(it=queues.begin(); it!=queues.end();++it)
     {
-        Demuxed *pair = *it;
-        if(pair->p_queue && pair->p_queue->i_dts > VLC_TS_0 + nztime)
-            pair->drop();
+        (*it)->drop();
     }
     /* disable appending until restarted */
     b_drop = true;
@@ -493,9 +491,12 @@ BaseStreamOutput::Demuxed::~Demuxed()
 
 void BaseStreamOutput::Demuxed::drop()
 {
-    block_ChainRelease(p_queue);
-    p_queue = NULL;
-    pp_queue_last = &p_queue;
+    if(p_queue)
+    {
+        block_ChainRelease(p_queue);
+        p_queue = NULL;
+        pp_queue_last = &p_queue;
+    }
 }
 
 /* Static callbacks */
