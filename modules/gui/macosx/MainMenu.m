@@ -1153,7 +1153,7 @@
         o_audioeffects = [[VLCAudioEffects alloc] init];
 
     if (!b_nib_audioeffects_loaded)
-        b_nib_audioeffects_loaded = [NSBundle loadNibNamed:@"AudioEffects" owner:NSApp];
+        b_nib_audioeffects_loaded = [NSBundle loadNibNamed:@"AudioEffects" owner:o_audioeffects];
 
     [o_audioeffects toggleWindow:sender];
 }

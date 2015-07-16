@@ -1,7 +1,7 @@
 /*****************************************************************************
  * AudioEffects.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2004-2012 VLC authors and VideoLAN
+ * Copyright (C) 2004-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -38,7 +38,6 @@
 
 @interface VLCAudioEffects ()
 {
-    intf_thread_t *p_intf;
     BOOL b_genericAudioProfileInInteraction;
     NSInteger i_old_profile_index;
 }
@@ -101,7 +100,6 @@
 - (id)init
 {
     self = [super init];
-    p_intf = VLCIntf;
     i_old_profile_index = -1;
     return self;
 }
@@ -110,44 +108,45 @@
 {
     /* setup the user's language */
     /* Equalizer */
-    [o_eq_enable_ckb setTitle:_NS("Enable")];
-    [o_eq_twopass_ckb setTitle:_NS("2 Pass")];
-    [o_eq_preamp_lbl setStringValue:_NS("Preamp")];
+    [_equalizerEnableCheckbox setTitle:_NS("Enable")];
+    [_equalizerTwoPassCheckbox setTitle:_NS("2 Pass")];
+    [_equalizerPreampLabel setStringValue:_NS("Preamp")];
 
     /* Compressor */
-    [o_comp_enable_ckb setTitle:_NS("Enable dynamic range compressor")];
-    [o_comp_reset_btn setTitle:_NS("Reset")];
-    [o_comp_band1_lbl setStringValue:_NS("RMS/peak")];;
-    [o_comp_band2_lbl setStringValue:_NS("Attack")];
-    [o_comp_band3_lbl setStringValue:_NS("Release")];
-    [o_comp_band4_lbl setStringValue:_NS("Threshold")];
-    [o_comp_band5_lbl setStringValue:_NS("Ratio")];
-    [o_comp_band6_lbl setStringValue:_NS("Knee radius")];
-    [o_comp_band7_lbl setStringValue:_NS("Makeup gain")];
+    [_compressorEnableCheckbox setTitle:_NS("Enable dynamic range compressor")];
+    [_compressorResetButton setTitle:_NS("Reset")];
+    [_compressorBand1Label setStringValue:_NS("RMS/peak")];;
+    [_compressorBand2Label setStringValue:_NS("Attack")];
+    [_compressorBand3Label setStringValue:_NS("Release")];
+    [_compressorBand4Label setStringValue:_NS("Threshold")];
+    [_compressorBand5Label setStringValue:_NS("Ratio")];
+    [_compressorBand6Label setStringValue:_NS("Knee radius")];
+    [_compressorBand7Label setStringValue:_NS("Makeup gain")];
+
 
     /* Spatializer */
-    [o_spat_enable_ckb setTitle:_NS("Enable Spatializer")];
-    [o_spat_reset_btn setTitle:_NS("Reset")];
-    [o_spat_band1_lbl setStringValue:_NS("Size")];
-    [o_spat_band2_lbl setStringValue:_NS("Width")];
-    [o_spat_band3_lbl setStringValue:_NS("Wet")];
-    [o_spat_band4_lbl setStringValue:_NS("Dry")];
-    [o_spat_band5_lbl setStringValue:_NS("Damp")];
+    [_spatializerEnableCheckbox setTitle:_NS("Enable Spatializer")];
+    [_spatializerResetButton setTitle:_NS("Reset")];
+    [_spatializerBand1Label setStringValue:_NS("Size")];
+    [_spatializerBand2Label setStringValue:_NS("Width")];
+    [_spatializerBand3Label setStringValue:_NS("Wet")];
+    [_spatializerBand4Label setStringValue:_NS("Dry")];
+    [_spatializerBand5Label setStringValue:_NS("Damp")];
 
     /* Filter */
-    [o_filter_headPhone_ckb setTitle:_NS("Headphone virtualization")];
-    [o_filter_normLevel_ckb setTitle:_NS("Volume normalization")];
-    [o_filter_normLevel_lbl setStringValue:_NS("Maximum level")];
-    [o_filter_karaoke_ckb setTitle:_NS("Karaoke")];
+    [_filterHeadPhoneCheckbox setTitle:_NS("Headphone virtualization")];
+    [_filterNormLevelCheckbox setTitle:_NS("Volume normalization")];
+    [_filterNormLevelLabel setStringValue:_NS("Maximum level")];
+    [_filterKaraokeCheckbox setTitle:_NS("Karaoke")];
 
     /* generic */
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"equalizer"]] setLabel:_NS("Equalizer")];
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"compressor"]] setLabel:_NS("Compressor")];
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"spatializer"]] setLabel:_NS("Spatializer")];
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"filter"]] setLabel:_NS("Filter")];
-    [o_window setTitle:_NS("Audio Effects")];
-    [o_window setExcludedFromWindowsMenu:YES];
-    [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"equalizer"]] setLabel:_NS("Equalizer")];
+    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"compressor"]] setLabel:_NS("Compressor")];
+    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"spatializer"]] setLabel:_NS("Spatializer")];
+    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"filter"]] setLabel:_NS("Filter")];
+    [_window setTitle:_NS("Audio Effects")];
+    [_window setExcludedFromWindowsMenu:YES];
+    [_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self equalizerUpdated];
     [self resetCompressor];
@@ -162,6 +161,7 @@
 - (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on
 {
     audio_output_t *p_aout = getAout();
+    intf_thread_t *p_intf = VLCIntf;
     playlist_EnableAudioFilter(pl_Get(p_intf), psz_name, b_on);
 
     if (p_aout) {
@@ -176,23 +176,23 @@
 - (void)resetProfileSelector
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [o_profile_pop removeAllItems];
+    [_profilePopup removeAllItems];
 
     NSArray *profileNames = [defaults objectForKey:@"AudioEffectProfileNames"];
-    [o_profile_pop addItemsWithTitles:profileNames];
+    [_profilePopup addItemsWithTitles:profileNames];
 
-    [[o_profile_pop menu] addItem:[NSMenuItem separatorItem]];
-    [o_profile_pop addItemWithTitle:_NS("Duplicate current profile...")];
-    [[o_profile_pop lastItem] setTarget: self];
-    [[o_profile_pop lastItem] setAction: @selector(addAudioEffectsProfile:)];
+    [[_profilePopup menu] addItem:[NSMenuItem separatorItem]];
+    [_profilePopup addItemWithTitle:_NS("Duplicate current profile...")];
+    [[_profilePopup lastItem] setTarget: self];
+    [[_profilePopup lastItem] setAction: @selector(addAudioEffectsProfile:)];
 
     if ([profileNames count] > 1) {
-        [o_profile_pop addItemWithTitle:_NS("Organize Profiles...")];
-        [[o_profile_pop lastItem] setTarget: self];
-        [[o_profile_pop lastItem] setAction: @selector(removeAudioEffectsProfile:)];
+        [_profilePopup addItemWithTitle:_NS("Organize Profiles...")];
+        [[_profilePopup lastItem] setTarget: self];
+        [[_profilePopup lastItem] setAction: @selector(removeAudioEffectsProfile:)];
     }
 
-    [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
+    [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
     [self profileSelectorAction:self];
 }
 
@@ -200,22 +200,23 @@
 #pragma mark generic code
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (o_window && [o_window isVisible] && [o_window level] != i_level)
-        [o_window setLevel: i_level];
+    if (_window && [_window isVisible] && [_window level] != i_level)
+        [_window setLevel: i_level];
 }
 
 - (IBAction)toggleWindow:(id)sender
 {
-    if ([o_window isKeyWindow])
-        [o_window orderOut:sender];
+    if ([_window isKeyWindow])
+        [_window orderOut:sender];
     else {
-        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
-        [o_window makeKeyAndOrderFront:sender];
+        [_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+        [_window makeKeyAndOrderFront:sender];
     }
 }
 
 - (NSString *)generateProfileString
 {
+    intf_thread_t *p_intf = VLCIntf;
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
@@ -262,11 +263,12 @@
 
 - (IBAction)profileSelectorAction:(id)sender
 {
+    intf_thread_t *p_intf = VLCIntf;
     [self saveCurrentProfile];
-    i_old_profile_index = [o_profile_pop indexOfSelectedItem];
+    i_old_profile_index = [_profilePopup indexOfSelectedItem];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSInteger selectedProfile = [o_profile_pop indexOfSelectedItem];
+    NSInteger selectedProfile = [_profilePopup indexOfSelectedItem];
     if (selectedProfile < 0)
         return;
 
@@ -344,11 +346,11 @@
     }
 
     /* update UI */
-    BOOL b_eq_enabled = [tempString rangeOfString:@"equalizer"].location != NSNotFound;
-    [o_eq_view enableSubviews:b_eq_enabled];
-    [o_eq_enable_ckb setState:(b_eq_enabled ? NSOnState : NSOffState)];
+    BOOL b_equalizerEnabled = [tempString rangeOfString:@"equalizer"].location != NSNotFound;
+    [_equalizerView enableSubviews:b_equalizerEnabled];
+    [_equalizerEnableCheckbox setState:(b_equalizerEnabled ? NSOnState : NSOffState)];
 
-    [o_eq_twopass_ckb setState:[[items objectAtIndex:15] intValue]];
+    [_equalizerTwoPassCheckbox setState:[[items objectAtIndex:15] intValue]];
     [self resetCompressor];
     [self resetSpatializer];
     [self resetAudioFilters];
@@ -362,7 +364,7 @@
         vlc_object_release(p_aout);
 }
 
-- (IBAction)addAudioEffectsProfile:(id)sender
+- (void)addAudioEffectsProfile:(id)sender
 {
     /* show panel */
     VLCEnterTextPanel *panel = [VLCEnterTextPanel sharedInstance];
@@ -373,10 +375,10 @@
     [panel setTarget:self];
     b_genericAudioProfileInInteraction = YES;
 
-    [panel runModalForWindow:o_window];
+    [panel runModalForWindow:_window];
 }
 
-- (IBAction)removeAudioEffectsProfile:(id)sender
+- (void)removeAudioEffectsProfile:(id)sender
 {
     /* show panel */
     VLCSelectItemInPopupPanel *panel = [VLCSelectItemInPopupPanel sharedInstance];
@@ -388,7 +390,7 @@
     [panel setTarget:self];
     b_genericAudioProfileInInteraction = YES;
 
-    [panel runModalForWindow:o_window];
+    [panel runModalForWindow:_window];
 }
 
 #pragma mark -
@@ -426,17 +428,17 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSArray *presets = [defaults objectForKey:@"EQNames"];
 
-    [o_eq_presets_popup removeAllItems];
-    [o_eq_presets_popup addItemsWithTitles:[[NSUserDefaults standardUserDefaults] objectForKey:@"EQTitles"]];
-    [[o_eq_presets_popup menu] addItem:[NSMenuItem separatorItem]];
-    [o_eq_presets_popup addItemWithTitle:_NS("Add new Preset...")];
-    [[o_eq_presets_popup lastItem] setTarget: self];
-    [[o_eq_presets_popup lastItem] setAction: @selector(addPresetAction:)];
+    [_equalizerPresetsPopup removeAllItems];
+    [_equalizerPresetsPopup addItemsWithTitles:[[NSUserDefaults standardUserDefaults] objectForKey:@"EQTitles"]];
+    [[_equalizerPresetsPopup menu] addItem:[NSMenuItem separatorItem]];
+    [_equalizerPresetsPopup addItemWithTitle:_NS("Add new Preset...")];
+    [[_equalizerPresetsPopup lastItem] setTarget: self];
+    [[_equalizerPresetsPopup lastItem] setAction: @selector(addPresetAction:)];
 
     if ([presets count] > 1) {
-        [o_eq_presets_popup addItemWithTitle:_NS("Organize Presets...")];
-        [[o_eq_presets_popup lastItem] setTarget: self];
-        [[o_eq_presets_popup lastItem] setAction: @selector(deletePresetAction:)];
+        [_equalizerPresetsPopup addItemWithTitle:_NS("Organize Presets...")];
+        [[_equalizerPresetsPopup lastItem] setTarget: self];
+        [[_equalizerPresetsPopup lastItem] setAction: @selector(deletePresetAction:)];
     }
 
     audio_output_t *p_aout = getAout();
@@ -457,42 +459,43 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
             currentPresetIndex = [presets count] - 1;
     }    
 
-    [o_eq_presets_popup selectItemAtIndex:currentPresetIndex];
-    [self eq_changePreset: o_eq_presets_popup];
+    [_equalizerPresetsPopup selectItemAtIndex:currentPresetIndex];
+    [self equalizerChangePreset:_equalizerPresetsPopup];
 
     
-    [o_eq_preamp_sld setFloatValue:[[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:currentPresetIndex] floatValue]];
+    [_equalizerPreampSlider setFloatValue:[[[defaults objectForKey:@"EQPreampValues"] objectAtIndex:currentPresetIndex] floatValue]];
     [self setBandSliderValuesForPreset:currentPresetIndex];
 }
 
 - (void)equalizerUpdated
 {
-    float f_preamp = config_GetFloat(p_intf, "equalizer-preamp");
+    intf_thread_t *p_intf = VLCIntf;
+    float fPreamp = config_GetFloat(p_intf, "equalizer-preamp");
     bool b_2p = (BOOL)config_GetInt(p_intf, "equalizer-2pass");
-    bool b_enabled = GetEqualizerStatus(p_intf, (char *)"equalizer");
+    bool bEnabled = GetEqualizerStatus(p_intf, (char *)"equalizer");
 
     /* Setup sliders */
     [self updatePresetSelector];
 
     /* Set the the checkboxes */
-    [o_eq_view enableSubviews: b_enabled];
-    [o_eq_enable_ckb setState: b_enabled];
-    [o_eq_twopass_ckb setState: b_2p];
+    [_equalizerView enableSubviews: bEnabled];
+    [_equalizerEnableCheckbox setState: bEnabled];
+    [_equalizerTwoPassCheckbox setState: b_2p];
 }
 
 - (id)sliderByIndex:(int)index
 {
     switch(index) {
-        case 0 : return o_eq_band1_sld;
-        case 1 : return o_eq_band2_sld;
-        case 2 : return o_eq_band3_sld;
-        case 3 : return o_eq_band4_sld;
-        case 4 : return o_eq_band5_sld;
-        case 5 : return o_eq_band6_sld;
-        case 6 : return o_eq_band7_sld;
-        case 7 : return o_eq_band8_sld;
-        case 8 : return o_eq_band9_sld;
-        case 9 : return o_eq_band10_sld;
+        case 0 : return _equalizerBand1Slider;
+        case 1 : return _equalizerBand2Slider;
+        case 2 : return _equalizerBand3Slider;
+        case 3 : return _equalizerBand4Slider;
+        case 4 : return _equalizerBand5Slider;
+        case 5 : return _equalizerBand6Slider;
+        case 6 : return _equalizerBand7Slider;
+        case 7 : return _equalizerBand8Slider;
+        case 8 : return _equalizerBand9Slider;
+        case 9 : return _equalizerBand10Slider;
         default : return nil;
     }
 }
@@ -509,16 +512,16 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (NSString *)generatePresetString
 {
     return [NSString stringWithFormat:@"%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f",
-            [o_eq_band1_sld floatValue],
-            [o_eq_band2_sld floatValue],
-            [o_eq_band3_sld floatValue],
-            [o_eq_band4_sld floatValue],
-            [o_eq_band5_sld floatValue],
-            [o_eq_band6_sld floatValue],
-            [o_eq_band7_sld floatValue],
-            [o_eq_band8_sld floatValue],
-            [o_eq_band9_sld floatValue],
-            [o_eq_band10_sld floatValue]];
+            [_equalizerBand1Slider floatValue],
+            [_equalizerBand2Slider floatValue],
+            [_equalizerBand3Slider floatValue],
+            [_equalizerBand4Slider floatValue],
+            [_equalizerBand5Slider floatValue],
+            [_equalizerBand6Slider floatValue],
+            [_equalizerBand7Slider floatValue],
+            [_equalizerBand8Slider floatValue],
+            [_equalizerBand9Slider floatValue],
+            [_equalizerBand10Slider floatValue]];
 }
 
 - (void)setValue:(float)value forSlider:(int)index
@@ -529,13 +532,13 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         [slider setFloatValue:value];
 }
 
-- (IBAction)eq_enable:(id)sender
+- (IBAction)equalizerEnable:(id)sender
 {
-    [o_eq_view enableSubviews:[sender state]];
+    [_equalizerView enableSubviews:[sender state]];
     [self setAudioFilter: "equalizer" on:[sender state]];
 }
 
-- (IBAction)eq_bandSliderUpdated:(id)sender
+- (IBAction)equalizerBandSliderUpdated:(id)sender
 {
     audio_output_t *p_aout = getAout();
     if (p_aout) {
@@ -544,12 +547,13 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     }
 
     /* save changed to config */
-    config_PutPsz(p_intf, "equalizer-bands", [[self generatePresetString] UTF8String]);
+    config_PutPsz(VLCIntf, "equalizer-bands", [[self generatePresetString] UTF8String]);
 
 }
 
-- (IBAction)eq_changePreset:(id)sender
+- (IBAction)equalizerChangePreset:(id)sender
 {
+    intf_thread_t *p_intf = VLCIntf;
     NSInteger numberOfChosenPreset = [sender indexOfSelectedItem];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
@@ -564,31 +568,30 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         vlc_object_release(p_aout);
     }
 
-    [o_eq_preamp_sld setFloatValue: [preamp floatValue]];
+    [_equalizerPreampSlider setFloatValue: [preamp floatValue]];
     [self setBandSliderValuesForPreset:numberOfChosenPreset];
 
     /* save changed to config */
     config_PutPsz(p_intf, "equalizer-bands", [preset UTF8String]);
     config_PutFloat(p_intf, "equalizer-preamp", [preamp floatValue]);
     config_PutPsz(p_intf, "equalizer-preset", [[[defaults objectForKey:@"EQNames"] objectAtIndex:numberOfChosenPreset] UTF8String]);
-
 }
 
-- (IBAction)eq_preampSliderUpdated:(id)sender
+- (IBAction)equalizerPreAmpSliderUpdated:(id)sender
 {
-    float f_preamp = [sender floatValue] ;
+    float fPreamp = [sender floatValue] ;
 
     audio_output_t *p_aout = getAout();
     if (p_aout) {
-        var_SetFloat(p_aout, "equalizer-preamp", f_preamp);
+        var_SetFloat(p_aout, "equalizer-preamp", fPreamp);
         vlc_object_release(p_aout);
     }
     
     /* save changed to config */
-    config_PutFloat(p_intf, "equalizer-preamp", f_preamp);
-
+    config_PutFloat(VLCIntf, "equalizer-preamp", fPreamp);
 }
-- (IBAction)eq_twopass:(id)sender
+
+- (IBAction)equalizerTwoPass:(id)sender
 {
     bool b_2p = [sender state] ? true : false;
 
@@ -599,8 +602,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     }
 
     /* save changed to config */
-    config_PutInt(p_intf, "equalizer-2pass", (int)b_2p);
-
+    config_PutInt(VLCIntf, "equalizer-2pass", (int)b_2p);
 }
 
 - (IBAction)addPresetAction:(id)sender
@@ -614,7 +616,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [panel setTarget:self];
     b_genericAudioProfileInInteraction = NO;
 
-    [panel runModalForWindow:o_window];
+    [panel runModalForWindow:_window];
 }
 
 - (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text
@@ -632,7 +634,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
             [workArray addObject:text];
             [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQTitles"];
             workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQPreampValues"]];
-            [workArray addObject:[NSString stringWithFormat:@"%.1f", [o_eq_preamp_sld floatValue]]];
+            [workArray addObject:[NSString stringWithFormat:@"%.1f", [_equalizerPreampSlider floatValue]]];
             [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQPreampValues"];
             workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQNames"]];
             [workArray addObject:[text decomposedStringWithCanonicalMapping]];
@@ -646,8 +648,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
                 vlc_object_release(p_aout);
             }
 
-            config_PutPsz(p_intf, "equalizer-preset", [[text decomposedStringWithCanonicalMapping] UTF8String]);
-
+            config_PutPsz(VLCIntf, "equalizer-preset", [[text decomposedStringWithCanonicalMapping] UTF8String]);
 
             /* update UI */
             [self updatePresetSelector];
@@ -656,7 +657,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     // profile settings
     } else {
         if (value != NSOKButton) {
-            [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
+            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
             return;
         }
 
@@ -664,14 +665,14 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
         // duplicate names are not allowed in the popup control
         if ([text length] == 0 || [profileNames containsObject:text]) {
-            [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
+            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
 
             NSAlert *alert = [[NSAlert alloc] init];
             [alert setAlertStyle:NSCriticalAlertStyle];
             [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
             [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
 
-            [alert beginSheetModalForWindow:o_window
+            [alert beginSheetModalForWindow:_window
                               modalDelegate:nil
                              didEndSelector:nil
                                 contextInfo:nil];
@@ -707,7 +708,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [panel setTarget:self];
     b_genericAudioProfileInInteraction = NO;
 
-    [panel runModalForWindow:o_window];
+    [panel runModalForWindow:_window];
 }
 
 - (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item
@@ -737,7 +738,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         if (value != NSOKButton) {
-            [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
+            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
             return;
         }
 
@@ -762,36 +763,38 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 #pragma mark Compressor
 - (void)resetCompressor
 {
-    BOOL b_enable_comp = NO;
+    intf_thread_t *p_intf = VLCIntf;
+    BOOL bEnable_compressor = NO;
     char *psz_afilters;
     psz_afilters = config_GetPsz(p_intf, "audio-filter");
     if (psz_afilters) {
-        b_enable_comp = strstr(psz_afilters, "compressor") != NULL;
-        [o_comp_enable_ckb setState: (NSInteger)strstr(psz_afilters, "compressor") ];
+        bEnable_compressor = strstr(psz_afilters, "compressor") != NULL;
+        [_compressorEnableCheckbox setState: (NSInteger)strstr(psz_afilters, "compressor") ];
         free(psz_afilters);
     }
 
-    [o_comp_view enableSubviews:b_enable_comp];
-    [o_comp_enable_ckb setState:(b_enable_comp ? NSOnState : NSOffState)];
+    [_compressorView enableSubviews:bEnable_compressor];
+    [_compressorEnableCheckbox setState:(bEnable_compressor ? NSOnState : NSOffState)];
 
-    [o_comp_band1_sld setFloatValue: config_GetFloat(p_intf, "compressor-rms-peak")];
-    [o_comp_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [o_comp_band1_sld floatValue]]];
-    [o_comp_band2_sld setFloatValue: config_GetFloat(p_intf, "compressor-attack")];
-    [o_comp_band2_fld setStringValue:[NSString localizedStringWithFormat:@"%2.1f ms", [o_comp_band2_sld floatValue]]];
-    [o_comp_band3_sld setFloatValue: config_GetFloat(p_intf, "compressor-release")];
-    [o_comp_band3_fld setStringValue:[NSString localizedStringWithFormat:@"%3.1f ms", [o_comp_band3_sld floatValue]]];
-    [o_comp_band4_sld setFloatValue: config_GetFloat(p_intf, "compressor-threshold")];
-    [o_comp_band4_fld setStringValue:[NSString localizedStringWithFormat:@"%2.1f dB", [o_comp_band4_sld floatValue]]];
-    [o_comp_band5_sld setFloatValue: config_GetFloat(p_intf, "compressor-ratio")];
-    [o_comp_band5_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f:1", [o_comp_band5_sld floatValue]]];
-    [o_comp_band6_sld setFloatValue: config_GetFloat(p_intf, "compressor-knee")];
-    [o_comp_band6_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [o_comp_band6_sld floatValue]]];
-    [o_comp_band7_sld setFloatValue: config_GetFloat(p_intf, "compressor-makeup-gain")];
-    [o_comp_band7_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [o_comp_band7_sld floatValue]]];
+    [_compressorBand1Slider setFloatValue: config_GetFloat(p_intf, "compressor-rms-peak")];
+    [_compressorBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [_compressorBand1Slider floatValue]]];
+    [_compressorBand2Slider setFloatValue: config_GetFloat(p_intf, "compressor-attack")];
+    [_compressorBand2TextField setStringValue:[NSString localizedStringWithFormat:@"%2.1f ms", [_compressorBand2Slider floatValue]]];
+    [_compressorBand3Slider setFloatValue: config_GetFloat(p_intf, "compressor-release")];
+    [_compressorBand3TextField setStringValue:[NSString localizedStringWithFormat:@"%3.1f ms", [_compressorBand3Slider floatValue]]];
+    [_compressorBand4Slider setFloatValue: config_GetFloat(p_intf, "compressor-threshold")];
+    [_compressorBand4TextField setStringValue:[NSString localizedStringWithFormat:@"%2.1f dB", [_compressorBand4Slider floatValue]]];
+    [_compressorBand5Slider setFloatValue: config_GetFloat(p_intf, "compressor-ratio")];
+    [_compressorBand5TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f:1", [_compressorBand5Slider floatValue]]];
+    [_compressorBand6Slider setFloatValue: config_GetFloat(p_intf, "compressor-knee")];
+    [_compressorBand6TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [_compressorBand6Slider floatValue]]];
+    [_compressorBand7Slider setFloatValue: config_GetFloat(p_intf, "compressor-makeup-gain")];
+    [_compressorBand7TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [_compressorBand7Slider floatValue]]];
 }
 
 - (IBAction)resetCompressorValues:(id)sender
 {
+    intf_thread_t *p_intf = VLCIntf;
     config_PutFloat(p_intf, "compressor-rms-peak", 0.000000);
     config_PutFloat(p_intf, "compressor-attack", 25.000000);
     config_PutFloat(p_intf, "compressor-release", 100.000000);
@@ -814,84 +817,86 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [self resetCompressor];
 }
 
-- (IBAction)comp_enable:(id)sender
+- (IBAction)compressorEnable:(id)sender
 {
-    [o_comp_view enableSubviews:[sender state]];
+    [_compressorView enableSubviews:[sender state]];
     [self setAudioFilter:"compressor" on:[sender state]];
 }
 
-- (IBAction)comp_sliderUpdated:(id)sender
+- (IBAction)compressorSliderUpdated:(id)sender
 {
     audio_output_t *p_aout = getAout();
     char *value;
-    if (sender == o_comp_band1_sld)
+    if (sender == _compressorBand1Slider)
         value = "compressor-rms-peak";
-    else if (sender == o_comp_band2_sld)
+    else if (sender == _compressorBand2Slider)
         value = "compressor-attack";
-    else if (sender == o_comp_band3_sld)
+    else if (sender == _compressorBand3Slider)
         value = "compressor-release";
-    else if (sender == o_comp_band4_sld)
+    else if (sender == _compressorBand4Slider)
         value = "compressor-threshold";
-    else if (sender == o_comp_band5_sld)
+    else if (sender == _compressorBand5Slider)
         value = "compressor-ratio";
-    else if (sender == o_comp_band6_sld)
+    else if (sender == _compressorBand6Slider)
         value = "compressor-knee";
-    else if (sender == o_comp_band7_sld)
+    else if (sender == _compressorBand7Slider)
         value = "compressor-makeup-gain";
 
     if (p_aout) {
         var_SetFloat(p_aout, value, [sender floatValue]);
         vlc_object_release(p_aout);
     }
-    config_PutFloat(p_intf, value, [sender floatValue]);
+    config_PutFloat(VLCIntf, value, [sender floatValue]);
 
-    if (sender == o_comp_band1_sld)
-        [o_comp_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
-    else if (sender == o_comp_band2_sld)
-        [o_comp_band2_fld setStringValue:[NSString localizedStringWithFormat:@"%2.1f ms", [sender floatValue]]];
-    else if (sender == o_comp_band3_sld)
-        [o_comp_band3_fld setStringValue:[NSString localizedStringWithFormat:@"%3.1f ms", [sender floatValue]]];
-    else if (sender == o_comp_band4_sld)
-        [o_comp_band4_fld setStringValue:[NSString localizedStringWithFormat:@"%2.1f dB", [sender floatValue]]];
-    else if (sender == o_comp_band5_sld)
-        [o_comp_band5_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f:1", [sender floatValue]]];
-    else if (sender == o_comp_band6_sld)
-        [o_comp_band6_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [sender floatValue]]];
-    else if (sender == o_comp_band7_sld)
-        [o_comp_band7_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [sender floatValue]]];
+    if (sender == _compressorBand1Slider)
+        [_compressorBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if (sender == _compressorBand2Slider)
+        [_compressorBand2TextField setStringValue:[NSString localizedStringWithFormat:@"%2.1f ms", [sender floatValue]]];
+    else if (sender == _compressorBand3Slider)
+        [_compressorBand3TextField setStringValue:[NSString localizedStringWithFormat:@"%3.1f ms", [sender floatValue]]];
+    else if (sender == _compressorBand4Slider)
+        [_compressorBand4TextField setStringValue:[NSString localizedStringWithFormat:@"%2.1f dB", [sender floatValue]]];
+    else if (sender == _compressorBand5Slider)
+        [_compressorBand5TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f:1", [sender floatValue]]];
+    else if (sender == _compressorBand6Slider)
+        [_compressorBand6TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [sender floatValue]]];
+    else if (sender == _compressorBand7Slider)
+        [_compressorBand7TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f dB", [sender floatValue]]];
 }
 
 #pragma mark -
 #pragma mark Spatializer
 - (void)resetSpatializer
 {
-    BOOL b_enable_spat = NO;
+    intf_thread_t *p_intf = VLCIntf;
+    BOOL bEnable_spatializer = NO;
     char *psz_afilters;
     psz_afilters = config_GetPsz(p_intf, "audio-filter");
     if (psz_afilters) {
-        b_enable_spat = strstr(psz_afilters, "spatializer") != NULL;
+        bEnable_spatializer = strstr(psz_afilters, "spatializer") != NULL;
         free(psz_afilters);
     }
 
-    [o_spat_view enableSubviews:b_enable_spat];
-    [o_spat_enable_ckb setState:(b_enable_spat ? NSOnState : NSOffState)];
+    [_spatializerView enableSubviews:bEnable_spatializer];
+    [_spatializerEnableCheckbox setState:(bEnable_spatializer ? NSOnState : NSOffState)];
 
 
 #define setSlider(bandsld, bandfld, var) \
 [bandsld setFloatValue: config_GetFloat(p_intf, var) * 10.]; \
 [bandfld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [bandsld floatValue]]]
 
-    setSlider(o_spat_band1_sld, o_spat_band1_fld, "spatializer-roomsize");
-    setSlider(o_spat_band2_sld, o_spat_band2_fld, "spatializer-width");
-    setSlider(o_spat_band3_sld, o_spat_band3_fld, "spatializer-wet");
-    setSlider(o_spat_band4_sld, o_spat_band4_fld, "spatializer-dry");
-    setSlider(o_spat_band5_sld, o_spat_band5_fld, "spatializer-damp");
+    setSlider(_spatializerBand1Slider, _spatializerBand1TextField, "spatializer-roomsize");
+    setSlider(_spatializerBand2Slider, _spatializerBand2TextField, "spatializer-width");
+    setSlider(_spatializerBand3Slider, _spatializerBand3TextField, "spatializer-wet");
+    setSlider(_spatializerBand4Slider, _spatializerBand4TextField, "spatializer-dry");
+    setSlider(_spatializerBand5Slider, _spatializerBand5TextField, "spatializer-damp");
 
 #undef setSlider
 }
 
 - (IBAction)resetSpatializerValues:(id)sender
 {
+    intf_thread_t *p_intf = VLCIntf;
     config_PutFloat(p_intf, "spatializer-roomsize", .85);
     config_PutFloat(p_intf, "spatializer-width", 1.);
     config_PutFloat(p_intf, "spatializer-wet", .4);
@@ -910,94 +915,95 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [self resetSpatializer];
 }
 
-- (IBAction)spat_enable:(id)sender
+- (IBAction)spatializerEnable:(id)sender
 {
-    [o_spat_view enableSubviews:[sender state]];
+    [_spatializerView enableSubviews:[sender state]];
     [self setAudioFilter:"spatializer" on:[sender state]];
 }
 
-- (IBAction)spat_sliderUpdated:(id)sender
+- (IBAction)spatializerSliderUpdated:(id)sender
 {
     audio_output_t *p_aout = getAout();
     char *value = NULL;
-    if (sender == o_spat_band1_sld)
+    if (sender == _spatializerBand1Slider)
         value = "spatializer-roomsize";
-    else if (sender == o_spat_band2_sld)
+    else if (sender == _spatializerBand2Slider)
         value = "spatializer-width";
-    else if (sender == o_spat_band3_sld)
+    else if (sender == _spatializerBand3Slider)
         value = "spatializer-wet";
-    else if (sender == o_spat_band4_sld)
+    else if (sender == _spatializerBand4Slider)
         value = "spatializer-dry";
-    else if (sender == o_spat_band5_sld)
+    else if (sender == _spatializerBand5Slider)
         value = "spatializer-damp";
 
     if (p_aout) {
         var_SetFloat(p_aout, value, [sender floatValue] / 10.);
         vlc_object_release(p_aout);
     }
-    config_PutFloat(p_intf, value, [sender floatValue] / 10.);
+    config_PutFloat(VLCIntf, value, [sender floatValue] / 10.);
 
-    if (sender == o_spat_band1_sld)
-        [o_spat_band1_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
-    else if (sender == o_spat_band2_sld)
-        [o_spat_band2_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
-    else if (sender == o_spat_band3_sld)
-        [o_spat_band3_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
-    else if (sender == o_spat_band4_sld)
-        [o_spat_band4_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
-    else if (sender == o_spat_band5_sld)
-        [o_spat_band5_fld setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    if (sender == _spatializerBand1Slider)
+        [_spatializerBand1TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if (sender == _spatializerBand2Slider)
+        [_spatializerBand2TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if (sender == _spatializerBand3Slider)
+        [_spatializerBand3TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if (sender == _spatializerBand4Slider)
+        [_spatializerBand4TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
+    else if (sender == _spatializerBand5Slider)
+        [_spatializerBand5TextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f", [sender floatValue]]];
 }
 
 #pragma mark -
 #pragma mark Filter
 - (void)resetAudioFilters
 {
-    BOOL b_enable_normvol = NO;
+    intf_thread_t *p_intf = VLCIntf;
+    BOOL bEnable_normvol = NO;
     char *psz_afilters;
     psz_afilters = config_GetPsz(p_intf, "audio-filter");
     if (psz_afilters) {
-        [o_filter_headPhone_ckb setState: (NSInteger)strstr(psz_afilters, "headphone") ];
-        [o_filter_karaoke_ckb setState: (NSInteger)strstr(psz_afilters, "karaoke") ];
-        b_enable_normvol = strstr(psz_afilters, "normvol") != NULL;
+        [_filterHeadPhoneCheckbox setState: (NSInteger)strstr(psz_afilters, "headphone") ];
+        [_filterKaraokeCheckbox setState: (NSInteger)strstr(psz_afilters, "karaoke") ];
+        bEnable_normvol = strstr(psz_afilters, "normvol") != NULL;
         free(psz_afilters);
     } else {
-        [o_filter_headPhone_ckb setState: NSOffState];
-        [o_filter_karaoke_ckb setState: NSOffState];
+        [_filterHeadPhoneCheckbox setState: NSOffState];
+        [_filterKaraokeCheckbox setState: NSOffState];
     }
 
-    [o_filter_normLevel_sld setEnabled:b_enable_normvol];
-    [o_filter_normLevel_lbl setEnabled:b_enable_normvol];
-    [o_filter_normLevel_ckb setState:(b_enable_normvol ? NSOnState : NSOffState)];
+    [_filterNormLevelSlider setEnabled:bEnable_normvol];
+    [_filterNormLevelLabel setEnabled:bEnable_normvol];
+    [_filterNormLevelCheckbox setState:(bEnable_normvol ? NSOnState : NSOffState)];
 
-    [o_filter_normLevel_sld setFloatValue: config_GetFloat(p_intf, "norm-max-level")];
+    [_filterNormLevelSlider setFloatValue: config_GetFloat(p_intf, "norm-max-level")];
 }
 
-- (IBAction)filter_enableHeadPhoneVirt:(id)sender
+- (IBAction)filterEnableHeadPhoneVirt:(id)sender
 {
     [self setAudioFilter: "headphone" on:[sender state]];
 }
 
-- (IBAction)filter_enableVolumeNorm:(id)sender
+- (IBAction)filterEnableVolumeNorm:(id)sender
 {
-    [o_filter_normLevel_sld setEnabled:[sender state]];
-    [o_filter_normLevel_lbl setEnabled:[sender state]];
+    [_filterNormLevelSlider setEnabled:[sender state]];
+    [_filterNormLevelLabel setEnabled:[sender state]];
     [self setAudioFilter: "normvol" on:[sender state]];
 }
 
-- (IBAction)filter_volNormSliderUpdated:(id)sender
+- (IBAction)filterVolumeNormSliderUpdated:(id)sender
 {
     audio_output_t *p_aout = getAout();
 
     if (p_aout) {
-        var_SetFloat(p_aout, "norm-max-level", [o_filter_normLevel_sld floatValue]);
+        var_SetFloat(p_aout, "norm-max-level", [_filterNormLevelSlider floatValue]);
         vlc_object_release(p_aout);
     }
 
-    config_PutFloat(p_intf, "norm-max-level", [o_filter_normLevel_sld floatValue]);
+    config_PutFloat(VLCIntf, "norm-max-level", [_filterNormLevelSlider floatValue]);
 }
 
-- (IBAction)filter_enableKaraoke:(id)sender
+- (IBAction)filterEnableKaraoke:(id)sender
 {
     [self setAudioFilter: "karaoke" on:[sender state]];
 }

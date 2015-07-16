@@ -1,7 +1,7 @@
 /*****************************************************************************
  * AudioEffects.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2004-2012 VLC authors and VideoLAN
+ * Copyright (C) 2004-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -24,122 +24,114 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCAudioEffects : NSObject {
-    /* generic */
-    IBOutlet id o_tableView;
-    IBOutlet id o_window;
-    IBOutlet id o_profile_pop;
+@interface VLCAudioEffects : NSObject
 
-    /* Equalizer */
-    IBOutlet id o_eq_view;
-    IBOutlet id o_eq_enable_ckb;
-    IBOutlet id o_eq_twopass_ckb;
-    IBOutlet id o_eq_preamp_lbl;
-    IBOutlet id o_eq_presets_popup;
-    IBOutlet id o_eq_band1_sld;
-    IBOutlet id o_eq_band2_sld;
-    IBOutlet id o_eq_band3_sld;
-    IBOutlet id o_eq_band4_sld;
-    IBOutlet id o_eq_band5_sld;
-    IBOutlet id o_eq_band6_sld;
-    IBOutlet id o_eq_band7_sld;
-    IBOutlet id o_eq_band8_sld;
-    IBOutlet id o_eq_band9_sld;
-    IBOutlet id o_eq_band10_sld;
-    IBOutlet id o_eq_preamp_sld;
+/* generic */
+@property (readwrite, weak) IBOutlet NSWindow *window;
+@property (readwrite, weak) IBOutlet NSTabView *tabView;
+@property (readwrite, weak) IBOutlet NSPopUpButton *profilePopup;
 
-    /* Compressor */
-    IBOutlet id o_comp_view;
-    IBOutlet id o_comp_enable_ckb;
-    IBOutlet id o_comp_reset_btn;
-    IBOutlet id o_comp_band1_sld;
-    IBOutlet id o_comp_band1_fld;
-    IBOutlet id o_comp_band1_lbl;
-    IBOutlet id o_comp_band2_sld;
-    IBOutlet id o_comp_band2_fld;
-    IBOutlet id o_comp_band2_lbl;
-    IBOutlet id o_comp_band3_sld;
-    IBOutlet id o_comp_band3_fld;
-    IBOutlet id o_comp_band3_lbl;
-    IBOutlet id o_comp_band4_sld;
-    IBOutlet id o_comp_band4_fld;
-    IBOutlet id o_comp_band4_lbl;
-    IBOutlet id o_comp_band5_sld;
-    IBOutlet id o_comp_band5_fld;
-    IBOutlet id o_comp_band5_lbl;
-    IBOutlet id o_comp_band6_sld;
-    IBOutlet id o_comp_band6_fld;
-    IBOutlet id o_comp_band6_lbl;
-    IBOutlet id o_comp_band7_sld;
-    IBOutlet id o_comp_band7_fld;
-    IBOutlet id o_comp_band7_lbl;
+/* Equalizer */
+@property (readwrite, weak) IBOutlet NSView *equalizerView;
+@property (readwrite, weak) IBOutlet NSButton *equalizerEnableCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *equalizerTwoPassCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *equalizerPreampLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *equalizerPresetsPopup;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand1Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand2Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand3Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand4Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand5Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand6Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand7Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand8Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand9Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerBand10Slider;
+@property (readwrite, weak) IBOutlet NSSlider *equalizerPreampSlider;
 
-    /* Spatializer */
-    IBOutlet id o_spat_view;
-    IBOutlet id o_spat_enable_ckb;
-    IBOutlet id o_spat_reset_btn;
-    IBOutlet id o_spat_band1_sld;
-    IBOutlet id o_spat_band1_fld;
-    IBOutlet id o_spat_band1_lbl;
-    IBOutlet id o_spat_band2_sld;
-    IBOutlet id o_spat_band2_fld;
-    IBOutlet id o_spat_band2_lbl;
-    IBOutlet id o_spat_band3_sld;
-    IBOutlet id o_spat_band3_fld;
-    IBOutlet id o_spat_band3_lbl;
-    IBOutlet id o_spat_band4_sld;
-    IBOutlet id o_spat_band4_fld;
-    IBOutlet id o_spat_band4_lbl;
-    IBOutlet id o_spat_band5_sld;
-    IBOutlet id o_spat_band5_fld;
-    IBOutlet id o_spat_band5_lbl;
+/* Compressor */
+@property (readwrite, weak) IBOutlet NSView *compressorView;
+@property (readwrite, weak) IBOutlet NSButton *compressorEnableCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *compressorResetButton;
+@property (readwrite, weak) IBOutlet NSSlider *compressorBand1Slider;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand1TextField;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand1Label;
+@property (readwrite, weak) IBOutlet NSSlider *compressorBand2Slider;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand2TextField;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand2Label;
+@property (readwrite, weak) IBOutlet NSSlider *compressorBand3Slider;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand3TextField;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand3Label;
+@property (readwrite, weak) IBOutlet NSSlider *compressorBand4Slider;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand4TextField;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand4Label;
+@property (readwrite, weak) IBOutlet NSSlider *compressorBand5Slider;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand5TextField;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand5Label;
+@property (readwrite, weak) IBOutlet NSSlider *compressorBand6Slider;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand6TextField;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand6Label;
+@property (readwrite, weak) IBOutlet NSSlider *compressorBand7Slider;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand7TextField;
+@property (readwrite, weak) IBOutlet NSTextField *compressorBand7Label;
 
-    /* Filter */
-    IBOutlet id o_filter_headPhone_ckb;
-    IBOutlet id o_filter_normLevel_ckb;
-    IBOutlet id o_filter_normLevel_sld;
-    IBOutlet id o_filter_normLevel_lbl;
-    IBOutlet id o_filter_karaoke_ckb;
-}
+/* Spatializer */
+@property (readwrite, weak) IBOutlet NSView *spatializerView;
+@property (readwrite, weak) IBOutlet NSButton *spatializerEnableCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *spatializerResetButton;
+@property (readwrite, weak) IBOutlet NSSlider *spatializerBand1Slider;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand1TextField;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand1Label;
+@property (readwrite, weak) IBOutlet NSSlider *spatializerBand2Slider;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand2TextField;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand2Label;
+@property (readwrite, weak) IBOutlet NSSlider *spatializerBand3Slider;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand3TextField;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand3Label;
+@property (readwrite, weak) IBOutlet NSSlider *spatializerBand4Slider;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand4TextField;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand4Label;
+@property (readwrite, weak) IBOutlet NSSlider *spatializerBand5Slider;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand5TextField;
+@property (readwrite, weak) IBOutlet NSTextField *spatializerBand5Label;
+
+/* Filter */
+@property (readwrite, weak) IBOutlet NSButton *filterHeadPhoneCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *filterNormLevelCheckbox;
+@property (readwrite, weak) IBOutlet NSSlider *filterNormLevelSlider;
+@property (readwrite, weak) IBOutlet NSTextField *filterNormLevelLabel;
+@property (readwrite, weak) IBOutlet NSButton *filterKaraokeCheckbox;
 
 /* generic */
 + (VLCAudioEffects *)sharedInstance;
 
-- (void)updateCocoaWindowLevel:(NSInteger)i_level;
-- (IBAction)toggleWindow:(id)sender;
-- (void)setAudioFilter: (char *)psz_name on:(BOOL)b_on;
 - (IBAction)profileSelectorAction:(id)sender;
-- (IBAction)addAudioEffectsProfile:(id)sender;
-- (IBAction)removeAudioEffectsProfile:(id)sender;
 
+- (void)toggleWindow:(id)sender;
+- (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (void)saveCurrentProfile;
 
 /* Equalizer */
-- (void)equalizerUpdated;
-- (void)setValue:(float)value forSlider:(int)index;
-- (IBAction)eq_bandSliderUpdated:(id)sender;
-- (IBAction)eq_changePreset:(id)sender;
-- (IBAction)eq_enable:(id)sender;
-- (IBAction)eq_preampSliderUpdated:(id)sender;
-- (IBAction)eq_twopass:(id)sender;
+- (IBAction)equalizerBandSliderUpdated:(id)sender;
+- (IBAction)equalizerChangePreset:(id)sender;
+- (IBAction)equalizerEnable:(id)sender;
+- (IBAction)equalizerPreAmpSliderUpdated:(id)sender;
+- (IBAction)equalizerTwoPass:(id)sender;
 
 /* Compressor */
-- (void)resetCompressor;
 - (IBAction)resetCompressorValues:(id)sender;
-- (IBAction)comp_enable:(id)sender;
-- (IBAction)comp_sliderUpdated:(id)sender;
+- (IBAction)compressorEnable:(id)sender;
+- (IBAction)compressorSliderUpdated:(id)sender;
 
 /* Spatializer */
-- (void)resetSpatializer;
 - (IBAction)resetSpatializerValues:(id)sender;
-- (IBAction)spat_enable:(id)sender;
-- (IBAction)spat_sliderUpdated:(id)sender;
+- (IBAction)spatializerEnable:(id)sender;
+- (IBAction)spatializerSliderUpdated:(id)sender;
 
 /* Filter */
-- (void)resetAudioFilters;
-- (IBAction)filter_enableHeadPhoneVirt:(id)sender;
-- (IBAction)filter_enableVolumeNorm:(id)sender;
-- (IBAction)filter_volNormSliderUpdated:(id)sender;
-- (IBAction)filter_enableKaraoke:(id)sender;
+- (IBAction)filterEnableHeadPhoneVirt:(id)sender;
+- (IBAction)filterEnableVolumeNorm:(id)sender;
+- (IBAction)filterVolumeNormSliderUpdated:(id)sender;
+- (IBAction)filterEnableKaraoke:(id)sender;
 
 @end
