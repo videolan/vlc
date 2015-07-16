@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VideoEffects.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2012 Felix Paul Kühne
+ * Copyright (C) 2011-2015 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -23,125 +23,124 @@
 
 #import <Cocoa/Cocoa.h>
 
+@interface VLCVideoEffects : NSObject
 
-@interface VLCVideoEffects : NSObject {
-    /* generic */
-    IBOutlet id o_window;
-    IBOutlet id o_tableView;
-    IBOutlet id o_profile_pop;
+/* generic */
+@property (readwrite, weak) IBOutlet NSWindow *window;
+@property (readwrite, weak) IBOutlet NSTabView *tabView;
+@property (readwrite, weak) IBOutlet NSPopUpButton *profilePopup;
 
-    /* basic */
-    IBOutlet id o_adjust_ckb;
-    IBOutlet id o_adjust_hue_lbl;
-    IBOutlet id o_adjust_hue_sld;
-    IBOutlet id o_adjust_contrast_lbl;
-    IBOutlet id o_adjust_contrast_sld;
-    IBOutlet id o_adjust_brightness_lbl;
-    IBOutlet id o_adjust_brightness_sld;
-    IBOutlet id o_adjust_brightness_ckb;
-    IBOutlet id o_adjust_saturation_lbl;
-    IBOutlet id o_adjust_saturation_sld;
-    IBOutlet id o_adjust_gamma_lbl;
-    IBOutlet id o_adjust_gamma_sld;
-    IBOutlet id o_adjust_reset_btn;
-    IBOutlet id o_sharpen_ckb;
-    IBOutlet id o_sharpen_lbl;
-    IBOutlet id o_sharpen_sld;
-    IBOutlet id o_banding_ckb;
-    IBOutlet id o_banding_lbl;
-    IBOutlet id o_banding_sld;
-    IBOutlet id o_grain_ckb;
-    IBOutlet id o_grain_sld;
-    IBOutlet id o_grain_lbl;
+/* basic */
+@property (readwrite, weak) IBOutlet NSButton *adjustCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *adjustHueLabel;
+@property (readwrite, weak) IBOutlet NSSlider *adjustHueSlider;
+@property (readwrite, weak) IBOutlet NSTextField *adjustContrastLabel;
+@property (readwrite, weak) IBOutlet NSSlider *adjustContrastSlider;
+@property (readwrite, weak) IBOutlet NSTextField *adjustBrightnessLabel;
+@property (readwrite, weak) IBOutlet NSSlider *adjustBrightnessSlider;
+@property (readwrite, weak) IBOutlet NSButton *adjustBrightnessCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *adjustSaturationLabel;
+@property (readwrite, weak) IBOutlet NSSlider *adjustSaturationSlider;
+@property (readwrite, weak) IBOutlet NSTextField *adjustGammaLabel;
+@property (readwrite, weak) IBOutlet NSSlider *adjustGammaSlider;
+@property (readwrite, weak) IBOutlet NSButton *adjustResetButton;
+@property (readwrite, weak) IBOutlet NSButton *sharpenCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *sharpenLabel;
+@property (readwrite, weak) IBOutlet NSSlider *sharpenSlider;
+@property (readwrite, weak) IBOutlet NSButton *bandingCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *bandingLabel;
+@property (readwrite, weak) IBOutlet NSSlider *bandingSlider;
+@property (readwrite, weak) IBOutlet NSButton *grainCheckbox;
+@property (readwrite, weak) IBOutlet NSSlider *grainSlider;
+@property (readwrite, weak) IBOutlet NSTextField *grainLabel;
 
-    /* crop */
-    IBOutlet id o_crop_top_lbl;
-    IBOutlet id o_crop_top_fld;
-    IBOutlet id o_crop_top_stp;
-    IBOutlet id o_crop_left_lbl;
-    IBOutlet id o_crop_left_fld;
-    IBOutlet id o_crop_left_stp;
-    IBOutlet id o_crop_right_lbl;
-    IBOutlet id o_crop_right_fld;
-    IBOutlet id o_crop_right_stp;
-    IBOutlet id o_crop_bottom_lbl;
-    IBOutlet id o_crop_bottom_fld;
-    IBOutlet id o_crop_bottom_stp;
-    IBOutlet id o_crop_sync_top_bottom_ckb;
-    IBOutlet id o_crop_sync_left_right_ckb;
+/* crop */
+@property (readwrite, weak) IBOutlet NSTextField *cropTopLabel;
+@property (readwrite, weak) IBOutlet NSTextField *cropTopTextField;
+@property (readwrite, weak) IBOutlet NSStepper *cropTopStepper;
+@property (readwrite, weak) IBOutlet NSTextField *cropLeftLabel;
+@property (readwrite, weak) IBOutlet NSTextField *cropLeftTextField;
+@property (readwrite, weak) IBOutlet NSStepper *cropLeftStepper;
+@property (readwrite, weak) IBOutlet NSTextField *cropRightLabel;
+@property (readwrite, weak) IBOutlet NSTextField *cropRightTextField;
+@property (readwrite, weak) IBOutlet NSStepper *cropRightStepper;
+@property (readwrite, weak) IBOutlet NSTextField *cropBottomLabel;
+@property (readwrite, weak) IBOutlet NSTextField *cropBottomTextField;
+@property (readwrite, weak) IBOutlet NSStepper *cropBottomStepper;
+@property (readwrite, weak) IBOutlet NSButton *cropSyncTopBottomCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *cropSyncLeftRightCheckbox;
 
-    /* geometry */
-    IBOutlet id o_transform_ckb;
-    IBOutlet id o_transform_pop;
-    IBOutlet id o_zoom_ckb;
-    IBOutlet id o_puzzle_ckb;
-    IBOutlet id o_puzzle_rows_lbl;
-    IBOutlet id o_puzzle_rows_fld;
-    IBOutlet id o_puzzle_rows_stp;
-    IBOutlet id o_puzzle_columns_lbl;
-    IBOutlet id o_puzzle_columns_fld;
-    IBOutlet id o_puzzle_columns_stp;
-    IBOutlet id o_clone_ckb;
-    IBOutlet id o_clone_number_fld;
-    IBOutlet id o_clone_number_stp;
-    IBOutlet id o_clone_number_lbl;
-    IBOutlet id o_wall_ckb;
-    IBOutlet id o_wall_numofrows_fld;
-    IBOutlet id o_wall_numofrows_stp;
-    IBOutlet id o_wall_numofrows_lbl;
-    IBOutlet id o_wall_numofcols_fld;
-    IBOutlet id o_wall_numofcols_stp;
-    IBOutlet id o_wall_numofcols_lbl;
+/* geometry */
+@property (readwrite, weak) IBOutlet NSButton *transformCheckbox;
+@property (readwrite, weak) IBOutlet NSPopUpButton *transformPopup;
+@property (readwrite, weak) IBOutlet NSButton *zoomCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *puzzleCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *puzzleRowsLabel;
+@property (readwrite, weak) IBOutlet NSTextField *puzzleRowsTextField;
+@property (readwrite, weak) IBOutlet NSStepper *puzzleRowsStepper;
+@property (readwrite, weak) IBOutlet NSTextField *puzzleColumnsLabel;
+@property (readwrite, weak) IBOutlet NSTextField *puzzleColumnsTextField;
+@property (readwrite, weak) IBOutlet NSStepper *puzzleColumnsStepper;
+@property (readwrite, weak) IBOutlet NSButton *cloneCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *cloneNumberTextField;
+@property (readwrite, weak) IBOutlet NSStepper *cloneNumberStepper;
+@property (readwrite, weak) IBOutlet NSTextField *cloneNumberLabel;
+@property (readwrite, weak) IBOutlet NSButton *wallCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *wallNumbersOfRowsTextField;
+@property (readwrite, weak) IBOutlet NSStepper *wallNumbersOfRowsStepper;
+@property (readwrite, weak) IBOutlet NSTextField *wallNumbersOfRowsLabel;
+@property (readwrite, weak) IBOutlet NSTextField *wallNumberOfColumnsTextField;
+@property (readwrite, weak) IBOutlet NSStepper *wallNumberOfColumnsStepper;
+@property (readwrite, weak) IBOutlet NSTextField *wallNumberOfColumnsLabel;
 
-    /* color */
-    IBOutlet id o_threshold_ckb;
-    IBOutlet id o_threshold_color_lbl;
-    IBOutlet id o_threshold_color_fld;
-    IBOutlet id o_threshold_saturation_lbl;
-    IBOutlet id o_threshold_saturation_sld;
-    IBOutlet id o_threshold_similarity_lbl;
-    IBOutlet id o_threshold_similarity_sld;
-    IBOutlet id o_sepia_ckb;
-    IBOutlet id o_sepia_lbl;
-    IBOutlet id o_sepia_fld;
-    IBOutlet id o_sepia_stp;
-    IBOutlet id o_noise_ckb;
-    IBOutlet id o_gradient_ckb;
-    IBOutlet id o_gradient_mode_lbl;
-    IBOutlet id o_gradient_mode_pop;
-    IBOutlet id o_gradient_color_ckb;
-    IBOutlet id o_gradient_cartoon_ckb;
-    IBOutlet id o_extract_ckb;
-    IBOutlet id o_extract_lbl;
-    IBOutlet id o_extract_fld;
-    IBOutlet id o_invert_ckb;
-    IBOutlet id o_posterize_ckb;
-    IBOutlet id o_posterize_lbl;
-    IBOutlet id o_posterize_fld;
-    IBOutlet id o_posterize_stp;
-    IBOutlet id o_blur_ckb;
-    IBOutlet id o_blur_sld;
-    IBOutlet id o_blur_lbl;
-    IBOutlet id o_motiondetect_ckb;
-    IBOutlet id o_watereffect_ckb;
-    IBOutlet id o_waves_ckb;
-    IBOutlet id o_psychedelic_ckb;
+/* color */
+@property (readwrite, weak) IBOutlet NSButton *thresholdCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *thresholdColorLabel;
+@property (readwrite, weak) IBOutlet NSTextField *thresholdColorTextField;
+@property (readwrite, weak) IBOutlet NSTextField *thresholdSaturationLabel;
+@property (readwrite, weak) IBOutlet NSSlider *thresholdSaturationSlider;
+@property (readwrite, weak) IBOutlet NSTextField *thresholdSimilarityLabel;
+@property (readwrite, weak) IBOutlet NSSlider *thresholdSimilaritySlider;
+@property (readwrite, weak) IBOutlet NSButton *sepiaCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *sepiaLabel;
+@property (readwrite, weak) IBOutlet NSTextField *sepiaTextField;
+@property (readwrite, weak) IBOutlet NSStepper *sepiaStepper;
+@property (readwrite, weak) IBOutlet NSButton *noiseCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *gradientCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *gradientModeLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *gradientModePopup;
+@property (readwrite, weak) IBOutlet NSButton *gradientColorCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *gradientCartoonCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *extractCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *extractLabel;
+@property (readwrite, weak) IBOutlet NSTextField *extractTextField;
+@property (readwrite, weak) IBOutlet NSButton *invertCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *posterizeCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *posterizeLabel;
+@property (readwrite, weak) IBOutlet NSTextField *posterizeTextField;
+@property (readwrite, weak) IBOutlet NSStepper *posterizeStepper;
+@property (readwrite, weak) IBOutlet NSButton *blurCheckbox;
+@property (readwrite, weak) IBOutlet NSSlider *blurSlider;
+@property (readwrite, weak) IBOutlet NSTextField *blurLabel;
+@property (readwrite, weak) IBOutlet NSButton *motiondetectCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *watereffectCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *wavesCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *psychedelicCheckbox;
 
-    /* misc */
-    IBOutlet id o_addtext_ckb;
-    IBOutlet id o_addtext_text_fld;
-    IBOutlet id o_addtext_text_lbl;
-    IBOutlet id o_addtext_pos_lbl;
-    IBOutlet id o_addtext_pos_pop;
-    IBOutlet id o_addlogo_ckb;
-    IBOutlet id o_addlogo_logo_lbl;
-    IBOutlet id o_addlogo_logo_fld;
-    IBOutlet id o_addlogo_pos_lbl;
-    IBOutlet id o_addlogo_pos_pop;
-    IBOutlet id o_addlogo_transparency_lbl;
-    IBOutlet id o_addlogo_transparency_sld;
-    IBOutlet id o_anaglyph_ckb;
-}
+/* misc */
+@property (readwrite, weak) IBOutlet NSButton *addTextCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *addTextTextTextField;
+@property (readwrite, weak) IBOutlet NSTextField *addTextTextLabel;
+@property (readwrite, weak) IBOutlet NSTextField *addTextPositionLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *addTextPositionPopup;
+@property (readwrite, weak) IBOutlet NSButton *addLogoCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *addLogoLogoLabel;
+@property (readwrite, weak) IBOutlet NSTextField *addLogoLogoTextField;
+@property (readwrite, weak) IBOutlet NSTextField *addLogoPositionLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *addLogoPositionPopup;
+@property (readwrite, weak) IBOutlet NSTextField *addLogoTransparencyLabel;
+@property (readwrite, weak) IBOutlet NSSlider *addLogoTransparencySlider;
+@property (readwrite, weak) IBOutlet NSButton *anaglyphCheckbox;
 
 /* text field / stepper binding values */
 /* use setter to modify gui elements */
@@ -165,13 +164,10 @@
 /* generic */
 + (VLCVideoEffects *)sharedInstance;
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
-
 - (void)saveCurrentProfile;
 
-- (IBAction)toggleWindow:(id)sender;
+- (void)toggleWindow:(id)sender;
 - (IBAction)profileSelectorAction:(id)sender;
-- (IBAction)addProfile:(id)sender;
-- (IBAction)removeProfile:(id)sender;
 
 /* basic */
 - (IBAction)enableAdjust:(id)sender;

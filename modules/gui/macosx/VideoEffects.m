@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VideoEffects.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2012 Felix Paul Kühne
+ * Copyright (C) 2011-2015 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -29,10 +29,8 @@
 
 @interface VLCVideoEffects()
 {
-    intf_thread_t *p_intf;
     NSInteger i_old_profile_index;
 }
-- (void)resetProfileSelector;
 @end
 
 #pragma mark -
@@ -62,7 +60,6 @@
 - (id)init
 {
     self = [super init];
-    p_intf = VLCIntf;
     i_old_profile_index = -1;
 
     return self;
@@ -70,139 +67,139 @@
 
 - (void)awakeFromNib
 {
-    [o_window setTitle: _NS("Video Effects")];
-    [o_window setExcludedFromWindowsMenu:YES];
-    [o_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [_window setTitle: _NS("Video Effects")];
+    [_window setExcludedFromWindowsMenu:YES];
+    [_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"basic"]] setLabel:_NS("Basic")];
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"crop"]] setLabel:_NS("Crop")];
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"geometry"]] setLabel:_NS("Geometry")];
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"color"]] setLabel:_NS("Color")];
-    [[o_tableView tabViewItemAtIndex:[o_tableView indexOfTabViewItemWithIdentifier:@"misc"]] setLabel:_NS("Miscellaneous")];
+    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"basic"]] setLabel:_NS("Basic")];
+    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"crop"]] setLabel:_NS("Crop")];
+    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"geometry"]] setLabel:_NS("Geometry")];
+    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"color"]] setLabel:_NS("Color")];
+    [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"misc"]] setLabel:_NS("Miscellaneous")];
 
     [self resetProfileSelector];
 
-    [o_adjust_ckb setTitle:_NS("Image Adjust")];
-    [o_adjust_hue_lbl setStringValue:_NS("Hue")];
-    [o_adjust_contrast_lbl setStringValue:_NS("Contrast")];
-    [o_adjust_brightness_lbl setStringValue:_NS("Brightness")];
-    [o_adjust_brightness_ckb setTitle:_NS("Brightness Threshold")];
-    [o_adjust_saturation_lbl setStringValue:_NS("Saturation")];
-    [o_adjust_gamma_lbl setStringValue:_NS("Gamma")];
-    [o_adjust_reset_btn setTitle: _NS("Reset")];
-    [o_sharpen_ckb setTitle:_NS("Sharpen")];
-    [o_sharpen_lbl setStringValue:_NS("Sigma")];
-    [o_banding_ckb setTitle:_NS("Banding removal")];
-    [o_banding_lbl setStringValue:_NS("Radius")];
-    [o_grain_ckb setTitle:_NS("Film Grain")];
-    [o_grain_lbl setStringValue:_NS("Variance")];
-    [o_crop_top_lbl setStringValue:_NS("Top")];
-    [o_crop_left_lbl setStringValue:_NS("Left")];
-    [o_crop_right_lbl setStringValue:_NS("Right")];
-    [o_crop_bottom_lbl setStringValue:_NS("Bottom")];
-    [o_crop_sync_top_bottom_ckb setTitle:_NS("Synchronize top and bottom")];
-    [o_crop_sync_left_right_ckb setTitle:_NS("Synchronize left and right")];
+    [_adjustCheckbox setTitle:_NS("Image Adjust")];
+    [_adjustHueLabel setStringValue:_NS("Hue")];
+    [_adjustContrastLabel setStringValue:_NS("Contrast")];
+    [_adjustBrightnessLabel setStringValue:_NS("Brightness")];
+    [_adjustBrightnessCheckbox setTitle:_NS("Brightness Threshold")];
+    [_adjustSaturationLabel setStringValue:_NS("Saturation")];
+    [_adjustGammaLabel setStringValue:_NS("Gamma")];
+    [_adjustResetButton setTitle: _NS("Reset")];
+    [_sharpenCheckbox setTitle:_NS("Sharpen")];
+    [_sharpenLabel setStringValue:_NS("Sigma")];
+    [_bandingCheckbox setTitle:_NS("Banding removal")];
+    [_bandingLabel setStringValue:_NS("Radius")];
+    [_grainCheckbox setTitle:_NS("Film Grain")];
+    [_grainLabel setStringValue:_NS("Variance")];
+    [_cropTopLabel setStringValue:_NS("Top")];
+    [_cropLeftLabel setStringValue:_NS("Left")];
+    [_cropRightLabel setStringValue:_NS("Right")];
+    [_cropBottomLabel setStringValue:_NS("Bottom")];
+    [_cropSyncTopBottomCheckbox setTitle:_NS("Synchronize top and bottom")];
+    [_cropSyncLeftRightCheckbox setTitle:_NS("Synchronize left and right")];
 
-    [o_transform_ckb setTitle:_NS("Transform")];
-    [o_transform_pop removeAllItems];
-    [o_transform_pop addItemWithTitle: _NS("Rotate by 90 degrees")];
-    [[o_transform_pop lastItem] setTag: 90];
-    [o_transform_pop addItemWithTitle: _NS("Rotate by 180 degrees")];
-    [[o_transform_pop lastItem] setTag: 180];
-    [o_transform_pop addItemWithTitle: _NS("Rotate by 270 degrees")];
-    [[o_transform_pop lastItem] setTag: 270];
-    [o_transform_pop addItemWithTitle: _NS("Flip horizontally")];
-    [[o_transform_pop lastItem] setTag: 1];
-    [o_transform_pop addItemWithTitle: _NS("Flip vertically")];
-    [[o_transform_pop lastItem] setTag: 2];
-    [o_zoom_ckb setTitle:_NS("Magnification/Zoom")];
-    [o_puzzle_ckb setTitle:_NS("Puzzle game")];
-    [o_puzzle_rows_lbl setStringValue:_NS("Rows")];
-    [o_puzzle_columns_lbl setStringValue:_NS("Columns")];
-    [o_clone_ckb setTitle:_NS("Clone")];
-    [o_clone_number_lbl setStringValue:_NS("Number of clones")];
-    [o_wall_ckb setTitle:_NS("Wall")];
-    [o_wall_numofrows_lbl setStringValue:_NS("Rows")];
-    [o_wall_numofcols_lbl setStringValue:_NS("Columns")];
+    [_transformCheckbox setTitle:_NS("Transform")];
+    [_transformPopup removeAllItems];
+    [_transformPopup addItemWithTitle: _NS("Rotate by 90 degrees")];
+    [[_transformPopup lastItem] setTag: 90];
+    [_transformPopup addItemWithTitle: _NS("Rotate by 180 degrees")];
+    [[_transformPopup lastItem] setTag: 180];
+    [_transformPopup addItemWithTitle: _NS("Rotate by 270 degrees")];
+    [[_transformPopup lastItem] setTag: 270];
+    [_transformPopup addItemWithTitle: _NS("Flip horizontally")];
+    [[_transformPopup lastItem] setTag: 1];
+    [_transformPopup addItemWithTitle: _NS("Flip vertically")];
+    [[_transformPopup lastItem] setTag: 2];
+    [_zoomCheckbox setTitle:_NS("Magnification/Zoom")];
+    [_puzzleCheckbox setTitle:_NS("Puzzle game")];
+    [_puzzleRowsLabel setStringValue:_NS("Rows")];
+    [_puzzleColumnsLabel setStringValue:_NS("Columns")];
+    [_cloneCheckbox setTitle:_NS("Clone")];
+    [_cloneNumberLabel setStringValue:_NS("Number of clones")];
+    [_wallCheckbox setTitle:_NS("Wall")];
+    [_wallNumbersOfRowsLabel setStringValue:_NS("Rows")];
+    [_wallNumberOfColumnsLabel setStringValue:_NS("Columns")];
 
-    [o_threshold_ckb setTitle:_NS("Color threshold")];
-    [o_threshold_color_lbl setStringValue:_NS("Color")];
-    [o_threshold_saturation_lbl setStringValue:_NS("Saturation")];
-    [o_threshold_similarity_lbl setStringValue:_NS("Similarity")];
-    [o_sepia_ckb setTitle:_NS("Sepia")];
-    [o_sepia_lbl setStringValue:_NS("Intensity")];
-    [o_noise_ckb setTitle:_NS("Noise")];
-    [o_gradient_ckb setTitle:_NS("Gradient")];
-    [o_gradient_mode_lbl setStringValue:_NS("Mode")];
-    [o_gradient_mode_pop removeAllItems];
-    [o_gradient_mode_pop addItemWithTitle: _NS("Gradient")];
-    [[o_gradient_mode_pop lastItem] setTag: 1];
-    [o_gradient_mode_pop addItemWithTitle: _NS("Edge")];
-    [[o_gradient_mode_pop lastItem] setTag: 2];
-    [o_gradient_mode_pop addItemWithTitle: _NS("Hough")];
-    [[o_gradient_mode_pop lastItem] setTag: 3];
-    [o_gradient_color_ckb setTitle:_NS("Color")];
-    [o_gradient_cartoon_ckb setTitle:_NS("Cartoon")];
-    [o_extract_ckb setTitle:_NS("Color extraction")];
-    [o_extract_lbl setStringValue:_NS("Color")];
-    [o_invert_ckb setTitle:_NS("Invert colors")];
-    [o_posterize_ckb setTitle:_NS("Posterize")];
-    [o_posterize_lbl setStringValue:_NS("Posterize level")];
-    [o_blur_ckb setTitle:_NS("Motion blur")];
-    [o_blur_lbl setStringValue:_NS("Factor")];
-    [o_motiondetect_ckb setTitle:_NS("Motion Detect")];
-    [o_watereffect_ckb setTitle:_NS("Water effect")];
-    [o_waves_ckb setTitle:_NS("Waves")];
-    [o_psychedelic_ckb setTitle:_NS("Psychedelic")];
-    [o_anaglyph_ckb setTitle:_NS("Anaglyph")];
+    [_thresholdCheckbox setTitle:_NS("Color threshold")];
+    [_thresholdColorLabel setStringValue:_NS("Color")];
+    [_thresholdSaturationLabel setStringValue:_NS("Saturation")];
+    [_thresholdSimilarityLabel setStringValue:_NS("Similarity")];
+    [_sepiaCheckbox setTitle:_NS("Sepia")];
+    [_sepiaLabel setStringValue:_NS("Intensity")];
+    [_noiseCheckbox setTitle:_NS("Noise")];
+    [_gradientCheckbox setTitle:_NS("Gradient")];
+    [_gradientModeLabel setStringValue:_NS("Mode")];
+    [_gradientModePopup removeAllItems];
+    [_gradientModePopup addItemWithTitle: _NS("Gradient")];
+    [[_gradientModePopup lastItem] setTag: 1];
+    [_gradientModePopup addItemWithTitle: _NS("Edge")];
+    [[_gradientModePopup lastItem] setTag: 2];
+    [_gradientModePopup addItemWithTitle: _NS("Hough")];
+    [[_gradientModePopup lastItem] setTag: 3];
+    [_gradientColorCheckbox setTitle:_NS("Color")];
+    [_gradientCartoonCheckbox setTitle:_NS("Cartoon")];
+    [_extractCheckbox setTitle:_NS("Color extraction")];
+    [_extractLabel setStringValue:_NS("Color")];
+    [_invertCheckbox setTitle:_NS("Invert colors")];
+    [_posterizeCheckbox setTitle:_NS("Posterize")];
+    [_posterizeLabel setStringValue:_NS("Posterize level")];
+    [_blurCheckbox setTitle:_NS("Motion blur")];
+    [_blurLabel setStringValue:_NS("Factor")];
+    [_motiondetectCheckbox setTitle:_NS("Motion Detect")];
+    [_watereffectCheckbox setTitle:_NS("Water effect")];
+    [_wavesCheckbox setTitle:_NS("Waves")];
+    [_psychedelicCheckbox setTitle:_NS("Psychedelic")];
+    [_anaglyphCheckbox setTitle:_NS("Anaglyph")];
 
-    [o_addtext_ckb setTitle:_NS("Add text")];
-    [o_addtext_text_lbl setStringValue:_NS("Text")];
-    [o_addtext_pos_lbl setStringValue:_NS("Position")];
-    [o_addtext_pos_pop removeAllItems];
-    [o_addtext_pos_pop addItemWithTitle: _NS("Center")];
-    [[o_addtext_pos_pop lastItem] setTag: 0];
-    [o_addtext_pos_pop addItemWithTitle: _NS("Left")];
-    [[o_addtext_pos_pop lastItem] setTag: 1];
-    [o_addtext_pos_pop addItemWithTitle: _NS("Right")];
-    [[o_addtext_pos_pop lastItem] setTag: 2];
-    [o_addtext_pos_pop addItemWithTitle: _NS("Top")];
-    [[o_addtext_pos_pop lastItem] setTag: 4];
-    [o_addtext_pos_pop addItemWithTitle: _NS("Bottom")];
-    [[o_addtext_pos_pop lastItem] setTag: 8];
-    [o_addtext_pos_pop addItemWithTitle: _NS("Top-Left")];
-    [[o_addtext_pos_pop lastItem] setTag: 5];
-    [o_addtext_pos_pop addItemWithTitle: _NS("Top-Right")];
-    [[o_addtext_pos_pop lastItem] setTag: 6];
-    [o_addtext_pos_pop addItemWithTitle: _NS("Bottom-Left")];
-    [[o_addtext_pos_pop lastItem] setTag: 9];
-    [o_addtext_pos_pop addItemWithTitle: _NS("Bottom-Right")];
-    [[o_addtext_pos_pop lastItem] setTag: 10];
-    [o_addlogo_ckb setTitle:_NS("Add logo")];
-    [o_addlogo_logo_lbl setStringValue:_NS("Logo")];
-    [o_addlogo_pos_lbl setStringValue:_NS("Position")];
-    [o_addlogo_pos_pop removeAllItems];
-    [o_addlogo_pos_pop addItemWithTitle: _NS("Center")];
-    [[o_addlogo_pos_pop lastItem] setTag: 0];
-    [o_addlogo_pos_pop addItemWithTitle: _NS("Left")];
-    [[o_addlogo_pos_pop lastItem] setTag: 1];
-    [o_addlogo_pos_pop addItemWithTitle: _NS("Right")];
-    [[o_addlogo_pos_pop lastItem] setTag: 2];
-    [o_addlogo_pos_pop addItemWithTitle: _NS("Top")];
-    [[o_addlogo_pos_pop lastItem] setTag: 4];
-    [o_addlogo_pos_pop addItemWithTitle: _NS("Bottom")];
-    [[o_addlogo_pos_pop lastItem] setTag: 8];
-    [o_addlogo_pos_pop addItemWithTitle: _NS("Top-Left")];
-    [[o_addlogo_pos_pop lastItem] setTag: 5];
-    [o_addlogo_pos_pop addItemWithTitle: _NS("Top-Right")];
-    [[o_addlogo_pos_pop lastItem] setTag: 6];
-    [o_addlogo_pos_pop addItemWithTitle: _NS("Bottom-Left")];
-    [[o_addlogo_pos_pop lastItem] setTag: 9];
-    [o_addlogo_pos_pop addItemWithTitle: _NS("Bottom-Right")];
-    [[o_addlogo_pos_pop lastItem] setTag: 10];
-    [o_addlogo_transparency_lbl setStringValue:_NS("Transparency")];
+    [_addTextCheckbox setTitle:_NS("Add text")];
+    [_addTextTextLabel setStringValue:_NS("Text")];
+    [_addTextPositionLabel setStringValue:_NS("Position")];
+    [_addTextPositionPopup removeAllItems];
+    [_addTextPositionPopup addItemWithTitle: _NS("Center")];
+    [[_addTextPositionPopup lastItem] setTag: 0];
+    [_addTextPositionPopup addItemWithTitle: _NS("Left")];
+    [[_addTextPositionPopup lastItem] setTag: 1];
+    [_addTextPositionPopup addItemWithTitle: _NS("Right")];
+    [[_addTextPositionPopup lastItem] setTag: 2];
+    [_addTextPositionPopup addItemWithTitle: _NS("Top")];
+    [[_addTextPositionPopup lastItem] setTag: 4];
+    [_addTextPositionPopup addItemWithTitle: _NS("Bottom")];
+    [[_addTextPositionPopup lastItem] setTag: 8];
+    [_addTextPositionPopup addItemWithTitle: _NS("Top-Left")];
+    [[_addTextPositionPopup lastItem] setTag: 5];
+    [_addTextPositionPopup addItemWithTitle: _NS("Top-Right")];
+    [[_addTextPositionPopup lastItem] setTag: 6];
+    [_addTextPositionPopup addItemWithTitle: _NS("Bottom-Left")];
+    [[_addTextPositionPopup lastItem] setTag: 9];
+    [_addTextPositionPopup addItemWithTitle: _NS("Bottom-Right")];
+    [[_addTextPositionPopup lastItem] setTag: 10];
+    [_addLogoCheckbox setTitle:_NS("Add logo")];
+    [_addLogoLogoLabel setStringValue:_NS("Logo")];
+    [_addLogoPositionLabel setStringValue:_NS("Position")];
+    [_addLogoPositionPopup removeAllItems];
+    [_addLogoPositionPopup addItemWithTitle: _NS("Center")];
+    [[_addLogoPositionPopup lastItem] setTag: 0];
+    [_addLogoPositionPopup addItemWithTitle: _NS("Left")];
+    [[_addLogoPositionPopup lastItem] setTag: 1];
+    [_addLogoPositionPopup addItemWithTitle: _NS("Right")];
+    [[_addLogoPositionPopup lastItem] setTag: 2];
+    [_addLogoPositionPopup addItemWithTitle: _NS("Top")];
+    [[_addLogoPositionPopup lastItem] setTag: 4];
+    [_addLogoPositionPopup addItemWithTitle: _NS("Bottom")];
+    [[_addLogoPositionPopup lastItem] setTag: 8];
+    [_addLogoPositionPopup addItemWithTitle: _NS("Top-Left")];
+    [[_addLogoPositionPopup lastItem] setTag: 5];
+    [_addLogoPositionPopup addItemWithTitle: _NS("Top-Right")];
+    [[_addLogoPositionPopup lastItem] setTag: 6];
+    [_addLogoPositionPopup addItemWithTitle: _NS("Bottom-Left")];
+    [[_addLogoPositionPopup lastItem] setTag: 9];
+    [_addLogoPositionPopup addItemWithTitle: _NS("Bottom-Right")];
+    [[_addLogoPositionPopup lastItem] setTag: 10];
+    [_addLogoTransparencyLabel setStringValue:_NS("Transparency")];
 
-    [o_tableView selectFirstTabViewItem:self];
+    [_tabView selectFirstTabViewItem:self];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(inputChangedEvent:)
@@ -220,8 +217,8 @@
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (o_window && [o_window isVisible] && [o_window level] != i_level)
-        [o_window setLevel: i_level];
+    if (_window && [_window isVisible] && [_window level] != i_level)
+        [_window setLevel: i_level];
 }
 
 #pragma mark -
@@ -239,28 +236,29 @@
 - (void)resetProfileSelector
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [o_profile_pop removeAllItems];
+    [_profilePopup removeAllItems];
 
-    NSArray * profileNames = [defaults objectForKey:@"VideoEffectProfileNames"];
-    [o_profile_pop addItemsWithTitles:profileNames];
+    NSArray *profileNames = [defaults objectForKey:@"VideoEffectProfileNames"];
+    [_profilePopup addItemsWithTitles:profileNames];
 
-    [[o_profile_pop menu] addItem:[NSMenuItem separatorItem]];
-    [o_profile_pop addItemWithTitle:_NS("Duplicate current profile...")];
-    [[o_profile_pop lastItem] setTarget: self];
-    [[o_profile_pop lastItem] setAction: @selector(addProfile:)];
+    [[_profilePopup menu] addItem:[NSMenuItem separatorItem]];
+    [_profilePopup addItemWithTitle:_NS("Duplicate current profile...")];
+    [[_profilePopup lastItem] setTarget: self];
+    [[_profilePopup lastItem] setAction: @selector(addProfile:)];
 
     if ([profileNames count] > 1) {
-        [o_profile_pop addItemWithTitle:_NS("Organize profiles...")];
-        [[o_profile_pop lastItem] setTarget: self];
-        [[o_profile_pop lastItem] setAction: @selector(removeProfile:)];
+        [_profilePopup addItemWithTitle:_NS("Organize profiles...")];
+        [[_profilePopup lastItem] setTarget: self];
+        [[_profilePopup lastItem] setAction: @selector(removeProfile:)];
     }
 
-    [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
+    [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
     [self profileSelectorAction:self];
 }
 
 - (void)resetValues
 {
+    intf_thread_t *p_intf = VLCIntf;
     NSString *tmpString;
     char *tmpChar;
     BOOL b_state;
@@ -269,240 +267,246 @@
     char * psz_vfilters;
     psz_vfilters = config_GetPsz(p_intf, "video-filter");
     if (psz_vfilters) {
-        [o_adjust_ckb setState: (NSInteger)strstr(psz_vfilters, "adjust")];
-        [o_sharpen_ckb setState: (NSInteger)strstr(psz_vfilters, "sharpen")];
-        [o_banding_ckb setState: (NSInteger)strstr(psz_vfilters, "gradfun")];
-        [o_grain_ckb setState: (NSInteger)strstr(psz_vfilters, "grain")];
-        [o_transform_ckb setState: (NSInteger)strstr(psz_vfilters, "transform")];
-        [o_zoom_ckb setState: (NSInteger)strstr(psz_vfilters, "magnify")];
-        [o_puzzle_ckb setState: (NSInteger)strstr(psz_vfilters, "puzzle")];
-        [o_threshold_ckb setState: (NSInteger)strstr(psz_vfilters, "colorthres")];
-        [o_sepia_ckb setState: (NSInteger)strstr(psz_vfilters, "sepia")];
-        [o_noise_ckb setState: (NSInteger)strstr(psz_vfilters, "noise")];
-        [o_gradient_ckb setState: (NSInteger)strstr(psz_vfilters, "gradient")];
-        [o_extract_ckb setState: (NSInteger)strstr(psz_vfilters, "extract")];
-        [o_invert_ckb setState: (NSInteger)strstr(psz_vfilters, "invert")];
-        [o_posterize_ckb setState: (NSInteger)strstr(psz_vfilters, "posterize")];
-        [o_blur_ckb setState: (NSInteger)strstr(psz_vfilters, "motionblur")];
-        [o_motiondetect_ckb setState: (NSInteger)strstr(psz_vfilters, "motiondetect")];
-        [o_watereffect_ckb setState: (NSInteger)strstr(psz_vfilters, "ripple")];
-        [o_waves_ckb setState: (NSInteger)strstr(psz_vfilters, "wave")];
-        [o_psychedelic_ckb setState: (NSInteger)strstr(psz_vfilters, "psychedelic")];
-        [o_anaglyph_ckb setState: (NSInteger)strstr(psz_vfilters, "anaglyph")];
+        [_adjustCheckbox setState: (NSInteger)strstr(psz_vfilters, "adjust")];
+        [_sharpenCheckbox setState: (NSInteger)strstr(psz_vfilters, "sharpen")];
+        [_bandingCheckbox setState: (NSInteger)strstr(psz_vfilters, "gradfun")];
+        [_grainCheckbox setState: (NSInteger)strstr(psz_vfilters, "grain")];
+        [_transformCheckbox setState: (NSInteger)strstr(psz_vfilters, "transform")];
+        [_zoomCheckbox setState: (NSInteger)strstr(psz_vfilters, "magnify")];
+        [_puzzleCheckbox setState: (NSInteger)strstr(psz_vfilters, "puzzle")];
+        [_thresholdCheckbox setState: (NSInteger)strstr(psz_vfilters, "colorthres")];
+        [_sepiaCheckbox setState: (NSInteger)strstr(psz_vfilters, "sepia")];
+        [_noiseCheckbox setState: (NSInteger)strstr(psz_vfilters, "noise")];
+        [_gradientCheckbox setState: (NSInteger)strstr(psz_vfilters, "gradient")];
+        [_extractCheckbox setState: (NSInteger)strstr(psz_vfilters, "extract")];
+        [_invertCheckbox setState: (NSInteger)strstr(psz_vfilters, "invert")];
+        [_posterizeCheckbox setState: (NSInteger)strstr(psz_vfilters, "posterize")];
+        [_blurCheckbox setState: (NSInteger)strstr(psz_vfilters, "motionblur")];
+        [_motiondetectCheckbox setState: (NSInteger)strstr(psz_vfilters, "motiondetect")];
+        [_watereffectCheckbox setState: (NSInteger)strstr(psz_vfilters, "ripple")];
+        [_wavesCheckbox setState: (NSInteger)strstr(psz_vfilters, "wave")];
+        [_psychedelicCheckbox setState: (NSInteger)strstr(psz_vfilters, "psychedelic")];
+        [_anaglyphCheckbox setState: (NSInteger)strstr(psz_vfilters, "anaglyph")];
         free(psz_vfilters);
     } else {
-        [o_adjust_ckb setState: NSOffState];
-        [o_sharpen_ckb setState: NSOffState];
-        [o_banding_ckb setState: NSOffState];
-        [o_grain_ckb setState: NSOffState];
-        [o_transform_ckb setState: NSOffState];
-        [o_zoom_ckb setState: NSOffState];
-        [o_puzzle_ckb setState: NSOffState];
-        [o_threshold_ckb setState: NSOffState];
-        [o_sepia_ckb setState: NSOffState];
-        [o_noise_ckb setState: NSOffState];
-        [o_gradient_ckb setState: NSOffState];
-        [o_extract_ckb setState: NSOffState];
-        [o_invert_ckb setState: NSOffState];
-        [o_posterize_ckb setState: NSOffState];
-        [o_blur_ckb setState: NSOffState];
-        [o_motiondetect_ckb setState: NSOffState];
-        [o_watereffect_ckb setState: NSOffState];
-        [o_waves_ckb setState: NSOffState];
-        [o_psychedelic_ckb setState: NSOffState];
-        [o_anaglyph_ckb setState: NSOffState];
+        [_adjustCheckbox setState: NSOffState];
+        [_sharpenCheckbox setState: NSOffState];
+        [_bandingCheckbox setState: NSOffState];
+        [_grainCheckbox setState: NSOffState];
+        [_transformCheckbox setState: NSOffState];
+        [_zoomCheckbox setState: NSOffState];
+        [_puzzleCheckbox setState: NSOffState];
+        [_thresholdCheckbox setState: NSOffState];
+        [_sepiaCheckbox setState: NSOffState];
+        [_noiseCheckbox setState: NSOffState];
+        [_gradientCheckbox setState: NSOffState];
+        [_extractCheckbox setState: NSOffState];
+        [_invertCheckbox setState: NSOffState];
+        [_posterizeCheckbox setState: NSOffState];
+        [_blurCheckbox setState: NSOffState];
+        [_motiondetectCheckbox setState: NSOffState];
+        [_watereffectCheckbox setState: NSOffState];
+        [_wavesCheckbox setState: NSOffState];
+        [_psychedelicCheckbox setState: NSOffState];
+        [_anaglyphCheckbox setState: NSOffState];
     }
 
     psz_vfilters = config_GetPsz(p_intf, "sub-source");
     if (psz_vfilters) {
-        [o_addtext_ckb setState: (NSInteger)strstr(psz_vfilters, "marq")];
-        [o_addlogo_ckb setState: (NSInteger)strstr(psz_vfilters, "logo")];
+        [_addTextCheckbox setState: (NSInteger)strstr(psz_vfilters, "marq")];
+        [_addLogoCheckbox setState: (NSInteger)strstr(psz_vfilters, "logo")];
         free(psz_vfilters);
     } else {
-        [o_addtext_ckb setState: NSOffState];
-        [o_addlogo_ckb setState: NSOffState];
+        [_addTextCheckbox setState: NSOffState];
+        [_addLogoCheckbox setState: NSOffState];
     }
 
     psz_vfilters = config_GetPsz(p_intf, "video-splitter");
     if (psz_vfilters) {
-        [o_clone_ckb setState: (NSInteger)strstr(psz_vfilters, "clone")];
-        [o_wall_ckb setState: (NSInteger)strstr(psz_vfilters, "wall")];
+        [_cloneCheckbox setState: (NSInteger)strstr(psz_vfilters, "clone")];
+        [_wallCheckbox setState: (NSInteger)strstr(psz_vfilters, "wall")];
         free(psz_vfilters);
     } else {
-        [o_clone_ckb setState: NSOffState];
-        [o_wall_ckb setState: NSOffState];
+        [_cloneCheckbox setState: NSOffState];
+        [_wallCheckbox setState: NSOffState];
     }
 
     /* fetch and show the various values */
-    [o_adjust_hue_sld setFloatValue: config_GetFloat(p_intf, "hue")];
-    [o_adjust_contrast_sld setFloatValue: config_GetFloat(p_intf, "contrast")];
-    [o_adjust_brightness_sld setFloatValue: config_GetFloat(p_intf, "brightness")];
-    [o_adjust_saturation_sld setFloatValue: config_GetFloat(p_intf, "saturation")];
-    [o_adjust_brightness_ckb setState:(config_GetInt(p_intf, "brightness-threshold") != 0 ? NSOnState : NSOffState)];
-    [o_adjust_gamma_sld setFloatValue: config_GetFloat(p_intf, "gamma")];
-    [o_adjust_brightness_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "brightness")]];
-    [o_adjust_contrast_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "contrast")]];
-    [o_adjust_gamma_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "gamma")]];
-    [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%.0f", config_GetFloat(p_intf, "hue")]];
-    [o_adjust_saturation_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "saturation")]];
-    b_state = [o_adjust_ckb state];
-    [o_adjust_brightness_sld setEnabled: b_state];
-    [o_adjust_brightness_ckb setEnabled: b_state];
-    [o_adjust_contrast_sld setEnabled: b_state];
-    [o_adjust_gamma_sld setEnabled: b_state];
-    [o_adjust_hue_sld setEnabled: b_state];
-    [o_adjust_saturation_sld setEnabled: b_state];
-    [o_adjust_brightness_lbl setEnabled: b_state];
-    [o_adjust_contrast_lbl setEnabled: b_state];
-    [o_adjust_gamma_lbl setEnabled: b_state];
-    [o_adjust_hue_lbl setEnabled: b_state];
-    [o_adjust_saturation_lbl setEnabled: b_state];
-    [o_adjust_reset_btn setEnabled: b_state];
+    [_adjustHueSlider setFloatValue: config_GetFloat(p_intf, "hue")];
+    [_adjustContrastSlider setFloatValue: config_GetFloat(p_intf, "contrast")];
+    [_adjustBrightnessSlider setFloatValue: config_GetFloat(p_intf, "brightness")];
+    [_adjustSaturationSlider setFloatValue: config_GetFloat(p_intf, "saturation")];
+    [_adjustBrightnessCheckbox setState:(config_GetInt(p_intf, "brightness-threshold") != 0 ? NSOnState : NSOffState)];
+    [_adjustGammaSlider setFloatValue: config_GetFloat(p_intf, "gamma")];
+    [_adjustBrightnessSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "brightness")]];
+    [_adjustContrastSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "contrast")]];
+    [_adjustGammaSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "gamma")]];
+    [_adjustHueSlider setToolTip: [NSString stringWithFormat:@"%.0f", config_GetFloat(p_intf, "hue")]];
+    [_adjustSaturationSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "saturation")]];
+    b_state = [_adjustCheckbox state];
+#if 0
+    [_adjustBrightnessSlider setEnabled: b_state];
+    [_adjustBrightnessCheckbox setEnabled: b_state];
+    [_adjustContrastSlider setEnabled: b_state];
+    [_adjustGammaSlider setEnabled: b_state];
+    [_adjustHueSlider setEnabled: b_state];
+    [_adjustSaturationSlider setEnabled: b_state];
+    [_adjustBrightnessLabel setEnabled: b_state];
+    [_adjustContrastLabel setEnabled: b_state];
+    [_adjustGammaLabel setEnabled: b_state];
+    [_adjustHueLabel setEnabled: b_state];
+    [_adjustSaturationLabel setEnabled: b_state];
+    [_adjustResetButton setEnabled: b_state];
 
-    [o_sharpen_sld setFloatValue: config_GetFloat(p_intf, "sharpen-sigma")];
-    [o_sharpen_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "sharpen-sigma")]];
-    [o_sharpen_sld setEnabled: [o_sharpen_ckb state]];
-    [o_sharpen_lbl setEnabled: [o_sharpen_ckb state]];
+    [_sharpenSlider setFloatValue: config_GetFloat(p_intf, "sharpen-sigma")];
+    [_sharpenSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "sharpen-sigma")]];
+    [_sharpenSlider setEnabled: [_sharpenCheckbox state]];
+    [_sharpenLabel setEnabled: [_sharpenCheckbox state]];
 
-    [o_banding_sld setIntValue: config_GetInt(p_intf, "gradfun-radius")];
-    [o_banding_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "gradfun-radius")]];
-    [o_banding_sld setEnabled: [o_banding_ckb state]];
-    [o_banding_lbl setEnabled: [o_banding_ckb state]];
+    [_bandingSlider setIntValue: config_GetInt(p_intf, "gradfun-radius")];
+    [_bandingSlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "gradfun-radius")]];
+    [_bandingSlider setEnabled: [_bandingCheckbox state]];
+    [_bandingLabel setEnabled: [_bandingCheckbox state]];
 
-    [o_grain_sld setFloatValue: config_GetFloat(p_intf, "grain-variance")];
-    [o_grain_sld setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "grain-variance")]];
-    [o_grain_sld setEnabled: [o_grain_ckb state]];
-    [o_grain_lbl setEnabled: [o_grain_ckb state]];
+    [_grainSlider setFloatValue: config_GetFloat(p_intf, "grain-variance")];
+    [_grainSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "grain-variance")]];
+    [_grainSlider setEnabled: [_grainCheckbox state]];
+    [_grainLabel setEnabled: [_grainCheckbox state]];
 
     [self setCropLeftValue: 0];
     [self setCropTopValue: 0];
     [self setCropRightValue: 0];
     [self setCropBottomValue: 0];
-    [o_crop_sync_top_bottom_ckb setState: NSOffState];
-    [o_crop_sync_left_right_ckb setState: NSOffState];
+    [_cropSyncTopBottomCheckbox setState: NSOffState];
+    [_cropSyncLeftRightCheckbox setState: NSOffState];
 
     tmpChar = config_GetPsz(p_intf, "transform-type");
     tmpString = [NSString stringWithUTF8String:tmpChar];
     if ([tmpString isEqualToString:@"hflip"])
-        [o_transform_pop selectItemWithTag: 1];
+        [_transformPopup selectItemWithTag: 1];
     else if ([tmpString isEqualToString:@"vflip"])
-        [o_transform_pop selectItemWithTag: 2];
+        [_transformPopup selectItemWithTag: 2];
     else
-        [o_transform_pop selectItemWithTag:[tmpString intValue]];
+        [_transformPopup selectItemWithTag:[tmpString intValue]];
     FREENULL(tmpChar);
-    [o_transform_pop setEnabled: [o_transform_ckb state]];
+    [_transformPopup setEnabled: [_transformCheckbox state]];
 
     [self setPuzzleColumnsValue: config_GetInt(p_intf, "puzzle-cols")];
     [self setPuzzleRowsValue: config_GetInt(p_intf, "puzzle-rows")];
-    b_state = [o_puzzle_ckb state];
-    [o_puzzle_rows_fld setEnabled: b_state];
-    [o_puzzle_rows_stp setEnabled: b_state];
-    [o_puzzle_rows_lbl setEnabled: b_state];
-    [o_puzzle_columns_fld setEnabled: b_state];
-    [o_puzzle_columns_stp setEnabled: b_state];
-    [o_puzzle_columns_lbl setEnabled: b_state];
+    b_state = [_puzzleCheckbox state];
+    [_puzzleRowsTextField setEnabled: b_state];
+    [_puzzleRowsStepper setEnabled: b_state];
+    [_puzzleRowsLabel setEnabled: b_state];
+    [_puzzleColumnsTextField setEnabled: b_state];
+    [_puzzleColumnsStepper setEnabled: b_state];
+    [_puzzleColumnsLabel setEnabled: b_state];
+#endif
 
+#if 0
     [self setCloneValue: config_GetInt(p_intf, "clone-count")];
-    b_state = [o_clone_ckb state];
-    [o_clone_number_lbl setEnabled: b_state];
-    [o_clone_number_fld setEnabled: b_state];
-    [o_clone_number_stp setEnabled: b_state];
+    b_state = [_cloneCheckbox state];
+    [_cloneNumberLabel setEnabled: b_state];
+    [_cloneNumberTextField setEnabled: b_state];
+    [_cloneNumberStepper setEnabled: b_state];
 
-    b_state = [o_wall_ckb state];
+    b_state = [_wallCheckbox state];
     [self setWallRowsValue: config_GetInt(p_intf, "wall-rows")];
-    [o_wall_numofrows_lbl setEnabled: b_state];
-    [o_wall_numofrows_fld setEnabled: b_state];
-    [o_wall_numofrows_stp setEnabled: b_state];
+    [_wallNumbersOfRowsLabel setEnabled: b_state];
+    [_wallNumbersOfRowsTextField setEnabled: b_state];
+    [_wallNumbersOfRowsStepper setEnabled: b_state];
     [self setWallColumnsValue: config_GetInt(p_intf, "wall-cols")];
-    [o_wall_numofcols_lbl setEnabled: b_state];
-    [o_wall_numofcols_fld setEnabled: b_state];
-    [o_wall_numofcols_stp setEnabled: b_state];
+    [_wallNumberOfColumnsLabel setEnabled: b_state];
+    [_wallNumberOfColumnsTextField setEnabled: b_state];
+    [_wallNumberOfColumnsStepper setEnabled: b_state];
 
-    [o_threshold_color_fld setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "colorthres-color")] uppercaseString]];
-    [o_threshold_saturation_sld setIntValue: config_GetInt(p_intf, "colorthres-saturationthres")];
-    [o_threshold_saturation_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-saturationthres")]];
-    [o_threshold_similarity_sld setIntValue: config_GetInt(p_intf, "colorthres-similaritythres")];
-    [o_threshold_similarity_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-similaritythres")]];
+    [_thresholdColorTextField setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "colorthres-color")] uppercaseString]];
+    [_thresholdSaturationSlider setIntValue: config_GetInt(p_intf, "colorthres-saturationthres")];
+    [_thresholdSaturationSlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-saturationthres")]];
+    [_thresholdSimilaritySlider setIntValue: config_GetInt(p_intf, "colorthres-similaritythres")];
+    [_thresholdSimilaritySlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "colorthres-similaritythres")]];
 
-    b_state = [o_threshold_ckb state];
-    [o_threshold_color_fld setEnabled: b_state];
-    [o_threshold_color_lbl setEnabled: b_state];
-    [o_threshold_saturation_sld setEnabled: b_state];
-    [o_threshold_saturation_lbl setEnabled: b_state];
-    [o_threshold_similarity_sld setEnabled: b_state];
-    [o_threshold_similarity_lbl setEnabled: b_state];
+    b_state = [_thresholdCheckbox state];
+    [_thresholdColorTextField setEnabled: b_state];
+    [_thresholdColorLabel setEnabled: b_state];
+    [_thresholdSaturationSlider setEnabled: b_state];
+    [_thresholdSaturationLabel setEnabled: b_state];
+    [_thresholdSimilaritySlider setEnabled: b_state];
+    [_thresholdSimilarityLabel setEnabled: b_state];
 
     [self setSepiaValue: config_GetInt(p_intf, "sepia-intensity")];
-    b_state = [o_sepia_ckb state];
-    [o_sepia_fld setEnabled: b_state];
-    [o_sepia_stp setEnabled: b_state];
-    [o_sepia_lbl setEnabled: b_state];
+    b_state = [_sepiaCheckbox state];
+    [_sepiaTextField setEnabled: b_state];
+    [_sepiaStepper setEnabled: b_state];
+    [_sepiaLabel setEnabled: b_state];
 
     tmpChar = config_GetPsz(p_intf, "gradient-mode");
     tmpString = [NSString stringWithUTF8String:tmpChar];
     if ([tmpString isEqualToString:@"hough"])
-        [o_gradient_mode_pop selectItemWithTag: 3];
+        [_gradientModePopup selectItemWithTag: 3];
     else if ([tmpString isEqualToString:@"edge"])
-        [o_gradient_mode_pop selectItemWithTag: 2];
+        [_gradientModePopup selectItemWithTag: 2];
     else
-        [o_gradient_mode_pop selectItemWithTag: 1];
+        [_gradientModePopup selectItemWithTag: 1];
     FREENULL(tmpChar);
-    [o_gradient_cartoon_ckb setState: config_GetInt(p_intf, "gradient-cartoon")];
-    [o_gradient_color_ckb setState: config_GetInt(p_intf, "gradient-type")];
-    b_state = [o_gradient_ckb state];
-    [o_gradient_mode_pop setEnabled: b_state];
-    [o_gradient_mode_lbl setEnabled: b_state];
-    [o_gradient_cartoon_ckb setEnabled: b_state];
-    [o_gradient_color_ckb setEnabled: b_state];
-
-    [o_extract_fld setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "extract-component")] uppercaseString]];
-    [o_extract_fld setEnabled: [o_extract_ckb state]];
-    [o_extract_lbl setEnabled: [o_extract_ckb state]];
+    [_gradientCartoonCheckbox setState: config_GetInt(p_intf, "gradient-cartoon")];
+    [_gradientColorCheckbox setState: config_GetInt(p_intf, "gradient-type")];
+    b_state = [_gradientCheckbox state];
+    [_gradientModePopup setEnabled: b_state];
+    [_gradientModeLabel setEnabled: b_state];
+    [_gradientCartoonCheckbox setEnabled: b_state];
+    [_gradientColorCheckbox setEnabled: b_state];
+#endif
+#if 0
+    [_extractTextField setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "extract-component")] uppercaseString]];
+    [_extractTextField setEnabled: [_extractCheckbox state]];
+    [_extractLabel setEnabled: [_extractCheckbox state]];
 
     [self setPosterizeValue: config_GetInt(p_intf, "posterize-level")];
-    b_state = [o_posterize_ckb state];
-    [o_posterize_fld setEnabled: b_state];
-    [o_posterize_stp setEnabled: b_state];
-    [o_posterize_lbl setEnabled: b_state];
+    b_state = [_posterizeCheckbox state];
+    [_posterizeTextField setEnabled: b_state];
+    [_posterizeStepper setEnabled: b_state];
+    [_posterizeLabel setEnabled: b_state];
 
-    [o_blur_sld setIntValue: config_GetInt(p_intf, "blur-factor")];
-    [o_blur_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "blur-factor")]];
-    [o_blur_sld setEnabled: [o_blur_ckb state]];
-    [o_blur_lbl setEnabled: [o_blur_ckb state]];
+    [_blurSlider setIntValue: config_GetInt(p_intf, "blur-factor")];
+    [_blurSlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "blur-factor")]];
+    [_blurSlider setEnabled: [_blurCheckbox state]];
+    [_blurLabel setEnabled: [_blurCheckbox state]];
 
     tmpChar = config_GetPsz(p_intf, "marq-marquee");
     if (tmpChar) {
-        [o_addtext_text_fld setStringValue: [NSString stringWithUTF8String:tmpChar]];
+        [_addTextTextTextField setStringValue: [NSString stringWithUTF8String:tmpChar]];
         FREENULL(tmpChar);
     } else
-        [o_addtext_text_fld setStringValue: @""];
-    [o_addtext_pos_pop selectItemWithTag: config_GetInt(p_intf, "marq-position")];
-    b_state = [o_addtext_ckb state];
-    [o_addtext_pos_pop setEnabled: b_state];
-    [o_addtext_pos_lbl setEnabled: b_state];
-    [o_addtext_text_lbl setEnabled: b_state];
-    [o_addtext_text_fld setEnabled: b_state];
+        [_addTextTextTextField setStringValue: @""];
+    [_addTextPositionPopup selectItemWithTag: config_GetInt(p_intf, "marq-position")];
+    b_state = [_addTextCheckbox state];
+    [_addTextPositionPopup setEnabled: b_state];
+    [_addTextPositionLabel setEnabled: b_state];
+    [_addTextTextLabel setEnabled: b_state];
+    [_addTextTextTextField setEnabled: b_state];
 
     tmpChar = config_GetPsz(p_intf, "logo-file");
     if (tmpChar) {
-        [o_addlogo_logo_fld setStringValue: [NSString stringWithUTF8String:tmpChar]];
+        [_addLogoLogoTextField setStringValue: [NSString stringWithUTF8String:tmpChar]];
         FREENULL(tmpChar);
     } else
-        [o_addlogo_logo_fld setStringValue: @""];
-    [o_addlogo_pos_pop selectItemWithTag: config_GetInt(p_intf, "logo-position")];
-    [o_addlogo_transparency_sld setIntValue: config_GetInt(p_intf, "logo-opacity")];
-    [o_addlogo_transparency_sld setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "logo-opacity")]];
-    b_state = [o_addlogo_ckb state];
-    [o_addlogo_pos_pop setEnabled: b_state];
-    [o_addlogo_pos_lbl setEnabled: b_state];
-    [o_addlogo_logo_fld setEnabled: b_state];
-    [o_addlogo_logo_lbl setEnabled: b_state];
-    [o_addlogo_transparency_sld setEnabled: b_state];
-    [o_addlogo_transparency_lbl setEnabled: b_state];
+        [_addLogoLogoTextField setStringValue: @""];
+    [_addLogoPositionPopup selectItemWithTag: config_GetInt(p_intf, "logo-position")];
+    [_addLogoTransparencySlider setIntValue: config_GetInt(p_intf, "logo-opacity")];
+    [_addLogoTransparencySlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "logo-opacity")]];
+    b_state = [_addLogoCheckbox state];
+    [_addLogoPositionPopup setEnabled: b_state];
+    [_addLogoPositionLabel setEnabled: b_state];
+    [_addLogoLogoTextField setEnabled: b_state];
+    [_addLogoLogoLabel setEnabled: b_state];
+    [_addLogoTransparencySlider setEnabled: b_state];
+    [_addLogoTransparencyLabel setEnabled: b_state];
+#endif
 }
 
 - (NSString *)generateProfileString
 {
+    intf_thread_t *p_intf = VLCIntf;
     return [NSString stringWithFormat:@"%@;%@;%@;%lli;%f;%f;%f;%f;%f;%lli;%f;%@;%lli;%lli;%lli;%lli;%lli;%lli;%@;%lli;%lli;%lli;%lli;%lli;%@;%lli;%@;%lli;%lli;%lli;%lli;%lli;%lli;%f",
             B64EncAndFree(config_GetPsz(p_intf, "video-filter")),
             B64EncAndFree(config_GetPsz(p_intf, "sub-source")),
@@ -566,22 +570,23 @@
 
 - (IBAction)toggleWindow:(id)sender
 {
-    if ([o_window isKeyWindow])
-        [o_window orderOut:sender];
+    if ([_window isKeyWindow])
+        [_window orderOut:sender];
     else {
-        [o_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
-        [o_window makeKeyAndOrderFront:sender];
+        [_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+        [_window makeKeyAndOrderFront:sender];
     }
 }
 
 - (IBAction)profileSelectorAction:(id)sender
 {
+    intf_thread_t *p_intf = VLCIntf;
     [self saveCurrentProfile];
-    i_old_profile_index = [o_profile_pop indexOfSelectedItem];
+    i_old_profile_index = [_profilePopup indexOfSelectedItem];
     VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSUInteger selectedProfile = [o_profile_pop indexOfSelectedItem];
+    NSUInteger selectedProfile = [_profilePopup indexOfSelectedItem];
 
     /* fetch preset */
     NSArray *items = [[[defaults objectForKey:@"VideoEffectProfiles"] objectAtIndex:selectedProfile] componentsSeparatedByString:@";"];
@@ -676,7 +681,7 @@
     [self resetValues];
 }
 
-- (IBAction)addProfile:(id)sender
+- (void)addProfile:(id)sender
 {
     /* show panel */
     VLCEnterTextPanel * panel = [VLCEnterTextPanel sharedInstance];
@@ -686,7 +691,7 @@
     [panel setOKButtonLabel: _NS("Save")];
     [panel setTarget:self];
 
-    [panel runModalForWindow:o_window];
+    [panel runModalForWindow:_window];
 }
 
 - (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text
@@ -694,7 +699,7 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     if (value != NSOKButton) {
-        [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
+        [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
         return;
     }
 
@@ -702,14 +707,14 @@
 
     // duplicate names are not allowed in the popup control
     if ([text length] == 0 || [profileNames containsObject:text]) {
-        [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
+        [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
 
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setAlertStyle:NSCriticalAlertStyle];
         [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
         [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
 
-        [alert beginSheetModalForWindow:o_window
+        [alert beginSheetModalForWindow:_window
                           modalDelegate:nil
                          didEndSelector:nil
                             contextInfo:nil];
@@ -737,7 +742,7 @@
     [self resetProfileSelector];
 }
 
-- (IBAction)removeProfile:(id)sender
+- (void)removeProfile:(id)sender
 {
     /* show panel */
     VLCSelectItemInPopupPanel * panel = [VLCSelectItemInPopupPanel sharedInstance];
@@ -748,7 +753,7 @@
     [panel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"VideoEffectProfileNames"]];
     [panel setTarget:self];
 
-    [panel runModalForWindow:o_window];
+    [panel runModalForWindow:_window];
 }
 
 - (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item
@@ -756,7 +761,7 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     if (value != NSOKButton) {
-        [o_profile_pop selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
+        [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
         return;
     }
 
@@ -785,38 +790,38 @@
 #pragma mark basic
 - (IBAction)enableAdjust:(id)sender
 {
-    BOOL b_state = [o_adjust_ckb state];
+    BOOL b_state = [_adjustCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "adjust" on: b_state];
-    [o_adjust_brightness_sld setEnabled: b_state];
-    [o_adjust_brightness_ckb setEnabled: b_state];
-    [o_adjust_brightness_lbl setEnabled: b_state];
-    [o_adjust_contrast_sld setEnabled: b_state];
-    [o_adjust_contrast_lbl setEnabled: b_state];
-    [o_adjust_gamma_sld setEnabled: b_state];
-    [o_adjust_gamma_lbl setEnabled: b_state];
-    [o_adjust_hue_sld setEnabled: b_state];
-    [o_adjust_hue_lbl setEnabled: b_state];
-    [o_adjust_saturation_sld setEnabled: b_state];
-    [o_adjust_saturation_lbl setEnabled: b_state];
-    [o_adjust_reset_btn setEnabled: b_state];
+    [_adjustBrightnessSlider setEnabled: b_state];
+    [_adjustBrightnessCheckbox setEnabled: b_state];
+    [_adjustBrightnessLabel setEnabled: b_state];
+    [_adjustContrastSlider setEnabled: b_state];
+    [_adjustContrastLabel setEnabled: b_state];
+    [_adjustGammaSlider setEnabled: b_state];
+    [_adjustGammaLabel setEnabled: b_state];
+    [_adjustHueSlider setEnabled: b_state];
+    [_adjustHueLabel setEnabled: b_state];
+    [_adjustSaturationSlider setEnabled: b_state];
+    [_adjustSaturationLabel setEnabled: b_state];
+    [_adjustResetButton setEnabled: b_state];
 }
 
 - (IBAction)adjustSliderChanged:(id)sender
 {
-    if (sender == o_adjust_brightness_sld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "brightness" forFilter: "adjust" float: [o_adjust_brightness_sld floatValue]];
-    else if (sender == o_adjust_contrast_sld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "contrast" forFilter: "adjust" float: [o_adjust_contrast_sld floatValue]];
-    else if (sender == o_adjust_gamma_sld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gamma" forFilter: "adjust" float: [o_adjust_gamma_sld floatValue]];
-    else if (sender == o_adjust_hue_sld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "hue" forFilter: "adjust" float: [o_adjust_hue_sld floatValue]];
-    else if (sender == o_adjust_saturation_sld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "saturation" forFilter: "adjust" float: [o_adjust_saturation_sld floatValue]];
+    if (sender == _adjustBrightnessSlider)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "brightness" forFilter: "adjust" float: [_adjustBrightnessSlider floatValue]];
+    else if (sender == _adjustContrastSlider)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "contrast" forFilter: "adjust" float: [_adjustContrastSlider floatValue]];
+    else if (sender == _adjustGammaSlider)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gamma" forFilter: "adjust" float: [_adjustGammaSlider floatValue]];
+    else if (sender == _adjustHueSlider)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "hue" forFilter: "adjust" float: [_adjustHueSlider floatValue]];
+    else if (sender == _adjustSaturationSlider)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "saturation" forFilter: "adjust" float: [_adjustSaturationSlider floatValue]];
 
-    if (sender == o_adjust_hue_sld)
-        [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%.0f", [o_adjust_hue_sld floatValue]]];
+    if (sender == _adjustHueSlider)
+        [_adjustHueSlider setToolTip: [NSString stringWithFormat:@"%.0f", [_adjustHueSlider floatValue]]];
     else
         [sender setToolTip: [NSString stringWithFormat:@"%0.3f", [sender floatValue]]];
 }
@@ -825,34 +830,34 @@
 {
     VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
 
-    if (sender == o_adjust_reset_btn) {
-        [o_adjust_brightness_sld setFloatValue: 1.0];
-        [o_adjust_contrast_sld setFloatValue: 1.0];
-        [o_adjust_gamma_sld setFloatValue: 1.0];
-        [o_adjust_hue_sld setFloatValue: 0];
-        [o_adjust_saturation_sld setFloatValue: 1.0];
-        [o_adjust_brightness_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
-        [o_adjust_contrast_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
-        [o_adjust_gamma_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
-        [o_adjust_hue_sld setToolTip: [NSString stringWithFormat:@"%.0f", 0.0]];
-        [o_adjust_saturation_sld setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+    if (sender == _adjustResetButton) {
+        [_adjustBrightnessSlider setFloatValue: 1.0];
+        [_adjustContrastSlider setFloatValue: 1.0];
+        [_adjustGammaSlider setFloatValue: 1.0];
+        [_adjustHueSlider setFloatValue: 0];
+        [_adjustSaturationSlider setFloatValue: 1.0];
+        [_adjustBrightnessSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [_adjustContrastSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [_adjustGammaSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
+        [_adjustHueSlider setToolTip: [NSString stringWithFormat:@"%.0f", 0.0]];
+        [_adjustSaturationSlider setToolTip: [NSString stringWithFormat:@"%0.3f", 1.0]];
         [vci_si setVideoFilterProperty: "brightness" forFilter: "adjust" float: 1.0];
         [vci_si setVideoFilterProperty: "contrast" forFilter: "adjust" float: 1.0];
         [vci_si setVideoFilterProperty: "gamma" forFilter: "adjust" float: 1.0];
         [vci_si setVideoFilterProperty: "hue" forFilter: "adjust" float: 0.0];
         [vci_si setVideoFilterProperty: "saturation" forFilter: "adjust" float: 1.0];
     } else
-        [vci_si setVideoFilterProperty: "brightness-threshold" forFilter: "adjust" boolean: [o_adjust_brightness_ckb state]];
+        [vci_si setVideoFilterProperty: "brightness-threshold" forFilter: "adjust" boolean: [_adjustBrightnessCheckbox state]];
 
 }
 
 - (IBAction)enableSharpen:(id)sender
 {
-    BOOL b_state = [o_sharpen_ckb state];
+    BOOL b_state = [_sharpenCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "sharpen" on: b_state];
-    [o_sharpen_sld setEnabled: b_state];
-    [o_sharpen_lbl setEnabled: b_state];
+    [_sharpenSlider setEnabled: b_state];
+    [_sharpenLabel setEnabled: b_state];
 }
 
 - (IBAction)sharpenSliderChanged:(id)sender
@@ -863,11 +868,11 @@
 
 - (IBAction)enableBanding:(id)sender
 {
-    BOOL b_state = [o_banding_ckb state];
+    BOOL b_state = [_bandingCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "gradfun" on: b_state];
-    [o_banding_sld setEnabled: b_state];
-    [o_banding_lbl setEnabled: b_state];
+    [_bandingSlider setEnabled: b_state];
+    [_bandingLabel setEnabled: b_state];
 }
 
 - (IBAction)bandingSliderChanged:(id)sender
@@ -878,11 +883,11 @@
 
 - (IBAction)enableGrain:(id)sender
 {
-    BOOL b_state = [o_grain_ckb state];
+    BOOL b_state = [_grainCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "grain" on: b_state];
-    [o_grain_sld setEnabled: b_state];
-    [o_grain_lbl setEnabled: b_state];
+    [_grainSlider setEnabled: b_state];
+    [_grainLabel setEnabled: b_state];
 }
 
 - (IBAction)grainSliderChanged:(id)sender
@@ -897,14 +902,14 @@
 
 - (IBAction)cropObjectChanged:(id)sender
 {
-    if ([o_crop_sync_top_bottom_ckb state]) {
-        if (sender == o_crop_bottom_fld || sender == o_crop_bottom_stp)
+    if ([_cropSyncTopBottomCheckbox state]) {
+        if (sender == _cropBottomTextField || sender == _cropBottomStepper)
             [self setCropTopValue: [self cropBottomValue]];
         else
             [self setCropBottomValue: [self cropTopValue]];
     }
-    if ([o_crop_sync_left_right_ckb state]) {
-        if (sender == o_crop_right_fld || sender == o_crop_right_stp)
+    if ([_cropSyncLeftRightCheckbox state]) {
+        if (sender == _cropRightTextField || sender == _cropRightStepper)
             [self setCropLeftValue: [self cropRightValue]];
         else
             [self setCropRightValue: [self cropLeftValue]];
@@ -912,10 +917,10 @@
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
-        var_SetInteger(p_vout, "crop-top", [o_crop_top_fld intValue]);
-        var_SetInteger(p_vout, "crop-bottom", [o_crop_bottom_fld intValue]);
-        var_SetInteger(p_vout, "crop-left", [o_crop_left_fld intValue]);
-        var_SetInteger(p_vout, "crop-right", [o_crop_right_fld intValue]);
+        var_SetInteger(p_vout, "crop-top", [_cropTopTextField intValue]);
+        var_SetInteger(p_vout, "crop-bottom", [_cropBottomTextField intValue]);
+        var_SetInteger(p_vout, "crop-left", [_cropLeftTextField intValue]);
+        var_SetInteger(p_vout, "crop-right", [_cropRightTextField intValue]);
         vlc_object_release(p_vout);
     }
 }
@@ -924,13 +929,13 @@
 #pragma mark geometry
 - (IBAction)enableTransform:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "transform" on: [o_transform_ckb state]];
-    [o_transform_pop setEnabled: [o_transform_ckb state]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter: "transform" on: [_transformCheckbox state]];
+    [_transformPopup setEnabled: [_transformCheckbox state]];
 }
 
 - (IBAction)transformModifierChanged:(id)sender
 {
-    NSInteger tag = [[o_transform_pop selectedItem] tag];
+    NSInteger tag = [[_transformPopup selectedItem] tag];
     const char *psz_string = [[NSString stringWithFormat:@"%li", tag] UTF8String];
     if (tag == 1)
         psz_string = "hflip";
@@ -942,25 +947,25 @@
 
 - (IBAction)enableZoom:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "magnify" on: [o_zoom_ckb state]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter: "magnify" on: [_zoomCheckbox state]];
 }
 
 - (IBAction)enablePuzzle:(id)sender
 {
-    BOOL b_state = [o_puzzle_ckb state];
+    BOOL b_state = [_puzzleCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "puzzle" on: b_state];
-    [o_puzzle_columns_fld setEnabled: b_state];
-    [o_puzzle_columns_stp setEnabled: b_state];
-    [o_puzzle_columns_lbl setEnabled: b_state];
-    [o_puzzle_rows_fld setEnabled: b_state];
-    [o_puzzle_rows_stp setEnabled: b_state];
-    [o_puzzle_rows_lbl setEnabled: b_state];
+    [_puzzleColumnsTextField setEnabled: b_state];
+    [_puzzleColumnsStepper setEnabled: b_state];
+    [_puzzleColumnsLabel setEnabled: b_state];
+    [_puzzleRowsTextField setEnabled: b_state];
+    [_puzzleRowsStepper setEnabled: b_state];
+    [_puzzleRowsLabel setEnabled: b_state];
 }
 
 - (IBAction)puzzleModifierChanged:(id)sender
 {
-    if (sender == o_puzzle_columns_fld || sender == o_puzzle_columns_stp)
+    if (sender == _puzzleColumnsTextField || sender == _puzzleColumnsStepper)
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "puzzle-cols" forFilter: "puzzle" integer: [sender intValue]];
     else
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "puzzle-rows" forFilter: "puzzle" integer: [sender intValue]];
@@ -968,46 +973,46 @@
 
 - (IBAction)enableClone:(id)sender
 {
-    BOOL b_state = [o_clone_ckb state];
+    BOOL b_state = [_cloneCheckbox state];
 
-    if (b_state && [o_wall_ckb state]) {
-        [o_wall_ckb setState: NSOffState];
-        [self enableWall: o_wall_ckb];
+    if (b_state && [_wallCheckbox state]) {
+        [_wallCheckbox setState: NSOffState];
+        [self enableWall:_wallCheckbox];
     }
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "clone" on: b_state];
-    [o_clone_number_lbl setEnabled: b_state];
-    [o_clone_number_fld setEnabled: b_state];
-    [o_clone_number_stp setEnabled: b_state];
+    [_cloneNumberLabel setEnabled: b_state];
+    [_cloneNumberTextField setEnabled: b_state];
+    [_cloneNumberStepper setEnabled: b_state];
 }
 
 - (IBAction)cloneModifierChanged:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "clone-count" forFilter: "clone" integer: [o_clone_number_fld intValue]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "clone-count" forFilter: "clone" integer: [_cloneNumberTextField intValue]];
 }
 
 - (IBAction)enableWall:(id)sender
 {
-    BOOL b_state = [o_wall_ckb state];
+    BOOL b_state = [_wallCheckbox state];
 
-    if (b_state && [o_clone_ckb state]) {
-        [o_clone_ckb setState: NSOffState];
-        [self enableClone: o_clone_ckb];
+    if (b_state && [_cloneCheckbox state]) {
+        [_cloneCheckbox setState: NSOffState];
+        [self enableClone:_cloneCheckbox];
     }
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "wall" on: b_state];
-    [o_wall_numofcols_fld setEnabled: b_state];
-    [o_wall_numofcols_stp setEnabled: b_state];
-    [o_wall_numofcols_lbl setEnabled: b_state];
+    [_wallNumberOfColumnsTextField setEnabled: b_state];
+    [_wallNumberOfColumnsStepper setEnabled: b_state];
+    [_wallNumberOfColumnsLabel setEnabled: b_state];
 
-    [o_wall_numofrows_fld setEnabled: b_state];
-    [o_wall_numofrows_stp setEnabled: b_state];
-    [o_wall_numofrows_lbl setEnabled: b_state];
+    [_wallNumbersOfRowsTextField setEnabled: b_state];
+    [_wallNumbersOfRowsStepper setEnabled: b_state];
+    [_wallNumbersOfRowsLabel setEnabled: b_state];
 }
 
 - (IBAction)wallModifierChanged:(id)sender
 {
-    if (sender == o_wall_numofcols_fld || sender == o_wall_numofcols_stp)
+    if (sender == _wallNumberOfColumnsTextField || sender == _wallNumberOfColumnsStepper)
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "wall-cols" forFilter: "wall" integer: [sender intValue]];
     else
         [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "wall-rows" forFilter: "wall" integer: [sender intValue]];
@@ -1017,116 +1022,116 @@
 #pragma mark color
 - (IBAction)enableThreshold:(id)sender
 {
-    BOOL b_state = [o_threshold_ckb state];
+    BOOL b_state = [_thresholdCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "colorthres" on: b_state];
-    [o_threshold_color_fld setEnabled: b_state];
-    [o_threshold_color_lbl setEnabled: b_state];
-    [o_threshold_saturation_sld setEnabled: b_state];
-    [o_threshold_saturation_lbl setEnabled: b_state];
-    [o_threshold_similarity_sld setEnabled: b_state];
-    [o_threshold_similarity_lbl setEnabled: b_state];
+    [_thresholdColorTextField setEnabled: b_state];
+    [_thresholdColorLabel setEnabled: b_state];
+    [_thresholdSaturationSlider setEnabled: b_state];
+    [_thresholdSaturationLabel setEnabled: b_state];
+    [_thresholdSimilaritySlider setEnabled: b_state];
+    [_thresholdSimilarityLabel setEnabled: b_state];
 }
 
 - (IBAction)thresholdModifierChanged:(id)sender
 {
-    if (sender == o_threshold_color_fld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "colorthres-color" forFilter: "colorthres" integer: [o_threshold_color_fld intValue]];
-    else if (sender == o_threshold_saturation_sld) {
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "colorthres-saturationthres" forFilter: "colorthres" integer: [o_threshold_saturation_sld intValue]];
-        [o_threshold_saturation_sld setToolTip: [NSString stringWithFormat:@"%i", [o_threshold_saturation_sld intValue]]];
+    if (sender == _thresholdColorTextField)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "colorthres-color" forFilter: "colorthres" integer: [_thresholdColorTextField intValue]];
+    else if (sender == _thresholdSaturationSlider) {
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "colorthres-saturationthres" forFilter: "colorthres" integer: [_thresholdSaturationSlider intValue]];
+        [_thresholdSaturationSlider setToolTip: [NSString stringWithFormat:@"%i", [_thresholdSaturationSlider intValue]]];
     } else {
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "colorthres-similaritythres" forFilter: "colorthres" integer: [o_threshold_similarity_sld intValue]];
-        [o_threshold_similarity_sld setToolTip: [NSString stringWithFormat:@"%i", [o_threshold_similarity_sld intValue]]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "colorthres-similaritythres" forFilter: "colorthres" integer: [_thresholdSimilaritySlider intValue]];
+        [_thresholdSimilaritySlider setToolTip: [NSString stringWithFormat:@"%i", [_thresholdSimilaritySlider intValue]]];
     }
 }
 
 - (IBAction)enableSepia:(id)sender
 {
-    BOOL b_state = [o_sepia_ckb state];
+    BOOL b_state = [_sepiaCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "sepia" on: b_state];
-    [o_sepia_fld setEnabled: b_state];
-    [o_sepia_stp setEnabled: b_state];
-    [o_sepia_lbl setEnabled: b_state];
+    [_sepiaTextField setEnabled: b_state];
+    [_sepiaStepper setEnabled: b_state];
+    [_sepiaLabel setEnabled: b_state];
 }
 
 - (IBAction)sepiaModifierChanged:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "sepia-intensity" forFilter: "sepia" integer: [o_sepia_fld intValue]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "sepia-intensity" forFilter: "sepia" integer: [_sepiaTextField intValue]];
 }
 
 - (IBAction)enableNoise:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "noise" on: [o_noise_ckb state]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter: "noise" on: [_noiseCheckbox state]];
 }
 
 - (IBAction)enableGradient:(id)sender
 {
-    BOOL b_state = [o_gradient_ckb state];
+    BOOL b_state = [_gradientCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "gradient" on: b_state];
-    [o_gradient_mode_pop setEnabled: b_state];
-    [o_gradient_mode_lbl setEnabled: b_state];
-    [o_gradient_color_ckb setEnabled: b_state];
-    [o_gradient_cartoon_ckb setEnabled: b_state];
+    [_gradientModePopup setEnabled: b_state];
+    [_gradientModeLabel setEnabled: b_state];
+    [_gradientColorCheckbox setEnabled: b_state];
+    [_gradientCartoonCheckbox setEnabled: b_state];
 }
 
 - (IBAction)gradientModifierChanged:(id)sender
 {
-    if (sender == o_gradient_mode_pop) {
-        if ([[o_gradient_mode_pop selectedItem] tag] == 3)
+    if (sender == _gradientModePopup) {
+        if ([[_gradientModePopup selectedItem] tag] == 3)
             [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gradient-mode" forFilter: "gradient" string: "hough"];
-        else if ([[o_gradient_mode_pop selectedItem] tag] == 2)
+        else if ([[_gradientModePopup selectedItem] tag] == 2)
             [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gradient-mode" forFilter: "gradient" string: "edge"];
         else
             [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gradient-mode" forFilter: "gradient" string: "gradient"];
-    } else if (sender == o_gradient_color_ckb)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gradient-type" forFilter: "gradient" integer: [o_gradient_color_ckb state]];
+    } else if (sender == _gradientColorCheckbox)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gradient-type" forFilter: "gradient" integer: [_gradientColorCheckbox state]];
     else
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gradient-cartoon" forFilter: "gradient" boolean: [o_gradient_cartoon_ckb state]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "gradient-cartoon" forFilter: "gradient" boolean: [_gradientCartoonCheckbox state]];
 }
 
 - (IBAction)enableExtract:(id)sender
 {
-    BOOL b_state = [o_extract_ckb state];
+    BOOL b_state = [_extractCheckbox state];
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "extract" on: b_state];
-    [o_extract_fld setEnabled: b_state];
-    [o_extract_lbl setEnabled: b_state];
+    [_extractTextField setEnabled: b_state];
+    [_extractLabel setEnabled: b_state];
 }
 
 - (IBAction)extractModifierChanged:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "extract-component" forFilter: "extract" integer: [o_extract_fld intValue]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "extract-component" forFilter: "extract" integer: [_extractTextField intValue]];
 }
 
 - (IBAction)enableInvert:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "invert" on: [o_invert_ckb state]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter: "invert" on: [_invertCheckbox state]];
 }
 
 - (IBAction)enablePosterize:(id)sender
 {
-    BOOL b_state = [o_posterize_ckb state];
+    BOOL b_state = [_posterizeCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "posterize" on: b_state];
-    [o_posterize_fld setEnabled: b_state];
-    [o_posterize_stp setEnabled: b_state];
-    [o_posterize_lbl setEnabled: b_state];
+    [_posterizeTextField setEnabled: b_state];
+    [_posterizeStepper setEnabled: b_state];
+    [_posterizeLabel setEnabled: b_state];
 }
 
 - (IBAction)posterizeModifierChanged:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "posterize-level" forFilter: "posterize" integer: [o_posterize_fld intValue]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "posterize-level" forFilter: "posterize" integer: [_posterizeTextField intValue]];
 }
 
 - (IBAction)enableBlur:(id)sender
 {
-    BOOL b_state = [o_blur_ckb state];
+    BOOL b_state = [_blurCheckbox state];
 
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "motionblur" on: b_state];
-    [o_blur_sld setEnabled: b_state];
-    [o_blur_lbl setEnabled: b_state];
+    [_blurSlider setEnabled: b_state];
+    [_blurLabel setEnabled: b_state];
 }
 
 - (IBAction)blurModifierChanged:(id)sender
@@ -1137,76 +1142,76 @@
 
 - (IBAction)enableMotionDetect:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "motiondetect" on: [o_motiondetect_ckb state]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter: "motiondetect" on: [_motiondetectCheckbox state]];
 }
 
 - (IBAction)enableWaterEffect:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "ripple" on: [o_watereffect_ckb state]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter: "ripple" on: [_watereffectCheckbox state]];
 }
 
 - (IBAction)enableWaves:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "wave" on: [o_waves_ckb state]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter: "wave" on: [_wavesCheckbox state]];
 }
 
 - (IBAction)enablePsychedelic:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "psychedelic" on: [o_psychedelic_ckb state]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter: "psychedelic" on: [_psychedelicCheckbox state]];
 }
 
 #pragma mark -
 #pragma mark Miscellaneous
 - (IBAction)enableAddText:(id)sender
 {
-    BOOL b_state = [o_addtext_ckb state];
+    BOOL b_state = [_addTextCheckbox state];
     VLCCoreInteraction *vci_si = [VLCCoreInteraction sharedInstance];
 
-    [o_addtext_pos_pop setEnabled: b_state];
-    [o_addtext_pos_lbl setEnabled: b_state];
-    [o_addtext_text_lbl setEnabled: b_state];
-    [o_addtext_text_fld setEnabled: b_state];
+    [_addTextPositionPopup setEnabled: b_state];
+    [_addTextPositionLabel setEnabled: b_state];
+    [_addTextTextLabel setEnabled: b_state];
+    [_addTextTextTextField setEnabled: b_state];
     [vci_si setVideoFilter: "marq" on: b_state];
-    [vci_si setVideoFilterProperty: "marq-marquee" forFilter: "marq" string: [[o_addtext_text_fld stringValue] UTF8String]];
-    [vci_si setVideoFilterProperty: "marq-position" forFilter: "marq" integer: [[o_addtext_pos_pop selectedItem] tag]];
+    [vci_si setVideoFilterProperty: "marq-marquee" forFilter: "marq" string: [[_addTextTextTextField stringValue] UTF8String]];
+    [vci_si setVideoFilterProperty: "marq-position" forFilter: "marq" integer: [[_addTextPositionPopup selectedItem] tag]];
 }
 
 - (IBAction)addTextModifierChanged:(id)sender
 {
-    if (sender == o_addtext_text_fld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-marquee" forFilter: "marq" string:[[o_addtext_text_fld stringValue] UTF8String]];
+    if (sender == _addTextTextTextField)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-marquee" forFilter: "marq" string:[[_addTextTextTextField stringValue] UTF8String]];
     else
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-position" forFilter: "marq" integer: [[o_addtext_pos_pop selectedItem] tag]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "marq-position" forFilter: "marq" integer: [[_addTextPositionPopup selectedItem] tag]];
 }
 
 - (IBAction)enableAddLogo:(id)sender
 {
-    BOOL b_state = [o_addlogo_ckb state];
+    BOOL b_state = [_addLogoCheckbox state];
 
-    [o_addlogo_pos_pop setEnabled: b_state];
-    [o_addlogo_pos_lbl setEnabled: b_state];
-    [o_addlogo_logo_fld setEnabled: b_state];
-    [o_addlogo_logo_lbl setEnabled: b_state];
-    [o_addlogo_transparency_sld setEnabled: b_state];
-    [o_addlogo_transparency_lbl setEnabled: b_state];
+    [_addLogoPositionPopup setEnabled: b_state];
+    [_addLogoPositionLabel setEnabled: b_state];
+    [_addLogoLogoTextField setEnabled: b_state];
+    [_addLogoLogoLabel setEnabled: b_state];
+    [_addLogoTransparencySlider setEnabled: b_state];
+    [_addLogoTransparencyLabel setEnabled: b_state];
     [[VLCCoreInteraction sharedInstance] setVideoFilter: "logo" on: b_state];
 }
 
 - (IBAction)addLogoModifierChanged:(id)sender
 {
-    if (sender == o_addlogo_logo_fld)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-file" forFilter: "logo" string: [[o_addlogo_logo_fld stringValue] UTF8String]];
-    else if (sender == o_addlogo_pos_pop)
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-position" forFilter: "logo" integer: [[o_addlogo_pos_pop selectedItem] tag]];
+    if (sender == _addLogoLogoTextField)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-file" forFilter: "logo" string: [[_addLogoLogoTextField stringValue] UTF8String]];
+    else if (sender == _addLogoPositionPopup)
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-position" forFilter: "logo" integer: [[_addLogoPositionPopup selectedItem] tag]];
     else {
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-opacity" forFilter: "logo" integer: [o_addlogo_transparency_sld intValue]];
-        [o_addlogo_transparency_sld setToolTip: [NSString stringWithFormat:@"%i", [o_addlogo_transparency_sld intValue]]];
+        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty: "logo-opacity" forFilter: "logo" integer: [_addLogoTransparencySlider intValue]];
+        [_addLogoTransparencySlider setToolTip: [NSString stringWithFormat:@"%i", [_addLogoTransparencySlider intValue]]];
     }
 }
 
 - (IBAction)enableAnaglyph:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter: "anaglyph" on: [o_anaglyph_ckb state]];
+    [[VLCCoreInteraction sharedInstance] setVideoFilter: "anaglyph" on: [_anaglyphCheckbox state]];
 }
 
 @end

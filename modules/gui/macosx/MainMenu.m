@@ -1131,7 +1131,7 @@
         o_videoeffects = [[VLCVideoEffects alloc] init];
 
     if (!b_nib_videoeffects_loaded)
-        b_nib_videoeffects_loaded = [NSBundle loadNibNamed:@"VideoEffects" owner: NSApp];
+        b_nib_videoeffects_loaded = [NSBundle loadNibNamed:@"VideoEffects" owner: o_videoeffects];
 
     [o_videoeffects toggleWindow:sender];
 }
