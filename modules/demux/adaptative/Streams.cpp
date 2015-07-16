@@ -392,15 +392,17 @@ void BaseStreamOutput::setPosition(mtime_t nztime)
     {
         (*it)->drop();
     }
-    /* disable appending until restarted */
-    b_drop = true;
-    vlc_mutex_unlock(&lock);
 
     if(reinitsOnSeek())
+    {
+        /* disable appending until restarted */
+        b_drop = true;
+        vlc_mutex_unlock(&lock);
         restart();
+        vlc_mutex_lock(&lock);
+        b_drop = false;
+    }
 
-    vlc_mutex_lock(&lock);
-    b_drop = false;
     pcr = VLC_TS_INVALID;
     vlc_mutex_unlock(&lock);
 
