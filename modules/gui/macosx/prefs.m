@@ -1,7 +1,7 @@
 /*****************************************************************************
  * prefs.m: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -84,7 +84,7 @@
 - (NSString *)name;
 - (NSMutableArray *)children;
 - (NSMutableArray *)options;
-- (void)showView:(NSScrollView *)o_prefs_view;
+- (void)showView:(NSScrollView *)prefsView;
 - (void)applyChanges;
 - (void)resetView;
 
@@ -147,9 +147,8 @@
 
 @interface VLCPrefs()
 {
-    intf_thread_t *p_intf;
     VLCTreeMainItem * _rootTreeItem;
-    NSView *o_empty_view;
+    NSView *o_emptyView;
     NSMutableDictionary *o_save_prefs;
 }
 @end
@@ -168,52 +167,38 @@
     return sharedInstance;
 }
 
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        p_intf = VLCIntf;
-        o_empty_view = [[NSView alloc] init];
-        _rootTreeItem = [[VLCTreeMainItem alloc] init];
-    }
-    return self;
-}
-
 - (void)awakeFromNib
 {
-    p_intf = VLCIntf;
+    o_emptyView = [[NSView alloc] init];
+    _rootTreeItem = [[VLCTreeMainItem alloc] init];
 
-    [o_prefs_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
-    [o_prefs_window setHidesOnDeactivate:YES];
+    [_prefsWindow setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [_prefsWindow setHidesOnDeactivate:YES];
 
-    [self initStrings];
-    [o_prefs_view setBorderType: NSGrooveBorder];
-    [o_prefs_view setHasVerticalScroller: YES];
-    [o_prefs_view setDrawsBackground: NO];
-    [o_prefs_view setDocumentView: o_empty_view];
-    [o_tree selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
+    [_prefsWindow setTitle: _NS("Preferences")];
+    [_saveButton setTitle: _NS("Save")];
+    [_cancelButton setTitle: _NS("Cancel")];
+    [_resetButton setTitle: _NS("Reset All")];
+    [_showBasicButton setTitle: _NS("Show Basic")];
+
+    [_prefsView setBorderType: NSGrooveBorder];
+    [_prefsView setHasVerticalScroller: YES];
+    [_prefsView setDrawsBackground: NO];
+    [_prefsView setDocumentView: o_emptyView];
+    [_tree selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
 }
 
 - (void)setTitle: (NSString *) o_title_name
 {
-    [o_title setStringValue: o_title_name];
+    [_titleLabel setStringValue: o_title_name];
 }
 
-- (void)showPrefsWithLevel:(NSInteger)i_window_level
+- (void)showPrefsWithLevel:(NSInteger)iWindow_level
 {
-    [o_prefs_window setLevel: i_window_level];
-    [o_prefs_window center];
-    [o_prefs_window makeKeyAndOrderFront:self];
+    [_prefsWindow setLevel: iWindow_level];
+    [_prefsWindow center];
+    [_prefsWindow makeKeyAndOrderFront:self];
     [_rootTreeItem resetView];
-}
-
-- (void)initStrings
-{
-    [o_prefs_window setTitle: _NS("Preferences")];
-    [o_save_btn setTitle: _NS("Save")];
-    [o_cancel_btn setTitle: _NS("Cancel")];
-    [o_reset_btn setTitle: _NS("Reset All")];
-    [o_showBasic_btn setTitle: _NS("Show Basic")];
 }
 
 - (IBAction)savePrefs: (id)sender
@@ -221,19 +206,24 @@
     /* TODO: call savePrefs on Root item */
     [_rootTreeItem applyChanges];
     [[VLCCoreInteraction sharedInstance] fixPreferences];
-    config_SaveConfigFile(p_intf);
-    [o_prefs_window orderOut:self];
+    config_SaveConfigFile(VLCIntf);
+    [_prefsWindow orderOut:self];
 }
 
 - (IBAction)closePrefs: (id)sender
 {
-    [o_prefs_window orderOut:self];
+    [_prefsWindow orderOut:self];
 }
 
-- (IBAction)buttonAction: (id)sender
+- (IBAction)showSimplePrefs: (id)sender
 {
-    [o_prefs_window orderOut: self];
+    [_prefsWindow orderOut: self];
     [[[VLCMain sharedInstance] simplePreferences] showSimplePrefs];
+}
+
+- (IBAction)resetPrefs:(id)sender
+{
+#warning implement me
 }
 
 - (void)loadConfigTree
@@ -247,8 +237,8 @@
 /* update the document view to the view of the selected tree item */
 - (void)outlineViewSelectionDidChange:(NSNotification *)o_notification
 {
-    [[o_tree itemAtRow:[o_tree selectedRow]] showView: o_prefs_view];
-    [o_tree expandItem:[o_tree itemAtRow:[o_tree selectedRow]]];
+    [[_tree itemAtRow:[_tree selectedRow]] showView: _prefsView];
+    [_tree expandItem:[_tree itemAtRow:[_tree selectedRow]]];
 }
 
 @end
@@ -276,6 +266,140 @@
     return (item == nil) ? @"" : [item name];
 }
 
+@end
+
+#pragma mark -
+#pragma mark (Root class for all TreeItems)
+@implementation VLCTreeItem
+
+- (id)initWithName:(NSString*)name
+{
+    self = [super init];
+    if (self != nil)
+        _name = name;
+
+    return self;
+}
+
+- (VLCTreeItem *)childAtIndex:(NSInteger)i_index
+{
+    return [[self children] objectAtIndex:i_index];
+}
+
+- (int)numberOfChildren
+{
+    return [[self children] count];
+}
+
+- (NSString *)name
+{
+    return _name;
+}
+
+- (void)showView:(NSScrollView *)prefsView
+{
+    NSRect s_vrc;
+    NSView *view;
+
+    [[VLCPrefs sharedInstance] setTitle: [self name]];
+    s_vrc = [[prefsView contentView] bounds]; s_vrc.size.height -= 4;
+    view = [[NSView alloc] initWithFrame: s_vrc];
+    [view setAutoresizingMask: NSViewWidthSizable | NSViewMinYMargin | NSViewMaxYMargin];
+
+    if (!_subviews) {
+        _subviews = [[NSMutableArray alloc] initWithCapacity:10];
+
+        NSUInteger count = [[self options] count];
+        for (NSUInteger i = 0; i < count; i++) {
+            VLCTreeLeafItem * item = [[self options] objectAtIndex:i];
+
+            VLCConfigControl *control;
+            control = [VLCConfigControl newControl:[item configItem] withView:view];
+            if (control) {
+                [control setAutoresizingMask: NSViewMaxYMargin | NSViewWidthSizable];
+                [_subviews addObject: control];
+            }
+        }
+    }
+
+    assert(view);
+
+    int i_lastItem = 0;
+    int i_yPos = -2;
+    int i_max_label = 0;
+
+    NSEnumerator *enumerator = [_subviews objectEnumerator];
+    VLCConfigControl *widget;
+    NSRect frame;
+
+    while((widget = [enumerator nextObject])) {
+        if (i_max_label < [widget labelSize])
+            i_max_label = [widget labelSize];
+    }
+
+    enumerator = [_subviews objectEnumerator];
+    while((widget = [enumerator nextObject])) {
+        int i_widget;
+
+        i_widget = [widget viewType];
+        i_yPos += [VLCConfigControl calcVerticalMargin:i_widget lastItem:i_lastItem];
+        [widget setYPos:i_yPos];
+        frame = [widget frame];
+        frame.size.width = [view frame].size.width - LEFTMARGIN - RIGHTMARGIN;
+        [widget setFrame:frame];
+        [widget alignWithXPosition: i_max_label];
+        i_yPos += [widget frame].size.height;
+        i_lastItem = i_widget;
+        [view addSubview:widget];
+    }
+
+    frame = [view frame];
+    frame.size.height = i_yPos;
+    [view setFrame:frame];
+    [prefsView setDocumentView:view];
+}
+
+- (void)applyChanges
+{
+    NSUInteger i;
+    NSUInteger count = [_subviews count];
+    for (i = 0 ; i < count ; i++)
+        [[_subviews objectAtIndex:i] applyChanges];
+
+    count = [_children count];
+    for (i = 0 ; i < count ; i++)
+        [[_children objectAtIndex:i] applyChanges];
+}
+
+- (void)resetView
+{
+    NSUInteger count = [_subviews count];
+    for (NSUInteger i = 0 ; i < count ; i++)
+        [[_subviews objectAtIndex:i] resetValues];
+
+    count = [_options count];
+    for (NSUInteger i = 0 ; i < count ; i++)
+        [[_options objectAtIndex:i] resetView];
+
+    count = [_children count];
+    for (NSUInteger i = 0 ; i < count ; i++)
+        [[_children objectAtIndex:i] resetView];
+
+}
+
+- (NSMutableArray *)children
+{
+    if (!_children)
+        _children = [[NSMutableArray alloc] init];
+    return _children;
+}
+
+- (NSMutableArray *)options
+{
+    if (!_options)
+        _options = [[NSMutableArray alloc] init];
+    return _options;
+}
 @end
 
 #pragma mark -
@@ -312,8 +436,6 @@
 {
     if (_children) return _children;
     _children = [[NSMutableArray alloc] init];
-
-    intf_thread_t   *p_intf = VLCIntf;
 
     /* List the modules */
     size_t count, i;
@@ -501,148 +623,4 @@
 {
     return _configItem;
 }
-@end
-
-#pragma mark -
-#pragma mark (Root class for all TreeItems)
-@implementation VLCTreeItem
-
-- (id)initWithName:(NSString*)name
-{
-    self = [super init];
-    if (self != nil)
-        _name = name;
-
-    return self;
-}
-
-- (VLCTreeItem *)childAtIndex:(NSInteger)i_index
-{
-    return [[self children] objectAtIndex:i_index];
-}
-
-- (int)numberOfChildren
-{
-    return [[self children] count];
-}
-
-- (NSString *)name
-{
-    return _name;
-}
-
-- (void)showView:(NSScrollView *)prefsView
-{
-    NSRect          s_vrc;
-    NSView          *view;
-
-    [[VLCPrefs sharedInstance] setTitle: [self name]];
-    s_vrc = [[prefsView contentView] bounds]; s_vrc.size.height -= 4;
-    view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
-    [view setAutoresizingMask: NSViewWidthSizable | NSViewMinYMargin | NSViewMaxYMargin];
-
-    if (!_subviews) {
-        _subviews = [[NSMutableArray alloc] initWithCapacity:10];
-
-        NSUInteger count = [[self options] count];
-        for (NSUInteger i = 0; i < count; i++) {
-            VLCTreeLeafItem * item = [[self options] objectAtIndex:i];
-
-            VLCConfigControl *control;
-            control = [VLCConfigControl newControl:[item configItem] withView:view];
-            if (control) {
-                [control setAutoresizingMask: NSViewMaxYMargin | NSViewWidthSizable];
-                [_subviews addObject: control];
-            }
-        }
-    }
-
-    assert(view);
-
-    int i_lastItem = 0;
-    int i_yPos = -2;
-    int i_max_label = 0;
-
-    NSEnumerator *enumerator = [_subviews objectEnumerator];
-    VLCConfigControl *widget;
-    NSRect frame;
-
-    while((widget = [enumerator nextObject])) {
-        if (i_max_label < [widget labelSize])
-            i_max_label = [widget labelSize];
-    }
-
-    enumerator = [_subviews objectEnumerator];
-    while((widget = [enumerator nextObject])) {
-        int i_widget;
-
-        i_widget = [widget viewType];
-        i_yPos += [VLCConfigControl calcVerticalMargin:i_widget lastItem:i_lastItem];
-        [widget setYPos:i_yPos];
-        frame = [widget frame];
-        frame.size.width = [view frame].size.width - LEFTMARGIN - RIGHTMARGIN;
-        [widget setFrame:frame];
-        [widget alignWithXPosition: i_max_label];
-        i_yPos += [widget frame].size.height;
-        i_lastItem = i_widget;
-        [view addSubview:widget];
-    }
-
-    frame = [view frame];
-    frame.size.height = i_yPos;
-    [view setFrame:frame];
-    [prefsView setDocumentView:view];
-}
-
-- (void)applyChanges
-{
-    NSUInteger i;
-    NSUInteger count = [_subviews count];
-    for (i = 0 ; i < count ; i++)
-        [[_subviews objectAtIndex:i] applyChanges];
-
-    count = [_children count];
-    for (i = 0 ; i < count ; i++)
-        [[_children objectAtIndex:i] applyChanges];
-}
-
-- (void)resetView
-{
-    NSUInteger count = [_subviews count];
-    for (NSUInteger i = 0 ; i < count ; i++)
-        [[_subviews objectAtIndex:i] resetValues];
-
-    count = [_options count];
-    for (NSUInteger i = 0 ; i < count ; i++)
-        [[_options objectAtIndex:i] resetView];
-
-    count = [_children count];
-    for (NSUInteger i = 0 ; i < count ; i++)
-        [[_children objectAtIndex:i] resetView];
-
-}
-
-- (NSMutableArray *)children
-{
-    if (!_children)
-        _children = [[NSMutableArray alloc] init];
-    return _children;
-}
-
-- (NSMutableArray *)options
-{
-    if (!_options)
-        _options = [[NSMutableArray alloc] init];
-    return _options;
-}
-@end
-
-#pragma mark -
-@implementation VLCFlippedView
-
-- (BOOL)isFlipped
-{
-    return(YES);
-}
-
 @end
