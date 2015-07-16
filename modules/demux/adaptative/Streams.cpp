@@ -556,7 +556,7 @@ es_out_id_t * BaseStreamOutput::esOutAdd(const es_format_t *p_fmt)
                     p_fmt->i_extra == pair->fmtcpy.i_extra &&
                     !memcmp(p_fmt->p_extra, pair->fmtcpy.p_extra, p_fmt->i_extra) )
             {
-                msg_Err(realdemux, "using recycled");
+                msg_Dbg(realdemux, "reusing output for codec %4.4s", (char*)&p_fmt->i_codec);
                 pair->recycle = false;
                 p_es = pair->es_id;
             }
