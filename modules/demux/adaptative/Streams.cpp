@@ -174,6 +174,7 @@ size_t Stream::read(HTTPConnectionManager *connManager)
     }
 
     size_t readsize = 0;
+    bool b_segment_head_chunk = false;
 
     /* New chunk, do query */
     if(chunk->getBytesRead() == 0)
@@ -185,6 +186,7 @@ size_t Stream::read(HTTPConnectionManager *connManager)
             delete chunk;
             return 0;
         }
+        b_segment_head_chunk = true;
     }
 
     /* Because we don't know Chunk size at start, we need to get size
@@ -234,7 +236,7 @@ size_t Stream::read(HTTPConnectionManager *connManager)
     readsize = block->i_buffer;
 
     if(output)
-        output->pushBlock(block);
+        output->pushBlock(block, b_segment_head_chunk);
     else
         block_Release(block);
 
@@ -371,7 +373,7 @@ int BaseStreamOutput::esCount() const
     return queues.size();
 }
 
-void BaseStreamOutput::pushBlock(block_t *block)
+void BaseStreamOutput::pushBlock(block_t *block, bool)
 {
     stream_DemuxSend(demuxstream, block);
 }

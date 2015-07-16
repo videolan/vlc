@@ -102,7 +102,7 @@ namespace adaptative
         virtual ~AbstractStreamOutput();
 
         const StreamFormat & getStreamFormat() const;
-        virtual void pushBlock(block_t *) = 0;
+        virtual void pushBlock(block_t *, bool) = 0;
         virtual mtime_t getPCR() const;
         virtual mtime_t getFirstDTS() const = 0;
         virtual int getGroup() const;
@@ -134,7 +134,7 @@ namespace adaptative
     public:
         BaseStreamOutput(demux_t *, const StreamFormat &, const std::string &);
         virtual ~BaseStreamOutput();
-        virtual void pushBlock(block_t *); /* reimpl */
+        virtual void pushBlock(block_t *, bool); /* reimpl */
         virtual mtime_t getFirstDTS() const; /* reimpl */
         virtual int esCount() const; /* reimpl */
         virtual bool seekAble() const; /* reimpl */
