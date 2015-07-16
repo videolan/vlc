@@ -276,7 +276,7 @@ void Stream::prune()
 AbstractStreamOutput::AbstractStreamOutput(demux_t *demux, const StreamFormat &format_)
 {
     realdemux = demux;
-    pcr = VLC_TS_0;
+    pcr = VLC_TS_INVALID;
     group = 0;
     format = format_;
 }

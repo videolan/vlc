@@ -227,8 +227,9 @@ static int Demux(demux_t *p_demux)
         {
             return VLC_DEMUXER_EOF;
         }
-        mtime_t i_dts = p_sys->p_manager->getFirstDTS();
-        p_sys->i_nzpcr = i_dts;
+        p_sys->i_nzpcr = p_sys->p_manager->getFirstDTS();
+        if(p_sys->i_nzpcr == VLC_TS_INVALID)
+            p_sys->i_nzpcr = p_sys->p_manager->getPCR();
     }
 
     Stream::status status =
