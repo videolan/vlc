@@ -42,3 +42,9 @@ libaribcam_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(ARIBB25_LDFLAGS) -rpath '$(stream
 libaribcam_plugin_la_LIBADD = $(ARIBB25_LIBS)
 stream_filter_LTLIBRARIES += $(LTLIBaribcam)
 EXTRA_LTLIBRARIES += libaribcam_plugin.la
+
+libaccesstweaks_plugin_la_SOURCES = stream_filter/accesstweaks.c
+libaccesstweaks_plugin_la_CFLAGS = $(AM_CFLAGS)
+libaccesstweaks_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(stream_filterdir)'
+stream_filter_LTLIBRARIES += $(LTLIBaccesstweaks)
+EXTRA_LTLIBRARIES += libaccesstweaks_plugin.la

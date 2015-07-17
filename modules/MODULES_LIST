@@ -22,6 +22,7 @@ $Id$
  * access_output_udp: UDP Network access_output module
  * access_realrtsp: Real RTSP access
  * access_wasapi: WASAPI audio input
+ * accesstweaks: access control tweaking module (dev tool)
  * adaptative: Unified adaptative streaming module (DASH/HLS)
  * addonsfsstorage: Local storage extensions repository
  * addonsvorepository: Videolan extensions repository
