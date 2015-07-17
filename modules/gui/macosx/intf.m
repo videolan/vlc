@@ -1285,7 +1285,7 @@ audio_output_t *getAout(void)
         o_sprefs = [[VLCSimplePrefs alloc] init];
 
     if (!nib_prefs_loaded)
-        nib_prefs_loaded = [NSBundle loadNibNamed:@"Preferences" owner: NSApp];
+        nib_prefs_loaded = [NSBundle loadNibNamed:@"SimplePreferences" owner: o_sprefs];
 
     return o_sprefs;
 }
@@ -1296,7 +1296,7 @@ audio_output_t *getAout(void)
         o_prefs = [[VLCPrefs alloc] init];
 
     if (!nib_prefs_loaded)
-        nib_prefs_loaded = [NSBundle loadNibNamed:@"Preferences" owner: NSApp];
+        nib_prefs_loaded = [NSBundle loadNibNamed:@"Preferences" owner: o_prefs];
 
     return o_prefs;
 }
