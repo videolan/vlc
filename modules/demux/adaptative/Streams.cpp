@@ -141,6 +141,11 @@ bool Stream::seekAble() const
     return (output && output->seekAble());
 }
 
+bool Stream::isSelected() const
+{
+    return output && output->isSelected();
+}
+
 Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_deadline, bool send)
 {
     if(!output)
@@ -440,6 +445,21 @@ bool BaseStreamOutput::switchAllowed() const
     b_allowed = !restarting;
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return b_allowed;
+}
+
+bool BaseStreamOutput::isSelected() const
+{
+    bool b_selected = false;
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    std::list<Demuxed *>::const_iterator it;
+    for(it=queues.begin(); it!=queues.end() && !b_selected; ++it)
+    {
+        const Demuxed *pair = *it;
+        if(pair->es_id)
+            es_out_Control(realdemux->out, ES_OUT_GET_ES_STATE, pair->es_id, &b_selected);
+    }
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return b_selected;
 }
 
 void BaseStreamOutput::sendToDecoder(mtime_t nzdeadline)

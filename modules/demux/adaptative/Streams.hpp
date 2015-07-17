@@ -74,6 +74,7 @@ namespace adaptative
         int getGroup() const;
         int esCount() const;
         bool seekAble() const;
+        bool isSelected() const;
         typedef enum {status_eof, status_buffering, status_demuxed} status;
         status demux(HTTPConnectionManager *, mtime_t, bool);
         bool setPosition(mtime_t, bool);
@@ -112,6 +113,7 @@ namespace adaptative
         virtual void sendToDecoder(mtime_t) = 0;
         virtual bool reinitsOnSeek() const = 0;
         virtual bool switchAllowed() const = 0;
+        virtual bool isSelected() const = 0;
 
     protected:
         demux_t  *realdemux;
@@ -142,6 +144,7 @@ namespace adaptative
         virtual void sendToDecoder(mtime_t); /* reimpl */
         virtual bool reinitsOnSeek() const; /* reimpl */
         virtual bool switchAllowed() const; /* reimpl */
+        virtual bool isSelected() const; /* reimpl */
         void setTimestampOffset(mtime_t);
 
     protected:
