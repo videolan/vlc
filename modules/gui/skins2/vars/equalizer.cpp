@@ -60,7 +60,7 @@ EqualizerBands::~EqualizerBands()
 
 void EqualizerBands::set( std::string bands )
 {
-    float val;
+    float val = 0.0f;
     std::stringstream ss( bands );
 
     m_isUpdating = true;
