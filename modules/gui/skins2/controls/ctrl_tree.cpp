@@ -31,6 +31,7 @@
 #include "../src/generic_bitmap.hpp"
 #include "../src/generic_font.hpp"
 #include "../src/scaled_bitmap.hpp"
+#include "../src/dialogs.hpp"
 #include "../utils/position.hpp"
 #include "../utils/ustring.hpp"
 #include "../events/evt_key.hpp"
@@ -382,8 +383,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
         {
             // other keys to be forwarded to vlc core
             EvtKey& rEvtKey = (EvtKey&)rEvent;
-            var_SetInteger( getIntf()->p_libvlc, "key-pressed",
-                            rEvtKey.getModKey() );
+            getIntf()->p_sys->p_dialogs->sendKey( rEvtKey.getModKey() );
         }
     }
 
