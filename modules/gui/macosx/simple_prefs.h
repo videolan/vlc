@@ -27,8 +27,6 @@
 
 @interface VLCSimplePrefs : NSObject
 
-+ (VLCSimplePrefs *)sharedInstance;
-
 @property (readwrite, weak) IBOutlet NSPopUpButton *audio_dolbyPopup;
 @property (readwrite, weak) IBOutlet NSTextField *audio_dolbyLabel;
 @property (readwrite, weak) IBOutlet NSBox *audio_effectsBox;
