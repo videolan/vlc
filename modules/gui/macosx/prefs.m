@@ -75,6 +75,7 @@
     NSMutableArray *_options;
     NSMutableArray *_subviews;
 }
+@property (readwrite, weak) VLCPrefs *prefsViewController;
 
 - (id)initWithName:(NSString*)name;
 
@@ -84,7 +85,7 @@
 - (NSString *)name;
 - (NSMutableArray *)children;
 - (NSMutableArray *)options;
-- (void)showView:(NSScrollView *)prefsView;
+- (void)showView;
 - (void)applyChanges;
 - (void)resetView;
 
@@ -131,7 +132,6 @@
     module_config_t * _configItem;
 }
 - (id)initWithConfigItem:(module_config_t *)configItem;
-
 - (module_config_t *)configItem;
 @end
 
@@ -147,25 +147,13 @@
 
 @interface VLCPrefs()
 {
-    VLCTreeMainItem * _rootTreeItem;
+    VLCTreeMainItem *_rootTreeItem;
     NSView *o_emptyView;
     NSMutableDictionary *o_save_prefs;
 }
 @end
 
 @implementation VLCPrefs
-
-+ (VLCPrefs *)sharedInstance
-{
-    static VLCPrefs *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCPrefs new];
-    });
-
-    return sharedInstance;
-}
 
 - (void)awakeFromNib
 {
@@ -190,14 +178,14 @@
 
 - (void)setTitle: (NSString *) o_title_name
 {
-    [_titleLabel setStringValue: o_title_name];
+    [self.titleLabel setStringValue: o_title_name];
 }
 
 - (void)showPrefsWithLevel:(NSInteger)iWindow_level
 {
-    [_prefsWindow setLevel: iWindow_level];
-    [_prefsWindow center];
-    [_prefsWindow makeKeyAndOrderFront:self];
+    [self.prefsWindow setLevel: iWindow_level];
+    [self.prefsWindow center];
+    [self.prefsWindow makeKeyAndOrderFront:self];
     [_rootTreeItem resetView];
 }
 
@@ -237,7 +225,9 @@
 /* update the document view to the view of the selected tree item */
 - (void)outlineViewSelectionDidChange:(NSNotification *)o_notification
 {
-    [[_tree itemAtRow:[_tree selectedRow]] showView: _prefsView];
+    VLCTreeItem *treeItem = [_tree itemAtRow:[_tree selectedRow]];
+    treeItem.prefsViewController = self;
+    [treeItem showView];
     [_tree expandItem:[_tree itemAtRow:[_tree selectedRow]]];
 }
 
@@ -296,12 +286,13 @@
     return _name;
 }
 
-- (void)showView:(NSScrollView *)prefsView
+- (void)showView
 {
+    NSScrollView *prefsView = self.prefsViewController.prefsView;
     NSRect s_vrc;
     NSView *view;
 
-    [[VLCPrefs sharedInstance] setTitle: [self name]];
+    [self.prefsViewController setTitle: [self name]];
     s_vrc = [[prefsView contentView] bounds]; s_vrc.size.height -= 4;
     view = [[NSView alloc] initWithFrame: s_vrc];
     [view setAutoresizingMask: NSViewWidthSizable | NSViewMinYMargin | NSViewMaxYMargin];

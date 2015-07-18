@@ -29,8 +29,6 @@
  *****************************************************************************/
 @interface VLCPrefs : NSObject
 
-+ (VLCPrefs *)sharedInstance;
-
 @property (readwrite, weak) IBOutlet NSWindow *prefsWindow;
 @property (readwrite, weak) IBOutlet NSTextField *titleLabel;
 @property (readwrite, weak) IBOutlet NSOutlineView *tree;
