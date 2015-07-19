@@ -24,6 +24,7 @@
 
 #include "logic/AbstractAdaptationLogic.h"
 #include "Streams.hpp"
+#include <vector>
 
 namespace adaptative
 {
@@ -74,7 +75,7 @@ namespace adaptative
             AbstractPlaylist                    *playlist;
             AbstractStreamOutputFactory         *streamOutputFactory;
             stream_t                            *stream;
-            Stream                              *streams[StreamTypeCount];
+            std::vector<Stream *>                streams;
             mtime_t                              nextPlaylistupdate;
     };
 

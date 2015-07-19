@@ -107,11 +107,10 @@ bool DASHManager::updatePlaylist()
         }
 
         mtime_t minsegmentTime = 0;
-        for(int type=0; type<StreamTypeCount; type++)
+        std::vector<Stream *>::iterator it;
+        for(it=streams.begin(); it!=streams.end(); it++)
         {
-            if(!streams[type])
-                continue;
-            mtime_t segmentTime = streams[type]->getPosition();
+            mtime_t segmentTime = (*it)->getPosition();
             if(!minsegmentTime || segmentTime < minsegmentTime)
                 minsegmentTime = segmentTime;
         }

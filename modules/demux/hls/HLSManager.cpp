@@ -121,11 +121,10 @@ bool HLSManager::updatePlaylist()
         delete updatedplaylist;
 
         /* pruning */
-        for(int type=0; type<StreamTypeCount; type++)
+        std::vector<Stream *>::iterator it;
+        for(it=streams.begin(); it!=streams.end(); ++it)
         {
-            if(!streams[type])
-                continue;
-            streams[type]->prune();
+            (*it)->prune();
         }
     }
     else

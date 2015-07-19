@@ -51,16 +51,16 @@ PlaylistManager::PlaylistManager( AbstractPlaylist *pl,
              stream         ( stream ),
              nextPlaylistupdate  ( 0 )
 {
-    for(int i=0; i<StreamTypeCount; i++)
-        streams[i] = NULL;
 }
 
 PlaylistManager::~PlaylistManager   ()
 {
     delete conManager;
     delete streamOutputFactory;
-    for(int i=0; i<StreamTypeCount; i++)
-        delete streams[i];
+    std::vector<Stream *>::iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
+        delete *it;
+    streams.clear();
 }
 
 bool PlaylistManager::start(demux_t *demux)
@@ -75,14 +75,13 @@ bool PlaylistManager::start(demux_t *demux)
         const BaseAdaptationSet *set = period->getAdaptationSet(type);
         if(set)
         {
-            streams[type] = new (std::nothrow) Stream(demux, type, set->getStreamFormat());
-            if(!streams[type])
+            Stream *st = new (std::nothrow) Stream(demux, type, set->getStreamFormat());
+            if(!st)
                 continue;
             AbstractAdaptationLogic *logic = createLogic(logicType);
             if(!logic)
             {
-                delete streams[type];
-                streams[type] = NULL;
+                delete st;
                 continue;
             }
 
@@ -90,13 +89,15 @@ bool PlaylistManager::start(demux_t *demux)
             try
             {
                 if(!tracker || !streamOutputFactory)
+                {
+                    delete tracker;
+                    delete logic;
                     throw VLC_ENOMEM;
-                streams[type]->create(logic, tracker, streamOutputFactory);
+                }
+                st->create(logic, tracker, streamOutputFactory);
+                streams.push_back(st);
             } catch (int) {
-                delete streams[type];
-                delete logic;
-                delete tracker;
-                streams[type] = NULL;
+                delete st;
             }
         }
     }
@@ -115,13 +116,10 @@ Stream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
 {
     Stream::status i_return = Stream::status_eof;
 
-    for(int type=0; type<StreamTypeCount; type++)
+    std::vector<Stream *>::iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if(!streams[type])
-            continue;
-
-        Stream::status i_ret =
-                streams[type]->demux(conManager, nzdeadline, send);
+        Stream::status i_ret = (*it)->demux(conManager, nzdeadline, send);
 
         if(i_ret == Stream::status_buffering)
         {
@@ -140,12 +138,11 @@ Stream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
 mtime_t PlaylistManager::getPCR() const
 {
     mtime_t pcr = VLC_TS_INVALID;
-    for(int type=0; type<StreamTypeCount; type++)
+    std::vector<Stream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if(!streams[type])
-            continue;
-        if(pcr == VLC_TS_INVALID || pcr > streams[type]->getPCR())
-            pcr = streams[type]->getPCR();
+        if(pcr == VLC_TS_INVALID || pcr > (*it)->getPCR())
+            pcr = (*it)->getPCR();
     }
     return pcr;
 }
@@ -153,23 +150,21 @@ mtime_t PlaylistManager::getPCR() const
 mtime_t PlaylistManager::getFirstDTS() const
 {
     mtime_t dts = VLC_TS_INVALID;
-    for(int type=0; type<StreamTypeCount; type++)
+    std::vector<Stream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if(!streams[type])
-            continue;
-        if(dts == VLC_TS_INVALID || dts > streams[type]->getFirstDTS())
-            dts = streams[type]->getFirstDTS();
+        if(dts == VLC_TS_INVALID || dts > (*it)->getFirstDTS())
+            dts = (*it)->getFirstDTS();
     }
     return dts;
 }
 
 int PlaylistManager::getGroup() const
 {
-    for(int type=0; type<StreamTypeCount; type++)
+    std::vector<Stream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if(!streams[type])
-            continue;
-        return streams[type]->getGroup();
+        return (*it)->getGroup();
     }
     return -1;
 }
@@ -177,11 +172,10 @@ int PlaylistManager::getGroup() const
 int PlaylistManager::esCount() const
 {
     int es = 0;
-    for(int type=0; type<StreamTypeCount; type++)
+    std::vector<Stream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if(!streams[type])
-            continue;
-        es += streams[type]->esCount();
+        es += (*it)->esCount();
     }
     return es;
 }
@@ -200,11 +194,10 @@ bool PlaylistManager::setPosition(mtime_t time)
     for(int real = 0; real < 2; real++)
     {
         /* Always probe if we can seek first */
-        for(int type=0; type<StreamTypeCount; type++)
+        std::vector<Stream *>::iterator it;
+        for(it=streams.begin(); it!=streams.end(); ++it)
         {
-            if(!streams[type])
-                continue;
-            ret &= streams[type]->setPosition(time, !real);
+            ret &= (*it)->setPosition(time, !real);
         }
         if(!ret)
             break;
@@ -217,11 +210,10 @@ bool PlaylistManager::seekAble() const
     if(playlist->isLive())
         return false;
 
-    for(int type=0; type<StreamTypeCount; type++)
+    std::vector<Stream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        if(!streams[type])
-            continue;
-        if(!streams[type]->seekAble())
+        if(!(*it)->seekAble())
             return false;
     }
     return true;
