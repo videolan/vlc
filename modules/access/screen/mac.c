@@ -121,6 +121,7 @@ int screen_InitCapture(demux_t *p_demux)
     p_sys->fmt.video.i_rmask          = 0x00ff0000;
     p_sys->fmt.video.i_gmask          = 0x0000ff00;
     p_sys->fmt.video.i_bmask          = 0x000000ff;
+    p_sys->fmt.video.i_sar_num = p_sys->fmt.video.i_sar_den = 1;
 
     return VLC_SUCCESS;
 }
