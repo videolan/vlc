@@ -1017,7 +1017,7 @@
         if (mediaListCount > 30) {
             for (NSUInteger x = 0; x < mediaListCount - 30; x++) {
                 [mutDict removeObjectForKey:[mediaList firstObject]];
-                [mediaList removefirstObject];
+                [mediaList removeObjectAtIndex:0];
             }
         }
     } else {
