@@ -55,6 +55,8 @@ struct screen_data_t
     int screen_width;
     int screen_height;
 
+    float rate;
+
     CGDirectDisplayID display_id;
 
     CGContextRef offscreen_context;
@@ -75,6 +77,7 @@ int screen_InitCapture(demux_t *p_demux)
 
     /* fetch the screen we should capture */
     p_data->display_id = kCGDirectMainDisplay;
+    p_data->rate = var_InheritFloat(p_demux, "screen-fps");
 
     unsigned int displayCount = 0;
     returnedError = CGGetOnlineDisplayList(0, NULL, &displayCount);
@@ -112,16 +115,19 @@ int screen_InitCapture(demux_t *p_demux)
 
     /* setup format */
     es_format_Init(&p_sys->fmt, VIDEO_ES, VLC_CODEC_RGB32);
-    p_sys->fmt.video.i_visible_width  =
-    p_sys->fmt.video.i_width          = rect.size.width;
-    p_sys->fmt.video.i_visible_height =
-    p_sys->fmt.video.i_height         = rect.size.height;
-    p_sys->fmt.video.i_bits_per_pixel = 32;
-    p_sys->fmt.video.i_chroma         = VLC_CODEC_RGB32;
-    p_sys->fmt.video.i_rmask          = 0x00ff0000;
-    p_sys->fmt.video.i_gmask          = 0x0000ff00;
-    p_sys->fmt.video.i_bmask          = 0x000000ff;
-    p_sys->fmt.video.i_sar_num = p_sys->fmt.video.i_sar_den = 1;
+    p_sys->fmt.video.i_visible_width   =
+    p_sys->fmt.video.i_width           = rect.size.width;
+    p_sys->fmt.video.i_visible_height  =
+    p_sys->fmt.video.i_height          = rect.size.height;
+    p_sys->fmt.video.i_bits_per_pixel  = 32;
+    p_sys->fmt.video.i_chroma          = VLC_CODEC_RGB32;
+    p_sys->fmt.video.i_rmask           = 0x00ff0000;
+    p_sys->fmt.video.i_gmask           = 0x0000ff00;
+    p_sys->fmt.video.i_bmask           = 0x000000ff;
+    p_sys->fmt.video.i_sar_num         =
+    p_sys->fmt.video.i_sar_den         = 1;
+    p_sys->fmt.video.i_frame_rate      = 1000 * p_data->rate;
+    p_sys->fmt.video.i_frame_rate_base = 1000;
 
     return VLC_SUCCESS;
 }
