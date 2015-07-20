@@ -468,19 +468,46 @@ LIBVLC_API uint32_t libvlc_media_player_get_agl ( libvlc_media_player_t *p_mi );
 
 /**
  * Set an X Window System drawable where the media player should render its
- * video output. If LibVLC was built without X11 output support, then this has
- * no effects.
+ * video output. The call takes effect when the playback starts. If it is
+ * already started, it might need to be stopped before changes apply.
+ * If LibVLC was built without X11 output support, then this function has no
+ * effects.
  *
+ * By default, LibVLC will capture input events on the video rendering area.
+ * Use libvlc_video_set_mouse_input() and libvlc_video_set_key_input() to
+ * disable that and deliver events to the parent window / to the application
+ * instead. By design, the X11 protocol delivers input events to only one
+ * recipient.
+ *
+ * \warning
+ * The application must call the XInitThreads() function from Xlib before
+ * libvlc_new(), and before any call to XOpenDisplay() directly or via any
+ * other library. Failure to call XInitThreads() will seriously impede LibVLC
+ * performance. Calling XOpenDisplay() before XInitThreads() will eventually
+ * crash the process. That is a limitation of Xlib.
+ *
+ * \param p_mi media player
+ * \param drawable X11 window ID
+ *
+ * \note
  * The specified identifier must correspond to an existing Input/Output class
- * X11 window. Pixmaps are <b>not</b> supported. The caller shall ensure that
- * the X11 server is the same as the one the VLC instance has been configured
- * with. This function must be called before video playback is started;
- * otherwise it will only take effect after playback stop and restart.
+ * X11 window. Pixmaps are <b>not</b> currently supported. The default X11
+ * server is assumed, i.e. that specified in the DISPLAY environment variable.
  *
- * \param p_mi the Media Player
- * \param drawable the ID of the X window
+ * \warning
+ * LibVLC can deal with invalid X11 handle errors, however some display drivers
+ * (EGL, GLX, VA and/or VDPAU) can unfortunately not. Thus the window handle
+ * must remain valid until playback is stopped, otherwise the process may
+ * abort or crash.
+ *
+ * \bug
+ * No more than one window handle per media player instance can be specified.
+ * If the media has multiple simultaneously active video tracks, extra tracks
+ * will be rendered into external windows beyond the control of the
+ * application.
  */
-LIBVLC_API void libvlc_media_player_set_xwindow ( libvlc_media_player_t *p_mi, uint32_t drawable );
+LIBVLC_API void libvlc_media_player_set_xwindow(libvlc_media_player_t *p_mi,
+                                                uint32_t drawable);
 
 /**
  * Get the X Window System window identifier previously set with
