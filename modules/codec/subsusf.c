@@ -429,14 +429,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
     {
         ssa_style_t  *p_ssa_style = NULL;
 
-        p_text_region->psz_html = strndup( psz_subtitle, i_len );
-        if( ! p_text_region->psz_html )
-        {
-            subpicture_region_Delete( p_text_region );
-            return NULL;
-        }
-
-        p_ssa_style = ParseStyle( p_sys, p_text_region->psz_html );
+        p_ssa_style = ParseStyle( p_sys, psz_subtitle );
         if( !p_ssa_style )
         {
             int i;
@@ -452,7 +445,6 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
         {
             msg_Dbg( p_dec, "style is: %s", p_ssa_style->psz_stylename );
 
-            p_text_region->p_style = text_style_Duplicate( &p_ssa_style->font_style );
             p_text_region->i_align = p_ssa_style->i_align;
 
             /* TODO: Setup % based offsets properly, without adversely affecting
@@ -464,13 +456,14 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
              */
             p_text_region->i_x         = p_ssa_style->i_margin_h;
             p_text_region->i_y         = p_ssa_style->i_margin_v;
-
+            p_text_region->p_text = text_segment_NewInheritStyle( &p_ssa_style->font_style );
         }
         else
         {
             p_text_region->i_align = SUBPICTURE_ALIGN_BOTTOM | i_sys_align;
             p_text_region->i_x = i_sys_align ? 20 : 0;
             p_text_region->i_y = 10;
+            p_text_region->p_text = text_segment_New( NULL );
         }
         /* Look for position arguments which may override the style-based
          * defaults.
@@ -825,45 +818,8 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
         {
             char *psz_end = NULL;
 
-            if(( !strncasecmp( psz_subtitle, "<text ", 6 )) ||
-               ( !strncasecmp( psz_subtitle, "<text>", 6 )))
-            {
-                psz_end = strcasestr( psz_subtitle, "</text>" );
 
-                if( psz_end )
-                {
-                    subpicture_region_t  *p_text_region;
-
-                    psz_end += strcspn( psz_end, ">" ) + 1;
-
-                    p_text_region = CreateTextRegion( p_dec,
-                                                      psz_subtitle,
-                                                      psz_end - psz_subtitle,
-                                                      p_sys->i_align );
-
-                    if( p_text_region )
-                    {
-                        p_text_region->p_text = text_segment_New( CreatePlainText( p_text_region->psz_html ) );
-
-                        if( ! var_CreateGetBool( p_dec, "subsdec-formatted" ) )
-                        {
-                            free( p_text_region->psz_html );
-                            p_text_region->psz_html = NULL;
-                        }
-                    }
-
-                    if( !p_region_first )
-                    {
-                        p_region_first = p_region_upto = p_text_region;
-                    }
-                    else if( p_text_region )
-                    {
-                        p_region_upto->p_next = p_text_region;
-                        p_region_upto = p_region_upto->p_next;
-                    }
-                }
-            }
-            else if(( !strncasecmp( psz_subtitle, "<karaoke ", 9 )) ||
+            if(( !strncasecmp( psz_subtitle, "<karaoke ", 9 )) ||
                     ( !strncasecmp( psz_subtitle, "<karaoke>", 9 )))
             {
                 psz_end = strcasestr( psz_subtitle, "</karaoke>" );
@@ -879,14 +835,6 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                                                       psz_end - psz_subtitle,
                                                       p_sys->i_align );
 
-                    if( p_text_region )
-                    {
-                        if( ! var_CreateGetBool( p_dec, "subsdec-formatted" ) )
-                        {
-                            free( p_text_region->psz_html );
-                            p_text_region->psz_html = NULL;
-                        }
-                    }
                     if( !p_region_first )
                     {
                         p_region_first = p_region_upto = p_text_region;
@@ -941,9 +889,6 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                     SetupPositions( p_image_region, psz_subtitle );
 
                     p_image_region->p_next   = NULL;
-                    p_image_region->p_text   = NULL;
-                    p_image_region->psz_html = NULL;
-
                 }
                 if( !p_region_first )
                 {
@@ -952,6 +897,33 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                 else if( p_image_region )
                 {
                     p_region_upto->p_next = p_image_region;
+                    p_region_upto = p_region_upto->p_next;
+                }
+            }
+            else
+            {
+                subpicture_region_t  *p_text_region;
+
+                psz_end += strcspn( psz_end, ">" ) + 1;
+
+                p_text_region = CreateTextRegion( p_dec,
+                                                  psz_subtitle,
+                                                  psz_end - psz_subtitle,
+                                                  p_sys->i_align );
+
+                if( p_text_region )
+                {
+                    free( p_text_region->p_text->psz_text );
+                    p_text_region->p_text->psz_text = CreatePlainText( psz_subtitle );
+                }
+
+                if( !p_region_first )
+                {
+                    p_region_first = p_region_upto = p_text_region;
+                }
+                else if( p_text_region )
+                {
+                    p_region_upto->p_next = p_text_region;
                     p_region_upto = p_region_upto->p_next;
                 }
             }

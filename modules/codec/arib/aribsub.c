@@ -298,7 +298,6 @@ static subpicture_t *render( decoder_t *p_dec, arib_parser_t *p_parser,
 
         p_region->psz_text = strdup( psz_text );
         free( psz_text );
-        p_region->psz_html = NULL;
         p_region->psz_fontname = NULL;
         p_region->i_font_color = p_buf_region->i_foreground_color;
         p_region->i_planewidth = p_buf_region->i_planewidth;

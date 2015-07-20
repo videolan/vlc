@@ -8,9 +8,7 @@ typedef struct
 } subpicture_updater_sys_option_t;
 
 struct subpicture_updater_sys_t {
-    char *text;
-    char *html;
-    text_segment_t *p_htmlsegments;
+    text_segment_t *p_segments;
 
     int  align;
     int  x;
@@ -31,116 +29,6 @@ struct subpicture_updater_sys_t {
     int16_t i_drop_shadow;
     int16_t i_drop_shadow_alpha;
 };
-
-static void MakeHtmlNewLines( char **ppsz_src )
-{
-    unsigned int i_nlcount = 0;
-    unsigned i_len = strlen( *ppsz_src );
-    if ( i_len == 0 ) return;
-    for ( unsigned i=0; i<i_len; i++ )
-        if ( (*ppsz_src)[i] == '\n' )
-            i_nlcount++;
-    if ( !i_nlcount ) return;
-
-    char *psz_dst = malloc( i_len + 1 + (i_nlcount * 4) );
-    char *ptr = psz_dst;
-    for ( unsigned i=0; i<i_len; i++ )
-    {
-        if ( (*ppsz_src)[i] == '\n' )
-        {
-            strcpy( ptr, "<br/>" );
-            ptr += 5;
-        } else {
-            *ptr++ = (*ppsz_src)[i];
-        }
-    }
-    *ptr = 0;
-    free( *ppsz_src );
-    *ppsz_src = psz_dst;
-}
-
-static void HtmlAppend( char **ppsz_dst, const char *psz_src,
-                        const text_style_t *p_styles, const float f_scale )
-{
-    if ( !ppsz_dst ) return;
-    int i_return;
-    char *psz_subtext = NULL;
-    char *psz_text = NULL;
-    char *psz_fontsize = NULL;
-    char *psz_color = NULL;
-    char *psz_encoded = convert_xml_special_chars( psz_src );
-    if ( !psz_encoded ) return;
-
-    MakeHtmlNewLines( &psz_encoded );
-
-    if ( p_styles->i_font_alpha > 0 ) //ARGB
-    {
-        i_return = asprintf( &psz_color, " color=\"#%6x\"",
-                             p_styles->i_font_color & 0x00FFFFFF );
-        if ( i_return < 0 ) psz_color = NULL;
-    }
-
-    if ( p_styles->i_font_size > 0 && f_scale > 0 )
-    {
-        i_return = asprintf( &psz_fontsize, " size=\"%u\"",
-                             (unsigned) (f_scale * p_styles->i_font_size) );
-        if ( i_return < 0 ) psz_fontsize = NULL;
-    }
-
-    i_return = asprintf( &psz_subtext, "%s%s%s%s%s%s%s",
-                        ( p_styles->i_style_flags & STYLE_UNDERLINE ) ? "<u>" : "",
-                        ( p_styles->i_style_flags & STYLE_BOLD ) ? "<b>" : "",
-                        ( p_styles->i_style_flags & STYLE_ITALIC ) ? "<i>" : "",
-                          psz_encoded,
-                        ( p_styles->i_style_flags & STYLE_ITALIC ) ? "</i>" : "",
-                        ( p_styles->i_style_flags & STYLE_BOLD ) ? "</b>" : "",
-                        ( p_styles->i_style_flags & STYLE_UNDERLINE ) ? "</u>" : ""
-                        );
-    if ( i_return < 0 ) psz_subtext = NULL;
-
-    if ( psz_color || psz_fontsize )
-    {
-        i_return = asprintf( &psz_text, "<font%s%s>%s</font>",
-                            psz_color ? psz_color : "",
-                            psz_fontsize ? psz_fontsize : "",
-                            psz_subtext );
-        if ( i_return < 0 ) psz_text = NULL;
-        free( psz_subtext );
-    }
-    else
-    {
-        psz_text = psz_subtext;
-    }
-
-    free( psz_fontsize );
-    free( psz_color );
-
-    if ( *ppsz_dst )
-    {
-        char *psz_dst = *ppsz_dst;
-        i_return = asprintf( ppsz_dst, "%s%s", psz_dst, psz_text );
-        if ( i_return < 0 ) ppsz_dst = NULL;
-        free( psz_dst );
-        free( psz_text );
-    }
-    else
-        *ppsz_dst = psz_text;
-}
-
-static char *SegmentsToHtml( text_segment_t *p_head, const float f_scale )
-{
-    char *psz_dst = NULL;
-    char *psz_ret = NULL;
-    while( p_head )
-    {
-        HtmlAppend( &psz_dst, p_head->psz_text, p_head->style, f_scale );
-        p_head = p_head->p_next;
-    }
-    int i_ret = asprintf( &psz_ret, "<text>%s</text>", psz_dst );
-    if ( i_ret < 0 ) psz_ret = NULL;
-    free( psz_dst );
-    return psz_ret;
-}
 
 static int SubpictureTextValidate(subpicture_t *subpic,
                                   bool has_src_changed, const video_format_t *fmt_src,
@@ -164,6 +52,7 @@ static int SubpictureTextValidate(subpicture_t *subpic,
     }
     return VLC_EGENERIC;
 }
+
 static void SubpictureTextUpdate(subpicture_t *subpic,
                                  const video_format_t *fmt_src,
                                  const video_format_t *fmt_dst,
@@ -187,14 +76,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     if (!r)
         return;
 
-    r->p_text = sys->text ? text_segment_New( sys->text ): NULL;
-    if ( sys->p_htmlsegments )
-        r->psz_html = SegmentsToHtml( sys->p_htmlsegments,
-                                      (float) fmt_dst->i_height / fmt_src->i_height );
-    else if ( sys->html )
-        r->psz_html = strdup(sys->html);
-    else
-        r->psz_html = NULL;
+    r->p_text = sys->p_segments;
     r->i_align  = sys->align;
     r->b_renderbg = sys->renderbg;
     if (!sys->is_fixed) {
@@ -224,47 +106,43 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         sys->font_color.b_set ||
         sys->background_color.b_set )
     {
-        r->p_style = text_style_New();
-        if (!r->p_style) return;
-
-        if (sys->i_font_height_abs_to_src)
-            sys->i_font_height_percent = sys->i_font_height_abs_to_src * 100 /
-                                         fmt_src->i_visible_height;
-
-        if (sys->i_font_height_percent)
+        //FIXME: Is this used for something else than tx3g?
+        for ( text_segment_t* p_segment = sys->p_segments; p_segment; p_segment = p_segment->p_next )
         {
-            r->p_style->i_font_size = sys->i_font_height_percent *
-                                      subpic->i_original_picture_height / 100;
-            r->p_style->i_font_color = 0xffffff;
-            r->p_style->i_font_alpha = 0xff;
-        }
+            text_style_t* p_style = p_segment->style;
 
-        if (sys->style_flags.b_set)
-            r->p_style->i_style_flags = sys->style_flags.i_value;
-        if (sys->font_color.b_set)
-            r->p_style->i_font_color = sys->font_color.i_value;
-        if (sys->background_color.b_set)
-            r->p_style->i_background_color = sys->background_color.i_value;
-        if (sys->i_alpha)
-            r->p_style->i_font_alpha = sys->i_alpha;
-        if (sys->i_drop_shadow)
-            r->p_style->i_shadow_width = sys->i_drop_shadow;
-        if (sys->i_drop_shadow_alpha)
-            r->p_style->i_shadow_alpha = sys->i_drop_shadow_alpha;
+            if (sys->i_font_height_abs_to_src)
+                sys->i_font_height_percent = sys->i_font_height_abs_to_src * 100 /
+                                             fmt_src->i_visible_height;
+
+            if (sys->i_font_height_percent)
+            {
+                p_style->i_font_size = sys->i_font_height_percent *
+                                       subpic->i_original_picture_height / 100;
+                p_style->i_font_color = 0xffffff;
+                p_style->i_font_alpha = 0xff;
+            }
+
+            if (sys->style_flags.b_set)
+                p_style->i_style_flags = sys->style_flags.i_value;
+            if (sys->font_color.b_set)
+                p_style->i_font_color = sys->font_color.i_value;
+            if (sys->background_color.b_set)
+                p_style->i_background_color = sys->background_color.i_value;
+            if (sys->i_alpha)
+                p_style->i_font_alpha = sys->i_alpha;
+            if (sys->i_drop_shadow)
+                p_style->i_shadow_width = sys->i_drop_shadow;
+            if (sys->i_drop_shadow_alpha)
+                p_style->i_shadow_alpha = sys->i_drop_shadow_alpha;
+        }
     }
 }
 static void SubpictureTextDestroy(subpicture_t *subpic)
 {
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
 
-    free(sys->text);
-    free(sys->html);
-    while( sys->p_htmlsegments )
-    {
-        text_segment_t *p_segment = sys->p_htmlsegments;
-        sys->p_htmlsegments = p_segment->p_next;
-        text_segment_Delete( p_segment );
-    }
+    text_segment_ChainDelete( sys->p_segments );
     free(sys);
 }
 

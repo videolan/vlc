@@ -461,80 +461,15 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
     p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-    p_spu_sys->text  = StripTags( psz_subtitle );
-    if( var_InheritBool( p_dec, "subsdec-formatted" ) )
-        p_spu_sys->html = CreateHtmlSubtitle( &p_spu_sys->align, psz_subtitle );
+    char* psz_sub = CreateHtmlSubtitle( &p_spu_sys->align, psz_subtitle );
+    p_spu_sys->p_segments = text_segment_New( psz_sub );
 
-    free( psz_subtitle );
+    //FIXME: Remove the variable?
+    //if( var_InheritBool( p_dec, "subsdec-formatted" ) )
+
+    free( psz_sub );
 
     return p_spu;
-}
-
-/* Function now handles tags with attribute values, and tries
- * to deal with &' commands too. It no longer modifies the string
- * in place, so that the original text can be reused
- */
-static char *StripTags( char *psz_subtitle )
-{
-    char *psz_text_start;
-    char *psz_text;
-
-    psz_text = psz_text_start = malloc( strlen( psz_subtitle ) + 1 );
-    if( !psz_text_start )
-        return NULL;
-
-    while( *psz_subtitle )
-    {
-        if( *psz_subtitle == '<' )
-        {
-            if( strncasecmp( psz_subtitle, "<br/>", 5 ) == 0 )
-                *psz_text++ = '\n';
-
-            psz_subtitle += strcspn( psz_subtitle, ">" );
-        }
-        else if( *psz_subtitle == '&' )
-        {
-            if( !strncasecmp( psz_subtitle, "&lt;", 4 ))
-            {
-                *psz_text++ = '<';
-                psz_subtitle += strcspn( psz_subtitle, ";" );
-            }
-            else if( !strncasecmp( psz_subtitle, "&gt;", 4 ))
-            {
-                *psz_text++ = '>';
-                psz_subtitle += strcspn( psz_subtitle, ";" );
-            }
-            else if( !strncasecmp( psz_subtitle, "&amp;", 5 ))
-            {
-                *psz_text++ = '&';
-                psz_subtitle += strcspn( psz_subtitle, ";" );
-            }
-            else if( !strncasecmp( psz_subtitle, "&quot;", 6 ))
-            {
-                *psz_text++ = '\"';
-                psz_subtitle += strcspn( psz_subtitle, ";" );
-            }
-            else
-            {
-                /* Assume it is just a normal ampersand */
-                *psz_text++ = '&';
-            }
-        }
-        else
-        {
-            *psz_text++ = *psz_subtitle;
-        }
-
-        /* Security fix: Account for the case where input ends early */
-        if( *psz_subtitle == '\0' ) break;
-
-        psz_subtitle++;
-    }
-    *psz_text = '\0';
-    char *psz = realloc( psz_text_start, strlen( psz_text_start ) + 1 );
-    if( psz ) psz_text_start = psz;
-
-    return psz_text_start;
 }
 
 /* Try to respect any style tags present in the subtitle string. The main

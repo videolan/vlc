@@ -136,15 +136,11 @@ struct filter_t
 
         struct
         {
-            int         (*pf_text) ( filter_t *, subpicture_region_t *,
-                                     subpicture_region_t *,
-                                     const vlc_fourcc_t * );
-            int         (*pf_html) ( filter_t *, subpicture_region_t *,
+            int         (*pf_render) ( filter_t *, subpicture_region_t *,
                                      subpicture_region_t *,
                                      const vlc_fourcc_t * );
         } render;
-#define pf_render_text     u.render.pf_text
-#define pf_render_html     u.render.pf_html
+#define pf_render     u.render.pf_render
 
     } u;
 

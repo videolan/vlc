@@ -249,9 +249,6 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
     free( p_region->fmt.p_palette );
 
     text_segment_ChainDelete( p_region->p_text );
-    free( p_region->psz_html );
-    if( p_region->p_style )
-        text_style_Delete( p_region->p_style );
     free( p_region );
 }
 
@@ -305,12 +302,6 @@ subpicture_region_t* subpicture_region_Copy( subpicture_region_t *p_region_src )
     p_region_dst->i_alpha  = p_region_src->i_alpha;
 
     p_region_dst->p_text = text_segment_Copy( p_region_src->p_text );
-    p_region_dst->psz_html = p_region_src->psz_html ? strdup(p_region_src->psz_html) : NULL;
-    if (p_region_src->p_style != NULL) {
-        p_region_dst->p_style = text_style_New();
-        p_region_dst->p_style = text_style_Copy(p_region_dst->p_style,
-                                                p_region_src->p_style);
-    }
 
     //Palette is already copied by subpicture_region_New, we just have to duplicate p_pixels
     for (int i = 0; i < p_region_src->p_picture->i_planes; i++)

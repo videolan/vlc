@@ -34,6 +34,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_charset.h>
 #include <vlc_filter.h>
 #include <vlc_text_style.h>
 
@@ -207,7 +208,7 @@ static void BBoxEnlarge( FT_BBox *p_max, const FT_BBox *p )
 
 static paragraph_t *NewParagraph( filter_t *p_filter,
                                   int i_size,
-                                  uni_char_t *p_code_points,
+                                  const uni_char_t *p_code_points,
                                   text_style_t **pp_styles,
                                   uint32_t *pi_k_dates,
                                   int i_runs_size )
@@ -458,11 +459,14 @@ static int ItemizeParagraph( filter_t *p_filter, paragraph_t *p_paragraph )
             || last_script != p_paragraph->p_scripts[ i ]
             || last_level != p_paragraph->p_levels[ i ]
 #endif
-            || p_last_style->i_font_size != p_paragraph->pp_styles[ i ]->i_font_size
-            || ( ( p_last_style->i_style_flags
-                 ^ p_paragraph->pp_styles[ i ]->i_style_flags )
-                 & STYLE_HALFWIDTH )
-            ||!FaceStyleEquals( p_last_style, p_paragraph->pp_styles[ i ] ) )
+            || ( p_paragraph->pp_styles[ i ] != NULL && (
+                p_last_style->i_font_size != p_paragraph->pp_styles[ i ]->i_font_size
+                || ( ( p_last_style->i_style_flags
+                     ^ p_paragraph->pp_styles[ i ]->i_style_flags )
+                     & STYLE_HALFWIDTH )
+                ||!FaceStyleEquals( p_last_style, p_paragraph->pp_styles[ i ] ) )
+            )
+        )
         {
             int i_ret = AddRun( p_filter, p_paragraph, i_last_run_start, i, 0 );
             if( i_ret )
@@ -1203,7 +1207,7 @@ error:
 int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
                 FT_BBox *p_bbox, int *pi_max_face_height,
 
-                uni_char_t *psz_text, text_style_t **pp_styles,
+                const uni_char_t *psz_text, text_style_t **pp_styles,
                 uint32_t *pi_k_dates, int i_len )
 {
     line_desc_t *p_first_line = 0;
@@ -1310,4 +1314,50 @@ error:
     if( p_first_line ) FreeLines( p_first_line );
     if( p_paragraph ) FreeParagraph( p_paragraph );
     return VLC_EGENERIC;
+}
+
+uni_char_t* SegmentsToTextAndStyles(const text_segment_t *p_segment, size_t *pi_string_length, text_style_t ***ppp_styles)
+{
+    text_style_t **pp_styles = NULL;
+    uni_char_t *psz_uni = NULL;
+    size_t i_size = 0;
+    for ( const text_segment_t *s = p_segment; s != NULL; s = s->p_next )
+    {
+        //FIXME: This is missing a space in between segments.
+        if ( !s->psz_text )
+            continue;
+        size_t i_string_bytes = 0;
+        uni_char_t *psz_tmp = ToCharset( FREETYPE_TO_UCS, s->psz_text, &i_string_bytes );
+        if ( !psz_tmp )
+        {
+            free( psz_uni );
+            free( pp_styles );
+            return NULL;
+        }
+        uni_char_t *psz_realloc = realloc(psz_uni, i_size + i_string_bytes);
+        if ( unlikely( !psz_realloc ) )
+        {
+            free( pp_styles );
+            free( psz_uni );
+            free( psz_tmp );
+            return NULL;
+        }
+        psz_uni = psz_realloc;
+        memcpy( psz_uni + i_size, psz_tmp, i_string_bytes );
+        free( psz_tmp );
+        text_style_t **pp_styles_realloc = realloc( pp_styles, i_size + i_string_bytes);
+        if ( unlikely( !pp_styles_realloc ) )
+        {
+            free( pp_styles );
+            free( psz_uni );
+            return NULL;
+        }
+        pp_styles = pp_styles_realloc;
+        for ( size_t i = i_size; i < (i_size + i_string_bytes) / sizeof(*psz_uni); i++ )
+            pp_styles[i] = s->style;
+        i_size += i_string_bytes;
+    }
+    *pi_string_length = i_size / sizeof( *psz_uni );
+    *ppp_styles = pp_styles;
+    return psz_uni;
 }

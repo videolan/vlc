@@ -184,8 +184,7 @@ static int Create( vlc_object_t *p_this )
     if( SetFont( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
     free( psz_fontfile );
-    p_filter->pf_render_text = RenderText;
-    p_filter->pf_render_html = NULL;
+    p_filter->pf_render = RenderText;
     return VLC_SUCCESS;
 
  error:
@@ -324,11 +323,11 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         return VLC_EGENERIC;
     }
 
-    if( p_region_in->p_style )
+    if( p_region_in->p_text->style )
     {
-        i_font_color = VLC_CLIP( p_region_in->p_style->i_font_color, 0, 0xFFFFFF );
-        i_font_alpha = VLC_CLIP( p_region_in->p_style->i_font_alpha, 0, 255 );
-        i_font_size  = VLC_CLIP( p_region_in->p_style->i_font_size, 0, 255 );
+        i_font_color = VLC_CLIP( p_region_in->p_text->style->i_font_color, 0, 0xFFFFFF );
+        i_font_alpha = VLC_CLIP( p_region_in->p_text->style->i_font_alpha, 0, 255 );
+        i_font_size  = VLC_CLIP( p_region_in->p_text->style->i_font_size, 0, 255 );
     }
     else
     {

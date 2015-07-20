@@ -216,7 +216,7 @@ static int SubsdelayCalculateAlpha( filter_t *p_filter, int i_overlapping, int i
 
 static int SubsdelayGetTextRank( char *psz_text );
 
-static bool SubsdelayIsTextEmpty( char *psz_text );
+static bool SubsdelayIsTextEmpty( const text_segment_t* p_segment );
 
 /*****************************************************************************
  * Subpicture functions
@@ -1052,8 +1052,8 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, mtime_t i_ts )
 
     if( p_entry->b_check_empty && p_subpic->p_region )
     {
-        if( SubsdelayIsTextEmpty( p_subpic->p_region->psz_html ) ||
-            SubsdelayIsTextEmpty( p_subpic->p_region->p_text->psz_text ) )
+        //FIXME: What if there is more than one segment?
+        if( SubsdelayIsTextEmpty( p_subpic->p_region->p_text ) )
         {
             /* remove empty subtitle */
 
@@ -1116,8 +1116,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, mtime_t i_ts )
  *****************************************************************************/
 static bool SubpicIsEmpty( subpicture_t* p_subpic )
 {
-    return ( p_subpic->p_region && ( SubsdelayIsTextEmpty( p_subpic->p_region->psz_html ) ||
-                                     SubsdelayIsTextEmpty( p_subpic->p_region->p_text->psz_text ) ) );
+    return ( p_subpic->p_region && ( SubsdelayIsTextEmpty( p_subpic->p_region->p_text ) ) );
 }
 
 /*****************************************************************************
@@ -1180,17 +1179,10 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
 
     if( i_mode == SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT )
     {
-        if( p_entry->p_subpic && p_entry->p_subpic->p_region && ( p_entry->p_subpic->p_region->p_text->psz_text
-                || p_entry->p_subpic->p_region->psz_html ) )
+        if( p_entry->p_subpic && p_entry->p_subpic->p_region && ( p_entry->p_subpic->p_region->p_text ) )
         {
-            if( p_entry->p_subpic->p_region->p_text->psz_text )
-            {
-                i_rank = SubsdelayGetTextRank( p_entry->p_subpic->p_region->p_text->psz_text );
-            }
-            else
-            {
-                i_rank = SubsdelayGetTextRank( p_entry->p_subpic->p_region->psz_html );
-            }
+            //FIXME: We only use a single segment here
+            i_rank = SubsdelayGetTextRank( p_entry->p_subpic->p_region->p_text->psz_text );
 
             return ( i_rank * INT_FACTOR_TO_RANK_FACTOR( i_factor ) );
         }
@@ -1341,13 +1333,18 @@ static int SubsdelayGetTextRank( char *psz_text )
 /*****************************************************************************
  * SubsdelayIsTextEmpty: Check if the text contains spaces only
  *****************************************************************************/
-static bool SubsdelayIsTextEmpty( char *psz_text )
+static bool SubsdelayIsTextEmpty( const text_segment_t *p_segment )
 {
-    if( !psz_text )
+    while ( p_segment )
     {
-        return false;
+        if ( strlen( p_segment->psz_text ) > 0 )
+        {
+            size_t offset = strspn( p_segment->psz_text, " " );
+            if ( p_segment->psz_text[offset] )
+                return false;
+        }
+        p_segment = p_segment->p_next;
     }
 
-    psz_text += strspn( psz_text, " " );
-    return !( *psz_text );
+    return true;
 }

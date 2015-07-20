@@ -384,7 +384,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             if( !p_spu )
                 goto error;
             subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
-            p_spu_sys->text = strdup("");
+            p_spu_sys->p_segments = text_segment_New("");
 
             p_sys->b_update = true;
             p_sys->i_last_page = i_wanted_page;
@@ -441,7 +441,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
            offset++;
 
         subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
-        p_spu_sys->text = strdup( &p_text[offset] );
+        p_spu_sys->p_segments = text_segment_New( &p_text[offset] );
 
         p_spu_sys->align = i_align;
         p_spu_sys->i_font_height_percent = 5;

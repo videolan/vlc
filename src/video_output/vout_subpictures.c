@@ -275,10 +275,8 @@ static void SpuRenderText(spu_t *spu, bool *rerender_text,
     var_SetInteger(text, "spu-elapsed", elapsed_time);
     var_SetBool(text, "text-rerender", false);
 
-    if (text->pf_render_html && region->psz_html)
-        text->pf_render_html(text, region, region, chroma_list);
-    else if (text->pf_render_text)
-        text->pf_render_text(text, region, region, chroma_list);
+    if ( region->p_text )
+        text->pf_render(text, region, region, chroma_list);
     *rerender_text = var_GetBool(text, "text-rerender");
 }
 

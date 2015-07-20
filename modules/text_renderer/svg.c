@@ -134,8 +134,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_width = p_filter->fmt_out.video.i_width;
     p_sys->i_height = p_filter->fmt_out.video.i_height;
 
-    p_filter->pf_render_text = RenderText;
-    p_filter->pf_render_html = NULL;
+    p_filter->pf_render = RenderText;
     p_filter->p_sys = p_sys;
 
     /* MUST call this before any RSVG funcs */
@@ -436,6 +435,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     /* Sanity check */
     if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
     if( !p_region_in->p_text ) return VLC_EGENERIC;
+    //FIXME: What should we do when there's more than a single segment?
+    //Is this refused at codec level?
     psz_string = p_region_in->p_text->psz_text;
     if( !psz_string || !*psz_string ) return VLC_EGENERIC;
 

@@ -102,7 +102,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
     p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-    p_spu_sys->text  = psz_subtitle;
+    p_spu_sys->p_segments = text_segment_New( psz_subtitle );
+    free( psz_subtitle );
 
     return p_spu;
 }

@@ -114,16 +114,28 @@ static subpicture_region_t * vout_OSDEpgText(const char *text,
 
     /* Set subpicture parameters */
     region->p_text   = text_segment_New(text);
+    if ( unlikely( !region->p_text ) )
+    {
+        subpicture_region_Delete( region );
+        return NULL;
+    }
     region->i_align  = 0;
     region->i_x      = x;
     region->i_y      = y;
 
     /* Set text style */
-    region->p_style = text_style_New();
-    if (region->p_style) {
-        region->p_style->i_font_size  = size;
-        region->p_style->i_font_color = color;
-        region->p_style->i_font_alpha = 0;
+    text_style_t *p_style = text_style_New();
+    if ( unlikely( !p_style ) )
+    {
+        text_segment_Delete( region->p_text );
+        subpicture_region_Delete( region );
+        return NULL;
+    }
+    region->p_text->style = p_style;
+    if (p_style) {
+        p_style->i_font_size  = size;
+        p_style->i_font_color = color;
+        p_style->i_font_alpha = 0;
     }
 
     return region;

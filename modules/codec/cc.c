@@ -296,7 +296,7 @@ static block_t *Pop( decoder_t *p_dec )
     return p_block;
 }
 
-static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_html, mtime_t i_pts )
+static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, mtime_t i_pts )
 {
     //decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
@@ -306,20 +306,16 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
     {
         msg_Warn( p_dec, "subtitle without a date" );
         free( psz_subtitle );
-        free( psz_html );
         return NULL;
     }
 
     EnsureUTF8( psz_subtitle );
-    if( psz_html )
-        EnsureUTF8( psz_html );
 
     /* Create the subpicture unit */
     p_spu = decoder_NewSubpictureText( p_dec );
     if( !p_spu )
     {
         free( psz_subtitle );
-        free( psz_html );
         return NULL;
     }
     p_spu->i_start    = i_pts;
@@ -332,10 +328,11 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
     /* The "leavetext" alignment is a special mode where the subpicture
        region itself gets aligned, but the text inside it does not */
     p_spu_sys->align = SUBPICTURE_ALIGN_LEAVETEXT;
-    p_spu_sys->text  = psz_subtitle;
-    p_spu_sys->html  = psz_html;
+    p_spu_sys->p_segments = text_segment_New( psz_subtitle );
     p_spu_sys->i_font_height_percent = 5;
     p_spu_sys->renderbg = true;
+
+    free( psz_subtitle );
 
     return p_spu;
 }
@@ -362,9 +359,8 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t *p_block )
 
     if( b_changed )
     {
-        char *psz_subtitle = Eia608Text( &p_sys->eia608, false );
         char *psz_html = Eia608Text( &p_sys->eia608, true );
-        return Subtitle( p_dec, psz_subtitle, psz_html, i_pts );
+        return Subtitle( p_dec, psz_html, i_pts );
     }
     return NULL;
 }

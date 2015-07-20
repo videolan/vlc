@@ -365,7 +365,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         if( p_overlay->format.i_chroma == VLC_CODEC_TEXT )
         {
             p_region->p_text = text_segment_New( p_overlay->data.p_text );
-            p_region->p_style = text_style_Duplicate( p_overlay->p_fontstyle );
+            p_region->p_text->style = text_style_Duplicate( p_overlay->p_fontstyle );
         }
         else
         {

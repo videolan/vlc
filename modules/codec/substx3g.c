@@ -379,8 +379,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->b_absolute = false;
 
     p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM;
-    p_spu_sys->text  = psz_subtitle;
-    p_spu_sys->p_htmlsegments = p_segment;
+    p_spu_sys->p_segments = p_segment;
 
     block_Release( p_block );
 
