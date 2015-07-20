@@ -386,7 +386,6 @@ struct decoder_sys_t
 
     vlc_iconv_t         iconv_handle;            /* handle to iconv instance */
     bool                b_autodetect_utf8;
-    xml_reader_t*       p_reader;
 };
 
 
@@ -492,13 +491,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     free (var);
 
     p_sys->i_align = var_InheritInteger( p_dec, "subsdec-align" );
-
-    p_sys->p_reader = xml_ReaderCreate( p_dec, NULL );
-    if ( !p_sys->p_reader )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
 
     return VLC_SUCCESS;
 }
