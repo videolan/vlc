@@ -159,6 +159,7 @@ Misc
 
 Removed modules
  * Atmo video filter
+ * QTCapture access module (use AVCapture instead)
 
 
 Changes between 2.2.0 and 2.2.1:

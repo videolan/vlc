@@ -165,13 +165,6 @@ libshm_plugin_la_SOURCES = access/shm.c
 libshm_plugin_la_LIBADD = $(LIBM)
 access_LTLIBRARIES += libshm_plugin.la
 
-libqtcapture_plugin_la_SOURCES = access/qtcapture.m
-libqtcapture_plugin_la_LDFLAGS = \
-	-Wl,-framework,QTKit -Wl,-framework,CoreVideo -Wl,-framework,QuartzCore
-if HAVE_QTKIT
-access_LTLIBRARIES += libqtcapture_plugin.la
-endif
-
 libv4l2_plugin_la_SOURCES = \
 	access/v4l2/linux/videodev2.h \
 	access/v4l2/linux/v4l2-common.h \
