@@ -36,6 +36,15 @@
 #define B64DecNSStr(s) [[VLCStringUtility sharedInstance] b64Decode: s]
 #define B64EncAndFree(s) [[VLCStringUtility sharedInstance] b64EncodeAndFree: s]
 
+extern NSString *const kVLCMediaAudioCD;
+extern NSString *const kVLCMediaDVD;
+extern NSString *const kVLCMediaVCD;
+extern NSString *const kVLCMediaSVCD;
+extern NSString *const kVLCMediaBD;
+extern NSString *const kVLCMediaVideoTSFolder;
+extern NSString *const kVLCMediaBDMVFolder;
+extern NSString *const kVLCMediaUnknown;
+
 NSString *toNSStr(const char *str);
 unsigned int CocoaKeyToVLC(unichar i_key);
 
@@ -60,5 +69,8 @@ NSImage *imageFromRes(NSString *o_id);
 
 - (NSString *)b64Decode:(NSString *)string;
 - (NSString *)b64EncodeAndFree:(char *)psz_string;
+
+- (NSString *)getVolumeTypeFromMountPath:(NSString *)mountPath;
+- (NSString *)getBSDNodeFromMountPath:(NSString *)mountPath;
 
 @end

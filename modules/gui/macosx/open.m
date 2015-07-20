@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.m: Open dialogues for VLC's MacOS X port
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -35,10 +35,6 @@
 
 #import <paths.h>
 #import <IOKit/IOBSD.h>
-#import <IOKit/storage/IOMedia.h>
-#import <IOKit/storage/IOCDMedia.h>
-#import <IOKit/storage/IODVDMedia.h>
-#import <IOKit/storage/IOBDMedia.h>
 #import <Cocoa/Cocoa.h>
 #import <QTKit/QTKit.h>
 
@@ -51,15 +47,6 @@
 
 #import <vlc_url.h>
 
-NSArray *qtkvideoDevices;
-NSArray *qtkaudioDevices;
-#define setEyeTVUnconnected \
-[o_capture_lbl setStringValue: _NS("No device is selected")]; \
-[o_capture_long_lbl setStringValue: _NS("No device is selected.\n\nChoose available device in above pull-down menu.\n")]; \
-[o_capture_lbl displayIfNeeded]; \
-[o_capture_long_lbl displayIfNeeded]; \
-[self showCaptureView: o_capture_label_view]
-
 struct display_info_t
 {
     CGRect rect;
@@ -71,8 +58,8 @@ struct display_info_t
  *****************************************************************************/
 @interface VLCOpen()
 {
-    NSArray         *qtkvideoDevices;
-    NSArray         *qtkaudioDevices;
+    NSArray         *_qtkvideoDevices;
+    NSArray         *_qtkaudioDevices;
     NSString        *qtk_currdevice_uid;
     NSString        *qtkaudio_currdevice_uid;
 
@@ -90,24 +77,15 @@ struct display_info_t
     NSString *o_mrl;
     NSMutableArray *o_displayInfos;
 }
+
+@property (readwrite, assign) NSString *MRL;
+
 @end
 
 @implementation VLCOpen
 
 #pragma mark -
 #pragma mark Init
-
-+ (VLCOpen *)sharedInstance
-{
-    static VLCOpen *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCOpen new];
-    });
-
-    return sharedInstance;
-}
 
 - (void)dealloc
 {
@@ -223,19 +201,19 @@ struct display_info_t
     [o_file_starttime_fld setFormatter:[[PositionFormatter alloc] init]];
     [o_file_stoptime_fld setFormatter:[[PositionFormatter alloc] init]];
 
-    [self qtkvideoDevices];
+    [self updateQTKVideoDevices];
     [o_qtk_video_device_pop removeAllItems];
-    msg_Dbg(VLCIntf, "Found %lu video capture devices", [qtkvideoDevices count]);
+    msg_Dbg(VLCIntf, "Found %lu video capture devices", _qtkvideoDevices.count);
 
-    if ([qtkvideoDevices count] >= 1) {
+    if (_qtkvideoDevices.count >= 1) {
         if (!qtk_currdevice_uid)
             qtk_currdevice_uid = [[[QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeVideo] uniqueID]
                                                                 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
-        NSUInteger deviceCount = [qtkvideoDevices count];
+        NSUInteger deviceCount = _qtkvideoDevices.count;
         for (int ivideo = 0; ivideo < deviceCount; ivideo++) {
             QTCaptureDevice *qtk_device;
-            qtk_device = [qtkvideoDevices objectAtIndex:ivideo];
+            qtk_device = _qtkvideoDevices[ivideo];
             // allow same name for multiple times
             [[o_qtk_video_device_pop menu] addItemWithTitle:[qtk_device localizedDisplayName] action:nil keyEquivalent:@""];
 
@@ -246,19 +224,20 @@ struct display_info_t
         [o_qtk_video_device_pop addItemWithTitle: _NS("None")];
     }
 
-    [self qtkaudioDevices];
     [o_qtk_audio_device_pop removeAllItems];
     [o_screen_qtk_audio_pop removeAllItems];
-    msg_Dbg(VLCIntf, "Found %lu audio capture devices", [qtkaudioDevices count]);
 
-    if ([qtkaudioDevices count] >= 1) {
+    [self updateQTKAudioDevices];
+    msg_Dbg(VLCIntf, "Found %lu audio capture devices", _qtkaudioDevices.count);
+
+    if (_qtkaudioDevices.count >= 1) {
         if (!qtkaudio_currdevice_uid)
             qtkaudio_currdevice_uid = [[[QTCaptureDevice defaultInputDeviceWithMediaType: QTMediaTypeSound] uniqueID]
                                   stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
-        NSUInteger deviceCount = [qtkaudioDevices count];
+        NSUInteger deviceCount = _qtkaudioDevices.count;
         for (int iaudio = 0; iaudio < deviceCount; iaudio++) {
-            QTCaptureDevice *qtkaudio_device = [qtkaudioDevices objectAtIndex:iaudio];
+            QTCaptureDevice *qtkaudio_device = _qtkaudioDevices[iaudio];
 
             // allow same name for multiple times
             [[o_qtk_audio_device_pop menu] addItemWithTitle:[qtkaudio_device localizedDisplayName] action:nil keyEquivalent:@""];
@@ -307,7 +286,7 @@ struct display_info_t
     /* register clicks on text fields */
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(textFieldWasClicked:)
-                                                 name: @"VLCOpenTextFieldWasClicked"
+                                                 name: VLCOpenTextFieldWasClicked
                                                object: nil];
 
     /* we want to be notified about removed or added media */
@@ -535,22 +514,22 @@ struct display_info_t
 - (IBAction)qtkChanged:(id)sender
 {
     NSInteger i_selectedDevice = [o_qtk_video_device_pop indexOfSelectedItem];
-    if ([qtkvideoDevices count] >= 1) {
+    if (_qtkvideoDevices.count >= 1) {
         NSValue *sizes = [[[[qtkvideoDevices objectAtIndex:i_selectedDevice] formatDescriptions] objectAtIndex:0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
 
         [o_capture_width_fld setIntValue: [sizes sizeValue].width];
         [o_capture_height_fld setIntValue: [sizes sizeValue].height];
         [o_capture_width_stp setIntValue: [o_capture_width_fld intValue]];
         [o_capture_height_stp setIntValue: [o_capture_height_fld intValue]];
-        qtk_currdevice_uid = [[(QTCaptureDevice *)[qtkvideoDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        qtk_currdevice_uid = [[(QTCaptureDevice *)_qtkvideoDevices[i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
 }
 
 - (IBAction)qtkAudioChanged:(id)sender
 {
     NSInteger i_selectedDevice = [o_qtk_audio_device_pop indexOfSelectedItem];
-    if ([qtkaudioDevices count] >= 1) {
-        qtkaudio_currdevice_uid = [[(QTCaptureDevice *)[qtkaudioDevices objectAtIndex:i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    if (_qtkaudioDevices.count >= 1) {
+        qtkaudio_currdevice_uid = [[(QTCaptureDevice *)_qtkaudioDevices[i_selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
     [o_screen_qtk_audio_pop selectItemAtIndex: i_selectedDevice];
     [o_qtk_audio_device_pop selectItemAtIndex: i_selectedDevice];
@@ -805,136 +784,6 @@ struct display_info_t
     [[[o_tabview tabViewItemAtIndex: [o_tabview indexOfTabViewItemWithIdentifier:@"optical"]] view] displayIfNeeded];
 }
 
-+ (NSString *) getBSDNodeFromMountPath:(NSString *)mountPath
-{
-    OSStatus err;
-    FSRef ref;
-    FSVolumeRefNum actualVolume;
-    err = FSPathMakeRef ((const UInt8 *) [mountPath fileSystemRepresentation], &ref, NULL);
-
-    // get a FSVolumeRefNum from mountPath
-    if (noErr == err) {
-        FSCatalogInfo   catalogInfo;
-        err = FSGetCatalogInfo (&ref,
-                                kFSCatInfoVolume,
-                                &catalogInfo,
-                                NULL,
-                                NULL,
-                                NULL
-                               );
-        if (noErr == err)
-            actualVolume = catalogInfo.volume;
-        else
-            return @"";
-    }
-    else
-        return @"";
-
-    GetVolParmsInfoBuffer volumeParms;
-    err = FSGetVolumeParms(actualVolume, &volumeParms, sizeof(volumeParms));
-    if (noErr == err) {
-        NSString *bsdName = [NSString stringWithUTF8String:(char *)volumeParms.vMDeviceID];
-        return [NSString stringWithFormat:@"/dev/r%@", bsdName];
-    }
-
-    return @"";
-}
-
-+ (NSString *)getVolumeTypeFromMountPath:(NSString *)mountPath
-{
-    OSStatus err;
-    FSRef ref;
-    FSVolumeRefNum actualVolume;
-    NSString *returnValue;
-    err = FSPathMakeRef ((const UInt8 *) [mountPath fileSystemRepresentation], &ref, NULL);
-
-    // get a FSVolumeRefNum from mountPath
-    if (noErr == err) {
-        FSCatalogInfo   catalogInfo;
-        err = FSGetCatalogInfo (&ref,
-                                kFSCatInfoVolume,
-                                &catalogInfo,
-                                NULL,
-                                NULL,
-                                NULL
-                               );
-        if (noErr == err)
-            actualVolume = catalogInfo.volume;
-        else
-            goto out;
-    }
-    else
-        goto out;
-
-    GetVolParmsInfoBuffer volumeParms;
-    err = FSGetVolumeParms(actualVolume, &volumeParms, sizeof(volumeParms));
-
-    CFMutableDictionaryRef matchingDict;
-    io_service_t service;
-
-    if (!volumeParms.vMDeviceID) {
-        goto out;
-    }
-
-    matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, volumeParms.vMDeviceID);
-    service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
-
-    if (IO_OBJECT_NULL != service) {
-        if (IOObjectConformsTo(service, kIOCDMediaClass))
-            returnValue = kVLCMediaAudioCD;
-        else if (IOObjectConformsTo(service, kIODVDMediaClass))
-            returnValue = kVLCMediaDVD;
-        else if (IOObjectConformsTo(service, kIOBDMediaClass))
-            returnValue = kVLCMediaBD;
-        IOObjectRelease(service);
-
-        if (returnValue)
-            return returnValue;
-    }
-
-out:
-    if ([mountPath rangeOfString:@"VIDEO_TS" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
-        returnValue = kVLCMediaVideoTSFolder;
-    else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
-        returnValue = kVLCMediaBDMVFolder;
-    else {
-        // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
-        NSFileManager * fm = [[NSFileManager alloc] init];
-
-        NSArray *dirContents = [fm contentsOfDirectoryAtPath:mountPath error:nil];
-        for (int i = 0; i < [dirContents count]; i++) {
-            NSString *currentFile = [dirContents objectAtIndex:i];
-            NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
-
-            BOOL isDir;
-            if ([fm fileExistsAtPath:fullPath isDirectory:&isDir] && isDir)
-            {
-                if ([currentFile caseInsensitiveCompare:@"SVCD"] == NSOrderedSame) {
-                    returnValue = kVLCMediaSVCD;
-                    break;
-                }
-                if ([currentFile caseInsensitiveCompare:@"VCD"] == NSOrderedSame) {
-                    returnValue = kVLCMediaVCD;
-                    break;
-                }
-                if ([currentFile caseInsensitiveCompare:@"BDMV"] == NSOrderedSame) {
-                    returnValue = kVLCMediaBDMVFolder;
-                    break;
-                }
-                if ([currentFile caseInsensitiveCompare:@"VIDEO_TS"] == NSOrderedSame) {
-                    returnValue = kVLCMediaVideoTSFolder;
-                    break;
-                }
-            }
-        }
-
-        if (!returnValue)
-            returnValue = kVLCMediaVideoTSFolder;
-    }
-
-    return returnValue;
-}
-
 - (void)showOpticalAtPath: (NSDictionary *)o_dict
 {
     NSString *diskType = [o_dict objectForKey:@"mediaType"];
@@ -980,7 +829,7 @@ out:
 
 - (NSDictionary *)scanPath:(NSString *)o_path
 {
-    NSString *o_type = [VLCOpen getVolumeTypeFromMountPath:o_path];
+    NSString *o_type = [[VLCStringUtility sharedInstance] getVolumeTypeFromMountPath:o_path];
     NSImage *o_image = [[NSWorkspace sharedWorkspace] iconForFile: o_path];
     NSString *o_device_path;
 
@@ -997,7 +846,7 @@ out:
         [o_type isEqualToString: kVLCMediaUnknown])
         o_device_path = o_path;
     else
-        o_device_path = [VLCOpen getBSDNodeFromMountPath:o_path];
+        o_device_path = [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath:o_path];
 
     return [NSDictionary dictionaryWithObjectsAndKeys: o_path, @"path",
                                                 o_device_path, @"devicePath",
@@ -1182,13 +1031,13 @@ out:
 
     if (i_tag == 0) {
         [o_net_udp_port setIntValue: [o_net_udp_port_stp intValue]];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked"
+        [[NSNotificationCenter defaultCenter] postNotificationName: VLCOpenTextFieldWasClicked
                                                             object: o_net_udp_port];
         [o_panel makeFirstResponder: o_net_udp_port];
     }
     else if (i_tag == 1) {
         [o_net_udpm_port setIntValue: [o_net_udpm_port_stp intValue]];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked"
+        [[NSNotificationCenter defaultCenter] postNotificationName: VLCOpenTextFieldWasClicked
                                                             object: o_net_udpm_port];
         [o_panel makeFirstResponder: o_net_udpm_port];
     }
@@ -1315,7 +1164,7 @@ out:
                 [self setupChannelInfo];
             }
             else
-                setEyeTVUnconnected;
+                [self setEyeTVUnconnected];
         }
         else
             [self showCaptureView: o_eyetv_notLaunched_view];
@@ -1431,7 +1280,7 @@ out:
         /* leave the channel selection like that,
          * switch to our "no device" tab */
         msg_Dbg(VLCIntf, "eyetv device was removed");
-        setEyeTVUnconnected;
+        [self setEyeTVUnconnected];
     } else if ([[o_notification name] isEqualToString: @"PluginQuit"]) {
         /* switch to the "launch eyetv" tab */
         msg_Dbg(VLCIntf, "eyetv was terminated");
@@ -1439,8 +1288,17 @@ out:
     } else if ([[o_notification name] isEqualToString: @"PluginInit"]) {
         /* we got no device yet */
         msg_Dbg(VLCIntf, "eyetv was launched, no device yet");
-        setEyeTVUnconnected;
+        [self setEyeTVUnconnected];
     }
+}
+
+- (void)setEyeTVUnconnected
+{
+    [o_capture_lbl setStringValue: _NS("No device is selected")];
+    [o_capture_long_lbl setStringValue: _NS("No device is selected.\n\nChoose available device in above pull-down menu.\n")];
+    [o_capture_lbl displayIfNeeded];
+    [o_capture_long_lbl displayIfNeeded];
+    [self showCaptureView: o_capture_label_view];
 }
 
 /* little helper method, since this code needs to be run by multiple objects */
@@ -1562,39 +1420,14 @@ out:
         NSBeep();
 }
 
-- (NSArray *)qtkvideoDevices
+- (void)updateQTKVideoDevices
 {
-    if (!qtkvideoDevices)
-        [self qtkrefreshVideoDevices];
-    return qtkvideoDevices;
+    _qtkvideoDevices = [[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]];
 }
 
-- (void)qtkrefreshVideoDevices
+- (void)updateQTKAudioDevices
 {
-    qtkvideoDevices = [[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]];
-}
-
-- (NSArray *)qtkaudioDevices
-{
-    if (!qtkaudioDevices)
-        [self qtkrefreshAudioDevices];
-    return qtkaudioDevices;
-}
-
-- (void)qtkrefreshAudioDevices
-{
-    qtkaudioDevices = [[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeSound] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]];
-}
-
-@end
-
-@implementation VLCOpenTextField
-
-- (void)mouseDown:(NSEvent *)theEvent
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked"
-                                                        object: self];
-    [super mouseDown: theEvent];
+    _qtkaudioDevices = [[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeSound] arrayByAddingObjectsFromArray:[QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeMuxed]];
 }
 
 @end

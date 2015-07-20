@@ -28,6 +28,20 @@
 #import "StringUtility.h"
 #import "CompatibilityFixes.h"
 
+#import <IOKit/storage/IOMedia.h>
+#import <IOKit/storage/IOCDMedia.h>
+#import <IOKit/storage/IODVDMedia.h>
+#import <IOKit/storage/IOBDMedia.h>
+
+NSString *const kVLCMediaAudioCD = @"AudioCD";
+NSString *const kVLCMediaDVD = @"DVD";
+NSString *const kVLCMediaVCD = @"VCD";
+NSString *const kVLCMediaSVCD = @"SVCD";
+NSString *const kVLCMediaBD = @"Blu-ray";
+NSString *const kVLCMediaVideoTSFolder = @"VIDEO_TS";
+NSString *const kVLCMediaBDMVFolder = @"BDMV";
+NSString *const kVLCMediaUnknown = @"Unknown";
+
 #import <vlc_keys.h>
 #import <vlc_strings.h>
 
@@ -381,6 +395,136 @@ NSString *toNSStr(const char *str) {
     free(psz_encoded_string);
 
     return returnStr;
+}
+
+- (NSString *) getBSDNodeFromMountPath:(NSString *)mountPath
+{
+    OSStatus err;
+    FSRef ref;
+    FSVolumeRefNum actualVolume;
+    err = FSPathMakeRef ((const UInt8 *) [mountPath fileSystemRepresentation], &ref, NULL);
+
+    // get a FSVolumeRefNum from mountPath
+    if (noErr == err) {
+        FSCatalogInfo   catalogInfo;
+        err = FSGetCatalogInfo (&ref,
+                                kFSCatInfoVolume,
+                                &catalogInfo,
+                                NULL,
+                                NULL,
+                                NULL
+                                );
+        if (noErr == err)
+            actualVolume = catalogInfo.volume;
+        else
+            return @"";
+    }
+    else
+        return @"";
+
+    GetVolParmsInfoBuffer volumeParms;
+    err = FSGetVolumeParms(actualVolume, &volumeParms, sizeof(volumeParms));
+    if (noErr == err) {
+        NSString *bsdName = [NSString stringWithUTF8String:(char *)volumeParms.vMDeviceID];
+        return [NSString stringWithFormat:@"/dev/r%@", bsdName];
+    }
+
+    return @"";
+}
+
+- (NSString *)getVolumeTypeFromMountPath:(NSString *)mountPath
+{
+    OSStatus err;
+    FSRef ref;
+    FSVolumeRefNum actualVolume;
+    NSString *returnValue;
+    err = FSPathMakeRef ((const UInt8 *) [mountPath fileSystemRepresentation], &ref, NULL);
+
+    // get a FSVolumeRefNum from mountPath
+    if (noErr == err) {
+        FSCatalogInfo   catalogInfo;
+        err = FSGetCatalogInfo (&ref,
+                                kFSCatInfoVolume,
+                                &catalogInfo,
+                                NULL,
+                                NULL,
+                                NULL
+                                );
+        if (noErr == err)
+            actualVolume = catalogInfo.volume;
+        else
+            goto out;
+    }
+    else
+        goto out;
+
+    GetVolParmsInfoBuffer volumeParms;
+    err = FSGetVolumeParms(actualVolume, &volumeParms, sizeof(volumeParms));
+
+    CFMutableDictionaryRef matchingDict;
+    io_service_t service;
+
+    if (!volumeParms.vMDeviceID) {
+        goto out;
+    }
+
+    matchingDict = IOBSDNameMatching(kIOMasterPortDefault, 0, volumeParms.vMDeviceID);
+    service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict);
+
+    if (IO_OBJECT_NULL != service) {
+        if (IOObjectConformsTo(service, kIOCDMediaClass))
+            returnValue = kVLCMediaAudioCD;
+        else if (IOObjectConformsTo(service, kIODVDMediaClass))
+            returnValue = kVLCMediaDVD;
+        else if (IOObjectConformsTo(service, kIOBDMediaClass))
+            returnValue = kVLCMediaBD;
+        IOObjectRelease(service);
+
+        if (returnValue)
+            return returnValue;
+    }
+
+    out:
+    if ([mountPath rangeOfString:@"VIDEO_TS" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
+        returnValue = kVLCMediaVideoTSFolder;
+    else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
+        returnValue = kVLCMediaBDMVFolder;
+    else {
+        // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
+        NSFileManager * fm = [[NSFileManager alloc] init];
+
+        NSArray *dirContents = [fm contentsOfDirectoryAtPath:mountPath error:nil];
+        for (int i = 0; i < [dirContents count]; i++) {
+            NSString *currentFile = [dirContents objectAtIndex:i];
+            NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
+
+            BOOL isDir;
+            if ([fm fileExistsAtPath:fullPath isDirectory:&isDir] && isDir)
+            {
+                if ([currentFile caseInsensitiveCompare:@"SVCD"] == NSOrderedSame) {
+                    returnValue = kVLCMediaSVCD;
+                    break;
+                }
+                if ([currentFile caseInsensitiveCompare:@"VCD"] == NSOrderedSame) {
+                    returnValue = kVLCMediaVCD;
+                    break;
+                }
+                if ([currentFile caseInsensitiveCompare:@"BDMV"] == NSOrderedSame) {
+                    returnValue = kVLCMediaBDMVFolder;
+                    break;
+                }
+                if ([currentFile caseInsensitiveCompare:@"VIDEO_TS"] == NSOrderedSame) {
+                    returnValue = kVLCMediaVideoTSFolder;
+                    break;
+                }
+            }
+        }
+
+        if (!returnValue)
+            returnValue = kVLCMediaVideoTSFolder;
+    }
+
+    return returnValue;
 }
 
 @end

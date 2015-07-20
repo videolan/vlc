@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.h: Open dialogues for VLC's MacOS X port
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -23,15 +23,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
-#define kVLCMediaAudioCD @"AudioCD"
-#define kVLCMediaDVD @"DVD"
-#define kVLCMediaVCD @"VCD"
-#define kVLCMediaSVCD @"SVCD"
-#define kVLCMediaBD @"Blu-ray"
-#define kVLCMediaVideoTSFolder @"VIDEO_TS"
-#define kVLCMediaBDMVFolder @"BDMV"
-#define kVLCMediaUnknown @"Unknown"
 
 /*****************************************************************************
  * Intf_Open interface
@@ -221,22 +212,11 @@
     IBOutlet id o_capture_height_stp;
 }
 
-+ (VLCOpen *)sharedInstance;
-
-@property (readwrite, assign) NSString *MRL;
-@property (readonly) NSArray *qtkvideoDevices;
-@property (readonly) NSArray *qtkaudioDevices;
-
 /* text field / stepper binding values - subs panel */
 @property (nonatomic) float fileSubDelay;
 @property (nonatomic) float fileSubFps;
 
-
-- (void)qtkrefreshVideoDevices;
-- (void)qtkrefreshAudioDevices;
-
 - (void)setSubPanel;
-- (void)openTarget:(int)i_type;
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi;
 - (void)textFieldWasClicked:(NSNotification *)o_notification;
 - (IBAction)expandMRLfieldAction:(id)sender;
@@ -244,20 +224,14 @@
 - (IBAction)fileTimeCustomization:(id)sender;
 
 - (void)openFileGeneric;
-- (void)openFilePathChanged:(NSNotification *)o_notification;
 - (IBAction)openFileBrowse:(id)sender;
 - (IBAction)openFileStreamChanged:(id)sender;
 
 - (void)openDisc;
-- (void)scanOpticalMedia:(NSNotification *)o_notification;
 - (IBAction)discSelectorChanged:(id)sender;
 - (IBAction)openSpecialMediaFolder:(id)sender;
 - (IBAction)dvdreadOptionChanged:(id)sender;
 - (IBAction)vcdOptionChanged:(id)sender;
-
-// static helper functions
-+ (NSString *)getVolumeTypeFromMountPath:(NSString *)mountPath;
-+ (NSString *)getBSDNodeFromMountPath:(NSString *)mountPath;
 
 - (void)openNet;
 - (IBAction)openNetModeChanged:(id)sender;
@@ -266,7 +240,6 @@
 - (IBAction)openNetUDPButtonAction:(id)sender;
 
 - (void)openCapture;
-- (void)showCaptureView: theView;
 - (IBAction)openCaptureModeChanged:(id)sender;
 - (IBAction)qtkChanged:(id)sender;
 - (IBAction)qtkAudioChanged:(id)sender;
@@ -275,9 +248,6 @@
 - (IBAction)eyetvSwitchChannel:(id)sender;
 - (IBAction)eyetvLaunch:(id)sender;
 - (IBAction)eyetvGetPlugin:(id)sender;
-- (void)eyetvChanged:(NSNotification *)o_notification;
-- (void)setupChannelInfo;
-- (void)screenFPSfieldChanged:(NSNotification *)o_notification;
 
 - (IBAction)subsChanged:(id)sender;
 - (IBAction)subSettings:(id)sender;
@@ -290,8 +260,4 @@
 - (IBAction)panelOk:(id)sender;
 
 - (void)openFile;
-@end
-
-@interface VLCOpenTextField : NSTextField
-- (void)mouseDown:(NSEvent *)theEvent;
 @end
