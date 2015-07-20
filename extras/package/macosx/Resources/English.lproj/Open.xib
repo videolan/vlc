@@ -6,9 +6,163 @@
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8152.3"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCOpen"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCOpen">
+            <connections>
+                <outlet property="cancelButton" destination="641" id="QPb-Fs-uG1"/>
+                <outlet property="captureLabel" destination="2302" id="yA2-pt-LWQ"/>
+                <outlet property="captureLongLabel" destination="2303" id="g9x-RT-AOl"/>
+                <outlet property="captureModePopup" destination="2327" id="v7x-B4-tJK"/>
+                <outlet property="captureView" destination="2301" id="Pkb-rA-pl4"/>
+                <outlet property="discAudioCDLabel" destination="3084" id="qIb-o0-AKx"/>
+                <outlet property="discAudioCDTrackCountLabel" destination="3104" id="oKf-yd-oZG"/>
+                <outlet property="discAudioCDVideoTSButton" destination="3081" id="MRT-9B-eSa"/>
+                <outlet property="discAudioCDView" destination="3080" id="x3q-0V-eqv"/>
+                <outlet property="discBDLabel" destination="3291" id="JLB-jY-BDh"/>
+                <outlet property="discBDVideoTSButton" destination="3293" id="8A9-id-i6v"/>
+                <outlet property="discBDView" destination="3289" id="9Ga-GL-AA9"/>
+                <outlet property="discDVDDisableMenusButton" destination="3183" id="xen-y0-De2"/>
+                <outlet property="discDVDLabel" destination="3110" id="ER7-GJ-Su9"/>
+                <outlet property="discDVDVideoTSButton" destination="3108" id="XSM-up-Nk9"/>
+                <outlet property="discDVDView" destination="3106" id="bij-VT-fAD"/>
+                <outlet property="discDVDwomenusChapterLabel" destination="3148" id="c1g-Zt-Bkx"/>
+                <outlet property="discDVDwomenusChapterStepper" destination="3153" id="I28-yg-XlN"/>
+                <outlet property="discDVDwomenusChapterTextField" destination="3151" id="66f-Yv-jW0"/>
+                <outlet property="discDVDwomenusEnableMenusButton" destination="3192" id="Sow-Rz-dKM"/>
+                <outlet property="discDVDwomenusLabel" destination="3193" id="bQ4-MA-QPp"/>
+                <outlet property="discDVDwomenusTitleLabel" destination="3149" id="XdD-jF-Iho"/>
+                <outlet property="discDVDwomenusTitleStepper" destination="3152" id="V8i-WF-bKh"/>
+                <outlet property="discDVDwomenusTitleTextField" destination="3150" id="qEs-2h-iVe"/>
+                <outlet property="discDVDwomenusVideoTSButton" destination="3186" id="HqQ-By-sdI"/>
+                <outlet property="discDVDwomenusView" destination="3119" id="GT4-Q2-UEQ"/>
+                <outlet property="discNoDiscLabel" destination="3094" id="nJX-iG-87a"/>
+                <outlet property="discNoDiscVideoTSButton" destination="3096" id="XTT-fQ-Pbi"/>
+                <outlet property="discNoDiscView" destination="3093" id="U77-Gf-uM4"/>
+                <outlet property="discSelectorPopup" destination="3166" id="zcc-5p-aZQ"/>
+                <outlet property="discVCDChapterLabel" destination="3243" id="5LT-gi-4u8"/>
+                <outlet property="discVCDChapterStepper" destination="3238" id="dY9-Vh-bgH"/>
+                <outlet property="discVCDChapterTextField" destination="3240" id="d2f-PQ-Lqu"/>
+                <outlet property="discVCDLabel" destination="3234" id="uHN-5Y-069"/>
+                <outlet property="discVCDTitleLabel" destination="3242" id="QeV-HV-T42"/>
+                <outlet property="discVCDTitleStepper" destination="3239" id="zZ5-kQ-2G6"/>
+                <outlet property="discVCDTitleTextField" destination="3241" id="zTk-hy-VrR"/>
+                <outlet property="discVCDVideoTSButton" destination="3237" id="0Uh-rC-7Ho"/>
+                <outlet property="discVCDView" destination="3233" id="Sv2-dO-K19"/>
+                <outlet property="eyeTVChannelProgressBar" destination="2313" id="jF9-DH-aLc"/>
+                <outlet property="eyeTVChannelStatusLabel" destination="2314" id="nK9-P1-ai5"/>
+                <outlet property="eyeTVchannelsPopup" destination="2308" id="Xfy-qx-pim"/>
+                <outlet property="eyeTVcurrentChannelLabel" destination="2307" id="LaM-Lq-8eo"/>
+                <outlet property="eyeTVgetPluginButton" destination="2366" id="Ctg-Hb-A41"/>
+                <outlet property="eyeTVlaunchEyeTVButton" destination="2300" id="Wv7-cY-UgG"/>
+                <outlet property="eyeTVnextProgramButton" destination="2306" id="dd6-bh-Jak"/>
+                <outlet property="eyeTVnoInstanceLabel" destination="2298" id="guC-09-gbT"/>
+                <outlet property="eyeTVnoInstanceLongLabel" destination="2299" id="ZFf-jf-GLF"/>
+                <outlet property="eyeTVnotLaunchedView" destination="2297" id="rkJ-LS-3Re"/>
+                <outlet property="eyeTVpreviousProgramButton" destination="2305" id="zdn-6d-Ufc"/>
+                <outlet property="eyeTVrunningView" destination="2304" id="aI9-hD-69n"/>
+                <outlet property="fileBrowseButton" destination="686" id="kVF-QN-bSe"/>
+                <outlet property="fileCustomTimingCheckbox" destination="3485" id="cfA-oe-tE9"/>
+                <outlet property="fileIconWell" destination="3326" id="vKh-ut-K7F"/>
+                <outlet property="fileNameLabel" destination="3342" id="ypA-ef-5Vn"/>
+                <outlet property="fileNameStubLabel" destination="3328" id="Lw8-gC-PNl"/>
+                <outlet property="fileSelectSlaveButton" destination="3004" id="OFe-gP-ull"/>
+                <outlet property="fileSlaveCheckbox" destination="2995" id="qAi-B5-h5J"/>
+                <outlet property="fileSlaveFilenameLabel" destination="3008" id="m6D-Tf-fo9"/>
+                <outlet property="fileSlaveIconWell" destination="3332" id="C6k-Kl-dsI"/>
+                <outlet property="fileStartTimeLabel" destination="3475" id="Ufu-1O-arq"/>
+                <outlet property="fileStartTimeTextField" destination="3473" id="ffN-OX-qfu"/>
+                <outlet property="fileStopTimeLabel" destination="3478" id="40E-x1-prK"/>
+                <outlet property="fileStopTimeTextField" destination="3477" id="LL4-vZ-sb5"/>
+                <outlet property="fileSubAlignLabel" destination="2142" id="G59-Vo-B7E"/>
+                <outlet property="fileSubAlignPopup" destination="2153" id="9Rq-fG-C5a"/>
+                <outlet property="fileSubBrowseButton" destination="1266" id="Bfh-Pw-eed"/>
+                <outlet property="fileSubCheckbox" destination="1112" id="aZv-XL-1yd"/>
+                <outlet property="fileSubDelayLabel" destination="1278" id="llZ-Jf-5J4"/>
+                <outlet property="fileSubDelayStepper" destination="1280" id="vvF-W2-rLE"/>
+                <outlet property="fileSubDelayTextField" destination="1279" id="1Wk-2c-9KR"/>
+                <outlet property="fileSubEncodingLabel" destination="2139" id="VTH-nt-ObJ"/>
+                <outlet property="fileSubEncodingPopup" destination="2158" id="icg-0h-3NY"/>
+                <outlet property="fileSubFPSLabel" destination="1274" id="Yd5-ql-9Y8"/>
+                <outlet property="fileSubFPSStepper" destination="1276" id="uY4-id-bET"/>
+                <outlet property="fileSubFPSTextField" destination="1275" id="yCe-6D-ISK"/>
+                <outlet property="fileSubFileBox" destination="1267" id="OGg-0J-ufa"/>
+                <outlet property="fileSubFontBox" destination="2137" id="nFl-Mo-DDE"/>
+                <outlet property="fileSubIconView" destination="3371" id="s3v-z0-LLe"/>
+                <outlet property="fileSubOKButton" destination="1304" id="KQv-fB-mRo"/>
+                <outlet property="fileSubOverrideCheckbox" destination="1336" id="DNR-5q-wbl"/>
+                <outlet property="fileSubPathLabel" destination="3372" id="s86-Rk-QxG"/>
+                <outlet property="fileSubPathTextField" destination="3373" id="bwV-9U-Lvt"/>
+                <outlet property="fileSubSettingsButton" destination="1269" id="iry-xC-QZj"/>
+                <outlet property="fileSubSheet" destination="1263" id="WY1-iD-m7z"/>
+                <outlet property="fileSubSizeLabel" destination="2177" id="x7N-x4-nb7"/>
+                <outlet property="fileSubSizePopup" destination="2176" id="sHQ-dV-vM8"/>
+                <outlet property="fileSubtitlesFilenameLabel" destination="3334" id="e8g-Pz-arj"/>
+                <outlet property="fileSubtitlesIconWell" destination="3335" id="Ewo-mh-0b9"/>
+                <outlet property="fileTreatAsPipeButton" destination="834" id="qZ9-Ma-hdL"/>
+                <outlet property="mrlButton" destination="2836" id="BTX-dY-2pe"/>
+                <outlet property="mrlLabel" destination="2835" id="dYM-KV-nw8"/>
+                <outlet property="mrlTextField" destination="2840" id="YtE-PL-EEV"/>
+                <outlet property="mrlView" destination="2837" id="4C3-kA-e1R"/>
+                <outlet property="netHTTPURLLabel" destination="725" id="V9O-ut-b26"/>
+                <outlet property="netHTTPURLTextField" destination="730" id="L9w-sd-gAb"/>
+                <outlet property="netHelpLabel" destination="2809" id="9o4-Oi-RcV"/>
+                <outlet property="netHelpUDPLabel" destination="2811" id="S3O-dh-JDy"/>
+                <outlet property="netModeMatrix" destination="2794" id="7TP-FH-hM0"/>
+                <outlet property="netOpenUDPButton" destination="2810" id="PF2-Ai-4GR"/>
+                <outlet property="netUDPAddressLabel" destination="2854" id="6uM-rY-Muq"/>
+                <outlet property="netUDPCancelButton" destination="2808" id="8h1-ZL-RgL"/>
+                <outlet property="netUDPMAddressLabel" destination="2798" id="S1s-TA-3Vc"/>
+                <outlet property="netUDPMAddressTextField" destination="2801" id="l4Y-4K-uoA"/>
+                <outlet property="netUDPMPortLabel" destination="2802" id="xiA-cH-f1n"/>
+                <outlet property="netUDPMPortStepper" destination="2804" id="dOC-PM-ZPi"/>
+                <outlet property="netUDPMPortTextField" destination="2803" id="GgX-P2-fwq"/>
+                <outlet property="netUDPModeLabel" destination="2853" id="9ag-mX-lxD"/>
+                <outlet property="netUDPOKButton" destination="2807" id="ZRJ-0a-bLS"/>
+                <outlet property="netUDPPanel" destination="2792" id="PAk-L8-xdC"/>
+                <outlet property="netUDPPortLabel" destination="2797" id="ono-Ti-Irr"/>
+                <outlet property="netUDPPortStepper" destination="2800" id="4Kv-Vv-ZWH"/>
+                <outlet property="netUDPPortTextField" destination="2799" id="XiR-wY-oLp"/>
+                <outlet property="netUDPProtocolLabel" destination="2852" id="HHB-zG-Tis"/>
+                <outlet property="netUDPProtocolMatrix" destination="2860" id="BXg-n9-cH5"/>
+                <outlet property="okButton" destination="640" id="S9F-WP-A7y"/>
+                <outlet property="outputCheckbox" destination="929" id="Gz1-rY-w0Q"/>
+                <outlet property="panel" destination="636" id="POG-Xe-8j5"/>
+                <outlet property="qtkAudioCheckbox" destination="3492" id="5d3-k7-1dB"/>
+                <outlet property="qtkAudioDevicePopup" destination="3438" id="Jt3-3n-AjR"/>
+                <outlet property="qtkHeightLabel" destination="3349" id="1V9-Wm-BdJ"/>
+                <outlet property="qtkHeightStepper" destination="3351" id="v8k-yD-WE5"/>
+                <outlet property="qtkHeightTextField" destination="3348" id="8c7-le-9su"/>
+                <outlet property="qtkVideoCheckbox" destination="3490" id="S1B-xw-YKh"/>
+                <outlet property="qtkVideoDevicePopup" destination="3071" id="wma-HH-ELO"/>
+                <outlet property="qtkView" destination="3013" id="Wg4-GC-17d"/>
+                <outlet property="qtkWidthLabel" destination="3347" id="oHc-a5-8wQ"/>
+                <outlet property="qtkWidthStepper" destination="3350" id="X4f-so-Mux"/>
+                <outlet property="qtkWidthTextField" destination="3346" id="ldN-GB-hNL"/>
+                <outlet property="screenFPSLabel" destination="2351" id="fNh-dQ-cWm"/>
+                <outlet property="screenFPSStepper" destination="2352" id="5MV-V5-oeN"/>
+                <outlet property="screenFPSTextField" destination="2349" id="Ptg-Br-V44"/>
+                <outlet property="screenFollowMouseCheckbox" destination="2508" id="49F-Po-mCG"/>
+                <outlet property="screenHeightLabel" destination="2499" id="KDW-7r-kh7"/>
+                <outlet property="screenHeightStepper" destination="2774" id="kc8-FZ-RSj"/>
+                <outlet property="screenHeightTextField" destination="2498" id="m3Q-SQ-EQW"/>
+                <outlet property="screenLabel" destination="3462" id="aFP-U7-Feg"/>
+                <outlet property="screenLeftLabel" destination="2493" id="mEu-iM-NS0"/>
+                <outlet property="screenLeftStepper" destination="2771" id="cYf-8O-K4J"/>
+                <outlet property="screenLeftTextField" destination="2492" id="bMn-pS-hFD"/>
+                <outlet property="screenPopup" destination="3463" id="GSo-Ru-q3s"/>
+                <outlet property="screenTopLabel" destination="2495" id="VYv-Q7-Kxi"/>
+                <outlet property="screenTopStepper" destination="2772" id="Byb-rC-FeI"/>
+                <outlet property="screenTopTextField" destination="2494" id="N0E-Bo-dqu"/>
+                <outlet property="screenView" destination="2346" id="RVo-Xq-4ky"/>
+                <outlet property="screenWidthLabel" destination="2497" id="hPy-Eg-VEe"/>
+                <outlet property="screenWidthStepper" destination="2773" id="wG3-yZ-vhc"/>
+                <outlet property="screenWidthTextField" destination="2496" id="7k8-nP-DoC"/>
+                <outlet property="screenqtkAudioCheckbox" destination="3515" id="Y4X-ro-aSB"/>
+                <outlet property="screenqtkAudioPopup" destination="3506" id="gkb-yW-rOf"/>
+                <outlet property="tabView" destination="678" id="bM9-Bh-adI"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Open Source" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="open" animationBehavior="default" id="636" userLabel="OpenTarget" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -37,6 +191,9 @@
 DQ
 </string>
                         </buttonCell>
+                        <connections>
+                            <action selector="panelOk:" target="-2" id="8t9-Gq-Sej"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="641">
                         <rect key="frame" x="314" y="12" width="123" height="32"/>
@@ -48,6 +205,9 @@ DQ
 Gw
 </string>
                         </buttonCell>
+                        <connections>
+                            <action selector="panelCancel:" target="-2" id="9aG-gu-Abl"/>
+                        </connections>
                     </button>
                     <tabView id="678">
                         <rect key="frame" x="13" y="96" width="548" height="278"/>
@@ -66,6 +226,9 @@ Gw
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="openFileBrowse:" target="-2" id="oX7-TG-08f"/>
+                                            </connections>
                                         </button>
                                         <button id="834">
                                             <rect key="frame" x="57" y="169" width="492" height="18"/>
@@ -74,6 +237,9 @@ Gw
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="openFileStreamChanged:" target="-2" id="6ig-pa-BOY"/>
+                                            </connections>
                                         </button>
                                         <button id="1112">
                                             <rect key="frame" x="18" y="138" width="373" height="18"/>
@@ -82,6 +248,9 @@ Gw
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="subsChanged:" target="-2" id="0iz-a1-NHr"/>
+                                            </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" id="1269">
                                             <rect key="frame" x="391" y="129" width="123" height="32"/>
@@ -90,6 +259,9 @@ Gw
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="subSettings:" target="-2" id="mNZ-NQ-fJc"/>
+                                            </connections>
                                         </button>
                                         <button id="2995">
                                             <rect key="frame" x="18" y="86" width="419" height="18"/>
@@ -98,6 +270,9 @@ Gw
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="inputSlaveAction:" target="-2" id="3he-cY-9xM"/>
+                                            </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" id="3004">
                                             <rect key="frame" x="391" y="77" width="123" height="32"/>
@@ -106,6 +281,9 @@ Gw
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="inputSlaveAction:" target="-2" id="gZZ-CJ-ibf"/>
+                                            </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" id="3008">
                                             <rect key="frame" x="60" y="69" width="451" height="14"/>
@@ -208,6 +386,9 @@ Gw
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="fileTimeCustomization:" target="-2" id="L9m-sN-HCz"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                             </view>
@@ -220,14 +401,14 @@ Gw
                             <tabViewItem label="Disc" identifier="optical" id="679">
                                 <view key="view" wantsLayer="YES" id="677">
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <popUpButton hidden="YES" verticalHuggingPriority="750" id="3166">
                                             <rect key="frame" x="162" y="205" width="203" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="GANGS_OF_NEW_YORK" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3169" id="3167">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
+                                                <font key="font" metaFont="menu"/>
                                                 <menu key="menu" title="OtherViews" id="3168">
                                                     <items>
                                                         <menuItem title="GANGS_OF_NEW_YORK" state="on" id="3169"/>
@@ -236,6 +417,9 @@ Gw
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
+                                            <connections>
+                                                <action selector="discSelectorChanged:" target="-2" id="lMm-4A-mou"/>
+                                            </connections>
                                         </popUpButton>
                                     </subviews>
                                 </view>
@@ -243,7 +427,7 @@ Gw
                             <tabViewItem label="Network" identifier="" id="682">
                                 <view key="view" id="683">
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" id="725">
                                             <rect key="frame" x="17" y="192" width="39" height="17"/>
@@ -280,6 +464,9 @@ Gw
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="openNetUDPButtonAction:" target="-2" id="oIe-UH-T53"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                 </view>
@@ -287,22 +474,25 @@ Gw
                             <tabViewItem label="Capture" identifier="" id="2257">
                                 <view key="view" id="2258">
                                     <rect key="frame" x="10" y="33" width="528" height="232"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <popUpButton verticalHuggingPriority="750" id="2327">
                                             <rect key="frame" x="184" y="198" width="160" height="26"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <popUpButtonCell key="cell" type="push" title="EyeTV" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="2889">
+                                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="2889">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
+                                                <font key="font" metaFont="menu"/>
                                                 <menu key="menu" title="OtherViews" id="2328">
                                                     <items>
-                                                        <menuItem title="EyeTV" state="on" id="2329"/>
+                                                        <menuItem title="EyeTV" id="2329"/>
                                                         <menuItem title="Screen" id="2330"/>
                                                         <menuItem title="iSight Capture" id="2331"/>
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
+                                            <connections>
+                                                <action selector="openCaptureModeChanged:" target="-2" id="Ad1-uv-dam"/>
+                                            </connections>
                                         </popUpButton>
                                     </subviews>
                                 </view>
@@ -333,9 +523,13 @@ Gw
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="expandMRLfieldAction:" target="-2" id="xIA-tD-1dw"/>
+                        </connections>
                     </button>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="-428" y="35"/>
         </window>
         <window title="Subtitle Sheet" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="subs" animationBehavior="default" id="1263" userLabel="SubtitleSheet" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
@@ -361,6 +555,9 @@ Gw
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="subFileBrowse:" target="-2" id="Fno-mE-c9n"/>
+                                    </connections>
                                 </button>
                                 <textField verticalHuggingPriority="750" id="1274">
                                     <rect key="frame" x="370" y="15" width="38" height="17"/>
@@ -415,6 +612,9 @@ Gw
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="subOverride:" target="-2" id="5Qm-qW-tBz"/>
+                                    </connections>
                                 </button>
                                 <imageView id="3371">
                                     <rect key="frame" x="17" y="49" width="32" height="32"/>
@@ -431,7 +631,7 @@ Gw
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" id="3373">
-                                    <rect key="frame" x="54" y="57" width="306" height="17"/>
+                                    <rect key="frame" x="54" y="56" width="306" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="bla bla bla.mov" id="3374">
                                         <font key="font" metaFont="system"/>
@@ -455,6 +655,9 @@ Gw
 DQ
 </string>
                         </buttonCell>
+                        <connections>
+                            <action selector="subCloseSheet:" target="-2" id="kh8-Rd-v5M"/>
+                        </connections>
                     </button>
                     <box title="Font Properties" id="2137">
                         <rect key="frame" x="17" y="56" width="497" height="133"/>
@@ -486,7 +689,7 @@ DQ
                                     <autoresizingMask key="autoresizingMask"/>
                                     <popUpButtonCell key="cell" type="push" title="Left" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2149" id="2906">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="menu"/>
                                         <menu key="menu" title="OtherViews" id="2150">
                                             <items>
                                                 <menuItem title="Left" state="on" id="2149"/>
@@ -500,7 +703,7 @@ DQ
                                     <autoresizingMask key="autoresizingMask"/>
                                     <popUpButtonCell key="cell" type="push" title="System Default" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2154" id="2907">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="menu"/>
                                         <menu key="menu" title="OtherViews" id="2157">
                                             <items>
                                                 <menuItem title="System Default" state="on" id="2154"/>
@@ -515,7 +718,7 @@ DQ
                                     <autoresizingMask key="autoresizingMask"/>
                                     <popUpButtonCell key="cell" type="push" title="Small" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2174" id="2908">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="system"/>
+                                        <font key="font" metaFont="menu"/>
                                         <menu key="menu" title="OtherViews" id="2172">
                                             <items>
                                                 <menuItem title="Small" state="on" id="2174"/>
@@ -542,6 +745,7 @@ DQ
                     </box>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="-421.5" y="467"/>
         </window>
         <customView id="2297" userLabel="EyeTV Not Launched">
             <rect key="frame" x="0.0" y="0.0" width="528" height="222"/>
@@ -554,6 +758,9 @@ DQ
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="eyetvGetPlugin:" target="-2" id="a6w-ZJ-RpU"/>
+                    </connections>
                 </button>
                 <button verticalHuggingPriority="750" id="2300">
                     <rect key="frame" x="264" y="45" width="159" height="32"/>
@@ -562,6 +769,9 @@ DQ
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="eyetvLaunch:" target="-2" id="qRw-jO-t7J"/>
+                    </connections>
                 </button>
                 <textField verticalHuggingPriority="750" id="2299">
                     <rect key="frame" x="17" y="93" width="494" height="44"/>
@@ -634,7 +844,7 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                     <autoresizingMask key="autoresizingMask"/>
                     <popUpButtonCell key="cell" type="push" title="Item1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2311" id="2956">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
+                        <font key="font" metaFont="menu"/>
                         <menu key="menu" title="OtherViews" id="2309">
                             <items>
                                 <menuItem title="Item1" state="on" id="2311"/>
@@ -643,6 +853,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                             </items>
                         </menu>
                     </popUpButtonCell>
+                    <connections>
+                        <action selector="eyetvSwitchChannel:" target="-2" id="bhE-fT-qZB"/>
+                    </connections>
                 </popUpButton>
                 <textField verticalHuggingPriority="750" id="2307">
                     <rect key="frame" x="13" y="150" width="253" height="17"/>
@@ -660,6 +873,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="eyetvSwitchChannel:" target="-2" id="KdG-xP-TJl"/>
+                    </connections>
                 </button>
                 <button verticalHuggingPriority="750" id="2305">
                     <rect key="frame" x="95" y="90" width="178" height="32"/>
@@ -668,6 +884,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="eyetvSwitchChannel:" target="-2" id="mXj-8p-Ud6"/>
+                    </connections>
                 </button>
             </subviews>
         </customView>
@@ -864,6 +1083,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                             </items>
                         </menu>
                     </popUpButtonCell>
+                    <connections>
+                        <action selector="screenChanged:" target="-2" id="iLa-oo-iCO"/>
+                    </connections>
                 </popUpButton>
                 <box title="Title" titlePosition="noTitle" id="3504">
                     <rect key="frame" x="17" y="16" width="494" height="46"/>
@@ -873,22 +1095,25 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <popUpButton verticalHuggingPriority="750" id="3506">
-                                <rect key="frame" x="166.2421875" y="10" width="309.7578125" height="22"/>
+                                <rect key="frame" x="166" y="10" width="310" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3507">
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3507">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="smallSystem"/>
                                     <menu key="menu" title="OtherViews" id="3508">
                                         <items>
-                                            <menuItem title="Item 1" state="on" id="3511"/>
+                                            <menuItem title="Item 1" id="3511"/>
                                             <menuItem title="Item 2" id="3510"/>
                                             <menuItem title="Item 3" id="3509"/>
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <connections>
+                                    <action selector="qtkAudioChanged:" target="-2" id="TJW-rd-MC9"/>
+                                </connections>
                             </popUpButton>
                             <button id="3515">
-                                <rect key="frame" x="14" y="13" width="145.09375" height="18"/>
+                                <rect key="frame" x="14" y="13" width="145" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Capture Audio" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="3516">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -907,10 +1132,10 @@ Check the device's connection, make sure that the latest EyeTV software is insta
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <box title="Title" titlePosition="noTitle" id="3014">
-                    <rect key="frame" x="17" y="86.77734375" width="494" height="117.22265625"/>
+                    <rect key="frame" x="17" y="87" width="494" height="117"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <view key="contentView">
-                        <rect key="frame" x="2" y="2.22265625" width="490" height="113"/>
+                        <rect key="frame" x="2" y="2" width="490" height="113"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <popUpButton verticalHuggingPriority="750" id="3071">
@@ -918,7 +1143,7 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3074" id="3072">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3073">
                                         <items>
                                             <menuItem title="Item 1" state="on" id="3074"/>
@@ -927,6 +1152,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <connections>
+                                    <action selector="qtkChanged:" target="-2" id="3BT-jd-WjF"/>
+                                </connections>
                             </popUpButton>
                             <textField verticalHuggingPriority="750" id="3346">
                                 <rect key="frame" x="157" y="14" width="43" height="19"/>
@@ -937,7 +1165,7 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
-                                    <action selector="takeIntValueFrom:" target="3350" id="3358"/>
+                                    <action selector="qtkChanged:" target="-2" id="Mam-ry-7Jz"/>
                                     <outlet property="nextKeyView" destination="3348" id="3359"/>
                                 </connections>
                             </textField>
@@ -959,7 +1187,7 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
-                                    <action selector="takeIntValueFrom:" target="3351" id="3360"/>
+                                    <action selector="qtkChanged:" target="-2" id="p6V-2h-C7A"/>
                                     <outlet property="nextKeyView" destination="3346" id="3368"/>
                                 </connections>
                             </textField>
@@ -977,7 +1205,7 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                                 <autoresizingMask key="autoresizingMask"/>
                                 <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="20" maxValue="2000" valueWraps="YES" id="3353"/>
                                 <connections>
-                                    <action selector="takeIntValueFrom:" target="3346" id="3362"/>
+                                    <action selector="qtkChanged:" target="-2" id="NJN-8p-dqB"/>
                                 </connections>
                             </stepper>
                             <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="3351">
@@ -985,7 +1213,7 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                                 <autoresizingMask key="autoresizingMask"/>
                                 <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="20" maxValue="1000" valueWraps="YES" id="3352"/>
                                 <connections>
-                                    <action selector="takeIntValueFrom:" target="3348" id="3361"/>
+                                    <action selector="qtkChanged:" target="-2" id="lg6-bz-uHy"/>
                                 </connections>
                             </stepper>
                             <button id="3490">
@@ -995,6 +1223,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="systemBold" size="14"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="qtkToggleUIElements:" target="-2" id="jWl-oP-ygW"/>
+                                </connections>
                             </button>
                         </subviews>
                     </view>
@@ -1002,34 +1233,40 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                     <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </box>
                 <box title="Title" titlePosition="noTitle" id="3429">
-                    <rect key="frame" x="17" y="16" width="494" height="70.77734375"/>
+                    <rect key="frame" x="17" y="16" width="494" height="71"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <view key="contentView">
-                        <rect key="frame" x="2" y="2" width="490" height="66"/>
+                        <rect key="frame" x="2" y="2" width="490" height="67"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <popUpButton verticalHuggingPriority="750" id="3438">
-                                <rect key="frame" x="102" y="11" width="286" height="26"/>
+                                <rect key="frame" x="102" y="12" width="286" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3439">
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3439">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="3440">
                                         <items>
-                                            <menuItem title="Item 1" state="on" id="3443"/>
+                                            <menuItem title="Item 1" id="3443"/>
                                             <menuItem title="Item 2" id="3442"/>
                                             <menuItem title="Item 3" id="3441"/>
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <connections>
+                                    <action selector="qtkAudioChanged:" target="-2" id="xcc-kW-F5g"/>
+                                </connections>
                             </popUpButton>
                             <button id="3492">
-                                <rect key="frame" x="15" y="39" width="290" height="18"/>
+                                <rect key="frame" x="15" y="40" width="290" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Audio" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="3493">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="systemBold" size="14"/>
                                 </buttonCell>
+                                <connections>
+                                    <action selector="qtkToggleUIElements:" target="-2" id="tZR-hB-Mz1"/>
+                                </connections>
                             </button>
                         </subviews>
                     </view>
@@ -1070,6 +1307,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                                 </buttonCell>
                             </column>
                         </cells>
+                        <connections>
+                            <action selector="openNetModeChanged:" target="-2" id="Mp3-t0-2g5"/>
+                        </connections>
                     </matrix>
                     <textField verticalHuggingPriority="750" id="2797">
                         <rect key="frame" x="290" y="187" width="74" height="17"/>
@@ -1105,6 +1345,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                         <rect key="frame" x="452" y="182" width="19" height="27"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" maxValue="65535" doubleValue="1234" valueWraps="YES" id="2979"/>
+                        <connections>
+                            <action selector="openNetStepperChanged:" target="-2" id="cOb-FE-uz7"/>
+                        </connections>
                     </stepper>
                     <textField verticalHuggingPriority="750" id="2801" customClass="VLCOpenTextField">
                         <rect key="frame" x="369" y="155" width="119" height="22"/>
@@ -1140,6 +1383,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
                         <rect key="frame" x="599" y="152" width="19" height="27"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" tag="1" maxValue="65535" doubleValue="1234" valueWraps="YES" id="2983"/>
+                        <connections>
+                            <action selector="openNetStepperChanged:" target="-2" id="TlS-ML-UbZ"/>
+                        </connections>
                     </stepper>
                     <button verticalHuggingPriority="750" id="2807">
                         <rect key="frame" x="519" y="12" width="123" height="32"/>
@@ -1151,6 +1397,9 @@ Check the device's connection, make sure that the latest EyeTV software is insta
 DQ
 </string>
                         </buttonCell>
+                        <connections>
+                            <action selector="openNetUDPButtonAction:" target="-2" id="0sE-n0-KBH"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="2808">
                         <rect key="frame" x="396" y="12" width="123" height="32"/>
@@ -1162,6 +1411,9 @@ DQ
 Gw
 </string>
                         </buttonCell>
+                        <connections>
+                            <action selector="openNetUDPButtonAction:" target="-2" id="jxT-wR-kT9"/>
+                        </connections>
                     </button>
                     <textField verticalHuggingPriority="750" id="2811">
                         <rect key="frame" x="17" y="60" width="622" height="70"/>
@@ -1228,6 +1480,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </matrix>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="537" y="757.5"/>
         </window>
         <customView id="2837" userLabel="MRL Field">
             <rect key="frame" x="0.0" y="0.0" width="553" height="52"/>
@@ -1268,6 +1521,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openSpecialMediaFolder:" target="-2" id="PGL-xT-u1u"/>
+                    </connections>
                 </button>
                 <textField verticalHuggingPriority="750" id="3084">
                     <rect key="frame" x="18" y="172" width="259" height="17"/>
@@ -1300,6 +1556,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openSpecialMediaFolder:" target="-2" id="JMW-uG-By3"/>
+                    </connections>
                 </button>
                 <textField verticalHuggingPriority="750" id="3094">
                     <rect key="frame" x="18" y="172" width="259" height="17"/>
@@ -1323,6 +1582,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openSpecialMediaFolder:" target="-2" id="01G-06-mbK"/>
+                    </connections>
                 </button>
                 <button verticalHuggingPriority="750" id="3183">
                     <rect key="frame" x="82" y="140" width="165" height="28"/>
@@ -1331,6 +1593,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="dvdreadOptionChanged:" target="-2" id="1xF-jH-wsI"/>
+                    </connections>
                 </button>
                 <textField verticalHuggingPriority="750" id="3110">
                     <rect key="frame" x="18" y="172" width="259" height="17"/>
@@ -1373,6 +1638,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
+                    <connections>
+                        <action selector="dvdreadOptionChanged:" target="-2" id="kcG-pd-mkp"/>
+                    </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" id="3151">
                     <rect key="frame" x="120" y="87" width="152" height="19"/>
@@ -1382,6 +1650,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
+                    <connections>
+                        <action selector="dvdreadOptionChanged:" target="-2" id="M9i-A9-ceM"/>
+                    </connections>
                 </textField>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="3152">
                     <rect key="frame" x="277" y="115" width="15" height="22"/>
@@ -1389,6 +1660,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="999" doubleValue="1" valueWraps="YES" id="3155">
                         <font key="font" metaFont="smallSystem"/>
                     </stepperCell>
+                    <connections>
+                        <action selector="dvdreadOptionChanged:" target="-2" id="6lt-ib-YL6"/>
+                    </connections>
                 </stepper>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" tag="1" id="3153">
                     <rect key="frame" x="277" y="85" width="15" height="22"/>
@@ -1396,6 +1670,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" tag="1" minValue="1" maxValue="999" doubleValue="1" valueWraps="YES" id="3154">
                         <font key="font" metaFont="smallSystem"/>
                     </stepperCell>
+                    <connections>
+                        <action selector="dvdreadOptionChanged:" target="-2" id="V7m-Hb-Gq3"/>
+                    </connections>
                 </stepper>
                 <button verticalHuggingPriority="750" id="3186">
                     <rect key="frame" x="32" y="44" width="246" height="32"/>
@@ -1404,6 +1681,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openSpecialMediaFolder:" target="-2" id="9tN-Dx-V5C"/>
+                    </connections>
                 </button>
                 <button verticalHuggingPriority="750" id="3192">
                     <rect key="frame" x="82" y="140" width="165" height="28"/>
@@ -1412,6 +1692,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="dvdreadOptionChanged:" target="-2" id="QNN-GH-YXF"/>
+                    </connections>
                 </button>
                 <textField verticalHuggingPriority="750" id="3193">
                     <rect key="frame" x="18" y="172" width="259" height="17"/>
@@ -1423,6 +1706,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </textFieldCell>
                 </textField>
             </subviews>
+            <point key="canvasLocation" x="-666.5" y="216.5"/>
         </customView>
         <customView id="3233" userLabel="VCD">
             <rect key="frame" x="0.0" y="0.0" width="295" height="205"/>
@@ -1454,6 +1738,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
+                    <connections>
+                        <action selector="vcdOptionChanged:" target="-2" id="gIZ-a1-Uco"/>
+                    </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" id="3240">
                     <rect key="frame" x="120" y="87" width="152" height="19"/>
@@ -1463,6 +1750,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
+                    <connections>
+                        <action selector="vcdOptionChanged:" target="-2" id="PJG-S8-A8f"/>
+                    </connections>
                 </textField>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="3239">
                     <rect key="frame" x="277" y="115" width="15" height="22"/>
@@ -1470,6 +1760,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="999" doubleValue="1" valueWraps="YES" id="3248">
                         <font key="font" metaFont="smallSystem"/>
                     </stepperCell>
+                    <connections>
+                        <action selector="vcdOptionChanged:" target="-2" id="h2b-w4-mzR"/>
+                    </connections>
                 </stepper>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" tag="1" id="3238">
                     <rect key="frame" x="277" y="85" width="15" height="22"/>
@@ -1477,6 +1770,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" tag="1" minValue="1" maxValue="999" doubleValue="1" valueWraps="YES" id="3249">
                         <font key="font" metaFont="smallSystem"/>
                     </stepperCell>
+                    <connections>
+                        <action selector="vcdOptionChanged:" target="-2" id="osf-DS-7Fj"/>
+                    </connections>
                 </stepper>
                 <button verticalHuggingPriority="750" id="3237">
                     <rect key="frame" x="32" y="44" width="246" height="32"/>
@@ -1485,6 +1781,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openSpecialMediaFolder:" target="-2" id="2CS-0k-grY"/>
+                    </connections>
                 </button>
                 <textField verticalHuggingPriority="750" id="3234">
                     <rect key="frame" x="18" y="172" width="259" height="17"/>
@@ -1496,6 +1795,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </textFieldCell>
                 </textField>
             </subviews>
+            <point key="canvasLocation" x="-666.5" y="-53.5"/>
         </customView>
         <customView id="3289" userLabel="BD">
             <rect key="frame" x="0.0" y="0.0" width="295" height="205"/>
@@ -1508,6 +1808,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openSpecialMediaFolder:" target="-2" id="r36-Sr-6wo"/>
+                    </connections>
                 </button>
                 <textField verticalHuggingPriority="750" id="3291">
                     <rect key="frame" x="18" y="172" width="259" height="17"/>

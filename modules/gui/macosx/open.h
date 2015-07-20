@@ -24,193 +24,188 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Intf_Open interface
- *****************************************************************************/
 @interface VLCOpen : NSObject
-{
-    IBOutlet id o_panel;
 
-    IBOutlet id o_mrl_fld;
-    IBOutlet id o_mrl_lbl;
-    IBOutlet id o_mrl_view;
-    IBOutlet id o_mrl_btn;
-    IBOutlet id o_tabview;
+@property (readwrite, weak) IBOutlet NSWindow *panel;
 
-    IBOutlet id o_btn_ok;
-    IBOutlet id o_btn_cancel;
+@property (readwrite, weak) IBOutlet NSTextField *mrlTextField;
+@property (readwrite, weak) IBOutlet NSTextField *mrlLabel;
+@property (readwrite, weak) IBOutlet NSView *mrlView;
+@property (readwrite, weak) IBOutlet NSButton *mrlButton;
+@property (readwrite, weak) IBOutlet NSTabView *tabView;
 
-    /* bottom-line items */
-    IBOutlet id o_output_ckbox;
-    IBOutlet id o_sout_options;
+@property (readwrite, weak) IBOutlet NSButton *okButton;
+@property (readwrite, weak) IBOutlet NSButton *cancelButton;
 
-    /* open file */
-    IBOutlet id o_file_name;
-    IBOutlet id o_file_name_stub;
-    IBOutlet id o_file_icon_well;
-    IBOutlet id o_file_btn_browse;
-    IBOutlet id o_file_stream;
-    IBOutlet id o_file_slave_ckbox;
-    IBOutlet id o_file_slave_select_btn;
-    IBOutlet id o_file_slave_filename_lbl;
-    IBOutlet id o_file_slave_icon_well;
-    IBOutlet id o_file_subtitles_filename_lbl;
-    IBOutlet id o_file_subtitles_icon_well;
-    IBOutlet id o_file_custom_timing_ckb;
-    IBOutlet id o_file_starttime_fld;
-    IBOutlet id o_file_starttime_lbl;
-    IBOutlet id o_file_stoptime_fld;
-    IBOutlet id o_file_stoptime_lbl;
+/* bottom-line items */
+@property (readwrite, weak) IBOutlet NSButton *outputCheckbox;
 
-    /* open disc */
-    IBOutlet id o_disc_selector_pop;
+/* open file */
+@property (readwrite, weak) IBOutlet NSTextField *fileNameLabel;
+@property (readwrite, weak) IBOutlet NSTextField *fileNameStubLabel;
+@property (readwrite, weak) IBOutlet NSImageView *fileIconWell;
+@property (readwrite, weak) IBOutlet NSButton *fileBrowseButton;
+@property (readwrite, weak) IBOutlet NSButton *fileTreatAsPipeButton;
+@property (readwrite, weak) IBOutlet NSButton *fileSlaveCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *fileSelectSlaveButton;
+@property (readwrite, weak) IBOutlet NSTextField *fileSlaveFilenameLabel;
+@property (readwrite, weak) IBOutlet NSImageView *fileSlaveIconWell;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubtitlesFilenameLabel;
+@property (readwrite, weak) IBOutlet NSImageView *fileSubtitlesIconWell;
+@property (readwrite, weak) IBOutlet NSButton *fileCustomTimingCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *fileStartTimeTextField;
+@property (readwrite, weak) IBOutlet NSTextField *fileStartTimeLabel;
+@property (readwrite, weak) IBOutlet NSTextField *fileStopTimeTextField;
+@property (readwrite, weak) IBOutlet NSTextField *fileStopTimeLabel;
 
-    IBOutlet id o_disc_nodisc_view;
-    IBOutlet id o_disc_nodisc_lbl;
-    IBOutlet id o_disc_nodisc_videots_btn;
+/* open disc */
+@property (readwrite, weak) IBOutlet NSPopUpButton *discSelectorPopup;
 
-    IBOutlet id o_disc_audiocd_view;
-    IBOutlet id o_disc_audiocd_lbl;
-    IBOutlet id o_disc_audiocd_trackcount_lbl;
-    IBOutlet id o_disc_audiocd_videots_btn;
+@property (readwrite, weak) IBOutlet NSView *discNoDiscView;
+@property (readwrite, weak) IBOutlet NSTextField *discNoDiscLabel;
+@property (readwrite, weak) IBOutlet NSButton *discNoDiscVideoTSButton;
 
-    IBOutlet id o_disc_dvd_view;
-    IBOutlet id o_disc_dvd_lbl;
-    IBOutlet id o_disc_dvd_disablemenus_btn;
-    IBOutlet id o_disc_dvd_videots_btn;
+@property (readwrite, weak) IBOutlet NSView *discAudioCDView;
+@property (readwrite, weak) IBOutlet NSTextField *discAudioCDLabel;
+@property (readwrite, weak) IBOutlet NSTextField *discAudioCDTrackCountLabel;
+@property (readwrite, weak) IBOutlet NSButton *discAudioCDVideoTSButton;
 
-    IBOutlet id o_disc_dvdwomenus_view;
-    IBOutlet id o_disc_dvdwomenus_lbl;
-    IBOutlet id o_disc_dvdwomenus_enablemenus_btn;
-    IBOutlet id o_disc_dvdwomenus_videots_btn;
-    IBOutlet id o_disc_dvdwomenus_title;
-    IBOutlet id o_disc_dvdwomenus_title_lbl;
-    IBOutlet id o_disc_dvdwomenus_title_stp;
-    IBOutlet id o_disc_dvdwomenus_chapter;
-    IBOutlet id o_disc_dvdwomenus_chapter_lbl;
-    IBOutlet id o_disc_dvdwomenus_chapter_stp;
+@property (readwrite, weak) IBOutlet NSView *discDVDView;
+@property (readwrite, weak) IBOutlet NSTextField *discDVDLabel;
+@property (readwrite, weak) IBOutlet NSButton *discDVDDisableMenusButton;
+@property (readwrite, weak) IBOutlet NSButton *discDVDVideoTSButton;
 
-    IBOutlet id o_disc_vcd_view;
-    IBOutlet id o_disc_vcd_lbl;
-    IBOutlet id o_disc_vcd_videots_btn;
-    IBOutlet id o_disc_vcd_title;
-    IBOutlet id o_disc_vcd_title_lbl;
-    IBOutlet id o_disc_vcd_title_stp;
-    IBOutlet id o_disc_vcd_chapter;
-    IBOutlet id o_disc_vcd_chapter_lbl;
-    IBOutlet id o_disc_vcd_chapter_stp;
+@property (readwrite, weak) IBOutlet NSView *discDVDwomenusView;
+@property (readwrite, weak) IBOutlet NSTextField *discDVDwomenusLabel;
+@property (readwrite, weak) IBOutlet NSButton *discDVDwomenusEnableMenusButton;
+@property (readwrite, weak) IBOutlet NSButton *discDVDwomenusVideoTSButton;
+@property (readwrite, weak) IBOutlet NSTextField *discDVDwomenusTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *discDVDwomenusTitleLabel;
+@property (readwrite, weak) IBOutlet NSStepper *discDVDwomenusTitleStepper;
+@property (readwrite, weak) IBOutlet NSTextField *discDVDwomenusChapterTextField;
+@property (readwrite, weak) IBOutlet NSTextField *discDVDwomenusChapterLabel;
+@property (readwrite, weak) IBOutlet NSStepper *discDVDwomenusChapterStepper;
 
-    IBOutlet id o_disc_bd_view;
-    IBOutlet id o_disc_bd_lbl;
-    IBOutlet id o_disc_bd_videots_btn;
+@property (readwrite, weak) IBOutlet NSView *discVCDView;
+@property (readwrite, weak) IBOutlet NSTextField *discVCDLabel;
+@property (readwrite, weak) IBOutlet NSButton *discVCDVideoTSButton;
+@property (readwrite, weak) IBOutlet NSTextField *discVCDTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *discVCDTitleLabel;
+@property (readwrite, weak) IBOutlet NSStepper *discVCDTitleStepper;
+@property (readwrite, weak) IBOutlet NSTextField *discVCDChapterTextField;
+@property (readwrite, weak) IBOutlet NSTextField *discVCDChapterLabel;
+@property (readwrite, weak) IBOutlet NSStepper *discVCDChapterStepper;
 
-    /* open network */
-    IBOutlet id o_net_http_url;
-    IBOutlet id o_net_http_url_lbl;
-    IBOutlet id o_net_help_lbl;
+@property (readwrite, weak) IBOutlet NSView *discBDView;
+@property (readwrite, weak) IBOutlet NSTextField *discBDLabel;
+@property (readwrite, weak) IBOutlet NSButton *discBDVideoTSButton;
 
-    /* open UDP stuff panel */
-    IBOutlet id o_net_help_udp_lbl;
-    IBOutlet id o_net_udp_protocol_mat;
-    IBOutlet id o_net_udp_protocol_lbl;
-    IBOutlet id o_net_udp_address_lbl;
-    IBOutlet id o_net_udp_mode_lbl;
-    IBOutlet id o_net_mode;
-    IBOutlet id o_net_openUDP_btn;
-    IBOutlet id o_net_udp_cancel_btn;
-    IBOutlet id o_net_udp_ok_btn;
-    IBOutlet id o_net_udp_panel;
-    IBOutlet id o_net_udp_port;
-    IBOutlet id o_net_udp_port_lbl;
-    IBOutlet id o_net_udp_port_stp;
-    IBOutlet id o_net_udpm_addr;
-    IBOutlet id o_net_udpm_addr_lbl;
-    IBOutlet id o_net_udpm_port;
-    IBOutlet id o_net_udpm_port_lbl;
-    IBOutlet id o_net_udpm_port_stp;
+/* open network */
+@property (readwrite, weak) IBOutlet NSTextField *netHTTPURLLabel;
+@property (readwrite, weak) IBOutlet NSTextField *netHTTPURLTextField;
+@property (readwrite, weak) IBOutlet NSTextField *netHelpLabel;
 
-    /* open subtitle file */
-    IBOutlet id o_file_sub_ckbox;
-    IBOutlet id o_file_sub_btn_settings;
-    IBOutlet id o_file_sub_sheet;
-    IBOutlet id o_file_sub_path_lbl;
-    IBOutlet id o_file_sub_path_fld;
-    IBOutlet id o_file_sub_icon_view;
-    IBOutlet id o_file_sub_btn_browse;
-    IBOutlet id o_file_sub_override;
-    IBOutlet id o_file_sub_delay;
-    IBOutlet id o_file_sub_delay_lbl;
-    IBOutlet id o_file_sub_delay_stp;
-    IBOutlet id o_file_sub_fps;
-    IBOutlet id o_file_sub_fps_lbl;
-    IBOutlet id o_file_sub_fps_stp;
-    IBOutlet id o_file_sub_encoding_pop;
-    IBOutlet id o_file_sub_encoding_lbl;
-    IBOutlet id o_file_sub_size_pop;
-    IBOutlet id o_file_sub_size_lbl;
-    IBOutlet id o_file_sub_align_pop;
-    IBOutlet id o_file_sub_align_lbl;
-    IBOutlet id o_file_sub_ok_btn;
-    IBOutlet id o_file_sub_font_box;
-    IBOutlet id o_file_sub_file_box;
+/* open UDP stuff panel */
+@property (readwrite, weak) IBOutlet NSTextField *netHelpUDPLabel;
+@property (readwrite, weak) IBOutlet NSMatrix *netUDPProtocolMatrix;
+@property (readwrite, weak) IBOutlet NSTextField *netUDPProtocolLabel;
+@property (readwrite, weak) IBOutlet NSTextField *netUDPAddressLabel;
+@property (readwrite, weak) IBOutlet NSTextField *netUDPModeLabel;
+@property (readwrite, weak) IBOutlet NSMatrix *netModeMatrix;
+@property (readwrite, weak) IBOutlet NSButton *netOpenUDPButton;
+@property (readwrite, weak) IBOutlet NSButton *netUDPCancelButton;
+@property (readwrite, weak) IBOutlet NSButton *netUDPOKButton;
+@property (readwrite, weak) IBOutlet NSWindow *netUDPPanel;
+@property (readwrite, weak) IBOutlet NSTextField *netUDPPortTextField;
+@property (readwrite, weak) IBOutlet NSTextField *netUDPPortLabel;
+@property (readwrite, weak) IBOutlet NSStepper *netUDPPortStepper;
+@property (readwrite, weak) IBOutlet NSTextField *netUDPMAddressTextField;
+@property (readwrite, weak) IBOutlet NSTextField *netUDPMAddressLabel;
+@property (readwrite, weak) IBOutlet NSTextField *netUDPMPortTextField;
+@property (readwrite, weak) IBOutlet NSTextField *netUDPMPortLabel;
+@property (readwrite, weak) IBOutlet NSStepper *netUDPMPortStepper;
 
-    /* generic capturing stuff */
-    IBOutlet id o_capture_lbl;
-    IBOutlet id o_capture_long_lbl;
-    IBOutlet id o_capture_mode_pop;
-    IBOutlet id o_capture_label_view;
+/* open subtitle file */
+@property (readwrite, weak) IBOutlet NSButton *fileSubCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *fileSubSettingsButton;
+@property (readwrite, weak) IBOutlet NSPanel *fileSubSheet;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubPathLabel;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubPathTextField;
+@property (readwrite, weak) IBOutlet NSImageView *fileSubIconView;
+@property (readwrite, weak) IBOutlet NSButton *fileSubBrowseButton;
+@property (readwrite, weak) IBOutlet NSButton *fileSubOverrideCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubDelayTextField;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubDelayLabel;
+@property (readwrite, weak) IBOutlet NSStepper *fileSubDelayStepper;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubFPSTextField;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubFPSLabel;
+@property (readwrite, weak) IBOutlet NSStepper *fileSubFPSStepper;
+@property (readwrite, weak) IBOutlet NSPopUpButton *fileSubEncodingPopup;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubEncodingLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *fileSubSizePopup;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubSizeLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *fileSubAlignPopup;
+@property (readwrite, weak) IBOutlet NSTextField *fileSubAlignLabel;
+@property (readwrite, weak) IBOutlet NSButton *fileSubOKButton;
+@property (readwrite, weak) IBOutlet NSBox *fileSubFontBox;
+@property (readwrite, weak) IBOutlet NSBox *fileSubFileBox;
 
-    /* eyetv support */
-    IBOutlet id o_eyetv_notLaunched_view;
-    IBOutlet id o_eyetv_running_view;
-    IBOutlet id o_eyetv_channels_pop;
-    IBOutlet id o_eyetv_currentChannel_lbl;
-    IBOutlet id o_eyetv_chn_status_txt;
-    IBOutlet id o_eyetv_chn_bgbar;
-    IBOutlet id o_eyetv_launchEyeTV_btn;
-    IBOutlet id o_eyetv_getPlugin_btn;
-    IBOutlet id o_eyetv_nextProgram_btn;
-    IBOutlet id o_eyetv_noInstance_lbl;
-    IBOutlet id o_eyetv_noInstanceLong_lbl;
-    IBOutlet id o_eyetv_previousProgram_btn;
+/* generic capturing stuff */
+@property (readwrite, weak) IBOutlet NSTextField *captureLabel;
+@property (readwrite, weak) IBOutlet NSTextField *captureLongLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *captureModePopup;
+@property (readwrite, weak) IBOutlet NSView *captureView;
 
-    /* screen support */
-    IBOutlet id o_screen_view;
-    IBOutlet id o_screen_long_lbl;
-    IBOutlet id o_screen_fps_fld;
-    IBOutlet id o_screen_fps_lbl;
-    IBOutlet id o_screen_fps_stp;
-    IBOutlet id o_screen_screen_lbl;
-    IBOutlet id o_screen_screen_pop;
-    IBOutlet id o_screen_left_fld;
-    IBOutlet id o_screen_left_lbl;
-    IBOutlet id o_screen_left_stp;
-    IBOutlet id o_screen_top_fld;
-    IBOutlet id o_screen_top_lbl;
-    IBOutlet id o_screen_top_stp;
-    IBOutlet id o_screen_width_fld;
-    IBOutlet id o_screen_width_lbl;
-    IBOutlet id o_screen_width_stp;
-    IBOutlet id o_screen_height_fld;
-    IBOutlet id o_screen_height_lbl;
-    IBOutlet id o_screen_height_stp;
-    IBOutlet id o_screen_follow_mouse_ckb;
-    IBOutlet id o_screen_qtk_audio_pop;
-    IBOutlet id o_screen_qtk_audio_ckb;
+/* eyetv support */
+@property (readwrite, weak) IBOutlet NSView *eyeTVnotLaunchedView;
+@property (readwrite, weak) IBOutlet NSView *eyeTVrunningView;
+@property (readwrite, weak) IBOutlet NSPopUpButton *eyeTVchannelsPopup;
+@property (readwrite, weak) IBOutlet NSTextField *eyeTVcurrentChannelLabel;
+@property (readwrite, weak) IBOutlet NSTextField *eyeTVChannelStatusLabel;
+@property (readwrite, weak) IBOutlet NSProgressIndicator *eyeTVChannelProgressBar;
+@property (readwrite, weak) IBOutlet NSButton *eyeTVlaunchEyeTVButton;
+@property (readwrite, weak) IBOutlet NSButton *eyeTVgetPluginButton;
+@property (readwrite, weak) IBOutlet NSButton *eyeTVnextProgramButton;
+@property (readwrite, weak) IBOutlet NSTextField *eyeTVnoInstanceLabel;
+@property (readwrite, weak) IBOutlet NSTextField *eyeTVnoInstanceLongLabel;
+@property (readwrite, weak) IBOutlet NSButton *eyeTVpreviousProgramButton;
 
-    /* QTK support */
-    IBOutlet id o_qtk_view;
-    IBOutlet id o_qtk_video_device_pop;
-    IBOutlet id o_qtk_video_ckb;
-    IBOutlet id o_qtk_audio_device_pop;
-    IBOutlet id o_qtk_audio_ckb;
-    IBOutlet id o_capture_width_lbl;
-    IBOutlet id o_capture_width_fld;
-    IBOutlet id o_capture_width_stp;
-    IBOutlet id o_capture_height_lbl;
-    IBOutlet id o_capture_height_fld;
-    IBOutlet id o_capture_height_stp;
-}
+/* screen support */
+@property (readwrite, weak) IBOutlet NSView *screenView;
+@property (readwrite, weak) IBOutlet NSTextField *screenlongLabel;
+@property (readwrite, weak) IBOutlet NSTextField *screenFPSTextField;
+@property (readwrite, weak) IBOutlet NSTextField *screenFPSLabel;
+@property (readwrite, weak) IBOutlet NSStepper *screenFPSStepper;
+@property (readwrite, weak) IBOutlet NSTextField *screenLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *screenPopup;
+@property (readwrite, weak) IBOutlet NSTextField *screenLeftTextField;
+@property (readwrite, weak) IBOutlet NSTextField *screenLeftLabel;
+@property (readwrite, weak) IBOutlet NSStepper *screenLeftStepper;
+@property (readwrite, weak) IBOutlet NSTextField *screenTopTextField;
+@property (readwrite, weak) IBOutlet NSTextField *screenTopLabel;
+@property (readwrite, weak) IBOutlet NSStepper *screenTopStepper;
+@property (readwrite, weak) IBOutlet NSTextField *screenWidthTextField;
+@property (readwrite, weak) IBOutlet NSTextField *screenWidthLabel;
+@property (readwrite, weak) IBOutlet NSStepper *screenWidthStepper;
+@property (readwrite, weak) IBOutlet NSTextField *screenHeightTextField;
+@property (readwrite, weak) IBOutlet NSTextField *screenHeightLabel;
+@property (readwrite, weak) IBOutlet NSStepper *screenHeightStepper;
+@property (readwrite, weak) IBOutlet NSButton *screenFollowMouseCheckbox;
+@property (readwrite, weak) IBOutlet NSPopUpButton *screenqtkAudioPopup;
+@property (readwrite, weak) IBOutlet NSButton *screenqtkAudioCheckbox;
+
+/* QTK support */
+@property (readwrite, weak) IBOutlet NSView *qtkView;
+@property (readwrite, weak) IBOutlet NSPopUpButton *qtkVideoDevicePopup;
+@property (readwrite, weak) IBOutlet NSButton *qtkVideoCheckbox;
+@property (readwrite, weak) IBOutlet NSPopUpButton *qtkAudioDevicePopup;
+@property (readwrite, weak) IBOutlet NSButton *qtkAudioCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *qtkWidthLabel;
+@property (readwrite, weak) IBOutlet NSTextField *qtkWidthTextField;
+@property (readwrite, weak) IBOutlet NSStepper *qtkWidthStepper;
+@property (readwrite, weak) IBOutlet NSTextField *qtkHeightLabel;
+@property (readwrite, weak) IBOutlet NSTextField *qtkHeightTextField;
+@property (readwrite, weak) IBOutlet NSStepper *qtkHeightStepper;
 
 /* text field / stepper binding values - subs panel */
 @property (nonatomic) float fileSubDelay;
