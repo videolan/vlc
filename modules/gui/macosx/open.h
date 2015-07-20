@@ -39,6 +39,7 @@
 
 /* bottom-line items */
 @property (readwrite, weak) IBOutlet NSButton *outputCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *outputSettingsButton;
 
 /* open file */
 @property (readwrite, weak) IBOutlet NSTextField *fileNameLabel;
@@ -211,6 +212,7 @@
 @property (nonatomic) float fileSubDelay;
 @property (nonatomic) float fileSubFps;
 
+- (IBAction)outputSettings:(id)sender;
 - (void)setSubPanel;
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi;
 - (void)textFieldWasClicked:(NSNotification *)o_notification;

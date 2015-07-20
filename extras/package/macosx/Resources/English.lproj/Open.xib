@@ -125,6 +125,7 @@
                 <outlet property="netUDPProtocolMatrix" destination="2860" id="BXg-n9-cH5"/>
                 <outlet property="okButton" destination="640" id="S9F-WP-A7y"/>
                 <outlet property="outputCheckbox" destination="929" id="Gz1-rY-w0Q"/>
+                <outlet property="outputSettingsButton" destination="1256" id="ruY-7h-HIS"/>
                 <outlet property="panel" destination="636" id="POG-Xe-8j5"/>
                 <outlet property="qtkAudioCheckbox" destination="3492" id="5d3-k7-1dB"/>
                 <outlet property="qtkAudioDevicePopup" destination="3438" id="Jt3-3n-AjR"/>
@@ -180,6 +181,9 @@
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="outputSettings:" target="-2" id="EUk-e1-Lcu"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="640">
                         <rect key="frame" x="437" y="12" width="123" height="32"/>
@@ -506,6 +510,9 @@ Gw
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="outputSettings:" target="-2" id="hbB-87-Udf"/>
+                        </connections>
                     </button>
                     <textField verticalHuggingPriority="750" id="2835" customClass="VLCOpenTextField">
                         <rect key="frame" x="38" y="82" width="246" height="17"/>

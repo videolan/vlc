@@ -53,6 +53,7 @@ struct display_info_t
 @interface VLCOpen()
 {
     VLCOutput *_output;
+    BOOL b_outputNibLoaded;
     NSArray *_qtkvideoDevices;
     NSArray *_qtkaudioDevices;
     NSString *_qtkCurrentDeviceUID;
@@ -92,6 +93,8 @@ struct display_info_t
 
 - (void)awakeFromNib
 {
+    _output = [VLCOutput new];
+
     [_panel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [_panel setTitle: _NS("Open Source")];
@@ -650,6 +653,23 @@ struct display_info_t
         NSLog(@"adding %@", array);
         [[[VLCMain sharedInstance] playlist] addPlaylistItems:array];
     }
+}
+
+- (IBAction)outputSettings:(id)sender
+{
+    if (sender == self.outputCheckbox) {
+        self.outputSettingsButton.enabled = self.outputCheckbox.state;
+        return;
+    }
+
+    if (!b_outputNibLoaded)
+        b_outputNibLoaded = [NSBundle loadNibNamed:@"StreamOutput" owner:_output];
+
+    [NSApp beginSheet:_output.outputSheet
+       modalForWindow:self.panel
+        modalDelegate:self
+       didEndSelector:NULL
+          contextInfo:nil];
 }
 
 #pragma mark -
