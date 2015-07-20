@@ -433,21 +433,21 @@ struct display_info_t
             NSUInteger componentCount = [components count];
             NSInteger tempValue = 0;
             if (componentCount == 1)
-                tempValue = [[components objectAtIndex:0] intValue];
+                tempValue = [[components firstObject] intValue];
             else if (componentCount == 2)
-                tempValue = [[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue];
+                tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
             else if (componentCount == 3)
-                tempValue = [[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
+                tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
             if (tempValue > 0)
                 [o_options addObject: [NSString stringWithFormat:@"start-time=%li", tempValue]];
             components = [[o_file_stoptime_fld stringValue] componentsSeparatedByString:@":"];
             componentCount = [components count];
             if (componentCount == 1)
-                tempValue = [[components objectAtIndex:0] intValue];
+                tempValue = [[components firstObject] intValue];
             else if (componentCount == 2)
-                tempValue = [[components objectAtIndex:0] intValue] * 60 + [[components objectAtIndex:1] intValue];
+                tempValue = [[components firstObject] intValue] * 60 + [[components objectAtIndex:1] intValue];
             else if (componentCount == 3)
-                tempValue = [[components objectAtIndex:0] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
+                tempValue = [[components firstObject] intValue] * 3600 + [[components objectAtIndex:1] intValue] * 60 + [[components objectAtIndex:2] intValue];
             if (tempValue != 0)
                 [o_options addObject: [NSString stringWithFormat:@"stop-time=%li", tempValue]];
         }
@@ -515,7 +515,7 @@ struct display_info_t
 {
     NSInteger i_selectedDevice = [o_qtk_video_device_pop indexOfSelectedItem];
     if (_qtkvideoDevices.count >= 1) {
-        NSValue *sizes = [[[[qtkvideoDevices objectAtIndex:i_selectedDevice] formatDescriptions] objectAtIndex:0] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
+        NSValue *sizes = [[[_qtkvideoDevices[i_selectedDevice] formatDescriptions] firstObject] attributeForKey: QTFormatDescriptionVideoEncodedPixelsSizeAttribute];
 
         [o_capture_width_fld setIntValue: [sizes sizeValue].width];
         [o_capture_height_fld setIntValue: [sizes sizeValue].height];
@@ -709,7 +709,7 @@ struct display_info_t
     [o_open_panel setPrompt: _NS("Open")];
     [o_open_panel beginSheetModalForWindow:[sender window] completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSFileHandlingPanelOKButton) {
-            o_file_path = [[[o_open_panel URLs] objectAtIndex:0] path];
+            o_file_path = [[[o_open_panel URLs] firstObject] path];
             [self openFilePathChanged: nil];
         }
     }];
@@ -730,7 +730,7 @@ struct display_info_t
         [o_open_panel setCanChooseFiles: YES];
         [o_open_panel setCanChooseDirectories: NO];
         if ([o_open_panel runModal] == NSOKButton) {
-            o_file_slave_path = [[[o_open_panel URLs] objectAtIndex:0] path];
+            o_file_slave_path = [[[o_open_panel URLs] firstObject] path];
         }
     }
     if (o_file_slave_path && [o_file_slave_ckbox state] == NSOnState) {
@@ -945,7 +945,7 @@ struct display_info_t
     [o_open_panel setAllowedFileTypes:[NSArray arrayWithObject:@"public.directory"]];
 
     if ([o_open_panel runModal] == NSOKButton) {
-        NSString *o_path = [[[o_open_panel URLs] objectAtIndex:0] path];
+        NSString *o_path = [[[o_open_panel URLs] firstObject] path];
         if ([o_path length] > 0) {
             [NSThread detachNewThreadSelector:@selector(scanSpecialPath:) toTarget:self withObject:o_path];
         }
@@ -1380,7 +1380,7 @@ struct display_info_t
     [o_open_panel setPrompt: _NS("Open")];
 
     if ([o_open_panel runModal] == NSOKButton) {
-        o_sub_path = [[[o_open_panel URLs] objectAtIndex:0] path];
+        o_sub_path = [[[o_open_panel URLs] firstObject] path];
         [o_file_subtitles_filename_lbl setStringValue: [[NSFileManager defaultManager] displayNameAtPath:o_sub_path]];
         [o_file_sub_path_fld setStringValue: [o_file_subtitles_filename_lbl stringValue]];
         [o_file_sub_path_lbl setHidden: YES];

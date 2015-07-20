@@ -1173,7 +1173,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     [o_open_panel setCanChooseDirectories: b_directory];
     [o_open_panel beginSheetModalForWindow:[sender window] completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton) {
-            NSString *o_path = [[[o_open_panel URLs] objectAtIndex:0] path];
+            NSString *o_path = [[[o_open_panel URLs] firstObject] path];
             [o_textfield setStringValue: o_path];
         }
     }];
@@ -2168,7 +2168,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
         if ([[[o_modulearray objectAtIndex:i] objectAtIndex:2]
              boolValue] != NO) {
             o_newstring = [o_newstring stringByAppendingString:
-                           [[o_modulearray objectAtIndex:i] objectAtIndex:0]];
+                           [[o_modulearray objectAtIndex:i] firstObject]];
             o_newstring = [o_newstring stringByAppendingString:@":"];
         }
 

@@ -149,7 +149,7 @@
     @synchronized(self) {
         current_anim = self->o_current_animation;
 
-        if (!([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating])) {
+        if (!([[[current_anim viewAnimations] firstObject] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating])) {
             if (current_anim) {
                 [current_anim stopAnimation];
                 [anim setCurrentProgress:1.0 - [current_anim currentProgress]];
@@ -197,7 +197,7 @@
     @synchronized(self) {
         current_anim = self->o_current_animation;
 
-        if (!([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating])) {
+        if (!([[[current_anim viewAnimations] firstObject] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating])) {
             if (current_anim) {
                 [current_anim stopAnimation];
                 [anim setCurrentProgress:1.0 - [current_anim currentProgress]];
@@ -227,7 +227,7 @@
 {
     NSArray *o_subViews = [[self contentView] subviews];
     if ([o_subViews count] > 0) {
-        id o_vout_view = [o_subViews objectAtIndex:0];
+        id o_vout_view = [o_subViews firstObject];
 
         if ([o_vout_view class] == [VLCVoutView class])
             return (VLCVoutView *)o_vout_view;
@@ -1006,7 +1006,7 @@
 - (void)hasBecomeFullscreen
 {
     if ([[_videoView subviews] count] > 0)
-        [o_fullscreen_window makeFirstResponder: [[_videoView subviews] objectAtIndex:0]];
+        [o_fullscreen_window makeFirstResponder: [[_videoView subviews] firstObject]];
 
     [o_fullscreen_window makeKeyWindow];
     [o_fullscreen_window setAcceptsMouseMovedEvents: YES];
@@ -1132,7 +1132,7 @@
     [[o_temp_view superview] replaceSubview:o_temp_view with:_videoView];
     [_videoView setFrame:[o_temp_view frame]];
     if ([[_videoView subviews] count] > 0)
-        [self makeFirstResponder: [[_videoView subviews] objectAtIndex:0]];
+        [self makeFirstResponder: [[_videoView subviews] firstObject]];
 
     [_videoView setHidden: b_video_view_was_hidden];
 
@@ -1158,7 +1158,7 @@
     /* Fullscreen ended or started (we are a delegate only for leaveFullscreen's/enterFullscren's anim2) */
     viewAnimations = [o_fullscreen_anim2 viewAnimations];
     if ([viewAnimations count] >=1 &&
-        [[[viewAnimations objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] isEqualToString:NSViewAnimationFadeInEffect]) {
+        [[[viewAnimations firstObject] objectForKey: NSViewAnimationEffectKey] isEqualToString:NSViewAnimationFadeInEffect]) {
         /* Fullscreen ended */
         [self hasEndedFullscreen];
     } else

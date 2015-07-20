@@ -577,7 +577,7 @@
         input_thread_t *p_input = playlist_CurrentInput(p_playlist);
 
         if (count == 1 && p_input) {
-            int i_result = input_AddSubtitleOSD(p_input, vlc_path2uri([[o_values objectAtIndex:0] UTF8String], NULL), true, true);
+            int i_result = input_AddSubtitleOSD(p_input, vlc_path2uri([[o_values firstObject] UTF8String], NULL), true, true);
             vlc_object_release(p_input);
             if (i_result == VLC_SUCCESS)
                 return YES;

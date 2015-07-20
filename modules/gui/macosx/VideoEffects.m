@@ -599,7 +599,7 @@
     }
 
     /* filter handling */
-    NSString *tempString = B64DecNSStr([items objectAtIndex:0]);
+    NSString *tempString = B64DecNSStr([items firstObject]);
     vout_thread_t *p_vout = getVout();
 
     /* enable the new filters */

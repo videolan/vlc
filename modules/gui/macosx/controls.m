@@ -208,11 +208,11 @@
                     [fieldContent componentsSeparatedByString: @":"];
 
                 if ([[fieldContent componentsSeparatedByString: @":"] count] == 3) {
-                    timeInSec += ([[ourTempArray objectAtIndex:0] intValue] * 3600); //h
+                    timeInSec += ([[ourTempArray firstObject] intValue] * 3600); //h
                     timeInSec += ([[ourTempArray objectAtIndex:1] intValue] * 60); //m
                     timeInSec += [[ourTempArray objectAtIndex:2] intValue];        //s
                 } else {
-                    timeInSec += ([[ourTempArray objectAtIndex:0] intValue] * 60); //m
+                    timeInSec += ([[ourTempArray firstObject] intValue] * 60); //m
                     timeInSec += [[ourTempArray objectAtIndex:1] intValue]; //s
                 }
             }

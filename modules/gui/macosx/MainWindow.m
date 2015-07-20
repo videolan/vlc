@@ -491,7 +491,7 @@ static VLCMainWindow *sharedInstance = nil;
     }
 
     if ([[self.videoView subviews] count] > 0)
-        [self makeFirstResponder: [[self.videoView subviews] objectAtIndex:0]];
+        [self makeFirstResponder: [[self.videoView subviews] firstObject]];
 }
 
 

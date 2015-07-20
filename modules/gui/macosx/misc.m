@@ -198,7 +198,7 @@ static bool b_old_spaces_style = YES;
 - (BOOL)hasMenuBar
 {
     if (b_old_spaces_style)
-        return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
+        return ([self displayID] == [[[NSScreen screens] firstObject] displayID]);
     else
         return YES;
 }

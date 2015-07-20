@@ -909,13 +909,13 @@ audio_output_t *getAout(void)
         }
     }
 
-    char *psz_uri = vlc_path2uri([[o_names objectAtIndex:0] UTF8String], NULL);
+    char *psz_uri = vlc_path2uri([[o_names firstObject] UTF8String], NULL);
 
     // try to add file as subtitle
     if ([o_names count] == 1 && psz_uri) {
         input_thread_t * p_input = pl_CurrentInput(VLCIntf);
         if (p_input) {
-            int i_result = input_AddSubtitleOSD(p_input, [[o_names objectAtIndex:0] UTF8String], true, true);
+            int i_result = input_AddSubtitleOSD(p_input, [[o_names firstObject] UTF8String], true, true);
             vlc_object_release(p_input);
             if (i_result == VLC_SUCCESS) {
                 free(psz_uri);
@@ -1163,7 +1163,7 @@ audio_output_t *getAout(void)
 
 - (void)plItemAppended:(NSArray *)o_val
 {
-    int i_node = [[o_val objectAtIndex:0] intValue];
+    int i_node = [[o_val firstObject] intValue];
     int i_item = [[o_val objectAtIndex:1] intValue];
 
     [[[self playlist] model] addItem:i_item withParentNode:i_node];
@@ -1274,7 +1274,7 @@ audio_output_t *getAout(void)
 - (id)open
 {
     if (!nib_open_loaded)
-        nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: NSApp];
+        nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: o_open];
 
     return o_open;
 }
@@ -1396,7 +1396,7 @@ static const int kCurrentPreferencesVersion = 3;
         NSArray *libraries = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
             NSUserDomainMask, YES);
         if (!libraries || [libraries count] == 0) return;
-        NSString * preferences = [[libraries objectAtIndex:0] stringByAppendingPathComponent:@"Preferences"];
+        NSString * preferences = [[libraries firstObject] stringByAppendingPathComponent:@"Preferences"];
 
         int res = NSRunInformationalAlertPanel(_NS("Remove old preferences?"),
                     _NS("We just found an older version of VLC's preferences files."),

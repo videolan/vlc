@@ -136,7 +136,7 @@
 
     /* check whether the user runs OSX with a RTL language */
     NSArray* languages = [NSLocale preferredLanguages];
-    NSString* preferredLanguage = [languages objectAtIndex:0];
+    NSString* preferredLanguage = [languages firstObject];
 
     if ([NSLocale characterDirectionForLanguage:preferredLanguage] == NSLocaleLanguageDirectionRightToLeft) {
         msg_Dbg(VLCIntf, "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);

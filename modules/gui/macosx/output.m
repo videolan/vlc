@@ -334,7 +334,7 @@
             if ([urlItems count] == 1)
                 [finalStreamAddress appendFormat: @"\"%@:%@\"", [self.streamAddressTextField stringValue],[self.streamPortTextField stringValue]];
             else {
-                [finalStreamAddress appendFormat: @"\"%@:%@", [urlItems objectAtIndex:0], [self.streamPortTextField stringValue]];
+                [finalStreamAddress appendFormat: @"\"%@:%@", [urlItems firstObject], [self.streamPortTextField stringValue]];
                 NSUInteger itemCount = [urlItems count];
                 for (NSUInteger x = 0; x < itemCount; x++)
                     [finalStreamAddress appendFormat: @"/%@", [urlItems objectAtIndex:x]];

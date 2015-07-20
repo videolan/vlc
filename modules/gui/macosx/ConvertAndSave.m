@@ -221,9 +221,9 @@
     [_customize_aud_samplerate_pop removeAllItems];
     [_customize_subs_pop removeAllItems];
 
-    [_customize_vid_codec_pop addItemsWithTitles:[_videoCodecs objectAtIndex:0]];
-    [_customize_aud_codec_pop addItemsWithTitles:[_audioCodecs objectAtIndex:0]];
-    [_customize_subs_pop addItemsWithTitles:[_subsCodecs objectAtIndex:0]];
+    [_customize_vid_codec_pop addItemsWithTitles:[_videoCodecs firstObject]];
+    [_customize_aud_codec_pop addItemsWithTitles:[_audioCodecs firstObject]];
+    [_customize_subs_pop addItemsWithTitles:[_subsCodecs firstObject]];
 
     [_customize_aud_samplerate_pop addItemWithTitle:@"8000"];
     [_customize_aud_samplerate_pop addItemWithTitle:@"11025"];
@@ -246,7 +246,7 @@
     [_drop_box enablePlaylistItems];
     [_drop_box setDropHandler: self];
 
-    [self resetCustomizationSheetBasedOnProfile:[self.profileValueList objectAtIndex:0]];
+    [self resetCustomizationSheetBasedOnProfile:[self.profileValueList firstObject]];
 }
 
 # pragma mark -
@@ -264,7 +264,7 @@
 {
     if (b_streaming) {
         if ([[[_stream_type_pop selectedItem] title] isEqualToString:@"HTTP"]) {
-            NSString *muxformat = [self.currentProfile objectAtIndex:0];
+            NSString *muxformat = [self.currentProfile firstObject];
             if ([muxformat isEqualToString:@"wav"] || [muxformat isEqualToString:@"mov"] || [muxformat isEqualToString:@"mp4"] || [muxformat isEqualToString:@"mkv"]) {
                 NSBeginInformationalAlertSheet(_NS("Invalid container format for HTTP streaming"), _NS("OK"), @"", @"", _window,
                                                nil, nil, nil, nil,
@@ -541,7 +541,7 @@
             NSArray *values = [[paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
             if ([values count] > 0) {
-                [self setMRL: [NSString stringWithUTF8String:vlc_path2uri([[values objectAtIndex:0] UTF8String], NULL)]];
+                [self setMRL: [NSString stringWithUTF8String:vlc_path2uri([[values firstObject] UTF8String], NULL)]];
                 [self updateOKButton];
                 [self updateDropView];
                 return YES;
@@ -694,7 +694,7 @@
         return;
     }
 
-    [self selectCellByEncapsulationFormat:[components objectAtIndex:0]];
+    [self selectCellByEncapsulationFormat:[components firstObject]];
     [_customize_vid_ckb setState:[[components objectAtIndex:1] intValue]];
     [_customize_aud_ckb setState:[[components objectAtIndex:2] intValue]];
     [_customize_subs_ckb setState:[[components objectAtIndex:3] intValue]];
@@ -924,7 +924,7 @@
     if (!b_streaming) {
         /* file transcoding */
         // add muxer
-        [composedOptions appendFormat:@"}:standard{mux=%@", [self.currentProfile objectAtIndex:0]];
+        [composedOptions appendFormat:@"}:standard{mux=%@", [self.currentProfile firstObject]];
 
         // add output destination
         [composedOptions appendFormat:@",access=file{no-overwrite},dst=%@}", _outputDestination];
@@ -937,7 +937,7 @@
         else if ([[[_stream_type_pop selectedItem] title] isEqualToString:@"MMSH"])
             [composedOptions appendFormat:@":standard{mux=asfh,dst=%@,port=%@,access=mmsh", _outputDestination, [_stream_port_fld stringValue]];
         else
-            [composedOptions appendFormat:@":standard{mux=%@,dst=%@,port=%@,access=http", [self.currentProfile objectAtIndex:0], [_stream_port_fld stringValue], _outputDestination];
+            [composedOptions appendFormat:@":standard{mux=%@,dst=%@,port=%@,access=http", [self.currentProfile firstObject], [_stream_port_fld stringValue], _outputDestination];
 
         if ([_stream_sap_ckb state])
             [composedOptions appendFormat:@",sap,name=\"%@\"", [_stream_channel_fld stringValue]];

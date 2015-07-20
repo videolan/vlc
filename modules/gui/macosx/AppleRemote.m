@@ -361,7 +361,7 @@ static AppleRemote* sharedInstance=nil;
 }
 
 - (void) executeClickCountEvent: (NSArray*) values {
-    AppleRemoteEventIdentifier event = [[values objectAtIndex:0] unsignedIntValue];
+    AppleRemoteEventIdentifier event = [[values firstObject] unsignedIntValue];
     NSTimeInterval eventTimePoint = [[values objectAtIndex:1] doubleValue];
 
     BOOL finishedClicking = NO;

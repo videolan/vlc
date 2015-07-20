@@ -242,7 +242,7 @@
     [o_playlist_header setMenu: o_context_menu];
 
     for (NSUInteger i = 0; i < count; i++) {
-        o_column = [[o_columnArray objectAtIndex:i] objectAtIndex:0];
+        o_column = [[o_columnArray objectAtIndex:i] firstObject];
         if ([o_column isEqualToString:@"status"])
             continue;
 
@@ -1016,8 +1016,8 @@
         NSUInteger mediaListCount = mediaList.count;
         if (mediaListCount > 30) {
             for (NSUInteger x = 0; x < mediaListCount - 30; x++) {
-                [mutDict removeObjectForKey:[mediaList objectAtIndex:0]];
-                [mediaList removeObjectAtIndex:0];
+                [mutDict removeObjectForKey:[mediaList firstObject]];
+                [mediaList removefirstObject];
             }
         }
     } else {

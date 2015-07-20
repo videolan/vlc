@@ -293,7 +293,7 @@
     vlc_object_t *p_object = VLC_OBJECT(getAout());
     if (p_object == NULL)
         p_object = vlc_object_hold(pl_Get(p_intf));
-    var_SetString(p_object, "equalizer-preset", [B64DecNSStr([items objectAtIndex:0]) UTF8String]);
+    var_SetString(p_object, "equalizer-preset", [B64DecNSStr([items firstObject]) UTF8String]);
     vlc_object_release(p_object);
 
     /* filter handling */
