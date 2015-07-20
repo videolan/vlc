@@ -120,6 +120,31 @@ LIBVLC_API const char *libvlc_printerr (const char *fmt, ...);
  * This functions accept a list of "command line" arguments similar to the
  * main(). These arguments affect the LibVLC instance default configuration.
  *
+ * \note
+ * LibVLC may create threads. Therefore, any thread-unsafe process
+ * initialization must be performed before calling libvlc_new(). In particular
+ * and where applicable:
+ * - setlocale() and textdomain(),
+ * - setenv(), unsetenv() and putenv(),
+ * - with the X11 display system, XInitThreads()
+ *   (see also libvlc_media_player_set_xwindow()) and
+ * - on Microsoft Windows, SetErrorMode().
+ * - sigprocmask() shall never be invoked; pthread_sigmask() can be used.
+ *
+ * On POSIX systems, the SIGCHLD signal must <b>not</b> be ignored, i.e. the
+ * signal handler must set to SIG_DFL or a function pointer, not SIG_IGN.
+ * Also while LibVLC is active, the wait() function shall not be called, and
+ * any call to waitpid() shall use a strictly positive value for the first
+ * parameter (i.e. the PID). Failure to follow those rules may lead to a
+ * deadlock or a busy loop.
+ *
+ * Also on POSIX systems, it is recommended that the SIGPIPE signal be blocked,
+ * even if it is not, in principles, necessary.
+ *
+ * On Microsoft Windows Vista/2008, the process error mode
+ * SEM_FAILCRITICALERRORS flag <b>must</b> with the SetErrorMode() function
+ * before using LibVLC. On later versions, it is optional and unnecessary.
+ *
  * \version
  * Arguments are meant to be passed from the command line to LibVLC, just like
  * VLC media player does. The list of valid arguments depends on the LibVLC
