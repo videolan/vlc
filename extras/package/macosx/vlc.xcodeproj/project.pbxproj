@@ -464,6 +464,7 @@
 		7D8BB0C01830393300FAE9B7 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */; };
 		7DB65D5618ABD6490053B874 /* AddonManager.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DB65D5418ABD6490053B874 /* AddonManager.xib */; };
 		7DD6EC101B58136D0047CF5C /* SimplePreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DD6EC0E1B58136D0047CF5C /* SimplePreferences.xib */; };
+		7DE78AC61B5D0A360019454C /* StreamOutput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DE78AC41B5D0A360019454C /* StreamOutput.xib */; };
 		7DE88F2A1831396A00CD9DA2 /* PlaylistAccessoryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7DE88F281831396A00CD9DA2 /* PlaylistAccessoryView.xib */; };
 		7DFFA16C16124F38001AF89F /* effects-one-button-pressed-dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DFFA16A16124F38001AF89F /* effects-one-button-pressed-dark.png */; };
 		7DFFA16D16124F38001AF89F /* effects-one-button-pressed-dark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7DFFA16B16124F38001AF89F /* effects-one-button-pressed-dark@2x.png */; };
@@ -1248,6 +1249,7 @@
 		7DB65D5318ABD6380053B874 /* AddonsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonsWindowController.m; path = ../../../modules/gui/macosx/AddonsWindowController.m; sourceTree = SOURCE_ROOT; };
 		7DB65D5518ABD6490053B874 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AddonManager.xib; sourceTree = "<group>"; };
 		7DD6EC0F1B58136D0047CF5C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/SimplePreferences.xib; sourceTree = "<group>"; };
+		7DE78AC51B5D0A360019454C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/StreamOutput.xib; sourceTree = "<group>"; };
 		7DE88F291831396A00CD9DA2 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistAccessoryView.xib; sourceTree = "<group>"; };
 		7DF0435E1972E26A0022B534 /* AddonListDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonListDataSource.h; path = ../../../modules/gui/macosx/AddonListDataSource.h; sourceTree = SOURCE_ROOT; };
 		7DF0435F1972E26A0022B534 /* AddonListDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonListDataSource.m; path = ../../../modules/gui/macosx/AddonListDataSource.m; sourceTree = SOURCE_ROOT; };
@@ -2898,6 +2900,7 @@
 				7DE88F281831396A00CD9DA2 /* PlaylistAccessoryView.xib */,
 				7D3F6523188051F2005776C4 /* BWQuincyMain.xib */,
 				7DB65D5418ABD6490053B874 /* AddonManager.xib */,
+				7DE78AC41B5D0A360019454C /* StreamOutput.xib */,
 			);
 			name = xibs;
 			sourceTree = "<group>";
@@ -3671,6 +3674,7 @@
 				1C88BBED19DC7C8100645190 /* ys-bottom-background_dark.png in Resources */,
 				1C88BB6719DC7C7800645190 /* ys-stop-pressed@2x.png in Resources */,
 				CC91919D159B547C00E634A7 /* dropzone@2x.png in Resources */,
+				7DE78AC61B5D0A360019454C /* StreamOutput.xib in Resources */,
 				CC973B9C15F0D02F00D5F650 /* forward-3btns-dark-pressed.png in Resources */,
 				CC973B9D15F0D02F00D5F650 /* forward-3btns-dark-pressed@2x.png in Resources */,
 				CC973B9E15F0D02F00D5F650 /* forward-3btns-dark.png in Resources */,
@@ -3998,6 +4002,14 @@
 				7DD6EC0F1B58136D0047CF5C /* English */,
 			);
 			name = SimplePreferences.xib;
+			sourceTree = "<group>";
+		};
+		7DE78AC41B5D0A360019454C /* StreamOutput.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7DE78AC51B5D0A360019454C /* English */,
+			);
+			name = StreamOutput.xib;
 			sourceTree = "<group>";
 		};
 		7DE88F281831396A00CD9DA2 /* PlaylistAccessoryView.xib */ = {

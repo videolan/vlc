@@ -1,12 +1,13 @@
 /*****************************************************************************
  * output.h: MacOS X Output Dialog
  *****************************************************************************
- * Copyright (C) 2002-2007 VLC authors and VideoLAN
+ * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Felix Paul Kühne <fkuehne # videolan org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,72 +24,61 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * VLCOutput interface
- *****************************************************************************/
 @interface VLCOutput : NSObject
-{
-    IBOutlet id o_open_panel;
-    IBOutlet id o_output_ckbox;
-    IBOutlet id o_output_settings;
-    IBOutlet id o_output_sheet;
-    IBOutlet id o_btn_ok;
 
-    IBOutlet id o_options_lbl;
-    IBOutlet id o_display;
-    IBOutlet id o_method;
-    IBOutlet id o_file_field;
-    IBOutlet id o_dump_chkbox;
-    IBOutlet id o_btn_browse;
-    IBOutlet id o_stream_address;
-    IBOutlet id o_stream_address_lbl;
-    IBOutlet id o_stream_port;
-    IBOutlet id o_stream_port_stp;
-    IBOutlet id o_stream_port_lbl;
-    IBOutlet id o_stream_ttl;
-    IBOutlet id o_stream_ttl_stp;
-    IBOutlet id o_stream_ttl_lbl;
-    IBOutlet id o_stream_type;
-    IBOutlet id o_stream_type_lbl;
+@property (readwrite, weak) IBOutlet NSPanel *outputSheet;
+@property (readwrite, weak) IBOutlet NSButton *okButton;
 
-    IBOutlet id o_mux_lbl;
-    IBOutlet NSPopUpButton *o_mux_selector;
+@property (readwrite, weak) IBOutlet NSBox *optionsBox;
+@property (readwrite, weak) IBOutlet NSButton *displayOnLocalScreenCheckbox;
+@property (readwrite, weak) IBOutlet NSMatrix *outputMethodMatrix;
+@property (readwrite, weak) IBOutlet NSTextField *fileTextField;
+@property (readwrite, weak) IBOutlet NSButton *dumpCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *browseButton;
+@property (readwrite, weak) IBOutlet NSTextField *streamAddressTextField;
+@property (readwrite, weak) IBOutlet NSTextField *streamAddressLabel;
+@property (readwrite, weak) IBOutlet NSTextField *streamPortTextField;
+@property (readwrite, weak) IBOutlet NSStepper *streamPortStepper;
+@property (readwrite, weak) IBOutlet NSTextField *streamPortLabel;
+@property (readwrite, weak) IBOutlet NSTextField *streamTTLTextField;
+@property (readwrite, weak) IBOutlet NSStepper *streamTTLStepper;
+@property (readwrite, weak) IBOutlet NSTextField *streamTTLLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *streamTypePopup;
+@property (readwrite, weak) IBOutlet NSTextField *streamTypeLabel;
 
-    IBOutlet id o_transcode_audio_bitrate;
-    IBOutlet id o_transcode_audio_bitrate_lbl;
-    IBOutlet id o_transcode_audio_channels;
-    IBOutlet id o_transcode_audio_channels_lbl;
-    IBOutlet id o_transcode_audio_chkbox;
-    IBOutlet id o_transcode_audio_selector;
-    IBOutlet id o_transcode_lbl;
-    IBOutlet id o_transcode_video_bitrate;
-    IBOutlet id o_transcode_video_bitrate_lbl;
-    IBOutlet id o_transcode_video_scale;
-    IBOutlet id o_transcode_video_scale_lbl;
-    IBOutlet id o_transcode_video_chkbox;
-    IBOutlet id o_transcode_video_selector;
+@property (readwrite, weak) IBOutlet NSTextField *muxLabel;
+@property (readwrite, weak) IBOutlet NSPopUpButton *muxSelectorPopup;
 
-    IBOutlet id o_misc_lbl;
-    IBOutlet id o_sap_chkbox;
-    IBOutlet id o_channel_name;
-    IBOutlet id o_channel_name_lbl;
+@property (readwrite, weak) IBOutlet NSBox *transcodeBox;
+@property (readwrite, weak) IBOutlet NSComboBox *transcodeAudioBitrateComboBox;
+@property (readwrite, weak) IBOutlet NSTextField *transcodeAudioBitrateLabel;
+@property (readwrite, weak) IBOutlet NSComboBox *transcodeAudioChannelsComboBox;
+@property (readwrite, weak) IBOutlet NSTextField *transcodeAudioChannelsLabel;
+@property (readwrite, weak) IBOutlet NSButton *transcodeAudioCheckbox;
+@property (readwrite, weak) IBOutlet NSPopUpButton *transcodeAudioSelectorPopup;
+@property (readwrite, weak) IBOutlet NSComboBox *transcodeVideoBitrateComboBox;
+@property (readwrite, weak) IBOutlet NSTextField *transcodeVideoBitrateLabel;
+@property (readwrite, weak) IBOutlet NSComboBox *transcodeVideoScaleComboBox;
+@property (readwrite, weak) IBOutlet NSTextField *transcodeVideoScaleLabel;
+@property (readwrite, weak) IBOutlet NSButton *transcodeVideoCheckbox;
+@property (readwrite, weak) IBOutlet NSPopUpButton *transcodeVideoSelectorPopup;
 
-    IBOutlet id o_sdp_url;
-    IBOutlet id o_sdp_url_lbl;
-    IBOutlet id o_rtsp_chkbox;
-    IBOutlet id o_http_chkbox;
-    IBOutlet id o_file_chkbox;
-}
-@property (readwrite, retain) NSArray *soutMRL;
+@property (readwrite, weak) IBOutlet NSBox *miscBox;
+@property (readwrite, weak) IBOutlet NSButton *sapCheckbox;
+@property (readwrite, weak) IBOutlet NSTextField *channelNameTextField;
+@property (readwrite, weak) IBOutlet NSTextField *channelNameLabel;
 
-- (void)initStrings;
+@property (readwrite, weak) IBOutlet NSTextField *sdpURLTextField;
+@property (readwrite, weak) IBOutlet NSTextField *sdpURLLabel;
+@property (readwrite, weak) IBOutlet NSButton *rtspCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *httpCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *fileCheckbox;
 
-- (IBAction)outputChanged:(id)sender;
-- (IBAction)outputSettings:(id)sender;
+@property (readonly) NSArray *soutMRL;
+
 - (IBAction)outputCloseSheet:(id)sender;
 - (IBAction)outputMethodChanged:(id)sender;
 - (IBAction)outputInfoChanged:(id)object;
-- (void)TTLChanged:(NSNotification *)o_notification;
 - (IBAction)outputFileBrowse:(id)sender;
 - (IBAction)streamPortStepperChanged:(id)sender;
 - (IBAction)streamTTLStepperChanged:(id)sender;
@@ -97,4 +87,5 @@
 - (IBAction)announceChanged:(id)sender;
 
 - (IBAction)streamTTLStepperChanged:(id)sender;
+
 @end
