@@ -27,8 +27,6 @@
 
 @interface VLCBookmarks : NSObject
 
-+ (VLCBookmarks *)sharedInstance;
-
 /* main window */
 @property (readwrite, weak) IBOutlet NSWindow *bookmarksWindow;
 @property (readwrite, weak) IBOutlet NSButton *addButton;

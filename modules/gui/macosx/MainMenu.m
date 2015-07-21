@@ -65,7 +65,6 @@
     VLCVideoEffects *_videoEffectsWindowController;
     VLCAudioEffects *_audioEffectsWindowController;
     VLCTrackSynchronization *_trackSynchronizationWindowController;
-    VLCBookmarks *_bookmarksWindowController;
     VLCConvertAndSave *_convertAndSaveWindowController;
     AddonsWindowController *_addonsController;
 

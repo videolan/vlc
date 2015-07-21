@@ -45,18 +45,6 @@
 
 @implementation VLCBookmarks
 
-+ (VLCBookmarks *)sharedInstance
-{
-    static VLCBookmarks *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCBookmarks new];
-    });
-
-    return sharedInstance;
-}
-
 /*****************************************************************************
  * GUI methods
  *****************************************************************************/

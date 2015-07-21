@@ -599,14 +599,14 @@ void WindowClose(vout_window_t *p_wnd)
 
     NSInteger currentStatusWindowLevel = self.currentStatusWindowLevel;
 
+    VLCMain *main = [VLCMain sharedInstance];
     [[VLCMainWindow sharedInstance] setWindowLevel:i_level];
-
     [[VLCVideoEffects sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[VLCAudioEffects sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[VLCInfo sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[VLCBookmarks sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[main bookmarks] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[VLCTrackSynchronization sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[[VLCMain sharedInstance] resumeDialog] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[main resumeDialog] updateCocoaWindowLevel:currentStatusWindowLevel];
 }
 
 @end
