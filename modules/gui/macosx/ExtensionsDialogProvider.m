@@ -38,9 +38,9 @@
  * VLCExtensionsDialogProvider implementation
  *****************************************************************************/
 
-static int dialogCallback(vlc_object_t *p_this, const char *psz_variable,
-                           vlc_value_t old_val, vlc_value_t new_val,
-                           void *param);
+static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variable,
+                                   vlc_value_t old_val, vlc_value_t new_val,
+                                   void *param);
 
 static NSView *createControlFromWidget(extension_widget_t *widget, id self)
 {
@@ -155,11 +155,10 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
                 // Get the web view
                 assert([control isKindOfClass:[WebView class]]);
                 WebView *webView = (WebView *)control;
-                NSString *string = [NSString stringWithUTF8String:widget->psz_text];
+                NSString *string = toNSStr(widget->psz_text);
                 [[webView mainFrame] loadHTMLString:string baseURL:[NSURL URLWithString:@""]];
                 [webView setNeedsDisplay:YES];
                 break;
-
             }
             case EXTENSION_WIDGET_LABEL:
             case EXTENSION_WIDGET_PASSWORD:
@@ -169,7 +168,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
                     break;
                 assert([control isKindOfClass:[NSControl class]]);
                 NSControl *field = (NSControl *)control;
-                NSString *string = [NSString stringWithCString:widget->psz_text encoding:NSUTF8StringEncoding];
+                NSString *string = toNSStr(widget->psz_text);
                 NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding: NSISOLatin1StringEncoding] documentAttributes:NULL];
                 [field setAttributedStringValue:attrString];
                 break;
@@ -246,9 +245,9 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
 /**
  * Ask the dialogs provider to create a new dialog
  **/
-static int dialogCallback(vlc_object_t *p_this, const char *psz_variable,
-                           vlc_value_t old_val, vlc_value_t new_val,
-                           void *param)
+static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variable,
+                                   vlc_value_t old_val, vlc_value_t new_val,
+                                   void *param)
 {
     @autoreleasepool {
         (void) p_this;
@@ -256,71 +255,59 @@ static int dialogCallback(vlc_object_t *p_this, const char *psz_variable,
         (void) old_val;
         (void) param;
 
-        ExtensionsDialogProvider *p_edp = [ExtensionsDialogProvider sharedInstance:(intf_thread_t *)p_this];
-        if (!p_edp)
+        ExtensionsDialogProvider *extensionDialogProvider = [ExtensionsDialogProvider sharedInstance];
+        if (!extensionDialogProvider)
             return VLC_EGENERIC;
         if (!new_val.p_address)
             return VLC_EGENERIC;
 
         extension_dialog_t *p_dialog = (extension_dialog_t*) new_val.p_address;
-        [p_edp manageDialog:p_dialog];
+        [extensionDialogProvider manageDialog:p_dialog];
         return VLC_SUCCESS;
     }
 }
 
 @interface ExtensionsDialogProvider ()
-{
-    intf_thread_t *p_intf;
-}
 @end
 
 @implementation ExtensionsDialogProvider
 
-static ExtensionsDialogProvider *sharedInstance = nil;
-
-+ (ExtensionsDialogProvider *)sharedInstance:(intf_thread_t *)_p_intf
++ (ExtensionsDialogProvider *)sharedInstance
 {
-
+    static ExtensionsDialogProvider *sharedInstance = nil;
     static dispatch_once_t pred;
-
     dispatch_once(&pred, ^{
-        sharedInstance = [[ExtensionsDialogProvider alloc] initWithIntf:_p_intf];
+        sharedInstance = [[ExtensionsDialogProvider alloc] init];
     });
 
     return sharedInstance;
 }
 
-+ (void)killInstance
-{
-    sharedInstance = nil;
-}
-
-- (id)initWithIntf:(intf_thread_t *)_p_intf
+- (id)init
 {
     self = [super init];
     if (self) {
-        p_intf = _p_intf;
-
-        // The Cocoa interface already called dialog_Register()
+        intf_thread_t *p_intf = VLCIntf;
         var_Create(p_intf, "dialog-extension", VLC_VAR_ADDRESS);
-        var_AddCallback(p_intf, "dialog-extension", dialogCallback, NULL);
+        var_AddCallback(p_intf, "dialog-extension", extensionDialogCallback, (__bridge void *)self);
+        dialog_Register(p_intf);
     }
     return self;
 }
 
 - (void)dealloc
 {
-    msg_Dbg(p_intf, "ExtensionsDialogProvider is quitting...");
-    var_DelCallback(p_intf, "dialog-extension", dialogCallback, NULL);
+    intf_thread_t *p_intf = VLCIntf;
+    var_DelCallback(p_intf, "dialog-extension", extensionDialogCallback, (__bridge void *)self);
 }
 
-- (void)performEventWithObject: (NSValue *)o_value ofType: (const char*)type
+- (void)performEventWithObject:(NSValue *)objectValue ofType:(const char*)type
 {
-    NSString *o_type = [NSString stringWithUTF8String:type];
+    NSString *typeString = [NSString stringWithUTF8String:type];
 
-    if ([o_type isEqualToString: @"dialog-extension"]) {
+    if ([typeString isEqualToString: @"dialog-extension"]) {
         [self performSelectorOnMainThread:@selector(updateExtensionDialog:)
-                               withObject:o_value
+                               withObject:objectValue
                             waitUntilDone:YES];
 
     }
@@ -413,13 +400,13 @@ static ExtensionsDialogProvider *sharedInstance = nil;
             continue; /* Some widgets may be NULL@this point */
 
         BOOL shouldDestroy = widget->b_kill;
-        NSView *control = (__bridge NSView *)(widget->p_sys_intf);
+        NSView *control = CFBridgingRelease(widget->p_sys_intf);
         BOOL update = widget->b_update;
 
         if (!control && !shouldDestroy) {
             control = createControlFromWidget(widget, self);
             updateControlFromWidget(control, widget, self);
-            widget->p_sys_intf = (__bridge void *)(control);
+            widget->p_sys_intf = (void *)CFBridgingRetain(control);
             update = YES; // Force update and repositionning
             [control setHidden:widget->b_hide];
         }
@@ -456,7 +443,7 @@ static ExtensionsDialogProvider *sharedInstance = nil;
  * Note: Lock on p_dialog->lock must be held. */
 - (VLCDialogWindow *)createExtensionDialog:(extension_dialog_t *)p_dialog
 {
-    VLCDialogWindow *dialogWindow = nil;
+    VLCDialogWindow *dialogWindow;
 
     BOOL shouldDestroy = p_dialog->b_kill;
     if (!shouldDestroy) {
@@ -467,13 +454,13 @@ static ExtensionsDialogProvider *sharedInstance = nil;
                                                               defer:NO];
         [dialogWindow setDelegate:self];
         [dialogWindow setDialog:p_dialog];
-        [dialogWindow setTitle:[NSString stringWithUTF8String:p_dialog->psz_title]];
+        [dialogWindow setTitle:toNSStr(p_dialog->psz_title)];
 
         VLCDialogGridView *gridView = [[VLCDialogGridView alloc] init];
         [gridView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
         [dialogWindow setContentView:gridView];
 
-        p_dialog->p_sys_intf = (__bridge void *)dialogWindow;
+        p_dialog->p_sys_intf = (void *)CFBridgingRetain(dialogWindow);
     }
 
     [self updateWidgets:p_dialog];
@@ -494,14 +481,13 @@ static ExtensionsDialogProvider *sharedInstance = nil;
 {
     assert(p_dialog);
 
-    VLCDialogWindow *dialogWindow = (__bridge VLCDialogWindow*) p_dialog->p_sys_intf;
+    VLCDialogWindow *dialogWindow = CFBridgingRelease(p_dialog->p_sys_intf);
     if (!dialogWindow) {
         msg_Warn(VLCIntf, "dialog window not found");
         return VLC_EGENERIC;
     }
 
     [dialogWindow setDelegate:nil];
-    [dialogWindow close];
     dialogWindow = nil;
 
     p_dialog->p_sys_intf = NULL;
@@ -541,8 +527,7 @@ static ExtensionsDialogProvider *sharedInstance = nil;
         [self updateWidgets:p_dialog];
         if (strcmp([[dialogWindow title] UTF8String],
                     p_dialog->psz_title) != 0) {
-            NSString *titleString = [NSString stringWithCString:p_dialog->psz_title
-                                                       encoding:NSUTF8StringEncoding];
+            NSString *titleString = toNSStr(p_dialog->psz_title);
 
             [dialogWindow setTitle:titleString];
         }
@@ -569,7 +554,7 @@ static ExtensionsDialogProvider *sharedInstance = nil;
 - (void)manageDialog:(extension_dialog_t *)p_dialog
 {
     assert(p_dialog);
-    ExtensionsManager *extMgr = [ExtensionsManager getInstance:p_intf];
+    ExtensionsManager *extMgr = [ExtensionsManager sharedInstance];
     assert(extMgr != NULL);
 
     NSValue *o_value = [NSValue valueWithPointer:p_dialog];

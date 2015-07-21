@@ -53,7 +53,6 @@
 
 @interface VLCMainMenu()
 {
-    BOOL b_mainMenu_setup;
     BOOL b_nib_videoeffects_loaded;
     BOOL b_nib_audioeffects_loaded;
     BOOL b_nib_tracksynchrloaded;
@@ -117,11 +116,6 @@
 
 - (void)awakeFromNib
 {
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(applicationWillFinishLaunching:)
-                                                 name: NSApplicationWillFinishLaunchingNotification
-                                               object: nil];
-
     /* check whether the user runs OSX with a RTL language */
     NSArray* languages = [NSLocale preferredLanguages];
     NSString* preferredLanguage = [languages firstObject];
@@ -130,10 +124,7 @@
         msg_Dbg(VLCIntf, "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
         [_rateTextField setAlignment: NSLeftTextAlignment];
     }
-}
 
-- (void)applicationWillFinishLaunching:(NSNotification *)notification
-{
     [self setRateControlsEnabled:NO];
 
 #ifdef HAVE_SPARKLE
@@ -149,14 +140,9 @@
     VLCStringUtility *stringUtility = [VLCStringUtility sharedInstance];
     char *key;
 
-    /* Check if we already did this once. Opening the other nibs calls it too,
-     because VLCMain is the owner */
-    if (b_mainMenu_setup)
-        return;
-
     /* Get ExtensionsManager */
     intf_thread_t *p_intf = VLCIntf;
-    _extensionManager = [ExtensionsManager getInstance:p_intf];
+    _extensionManager = [ExtensionsManager sharedInstance];
 
     [self initStrings];
 
@@ -259,20 +245,17 @@
                                                  name: NSApplicationDidChangeScreenParametersNotification
                                                object: nil];
 
-    /* we're done */
-    b_mainMenu_setup = YES;
-
     [self setupVarMenuItem:_add_intf target: (vlc_object_t *)p_intf
                              var:"intf-add" selector: @selector(toggleVar:)];
 
     /* setup extensions menu */
-    // FIXME: Implement preference for autoloading extensions on mac
-    if (![_extensionManager isLoaded] && ![_extensionManager cannotLoad])
-        [_extensionManager loadExtensions];
-
     /* Let the ExtensionsManager itself build the menu */
     [_extensionManager buildMenu:_extensionsMenu];
     [_extensions setEnabled: ([_extensionsMenu numberOfItems] > 0)];
+
+    // FIXME: Implement preference for autoloading extensions on mac
+    if (![_extensionManager isLoaded] && ![_extensionManager cannotLoad])
+        [_extensionManager loadExtensions];
 
     /* setup post-proc menu */
     NSUInteger count = (NSUInteger) [_postprocessingMenu numberOfItems];

@@ -40,9 +40,8 @@
 
 @interface ExtensionsManager : NSObject
 
-+ (ExtensionsManager *)getInstance:(intf_thread_t *)_p_intf;
++ (ExtensionsManager *)sharedInstance;
 
-- (id)initWithIntf:(intf_thread_t *)_p_intf;
 - (void)buildMenu:(NSMenu *)extMenu;
 
 - (BOOL)loadExtensions;
