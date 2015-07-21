@@ -553,8 +553,6 @@ modules/gui/macosx/bookmarks.h
 modules/gui/macosx/bookmarks.m
 modules/gui/macosx/BWQuincyUI.h
 modules/gui/macosx/BWQuincyUI.m
-modules/gui/macosx/controls.h
-modules/gui/macosx/controls.m
 modules/gui/macosx/ControlsBar.h
 modules/gui/macosx/ControlsBar.m
 modules/gui/macosx/ConvertAndSave.h
@@ -576,8 +574,11 @@ modules/gui/macosx/eyetv.h
 modules/gui/macosx/eyetv.m
 modules/gui/macosx/fspanel.h
 modules/gui/macosx/fspanel.m
+modules/gui/macosx/helpers.h
 modules/gui/macosx/intf.h
 modules/gui/macosx/intf.m
+modules/gui/macosx/intf-prefs.h
+modules/gui/macosx/intf-prefs.m
 modules/gui/macosx/macosx.m
 modules/gui/macosx/MainMenu.h
 modules/gui/macosx/MainMenu.m
