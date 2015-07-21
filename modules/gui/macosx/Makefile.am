@@ -29,7 +29,6 @@ libmacosx_plugin_la_SOURCES = \
 	BWQuincyManager.h BWQuincyManager.m \
 	BWQuincyUI.h BWQuincyUI.m \
 	CompatibilityFixes.h \
-	controls.h controls.m \
 	ControlsBar.m ControlsBar.h \
 	ConvertAndSave.h ConvertAndSave.m \
 	coredialogs.h coredialogs.m \

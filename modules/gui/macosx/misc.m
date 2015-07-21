@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.m: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2014 VLC authors and VideoLAN
+ * Copyright (C) 2003-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -26,8 +26,8 @@
 #import "misc.h"
 #import "intf.h"                                          /* VLCApplication */
 #import "MainWindow.h"
+#import "MainMenu.h"
 #import "ControlsBar.h"
-#import "controls.h"
 #import "CoreInteraction.h"
 #import <CoreAudio/CoreAudio.h>
 #import <vlc_keys.h>
@@ -791,7 +791,7 @@ void _drawFrameInRect(NSRect frameRect)
 - (void)mouseDown: (NSEvent *)ourEvent
 {
     if ( [ourEvent clickCount] > 1 )
-        [[[VLCMain sharedInstance] controls] goToSpecificTime: nil];
+        [[[VLCMain sharedInstance] mainMenu] goToSpecificTime: nil];
     else
     {
         if (o_remaining_identifier) {

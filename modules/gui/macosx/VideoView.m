@@ -167,7 +167,7 @@
     } else if (([o_event type] == NSRightMouseDown) ||
                (([o_event type] == NSLeftMouseDown) &&
                ([o_event modifierFlags] &  NSControlKeyMask)))
-        [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
+        [NSMenu popUpContextMenu: [[[VLCMain sharedInstance] mainMenu] voutMenu] withEvent: o_event forView: self];
 
     [super mouseDown: o_event];
 }
@@ -175,7 +175,7 @@
 - (void)rightMouseDown:(NSEvent *)o_event
 {
     if ([o_event type] == NSRightMouseDown)
-        [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
+        [NSMenu popUpContextMenu: [[[VLCMain sharedInstance] mainMenu] voutMenu] withEvent: o_event forView: self];
 
     [super mouseDown: o_event];
 }
@@ -183,7 +183,7 @@
 - (void)rightMouseUp:(NSEvent *)o_event
 {
     if ([o_event type] == NSRightMouseUp)
-        [NSMenu popUpContextMenu: [[VLCMainMenu sharedInstance] voutMenu] withEvent: o_event forView: self];
+        [NSMenu popUpContextMenu: [[[VLCMain sharedInstance] mainMenu] voutMenu] withEvent: o_event forView: self];
 
     [super mouseUp: o_event];
 }

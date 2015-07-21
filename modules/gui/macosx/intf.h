@@ -55,7 +55,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
  *****************************************************************************/
 @class AppleRemote;
 @class VLCInfo;
-@class VLCControls;
 @class VLCMainMenu;
 @class VLCPlaylist;
 @class VLCInputManager;
@@ -70,8 +69,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {
     IBOutlet VLCMainWindow *o_mainwindow;            /* VLCMainWindow */
-
-    IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
 }
 
@@ -85,7 +82,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
 - (VLCMainMenu *)mainMenu;
 - (VLCMainWindow *)mainWindow;
-- (VLCControls *)controls;
 - (VLCBookmarks *)bookmarks;
 - (VLCOpen *)open;
 - (VLCSimplePrefs *)simplePreferences;

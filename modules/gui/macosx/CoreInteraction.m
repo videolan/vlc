@@ -40,7 +40,6 @@
 #import "SPMediaKeyTap.h"
 #import "AppleRemote.h"
 #import "InputManager.h"
-#import "controls.h"
 
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)
@@ -616,6 +615,19 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     vlc_object_release(p_input);
 }
 
+- (void)showPosition
+{
+    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    if (p_input != NULL) {
+        vout_thread_t *p_vout = input_GetVout(p_input);
+        if (p_vout != NULL) {
+            var_SetInteger(VLCIntf->p_libvlc, "key-action", ACTIONID_POSITION);
+            vlc_object_release(p_vout);
+        }
+        vlc_object_release(p_input);
+    }
+}
+
 #pragma mark - drag and drop support for VLCVoutView, VLCDragDropView and VLCThreePartDropView
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
@@ -1152,7 +1164,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             }
             break;
         case kRemoteButtonMenu:
-            [[[VLCMain sharedInstance] controls] showPosition: self]; //FIXME
+            [self showPosition];
             break;
         case kRemoteButtonPlay_Sleep:
         {
@@ -1174,6 +1186,36 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
  * shortcut key.  If it is, pass it off to VLC for handling and return YES,
  * otherwise ignore it and return NO (where it will get handled by Cocoa).
  *****************************************************************************/
+
+- (BOOL)keyEvent:(NSEvent *)o_event
+{
+    BOOL eventHandled = NO;
+    NSString * characters = [o_event charactersIgnoringModifiers];
+    if ([characters length] > 0) {
+        unichar key = [characters characterAtIndex: 0];
+
+        if (key) {
+            input_thread_t * p_input = pl_CurrentInput(VLCIntf);
+            if (p_input != NULL) {
+                vout_thread_t *p_vout = input_GetVout(p_input);
+
+                if (p_vout != NULL) {
+                    /* Escape */
+                    if (key == (unichar) 0x1b) {
+                        if (var_GetBool(p_vout, "fullscreen")) {
+                            [self toggleFullscreen];
+                            eventHandled = YES;
+                        }
+                    }
+                    vlc_object_release(p_vout);
+                }
+                vlc_object_release(p_input);
+            }
+        }
+    }
+    return eventHandled;
+}
+
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force
 {
     intf_thread_t *p_intf = VLCIntf;

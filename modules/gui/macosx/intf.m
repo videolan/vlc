@@ -49,7 +49,6 @@
 #import "prefs.h"
 #import "playlist.h"
 #import "playlistinfo.h"
-#import "controls.h"
 #import "open.h"
 #import "bookmarks.h"
 #import "coredialogs.h"
@@ -73,6 +72,8 @@
  * Local prototypes.
  *****************************************************************************/
 
+static VLCMain *sharedInstance = nil;
+
 #pragma mark -
 #pragma mark VLC Interface Object Callbacks
 
@@ -91,11 +92,6 @@ int OpenIntf (vlc_object_t *p_this)
 
         [VLCVoutWindowController sharedInstance];
 
-        [NSBundle loadNibNamed:@"MainMenu" owner:NSApp];
-        [NSBundle loadNibNamed:@"MainWindow" owner:[VLCMain sharedInstance]];
-
-        [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
-
         return VLC_SUCCESS;
     }
 }
@@ -105,6 +101,7 @@ void CloseIntf (vlc_object_t *p_this)
     @autoreleasepool {
         msg_Dbg(p_this, "Closing macosx interface");
         [[VLCMain sharedInstance] applicationWillTerminate:nil];
+        sharedInstance = nil;
     }
 }
 
@@ -151,8 +148,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_open_loaded;       /* open nibfile */
     BOOL nib_about_loaded;      /* about nibfile */
-    BOOL nib_prefs_loaded;      /* preferences nibfile */
-    BOOL nib_info_loaded;       /* information panel nibfile */
+    BOOL nib_prefs_loaded;      /* preferences xibfile */
+    BOOL nib_sprefs_loaded;      /* simple preferences xibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
     BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
     BOOL b_active_videoplayback;
@@ -162,7 +159,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCSimplePrefs *_sprefs;
     VLCOpen *_open;
     VLCCoreDialogProvider *_coredialogs;
-    VLCInfo *_info;
     VLCEyeTVController *_eyetv;
     VLCBookmarks *_bookmarks;
     VLCCoreInteraction *_coreinteraction;
@@ -185,7 +181,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 + (VLCMain *)sharedInstance
 {
     static dispatch_once_t pred;
-    static VLCMain *sharedInstance = nil;
 
     dispatch_once(&pred, ^{
         sharedInstance = [VLCMain new];
@@ -200,9 +195,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
     p_intf = NULL;
 
-    _open = [[VLCOpen alloc] init];
-    _mainmenu = [VLCMainMenu sharedInstance];
-    _eyetv = [[VLCEyeTVController alloc] init];
+    [VLCApplication sharedApplication].delegate = self;
 
     /* announce our launch to a potential eyetv plugin */
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"VLCOSXGUIInit"
@@ -219,6 +212,20 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     return self;
 }
 
+- (void)dealloc
+{
+    _mainmenu = nil;
+    _prefs = nil;
+    _sprefs = nil;
+    _open = nil;
+    _coredialogs = nil;
+    _eyetv = nil;
+    _bookmarks = nil;
+    _coreinteraction = nil;
+    _resume_dialog = nil;
+    _input_manager = nil;
+}
+
 - (void)setIntf: (intf_thread_t *)p_mainintf
 {
     p_intf = p_mainintf;
@@ -229,13 +236,35 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     return p_intf;
 }
 
+- (void)applicationWillFinishLaunching:(NSNotification *)aNotification
+{
+    _open = [[VLCOpen alloc] init];
+    _mainmenu = [[VLCMainMenu alloc] init];
+    [NSBundle loadNibNamed:@"MainMenu" owner:_mainmenu];
+
+
+    [NSBundle loadNibNamed:@"MainWindow" owner:[VLCMain sharedInstance]];
+    [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
+    _eyetv = [[VLCEyeTVController alloc] init];
+
+    _coreinteraction = [VLCCoreInteraction sharedInstance];
+
+    playlist_t * p_playlist = pl_Get(VLCIntf);
+    PL_LOCK;
+    items_at_launch = p_playlist->p_local_category->i_children;
+    PL_UNLOCK;
+
+#ifdef HAVE_SPARKLE
+    [[SUUpdater sharedUpdater] setDelegate:self];
+#endif
+}
+
 - (void)awakeFromNib
 {
     if (!p_intf) return;
     var_Create(p_intf, "intf-change", VLC_VAR_BOOL);
 
-    /* Check if we already did this once. Opening the other nibs calls it too,
-     because VLCMain is the owner */
+    /* Check if we already did this once */
     if (nib_main_loaded)
         return;
 
@@ -268,20 +297,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     }
 
     nib_main_loaded = TRUE;
-}
-
-- (void)applicationWillFinishLaunching:(NSNotification *)aNotification
-{
-    _coreinteraction = [VLCCoreInteraction sharedInstance];
-
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    PL_LOCK;
-    items_at_launch = p_playlist->p_local_category->i_children;
-    PL_UNLOCK;
-
-#ifdef HAVE_SPARKLE
-    [[SUUpdater sharedUpdater] setDelegate:self];
-#endif
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -525,11 +540,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     return o_mainwindow;
 }
 
-- (VLCControls *)controls
-{
-    return o_controls;
-}
-
 - (VLCInputManager *)inputManager
 {
     return _input_manager;
@@ -559,8 +569,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     if (!_sprefs)
         _sprefs = [[VLCSimplePrefs alloc] init];
 
-    if (!nib_prefs_loaded)
-        nib_prefs_loaded = [NSBundle loadNibNamed:@"SimplePreferences" owner: _sprefs];
+    if (!nib_sprefs_loaded)
+        nib_sprefs_loaded = [NSBundle loadNibNamed:@"SimplePreferences" owner: _sprefs];
 
     return _sprefs;
 }

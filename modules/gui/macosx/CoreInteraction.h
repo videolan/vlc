@@ -66,6 +66,7 @@
 - (void)volumeUp;
 - (void)volumeDown;
 - (void)toggleMute;
+- (void)showPosition;
 - (void)startListeningWithAppleRemote;
 - (void)stopListeningWithAppleRemote;
 
@@ -82,6 +83,7 @@
 - (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter string: (const char *)psz_value;
 - (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter boolean: (BOOL)b_value;
 
+- (BOOL)keyEvent:(NSEvent *)o_event;
 - (void)updateCurrentlyUsedHotkeys;
 - (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
 

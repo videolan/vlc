@@ -1104,7 +1104,7 @@ else \
 
 - (IBAction)effects:(id)sender
 {
-    [[VLCMainMenu sharedInstance] showAudioEffects: sender];
+    [[[VLCMain sharedInstance] mainMenu] showAudioEffects: sender];
 }
 
 #pragma mark -
@@ -1161,7 +1161,7 @@ else \
         [o_next_btn setEnabled: (b_seekable || b_plmul || b_chapters)];
     }
 
-    [[VLCMainMenu sharedInstance] setRateControlsEnabled: b_control];
+    [[[VLCMain sharedInstance] mainMenu] setRateControlsEnabled: b_control];
 }
 
 @end

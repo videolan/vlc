@@ -374,8 +374,6 @@
 		1CCB5F5B1A62A724004C3E90 /* bookmarks.h in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0708A5724D007B10AE /* bookmarks.h */; };
 		1CCB5F5C1A62A724004C3E90 /* bookmarks.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7BD0608A5724D007B10AE /* bookmarks.m */; };
 		1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */ = {isa = PBXBuildFile; fileRef = CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */; };
-		1CCB5F5E1A62A724004C3E90 /* controls.h in Sources */ = {isa = PBXBuildFile; fileRef = 8E6BC6FA041684EC0059A3A7 /* controls.h */; };
-		1CCB5F5F1A62A724004C3E90 /* controls.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27B03E2EB1C0059A3A7 /* controls.m */; };
 		1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */ = {isa = PBXBuildFile; fileRef = E0382C00160BA09E0031D7FF /* ControlsBar.h */; };
 		1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = E0382C01160BA09E0031D7FF /* ControlsBar.m */; };
 		1CCB5F621A62A724004C3E90 /* ConvertAndSave.h in Sources */ = {isa = PBXBuildFile; fileRef = CC0663341566C34C003A411C /* ConvertAndSave.h */; };
@@ -1272,12 +1270,10 @@
 		8E55FB800459B0FD00FB3317 /* output.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = output.m; path = ../../../modules/gui/macosx/output.m; sourceTree = SOURCE_ROOT; };
 		8E6BC6F6041643860059A3A7 /* applescript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = applescript.h; path = ../../../modules/gui/macosx/applescript.h; sourceTree = SOURCE_ROOT; };
 		8E6BC6F7041643860059A3A7 /* applescript.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = applescript.m; path = ../../../modules/gui/macosx/applescript.m; sourceTree = SOURCE_ROOT; };
-		8E6BC6FA041684EC0059A3A7 /* controls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = controls.h; path = ../../../modules/gui/macosx/controls.h; sourceTree = SOURCE_ROOT; };
 		8E9CA1A306D7DEE800B7186C /* prefs_widgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prefs_widgets.h; path = ../../../modules/gui/macosx/prefs_widgets.h; sourceTree = SOURCE_ROOT; };
 		8E9CA1A406D7DEE800B7186C /* prefs_widgets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = prefs_widgets.m; path = ../../../modules/gui/macosx/prefs_widgets.m; sourceTree = SOURCE_ROOT; };
 		8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text; name = vlc.scriptSuite; path = Resources/vlc.scriptSuite; sourceTree = SOURCE_ROOT; };
 		8EBF3FA503F140960059A3A7 /* vlc.scriptTerminology */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = vlc.scriptTerminology; path = Resources/vlc.scriptTerminology; sourceTree = SOURCE_ROOT; };
-		8ED6C27B03E2EB1C0059A3A7 /* controls.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = controls.m; path = ../../../modules/gui/macosx/controls.m; sourceTree = SOURCE_ROOT; };
 		8ED6C27C03E2EB1C0059A3A7 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/macosx/intf.h; sourceTree = SOURCE_ROOT; };
 		8ED6C27D03E2EB1C0059A3A7 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/macosx/intf.m; sourceTree = SOURCE_ROOT; };
 		8ED6C27E03E2EB1C0059A3A7 /* macosx.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/gui/macosx/macosx.m; sourceTree = SOURCE_ROOT; };
@@ -1827,8 +1823,6 @@
 				DCE7BD0708A5724D007B10AE /* bookmarks.h */,
 				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
 				CCB0BB3013FAC9F40095BD0A /* CompatibilityFixes.h */,
-				8E6BC6FA041684EC0059A3A7 /* controls.h */,
-				8ED6C27B03E2EB1C0059A3A7 /* controls.m */,
 				E0382C00160BA09E0031D7FF /* ControlsBar.h */,
 				E0382C01160BA09E0031D7FF /* ControlsBar.m */,
 				CC0663341566C34C003A411C /* ConvertAndSave.h */,
@@ -3854,8 +3848,6 @@
 				1CCB5F5B1A62A724004C3E90 /* bookmarks.h in Sources */,
 				1CCB5F5C1A62A724004C3E90 /* bookmarks.m in Sources */,
 				1CCB5F5D1A62A724004C3E90 /* CompatibilityFixes.h in Sources */,
-				1CCB5F5E1A62A724004C3E90 /* controls.h in Sources */,
-				1CCB5F5F1A62A724004C3E90 /* controls.m in Sources */,
 				1CCB5F601A62A724004C3E90 /* ControlsBar.h in Sources */,
 				1CCB5F611A62A724004C3E90 /* ControlsBar.m in Sources */,
 				1CCB5F621A62A724004C3E90 /* ConvertAndSave.h in Sources */,

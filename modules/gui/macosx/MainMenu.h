@@ -1,219 +1,219 @@
 /*****************************************************************************
- * MainMenu.h: MacOS X interface module
+ *MainMenu.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2014 Felix Paul Kühne
- * $Id$
+ *Copyright (C) 2011-2015 Felix Paul Kühne
+ *$Id$
  *
- * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
+ *Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ *This program is free software; you can redistribute it and/or modify
+ *it under the terms of the GNU General Public License as published by
+ *the Free Software Foundation; either version 2 of the License, or
+ *(at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *This program is distributed in the hope that it will be useful,
+ *but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *You should have received a copy of the GNU General Public License
+ *along with this program; if not, write to the Free Software
+ *Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
 #import <vlc_common.h>
 #import <vlc_interface.h>
 
-@class AboutWindowController;
-@class AddonsWindowController;
-@class HelpWindowController;
-
 @interface VLCMainMenu : NSObject
-{
-    /* main menu */
 
-    IBOutlet NSMenuItem * o_mi_about;
-    IBOutlet NSMenuItem * o_mi_prefs;
-    IBOutlet NSMenuItem * o_mi_checkForUpdate;
-    IBOutlet NSMenuItem * o_mi_extensions;
-    IBOutlet NSMenu * o_mu_extensions;
-    IBOutlet NSMenuItem * o_mi_addonManager;
-    IBOutlet NSMenuItem * o_mi_add_intf;
-    IBOutlet NSMenu * o_mu_add_intf;
-    IBOutlet NSMenuItem * o_mi_services;
-    IBOutlet NSMenuItem * o_mi_hide;
-    IBOutlet NSMenuItem * o_mi_hide_others;
-    IBOutlet NSMenuItem * o_mi_show_all;
-    IBOutlet NSMenuItem * o_mi_quit;
+/* main menu */
+@property (readwrite, weak) IBOutlet NSMenuItem *about;
+@property (readwrite, weak) IBOutlet NSMenuItem *prefs;
+@property (readwrite, weak) IBOutlet NSMenuItem *checkForUpdate;
+@property (readwrite, weak) IBOutlet NSMenuItem *extensions;
+@property (readwrite, weak) IBOutlet NSMenu *extensionsMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *addonManager;
+@property (readwrite, weak) IBOutlet NSMenuItem *add_intf;
+@property (readwrite, weak) IBOutlet NSMenu *add_intfMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *services;
+@property (readwrite, weak) IBOutlet NSMenuItem *hide;
+@property (readwrite, weak) IBOutlet NSMenuItem *hide_others;
+@property (readwrite, weak) IBOutlet NSMenuItem *show_all;
+@property (readwrite, weak) IBOutlet NSMenuItem *quit;
 
-    IBOutlet NSMenu * o_mu_file;
-    IBOutlet NSMenuItem * o_mi_open_file;
-    IBOutlet NSMenuItem * o_mi_open_generic;
-    IBOutlet NSMenuItem * o_mi_open_disc;
-    IBOutlet NSMenuItem * o_mi_open_net;
-    IBOutlet NSMenuItem * o_mi_open_capture;
-    IBOutlet NSMenuItem * o_mi_open_recent;
-    IBOutlet NSMenuItem * o_mi_close_window;
-    IBOutlet NSMenuItem * o_mi_convertandsave;
-    IBOutlet NSMenuItem * o_mi_save_playlist;
-    IBOutlet NSMenuItem * o_mi_revealInFinder;
+@property (readwrite, weak) IBOutlet NSMenu *fileMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *open_file;
+@property (readwrite, weak) IBOutlet NSMenuItem *open_generic;
+@property (readwrite, weak) IBOutlet NSMenuItem *open_disc;
+@property (readwrite, weak) IBOutlet NSMenuItem *open_net;
+@property (readwrite, weak) IBOutlet NSMenuItem *open_capture;
+@property (readwrite, weak) IBOutlet NSMenuItem *open_recent;
+@property (readwrite, weak) IBOutlet NSMenuItem *close_window;
+@property (readwrite, weak) IBOutlet NSMenuItem *convertandsave;
+@property (readwrite, weak) IBOutlet NSMenuItem *save_playlist;
+@property (readwrite, weak) IBOutlet NSMenuItem *revealInFinder;
 
-    IBOutlet NSMenu * o_mu_edit;
-    IBOutlet NSMenuItem * o_mi_cut;
-    IBOutlet NSMenuItem * o_mi_copy;
-    IBOutlet NSMenuItem * o_mi_paste;
-    IBOutlet NSMenuItem * o_mi_clear;
-    IBOutlet NSMenuItem * o_mi_select_all;
+@property (readwrite, weak) IBOutlet NSMenu *editMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *cutItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *mcopyItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *pasteItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *clearItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *select_all;
 
-    IBOutlet NSMenu * o_mu_view;
-    IBOutlet NSMenuItem * o_mi_toggleJumpButtons;
-    IBOutlet NSMenuItem * o_mi_togglePlaymodeButtons;
-    IBOutlet NSMenuItem * o_mi_toggleEffectsButton;
-    IBOutlet NSMenuItem * o_mi_toggleSidebar;
-    IBOutlet NSMenu * o_mu_playlistTableColumns;
-    IBOutlet NSMenuItem * o_mi_playlistTableColumns;
-    NSMenu * o_mu_playlistTableColumnsContextMenu;
+@property (readwrite, weak) IBOutlet NSMenu *viewMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *toggleJumpButtons;
+@property (readwrite, weak) IBOutlet NSMenuItem *togglePlaymodeButtons;
+@property (readwrite, weak) IBOutlet NSMenuItem *toggleEffectsButton;
+@property (readwrite, weak) IBOutlet NSMenuItem *toggleSidebar;
+@property (readwrite, weak) IBOutlet NSMenu *playlistTableColumnsMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *playlistTableColumns;
 
-    IBOutlet NSMenu * o_mu_controls;
-    IBOutlet NSMenuItem * o_mi_play;
-    IBOutlet NSMenuItem * o_mi_stop;
-    IBOutlet NSMenuItem * o_mi_record;
-    IBOutlet NSMenuItem * o_mi_rate;
-    IBOutlet NSView * o_mi_rate_view;
-    IBOutlet id o_mi_rate_lbl;
-    IBOutlet id o_mi_rate_slower_lbl;
-    IBOutlet id o_mi_rate_normal_lbl;
-    IBOutlet id o_mi_rate_faster_lbl;
-    IBOutlet id o_mi_rate_sld;
-    IBOutlet id o_mi_rate_fld;
-    IBOutlet NSMenuItem * o_mi_trackSynchronization;
-    IBOutlet NSMenuItem * o_mi_previous;
-    IBOutlet NSMenuItem * o_mi_next;
-    IBOutlet NSMenuItem * o_mi_random;
-    IBOutlet NSMenuItem * o_mi_repeat;
-    IBOutlet NSMenuItem * o_mi_loop;
-    IBOutlet NSMenuItem * o_mi_AtoBloop;
-    IBOutlet NSMenuItem * o_mi_quitAfterPB;
-    IBOutlet NSMenuItem * o_mi_fwd;
-    IBOutlet NSMenuItem * o_mi_bwd;
-    IBOutlet NSMenuItem * o_mi_program;
-    IBOutlet NSMenu * o_mu_program;
-    IBOutlet NSMenuItem * o_mi_title;
-    IBOutlet NSMenu * o_mu_title;
-    IBOutlet NSMenuItem * o_mi_chapter;
-    IBOutlet NSMenu * o_mu_chapter;
+@property (readwrite, weak) IBOutlet NSMenu *controlsMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *play;
+@property (readwrite, weak) IBOutlet NSMenuItem *stop;
+@property (readwrite, weak) IBOutlet NSMenuItem *record;
+@property (readwrite, weak) IBOutlet NSMenuItem *rate;
+@property (readwrite, weak) IBOutlet NSView *rate_view;
+@property (readwrite, weak) IBOutlet NSTextField *rateLabel;
+@property (readwrite, weak) IBOutlet NSTextField *rate_slowerLabel;
+@property (readwrite, weak) IBOutlet NSTextField *rate_normalLabel;
+@property (readwrite, weak) IBOutlet NSTextField *rate_fasterLabel;
+@property (readwrite, weak) IBOutlet NSSlider *rate_sld;
+@property (readwrite, weak) IBOutlet NSTextField *rateTextField;
+@property (readwrite, weak) IBOutlet NSMenuItem *trackSynchronization;
+@property (readwrite, weak) IBOutlet NSMenuItem *previous;
+@property (readwrite, weak) IBOutlet NSMenuItem *next;
+@property (readwrite, weak) IBOutlet NSMenuItem *random;
+@property (readwrite, weak) IBOutlet NSMenuItem *repeat;
+@property (readwrite, weak) IBOutlet NSMenuItem *loop;
+@property (readwrite, weak) IBOutlet NSMenuItem *AtoBloop;
+@property (readwrite, weak) IBOutlet NSMenuItem *quitAfterPB;
+@property (readwrite, weak) IBOutlet NSMenuItem *fwd;
+@property (readwrite, weak) IBOutlet NSMenuItem *bwd;
+@property (readwrite, weak) IBOutlet NSMenuItem *jumpToTime;
+@property (readwrite, weak) IBOutlet NSMenuItem *program;
+@property (readwrite, weak) IBOutlet NSMenu *programMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *title;
+@property (readwrite, weak) IBOutlet NSMenu *titleMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *chapter;
+@property (readwrite, weak) IBOutlet NSMenu *chapterMenu;
 
-    IBOutlet NSMenu * o_mu_audio;
-    IBOutlet NSMenuItem * o_mi_vol_up;
-    IBOutlet NSMenuItem * o_mi_vol_down;
-    IBOutlet NSMenuItem * o_mi_mute;
-    IBOutlet NSMenuItem * o_mi_audiotrack;
-    IBOutlet NSMenu * o_mu_audiotrack;
-    IBOutlet NSMenuItem * o_mi_channels;
-    IBOutlet NSMenu * o_mu_channels;
-    IBOutlet NSMenuItem * o_mi_device;
-    IBOutlet NSMenu * o_mu_device;
-    IBOutlet NSMenuItem * o_mi_visual;
-    IBOutlet NSMenu * o_mu_visual;
+@property (readwrite, weak) IBOutlet NSMenu *audioMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *vol_up;
+@property (readwrite, weak) IBOutlet NSMenuItem *vol_down;
+@property (readwrite, weak) IBOutlet NSMenuItem *mute;
+@property (readwrite, weak) IBOutlet NSMenuItem *audiotrack;
+@property (readwrite, weak) IBOutlet NSMenu *audiotrackMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *channels;
+@property (readwrite, weak) IBOutlet NSMenu *channelsMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *audioDevice;
+@property (readwrite, weak) IBOutlet NSMenu *audioDeviceMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *visual;
+@property (readwrite, weak) IBOutlet NSMenu *visualMenu;
 
-    IBOutlet NSMenu * o_mu_video;
-    IBOutlet NSMenuItem * o_mi_half_window;
-    IBOutlet NSMenuItem * o_mi_normal_window;
-    IBOutlet NSMenuItem * o_mi_double_window;
-    IBOutlet NSMenuItem * o_mi_fittoscreen;
-    IBOutlet NSMenuItem * o_mi_fullscreen;
-    IBOutlet NSMenuItem * o_mi_floatontop;
-    IBOutlet NSMenuItem * o_mi_snapshot;
-    IBOutlet NSMenuItem * o_mi_videotrack;
-    IBOutlet NSMenu * o_mu_videotrack;
-    IBOutlet NSMenuItem * o_mi_screen;
-    IBOutlet NSMenu * o_mu_screen;
-    IBOutlet NSMenuItem * o_mi_aspect_ratio;
-    IBOutlet NSMenu * o_mu_aspect_ratio;
-    IBOutlet NSMenuItem * o_mi_crop;
-    IBOutlet NSMenu * o_mu_crop;
-    IBOutlet NSMenuItem * o_mi_deinterlace;
-    IBOutlet NSMenu * o_mu_deinterlace;
-    IBOutlet NSMenuItem * o_mi_deinterlace_mode;
-    IBOutlet NSMenu * o_mu_deinterlace_mode;
-    IBOutlet NSMenuItem * o_mi_ffmpeg_pp;
-    IBOutlet NSMenu * o_mu_ffmpeg_pp;
+@property (readwrite, weak) IBOutlet NSMenu *videoMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *half_window;
+@property (readwrite, weak) IBOutlet NSMenuItem *normal_window;
+@property (readwrite, weak) IBOutlet NSMenuItem *double_window;
+@property (readwrite, weak) IBOutlet NSMenuItem *fittoscreen;
+@property (readwrite, weak) IBOutlet NSMenuItem *fullscreenItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *floatontop;
+@property (readwrite, weak) IBOutlet NSMenuItem *snapshot;
+@property (readwrite, weak) IBOutlet NSMenuItem *videotrack;
+@property (readwrite, weak) IBOutlet NSMenu *videotrackMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *screen;
+@property (readwrite, weak) IBOutlet NSMenu *screenMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *aspect_ratio;
+@property (readwrite, weak) IBOutlet NSMenu *aspect_ratioMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *crop;
+@property (readwrite, weak) IBOutlet NSMenu *cropMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *deinterlace;
+@property (readwrite, weak) IBOutlet NSMenu *deinterlaceMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *deinterlace_mode;
+@property (readwrite, weak) IBOutlet NSMenu *deinterlace_modeMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *postprocessing;
+@property (readwrite, weak) IBOutlet NSMenu *postprocessingMenu;
 
-    IBOutlet NSMenu * o_mu_subtitles;
-    IBOutlet NSMenuItem * o_mi_subtitle_track;
-    IBOutlet NSMenu * o_mu_subtitle_tracks;
-    IBOutlet NSMenuItem * o_mi_openSubtitleFile;
-    IBOutlet NSMenu * o_mu_subtitle_size;
-    IBOutlet NSMenuItem *o_mi_subtitle_size;
-    IBOutlet NSMenu * o_mu_subtitle_textcolor;
-    IBOutlet NSMenuItem *o_mi_subtitle_textcolor;
-    IBOutlet NSMenu * o_mu_subtitle_bgcolor;
-    IBOutlet NSMenuItem * o_mi_subtitle_bgcolor;
-    IBOutlet NSMenuItem * o_mi_subtitle_bgopacity;
-    IBOutlet NSView * o_mi_subtitle_bgopacity_view;
-    IBOutlet id o_mi_subtitle_bgopacity_lbl;
-    IBOutlet id o_mi_subtitle_bgopacity_lbl_gray;
-    IBOutlet id o_mi_subtitle_bgopacity_sld;
-    IBOutlet NSMenu * o_mu_subtitle_outlinethickness;
-    IBOutlet NSMenuItem * o_mi_subtitle_outlinethickness;
-    IBOutlet NSMenuItem * o_mi_teletext;
-    IBOutlet NSMenuItem * o_mi_teletext_transparent;
-    IBOutlet NSMenuItem * o_mi_teletext_index;
-    IBOutlet NSMenuItem * o_mi_teletext_red;
-    IBOutlet NSMenuItem * o_mi_teletext_green;
-    IBOutlet NSMenuItem * o_mi_teletext_yellow;
-    IBOutlet NSMenuItem * o_mi_teletext_blue;
+@property (readwrite, weak) IBOutlet NSMenu *subtitlesMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *subtitle_track;
+@property (readwrite, weak) IBOutlet NSMenu *subtitle_tracksMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *openSubtitleFile;
+@property (readwrite, weak) IBOutlet NSMenu *subtitle_sizeMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *subtitle_size;
+@property (readwrite, weak) IBOutlet NSMenu *subtitle_textcolorMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *subtitle_textcolor;
+@property (readwrite, weak) IBOutlet NSMenu *subtitle_bgcolorMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *subtitle_bgcolor;
+@property (readwrite, weak) IBOutlet NSMenuItem *subtitle_bgopacity;
+@property (readwrite, weak) IBOutlet NSView *subtitle_bgopacity_view;
+@property (readwrite, weak) IBOutlet NSTextField *subtitle_bgopacityLabel;
+@property (readwrite, weak) IBOutlet NSTextField *subtitle_bgopacityLabel_gray;
+@property (readwrite, weak) IBOutlet NSSlider *subtitle_bgopacity_sld;
+@property (readwrite, weak) IBOutlet NSMenu *subtitle_outlinethicknessMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *subtitle_outlinethickness;
+@property (readwrite, weak) IBOutlet NSMenuItem *teletext;
+@property (readwrite, weak) IBOutlet NSMenuItem *teletext_transparent;
+@property (readwrite, weak) IBOutlet NSMenuItem *teletext_index;
+@property (readwrite, weak) IBOutlet NSMenuItem *teletext_red;
+@property (readwrite, weak) IBOutlet NSMenuItem *teletext_green;
+@property (readwrite, weak) IBOutlet NSMenuItem *teletext_yellow;
+@property (readwrite, weak) IBOutlet NSMenuItem *teletext_blue;
 
-    IBOutlet NSMenu * o_mu_window;
-    IBOutlet NSMenuItem * o_mi_minimize;
-    IBOutlet NSMenuItem * o_mi_zoom_window;
-    IBOutlet NSMenuItem * o_mi_player;
-    IBOutlet NSMenuItem * o_mi_controller;
-    IBOutlet NSMenuItem * o_mi_audioeffects;
-    IBOutlet NSMenuItem * o_mi_videoeffects;
-    IBOutlet NSMenuItem * o_mi_bookmarks;
-    IBOutlet NSMenuItem * o_mi_playlist;
-    IBOutlet NSMenuItem * o_mi_info;
-    IBOutlet NSMenuItem * o_mi_messages;
-    IBOutlet NSMenuItem * o_mi_bring_atf;
+@property (readwrite, weak) IBOutlet NSMenu *windowMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *minimize;
+@property (readwrite, weak) IBOutlet NSMenuItem *zoom_window;
+@property (readwrite, weak) IBOutlet NSMenuItem *player;
+@property (readwrite, weak) IBOutlet NSMenuItem *controller;
+@property (readwrite, weak) IBOutlet NSMenuItem *audioeffects;
+@property (readwrite, weak) IBOutlet NSMenuItem *videoeffects;
+@property (readwrite, weak) IBOutlet NSMenuItem *bookmarks;
+@property (readwrite, weak) IBOutlet NSMenuItem *playlist;
+@property (readwrite, weak) IBOutlet NSMenuItem *info;
+@property (readwrite, weak) IBOutlet NSMenuItem *messages;
+@property (readwrite, weak) IBOutlet NSMenuItem *bring_atf;
 
-    IBOutlet NSMenu * o_mu_help;
-    IBOutlet NSMenuItem * o_mi_help;
-    IBOutlet NSMenuItem * o_mi_readme;
-    IBOutlet NSMenuItem * o_mi_documentation;
-    IBOutlet NSMenuItem * o_mi_license;
-    IBOutlet NSMenuItem * o_mi_website;
-    IBOutlet NSMenuItem * o_mi_donation;
-    IBOutlet NSMenuItem * o_mi_forum;
-    IBOutlet NSMenuItem * o_mi_errorsAndWarnings;
+@property (readwrite, weak) IBOutlet NSMenu *helpMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *help;
+@property (readwrite, weak) IBOutlet NSMenuItem *readme;
+@property (readwrite, weak) IBOutlet NSMenuItem *documentation;
+@property (readwrite, weak) IBOutlet NSMenuItem *license;
+@property (readwrite, weak) IBOutlet NSMenuItem *website;
+@property (readwrite, weak) IBOutlet NSMenuItem *donation;
+@property (readwrite, weak) IBOutlet NSMenuItem *forum;
+@property (readwrite, weak) IBOutlet NSMenuItem *errorsAndWarnings;
 
-    /* dock menu */
-    IBOutlet NSMenuItem * o_dmi_play;
-    IBOutlet NSMenuItem * o_dmi_stop;
-    IBOutlet NSMenuItem * o_dmi_next;
-    IBOutlet NSMenuItem * o_dmi_previous;
-    IBOutlet NSMenuItem * o_dmi_mute;
+/* dock menu */
+@property (readwrite, weak) IBOutlet NSMenuItem *dockMenuplay;
+@property (readwrite, weak) IBOutlet NSMenuItem *dockMenustop;
+@property (readwrite, weak) IBOutlet NSMenuItem *dockMenunext;
+@property (readwrite, weak) IBOutlet NSMenuItem *dockMenuprevious;
+@property (readwrite, weak) IBOutlet NSMenuItem *dockMenumute;
 
-    /* vout menu */
-    IBOutlet NSMenu * o_vout_menu;
-    IBOutlet NSMenuItem * o_vmi_play;
-    IBOutlet NSMenuItem * o_vmi_stop;
-    IBOutlet NSMenuItem * o_vmi_prev;
-    IBOutlet NSMenuItem * o_vmi_next;
-    IBOutlet NSMenuItem * o_vmi_volup;
-    IBOutlet NSMenuItem * o_vmi_voldown;
-    IBOutlet NSMenuItem * o_vmi_mute;
-    IBOutlet NSMenuItem * o_vmi_fullscreen;
-    IBOutlet NSMenuItem * o_vmi_snapshot;
-}
-+ (VLCMainMenu *)sharedInstance;
+/* vout menu */
+@property (readwrite, weak) IBOutlet NSMenu *voutMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuplay;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenustop;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuprev;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenunext;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuvolup;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenuvoldown;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenumute;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenufullscreen;
+@property (readwrite, weak) IBOutlet NSMenuItem *voutMenusnapshot;
 
-- (void)initStrings;
+@property (readwrite, weak) IBOutlet NSButton *specificTime_cancelButton;
+@property (readwrite, weak) IBOutlet NSTextField *specificTime_enterTextField;
+@property (readwrite, weak) IBOutlet NSTextField *specificTime_goToLabel;
+@property (readwrite, weak) IBOutlet NSButton *specificTime_okButton;
+@property (readwrite, weak) IBOutlet NSWindow *specificTimeWindow;
+@property (readwrite, weak) IBOutlet NSTextField *specificTime_secLabel;
+@property (readwrite, weak) IBOutlet NSStepper *specificTime_stepper;
+@property (nonatomic) int jumpTimeValue;
+
 - (void)releaseRepresentedObjects:(NSMenu *)the_menu;
 
 - (void)setupMenus;
-- (void)refreshVoutDeviceMenu:(NSNotification *)o_notification;
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)setRateControlsEnabled:(BOOL)b_enabled;
 - (void)updateSidebarMenuItem;
@@ -232,9 +232,26 @@
 - (IBAction)toggleJumpButtons:(id)sender;
 - (IBAction)togglePlaymodeButtons:(id)sender;
 - (IBAction)toggleSidebar:(id)sender;
-- (IBAction)togglePlaylistColumnTable:(id)sender;
 - (BOOL)setPlaylistColumnTableState:(NSInteger)i_state forColumn:(NSString *)o_column;
 - (NSMenu *)setupPlaylistTableColumnsMenu;
+
+- (IBAction)play:(id)sender;
+- (IBAction)stop:(id)sender;
+
+- (IBAction)prev:(id)sender;
+- (IBAction)next:(id)sender;
+- (IBAction)random:(id)sender;
+- (IBAction)repeat:(id)sender;
+- (IBAction)loop:(id)sender;
+
+- (IBAction)forward:(id)sender;
+- (IBAction)backward:(id)sender;
+
+- (IBAction)volumeUp:(id)sender;
+- (IBAction)volumeDown:(id)sender;
+- (IBAction)mute:(id)sender;
+
+- (IBAction)goToSpecificTime:(id)sender;
 
 - (IBAction)quitAfterPlayback:(id)sender;
 - (IBAction)toggleRecord:(id)sender;
@@ -243,20 +260,15 @@
 - (void)updatePlaybackRate;
 - (IBAction)toggleAtoBloop:(id)sender;
 
-- (IBAction)toggleAudioDevice:(id)sender;
-
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)resizeVideoWindow:(id)sender;
 - (IBAction)floatOnTop:(id)sender;
 - (IBAction)createVideoSnapshot:(id)sender;
-- (IBAction)toggleFullscreenDevice:(id)sender;
 
 - (IBAction)addSubtitleFile:(id)sender;
-- (IBAction)switchSubtitleOption:(id)sender;
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender;
 - (IBAction)telxTransparent:(id)sender;
 - (IBAction)telxNavLink:(id)sender;
-- (IBAction)togglePostProcessing:(id)sender;
 
 - (IBAction)showConvertAndSave:(id)sender;
 - (IBAction)showVideoEffects:(id)sender;
@@ -265,16 +277,16 @@
 - (IBAction)showBookmarks:(id)sender;
 - (IBAction)showInformationPanel:(id)sender;
 
-- (IBAction)viewAbout:(id)sender;
+- (IBAction)showAbout:(id)sender;
 - (IBAction)showLicense:(id)sender;
-- (IBAction)viewPreferences:(id)sender;
-- (IBAction)viewHelp:(id)sender;
+- (IBAction)showPreferences:(id)sender;
+- (IBAction)showHelp:(id)sender;
 - (IBAction)openReadMe:(id)sender;
 - (IBAction)openDocumentation:(id)sender;
 - (IBAction)openWebsite:(id)sender;
 - (IBAction)openForum:(id)sender;
 - (IBAction)openDonate:(id)sender;
-- (IBAction)viewErrorsAndWarnings:(id)sender;
+- (IBAction)showErrorsAndWarnings:(id)sender;
 - (IBAction)showMessagesPanel:(id)showMessagesPanel;
 - (IBAction)showMainWindow:(id)sender;
 - (IBAction)showPlaylist:(id)sender;
@@ -285,34 +297,14 @@
 - (void)setRepeatAll;
 - (void)setRepeatOff;
 - (void)setShuffle;
-
-- (IBAction)toggleVar:(id)sender;
-- (int)toggleVarThread:(id)_o_data;
-- (void)setupVarMenuItem:(NSMenuItem *)o_mi
-                  target:(vlc_object_t *)p_object
-                     var:(const char *)psz_variable
-                selector:(SEL)pf_callback;
-- (void)setupVarMenu:(NSMenu *)o_menu
-         forMenuItem: (NSMenuItem *)o_parent
-              target:(vlc_object_t *)p_object
-                 var:(const char *)psz_variable
-            selector:(SEL)pf_callback;
-
-- (id)voutMenu;
 @end
 
 /*****************************************************************************
- * VLCAutoGeneratedMenuContent interface
+ *VLCAutoGeneratedMenuContent interface
  *****************************************************************************
- * This holds our data for autogenerated menus
+ *This holds our data for autogenerated menus
  *****************************************************************************/
 @interface VLCAutoGeneratedMenuContent : NSObject
-{
-    char *psz_name;
-    vlc_object_t * _vlc_object;
-    vlc_value_t value;
-    int i_type;
-}
 
 - (id)initWithVariableName: (const char *)name
                   ofObject: (vlc_object_t *)object

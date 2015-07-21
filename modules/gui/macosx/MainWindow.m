@@ -32,7 +32,6 @@
 #import "AudioEffects.h"
 #import "MainMenu.h"
 #import "open.h"
-#import "controls.h" // TODO: remove me
 #import "playlist.h"
 #import "SideBarItem.h"
 #import <math.h>
@@ -146,8 +145,9 @@ static VLCMainWindow *sharedInstance = nil;
     else
         b_force = YES;
 
-    return [[VLCCoreInteraction sharedInstance] hasDefinedShortcutKey:o_event force:b_force] ||
-           [(VLCControls *)[[VLCMain sharedInstance] controls] keyEvent:o_event];
+    VLCCoreInteraction *coreInteraction = [VLCCoreInteraction sharedInstance];
+    return [coreInteraction hasDefinedShortcutKey:o_event force:b_force] ||
+           [coreInteraction keyEvent:o_event];
 }
 
 - (void)dealloc

@@ -45,7 +45,6 @@
 #import "bookmarks.h"
 #import "playlistinfo.h"
 #import "playlist.h"
-#import "controls.h"
 #import "misc.h"
 #import "open.h"
 #import "MainMenu.h"
