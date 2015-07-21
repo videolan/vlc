@@ -72,6 +72,7 @@ struct display_info_t
     NSString *_subPath;
     NSString *_MRL;
     NSMutableArray *_displayInfos;
+    VLCEyeTVController *_eyeTVController;
 }
 
 @property (readwrite, assign) NSString *MRL;
@@ -390,6 +391,7 @@ struct display_info_t
     if ([NSApp modalWindow] != nil)
         return;
 
+    _eyeTVController = [[VLCEyeTVController alloc] init];
     int i_result;
 
     [_tabView selectTabViewItemAtIndex: i_type];
@@ -490,6 +492,7 @@ struct display_info_t
 
         [[[VLCMain sharedInstance] playlist] addPlaylistItems:[NSArray arrayWithObject:itemOptionsDictionary]];
     }
+    _eyeTVController = nil;
 }
 
 - (IBAction)screenChanged:(id)sender
@@ -1162,8 +1165,8 @@ struct display_info_t
     intf_thread_t * p_intf = VLCIntf;
 
     if ([[[_captureModePopup selectedItem] title] isEqualToString: @"EyeTV"]) {
-        if ([[[VLCMain sharedInstance] eyeTVController] eyeTVRunning] == YES) {
-            if ([[[VLCMain sharedInstance] eyeTVController] deviceConnected] == YES) {
+        if ([_eyeTVController eyeTVRunning] == YES) {
+            if ([_eyeTVController deviceConnected] == YES) {
                 [self showCaptureView: _eyeTVrunningView];
                 [self setupChannelInfo];
             }
@@ -1250,16 +1253,16 @@ struct display_info_t
 - (IBAction)eyetvSwitchChannel:(id)sender
 {
     if (sender == _eyeTVnextProgramButton) {
-        int chanNum = [[[VLCMain sharedInstance] eyeTVController] switchChannelUp: YES];
+        int chanNum = [_eyeTVController switchChannelUp: YES];
         [_eyeTVchannelsPopup selectItemWithTag:chanNum];
         [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
     } else if (sender == _eyeTVpreviousProgramButton) {
-        int chanNum = [[[VLCMain sharedInstance] eyeTVController] switchChannelUp: NO];
+        int chanNum = [_eyeTVController switchChannelUp: NO];
         [_eyeTVchannelsPopup selectItemWithTag:chanNum];
         [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
     } else if (sender == _eyeTVchannelsPopup) {
         int chanNum = [[sender selectedItem] tag];
-        [[[VLCMain sharedInstance] eyeTVController] setChannel:chanNum];
+        [_eyeTVController setChannel:chanNum];
         [self setMRL: [NSString stringWithFormat:@"eyetv:// :eyetv-channel=%d", chanNum]];
     } else
         msg_Err(VLCIntf, "eyetvSwitchChannel sent by unknown object");
@@ -1267,7 +1270,7 @@ struct display_info_t
 
 - (IBAction)eyetvLaunch:(id)sender
 {
-    [[[VLCMain sharedInstance] eyeTVController] launchEyeTV];
+    [_eyeTVController launchEyeTV];
 }
 
 - (IBAction)eyetvGetPlugin:(id)sender
@@ -1317,7 +1320,7 @@ struct display_info_t
     [_eyeTVChannelStatusLabel setHidden: NO];
 
     /* retrieve info */
-    NSEnumerator *channels = [[[VLCMain sharedInstance] eyeTVController] allChannels];
+    NSEnumerator *channels = [_eyeTVController allChannels];
     int x = -2;
     [[[_eyeTVchannelsPopup menu] addItemWithTitle: _NS("Composite input")
                                            action: nil
@@ -1334,7 +1337,7 @@ struct display_info_t
             [[[_eyeTVchannelsPopup menu] addItemWithTitle: channel action: nil keyEquivalent: @""] setTag:++x];
 
         /* make Tuner the default */
-        [_eyeTVchannelsPopup selectItemWithTag:[[[VLCMain sharedInstance] eyeTVController] channel]];
+        [_eyeTVchannelsPopup selectItemWithTag:[_eyeTVController channel]];
     }
 
     /* clean up GUI */

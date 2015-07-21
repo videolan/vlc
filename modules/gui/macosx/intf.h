@@ -62,7 +62,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCSimplePrefs;
 @class VLCPrefs;
 @class VLCCoreDialogProvider;
-@class VLCEyeTVController;
 @class VLCBookmarks;
 @class VLCOpen;
 
@@ -89,7 +88,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (VLCPlaylist *)playlist;
 - (VLCCoreDialogProvider *)coreDialogProvider;
 - (ResumeDialogController *)resumeDialog;
-- (VLCEyeTVController *)eyeTVController;
 - (VLCInputManager *)inputManager;
 - (void)setActiveVideoPlayback:(BOOL)b_value;
 - (BOOL)activeVideoPlayback;

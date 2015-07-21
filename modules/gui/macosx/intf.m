@@ -52,7 +52,6 @@
 #import "open.h"
 #import "bookmarks.h"
 #import "coredialogs.h"
-#import "eyetv.h"
 #import "simple_prefs.h"
 #import "CoreInteraction.h"
 #import "TrackSynchronization.h"
@@ -159,7 +158,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCSimplePrefs *_sprefs;
     VLCOpen *_open;
     VLCCoreDialogProvider *_coredialogs;
-    VLCEyeTVController *_eyetv;
     VLCBookmarks *_bookmarks;
     VLCCoreInteraction *_coreinteraction;
     ResumeDialogController *_resume_dialog;
@@ -219,7 +217,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     _sprefs = nil;
     _open = nil;
     _coredialogs = nil;
-    _eyetv = nil;
     _bookmarks = nil;
     _coreinteraction = nil;
     _resume_dialog = nil;
@@ -245,7 +242,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
     [NSBundle loadNibNamed:@"MainWindow" owner:[VLCMain sharedInstance]];
     [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
-    _eyetv = [[VLCEyeTVController alloc] init];
 
     _coreinteraction = [VLCCoreInteraction sharedInstance];
 
@@ -607,11 +603,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
         _resume_dialog = [[ResumeDialogController alloc] init];
 
     return _resume_dialog;
-}
-
-- (VLCEyeTVController *)eyeTVController
-{
-    return _eyetv;
 }
 
 - (BOOL)activeVideoPlayback

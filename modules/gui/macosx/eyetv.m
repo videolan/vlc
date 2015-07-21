@@ -30,18 +30,6 @@
 
 @implementation VLCEyeTVController
 
-+ (VLCEyeTVController *)sharedInstance
-{
-    static VLCEyeTVController *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCEyeTVController new];
-    });
-
-    return sharedInstance;
-}
-
 - (id)init
 {
     self = [super init];
