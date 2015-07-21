@@ -647,7 +647,7 @@ struct display_info_t
             char *psz_uri = vlc_path2uri([values[i] UTF8String], "file");
             if (!psz_uri)
                 continue;
-            dictionary = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+            dictionary = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
             NSLog(@"dict: %@", dictionary);
             free(psz_uri);
             [array addObject: dictionary];
@@ -689,7 +689,7 @@ struct display_info_t
         char *psz_uri = vlc_path2uri([_filePath UTF8String], "file");
         if (!psz_uri) return;
 
-        NSMutableString *mrlString = [NSMutableString stringWithUTF8String: psz_uri ];
+        NSMutableString *mrlString = [NSMutableString stringWithUTF8String:psz_uri];
         NSRange offile = [mrlString rangeOfString:@"file"];
         free(psz_uri);
 

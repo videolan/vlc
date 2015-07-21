@@ -86,8 +86,8 @@
                       eqz_preset_10b[i].f_amp[9]];
         [workValues addObject:workString];
         [workPreamp addObject:[NSString stringWithFormat:@"%1.f", eqz_preset_10b[i].f_preamp]];
-        [workTitles addObject:[NSString stringWithUTF8String:preset_list_text[i]]];
-        [workNames addObject:[NSString stringWithUTF8String:preset_list[i]]];
+        [workTitles addObject:toNSStr(preset_list_text[i])];
+        [workNames addObject:toNSStr(preset_list[i])];
     }
 
     NSString *defaultProfile = [NSString stringWithFormat:@"ZmxhdA==;;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i",

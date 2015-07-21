@@ -219,14 +219,14 @@
 
             /* fill uri info */
             char *psz_url = decode_URI(input_item_GetURI(p_item));
-            [_uriTextField setStringValue: [NSString stringWithUTF8String:psz_url ? psz_url : ""]];
+            [_uriTextField setStringValue:toNSStr(psz_url)];
             free(psz_url);
 
             /* fill title info */
             char *psz_title = input_item_GetTitle(p_item);
             if (!psz_title)
                 psz_title = input_item_GetName(p_item);
-            [_titleTextField setStringValue: [NSString stringWithUTF8String:psz_title ? : ""]];
+            [_titleTextField setStringValue:toNSStr(psz_title)];
             free(psz_title);
 
         #define SET( foo, bar ) \
@@ -255,7 +255,7 @@
 
             /* FIXME Can also be attachment:// */
             if (psz_meta && strncmp(psz_meta, "attachment://", 13))
-                image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:[NSString stringWithUTF8String:psz_meta]]];
+                image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:toNSStr(psz_meta)]];
             else
                 image = [NSImage imageNamed: @"noart.png"];
             [_imageWell setImage: image];
@@ -275,7 +275,7 @@
 - (void)setMeta: (char *)psz_meta forLabel: (id)theItem
 {
     if (psz_meta != NULL && *psz_meta)
-        [theItem setStringValue: [NSString stringWithUTF8String:psz_meta]];
+        [theItem setStringValue: toNSStr(psz_meta)];
     else
         [theItem setStringValue: @""];
 }
@@ -472,11 +472,7 @@ error:
     if (i_object_id == -1) {
         vlc_mutex_lock(&p_item->lock);
         for (int i = 0 ; i < p_item->i_categories ; i++) {
-            NSString *name;
-            if (p_item->pp_categories[i]->psz_name)
-                name = [NSString stringWithUTF8String:p_item->pp_categories[i]->psz_name];
-            else
-                name = @"";
+            NSString *name = toNSStr(p_item->pp_categories[i]->psz_name);
             VLCInfoTreeItem *item = [[VLCInfoTreeItem alloc]
                                       initWithName:name
                                       value:@""
@@ -491,16 +487,8 @@ error:
         vlc_mutex_lock(&p_item->lock);
         info_category_t *cat = p_item->pp_categories[i_object_id];
         for (int i = 0 ; i < cat->i_infos ; i++) {
-            NSString *name;
-            NSString *value;
-            if (cat->pp_infos[i]->psz_name != NULL)
-                name = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_name];
-            else
-                name = @"";
-            if (cat->pp_infos[i]->psz_value != NULL)
-                value = [NSString stringWithUTF8String:cat->pp_infos[i]->psz_value];
-            else
-                value = @"";
+            NSString *name = toNSStr(cat->pp_infos[i]->psz_name);
+            NSString *value  = toNSStr(cat->pp_infos[i]->psz_value);
             VLCInfoTreeItem *item = [[VLCInfoTreeItem alloc]
                                      initWithName:name
                                      value:value

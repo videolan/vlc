@@ -539,7 +539,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 - (void)setupField:(NSTextField *)object forOption:(const char *)psz_option
 {
     char *psz_tmp = config_GetPsz(p_intf, psz_option);
-    [object setStringValue: [NSString stringWithUTF8String:psz_tmp ?: ""]];
+    [object setStringValue: toNSStr(psz_tmp)];
     [object setToolTip: _NS(config_GetLabel(p_intf, psz_option))];
     free(psz_tmp);
 }
@@ -557,7 +557,7 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
     const char *pref = NULL;
     pref = [[[NSUserDefaults standardUserDefaults] objectForKey:@"language"] UTF8String];
     for (int x = 0; ppsz_language[x] != NULL; x++) {
-        [_intf_languagePopup addItemWithTitle:[NSString stringWithUTF8String:ppsz_language_text[x]]];
+        [_intf_languagePopup addItemWithTitle:toNSStr(ppsz_language_text[x])];
         if (pref) {
             if (!strcmp(ppsz_language[x], pref))
                 sel = x;
@@ -777,9 +777,9 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
            && !strncmp(p_item->psz_name , "key-", 4)
            && !EMPTY_STR(p_item->psz_text)) {
             [tempArray_desc addObject: _NS(p_item->psz_text)];
-            [tempArray_names addObject: [NSString stringWithUTF8String:p_item->psz_name]];
+            [tempArray_names addObject: toNSStr(p_item->psz_name)];
             if (p_item->value.psz)
-                [_hotkeySettings addObject: [NSString stringWithUTF8String:p_item->value.psz]];
+                [_hotkeySettings addObject: toNSStr(p_item->value.psz)];
             else
                 [_hotkeySettings addObject: [NSString string]];
         }
@@ -907,7 +907,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     if (_intfSettingChanged) {
         NSUInteger index = [_intf_languagePopup indexOfSelectedItem];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        [defaults setObject:[NSString stringWithUTF8String:ppsz_language[index]] forKey:@"language"];
+        [defaults setObject:toNSStr(ppsz_language[index]) forKey:@"language"];
         [defaults synchronize];
 
         config_PutInt(p_intf, "metadata-network-access", [_intf_artCheckbox state]);
@@ -1252,7 +1252,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 - (IBAction)showFontPicker:(id)sender
 {
     char * font = config_GetPsz(p_intf, "freetype-font");
-    NSString * fontName = font ? [NSString stringWithUTF8String:font] : nil;
+    NSString * fontName = font ? toNSStr(font) : nil;
     free(font);
     if (fontName) {
         NSFont * font = [NSFont fontWithName:fontName size:0.0];

@@ -278,7 +278,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
 
     NSURL *o_url;
-    o_url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_uri]];
+    o_url = [NSURL URLWithString:toNSStr(psz_uri)];
     vlc_object_release(p_input);
 
     return o_url;
@@ -315,7 +315,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         free(formated);
     }
 
-    NSURL * o_url = [NSURL URLWithString:[NSString stringWithUTF8String:psz_uri]];
+    NSURL * o_url = [NSURL URLWithString:toNSStr(psz_uri)];
     free(psz_uri);
 
     if ([o_name isEqualToString:@""]) {
@@ -659,7 +659,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                 if (!psz_uri)
                     continue;
 
-                o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+                o_dic = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
                 free(psz_uri);
 
                 o_array = [o_array arrayByAddingObject: o_dic];
@@ -1309,7 +1309,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
             && !strncmp(p_item->psz_name , "key-", 4)
             && !EMPTY_STR(p_item->psz_text)) {
             if (p_item->value.psz)
-                [mutArray addObject: [NSString stringWithUTF8String:p_item->value.psz]];
+                [mutArray addObject:toNSStr(p_item->value.psz)];
         }
     }
     module_config_free (p_config);

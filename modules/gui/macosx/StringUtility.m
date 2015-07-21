@@ -68,7 +68,7 @@ NSString *const kVLCMediaUnknown = @"Unknown";
     NSString * stringObject = nil;
 
     if (psz != NULL) {
-        stringObject = [NSString stringWithCString: _(psz) encoding:NSUTF8StringEncoding];
+        stringObject = toNSStr(_(psz));
 
         if (stringObject == NULL) {
             msg_Err(VLCIntf, "could not translate: %s", psz);
@@ -133,7 +133,7 @@ NSString *const kVLCMediaUnknown = @"Unknown";
             remaining = dur - t;
         return [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];
     } else
-        return [NSString stringWithUTF8String:secstotimestr(psz_time, t / CLOCK_FREQ )];
+        return toNSStr(secstotimestr(psz_time, t / CLOCK_FREQ ));
 }
 
 - (NSString *)stringForTime:(long long int)time

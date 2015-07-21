@@ -315,7 +315,7 @@
     [openPanel beginSheetModalForWindow:_window completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton)
         {
-            [self setMRL: [NSString stringWithUTF8String:vlc_path2uri([[[openPanel URL] path] UTF8String], NULL)]];
+            [self setMRL: toNSStr(vlc_path2uri([[[openPanel URL] path] UTF8String], NULL))];
             [self updateOKButton];
             [self updateDropView];
         }
@@ -541,7 +541,7 @@
             NSArray *values = [[paste propertyListForType: NSFilenamesPboardType] sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 
             if ([values count] > 0) {
-                [self setMRL: [NSString stringWithUTF8String:vlc_path2uri([[values firstObject] UTF8String], NULL)]];
+                [self setMRL: toNSStr(vlc_path2uri([[values firstObject] UTF8String], NULL))];
                 [self updateOKButton];
                 [self updateDropView];
                 return YES;

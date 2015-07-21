@@ -125,7 +125,7 @@
     /* Setup the nameversion field */
     [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VERSION_MESSAGE, PLATFORM]];
 
-    NSMutableArray *tmpArray = [NSMutableArray arrayWithArray: [[NSString stringWithUTF8String:psz_authors] componentsSeparatedByString:@"\n\n"]];
+    NSMutableArray *tmpArray = [NSMutableArray arrayWithArray: [toNSStr(psz_authors) componentsSeparatedByString:@"\n\n"]];
     NSUInteger count = [tmpArray count];
     for (NSUInteger i = 0; i < count; i++) {
         [tmpArray replaceObjectAtIndex:i withObject:[[tmpArray objectAtIndex:i]stringByReplacingOccurrencesOfString:@"\n" withString:@", "]];
@@ -136,15 +136,15 @@
     o_authors = [tmpArray componentsJoinedByString:@"\n\n"];
 
     /* setup join us! */
-    NSString *joinus = [NSString stringWithUTF8String:_(""
-                                                        "<p>VLC media player is a free and open source media player, encoder, and "
-                                                        "streamer made by the volunteers of the <a href=\"http://www.videolan.org/"
-                                                        "\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
-                                                        "span></a> community.</p><p>VLC uses its internal codecs, works on "
-                                                        "essentially every popular platform, and can read almost all files, CDs, "
-                                                        "DVDs, network streams, capture cards and other media formats!</p><p><a href="
-                                                        "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
-                                                        "underline; color:#0057ae;\">Help and join us!</span></a>")];
+    NSString *joinus = toNSStr(_(""
+                                 "<p>VLC media player is a free and open source media player, encoder, and "
+                                 "streamer made by the volunteers of the <a href=\"http://www.videolan.org/"
+                                 "\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
+                                 "span></a> community.</p><p>VLC uses its internal codecs, works on "
+                                 "essentially every popular platform, and can read almost all files, CDs, "
+                                 "DVDs, network streams, capture cards and other media formats!</p><p><a href="
+                                 "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
+                                 "underline; color:#0057ae;\">Help and join us!</span></a>"));
     NSString *fontfamily;
     if (OSX_YOSEMITE)
         fontfamily = @"Helvetica Neue";
@@ -236,9 +236,9 @@
     if (sender == o_authors_btn)
         [o_credits_textview setString:o_authors];
     else if (sender == o_credits_btn)
-        [o_credits_textview setString:[[NSString stringWithUTF8String:psz_thanks] stringByReplacingOccurrencesOfString:@"\n" withString:@" " options:0 range:NSRangeFromString(@"680 2")]];
+        [o_credits_textview setString:[toNSStr(psz_thanks) stringByReplacingOccurrencesOfString:@"\n" withString:@" " options:0 range:NSRangeFromString(@"680 2")]];
     else
-        [o_credits_textview setString:[NSString stringWithUTF8String:psz_license]];
+        [o_credits_textview setString:toNSStr(psz_license)];
 
     [o_credits_textview scrollPoint:NSMakePoint(0, 0)];
     b_restart = YES;

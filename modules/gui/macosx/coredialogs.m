@@ -36,7 +36,7 @@ static void destroyProgressPanel (void *);
 static int DialogCallback(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
     @autoreleasepool {
-        if ([[NSString stringWithUTF8String:type] isEqualToString: @"dialog-progress-bar"]) {
+        if ([toNSStr(type) isEqualToString: @"dialog-progress-bar"]) {
             /* the progress panel needs to update itself and therefore wants special treatment within this context */
             dialog_progress_bar_t *p_dialog = (dialog_progress_bar_t *)value.p_address;
 
@@ -145,7 +145,7 @@ bool checkProgressPanel (void *priv)
 
 -(void)performEventWithObject: (NSValue *)o_value ofType: (const char*)type
 {
-    NSString *o_type = [NSString stringWithUTF8String:type];
+    NSString *o_type = toNSStr(type);
 
     if ([o_type isEqualToString: @"dialog-error"])
         [self performSelectorOnMainThread:@selector(showFatalDialog:) withObject:o_value waitUntilDone:YES];
@@ -241,7 +241,7 @@ bool checkProgressPanel (void *priv)
     [o_prog_title_txt setStringValue: toNSStr(p_dialog->title)];
 
     if (p_dialog->cancel != NULL)
-        [o_prog_cancel_btn setTitle: [NSString stringWithUTF8String:p_dialog->cancel]];
+        [o_prog_cancel_btn setTitle: toNSStr(p_dialog->cancel)];
     else
         [o_prog_cancel_btn setTitle: _NS("Cancel")];
 

@@ -344,25 +344,25 @@ static VLCMainWindow *sharedInstance = nil;
     NSMutableArray *mycompItems = [[NSMutableArray alloc] init];
     NSString *o_identifier;
     for (; ppsz_name && *ppsz_name; ppsz_name++, ppsz_longname++, p_category++) {
-        o_identifier = [NSString stringWithCString: *ppsz_name encoding: NSUTF8StringEncoding];
+        o_identifier = toNSStr(*ppsz_name);
         switch (*p_category) {
             case SD_CAT_INTERNET:
                 [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 [[internetItems lastObject] setIcon: imageFromRes(@"sidebar-podcast")];
                 [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
-                [[internetItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
+                [[internetItems lastObject] setUntranslatedTitle: toNSStr(*ppsz_longname)];
                 break;
             case SD_CAT_DEVICES:
                 [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 [[devicesItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
                 [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
-                [[devicesItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
+                [[devicesItems lastObject] setUntranslatedTitle: toNSStr(*ppsz_longname)];
                 break;
             case SD_CAT_LAN:
                 [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 [[lanItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
                 [[lanItems lastObject] setSdtype: SD_CAT_LAN];
-                [[lanItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
+                [[lanItems lastObject] setUntranslatedTitle: toNSStr(*ppsz_longname)];
                 break;
             case SD_CAT_MYCOMPUTER:
                 [mycompItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
@@ -374,7 +374,7 @@ static VLCMainWindow *sharedInstance = nil;
                     [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-pictures")];
                 else
                     [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
-                [[mycompItems lastObject] setUntranslatedTitle: [NSString stringWithUTF8String:*ppsz_longname]];
+                [[mycompItems lastObject] setUntranslatedTitle: toNSStr(*ppsz_longname)];
                 [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
                 break;
             default:
@@ -694,11 +694,11 @@ static VLCMainWindow *sharedInstance = nil;
                 free(formated);
             }
         } else
-            aString = [NSString stringWithUTF8String:config_GetPsz(VLCIntf, "video-title")];
+            aString = toNSStr(config_GetPsz(VLCIntf, "video-title"));
 
         char *uri = input_item_GetURI(input_GetItem(p_input));
 
-        NSURL * o_url = [NSURL URLWithString:[NSString stringWithUTF8String:uri]];
+        NSURL * o_url = [NSURL URLWithString:toNSStr(uri)];
         if ([o_url isFileURL]) {
             [self setRepresentedURL: o_url];
             [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *o_window) {
@@ -1198,7 +1198,7 @@ static VLCMainWindow *sharedInstance = nil;
             if (!psz_uri)
                 continue;
 
-            o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+            o_dic = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
 
             free(psz_uri);
 
@@ -1294,7 +1294,7 @@ static VLCMainWindow *sharedInstance = nil;
         playlist_t * p_playlist = pl_Get(VLCIntf);
         char *psz_urls = var_InheritString(p_playlist, "podcast-urls");
 
-        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[[NSString stringWithUTF8String:config_GetPsz(VLCIntf, "podcast-urls")] componentsSeparatedByString:@"|"]];
+        NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[toNSStr(config_GetPsz(VLCIntf, "podcast-urls")) componentsSeparatedByString:@"|"]];
         [urls removeObjectAtIndex: [o_podcast_unsubscribe_pop indexOfSelectedItem]];
         const char *psz_new_urls = [[urls componentsJoinedByString:@"|"] UTF8String];
         var_SetString(pl_Get(VLCIntf), "podcast-urls", psz_new_urls);

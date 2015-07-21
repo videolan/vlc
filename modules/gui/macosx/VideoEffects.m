@@ -344,7 +344,7 @@
     [_adjustHueSlider setToolTip: [NSString stringWithFormat:@"%.0f", config_GetFloat(p_intf, "hue")]];
     [_adjustSaturationSlider setToolTip: [NSString stringWithFormat:@"%0.3f", config_GetFloat(p_intf, "saturation")]];
     b_state = [_adjustCheckbox state];
-#if 0
+
     [_adjustBrightnessSlider setEnabled: b_state];
     [_adjustBrightnessCheckbox setEnabled: b_state];
     [_adjustContrastSlider setEnabled: b_state];
@@ -381,7 +381,7 @@
     [_cropSyncLeftRightCheckbox setState: NSOffState];
 
     tmpChar = config_GetPsz(p_intf, "transform-type");
-    tmpString = [NSString stringWithUTF8String:tmpChar];
+    tmpString = toNSStr(tmpChar);
     if ([tmpString isEqualToString:@"hflip"])
         [_transformPopup selectItemWithTag: 1];
     else if ([tmpString isEqualToString:@"vflip"])
@@ -400,9 +400,7 @@
     [_puzzleColumnsTextField setEnabled: b_state];
     [_puzzleColumnsStepper setEnabled: b_state];
     [_puzzleColumnsLabel setEnabled: b_state];
-#endif
 
-#if 0
     [self setCloneValue: config_GetInt(p_intf, "clone-count")];
     b_state = [_cloneCheckbox state];
     [_cloneNumberLabel setEnabled: b_state];
@@ -440,7 +438,7 @@
     [_sepiaLabel setEnabled: b_state];
 
     tmpChar = config_GetPsz(p_intf, "gradient-mode");
-    tmpString = [NSString stringWithUTF8String:tmpChar];
+    tmpString = toNSStr(tmpChar);
     if ([tmpString isEqualToString:@"hough"])
         [_gradientModePopup selectItemWithTag: 3];
     else if ([tmpString isEqualToString:@"edge"])
@@ -455,8 +453,7 @@
     [_gradientModeLabel setEnabled: b_state];
     [_gradientCartoonCheckbox setEnabled: b_state];
     [_gradientColorCheckbox setEnabled: b_state];
-#endif
-#if 0
+
     [_extractTextField setStringValue: [[NSString stringWithFormat:@"%llx", config_GetInt(p_intf, "extract-component")] uppercaseString]];
     [_extractTextField setEnabled: [_extractCheckbox state]];
     [_extractLabel setEnabled: [_extractCheckbox state]];
@@ -473,11 +470,9 @@
     [_blurLabel setEnabled: [_blurCheckbox state]];
 
     tmpChar = config_GetPsz(p_intf, "marq-marquee");
-    if (tmpChar) {
-        [_addTextTextTextField setStringValue: [NSString stringWithUTF8String:tmpChar]];
+    [_addTextTextTextField setStringValue:toNSStr(tmpChar)];
+    if (tmpChar)
         FREENULL(tmpChar);
-    } else
-        [_addTextTextTextField setStringValue: @""];
     [_addTextPositionPopup selectItemWithTag: config_GetInt(p_intf, "marq-position")];
     b_state = [_addTextCheckbox state];
     [_addTextPositionPopup setEnabled: b_state];
@@ -486,11 +481,9 @@
     [_addTextTextTextField setEnabled: b_state];
 
     tmpChar = config_GetPsz(p_intf, "logo-file");
-    if (tmpChar) {
-        [_addLogoLogoTextField setStringValue: [NSString stringWithUTF8String:tmpChar]];
+    [_addLogoLogoTextField setStringValue: toNSStr(tmpChar)];
+    if (tmpChar)
         FREENULL(tmpChar);
-    } else
-        [_addLogoLogoTextField setStringValue: @""];
     [_addLogoPositionPopup selectItemWithTag: config_GetInt(p_intf, "logo-position")];
     [_addLogoTransparencySlider setIntValue: config_GetInt(p_intf, "logo-opacity")];
     [_addLogoTransparencySlider setToolTip: [NSString stringWithFormat:@"%lli", config_GetInt(p_intf, "logo-opacity")]];
@@ -501,7 +494,6 @@
     [_addLogoLogoLabel setEnabled: b_state];
     [_addLogoTransparencySlider setEnabled: b_state];
     [_addLogoTransparencyLabel setEnabled: b_state];
-#endif
 }
 
 - (NSString *)generateProfileString

@@ -323,7 +323,7 @@
         [mi setTarget:self];
         [mi setAction:selector];
         [mi setTag:p_item->list.i[i]];
-        [mi setRepresentedObject:[NSString stringWithUTF8String:psz_name]];
+        [mi setRepresentedObject:toNSStr(psz_name)];
         [menu addItem:mi];
         if (p_item->value.i == p_item->list.i[i])
             [mi setState:NSOnState];
@@ -1117,7 +1117,7 @@
 
     [openPanel setAllowedFileTypes: [NSArray arrayWithObjects:@"cdg",@"idx",@"srt",@"sub",@"utf",@"ass",@"ssa",@"aqt",@"jss",@"psb",@"rt",@"smi",@"txt",@"smil",nil]];
 
-    NSURL *url = [NSURL URLWithString:[[NSString stringWithUTF8String:path] stringByExpandingTildeInPath]];
+    NSURL *url = [NSURL URLWithString:[toNSStr(path) stringByExpandingTildeInPath]];
     url = [url URLByDeletingLastPathComponent];
     [openPanel setDirectoryURL: url];
     free(path);

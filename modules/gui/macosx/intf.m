@@ -469,7 +469,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
         if (!psz_uri)
             continue;
 
-        NSDictionary *o_dic = [NSDictionary dictionaryWithObject:[NSString stringWithCString:psz_uri encoding:NSUTF8StringEncoding] forKey:@"ITEM_URL"];
+        NSDictionary *o_dic = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
         free(psz_uri);
         [o_result addObject: o_dic];
     }

@@ -209,7 +209,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
                 {
                     NSDictionary *entry = [NSDictionary dictionaryWithObjectsAndKeys:
                                            [NSNumber numberWithInt:value->i_id], @"id",
-                                           [NSString stringWithUTF8String:value->psz_text], @"text",
+                                           toNSStr(value->psz_text), @"text",
                                            nil];
                     [contentArray addObject:entry];
                 }
@@ -221,7 +221,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
             {
                 assert([control isKindOfClass:[NSImageView class]]);
                 NSImageView *imageView = (NSImageView *)control;
-                NSString *string = widget->psz_text ? [NSString stringWithUTF8String:widget->psz_text] : nil;
+                NSString *string = widget->psz_text ? toNSStr(widget->psz_text) : nil;
                 NSImage *image = nil;
                 if (string)
                     image = [[NSImage alloc] initWithContentsOfURL:[NSURL fileURLWithPath:string]];
@@ -303,7 +303,7 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
 
 - (void)performEventWithObject:(NSValue *)objectValue ofType:(const char*)type
 {
-    NSString *typeString = [NSString stringWithUTF8String:type];
+    NSString *typeString = toNSStr(type);
 
     if ([typeString isEqualToString: @"dialog-extension"]) {
         [self performSelectorOnMainThread:@selector(updateExtensionDialog:)
