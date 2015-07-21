@@ -105,7 +105,6 @@ The class is not thread safe
 
     id delegate;
 }
-+ (AppleRemote *)sharedInstance;
 
 @property (readonly) int remoteId;
 @property (readonly) BOOL remoteAvailable;

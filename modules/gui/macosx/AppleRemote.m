@@ -66,18 +66,6 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 #pragma public interface
 
-+ (AppleRemote *)sharedInstance
-{
-    static AppleRemote *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [AppleRemote new];
-    });
-
-    return sharedInstance;
-}
-
 - (id)init
 {
     self = [super init];
