@@ -957,7 +957,6 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
     size_t i_nb_char = 0;
     for ( const text_segment_t *s = p_segment; s != NULL; s = s->p_next )
     {
-        //FIXME: This is missing a space in between segments.
         if ( !s->psz_text )
             continue;
         size_t i_string_bytes = 0;
