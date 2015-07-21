@@ -1,7 +1,7 @@
 /*****************************************************************************
  * coredialogs.m: Mac OS X Core Dialogs
  *****************************************************************************
- * Copyright (C) 2005-2012 VLC authors and VideoLAN
+ * Copyright (C) 2005-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -29,9 +29,56 @@
 /* for the icon in our custom error panel */
 #import <ApplicationServices/ApplicationServices.h>
 
-/*****************************************************************************
- * VLCCoreDialogProvider implementation
- *****************************************************************************/
+static void updateProgressPanel (void *, const char *, float);
+static bool checkProgressPanel (void *);
+static void destroyProgressPanel (void *);
+
+static int DialogCallback(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
+{
+    @autoreleasepool {
+        if ([[NSString stringWithUTF8String:type] isEqualToString: @"dialog-progress-bar"]) {
+            /* the progress panel needs to update itself and therefore wants special treatment within this context */
+            dialog_progress_bar_t *p_dialog = (dialog_progress_bar_t *)value.p_address;
+
+            p_dialog->pf_update = updateProgressPanel;
+            p_dialog->pf_check = checkProgressPanel;
+            p_dialog->pf_destroy = destroyProgressPanel;
+            p_dialog->p_sys = VLCIntf->p_libvlc;
+        }
+
+        NSValue *o_value = [NSValue valueWithPointer:value.p_address];
+        [[VLCCoreDialogProvider sharedInstance] performEventWithObject: o_value ofType: type];
+
+        return VLC_SUCCESS;
+    }
+}
+
+void updateProgressPanel (void *priv, const char *text, float value)
+{
+    @autoreleasepool {
+        NSString *o_txt = toNSStr(text);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[VLCCoreDialogProvider sharedInstance] updateProgressPanelWithText: o_txt andNumber: (double)(value * 1000.)];
+        });
+    }
+}
+
+void destroyProgressPanel (void *priv)
+{
+    @autoreleasepool {
+        if ([[NSApplication sharedApplication] isRunning])
+            [[VLCCoreDialogProvider sharedInstance] performSelectorOnMainThread:@selector(destroyProgressPanel) withObject:nil waitUntilDone:YES];
+    }
+}
+
+bool checkProgressPanel (void *priv)
+{
+    @autoreleasepool {
+        return [[VLCCoreDialogProvider sharedInstance] progressCancelled];
+    }
+}
+
+
 @interface VLCCoreDialogProvider()
 {
     ErrorWindowController *o_error_panel;
@@ -50,6 +97,39 @@
     });
 
     return sharedInstance;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+
+    if (self) {
+        intf_thread_t *p_intf = VLCIntf;
+        /* subscribe to various interactive dialogues */
+        var_Create(p_intf, "dialog-error", VLC_VAR_ADDRESS);
+        var_AddCallback(p_intf, "dialog-error", DialogCallback, (__bridge void *)self);
+        var_Create(p_intf, "dialog-critical", VLC_VAR_ADDRESS);
+        var_AddCallback(p_intf, "dialog-critical", DialogCallback, (__bridge void *)self);
+        var_Create(p_intf, "dialog-login", VLC_VAR_ADDRESS);
+        var_AddCallback(p_intf, "dialog-login", DialogCallback, (__bridge void *)self);
+        var_Create(p_intf, "dialog-question", VLC_VAR_ADDRESS);
+        var_AddCallback(p_intf, "dialog-question", DialogCallback, (__bridge void *)self);
+        var_Create(p_intf, "dialog-progress-bar", VLC_VAR_ADDRESS);
+        var_AddCallback(p_intf, "dialog-progress-bar", DialogCallback, (__bridge void *)self);
+        dialog_Register(p_intf);
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    intf_thread_t *p_intf = VLCIntf;
+    dialog_Unregister(p_intf);
+    var_DelCallback(p_intf, "dialog-error", DialogCallback, (__bridge void *)self);
+    var_DelCallback(p_intf, "dialog-critical", DialogCallback, (__bridge void *)self);
+    var_DelCallback(p_intf, "dialog-login", DialogCallback, (__bridge void *)self);
+    var_DelCallback(p_intf, "dialog-question", DialogCallback, (__bridge void *)self);
+    var_DelCallback(p_intf, "dialog-progress-bar", DialogCallback, (__bridge void *)self);
 }
 
 -(void)awakeFromNib

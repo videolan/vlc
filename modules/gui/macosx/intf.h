@@ -1,11 +1,10 @@
 /*****************************************************************************
  * intf.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2014 VLC authors and VideoLAN
+ * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Derk-Jan Hartman <hartman at videolan dot org>
+ * Authors: Derk-Jan Hartman <hartman at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *          Pierre d'Herbemont <pdherbemont # videolan org>
@@ -36,9 +35,9 @@
 #import <vlc_aout.h>
 #import <vlc_input.h>
 #import <vlc_vout_window.h>
+#import <vlc_atomic.h>
 
 #import <Cocoa/Cocoa.h>
-#import "SPMediaKeyTap.h"                   /* for the media key support */
 #import "misc.h"
 #import "MainWindow.h"
 #import "VLCVoutWindowController.h"
@@ -48,12 +47,6 @@
  * Local prototypes.
  *****************************************************************************/
 #define VLCIntf [[VLCMain sharedInstance] intf]
-
-// You need to release those objects after use
-input_thread_t *getInput(void);
-vout_thread_t *getVout(void);
-vout_thread_t *getVoutForActiveWindow(void);
-audio_output_t *getAout(void);
 
 static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
@@ -65,8 +58,14 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCControls;
 @class VLCMainMenu;
 @class VLCPlaylist;
-@class InputManager;
+@class VLCInputManager;
 @class ResumeDialogController;
+@class VLCSimplePrefs;
+@class VLCPrefs;
+@class VLCCoreDialogProvider;
+@class VLCEyeTVController;
+@class VLCBookmarks;
+@class VLCOpen;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {
@@ -86,31 +85,22 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
 - (VLCMainMenu *)mainMenu;
 - (VLCMainWindow *)mainWindow;
-- (id)controls;
-- (id)bookmarks;
-- (id)open;
-- (id)simplePreferences;
-- (id)preferences;
+- (VLCControls *)controls;
+- (VLCBookmarks *)bookmarks;
+- (VLCOpen *)open;
+- (VLCSimplePrefs *)simplePreferences;
+- (VLCPrefs *)preferences;
 - (VLCPlaylist *)playlist;
-- (id)coreDialogProvider;
+- (VLCCoreDialogProvider *)coreDialogProvider;
 - (ResumeDialogController *)resumeDialog;
-- (id)eyeTVController;
-- (id)appleRemoteController;
+- (VLCEyeTVController *)eyeTVController;
+- (VLCInputManager *)inputManager;
 - (void)setActiveVideoPlayback:(BOOL)b_value;
 - (BOOL)activeVideoPlayback;
 - (void)applicationWillTerminate:(NSNotification *)notification;
-- (void)updateCurrentlyUsedHotkeys;
-- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
-
-- (void)plItemUpdated;
-- (void)playbackModeUpdated;
-- (void)showFullscreenController;
-
-- (void)updateTogglePlaylistState;
-
-- (void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event;
-
 - (void)resetAndReinitializeUserDefaults;
+
+- (void)showFullscreenController;
 
 - (BOOL)isTerminating;
 
@@ -124,3 +114,5 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @interface VLCApplication : NSApplication
 
 @end
+
+#import "helpers.h"

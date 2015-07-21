@@ -1240,6 +1240,9 @@
 		7D3F652718805297005776C4 /* BWQuincyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyManager.m; path = ../../../modules/gui/macosx/BWQuincyManager.m; sourceTree = SOURCE_ROOT; };
 		7D3F652818805297005776C4 /* BWQuincyUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BWQuincyUI.h; path = ../../../modules/gui/macosx/BWQuincyUI.h; sourceTree = SOURCE_ROOT; };
 		7D3F652918805297005776C4 /* BWQuincyUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BWQuincyUI.m; path = ../../../modules/gui/macosx/BWQuincyUI.m; sourceTree = SOURCE_ROOT; };
+		7D871D371B5E6844000B56C0 /* intf-prefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "intf-prefs.h"; path = "../../../modules/gui/macosx/intf-prefs.h"; sourceTree = "<group>"; };
+		7D871D381B5E6844000B56C0 /* intf-prefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "intf-prefs.m"; path = "../../../modules/gui/macosx/intf-prefs.m"; sourceTree = "<group>"; };
+		7D871D391B5E684D000B56C0 /* helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = helpers.h; path = ../../../modules/gui/macosx/helpers.h; sourceTree = "<group>"; };
 		7D8BB0B318302AC000FAE9B7 /* DebugMessageVisualizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DebugMessageVisualizer.h; path = ../../../modules/gui/macosx/DebugMessageVisualizer.h; sourceTree = SOURCE_ROOT; };
 		7D8BB0B418302AC000FAE9B7 /* DebugMessageVisualizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DebugMessageVisualizer.m; path = ../../../modules/gui/macosx/DebugMessageVisualizer.m; sourceTree = SOURCE_ROOT; };
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
@@ -1810,6 +1813,7 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				7D871D391B5E684D000B56C0 /* helpers.h */,
 				8EE1AF9F044465080059A3A7 /* about.h */,
 				8EE1AFA0044465080059A3A7 /* about.m */,
 				7DF0435E1972E26A0022B534 /* AddonListDataSource.h */,
@@ -1845,6 +1849,8 @@
 				2AEF857709A5FEC900130822 /* fspanel.m */,
 				8ED6C27C03E2EB1C0059A3A7 /* intf.h */,
 				8ED6C27D03E2EB1C0059A3A7 /* intf.m */,
+				7D871D371B5E6844000B56C0 /* intf-prefs.h */,
+				7D871D381B5E6844000B56C0 /* intf-prefs.m */,
 				7DF812ED1B555A340052293C /* InputManager.h */,
 				7DF812EE1B555A340052293C /* InputManager.m */,
 				7DF812EF1B555C8E0052293C /* KeyboardBacklight.h */,

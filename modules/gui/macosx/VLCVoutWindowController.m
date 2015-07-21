@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_vout_display.h>
+
 #import "CompatibilityFixes.h"
 #import "VLCVoutWindowController.h"
 #import "intf.h"
@@ -35,6 +37,162 @@
 #import "TrackSynchronization.h"
 #import "ResumeDialogController.h"
 #import "playlist.h"
+
+static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
+
+static int WindowControl(vout_window_t *, int i_query, va_list);
+
+int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
+{
+    @autoreleasepool {
+        if (cfg->type != VOUT_WINDOW_TYPE_INVALID
+            && cfg->type != VOUT_WINDOW_TYPE_NSOBJECT)
+            return VLC_EGENERIC;
+
+        msg_Dbg(p_wnd, "Opening video window");
+
+        if (!atomic_load(&b_intf_starting)) {
+            msg_Err(p_wnd, "Cannot create vout as Mac OS X interface was not found");
+            return VLC_EGENERIC;
+        }
+
+        NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
+
+        VLCVoutWindowController *voutController = [[VLCMain sharedInstance] voutController];
+        if (!voutController) {
+            return VLC_EGENERIC;
+        }
+        [voutController.lock lock];
+
+        SEL sel = @selector(setupVoutForWindow:withProposedVideoViewPosition:);
+        NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[voutController methodSignatureForSelector:sel]];
+        [inv setTarget:voutController];
+        [inv setSelector:sel];
+        [inv setArgument:&p_wnd atIndex:2]; // starting at 2!
+        [inv setArgument:&proposedVideoViewPosition atIndex:3];
+
+        [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                           waitUntilDone:YES];
+
+        VLCVoutView *videoView = nil;
+        [inv getReturnValue:&videoView];
+
+        // this method is not supposed to fail
+        assert(videoView != nil);
+
+        msg_Dbg(VLCIntf, "returning videoview with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
+        p_wnd->handle.nsobject = (void *)CFBridgingRetain(videoView);
+
+        [voutController.lock unlock];
+
+        p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
+        p_wnd->control = WindowControl;
+
+        return VLC_SUCCESS;
+    }
+}
+
+static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
+{
+    @autoreleasepool {
+        VLCVoutWindowController *voutController = [[VLCMain sharedInstance] voutController];
+        if (!voutController) {
+            return VLC_EGENERIC;
+        }
+        [voutController.lock lock];
+
+        switch(i_query) {
+            case VOUT_WINDOW_SET_STATE:
+            {
+                unsigned i_state = va_arg(args, unsigned);
+
+                if (i_state & VOUT_WINDOW_STATE_BELOW)
+                {
+                    msg_Dbg(p_wnd, "Ignore change to VOUT_WINDOW_STATE_BELOW");
+                    goto out;
+                }
+
+                NSInteger i_cooca_level = NSNormalWindowLevel;
+                if (i_state & VOUT_WINDOW_STATE_ABOVE)
+                    i_cooca_level = NSStatusWindowLevel;
+
+                SEL sel = @selector(setWindowLevel:forWindow:);
+                NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[voutController methodSignatureForSelector:sel]];
+                [inv setTarget:voutController];
+                [inv setSelector:sel];
+                [inv setArgument:&i_cooca_level atIndex:2]; // starting at 2!
+                [inv setArgument:&p_wnd atIndex:3];
+                [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                                   waitUntilDone:NO];
+
+                break;
+            }
+            case VOUT_WINDOW_SET_SIZE:
+            {
+                unsigned int i_width  = va_arg(args, unsigned int);
+                unsigned int i_height = va_arg(args, unsigned int);
+
+                NSSize newSize = NSMakeSize(i_width, i_height);
+                SEL sel = @selector(setNativeVideoSize:forWindow:);
+                NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[voutController methodSignatureForSelector:sel]];
+                [inv setTarget:voutController];
+                [inv setSelector:sel];
+                [inv setArgument:&newSize atIndex:2]; // starting at 2!
+                [inv setArgument:&p_wnd atIndex:3];
+                [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                                   waitUntilDone:NO];
+
+                break;
+            }
+            case VOUT_WINDOW_SET_FULLSCREEN:
+            {
+                if (var_InheritBool(VLCIntf, "video-wallpaper")) {
+                    msg_Dbg(p_wnd, "Ignore fullscreen event as video-wallpaper is on");
+                    goto out;
+                }
+
+                int i_full = va_arg(args, int);
+                BOOL b_animation = YES;
+
+                SEL sel = @selector(setFullscreen:forWindow:withAnimation:);
+                NSInvocation *inv = [NSInvocation invocationWithMethodSignature:[voutController methodSignatureForSelector:sel]];
+                [inv setTarget:voutController];
+                [inv setSelector:sel];
+                [inv setArgument:&i_full atIndex:2]; // starting at 2!
+                [inv setArgument:&p_wnd atIndex:3];
+                [inv setArgument:&b_animation atIndex:4];
+                [inv performSelectorOnMainThread:@selector(invoke) withObject:nil
+                                   waitUntilDone:NO];
+
+                break;
+            }
+            default:
+            {
+                msg_Warn(p_wnd, "unsupported control query");
+                [voutController.lock unlock];
+                return VLC_EGENERIC;
+            }
+        }
+
+        out:
+        [voutController.lock unlock];
+        return VLC_SUCCESS;
+    }
+}
+
+void WindowClose(vout_window_t *p_wnd)
+{
+    @autoreleasepool {
+        VLCVoutWindowController *voutController = [[VLCMain sharedInstance] voutController];
+        if (!voutController) {
+            return;
+        }
+
+        [voutController.lock lock];
+        [voutController performSelectorOnMainThread:@selector(removeVoutforDisplay:) withObject:[NSValue valueWithPointer:p_wnd] waitUntilDone:NO];
+        [voutController.lock unlock];
+    }
+}
 
 @interface VLCVoutWindowController ()
 {
@@ -53,13 +211,28 @@
 
 @implementation VLCVoutWindowController
 
++ (VLCVoutWindowController *)sharedInstance
+{
+    static VLCVoutWindowController *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [VLCVoutWindowController new];
+    });
+
+    return sharedInstance;
+}
+
 - (id)init
 {
     self = [super init];
-    o_vout_dict = [[NSMutableDictionary alloc] init];
-    o_keyboard_backlight = [[KeyboardBacklight alloc] init];
-    i_currentWindowLevel = NSNormalWindowLevel;
-    _currentStatusWindowLevel = NSFloatingWindowLevel;
+    if (self) {
+        atomic_store(&b_intf_starting, true);
+        o_vout_dict = [[NSMutableDictionary alloc] init];
+        o_keyboard_backlight = [[KeyboardBacklight alloc] init];
+        i_currentWindowLevel = NSNormalWindowLevel;
+        _currentStatusWindowLevel = NSFloatingWindowLevel;
+    }
     return self;
 }
 

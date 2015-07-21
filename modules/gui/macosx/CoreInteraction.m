@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CoreInteraction.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2014 Felix Paul Kühne
+ * Copyright (C) 2011-2015 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -36,6 +36,24 @@
 #import <vlc_url.h>
 #import <vlc_modules.h>
 #import <vlc_charset.h>
+#include <vlc_plugin.h>
+#import "SPMediaKeyTap.h"
+#import "AppleRemote.h"
+#import "InputManager.h"
+#import "controls.h"
+
+static int BossCallback(vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    @autoreleasepool {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[VLCCoreInteraction sharedInstance] pause];
+            [[NSApplication sharedApplication] hide:nil];
+        });
+
+        return VLC_SUCCESS;
+    }
+}
 
 @interface VLCCoreInteraction ()
 {
@@ -43,6 +61,17 @@
     mtime_t timeA, timeB;
 
     float f_maxVolume;
+
+    /* media key support */
+    BOOL b_mediaKeySupport;
+    BOOL b_mediakeyJustJumped;
+    SPMediaKeyTap *_mediaKeyController;
+    BOOL b_mediaKeyTrapEnabled;
+
+    AppleRemote *_remote;
+    BOOL b_remote_button_hold; /* true as long as the user holds the left,right,plus or minus on the remote control */
+
+    NSArray *_usedHotkeys;
 }
 @end
 
@@ -62,8 +91,36 @@
     return sharedInstance;
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        intf_thread_t *p_intf = VLCIntf;
+
+        /* init media key support */
+        b_mediaKeySupport = var_InheritBool(p_intf, "macosx-mediakeys");
+        if (b_mediaKeySupport) {
+            _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
+            [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                     [SPMediaKeyTap defaultMediaKeyUserBundleIdentifiers], kMediaKeyUsingBundleIdentifiersDefaultsKey,
+                                                                     nil]];
+        }
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(coreChangedMediaKeySupportSetting:) name: @"VLCMediaKeySupportSettingChanged" object: nil];
+
+        /* init Apple Remote support */
+        _remote = [[AppleRemote alloc] init];
+        [_remote setClickCountEnabledButtons: kRemoteButtonPlay];
+        [_remote setDelegate: self];
+
+        var_AddCallback(p_intf->p_libvlc, "intf-boss", BossCallback, (__bridge void *)self);
+    }
+    return self;
+}
+
 - (void)dealloc
 {
+    intf_thread_t *p_intf = VLCIntf;
+    var_DelCallback(p_intf->p_libvlc, "intf-boss", BossCallback, (__bridge void *)self);
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
@@ -911,6 +968,311 @@
         vlc_object_release(p_vout);
         vlc_object_release(p_filter);
     }
+}
+
+#pragma mark -
+#pragma mark Media Key support
+
+- (void)resetMediaKeyJump
+{
+    b_mediakeyJustJumped = NO;
+}
+
+- (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
+{
+    intf_thread_t *p_intf = VLCIntf;
+    if (!p_intf)
+        return;
+
+    b_mediaKeySupport = var_InheritBool(p_intf, "macosx-mediakeys");
+    if (b_mediaKeySupport && !_mediaKeyController)
+        _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
+
+    VLCMain *main = [VLCMain sharedInstance];
+    if (b_mediaKeySupport && ([[[main playlist] model] hasChildren] ||
+                              [[main inputManager] hasInput])) {
+        if (!b_mediaKeyTrapEnabled) {
+            b_mediaKeyTrapEnabled = YES;
+            msg_Dbg(p_intf, "Enable media key support");
+            [_mediaKeyController startWatchingMediaKeys];
+        }
+    } else {
+        if (b_mediaKeyTrapEnabled) {
+            b_mediaKeyTrapEnabled = NO;
+            msg_Dbg(p_intf, "Disable media key support");
+            [_mediaKeyController stopWatchingMediaKeys];
+        }
+    }
+}
+
+-(void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event
+{
+    if (b_mediaKeySupport) {
+        assert([event type] == NSSystemDefined && [event subtype] == SPSystemDefinedEventMediaKeys);
+
+        int keyCode = (([event data1] & 0xFFFF0000) >> 16);
+        int keyFlags = ([event data1] & 0x0000FFFF);
+        int keyState = (((keyFlags & 0xFF00) >> 8)) == 0xA;
+        int keyRepeat = (keyFlags & 0x1);
+
+        if (keyCode == NX_KEYTYPE_PLAY && keyState == 0)
+            [self playOrPause];
+
+        if ((keyCode == NX_KEYTYPE_FAST || keyCode == NX_KEYTYPE_NEXT) && !b_mediakeyJustJumped) {
+            if (keyState == 0 && keyRepeat == 0)
+                [self next];
+            else if (keyRepeat == 1) {
+                [self forwardShort];
+                b_mediakeyJustJumped = YES;
+                [self performSelector:@selector(resetMediaKeyJump)
+                           withObject: NULL
+                           afterDelay:0.25];
+            }
+        }
+
+        if ((keyCode == NX_KEYTYPE_REWIND || keyCode == NX_KEYTYPE_PREVIOUS) && !b_mediakeyJustJumped) {
+            if (keyState == 0 && keyRepeat == 0)
+                [self previous];
+            else if (keyRepeat == 1) {
+                [self backwardShort];
+                b_mediakeyJustJumped = YES;
+                [self performSelector:@selector(resetMediaKeyJump)
+                           withObject: NULL
+                           afterDelay:0.25];
+            }
+        }
+    }
+}
+
+#pragma mark -
+#pragma mark Apple Remote Control
+
+- (void)startListeningWithAppleRemote
+{
+    [_remote startListening: self];
+}
+
+- (void)stopListeningWithAppleRemote
+{
+    [_remote stopListening:self];
+}
+
+/* Helper method for the remote control interface in order to trigger forward/backward and volume
+ increase/decrease as long as the user holds the left/right, plus/minus button */
+- (void) executeHoldActionForRemoteButton: (NSNumber*) buttonIdentifierNumber
+{
+    intf_thread_t *p_intf = VLCIntf;
+    if (!p_intf)
+        return;
+
+    if (b_remote_button_hold) {
+        switch([buttonIdentifierNumber intValue]) {
+            case kRemoteButtonRight_Hold:
+                [self forward];
+                break;
+            case kRemoteButtonLeft_Hold:
+                [self backward];
+                break;
+            case kRemoteButtonVolume_Plus_Hold:
+                if (p_intf)
+                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_UP);
+                break;
+            case kRemoteButtonVolume_Minus_Hold:
+                if (p_intf)
+                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN);
+                break;
+        }
+        if (b_remote_button_hold) {
+            /* trigger event */
+            [self performSelector:@selector(executeHoldActionForRemoteButton:)
+                       withObject:buttonIdentifierNumber
+                       afterDelay:0.25];
+        }
+    }
+}
+
+/* Apple Remote callback */
+- (void) appleRemoteButton: (AppleRemoteEventIdentifier)buttonIdentifier
+               pressedDown: (BOOL) pressedDown
+                clickCount: (unsigned int) count
+{
+    intf_thread_t *p_intf = VLCIntf;
+    if (!p_intf)
+        return;
+
+    switch(buttonIdentifier) {
+        case k2009RemoteButtonFullscreen:
+            [self toggleFullscreen];
+            break;
+        case k2009RemoteButtonPlay:
+            [self playOrPause];
+            break;
+        case kRemoteButtonPlay:
+            if (count >= 2)
+                [self toggleFullscreen];
+            else
+                [self playOrPause];
+            break;
+        case kRemoteButtonVolume_Plus:
+            if (config_GetInt(VLCIntf, "macosx-appleremote-sysvol"))
+                [NSSound increaseSystemVolume];
+            else
+                if (p_intf)
+                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_UP);
+            break;
+        case kRemoteButtonVolume_Minus:
+            if (config_GetInt(VLCIntf, "macosx-appleremote-sysvol"))
+                [NSSound decreaseSystemVolume];
+            else
+                if (p_intf)
+                    var_SetInteger(p_intf->p_libvlc, "key-action", ACTIONID_VOL_DOWN);
+            break;
+        case kRemoteButtonRight:
+            if (config_GetInt(VLCIntf, "macosx-appleremote-prevnext"))
+                [self forward];
+            else
+                [self next];
+            break;
+        case kRemoteButtonLeft:
+            if (config_GetInt(VLCIntf, "macosx-appleremote-prevnext"))
+                [self backward];
+            else
+                [self previous];
+            break;
+        case kRemoteButtonRight_Hold:
+        case kRemoteButtonLeft_Hold:
+        case kRemoteButtonVolume_Plus_Hold:
+        case kRemoteButtonVolume_Minus_Hold:
+            /* simulate an event as long as the user holds the button */
+            b_remote_button_hold = pressedDown;
+            if (pressedDown) {
+                NSNumber* buttonIdentifierNumber = [NSNumber numberWithInt:buttonIdentifier];
+                [self performSelector:@selector(executeHoldActionForRemoteButton:)
+                           withObject:buttonIdentifierNumber];
+            }
+            break;
+        case kRemoteButtonMenu:
+            [[[VLCMain sharedInstance] controls] showPosition: self]; //FIXME
+            break;
+        case kRemoteButtonPlay_Sleep:
+        {
+            NSAppleScript * script = [[NSAppleScript alloc] initWithSource:@"tell application \"System Events\" to sleep"];
+            [script executeAndReturnError:nil];
+            break;
+        }
+        default:
+            /* Add here whatever you want other buttons to do */
+            break;
+    }
+}
+
+#pragma mark -
+#pragma mark Key Shortcuts
+
+/*****************************************************************************
+ * hasDefinedShortcutKey: Check to see if the key press is a defined VLC
+ * shortcut key.  If it is, pass it off to VLC for handling and return YES,
+ * otherwise ignore it and return NO (where it will get handled by Cocoa).
+ *****************************************************************************/
+- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force
+{
+    intf_thread_t *p_intf = VLCIntf;
+    if (!p_intf)
+        return NO;
+
+    unichar key = 0;
+    vlc_value_t val;
+    unsigned int i_pressed_modifiers = 0;
+
+    val.i_int = 0;
+    i_pressed_modifiers = [o_event modifierFlags];
+
+    if (i_pressed_modifiers & NSControlKeyMask)
+        val.i_int |= KEY_MODIFIER_CTRL;
+
+    if (i_pressed_modifiers & NSAlternateKeyMask)
+        val.i_int |= KEY_MODIFIER_ALT;
+
+    if (i_pressed_modifiers & NSShiftKeyMask)
+        val.i_int |= KEY_MODIFIER_SHIFT;
+
+    if (i_pressed_modifiers & NSCommandKeyMask)
+        val.i_int |= KEY_MODIFIER_COMMAND;
+
+    NSString * characters = [o_event charactersIgnoringModifiers];
+    if ([characters length] > 0) {
+        key = [[characters lowercaseString] characterAtIndex: 0];
+
+        /* handle Lion's default key combo for fullscreen-toggle in addition to our own hotkeys */
+        if (key == 'f' && i_pressed_modifiers & NSControlKeyMask && i_pressed_modifiers & NSCommandKeyMask) {
+            [self toggleFullscreen];
+            return YES;
+        }
+
+        if (!b_force) {
+            switch(key) {
+                case NSDeleteCharacter:
+                case NSDeleteFunctionKey:
+                case NSDeleteCharFunctionKey:
+                case NSBackspaceCharacter:
+                case NSUpArrowFunctionKey:
+                case NSDownArrowFunctionKey:
+                case NSEnterCharacter:
+                case NSCarriageReturnCharacter:
+                    return NO;
+            }
+        }
+
+        val.i_int |= CocoaKeyToVLC(key);
+
+        BOOL b_found_key = NO;
+        for (NSUInteger i = 0; i < [_usedHotkeys count]; i++) {
+            NSString *str = [_usedHotkeys objectAtIndex:i];
+            unsigned int i_keyModifiers = [[VLCStringUtility sharedInstance] VLCModifiersToCocoa: str];
+
+            if ([[characters lowercaseString] isEqualToString: [[VLCStringUtility sharedInstance] VLCKeyToString: str]] &&
+                (i_keyModifiers & NSShiftKeyMask)     == (i_pressed_modifiers & NSShiftKeyMask) &&
+                (i_keyModifiers & NSControlKeyMask)   == (i_pressed_modifiers & NSControlKeyMask) &&
+                (i_keyModifiers & NSAlternateKeyMask) == (i_pressed_modifiers & NSAlternateKeyMask) &&
+                (i_keyModifiers & NSCommandKeyMask)   == (i_pressed_modifiers & NSCommandKeyMask)) {
+                b_found_key = YES;
+                break;
+            }
+        }
+
+        if (b_found_key) {
+            var_SetInteger(p_intf->p_libvlc, "key-pressed", val.i_int);
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (void)updateCurrentlyUsedHotkeys
+{
+    NSMutableArray *mutArray = [[NSMutableArray alloc] init];
+    /* Get the main Module */
+    module_t *p_main = module_get_main();
+    assert(p_main);
+    unsigned confsize;
+    module_config_t *p_config;
+
+    p_config = module_config_get (p_main, &confsize);
+
+    for (size_t i = 0; i < confsize; i++) {
+        module_config_t *p_item = p_config + i;
+
+        if (CONFIG_ITEM(p_item->i_type) && p_item->psz_name != NULL
+            && !strncmp(p_item->psz_name , "key-", 4)
+            && !EMPTY_STR(p_item->psz_text)) {
+            if (p_item->value.psz)
+                [mutArray addObject: [NSString stringWithUTF8String:p_item->value.psz]];
+        }
+    }
+    module_config_free (p_config);
+
+    _usedHotkeys = [[NSArray alloc] initWithArray:mutArray copyItems:YES];
 }
 
 @end

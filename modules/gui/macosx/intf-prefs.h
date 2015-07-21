@@ -1,8 +1,10 @@
 /*****************************************************************************
- * InputManager.h: MacOS X interface module
+ * intf-prefs.h
  *****************************************************************************
- * Copyright (C) 2015 VLC authors and VideoLAN
+ * Copyright (C) 2001-2015 VLC authors and VideoLAN
  * $Id$
+ *
+ * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,26 +21,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "intf.h"
 
-#include <vlc_common.h>
-#import <vlc_interface.h>
+@interface VLCMain (OldPrefs)
 
-#import <IOKit/pwr_mgt/IOPMLib.h>           /* for sleep prevention */
-
-
-@class VLCMain;
-
-@interface VLCInputManager : NSObject
-
-- (id)initWithMain:(VLCMain *)o_mainObj;
-
-- (void)inputThreadChanged;
-
-- (void)playbackStatusUpdated;
-
-- (void)resumeItunesPlayback:(id)sender;
-
-- (BOOL)hasInput;
+- (void)private_resetAndReinitializeUserDefaults;
+- (void)removeOldPreferences;
 
 @end

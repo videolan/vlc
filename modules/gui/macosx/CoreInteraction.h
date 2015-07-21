@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CoreInteraction.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2014 Felix Paul Kühne
+ * Copyright (C) 2011-2015 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -66,6 +66,8 @@
 - (void)volumeUp;
 - (void)volumeDown;
 - (void)toggleMute;
+- (void)startListeningWithAppleRemote;
+- (void)stopListeningWithAppleRemote;
 
 - (void)addSubtitlesToCurrentInput:(NSArray *)paths;
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
@@ -79,5 +81,8 @@
 - (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter float: (float)f_value;
 - (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter string: (const char *)psz_value;
 - (void)setVideoFilterProperty: (const char *)psz_name forFilter: (const char *)psz_filter boolean: (BOOL)b_value;
+
+- (void)updateCurrentlyUsedHotkeys;
+- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event force:(BOOL)b_force;
 
 @end

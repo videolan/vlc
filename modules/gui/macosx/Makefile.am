@@ -18,6 +18,7 @@ EXTRA_LTLIBRARIES = libmacosx_plugin.la
 gui_LTLIBRARIES = $(LTLIBmacosx)
 
 libmacosx_plugin_la_SOURCES = \
+	helpers.h \
 	about.h about.m \
 	AddonListDataSource.h AddonListDataSource.m \
 	AddonsWindowController.h AddonsWindowController.m \
@@ -38,6 +39,7 @@ libmacosx_plugin_la_SOURCES = \
 	ExtensionsManager.h ExtensionsManager.m \
 	eyetv.h eyetv.m \
 	fspanel.h fspanel.m \
+	intf-prefs.h intf-prefs.m \
 	intf.h intf.m \
 	InputManager.h InputManager.m \
 	iTunes.h \

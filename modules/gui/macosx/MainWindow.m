@@ -100,7 +100,7 @@ static VLCMainWindow *sharedInstance = nil;
                                               defer:flag];
     });
 
-    [[VLCMain sharedInstance] updateTogglePlaylistState];
+    [[[VLCMain sharedInstance] playlist] updateTogglePlaylistState];
 
     return sharedInstance;
 }
@@ -146,7 +146,7 @@ static VLCMainWindow *sharedInstance = nil;
     else
         b_force = YES;
 
-    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event force:b_force] ||
+    return [[VLCCoreInteraction sharedInstance] hasDefinedShortcutKey:o_event force:b_force] ||
            [(VLCControls *)[[VLCMain sharedInstance] controls] keyEvent:o_event];
 }
 

@@ -35,6 +35,7 @@
 #import <vlc_config_cat.h>
 #import "misc.h"
 #import "intf.h"
+#import "intf-prefs.h"
 #import "AppleRemote.h"
 #import "CoreInteraction.h"
 
@@ -948,9 +949,9 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         /* activate stuff without restart */
         if ([_intf_appleremoteCheckbox state] == YES)
-            [[[VLCMain sharedInstance] appleRemoteController] startListening: [VLCMain sharedInstance]];
+            [[VLCCoreInteraction sharedInstance] startListeningWithAppleRemote];
         else
-            [[[VLCMain sharedInstance] appleRemoteController] stopListening: [VLCMain sharedInstance]];
+            [[VLCCoreInteraction sharedInstance] stopListeningWithAppleRemote];
         _intfSettingChanged = NO;
     }
 

@@ -41,7 +41,7 @@ static int InputThreadChanged(vlc_object_t *p_this, const char *psz_var,
                               vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     @autoreleasepool {
-        InputManager *inputManager = (__bridge InputManager *)param;
+        VLCInputManager *inputManager = (__bridge VLCInputManager *)param;
         [inputManager performSelectorOnMainThread:@selector(inputThreadChanged) withObject:nil waitUntilDone:NO];
     }
 
@@ -53,7 +53,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                       vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
     @autoreleasepool {
-        InputManager *inputManager = (__bridge InputManager *)param;
+        VLCInputManager *inputManager = (__bridge VLCInputManager *)param;
 
         switch (new_val.i_int) {
             case INPUT_EVENT_STATE:
@@ -131,9 +131,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 #pragma mark -
 #pragma mark InputManager implementation
 
-@interface InputManager()
+@interface VLCInputManager()
 {
-    intf_thread_t *p_intf;
     VLCMain *o_main;
 
     input_thread_t *p_current_input;
@@ -150,13 +149,12 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 }
 @end
 
-@implementation InputManager
+@implementation VLCInputManager
 
 - (id)initWithMain:(VLCMain *)o_mainObj
 {
     self = [super init];
     if(self) {
-        p_intf = VLCIntf;
         o_main = o_mainObj;
         var_AddCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, (__bridge void *)self);
 
@@ -168,6 +166,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)dealloc
 {
+    intf_thread_t *p_intf = VLCIntf;
     if (p_current_input) {
         /* continue playback where you left off */
         [[o_main playlist] storePlaybackPositionForItem:p_current_input];
@@ -177,7 +176,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         p_current_input = NULL;
     }
 
-    var_DelCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, (__bridge void *)self);
+    if (p_intf)
+        var_DelCallback(p_intf, "input-current", InputThreadChanged, (__bridge void *)self);
 
     dispatch_release(informInputChangedQueue);
 }
@@ -230,7 +230,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
      * The serial queue ensures that changed inputs are propagated in the same order as they arrive.
      */
     dispatch_async(informInputChangedQueue, ^{
-        [[ExtensionsManager getInstance:p_intf] inputChanged:p_input_changed];
+        [[ExtensionsManager getInstance:VLCIntf] inputChanged:p_input_changed];
         if (p_input_changed)
             vlc_object_release(p_input_changed);
     });
@@ -239,6 +239,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)playbackStatusUpdated
 {
+    intf_thread_t *p_intf = VLCIntf;
     int state = -1;
     if (p_current_input) {
         state = var_GetInteger(p_current_input, "state");
@@ -363,6 +364,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)resumeItunesPlayback:(id)sender
 {
+    intf_thread_t *p_intf = VLCIntf;
     if (var_InheritInteger(p_intf, "macosx-control-itunes") > 1) {
         if (b_has_itunes_paused) {
             iTunesApplication *iTunesApp = (iTunesApplication *) [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];

@@ -27,6 +27,7 @@
 #import "CoreInteraction.h"
 #import "MainMenu.h"
 #import "fspanel.h"
+#import "playlist.h"
 #import "CompatibilityFixes.h"
 
 /*****************************************************************************
@@ -632,7 +633,7 @@ frame.origin.x = f_width + frame.origin.x; \
     if (!config_GetInt(VLCIntf, "macosx-show-effects-button"))
         [self removeEffectsButton:YES];
 
-    [[VLCMain sharedInstance] playbackModeUpdated];
+    [[[VLCMain sharedInstance] playlist] playbackModeUpdated];
 
 }
 

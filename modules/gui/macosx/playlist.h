@@ -75,6 +75,8 @@
 - (IBAction)searchItem:(id)sender;
 
 - (void)playlistUpdated;
+- (void)playbackModeUpdated;
+- (void)updateTogglePlaylistState;
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification;
 - (void)sortNode:(int)i_mode;
 
