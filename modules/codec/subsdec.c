@@ -1025,6 +1025,8 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
             psz_subtitle++;
         }
     }
+    while ( p_stack )
+        PopStyle( &p_stack );
 
     return p_first_segment;
 
