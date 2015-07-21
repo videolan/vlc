@@ -908,16 +908,26 @@ static xml_reader_t *GetXMLReader( filter_t *p_filter, stream_t *p_sub )
     return p_xml_reader;
 }
 
-static text_style_t* ApplyDefaultStyle( filter_sys_t *p_sys, text_style_t* p_original_style )
+static text_style_t* ApplyDefaultStyle( filter_t *p_filter, text_style_t* p_original_style )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
+
     text_style_t *p_style = p_original_style;
     if ( !p_style )
     {
         p_style = text_style_New();
         if ( unlikely( !p_style ) )
             return NULL;
-        p_style->i_font_color = p_sys->style.i_font_color & 0x00FFFFFF;
-        p_style->i_font_alpha = (p_sys->style.i_font_alpha & 0xFF000000) >> 24;
+        //FIXME: Shouldn't this be compute only once?
+        // How come we have some stuff from p_sys and not this?!
+        uint32_t i_font_color = var_InheritInteger( p_filter, "freetype-color" );
+        i_font_color = VLC_CLIP( i_font_color, 0, 0xFFFFFF );
+        p_style->i_font_color = i_font_color;
+
+        uint32_t i_font_opacity = var_InheritInteger( p_filter, "freetype-opacity" );
+        i_font_opacity = VLC_CLIP( i_font_opacity, 0, 0xFF );
+        p_style->i_font_alpha = i_font_opacity;
+
         p_style->i_karaoke_background_color = p_sys->style.i_karaoke_background_color;
         p_style->i_karaoke_background_alpha = p_sys->style.i_karaoke_background_alpha;
         p_style->i_style_flags = p_sys->style.i_style_flags;
@@ -939,7 +949,7 @@ static text_style_t* ApplyDefaultStyle( filter_sys_t *p_sys, text_style_t* p_ori
     return p_style;
 }
 
-static uni_char_t* SegmentsToTextAndStyles( filter_sys_t *p_sys, const text_segment_t *p_segment, size_t *pi_string_length, text_style_t ***ppp_styles)
+static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment, size_t *pi_string_length, text_style_t ***ppp_styles)
 {
     text_style_t **pp_styles = NULL;
     uni_char_t *psz_uni = NULL;
@@ -980,7 +990,7 @@ static uni_char_t* SegmentsToTextAndStyles( filter_sys_t *p_sys, const text_segm
         }
         pp_styles = pp_styles_realloc;
         // We're actually writing to a read only object, something's wrong with the conception.
-        text_style_t *p_style = ApplyDefaultStyle( p_sys, s->style );
+        text_style_t *p_style = ApplyDefaultStyle( p_filter, s->style );
         if ( p_style == NULL )
         {
             free( pp_styles );
@@ -1008,15 +1018,13 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                          subpicture_region_t *p_region_in,
                          const vlc_fourcc_t *p_chroma_list )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
-
     if( !p_region_in )
         return VLC_EGENERIC;
 
     text_style_t **pp_styles = NULL;
     size_t i_text_length = 0;
 
-    uni_char_t *psz_text = SegmentsToTextAndStyles( p_sys, p_region_in->p_text, &i_text_length, &pp_styles );
+    uni_char_t *psz_text = SegmentsToTextAndStyles( p_filter, p_region_in->p_text, &i_text_length, &pp_styles );
 
     if( !psz_text || !pp_styles )
     {
