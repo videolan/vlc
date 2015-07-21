@@ -80,8 +80,9 @@ int OpenIntf (vlc_object_t *p_this)
         msg_Dbg(p_intf, "Starting macosx interface");
 
         [VLCApplication sharedApplication];
-
         [[VLCMain sharedInstance] setIntf: p_intf];
+
+        [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
 
         [VLCVoutWindowController sharedInstance];
 
@@ -155,6 +156,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCCoreInteraction *_coreinteraction;
     ResumeDialogController *_resume_dialog;
     VLCInputManager *_input_manager;
+    VLCPlaylist *_playlist;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -218,14 +220,11 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+    _playlist = [[VLCPlaylist alloc] init];
+    [NSBundle loadNibNamed:@"MainWindow" owner:self];
+    [[self mainWindow] makeKeyAndOrderFront:nil];
     _open = [[VLCOpen alloc] init];
     _mainmenu = [[VLCMainMenu alloc] init];
-    [NSBundle loadNibNamed:@"MainMenu" owner:_mainmenu];
-
-
-    [NSBundle loadNibNamed:@"MainWindow" owner:[VLCMain sharedInstance]];
-    [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
-
     _coreinteraction = [VLCCoreInteraction sharedInstance];
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
@@ -314,7 +313,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
      * the callbacks are registered.
      */
     [_input_manager inputThreadChanged];
-    [o_playlist playbackModeUpdated];
+    [_playlist playbackModeUpdated];
 
     // respect playlist-autostart
     // note that PLAYLIST_PLAY will not stop any playback if already started
@@ -567,7 +566,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 - (VLCPlaylist *)playlist
 {
-    return o_playlist;
+    return _playlist;
 }
 
 - (VLCCoreDialogProvider *)coreDialogProvider

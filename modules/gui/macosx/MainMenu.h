@@ -211,6 +211,10 @@
 @property (readwrite, weak) IBOutlet NSStepper *specificTime_stepper;
 @property (nonatomic) int jumpTimeValue;
 
+@property (readwrite, weak) IBOutlet NSView *playlistSaveAccessoryView;
+@property (readwrite, weak) IBOutlet NSPopUpButton *playlistSaveAccessoryPopup;
+@property (readwrite, weak) IBOutlet NSTextField *playlistSaveAccessoryText;
+
 - (void)releaseRepresentedObjects:(NSMenu *)the_menu;
 
 - (void)setupMenus;

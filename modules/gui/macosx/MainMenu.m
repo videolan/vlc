@@ -1212,7 +1212,70 @@
 
 - (IBAction)savePlaylist:(id)sender
 {
-    [[[VLCMain sharedInstance] playlist] savePlaylist:sender];
+    playlist_t *p_playlist = pl_Get(VLCIntf);
+
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    NSString * name = [NSString stringWithFormat: @"%@", _NS("Untitled")];
+
+    [NSBundle loadNibNamed:@"PlaylistAccessoryView" owner:self];
+
+    [_playlistSaveAccessoryText setStringValue: _NS("File Format:")];
+    [[_playlistSaveAccessoryPopup itemAtIndex:0] setTitle: _NS("Extended M3U")];
+    [[_playlistSaveAccessoryPopup itemAtIndex:1] setTitle: _NS("XML Shareable Playlist Format (XSPF)")];
+    [[_playlistSaveAccessoryPopup itemAtIndex:2] setTitle: _NS("HTML playlist")];
+
+    [savePanel setTitle: _NS("Save Playlist")];
+    [savePanel setPrompt: _NS("Save")];
+    [savePanel setAccessoryView: _playlistSaveAccessoryView];
+    [savePanel setNameFieldStringValue: name];
+
+    if ([savePanel runModal] == NSFileHandlingPanelOKButton) {
+        NSString *filename = [[savePanel URL] path];
+
+        if ([_playlistSaveAccessoryPopup indexOfSelectedItem] == 0) {
+            NSString *actualFilename;
+            NSRange range;
+            range.location = [filename length] - [@".m3u" length];
+            range.length = [@".m3u" length];
+
+            if ([filename compare:@".m3u" options: NSCaseInsensitiveSearch range: range] != NSOrderedSame)
+                actualFilename = [NSString stringWithFormat: @"%@.m3u", filename];
+            else
+                actualFilename = filename;
+
+            playlist_Export(p_playlist,
+                            [actualFilename fileSystemRepresentation],
+                            p_playlist->p_local_category, "export-m3u");
+        } else if ([_playlistSaveAccessoryPopup indexOfSelectedItem] == 1) {
+            NSString *actualFilename;
+            NSRange range;
+            range.location = [filename length] - [@".xspf" length];
+            range.length = [@".xspf" length];
+
+            if ([filename compare:@".xspf" options: NSCaseInsensitiveSearch range: range] != NSOrderedSame)
+                actualFilename = [NSString stringWithFormat: @"%@.xspf", filename];
+            else
+                actualFilename = filename;
+
+            playlist_Export(p_playlist,
+                            [actualFilename fileSystemRepresentation],
+                            p_playlist->p_local_category, "export-xspf");
+        } else {
+            NSString *actualFilename;
+            NSRange range;
+            range.location = [filename length] - [@".html" length];
+            range.length = [@".html" length];
+
+            if ([filename compare:@".html" options: NSCaseInsensitiveSearch range: range] != NSOrderedSame)
+                actualFilename = [NSString stringWithFormat: @"%@.html", filename];
+            else
+                actualFilename = filename;
+
+            playlist_Export(p_playlist,
+                            [actualFilename fileSystemRepresentation],
+                            p_playlist->p_local_category, "export-html");
+        }
+    }
 }
 
 - (IBAction)revealItemInFinder:(id)sender

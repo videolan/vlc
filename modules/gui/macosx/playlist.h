@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2012 VLC authors and VideoLAN
+ * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -37,42 +37,27 @@
  * VLCPlaylist interface
  *****************************************************************************/
 @interface VLCPlaylist : NSObject<NSOutlineViewDataSource, NSOutlineViewDelegate>
-{
-    IBOutlet VLCPlaylistView* o_outline_view;
 
-    IBOutlet id o_controller;
+@property (readwrite, weak) IBOutlet NSMenu *playlistMenu;
+@property (readwrite, weak) IBOutlet NSMenuItem *playPlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *deletePlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *infoPlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *preparsePlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *revealInFinderPlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *downloadCoverArtPlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *selectAllPlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *sortNamePlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *sortAuthorPlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *recursiveExpandPlaylistMenuItem;
 
-    IBOutlet id o_btn_playlist;
-    IBOutlet id o_playlist_view;
-    IBOutlet id o_search_field;
-    IBOutlet id o_mi_save_playlist;
-    IBOutlet id o_ctx_menu;
-
-    IBOutlet id o_mi_play;
-    IBOutlet id o_mi_delete;
-    IBOutlet id o_mi_info;
-    IBOutlet id o_mi_preparse;
-    IBOutlet id o_mi_revealInFinder;
-    IBOutlet id o_mi_dl_cover_art;
-    IBOutlet id o_mi_selectall;
-    IBOutlet id o_mi_sort_name;
-    IBOutlet id o_mi_sort_author;
-    IBOutlet id o_mi_recursive_expand;
-
-    IBOutlet id o_save_accessory_view;
-    IBOutlet id o_save_accessory_popup;
-    IBOutlet id o_save_accessory_text;
-
-    IBOutlet id o_playlist_header;
-}
+@property (nonatomic, readwrite, weak) VLCPlaylistView *outlineView;
+@property (nonatomic, readwrite, weak) NSTableHeaderView *playlistHeaderView;
 
 - (PLModel *)model;
 
 - (void)reloadStyles;
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
-
-- (IBAction)searchItem:(id)sender;
 
 - (void)playlistUpdated;
 - (void)playbackModeUpdated;
@@ -91,7 +76,6 @@
 - (IBAction)revealItemInFinder:(id)sender;
 - (IBAction)preparseItem:(id)sender;
 - (IBAction)downloadCoverArt:(id)sender;
-- (IBAction)savePlaylist:(id)sender;
 - (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;
 - (IBAction)sortNodeByName:(id)sender;

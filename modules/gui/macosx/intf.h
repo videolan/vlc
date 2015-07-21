@@ -68,7 +68,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {
     IBOutlet VLCMainWindow *o_mainwindow;            /* VLCMainWindow */
-    IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
 }
 
 @property (readonly) VLCVoutWindowController* voutController;

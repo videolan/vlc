@@ -99,8 +99,6 @@ static VLCMainWindow *sharedInstance = nil;
                                               defer:flag];
     });
 
-    [[[VLCMain sharedInstance] playlist] updateTogglePlaylistState];
-
     return sharedInstance;
 }
 
@@ -171,6 +169,13 @@ static VLCMainWindow *sharedInstance = nil;
 
     [[o_search_fld cell] setPlaceholderString: _NS("Search")];
     [[o_search_fld cell] accessibilitySetOverrideValue:_NS("Enter a term to search the playlist. Results will be selected in the table.") forAttribute:NSAccessibilityDescriptionAttribute];
+    [o_search_fld setToolTip: _NS("Search in Playlist")];
+
+    VLCPlaylist *playlist = [[VLCMain sharedInstance] playlist];
+    playlist.outlineView = o_outline_view;
+    playlist.playlistHeaderView = [o_outline_view headerView];
+    [o_outline_view setDelegate:playlist];
+    [o_outline_view setDataSource:playlist];
 
     [o_dropzone_btn setTitle: _NS("Open media...")];
     [[o_dropzone_btn cell] accessibilitySetOverrideValue:_NS("Click to open an advanced dialog to select the media to play. You can also drop files here to play.") forAttribute:NSAccessibilityDescriptionAttribute];
@@ -971,6 +976,11 @@ static VLCMainWindow *sharedInstance = nil;
     [formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 
     return [NSString stringWithFormat:@" — %@",[formatter stringFromDate:date]];
+}
+
+- (IBAction)searchItem:(id)sender
+{
+    [[[[VLCMain sharedInstance] playlist] model] searchUpdate:[o_search_fld stringValue]];
 }
 
 #pragma mark -

@@ -53,6 +53,7 @@ typedef enum {
     IBOutlet id o_search_fld;
 
     IBOutlet id o_playlist_table;
+    IBOutlet id o_outline_view;
     IBOutlet id o_split_view;
     IBOutlet id o_left_split_view;
     IBOutlet id o_right_split_view;
@@ -96,6 +97,8 @@ typedef enum {
 - (IBAction)addPodcastWindowAction:(id)sender;
 - (IBAction)removePodcast:(id)sender;
 - (IBAction)removePodcastWindowAction:(id)sender;
+
+- (IBAction)searchItem:(id)sender;
 
 - (void)windowResizedOrMoved:(NSNotification *)notification;
 

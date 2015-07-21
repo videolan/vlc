@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
-* Copyright (C) 2002-2014 VLC authors and VideoLAN
+* Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -221,13 +221,13 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 + (void)initialize
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *o_columnArray = [[NSMutableArray alloc] init];
-    [o_columnArray addObject: [NSArray arrayWithObjects:TITLE_COLUMN, [NSNumber numberWithFloat:190.], nil]];
-    [o_columnArray addObject: [NSArray arrayWithObjects:ARTIST_COLUMN, [NSNumber numberWithFloat:95.], nil]];
-    [o_columnArray addObject: [NSArray arrayWithObjects:DURATION_COLUMN, [NSNumber numberWithFloat:95.], nil]];
+    NSMutableArray *columnArray = [[NSMutableArray alloc] init];
+    [columnArray addObject: [NSArray arrayWithObjects:TITLE_COLUMN, [NSNumber numberWithFloat:190.], nil]];
+    [columnArray addObject: [NSArray arrayWithObjects:ARTIST_COLUMN, [NSNumber numberWithFloat:95.], nil]];
+    [columnArray addObject: [NSArray arrayWithObjects:DURATION_COLUMN, [NSNumber numberWithFloat:95.], nil]];
 
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 [NSArray arrayWithArray:o_columnArray], @"PlaylistColumnSelection",
+                                 [NSArray arrayWithArray:columnArray], @"PlaylistColumnSelection",
                                  [NSArray array], @"recentlyPlayedMediaList",
                                  [NSDictionary dictionary], @"recentlyPlayedMedia", nil];
 
@@ -281,11 +281,11 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         rowHeight = 16.;
     }
 
-    NSArray *columns = [o_outline_view tableColumns];
+    NSArray *columns = [_outlineView tableColumns];
     NSUInteger count = columns.count;
     for (NSUInteger x = 0; x < count; x++)
         [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
-    [o_outline_view setRowHeight:rowHeight];
+    [_outlineView setRowHeight:rowHeight];
 }
 
 - (void)awakeFromNib
@@ -298,16 +298,16 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     [self reloadStyles];
     [self initStrings];
 
-    o_model = [[PLModel alloc] initWithOutlineView:o_outline_view playlist:p_playlist rootItem:p_playlist->p_playing playlistObject:self];
-    [o_outline_view setDataSource:o_model];
-    [o_outline_view reloadData];
+    o_model = [[PLModel alloc] initWithOutlineView:_outlineView playlist:p_playlist rootItem:p_playlist->p_playing playlistObject:self];
+    [_outlineView setDataSource:o_model];
+    [_outlineView reloadData];
 
-    [o_outline_view setTarget: self];
-    [o_outline_view setDoubleAction: @selector(playItem:)];
+    [_outlineView setTarget: self];
+    [_outlineView setDoubleAction: @selector(playItem:)];
 
-    [o_outline_view setAllowsEmptySelection: NO];
-    [o_outline_view registerForDraggedTypes: [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
-    [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
+    [_outlineView setAllowsEmptySelection: NO];
+    [_outlineView registerForDraggedTypes: [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
+    [_outlineView setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
     /* This uses a private API, but works fine on all current OSX releases.
      * Radar ID 11739459 request a public API for this. However, it is probably
@@ -317,29 +317,32 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
     o_tc_sortColumn = nil;
 
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
+
+    b_view_setup = YES;
+}
+
+- (void)setPlaylistHeaderView:(NSTableHeaderView * __nullable)playlistHeaderView
+{
+    VLCMainMenu *mainMenu = [[VLCMain sharedInstance] mainMenu];
+    _playlistHeaderView = playlistHeaderView;
+    NSMenu *contextMenu = [mainMenu setupPlaylistTableColumnsMenu];
+    [_playlistHeaderView setMenu: contextMenu];
+
     NSArray * o_columnArray = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PlaylistColumnSelection"];
     NSUInteger count = [o_columnArray count];
-
-    id o_menu = [[VLCMain sharedInstance] mainMenu];
     NSString * o_column;
-
-    NSMenu *o_context_menu = [o_menu setupPlaylistTableColumnsMenu];
-    [o_playlist_header setMenu: o_context_menu];
 
     for (NSUInteger i = 0; i < count; i++) {
         o_column = [[o_columnArray objectAtIndex:i] firstObject];
         if ([o_column isEqualToString:@"status"])
             continue;
 
-        if(![o_menu setPlaylistColumnTableState: NSOnState forColumn: o_column])
+        if(![mainMenu setPlaylistColumnTableState: NSOnState forColumn: o_column])
             continue;
 
-        [[o_outline_view tableColumnWithIdentifier: o_column] setWidth: [[[o_columnArray objectAtIndex:i] objectAtIndex:1] floatValue]];
+        [[_outlineView tableColumnWithIdentifier: o_column] setWidth: [[[o_columnArray objectAtIndex:i] objectAtIndex:1] floatValue]];
     }
-
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
-
-    b_view_setup = YES;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
@@ -350,23 +353,21 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
 - (void)initStrings
 {
-    [o_mi_play setTitle: _NS("Play")];
-    [o_mi_delete setTitle: _NS("Delete")];
-    [o_mi_recursive_expand setTitle: _NS("Expand Node")];
-    [o_mi_selectall setTitle: _NS("Select All")];
-    [o_mi_info setTitle: _NS("Media Information...")];
-    [o_mi_dl_cover_art setTitle: _NS("Download Cover Art")];
-    [o_mi_preparse setTitle: _NS("Fetch Meta Data")];
-    [o_mi_revealInFinder setTitle: _NS("Reveal in Finder")];
-    [o_mi_sort_name setTitle: _NS("Sort Node by Name")];
-    [o_mi_sort_author setTitle: _NS("Sort Node by Author")];
-
-    [o_search_field setToolTip: _NS("Search in Playlist")];
+    [_playPlaylistMenuItem setTitle: _NS("Play")];
+    [_deletePlaylistMenuItem setTitle: _NS("Delete")];
+    [_recursiveExpandPlaylistMenuItem setTitle: _NS("Expand Node")];
+    [_selectAllPlaylistMenuItem setTitle: _NS("Select All")];
+    [_infoPlaylistMenuItem setTitle: _NS("Media Information...")];
+    [_downloadCoverArtPlaylistMenuItem setTitle: _NS("Download Cover Art")];
+    [_preparsePlaylistMenuItem setTitle: _NS("Fetch Meta Data")];
+    [_revealInFinderPlaylistMenuItem setTitle: _NS("Reveal in Finder")];
+    [_sortNamePlaylistMenuItem setTitle: _NS("Sort Node by Name")];
+    [_sortAuthorPlaylistMenuItem setTitle: _NS("Sort Node by Author")];
 }
 
 - (void)playlistUpdated
 {
-    [o_outline_view reloadData];
+    [_outlineView reloadData];
 }
 
 - (void)plItemAppended:(NSArray *)o_val
@@ -439,7 +440,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
 //    // FIXME: unsafe
-//    playlist_item_t * p_item = [[o_outline_view itemAtRow:[o_outline_view selectedRow]] pointerValue];
+//    playlist_item_t * p_item = [[_outlineView itemAtRow:[_outlineView selectedRow]] pointerValue];
 //
 //    if (p_item) {
 //        /* update the state of our Reveal-in-Finder menu items */
@@ -470,7 +471,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
 - (BOOL)isSelectionEmpty
 {
-    return [o_outline_view selectedRow] == -1;
+    return [_outlineView selectedRow] == -1;
 }
 
 - (void)currentlyPlayingItemChanged
@@ -480,95 +481,27 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         return;
 
     // select item
-    NSInteger itemIndex = [o_outline_view rowForItem:item];
+    NSInteger itemIndex = [_outlineView rowForItem:item];
     if (itemIndex < 0) {
         // expand if needed
         while (item != nil) {
             PLItem *parent = [item parent];
 
-            if (![o_outline_view isExpandable: parent])
+            if (![_outlineView isExpandable: parent])
                 break;
-            if (![o_outline_view isItemExpanded: parent])
-                [o_outline_view expandItem: parent];
+            if (![_outlineView isItemExpanded: parent])
+                [_outlineView expandItem: parent];
             item = parent;
         }
 
         // search for row again
-        itemIndex = [o_outline_view rowForItem:item];
+        itemIndex = [_outlineView rowForItem:item];
         if (itemIndex < 0) {
             return;
         }
     }
 
-    [o_outline_view selectRowIndexes: [NSIndexSet indexSetWithIndex: itemIndex] byExtendingSelection: NO];
-}
-
-- (IBAction)savePlaylist:(id)sender
-{
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-
-    NSSavePanel *o_save_panel = [NSSavePanel savePanel];
-    NSString * o_name = [NSString stringWithFormat: @"%@", _NS("Untitled")];
-
-    [NSBundle loadNibNamed:@"PlaylistAccessoryView" owner:self];
-
-    [o_save_accessory_text setStringValue: _NS("File Format:")];
-    [[o_save_accessory_popup itemAtIndex:0] setTitle: _NS("Extended M3U")];
-    [[o_save_accessory_popup itemAtIndex:1] setTitle: _NS("XML Shareable Playlist Format (XSPF)")];
-    [[o_save_accessory_popup itemAtIndex:2] setTitle: _NS("HTML playlist")];
-
-    [o_save_panel setTitle: _NS("Save Playlist")];
-    [o_save_panel setPrompt: _NS("Save")];
-    [o_save_panel setAccessoryView: o_save_accessory_view];
-    [o_save_panel setNameFieldStringValue: o_name];
-
-    if ([o_save_panel runModal] == NSFileHandlingPanelOKButton) {
-        NSString *o_filename = [[o_save_panel URL] path];
-
-        if ([o_save_accessory_popup indexOfSelectedItem] == 0) {
-            NSString * o_real_filename;
-            NSRange range;
-            range.location = [o_filename length] - [@".m3u" length];
-            range.length = [@".m3u" length];
-
-            if ([o_filename compare:@".m3u" options: NSCaseInsensitiveSearch range: range] != NSOrderedSame)
-                o_real_filename = [NSString stringWithFormat: @"%@.m3u", o_filename];
-            else
-                o_real_filename = o_filename;
-
-            playlist_Export(p_playlist,
-                [o_real_filename fileSystemRepresentation],
-                p_playlist->p_local_category, "export-m3u");
-        } else if ([o_save_accessory_popup indexOfSelectedItem] == 1) {
-            NSString * o_real_filename;
-            NSRange range;
-            range.location = [o_filename length] - [@".xspf" length];
-            range.length = [@".xspf" length];
-
-            if ([o_filename compare:@".xspf" options: NSCaseInsensitiveSearch range: range] != NSOrderedSame)
-                o_real_filename = [NSString stringWithFormat: @"%@.xspf", o_filename];
-            else
-                o_real_filename = o_filename;
-
-            playlist_Export(p_playlist,
-                [o_real_filename fileSystemRepresentation],
-                p_playlist->p_local_category, "export-xspf");
-        } else {
-            NSString * o_real_filename;
-            NSRange range;
-            range.location = [o_filename length] - [@".html" length];
-            range.length = [@".html" length];
-
-            if ([o_filename compare:@".html" options: NSCaseInsensitiveSearch range: range] != NSOrderedSame)
-                o_real_filename = [NSString stringWithFormat: @"%@.html", o_filename];
-            else
-                o_real_filename = o_filename;
-
-            playlist_Export(p_playlist,
-                [o_real_filename fileSystemRepresentation],
-                p_playlist->p_local_category, "export-html");
-        }
-    }
+    [_outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: itemIndex] byExtendingSelection: NO];
 }
 
 /* When called retrieves the selected outlineview row and plays that node or item */
@@ -577,10 +510,10 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     playlist_t *p_playlist = pl_Get(VLCIntf);
 
     // ignore clicks on column header when handling double action
-    if (sender == o_outline_view && [o_outline_view clickedRow] == -1)
+    if (sender == _outlineView && [_outlineView clickedRow] == -1)
         return;
 
-    PLItem *o_item = [o_outline_view itemAtRow:[o_outline_view selectedRow]];
+    PLItem *o_item = [_outlineView itemAtRow:[_outlineView selectedRow]];
     if (!o_item)
         return;
 
@@ -596,10 +529,10 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
 - (IBAction)revealItemInFinder:(id)sender
 {
-    NSIndexSet *selectedRows = [o_outline_view selectedRowIndexes];
+    NSIndexSet *selectedRows = [_outlineView selectedRowIndexes];
     [selectedRows enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
 
-        PLItem *o_item = [o_outline_view itemAtRow:idx];
+        PLItem *o_item = [_outlineView itemAtRow:idx];
 
         /* perform some checks whether it is a file and if it is local at all... */
         char *psz_url = input_item_GetURI([o_item input]);
@@ -625,14 +558,14 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     playlist_t * p_playlist = pl_Get(p_intf);
     playlist_item_t *p_item = NULL;
 
-    o_selected_indexes = [o_outline_view selectedRowIndexes];
+    o_selected_indexes = [_outlineView selectedRowIndexes];
     i_count = [o_selected_indexes count];
 
     NSUInteger indexes[i_count];
     [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
     for (int i = 0; i < i_count; i++) {
-        PLItem *o_item = [o_outline_view itemAtRow:indexes[i]];
-        [o_outline_view deselectRow: indexes[i]];
+        PLItem *o_item = [_outlineView itemAtRow:indexes[i]];
+        [_outlineView deselectRow: indexes[i]];
 
         if (![o_item isLeaf]) {
             msg_Dbg(p_intf, "preparsing nodes not implemented");
@@ -653,13 +586,13 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     playlist_t * p_playlist = pl_Get(p_intf);
     playlist_item_t *p_item = NULL;
 
-    o_selected_indexes = [o_outline_view selectedRowIndexes];
+    o_selected_indexes = [_outlineView selectedRowIndexes];
     i_count = [o_selected_indexes count];
 
     NSUInteger indexes[i_count];
     [o_selected_indexes getIndexes:indexes maxCount:i_count inIndexRange:nil];
     for (int i = 0; i < i_count; i++) {
-        PLItem *o_item = [o_outline_view itemAtRow: indexes[i]];
+        PLItem *o_item = [_outlineView itemAtRow: indexes[i]];
 
         if (![o_item isLeaf])
             continue;
@@ -671,7 +604,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
 - (IBAction)selectAll:(id)sender
 {
-    [o_outline_view selectAll: nil];
+    [_outlineView selectAll: nil];
 }
 
 - (IBAction)showInfoPanel:(id)sender
@@ -682,7 +615,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 - (void)deletionCompleted
 {
     // retain selection before deletion
-    [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:retainedRowSelection] byExtendingSelection:NO];
+    [_outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:retainedRowSelection] byExtendingSelection:NO];
 }
 
 - (IBAction)deleteItem:(id)sender
@@ -693,13 +626,13 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     if (![[self model] editAllowed])
         return;
 
-    NSIndexSet *o_selected_indexes = [o_outline_view selectedRowIndexes];
+    NSIndexSet *o_selected_indexes = [_outlineView selectedRowIndexes];
     retainedRowSelection = [o_selected_indexes firstIndex];
     if (retainedRowSelection == NSNotFound)
         retainedRowSelection = 0;
 
     [o_selected_indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-        PLItem *o_item = [o_outline_view itemAtRow: idx];
+        PLItem *o_item = [_outlineView itemAtRow: idx];
         if (!o_item)
             return;
 
@@ -725,8 +658,8 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
     // TODO why do we need this kind of sort? It looks crap and confusing...
 
-//    if ([o_outline_view selectedRow] > -1) {
-//        p_item = [[o_outline_view itemAtRow: [o_outline_view selectedRow]] pointerValue];
+//    if ([_outlineView selectedRow] > -1) {
+//        p_item = [[_outlineView itemAtRow: [_outlineView selectedRow]] pointerValue];
 //        if (!p_item)
 //            return;
 //    } else
@@ -857,15 +790,9 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     PL_UNLOCK;
 }
 
-
-- (IBAction)searchItem:(id)sender
-{
-    [[self model] searchUpdate:[o_search_field stringValue]];
-}
-
 - (IBAction)recursiveExpandNode:(id)sender
 {
-    NSIndexSet * selectedRows = [o_outline_view selectedRowIndexes];
+    NSIndexSet * selectedRows = [_outlineView selectedRowIndexes];
     NSUInteger count = [selectedRows count];
     NSUInteger indexes[count];
     [selectedRows getIndexes:indexes maxCount:count inIndexRange:nil];
@@ -873,16 +800,16 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     id o_item;
     playlist_item_t *p_item;
     for (NSUInteger i = 0; i < count; i++) {
-        o_item = [o_outline_view itemAtRow: indexes[i]];
+        o_item = [_outlineView itemAtRow: indexes[i]];
 
         /* We need to collapse the node first, since OSX refuses to recursively
          expand an already expanded node, even if children nodes are collapsed. */
-        if ([o_outline_view isExpandable:o_item]) {
-            [o_outline_view collapseItem: o_item collapseChildren: YES];
-            [o_outline_view expandItem: o_item expandChildren: YES];
+        if ([_outlineView isExpandable:o_item]) {
+            [_outlineView collapseItem: o_item collapseChildren: YES];
+            [_outlineView expandItem: o_item expandChildren: YES];
         }
 
-        selectedRows = [o_outline_view selectedRowIndexes];
+        selectedRows = [_outlineView selectedRowIndexes];
         [selectedRows getIndexes:indexes maxCount:count inIndexRange:nil];
     }
 }
@@ -896,28 +823,28 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     bool b_rows;
     bool b_item_sel;
 
-    pt = [o_outline_view convertPoint: [o_event locationInWindow] fromView: nil];
-    int row = [o_outline_view rowAtPoint:pt];
-    if (row != -1 && ![[o_outline_view selectedRowIndexes] containsIndex: row])
-        [o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+    pt = [_outlineView convertPoint: [o_event locationInWindow] fromView: nil];
+    int row = [_outlineView rowAtPoint:pt];
+    if (row != -1 && ![[_outlineView selectedRowIndexes] containsIndex: row])
+        [_outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
-    b_item_sel = (row != -1 && [o_outline_view selectedRow] != -1);
-    b_rows = [o_outline_view numberOfRows] != 0;
+    b_item_sel = (row != -1 && [_outlineView selectedRow] != -1);
+    b_rows = [_outlineView numberOfRows] != 0;
 
     playlist_t *p_playlist = pl_Get(VLCIntf);
     bool b_del_allowed = [[self model] editAllowed];
 
-    [o_mi_play setEnabled: b_item_sel];
-    [o_mi_delete setEnabled: b_item_sel && b_del_allowed];
-    [o_mi_selectall setEnabled: b_rows];
-    [o_mi_info setEnabled: b_item_sel];
-    [o_mi_preparse setEnabled: b_item_sel];
-    [o_mi_recursive_expand setEnabled: b_item_sel];
-    [o_mi_sort_name setEnabled: b_item_sel];
-    [o_mi_sort_author setEnabled: b_item_sel];
-    [o_mi_dl_cover_art setEnabled: b_item_sel];
+    [_playPlaylistMenuItem setEnabled: b_item_sel];
+    [_deletePlaylistMenuItem setEnabled: b_item_sel && b_del_allowed];
+    [_selectAllPlaylistMenuItem setEnabled: b_rows];
+    [_infoPlaylistMenuItem setEnabled: b_item_sel];
+    [_preparsePlaylistMenuItem setEnabled: b_item_sel];
+    [_recursiveExpandPlaylistMenuItem setEnabled: b_item_sel];
+    [_sortNamePlaylistMenuItem setEnabled: b_item_sel];
+    [_sortAuthorPlaylistMenuItem setEnabled: b_item_sel];
+    [_downloadCoverArtPlaylistMenuItem setEnabled: b_item_sel];
 
-    return o_ctx_menu;
+    return _playlistMenu;
 }
 
 - (void)outlineView: (NSOutlineView *)o_tv didClickTableColumn:(NSTableColumn *)o_tc
@@ -944,21 +871,20 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 //    [self playlistUpdated];
 
     /* Clear indications of any existing column sorting */
-    NSUInteger count = [[o_outline_view tableColumns] count];
+    NSUInteger count = [[_outlineView tableColumns] count];
     for (NSUInteger i = 0 ; i < count ; i++)
-        [o_outline_view setIndicatorImage:nil inTableColumn: [[o_outline_view tableColumns] objectAtIndex:i]];
+        [_outlineView setIndicatorImage:nil inTableColumn: [[_outlineView tableColumns] objectAtIndex:i]];
 
-    [o_outline_view setHighlightedTableColumn:nil];
+    [_outlineView setHighlightedTableColumn:nil];
     o_tc_sortColumn = nil;
 
-
     o_tc_sortColumn = o_tc;
-    [o_outline_view setHighlightedTableColumn:o_tc];
+    [_outlineView setHighlightedTableColumn:o_tc];
 
     if (b_isSortDescending)
-        [o_outline_view setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
+        [_outlineView setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
     else
-        [o_outline_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
+        [_outlineView setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
 }
 
 
@@ -1026,20 +952,20 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
             [[o_work_tc headerCell] setStringValue: @"#"];
         }
 
-        [o_outline_view addTableColumn: o_work_tc];
-        [o_outline_view reloadData];
-        [o_outline_view setNeedsDisplay: YES];
+        [_outlineView addTableColumn: o_work_tc];
+        [_outlineView reloadData];
+        [_outlineView setNeedsDisplay: YES];
     }
     else
-        [o_outline_view removeTableColumn: [o_outline_view tableColumnWithIdentifier: o_column]];
+        [_outlineView removeTableColumn: [_outlineView tableColumnWithIdentifier: o_column]];
 
-    [o_outline_view setOutlineTableColumn: [o_outline_view tableColumnWithIdentifier:TITLE_COLUMN]];
+    [_outlineView setOutlineTableColumn: [_outlineView tableColumnWithIdentifier:TITLE_COLUMN]];
 }
 
 - (void)saveTableColumns
 {
     NSMutableArray * o_arrayToSave = [[NSMutableArray alloc] init];
-    NSArray * o_columns = [[NSArray alloc] initWithArray:[o_outline_view tableColumns]];
+    NSArray * o_columns = [[NSArray alloc] initWithArray:[_outlineView tableColumns]];
     NSUInteger count = [o_columns count];
     NSTableColumn * o_currentColumn;
     for (NSUInteger i = 0; i < count; i++) {
