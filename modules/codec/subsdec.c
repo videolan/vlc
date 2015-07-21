@@ -709,7 +709,7 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_
         return NULL;
     }
     strncpy( *psz_attribute_value, psz_subtitle - attr_len, attr_len );
-    *psz_attribute_value[attr_len] = 0;
+    (*psz_attribute_value)[attr_len] = 0;
     *ppsz_subtitle = psz_subtitle;
     return psz_attribute_name;
 }
