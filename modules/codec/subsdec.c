@@ -648,7 +648,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 static bool AppendCharacter( text_segment_t* p_segment, char c )
 {
     char* tmp;
-    if ( asprintf( &tmp, "%s%c", p_segment->psz_text, c ) < 0 )
+    if ( asprintf( &tmp, "%s%c", p_segment->psz_text ? p_segment->psz_text : "", c ) < 0 )
         return false;
     free( p_segment->psz_text );
     p_segment->psz_text = tmp;
@@ -671,7 +671,7 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_
         psz_subtitle++;
         attr_len++;
     }
-    if ( !*psz_subtitle )
+    if ( !*psz_subtitle || attr_len == 0 )
         return NULL;
     psz_attribute_name = malloc( attr_len + 1 );
     if ( unlikely( !psz_attribute_name ) )
@@ -682,13 +682,19 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_
     // Skip over to the attribute value
     while ( *psz_subtitle && *psz_subtitle != '=' )
         psz_subtitle++;
+    // Skip the '=' sign
+    psz_subtitle++;
 
     // Aknoledge the delimiter if any
     while ( *psz_subtitle && isspace( *psz_subtitle) )
         psz_subtitle++;
 
     if ( *psz_subtitle == '\'' || *psz_subtitle == '"' )
+    {
+        // Save the delimiter and skip it
         delimiter = *psz_subtitle;
+        psz_subtitle++;
+    }
     else
         delimiter = 0;
 
@@ -698,24 +704,42 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_
 
     attr_len = 0;
     while ( *psz_subtitle && ( ( delimiter != 0 && *psz_subtitle != delimiter ) ||
-                               ( delimiter == 0 && !isalpha( *psz_subtitle ) ) ) )
+                               ( delimiter == 0 && ( isalnum( *psz_subtitle ) || *psz_subtitle == '#' ) ) ) )
     {
         psz_subtitle++;
         attr_len++;
     }
-    if ( !*psz_subtitle || unlikely( !( *psz_attribute_value = malloc( attr_len + 1 ) ) ) )
+    if ( unlikely( !( *psz_attribute_value = malloc( attr_len + 1 ) ) ) )
     {
         free( psz_attribute_name );
         return NULL;
     }
     strncpy( *psz_attribute_value, psz_subtitle - attr_len, attr_len );
     (*psz_attribute_value)[attr_len] = 0;
+    // Finally, skip over the final delimiter
+    if (delimiter != 0 && *psz_subtitle)
+        psz_subtitle++;
     *ppsz_subtitle = psz_subtitle;
     return psz_attribute_name;
 }
 
 static int GetColor( const char* psz_color )
 {
+    if ( *psz_color == '#' )
+        return strtol( psz_color + 1, NULL, 16 );
+    // Check if the string can be converted as an hex number
+    bool ok = true;
+    for (int i = 0; psz_color[i]; ++i )
+    {
+        if ( !isxdigit( psz_color[i] ) )
+        {
+            ok = false;
+            break;
+        }
+    }
+    if ( ok )
+        return strtol( psz_color, NULL, 16 );
+
     for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
     {
         if( !strcasecmp( psz_color, p_html_colors[i].psz_name ) )
@@ -757,6 +781,8 @@ static text_style_t* DuplicateAndPushStyle(style_stack_t** pp_stack)
 static void PopStyle(style_stack_t** pp_stack)
 {
     style_stack_t* p_old = *pp_stack;
+    if ( !p_old )
+        return;
     *pp_stack = p_old->p_next;
     // Don't free the style, it is now owned by the text_segment_t
     free( p_old );
@@ -778,9 +804,9 @@ static text_segment_t* NewTextSegmentPopStyle( text_segment_t* p_segment, style_
     text_segment_t* p_new = text_segment_New( NULL );
     if ( unlikely( p_new == NULL ) )
         return NULL;
-    PopStyle( pp_stack );
     // We shouldn't have an empty stack since this happens when closing a tag,
     // but better be safe than sorry if (/when) we encounter a broken subtitle file.
+    PopStyle( pp_stack );
     text_style_t* p_dup = *pp_stack ? text_style_Duplicate( (*pp_stack)->p_style ) : text_style_New();
     p_new->style = p_dup;
     p_segment->p_next = p_new;
@@ -899,10 +925,13 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                 // Skip potential spaces & end tag
                 while ( *psz_subtitle && *psz_subtitle != '>' )
                     psz_subtitle++;
+                if ( *psz_subtitle == '>' )
+                    psz_subtitle++;
             }
             else if( !strncmp( psz_subtitle, "</", 2 ))
             {
                 size_t tag_length = 0;
+                psz_subtitle += 2;
                 const char* p_old_pos = psz_subtitle;
                 while ( *psz_subtitle && *psz_subtitle != '>' )
                 {
@@ -918,13 +947,16 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                     // A closing tag for one of the tags we handle, meaning
                     // we pushed a style onto the stack earlier
                     p_segment = NewTextSegmentPopStyle( p_segment, &p_stack );
+                    // Also skip the '>'
+                    psz_subtitle++;
                 }
                 else
                 {
-                    // Unknown closing tag, just append the '<', and go on.
+                    // Unknown closing tag, just append the "</", and go on.
                     // This will make the unknown tag appear as text
                     AppendCharacter( p_segment, '<' );
-                    psz_subtitle = p_old_pos + 1;
+                    AppendCharacter( p_segment, '/' );
+                    psz_subtitle = p_old_pos + 2;
                 }
             }
             else
