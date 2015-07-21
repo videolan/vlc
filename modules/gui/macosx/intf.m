@@ -67,12 +67,6 @@
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
 #endif
 
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-
-static VLCMain *sharedInstance = nil;
-
 #pragma mark -
 #pragma mark VLC Interface Object Callbacks
 
@@ -100,7 +94,6 @@ void CloseIntf (vlc_object_t *p_this)
     @autoreleasepool {
         msg_Dbg(p_this, "Closing macosx interface");
         [[VLCMain sharedInstance] applicationWillTerminate:nil];
-        sharedInstance = nil;
     }
 }
 
@@ -178,6 +171,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 + (VLCMain *)sharedInstance
 {
+    static VLCMain *sharedInstance = nil;
     static dispatch_once_t pred;
 
     dispatch_once(&pred, ^{
@@ -191,36 +185,25 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 {
     self = [super init];
 
-    p_intf = NULL;
+    if (self) {
+        p_intf = NULL;
 
-    [VLCApplication sharedApplication].delegate = self;
+        [VLCApplication sharedApplication].delegate = self;
 
-    /* announce our launch to a potential eyetv plugin */
-    [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"VLCOSXGUIInit"
-                                                                   object: @"VLCEyeTVSupport"
-                                                                 userInfo: NULL
-                                                       deliverImmediately: YES];
+        /* announce our launch to a potential eyetv plugin */
+        [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"VLCOSXGUIInit"
+                                                                       object: @"VLCEyeTVSupport"
+                                                                     userInfo: NULL
+                                                           deliverImmediately: YES];
 
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"NO" forKey:@"LiveUpdateTheMessagesPanel"];
-    [defaults registerDefaults:appDefaults];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"NO" forKey:@"LiveUpdateTheMessagesPanel"];
+        [defaults registerDefaults:appDefaults];
 
-    _voutController = [[VLCVoutWindowController alloc] init];
+        _voutController = [[VLCVoutWindowController alloc] init];
+    }
 
     return self;
-}
-
-- (void)dealloc
-{
-    _mainmenu = nil;
-    _prefs = nil;
-    _sprefs = nil;
-    _open = nil;
-    _coredialogs = nil;
-    _bookmarks = nil;
-    _coreinteraction = nil;
-    _resume_dialog = nil;
-    _input_manager = nil;
 }
 
 - (void)setIntf: (intf_thread_t *)p_mainintf
