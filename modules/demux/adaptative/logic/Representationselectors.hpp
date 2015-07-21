@@ -20,15 +20,15 @@
 #ifndef REPRESENTATIONSELECTORS_HPP
 #define REPRESENTATIONSELECTORS_HPP
 
-#include "../Streams.hpp"
 #include <vector>
+#include <vlc_common.h>
 
 namespace adaptative
 {
     namespace playlist
     {
         class BaseRepresentation;
-        class BasePeriod;
+        class BaseAdaptationSet;
     }
 
     namespace logic
@@ -40,9 +40,9 @@ namespace adaptative
         public:
             RepresentationSelector();
             virtual ~RepresentationSelector() {}
-            virtual BaseRepresentation * select(BasePeriod *period, StreamType) const;
-            virtual BaseRepresentation * select(BasePeriod *period, StreamType, uint64_t bitrate) const;
-            virtual BaseRepresentation * select(BasePeriod *period, StreamType, uint64_t bitrate,
+            virtual BaseRepresentation * select(BaseAdaptationSet *) const;
+            virtual BaseRepresentation * select(BaseAdaptationSet *, uint64_t bitrate) const;
+            virtual BaseRepresentation * select(BaseAdaptationSet *, uint64_t bitrate,
                                             int width, int height) const;
         protected:
             virtual BaseRepresentation * select(std::vector<BaseRepresentation *>&reps,

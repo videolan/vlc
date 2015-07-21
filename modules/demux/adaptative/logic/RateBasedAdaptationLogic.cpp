@@ -47,16 +47,16 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (int w, int h) :
     stabilizer = 16;
 }
 
-BaseRepresentation *RateBasedAdaptationLogic::getCurrentRepresentation(adaptative::StreamType type, BasePeriod *period) const
+BaseRepresentation *RateBasedAdaptationLogic::getCurrentRepresentation(BaseAdaptationSet *adaptSet) const
 {
-    if(period == NULL)
+    if(adaptSet == NULL)
         return NULL;
 
     RepresentationSelector selector;
-    BaseRepresentation *rep = selector.select(period, type, currentBps, width, height);
+    BaseRepresentation *rep = selector.select(adaptSet, currentBps, width, height);
     if ( rep == NULL )
     {
-        rep = selector.select(period, type);
+        rep = selector.select(adaptSet);
         if ( rep == NULL )
             return NULL;
     }
@@ -98,16 +98,16 @@ FixedRateAdaptationLogic::FixedRateAdaptationLogic(size_t bps) :
     currentBps = bps;
 }
 
-BaseRepresentation *FixedRateAdaptationLogic::getCurrentRepresentation(adaptative::StreamType type, BasePeriod *period) const
+BaseRepresentation *FixedRateAdaptationLogic::getCurrentRepresentation(BaseAdaptationSet *adaptSet) const
 {
-    if(period == NULL)
+    if(adaptSet == NULL)
         return NULL;
 
     RepresentationSelector selector;
-    BaseRepresentation *rep = selector.select(period, type, currentBps);
+    BaseRepresentation *rep = selector.select(adaptSet, currentBps);
     if ( rep == NULL )
     {
-        rep = selector.select(period, type);
+        rep = selector.select(adaptSet);
         if ( rep == NULL )
             return NULL;
     }

@@ -36,8 +36,8 @@ AlwaysBestAdaptationLogic::AlwaysBestAdaptationLogic    () :
 {
 }
 
-BaseRepresentation *AlwaysBestAdaptationLogic::getCurrentRepresentation(adaptative::StreamType type, BasePeriod *period) const
+BaseRepresentation *AlwaysBestAdaptationLogic::getCurrentRepresentation(BaseAdaptationSet *adaptSet) const
 {
     RepresentationSelector selector;
-    return selector.select(period, type);
+    return selector.select(adaptSet);
 }

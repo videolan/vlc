@@ -61,7 +61,7 @@ namespace adaptative
     class Stream
     {
     public:
-        Stream(demux_t *, const StreamType, const StreamFormat &);
+        Stream(demux_t *, const StreamFormat &);
         ~Stream();
         bool operator==(const Stream &) const;
         static StreamType mimeToType(const std::string &mime);
@@ -75,6 +75,8 @@ namespace adaptative
         int esCount() const;
         bool seekAble() const;
         bool isSelected() const;
+        bool reactivate(mtime_t);
+        bool isDisabled() const;
         typedef enum {status_eof, status_buffering, status_demuxed} status;
         status demux(HTTPConnectionManager *, mtime_t, bool);
         bool setPosition(mtime_t, bool);
@@ -91,6 +93,7 @@ namespace adaptative
         AbstractAdaptationLogic *adaptationLogic;
         SegmentTracker *segmentTracker;
         SegmentChunk *currentChunk;
+        bool disabled;
         bool eof;
 
         const AbstractStreamOutputFactory *streamOutputFactory;

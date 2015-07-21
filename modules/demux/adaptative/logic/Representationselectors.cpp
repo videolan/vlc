@@ -29,57 +29,47 @@ RepresentationSelector::RepresentationSelector()
 {
 }
 
-BaseRepresentation * RepresentationSelector::select(BasePeriod *period, adaptative::StreamType type) const
+BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet) const
 {
-    return select(period, type, std::numeric_limits<uint64_t>::max());
+    return select(adaptSet, std::numeric_limits<uint64_t>::max());
 }
-BaseRepresentation * RepresentationSelector::select(BasePeriod *period, adaptative::StreamType type, uint64_t bitrate) const
+BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet, uint64_t bitrate) const
 {
-    if (period == NULL)
+    if (adaptSet == NULL)
         return NULL;
 
-    std::vector<BaseAdaptationSet *> adaptSets = period->getAdaptationSets(type);
     BaseRepresentation *best = NULL;
-
-    std::vector<BaseAdaptationSet *>::const_iterator adaptIt;
-    for(adaptIt=adaptSets.begin(); adaptIt!=adaptSets.end(); ++adaptIt)
+    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
+    BaseRepresentation *candidate = select(reps, (best)?best->getBandwidth():0, bitrate);
+    if (candidate)
     {
-        std::vector<BaseRepresentation *> reps = (*adaptIt)->getRepresentations();
-        BaseRepresentation *candidate = select(reps, (best)?best->getBandwidth():0, bitrate);
-        if (candidate)
-        {
-            if (candidate->getBandwidth() > bitrate) /* none matched, returned lowest */
-                return candidate;
-            best = candidate;
-        }
+        if (candidate->getBandwidth() > bitrate) /* none matched, returned lowest */
+            return candidate;
+        best = candidate;
     }
+
     return best;
 }
 
-BaseRepresentation * RepresentationSelector::select(BasePeriod *period, adaptative::StreamType type, uint64_t bitrate,
+BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet, uint64_t bitrate,
                                                 int width, int height) const
 {
-    if(period == NULL)
+    if(adaptSet == NULL)
         return NULL;
 
     std::vector<BaseRepresentation *> resMatchReps;
 
     /* subset matching WxH */
-    std::vector<BaseAdaptationSet *> adaptSets = period->getAdaptationSets(type);
-    std::vector<BaseAdaptationSet *>::const_iterator adaptIt;
-    for(adaptIt=adaptSets.begin(); adaptIt!=adaptSets.end(); ++adaptIt)
+    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
+    std::vector<BaseRepresentation *>::const_iterator repIt;
+    for(repIt=reps.begin(); repIt!=reps.end(); ++repIt)
     {
-        std::vector<BaseRepresentation *> reps = (*adaptIt)->getRepresentations();
-        std::vector<BaseRepresentation *>::const_iterator repIt;
-        for(repIt=reps.begin(); repIt!=reps.end(); ++repIt)
-        {
-            if((*repIt)->getWidth() == width && (*repIt)->getHeight() == height)
-                resMatchReps.push_back(*repIt);
-        }
+        if((*repIt)->getWidth() == width && (*repIt)->getHeight() == height)
+            resMatchReps.push_back(*repIt);
     }
 
     if(resMatchReps.empty())
-        return select(period, type, bitrate);
+        return select(adaptSet, bitrate);
     else
         return select(resMatchReps, 0, bitrate);
 }

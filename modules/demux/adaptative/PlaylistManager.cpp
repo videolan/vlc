@@ -51,31 +51,37 @@ PlaylistManager::PlaylistManager( AbstractPlaylist *pl,
              stream         ( stream ),
              nextPlaylistupdate  ( 0 )
 {
+    currentPeriod = playlist->getFirstPeriod();
 }
 
 PlaylistManager::~PlaylistManager   ()
 {
     delete conManager;
     delete streamOutputFactory;
+    unsetPeriod();
+}
+
+void PlaylistManager::unsetPeriod()
+{
     std::vector<Stream *>::iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
         delete *it;
     streams.clear();
 }
 
-bool PlaylistManager::start(demux_t *demux)
+bool PlaylistManager::setupPeriod()
 {
-    const BasePeriod *period = playlist->getFirstPeriod();
-    if(!period)
+    if(!currentPeriod)
         return false;
 
-    for(int i=0; i<StreamTypeCount; i++)
+    std::vector<BaseAdaptationSet*> sets = currentPeriod->getAdaptationSets();
+    std::vector<BaseAdaptationSet*>::iterator it;
+    for(it=sets.begin();it!=sets.end();++it)
     {
-        StreamType type = static_cast<StreamType>(i);
-        const BaseAdaptationSet *set = period->getAdaptationSet(type);
+        BaseAdaptationSet *set = *it;
         if(set)
         {
-            Stream *st = new (std::nothrow) Stream(demux, type, set->getStreamFormat());
+            Stream *st = new (std::nothrow) Stream(p_demux, set->getStreamFormat());
             if(!st)
                 continue;
             AbstractAdaptationLogic *logic = createLogic(logicType);
@@ -85,7 +91,7 @@ bool PlaylistManager::start(demux_t *demux)
                 continue;
             }
 
-            SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, playlist);
+            SegmentTracker *tracker = new (std::nothrow) SegmentTracker(logic, set);
             try
             {
                 if(!tracker || !streamOutputFactory)
@@ -101,6 +107,15 @@ bool PlaylistManager::start(demux_t *demux)
             }
         }
     }
+    return true;
+}
+
+bool PlaylistManager::start(demux_t *demux_)
+{
+    p_demux = demux_;
+
+    if(!setupPeriod())
+        return false;
 
     conManager = new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(stream));
     if(!conManager)
@@ -119,7 +134,17 @@ Stream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
     std::vector<Stream *>::iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
-        Stream::status i_ret = (*it)->demux(conManager, nzdeadline, send);
+        Stream *st = *it;
+
+        if (st->isDisabled())
+        {
+            if(st->isSelected() && !st->isEOF())
+                st->reactivate(getPCR());
+            else
+                continue;
+        }
+
+        Stream::status i_ret = st->demux(conManager, nzdeadline, send);
 
         if(i_ret == Stream::status_buffering)
         {
@@ -141,6 +166,8 @@ mtime_t PlaylistManager::getPCR() const
     std::vector<Stream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
+        if ((*it)->isDisabled())
+            continue;
         if(pcr == VLC_TS_INVALID || pcr > (*it)->getPCR())
             pcr = (*it)->getPCR();
     }
@@ -153,6 +180,8 @@ mtime_t PlaylistManager::getFirstDTS() const
     std::vector<Stream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
+        if ((*it)->isDisabled())
+            continue;
         if(dts == VLC_TS_INVALID || dts > (*it)->getFirstDTS())
             dts = (*it)->getFirstDTS();
     }

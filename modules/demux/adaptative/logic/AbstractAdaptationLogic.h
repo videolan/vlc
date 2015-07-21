@@ -26,14 +26,13 @@
 #define ABSTRACTADAPTATIONLOGIC_H_
 
 #include "IDownloadRateObserver.h"
-#include "../StreamsType.hpp"
 
 namespace adaptative
 {
     namespace playlist
     {
         class BaseRepresentation;
-        class BasePeriod;
+        class BaseAdaptationSet;
     }
 
     namespace logic
@@ -46,7 +45,7 @@ namespace adaptative
                 AbstractAdaptationLogic             ();
                 virtual ~AbstractAdaptationLogic    ();
 
-                virtual BaseRepresentation* getCurrentRepresentation(StreamType, BasePeriod *) const = 0;
+                virtual BaseRepresentation* getCurrentRepresentation(BaseAdaptationSet *) const = 0;
                 virtual void                updateDownloadRate     (size_t, mtime_t);
 
                 enum LogicType

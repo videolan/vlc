@@ -36,8 +36,7 @@ namespace adaptative
 
     namespace playlist
     {
-        class AbstractPlaylist;
-        class BasePeriod;
+        class BaseAdaptationSet;
         class BaseRepresentation;
         class SegmentChunk;
     }
@@ -48,12 +47,12 @@ namespace adaptative
     class SegmentTracker
     {
         public:
-            SegmentTracker(AbstractAdaptationLogic *, AbstractPlaylist *);
+            SegmentTracker(AbstractAdaptationLogic *, BaseAdaptationSet *);
             ~SegmentTracker();
 
             void setAdaptationLogic(AbstractAdaptationLogic *);
             void resetCounter();
-            SegmentChunk* getNextChunk(StreamType, bool);
+            SegmentChunk* getNextChunk(bool);
             bool setPosition(mtime_t, bool, bool);
             mtime_t getSegmentStart() const;
             void pruneFromCurrent();
@@ -63,8 +62,7 @@ namespace adaptative
             bool indexed;
             uint64_t count;
             AbstractAdaptationLogic *logic;
-            AbstractPlaylist *playlist;
-            BasePeriod *currentPeriod;
+            BaseAdaptationSet *adaptationSet;
             BaseRepresentation *prevRepresentation;
     };
 }

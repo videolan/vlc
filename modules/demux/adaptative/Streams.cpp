@@ -31,15 +31,16 @@ using namespace adaptative;
 using namespace adaptative::http;
 using namespace adaptative::logic;
 
-Stream::Stream(demux_t * demux_,const StreamType type_, const StreamFormat &format_)
+Stream::Stream(demux_t * demux_, const StreamFormat &format_)
 {
     p_demux = demux_;
-    type = type_;
+    type = StreamType::UNKNOWN;
     format = format_;
     output = NULL;
     adaptationLogic = NULL;
     currentChunk = NULL;
     eof = false;
+    disabled = false;
     segmentTracker = NULL;
     streamOutputFactory = NULL;
 }
@@ -129,7 +130,12 @@ SegmentChunk * Stream::getChunk()
 {
     if (currentChunk == NULL && output)
     {
-        currentChunk = segmentTracker->getNextChunk(type, output->switchAllowed());
+        if(esCount() && !isSelected())
+        {
+            disabled = true;
+            return NULL;
+        }
+        currentChunk = segmentTracker->getNextChunk(output->switchAllowed());
         if (currentChunk == NULL)
             eof = true;
     }
@@ -144,6 +150,25 @@ bool Stream::seekAble() const
 bool Stream::isSelected() const
 {
     return output && output->isSelected();
+}
+
+bool Stream::reactivate(mtime_t basetime)
+{
+    if(setPosition(basetime, false))
+    {
+        disabled = false;
+        return true;
+    }
+    else
+    {
+        eof = true; /* can't reactivate */
+        return false;
+    }
+}
+
+bool Stream::isDisabled() const
+{
+    return disabled;
 }
 
 Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_deadline, bool send)

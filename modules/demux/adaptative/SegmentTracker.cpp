@@ -20,6 +20,7 @@
 #include "SegmentTracker.hpp"
 #include "playlist/AbstractPlaylist.hpp"
 #include "playlist/BaseRepresentation.h"
+#include "playlist/BaseAdaptationSet.h"
 #include "playlist/Segment.h"
 #include "logic/AbstractAdaptationLogic.h"
 
@@ -27,15 +28,14 @@ using namespace adaptative;
 using namespace adaptative::logic;
 using namespace adaptative::playlist;
 
-SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, AbstractPlaylist *playlist_)
+SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
 {
     count = 0;
     initializing = true;
     indexed = false;
     prevRepresentation = NULL;
     setAdaptationLogic(logic_);
-    playlist = playlist_;
-    currentPeriod = playlist->getFirstPeriod();
+    adaptationSet = adaptSet;
 }
 
 SegmentTracker::~SegmentTracker()
@@ -54,19 +54,19 @@ void SegmentTracker::resetCounter()
     prevRepresentation = NULL;
 }
 
-SegmentChunk * SegmentTracker::getNextChunk(StreamType type, bool switch_allowed)
+SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
 {
     BaseRepresentation *rep;
     ISegment *segment;
 
-    if(!currentPeriod)
+    if(!adaptationSet)
         return NULL;
 
     if( !switch_allowed ||
        (prevRepresentation && prevRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE) )
         rep = prevRepresentation;
     else
-        rep = logic->getCurrentRepresentation(type, currentPeriod);
+        rep = logic->getCurrentRepresentation(adaptationSet);
 
     if ( rep == NULL )
             return NULL;
@@ -96,9 +96,8 @@ SegmentChunk * SegmentTracker::getNextChunk(StreamType type, bool switch_allowed
     segment = rep->getSegment(BaseRepresentation::INFOTYPE_MEDIA, count);
     if(!segment)
     {
-        currentPeriod = playlist->getNextPeriod(currentPeriod);
         resetCounter();
-        return getNextChunk(type, switch_allowed);
+        return NULL;
     }
 
     SegmentChunk *chunk = segment->toChunk(count, rep);
@@ -135,6 +134,7 @@ mtime_t SegmentTracker::getSegmentStart() const
 
 void SegmentTracker::pruneFromCurrent()
 {
+    AbstractPlaylist *playlist = adaptationSet->getPlaylist();
     if(playlist->isLive())
         playlist->pruneBySegmentNumber(count);
 }

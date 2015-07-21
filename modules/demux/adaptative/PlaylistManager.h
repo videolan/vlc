@@ -31,6 +31,7 @@ namespace adaptative
     namespace playlist
     {
         class AbstractPlaylist;
+        class BasePeriod;
     }
 
     namespace http
@@ -67,6 +68,8 @@ namespace adaptative
             virtual bool updatePlaylist();
 
         protected:
+            bool setupPeriod();
+            void unsetPeriod();
             /* local factories */
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType);
 
@@ -75,8 +78,10 @@ namespace adaptative
             AbstractPlaylist                    *playlist;
             AbstractStreamOutputFactory         *streamOutputFactory;
             stream_t                            *stream;
+            demux_t                             *p_demux;
             std::vector<Stream *>                streams;
             mtime_t                              nextPlaylistupdate;
+            BasePeriod                          *currentPeriod;
     };
 
 }
