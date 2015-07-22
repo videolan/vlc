@@ -28,6 +28,7 @@
 #include <assert.h>
 
 #include "access.h"
+#include "input_internal.h"
 #include <libvlc.h>
 #include <vlc_url.h>
 #include <vlc_modules.h>
@@ -119,6 +120,26 @@ void access_Delete( access_t *p_access )
     vlc_object_release( p_access );
 }
 
+access_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
+{
+    char *buf = strdup(mrl);
+    if (unlikely(buf == NULL))
+        return NULL;
+
+    const char *access, *demux, *location, *anchor;
+    input_SplitMRL(&access, &demux, &location, &anchor, buf);
+
+    /* Both demux and anchor are ignored, since they are of no use here. */
+    access_t *obj = access_New(parent, NULL, access, "", location);
+
+    free(buf);
+    return obj;
+}
+
+void vlc_access_Delete(access_t *access)
+{
+    access_Delete(access);
+}
 
 /*****************************************************************************
  * access_GetParentInput:

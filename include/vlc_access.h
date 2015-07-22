@@ -124,6 +124,103 @@ struct access_t
     input_thread_t *p_input;
 };
 
+/**
+ * Opens a new read-only byte stream.
+ *
+ * This function might block.
+ * The initial offset is of course always zero.
+ *
+ * \param obj parent VLC object
+ * \param mrl media resource location to read
+ * \return a new access object on success, NULL on failure
+ */
+VLC_API access_t *vlc_access_NewMRL(vlc_object_t *obj, const char *mrl);
+
+/**
+ * Closes a byte stream.
+ * \param access byte stream to close
+ */
+VLC_API void vlc_access_Delete(access_t *access);
+
+/**
+ * Sets the read byte offset.
+ */
+static inline int vlc_access_Seek(access_t *access, uint64_t offset)
+{
+    if (access->pf_seek == NULL)
+        return VLC_EGENERIC;
+    return access->pf_seek(access, offset);
+}
+
+/**
+ * Gets the read byte offset.
+ */
+static inline uint64_t vlc_access_Tell(const access_t *access)
+{
+    return access->info.i_pos;
+}
+
+/**
+ * Checks if end-of-stream is reached.
+ */
+static inline bool vlc_access_Eof(const access_t *access)
+{
+    return access->info.b_eof;
+}
+
+/**
+ * Reads a byte stream.
+ *
+ * This function waits for some data to be available (if necessary) and returns
+ * available data (up to the requested size). Not all byte streams support
+ * this. Some streams must be read with vlc_access_Block() instead.
+ *
+ * \note
+ * A short read does <b>not</b> imply the end of the stream. It merely implies
+ * that enough data is not immediately available.
+ * To detect the end of the stream, either check if the function returns zero,
+ * or call vlc_access_Eof().
+ *
+ * \note
+ * The function may return a negative value spuriously. Negative error values
+ * should be ignored; they do not necessarily indicate a fatal error.
+ *
+ * \param buf buffer to read data into
+ * \param len size of the buffer in bytes
+ * \return the number of bytes read (possibly less than requested),
+ *         zero at end-of-stream, or -1 on <b>transient</b> errors
+  */
+static inline ssize_t vlc_access_Read(access_t *access, void *buf, size_t len)
+{
+    if (access->pf_read == NULL)
+        return -1;
+    return access->pf_read(access, (unsigned char *)buf, len);
+}
+
+/**
+ * Dequeues one block of data.
+ *
+ * This function waits for a block of data to be available (if necessary) and
+ * returns a reference to it. Not all byte streams support this. Some streams
+ * must be read with vlc_access_Read() instead.
+ *
+ * \note
+ * The returned block may be of any size. The size is dependent on the
+ * underlying implementation of the byte stream.
+ *
+ * \note
+ * The function may return NULL spuriously. A NULL return is not indicative of
+ * a fatal error.
+ *
+ * \return a data block (free with block_Release()) or NULL
+ */
+static inline block_t *vlc_access_Block(access_t *access)
+{
+    if (access->pf_block == NULL)
+        return NULL;
+    return access->pf_block(access);
+}
+
 static inline int access_vaControl( access_t *p_access, int i_query, va_list args )
 {
     if( !p_access ) return VLC_EGENERIC;
