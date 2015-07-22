@@ -322,7 +322,6 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
     char         *psz_fontname;
     int           i_font_size;
     int           i_spacing = 0;
-    int           i_font_alpha;
     uint32_t      i_font_color;
     bool          b_bold, b_uline, b_italic, b_halfwidth;
     vlc_value_t val;
@@ -489,7 +488,8 @@ static int HandleFontAttributes(xml_reader_t *p_xml_reader,
                                 &psz_fontname,
                                 &i_font_size,
                                 &i_font_color)) {
-        psz_fontname = strdup(psz_fontname);
+        if (psz_fontname)
+            psz_fontname = strdup(psz_fontname);
         i_font_size = i_font_size;
     }
     i_font_alpha = (i_font_color >> 24) & 0xff;
@@ -498,7 +498,8 @@ static int HandleFontAttributes(xml_reader_t *p_xml_reader,
     while ((attr = xml_ReaderNextAttr(p_xml_reader, &value))) {
         if (!strcasecmp("face", attr)) {
             free(psz_fontname);
-            psz_fontname = strdup(value);
+            if (value)
+                psz_fontname = strdup(value);
         } else if (!strcasecmp("size", attr)) {
             if ((*value == '+') || (*value == '-')) {
                 int i_value = atoi(value);
@@ -744,6 +745,8 @@ static int ProcessNodes(filter_t *p_filter,
                 int           len;
 
                 // Turn any multiple-whitespaces into single spaces
+                if (!node)
+                    break;
                 char *dup = strdup(node);
                 if (!dup)
                     break;
@@ -883,7 +886,7 @@ static CGContextRef CreateOffScreenContext(int i_width, int i_height,
                                 *pp_colorSpace, kCGImageAlphaPremultipliedFirst);
 
         if (p_context) {
-            if (CGContextSetAllowsAntialiasing != NULL)
+            if (&CGContextSetAllowsAntialiasing != NULL)
                 CGContextSetAllowsAntialiasing(p_context, true);
         }
         *pp_memory = p_bitmap;
