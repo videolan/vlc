@@ -35,6 +35,7 @@
 #include <vlc_stream.h>
 #include <cstdio>
 #include <sstream>
+#include <map>
 
 using namespace adaptative;
 using namespace adaptative::playlist;
@@ -78,12 +79,21 @@ void Parser::parseAdaptationSet(BasePeriod *period, const AttributesTag *)
     }
 }
 
-void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * streaminftag)
+void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag)
 {
-    if(!streaminftag->getAttributeByName("URI"))
+    if(!tag->getAttributeByName("URI"))
         return;
 
-    Url url = Url(streaminftag->getAttributeByName("URI")->value);
+    Url url;
+    if(tag->getType() == AttributesTag::EXTXMEDIA)
+    {
+        url = Url(tag->getAttributeByName("URI")->quotedString());
+    }
+    else
+    {
+        url = Url(tag->getAttributeByName("URI")->value);
+    }
+
     if(!url.hasScheme())
         url = url.prepend(adaptSet->getUrlSegment());
 
@@ -97,28 +107,37 @@ void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTa
             std::list<Tag *> tagslist = parseEntries(substream);
             stream_Delete(substream);
 
-            parseRepresentation(adaptSet, streaminftag, tagslist);
+            parseRepresentation(adaptSet, tag, tagslist);
 
             releaseTagsList(tagslist);
         }
     }
 }
 
-void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * streaminftag,
+void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag,
                                  const std::list<Tag *> &tagslist)
 {
-    const Attribute *uriAttr = streaminftag->getAttributeByName("URI");
-    const Attribute *bwAttr = streaminftag->getAttributeByName("BANDWIDTH");
-    const Attribute *codecsAttr = streaminftag->getAttributeByName("CODECS");
+    const Attribute *uriAttr = tag->getAttributeByName("URI");
+    const Attribute *bwAttr = tag->getAttributeByName("BANDWIDTH");
+    const Attribute *codecsAttr = tag->getAttributeByName("CODECS");
 
     Representation *rep = new (std::nothrow) Representation(adaptSet);
     if(rep)
     {
         if(uriAttr)
         {
-            size_t pos = uriAttr->value.find_last_of('/');
+            std::string uri;
+            if(tag->getType() == AttributesTag::EXTXMEDIA)
+            {
+                uri = uriAttr->quotedString();
+            }
+            else
+            {
+                uri = uriAttr->value;
+            }
+            size_t pos = uri.find_last_of('/');
             if(pos != std::string::npos)
-                rep->baseUrl.Set(new Url(uriAttr->value.substr(0, pos+1)));
+                rep->baseUrl.Set(new Url(uri.substr(0, pos+1)));
         }
 
         if(bwAttr)
@@ -287,15 +306,61 @@ M3U8 * Parser::parse(const std::string &playlisturl)
     bool b_masterplaylist = !getTagsFromList(tagslist, AttributesTag::EXTXSTREAMINF).empty();
     if(b_masterplaylist)
     {
+        std::list<Tag *>::const_iterator it;
+        std::map<std::string, AttributesTag *> groupsmap;
+
+        /* We'll need to create an adaptation set for each media group / alternative rendering
+         * we create a list of playlist being and alternative/group */
+        std::list<Tag *> mediainfotags = getTagsFromList(tagslist, AttributesTag::EXTXMEDIA);
+        for(it = mediainfotags.begin(); it != mediainfotags.end(); ++it)
+        {
+            AttributesTag *tag = dynamic_cast<AttributesTag *>(*it);
+            if(tag && tag->getAttributeByName("URI"))
+            {
+                std::pair<std::string, AttributesTag *> pair(tag->getAttributeByName("URI")->quotedString(), tag);
+                groupsmap.insert(pair);
+            }
+        }
+
+        /* Then we parse all playlists uri and add them, except when alternative */
         BaseAdaptationSet *adaptSet = new (std::nothrow) BaseAdaptationSet(period);
         if(adaptSet)
         {
-            std::list<Tag *> mediainfotags = getTagsFromList(tagslist, AttributesTag::EXTXSTREAMINF);
-            std::list<Tag *>::const_iterator it;
-            for(it = mediainfotags.begin(); it != mediainfotags.end(); ++it)
-                parseRepresentation(adaptSet, dynamic_cast<AttributesTag *>(*it));
-            period->addAdaptationSet(adaptSet);
+            std::list<Tag *> streaminfotags = getTagsFromList(tagslist, AttributesTag::EXTXSTREAMINF);
+            for(it = streaminfotags.begin(); it != streaminfotags.end(); ++it)
+            {
+                AttributesTag *tag = dynamic_cast<AttributesTag *>(*it);
+                if(tag && tag->getAttributeByName("URI"))
+                {
+                    if(groupsmap.find(tag->getAttributeByName("URI")->value) == groupsmap.end())
+                    {
+                        /* not a group, belong to default adaptation set */
+                        parseRepresentation(adaptSet, tag);
+                    }
+                }
+            }
+            if(!adaptSet->getRepresentations().empty())
+                period->addAdaptationSet(adaptSet);
+            else
+                delete adaptSet;
         }
+
+        /* Finally add all groups */
+        std::map<std::string, AttributesTag *>::const_iterator groupsit;
+        for(groupsit = groupsmap.begin(); groupsit != groupsmap.end(); ++groupsit)
+        {
+            BaseAdaptationSet *altAdaptSet = new (std::nothrow) BaseAdaptationSet(period);
+            if(altAdaptSet)
+            {
+                std::pair<std::string, AttributesTag *> pair = *groupsit;
+                parseRepresentation(altAdaptSet, pair.second);
+                if(!altAdaptSet->getRepresentations().empty())
+                    period->addAdaptationSet(altAdaptSet);
+                else
+                    delete altAdaptSet;
+            }
+        }
+
     }
     else
     {
