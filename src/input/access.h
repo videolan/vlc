@@ -32,7 +32,6 @@ access_t *access_New( vlc_object_t *p_obj, input_thread_t *p_input,
                       const char *psz_access, const char *psz_demux,
                       const char *psz_path );
 #define access_New( a, b, c, d, e ) access_New(VLC_OBJECT(a), b, c, d, e )
-void access_Delete( access_t * );
 
 char *get_path(const char *location);
 

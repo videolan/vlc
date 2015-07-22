@@ -105,21 +105,6 @@ error:
     return NULL;
 }
 
-/*****************************************************************************
- * access_Delete:
- *****************************************************************************/
-void access_Delete( access_t *p_access )
-{
-    module_unneed( p_access, p_access->p_module );
-
-    free( p_access->psz_access );
-    free( p_access->psz_location );
-    free( p_access->psz_filepath );
-    free( p_access->psz_demux );
-
-    vlc_object_release( p_access );
-}
-
 access_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
 {
     char *buf = strdup(mrl);
@@ -138,7 +123,13 @@ access_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
 
 void vlc_access_Delete(access_t *access)
 {
-    access_Delete(access);
+    module_unneed(access, access->p_module);
+
+    free(access->psz_access);
+    free(access->psz_location);
+    free(access->psz_filepath);
+    free(access->psz_demux);
+    vlc_object_release(access);
 }
 
 /*****************************************************************************

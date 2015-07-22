@@ -385,7 +385,7 @@ error:
     }
     free( s->p_sys );
     stream_CommonDelete( s );
-    access_Delete( p_access );
+    vlc_access_Delete( p_access );
     return NULL;
 }
 
@@ -404,7 +404,7 @@ static void AStreamDestroy( stream_t *s )
     free( p_sys->p_peek );
 
     stream_CommonDelete( s );
-    access_Delete( p_sys->p_access );
+    vlc_access_Delete( p_sys->p_access );
     free( p_sys );
 }
 
