@@ -106,13 +106,6 @@ typedef struct
 
 } stream_track_t;
 
-typedef struct
-{
-    char     *psz_path;
-    uint64_t  i_size;
-
-} access_entry_t;
-
 typedef enum
 {
     STREAM_METHOD_BLOCK,
@@ -169,12 +162,6 @@ struct stream_sys_t
         uint64_t i_bytes;
         uint64_t i_read_time;
     } stat;
-
-    /* Streams list */
-    int            i_list;
-    access_entry_t **list;
-    int            i_list_index;
-    access_t       *p_list_access;
 };
 
 /* Method 1: */
@@ -212,7 +199,6 @@ static input_item_t * AStreamReadDirError( stream_t *s )
 }
 static int AStreamControl( stream_t *s, int i_query, va_list );
 static void AStreamDestroy( stream_t *s );
-static int  ASeek( stream_t *s, uint64_t i_pos );
 
 /****************************************************************************
  * stream_CommonNew: create an empty stream structure
@@ -268,10 +254,10 @@ stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
         return NULL;
     }
 
-    return stream_AccessNew( p_access, NULL );
+    return stream_AccessNew( p_access );
 }
 
-stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
+stream_t *stream_AccessNew( access_t *p_access )
 {
     stream_t *s = stream_CommonNew( VLC_OBJECT(p_access) );
     stream_sys_t *p_sys;
@@ -311,57 +297,6 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
     p_sys->stat.i_bytes = 0;
     p_sys->stat.i_read_time = 0;
     p_sys->stat.i_read_count = 0;
-
-    TAB_INIT( p_sys->i_list, p_sys->list );
-    p_sys->i_list_index = 0;
-    p_sys->p_list_access = NULL;
-
-    /* Get the additional list of inputs if any (for concatenation) */
-    if( ppsz_list && ppsz_list[0] )
-    {
-        access_entry_t *p_entry = malloc( sizeof(*p_entry) );
-        if( !p_entry )
-            goto error;
-
-        p_entry->i_size = access_GetSize( p_access );
-        p_entry->psz_path = strdup( p_access->psz_location );
-        if( !p_entry->psz_path )
-        {
-            free( p_entry );
-            goto error;
-        }
-        p_sys->p_list_access = p_access;
-        TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
-        msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
-                 p_entry->psz_path, p_entry->i_size );
-
-        for( int i = 0; ppsz_list[i] != NULL; i++ )
-        {
-            char *psz_name = strdup( ppsz_list[i] );
-
-            if( !psz_name )
-                break;
-
-            access_t *p_tmp = access_New( p_access, p_access->p_input,
-                                          p_access->psz_access, "", psz_name );
-            if( !p_tmp )
-            {
-                free( psz_name );
-                continue;
-            }
-
-            p_entry = malloc( sizeof(*p_entry) );
-            if( p_entry )
-            {
-                p_entry->i_size = access_GetSize( p_tmp );
-                p_entry->psz_path = psz_name;
-                TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
-                msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
-                         p_entry->psz_path, p_entry->i_size );
-            }
-            access_Delete( p_tmp );
-        }
-    }
 
     /* Peek */
     p_sys->i_peek = 0;
@@ -448,9 +383,6 @@ error:
     {
         free( p_sys->stream.p_buffer );
     }
-    while( p_sys->i_list > 0 )
-        free( p_sys->list[--(p_sys->i_list)] );
-    free( p_sys->list );
     free( s->p_sys );
     stream_CommonDelete( s );
     access_Delete( p_access );
@@ -470,16 +402,6 @@ static void AStreamDestroy( stream_t *s )
         free( p_sys->stream.p_buffer );
 
     free( p_sys->p_peek );
-
-    if( p_sys->p_list_access && p_sys->p_list_access != p_sys->p_access )
-        access_Delete( p_sys->p_list_access );
-
-    while( p_sys->i_list-- )
-    {
-        free( p_sys->list[p_sys->i_list]->psz_path );
-        free( p_sys->list[p_sys->i_list] );
-    }
-    free( p_sys->list );
 
     stream_CommonDelete( s );
     access_Delete( p_sys->p_access );
@@ -541,15 +463,6 @@ static void AStreamControlUpdate( stream_t *s )
     stream_sys_t *p_sys = s->p_sys;
 
     p_sys->i_pos = p_sys->p_access->info.i_pos;
-
-    if( p_sys->i_list )
-    {
-        int i;
-        for( i = 0; i < p_sys->i_list_index; i++ )
-        {
-            p_sys->i_pos += p_sys->list[i]->i_size;
-        }
-    }
 }
 
 #define static_control_match(foo) \
@@ -603,14 +516,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_GET_SIZE:
         {
             uint64_t *pi_64 = va_arg( args, uint64_t * );
-            if( s->p_sys->i_list )
-            {
-                int i;
-                *pi_64 = 0;
-                for( i = 0; i < s->p_sys->i_list; i++ )
-                    *pi_64 += s->p_sys->list[i]->i_size;
-                break;
-            }
             *pi_64 = access_GetSize( p_access );
             break;
         }
@@ -937,7 +842,7 @@ static int AStreamSeekBlock( stream_t *s, uint64_t i_pos )
     if( b_seek )
     {
         /* Do the access seek */
-        if( ASeek( s, i_pos ) ) return VLC_EGENERIC;
+        if( vlc_access_Seek( p_access, i_pos ) ) return VLC_EGENERIC;
 
         /* Release data */
         block_ChainRelease( p_sys->block.p_first );
@@ -1235,7 +1140,7 @@ static int AStreamSeekStream( stream_t *s, uint64_t i_pos )
             /* Seek at the end of the buffer
              * TODO it is stupid to seek now, it would be better to delay it
              */
-            if( ASeek( s, tk->i_end ) )
+            if( vlc_access_Seek( p_access, tk->i_end ) )
                 return VLC_EGENERIC;
         }
         else if( i_pos > tk->i_end )
@@ -1256,7 +1161,7 @@ static int AStreamSeekStream( stream_t *s, uint64_t i_pos )
         msg_Err( s, "AStreamSeekStream: hard seek" );
 #endif
         /* Nothing good, seek and choose oldest segment */
-        if( ASeek( s, i_pos ) )
+        if( vlc_access_Seek( p_access, i_pos ) )
             return VLC_EGENERIC;
 
         tk->i_start = i_pos;
@@ -1674,52 +1579,10 @@ error:
 static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
-    access_t *p_access = p_sys->p_access;
     input_thread_t *p_input = s->p_input;
-    int i_read_orig = i_read;
 
-    if( !p_sys->i_list )
-    {
-        i_read = p_access->pf_read( p_access, p_read, i_read );
-        if( p_input )
-        {
-            uint64_t total;
-
-            vlc_mutex_lock( &p_input->p->counters.counters_lock );
-            stats_Update( p_input->p->counters.p_read_bytes, i_read, &total );
-            stats_Update( p_input->p->counters.p_input_bitrate, total, NULL );
-            stats_Update( p_input->p->counters.p_read_packets, 1, NULL );
-            vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-        }
-        return i_read;
-    }
-
-    i_read = p_sys->p_list_access->pf_read( p_sys->p_list_access, p_read,
-                                            i_read );
-
-    /* If we reached an EOF then switch to the next stream in the list */
-    if( i_read == 0 && p_sys->i_list_index + 1 < p_sys->i_list )
-    {
-        char *psz_name = p_sys->list[++p_sys->i_list_index]->psz_path;
-        access_t *p_list_access;
-
-        msg_Dbg( s, "opening input `%s'", psz_name );
-
-        p_list_access = access_New( s, p_access->p_input, p_access->psz_access, "", psz_name );
-
-        if( !p_list_access ) return 0;
-
-        if( p_sys->p_list_access != p_access )
-            access_Delete( p_sys->p_list_access );
-
-        p_sys->p_list_access = p_list_access;
-
-        /* We have to read some data */
-        return AReadStream( s, p_read, i_read_orig );
-    }
-
-    /* Update read bytes in input */
-    if( p_input )
+    i_read = vlc_access_Read( p_sys->p_access, p_read, i_read );
+    if( p_input != NULL )
     {
         uint64_t total;
 
@@ -1737,116 +1600,24 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
     stream_sys_t *p_sys = s->p_sys;
     access_t *p_access = p_sys->p_access;
     input_thread_t *p_input = s->p_input;
-    block_t *p_block;
-    bool b_eof;
 
-    if( !p_sys->i_list )
+    block_t *p_block = p_access->pf_block( p_access );
+
+    if( pb_eof != NULL )
+        *pb_eof = p_access->info.b_eof;
+
+    if( p_input != NULL && p_block != NULL && libvlc_stats (p_access) )
     {
-        p_block = p_access->pf_block( p_access );
-        if( pb_eof ) *pb_eof = p_access->info.b_eof;
-        if( p_input && p_block && libvlc_stats (p_access) )
-        {
-            uint64_t total;
+        uint64_t total;
 
-            vlc_mutex_lock( &p_input->p->counters.counters_lock );
-            stats_Update( p_input->p->counters.p_read_bytes,
-                          p_block->i_buffer, &total );
-            stats_Update( p_input->p->counters.p_input_bitrate,
-                          total, NULL );
-            stats_Update( p_input->p->counters.p_read_packets, 1, NULL );
-            vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-        }
-        return p_block;
-    }
-
-    p_block = p_sys->p_list_access->pf_block( p_sys->p_list_access );
-    b_eof = p_sys->p_list_access->info.b_eof;
-    if( pb_eof ) *pb_eof = b_eof;
-
-    /* If we reached an EOF then switch to the next stream in the list */
-    if( !p_block && b_eof && p_sys->i_list_index + 1 < p_sys->i_list )
-    {
-        char *psz_name = p_sys->list[++p_sys->i_list_index]->psz_path;
-        access_t *p_list_access;
-
-        msg_Dbg( s, "opening input `%s'", psz_name );
-
-        p_list_access = access_New( s, p_access->p_input, p_access->psz_access, "", psz_name );
-
-        if( !p_list_access ) return 0;
-
-        if( p_sys->p_list_access != p_access )
-            access_Delete( p_sys->p_list_access );
-
-        p_sys->p_list_access = p_list_access;
-
-        /* We have to read some data */
-        return AReadBlock( s, pb_eof );
-    }
-    if( p_block )
-    {
-        if( p_input )
-        {
-            uint64_t total;
-
-            vlc_mutex_lock( &p_input->p->counters.counters_lock );
-            stats_Update( p_input->p->counters.p_read_bytes,
-                          p_block->i_buffer, &total );
-            stats_Update( p_input->p->counters.p_input_bitrate, total, NULL );
-            stats_Update( p_input->p->counters.p_read_packets, 1 , NULL);
-            vlc_mutex_unlock( &p_input->p->counters.counters_lock );
-        }
+        vlc_mutex_lock( &p_input->p->counters.counters_lock );
+        stats_Update( p_input->p->counters.p_read_bytes, p_block->i_buffer,
+                      &total );
+        stats_Update( p_input->p->counters.p_input_bitrate, total, NULL );
+        stats_Update( p_input->p->counters.p_read_packets, 1, NULL );
+        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
     }
     return p_block;
-}
-
-static int ASeek( stream_t *s, uint64_t i_pos )
-{
-    stream_sys_t *p_sys = s->p_sys;
-    access_t *p_access = p_sys->p_access;
-
-    /* Check which stream we need to access */
-    if( p_sys->i_list )
-    {
-        int i;
-        char *psz_name;
-        int64_t i_size = 0;
-        access_t *p_list_access = 0;
-
-        for( i = 0; i < p_sys->i_list - 1; i++ )
-        {
-            if( i_pos < p_sys->list[i]->i_size + i_size ) break;
-            i_size += p_sys->list[i]->i_size;
-        }
-        psz_name = p_sys->list[i]->psz_path;
-
-        if( i != p_sys->i_list_index )
-            msg_Dbg( s, "opening input `%s'", psz_name );
-
-        if( i != p_sys->i_list_index && i != 0 )
-        {
-            p_list_access =
-                access_New( s, p_access->p_input, p_access->psz_access, "", psz_name );
-        }
-        else if( i != p_sys->i_list_index )
-        {
-            p_list_access = p_access;
-        }
-
-        if( p_list_access )
-        {
-            if( p_sys->p_list_access != p_access )
-                access_Delete( p_sys->p_list_access );
-
-            p_sys->p_list_access = p_list_access;
-        }
-
-        p_sys->i_list_index = i;
-        return p_sys->p_list_access->pf_seek( p_sys->p_list_access,
-                                              i_pos - i_size );
-    }
-
-    return p_access->pf_seek( p_access, i_pos );
 }
 
 static input_item_t *AStreamReadDir( stream_t *s )

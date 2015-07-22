@@ -43,14 +43,8 @@ void stream_CommonDelete( stream_t * );
 
 /**
  * This function creates a stream_t from a provided access_t.
- *
- * An optional NULL terminated list of file may be provided. The content
- * of these extra files will be concatenated after to the main access.
- *
- * XXX ppsz_list is treated as const (I failed to avoid a warning when
- * using const keywords for pointer of pointers)
  */
-stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list );
+stream_t *stream_AccessNew( access_t *p_access );
 
 /**
  * This function creates a new stream_t filter.

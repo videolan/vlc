@@ -2302,7 +2302,7 @@ static int InputSourceInit( input_thread_t *p_input,
             psz_demux = p_access->psz_demux;
 
         /* Create the stream_t */
-        stream_t *p_stream = stream_AccessNew( p_access, NULL );
+        stream_t *p_stream = stream_AccessNew( p_access );
         if( p_stream == NULL )
         {
             msg_Warn( p_input, "cannot create a stream_t from access" );
