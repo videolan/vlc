@@ -180,14 +180,19 @@ Stream::status Stream::demux(HTTPConnectionManager *connManager, mtime_t nz_dead
     {
         /* need to read, demuxer still buffering, ... */
         if(read(connManager) <= 0)
-            return Stream::status_eof;
-
-        if(nz_deadline + VLC_TS_0 > output->getPCR()) /* need to read more */
+        {
+            if(output->isEmpty())
+                return Stream::status_eof;
+        }
+        else if(nz_deadline + VLC_TS_0 > output->getPCR()) /* need to read more */
+        {
             return Stream::status_buffering;
+        }
     }
 
     if(send)
         output->sendToDecoder(nz_deadline);
+
     return Stream::status_demuxed;
 }
 
@@ -485,6 +490,19 @@ bool BaseStreamOutput::isSelected() const
     }
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return b_selected;
+}
+
+bool BaseStreamOutput::isEmpty() const
+{
+    bool b_empty = true;
+    vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
+    std::list<Demuxed *>::const_iterator it;
+    for(it=queues.begin(); it!=queues.end() && b_empty; ++it)
+    {
+        b_empty = !(*it)->p_queue;
+    }
+    vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
+    return b_empty;
 }
 
 void BaseStreamOutput::sendToDecoder(mtime_t nzdeadline)

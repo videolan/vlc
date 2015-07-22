@@ -114,6 +114,7 @@ namespace adaptative
         virtual bool seekAble() const = 0;
         virtual void setPosition(mtime_t) = 0;
         virtual void sendToDecoder(mtime_t) = 0;
+        virtual bool isEmpty() const = 0;
         virtual bool reinitsOnSeek() const = 0;
         virtual bool switchAllowed() const = 0;
         virtual bool isSelected() const = 0;
@@ -145,6 +146,7 @@ namespace adaptative
         virtual bool seekAble() const; /* reimpl */
         virtual void setPosition(mtime_t); /* reimpl */
         virtual void sendToDecoder(mtime_t); /* reimpl */
+        virtual bool isEmpty() const; /* reimpl */
         virtual bool reinitsOnSeek() const; /* reimpl */
         virtual bool switchAllowed() const; /* reimpl */
         virtual bool isSelected() const; /* reimpl */
