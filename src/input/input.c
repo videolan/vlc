@@ -2231,6 +2231,60 @@ static int InputSourceInit( input_thread_t *p_input,
     }
     else
     {   /* Now try a real access */
+        if( &p_input->p->input == in )
+        {   /* On master stream only, use input-list */
+            char *str = var_InheritString( p_input, "input-list" );
+            if( str != NULL )
+            {
+                char *list;
+
+                var_Create( p_input, "concat-list", VLC_VAR_STRING );
+                if( likely(asprintf( &list, "%s://%s,%s", psz_access, psz_path,
+                                     str ) >= 0) )
+                {
+                     var_SetString( p_input, "concat-list", list );
+                     free( list );
+                }
+                free( str );
+                psz_access = "concat";
+            }
+        }
+
+        if( strcasecmp( psz_access, "concat" ) )
+        {   /* Autodetect extra files if none specified */
+            int count;
+            char **tab;
+
+            TAB_INIT( count, tab );
+            InputGetExtraFiles( p_input, &count, &tab, psz_access, psz_path );
+            if( count > 0 )
+            {
+                char *list = NULL;
+
+                for( int i = 0; i < count; i++ )
+                {
+                    char *str;
+                    if( asprintf( &str, "%s,%s", list ? list : psz_mrl,
+                                  tab[i] ) < 0 )
+                        break;
+
+                    free( tab[i] );
+                    free( list );
+                    list = str;
+                }
+
+                var_Create( p_input, "concat-list", VLC_VAR_STRING );
+                if( likely(list != NULL) )
+                {
+                    var_SetString( p_input, "concat-list", list );
+                    free( list );
+                }
+                psz_access = "concat";
+            }
+            TAB_CLEAN( count, tab );
+        }
+
+        /* */
         access_t *p_access = access_New( p_input, p_input,
                                          psz_access, psz_demux, psz_path );
         if( p_access == NULL )
@@ -2247,56 +2301,8 @@ static int InputSourceInit( input_thread_t *p_input,
         if( !psz_demux[0] || !strcasecmp( psz_demux, "any" ) )
             psz_demux = p_access->psz_demux;
 
-        /* */
-        int  i_input_list;
-        char **ppsz_input_list;
-
-        TAB_INIT( i_input_list, ppsz_input_list );
-
-        /* On master stream only, use input-list */
-        if( &p_input->p->input == in )
-        {
-            char *psz_list;
-            char *psz_parser;
-
-            psz_list =
-            psz_parser = var_CreateGetNonEmptyString( p_input, "input-list" );
-
-            while( psz_parser && *psz_parser )
-            {
-                char *p = strchr( psz_parser, ',' );
-                if( p )
-                    *p++ = '\0';
-
-                if( *psz_parser )
-                {
-                    char *psz_name = strdup( psz_parser );
-                    if( psz_name )
-                        TAB_APPEND( i_input_list, ppsz_input_list, psz_name );
-                }
-
-                psz_parser = p;
-            }
-            free( psz_list );
-        }
-        /* Autodetect extra files if none specified */
-        if( i_input_list <= 0 )
-        {
-            InputGetExtraFiles( p_input, &i_input_list, &ppsz_input_list,
-                                psz_access, psz_path );
-        }
-        if( i_input_list > 0 )
-            TAB_APPEND( i_input_list, ppsz_input_list, NULL );
-
         /* Create the stream_t */
-        stream_t *p_stream = stream_AccessNew( p_access, ppsz_input_list );
-        if( ppsz_input_list )
-        {
-            for( int i = 0; ppsz_input_list[i] != NULL; i++ )
-                free( ppsz_input_list[i] );
-            TAB_CLEAN( i_input_list, ppsz_input_list );
-        }
-
+        stream_t *p_stream = stream_AccessNew( p_access, NULL );
         if( p_stream == NULL )
         {
             msg_Warn( p_input, "cannot create a stream_t from access" );
