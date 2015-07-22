@@ -766,6 +766,69 @@ static char* GetTag( const char** ppsz_subtitle, bool b_closing )
     return psz_tagname;
 }
 
+static bool IsClosed( const char* psz_subtitle, const char* psz_tagname )
+{
+    const char* psz_tagpos = strcasestr( psz_subtitle, psz_tagname );
+    if ( !psz_tagpos )
+        return false;
+    // Search for '</' and '>' immediatly before & after (minding the potential spaces)
+    const char* psz_endtag = psz_tagpos + strlen( psz_tagname );
+    while ( *psz_endtag == ' ' )
+        psz_endtag++;
+    if ( *psz_endtag != '>' )
+        return false;
+    // Skip back before the tag itself
+    psz_tagpos--;
+    while ( *psz_tagpos == ' ' && psz_tagpos > psz_subtitle )
+        psz_tagpos--;
+    if ( *psz_tagpos-- != '/' )
+        return false;
+    if ( *psz_tagpos != '<' )
+        return false;
+    return true;
+}
+
+typedef struct tag_stack tag_stack_t;
+struct tag_stack
+{
+    char* psz_tagname;
+    tag_stack_t *p_next;
+};
+
+static void AppendTag( tag_stack_t **pp_stack, char* psz_tagname )
+{
+    tag_stack_t* p_elem = malloc( sizeof( *p_elem ) );
+    if ( unlikely( !p_elem ) )
+        return;
+    p_elem->p_next = *pp_stack;
+    p_elem->psz_tagname = psz_tagname;
+    *pp_stack = p_elem;
+}
+
+static bool HasTag( tag_stack_t **pp_stack, const char* psz_tagname )
+{
+    tag_stack_t *p_prev = NULL;
+    for ( tag_stack_t* p_current = *pp_stack; p_current; p_current = p_current->p_next )
+    {
+        if ( !strcasecmp( psz_tagname, p_current->psz_tagname ) )
+        {
+            if ( p_current == *pp_stack )
+            {
+                *pp_stack = p_current->p_next;
+            }
+            else
+            {
+                p_prev->p_next = p_current->p_next;
+            }
+            free( p_current->psz_tagname );
+            free( p_current );
+            return true;
+        }
+        p_prev = p_current;
+    }
+    return false;
+}
+
 static int GetColor( const char* psz_color )
 {
     if ( *psz_color == '#' )
@@ -856,13 +919,12 @@ static text_segment_t* NewTextSegmentPopStyle( text_segment_t* p_segment, style_
     return p_new;
 }
 
-
-
 static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
 {
     text_segment_t* p_segment;
     text_segment_t* p_first_segment;
     style_stack_t* p_stack = NULL;
+    tag_stack_t* p_tag_stack = NULL;
 
     //FIXME: Remove initial allocation? Might make the below code more complicated
     p_first_segment = p_segment = text_segment_New( "" );
@@ -962,6 +1024,24 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                         free( psz_attribute_value );
                     }
                 }
+                else
+                {
+                    // This is an unknown tag. We need to hide it if it's properly closed, and display it otherwise
+                    if ( !IsClosed( psz_subtitle, psz_tagname ) )
+                    {
+                        AppendCharacter( p_segment, '<' );
+                        AppendString( p_segment, psz_tagname );
+                        AppendCharacter( p_segment, '>' );
+                    }
+                    else
+                    {
+                        AppendTag( &p_tag_stack, psz_tagname );
+                        // We don't want to free the tagname now, it will be freed when the tag
+                        // gets poped from the stack.
+                        psz_tagname = NULL;
+                    }
+                    // In any case, fall through and skip to the closing tag.
+                }
                 // Skip potential spaces & end tag
                 while ( *psz_subtitle && *psz_subtitle != '>' )
                     psz_subtitle++;
@@ -987,10 +1067,13 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                     }
                     else
                     {
-                        // Unknown closing tag, just append the "</", and go on.
-                        // This will make the unknown tag appear as text
-                        AppendString( p_segment, "</" );
-                        AppendString( p_segment, psz_tagname );
+                        // Unknown closing tag. If it is closing an unknown tag, ignore it. Otherwise, display it
+                        if ( !HasTag( &p_tag_stack, psz_tagname ) )
+                        {
+                            AppendString( p_segment, "</" );
+                            AppendString( p_segment, psz_tagname );
+                            AppendCharacter( p_segment, '>' );
+                        }
                     }
                     while ( *psz_subtitle == ' ' )
                         psz_subtitle++;
@@ -1105,6 +1188,13 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
     }
     while ( p_stack )
         PopStyle( &p_stack );
+    while ( p_tag_stack )
+    {
+        tag_stack_t *p_tag = p_tag_stack;
+        p_tag_stack = p_tag_stack->p_next;
+        free( p_tag->psz_tagname );
+        free( p_tag );
+    }
 
     return p_first_segment;
 
