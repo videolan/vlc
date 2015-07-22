@@ -25,6 +25,10 @@
 
 #import "playlist.h"
 #import "StringUtility.h"
+#import "intf.h"
+#import "ControlsBar.h"
+#import "MainMenu.h"
+#import "playlistinfo.h"
 
 #ifdef HAVE_CONFIG_H
 # import "config.h"
@@ -36,6 +40,61 @@
 #include <vlc_input.h>
 #include <vlc_url.h>
 
+static int PLItemUpdated(vlc_object_t *p_this, const char *psz_var,
+                         vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    @autoreleasepool {
+        [[[VLCMain sharedInstance] playlist] performSelectorOnMainThread:@selector(plItemUpdated) withObject:nil waitUntilDone:NO];
+
+        return VLC_SUCCESS;
+    }
+}
+
+static int PLItemAppended(vlc_object_t *p_this, const char *psz_var,
+                          vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    @autoreleasepool {
+        playlist_add_t *p_add = new_val.p_address;
+        NSArray *o_val = [NSArray arrayWithObjects:[NSNumber numberWithInt:p_add->i_node], [NSNumber numberWithInt:p_add->i_item], nil];
+        [[[VLCMain sharedInstance] playlist] performSelectorOnMainThread:@selector(plItemAppended:) withObject:o_val waitUntilDone:NO];
+
+        return VLC_SUCCESS;
+    }
+}
+
+static int PLItemRemoved(vlc_object_t *p_this, const char *psz_var,
+                         vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    @autoreleasepool {
+        NSNumber *o_val = [NSNumber numberWithInt:new_val.i_int];
+        [[[VLCMain sharedInstance] playlist] performSelectorOnMainThread:@selector(plItemRemoved:) withObject:o_val waitUntilDone:NO];
+
+        return VLC_SUCCESS;
+    }
+}
+
+static int PlaybackModeUpdated(vlc_object_t *p_this, const char *psz_var,
+                               vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    @autoreleasepool {
+        [[[VLCMain sharedInstance] playlist] performSelectorOnMainThread:@selector(playbackModeUpdated) withObject:nil waitUntilDone:NO];
+
+        return VLC_SUCCESS;
+    }
+}
+
+static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
+                         vlc_value_t oldval, vlc_value_t new_val, void *param)
+{
+    @autoreleasepool {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[[VLCMain sharedInstance] mainWindow] updateVolumeSlider];
+        });
+
+        return VLC_SUCCESS;
+    }
+}
+
 #pragma mark -
 
 @interface PLModel ()
@@ -45,6 +104,7 @@
 
     // TODO: for transition
     VLCPlaylist *_playlist;
+    NSUInteger _retainedRowSelection;
 }
 @end
 
@@ -61,19 +121,38 @@
         _outlineView = outlineView;
         _playlist = plObj;
 
+        var_AddCallback(p_playlist, "item-change", PLItemUpdated, (__bridge void *)self);
+        var_AddCallback(p_playlist, "playlist-item-append", PLItemAppended, (__bridge void *)self);
+        var_AddCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, (__bridge void *)self);
+        var_AddCallback(p_playlist, "random", PlaybackModeUpdated, (__bridge void *)self);
+        var_AddCallback(p_playlist, "repeat", PlaybackModeUpdated, (__bridge void *)self);
+        var_AddCallback(p_playlist, "loop", PlaybackModeUpdated, (__bridge void *)self);
+        var_AddCallback(p_playlist, "volume", VolumeUpdated, (__bridge void *)self);
+        var_AddCallback(p_playlist, "mute", VolumeUpdated, (__bridge void *)self);
+
         PL_LOCK;
         _rootItem = [[PLItem alloc] initWithPlaylistItem:root];
         [self rebuildPLItem:_rootItem];
         PL_UNLOCK;
-
     }
 
     return self;
 }
 
+- (void)dealloc
+{
+    var_DelCallback(p_playlist, "item-change", PLItemUpdated, (__bridge void *)self);
+    var_DelCallback(p_playlist, "playlist-item-append", PLItemAppended, (__bridge void *)self);
+    var_DelCallback(p_playlist, "playlist-item-deleted", PLItemRemoved, (__bridge void *)self);
+    var_DelCallback(p_playlist, "random", PlaybackModeUpdated, (__bridge void *)self);
+    var_DelCallback(p_playlist, "repeat", PlaybackModeUpdated, (__bridge void *)self);
+    var_DelCallback(p_playlist, "loop", PlaybackModeUpdated, (__bridge void *)self);
+    var_DelCallback(p_playlist, "volume", VolumeUpdated, (__bridge void *)self);
+    var_DelCallback(p_playlist, "mute", VolumeUpdated, (__bridge void *)self);
+}
+
 - (void)changeRootItem:(playlist_item_t *)p_root;
 {
-    NSLog(@"change root item to %p", p_root);
     PL_ASSERT_LOCKED;
     _rootItem = [[PLItem alloc] initWithPlaylistItem:p_root];
     [self rebuildPLItem:_rootItem];
@@ -104,10 +183,31 @@
     [self currentRootType] == ROOT_TYPE_PLAYLIST;
 }
 
-- (void)rebuildPLItem:(PLItem *)o_item
+- (void)deleteSelectedItem
 {
-    [o_item clear];
-    playlist_item_t *p_item = playlist_ItemGetById(p_playlist, [o_item plItemId]);
+    // check if deletion is allowed
+    if (![self editAllowed])
+        return;
+
+    NSIndexSet *selectedIndexes = [_outlineView selectedRowIndexes];
+    _retainedRowSelection = [selectedIndexes firstIndex];
+    if (_retainedRowSelection == NSNotFound)
+        _retainedRowSelection = 0;
+
+    [selectedIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        PLItem *item = [_outlineView itemAtRow: idx];
+        if (!item)
+            return;
+
+        // model deletion is done via callback
+        playlist_DeleteFromInput(p_playlist, [item input], pl_Unlocked);
+    }];
+}
+
+- (void)rebuildPLItem:(PLItem *)item
+{
+    [item clear];
+    playlist_item_t *p_item = playlist_ItemGetById(p_playlist, [item plItemId]);
     if (p_item) {
         int currPos = 0;
         for(int i = 0; i < p_item->i_children; ++i) {
@@ -116,11 +216,11 @@
             if (p_child->i_flags & PLAYLIST_DBL_FLAG)
                 continue;
 
-            PLItem *o_child = [[PLItem alloc] initWithPlaylistItem:p_child];
-            [o_item addChild:o_child atPos:currPos++];
+            PLItem *child = [[PLItem alloc] initWithPlaylistItem:p_child];
+            [item addChild:child atPos:currPos++];
 
             if (p_child->i_children >= 0) {
-                [self rebuildPLItem:o_child];
+                [self rebuildPLItem:child];
             }
 
         }
@@ -158,10 +258,48 @@
 #pragma mark -
 #pragma mark Core events
 
+
+- (void)plItemAppended:(NSArray *)valueArray
+{
+    int i_node = [[valueArray firstObject] intValue];
+    int i_item = [valueArray[1] intValue];
+
+    [self addItem:i_item withParentNode:i_node];
+
+    // update badge in sidebar
+    [[[VLCMain sharedInstance] mainWindow] updateWindow];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+                                                        object: nil
+                                                      userInfo: nil];
+}
+
+- (void)plItemRemoved:(NSNumber *)value
+{
+    int i_item = [value intValue];
+
+    [self removeItem:i_item];
+    // retain selection before deletion
+    [_outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:_retainedRowSelection] byExtendingSelection:NO];
+
+    // update badge in sidebar
+    [[[VLCMain sharedInstance] mainWindow] updateWindow];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCMediaKeySupportSettingChanged"
+                                                        object: nil
+                                                      userInfo: nil];
+}
+
+- (void)plItemUpdated
+{
+    VLCMain *instance = [VLCMain sharedInstance];
+    [[instance mainWindow] updateName];
+
+    [[VLCInfo sharedInstance] updateMetadata];
+}
+
 - (void)addItem:(int)i_item withParentNode:(int)i_node
 {
-    NSLog(@"add item with index %d, parent: %d", i_item, i_node);
-
     PLItem *o_parent = [self findItemByPlaylistId:i_node];
     if (!o_parent) {
         return;
@@ -195,8 +333,6 @@
 
 - (void)removeItem:(int)i_item
 {
-    NSLog(@"remove item with index %d", i_item);
-
     PLItem *o_item = [self findItemByPlaylistId:i_item];
     if (!o_item) {
         return;
@@ -244,6 +380,28 @@
         item = [self findItemByPlaylistId:p_current->i_id];
     PL_UNLOCK;
     return item;
+}
+
+- (void)playbackModeUpdated
+{
+    bool loop = var_GetBool(p_playlist, "loop");
+    bool repeat = var_GetBool(p_playlist, "repeat");
+
+    VLCMainWindowControlsBar *controlsBar = (VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar];
+    VLCMainMenu *mainMenu = [[VLCMain sharedInstance] mainMenu];
+    if (repeat) {
+        [controlsBar setRepeatOne];
+        [mainMenu setRepeatOne];
+    } else if (loop) {
+        [controlsBar setRepeatAll];
+        [mainMenu setRepeatAll];
+    } else {
+        [controlsBar setRepeatOff];
+        [mainMenu setRepeatOff];
+    }
+
+    [controlsBar setShuffle];
+    [mainMenu setShuffle];
 }
 
 #pragma mark -
