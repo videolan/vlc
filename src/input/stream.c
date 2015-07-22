@@ -258,18 +258,10 @@ void stream_CommonDelete( stream_t *s )
  ****************************************************************************/
 stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 {
-    const char *psz_access, *psz_demux, *psz_path, *psz_anchor;
-    access_t *p_access;
-
     if( !psz_url )
         return NULL;
 
-    char psz_dup[strlen( psz_url ) + 1];
-    strcpy( psz_dup, psz_url );
-    input_SplitMRL( &psz_access, &psz_demux, &psz_path, &psz_anchor, psz_dup );
-
-    /* Now try a real access */
-    p_access = access_New( p_parent, NULL, psz_access, psz_demux, psz_path );
+    access_t *p_access = vlc_access_NewMRL( p_parent, psz_url );
     if( p_access == NULL )
     {
         msg_Err( p_parent, "no suitable access module for `%s'", psz_url );
