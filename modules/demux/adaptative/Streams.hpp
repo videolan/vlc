@@ -77,7 +77,7 @@ namespace adaptative
         bool isSelected() const;
         bool reactivate(mtime_t);
         bool isDisabled() const;
-        typedef enum {status_eof, status_buffering, status_demuxed} status;
+        typedef enum {status_eof, status_eop, status_buffering, status_demuxed} status;
         status demux(HTTPConnectionManager *, mtime_t, bool);
         bool setPosition(mtime_t, bool);
         mtime_t getPosition() const;

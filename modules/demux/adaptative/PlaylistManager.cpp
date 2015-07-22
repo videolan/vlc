@@ -157,6 +157,14 @@ Stream::status PlaylistManager::demux(mtime_t nzdeadline, bool send)
         }
     }
 
+    /* might be end of current period */
+    if(i_return == Stream::status_eof && currentPeriod)
+    {
+        unsetPeriod();
+        currentPeriod = playlist->getNextPeriod(currentPeriod);
+        i_return = (setupPeriod()) ? Stream::status_eop : Stream::status_eof;
+    }
+
     return i_return;
 }
 

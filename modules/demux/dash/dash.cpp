@@ -197,11 +197,16 @@ static int Demux(demux_t *p_demux)
 
     Stream::status status =
             p_sys->p_dashManager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT, true);
+
     switch(status)
     {
     case Stream::status_eof:
         return VLC_DEMUXER_EOF;
     case Stream::status_buffering:
+        break;
+    case Stream::status_eop:
+        p_sys->i_nzpcr = VLC_TS_INVALID;
+        es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         break;
     case Stream::status_demuxed:
         if( p_sys->i_nzpcr != VLC_TS_INVALID )
