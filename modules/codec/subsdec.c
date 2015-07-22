@@ -941,9 +941,6 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
 
     bool b_has_align = false;
 
-    while ( *psz_subtitle == ' ' )
-        psz_subtitle++;
-
     /* */
     while( *psz_subtitle )
     {
@@ -1168,28 +1165,8 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                     goto fail;
                 psz_subtitle += 2;
             }
-            else if ( *psz_subtitle == ' ' )
-            {
-                const char *psz_current = psz_subtitle;
-                // Check if we need to trim EOL spaces
-                while ( *psz_current == ' ' )
-                    psz_current++;
-                if ( *psz_current == '\n' || *psz_current == 0 )
-                    psz_subtitle = psz_current;
-                else
-                {
-                    // Avoid continuing and iterating over spaces for each main loop iteration.
-                    // Just get done with it here.
-                    while ( *psz_subtitle == ' ' )
-                    {
-                        AppendCharacter( p_segment, ' ' );
-                        psz_subtitle++;
-                    }
-                }
-            }
             else
             {
-
                 //FIXME: Highly inneficient
                 AppendCharacter( p_segment, *psz_subtitle );
                 psz_subtitle++;
