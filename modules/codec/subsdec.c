@@ -733,6 +733,39 @@ static char* ConsumeAttribute( const char** ppsz_subtitle, char** psz_attribute_
     return psz_attribute_name;
 }
 
+// Returns the next tag and consume the string up to after the tag name, or
+// returns NULL and doesn't advance if the angle bracket was not a tag opening
+// For instance, if psz_subtitle == "<some_tag attribute=value>"
+// GetTag will return "some_tag", and will advance up to the first 'a' in "attribute"
+// The returned value must be freed.
+static char* GetTag( const char** ppsz_subtitle, bool b_closing )
+{
+    const char* psz_subtitle = *ppsz_subtitle;
+    if ( *psz_subtitle != '<' )
+        return NULL;
+    // Skip the '<'
+    psz_subtitle++;
+    if ( b_closing && *psz_subtitle == '/' )
+        psz_subtitle++;
+    // Skip potential spaces
+    while ( *psz_subtitle == ' ' )
+        psz_subtitle++;
+    // Now we need to verify if what comes next is a valid tag:
+    if ( !isalpha( *psz_subtitle ) )
+        return NULL;
+    size_t tag_size = 1;
+    while ( isalnum( psz_subtitle[tag_size] ) || psz_subtitle[tag_size] == '_' )
+        tag_size++;
+    char* psz_tagname = malloc( ( tag_size + 1 ) * sizeof( *psz_tagname ) );
+    if ( unlikely( !psz_tagname ) )
+        return NULL;
+    strncpy( psz_tagname, psz_subtitle, tag_size );
+    psz_tagname[tag_size] = 0;
+    psz_subtitle += tag_size;
+    *ppsz_subtitle = psz_subtitle;
+    return psz_tagname;
+}
+
 static int GetColor( const char* psz_color )
 {
     if ( *psz_color == '#' )
@@ -824,6 +857,7 @@ static text_segment_t* NewTextSegmentPopStyle( text_segment_t* p_segment, style_
 }
 
 
+
 static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
 {
     text_segment_t* p_segment;
@@ -843,126 +877,126 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
     {
         if( *psz_subtitle == '<' )
         {
-            if( !strncasecmp( psz_subtitle, "<br/>", 5 ))
+            char *psz_tagname = GetTag( &psz_subtitle, false );
+            if ( psz_tagname != NULL )
             {
-                if ( !AppendCharacter( p_segment, '\n' ) )
-                    goto fail;
-                psz_subtitle += strlen( "<br/>" );
-            }
-            else if( !strncasecmp( psz_subtitle, "<b>", 3 ) )
-            {
-                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
-                p_segment->style->i_style_flags |= STYLE_BOLD;
-                psz_subtitle += strlen( "<b>" );
-            }
-            else if( !strncasecmp( psz_subtitle, "<i>", 3 ) )
-            {
-                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
-                p_segment->style->i_style_flags |= STYLE_ITALIC;
-                psz_subtitle += strlen( "<i>" );
-            }
-            else if( !strncasecmp( psz_subtitle, "<u>", 3 ) )
-            {
-                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
-                p_segment->style->i_style_flags |= STYLE_UNDERLINE;
-                psz_subtitle += strlen( "<u>" );
-            }
-            else if( !strncasecmp( psz_subtitle, "<s>", 3 ) )
-            {
-                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
-                p_segment->style->i_style_flags |= STYLE_STRIKEOUT;
-                psz_subtitle += strlen( "<s>" );
-            }
-            else if( !strncasecmp( psz_subtitle, "<font ", 6 ))
-            {
-                p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
-                psz_subtitle += strlen( "<font " );
-
-                char* psz_attribute_name;
-                char* psz_attribute_value;
-
-                while( ( psz_attribute_name = ConsumeAttribute( &psz_subtitle, &psz_attribute_value ) ) )
+                if( !strcasecmp( psz_tagname, "br" ) )
                 {
-                    if ( !strcasecmp( psz_attribute_name, "face" ) )
-                    {
-                        p_segment->style->psz_fontname = psz_attribute_value;
-                        psz_attribute_value = NULL;
-                    }
-                    else if ( !strcasecmp( psz_attribute_name, "family" ) )
-                    {
-                        p_segment->style->psz_monofontname = psz_attribute_value;
-                        psz_attribute_value = NULL;
-                    }
-                    else if ( !strcasecmp( psz_attribute_name, "size" ) )
-                    {
-                        p_segment->style->i_font_size = atoi( psz_attribute_value );
-                    }
-                    else if ( !strcasecmp( psz_attribute_name, "color" ) )
-                    {
-                        p_segment->style->i_font_color = GetColor( psz_attribute_value );
-                    }
-                    else if ( !strcasecmp( psz_attribute_name, "outline-color" ) )
-                    {
-                        p_segment->style->i_outline_color = GetColor( psz_attribute_value );
-                    }
-                    else if ( !strcasecmp( psz_attribute_name, "shadow-color" ) )
-                    {
-                        p_segment->style->i_shadow_color = GetColor( psz_attribute_value );
-                    }
-                    else if ( !strcasecmp( psz_attribute_name, "outline-level" ) )
-                    {
-                        p_segment->style->i_outline_width = atoi( psz_attribute_value );
-                    }
-                    else if ( !strcasecmp( psz_attribute_name, "shadow-level" ) )
-                    {
-                        p_segment->style->i_shadow_width = atoi( psz_attribute_value );
-                    }
-                    else if ( !strcasecmp( psz_attribute_name, "back-color" ) )
-                    {
-                        p_segment->style->i_background_color = GetColor( psz_attribute_value );
-                    }
-                    else if ( !strcasecmp( psz_attribute_name, "alpha" ) )
-                    {
-                        p_segment->style->i_font_alpha = atoi( psz_attribute_value );
-                    }
+                    if ( !AppendCharacter( p_segment, '\n' ) )
+                        goto fail;
+                }
+                else if( !strcasecmp( psz_tagname, "b" ) )
+                {
+                    p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                    p_segment->style->i_style_flags |= STYLE_BOLD;
+                }
+                else if( !strcasecmp( psz_tagname, "i" ) )
+                {
+                    p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                    p_segment->style->i_style_flags |= STYLE_ITALIC;
+                }
+                else if( !strcasecmp( psz_tagname, "u" ) )
+                {
+                    p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                    p_segment->style->i_style_flags |= STYLE_UNDERLINE;
+                }
+                else if( !strcasecmp( psz_tagname, "s" ) )
+                {
+                    p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
+                    p_segment->style->i_style_flags |= STYLE_STRIKEOUT;
+                }
+                else if( !strcasecmp( psz_tagname, "font" ) )
+                {
+                    p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
 
-                    free( psz_attribute_name );
-                    free( psz_attribute_value );
+                    char* psz_attribute_name;
+                    char* psz_attribute_value;
+
+                    while( ( psz_attribute_name = ConsumeAttribute( &psz_subtitle, &psz_attribute_value ) ) )
+                    {
+                        if ( !strcasecmp( psz_attribute_name, "face" ) )
+                        {
+                            p_segment->style->psz_fontname = psz_attribute_value;
+                            // We don't want to free the attribute value since it has become our fontname
+                            psz_attribute_value = NULL;
+                        }
+                        else if ( !strcasecmp( psz_attribute_name, "family" ) )
+                        {
+                            p_segment->style->psz_monofontname = psz_attribute_value;
+                            psz_attribute_value = NULL;
+                        }
+                        else if ( !strcasecmp( psz_attribute_name, "size" ) )
+                        {
+                            p_segment->style->i_font_size = atoi( psz_attribute_value );
+                        }
+                        else if ( !strcasecmp( psz_attribute_name, "color" ) )
+                        {
+                            p_segment->style->i_font_color = GetColor( psz_attribute_value );
+                        }
+                        else if ( !strcasecmp( psz_attribute_name, "outline-color" ) )
+                        {
+                            p_segment->style->i_outline_color = GetColor( psz_attribute_value );
+                        }
+                        else if ( !strcasecmp( psz_attribute_name, "shadow-color" ) )
+                        {
+                            p_segment->style->i_shadow_color = GetColor( psz_attribute_value );
+                        }
+                        else if ( !strcasecmp( psz_attribute_name, "outline-level" ) )
+                        {
+                            p_segment->style->i_outline_width = atoi( psz_attribute_value );
+                        }
+                        else if ( !strcasecmp( psz_attribute_name, "shadow-level" ) )
+                        {
+                            p_segment->style->i_shadow_width = atoi( psz_attribute_value );
+                        }
+                        else if ( !strcasecmp( psz_attribute_name, "back-color" ) )
+                        {
+                            p_segment->style->i_background_color = GetColor( psz_attribute_value );
+                        }
+                        else if ( !strcasecmp( psz_attribute_name, "alpha" ) )
+                        {
+                            p_segment->style->i_font_alpha = atoi( psz_attribute_value );
+                        }
+
+                        free( psz_attribute_name );
+                        free( psz_attribute_value );
+                    }
                 }
                 // Skip potential spaces & end tag
                 while ( *psz_subtitle && *psz_subtitle != '>' )
                     psz_subtitle++;
                 if ( *psz_subtitle == '>' )
                     psz_subtitle++;
+
+                free( psz_tagname );
             }
             else if( !strncmp( psz_subtitle, "</", 2 ))
             {
-                size_t tag_length = 0;
-                psz_subtitle += 2;
-                const char* p_old_pos = psz_subtitle;
-                while ( *psz_subtitle && *psz_subtitle != '>' )
+                char* psz_tagname = GetTag( &psz_subtitle, true );
+                if ( psz_tagname != NULL )
                 {
-                    tag_length++;
-                    psz_subtitle++;
-                }
-                if ( !strncasecmp( p_old_pos, "b", tag_length ) ||
-                     !strncasecmp( p_old_pos, "i", tag_length ) ||
-                     !strncasecmp( p_old_pos, "u", tag_length ) ||
-                     !strncasecmp( p_old_pos, "s", tag_length ) ||
-                     !strncasecmp( p_old_pos, "font", tag_length ) )
-                {
-                    // A closing tag for one of the tags we handle, meaning
-                    // we pushed a style onto the stack earlier
-                    p_segment = NewTextSegmentPopStyle( p_segment, &p_stack );
-                    // Also skip the '>'
-                    psz_subtitle++;
-                }
-                else
-                {
-                    // Unknown closing tag, just append the "</", and go on.
-                    // This will make the unknown tag appear as text
-                    AppendString( p_segment, "</" );
-                    psz_subtitle = p_old_pos + 2;
+                    if ( !strcasecmp( psz_tagname, "b" ) ||
+                         !strcasecmp( psz_tagname, "i" ) ||
+                         !strcasecmp( psz_tagname, "u" ) ||
+                         !strcasecmp( psz_tagname, "s" ) ||
+                         !strcasecmp( psz_tagname, "font" ) )
+                    {
+                        // A closing tag for one of the tags we handle, meaning
+                        // we pushed a style onto the stack earlier
+                        p_segment = NewTextSegmentPopStyle( p_segment, &p_stack );
+                    }
+                    else
+                    {
+                        // Unknown closing tag, just append the "</", and go on.
+                        // This will make the unknown tag appear as text
+                        AppendString( p_segment, "</" );
+                        AppendString( p_segment, psz_tagname );
+                    }
+                    while ( *psz_subtitle == ' ' )
+                        psz_subtitle++;
+                    if ( *psz_subtitle == '>' )
+                        psz_subtitle++;
+                    free( psz_tagname );
                 }
             }
             else
