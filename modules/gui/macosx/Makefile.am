@@ -50,6 +50,7 @@ libmacosx_plugin_la_SOURCES = \
 	misc.h misc.m \
 	open.h open.m \
 	output.h output.m \
+	playlistview.h playlistview.m \
 	playlist.h playlist.m \
 	playlistinfo.h playlistinfo.m \
 	PLItem.h PLItem.m \

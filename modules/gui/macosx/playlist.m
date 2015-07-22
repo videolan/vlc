@@ -4,10 +4,10 @@
 * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Derk-Jan Hartman <hartman at videola/n dot org>
- *          Benjamin Pracht <bigben at videolab dot org>
+ * Authors: Derk-Jan Hartman <hartman at videola/n dot org>
+ *          Benjamin Pracht <bigben at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -113,74 +113,6 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 }
 
 /*****************************************************************************
- * VLCPlaylistView implementation
- *****************************************************************************/
-@implementation VLCPlaylistView
-
-- (NSMenu *)menuForEvent:(NSEvent *)o_event
-{
-    return([(VLCPlaylist *)[self delegate] menuForEvent: o_event]);
-}
-
-- (void)keyDown:(NSEvent *)o_event
-{
-    unichar key = 0;
-
-    if ([[o_event characters] length])
-        key = [[o_event characters] characterAtIndex: 0];
-
-    switch(key) {
-        case NSDeleteCharacter:
-        case NSDeleteFunctionKey:
-        case NSDeleteCharFunctionKey:
-        case NSBackspaceCharacter:
-            [(VLCPlaylist *)[self delegate] deleteItem:self];
-            break;
-
-        case NSEnterCharacter:
-        case NSCarriageReturnCharacter:
-            [(VLCPlaylist *)[[VLCMain sharedInstance] playlist] playItem:nil];
-            break;
-
-        default:
-            [super keyDown: o_event];
-            break;
-    }
-}
-
-- (BOOL)validateMenuItem:(NSMenuItem *)item
-{
-    if (([self numberOfSelectedRows] >= 1 && [item action] == @selector(delete:)) || [item action] == @selector(selectAll:))
-        return YES;
-
-    return NO;
-}
-
-- (BOOL)acceptsFirstResponder
-{
-    return YES;
-}
-
-- (BOOL)becomeFirstResponder
-{
-    [self setNeedsDisplay:YES];
-    return YES;
-}
-
-- (BOOL)resignFirstResponder
-{
-    [self setNeedsDisplay:YES];
-    return YES;
-}
-
-- (IBAction)delete:(id)sender
-{
-    [[[VLCMain sharedInstance] playlist] deleteItem: sender];
-}
-
-@end
-
-/*****************************************************************************
  * An extension to NSOutlineView's interface to fix compilation warnings
  * and let us access these 2 functions properly.
  * This uses a private API, but works fine on all current OSX releases.
@@ -193,10 +125,6 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 + (NSImage *)_defaultTableHeaderReverseSortImage;
 @end
 
-
-/*****************************************************************************
- * VLCPlaylist implementation
- *****************************************************************************/
 @interface VLCPlaylist ()
 {
     NSImage *_descendingSortingImage;
@@ -732,12 +660,12 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     if (optionsArray) {
         NSUInteger count = [optionsArray count];
         for (NSUInteger i = 0; i < count; i++)
-            input_item_AddOption(p_input, [o_options[i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
+            input_item_AddOption(p_input, [optionsArray[i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
     }
 
     /* Recent documents menu */
     if (url != nil && (BOOL)config_GetInt(p_playlist, "macosx-recentitems") == YES)
-        [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_nsurl];
+        [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL:url];
 
     return p_input;
 }
@@ -866,9 +794,9 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         b_isSortDescending = false;
 
     if (b_isSortDescending)
-        i_type = ORDER_REVERSE;
+        type = ORDER_REVERSE;
     else
-        i_type = ORDER_NORMAL;
+        type = ORDER_NORMAL;
 
     [[self model] sortForColumn:identifier withMode:type];
 

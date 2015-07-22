@@ -1246,6 +1246,8 @@
 		7D8BB0B61830311300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/DebugMessageVisualizer.xib; sourceTree = "<group>"; };
 		7D8BB0B91830367200FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PlaylistMenu.xib; sourceTree = "<group>"; };
 		7D8BB0BF1830393300FAE9B7 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		7DA481221B5FC13700917FD7 /* playlistview.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = playlistview.h; path = ../../../modules/gui/macosx/playlistview.h; sourceTree = "<group>"; };
+		7DA481231B5FC13700917FD7 /* playlistview.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = playlistview.m; path = ../../../modules/gui/macosx/playlistview.m; sourceTree = "<group>"; };
 		7DB65D5218ABD6380053B874 /* AddonsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddonsWindowController.h; path = ../../../modules/gui/macosx/AddonsWindowController.h; sourceTree = SOURCE_ROOT; };
 		7DB65D5318ABD6380053B874 /* AddonsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddonsWindowController.m; path = ../../../modules/gui/macosx/AddonsWindowController.m; sourceTree = SOURCE_ROOT; };
 		7DB65D5518ABD6490053B874 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/AddonManager.xib; sourceTree = "<group>"; };
@@ -1860,6 +1862,8 @@
 				8E55FB800459B0FD00FB3317 /* output.m */,
 				8ED6C28303E2EB1C0059A3A7 /* playlist.h */,
 				8ED6C28403E2EB1C0059A3A7 /* playlist.m */,
+				7DA481221B5FC13700917FD7 /* playlistview.h */,
+				7DA481231B5FC13700917FD7 /* playlistview.m */,
 				8E49720006417F6800370C9F /* playlistinfo.h */,
 				8E49720106417F6800370C9F /* playlistinfo.m */,
 				7DF812F11B5599E40052293C /* PLItem.h */,

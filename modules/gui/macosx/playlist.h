@@ -4,9 +4,9 @@
  * Copyright (C) 2002-2015 VLC authors and VideoLAN
  * $Id$
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Derk-Jan Hartman <hartman at videolan dot org>
+ * Authors: Benjamin Pracht <bigben at videolab dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,17 +25,8 @@
 
 #import "PXSourceList.h"
 #import "PLModel.h"
+#import "playlistview.h"
 
-/*****************************************************************************
- * VLCPlaylistView interface
- *****************************************************************************/
-@interface VLCPlaylistView : NSOutlineView
-
-@end
-
-/*****************************************************************************
- * VLCPlaylist interface
- *****************************************************************************/
 @interface VLCPlaylist : NSObject<NSOutlineViewDelegate>
 
 @property (readwrite, weak) IBOutlet NSMenu *playlistMenu;
@@ -70,7 +61,6 @@
 - (BOOL)isSelectionEmpty;
 
 - (void)deletionCompleted;
-
 
 - (IBAction)playItem:(id)sender;
 - (IBAction)revealItemInFinder:(id)sender;

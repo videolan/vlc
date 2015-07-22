@@ -596,6 +596,8 @@ modules/gui/macosx/playlist.h
 modules/gui/macosx/playlist.m
 modules/gui/macosx/playlistinfo.h
 modules/gui/macosx/playlistinfo.m
+modules/gui/macosx/playlistview.h
+modules/gui/macosx/playlistview.m
 modules/gui/macosx/prefs.h
 modules/gui/macosx/prefs.m
 modules/gui/macosx/prefs_widgets.h
