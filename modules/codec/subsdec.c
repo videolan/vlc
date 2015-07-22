@@ -645,10 +645,20 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     return p_spu;
 }
 
-static bool AppendCharacter( text_segment_t* p_segment, char c )
+static bool AppendCharacter( text_segment_t* p_segment, wchar_t c )
 {
     char* tmp;
-    if ( asprintf( &tmp, "%s%c", p_segment->psz_text ? p_segment->psz_text : "", c ) < 0 )
+    if ( asprintf( &tmp, "%s%lc", p_segment->psz_text ? p_segment->psz_text : "", c ) < 0 )
+        return false;
+    free( p_segment->psz_text );
+    p_segment->psz_text = tmp;
+    return true;
+}
+
+static bool AppendString( text_segment_t* p_segment, const char* psz_str )
+{
+    char* tmp;
+    if ( asprintf( &tmp, "%s%s", p_segment->psz_text ? p_segment->psz_text : "", psz_str ) < 0 )
         return false;
     free( p_segment->psz_text );
     p_segment->psz_text = tmp;
@@ -825,16 +835,13 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
 
     bool b_has_align = false;
 
+    while ( *psz_subtitle == ' ' )
+        psz_subtitle++;
+
     /* */
     while( *psz_subtitle )
     {
-        if( *psz_subtitle == '\n' )
-        {
-            if ( !AppendCharacter( p_segment, '\n' ) )
-                goto fail;
-            psz_subtitle++;
-        }
-        else if( *psz_subtitle == '<' )
+        if( *psz_subtitle == '<' )
         {
             if( !strncasecmp( psz_subtitle, "<br/>", 5 ))
             {
@@ -954,8 +961,7 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                 {
                     // Unknown closing tag, just append the "</", and go on.
                     // This will make the unknown tag appear as text
-                    AppendCharacter( p_segment, '<' );
-                    AppendCharacter( p_segment, '/' );
+                    AppendString( p_segment, "</" );
                     psz_subtitle = p_old_pos + 2;
                 }
             }
@@ -1020,9 +1026,47 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
         }
         else
         {
-            //FIXME: Highly inneficient
-            AppendCharacter( p_segment, *psz_subtitle );
-            psz_subtitle++;
+            if( *psz_subtitle == '\n' || !strncasecmp( psz_subtitle, "\\n", 2 ) )
+            {
+                if ( !AppendCharacter( p_segment, '\n' ) )
+                    goto fail;
+                if ( *psz_subtitle == '\n' )
+                    psz_subtitle++;
+                else
+                    psz_subtitle += 2;
+            }
+            else if( !strncasecmp( psz_subtitle, "\\h", 2 ) )
+            {
+                if ( !AppendCharacter( p_segment, L'\u00A0' ) )
+                    goto fail;
+                psz_subtitle += 2;
+            }
+            else if ( *psz_subtitle == ' ' )
+            {
+                const char *psz_current = psz_subtitle;
+                // Check if we need to trim EOL spaces
+                while ( *psz_current == ' ' )
+                    psz_current++;
+                if ( *psz_current == '\n' || *psz_current == 0 )
+                    psz_subtitle = psz_current;
+                else
+                {
+                    // Avoid continuing and iterating over spaces for each main loop iteration.
+                    // Just get done with it here.
+                    while ( *psz_subtitle == ' ' )
+                    {
+                        AppendCharacter( p_segment, ' ' );
+                        psz_subtitle++;
+                    }
+                }
+            }
+            else
+            {
+
+                //FIXME: Highly inneficient
+                AppendCharacter( p_segment, *psz_subtitle );
+                psz_subtitle++;
+            }
         }
     }
     while ( p_stack )
