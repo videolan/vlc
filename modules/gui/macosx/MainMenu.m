@@ -81,32 +81,6 @@
 
 #pragma mark - Initialization
 
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        _translationsForPlaylistTableColumns = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                                _NS("Track Number"),  TRACKNUM_COLUMN,
-                                                _NS("Title"),         TITLE_COLUMN,
-                                                _NS("Author"),        ARTIST_COLUMN,
-                                                _NS("Duration"),      DURATION_COLUMN,
-                                                _NS("Genre"),         GENRE_COLUMN,
-                                                _NS("Album"),         ALBUM_COLUMN,
-                                                _NS("Description"),   DESCRIPTION_COLUMN,
-                                                _NS("Date"),          DATE_COLUMN,
-                                                _NS("Language"),      LANGUAGE_COLUMN,
-                                                _NS("URI"),           URI_COLUMN,
-                                                _NS("File Size"),     FILESIZE_COLUMN,
-                                                nil];
-        // this array also assigns tags (index) to type of menu item
-        _menuOrderOfPlaylistTableColumns = [[NSArray alloc] initWithObjects: TRACKNUM_COLUMN, TITLE_COLUMN,
-                                            ARTIST_COLUMN, DURATION_COLUMN, GENRE_COLUMN, ALBUM_COLUMN,
-                                            DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN,
-                                            FILESIZE_COLUMN,nil];
-    }
-    return self;
-}
-
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
@@ -126,6 +100,25 @@
     }
 
     [self setRateControlsEnabled:NO];
+
+    _translationsForPlaylistTableColumns = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                            _NS("Track Number"),  TRACKNUM_COLUMN,
+                                            _NS("Title"),         TITLE_COLUMN,
+                                            _NS("Author"),        ARTIST_COLUMN,
+                                            _NS("Duration"),      DURATION_COLUMN,
+                                            _NS("Genre"),         GENRE_COLUMN,
+                                            _NS("Album"),         ALBUM_COLUMN,
+                                            _NS("Description"),   DESCRIPTION_COLUMN,
+                                            _NS("Date"),          DATE_COLUMN,
+                                            _NS("Language"),      LANGUAGE_COLUMN,
+                                            _NS("URI"),           URI_COLUMN,
+                                            _NS("File Size"),     FILESIZE_COLUMN,
+                                            nil];
+    // this array also assigns tags (index) to type of menu item
+    _menuOrderOfPlaylistTableColumns = [[NSArray alloc] initWithObjects: TRACKNUM_COLUMN, TITLE_COLUMN,
+                                        ARTIST_COLUMN, DURATION_COLUMN, GENRE_COLUMN, ALBUM_COLUMN,
+                                        DESCRIPTION_COLUMN, DATE_COLUMN, LANGUAGE_COLUMN, URI_COLUMN,
+                                        FILESIZE_COLUMN,nil];
 
 #ifdef HAVE_SPARKLE
     [_checkForUpdate setAction:@selector(checkForUpdates:)];
@@ -376,7 +369,7 @@
     [_toggleEffectsButton setState: config_GetInt(VLCIntf, "macosx-show-effects-button")];
     [_toggleSidebar setTitle: _NS("Show Sidebar")];
     [_toggleSidebar setState: config_GetInt(VLCIntf, "macosx-show-sidebar")];
-    [_playlistTableColumnsMenu setTitle: _NS("Playlist Table Columns")];
+    [self setupPlaylistTableColumnsForMenu:_playlistTableColumnsMenu];
     [_playlistTableColumns setTitle: _NS("Playlist Table Columns")];
 
     [_controlsMenu setTitle: _NS("Playback")];
@@ -513,30 +506,24 @@
 - (NSMenu *)setupPlaylistTableColumnsMenu
 {
     NSMenu *contextMenu = [[NSMenu alloc] init];
+    [self setupPlaylistTableColumnsForMenu:contextMenu];
+    return contextMenu;
+}
 
+- (void)setupPlaylistTableColumnsForMenu:(NSMenu *)menu
+{
     NSMenuItem *menuItem;
     NSUInteger count = [_menuOrderOfPlaylistTableColumns count];
     for (NSUInteger i = 0; i < count; i++) {
         NSString *title = [_translationsForPlaylistTableColumns objectForKey:[_menuOrderOfPlaylistTableColumns objectAtIndex:i]];
-        menuItem = [_playlistTableColumnsMenu addItemWithTitle:title
-                                                        action:@selector(togglePlaylistColumnTable:)
-                                                 keyEquivalent:@""];
-        /* don't set a valid target for the title column selector, since we want it to be disabled */
-        if (![[_menuOrderOfPlaylistTableColumns objectAtIndex:i] isEqualToString: TITLE_COLUMN])
-            [menuItem setTarget:self];
-        [menuItem setTag:i];
-
-        menuItem = [contextMenu addItemWithTitle:title
-                                             action:@selector(togglePlaylistColumnTable:)
-                                      keyEquivalent:@""];
+        menuItem = [menu addItemWithTitle:title
+                                   action:@selector(togglePlaylistColumnTable:)
+                            keyEquivalent:@""];
         /* don't set a valid target for the title column selector, since we want it to be disabled */
         if (![[_menuOrderOfPlaylistTableColumns objectAtIndex:i] isEqualToString: TITLE_COLUMN])
             [menuItem setTarget:self];
         [menuItem setTag:i];
     }
-    if (!_playlistTableColumnsContextMenu)
-        _playlistTableColumnsContextMenu = contextMenu;
-    return contextMenu;
 }
 
 #pragma mark - Termination

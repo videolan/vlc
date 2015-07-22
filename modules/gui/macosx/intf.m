@@ -202,6 +202,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
         NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"NO" forKey:@"LiveUpdateTheMessagesPanel"];
         [defaults registerDefaults:appDefaults];
 
+        _mainmenu = [[VLCMainMenu alloc] init];
         _voutController = [[VLCVoutWindowController alloc] init];
     }
 
@@ -224,7 +225,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     [NSBundle loadNibNamed:@"MainWindow" owner:self];
     [[self mainWindow] makeKeyAndOrderFront:nil];
     _open = [[VLCOpen alloc] init];
-    _mainmenu = [[VLCMainMenu alloc] init];
     _coreinteraction = [VLCCoreInteraction sharedInstance];
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
