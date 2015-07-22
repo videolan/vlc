@@ -199,18 +199,18 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
  *****************************************************************************/
 @interface VLCPlaylist ()
 {
-    NSImage *o_descendingSortingImage;
-    NSImage *o_ascendingSortingImage;
+    NSImage *_descendingSortingImage;
+    NSImage *_ascendingSortingImage;
 
     BOOL b_selected_item_met;
     BOOL b_isSortDescending;
-    id o_tc_sortColumn;
+    NSTableColumn *_sortTableColumn;
     NSUInteger retainedRowSelection;
 
     BOOL b_playlistmenu_nib_loaded;
     BOOL b_view_setup;
 
-    PLModel *o_model;
+    PLModel *_model;
 }
 
 - (void)saveTableColumns;
@@ -266,7 +266,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
 - (PLModel *)model
 {
-    return o_model;
+    return _model;
 }
 
 - (void)reloadStyles
@@ -284,7 +284,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     NSArray *columns = [_outlineView tableColumns];
     NSUInteger count = columns.count;
     for (NSUInteger x = 0; x < count; x++)
-        [[[columns objectAtIndex:x] dataCell] setFont:fontToUse];
+        [[columns[x] dataCell] setFont:fontToUse];
     [_outlineView setRowHeight:rowHeight];
 }
 
@@ -293,13 +293,31 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     if (b_view_setup)
         return;
 
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-
     [self reloadStyles];
     [self initStrings];
 
-    o_model = [[PLModel alloc] initWithOutlineView:_outlineView playlist:p_playlist rootItem:p_playlist->p_playing playlistObject:self];
-    [_outlineView setDataSource:o_model];
+    /* This uses a private API, but works fine on all current OSX releases.
+     * Radar ID 11739459 request a public API for this. However, it is probably
+     * easier and faster to recreate similar looking bitmaps ourselves. */
+    _ascendingSortingImage = [[NSOutlineView class] _defaultTableHeaderSortImage];
+    _descendingSortingImage = [[NSOutlineView class] _defaultTableHeaderReverseSortImage];
+
+    _sortTableColumn = nil;
+
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
+
+    b_view_setup = YES;
+}
+
+- (void)setOutlineView:(VLCPlaylistView * __nullable)outlineView
+{
+    _outlineView = outlineView;
+    [_outlineView setDelegate:self];
+
+    playlist_t * p_playlist = pl_Get(VLCIntf);
+
+    _model = [[PLModel alloc] initWithOutlineView:_outlineView playlist:p_playlist rootItem:p_playlist->p_playing playlistObject:self];
+    [_outlineView setDataSource:_model];
     [_outlineView reloadData];
 
     [_outlineView setTarget: self];
@@ -308,18 +326,6 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     [_outlineView setAllowsEmptySelection: NO];
     [_outlineView registerForDraggedTypes: [NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
     [_outlineView setIntercellSpacing: NSMakeSize (0.0, 1.0)];
-
-    /* This uses a private API, but works fine on all current OSX releases.
-     * Radar ID 11739459 request a public API for this. However, it is probably
-     * easier and faster to recreate similar looking bitmaps ourselves. */
-    o_ascendingSortingImage = [[NSOutlineView class] _defaultTableHeaderSortImage];
-    o_descendingSortingImage = [[NSOutlineView class] _defaultTableHeaderReverseSortImage];
-
-    o_tc_sortColumn = nil;
-
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
-
-    b_view_setup = YES;
 }
 
 - (void)setPlaylistHeaderView:(NSTableHeaderView * __nullable)playlistHeaderView
@@ -329,19 +335,19 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     NSMenu *contextMenu = [mainMenu setupPlaylistTableColumnsMenu];
     [_playlistHeaderView setMenu: contextMenu];
 
-    NSArray * o_columnArray = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PlaylistColumnSelection"];
-    NSUInteger count = [o_columnArray count];
-    NSString * o_column;
+    NSArray * columnArray = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PlaylistColumnSelection"];
+    NSUInteger columnCount = [columnArray count];
+    NSString * column;
 
-    for (NSUInteger i = 0; i < count; i++) {
-        o_column = [[o_columnArray objectAtIndex:i] firstObject];
-        if ([o_column isEqualToString:@"status"])
+    for (NSUInteger i = 0; i < columnCount; i++) {
+        column = [columnArray[i] firstObject];
+        if ([column isEqualToString:@"status"])
             continue;
 
-        if(![mainMenu setPlaylistColumnTableState: NSOnState forColumn: o_column])
+        if(![mainMenu setPlaylistColumnTableState: NSOnState forColumn:column])
             continue;
 
-        [[_outlineView tableColumnWithIdentifier: o_column] setWidth: [[[o_columnArray objectAtIndex:i] objectAtIndex:1] floatValue]];
+        [[_outlineView tableColumnWithIdentifier: column] setWidth: [columnArray[i][1] floatValue]];
     }
 }
 
@@ -370,10 +376,10 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     [_outlineView reloadData];
 }
 
-- (void)plItemAppended:(NSArray *)o_val
+- (void)plItemAppended:(NSArray *)valueArray
 {
-    int i_node = [[o_val firstObject] intValue];
-    int i_item = [[o_val objectAtIndex:1] intValue];
+    int i_node = [[valueArray firstObject] intValue];
+    int i_item = [valueArray[1] intValue];
 
     [[self model] addItem:i_item withParentNode:i_node];
 
@@ -385,9 +391,9 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
                                                       userInfo: nil];
 }
 
-- (void)plItemRemoved:(NSNumber *)o_val
+- (void)plItemRemoved:(NSNumber *)value
 {
-    int i_item = [o_val intValue];
+    int i_item = [value intValue];
 
     [[self model] removeItem:i_item];
     [self deletionCompleted];
@@ -626,12 +632,12 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     if (![[self model] editAllowed])
         return;
 
-    NSIndexSet *o_selected_indexes = [_outlineView selectedRowIndexes];
-    retainedRowSelection = [o_selected_indexes firstIndex];
+    NSIndexSet *selectedIndexes = [_outlineView selectedRowIndexes];
+    retainedRowSelection = [selectedIndexes firstIndex];
     if (retainedRowSelection == NSNotFound)
         retainedRowSelection = 0;
 
-    [o_selected_indexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+    [selectedIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
         PLItem *o_item = [_outlineView itemAtRow: idx];
         if (!o_item)
             return;
@@ -675,69 +681,68 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 //    [self playlistUpdated];
 }
 
-- (input_item_t *)createItem:(NSDictionary *)o_one_item
+- (input_item_t *)createItem:(NSDictionary *)itemToCreateDict
 {
-    intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Get(p_intf);
+    intf_thread_t *p_intf = VLCIntf;
+    playlist_t *p_playlist = pl_Get(p_intf);
 
     input_item_t *p_input;
     BOOL b_rem = FALSE, b_dir = FALSE, b_writable = FALSE;
-    NSString *o_uri, *o_name, *o_path;
-    NSURL * o_nsurl;
-    NSArray *o_options;
-    NSURL *o_true_file;
+    NSString *uri, *name, *path;
+    NSURL * url;
+    NSArray *optionsArray;
 
     /* Get the item */
-    o_uri = (NSString *)[o_one_item objectForKey: @"ITEM_URL"];
-    o_nsurl = [NSURL URLWithString: o_uri];
-    o_path = [o_nsurl path];
-    o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
-    o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
+    uri = (NSString *)[itemToCreateDict objectForKey: @"ITEM_URL"];
+    url = [NSURL URLWithString: uri];
+    path = [url path];
+    name = (NSString *)[itemToCreateDict objectForKey: @"ITEM_NAME"];
+    optionsArray = (NSArray *)[itemToCreateDict objectForKey: @"ITEM_OPTIONS"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtPath:o_path isDirectory:&b_dir] && b_dir &&
-        [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath:o_path isRemovable: &b_rem
-                                                     isWritable:&b_writable isUnmountable:NULL description:NULL type:NULL] && b_rem && !b_writable && [o_nsurl isFileURL]) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&b_dir] && b_dir &&
+        [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath:path isRemovable: &b_rem
+                                                     isWritable:&b_writable isUnmountable:NULL description:NULL type:NULL] && b_rem && !b_writable && [url isFileURL]) {
 
-        NSString *diskType = [[VLCStringUtility sharedInstance] getVolumeTypeFromMountPath: o_path];
+        NSString *diskType = [[VLCStringUtility sharedInstance] getVolumeTypeFromMountPath: path];
         msg_Dbg(p_intf, "detected optical media of type %s in the file input", [diskType UTF8String]);
 
         if ([diskType isEqualToString: kVLCMediaDVD])
-            o_uri = [NSString stringWithFormat: @"dvdnav://%@", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: o_path]];
+            uri = [NSString stringWithFormat: @"dvdnav://%@", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: path]];
         else if ([diskType isEqualToString: kVLCMediaVideoTSFolder])
-            o_uri = [NSString stringWithFormat: @"dvdnav://%@", o_path];
+            uri = [NSString stringWithFormat: @"dvdnav://%@", path];
         else if ([diskType isEqualToString: kVLCMediaAudioCD])
-            o_uri = [NSString stringWithFormat: @"cdda://%@", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: o_path]];
+            uri = [NSString stringWithFormat: @"cdda://%@", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: path]];
         else if ([diskType isEqualToString: kVLCMediaVCD])
-            o_uri = [NSString stringWithFormat: @"vcd://%@#0:0", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: o_path]];
+            uri = [NSString stringWithFormat: @"vcd://%@#0:0", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: path]];
         else if ([diskType isEqualToString: kVLCMediaSVCD])
-            o_uri = [NSString stringWithFormat: @"vcd://%@@0:0", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: o_path]];
+            uri = [NSString stringWithFormat: @"vcd://%@@0:0", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: path]];
         else if ([diskType isEqualToString: kVLCMediaBD] || [diskType isEqualToString: kVLCMediaBDMVFolder])
-            o_uri = [NSString stringWithFormat: @"bluray://%@", o_path];
+            uri = [NSString stringWithFormat: @"bluray://%@", path];
         else
-            msg_Warn(VLCIntf, "unknown disk type, treating %s as regular input", [o_path UTF8String]);
+            msg_Warn(VLCIntf, "unknown disk type, treating %s as regular input", [path UTF8String]);
 
-        p_input = input_item_New([o_uri UTF8String], [[[NSFileManager defaultManager] displayNameAtPath: o_path] UTF8String]);
+        p_input = input_item_New([uri UTF8String], [[[NSFileManager defaultManager] displayNameAtPath:path] UTF8String]);
     }
     else
-        p_input = input_item_New([o_uri fileSystemRepresentation], o_name ? [o_name UTF8String] : NULL);
+        p_input = input_item_New([uri fileSystemRepresentation], name ? [name UTF8String] : NULL);
 
     if (!p_input)
         return NULL;
 
-    if (o_options) {
-        NSUInteger count = [o_options count];
+    if (optionsArray) {
+        NSUInteger count = [optionsArray count];
         for (NSUInteger i = 0; i < count; i++)
-            input_item_AddOption(p_input, [[o_options objectAtIndex:i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
+            input_item_AddOption(p_input, [o_options[i] UTF8String], VLC_INPUT_OPTION_TRUSTED);
     }
 
     /* Recent documents menu */
-    if (o_nsurl != nil && (BOOL)config_GetInt(p_playlist, "macosx-recentitems") == YES)
+    if (url != nil && (BOOL)config_GetInt(p_playlist, "macosx-recentitems") == YES)
         [[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL: o_nsurl];
 
     return p_input;
 }
 
-- (void)addPlaylistItems:(NSArray*)o_array
+- (void)addPlaylistItems:(NSArray*)array
 {
 
     int i_plItemId = -1;
@@ -748,10 +753,10 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
     BOOL b_autoplay = var_InheritBool(VLCIntf, "macosx-autoplay");
 
-    [self addPlaylistItems:o_array withParentItemId:i_plItemId atPos:-1 startPlayback:b_autoplay];
+    [self addPlaylistItems:array withParentItemId:i_plItemId atPos:-1 startPlayback:b_autoplay];
 }
 
-- (void)addPlaylistItems:(NSArray*)o_array withParentItemId:(int)i_plItemId atPos:(int)i_position startPlayback:(BOOL)b_start
+- (void)addPlaylistItems:(NSArray*)array withParentItemId:(int)i_plItemId atPos:(int)i_position startPlayback:(BOOL)b_start
 {
     playlist_t * p_playlist = pl_Get(VLCIntf);
     PL_LOCK;
@@ -767,11 +772,11 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         return;
     }
 
-    NSUInteger count = [o_array count];
+    NSUInteger count = [array count];
     int i_current_offset = 0;
     for (NSUInteger i = 0; i < count; ++i) {
 
-        NSDictionary *o_current_item = [o_array objectAtIndex:i];
+        NSDictionary *o_current_item = array[i];
         input_item_t *p_input = [self createItem: o_current_item];
         if (!p_input)
             continue;
@@ -797,16 +802,16 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     NSUInteger indexes[count];
     [selectedRows getIndexes:indexes maxCount:count inIndexRange:nil];
 
-    id o_item;
+    id item;
     playlist_item_t *p_item;
     for (NSUInteger i = 0; i < count; i++) {
-        o_item = [_outlineView itemAtRow: indexes[i]];
+        item = [_outlineView itemAtRow: indexes[i]];
 
         /* We need to collapse the node first, since OSX refuses to recursively
          expand an already expanded node, even if children nodes are collapsed. */
-        if ([_outlineView isExpandable:o_item]) {
-            [_outlineView collapseItem: o_item collapseChildren: YES];
-            [_outlineView expandItem: o_item expandChildren: YES];
+        if ([_outlineView isExpandable:item]) {
+            [_outlineView collapseItem: item collapseChildren: YES];
+            [_outlineView expandItem: item expandChildren: YES];
         }
 
         selectedRows = [_outlineView selectedRowIndexes];
@@ -847,15 +852,15 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     return _playlistMenu;
 }
 
-- (void)outlineView: (NSOutlineView *)o_tv didClickTableColumn:(NSTableColumn *)o_tc
+- (void)outlineView:(NSOutlineView *)outlineView didClickTableColumn:(NSTableColumn *)aTableColumn
 {
-    int i_mode, i_type = 0;
+    int type = 0;
     intf_thread_t *p_intf = VLCIntf;
-    NSString * o_identifier = [o_tc identifier];
+    NSString * identifier = [aTableColumn identifier];
 
     playlist_t *p_playlist = pl_Get(p_intf);
 
-    if (o_tc_sortColumn == o_tc)
+    if (_sortTableColumn == aTableColumn)
         b_isSortDescending = !b_isSortDescending;
     else
         b_isSortDescending = false;
@@ -865,7 +870,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     else
         i_type = ORDER_NORMAL;
 
-    [[self model] sortForColumn:o_identifier withMode:i_type];
+    [[self model] sortForColumn:identifier withMode:type];
 
     // TODO rework, why do we need a full call here?
 //    [self playlistUpdated];
@@ -873,18 +878,16 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     /* Clear indications of any existing column sorting */
     NSUInteger count = [[_outlineView tableColumns] count];
     for (NSUInteger i = 0 ; i < count ; i++)
-        [_outlineView setIndicatorImage:nil inTableColumn: [[_outlineView tableColumns] objectAtIndex:i]];
+        [_outlineView setIndicatorImage:nil inTableColumn: [_outlineView tableColumns][i]];
 
     [_outlineView setHighlightedTableColumn:nil];
-    o_tc_sortColumn = nil;
-
-    o_tc_sortColumn = o_tc;
-    [_outlineView setHighlightedTableColumn:o_tc];
+    _sortTableColumn = aTableColumn;
+    [_outlineView setHighlightedTableColumn:aTableColumn];
 
     if (b_isSortDescending)
-        [_outlineView setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
+        [_outlineView setIndicatorImage:_descendingSortingImage inTableColumn:aTableColumn];
     else
-        [_outlineView setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
+        [_outlineView setIndicatorImage:_ascendingSortingImage inTableColumn:aTableColumn];
 }
 
 
@@ -931,67 +934,65 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     return [[self model] draggedItems];
 }
 
-- (void)setColumn: (NSString *)o_column state: (NSInteger)i_state translationDict:(NSDictionary *)o_dict
+- (void)setColumn:(NSString *)columnIdentifier state:(NSInteger)i_state translationDict:(NSDictionary *)translationDict
 {
-    NSTableColumn * o_work_tc;
-
     if (i_state == NSOnState) {
-        NSString *o_title = [o_dict objectForKey:o_column];
-        if (!o_title)
+        NSString *title = [translationDict objectForKey:columnIdentifier];
+        if (!title)
             return;
 
-        o_work_tc = [[NSTableColumn alloc] initWithIdentifier: o_column];
-        [o_work_tc setEditable: NO];
-        [[o_work_tc dataCell] setFont: [NSFont controlContentFontOfSize:11.]];
+        NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:columnIdentifier];
+        [tableColumn setEditable:NO];
+        [[tableColumn dataCell] setFont:[NSFont controlContentFontOfSize:11.]];
 
-        [[o_work_tc headerCell] setStringValue: [o_dict objectForKey:o_column]];
+        [[tableColumn headerCell] setStringValue:[translationDict objectForKey:columnIdentifier]];
 
-        if ([o_column isEqualToString: TRACKNUM_COLUMN]) {
-            [o_work_tc setWidth: 20.];
-            [o_work_tc setResizingMask: NSTableColumnNoResizing];
-            [[o_work_tc headerCell] setStringValue: @"#"];
+        if ([columnIdentifier isEqualToString: TRACKNUM_COLUMN]) {
+            [tableColumn setWidth:20.];
+            [tableColumn setResizingMask:NSTableColumnNoResizing];
+            [[tableColumn headerCell] setStringValue:@"#"];
         }
 
-        [_outlineView addTableColumn: o_work_tc];
+        [_outlineView addTableColumn:tableColumn];
         [_outlineView reloadData];
         [_outlineView setNeedsDisplay: YES];
     }
     else
-        [_outlineView removeTableColumn: [_outlineView tableColumnWithIdentifier: o_column]];
+        [_outlineView removeTableColumn: [_outlineView tableColumnWithIdentifier:columnIdentifier]];
 
     [_outlineView setOutlineTableColumn: [_outlineView tableColumnWithIdentifier:TITLE_COLUMN]];
 }
 
 - (void)saveTableColumns
 {
-    NSMutableArray * o_arrayToSave = [[NSMutableArray alloc] init];
-    NSArray * o_columns = [[NSArray alloc] initWithArray:[_outlineView tableColumns]];
-    NSUInteger count = [o_columns count];
-    NSTableColumn * o_currentColumn;
-    for (NSUInteger i = 0; i < count; i++) {
-        o_currentColumn = [o_columns objectAtIndex:i];
-        [o_arrayToSave addObject:[NSArray arrayWithObjects:[o_currentColumn identifier], [NSNumber numberWithFloat:[o_currentColumn width]], nil]];
+    NSMutableArray *arrayToSave = [[NSMutableArray alloc] init];
+    NSArray *columns = [[NSArray alloc] initWithArray:[_outlineView tableColumns]];
+    NSUInteger columnCount = [columns count];
+    NSTableColumn *currentColumn;
+    for (NSUInteger i = 0; i < columnCount; i++) {
+        currentColumn = columns[i];
+        [arrayToSave addObject:[NSArray arrayWithObjects:[currentColumn identifier], [NSNumber numberWithFloat:[currentColumn width]], nil]];
     }
-    [[NSUserDefaults standardUserDefaults] setObject: o_arrayToSave forKey:@"PlaylistColumnSelection"];
+    [[NSUserDefaults standardUserDefaults] setObject:arrayToSave forKey:@"PlaylistColumnSelection"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (BOOL)isValidResumeItem:(input_item_t *)p_item
 {
     char *psz_url = input_item_GetURI(p_item);
-    NSString *o_url_string = toNSStr(psz_url);
+    NSString *urlString = toNSStr(psz_url);
     free(psz_url);
 
-    if ([o_url_string isEqualToString:@""])
+    if ([urlString isEqualToString:@""])
         return NO;
 
-    NSURL *o_url = [NSURL URLWithString:o_url_string];
+    NSURL *url = [NSURL URLWithString:urlString];
 
-    if (![o_url isFileURL])
+    if (![url isFileURL])
         return NO;
 
     BOOL isDir = false;
-    if (![[NSFileManager defaultManager] fileExistsAtPath:[o_url path] isDirectory:&isDir])
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[url path] isDirectory:&isDir])
         return NO;
 
     if (isDir)

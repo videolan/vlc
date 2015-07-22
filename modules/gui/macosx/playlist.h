@@ -36,7 +36,7 @@
 /*****************************************************************************
  * VLCPlaylist interface
  *****************************************************************************/
-@interface VLCPlaylist : NSObject<NSOutlineViewDataSource, NSOutlineViewDelegate>
+@interface VLCPlaylist : NSObject<NSOutlineViewDelegate>
 
 @property (readwrite, weak) IBOutlet NSMenu *playlistMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *playPlaylistMenuItem;

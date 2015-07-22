@@ -39,6 +39,7 @@
 #import <vlc_url.h>
 #import <vlc_strings.h>
 #import <vlc_services_discovery.h>
+#import "PLModel.h"
 
 #import "ControlsBar.h"
 #import "VideoView.h"
@@ -174,8 +175,6 @@ static VLCMainWindow *sharedInstance = nil;
     VLCPlaylist *playlist = [[VLCMain sharedInstance] playlist];
     playlist.outlineView = o_outline_view;
     playlist.playlistHeaderView = [o_outline_view headerView];
-    [o_outline_view setDelegate:playlist];
-    [o_outline_view setDataSource:playlist];
 
     [o_dropzone_btn setTitle: _NS("Open media...")];
     [[o_dropzone_btn cell] accessibilitySetOverrideValue:_NS("Click to open an advanced dialog to select the media to play. You can also drop files here to play.") forAttribute:NSAccessibilityDescriptionAttribute];
@@ -1132,7 +1131,6 @@ static VLCMainWindow *sharedInstance = nil;
 
     if ([[item identifier] isEqualToString:@"playlist"]) {
         PL_LOCK;
-
         [[[[VLCMain sharedInstance] playlist] model] changeRootItem:p_playlist->p_playing];
         PL_UNLOCK;
 

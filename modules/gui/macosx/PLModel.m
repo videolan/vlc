@@ -56,7 +56,7 @@
 - (id)initWithOutlineView:(NSOutlineView *)outlineView playlist:(playlist_t *)pl rootItem:(playlist_item_t *)root playlistObject:(id)plObj;
 {
     self = [super init];
-    if(self) {
+    if (self) {
         p_playlist = pl;
         _outlineView = outlineView;
         _playlist = plObj;
