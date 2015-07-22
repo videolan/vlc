@@ -91,7 +91,6 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (void)setActiveVideoPlayback:(BOOL)b_value;
 - (BOOL)activeVideoPlayback;
 - (void)applicationWillTerminate:(NSNotification *)notification;
-- (void)resetAndReinitializeUserDefaults;
 
 - (void)showFullscreenController;
 

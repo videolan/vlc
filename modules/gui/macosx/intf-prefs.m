@@ -39,7 +39,7 @@ static const int kCurrentPreferencesVersion = 3;
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 }
 
-- (void)private_resetAndReinitializeUserDefaults
+- (void)resetAndReinitializeUserDefaults
 {
     // note that [NSUserDefaults resetStandardUserDefaults] will NOT correctly reset to the defaults
 

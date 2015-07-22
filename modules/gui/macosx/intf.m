@@ -592,11 +592,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     return b_active_videoplayback;
 }
 
-- (void)resetAndReinitializeUserDefaults
-{
-    [self private_resetAndReinitializeUserDefaults];
-}
-
 @end
 
 /*****************************************************************************
