@@ -108,14 +108,14 @@ AbstractAdaptationLogic *HLSManager::createLogic(AbstractAdaptationLogic::LogicT
     {
         case AbstractAdaptationLogic::FixedRate:
         {
-            size_t bps = var_InheritInteger(p_demux, "hls-prefbw") * 8192;
+            size_t bps = var_InheritInteger(p_demux, "adaptative-bw") * 8192;
             return new (std::nothrow) FixedRateAdaptationLogic(bps);
         }
         case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::RateBased:
         {
-            int width = var_InheritInteger(p_demux, "hls-prefwidth");
-            int height = var_InheritInteger(p_demux, "hls-prefheight");
+            int width = var_InheritInteger(p_demux, "adaptative-width");
+            int height = var_InheritInteger(p_demux, "adaptative-height");
             return new (std::nothrow) RateBasedAdaptationLogic(width, height);
         }
         default:

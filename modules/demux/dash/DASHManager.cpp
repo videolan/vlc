@@ -218,14 +218,14 @@ AbstractAdaptationLogic *DASHManager::createLogic(AbstractAdaptationLogic::Logic
     {
         case AbstractAdaptationLogic::FixedRate:
         {
-            size_t bps = var_InheritInteger(p_demux, "dash-prefbw") * 8192;
+            size_t bps = var_InheritInteger(p_demux, "adaptative-bw") * 8192;
             return new (std::nothrow) FixedRateAdaptationLogic(bps);
         }
         case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::RateBased:
         {
-            int width = var_InheritInteger(p_demux, "dash-prefwidth");
-            int height = var_InheritInteger(p_demux, "dash-prefheight");
+            int width = var_InheritInteger(p_demux, "adaptative-width");
+            int height = var_InheritInteger(p_demux, "adaptative-height");
             return new (std::nothrow) RateBasedAdaptationLogic(width, height);
         }
         default:

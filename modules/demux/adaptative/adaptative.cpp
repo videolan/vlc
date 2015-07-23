@@ -1,11 +1,7 @@
 /*****************************************************************************
- * dash.cpp: DASH module
+ * adaptative.cpp: Adaptative streaming module
  *****************************************************************************
- * Copyright © 2010 - 2011 Klagenfurt University
- *
- * Created on: Aug 10, 2010
- * Authors: Christopher Mueller <christopher.mueller@itec.uni-klu.ac.at>
- *          Christian Timmerer  <christian.timmerer@itec.uni-klu.ac.at>
+ * Copyright © 2015 - VideoLAN and VLC Authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -36,16 +32,25 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 
-#include "xml/DOMParser.h"
-#include "mpd/MPDFactory.h"
-#include "mpd/Period.h"
-#include "DASHManager.h"
+#include "playlist/BasePeriod.h"
+
+#include "../dash/xml/DOMParser.h"
+#include "../dash/mpd/MPDFactory.h"
+#include "../dash/DASHManager.h"
+
+#include "../hls/HLSManager.hpp"
+#include "../hls/HLSStreams.hpp"
+#include "../hls/playlist/Parser.hpp"
+#include "../hls/playlist/M3U8.hpp"
+
 
 using namespace adaptative::logic;
 using namespace adaptative::playlist;
 using namespace dash::mpd;
 using namespace dash::xml;
 using namespace dash;
+using namespace hls;
+using namespace hls::playlist;
 
 /*****************************************************************************
  * Module descriptor
@@ -53,16 +58,14 @@ using namespace dash;
 static int  Open    (vlc_object_t *);
 static void Close   (vlc_object_t *);
 
-#define DASH_WIDTH_TEXT N_("Preferred Width")
-#define DASH_WIDTH_LONGTEXT N_("Preferred Width")
+#define ADAPT_WIDTH_TEXT N_("Preferred Width")
 
-#define DASH_HEIGHT_TEXT N_("Preferred Height")
-#define DASH_HEIGHT_LONGTEXT N_("Preferred Height")
+#define ADAPT_HEIGHT_TEXT N_("Preferred Height")
 
-#define DASH_BW_TEXT N_("Fixed Bandwidth in KiB/s")
-#define DASH_BW_LONGTEXT N_("Preferred bandwidth for non adaptative streams")
+#define ADAPT_BW_TEXT N_("Fixed Bandwidth in KiB/s")
+#define ADAPT_BW_LONGTEXT N_("Preferred bandwidth for non adaptative streams")
 
-#define DASH_LOGIC_TEXT N_("Adaptation Logic")
+#define ADAPT_LOGIC_TEXT N_("Adaptation Logic")
 
 static const int pi_logics[] = {AbstractAdaptationLogic::RateBased,
                                 AbstractAdaptationLogic::FixedRate,
@@ -75,17 +78,17 @@ static const char *const ppsz_logics[] = { N_("Bandwidth Adaptive"),
                                            N_("Highest Bandwith/Quality")};
 
 vlc_module_begin ()
-        set_shortname( N_("DASH"))
-        set_description( N_("Dynamic Adaptive Streaming over HTTP") )
-        set_capability( "demux", 10 )
+        set_shortname( N_("Adaptative"))
+        set_description( N_("Unified adaptative streaming for DASH/HLS") )
+        set_capability( "demux", 12 )
         set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_DEMUX )
-        add_integer( "dash-logic",      dash::logic::AbstractAdaptationLogic::Default,
-                                             DASH_LOGIC_TEXT, NULL, false )
+        add_integer( "adaptative-logic",  AbstractAdaptationLogic::Default,
+                                          ADAPT_LOGIC_TEXT, NULL, false )
             change_integer_list( pi_logics, ppsz_logics )
-        add_integer( "dash-prefwidth",  480, DASH_WIDTH_TEXT,  DASH_WIDTH_LONGTEXT,  true )
-        add_integer( "dash-prefheight", 360, DASH_HEIGHT_TEXT, DASH_HEIGHT_LONGTEXT, true )
-        add_integer( "dash-prefbw",     250, DASH_BW_TEXT,     DASH_BW_LONGTEXT,     false )
+        add_integer( "adaptative-width",  480, ADAPT_WIDTH_TEXT,  ADAPT_WIDTH_TEXT,  true )
+        add_integer( "adaptative-height", 360, ADAPT_HEIGHT_TEXT, ADAPT_HEIGHT_TEXT, true )
+        add_integer( "adaptative-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT,     false )
         set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -108,42 +111,58 @@ static int Open(vlc_object_t *p_obj)
         free(psz_mime);
     }
 
-    if(!b_mimematched && !DASHManager::isDASH(p_demux->s))
-        return VLC_EGENERIC;
+    PlaylistManager *p_manager = NULL;
+    int logic = var_InheritInteger(p_obj, "adaptative-logic");
 
-    //Build a XML tree
-    DOMParser        parser(p_demux->s);
-    if( !parser.parse() )
+    if(b_mimematched || DASHManager::isDASH(p_demux->s))
     {
-        msg_Err( p_demux, "Could not parse MPD" );
+        //Build a XML tree
+        DOMParser parser(p_demux->s);
+        if( !parser.parse() )
+        {
+            msg_Err( p_demux, "Could not parse MPD" );
+            return VLC_EGENERIC;
+        }
+
+        //Begin the actual MPD parsing:
+        MPD *p_playlist = MPDFactory::create(parser.getRootNode(), p_demux->s, parser.getProfile());
+        if(p_playlist == NULL)
+        {
+            msg_Err( p_demux, "Cannot create/unknown MPD for profile");
+            return VLC_EGENERIC;
+        }
+
+        p_manager = new DASHManager( p_demux, p_playlist,
+                                     new (std::nothrow) DASHStreamOutputFactory,
+                                     static_cast<AbstractAdaptationLogic::LogicType>(logic) );
+    }
+    else if(HLSManager::isHTTPLiveStreaming(p_demux->s))
+    {
+        Parser parser(p_demux->s);
+        M3U8 *p_playlist = parser.parse(std::string());
+        if(!p_playlist)
+        {
+            msg_Err( p_demux, "Could not parse MPD" );
+            return VLC_EGENERIC;
+        }
+
+        p_manager =
+                new (std::nothrow) HLSManager(p_demux, p_playlist,
+                                              new (std::nothrow) HLSStreamOutputFactory,
+                                              static_cast<AbstractAdaptationLogic::LogicType>(logic));
+    }
+
+    if(!p_manager->start())
+    {
+        delete p_manager;
         return VLC_EGENERIC;
     }
 
-    //Begin the actual MPD parsing:
-    MPD *mpd = MPDFactory::create(parser.getRootNode(), p_demux->s, parser.getProfile());
-    if(mpd == NULL)
-    {
-        msg_Err( p_demux, "Cannot create/unknown MPD for profile");
-        return VLC_EGENERIC;
-    }
+    p_demux->p_sys         = reinterpret_cast<demux_sys_t *>(p_manager);
+    p_demux->pf_demux      = p_manager->demux_callback;
+    p_demux->pf_control    = p_manager->control_callback;
 
-    int logic = var_InheritInteger( p_obj, "dash-logic" );
-    DASHManager *p_dashManager = new (std::nothrow) DASHManager(p_demux, mpd,
-            new (std::nothrow) DASHStreamOutputFactory,
-            static_cast<AbstractAdaptationLogic::LogicType>(logic));
-
-    BasePeriod *period = mpd->getFirstPeriod();
-    if(period && !p_dashManager->start())
-    {
-        delete p_dashManager;
-        return VLC_EGENERIC;
-    }
-
-    p_demux->p_sys         = reinterpret_cast<demux_sys_t *>(p_dashManager);
-    p_demux->pf_demux      = p_dashManager->demux_callback;
-    p_demux->pf_control    = p_dashManager->control_callback;
-
-    msg_Dbg(p_obj,"opening mpd file (%s)", p_demux->s->psz_path);
+    msg_Dbg(p_obj,"opening playlist file (%s)", p_demux->s->psz_path);
 
     return VLC_SUCCESS;
 }
@@ -157,4 +176,3 @@ static void Close(vlc_object_t *p_obj)
 
     delete p_manager;
 }
-

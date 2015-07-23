@@ -22,6 +22,7 @@ $Id$
  * access_output_udp: UDP Network access_output module
  * access_realrtsp: Real RTSP access
  * access_wasapi: WASAPI audio input
+ * adaptative: Unified adaptative streaming module (DASH/HLS)
  * addonsfsstorage: Local storage extensions repository
  * addonsvorepository: Videolan extensions repository
  * adjust: Contrast/Hue/saturation/Brightness adjust module
@@ -85,7 +86,6 @@ $Id$
  * d3d11_surface: Convert D3D11 GPU textures to YUV planes
  * d3d11va: Direct3D11 hardware-accelerated decoding
  * daala: a daala video decoder/packetizer using libdaala
- * dash: MPEG DASH playback
  * dbus: D-Bus control interface
  * dbus_screensaver: preventing the computer from suspending
  * dc1394: IIDC (DCAM) FireWire input module
@@ -174,7 +174,6 @@ $Id$
  * hevc: HEVC demuxer
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
- * hls: HTTP Live Streaming demuxer
  * http: HTTP Network access module
  * httplive: HTTP Live streaming for playback
  * i420_rgb: planar YUV to packed RGB conversion functions

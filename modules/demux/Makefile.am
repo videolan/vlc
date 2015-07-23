@@ -244,7 +244,7 @@ if HAVE_DVBPSI
 demux_LTLIBRARIES += libts_plugin.la
 endif
 
-adaptative_SOURCES = \
+libadaptative_plugin_la_SOURCES = \
     demux/adaptative/playlist/AbstractPlaylist.cpp \
     demux/adaptative/playlist/AbstractPlaylist.hpp \
     demux/adaptative/playlist/BaseAdaptationSet.cpp \
@@ -311,7 +311,7 @@ adaptative_SOURCES = \
     demux/adaptative/tools/Retrieve.cpp \
     demux/adaptative/tools/Retrieve.hpp
 
-libdash_plugin_la_SOURCES = \
+libadaptative_dash_SOURCES = \
     demux/dash/mpd/AdaptationSet.cpp \
     demux/dash/mpd/AdaptationSet.h \
     demux/dash/mpd/DASHCommonAttributesElements.cpp \
@@ -344,22 +344,11 @@ libdash_plugin_la_SOURCES = \
     demux/dash/xml/DOMParser.h \
     demux/dash/xml/Node.cpp \
     demux/dash/xml/Node.h \
-    demux/dash/dash.cpp \
     demux/dash/DASHManager.cpp \
     demux/dash/DASHManager.h \
     demux/dash/DASHStreamFormat.hpp
 
-libdash_plugin_la_SOURCES += $(adaptative_SOURCES)
-libdash_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
-libdash_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/demux/dash
-libdash_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
-if HAVE_ZLIB
-libdash_plugin_la_LIBADD += -lz
-endif
-demux_LTLIBRARIES += libdash_plugin.la
-
-
-libhls_plugin_la_SOURCES = \
+libadaptative_hls_SOURCES = \
     demux/hls/playlist/M3U8.hpp \
     demux/hls/playlist/M3U8.cpp \
     demux/hls/playlist/Parser.hpp \
@@ -374,21 +363,22 @@ libhls_plugin_la_SOURCES = \
     demux/hls/HLSManager.cpp \
     demux/hls/HLSStreamFormat.hpp \
     demux/hls/HLSStreams.hpp \
-    demux/hls/HLSStreams.cpp \
-    demux/hls/hls.cpp
+    demux/hls/HLSStreams.cpp
 
-libhls_plugin_la_SOURCES += $(adaptative_SOURCES)
-libhls_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/demux/hls
-libhls_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
+libadaptative_plugin_la_SOURCES += $(libadaptative_hls_SOURCES)
+libadaptative_plugin_la_SOURCES += $(libadaptative_dash_SOURCES)
+libadaptative_plugin_la_SOURCES += demux/adaptative/adaptative.cpp
+libadaptative_plugin_la_SOURCES += demux/mp4/libmp4.c demux/mp4/libmp4.h
+libadaptative_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/demux/adaptative
+libadaptative_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
 if HAVE_ZLIB
-libhls_plugin_la_LIBADD += -lz
+libadaptative_plugin_la_LIBADD += -lz
 endif
 if HAVE_GCRYPT
-libhls_plugin_la_CXXFLAGS += $(GCRYPT_CFLAGS)
-libhls_plugin_la_LIBADD += $(GCRYPT_LIBS)
+libadaptative_plugin_la_CXXFLAGS += $(GCRYPT_CFLAGS)
+libadaptative_plugin_la_LIBADD += $(GCRYPT_LIBS)
 endif
-
-demux_LTLIBRARIES += libhls_plugin.la
+demux_LTLIBRARIES += libadaptative_plugin.la
 
 libttml_plugin_la_SOURCES = demux/ttml.c
 demux_LTLIBRARIES += libttml_plugin.la

@@ -22,8 +22,8 @@
 #endif
 
 #include "Parser.hpp"
-#include "playlist/HLSSegment.hpp"
-#include "playlist/Representation.hpp"
+#include "HLSSegment.hpp"
+#include "Representation.hpp"
 #include "../adaptative/playlist/BasePeriod.h"
 #include "../adaptative/playlist/BaseAdaptationSet.h"
 #include "../adaptative/playlist/SegmentList.h"

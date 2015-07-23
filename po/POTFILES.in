@@ -447,6 +447,7 @@ modules/control/ntservice.c
 modules/control/oldrc.c
 modules/control/unimotion.c
 modules/control/unimotion.h
+modules/demux/adaptative/adaptative.cpp
 modules/demux/aiff.c
 modules/demux/asf/asf.c
 modules/demux/asf/libasf.c
@@ -461,12 +462,10 @@ modules/demux/avi/libavi.c
 modules/demux/avi/libavi.h
 modules/demux/caf.c
 modules/demux/cdg.c
-modules/demux/dash/dash.cpp
 modules/demux/demuxdump.c
 modules/demux/dirac.c
 modules/demux/flac.c
 modules/demux/gme.c
-modules/demux/hls/hls.cpp
 modules/demux/image.c
 modules/demux/mjpeg.c
 modules/demux/mkv/chapter_command.cpp
