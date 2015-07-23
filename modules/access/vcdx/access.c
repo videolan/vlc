@@ -882,7 +882,7 @@ VCDOpen ( vlc_object_t *p_this )
                                                     "-track-length" );
     p_vcdplayer->in_still          = false;
     p_vcdplayer->play_item.type    = VCDINFO_ITEM_TYPE_NOTFOUND;
-    p_vcdplayer->p_input           = access_GetParentInput( p_access );
+    p_vcdplayer->p_input           = p_access->p_input;
 //    p_vcdplayer->p_meta            = vlc_meta_New();
     p_vcdplayer->p_segments        = NULL;
     p_vcdplayer->p_entries         = NULL;
@@ -950,7 +950,6 @@ VCDOpen ( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
  err_exit:
-    if( p_vcdplayer->p_input ) vlc_object_release( p_vcdplayer->p_input );
     free( psz_source );
     free( p_vcdplayer->psz_source );
     free( p_vcdplayer );
@@ -976,8 +975,6 @@ VCDClose ( vlc_object_t *p_this )
     }
  
     vcdinfo_close( p_vcdplayer->vcd );
-
-    if( p_vcdplayer->p_input ) vlc_object_release( p_vcdplayer->p_input );
 
     FREENULL( p_vcdplayer->p_entries );
     FREENULL( p_vcdplayer->p_segments );

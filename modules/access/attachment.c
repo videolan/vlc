@@ -68,15 +68,13 @@ static int Open(vlc_object_t *object)
     access_t     *access = (access_t *)object;
     access_sys_t *sys;
 
-    input_thread_t *input = access_GetParentInput(access);
+    input_thread_t *input = access->p_input;
     if (!input)
         return VLC_EGENERIC;
 
     input_attachment_t *a;
     if (input_Control(input, INPUT_GET_ATTACHMENT, &a, access->psz_location))
         a = NULL;
-
-    vlc_object_release(input);
 
     if (!a) {
         msg_Err(access, "Failed to find the attachment '%s'",

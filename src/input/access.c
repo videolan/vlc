@@ -133,14 +133,6 @@ void vlc_access_Delete(access_t *access)
 }
 
 /*****************************************************************************
- * access_GetParentInput:
- *****************************************************************************/
-input_thread_t * access_GetParentInput( access_t *p_access )
-{
-    return p_access->p_input ? vlc_object_hold((vlc_object_t *)p_access->p_input) : NULL;
-}
-
-/*****************************************************************************
  * access_vaDirectoryControlHelper:
  *****************************************************************************/
 int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list args )

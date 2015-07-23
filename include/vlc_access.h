@@ -253,12 +253,6 @@ static inline void access_InitFields( access_t *p_a )
 }
 
 /**
- * This function will return the parent input of this access.
- * It is retained. It can return NULL.
- */
-VLC_API input_thread_t * access_GetParentInput( access_t *p_access ) VLC_USED;
-
-/**
  * Default pf_control callback for directory accesses.
  */
 VLC_API int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list args );

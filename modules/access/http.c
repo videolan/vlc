@@ -858,13 +858,12 @@ static int ReadICYMeta( access_t *p_access )
                 free( psz_tmp );
 
             msg_Dbg( p_access, "New Icy-Title=%s", p_sys->psz_icy_title );
-            input_thread_t *p_input = access_GetParentInput( p_access );
+            input_thread_t *p_input = p_access->p_input;
             if( p_input )
             {
                 input_item_t *p_input_item = input_GetItem( p_access->p_input );
                 if( p_input_item )
                     input_item_SetMeta( p_input_item, vlc_meta_NowPlaying, p_sys->psz_icy_title );
-                vlc_object_release( p_input );
             }
         }
     }
@@ -1452,13 +1451,12 @@ static int Request( access_t *p_access, uint64_t i_tell )
             else
                 resolve_xml_special_chars( p_sys->psz_icy_name );
             msg_Dbg( p_access, "Icy-Name: %s", p_sys->psz_icy_name );
-            input_thread_t *p_input = access_GetParentInput( p_access );
+            input_thread_t *p_input = p_access->p_input;
             if ( p_input )
             {
                 input_item_t *p_input_item = input_GetItem( p_access->p_input );
                 if ( p_input_item )
                     input_item_SetMeta( p_input_item, vlc_meta_Title, p_sys->psz_icy_name );
-                vlc_object_release( p_input );
             }
 
             p_sys->b_icecast = true; /* be on the safeside. set it here as well. */
@@ -1475,13 +1473,12 @@ static int Request( access_t *p_access, uint64_t i_tell )
             else
                 resolve_xml_special_chars( p_sys->psz_icy_genre );
             msg_Dbg( p_access, "Icy-Genre: %s", p_sys->psz_icy_genre );
-            input_thread_t *p_input = access_GetParentInput( p_access );
+            input_thread_t *p_input = p_access->p_input;
             if( p_input )
             {
                 input_item_t *p_input_item = input_GetItem( p_access->p_input );
                 if( p_input_item )
                     input_item_SetMeta( p_input_item, vlc_meta_Genre, p_sys->psz_icy_genre );
-                vlc_object_release( p_input );
             }
         }
         else if( !strncasecmp( psz, "Icy-Notice", 10 ) )

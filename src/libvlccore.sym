@@ -1,4 +1,3 @@
-access_GetParentInput
 access_vaDirectoryControlHelper
 vlc_access_NewMRL
 vlc_access_Delete

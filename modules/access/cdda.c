@@ -174,7 +174,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->i_track < 0 )
     {
         /* We only do separate items if the whole disc is requested */
-        input_thread_t *p_input = access_GetParentInput( p_access );
+        input_thread_t *p_input = p_access->p_input;
 
         int i_ret = -1;
         if( p_input )
@@ -182,8 +182,6 @@ static int Open( vlc_object_t *p_this )
             input_item_t *p_current = input_GetItem( p_input );
             if( p_current )
                 i_ret = GetTracks( p_access, p_current );
-
-            vlc_object_release( p_input );
         }
         if( i_ret < 0 )
             goto error;

@@ -154,7 +154,7 @@ int MMSHOpen( access_t *p_access )
     {
         msg_Dbg( p_access, "redirection to %s", psz_location );
 
-        input_thread_t * p_input = access_GetParentInput( p_access );
+        input_thread_t * p_input = p_access->p_input;
         input_item_t * p_new_loc;
 
         if( !p_input )
@@ -168,7 +168,6 @@ int MMSHOpen( access_t *p_access )
         input_item_PostSubItem( p_item, p_new_loc );
 
         vlc_gc_decref( p_new_loc );
-        vlc_object_release( p_input );
 
         free( psz_location );
 
