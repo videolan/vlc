@@ -117,8 +117,8 @@ enum stream_query_e
     STREAM_GET_PRIVATE_ID_STATE,          /* arg1=int i_private_data arg2=bool *          res=can fail */
 };
 
-VLC_API int stream_Read( stream_t *s, void *p_read, int i_read );
-VLC_API int stream_Peek( stream_t *s, const uint8_t **pp_peek, int i_peek );
+VLC_API ssize_t stream_Read(stream_t *, void *, size_t);
+VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t);
 VLC_API int stream_vaControl( stream_t *s, int i_query, va_list args );
 VLC_API void stream_Delete( stream_t *s );
 VLC_API int stream_Control( stream_t *s, int i_query, ... );
