@@ -88,8 +88,8 @@ static int Open (vlc_object_t *obj)
     block_t *data = NULL;
     if (size <= 0)
     {
-        data = stream_BlockRemaining (demux->s, 100000000);
-        if (!data )
+        data = stream_Block (demux->s, 1 << 24);
+        if (data == NULL)
             return VLC_EGENERIC;
     }
 
