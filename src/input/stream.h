@@ -27,15 +27,6 @@
 
 #include <vlc_common.h>
 #include <vlc_stream.h>
-#include <vlc_charset.h>
-
-struct stream_text_t
-{
-    /* UTF-16 and UTF-32 file reading */
-    vlc_iconv_t     conv;
-    int             i_char_width;
-    bool            b_little_endian;
-};
 
 /* */
 stream_t *stream_CommonNew( vlc_object_t * );

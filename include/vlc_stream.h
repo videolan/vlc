@@ -39,9 +39,6 @@ extern "C" {
  * Byte streams and byte stream filter modules interface
  */
 
-/* Opaque definition for text reader context */
-typedef struct stream_text_t stream_text_t;
-
 /**
  * stream_t definition
  */
@@ -72,9 +69,6 @@ struct stream_t
 
     /* Private data for module */
     stream_sys_t *p_sys;
-
-    /* Text reader state */
-    stream_text_t *p_text;
 
     /* Weak link to parent input */
     input_thread_t *p_input;

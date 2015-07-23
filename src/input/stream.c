@@ -2,6 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VLC authors and VideoLAN
+ * Copyright 2008-2015 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -32,43 +33,55 @@
 #include <vlc_common.h>
 #include <vlc_memory.h>
 #include <vlc_access.h>
+#include <vlc_charset.h>
 
 #include <libvlc.h>
 #include "stream.h"
 
-/****************************************************************************
- * stream_CommonNew: create an empty stream structure
- ****************************************************************************/
-stream_t *stream_CommonNew( vlc_object_t *p_obj )
+typedef struct stream_priv_t
 {
-    stream_t *s = (stream_t *)vlc_custom_create( p_obj, sizeof(*s), "stream" );
+    stream_t stream;
 
-    if( !s )
+    /* UTF-16 and UTF-32 file reading */
+    struct {
+        vlc_iconv_t   conv;
+        unsigned char char_width;
+        bool          little_endian;
+    } text;
+} stream_priv_t;
+
+/**
+ * Allocates a VLC stream object
+ */
+stream_t *stream_CommonNew(vlc_object_t *parent)
+{
+    stream_priv_t *priv = vlc_custom_create(parent, sizeof (*priv), "stream");
+    if (unlikely(priv == NULL))
         return NULL;
 
-    s->p_text = malloc( sizeof(*s->p_text) );
-    if( !s->p_text )
-    {
-        vlc_object_release( s );
-        return NULL;
-    }
+    stream_t *s = &priv->stream;
+
+    s->psz_access = NULL;
+    s->psz_path = NULL;
 
     /* UTF16 and UTF32 text file conversion */
-    s->p_text->conv = (vlc_iconv_t)(-1);
-    s->p_text->i_char_width = 1;
-    s->p_text->b_little_endian = false;
+    priv->text.conv = (vlc_iconv_t)(-1);
+    priv->text.char_width = 1;
+    priv->text.little_endian = false;
 
     return s;
 }
 
+/**
+ * Destroys a VLC stream object
+ */
 void stream_CommonDelete( stream_t *s )
 {
-    if( s->p_text )
-    {
-        if( s->p_text->conv != (vlc_iconv_t)(-1) )
-            vlc_iconv_close( s->p_text->conv );
-        free( s->p_text );
-    }
+    stream_priv_t *priv = (stream_priv_t *)s;
+
+    if (priv->text.conv != (vlc_iconv_t)(-1))
+        vlc_iconv_close(priv->text.conv);
+
     free( s->psz_access );
     free( s->psz_path );
     vlc_object_release( s );
@@ -93,9 +106,6 @@ stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
     return stream_AccessNew( p_access );
 }
 
-/****************************************************************************
- * stream_ReadLine:
- ****************************************************************************/
 /**
  * Read from the stream untill first newline.
  * \param s Stream handle to read from
@@ -105,6 +115,7 @@ stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 #define STREAM_LINE_MAX (2048*100)
 char *stream_ReadLine( stream_t *s )
 {
+    stream_priv_t *priv = (stream_priv_t *)s;
     char *p_line = NULL;
     int i_line = 0, i_read = 0;
 
@@ -132,7 +143,7 @@ char *stream_ReadLine( stream_t *s )
             if( !memcmp( p_data, "\xFF\xFE", 2 ) )
             {
                 psz_encoding = "UTF-16LE";
-                s->p_text->b_little_endian = true;
+                priv->text.little_endian = true;
             }
             else if( !memcmp( p_data, "\xFE\xFF", 2 ) )
             {
@@ -143,17 +154,17 @@ char *stream_ReadLine( stream_t *s )
             if( psz_encoding != NULL )
             {
                 msg_Dbg( s, "UTF-16 BOM detected" );
-                s->p_text->i_char_width = 2;
-                s->p_text->conv = vlc_iconv_open( "UTF-8", psz_encoding );
-                if( s->p_text->conv == (vlc_iconv_t)-1 )
+                priv->text.char_width = 2;
+                priv->text.conv = vlc_iconv_open( "UTF-8", psz_encoding );
+                if( priv->text.conv == (vlc_iconv_t)-1 )
                     msg_Err( s, "iconv_open failed" );
             }
         }
 
-        if( i_data % s->p_text->i_char_width )
+        if( i_data % priv->text.char_width )
         {
             /* keep i_char_width boundary */
-            i_data = i_data - ( i_data % s->p_text->i_char_width );
+            i_data = i_data - ( i_data % priv->text.char_width );
             msg_Warn( s, "the read is not i_char_width compatible");
         }
 
@@ -161,7 +172,7 @@ char *stream_ReadLine( stream_t *s )
             break;
 
         /* Check if there is an EOL */
-        if( s->p_text->i_char_width == 1 )
+        if( priv->text.char_width == 1 )
         {
             /* UTF-8: 0A <LF> */
             psz_eol = memchr( p_data, '\n', i_data );
@@ -171,10 +182,10 @@ char *stream_ReadLine( stream_t *s )
         }
         else
         {
-            const uint8_t *p_last = p_data + i_data - s->p_text->i_char_width;
-            uint16_t eol = s->p_text->b_little_endian ? 0x0A00 : 0x00A0;
+            const uint8_t *p_last = p_data + i_data - priv->text.char_width;
+            uint16_t eol = priv->text.little_endian ? 0x0A00 : 0x00A0;
 
-            assert( s->p_text->i_char_width == 2 );
+            assert( priv->text.char_width == 2 );
             psz_eol = NULL;
             /* UTF-16: 000A <LF> */
             for( const uint8_t *p = p_data; p <= p_last; p += 2 )
@@ -188,7 +199,7 @@ char *stream_ReadLine( stream_t *s )
 
             if( psz_eol == NULL )
             {   /* UTF-16: 000D <CR> */
-                eol = s->p_text->b_little_endian ? 0x0D00 : 0x00D0;
+                eol = priv->text.little_endian ? 0x0D00 : 0x00D0;
                 for( const uint8_t *p = p_data; p <= p_last; p += 2 )
                 {
                     if( U16_AT( p ) == eol )
@@ -204,12 +215,12 @@ char *stream_ReadLine( stream_t *s )
         {
             i_data = (psz_eol - (char *)p_data) + 1;
             p_line = realloc_or_free( p_line,
-                     i_line + i_data + s->p_text->i_char_width ); /* add \0 */
+                        i_line + i_data + priv->text.char_width ); /* add \0 */
             if( !p_line )
                 goto error;
             i_data = stream_Read( s, &p_line[i_line], i_data );
             if( i_data <= 0 ) break; /* Hmmm */
-            i_line += i_data - s->p_text->i_char_width; /* skip \n */;
+            i_line += i_data - priv->text.char_width; /* skip \n */;
             i_read += i_data;
 
             /* We have our line */
@@ -218,7 +229,7 @@ char *stream_ReadLine( stream_t *s )
 
         /* Read data (+1 for easy \0 append) */
         p_line = realloc_or_free( p_line,
-                       i_line + STREAM_PROBE_LINE + s->p_text->i_char_width );
+                          i_line + STREAM_PROBE_LINE + priv->text.char_width );
         if( !p_line )
             goto error;
         i_data = stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );
@@ -232,13 +243,10 @@ char *stream_ReadLine( stream_t *s )
 
     if( i_read > 0 )
     {
-        int j;
-        for( j = 0; j < s->p_text->i_char_width; j++ )
-        {
-            p_line[i_line + j] = '\0';
-        }
-        i_line += s->p_text->i_char_width; /* the added \0 */
-        if( s->p_text->i_char_width > 1 )
+        memset(p_line + i_line, 0, priv->text.char_width);
+        i_line += priv->text.char_width; /* the added \0 */
+
+        if( priv->text.char_width > 1 )
         {
             int i_new_line = 0;
             size_t i_in = 0, i_out = 0;
@@ -257,7 +265,7 @@ char *stream_ReadLine( stream_t *s )
             p_in = p_line;
             p_out = psz_new_line;
 
-            if( vlc_iconv( s->p_text->conv, &p_in, &i_in, &p_out, &i_out ) == (size_t)-1 )
+            if( vlc_iconv( priv->text.conv, &p_in, &i_in, &p_out, &i_out ) == (size_t)-1 )
             {
                 msg_Err( s, "iconv failed" );
                 msg_Dbg( s, "original: %d, in %d, out %d", i_line, (int)i_in, (int)i_out );
@@ -282,9 +290,11 @@ error:
     free( p_line );
 
     /* */
-    if( s->p_text->conv != (vlc_iconv_t)(-1) )
-        vlc_iconv_close( s->p_text->conv );
-    s->p_text->conv = (vlc_iconv_t)(-1);
+    if( priv->text.conv != (vlc_iconv_t)(-1) )
+    {
+        vlc_iconv_close( priv->text.conv );
+        priv->text.conv = (vlc_iconv_t)(-1);
+    }
     return NULL;
 }
 
