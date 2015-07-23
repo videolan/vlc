@@ -99,8 +99,6 @@ struct stream_sys_t
     bool   b_unitsizeset;
 };
 
-static int Peek( stream_t *, const uint8_t **, unsigned int );
-
 static const char * GetErrorMessage( const int i_error,
                                const struct error_messages_s const *p_errors_messages )
 {
@@ -114,7 +112,7 @@ static const char * GetErrorMessage( const int i_error,
     return "unkown error";
 }
 
-static size_t RemainRead( stream_t *p_stream, uint8_t *p_data, size_t i_toread, bool b_peek )
+static size_t RemainRead( stream_t *p_stream, uint8_t *p_data, size_t i_toread )
 {
     stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -129,22 +127,17 @@ static size_t RemainRead( stream_t *p_stream, uint8_t *p_data, size_t i_toread, 
         i_total += i_copy;
         p_data += i_copy;
 
-        if ( !b_peek )
-        {
-            /* update block data pointer and release if no longer needed */
-            p_sys->remain.p_list->i_buffer -= i_copy;
-            p_sys->remain.p_list->p_buffer += i_copy;
-            p_sys->remain.i_size -= i_copy;
+        /* update block data pointer and release if no longer needed */
+        p_sys->remain.p_list->i_buffer -= i_copy;
+        p_sys->remain.p_list->p_buffer += i_copy;
+        p_sys->remain.i_size -= i_copy;
 
-            if ( p_sys->remain.p_list->i_buffer == 0 )
-            {
-                block_t *p_prevhead = p_sys->remain.p_list;
-                p_sys->remain.p_list = p_sys->remain.p_list->p_next;
-                block_Release( p_prevhead );
-            }
-        }
-        else
+        if ( p_sys->remain.p_list->i_buffer == 0 )
+        {
+            block_t *p_prevhead = p_sys->remain.p_list;
             p_sys->remain.p_list = p_sys->remain.p_list->p_next;
+            block_Release( p_prevhead );
+        }
     }
     return i_total;
 }
@@ -173,7 +166,7 @@ static void RemainFlush( stream_sys_t *p_sys )
 
 #define ALL_READY (UNIT_SIZE_READY|ECM_READY|PMT_READY)
 
-static int DecoderRead( stream_t *p_stream, uint8_t *p_dst, int i_toread, bool b_peek )
+static int DecoderRead( stream_t *p_stream, uint8_t *p_dst, int i_toread )
 {
     stream_sys_t *p_sys = p_stream->p_sys;
     ARIB_STD_B25_BUFFER getbuf = { NULL, 0 };
@@ -184,7 +177,7 @@ static int DecoderRead( stream_t *p_stream, uint8_t *p_dst, int i_toread, bool b
         return -1;
 
     /* Use data from previous reads */
-    size_t i_fromremain = RemainRead( p_stream, p_dst, i_toread, b_peek );
+    size_t i_fromremain = RemainRead( p_stream, p_dst, i_toread );
     i_toread -= i_fromremain;
     i_total_read += i_fromremain;
 
@@ -227,20 +220,12 @@ static int DecoderRead( stream_t *p_stream, uint8_t *p_dst, int i_toread, bool b
         if ( i_ret < 0 )
             return -1;
 
-        if ( b_peek )
-        {
-            /* put everything in remain */
-            RemainAdd( p_stream, getbuf.data, getbuf.size );
-        }
-        else
-        {
-            memcpy( p_dst, getbuf.data, __MIN(getbuf.size, i_toread) );
+        memcpy( p_dst, getbuf.data, __MIN(getbuf.size, i_toread) );
 
-            if ( getbuf.size > i_toread )
-            {
-                /* Hold remaining data for next call */
-                RemainAdd( p_stream, getbuf.data + i_toread, getbuf.size - i_toread );
-            }
+        if ( getbuf.size > i_toread )
+        {
+            /* Hold remaining data for next call */
+            RemainAdd( p_stream, getbuf.data + i_toread, getbuf.size - i_toread );
         }
 
         i_total_read += __MIN(getbuf.size, i_toread);
@@ -268,7 +253,7 @@ static int Read( stream_t *p_stream, void *p_buf, unsigned int i_toread )
             msg_Dbg( p_stream, "Set unit size to %u", i_toread );
     }
 
-    int i_read = DecoderRead( p_stream, p_buf, i_toread, false );
+    int i_read = DecoderRead( p_stream, p_buf, i_toread );
     if ( i_read < 0 )
         return -1;
     else
@@ -279,40 +264,6 @@ static int Read( stream_t *p_stream, void *p_buf, unsigned int i_toread )
 /**
  *
  */
-
-static int Peek( stream_t *p_stream, const uint8_t **pp_buf, unsigned int i_len )
-{
-    stream_sys_t *p_sys = p_stream->p_sys;
-    i_len = __MAX(ARIB_STD_B25_TS_PROBING_MIN_DATA, i_len);
-
-    if ( i_len > p_sys->remain.i_size )
-    {
-        uint8_t *p_tmpbuf = malloc( i_len - p_sys->remain.i_size );
-        DecoderRead( p_stream, p_tmpbuf, i_len - p_sys->remain.i_size, true );
-        free( p_tmpbuf );
-    }
-
-    if ( !p_sys->remain.p_list )
-    {
-        assert(p_sys->remain.i_size == 0);
-        /* might not be enough data in the stream to allow returning data */
-        return 0;
-    }
-
-    if ( p_sys->remain.p_list->i_buffer < i_len )
-    {
-        p_sys->remain.p_list = block_ChainGather( p_sys->remain.p_list );
-        if ( !p_sys->remain.p_list )
-        {
-            p_sys->remain.i_size = 0;
-            return 0;
-        }
-    }
-
-    *pp_buf = p_sys->remain.p_list->p_buffer;
-
-    return __MIN(i_len, p_sys->remain.i_size);
-}
 
 static int Seek( stream_t *p_stream, uint64_t i_pos )
 {
@@ -415,7 +366,6 @@ static int Open( vlc_object_t *p_object )
     p_sys->i_pos = stream_Tell( p_stream->p_source );
 
     p_stream->pf_read = Read;
-    p_stream->pf_peek = Peek;
     p_stream->pf_control = Control;
 
     return VLC_SUCCESS;
