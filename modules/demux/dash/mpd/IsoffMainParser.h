@@ -30,7 +30,7 @@
 #endif
 
 #include "../adaptative/playlist/SegmentInfoCommon.h"
-#include "mpd/Profile.hpp"
+#include "Profile.hpp"
 
 #include <cstdlib>
 #include <sstream>

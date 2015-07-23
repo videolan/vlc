@@ -18,8 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "AtomsReader.hpp"
-#include "mpd/Representation.h"
-#include "mpd/MPD.h"
+#include "../mpd/Representation.h"
+#include "../mpd/MPD.h"
 
 using namespace dash::mp4;
 using namespace dash::mpd;

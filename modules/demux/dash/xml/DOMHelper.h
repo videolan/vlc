@@ -28,7 +28,7 @@
 #include <vector>
 #include <string>
 
-#include "xml/Node.h"
+#include "Node.h"
 
 namespace dash
 {

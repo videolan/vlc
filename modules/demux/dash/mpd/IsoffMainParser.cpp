@@ -38,7 +38,7 @@
 #include "AdaptationSet.h"
 #include "ProgramInformation.h"
 #include "DASHSegment.h"
-#include "xml/DOMHelper.h"
+#include "../xml/DOMHelper.h"
 #include <vlc_strings.h>
 #include <vlc_stream.h>
 #include <cstdio>

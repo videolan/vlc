@@ -27,7 +27,7 @@
 #endif
 
 #include "MPDFactory.h"
-#include "mpd/IsoffMainParser.h"
+#include "IsoffMainParser.h"
 
 using namespace dash::xml;
 using namespace dash::mpd;

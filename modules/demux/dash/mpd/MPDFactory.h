@@ -24,8 +24,8 @@
 #ifndef MPDFACTORY_H_
 #define MPDFACTORY_H_
 
-#include "mpd/MPD.h"
-#include "mpd/Profile.hpp"
+#include "MPD.h"
+#include "Profile.hpp"
 
 namespace dash
 {

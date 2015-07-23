@@ -27,7 +27,7 @@
 
 #include "DASHCommonAttributesElements.h"
 
-#include "mpd/ContentDescription.h"
+#include "ContentDescription.h"
 
 #include <vlc_common.h>
 #include <vlc_arrays.h>
