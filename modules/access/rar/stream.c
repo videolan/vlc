@@ -44,11 +44,6 @@ static int Read(stream_t *s, void *data, unsigned size)
     return stream_Read(s->p_sys->payload, data, size);
 }
 
-static int Peek( stream_t *s, const uint8_t **data, unsigned size)
-{
-    return stream_Peek(s->p_sys->payload, data, size);
-}
-
 static int Control(stream_t *s, int query, va_list args)
 {
     switch (query) {
@@ -145,7 +140,6 @@ int RarStreamOpen(vlc_object_t *object)
     }
 
     s->pf_read = Read;
-    s->pf_peek = Peek;
     s->pf_control = Control;
 
     stream_sys_t *sys = s->p_sys = malloc(sizeof(*sys));

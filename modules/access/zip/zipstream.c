@@ -54,7 +54,6 @@ vlc_module_end()
  * Local prototypes
  ****************************************************************************/
 static int Read   ( stream_t *, void *p_read, unsigned int i_read );
-static int Peek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
 static int Control( stream_t *, int i_query, va_list );
 
 typedef struct node node;
@@ -184,7 +183,6 @@ int StreamOpen( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     s->pf_read = Read;
-    s->pf_peek = Peek;
     s->pf_control = Control;
 
     p_sys->fileFunctions = ( zlib_filefunc_def * )
@@ -262,24 +260,6 @@ static int Read( stream_t *s, void *p_read, unsigned int i_read )
     if( p_read )
         memcpy( p_read, p_sys->psz_xspf + p_sys->i_pos, i_len );
     p_sys->i_pos += i_len;
-
-    return i_len;
-}
-
-/** *************************************************************************
- * Peek
- ****************************************************************************/
-static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned int i_peek )
-{
-    stream_sys_t *p_sys = s->p_sys;
-
-    /* Fill the buffer */
-    if( Fill( s ) )
-        return -1;
-
-    /* Point to the buffer */
-    int i_len = __MIN( i_peek, p_sys->i_len - p_sys->i_pos );
-    *pp_peek = (uint8_t*) p_sys->psz_xspf + p_sys->i_pos;
 
     return i_len;
 }
