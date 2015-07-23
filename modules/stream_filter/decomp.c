@@ -87,7 +87,6 @@ struct stream_sys_t
     pid_t        pid;
 
     uint64_t     offset;
-    block_t      *peeked;
 
     int          read_fd;
     bool         can_pace;
@@ -186,8 +185,6 @@ static void *Thread (void *data)
 }
 
 
-static int Peek (stream_t *, const uint8_t **, unsigned int);
-
 #define MIN_BLOCK (1 << 10)
 #define MAX_BLOCK (1 << 20)
 /**
@@ -197,36 +194,19 @@ static int Peek (stream_t *, const uint8_t **, unsigned int);
 static int Read (stream_t *stream, void *buf, unsigned int buflen)
 {
     stream_sys_t *sys = stream->p_sys;
-    unsigned ret = 0;
+    ssize_t ret = 0;
 
     if (buf == NULL) /* caller skips data, get big enough peek buffer */
-        buflen = Peek (stream, &(const uint8_t *){ NULL }, buflen);
+    {
+        buf = malloc(buflen);
+        if (unlikely(buf == NULL))
+            return -1;
 
-    block_t *peeked = sys->peeked;
-    if (peeked != NULL)
-    {   /* dequeue peeked data */
-        size_t length = peeked->i_buffer;
-        if (length > buflen)
-            length = buflen;
-
-        if (buf != NULL)
-        {
-            memcpy (buf, peeked->p_buffer, length);
-            buf = ((char *)buf) + length;
-        }
-        buflen -= length;
-        peeked->p_buffer += length;
-        peeked->i_buffer -= length;
-
-        if (peeked->i_buffer == 0)
-        {
-            block_Release (peeked);
-            sys->peeked = NULL;
-        }
-
-        sys->offset += length;
-        ret += length;
+        ret = Read(stream, buf, buflen);
+        free(buf);
+        return ret;
     }
+
     assert ((buf != NULL) || (buflen == 0));
 
     ssize_t val = vlc_read_i11e (sys->read_fd, buf, buflen);
@@ -236,46 +216,6 @@ static int Read (stream_t *stream, void *buf, unsigned int buflen)
         ret += val;
     }
     return ret;
-}
-
-/**
- *
- */
-static int Peek (stream_t *stream, const uint8_t **pbuf, unsigned int len)
-{
-    stream_sys_t *sys = stream->p_sys;
-    block_t *peeked = sys->peeked;
-    size_t curlen;
-
-    if (peeked != NULL)
-    {
-        curlen = peeked->i_buffer;
-        if (curlen < len)
-           peeked = block_Realloc (peeked, 0, len);
-    }
-    else
-    {
-        curlen = 0;
-        peeked = block_Alloc (len);
-    }
-
-    sys->peeked = peeked;
-    if (unlikely(peeked == NULL))
-        return 0;
-
-    while (curlen < len)
-    {
-        ssize_t val;
-
-        val = vlc_read_i11e (sys->read_fd, peeked->p_buffer + curlen,
-                           len - curlen);
-        if (val <= 0)
-            break;
-        curlen += val;
-        peeked->i_buffer = curlen;
-    }
-    *pbuf = peeked->p_buffer;
-    return curlen;
 }
 
 /**
@@ -335,7 +275,6 @@ static int Open (stream_t *stream, const char *path)
         return VLC_ENOMEM;
 
     stream->pf_read = Read;
-    stream->pf_peek = Peek;
     stream->pf_control = Control;
 
     vlc_cond_init (&p_sys->wait);
@@ -343,7 +282,6 @@ static int Open (stream_t *stream, const char *path)
     p_sys->paused = false;
     p_sys->pid = -1;
     p_sys->offset = 0;
-    p_sys->peeked = NULL;
     stream_Control (stream->p_source, STREAM_CAN_PAUSE, &p_sys->can_pause);
     stream_Control (stream->p_source, STREAM_CAN_CONTROL_PACE,
                     &p_sys->can_pace);
@@ -445,8 +383,6 @@ static void Close (vlc_object_t *obj)
     while (waitpid (p_sys->pid, &status, 0) == -1);
     msg_Dbg (obj, "exit status %d", status);
 
-    if (p_sys->peeked)
-        block_Release (p_sys->peeked);
     vlc_mutex_destroy (&p_sys->lock);
     vlc_cond_destroy (&p_sys->wait);
     free (p_sys);
