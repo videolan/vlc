@@ -34,14 +34,6 @@ struct stream_sys_t
     uint8_t buffer[ARCHIVE_READ_SIZE];
 };
 
-static int Peek(stream_t *p_stream, const uint8_t **pp_peek, unsigned int i_peek)
-{
-    VLC_UNUSED(p_stream);
-    VLC_UNUSED(pp_peek);
-    VLC_UNUSED(i_peek);
-    return 0;
-}
-
 static int Control(stream_t *p_stream, int i_query, va_list args)
 {
     switch( i_query )
@@ -208,7 +200,6 @@ int StreamOpen(vlc_object_t *p_object)
     }
 
     p_stream->pf_read = NULL;
-    p_stream->pf_peek = Peek;
     p_stream->pf_control = Control;
     p_stream->pf_readdir = Browse;
 
