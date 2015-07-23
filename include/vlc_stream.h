@@ -60,7 +60,6 @@ struct stream_t
 
     /* */
     int         (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
-    int         (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
     input_item_t *(*pf_readdir)( stream_t * );
     int         (*pf_control)( stream_t *, int i_query, va_list );
 
