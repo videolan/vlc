@@ -65,7 +65,6 @@ struct stream_sys_t
  * Local prototypes
  ****************************************************************************/
 static int  Read   ( stream_t *, void *p_read, unsigned int i_read );
-static int  Peek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
 static int  Control( stream_t *, int i_query, va_list );
 
 static int  Start  ( stream_t *, const char *psz_extension );
@@ -89,7 +88,6 @@ static int Open ( vlc_object_t *p_this )
 
     /* */
     s->pf_read = Read;
-    s->pf_peek = Peek;
     s->pf_control = Control;
     stream_FilterSetDefaultReadDir( s );
 
@@ -135,11 +133,6 @@ static int Read( stream_t *s, void *p_read, unsigned int i_read )
     }
 
     return i_record;
-}
-
-static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned int i_peek )
-{
-    return stream_Peek( s->p_source, pp_peek, i_peek );
 }
 
 static int Control( stream_t *s, int i_query, va_list args )
