@@ -42,14 +42,16 @@ namespace dash
     class DASHManager : public PlaylistManager
     {
         public:
-            DASHManager( mpd::MPD *mpd,
+            DASHManager( demux_t *, mpd::MPD *mpd,
                          AbstractStreamOutputFactory *,
-                         logic::AbstractAdaptationLogic::LogicType type,
-                         stream_t *stream);
+                         logic::AbstractAdaptationLogic::LogicType type);
             virtual ~DASHManager    ();
 
             virtual bool updatePlaylist(); //reimpl
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType); //reimpl
+
+        protected:
+            virtual int doControl(int, va_list); /* reimpl */
     };
 
 }

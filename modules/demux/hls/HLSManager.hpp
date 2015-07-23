@@ -31,10 +31,9 @@ namespace hls
     class HLSManager : public PlaylistManager
     {
         public:
-            HLSManager( playlist::M3U8 *,
+            HLSManager( demux_t *, playlist::M3U8 *,
                         AbstractStreamOutputFactory *,
-                        logic::AbstractAdaptationLogic::LogicType type,
-                        stream_t *stream );
+                        logic::AbstractAdaptationLogic::LogicType type );
             virtual ~HLSManager();
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType);
             virtual bool updatePlaylist();

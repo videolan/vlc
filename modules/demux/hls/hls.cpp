@@ -31,9 +31,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_meta.h>
-
-#include <errno.h>
 
 #include "../adaptative/logic/AbstractAdaptationLogic.h"
 #include "HLSManager.hpp"
@@ -93,15 +90,6 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct demux_sys_t
-{
-        adaptative::PlaylistManager     *p_manager;
-        hls::playlist::M3U8             *p_playlist;
-        mtime_t              i_nzpcr;
-};
-
-static int  Demux( demux_t * );
-static int  Control         (demux_t *p_demux, int i_query, va_list args);
 
 /*****************************************************************************
  * Open:
@@ -169,39 +157,28 @@ static int Open(vlc_object_t *p_obj)
     if(!isHTTPLiveStreaming(p_demux->s))
         return VLC_EGENERIC;
 
-    demux_sys_t *p_sys = (demux_sys_t *) malloc(sizeof(demux_sys_t));
-    if (unlikely(p_sys == NULL))
-        return VLC_ENOMEM;
-
     Parser parser(p_demux->s);
-    p_sys->p_playlist = parser.parse(std::string());
-    if(!p_sys->p_playlist)
-    {
-        free(p_sys);
+    M3U8 *p_playlist = parser.parse(std::string());
+    if(!p_playlist)
         return VLC_EGENERIC;
-    }
 
     int logic = var_InheritInteger(p_obj, "hls-logic");
 
     HLSManager *p_manager =
-            new (std::nothrow) HLSManager(p_sys->p_playlist,
+            new (std::nothrow) HLSManager(p_demux, p_playlist,
             new (std::nothrow) HLSStreamOutputFactory,
-            static_cast<AbstractAdaptationLogic::LogicType>(logic),
-            p_demux->s);
+            static_cast<AbstractAdaptationLogic::LogicType>(logic));
 
-    BasePeriod *period = p_sys->p_playlist->getFirstPeriod();
-    if(period && !p_manager->start(p_demux))
+    BasePeriod *period = p_playlist->getFirstPeriod();
+    if(period && !p_manager->start())
     {
         delete p_manager;
-        free( p_sys );
         return VLC_EGENERIC;
     }
-    p_sys->p_manager       = p_manager;
-    p_demux->p_sys         = p_sys;
-    p_demux->pf_demux      = Demux;
-    p_demux->pf_control    = Control;
 
-    p_sys->i_nzpcr = VLC_TS_INVALID;
+    p_demux->p_sys         = reinterpret_cast<demux_sys_t *>(p_manager);
+    p_demux->pf_demux      = p_manager->demux_callback;
+    p_demux->pf_control    = p_manager->control_callback;
 
     msg_Dbg(p_obj,"opening mpd file (%s)", p_demux->s->psz_path);
 
@@ -212,122 +189,8 @@ static int Open(vlc_object_t *p_obj)
  *****************************************************************************/
 static void Close(vlc_object_t *p_obj)
 {
-    demux_t                            *p_demux       = (demux_t*) p_obj;
-    demux_sys_t                        *p_sys          = (demux_sys_t *) p_demux->p_sys;
+    demux_t         *p_demux       = (demux_t*) p_obj;
+    PlaylistManager *p_manager  = reinterpret_cast<PlaylistManager *>(p_demux->p_sys);
 
-    delete p_sys->p_manager;
-    free(p_sys);
-}
-/*****************************************************************************
- * Callbacks:
- *****************************************************************************/
-#define DEMUX_INCREMENT (CLOCK_FREQ / 20)
-static int Demux(demux_t *p_demux)
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    if(p_sys->i_nzpcr == VLC_TS_INVALID)
-    {
-        if( Stream::status_eof ==
-            p_sys->p_manager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT, false) )
-        {
-            return VLC_DEMUXER_EOF;
-        }
-        p_sys->i_nzpcr = p_sys->p_manager->getFirstDTS();
-        if(p_sys->i_nzpcr == VLC_TS_INVALID)
-            p_sys->i_nzpcr = p_sys->p_manager->getPCR();
-    }
-
-    Stream::status status =
-            p_sys->p_manager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT, true);
-    switch(status)
-    {
-    case Stream::status_eof:
-        return VLC_DEMUXER_EOF;
-    case Stream::status_buffering:
-        break;
-    case Stream::status_eop:
-        p_sys->i_nzpcr = VLC_TS_INVALID;
-        es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
-        break;
-    case Stream::status_demuxed:
-        if( p_sys->i_nzpcr != VLC_TS_INVALID )
-        {
-            p_sys->i_nzpcr += DEMUX_INCREMENT;
-            int group = p_sys->p_manager->getGroup();
-            es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, VLC_TS_0 + p_sys->i_nzpcr);
-        }
-        break;
-    }
-
-    if( !p_sys->p_manager->updatePlaylist() )
-        msg_Warn(p_demux, "Can't update playlist");
-
-    return VLC_DEMUXER_SUCCESS;
-}
-
-static int  Control         (demux_t *p_demux, int i_query, va_list args)
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    switch (i_query)
-    {
-        case DEMUX_CAN_SEEK:
-            *(va_arg (args, bool *)) = p_sys->p_manager->seekAble();
-            break;
-
-        case DEMUX_CAN_CONTROL_PACE:
-            *(va_arg (args, bool *)) = true;
-            break;
-
-        case DEMUX_CAN_PAUSE:
-            *(va_arg (args, bool *)) = p_sys->p_playlist->isLive();
-            break;
-
-        case DEMUX_GET_TIME:
-            *(va_arg (args, int64_t *)) = p_sys->i_nzpcr;
-            break;
-
-        case DEMUX_GET_LENGTH:
-            *(va_arg (args, int64_t *)) = p_sys->p_manager->getDuration();
-            break;
-
-        case DEMUX_GET_POSITION:
-            if(!p_sys->p_manager->getDuration())
-                return VLC_EGENERIC;
-
-            *(va_arg (args, double *)) = (double) p_sys->i_nzpcr
-                                         / p_sys->p_manager->getDuration();
-            break;
-
-        case DEMUX_SET_POSITION:
-        {
-            int64_t time = p_sys->p_manager->getDuration() * va_arg(args, double);
-            if(p_sys->p_playlist->isLive() ||
-               !p_sys->p_manager->getDuration() ||
-               !p_sys->p_manager->setPosition(time))
-                return VLC_EGENERIC;
-            p_sys->i_nzpcr = VLC_TS_INVALID;
-            break;
-        }
-
-        case DEMUX_SET_TIME:
-        {
-            int64_t time = va_arg(args, int64_t);
-            if(p_sys->p_playlist->isLive() ||
-               !p_sys->p_manager->setPosition(time))
-                return VLC_EGENERIC;
-            p_sys->i_nzpcr = VLC_TS_INVALID;
-            break;
-        }
-
-        case DEMUX_GET_PTS_DELAY:
-            *va_arg (args, int64_t *) = INT64_C(1000) *
-                var_InheritInteger(p_demux, "network-caching");
-             break;
-
-        default:
-            return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
+    delete p_manager;
 }

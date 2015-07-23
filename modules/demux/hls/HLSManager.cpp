@@ -27,6 +27,7 @@
 #include "../adaptative/tools/Retrieve.hpp"
 #include "playlist/Parser.hpp"
 #include <vlc_stream.h>
+#include <vlc_demux.h>
 #include <time.h>
 
 using namespace adaptative;
@@ -34,10 +35,10 @@ using namespace adaptative::logic;
 using namespace hls;
 using namespace hls::playlist;
 
-HLSManager::HLSManager(M3U8 *playlist,
+HLSManager::HLSManager(demux_t *demux_, M3U8 *playlist,
                        AbstractStreamOutputFactory *factory,
-                       AbstractAdaptationLogic::LogicType type, stream_t *stream) :
-             PlaylistManager(playlist, factory, type, stream)
+                       AbstractAdaptationLogic::LogicType type) :
+             PlaylistManager(demux_, playlist, factory, type)
 {
 }
 
@@ -51,14 +52,14 @@ AbstractAdaptationLogic *HLSManager::createLogic(AbstractAdaptationLogic::LogicT
     {
         case AbstractAdaptationLogic::FixedRate:
         {
-            size_t bps = var_InheritInteger(stream, "hls-prefbw") * 8192;
+            size_t bps = var_InheritInteger(p_demux, "hls-prefbw") * 8192;
             return new (std::nothrow) FixedRateAdaptationLogic(bps);
         }
         case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::RateBased:
         {
-            int width = var_InheritInteger(stream, "hls-prefwidth");
-            int height = var_InheritInteger(stream, "hls-prefheight");
+            int width = var_InheritInteger(p_demux, "hls-prefwidth");
+            int height = var_InheritInteger(p_demux, "hls-prefheight");
             return new (std::nothrow) RateBasedAdaptationLogic(width, height);
         }
         default:
@@ -80,16 +81,16 @@ bool HLSManager::updatePlaylist()
     /* do update */
     if(nextPlaylistupdate)
     {
-        std::string url(stream->psz_access);
+        std::string url(p_demux->s->psz_access);
         url.append("://");
-        url.append(stream->psz_path);
+        url.append(p_demux->s->psz_path);
 
         uint8_t *p_data = NULL;
-        size_t i_data = Retrieve::HTTP(VLC_OBJECT(stream), url, (void**) &p_data);
+        size_t i_data = Retrieve::HTTP(VLC_OBJECT(p_demux->s), url, (void**) &p_data);
         if(!p_data)
             return false;
 
-        stream_t *updatestream = stream_MemoryNew(stream, p_data, i_data, false);
+        stream_t *updatestream = stream_MemoryNew(p_demux->s, p_data, i_data, false);
         if(!updatestream)
         {
             free(p_data);
@@ -140,7 +141,7 @@ bool HLSManager::updatePlaylist()
 
     nextPlaylistupdate = now + (mininterval + maxinterval) / (2 * CLOCK_FREQ);
 
-    msg_Dbg(stream, "Updated playlist, next update in %" PRId64 "s "
+    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s "
             "%" PRId64 " %" PRId64, nextPlaylistupdate - now, mininterval,
             maxinterval);
 

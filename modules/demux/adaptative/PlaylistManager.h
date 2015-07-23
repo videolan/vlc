@@ -49,13 +49,12 @@ namespace adaptative
     class PlaylistManager
     {
         public:
-            PlaylistManager( AbstractPlaylist *,
+            PlaylistManager( demux_t *, AbstractPlaylist *,
                              AbstractStreamOutputFactory *,
-                             AbstractAdaptationLogic::LogicType type,
-                             stream_t *stream);
+                             AbstractAdaptationLogic::LogicType type );
             virtual ~PlaylistManager    ();
 
-            bool    start(demux_t *);
+            bool    start();
 
             Stream::status demux(mtime_t, bool);
             mtime_t getDuration() const;
@@ -67,7 +66,15 @@ namespace adaptative
             bool    seekAble() const;
             virtual bool updatePlaylist();
 
+            /* static callbacks */
+            static int control_callback(demux_t *, int, va_list);
+            static int demux_callback(demux_t *);
+
         protected:
+            /* Demux calls */
+            virtual int doControl(int, va_list);
+            virtual int doDemux(int64_t);
+
             bool setupPeriod();
             void unsetPeriod();
             /* local factories */
@@ -77,10 +84,10 @@ namespace adaptative
             AbstractAdaptationLogic::LogicType  logicType;
             AbstractPlaylist                    *playlist;
             AbstractStreamOutputFactory         *streamOutputFactory;
-            stream_t                            *stream;
             demux_t                             *p_demux;
             std::vector<Stream *>                streams;
             mtime_t                              nextPlaylistupdate;
+            mtime_t                              i_nzpcr;
             BasePeriod                          *currentPeriod;
     };
 

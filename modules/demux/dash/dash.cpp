@@ -35,14 +35,10 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_meta.h>
-
-#include <errno.h>
 
 #include "xml/DOMParser.h"
 #include "mpd/MPDFactory.h"
 #include "mpd/Period.h"
-#include "mpd/ProgramInformation.h"
 #include "DASHManager.h"
 
 using namespace adaptative::logic;
@@ -96,15 +92,6 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct demux_sys_t
-{
-        dash::DASHManager   *p_dashManager;
-        dash::mpd::MPD      *p_mpd;
-        mtime_t              i_nzpcr;
-};
-
-static int  Demux( demux_t * );
-static int  Control         (demux_t *p_demux, int i_query, va_list args);
 
 /*****************************************************************************
  * Open:
@@ -140,30 +127,21 @@ static int Open(vlc_object_t *p_obj)
         return VLC_EGENERIC;
     }
 
-    demux_sys_t        *p_sys = (demux_sys_t *) malloc(sizeof(demux_sys_t));
-    if (unlikely(p_sys == NULL))
-        return VLC_ENOMEM;
-
-    p_sys->p_mpd = mpd;
     int logic = var_InheritInteger( p_obj, "dash-logic" );
-    DASHManager*p_dashManager = new DASHManager(p_sys->p_mpd,
+    DASHManager *p_dashManager = new (std::nothrow) DASHManager(p_demux, mpd,
             new (std::nothrow) DASHStreamOutputFactory,
-            static_cast<AbstractAdaptationLogic::LogicType>(logic),
-            p_demux->s);
+            static_cast<AbstractAdaptationLogic::LogicType>(logic));
 
     BasePeriod *period = mpd->getFirstPeriod();
-    if(period && !p_dashManager->start(p_demux))
+    if(period && !p_dashManager->start())
     {
         delete p_dashManager;
-        free( p_sys );
         return VLC_EGENERIC;
     }
-    p_sys->p_dashManager    = p_dashManager;
-    p_demux->p_sys         = p_sys;
-    p_demux->pf_demux      = Demux;
-    p_demux->pf_control    = Control;
 
-    p_sys->i_nzpcr = 0;
+    p_demux->p_sys         = reinterpret_cast<demux_sys_t *>(p_dashManager);
+    p_demux->pf_demux      = p_dashManager->demux_callback;
+    p_demux->pf_control    = p_dashManager->control_callback;
 
     msg_Dbg(p_obj,"opening mpd file (%s)", p_demux->s->psz_path);
 
@@ -174,151 +152,9 @@ static int Open(vlc_object_t *p_obj)
  *****************************************************************************/
 static void Close(vlc_object_t *p_obj)
 {
-    demux_t                            *p_demux       = (demux_t*) p_obj;
-    demux_sys_t                        *p_sys          = (demux_sys_t *) p_demux->p_sys;
-    DASHManager                        *p_dashManager  = p_sys->p_dashManager;
+    demux_t         *p_demux       = (demux_t*) p_obj;
+    PlaylistManager *p_manager  = reinterpret_cast<PlaylistManager *>(p_demux->p_sys);
 
-    delete p_dashManager;
-    free(p_sys);
-}
-/*****************************************************************************
- * Callbacks:
- *****************************************************************************/
-#define DEMUX_INCREMENT (CLOCK_FREQ / 20)
-static int Demux(demux_t *p_demux)
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    if(p_sys->i_nzpcr == VLC_TS_INVALID)
-    {
-        if( Stream::status_eof ==
-            p_sys->p_dashManager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT, false) )
-        {
-            return VLC_DEMUXER_EOF;
-        }
-        p_sys->i_nzpcr = p_sys->p_dashManager->getFirstDTS();
-        if(p_sys->i_nzpcr == VLC_TS_INVALID)
-            p_sys->i_nzpcr = p_sys->p_dashManager->getPCR();
-    }
-
-    Stream::status status =
-            p_sys->p_dashManager->demux(p_sys->i_nzpcr + DEMUX_INCREMENT, true);
-
-    switch(status)
-    {
-    case Stream::status_eof:
-        return VLC_DEMUXER_EOF;
-    case Stream::status_buffering:
-        break;
-    case Stream::status_eop:
-        p_sys->i_nzpcr = VLC_TS_INVALID;
-        es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
-        break;
-    case Stream::status_demuxed:
-        if( p_sys->i_nzpcr != VLC_TS_INVALID )
-        {
-            p_sys->i_nzpcr += DEMUX_INCREMENT;
-            int group = p_sys->p_dashManager->getGroup();
-            es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, VLC_TS_0 + p_sys->i_nzpcr);
-        }
-        break;
-    }
-
-    if( !p_sys->p_dashManager->updatePlaylist() )
-        msg_Warn(p_demux, "Can't update MPD");
-
-    return VLC_DEMUXER_SUCCESS;
+    delete p_manager;
 }
 
-static int  Control         (demux_t *p_demux, int i_query, va_list args)
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    switch (i_query)
-    {
-        case DEMUX_CAN_SEEK:
-            *(va_arg (args, bool *)) = p_sys->p_dashManager->seekAble();
-            break;
-
-        case DEMUX_CAN_CONTROL_PACE:
-            *(va_arg (args, bool *)) = true;
-            break;
-
-        case DEMUX_CAN_PAUSE:
-            *(va_arg (args, bool *)) = p_sys->p_mpd->isLive();
-            break;
-
-        case DEMUX_GET_TIME:
-            *(va_arg (args, int64_t *)) = p_sys->i_nzpcr;
-            break;
-
-        case DEMUX_GET_LENGTH:
-            *(va_arg (args, int64_t *)) = p_sys->p_dashManager->getDuration();
-            break;
-
-        case DEMUX_GET_POSITION:
-            if(!p_sys->p_dashManager->getDuration())
-                return VLC_EGENERIC;
-
-            *(va_arg (args, double *)) = (double) p_sys->i_nzpcr
-                                         / p_sys->p_dashManager->getDuration();
-            break;
-
-        case DEMUX_SET_POSITION:
-        {
-            int64_t time = p_sys->p_dashManager->getDuration() * va_arg(args, double);
-            if(p_sys->p_mpd->isLive() ||
-               !p_sys->p_dashManager->getDuration() ||
-               !p_sys->p_dashManager->setPosition(time))
-                return VLC_EGENERIC;
-            p_sys->i_nzpcr = VLC_TS_INVALID;
-            break;
-        }
-
-        case DEMUX_SET_TIME:
-        {
-            int64_t time = va_arg(args, int64_t);
-            if(p_sys->p_mpd->isLive() ||
-               !p_sys->p_dashManager->setPosition(time))
-                return VLC_EGENERIC;
-            p_sys->i_nzpcr = VLC_TS_INVALID;
-            break;
-        }
-
-        case DEMUX_GET_PTS_DELAY:
-            *va_arg (args, int64_t *) = INT64_C(1000) *
-                var_InheritInteger(p_demux, "network-caching");
-             break;
-
-        case DEMUX_GET_META:
-        {
-            if(!p_sys->p_mpd->programInfo.Get())
-                break;
-
-            vlc_meta_t *p_meta = (vlc_meta_t *) va_arg (args, vlc_meta_t*);
-            vlc_meta_t *meta = vlc_meta_New();
-            if (meta == NULL)
-                return VLC_EGENERIC;
-
-            if(!p_sys->p_mpd->programInfo.Get()->getTitle().empty())
-                vlc_meta_SetTitle(meta, p_sys->p_mpd->programInfo.Get()->getTitle().c_str());
-
-            if(!p_sys->p_mpd->programInfo.Get()->getSource().empty())
-                vlc_meta_SetPublisher(meta, p_sys->p_mpd->programInfo.Get()->getSource().c_str());
-
-            if(!p_sys->p_mpd->programInfo.Get()->getCopyright().empty())
-                vlc_meta_SetCopyright(meta, p_sys->p_mpd->programInfo.Get()->getCopyright().c_str());
-
-            if(!p_sys->p_mpd->programInfo.Get()->getMoreInformationUrl().empty())
-                vlc_meta_SetURL(meta, p_sys->p_mpd->programInfo.Get()->getMoreInformationUrl().c_str());
-
-            vlc_meta_Merge(p_meta, meta);
-            vlc_meta_Delete(meta);
-            break;
-        }
-
-        default:
-            return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}

@@ -31,9 +31,12 @@
 #include "DASHManager.h"
 #include "DASHStreamFormat.hpp"
 #include "mpd/MPDFactory.h"
+#include "mpd/ProgramInformation.h"
 #include "xml/DOMParser.h"
 #include "../adaptative/logic/RateBasedAdaptationLogic.h"
 #include <vlc_stream.h>
+#include <vlc_demux.h>
+#include <vlc_meta.h>
 #include "../adaptative/tools/Retrieve.hpp"
 
 #include <algorithm>
@@ -58,10 +61,10 @@ AbstractStreamOutput *DASHStreamOutputFactory::create(demux_t *demux, const Stre
     return NULL;
 }
 
-DASHManager::DASHManager(MPD *mpd,
+DASHManager::DASHManager(demux_t *demux_, MPD *mpd,
                          AbstractStreamOutputFactory *factory,
-                         AbstractAdaptationLogic::LogicType type, stream_t *stream) :
-             PlaylistManager(mpd, factory, type, stream)
+                         AbstractAdaptationLogic::LogicType type) :
+             PlaylistManager(demux_, mpd, factory, type)
 {
 }
 
@@ -81,16 +84,16 @@ bool DASHManager::updatePlaylist()
     /* do update */
     if(nextPlaylistupdate)
     {
-        std::string url(stream->psz_access);
+        std::string url(p_demux->s->psz_access);
         url.append("://");
-        url.append(stream->psz_path);
+        url.append(p_demux->s->psz_path);
 
         uint8_t *p_data = NULL;
-        size_t i_data = Retrieve::HTTP(VLC_OBJECT(stream), url, (void**) &p_data);
+        size_t i_data = Retrieve::HTTP(VLC_OBJECT(p_demux->s), url, (void**) &p_data);
         if(!p_data)
             return false;
 
-        stream_t *mpdstream = stream_MemoryNew(stream, p_data, i_data, false);
+        stream_t *mpdstream = stream_MemoryNew(p_demux->s, p_data, i_data, false);
         if(!mpdstream)
         {
             free(p_data);
@@ -139,10 +142,48 @@ bool DASHManager::updatePlaylist()
 
     nextPlaylistupdate = now + (maxinterval - mininterval) / (2 * CLOCK_FREQ);
 
-    msg_Dbg(stream, "Updated MPD, next update in %" PRId64 "s (%" PRId64 "..%" PRId64 ")",
+    msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s (%" PRId64 "..%" PRId64 ")",
             nextPlaylistupdate - now, mininterval, maxinterval );
 
     return true;
+}
+
+int DASHManager::doControl(int i_query, va_list args)
+{
+    switch (i_query)
+    {
+        case DEMUX_GET_META:
+        {
+            MPD *mpd = dynamic_cast<MPD *>(playlist);
+            if(!mpd)
+                return VLC_EGENERIC;
+
+            if(!mpd->programInfo.Get())
+                break;
+
+            vlc_meta_t *p_meta = (vlc_meta_t *) va_arg (args, vlc_meta_t*);
+            vlc_meta_t *meta = vlc_meta_New();
+            if (meta == NULL)
+                return VLC_EGENERIC;
+
+            if(!mpd->programInfo.Get()->getTitle().empty())
+                vlc_meta_SetTitle(meta, mpd->programInfo.Get()->getTitle().c_str());
+
+            if(!mpd->programInfo.Get()->getSource().empty())
+                vlc_meta_SetPublisher(meta, mpd->programInfo.Get()->getSource().c_str());
+
+            if(!mpd->programInfo.Get()->getCopyright().empty())
+                vlc_meta_SetCopyright(meta, mpd->programInfo.Get()->getCopyright().c_str());
+
+            if(!mpd->programInfo.Get()->getMoreInformationUrl().empty())
+                vlc_meta_SetURL(meta, mpd->programInfo.Get()->getMoreInformationUrl().c_str());
+
+            vlc_meta_Merge(p_meta, meta);
+            vlc_meta_Delete(meta);
+            break;
+        }
+    }
+    return PlaylistManager::doControl(i_query, args);
 }
 
 AbstractAdaptationLogic *DASHManager::createLogic(AbstractAdaptationLogic::LogicType type)
@@ -151,14 +192,14 @@ AbstractAdaptationLogic *DASHManager::createLogic(AbstractAdaptationLogic::Logic
     {
         case AbstractAdaptationLogic::FixedRate:
         {
-            size_t bps = var_InheritInteger(stream, "dash-prefbw") * 8192;
+            size_t bps = var_InheritInteger(p_demux, "dash-prefbw") * 8192;
             return new (std::nothrow) FixedRateAdaptationLogic(bps);
         }
         case AbstractAdaptationLogic::Default:
         case AbstractAdaptationLogic::RateBased:
         {
-            int width = var_InheritInteger(stream, "dash-prefwidth");
-            int height = var_InheritInteger(stream, "dash-prefheight");
+            int width = var_InheritInteger(p_demux, "dash-prefwidth");
+            int height = var_InheritInteger(p_demux, "dash-prefheight");
             return new (std::nothrow) RateBasedAdaptationLogic(width, height);
         }
         default:

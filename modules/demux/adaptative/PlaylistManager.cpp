@@ -33,6 +33,7 @@
 #include "logic/RateBasedAdaptationLogic.h"
 #include "logic/AlwaysLowestAdaptationLogic.hpp"
 #include <vlc_stream.h>
+#include <vlc_demux.h>
 
 #include <ctime>
 
@@ -40,16 +41,17 @@ using namespace adaptative::http;
 using namespace adaptative::logic;
 using namespace adaptative;
 
-PlaylistManager::PlaylistManager( AbstractPlaylist *pl,
+PlaylistManager::PlaylistManager( demux_t *p_demux_,
+                                  AbstractPlaylist *pl,
                                   AbstractStreamOutputFactory *factory,
-                                  AbstractAdaptationLogic::LogicType type,
-                                  stream_t *stream) :
+                                  AbstractAdaptationLogic::LogicType type ) :
              conManager     ( NULL ),
              logicType      ( type ),
              playlist       ( pl ),
              streamOutputFactory( factory ),
-             stream         ( stream ),
-             nextPlaylistupdate  ( 0 )
+             p_demux        ( p_demux_ ),
+             nextPlaylistupdate  ( 0 ),
+             i_nzpcr        ( 0 )
 {
     currentPeriod = playlist->getFirstPeriod();
 }
@@ -110,14 +112,12 @@ bool PlaylistManager::setupPeriod()
     return true;
 }
 
-bool PlaylistManager::start(demux_t *demux_)
+bool PlaylistManager::start()
 {
-    p_demux = demux_;
-
     if(!setupPeriod())
         return false;
 
-    conManager = new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(stream));
+    conManager = new (std::nothrow) HTTPConnectionManager(VLC_OBJECT(p_demux->s));
     if(!conManager)
         return false;
 
@@ -259,6 +259,124 @@ bool PlaylistManager::seekAble() const
 bool PlaylistManager::updatePlaylist()
 {
     return true;
+}
+
+#define DEMUX_INCREMENT (CLOCK_FREQ / 20)
+int PlaylistManager::demux_callback(demux_t *p_demux)
+{
+    PlaylistManager *manager = reinterpret_cast<PlaylistManager *>(p_demux->p_sys);
+    return manager->doDemux(DEMUX_INCREMENT);
+}
+
+int PlaylistManager::doDemux(int64_t increment)
+{
+    if(i_nzpcr == VLC_TS_INVALID)
+    {
+        if( Stream::status_eof == demux(i_nzpcr + increment, false) )
+        {
+            return VLC_DEMUXER_EOF;
+        }
+        i_nzpcr = getFirstDTS();
+        if(i_nzpcr == VLC_TS_INVALID)
+            i_nzpcr = getPCR();
+    }
+
+    Stream::status status = demux(i_nzpcr + increment, true);
+
+    switch(status)
+    {
+    case Stream::status_eof:
+        return VLC_DEMUXER_EOF;
+    case Stream::status_buffering:
+        break;
+    case Stream::status_eop:
+        i_nzpcr = VLC_TS_INVALID;
+        es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
+        break;
+    case Stream::status_demuxed:
+        if( i_nzpcr != VLC_TS_INVALID )
+        {
+            i_nzpcr += increment;
+            int group = getGroup();
+            es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, group, VLC_TS_0 + i_nzpcr);
+        }
+        break;
+    }
+
+    if( !updatePlaylist() )
+        msg_Warn(p_demux, "Can't update MPD");
+
+    return VLC_DEMUXER_SUCCESS;
+}
+
+int PlaylistManager::control_callback(demux_t *p_demux, int i_query, va_list args)
+{
+    PlaylistManager *manager = reinterpret_cast<PlaylistManager *>(p_demux->p_sys);
+    return manager->doControl(i_query, args);
+}
+
+int PlaylistManager::doControl(int i_query, va_list args)
+{
+    switch (i_query)
+    {
+        case DEMUX_CAN_SEEK:
+            *(va_arg (args, bool *)) = seekAble();
+            break;
+
+        case DEMUX_CAN_CONTROL_PACE:
+            *(va_arg (args, bool *)) = true;
+            break;
+
+        case DEMUX_CAN_PAUSE:
+            *(va_arg (args, bool *)) = playlist->isLive();
+            break;
+
+        case DEMUX_GET_TIME:
+            *(va_arg (args, int64_t *)) = i_nzpcr;
+            break;
+
+        case DEMUX_GET_LENGTH:
+            *(va_arg (args, int64_t *)) = getDuration();
+            break;
+
+        case DEMUX_GET_POSITION:
+            if(!getDuration())
+                return VLC_EGENERIC;
+
+            *(va_arg (args, double *)) = (double) i_nzpcr
+                                         / getDuration();
+            break;
+
+        case DEMUX_SET_POSITION:
+        {
+            int64_t time = getDuration() * va_arg(args, double);
+            if(playlist->isLive() ||
+               !getDuration() ||
+               !setPosition(time))
+                return VLC_EGENERIC;
+            i_nzpcr = VLC_TS_INVALID;
+            break;
+        }
+
+        case DEMUX_SET_TIME:
+        {
+            int64_t time = va_arg(args, int64_t);
+            if(playlist->isLive() ||
+               !setPosition(time))
+                return VLC_EGENERIC;
+            i_nzpcr = VLC_TS_INVALID;
+            break;
+        }
+
+        case DEMUX_GET_PTS_DELAY:
+            *va_arg (args, int64_t *) = INT64_C(1000) *
+                var_InheritInteger(p_demux, "network-caching");
+             break;
+
+        default:
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
 
 AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::LogicType type)
