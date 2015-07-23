@@ -91,10 +91,6 @@ enum stream_query_e
 
     STREAM_GET_SIZE,            /**< arg1= uint64_t *     res=cannot fail (0 if no sense)*/
 
-    /* You should update size of source if any and then update size
-     * FIXME find a way to avoid it */
-    STREAM_UPDATE_SIZE,
-
     /* */
     STREAM_GET_PTS_DELAY = 0x101,/**< arg1= int64_t* res=cannot fail */
     STREAM_GET_TITLE_INFO, /**< arg1=input_title_t*** arg2=int* res=can fail */

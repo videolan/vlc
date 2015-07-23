@@ -302,7 +302,6 @@ static int Control( stream_t *s, int i_query, va_list args )
         case STREAM_GET_CONTENT_TYPE:
             return VLC_EGENERIC;
 
-        case STREAM_UPDATE_SIZE:
         case STREAM_CAN_SEEK:
         case STREAM_CAN_FASTSEEK:
         case STREAM_SET_RECORD_STATE:

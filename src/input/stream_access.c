@@ -374,16 +374,6 @@ static void AStreamControlReset( stream_t *s )
     }
 }
 
-/****************************************************************************
- * AStreamControlUpdate:
- ****************************************************************************/
-static void AStreamControlUpdate( stream_t *s )
-{
-    stream_sys_t *p_sys = s->p_sys;
-
-    p_sys->i_pos = p_sys->p_access->info.i_pos;
-}
-
 #define static_control_match(foo) \
     static_assert((unsigned) STREAM_##foo == ACCESS_##foo, "Mismatch")
 
@@ -457,10 +447,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
         }
-
-        case STREAM_UPDATE_SIZE:
-            AStreamControlUpdate( s );
-            return VLC_SUCCESS;
 
         case STREAM_SET_TITLE:
         case STREAM_SET_SEEKPOINT:
