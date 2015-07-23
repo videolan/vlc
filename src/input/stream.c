@@ -523,50 +523,6 @@ block_t *stream_Block( stream_t *s, int i_size )
 }
 
 /**
- * Read the remaining of the data if there is less than i_max_size bytes, otherwise
- * return NULL.
- *
- * The stream position is unknown after the call.
- */
-block_t *stream_BlockRemaining( stream_t *s, int i_max_size )
-{
-    int     i_allocate = __MIN(1000000, i_max_size);
-    int64_t i_size = stream_Size( s );
-    if( i_size > 0 )
-    {
-        int64_t i_position = stream_Tell( s );
-        if( i_position + i_max_size < i_size )
-        {
-            msg_Err( s, "Remaining stream size is greater than %d bytes",
-                     i_max_size );
-            return NULL;
-        }
-        i_allocate = i_size - i_position;
-    }
-    if( i_allocate <= 0 )
-        return NULL;
-
-    block_t *p_block = block_Alloc( i_allocate );
-    int i_index = 0;
-    while( p_block )
-    {
-        int i_read = stream_Read( s, &p_block->p_buffer[i_index],
-                                     p_block->i_buffer - i_index);
-        if( i_read <= 0 )
-            break;
-        i_index += i_read;
-        i_max_size -= i_read;
-        if( i_max_size <= 0 )
-            break;
-        p_block = block_Realloc( p_block, 0, p_block->i_buffer +
-                                             __MIN(1000000, i_max_size) );
-    }
-    if( p_block )
-        p_block->i_buffer = i_index;
-    return p_block;
-}
-
-/**
  * Read the next input_item_t from the directory stream. It returns the next
  * input item on success or NULL in case of error or end of stream. The item
  * must be released with input_item_Release.
