@@ -30,6 +30,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_stream.h>
 
 #include "Node.h"
 #include "../mpd/Profile.hpp"
@@ -47,7 +48,6 @@ namespace dash
                 bool                parse       ();
                 Node*               getRootNode ();
                 void                print       ();
-                static bool         isDash      (stream_t *stream);
                 mpd::Profile        getProfile  () const;
 
             private:

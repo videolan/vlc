@@ -108,7 +108,7 @@ static int Open(vlc_object_t *p_obj)
         free(psz_mime);
     }
 
-    if(!b_mimematched && !DOMParser::isDash(p_demux->s))
+    if(!b_mimematched && !DASHManager::isDASH(p_demux->s))
         return VLC_EGENERIC;
 
     //Build a XML tree

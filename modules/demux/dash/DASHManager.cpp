@@ -34,6 +34,7 @@
 #include "mpd/ProgramInformation.h"
 #include "xml/DOMParser.h"
 #include "../adaptative/logic/RateBasedAdaptationLogic.h"
+#include "../adaptative/tools/Helper.h"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 #include <vlc_meta.h>
@@ -184,6 +185,31 @@ int DASHManager::doControl(int i_query, va_list args)
         }
     }
     return PlaylistManager::doControl(i_query, args);
+}
+
+bool DASHManager::isDASH(stream_t *stream)
+{
+    const std::string namespaces[] = {
+        "xmlns=\"urn:mpeg:mpegB:schema:DASH:MPD:DIS2011\"",
+        "xmlns=\"urn:mpeg:schema:dash:mpd:2011\"",
+        "xmlns=\"urn:mpeg:DASH:schema:MPD:2011\"",
+        "xmlns='urn:mpeg:mpegB:schema:DASH:MPD:DIS2011'",
+        "xmlns='urn:mpeg:schema:dash:mpd:2011'",
+        "xmlns='urn:mpeg:DASH:schema:MPD:2011'",
+    };
+
+    const uint8_t *peek;
+    int peek_size = stream_Peek(stream, &peek, 1024);
+    if (peek_size < (int)namespaces[0].length())
+        return false;
+
+    std::string header((const char*)peek, peek_size);
+    for( size_t i=0; i<ARRAY_SIZE(namespaces); i++ )
+    {
+        if ( adaptative::Helper::ifind(header, namespaces[i]) )
+            return true;
+    }
+    return false;
 }
 
 AbstractAdaptationLogic *DASHManager::createLogic(AbstractAdaptationLogic::LogicType type)

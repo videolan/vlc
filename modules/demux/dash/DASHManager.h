@@ -50,6 +50,8 @@ namespace dash
             virtual bool updatePlaylist(); //reimpl
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType); //reimpl
 
+            static bool isDASH(stream_t *);
+
         protected:
             virtual int doControl(int, va_list); /* reimpl */
     };

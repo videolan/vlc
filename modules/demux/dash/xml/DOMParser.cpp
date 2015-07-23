@@ -26,12 +26,10 @@
 #endif
 
 #include "DOMParser.h"
-#include "../adaptative/tools/Helper.h"
 
 #include <vector>
 #include <stack>
 #include <vlc_xml.h>
-#include <vlc_stream.h>
 
 using namespace dash::xml;
 using namespace dash::mpd;
@@ -165,30 +163,6 @@ void    DOMParser::print                    (Node *node, int offset)
 void    DOMParser::print                    ()
 {
     this->print(this->root, 0);
-}
-bool    DOMParser::isDash                   (stream_t *stream)
-{
-    const std::string namespaces[] = {
-        "xmlns=\"urn:mpeg:mpegB:schema:DASH:MPD:DIS2011\"",
-        "xmlns=\"urn:mpeg:schema:dash:mpd:2011\"",
-        "xmlns=\"urn:mpeg:DASH:schema:MPD:2011\"",
-        "xmlns='urn:mpeg:mpegB:schema:DASH:MPD:DIS2011'",
-        "xmlns='urn:mpeg:schema:dash:mpd:2011'",
-        "xmlns='urn:mpeg:DASH:schema:MPD:2011'",
-    };
-
-    const uint8_t *peek;
-    int peek_size = stream_Peek(stream, &peek, 1024);
-    if (peek_size < (int)namespaces[0].length())
-        return false;
-
-    std::string header((const char*)peek, peek_size);
-    for( size_t i=0; i<ARRAY_SIZE(namespaces); i++ )
-    {
-        if ( adaptative::Helper::ifind(header, namespaces[i]) )
-            return true;
-    }
-    return false;
 }
 
 Profile DOMParser::getProfile() const
