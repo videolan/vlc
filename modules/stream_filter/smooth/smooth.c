@@ -60,7 +60,6 @@ vlc_module_begin()
 vlc_module_end()
 
 static int   Read( stream_t *, void *, unsigned );
-static int   Peek( stream_t *, const uint8_t **, unsigned );
 static int   Control( stream_t *, int , va_list );
 
 static bool isSmoothStreaming( stream_t *s )
@@ -536,7 +535,6 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     s->pf_read = Read;
-    s->pf_peek = Peek;
     s->pf_control = Control;
 
     if( vlc_clone( &p_sys->download.thread, sms_Thread, s, VLC_THREAD_PRIORITY_INPUT ) )
@@ -777,32 +775,6 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
         msg_Warn( s, "could not read %u bytes, only %u !", i_read, length );
 
     return length;
-}
-
-/* The MP4 demux should never have to to peek outside the current chunk */
-static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned i_peek )
-{
-    chunk_t *chunk = get_chunk( s, true, NULL );
-    if( !chunk || !chunk->data )
-    {
-        if(!chunk)
-            msg_Err( s, "cannot peek: no data" );
-        else
-            msg_Err( s, "cannot peek: chunk pos %"PRIu64"", chunk->read_pos );
-        return 0;
-    }
-
-    int bytes = chunk->size - chunk->read_pos;
-    assert( bytes > 0 );
-
-    if( (unsigned)bytes < i_peek )
-    {
-        msg_Err( s, "could not peek %u bytes, only %i!", i_peek, bytes );
-    }
-    msg_Dbg( s, "peeking at chunk %"PRIu64, chunk->start_time );
-    *pp_peek = chunk->data + chunk->read_pos;
-
-    return bytes;
 }
 
 /* Normaly a stream_filter is not able to provide *time* seeking, since a
