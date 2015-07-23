@@ -2,6 +2,9 @@ stream_filterdir = $(pluginsdir)/stream_filter
 
 stream_filter_LTLIBRARIES =
 
+libcache_read_plugin_la_SOURCES = stream_filter/cache_read.c
+stream_filter_LTLIBRARIES += libcache_read_plugin.la
+
 libdecomp_plugin_la_SOURCES = stream_filter/decomp.c
 libdecomp_plugin_la_LIBADD = $(LIBPTHREAD)
 if !HAVE_WIN32

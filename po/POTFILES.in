@@ -1033,6 +1033,7 @@ modules/services_discovery/upnp.cpp
 modules/services_discovery/windrive.c
 modules/services_discovery/xcb_apps.c
 modules/stream_filter/aribcam.c
+modules/stream_filter/cache_read.c
 modules/stream_filter/decomp.c
 modules/stream_filter/hds/hds.c
 modules/stream_filter/record.c

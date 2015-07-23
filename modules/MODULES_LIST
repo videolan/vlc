@@ -66,6 +66,7 @@ $Id$
  * bonjour: Zeroconf services discovery
  * bpg: BPG image decoder using libbpg
  * caca: color ASCII art video output using libcaca
+ * cache_read: byte stream caching stream filter
  * caf: CAF demuxer
  * canvas: Automatically resize and padd a video
  * caopengllayer: CoreAnimation OpenGL video output
