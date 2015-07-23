@@ -378,6 +378,7 @@ SOURCES_libvlc_common = \
 	input/resource.c \
 	input/stats.c \
 	input/stream.c \
+	input/stream_access.c \
 	input/stream_demux.c \
 	input/stream_filter.c \
 	input/stream_memory.c \
