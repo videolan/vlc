@@ -738,7 +738,7 @@ static int Open( vlc_object_t * p_this )
 
         msg_Dbg( p_demux, "detected playlist mov file (%d ref)", i_count );
 
-        input_thread_t *p_input = demux_GetParentInput( p_demux );
+        input_thread_t *p_input = p_demux->p_input;
         input_item_t *p_current = input_GetItem( p_input );
 
         input_item_node_t *p_subitems = input_item_node_Create( p_current );
@@ -784,7 +784,6 @@ static int Open( vlc_object_t * p_this )
                         free( psz_ref );
                         free( psz_path );
                         input_item_node_Delete( p_subitems );
-                        vlc_object_release( p_input) ;
                         return VLC_ENOMEM;
                     }
 
@@ -806,7 +805,6 @@ static int Open( vlc_object_t * p_this )
             free( psz_ref );
         }
         input_item_node_PostAndDelete( p_subitems );
-        vlc_object_release( p_input );
     }
 
     if( !(p_mvhd = MP4_BoxGet( p_sys->p_root, "/moov/mvhd" ) ) )

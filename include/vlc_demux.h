@@ -243,12 +243,6 @@ VLC_API decoder_t * demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, c
  */
 VLC_API void demux_PacketizerDestroy( decoder_t *p_packetizer );
 
-/**
- * This function will return the parent input of this demux.
- * It is retained. Can return NULL.
- */
-VLC_API input_thread_t * demux_GetParentInput( demux_t *p_demux ) VLC_USED;
-
 /* */
 #define DEMUX_INIT_COMMON() do {            \
     p_demux->pf_control = Control;          \

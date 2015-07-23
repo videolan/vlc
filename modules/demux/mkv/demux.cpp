@@ -148,7 +148,7 @@ void event_thread_t::EventThread()
     /* catch all key event */
     var_AddCallback( p_demux->p_libvlc, "key-action", EventKey, this );
     /* catch input event */
-    var_AddCallback( p_sys->p_input, "intf-event", EventInput, this );
+    var_AddCallback( p_demux->p_input, "intf-event", EventInput, this );
 
     /* main loop */
     for( ;; )
@@ -368,17 +368,17 @@ void event_thread_t::EventThread()
                         }
 
                         vlc_global_lock( VLC_HIGHLIGHT_MUTEX );
-                        var_SetInteger( p_sys->p_input, "x-start",
+                        var_SetInteger( p_demux->p_input, "x-start",
                                         button_ptr.x_start );
-                        var_SetInteger( p_sys->p_input, "x-end",
+                        var_SetInteger( p_demux->p_input, "x-end",
                                         button_ptr.x_end );
-                        var_SetInteger( p_sys->p_input, "y-start",
+                        var_SetInteger( p_demux->p_input, "y-start",
                                         button_ptr.y_start );
-                        var_SetInteger( p_sys->p_input, "y-end",
+                        var_SetInteger( p_demux->p_input, "y-end",
                                         button_ptr.y_end );
-                        var_SetAddress( p_sys->p_input, "menu-palette",
+                        var_SetAddress( p_demux->p_input, "menu-palette",
                                         p_sys->palette );
-                        var_SetBool( p_sys->p_input, "highlight", true );
+                        var_SetBool( p_demux->p_input, "highlight", true );
                         vlc_global_unlock( VLC_HIGHLIGHT_MUTEX );
                     }
                     vlc_mutex_unlock( &p_sys->lock_demuxer );
@@ -400,7 +400,7 @@ void event_thread_t::EventThread()
         /* Always check vout */
         if( p_vout == NULL )
         {
-            p_vout = (vlc_object_t*) input_GetVout(p_sys->p_input);
+            p_vout = (vlc_object_t*) input_GetVout(p_demux->p_input);
             if( p_vout)
             {
                 var_AddCallback( p_vout, "mouse-moved", EventMouse, this );
@@ -416,7 +416,7 @@ void event_thread_t::EventThread()
         var_DelCallback( p_vout, "mouse-clicked", EventMouse, this );
         vlc_object_release( p_vout );
     }
-    var_DelCallback( p_sys->p_input, "intf-event", EventInput, this );
+    var_DelCallback( p_demux->p_input, "intf-event", EventInput, this );
     var_DelCallback( p_demux->p_libvlc, "key-action", EventKey, this );
 
     vlc_restorecancel (canc);
@@ -605,7 +605,7 @@ void demux_sys_t::InitUi()
 
     /* FIXME hack hack hack hack FIXME */
     /* Get p_input and create variable */
-    p_input = demux_GetParentInput( &demuxer );
+    p_input = demuxer.p_input;
     if( p_input )
     {
         var_Create( p_input, "x-start", VLC_VAR_INTEGER );
@@ -635,8 +635,6 @@ void demux_sys_t::CleanUi()
         var_Destroy( p_input, "y-end" );
         var_Destroy( p_input, "color" );
         var_Destroy( p_input, "menu-palette" );
-
-        vlc_object_release( p_input );
     }
 
     msg_Dbg( &demuxer, "Stopping the UI Hook" );

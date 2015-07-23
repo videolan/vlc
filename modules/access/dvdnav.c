@@ -138,9 +138,6 @@ struct demux_sys_t
     ps_track_t  tk[PS_TK_COUNT];
     int         i_mux_rate;
 
-    /* for spu variables */
-    input_thread_t *p_input;
-
     /* event */
     vout_thread_t *p_vout;
 
@@ -316,17 +313,16 @@ static int CommonOpen( vlc_object_t *p_this,
 
     /* FIXME hack hack hack hack FIXME */
     /* Get p_input and create variable */
-    p_sys->p_input = demux_GetParentInput( p_demux );
-    var_Create( p_sys->p_input, "x-start", VLC_VAR_INTEGER );
-    var_Create( p_sys->p_input, "y-start", VLC_VAR_INTEGER );
-    var_Create( p_sys->p_input, "x-end", VLC_VAR_INTEGER );
-    var_Create( p_sys->p_input, "y-end", VLC_VAR_INTEGER );
-    var_Create( p_sys->p_input, "color", VLC_VAR_ADDRESS );
-    var_Create( p_sys->p_input, "menu-palette", VLC_VAR_ADDRESS );
-    var_Create( p_sys->p_input, "highlight", VLC_VAR_BOOL );
+    var_Create( p_demux->p_input, "x-start", VLC_VAR_INTEGER );
+    var_Create( p_demux->p_input, "y-start", VLC_VAR_INTEGER );
+    var_Create( p_demux->p_input, "x-end", VLC_VAR_INTEGER );
+    var_Create( p_demux->p_input, "y-end", VLC_VAR_INTEGER );
+    var_Create( p_demux->p_input, "color", VLC_VAR_ADDRESS );
+    var_Create( p_demux->p_input, "menu-palette", VLC_VAR_ADDRESS );
+    var_Create( p_demux->p_input, "highlight", VLC_VAR_BOOL );
 
     /* catch vout creation event */
-    var_AddCallback( p_sys->p_input, "intf-event", EventIntf, p_demux );
+    var_AddCallback( p_demux->p_input, "intf-event", EventIntf, p_demux );
 
     p_sys->still.b_enabled = false;
     vlc_mutex_init( &p_sys->still.lock );
@@ -501,7 +497,7 @@ static void Close( vlc_object_t *p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     /* Stop vout event handler */
-    var_DelCallback( p_sys->p_input, "intf-event", EventIntf, p_demux );
+    var_DelCallback( p_demux->p_input, "intf-event", EventIntf, p_demux );
     if( p_sys->p_vout != NULL )
     {   /* Should not happen, but better be safe than sorry. */
         msg_Warn( p_sys->p_vout, "removing dangling mouse DVD callbacks" );
@@ -514,15 +510,13 @@ static void Close( vlc_object_t *p_this )
         vlc_timer_destroy( p_sys->still.timer );
     vlc_mutex_destroy( &p_sys->still.lock );
 
-    var_Destroy( p_sys->p_input, "highlight" );
-    var_Destroy( p_sys->p_input, "x-start" );
-    var_Destroy( p_sys->p_input, "x-end" );
-    var_Destroy( p_sys->p_input, "y-start" );
-    var_Destroy( p_sys->p_input, "y-end" );
-    var_Destroy( p_sys->p_input, "color" );
-    var_Destroy( p_sys->p_input, "menu-palette" );
-
-    vlc_object_release( p_sys->p_input );
+    var_Destroy( p_demux->p_input, "highlight" );
+    var_Destroy( p_demux->p_input, "x-start" );
+    var_Destroy( p_demux->p_input, "x-end" );
+    var_Destroy( p_demux->p_input, "y-start" );
+    var_Destroy( p_demux->p_input, "y-end" );
+    var_Destroy( p_demux->p_input, "color" );
+    var_Destroy( p_demux->p_input, "menu-palette" );
 
     for( int i = 0; i < PS_TK_COUNT; i++ )
     {
@@ -1232,13 +1226,13 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
         }
 
         vlc_global_lock( VLC_HIGHLIGHT_MUTEX );
-        var_SetInteger( p_sys->p_input, "x-start", hl.sx );
-        var_SetInteger( p_sys->p_input, "x-end",  hl.ex );
-        var_SetInteger( p_sys->p_input, "y-start", hl.sy );
-        var_SetInteger( p_sys->p_input, "y-end", hl.ey );
+        var_SetInteger( p_demux->p_input, "x-start", hl.sx );
+        var_SetInteger( p_demux->p_input, "x-end",  hl.ex );
+        var_SetInteger( p_demux->p_input, "y-start", hl.sy );
+        var_SetInteger( p_demux->p_input, "y-end", hl.ey );
 
-        var_SetAddress( p_sys->p_input, "menu-palette", p_sys->palette );
-        var_SetBool( p_sys->p_input, "highlight", true );
+        var_SetAddress( p_demux->p_input, "menu-palette", p_sys->palette );
+        var_SetBool( p_demux->p_input, "highlight", true );
 
         msg_Dbg( p_demux, "buttonUpdate %d", i_button );
     }
@@ -1249,7 +1243,7 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
 
         /* Show all */
         vlc_global_lock( VLC_HIGHLIGHT_MUTEX );
-        var_SetBool( p_sys->p_input, "highlight", false );
+        var_SetBool( p_demux->p_input, "highlight", false );
     }
     vlc_global_unlock( VLC_HIGHLIGHT_MUTEX );
 }

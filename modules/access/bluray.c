@@ -142,7 +142,6 @@ struct  demux_sys_t
     mtime_t             i_still_end_time;
 
     /* */
-    input_thread_t      *p_input;
     vout_thread_t       *p_vout;
 
     /* TS stream */
@@ -423,8 +422,7 @@ static int blurayOpen(vlc_object_t *object)
 
     /* Registering overlay event handler */
     bd_register_overlay_proc(p_sys->bluray, p_demux, blurayOverlayProc);
-    p_sys->p_input = demux_GetParentInput(p_demux);
-    if (unlikely(!p_sys->p_input)) {
+    if (unlikely(!p_demux->p_input)) {
         msg_Err(p_demux, "Could not get parent input");
         goto error;
     }
@@ -495,8 +493,6 @@ static void blurayClose(vlc_object_t *object)
         var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
         vlc_object_release(p_sys->p_vout);
     }
-    if (p_sys->p_input != NULL)
-        vlc_object_release(p_sys->p_input);
     if (p_sys->p_parser)
         stream_Delete(p_sys->p_parser);
     if (p_sys->p_out != NULL)
@@ -1693,7 +1689,7 @@ static int blurayDemux(demux_t *p_demux)
         vlc_mutex_unlock(&ov->lock);
         if (display) {
             if (p_sys->p_vout == NULL)
-                p_sys->p_vout = input_GetVout(p_sys->p_input);
+                p_sys->p_vout = input_GetVout(p_demux->p_input);
             if (p_sys->p_vout != NULL) {
                 var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
                 var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);

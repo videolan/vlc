@@ -89,7 +89,6 @@ decoder_SynchroReset
 decoder_SynchroTrash
 decode_URI
 decode_URI_duplicate
-demux_GetParentInput
 demux_PacketizerDestroy
 demux_PacketizerNew
 demux_vaControlHelper

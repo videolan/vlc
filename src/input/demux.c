@@ -221,15 +221,6 @@ void demux_Delete( demux_t *p_demux )
 }
 
 /*****************************************************************************
- * demux_GetParentInput:
- *****************************************************************************/
-input_thread_t * demux_GetParentInput( demux_t *p_demux )
-{
-    return p_demux->p_input ? vlc_object_hold((vlc_object_t*)p_demux->p_input) : NULL;
-}
-
-
-/*****************************************************************************
  * demux_vaControlHelper:
  *****************************************************************************/
 int demux_vaControlHelper( stream_t *s,

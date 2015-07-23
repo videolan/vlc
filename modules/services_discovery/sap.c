@@ -613,10 +613,9 @@ static void *Run( void *data )
 static int Demux( demux_t *p_demux )
 {
     sdp_t *p_sdp = p_demux->p_sys->p_sdp;
-    input_thread_t *p_input;
+    input_thread_t *p_input = p_demux->p_input;
     input_item_t *p_parent_input;
 
-    p_input = demux_GetParentInput( p_demux );
     assert( p_input );
     if( !p_input )
     {
@@ -646,7 +645,6 @@ static int Demux( demux_t *p_demux )
     p_parent_input->b_net = true;
 
     vlc_mutex_unlock( &p_parent_input->lock );
-    vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
 
