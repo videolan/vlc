@@ -217,7 +217,6 @@ vlc_module_begin()
 vlc_module_end()
 
 static int   Read( stream_t *, void *, unsigned );
-static int   Peek( stream_t *, const uint8_t **, unsigned );
 static int   Control( stream_t *, int , va_list );
 
 static inline bool isFQUrl( const char* url )
@@ -1665,7 +1664,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     s->pf_read = Read;
-    s->pf_peek = Peek;
     s->pf_control = Control;
 
     if( vlc_clone( &p_sys->dl_thread, download_thread, s, VLC_THREAD_PRIORITY_INPUT ) )
@@ -1715,7 +1713,7 @@ static void Close( vlc_object_t *p_this )
 }
 
 static int send_flv_header( hds_stream_t *stream, stream_sys_t* p_sys,
-                            void* buffer, unsigned i_read, bool peek )
+                            void* buffer, unsigned i_read )
 {
     if ( !p_sys->flv_header )
     {
@@ -1731,10 +1729,7 @@ static int send_flv_header( hds_stream_t *stream, stream_sys_t* p_sys,
 
     memcpy( buffer, p_sys->flv_header + p_sys->flv_header_bytes_sent, to_be_read );
 
-    if( ! peek )
-    {
-        p_sys->flv_header_bytes_sent += to_be_read;
-    }
+    p_sys->flv_header_bytes_sent += to_be_read;
     return to_be_read;
 }
 
@@ -1861,7 +1856,7 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
 
     if ( header_unfinished( p_sys ) )
     {
-        unsigned hdr_bytes = send_flv_header( stream, p_sys, buffer, i_read, false );
+        unsigned hdr_bytes = send_flv_header( stream, p_sys, buffer, i_read );
         length += hdr_bytes;
         i_read -= hdr_bytes;
         buffer_uint8 += hdr_bytes;
@@ -1878,46 +1873,6 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
     }
 
     return length;
-}
-
-static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned i_peek )
-{
-    stream_sys_t *p_sys = s->p_sys;
-
-    if ( vlc_array_count( p_sys->hds_streams ) == 0 )
-        return 0;
-
-    // TODO: change here for selectable stream
-    hds_stream_t *stream = p_sys->hds_streams->pp_elems[0];
-
-    if ( !p_sys->flv_header )
-    {
-        initialize_header_and_metadata( p_sys, stream );
-    }
-
-    if( header_unfinished( p_sys ) )
-    {
-        *pp_peek = p_sys->flv_header + p_sys->flv_header_bytes_sent;
-        return p_sys->flv_header_len - p_sys->flv_header_bytes_sent;
-    }
-
-    if( stream->chunks_head && ! stream->chunks_head->failed && stream->chunks_head->data )
-    {
-        // TODO: change here for selectable stream
-        chunk_t* chunk = stream->chunks_head;
-        *pp_peek = chunk->mdat_data + chunk->mdat_pos;
-        if( chunk->mdat_len - chunk->mdat_pos < i_peek )
-        {
-            return chunk->mdat_len - chunk->mdat_pos;
-        }
-        else
-        {
-            return i_peek;
-        }
-    } else
-    {
-        return 0;
-    }
 }
 
 static int Control( stream_t *s, int i_query, va_list args )
