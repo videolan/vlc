@@ -39,11 +39,11 @@
 
 #include <errno.h>
 
-#include "dash.hpp"
 #include "xml/DOMParser.h"
 #include "mpd/MPDFactory.h"
 #include "mpd/Period.h"
 #include "mpd/ProgramInformation.h"
+#include "DASHManager.h"
 
 using namespace adaptative::logic;
 using namespace adaptative::playlist;
@@ -96,6 +96,12 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+struct demux_sys_t
+{
+        dash::DASHManager   *p_dashManager;
+        dash::mpd::MPD      *p_mpd;
+        mtime_t              i_nzpcr;
+};
 
 static int  Demux( demux_t * );
 static int  Control         (demux_t *p_demux, int i_query, va_list args);

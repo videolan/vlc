@@ -345,7 +345,6 @@ libdash_plugin_la_SOURCES = \
     demux/dash/xml/Node.cpp \
     demux/dash/xml/Node.h \
     demux/dash/dash.cpp \
-    demux/dash/dash.hpp \
     demux/dash/DASHManager.cpp \
     demux/dash/DASHManager.h \
     demux/dash/DASHStreamFormat.hpp
@@ -376,8 +375,7 @@ libhls_plugin_la_SOURCES = \
     demux/hls/HLSStreamFormat.hpp \
     demux/hls/HLSStreams.hpp \
     demux/hls/HLSStreams.cpp \
-    demux/hls/hls.cpp \
-    demux/hls/hls.hpp
+    demux/hls/hls.cpp
 
 libhls_plugin_la_SOURCES += $(adaptative_SOURCES)
 libhls_plugin_la_CXXFLAGS = $(AM_CFLAGS) -I$(srcdir)/demux/hls

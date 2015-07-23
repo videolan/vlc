@@ -41,7 +41,6 @@
 
 #include "playlist/Parser.hpp"
 #include "playlist/M3U8.hpp"
-#include "hls.hpp"
 
 using namespace adaptative;
 using namespace adaptative::logic;
@@ -94,6 +93,12 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+struct demux_sys_t
+{
+        adaptative::PlaylistManager     *p_manager;
+        hls::playlist::M3U8             *p_playlist;
+        mtime_t              i_nzpcr;
+};
 
 static int  Demux( demux_t * );
 static int  Control         (demux_t *p_demux, int i_query, va_list args);
