@@ -38,7 +38,7 @@ using namespace adaptative::logic;
 
 RateBasedAdaptationLogic::RateBasedAdaptationLogic  (int w, int h) :
                           AbstractAdaptationLogic   (),
-                          bpsAvg(0), bpsSamplecount(0),
+                          bpsAvg(0), bpsRemainder(0), bpsSamplecount(0),
                           currentBps(0)
 {
     width  = w;
@@ -68,12 +68,18 @@ void RateBasedAdaptationLogic::updateDownloadRate(size_t size, mtime_t time)
     if(unlikely(time == 0))
         return;
 
-    size_t current = size * 8000 / time;
+    size_t current = bpsRemainder + size * 8000 / time;
 
     if (current >= bpsAvg)
-        bpsAvg = bpsAvg + (current - bpsAvg) / ++bpsSamplecount;
+    {
+        bpsAvg += (current - bpsAvg) / ++bpsSamplecount;
+        bpsRemainder = (current - bpsAvg) % bpsSamplecount;
+    }
     else
-        bpsAvg = bpsAvg - (bpsAvg - current) / ++bpsSamplecount;
+    {
+        bpsAvg -= (bpsAvg - current) / ++bpsSamplecount;
+        bpsRemainder = (bpsAvg - current) % bpsSamplecount;
+    }
 
     cumulatedTime += time;
     if(cumulatedTime > 4 * CLOCK_FREQ / stabilizer)

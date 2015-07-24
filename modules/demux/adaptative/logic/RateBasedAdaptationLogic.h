@@ -46,6 +46,7 @@ namespace adaptative
                 int                     width;
                 int                     height;
                 size_t                  bpsAvg;
+                size_t                  bpsRemainder;
                 size_t                  bpsSamplecount;
                 size_t                  currentBps;
                 mtime_t                 cumulatedTime;
