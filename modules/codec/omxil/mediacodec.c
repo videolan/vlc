@@ -149,6 +149,8 @@ struct decoder_sys_t
     size_t i_csd_send;
 
     bool b_update_format;
+    bool b_has_format;
+
     int i_width;
     int i_height;
 
@@ -734,7 +736,7 @@ static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
          * due to an invalid format or a preroll */
         int64_t forced_ts = timestamp_FifoGet(p_sys->timestamp_fifo);
 
-        if (!p_sys->pixel_format || !p_pic) {
+        if (!p_sys->b_has_format) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
             return p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false);
         }
@@ -822,6 +824,7 @@ static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
             p_sys->stride = p_dec->fmt_out.video.i_width;
         }
         p_sys->b_update_format = true;
+        p_sys->b_has_format = true;
         return 0;
     }
 }
@@ -999,7 +1002,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
              * input is waiting for the output or vice-versa.  Therefore, call
              * decoder_NewPicture before GetOutput as a safeguard. */
 
-            if (p_sys->pixel_format)
+            if (p_sys->b_has_format)
             {
                 if (p_sys->b_update_format)
                 {
@@ -1028,7 +1031,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
             {
                 if (i_output_ret == 0 && i_input_ret == 0 && ++i_attempts > 100)
                 {
-                    /* No p_pic, so no pixel_format, thereforce mediacodec
+                    /* No p_pic, so no format, thereforce mediacodec
                      * didn't produce any output or events yet. Don't wait
                      * indefinitely and abort after 2seconds (100 * 2 * 10ms)
                      * without any data. Indeed, MediaCodec can fail without
