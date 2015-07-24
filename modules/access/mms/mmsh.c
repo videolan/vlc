@@ -242,7 +242,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_GET_SIZE:
         {
             uint64_t *s = va_arg( args, uint64_t * );
-            *s = p_sys->b_broadcast ? 0 : p_sys->asfh.i_file_size;
+            if (p_sys->b_broadcast)
+                return VLC_EGENERIC;
+            *s = p_sys->asfh.i_file_size;
             return VLC_SUCCESS;
         }
 
