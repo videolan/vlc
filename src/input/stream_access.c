@@ -389,6 +389,7 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     static_control_match(CAN_FASTSEEK);
     static_control_match(CAN_PAUSE);
     static_control_match(CAN_CONTROL_PACE);
+    static_control_match(GET_SIZE);
     static_control_match(GET_PTS_DELAY);
     static_control_match(GET_TITLE_INFO);
     static_control_match(GET_TITLE);
@@ -409,6 +410,7 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_CAN_FASTSEEK:
         case STREAM_CAN_PAUSE:
         case STREAM_CAN_CONTROL_PACE:
+        case STREAM_GET_SIZE:
         case STREAM_GET_PTS_DELAY:
         case STREAM_GET_TITLE_INFO:
         case STREAM_GET_TITLE:
@@ -421,13 +423,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_SET_PRIVATE_ID_CA:
         case STREAM_GET_PRIVATE_ID_STATE:
             return access_vaControl( p_access, i_query, args );
-
-        case STREAM_GET_SIZE:
-        {
-            uint64_t *pi_64 = va_arg( args, uint64_t * );
-            *pi_64 = access_GetSize( p_access );
-            break;
-        }
 
         case STREAM_GET_POSITION:
             *va_arg( args, uint64_t * ) = p_sys->i_pos;
