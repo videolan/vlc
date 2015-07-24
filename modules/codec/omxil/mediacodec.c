@@ -914,24 +914,24 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     if (p_sys->error_state)
         goto endclean;
 
-    if (p_block && p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
-        && !p_sys->api->b_support_interlaced)
-    {
-        b_error = true;
-        goto endclean;
-    }
-
-    if (p_block && p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        if (DecodeFlush(p_dec) != VLC_SUCCESS)
-            b_error = true;
-        goto endclean;
-    }
-
     if (b_new_block)
     {
         bool b_csd_changed = false, b_size_changed = false;
 
         p_sys->b_new_block = false;
+        if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
+            && !p_sys->api->b_support_interlaced)
+        {
+            b_error = true;
+            goto endclean;
+        }
+
+        if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+            if (DecodeFlush(p_dec) != VLC_SUCCESS)
+                b_error = true;
+            goto endclean;
+        }
+
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
             H264ProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
         else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
@@ -953,23 +953,23 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         }
         if (b_csd_changed)
             b_delayed_start = true;
-    }
 
-    /* try delayed opening if there is a new extra data */
-    if (!p_sys->api->b_started)
-    {
-        switch (p_dec->fmt_in.i_codec)
+        /* try delayed opening if there is a new extra data */
+        if (!p_sys->api->b_started)
         {
-        case VLC_CODEC_VC1:
-            if (p_dec->fmt_in.i_extra)
-                b_delayed_start = true;
-        default:
-            break;
-        }
-        if (b_delayed_start && StartMediaCodec(p_dec) != VLC_SUCCESS)
-        {
-            b_error = true;
-            goto endclean;
+            switch (p_dec->fmt_in.i_codec)
+            {
+            case VLC_CODEC_VC1:
+                if (p_dec->fmt_in.i_extra)
+                    b_delayed_start = true;
+            default:
+                break;
+            }
+            if (b_delayed_start && StartMediaCodec(p_dec) != VLC_SUCCESS)
+            {
+                b_error = true;
+                goto endclean;
+            }
         }
     }
     if (!p_sys->api->b_started)
