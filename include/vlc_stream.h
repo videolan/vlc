@@ -89,7 +89,7 @@ enum stream_query_e
     STREAM_SET_POSITION,        /**< arg1= uint64_t       res=can fail  */
     STREAM_GET_POSITION,        /**< arg1= uint64_t *     res=cannot fail*/
 
-    STREAM_GET_SIZE,            /**< arg1= uint64_t *     res=cannot fail (0 if no sense)*/
+    STREAM_GET_SIZE,            /**< arg1= uint64_t *     res=can fail */
 
     /* */
     STREAM_GET_PTS_DELAY = 0x101,/**< arg1= int64_t* res=cannot fail */
@@ -139,7 +139,9 @@ static inline int64_t stream_Tell( stream_t *s )
 static inline int64_t stream_Size( stream_t *s )
 {
     uint64_t i_pos;
-    stream_Control( s, STREAM_GET_SIZE, &i_pos );
+
+    if( stream_Control( s, STREAM_GET_SIZE, &i_pos ) )
+        i_pos = 0;
     if( i_pos >> 62 )
         return (int64_t)1 << 62;
     return i_pos;
