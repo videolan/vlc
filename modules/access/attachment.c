@@ -122,28 +122,28 @@ static int Seek(access_t *access, uint64_t position)
 /* */
 static int Control(access_t *access, int query, va_list args)
 {
-    VLC_UNUSED(access);
+    input_attachment_t *a = (void *)access->p_sys;
+
     switch (query)
     {
-    /* */
     case ACCESS_CAN_SEEK:
     case ACCESS_CAN_FASTSEEK:
     case ACCESS_CAN_PAUSE:
-    case ACCESS_CAN_CONTROL_PACE: {
-        bool *b = va_arg(args, bool*);
-        *b = true;
-        return VLC_SUCCESS;
-    }
-    case ACCESS_GET_PTS_DELAY: {
-        int64_t *d = va_arg(args, int64_t *);
-        *d = DEFAULT_PTS_DELAY;
-        return VLC_SUCCESS;
-    }
+    case ACCESS_CAN_CONTROL_PACE:
+        *va_arg(args, bool *) = true;
+        break;
+    case ACCESS_GET_SIZE:
+        *va_arg(args, uint64_t *) = a->i_data;
+        break;
+    case ACCESS_GET_PTS_DELAY:
+        *va_arg(args, int64_t *) = DEFAULT_PTS_DELAY;
+        break;
     case ACCESS_SET_PAUSE_STATE:
         return VLC_SUCCESS;
 
     default:
         return VLC_EGENERIC;
     }
+    return VLC_SUCCESS;
 }
 
