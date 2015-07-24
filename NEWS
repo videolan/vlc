@@ -145,7 +145,8 @@ libVLC:
  * Add libvlc_media_get_type to get the type of the media
  * Add libvlc_media_player_get_full_title_descriptions to get full title info of the media
  * Add libvlc_media_player_get_full_chapter_descriptions to get full chapter info of the media
- * Deprecate libvlc_video_get_title_description, libvlc_video_get_chapter_description
+ * Deprecate libvlc_video_get_title_description, libvlc_video_get_chapter_description,
+   libvlc_media_player_get_agl, libvlc_media_player_set_agl
 
 Logging
  * Support for the SystemD Journal

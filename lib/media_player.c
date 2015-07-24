@@ -1025,14 +1025,7 @@ void * libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
 void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
                                   uint32_t drawable )
 {
-#ifdef __APPLE__
-    var_SetString (p_mi, "avcodec-hw", "");
-    var_SetString (p_mi, "vout", "");
-    var_SetString (p_mi, "window", "none");
-    var_SetInteger (p_mi, "drawable-agl", drawable);
-#else
     (void) p_mi; (void)drawable;
-#endif
 }
 
 /**************************************************************************
@@ -1040,12 +1033,7 @@ void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
  **************************************************************************/
 uint32_t libvlc_media_player_get_agl( libvlc_media_player_t *p_mi )
 {
-    assert (p_mi != NULL);
-#ifdef __APPLE__
-    return var_GetInteger (p_mi, "drawable-agl");
-#else
     return 0;
-#endif
 }
 
 /**************************************************************************

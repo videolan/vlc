@@ -451,19 +451,15 @@ LIBVLC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, 
 LIBVLC_API void * libvlc_media_player_get_nsobject ( libvlc_media_player_t *p_mi );
 
 /**
- * Set the agl handler where the media player should render its video output.
- *
- * \param p_mi the Media Player
- * \param drawable the agl handler
+ * \deprecated Use libvlc_media_player_set_nsobject instead
  */
+LIBVLC_DEPRECATED
 LIBVLC_API void libvlc_media_player_set_agl ( libvlc_media_player_t *p_mi, uint32_t drawable );
 
 /**
- * Get the agl handler previously set with libvlc_media_player_set_agl().
- *
- * \param p_mi the Media Player
- * \return the agl handler or 0 if none where set
+ * \deprecated Use libvlc_media_player_get_nsobject instead
  */
+LIBVLC_DEPRECATED
 LIBVLC_API uint32_t libvlc_media_player_get_agl ( libvlc_media_player_t *p_mi );
 
 /**
