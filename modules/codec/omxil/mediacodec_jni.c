@@ -416,7 +416,6 @@ static int Stop(mc_api *api)
     JNIEnv *env;
 
     api->b_direct_rendering = false;
-    api->b_support_interlaced = false;
 
     GET_ENV();
 
@@ -574,9 +573,7 @@ static int Start(mc_api *api, AWindowHandler *p_awh, const char *psz_name,
                                      jfields.buffer_info_ctor);
     p_sys->buffer_info = (*env)->NewGlobalRef(env, jbuffer_info);
 
-    /* Allow interlaced picture only after API 21 */
     api->b_direct_rendering = b_direct_rendering;
-    api->b_support_interlaced = jfields.get_input_buffer && jfields.get_output_buffer;
     i_ret = VLC_SUCCESS;
     msg_Dbg(api->p_obj, "MediaCodec via JNI opened");
 
@@ -846,5 +843,8 @@ int MediaCodecJni_Init(mc_api *api)
     api->get_out = GetOutput;
     api->release_out = ReleaseOutput;
 
+    /* Allow interlaced picture only after API 21 */
+    api->b_support_interlaced = jfields.get_input_buffer
+                                && jfields.get_output_buffer;
     return VLC_SUCCESS;
 }

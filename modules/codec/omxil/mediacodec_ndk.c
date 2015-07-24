@@ -272,7 +272,6 @@ static int Stop(mc_api *api)
     mc_api_sys *p_sys = api->p_sys;
 
     api->b_direct_rendering = false;
-    api->b_support_interlaced = false;
 
     if (p_sys->p_codec)
     {
@@ -341,7 +340,6 @@ static int Start(mc_api *api, AWindowHandler *p_awh, const char *psz_name,
 
     api->b_started = true;
     api->b_direct_rendering = !!p_anw;
-    api->b_support_interlaced = true;
     i_ret = VLC_SUCCESS;
 
     msg_Dbg(api->p_obj, "MediaCodec via NDK opened");
@@ -523,5 +521,7 @@ int MediaCodecNdk_Init(mc_api *api)
     api->put_in = PutInput;
     api->get_out = GetOutput;
     api->release_out = ReleaseOutput;
+
+    api->b_support_interlaced = true;
     return VLC_SUCCESS;
 }
