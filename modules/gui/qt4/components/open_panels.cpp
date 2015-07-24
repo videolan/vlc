@@ -723,6 +723,10 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     isInitialized = false;
+#ifdef _WIN32
+    vdevDshowW = NULL;
+    adevDshowW = NULL;
+#endif
 }
 
 void CaptureOpenPanel::initialize()
