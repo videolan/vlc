@@ -54,10 +54,6 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct access_sys_t {
-    input_attachment_t *a;
-};
-
 static ssize_t Read(access_t *, uint8_t *, size_t);
 static int     Seek(access_t *, uint64_t);
 static int     Control(access_t *, int, va_list);
@@ -66,7 +62,6 @@ static int     Control(access_t *, int, va_list);
 static int Open(vlc_object_t *object)
 {
     access_t     *access = (access_t *)object;
-    access_sys_t *sys;
 
     input_thread_t *input = access->p_input;
     if (!input)
@@ -83,20 +78,12 @@ static int Open(vlc_object_t *object)
     }
 
     /* */
-    access->p_sys = sys = malloc(sizeof(*sys));
-    if (!sys) {
-        vlc_input_attachment_Delete(a);
-        return VLC_ENOMEM;
-    }
-    sys->a = a;
-
-    /* */
     access_InitFields(access);
     access->pf_read    = Read;
     access->pf_block   = NULL;
     access->pf_control = Control;
     access->pf_seek    = Seek;
-
+    access->p_sys      = (void *)a;
     return VLC_SUCCESS;
 }
 
@@ -104,23 +91,22 @@ static int Open(vlc_object_t *object)
 static void Close(vlc_object_t *object)
 {
     access_t     *access = (access_t *)object;
-    access_sys_t *sys = access->p_sys;
+    input_attachment_t *a = (void *)access->p_sys;
 
-    vlc_input_attachment_Delete(sys->a);
-    free(sys);
+    vlc_input_attachment_Delete(a);
 }
 
 /* */
 static ssize_t Read(access_t *access, uint8_t *buffer, size_t size)
 {
-    access_sys_t *sys = access->p_sys;
+    input_attachment_t *a = (void *)access->p_sys;
 
-    access->info.b_eof = access->info.i_pos >= (uint64_t)sys->a->i_data;
+    access->info.b_eof = access->info.i_pos >= (uint64_t)a->i_data;
     if (access->info.b_eof)
         return 0;
 
-    const size_t copy = __MIN(size, sys->a->i_data - access->info.i_pos);
-    memcpy(buffer, (uint8_t*)sys->a->p_data + access->info.i_pos, copy);
+    const size_t copy = __MIN(size, a->i_data - access->info.i_pos);
+    memcpy(buffer, (uint8_t *)a->p_data + access->info.i_pos, copy);
     access->info.i_pos += copy;
     return copy;
 }
