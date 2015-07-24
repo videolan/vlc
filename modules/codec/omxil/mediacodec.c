@@ -942,7 +942,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
                     b_error = true;
             }
         }
-        if (!p_sys->api->b_started)
+        if (b_csd_changed)
             b_delayed_start = true;
     }
 
