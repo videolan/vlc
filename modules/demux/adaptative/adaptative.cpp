@@ -152,7 +152,7 @@ static int Open(vlc_object_t *p_obj)
                                               static_cast<AbstractAdaptationLogic::LogicType>(logic));
     }
 
-    if(!p_manager->start())
+    if(!p_manager || !p_manager->start())
     {
         delete p_manager;
         return VLC_EGENERIC;
