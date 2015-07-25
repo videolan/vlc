@@ -68,6 +68,7 @@ namespace adaptative
         void create(AbstractAdaptationLogic *, SegmentTracker *,
                     const AbstractStreamOutputFactory *);
         void updateFormat(StreamFormat &);
+        void setLanguage(const std::string &);
         bool isEOF() const;
         mtime_t getPCR() const;
         mtime_t getFirstDTS() const;
@@ -95,6 +96,7 @@ namespace adaptative
         SegmentChunk *currentChunk;
         bool disabled;
         bool eof;
+        std::string language;
 
         const AbstractStreamOutputFactory *streamOutputFactory;
     };
@@ -105,6 +107,7 @@ namespace adaptative
         AbstractStreamOutput(demux_t *, const StreamFormat &);
         virtual ~AbstractStreamOutput();
 
+        void setLanguage(const std::string &);
         const StreamFormat & getStreamFormat() const;
         virtual void pushBlock(block_t *, bool) = 0;
         virtual mtime_t getPCR() const;
@@ -123,6 +126,7 @@ namespace adaptative
         demux_t  *realdemux;
         mtime_t   pcr;
         int       group;
+        std::string language;
 
     private:
         StreamFormat format;

@@ -86,6 +86,12 @@ void Stream::updateFormat(StreamFormat &newformat)
     output = streamOutputFactory->create(p_demux, format);
     if(!output)
         throw VLC_EGENERIC;
+    output->setLanguage(language);
+}
+
+void Stream::setLanguage(const std::string &lang)
+{
+    language = lang;
 }
 
 bool Stream::isEOF() const
@@ -316,6 +322,11 @@ AbstractStreamOutput::AbstractStreamOutput(demux_t *demux, const StreamFormat &f
     pcr = VLC_TS_INVALID;
     group = 0;
     format = format_;
+}
+
+void AbstractStreamOutput::setLanguage(const std::string &lang)
+{
+    language = lang;
 }
 
 const StreamFormat & AbstractStreamOutput::getStreamFormat() const
@@ -633,13 +644,21 @@ es_out_id_t * BaseStreamOutput::esOutAdd(const es_format_t *p_fmt)
 
     if(!p_es)
     {
-        p_es = realdemux->out->pf_add(realdemux->out, p_fmt);
+        es_format_t fmtcpy;
+        es_format_Init(&fmtcpy, p_fmt->i_cat, p_fmt->i_codec);
+        es_format_Copy(&fmtcpy, p_fmt);
+        if(!fmtcpy.psz_language && !language.empty())
+            fmtcpy.psz_language = strdup(language.c_str());
+        if(!fmtcpy.psz_description && !description.empty())
+            fmtcpy.psz_description = strdup(description.c_str());
+        p_es = realdemux->out->pf_add(realdemux->out, &fmtcpy);
         if(p_es)
         {
-            Demuxed *pair = new (std::nothrow) Demuxed(p_es, p_fmt);
+            Demuxed *pair = new (std::nothrow) Demuxed(p_es, &fmtcpy);
             if(pair)
                 queues.push_back(pair);
         }
+        es_format_Clean(&fmtcpy);
     }
     vlc_mutex_unlock(&lock);
 
