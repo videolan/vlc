@@ -354,6 +354,10 @@ M3U8 * Parser::parse(const std::string &playlisturl)
             {
                 std::pair<std::string, AttributesTag *> pair = *groupsit;
                 parseRepresentation(altAdaptSet, pair.second);
+
+                if(pair.second->getAttributeByName("NAME"))
+                   altAdaptSet->description.Set(pair.second->getAttributeByName("NAME")->quotedString());
+
                 if(!altAdaptSet->getRepresentations().empty())
                     period->addAdaptationSet(altAdaptSet);
                 else
