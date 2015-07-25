@@ -239,6 +239,14 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
         if(baseUrl)
             adaptationSet->baseUrl.Set(new Url(baseUrl->getText()));
 
+        Node *role = DOMHelper::getFirstChildElementByName((*it), "Role");
+        if(role && role->hasAttribute("schemeIdUri") && role->hasAttribute("value"))
+        {
+            std::string uri = role->getAttributeValue("schemeIdUri");
+            if(uri == "urn:mpeg:dash:role:2011")
+                adaptationSet->description.Set(role->getAttributeValue("value"));
+        }
+
         parseSegmentInformation( *it, adaptationSet );
 
         setRepresentations((*it), adaptationSet);
