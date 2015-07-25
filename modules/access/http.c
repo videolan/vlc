@@ -987,9 +987,17 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_GET_CONTENT_TYPE:
-            *va_arg( args, char ** ) =
-                p_sys->psz_mime ? strdup( p_sys->psz_mime ) : NULL;
+        {
+            char **type = va_arg( args, char ** );
+
+            if( p_sys->b_icecast && p_sys->psz_mime == NULL )
+                *type = strdup( "audio/mpeg" );
+            else if( !strcasecmp( p_access->psz_access, "itpc" ) )
+                *type = strdup( "application/rss+xml" );
+            else
+                *type = strdup( p_sys->psz_mime );
             break;
+        }
 
         default:
             return VLC_EGENERIC;
@@ -1232,6 +1240,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
     {
         p_sys->psz_protocol = "ICY";
         p_sys->i_code = atoi( &psz[4] );
+        p_sys->b_icecast = true;
         p_sys->b_reconnect = true;
     }
     else
