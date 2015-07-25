@@ -277,6 +277,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *va_arg( args, unsigned * ) = p_sys->i_current_seekpoint;
             break;
 
+        case ACCESS_GET_CONTENT_TYPE:
+            *va_arg( args, char ** ) = strdup("video/mpeg");
+            break;
+
         case ACCESS_SET_TITLE:
         {
             int i = va_arg( args, int );
