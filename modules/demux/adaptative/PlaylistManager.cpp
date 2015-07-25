@@ -28,6 +28,7 @@
 #include "playlist/AbstractPlaylist.hpp"
 #include "playlist/BasePeriod.h"
 #include "playlist/BaseAdaptationSet.h"
+#include "playlist/BaseRepresentation.h"
 #include "http/HTTPConnectionManager.h"
 #include "logic/AlwaysBestAdaptationLogic.h"
 #include "logic/RateBasedAdaptationLogic.h"
@@ -102,6 +103,20 @@ bool PlaylistManager::setupPeriod()
                     delete logic;
                     throw VLC_ENOMEM;
                 }
+
+                std::list<std::string> languages;
+                if(!set->getLang().empty())
+                {
+                    languages = set->getLang();
+                }
+                else if(!set->getRepresentations().empty())
+                {
+                    languages = set->getRepresentations().front()->getLang();
+                }
+
+                if(!languages.empty())
+                    st->setLanguage(languages.front());
+
                 st->create(logic, tracker, streamOutputFactory);
                 streams.push_back(st);
             } catch (int) {
