@@ -1933,6 +1933,21 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
             INT64_C(1000) * var_InheritInteger( p_access, "live-caching" );
         break;
 
+    case ACCESS_GET_CONTENT_TYPE:
+    {
+        dshow_stream_t *p_stream = p_access->p_sys->pp_streams[0];
+        char **type = va_arg( args, char ** );
+
+        /* Check if we need to force demuxers */
+        if( p_stream->i_fourcc == VLC_CODEC_DV )
+            *type = strdup( "video/dv" );
+        else if( p_stream->i_fourcc == VLC_CODEC_MPGV )
+            *type = strdup( "video/mpeg" );
+        else
+            return VLC_EGENERIC;
+        break;
+    }
+
     default:
         return VLC_EGENERIC;
     }
