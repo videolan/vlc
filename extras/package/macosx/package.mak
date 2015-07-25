@@ -18,12 +18,12 @@ VLC-dev.app: VLC-tmp
 VLC.app: VLC-tmp
 	rm -Rf $@
 	cp -R VLC-tmp $@
-	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/build-package.sh
-	find $@ -type d -exec chmod ugo+rx '{}' \;
-	find $@ -type f -exec chmod ugo+r '{}' \;
 	rm -Rf $@/Contents/Frameworks/BGHUDAppKit.framework/Versions/A/Resources/BGHUDAppKitPlugin.ibplugin
 	rm -Rf $@/Contents/Frameworks/BGHUDAppKit.framework/Versions/A/Resources/README.textile
-
+	PRODUCT="$@" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/extras/package/macosx/build-package.sh
+	cp "$(top_builddir)/modules/plugins.dat" $@/Contents/MacOS/plugins
+	find $@ -type d -exec chmod ugo+rx '{}' \;
+	find $@ -type f -exec chmod ugo+r '{}' \;
 
 VLC-tmp:
 	$(AM_V_GEN)for i in src lib share; do \
