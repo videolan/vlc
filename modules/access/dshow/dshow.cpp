@@ -786,20 +786,6 @@ static int AccessOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    dshow_stream_t *p_stream = p_sys->pp_streams[0];
-
-    /* Check if we need to force demuxers */
-    if( p_stream->i_fourcc == VLC_CODEC_DV )
-    {
-        free( p_access->psz_demux );
-        p_access->psz_demux = strdup( "rawdv" );
-    }
-    else if( p_stream->i_fourcc == VLC_CODEC_MPGV )
-    {
-        free( p_access->psz_demux );
-        p_access->psz_demux = strdup( "mpgv" );
-    }
-
     /* Setup Access */
     p_access->pf_read = NULL;
     p_access->pf_block = ReadCompressed;

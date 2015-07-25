@@ -484,8 +484,6 @@ static int Open (vlc_object_t *obj)
 
     access->pf_block = Read;
     access->pf_control = Control;
-    free (access->psz_demux);
-    access->psz_demux = strdup ("ts");
     return VLC_SUCCESS;
 
 error:

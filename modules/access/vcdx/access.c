@@ -936,9 +936,6 @@ VCDOpen ( vlc_object_t *p_this )
 
     vcdplayer_play( p_access, itemid );
 
-    free( p_access->psz_demux );
-    p_access->psz_demux = strdup( "ps" );
-
 #ifdef FIXED
     if( play_single_item )
         VCDFixupPlayList(p_access,p_vcd,psz_source,&itemid,play_single_item);

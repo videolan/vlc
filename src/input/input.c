@@ -2286,7 +2286,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
         /* */
         access_t *p_access = access_New( p_input, p_input,
-                                         psz_access, psz_demux, psz_path );
+                                         psz_access, psz_path );
         if( p_access == NULL )
         {
             msg_Err( p_input, "open of `%s' failed", psz_mrl );
@@ -2298,8 +2298,7 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* Access-forced demuxer (PARENTAL ADVISORY: EXPLICIT HACK) */
-        if( !psz_demux[0] || !strcasecmp( psz_demux, "any" ) )
-            psz_demux = p_access->psz_demux;
+#warning FIXME: parse content type
 
         /* Create the stream_t */
         stream_t *p_stream = stream_AccessNew( p_access );

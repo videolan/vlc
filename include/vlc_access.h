@@ -82,11 +82,6 @@ struct access_t
     char        *psz_location; /**< Location (URL with the scheme stripped) */
     char        *psz_filepath; /**< Local file path (if applicable) */
 
-    /* Access can fill this entry to force a demuxer
-     * XXX: fill it once you know for sure you will succeed
-     * (if you fail, this value won't be reseted */
-    char        *psz_demux;
-
     /* pf_read/pf_block/pf_readdir is used to read data.
      * XXX A access should set one and only one of them */
     ssize_t     (*pf_read)   ( access_t *, uint8_t *, size_t );  /* Return -1 if no data yet, 0 if no more data, else real data read */

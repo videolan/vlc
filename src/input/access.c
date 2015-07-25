@@ -54,8 +54,7 @@ char *get_path(const char *location)
  * access_New:
  *****************************************************************************/
 access_t *access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
-                      const char *psz_access, const char *psz_demux,
-                      const char *psz_location )
+                      const char *psz_access, const char *psz_location )
 {
     access_t *p_access = vlc_custom_create( p_obj, sizeof (*p_access),
                                             "access" );
@@ -70,9 +69,7 @@ access_t *access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     p_access->psz_access = strdup( psz_access );
     p_access->psz_location = strdup( psz_location );
     p_access->psz_filepath = get_path( psz_location );
-    p_access->psz_demux  = strdup( psz_demux );
-    if( p_access->psz_access == NULL || p_access->psz_location == NULL
-     || p_access->psz_demux == NULL )
+    if( p_access->psz_access == NULL || p_access->psz_location == NULL )
         goto error;
 
     msg_Dbg( p_obj, "creating access '%s' location='%s', path='%s'",
@@ -100,7 +97,6 @@ error:
     free( p_access->psz_access );
     free( p_access->psz_location );
     free( p_access->psz_filepath );
-    free( p_access->psz_demux );
     vlc_object_release( p_access );
     return NULL;
 }
@@ -115,7 +111,7 @@ access_t *vlc_access_NewMRL(vlc_object_t *parent, const char *mrl)
     input_SplitMRL(&access, &demux, &location, &anchor, buf);
 
     /* Both demux and anchor are ignored, since they are of no use here. */
-    access_t *obj = access_New(parent, NULL, access, "", location);
+    access_t *obj = access_New(parent, NULL, access, location);
 
     free(buf);
     return obj;
@@ -128,7 +124,6 @@ void vlc_access_Delete(access_t *access)
     free(access->psz_access);
     free(access->psz_location);
     free(access->psz_filepath);
-    free(access->psz_demux);
     vlc_object_release(access);
 }
 

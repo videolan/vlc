@@ -203,9 +203,6 @@ static int Open( vlc_object_t *p_this )
     p_access->info.i_pos       = (uint64_t)( p_sys->i_sector - p_sys->p_sectors[1+i_title] ) *
                                  VCD_DATA_SIZE;
 
-    free( p_access->psz_demux );
-    p_access->psz_demux = strdup( "ps" );
-
     return VLC_SUCCESS;
 
 error:
