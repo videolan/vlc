@@ -493,7 +493,7 @@ int stream_Control( stream_t *s, int i_query, ... )
         return VLC_EGENERIC;
 
     va_start( args, i_query );
-    i_result = s->pf_control( s, i_query, args );
+    i_result = stream_vaControl( s, i_query, args );
     va_end( args );
     return i_result;
 }
