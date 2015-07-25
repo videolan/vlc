@@ -170,7 +170,6 @@ static void Destroy( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    int i, j;
     uint8_t *restrict p_src = NULL;
     uint8_t *restrict p_out = NULL;
     int i_src_pitch;
@@ -202,11 +201,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     memcpy(p_out, p_src, i_visible_pitch);
 
-    for( i = 1; i < i_visible_lines - 1; i++ )
+    for( unsigned i = 1; i < i_visible_lines - 1; i++ )
     {
         p_out[i * i_out_pitch] = p_src[i * i_src_pitch];
 
-        for( j = 1; j < i_visible_pitch - 1; j++ )
+        for( unsigned j = 1; j < i_visible_pitch - 1; j++ )
         {
             pix = (p_src[(i - 1) * i_src_pitch + j - 1] * v1) +
                   (p_src[(i - 1) * i_src_pitch + j    ] * v1) +
