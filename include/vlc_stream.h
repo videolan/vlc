@@ -57,7 +57,7 @@ struct stream_t
     stream_t *p_source;
 
     /* */
-    int         (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
+    ssize_t     (*pf_read)(stream_t *, void *, size_t);
     input_item_t *(*pf_readdir)( stream_t * );
     int         (*pf_control)( stream_t *, int i_query, va_list );
 

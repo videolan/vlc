@@ -57,7 +57,7 @@ struct stream_sys_t
     } stats;
 };
 
-static int  DStreamRead   ( stream_t *, void *p_read, unsigned int i_read );
+static ssize_t DStreamRead( stream_t *, void *p_read, size_t i_read );
 static int  DStreamControl( stream_t *, int i_query, va_list );
 static void DStreamDelete ( stream_t * );
 static void* DStreamThread ( void * );
@@ -173,18 +173,18 @@ static void DStreamDelete( stream_t *s )
 }
 
 
-static int DStreamRead( stream_t *s, void *p_read, unsigned int i_read )
+static ssize_t DStreamRead( stream_t *s, void *p_read, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     uint8_t *p_out = p_read;
-    int i_out = 0;
+    size_t i_out = 0;
 
     //msg_Dbg( s, "DStreamRead: wanted %d bytes", i_read );
 
     while( atomic_load( &p_sys->active ) && !s->b_error && i_read )
     {
         block_t *p_block = p_sys->p_block;
-        int i_copy;
+        size_t i_copy;
 
         if( !p_block )
         {

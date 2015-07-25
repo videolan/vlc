@@ -64,7 +64,7 @@ struct stream_sys_t
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int  Read   ( stream_t *, void *p_read, unsigned int i_read );
+static ssize_t Read( stream_t *, void *p_read, size_t i_read );
 static int  Control( stream_t *, int i_query, va_list );
 
 static int  Start  ( stream_t *, const char *psz_extension );
@@ -111,7 +111,7 @@ static void Close( vlc_object_t *p_this )
 /****************************************************************************
  * Stream filters functions
  ****************************************************************************/
-static int Read( stream_t *s, void *p_read, unsigned int i_read )
+static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     void *p_record = p_read;
@@ -121,7 +121,7 @@ static int Read( stream_t *s, void *p_read, unsigned int i_read )
         p_record = malloc( i_read );
 
     /* */
-    const int i_record = stream_Read( s->p_source, p_record, i_read );
+    const ssize_t i_record = stream_Read( s->p_source, p_record, i_read );
 
     /* Dump read data */
     if( p_sys->f )

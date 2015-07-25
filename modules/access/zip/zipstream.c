@@ -53,7 +53,7 @@ vlc_module_end()
 /** *************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int Read   ( stream_t *, void *p_read, unsigned int i_read );
+static ssize_t Read( stream_t *, void *p_read, size_t i_read );
 static int Control( stream_t *, int i_query, va_list );
 
 typedef struct node node;
@@ -252,7 +252,7 @@ void StreamClose( vlc_object_t *p_this )
 /** *************************************************************************
  * Read
  ****************************************************************************/
-static int Read( stream_t *s, void *p_read, unsigned int i_read )
+static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -261,7 +261,7 @@ static int Read( stream_t *s, void *p_read, unsigned int i_read )
         return -1;
 
     /* Read the buffer */
-    unsigned i_len = __MIN( i_read, p_sys->i_len - p_sys->i_pos );
+    size_t i_len = __MIN( i_read, p_sys->i_len - p_sys->i_pos );
     if( p_read )
         memcpy( p_read, p_sys->psz_xspf + p_sys->i_pos, i_len );
     p_sys->i_pos += i_len;

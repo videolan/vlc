@@ -39,7 +39,7 @@ struct stream_sys_t {
     stream_t *payload;
 };
 
-static int Read(stream_t *s, void *data, unsigned size)
+static ssize_t Read(stream_t *s, void *data, size_t size)
 {
     return stream_Read(s->p_sys->payload, data, size);
 }

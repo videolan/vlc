@@ -191,7 +191,7 @@ static void *Thread (void *data)
  * Reads decompressed from the decompression program
  * @return -1 for EAGAIN, 0 for EOF, byte count otherwise.
  */
-static int Read (stream_t *stream, void *buf, unsigned int buflen)
+static ssize_t Read (stream_t *stream, void *buf, size_t buflen)
 {
     stream_sys_t *sys = stream->p_sys;
     ssize_t ret = 0;

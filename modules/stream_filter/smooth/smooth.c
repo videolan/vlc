@@ -59,7 +59,7 @@ vlc_module_begin()
     set_callbacks( Open, Close )
 vlc_module_end()
 
-static int   Read( stream_t *, void *, unsigned );
+static ssize_t Read( stream_t *, void *, size_t );
 static int   Control( stream_t *, int , va_list );
 
 static bool isSmoothStreaming( stream_t *s )
@@ -689,10 +689,10 @@ static chunk_t *get_chunk( stream_t *s, const bool wait, bool *pb_isinit )
     return p_chunk;
 }
 
-static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read )
+static size_t sms_Read( stream_t *s, uint8_t *p_read, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
-    unsigned int copied = 0;
+    size_t copied = 0;
     chunk_t *chunk = NULL;
 
     do
@@ -732,7 +732,7 @@ static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read 
         if( chunk->read_pos == 0 )
         {
             const char *verb = p_read == NULL ? "skipping" : "reading";
-            msg_Dbg( s, "%s chunk time %"PRIu64" (%u bytes), type %i",
+            msg_Dbg( s, "%s chunk time %"PRIu64" (%zu bytes), type %i",
                         verb, chunk->start_time, i_read, chunk->type );
         }
 
@@ -758,9 +758,9 @@ static unsigned int sms_Read( stream_t *s, uint8_t *p_read, unsigned int i_read 
     return copied;
 }
 
-static int Read( stream_t *s, void *buffer, unsigned i_read )
+static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
 {
-    int length = 0;
+    ssize_t length = 0;
     i_read = __MIN(INT_MAX, i_read);
 
     length = sms_Read( s, (uint8_t*) buffer, i_read );
@@ -772,7 +772,7 @@ static int Read( stream_t *s, void *buffer, unsigned i_read )
     sms_Read( s, NULL, 0 );
 
     if( length < (int)i_read )
-        msg_Warn( s, "could not read %u bytes, only %u !", i_read, length );
+        msg_Warn( s, "could not read %zu bytes, only %zd !", i_read, length );
 
     return length;
 }

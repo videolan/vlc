@@ -237,7 +237,7 @@ static int DecoderRead( stream_t *p_stream, uint8_t *p_dst, int i_toread )
     return i_total_read;
 }
 
-static int Read( stream_t *p_stream, void *p_buf, unsigned int i_toread )
+static ssize_t Read( stream_t *p_stream, void *p_buf, size_t i_toread )
 {
     stream_sys_t *p_sys = p_stream->p_sys;
 

@@ -216,7 +216,7 @@ vlc_module_begin()
     set_callbacks( Open, Close )
 vlc_module_end()
 
-static int   Read( stream_t *, void *, unsigned );
+static ssize_t Read( stream_t *, void *, size_t );
 static int   Control( stream_t *, int , va_list );
 
 static inline bool isFQUrl( const char* url )
@@ -1839,7 +1839,7 @@ static inline bool header_unfinished( stream_sys_t *p_sys )
     return p_sys->flv_header_bytes_sent < p_sys->flv_header_len;
 }
 
-static int Read( stream_t *s, void *buffer, unsigned i_read )
+static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 

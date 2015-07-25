@@ -157,22 +157,22 @@ struct stream_sys_t
 };
 
 /* Method 1: */
-static int  AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read );
+static ssize_t AStreamReadBlock( stream_t *, void *, size_t );
 static int  AStreamSeekBlock( stream_t *s, uint64_t i_pos );
 static void AStreamPrebufferBlock( stream_t *s );
 static block_t *AReadBlock( stream_t *s, bool *pb_eof );
 
 /* Method 2 */
-static int  AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read );
+static ssize_t AStreamReadStream( stream_t *, void *, size_t );
 static int  AStreamSeekStream( stream_t *s, uint64_t i_pos );
 static void AStreamPrebufferStream( stream_t *s );
-static int  AReadStream( stream_t *s, void *p_read, unsigned int i_read );
+static ssize_t AReadStream( stream_t *s, void *p_read, size_t i_read );
 
 /* ReadDir */
 static input_item_t *AStreamReadDir( stream_t *s );
 
 /* Common */
-static int  AStreamReadError( stream_t *s, void *p_read, unsigned int i_read )
+static ssize_t AStreamReadError( stream_t *s, void *p_read, size_t i_read )
 {
     (void) s; (void) p_read; (void) i_read;
     return VLC_EGENERIC;
@@ -542,12 +542,12 @@ static void AStreamPrebufferBlock( stream_t *s )
 
 static int AStreamRefillBlock( stream_t *s );
 
-static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
+static ssize_t AStreamReadBlock( stream_t *s, void *p_read, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
     uint8_t *p_data = p_read;
-    unsigned int i_data = 0;
+    size_t i_data = 0;
 
     /* It means EOF */
     if( p_sys->block.p_current == NULL )
@@ -566,9 +566,9 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
 
     while( i_data < i_read )
     {
-        int i_current =
+        ssize_t i_current =
             p_sys->block.p_current->i_buffer - p_sys->block.i_offset;
-        unsigned int i_copy = VLC_CLIP( (unsigned int)i_current, 0, i_read - i_data);
+        size_t i_copy = VLC_CLIP( (size_t)i_current, 0, i_read - i_data);
 
         /* Copy data */
         if( p_data )
@@ -791,9 +791,9 @@ static int AStreamRefillBlock( stream_t *s )
  * Method 2:
  ****************************************************************************/
 static int AStreamRefillStream( stream_t *s );
-static int AStreamReadNoSeekStream( stream_t *s, void *p_read, unsigned int i_read );
+static ssize_t AStreamReadNoSeekStream( stream_t *, void *, size_t );
 
-static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
+static ssize_t AStreamReadStream( stream_t *s, void *p_read, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -958,13 +958,14 @@ static int AStreamSeekStream( stream_t *s, uint64_t i_pos )
     return VLC_SUCCESS;
 }
 
-static int AStreamReadNoSeekStream( stream_t *s, void *p_read, unsigned int i_read )
+static ssize_t AStreamReadNoSeekStream( stream_t *s, void *p_read,
+                                        size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
 
     uint8_t *p_data = (uint8_t *)p_read;
-    unsigned int i_data = 0;
+    size_t i_data = 0;
 
     if( tk->i_start >= tk->i_end )
         return 0; /* EOF */
@@ -979,10 +980,10 @@ static int AStreamReadNoSeekStream( stream_t *s, void *p_read, unsigned int i_re
     while( i_data < i_read )
     {
         unsigned i_off = (tk->i_start + p_sys->stream.i_offset) % STREAM_CACHE_TRACK_SIZE;
-        unsigned int i_current =
+        size_t i_current =
             __MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset,
                    STREAM_CACHE_TRACK_SIZE - i_off );
-        int i_copy = __MIN( i_current, i_read - i_data );
+        ssize_t i_copy = __MIN( i_current, i_read - i_data );
 
         if( i_copy <= 0 ) break; /* EOF */
 
@@ -1004,7 +1005,7 @@ static int AStreamReadNoSeekStream( stream_t *s, void *p_read, unsigned int i_re
 
         if( tk->i_end + i_data <= tk->i_start + p_sys->stream.i_offset + i_read )
         {
-            const unsigned i_read_requested = VLC_CLIP( i_read - i_data,
+            const size_t i_read_requested = VLC_CLIP( i_read - i_data,
                                                     STREAM_READ_ATONCE / 2,
                                                     STREAM_READ_ATONCE * 10 );
 
@@ -1152,7 +1153,7 @@ static void AStreamPrebufferStream( stream_t *s )
 /****************************************************************************
  * Access reading/seeking wrappers to handle concatenated streams.
  ****************************************************************************/
-static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
+static ssize_t AReadStream( stream_t *s, void *p_read, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     input_thread_t *p_input = s->p_input;
