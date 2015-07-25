@@ -308,6 +308,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *va_arg( args, unsigned * ) = p_sys->cur_seekpoint;
             break;
 
+        case ACCESS_GET_CONTENT_TYPE:
+            *va_arg( args, char ** ) =
+                strdup( p_sys->b_ts_format ? "video/MP2T" : "video/mpeg" );
+            break;
+
         case ACCESS_SET_TITLE:
             /* ignore - only one title */
             break;
