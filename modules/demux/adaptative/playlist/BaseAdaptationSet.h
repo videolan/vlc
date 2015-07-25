@@ -52,6 +52,7 @@ namespace adaptative
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( BaseRepresentation *rep );
                 void                            debug(vlc_object_t *,int = 0) const;
+                Property<std::string>           description;
 
             protected:
                 std::vector<BaseRepresentation *>   representations;

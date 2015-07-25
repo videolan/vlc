@@ -117,7 +117,11 @@ bool PlaylistManager::setupPeriod()
                 if(!languages.empty())
                     st->setLanguage(languages.front());
 
+                if(!set->description.Get().empty())
+                    st->setDescription(set->description.Get());
+
                 st->create(logic, tracker, streamOutputFactory);
+
                 streams.push_back(st);
             } catch (int) {
                 delete st;

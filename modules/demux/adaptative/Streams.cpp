@@ -87,11 +87,17 @@ void Stream::updateFormat(StreamFormat &newformat)
     if(!output)
         throw VLC_EGENERIC;
     output->setLanguage(language);
+    output->setDescription(description);
 }
 
 void Stream::setLanguage(const std::string &lang)
 {
     language = lang;
+}
+
+void Stream::setDescription(const std::string &desc)
+{
+    description = desc;
 }
 
 bool Stream::isEOF() const
@@ -327,6 +333,11 @@ AbstractStreamOutput::AbstractStreamOutput(demux_t *demux, const StreamFormat &f
 void AbstractStreamOutput::setLanguage(const std::string &lang)
 {
     language = lang;
+}
+
+void AbstractStreamOutput::setDescription(const std::string &desc)
+{
+    description = desc;
 }
 
 const StreamFormat & AbstractStreamOutput::getStreamFormat() const
