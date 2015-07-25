@@ -340,7 +340,7 @@ void MessagesDialog::MsgCallback( void *self, int type, const vlc_log_t *item,
 {
     MessagesDialog *dialog = (MessagesDialog *)self;
     char *str;
-    int verbosity = dialog->verbosity;
+    int verbosity = dialog->verbosity.load();
 
     if( verbosity < 0 || verbosity < (type - VLC_MSG_ERR)
      || unlikely(vasprintf( &str, format, ap ) == -1) )
