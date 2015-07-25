@@ -1085,6 +1085,10 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
         *va_arg( args, unsigned * ) = p_vcdplayer->i_cur_chapter;
         break;
 
+    case ACCESS_GET_CONTENT_TYPE:
+        *va_arg = strdup( "video/mpeg" );
+        break;
+
     case ACCESS_SET_TITLE:
         i = (int)va_arg( args, int );
 
