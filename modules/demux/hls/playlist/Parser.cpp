@@ -358,6 +358,16 @@ M3U8 * Parser::parse(const std::string &playlisturl)
                 if(pair.second->getAttributeByName("NAME"))
                    altAdaptSet->description.Set(pair.second->getAttributeByName("NAME")->quotedString());
 
+                if(pair.second->getAttributeByName("LANGUAGE"))
+                {
+                    std::string lang = pair.second->getAttributeByName("LANGUAGE")->quotedString();
+                    std::size_t pos = lang.find_first_of('-');
+                    if(pos != std::string::npos && pos > 0)
+                        altAdaptSet->addLang(lang.substr(0, pos));
+                    else if (lang.size() < 4)
+                        altAdaptSet->addLang(lang);
+                }
+
                 if(!altAdaptSet->getRepresentations().empty())
                     period->addAdaptationSet(altAdaptSet);
                 else
