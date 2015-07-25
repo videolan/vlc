@@ -464,13 +464,13 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
         {
             uint64_t pos = va_arg(args, uint64_t);
 
-            if (priv->peek != NULL)
+            int ret = stream_ControlInternal(s, STREAM_SET_POSITION, pos);
+            if (ret == VLC_SUCCESS && priv->peek != NULL)
             {
                 block_Release(priv->peek);
                 priv->peek = NULL;
             }
-
-            return stream_ControlInternal(s, STREAM_SET_POSITION, pos);
+            return ret;
         }
     }
     return s->pf_control(s, cmd, args);
