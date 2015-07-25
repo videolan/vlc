@@ -1033,6 +1033,7 @@ void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
  **************************************************************************/
 uint32_t libvlc_media_player_get_agl( libvlc_media_player_t *p_mi )
 {
+    (void) p_mi;
     return 0;
 }
 
