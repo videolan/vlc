@@ -5486,6 +5486,7 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
 
         ValidateDVBMeta( p_demux, p_program->i_pid );
 
+        bool b_existing = (pmtpid->type == TYPE_PMT);
         /* create or temporary incref pid */
         if( !PIDSetup( p_demux, TYPE_PMT, pmtpid, patpid ) )
         {
@@ -5494,11 +5495,17 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
             continue;
         }
 
-        pmtpid->u.p_pmt->i_number = p_program->i_number;
+        if( !b_existing || pmtpid->u.p_pmt->i_number != p_program->i_number )
+        {
+            if( b_existing && pmtpid->u.p_pmt->i_number != p_program->i_number )
+                dvbpsi_pmt_detach(pmtpid->u.p_pmt->handle);
 
-        if( !dvbpsi_pmt_attach( pmtpid->u.p_pmt->handle, p_program->i_number, PMTCallBack, p_demux ) )
-            msg_Err( p_demux, "PATCallback failed attaching PMTCallback to program %d",
-                     p_program->i_number );
+            if( !dvbpsi_pmt_attach( pmtpid->u.p_pmt->handle, p_program->i_number, PMTCallBack, p_demux ) )
+                msg_Err( p_demux, "PATCallback failed attaching PMTCallback to program %d",
+                         p_program->i_number );
+        }
+
+        pmtpid->u.p_pmt->i_number = p_program->i_number;
 
         ARRAY_APPEND( p_pat->programs, pmtpid );
 
