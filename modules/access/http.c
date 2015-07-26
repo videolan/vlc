@@ -994,6 +994,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 *type = strdup( "audio/mpeg" );
             else if( !strcasecmp( p_access->psz_access, "itpc" ) )
                 *type = strdup( "application/rss+xml" );
+            else if( !strcasecmp( p_access->psz_access, "unsv" ) &&
+                p_sys->psz_mime != NULL &&
+                !strcasecmp( p_sys->psz_mime, "misc/ultravox" ) )
+                /* Grrrr! detect ultravox server and force NSV demuxer */
+                *type = strdup( "video/nsa" );
             else
                 *type = strdup( p_sys->psz_mime );
             break;
