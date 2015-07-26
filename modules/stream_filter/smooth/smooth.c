@@ -462,14 +462,14 @@ static int Open( vlc_object_t *p_this )
     if( !isSmoothStreaming( s ) )
         return VLC_EGENERIC;
 
-    msg_Info( p_this, "Smooth Streaming (%s)", s->psz_path );
+    msg_Info( p_this, "Smooth Streaming (%s)", s->psz_url );
 
     s->p_sys = p_sys = calloc( 1, sizeof(*p_sys ) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    char *uri = NULL;
-    if( unlikely( asprintf( &uri, "%s://%s", s->psz_access, s->psz_path ) < 0 ) )
+    char *uri = strdup( s->psz_url );
+    if( unlikely( uri == NULL ) )
     {
         free( p_sys );
         return VLC_ENOMEM;

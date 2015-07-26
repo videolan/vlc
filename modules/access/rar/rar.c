@@ -317,12 +317,11 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file, unsigned int *pi_nbvol
     *file = NULL;
     *pi_nbvols = 1;
 
-    const rar_pattern_t *pattern = FindVolumePattern(s->psz_path, b_extonly);
+    const rar_pattern_t *pattern = FindVolumePattern(s->psz_url, b_extonly);
     int volume_offset = 0;
 
-    char *volume_mrl;
-    if (asprintf(&volume_mrl, "%s://%s",
-                 s->psz_access, s->psz_path) < 0)
+    char *volume_mrl = strdup(s->psz_url);
+    if (volume_mrl == NULL)
         return VLC_EGENERIC;
 
     stream_t *vol = s;
@@ -374,10 +373,9 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file, unsigned int *pi_nbvol
         if (volume_index > pattern->stop)
             return VLC_SUCCESS;
 
-        char *volume_base;
-        if (asprintf(&volume_base, "%s://%.*s",
-                     s->psz_access,
-                     (int)(strlen(s->psz_path) - strlen(pattern->match)), s->psz_path) < 0)
+        char *volume_base = strndup(s->psz_url,
+                                  strlen(s->psz_url) - strlen(pattern->match));
+        if (volume_base == NULL)
             return VLC_SUCCESS;
 
         if (pattern->start) {

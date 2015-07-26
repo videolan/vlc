@@ -194,10 +194,11 @@ stream_t *stream_AccessNew( access_t *p_access )
         return NULL;
 
     s->p_input = p_access->p_input;
-    s->psz_access = strdup( p_access->psz_access );
-    s->psz_path = strdup( p_access->psz_location );
+    if( asprintf( &s->psz_url, "%s://%s", p_access->psz_access,
+                  p_access->psz_location ) == -1 )
+        s->psz_url = NULL;
     s->p_sys = p_sys = malloc( sizeof( *p_sys ) );
-    if( !s->psz_access || !s->psz_path || !s->p_sys )
+    if( !s->psz_url || !s->p_sys )
     {
         stream_CommonDelete( s );
         return NULL;

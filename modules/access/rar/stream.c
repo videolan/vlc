@@ -104,13 +104,8 @@ int RarStreamOpen(vlc_object_t *object)
      * Reusing WriteXSPF from the zip access is probably a good idea
      * (becareful about '\' and '/'.
      */
-    char *mrl;
-    if (asprintf(&mrl, "%s://%s", s->psz_access, s->psz_path)< 0)
-        mrl = NULL;
     char *base;
-    char *encoded = mrl ? encode_URI_component(mrl) : NULL;
-    free(mrl);
-
+    char *encoded = encode_URI_component(s->psz_url);
     if (!encoded || asprintf(&base, "rar://%s", encoded) < 0)
         base = NULL;
     free(encoded);
@@ -150,12 +145,12 @@ int RarStreamOpen(vlc_object_t *object)
     sys->payload = payload;
 
     char *tmp;
-    if (asprintf(&tmp, "%s.m3u", s->psz_path) < 0) {
+    if (asprintf(&tmp, "%s.m3u", s->psz_url) < 0) {
         RarStreamClose(object);
         return VLC_ENOMEM;
     }
-    free(s->psz_path);
-    s->psz_path = tmp;
+    free(s->psz_url);
+    s->psz_url = tmp;
 
     return VLC_SUCCESS;
 }

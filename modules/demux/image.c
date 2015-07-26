@@ -437,7 +437,7 @@ static bool FindSVGmarker(int *position, const uint8_t *data, const int size, co
 
 static bool IsSVG(stream_t *s)
 {
-    char *ext = strstr(s->psz_path, ".svg");
+    char *ext = strstr(s->psz_url, ".svg");
     if (!ext) return false;
 
     const uint8_t *header;

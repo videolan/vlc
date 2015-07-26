@@ -2341,10 +2341,14 @@ static int InputSourceInit( input_thread_t *p_input,
             stream_Control( p_stream, STREAM_GET_PTS_DELAY, &i_pts_delay );
         }
 
+        if( p_stream->psz_url != NULL )
+            /* Take access/stream redirections into account: */
+            psz_path = strstr( p_stream->psz_url, "://" );
+        if( psz_path == NULL )
+            psz_path = "";
+
         in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,
-                   /* Take access/stream redirections into account: */
-                            p_stream->psz_path ? p_stream->psz_path : psz_path,
-                                 p_stream, p_input->p->p_es_out,
+                                 psz_path, p_stream, p_input->p->p_es_out,
                                  p_input->b_preparsing );
 
         if( in->p_demux == NULL )

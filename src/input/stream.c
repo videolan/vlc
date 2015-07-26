@@ -63,8 +63,7 @@ stream_t *stream_CommonNew(vlc_object_t *parent)
 
     stream_t *s = &priv->stream;
 
-    s->psz_access = NULL;
-    s->psz_path = NULL;
+    s->psz_url = NULL;
     priv->peek = NULL;
 
     /* UTF16 and UTF32 text file conversion */
@@ -88,8 +87,7 @@ void stream_CommonDelete( stream_t *s )
     if (priv->peek != NULL)
         block_Release(priv->peek);
 
-    free( s->psz_access );
-    free( s->psz_path );
+    free(s->psz_url);
     vlc_object_release( s );
 }
 

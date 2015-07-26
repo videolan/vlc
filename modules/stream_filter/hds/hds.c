@@ -1631,17 +1631,15 @@ static int Open( vlc_object_t *p_this )
     if( !isHDS( s ) )
         return VLC_EGENERIC;
 
-    msg_Info( p_this, "HTTP Dynamic Streaming (%s)", s->psz_path );
+    msg_Info( p_this, "HTTP Dynamic Streaming (%s)", s->psz_url );
 
     s->p_sys = p_sys = calloc( 1, sizeof(*p_sys ) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    char *uri_without_query = NULL;
-    size_t pathlen = strcspn( s->psz_path, "?" );
-    if( unlikely( ( pathlen > INT_MAX ) ||
-        ( asprintf( &uri_without_query, "%s://%.*s", s->psz_access,
-                    (int)pathlen, s->psz_path ) < 0 ) ) )
+    char *uri_without_query = strndup( s->psz_url,
+                                       strcspn( s->psz_url, "?" ) );
+    if( uri_without_query == NULL )
     {
         free( p_sys );
         return VLC_ENOMEM;

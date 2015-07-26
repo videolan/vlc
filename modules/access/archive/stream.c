@@ -142,8 +142,8 @@ static input_item_t *Browse(stream_t *p_stream)
     {
         char *psz_uri = NULL;
         char *psz_access_uri = NULL;
-        int i_ret = asprintf(&psz_access_uri, "%s://%s%c%s", p_stream->psz_access,
-                             p_stream->psz_path, ARCHIVE_SEP_CHAR, archive_entry_pathname(p_entry));
+        int i_ret = asprintf(&psz_access_uri, "%s%c%s", p_stream->psz_url,
+                             ARCHIVE_SEP_CHAR, archive_entry_pathname(p_entry));
         if (i_ret == -1)
             return NULL;
         i_ret = asprintf(&psz_uri, "archive://%s", psz_access_uri);

@@ -78,7 +78,7 @@ Url AbstractPlaylist::getUrlSegment() const
     else
     {
         std::stringstream ss;
-        ss << stream->psz_access << "://" << Helper::getDirectoryPath(stream->psz_path) << "/";
+        ss << Helper::getDirectoryPath(stream->psz_url) << "/";
         return Url(ss.str());
     }
 }

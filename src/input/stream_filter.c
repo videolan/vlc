@@ -49,9 +49,8 @@ stream_t *stream_FilterNew( stream_t *p_source,
     s->p_input = p_source->p_input;
 
     /* */
-    s->psz_access = strdup( p_source->psz_access );
-    s->psz_path = strdup( p_source->psz_path );
-    if( !s->psz_path )
+    s->psz_url = strdup( p_source->psz_url );
+    if( unlikely(s->psz_url == NULL) )
     {
         stream_CommonDelete( s );
         return NULL;

@@ -185,10 +185,7 @@ int StreamOpen( vlc_object_t *p_this )
     p_sys->fileFunctions = ( zlib_filefunc_def * )
             calloc( 1, sizeof( zlib_filefunc_def ) );
     if( !p_sys->fileFunctions )
-    {
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
+        goto error;
     p_sys->fileFunctions->zopen_file   = ZipIO_Open;
     p_sys->fileFunctions->zread_file   = ZipIO_Read;
     p_sys->fileFunctions->zwrite_file  = ZipIO_Write;
@@ -202,23 +199,31 @@ int StreamOpen( vlc_object_t *p_this )
     {
         msg_Warn( s, "unable to open file" );
         free( p_sys->fileFunctions );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* Find the stream uri */
+    const char *p = strstr(s->psz_url, "://");
+    p_sys->psz_path = strdup(p ? p + 3 : "");
+
     char *psz_tmp;
-    if( asprintf( &psz_tmp, "%s.xspf", s->psz_path ) == -1 )
+    if( asprintf( &psz_tmp, "%s.xspf", s->psz_url ) == -1 )
+        psz_tmp = NULL;
+
+    if( p_sys->psz_path == NULL || psz_tmp == NULL )
     {
+        free( psz_tmp );
+        free( p_sys->psz_path );
         free( p_sys->fileFunctions );
-        free( p_sys );
-        return VLC_ENOMEM;
     }
-    p_sys->psz_path = s->psz_path;
-    s->psz_path = psz_tmp;
+    free(s->psz_url);
+    s->psz_url = psz_tmp;
     s->pf_read = Read;
     s->pf_control = Control;
     return VLC_SUCCESS;
+error:
+    free( p_sys );
+    return VLC_ENOMEM;
 }
 
 /** *************************************************************************
