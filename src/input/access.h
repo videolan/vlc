@@ -28,10 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_access.h>
 
-access_t *access_New( vlc_object_t *p_obj, input_thread_t *p_input,
-                      const char *psz_access, const char *psz_path );
-#define access_New( a, b, c, d ) access_New(VLC_OBJECT(a), b, c, d )
-
+access_t *access_New(vlc_object_t *, input_thread_t *, const char *);
 char *get_path(const char *location);
 
 #endif

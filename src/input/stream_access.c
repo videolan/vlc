@@ -33,6 +33,7 @@
 #include <vlc_interrupt.h>
 
 #include <libvlc.h>
+#include "access.h"
 #include "stream.h"
 #include "input_internal.h"
 
@@ -236,32 +237,28 @@ static void AStreamDestroy(stream_t *s)
     free(sys);
 }
 
-stream_t *stream_AccessNew(access_t *access)
+stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
+                           const char *url)
 {
-    stream_t *s = stream_CommonNew(VLC_OBJECT(access));
+    stream_t *s = stream_CommonNew(parent);
     if (unlikely(s == NULL))
         return NULL;
 
-    s->p_input = access->p_input;
-    if (asprintf(&s->psz_url, "%s://%s", access->psz_access,
-                 access->psz_location) == -1)
-        s->psz_url = NULL;
+    s->p_input = input;
+    s->psz_url = strdup(url);
 
     stream_sys_t *sys = malloc(sizeof (*sys));
-
     if (unlikely(s->psz_url == NULL || sys == NULL))
-    {
-        free(sys);
-        stream_CommonDelete(s);
-        vlc_access_Delete(access);
-        return NULL;
-    }
+        goto error;
 
-    sys->access = access;
+    sys->access = access_New(VLC_OBJECT(s), input, url);
+    if (sys->access == NULL)
+        goto error;
+
     sys->block = NULL;
 
     s->p_sys      = sys;
-    if (access->pf_block != NULL)
+    if (sys->access->pf_block != NULL)
         s->pf_read = AStreamReadBlock;
     else
         s->pf_read = AStreamReadStream;
@@ -270,4 +267,8 @@ stream_t *stream_AccessNew(access_t *access)
     s->pf_destroy = AStreamDestroy;
 
     return s;
+error:
+    free(sys);
+    stream_CommonDelete(s);
+    return NULL;
 }

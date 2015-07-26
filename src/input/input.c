@@ -2284,27 +2284,22 @@ static int InputSourceInit( input_thread_t *p_input,
             TAB_CLEAN( count, tab );
         }
 
-        /* */
-        access_t *p_access = access_New( p_input, p_input,
-                                         psz_access, psz_path );
-        if( p_access == NULL )
+        /* Create the stream_t */
+        stream_t *p_stream = NULL;
+        char *url;
+
+        if( likely(asprintf( &url, "%s://%s", psz_access, psz_path) >= 0) )
+        {
+            p_stream = stream_AccessNew( VLC_OBJECT(p_input), p_input, url );
+            free( url );
+        }
+        if( p_stream == NULL )
         {
             msg_Err( p_input, "open of `%s' failed", psz_mrl );
             if( !b_in_can_fail && !input_Stopped( p_input ) )
                 dialog_Fatal( p_input, _("Your input can't be opened"),
                               _("VLC is unable to open the MRL '%s'."
                                 " Check the log for details."), psz_mrl );
-            goto error;
-        }
-
-        /* Access-forced demuxer (PARENTAL ADVISORY: EXPLICIT HACK) */
-#warning FIXME: parse content type
-
-        /* Create the stream_t */
-        stream_t *p_stream = stream_AccessNew( p_access );
-        if( p_stream == NULL )
-        {
-            msg_Warn( p_input, "cannot create a stream_t from access" );
             goto error;
         }
 

@@ -101,14 +101,10 @@ stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
     if( !psz_url )
         return NULL;
 
-    access_t *p_access = vlc_access_NewMRL( p_parent, psz_url );
-    if( p_access == NULL )
-    {
+    stream_t *s = stream_AccessNew( p_parent, NULL, psz_url );
+    if( s == NULL )
         msg_Err( p_parent, "no suitable access module for `%s'", psz_url );
-        return NULL;
-    }
-
-    return stream_AccessNew( p_access );
+    return s;
 }
 
 /**
