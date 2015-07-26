@@ -364,28 +364,22 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file, unsigned int *pi_nbvol
             has_next = 1;
         if (vol != s)
             stream_Delete(vol);
+        free(volume_mrl);
 
-        if (!has_next || !pattern) {
-            free(volume_mrl);
+        if (!has_next || !pattern)
             return VLC_SUCCESS;
-        }
 
         /* Open next volume */
         const int volume_index = pattern->start + volume_offset++;
-        if (volume_index > pattern->stop) {
-            free(volume_mrl);
+        if (volume_index > pattern->stop)
             return VLC_SUCCESS;
-        }
 
         char *volume_base;
         if (asprintf(&volume_base, "%s://%.*s",
                      s->psz_access,
-                     (int)(strlen(s->psz_path) - strlen(pattern->match)), s->psz_path) < 0) {
-            free(volume_mrl);
+                     (int)(strlen(s->psz_path) - strlen(pattern->match)), s->psz_path) < 0)
             return VLC_SUCCESS;
-        }
 
-        free(volume_mrl);
         if (pattern->start) {
             if (asprintf(&volume_mrl, pattern->format, volume_base, volume_index) < 0)
                 volume_mrl = NULL;
