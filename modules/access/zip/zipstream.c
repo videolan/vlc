@@ -177,6 +177,8 @@ int StreamOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     if( memcmp( p_peek, p_zip_marker, i_zip_marker ) )
         return VLC_EGENERIC;
+    if( s->psz_url == NULL )
+        return VLC_EGENERIC;
 
     s->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )

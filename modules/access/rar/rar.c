@@ -317,12 +317,15 @@ int RarParse(stream_t *s, int *count, rar_file_t ***file, unsigned int *pi_nbvol
     *file = NULL;
     *pi_nbvols = 1;
 
+    if( s->psz_url == NULL )
+        return VLC_EGENERIC;
+
     const rar_pattern_t *pattern = FindVolumePattern(s->psz_url, b_extonly);
     int volume_offset = 0;
 
     char *volume_mrl = strdup(s->psz_url);
     if (volume_mrl == NULL)
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
 
     stream_t *vol = s;
     for (;;) {

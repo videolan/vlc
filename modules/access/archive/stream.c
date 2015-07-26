@@ -169,6 +169,8 @@ int StreamOpen(vlc_object_t *p_object)
 
     if (!ProbeArchiveFormat(p_stream->p_source))
         return VLC_EGENERIC;
+    if (p_stream->psz_url == NULL)
+        return VLC_EGENERIC;
 
     p_stream->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )

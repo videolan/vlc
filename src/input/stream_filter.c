@@ -48,12 +48,14 @@ stream_t *stream_FilterNew( stream_t *p_source,
 
     s->p_input = p_source->p_input;
 
-    /* */
-    s->psz_url = strdup( p_source->psz_url );
-    if( unlikely(s->psz_url == NULL) )
+    if( s->psz_url != NULL )
     {
-        stream_CommonDelete( s );
-        return NULL;
+        s->psz_url = strdup( p_source->psz_url );
+        if( unlikely(s->psz_url == NULL) )
+        {
+            stream_CommonDelete( s );
+            return NULL;
+        }
     }
     s->p_source = p_source;
 

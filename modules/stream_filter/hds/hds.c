@@ -1628,7 +1628,7 @@ static int Open( vlc_object_t *p_this )
     stream_t *s = (stream_t*)p_this;
     stream_sys_t *p_sys;
 
-    if( !isHDS( s ) )
+    if( !isHDS( s ) || s->psz_url == NULL )
         return VLC_EGENERIC;
 
     msg_Info( p_this, "HTTP Dynamic Streaming (%s)", s->psz_url );
