@@ -39,20 +39,21 @@
 #include "ProgramInformation.h"
 #include "DASHSegment.h"
 #include "../xml/DOMHelper.h"
+#include "../adaptative/tools/Helper.h"
 #include <vlc_strings.h>
 #include <vlc_stream.h>
 #include <cstdio>
-#include <sstream>
 
 using namespace dash::mpd;
 using namespace dash::xml;
 using namespace adaptative::playlist;
 
-IsoffMainParser::IsoffMainParser    (Node *root_, stream_t *stream)
+IsoffMainParser::IsoffMainParser    (Node *root_, stream_t *stream, std::string & streambaseurl_)
 {
     root = root_;
     mpd = NULL;
     p_stream = stream;
+    playlisturl = streambaseurl_;
 }
 
 IsoffMainParser::~IsoffMainParser   ()
@@ -65,6 +66,9 @@ void IsoffMainParser::setMPDBaseUrl(Node *root)
 
     for(size_t i = 0; i < baseUrls.size(); i++)
         mpd->addBaseUrl(baseUrls.at(i)->getText());
+
+    if(baseUrls.empty())
+        mpd->addBaseUrl(Helper::getDirectoryPath(playlisturl).append("/"));
 }
 
 MPD* IsoffMainParser::getMPD()

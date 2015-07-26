@@ -119,7 +119,9 @@ bool DASHManager::updatePlaylist()
                 minsegmentTime = segmentTime;
         }
 
-        MPD *newmpd = MPDFactory::create(parser.getRootNode(), mpdstream, parser.getProfile());
+        MPD *newmpd = MPDFactory::create(parser.getRootNode(), mpdstream,
+                                         Helper::getDirectoryPath(url).append("/"),
+                                         parser.getProfile());
         if(newmpd)
         {
             playlist->mergeWith(newmpd, minsegmentTime);

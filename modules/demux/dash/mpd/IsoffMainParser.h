@@ -64,7 +64,7 @@ namespace dash
         class IsoffMainParser
         {
             public:
-                IsoffMainParser             (xml::Node *root, stream_t *p_stream);
+                IsoffMainParser             (xml::Node *root, stream_t *p_stream, std::string &);
                 virtual ~IsoffMainParser    ();
 
                 bool            parse  (Profile profile);
@@ -87,6 +87,7 @@ namespace dash
                 xml::Node       *root;
                 MPD             *mpd;
                 stream_t        *p_stream;
+                std::string      playlisturl;
         };
 
         class IsoTime

@@ -114,6 +114,10 @@ static int Open(vlc_object_t *p_obj)
     PlaylistManager *p_manager = NULL;
     int logic = var_InheritInteger(p_obj, "adaptative-logic");
 
+    std::string playlisturl(p_demux->psz_access);
+    playlisturl.append("://");
+    playlisturl.append(p_demux->psz_location);
+
     if(b_mimematched || DASHManager::isDASH(p_demux->s))
     {
         //Build a XML tree
@@ -125,7 +129,8 @@ static int Open(vlc_object_t *p_obj)
         }
 
         //Begin the actual MPD parsing:
-        MPD *p_playlist = MPDFactory::create(parser.getRootNode(), p_demux->s, parser.getProfile());
+        MPD *p_playlist = MPDFactory::create(parser.getRootNode(), p_demux->s,
+                                             playlisturl, parser.getProfile());
         if(p_playlist == NULL)
         {
             msg_Err( p_demux, "Cannot create/unknown MPD for profile");
@@ -139,7 +144,7 @@ static int Open(vlc_object_t *p_obj)
     else if(HLSManager::isHTTPLiveStreaming(p_demux->s))
     {
         Parser parser(p_demux->s);
-        M3U8 *p_playlist = parser.parse(std::string());
+        M3U8 *p_playlist = parser.parse(playlisturl);
         if(!p_playlist)
         {
             msg_Err( p_demux, "Could not parse MPD" );

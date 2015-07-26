@@ -39,7 +39,8 @@ namespace dash
         class MPDFactory
         {
             public:
-                static MPD* create(xml::Node *root, stream_t *p_stream, Profile profile);
+                static MPD* create(xml::Node *root, stream_t *p_stream,
+                                   std::string &, Profile profile);
         };
     }
 }

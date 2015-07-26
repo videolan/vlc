@@ -32,7 +32,8 @@
 using namespace dash::xml;
 using namespace dash::mpd;
 
-MPD* MPDFactory::create(Node *root, stream_t *p_stream, Profile profile)
+MPD* MPDFactory::create(Node *root, stream_t *p_stream,
+                        std::string & playlisturl, Profile profile)
 {
     IsoffMainParser *parser = NULL;
 
@@ -41,7 +42,7 @@ MPD* MPDFactory::create(Node *root, stream_t *p_stream, Profile profile)
         case Profile::Unknown:
             break;
         default:
-            parser = new (std::nothrow) IsoffMainParser(root, p_stream);
+            parser = new (std::nothrow) IsoffMainParser(root, p_stream, playlisturl);
             break;
     }
 
