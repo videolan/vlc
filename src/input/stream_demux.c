@@ -82,6 +82,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
     s->p_sys = p_sys = malloc( sizeof( *p_sys) );
     if( !s->psz_path || !s->p_sys )
     {
+        free( p_sys );
         stream_CommonDelete( s );
         return NULL;
     }
