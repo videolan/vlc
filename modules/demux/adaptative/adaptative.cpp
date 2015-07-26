@@ -162,7 +162,7 @@ static int Open(vlc_object_t *p_obj)
     p_demux->pf_demux      = p_manager->demux_callback;
     p_demux->pf_control    = p_manager->control_callback;
 
-    msg_Dbg(p_obj,"opening playlist file (%s)", p_demux->s->psz_path);
+    msg_Dbg(p_obj,"opening playlist file (%s)", p_demux->psz_location);
 
     return VLC_SUCCESS;
 }
