@@ -39,7 +39,6 @@
 #include <vlc_plugin.h>
 #include <vlc_stream.h>                        /* stream_MemoryNew */
 #include <vlc_input.h>                         /* vlc_input_attachment_* */
-#include <vlc_xml.h>                           /* xml_reader */
 #include <vlc_dialog.h>                        /* FcCache dialog */
 #include <vlc_filter.h>                                      /* filter_sys_t */
 #include <vlc_text_style.h>                                   /* text_style_t*/
@@ -896,18 +895,6 @@ static FT_Face LoadEmbeddedFace( filter_sys_t *p_sys, const text_style_t *p_styl
     return NULL;
 }
 
-static xml_reader_t *GetXMLReader( filter_t *p_filter, stream_t *p_sub )
-{
-    xml_reader_t *p_xml_reader = p_filter->p_sys->p_xml;
-    if( !p_xml_reader )
-        p_xml_reader = xml_ReaderCreate( p_filter, p_sub );
-    else
-        p_xml_reader = xml_ReaderReset( p_xml_reader, p_sub );
-    p_filter->p_sys->p_xml = p_xml_reader;
-
-    return p_xml_reader;
-}
-
 static text_style_t* ApplyDefaultStyle( filter_t *p_filter, text_style_t* p_original_style )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -1188,7 +1175,6 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->style.psz_fontname   = NULL;
-    p_sys->p_xml            = NULL;
     p_sys->p_face           = 0;
     p_sys->p_library        = 0;
     p_sys->style.i_font_size      = 0;
@@ -1350,7 +1336,6 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->pp_font_attachments );
     }
 
-    if( p_sys->p_xml ) xml_ReaderDelete( p_sys->p_xml );
     free( p_sys->style.psz_fontname );
     free( p_sys->style.psz_monofontname );
 

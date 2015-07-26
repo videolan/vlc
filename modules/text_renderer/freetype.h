@@ -45,8 +45,6 @@ struct filter_sys_t
     FT_Face        p_face;      /* handle to face object */
     FT_Stroker     p_stroker;   /* handle to path stroker object */
 
-    xml_reader_t  *p_xml;       /* vlc xml parser */
-
     text_style_t   style;       /* Current Style */
 
     /* More styles... */
