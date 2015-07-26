@@ -32,9 +32,45 @@
 #include <vlc_meta.h>
 #include <vlc_url.h>
 #include <vlc_modules.h>
+#include <vlc_strings.h>
 
 static bool SkipID3Tag( demux_t * );
 static bool SkipAPETag( demux_t *p_demux );
+
+struct demux_type
+{
+    char type[20];
+    char demux[8];
+};
+
+static int typecmp( const void *k, const void *t )
+{
+    const char *key = k;
+    const struct demux_type *type = t;
+
+    return vlc_ascii_strcasecmp( key, type->type );
+}
+
+static const char *demux_FromContentType(const char *mime)
+{
+    static const struct demux_type types[] =
+    {   /* Must be sorted in ascending ASCII order */
+        { "audio/aac",           "m4a"     },
+        { "audio/aacp",          "m4a"     },
+        { "audio/mpeg",          "mp3"     },
+        { "application/rss+xml", "podcast" },
+        { "video/MP2T",          "ts"      },
+        { "video/dv",            "rawdv"   },
+        { "video/mpeg",          "ps"      },
+        { "video/nsa",           "nsv"     },
+        { "video/nsv",           "nsv"     },
+    };
+    const struct demux_type *type;
+
+    type = bsearch( mime, types, sizeof (types) / sizeof (types[0]),
+                    sizeof (types[0]), typecmp );
+    return (type != NULL) ? type->demux : "any";
+}
 
 #undef demux_New
 /*****************************************************************************
@@ -49,6 +85,16 @@ demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     demux_t *p_demux = vlc_custom_create( p_obj, sizeof( *p_demux ), "demux" );
     if( unlikely(p_demux == NULL) )
         return NULL;
+
+    if( s != NULL && (!strcasecmp( psz_demux, "any" ) || !psz_demux[0]) )
+    {   /* Look up demux by Content-Type for hard to detect formats */
+        char *type = stream_ContentType( s );
+        if( type != NULL )
+        {
+            psz_demux = demux_FromContentType( type );
+            free( type );
+        }
+    }
 
     p_demux->p_input = p_parent_input;
     p_demux->psz_access = strdup( psz_access );
