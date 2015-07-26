@@ -704,30 +704,19 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 
     [self setupButton:_input_mkv_preload_dirCheckbox forBoolValue: "mkv-preload-local-dir"];
 
-    /* do not trust translators to do the correct thing,
-     * so re-build the menu in an unorthodox way (#15106) */
     [_input_cachelevelPopup removeAllItems];
-    NSArray *plainTitles = @[@"Custom", @"Lowest latency", @"Low latency", @"Normal", @"High latency", @"Higher latency"];
-    NSMenuItem *workerItem;
-    [_input_cachelevelPopup addItemsWithTitles: plainTitles];
-    workerItem = [_input_cachelevelPopup itemAtIndex: 0];
-    [workerItem setTag: 0];
-    [workerItem setTitle:_NS("Custom")];
-    workerItem = [_input_cachelevelPopup itemAtIndex: 1];
-    [workerItem setTag: 100];
-    [workerItem setTitle:_NS("Lowest Latency")];
-    workerItem = [_input_cachelevelPopup itemAtIndex: 2];
-    [workerItem setTag: 200];
-    [workerItem setTitle:_NS("Low Latency")];
-    workerItem = [_input_cachelevelPopup itemAtIndex: 3];
-    [workerItem setTag: 300];
-    [workerItem setTitle:_NS("Normal")];
-    workerItem = [_input_cachelevelPopup itemAtIndex: 4];
-    [workerItem setTag: 500];
-    [workerItem setTitle:_NS("Higher Latency")];
-    workerItem = [_input_cachelevelPopup itemAtIndex: 5];
-    [workerItem setTag: 1000];
-    [workerItem setTitle:_NS("Highest Latency")];
+    NSMenuItem *item = [[_input_cachelevelPopup menu] addItemWithTitle:_NS("Custom") action:nil keyEquivalent:@""];
+    [item setTag: 0];
+    item = [[_input_cachelevelPopup menu] addItemWithTitle:_NS("Lowest Latency") action:nil keyEquivalent:@""];
+    [item setTag: 100];
+    item = [[_input_cachelevelPopup menu] addItemWithTitle:_NS("Low Latency") action:nil keyEquivalent:@""];
+    [item setTag: 200];
+    item = [[_input_cachelevelPopup menu] addItemWithTitle:_NS("Normal") action:nil keyEquivalent:@""];
+    [item setTag: 300];
+    item = [[_input_cachelevelPopup menu] addItemWithTitle:_NS("Higher Latency") action:nil keyEquivalent:@""];
+    [item setTag: 500];
+    item = [[_input_cachelevelPopup menu] addItemWithTitle:_NS("Highest Latency") action:nil keyEquivalent:@""];
+    [item setTag: 1000];
 
     #define TestCaC(name, factor) \
     cache_equal = cache_equal && \
