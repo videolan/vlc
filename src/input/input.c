@@ -2170,7 +2170,7 @@ static int InputSourceInit( input_thread_t *p_input,
             /* special hack for forcing a demuxer with --demux=module
              * (and do nothing with a list) */
             psz_var_demux = var_GetNonEmptyString( p_input, "demux" );
-            psz_demux = psz_var_demux;
+            psz_demux = (psz_var_demux != NULL) ? psz_var_demux : "any";
             msg_Dbg( p_input, "specified demux `%s'", psz_demux );
         }
 
