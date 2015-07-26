@@ -182,9 +182,6 @@ int StreamOpen( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    s->pf_read = Read;
-    s->pf_control = Control;
-
     p_sys->fileFunctions = ( zlib_filefunc_def * )
             calloc( 1, sizeof( zlib_filefunc_def ) );
     if( !p_sys->fileFunctions )
@@ -219,7 +216,8 @@ int StreamOpen( vlc_object_t *p_this )
     }
     p_sys->psz_path = s->psz_path;
     s->psz_path = psz_tmp;
-
+    s->pf_read = Read;
+    s->pf_control = Control;
     return VLC_SUCCESS;
 }
 
