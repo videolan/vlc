@@ -230,7 +230,6 @@ static void AStreamDestroy(stream_t *s)
 {
     stream_sys_t *sys = s->p_sys;
 
-    stream_CommonDelete(s);
     if (sys->block != NULL)
         block_Release(sys->block);
     vlc_access_Delete(sys->access);
@@ -269,6 +268,6 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     return s;
 error:
     free(sys);
-    stream_CommonDelete(s);
+    stream_Delete(s);
     return NULL;
 }

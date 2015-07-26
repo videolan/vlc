@@ -62,8 +62,7 @@ stream_t *stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
     if( !s->p_sys )
     {
-        stream_CommonDelete( s );
-        free( p_sys );
+        stream_Delete( s );
         return NULL;
     }
     p_sys->i_pos = 0;
@@ -83,7 +82,6 @@ static void Delete( stream_t *s )
 {
     if( !s->p_sys->i_preserve_memory ) free( s->p_sys->p_buffer );
     free( s->p_sys );
-    stream_CommonDelete( s );
 }
 
 /****************************************************************************

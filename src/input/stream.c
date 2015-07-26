@@ -64,7 +64,15 @@ stream_t *stream_CommonNew(vlc_object_t *parent)
 
     stream_t *s = &priv->stream;
 
+    s->b_error = false;
+    s->p_module = NULL;
     s->psz_url = NULL;
+    s->p_source = NULL;
+    s->pf_read = NULL;
+    s->pf_readdir = NULL;
+    s->pf_control = NULL;
+    s->pf_destroy = NULL;
+    s->p_input = NULL;
     priv->peek = NULL;
 
     /* UTF16 and UTF32 text file conversion */
@@ -76,20 +84,22 @@ stream_t *stream_CommonNew(vlc_object_t *parent)
 }
 
 /**
- * Destroys a VLC stream object
+ * Destroy a stream
  */
-void stream_CommonDelete( stream_t *s )
+void stream_Delete(stream_t *s)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
 
     if (priv->text.conv != (vlc_iconv_t)(-1))
         vlc_iconv_close(priv->text.conv);
-
     if (priv->peek != NULL)
         block_Release(priv->peek);
 
+    if (s->pf_destroy != NULL)
+        s->pf_destroy(s);
+
     free(s->psz_url);
-    vlc_object_release( s );
+    vlc_object_release(s);
 }
 
 #undef stream_UrlNew
@@ -511,14 +521,6 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
         }
     }
     return s->pf_control(s, cmd, args);
-}
-
-/**
- * Destroy a stream
- */
-void stream_Delete( stream_t *s )
-{
-    s->pf_destroy( s );
 }
 
 int stream_Control( stream_t *s, int i_query, ... )

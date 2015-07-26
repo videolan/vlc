@@ -81,8 +81,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
     s->p_sys = p_sys = malloc( sizeof( *p_sys) );
     if( !s->p_sys )
     {
-        free( p_sys );
-        stream_CommonDelete( s );
+        stream_Delete( s );
         return NULL;
     }
 
@@ -97,7 +96,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
     /* decoder fifo */
     if( ( p_sys->p_fifo = block_FifoNew() ) == NULL )
     {
-        stream_CommonDelete( s );
+        stream_Delete( s );
         free( p_sys->psz_name );
         free( p_sys );
         return NULL;
@@ -110,7 +109,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
     {
         vlc_mutex_destroy( &p_sys->lock );
         block_FifoRelease( p_sys->p_fifo );
-        stream_CommonDelete( s );
+        stream_Delete( s );
         free( p_sys->psz_name );
         free( p_sys );
         return NULL;
@@ -169,7 +168,6 @@ static void DStreamDelete( stream_t *s )
     block_FifoRelease( p_sys->p_fifo );
     free( p_sys->psz_name );
     free( p_sys );
-    stream_CommonDelete( s );
 }
 
 

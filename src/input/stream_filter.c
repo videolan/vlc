@@ -53,7 +53,7 @@ stream_t *stream_FilterNew( stream_t *p_source,
         s->psz_url = strdup( p_source->psz_url );
         if( unlikely(s->psz_url == NULL) )
         {
-            stream_CommonDelete( s );
+            stream_Delete( s );
             return NULL;
         }
     }
@@ -64,7 +64,7 @@ stream_t *stream_FilterNew( stream_t *p_source,
 
     if( !s->p_module )
     {
-        stream_CommonDelete( s );
+        stream_Delete( s );
         return NULL;
     }
 
@@ -118,8 +118,6 @@ static void StreamDelete( stream_t *s )
 
     if( s->p_source )
         stream_Delete( s->p_source );
-
-    stream_CommonDelete( s );
 }
 
 input_item_t *stream_FilterDefaultReadDir( stream_t *s )

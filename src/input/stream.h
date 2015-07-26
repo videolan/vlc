@@ -30,7 +30,6 @@
 
 /* */
 stream_t *stream_CommonNew( vlc_object_t * );
-void stream_CommonDelete( stream_t * );
 
 /**
  * This function creates a stream_t with an access_t back-end.
