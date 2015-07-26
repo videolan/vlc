@@ -52,13 +52,7 @@ demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 
     p_demux->p_input = p_parent_input;
     p_demux->psz_access = strdup( psz_access );
-
-    if( psz_demux[0] == '\0' )
-        /* Take into account "demux" to be able to do :demux=dump */
-        p_demux->psz_demux = var_InheritString( p_obj, "demux" );
-    else
-        p_demux->psz_demux = strdup( psz_demux );
-
+    p_demux->psz_demux = strdup( psz_demux );
     p_demux->psz_location = strdup( psz_location );
     p_demux->psz_file = get_path( psz_location ); /* parse URL */
 
