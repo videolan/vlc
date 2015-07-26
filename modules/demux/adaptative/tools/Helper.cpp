@@ -49,9 +49,9 @@ std::string Helper::combinePaths        (const std::string &path1, const std::st
 }
 std::string Helper::getDirectoryPath    (const std::string &path)
 {
-    int pos = path.find_last_of('/');
+    std::size_t pos = path.find_last_of('/');
 
-    return path.substr(0, pos);
+    return (pos != std::string::npos) ? path.substr(0, pos) : path;
 }
 
 bool Helper::ifind(std::string haystack, std::string needle)
