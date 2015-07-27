@@ -649,8 +649,15 @@ static int PutInput(mc_api *api, const void *p_buf, size_t i_size,
         j_mc_buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers,
                                                  index);
     else
+    {
         j_mc_buf = (*env)->CallObjectMethod(env, p_sys->codec,
                                             jfields.get_input_buffer, index);
+        if (CHECK_EXCEPTION())
+        {
+            msg_Err(api->p_obj, "Exception in MediaCodec.getInputBuffer");
+            return VLC_EGENERIC;
+        }
+    }
     j_mc_size = (*env)->GetDirectBufferCapacity(env, j_mc_buf);
     p_mc_buf = (*env)->GetDirectBufferAddress(env, j_mc_buf);
     if (j_mc_size < 0)
@@ -716,9 +723,16 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
                 buf = (*env)->GetObjectArrayElement(env, p_sys->output_buffers,
                                                     i_index);
             else
+            {
                 buf = (*env)->CallObjectMethod(env, p_sys->codec,
                                                jfields.get_output_buffer,
                                                i_index);
+                if (CHECK_EXCEPTION())
+                {
+                    msg_Err(api->p_obj, "Exception in MediaCodec.getOutputBuffer");
+                    return VLC_EGENERIC;
+                }
+            }
             //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
             ptr = (*env)->GetDirectBufferAddress(env, buf);
 
