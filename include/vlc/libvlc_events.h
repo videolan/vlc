@@ -79,6 +79,8 @@ enum libvlc_event_e {
     libvlc_MediaPlayerESSelected,
     libvlc_MediaPlayerCorked,
     libvlc_MediaPlayerUncorked,
+    libvlc_MediaPlayerMuted,
+    libvlc_MediaPlayerUnmuted,
 
     libvlc_MediaListItemAdded=0x200,
     libvlc_MediaListWillAddItem,
