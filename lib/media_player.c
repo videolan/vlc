@@ -67,6 +67,10 @@ input_es_selected( vlc_object_t * p_this, char const * psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval,
                    void * p_userdata );
 
+static int
+corks_changed(vlc_object_t *obj, const char *name, vlc_value_t old,
+              vlc_value_t cur, void *opaque);
+
 static void
 add_es_callbacks( input_thread_t *p_input_thread, libvlc_media_player_t *p_mi );
 
@@ -462,6 +466,23 @@ static int snapshot_was_taken(vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
+static int corks_changed(vlc_object_t *obj, const char *name, vlc_value_t old,
+                         vlc_value_t cur, void *opaque)
+{
+    libvlc_media_player_t *mp = (libvlc_media_player_t *)obj;
+
+    if (!old.i_int != !cur.i_int)
+    {
+        libvlc_event_t event;
+
+        event.type = cur.i_int ? libvlc_MediaPlayerCorked
+                               : libvlc_MediaPlayerUncorked;
+        libvlc_event_send(mp->p_event_manager, &event);
+    }
+    VLC_UNUSED(name); VLC_UNUSED(opaque);
+    return VLC_SUCCESS;
+}
+
 /**************************************************************************
  * Create a Media Instance object.
  *
@@ -637,6 +658,10 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     register_event(mp, ESAdded);
     register_event(mp, ESDeleted);
     register_event(mp, ESSelected);
+    register_event(mp, Corked);
+    register_event(mp, Uncorked);
+
+    var_AddCallback(mp, "corks", corks_changed, NULL);
 
     /* Snapshot initialization */
     register_event(mp, SnapshotTaken);
@@ -686,6 +711,9 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     /* Detach Callback from the main libvlc object */
     var_DelCallback( p_mi->p_libvlc,
                      "snapshot-file", snapshot_was_taken, p_mi );
+
+    /* Detach callback from the media player / input manager object */
+    var_DelCallback( p_mi, "corks", corks_changed, NULL );
 
     /* No need for lock_input() because no other threads knows us anymore */
     if( p_mi->input.p_thread )
