@@ -511,7 +511,7 @@ bool aout_CheckChannelExtraction( int *pi_selection,
         if( pi_selection[i] != i )
             return true;
     }
-    return i_out == i_channels;
+    return i_out != i_channels;
 }
 
 /* Return the order in which filters should be inserted */
