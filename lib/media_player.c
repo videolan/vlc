@@ -491,6 +491,19 @@ static int corks_changed(vlc_object_t *obj, const char *name, vlc_value_t old,
     return VLC_SUCCESS;
 }
 
+static int audio_device_changed(vlc_object_t *obj, const char *name,
+                                vlc_value_t old, vlc_value_t cur, void *opaque)
+{
+    libvlc_media_player_t *mp = (libvlc_media_player_t *)obj;
+    libvlc_event_t event;
+
+    event.type = libvlc_MediaPlayerAudioDevice;
+    event.u.media_player_audio_device.device = cur.psz_string;
+    libvlc_event_send(mp->p_event_manager, &event);
+    VLC_UNUSED(name); VLC_UNUSED(old); VLC_UNUSED(opaque);
+    return VLC_SUCCESS;
+}
+
 static int mute_changed(vlc_object_t *obj, const char *name, vlc_value_t old,
                         vlc_value_t cur, void *opaque)
 {
@@ -702,8 +715,10 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     register_event(mp, Muted);
     register_event(mp, Unmuted);
     register_event(mp, AudioVolume);
+    register_event(mp, AudioDevice);
 
     var_AddCallback(mp, "corks", corks_changed, NULL);
+    var_AddCallback(mp, "audio-device", audio_device_changed, NULL);
     var_AddCallback(mp, "mute", mute_changed, NULL);
     var_AddCallback(mp, "volume", volume_changed, NULL);
 
@@ -759,6 +774,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     /* Detach callback from the media player / input manager object */
     var_DelCallback( p_mi, "volume", volume_changed, NULL );
     var_DelCallback( p_mi, "mute", mute_changed, NULL );
+    var_DelCallback( p_mi, "audio-device", audio_device_changed, NULL );
     var_DelCallback( p_mi, "corks", corks_changed, NULL );
 
     /* No need for lock_input() because no other threads knows us anymore */

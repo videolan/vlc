@@ -82,6 +82,7 @@ enum libvlc_event_e {
     libvlc_MediaPlayerMuted,
     libvlc_MediaPlayerUnmuted,
     libvlc_MediaPlayerAudioVolume,
+    libvlc_MediaPlayerAudioDevice,
 
     libvlc_MediaListItemAdded=0x200,
     libvlc_MediaListWillAddItem,
@@ -250,6 +251,11 @@ typedef struct libvlc_event_t
         {
             float volume;
         } media_player_audio_volume;
+
+        struct
+        {
+            const char *device;
+        } media_player_audio_device;
     } u; /**< Type-dependent event description */
 } libvlc_event_t;
 
