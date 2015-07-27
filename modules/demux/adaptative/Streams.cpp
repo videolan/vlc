@@ -34,7 +34,7 @@ using namespace adaptative::logic;
 Stream::Stream(demux_t * demux_, const StreamFormat &format_)
 {
     p_demux = demux_;
-    type = StreamType::UNKNOWN;
+    type = UNKNOWN;
     format = format_;
     output = NULL;
     adaptationLogic = NULL;
