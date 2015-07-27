@@ -143,16 +143,6 @@ static const struct member members[] = {
     { NULL, NULL, NULL, 0, 0, false },
 };
 
-static inline int get_integer(JNIEnv *env, jobject obj, const char *psz_name)
-{
-    int i_ret;
-    jstring jname = (*env)->NewStringUTF(env, psz_name);
-    i_ret = (*env)->CallIntMethod(env, obj, jfields.get_integer, jname);
-    (*env)->DeleteLocalRef(env, jname);
-    return i_ret;
-}
-#define GET_INTEGER(obj, name) get_integer(env, obj, name)
-
 static int jstrcmp(JNIEnv* env, jobject str, const char* str2)
 {
     jsize len = (*env)->GetStringUTFLength(env, str);
@@ -176,6 +166,24 @@ static inline bool check_exception(JNIEnv *env)
 }
 #define CHECK_EXCEPTION() check_exception( env )
 #define GET_ENV() if (!(env = android_getEnv(api->p_obj, THREAD_NAME))) return VLC_EGENERIC;
+
+static inline int get_integer(JNIEnv *env, jobject obj, const char *psz_name)
+{
+    jstring jname = (*env)->NewStringUTF(env, psz_name);
+    if (!CHECK_EXCEPTION() && jname)
+    {
+        int i_ret = (*env)->CallIntMethod(env, obj, jfields.get_integer, jname);
+        (*env)->DeleteLocalRef(env, jname);
+        /* getInteger can throw NullPointerException (when fetching the
+         * "channel-mask" property for example) */
+        if (CHECK_EXCEPTION())
+            return 0;
+        return i_ret;
+    }
+    else
+        return 0;
+}
+#define GET_INTEGER(obj, name) get_integer(env, obj, name)
 
 /* Initialize all jni fields.
  * Done only one time during the first initialisation */
