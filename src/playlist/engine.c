@@ -480,6 +480,7 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "video-wallpaper", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Audio output parameters */
+    var_Create( p_playlist, "audio-device", VLC_VAR_STRING );
     var_Create( p_playlist, "mute", VLC_VAR_BOOL );
     var_Create( p_playlist, "volume", VLC_VAR_FLOAT );
     var_SetFloat( p_playlist, "volume", -1.f );
