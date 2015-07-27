@@ -447,7 +447,7 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
                 return VLC_EGENERIC;
             }
             p_out->u.buf.p_ptr = p_mc_buf + info.offset;
-            p_out->u.buf.i_size = i_mc_size;
+            p_out->u.buf.i_size = info.size;
         }
         return 1;
     }
