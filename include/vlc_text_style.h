@@ -140,6 +140,16 @@ VLC_API void text_style_Delete( text_style_t * );
 VLC_API text_segment_t *text_segment_New( const char * );
 
 /**
+ * This function will create a new text segment and duplicates the style passed as argument
+ *
+ * You should use text_segment_ChainDelete to destroy it, to clean all
+ * the linked segments, or text_segment_Delete to free a specic one
+ *
+ * This doesn't initialize the text.
+ */
+VLC_API text_segment_t *text_segment_NewInheritStyle( const text_style_t* p_style );
+
+/**
  * Delete a text segment and its content.
  *
  * This assumes the segment is not part of a chain

@@ -105,6 +105,22 @@ text_segment_t *text_segment_New( const char *psz_text )
     return segment;
 }
 
+text_segment_t *text_segment_NewInheritStyle( const text_style_t* p_style )
+{
+    if ( !p_style )
+        return NULL; //FIXME: Allow this, even if it is an alias to text_segment_New( NULL ) ?
+    text_segment_t* p_segment = text_segment_New( NULL );
+    if ( unlikely( !p_segment ) )
+        return NULL;
+    p_segment->style = text_style_Duplicate( p_style );
+    if ( unlikely( !p_segment->style ) )
+    {
+        text_segment_Delete( p_segment );
+        return NULL;
+    }
+    return p_segment;
+}
+
 void text_segment_Delete( text_segment_t* segment )
 {
     if ( segment != NULL )
