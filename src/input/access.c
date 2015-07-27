@@ -396,7 +396,7 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     if (sys->access->pf_read != NULL)
     {
         s->pf_read = AStreamReadStream;
-        cachename = "cache_read";
+        cachename = "prefetch,cache_read";
     }
     else
     {

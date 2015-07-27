@@ -288,6 +288,7 @@ $Id$
  * podcast: podcast feed parser
  * posterize: posterize video filter
  * postproc: Video post processing filter
+ * prefetch: Stream prefetching stream filter
  * projectm: visualisation using libprojectM
  * ps: input module for MPEG PS decapsulation
  * psychedelic: Psychedelic video filter
