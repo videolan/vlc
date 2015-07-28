@@ -273,10 +273,6 @@ static void Close(vlc_object_t *object)
 
 static void DestroyPicture(picture_t *picture)
 {
-    LPDIRECT3DDEVICE9 d3ddev;
-    if (!FAILED(IDirect3DSurface9_GetDevice(picture->p_sys->surface, &d3ddev)))
-        IDirect3DDevice9_Release(d3ddev);
-
     IDirect3DSurface9_Release(picture->p_sys->surface);
 
     free(picture->p_sys);
@@ -325,8 +321,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
         }
 
         pictures[picture_count] = picture;
-        /* each picture_t holds a ref to the device and release it on Destroy */
-        IDirect3DDevice9_AddRef(vd->sys->d3ddev);
     }
 
     picture_pool_configuration_t pool_cfg;
