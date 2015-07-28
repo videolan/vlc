@@ -4,10 +4,10 @@ libtdummy_plugin_la_SOURCES = text_renderer/tdummy.c
 text_LTLIBRARIES = libtdummy_plugin.la
 
 libfreetype_plugin_la_SOURCES = \
-	text_renderer/text_renderer.c text_renderer/text_renderer.h \
 	text_renderer/platform_fonts.c text_renderer/platform_fonts.h \
 	text_renderer/freetype.c text_renderer/freetype.h \
 	text_renderer/text_layout.c text_renderer/text_layout.h
+
 libfreetype_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(FREETYPE_CFLAGS)
 libfreetype_plugin_la_LIBADD = $(LIBM) $(FREETYPE_LIBS)
 if HAVE_FREETYPE

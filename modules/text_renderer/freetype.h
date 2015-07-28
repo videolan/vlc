@@ -25,6 +25,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef VLC_FREETYPE_H
+#define VLC_FREETYPE_H
+
+#include <vlc_text_style.h>                                   /* text_style_t*/
+
 typedef struct faces_cache_t
 {
     FT_Face        *p_faces;
@@ -71,4 +76,22 @@ struct filter_sys_t
  #define FT_MulFix(v, s) (((v)*(s))>>16)
 #endif
 
+#ifdef __OS2__
+typedef uint16_t uni_char_t;
+# define FREETYPE_TO_UCS    "UCS-2LE"
+#else
+typedef uint32_t uni_char_t;
+# if defined(WORDS_BIGENDIAN)
+#  define FREETYPE_TO_UCS   "UCS-4BE"
+# else
+#  define FREETYPE_TO_UCS   "UCS-4LE"
+# endif
+#endif
+
+
 FT_Face LoadFace( filter_t *p_filter, const text_style_t *p_style );
+
+bool FaceStyleEquals( const text_style_t *p_style1,
+                      const text_style_t *p_style2 );
+
+#endif

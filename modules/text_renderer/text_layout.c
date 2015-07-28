@@ -56,7 +56,6 @@
 # include <hb-ft.h>
 #endif
 
-#include "text_renderer.h"
 #include "text_layout.h"
 #include "freetype.h"
 
