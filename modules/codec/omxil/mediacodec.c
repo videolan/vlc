@@ -343,8 +343,9 @@ static int StartMediaCodec(decoder_t *p_dec)
 
     if (p_dec->fmt_in.i_extra && !p_sys->p_csd)
     {
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
-         || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
+        if (p_dec->fmt_in.i_cat == VIDEO_ES
+         && (p_dec->fmt_in.i_codec == VLC_CODEC_H264
+         || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC))
         {
             int buf_size = p_dec->fmt_in.i_extra + 20;
             uint32_t size = p_dec->fmt_in.i_extra;
@@ -392,42 +393,45 @@ static int StartMediaCodec(decoder_t *p_dec)
         p_sys->i_csd_send = 0;
     }
 
-    if (!p_sys->u.video.i_width || !p_sys->u.video.i_height)
+    if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        msg_Err(p_dec, "invalid size, abort MediaCodec");
-        return VLC_EGENERIC;
-    }
-    args.video.i_width = p_sys->u.video.i_width;
-    args.video.i_height = p_sys->u.video.i_height;
-
-    if (p_dec->fmt_in.video.orientation != ORIENT_NORMAL)
-    {
-        switch (p_dec->fmt_in.video.orientation)
+        if (!p_sys->u.video.i_width || !p_sys->u.video.i_height)
         {
-            case ORIENT_ROTATED_90:
-                args.video.i_angle = 90;
-                break;
-            case ORIENT_ROTATED_180:
-                args.video.i_angle = 180;
-                break;
-            case ORIENT_ROTATED_270:
-                args.video.i_angle = 270;
-                break;
-            default:
-                args.video.i_angle = 0;
+            msg_Err(p_dec, "invalid size, abort MediaCodec");
+            return VLC_EGENERIC;
         }
-    }
+        args.video.i_width = p_sys->u.video.i_width;
+        args.video.i_height = p_sys->u.video.i_height;
 
-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-        h264_get_profile_level(&p_dec->fmt_in, &h264_profile, NULL, NULL);
+        if (p_dec->fmt_in.video.orientation != ORIENT_NORMAL)
+        {
+            switch (p_dec->fmt_in.video.orientation)
+            {
+                case ORIENT_ROTATED_90:
+                    args.video.i_angle = 90;
+                    break;
+                case ORIENT_ROTATED_180:
+                    args.video.i_angle = 180;
+                    break;
+                case ORIENT_ROTATED_270:
+                    args.video.i_angle = 270;
+                    break;
+                default:
+                    args.video.i_angle = 0;
+            }
+        }
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+            h264_get_profile_level(&p_dec->fmt_in, &h264_profile, NULL, NULL);
+
+        if (!p_sys->u.video.p_awh && var_InheritBool(p_dec, CFG_PREFIX "dr"))
+            p_sys->u.video.p_awh = AWindowHandler_new(VLC_OBJECT(p_dec));
+        args.video.p_awh = p_sys->u.video.p_awh;
+    }
 
     psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, h264_profile);
     if (!psz_name)
         return VLC_EGENERIC;
 
-    if (!p_sys->u.video.p_awh && var_InheritBool(p_dec, CFG_PREFIX "dr"))
-        p_sys->u.video.p_awh = AWindowHandler_new(VLC_OBJECT(p_dec));
-    args.video.p_awh = p_sys->u.video.p_awh;
     i_ret = p_sys->api->start(p_sys->api, psz_name, p_sys->mime, &args);
 
     if (i_ret == VLC_SUCCESS)
@@ -461,7 +465,7 @@ static void StopMediaCodec(decoder_t *p_dec)
     p_sys->psz_name = NULL;
 
     p_sys->api->stop(p_sys->api);
-    if (p_sys->u.video.p_awh)
+    if (p_dec->fmt_in.i_cat == VIDEO_ES && p_sys->u.video.p_awh)
     {
         AWindowHandler_releaseANativeWindow(p_sys->u.video.p_awh, AWindow_Video);
         AWindowHandler_releaseSurface(p_sys->u.video.p_awh, AWindow_Video);
@@ -475,36 +479,41 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     mc_api *api;
-    const char *mime;
+    const char *mime = NULL;
 
     if (p_dec->fmt_in.i_cat != VIDEO_ES && !p_dec->b_force)
         return VLC_EGENERIC;
 
-    switch (p_dec->fmt_in.i_codec) {
-    case VLC_CODEC_HEVC: mime = "video/hevc"; break;
-    case VLC_CODEC_H264: mime = "video/avc"; break;
-    case VLC_CODEC_H263: mime = "video/3gpp"; break;
-    case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
-    case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
-    case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
-    case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
-    case VLC_CODEC_VP9:  mime = "video/x-vnd.on2.vp9"; break;
-    /* case VLC_CODEC_MPGV: mime = "video/mpeg2"; break; */
-    default:
+    if (p_dec->fmt_in.i_cat == VIDEO_ES)
+    {
+        if (!p_dec->fmt_in.video.i_width || !p_dec->fmt_in.video.i_height)
+        {
+            /* We can handle h264 without a valid video size */
+            if (p_dec->fmt_in.i_codec != VLC_CODEC_H264)
+            {
+                msg_Dbg(p_dec, "resolution (%dx%d) not supported",
+                        p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
+                return VLC_EGENERIC;
+            }
+        }
+
+        switch (p_dec->fmt_in.i_codec) {
+        case VLC_CODEC_HEVC: mime = "video/hevc"; break;
+        case VLC_CODEC_H264: mime = "video/avc"; break;
+        case VLC_CODEC_H263: mime = "video/3gpp"; break;
+        case VLC_CODEC_MP4V: mime = "video/mp4v-es"; break;
+        case VLC_CODEC_WMV3: mime = "video/x-ms-wmv"; break;
+        case VLC_CODEC_VC1:  mime = "video/wvc1"; break;
+        case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
+        case VLC_CODEC_VP9:  mime = "video/x-vnd.on2.vp9"; break;
+        /* case VLC_CODEC_MPGV: mime = "video/mpeg2"; break; */
+        }
+    }
+    if (!mime)
+    {
         msg_Dbg(p_dec, "codec %4.4s not supported",
                 (char *)&p_dec->fmt_in.i_codec);
         return VLC_EGENERIC;
-    }
-
-    if (!p_dec->fmt_in.video.i_width || !p_dec->fmt_in.video.i_height)
-    {
-        /* We can handle h264 without a valid video size */
-        if (p_dec->fmt_in.i_codec != VLC_CODEC_H264)
-        {
-            msg_Dbg(p_dec, "resolution (%dx%d) not supported",
-                    p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height);
-            return VLC_EGENERIC;
-        }
     }
 
     api = calloc(1, sizeof(mc_api));
@@ -533,38 +542,41 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     p_dec->fmt_out.video = p_dec->fmt_in.video;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
     p_dec->b_need_packetized = true;
-
-    p_dec->p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
-    p_dec->p_sys->u.video.i_height = p_dec->fmt_in.video.i_height;
-
-    p_dec->p_sys->u.video.timestamp_fifo = timestamp_FifoNew(32);
-    if (!p_dec->p_sys->u.video.timestamp_fifo)
-    {
-        CloseDecoder(p_this);
-        return VLC_ENOMEM;
-    }
-
     p_dec->p_sys->mime = mime;
     p_dec->p_sys->b_new_block = true;
 
-    switch (p_dec->fmt_in.i_codec)
+    if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-    case VLC_CODEC_H264:
-        if (!p_dec->p_sys->u.video.i_width || !p_dec->p_sys->u.video.i_height)
+        p_dec->p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
+        p_dec->p_sys->u.video.i_height = p_dec->fmt_in.video.i_height;
+
+        p_dec->p_sys->u.video.timestamp_fifo = timestamp_FifoNew(32);
+        if (!p_dec->p_sys->u.video.timestamp_fifo)
         {
-            msg_Warn(p_dec, "waiting for sps/pps for codec %4.4s",
-                     (const char *)&p_dec->fmt_in.i_codec);
-            return VLC_SUCCESS;
+            CloseDecoder(p_this);
+            return VLC_ENOMEM;
         }
-    case VLC_CODEC_VC1:
-        if (!p_dec->fmt_in.i_extra)
+
+        switch (p_dec->fmt_in.i_codec)
         {
-            msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
-                     (const char *)&p_dec->fmt_in.i_codec);
-            return VLC_SUCCESS;
+        case VLC_CODEC_H264:
+            if (!p_dec->p_sys->u.video.i_width || !p_dec->p_sys->u.video.i_height)
+            {
+                msg_Warn(p_dec, "waiting for sps/pps for codec %4.4s",
+                         (const char *)&p_dec->fmt_in.i_codec);
+                return VLC_SUCCESS;
+            }
+        case VLC_CODEC_VC1:
+            if (!p_dec->fmt_in.i_extra)
+            {
+                msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
+                         (const char *)&p_dec->fmt_in.i_codec);
+                return VLC_SUCCESS;
+            }
+            break;
         }
-        break;
     }
+
     return StartMediaCodec(p_dec);
 }
 
@@ -592,15 +604,19 @@ static void CloseDecoder(vlc_object_t *p_this)
     StopMediaCodec(p_dec);
 
     CSDFree(p_dec);
-    ArchitectureSpecificCopyHooksDestroy(p_sys->u.video.i_pixel_format,
-                                         &p_sys->u.video.ascd);
-    free(p_sys->u.video.pp_inflight_pictures);
-    if (p_sys->u.video.timestamp_fifo)
-        timestamp_FifoRelease(p_sys->u.video.timestamp_fifo);
     p_sys->api->clean(p_sys->api);
+
+    if (p_dec->fmt_in.i_cat == VIDEO_ES)
+    {
+        ArchitectureSpecificCopyHooksDestroy(p_sys->u.video.i_pixel_format,
+                                             &p_sys->u.video.ascd);
+        free(p_sys->u.video.pp_inflight_pictures);
+        if (p_sys->u.video.timestamp_fifo)
+            timestamp_FifoRelease(p_sys->u.video.timestamp_fifo);
+        if (p_sys->u.video.p_awh)
+            AWindowHandler_destroy(p_sys->u.video.p_awh);
+    }
     free(p_sys->api);
-    if (p_sys->u.video.p_awh)
-        AWindowHandler_destroy(p_sys->u.video.p_awh);
     free(p_sys);
 }
 
