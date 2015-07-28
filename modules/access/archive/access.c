@@ -51,12 +51,14 @@ static ssize_t Read(access_t *p_access, uint8_t *p_data, size_t i_size)
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    size_t i_read = 0;
+    ssize_t i_read = 0;
 
     i_read = archive_read_data(p_sys->p_archive, p_data, i_size);
 
     if (i_read > 0)
         p_access->info.i_pos += i_read;
+    else
+        i_read = 0;
 
     if (i_size > 0 && i_read <= 0)
         p_access->info.b_eof = true;
