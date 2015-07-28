@@ -32,6 +32,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_aout.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_block_helper.h>
@@ -165,6 +166,12 @@ struct decoder_sys_t
             unsigned int i_inflight_pictures;
             timestamp_fifo_t *timestamp_fifo;
         } video;
+        struct {
+            date_t i_end_date;
+            int i_channels;
+            bool b_extract;
+            int pi_extraction[AOUT_CHAN_MAX];
+        } audio;
     } u;
 };
 
@@ -176,6 +183,7 @@ static int  OpenDecoderNdk(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
 static picture_t *DecodeVideo(decoder_t *, block_t **);
+static block_t *DecodeAudio(decoder_t *, block_t **);
 
 static void InvalidateAllPictures(decoder_t *);
 static int InsertInflightPicture(decoder_t *, picture_t *, unsigned int );
@@ -187,6 +195,9 @@ static int InsertInflightPicture(decoder_t *, picture_t *, unsigned int );
 #define DIRECTRENDERING_LONGTEXT N_(\
         "Enable Android direct rendering using opaque buffers.")
 
+#define MEDIACODEC_AUDIO_TEXT "Use MediaCodec for audio decoding"
+#define MEDIACODEC_AUDIO_LONGTEXT "Still experimental."
+
 #define CFG_PREFIX "mediacodec-"
 
 vlc_module_begin ()
@@ -197,6 +208,8 @@ vlc_module_begin ()
     set_capability( "decoder", 0 ) /* Only enabled via commandline arguments */
     add_bool(CFG_PREFIX "dr", true,
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
+    add_bool(CFG_PREFIX "audio", false,
+             MEDIACODEC_AUDIO_TEXT, MEDIACODEC_AUDIO_LONGTEXT, true)
     set_callbacks( OpenDecoderNdk, CloseDecoder )
     add_shortcut( "mediacodec_ndk" )
     add_submodule ()
@@ -440,6 +453,13 @@ static int StartMediaCodec(decoder_t *p_dec)
             p_sys->u.video.p_awh = AWindowHandler_new(VLC_OBJECT(p_dec));
         args.video.p_awh = p_sys->u.video.p_awh;
     }
+    else
+    {
+        date_Set(&p_sys->u.audio.i_end_date, VLC_TS_INVALID);
+
+        args.audio.i_sample_rate    = p_dec->fmt_in.audio.i_rate;
+        args.audio.i_channel_count  = p_dec->p_sys->u.audio.i_channels;
+    }
 
     psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, h264_profile);
     if (!psz_name)
@@ -494,7 +514,9 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     mc_api *api;
     const char *mime = NULL;
 
-    if (p_dec->fmt_in.i_cat != VIDEO_ES && !p_dec->b_force)
+    /* Video or Audio if "mediacodec-audio" bool is true */
+    if (p_dec->fmt_in.i_cat != VIDEO_ES && (p_dec->fmt_in.i_cat != AUDIO_ES
+     || !var_InheritBool(p_dec, CFG_PREFIX "audio")))
         return VLC_EGENERIC;
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
@@ -520,6 +542,37 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         case VLC_CODEC_VP8:  mime = "video/x-vnd.on2.vp8"; break;
         case VLC_CODEC_VP9:  mime = "video/x-vnd.on2.vp9"; break;
         /* case VLC_CODEC_MPGV: mime = "video/mpeg2"; break; */
+        }
+    }
+    else
+    {
+        if (!p_dec->fmt_in.audio.i_channels)
+        {
+            /* MediaCodec assert if number of channels is 0 */
+            msg_Dbg(p_dec, "no channels, abort MediaCodec");
+            return VLC_EGENERIC;
+        }
+
+        switch (p_dec->fmt_in.i_codec) {
+        case VLC_CODEC_AMR_NB: mime = "audio/3gpp"; break;
+        case VLC_CODEC_AMR_WB: mime = "audio/amr-wb"; break;
+        case VLC_CODEC_MPGA:
+        case VLC_CODEC_MP3:    mime = "audio/mpeg"; break;
+        case VLC_CODEC_MP2:    mime = "audio/mpeg-L2"; break;
+        case VLC_CODEC_MP4A:   mime = "audio/mp4a-latm"; break;
+        case VLC_CODEC_QCELP:  mime = "audio/qcelp"; break;
+        case VLC_CODEC_VORBIS: mime = "audio/vorbis"; break;
+        case VLC_CODEC_OPUS:   mime = "audio/opus"; break;
+        case VLC_CODEC_ALAW:   mime = "audio/g711-alaw"; break;
+        case VLC_CODEC_MULAW:  mime = "audio/g711-mlaw"; break;
+        case VLC_CODEC_FLAC:   mime = "audio/flac"; break;
+        case VLC_CODEC_GSM:    mime = "audio/gsm"; break;
+        case VLC_CODEC_A52:    mime = "audio/ac3"; break;
+        case VLC_CODEC_EAC3:   mime = "audio/eac3"; break;
+        case VLC_CODEC_ALAC:   mime = "audio/alac"; break;
+        case VLC_CODEC_DTS:    mime = "audio/vnd.dts"; break;
+        /* case VLC_CODEC_: mime = "audio/mpeg-L1"; break; */
+        /* case VLC_CODEC_: mime = "audio/aac-adts"; break; */
         }
     }
     if (!mime)
@@ -550,6 +603,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     p_dec->p_sys->api = api;
 
     p_dec->pf_decode_video = DecodeVideo;
+    p_dec->pf_decode_audio = DecodeAudio;
 
     p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
     p_dec->fmt_out.video = p_dec->fmt_in.video;
@@ -580,6 +634,23 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
                 return VLC_SUCCESS;
             }
         case VLC_CODEC_VC1:
+            if (!p_dec->fmt_in.i_extra)
+            {
+                msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
+                         (const char *)&p_dec->fmt_in.i_codec);
+                return VLC_SUCCESS;
+            }
+            break;
+        }
+    }
+    else
+    {
+        p_dec->p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
+
+        switch (p_dec->fmt_in.i_codec)
+        {
+        case VLC_CODEC_VORBIS:
+        case VLC_CODEC_MP4A:
             if (!p_dec->fmt_in.i_extra)
             {
                 msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
@@ -907,6 +978,118 @@ end:
     return i_ret;
 }
 
+/* samples will be in the following order: FL FR FC LFE BL BR BC SL SR */
+uint32_t pi_audio_order_src[] =
+{
+    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER, AOUT_CHAN_LFE,
+    AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
+    AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+};
+
+static int Audio_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
+                           block_t **pp_out_block, bool *p_abort,
+                           mtime_t i_timeout)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    mc_api_out out;
+    int i_ret;
+    (void) p_abort;
+
+    assert(!pp_out_pic && pp_out_block);
+
+    i_ret = p_sys->api->get_out(p_sys->api, &out, i_timeout);
+    if (i_ret != 1)
+        return i_ret;
+
+    if (out.type == MC_OUT_TYPE_BUF)
+    {
+        block_t *p_block = NULL;
+        if (!p_sys->b_has_format) {
+            msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
+            return p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false);
+        }
+
+        p_block = block_Alloc(out.u.buf.i_size);
+        if (!p_block)
+            return -1;
+        p_block->i_nb_samples = out.u.buf.i_size
+                              / p_dec->fmt_out.audio.i_bytes_per_frame;
+
+        if (p_sys->u.audio.b_extract)
+        {
+            aout_ChannelExtract(p_block->p_buffer,
+                                p_dec->fmt_out.audio.i_channels,
+                                out.u.buf.p_ptr, p_sys->u.audio.i_channels,
+                                p_block->i_nb_samples, p_sys->u.audio.pi_extraction,
+                                p_dec->fmt_out.audio.i_bitspersample);
+        }
+        else
+            memcpy(p_block->p_buffer, out.u.buf.p_ptr, out.u.buf.i_size);
+
+        if (out.u.buf.i_ts != 0 && out.u.buf.i_ts != date_Get(&p_sys->u.audio.i_end_date))
+            date_Set(&p_sys->u.audio.i_end_date, out.u.buf.i_ts);
+
+        p_block->i_pts = date_Get(&p_sys->u.audio.i_end_date);
+        p_block->i_length = date_Increment(&p_sys->u.audio.i_end_date,
+                                           p_block->i_nb_samples)
+                          - p_block->i_pts;
+
+        if (p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false))
+        {
+            block_Release(p_block);
+            return -1;
+        }
+        *pp_out_block = p_block;
+        return 1;
+    } else {
+        uint32_t i_layout_dst;
+        int      i_channels_dst;
+
+        assert(out.type == MC_OUT_TYPE_CONF);
+
+        if (out.u.conf.audio.channel_count <= 0
+         || out.u.conf.audio.channel_count > 8
+         || out.u.conf.audio.sample_rate <= 0)
+        {
+            msg_Warn( p_dec, "invalid audio properties channels count %d, sample rate %d",
+                      out.u.conf.audio.channel_count,
+                      out.u.conf.audio.sample_rate);
+            return -1;
+        }
+
+        msg_Err(p_dec, "output: channel_count: %d, channel_mask: 0x%X, rate: %d",
+                out.u.conf.audio.channel_count, out.u.conf.audio.channel_mask,
+                out.u.conf.audio.sample_rate);
+
+        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
+        p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
+
+        p_dec->fmt_out.audio.i_rate = out.u.conf.audio.sample_rate;
+        date_Init(&p_sys->u.audio.i_end_date, out.u.conf.audio.sample_rate, 1 );
+
+        p_sys->u.audio.i_channels = out.u.conf.audio.channel_count;
+        p_sys->u.audio.b_extract =
+            aout_CheckChannelExtraction(p_sys->u.audio.pi_extraction,
+                                        &i_layout_dst, &i_channels_dst,
+                                        NULL, pi_audio_order_src,
+                                        p_sys->u.audio.i_channels);
+
+        if (p_sys->u.audio.b_extract)
+            msg_Warn(p_dec, "need channel extraction: %d -> %d",
+                     p_sys->u.audio.i_channels, i_channels_dst);
+
+        p_dec->fmt_out.audio.i_original_channels =
+        p_dec->fmt_out.audio.i_physical_channels = i_layout_dst;
+        aout_FormatPrepare(&p_dec->fmt_out.audio);
+
+        if (decoder_UpdateAudioFormat(p_dec))
+            return -1;
+
+        p_sys->b_has_format = true;
+        return 0;
+    }
+}
+
 static void H264ProcessBlock(decoder_t *p_dec, block_t *p_block,
                              bool *p_csd_changed, bool *p_size_changed)
 {
@@ -1165,6 +1348,58 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
     if (DecodeCommon(p_dec, pp_block, Video_OnNewBlock, Video_GetOutput,
                      &p_out, NULL))
+        return NULL;
+    return p_out;
+}
+
+static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
+    {
+        if (DecodeFlush(p_dec) != VLC_SUCCESS)
+            return -1;
+        date_Set(&p_sys->u.audio.i_end_date, VLC_TS_INVALID);
+        return 0;
+    }
+
+    /* We've just started the stream, wait for the first PTS. */
+    if (!date_Get(&p_sys->u.audio.i_end_date))
+    {
+        if (p_block->i_pts <= VLC_TS_INVALID)
+            return 0;
+        date_Set(&p_sys->u.audio.i_end_date, p_block->i_pts);
+    }
+
+    /* try delayed opening if there is a new extra data */
+    if (!p_sys->api->b_started)
+    {
+        bool b_delayed_start = false;
+
+        switch (p_dec->fmt_in.i_codec)
+        {
+        case VLC_CODEC_VORBIS:
+        case VLC_CODEC_MP4A:
+            if (p_dec->fmt_in.i_extra)
+                b_delayed_start = true;
+        default:
+            break;
+        }
+        if (b_delayed_start && StartMediaCodec(p_dec) != VLC_SUCCESS)
+            return -1;
+        if (!p_sys->api->b_started)
+            return 0;
+    }
+    return 1;
+}
+
+static block_t *DecodeAudio(decoder_t *p_dec, block_t **pp_block)
+{
+    block_t *p_out = NULL;
+
+    if (DecodeCommon(p_dec, pp_block, Audio_OnNewBlock,
+                     Audio_GetOutput, NULL, &p_out))
         return NULL;
     return p_out;
 }
