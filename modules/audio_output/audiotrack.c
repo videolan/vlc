@@ -114,6 +114,7 @@ struct aout_sys_t {
     } smoothpos;
 
     uint32_t i_bytes_per_frame; /* byte per frame */
+    uint32_t i_frame_length; /* frame length */
     uint32_t i_max_audiotrack_samples;
     bool b_spdif;
     uint8_t i_chans_to_reorder; /* do we need channel reordering */
@@ -461,10 +462,7 @@ frames_to_us( aout_sys_t *p_sys, uint64_t i_nb_frames )
 static inline uint64_t
 bytes_to_frames( aout_sys_t *p_sys, size_t i_bytes )
 {
-    if( p_sys->b_spdif )
-        return i_bytes * A52_FRAME_NB / p_sys->i_bytes_per_frame;
-    else
-        return i_bytes / p_sys->i_bytes_per_frame;
+    return i_bytes * p_sys->i_frame_length / p_sys->i_bytes_per_frame;
 }
 #define BYTES_TO_FRAMES(x) bytes_to_frames( p_sys, (x) )
 #define BYTES_TO_US(x) frames_to_us( p_sys, bytes_to_frames( p_sys, (x) ) )
@@ -472,10 +470,7 @@ bytes_to_frames( aout_sys_t *p_sys, size_t i_bytes )
 static inline size_t
 frames_to_bytes( aout_sys_t *p_sys, uint64_t i_frames )
 {
-    if( p_sys->b_spdif )
-        return i_frames * p_sys->i_bytes_per_frame / A52_FRAME_NB;
-    else
-        return i_frames * p_sys->i_bytes_per_frame;
+    return i_frames * p_sys->i_bytes_per_frame / p_sys->i_frame_length;
 }
 #define FRAMES_TO_BYTES(x) frames_to_bytes( p_sys, (x) )
 
@@ -881,10 +876,7 @@ AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
         msg_Warn( p_aout, "getMinBufferSize returned an invalid size" ) ;
         return -1;
     }
-    if( i_vlc_format == VLC_CODEC_SPDIFB )
-        i_size = ( i_min_buffer_size / AOUT_SPDIF_SIZE + 1 ) * AOUT_SPDIF_SIZE;
-    else
-        i_size = i_min_buffer_size * 2;
+    i_size = i_min_buffer_size * 2;
 
     /* create AudioTrack object */
     if( AudioTrack_New( env, p_aout, i_rate, i_channel_config,
@@ -904,8 +896,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
-    int i_nb_channels, i_max_channels, i_bytes_per_frame, i_native_rate = 0,
-        i_ret;
+    int i_nb_channels, i_max_channels, i_native_rate = 0, i_ret;
     unsigned int i_rate;
     bool b_spdif;
 
@@ -989,8 +980,6 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     do
     {
         i_nb_channels = aout_FormatNbChannels( &p_sys->fmt );
-        i_bytes_per_frame = i_nb_channels *
-                            aout_BitsPerSample( p_sys->fmt.i_format ) / 8;
         i_rate = p_sys->fmt.i_format == VLC_CODEC_SPDIFB ?
                                         VLC_CLIP( p_sys->fmt.i_rate, 32000, 48000 )
                                         : (unsigned int) i_native_rate;
@@ -1036,9 +1025,10 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     p_sys->b_spdif = p_sys->fmt.i_format == VLC_CODEC_SPDIFB;
     if( p_sys->b_spdif )
     {
+        p_sys->i_bytes_per_frame =
         p_sys->fmt.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        p_sys->i_frame_length =
         p_sys->fmt.i_frame_length = A52_FRAME_NB;
-        p_sys->i_bytes_per_frame = p_sys->fmt.i_bytes_per_frame;
     }
     else
     {
@@ -1050,7 +1040,10 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
             aout_CheckChannelReorder( NULL, p_chans_out,
                                       p_sys->fmt.i_physical_channels,
                                       p_sys->p_chan_table );
-        p_sys->i_bytes_per_frame = i_bytes_per_frame;
+        p_sys->i_bytes_per_frame = i_nb_channels
+                                 * aout_BitsPerSample( p_sys->fmt.i_format )
+                                 / 8;
+        p_sys->i_frame_length = 1;
     }
     p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( p_sys->audiotrack_args.i_size );
 
@@ -1091,7 +1084,9 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     p_sys->circular.i_read = p_sys->circular.i_write = 0;
     /* 2 seconds of buffering */
     p_sys->circular.i_size = (int)i_rate * AOUT_MAX_PREPARE_TIME
-                           * i_bytes_per_frame / CLOCK_FREQ;
+                           * p_sys->i_bytes_per_frame
+                           / p_sys->i_frame_length
+                           / CLOCK_FREQ;
 
     /* Allocate circular buffer */
     switch( p_sys->i_write_type )
