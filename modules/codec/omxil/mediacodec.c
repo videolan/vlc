@@ -330,57 +330,70 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
     return VLC_EGENERIC;
 }
 
+static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
+     || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
+    {
+        int buf_size = i_extra + 20;
+        uint32_t size = i_extra;
+        void *p_buf = malloc(buf_size);
+
+        if (!p_buf)
+        {
+            msg_Warn(p_dec, "extra buffer allocation failed");
+            return VLC_EGENERIC;
+        }
+
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+        {
+            if (p_extra[0] == 1
+             && convert_sps_pps(p_dec, p_extra, i_extra,
+                                p_buf, buf_size, &size,
+                                &p_sys->u.video.i_nal_size) == VLC_SUCCESS)
+                H264SetCSD(p_dec, p_buf, size, NULL);
+        } else
+        {
+            if (convert_hevc_nal_units(p_dec, p_extra, i_extra,
+                                       p_buf, buf_size, &size,
+                                       &p_sys->u.video.i_nal_size) == VLC_SUCCESS)
+            {
+                struct csd csd;
+
+                csd.p_buf = p_buf;
+                csd.i_size = size;
+                CSDDup(p_dec, &csd, 1);
+            }
+        }
+        free(p_buf);
+    }
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * StartMediaCodec: Create the mediacodec instance
  *****************************************************************************/
 static int StartMediaCodec(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_ret;
+    int i_ret = 0;
     size_t h264_profile = 0;
     char *psz_name = NULL;
     union mc_api_args args;
 
     if (p_dec->fmt_in.i_extra && !p_sys->p_csd)
     {
-        if (p_dec->fmt_in.i_cat == VIDEO_ES
-         && (p_dec->fmt_in.i_codec == VLC_CODEC_H264
-         || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC))
-        {
-            int buf_size = p_dec->fmt_in.i_extra + 20;
-            uint32_t size = p_dec->fmt_in.i_extra;
-            void *p_buf = malloc(buf_size);
+        /* Try first to configure specific Video CSD */
+        if (p_dec->fmt_in.i_cat == VIDEO_ES)
+            i_ret = ParseVideoExtra(p_dec, p_dec->fmt_in.p_extra,
+                                    p_dec->fmt_in.i_extra);
 
-            if (!p_buf)
-            {
-                msg_Warn(p_dec, "extra buffer allocation failed");
-                return VLC_EGENERIC;
-            }
+        if (i_ret != VLC_SUCCESS)
+            return i_ret;
 
-            if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-            {
-                if (((uint8_t*)p_dec->fmt_in.p_extra)[0] == 1
-                 && convert_sps_pps(p_dec, p_dec->fmt_in.p_extra,
-                                    p_dec->fmt_in.i_extra,
-                                    p_buf, buf_size, &size,
-                                    &p_sys->u.video.i_nal_size) == VLC_SUCCESS)
-                    H264SetCSD(p_dec, p_buf, size, NULL);
-            } else
-            {
-                if (convert_hevc_nal_units(p_dec, p_dec->fmt_in.p_extra,
-                                           p_dec->fmt_in.i_extra,
-                                           p_buf, buf_size, &size,
-                                           &p_sys->u.video.i_nal_size) == VLC_SUCCESS)
-                {
-                    struct csd csd;
-
-                    csd.p_buf = p_buf;
-                    csd.i_size = size;
-                    CSDDup(p_dec, &csd, 1);
-                }
-            }
-            free(p_buf);
-        }
+        /* Set default CSD if ParseVideoExtra failed to configure one */
         if (!p_sys->p_csd)
         {
             struct csd csd;
