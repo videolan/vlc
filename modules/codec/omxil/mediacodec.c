@@ -731,21 +731,53 @@ static int PutInput(decoder_t *p_dec, block_t *p_block, mtime_t timeout)
         p_sys->decoded = true;
         if (p_block->i_flags & BLOCK_FLAG_PREROLL )
             p_sys->i_preroll_end = i_ts;
-        timestamp_FifoPut(p_sys->u.video.timestamp_fifo,
-                          p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
         return 1;
     }
 }
 
-static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
-                     mtime_t i_timeout)
+static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
+                           block_t **pp_out_block, bool *p_abort,
+                           mtime_t i_timeout)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     mc_api_out out;
-    int i_ret = p_sys->api->get_out(p_sys->api, &out, i_timeout);
+    picture_t *p_pic = NULL;
+    int i_ret;
 
+    assert(pp_out_pic && !pp_out_block);
+
+    /* FIXME: A new picture shouldn't be created each time.  If
+     * decoder_NewPicture fails because the decoder is flushing/exiting,
+     * GetVideoOutput will either fail (or crash in function of devices), or
+     * never return an output buffer. Indeed, if the Decoder is flushing,
+     * MediaCodec can be stalled since the input is waiting for the output or
+     * vice-versa. Therefore, call decoder_NewPicture before GetVideoOutput as
+     * a safeguard. */
+
+    if (p_sys->b_has_format)
+    {
+        if (p_sys->b_update_format)
+        {
+            p_sys->b_update_format = false;
+            if (decoder_UpdateVideoFormat(p_dec) != 0)
+            {
+                msg_Err(p_dec, "decoder_UpdateVideoFormat failed");
+                return -1;
+            }
+        }
+        p_pic = decoder_NewPicture(p_dec);
+        if (!p_pic) {
+            msg_Warn(p_dec, "NewPicture failed");
+            /* abort current Decode call */
+            *p_abort = true;
+            return 0;
+        }
+    }
+
+    i_ret = p_sys->api->get_out(p_sys->api, &out, i_timeout);
     if (i_ret != 1)
-        return i_ret;
+        goto end;
+
     if (out.type == MC_OUT_TYPE_BUF)
     {
         /* If the oldest input block had no PTS, the timestamp of
@@ -757,11 +789,15 @@ static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
 
         if (!p_sys->b_has_format) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
-            return p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false);
+            i_ret = p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false);
+            goto end;
         }
 
         if (out.u.buf.i_ts <= p_sys->i_preroll_end)
-            return p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false);
+        {
+            i_ret = p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false);
+            goto end;
+        }
 
         if (forced_ts == VLC_TS_INVALID)
             p_pic->date = out.u.buf.i_ts;
@@ -792,9 +828,9 @@ static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
                            &p_sys->u.video.ascd);
 
             if (p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false))
-                return -1;
+                i_ret = -1;
         }
-        return 1;
+        i_ret = 1;
     } else {
         assert(out.type == MC_OUT_TYPE_CONF);
         p_sys->u.video.i_pixel_format = out.u.conf.video.pixel_format;
@@ -806,7 +842,8 @@ static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
             if (!GetVlcChromaFormat(p_sys->u.video.i_pixel_format,
                                     &p_dec->fmt_out.i_codec, &name)) {
                 msg_Err(p_dec, "color-format not recognized");
-                return -1;
+                i_ret = -1;
+                goto end;
             }
         }
 
@@ -844,8 +881,17 @@ static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
         }
         p_sys->b_update_format = true;
         p_sys->b_has_format = true;
-        return 0;
+        i_ret = 0;
     }
+end:
+    if (p_pic)
+    {
+        if (i_ret == 1)
+            *pp_out_pic = p_pic;
+        else
+            picture_Release(p_pic);
+    }
+    return i_ret;
 }
 
 static void H264ProcessBlock(decoder_t *p_dec, block_t *p_block,
@@ -890,19 +936,9 @@ static int DecodeFlush(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->decoded)
-    {
-        p_sys->i_preroll_end = 0;
-        timestamp_FifoEmpty(p_sys->u.video.timestamp_fifo);
-        /* Invalidate all pictures that are currently in flight
-         * since flushing make all previous indices returned by
-         * MediaCodec invalid. */
-        if (p_sys->api->b_direct_rendering)
-            InvalidateAllPictures(p_dec);
-    }
-
     if (p_sys->decoded || p_sys->i_csd_send > 0)
     {
+        p_sys->i_preroll_end = 0;
         if (p_sys->api->flush(p_sys->api) != VLC_SUCCESS)
             return VLC_EGENERIC;
         /* resend CODEC_CONFIG buffer after a flush */
@@ -912,17 +948,36 @@ static int DecodeFlush(decoder_t *p_dec)
     return VLC_SUCCESS;
 }
 
-static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
+/**
+ * Callback called when a new block is processed from DecodeCommon.
+ * It returns -1 in case of error, 0 if block should be dropped, 1 otherwise.
+ */
+typedef int (*dec_on_new_block_cb)(decoder_t *, block_t *);
+
+/**
+ * Callback called when DecodeCommon try to get an output buffer (pic or block).
+ * It returns -1 in case of error, or the number of output buffer returned.
+ */
+typedef int (*dec_get_output_cb)(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
+
+/**
+ * DecodeCommon called from DecodeVideo or DecodeAudio.
+ * It returns -1 in case of error, 0 otherwise. The output buffer is returned
+ * in pp_out_pic for Video, and pp_out_block for Audio.
+ */
+static int DecodeCommon(decoder_t *p_dec, block_t **pp_block,
+                        dec_on_new_block_cb pf_on_new_block,
+                        dec_get_output_cb pf_get_out,
+                        picture_t **pp_out_pic, block_t **pp_out_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    picture_t *p_pic = NULL;
     block_t *p_block = pp_block ? *pp_block : NULL;
     unsigned int i_attempts = 0;
     jlong timeout = 0;
     int i_output_ret = 0;
     int i_input_ret = 0;
+    bool b_abort = false;
     bool b_error = false;
-    bool b_delayed_start = false;
     bool b_new_block = p_block ? p_sys->b_new_block : false;
 
     if (p_sys->error_state)
@@ -930,75 +985,16 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 
     if (b_new_block)
     {
-        bool b_csd_changed = false, b_size_changed = false;
+        int i_ret;
 
         p_sys->b_new_block = false;
-        if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
-            && !p_sys->api->b_support_interlaced)
+        i_ret = pf_on_new_block(p_dec, p_block);
+        if (i_ret != 1)
         {
-            b_error = true;
-            goto endclean;
-        }
-
-        if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-            if (DecodeFlush(p_dec) != VLC_SUCCESS)
+            if (i_ret == -1)
                 b_error = true;
             goto endclean;
         }
-
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-            H264ProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
-        else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
-            HEVCProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
-
-        if (p_sys->api->b_started && b_csd_changed)
-        {
-            if (b_size_changed)
-            {
-                msg_Err(p_dec, "SPS/PPS changed during playback and "
-                        "video size are different. Restart it !");
-                StopMediaCodec(p_dec);
-            } else
-            {
-                msg_Err(p_dec, "SPS/PPS changed during playback. Flush it");
-                if (DecodeFlush(p_dec) != VLC_SUCCESS)
-                    b_error = true;
-            }
-        }
-        if (b_csd_changed)
-            b_delayed_start = true;
-
-        /* try delayed opening if there is a new extra data */
-        if (!p_sys->api->b_started)
-        {
-            switch (p_dec->fmt_in.i_codec)
-            {
-            case VLC_CODEC_VC1:
-                if (p_dec->fmt_in.i_extra)
-                    b_delayed_start = true;
-            default:
-                break;
-            }
-            if (b_delayed_start && StartMediaCodec(p_dec) != VLC_SUCCESS)
-            {
-                b_error = true;
-                goto endclean;
-            }
-        }
-    }
-    if (!p_sys->api->b_started)
-        goto endclean;
-
-    /* Use the aspect ratio provided by the input (ie read from packetizer).
-     * Don't check the current value of the aspect ratio in fmt_out, since we
-     * want to allow changes in it to propagate. */
-    if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0
-     && (p_dec->fmt_out.video.i_sar_num != p_dec->fmt_in.video.i_sar_num ||
-         p_dec->fmt_out.video.i_sar_den != p_dec->fmt_in.video.i_sar_den))
-    {
-        p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
-        p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
-        p_sys->b_update_format = true;
     }
 
     do
@@ -1008,65 +1004,33 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         {
             i_input_ret = PutInput(p_dec, p_block, timeout);
             if (!p_sys->decoded)
-                    continue;
+                continue;
         }
 
         if (i_input_ret != -1 && p_sys->decoded && i_output_ret == 0)
         {
-            /* FIXME: A new picture shouldn't be created each time.
-             * If decoder_NewPicture fails because the decoder is
-             * flushing/exiting, GetOutput will either fail (or crash in
-             * function of devices), or never return an output buffer. Indeed,
-             * if the Decoder is flushing, MediaCodec can be stalled since the
-             * input is waiting for the output or vice-versa.  Therefore, call
-             * decoder_NewPicture before GetOutput as a safeguard. */
+            i_output_ret = pf_get_out(p_dec, pp_out_pic, pp_out_block,
+                                      &b_abort, timeout);
 
-            if (p_sys->b_has_format)
+            if (!p_sys->b_has_format && i_output_ret == 0 && i_input_ret == 0
+             && ++i_attempts > 100)
             {
-                if (p_sys->b_update_format)
-                {
-                    p_sys->b_update_format = false;
-                    if (decoder_UpdateVideoFormat(p_dec) != 0)
-                    {
-                        msg_Err(p_dec, "decoder_UpdateVideoFormat failed");
-                        b_error = true;
-                        break;
-                    }
-                }
-                p_pic = decoder_NewPicture(p_dec);
-                if (!p_pic) {
-                    msg_Warn(p_dec, "NewPicture failed");
-                    break;
-                }
-            }
-            i_output_ret = GetOutput(p_dec, p_pic, timeout);
-            if (p_pic)
-            {
-                if (i_output_ret != 1) {
-                    picture_Release(p_pic);
-                    p_pic = NULL;
-                }
-            } else
-            {
-                if (i_output_ret == 0 && i_input_ret == 0 && ++i_attempts > 100)
-                {
-                    /* No p_pic, so no format, thereforce mediacodec
-                     * didn't produce any output or events yet. Don't wait
-                     * indefinitely and abort after 2seconds (100 * 2 * 10ms)
-                     * without any data. Indeed, MediaCodec can fail without
-                     * throwing any exception or error returns... */
-                    msg_Err(p_dec, "No output/input for %lld ms, abort",
-                                    i_attempts * timeout);
-                    b_error = true;
-                    break;
-                }
+                /* No output and no format, thereforce mediacodec didn't
+                 * produce any output or events yet. Don't wait indefinitely
+                 * and abort after 2seconds (100 * 2 * 10ms) without any data.
+                 * Indeed, MediaCodec can fail without throwing any exception
+                 * or error returns... */
+                msg_Err(p_dec, "No output/input for %lld ms, abort",
+                                i_attempts * timeout);
+                b_error = true;
+                break;
             }
         }
         timeout = 10 * 1000; // 10 ms
         /* loop until either the input or the output are processed (i_input_ret
          * or i_output_ret == 1 ) or caused an error (i_input_ret or
          * i_output_ret == -1 )*/
-    } while (p_block && i_input_ret == 0 && i_output_ret == 0);
+    } while (p_block && i_input_ret == 0 && i_output_ret == 0 && !b_abort);
 
     if (i_input_ret == -1 || i_output_ret == -1)
     {
@@ -1082,7 +1046,7 @@ endclean:
      * couldn't process it (it happens in case or error or if MediaCodec is
      * still not opened). We also must release the current p_block if we were
      * able to process it. */
-    if (p_block && (p_pic == NULL || i_input_ret != 0))
+    if (p_block && (i_output_ret != 1 || i_input_ret != 0))
     {
         block_Release(p_block);
         *pp_block = NULL;
@@ -1094,5 +1058,100 @@ endclean:
         p_sys->error_state = true;
     }
 
-    return p_pic;
+    return b_error ? -1 : 0;
+}
+
+static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    bool b_csd_changed = false, b_size_changed = false;
+    bool b_delayed_start = false;
+
+    if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
+        && !p_sys->api->b_support_interlaced)
+        return -1;
+
+    if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
+    {
+        if (p_sys->decoded)
+        {
+            timestamp_FifoEmpty(p_sys->u.video.timestamp_fifo);
+            /* Invalidate all pictures that are currently in flight
+             * since flushing make all previous indices returned by
+             * MediaCodec invalid. */
+            if (p_sys->api->b_direct_rendering)
+                InvalidateAllPictures(p_dec);
+        }
+
+        if (DecodeFlush(p_dec) != VLC_SUCCESS)
+            return -1;
+        return 0;
+    }
+
+    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+        H264ProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
+    else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
+        HEVCProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
+
+    if (p_sys->api->b_started && b_csd_changed)
+    {
+        if (b_size_changed)
+        {
+            msg_Err(p_dec, "SPS/PPS changed during playback and "
+                    "video size are different. Restart it !");
+            StopMediaCodec(p_dec);
+        } else
+        {
+            msg_Err(p_dec, "SPS/PPS changed during playback. Flush it");
+            if (DecodeFlush(p_dec) != VLC_SUCCESS)
+                return -1;
+        }
+    }
+
+    if (b_csd_changed)
+        b_delayed_start = true;
+
+    /* try delayed opening if there is a new extra data */
+    if (!p_sys->api->b_started)
+    {
+        switch (p_dec->fmt_in.i_codec)
+        {
+        case VLC_CODEC_VC1:
+            if (p_dec->fmt_in.i_extra)
+                b_delayed_start = true;
+        default:
+            break;
+        }
+        if (b_delayed_start && StartMediaCodec(p_dec) != VLC_SUCCESS)
+            return -1;
+        if (!p_sys->api->b_started)
+            return 0;
+    }
+
+    timestamp_FifoPut(p_sys->u.video.timestamp_fifo,
+                      p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
+    return 1;
+}
+
+static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    picture_t *p_out = NULL;
+
+    /* Use the aspect ratio provided by the input (ie read from packetizer).
+     * Don't check the current value of the aspect ratio in fmt_out, since we
+     * want to allow changes in it to propagate. */
+    if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0
+     && (p_dec->fmt_out.video.i_sar_num != p_dec->fmt_in.video.i_sar_num ||
+         p_dec->fmt_out.video.i_sar_den != p_dec->fmt_in.video.i_sar_den))
+    {
+        p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
+        p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
+        p_sys->b_update_format = true;
+    }
+
+    if (DecodeCommon(p_dec, pp_block, Video_OnNewBlock, Video_GetOutput,
+                     &p_out, NULL))
+        return NULL;
+    return p_out;
 }
