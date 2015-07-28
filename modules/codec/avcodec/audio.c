@@ -313,7 +313,7 @@ static block_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         }
 
         assert( p_block->i_buffer >= (unsigned)used );
-        if( used > p_block->i_buffer )
+        if( (unsigned)used > p_block->i_buffer )
             used = p_block->i_buffer;
 
         p_block->p_buffer += used;
