@@ -151,7 +151,7 @@ static input_item_t *Browse(stream_t *p_stream)
         if( i_ret == -1 )
             return NULL;
 
-        input_item_t *p_item = input_item_New(psz_uri, archive_entry_pathname(p_entry));
+        p_item = input_item_New(psz_uri, archive_entry_pathname(p_entry));
         free( psz_uri );
         if(p_item == NULL)
             return NULL;
