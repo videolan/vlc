@@ -498,6 +498,21 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
             }
             return ret;
         }
+
+        case STREAM_GET_PRIVATE_BLOCK:
+        {
+            block_t **b = va_arg(args, block_t **);
+            bool *eof = va_arg(args, bool *);
+
+            if (priv->peek != NULL)
+            {
+                *b = priv->peek;
+                priv->peek = NULL;
+                *eof = false;
+                return VLC_SUCCESS;
+            }
+            return stream_ControlInternal(s, STREAM_GET_PRIVATE_BLOCK, b, eof);
+        }
     }
     return s->pf_control(s, cmd, args);
 }
