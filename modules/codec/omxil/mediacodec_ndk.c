@@ -296,8 +296,8 @@ static int Stop(mc_api *api)
 /*****************************************************************************
  * Start
  *****************************************************************************/
-static int Start(mc_api *api, AWindowHandler *p_awh, const char *psz_name,
-                 const char *psz_mime, int i_width, int i_height, int i_angle)
+static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
+                 union mc_api_args *p_args)
 {
     mc_api_sys *p_sys = api->p_sys;
     int i_ret = VLC_EGENERIC;
@@ -317,14 +317,22 @@ static int Start(mc_api *api, AWindowHandler *p_awh, const char *psz_name,
         goto error;
     }
 
-    syms.AMediaFormat.setString(p_sys->p_format, "mime", psz_mime);
-    syms.AMediaFormat.setInt32(p_sys->p_format, "width", i_width);
-    syms.AMediaFormat.setInt32(p_sys->p_format, "height", i_height);
-    syms.AMediaFormat.setInt32(p_sys->p_format, "rotation-degrees", i_angle);
     syms.AMediaFormat.setInt32(p_sys->p_format, "encoder", 0);
-
-    if (p_awh)
-        p_anw = AWindowHandler_getANativeWindow(p_awh, AWindow_Video);
+    syms.AMediaFormat.setString(p_sys->p_format, "mime", psz_mime);
+    if (api->b_video)
+    {
+        syms.AMediaFormat.setInt32(p_sys->p_format, "width", p_args->video.i_width);
+        syms.AMediaFormat.setInt32(p_sys->p_format, "height", p_args->video.i_height);
+        syms.AMediaFormat.setInt32(p_sys->p_format, "rotation-degrees", p_args->video.i_angle);
+        if (p_args->video.p_awh)
+            p_anw = AWindowHandler_getANativeWindow(p_args->video.p_awh,
+                                                    AWindow_Video);
+    }
+    else
+    {
+        syms.AMediaFormat.setInt32(p_sys->p_format, "sample-rate", p_args->audio.i_sample_rate);
+        syms.AMediaFormat.setInt32(p_sys->p_format, "channel-count", p_args->audio.i_channel_count);
+    }
 
     if (syms.AMediaCodec.configure(p_sys->p_codec, p_sys->p_format,
                                    p_anw, NULL, 0) != AMEDIA_OK)
@@ -456,15 +464,24 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
         AMediaFormat *format = syms.AMediaCodec.getOutputFormat(p_sys->p_codec);
 
         p_out->type = MC_OUT_TYPE_CONF;
-        p_out->u.conf.width = GetFormatInteger(format, "width");
-        p_out->u.conf.height = GetFormatInteger(format, "height");
-        p_out->u.conf.stride = GetFormatInteger(format, "stride");
-        p_out->u.conf.slice_height = GetFormatInteger(format, "slice-height");
-        p_out->u.conf.pixel_format = GetFormatInteger(format, "color-format");
-        p_out->u.conf.crop_left = GetFormatInteger(format, "crop-left");
-        p_out->u.conf.crop_top = GetFormatInteger(format, "crop-top");
-        p_out->u.conf.crop_right = GetFormatInteger(format, "crop-right");
-        p_out->u.conf.crop_bottom = GetFormatInteger(format, "crop-bottom");
+        if (api->b_video)
+        {
+            p_out->u.conf.video.width         = GetFormatInteger(format, "width");
+            p_out->u.conf.video.height        = GetFormatInteger(format, "height");
+            p_out->u.conf.video.stride        = GetFormatInteger(format, "stride");
+            p_out->u.conf.video.slice_height  = GetFormatInteger(format, "slice-height");
+            p_out->u.conf.video.pixel_format  = GetFormatInteger(format, "color-format");
+            p_out->u.conf.video.crop_left     = GetFormatInteger(format, "crop-left");
+            p_out->u.conf.video.crop_top      = GetFormatInteger(format, "crop-top");
+            p_out->u.conf.video.crop_right    = GetFormatInteger(format, "crop-right");
+            p_out->u.conf.video.crop_bottom   = GetFormatInteger(format, "crop-bottom");
+        }
+        else
+        {
+            p_out->u.conf.audio.channel_count = GetFormatInteger(format, "channel-count");
+            p_out->u.conf.audio.channel_mask  = GetFormatInteger(format, "channel-mask");
+            p_out->u.conf.audio.sample_rate   = GetFormatInteger(format, "sample-rate");
+        }
         return 1;
     }
     else if (i_index == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED

@@ -50,18 +50,43 @@ struct mc_api_out
             const void *p_ptr;
             int i_size;
         } buf;
-        struct
+        union
         {
-            int width, height;
-            int stride;
-            int slice_height;
-            int pixel_format;
-            int crop_left;
-            int crop_top;
-            int crop_right;
-            int crop_bottom;
+            struct
+            {
+                int width, height;
+                int stride;
+                int slice_height;
+                int pixel_format;
+                int crop_left;
+                int crop_top;
+                int crop_right;
+                int crop_bottom;
+            } video;
+            struct
+            {
+                int channel_count;
+                int channel_mask;
+                int sample_rate;
+            } audio;
         } conf;
     } u;
+};
+
+union mc_api_args
+{
+    struct
+    {
+        AWindowHandler *p_awh;
+        int i_width;
+        int i_height;
+        int i_angle;
+    } video;
+    struct
+    {
+        int i_sample_rate;
+        int i_channel_count;
+    } audio;
 };
 
 struct mc_api
@@ -71,12 +96,13 @@ struct mc_api
     mc_api_sys *p_sys;
 
     bool b_started;
+    bool b_video;
     bool b_direct_rendering;
     bool b_support_interlaced;
 
     void (*clean)(mc_api *);
-    int (*start)(mc_api *, AWindowHandler *p_awh, const char *psz_name,
-                 const char *psz_mime, int i_width, int i_height, int i_angle);
+    int (*start)(mc_api *, const char *psz_name, const char *psz_mime,
+                 union mc_api_args *p_args);
     int (*stop)(mc_api *);
     int (*flush)(mc_api *);
     int (*put_in)(mc_api *, const void *p_buf, size_t i_size,

@@ -339,9 +339,10 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
 static int StartMediaCodec(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_angle = 0, i_ret;
+    int i_ret;
     size_t h264_profile = 0;
     char *psz_name = NULL;
+    union mc_api_args args;
 
     if (p_dec->fmt_in.i_extra && !p_sys->p_csd)
     {
@@ -393,27 +394,30 @@ static int StartMediaCodec(decoder_t *p_dec)
 
         p_sys->i_csd_send = 0;
     }
+
     if (!p_sys->i_width || !p_sys->i_height)
     {
         msg_Err(p_dec, "invalid size, abort MediaCodec");
         return VLC_EGENERIC;
     }
+    args.video.i_width = p_sys->i_width;
+    args.video.i_height = p_sys->i_height;
 
-    if ( p_dec->fmt_in.video.orientation != ORIENT_NORMAL)
+    if (p_dec->fmt_in.video.orientation != ORIENT_NORMAL)
     {
         switch (p_dec->fmt_in.video.orientation)
         {
             case ORIENT_ROTATED_90:
-                i_angle = 90;
+                args.video.i_angle = 90;
                 break;
             case ORIENT_ROTATED_180:
-                i_angle = 180;
+                args.video.i_angle = 180;
                 break;
             case ORIENT_ROTATED_270:
-                i_angle = 270;
+                args.video.i_angle = 270;
                 break;
             default:
-                i_angle = 0;
+                args.video.i_angle = 0;
         }
     }
 
@@ -426,8 +430,8 @@ static int StartMediaCodec(decoder_t *p_dec)
 
     if (!p_sys->p_awh && var_InheritBool(p_dec, CFG_PREFIX "dr"))
         p_sys->p_awh = AWindowHandler_new(VLC_OBJECT(p_dec));
-    i_ret = p_sys->api->start(p_sys->api, p_sys->p_awh, psz_name, p_sys->mime,
-                              p_sys->i_width, p_sys->i_height, i_angle);
+    args.video.p_awh = p_sys->p_awh;
+    i_ret = p_sys->api->start(p_sys->api, psz_name, p_sys->mime, &args);
 
     if (i_ret == VLC_SUCCESS)
     {
@@ -510,6 +514,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     if (!api)
         return VLC_ENOMEM;
     api->p_obj = p_this;
+    api->b_video = p_dec->fmt_in.i_cat == VIDEO_ES;
     if (pf_init(api) != VLC_SUCCESS)
     {
         free(api);
@@ -778,7 +783,7 @@ static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
         return 1;
     } else {
         assert(out.type == MC_OUT_TYPE_CONF);
-        p_sys->pixel_format = out.u.conf.pixel_format;
+        p_sys->pixel_format = out.u.conf.video.pixel_format;
         ArchitectureSpecificCopyHooksDestroy(p_sys->pixel_format,
                                              &p_sys->architecture_specific_data);
 
@@ -792,33 +797,33 @@ static int GetOutput(decoder_t *p_dec, picture_t *p_pic,
         }
 
         msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
-                p_sys->pixel_format, name, out.u.conf.width, out.u.conf.height,
-                out.u.conf.stride, out.u.conf.slice_height,
-                out.u.conf.crop_left, out.u.conf.crop_top,
-                out.u.conf.crop_right, out.u.conf.crop_bottom);
+                p_sys->pixel_format, name, out.u.conf.video.width, out.u.conf.video.height,
+                out.u.conf.video.stride, out.u.conf.video.slice_height,
+                out.u.conf.video.crop_left, out.u.conf.video.crop_top,
+                out.u.conf.video.crop_right, out.u.conf.video.crop_bottom);
 
-        p_dec->fmt_out.video.i_width = out.u.conf.crop_right + 1 - out.u.conf.crop_left;
-        p_dec->fmt_out.video.i_height = out.u.conf.crop_bottom + 1 - out.u.conf.crop_top;
+        p_dec->fmt_out.video.i_width = out.u.conf.video.crop_right + 1 - out.u.conf.video.crop_left;
+        p_dec->fmt_out.video.i_height = out.u.conf.video.crop_bottom + 1 - out.u.conf.video.crop_top;
         if (p_dec->fmt_out.video.i_width <= 1
             || p_dec->fmt_out.video.i_height <= 1) {
-            p_dec->fmt_out.video.i_width = out.u.conf.width;
-            p_dec->fmt_out.video.i_height = out.u.conf.height;
+            p_dec->fmt_out.video.i_width = out.u.conf.video.width;
+            p_dec->fmt_out.video.i_height = out.u.conf.video.height;
         }
         p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
         p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
 
-        p_sys->stride = out.u.conf.stride;
-        p_sys->slice_height = out.u.conf.slice_height;
+        p_sys->stride = out.u.conf.video.stride;
+        p_sys->slice_height = out.u.conf.video.slice_height;
         if (p_sys->stride <= 0)
-            p_sys->stride = out.u.conf.width;
+            p_sys->stride = out.u.conf.video.width;
         if (p_sys->slice_height <= 0)
-            p_sys->slice_height = out.u.conf.height;
+            p_sys->slice_height = out.u.conf.video.height;
 
-        ArchitectureSpecificCopyHooks(p_dec, out.u.conf.pixel_format,
-                                      out.u.conf.slice_height,
+        ArchitectureSpecificCopyHooks(p_dec, out.u.conf.video.pixel_format,
+                                      out.u.conf.video.slice_height,
                                       p_sys->stride, &p_sys->architecture_specific_data);
         if (p_sys->pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
-            p_sys->slice_height -= out.u.conf.crop_top/2;
+            p_sys->slice_height -= out.u.conf.video.crop_top/2;
         if (IgnoreOmxDecoderPadding(p_sys->psz_name)) {
             p_sys->slice_height = 0;
             p_sys->stride = p_dec->fmt_out.video.i_width;

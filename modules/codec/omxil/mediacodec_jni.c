@@ -62,7 +62,8 @@ struct jfields
     jmethodID get_output_buffers, get_output_buffer;
     jmethodID dequeue_input_buffer, dequeue_output_buffer, queue_input_buffer;
     jmethodID release_output_buffer;
-    jmethodID create_video_format, set_integer, set_bytebuffer, get_integer;
+    jmethodID create_video_format, create_audio_format;
+    jmethodID set_integer, set_bytebuffer, get_integer;
     jmethodID buffer_info_ctor;
     jfieldID size_field, offset_field, pts_field;
 };
@@ -130,6 +131,7 @@ static const struct member members[] = {
     { "releaseOutputBuffer", "(IZ)V", "android/media/MediaCodec", OFF(release_output_buffer), METHOD, true },
 
     { "createVideoFormat", "(Ljava/lang/String;II)Landroid/media/MediaFormat;", "android/media/MediaFormat", OFF(create_video_format), STATIC_METHOD, true },
+    { "createAudioFormat", "(Ljava/lang/String;II)Landroid/media/MediaFormat;", "android/media/MediaFormat", OFF(create_audio_format), STATIC_METHOD, true },
     { "setInteger", "(Ljava/lang/String;I)V", "android/media/MediaFormat", OFF(set_integer), METHOD, true },
     { "getInteger", "(Ljava/lang/String;)I", "android/media/MediaFormat", OFF(get_integer), METHOD, true },
     { "setByteBuffer", "(Ljava/lang/String;Ljava/nio/ByteBuffer;)V", "android/media/MediaFormat", OFF(set_bytebuffer), METHOD, true },
@@ -457,13 +459,13 @@ static int Stop(mc_api *api)
 /*****************************************************************************
  * Start
  *****************************************************************************/
-static int Start(mc_api *api, AWindowHandler *p_awh, const char *psz_name,
-                 const char *psz_mime, int i_width, int i_height, int i_angle)
+static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
+                 union mc_api_args *p_args)
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv* env = NULL;
     int i_ret = VLC_EGENERIC;
-    bool b_direct_rendering;
+    bool b_direct_rendering = false;
     jstring jmime = NULL;
     jstring jcodec_name = NULL;
     jobject jcodec = NULL;
@@ -494,31 +496,45 @@ static int Start(mc_api *api, AWindowHandler *p_awh, const char *psz_name,
     }
     p_sys->codec = (*env)->NewGlobalRef(env, jcodec);
 
-    jformat = (*env)->CallStaticObjectMethod(env, jfields.media_format_class,
-                                             jfields.create_video_format, jmime,
-                                             i_width, i_height);
+    if (api->b_video)
+    {
+        jformat = (*env)->CallStaticObjectMethod(env,
+                                                 jfields.media_format_class,
+                                                 jfields.create_video_format,
+                                                 jmime,
+                                                 p_args->video.i_width,
+                                                 p_args->video.i_height);
+        if (p_args->video.p_awh)
+            jsurface = AWindowHandler_getSurface(p_args->video.p_awh,
+                                                 AWindow_Video);
+        b_direct_rendering = !!jsurface;
 
-    if (p_awh)
-        jsurface = AWindowHandler_getSurface(p_awh, AWindow_Video);
-    b_direct_rendering = !!jsurface;
+        /* There is no way to rotate the video using direct rendering (and
+         * using a SurfaceView) before  API 21 (Lollipop). Therefore, we
+         * deactivate direct rendering if video doesn't have a normal rotation
+         * and if get_input_buffer method is not present (This method exists
+         * since API 21). */
+        if (b_direct_rendering && p_args->video.i_angle != 0
+         && !jfields.get_input_buffer)
+            b_direct_rendering = false;
 
-    /* There is no way to rotate the video using direct rendering (and using a
-     * SurfaceView) before  API 21 (Lollipop). Therefore, we deactivate direct
-     * rendering if video doesn't have a normal rotation and if
-     * get_input_buffer method is not present (This method exists since API
-     * 21). */
-    if (b_direct_rendering && i_angle != 0 && !jfields.get_input_buffer)
-        b_direct_rendering = false;
+        if (b_direct_rendering && p_args->video.i_angle != 0)
+            jrotation_string = (*env)->NewStringUTF(env, "rotation-degrees");
+            (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
+                                   jrotation_string, p_args->video.i_angle);
+    }
+    else
+    {
+        jformat = (*env)->CallStaticObjectMethod(env,
+                                                 jfields.media_format_class,
+                                                 jfields.create_audio_format,
+                                                 jmime,
+                                                 p_args->audio.i_sample_rate,
+                                                 p_args->audio.i_channel_count);
+    }
 
     if (b_direct_rendering)
     {
-        if (i_angle != 0)
-        {
-            jrotation_string = (*env)->NewStringUTF(env, "rotation-degrees");
-            (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
-                                   jrotation_string, i_angle);
-        }
-
         // Configure MediaCodec with the Android surface.
         (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure,
                                jformat, jsurface, NULL, 0);
@@ -769,15 +785,24 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
         (*env)->ReleaseStringUTFChars(env, format_string, format_ptr);
 
         p_out->type = MC_OUT_TYPE_CONF;
-        p_out->u.conf.width         = GET_INTEGER(format, "width");
-        p_out->u.conf.height        = GET_INTEGER(format, "height");
-        p_out->u.conf.stride        = GET_INTEGER(format, "stride");
-        p_out->u.conf.slice_height  = GET_INTEGER(format, "slice-height");
-        p_out->u.conf.pixel_format  = GET_INTEGER(format, "color-format");
-        p_out->u.conf.crop_left     = GET_INTEGER(format, "crop-left");
-        p_out->u.conf.crop_top      = GET_INTEGER(format, "crop-top");
-        p_out->u.conf.crop_right    = GET_INTEGER(format, "crop-right");
-        p_out->u.conf.crop_bottom   = GET_INTEGER(format, "crop-bottom");
+        if (api->b_video)
+        {
+            p_out->u.conf.video.width         = GET_INTEGER(format, "width");
+            p_out->u.conf.video.height        = GET_INTEGER(format, "height");
+            p_out->u.conf.video.stride        = GET_INTEGER(format, "stride");
+            p_out->u.conf.video.slice_height  = GET_INTEGER(format, "slice-height");
+            p_out->u.conf.video.pixel_format  = GET_INTEGER(format, "color-format");
+            p_out->u.conf.video.crop_left     = GET_INTEGER(format, "crop-left");
+            p_out->u.conf.video.crop_top      = GET_INTEGER(format, "crop-top");
+            p_out->u.conf.video.crop_right    = GET_INTEGER(format, "crop-right");
+            p_out->u.conf.video.crop_bottom   = GET_INTEGER(format, "crop-bottom");
+        }
+        else
+        {
+            p_out->u.conf.audio.channel_count = GET_INTEGER(format, "channel-count");
+            p_out->u.conf.audio.channel_mask = GET_INTEGER(format, "channel-mask");
+            p_out->u.conf.audio.sample_rate = GET_INTEGER(format, "sample-rate");
+        }
 
         (*env)->DeleteLocalRef(env, format);
         return 1;
