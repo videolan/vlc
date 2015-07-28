@@ -47,6 +47,7 @@
 
 class QMenu;
 class QSlider;
+class QWidgetAction;
 class SpeedControlWidget;
 struct vout_window_t;
 
@@ -232,6 +233,7 @@ private:
     QMenu *speedControlMenu;
     QString tooltipStringPattern;
     SpeedControlWidget *speedControl;
+    QWidgetAction *widgetAction;
 };
 
 /******************** Speed Control Widgets ****************/

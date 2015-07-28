@@ -486,7 +486,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
     speedControl = new SpeedControlWidget( p_intf, this );
     speedControlMenu = new QMenu( this );
 
-    QWidgetAction *widgetAction = new QWidgetAction( speedControl );
+    widgetAction = new QWidgetAction( speedControl );
     widgetAction->setDefaultWidget( speedControl );
     speedControlMenu->addAction( widgetAction );
 
@@ -502,6 +502,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, QWidget *parent )
 
 SpeedLabel::~SpeedLabel()
 {
+    widgetAction->setParent( this );
     delete speedControlMenu;
 }
 
