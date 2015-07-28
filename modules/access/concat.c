@@ -214,7 +214,7 @@ static int Open(vlc_object_t *obj)
 {
     access_t *access = (access_t *)obj;
 
-    char *list = var_InheritString(access, "concat-list");
+    char *list = var_CreateGetNonEmptyString(access, "concat-list");
     if (list == NULL)
         return VLC_EGENERIC;
 
@@ -224,6 +224,8 @@ static int Open(vlc_object_t *obj)
         free(list);
         return VLC_ENOMEM;
     }
+
+    var_SetString(access, "concat-list", ""); /* prevent recursion */
 
     bool read_cb = true;
 
@@ -318,6 +320,7 @@ static void Close(vlc_object_t *obj)
         free(e);
     }
 
+    var_Destroy(access, "concat-list");
     free(sys);
 }
 
