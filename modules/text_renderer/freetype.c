@@ -43,6 +43,7 @@
 #include <vlc_dialog.h>                        /* FcCache dialog */
 #include <vlc_filter.h>                                      /* filter_sys_t */
 #include <vlc_text_style.h>                                   /* text_style_t*/
+#include <vlc_charset.h>
 
 /* Freetype */
 #include <ft2build.h>
@@ -907,6 +908,96 @@ static xml_reader_t *GetXMLReader( filter_t *p_filter, stream_t *p_sub )
     return p_xml_reader;
 }
 
+static text_style_t* ApplyDefaultStyle( filter_sys_t *p_sys, text_style_t* p_original_style )
+{
+    text_style_t *p_style = p_original_style;
+    if ( !p_style )
+    {
+        p_style = text_style_New();
+        if ( unlikely( !p_style ) )
+            return NULL;
+        p_style->i_font_color = p_sys->style.i_font_color & 0x00FFFFFF;
+        p_style->i_font_alpha = (p_sys->style.i_font_alpha & 0xFF000000) >> 24;
+        p_style->i_karaoke_background_color = p_sys->style.i_karaoke_background_color;
+        p_style->i_karaoke_background_alpha = p_sys->style.i_karaoke_background_alpha;
+        p_style->i_style_flags = p_sys->style.i_style_flags;
+    }
+    if ( !p_style->psz_fontname )
+        p_style->psz_fontname = strdup( p_sys->style.psz_fontname );
+    if ( !p_style->psz_monofontname )
+        p_style->psz_monofontname = strdup( p_sys->style.psz_monofontname );
+    if ( !p_style->psz_fontname || !p_style->psz_monofontname )
+    {
+        free( p_style->psz_fontname );
+        free( p_style->psz_monofontname );
+        if ( !p_original_style )
+            free( p_style );
+        return NULL;
+    }
+    if ( !p_style->i_font_size )
+        p_style->i_font_size = p_sys->style.i_font_size;
+    return p_style;
+}
+
+static uni_char_t* SegmentsToTextAndStyles( filter_sys_t *p_sys, const text_segment_t *p_segment, size_t *pi_string_length, text_style_t ***ppp_styles)
+{
+    text_style_t **pp_styles = NULL;
+    uni_char_t *psz_uni = NULL;
+    size_t i_size = 0;
+    size_t i_nb_char = 0;
+    for ( const text_segment_t *s = p_segment; s != NULL; s = s->p_next )
+    {
+        //FIXME: This is missing a space in between segments.
+        if ( !s->psz_text )
+            continue;
+        size_t i_string_bytes = 0;
+        uni_char_t *psz_tmp = ToCharset( FREETYPE_TO_UCS, s->psz_text, &i_string_bytes );
+        if ( !psz_tmp )
+        {
+            free( psz_uni );
+            free( pp_styles );
+            return NULL;
+        }
+        uni_char_t *psz_realloc = realloc(psz_uni, i_size + i_string_bytes);
+        if ( unlikely( !psz_realloc ) )
+        {
+            free( pp_styles );
+            free( psz_uni );
+            free( psz_tmp );
+            return NULL;
+        }
+        psz_uni = psz_realloc;
+        memcpy( psz_uni + i_nb_char, psz_tmp, i_string_bytes );
+        free( psz_tmp );
+        // We want one text_style_t* per character. The amount of characters is the number of bytes divided by
+        // the size of one glyph, in byte
+        text_style_t **pp_styles_realloc = realloc( pp_styles, ( (i_size + i_string_bytes) / sizeof( *psz_uni ) * sizeof( *pp_styles ) ) );
+        if ( unlikely( !pp_styles_realloc ) )
+        {
+            free( pp_styles );
+            free( psz_uni );
+            return NULL;
+        }
+        pp_styles = pp_styles_realloc;
+        // We're actually writing to a read only object, something's wrong with the conception.
+        text_style_t *p_style = ApplyDefaultStyle( p_sys, s->style );
+        if ( p_style == NULL )
+        {
+            free( pp_styles );
+            free( psz_uni );
+            return NULL;
+        }
+        // i_string_bytes is a number of bytes, while here we're going to assign pointer by pointer
+        for ( size_t i = 0; i < i_string_bytes / sizeof( *psz_uni ); ++i )
+            pp_styles[i_nb_char + i] = p_style;
+        i_size += i_string_bytes;
+        i_nb_char = i_size / sizeof( *psz_uni );
+    }
+    *pi_string_length = i_nb_char;
+    *ppp_styles = pp_styles;
+    return psz_uni;
+}
+
 /**
  * This function renders a text subpicture region into another one.
  * It also calculates the size needed for this string, and renders the
@@ -925,7 +1016,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     text_style_t **pp_styles = NULL;
     size_t i_text_length = 0;
 
-    uni_char_t *psz_text = SegmentsToTextAndStyles( p_region_in->p_text, &i_text_length, &pp_styles );
+    uni_char_t *psz_text = SegmentsToTextAndStyles( p_sys, p_region_in->p_text, &i_text_length, &pp_styles );
 
     if( !psz_text || !pp_styles )
     {
@@ -1003,11 +1094,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     FreeLines( p_lines );
 
     free( psz_text );
-    for( size_t i = 0; i < i_text_length; i++ )
-    {
-        if( pp_styles[i] && ( i + 1 == i_text_length || pp_styles[i] != pp_styles[i + 1] ) )
-            text_style_Delete( pp_styles[i] );
-    }
+    // Let the styles themselves be freed by the text_segment's release
     free( pp_styles );
     free( pi_k_durations );
 
