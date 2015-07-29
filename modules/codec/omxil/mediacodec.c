@@ -171,6 +171,8 @@ struct decoder_sys_t
             date_t i_end_date;
             int i_channels;
             bool b_extract;
+            /* Some audio decoders need a valid channel count */
+            bool b_need_channels;
             int pi_extraction[AOUT_CHAN_MAX];
         } audio;
     } u;
@@ -552,13 +554,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     }
     else
     {
-        if (!p_dec->fmt_in.audio.i_channels)
-        {
-            /* MediaCodec assert if number of channels is 0 */
-            msg_Dbg(p_dec, "no channels, abort MediaCodec");
-            return VLC_EGENERIC;
-        }
-
         switch (p_dec->fmt_in.i_codec) {
         case VLC_CODEC_AMR_NB: mime = "audio/3gpp"; break;
         case VLC_CODEC_AMR_WB: mime = "audio/amr-wb"; break;
@@ -674,6 +669,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             return VLC_EGENERIC;
         }
 
+        /* Marvel ACodec assert if channel count is 0 */
+        if (!strncmp(p_sys->psz_name, "OMX.Marvell",
+                     __MIN(strlen(p_sys->psz_name), strlen("OMX.Marvell"))))
+            p_sys->u.audio.b_need_channels = true;
+
         /* Check if we need late opening */
         switch (p_dec->fmt_in.i_codec)
         {
@@ -686,6 +686,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
                 return VLC_SUCCESS;
             }
             break;
+        }
+        if (!p_sys->u.audio.i_channels && p_sys->u.audio.b_need_channels)
+        {
+            msg_Warn(p_dec, "waiting for valid channel count");
+            return VLC_SUCCESS;
         }
     }
 
@@ -1415,6 +1420,16 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block)
         default:
             break;
         }
+        if (!p_dec->p_sys->u.audio.i_channels && p_dec->fmt_in.audio.i_channels)
+        {
+            p_dec->p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
+            b_delayed_start = true;
+        }
+
+        if (b_delayed_start && !p_dec->p_sys->u.audio.i_channels
+         && p_sys->u.audio.b_need_channels)
+            b_delayed_start = false;
+
         if (b_delayed_start && StartMediaCodec(p_dec) != VLC_SUCCESS)
             return -1;
         if (!p_sys->api->b_started)
