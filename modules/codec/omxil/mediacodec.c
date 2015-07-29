@@ -511,6 +511,7 @@ static void StopMediaCodec(decoder_t *p_dec)
 static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
+    decoder_sys_t *p_sys;
     mc_api *api;
     const char *mime = NULL;
 
@@ -594,13 +595,14 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if ((p_dec->p_sys = calloc(1, sizeof(*p_dec->p_sys))) == NULL)
+    if ((p_sys = calloc(1, sizeof(*p_sys))) == NULL)
     {
         api->clean(api);
         free(api);
         return VLC_ENOMEM;
     }
-    p_dec->p_sys->api = api;
+    p_sys->api = api;
+    p_dec->p_sys = p_sys;
 
     p_dec->pf_decode_video = DecodeVideo;
     p_dec->pf_decode_audio = DecodeAudio;
@@ -609,16 +611,16 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     p_dec->fmt_out.video = p_dec->fmt_in.video;
     p_dec->fmt_out.audio = p_dec->fmt_in.audio;
     p_dec->b_need_packetized = true;
-    p_dec->p_sys->mime = mime;
-    p_dec->p_sys->b_new_block = true;
+    p_sys->mime = mime;
+    p_sys->b_new_block = true;
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
-        p_dec->p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
-        p_dec->p_sys->u.video.i_height = p_dec->fmt_in.video.i_height;
+        p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
+        p_sys->u.video.i_height = p_dec->fmt_in.video.i_height;
 
-        p_dec->p_sys->u.video.timestamp_fifo = timestamp_FifoNew(32);
-        if (!p_dec->p_sys->u.video.timestamp_fifo)
+        p_sys->u.video.timestamp_fifo = timestamp_FifoNew(32);
+        if (!p_sys->u.video.timestamp_fifo)
         {
             CloseDecoder(p_this);
             return VLC_ENOMEM;
@@ -627,7 +629,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         switch (p_dec->fmt_in.i_codec)
         {
         case VLC_CODEC_H264:
-            if (!p_dec->p_sys->u.video.i_width || !p_dec->p_sys->u.video.i_height)
+            if (!p_sys->u.video.i_width || !p_sys->u.video.i_height)
             {
                 msg_Warn(p_dec, "waiting for sps/pps for codec %4.4s",
                          (const char *)&p_dec->fmt_in.i_codec);
@@ -645,7 +647,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     }
     else
     {
-        p_dec->p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
+        p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
 
         switch (p_dec->fmt_in.i_codec)
         {
