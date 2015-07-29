@@ -38,6 +38,7 @@
 #include <vlc_block_helper.h>
 #include <vlc_cpu.h>
 #include <vlc_memory.h>
+#include <vlc_timestamp_helper.h>
 
 #include "mediacodec.h"
 #include "../../packetizer/h264_nal.h"
@@ -50,80 +51,6 @@
 
 /* JNI functions to get/set an Android Surface object. */
 extern void jni_EventHardwareAccelerationError(); // TODO REMOVE
-
-/* Implementation of a circular buffer of timestamps with overwriting
- * of older values. MediaCodec has only one type of timestamp, if a
- * block has no PTS, we send the DTS instead. Some hardware decoders
- * cannot cope with this situation and output the frames in the wrong
- * order. As a workaround in this case, we use a FIFO of timestamps in
- * order to remember which input packets had no PTS.  Since an
- * hardware decoder can silently drop frames, this might cause a
- * growing desynchronization with the actual timestamp. Thus the
- * circular buffer has a limited size and will overwrite older values.
- */
-typedef struct
-{
-    uint32_t          begin;
-    uint32_t          size;
-    uint32_t          capacity;
-    int64_t           *buffer;
-} timestamp_fifo_t;
-
-static timestamp_fifo_t *timestamp_FifoNew(uint32_t capacity)
-{
-    timestamp_fifo_t *fifo = calloc(1, sizeof(*fifo));
-    if (!fifo)
-        return NULL;
-    fifo->buffer = malloc(capacity * sizeof(*fifo->buffer));
-    if (!fifo->buffer) {
-        free(fifo);
-        return NULL;
-    }
-    fifo->capacity = capacity;
-    return fifo;
-}
-
-static void timestamp_FifoRelease(timestamp_fifo_t *fifo)
-{
-    free(fifo->buffer);
-    free(fifo);
-}
-
-static bool timestamp_FifoIsEmpty(timestamp_fifo_t *fifo)
-{
-    return fifo->size == 0;
-}
-
-static bool timestamp_FifoIsFull(timestamp_fifo_t *fifo)
-{
-    return fifo->size == fifo->capacity;
-}
-
-static void timestamp_FifoEmpty(timestamp_fifo_t *fifo)
-{
-    fifo->size = 0;
-}
-
-static void timestamp_FifoPut(timestamp_fifo_t *fifo, int64_t ts)
-{
-    uint32_t end = (fifo->begin + fifo->size) % fifo->capacity;
-    fifo->buffer[end] = ts;
-    if (!timestamp_FifoIsFull(fifo))
-        fifo->size += 1;
-    else
-        fifo->begin = (fifo->begin + 1) % fifo->capacity;
-}
-
-static int64_t timestamp_FifoGet(timestamp_fifo_t *fifo)
-{
-    if (timestamp_FifoIsEmpty(fifo))
-        return VLC_TS_INVALID;
-
-    int64_t result = fifo->buffer[fifo->begin];
-    fifo->begin = (fifo->begin + 1) % fifo->capacity;
-    fifo->size -= 1;
-    return result;
-}
 
 /* Codec Specific Data */
 struct csd
