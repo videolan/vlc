@@ -1126,14 +1126,13 @@ static void H264ProcessBlock(decoder_t *p_dec, block_t *p_block,
                              bool *p_csd_changed, bool *p_size_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    struct H264ConvertState convert_state = { 0, 0 };
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_H264 && p_block);
 
     if (p_sys->u.video.i_nal_size)
     {
         convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->u.video.i_nal_size, &convert_state);
+                               p_sys->u.video.i_nal_size);
     } else if (H264SetCSD(p_dec, p_block->p_buffer, p_block->i_buffer,
                           p_size_changed) == VLC_SUCCESS)
     {
@@ -1145,14 +1144,13 @@ static void HEVCProcessBlock(decoder_t *p_dec, block_t *p_block,
                              bool *p_csd_changed, bool *p_size_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    struct H264ConvertState convert_state = { 0, 0 };
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && p_block);
 
     if (p_sys->u.video.i_nal_size)
     {
         convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->u.video.i_nal_size, &convert_state);
+                               p_sys->u.video.i_nal_size);
     }
 
     /* TODO */

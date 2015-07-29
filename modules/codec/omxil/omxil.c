@@ -1430,7 +1430,6 @@ static int DecodeVideoInput( decoder_t *p_dec, OmxPort *p_port, block_t **pp_blo
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     OMX_BUFFERHEADERTYPE *p_header;
-    struct H264ConvertState convert_state = { 0, 0 };
     block_t *p_block = *pp_block;
 
     /* Send the input buffer to the component */
@@ -1486,7 +1485,7 @@ static int DecodeVideoInput( decoder_t *p_dec, OmxPort *p_port, block_t **pp_blo
          * i_nal_size_length == 0, which is the case for codecs other
          * than H.264 */
         convert_h264_to_annexb( p_header->pBuffer, p_header->nFilledLen,
-                                p_sys->i_nal_size_length, &convert_state );
+                                p_sys->i_nal_size_length);
         OMX_DBG( "EmptyThisBuffer %p, %p, %i, %"PRId64, p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen, FromOmxTicks(p_header->nTimeStamp) );
         OMX_EmptyThisBuffer(p_port->omx_handle, p_header);

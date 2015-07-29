@@ -120,15 +120,8 @@ int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
                      uint32_t *p_nal_size);
 
-/* Convert H.264 NAL format to annex b in-place */
-struct H264ConvertState {
-    uint32_t nal_len;
-    uint32_t nal_pos;
-};
-
 void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
-                             size_t i_nal_size,
-                             struct H264ConvertState *state );
+                             size_t i_nal_size );
 
 /* Get the SPS/PPS pointers from an Annex B buffer
  * Returns 0 if a SPS and/or a PPS is found */

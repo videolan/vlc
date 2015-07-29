@@ -575,8 +575,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
     {
         /* in-place NAL to annex B conversion. */
-        struct H264ConvertState convert_state = { 0, 0 };
-        convert_h264_to_annexb(buffer_start, p_block->i_buffer, p_sys->nal_size, &convert_state);
+        convert_h264_to_annexb(buffer_start, p_block->i_buffer, p_sys->nal_size);
     }
 
     hr = IMFMediaBuffer_Unlock(input_media_buffer);

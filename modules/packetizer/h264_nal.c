@@ -102,40 +102,41 @@ int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
 }
 
 void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
-                             size_t i_nal_size,
-                             struct H264ConvertState *state )
+                             size_t i_nal_size )
 {
+    uint32_t nal_len = 0, nal_pos = 0;
+
     if( i_nal_size < 3 || i_nal_size > 4 )
         return;
 
     /* This only works for NAL sizes 3-4 */
     while( i_len > 0 )
     {
-        if( state->nal_pos < i_nal_size ) {
+        if( nal_pos < i_nal_size ) {
             unsigned int i;
-            for( i = 0; state->nal_pos < i_nal_size && i < i_len; i++, state->nal_pos++ ) {
-                state->nal_len = (state->nal_len << 8) | p_buf[i];
+            for( i = 0; nal_pos < i_nal_size && i < i_len; i++, nal_pos++ ) {
+                nal_len = (nal_len << 8) | p_buf[i];
                 p_buf[i] = 0;
             }
-            if( state->nal_pos < i_nal_size )
+            if( nal_pos < i_nal_size )
                 return;
             p_buf[i - 1] = 1;
             p_buf += i;
             i_len -= i;
         }
-        if( state->nal_len > INT_MAX )
+        if( nal_len > INT_MAX )
             return;
-        if( state->nal_len > i_len )
+        if( nal_len > i_len )
         {
-            state->nal_len -= i_len;
+            nal_len -= i_len;
             return;
         }
         else
         {
-            p_buf += state->nal_len;
-            i_len -= state->nal_len;
-            state->nal_len = 0;
-            state->nal_pos = 0;
+            p_buf += nal_len;
+            i_len -= nal_len;
+            nal_len = 0;
+            nal_pos = 0;
         }
     }
 }
