@@ -502,8 +502,6 @@ static void StopMediaCodec(decoder_t *p_dec)
     if (p_sys->api->b_direct_rendering)
         InvalidateAllPictures(p_dec);
 
-    p_sys->psz_name = NULL;
-
     p_sys->api->stop(p_sys->api);
     if (p_dec->fmt_in.i_cat == VIDEO_ES && p_sys->u.video.p_awh)
     {
