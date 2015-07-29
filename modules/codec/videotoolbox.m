@@ -97,6 +97,7 @@ struct decoder_sys_t
     size_t                      codec_level;
 
     bool                        b_started;
+    bool                        b_is_avcc;
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
 
@@ -251,6 +252,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 
         if (p_block == NULL) {
             int buf_size = p_dec->fmt_in.i_extra + 20;
+            uint32_t i_nal_size = 0;
             size = p_dec->fmt_in.i_extra;
 
             p_buf = malloc(buf_size);
@@ -262,13 +264,14 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 
             /* we need to convert the SPS and PPS units we received from the
              * demuxer's avvC atom so we can process them further */
-            i_ret = convert_sps_pps(p_dec,
-                                    p_dec->fmt_in.p_extra,
-                                    p_dec->fmt_in.i_extra,
-                                    p_buf,
-                                    buf_size,
-                                    &size,
-                                    NULL);
+            if (convert_sps_pps(p_dec,
+                                p_dec->fmt_in.p_extra,
+                                p_dec->fmt_in.i_extra,
+                                p_buf,
+                                buf_size,
+                                &size,
+                                &i_nal_size) == VLC_SUCCESS)
+                p_sys->b_is_avcc = i_nal_size > 0;
         } else {
             /* we are mid-stream, let's have the h264_get helper see if it
              * can find a NAL unit */
@@ -605,6 +608,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_ENOMEM;
     p_dec->p_sys = p_sys;
     p_sys->b_started = false;
+    p_sys->b_is_avcc = false;
     p_sys->codec = codec;
 
     int i_ret = StartVideoToolbox(p_dec, NULL);
@@ -719,6 +723,9 @@ static bool H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
 
     if (!p_block->p_buffer)
         return false;
+
+    if (p_sys->b_is_avcc)
+        return true;
 
     int buf_size = p_dec->fmt_in.i_extra + 20;
     uint32_t size = p_dec->fmt_in.i_extra;
