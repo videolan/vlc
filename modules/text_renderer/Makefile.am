@@ -36,6 +36,12 @@ libquartztext_plugin_la_LDFLAGS = $(AM_LDLFAGS) -rpath '$(textdir)' \
 EXTRA_LTLIBRARIES += libquartztext_plugin.la
 text_LTLIBRARIES += $(LTLIBquartztext)
 
+if HAVE_OSX
+libnsspeechsynthesizer_plugin_la_SOURCES = text_renderer/nsspeechsynthesizer.m
+libnsspeechsynthesizer_plugin_la_LDFLAGS = -Wl,-framework,Cocoa
+text_LTLIBRARIES += libnsspeechsynthesizer_plugin.la
+endif
+
 libsvg_plugin_la_SOURCES = text_renderer/svg.c
 libsvg_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SVG_CFLAGS)
 libsvg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(textdir)'
