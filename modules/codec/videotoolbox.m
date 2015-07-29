@@ -610,6 +610,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->b_started = false;
     p_sys->b_is_avcc = false;
     p_sys->codec = codec;
+    p_sys->videoFormatDescription = nil;
 
     int i_ret = StartVideoToolbox(p_dec, NULL);
     if (i_ret != VLC_SUCCESS) {
