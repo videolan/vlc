@@ -728,8 +728,6 @@ static bool H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
     if (p_sys->b_is_avcc)
         return true;
 
-    int buf_size = p_dec->fmt_in.i_extra + 20;
-    uint32_t size = p_dec->fmt_in.i_extra;
     uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
     size_t i_sps_size = 0, i_pps_size = 0;
     int i_ret = 0;
