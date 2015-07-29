@@ -158,10 +158,12 @@ Misc
  * remove langfromtelx
  * remove ZPL playlist format
  * Update libVLC doxygen modules
+ * Add a text-to-speech renderer for subtitles on OS X/iOS
 
 Removed modules
  * Atmo video filter
  * QTCapture access module (use AVCapture instead)
+ * httplive (use adaptive instead)
 
 
 Changes between 2.2.0 and 2.2.1:

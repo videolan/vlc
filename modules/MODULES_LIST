@@ -175,7 +175,6 @@ $Id$
  * hotkeys: hotkeys control module
  * hqdn3d: High Quality denoising filter
  * http: HTTP Network access module
- * httplive: HTTP Live streaming for playback
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb
  * i420_rgb_sse2: sse2 accelerated version of i420_rgb
@@ -253,6 +252,7 @@ $Id$
  * normvol: a audio filter for volume normalization
  * notify: notifications using libnotify
  * nsc: decoder for Microsoft proprietary NSC descriptors
+ * nsspeechsynthesizer: Text to speech subtitles renderer
  * nsv: NullSoft Video demuxer
  * ntservice: run VLC as a NT service
  * nuv: NUV demuxer
@@ -295,7 +295,6 @@ $Id$
  * pva: PVA demuxer
  * qsv: QuickSyncVideo Encoder for Intel hardware
  * qt4: interface module using the cross-platform Qt4 library
- * qtcapture: Quicktime Video Capture
  * qtsound: Quicktime Audio Capture
  * quartztext: Text renderer using native Mac OS X API
  * quicktime: Quicktime decoder that uses the QT library
@@ -415,6 +414,7 @@ $Id$
  * vdr: VDR access module
  * vdummy: dummy video display
  * vhs: vhs style video filter
+ * videotoolbox: Video Toolbox hardware decoder for OS X/iOS
  * visual: visualisation system
  * vmem: video memory output
  * vnc: VNC/rfb view only access module
