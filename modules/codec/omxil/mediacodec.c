@@ -160,6 +160,7 @@ struct decoder_sys_t
             AWindowHandler *p_awh;
             int i_pixel_format, i_stride, i_slice_height, i_width, i_height;
             uint32_t i_nal_size;
+            size_t i_h264_profile;
             ArchitectureSpecificCopyData ascd;
             /* stores the inflight picture for each output buffer or NULL */
             picture_t** pp_inflight_pictures;
@@ -392,8 +393,6 @@ static int StartMediaCodec(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_ret = 0;
-    size_t h264_profile = 0;
-    char *psz_name = NULL;
     union mc_api_args args;
 
     if (p_dec->fmt_in.i_extra && !p_sys->p_csd)
@@ -446,8 +445,23 @@ static int StartMediaCodec(decoder_t *p_dec)
                     args.video.i_angle = 0;
             }
         }
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-            h264_get_profile_level(&p_dec->fmt_in, &h264_profile, NULL, NULL);
+
+        /* Check again the codec name if h264 profile changed */
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
+         && !p_sys->u.video.i_h264_profile)
+        {
+            h264_get_profile_level(&p_dec->fmt_in,
+                                   &p_sys->u.video.i_h264_profile, NULL, NULL);
+            if (p_sys->u.video.i_h264_profile)
+            {
+                free(p_sys->psz_name);
+                p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec),
+                                                     p_sys->mime,
+                                                     p_sys->u.video.i_h264_profile);
+                if (!p_sys->psz_name)
+                    return VLC_EGENERIC;
+            }
+        }
 
         if (!p_sys->u.video.p_awh && var_InheritBool(p_dec, CFG_PREFIX "dr"))
             p_sys->u.video.p_awh = AWindowHandler_new(VLC_OBJECT(p_dec));
@@ -461,25 +475,17 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.audio.i_channel_count  = p_dec->p_sys->u.audio.i_channels;
     }
 
-    psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, h264_profile);
-    if (!psz_name)
-        return VLC_EGENERIC;
-
-    i_ret = p_sys->api->start(p_sys->api, psz_name, p_sys->mime, &args);
+    i_ret = p_sys->api->start(p_sys->api, p_sys->psz_name, p_sys->mime, &args);
 
     if (i_ret == VLC_SUCCESS)
     {
-        p_sys->psz_name = psz_name;
         if (p_sys->api->b_direct_rendering)
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
         p_sys->b_update_format = true;
         return VLC_SUCCESS;
     }
     else
-    {
-        free(psz_name);
         return VLC_EGENERIC;
-    }
 }
 
 /*****************************************************************************
@@ -494,7 +500,6 @@ static void StopMediaCodec(decoder_t *p_dec)
     if (p_sys->api->b_direct_rendering)
         InvalidateAllPictures(p_dec);
 
-    free(p_sys->psz_name);
     p_sys->psz_name = NULL;
 
     p_sys->api->stop(p_sys->api);
@@ -626,6 +631,19 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             return VLC_ENOMEM;
         }
 
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+            h264_get_profile_level(&p_dec->fmt_in,
+                                   &p_sys->u.video.i_h264_profile, NULL, NULL);
+
+        p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime,
+                                              p_sys->u.video.i_h264_profile);
+        if (!p_sys->psz_name)
+        {
+            CloseDecoder(p_this);
+            return VLC_EGENERIC;
+        }
+
+        /* Check if we need late opening */
         switch (p_dec->fmt_in.i_codec)
         {
         case VLC_CODEC_H264:
@@ -649,6 +667,14 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     {
         p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
 
+        p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, 0);
+        if (!p_sys->psz_name)
+        {
+            CloseDecoder(p_this);
+            return VLC_EGENERIC;
+        }
+
+        /* Check if we need late opening */
         switch (p_dec->fmt_in.i_codec)
         {
         case VLC_CODEC_VORBIS:
@@ -703,6 +729,7 @@ static void CloseDecoder(vlc_object_t *p_this)
             AWindowHandler_destroy(p_sys->u.video.p_awh);
     }
     free(p_sys->api);
+    free(p_sys->psz_name);
     free(p_sys);
 }
 
