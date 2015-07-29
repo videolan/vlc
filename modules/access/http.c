@@ -946,8 +946,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 !strcasecmp( p_sys->psz_mime, "misc/ultravox" ) )
                 /* Grrrr! detect ultravox server and force NSV demuxer */
                 *type = strdup( "video/nsa" );
-            else
+            else if( p_sys->psz_mime )
                 *type = strdup( p_sys->psz_mime );
+            else
+                return VLC_EGENERIC;
             break;
         }
 
