@@ -320,7 +320,6 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
 
     if (p_text->psz_text) {
         psz_render_string = strdup(p_text->psz_text);
-        msg_Dbg(p_filter, "raw render string '%s'", psz_render_string);
     }
 
     if (!psz_render_string) {
@@ -356,8 +355,6 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;
 
-    msg_Dbg(p_filter, "will render");
-
     CFMutableAttributedStringRef p_attrString = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
 
     if (p_attrString) {
@@ -365,9 +362,7 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         int           len;
 
         p_cfString = CFStringCreateWithCString(NULL, psz_render_string, kCFStringEncodingUTF8);
-        if (p_cfString) {
-            msg_Dbg(p_filter, "ok");
-        } else
+        if (!p_cfString)
             return VLC_EGENERIC;
 
         CFAttributedStringReplaceString(p_attrString, CFRangeMake(0, 0), p_cfString);
@@ -381,8 +376,6 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         RenderYUVA(p_filter, p_region_out, p_attrString);
         CFRelease(p_attrString);
     }
-
-    msg_Info(p_filter, "OK");
 
     return VLC_SUCCESS;
 }
