@@ -32,8 +32,6 @@
 
 @interface VLCVoutWindowController : NSObject
 
-+ (VLCVoutWindowController *)sharedInstance;
-
 @property (readonly, atomic) NSLock *lock;
 
 @property (readonly, nonatomic) NSInteger currentStatusWindowLevel;

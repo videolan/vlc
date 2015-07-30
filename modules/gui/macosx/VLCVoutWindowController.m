@@ -211,18 +211,6 @@ void WindowClose(vout_window_t *p_wnd)
 
 @implementation VLCVoutWindowController
 
-+ (VLCVoutWindowController *)sharedInstance
-{
-    static VLCVoutWindowController *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCVoutWindowController new];
-    });
-
-    return sharedInstance;
-}
-
 - (id)init
 {
     self = [super init];

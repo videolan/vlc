@@ -86,8 +86,6 @@ int OpenIntf (vlc_object_t *p_this)
         [NSBundle loadNibNamed:@"MainWindow" owner:[VLCMain sharedInstance]];
         [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
 
-        [VLCVoutWindowController sharedInstance];
-
         return VLC_SUCCESS;
     }
 }
