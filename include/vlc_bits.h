@@ -217,12 +217,17 @@ static inline bool bo_init(bo_t *p_bo, int i_size)
     return true;
 }
 
+static inline void bo_deinit(bo_t *p_bo)
+{
+    if(p_bo->b)
+        block_Release(p_bo->b);
+}
+
 static inline void bo_free(bo_t *p_bo)
 {
     if(!p_bo)
         return;
-    if(p_bo->b)
-        block_Release(p_bo->b);
+    bo_deinit(p_bo);
     free(p_bo);
 }
 
