@@ -111,10 +111,11 @@ void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
 {
     uint32_t nal_len = 0, nal_pos = 0;
 
-    if( i_nal_length_size < 3 || i_nal_length_size > 4 )
+    if( i_nal_length_size != 4 )
         return;
 
-    /* This only works for NAL sizes 3-4 */
+    /* This only works for a NAL length size of 4 */
+    /* TODO: realloc/memmove if i_nal_length_size is 2 or 1 */
     while( i_len > 0 )
     {
         if( nal_pos < i_nal_length_size ) {
