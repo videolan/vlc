@@ -80,6 +80,7 @@ libvlc_media_library_new( libvlc_instance_t * p_inst )
         return NULL;
     }
 
+    libvlc_retain( p_inst );
     return p_mlib;
 }
 
@@ -94,6 +95,7 @@ void libvlc_media_library_release( libvlc_media_library_t * p_mlib )
         return;
 
     libvlc_event_manager_release( p_mlib->p_event_manager );
+    libvlc_release( p_mlib->p_libvlc_instance );
     free( p_mlib );
 }
 

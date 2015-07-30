@@ -117,6 +117,7 @@ static void libvlc_vlm_release_internal( libvlc_instance_t *p_instance )
     p_instance->libvlc_vlm.p_event_manager = NULL;
     vlm_Delete( p_vlm );
     p_instance->libvlc_vlm.p_vlm = NULL;
+    libvlc_release( p_instance );
 }
 
 static int libvlc_vlm_init( libvlc_instance_t *p_instance )
@@ -174,6 +175,7 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance )
                          "intf-event", VlmEvent,
                          p_instance->libvlc_vlm.p_event_manager );
         p_instance->libvlc_vlm.pf_release = libvlc_vlm_release_internal;
+        libvlc_retain( p_instance );
     }
 
     return VLC_SUCCESS;

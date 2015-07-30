@@ -189,6 +189,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
     p_mlist->p_md = NULL;
     p_mlist->p_internal_md = NULL;
 
+    libvlc_retain( p_inst );
     return p_mlist;
 }
 
@@ -227,6 +228,7 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
     vlc_mutex_destroy( &p_mlist->refcount_lock );
     vlc_array_clear( &p_mlist->items );
 
+    libvlc_release( p_mlist->p_libvlc_instance );
     free( p_mlist );
 }
 

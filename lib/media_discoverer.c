@@ -254,6 +254,7 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
                       services_discovery_removeall,
                       p_mdis );
 
+    libvlc_retain( p_inst );
     return p_mdis;
 }
 
@@ -347,6 +348,7 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
 
     vlc_dictionary_clear( &p_mdis->catname_to_submedialist, NULL, NULL );
     libvlc_event_manager_release( p_mdis->p_event_manager );
+    libvlc_release( p_mdis->p_libvlc_instance );
 
     free( p_mdis );
 }

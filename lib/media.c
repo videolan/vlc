@@ -375,6 +375,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
 
     install_input_item_observer( p_md );
 
+    libvlc_retain( p_instance );
     return p_md;
 }
 
@@ -532,7 +533,7 @@ void libvlc_media_release( libvlc_media_t *p_md )
     libvlc_event_send( p_md->p_event_manager, &event );
 
     libvlc_event_manager_release( p_md->p_event_manager );
-
+    libvlc_release( p_md->p_libvlc_instance );
     free( p_md );
 }
 
