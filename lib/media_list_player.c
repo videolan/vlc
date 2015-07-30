@@ -55,7 +55,6 @@
 struct libvlc_media_list_player_t
 {
     libvlc_event_manager_t *    p_event_manager;
-    libvlc_instance_t *         p_libvlc_instance;
     int                         i_refcount;
     /* Protect access to this structure. */
     vlc_mutex_t                 object_lock;
@@ -430,10 +429,6 @@ set_current_playing_item(libvlc_media_list_player_t * p_mlp, libvlc_media_list_p
     /* Make sure media_player_reached_end() won't get called */
     uninstall_media_player_observer(p_mlp);
 
-    /* Create a new media_player if there is none */
-    if (!p_mlp->p_mi)
-        p_mlp->p_mi = libvlc_media_player_new_from_media(p_md);
-
     libvlc_media_player_set_media(p_mlp->p_mi, p_md);
 
     install_media_player_observer(p_mlp);
@@ -465,8 +460,15 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
         return NULL;
     }
 
-    libvlc_retain(p_instance);
-    p_mlp->p_libvlc_instance = p_instance;
+    /* Create the underlying media_player */
+    p_mlp->p_mi = libvlc_media_player_new(p_instance);
+    if( p_mlp->p_mi == NULL )
+    {
+        libvlc_event_manager_release(p_mlp->p_event_manager);
+        free(p_mlp);
+        return NULL;
+    }
+
     p_mlp->i_refcount = 1;
     vlc_mutex_init(&p_mlp->object_lock);
     vlc_mutex_init(&p_mlp->mp_callback_lock);
@@ -502,11 +504,9 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
     /* Keep the lock(), because the uninstall functions
      * check for it. That's convenient. */
 
-    if (p_mlp->p_mi)
-    {
-        uninstall_media_player_observer(p_mlp);
-        libvlc_media_player_release(p_mlp->p_mi);
-    }
+    uninstall_media_player_observer(p_mlp);
+    libvlc_media_player_release(p_mlp->p_mi);
+
     if (p_mlp->p_mlist)
     {
         uninstall_playlist_observer(p_mlp);
@@ -520,7 +520,6 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
     libvlc_event_manager_release(p_mlp->p_event_manager);
 
     free(p_mlp->current_playing_item_path);
-    libvlc_release(p_mlp->p_libvlc_instance);
     free(p_mlp);
 }
 
@@ -551,19 +550,19 @@ libvlc_media_list_player_event_manager(libvlc_media_list_player_t * p_mlp)
  **************************************************************************/
 void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_mlp, libvlc_media_player_t * p_mi)
 {
-    lock(p_mlp);
+    libvlc_media_player_t *p_oldmi;
 
-    if (p_mlp->p_mi)
-    {
-        uninstall_media_player_observer(p_mlp);
-        libvlc_media_player_release(p_mlp->p_mi);
-    }
+    assert(p_mi != NULL);
     libvlc_media_player_retain(p_mi);
+
+    lock(p_mlp);
+    uninstall_media_player_observer(p_mlp);
+    p_oldmi = p_mlp->p_mi;
     p_mlp->p_mi = p_mi;
-
     install_media_player_observer(p_mlp);
-
     unlock(p_mlp);
+
+    libvlc_media_player_release(p_oldmi);
 }
 
 /**************************************************************************
