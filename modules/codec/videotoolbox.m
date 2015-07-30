@@ -347,55 +347,17 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         p_sys->codec_level = sps_data.i_level;
 
         /* create avvC atom to forward to the HW decoder */
-        bo_t bo;
-        bool status = bo_init(&bo, 1024);
-
-        if (status != true)
-        {
-            free(p_alloc_buf);
-            return VLC_ENOMEM;
-        }
-
-        bo_add_8(&bo, 1);      /* configuration version */
-        bo_add_8(&bo, sps_data.i_profile);
-        bo_add_8(&bo, sps_data.i_profile_compatibility);
-        bo_add_8(&bo, sps_data.i_level);
-        bo_add_8(&bo, 0xff);   /* 0b11111100 | lengthsize = 0x11 */
-
-        bo_add_8(&bo, 0xe0 | (i_sps_size > 0 ? 1 : 0));   /* 0b11100000 | sps_count */
-
-        if (i_sps_size > 4) {
-            /* the SPS data we have got includes 4 leading
-             * bytes which we need to remove */
-            uint8_t *fixed_sps = malloc(i_sps_size - 4);
-            for (int i = 0; i < i_sps_size - 4; i++) {
-                fixed_sps[i] = p_sps_buf[i+4];
-            }
-
-            bo_add_16be(&bo, i_sps_size - 4);
-            bo_add_mem(&bo, i_sps_size - 4, fixed_sps);
-            free(fixed_sps);
-        }
-
-        bo_add_8(&bo, (i_pps_size > 0 ? 1 : 0));   /* pps_count */
-        if (i_pps_size > 4) {
-            /* the PPS data we have got includes 4 leading
-             * bytes which we need to remove */
-            uint8_t *fixed_pps = malloc(i_pps_size - 4);
-            for (int i = 0; i < i_pps_size - 4; i++) {
-                fixed_pps[i] = p_pps_buf[i+4];
-            }
-
-            bo_add_16be(&bo, i_pps_size - 4);
-            bo_add_mem(&bo, i_pps_size - 4, fixed_pps);
-            free(fixed_pps);
-        }
+        block_t *p_block = h264_create_avcdec_config_record(4,
+                                &sps_data, p_sps_buf, i_sps_size,
+                                p_pps_buf, i_pps_size);
         free(p_alloc_buf);
+        if (!p_block)
+            return VLC_EGENERIC;
 
         extradata = CFDataCreate(kCFAllocatorDefault,
-                                 bo.b->p_buffer,
-                                 bo.b->i_buffer);
-        bo_deinit(&bo);
+                                 p_block->p_buffer,
+                                 p_block->i_buffer);
+        block_Release(p_block);
 
         if (extradata)
             CFDictionarySetValue(extradata_info, CFSTR("avcC"), extradata);

@@ -518,6 +518,51 @@ int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
     return 0;
 }
 
+block_t *h264_create_avcdec_config_record( size_t i_nal_length_size,
+                                           struct nal_sps *p_sps,
+                                           const uint8_t *p_sps_buf,
+                                           size_t i_sps_size,
+                                           const uint8_t *p_pps_buf,
+                                           size_t i_pps_size )
+{
+    bo_t bo;
+
+    /* The length of the NAL size is encoded using 1, 2 or 4 bytes */
+    if( i_nal_length_size != 1 && i_nal_length_size != 2
+     && i_nal_length_size != 4 )
+        return NULL;
+
+    /* 6 * int(8), i_sps_size - 4, 1 * int(8), i_pps_size - 4 */
+    if( bo_init( &bo, 7 + i_sps_size + i_pps_size - 8 ) != true )
+        return NULL;
+
+    bo_add_8( &bo, 1 ); /* configuration version */
+    bo_add_8( &bo, p_sps->i_profile );
+    bo_add_8( &bo, p_sps->i_profile_compatibility );
+    bo_add_8( &bo, p_sps->i_level );
+    bo_add_8( &bo, 0xfc | (i_nal_length_size - 1) ); /* 0b11111100 | lengthsize - 1*/
+
+    bo_add_8( &bo, 0xe0 | (i_sps_size > 0 ? 1 : 0) ); /* 0b11100000 | sps_count */
+
+    if( i_sps_size > 4 )
+    {
+        /* the SPS data we have got includes 4 leading
+         * bytes which we need to remove */
+        bo_add_16be( &bo, i_sps_size - 4 );
+        bo_add_mem( &bo, i_sps_size - 4, p_sps_buf + 4 );
+    }
+
+    bo_add_8( &bo, (i_pps_size > 0 ? 1 : 0) ); /* pps_count */
+    if( i_pps_size > 4 )
+    {
+        /* the PPS data we have got includes 4 leading
+         * bytes which we need to remove */
+        bo_add_16be( &bo, i_pps_size - 4 );
+        bo_add_mem( &bo, i_pps_size - 4, p_pps_buf + 4 );
+    }
+    return bo.b;
+}
+
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
                             size_t *p_level, size_t *p_nal_length_size)
 {

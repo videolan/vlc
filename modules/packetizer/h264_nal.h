@@ -139,6 +139,15 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
 int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
                     struct nal_pps *p_pps );
 
+/* Create a AVCDecoderConfigurationRecord from SPS/PPS
+ * Returns a valid block_t on success, must be freed with block_Release */
+block_t *h264_create_avcdec_config_record( size_t i_nal_length_size,
+                                           struct nal_sps *p_sps,
+                                           const uint8_t *p_sps_buf,
+                                           size_t i_sps_size,
+                                           const uint8_t *p_pps_buf,
+                                           size_t i_pps_size );
+
 /* Get level and Profile */
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
                             size_t *p_level, size_t *p_nal_length_size);
