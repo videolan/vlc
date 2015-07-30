@@ -264,14 +264,14 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 
             /* we need to convert the SPS and PPS units we received from the
              * demuxer's avvC atom so we can process them further */
-            if (convert_sps_pps(p_dec,
-                                p_dec->fmt_in.p_extra,
-                                p_dec->fmt_in.i_extra,
-                                p_buf,
-                                buf_size,
-                                &size,
-                                &i_nal_size) == VLC_SUCCESS)
-                p_sys->b_is_avcc = i_nal_size > 0;
+            i_ret = convert_sps_pps(p_dec,
+                                    p_dec->fmt_in.p_extra,
+                                    p_dec->fmt_in.i_extra,
+                                    p_buf,
+                                    buf_size,
+                                    &size,
+                                    &i_nal_size);
+            p_sys->b_is_avcc = i_ret == VLC_SUCCESS;
         } else {
             /* we are mid-stream, let's have the h264_get helper see if it
              * can find a NAL unit */
