@@ -84,3 +84,8 @@ void    CommonAttributesElements::addLang( const std::string &lang )
     if ( lang.empty() == false )
         this->lang.push_back( lang );
 }
+
+const ID & CommonAttributesElements::getID() const
+{
+    return id;
+}

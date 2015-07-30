@@ -34,6 +34,7 @@
 
 #include "SegmentTemplate.h"
 #include "BasePeriod.h"
+#include "ID.hpp"
 
 using namespace adaptative;
 using namespace adaptative::playlist;
@@ -61,6 +62,17 @@ std::vector<BaseRepresentation*>& BaseAdaptationSet::getRepresentations()
     return representations;
 }
 
+BaseRepresentation * BaseAdaptationSet::getRepresentationByID(const ID &id)
+{
+    std::vector<BaseRepresentation *>::const_iterator it;
+    for(it = representations.begin(); it != representations.end(); ++it)
+    {
+        if((*it)->getID() == id)
+            return *it;
+    }
+    return NULL;
+}
+
 void BaseAdaptationSet::addRepresentation(BaseRepresentation *rep)
 {
     representations.push_back(rep);
@@ -80,7 +92,8 @@ bool BaseAdaptationSet::getBitstreamSwitching  () const
 void BaseAdaptationSet::debug(vlc_object_t *obj, int indent) const
 {
     std::string text(indent, ' ');
-    text.append("BaseAdaptationSet");
+    text.append("BaseAdaptationSet ");
+    text.append(id.str());
     msg_Dbg(obj, "%s", text.c_str());
     std::vector<BaseRepresentation *>::const_iterator k;
     for(k = representations.begin(); k != representations.end(); ++k)

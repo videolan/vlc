@@ -38,6 +38,7 @@ namespace adaptative
     {
         class BaseRepresentation;
         class BasePeriod;
+        class ID;
 
         class BaseAdaptationSet : public CommonAttributesElements,
                                   public SegmentInformation
@@ -48,6 +49,7 @@ namespace adaptative
 
                 virtual StreamFormat            getStreamFormat() const; /*reimpl*/
                 std::vector<BaseRepresentation *>&  getRepresentations      ();
+                BaseRepresentation *            getRepresentationByID(const ID &);
                 void                            setSwitchPolicy(bool value);
                 bool                            getBitstreamSwitching() const;
                 void                            addRepresentation( BaseRepresentation *rep );

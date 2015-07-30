@@ -30,6 +30,7 @@
 #include "BaseRepresentation.h"
 #include "BaseAdaptationSet.h"
 #include "SegmentTemplate.h"
+#include "ID.hpp"
 
 using namespace adaptative;
 using namespace adaptative::playlist;
@@ -73,7 +74,8 @@ void BaseRepresentation::addCodec(const std::string &codec)
 void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
 {
     std::string text(indent, ' ');
-    text.append("Representation");
+    text.append("Representation ");
+    text.append(id.str());
     msg_Dbg(obj, "%s", text.c_str());
     std::vector<ISegment *> list;
     getAllSegments(list);
