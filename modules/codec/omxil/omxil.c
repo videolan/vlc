@@ -2016,6 +2016,7 @@ static void HwBuffer_ChangeState( decoder_t *p_dec, OmxPort *p_port,
 static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
 {
     VLC_UNUSED( p_dec );
+    jobject jsurface;
     ANativeWindow *p_anw;
     OMX_ERRORTYPE omx_error;
 
@@ -2053,8 +2054,14 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
         msg_Warn( p_dec, "AWindowHandler_getANativeWindowPrivAPI failed" );
         goto error;
     }
-    p_anw = AWindowHandler_getANativeWindow( p_port->p_hwbuf->p_awh,
-                                             AWindow_Video );
+    jsurface = AWindowHandler_getSurface( p_port->p_hwbuf->p_awh,
+                                          AWindow_Video );
+    if( !jsurface  )
+    {
+        msg_Warn( p_dec, "AWindowHandler_getSurface failed" );
+        goto error;
+    }
+    p_anw = AWindowHandler_getANativeWindow( p_port->p_hwbuf->p_awh, jsurface );
     if( !p_anw )
     {
         msg_Warn( p_dec, "AWindowHandler_getVideoANativeWindow failed" );

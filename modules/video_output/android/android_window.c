@@ -89,9 +89,8 @@ struct android_window
     unsigned int i_pic_count;
     unsigned int i_min_undequeued;
     bool b_use_priv;
-    bool b_opaque;
 
-    enum AWindow_ID id;
+    jobject jsurface; /* NULL if opaque */
     ANativeWindow *p_handle;
     native_window_priv *p_handle_priv;
 };
@@ -307,7 +306,7 @@ static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,
         p_window->p_handle_priv = NULL;
     }
     if (p_window->p_handle) {
-        AWindowHandler_releaseANativeWindow(sys->p_awh, p_window->id);
+        AWindowHandler_releaseANativeWindow(sys->p_awh, p_window->p_handle);
         p_window->p_handle = NULL;
     }
 }
@@ -315,9 +314,9 @@ static void AndroidWindow_DisconnectSurface(vout_display_sys_t *sys,
 static int AndroidWindow_ConnectSurface(vout_display_sys_t *sys,
                                         android_window *p_window)
 {
-    if (!p_window->p_handle && !p_window->b_opaque) {
+    if (!p_window->p_handle && p_window->jsurface) {
         p_window->p_handle = AWindowHandler_getANativeWindow(sys->p_awh,
-                                                             p_window->id);
+                                                             p_window->jsurface);
         if (!p_window->p_handle)
             return -1;
     }
@@ -332,14 +331,13 @@ static android_window *AndroidWindow_New(vout_display_t *vd,
 {
     vout_display_sys_t *sys = vd->sys;
     android_window *p_window = NULL;
+    const bool b_opaque = p_fmt->i_chroma == VLC_CODEC_ANDROID_OPAQUE;
 
     p_window = calloc(1, sizeof(android_window));
     if (!p_window)
         goto error;
 
-    p_window->id = id;
-    p_window->b_opaque = p_fmt->i_chroma == VLC_CODEC_ANDROID_OPAQUE;
-    if (!p_window->b_opaque) {
+    if (!b_opaque) {
         p_window->b_use_priv = sys->anwp && b_use_priv;
 
         p_window->i_android_hal = ChromaToAndroidHal(p_fmt->i_chroma);
@@ -367,6 +365,14 @@ static android_window *AndroidWindow_New(vout_display_t *vd,
         video_format_ApplyRotation(&p_window->fmt, p_fmt);
     p_window->i_pic_count = 1;
 
+    if (!b_opaque) {
+        p_window->jsurface = AWindowHandler_getSurface(sys->p_awh, id);
+        if (!p_window->jsurface)
+        {
+            msg_Err(vd, "AWindowHandler_getSurface failed");
+            goto error;
+        }
+    }
     if (AndroidWindow_ConnectSurface(sys, p_window) != 0)
     {
         if (id == AWindow_Video)
@@ -384,6 +390,8 @@ static void AndroidWindow_Destroy(vout_display_t *vd,
                                   android_window *p_window)
 {
     AndroidWindow_DisconnectSurface(vd->sys, p_window);
+    if (p_window->jsurface)
+        AWindowHandler_releaseSurface(vd->sys->p_awh, p_window->jsurface);
     free(p_window);
 }
 
@@ -464,7 +472,7 @@ static int AndroidWindow_ConfigureJavaSurface(vout_display_sys_t *sys,
      * don't need to call it (ie, after ics). if this call succeed, you need to
      * get a new surface handle. That's why AndroidWindow_DisconnectSurface is
      * called here. */
-    if (AWindowHandler_setBuffersGeometry(sys->p_awh, p_window->id,
+    if (AWindowHandler_setBuffersGeometry(sys->p_awh, p_window->jsurface,
                                           p_window->fmt.i_width,
                                           p_window->fmt.i_height,
                                           p_window->i_android_hal) == VLC_SUCCESS)
@@ -504,7 +512,7 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
     if (i_pic_count != 0)
         p_window->i_pic_count = i_pic_count;
 
-    if (!p_window->b_opaque) {
+    if (p_window->jsurface) {
         int align_pixels;
         picture_t *p_pic = PictureAlloc(sys, &p_window->fmt);
 
@@ -519,7 +527,7 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
                                            &b_java_configured) != 0)
         return -1;
 
-    if (p_window->b_opaque) {
+    if (!p_window->jsurface) {
         sys->p_window->i_pic_count = 31; // TODO
         sys->p_window->i_min_undequeued = 0;
         return 0;
@@ -689,10 +697,10 @@ static int Open(vlc_object_t *p_this)
         goto error;
 
     /* use software rotation if we don't use private anw */
-    if (!sys->p_window->b_opaque && !sys->p_window->b_use_priv)
+    if (sys->p_window->jsurface && !sys->p_window->b_use_priv)
         video_format_ApplyRotation(&vd->fmt, &vd->fmt);
 
-    msg_Dbg(vd, "using %s", sys->p_window->b_opaque ? "opaque" :
+    msg_Dbg(vd, "using %s", !sys->p_window->jsurface ? "opaque" :
             (sys->p_window->b_use_priv ? "ANWP" : "ANW"));
 
     video_format_ApplyRotation(&sub_fmt, &vd->fmt);
@@ -817,7 +825,7 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
         picture_t *p_pic = PictureAlloc(sys, &sys->p_window->fmt);
         if (!p_pic)
             goto error;
-        if (!sys->p_window->b_opaque) {
+        if (sys->p_window->jsurface) {
             p_pic->p_sys->pf_lock_pic = DefaultLockPicture;
             p_pic->p_sys->pf_unlock_pic = DefaultUnlockPicture;
         }
@@ -1051,7 +1059,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     case VOUT_DISPLAY_RESET_PICTURES:
     {
-        if (sys->p_window->b_opaque)
+        if (!sys->p_window->jsurface)
             return VLC_EGENERIC;
 
         msg_Dbg(vd, "resetting pictures");

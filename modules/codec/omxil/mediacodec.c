@@ -85,6 +85,7 @@ struct decoder_sys_t
         struct
         {
             AWindowHandler *p_awh;
+            jobject jsurface;
             int i_pixel_format, i_stride, i_slice_height, i_width, i_height;
             uint32_t i_nal_length_size;
             size_t i_h264_profile;
@@ -393,8 +394,23 @@ static int StartMediaCodec(decoder_t *p_dec)
         }
 
         if (!p_sys->u.video.p_awh && var_InheritBool(p_dec, CFG_PREFIX "dr"))
+        {
             p_sys->u.video.p_awh = AWindowHandler_new(VLC_OBJECT(p_dec));
+            if (p_sys->u.video.p_awh)
+            {
+                p_sys->u.video.jsurface = AWindowHandler_getSurface(
+                                                p_sys->u.video.p_awh,
+                                                AWindow_Video);
+                if (!p_sys->u.video.jsurface)
+                {
+                    AWindowHandler_destroy(p_sys->u.video.p_awh);
+                    p_sys->u.video.p_awh = NULL;
+                }
+
+            }
+        }
         args.video.p_awh = p_sys->u.video.p_awh;
+        args.video.jsurface = p_sys->u.video.jsurface;
     }
     else
     {
@@ -431,10 +447,8 @@ static void StopMediaCodec(decoder_t *p_dec)
 
     p_sys->api->stop(p_sys->api);
     if (p_dec->fmt_in.i_cat == VIDEO_ES && p_sys->u.video.p_awh)
-    {
-        AWindowHandler_releaseANativeWindow(p_sys->u.video.p_awh, AWindow_Video);
-        AWindowHandler_releaseSurface(p_sys->u.video.p_awh, AWindow_Video);
-    }
+        AWindowHandler_releaseSurface(p_sys->u.video.p_awh,
+                                      p_sys->u.video.jsurface);
 }
 
 /*****************************************************************************

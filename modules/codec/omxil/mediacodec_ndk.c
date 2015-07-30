@@ -326,7 +326,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
         syms.AMediaFormat.setInt32(p_sys->p_format, "rotation-degrees", p_args->video.i_angle);
         if (p_args->video.p_awh)
             p_anw = AWindowHandler_getANativeWindow(p_args->video.p_awh,
-                                                    AWindow_Video);
+                                                    p_args->video.jsurface);
     }
     else
     {
