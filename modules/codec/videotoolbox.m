@@ -240,8 +240,10 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
     int i_sar_num = 0;
 
     if (p_sys->codec == kCMVideoCodecType_H264) {
-        if ((p_dec->fmt_in.video.i_width == 0 || p_dec->fmt_in.video.i_height == 0) && p_block == NULL) {
-            msg_Dbg(p_dec, "waiting for H264 SPS/PPS, extra data %i", p_dec->fmt_in.i_extra);
+        /* Do a late opening if there is no extra data and no valid video size */
+        if ((p_dec->fmt_in.video.i_width == 0 || p_dec->fmt_in.video.i_height == 0
+          || p_dec->fmt_in.i_extra == 0) && p_block == NULL) {
+            msg_Err(p_dec, "waiting for H264 SPS/PPS, extra data %i", p_dec->fmt_in.i_extra);
 
             return VLC_SUCCESS; // return VLC_GENERIC to leave the waiting to someone else
         }
