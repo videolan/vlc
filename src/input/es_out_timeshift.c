@@ -576,16 +576,6 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
 
     switch( i_query )
     {
-    /* Invalid query for this es_out level */
-    case ES_OUT_SET_ES_BY_ID:
-    case ES_OUT_RESTART_ES_BY_ID:
-    case ES_OUT_SET_ES_DEFAULT_BY_ID:
-    case ES_OUT_GET_ES_OBJECTS_BY_ID:
-    case ES_OUT_SET_DELAY:
-    case ES_OUT_SET_RECORD_STATE:
-        vlc_assert_unreachable();
-        return VLC_EGENERIC;
-
     /* Pass-through control */
     case ES_OUT_SET_MODE:
     case ES_OUT_SET_GROUP:
@@ -697,9 +687,16 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
         return es_out_Control( p_sys->p_out, ES_OUT_GET_GROUP_FORCED, pi_group );
     }
 
-
     default:
         msg_Err( p_sys->p_input, "Unknown es_out_Control query !" );
+        // ft
+    /* Invalid queries for this es_out level */
+    case ES_OUT_SET_ES_BY_ID:
+    case ES_OUT_RESTART_ES_BY_ID:
+    case ES_OUT_SET_ES_DEFAULT_BY_ID:
+    case ES_OUT_GET_ES_OBJECTS_BY_ID:
+    case ES_OUT_SET_DELAY:
+    case ES_OUT_SET_RECORD_STATE:
         vlc_assert_unreachable();
         return VLC_EGENERIC;
     }
