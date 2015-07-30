@@ -52,8 +52,7 @@
  * libvlc_my_cool_object_new()
  * {
  *        ...
- *        p_self->p_event_manager = libvlc_event_manager_new( p_self,
- *                                                   p_self->p_libvlc_instance, p_e);
+ *        p_self->p_event_manager = libvlc_event_manager_new( p_self )
  *        libvlc_event_manager_register_event_type(p_self->p_event_manager,
  *                libvlc_MyCoolObjectDidSomething, p_e)
  *        ...
@@ -87,7 +86,6 @@ typedef struct libvlc_event_listener_t
 typedef struct libvlc_event_manager_t
 {
     void * p_obj;
-    struct libvlc_instance_t * p_libvlc_instance;
     vlc_array_t listeners_groups;
     vlc_mutex_t object_lock;
     vlc_mutex_t event_sending_lock;

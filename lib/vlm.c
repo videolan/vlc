@@ -125,7 +125,7 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance )
     if( !p_instance->libvlc_vlm.p_event_manager )
     {
         p_instance->libvlc_vlm.p_event_manager =
-            libvlc_event_manager_new( p_instance->libvlc_vlm.p_vlm, p_instance );
+            libvlc_event_manager_new( p_instance->libvlc_vlm.p_vlm );
         if( unlikely(p_instance->libvlc_vlm.p_event_manager == NULL) )
             return VLC_ENOMEM;
         libvlc_event_manager_register_event_type(

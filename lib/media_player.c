@@ -678,7 +678,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
 
     vlc_mutex_init (&mp->input.lock);
     mp->i_refcount = 1;
-    mp->p_event_manager = libvlc_event_manager_new(mp, instance);
+    mp->p_event_manager = libvlc_event_manager_new(mp);
     if (unlikely(mp->p_event_manager == NULL))
     {
         input_resource_Release(mp->input.p_resource);

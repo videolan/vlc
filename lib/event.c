@@ -68,7 +68,7 @@ group_contains_listener( libvlc_event_listeners_group_t * group,
  * Init an object's event manager.
  **************************************************************************/
 libvlc_event_manager_t *
-libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst )
+libvlc_event_manager_new( void * p_obj )
 {
     libvlc_event_manager_t * p_em;
 
@@ -81,9 +81,7 @@ libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst )
 
     p_em->p_obj = p_obj;
     p_em->async_event_queue = NULL;
-    p_em->p_libvlc_instance = p_libvlc_inst;
 
-    libvlc_retain( p_libvlc_inst );
     vlc_array_init( &p_em->listeners_groups );
     vlc_mutex_init( &p_em->object_lock );
     vlc_mutex_init_recursive( &p_em->event_sending_lock );
@@ -116,7 +114,6 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
         free( p_lg );
     }
     vlc_array_clear( &p_em->listeners_groups );
-    libvlc_release( p_em->p_libvlc_instance );
     free( p_em );
 }
 

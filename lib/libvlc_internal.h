@@ -90,8 +90,7 @@ void libvlc_threads_init (void);
 void libvlc_threads_deinit (void);
 
 /* Events */
-libvlc_event_manager_t * libvlc_event_manager_new(
-        void * p_obj, libvlc_instance_t * p_libvlc_inst );
+libvlc_event_manager_t * libvlc_event_manager_new(void * p_obj);
 
 void libvlc_event_manager_release(
         libvlc_event_manager_t * p_em );

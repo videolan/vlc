@@ -210,7 +210,7 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
 
     vlc_dictionary_init( &p_mdis->catname_to_submedialist, 0 );
 
-    p_mdis->p_event_manager = libvlc_event_manager_new( p_mdis, p_inst );
+    p_mdis->p_event_manager = libvlc_event_manager_new( p_mdis );
     if( unlikely(p_mdis->p_event_manager == NULL) )
     {
         free( p_mdis );

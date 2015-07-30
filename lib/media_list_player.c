@@ -458,7 +458,7 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
         return NULL;
     }
 
-    p_mlp->p_event_manager = libvlc_event_manager_new(p_mlp, p_instance);
+    p_mlp->p_event_manager = libvlc_event_manager_new(p_mlp);
     if (unlikely(p_mlp->p_event_manager == NULL))
     {
         free (p_mlp);

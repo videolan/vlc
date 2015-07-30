@@ -355,7 +355,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
      * It can give a bunch of item to read. */
     p_md->p_subitems        = NULL;
 
-    p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance );
+    p_md->p_event_manager = libvlc_event_manager_new( p_md );
     if( unlikely(p_md->p_event_manager == NULL) )
     {
         free(p_md);

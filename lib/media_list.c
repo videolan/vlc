@@ -160,7 +160,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
     }
 
     p_mlist->p_libvlc_instance = p_inst;
-    p_mlist->p_event_manager = libvlc_event_manager_new( p_mlist, p_inst );
+    p_mlist->p_event_manager = libvlc_event_manager_new( p_mlist );
     if( unlikely(p_mlist->p_event_manager == NULL) )
     {
         free(p_mlist);
