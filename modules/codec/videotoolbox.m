@@ -85,6 +85,7 @@ struct decoder_sys_t
     CMVideoCodecType            codec;
     size_t                      codec_profile;
     size_t                      codec_level;
+    uint32_t                    i_nal_length_size;
 
     bool                        b_started;
     bool                        b_is_avcc;
@@ -289,13 +290,14 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                     p_buf,
                                     buf_size,
                                     &size,
-                                    &i_nal_size);
+                                    &p_sys->i_nal_length_size);
             p_sys->b_is_avcc = i_ret == VLC_SUCCESS;
         } else {
             /* we are mid-stream, let's have the h264_get helper see if it
              * can find a NAL unit */
             size = p_block->i_buffer;
             p_buf = p_block->p_buffer;
+            p_sys->i_nal_length_size = 4; /* default to 4 bytes */
             i_ret = VLC_SUCCESS;
         }
 
@@ -347,7 +349,8 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         p_sys->codec_level = sps_data.i_level;
 
         /* create avvC atom to forward to the HW decoder */
-        block_t *p_block = h264_create_avcdec_config_record(4,
+        block_t *p_block = h264_create_avcdec_config_record(
+                                p_sys->i_nal_length_size,
                                 &sps_data, p_sps_buf, i_sps_size,
                                 p_pps_buf, i_pps_size);
         free(p_alloc_buf);
