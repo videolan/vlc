@@ -714,15 +714,12 @@ static CFDataRef ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_siz
     return data;
 }
 
-static bool H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
+static block_t *H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (!p_block->p_buffer)
-        return false;
-
     if (p_sys->b_is_avcc)
-        return true;
+        return p_block;
 
     uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
     size_t i_sps_size = 0, i_pps_size = 0;
@@ -768,12 +765,13 @@ static bool H264ProcessBlock(decoder_t *p_dec, block_t *p_block)
                 p_sys->codec_profile = sps_data.i_profile;
                 p_sys->codec_level = sps_data.i_level;
                 StopVideoToolbox(p_dec);
-                return false;
+                block_Release(p_block);
+                return NULL;
             }
         }
     }
 
-    return true;
+    return convert_annexb_to_h264(p_block, p_sys->i_nal_length_size);
 }
 
 static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
@@ -899,7 +897,9 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
             }
 
             if (p_sys->codec == kCMVideoCodecType_H264) {
-                if (!H264ProcessBlock(p_dec, p_block)) {
+                p_block = H264ProcessBlock(p_dec, p_block);
+                if (!p_block)
+                {
                     *pp_block = NULL;
                     return NULL;
                 }
