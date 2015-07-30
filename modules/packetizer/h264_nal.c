@@ -22,6 +22,11 @@
 
 #include <limits.h>
 
+/*
+ * For avcC specification, see ISO/IEC 14496-15,
+ * For Annex B specification, see ISO/IEC 14496-10
+ */
+
 static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x01 };
 
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
