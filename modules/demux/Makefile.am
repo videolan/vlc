@@ -256,6 +256,8 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/playlist/CommonAttributesElements.cpp \
     demux/adaptative/playlist/CommonAttributesElements.h \
     demux/adaptative/playlist/ICanonicalUrl.hpp \
+    demux/adaptative/playlist/ID.hpp \
+    demux/adaptative/playlist/ID.cpp \
     demux/adaptative/playlist/Inheritables.hpp \
     demux/adaptative/playlist/Inheritables.cpp \
     demux/adaptative/playlist/Segment.cpp \
