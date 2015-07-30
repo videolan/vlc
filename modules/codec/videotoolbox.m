@@ -72,21 +72,11 @@ vlc_module_end()
 static CFDataRef ESDSCreate(decoder_t *, uint8_t *, uint32_t);
 static picture_t *DecodeBlock(decoder_t *, block_t **);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
-                             CVPixelBufferRef, CMTime, CMTime);
+                            CVPixelBufferRef, CMTime, CMTime);
 void VTDictionarySetInt32(CFMutableDictionaryRef, CFStringRef, int);
 static void copy420YpCbCr8Planar(picture_t *, CVPixelBufferRef buffer,
                                  unsigned i_width, unsigned i_height);
 static BOOL deviceSupportsAdvancedProfiles();
-
-@interface VTStorageObject : NSObject
-
-@property (retain) NSMutableArray *outputFrames;
-@property (retain) NSMutableArray *presentationTimes;
-
-@end
-
-@implementation VTStorageObject
-@end
 
 #pragma mark - decoder structure
 
@@ -101,7 +91,8 @@ struct decoder_sys_t
     VTDecompressionSessionRef   session;
     CMVideoFormatDescriptionRef videoFormatDescription;
 
-    VTStorageObject             *storageObject;
+    NSMutableArray              *outputTimeStamps;
+    NSMutableDictionary         *outputFrames;
 };
 
 #pragma mark - start & stop
@@ -258,8 +249,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             size = p_dec->fmt_in.i_extra;
 
             p_alloc_buf = p_buf = malloc(buf_size);
-            if (!p_buf)
-            {
+            if (!p_buf) {
                 msg_Warn(p_dec, "extra buffer allocation failed");
                 return VLC_ENOMEM;
             }
@@ -302,8 +292,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                 &i_sps_size,
                                 &p_pps_buf,
                                 &i_pps_size);
-        if (i_ret != VLC_SUCCESS)
-        {
+        if (i_ret != VLC_SUCCESS) {
             msg_Warn(p_dec, "sps pps parsing failed");
             free(p_alloc_buf);
             return VLC_EGENERIC;
@@ -314,8 +303,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                                i_sps_size,
                                &sps_data);
 
-        if (i_ret != VLC_SUCCESS)
-        {
+        if (i_ret != VLC_SUCCESS) {
             free(p_alloc_buf);
             return VLC_EGENERIC;
         }
@@ -494,11 +482,6 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                          kCVPixelBufferBytesPerRowAlignmentKey,
                          i_video_width * 2);
 
-    /* setup storage */
-    p_sys->storageObject = [[VTStorageObject alloc] init];
-    p_sys->storageObject.outputFrames = [[NSMutableArray alloc] init];
-    p_sys->storageObject.presentationTimes = [[NSMutableArray alloc] init];
-
     /* setup decoder callback record */
     VTDecompressionOutputCallbackRecord decoderCallbackRecord;
     decoderCallbackRecord.decompressionOutputCallback = DecoderCallback;
@@ -575,6 +558,12 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         decoder_UpdateVideoFormat(p_dec);
     }
 
+    /* setup storage */
+    p_sys->outputTimeStamps = [[NSMutableArray alloc] init];
+    p_sys->outputFrames = [[NSMutableDictionary alloc] init];
+    if (!p_sys->outputFrames)
+        return VLC_ENOMEM;
+
     p_sys->b_started = YES;
 
     return VLC_SUCCESS;
@@ -585,6 +574,9 @@ static void StopVideoToolbox(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (p_sys->b_started) {
+        p_sys->outputTimeStamps = nil;
+        p_sys->outputFrames = nil;
+
         p_sys->b_started = false;
         if (p_sys->session != nil) {
             VTDecompressionSessionInvalidate(p_sys->session);
@@ -894,7 +886,9 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
     p_block = *pp_block;
 
     if (likely(p_block)) {
-        if (unlikely(p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))) { // p_block->i_dts < VLC_TS_INVALID ||
+        if (unlikely(p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))) {
+            [p_sys->outputTimeStamps removeAllObjects];
+            [p_sys->outputFrames removeAllObjects];
             block_Release(p_block);
             goto skip;
         }
@@ -968,37 +962,52 @@ skip:
 
     *pp_block = NULL;
 
-    if ([p_sys->storageObject.outputFrames count] && [p_sys->storageObject.presentationTimes count]) {
+    NSUInteger outputFramesCount = [p_sys->outputFrames count];
+
+    if (outputFramesCount > 5) {
         CVPixelBufferRef imageBuffer = NULL;
-        NSNumber *framePTS = nil;
         id imageBufferObject = nil;
         picture_t *p_pic = NULL;
 
-        @synchronized(p_sys->storageObject) {
-            framePTS = [p_sys->storageObject.presentationTimes firstObject];
-            imageBufferObject = [p_sys->storageObject.outputFrames firstObject];
-            imageBuffer = (__bridge CVPixelBufferRef)imageBufferObject;
+        NSString *timeStamp;
+        @synchronized(p_sys->outputTimeStamps) {
+            [p_sys->outputTimeStamps sortUsingComparator:^(id obj1, id obj2) {
+                if ([obj1 longLongValue] > [obj2 longLongValue]) {
+                    return (NSComparisonResult)NSOrderedDescending;
+                }
+                if ([obj1 longLongValue] < [obj2 longLongValue]) {
+                    return (NSComparisonResult)NSOrderedAscending;
+                }
+                return (NSComparisonResult)NSOrderedSame;
+            }];
+            timeStamp = [p_sys->outputTimeStamps firstObject];
+            [p_sys->outputTimeStamps removeObjectAtIndex:0];
+        }
 
-            if (imageBuffer != NULL) {
-                if (CVPixelBufferGetDataSize(imageBuffer) > 0) {
-                    p_pic = decoder_NewPicture(p_dec);
+        @synchronized(p_sys->outputFrames) {
+            imageBufferObject = [p_sys->outputFrames objectForKey:timeStamp];
+        }
+        imageBuffer = (__bridge CVPixelBufferRef)imageBufferObject;
 
-                    if (!p_pic)
-                        return NULL;
+        if (imageBuffer != NULL) {
+            if (CVPixelBufferGetDataSize(imageBuffer) > 0) {
+                p_pic = decoder_NewPicture(p_dec);
 
-                    /* ehm, *cough*, memcpy.. */
-                    copy420YpCbCr8Planar(p_pic,
-                                         imageBuffer,
-                                         CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
-                                         CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
+                if (!p_pic)
+                    return NULL;
 
-                    p_pic->date = framePTS.longLongValue;
+                /* ehm, *cough*, memcpy.. */
+                copy420YpCbCr8Planar(p_pic,
+                                     imageBuffer,
+                                     CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
+                                     CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
 
-                    if (imageBufferObject)
-                        [p_sys->storageObject.outputFrames removeObjectAtIndex:0];
+                p_pic->date = timeStamp.longLongValue;
 
-                    if (framePTS)
-                        [p_sys->storageObject.presentationTimes removeObjectAtIndex:0];
+                if (imageBufferObject) {
+                    @synchronized(p_sys->outputFrames) {
+                        [p_sys->outputFrames removeObjectForKey:timeStamp];
+                    }
                 }
             }
         }
@@ -1009,12 +1018,12 @@ skip:
 }
 
 static void DecoderCallback(void *decompressionOutputRefCon,
-                             void *sourceFrameRefCon,
-                             OSStatus status,
-                             VTDecodeInfoFlags infoFlags,
-                             CVPixelBufferRef imageBuffer,
-                             CMTime pts,
-                             CMTime duration)
+                            void *sourceFrameRefCon,
+                            OSStatus status,
+                            VTDecodeInfoFlags infoFlags,
+                            CVPixelBufferRef imageBuffer,
+                            CMTime pts,
+                            CMTime duration)
 {
     VLC_UNUSED(sourceFrameRefCon);
     VLC_UNUSED(duration);
@@ -1046,38 +1055,23 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         return;
     }
 
-    NSNumber *framePTS = nil;
+    NSString *timeStamp = nil;
 
     if (CMTIME_IS_VALID(pts))
-        framePTS = [NSNumber numberWithLongLong:pts.value];
+        timeStamp = [[NSNumber numberWithLongLong:pts.value] stringValue];
     else {
         msg_Dbg(p_dec, "invalid timestamp, dropping frame");
         CFRelease(imageBuffer);
         return;
     }
 
-    if (framePTS) {
-        @synchronized(p_sys->storageObject) {
-            id imageBufferObject = (__bridge id)imageBuffer;
-            BOOL shouldStop = YES;
-            NSInteger insertionIndex = [p_sys->storageObject.presentationTimes count] - 1;
-            while (insertionIndex >= 0 && shouldStop == NO) {
-                NSNumber *aNumber = p_sys->storageObject.presentationTimes[insertionIndex];
-                if ([aNumber longLongValue] <= [framePTS longLongValue]) {
-                    shouldStop = YES;
-                    break;
-                }
-                insertionIndex--;
-            }
-
-            /* re-order frames on presentation times using a double mutable array structure */
-            if (insertionIndex + 1 == [p_sys->storageObject.presentationTimes count]) {
-                [p_sys->storageObject.presentationTimes addObject:framePTS];
-                [p_sys->storageObject.outputFrames addObject:imageBufferObject];
-            } else {
-                [p_sys->storageObject.presentationTimes insertObject:framePTS atIndex:insertionIndex + 1];
-                [p_sys->storageObject.outputFrames insertObject:framePTS atIndex:insertionIndex + 1];
-            }
+    if (timeStamp) {
+        id imageBufferObject = (__bridge id)imageBuffer;
+        @synchronized(p_sys->outputTimeStamps) {
+            [p_sys->outputTimeStamps addObject:timeStamp];
+        }
+        @synchronized(p_sys->outputFrames) {
+            [p_sys->outputFrames setObject:imageBufferObject forKey:timeStamp];
         }
     }
 }
