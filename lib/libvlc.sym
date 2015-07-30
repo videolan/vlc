@@ -48,9 +48,6 @@ libvlc_chapter_descriptions_release
 libvlc_clock
 libvlc_event_attach
 libvlc_event_detach
-libvlc_event_manager_new
-libvlc_event_manager_register_event_type
-libvlc_event_manager_release
 libvlc_event_type_name
 libvlc_free
 libvlc_get_changeset
