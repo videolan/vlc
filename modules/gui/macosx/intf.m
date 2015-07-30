@@ -83,6 +83,8 @@ int OpenIntf (vlc_object_t *p_this)
         [[VLCMain sharedInstance] setIntf: p_intf];
 
         [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
+        [NSBundle loadNibNamed:@"MainWindow" owner:[VLCMain sharedInstance]];
+        [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
 
         [VLCVoutWindowController sharedInstance];
 
@@ -204,6 +206,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
         _mainmenu = [[VLCMainMenu alloc] init];
         _voutController = [[VLCVoutWindowController alloc] init];
+        _playlist = [[VLCPlaylist alloc] init];
     }
 
     return self;
@@ -221,9 +224,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-    _playlist = [[VLCPlaylist alloc] init];
-    [NSBundle loadNibNamed:@"MainWindow" owner:self];
-    [[self mainWindow] makeKeyAndOrderFront:nil];
     _open = [[VLCOpen alloc] init];
     _coreinteraction = [VLCCoreInteraction sharedInstance];
 
