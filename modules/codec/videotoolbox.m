@@ -249,7 +249,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         }
 
         uint32_t size;
-        void *p_buf;
+        void *p_buf, *p_alloc_buf = NULL;
         int i_ret = 0;
 
         if (p_block == NULL) {
@@ -257,7 +257,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             uint32_t i_nal_size = 0;
             size = p_dec->fmt_in.i_extra;
 
-            p_buf = malloc(buf_size);
+            p_alloc_buf = p_buf = malloc(buf_size);
             if (!p_buf)
             {
                 msg_Warn(p_dec, "extra buffer allocation failed");
@@ -283,12 +283,14 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         }
 
         if (i_ret != VLC_SUCCESS) {
+            free(p_alloc_buf);
             return VLC_EGENERIC;
         }
 
         uint8_t *p_sps_buf = NULL, *p_pps_buf = NULL;
         size_t i_sps_size = 0, i_pps_size = 0;
         if (!p_buf) {
+            free(p_alloc_buf);
             return VLC_EGENERIC;
         }
 
@@ -303,6 +305,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         if (i_ret != VLC_SUCCESS)
         {
             msg_Warn(p_dec, "sps pps parsing failed");
+            free(p_alloc_buf);
             return VLC_EGENERIC;
         }
 
@@ -313,6 +316,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 
         if (i_ret != VLC_SUCCESS)
         {
+            free(p_alloc_buf);
             return VLC_EGENERIC;
         }
         /* this data is more trust-worthy than what we receive
@@ -332,7 +336,10 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         bool status = bo_init(&bo, 1024);
 
         if (status != true)
+        {
+            free(p_alloc_buf);
             return VLC_ENOMEM;
+        }
 
         bo_add_8(&bo, 1);      /* configuration version */
         bo_add_8(&bo, sps_data.i_profile);
@@ -368,10 +375,12 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
             bo_add_mem(&bo, i_pps_size - 4, fixed_pps);
             free(fixed_pps);
         }
+        free(p_alloc_buf);
 
         extradata = CFDataCreate(kCFAllocatorDefault,
                                  bo.b->p_buffer,
                                  bo.b->i_buffer);
+        bo_deinit(&bo);
 
         if (extradata)
             CFDictionarySetValue(extradata_info, CFSTR("avcC"), extradata);
@@ -717,6 +726,7 @@ static CFDataRef ESDSCreate(decoder_t *p_dec, uint8_t *p_buf, uint32_t i_buf_siz
     CFDataRef data = CFDataCreate(kCFAllocatorDefault,
                                   bo.b->p_buffer,
                                   bo.b->i_buffer);
+    bo_deinit(&bo);
     return data;
 }
 
