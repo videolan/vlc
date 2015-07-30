@@ -86,7 +86,7 @@ struct decoder_sys_t
         {
             AWindowHandler *p_awh;
             int i_pixel_format, i_stride, i_slice_height, i_width, i_height;
-            uint32_t i_nal_size;
+            uint32_t i_nal_length_size;
             size_t i_h264_profile;
             ArchitectureSpecificCopyData ascd;
             /* stores the inflight picture for each output buffer or NULL */
@@ -295,13 +295,13 @@ static int ParseVideoExtra(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
             if (p_extra[0] == 1
              && convert_sps_pps(p_dec, p_extra, i_extra,
                                 p_buf, buf_size, &size,
-                                &p_sys->u.video.i_nal_size) == VLC_SUCCESS)
+                                &p_sys->u.video.i_nal_length_size) == VLC_SUCCESS)
                 H264SetCSD(p_dec, p_buf, size, NULL);
         } else
         {
             if (convert_hevc_nal_units(p_dec, p_extra, i_extra,
                                        p_buf, buf_size, &size,
-                                       &p_sys->u.video.i_nal_size) == VLC_SUCCESS)
+                                       &p_sys->u.video.i_nal_length_size) == VLC_SUCCESS)
             {
                 struct csd csd;
 
@@ -1056,10 +1056,10 @@ static void H264ProcessBlock(decoder_t *p_dec, block_t *p_block,
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_H264 && p_block);
 
-    if (p_sys->u.video.i_nal_size)
+    if (p_sys->u.video.i_nal_length_size)
     {
         convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->u.video.i_nal_size);
+                               p_sys->u.video.i_nal_length_size);
     } else if (H264SetCSD(p_dec, p_block->p_buffer, p_block->i_buffer,
                           p_size_changed) == VLC_SUCCESS)
     {
@@ -1074,10 +1074,10 @@ static void HEVCProcessBlock(decoder_t *p_dec, block_t *p_block,
 
     assert(p_dec->fmt_in.i_codec == VLC_CODEC_HEVC && p_block);
 
-    if (p_sys->u.video.i_nal_size)
+    if (p_sys->u.video.i_nal_length_size)
     {
         convert_h264_to_annexb(p_block->p_buffer, p_block->i_buffer,
-                               p_sys->u.video.i_nal_size);
+                               p_sys->u.video.i_nal_length_size);
     }
 
     /* TODO */

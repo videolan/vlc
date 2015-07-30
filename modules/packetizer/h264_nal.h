@@ -118,10 +118,10 @@ static inline void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,
                      uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
-                     uint32_t *p_nal_size);
+                     uint32_t *p_nal_length_size);
 
 void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
-                             size_t i_nal_size );
+                             size_t i_nal_length_size );
 
 /* Get the SPS/PPS pointers from an Annex B buffer
  * Returns 0 if a SPS and/or a PPS is found */
@@ -141,6 +141,6 @@ int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
 
 /* Get level and Profile */
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
-                            size_t *p_level, size_t *p_nal_size);
+                            size_t *p_level, size_t *p_nal_length_size);
 
 #endif /* H264_NAL_H */

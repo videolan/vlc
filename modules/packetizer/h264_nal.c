@@ -32,7 +32,7 @@ static const uint8_t annexb_startcode[] = { 0x00, 0x00, 0x01 };
 int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_buf_size, uint8_t *p_out_buf,
                      uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
-                     uint32_t *p_nal_size)
+                     uint32_t *p_nal_length_size)
 {
     int i_profile;
     uint32_t i_data_size = i_buf_size, i_nal_size, i_sps_pps_size = 0;
@@ -47,8 +47,8 @@ int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
 
     /* Read infos in first 6 bytes */
     i_profile = (p_buf[1] << 16) | (p_buf[2] << 8) | p_buf[3];
-    if (p_nal_size)
-        *p_nal_size  = (p_buf[4] & 0x03) + 1;
+    if (p_nal_length_size)
+        *p_nal_length_size  = (p_buf[4] & 0x03) + 1;
     p_buf       += 5;
     i_data_size -= 5;
 
@@ -107,23 +107,23 @@ int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
 }
 
 void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
-                             size_t i_nal_size )
+                             size_t i_nal_length_size )
 {
     uint32_t nal_len = 0, nal_pos = 0;
 
-    if( i_nal_size < 3 || i_nal_size > 4 )
+    if( i_nal_length_size < 3 || i_nal_length_size > 4 )
         return;
 
     /* This only works for NAL sizes 3-4 */
     while( i_len > 0 )
     {
-        if( nal_pos < i_nal_size ) {
+        if( nal_pos < i_nal_length_size ) {
             unsigned int i;
-            for( i = 0; nal_pos < i_nal_size && i < i_len; i++, nal_pos++ ) {
+            for( i = 0; nal_pos < i_nal_length_size && i < i_len; i++, nal_pos++ ) {
                 nal_len = (nal_len << 8) | p_buf[i];
                 p_buf[i] = 0;
             }
-            if( nal_pos < i_nal_size )
+            if( nal_pos < i_nal_length_size )
                 return;
             p_buf[i - 1] = 1;
             p_buf += i;
@@ -518,7 +518,7 @@ int h264_parse_pps( const uint8_t *p_pps_buf, int i_pps_size,
 }
 
 bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
-                            size_t *p_level, size_t *p_nal_size)
+                            size_t *p_level, size_t *p_nal_length_size)
 {
     uint8_t *p = (uint8_t*)p_fmt->p_extra;
     if(!p || !p_fmt->p_extra) return false;
@@ -527,7 +527,7 @@ bool h264_get_profile_level(const es_format_t *p_fmt, size_t *p_profile,
     if (p_fmt->i_original_fourcc == VLC_FOURCC('a','v','c','1') && p[0] == 1)
     {
         if (p_fmt->i_extra < 12) return false;
-        if (p_nal_size) *p_nal_size = 1 + (p[4]&0x03);
+        if (p_nal_length_size) *p_nal_length_size = 1 + (p[4]&0x03);
         if (!(p[5]&0x1f)) return false;
         p += 8;
     }
