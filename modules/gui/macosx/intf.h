@@ -64,6 +64,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCCoreDialogProvider;
 @class VLCBookmarks;
 @class VLCOpen;
+@class VLCDebugMessageVisualizer;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 {
@@ -88,6 +89,8 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (VLCCoreDialogProvider *)coreDialogProvider;
 - (ResumeDialogController *)resumeDialog;
 - (VLCInputManager *)inputManager;
+- (VLCDebugMessageVisualizer *)debugMsgPanel;
+
 - (void)setActiveVideoPlayback:(BOOL)b_value;
 - (BOOL)activeVideoPlayback;
 - (void)applicationWillTerminate:(NSNotification *)notification;

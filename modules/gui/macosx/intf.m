@@ -58,6 +58,7 @@
 #import "ExtensionsManager.h"
 #import "BWQuincyManager.h"
 #import "ResumeDialogController.h"
+#import "DebugMessageVisualizer.h"
 
 #import "VideoEffects.h"
 #import "AudioEffects.h"
@@ -157,6 +158,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     ResumeDialogController *_resume_dialog;
     VLCInputManager *_input_manager;
     VLCPlaylist *_playlist;
+    VLCDebugMessageVisualizer *_messagePanelController;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -519,6 +521,14 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 - (VLCInputManager *)inputManager
 {
     return _input_manager;
+}
+
+- (VLCDebugMessageVisualizer *)debugMsgPanel
+{
+    if (!_messagePanelController)
+        _messagePanelController = [[VLCDebugMessageVisualizer alloc] init];
+
+    return _messagePanelController;
 }
 
 - (VLCBookmarks *)bookmarks

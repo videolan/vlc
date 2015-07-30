@@ -25,16 +25,15 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCDebugMessageVisualizer : NSObject
+@interface VLCDebugMessageVisualizer : NSWindowController
 {
-    IBOutlet NSWindow * _msgs_panel;
     IBOutlet NSButton * _msgs_save_btn;
     IBOutlet NSButton * _msgs_refresh_btn;
     IBOutlet id _msgs_table;
 }
 + (VLCDebugMessageVisualizer *)sharedInstance;
 
-- (void)showPanel;
+- (void)showWindow:(id)sender;
 
 - (IBAction)updateMessagesPanel:(id)sender;
 - (IBAction)saveDebugLog:(id)sender;

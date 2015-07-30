@@ -47,6 +47,9 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 static void MsgCallback(void *data, int type, const vlc_log_t *item, const char *format, va_list ap)
 {
     @autoreleasepool {
+
+        VLCDebugMessageVisualizer *visualizer = (__bridge VLCDebugMessageVisualizer*)data;
+
         int canc = vlc_savecancel();
         char *str;
 
@@ -55,7 +58,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
             return;
         }
 
-        [[VLCDebugMessageVisualizer sharedInstance] processReceivedlibvlcMessage: item ofType: type withStr: str];
+        [visualizer processReceivedlibvlcMessage: item ofType: type withStr: str];
 
         vlc_restorecancel(canc);
         free(str);
@@ -78,33 +81,31 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 - (id)init
 {
-    self = [super init];
+    self = [super initWithWindowNibName:@"DebugMessageVisualizer"];
     if (self) {
         _msg_lock = [[NSLock alloc] init];
         _msg_arr = [NSMutableArray arrayWithCapacity:600];
-        BOOL loaded = [NSBundle loadNibNamed:@"DebugMessageVisualizer" owner:self];
     }
     return self;
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
-    [_msgs_panel setExcludedFromWindowsMenu: YES];
-    [_msgs_panel setDelegate: self];
-    [_msgs_panel setTitle: _NS("Messages")];
+    [self.window setExcludedFromWindowsMenu: YES];
+    [self.window setDelegate: self];
+    [self.window setTitle: _NS("Messages")];
     [_msgs_save_btn setTitle: _NS("Save this Log...")];
     [_msgs_refresh_btn setImage: [NSImage imageNamed: NSImageNameRefreshTemplate]];
 }
 
 #pragma mark - UI interaction
 
-- (void)showPanel
+- (void)showWindow:(id)sender
 {
     /* subscribe to LibVLCCore's messages */
-    vlc_LogSet(VLCIntf->p_libvlc, MsgCallback, NULL);
+    vlc_LogSet(VLCIntf->p_libvlc, MsgCallback, (__bridge void*)self);
 
-    /* show panel */
-    [_msgs_panel makeKeyAndOrderFront:nil];
+    [super showWindow:sender];
 }
 
 - (IBAction)updateMessagesPanel:(id)sender
@@ -132,7 +133,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     [saveFolderPanel setCanCreateDirectories: YES];
     [saveFolderPanel setAllowedFileTypes: [NSArray arrayWithObject:@"rtf"]];
     [saveFolderPanel setNameFieldStringValue:[NSString stringWithFormat: _NS("VLC Debug Log (%s).rtf"), VERSION_MESSAGE]];
-    [saveFolderPanel beginSheetModalForWindow: _msgs_panel completionHandler:^(NSInteger returnCode) {
+    [saveFolderPanel beginSheetModalForWindow: self.window completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton) {
             NSUInteger count = [_msg_arr count];
             NSMutableAttributedString * string = [[NSMutableAttributedString alloc] init];

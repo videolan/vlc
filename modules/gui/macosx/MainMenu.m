@@ -1335,7 +1335,7 @@
 
 - (IBAction)showMessagesPanel:(id)showMessagesPanel
 {
-    [[VLCDebugMessageVisualizer sharedInstance] showPanel];
+    [[[VLCMain sharedInstance] debugMsgPanel] showWindow:self];
 }
 
 - (IBAction)showMainWindow:(id)sender
