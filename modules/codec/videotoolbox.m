@@ -156,7 +156,34 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
             break;
 
 #if !TARGET_OS_IPHONE
-            /* there are no DV decoders on iOS, so bailout early */
+        /* there are no DV or ProRes decoders on iOS, so bailout early */
+        case VLC_CODEC_PRORES:
+            /* the VT decoder can't differenciate between the ProRes flavors, so we do it */
+            switch (p_dec->fmt_in.i_original_fourcc) {
+                case VLC_FOURCC( 'a','p','4','c' ):
+                case VLC_FOURCC( 'a','p','4','h' ):
+                    codec = kCMVideoCodecType_AppleProRes4444;
+                    break;
+
+                case VLC_FOURCC( 'a','p','c','h' ):
+                    codec = kCMVideoCodecType_AppleProRes422HQ;
+                    break;
+
+                case VLC_FOURCC( 'a','p','c','s' ):
+                    codec = kCMVideoCodecType_AppleProRes422LT;
+                    break;
+
+                case VLC_FOURCC( 'a','p','c','o' ):
+                    codec = kCMVideoCodecType_AppleProRes422Proxy;
+                    break;
+
+                default:
+                    codec = kCMVideoCodecType_AppleProRes422;
+                    break;
+            }
+            if (codec != 0)
+                break;
+
         case VLC_CODEC_DV:
             /* the VT decoder can't differenciate between PAL and NTSC, so we need to do it */
             switch (p_dec->fmt_in.i_original_fourcc) {
@@ -234,9 +261,9 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         /* Do a late opening if there is no extra data and no valid video size */
         if ((p_dec->fmt_in.video.i_width == 0 || p_dec->fmt_in.video.i_height == 0
           || p_dec->fmt_in.i_extra == 0) && p_block == NULL) {
-            msg_Err(p_dec, "waiting for H264 SPS/PPS, extra data %i", p_dec->fmt_in.i_extra);
+            msg_Dbg(p_dec, "waiting for H264 SPS/PPS, will start late");
 
-            return VLC_SUCCESS; // return VLC_GENERIC to leave the waiting to someone else
+            return VLC_SUCCESS;
         }
 
         uint32_t size;
