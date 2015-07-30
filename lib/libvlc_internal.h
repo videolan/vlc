@@ -103,11 +103,6 @@ void libvlc_event_send(
         libvlc_event_manager_t * p_em,
         libvlc_event_t * p_event );
 
-void libvlc_event_attach_async( libvlc_event_manager_t * p_event_manager,
-                               libvlc_event_type_t event_type,
-                               libvlc_callback_t pf_callback,
-                               void *p_user_data );
-
 static inline libvlc_time_t from_mtime(mtime_t time)
 {
     return (time + 500ULL)/ 1000ULL;

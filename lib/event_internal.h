@@ -80,7 +80,6 @@ typedef struct libvlc_event_listener_t
     libvlc_event_type_t event_type;
     void *              p_user_data;
     libvlc_callback_t   pf_callback;
-    bool                is_asynchronous;
 } libvlc_event_listener_t;
 
 typedef struct libvlc_event_manager_t
@@ -89,7 +88,6 @@ typedef struct libvlc_event_manager_t
     vlc_array_t listeners_groups;
     vlc_mutex_t object_lock;
     vlc_mutex_t event_sending_lock;
-    struct libvlc_event_async_queue * async_event_queue;
 } libvlc_event_sender_t;
 
 
@@ -99,13 +97,7 @@ listeners_are_equal( libvlc_event_listener_t * listener1,
 {
     return listener1->event_type  == listener2->event_type &&
     listener1->pf_callback == listener2->pf_callback &&
-    listener1->p_user_data == listener2->p_user_data &&
-    listener1->is_asynchronous == listener2->is_asynchronous;
+    listener1->p_user_data == listener2->p_user_data;
 }
-
-/* event_async.c */
-void libvlc_event_async_fini(libvlc_event_manager_t * p_em);
-void libvlc_event_async_dispatch(libvlc_event_manager_t * p_em, libvlc_event_listener_t * listener, libvlc_event_t * event);
-void libvlc_event_async_ensure_listener_removal(libvlc_event_manager_t * p_em, libvlc_event_listener_t * listener);
 
 #endif

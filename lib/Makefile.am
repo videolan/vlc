@@ -44,7 +44,6 @@ libvlc_la_SOURCES = \
 	video.c \
 	audio.c \
 	event.c \
-	event_async.c \
 	media.c \
 	media_player.c \
 	media_list.c \

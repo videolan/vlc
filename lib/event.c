@@ -80,7 +80,6 @@ libvlc_event_manager_new( void * p_obj )
     }
 
     p_em->p_obj = p_obj;
-    p_em->async_event_queue = NULL;
 
     vlc_array_init( &p_em->listeners_groups );
     vlc_mutex_init( &p_em->object_lock );
@@ -97,8 +96,6 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
 {
     libvlc_event_listeners_group_t * p_lg;
     int i,j ;
-
-    libvlc_event_async_fini(p_em);
 
     vlc_mutex_destroy( &p_em->event_sending_lock );
     vlc_mutex_destroy( &p_em->object_lock );
@@ -204,30 +201,21 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
     listener_cached = array_listeners_cached;
     for( i = 0; i < i_cached_listeners; i++ )
     {
-        if(listener_cached->is_asynchronous)
-        {
-            /* The listener wants not to block the emitter during event callback */
-            libvlc_event_async_dispatch(p_em, listener_cached, p_event);
-        }
-        else
-        {
-            /* The listener wants to block the emitter during event callback */
+        /* The listener wants to block the emitter during event callback */
+        listener_cached->pf_callback( p_event, listener_cached->p_user_data );
+        listener_cached++;
 
-            listener_cached->pf_callback( p_event, listener_cached->p_user_data );
-            listener_cached++;
-
-            if( listeners_group->b_sublistener_removed )
+        if( listeners_group->b_sublistener_removed )
+        {
+            /* If a callback was removed, this gets called */
+            bool valid_listener;
+            vlc_mutex_lock( &p_em->object_lock );
+            valid_listener = group_contains_listener( listeners_group, listener_cached );
+            vlc_mutex_unlock( &p_em->object_lock );
+            if( !valid_listener )
             {
-                /* If a callback was removed, this gets called */
-                bool valid_listener;
-                vlc_mutex_lock( &p_em->object_lock );
-                valid_listener = group_contains_listener( listeners_group, listener_cached );
-                vlc_mutex_unlock( &p_em->object_lock );
-                if( !valid_listener )
-                {
-                    listener_cached++;
-                    continue;
-                }
+                listener_cached++;
+                continue;
             }
         }
     }
@@ -343,8 +331,7 @@ const char * libvlc_event_type_name( int event_type )
 static
 int event_attach( libvlc_event_manager_t * p_event_manager,
                   libvlc_event_type_t event_type,
-                  libvlc_callback_t pf_callback, void *p_user_data,
-                  bool is_asynchronous )
+                  libvlc_callback_t pf_callback, void *p_user_data )
 {
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
@@ -357,7 +344,6 @@ int event_attach( libvlc_event_manager_t * p_event_manager,
     listener->event_type = event_type;
     listener->p_user_data = p_user_data;
     listener->pf_callback = pf_callback;
-    listener->is_asynchronous = is_asynchronous;
 
     vlc_mutex_lock( &p_event_manager->object_lock );
     for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++ )
@@ -389,22 +375,7 @@ int libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
                          libvlc_callback_t pf_callback,
                          void *p_user_data )
 {
-    return event_attach(p_event_manager, event_type, pf_callback, p_user_data,
-                        false /* synchronous */);
-}
-
-/**************************************************************************
- *       libvlc_event_attach (public) :
- *
- * Add a callback for an event.
- **************************************************************************/
-void libvlc_event_attach_async( libvlc_event_manager_t * p_event_manager,
-                         libvlc_event_type_t event_type,
-                         libvlc_callback_t pf_callback,
-                         void *p_user_data )
-{
-    event_attach(p_event_manager, event_type, pf_callback, p_user_data,
-                 true /* asynchronous */);
+    return event_attach(p_event_manager, event_type, pf_callback, p_user_data);
 }
 
 /**************************************************************************
@@ -452,15 +423,6 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
     }
     vlc_mutex_unlock( &p_event_manager->object_lock );
     vlc_mutex_unlock( &p_event_manager->event_sending_lock );
-
-    /* Now make sure any pending async event won't get fired after that point */
-    libvlc_event_listener_t listener_to_remove;
-    listener_to_remove.event_type  = event_type;
-    listener_to_remove.pf_callback = pf_callback;
-    listener_to_remove.p_user_data = p_user_data;
-    listener_to_remove.is_asynchronous = true;
-
-    libvlc_event_async_ensure_listener_removal(p_event_manager, &listener_to_remove);
 
     assert(found);
 }
