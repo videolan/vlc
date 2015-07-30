@@ -120,8 +120,15 @@ int convert_sps_pps( decoder_t *p_dec, const uint8_t *p_buf,
                      uint32_t i_out_buf_size, uint32_t *p_sps_pps_size,
                      uint32_t *p_nal_length_size);
 
+/* Convert avcC format to Annex B in-place */
 void convert_h264_to_annexb( uint8_t *p_buf, uint32_t i_len,
                              size_t i_nal_length_size );
+
+/* Convert Annex B to avcC format in-place
+ * Returns the same p_block or a new p_block if there is not enough room to put
+ * the NAL size. In case of error, NULL is returned and p_block is released.
+ * */
+block_t *convert_annexb_to_h264( block_t *p_block, size_t i_nal_length_size );
 
 /* Get the SPS/PPS pointers from an Annex B buffer
  * Returns 0 if a SPS and/or a PPS is found */
