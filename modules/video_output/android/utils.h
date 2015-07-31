@@ -148,7 +148,8 @@ void AWindowHandler_releaseSurface(AWindowHandler *p_awh, enum AWindow_ID id);
 /**
  * This function returns the Video or the Subtitles ANativeWindow attached to
  * the Android Surface. It can be released with
- * AWindowHandler_releaseANativeWindow or by AWindowHandler_destroy.
+ * AWindowHandler_releaseANativeWindow, AWindowHandler_releaseSurface or by
+ * AWindowHandler_destroy.
  */
 ANativeWindow *AWindowHandler_getANativeWindow(AWindowHandler *p_awh,
                                                enum AWindow_ID id);

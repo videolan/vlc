@@ -514,6 +514,7 @@ static void
 AWindowHandler_releaseSurfaceEnv(AWindowHandler *p_awh, JNIEnv *p_env,
                                  enum AWindow_ID id)
 {
+    AWindowHandler_releaseANativeWindow(p_awh, id);
     if (p_awh->views[id].jsurface)
     {
         (*p_env)->DeleteGlobalRef(p_env, p_awh->views[id].jsurface);
@@ -525,9 +526,6 @@ void
 AWindowHandler_destroy(AWindowHandler *p_awh)
 {
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
-
-    AWindowHandler_releaseANativeWindow(p_awh, AWindow_Video);
-    AWindowHandler_releaseANativeWindow(p_awh, AWindow_Subtitles);
 
     if (p_env)
     {
