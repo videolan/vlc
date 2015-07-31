@@ -521,22 +521,19 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
         p_window->fmt.i_height = p_pic->format.i_height;
         p_window->fmt.i_width = (p_pic->format.i_width + align_pixels) & ~align_pixels;
         picture_Release(p_pic);
-    }
 
-    if (AndroidWindow_ConfigureJavaSurface(sys, p_window,
-                                           &b_java_configured) != 0)
-        return -1;
+        if (AndroidWindow_ConfigureJavaSurface(sys, p_window,
+                                               &b_java_configured) != 0)
+            return -1;
 
-    if (!p_window->jsurface) {
+        if (!p_window->b_use_priv
+            || AndroidWindow_SetupANWP(sys, p_window, b_java_configured) != 0) {
+            if (AndroidWindow_SetupANW(sys, p_window, b_java_configured) != 0)
+                return -1;
+        }
+    } else {
         sys->p_window->i_pic_count = 31; // TODO
         sys->p_window->i_min_undequeued = 0;
-        return 0;
-    }
-
-    if (!p_window->b_use_priv
-        || AndroidWindow_SetupANWP(sys, p_window, b_java_configured) != 0) {
-        if (AndroidWindow_SetupANW(sys, p_window, b_java_configured) != 0)
-            return -1;
     }
 
     return 0;
