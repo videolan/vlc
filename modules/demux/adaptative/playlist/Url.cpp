@@ -99,9 +99,8 @@ std::string Url::toString(size_t index, const BaseRepresentation *rep) const
 }
 
 Url::Component::Component(const std::string & str, const MediaSegmentTemplate *templ_)
+ : component(str), templ(templ_), b_scheme(false), b_dir(false)
 {
-    component = str;
-    templ = templ_;
     if(!component.empty())
     {
         b_dir = (component[component.length()-1]=='/');
