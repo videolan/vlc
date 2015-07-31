@@ -44,10 +44,10 @@ DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
 #include "audio_output/mmdevice.h"
 
 #if (_WIN32_WINNT < 0x600)
-static VOID WINAPI (*InitializeConditionVariable)(PCONDITION_VARIABLE);
-static BOOL WINAPI (*SleepConditionVariableCS)(PCONDITION_VARIABLE,
+static VOID (WINAPI *InitializeConditionVariable) (PCONDITION_VARIABLE);
+static BOOL (WINAPI *SleepConditionVariableCS) (PCONDITION_VARIABLE,
                                                PCRITICAL_SECTION, DWORD);
-static VOID WINAPI (*WakeConditionVariable)(PCONDITION_VARIABLE);
+static VOID (WINAPI *WakeConditionVariable)(PCONDITION_VARIABLE);
 #define LOOKUP(s) \
     if (((s) = (void *)GetProcAddress(h, #s)) == NULL) return FALSE
 
