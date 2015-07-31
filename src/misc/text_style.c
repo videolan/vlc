@@ -127,8 +127,8 @@ void text_segment_Delete( text_segment_t* segment )
     if ( segment != NULL )
     {
         free( segment->psz_text );
-        free( segment );
         text_style_Delete( segment->style );
+        free( segment );
     }
 }
 
