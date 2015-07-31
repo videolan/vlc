@@ -34,7 +34,8 @@
 #define CHAPTERSSPOTSIZE 3
 
 SeekStyle::SeekStyleOption::SeekStyleOption()
-    : QStyleOptionSlider(), buffering( 1.0 ), length(0), animate(false), animationopacity( 1.0 )
+    : QStyleOptionSlider(), buffering( 1.0 ), length(0), animate(false), animationopacity( 1.0 ),
+      animationloading(0.0)
 {
 
 }
