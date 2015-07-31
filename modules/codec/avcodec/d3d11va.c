@@ -44,9 +44,11 @@
 #include "directx_va.h"
 
 #define COBJMACROS
+#define INITGUID
+#include <d3d11.h>
 #include <libavcodec/d3d11va.h>
 
-#include "../../video_chroma/copy.h"
+#include "../../video_chroma/dxgi_fmt.h"
 
 static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat,
                 const es_format_t *, picture_sys_t *p_sys);
@@ -618,38 +620,54 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input)
     directx_sys_t *dx_sys = &va->sys->dx_sys;
     HRESULT hr;
 
-    /* */
-    BOOL is_supported = false;
-    hr = ID3D11VideoDevice_CheckVideoDecoderFormat((ID3D11VideoDevice*) dx_sys->d3ddec, input, DXGI_FORMAT_NV12, &is_supported);
-    if (SUCCEEDED(hr) && is_supported)
-        msg_Dbg(va, "NV12 is supported for output");
+#ifndef NDEBUG
+    BOOL bSupported = false;
+    for (int format = 0; format < 188; format++) {
+        hr = ID3D11VideoDevice_CheckVideoDecoderFormat((ID3D11VideoDevice*) dx_sys->d3ddec, input, format, &bSupported);
+        if (SUCCEEDED(hr) && bSupported)
+            msg_Dbg(va, "format %s is supported for output", DxgiFormatToStr(format));
+    }
+#endif
 
+    DXGI_FORMAT processorInput[4];
+    int idx = 0;
     if ( va->sys->render != DXGI_FORMAT_UNKNOWN )
+        processorInput[idx++] = va->sys->render;
+    processorInput[idx++] = DXGI_FORMAT_NV12;
+    processorInput[idx++] = DXGI_FORMAT_UNKNOWN;
+
+    /* */
+    for (idx = 0; processorInput[idx] != DXGI_FORMAT_UNKNOWN; ++idx)
     {
-        is_supported = false;
-        hr = ID3D11VideoDevice_CheckVideoDecoderFormat((ID3D11VideoDevice*) dx_sys->d3ddec, input, va->sys->render, &is_supported);
+        BOOL is_supported = false;
+        hr = ID3D11VideoDevice_CheckVideoDecoderFormat((ID3D11VideoDevice*) dx_sys->d3ddec, input, processorInput[idx], &is_supported);
         if (SUCCEEDED(hr) && is_supported)
+            msg_Dbg(va, "%s is supported for output", DxgiFormatToStr(processorInput[idx]));
+        else
         {
-            /* We have our solution */
-            msg_Dbg(va, "Using decoder output from picture source.");
+            msg_Dbg(va, "Can't get a decoder for output format %s.", DxgiFormatToStr(processorInput[idx]));
+            continue;
+        }
+
+        // check if we can create render texture of that format
+        // check the decoder can output to that format
+        const UINT i_quadSupportFlags = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
+        UINT i_formatSupport;
+        bool b_needsProcessor = true;
+        if( SUCCEEDED( ID3D11Device_CheckFormatSupport((ID3D11Device*) dx_sys->d3ddev,
+                                                       processorInput[idx],
+                                                       &i_formatSupport)) &&
+                ( i_formatSupport & i_quadSupportFlags ) == i_quadSupportFlags )
+            b_needsProcessor = false;
+
+        if ( !b_needsProcessor )
+        {
+            va->sys->render = processorInput[idx];
             return VLC_SUCCESS;
         }
-        msg_Dbg(va, "Output format from picture source not supported.");
-        return VLC_EGENERIC;
     }
-    else
-    {
-        /* */
-        is_supported = false;
-        hr = ID3D11VideoDevice_CheckVideoDecoderFormat((ID3D11VideoDevice*) dx_sys->d3ddec, input, DXGI_FORMAT_NV12, &is_supported);
-        if (SUCCEEDED(hr) && is_supported)
-        {
-            /* We have our solution */
-            msg_Dbg(va, "Using decoder output NV12");
-            va->sys->render = DXGI_FORMAT_NV12;
-            return VLC_SUCCESS;
-        }
-    }
+
+    msg_Dbg(va, "Output format from picture source not supported.");
     return VLC_EGENERIC;
 }
 

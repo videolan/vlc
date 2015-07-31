@@ -178,6 +178,7 @@ vout_LTLIBRARIES += $(LTLIBdirect3d9)
 EXTRA_LTLIBRARIES += libdirect3d9_plugin.la
 
 libdirect3d11_plugin_la_SOURCES = video_output/msw/direct3d11.c \
+ video_chroma/dxgi_fmt.c video_chroma/dxgi_fmt.h \
  video_output/msw/common.c video_output/msw/common.h
 libdirect3d11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
  -DMODULE_NAME_IS_direct3d11
