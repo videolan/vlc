@@ -1,0 +1,48 @@
+--- libass/libass/ass.c.orig	2015-07-10 18:30:35.165007300 +0200
++++ libass/libass/ass.c	2015-07-10 18:35:00.583091000 +0200
+@@ -21,7 +21,9 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#ifdef HAVE_STRINGS_H
+ #include <strings.h>
++#endif
+ #include <assert.h>
+ #include <errno.h>
+ #include <sys/types.h>
+--- libass/libass/ass_font.c.orig	2015-07-10 18:30:37.924973400 +0200
++++ libass/libass/ass_font.c	2015-07-10 18:35:03.696308800 +0200
+@@ -25,7 +25,9 @@
+ #include FT_GLYPH_H
+ #include FT_TRUETYPE_TABLES_H
+ #include FT_OUTLINE_H
++#ifdef HAVE_STRINGS_H
+ #include <strings.h>
++#endif
+ #include <limits.h>
+ 
+ #include "ass.h"
+--- libass/libass/ass_fontconfig.c.orig	2015-07-10 18:30:40.017464100 +0200
++++ libass/libass/ass_fontconfig.c	2015-07-10 18:35:06.568353600 +0200
+@@ -22,7 +22,9 @@
+ #include <stdio.h>
+ #include <assert.h>
+ #include <string.h>
++#ifdef HAVE_STRINGS_H
+ #include <strings.h>
++#endif
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <inttypes.h>
+--- libass/libass/ass_utils.c.orig	2015-07-10 18:30:41.897803700 +0200
++++ libass/libass/ass_utils.c	2015-07-10 18:35:09.705589800 +0200
+@@ -23,7 +23,9 @@
+ #include <stdio.h>
+ #include <stdint.h>
+ #include <inttypes.h>
++#ifdef HAVE_STRINGS_H
+ #include <strings.h>
++#endif
+ #include <limits.h>
+ 
+ #include "ass_library.h"
