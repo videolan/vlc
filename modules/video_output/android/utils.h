@@ -143,25 +143,24 @@ bool AWindowHandler_getWindowSize(AWindowHandler *p_awh,
  * AWindowHandler_destroy.
  */
 jobject AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id);
-void AWindowHandler_releaseSurface(AWindowHandler *p_awh, jobject jsurface);
+void AWindowHandler_releaseSurface(AWindowHandler *p_awh, enum AWindow_ID id);
 
 /**
  * This function returns the Video or the Subtitles ANativeWindow attached to
  * the Android Surface. It can be released with
- * AWindowHandler_releaseANativeWindow, AWindowHandler_releaseSurface or by
- * AWindowHandler_destroy.
+ * AWindowHandler_releaseANativeWindow or by AWindowHandler_destroy.
  */
 ANativeWindow *AWindowHandler_getANativeWindow(AWindowHandler *p_awh,
-                                               jobject jsurface);
+                                               enum AWindow_ID id);
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
-                                         ANativeWindow *panw);
+                                         enum AWindow_ID id);
 /**
  * This function is a fix up of ANativeWindow_setBuffersGeometry that doesn't
  * work before Android ICS. It configures the Surface from the Android
  * MainThread via a SurfaceHolder. It returns VLC_SUCCESS if the Surface was
  * configured (it returns VLC_EGENERIC after Android ICS).
  */
-int AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, jobject jsurface,
+int AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
                                       int i_width, int i_height, int i_format);
 
 /**

@@ -510,21 +510,31 @@ AWindowHandler_new(vlc_object_t *p_obj)
     return p_awh;
 }
 
+static void
+AWindowHandler_releaseSurfaceEnv(AWindowHandler *p_awh, JNIEnv *p_env,
+                                 enum AWindow_ID id)
+{
+    if (p_awh->views[id].jsurface)
+    {
+        (*p_env)->DeleteGlobalRef(p_env, p_awh->views[id].jsurface);
+        p_awh->views[id].jsurface = NULL;
+    }
+}
+
 void
 AWindowHandler_destroy(AWindowHandler *p_awh)
 {
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
 
+    AWindowHandler_releaseANativeWindow(p_awh, AWindow_Video);
+    AWindowHandler_releaseANativeWindow(p_awh, AWindow_Subtitles);
+
     if (p_env)
     {
         if (p_awh->event.b_registered)
             JNI_CALL(CallBooleanMethod, setCallback, (jlong)0LL);
-        if (p_awh->views[AWindow_Video].jsurface)
-            AWindowHandler_releaseSurface(p_awh,
-                                          p_awh->views[AWindow_Video].jsurface);
-        if (p_awh->views[AWindow_Subtitles].jsurface)
-            AWindowHandler_releaseSurface(p_awh,
-                                          p_awh->views[AWindow_Subtitles].jsurface);
+        AWindowHandler_releaseSurfaceEnv(p_awh, p_env, AWindow_Video);
+        AWindowHandler_releaseSurfaceEnv(p_awh, p_env, AWindow_Subtitles);
         (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
     }
 
@@ -549,40 +559,6 @@ AWindowHandler_getANativeWindowPrivAPI(AWindowHandler *p_awh)
         return NULL;
     else
         return &p_awh->anwpriv_api;
-}
-
-static enum AWindow_ID
-AWindowHandler_getIdFromSurface(AWindowHandler *p_awh, jobject jsurface)
-{
-    enum AWindow_ID id = AWindow_Max;
-
-    if (jsurface)
-    {
-        if (p_awh->views[AWindow_Video].jsurface == jsurface)
-            id = AWindow_Video;
-        else if (p_awh->views[AWindow_Subtitles].jsurface == jsurface)
-            id = AWindow_Subtitles;
-    }
-
-    assert(id != AWindow_Max);
-    return id;
-}
-
-static enum AWindow_ID
-AWindowHandler_getIdFromANW(AWindowHandler *p_awh, ANativeWindow *p_anw)
-{
-    enum AWindow_ID id = AWindow_Max;
-
-    if (p_anw)
-    {
-        if (p_awh->views[AWindow_Video].p_anw == p_anw)
-            id = AWindow_Video;
-        else if (p_awh->views[AWindow_Subtitles].p_anw == p_anw)
-            id = AWindow_Subtitles;
-    }
-
-    assert(id != AWindow_Max);
-    return id;
 }
 
 jobject
@@ -613,37 +589,22 @@ AWindowHandler_getSurface(AWindowHandler *p_awh, enum AWindow_ID id)
 }
 
 void
-AWindowHandler_releaseSurface(AWindowHandler *p_awh, jobject jsurface)
+AWindowHandler_releaseSurface(AWindowHandler *p_awh, enum AWindow_ID id)
 {
+    assert(id < AWindow_Max);
 
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
-
     if (p_env)
-    {
-        enum AWindow_ID id = AWindowHandler_getIdFromSurface(p_awh, jsurface);
-        if (id != AWindow_Max)
-        {
-            if (p_awh->views[id].p_anw)
-            {
-                p_awh->pf_winRelease(p_awh->views[id].p_anw);
-                p_awh->views[id].p_anw = NULL;
-            }
-            if (p_awh->views[id].jsurface)
-            {
-                (*p_env)->DeleteGlobalRef(p_env, p_awh->views[id].jsurface);
-                p_awh->views[id].jsurface = NULL;
-            }
-        }
-    }
+        AWindowHandler_releaseSurfaceEnv(p_awh, p_env, id);
 }
 
 ANativeWindow *
-AWindowHandler_getANativeWindow(AWindowHandler *p_awh, jobject jsurface)
+AWindowHandler_getANativeWindow(AWindowHandler *p_awh, enum AWindow_ID id)
 {
+    assert(id < AWindow_Max);
+
+    jobject jsurf;
     JNIEnv *p_env;
-    enum AWindow_ID id = AWindowHandler_getIdFromSurface(p_awh, jsurface);
-    if (id == AWindow_Max)
-        return NULL;
 
     if (p_awh->views[id].p_anw)
         return p_awh->views[id].p_anw;
@@ -652,16 +613,20 @@ AWindowHandler_getANativeWindow(AWindowHandler *p_awh, jobject jsurface)
     if (!p_env)
         return NULL;
 
-    p_awh->views[id].p_anw = p_awh->pf_winFromSurface(p_env, jsurface);
+    jsurf = AWindowHandler_getSurface(p_awh, id);
+    if (!jsurf)
+        return NULL;
+
+    p_awh->views[id].p_anw = p_awh->pf_winFromSurface(p_env, jsurf);
     return p_awh->views[id].p_anw;
 }
 
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
-                                         ANativeWindow *p_anw)
+                                         enum AWindow_ID id)
 {
-    enum AWindow_ID id = AWindowHandler_getIdFromANW(p_awh, p_anw);
+    assert(id < AWindow_Max);
 
-    if (id != AWindow_Max)
+    if (p_awh->views[id].p_anw)
     {
         p_awh->pf_winRelease(p_awh->views[id].p_anw);
         p_awh->views[id].p_anw = NULL;
@@ -761,16 +726,21 @@ AWindowHandler_getWindowSize(AWindowHandler *p_awh,
 }
 
 int
-AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, jobject jsurface,
+AWindowHandler_setBuffersGeometry(AWindowHandler *p_awh, enum AWindow_ID id,
                                   int i_width, int i_height, int i_format)
 {
+    jobject jsurf;
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
     if (!p_env)
         return VLC_EGENERIC;
 
-    return JNI_CALL(CallBooleanMethod, setBuffersGeometry, jsurface,
-                     i_width, i_height, i_format) ? VLC_SUCCESS
-                                                  : VLC_EGENERIC;
+    jsurf = AWindowHandler_getSurface(p_awh, id);
+    if (!jsurf)
+        return VLC_EGENERIC;
+
+    return JNI_CALL(CallBooleanMethod, setBuffersGeometry,
+                    jsurf, i_width, i_height, i_format) ? VLC_SUCCESS
+                                                        : VLC_EGENERIC;
 }
 
 int

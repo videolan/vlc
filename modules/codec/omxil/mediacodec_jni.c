@@ -482,6 +482,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
     jobject jinput_buffers = NULL;
     jobject joutput_buffers = NULL;
     jobject jbuffer_info = NULL;
+    jobject jsurface = NULL;
 
     GET_ENV();
 
@@ -511,7 +512,10 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
                                                  jmime,
                                                  p_args->video.i_width,
                                                  p_args->video.i_height);
-        b_direct_rendering = !!p_args->video.jsurface;
+        if (p_args->video.p_awh)
+            jsurface = AWindowHandler_getSurface(p_args->video.p_awh,
+                                                 AWindow_Video);
+        b_direct_rendering = !!jsurface;
 
         /* There is no way to rotate the video using direct rendering (and
          * using a SurfaceView) before  API 21 (Lollipop). Therefore, we
@@ -541,7 +545,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
     {
         // Configure MediaCodec with the Android surface.
         (*env)->CallVoidMethod(env, p_sys->codec, jfields.configure,
-                               jformat, p_args->video.jsurface, NULL, 0);
+                               jformat, jsurface, NULL, 0);
         if (CHECK_EXCEPTION())
         {
             msg_Warn(api->p_obj, "Exception occurred in MediaCodec.configure "
