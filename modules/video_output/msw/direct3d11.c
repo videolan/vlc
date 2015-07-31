@@ -1721,27 +1721,26 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
             quad_picture = (*region)[i];
-            hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)((d3d_quad_t *) quad_picture->p_sys)->pTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-            if( SUCCEEDED(hr) ) {
-                err = CommonUpdatePicture(quad_picture, NULL, mappedResource.pData, mappedResource.RowPitch);
-                ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)((d3d_quad_t *) quad_picture->p_sys)->pTexture, 0);
-                if (err != VLC_SUCCESS) {
-                    msg_Err(vd, "Failed to set the buffer on the OSD picture" );
-                    picture_Release(quad_picture);
-                    continue;
-                }
-            } else {
-                msg_Err(vd, "Failed to map the OSD texture (hr=0x%lX)", hr );
+        }
+
+        hr = ID3D11DeviceContext_Map(sys->d3dcontext, (ID3D11Resource *)((d3d_quad_t *) quad_picture->p_sys)->pTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        if( SUCCEEDED(hr) ) {
+            err = CommonUpdatePicture(quad_picture, NULL, mappedResource.pData, mappedResource.RowPitch);
+            if (err != VLC_SUCCESS) {
+                msg_Err(vd, "Failed to set the buffer on the SPU picture" );
                 picture_Release(quad_picture);
                 continue;
             }
-#ifndef NDEBUG
-            msg_Dbg(vd, "Created %dx%d texture for OSD",
-                    r->fmt.i_visible_width, r->fmt.i_visible_height);
-#endif
+
+            picture_CopyPixels(quad_picture, r->p_picture);
+
+            ID3D11DeviceContext_Unmap(sys->d3dcontext, (ID3D11Resource *)((d3d_quad_t *) quad_picture->p_sys)->pTexture, 0);
+        } else {
+            msg_Err(vd, "Failed to map the SPU texture (hr=0x%lX)", hr );
+            picture_Release(quad_picture);
+            continue;
         }
 
-        picture_CopyPixels(quad_picture, r->p_picture);
 
         /* Map the subpicture to sys->rect_dest */
         const int i_original_width  = subpicture->i_original_picture_width;
