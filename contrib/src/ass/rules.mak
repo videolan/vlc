@@ -59,8 +59,14 @@ else
 ASS_CONF += --disable-harfbuzz
 endif
 
+ifdef WITH_OPTIMIZATION
+ASS_CFLAGS += -O3
+else
+ASS_CFLAGS += -g
+endif
+
 .ass: libass
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -O3" ./configure $(HOSTCONF) $(ASS_CONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) $(ASS_CFLAGS)" ./configure $(HOSTCONF) $(ASS_CONF)
 	cd $< && $(MAKE) install
 	touch $@
