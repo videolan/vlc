@@ -217,12 +217,10 @@ mtime_t PlaylistManager::getFirstDTS() const
 
 int PlaylistManager::getGroup() const
 {
-    std::vector<Stream *>::const_iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
-    {
-        return (*it)->getGroup();
-    }
-    return -1;
+    if (!streams.empty())
+        return streams[0]->getGroup();
+    else
+        return -1;
 }
 
 int PlaylistManager::esCount() const
