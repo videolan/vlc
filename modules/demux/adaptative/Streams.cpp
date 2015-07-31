@@ -565,6 +565,7 @@ BaseStreamOutput::Demuxed::Demuxed(es_out_id_t *id, const es_format_t *fmt)
 {
     p_queue = NULL;
     pp_queue_last = &p_queue;
+    recycle = false;
     es_id = id;
     es_format_Init(&fmtcpy, UNKNOWN_ES, 0);
     es_format_Copy(&fmtcpy, fmt);
