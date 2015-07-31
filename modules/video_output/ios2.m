@@ -210,7 +210,7 @@ static int Open(vlc_object_t *this)
     CGFloat scaleFactor = sys->viewContainer.contentScaleFactor;
     CGSize viewSize = sys->viewContainer.bounds.size;
     vout_display_SendEventFullscreen(vd, false);
-    vout_display_SendEventDisplaySize(vd, viewSize.width * scaleFactor, viewSize.height * scaleFactor, false);
+    vout_display_SendEventDisplaySize(vd, viewSize.width * scaleFactor, viewSize.height * scaleFactor);
 
     /* */
     [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
