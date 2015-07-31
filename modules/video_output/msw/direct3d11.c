@@ -1095,29 +1095,31 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmt)
         sys->d3dregion_format = DXGI_FORMAT_UNKNOWN;
     }
 
-    switch (fmt->i_chroma)
+    sys->d3dPxShader = globPixelShaderDefault;
+    if (sys->picQuadConfig.resourceFormatYRGB == DXGI_FORMAT_R8_UNORM)
     {
-    case VLC_CODEC_NV12:
-    case VLC_CODEC_D3D11_OPAQUE:
-        if( fmt->i_height > 576 )
-            sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
-        else
-            sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
-        break;
-    case VLC_CODEC_YV12:
-    case VLC_CODEC_I420:
-        if( fmt->i_height > 576 )
-            sys->d3dPxShader = globPixelShaderBiplanarI420_BT709_2RGB;
-        else
-            sys->d3dPxShader = globPixelShaderBiplanarI420_BT601_2RGB;
-        break;
-    case VLC_CODEC_RGB32:
-    case VLC_CODEC_BGRA:
-    case VLC_CODEC_RGB16:
-    default:
-        sys->d3dPxShader = globPixelShaderDefault;
-        break;
+        switch (fmt->i_chroma)
+        {
+        case VLC_CODEC_NV12:
+        case VLC_CODEC_D3D11_OPAQUE:
+            if( fmt->i_height > 576 )
+                sys->d3dPxShader = globPixelShaderBiplanarYUV_BT709_2RGB;
+            else
+                sys->d3dPxShader = globPixelShaderBiplanarYUV_BT601_2RGB;
+            break;
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_I420:
+            if( fmt->i_height > 576 )
+                sys->d3dPxShader = globPixelShaderBiplanarI420_BT709_2RGB;
+            else
+                sys->d3dPxShader = globPixelShaderBiplanarI420_BT601_2RGB;
+            break;
+        default:
+            vlc_assert_unreachable();
+            break;
+        }
     }
+
     if (sys->d3dregion_format != DXGI_FORMAT_UNKNOWN)
         sys->psz_rgbaPxShader = globPixelShaderDefault;
     else
