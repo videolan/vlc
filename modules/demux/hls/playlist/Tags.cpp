@@ -69,7 +69,6 @@ std::vector<uint8_t> Attribute::hexSequence() const
 
 std::pair<std::size_t,std::size_t> Attribute::getByteRange() const
 {
-    std::pair<std::size_t,std::size_t> ret;
     std::size_t length = 0;
     std::size_t offset = 0;
     std::istringstream is(value);
@@ -85,8 +84,7 @@ std::pair<std::size_t,std::size_t> Attribute::getByteRange() const
         }
     }
 
-    ret = std::make_pair(offset, length);
-    return ret;
+    return std::make_pair(offset, length);
 }
 
 std::pair<int, int> Attribute::getResolution() const
