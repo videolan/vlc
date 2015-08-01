@@ -37,6 +37,7 @@ Representation::Representation  ( BaseAdaptationSet *set ) :
                 BaseRepresentation( set )
 {
     b_live = true;
+    switchpolicy = SegmentInformation::SWITCH_SEGMENT_ALIGNED; /* FIXME: based on streamformat */
 }
 
 Representation::~Representation ()
