@@ -2595,7 +2595,7 @@ static void UpdateScrambledState( demux_t *p_demux, ts_pid_t *p_pid, bool b_scra
         return;
 
     msg_Warn( p_demux, "scrambled state changed on pid %d (%d->%d)",
-              p_pid->i_pid, SCRAMBLED(*p_pid), b_scrambled );
+              p_pid->i_pid, !!SCRAMBLED(*p_pid), b_scrambled );
 
     if( b_scrambled )
         p_pid->i_flags |= FLAG_SCRAMBLED;
