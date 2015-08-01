@@ -89,6 +89,25 @@ std::pair<std::size_t,std::size_t> Attribute::getByteRange() const
     return ret;
 }
 
+std::pair<int, int> Attribute::getResolution() const
+{
+    int w = 0, h = 0;
+
+    std::istringstream is(value);
+    if(!is.eof())
+    {
+        is >> w;
+        if(!is.eof())
+        {
+            char c = is.get();
+            if(c == 'x' && !is.eof())
+                is >> h;
+        }
+    }
+
+    return std::make_pair(w, h);
+}
+
 std::string Attribute::quotedString() const
 {
     if(value.length() < 2)

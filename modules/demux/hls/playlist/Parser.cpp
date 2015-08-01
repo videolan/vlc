@@ -120,6 +120,7 @@ void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTa
     const Attribute *uriAttr = tag->getAttributeByName("URI");
     const Attribute *bwAttr = tag->getAttributeByName("BANDWIDTH");
     const Attribute *codecsAttr = tag->getAttributeByName("CODECS");
+    const Attribute *resAttr = tag->getAttributeByName("RESOLUTION");
 
     Representation *rep = new (std::nothrow) Representation(adaptSet);
     if(rep)
@@ -146,6 +147,16 @@ void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTa
         /* if more than 1 codec, don't probe, can't be packed audio */
         if(codecsAttr && codecsAttr->quotedString().find(',') != std::string::npos)
             rep->setMimeType("video/mp2t");
+
+        if(resAttr)
+        {
+            std::pair<int, int> res = resAttr->getResolution();
+            if(res.first * res.second)
+            {
+                rep->setWidth(res.first);
+                rep->setHeight(res.second);
+            }
+        }
 
         parseSegments(rep, tagslist);
 

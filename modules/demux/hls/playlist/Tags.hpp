@@ -47,6 +47,7 @@ namespace hls
                 double floatingPoint() const;
                 std::vector<uint8_t> hexSequence() const;
                 std::pair<std::size_t,std::size_t> getByteRange() const;
+                std::pair<int, int> getResolution() const;
 
                 std::string name;
                 std::string value;
