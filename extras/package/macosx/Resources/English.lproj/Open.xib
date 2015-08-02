@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8152.3" systemVersion="14F6a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F19a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8152.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCOpen">
@@ -126,7 +126,6 @@
                 <outlet property="okButton" destination="640" id="S9F-WP-A7y"/>
                 <outlet property="outputCheckbox" destination="929" id="Gz1-rY-w0Q"/>
                 <outlet property="outputSettingsButton" destination="1256" id="ruY-7h-HIS"/>
-                <outlet property="panel" destination="636" id="POG-Xe-8j5"/>
                 <outlet property="qtkAudioCheckbox" destination="3492" id="5d3-k7-1dB"/>
                 <outlet property="qtkAudioDevicePopup" destination="3438" id="Jt3-3n-AjR"/>
                 <outlet property="qtkHeightLabel" destination="3349" id="1V9-Wm-BdJ"/>
@@ -160,6 +159,7 @@
                 <outlet property="screenqtkAudioCheckbox" destination="3515" id="Y4X-ro-aSB"/>
                 <outlet property="screenqtkAudioPopup" destination="3506" id="gkb-yW-rOf"/>
                 <outlet property="tabView" destination="678" id="bM9-Bh-adI"/>
+                <outlet property="window" destination="636" id="cOB-1N-Yl8"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>

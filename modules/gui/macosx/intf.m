@@ -140,7 +140,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     int items_at_launch;
 
     BOOL nib_main_loaded;       /* main nibfile */
-    BOOL nib_open_loaded;       /* open nibfile */
     BOOL nib_about_loaded;      /* about nibfile */
     BOOL nib_prefs_loaded;      /* preferences xibfile */
     BOOL nib_sprefs_loaded;      /* simple preferences xibfile */
@@ -223,7 +222,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-    _open = [[VLCOpen alloc] init];
     _coreinteraction = [VLCCoreInteraction sharedInstance];
 
     playlist_t * p_playlist = pl_Get(VLCIntf);
@@ -540,8 +538,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 - (VLCOpen *)open
 {
-    if (!nib_open_loaded)
-        nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner: _open];
+    if (!_open)
+        _open = [[VLCOpen alloc] init];
 
     return _open;
 }

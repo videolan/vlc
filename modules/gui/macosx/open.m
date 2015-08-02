@@ -84,6 +84,14 @@ struct display_info_t
 #pragma mark -
 #pragma mark Init
 
+- (id)init
+{
+    self = [super initWithWindowNibName:@"Open"];
+
+    return self;
+}
+
+
 - (void)dealloc
 {
     for (int i = 0; i < [_displayInfos count]; i ++) {
@@ -92,13 +100,13 @@ struct display_info_t
     }
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
     _output = [VLCOutput new];
 
-    [_panel setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    [_panel setTitle: _NS("Open Source")];
+    [self.window setTitle: _NS("Open Source")];
     [_mrlLabel setStringValue: _NS("Media Resource Locator (MRL)")];
 
     [_okButton setTitle: _NS("Open")];
@@ -391,14 +399,17 @@ struct display_info_t
     if ([NSApp modalWindow] != nil)
         return;
 
+    // load window
+    [self window];
+
     _eyeTVController = [[VLCEyeTVController alloc] init];
     int i_result;
 
     [_tabView selectTabViewItemAtIndex: i_type];
     [_fileSubCheckbox setState: NSOffState];
 
-    i_result = [NSApp runModalForWindow: _panel];
-    [_panel close];
+    i_result = [NSApp runModalForWindow: self.window];
+    [self.window close];
 
     if (i_result) {
         NSMutableDictionary *itemOptionsDictionary;
@@ -568,7 +579,7 @@ struct display_info_t
 
 - (IBAction)expandMRLfieldAction:(id)sender
 {
-    NSRect windowRect = [_panel frame];
+    NSRect windowRect = [self.window frame];
     NSRect viewRect = [_mrlView frame];
 
     if ([_mrlButton state] == NSOffState) {
@@ -591,10 +602,10 @@ struct display_info_t
         windowRect.size.height = windowRect.size.height + viewRect.size.height;
     }
 
-    [[_panel animator] setFrame: windowRect display:YES];
+    [[self.window animator] setFrame: windowRect display:YES];
 
     if ([_mrlButton state] == NSOnState)
-        [[_panel contentView] addSubview: _mrlView];
+        [[self.window contentView] addSubview: _mrlView];
 }
 
 - (void)openFileGeneric
@@ -669,7 +680,7 @@ struct display_info_t
         b_outputNibLoaded = [NSBundle loadNibNamed:@"StreamOutput" owner:_output];
 
     [NSApp beginSheet:_output.outputSheet
-       modalForWindow:self.panel
+       modalForWindow:self.window
         modalDelegate:self
        didEndSelector:NULL
           contextInfo:nil];
@@ -1023,9 +1034,9 @@ struct display_info_t
 {
     if (sender == _netModeMatrix) {
         if ([[sender selectedCell] tag] == 0)
-            [_panel makeFirstResponder: _netUDPPortTextField];
+            [self.window makeFirstResponder: _netUDPPortTextField];
         else if ([[sender selectedCell] tag] == 1)
-            [_panel makeFirstResponder: _netUDPMAddressTextField];
+            [self.window makeFirstResponder: _netUDPMAddressTextField];
         else
             msg_Warn(VLCIntf, "Unknown sender tried to change UDP/RTP mode");
     }
@@ -1041,13 +1052,13 @@ struct display_info_t
         [_netUDPPortTextField setIntValue: [_netUDPPortStepper intValue]];
         [[NSNotificationCenter defaultCenter] postNotificationName: VLCOpenTextFieldWasClicked
                                                             object: _netUDPPortTextField];
-        [_panel makeFirstResponder: _netUDPPortTextField];
+        [self.window makeFirstResponder: _netUDPPortTextField];
     }
     else if (i_tag == 1) {
         [_netUDPMPortTextField setIntValue: [_netUDPMPortStepper intValue]];
         [[NSNotificationCenter defaultCenter] postNotificationName: VLCOpenTextFieldWasClicked
                                                             object: _netUDPMPortTextField];
-        [_panel makeFirstResponder: _netUDPMPortTextField];
+        [self.window makeFirstResponder: _netUDPMPortTextField];
     }
 
     [self openNetInfoChanged: nil];
@@ -1098,7 +1109,7 @@ struct display_info_t
 {
     if (sender == _netOpenUDPButton) {
         [NSApp beginSheet: self.netUDPPanel
-           modalForWindow: self.panel
+           modalForWindow: self.window
             modalDelegate: self
            didEndSelector: NULL
               contextInfo: nil];

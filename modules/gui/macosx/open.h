@@ -24,9 +24,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-@interface VLCOpen : NSObject
-
-@property (readwrite, weak) IBOutlet NSWindow *panel;
+@interface VLCOpen : NSWindowController
 
 @property (readwrite, weak) IBOutlet NSTextField *mrlTextField;
 @property (readwrite, weak) IBOutlet NSTextField *mrlLabel;
