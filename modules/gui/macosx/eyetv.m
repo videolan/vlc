@@ -34,14 +34,18 @@
 {
     self = [super init];
     if (self) {
-        [[NSDistributedNotificationCenter defaultCenter]
-         addObserver:self
-         selector:@selector(globalNotificationReceived:)
-         name:NULL
-         object:@"VLCEyeTVSupport"
-         suspensionBehavior:NSNotificationSuspensionBehaviorDeliverImmediately];
+        [[NSDistributedNotificationCenter defaultCenter] addObserver:self
+                                                            selector:@selector(globalNotificationReceived:)
+                                                                name:NULL
+                                                              object:@"VLCEyeTVSupport"
+                                                  suspensionBehavior:NSNotificationSuspensionBehaviorDeliverImmediately];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)globalNotificationReceived: (NSNotification *)theNotification
