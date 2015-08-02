@@ -38,18 +38,6 @@
 
 @implementation VLCVideoEffects
 
-+ (VLCVideoEffects *)sharedInstance
-{
-    static VLCVideoEffects *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCVideoEffects new];
-    });
-
-    return sharedInstance;
-}
-
 + (void)initialize
 {
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:@";;;0;1.000000;1.000000;1.000000;1.000000;0.050000;16;2.000000;OTA=;4;4;16711680;20;15;120;Z3JhZGllbnQ=;1;0;16711680;6;80;VkxD;-1;;-1;255;2;3;3"], @"VideoEffectProfiles",
@@ -59,17 +47,19 @@
 
 - (id)init
 {
-    self = [super init];
-    i_old_profile_index = -1;
+    self = [super initWithWindowNibName:@"VideoEffects"];
+    if (self) {
+        i_old_profile_index = -1;
+    }
 
     return self;
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
-    [_window setTitle: _NS("Video Effects")];
-    [_window setExcludedFromWindowsMenu:YES];
-    [_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [self.window setTitle: _NS("Video Effects")];
+    [self.window setExcludedFromWindowsMenu:YES];
+    [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"basic"]] setLabel:_NS("Basic")];
     [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"crop"]] setLabel:_NS("Crop")];
@@ -217,8 +207,8 @@
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (_window && [_window isVisible] && [_window level] != i_level)
-        [_window setLevel: i_level];
+    if (self.window && [self.window isVisible] && [self.window level] != i_level)
+        [self.window setLevel: i_level];
 }
 
 #pragma mark -
@@ -562,11 +552,11 @@
 
 - (IBAction)toggleWindow:(id)sender
 {
-    if ([_window isKeyWindow])
-        [_window orderOut:sender];
+    if ([self.window isKeyWindow])
+        [self.window orderOut:sender];
     else {
-        [_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
-        [_window makeKeyAndOrderFront:sender];
+        [self.window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+        [self.window makeKeyAndOrderFront:sender];
     }
 }
 
@@ -683,7 +673,7 @@
     [panel setOKButtonLabel: _NS("Save")];
     [panel setTarget:self];
 
-    [panel runModalForWindow:_window];
+    [panel runModalForWindow:self.window];
 }
 
 - (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text
@@ -706,7 +696,7 @@
         [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
         [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
 
-        [alert beginSheetModalForWindow:_window
+        [alert beginSheetModalForWindow:self.window
                           modalDelegate:nil
                          didEndSelector:nil
                             contextInfo:nil];
@@ -745,7 +735,7 @@
     [panel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"VideoEffectProfileNames"]];
     [panel setTarget:self];
 
-    [panel runModalForWindow:_window];
+    [panel runModalForWindow:self.window];
 }
 
 - (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item

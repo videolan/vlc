@@ -23,10 +23,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCVideoEffects : NSObject
+@interface VLCVideoEffects : NSWindowController
 
 /* generic */
-@property (readwrite, weak) IBOutlet NSWindow *window;
 @property (readwrite, weak) IBOutlet NSTabView *tabView;
 @property (readwrite, weak) IBOutlet NSPopUpButton *profilePopup;
 
@@ -162,7 +161,6 @@
 @property (nonatomic) int posterizeValue;
 
 /* generic */
-+ (VLCVideoEffects *)sharedInstance;
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (void)saveCurrentProfile;
 

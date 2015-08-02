@@ -53,13 +53,11 @@
 
 @interface VLCMainMenu()
 {
-    BOOL b_nib_videoeffects_loaded;
     BOOL b_nib_bookmarks_loaded;
     BOOL b_nib_convertandsave_loaded;
 
     AboutWindowController *_aboutWindowController;
     HelpWindowController  *_helpWindowController;
-    VLCVideoEffects *_videoEffectsWindowController;
     VLCConvertAndSave *_convertAndSaveWindowController;
     AddonsWindowController *_addonsController;
 
@@ -1279,13 +1277,7 @@
 
 - (IBAction)showVideoEffects:(id)sender
 {
-    if (_videoEffectsWindowController == nil)
-        _videoEffectsWindowController = [[VLCVideoEffects alloc] init];
-
-    if (!b_nib_videoeffects_loaded)
-        b_nib_videoeffects_loaded = [NSBundle loadNibNamed:@"VideoEffects" owner: _videoEffectsWindowController];
-
-    [_videoEffectsWindowController toggleWindow:sender];
+    [[[VLCMain sharedInstance] videoEffectsPanel] toggleWindow:sender];
 }
 
 - (IBAction)showTrackSynchronization:(id)sender
