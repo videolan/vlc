@@ -27,9 +27,8 @@
 /*****************************************************************************
  * VLCPrefs interface
  *****************************************************************************/
-@interface VLCPrefs : NSObject
+@interface VLCPrefs : NSWindowController
 
-@property (readwrite, weak) IBOutlet NSWindow *prefsWindow;
 @property (readwrite, weak) IBOutlet NSTextField *titleLabel;
 @property (readwrite, weak) IBOutlet NSOutlineView *tree;
 @property (readwrite, weak) IBOutlet NSScrollView *prefsView;

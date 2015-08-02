@@ -155,15 +155,23 @@
 
 @implementation VLCPrefs
 
-- (void)awakeFromNib
+- (id)init
+{
+    self = [super initWithWindowNibName:@"Preferences"];
+
+    return self;
+}
+
+- (void)windowDidLoad
+
 {
     o_emptyView = [[NSView alloc] init];
     _rootTreeItem = [[VLCTreeMainItem alloc] init];
 
-    [_prefsWindow setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
-    [_prefsWindow setHidesOnDeactivate:YES];
+    [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [self.window setHidesOnDeactivate:YES];
 
-    [_prefsWindow setTitle: _NS("Preferences")];
+    [self.window setTitle: _NS("Preferences")];
     [_saveButton setTitle: _NS("Save")];
     [_cancelButton setTitle: _NS("Cancel")];
     [_resetButton setTitle: _NS("Reset All")];
@@ -183,9 +191,9 @@
 
 - (void)showPrefsWithLevel:(NSInteger)iWindow_level
 {
-    [self.prefsWindow setLevel: iWindow_level];
-    [self.prefsWindow center];
-    [self.prefsWindow makeKeyAndOrderFront:self];
+    [self.window setLevel: iWindow_level];
+    [self.window center];
+    [self.window makeKeyAndOrderFront:self];
     [_rootTreeItem resetView];
 }
 
@@ -195,17 +203,17 @@
     [_rootTreeItem applyChanges];
     [[VLCCoreInteraction sharedInstance] fixPreferences];
     config_SaveConfigFile(VLCIntf);
-    [_prefsWindow orderOut:self];
+    [self.window orderOut:self];
 }
 
 - (IBAction)closePrefs: (id)sender
 {
-    [_prefsWindow orderOut:self];
+    [self.window orderOut:self];
 }
 
 - (IBAction)showSimplePrefs: (id)sender
 {
-    [_prefsWindow orderOut: self];
+    [self.window orderOut: self];
     [[[VLCMain sharedInstance] simplePreferences] showSimplePrefs];
 }
 
