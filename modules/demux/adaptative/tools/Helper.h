@@ -26,6 +26,7 @@
 #define HELPER_H_
 
 #include <string>
+#include <list>
 
 namespace adaptative
 {
@@ -35,6 +36,7 @@ namespace adaptative
             static std::string combinePaths     (const std::string &path1, const std::string &path2);
             static std::string getDirectoryPath (const std::string &path);
             static bool        ifind            (std::string haystack, std::string needle);
+            static std::list<std::string> tokenize(const std::string &, char);
     };
 }
 

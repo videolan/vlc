@@ -60,3 +60,19 @@ bool Helper::ifind(std::string haystack, std::string needle)
     transform(needle.begin(), needle.end(), needle.begin(), toupper);
     return haystack.find(needle) != std::string::npos;
 }
+
+std::list<std::string> Helper::tokenize(const std::string &str, char c)
+{
+    std::list<std::string> ret;
+    std::size_t prev = 0;
+    std::size_t cur = str.find_first_of(c, 0);
+    while(cur != std::string::npos)
+    {
+        ret.push_back(str.substr(prev, cur - prev));
+        prev = cur + 1;
+        cur = str.find_first_of(c, cur + 1);
+    }
+
+    ret.push_back(str.substr(prev));
+    return ret;
+}
