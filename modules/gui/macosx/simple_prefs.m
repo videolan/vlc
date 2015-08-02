@@ -207,12 +207,15 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
 
 - (id)init
 {
-    self = [super init];
-    p_intf = VLCIntf;
+    self = [super initWithWindowNibName:@"SimplePreferences"];
+    if (self) {
+        p_intf = VLCIntf;
+    }
+
     return self;
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
     [self initStrings];
 
@@ -233,10 +236,10 @@ static NSString* VLCHotkeysSettingToolbarIdentifier = @"Hotkeys Settings Item Id
     [toolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
     [toolbar setSizeMode: NSToolbarSizeModeRegular];
     [toolbar setDelegate: self];
-    [_window setToolbar:toolbar];
+    [self.window setToolbar:toolbar];
 
-    [_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
-    [_window setHidesOnDeactivate:YES];
+    [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [self.window setHidesOnDeactivate:YES];
 
     [_hotkeys_listbox setTarget:self];
     [_hotkeys_listbox setDoubleAction:@selector(hotkeyTableDoubleClick:)];
@@ -422,7 +425,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_cancelButton setTitle: _NS("Cancel")];
     [_resetButton setTitle: _NS("Reset All")];
     [_saveButton setTitle: _NS("Save")];
-    [_window setTitle: _NS("Preferences")];
+    [self.window setTitle: _NS("Preferences")];
 }
 
 /* TODO: move this part to core */
@@ -802,20 +805,20 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 - (void)showSimplePrefs
 {
     /* we want to show the interface settings, if no category was chosen */
-    if ([[_window toolbar] selectedItemIdentifier] == nil) {
-        [[_window toolbar] setSelectedItemIdentifier: VLCIntfSettingToolbarIdentifier];
+    if ([[self.window toolbar] selectedItemIdentifier] == nil) {
+        [[self.window toolbar] setSelectedItemIdentifier: VLCIntfSettingToolbarIdentifier];
         [self showInterfaceSettings];
     }
 
     [self resetControls];
 
-    [_window center];
-    [_window makeKeyAndOrderFront: self];
+    [self.window center];
+    [self.window makeKeyAndOrderFront: self];
 }
 
 - (void)showSimplePrefsWithLevel:(NSInteger)i_window_level
 {
-    [_window setLevel: i_window_level];
+    [self.window setLevel: i_window_level];
     [self showSimplePrefs];
 }
 
@@ -823,14 +826,14 @@ static inline char * __config_GetLabel(vlc_object_t *p_this, const char *psz_nam
 {
     if (sender == _cancelButton) {
         [[NSFontPanel sharedFontPanel] close];
-        [_window orderOut: sender];
+        [self.window orderOut: sender];
     } else if (sender == _saveButton) {
         [self saveChangedSettings];
         [[NSFontPanel sharedFontPanel] close];
-        [_window orderOut: sender];
+        [self.window orderOut: sender];
     } else if (sender == _showAllButton) {
-        [_window orderOut: self];
-        [[[VLCMain sharedInstance] preferences] showPrefsWithLevel:[_window level]];
+        [self.window orderOut: self];
+        [[[VLCMain sharedInstance] preferences] showPrefsWithLevel:[self.window level]];
     } else
         msg_Warn(p_intf, "unknown buttonAction sender");
 }
@@ -1089,7 +1092,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 - (void)showSettingsForCategory:(id)new_categoryView
 {
     NSRect win_rect, view_rect, oldView_rect;
-    win_rect = [_window frame];
+    win_rect = [self.window frame];
     view_rect = [new_categoryView frame];
 
     if (_currentlyShownCategoryView == new_categoryView)
@@ -1110,11 +1113,11 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
                                            view_rect.size.height)];
     [new_categoryView setAutoresizesSubviews: YES];
     if (_currentlyShownCategoryView) {
-        [[[_window contentView] animator] replaceSubview:_currentlyShownCategoryView with:new_categoryView];
-        [[_window animator] setFrame:win_rect display:YES];
+        [[[self.window contentView] animator] replaceSubview:_currentlyShownCategoryView with:new_categoryView];
+        [[self.window animator] setFrame:win_rect display:YES];
     } else {
-        [[_window contentView] addSubview:new_categoryView];
-        [_window setFrame:win_rect display:YES animate:NO];
+        [[self.window contentView] addSubview:new_categoryView];
+        [self.window setFrame:win_rect display:YES animate:NO];
     }
 
     /* keep our current category for further reference */
@@ -1199,7 +1202,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [_selectFolderPanel setMessage: _NS("Choose the folder to save your video snapshots to.")];
         [_selectFolderPanel setCanCreateDirectories: YES];
         [_selectFolderPanel setPrompt: _NS("Choose")];
-        [_selectFolderPanel beginSheetModalForWindow:_window completionHandler: ^(NSInteger returnCode) {
+        [_selectFolderPanel beginSheetModalForWindow:self.window completionHandler: ^(NSInteger returnCode) {
             if (returnCode == NSOKButton)
             {
                 [_video_snap_folderTextField setStringValue: [[_selectFolderPanel URL] path]];
@@ -1299,7 +1302,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [_selectFolderPanel setMessage: _NS("Choose the directory or filename where the records will be stored.")];
         [_selectFolderPanel setCanCreateDirectories: YES];
         [_selectFolderPanel setPrompt: _NS("Choose")];
-        [_selectFolderPanel beginSheetModalForWindow:_window completionHandler: ^(NSInteger returnCode) {
+        [_selectFolderPanel beginSheetModalForWindow:self.window completionHandler: ^(NSInteger returnCode) {
             if (returnCode == NSOKButton)
             {
                 [_input_recordTextField setStringValue: [[_selectFolderPanel URL] path]];
@@ -1381,7 +1384,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 #undef fillUrlHandlerPopup
 
-        [NSApp beginSheet:_urlhandler_win modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+        [NSApp beginSheet:_urlhandler_win modalForWindow:self.window modalDelegate:self didEndSelector:NULL contextInfo:nil];
     } else {
         [_urlhandler_win orderOut:sender];
         [NSApp endSheet:_urlhandler_win];

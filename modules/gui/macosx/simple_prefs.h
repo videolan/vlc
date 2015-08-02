@@ -25,7 +25,7 @@
 #import "intf.h"
 #import <vlc_common.h>
 
-@interface VLCSimplePrefs : NSObject
+@interface VLCSimplePrefs : NSWindowController
 
 @property (readwrite, weak) IBOutlet NSPopUpButton *audio_dolbyPopup;
 @property (readwrite, weak) IBOutlet NSTextField *audio_dolbyLabel;
@@ -141,7 +141,6 @@
 @property (readwrite, weak) IBOutlet NSBox *controlsBox;
 @property (readwrite, weak) IBOutlet NSButton *resetButton;
 @property (readwrite, weak) IBOutlet NSButton *saveButton;
-@property (readwrite, weak) IBOutlet NSWindow *window;
 
 @property (readwrite, weak) IBOutlet NSButton *video_blackCheckbox;
 @property (readwrite, weak) IBOutlet NSPopUpButton *video_devicePopup;

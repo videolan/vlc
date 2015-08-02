@@ -142,7 +142,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_about_loaded;      /* about nibfile */
     BOOL nib_prefs_loaded;      /* preferences xibfile */
-    BOOL nib_sprefs_loaded;      /* simple preferences xibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
     BOOL b_active_videoplayback;
 
@@ -548,9 +547,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 {
     if (!_sprefs)
         _sprefs = [[VLCSimplePrefs alloc] init];
-
-    if (!nib_sprefs_loaded)
-        nib_sprefs_loaded = [NSBundle loadNibNamed:@"SimplePreferences" owner: _sprefs];
 
     return _sprefs;
 }
