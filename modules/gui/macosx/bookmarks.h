@@ -25,10 +25,9 @@
 #import "intf.h"
 #import <vlc_common.h>
 
-@interface VLCBookmarks : NSObject
+@interface VLCBookmarks : NSWindowController
 
 /* main window */
-@property (readwrite, weak) IBOutlet NSWindow *bookmarksWindow;
 @property (readwrite, weak) IBOutlet NSButton *addButton;
 @property (readwrite, weak) IBOutlet NSButton *clearButton;
 @property (readwrite, weak) IBOutlet NSButton *editButton;

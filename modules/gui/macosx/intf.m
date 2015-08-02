@@ -145,7 +145,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     BOOL nib_prefs_loaded;      /* preferences xibfile */
     BOOL nib_sprefs_loaded;      /* simple preferences xibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
-    BOOL nib_bookmarks_loaded;   /* Bookmarks nibfile */
     BOOL b_active_videoplayback;
 
     VLCMainMenu *_mainmenu;
@@ -535,9 +534,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 {
     if (!_bookmarks)
         _bookmarks = [[VLCBookmarks alloc] init];
-
-    if (!nib_bookmarks_loaded)
-        nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner:_bookmarks];
 
     return _bookmarks;
 }
