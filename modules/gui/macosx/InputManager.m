@@ -419,7 +419,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)updateDelays
 {
-    [[VLCTrackSynchronization sharedInstance] updateValues];
+    [[[VLCMain sharedInstance] trackSyncPanel] updateValues];
 }
 
 - (void)updateMainMenu

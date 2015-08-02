@@ -36,21 +36,16 @@
 
 @implementation VLCTrackSynchronization
 
-+ (VLCTrackSynchronization *)sharedInstance
+- (id)init
 {
-    static VLCTrackSynchronization *sharedInstance = nil;
-    static dispatch_once_t pred;
+    self = [super initWithWindowNibName:@"SyncTracks"];
 
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCTrackSynchronization new];
-    });
-
-    return sharedInstance;
+    return self;
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
-    [_window setTitle:_NS("Track Synchronization")];
+    [self.window setTitle:_NS("Track Synchronization")];
     [_resetButton setTitle:_NS("Reset")];
     [_avLabel setStringValue:_NS("Audio/Video")];
     [_av_advanceLabel setStringValue: _NS("Audio track synchronization:")];
@@ -86,24 +81,26 @@
     [[_sv_durTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000%@", o_suffix]];
     [_sv_durTextField setToolTip: o_toolTip];
 
-    [_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self resetValues:self];
 }
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (_window && [_window isVisible] && [_window level] != i_level)
-        [_window setLevel: i_level];
+    if (self.window && [self.window isVisible] && [self.window level] != i_level)
+        [self.window setLevel: i_level];
 }
 
 - (IBAction)toggleWindow:(id)sender
 {
-    if ([_window isVisible])
-        [_window orderOut:sender];
+    if ([self.window isVisible])
+        [self.window orderOut:sender];
     else {
-        [_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
-        [_window makeKeyAndOrderFront:sender];
+        [self.window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+        [self.window makeKeyAndOrderFront:sender];
+
+        [self updateValues];
     }
 }
 

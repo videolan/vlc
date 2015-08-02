@@ -24,10 +24,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCTrackSynchronization : NSObject
+@interface VLCTrackSynchronization : NSWindowController
 
 /* generic */
-@property (readwrite, weak) IBOutlet NSWindow *window;
 @property (readwrite, weak) IBOutlet NSButton *resetButton;
 
 /* Audio / Video */
@@ -48,7 +47,6 @@
 @property (readwrite, weak) IBOutlet NSTextField *sv_durTextField;
 @property (readwrite, weak) IBOutlet NSStepper *sv_durStepper;
 
-+ (VLCTrackSynchronization *)sharedInstance;
 
 - (void)updateCocoaWindowLevel:(NSInteger)i_level;
 - (IBAction)toggleWindow:(id)sender;

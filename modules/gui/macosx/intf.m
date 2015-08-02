@@ -155,6 +155,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCInputManager *_input_manager;
     VLCPlaylist *_playlist;
     VLCDebugMessageVisualizer *_messagePanelController;
+    VLCTrackSynchronization *_trackSyncPanel;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -524,6 +525,14 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
         _messagePanelController = [[VLCDebugMessageVisualizer alloc] init];
 
     return _messagePanelController;
+}
+
+- (VLCTrackSynchronization *)trackSyncPanel
+{
+    if (!_trackSyncPanel)
+        _trackSyncPanel = [[VLCTrackSynchronization alloc] init];
+
+    return _trackSyncPanel;
 }
 
 - (VLCBookmarks *)bookmarks

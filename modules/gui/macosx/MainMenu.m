@@ -55,7 +55,6 @@
 {
     BOOL b_nib_videoeffects_loaded;
     BOOL b_nib_audioeffects_loaded;
-    BOOL b_nib_tracksynchrloaded;
     BOOL b_nib_bookmarks_loaded;
     BOOL b_nib_convertandsave_loaded;
 
@@ -63,7 +62,6 @@
     HelpWindowController  *_helpWindowController;
     VLCVideoEffects *_videoEffectsWindowController;
     VLCAudioEffects *_audioEffectsWindowController;
-    VLCTrackSynchronization *_trackSynchronizationWindowController;
     VLCConvertAndSave *_convertAndSaveWindowController;
     AddonsWindowController *_addonsController;
 
@@ -1294,13 +1292,7 @@
 
 - (IBAction)showTrackSynchronization:(id)sender
 {
-    if (!_trackSynchronizationWindowController)
-        _trackSynchronizationWindowController = [[VLCTrackSynchronization alloc] init];
-
-    if (!b_nib_tracksynchrloaded)
-        b_nib_tracksynchrloaded = [NSBundle loadNibNamed:@"SyncTracks" owner:_trackSynchronizationWindowController];
-
-    [_trackSynchronizationWindowController toggleWindow:sender];
+    [[[VLCMain sharedInstance] trackSyncPanel] toggleWindow:sender];
 }
 
 - (IBAction)showAudioEffects:(id)sender

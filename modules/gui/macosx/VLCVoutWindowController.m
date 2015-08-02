@@ -593,7 +593,7 @@ void WindowClose(vout_window_t *p_wnd)
     [[VLCAudioEffects sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[VLCInfo sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[main bookmarks] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[VLCTrackSynchronization sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[main trackSyncPanel] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[main resumeDialog] updateCocoaWindowLevel:currentStatusWindowLevel];
 }
 
