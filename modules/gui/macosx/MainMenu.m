@@ -54,14 +54,12 @@
 @interface VLCMainMenu()
 {
     BOOL b_nib_videoeffects_loaded;
-    BOOL b_nib_audioeffects_loaded;
     BOOL b_nib_bookmarks_loaded;
     BOOL b_nib_convertandsave_loaded;
 
     AboutWindowController *_aboutWindowController;
     HelpWindowController  *_helpWindowController;
     VLCVideoEffects *_videoEffectsWindowController;
-    VLCAudioEffects *_audioEffectsWindowController;
     VLCConvertAndSave *_convertAndSaveWindowController;
     AddonsWindowController *_addonsController;
 
@@ -1297,13 +1295,7 @@
 
 - (IBAction)showAudioEffects:(id)sender
 {
-    if (!_audioEffectsWindowController)
-        _audioEffectsWindowController = [[VLCAudioEffects alloc] init];
-
-    if (!b_nib_audioeffects_loaded)
-        b_nib_audioeffects_loaded = [NSBundle loadNibNamed:@"AudioEffects" owner:_audioEffectsWindowController];
-
-    [_audioEffectsWindowController toggleWindow:sender];
+    [[[VLCMain sharedInstance] audioEffectsPanel] toggleWindow:sender];
 }
 
 - (IBAction)showBookmarks:(id)sender

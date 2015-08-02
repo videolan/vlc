@@ -590,7 +590,7 @@ void WindowClose(vout_window_t *p_wnd)
     VLCMain *main = [VLCMain sharedInstance];
     [[VLCMainWindow sharedInstance] setWindowLevel:i_level];
     [[VLCVideoEffects sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
-    [[VLCAudioEffects sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
+    [[main audioEffectsPanel] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[VLCInfo sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[main bookmarks] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[main trackSyncPanel] updateCocoaWindowLevel:currentStatusWindowLevel];

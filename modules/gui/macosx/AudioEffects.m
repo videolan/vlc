@@ -51,19 +51,8 @@
 
 @implementation VLCAudioEffects
 
-+ (VLCAudioEffects *)sharedInstance
++ (void)initialize
 {
-    static VLCAudioEffects *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCAudioEffects new];
-    });
-
-    return sharedInstance;
-}
-
-+ (void)initialize{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     NSString *workString;
@@ -99,12 +88,15 @@
 
 - (id)init
 {
-    self = [super init];
-    i_old_profile_index = -1;
+    self = [super initWithWindowNibName:@"AudioEffects"];
+    if (self) {
+        i_old_profile_index = -1;
+    }
+
     return self;
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
     /* setup the user's language */
     /* Equalizer */
@@ -144,9 +136,9 @@
     [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"compressor"]] setLabel:_NS("Compressor")];
     [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"spatializer"]] setLabel:_NS("Spatializer")];
     [[_tabView tabViewItemAtIndex:[_tabView indexOfTabViewItemWithIdentifier:@"filter"]] setLabel:_NS("Filter")];
-    [_window setTitle:_NS("Audio Effects")];
-    [_window setExcludedFromWindowsMenu:YES];
-    [_window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
+    [self.window setTitle:_NS("Audio Effects")];
+    [self.window setExcludedFromWindowsMenu:YES];
+    [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self equalizerUpdated];
     [self resetCompressor];
@@ -200,17 +192,17 @@
 #pragma mark generic code
 - (void)updateCocoaWindowLevel:(NSInteger)i_level
 {
-    if (_window && [_window isVisible] && [_window level] != i_level)
-        [_window setLevel: i_level];
+    if (self.window && [self.window isVisible] && [self.window level] != i_level)
+        [self.window setLevel: i_level];
 }
 
 - (IBAction)toggleWindow:(id)sender
 {
-    if ([_window isKeyWindow])
-        [_window orderOut:sender];
+    if ([self.window isKeyWindow])
+        [self.window orderOut:sender];
     else {
-        [_window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
-        [_window makeKeyAndOrderFront:sender];
+        [self.window setLevel: [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+        [self.window makeKeyAndOrderFront:sender];
     }
 }
 
@@ -375,7 +367,7 @@
     [panel setTarget:self];
     b_genericAudioProfileInInteraction = YES;
 
-    [panel runModalForWindow:_window];
+    [panel runModalForWindow:self.window];
 }
 
 - (void)removeAudioEffectsProfile:(id)sender
@@ -390,7 +382,7 @@
     [panel setTarget:self];
     b_genericAudioProfileInInteraction = YES;
 
-    [panel runModalForWindow:_window];
+    [panel runModalForWindow:self.window];
 }
 
 #pragma mark -
@@ -616,7 +608,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [panel setTarget:self];
     b_genericAudioProfileInInteraction = NO;
 
-    [panel runModalForWindow:_window];
+    [panel runModalForWindow:self.window];
 }
 
 - (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text
@@ -672,7 +664,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
             [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
             [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
 
-            [alert beginSheetModalForWindow:_window
+            [alert beginSheetModalForWindow:self.window
                               modalDelegate:nil
                              didEndSelector:nil
                                 contextInfo:nil];
@@ -708,7 +700,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [panel setTarget:self];
     b_genericAudioProfileInInteraction = NO;
 
-    [panel runModalForWindow:_window];
+    [panel runModalForWindow:self.window];
 }
 
 - (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item

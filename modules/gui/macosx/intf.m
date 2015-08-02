@@ -156,6 +156,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCPlaylist *_playlist;
     VLCDebugMessageVisualizer *_messagePanelController;
     VLCTrackSynchronization *_trackSyncPanel;
+    VLCAudioEffects *_audioEffectsPanel;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -344,7 +345,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
     /* save current video and audio profiles */
     [[VLCVideoEffects sharedInstance] saveCurrentProfile];
-    [[VLCAudioEffects sharedInstance] saveCurrentProfile];
+    [[self audioEffectsPanel] saveCurrentProfile];
 
     /* Save some interface state in configuration, at module quit */
     config_PutInt(p_intf, "random", var_GetBool(p_playlist, "random"));
@@ -533,6 +534,14 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
         _trackSyncPanel = [[VLCTrackSynchronization alloc] init];
 
     return _trackSyncPanel;
+}
+
+- (VLCAudioEffects *)audioEffectsPanel
+{
+    if (!_audioEffectsPanel)
+        _audioEffectsPanel = [[VLCAudioEffects alloc] init];
+
+    return _audioEffectsPanel;
 }
 
 - (VLCBookmarks *)bookmarks
