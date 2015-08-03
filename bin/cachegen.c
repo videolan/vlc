@@ -29,7 +29,7 @@
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 # include <windows.h>
 #endif
 
@@ -48,7 +48,7 @@ static void usage (const char *path)
 
 int main (int argc, char *argv[])
 {
-#ifdef WIN32
+#ifdef _WIN32
     SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
     static const struct option opts[] =
