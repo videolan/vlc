@@ -119,13 +119,6 @@ mtime_t Stream::getFirstDTS() const
     return output->getFirstDTS();
 }
 
-int Stream::getGroup() const
-{
-    if(!output)
-        return 0;
-    return output->getGroup();
-}
-
 int Stream::esCount() const
 {
     if(!output)
@@ -326,7 +319,6 @@ AbstractStreamOutput::AbstractStreamOutput(demux_t *demux, const StreamFormat &f
 {
     realdemux = demux;
     pcr = VLC_TS_INVALID;
-    group = 0;
     format = format_;
 }
 
@@ -352,11 +344,6 @@ AbstractStreamOutput::~AbstractStreamOutput()
 mtime_t AbstractStreamOutput::getPCR() const
 {
     return pcr;
-}
-
-int AbstractStreamOutput::getGroup() const
-{
-    return group;
 }
 
 BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, const std::string &name) :
@@ -659,6 +646,7 @@ es_out_id_t * BaseStreamOutput::esOutAdd(const es_format_t *p_fmt)
         es_format_t fmtcpy;
         es_format_Init(&fmtcpy, p_fmt->i_cat, p_fmt->i_codec);
         es_format_Copy(&fmtcpy, p_fmt);
+        fmtcpy.i_group = 0;
         if(!fmtcpy.psz_language && !language.empty())
             fmtcpy.psz_language = strdup(language.c_str());
         if(!fmtcpy.psz_description && !description.empty())
@@ -756,7 +744,7 @@ int BaseStreamOutput::esOutControl(int i_query, va_list args)
     else if( i_query == ES_OUT_SET_GROUP_PCR )
     {
         vlc_mutex_lock(&lock);
-        group = (int) va_arg( args, int );
+        static_cast<void>(va_arg( args, int ));
         pcr = (int64_t)va_arg( args, int64_t );
         if(pcr > VLC_TS_INVALID && timestamps_offset > VLC_TS_INVALID)
             pcr += (timestamps_offset - VLC_TS_0);

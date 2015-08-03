@@ -73,7 +73,6 @@ namespace adaptative
         bool isEOF() const;
         mtime_t getPCR() const;
         mtime_t getFirstDTS() const;
-        int getGroup() const;
         int esCount() const;
         bool seekAble() const;
         bool isSelected() const;
@@ -115,7 +114,6 @@ namespace adaptative
         virtual void pushBlock(block_t *, bool) = 0;
         virtual mtime_t getPCR() const;
         virtual mtime_t getFirstDTS() const = 0;
-        virtual int getGroup() const;
         virtual int esCount() const = 0;
         virtual bool seekAble() const = 0;
         virtual void setPosition(mtime_t) = 0;
@@ -128,7 +126,6 @@ namespace adaptative
     protected:
         demux_t  *realdemux;
         mtime_t   pcr;
-        int       group;
         std::string language;
         std::string description;
 
