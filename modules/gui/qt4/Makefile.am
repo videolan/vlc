@@ -127,6 +127,7 @@ moc_verbose_0 = @echo "  MOC   " $@;
 moc_verbose__0 = $(moc_verbose_0)
 
 .hpp.moc.cpp:
+	[ -d $(dir $@) ] || mkdir -p $(dir $@)
 	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $<
 
 # These MOC files depend on the configure settings:
