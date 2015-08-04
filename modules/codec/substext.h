@@ -110,6 +110,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         for ( text_segment_t* p_segment = sys->p_segments; p_segment; p_segment = p_segment->p_next )
         {
             text_style_t* p_style = p_segment->style;
+            if(!p_style)
+                continue;
 
             if (sys->i_font_height_abs_to_src)
                 sys->i_font_height_percent = sys->i_font_height_abs_to_src * 100 /
