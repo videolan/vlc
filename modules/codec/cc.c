@@ -134,7 +134,7 @@ typedef struct
 
 static void         Eia608Init( eia608_t * );
 static bool   Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] );
-static char        *Eia608Text( eia608_t *h, bool b_html );
+static text_segment_t *Eia608Text( eia608_t *h );
 
 /* It will be enough up to 63 B frames, which is far too high for
  * broadcast environment */
@@ -296,7 +296,7 @@ static block_t *Pop( decoder_t *p_dec )
     return p_block;
 }
 
-static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, mtime_t i_pts )
+static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mtime_t i_pts )
 {
     //decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
@@ -305,17 +305,17 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, mtime_t i_p
     if( i_pts <= VLC_TS_INVALID )
     {
         msg_Warn( p_dec, "subtitle without a date" );
-        free( psz_subtitle );
+        text_segment_ChainDelete( p_segments );
         return NULL;
     }
 
-    EnsureUTF8( psz_subtitle );
+    //EnsureUTF8( psz_subtitle );
 
     /* Create the subpicture unit */
     p_spu = decoder_NewSubpictureText( p_dec );
     if( !p_spu )
     {
-        free( psz_subtitle );
+        text_segment_ChainDelete( p_segments );
         return NULL;
     }
     p_spu->i_start    = i_pts;
@@ -328,11 +328,9 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, mtime_t i_p
     /* The "leavetext" alignment is a special mode where the subpicture
        region itself gets aligned, but the text inside it does not */
     p_spu_sys->align = SUBPICTURE_ALIGN_LEAVETEXT;
-    p_spu_sys->p_segments = text_segment_New( psz_subtitle );
+    p_spu_sys->p_segments = p_segments;
     p_spu_sys->i_font_height_percent = 5;
     p_spu_sys->renderbg = true;
-
-    free( psz_subtitle );
 
     return p_spu;
 }
@@ -359,8 +357,8 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t *p_block )
 
     if( b_changed )
     {
-        char *psz_html = Eia608Text( &p_sys->eia608, true );
-        return Subtitle( p_dec, psz_html, i_pts );
+        text_segment_t *p_segments = Eia608Text( &p_sys->eia608 );
+        return Subtitle( p_dec, p_segments, i_pts );
     }
     return NULL;
 }
@@ -919,7 +917,7 @@ static void Eia608Strlcat( char *d, const char *s, int i_max )
 
 #define CAT(t) Eia608Strlcat( psz_text, t, i_text_max )
 
-static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_text_max, int i_row, bool b_html )
+static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row, bool b_endline )
 {
     const uint8_t *p_char = screen->characters[i_row];
     const eia608_color_t *p_color = screen->colors[i_row];
@@ -927,17 +925,30 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
     int i_start;
     int i_end;
     int x;
-    eia608_color_t last_color = EIA608_COLOR_DEFAULT;
-    bool     b_last_italics = false;
-    bool     b_last_underline = false;
+    eia608_color_t prev_color = EIA608_COLOR_DEFAULT;
+    eia608_font_t prev_font = EIA608_FONT_REGULAR;
+
     char utf8[4];
+    const unsigned i_text_max = 4 * EIA608_SCREEN_COLUMNS + 1;
+    char psz_text[i_text_max + 1];
+    psz_text[0] = '\0';
+
+    text_segment_t *p_segment, *p_segments_head = p_segment = text_segment_New( NULL );
+    if(!p_segment)
+        return NULL;
+
+    p_segment->style = text_style_New();
+    if(!p_segment->style)
+    {
+        text_segment_Delete(p_segment);
+        return NULL;
+    }
 
     /* Search the start */
     i_start = 0;
 
     /* Ensure we get a monospaced font (required for accurate positioning */
-    if( b_html )
-        CAT( "<tt>" );
+    p_segment->style->psz_monofontname = strdup("Courier");
 
     /* Convert leading spaces to non-breaking so that they don't get
        stripped by the RenderHtml routine as regular whitespace */
@@ -953,100 +964,73 @@ static void Eia608TextLine( struct eia608_screen *screen, char *psz_text, int i_
         i_end--;
 
     /* */
+
     for( x = i_start; x <= i_end; x++ )
     {
         eia608_color_t color = p_color[x];
-        bool b_italics = p_font[x] & EIA608_FONT_ITALICS;
-        bool b_underline = p_font[x] & EIA608_FONT_UNDERLINE;
+        eia608_font_t font = p_font[x];
 
-        /* */
-        if( b_html )
+        if(font != prev_font || color != prev_color)
         {
-            bool b_close_color, b_close_italics, b_close_underline;
+            p_segment->psz_text = strdup(psz_text);
+            psz_text[0] = '\0';
+            p_segment->p_next = text_segment_New( NULL );
+            p_segment = p_segment->p_next;
+            if(!p_segment)
+                return p_segments_head;
 
-            /* We create the tags font / i / u in that orders */
-            b_close_color = color != last_color && last_color != EIA608_COLOR_DEFAULT;
-            b_close_italics = !b_italics && b_last_italics;
-            b_close_underline = !b_underline && b_last_underline;
-
-            /* Be sure to create valid html */
-            b_close_italics |= b_last_italics && b_close_color;
-            b_close_underline |= b_last_underline && ( b_close_italics || b_close_color );
-
-            if( b_close_underline )
-                CAT( "</u>" );
-            if( b_close_italics )
-                CAT( "</i>" );
-            if( b_close_color )
-                CAT( "</font>" );
-
-            if( color != EIA608_COLOR_DEFAULT && color != last_color)
+            p_segment->style = text_style_New();
+            if(!p_segment->style)
             {
-                static const char *ppsz_color[] = {
-                    "#ffffff",  // white
-                    "#00ff00",  // green
-                    "#0000ff",  // blue
-                    "#00ffff",  // cyan
-                    "#ff0000",  // red
-                    "#ffff00",  // yellow
-                    "#ff00ff",  // magenta
-                    "#ffffff",  // user defined XXX we use white
-                };
-                CAT( "<font color=\"" );
-                CAT( ppsz_color[color] );
-                CAT( "\">" );
+                text_segment_Delete(p_segment);
+                return p_segments_head;
             }
-            if( ( b_close_italics && b_italics ) || ( b_italics && !b_last_italics ) )
-                CAT( "<i>" );
-            if( ( b_close_underline && b_underline ) || ( b_underline && !b_last_underline ) )
-                CAT( "<u>" );
+
+            /* start segment with new style */
+            p_segment->style->psz_monofontname = strdup("Courier");
+            if(font & EIA608_FONT_ITALICS)
+                p_segment->style->i_style_flags |= STYLE_ITALIC;
+            if(font & EIA608_FONT_UNDERLINE)
+                p_segment->style->i_style_flags |= STYLE_UNDERLINE;
+
+            if(color != EIA608_COLOR_DEFAULT)
+            {
+                static const int rgi_colors[] = {
+                    0xffffff,  // white
+                    0x00ff00,  // green
+                    0x0000ff,  // blue
+                    0x00ffff,  // cyan
+                    0xff0000,  // red
+                    0xffff00,  // yellow
+                    0xff00ff,  // magenta
+                    0xffffff,  // user defined XXX we use white
+                };
+                p_segment->style->i_font_color = rgi_colors[color];
+            }
         }
 
-        if( b_html ) {
-            /* Escape XML reserved characters
-               http://www.w3.org/TR/xml/#syntax */
-            switch (p_char[x]) {
-            case '>':
-                CAT( "&gt;" );
-                break;
-            case '<':
-                CAT( "&lt;" );
-                break;
-            case '"':
-                CAT( "&quot;" );
-                break;
-            case '\'':
-                CAT( "&apos;" );
-                break;
-            case '&':
-                CAT( "&amp;" );
-                break;
-            default:
-                Eia608TextUtf8( utf8, p_char[x] );
-                CAT( utf8 );
-                break;
-            }
-        } else {
-            Eia608TextUtf8( utf8, p_char[x] );
-            CAT( utf8 );
-        }
+        Eia608TextUtf8( utf8, p_char[x] );
+        CAT( utf8 );
 
         /* */
-        b_last_underline = b_underline;
-        b_last_italics = b_italics;
-        last_color = color;
+        prev_font = font;
+        prev_color = color;
     }
-    if( b_html )
+
+    if(b_endline)
     {
-        if( b_last_underline )
-            CAT( "</u>" );
-        if( b_last_italics )
-            CAT( "</i>" );
-        if( last_color != EIA608_COLOR_DEFAULT )
-            CAT( "</font>" );
-        CAT( "</tt>" );
+        CAT( "\n" );
     }
+
 #undef CAT
+
+    if( p_segment )
+    {
+        assert(!p_segment->psz_text); // shouldn't happen
+        p_segment->psz_text = strdup(psz_text);
+    }
+
+    return p_segments_head;
 }
 
 /* */
@@ -1102,29 +1086,23 @@ static bool Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data
     return b_screen_changed;
 }
 
-static char *Eia608Text( eia608_t *h, bool b_html )
+static text_segment_t *Eia608Text( eia608_t *h )
 {
-    const int i_size = EIA608_SCREEN_ROWS * 10 * EIA608_SCREEN_COLUMNS+1;
     struct eia608_screen *screen = &h->screen[h->i_screen];
-    bool b_first = true;
-    char *psz;
+    text_segment_t *p_head = NULL, *p_last = NULL;
 
-    /* We allocate a buffer big enough for normal case */
-    psz = malloc( i_size );
-    if( !psz )
-        return NULL;
-    *psz = '\0';
-    if( b_html )
-        Eia608Strlcat( psz, "<text>", i_size );
     for( int i = 0; i < EIA608_SCREEN_ROWS; i++ )
     {
-        if( !b_first )
-            Eia608Strlcat( psz, b_html ? "<br />" : "\n", i_size );
-        b_first = false;
-
-        Eia608TextLine( screen, psz, i_size, i, b_html );
+        text_segment_t *p_line = Eia608TextLine( screen, i, (i + 1 != EIA608_SCREEN_ROWS) );
+        if(p_line)
+        {
+            if(!p_head)
+                p_head = p_line;
+            else
+                p_last->p_next = p_line;
+            p_last = p_line;
+        }
     }
-    if( b_html )
-        Eia608Strlcat( psz, "</text>", i_size );
-    return psz;
+
+    return p_head;
 }
