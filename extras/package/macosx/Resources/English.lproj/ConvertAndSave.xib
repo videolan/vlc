@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">14B25</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
-		<string key="IBDocument.AppKitVersion">1343.16</string>
-		<string key="IBDocument.HIToolboxVersion">755.00</string>
+		<string key="IBDocument.SystemVersion">14F19a</string>
+		<string key="IBDocument.InterfaceBuilderVersion">7706</string>
+		<string key="IBDocument.AppKitVersion">1348.17</string>
+		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6254</string>
+			<string key="NS.object.0">7706</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -43,7 +43,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">NSObject</string>
+				<string key="NSClassName">VLCConvertAndSave</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
@@ -84,6 +84,7 @@
 													<string key="NSFrame">{{231, 16}, {153, 32}}</string>
 													<reference key="NSSuperview" ref="595691694"/>
 													<reference key="NSWindow"/>
+													<reference key="NSNextKeyView" ref="1053913655"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSButtonCell" key="NSCell" id="963202121">
 														<int key="NSCellFlags">67108864</int>
@@ -111,6 +112,7 @@
 													<string key="NSFrame">{{10, 177}, {597, 22}}</string>
 													<reference key="NSSuperview" ref="595691694"/>
 													<reference key="NSWindow"/>
+													<reference key="NSNextKeyView" ref="57114548"/>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSTextFieldCell" key="NSCell" id="425578110">
 														<int key="NSCellFlags">68157504</int>
@@ -158,6 +160,7 @@
 													<string key="NSFrame">{{251, 59}, {112, 112}}</string>
 													<reference key="NSSuperview" ref="595691694"/>
 													<reference key="NSWindow"/>
+													<reference key="NSNextKeyView" ref="775178384"/>
 													<string key="NSReuseIdentifierKey">_NS:2165</string>
 													<bool key="NSEnabled">YES</bool>
 													<object class="NSImageCell" key="NSCell" id="624480290">
@@ -180,6 +183,7 @@
 											<string key="NSFrame">{{5, 4}, {617, 208}}</string>
 											<reference key="NSSuperview" ref="370005935"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="807070215"/>
 											<string key="NSReuseIdentifierKey">_NS:1109</string>
 											<string key="NSClassName">VLCDragDropView</string>
 										</object>
@@ -187,12 +191,14 @@
 									<string key="NSFrame">{{1, 1}, {627, 215}}</string>
 									<reference key="NSSuperview" ref="90126139"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="595691694"/>
 									<string key="NSReuseIdentifierKey">_NS:21</string>
 								</object>
 							</array>
 							<string key="NSFrame">{{17, 255}, {629, 217}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="370005935"/>
 							<string key="NSReuseIdentifierKey">_NS:18</string>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
@@ -240,6 +246,7 @@
 											<string key="NSFrame">{{15, 56}, {597, 22}}</string>
 											<reference key="NSSuperview" ref="376558750"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="803077624"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="505049724">
 												<int key="NSCellFlags">68157504</int>
@@ -263,6 +270,7 @@
 											<string key="NSFrame">{{144, 19}, {223, 26}}</string>
 											<reference key="NSSuperview" ref="376558750"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="614860136"/>
 											<string key="NSReuseIdentifierKey">_NS:791</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="219049436">
@@ -338,6 +346,7 @@
 											<string key="NSFrame">{{366, 15}, {120, 32}}</string>
 											<reference key="NSSuperview" ref="376558750"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="960318313"/>
 											<string key="NSReuseIdentifierKey">_NS:610</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="724098160">
@@ -360,12 +369,14 @@
 									<string key="NSFrame">{{1, 1}, {627, 90}}</string>
 									<reference key="NSSuperview" ref="1053913655"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="368464562"/>
 									<string key="NSReuseIdentifierKey">_NS:21</string>
 								</object>
 							</array>
 							<string key="NSFrame">{{17, 161}, {629, 92}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="376558750"/>
 							<string key="NSReuseIdentifierKey">_NS:18</string>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
@@ -396,6 +407,7 @@
 											<string key="NSFrame">{{15, 64}, {597, 22}}</string>
 											<reference key="NSSuperview" ref="446951149"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="570131195"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="302648704">
 												<int key="NSCellFlags">68157504</int>
@@ -419,6 +431,7 @@
 											<string key="NSFrame">{{160, 15}, {153, 32}}</string>
 											<reference key="NSSuperview" ref="446951149"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="665885492"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="475795629">
 												<int key="NSCellFlags">67108864</int>
@@ -442,6 +455,7 @@
 											<string key="NSFrame">{{313, 15}, {153, 32}}</string>
 											<reference key="NSSuperview" ref="446951149"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="210468830"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="806715934">
 												<int key="NSCellFlags">67108864</int>
@@ -465,6 +479,7 @@
 											<string key="NSFrame">{{12, 17}, {32, 32}}</string>
 											<reference key="NSSuperview" ref="446951149"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="501968637"/>
 											<string key="NSReuseIdentifierKey">_NS:4108</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="493857121">
@@ -487,12 +502,14 @@
 									<string key="NSFrame">{{1, 1}, {627, 98}}</string>
 									<reference key="NSSuperview" ref="960318313"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="57051022"/>
 									<string key="NSReuseIdentifierKey">_NS:21</string>
 								</object>
 							</array>
 							<string key="NSFrame">{{17, 58}, {629, 100}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="446951149"/>
 							<string key="NSReuseIdentifierKey">_NS:18</string>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
@@ -515,6 +532,7 @@
 							<string key="NSFrame">{{541, 13}, {108, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:610</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="94756638">
@@ -537,14 +555,15 @@
 					<string key="NSFrameSize">{663, 490}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="90126139"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1027}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1280, 777}}</string>
 				<string key="NSMinSize">{663, 512}</string>
 				<string key="NSMaxSize">{663, 512}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
 			<object class="NSCustomView" id="494472580">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSTextField" id="375510155">
@@ -552,6 +571,8 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{17, 20}, {444, 17}}</string>
 						<reference key="NSSuperview" ref="494472580"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="709615775">
 							<int key="NSCellFlags">68157504</int>
@@ -583,6 +604,8 @@
 						</set>
 						<string key="NSFrame">{{207, 45}, {64, 64}}</string>
 						<reference key="NSSuperview" ref="494472580"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="375510155"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSImageCell" key="NSCell" id="887171120">
 							<int key="NSCellFlags">134217728</int>
@@ -601,11 +624,11 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{478, 129}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
+				<reference key="NSNextKeyView" ref="580302459"/>
 				<string key="NSReuseIdentifierKey">_NS:1109</string>
 				<string key="NSClassName">NSView</string>
-			</object>
-			<object class="NSCustomObject" id="203744709">
-				<string key="NSClassName">VLCConvertAndSave</string>
 			</object>
 			<object class="NSWindowTemplate" id="450022049">
 				<int key="NSWindowStyleMask">15</int>
@@ -617,27 +640,33 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="258594766">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSTabView" id="766667681">
 							<reference key="NSNextResponder" ref="258594766"/>
-							<int key="NSvFlags">12</int>
+							<int key="NSvFlags">268</int>
+							<set class="NSMutableSet" key="NSDragTypes">
+								<string>public.item</string>
+							</set>
 							<string key="NSFrame">{{13, 40}, {532, 334}}</string>
 							<reference key="NSSuperview" ref="258594766"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="297126720"/>
 							<string key="NSReuseIdentifierKey">_NS:559</string>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="563674961">
 									<string key="NSIdentifier">1</string>
 									<object class="NSView" key="NSView" id="573657579">
 										<nil key="NSNextResponder"/>
-										<int key="NSvFlags">256</int>
+										<int key="NSvFlags">274</int>
 										<array class="NSMutableArray" key="NSSubviews">
 											<object class="NSMatrix" id="436146867">
 												<reference key="NSNextResponder" ref="573657579"/>
 												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{17, 36}, {484, 249}}</string>
+												<string key="NSFrame">{{17, 35}, {484, 249}}</string>
 												<reference key="NSSuperview" ref="573657579"/>
+												<reference key="NSNextKeyView" ref="236566072"/>
 												<string key="NSReuseIdentifierKey">_NS:736</string>
 												<bool key="NSEnabled">YES</bool>
 												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -1063,7 +1092,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												<reference key="NSFont" ref="1024428774"/>
 											</object>
 										</array>
-										<string key="NSFrame">{{10, 33}, {512, 288.5625}}</string>
+										<string key="NSFrame">{{10, 33}, {512, 288}}</string>
+										<reference key="NSNextKeyView" ref="436146867"/>
 										<string key="NSReuseIdentifierKey">_NS:561</string>
 									</object>
 									<string key="NSLabel">Encapsulation</string>
@@ -1073,14 +1103,15 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 								<object class="NSTabViewItem" id="150347254">
 									<string key="NSIdentifier">2</string>
 									<object class="NSView" key="NSView" id="293072252">
-										<reference key="NSNextResponder" ref="766667681"/>
-										<int key="NSvFlags">256</int>
+										<nil key="NSNextResponder"/>
+										<int key="NSvFlags">274</int>
 										<array class="NSMutableArray" key="NSSubviews">
 											<object class="NSButton" id="76044263">
 												<reference key="NSNextResponder" ref="293072252"/>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{14, 269}, {482, 18}}</string>
 												<reference key="NSSuperview" ref="293072252"/>
+												<reference key="NSNextKeyView" ref="522410221"/>
 												<string key="NSReuseIdentifierKey">_NS:682</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="749406043">
@@ -1111,6 +1142,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{23, 249}, {482, 18}}</string>
 												<reference key="NSSuperview" ref="293072252"/>
+												<reference key="NSNextKeyView" ref="236566072"/>
 												<string key="NSReuseIdentifierKey">_NS:682</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="118793365">
@@ -1144,6 +1176,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{15, 206}, {137, 14}}</string>
 																<reference key="NSSuperview" ref="645762380"/>
+																<reference key="NSNextKeyView" ref="858610734"/>
 																<string key="NSReuseIdentifierKey">_NS:4068</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="516232134">
@@ -1164,6 +1197,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{15, 180}, {137, 14}}</string>
 																<reference key="NSSuperview" ref="645762380"/>
+																<reference key="NSNextKeyView" ref="450015214"/>
 																<string key="NSReuseIdentifierKey">_NS:4068</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="666576391">
@@ -1184,6 +1218,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{138, 201}, {345, 22}}</string>
 																<reference key="NSSuperview" ref="645762380"/>
+																<reference key="NSNextKeyView" ref="446703714"/>
 																<string key="NSReuseIdentifierKey">_NS:791</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSPopUpButtonCell" key="NSCell" id="367524124">
@@ -1252,6 +1287,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{300, 178}, {161, 19}}</string>
 																<reference key="NSSuperview" ref="645762380"/>
+																<reference key="NSNextKeyView" ref="324416275"/>
 																<string key="NSReuseIdentifierKey">_NS:817</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="144957551">
@@ -1326,6 +1362,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{467, 177}, {15, 22}}</string>
 																<reference key="NSSuperview" ref="645762380"/>
+																<reference key="NSNextKeyView" ref="300145328"/>
 																<string key="NSReuseIdentifierKey">_NS:4123</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSStepperCell" key="NSCell" id="421001553">
@@ -1345,6 +1382,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{15, 152}, {137, 14}}</string>
 																<reference key="NSSuperview" ref="645762380"/>
+																<reference key="NSNextKeyView" ref="103927021"/>
 																<string key="NSReuseIdentifierKey">_NS:4068</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="742785541">
@@ -1365,6 +1403,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{300, 149}, {161, 19}}</string>
 																<reference key="NSSuperview" ref="645762380"/>
+																<reference key="NSNextKeyView" ref="125993522"/>
 																<string key="NSReuseIdentifierKey">_NS:817</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="594978600">
@@ -1425,6 +1464,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{467, 148}, {15, 22}}</string>
 																<reference key="NSSuperview" ref="645762380"/>
+																<reference key="NSNextKeyView" ref="356820111"/>
 																<string key="NSReuseIdentifierKey">_NS:4123</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSStepperCell" key="NSCell" id="984675514">
@@ -1452,6 +1492,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																				<int key="NSvFlags">268</int>
 																				<string key="NSFrame">{{73, 89}, {96, 19}}</string>
 																				<reference key="NSSuperview" ref="760924829"/>
+																				<reference key="NSNextKeyView" ref="294405134"/>
 																				<string key="NSReuseIdentifierKey">_NS:817</string>
 																				<bool key="NSEnabled">YES</bool>
 																				<object class="NSTextFieldCell" key="NSCell" id="957644199">
@@ -1513,6 +1554,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																				<int key="NSvFlags">268</int>
 																				<string key="NSFrame">{{220, 90}, {53, 14}}</string>
 																				<reference key="NSSuperview" ref="760924829"/>
+																				<reference key="NSNextKeyView" ref="378256048"/>
 																				<string key="NSReuseIdentifierKey">_NS:4068</string>
 																				<bool key="NSEnabled">YES</bool>
 																				<object class="NSTextFieldCell" key="NSCell" id="941441891">
@@ -1533,6 +1575,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																				<int key="NSvFlags">268</int>
 																				<string key="NSFrame">{{73, 64}, {96, 19}}</string>
 																				<reference key="NSSuperview" ref="760924829"/>
+																				<reference key="NSNextKeyView" ref="646879153"/>
 																				<string key="NSReuseIdentifierKey">_NS:817</string>
 																				<bool key="NSEnabled">YES</bool>
 																				<object class="NSTextFieldCell" key="NSCell" id="530478794">
@@ -1594,6 +1637,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																				<int key="NSvFlags">268</int>
 																				<string key="NSFrame">{{15, 91}, {53, 14}}</string>
 																				<reference key="NSSuperview" ref="760924829"/>
+																				<reference key="NSNextKeyView" ref="493365581"/>
 																				<string key="NSReuseIdentifierKey">_NS:4068</string>
 																				<bool key="NSEnabled">YES</bool>
 																				<object class="NSTextFieldCell" key="NSCell" id="186651859">
@@ -1614,6 +1658,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																				<int key="NSvFlags">268</int>
 																				<string key="NSFrame">{{15, 66}, {53, 14}}</string>
 																				<reference key="NSSuperview" ref="760924829"/>
+																				<reference key="NSNextKeyView" ref="210733286"/>
 																				<string key="NSReuseIdentifierKey">_NS:4068</string>
 																				<bool key="NSEnabled">YES</bool>
 																				<object class="NSTextFieldCell" key="NSCell" id="213346253">
@@ -1634,6 +1679,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																				<int key="NSvFlags">268</int>
 																				<string key="NSFrame">{{15, 14}, {362, 42}}</string>
 																				<reference key="NSSuperview" ref="760924829"/>
+																				<reference key="NSNextKeyView" ref="761826139"/>
 																				<string key="NSReuseIdentifierKey">_NS:3939</string>
 																				<bool key="NSEnabled">YES</bool>
 																				<object class="NSTextFieldCell" key="NSCell" id="199394262">
@@ -1654,6 +1700,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																				<int key="NSvFlags">268</int>
 																				<string key="NSFrame">{{275, 85}, {102, 22}}</string>
 																				<reference key="NSSuperview" ref="760924829"/>
+																				<reference key="NSNextKeyView" ref="999606719"/>
 																				<string key="NSReuseIdentifierKey">_NS:791</string>
 																				<bool key="NSEnabled">YES</bool>
 																				<object class="NSPopUpButtonCell" key="NSCell" id="251638218">
@@ -1720,11 +1767,13 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																		</array>
 																		<string key="NSFrame">{{1, 1}, {392, 117}}</string>
 																		<reference key="NSSuperview" ref="356820111"/>
+																		<reference key="NSNextKeyView" ref="552998901"/>
 																		<string key="NSReuseIdentifierKey">_NS:21</string>
 																	</object>
 																</array>
 																<string key="NSFrame">{{60, 10}, {394, 133}}</string>
 																<reference key="NSSuperview" ref="645762380"/>
+																<reference key="NSNextKeyView" ref="760924829"/>
 																<string key="NSReuseIdentifierKey">_NS:18</string>
 																<string key="NSOffsets">{0, 0}</string>
 																<object class="NSTextFieldCell" key="NSTitleCell">
@@ -1744,11 +1793,13 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 														</array>
 														<string key="NSFrame">{{1, 1}, {498, 232}}</string>
 														<reference key="NSSuperview" ref="522410221"/>
+														<reference key="NSNextKeyView" ref="985970330"/>
 														<string key="NSReuseIdentifierKey">_NS:21</string>
 													</object>
 												</array>
 												<string key="NSFrame">{{6, 11}, {500, 248}}</string>
 												<reference key="NSSuperview" ref="293072252"/>
+												<reference key="NSNextKeyView" ref="645762380"/>
 												<string key="NSReuseIdentifierKey">_NS:18</string>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
@@ -1767,7 +1818,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											</object>
 										</array>
 										<string key="NSFrame">{{10, 33}, {512, 288}}</string>
-										<reference key="NSSuperview" ref="766667681"/>
+										<reference key="NSNextKeyView" ref="76044263"/>
 										<string key="NSReuseIdentifierKey">_NS:571</string>
 									</object>
 									<string key="NSLabel">Video codec</string>
@@ -1778,13 +1829,14 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 									<string key="NSIdentifier">Item 2</string>
 									<object class="NSView" key="NSView" id="136070917">
 										<nil key="NSNextResponder"/>
-										<int key="NSvFlags">256</int>
+										<int key="NSvFlags">274</int>
 										<array class="NSMutableArray" key="NSSubviews">
 											<object class="NSButton" id="138650507">
 												<reference key="NSNextResponder" ref="136070917"/>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{14, 268}, {482, 18}}</string>
 												<reference key="NSSuperview" ref="136070917"/>
+												<reference key="NSNextKeyView" ref="858891598"/>
 												<string key="NSReuseIdentifierKey">_NS:682</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="244089770">
@@ -1810,6 +1862,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{23, 248}, {482, 18}}</string>
 												<reference key="NSSuperview" ref="136070917"/>
+												<reference key="NSNextKeyView" ref="236566072"/>
 												<string key="NSReuseIdentifierKey">_NS:682</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="626137501">
@@ -1843,6 +1896,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{15, 102}, {137, 14}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="1046229328"/>
 																<string key="NSReuseIdentifierKey">_NS:4068</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="411095313">
@@ -1863,6 +1917,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{15, 73}, {137, 14}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="910307710"/>
 																<string key="NSReuseIdentifierKey">_NS:4068</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="898626529">
@@ -1883,6 +1938,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{138, 97}, {345, 22}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="431719761"/>
 																<string key="NSReuseIdentifierKey">_NS:791</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSPopUpButtonCell" key="NSCell" id="96083870">
@@ -1951,6 +2007,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{297, 10}, {186, 22}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="970188062"/>
 																<string key="NSReuseIdentifierKey">_NS:791</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSPopUpButtonCell" key="NSCell" id="597099849">
@@ -2019,6 +2076,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{300, 71}, {161, 19}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="424706349"/>
 																<string key="NSReuseIdentifierKey">_NS:817</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="335566535">
@@ -2078,6 +2136,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{467, 71}, {15, 22}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="820393826"/>
 																<string key="NSReuseIdentifierKey">_NS:4123</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSStepperCell" key="NSCell" id="459360252">
@@ -2097,6 +2156,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{15, 44}, {137, 14}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="749121624"/>
 																<string key="NSReuseIdentifierKey">_NS:4068</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="904125815">
@@ -2117,6 +2177,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{15, 15}, {137, 14}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="503048419"/>
 																<string key="NSReuseIdentifierKey">_NS:4068</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="165672423">
@@ -2137,6 +2198,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{300, 42}, {161, 19}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="46797329"/>
 																<string key="NSReuseIdentifierKey">_NS:817</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="865388395">
@@ -2198,6 +2260,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{467, 42}, {15, 22}}</string>
 																<reference key="NSSuperview" ref="990333430"/>
+																<reference key="NSNextKeyView" ref="193200698"/>
 																<string key="NSReuseIdentifierKey">_NS:4123</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSStepperCell" key="NSCell" id="700824889">
@@ -2215,11 +2278,13 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 														</array>
 														<string key="NSFrame">{{1, 1}, {498, 128}}</string>
 														<reference key="NSSuperview" ref="858891598"/>
+														<reference key="NSNextKeyView" ref="902737598"/>
 														<string key="NSReuseIdentifierKey">_NS:21</string>
 													</object>
 												</array>
 												<string key="NSFrame">{{6, 114}, {500, 144}}</string>
 												<reference key="NSSuperview" ref="136070917"/>
+												<reference key="NSNextKeyView" ref="990333430"/>
 												<string key="NSReuseIdentifierKey">_NS:18</string>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
@@ -2238,6 +2303,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											</object>
 										</array>
 										<string key="NSFrame">{{10, 33}, {512, 288}}</string>
+										<reference key="NSNextKeyView" ref="138650507"/>
 									</object>
 									<string key="NSLabel">Audio codec</string>
 									<reference key="NSColor" ref="382902660"/>
@@ -2246,14 +2312,16 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 								<object class="NSTabViewItem" id="346466288">
 									<string key="NSIdentifier">Item 3</string>
 									<object class="NSView" key="NSView" id="297126720">
-										<nil key="NSNextResponder"/>
-										<int key="NSvFlags">256</int>
+										<reference key="NSNextResponder" ref="766667681"/>
+										<int key="NSvFlags">274</int>
 										<array class="NSMutableArray" key="NSSubviews">
 											<object class="NSButton" id="37217108">
 												<reference key="NSNextResponder" ref="297126720"/>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{14, 266}, {482, 18}}</string>
 												<reference key="NSSuperview" ref="297126720"/>
+												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="653945831"/>
 												<string key="NSReuseIdentifierKey">_NS:682</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="284462790">
@@ -2279,6 +2347,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{14, 243}, {482, 18}}</string>
 												<reference key="NSSuperview" ref="297126720"/>
+												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="236566072"/>
 												<string key="NSReuseIdentifierKey">_NS:682</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="277861297">
@@ -2304,6 +2374,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{153, 263}, {345, 22}}</string>
 												<reference key="NSSuperview" ref="297126720"/>
+												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="172789852"/>
 												<string key="NSReuseIdentifierKey">_NS:791</string>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSPopUpButtonCell" key="NSCell" id="666152435">
@@ -2369,19 +2441,22 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											</object>
 										</array>
 										<string key="NSFrame">{{10, 33}, {512, 288}}</string>
+										<reference key="NSSuperview" ref="766667681"/>
+										<reference key="NSWindow"/>
+										<reference key="NSNextKeyView" ref="37217108"/>
 									</object>
 									<string key="NSLabel">Subtitles</string>
 									<reference key="NSColor" ref="382902660"/>
 									<reference key="NSTabView" ref="766667681"/>
 								</object>
 							</array>
-							<reference key="NSSelectedTabViewItem" ref="150347254"/>
+							<reference key="NSSelectedTabViewItem" ref="346466288"/>
 							<reference key="NSFont" ref="1024428774"/>
 							<int key="NSTvFlags">0</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
 							<array class="NSMutableArray" key="NSSubviews">
-								<reference ref="293072252"/>
+								<reference ref="297126720"/>
 							</array>
 						</object>
 						<object class="NSButton" id="876884721">
@@ -2389,6 +2464,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<int key="NSvFlags">289</int>
 							<string key="NSFrame">{{436, 12}, {108, 32}}</string>
 							<reference key="NSSuperview" ref="258594766"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:610</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="538591357">
@@ -2412,6 +2489,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<int key="NSvFlags">289</int>
 							<string key="NSFrame">{{328, 12}, {108, 32}}</string>
 							<reference key="NSSuperview" ref="258594766"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="876884721"/>
 							<string key="NSReuseIdentifierKey">_NS:610</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="791835020">
@@ -2433,8 +2512,10 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<object class="NSButton" id="236566072">
 							<reference key="NSNextResponder" ref="258594766"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{14, 12}, {209.609375, 32}}</string>
+							<string key="NSFrame">{{14, 12}, {209.5, 32}}</string>
 							<reference key="NSSuperview" ref="258594766"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="427605043"/>
 							<string key="NSReuseIdentifierKey">_NS:610</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="1013523753">
@@ -2455,9 +2536,12 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						</object>
 					</array>
 					<string key="NSFrameSize">{558, 382}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="766667681"/>
 					<string key="NSReuseIdentifierKey">_NS:122</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1027}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1280, 777}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
 			</object>
@@ -2471,7 +2555,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="575278109">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSBox" id="200204793">
@@ -2487,6 +2571,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{407, 13}, {50, 22}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="51273226"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="190400494">
 												<int key="NSCellFlags">-1804599231</int>
@@ -2506,6 +2592,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{407, 46}, {50, 22}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="681462793"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="471190670">
 												<int key="NSCellFlags">-1804599231</int>
@@ -2525,6 +2613,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{366, 15}, {36, 17}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="758372259"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="357417846">
 												<int key="NSCellFlags">67108864</int>
@@ -2543,6 +2633,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{462, 10}, {19, 27}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="696647107"/>
 											<int key="NSTag">1</int>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSStepperCell" key="NSCell" id="871862287">
@@ -2563,6 +2655,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{15, 15}, {83, 17}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="1046908722"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="153366819">
 												<int key="NSCellFlags">67108864</int>
@@ -2581,6 +2675,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{120, 43}, {91, 26}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="491568395"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="220952697">
 												<int key="NSCellFlags">-2076180416</int>
@@ -2666,6 +2762,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{15, 48}, {83, 17}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="224873446"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="663532440">
 												<int key="NSCellFlags">67108864</int>
@@ -2684,6 +2782,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{123, 13}, {205, 22}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="641614128"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="950870220">
 												<int key="NSCellFlags">-1804599231</int>
@@ -2703,6 +2803,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{366, 48}, {36, 17}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="911345669"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="393094502">
 												<int key="NSCellFlags">67108864</int>
@@ -2721,6 +2823,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{462, 43}, {19, 27}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="788092076"/>
 											<int key="NSTag">1</int>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSStepperCell" key="NSCell" id="347503014">
@@ -2742,6 +2846,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">303</int>
 											<string key="NSFrame">{{15, 85}, {466, 22}}</string>
 											<reference key="NSSuperview" ref="683257719"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="1017211816"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="709738559">
 												<int key="NSCellFlags">68157504</int>
@@ -2762,11 +2868,15 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 									</array>
 									<string key="NSFrame">{{1, 1}, {496, 120}}</string>
 									<reference key="NSSuperview" ref="200204793"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="755919972"/>
 									<string key="NSReuseIdentifierKey">_NS:21</string>
 								</object>
 							</array>
 							<string key="NSFrame">{{17, 227}, {498, 122}}</string>
 							<reference key="NSSuperview" ref="575278109"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="683257719"/>
 							<string key="NSReuseIdentifierKey">_NS:18</string>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
@@ -2796,6 +2906,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{12, 105}, {221, 18}}</string>
 											<reference key="NSSuperview" ref="773564715"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="379188040"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="423585958">
 												<int key="NSCellFlags">603979776</int>
@@ -2818,6 +2930,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{130, 80}, {345, 19}}</string>
 											<reference key="NSSuperview" ref="773564715"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="216655069"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="313191672">
 												<int key="NSCellFlags">-1267728319</int>
@@ -2837,6 +2951,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{12, 82}, {100, 13}}</string>
 											<reference key="NSSuperview" ref="773564715"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="683214308"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="1058358408">
 												<int key="NSCellFlags">67108864</int>
@@ -2859,6 +2975,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{14, 15}, {100, 13}}</string>
 											<reference key="NSSuperview" ref="773564715"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="216857188"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="731548839">
 												<int key="NSCellFlags">67108864</int>
@@ -2877,6 +2995,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{132, 13}, {345, 19}}</string>
 											<reference key="NSSuperview" ref="773564715"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="606173151"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="976724265">
 												<int key="NSCellFlags">-1267728319</int>
@@ -2896,6 +3016,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">303</int>
 											<string key="NSFrame">{{15, 133}, {465, 22}}</string>
 											<reference key="NSSuperview" ref="773564715"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="706187556"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="332915798">
 												<int key="NSCellFlags">68157504</int>
@@ -2918,6 +3040,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">256</int>
 											<string key="NSFrame">{{15, 36}, {371, 36}}</string>
 											<reference key="NSSuperview" ref="773564715"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="213091217"/>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<int key="NSNumRows">2</int>
@@ -3006,8 +3130,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												<int key="NSPeriodicDelay">200</int>
 												<int key="NSPeriodicInterval">25</int>
 											</object>
-											<int key="NSSelectedRow">-1</int>
-											<int key="NSSelectedCol">-1</int>
+											<reference key="NSSelectedCell" ref="555700273"/>
 											<reference key="NSBackgroundColor" ref="382902660"/>
 											<reference key="NSCellBackgroundColor" ref="382902660"/>
 										</object>
@@ -3016,6 +3139,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<int key="NSvFlags">268</int>
 											<string key="NSFrame">{{386, 35}, {90, 16}}</string>
 											<reference key="NSSuperview" ref="773564715"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="757714396"/>
 											<string key="NSReuseIdentifierKey">_NS:610</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="1036591792">
@@ -3041,10 +3166,14 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 									</array>
 									<string key="NSFrame">{{2, 2}, {494, 165}}</string>
 									<reference key="NSSuperview" ref="696647107"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="190503833"/>
 								</object>
 							</array>
 							<string key="NSFrame">{{17, 56}, {498, 169}}</string>
 							<reference key="NSSuperview" ref="575278109"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="773564715"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67108864</int>
@@ -3065,6 +3194,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{422, 12}, {96, 32}}</string>
 							<reference key="NSSuperview" ref="575278109"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:610</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="873992339">
@@ -3088,6 +3219,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<int key="NSvFlags">289</int>
 							<string key="NSFrame">{{314, 12}, {108, 32}}</string>
 							<reference key="NSSuperview" ref="575278109"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="524920181"/>
 							<string key="NSReuseIdentifierKey">_NS:610</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="365227636">
@@ -3108,14 +3241,17 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						</object>
 					</array>
 					<string key="NSFrameSize">{532, 368}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="200204793"/>
 					<string key="NSReuseIdentifierKey">_NS:122</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1680, 1027}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1280, 777}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
 			</object>
 			<object class="NSCustomView" id="19725126">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSTextField" id="316407005">
@@ -3123,6 +3259,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{57, 28}, {335, 17}}</string>
 						<reference key="NSSuperview" ref="19725126"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="550909268"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="250911055">
 							<int key="NSCellFlags">68157504</int>
@@ -3141,6 +3279,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{57, 28}, {335, 17}}</string>
 						<reference key="NSSuperview" ref="19725126"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="316407005"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="359696728">
 							<int key="NSCellFlags">68157504</int>
@@ -3175,6 +3315,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						</set>
 						<string key="NSFrame">{{20, 20}, {32, 32}}</string>
 						<reference key="NSSuperview" ref="19725126"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="672608831"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSImageCell" key="NSCell" id="82823101">
 							<int key="NSCellFlags">134217728</int>
@@ -3193,6 +3335,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<int key="NSvFlags">256</int>
 						<string key="NSFrame">{{352, 18}, {165, 32}}</string>
 						<reference key="NSSuperview" ref="19725126"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="773745610">
 							<int key="NSCellFlags">67108864</int>
@@ -3218,11 +3362,14 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 					</object>
 				</array>
 				<string key="NSFrameSize">{531, 72}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
+				<reference key="NSNextKeyView" ref="185323398"/>
 				<string key="NSReuseIdentifierKey">_NS:1109</string>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomView" id="501681605">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSTextField" id="277074074">
@@ -3230,6 +3377,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{17, 30}, {336, 14}}</string>
 						<reference key="NSSuperview" ref="501681605"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="886208703"/>
 						<string key="NSReuseIdentifierKey">_NS:4068</string>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="301930122">
@@ -3251,8 +3400,10 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 					<object class="NSButton" id="886208703">
 						<reference key="NSNextResponder" ref="501681605"/>
 						<int key="NSvFlags">256</int>
-						<string key="NSFrame">{{352, 19}, {204.89453125, 32}}</string>
+						<string key="NSFrame">{{352, 19}, {205, 32}}</string>
 						<reference key="NSSuperview" ref="501681605"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="994251054">
 							<int key="NSCellFlags">-2080374784</int>
@@ -3274,6 +3425,9 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 					</object>
 				</array>
 				<string key="NSFrameSize">{571, 72}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
+				<reference key="NSNextKeyView" ref="277074074"/>
 				<string key="NSReuseIdentifierKey">_NS:1109</string>
 				<string key="NSClassName">NSView</string>
 			</object>
@@ -3284,877 +3438,877 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<array key="connectionRecords">
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">customizeProfile:</string>
-						<reference key="source" ref="203744709"/>
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">window</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1005"/>
+					</object>
+					<int key="connectionID">540</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dropLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="807070215"/>
+					</object>
+					<int key="connectionID">541</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dropImage</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="57114548"/>
+					</object>
+					<int key="connectionID">542</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dropButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="775178384"/>
+					</object>
+					<int key="connectionID">543</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">profileLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="368464562"/>
+					</object>
+					<int key="connectionID">544</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">profilePopup</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="803077624"/>
+					</object>
+					<int key="connectionID">545</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeButton</string>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="614860136"/>
 					</object>
-					<int key="connectionID">98</int>
+					<int key="connectionID">546</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">destinationLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="57051022"/>
+					</object>
+					<int key="connectionID">547</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">destinationCancelBtn</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="570131195"/>
+					</object>
+					<int key="connectionID">548</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">destinationStreamButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="501968637"/>
+					</object>
+					<int key="connectionID">549</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">destinationFileButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="665885492"/>
+					</object>
+					<int key="connectionID">550</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">okButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="210468830"/>
+					</object>
+					<int key="connectionID">551</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dropinView</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="494472580"/>
+					</object>
+					<int key="connectionID">552</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dropinIcon</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="580302459"/>
+					</object>
+					<int key="connectionID">553</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dropinMediaLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="375510155"/>
+					</object>
+					<int key="connectionID">554</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fileDestinationView</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="19725126"/>
+					</object>
+					<int key="connectionID">555</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fileDestinationIcon</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="185323398"/>
+					</object>
+					<int key="connectionID">556</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fileDestinationFileName</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="316407005"/>
+					</object>
+					<int key="connectionID">557</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fileDestinationBrowseButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="550909268"/>
+					</object>
+					<int key="connectionID">558</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">fileDestinationFileNameStub</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="672608831"/>
+					</object>
+					<int key="connectionID">559</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamDestinationView</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="501681605"/>
+					</object>
+					<int key="connectionID">560</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamDestinationURLLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="277074074"/>
+					</object>
+					<int key="connectionID">561</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamDestinationButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="886208703"/>
+					</object>
+					<int key="connectionID">562</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizePanel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="450022049"/>
+					</object>
+					<int key="connectionID">565</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeNewProfileButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="236566072"/>
+					</object>
+					<int key="connectionID">566</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeCancelButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="427605043"/>
+					</object>
+					<int key="connectionID">567</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeOkButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="876884721"/>
+					</object>
+					<int key="connectionID">568</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeTabView</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="766667681"/>
+					</object>
+					<int key="connectionID">569</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeEncapMatrix</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="436146867"/>
+					</object>
+					<int key="connectionID">570</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidSettingsBox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="522410221"/>
+					</object>
+					<int key="connectionID">572</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidCodecLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="985970330"/>
+					</object>
+					<int key="connectionID">574</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidBitrateLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="446703714"/>
+					</object>
+					<int key="connectionID">575</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidFramerateLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="300145328"/>
+					</object>
+					<int key="connectionID">576</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidResolutionBox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="356820111"/>
+					</object>
+					<int key="connectionID">577</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidHeightLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="999606719"/>
+					</object>
+					<int key="connectionID">579</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidScaleLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="294405134"/>
+					</object>
+					<int key="connectionID">580</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidResLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="646879153"/>
+					</object>
+					<int key="connectionID">581</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidCodecPopup</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="858610734"/>
+					</object>
+					<int key="connectionID">582</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidBitrateField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="450015214"/>
+					</object>
+					<int key="connectionID">583</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidFramerateField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="103927021"/>
+					</object>
+					<int key="connectionID">584</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidWidthField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="493365581"/>
+					</object>
+					<int key="connectionID">585</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidHeightField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="210733286"/>
+					</object>
+					<int key="connectionID">586</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidScalePopup</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="378256048"/>
+					</object>
+					<int key="connectionID">587</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudCheckbox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="138650507"/>
+					</object>
+					<int key="connectionID">588</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudSettingsBox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="858891598"/>
+					</object>
+					<int key="connectionID">589</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudKeepCheckbox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="970188062"/>
+					</object>
+					<int key="connectionID">590</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudCodecLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="902737598"/>
+					</object>
+					<int key="connectionID">591</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudBitrateLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="431719761"/>
+					</object>
+					<int key="connectionID">592</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudChannelsLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="820393826"/>
+					</object>
+					<int key="connectionID">593</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudSamplerateLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="193200698"/>
+					</object>
+					<int key="connectionID">594</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudCodecPopup</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1046229328"/>
+					</object>
+					<int key="connectionID">595</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudBitrateField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="910307710"/>
+					</object>
+					<int key="connectionID">596</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudChannelsField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="749121624"/>
+					</object>
+					<int key="connectionID">597</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeAudSampleratePopup</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="503048419"/>
+					</object>
+					<int key="connectionID">598</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeSubsCheckbox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="37217108"/>
+					</object>
+					<int key="connectionID">600</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeSubsOverlayCheckbox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="172789852"/>
+					</object>
+					<int key="connectionID">601</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeSubsPopup</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="653945831"/>
+					</object>
+					<int key="connectionID">602</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidCheckbox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="76044263"/>
+					</object>
+					<int key="connectionID">603</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidKeepCheckbox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="761826139"/>
+					</object>
+					<int key="connectionID">604</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">customizeVidWidthLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="552998901"/>
+					</object>
+					<int key="connectionID">605</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">destinationBox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="960318313"/>
+					</object>
+					<int key="connectionID">606</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dropBox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="595691694"/>
+					</object>
+					<int key="connectionID">607</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamPanel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="939593274"/>
+					</object>
+					<int key="connectionID">608</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamDestinationLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="755919972"/>
+					</object>
+					<int key="connectionID">609</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamTypeLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1017211816"/>
+					</object>
+					<int key="connectionID">610</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamAddressLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="788092076"/>
+					</object>
+					<int key="connectionID">611</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamTypePopup</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="224873446"/>
+					</object>
+					<int key="connectionID">612</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamAddressField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1046908722"/>
+					</object>
+					<int key="connectionID">613</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamAnnouncementLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="190503833"/>
+					</object>
+					<int key="connectionID">614</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamSAPCheckbox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="706187556"/>
+					</object>
+					<int key="connectionID">615</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamChannelField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="683214308"/>
+					</object>
+					<int key="connectionID">616</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamSDPMatrix</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="216655069"/>
+					</object>
+					<int key="connectionID">617</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamSDPFileBrowseButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="213091217"/>
+					</object>
+					<int key="connectionID">618</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamSDPField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="216857188"/>
+					</object>
+					<int key="connectionID">619</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamCancelButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="606173151"/>
+					</object>
+					<int key="connectionID">620</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamOkButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="524920181"/>
+					</object>
+					<int key="connectionID">621</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamTTLLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="491568395"/>
+					</object>
+					<int key="connectionID">622</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamTTLField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="911345669"/>
+					</object>
+					<int key="connectionID">623</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamTTLStepper</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="681462793"/>
+					</object>
+					<int key="connectionID">624</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamPortLabel</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="641614128"/>
+					</object>
+					<int key="connectionID">625</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">streamPortField</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="758372259"/>
+					</object>
+					<int key="connectionID">626</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">openMedia:</string>
-						<reference key="source" ref="203744709"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="775178384"/>
 					</object>
-					<int key="connectionID">99</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_filename_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="316407005"/>
-					</object>
-					<int key="connectionID">106</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_filename_stub_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="672608831"/>
-					</object>
-					<int key="connectionID">107</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_icon_view</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="185323398"/>
-					</object>
-					<int key="connectionID">108</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="57051022"/>
-					</object>
-					<int key="connectionID">109</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_drop_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="775178384"/>
-					</object>
-					<int key="connectionID">111</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_drop_image_view</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="57114548"/>
-					</object>
-					<int key="connectionID">112</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_drop_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="807070215"/>
-					</object>
-					<int key="connectionID">113</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_dropin_icon_view</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="580302459"/>
-					</object>
-					<int key="connectionID">114</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_dropin_media_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="375510155"/>
-					</object>
-					<int key="connectionID">115</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_dropin_view</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="494472580"/>
-					</object>
-					<int key="connectionID">116</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_ok_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="210468830"/>
-					</object>
-					<int key="connectionID">117</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_profile_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="614860136"/>
-					</object>
-					<int key="connectionID">118</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_profile_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="368464562"/>
-					</object>
-					<int key="connectionID">119</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_profile_pop</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="803077624"/>
-					</object>
-					<int key="connectionID">120</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_bitrate_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="910307710"/>
-					</object>
-					<int key="connectionID">249</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_bitrate_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="431719761"/>
-					</object>
-					<int key="connectionID">250</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_channels_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="749121624"/>
-					</object>
-					<int key="connectionID">252</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_channels_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="820393826"/>
-					</object>
-					<int key="connectionID">254</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_ckb</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="138650507"/>
-					</object>
-					<int key="connectionID">255</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_codec_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="902737598"/>
-					</object>
-					<int key="connectionID">256</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_codec_pop</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="1046229328"/>
-					</object>
-					<int key="connectionID">257</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_keep_ckb</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="970188062"/>
-					</object>
-					<int key="connectionID">258</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_samplerate_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="193200698"/>
-					</object>
-					<int key="connectionID">259</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_samplerate_pop</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="503048419"/>
-					</object>
-					<int key="connectionID">260</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_cancel_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="427605043"/>
-					</object>
-					<int key="connectionID">261</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_encap_matrix</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="436146867"/>
-					</object>
-					<int key="connectionID">262</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_ok_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="876884721"/>
-					</object>
-					<int key="connectionID">263</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_panel</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="450022049"/>
-					</object>
-					<int key="connectionID">264</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_subs_ckb</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="37217108"/>
-					</object>
-					<int key="connectionID">265</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_subs_overlay_ckb</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="172789852"/>
-					</object>
-					<int key="connectionID">266</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_subs_pop</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="653945831"/>
-					</object>
-					<int key="connectionID">267</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_bitrate_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="450015214"/>
-					</object>
-					<int key="connectionID">268</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_bitrate_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="446703714"/>
-					</object>
-					<int key="connectionID">269</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_ckb</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="76044263"/>
-					</object>
-					<int key="connectionID">270</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_codec_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="985970330"/>
-					</object>
-					<int key="connectionID">271</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_codec_pop</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="858610734"/>
-					</object>
-					<int key="connectionID">272</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_framerate_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="103927021"/>
-					</object>
-					<int key="connectionID">273</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_framerate_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="300145328"/>
-					</object>
-					<int key="connectionID">274</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_height_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="210733286"/>
-					</object>
-					<int key="connectionID">275</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_height_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="999606719"/>
-					</object>
-					<int key="connectionID">276</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_keep_ckb</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="761826139"/>
-					</object>
-					<int key="connectionID">277</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_res_box</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="356820111"/>
-					</object>
-					<int key="connectionID">278</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_res_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="646879153"/>
-					</object>
-					<int key="connectionID">279</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_scale_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="294405134"/>
-					</object>
-					<int key="connectionID">281</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_width_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="493365581"/>
-					</object>
-					<int key="connectionID">282</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_width_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="552998901"/>
-					</object>
-					<int key="connectionID">283</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">closeCustomizationSheet:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="876884721"/>
-					</object>
-					<int key="connectionID">284</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">closeCustomizationSheet:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="427605043"/>
-					</object>
-					<int key="connectionID">285</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_tabview</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="766667681"/>
-					</object>
-					<int key="connectionID">286</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_scale_pop</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="378256048"/>
-					</object>
-					<int key="connectionID">293</int>
+					<int key="connectionID">627</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">switchProfile:</string>
-						<reference key="source" ref="203744709"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="803077624"/>
 					</object>
-					<int key="connectionID">297</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_stream_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="886208703"/>
-					</object>
-					<int key="connectionID">305</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_stream_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="277074074"/>
-					</object>
-					<int key="connectionID">306</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_panel</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="939593274"/>
-					</object>
-					<int key="connectionID">364</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_ok_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="524920181"/>
-					</object>
-					<int key="connectionID">366</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_destination_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="755919972"/>
-					</object>
-					<int key="connectionID">367</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_address_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="1046908722"/>
-					</object>
-					<int key="connectionID">368</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_address_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="788092076"/>
-					</object>
-					<int key="connectionID">369</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_announcement_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="190503833"/>
-					</object>
-					<int key="connectionID">370</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_channel_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="683214308"/>
-					</object>
-					<int key="connectionID">371</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_port_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="758372259"/>
-					</object>
-					<int key="connectionID">373</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_port_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="641614128"/>
-					</object>
-					<int key="connectionID">374</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_sap_ckb</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="706187556"/>
-					</object>
-					<int key="connectionID">376</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_sdp_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="216857188"/>
-					</object>
-					<int key="connectionID">378</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_ttl_fld</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="911345669"/>
-					</object>
-					<int key="connectionID">379</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_ttl_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="491568395"/>
-					</object>
-					<int key="connectionID">380</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_type_lbl</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="1017211816"/>
-					</object>
-					<int key="connectionID">381</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_type_pop</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="224873446"/>
-					</object>
-					<int key="connectionID">382</int>
+					<int key="connectionID">628</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">closeStreamPanel:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="524920181"/>
+						<string key="label">customizeProfile:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="614860136"/>
 					</object>
-					<int key="connectionID">383</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">showStreamPanel:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="886208703"/>
-					</object>
-					<int key="connectionID">385</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_itwantafile_view</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="19725126"/>
-					</object>
-					<int key="connectionID">395</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_itwantafile_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="665885492"/>
-					</object>
-					<int key="connectionID">396</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_itwantastream_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="501968637"/>
-					</object>
-					<int key="connectionID">397</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_box</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="960318313"/>
-					</object>
-					<int key="connectionID">398</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_itwantastream_view</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="501681605"/>
-					</object>
-					<int key="connectionID">399</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">iWantAStream:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="501968637"/>
-					</object>
-					<int key="connectionID">401</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">iWantAFile:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="665885492"/>
-					</object>
-					<int key="connectionID">402</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">browseFileDestination:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="550909268"/>
-					</object>
-					<int key="connectionID">403</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_cancel_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="570131195"/>
-					</object>
-					<int key="connectionID">406</int>
+					<int key="connectionID">629</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">cancelDestination:</string>
-						<reference key="source" ref="203744709"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="570131195"/>
 					</object>
-					<int key="connectionID">407</int>
+					<int key="connectionID">630</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">streamTypeToggle:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="224873446"/>
+						<string key="label">iWantAStream:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="501968637"/>
 					</object>
-					<int key="connectionID">408</int>
+					<int key="connectionID">631</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">streamAnnouncementToggle:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="706187556"/>
+						<string key="label">iWantAFile:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="665885492"/>
 					</object>
-					<int key="connectionID">409</int>
+					<int key="connectionID">632</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">finalizePanel:</string>
-						<reference key="source" ref="203744709"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="210468830"/>
 					</object>
-					<int key="connectionID">413</int>
+					<int key="connectionID">633</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_ttl_stepper</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="681462793"/>
+					<object class="IBActionConnection" key="connection">
+						<string key="label">videoSettingsChanged:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="76044263"/>
 					</object>
-					<int key="connectionID">417</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_newProfile_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="236566072"/>
-					</object>
-					<int key="connectionID">452</int>
+					<int key="connectionID">634</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">newProfileAction:</string>
-						<reference key="source" ref="203744709"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="236566072"/>
 					</object>
-					<int key="connectionID">459</int>
+					<int key="connectionID">635</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">streamAnnouncementToggle:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="533441225"/>
+						<string key="label">closeCustomizationSheet:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="427605043"/>
 					</object>
-					<int key="connectionID">474</int>
+					<int key="connectionID">636</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">streamAnnouncementToggle:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="93983585"/>
+						<string key="label">closeCustomizationSheet:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="876884721"/>
 					</object>
-					<int key="connectionID">475</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">streamAnnouncementToggle:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="555700273"/>
-					</object>
-					<int key="connectionID">476</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">streamAnnouncementToggle:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="541046006"/>
-					</object>
-					<int key="connectionID">477</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_sdp_matrix</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="216655069"/>
-					</object>
-					<int key="connectionID">478</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">streamAnnouncementToggle:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="216655069"/>
-					</object>
-					<int key="connectionID">479</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">sdpFileLocationSelector:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="213091217"/>
-					</object>
-					<int key="connectionID">484</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_sdp_browsefile_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="213091217"/>
-					</object>
-					<int key="connectionID">485</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_destination_browse_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="550909268"/>
-					</object>
-					<int key="connectionID">486</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_vid_settings_box</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="522410221"/>
-					</object>
-					<int key="connectionID">525</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_customize_aud_settings_box</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="858891598"/>
-					</object>
-					<int key="connectionID">526</int>
+					<int key="connectionID">637</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">audioSettingsChanged:</string>
-						<reference key="source" ref="203744709"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="138650507"/>
 					</object>
-					<int key="connectionID">527</int>
+					<int key="connectionID">638</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">audioSettingsChanged:</string>
-						<reference key="source" ref="203744709"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="970188062"/>
 					</object>
-					<int key="connectionID">528</int>
+					<int key="connectionID">639</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">videoSettingsChanged:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="76044263"/>
-					</object>
-					<int key="connectionID">529</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">videoSettingsChanged:</string>
-						<reference key="source" ref="203744709"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="761826139"/>
 					</object>
-					<int key="connectionID">530</int>
+					<int key="connectionID">640</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">subSettingsChanged:</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="37217108"/>
+						<string key="label">streamTypeToggle:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="224873446"/>
 					</object>
-					<int key="connectionID">531</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_stream_cancel_btn</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="606173151"/>
-					</object>
-					<int key="connectionID">535</int>
+					<int key="connectionID">641</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">closeStreamPanel:</string>
-						<reference key="source" ref="203744709"/>
+						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="606173151"/>
 					</object>
-					<int key="connectionID">536</int>
+					<int key="connectionID">642</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_drop_box</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="595691694"/>
+					<object class="IBActionConnection" key="connection">
+						<string key="label">closeStreamPanel:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="524920181"/>
 					</object>
-					<int key="connectionID">538</int>
+					<int key="connectionID">643</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">_window</string>
-						<reference key="source" ref="203744709"/>
-						<reference key="destination" ref="1005"/>
+					<object class="IBActionConnection" key="connection">
+						<string key="label">sdpFileLocationSelector:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="213091217"/>
 					</object>
-					<int key="connectionID">539</int>
+					<int key="connectionID">644</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">browseFileDestination:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="550909268"/>
+					</object>
+					<int key="connectionID">645</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">showStreamPanel:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="886208703"/>
+					</object>
+					<int key="connectionID">646</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">streamAnnouncementToggle:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="216655069"/>
+					</object>
+					<int key="connectionID">647</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">streamAnnouncementToggle:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="706187556"/>
+					</object>
+					<int key="connectionID">648</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">streamAnnouncementToggle:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="555700273"/>
+					</object>
+					<int key="connectionID">649</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">streamAnnouncementToggle:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="533441225"/>
+					</object>
+					<int key="connectionID">650</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">streamAnnouncementToggle:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="541046006"/>
+					</object>
+					<int key="connectionID">651</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">streamAnnouncementToggle:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="93983585"/>
+					</object>
+					<int key="connectionID">652</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">subSettingsChanged:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="37217108"/>
+					</object>
+					<int key="connectionID">681</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: self.vidBitrate</string>
 						<reference key="source" ref="450015214"/>
-						<reference key="destination" ref="203744709"/>
+						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="450015214"/>
-							<reference key="NSDestination" ref="203744709"/>
+							<reference key="NSDestination" ref="1001"/>
 							<string key="NSLabel">value: self.vidBitrate</string>
 							<string key="NSBinding">value</string>
 							<string key="NSKeyPath">self.vidBitrate</string>
@@ -4165,32 +4319,32 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">517</int>
+					<int key="connectionID">660</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: self.vidBitrate</string>
 						<reference key="source" ref="324416275"/>
-						<reference key="destination" ref="203744709"/>
+						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="324416275"/>
-							<reference key="NSDestination" ref="203744709"/>
+							<reference key="NSDestination" ref="1001"/>
 							<string key="NSLabel">value: self.vidBitrate</string>
 							<string key="NSBinding">value</string>
 							<string key="NSKeyPath">self.vidBitrate</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">497</int>
+					<int key="connectionID">658</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: self.vidFramerate</string>
 						<reference key="source" ref="103927021"/>
-						<reference key="destination" ref="203744709"/>
+						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="103927021"/>
-							<reference key="NSDestination" ref="203744709"/>
+							<reference key="NSDestination" ref="1001"/>
 							<string key="NSLabel">value: self.vidFramerate</string>
 							<string key="NSBinding">value</string>
 							<string key="NSKeyPath">self.vidFramerate</string>
@@ -4201,32 +4355,32 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">518</int>
+					<int key="connectionID">663</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: self.vidFramerate</string>
 						<reference key="source" ref="125993522"/>
-						<reference key="destination" ref="203744709"/>
+						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="125993522"/>
-							<reference key="NSDestination" ref="203744709"/>
+							<reference key="NSDestination" ref="1001"/>
 							<string key="NSLabel">value: self.vidFramerate</string>
 							<string key="NSBinding">value</string>
 							<string key="NSKeyPath">self.vidFramerate</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">503</int>
+					<int key="connectionID">666</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: self.audBitrate</string>
 						<reference key="source" ref="910307710"/>
-						<reference key="destination" ref="203744709"/>
+						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="910307710"/>
-							<reference key="NSDestination" ref="203744709"/>
+							<reference key="NSDestination" ref="1001"/>
 							<string key="NSLabel">value: self.audBitrate</string>
 							<string key="NSBinding">value</string>
 							<string key="NSKeyPath">self.audBitrate</string>
@@ -4237,32 +4391,32 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">519</int>
+					<int key="connectionID">669</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: self.audBitrate</string>
 						<reference key="source" ref="424706349"/>
-						<reference key="destination" ref="203744709"/>
+						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="424706349"/>
-							<reference key="NSDestination" ref="203744709"/>
+							<reference key="NSDestination" ref="1001"/>
 							<string key="NSLabel">value: self.audBitrate</string>
 							<string key="NSBinding">value</string>
 							<string key="NSKeyPath">self.audBitrate</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">508</int>
+					<int key="connectionID">672</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: self.audChannels</string>
 						<reference key="source" ref="749121624"/>
-						<reference key="destination" ref="203744709"/>
+						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="749121624"/>
-							<reference key="NSDestination" ref="203744709"/>
+							<reference key="NSDestination" ref="1001"/>
 							<string key="NSLabel">value: self.audChannels</string>
 							<string key="NSBinding">value</string>
 							<string key="NSKeyPath">self.audChannels</string>
@@ -4273,23 +4427,23 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">520</int>
+					<int key="connectionID">680</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: self.audChannels</string>
 						<reference key="source" ref="46797329"/>
-						<reference key="destination" ref="203744709"/>
+						<reference key="destination" ref="1001"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="46797329"/>
-							<reference key="NSDestination" ref="203744709"/>
+							<reference key="NSDestination" ref="1001"/>
 							<string key="NSLabel">value: self.audChannels</string>
 							<string key="NSBinding">value</string>
 							<string key="NSKeyPath">self.audChannels</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">512</int>
+					<int key="connectionID">678</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -4511,12 +4665,6 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<int key="objectID">36</int>
 						<reference key="object" ref="302648704"/>
 						<reference key="parent" ref="57051022"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">79</int>
-						<reference key="object" ref="203744709"/>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">ConvertAndSave</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">131</int>
@@ -6206,10 +6354,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 				<string key="361.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="387.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="388.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="389.CustomClassName">VLCDropEnabledButton</string>
 				<string key="389.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="390.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="392.CustomClassName">VLCDropEnabledButton</string>
 				<string key="392.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="393.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="4.CustomClassName">VLCDropDisabledImageView</string>
@@ -6256,7 +6402,6 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 				<string key="54.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="6.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="7.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="79.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="8.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
@@ -6264,7 +6409,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">539</int>
+			<int key="maxID">681</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -6366,412 +6511,412 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="_customize_aud_bitrate_fld">id</string>
-						<string key="_customize_aud_bitrate_lbl">id</string>
-						<string key="_customize_aud_channels_fld">id</string>
-						<string key="_customize_aud_channels_lbl">id</string>
-						<string key="_customize_aud_ckb">id</string>
-						<string key="_customize_aud_codec_lbl">id</string>
-						<string key="_customize_aud_codec_pop">id</string>
-						<string key="_customize_aud_keep_ckb">id</string>
-						<string key="_customize_aud_samplerate_lbl">id</string>
-						<string key="_customize_aud_samplerate_pop">id</string>
-						<string key="_customize_aud_settings_box">id</string>
-						<string key="_customize_cancel_btn">id</string>
-						<string key="_customize_encap_matrix">id</string>
-						<string key="_customize_newProfile_btn">id</string>
-						<string key="_customize_ok_btn">id</string>
-						<string key="_customize_panel">id</string>
-						<string key="_customize_subs_ckb">id</string>
-						<string key="_customize_subs_overlay_ckb">id</string>
-						<string key="_customize_subs_pop">id</string>
-						<string key="_customize_tabview">id</string>
-						<string key="_customize_vid_bitrate_fld">id</string>
-						<string key="_customize_vid_bitrate_lbl">id</string>
-						<string key="_customize_vid_ckb">id</string>
-						<string key="_customize_vid_codec_lbl">id</string>
-						<string key="_customize_vid_codec_pop">id</string>
-						<string key="_customize_vid_framerate_fld">id</string>
-						<string key="_customize_vid_framerate_lbl">id</string>
-						<string key="_customize_vid_height_fld">id</string>
-						<string key="_customize_vid_height_lbl">id</string>
-						<string key="_customize_vid_keep_ckb">id</string>
-						<string key="_customize_vid_res_box">id</string>
-						<string key="_customize_vid_res_lbl">id</string>
-						<string key="_customize_vid_scale_lbl">id</string>
-						<string key="_customize_vid_scale_pop">id</string>
-						<string key="_customize_vid_settings_box">id</string>
-						<string key="_customize_vid_width_fld">id</string>
-						<string key="_customize_vid_width_lbl">id</string>
-						<string key="_destination_box">id</string>
-						<string key="_destination_browse_btn">id</string>
-						<string key="_destination_cancel_btn">id</string>
-						<string key="_destination_filename_lbl">id</string>
-						<string key="_destination_filename_stub_lbl">id</string>
-						<string key="_destination_icon_view">id</string>
-						<string key="_destination_itwantafile_btn">id</string>
-						<string key="_destination_itwantafile_view">id</string>
-						<string key="_destination_itwantastream_btn">id</string>
-						<string key="_destination_itwantastream_view">id</string>
-						<string key="_destination_lbl">id</string>
-						<string key="_destination_stream_btn">id</string>
-						<string key="_destination_stream_lbl">id</string>
-						<string key="_drop_box">id</string>
-						<string key="_drop_btn">id</string>
-						<string key="_drop_image_view">id</string>
-						<string key="_drop_lbl">id</string>
-						<string key="_dropin_icon_view">id</string>
-						<string key="_dropin_media_lbl">id</string>
-						<string key="_dropin_view">id</string>
-						<string key="_ok_btn">id</string>
-						<string key="_profile_btn">id</string>
-						<string key="_profile_lbl">id</string>
-						<string key="_profile_pop">id</string>
-						<string key="_stream_address_fld">id</string>
-						<string key="_stream_address_lbl">id</string>
-						<string key="_stream_announcement_lbl">id</string>
-						<string key="_stream_cancel_btn">id</string>
-						<string key="_stream_channel_fld">id</string>
-						<string key="_stream_destination_lbl">id</string>
-						<string key="_stream_ok_btn">id</string>
-						<string key="_stream_panel">id</string>
-						<string key="_stream_port_fld">id</string>
-						<string key="_stream_port_lbl">id</string>
-						<string key="_stream_sap_ckb">id</string>
-						<string key="_stream_sdp_browsefile_btn">id</string>
-						<string key="_stream_sdp_fld">id</string>
-						<string key="_stream_sdp_matrix">id</string>
-						<string key="_stream_ttl_fld">id</string>
-						<string key="_stream_ttl_lbl">id</string>
-						<string key="_stream_ttl_stepper">id</string>
-						<string key="_stream_type_lbl">id</string>
-						<string key="_stream_type_pop">id</string>
-						<string key="_window">id</string>
+						<string key="customizeAudBitrateField">NSTextField</string>
+						<string key="customizeAudBitrateLabel">NSTextField</string>
+						<string key="customizeAudChannelsField">NSTextField</string>
+						<string key="customizeAudChannelsLabel">NSTextField</string>
+						<string key="customizeAudCheckbox">NSButton</string>
+						<string key="customizeAudCodecLabel">NSTextField</string>
+						<string key="customizeAudCodecPopup">NSPopUpButton</string>
+						<string key="customizeAudKeepCheckbox">NSButton</string>
+						<string key="customizeAudSamplerateLabel">NSTextField</string>
+						<string key="customizeAudSampleratePopup">NSPopUpButton</string>
+						<string key="customizeAudSettingsBox">NSBox</string>
+						<string key="customizeButton">NSButton</string>
+						<string key="customizeCancelButton">NSButton</string>
+						<string key="customizeEncapMatrix">NSMatrix</string>
+						<string key="customizeNewProfileButton">NSButton</string>
+						<string key="customizeOkButton">NSButton</string>
+						<string key="customizePanel">NSWindow</string>
+						<string key="customizeSubsCheckbox">NSButton</string>
+						<string key="customizeSubsOverlayCheckbox">NSButton</string>
+						<string key="customizeSubsPopup">NSPopUpButton</string>
+						<string key="customizeTabView">NSTabView</string>
+						<string key="customizeVidBitrateField">NSTextField</string>
+						<string key="customizeVidBitrateLabel">NSTextField</string>
+						<string key="customizeVidCheckbox">NSButton</string>
+						<string key="customizeVidCodecLabel">NSTextField</string>
+						<string key="customizeVidCodecPopup">NSPopUpButton</string>
+						<string key="customizeVidFramerateField">NSTextField</string>
+						<string key="customizeVidFramerateLabel">NSTextField</string>
+						<string key="customizeVidHeightField">NSTextField</string>
+						<string key="customizeVidHeightLabel">NSTextField</string>
+						<string key="customizeVidKeepCheckbox">NSButton</string>
+						<string key="customizeVidResLabel">NSTextField</string>
+						<string key="customizeVidResolutionBox">NSBox</string>
+						<string key="customizeVidScaleLabel">NSTextField</string>
+						<string key="customizeVidScalePopup">NSPopUpButton</string>
+						<string key="customizeVidSettingsBox">NSBox</string>
+						<string key="customizeVidWidthField">NSTextField</string>
+						<string key="customizeVidWidthLabel">NSTextField</string>
+						<string key="destinationBox">NSBox</string>
+						<string key="destinationCancelBtn">NSButton</string>
+						<string key="destinationFileButton">NSButton</string>
+						<string key="destinationLabel">NSTextField</string>
+						<string key="destinationStreamButton">NSButton</string>
+						<string key="dropBox">VLCDragDropView</string>
+						<string key="dropButton">NSButton</string>
+						<string key="dropImage">VLCDropDisabledImageView</string>
+						<string key="dropLabel">NSTextField</string>
+						<string key="dropinIcon">VLCDropDisabledImageView</string>
+						<string key="dropinMediaLabel">NSTextField</string>
+						<string key="dropinView">NSView</string>
+						<string key="fileDestinationBrowseButton">NSButton</string>
+						<string key="fileDestinationFileName">NSTextField</string>
+						<string key="fileDestinationFileNameStub">NSTextField</string>
+						<string key="fileDestinationIcon">NSImageView</string>
+						<string key="fileDestinationView">NSView</string>
+						<string key="okButton">NSButton</string>
+						<string key="profileLabel">NSTextField</string>
+						<string key="profilePopup">NSPopUpButton</string>
+						<string key="streamAddressField">NSTextField</string>
+						<string key="streamAddressLabel">NSTextField</string>
+						<string key="streamAnnouncementLabel">NSTextField</string>
+						<string key="streamCancelButton">NSButton</string>
+						<string key="streamChannelField">NSTextField</string>
+						<string key="streamDestinationButton">NSButton</string>
+						<string key="streamDestinationLabel">NSTextField</string>
+						<string key="streamDestinationURLLabel">NSTextField</string>
+						<string key="streamDestinationView">NSView</string>
+						<string key="streamOkButton">NSButton</string>
+						<string key="streamPanel">NSWindow</string>
+						<string key="streamPortField">NSTextField</string>
+						<string key="streamPortLabel">NSTextField</string>
+						<string key="streamSAPCheckbox">NSButton</string>
+						<string key="streamSDPField">NSTextField</string>
+						<string key="streamSDPFileBrowseButton">NSButton</string>
+						<string key="streamSDPMatrix">NSMatrix</string>
+						<string key="streamTTLField">NSTextField</string>
+						<string key="streamTTLLabel">NSTextField</string>
+						<string key="streamTTLStepper">NSStepper</string>
+						<string key="streamTypeLabel">NSTextField</string>
+						<string key="streamTypePopup">NSPopUpButton</string>
+						<string key="window">NSWindow</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="_customize_aud_bitrate_fld">
-							<string key="name">_customize_aud_bitrate_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_bitrate_lbl">
-							<string key="name">_customize_aud_bitrate_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_channels_fld">
-							<string key="name">_customize_aud_channels_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_channels_lbl">
-							<string key="name">_customize_aud_channels_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_ckb">
-							<string key="name">_customize_aud_ckb</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_codec_lbl">
-							<string key="name">_customize_aud_codec_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_codec_pop">
-							<string key="name">_customize_aud_codec_pop</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_keep_ckb">
-							<string key="name">_customize_aud_keep_ckb</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_samplerate_lbl">
-							<string key="name">_customize_aud_samplerate_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_samplerate_pop">
-							<string key="name">_customize_aud_samplerate_pop</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_aud_settings_box">
-							<string key="name">_customize_aud_settings_box</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_cancel_btn">
-							<string key="name">_customize_cancel_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_encap_matrix">
-							<string key="name">_customize_encap_matrix</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_newProfile_btn">
-							<string key="name">_customize_newProfile_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_ok_btn">
-							<string key="name">_customize_ok_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_panel">
-							<string key="name">_customize_panel</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_subs_ckb">
-							<string key="name">_customize_subs_ckb</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_subs_overlay_ckb">
-							<string key="name">_customize_subs_overlay_ckb</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_subs_pop">
-							<string key="name">_customize_subs_pop</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_tabview">
-							<string key="name">_customize_tabview</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_bitrate_fld">
-							<string key="name">_customize_vid_bitrate_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_bitrate_lbl">
-							<string key="name">_customize_vid_bitrate_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_ckb">
-							<string key="name">_customize_vid_ckb</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_codec_lbl">
-							<string key="name">_customize_vid_codec_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_codec_pop">
-							<string key="name">_customize_vid_codec_pop</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_framerate_fld">
-							<string key="name">_customize_vid_framerate_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_framerate_lbl">
-							<string key="name">_customize_vid_framerate_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_height_fld">
-							<string key="name">_customize_vid_height_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_height_lbl">
-							<string key="name">_customize_vid_height_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_keep_ckb">
-							<string key="name">_customize_vid_keep_ckb</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_res_box">
-							<string key="name">_customize_vid_res_box</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_res_lbl">
-							<string key="name">_customize_vid_res_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_scale_lbl">
-							<string key="name">_customize_vid_scale_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_scale_pop">
-							<string key="name">_customize_vid_scale_pop</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_settings_box">
-							<string key="name">_customize_vid_settings_box</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_width_fld">
-							<string key="name">_customize_vid_width_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_customize_vid_width_lbl">
-							<string key="name">_customize_vid_width_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_box">
-							<string key="name">_destination_box</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_browse_btn">
-							<string key="name">_destination_browse_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_cancel_btn">
-							<string key="name">_destination_cancel_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_filename_lbl">
-							<string key="name">_destination_filename_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_filename_stub_lbl">
-							<string key="name">_destination_filename_stub_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_icon_view">
-							<string key="name">_destination_icon_view</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_itwantafile_btn">
-							<string key="name">_destination_itwantafile_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_itwantafile_view">
-							<string key="name">_destination_itwantafile_view</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_itwantastream_btn">
-							<string key="name">_destination_itwantastream_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_itwantastream_view">
-							<string key="name">_destination_itwantastream_view</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_lbl">
-							<string key="name">_destination_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_stream_btn">
-							<string key="name">_destination_stream_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_destination_stream_lbl">
-							<string key="name">_destination_stream_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_drop_box">
-							<string key="name">_drop_box</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_drop_btn">
-							<string key="name">_drop_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_drop_image_view">
-							<string key="name">_drop_image_view</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_drop_lbl">
-							<string key="name">_drop_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_dropin_icon_view">
-							<string key="name">_dropin_icon_view</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_dropin_media_lbl">
-							<string key="name">_dropin_media_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_dropin_view">
-							<string key="name">_dropin_view</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_ok_btn">
-							<string key="name">_ok_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_profile_btn">
-							<string key="name">_profile_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_profile_lbl">
-							<string key="name">_profile_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_profile_pop">
-							<string key="name">_profile_pop</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_address_fld">
-							<string key="name">_stream_address_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_address_lbl">
-							<string key="name">_stream_address_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_announcement_lbl">
-							<string key="name">_stream_announcement_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_cancel_btn">
-							<string key="name">_stream_cancel_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_channel_fld">
-							<string key="name">_stream_channel_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_destination_lbl">
-							<string key="name">_stream_destination_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_ok_btn">
-							<string key="name">_stream_ok_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_panel">
-							<string key="name">_stream_panel</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_port_fld">
-							<string key="name">_stream_port_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_port_lbl">
-							<string key="name">_stream_port_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_sap_ckb">
-							<string key="name">_stream_sap_ckb</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_sdp_browsefile_btn">
-							<string key="name">_stream_sdp_browsefile_btn</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_sdp_fld">
-							<string key="name">_stream_sdp_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_sdp_matrix">
-							<string key="name">_stream_sdp_matrix</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_ttl_fld">
-							<string key="name">_stream_ttl_fld</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_ttl_lbl">
-							<string key="name">_stream_ttl_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_ttl_stepper">
-							<string key="name">_stream_ttl_stepper</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_type_lbl">
-							<string key="name">_stream_type_lbl</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_stream_type_pop">
-							<string key="name">_stream_type_pop</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="_window">
-							<string key="name">_window</string>
-							<string key="candidateClassName">id</string>
+						<object class="IBToOneOutletInfo" key="customizeAudBitrateField">
+							<string key="name">customizeAudBitrateField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudBitrateLabel">
+							<string key="name">customizeAudBitrateLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudChannelsField">
+							<string key="name">customizeAudChannelsField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudChannelsLabel">
+							<string key="name">customizeAudChannelsLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudCheckbox">
+							<string key="name">customizeAudCheckbox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudCodecLabel">
+							<string key="name">customizeAudCodecLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudCodecPopup">
+							<string key="name">customizeAudCodecPopup</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudKeepCheckbox">
+							<string key="name">customizeAudKeepCheckbox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudSamplerateLabel">
+							<string key="name">customizeAudSamplerateLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudSampleratePopup">
+							<string key="name">customizeAudSampleratePopup</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeAudSettingsBox">
+							<string key="name">customizeAudSettingsBox</string>
+							<string key="candidateClassName">NSBox</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeButton">
+							<string key="name">customizeButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeCancelButton">
+							<string key="name">customizeCancelButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeEncapMatrix">
+							<string key="name">customizeEncapMatrix</string>
+							<string key="candidateClassName">NSMatrix</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeNewProfileButton">
+							<string key="name">customizeNewProfileButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeOkButton">
+							<string key="name">customizeOkButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizePanel">
+							<string key="name">customizePanel</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeSubsCheckbox">
+							<string key="name">customizeSubsCheckbox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeSubsOverlayCheckbox">
+							<string key="name">customizeSubsOverlayCheckbox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeSubsPopup">
+							<string key="name">customizeSubsPopup</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeTabView">
+							<string key="name">customizeTabView</string>
+							<string key="candidateClassName">NSTabView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidBitrateField">
+							<string key="name">customizeVidBitrateField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidBitrateLabel">
+							<string key="name">customizeVidBitrateLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidCheckbox">
+							<string key="name">customizeVidCheckbox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidCodecLabel">
+							<string key="name">customizeVidCodecLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidCodecPopup">
+							<string key="name">customizeVidCodecPopup</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidFramerateField">
+							<string key="name">customizeVidFramerateField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidFramerateLabel">
+							<string key="name">customizeVidFramerateLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidHeightField">
+							<string key="name">customizeVidHeightField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidHeightLabel">
+							<string key="name">customizeVidHeightLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidKeepCheckbox">
+							<string key="name">customizeVidKeepCheckbox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidResLabel">
+							<string key="name">customizeVidResLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidResolutionBox">
+							<string key="name">customizeVidResolutionBox</string>
+							<string key="candidateClassName">NSBox</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidScaleLabel">
+							<string key="name">customizeVidScaleLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidScalePopup">
+							<string key="name">customizeVidScalePopup</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidSettingsBox">
+							<string key="name">customizeVidSettingsBox</string>
+							<string key="candidateClassName">NSBox</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidWidthField">
+							<string key="name">customizeVidWidthField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="customizeVidWidthLabel">
+							<string key="name">customizeVidWidthLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="destinationBox">
+							<string key="name">destinationBox</string>
+							<string key="candidateClassName">NSBox</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="destinationCancelBtn">
+							<string key="name">destinationCancelBtn</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="destinationFileButton">
+							<string key="name">destinationFileButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="destinationLabel">
+							<string key="name">destinationLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="destinationStreamButton">
+							<string key="name">destinationStreamButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dropBox">
+							<string key="name">dropBox</string>
+							<string key="candidateClassName">VLCDragDropView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dropButton">
+							<string key="name">dropButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dropImage">
+							<string key="name">dropImage</string>
+							<string key="candidateClassName">VLCDropDisabledImageView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dropLabel">
+							<string key="name">dropLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dropinIcon">
+							<string key="name">dropinIcon</string>
+							<string key="candidateClassName">VLCDropDisabledImageView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dropinMediaLabel">
+							<string key="name">dropinMediaLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dropinView">
+							<string key="name">dropinView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fileDestinationBrowseButton">
+							<string key="name">fileDestinationBrowseButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fileDestinationFileName">
+							<string key="name">fileDestinationFileName</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fileDestinationFileNameStub">
+							<string key="name">fileDestinationFileNameStub</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fileDestinationIcon">
+							<string key="name">fileDestinationIcon</string>
+							<string key="candidateClassName">NSImageView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fileDestinationView">
+							<string key="name">fileDestinationView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="okButton">
+							<string key="name">okButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="profileLabel">
+							<string key="name">profileLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="profilePopup">
+							<string key="name">profilePopup</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamAddressField">
+							<string key="name">streamAddressField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamAddressLabel">
+							<string key="name">streamAddressLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamAnnouncementLabel">
+							<string key="name">streamAnnouncementLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamCancelButton">
+							<string key="name">streamCancelButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamChannelField">
+							<string key="name">streamChannelField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamDestinationButton">
+							<string key="name">streamDestinationButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamDestinationLabel">
+							<string key="name">streamDestinationLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamDestinationURLLabel">
+							<string key="name">streamDestinationURLLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamDestinationView">
+							<string key="name">streamDestinationView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamOkButton">
+							<string key="name">streamOkButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamPanel">
+							<string key="name">streamPanel</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamPortField">
+							<string key="name">streamPortField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamPortLabel">
+							<string key="name">streamPortLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamSAPCheckbox">
+							<string key="name">streamSAPCheckbox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamSDPField">
+							<string key="name">streamSDPField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamSDPFileBrowseButton">
+							<string key="name">streamSDPFileBrowseButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamSDPMatrix">
+							<string key="name">streamSDPMatrix</string>
+							<string key="candidateClassName">NSMatrix</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamTTLField">
+							<string key="name">streamTTLField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamTTLLabel">
+							<string key="name">streamTTLLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamTTLStepper">
+							<string key="name">streamTTLStepper</string>
+							<string key="candidateClassName">NSStepper</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamTypeLabel">
+							<string key="name">streamTypeLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="streamTypePopup">
+							<string key="name">streamTypePopup</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="window">
+							<string key="name">window</string>
+							<string key="candidateClassName">NSWindow</string>
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -6788,6 +6933,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<string key="closeCustomizationSheet:">id</string>
 						<string key="closeStreamPanel:">id</string>
 						<string key="customizeProfile:">id</string>
+						<string key="customizeSubsCheckbox:">id</string>
 						<string key="deleteProfileAction:">id</string>
 						<string key="finalizePanel:">id</string>
 						<string key="iWantAFile:">id</string>
@@ -6825,6 +6971,10 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						</object>
 						<object class="IBActionInfo" key="customizeProfile:">
 							<string key="name">customizeProfile:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="customizeSubsCheckbox:">
+							<string key="name">customizeSubsCheckbox:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="deleteProfileAction:">
@@ -6888,7 +7038,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 				<object class="IBPartialClassDescription">
 					<string key="className">VLCDragDropView</string>
 					<string key="superclassName">NSView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="912376327">
+					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="391779569">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../../../../modules/gui/macosx/misc.h</string>
 					</object>
@@ -6896,7 +7046,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 				<object class="IBPartialClassDescription">
 					<string key="className">VLCDropDisabledImageView</string>
 					<string key="superclassName">NSImageView</string>
-					<reference key="sourceIdentifier" ref="912376327"/>
+					<reference key="sourceIdentifier" ref="391779569"/>
 				</object>
 			</array>
 			<array class="NSMutableArray" key="referencedPartialClassDescriptionsV3.2+">

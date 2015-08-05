@@ -1270,7 +1270,7 @@
         _convertAndSaveWindowController = [[VLCConvertAndSave alloc] init];
 
     if (!b_nib_convertandsave_loaded)
-        b_nib_convertandsave_loaded = [NSBundle loadNibNamed:@"ConvertAndSave" owner: NSApp];
+        b_nib_convertandsave_loaded = [NSBundle loadNibNamed:@"ConvertAndSave" owner: _convertAndSaveWindowController];
 
     [_convertAndSaveWindowController toggleWindow];
 }

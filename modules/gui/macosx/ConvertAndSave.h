@@ -24,106 +24,117 @@
 #import <Cocoa/Cocoa.h>
 #import "SharedDialogs.h"
 
+@class VLCDropDisabledImageView;
+@class VLCDragDropView;
+
 @interface VLCConvertAndSave : NSObject
-{
-    IBOutlet id _window;
-    IBOutlet id _ok_btn;
 
-    IBOutlet id _drop_lbl;
-    IBOutlet id _drop_image_view;
-    IBOutlet id _drop_btn;
-    IBOutlet id _drop_box;
+// main panel
+@property (weak) IBOutlet NSWindow *window;
+@property (weak) IBOutlet VLCDragDropView *dropBox;
+@property (weak) IBOutlet NSTextField *dropLabel;
 
-    IBOutlet id _profile_lbl;
-    IBOutlet id _profile_pop;
-    IBOutlet id _profile_btn;
+@property (weak) IBOutlet VLCDropDisabledImageView *dropImage;
+@property (weak) IBOutlet NSButton *dropButton;
+@property (weak) IBOutlet NSTextField *profileLabel;
+@property (weak) IBOutlet NSPopUpButton *profilePopup;
+@property (weak) IBOutlet NSButton *customizeButton;
 
-    IBOutlet id _destination_box;
-    IBOutlet id _destination_lbl;
-    IBOutlet id _destination_browse_btn;
-    IBOutlet id _destination_icon_view;
-    IBOutlet id _destination_filename_lbl;
-    IBOutlet id _destination_filename_stub_lbl;
-    IBOutlet id _destination_stream_btn;
-    IBOutlet id _destination_stream_lbl;
-    IBOutlet id _destination_itwantafile_btn;
-    IBOutlet id _destination_itwantastream_btn;
-    IBOutlet id _destination_itwantafile_view;
-    IBOutlet id _destination_itwantastream_view;
-    IBOutlet id _destination_cancel_btn;
+@property (weak) IBOutlet NSTextField *destinationLabel;
+@property (weak) IBOutlet NSBox *destinationBox;
 
-    IBOutlet id _dropin_view;
-    IBOutlet id _dropin_icon_view;
-    IBOutlet id _dropin_media_lbl;
+@property (weak) IBOutlet NSButton *destinationCancelBtn;
+@property (weak) IBOutlet NSButton *destinationStreamButton;
+@property (weak) IBOutlet NSButton *destinationFileButton;
 
-    IBOutlet id _customize_panel;
-    IBOutlet id _customize_ok_btn;
-    IBOutlet id _customize_cancel_btn;
-    IBOutlet id _customize_newProfile_btn;
-    IBOutlet id _customize_tabview;
-    IBOutlet id _customize_encap_matrix;
+@property (weak) IBOutlet NSButton *okButton;
 
-    IBOutlet id _customize_vid_settings_box;
-    IBOutlet id _customize_vid_ckb;
-    IBOutlet id _customize_vid_keep_ckb;
-    IBOutlet id _customize_vid_codec_lbl;
-    IBOutlet id _customize_vid_codec_pop;
-    IBOutlet id _customize_vid_bitrate_lbl;
-    IBOutlet id _customize_vid_bitrate_fld;
-    IBOutlet id _customize_vid_framerate_lbl;
-    IBOutlet id _customize_vid_framerate_fld;
-    IBOutlet id _customize_vid_res_box;
-    IBOutlet id _customize_vid_res_lbl;
-    IBOutlet id _customize_vid_width_lbl;
-    IBOutlet id _customize_vid_width_fld;
-    IBOutlet id _customize_vid_height_lbl;
-    IBOutlet id _customize_vid_height_fld;
-    IBOutlet id _customize_vid_scale_lbl;
-    IBOutlet id _customize_vid_scale_pop;
+@property (weak) IBOutlet NSView *dropinView;
+@property (weak) IBOutlet VLCDropDisabledImageView *dropinIcon;
+@property (weak) IBOutlet NSTextField *dropinMediaLabel;
+@property (weak) IBOutlet NSView *fileDestinationView;
+@property (weak) IBOutlet NSImageView *fileDestinationIcon;
+@property (weak) IBOutlet NSTextField *fileDestinationFileName;
+@property (weak) IBOutlet NSTextField *fileDestinationFileNameStub;
+@property (weak) IBOutlet NSButton *fileDestinationBrowseButton;
+@property (weak) IBOutlet NSView *streamDestinationView;
+@property (weak) IBOutlet NSTextField *streamDestinationURLLabel;
+@property (weak) IBOutlet NSButton *streamDestinationButton;
 
-    IBOutlet id _customize_aud_settings_box;
-    IBOutlet id _customize_aud_ckb;
-    IBOutlet id _customize_aud_keep_ckb;
-    IBOutlet id _customize_aud_codec_lbl;
-    IBOutlet id _customize_aud_codec_pop;
-    IBOutlet id _customize_aud_bitrate_lbl;
-    IBOutlet id _customize_aud_bitrate_fld;
-    IBOutlet id _customize_aud_channels_lbl;
-    IBOutlet id _customize_aud_channels_fld;
-    IBOutlet id _customize_aud_samplerate_lbl;
-    IBOutlet id _customize_aud_samplerate_pop;
+// customize panel
+@property (weak) IBOutlet NSWindow *customizePanel;
+@property (weak) IBOutlet NSButton *customizeNewProfileButton;
+@property (weak) IBOutlet NSButton *customizeCancelButton;
+@property (weak) IBOutlet NSButton *customizeOkButton;
+@property (weak) IBOutlet NSTabView *customizeTabView;
+@property (weak) IBOutlet NSMatrix *customizeEncapMatrix;
 
-    IBOutlet id _customize_subs_ckb;
-    IBOutlet id _customize_subs_pop;
-    IBOutlet id _customize_subs_overlay_ckb;
+// customize panel: video
+@property (weak) IBOutlet NSButton *customizeVidCheckbox;
+@property (weak) IBOutlet NSButton *customizeVidKeepCheckbox;
+@property (weak) IBOutlet NSBox *customizeVidSettingsBox;
+@property (weak) IBOutlet NSTextField *customizeVidCodecLabel;
+@property (weak) IBOutlet NSTextField *customizeVidBitrateLabel;
+@property (weak) IBOutlet NSTextField *customizeVidFramerateLabel;
+@property (weak) IBOutlet NSBox *customizeVidResolutionBox;
+@property (weak) IBOutlet NSTextField *customizeVidWidthLabel;
+@property (weak) IBOutlet NSTextField *customizeVidHeightLabel;
+@property (weak) IBOutlet NSTextField *customizeVidScaleLabel;
+@property (weak) IBOutlet NSTextField *customizeVidResLabel;
+@property (weak) IBOutlet NSPopUpButton *customizeVidCodecPopup;
+@property (weak) IBOutlet NSTextField *customizeVidBitrateField;
+@property (weak) IBOutlet NSTextField *customizeVidFramerateField;
+@property (weak) IBOutlet NSTextField *customizeVidWidthField;
+@property (weak) IBOutlet NSTextField *customizeVidHeightField;
+@property (weak) IBOutlet NSPopUpButton *customizeVidScalePopup;
 
-    IBOutlet id _stream_panel;
-    IBOutlet id _stream_cancel_btn;
-    IBOutlet id _stream_ok_btn;
-    IBOutlet id _stream_destination_lbl;
-    IBOutlet id _stream_announcement_lbl;
-    IBOutlet id _stream_type_lbl;
-    IBOutlet id _stream_type_pop;
-    IBOutlet id _stream_address_lbl;
-    IBOutlet id _stream_address_fld;
-    IBOutlet id _stream_ttl_lbl;
-    IBOutlet id _stream_ttl_fld;
-    IBOutlet id _stream_ttl_stepper;
-    IBOutlet id _stream_port_lbl;
-    IBOutlet id _stream_port_fld;
-    IBOutlet id _stream_sap_ckb;
-    IBOutlet id _stream_channel_fld;
-    IBOutlet id _stream_sdp_matrix;
-    IBOutlet id _stream_sdp_fld;
-    IBOutlet id _stream_sdp_browsefile_btn;
-}
+// customize panel: audio
+@property (weak) IBOutlet NSButton *customizeAudCheckbox;
+@property (weak) IBOutlet NSButton *customizeAudKeepCheckbox;
+@property (weak) IBOutlet NSBox *customizeAudSettingsBox;
+@property (weak) IBOutlet NSTextField *customizeAudCodecLabel;
+@property (weak) IBOutlet NSTextField *customizeAudBitrateLabel;
+@property (weak) IBOutlet NSTextField *customizeAudChannelsLabel;
+@property (weak) IBOutlet NSTextField *customizeAudSamplerateLabel;
+@property (weak) IBOutlet NSPopUpButton *customizeAudCodecPopup;
+@property (weak) IBOutlet NSTextField *customizeAudBitrateField;
+@property (weak) IBOutlet NSTextField *customizeAudChannelsField;
+@property (weak) IBOutlet NSPopUpButton *customizeAudSampleratePopup;
+
+// customize panel: subs
+@property (weak) IBOutlet NSButton *customizeSubsCheckbox;
+@property (weak) IBOutlet NSButton *customizeSubsOverlayCheckbox;
+@property (weak) IBOutlet NSPopUpButton *customizeSubsPopup;
+
+// stream panel
+@property (weak) IBOutlet NSWindow *streamPanel;
+@property (weak) IBOutlet NSTextField *streamDestinationLabel;
+@property (weak) IBOutlet NSTextField *streamTypeLabel;
+@property (weak) IBOutlet NSTextField *streamAddressLabel;
+@property (weak) IBOutlet NSPopUpButton *streamTypePopup;
+@property (weak) IBOutlet NSTextField *streamAddressField;
+@property (weak) IBOutlet NSTextField *streamTTLLabel;
+@property (weak) IBOutlet NSTextField *streamTTLField;
+@property (weak) IBOutlet NSStepper *streamTTLStepper;
+@property (weak) IBOutlet NSTextField *streamPortLabel;
+@property (weak) IBOutlet NSTextField *streamPortField;
+@property (weak) IBOutlet NSTextField *streamAnnouncementLabel;
+@property (weak) IBOutlet NSButton *streamSAPCheckbox;
+@property (weak) IBOutlet NSTextField *streamChannelField;
+@property (weak) IBOutlet NSMatrix *streamSDPMatrix;
+@property (weak) IBOutlet NSButton *streamSDPFileBrowseButton;
+@property (weak) IBOutlet NSTextField *streamSDPField;
+@property (weak) IBOutlet NSButton *streamCancelButton;
+@property (weak) IBOutlet NSButton *streamOkButton;
+
+// other properties
 @property (readwrite, nonatomic, retain) NSString * MRL;
 @property (readwrite, nonatomic, retain) NSString * outputDestination;
 @property (readwrite, retain) NSArray * profileNames;
 @property (readwrite, retain) NSArray * profileValueList;
 @property (readwrite, retain) NSMutableArray * currentProfile;
 
-/* Bindings for field / stepper combis */
+// Bindings for field / stepper combis
 @property (nonatomic) int vidBitrate;
 @property (nonatomic) int vidFramerate;
 @property (nonatomic) int audBitrate;
