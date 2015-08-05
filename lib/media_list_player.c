@@ -733,25 +733,18 @@ static int set_relative_playlist_position_and_play(
     {
         bool b_loop = (p_mlp->e_playback_mode == libvlc_playback_mode_loop);
 
-        if(i_relative_position > 0)
+        while (i_relative_position > 0)
         {
-            do
-            {
-                path = get_next_path(p_mlp, b_loop);
-                set_current_playing_item(p_mlp, path);
-                --i_relative_position;
-            }
-            while(i_relative_position > 0);
+            path = get_next_path(p_mlp, b_loop);
+            set_current_playing_item(p_mlp, path);
+            --i_relative_position;
         }
-        else if(i_relative_position < 0)
+
+        while (i_relative_position < 0)
         {
-            do
-            {
-                path = get_previous_path(p_mlp, b_loop);
-                set_current_playing_item(p_mlp, path);
-                ++i_relative_position;
-            }
-            while (i_relative_position < 0);
+            path = get_previous_path(p_mlp, b_loop);
+            set_current_playing_item(p_mlp, path);
+            ++i_relative_position;
         }
     }
     else
