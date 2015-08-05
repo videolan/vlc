@@ -1419,7 +1419,7 @@ int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi
         libvlc_title_description_t *title = malloc( sizeof (*title) );
         if( unlikely(title == NULL) )
         {
-            libvlc_title_descriptions_release( titles, count );
+            libvlc_title_descriptions_release( titles, i );
             return -1;
         }
         titles[i] = title;
