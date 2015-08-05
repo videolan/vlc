@@ -309,8 +309,6 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
         return NULL;
     }
 
-    //EnsureUTF8( psz_subtitle );
-
     /* Create the subpicture unit */
     p_spu = decoder_NewSubpictureText( p_dec );
     if( !p_spu )
@@ -972,6 +970,7 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
 
         if(font != prev_font || color != prev_color)
         {
+            EnsureUTF8(psz_text);
             p_segment->psz_text = strdup(psz_text);
             psz_text[0] = '\0';
             p_segment->p_next = text_segment_New( NULL );
@@ -1027,6 +1026,7 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
     if( p_segment )
     {
         assert(!p_segment->psz_text); // shouldn't happen
+        EnsureUTF8(psz_text);
         p_segment->psz_text = strdup(psz_text);
     }
 
