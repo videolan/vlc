@@ -118,21 +118,16 @@
     [defaults registerDefaults:appDefaults];
 }
 
-+ (VLCConvertAndSave *)sharedInstance
+- (id)init
 {
-    static VLCConvertAndSave *sharedInstance = nil;
-    static dispatch_once_t pred;
+    self = [super initWithWindowNibName:@"ConvertAndSave"];
 
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCConvertAndSave new];
-    });
-
-    return sharedInstance;
+    return self;
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
-    [_window setTitle: _NS("Convert & Stream")];
+    [self.window setTitle: _NS("Convert & Stream")];
     [_okButton setTitle: _NS("Go!")];
     [_dropLabel setStringValue: _NS("Drop media here")];
     [_dropButton setTitle: _NS("Open media...")];
@@ -255,14 +250,6 @@
 }
 
 # pragma mark -
-# pragma mark Code to Communicate with other objects
-
-- (void)toggleWindow
-{
-    [_window makeKeyAndOrderFront: nil];
-}
-
-# pragma mark -
 # pragma mark User Interaction
 
 - (IBAction)finalizePanel:(id)sender
@@ -271,7 +258,7 @@
         if ([[[_streamTypePopup selectedItem] title] isEqualToString:@"HTTP"]) {
             NSString *muxformat = [self.currentProfile firstObject];
             if ([muxformat isEqualToString:@"wav"] || [muxformat isEqualToString:@"mov"] || [muxformat isEqualToString:@"mp4"] || [muxformat isEqualToString:@"mkv"]) {
-                NSBeginInformationalAlertSheet(_NS("Invalid container format for HTTP streaming"), _NS("OK"), @"", @"", _window,
+                NSBeginInformationalAlertSheet(_NS("Invalid container format for HTTP streaming"), _NS("OK"), @"", @"", self.window,
                                                nil, nil, nil, nil,
                                                _NS("Media encapsulated as %@ cannot be streamed through the HTTP protocol for technical reasons."),
                                                [[self currentEncapsulationFormatAsFileExtension:YES] uppercaseString]);
@@ -307,7 +294,7 @@
     /* we're done with this input */
     vlc_gc_decref(p_input);
 
-    [_window performClose:sender];
+    [self.window performClose:sender];
 }
 
 - (IBAction)openMedia:(id)sender
@@ -317,7 +304,7 @@
     [openPanel setCanChooseDirectories:NO];
     [openPanel setResolvesAliases:YES];
     [openPanel setAllowsMultipleSelection:NO];
-    [openPanel beginSheetModalForWindow:_window completionHandler:^(NSInteger returnCode) {
+    [openPanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton)
         {
             [self setMRL: toNSStr(vlc_path2uri([[[openPanel URL] path] UTF8String], NULL))];
@@ -337,7 +324,7 @@
 
 - (IBAction)customizeProfile:(id)sender
 {
-    [NSApp beginSheet:_customizePanel modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [NSApp beginSheet:_customizePanel modalForWindow:self.window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
 - (IBAction)closeCustomizationSheet:(id)sender
@@ -373,7 +360,7 @@
     [panel setPopupButtonContent:self.profileNames];
     [panel setTarget:self];
 
-    [panel runModalForWindow:_window];
+    [panel runModalForWindow:self.window];
 }
 
 - (IBAction)iWantAFile:(id)sender
@@ -426,7 +413,7 @@
     [saveFilePanel setCanCreateDirectories: YES];
     if ([[_customizeEncapMatrix selectedCell] tag] != RAW) // there is no clever guess for this
         [saveFilePanel setAllowedFileTypes:[NSArray arrayWithObject:[self currentEncapsulationFormatAsFileExtension:YES]]];
-    [saveFilePanel beginSheetModalForWindow:_window completionHandler:^(NSInteger returnCode) {
+    [saveFilePanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSOKButton) {
             [self setOutputDestination:[[saveFilePanel URL] path]];
             [_fileDestinationFileName setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_outputDestination]];
@@ -443,7 +430,7 @@
 
 - (IBAction)showStreamPanel:(id)sender
 {
-    [NSApp beginSheet:_streamPanel modalForWindow:_window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [NSApp beginSheet:_streamPanel modalForWindow:self.window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
 - (IBAction)closeStreamPanel:(id)sender

@@ -54,11 +54,9 @@
 @interface VLCMainMenu()
 {
     BOOL b_nib_bookmarks_loaded;
-    BOOL b_nib_convertandsave_loaded;
 
     AboutWindowController *_aboutWindowController;
     HelpWindowController  *_helpWindowController;
-    VLCConvertAndSave *_convertAndSaveWindowController;
     AddonsWindowController *_addonsController;
 
     ExtensionsManager *_extensionManager;
@@ -1266,13 +1264,7 @@
 
 - (IBAction)showConvertAndSave:(id)sender
 {
-    if (_convertAndSaveWindowController == nil)
-        _convertAndSaveWindowController = [[VLCConvertAndSave alloc] init];
-
-    if (!b_nib_convertandsave_loaded)
-        b_nib_convertandsave_loaded = [NSBundle loadNibNamed:@"ConvertAndSave" owner: _convertAndSaveWindowController];
-
-    [_convertAndSaveWindowController toggleWindow];
+    [[[VLCMain sharedInstance] convertAndSaveWindow] showWindow:self];
 }
 
 - (IBAction)showVideoEffects:(id)sender

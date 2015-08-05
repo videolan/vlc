@@ -59,6 +59,7 @@
 #import "BWQuincyManager.h"
 #import "ResumeDialogController.h"
 #import "DebugMessageVisualizer.h"
+#import "ConvertAndSave.h"
 
 #import "VideoEffects.h"
 #import "AudioEffects.h"
@@ -158,6 +159,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCTrackSynchronization *_trackSyncPanel;
     VLCAudioEffects *_audioEffectsPanel;
     VLCVideoEffects *_videoEffectsPanel;
+    VLCConvertAndSave *_convertAndSaveWindow;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -567,6 +569,14 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
         _open = [[VLCOpen alloc] init];
 
     return _open;
+}
+
+- (VLCConvertAndSave *)convertAndSaveWindow
+{
+    if (_convertAndSaveWindow == nil)
+        _convertAndSaveWindow = [[VLCConvertAndSave alloc] init];
+
+    return _convertAndSaveWindow;
 }
 
 - (VLCSimplePrefs *)simplePreferences

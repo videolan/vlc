@@ -27,10 +27,9 @@
 @class VLCDropDisabledImageView;
 @class VLCDragDropView;
 
-@interface VLCConvertAndSave : NSObject
+@interface VLCConvertAndSave : NSWindowController
 
 // main panel
-@property (weak) IBOutlet NSWindow *window;
 @property (weak) IBOutlet VLCDragDropView *dropBox;
 @property (weak) IBOutlet NSTextField *dropLabel;
 
@@ -140,10 +139,6 @@
 @property (nonatomic) int audBitrate;
 @property (nonatomic) int audChannels;
 
-
-+ (VLCConvertAndSave *)sharedInstance;
-
-- (IBAction)toggleWindow;
 
 - (IBAction)finalizePanel:(id)sender;
 - (IBAction)openMedia:(id)sender;
