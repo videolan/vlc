@@ -54,6 +54,7 @@
 #endif
 
 #define DEFAULT_FONT           "Helvetica-Neue"
+#define DEFAULT_MONOFONT       "Andale-Mono"
 #define DEFAULT_FONT_COLOR     0xffffff
 #define DEFAULT_REL_FONT_SIZE  16
 
@@ -90,6 +91,7 @@ static void setFontAttibutes(char *psz_fontname, int i_font_size, uint32_t i_fon
  * RenderText. */
 #define FONT_TEXT N_("Font")
 #define FONT_LONGTEXT N_("Name for the font you want to use")
+#define MONOSPACE_FONT_TEXT N_("Monospace Font")
 #define FONTSIZER_TEXT N_("Relative font size")
 #define FONTSIZER_LONGTEXT N_("This is the relative default size of the " \
     "fonts that will be rendered on the video. If absolute font size is set, "\
@@ -123,6 +125,8 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_SUBPIC)
 
     add_string("quartztext-font", DEFAULT_FONT, FONT_TEXT, FONT_LONGTEXT,
+              false)
+    add_string("quartztext-monofont", DEFAULT_MONOFONT, MONOSPACE_FONT_TEXT, FONT_LONGTEXT,
               false)
     add_integer("quartztext-rel-fontsize", DEFAULT_REL_FONT_SIZE, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, false)
@@ -203,7 +207,7 @@ static int Create(vlc_object_t *p_this)
         return VLC_ENOMEM;
 
     p_sys->style.psz_fontname = var_CreateGetString(p_this, "quartztext-font");;
-    p_sys->style.psz_monofontname = strdup(p_sys->style.psz_fontname);
+    p_sys->style.psz_monofontname = var_CreateGetString(p_this, "quartztext-monofont");
     p_sys->style.i_font_size = GetFontSize(p_filter);;
     p_sys->style.i_style_flags = 0;
 
@@ -327,8 +331,16 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
     }
 
     if (p_text->style) {
-        psz_fontname = p_text->style->psz_fontname ?
-            p_text->style->psz_fontname : p_sys->style.psz_fontname;
+        if(p_text->style->i_style_flags & STYLE_MONOSPACED)
+        {
+            psz_fontname = p_text->style->psz_monofontname ?
+                           p_text->style->psz_monofontname : p_sys->style.psz_monofontname;
+        }
+        else
+        {
+            psz_fontname = p_text->style->psz_fontname ?
+                           p_text->style->psz_fontname : p_sys->style.psz_fontname;
+        }
         i_font_color = VLC_CLIP(p_text->style->i_font_color, 0, 0xFFFFFF);
         i_font_size  = VLC_CLIP(p_text->style->i_font_size, 0, 255);
         if (p_text->style->i_style_flags) {
