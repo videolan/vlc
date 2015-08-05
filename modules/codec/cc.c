@@ -945,9 +945,6 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
     /* Search the start */
     i_start = 0;
 
-    /* Ensure we get a monospaced font (required for accurate positioning */
-    p_segment->style->psz_monofontname = strdup("Courier");
-
     /* Convert leading spaces to non-breaking so that they don't get
        stripped by the RenderHtml routine as regular whitespace */
     while( i_start < EIA608_SCREEN_COLUMNS && p_char[i_start] == ' ' ) {
@@ -986,7 +983,6 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
             }
 
             /* start segment with new style */
-            p_segment->style->psz_monofontname = strdup("Courier");
             if(font & EIA608_FONT_ITALICS)
                 p_segment->style->i_style_flags |= STYLE_ITALIC;
             if(font & EIA608_FONT_UNDERLINE)
