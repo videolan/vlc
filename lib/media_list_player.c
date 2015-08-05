@@ -383,7 +383,6 @@ static void
 uninstall_media_player_observer(libvlc_media_list_player_t * p_mlp)
 {
     assert_locked(p_mlp);
-    if (!p_mlp->p_mi) return;
 
     // From now on, media_player callback won't be relevant.
     p_mlp->are_mp_callback_cancelled = true;
@@ -609,11 +608,6 @@ void libvlc_media_list_player_play(libvlc_media_list_player_t * p_mlp)
 void libvlc_media_list_player_pause(libvlc_media_list_player_t * p_mlp)
 {
     lock(p_mlp);
-    if (!p_mlp->p_mi)
-    {
-        unlock(p_mlp);
-        return;
-    }
     libvlc_media_player_pause(p_mlp->p_mi);
     unlock(p_mlp);
 }
@@ -624,10 +618,6 @@ void libvlc_media_list_player_pause(libvlc_media_list_player_t * p_mlp)
 int
 libvlc_media_list_player_is_playing(libvlc_media_list_player_t * p_mlp)
 {
-    if (!p_mlp->p_mi)
-    {
-        return libvlc_NothingSpecial;
-    }
     libvlc_state_t state = libvlc_media_player_get_state(p_mlp->p_mi);
     return (state == libvlc_Opening) || (state == libvlc_Buffering) ||
            (state == libvlc_Playing);
@@ -639,8 +629,6 @@ libvlc_media_list_player_is_playing(libvlc_media_list_player_t * p_mlp)
 libvlc_state_t
 libvlc_media_list_player_get_state(libvlc_media_list_player_t * p_mlp)
 {
-    if (!p_mlp->p_mi)
-        return libvlc_Ended;
     return libvlc_media_player_get_state(p_mlp->p_mi);
 }
 
@@ -694,13 +682,10 @@ static void stop(libvlc_media_list_player_t * p_mlp)
 {
     assert_locked(p_mlp);
 
-    if (p_mlp->p_mi)
-    {
-        /* We are not interested in getting media stop event now */
-        uninstall_media_player_observer(p_mlp);
-        libvlc_media_player_stop(p_mlp->p_mi);
-        install_media_player_observer(p_mlp);
-    }
+    /* We are not interested in getting media stop event now */
+    uninstall_media_player_observer(p_mlp);
+    libvlc_media_player_stop(p_mlp->p_mi);
+    install_media_player_observer(p_mlp);
 
     free(p_mlp->current_playing_item_path);
     p_mlp->current_playing_item_path = NULL;
