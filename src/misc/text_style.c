@@ -53,7 +53,6 @@ text_style_t *text_style_New( void )
     p_style->i_outline_width = 1;
     p_style->i_shadow_width = 0;
     p_style->i_spacing = -1;
-    p_style->b_monospaced = false;
 
     return p_style;
 }

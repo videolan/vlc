@@ -49,9 +49,8 @@ typedef struct
     uint8_t    i_font_alpha;      /**< The transparency of the text.
                                        0x00 is fully opaque,
                                        0xFF fully transparent */
-    int        i_style_flags;     /**< Formatting style flags */
+    uint16_t   i_style_flags;     /**< Formatting style flags */
     int        i_spacing;         /**< The spaceing between glyphs in pixels */
-    bool       b_monospaced;      /**< If font should be default monospaced font */
 
     /* Outline */
     int        i_outline_color;   /**< The color of the outline 0xRRGGBB */
@@ -87,6 +86,7 @@ typedef struct
 #define STYLE_UNDERLINE   32
 #define STYLE_STRIKEOUT   64
 #define STYLE_HALFWIDTH   128
+#define STYLE_MONOSPACED  256
 
 #define STYLE_DEFAULT_FONT_SIZE 22
 

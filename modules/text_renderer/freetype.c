@@ -1368,7 +1368,8 @@ FT_Face LoadFace( filter_t *p_filter,
          && !( ( p_cache->p_styles[ i ].i_style_flags ^ p_style->i_style_flags ) & STYLE_HALFWIDTH ) )
             return p_cache->p_faces[ i ];
 
-    const char *psz_fontname = (p_style->b_monospaced) ? p_style->psz_monofontname : p_style->psz_fontname;
+    const char *psz_fontname = (p_style->i_style_flags & STYLE_MONOSPACED)
+                               ? p_style->psz_monofontname : p_style->psz_fontname;
 
     /* Look for a match amongst our attachments first */
     FT_Face p_face = LoadEmbeddedFace( p_sys, psz_fontname, p_style );

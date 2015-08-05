@@ -942,7 +942,7 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
         return NULL;
     }
     /* Ensure we get a monospaced font (required for accurate positioning */
-    p_segment->style->b_monospaced = true;
+    p_segment->style->i_style_flags |= STYLE_MONOSPACED;
 
     /* Search the start */
     i_start = 0;
@@ -983,7 +983,7 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
                 text_segment_Delete(p_segment);
                 return p_segments_head;
             }
-            p_segment->style->b_monospaced = true;
+            p_segment->style->i_style_flags |= STYLE_MONOSPACED;
 
             /* start segment with new style */
             if(font & EIA608_FONT_ITALICS)
