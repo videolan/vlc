@@ -87,40 +87,11 @@ typedef struct libvlc_event_manager_t
     vlc_mutex_t lock;
 } libvlc_event_sender_t;
 
-
-static inline bool
-listeners_are_equal( libvlc_event_listener_t * listener1,
-                    libvlc_event_listener_t * listener2 )
-{
-    return listener1->event_type  == listener2->event_type &&
-    listener1->pf_callback == listener2->pf_callback &&
-    listener1->p_user_data == listener2->p_user_data;
-}
-
-
 typedef struct libvlc_event_listeners_group_t
 {
     libvlc_event_type_t event_type;
     vlc_array_t listeners;
-    bool b_sublistener_removed;
 } libvlc_event_listeners_group_t;
-
-/*
- * Private functions
- */
-
-static bool
-group_contains_listener( libvlc_event_listeners_group_t * group,
-                         libvlc_event_listener_t * searched_listener )
-{
-    int i;
-    for( i = 0; i < vlc_array_count(&group->listeners); i++ )
-    {
-        if( listeners_are_equal(searched_listener, vlc_array_item_at_index(&group->listeners, i)) )
-            return true;
-    }
-    return false;
-}
 
 /*
  * Internal libvlc functions
@@ -203,11 +174,7 @@ void libvlc_event_manager_register_event_type(
 void libvlc_event_send( libvlc_event_manager_t * p_em,
                         libvlc_event_t * p_event )
 {
-    libvlc_event_listeners_group_t * listeners_group = NULL;
-    libvlc_event_listener_t * listener_cached;
-    libvlc_event_listener_t * listener;
-    libvlc_event_listener_t * array_listeners_cached = NULL;
-    int i, i_cached_listeners = 0;
+    int i;
 
     /* Fill event with the sending object now */
     p_event->p_obj = p_em->p_obj;
@@ -215,68 +182,22 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
     vlc_mutex_lock(&p_em->lock);
     for( i = 0; i < vlc_array_count(&p_em->listeners_groups); i++)
     {
+        libvlc_event_listeners_group_t *listeners_group;
+
         listeners_group = vlc_array_item_at_index(&p_em->listeners_groups, i);
-        if( listeners_group->event_type == p_event->type )
+        if (listeners_group->event_type != p_event->type)
+            continue;
+
+        for (int j = 0; j < vlc_array_count(&listeners_group->listeners); j++)
         {
-            if( vlc_array_count( &listeners_group->listeners ) <= 0 )
-                break;
+            libvlc_event_listener_t *listener;
 
-            /* Cache a copy of the listener to avoid locking issues,
-             * and allow that edition of listeners during callbacks will garantee immediate effect. */
-            i_cached_listeners = vlc_array_count(&listeners_group->listeners);
-            array_listeners_cached = malloc(sizeof(libvlc_event_listener_t)*(i_cached_listeners));
-            if( !array_listeners_cached )
-            {
-                vlc_mutex_unlock(&p_em->lock);
-                fprintf(stderr, "Can't alloc memory in libvlc_event_send" );
-                return;
-            }
-
-            listener_cached = array_listeners_cached;
-            for( i = 0; i < vlc_array_count(&listeners_group->listeners); i++)
-            {
-                listener = vlc_array_item_at_index(&listeners_group->listeners, i);
-                memcpy( listener_cached, listener, sizeof(libvlc_event_listener_t) );
-                listener_cached++;
-            }
-            break;
+            listener = vlc_array_item_at_index(&listeners_group->listeners, j);
+            listener->pf_callback(p_event, listener->p_user_data);
         }
-    }
-
-    if( !listeners_group )
-    {
-        vlc_mutex_unlock(&p_em->lock);
-        free( array_listeners_cached );
-        return;
-    }
-
-    /* Track item removed from *this* thread, with a simple flag. Indeed
-     * event_sending_lock is a recursive lock. This has the advantage of
-     * allowing to remove an event listener from within a callback */
-    listeners_group->b_sublistener_removed = false;
-
-    listener_cached = array_listeners_cached;
-    for( i = 0; i < i_cached_listeners; i++ )
-    {
-        /* The listener wants to block the emitter during event callback */
-        listener_cached->pf_callback( p_event, listener_cached->p_user_data );
-        listener_cached++;
-
-        if( listeners_group->b_sublistener_removed )
-        {
-            /* If a callback was removed, this gets called */
-            bool valid_listener;
-            valid_listener = group_contains_listener( listeners_group, listener_cached );
-            if( !valid_listener )
-            {
-                listener_cached++;
-                continue;
-            }
-        }
+        break;
     }
     vlc_mutex_unlock(&p_em->lock);
-
-    free( array_listeners_cached );
 }
 
 /*
@@ -462,11 +383,6 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                     listener->p_user_data == p_user_data )
                 {
                     /* that's our listener */
-
-                    /* Mark this group as edited so that libvlc_event_send
-                     * will recheck what listener to call */
-                    listeners_group->b_sublistener_removed = true;
-
                     free( listener );
                     vlc_array_remove( &listeners_group->listeners, j );
                     found = true;
