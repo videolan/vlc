@@ -862,7 +862,8 @@ static inline int RenderAXYZ( filter_t *p_filter,
 
 
 
-static FT_Face LoadEmbeddedFace( filter_sys_t *p_sys, const text_style_t *p_style )
+static FT_Face LoadEmbeddedFace( filter_sys_t *p_sys, const char *psz_fontname,
+                                 const text_style_t *p_style )
 {
     for( int k = 0; k < p_sys->i_font_attachments; k++ )
     {
@@ -881,7 +882,7 @@ static FT_Face LoadEmbeddedFace( filter_sys_t *p_sys, const text_style_t *p_styl
                 int i_style_received = ((p_face->style_flags & FT_STYLE_FLAG_BOLD)    ? STYLE_BOLD   : 0) |
                                        ((p_face->style_flags & FT_STYLE_FLAG_ITALIC ) ? STYLE_ITALIC : 0);
                 if( p_face->family_name != NULL
-                 && !strcasecmp( p_face->family_name, p_style->psz_fontname )
+                 && !strcasecmp( p_face->family_name, psz_fontname )
                  && (p_style->i_style_flags & (STYLE_BOLD | STYLE_ITALIC))
                                                           == i_style_received )
                     return p_face;
@@ -1367,8 +1368,10 @@ FT_Face LoadFace( filter_t *p_filter,
          && !( ( p_cache->p_styles[ i ].i_style_flags ^ p_style->i_style_flags ) & STYLE_HALFWIDTH ) )
             return p_cache->p_faces[ i ];
 
+    const char *psz_fontname = (p_style->b_monospaced) ? p_style->psz_monofontname : p_style->psz_fontname;
+
     /* Look for a match amongst our attachments first */
-    FT_Face p_face = LoadEmbeddedFace( p_sys, p_style );
+    FT_Face p_face = LoadEmbeddedFace( p_sys, psz_fontname, p_style );
 
     /* Load system wide font otheriwse */
     if( !p_face )
@@ -1377,7 +1380,7 @@ FT_Face LoadFace( filter_t *p_filter,
         char *psz_fontfile = NULL;
         if( p_sys->pf_select )
             psz_fontfile = p_sys->pf_select( p_filter,
-                                             p_style->psz_fontname,
+                                             psz_fontname,
                                              (p_style->i_style_flags & STYLE_BOLD) != 0,
                                              (p_style->i_style_flags & STYLE_ITALIC) != 0,
                                              -1,
@@ -1393,7 +1396,7 @@ FT_Face LoadFace( filter_t *p_filter,
             msg_Warn( p_filter,
                       "We were not able to find a matching font: \"%s\" (%s %s),"
                       " so using default font",
-                      p_style->psz_fontname,
+                      psz_fontname,
                       (p_style->i_style_flags & STYLE_BOLD)   ? "Bold" : "",
                       (p_style->i_style_flags & STYLE_ITALIC) ? "Italic" : "" );
             p_face = NULL;
@@ -1455,7 +1458,7 @@ FT_Face LoadFace( filter_t *p_filter,
     text_style_t *p_face_style = p_cache->p_styles + p_cache->i_faces_count;
     p_face_style->i_font_size = p_style->i_font_size;
     p_face_style->i_style_flags = p_style->i_style_flags;
-    p_face_style->psz_fontname = strdup( p_style->psz_fontname );
+    p_face_style->psz_fontname = strdup( psz_fontname );
     p_cache->p_faces[ p_cache->i_faces_count ] = p_face;
     ++p_cache->i_faces_count;
 

@@ -51,6 +51,7 @@ typedef struct
                                        0xFF fully transparent */
     int        i_style_flags;     /**< Formatting style flags */
     int        i_spacing;         /**< The spaceing between glyphs in pixels */
+    bool       b_monospaced;      /**< If font should be default monospaced font */
 
     /* Outline */
     int        i_outline_color;   /**< The color of the outline 0xRRGGBB */
