@@ -169,17 +169,6 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
 
     p_mlist->b_read_only = false;
 
-    libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
-            libvlc_MediaListItemAdded );
-    libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
-            libvlc_MediaListWillAddItem );
-    libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
-            libvlc_MediaListItemDeleted );
-    libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
-            libvlc_MediaListWillDeleteItem );
-    libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
-            libvlc_MediaListEndReached );
-
     vlc_mutex_init( &p_mlist->object_lock );
     vlc_mutex_init( &p_mlist->refcount_lock ); // FIXME: spinlock?
 

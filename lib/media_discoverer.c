@@ -217,11 +217,6 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
         return NULL;
     }
 
-    libvlc_event_manager_register_event_type( p_mdis->p_event_manager,
-            libvlc_MediaDiscovererStarted );
-    libvlc_event_manager_register_event_type( p_mdis->p_event_manager,
-            libvlc_MediaDiscovererEnded );
-
     p_mdis->p_sd = vlc_sd_Create( (vlc_object_t*)p_inst->p_libvlc_int,
                                   psz_name );
     if( unlikely(p_mdis->p_sd == NULL) )

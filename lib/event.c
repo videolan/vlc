@@ -51,8 +51,6 @@
  * {
  *        ...
  *        p_self->p_event_manager = libvlc_event_manager_new( p_self )
- *        libvlc_event_manager_register_event_type(p_self->p_event_manager,
- *                libvlc_MyCoolObjectDidSomething, p_e)
  *        ...
  * }
  *
@@ -128,18 +126,6 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
 
     vlc_array_clear(&p_em->listeners);
     free( p_em );
-}
-
-/**************************************************************************
- *       libvlc_event_manager_register_event_type (internal) :
- *
- * Init an object's event manager.
- **************************************************************************/
-void libvlc_event_manager_register_event_type(
-        libvlc_event_manager_t * p_em,
-        libvlc_event_type_t event_type )
-{
-    (void) p_em; (void) event_type;
 }
 
 /**************************************************************************

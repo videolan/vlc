@@ -95,12 +95,6 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi );
  * Shortcuts
  */
 
-#define register_event(a, b) __register_event(a, libvlc_MediaPlayer ## b)
-static inline void __register_event(libvlc_media_player_t *mp, libvlc_event_type_t type)
-{
-    libvlc_event_manager_register_event_type(mp->p_event_manager, type);
-}
-
 /*
  * The input lock protects the input and input resource pointer.
  * It MUST NOT be used from callbacks.
@@ -687,46 +681,12 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     }
     vlc_mutex_init(&mp->object_lock);
 
-    register_event(mp, NothingSpecial);
-    register_event(mp, Opening);
-    register_event(mp, Buffering);
-    register_event(mp, Playing);
-    register_event(mp, Paused);
-    register_event(mp, Stopped);
-    register_event(mp, Forward);
-    register_event(mp, Backward);
-    register_event(mp, EndReached);
-    register_event(mp, EncounteredError);
-    register_event(mp, SeekableChanged);
-
-    register_event(mp, PositionChanged);
-    register_event(mp, TimeChanged);
-    register_event(mp, LengthChanged);
-    register_event(mp, TitleChanged);
-    register_event(mp, PausableChanged);
-
-    register_event(mp, Vout);
-    register_event(mp, ScrambledChanged);
-    register_event(mp, ESAdded);
-    register_event(mp, ESDeleted);
-    register_event(mp, ESSelected);
-    register_event(mp, Corked);
-    register_event(mp, Uncorked);
-    register_event(mp, Muted);
-    register_event(mp, Unmuted);
-    register_event(mp, AudioVolume);
-    register_event(mp, AudioDevice);
-
     var_AddCallback(mp, "corks", corks_changed, NULL);
     var_AddCallback(mp, "audio-device", audio_device_changed, NULL);
     var_AddCallback(mp, "mute", mute_changed, NULL);
     var_AddCallback(mp, "volume", volume_changed, NULL);
 
     /* Snapshot initialization */
-    register_event(mp, SnapshotTaken);
-
-    register_event(mp, MediaChanged);
-
     /* Attach a var callback to the global object to provide the glue between
      * vout_thread that generates the event and media_player that re-emits it
      * with its own event manager

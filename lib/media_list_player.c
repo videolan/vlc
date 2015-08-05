@@ -496,14 +496,6 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
         goto error;
     }
 
-    libvlc_event_manager_register_event_type( p_mlp->p_event_manager,
-            libvlc_MediaListPlayerNextItemSet );
-    libvlc_event_manager_register_event_type( p_mlp->p_event_manager,
-            libvlc_MediaListPlayerStopped );
-    libvlc_event_manager_register_event_type( p_mlp->p_event_manager,
-            libvlc_MediaListPlayerPlayed );
-    p_mlp->e_playback_mode = libvlc_playback_mode_default;
-
     if (vlc_clone(&p_mlp->thread, playlist_thread, p_mlp,
                   VLC_THREAD_PRIORITY_LOW))
     {

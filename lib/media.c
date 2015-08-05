@@ -362,15 +362,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(
         return NULL;
     }
 
-    libvlc_event_manager_t *em = p_md->p_event_manager;
-    libvlc_event_manager_register_event_type(em, libvlc_MediaMetaChanged);
-    libvlc_event_manager_register_event_type(em, libvlc_MediaSubItemAdded);
-    libvlc_event_manager_register_event_type(em, libvlc_MediaFreed);
-    libvlc_event_manager_register_event_type(em, libvlc_MediaDurationChanged);
-    libvlc_event_manager_register_event_type(em, libvlc_MediaStateChanged);
-    libvlc_event_manager_register_event_type(em, libvlc_MediaParsedChanged);
-    libvlc_event_manager_register_event_type(em, libvlc_MediaSubItemTreeAdded);
-
     vlc_gc_incref( p_md->p_input_item );
 
     install_input_item_observer( p_md );
