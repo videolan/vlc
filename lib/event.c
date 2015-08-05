@@ -83,15 +83,9 @@ typedef struct libvlc_event_listener_t
 typedef struct libvlc_event_manager_t
 {
     void * p_obj;
-    vlc_array_t listeners_groups;
+    vlc_array_t listeners;
     vlc_mutex_t lock;
 } libvlc_event_sender_t;
-
-typedef struct libvlc_event_listeners_group_t
-{
-    libvlc_event_type_t event_type;
-    vlc_array_t listeners;
-} libvlc_event_listeners_group_t;
 
 /*
  * Internal libvlc functions
@@ -115,8 +109,7 @@ libvlc_event_manager_new( void * p_obj )
     }
 
     p_em->p_obj = p_obj;
-
-    vlc_array_init( &p_em->listeners_groups );
+    vlc_array_init(&p_em->listeners);
     vlc_mutex_init_recursive(&p_em->lock);
     return p_em;
 }
@@ -128,22 +121,12 @@ libvlc_event_manager_new( void * p_obj )
  **************************************************************************/
 void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
 {
-    libvlc_event_listeners_group_t * p_lg;
-    int i,j ;
-
     vlc_mutex_destroy(&p_em->lock);
 
-    for( i = 0; i < vlc_array_count(&p_em->listeners_groups); i++)
-    {
-        p_lg = vlc_array_item_at_index( &p_em->listeners_groups, i );
+    for (int i = 0; i < vlc_array_count(&p_em->listeners); i++)
+        free(vlc_array_item_at_index(&p_em->listeners, i));
 
-        for( j = 0; j < vlc_array_count(&p_lg->listeners); j++)
-            free( vlc_array_item_at_index( &p_lg->listeners, j ) );
-
-        vlc_array_clear( &p_lg->listeners );
-        free( p_lg );
-    }
-    vlc_array_clear( &p_em->listeners_groups );
+    vlc_array_clear(&p_em->listeners);
     free( p_em );
 }
 
@@ -156,14 +139,7 @@ void libvlc_event_manager_register_event_type(
         libvlc_event_manager_t * p_em,
         libvlc_event_type_t event_type )
 {
-    libvlc_event_listeners_group_t * listeners_group;
-    listeners_group = xmalloc(sizeof(libvlc_event_listeners_group_t));
-    listeners_group->event_type = event_type;
-    vlc_array_init( &listeners_group->listeners );
-
-    vlc_mutex_lock(&p_em->lock);
-    vlc_array_append( &p_em->listeners_groups, listeners_group );
-    vlc_mutex_unlock(&p_em->lock);
+    (void) p_em; (void) event_type;
 }
 
 /**************************************************************************
@@ -174,28 +150,17 @@ void libvlc_event_manager_register_event_type(
 void libvlc_event_send( libvlc_event_manager_t * p_em,
                         libvlc_event_t * p_event )
 {
-    int i;
-
     /* Fill event with the sending object now */
     p_event->p_obj = p_em->p_obj;
 
     vlc_mutex_lock(&p_em->lock);
-    for( i = 0; i < vlc_array_count(&p_em->listeners_groups); i++)
+    for (int i = 0; i < vlc_array_count(&p_em->listeners); i++)
     {
-        libvlc_event_listeners_group_t *listeners_group;
+        libvlc_event_listener_t *listener;
 
-        listeners_group = vlc_array_item_at_index(&p_em->listeners_groups, i);
-        if (listeners_group->event_type != p_event->type)
-            continue;
-
-        for (int j = 0; j < vlc_array_count(&listeners_group->listeners); j++)
-        {
-            libvlc_event_listener_t *listener;
-
-            listener = vlc_array_item_at_index(&listeners_group->listeners, j);
+        listener = vlc_array_item_at_index(&p_em->listeners, i);
+        if (listener->event_type == p_event->type)
             listener->pf_callback(p_event, listener->p_user_data);
-        }
-        break;
     }
     vlc_mutex_unlock(&p_em->lock);
 }
@@ -300,58 +265,25 @@ const char * libvlc_event_type_name( int event_type )
 }
 
 /**************************************************************************
- *       event_attach (internal) :
- *
- * Add a callback for an event.
- **************************************************************************/
-static
-int event_attach( libvlc_event_manager_t * p_event_manager,
-                  libvlc_event_type_t event_type,
-                  libvlc_callback_t pf_callback, void *p_user_data )
-{
-    libvlc_event_listeners_group_t * listeners_group;
-    libvlc_event_listener_t * listener;
-    int i;
-
-    listener = malloc(sizeof(libvlc_event_listener_t));
-    if( unlikely(listener == NULL) )
-        return ENOMEM;
-
-    listener->event_type = event_type;
-    listener->p_user_data = p_user_data;
-    listener->pf_callback = pf_callback;
-
-    vlc_mutex_lock(&p_event_manager->lock);
-    for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++ )
-    {
-        listeners_group = vlc_array_item_at_index(&p_event_manager->listeners_groups, i);
-        if( listeners_group->event_type == listener->event_type )
-        {
-            vlc_array_append( &listeners_group->listeners, listener );
-            vlc_mutex_unlock(&p_event_manager->lock);
-            return 0;
-        }
-    }
-    vlc_mutex_unlock(&p_event_manager->lock);
-
-    free(listener);
-    fprintf( stderr, "This object event manager doesn't know about '%s' events",
-             libvlc_event_type_name(event_type) );
-    vlc_assert_unreachable();
-    return -1;
-}
-
-/**************************************************************************
  *       libvlc_event_attach (public) :
  *
  * Add a callback for an event.
  **************************************************************************/
-int libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
-                         libvlc_event_type_t event_type,
-                         libvlc_callback_t pf_callback,
-                         void *p_user_data )
+int libvlc_event_attach(libvlc_event_manager_t *em, libvlc_event_type_t type,
+                        libvlc_callback_t callback, void *opaque)
 {
-    return event_attach(p_event_manager, event_type, pf_callback, p_user_data);
+    libvlc_event_listener_t *listener = malloc(sizeof (*listener));
+    if (unlikely(listener == NULL))
+        return ENOMEM;
+
+    listener->event_type = type;
+    listener->p_user_data = opaque;
+    listener->pf_callback = callback;
+
+    vlc_mutex_lock(&em->lock);
+    vlc_array_append(&em->listeners, listener);
+    vlc_mutex_unlock(&em->lock);
+    return 0;
 }
 
 /**************************************************************************
@@ -359,39 +291,25 @@ int libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
  *
  * Remove a callback for an event.
  **************************************************************************/
-void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
-                                     libvlc_event_type_t event_type,
-                                     libvlc_callback_t pf_callback,
-                                     void *p_user_data )
+void libvlc_event_detach(libvlc_event_manager_t *em, libvlc_event_type_t type,
+                         libvlc_callback_t callback, void *opaque)
 {
-    libvlc_event_listeners_group_t * listeners_group;
-    libvlc_event_listener_t * listener;
-    int i, j;
-    bool found = false;
-
-    vlc_mutex_lock(&p_event_manager->lock);
-    for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++)
+    vlc_mutex_lock(&em->lock);
+    for (int i = 0; i < vlc_array_count(&em->listeners); i++)
     {
-        listeners_group = vlc_array_item_at_index(&p_event_manager->listeners_groups, i);
-        if( listeners_group->event_type == event_type )
-        {
-            for( j = 0; j < vlc_array_count(&listeners_group->listeners); j++)
-            {
-                listener = vlc_array_item_at_index(&listeners_group->listeners, j);
-                if( listener->event_type == event_type &&
-                    listener->pf_callback == pf_callback &&
-                    listener->p_user_data == p_user_data )
-                {
-                    /* that's our listener */
-                    free( listener );
-                    vlc_array_remove( &listeners_group->listeners, j );
-                    found = true;
-                    break;
-                }
-            }
-        }
-    }
-    vlc_mutex_unlock(&p_event_manager->lock);
+         libvlc_event_listener_t *listener;
 
-    assert(found);
+         listener = vlc_array_item_at_index(&em->listeners, i);
+
+         if (listener->event_type == type
+          && listener->pf_callback == callback
+          && listener->p_user_data == opaque)
+         {   /* that's our listener */
+             vlc_array_remove(&em->listeners, i);
+             vlc_mutex_unlock(&em->lock);
+             free(listener);
+             return;
+         }
+    }
+    abort();
 }
