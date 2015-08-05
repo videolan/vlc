@@ -143,13 +143,18 @@
 - (IBAction)finalizePanel:(id)sender;
 - (IBAction)openMedia:(id)sender;
 - (IBAction)switchProfile:(id)sender;
-- (IBAction)customizeProfile:(id)sender;
-- (IBAction)closeCustomizationSheet:(id)sender;
-- (IBAction)newProfileAction:(id)sender;
 - (IBAction)iWantAFile:(id)sender;
 - (IBAction)iWantAStream:(id)sender;
 - (IBAction)cancelDestination:(id)sender;
 - (IBAction)browseFileDestination:(id)sender;
+
+- (IBAction)customizeProfile:(id)sender;
+- (IBAction)closeCustomizationSheet:(id)sender;
+- (IBAction)videoSettingsChanged:(id)sender;
+- (IBAction)audioSettingsChanged:(id)sender;
+- (IBAction)subSettingsChanged:(id)sender;
+- (IBAction)newProfileAction:(id)sender;
+
 - (IBAction)showStreamPanel:(id)sender;
 - (IBAction)closeStreamPanel:(id)sender;
 - (IBAction)streamTypeToggle:(id)sender;
@@ -158,11 +163,5 @@
 
 - (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text;
 - (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item;
-
-- (IBAction)videoSettingsChanged:(id)sender;
-- (IBAction)audioSettingsChanged:(id)sender;
-- (IBAction)subSettingsChanged:(id)sender;
-
-- (void)updateDropView;
 
 @end

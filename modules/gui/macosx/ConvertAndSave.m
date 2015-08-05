@@ -250,7 +250,7 @@
 }
 
 # pragma mark -
-# pragma mark User Interaction
+# pragma mark User Interaction - main window
 
 - (IBAction)finalizePanel:(id)sender
 {
@@ -322,32 +322,6 @@
         [self resetCustomizationSheetBasedOnProfile:[self.profileValueList objectAtIndex:index]];
 }
 
-- (IBAction)customizeProfile:(id)sender
-{
-    [NSApp beginSheet:_customizePanel modalForWindow:self.window modalDelegate:self didEndSelector:NULL contextInfo:nil];
-}
-
-- (IBAction)closeCustomizationSheet:(id)sender
-{
-    [_customizePanel orderOut:sender];
-    [NSApp endSheet: _customizePanel];
-
-    if (sender == _customizeOkButton)
-        [self updateCurrentProfile];
-}
-
-- (IBAction)newProfileAction:(id)sender
-{
-    /* show panel */
-    VLCEnterTextPanel * panel = [VLCEnterTextPanel sharedInstance];
-    [panel setTitle: _NS("Save as new profile")];
-    [panel setSubTitle: _NS("Enter a name for the new profile:")];
-    [panel setCancelButtonLabel: _NS("Cancel")];
-    [panel setOKButtonLabel: _NS("Save")];
-    [panel setTarget:self];
-
-    [panel runModalForWindow:_customizePanel];
-}
 
 - (IBAction)deleteProfileAction:(id)sender
 {
@@ -427,6 +401,63 @@
         [self updateOKButton];
     }];
 }
+
+#pragma mark -
+#pragma mark User interaction - customization panel
+
+- (IBAction)customizeProfile:(id)sender
+{
+    [NSApp beginSheet:_customizePanel modalForWindow:self.window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+}
+
+- (IBAction)closeCustomizationSheet:(id)sender
+{
+    [_customizePanel orderOut:sender];
+    [NSApp endSheet: _customizePanel];
+
+    if (sender == _customizeOkButton)
+        [self updateCurrentProfile];
+}
+
+
+
+- (IBAction)videoSettingsChanged:(id)sender
+{
+    bool enableSettings = [_customizeVidCheckbox state] == NSOnState && [_customizeVidKeepCheckbox state] == NSOffState;
+    [_customizeVidSettingsBox enableSubviews:enableSettings];
+    [_customizeVidKeepCheckbox setEnabled:[_customizeVidCheckbox state] == NSOnState];
+}
+
+- (IBAction)audioSettingsChanged:(id)sender
+{
+    bool enableSettings = [_customizeAudCheckbox state] == NSOnState && [_customizeAudKeepCheckbox state] == NSOffState;
+    [_customizeAudSettingsBox enableSubviews:enableSettings];
+    [_customizeAudKeepCheckbox setEnabled:[_customizeAudCheckbox state] == NSOnState];
+}
+
+- (IBAction)subSettingsChanged:(id)sender
+{
+    bool enableSettings = [_customizeSubsCheckbox state] == NSOnState;
+    [_customizeSubsOverlayCheckbox setEnabled:enableSettings];
+    [_customizeSubsPopup setEnabled:enableSettings];
+}
+
+
+- (IBAction)newProfileAction:(id)sender
+{
+    /* show panel */
+    VLCEnterTextPanel * panel = [VLCEnterTextPanel sharedInstance];
+    [panel setTitle: _NS("Save as new profile")];
+    [panel setSubTitle: _NS("Enter a name for the new profile:")];
+    [panel setCancelButtonLabel: _NS("Cancel")];
+    [panel setOKButtonLabel: _NS("Save")];
+    [panel setTarget:self];
+
+    [panel runModalForWindow:_customizePanel];
+}
+
+#pragma mark -
+#pragma mark User interaction - stream panel
 
 - (IBAction)showStreamPanel:(id)sender
 {
@@ -520,6 +551,9 @@
             [_streamSDPField setStringValue:[[saveFilePanel URL] path]];
     }];
 }
+
+#pragma mark -
+#pragma mark User interaction - misc
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
@@ -617,29 +651,9 @@
     }
 }
 
-- (IBAction)videoSettingsChanged:(id)sender
-{
-    bool enableSettings = [_customizeVidCheckbox state] == NSOnState && [_customizeVidKeepCheckbox state] == NSOffState;
-    [_customizeVidSettingsBox enableSubviews:enableSettings];
-    [_customizeVidKeepCheckbox setEnabled:[_customizeVidCheckbox state] == NSOnState];
-}
-
-- (IBAction)audioSettingsChanged:(id)sender
-{
-    bool enableSettings = [_customizeAudCheckbox state] == NSOnState && [_customizeAudKeepCheckbox state] == NSOffState;
-    [_customizeAudSettingsBox enableSubviews:enableSettings];
-    [_customizeAudKeepCheckbox setEnabled:[_customizeAudCheckbox state] == NSOnState];
-}
-
-- (IBAction)subSettingsChanged:(id)sender
-{
-    bool enableSettings = [_customizeSubsCheckbox state] == NSOnState;
-    [_customizeSubsOverlayCheckbox setEnabled:enableSettings];
-    [_customizeSubsPopup setEnabled:enableSettings];
-}
-
 # pragma mark -
 # pragma mark Private Functionality
+
 - (void)updateDropView
 {
     if ([_MRL length] > 0) {
