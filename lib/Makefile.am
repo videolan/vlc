@@ -32,7 +32,6 @@ lib_LTLIBRARIES = libvlc.la
 
 libvlc_la_SOURCES = \
 	libvlc_internal.h \
-	event_internal.h \
 	media_internal.h \
 	media_list_internal.h \
 	media_player_internal.h \

@@ -26,13 +26,78 @@
 # include "config.h"
 #endif
 
-#define  LIBVLC_EVENT_TYPES_KEEP_DEFINE
-#include <vlc/libvlc.h>
-
-#include "libvlc_internal.h"
-#include "event_internal.h"
 #include <assert.h>
 #include <errno.h>
+
+#include <vlc/libvlc.h>
+#include "libvlc_internal.h"
+
+#include <vlc_common.h>
+
+/*
+ * Event Handling
+ */
+
+/* Example usage
+ *
+ * struct libvlc_cool_object_t
+ * {
+ *        ...
+ *        libvlc_event_manager_t * p_event_manager;
+ *        ...
+ * }
+ *
+ * libvlc_my_cool_object_new()
+ * {
+ *        ...
+ *        p_self->p_event_manager = libvlc_event_manager_new( p_self )
+ *        libvlc_event_manager_register_event_type(p_self->p_event_manager,
+ *                libvlc_MyCoolObjectDidSomething, p_e)
+ *        ...
+ * }
+ *
+ * libvlc_my_cool_object_release()
+ * {
+ *         ...
+ *         libvlc_event_manager_release( p_self->p_event_manager );
+ *         ...
+ * }
+ *
+ * libvlc_my_cool_object_do_something()
+ * {
+ *        ...
+ *        libvlc_event_t event;
+ *        event.type = libvlc_MyCoolObjectDidSomething;
+ *        event.u.my_cool_object_did_something.what_it_did = kSomething;
+ *        libvlc_event_send( p_self->p_event_manager, &event );
+ * }
+ * */
+
+typedef struct libvlc_event_listener_t
+{
+    libvlc_event_type_t event_type;
+    void *              p_user_data;
+    libvlc_callback_t   pf_callback;
+} libvlc_event_listener_t;
+
+typedef struct libvlc_event_manager_t
+{
+    void * p_obj;
+    vlc_array_t listeners_groups;
+    vlc_mutex_t object_lock;
+    vlc_mutex_t event_sending_lock;
+} libvlc_event_sender_t;
+
+
+static inline bool
+listeners_are_equal( libvlc_event_listener_t * listener1,
+                    libvlc_event_listener_t * listener2 )
+{
+    return listener1->event_type  == listener2->event_type &&
+    listener1->pf_callback == listener2->pf_callback &&
+    listener1->p_user_data == listener2->p_user_data;
+}
+
 
 typedef struct libvlc_event_listeners_group_t
 {
