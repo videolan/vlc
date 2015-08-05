@@ -669,17 +669,19 @@ static int ReadMeta( vlc_object_t* p_this)
 {
     vlc_mutex_locker locker (&taglib_lock);
     demux_meta_t*   p_demux_meta = (demux_meta_t *)p_this;
-    demux_t*        p_demux = p_demux_meta->p_demux;
     vlc_meta_t*     p_meta;
     FileRef f;
 
     p_demux_meta->p_meta = NULL;
-    if( strcmp( p_demux->psz_access, "file" ) )
-        return VLC_EGENERIC;
 
-    char *psz_path = strdup( p_demux->psz_file );
-    if( !psz_path )
+    char *psz_uri = input_item_GetURI( p_demux_meta->p_item );
+    if( unlikely(psz_uri == NULL) )
         return VLC_ENOMEM;
+
+    char *psz_path = make_path( psz_uri );
+    free( psz_uri );
+    if( psz_path == NULL )
+        return VLC_EGENERIC;
 
 #if defined(_WIN32)
     wchar_t *wpath = ToWide( psz_path );
