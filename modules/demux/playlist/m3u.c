@@ -261,7 +261,7 @@ static int Demux( demux_t *p_demux )
             free( psz_parse );
             free( psz_mrl );
 
-            if ( !EMPTY_STR(psz_artist) )
+            if( !EMPTY_STR(psz_artist) )
                 input_item_SetArtist( p_input, psz_artist );
             if( psz_name ) input_item_SetTitle( p_input, psz_name );
             if( !EMPTY_STR(psz_album_art) )
