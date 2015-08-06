@@ -336,7 +336,6 @@ static int Open( vlc_object_t *p_this )
 
         /* Set callback */
         p_dec->pf_packetize = PacketizeAVC1;
-        /* TODO CC ? */
     }
     else
     {
@@ -346,20 +345,22 @@ static int Open( vlc_object_t *p_this )
 
         /* Set callback */
         p_dec->pf_packetize = Packetize;
-        p_dec->pf_get_cc = GetCc;
-
-        /* */
-        p_sys->i_cc_pts = VLC_TS_INVALID;
-        p_sys->i_cc_dts = VLC_TS_INVALID;
-        p_sys->i_cc_flags = 0;
-        cc_Init( &p_sys->cc );
-        cc_Init( &p_sys->cc_next );
 
         /* */
         if( p_dec->fmt_in.i_extra > 0 )
             packetizer_Header( &p_sys->packetizer,
                                p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
     }
+
+    /* CC are the same for H264/AVC in T35 sections (ETSI TS 101 154)  */
+    p_dec->pf_get_cc = GetCc;
+
+    /* */
+    p_sys->i_cc_pts = VLC_TS_INVALID;
+    p_sys->i_cc_dts = VLC_TS_INVALID;
+    p_sys->i_cc_flags = 0;
+    cc_Init( &p_sys->cc );
+    cc_Init( &p_sys->cc_next );
 
     return VLC_SUCCESS;
 }
@@ -387,11 +388,8 @@ static void Close( vlc_object_t *p_this )
     }
     packetizer_Clean( &p_sys->packetizer );
 
-    if( p_dec->pf_get_cc )
-    {
-         cc_Exit( &p_sys->cc_next );
-         cc_Exit( &p_sys->cc );
-    }
+    cc_Exit( &p_sys->cc_next );
+    cc_Exit( &p_sys->cc );
 
     free( p_sys );
 }
