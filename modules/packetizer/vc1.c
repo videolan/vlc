@@ -37,6 +37,7 @@
 
 #include <vlc_bits.h>
 #include <vlc_block_helper.h>
+#include "../codec/cc.h"
 #include "packetizer_helper.h"
 
 /*****************************************************************************
@@ -92,6 +93,14 @@ struct decoder_sys_t
 
     mtime_t i_interpolated_dts;
     bool    b_check_startcode;
+
+    /* */
+    uint32_t i_cc_flags;
+    mtime_t i_cc_pts;
+    mtime_t i_cc_dts;
+    cc_data_t cc;
+
+    cc_data_t cc_next;
 };
 
 typedef enum
@@ -117,6 +126,7 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
 static int PacketizeValidate( void *p_private, block_t * );
 
 static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag );
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] );
 
 static const uint8_t p_vc1_startcode[3] = { 0x00, 0x00, 0x01 };
 /*****************************************************************************
@@ -134,6 +144,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     p_dec->pf_packetize = Packetize;
+    p_dec->pf_get_cc = GetCc;
 
     /* Create the output format */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -178,6 +189,13 @@ static int Open( vlc_object_t *p_this )
                                p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
     }
 
+    /* */
+    p_sys->i_cc_pts = VLC_TS_INVALID;
+    p_sys->i_cc_dts = VLC_TS_INVALID;
+    p_sys->i_cc_flags = 0;
+    cc_Init( &p_sys->cc );
+    cc_Init( &p_sys->cc_next );
+
     return VLC_SUCCESS;
 }
 
@@ -192,6 +210,10 @@ static void Close( vlc_object_t *p_this )
     packetizer_Clean( &p_sys->packetizer );
     if( p_sys->p_frame )
         block_Release( p_sys->p_frame );
+
+    cc_Exit( &p_sys->cc_next );
+    cc_Exit( &p_sys->cc );
+
     free( p_sys );
 }
 
@@ -392,6 +414,14 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
         }
 
         //msg_Dbg( p_dec, "-------------- dts=%"PRId64" pts=%"PRId64, p_pic->i_dts, p_pic->i_pts );
+
+        /* CC */
+        p_sys->i_cc_pts = p_pic->i_pts;
+        p_sys->i_cc_dts = p_pic->i_dts;
+        p_sys->i_cc_flags = p_pic->i_flags;
+
+        p_sys->cc = p_sys->cc_next;
+        cc_Flush( &p_sys->cc_next );
 
         /* Reset context */
         p_sys->b_frame = false;
@@ -677,9 +707,50 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
         }
         p_sys->b_frame = true;
     }
+    else if( idu == IDU_TYPE_FRAME_USER_DATA )
+    {
+        const uint8_t *p_data = &p_frag->p_buffer[4];
+        const unsigned i_data = (p_frag->i_buffer > 4) ? p_frag->i_buffer - 4 : 0;
+        /* TS 101 154 Auxiliary Data and VC-1 video */
+        static const uint8_t p_DVB1_user_identifier[] = {
+            0x47, 0x41, 0x39, 0x34 /* user identifier */
+        };
+
+        /* Check if we have DVB1_data() */
+        if( i_data >= sizeof(p_DVB1_user_identifier) &&
+            !memcmp( p_data, p_DVB1_user_identifier, sizeof(p_DVB1_user_identifier) ) )
+        {
+            cc_Extract( &p_sys->cc_next, true, p_data, i_data );
+        }
+    }
 
     if( p_release )
         block_Release( p_release );
     return p_pic;
 }
 
+/*****************************************************************************
+ * GetCc:
+ *****************************************************************************/
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_cc;
+
+    for( int i = 0; i < 4; i++ )
+        pb_present[i] = p_sys->cc.pb_present[i];
+
+    if( p_sys->cc.i_data <= 0 )
+        return NULL;
+
+    p_cc = block_Alloc( p_sys->cc.i_data);
+    if( p_cc )
+    {
+        memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
+        p_cc->i_dts =
+        p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
+        p_cc->i_flags = ( p_sys->cc.b_reorder  ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P ) & BLOCK_FLAG_TYPE_MASK;
+    }
+    cc_Flush( &p_sys->cc );
+    return p_cc;
+}
