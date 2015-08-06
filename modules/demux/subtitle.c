@@ -63,7 +63,7 @@ static const char *const ppsz_sub_type[] =
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
     "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2",
     "aqt", "pjs", "mpsub", "jacosub", "psb", "realtext", "dks",
-    "subviewer1","vtt"
+    "subviewer1", "vtt", "sbv"
 };
 
 vlc_module_begin ()
@@ -113,7 +113,8 @@ enum
     SUB_TYPE_DKS,
     SUB_TYPE_SUBVIEW1, /* SUBVIEWER 1 - mplayer calls it subrip09,
                          and Gnome subtitles SubViewer 1.0 */
-    SUB_TYPE_VTT
+    SUB_TYPE_VTT,
+    SUB_TYPE_SBV
 };
 
 typedef struct
@@ -185,7 +186,7 @@ static int  ParsePSB        ( demux_t *, subtitle_t *, int );
 static int  ParseRealText   ( demux_t *, subtitle_t *, int );
 static int  ParseDKS        ( demux_t *, subtitle_t *, int );
 static int  ParseSubViewer1 ( demux_t *, subtitle_t *, int );
-static int  ParseVTT        ( demux_t *, subtitle_t *, int );
+static int  ParseCommonVTTSBV( demux_t *, subtitle_t *, int );
 
 static const struct
 {
@@ -213,7 +214,8 @@ static const struct
     { "realtext",   SUB_TYPE_RT,          "RealText",    ParseRealText },
     { "dks",        SUB_TYPE_DKS,         "DKS",         ParseDKS },
     { "subviewer1", SUB_TYPE_SUBVIEW1,    "Subviewer 1", ParseSubViewer1 },
-    { "text/vtt",   SUB_TYPE_VTT,         "WebVTT",      ParseVTT },
+    { "text/vtt",   SUB_TYPE_VTT,         "WebVTT",      ParseCommonVTTSBV },
+    { "sbv",        SUB_TYPE_SBV,         "SBV",         ParseCommonVTTSBV },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
 /* When adding support for more formats, be sure to add their file extension
@@ -395,6 +397,13 @@ static int Open ( vlc_object_t *p_this )
                      sscanf( s, "@%d @%d", &i_dummy, &i_dummy) == 2)
             {
                 p_sys->i_type = SUB_TYPE_JACOSUB;
+                break;
+            }
+            else if( sscanf( s, "%d:%d:%d.%d,%d:%d:%d.%d",
+                                 &i_dummy, &i_dummy, &i_dummy, &i_dummy,
+                                 &i_dummy, &i_dummy, &i_dummy, &i_dummy ) == 8 )
+            {
+                p_sys->i_type = SUB_TYPE_SBV;
                 break;
             }
             else if( sscanf( s, "%d:%d:%d:", &i_dummy, &i_dummy, &i_dummy ) == 3 ||
@@ -2162,11 +2171,11 @@ static int ParseSubViewer1( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx 
 
     return VLC_SUCCESS;
 }
-/*Parsing WebVTT */
-static int  ParseVTT( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
+
+/* Common code for VTT/SBV since they just differ in timestamps */
+static int ParseCommonVTTSBV( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 {
     VLC_UNUSED( i_idx );
-
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
     char        *psz_text;
@@ -2180,18 +2189,33 @@ static int  ParseVTT( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         if( !s )
             return VLC_EGENERIC;
 
-        if( sscanf( s,"%d:%d:%d.%d --> %d:%d:%d.%d",
-                    &h1, &m1, &s1, &d1,
-                    &h2, &m2, &s2, &d2 ) == 8 ||
-            sscanf( s,"%d:%d:%d.%d --> %d:%d.%d",
-                    &h1, &m1, &s1, &d1,
-                         &m2, &s2, &d2 ) == 7 ||
-            sscanf( s,"%d:%d.%d --> %d:%d:%d.%d",
-                         &m1, &s1, &d1,
-                    &h2, &m2, &s2, &d2 ) == 7 ||
-            sscanf( s,"%d:%d.%d --> %d:%d.%d",
-                         &m1, &s1, &d1,
-                         &m2, &s2, &d2 ) == 6 )
+        bool b_matched = false;
+
+        if( p_sys->i_type == SUB_TYPE_VTT )
+        {
+            b_matched =
+            ( sscanf( s,"%d:%d:%d.%d --> %d:%d:%d.%d",
+                        &h1, &m1, &s1, &d1,
+                        &h2, &m2, &s2, &d2 ) == 8 ||
+                sscanf( s,"%d:%d:%d.%d --> %d:%d.%d",
+                        &h1, &m1, &s1, &d1,
+                             &m2, &s2, &d2 ) == 7 ||
+                sscanf( s,"%d:%d.%d --> %d:%d:%d.%d",
+                             &m1, &s1, &d1,
+                        &h2, &m2, &s2, &d2 ) == 7 ||
+                sscanf( s,"%d:%d.%d --> %d:%d.%d",
+                             &m1, &s1, &d1,
+                             &m2, &s2, &d2 ) == 6 );
+        }
+        else if( p_sys->i_type == SUB_TYPE_SBV )
+        {
+            b_matched =
+            ( sscanf( s,"%d:%d:%d.%d,%d:%d:%d.%d",
+                        &h1, &m1, &s1, &d1,
+                        &h2, &m2, &s2, &d2 ) == 8 );
+        }
+
+        if( b_matched )
         {
             p_subtitle->i_start = ( (int64_t)h1 * 3600 * 1000 +
                                     (int64_t)m1 * 60 * 1000 +

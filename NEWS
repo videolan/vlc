@@ -57,6 +57,7 @@ Demuxers:
  * Support Daala in Ogg
  * Important rework of the MP4 demuxer, including fragments
  * Support EIA-608 subtitles in MP4/mov
+ * Support SBV subtitles
  * Support WMV and WMAV in MP4/mov, aka Flip4Mac files
  * Support bitmap audio channel reordering in MP4/mov
  * Support AlbumArtist and DiscNumber metadata
