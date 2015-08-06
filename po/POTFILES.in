@@ -634,6 +634,7 @@ modules/gui/qt4/components/controller_widget.cpp
 modules/gui/qt4/components/controller_widget.hpp
 modules/gui/qt4/components/extended_panels.cpp
 modules/gui/qt4/components/extended_panels.hpp
+modules/gui/qt4/components/epg/EPGWidget.cpp
 modules/gui/qt4/components/info_panels.cpp
 modules/gui/qt4/components/info_panels.hpp
 modules/gui/qt4/components/info_widgets.cpp
