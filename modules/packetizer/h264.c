@@ -1052,7 +1052,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
         }
 
         /* Look for user_data_registered_itu_t_t35 */
-        if( i_type == SEI_USER_DATA_REGISTERED )
+        if( i_type == SEI_USER_DATA_REGISTERED_ITU_T_T35 )
         {
             static const uint8_t p_dvb1_data_start_code[] = {
                 0xb5,

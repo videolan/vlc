@@ -67,7 +67,7 @@ enum nal_unit_type_e
 enum sei_type_e
 {
     SEI_PIC_TIMING = 1,
-    SEI_USER_DATA_REGISTERED = 4,
+    SEI_USER_DATA_REGISTERED_ITU_T_T35 = 4,
     SEI_RECOVERY_POINT = 6
 };
 
