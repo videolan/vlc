@@ -1271,6 +1271,7 @@ static int Demux( demux_t *p_demux )
 
         if ( SCRAMBLED(*p_pid) && !p_demux->p_sys->csa )
         {
+            PCRHandle( p_demux, p_pid, p_pkt );
             block_Release( p_pkt );
             continue;
         }
