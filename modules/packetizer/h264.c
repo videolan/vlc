@@ -1054,17 +1054,18 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
         /* Look for user_data_registered_itu_t_t35 */
         if( i_type == SEI_USER_DATA_REGISTERED_ITU_T_T35 )
         {
-            static const uint8_t p_dvb1_data_start_code[] = {
-                0xb5,
-                0x00, 0x31,
-                0x47, 0x41, 0x39, 0x34
+            /* TS 101 154 Auxiliary Data and H264/AVC video */
+            static const uint8_t p_DVB1_data_start_code[] = {
+                0xb5, /* United States */
+                0x00, 0x31, /* US provider code */
+                0x47, 0x41, 0x39, 0x34 /* user identifier */
             };
-            const int      i_t35 = i_size;
+            const unsigned i_t35 = i_size;
             const uint8_t *p_t35 = &pb_dec[i_used];
 
             /* Check for we have DVB1_data() */
-            if( i_t35 >= 5 &&
-                !memcmp( p_t35, p_dvb1_data_start_code, sizeof(p_dvb1_data_start_code) ) )
+            if( i_t35 >= sizeof(p_DVB1_data_start_code) &&
+                !memcmp( p_t35, p_DVB1_data_start_code, sizeof(p_DVB1_data_start_code) ) )
             {
                 cc_Extract( &p_sys->cc_next, true, &p_t35[3], i_t35 - 3 );
             }
