@@ -1256,8 +1256,11 @@ static int Demux( demux_t *p_demux )
         /* Parse the TS packet */
         ts_pid_t *p_pid = GetPID( p_sys, PIDGet( p_pkt ) );
 
-        if( SCRAMBLED(*p_pid) != !!(p_pkt->p_buffer[3] & 0x80) )
+        if( (p_pkt->p_buffer[1] & 0x40) && (p_pkt->p_buffer[3] & 0x10) &&
+            !SCRAMBLED(*p_pid) != !(p_pkt->p_buffer[3] & 0x80) )
+        {
             UpdateScrambledState( p_demux, p_pid, p_pkt->p_buffer[3] & 0x80 );
+        }
 
         if( !SEEN(p_pid) )
         {
