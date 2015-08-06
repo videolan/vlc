@@ -1,7 +1,7 @@
 /*
  * SegmentTracker.hpp
  *****************************************************************************
- * Copyright (C) 2014 - VideoLAN authors
+ * Copyright (C) 2014 - VideoLAN and VLC authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
