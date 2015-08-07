@@ -250,6 +250,17 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         if( !p_sys->p_block )
             p_sys->p_block = Pop( p_dec );
 
+        /* Reset decoder if needed */
+        if( p_sys->p_block &&
+           (p_sys->p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED)) )
+        {
+            Eia608Init( &p_sys->eia608 );
+            p_sys->i_display_time = VLC_TS_INVALID;
+            /* clear flags, as we might process it more than once */
+            p_sys->p_block->i_flags ^= (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED);
+            continue;
+        }
+
         if( !p_sys->p_block )
             break;
 
