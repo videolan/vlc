@@ -1174,13 +1174,13 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
     HRESULT hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
     if (FAILED(hr)) {
         msg_Err(vd, "Can't get swapchain width, size %d. (hr=0x%lX)", hr, dataSize);
-        return hr;
+        return;
     }
     dataSize = sizeof(i_height);
     hr = IDXGISwapChain_GetPrivateData(sys->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
     if (FAILED(hr)) {
         msg_Err(vd, "Can't get swapchain height, size %d. (hr=0x%lX)", hr, dataSize);
-        return hr;
+        return;
     }
 #endif
 
@@ -1744,8 +1744,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         picture_CopyPixels(quad_picture, r->p_picture);
 
         /* Map the subpicture to sys->rect_dest */
-        int i_original_width  = subpicture->i_original_picture_width;
-        int i_original_height = subpicture->i_original_picture_height;
+        const int i_original_width  = subpicture->i_original_picture_width;
+        const int i_original_height = subpicture->i_original_picture_height;
 
         const RECT video = sys->rect_dest;
         const float scale_w = (float)(video.right  - video.left) / i_original_width;
