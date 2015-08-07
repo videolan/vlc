@@ -112,6 +112,15 @@ struct eia608_screen // A CC buffer
 };
 typedef struct eia608_screen eia608_screen;
 
+typedef enum
+{
+    EIA608_STATUS_DEFAULT         = 0x00,
+    EIA608_STATUS_CHANGED         = 0x01, /* current screen has been altered */
+    EIA608_STATUS_CAPTION_ENDED   = 0x02, /* screen flip */
+    EIA608_STATUS_CAPTION_CLEARED = 0x04, /* active screen erased */
+    EIA608_STATUS_DISPLAY         = EIA608_STATUS_CAPTION_CLEARED | EIA608_STATUS_CAPTION_ENDED,
+} eia608_status_t;
+
 typedef struct
 {
     /* Current channel (used to reject packet without channel information) */
@@ -142,7 +151,7 @@ typedef struct
 } eia608_t;
 
 static void         Eia608Init( eia608_t * );
-static bool   Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] );
+static eia608_status_t Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] );
 static text_segment_t *Eia608Text( eia608_t *h );
 
 /* It will be enough up to 63 B frames, which is far too high for
@@ -152,6 +161,7 @@ struct decoder_sys_t
 {
     int     i_block;
     block_t *pp_block[CC_MAX_REORDER_SIZE];
+    block_t *p_block; /* currently processed block (if incomplely) */
 
     int i_field;
     int i_channel;
@@ -221,10 +231,12 @@ static int Open( vlc_object_t *p_this )
  ****************************************************************************/
 static void     Push( decoder_t *, block_t * );
 static block_t *Pop( decoder_t * );
-static subpicture_t *Convert( decoder_t *, block_t * );
+static subpicture_t *Convert( decoder_t *, block_t ** );
 
 static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     if( pp_block && *pp_block )
     {
         Push( p_dec, *pp_block );
@@ -233,11 +245,13 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     for( ;; )
     {
-        block_t *p_block = Pop( p_dec );
-        if( !p_block )
+        if( !p_sys->p_block )
+            p_sys->p_block = Pop( p_dec );
+
+        if( !p_sys->p_block )
             break;
 
-        subpicture_t *p_spu = Convert( p_dec, p_block );
+        subpicture_t *p_spu = Convert( p_dec, &p_sys->p_block );
         if( p_spu )
             return p_spu;
     }
@@ -344,27 +358,38 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
     return p_spu;
 }
 
-static subpicture_t *Convert( decoder_t *p_dec, block_t *p_block )
+static subpicture_t *Convert( decoder_t *p_dec, block_t **pp_block )
 {
-    assert( p_block );
+    assert( pp_block && *pp_block );
+
+    block_t *p_block = *pp_block;
 
     decoder_sys_t *p_sys = p_dec->p_sys;
     const int64_t i_pts = p_block->i_pts;
-    bool b_changed = false;
+    eia608_status_t i_status = EIA608_STATUS_DEFAULT;
 
     /* TODO do the real decoding here */
-    while( p_block->i_buffer >= 3 )
+    while( p_block->i_buffer >= 3 && !(i_status & EIA608_STATUS_DISPLAY) )
     {
         if( p_block->p_buffer[0] == p_sys->i_field )
-            b_changed |= Eia608Parse( &p_sys->eia608, p_sys->i_channel, &p_block->p_buffer[1] );
+            i_status = Eia608Parse( &p_sys->eia608, p_sys->i_channel, &p_block->p_buffer[1] );
 
         p_block->i_buffer -= 3;
         p_block->p_buffer += 3;
     }
-    if( p_block )
+    if( p_block->i_buffer < 3 )
+    {
         block_Release( p_block );
+        *pp_block = NULL;
+    }
 
-    if( b_changed )
+    /* a caption is ready or removed, process its screen */
+    /*
+     * In case of rollup/painton with 1 packet/frame, we need to update on Changed status.
+     * Batch decoding might be incorrect if those in large number of commands (mp4, ...) then.
+     * see CEAv1.2zero.trp tests
+     */
+    if( i_status & (EIA608_STATUS_DISPLAY | EIA608_STATUS_CHANGED) )
     {
         text_segment_t *p_segments = Eia608Text( &p_sys->eia608 );
         return Subtitle( p_dec, p_segments, i_pts );
@@ -596,7 +621,7 @@ static void Eia608ParseChannel( eia608_t *h, const uint8_t d[2] )
     else if( d1 < 0x10 )
         h->i_channel = 3;
 }
-static bool Eia608ParseTextAttribute( eia608_t *h, uint8_t d2 )
+static eia608_status_t Eia608ParseTextAttribute( eia608_t *h, uint8_t d2 )
 {
     const int i_index = d2 - 0x20;
     assert( d2 >= 0x20 && d2 <= 0x2f );
@@ -605,21 +630,21 @@ static bool Eia608ParseTextAttribute( eia608_t *h, uint8_t d2 )
     h->font  = pac2_attribs[i_index].i_font;
     Eia608Cursor( h, 1 );
 
-    return false;
+    return EIA608_STATUS_DEFAULT;
 }
-static bool Eia608ParseSingle( eia608_t *h, const uint8_t dx )
+static eia608_status_t Eia608ParseSingle( eia608_t *h, const uint8_t dx )
 {
     assert( dx >= 0x20 );
     Eia608Write( h, dx );
-    return true;
+    return EIA608_STATUS_CHANGED;
 }
-static bool Eia608ParseDouble( eia608_t *h, uint8_t d2 )
+static eia608_status_t Eia608ParseDouble( eia608_t *h, uint8_t d2 )
 {
     assert( d2 >= 0x30 && d2 <= 0x3f );
     Eia608Write( h, d2 + 0x50 ); /* We use charaters 0x80...0x8f */
-    return true;
+    return EIA608_STATUS_CHANGED;
 }
-static bool Eia608ParseExtended( eia608_t *h, uint8_t d1, uint8_t d2 )
+static eia608_status_t Eia608ParseExtended( eia608_t *h, uint8_t d1, uint8_t d2 )
 {
     assert( d2 >= 0x20 && d2 <= 0x3f );
     assert( d1 == 0x12 || d1 == 0x13 );
@@ -632,11 +657,11 @@ static bool Eia608ParseExtended( eia608_t *h, uint8_t d1, uint8_t d2 )
      * advanced one */
     Eia608Cursor( h, -1 );
     Eia608Write( h, d2 );
-    return true;
+    return EIA608_STATUS_CHANGED;
 }
-static bool Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
+static eia608_status_t Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
 {
-    bool b_changed = false;
+    eia608_status_t i_status = EIA608_STATUS_DEFAULT;
 
     switch( d2 )
     {
@@ -645,7 +670,7 @@ static bool Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
         break;
     case 0x21:  /* Backspace */
         Eia608Erase( h );
-        b_changed = true;
+        i_status = EIA608_STATUS_CHANGED;
         break;
     case 0x22:  /* Reserved */
     case 0x23:
@@ -660,7 +685,7 @@ static bool Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
         {
             Eia608EraseScreen( h, true );
             Eia608EraseScreen( h, false );
-            b_changed = true;
+            i_status = EIA608_STATUS_CHANGED | EIA608_STATUS_CAPTION_CLEARED;
         }
 
         if( d2 == 0x25 )
@@ -689,11 +714,11 @@ static bool Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
 
     case 0x2c: /* Erase displayed memory */
         Eia608EraseScreen( h, true );
-        b_changed = true;
+        i_status = EIA608_STATUS_CHANGED | EIA608_STATUS_CAPTION_CLEARED;
         break;
     case 0x2d: /* Carriage return */
         Eia608RollUp(h);
-        b_changed = true;
+        i_status = EIA608_STATUS_CHANGED;
         break;
     case 0x2e: /* Erase non displayed memory */
         Eia608EraseScreen( h, false );
@@ -706,10 +731,10 @@ static bool Eia608ParseCommand0x14( eia608_t *h, uint8_t d2 )
         h->cursor.i_row = 0;
         h->color = EIA608_COLOR_DEFAULT;
         h->font = EIA608_FONT_REGULAR;
-        b_changed = true;
+        i_status = EIA608_STATUS_CHANGED | EIA608_STATUS_CAPTION_ENDED;
         break;
     }
-    return b_changed;
+    return i_status;
 }
 static bool Eia608ParseCommand0x17( eia608_t *h, uint8_t d2 )
 {
@@ -755,14 +780,14 @@ static bool Eia608ParsePac( eia608_t *h, uint8_t d1, uint8_t d2 )
     return false;
 }
 
-static bool Eia608ParseData( eia608_t *h, uint8_t d1, uint8_t d2 )
+static eia608_status_t Eia608ParseData( eia608_t *h, uint8_t d1, uint8_t d2 )
 {
-    bool b_changed = false;
+    eia608_status_t i_status = EIA608_STATUS_DEFAULT;
 
     if( d1 >= 0x18 && d1 <= 0x1f )
         d1 -= 8;
 
-#define ON( d2min, d2max, cmd ) do { if( d2 >= d2min && d2 <= d2max ) b_changed = cmd; } while(0)
+#define ON( d2min, d2max, cmd ) do { if( d2 >= d2min && d2 <= d2max ) i_status = cmd; } while(0)
     switch( d1 )
     {
     case 0x11:
@@ -787,11 +812,11 @@ static bool Eia608ParseData( eia608_t *h, uint8_t d1, uint8_t d2 )
 #undef ON
     if( d1 >= 0x20 )
     {
-        b_changed = Eia608ParseSingle( h, d1 );
+        i_status = Eia608ParseSingle( h, d1 );
         if( d2 >= 0x20 )
-            b_changed |= Eia608ParseSingle( h, d2 );
+            i_status |= Eia608ParseSingle( h, d2 );
     }
-    return b_changed;
+    return i_status;
 }
 
 static void Eia608TextUtf8( char *psz_utf8, uint8_t c ) // Returns number of bytes used
@@ -1066,14 +1091,14 @@ static void Eia608Init( eia608_t *h )
     h->font = EIA608_FONT_REGULAR;
     h->i_row_rollup = EIA608_SCREEN_ROWS-1;
 }
-static bool Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] )
+static eia608_status_t Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] )
 {
     const uint8_t d1 = data[0] & 0x7f; /* Removed parity bit */
     const uint8_t d2 = data[1] & 0x7f;
-    bool b_screen_changed = false;
+    eia608_status_t i_screen_status = EIA608_STATUS_DEFAULT;
 
     if( d1 == 0 && d2 == 0 )
-        return false;   /* Ignore padding (parity check are sometimes invalid on them) */
+        return EIA608_STATUS_DEFAULT;   /* Ignore padding (parity check are sometimes invalid on them) */
 
     Eia608ParseChannel( h, data );
     if( h->i_channel != i_channel_selected )
@@ -1084,7 +1109,7 @@ static bool Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data
     {
         if( d1 >= 0x20 ||
             d1 != h->last.d1 || d2 != h->last.d2 ) /* Command codes can be repeated */
-            b_screen_changed = Eia608ParseData( h, d1,d2 );
+            i_screen_status = Eia608ParseData( h, d1,d2 );
 
         h->last.d1 = d1;
         h->last.d2 = d2;
@@ -1093,7 +1118,7 @@ static bool Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data
     {
         /* XDS block / End of XDS block */
     }
-    return b_screen_changed;
+    return i_screen_status;
 }
 
 static text_segment_t *Eia608Text( eia608_t *h )
