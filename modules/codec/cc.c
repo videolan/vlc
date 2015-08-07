@@ -311,6 +311,12 @@ static block_t *Pop( decoder_t *p_dec )
      * XXX it won't work with H264 which use non out of order B picture or MMCO
      */
 
+    if( p_sys->i_block && (p_sys->pp_block[0]->i_flags & BLOCK_FLAG_PRIVATE_MASK) )
+    {
+        p_sys->i_block--;
+        return p_sys->pp_block[0];
+    }
+
     /* Wait for a P and output all *previous* picture by pts order (for
      * hierarchical B frames) */
     if( p_sys->i_block <= 1 ||

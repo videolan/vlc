@@ -38,6 +38,7 @@
 #include <vlc_aout.h>
 #include <assert.h>
 #include <limits.h>
+#include "../codec/cc.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -482,6 +483,7 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
 
     block_Release( p_block );
     p_newblock->i_buffer = i_copied;
+    p_newblock->i_flags = BLOCK_FLAG_ORDERED_CAPTIONS;
     return p_newblock;
 }
 

@@ -26,6 +26,8 @@
 
 #include <vlc_bits.h>
 
+#define BLOCK_FLAG_ORDERED_CAPTIONS (0x01 << BLOCK_FLAG_PRIVATE_SHIFT)
+
 /* CC have a maximum rate of 9600 bit/s (per field?) */
 #define CC_MAX_DATA_SIZE (2 * 3*600)
 enum
