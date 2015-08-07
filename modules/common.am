@@ -37,7 +37,4 @@ AM_LDFLAGS += $(top_builddir)/modules/module.rc.lo \
               -Wc,--static -Wc,-static-libgcc
 endif
 
-SUFFIXES = .asm
-
-.asm.lo:
-	$(LIBTOOL) --mode=compile --tag=ASM $(YASM) $(YASMFLAGS) $< -o $@
+SUFFIXES =

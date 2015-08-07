@@ -69,7 +69,6 @@ AM_PROG_AS
 
 AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [Validator for desktop entry files])
 AC_CHECK_PROGS(DESKTOP_FILE_VALIDATE, [${DESKTOP_FILE_VALIDATE} desktop-file-validate], :)
-AC_PATH_PROG(YASM, yasm)
 AC_ARG_VAR([BUILDCC], [Build system C11 or C99 compiler command])
 AC_PATH_PROGS(BUILDCC, [c11-gcc c11 c99-gcc c99], [false])
 AS_IF([test "$BUILDCC" = "false"], [
@@ -101,17 +100,6 @@ dnl
 HAVE_WIN64="0"
 HAVE_IOS="0"
 HAVE_OSX="0"
-
-YASMFLAGS=""
-case "${host}" in
-    i?86*)
-    YASMFLAGS="-f elf32"
-        ;;
-    x86_64*)
-    YASMFLAGS="-f elf64"
-        ;;
-esac
-
 
 case "${host_os}" in
   "")
@@ -148,7 +136,6 @@ case "${host_os}" in
     case "${host}" in
       i?86*)
         ARCH_flag="-arch i386"
-        YASMFLAGS="-f macho32"
       ;;
       ppc64*)
         ARCH_flag="-arch ppc64"
@@ -158,7 +145,6 @@ case "${host_os}" in
       ;;
       x86_64*)
         ARCH_flag="-arch x86_64"
-        YASMFLAGS="-f macho64"
       ;;
       arm*)
         ac_cv_c_bigendian="no"
@@ -269,12 +255,10 @@ case "${host_os}" in
                 HAVE_WIN64="1"
                 WINDOWS_ARCH="x64"
                 PROGRAMFILES="PROGRAMFILES64"
-                YASMFLAGS="-f win64"
             ;;
             *)
                 WINDOWS_ARCH="x86"
                 PROGRAMFILES="PROGRAMFILES"
-                YASMFLAGS="-f win32"
             ;;
         esac
         AC_SUBST(WINDOWS_ARCH)
@@ -307,8 +291,6 @@ AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
 AM_CONDITIONAL(HAVE_IOS,   test "${HAVE_IOS}" = "1")
 AM_CONDITIONAL(HAVE_OSX,   test "${HAVE_OSX}" = "1")
-
-AC_SUBST(YASMFLAGS)
 
 dnl
 dnl Sadly autoconf does not think about testing foo.exe when ask to test
