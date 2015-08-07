@@ -166,6 +166,8 @@ struct decoder_sys_t
     int i_field;
     int i_channel;
 
+    mtime_t i_display_time;
+
     eia608_t eia608;
     bool b_opaque;
 };
@@ -365,7 +367,10 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t **pp_block )
     block_t *p_block = *pp_block;
 
     decoder_sys_t *p_sys = p_dec->p_sys;
-    const int64_t i_pts = p_block->i_pts;
+
+    if( p_sys->i_display_time == VLC_TS_INVALID )
+        p_sys->i_display_time = p_block->i_pts;
+
     eia608_status_t i_status = EIA608_STATUS_DEFAULT;
 
     /* TODO do the real decoding here */
@@ -376,10 +381,15 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t **pp_block )
 
         p_block->i_buffer -= 3;
         p_block->p_buffer += 3;
+        p_sys->i_display_time += CLOCK_FREQ / 30;
     }
+
+    const mtime_t i_pts = p_sys->i_display_time;
+
     if( p_block->i_buffer < 3 )
     {
         block_Release( p_block );
+        p_sys->i_display_time = VLC_TS_INVALID;
         *pp_block = NULL;
     }
 
