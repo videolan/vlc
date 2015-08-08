@@ -76,6 +76,54 @@ text_style_t *text_style_Copy( text_style_t *p_dst, const text_style_t *p_src )
     return p_dst;
 }
 
+#define MERGE(var, fflag) \
+    if( (p_src->i_features & fflag) && (b_override || !(p_dst->i_features & fflag)) )\
+        p_dst->var = p_src->var
+
+#define MERGE_SIZE(var) \
+    if( p_src->var > 0 && (b_override || p_dst->var <= 0) )\
+        p_dst->var = p_src->var
+
+void text_style_Merge( text_style_t *p_dst, const text_style_t *p_src, bool b_override )
+{
+    if( p_src->psz_fontname && (!p_dst->psz_fontname || b_override) )
+    {
+        free( p_dst->psz_fontname );
+        p_dst->psz_fontname = strdup( p_src->psz_fontname );
+    }
+
+    if( p_src->psz_monofontname && (!p_dst->psz_monofontname || b_override) )
+    {
+        free( p_dst->psz_monofontname );
+        p_dst->psz_monofontname = strdup( p_src->psz_monofontname );
+    }
+
+    if( p_src->i_features != STYLE_NO_DEFAULTS )
+    {
+        MERGE(i_font_color,         STYLE_HAS_FONT_COLOR);
+        MERGE(i_font_alpha,         STYLE_HAS_FONT_ALPHA);
+        MERGE(i_outline_color,      STYLE_HAS_OUTLINE_COLOR);
+        MERGE(i_outline_alpha,      STYLE_HAS_OUTLINE_ALPHA);
+        MERGE(i_shadow_color,       STYLE_HAS_SHADOW_COLOR);
+        MERGE(i_shadow_alpha,       STYLE_HAS_SHADOW_ALPHA);
+        MERGE(i_background_color,   STYLE_HAS_BACKGROUND_COLOR);
+        MERGE(i_background_alpha,   STYLE_HAS_BACKGROUND_ALPHA);
+        MERGE(i_karaoke_background_color, STYLE_HAS_K_BACKGROUND_COLOR);
+        MERGE(i_karaoke_background_alpha, STYLE_HAS_K_BACKGROUND_ALPHA);
+        p_dst->i_features |= p_src->i_features;
+        p_dst->i_style_flags |= p_src->i_style_flags;
+    }
+
+    MERGE_SIZE(f_font_relsize);
+    MERGE_SIZE(i_font_size);
+    MERGE_SIZE(i_outline_width);
+    MERGE_SIZE(i_shadow_width);
+    MERGE_SIZE(i_spacing);
+}
+
+#undef MERGE
+#undef MERGE_SIZE
+
 text_style_t *text_style_Duplicate( const text_style_t *p_src )
 {
     if( !p_src )
