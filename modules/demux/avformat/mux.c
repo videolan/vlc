@@ -228,7 +228,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         codec->codec_type = AVMEDIA_TYPE_AUDIO;
         codec->channels = fmt->audio.i_channels;
         codec->sample_rate = fmt->audio.i_rate;
-        codec->time_base = (AVRational){1, codec->sample_rate};
+        stream->time_base = (AVRational){1, codec->sample_rate};
         codec->frame_size = fmt->audio.i_frame_length;
         if (fmt->i_bitrate == 0) {
             msg_Warn( p_mux, "Missing audio bitrate, assuming 64k" );
@@ -258,8 +258,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 fmt->video.i_sar_num, fmt->video.i_sar_den);
         stream->sample_aspect_ratio.den = codec->sample_aspect_ratio.den;
         stream->sample_aspect_ratio.num = codec->sample_aspect_ratio.num;
-        codec->time_base.den = fmt->video.i_frame_rate;
-        codec->time_base.num = fmt->video.i_frame_rate_base;
+        stream->time_base.den = fmt->video.i_frame_rate;
+        stream->time_base.num = fmt->video.i_frame_rate_base;
         if (fmt->i_bitrate == 0) {
             msg_Warn( p_mux, "Missing video bitrate, assuming 512k" );
             fmt->i_bitrate = 512000;
