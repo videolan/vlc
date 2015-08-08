@@ -57,7 +57,8 @@ static BOOL WINAPI SetThreadErrorModeFallback(DWORD mode, DWORD *oldmode)
     if (GetErrorModeReal != NULL)
         curmode = GetErrorModeReal();
 # endif
-    if ((mode & SEM_FAILCRITICALERRORS) != (curmode & SEM_FAILCRITICALERRORS))
+    /* Extra flags should be OK. Missing flags are NOT OK. */
+    if ((mode & curmode) != mode)
         return FALSE;
     if (oldmode != NULL)
         *oldmode = curmode;
