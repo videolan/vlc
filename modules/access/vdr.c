@@ -308,7 +308,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_CONTENT_TYPE:
             *va_arg( args, char ** ) =
-                strdup( p_sys->b_ts_format ? "video/MP2T" : "video/mpeg" );
+                strdup( p_sys->b_ts_format ? "video/MP2T" : "video/MP2P" );
             break;
 
         case ACCESS_SET_TITLE:

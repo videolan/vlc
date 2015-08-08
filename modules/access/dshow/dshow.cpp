@@ -1928,7 +1928,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
         if( p_stream->i_fourcc == VLC_CODEC_DV )
             *type = strdup( "video/dv" );
         else if( p_stream->i_fourcc == VLC_CODEC_MPGV )
-            *type = strdup( "video/mpeg" );
+            *type = strdup( "video/MP2P" );
         else
             return VLC_EGENERIC;
         break;

@@ -1082,7 +1082,7 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
         break;
 
     case ACCESS_GET_CONTENT_TYPE:
-        *va_arg( args, char ** ) = strdup( "video/mpeg" );
+        *va_arg( args, char ** ) = strdup( "video/MP2P" );
         break;
 
     case ACCESS_SET_TITLE:
