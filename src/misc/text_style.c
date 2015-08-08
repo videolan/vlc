@@ -38,10 +38,12 @@ text_style_t *text_style_New( void )
     /* initialize to default text style */
     p_style->psz_fontname = NULL;
     p_style->psz_monofontname = NULL;
+    p_style->i_features = STYLE_FULLY_SET;
+    p_style->i_style_flags = STYLE_OUTLINE;
+    p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE;
     p_style->i_font_size = STYLE_DEFAULT_FONT_SIZE;
     p_style->i_font_color = 0xffffff;
     p_style->i_font_alpha = 0xff;
-    p_style->i_style_flags = STYLE_OUTLINE;
     p_style->i_outline_color = 0x000000;
     p_style->i_outline_alpha = 0xff;
     p_style->i_shadow_color = 0x000000;

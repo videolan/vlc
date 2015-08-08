@@ -42,14 +42,17 @@ typedef struct
     char *     psz_fontname;      /**< The name of the font */
     char *     psz_monofontname;  /**< The name of the mono font */
 
+    uint16_t   i_features;        /**< Feature flags (means non default) */
+    uint16_t   i_style_flags;     /**< Formatting style flags */
+
     /* Font style */
+    float      f_font_relsize;    /**< The font size in % */
     int        i_font_size;       /**< The font size in pixels */
     int        i_font_color;      /**< The color of the text 0xRRGGBB
                                        (native endianness) */
     uint8_t    i_font_alpha;      /**< The transparency of the text.
                                        0x00 is fully opaque,
                                        0xFF fully transparent */
-    uint16_t   i_style_flags;     /**< Formatting style flags */
     int        i_spacing;         /**< The spaceing between glyphs in pixels */
 
     /* Outline */
@@ -77,18 +80,34 @@ typedef struct
                                        0xFF fully transparent */
 } text_style_t;
 
-/* Style flags for \ref text_style_t */
-#define STYLE_BOLD        1
-#define STYLE_ITALIC      2
-#define STYLE_OUTLINE     4
-#define STYLE_SHADOW      8
-#define STYLE_BACKGROUND  16
-#define STYLE_UNDERLINE   32
-#define STYLE_STRIKEOUT   64
-#define STYLE_HALFWIDTH   128
-#define STYLE_MONOSPACED  256
+/* Features flags for \ref i_features */
+#define STYLE_NO_DEFAULTS               0x0
+#define STYLE_FULLY_SET                 0xFFFF
+#define STYLE_HAS_FONT_COLOR            (1 << 0)
+#define STYLE_HAS_FONT_ALPHA            (1 << 1)
+#define STYLE_HAS_FLAGS                 (1 << 2)
+#define STYLE_HAS_OUTLINE_COLOR         (1 << 3)
+#define STYLE_HAS_OUTLINE_ALPHA         (1 << 4)
+#define STYLE_HAS_SHADOW_COLOR          (1 << 5)
+#define STYLE_HAS_SHADOW_ALPHA          (1 << 6)
+#define STYLE_HAS_BACKGROUND_COLOR      (1 << 7)
+#define STYLE_HAS_BACKGROUND_ALPHA      (1 << 8)
+#define STYLE_HAS_K_BACKGROUND_COLOR    (1 << 9)
+#define STYLE_HAS_K_BACKGROUND_ALPHA    (1 << 10)
 
-#define STYLE_DEFAULT_FONT_SIZE 22
+/* Style flags for \ref text_style_t */
+#define STYLE_BOLD              (1 << 0)
+#define STYLE_ITALIC            (1 << 1)
+#define STYLE_OUTLINE           (1 << 2)
+#define STYLE_SHADOW            (1 << 3)
+#define STYLE_BACKGROUND        (1 << 4)
+#define STYLE_UNDERLINE         (1 << 5)
+#define STYLE_STRIKEOUT         (1 << 6)
+#define STYLE_HALFWIDTH         (1 << 7)
+#define STYLE_MONOSPACED        (1 << 8)
+
+#define STYLE_DEFAULT_FONT_SIZE 20
+#define STYLE_DEFAULT_REL_FONT_SIZE 5.0
 
 
 typedef struct text_segment_t text_segment_t;
