@@ -782,12 +782,10 @@ int OpenEncoder( vlc_object_t *p_this )
                 p_context->mb_lmax = p_context->lmax = 42 * FF_QP2LAMBDA;
             }
 
-            } else {
-            if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
-            {
+        } else if( !var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" ) )
+        {
                 p_context->qmin = 1;
                 p_context->mb_lmin = p_context->lmin = FF_QP2LAMBDA;
-            }
         }
 
 
