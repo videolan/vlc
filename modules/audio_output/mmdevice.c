@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#define _WIN32_WINNT 0x600
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
@@ -42,37 +43,6 @@ DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
 #include <vlc_charset.h>
 #include <vlc_modules.h>
 #include "audio_output/mmdevice.h"
-
-#if (_WIN32_WINNT < 0x600)
-static VOID (WINAPI *InitializeConditionVariable) (PCONDITION_VARIABLE);
-static BOOL (WINAPI *SleepConditionVariableCS) (PCONDITION_VARIABLE,
-                                               PCRITICAL_SECTION, DWORD);
-static VOID (WINAPI *WakeConditionVariable)(PCONDITION_VARIABLE);
-#define LOOKUP(s) \
-    if (((s) = (void *)GetProcAddress(h, #s)) == NULL) return FALSE
-
-BOOL WINAPI DllMain(HINSTANCE, DWORD, LPVOID); /* avoid warning */
-BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID reserved)
-{
-    (void) dll;
-    (void) reserved;
-
-    switch (reason)
-    {
-        case DLL_PROCESS_ATTACH:
-        {
-            HANDLE h = GetModuleHandle(TEXT("kernel32.dll"));
-            if (unlikely(h == NULL))
-                return FALSE;
-            LOOKUP(InitializeConditionVariable);
-            LOOKUP(SleepConditionVariableCS);
-            LOOKUP(WakeConditionVariable);
-            break;
-        }
-    }
-    return TRUE;
-}
-#endif
 
 DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
    0xad, 0xb2, 0xc6, 0x8b, 0x50, 0x1a, 0x66, 0x55);
