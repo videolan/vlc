@@ -979,7 +979,6 @@ VCDClose ( vlc_object_t *p_this )
     FREENULL( p_vcdplayer->track );
     FREENULL( p_vcdplayer->segment );
     FREENULL( p_vcdplayer->entry );
-    FREENULL( p_access->psz_demux );
     FREENULL( p_vcdplayer );
     p_vcd_access    = NULL;
 }
