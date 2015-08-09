@@ -1084,30 +1084,27 @@ static void blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY *const overla
     }
 }
 
-static void bluraySendOverlayToVout(demux_t *p_demux)
+static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    assert(p_sys->current_overlay >= 0 &&
-           p_sys->p_overlays[p_sys->current_overlay] != NULL &&
-           p_sys->p_overlays[p_sys->current_overlay]->p_pic != NULL);
+    assert(p_ov != NULL &&
+           p_ov->p_pic != NULL);
 
-    p_sys->p_overlays[p_sys->current_overlay]->p_pic->i_start =
-        p_sys->p_overlays[p_sys->current_overlay]->p_pic->i_stop = mdate();
-    p_sys->p_overlays[p_sys->current_overlay]->p_pic->i_channel =
-        vout_RegisterSubpictureChannel(p_sys->p_vout);
+    p_ov->p_pic->i_start = p_ov->p_pic->i_stop = mdate();
+    p_ov->p_pic->i_channel = vout_RegisterSubpictureChannel(p_sys->p_vout);
     /*
      * After this point, the picture should not be accessed from the demux thread,
      * as it is held by the vout thread.
      * This must be done only once per subpicture, ie. only once between each
      * blurayInitOverlay & blurayCloseOverlay call.
      */
-    vout_PutSubpicture(p_sys->p_vout, p_sys->p_overlays[p_sys->current_overlay]->p_pic);
+    vout_PutSubpicture(p_sys->p_vout, p_ov->p_pic);
     /*
      * Mark the picture as Outdated, as it contains no region for now.
      * This will make the subpicture_updater_t call pf_update
      */
-    p_sys->p_overlays[p_sys->current_overlay]->status = Outdated;
+    p_ov->status = Outdated;
 }
 
 static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_info)
@@ -1663,7 +1660,7 @@ static int blurayDemux(demux_t *p_demux)
             if (p_sys->p_vout != NULL) {
                 var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
                 var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
-                bluraySendOverlayToVout(p_demux);
+                bluraySendOverlayToVout(p_demux, ov);
             }
         }
     }
