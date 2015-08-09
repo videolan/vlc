@@ -67,18 +67,6 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
 
 @implementation VLCDebugMessageVisualizer
 
-+ (VLCDebugMessageVisualizer *)sharedInstance
-{
-    static VLCDebugMessageVisualizer *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCDebugMessageVisualizer new];
-    });
-
-    return sharedInstance;
-}
-
 - (id)init
 {
     self = [super initWithWindowNibName:@"DebugMessageVisualizer"];

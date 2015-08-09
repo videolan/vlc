@@ -31,7 +31,6 @@
     IBOutlet NSButton * _msgs_refresh_btn;
     IBOutlet id _msgs_table;
 }
-+ (VLCDebugMessageVisualizer *)sharedInstance;
 
 - (void)showWindow:(id)sender;
 
