@@ -135,7 +135,6 @@ struct  demux_sys_t
 
     /* Menus */
     bluray_overlay_t    *p_overlays[MAX_OVERLAY];
-    int                 current_overlay; // -1 if no current overlay;
     bool                b_menu;
     bool                b_menu_open;
     bool                b_popup_available;
@@ -313,7 +312,6 @@ static int blurayOpen(vlc_object_t *object)
     if (unlikely(!p_sys))
         return VLC_ENOMEM;
 
-    p_sys->current_overlay = -1;
     p_sys->i_audio_stream = -1;
     p_sys->i_spu_stream = -1;
     p_sys->i_video_stream = -1;
@@ -778,9 +776,6 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
         if (p_sys->p_vout)
             vout_FlushSubpictureChannel(p_sys->p_vout, ov->p_pic->i_channel);
         blurayCleanOverlayStruct(ov);
-        if (p_sys->current_overlay == plane)
-            p_sys->current_overlay = -1;
-
         p_sys->p_overlays[plane] = NULL;
     }
 
@@ -825,7 +820,6 @@ static void blurayActivateOverlay(demux_t *p_demux, int plane)
      * the blurayDemuxMenu will send it to vout, as it may be unavailable when
      * the overlay is computed
      */
-    p_sys->current_overlay = plane;
     ov->status = ToDisplay;
     vlc_mutex_unlock(&ov->lock);
 }
@@ -972,7 +966,6 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
 
     if (!overlay) {
         msg_Info(p_demux, "Closing overlays.");
-        p_sys->current_overlay = -1;
         if (p_sys->p_vout)
             for (int i = 0; i < MAX_OVERLAY; i++)
                 blurayCloseOverlay(p_demux, i);
@@ -1649,8 +1642,11 @@ static int blurayDemux(demux_t *p_demux)
         }
     }
 
-    if (p_sys->current_overlay != -1) {
-        bluray_overlay_t *ov = p_sys->p_overlays[p_sys->current_overlay];
+    for (int i = 0; i < MAX_OVERLAY; i++) {
+        bluray_overlay_t *ov = p_sys->p_overlays[i];
+        if (!ov) {
+            continue;
+        }
         vlc_mutex_lock(&ov->lock);
         bool display = ov->status == ToDisplay;
         vlc_mutex_unlock(&ov->lock);
