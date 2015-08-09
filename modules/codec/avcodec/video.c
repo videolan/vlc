@@ -180,6 +180,17 @@ static int lavc_UpdateVideoFormat( decoder_t *p_dec, AVCodecContext *p_context,
         p_dec->fmt_out.video.i_frame_rate_base =
             p_dec->fmt_in.video.i_frame_rate_base;
     }
+#if LIBAVCODEC_VERSION_CHECK( 56, 5, 0, 7, 100 )
+    else if( p_context->framerate.num > 0 && p_context->framerate.den > 0 )
+    {
+        p_dec->fmt_out.video.i_frame_rate = p_context->framerate.num;
+        p_dec->fmt_out.video.i_frame_rate_base = p_context->framerate.den;
+# if LIBAVCODEC_VERSION_MICRO <  100
+        // for some reason libav don't thinkg framerate presents actually same thing as in ffmpeg
+        p_dec->fmt_out.video.i_frame_rate_base *= __MAX( p_context->ticks_per_frame, 1 );
+# endif
+    }
+#endif
     else if( p_context->time_base.num > 0 && p_context->time_base.den > 0 )
     {
         p_dec->fmt_out.video.i_frame_rate = p_context->time_base.den;
