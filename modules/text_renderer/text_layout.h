@@ -55,5 +55,5 @@ line_desc_t *NewLine( int i_count );
 
 int LayoutText(filter_t *p_filter, line_desc_t **pp_lines,
                 FT_BBox *p_bbox, int *pi_max_face_height,
-                const uni_char_t *psz_text, text_style_t **pp_styles,
+                const uni_char_t *psz_text, const text_style_t **pp_styles,
                 uint32_t *pi_k_dates, int i_len );

@@ -50,12 +50,13 @@ struct filter_sys_t
     FT_Face        p_face;      /* handle to face object */
     FT_Stroker     p_stroker;   /* handle to path stroker object */
 
-    text_style_t   style;       /* Current Style */
+    text_style_t  *p_default_style;
+    text_style_t  *p_style;       /* Current Style */
+    text_style_t  *p_forced_style;/* Renderer overridings */
 
     /* More styles... */
     float          f_shadow_vector_x;
     float          f_shadow_vector_y;
-    int            i_default_font_size;
 
     /* Attachments */
     input_attachment_t **pp_font_attachments;

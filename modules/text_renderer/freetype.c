@@ -171,6 +171,8 @@ vlc_module_begin ()
     add_loadfile( "freetype-monofont", DEFAULT_MONOSPACE_FONT_FILE, MONOSPACE_FONT_TEXT, FONT_LONGTEXT, false )
 #endif
 
+#define FREETYPE_DEFAULT_FONT_SIZE 12
+
     add_integer( "freetype-fontsize", 0, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, true )
         change_integer_range( 0, 4096)
@@ -312,22 +314,19 @@ static int GetFontSize( filter_t *p_filter )
     filter_sys_t *p_sys = p_filter->p_sys;
     int           i_size = 0;
 
-    if( p_sys->i_default_font_size )
+    if( p_sys->p_default_style->i_font_size )
     {
-        i_size = p_sys->i_default_font_size;
+        i_size = p_sys->p_default_style->i_font_size;
     }
-    else
+    else if( p_sys->p_default_style->f_font_relsize )
     {
-        int i_ratio = var_InheritInteger( p_filter, "freetype-rel-fontsize" );
-        if( i_ratio > 0 )
-        {
-            i_size = (int)p_filter->fmt_out.video.i_height / i_ratio;
-        }
+        i_size = (int) p_filter->fmt_out.video.i_height * p_sys->p_default_style->f_font_relsize;
     }
+
     if( i_size <= 0 )
     {
-        msg_Warn( p_filter, "invalid fontsize, using 12" );
-        i_size = 12;
+        msg_Warn( p_filter, "invalid fontsize, using %d", FREETYPE_DEFAULT_FONT_SIZE );
+        i_size = FREETYPE_DEFAULT_FONT_SIZE;
     }
     return i_size;
 }
@@ -343,7 +342,7 @@ static int SetFontSize( filter_t *p_filter, int i_size )
         msg_Dbg( p_filter, "using fontsize: %i", i_size );
     }
 
-    p_sys->style.i_font_size = i_size;
+    p_sys->p_style->i_font_size = i_size;
 
     if( FT_Set_Pixel_Sizes( p_sys->p_face, 0, i_size ) )
     {
@@ -821,12 +820,12 @@ static inline int RenderAXYZ( filter_t *p_filter,
                 uint32_t i_color;
                 switch (g) {
                 case 0:
-                    i_a     = i_a * p_sys->style.i_shadow_alpha / 255;
-                    i_color = p_sys->style.i_shadow_color;
+                    i_a     = i_a * p_sys->p_style->i_shadow_alpha / 255;
+                    i_color = p_sys->p_style->i_shadow_color;
                     break;
                 case 1:
-                    i_a     = i_a * p_sys->style.i_outline_alpha / 255;
-                    i_color = p_sys->style.i_outline_color;
+                    i_a     = i_a * p_sys->p_style->i_outline_alpha / 255;
+                    i_color = p_sys->p_style->i_outline_color;
                     break;
                 default:
                     i_color = ch->i_color;
@@ -894,50 +893,43 @@ static FT_Face LoadEmbeddedFace( filter_sys_t *p_sys, const char *psz_fontname,
     return NULL;
 }
 
-static text_style_t* ApplyDefaultStyle( filter_t *p_filter, text_style_t* p_original_style )
+static void FillDefaultStyles( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    text_style_t *p_style = p_original_style;
-    if ( !p_style )
-    {
-        p_style = text_style_New();
-        if ( unlikely( !p_style ) )
-            return NULL;
-        //FIXME: Shouldn't this be compute only once?
-        // How come we have some stuff from p_sys and not this?!
-        uint32_t i_font_color = var_InheritInteger( p_filter, "freetype-color" );
-        i_font_color = VLC_CLIP( i_font_color, 0, 0xFFFFFF );
-        p_style->i_font_color = i_font_color;
+    p_sys->p_default_style->psz_fontname = var_InheritString( p_filter, "freetype-font" );
+    p_sys->p_default_style->psz_monofontname = var_InheritString( p_filter, "freetype-monofont" );
 
-        uint32_t i_font_opacity = var_InheritInteger( p_filter, "freetype-opacity" );
-        i_font_opacity = VLC_CLIP( i_font_opacity, 0, 0xFF );
-        p_style->i_font_alpha = i_font_opacity;
+    p_sys->p_default_style->i_font_alpha = var_InheritInteger( p_filter,"freetype-opacity" );
+    p_sys->p_default_style->i_font_alpha = VLC_CLIP( p_sys->p_default_style->i_font_alpha, 0, 255 );
 
-        p_style->i_karaoke_background_color = p_sys->style.i_karaoke_background_color;
-        p_style->i_karaoke_background_alpha = p_sys->style.i_karaoke_background_alpha;
-        p_style->i_style_flags = p_sys->style.i_style_flags;
-    }
-    if ( !p_style->psz_fontname )
-        p_style->psz_fontname = strdup( p_sys->style.psz_fontname );
-    if ( !p_style->psz_monofontname )
-        p_style->psz_monofontname = strdup( p_sys->style.psz_monofontname );
-    if ( !p_style->psz_fontname || !p_style->psz_monofontname )
+    p_sys->p_default_style->i_outline_alpha = var_InheritInteger( p_filter, "freetype-outline-opacity" );
+    p_sys->p_default_style->i_outline_alpha = VLC_CLIP( p_sys->p_default_style->i_outline_alpha, 0, 255 );
+    p_sys->p_default_style->i_outline_color = var_InheritInteger( p_filter, "freetype-outline-color" );
+    p_sys->p_default_style->i_outline_color = VLC_CLIP( p_sys->p_default_style->i_outline_color, 0, 0xFFFFFF );
+
+    p_sys->p_default_style->i_shadow_alpha = var_InheritInteger( p_filter, "freetype-shadow-opacity" );
+    p_sys->p_default_style->i_shadow_alpha = VLC_CLIP( p_sys->p_default_style->i_shadow_alpha, 0, 255 );
+    p_sys->p_default_style->i_shadow_color = var_InheritInteger( p_filter, "freetype-shadow-color" );
+    p_sys->p_default_style->i_shadow_color = VLC_CLIP( p_sys->p_default_style->i_shadow_color, 0, 0xFFFFFF );
+
+    p_sys->p_forced_style->i_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
+    p_sys->p_forced_style->f_font_relsize = var_InheritInteger( p_filter, "freetype-rel-fontsize" );
+    if( p_sys->p_forced_style->f_font_relsize )
+        p_sys->p_forced_style->f_font_relsize = 1.0 / p_sys->p_forced_style->f_font_relsize;
+
+    if( var_InheritBool( p_filter, "freetype-bold" ) )
     {
-        free( p_style->psz_fontname );
-        free( p_style->psz_monofontname );
-        if ( !p_original_style )
-            free( p_style );
-        return NULL;
+        p_sys->p_forced_style->i_style_flags |= STYLE_BOLD;
+        p_sys->p_forced_style->i_features |= STYLE_HAS_FLAGS;
     }
-    if ( !p_style->i_font_size )
-        p_style->i_font_size = p_sys->style.i_font_size;
-    return p_style;
+
+    /* Apply forced styles to defaults, if any */
+    text_style_Merge( p_sys->p_default_style, p_sys->p_forced_style, true );
 }
-
-static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment, size_t *pi_string_length, text_style_t ***ppp_styles)
+static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment, size_t *pi_string_length, const text_style_t ***ppp_styles)
 {
-    text_style_t **pp_styles = NULL;
+    const text_style_t **pp_styles = NULL;
     uni_char_t *psz_uni = NULL;
     size_t i_size = 0;
     size_t i_nb_char = 0;
@@ -966,7 +958,7 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
         free( psz_tmp );
         // We want one text_style_t* per character. The amount of characters is the number of bytes divided by
         // the size of one glyph, in byte
-        text_style_t **pp_styles_realloc = realloc( pp_styles, ( (i_size + i_string_bytes) / sizeof( *psz_uni ) * sizeof( *pp_styles ) ) );
+        const text_style_t **pp_styles_realloc = realloc( pp_styles, ( (i_size + i_string_bytes) / sizeof( *psz_uni ) * sizeof( *pp_styles ) ) );
         if ( unlikely( !pp_styles_realloc ) )
         {
             free( pp_styles );
@@ -975,13 +967,22 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
         }
         pp_styles = pp_styles_realloc;
         // We're actually writing to a read only object, something's wrong with the conception.
-        text_style_t *p_style = ApplyDefaultStyle( p_filter, s->style );
+        text_style_t *p_style = text_style_Duplicate( p_filter->p_sys->p_default_style );
         if ( p_style == NULL )
         {
             free( pp_styles );
             free( psz_uni );
             return NULL;
         }
+
+        if( s->style )
+        {
+            /* Replace defaults with segment values */
+            text_style_Merge( p_style, s->style, true );
+            /* Overwrite any default or value with forced ones */
+            text_style_Merge( p_style, p_filter->p_sys->p_forced_style, true );
+        }
+
         // i_string_bytes is a number of bytes, while here we're going to assign pointer by pointer
         for ( size_t i = 0; i < i_string_bytes / sizeof( *psz_uni ); ++i )
             pp_styles[i_nb_char + i] = p_style;
@@ -1006,18 +1007,16 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !p_region_in )
         return VLC_EGENERIC;
 
-    text_style_t **pp_styles = NULL;
+    const text_style_t **pp_styles = NULL;
     size_t i_text_length = 0;
-
     uni_char_t *psz_text = SegmentsToTextAndStyles( p_filter, p_region_in->p_text, &i_text_length, &pp_styles );
-
     if( !psz_text || !pp_styles )
     {
         return VLC_EGENERIC;
     }
 
     /* Reset the default fontsize in case screen metrics have changed */
-    p_filter->p_sys->style.i_font_size = GetFontSize( p_filter );
+    p_filter->p_sys->p_style->i_font_size = GetFontSize( p_filter );
 
     /* */
     int rv = VLC_SUCCESS;
@@ -1138,7 +1137,7 @@ static int Init_FT( vlc_object_t *p_this,
         goto error;
     }
 
-    if( SetFontSize( p_filter, 0 ) != VLC_SUCCESS ) goto error;
+    if( SetFontSize( p_filter, (int) 0 ) != VLC_SUCCESS ) goto error;
 
     p_sys->p_stroker = NULL;
     if( f_outline_thickness > .001f )
@@ -1163,9 +1162,7 @@ static int Create( vlc_object_t *p_this )
     filter_t      *p_filter = (filter_t *)p_this;
     filter_sys_t  *p_sys;
     char          *psz_fontfile   = NULL;
-    char          *psz_fontname = NULL;
     char          *psz_monofontfile   = NULL;
-    char          *psz_monofontfamily = NULL;
     int            fontindex = 0, monofontindex = 0;
 
     /* Allocate structure */
@@ -1173,11 +1170,31 @@ static int Create( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->style.psz_fontname   = NULL;
     p_sys->p_face           = 0;
     p_sys->p_library        = 0;
-    p_sys->style.i_font_size      = 0;
-    p_sys->style.i_style_flags = 0;
+
+    /* default style to apply to uncomplete segmeents styles */
+    p_sys->p_default_style = text_style_New();
+    if(unlikely(!p_sys->p_default_style))
+    {
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+
+    p_sys->p_style = NULL;
+
+    /* empty style for style overriding cases */
+    p_sys->p_forced_style = text_style_New();
+    if(unlikely(!p_sys->p_forced_style))
+    {
+        text_style_Delete( p_sys->p_default_style );
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+    text_style_Reset( p_sys->p_forced_style );
+
+    /* fills default and forced style */
+    FillDefaultStyles( p_filter );
 
     /*
      * The following variables should not be cached, as they might be changed on-the-fly:
@@ -1186,25 +1203,8 @@ static int Create( vlc_object_t *p_this )
      *
      */
 
-    psz_fontname = var_InheritString( p_filter, "freetype-font" );
-    psz_monofontfamily = var_InheritString( p_filter, "freetype-monofont" );
-    p_sys->i_default_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
-    p_sys->style.i_font_alpha = var_InheritInteger( p_filter,"freetype-opacity" );
-    p_sys->style.i_font_alpha = VLC_CLIP( p_sys->style.i_font_alpha, 0, 255 );
-    if( var_InheritBool( p_filter, "freetype-bold" ) )
-        p_sys->style.i_style_flags |= STYLE_BOLD;
-
     double f_outline_thickness = var_InheritInteger( p_filter, "freetype-outline-thickness" ) / 100.0;
     f_outline_thickness = VLC_CLIP( f_outline_thickness, 0.0, 0.5 );
-    p_sys->style.i_outline_alpha = var_InheritInteger( p_filter, "freetype-outline-opacity" );
-    p_sys->style.i_outline_alpha = VLC_CLIP( p_sys->style.i_outline_alpha, 0, 255 );
-    p_sys->style.i_outline_color = var_InheritInteger( p_filter, "freetype-outline-color" );
-    p_sys->style.i_outline_color = VLC_CLIP( p_sys->style.i_outline_color, 0, 0xFFFFFF );
-
-    p_sys->style.i_shadow_alpha = var_InheritInteger( p_filter, "freetype-shadow-opacity" );
-    p_sys->style.i_shadow_alpha = VLC_CLIP( p_sys->style.i_shadow_alpha, 0, 255 );
-    p_sys->style.i_shadow_color = var_InheritInteger( p_filter, "freetype-shadow-color" );
-    p_sys->style.i_shadow_color = VLC_CLIP( p_sys->style.i_shadow_color, 0, 0xFFFFFF );
     float f_shadow_angle = var_InheritFloat( p_filter, "freetype-shadow-angle" );
     float f_shadow_distance = var_InheritFloat( p_filter, "freetype-shadow-distance" );
     f_shadow_distance = VLC_CLIP( f_shadow_distance, 0, 1 );
@@ -1212,30 +1212,26 @@ static int Create( vlc_object_t *p_this )
     p_sys->f_shadow_vector_y = f_shadow_distance * sinf((float)(2. * M_PI) * f_shadow_angle / 360);
 
     /* Set default psz_fontname */
-    if( !psz_fontname || !*psz_fontname )
+    if( !p_sys->p_default_style->psz_fontname || !*p_sys->p_default_style->psz_fontname )
     {
-        free( psz_fontname );
+        free( p_sys->p_default_style->psz_fontname );
 #ifdef HAVE_GET_FONT_BY_FAMILY_NAME
-        psz_fontname = strdup( DEFAULT_FAMILY );
+        p_sys->p_default_style->psz_fontname = strdup( DEFAULT_FAMILY );
 #else
-        psz_fontname = File_Select( DEFAULT_FONT_FILE );
+        p_sys->p_default_style->psz_fontname = File_Select( DEFAULT_FONT_FILE );
 #endif
     }
 
     /* set default psz_monofontname */
-    if( !psz_monofontfamily || !*psz_monofontfamily )
+    if( !p_sys->p_default_style->psz_monofontname || !*p_sys->p_default_style->psz_monofontname )
     {
-        free( psz_monofontfamily );
+        free( p_sys->p_default_style->psz_monofontname );
 #ifdef HAVE_GET_FONT_BY_FAMILY_NAME
-        psz_monofontfamily = strdup( DEFAULT_MONOSPACE_FAMILY );
+        p_sys->p_default_style->psz_monofontname = strdup( DEFAULT_MONOSPACE_FAMILY );
 #else
-        psz_monofontfamily = File_Select( DEFAULT_MONOSPACE_FONT_FILE );
+        p_sys->p_default_style->psz_monofontname = File_Select( DEFAULT_MONOSPACE_FONT_FILE );
 #endif
     }
-
-    /* Set the current font file */
-    p_sys->style.psz_fontname = psz_fontname;
-    p_sys->style.psz_monofontname = psz_monofontfamily;
 
 #ifdef HAVE_FONTCONFIG
     p_sys->pf_select = FontConfig_Select;
@@ -1250,20 +1246,32 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_select = Dummy_Select;
 #endif
 
+    /* Set default style to current (FIXME: is current really used/needed?) */
+    p_sys->p_style = text_style_Duplicate( p_sys->p_default_style );
+    if( !p_sys->p_style )
+    {
+        text_style_Delete( p_sys->p_default_style );
+        text_style_Delete( p_sys->p_forced_style );
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+
     /* */
-    psz_fontfile = p_sys->pf_select( p_filter, psz_fontname, false, false,
-                                      p_sys->i_default_font_size, &fontindex );
-    psz_monofontfile = p_sys->pf_select( p_filter, psz_monofontfamily, false,
-                                          false, p_sys->i_default_font_size,
+    psz_fontfile = p_sys->pf_select( p_filter, p_sys->p_default_style->psz_fontname,
+                                     false, false, p_sys->p_default_style->i_font_size, &fontindex );
+    psz_monofontfile = p_sys->pf_select( p_filter, p_sys->p_default_style->psz_monofontname,
+                                         false, false, p_sys->p_default_style->i_font_size,
                                           &monofontindex );
-    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontname, psz_fontfile );
-    msg_Dbg( p_filter, "Using %s as mono-font from file %s", psz_monofontfamily, psz_monofontfile );
+    msg_Dbg( p_filter, "Using %s as font from file %s",
+             p_sys->p_default_style->psz_fontname, psz_fontfile );
+    msg_Dbg( p_filter, "Using %s as mono-font from file %s",
+             p_sys->p_default_style->psz_monofontname, psz_monofontfile );
 
     /* If nothing is found, use the default family */
     if( !psz_fontfile )
-        psz_fontfile = File_Select( psz_fontname );
+        psz_fontfile = File_Select( p_sys->p_default_style->psz_fontname );
     if( !psz_monofontfile )
-        psz_monofontfile = File_Select( psz_monofontfamily );
+        psz_monofontfile = File_Select( p_sys->p_default_style->psz_monofontname );
 
     if( Init_FT( p_this, psz_fontfile, fontindex, f_outline_thickness ) != VLC_SUCCESS )
         goto error;
@@ -1289,8 +1297,9 @@ static int Create( vlc_object_t *p_this )
 error:
     free( psz_fontfile );
     free( psz_monofontfile );
-    free( psz_fontname );
-    free( psz_monofontfamily );
+    text_style_Delete( p_sys->p_style );
+    text_style_Delete( p_sys->p_default_style );
+    text_style_Delete( p_sys->p_forced_style );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -1335,8 +1344,9 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->pp_font_attachments );
     }
 
-    free( p_sys->style.psz_fontname );
-    free( p_sys->style.psz_monofontname );
+    text_style_Delete( p_sys->p_default_style );
+    text_style_Delete( p_sys->p_style );
+    text_style_Delete( p_sys->p_forced_style );
 
     Destroy_FT( p_this );
     free( p_sys );
