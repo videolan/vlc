@@ -73,7 +73,7 @@ typedef struct
 typedef struct
 {
     char *          psz_stylename; /* The name of the style, no comma's allowed */
-    text_style_t    font_style;
+    text_style_t *  p_style;
     int             i_align;
     int             i_margin_h;
     int             i_margin_v;
@@ -184,8 +184,7 @@ static void CloseDecoder( vlc_object_t *p_this )
                 continue;
 
             free( p_sys->pp_ssa_styles[i]->psz_stylename );
-            //FIXME: Make font_style a pointer and use text_style_* functions
-            free( p_sys->pp_ssa_styles[i]->font_style.psz_fontname );
+            text_style_Delete( p_sys->pp_ssa_styles[i]->p_style );
             free( p_sys->pp_ssa_styles[i] );
         }
         TAB_CLEAN( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
@@ -417,6 +416,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
     decoder_sys_t        *p_sys = p_dec->p_sys;
     subpicture_region_t  *p_text_region;
     video_format_t        fmt;
+    VLC_UNUSED( i_len );
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -456,7 +456,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
              */
             p_text_region->i_x         = p_ssa_style->i_margin_h;
             p_text_region->i_y         = p_ssa_style->i_margin_v;
-            p_text_region->p_text = text_segment_NewInheritStyle( &p_ssa_style->font_style );
+            p_text_region->p_text = text_segment_NewInheritStyle( p_ssa_style->p_style );
         }
         else
         {
@@ -616,6 +616,13 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                     p_ssa_style = calloc( 1, sizeof(ssa_style_t) );
                     if( unlikely(!p_ssa_style) )
                         return;
+                    p_ssa_style->p_style = text_style_New();
+                    if( unlikely(!p_ssa_style->p_style) )
+                    {
+                        free(p_ssa_style);
+                        return;
+                    }
+                    text_style_Reset( p_ssa_style->p_style );
                     /* All styles are supposed to default to Default, and then
                      * one or more settings are over-ridden.
                      * At the moment this only effects styles defined AFTER
@@ -630,7 +637,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                             memcpy( p_ssa_style, p_default_style, sizeof( ssa_style_t ) );
                             //FIXME: Make font_style a pointer. Actually we double copy some data here,
                             //   we use text_style_Copy to avoid copying psz_fontname, though .
-                            text_style_Copy( &p_ssa_style->font_style, &p_default_style->font_style );
+                            text_style_Copy( p_ssa_style->p_style, p_default_style->p_style );
                             p_ssa_style->psz_stylename = NULL;
                         }
                     }
@@ -652,8 +659,8 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                     {
                         if( !strcasecmp( "face", attr ) )
                         {
-                            free( p_ssa_style->font_style.psz_fontname );
-                            p_ssa_style->font_style.psz_fontname = strdup( val );
+                            free( p_ssa_style->p_style->psz_fontname );
+                            p_ssa_style->p_style->psz_fontname = strdup( val );
                         }
                         else if( !strcasecmp( "size", attr ) )
                         {
@@ -662,44 +669,49 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                                 int i_value = atoi( val );
 
                                 if( ( i_value >= -5 ) && ( i_value <= 5 ) )
-                                    p_ssa_style->font_style.i_font_size  +=
-                                       ( i_value * p_ssa_style->font_style.i_font_size ) / 10;
+                                    p_ssa_style->p_style->i_font_size  +=
+                                       ( i_value * p_ssa_style->p_style->i_font_size ) / 10;
                                 else if( i_value < -5 )
-                                    p_ssa_style->font_style.i_font_size  = - i_value;
+                                    p_ssa_style->p_style->i_font_size  = - i_value;
                                 else if( i_value > 5 )
-                                    p_ssa_style->font_style.i_font_size  = i_value;
+                                    p_ssa_style->p_style->i_font_size  = i_value;
                             }
                             else
-                                p_ssa_style->font_style.i_font_size  = atoi( val );
+                                p_ssa_style->p_style->i_font_size  = atoi( val );
                         }
                         else if( !strcasecmp( "italic", attr ) )
                         {
                             if( !strcasecmp( "yes", val ))
-                                p_ssa_style->font_style.i_style_flags |= STYLE_ITALIC;
+                                p_ssa_style->p_style->i_style_flags |= STYLE_ITALIC;
                             else
-                                p_ssa_style->font_style.i_style_flags &= ~STYLE_ITALIC;
+                                p_ssa_style->p_style->i_style_flags &= ~STYLE_ITALIC;
+                            p_ssa_style->p_style->i_features |= STYLE_HAS_FLAGS;
                         }
                         else if( !strcasecmp( "weight", attr ) )
                         {
                             if( !strcasecmp( "bold", val ))
-                                p_ssa_style->font_style.i_style_flags |= STYLE_BOLD;
+                                p_ssa_style->p_style->i_style_flags |= STYLE_BOLD;
                             else
-                                p_ssa_style->font_style.i_style_flags &= ~STYLE_BOLD;
+                                p_ssa_style->p_style->i_style_flags &= ~STYLE_BOLD;
+                            p_ssa_style->p_style->i_features |= STYLE_HAS_FLAGS;
                         }
                         else if( !strcasecmp( "underline", attr ) )
                         {
                             if( !strcasecmp( "yes", val ))
-                                p_ssa_style->font_style.i_style_flags |= STYLE_UNDERLINE;
+                                p_ssa_style->p_style->i_style_flags |= STYLE_UNDERLINE;
                             else
-                                p_ssa_style->font_style.i_style_flags &= ~STYLE_UNDERLINE;
+                                p_ssa_style->p_style->i_style_flags &= ~STYLE_UNDERLINE;
+                            p_ssa_style->p_style->i_features |= STYLE_HAS_FLAGS;
                         }
                         else if( !strcasecmp( "color", attr ) )
                         {
                             if( *val == '#' )
                             {
                                 unsigned long col = strtol(val+1, NULL, 16);
-                                 p_ssa_style->font_style.i_font_color = (col & 0x00ffffff);
-                                 p_ssa_style->font_style.i_font_alpha = (col >> 24) & 0xff;
+                                 p_ssa_style->p_style->i_font_color = (col & 0x00ffffff);
+                                 p_ssa_style->p_style->i_font_alpha = (col >> 24) & 0xff;
+                                 p_ssa_style->p_style->i_features |= STYLE_HAS_FONT_COLOR
+                                                                   | STYLE_HAS_FONT_ALPHA;
                             }
                         }
                         else if( !strcasecmp( "outline-color", attr ) )
@@ -707,39 +719,45 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                             if( *val == '#' )
                             {
                                 unsigned long col = strtol(val+1, NULL, 16);
-                                p_ssa_style->font_style.i_outline_color = (col & 0x00ffffff);
-                                p_ssa_style->font_style.i_outline_alpha = (col >> 24) & 0xff;
+                                p_ssa_style->p_style->i_outline_color = (col & 0x00ffffff);
+                                p_ssa_style->p_style->i_outline_alpha = (col >> 24) & 0xff;
+                                p_ssa_style->p_style->i_features |= STYLE_HAS_OUTLINE_COLOR
+                                                                  | STYLE_HAS_OUTLINE_ALPHA;
                             }
                         }
                         else if( !strcasecmp( "outline-level", attr ) )
                         {
-                            p_ssa_style->font_style.i_outline_width = atoi( val );
+                            p_ssa_style->p_style->i_outline_width = atoi( val );
                         }
                         else if( !strcasecmp( "shadow-color", attr ) )
                         {
                             if( *val == '#' )
                             {
                                 unsigned long col = strtol(val+1, NULL, 16);
-                                p_ssa_style->font_style.i_shadow_color = (col & 0x00ffffff);
-                                p_ssa_style->font_style.i_shadow_alpha = (col >> 24) & 0xff;
+                                p_ssa_style->p_style->i_shadow_color = (col & 0x00ffffff);
+                                p_ssa_style->p_style->i_shadow_alpha = (col >> 24) & 0xff;
+                                p_ssa_style->p_style->i_features |= STYLE_HAS_SHADOW_COLOR
+                                                                  | STYLE_HAS_SHADOW_ALPHA;
                             }
                         }
                         else if( !strcasecmp( "shadow-level", attr ) )
                         {
-                            p_ssa_style->font_style.i_shadow_width = atoi( val );
+                            p_ssa_style->p_style->i_shadow_width = atoi( val );
                         }
                         else if( !strcasecmp( "back-color", attr ) )
                         {
                             if( *val == '#' )
                             {
                                 unsigned long col = strtol(val+1, NULL, 16);
-                                p_ssa_style->font_style.i_karaoke_background_color = (col & 0x00ffffff);
-                                p_ssa_style->font_style.i_karaoke_background_alpha = (col >> 24) & 0xff;
+                                p_ssa_style->p_style->i_karaoke_background_color = (col & 0x00ffffff);
+                                p_ssa_style->p_style->i_karaoke_background_alpha = (col >> 24) & 0xff;
+                                p_ssa_style->p_style->i_features |= STYLE_HAS_K_BACKGROUND_COLOR
+                                                                  | STYLE_HAS_K_BACKGROUND_ALPHA;
                             }
                         }
                         else if( !strcasecmp( "spacing", attr ) )
                         {
-                            p_ssa_style->font_style.i_spacing = atoi( val );
+                            p_ssa_style->p_style->i_spacing = atoi( val );
                         }
                     }
                 }

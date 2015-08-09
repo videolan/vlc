@@ -285,12 +285,14 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_style = text_style_New();
     if( p_sys->p_style == NULL )
         goto error;
+    text_style_Reset( p_sys->p_style );
 
     p_sys->i_xoff = var_CreateGetInteger( p_filter, CFG_PREFIX "x" );
     p_sys->i_yoff = var_CreateGetInteger( p_filter, CFG_PREFIX "y" );
     p_sys->i_pos = var_CreateGetInteger( p_filter, CFG_PREFIX "position" );
     p_sys->p_style->i_font_alpha = var_CreateGetInteger( p_filter, CFG_PREFIX "opacity" );
     p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter, CFG_PREFIX "color" );
+    p_sys->p_style->i_features |= STYLE_HAS_FONT_ALPHA | STYLE_HAS_FONT_COLOR;
     p_sys->p_style->i_font_size = var_CreateGetInteger( p_filter, CFG_PREFIX "size" );
 
     if( p_sys->b_images && p_sys->p_style->i_font_size == -1 )
@@ -500,9 +502,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->p_region->i_x = p_sys->i_xoff;
     p_spu->p_region->i_y = p_sys->i_yoff;
 
-    //FIXME: Provide a way to force a default style to a list of segments
-#warning Missing style
-//    p_spu->p_region->p_style = text_style_Duplicate( p_sys->p_style );
+    p_spu->p_region->p_text->style = text_style_Duplicate( p_sys->p_style );
 
     if( p_feed->p_pic )
     {

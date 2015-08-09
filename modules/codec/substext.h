@@ -1,20 +1,12 @@
 #include <vlc_strings.h>
 #include <vlc_text_style.h>
 
-typedef struct
-{
-    bool b_set;
-    unsigned int i_value;
-} subpicture_updater_sys_option_t;
-
 struct subpicture_updater_sys_t {
     text_segment_t *p_segments;
 
     int  align;
     int  x;
     int  y;
-    int  i_font_height_percent;
-    int  i_font_height_abs_to_src;
 
     bool is_fixed;
     int  fixed_width;
@@ -22,12 +14,7 @@ struct subpicture_updater_sys_t {
     bool renderbg;
 
     /* styling */
-    subpicture_updater_sys_option_t style_flags;
-    subpicture_updater_sys_option_t font_color;
-    subpicture_updater_sys_option_t background_color;
-    int16_t i_alpha;
-    int16_t i_drop_shadow;
-    int16_t i_drop_shadow_alpha;
+    text_style_t *p_default_style; /* decoder (full or partial) defaults */
 };
 
 static int SubpictureTextValidate(subpicture_t *subpic,
@@ -101,42 +88,20 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->i_y = sys->y * fmt_dst->i_height / sys->fixed_height;
     }
 
-    if (sys->i_font_height_percent || sys->i_alpha ||
-        sys->style_flags.b_set ||
-        sys->font_color.b_set ||
-        sys->background_color.b_set )
+    /* Add missing default style, if any, to all segments */
+    for ( text_segment_t* p_segment = sys->p_segments; p_segment; p_segment = p_segment->p_next )
     {
-        //FIXME: Is this used for something else than tx3g?
-        for ( text_segment_t* p_segment = sys->p_segments; p_segment; p_segment = p_segment->p_next )
+        /* Add decoder defaults */
+        if( p_segment->style )
+            text_style_Merge( p_segment->style, sys->p_default_style, false );
+        else
+            p_segment->style = text_style_Duplicate( sys->p_default_style );
+        /* Update all segments font sizes in pixels, *** metric used by renderers *** */
+        /* We only do this when a fixed font size isn't set */
+        if( p_segment->style->f_font_relsize && !p_segment->style->i_font_size )
         {
-            text_style_t* p_style = p_segment->style;
-            if(!p_style)
-                continue;
-
-            if (sys->i_font_height_abs_to_src)
-                sys->i_font_height_percent = sys->i_font_height_abs_to_src * 100 /
-                                             fmt_src->i_visible_height;
-
-            if (sys->i_font_height_percent)
-            {
-                p_style->i_font_size = sys->i_font_height_percent *
-                                       subpic->i_original_picture_height / 100;
-                p_style->i_font_color = 0xffffff;
-                p_style->i_font_alpha = 0xff;
-            }
-
-            if (sys->style_flags.b_set)
-                p_style->i_style_flags = sys->style_flags.i_value;
-            if (sys->font_color.b_set)
-                p_style->i_font_color = sys->font_color.i_value;
-            if (sys->background_color.b_set)
-                p_style->i_background_color = sys->background_color.i_value;
-            if (sys->i_alpha)
-                p_style->i_font_alpha = sys->i_alpha;
-            if (sys->i_drop_shadow)
-                p_style->i_shadow_width = sys->i_drop_shadow;
-            if (sys->i_drop_shadow_alpha)
-                p_style->i_shadow_alpha = sys->i_drop_shadow_alpha;
+            p_segment->style->i_font_size = p_segment->style->f_font_relsize *
+                                            subpic->i_original_picture_height / 100;
         }
     }
 }
@@ -157,8 +122,18 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
         .pf_destroy  = SubpictureTextDestroy,
         .p_sys       = sys,
     };
+    sys->p_default_style = text_style_New();
+    if(unlikely(!sys->p_default_style))
+    {
+        free(sys);
+        return NULL;
+    }
+    text_style_Reset( sys->p_default_style );
     subpicture_t *subpic = decoder_NewSubpicture(decoder, &updater);
     if (!subpic)
+    {
+        text_style_Delete(sys->p_default_style);
         free(sys);
+    }
     return subpic;
 }

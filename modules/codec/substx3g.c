@@ -317,14 +317,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     tx3g_segment_t *p_segment3g = tx3g_segment_New( psz_subtitle );
     p_segment3g->i_size = str8len( psz_subtitle );
     if ( p_dec->fmt_in.subs.p_style )
-    {
-        p_segment3g->s->style = text_style_New();
-        p_segment3g->s->style->i_font_color = p_dec->fmt_in.subs.p_style->i_font_color;
-        p_segment3g->s->style->i_font_alpha = p_dec->fmt_in.subs.p_style->i_font_alpha;
-        if ( p_dec->fmt_in.subs.p_style->i_style_flags )
-            p_segment3g->s->style->i_style_flags = p_dec->fmt_in.subs.p_style->i_style_flags;
-        p_segment3g->s->style->i_font_size = p_dec->fmt_in.subs.p_style->i_font_size;
-    }
+        p_segment3g->s->style = text_style_Duplicate( p_dec->fmt_in.subs.p_style );
 
     if ( !p_segment3g->s->psz_text )
     {
@@ -367,23 +360,26 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                 uint16_t i_end =  __MIN( GetWBE(p_buf + 2), i_psz_bytelength - 1 );
 
                 text_style_t style;
+                memset( &style, 0, sizeof(text_style_t) );
+                text_style_Reset( &style );
                 style.i_style_flags = ConvertFlags( p_buf[6] );
-                style.i_font_size = p_buf[7];
+                style.f_font_relsize = p_buf[7] * 5 / 100; /* in % units of 0.05 height */
                 style.i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> RGB
                 style.i_font_alpha = GetDWBE(p_buf+8) & 0xFF;
+                style.i_features = STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
                 ApplySegmentStyle( &p_segment3g, i_start, i_end, &style );
 
                 if ( i_nbrecords == 1 )
                 {
                     if ( p_buf[6] )
                     {
-                        p_spu_sys->style_flags.i_value = ConvertFlags( p_buf[6] );
-                        p_spu_sys->style_flags.b_set = true;
+                        if( (p_spu_sys->p_default_style->i_style_flags = ConvertFlags( p_buf[6] )) )
+                            p_spu_sys->p_default_style->i_features |= STYLE_HAS_FLAGS;
                     }
-                    p_spu_sys->i_font_height_abs_to_src = p_buf[7];
-                    p_spu_sys->font_color.i_value = GetDWBE(p_buf+8) >> 8;// RGBA -> ARGB
-                    p_spu_sys->font_color.i_value |= (GetDWBE(p_buf+8) & 0xFF) << 24;
-                    p_spu_sys->font_color.b_set = true;
+                    p_spu_sys->p_default_style->f_font_relsize = p_buf[7] * 5 / 100;
+                    p_spu_sys->p_default_style->i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> ARGB
+                    p_spu_sys->p_default_style->i_font_alpha = (GetDWBE(p_buf+8) & 0xFF) << 24;
+                    p_spu_sys->p_default_style->i_features |= (STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA);
                 }
 
                 p_buf += 12;
@@ -392,12 +388,13 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
         case VLC_FOURCC('d','r','p','o'):
             if ( (size_t)(p_buf - p_block->p_buffer) < 4 ) break;
-            p_spu_sys->i_drop_shadow = __MAX( GetWBE(p_buf), GetWBE(p_buf+2) );
+            p_spu_sys->p_default_style->i_shadow_width = __MAX( GetWBE(p_buf), GetWBE(p_buf+2) );
             break;
 
         case VLC_FOURCC('d','r','p','t'):
             if ( (size_t)(p_buf - p_block->p_buffer) < 2 ) break;
-            p_spu_sys->i_drop_shadow_alpha = GetWBE(p_buf);
+            p_spu_sys->p_default_style->i_shadow_alpha = GetWBE(p_buf);
+            p_spu_sys->p_default_style->i_features |= STYLE_HAS_SHADOW_ALPHA;
             break;
 
         default:

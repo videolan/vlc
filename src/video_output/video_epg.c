@@ -131,11 +131,13 @@ static subpicture_region_t * vout_OSDEpgText(const char *text,
         subpicture_region_Delete( region );
         return NULL;
     }
+    text_style_Reset( p_style );
     region->p_text->style = p_style;
     if (p_style) {
-        p_style->i_font_size  = size;
+        p_style->f_font_relsize  = __MIN( size, 0 );
         p_style->i_font_color = color;
         p_style->i_font_alpha = 0;
+        p_style->i_features |= STYLE_HAS_FONT_ALPHA | STYLE_HAS_FONT_COLOR;
     }
 
     return region;

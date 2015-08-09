@@ -192,8 +192,17 @@ static int CreateFilter( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    vlc_mutex_init( &p_sys->lock );
     p_sys->p_style = text_style_New();
+    if(likely(p_sys->p_style))
+    {
+        text_style_Reset( p_sys->p_style );
+    }
+    else
+    {
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+    vlc_mutex_init( &p_sys->lock );
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
@@ -216,7 +225,9 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_style->i_font_alpha = var_CreateGetIntegerCommand( p_filter,
                                                             "marq-opacity" );
     var_AddCallback( p_filter, "marq-opacity", MarqueeCallback, p_sys );
+    p_sys->p_style->i_features |= STYLE_HAS_FONT_ALPHA;
     CREATE_VAR( p_style->i_font_color, Integer, "marq-color" );
+    p_sys->p_style->i_features |= STYLE_HAS_FONT_COLOR;
     CREATE_VAR( p_style->i_font_size, Integer, "marq-size" );
 
     /* Misc init */
@@ -330,9 +341,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->p_region->i_x = p_sys->i_xoff;
     p_spu->p_region->i_y = p_sys->i_yoff;
 
-    //FIXME: Provide a way to force a default style to a list of segments
-#warning Missing style
-    //p_spu->p_region->p_style = text_style_Duplicate( p_sys->p_style );
+    p_spu->p_region->p_text->style = text_style_Duplicate( p_sys->p_style );
 
 out:
     vlc_mutex_unlock( &p_sys->lock );

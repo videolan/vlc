@@ -876,9 +876,20 @@ struct  style_stack
     style_stack_t* p_next;
 };
 
+static text_style_t *CreateDefaultStyle()
+{
+    text_style_t *p_style = text_style_New();
+    if( p_style )
+    {
+        text_style_Reset( p_style );
+        p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE;
+    }
+    return p_style;
+}
+
 static text_style_t* DuplicateAndPushStyle(style_stack_t** pp_stack)
 {
-    text_style_t* p_dup = *pp_stack ? text_style_Duplicate( (*pp_stack)->p_style ) : text_style_New();
+    text_style_t* p_dup = ( *pp_stack ) ? text_style_Duplicate( (*pp_stack)->p_style ) : CreateDefaultStyle();
     if ( unlikely( !p_dup ) )
         return NULL;
     style_stack_t* p_entry = malloc( sizeof( *p_entry ) );
@@ -923,7 +934,7 @@ static text_segment_t* NewTextSegmentPopStyle( text_segment_t* p_segment, style_
     // We shouldn't have an empty stack since this happens when closing a tag,
     // but better be safe than sorry if (/when) we encounter a broken subtitle file.
     PopStyle( pp_stack );
-    text_style_t* p_dup = *pp_stack ? text_style_Duplicate( (*pp_stack)->p_style ) : text_style_New();
+    text_style_t* p_dup = ( *pp_stack ) ? text_style_Duplicate( (*pp_stack)->p_style ) : CreateDefaultStyle();
     p_new->style = p_dup;
     p_segment->p_next = p_new;
     return p_new;
@@ -958,21 +969,25 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                 {
                     p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
                     p_segment->style->i_style_flags |= STYLE_BOLD;
+                    p_segment->style->i_features |= STYLE_HAS_FLAGS;
                 }
                 else if( !strcasecmp( psz_tagname, "i" ) )
                 {
                     p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
                     p_segment->style->i_style_flags |= STYLE_ITALIC;
+                    p_segment->style->i_features |= STYLE_HAS_FLAGS;
                 }
                 else if( !strcasecmp( psz_tagname, "u" ) )
                 {
                     p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
                     p_segment->style->i_style_flags |= STYLE_UNDERLINE;
+                    p_segment->style->i_features |= STYLE_HAS_FLAGS;
                 }
                 else if( !strcasecmp( psz_tagname, "s" ) )
                 {
                     p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
                     p_segment->style->i_style_flags |= STYLE_STRIKEOUT;
+                    p_segment->style->i_features |= STYLE_HAS_FLAGS;
                 }
                 else if( !strcasecmp( psz_tagname, "font" ) )
                 {
@@ -997,18 +1012,23 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                         else if ( !strcasecmp( psz_attribute_name, "size" ) )
                         {
                             p_segment->style->i_font_size = atoi( psz_attribute_value );
+                            p_segment->style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE *
+                                    STYLE_DEFAULT_FONT_SIZE / p_segment->style->i_font_size;
                         }
                         else if ( !strcasecmp( psz_attribute_name, "color" ) )
                         {
                             p_segment->style->i_font_color = GetColor( psz_attribute_value );
+                            p_segment->style->i_features |= STYLE_HAS_FONT_COLOR;
                         }
                         else if ( !strcasecmp( psz_attribute_name, "outline-color" ) )
                         {
                             p_segment->style->i_outline_color = GetColor( psz_attribute_value );
+                            p_segment->style->i_features |= STYLE_HAS_OUTLINE_COLOR;
                         }
                         else if ( !strcasecmp( psz_attribute_name, "shadow-color" ) )
                         {
                             p_segment->style->i_shadow_color = GetColor( psz_attribute_value );
+                            p_segment->style->i_features |= STYLE_HAS_SHADOW_COLOR;
                         }
                         else if ( !strcasecmp( psz_attribute_name, "outline-level" ) )
                         {
@@ -1021,10 +1041,12 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                         else if ( !strcasecmp( psz_attribute_name, "back-color" ) )
                         {
                             p_segment->style->i_background_color = GetColor( psz_attribute_value );
+                            p_segment->style->i_features |= STYLE_HAS_BACKGROUND_COLOR;
                         }
                         else if ( !strcasecmp( psz_attribute_name, "alpha" ) )
                         {
                             p_segment->style->i_font_alpha = atoi( psz_attribute_value );
+                            p_segment->style->i_features |= STYLE_HAS_FONT_ALPHA;
                         }
 
                         free( psz_attribute_name );
@@ -1127,18 +1149,21 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
             {
                 p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
                 p_segment->style->i_style_flags |= STYLE_ITALIC;
+                p_segment->style->i_features |= STYLE_HAS_FLAGS;
                 psz_subtitle++;
             }
             if( psz_subtitle[3] == 'b' )
             {
                 p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
                 p_segment->style->i_style_flags |= STYLE_BOLD;
+                p_segment->style->i_features |= STYLE_HAS_FLAGS;
                 psz_subtitle++;
             }
             if( psz_subtitle[3] == 'u' )
             {
                 p_segment = NewTextSegmentPushStyle( p_segment, &p_stack );
                 p_segment->style->i_style_flags |= STYLE_UNDERLINE;
+                p_segment->style->i_features |= STYLE_HAS_FLAGS;
                 psz_subtitle++;
             }
             psz_subtitle = strchr( psz_subtitle, '}' ) + 1;

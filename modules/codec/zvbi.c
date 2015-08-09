@@ -444,7 +444,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         p_spu_sys->p_segments = text_segment_New( &p_text[offset] );
 
         p_spu_sys->align = i_align;
-        p_spu_sys->i_font_height_percent = 5;
         p_spu_sys->renderbg = b_opaque;
 
 #ifdef ZVBI_DEBUG

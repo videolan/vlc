@@ -121,6 +121,59 @@ typedef enum
     EIA608_STATUS_DISPLAY         = EIA608_STATUS_CAPTION_CLEARED | EIA608_STATUS_CAPTION_ENDED,
 } eia608_status_t;
 
+static const struct {
+    eia608_color_t  i_color;
+    eia608_font_t   i_font;
+    int             i_column;
+} pac2_attribs[]= {
+    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,           0 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,         0 },
+    { EIA608_COLOR_GREEN,   EIA608_FONT_REGULAR,           0 },
+    { EIA608_COLOR_GREEN,   EIA608_FONT_UNDERLINE,         0 },
+    { EIA608_COLOR_BLUE,    EIA608_FONT_REGULAR,           0 },
+    { EIA608_COLOR_BLUE,    EIA608_FONT_UNDERLINE,         0 },
+    { EIA608_COLOR_CYAN,    EIA608_FONT_REGULAR,           0 },
+    { EIA608_COLOR_CYAN,    EIA608_FONT_UNDERLINE,         0 },
+    { EIA608_COLOR_RED,     EIA608_FONT_REGULAR,           0 },
+    { EIA608_COLOR_RED,     EIA608_FONT_UNDERLINE,         0 },
+    { EIA608_COLOR_YELLOW,  EIA608_FONT_REGULAR,           0 },
+    { EIA608_COLOR_YELLOW,  EIA608_FONT_UNDERLINE,         0 },
+    { EIA608_COLOR_MAGENTA, EIA608_FONT_REGULAR,           0 },
+    { EIA608_COLOR_MAGENTA, EIA608_FONT_UNDERLINE,         0 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_ITALICS,           0 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE_ITALICS, 0 },
+
+    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,           0 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,         0 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,           4 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,         4 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,           8 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,         8 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          12 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        12 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          16 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        16 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          20 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        20 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          24 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        24 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          28 },
+    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        28 } ,
+};
+
+#define EIA608_COLOR_DEFAULT EIA608_COLOR_WHITE
+
+static const int rgi_eia608_colors[] = {
+    0xffffff,  // white
+    0x00ff00,  // green
+    0x0000ff,  // blue
+    0x00ffff,  // cyan
+    0xff0000,  // red
+    0xffff00,  // yellow
+    0xff00ff,  // magenta
+    0xffffff,  // user defined XXX we use white
+};
+
 typedef struct
 {
     /* Current channel (used to reject packet without channel information) */
@@ -371,8 +424,12 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
        region itself gets aligned, but the text inside it does not */
     p_spu_sys->align = SUBPICTURE_ALIGN_LEAVETEXT;
     p_spu_sys->p_segments = p_segments;
-    p_spu_sys->i_font_height_percent = 5;
     p_spu_sys->renderbg = p_dec->p_sys->b_opaque;
+    /* Set style defaults (will be added to segments if none set) */
+    p_spu_sys->p_default_style->i_style_flags |= STYLE_MONOSPACED;
+    p_spu_sys->p_default_style->i_font_color = rgi_eia608_colors[EIA608_COLOR_DEFAULT];
+    p_spu_sys->p_default_style->f_font_relsize = 80.0 / EIA608_SCREEN_ROWS;
+    p_spu_sys->p_default_style->i_features |= (STYLE_HAS_FONT_COLOR | STYLE_HAS_FLAGS);
 
     return p_spu;
 }
@@ -428,48 +485,6 @@ static subpicture_t *Convert( decoder_t *p_dec, block_t **pp_block )
 /*****************************************************************************
  *
  *****************************************************************************/
-static const struct {
-    eia608_color_t  i_color;
-    eia608_font_t   i_font;
-    int             i_column;
-} pac2_attribs[]= {
-    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,           0 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,         0 },
-    { EIA608_COLOR_GREEN,   EIA608_FONT_REGULAR,           0 },
-    { EIA608_COLOR_GREEN,   EIA608_FONT_UNDERLINE,         0 },
-    { EIA608_COLOR_BLUE,    EIA608_FONT_REGULAR,           0 },
-    { EIA608_COLOR_BLUE,    EIA608_FONT_UNDERLINE,         0 },
-    { EIA608_COLOR_CYAN,    EIA608_FONT_REGULAR,           0 },
-    { EIA608_COLOR_CYAN,    EIA608_FONT_UNDERLINE,         0 },
-    { EIA608_COLOR_RED,     EIA608_FONT_REGULAR,           0 },
-    { EIA608_COLOR_RED,     EIA608_FONT_UNDERLINE,         0 },
-    { EIA608_COLOR_YELLOW,  EIA608_FONT_REGULAR,           0 },
-    { EIA608_COLOR_YELLOW,  EIA608_FONT_UNDERLINE,         0 },
-    { EIA608_COLOR_MAGENTA, EIA608_FONT_REGULAR,           0 },
-    { EIA608_COLOR_MAGENTA, EIA608_FONT_UNDERLINE,         0 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_ITALICS,           0 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE_ITALICS, 0 },
-
-    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,           0 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,         0 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,           4 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,         4 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,           8 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,         8 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          12 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        12 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          16 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        16 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          20 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        20 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          24 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        24 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_REGULAR,          28 },
-    { EIA608_COLOR_WHITE,   EIA608_FONT_UNDERLINE,        28 } ,
-};
-
-#define EIA608_COLOR_DEFAULT EIA608_COLOR_WHITE
-
 static void Eia608Cursor( eia608_t *h, int dx )
 {
     h->cursor.i_column += dx;
@@ -1004,6 +1019,7 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
         text_segment_Delete(p_segment);
         return NULL;
     }
+    text_style_Reset( p_segment->style );
     /* Ensure we get a monospaced font (required for accurate positioning */
     p_segment->style->i_style_flags |= STYLE_MONOSPACED;
 
@@ -1046,27 +1062,25 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
                 text_segment_Delete(p_segment);
                 return p_segments_head;
             }
+            text_style_Reset( p_segment->style );
             p_segment->style->i_style_flags |= STYLE_MONOSPACED;
 
             /* start segment with new style */
             if(font & EIA608_FONT_ITALICS)
+            {
                 p_segment->style->i_style_flags |= STYLE_ITALIC;
+                p_segment->style->i_features |= STYLE_HAS_FLAGS;
+            }
             if(font & EIA608_FONT_UNDERLINE)
+            {
                 p_segment->style->i_style_flags |= STYLE_UNDERLINE;
+                p_segment->style->i_features |= STYLE_HAS_FLAGS;
+            }
 
             if(color != EIA608_COLOR_DEFAULT)
             {
-                static const int rgi_colors[] = {
-                    0xffffff,  // white
-                    0x00ff00,  // green
-                    0x0000ff,  // blue
-                    0x00ffff,  // cyan
-                    0xff0000,  // red
-                    0xffff00,  // yellow
-                    0xff00ff,  // magenta
-                    0xffffff,  // user defined XXX we use white
-                };
-                p_segment->style->i_font_color = rgi_colors[color];
+                p_segment->style->i_font_color = rgi_eia608_colors[color];
+                p_segment->style->i_features |= STYLE_HAS_FONT_COLOR;
             }
         }
 
