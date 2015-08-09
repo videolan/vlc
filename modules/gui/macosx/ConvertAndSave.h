@@ -22,10 +22,11 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import "SharedDialogs.h"
 
 @class VLCDropDisabledImageView;
 @class VLCDragDropView;
+@class VLCPopupPanelController;
+@class VLCTextfieldPanelController;
 
 @interface VLCConvertAndSave : NSWindowController
 
@@ -127,6 +128,10 @@
 @property (weak) IBOutlet NSButton *streamOkButton;
 
 // other properties
+@property (strong) VLCPopupPanelController *popupPanel;
+@property (strong) VLCTextfieldPanelController *textfieldPanel;
+
+
 @property (readwrite, nonatomic, retain) NSString * MRL;
 @property (readwrite, nonatomic, retain) NSString * outputDestination;
 @property (readwrite, retain) NSArray * profileNames;
@@ -161,7 +166,7 @@
 - (IBAction)streamAnnouncementToggle:(id)sender;
 - (IBAction)sdpFileLocationSelector:(id)sender;
 
-- (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text;
-- (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item;
+- (void)panel:(VLCTextfieldPanelController *)panel returnValue:(NSUInteger)value text:(NSString *)text;
+- (void)panel:(VLCPopupPanelController *)panel returnValue:(NSUInteger)value item:(NSUInteger)item;
 
 @end

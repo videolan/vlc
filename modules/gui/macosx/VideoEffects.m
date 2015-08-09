@@ -50,6 +50,9 @@
     self = [super initWithWindowNibName:@"VideoEffects"];
     if (self) {
         i_old_profile_index = -1;
+
+        self.popupPanel = [[VLCPopupPanelController alloc] init];
+        self.textfieldPanel = [[VLCTextfieldPanelController alloc] init];
     }
 
     return self;
@@ -666,17 +669,16 @@
 - (void)addProfile:(id)sender
 {
     /* show panel */
-    VLCEnterTextPanel * panel = [VLCEnterTextPanel sharedInstance];
-    [panel setTitle: _NS("Duplicate current profile for a new profile")];
-    [panel setSubTitle: _NS("Enter a name for the new profile:")];
-    [panel setCancelButtonLabel: _NS("Cancel")];
-    [panel setOKButtonLabel: _NS("Save")];
-    [panel setTarget:self];
+    [_textfieldPanel setTitle: _NS("Duplicate current profile for a new profile")];
+    [_textfieldPanel setSubTitle: _NS("Enter a name for the new profile:")];
+    [_textfieldPanel setCancelButtonLabel: _NS("Cancel")];
+    [_textfieldPanel setOKButtonLabel: _NS("Save")];
+    [_textfieldPanel setTarget:self];
 
-    [panel runModalForWindow:self.window];
+    [_textfieldPanel runModalForWindow:self.window];
 }
 
-- (void)panel:(VLCEnterTextPanel *)panel returnValue:(NSUInteger)value text:(NSString *)text
+- (void)panel:(VLCTextfieldPanelController *)panel returnValue:(NSUInteger)value text:(NSString *)text
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
@@ -727,18 +729,17 @@
 - (void)removeProfile:(id)sender
 {
     /* show panel */
-    VLCSelectItemInPopupPanel * panel = [VLCSelectItemInPopupPanel sharedInstance];
-    [panel setTitle:_NS("Remove a preset")];
-    [panel setSubTitle:_NS("Select the preset you would like to remove:")];
-    [panel setOKButtonLabel:_NS("Remove")];
-    [panel setCancelButtonLabel:_NS("Cancel")];
-    [panel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"VideoEffectProfileNames"]];
-    [panel setTarget:self];
+    [_popupPanel setTitle:_NS("Remove a preset")];
+    [_popupPanel setSubTitle:_NS("Select the preset you would like to remove:")];
+    [_popupPanel setOKButtonLabel:_NS("Remove")];
+    [_popupPanel setCancelButtonLabel:_NS("Cancel")];
+    [_popupPanel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"VideoEffectProfileNames"]];
+    [_popupPanel setTarget:self];
 
-    [panel runModalForWindow:self.window];
+    [_popupPanel runModalForWindow:self.window];
 }
 
-- (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item
+- (void)panel:(VLCPopupPanelController *)panel returnValue:(NSUInteger)value item:(NSUInteger)item
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 

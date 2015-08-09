@@ -23,6 +23,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class VLCPopupPanelController;
+@class VLCTextfieldPanelController;
+
 @interface VLCVideoEffects : NSWindowController
 
 /* generic */
@@ -140,6 +143,9 @@
 @property (readwrite, weak) IBOutlet NSTextField *addLogoTransparencyLabel;
 @property (readwrite, weak) IBOutlet NSSlider *addLogoTransparencySlider;
 @property (readwrite, weak) IBOutlet NSButton *anaglyphCheckbox;
+
+@property (strong) VLCPopupPanelController *popupPanel;
+@property (strong) VLCTextfieldPanelController *textfieldPanel;
 
 /* text field / stepper binding values */
 /* use setter to modify gui elements */

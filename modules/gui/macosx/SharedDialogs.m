@@ -23,27 +23,24 @@
 
 #import "SharedDialogs.h"
 
-@implementation VLCEnterTextPanel
-+ (VLCEnterTextPanel *)sharedInstance
+@implementation VLCTextfieldPanelController
+
+
+- (id)init
 {
-    static VLCEnterTextPanel *sharedInstance = nil;
-    static dispatch_once_t pred;
+    self = [super initWithWindowNibName:@"TextfieldPanel"];
 
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCEnterTextPanel new];
-    });
-
-    return sharedInstance;
+    return self;
 }
 
 - (IBAction)windowElementAction:(id)sender
 {
-    [_panel orderOut:sender];
-    [NSApp endSheet: _panel];
+    [self.window orderOut:sender];
+    [NSApp endSheet: self.window];
 
     if (self.target) {
         if ([self.target respondsToSelector:@selector(panel:returnValue:text:)]) {
-            if (sender == _cancel_btn)
+            if (sender == _cancelButton)
                 [self.target panel:self returnValue:NSCancelButton text:NULL];
             else
                 [self.target panel:self returnValue:NSOKButton text:self.enteredText];
@@ -53,44 +50,41 @@
 
 - (void)runModalForWindow:(NSWindow *)window
 {
-    [_title_lbl setStringValue:self.title];
-    [_subtitle_lbl setStringValue:self.subTitle];
-    [_cancel_btn setTitle:self.CancelButtonLabel];
-    [_ok_btn setTitle:self.OKButtonLabel];
-    [_text_fld setStringValue:@""];
+    [self window];
 
-    [NSApp beginSheet:_panel modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [_titleLabel setStringValue:self.title];
+    [_subtitleLabel setStringValue:self.subTitle];
+    [_cancelButton setTitle:self.CancelButtonLabel];
+    [_okButton setTitle:self.OKButtonLabel];
+    [_textField setStringValue:@""];
+
+    [NSApp beginSheet:self.window modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
 - (NSString *)enteredText
 {
-    return [_text_fld stringValue];
+    return [_textField stringValue];
 }
 
 @end
 
-@implementation VLCSelectItemInPopupPanel
+@implementation VLCPopupPanelController
 
-+ (VLCSelectItemInPopupPanel *)sharedInstance
+- (id)init
 {
-    static VLCSelectItemInPopupPanel *sharedInstance = nil;
-    static dispatch_once_t pred;
+    self = [super initWithWindowNibName:@"PopupPanel"];
 
-    dispatch_once(&pred, ^{
-        sharedInstance = [VLCSelectItemInPopupPanel new];
-    });
-
-    return sharedInstance;
+    return self;
 }
 
 - (IBAction)windowElementAction:(id)sender
 {
-    [_panel orderOut:sender];
-    [NSApp endSheet: _panel];
+    [self.window orderOut:sender];
+    [NSApp endSheet: self.window];
 
     if (self.target) {
         if ([self.target respondsToSelector:@selector(panel:returnValue:item:)]) {
-            if (sender == _cancel_btn)
+            if (sender == _cancelButton)
                 [self.target panel:self returnValue:NSCancelButton item:0];
             else
                 [self.target panel:self returnValue:NSOKButton item:self.currentItem];
@@ -100,18 +94,22 @@
 
 - (void)runModalForWindow:(NSWindow *)window
 {
-    [_title_lbl setStringValue:self.title];
-    [_subtitle_lbl setStringValue:self.subTitle];
-    [_cancel_btn setTitle:self.CancelButtonLabel];
-    [_ok_btn setTitle:self.OKButtonLabel];
-    [_pop removeAllItems];
-    [_pop addItemsWithTitles:self.popupButtonContent];
-    [NSApp beginSheet:_panel modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [self window];
+
+    [_titleLabel setStringValue:self.title];
+    [_subtitleLabel setStringValue:self.subTitle];
+    [_cancelButton setTitle:self.CancelButtonLabel];
+    [_okButton setTitle:self.OKButtonLabel];
+    [_popupButton removeAllItems];
+    for (NSString *value in self.popupButtonContent)
+        [[_popupButton menu] addItemWithTitle:value action:nil keyEquivalent:@""];
+
+    [NSApp beginSheet:self.window modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
 - (NSUInteger)currentItem
 {
-    return [_pop indexOfSelectedItem];
+    return [_popupButton indexOfSelectedItem];
 }
 
 @end

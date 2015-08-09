@@ -24,6 +24,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class VLCPopupPanelController;
+@class VLCTextfieldPanelController;
+
 @interface VLCAudioEffects : NSWindowController
 
 /* generic */
@@ -100,6 +103,9 @@
 @property (readwrite, weak) IBOutlet NSSlider *filterNormLevelSlider;
 @property (readwrite, weak) IBOutlet NSTextField *filterNormLevelLabel;
 @property (readwrite, weak) IBOutlet NSButton *filterKaraokeCheckbox;
+
+@property (strong) VLCPopupPanelController *popupPanel;
+@property (strong) VLCTextfieldPanelController *textfieldPanel;
 
 /* generic */
 - (IBAction)profileSelectorAction:(id)sender;

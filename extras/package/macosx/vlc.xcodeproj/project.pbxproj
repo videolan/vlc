@@ -359,6 +359,8 @@
 		1C88BCC119DC7CB300645190 /* ys-fs_volume_slider_knob@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8B19DC7CB300645190 /* ys-fs_volume_slider_knob@2x.png */; };
 		1C88BCC219DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8C19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png */; };
 		1C88BCC319DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BC8D19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png */; };
+		1C94659B1B77B9FC007C965A /* PopupPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C9465971B77B9FC007C965A /* PopupPanel.xib */; };
+		1C94659C1B77B9FC007C965A /* TextfieldPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C9465991B77B9FC007C965A /* TextfieldPanel.xib */; };
 		1CBB2CC81B06A6DE00110ADA /* Help.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1CBB2CC61B06A6DE00110ADA /* Help.xib */; };
 		1CC25CA81B2C585D0003F994 /* darwinvlc.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CC25CA71B2C585D0003F994 /* darwinvlc.m */; };
 		1CCB5F511A62A724004C3E90 /* about.h in Sources */ = {isa = PBXBuildFile; fileRef = 8EE1AF9F044465080059A3A7 /* about.h */; };
@@ -681,7 +683,6 @@
 		CC402F430E00ABBB006A4BA4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC1941240B9C1F8400635F6B /* QTKit.framework */; };
 		CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
 		CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
-		CC461F75160084A10022423C /* SharedDialogs.xib in Resources */ = {isa = PBXBuildFile; fileRef = CC461F73160084A10022423C /* SharedDialogs.xib */; };
 		CC4EFC2D13E96BD00091D19A /* dropzone.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4EFC2C13E96BD00091D19A /* dropzone.png */; };
 		CC68B0331544C1AE00FD9C7F /* vlc-xmas.png in Resources */ = {isa = PBXBuildFile; fileRef = CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */; };
 		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
@@ -1213,6 +1214,8 @@
 		1C88BC8B19DC7CB300645190 /* ys-fs_volume_slider_knob@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob@2x.png"; sourceTree = "<group>"; };
 		1C88BC8C19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob_highlight.png"; sourceTree = "<group>"; };
 		1C88BC8D19DC7CB300645190 /* ys-fs_volume_slider_knob_highlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ys-fs_volume_slider_knob_highlight@2x.png"; sourceTree = "<group>"; };
+		1C9465981B77B9FC007C965A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/PopupPanel.xib; sourceTree = "<group>"; };
+		1C94659A1B77B9FC007C965A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/TextfieldPanel.xib; sourceTree = "<group>"; };
 		1CBB2CC71B06A6DE00110ADA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Help.xib; sourceTree = "<group>"; };
 		1CC25CA71B2C585D0003F994 /* darwinvlc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = darwinvlc.m; path = ../../../bin/darwinvlc.m; sourceTree = "<group>"; };
 		1CCB5F2F1A62A6A5004C3E90 /* pseudo-vlc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "pseudo-vlc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1419,8 +1422,8 @@
 		CC0586B714ACF7C000659A99 /* sidebar-pictures.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-pictures.png"; path = "Resources/sidebar-icons/sidebar-pictures.png"; sourceTree = "<group>"; };
 		CC0586B814ACF7C000659A99 /* sidebar-playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-playlist.png"; path = "Resources/sidebar-icons/sidebar-playlist.png"; sourceTree = "<group>"; };
 		CC0586B914ACF7C000659A99 /* sidebar-podcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "sidebar-podcast.png"; path = "Resources/sidebar-icons/sidebar-podcast.png"; sourceTree = "<group>"; };
-		CC0663341566C34C003A411C /* ConvertAndSave.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConvertAndSave.h; path = ../../../modules/gui/macosx/ConvertAndSave.h; sourceTree = SOURCE_ROOT; };
-		CC0663351566C34C003A411C /* ConvertAndSave.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConvertAndSave.m; path = ../../../modules/gui/macosx/ConvertAndSave.m; sourceTree = SOURCE_ROOT; };
+		CC0663341566C34C003A411C /* ConvertAndSave.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ConvertAndSave.h; path = ../../../modules/gui/macosx/ConvertAndSave.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		CC0663351566C34C003A411C /* ConvertAndSave.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = ConvertAndSave.m; path = ../../../modules/gui/macosx/ConvertAndSave.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CC0663381566CD5A003A411C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/ConvertAndSave.xib; sourceTree = "<group>"; };
 		CC0CD0DF13DE0EAE00B0D90D /* PXSourceList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PXSourceList.h; path = ../../../modules/gui/macosx/PXSourceList.h; sourceTree = SOURCE_ROOT; };
 		CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PXSourceList.m; path = ../../../modules/gui/macosx/PXSourceList.m; sourceTree = SOURCE_ROOT; };
@@ -1516,15 +1519,14 @@
 		CC448A6113B68A0B009F72E0 /* CoreInteraction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CoreInteraction.m; path = ../../../modules/gui/macosx/CoreInteraction.m; sourceTree = SOURCE_ROOT; };
 		CC448A6213B68A0B009F72E0 /* MainWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindow.h; path = ../../../modules/gui/macosx/MainWindow.h; sourceTree = SOURCE_ROOT; };
 		CC448A6313B68A0B009F72E0 /* MainWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MainWindow.m; path = ../../../modules/gui/macosx/MainWindow.m; sourceTree = SOURCE_ROOT; };
-		CC461F6C160078340022423C /* SharedDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SharedDialogs.h; path = ../../../modules/gui/macosx/SharedDialogs.h; sourceTree = SOURCE_ROOT; };
+		CC461F6C160078340022423C /* SharedDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = SharedDialogs.h; path = ../../../modules/gui/macosx/SharedDialogs.h; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		CC461F6D160078340022423C /* SharedDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SharedDialogs.m; path = ../../../modules/gui/macosx/SharedDialogs.m; sourceTree = SOURCE_ROOT; };
-		CC461F74160084A10022423C /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/SharedDialogs.xib; sourceTree = "<group>"; };
 		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
 		CC4A33220F8CB017000FC4A7 /* coredialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coredialogs.h; path = ../../../modules/gui/macosx/coredialogs.h; sourceTree = SOURCE_ROOT; };
 		CC4D67F71348F601003FCC5B /* specific.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
 		CC4EFC2C13E96BD00091D19A /* dropzone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = dropzone.png; path = Resources/mainwindow/dropzone.png; sourceTree = "<group>"; };
 		CC5560231365CDC700D54038 /* AudioEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioEffects.h; path = ../../../modules/gui/macosx/AudioEffects.h; sourceTree = SOURCE_ROOT; };
-		CC5560241365CDC800D54038 /* AudioEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AudioEffects.m; path = ../../../modules/gui/macosx/AudioEffects.m; sourceTree = SOURCE_ROOT; };
+		CC5560241365CDC800D54038 /* AudioEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = AudioEffects.m; path = ../../../modules/gui/macosx/AudioEffects.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CC68B0321544C1AE00FD9C7F /* vlc-xmas.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "vlc-xmas.png"; path = "Resources/icons/vlc-xmas.png"; sourceTree = "<group>"; };
 		CC6C01A90DDF3E9200C7D754 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/minimal_macosx/intf.h; sourceTree = SOURCE_ROOT; };
 		CC6C01AA0DDF3E9200C7D754 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/minimal_macosx/intf.m; sourceTree = SOURCE_ROOT; };
@@ -1699,7 +1701,7 @@
 		CCCDDEEF13E870BB00A35661 /* SideBarItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SideBarItem.h; path = ../../../modules/gui/macosx/SideBarItem.h; sourceTree = SOURCE_ROOT; };
 		CCCDDEF013E870BB00A35661 /* SideBarItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SideBarItem.m; path = ../../../modules/gui/macosx/SideBarItem.m; sourceTree = SOURCE_ROOT; };
 		CCCE366D13817E4500694F2A /* VideoEffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VideoEffects.h; path = ../../../modules/gui/macosx/VideoEffects.h; sourceTree = SOURCE_ROOT; };
-		CCCE366E13817E4500694F2A /* VideoEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VideoEffects.m; path = ../../../modules/gui/macosx/VideoEffects.m; sourceTree = SOURCE_ROOT; };
+		CCCE366E13817E4500694F2A /* VideoEffects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = VideoEffects.m; path = ../../../modules/gui/macosx/VideoEffects.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		CCD590F010E5B73200D39094 /* dialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dialogProvider.h; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.h; sourceTree = SOURCE_ROOT; };
 		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
 		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
@@ -2897,7 +2899,8 @@
 				CCD83E2B13FE9B90004F1652 /* MainMenu.xib */,
 				CC0663371566CD5A003A411C /* ConvertAndSave.xib */,
 				633121CE1B5112C300E636DA /* ResumeDialog.xib */,
-				CC461F73160084A10022423C /* SharedDialogs.xib */,
+				1C9465971B77B9FC007C965A /* PopupPanel.xib */,
+				1C9465991B77B9FC007C965A /* TextfieldPanel.xib */,
 				7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */,
 				7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */,
 				7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */,
@@ -3400,6 +3403,7 @@
 				1C88BC3219DC7C8100645190 /* ys-repeat-all-blue-pressed_dark@2x.png in Resources */,
 				1C88BB1119DC7C7800645190 /* ys-bottom-background@2x.png in Resources */,
 				1C88BA7319DC7B2200645190 /* yosemite-window-minimize-over-graphite@2x.png in Resources */,
+				1C94659C1B77B9FC007C965A /* TextfieldPanel.xib in Resources */,
 				1C88BBF919DC7C8100645190 /* ys-effects-one-button_dark.png in Resources */,
 				1C88BA5519DC7B2200645190 /* yosemite-window-close-graphite@2x.png in Resources */,
 				1C88BC3D19DC7C8100645190 /* ys-shuffle-blue-pressed_dark.png in Resources */,
@@ -3416,6 +3420,7 @@
 				1C88BA6619DC7B2200645190 /* yosemite-window-fullscreen-over-graphite.png in Resources */,
 				1C88BC2319DC7C8100645190 /* ys-progressbar-fill-left_dark.png in Resources */,
 				1C88BC0819DC7C8100645190 /* ys-fullscreen-one-button-pressed_dark@2x.png in Resources */,
+				1C94659B1B77B9FC007C965A /* PopupPanel.xib in Resources */,
 				1C88BB2419DC7C7800645190 /* ys-fullscreen-double-buttons-pressed.png in Resources */,
 				1C88BB1719DC7C7800645190 /* ys-effects-double-buttons@2x.png in Resources */,
 				CC206B6014ACFEB8007935C6 /* topbar-dark-center-fill.png in Resources */,
@@ -3777,7 +3782,6 @@
 				CC16700315F5178B0088201B /* forward-6btns-dark.png in Resources */,
 				CC16700415F5178B0088201B /* forward-6btns-dark@2x.png in Resources */,
 				1C88BB1319DC7C7800645190 /* ys-dropzone@2x.png in Resources */,
-				CC461F75160084A10022423C /* SharedDialogs.xib in Resources */,
 				CCE8BAC4160615D9006741FB /* effects-one-button-pressed.png in Resources */,
 				CCE8BAC5160615D9006741FB /* effects-one-button-pressed@2x.png in Resources */,
 				1C88BC3519DC7C8100645190 /* ys-repeat-one-blue-pressed_dark.png in Resources */,
@@ -3942,6 +3946,22 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		1C9465971B77B9FC007C965A /* PopupPanel.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1C9465981B77B9FC007C965A /* English */,
+			);
+			name = PopupPanel.xib;
+			sourceTree = "<group>";
+		};
+		1C9465991B77B9FC007C965A /* TextfieldPanel.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1C94659A1B77B9FC007C965A /* English */,
+			);
+			name = TextfieldPanel.xib;
+			sourceTree = "<group>";
+		};
 		1CBB2CC61B06A6DE00110ADA /* Help.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -4028,14 +4048,6 @@
 				CC0663381566CD5A003A411C /* English */,
 			);
 			name = ConvertAndSave.xib;
-			sourceTree = "<group>";
-		};
-		CC461F73160084A10022423C /* SharedDialogs.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CC461F74160084A10022423C /* English */,
-			);
-			name = SharedDialogs.xib;
 			sourceTree = "<group>";
 		};
 		CCD83E2B13FE9B90004F1652 /* MainMenu.xib */ = {

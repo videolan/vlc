@@ -23,16 +23,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCEnterTextPanel : NSObject
-{
-    IBOutlet id _panel;
-    IBOutlet id _title_lbl;
-    IBOutlet id _subtitle_lbl;
-    IBOutlet id _text_fld;
-    IBOutlet id _cancel_btn;
-    IBOutlet id _ok_btn;
-}
-+ (VLCEnterTextPanel *)sharedInstance;
+@interface VLCTextfieldPanelController : NSWindowController
+
+@property (weak) IBOutlet NSTextField *titleLabel;
+@property (weak) IBOutlet NSTextField *subtitleLabel;
+@property (weak) IBOutlet NSTextField *textField;
+@property (weak) IBOutlet NSButton *cancelButton;
+@property (weak) IBOutlet NSButton *okButton;
 
 @property (readwrite, assign) NSString *title;
 @property (readwrite, assign) NSString *subTitle;
@@ -47,21 +44,18 @@
 
 @end
 
-@protocol VLCEnterTextPanel <NSObject>
+@protocol VLCTextfieldPanelController <NSObject>
 @optional
-- (void)panel:(VLCEnterTextPanel *)view returnValue:(NSUInteger)value text:(NSString *)text;
+- (void)panel:(VLCTextfieldPanelController *)view returnValue:(NSUInteger)value text:(NSString *)text;
 @end
 
-@interface VLCSelectItemInPopupPanel : NSObject
-{
-    IBOutlet id _panel;
-    IBOutlet id _title_lbl;
-    IBOutlet id _subtitle_lbl;
-    IBOutlet id _pop;
-    IBOutlet id _cancel_btn;
-    IBOutlet id _ok_btn;
-}
-+ (VLCSelectItemInPopupPanel *)sharedInstance;
+@interface VLCPopupPanelController : NSWindowController
+
+@property (weak) IBOutlet NSTextField *titleLabel;
+@property (weak) IBOutlet NSTextField *subtitleLabel;
+@property (weak) IBOutlet NSPopUpButton *popupButton;
+@property (weak) IBOutlet NSButton *cancelButton;
+@property (weak) IBOutlet NSButton *okButton;
 
 @property (readwrite, assign) NSString *title;
 @property (readwrite, assign) NSString *subTitle;
@@ -77,7 +71,7 @@
 
 @end
 
-@protocol VLCSelectItemInPopupPanel <NSObject>
+@protocol VLCPopupPanelController <NSObject>
 @optional
-- (void)panel:(VLCSelectItemInPopupPanel *)panel returnValue:(NSUInteger)value item:(NSUInteger)item;
+- (void)panel:(VLCPopupPanelController *)panel returnValue:(NSUInteger)value item:(NSUInteger)item;
 @end
