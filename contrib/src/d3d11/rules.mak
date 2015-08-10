@@ -23,6 +23,8 @@ $(TARBALLS)/d3d11.idl:
 $(TARBALLS)/dxgidebug.idl:
 	(cd $(TARBALLS) && patch -fp1) < $(SRC)/d3d11/dxgidebug.patch
 
+.sum-d3d11: $(TARBALLS)/d3d11.idl $(TARBALLS)/dxgidebug.idl
+
 $(DST_D3D11_H): $(TARBALLS)/d3d11.idl
 	$(WIDL) -DBOOL=WINBOOL -I$(IDL_INC_PATH) -h -o $@ $<
 
