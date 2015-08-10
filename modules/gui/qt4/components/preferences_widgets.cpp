@@ -214,8 +214,8 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
                                           bool pwd ) :
                            VStringConfigControl( _p_this, _p_item )
 {
-    label = new QLabel( qtr(p_item->psz_text), _parent );
-    text = new QLineEdit( qfu(p_item->value.psz), _parent );
+    label = new QLabel( p_item->psz_text ? qtr(p_item->psz_text) : "", _parent );
+    text = new QLineEdit( p_item->value.psz ? qfu(p_item->value.psz) : "", _parent );
     if( pwd ) text->setEchoMode( QLineEdit::Password );
     finish();
 }
