@@ -729,10 +729,9 @@ static inline void RenderBackground( subpicture_region_t *p_region,
         ExtractComponents( 0x000000, &i_x, &i_y, &i_z );
 
         /* Compute the upper boundary for the background */
-        if ((i_align_top + p_line->i_base_line - max_height) < 0 || p_line->i_base_line <= p_line->i_height)
-            line_top = i_align_top + p_line->i_base_line;
-        else
-            line_top = i_align_top + p_line->i_base_line - max_height;
+        line_top = i_align_top + p_line->i_base_line;
+        if( p_line->i_height && p_line->i_height < max_height )
+            line_top += max_height - p_line->i_height;
 
         /* Compute lower boundary for the background */
         line_bottom =  __MIN(line_top + p_line->i_height, p_region->fmt.i_visible_height);
