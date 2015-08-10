@@ -148,7 +148,7 @@ struct filter_sys_t
     "overlay text. 0 = transparent, 255 = totally opaque." )
 
 #define SIZE_TEXT N_("Font size, pixels")
-#define SIZE_LONGTEXT N_("Font size, in pixels. Default is -1 (use default " \
+#define SIZE_LONGTEXT N_("Font size, in pixels. Default is 0 (use default " \
     "font size)." )
 
 #define COLOR_TEXT N_("Color")
@@ -210,8 +210,8 @@ vlc_module_begin ()
     add_rgb( CFG_PREFIX "color", 0xFFFFFF, COLOR_TEXT, COLOR_LONGTEXT,
                   false )
         change_integer_list( pi_color_values, ppsz_color_descriptions )
-    add_integer( CFG_PREFIX "size", -1, SIZE_TEXT, SIZE_LONGTEXT, false )
-        change_integer_range( -1, 4096)
+    add_integer( CFG_PREFIX "size", 0, SIZE_TEXT, SIZE_LONGTEXT, false )
+        change_integer_range( 0, 4096)
 
     set_section( N_("Misc"), NULL )
     add_integer( CFG_PREFIX "speed", 100000, SPEED_TEXT, SPEED_LONGTEXT,
