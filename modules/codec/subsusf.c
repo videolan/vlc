@@ -904,7 +904,10 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
             {
                 subpicture_region_t  *p_text_region;
 
-                psz_end += strcspn( psz_end, ">" ) + 1;
+                if( psz_end )
+                    psz_end += strcspn( psz_end, ">" ) + 1;
+                else
+                    psz_end = psz_subtitle + strlen( psz_subtitle );
 
                 p_text_region = CreateTextRegion( p_dec,
                                                   psz_subtitle,
