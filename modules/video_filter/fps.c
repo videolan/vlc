@@ -38,6 +38,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture);
 
 #define CFG_PREFIX "fps-"
 
+#define FPS_TEXT N_( "Frame rate" )
+
 vlc_module_begin ()
     set_description( N_("FPS conversion video filter") )
     set_shortname( N_("FPS Converter" ))
@@ -46,8 +48,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_shortcut( "fps" )
-    add_string( CFG_PREFIX "fps", NULL, NULL,
-               NULL, false )
+    add_string( CFG_PREFIX "fps", NULL, FPS_TEXT, FPS_TEXT, false )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
