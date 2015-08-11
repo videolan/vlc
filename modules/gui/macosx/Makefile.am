@@ -70,6 +70,7 @@ libmacosx_plugin_la_SOURCES = \
 	TrackSynchronization.h TrackSynchronization.m \
 	VideoEffects.h VideoEffects.m \
 	VideoView.h VideoView.m \
+	VLCTimeSelectionPanelController.h VLCTimeSelectionPanelController.m \
 	VLCUIWidgets.h VLCUIWidgets.m \
 	VLCVoutWindowController.h VLCVoutWindowController.m \
 	Windows.h Windows.m

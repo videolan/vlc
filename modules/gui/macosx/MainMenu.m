@@ -46,6 +46,7 @@
 #import "ConvertAndSave.h"
 #import "DebugMessageVisualizer.h"
 #import "AddonsWindowController.h"
+#import "VLCTimeSelectionPanelController.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>
@@ -66,6 +67,9 @@
     NSArray *_menuOrderOfPlaylistTableColumns;
 
     NSMenu *_playlistTableColumnsContextMenu;
+
+    __strong VLCTimeSelectionPanelController *_timeSelectionPanel;
+
 }
 @end
 
@@ -82,6 +86,8 @@
 
 - (void)awakeFromNib
 {
+    _timeSelectionPanel = [[VLCTimeSelectionPanelController alloc] init];
+
     /* check whether the user runs OSX with a RTL language */
     NSArray* languages = [NSLocale preferredLanguages];
     NSString* preferredLanguage = [languages firstObject];
@@ -487,12 +493,6 @@
     [_voutMenumute setTitle: _NS("Mute")];
     [_voutMenufullscreen setTitle: _NS("Fullscreen")];
     [_voutMenusnapshot setTitle: _NS("Snapshot")];
-
-    [_specificTime_cancelButton setTitle: _NS("Cancel")];
-    [_specificTime_okButton setTitle: _NS("OK")];
-    [_specificTime_secLabel setStringValue: _NS("sec.")];
-    [_specificTime_goToLabel setStringValue: _NS("Jump to Time")];
-    [_specificTime_enterTextField setFormatter:[[PositionFormatter alloc] init]];
 }
 
 - (NSMenu *)setupPlaylistTableColumnsMenu
@@ -864,53 +864,27 @@
 
 - (IBAction)goToSpecificTime:(id)sender
 {
-    if (sender == _specificTime_cancelButton)
-    {
-        [NSApp endSheet: _specificTimeWindow];
-        [_specificTimeWindow close];
-    } else if (sender == _specificTime_okButton) {
-        input_thread_t *p_input = pl_CurrentInput(VLCIntf);
-        if (p_input) {
-            int64_t timeInSec = 0;
-            NSString *fieldContent = [_specificTime_enterTextField stringValue];
-            if ([[fieldContent componentsSeparatedByString: @":"] count] > 1 &&
-                [[fieldContent componentsSeparatedByString: @":"] count] <= 3) {
-                NSArray *ourTempArray = \
-                [fieldContent componentsSeparatedByString: @":"];
+    input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+    if (p_input) {
+        /* we can obviously only do that if an input is available */
+        int64_t length = var_GetInteger(p_input, "length");
+        [_timeSelectionPanel setMaxValue:(length / CLOCK_FREQ)];
+        int64_t pos = var_GetInteger(p_input, "time");
+        [_timeSelectionPanel setJumpTimeValue: (pos / CLOCK_FREQ)];
+        [_timeSelectionPanel runModalForWindow:[NSApp mainWindow]
+                             completionHandler:^(NSInteger returnCode, int64_t returnTime) {
 
-                if ([[fieldContent componentsSeparatedByString: @":"] count] == 3) {
-                    timeInSec += ([[ourTempArray firstObject] intValue] *3600); //h
-                    timeInSec += ([[ourTempArray objectAtIndex:1] intValue] *60); //m
-                    timeInSec += [[ourTempArray objectAtIndex:2] intValue];        //s
-                } else {
-                    timeInSec += ([[ourTempArray firstObject] intValue] *60); //m
-                    timeInSec += [[ourTempArray objectAtIndex:1] intValue]; //s
-                }
+            if (returnCode != NSOKButton)
+                return;
+
+            input_thread_t *p_input = pl_CurrentInput(VLCIntf);
+            if (p_input) {
+                input_Control(p_input, INPUT_SET_TIME, (int64_t)(returnTime *1000000));
+                vlc_object_release(p_input);
             }
-            else
-                timeInSec = [fieldContent intValue];
+        }];
 
-            input_Control(p_input, INPUT_SET_TIME, (int64_t)(timeInSec *1000000));
-            vlc_object_release(p_input);
-        }
-
-        [NSApp endSheet: _specificTimeWindow];
-        [_specificTimeWindow close];
-    } else {
-        input_thread_t *p_input = pl_CurrentInput(VLCIntf);
-        if (p_input) {
-            /* we can obviously only do that if an input is available */
-            int64_t pos, length;
-            length = var_GetInteger(p_input, "length");
-            [_specificTime_stepper setMaxValue: (length / CLOCK_FREQ)];
-            pos = var_GetInteger(p_input, "time");
-            [self setJumpTimeValue: (pos / CLOCK_FREQ)];
-            [NSApp beginSheet: _specificTimeWindow modalForWindow: \
-             [NSApp mainWindow] modalDelegate: self didEndSelector: nil \
-                  contextInfo: nil];
-            [_specificTimeWindow makeKeyWindow];
-            vlc_object_release(p_input);
-        }
+        vlc_object_release(p_input);
     }
 }
 

@@ -202,15 +202,6 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *voutMenufullscreen;
 @property (readwrite, weak) IBOutlet NSMenuItem *voutMenusnapshot;
 
-@property (readwrite, weak) IBOutlet NSButton *specificTime_cancelButton;
-@property (readwrite, weak) IBOutlet NSTextField *specificTime_enterTextField;
-@property (readwrite, weak) IBOutlet NSTextField *specificTime_goToLabel;
-@property (readwrite, weak) IBOutlet NSButton *specificTime_okButton;
-@property (readwrite, weak) IBOutlet NSWindow *specificTimeWindow;
-@property (readwrite, weak) IBOutlet NSTextField *specificTime_secLabel;
-@property (readwrite, weak) IBOutlet NSStepper *specificTime_stepper;
-@property (nonatomic) int jumpTimeValue;
-
 @property (readwrite, weak) IBOutlet NSView *playlistSaveAccessoryView;
 @property (readwrite, weak) IBOutlet NSPopUpButton *playlistSaveAccessoryPopup;
 @property (readwrite, weak) IBOutlet NSTextField *playlistSaveAccessoryText;

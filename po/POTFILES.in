@@ -614,6 +614,8 @@ modules/gui/macosx/VideoEffects.h
 modules/gui/macosx/VideoEffects.m
 modules/gui/macosx/VideoView.h
 modules/gui/macosx/VideoView.m
+modules/gui/macosx/VLCTimeSelectionPanelController.h
+modules/gui/macosx/VLCTimeSelectionPanelController.m
 modules/gui/macosx/VLCVoutWindowController.h
 modules/gui/macosx/VLCVoutWindowController.m
 modules/gui/macosx/Windows.h

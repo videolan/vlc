@@ -158,6 +158,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/StreamOutput.xib \
 	extras/package/macosx/Resources/English.lproj/SyncTracks.xib \
 	extras/package/macosx/Resources/English.lproj/TextfieldPanel.xib \
+	extras/package/macosx/Resources/English.lproj/TimeSelectionPanel.xib \
 	extras/package/macosx/Resources/English.lproj/VideoEffects.xib \
 	extras/package/macosx/Resources/fspanel/fs_background.png \
 	extras/package/macosx/Resources/fspanel/fs_background@2x.png \

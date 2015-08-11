@@ -24,6 +24,7 @@
 /* Begin PBXBuildFile section */
 		1C15C7DC1B5146DB003AB729 /* ResumeDialogController.h in Sources */ = {isa = PBXBuildFile; fileRef = 633121CA1B51122700E636DA /* ResumeDialogController.h */; };
 		1C15C7DD1B5146DB003AB729 /* ResumeDialogController.m in Sources */ = {isa = PBXBuildFile; fileRef = 633121CB1B51122700E636DA /* ResumeDialogController.m */; };
+		1C51BDE51B7A221B0056B9AA /* TimeSelectionPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C51BDE31B7A221B0056B9AA /* TimeSelectionPanel.xib */; };
 		1C57690E19DC93620099F5A6 /* topbar_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C57690D19DC93620099F5A6 /* topbar_background.png */; };
 		1C88BA5419DC7B2200645190 /* yosemite-window-close-graphite.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */; };
 		1C88BA5519DC7B2200645190 /* yosemite-window-close-graphite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */; };
@@ -451,6 +452,7 @@
 		1CCB5FAA1A62A724004C3E90 /* SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */; };
 		1CCB5FAB1A62A724004C3E90 /* SPMediaKeyTap.h in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */; };
 		1CCB5FAC1A62A724004C3E90 /* SPMediaKeyTap.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */; };
+		1CD3667B1B7A242E0054E39F /* VLCTimeSelectionPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */; };
 		1CE5ED2119DD6AB700FCEFD3 /* lion-window-fullscreen-on.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED1B19DD6AB700FCEFD3 /* lion-window-fullscreen-on.png */; };
 		1CE5ED2219DD6AB700FCEFD3 /* lion-window-fullscreen-on@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED1C19DD6AB700FCEFD3 /* lion-window-fullscreen-on@2x.png */; };
 		1CE5ED2319DD6AB700FCEFD3 /* lion-window-fullscreen-over.png in Resources */ = {isa = PBXBuildFile; fileRef = 1CE5ED1D19DD6AB700FCEFD3 /* lion-window-fullscreen-over.png */; };
@@ -879,6 +881,7 @@
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		1C3AABAC1B1BAE7B00FDF001 /* VLC.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = VLC.app; path = ../VLC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C3AABB01B1BB00A00FDF001 /* VLC-dev.app */ = {isa = PBXFileReference; lastKnownFileType = wrapper.application; name = "VLC-dev.app"; path = "../VLC-dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C51BDE41B7A221B0056B9AA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/TimeSelectionPanel.xib; sourceTree = "<group>"; };
 		1C57690D19DC93620099F5A6 /* topbar_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = topbar_background.png; path = Resources/mainwindow/topbar_background.png; sourceTree = "<group>"; };
 		1C88BA2419DC7B2200645190 /* yosemite-window-close-graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-graphite.png"; sourceTree = "<group>"; };
 		1C88BA2519DC7B2200645190 /* yosemite-window-close-graphite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yosemite-window-close-graphite@2x.png"; sourceTree = "<group>"; };
@@ -1219,6 +1222,8 @@
 		1CBB2CC71B06A6DE00110ADA /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = Resources/English.lproj/Help.xib; sourceTree = "<group>"; };
 		1CC25CA71B2C585D0003F994 /* darwinvlc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = darwinvlc.m; path = ../../../bin/darwinvlc.m; sourceTree = "<group>"; };
 		1CCB5F2F1A62A6A5004C3E90 /* pseudo-vlc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "pseudo-vlc.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CD366791B7A242E0054E39F /* VLCTimeSelectionPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCTimeSelectionPanelController.h; path = ../../../modules/gui/macosx/VLCTimeSelectionPanelController.h; sourceTree = "<group>"; };
+		1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCTimeSelectionPanelController.m; path = ../../../modules/gui/macosx/VLCTimeSelectionPanelController.m; sourceTree = "<group>"; };
 		1CE5ED1B19DD6AB700FCEFD3 /* lion-window-fullscreen-on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-on.png"; sourceTree = "<group>"; };
 		1CE5ED1C19DD6AB700FCEFD3 /* lion-window-fullscreen-on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-on@2x.png"; sourceTree = "<group>"; };
 		1CE5ED1D19DD6AB700FCEFD3 /* lion-window-fullscreen-over.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lion-window-fullscreen-over.png"; sourceTree = "<group>"; };
@@ -1890,6 +1895,8 @@
 				CCCE366E13817E4500694F2A /* VideoEffects.m */,
 				CCCCDCA01413E1C000FE3DE1 /* VideoView.h */,
 				CCCCDCA11413E1C000FE3DE1 /* VideoView.m */,
+				1CD366791B7A242E0054E39F /* VLCTimeSelectionPanelController.h */,
+				1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */,
 				5CCED71414C0D4A90057F8D1 /* VLCUIWidgets.h */,
 				5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */,
 				E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */,
@@ -2901,6 +2908,7 @@
 				633121CE1B5112C300E636DA /* ResumeDialog.xib */,
 				1C9465971B77B9FC007C965A /* PopupPanel.xib */,
 				1C9465991B77B9FC007C965A /* TextfieldPanel.xib */,
+				1C51BDE31B7A221B0056B9AA /* TimeSelectionPanel.xib */,
 				7D8BB0B51830311300FAE9B7 /* DebugMessageVisualizer.xib */,
 				7D8BB0B81830367200FAE9B7 /* PlaylistMenu.xib */,
 				7D8BB0BE1830393300FAE9B7 /* MainWindow.xib */,
@@ -3172,6 +3180,7 @@
 				CC04332213B28B2900D7D52E /* fs_time_slider_knob.png in Resources */,
 				1C88BC0919DC7C8100645190 /* ys-fullscreen-one-button_dark.png in Resources */,
 				CC04332313B28B2900D7D52E /* fs_time_slider.png in Resources */,
+				1C51BDE51B7A221B0056B9AA /* TimeSelectionPanel.xib in Resources */,
 				1C88BA5F19DC7B2200645190 /* yosemite-window-close@2x.png in Resources */,
 				CC04332413B28B2900D7D52E /* fs_volume_max_highlight.png in Resources */,
 				1C88BBFA19DC7C8100645190 /* ys-effects-one-button_dark@2x.png in Resources */,
@@ -3875,6 +3884,7 @@
 				1CCB5F701A62A724004C3E90 /* fspanel.h in Sources */,
 				1CCB5F711A62A724004C3E90 /* fspanel.m in Sources */,
 				1CCB5F721A62A724004C3E90 /* intf.h in Sources */,
+				1CD3667B1B7A242E0054E39F /* VLCTimeSelectionPanelController.m in Sources */,
 				1CCB5F731A62A724004C3E90 /* intf.m in Sources */,
 				1CCB5F741A62A724004C3E90 /* macosx.m in Sources */,
 				1CCB5F751A62A724004C3E90 /* MainMenu.h in Sources */,
@@ -3946,6 +3956,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		1C51BDE31B7A221B0056B9AA /* TimeSelectionPanel.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1C51BDE41B7A221B0056B9AA /* English */,
+			);
+			name = TimeSelectionPanel.xib;
+			sourceTree = "<group>";
+		};
 		1C9465971B77B9FC007C965A /* PopupPanel.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
