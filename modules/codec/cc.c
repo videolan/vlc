@@ -51,6 +51,10 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define OPAQUE_TEXT N_("Opacity")
+#define OPAQUE_LONGTEXT N_("Setting to true " \
+        "makes the text to be boxed and maybe easier to read." )
+
 vlc_module_begin ()
     set_shortname( N_("CC 608/708"))
     set_description( N_("Closed Captions decoder") )
@@ -58,6 +62,9 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_SCODEC )
     set_callbacks( Open, Close )
+
+    add_bool( "cc-opaque", true,
+                 OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -150,6 +157,7 @@ struct decoder_sys_t
     int i_channel;
 
     eia608_t eia608;
+    bool b_opaque;
 };
 
 static subpicture_t *Decode( decoder_t *, block_t ** );
@@ -198,6 +206,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_channel = i_channel;
 
     Eia608Init( &p_sys->eia608 );
+    p_sys->b_opaque = var_InheritBool( p_dec, "cc-opaque" );
 
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_TEXT;
@@ -330,7 +339,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
     p_spu_sys->align = SUBPICTURE_ALIGN_LEAVETEXT;
     p_spu_sys->p_segments = p_segments;
     p_spu_sys->i_font_height_percent = 5;
-    p_spu_sys->renderbg = true;
+    p_spu_sys->renderbg = p_dec->p_sys->b_opaque;
 
     return p_spu;
 }
