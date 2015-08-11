@@ -1680,7 +1680,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
     for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next, i++) {
         for (int j = 0; j < sys->d3dregion_count; j++) {
             picture_t *cache = sys->d3dregions[j];
-            if (((d3d_quad_t *) cache->p_sys)->pTexture) {
+            if (cache != NULL && ((d3d_quad_t *) cache->p_sys)->pTexture) {
                 ID3D11Texture2D_GetDesc( ((d3d_quad_t *) cache->p_sys)->pTexture, &texDesc );
                 if (texDesc.Format == sys->d3dregion_format &&
                     texDesc.Width  == r->fmt.i_visible_width &&
