@@ -71,19 +71,18 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCConvertAndSave;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
-{
-    IBOutlet VLCMainWindow *o_mainwindow;            /* VLCMainWindow */
-}
 
 @property (readonly) VLCVoutWindowController* voutController;
 @property (readonly) BOOL nativeFullscreenMode;
 @property (nonatomic, readwrite) BOOL playlistUpdatedSelectorInQueue;
 
++ (VLCMain *)createInstanceWithIntf:(intf_thread_t *)intf;
 + (VLCMain *)sharedInstance;
 + (void)killInstance;
 
+- (id)initWithIntf:(intf_thread_t *)intf;
+
 - (intf_thread_t *)intf;
-- (void)setIntf:(intf_thread_t *)p_mainintf;
 
 - (VLCMainMenu *)mainMenu;
 - (VLCMainWindow *)mainWindow;
