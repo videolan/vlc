@@ -106,10 +106,10 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 @interface PLModel ()
 {
     playlist_t *p_playlist;
-    NSOutlineView *_outlineView;
+    __weak NSOutlineView *_outlineView;
 
     // TODO: for transition
-    VLCPlaylist *_playlist;
+    __weak VLCPlaylist *_playlist;
     NSUInteger _retainedRowSelection;
 }
 @end

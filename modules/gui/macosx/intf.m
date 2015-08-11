@@ -97,6 +97,7 @@ void CloseIntf (vlc_object_t *p_this)
     @autoreleasepool {
         msg_Dbg(p_this, "Closing macosx interface");
         [[VLCMain sharedInstance] applicationWillTerminate:nil];
+        [VLCMain killInstance];
     }
 }
 
@@ -174,9 +175,10 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 #pragma mark -
 #pragma mark Initialization
 
+static VLCMain *sharedInstance = nil;
+
 + (VLCMain *)sharedInstance
 {
-    static VLCMain *sharedInstance = nil;
     static dispatch_once_t pred;
 
     dispatch_once(&pred, ^{
@@ -184,6 +186,11 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     });
 
     return sharedInstance;
+}
+
++ (void)killInstance
+{
+    sharedInstance = nil;
 }
 
 - (id)init
@@ -374,8 +381,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     [[NSUserDefaults standardUserDefaults] synchronize];
 
     o_mainwindow = NULL;
-
-    [self setIntf:nil];
 }
 
 #pragma mark -

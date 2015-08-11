@@ -78,7 +78,9 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @property (readonly) VLCVoutWindowController* voutController;
 @property (readonly) BOOL nativeFullscreenMode;
 @property (nonatomic, readwrite) BOOL playlistUpdatedSelectorInQueue;
+
 + (VLCMain *)sharedInstance;
++ (void)killInstance;
 
 - (intf_thread_t *)intf;
 - (void)setIntf:(intf_thread_t *)p_mainintf;

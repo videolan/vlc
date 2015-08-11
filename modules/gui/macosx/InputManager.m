@@ -133,7 +133,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 @interface VLCInputManager()
 {
-    VLCMain *o_main;
+    __weak VLCMain *o_main;
 
     input_thread_t *p_current_input;
     dispatch_queue_t informInputChangedQueue;
