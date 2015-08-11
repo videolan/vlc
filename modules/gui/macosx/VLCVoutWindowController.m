@@ -250,7 +250,7 @@ void WindowClose(vout_window_t *p_wnd)
 
     // should be called before any window resizing occurs
     if (!b_multiple_vout_windows)
-        [[VLCMainWindow sharedInstance] videoplayWillBeStarted];
+        [[[VLCMain sharedInstance] mainWindow] videoplayWillBeStarted];
 
     if (b_multiple_vout_windows && b_video_wallpaper)
         b_video_wallpaper = false;
@@ -262,13 +262,13 @@ void WindowClose(vout_window_t *p_wnd)
         msg_Dbg(VLCIntf, "Creating background / blank window");
         NSScreen *screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_InheritInteger(VLCIntf, "macosx-vdev")];
         if (!screen)
-            screen = [[VLCMainWindow sharedInstance] screen];
+            screen = [[[VLCMain sharedInstance] mainWindow] screen];
 
         NSRect window_rect;
         if (b_video_wallpaper)
             window_rect = [screen frame];
         else
-            window_rect = [[VLCMainWindow sharedInstance] frame];
+            window_rect = [[[VLCMain sharedInstance] mainWindow] frame];
 
         NSUInteger mask = NSBorderlessWindowMask;
         if (!b_video_deco)
@@ -312,7 +312,7 @@ void WindowClose(vout_window_t *p_wnd)
     } else {
         if ((var_InheritBool(VLCIntf, "embedded-video") && !b_mainwindow_has_video)) {
             // setup embedded video
-            o_new_video_window = [VLCMainWindow sharedInstance];
+            o_new_video_window = [[VLCMain sharedInstance] mainWindow] ;
             o_vout_view = [o_new_video_window videoView];
             b_mainwindow_has_video = YES;
             b_nonembedded = NO;
@@ -377,11 +377,11 @@ void WindowClose(vout_window_t *p_wnd)
     [o_vout_dict setObject:o_new_video_window forKey:[NSValue valueWithPointer:p_wnd]];
 
     [[VLCMain sharedInstance] setActiveVideoPlayback: YES];
-    [[VLCMainWindow sharedInstance] setNonembedded:!b_mainwindow_has_video];
+    [[[VLCMain sharedInstance] mainWindow] setNonembedded:!b_mainwindow_has_video];
 
     // beware of order, setActiveVideoPlayback:, setHasActiveVideo: and setNonembedded: must be called before
     if ([o_new_video_window class] == [VLCMainWindow class])
-        [[VLCMainWindow sharedInstance] changePlaylistState: psVideoStartedOrStoppedEvent];
+        [[[VLCMain sharedInstance] mainWindow] changePlaylistState: psVideoStartedOrStoppedEvent];
 
     if (b_nonembedded) {
         // events might be posted before window is created, so call them again
@@ -425,7 +425,7 @@ void WindowClose(vout_window_t *p_wnd)
 
     // prevent visible extra window if in fullscreen
     NSDisableScreenUpdates();
-    BOOL b_native = [[VLCMainWindow sharedInstance] nativeFullscreenMode];
+    BOOL b_native = [[[VLCMain sharedInstance] mainWindow] nativeFullscreenMode];
 
     // close fullscreen, without changing fullscreen vars
     if (!b_native && ([o_window fullscreen] || [o_window inFullscreenTransition]))
@@ -453,10 +453,10 @@ void WindowClose(vout_window_t *p_wnd)
 
         // video in main window might get stopped while another vout is open
         if ([o_vout_dict count] > 0)
-            [[VLCMainWindow sharedInstance] setNonembedded:YES];
+            [[[VLCMain sharedInstance] mainWindow] setNonembedded:YES];
 
         // beware of order, setActiveVideoPlayback:, setHasActiveVideo: and setNonembedded: must be called before
-        [[VLCMainWindow sharedInstance] changePlaylistState: psVideoStartedOrStoppedEvent];
+        [[[VLCMain sharedInstance] mainWindow] changePlaylistState: psVideoStartedOrStoppedEvent];
     }
 }
 
@@ -521,7 +521,7 @@ void WindowClose(vout_window_t *p_wnd)
 
     if (b_nativeFullscreenMode) {
         if(!o_current_window)
-            o_current_window = [VLCMainWindow sharedInstance];
+            o_current_window = [[VLCMain sharedInstance] mainWindow] ;
         assert(o_current_window);
 
         // fullscreen might be triggered twice (vout event)
@@ -588,7 +588,7 @@ void WindowClose(vout_window_t *p_wnd)
     NSInteger currentStatusWindowLevel = self.currentStatusWindowLevel;
 
     VLCMain *main = [VLCMain sharedInstance];
-    [[VLCMainWindow sharedInstance] setWindowLevel:i_level];
+    [[[VLCMain sharedInstance] mainWindow] setWindowLevel:i_level];
     [[main videoEffectsPanel] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[main audioEffectsPanel] updateCocoaWindowLevel:currentStatusWindowLevel];
     [[VLCInfo sharedInstance] updateCocoaWindowLevel:currentStatusWindowLevel];

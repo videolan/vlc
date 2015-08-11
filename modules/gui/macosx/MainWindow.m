@@ -80,29 +80,6 @@ static const float f_min_window_height = 307.;
 #pragma mark -
 #pragma mark Initialization
 
-static VLCMainWindow *sharedInstance = nil;
-+ (VLCMainWindow *)sharedInstance
-{
-    return sharedInstance;
-}
-
-- (id)initWithContentRect:(NSRect)contentRect
-                styleMask:(NSUInteger)styleMask
-                  backing:(NSBackingStoreType)backingType
-                    defer:(BOOL)flag
-{
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [super initWithContentRect:contentRect
-                                          styleMask:styleMask
-                                            backing:backingType
-                                              defer:flag];
-    });
-
-    return sharedInstance;
-}
-
 - (BOOL)isEvent:(NSEvent *)o_event forKey:(const char *)keyString
 {
     char *key;

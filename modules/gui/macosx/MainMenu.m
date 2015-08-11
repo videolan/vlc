@@ -1308,12 +1308,12 @@
 
 - (IBAction)showMainWindow:(id)sender
 {
-    [[VLCMainWindow sharedInstance] makeKeyAndOrderFront:sender];
+    [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:sender];
 }
 
 - (IBAction)showPlaylist:(id)sender
 {
-    [[VLCMainWindow sharedInstance] changePlaylistState: psUserMenuEvent];
+    [[[VLCMain sharedInstance] mainWindow] changePlaylistState: psUserMenuEvent];
 }
 
 #pragma mark - Help and Docs

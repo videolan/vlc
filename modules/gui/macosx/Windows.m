@@ -669,16 +669,16 @@
 
     // change fspanel state for the case when multiple windows are in fullscreen
     if ([self hasActiveVideo] && [self fullscreen])
-        [[[VLCMainWindow sharedInstance] fspanel] setActive:nil];
+        [[[[VLCMain sharedInstance] mainWindow] fspanel] setActive:nil];
     else
-        [[[VLCMainWindow sharedInstance] fspanel] setNonActive:nil];
+        [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive:nil];
 }
 
 - (void)resignKeyWindow
 {
     [super resignKeyWindow];
 
-    [[[VLCMainWindow sharedInstance] fspanel] setNonActive:nil];
+    [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive:nil];
 }
 
 -(NSArray*)customWindowsToEnterFullScreenForWindow:(NSWindow *)window
@@ -748,7 +748,7 @@
     }
 
     if ([self hasActiveVideo])
-        [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
+        [[[VLCMain sharedInstance] mainWindow] recreateHideMouseTimer];
 
     if (_darkInterface) {
         [self.titlebarView removeFromSuperviewWithoutNeedingDisplay];
@@ -779,9 +779,9 @@
     _inFullscreenTransition = NO;
 
     if ([self hasActiveVideo]) {
-        [[[VLCMainWindow sharedInstance] fspanel] setVoutWasUpdated: self];
+        [[[[VLCMain sharedInstance] mainWindow] fspanel] setVoutWasUpdated: self];
         if (![_videoView isHidden])
-            [[[VLCMainWindow sharedInstance] fspanel] setActive: nil];
+            [[[[VLCMain sharedInstance] mainWindow] fspanel] setActive: nil];
     }
 
     NSArray *subviews = [[self videoView] subviews];
@@ -809,7 +809,7 @@
     }
 
     [NSCursor setHiddenUntilMouseMoves: NO];
-    [[[VLCMainWindow sharedInstance] fspanel] setNonActive: nil];
+    [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive: nil];
 
 
     if (_darkInterface) {
@@ -875,9 +875,9 @@
 
     if (self.controlsBar)
         [self.controlsBar setFullscreenState:YES];
-    [[[VLCMainWindow sharedInstance] controlsBar] setFullscreenState:YES];
+    [[[[VLCMain sharedInstance] mainWindow] controlsBar] setFullscreenState:YES];
 
-    [[VLCMainWindow sharedInstance] recreateHideMouseTimer];
+    [[[VLCMain sharedInstance] mainWindow] recreateHideMouseTimer];
 
     if (blackout_other_displays)
         [screen blackoutOtherScreens];
@@ -1012,8 +1012,8 @@
     [o_fullscreen_window setAcceptsMouseMovedEvents: YES];
 
     /* tell the fspanel to move itself to front next time it's triggered */
-    [[[VLCMainWindow sharedInstance] fspanel] setVoutWasUpdated: o_fullscreen_window];
-    [[[VLCMainWindow sharedInstance] fspanel] setActive: nil];
+    [[[[VLCMain sharedInstance] mainWindow] fspanel] setVoutWasUpdated: o_fullscreen_window];
+    [[[[VLCMain sharedInstance] mainWindow] fspanel] setActive: nil];
 
     if ([self isVisible])
         [self orderOut: self];
@@ -1030,7 +1030,7 @@
 
     if (self.controlsBar)
         [self.controlsBar setFullscreenState:NO];
-    [[[VLCMainWindow sharedInstance] controlsBar] setFullscreenState:NO];
+    [[[[VLCMain sharedInstance] mainWindow] controlsBar] setFullscreenState:NO];
 
     /* We always try to do so */
     [NSScreen unblackoutScreens];
@@ -1042,7 +1042,7 @@
         return;
     }
 
-    [[[VLCMainWindow sharedInstance] fspanel] setNonActive: nil];
+    [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive: nil];
     [[o_fullscreen_window screen] setNonFullscreenPresentationOptions];
 
     if (o_fullscreen_anim1) {

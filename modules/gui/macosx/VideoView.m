@@ -155,7 +155,7 @@
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
-    return [[VLCMainWindow sharedInstance] performKeyEquivalent: o_event];
+    return [[[VLCMain sharedInstance] mainWindow] performKeyEquivalent: o_event];
 }
 
 - (void)mouseDown:(NSEvent *)o_event

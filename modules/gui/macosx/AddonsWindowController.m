@@ -241,7 +241,7 @@ static void addonsEventsCallback( const vlc_event_t *event, void *data )
 {
     [self _refactorDataModel];
     if (_shouldRefreshSideBarOnAddonChange) {
-        [[VLCMainWindow sharedInstance] performSelector:@selector(reloadSidebar) withObject:nil afterDelay:0.5];
+        [[[VLCMain sharedInstance] mainWindow] performSelector:@selector(reloadSidebar) withObject:nil afterDelay:0.5];
         _shouldRefreshSideBarOnAddonChange = NO;
     }
 }

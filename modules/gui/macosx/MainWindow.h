@@ -83,7 +83,7 @@ typedef enum {
     IBOutlet id o_podcast_unsubscribe_ok_btn;
     IBOutlet id o_podcast_unsubscribe_cancel_btn;
 }
-+ (VLCMainWindow *)sharedInstance;
+
 @property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;
 
