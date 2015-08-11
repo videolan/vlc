@@ -68,16 +68,21 @@ typedef void(^TextfieldPanelCompletionBlock)(NSInteger returnCode, NSString *res
 @property (readwrite, assign) NSString *OKButtonLabel;
 @property (readwrite, assign) NSString *CancelButtonLabel;
 @property (readwrite, assign) NSArray *popupButtonContent;
-@property (readwrite, assign) id target;
-@property (readonly) NSUInteger currentItem;
 
-- (void)runModalForWindow:(NSWindow *)window;
+/**
+ * Completion handler for popup panel
+ * \param returnCode Result from panel. Can be NSOKButton or NSCancelButton.
+ * \param selectedIndex Selected index of the popup in panel.
+ */
+typedef void(^PopupPanelCompletionBlock)(NSInteger returnCode, NSInteger selectedIndex);
+
+/**
+ * Shows the panel as a modal dialog with window as its owner.
+ * \param window Parent window for the dialog.
+ * \param handler Completion block.
+ */
+- (void)runModalForWindow:(NSWindow *)window completionHandler:(PopupPanelCompletionBlock)handler;
 
 - (IBAction)windowElementAction:(id)sender;
 
-@end
-
-@protocol VLCPopupPanelController <NSObject>
-@optional
-- (void)panel:(VLCPopupPanelController *)panel returnValue:(NSUInteger)value item:(NSUInteger)item;
 @end

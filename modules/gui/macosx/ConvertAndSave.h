@@ -166,6 +166,4 @@
 - (IBAction)streamAnnouncementToggle:(id)sender;
 - (IBAction)sdpFileLocationSelector:(id)sender;
 
-- (void)panel:(VLCPopupPanelController *)panel returnValue:(NSUInteger)value item:(NSUInteger)item;
-
 @end

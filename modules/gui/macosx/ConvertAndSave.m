@@ -326,7 +326,6 @@
         [self resetCustomizationSheetBasedOnProfile:[self.profileValueList objectAtIndex:index]];
 }
 
-
 - (IBAction)deleteProfileAction:(id)sender
 {
     /* show panel */
@@ -335,9 +334,28 @@
     [_popupPanel setOKButtonLabel:_NS("Remove")];
     [_popupPanel setCancelButtonLabel:_NS("Cancel")];
     [_popupPanel setPopupButtonContent:self.profileNames];
-    [_popupPanel setTarget:self];
 
-    [_popupPanel runModalForWindow:self.window];
+    __weak typeof(self) _self = self;
+    [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
+
+        if (returnCode != NSOKButton)
+            return;
+
+        /* remove requested profile from the arrays */
+        NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:_self.profileNames];
+        [workArray removeObjectAtIndex:selectedIndex];
+        [_self setProfileNames:[[NSArray alloc] initWithArray:workArray]];
+        workArray = [[NSMutableArray alloc] initWithArray:_self.profileValueList];
+        [workArray removeObjectAtIndex:selectedIndex];
+        [_self setProfileValueList:[[NSArray alloc] initWithArray:workArray]];
+
+        /* update UI */
+        [_self recreateProfilePopup];
+
+        /* update internals */
+        [_self switchProfile:_self];
+        [_self storeProfilesOnDisk];
+    }];
 }
 
 - (IBAction)iWantAFile:(id)sender
@@ -626,26 +644,6 @@
         }
     }
     return NO;
-}
-
-- (void)panel:(VLCPopupPanelController *)panel returnValue:(NSUInteger)value item:(NSUInteger)item
-{
-    if (value == NSOKButton) {
-        /* remove requested profile from the arrays */
-        NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:self.profileNames];
-        [workArray removeObjectAtIndex:item];
-        [self setProfileNames:[[NSArray alloc] initWithArray:workArray]];
-        workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
-        [workArray removeObjectAtIndex:item];
-        [self setProfileValueList:[[NSArray alloc] initWithArray:workArray]];
-
-        /* update UI */
-        [self recreateProfilePopup];
-
-        /* update internals */
-        [self switchProfile:self];
-        [self storeProfilesOnDisk];
-    }
 }
 
 # pragma mark -

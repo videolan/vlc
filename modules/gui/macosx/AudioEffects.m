@@ -38,7 +38,6 @@
 
 @interface VLCAudioEffects ()
 {
-    BOOL b_genericAudioProfileInInteraction;
     NSInteger i_old_profile_index;
 }
 - (void)resetProfileSelector;
@@ -420,10 +419,31 @@
     [_popupPanel setOKButtonLabel:_NS("Remove")];
     [_popupPanel setCancelButtonLabel:_NS("Cancel")];
     [_popupPanel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"AudioEffectProfileNames"]];
-    [_popupPanel setTarget:self];
-    b_genericAudioProfileInInteraction = YES;
 
-    [_popupPanel runModalForWindow:self.window];
+    __weak typeof(self) _self = self;
+    [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
+
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        if (returnCode != NSOKButton) {
+            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
+            return;
+        }
+
+        /* remove selected profile from settings */
+        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfiles"]];
+        [workArray removeObjectAtIndex:selectedIndex];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfiles"];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfileNames"]];
+        [workArray removeObjectAtIndex:selectedIndex];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfileNames"];
+
+        if (i_old_profile_index >= selectedIndex)
+            [defaults setInteger:i_old_profile_index - 1 forKey:@"AudioEffectSelectedProfile"];
+
+        /* save defaults */
+        [defaults synchronize];
+        [_self resetProfileSelector];
+    }];
 }
 
 #pragma mark -
@@ -684,64 +704,37 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)deletePresetAction:(id)sender
 {
-    VLCPopupPanelController *panel = [[VLCPopupPanelController alloc] init];
-    [panel setTitle:_NS("Remove a preset")];
-    [panel setSubTitle:_NS("Select the preset you would like to remove:")];
-    [panel setOKButtonLabel:_NS("Remove")];
-    [panel setCancelButtonLabel:_NS("Cancel")];
-    [panel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"EQTitles"]];
-    [panel setTarget:self];
-    b_genericAudioProfileInInteraction = NO;
+    [_popupPanel setTitle:_NS("Remove a preset")];
+    [_popupPanel setSubTitle:_NS("Select the preset you would like to remove:")];
+    [_popupPanel setOKButtonLabel:_NS("Remove")];
+    [_popupPanel setCancelButtonLabel:_NS("Cancel")];
+    [_popupPanel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"EQTitles"]];
 
-    [panel runModalForWindow:self.window];
-}
+    __weak typeof(self) _self = self;
+    [_popupPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSInteger selectedIndex) {
 
-- (void)panel:(VLCPopupPanelController *)panel returnValue:(NSUInteger)value item:(NSUInteger)item
-{
-    if (!b_genericAudioProfileInInteraction) {
-        if (value == NSOKButton) {
-            /* remove requested profile from the arrays */
-            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-            NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQValues"]];
-            [workArray removeObjectAtIndex:item];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQValues"];
-            workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQTitles"]];
-            [workArray removeObjectAtIndex:item];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQTitles"];
-            workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQPreampValues"]];
-            [workArray removeObjectAtIndex:item];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQPreampValues"];
-            workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQNames"]];
-            [workArray removeObjectAtIndex:item];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQNames"];
-            [defaults synchronize];
-        }
+        if (returnCode != NSOKButton)
+            return;
+
+        /* remove requested profile from the arrays */
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQValues"]];
+        [workArray removeObjectAtIndex:selectedIndex];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQValues"];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQTitles"]];
+        [workArray removeObjectAtIndex:selectedIndex];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQTitles"];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQPreampValues"]];
+        [workArray removeObjectAtIndex:selectedIndex];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQPreampValues"];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQNames"]];
+        [workArray removeObjectAtIndex:selectedIndex];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQNames"];
+        [defaults synchronize];
 
         /* update UI */
-        [self updatePresetSelector];
-    } else {
-
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        if (value != NSOKButton) {
-            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
-            return;
-        }
-
-        /* remove selected profile from settings */
-        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfiles"]];
-        [workArray removeObjectAtIndex:item];
-        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfiles"];
-        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfileNames"]];
-        [workArray removeObjectAtIndex:item];
-        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfileNames"];
-
-        if (i_old_profile_index >= item)
-            [defaults setInteger:i_old_profile_index - 1 forKey:@"AudioEffectSelectedProfile"];
-
-        /* save defaults */
-        [defaults synchronize];
-        [self resetProfileSelector];
-    }
+        [_self updatePresetSelector];
+    }];
 }
 
 #pragma mark -

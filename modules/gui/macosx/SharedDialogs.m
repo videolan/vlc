@@ -66,6 +66,12 @@
 
 @end
 
+@interface VLCPopupPanelController()
+{
+    PopupPanelCompletionBlock _completionBlock;
+}
+@end
+
 @implementation VLCPopupPanelController
 
 - (id)init
@@ -80,17 +86,11 @@
     [self.window orderOut:sender];
     [NSApp endSheet: self.window];
 
-    if (self.target) {
-        if ([self.target respondsToSelector:@selector(panel:returnValue:item:)]) {
-            if (sender == _cancelButton)
-                [self.target panel:self returnValue:NSCancelButton item:0];
-            else
-                [self.target panel:self returnValue:NSOKButton item:self.currentItem];
-        }
-    }
+    if (_completionBlock)
+        _completionBlock(sender == _okButton ? NSOKButton : NSCancelButton, [_popupButton indexOfSelectedItem]);
 }
 
-- (void)runModalForWindow:(NSWindow *)window
+- (void)runModalForWindow:(NSWindow *)window completionHandler:(PopupPanelCompletionBlock)handler;
 {
     [self window];
 
@@ -102,12 +102,9 @@
     for (NSString *value in self.popupButtonContent)
         [[_popupButton menu] addItemWithTitle:value action:nil keyEquivalent:@""];
 
-    [NSApp beginSheet:self.window modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
-}
+    _completionBlock = [handler copy];
 
-- (NSUInteger)currentItem
-{
-    return [_popupButton indexOfSelectedItem];
+    [NSApp beginSheet:self.window modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
 @end
