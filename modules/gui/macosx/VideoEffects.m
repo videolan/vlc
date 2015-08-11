@@ -673,57 +673,55 @@
     [_textfieldPanel setSubTitle: _NS("Enter a name for the new profile:")];
     [_textfieldPanel setCancelButtonLabel: _NS("Cancel")];
     [_textfieldPanel setOKButtonLabel: _NS("Save")];
-    [_textfieldPanel setTarget:self];
 
-    [_textfieldPanel runModalForWindow:self.window];
-}
+    __weak typeof(self) _self = self;
+    [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
 
-- (void)panel:(VLCTextfieldPanelController *)panel returnValue:(NSUInteger)value text:(NSString *)text
-{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-    if (value != NSOKButton) {
-        [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
-        return;
-    }
+        if (returnCode != NSOKButton) {
+            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
+            return;
+        }
 
-    NSArray *profileNames = [defaults objectForKey:@"VideoEffectProfileNames"];
+        NSArray *profileNames = [defaults objectForKey:@"VideoEffectProfileNames"];
 
-    // duplicate names are not allowed in the popup control
-    if ([text length] == 0 || [profileNames containsObject:text]) {
-        [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
+        // duplicate names are not allowed in the popup control
+        if ([resultingText length] == 0 || [profileNames containsObject:resultingText]) {
+            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"VideoEffectSelectedProfile"]];
 
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSCriticalAlertStyle];
-        [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
-        [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
+            NSAlert *alert = [[NSAlert alloc] init];
+            [alert setAlertStyle:NSCriticalAlertStyle];
+            [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
+            [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
 
-        [alert beginSheetModalForWindow:self.window
-                          modalDelegate:nil
-                         didEndSelector:nil
-                            contextInfo:nil];
-        return;
-    }
+            [alert beginSheetModalForWindow:_self.window
+                              modalDelegate:nil
+                             didEndSelector:nil
+                                contextInfo:nil];
+            return;
+        }
 
-    /* fetch all the current settings in a uniform string */
-    NSString *newProfile = [self generateProfileString];
+        /* fetch all the current settings in a uniform string */
+        NSString *newProfile = [_self generateProfileString];
 
-    /* add string to user defaults as well as a label */
+        /* add string to user defaults as well as a label */
 
-    NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfiles"]];
-    [workArray addObject:newProfile];
-    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
-    [defaults setInteger:[workArray count] - 1 forKey:@"VideoEffectSelectedProfile"];
+        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfiles"]];
+        [workArray addObject:newProfile];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfiles"];
+        [defaults setInteger:[workArray count] - 1 forKey:@"VideoEffectSelectedProfile"];
 
-    workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfileNames"]];
-    [workArray addObject:text];
-    [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"VideoEffectProfileNames"]];
+        [workArray addObject:resultingText];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"VideoEffectProfileNames"];
 
-    /* save defaults */
-    [defaults synchronize];
+        /* save defaults */
+        [defaults synchronize];
 
-    /* refresh UI */
-    [self resetProfileSelector];
+        /* refresh UI */
+        [_self resetProfileSelector];
+    }];
 }
 
 - (void)removeProfile:(id)sender

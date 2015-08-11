@@ -35,19 +35,25 @@
 @property (readwrite, assign) NSString *subTitle;
 @property (readwrite, assign) NSString *OKButtonLabel;
 @property (readwrite, assign) NSString *CancelButtonLabel;
-@property (readwrite, assign) id target;
-@property (readonly) NSString *enteredText;
 
-- (void)runModalForWindow:(NSWindow *)window;
+/**
+ * Completion handler for textfield panel
+ * \param returnCode Result from panel. Can be NSOKButton or NSCancelButton.
+ * \param resultingText Resulting text string entered in panel.
+ */
+typedef void(^TextfieldPanelCompletionBlock)(NSInteger returnCode, NSString *resultingText);
+
+/**
+ * Shows the panel as a modal dialog with window as its owner.
+ * \param window Parent window for the dialog.
+ * \param handler Completion block.
+ */
+- (void)runModalForWindow:(NSWindow *)window completionHandler:(TextfieldPanelCompletionBlock)handler;
 
 - (IBAction)windowElementAction:(id)sender;
 
 @end
 
-@protocol VLCTextfieldPanelController <NSObject>
-@optional
-- (void)panel:(VLCTextfieldPanelController *)view returnValue:(NSUInteger)value text:(NSString *)text;
-@end
 
 @interface VLCPopupPanelController : NSWindowController
 

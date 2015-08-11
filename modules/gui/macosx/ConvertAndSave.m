@@ -452,9 +452,32 @@
     [_textfieldPanel setSubTitle: _NS("Enter a name for the new profile:")];
     [_textfieldPanel setCancelButtonLabel: _NS("Cancel")];
     [_textfieldPanel setOKButtonLabel: _NS("Save")];
-    [_textfieldPanel setTarget:self];
 
-    [_textfieldPanel runModalForWindow:_customizePanel];
+    __weak typeof(self) _self = self;
+    [_textfieldPanel runModalForWindow:_customizePanel completionHandler:^(NSInteger returnCode, NSString *resultingText) {
+        if (returnCode != NSOKButton || [resultingText length] == 0)
+            return;
+
+        /* prepare current data */
+        [_self updateCurrentProfile];
+
+        /* add profile to arrays */
+        NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:self.profileNames];
+        [workArray addObject:resultingText];
+        [_self setProfileNames:[[NSArray alloc] initWithArray:workArray]];
+
+        workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
+        [workArray addObject:[self.currentProfile componentsJoinedByString:@";"]];
+        [_self setProfileValueList:[[NSArray alloc] initWithArray:workArray]];
+
+        /* update UI */
+        [_self recreateProfilePopup];
+        [_profilePopup selectItemWithTitle:resultingText];
+
+        /* update internals */
+        [_self switchProfile:self];
+        [_self storeProfilesOnDisk];
+    }];
 }
 
 #pragma mark -
@@ -603,33 +626,6 @@
         }
     }
     return NO;
-}
-
-- (void)panel:(VLCTextfieldPanelController *)panel returnValue:(NSUInteger)value text:(NSString *)text
-{
-    if (value == NSOKButton) {
-        if ([text length] > 0) {
-            /* prepare current data */
-            [self updateCurrentProfile];
-
-            /* add profile to arrays */
-            NSMutableArray * workArray = [[NSMutableArray alloc] initWithArray:self.profileNames];
-            [workArray addObject:text];
-            [self setProfileNames:[[NSArray alloc] initWithArray:workArray]];
-
-            workArray = [[NSMutableArray alloc] initWithArray:self.profileValueList];
-            [workArray addObject:[self.currentProfile componentsJoinedByString:@";"]];
-            [self setProfileValueList:[[NSArray alloc] initWithArray:workArray]];
-
-            /* update UI */
-            [self recreateProfilePopup];
-            [_profilePopup selectItemWithTitle:text];
-
-            /* update internals */
-            [self switchProfile:self];
-            [self storeProfilesOnDisk];
-        }
-    }
 }
 
 - (void)panel:(VLCPopupPanelController *)panel returnValue:(NSUInteger)value item:(NSUInteger)item

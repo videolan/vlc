@@ -366,10 +366,50 @@
     [_textfieldPanel setSubTitle: _NS("Enter a name for the new profile:")];
     [_textfieldPanel setCancelButtonLabel: _NS("Cancel")];
     [_textfieldPanel setOKButtonLabel: _NS("Save")];
-    [_textfieldPanel setTarget:self];
-    b_genericAudioProfileInInteraction = YES;
 
-    [_textfieldPanel runModalForWindow:self.window];
+    __weak typeof(self) _self = self;
+    [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
+
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        if (returnCode != NSOKButton) {
+            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
+            return;
+        }
+
+        NSArray *profileNames = [defaults objectForKey:@"AudioEffectProfileNames"];
+
+        // duplicate names are not allowed in the popup control
+        if ([resultingText length] == 0 || [profileNames containsObject:resultingText]) {
+            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
+
+            NSAlert *alert = [[NSAlert alloc] init];
+            [alert setAlertStyle:NSCriticalAlertStyle];
+            [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
+            [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
+
+            [alert beginSheetModalForWindow:_self.window
+                              modalDelegate:nil
+                             didEndSelector:nil
+                                contextInfo:nil];
+            return;
+        }
+
+        NSString *newProfile = [_self generateProfileString];
+
+        /* add string to user defaults as well as a label */
+        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfiles"]];
+        [workArray addObject:newProfile];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfiles"];
+        [defaults setInteger:[workArray count] - 1 forKey:@"AudioEffectSelectedProfile"];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfileNames"]];
+        [workArray addObject:resultingText];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfileNames"];
+
+        /* save defaults */
+        [defaults synchronize];
+        [_self resetProfileSelector];
+
+    }];
 }
 
 - (void)removeAudioEffectsProfile:(id)sender
@@ -601,93 +641,45 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (IBAction)addPresetAction:(id)sender
 {
     /* show panel */
-    VLCTextfieldPanelController *panel = [[VLCTextfieldPanelController alloc] init];
-    [panel setTitle: _NS("Save current selection as new preset")];
-    [panel setSubTitle: _NS("Enter a name for the new preset:")];
-    [panel setCancelButtonLabel: _NS("Cancel")];
-    [panel setOKButtonLabel: _NS("Save")];
-    [panel setTarget:self];
-    b_genericAudioProfileInInteraction = NO;
+    [_textfieldPanel setTitle: _NS("Save current selection as new preset")];
+    [_textfieldPanel setSubTitle: _NS("Enter a name for the new preset:")];
+    [_textfieldPanel setCancelButtonLabel: _NS("Cancel")];
+    [_textfieldPanel setOKButtonLabel: _NS("Save")];
 
-    [panel runModalForWindow:self.window];
-}
-
-- (void)panel:(VLCTextfieldPanelController *)panel returnValue:(NSUInteger)value text:(NSString *)text
-{
-
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-    // EQ settings
-    if (!b_genericAudioProfileInInteraction) {
-        if (value == NSOKButton && [text length] > 0) {
-            NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQValues"]];
-            [workArray addObject:[self generatePresetString]];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQValues"];
-            workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQTitles"]];
-            [workArray addObject:text];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQTitles"];
-            workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQPreampValues"]];
-            [workArray addObject:[NSString stringWithFormat:@"%.1f", [_equalizerPreampSlider floatValue]]];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQPreampValues"];
-            workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQNames"]];
-            [workArray addObject:[text decomposedStringWithCanonicalMapping]];
-            [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQNames"];
-            [defaults synchronize];
-
-            /* update VLC internals */
-            audio_output_t *p_aout = getAout();
-            if (p_aout) {
-                var_SetString(p_aout, "equalizer-preset", [[text decomposedStringWithCanonicalMapping] UTF8String]);
-                vlc_object_release(p_aout);
-            }
-
-            config_PutPsz(VLCIntf, "equalizer-preset", [[text decomposedStringWithCanonicalMapping] UTF8String]);
-
-            /* update UI */
-            [self updatePresetSelector];
-        }
-
-    // profile settings
-    } else {
-        if (value != NSOKButton) {
-            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
-            return;
-        }
-
-        NSArray *profileNames = [defaults objectForKey:@"AudioEffectProfileNames"];
-
-        // duplicate names are not allowed in the popup control
-        if ([text length] == 0 || [profileNames containsObject:text]) {
-            [_profilePopup selectItemAtIndex:[defaults integerForKey:@"AudioEffectSelectedProfile"]];
-
-            NSAlert *alert = [[NSAlert alloc] init];
-            [alert setAlertStyle:NSCriticalAlertStyle];
-            [alert setMessageText:_NS("Please enter a unique name for the new profile.")];
-            [alert setInformativeText:_NS("Multiple profiles with the same name are not allowed.")];
-
-            [alert beginSheetModalForWindow:self.window
-                              modalDelegate:nil
-                             didEndSelector:nil
-                                contextInfo:nil];
-            return;
-        }
-        
-        NSString *newProfile = [self generateProfileString];
-
-        /* add string to user defaults as well as a label */
+    __weak typeof(self) _self = self;
+    [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfiles"]];
-        [workArray addObject:newProfile];
-        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfiles"];
-        [defaults setInteger:[workArray count] - 1 forKey:@"AudioEffectSelectedProfile"];
-        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"AudioEffectProfileNames"]];
-        [workArray addObject:text];
-        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"AudioEffectProfileNames"];
 
-        /* save defaults */
+        // EQ settings
+        if (returnCode != NSOKButton || [resultingText length] == 0)
+            return;
+
+        NSMutableArray *workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQValues"]];
+        [workArray addObject:[self generatePresetString]];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQValues"];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQTitles"]];
+        [workArray addObject:resultingText];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQTitles"];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQPreampValues"]];
+        [workArray addObject:[NSString stringWithFormat:@"%.1f", [_equalizerPreampSlider floatValue]]];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQPreampValues"];
+        workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQNames"]];
+        [workArray addObject:[resultingText decomposedStringWithCanonicalMapping]];
+        [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQNames"];
         [defaults synchronize];
-        [self resetProfileSelector];
-    }
+
+        /* update VLC internals */
+        audio_output_t *p_aout = getAout();
+        if (p_aout) {
+            var_SetString(p_aout, "equalizer-preset", [[resultingText decomposedStringWithCanonicalMapping] UTF8String]);
+            vlc_object_release(p_aout);
+        }
+
+        config_PutPsz(VLCIntf, "equalizer-preset", [[resultingText decomposedStringWithCanonicalMapping] UTF8String]);
+
+        /* update UI */
+        [_self updatePresetSelector];
+    }];
 }
 
 - (IBAction)deletePresetAction:(id)sender

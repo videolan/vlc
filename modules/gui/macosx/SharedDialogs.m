@@ -23,6 +23,13 @@
 
 #import "SharedDialogs.h"
 
+@interface VLCTextfieldPanelController()
+{
+    TextfieldPanelCompletionBlock _completionBlock;
+}
+
+@end
+
 @implementation VLCTextfieldPanelController
 
 
@@ -38,17 +45,11 @@
     [self.window orderOut:sender];
     [NSApp endSheet: self.window];
 
-    if (self.target) {
-        if ([self.target respondsToSelector:@selector(panel:returnValue:text:)]) {
-            if (sender == _cancelButton)
-                [self.target panel:self returnValue:NSCancelButton text:NULL];
-            else
-                [self.target panel:self returnValue:NSOKButton text:self.enteredText];
-        }
-    }
+    if (_completionBlock)
+        _completionBlock(sender == _okButton ? NSOKButton : NSCancelButton, [_textField stringValue]);
 }
 
-- (void)runModalForWindow:(NSWindow *)window
+- (void)runModalForWindow:(NSWindow *)window completionHandler:(TextfieldPanelCompletionBlock)handler;
 {
     [self window];
 
@@ -58,12 +59,9 @@
     [_okButton setTitle:self.OKButtonLabel];
     [_textField setStringValue:@""];
 
-    [NSApp beginSheet:self.window modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
-}
+    _completionBlock = [handler copy];
 
-- (NSString *)enteredText
-{
-    return [_textField stringValue];
+    [NSApp beginSheet:self.window modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
 @end
