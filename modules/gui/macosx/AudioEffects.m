@@ -361,10 +361,10 @@
 - (void)addAudioEffectsProfile:(id)sender
 {
     /* show panel */
-    [_textfieldPanel setTitle: _NS("Duplicate current profile for a new profile")];
-    [_textfieldPanel setSubTitle: _NS("Enter a name for the new profile:")];
-    [_textfieldPanel setCancelButtonLabel: _NS("Cancel")];
-    [_textfieldPanel setOKButtonLabel: _NS("Save")];
+    [_textfieldPanel setTitleString:_NS("Duplicate current profile for a new profile")];
+    [_textfieldPanel setSubTitleString:_NS("Enter a name for the new profile:")];
+    [_textfieldPanel setCancelButtonString:_NS("Cancel")];
+    [_textfieldPanel setOkButtonString:_NS("Save")];
 
     __weak typeof(self) _self = self;
     [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
@@ -414,10 +414,10 @@
 - (void)removeAudioEffectsProfile:(id)sender
 {
     /* show panel */
-    [_popupPanel setTitle:_NS("Remove a preset")];
-    [_popupPanel setSubTitle:_NS("Select the preset you would like to remove:")];
-    [_popupPanel setOKButtonLabel:_NS("Remove")];
-    [_popupPanel setCancelButtonLabel:_NS("Cancel")];
+    [_popupPanel setTitleString:_NS("Remove a preset")];
+    [_popupPanel setSubTitleString:_NS("Select the preset you would like to remove:")];
+    [_popupPanel setOkButtonString:_NS("Remove")];
+    [_popupPanel setCancelButtonString:_NS("Cancel")];
     [_popupPanel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"AudioEffectProfileNames"]];
 
     __weak typeof(self) _self = self;
@@ -661,10 +661,10 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 - (IBAction)addPresetAction:(id)sender
 {
     /* show panel */
-    [_textfieldPanel setTitle: _NS("Save current selection as new preset")];
-    [_textfieldPanel setSubTitle: _NS("Enter a name for the new preset:")];
-    [_textfieldPanel setCancelButtonLabel: _NS("Cancel")];
-    [_textfieldPanel setOKButtonLabel: _NS("Save")];
+    [_textfieldPanel setTitleString:_NS("Save current selection as new preset")];
+    [_textfieldPanel setSubTitleString:_NS("Enter a name for the new preset:")];
+    [_textfieldPanel setCancelButtonString:_NS("Cancel")];
+    [_textfieldPanel setOkButtonString:_NS("Save")];
 
     __weak typeof(self) _self = self;
     [_textfieldPanel runModalForWindow:self.window completionHandler:^(NSInteger returnCode, NSString *resultingText) {
@@ -704,10 +704,10 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 
 - (IBAction)deletePresetAction:(id)sender
 {
-    [_popupPanel setTitle:_NS("Remove a preset")];
-    [_popupPanel setSubTitle:_NS("Select the preset you would like to remove:")];
-    [_popupPanel setOKButtonLabel:_NS("Remove")];
-    [_popupPanel setCancelButtonLabel:_NS("Cancel")];
+    [_popupPanel setTitleString:_NS("Remove a preset")];
+    [_popupPanel setSubTitleString:_NS("Select the preset you would like to remove:")];
+    [_popupPanel setOkButtonString:_NS("Remove")];
+    [_popupPanel setCancelButtonString:_NS("Cancel")];
     [_popupPanel setPopupButtonContent:[[NSUserDefaults standardUserDefaults] objectForKey:@"EQTitles"]];
 
     __weak typeof(self) _self = self;

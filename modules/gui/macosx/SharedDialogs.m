@@ -53,10 +53,10 @@
 {
     [self window];
 
-    [_titleLabel setStringValue:self.title];
-    [_subtitleLabel setStringValue:self.subTitle];
-    [_cancelButton setTitle:self.CancelButtonLabel];
-    [_okButton setTitle:self.OKButtonLabel];
+    [_titleLabel setStringValue:self.titleString];
+    [_subtitleLabel setStringValue:self.subTitleString];
+    [_cancelButton setTitle:self.cancelButtonString];
+    [_okButton setTitle:self.okButtonString];
     [_textField setStringValue:@""];
 
     _completionBlock = [handler copy];
@@ -94,10 +94,10 @@
 {
     [self window];
 
-    [_titleLabel setStringValue:self.title];
-    [_subtitleLabel setStringValue:self.subTitle];
-    [_cancelButton setTitle:self.CancelButtonLabel];
-    [_okButton setTitle:self.OKButtonLabel];
+    [_titleLabel setStringValue:self.titleString];
+    [_subtitleLabel setStringValue:self.subTitleString];
+    [_cancelButton setTitle:self.cancelButtonString];
+    [_okButton setTitle:self.okButtonString];
     [_popupButton removeAllItems];
     for (NSString *value in self.popupButtonContent)
         [[_popupButton menu] addItemWithTitle:value action:nil keyEquivalent:@""];

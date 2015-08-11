@@ -329,10 +329,10 @@
 - (IBAction)deleteProfileAction:(id)sender
 {
     /* show panel */
-    [_popupPanel setTitle:_NS("Remove a profile")];
-    [_popupPanel setSubTitle:_NS("Select the profile you would like to remove:")];
-    [_popupPanel setOKButtonLabel:_NS("Remove")];
-    [_popupPanel setCancelButtonLabel:_NS("Cancel")];
+    [_popupPanel setTitleString:_NS("Remove a profile")];
+    [_popupPanel setSubTitleString:_NS("Select the profile you would like to remove:")];
+    [_popupPanel setOkButtonString:_NS("Remove")];
+    [_popupPanel setCancelButtonString:_NS("Cancel")];
     [_popupPanel setPopupButtonContent:self.profileNames];
 
     __weak typeof(self) _self = self;
@@ -466,10 +466,10 @@
 - (IBAction)newProfileAction:(id)sender
 {
     /* show panel */
-    [_textfieldPanel setTitle: _NS("Save as new profile")];
-    [_textfieldPanel setSubTitle: _NS("Enter a name for the new profile:")];
-    [_textfieldPanel setCancelButtonLabel: _NS("Cancel")];
-    [_textfieldPanel setOKButtonLabel: _NS("Save")];
+    [_textfieldPanel setTitleString: _NS("Save as new profile")];
+    [_textfieldPanel setSubTitleString: _NS("Enter a name for the new profile:")];
+    [_textfieldPanel setCancelButtonString: _NS("Cancel")];
+    [_textfieldPanel setOkButtonString: _NS("Save")];
 
     __weak typeof(self) _self = self;
     [_textfieldPanel runModalForWindow:_customizePanel completionHandler:^(NSInteger returnCode, NSString *resultingText) {

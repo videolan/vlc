@@ -31,10 +31,10 @@
 @property (weak) IBOutlet NSButton *cancelButton;
 @property (weak) IBOutlet NSButton *okButton;
 
-@property (readwrite, assign) NSString *title;
-@property (readwrite, assign) NSString *subTitle;
-@property (readwrite, assign) NSString *OKButtonLabel;
-@property (readwrite, assign) NSString *CancelButtonLabel;
+@property (readwrite, assign) NSString *titleString;
+@property (readwrite, assign) NSString *subTitleString;
+@property (readwrite, assign) NSString *okButtonString;
+@property (readwrite, assign) NSString *cancelButtonString;
 
 /**
  * Completion handler for textfield panel
@@ -63,10 +63,10 @@ typedef void(^TextfieldPanelCompletionBlock)(NSInteger returnCode, NSString *res
 @property (weak) IBOutlet NSButton *cancelButton;
 @property (weak) IBOutlet NSButton *okButton;
 
-@property (readwrite, assign) NSString *title;
-@property (readwrite, assign) NSString *subTitle;
-@property (readwrite, assign) NSString *OKButtonLabel;
-@property (readwrite, assign) NSString *CancelButtonLabel;
+@property (readwrite, assign) NSString *titleString;
+@property (readwrite, assign) NSString *subTitleString;
+@property (readwrite, assign) NSString *okButtonString;
+@property (readwrite, assign) NSString *cancelButtonString;
 @property (readwrite, assign) NSArray *popupButtonContent;
 
 /**
