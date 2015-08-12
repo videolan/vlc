@@ -77,14 +77,23 @@
 /*****************************************************************************
  * OpenIntf: initialize interface
  *****************************************************************************/
+
+static intf_thread_t *p_interface_thread;
+
+intf_thread_t *getIntf()
+{
+    return p_interface_thread;
+}
+
 int OpenIntf (vlc_object_t *p_this)
 {
     @autoreleasepool {
         intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        p_interface_thread = p_intf;
         msg_Dbg(p_intf, "Starting macosx interface");
 
         [VLCApplication sharedApplication];
-        [VLCMain createInstanceWithIntf: p_intf];
+        [VLCMain sharedInstance];
 
         [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
         [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
@@ -99,6 +108,8 @@ void CloseIntf (vlc_object_t *p_this)
         msg_Dbg(p_this, "Closing macosx interface");
         [[VLCMain sharedInstance] applicationWillTerminate:nil];
         [VLCMain killInstance];
+
+        p_interface_thread = nil;
     }
 }
 
@@ -179,17 +190,11 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 static VLCMain *sharedInstance = nil;
 
-+ (VLCMain *)sharedInstance
-{
-    return sharedInstance;
-}
-
-+ (VLCMain *)createInstanceWithIntf:(intf_thread_t *)intf;
++ (VLCMain *)sharedInstance;
 {
     static dispatch_once_t pred;
-
     dispatch_once(&pred, ^{
-        sharedInstance = [[VLCMain alloc] initWithIntf:intf];
+        sharedInstance = [[VLCMain alloc] init];
     });
 
     return sharedInstance;
@@ -200,11 +205,11 @@ static VLCMain *sharedInstance = nil;
     sharedInstance = nil;
 }
 
-- (id)initWithIntf:(intf_thread_t *)intf;
+- (id)init
 {
     self = [super init];
     if (self) {
-        p_intf = intf;
+        p_intf = getIntf();
 
         [VLCApplication sharedApplication].delegate = self;
 
@@ -251,9 +256,9 @@ static VLCMain *sharedInstance = nil;
     return self;
 }
 
-- (intf_thread_t *)intf
+- (void)dealloc
 {
-    return p_intf;
+    msg_Dbg(VLCIntf, "Deinitializing VLCMain object");
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
@@ -359,9 +364,6 @@ static VLCMain *sharedInstance = nil;
     // closes all open vouts
     _voutController = nil;
     [_voutController.lock unlock];
-
-    /* unsubscribe from libvlc's debug messages */
-    vlc_LogSet(p_intf->p_libvlc, NULL, NULL);
 
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];

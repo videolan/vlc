@@ -156,7 +156,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     self = [super init];
     if(self) {
         o_main = o_mainObj;
-        var_AddCallback(pl_Get([o_mainObj intf]), "input-current", InputThreadChanged, (__bridge void *)self);
+        var_AddCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, (__bridge void *)self);
 
         informInputChangedQueue = dispatch_queue_create("org.videolan.vlc.inputChangedQueue", DISPATCH_QUEUE_SERIAL);
 

@@ -46,7 +46,11 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-#define VLCIntf [[VLCMain sharedInstance] intf]
+
+// deprecated macro
+#define VLCIntf getIntf()
+
+intf_thread_t *getIntf();
 
 static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 
@@ -76,13 +80,8 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @property (readonly) BOOL nativeFullscreenMode;
 @property (nonatomic, readwrite) BOOL playlistUpdatedSelectorInQueue;
 
-+ (VLCMain *)createInstanceWithIntf:(intf_thread_t *)intf;
 + (VLCMain *)sharedInstance;
 + (void)killInstance;
-
-- (id)initWithIntf:(intf_thread_t *)intf;
-
-- (intf_thread_t *)intf;
 
 - (VLCMainMenu *)mainMenu;
 - (VLCMainWindow *)mainWindow;
