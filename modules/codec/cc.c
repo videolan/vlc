@@ -1013,13 +1013,12 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
     if(!p_segment)
         return NULL;
 
-    p_segment->style = text_style_New();
+    p_segment->style = text_style_Create( STYLE_NO_DEFAULTS );
     if(!p_segment->style)
     {
         text_segment_Delete(p_segment);
         return NULL;
     }
-    text_style_Reset( p_segment->style );
     /* Ensure we get a monospaced font (required for accurate positioning */
     p_segment->style->i_style_flags |= STYLE_MONOSPACED;
 
@@ -1056,13 +1055,12 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row,
             if(!p_segment)
                 return p_segments_head;
 
-            p_segment->style = text_style_New();
+            p_segment->style = text_style_Create( STYLE_NO_DEFAULTS );
             if(!p_segment->style)
             {
                 text_segment_Delete(p_segment);
                 return p_segments_head;
             }
-            text_style_Reset( p_segment->style );
             p_segment->style->i_style_flags |= STYLE_MONOSPACED;
 
             /* start segment with new style */

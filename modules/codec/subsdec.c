@@ -876,20 +876,9 @@ struct  style_stack
     style_stack_t* p_next;
 };
 
-static text_style_t *CreateDefaultStyle()
-{
-    text_style_t *p_style = text_style_New();
-    if( p_style )
-    {
-        text_style_Reset( p_style );
-        p_style->f_font_relsize = STYLE_DEFAULT_REL_FONT_SIZE;
-    }
-    return p_style;
-}
-
 static text_style_t* DuplicateAndPushStyle(style_stack_t** pp_stack)
 {
-    text_style_t* p_dup = ( *pp_stack ) ? text_style_Duplicate( (*pp_stack)->p_style ) : CreateDefaultStyle();
+    text_style_t* p_dup = ( *pp_stack ) ? text_style_Duplicate( (*pp_stack)->p_style ) : text_style_Create( STYLE_NO_DEFAULTS );
     if ( unlikely( !p_dup ) )
         return NULL;
     style_stack_t* p_entry = malloc( sizeof( *p_entry ) );
@@ -934,7 +923,7 @@ static text_segment_t* NewTextSegmentPopStyle( text_segment_t* p_segment, style_
     // We shouldn't have an empty stack since this happens when closing a tag,
     // but better be safe than sorry if (/when) we encounter a broken subtitle file.
     PopStyle( pp_stack );
-    text_style_t* p_dup = ( *pp_stack ) ? text_style_Duplicate( (*pp_stack)->p_style ) : CreateDefaultStyle();
+    text_style_t* p_dup = ( *pp_stack ) ? text_style_Duplicate( (*pp_stack)->p_style ) : text_style_Create( STYLE_NO_DEFAULTS );
     p_new->style = p_dup;
     p_segment->p_next = p_new;
     return p_new;

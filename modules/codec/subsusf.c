@@ -616,13 +616,12 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                     p_ssa_style = calloc( 1, sizeof(ssa_style_t) );
                     if( unlikely(!p_ssa_style) )
                         return;
-                    p_ssa_style->p_style = text_style_New();
+                    p_ssa_style->p_style = text_style_Create( STYLE_NO_DEFAULTS );
                     if( unlikely(!p_ssa_style->p_style) )
                     {
                         free(p_ssa_style);
                         return;
                     }
-                    text_style_Reset( p_ssa_style->p_style );
                     /* All styles are supposed to default to Default, and then
                      * one or more settings are over-ridden.
                      * At the moment this only effects styles defined AFTER

@@ -56,7 +56,7 @@ overlay_t *OverlayCreate( void )
     p_ovl->b_active = false;
     video_format_Setup( &p_ovl->format, VLC_FOURCC( '\0','\0','\0','\0') , 0, 0,
                         0, 0, 1, 1 );
-    p_ovl->p_fontstyle = text_style_New();
+    p_ovl->p_fontstyle = text_style_Create( STYLE_NO_DEFAULTS );
     p_ovl->data.p_text = NULL;
 
     return p_ovl;
@@ -624,6 +624,7 @@ static int exec_GetTextAlpha( filter_t *p_filter,
         return VLC_EGENERIC;
 
     p_results->fontstyle.i_font_alpha = p_ovl->p_fontstyle->i_font_alpha;
+    p_results->fontstyle.i_features |= STYLE_HAS_FONT_ALPHA;
     return VLC_SUCCESS;
 }
 
@@ -637,6 +638,7 @@ static int exec_GetTextColor( filter_t *p_filter,
         return VLC_EGENERIC;
 
     p_results->fontstyle.i_font_color = p_ovl->p_fontstyle->i_font_color;
+    p_results->fontstyle.i_features |= STYLE_HAS_FONT_COLOR;
     return VLC_SUCCESS;
 }
 
@@ -713,6 +715,7 @@ static int exec_SetTextAlpha( filter_t *p_filter,
         return VLC_EGENERIC;
 
     p_ovl->p_fontstyle->i_font_alpha = p_params->fontstyle.i_font_alpha;
+    p_ovl->p_fontstyle->i_features |= STYLE_HAS_FONT_ALPHA;
     p_sys->b_updated = p_ovl->b_active;
     return VLC_SUCCESS;
 }
@@ -729,6 +732,7 @@ static int exec_SetTextColor( filter_t *p_filter,
         return VLC_EGENERIC;
 
     p_ovl->p_fontstyle->i_font_color = p_params->fontstyle.i_font_color;
+    p_ovl->p_fontstyle->i_features |= STYLE_HAS_FONT_COLOR;
     p_sys->b_updated = p_ovl->b_active;
     return VLC_SUCCESS;
 }

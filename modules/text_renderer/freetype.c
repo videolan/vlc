@@ -1174,7 +1174,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_library        = 0;
 
     /* default style to apply to uncomplete segmeents styles */
-    p_sys->p_default_style = text_style_New();
+    p_sys->p_default_style = text_style_Create( STYLE_FULLY_SET );
     if(unlikely(!p_sys->p_default_style))
     {
         free(p_sys);
@@ -1184,14 +1184,13 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_style = NULL;
 
     /* empty style for style overriding cases */
-    p_sys->p_forced_style = text_style_New();
+    p_sys->p_forced_style = text_style_Create( STYLE_NO_DEFAULTS );
     if(unlikely(!p_sys->p_forced_style))
     {
         text_style_Delete( p_sys->p_default_style );
         free(p_sys);
         return VLC_ENOMEM;
     }
-    text_style_Reset( p_sys->p_forced_style );
 
     /* fills default and forced style */
     FillDefaultStyles( p_filter );

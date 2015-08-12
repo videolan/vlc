@@ -31,11 +31,19 @@
 /* */
 text_style_t *text_style_New( void )
 {
+    return text_style_Create( STYLE_FULLY_SET );
+}
+
+text_style_t *text_style_Create( int i_defaults )
+{
     text_style_t *p_style = calloc( 1, sizeof(*p_style) );
     if( !p_style )
         return NULL;
 
-    /* initialize to default text style */
+    if( i_defaults == STYLE_NO_DEFAULTS )
+        return p_style;
+
+    /* initialize to default text style (FIXME: by flag) */
     p_style->psz_fontname = NULL;
     p_style->psz_monofontname = NULL;
     p_style->i_features = STYLE_FULLY_SET;

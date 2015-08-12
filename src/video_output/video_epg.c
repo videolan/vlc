@@ -124,14 +124,13 @@ static subpicture_region_t * vout_OSDEpgText(const char *text,
     region->i_y      = y;
 
     /* Set text style */
-    text_style_t *p_style = text_style_New();
+    text_style_t *p_style = text_style_Create( STYLE_NO_DEFAULTS );
     if ( unlikely( !p_style ) )
     {
         text_segment_Delete( region->p_text );
         subpicture_region_Delete( region );
         return NULL;
     }
-    text_style_Reset( p_style );
     region->p_text->style = p_style;
     if (p_style) {
         p_style->f_font_relsize  = __MIN( size, 0 );

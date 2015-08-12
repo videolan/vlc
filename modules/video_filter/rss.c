@@ -282,10 +282,9 @@ static int CreateFilter( vlc_object_t *p_this )
     }
     p_sys->psz_marquee[p_sys->i_length] = '\0';
 
-    p_sys->p_style = text_style_New();
+    p_sys->p_style = text_style_Create( STYLE_NO_DEFAULTS );
     if( p_sys->p_style == NULL )
         goto error;
-    text_style_Reset( p_sys->p_style );
 
     p_sys->i_xoff = var_CreateGetInteger( p_filter, CFG_PREFIX "x" );
     p_sys->i_yoff = var_CreateGetInteger( p_filter, CFG_PREFIX "y" );

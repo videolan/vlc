@@ -671,6 +671,7 @@ vout_display_PlacePicture
 vout_display_SendMouseMovedDisplayCoordinates
 xml_Create
 text_style_Copy
+text_style_Create
 text_style_Delete
 text_style_Duplicate
 text_style_Merge

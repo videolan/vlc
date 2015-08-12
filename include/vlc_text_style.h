@@ -135,6 +135,13 @@ struct text_segment_t {
 VLC_API text_style_t * text_style_New( void );
 
 /**
+ * Create a text style
+ *
+ * Set feature flags as argument if you want to set style defaults
+ */
+VLC_API text_style_t * text_style_Create( int );
+
+/**
  * Copy a text style into another
  */
 VLC_API text_style_t * text_style_Copy( text_style_t *, const text_style_t * );
@@ -150,21 +157,6 @@ VLC_API text_style_t * text_style_Duplicate( const text_style_t * );
  * Set b_override to true if you also want to overwrite non-defaults
  */
 VLC_API void text_style_Merge( text_style_t *, const text_style_t *, bool b_override );
-
-inline void text_style_Reset( text_style_t *p_style )
-{
-    free(p_style->psz_fontname);
-    p_style->psz_fontname = NULL;
-    free(p_style->psz_monofontname);
-    p_style->psz_monofontname = NULL;
-    p_style->i_features = STYLE_NO_DEFAULTS;
-    p_style->i_style_flags = 0;
-    p_style->f_font_relsize = 0.0;
-    p_style->i_font_size = 0;
-    p_style->i_outline_width = 0;
-    p_style->i_shadow_width = 0;
-    p_style->i_spacing = -0;
-}
 
 /**
  * Delete a text style created by text_style_New or text_style_Duplicate

@@ -104,14 +104,15 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
         r->i_x = p_region->i_charleft - (p_region->i_fontwidth + p_region->i_horint / 2) + p_region->i_charleft_adj;
         r->i_y = p_region->i_charbottom - (p_region->i_fontheight + p_region->i_verint / 2) + p_region->i_charbottom_adj;
-        r->p_text->style = text_style_New();
+        r->p_text->style = text_style_Create( STYLE_NO_DEFAULTS );
         r->p_text->style->psz_fontname = p_region->psz_fontname ? strdup( p_region->psz_fontname ) : NULL;
         r->p_text->style->i_font_size = p_region->i_fontheight;
         r->p_text->style->i_font_color = p_region->i_font_color;
-        r->p_text->style->i_style_flags = 0;
+        r->p_text->style->i_features |= STYLE_HAS_FONT_COLOR;
         if( p_region->i_fontwidth < p_region->i_fontheight )
         {
             r->p_text->style->i_style_flags |= STYLE_HALFWIDTH;
+            r->p_text->style->i_features |= STYLE_HAS_FLAGS;
         }
         r->p_text->style->i_spacing = p_region->i_horint;
     }

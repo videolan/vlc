@@ -786,10 +786,9 @@ int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         {
             p_track->fmt.i_codec = VLC_CODEC_TX3G;
 
-            text_style_t *p_style = text_style_New();
+            text_style_t *p_style = text_style_Create( STYLE_NO_DEFAULTS );
             if ( p_style )
             {
-                text_style_Reset( p_style );
                 if ( p_text->i_font_size ) /* !WARN: in % of 5% height */
                 {
                     p_style->f_font_relsize = p_text->i_font_size * 5 / 100;

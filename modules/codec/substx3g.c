@@ -361,7 +361,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
                 text_style_t style;
                 memset( &style, 0, sizeof(text_style_t) );
-                text_style_Reset( &style );
                 style.i_style_flags = ConvertFlags( p_buf[6] );
                 style.f_font_relsize = p_buf[7] * 5 / 100; /* in % units of 0.05 height */
                 style.i_font_color = GetDWBE(p_buf+8) >> 8;// RGBA -> RGB

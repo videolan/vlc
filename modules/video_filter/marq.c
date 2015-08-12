@@ -192,12 +192,8 @@ static int CreateFilter( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->p_style = text_style_New();
-    if(likely(p_sys->p_style))
-    {
-        text_style_Reset( p_sys->p_style );
-    }
-    else
+    p_sys->p_style = text_style_Create( STYLE_NO_DEFAULTS );
+    if(unlikely(!p_sys->p_style))
     {
         free(p_sys);
         return VLC_ENOMEM;

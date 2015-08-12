@@ -122,13 +122,12 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
         .pf_destroy  = SubpictureTextDestroy,
         .p_sys       = sys,
     };
-    sys->p_default_style = text_style_New();
+    sys->p_default_style = text_style_Create( STYLE_NO_DEFAULTS );
     if(unlikely(!sys->p_default_style))
     {
         free(sys);
         return NULL;
     }
-    text_style_Reset( sys->p_default_style );
     subpicture_t *subpic = decoder_NewSubpicture(decoder, &updater);
     if (!subpic)
     {
