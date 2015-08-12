@@ -253,35 +253,18 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
         (void) p_this;
         (void) psz_variable;
         (void) old_val;
-        (void) param;
 
-        ExtensionsDialogProvider *extensionDialogProvider = [ExtensionsDialogProvider sharedInstance];
-        if (!extensionDialogProvider)
-            return VLC_EGENERIC;
+        ExtensionsDialogProvider *provider = (__bridge ExtensionsDialogProvider *)param;
         if (!new_val.p_address)
             return VLC_EGENERIC;
 
         extension_dialog_t *p_dialog = (extension_dialog_t*) new_val.p_address;
-        [extensionDialogProvider manageDialog:p_dialog];
+        [provider manageDialog:p_dialog];
         return VLC_SUCCESS;
     }
 }
 
-@interface ExtensionsDialogProvider ()
-@end
-
 @implementation ExtensionsDialogProvider
-
-+ (ExtensionsDialogProvider *)sharedInstance
-{
-    static ExtensionsDialogProvider *sharedInstance = nil;
-    static dispatch_once_t pred;
-    dispatch_once(&pred, ^{
-        sharedInstance = [[ExtensionsDialogProvider alloc] init];
-    });
-
-    return sharedInstance;
-}
 
 - (id)init
 {
@@ -297,8 +280,7 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
 
 - (void)dealloc
 {
-    intf_thread_t *p_intf = VLCIntf;
-    var_DelCallback(p_intf, "dialog-extension", extensionDialogCallback, (__bridge void *)self);
+    var_DelCallback(VLCIntf, "dialog-extension", extensionDialogCallback, (__bridge void *)self);
 }
 
 - (void)performEventWithObject:(NSValue *)objectValue ofType:(const char*)type
@@ -554,8 +536,6 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
 - (void)manageDialog:(extension_dialog_t *)p_dialog
 {
     assert(p_dialog);
-    ExtensionsManager *extMgr = [ExtensionsManager sharedInstance];
-    assert(extMgr != NULL);
 
     NSValue *o_value = [NSValue valueWithPointer:p_dialog];
     [self performSelectorOnMainThread:@selector(updateExtensionDialog:)

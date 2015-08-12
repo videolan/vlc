@@ -38,8 +38,6 @@
  *****************************************************************************/
 @interface ExtensionsDialogProvider : NSObject <NSWindowDelegate>
 
-+ (ExtensionsDialogProvider *)sharedInstance;
-
 - (void)performEventWithObject: (NSValue *)o_value ofType:(const char*)type;
 
 - (void)triggerClick:(id)sender;

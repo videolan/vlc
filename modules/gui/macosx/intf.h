@@ -73,6 +73,7 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 @class VLCAudioEffects;
 @class VLCVideoEffects;
 @class VLCConvertAndSave;
+@class ExtensionsManager;
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 
@@ -93,6 +94,8 @@ static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 - (VLCCoreDialogProvider *)coreDialogProvider;
 - (ResumeDialogController *)resumeDialog;
 - (VLCInputManager *)inputManager;
+- (ExtensionsManager *)extensionsManager;
+
 - (VLCDebugMessageVisualizer *)debugMsgPanel;
 
 - (VLCTrackSynchronization *)trackSyncPanel;

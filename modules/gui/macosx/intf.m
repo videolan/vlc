@@ -174,6 +174,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCAudioEffects *_audioEffectsPanel;
     VLCVideoEffects *_videoEffectsPanel;
     VLCConvertAndSave *_convertAndSaveWindow;
+    ExtensionsManager *_extensionsManager;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -213,6 +214,9 @@ static VLCMain *sharedInstance = nil;
 
         [VLCApplication sharedApplication].delegate = self;
 
+        _input_manager = [[VLCInputManager alloc] initWithMain:self];
+        _extensionsManager = [[ExtensionsManager alloc] init];
+
         _mainmenu = [[VLCMainMenu alloc] init];
         _voutController = [[VLCVoutWindowController alloc] init];
         _playlist = [[VLCPlaylist alloc] init];
@@ -220,8 +224,6 @@ static VLCMain *sharedInstance = nil;
         _mainWindowController = [[NSWindowController alloc] initWithWindowNibName:@"MainWindow"];
 
         var_Create(p_intf, "intf-change", VLC_VAR_BOOL);
-
-        _input_manager = [[VLCInputManager alloc] initWithMain:self];
 
         var_AddCallback(p_intf->p_libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
         var_AddCallback(p_intf->p_libvlc, "intf-show", ShowController, (__bridge void *)self);
@@ -512,6 +514,11 @@ static VLCMain *sharedInstance = nil;
 - (VLCInputManager *)inputManager
 {
     return _input_manager;
+}
+
+- (ExtensionsManager *)extensionsManager
+{
+    return _extensionsManager;
 }
 
 - (VLCDebugMessageVisualizer *)debugMsgPanel

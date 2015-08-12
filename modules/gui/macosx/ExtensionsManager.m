@@ -48,22 +48,13 @@
 
 @implementation ExtensionsManager
 
-static ExtensionsManager* instance = nil;
-
-+ (ExtensionsManager *)sharedInstance
-{
-    if (!instance)
-        instance = [[ExtensionsManager alloc] init];
-    return instance;
-}
-
 - (id)init
 {
     self = [super init];
 
     if (self) {
         p_extensions_manager = NULL;
-        _extensionDialogProvider = [ExtensionsDialogProvider sharedInstance];
+        _extensionDialogProvider = [[ExtensionsDialogProvider alloc] init];
 
         p_extDict = [[NSMutableDictionary alloc] init];
 
@@ -189,18 +180,6 @@ static ExtensionsManager* instance = nil;
             return false;
         }
 
-        /* Initialize dialog provider */
-        _extensionDialogProvider = [ExtensionsDialogProvider sharedInstance];
-
-        if (!_extensionDialogProvider) {
-            msg_Err(p_intf, "Unable to create dialogs provider for extensions");
-            module_unneed(p_extensions_manager, p_extensions_manager->p_module);
-            vlc_object_release(p_extensions_manager);
-            p_extensions_manager = NULL;
-            b_failed = true;
-            [delegate extensionsUpdated];
-            return false;
-        }
         _isUnloading = false;
     }
     b_failed = false;
@@ -213,6 +192,7 @@ static ExtensionsManager* instance = nil;
     if (!p_extensions_manager)
         return;
     _isUnloading = true;
+
     module_unneed(p_extensions_manager, p_extensions_manager->p_module);
     vlc_object_release(p_extensions_manager);
     p_extensions_manager = NULL;
@@ -323,8 +303,9 @@ static ExtensionsManager* instance = nil;
 - (void)dealloc
 {
     intf_thread_t *p_intf = VLCIntf;
-    msg_Dbg(p_intf, "Killing extension dialog provider");
+    msg_Dbg(p_intf, "Deinitializing extensions manager");
 
+    _extensionDialogProvider = nil;
     if (p_extensions_manager)
         vlc_object_release(p_extensions_manager);
 }

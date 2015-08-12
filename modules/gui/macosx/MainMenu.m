@@ -60,8 +60,6 @@
     HelpWindowController  *_helpWindowController;
     AddonsWindowController *_addonsController;
 
-    ExtensionsManager *_extensionManager;
-
     // information for playlist table columns menu
     NSDictionary *_translationsForPlaylistTableColumns;
     NSArray *_menuOrderOfPlaylistTableColumns;
@@ -79,6 +77,7 @@
 
 - (void)dealloc
 {
+    msg_Dbg(VLCIntf, "Deinitializing main menu");
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     [self releaseRepresentedObjects:[NSApp mainMenu]];
@@ -133,7 +132,6 @@
 
     /* Get ExtensionsManager */
     intf_thread_t *p_intf = VLCIntf;
-    _extensionManager = [ExtensionsManager sharedInstance];
 
     [self initStrings];
 
@@ -241,12 +239,13 @@
 
     /* setup extensions menu */
     /* Let the ExtensionsManager itself build the menu */
-    [_extensionManager buildMenu:_extensionsMenu];
+    ExtensionsManager *extMgr = [[VLCMain sharedInstance] extensionsManager];
+    [extMgr buildMenu:_extensionsMenu];
     [_extensions setEnabled: ([_extensionsMenu numberOfItems] > 0)];
 
     // FIXME: Implement preference for autoloading extensions on mac
-    if (![_extensionManager isLoaded] && ![_extensionManager cannotLoad])
-        [_extensionManager loadExtensions];
+    if (![extMgr isLoaded] && ![extMgr cannotLoad])
+        [extMgr loadExtensions];
 
     /* setup post-proc menu */
     NSUInteger count = (NSUInteger) [_postprocessingMenu numberOfItems];

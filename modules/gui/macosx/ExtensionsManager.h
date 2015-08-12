@@ -40,8 +40,6 @@
 
 @interface ExtensionsManager : NSObject
 
-+ (ExtensionsManager *)sharedInstance;
-
 - (void)buildMenu:(NSMenu *)extMenu;
 
 - (BOOL)loadExtensions;
