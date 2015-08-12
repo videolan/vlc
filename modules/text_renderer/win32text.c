@@ -122,11 +122,8 @@ vlc_module_end ()
  *****************************************************************************/
 struct filter_sys_t
 {
-    uint8_t        i_font_opacity;
-    int            i_font_color;
-    int            i_font_size;
+    text_style_t  *p_default_style;
 
-    int            i_default_font_size;
     int            i_display_height;
 
     HDC hcdc;
@@ -154,7 +151,13 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-    p_sys->i_font_size = 0;
+    p_sys->p_default_style = text_style_Create( STYLE_FULLY_SET );
+    if( unlikely(!p_sys->p_default_style) )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
     p_sys->i_display_height = 0;
 
     var_Create( p_filter, "win32text-font",
@@ -163,14 +166,16 @@ static int Create( vlc_object_t *p_this )
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_filter, "win32text-rel-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
     var_Create( p_filter, "win32text-opacity",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_filter, "win32text-opacity", &val );
-    p_sys->i_font_opacity = VLC_CLIP( val.i_int, 0, 255 );
+    p_sys->p_default_style->i_font_alpha = VLC_CLIP( val.i_int, 0, 255 );
+
     var_Create( p_filter, "win32text-color",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_filter, "win32text-color", &val );
-    p_sys->i_font_color = VLC_CLIP( val.i_int, 0, 0xFFFFFF );
+    p_sys->p_default_style->i_font_color = VLC_CLIP( val.i_int, 0, 0xFFFFFF );
 
     p_sys->hfont = p_sys->hfont_bak = 0;
     hdc = GetDC( NULL );
@@ -180,7 +185,8 @@ static int Create( vlc_object_t *p_this )
     SetBkMode( p_sys->hcdc, TRANSPARENT );
 
     var_Get( p_filter, "win32text-fontsize", &val );
-    p_sys->i_default_font_size = val.i_int;
+    if( val.i_int )
+        p_sys->p_default_style->i_font_size = val.i_int;
     if( SetFont( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
     free( psz_fontfile );
@@ -188,6 +194,7 @@ static int Create( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
  error:
+    text_style_Delete( p_sys->p_default_style );
     free( psz_fontfile );
     free( p_sys );
     return VLC_EGENERIC;
@@ -204,6 +211,7 @@ static void Destroy( vlc_object_t *p_this )
     if( p_sys->hfont_bak ) SelectObject( p_sys->hcdc, p_sys->hfont_bak );
     if( p_sys->hfont ) DeleteObject( p_sys->hfont );
     DeleteDC( p_sys->hcdc );
+    text_style_Delete( p_sys->p_default_style );
     free( p_sys );
 }
 
@@ -300,7 +308,6 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                        const vlc_fourcc_t *p_chroma_list )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    int i_font_color, i_font_alpha, i_font_size;
     uint8_t *p_bitmap;
     TCHAR *psz_string;
     int i, i_width, i_height;
@@ -309,43 +316,53 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     RECT rect = { 0, 0, 0, 0 };
 
     /* Sanity check */
-    if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
-    if( !p_region_in->p_text ) return VLC_EGENERIC;
-    if( !p_region_in->p_text->psz_text || !*p_region_in->p_text->psz_text )
+    if( !p_region_in || !p_region_out || !p_region_in->p_text ) return VLC_EGENERIC;
+
+    /* Convert to segments to single raw text */
+    /* FIXME: render split segment/style */
+    size_t i_len = 0;
+    for (const text_segment_t *p_text = p_region_in->p_text; p_text != NULL; p_text = p_text->p_next)
+    {
+        i_len += (p_text->psz_text) ? strlen(p_text->psz_text) : 0;
+    }
+    if(i_len == 0)
         return VLC_EGENERIC;
 
-    psz_string = ToT(p_region_in->p_text->psz_text);
-    if( psz_string == NULL )
+    char *psz = psz_render_string = malloc(i_len + 1);
+    if(!psz_render_string)
         return VLC_EGENERIC;
-    if( !*psz_string )
+    *psz = 0;
+
+    for (const text_segment_t *p_text = p_region_in->p_text; p_text != NULL; p_text = p_text->p_next)
+    {
+        if(p_text->psz_text)
+            strcat(psz, p_text->psz_text);
+    }
+
+    psz_string = ToT(psz_render_string);
+    free(psz_render_string);
+    if( !psz_string || !*psz_string )
     {
         free( psz_string );
         return VLC_EGENERIC;
     }
 
-    if( p_region_in->p_text->style )
-    {
-        i_font_color = VLC_CLIP( p_region_in->p_text->style->i_font_color, 0, 0xFFFFFF );
-        i_font_alpha = VLC_CLIP( p_region_in->p_text->style->i_font_alpha, 0, 255 );
-        i_font_size  = VLC_CLIP( p_region_in->p_text->style->i_font_size, 0, 255 );
-    }
-    else
-    {
-        i_font_color = p_sys->i_font_color;
-        i_font_alpha = 255 - p_sys->i_font_opacity;
-        i_font_size = p_sys->i_default_font_size;
-    }
+    SetFont( p_filter, p_sys->p_default_style->i_font_size );
 
-    SetFont( p_filter, i_font_size );
-
-    SetTextColor( p_sys->hcdc, RGB( (i_font_color >> 16) & 0xff,
-                  (i_font_color >> 8) & 0xff, i_font_color & 0xff) );
+    SetTextColor( p_sys->hcdc, RGB( (p_sys->p_default_style->i_font_color >> 16) & 0xff,
+                                    (p_sys->p_default_style->i_font_color >> 8) & 0xff,
+                                    p_sys->p_default_style->i_font_color & 0xff) );
 
     DrawText( p_sys->hcdc, psz_string, -1, &rect,
               DT_CALCRECT | DT_CENTER | DT_NOPREFIX );
     i_width = rect.right; i_height = rect.bottom;
 
     p_bmi = malloc(sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)*16);
+    if(!p_bmi)
+    {
+        free( psz_string );
+        return VLC_ENOMEM;
+    }
     memset( p_bmi, 0, sizeof(BITMAPINFOHEADER) );
     p_bmi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     p_bmi->bmiHeader.biWidth = (i_width+3) & ~3;
@@ -368,6 +385,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
         msg_Err( p_filter, "could not create bitmap" );
         free( psz_string );
+        free( p_bmi );
         return VLC_EGENERIC;
     }
 
@@ -387,6 +405,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     SelectObject( p_sys->hcdc, bitmap_bak );
     DeleteObject( bitmap );
     free( psz_string );
+
+    free( p_bmi );
     return VLC_SUCCESS;
 }
 
@@ -395,19 +415,19 @@ static int SetFont( filter_t *p_filter, int i_size )
     filter_sys_t *p_sys = p_filter->p_sys;
     LOGFONT logfont;
 
-    if( i_size && i_size == p_sys->i_font_size ) return VLC_SUCCESS;
+    if( i_size && i_size == p_sys->p_default_style->i_font_size ) return VLC_SUCCESS;
 
     if( !i_size )
     {
         vlc_value_t val;
 
-        if( !p_sys->i_default_font_size &&
+        if( !p_sys->p_default_style->i_font_size &&
             p_sys->i_display_height == (int)p_filter->fmt_out.video.i_height )
             return VLC_SUCCESS;
 
-        if( p_sys->i_default_font_size )
+        if( p_sys->p_default_style->i_font_size )
         {
-            i_size = p_sys->i_default_font_size;
+            i_size = p_sys->p_default_style->i_font_size;
         }
         else
         {
@@ -425,7 +445,7 @@ static int SetFont( filter_t *p_filter, int i_size )
         msg_Dbg( p_filter, "using fontsize: %i", i_size );
     }
 
-    p_sys->i_font_size = i_size;
+    p_sys->p_default_style->i_font_size = i_size;
 
     if( p_sys->hfont_bak ) SelectObject( p_sys->hcdc, p_sys->hfont_bak );
     if( p_sys->hfont ) DeleteObject( p_sys->hfont );
