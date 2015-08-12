@@ -166,7 +166,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)dealloc
 {
-    intf_thread_t *p_intf = VLCIntf;
+    msg_Dbg(VLCIntf, "Deinitializing input manager");
     if (p_current_input) {
         /* continue playback where you left off */
         [[o_main playlist] storePlaybackPositionForItem:p_current_input];
@@ -176,8 +176,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         p_current_input = NULL;
     }
 
-    if (p_intf)
-        var_DelCallback(p_intf, "input-current", InputThreadChanged, (__bridge void *)self);
+    var_DelCallback(pl_Get(VLCIntf), "input-current", InputThreadChanged, (__bridge void *)self);
 
     dispatch_release(informInputChangedQueue);
 }
