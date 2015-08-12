@@ -382,13 +382,13 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
             continue; /* Some widgets may be NULL@this point */
 
         BOOL shouldDestroy = widget->b_kill;
-        NSView *control = CFBridgingRelease(widget->p_sys_intf);
+        NSView *control = (__bridge NSView *)widget->p_sys_intf;
         BOOL update = widget->b_update;
 
         if (!control && !shouldDestroy) {
             control = createControlFromWidget(widget, self);
             updateControlFromWidget(control, widget, self);
-            widget->p_sys_intf = (void *)CFBridgingRetain(control);
+            widget->p_sys_intf = (__bridge void *)control;
             update = YES; // Force update and repositionning
             [control setHidden:widget->b_hide];
         }
