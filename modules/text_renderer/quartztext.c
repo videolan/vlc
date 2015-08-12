@@ -179,11 +179,7 @@ struct offscreen_bitmap_t
  *****************************************************************************/
 struct filter_sys_t
 {
-    uint8_t        i_font_opacity;
-    int            i_font_color;
-    bool           b_outline;
-    bool           b_shadow;
-    text_style_t   style;
+    text_style_t  *p_default_style;
 
 #ifndef TARGET_OS_IPHONE
     ATSFontContainerRef    *p_fonts;
@@ -206,15 +202,40 @@ static int Create(vlc_object_t *p_this)
     if (!p_sys)
         return VLC_ENOMEM;
 
-    p_sys->style.psz_fontname = var_CreateGetString(p_this, "quartztext-font");;
-    p_sys->style.psz_monofontname = var_CreateGetString(p_this, "quartztext-monofont");
-    p_sys->style.i_font_size = GetFontSize(p_filter);;
-    p_sys->style.i_style_flags = 0;
+    p_sys->p_default_style = text_style_Create( STYLE_FULLY_SET );
+    if(unlikely(!p_sys->p_default_style))
+    {
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+    p_sys->p_default_style->psz_fontname = var_CreateGetString(p_this, "quartztext-font");;
+    p_sys->p_default_style->psz_monofontname = var_CreateGetString(p_this, "quartztext-monofont");
+    p_sys->p_default_style->i_font_size = GetFontSize(p_filter);
 
-    p_sys->i_font_opacity = 255;
-    p_sys->i_font_color = VLC_CLIP(var_CreateGetInteger(p_this, "quartztext-color") , 0, 0xFFFFFF);
-    p_sys->b_outline = var_InheritBool(p_this, "quartztext-outline");
-    p_sys->b_shadow = var_InheritBool(p_this, "quartztext-shadow");
+    p_sys->p_default_style->i_font_color = VLC_CLIP(var_CreateGetInteger(p_this, "quartztext-color") , 0, 0xFFFFFF);
+    p_sys->p_default_style->i_features |= STYLE_HAS_FONT_COLOR;
+
+    if( var_InheritBool(p_this, "quartztext-outline") )
+    {
+        p_sys->p_default_style->i_style_flags |= STYLE_OUTLINE;
+        p_sys->p_default_style->i_features |= STYLE_HAS_FLAGS;
+    }
+
+    if( var_InheritBool(p_this, "quartztext-shadow") )
+    {
+        p_sys->p_default_style->i_style_flags |= STYLE_SHADOW;
+        p_sys->p_default_style->i_features |= STYLE_HAS_FLAGS;
+    }
+
+    if (p_sys->p_default_style->i_font_size <= 0)
+    {
+        vlc_value_t val;
+        msg_Warn(p_filter, "invalid fontsize, using 12");
+        if (VLC_SUCCESS == var_Get(p_filter, "scale", &val))
+            p_sys->p_default_style->i_font_size = 12 * val.i_int / 1000;
+        else
+            p_sys->p_default_style->i_font_size = 12;
+    }
 
     p_filter->pf_render = RenderText;
 
@@ -245,7 +266,7 @@ static void Destroy(vlc_object_t *p_this)
         free(p_sys->p_fonts);
     }
 #endif
-    free(p_sys->style.psz_fontname);
+    text_style_Delete( p_sys->p_default_style );
     free(p_sys);
 }
 
@@ -303,16 +324,7 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     char         *psz_render_string = NULL;
-    char         *psz_fontname;
-    int           i_font_size;
-    int           i_spacing = 0;
-    uint32_t      i_font_color;
-    bool          b_bold, b_uline, b_italic, b_halfwidth;
-    vlc_value_t val;
-    b_bold = b_uline = b_italic = b_halfwidth = FALSE;
     VLC_UNUSED(p_chroma_list);
-
-    i_font_size = p_sys->style.i_font_size = GetFontSize(p_filter);
 
     // Sanity check
     if (!p_region_in || !p_region_out) {
@@ -320,49 +332,28 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
         return VLC_EGENERIC;
     }
 
-    text_segment_t *p_text = p_region_in->p_text;
-
-    if (p_text->psz_text) {
-        psz_render_string = strdup(p_text->psz_text);
+    /* Convert to segments to single raw text */
+    /* FIXME: render split segment/style */
+    size_t i_len = 0;
+    for (const text_segment_t *p_text = p_region_in->p_text; p_text != NULL; p_text = p_text->p_next)
+    {
+        i_len += (p_text->psz_text) ? strlen(p_text->psz_text) : 0;
     }
-
-    if (!psz_render_string) {
+    if(i_len == 0)
         return VLC_EGENERIC;
+
+    char *psz = psz_render_string = malloc(i_len + 1);
+    if(!psz_render_string)
+        return VLC_EGENERIC;
+    *psz = 0;
+
+    for (const text_segment_t *p_text = p_region_in->p_text; p_text != NULL; p_text = p_text->p_next)
+    {
+        if(p_text->psz_text)
+            strcat(psz, p_text->psz_text);
     }
 
-    if (p_text->style) {
-        if(p_text->style->i_style_flags & STYLE_MONOSPACED)
-        {
-            psz_fontname = p_text->style->psz_monofontname ?
-                           p_text->style->psz_monofontname : p_sys->style.psz_monofontname;
-        }
-        else
-        {
-            psz_fontname = p_text->style->psz_fontname ?
-                           p_text->style->psz_fontname : p_sys->style.psz_fontname;
-        }
-        i_font_color = VLC_CLIP(p_text->style->i_font_color, 0, 0xFFFFFF);
-        i_font_size  = VLC_CLIP(p_text->style->i_font_size, 0, 255);
-        if (p_text->style->i_style_flags) {
-            if (p_text->style->i_style_flags & STYLE_BOLD)
-                b_bold = TRUE;
-            if (p_text->style->i_style_flags & STYLE_ITALIC)
-                b_italic = TRUE;
-            if (p_text->style->i_style_flags & STYLE_UNDERLINE)
-                b_uline = TRUE;
-            if (p_text->style->i_style_flags & STYLE_HALFWIDTH)
-                b_halfwidth = TRUE;
-        }
-        i_spacing = VLC_CLIP(p_text->style->i_spacing, 0, 255);
-    }
-
-    if (i_font_size <= 0) {
-        msg_Warn(p_filter, "invalid fontsize, using 12");
-        if (VLC_SUCCESS == var_Get(p_filter, "scale", &val))
-            i_font_size = 12 * val.i_int / 1000;
-        else
-            i_font_size = 12;
-    }
+    const int i_font_size = GetFontSize(p_filter);
 
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;
@@ -375,19 +366,32 @@ static int RenderText(filter_t *p_filter, subpicture_region_t *p_region_out,
 
         p_cfString = CFStringCreateWithCString(NULL, psz_render_string, kCFStringEncodingUTF8);
         if (!p_cfString)
+        {
+            CFRelease(p_attrString);
+            free(psz_render_string);
             return VLC_EGENERIC;
+        }
 
         CFAttributedStringReplaceString(p_attrString, CFRangeMake(0, 0), p_cfString);
         CFRelease(p_cfString);
         len = CFAttributedStringGetLength(p_attrString);
 
-        setFontAttibutes(psz_fontname, i_font_size, i_font_color, b_bold, b_italic, b_uline, b_halfwidth,
-                                             i_spacing,
-                                             CFRangeMake(0, len), p_attrString);
+        setFontAttibutes((p_sys->p_default_style->i_style_flags & STYLE_MONOSPACED) ? p_sys->p_default_style->psz_monofontname :
+                                                                                      p_sys->p_default_style->psz_fontname,
+                         i_font_size,
+                         p_sys->p_default_style->i_font_color,
+                         p_sys->p_default_style->i_style_flags & STYLE_BOLD,
+                         p_sys->p_default_style->i_style_flags & STYLE_ITALIC,
+                         p_sys->p_default_style->i_style_flags & STYLE_UNDERLINE,
+                         p_sys->p_default_style->i_style_flags & STYLE_HALFWIDTH,
+                         p_sys->p_default_style->i_spacing,
+                         CFRangeMake(0, len), p_attrString);
 
         RenderYUVA(p_filter, p_region_out, p_attrString);
         CFRelease(p_attrString);
     }
+
+    free(psz_render_string);
 
     return VLC_SUCCESS;
 }
@@ -572,14 +576,14 @@ static offscreen_bitmap_t *Compose(filter_t *p_filter,
             CGPathRelease(p_path);
 
             // Set up black outlining of the text --
-            if (p_sys->b_outline)
+            if (p_sys->p_default_style->i_style_flags & STYLE_OUTLINE)
             {
                 CGContextSetRGBStrokeColor(p_context, 0, 0, 0, 0.5);
                 CGContextSetTextDrawingMode(p_context, kCGTextFillStroke);
             }
 
             // Shadow
-            if (p_sys->b_shadow)
+            if (p_sys->p_default_style->i_style_flags & STYLE_SHADOW)
             {
                 // TODO: Use CGContextSetShadowWithColor.
                 // TODO: Use user defined parrameters (color, distance, etc.)
