@@ -328,7 +328,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     if(i_len == 0)
         return VLC_EGENERIC;
 
-    char *psz = psz_render_string = malloc(i_len + 1);
+    char *psz;
+    char *psz_render_string = psz = malloc(i_len + 1);
     if(!psz_render_string)
         return VLC_EGENERIC;
     *psz = 0;
