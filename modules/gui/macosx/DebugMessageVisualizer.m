@@ -77,6 +77,11 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     return self;
 }
 
+- (void)dealloc
+{
+    vlc_LogSet( VLCIntf->p_libvlc, NULL, NULL );
+}
+
 - (void)windowDidLoad
 {
     [self.window setExcludedFromWindowsMenu: YES];
