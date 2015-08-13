@@ -513,8 +513,8 @@
     NSSize windowMinSize = [self minSize];
     NSRect screenFrame = [[self screen] visibleFrame];
 
-    NSPoint topleftbase = NSMakePoint(0, [self frame].size.height);
-    NSPoint topleftscreen = [self convertBaseToScreen: topleftbase];
+    NSRect topleftbase = NSMakeRect(0, [self frame].size.height, 0, 0);
+    NSPoint topleftscreen = [self convertRectToScreen: topleftbase].origin;
 
     CGFloat f_width = size.width;
     CGFloat f_height = size.height;

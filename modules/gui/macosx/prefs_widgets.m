@@ -2221,7 +2221,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     // We don't ever want to drop onto a row, only between rows.
     if (op == NSTableViewDropOn)
         [table setDropRow:(row+1) dropOperation:NSTableViewDropAbove];
-    return NSTableViewDropAbove;
+    return NSDragOperationGeneric;
 }
 
 - (BOOL)tableView:(NSTableView*)table acceptDrop:(id <NSDraggingInfo>)info

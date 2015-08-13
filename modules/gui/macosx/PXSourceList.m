@@ -378,21 +378,11 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
                         iconRect = NSMakeRect(NSMidX(iconRect)-(actualIconSize.width/2.0f), NSMidY(iconRect)-(actualIconSize.height/2.0f), actualIconSize.width, actualIconSize.height);
                     }
 
-                    //Use 10.6 NSImage drawing if we can
-                    if(NSAppKitVersionNumber >= 1115.2) { // Lion
-                        [icon drawInRect:iconRect
-                                fromRect:NSZeroRect
-                               operation:NSCompositeSourceOver
-                                fraction:1
-                          respectFlipped:YES hints:nil];
-                    }
-                    else {
-                        [icon setFlipped:[self isFlipped]];
-                        [icon drawInRect:iconRect
-                                fromRect:NSZeroRect
-                               operation:NSCompositeSourceOver
-                                fraction:1];
-                    }
+                    [icon drawInRect:iconRect
+                            fromRect:NSZeroRect
+                           operation:NSCompositeSourceOver
+                            fraction:1
+                      respectFlipped:YES hints:nil];
                 }
             }
         }

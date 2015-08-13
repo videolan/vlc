@@ -356,8 +356,8 @@ void WindowClose(vout_window_t *p_wnd)
             if ([o_vout_dict count] == 1) {
                 NSWindow * o_first_window = [o_vout_dict objectForKey: [[o_vout_dict allKeys] firstObject]];
 
-                NSPoint topleftbase = NSMakePoint(0, [o_first_window frame].size.height);
-                top_left_point = [o_first_window convertBaseToScreen: topleftbase];
+                NSRect topleftBaseRect = NSMakeRect(0, [o_first_window frame].size.height, 0, 0);
+                top_left_point = [o_first_window convertRectToScreen: topleftBaseRect].origin;
             }
 
             top_left_point = [o_new_video_window cascadeTopLeftFromPoint: top_left_point];

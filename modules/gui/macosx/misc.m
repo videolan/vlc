@@ -407,7 +407,7 @@ static bool b_old_spaces_style = YES;
         NSRect frameRect = [self bounds];
 
         [[NSColor selectedControlColor] set];
-        NSFrameRectWithWidthUsingOperation(frameRect, 2., NSCompositeHighlight);
+        NSFrameRectWithWidthUsingOperation(frameRect, 2., NSCompositeSourceOver);
     }
 
     [super drawRect:dirtyRect];
