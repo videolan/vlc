@@ -554,13 +554,14 @@ void WindowClose(vout_window_t *p_wnd)
 #pragma mark -
 #pragma mark Misc methods
 
-- (void)updateWindowsControlsBarWithSelector:(SEL)aSel
+- (void)updateControlsBarsUsingBlock:(void (^)(VLCControlsBarCommon *controlsBar))block
 {
     [o_vout_dict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+
         if ([obj respondsToSelector:@selector(controlsBar)]) {
-            id o_controlsBar = [obj controlsBar];
-            if (o_controlsBar)
-                [o_controlsBar performSelector:aSel];
+            VLCControlsBarCommon *o_controlsBar = [obj controlsBar];
+            if (o_controlsBar && block)
+                block(o_controlsBar);
         }
     }];
 }

@@ -654,7 +654,9 @@ static const float f_min_window_height = 307.;
     [self.controlsBar updateTimeSlider];
     [self.fspanel updatePositionAndTime];
 
-    [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(updateTimeSlider)];
+    [[[VLCMain sharedInstance] voutController] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
+        [controlsBar updateTimeSlider];
+    }];
 
     [[VLCCoreInteraction sharedInstance] updateAtoB];
 }
@@ -722,7 +724,9 @@ static const float f_min_window_height = 307.;
 - (void)updateWindow
 {
     [self.controlsBar updateControls];
-    [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(updateControls)];
+    [[[VLCMain sharedInstance] voutController] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
+        [controlsBar updateControls];
+    }];
 
     bool b_seekable = false;
 
@@ -756,7 +760,9 @@ static const float f_min_window_height = 307.;
     [self.controlsBar setPause];
     [self.fspanel setPause];
 
-    [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(setPause)];
+    [[[VLCMain sharedInstance] voutController] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
+        [controlsBar setPause];
+    }];
 }
 
 - (void)setPlay
@@ -764,7 +770,9 @@ static const float f_min_window_height = 307.;
     [self.controlsBar setPlay];
     [self.fspanel setPlay];
 
-    [[[VLCMain sharedInstance] voutController] updateWindowsControlsBarWithSelector:@selector(setPlay)];
+    [[[VLCMain sharedInstance] voutController] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
+        [controlsBar setPlay];
+    }];
 }
 
 - (void)updateVolumeSlider
