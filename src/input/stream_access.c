@@ -200,6 +200,7 @@ stream_t *stream_AccessNew( access_t *p_access )
     s->p_sys = p_sys = malloc( sizeof( *p_sys ) );
     if( !s->psz_url || !s->p_sys )
     {
+        free( s->p_sys );
         stream_CommonDelete( s );
         return NULL;
     }
