@@ -283,8 +283,11 @@ static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
         else
         {
             if( asprintf( &psz_name, "%i", asfPicture.type() ) == -1 )
-                continue;
+                psz_name = NULL;
         }
+
+        if( unlikely(psz_name == NULL) )
+            continue;
 
         msg_Dbg( p_demux_meta, "Found embedded art: %s (%s) is %u bytes",
                  psz_name, psz_mime, i_data );
