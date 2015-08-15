@@ -198,7 +198,7 @@ stream_t *stream_AccessNew( access_t *p_access )
                   p_access->psz_location ) == -1 )
         s->psz_url = NULL;
     s->p_sys = p_sys = malloc( sizeof( *p_sys ) );
-    if( !s->psz_url || !s->p_sys )
+    if( unlikely(s->psz_url == NULL || s->p_sys == NULL) )
     {
         free( s->p_sys );
         stream_CommonDelete( s );
