@@ -1004,7 +1004,7 @@ static void LoadSubtitles( input_thread_t *p_input )
         if( !a )
             continue;
         char *psz_mrl;
-        if( a->psz_name[i] &&
+        if( a->psz_name[0] &&
             asprintf( &psz_mrl, "attachment://%s", a->psz_name ) >= 0 )
         {
             var_SetString( p_input, "sub-description", a->psz_description ? a->psz_description : "");
