@@ -980,12 +980,11 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
         }
 
         if( s->style )
-        {
             /* Replace defaults with segment values */
             text_style_Merge( p_style, s->style, true );
-            /* Overwrite any default or value with forced ones */
-            text_style_Merge( p_style, p_filter->p_sys->p_forced_style, true );
-        }
+
+        /* Overwrite any default or value with forced ones */
+        text_style_Merge( p_style, p_filter->p_sys->p_forced_style, true );
 
         // i_string_bytes is a number of bytes, while here we're going to assign pointer by pointer
         for ( size_t i = 0; i < i_string_bytes / sizeof( *psz_uni ); ++i )
