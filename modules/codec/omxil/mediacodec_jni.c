@@ -527,9 +527,11 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
             b_direct_rendering = false;
 
         if (b_direct_rendering && p_args->video.i_angle != 0)
+        {
             jrotation_string = (*env)->NewStringUTF(env, "rotation-degrees");
             (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
                                    jrotation_string, p_args->video.i_angle);
+        }
     }
     else
     {
