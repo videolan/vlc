@@ -12,6 +12,7 @@ struct subpicture_updater_sys_t {
     int  fixed_width;
     int  fixed_height;
     bool renderbg;
+    bool gridmode;
 
     /* styling */
     text_style_t *p_default_style; /* decoder (full or partial) defaults */
@@ -66,6 +67,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     r->p_text = sys->p_segments;
     r->i_align  = sys->align;
     r->b_renderbg = sys->renderbg;
+    r->b_gridmode = sys->gridmode;
     if (!sys->is_fixed) {
         const float margin_ratio = 0.04;
         const int   margin_h     = margin_ratio * fmt_dst->i_visible_width;

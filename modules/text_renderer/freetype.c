@@ -1047,7 +1047,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
         uint8_t i_background_opacity = var_InheritInteger( p_filter, "freetype-background-opacity" );
         i_background_opacity = VLC_CLIP( i_background_opacity, 0, 255 );
-        const int i_margin = i_background_opacity > 0 ? i_max_face_height / 4 : 0;
+        const int i_margin = (i_background_opacity > 0 && !p_region_in->b_gridmode) ? i_max_face_height / 4 : 0;
         for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
         {
             rv = VLC_EGENERIC;

@@ -425,6 +425,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
     p_spu_sys->align = SUBPICTURE_ALIGN_LEAVETEXT;
     p_spu_sys->p_segments = p_segments;
     p_spu_sys->renderbg = p_dec->p_sys->b_opaque;
+    p_spu_sys->gridmode = true;
     /* Set style defaults (will be added to segments if none set) */
     p_spu_sys->p_default_style->i_style_flags |= STYLE_MONOSPACED;
     p_spu_sys->p_default_style->i_font_color = rgi_eia608_colors[EIA608_COLOR_DEFAULT];

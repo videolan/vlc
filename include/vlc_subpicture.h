@@ -66,6 +66,7 @@ struct subpicture_region_t
 
     text_segment_t  *p_text;         /**< subtitle text, made of a list of segments */
     bool            b_renderbg;      /**< render black background under text */
+    bool            b_gridmode;      /** if the decoder sends row/cols based output */
 
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_private_t *p_private;  /**< Private data for spu_t *only* */
