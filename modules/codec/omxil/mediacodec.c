@@ -357,22 +357,19 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.video.i_width = p_sys->u.video.i_width;
         args.video.i_height = p_sys->u.video.i_height;
 
-        if (p_dec->fmt_in.video.orientation != ORIENT_NORMAL)
+        switch (p_dec->fmt_in.video.orientation)
         {
-            switch (p_dec->fmt_in.video.orientation)
-            {
-                case ORIENT_ROTATED_90:
-                    args.video.i_angle = 90;
-                    break;
-                case ORIENT_ROTATED_180:
-                    args.video.i_angle = 180;
-                    break;
-                case ORIENT_ROTATED_270:
-                    args.video.i_angle = 270;
-                    break;
-                default:
-                    args.video.i_angle = 0;
-            }
+            case ORIENT_ROTATED_90:
+                args.video.i_angle = 90;
+                break;
+            case ORIENT_ROTATED_180:
+                args.video.i_angle = 180;
+                break;
+            case ORIENT_ROTATED_270:
+                args.video.i_angle = 270;
+                break;
+            default:
+                args.video.i_angle = 0;
         }
 
         /* Check again the codec name if h264 profile changed */
