@@ -971,7 +971,7 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
         }
         pp_styles = pp_styles_realloc;
         // We're actually writing to a read only object, something's wrong with the conception.
-        text_style_t *p_style = text_style_Duplicate( p_filter->p_sys->p_default_style );
+        text_style_t *p_style = text_style_Duplicate( p_filter->p_sys->p_style );
         if ( p_style == NULL )
         {
             free( pp_styles );
