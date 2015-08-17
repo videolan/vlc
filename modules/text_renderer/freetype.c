@@ -1011,6 +1011,9 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !p_region_in )
         return VLC_EGENERIC;
 
+    /* Reset the default fontsize in case screen metrics have changed */
+    p_filter->p_sys->p_style->i_font_size = GetFontSize( p_filter );
+
     const text_style_t **pp_styles = NULL;
     size_t i_text_length = 0;
     uni_char_t *psz_text = SegmentsToTextAndStyles( p_filter, p_region_in->p_text, &i_text_length, &pp_styles );
@@ -1018,9 +1021,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
         return VLC_EGENERIC;
     }
-
-    /* Reset the default fontsize in case screen metrics have changed */
-    p_filter->p_sys->p_style->i_font_size = GetFontSize( p_filter );
 
     /* */
     int rv = VLC_SUCCESS;
