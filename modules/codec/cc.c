@@ -428,7 +428,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
     /* Set style defaults (will be added to segments if none set) */
     p_spu_sys->p_default_style->i_style_flags |= STYLE_MONOSPACED;
     p_spu_sys->p_default_style->i_font_color = rgi_eia608_colors[EIA608_COLOR_DEFAULT];
-    p_spu_sys->p_default_style->f_font_relsize = 80.0 / EIA608_SCREEN_ROWS;
+    p_spu_sys->p_default_style->f_font_relsize = 100 / EIA608_SCREEN_ROWS * 3/4;
     p_spu_sys->p_default_style->i_features |= (STYLE_HAS_FONT_COLOR | STYLE_HAS_FLAGS);
 
     return p_spu;
