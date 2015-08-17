@@ -314,9 +314,13 @@ static int GetFontSize( filter_t *p_filter )
     filter_sys_t *p_sys = p_filter->p_sys;
     int           i_size = 0;
 
-    if( p_sys->p_default_style->i_font_size )
+    if( p_sys->p_forced_style->i_font_size )
     {
-        i_size = p_sys->p_default_style->i_font_size;
+        i_size = p_sys->p_forced_style->i_font_size;
+    }
+    else if( p_sys->p_forced_style->f_font_relsize )
+    {
+        i_size = (int) p_filter->fmt_out.video.i_height * p_sys->p_forced_style->f_font_relsize;
     }
     else if( p_sys->p_default_style->f_font_relsize )
     {
