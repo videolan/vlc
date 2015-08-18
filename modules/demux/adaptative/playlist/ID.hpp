@@ -21,6 +21,7 @@
 #define ID_HPP
 
 #include <string>
+#include <inttypes.h>
 
 namespace adaptative
 {
