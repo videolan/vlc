@@ -270,6 +270,18 @@ static void FindMountPoint(char **file)
 #endif
 }
 
+static void blurayReleaseVout(demux_t *p_demux)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if (p_sys->p_vout != NULL) {
+        var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
+        var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
+        vlc_object_release(p_sys->p_vout);
+        p_sys->p_vout = NULL;
+    }
+}
+
 /*****************************************************************************
  * cache current playlist (title) information
  *****************************************************************************/
@@ -486,11 +498,8 @@ static void blurayClose(vlc_object_t *object)
     assert(p_sys->bluray);
     bd_close(p_sys->bluray);
 
-    if (p_sys->p_vout != NULL) {
-        var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
-        var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
-        vlc_object_release(p_sys->p_vout);
-    }
+    blurayReleaseVout(p_demux);
+
     if (p_sys->p_parser)
         stream_Delete(p_sys->p_parser);
     if (p_sys->p_out != NULL)
@@ -784,12 +793,7 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
             return;
 
     /* All overlays have been closed */
-    if (p_sys->p_vout != NULL) {
-        var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
-        var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
-        vlc_object_release(p_sys->p_vout);
-        p_sys->p_vout = NULL;
-    }
+    blurayReleaseVout(p_demux);
 }
 
 /*
