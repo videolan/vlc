@@ -902,20 +902,20 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
     uni_char_t *psz_uni = NULL;
     size_t i_size = 0;
     size_t i_nb_char = 0;
-    for ( const text_segment_t *s = p_segment; s != NULL; s = s->p_next )
+    for( const text_segment_t *s = p_segment; s != NULL; s = s->p_next )
     {
-        if ( !s->psz_text )
+        if( !s->psz_text )
             continue;
         size_t i_string_bytes = 0;
         uni_char_t *psz_tmp = ToCharset( FREETYPE_TO_UCS, s->psz_text, &i_string_bytes );
-        if ( !psz_tmp )
+        if( !psz_tmp )
         {
             free( psz_uni );
             free( pp_styles );
             return NULL;
         }
         uni_char_t *psz_realloc = realloc(psz_uni, i_size + i_string_bytes);
-        if ( unlikely( !psz_realloc ) )
+        if( unlikely( !psz_realloc ) )
         {
             free( pp_styles );
             free( psz_uni );
@@ -925,6 +925,7 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
         psz_uni = psz_realloc;
         memcpy( psz_uni + i_nb_char, psz_tmp, i_string_bytes );
         free( psz_tmp );
+
         // We want one text_style_t* per character. The amount of characters is the number of bytes divided by
         // the size of one glyph, in byte
         const text_style_t **pp_styles_realloc = realloc( pp_styles, ( (i_size + i_string_bytes) / sizeof( *psz_uni ) * sizeof( *pp_styles ) ) );
@@ -935,6 +936,7 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
             return NULL;
         }
         pp_styles = pp_styles_realloc;
+
         // We're actually writing to a read only object, something's wrong with the conception.
         text_style_t *p_style = text_style_Duplicate( p_filter->p_sys->p_style );
         if ( p_style == NULL )
@@ -1319,6 +1321,7 @@ static void Destroy( vlc_object_t *p_this )
     free( p_sys );
 }
 
+/* Face loading */
 bool FaceStyleEquals( const text_style_t *p_style1,
                              const text_style_t *p_style2 )
 {
