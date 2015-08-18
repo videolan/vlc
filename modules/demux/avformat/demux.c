@@ -462,8 +462,9 @@ int OpenDemux( vlc_object_t *p_this )
                         p_attachment = vlc_input_attachment_New(
                                 filename->value, "application/x-truetype-font",
                                 NULL, cc->extradata, (int)cc->extradata_size );
-                        TAB_APPEND( p_sys->i_attachments, p_sys->attachments,
-                                p_attachment );
+                        if( p_attachment )
+                            TAB_APPEND( p_sys->i_attachments, p_sys->attachments,
+                                        p_attachment );
                     }
                 }
                 else msg_Warn( p_demux, "unsupported attachment type (%u) in avformat demux", cc->codec_id );
