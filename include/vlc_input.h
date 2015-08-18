@@ -196,7 +196,7 @@ static inline input_attachment_t *vlc_input_attachment_New( const char *psz_name
         memcpy( a->p_data, p_data, i_data );
 
     if( unlikely(a->psz_name == NULL || a->psz_mime == NULL
-              || a->psz_description || (i_data > 0 && a->p_data == NULL)) )
+              || a->psz_description == NULL || (i_data > 0 && a->p_data == NULL)) )
     {
         vlc_input_attachment_Delete( a );
         a = NULL;
