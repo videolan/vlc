@@ -52,6 +52,8 @@
 /* JNI functions to get/set an Android Surface object. */
 extern void jni_EventHardwareAccelerationError(); // TODO REMOVE
 
+#define BLOCK_FLAG_CSD (0x01 << BLOCK_FLAG_PRIVATE_SHIFT)
+
 /* Codec Specific Data */
 struct csd
 {
@@ -80,7 +82,7 @@ struct decoder_sys_t
 
     /* Codec Specific Data buffer: sent in PutInput after a start or a flush
      * with the BUFFER_FLAG_CODEC_CONFIG flag.*/
-    struct csd *p_csd;
+    block_t **pp_csd;
     size_t i_csd_count;
     size_t i_csd_send;
 
@@ -175,12 +177,12 @@ static void CSDFree(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->p_csd)
+    if (p_sys->pp_csd)
     {
         for (unsigned int i = 0; i < p_sys->i_csd_count; ++i)
-            free(p_sys->p_csd[i].p_buf);
-        free(p_sys->p_csd);
-        p_sys->p_csd = NULL;
+            block_Release(p_sys->pp_csd[i]);
+        free(p_sys->pp_csd);
+        p_sys->pp_csd = NULL;
     }
     p_sys->i_csd_count = 0;
 }
@@ -189,36 +191,24 @@ static void CSDFree(decoder_t *p_dec)
 static int CSDDup(decoder_t *p_dec, const struct csd *p_csd, size_t i_count)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    unsigned int i_last_csd_count = p_sys->i_csd_count;
 
-    p_sys->i_csd_count = i_count;
-    /* free previous p_buf if old count is bigger */
-    for (size_t i = p_sys->i_csd_count; i < i_last_csd_count; ++i)
-        free(p_sys->p_csd[i].p_buf);
+    CSDFree(p_dec);
 
-    p_sys->p_csd = realloc_or_free(p_sys->p_csd, p_sys->i_csd_count *
-                                   sizeof(struct csd));
-    if (!p_sys->p_csd)
-    {
-        CSDFree(p_dec);
+    p_sys->pp_csd = malloc(i_count * sizeof(block_t *));
+    if (!p_sys->pp_csd)
         return VLC_ENOMEM;
-    }
 
-    if (p_sys->i_csd_count > i_last_csd_count)
-        memset(&p_sys->p_csd[i_last_csd_count], 0,
-               (p_sys->i_csd_count - i_last_csd_count) * sizeof(struct csd));
-
-    for (size_t i = 0; i < p_sys->i_csd_count; ++i)
+    for (size_t i = 0; i < i_count; ++i)
     {
-        p_sys->p_csd[i].p_buf = realloc_or_free(p_sys->p_csd[i].p_buf,
-                                                p_csd[i].i_size);
-        if (!p_sys->p_csd[i].p_buf)
+        p_sys->pp_csd[i] = block_Alloc(p_csd[i].i_size);
+        if (!p_sys->pp_csd[i])
         {
             CSDFree(p_dec);
             return VLC_ENOMEM;
         }
-        memcpy(p_sys->p_csd[i].p_buf, p_csd[i].p_buf, p_csd[i].i_size);
-        p_sys->p_csd[i].i_size = p_csd[i].i_size;
+        p_sys->pp_csd[i]->i_flags = BLOCK_FLAG_CSD;
+        memcpy(p_sys->pp_csd[i]->p_buffer, p_csd[i].p_buf, p_csd[i].i_size);
+        p_sys->i_csd_count++;
     }
     return VLC_SUCCESS;
 }
@@ -231,8 +221,9 @@ static bool CSDCmp(decoder_t *p_dec, struct csd *p_csd, size_t i_csd_count)
         return false;
     for (size_t i = 0; i < i_csd_count; ++i)
     {
-        if (p_sys->p_csd[i].i_size != p_csd[i].i_size
-         || memcmp(p_sys->p_csd[i].p_buf, p_csd[i].p_buf, p_csd[i].i_size) != 0)
+        if (p_sys->pp_csd[i]->i_buffer != p_csd[i].i_size
+         || memcmp(p_sys->pp_csd[i]->p_buffer, p_csd[i].p_buf,
+                   p_csd[i].i_size) != 0)
             return false;
     }
     return true;
@@ -345,7 +336,7 @@ static int StartMediaCodec(decoder_t *p_dec)
     int i_ret = 0;
     union mc_api_args args;
 
-    if (p_dec->fmt_in.i_extra && !p_sys->p_csd)
+    if (p_dec->fmt_in.i_extra && !p_sys->pp_csd)
     {
         /* Try first to configure specific Video CSD */
         if (p_dec->fmt_in.i_cat == VIDEO_ES)
@@ -356,7 +347,7 @@ static int StartMediaCodec(decoder_t *p_dec)
             return i_ret;
 
         /* Set default CSD if ParseVideoExtra failed to configure one */
-        if (!p_sys->p_csd)
+        if (!p_sys->pp_csd)
         {
             struct csd csd;
 
@@ -755,61 +746,6 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_t *p_pic,
     return 0;
 }
 
-static int PutInput(decoder_t *p_dec, block_t *p_block, mtime_t timeout)
-{
-    decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_ret;
-    const void *p_buf;
-    size_t i_size;
-    bool b_config = false;
-    mtime_t i_ts = 0;
-
-    assert(p_sys->i_csd_send < p_sys->i_csd_count || p_block);
-
-    if (p_sys->i_csd_send < p_sys->i_csd_count)
-    {
-        /* Try to send Codec Specific Data */
-        p_buf = p_sys->p_csd[p_sys->i_csd_send].p_buf;
-        i_size = p_sys->p_csd[p_sys->i_csd_send].i_size;
-        b_config = true;
-    } else
-    {
-        /* Try to send p_block input buffer */
-        p_buf = p_block->p_buffer;
-        i_size = p_block->i_buffer;
-        i_ts = p_block->i_pts;
-        if (!i_ts && p_block->i_dts)
-            i_ts = p_block->i_dts;
-    }
-
-    i_ret = p_sys->api->dequeue_in(p_sys->api, timeout);
-    if (i_ret == MC_API_INFO_TRYAGAIN)
-        return 0;
-    else if (i_ret < 0)
-        return -1;
-
-    i_ret = p_sys->api->queue_in(p_sys->api, i_ret, p_buf, i_size, i_ts,
-                                 b_config);
-    if (i_ret != 0)
-        return -1;
-
-    if (p_sys->i_csd_send < p_sys->i_csd_count)
-    {
-        msg_Dbg(p_dec, "sent codec specific data(%d) of size %d "
-                "via BUFFER_FLAG_CODEC_CONFIG flag",
-                p_sys->i_csd_send, i_size);
-        p_sys->i_csd_send++;
-        return 0;
-    }
-    else
-    {
-        p_sys->decoded = true;
-        if (p_block->i_flags & BLOCK_FLAG_PREROLL )
-            p_sys->i_preroll_end = i_ts;
-        return 1;
-    }
-}
-
 static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
                            block_t **pp_out_block, bool *p_abort,
                            mtime_t i_timeout)
@@ -1193,7 +1129,50 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block,
         if ((p_sys->i_csd_send < p_sys->i_csd_count || p_block)
          && i_input_ret == 0)
         {
-            i_input_ret = PutInput(p_dec, p_block, timeout);
+            int i_index = p_sys->api->dequeue_in(p_sys->api, timeout);
+
+            if (i_index >= 0)
+            {
+                block_t *p_in_block;
+                mtime_t i_ts;
+
+                if (p_sys->i_csd_send < p_sys->i_csd_count)
+                {
+                    p_in_block = p_sys->pp_csd[p_sys->i_csd_send];
+                    i_ts = 0;
+                }
+                else
+                {
+                    p_in_block = p_block;
+                    i_ts = p_block->i_pts;
+                    if (!i_ts && p_block->i_dts)
+                        i_ts = p_block->i_dts;
+                }
+                i_input_ret = p_sys->api->queue_in(p_sys->api, i_index,
+                                                   p_in_block->p_buffer,
+                                                   p_in_block->i_buffer, i_ts,
+                                                   p_in_block->i_flags & BLOCK_FLAG_CSD) == 0 ? 1 : -1;
+                if (i_input_ret == 1)
+                {
+                    if (p_sys->i_csd_send < p_sys->i_csd_count)
+                    {
+                        p_sys->i_csd_send++;
+                        i_input_ret = 0;
+                    }
+                    else
+                    {
+                        p_sys->decoded = true;
+                        if (p_block->i_flags & BLOCK_FLAG_PREROLL )
+                            p_sys->i_preroll_end = i_ts;
+                    }
+                }
+            }
+            else if (i_index == MC_API_INFO_TRYAGAIN)
+                i_input_ret = 0;
+            else
+                i_input_ret = -1;
+
+            /* No need to try output if no input buffer is decoded */
             if (!p_sys->decoded)
                 continue;
         }
