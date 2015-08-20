@@ -801,7 +801,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
             int i_align_top = i_margin;
 
             /* Render all glyphs and underline/strikethrough */
-            for( int i = 0; i < p_line->i_character_count; i++ )
+            for( int i = p_line->i_first_visible_char_index; i <= p_line->i_last_visible_char_index; i++ )
             {
                 const line_character_t *ch = &p_line->p_character[i];
                 const FT_BitmapGlyph p_glyph = g == 0 ? ch->p_shadow : g == 1 ? ch->p_outline : ch->p_glyph;
@@ -835,7 +835,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                                 BlendPixel );
 
                 /* underline/strikethrough are only rendered for the normal glyph */
-                if( g == 2 && ch->i_line_thickness > 0 && p_glyph->bitmap.rows )
+                if( g == 2 && ch->i_line_thickness > 0 )
                     BlendAXYZLine( p_picture,
                                    i_glyph_x, i_glyph_y + p_glyph->top,
                                    i_a, i_x, i_y, i_z,
