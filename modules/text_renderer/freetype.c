@@ -845,7 +845,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                                 BlendPixel );
 
                 /* underline/strikethrough are only rendered for the normal glyph */
-                if( g == 2 && ch->i_line_thickness > 0 )
+                if( g == 2 && ch->i_line_thickness > 0 && p_glyph->bitmap.rows )
                     BlendAXYZLine( p_picture,
                                    i_glyph_x, i_glyph_y + p_glyph->top,
                                    i_a, i_x, i_y, i_z,

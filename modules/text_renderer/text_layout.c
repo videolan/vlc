@@ -1021,6 +1021,12 @@ static int LayoutLine( filter_t *p_filter,
                 i_line_offset -=
                     abs( FT_FLOOR( FT_MulFix( p_face->descender * 2,
                                               p_face->size->metrics.y_scale ) ) );
+                p_bitmaps->glyph_bbox.yMax =
+                    __MAX( p_bitmaps->glyph_bbox.yMax,
+                           - i_line_offset );
+                p_bitmaps->glyph_bbox.yMin =
+                    __MIN( p_bitmaps->glyph_bbox.yMin,
+                           i_line_offset - i_line_thickness );
             }
             else if( i_line_thickness > 0 )
             {
