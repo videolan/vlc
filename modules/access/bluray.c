@@ -112,9 +112,10 @@ typedef struct bluray_overlay_t
 {
     atomic_flag         released_once;
     vlc_mutex_t         lock;
-    subpicture_t        *p_pic;
+    int                 i_channel;
     OverlayStatus       status;
     subpicture_region_t *p_regions;
+    int                 width, height;
 } bluray_overlay_t;
 
 struct  demux_sys_t
@@ -726,6 +727,36 @@ static void subpictureUpdaterDestroy(subpicture_t *p_subpic)
 {
     blurayCleanOverlayStruct(p_subpic->updater.p_sys->p_overlay);
     free(p_subpic->updater.p_sys);
+ }
+
+static subpicture_t *bluraySubpictureCreate(bluray_overlay_t *p_ov)
+{
+    subpicture_updater_sys_t *p_upd_sys = malloc(sizeof(*p_upd_sys));
+    if (unlikely(p_upd_sys == NULL)) {
+        return NULL;
+    }
+
+    p_upd_sys->p_overlay = p_ov;
+
+    subpicture_updater_t updater = {
+        .pf_validate = subpictureUpdaterValidate,
+        .pf_update   = subpictureUpdaterUpdate,
+        .pf_destroy  = subpictureUpdaterDestroy,
+        .p_sys       = p_upd_sys,
+    };
+
+    subpicture_t *p_pic = subpicture_New(&updater);
+    if (p_pic == NULL) {
+        free(p_upd_sys);
+        return NULL;
+    }
+
+    p_pic->i_original_picture_width = p_ov->width;
+    p_pic->i_original_picture_height = p_ov->height;
+    p_pic->b_ephemer = true;
+    p_pic->b_absolute = true;
+
+    return p_pic;
 }
 
 /*****************************************************************************
@@ -763,6 +794,7 @@ static int sendKeyEvent(demux_sys_t *p_sys, unsigned int key)
 /*****************************************************************************
  * libbluray overlay handling:
  *****************************************************************************/
+
 static void blurayCleanOverlayStruct(bluray_overlay_t *p_overlay)
 {
     if (!atomic_flag_test_and_set(&p_overlay->released_once))
@@ -782,8 +814,10 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
     bluray_overlay_t *ov = p_sys->p_overlays[plane];
 
     if (ov != NULL) {
-        if (p_sys->p_vout)
-            vout_FlushSubpictureChannel(p_sys->p_vout, ov->p_pic->i_channel);
+        if (p_sys->p_vout && ov->i_channel != -1) {
+            vout_FlushSubpictureChannel(p_sys->p_vout, ov->i_channel);
+        }
+
         blurayCleanOverlayStruct(ov);
         p_sys->p_overlays[plane] = NULL;
     }
@@ -838,33 +872,9 @@ static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height
     if (unlikely(ov == NULL))
         return;
 
-    subpicture_updater_sys_t *p_upd_sys = malloc(sizeof(*p_upd_sys));
-    if (unlikely(p_upd_sys == NULL)) {
-        free(ov);
-        return;
-    }
-    /* two references: vout + demux */
-    atomic_flag_clear(&ov->released_once);
-
-    p_upd_sys->p_overlay = ov;
-    subpicture_updater_t updater = {
-        .pf_validate = subpictureUpdaterValidate,
-        .pf_update   = subpictureUpdaterUpdate,
-        .pf_destroy  = subpictureUpdaterDestroy,
-        .p_sys       = p_upd_sys,
-    };
-
-    ov->p_pic = subpicture_New(&updater);
-    if (ov->p_pic == NULL) {
-        free(p_upd_sys);
-        free(ov);
-        return;
-    }
-
-    ov->p_pic->i_original_picture_width = width;
-    ov->p_pic->i_original_picture_height = height;
-    ov->p_pic->b_ephemer = true;
-    ov->p_pic->b_absolute = true;
+    ov->width = width;
+    ov->height = height;
+    ov->i_channel = -1;
 
     vlc_mutex_init(&ov->lock);
 
@@ -1085,18 +1095,25 @@ static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    assert(p_ov != NULL &&
-           p_ov->p_pic != NULL);
+    assert(p_ov != NULL);
+ 
+    subpicture_t *p_pic = bluraySubpictureCreate(p_ov);
+    if (!p_pic) {
+        return;
+    }
 
-    p_ov->p_pic->i_start = p_ov->p_pic->i_stop = mdate();
-    p_ov->p_pic->i_channel = vout_RegisterSubpictureChannel(p_sys->p_vout);
+    p_pic->i_start = p_pic->i_stop = mdate();
+    p_pic->i_channel = vout_RegisterSubpictureChannel(p_sys->p_vout);
+    p_ov->i_channel = p_pic->i_channel;
+
     /*
      * After this point, the picture should not be accessed from the demux thread,
      * as it is held by the vout thread.
      * This must be done only once per subpicture, ie. only once between each
      * blurayInitOverlay & blurayCloseOverlay call.
      */
-    vout_PutSubpicture(p_sys->p_vout, p_ov->p_pic);
+    vout_PutSubpicture(p_sys->p_vout, p_pic);
+
     /*
      * Mark the picture as Outdated, as it contains no region for now.
      * This will make the subpicture_updater_t call pf_update
