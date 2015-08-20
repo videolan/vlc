@@ -70,7 +70,8 @@ static inline int32_t bs_read_se( bs_t *s )
     return val&0x01 ? (val+1)/2 : -(val/2);
 }
 
-static inline size_t nal_decode(const uint8_t * p_src, uint8_t * p_dst, size_t i_size)
+/* Discards emulation prevention three bytes */
+static inline size_t nal_to_rbsp(const uint8_t * p_src, uint8_t * p_dst, size_t i_size)
 {
     size_t j = 0;
     for (size_t i = 0; i < i_size; i++) {

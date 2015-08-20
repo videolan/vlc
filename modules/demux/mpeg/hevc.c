@@ -231,7 +231,7 @@ static uint8_t * CreateDecodedNAL( int *pi_ret,
     if( !dst )
         return NULL;
 
-    *pi_ret = nal_decode( src, dst, i_src );
+    *pi_ret = nal_to_rbsp( src, dst, i_src );
     return dst;
 }
 

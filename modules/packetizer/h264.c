@@ -894,7 +894,7 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     bs_t s;
 
     /* do not convert the whole frame */
-    CreateDecodedNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5],
+    CreateRbspFromNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5],
                      __MIN( p_frag->i_buffer - 5, 60 ) );
     bs_init( &s, pb_dec, i_dec );
 
@@ -1000,7 +1000,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
     int i_dec;
 
     /* */
-    CreateDecodedNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
+    CreateRbspFromNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
     if( !pb_dec )
         return;
 

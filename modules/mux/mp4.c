@@ -1173,7 +1173,7 @@ static void hevcParseVPS(uint8_t * p_buffer, size_t i_buffer, uint8_t *general,
     const size_t i_decoded_nal_size = 512;
     uint8_t p_dec_nal[i_decoded_nal_size];
     size_t i_size = (i_buffer < i_decoded_nal_size)?i_buffer:i_decoded_nal_size;
-    nal_decode(p_buffer, p_dec_nal, i_size);
+    nal_to_rbsp(p_buffer, p_dec_nal, i_size);
 
     /* first two bytes are the NAL header, 3rd and 4th are:
         vps_video_parameter_set_id(4)
@@ -1196,7 +1196,7 @@ static void hevcParseSPS(uint8_t * p_buffer, size_t i_buffer, uint8_t * chroma_i
     const size_t i_decoded_nal_size = 512;
     uint8_t p_dec_nal[i_decoded_nal_size];
     size_t i_size = (i_buffer < i_decoded_nal_size)?i_buffer-2:i_decoded_nal_size;
-    nal_decode(p_buffer+2, p_dec_nal, i_size);
+    nal_to_rbsp(p_buffer+2, p_dec_nal, i_size);
     bs_t bs;
     bs_init(&bs, p_dec_nal, i_size);
 

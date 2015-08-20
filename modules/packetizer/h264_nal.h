@@ -103,7 +103,7 @@ struct nal_pps
     int i_pic_order_present_flag;
 };
 
-static inline void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
+static inline void CreateRbspFromNAL( uint8_t **pp_ret, int *pi_ret,
                                      const uint8_t *src, int i_src )
 {
     uint8_t *dst = malloc( i_src );
@@ -111,7 +111,7 @@ static inline void CreateDecodedNAL( uint8_t **pp_ret, int *pi_ret,
     *pp_ret = dst;
 
     if( dst )
-        *pi_ret = nal_decode(src, dst, i_src);
+        *pi_ret = nal_to_rbsp(src, dst, i_src);
 }
 
 /* Parse the SPS/PPS Metadata and convert it to annex b format */

@@ -404,7 +404,7 @@ int h264_parse_sps( const uint8_t *p_sps_buf, int i_sps_size,
         return -1;
 
     memset( p_sps, 0, sizeof(struct nal_sps) );
-    CreateDecodedNAL( &pb_dec, &i_dec, &p_sps_buf[5],
+    CreateRbspFromNAL( &pb_dec, &i_dec, &p_sps_buf[5],
                       i_sps_size - 5 );
 
     bs_init( &s, pb_dec, i_dec );
