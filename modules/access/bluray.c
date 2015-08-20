@@ -141,6 +141,8 @@ struct  demux_sys_t
     bool                b_popup_available;
     mtime_t             i_still_end_time;
 
+    vlc_mutex_t         bdj_overlay_lock; /* used to lock BD-J overlay open/close while overlays are being sent to vout */
+
     /* */
     vout_thread_t       *p_vout;
 
@@ -352,6 +354,7 @@ static int blurayOpen(vlc_object_t *object)
     }
 
     vlc_mutex_init(&p_sys->pl_info_lock);
+    vlc_mutex_init(&p_sys->bdj_overlay_lock);
 
     /* Warning the user about AACS/BD+ */
     const BLURAY_DISC_INFO *disc_info = bd_get_disc_info(p_sys->bluray);
@@ -514,6 +517,7 @@ static void blurayClose(vlc_object_t *object)
     TAB_CLEAN(p_sys->i_title, p_sys->pp_title);
 
     vlc_mutex_destroy(&p_sys->pl_info_lock);
+    vlc_mutex_destroy(&p_sys->bdj_overlay_lock);
 
     free(p_sys->psz_bd_path);
     free(p_sys);
@@ -1070,14 +1074,19 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
 static void blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY *const overlay)
 {
     demux_t *p_demux = (demux_t*)ptr;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     switch (overlay->cmd) {
     case BD_ARGB_OVERLAY_INIT:
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
         blurayInitArgbOverlay(p_demux, overlay->plane, overlay->w, overlay->h);
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
         break;
     case BD_ARGB_OVERLAY_CLOSE:
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
         blurayClearOverlay(p_demux, overlay->plane);
         blurayCloseOverlay(p_demux, overlay->plane);
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
         break;
     case BD_ARGB_OVERLAY_FLUSH:
         blurayActivateOverlay(p_demux, overlay->plane);
@@ -1663,6 +1672,8 @@ static int blurayDemux(demux_t *p_demux)
         }
     }
 
+    vlc_mutex_lock(&p_sys->bdj_overlay_lock);
+
     for (int i = 0; i < MAX_OVERLAY; i++) {
         bluray_overlay_t *ov = p_sys->p_overlays[i];
         if (!ov) {
@@ -1681,6 +1692,8 @@ static int blurayDemux(demux_t *p_demux)
             }
         }
     }
+
+    vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
 
     if (nread <= 0) {
         block_Release(p_block);
