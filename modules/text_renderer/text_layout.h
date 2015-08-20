@@ -46,6 +46,8 @@ struct line_desc_t
     int              i_height;
     int              i_base_line;
     int              i_character_count;
+    int              i_first_visible_char_index;
+    int              i_last_visible_char_index;
     line_character_t *p_character;
     FT_BBox          bbox;
 };

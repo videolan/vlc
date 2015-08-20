@@ -700,16 +700,12 @@ static inline void RenderBackground( subpicture_region_t *p_region,
                 max_height = p_glyph->top;
         }
 
+        if( p_line->i_first_visible_char_index < 0 )
+            continue; /* only spaces */
+
         /* Compute the background for the line (identify leading/trailing space) */
-        for( int i = 0; i < p_line->i_character_count; i++ ) {
-            const line_character_t *ch = &p_line->p_character[i];
-            FT_BitmapGlyph p_glyph = ch->p_outline ? ch->p_outline : ch->p_glyph;
-            if (p_glyph && p_glyph->bitmap.rows > 0) {
-                // Found a non-whitespace character
-                line_start = i_align_left + p_glyph->left - p_bbox->xMin;
-                break;
-            }
-        }
+        line_start = p_line->p_character[p_line->i_first_visible_char_index].p_glyph->left +
+                     i_align_left - p_bbox->xMin;
 
         /* Fudge factor to make sure caption background edges are left aligned
            despite variable font width */
@@ -717,15 +713,9 @@ static inline void RenderBackground( subpicture_region_t *p_region,
             line_start = 0;
 
         /* Find right boundary for bounding box for background */
-        for( int i = p_line->i_character_count; i > 0; i-- ) {
-            const line_character_t *ch = &p_line->p_character[i - 1];
-            FT_BitmapGlyph p_glyph = ch->p_shadow ? ch->p_shadow : ch->p_glyph;
-            if (p_glyph && p_glyph->bitmap.rows > 0) {
-                // Found a non-whitespace character
-                line_end = i_align_left + p_glyph->left - p_bbox->xMin + p_glyph->bitmap.width;
-                break;
-            }
-        }
+        line_end = p_line->p_character[p_line->i_last_visible_char_index].p_glyph->left +
+                   p_line->p_character[p_line->i_last_visible_char_index].p_glyph->bitmap.width +
+                   i_align_left - p_bbox->xMin;
 
         /* Setup color for the background */
         uint8_t i_x, i_y, i_z;

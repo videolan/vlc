@@ -163,6 +163,8 @@ line_desc_t *NewLine( int i_count )
     p_line->i_width = 0;
     p_line->i_base_line = 0;
     p_line->i_character_count = 0;
+    p_line->i_first_visible_char_index = -1;
+    p_line->i_last_visible_char_index = -2;
 
     p_line->bbox.xMin = INT_MAX;
     p_line->bbox.yMin = INT_MAX;
@@ -1070,6 +1072,14 @@ static int LayoutLine( filter_t *p_filter,
         {
             i_font_max_advance_y = abs( FT_FLOOR( FT_MulFix( p_face->max_advance_height,
                                       p_face->size->metrics.y_scale ) ) );
+        }
+
+        /* Keep track of blank/spaces in front/end of line */
+        if( p_ch->p_glyph->bitmap.rows )
+        {
+            if( p_line->i_first_visible_char_index < 0 )
+                p_line->i_first_visible_char_index = i_line_index;
+            p_line->i_last_visible_char_index = i_line_index;
         }
     }
 
