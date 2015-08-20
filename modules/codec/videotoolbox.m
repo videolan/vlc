@@ -52,6 +52,7 @@ const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDec
 const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder = CFSTR("RequireHardwareAcceleratedVideoDecoder");
 #endif
 
+#define VT_ZERO_COPY N_("Use zero-copy rendering")
 #if !TARGET_OS_IPHONE
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
 #endif
@@ -62,8 +63,12 @@ set_subcategory(SUBCAT_INPUT_VCODEC)
 set_description(N_("VideoToolbox video decoder"))
 set_capability("decoder",800)
 set_callbacks(OpenDecoder, CloseDecoder)
+
 #if !TARGET_OS_IPHONE
+add_bool("videotoolbox-zero-copy", false, VT_ZERO_COPY, VT_ZERO_COPY, false)
 add_bool("videotoolbox-hw-decoder-only", false, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
+#else
+add_bool("videotoolbox-zero-copy", true, VT_ZERO_COPY, VT_ZERO_COPY, false)
 #endif
 vlc_module_end()
 
@@ -77,6 +82,10 @@ void VTDictionarySetInt32(CFMutableDictionaryRef, CFStringRef, int);
 static void copy420YpCbCr8Planar(picture_t *, CVPixelBufferRef buffer,
                                  unsigned i_width, unsigned i_height);
 static BOOL deviceSupportsAdvancedProfiles();
+
+struct picture_sys_t {
+    CFTypeRef pixelBuffer;
+};
 
 #pragma mark - decoder structure
 
@@ -94,6 +103,7 @@ struct decoder_sys_t
 
     NSMutableArray              *outputTimeStamps;
     NSMutableDictionary         *outputFrames;
+    bool                        b_zero_copy;
 };
 
 #pragma mark - start & stop
@@ -445,6 +455,8 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         return VLC_EGENERIC;
     }
 
+    p_sys->b_zero_copy = var_InheritInteger(p_dec, "videotoolbox-zero-copy");
+
     /* destination pixel buffer attributes */
     CFMutableDictionaryRef dpba = CFDictionaryCreateMutable(kCFAllocatorDefault,
                                                             2,
@@ -459,7 +471,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 #else
     CFDictionarySetValue(dpba,
                          kCVPixelBufferOpenGLESCompatibilityKey,
-                         kCFBooleanFalse);
+                         kCFBooleanTrue);
 #endif
     VTDictionarySetInt32(dpba,
                          kCVPixelBufferPixelFormatTypeKey,
@@ -615,7 +627,10 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     /* return our proper VLC internal state */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_out.i_codec = VLC_CODEC_I420;
+    if (p_sys->b_zero_copy)
+        p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_OPAQUE;
+    else
+        p_dec->fmt_out.i_codec = VLC_CODEC_I420;
 
     p_dec->b_need_packetized = true;
 
@@ -875,10 +890,16 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
 
     p_block = *pp_block;
 
-    if (likely(p_block)) {
+    if (likely(p_block != NULL)) {
         if (unlikely(p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))) {
-            [p_sys->outputTimeStamps removeAllObjects];
-            [p_sys->outputFrames removeAllObjects];
+            if (likely(p_sys->b_started)) {
+                @synchronized(p_sys->outputTimeStamps) {
+                    [p_sys->outputTimeStamps removeAllObjects];
+                }
+                @synchronized(p_sys->outputFrames) {
+                    [p_sys->outputFrames removeAllObjects];
+                }
+            }
             block_Release(p_block);
             goto skip;
         }
@@ -988,11 +1009,18 @@ skip:
                 if (!p_pic)
                     return NULL;
 
-                /* ehm, *cough*, memcpy.. */
-                copy420YpCbCr8Planar(p_pic,
-                                     imageBuffer,
-                                     CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
-                                     CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
+                if (!p_sys->b_zero_copy) {
+                    /* ehm, *cough*, memcpy.. */
+                    copy420YpCbCr8Planar(p_pic,
+                                         imageBuffer,
+                                         CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
+                                         CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
+                } else {
+                    p_pic->p_sys = malloc(sizeof(picture_sys_t));
+                    if (p_pic->p_sys)
+                        p_pic->p_sys->pixelBuffer = CFBridgingRetain(imageBufferObject);
+                    /* will be freed by the vout */
+                }
 
                 p_pic->date = timeStamp.longLongValue;
 
