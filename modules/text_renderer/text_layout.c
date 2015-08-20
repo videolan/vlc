@@ -868,7 +868,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
 static int LayoutLine( filter_t *p_filter,
                        paragraph_t *p_paragraph,
                        int i_start_offset, int i_end_offset,
-                       line_desc_t **pp_line )
+                       line_desc_t **pp_line, bool b_grid )
 {
     if( p_paragraph->i_size <= 0 || p_paragraph->i_runs_count <= 0
      || i_start_offset >= i_end_offset
@@ -898,6 +898,7 @@ static int LayoutLine( filter_t *p_filter,
     int i_line_index = 0;
 
     int i_font_width = 0;
+    int i_font_max_advance_y = 0;
     int i_ul_offset = 0;
     int i_ul_thickness = 0;
 
@@ -1057,10 +1058,22 @@ static int LayoutLine( filter_t *p_filter,
 
         pen.x += p_bitmaps->i_x_advance;
         pen.y += p_bitmaps->i_y_advance;
+
+        /* Get max advance for grid mode */
+        if( b_grid && i_font_max_advance_y == 0 )
+        {
+            i_font_max_advance_y = abs( FT_FLOOR( FT_MulFix( p_face->max_advance_height,
+                                      p_face->size->metrics.y_scale ) ) );
+        }
     }
 
     p_line->i_width = __MAX( 0, p_line->bbox.xMax - p_line->bbox.xMin );
-    p_line->i_height = __MAX( 0, p_line->bbox.yMax - p_line->bbox.yMin );
+
+    if( b_grid )
+        p_line->i_height = i_font_max_advance_y;
+    else
+        p_line->i_height = __MAX( 0, p_line->bbox.yMax - p_line->bbox.yMin );
+
     p_line->i_character_count = i_line_index;
 
     if( i_ul_thickness > 0 )
@@ -1081,7 +1094,8 @@ static int LayoutLine( filter_t *p_filter,
 }
 
 static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
-                            int i_max_pixel_width, line_desc_t **pp_lines )
+                            int i_max_pixel_width, line_desc_t **pp_lines,
+                            bool b_grid )
 {
     if( p_paragraph->i_size <= 0 || p_paragraph->i_runs_count <= 0 )
     {
@@ -1118,7 +1132,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
         {
             if( i_line_start < i )
                 if( LayoutLine( p_filter, p_paragraph,
-                                i_line_start, i, pp_line ) )
+                                i_line_start, i, pp_line, b_grid ) )
                     goto error;
 
             break;
@@ -1176,7 +1190,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
                 i_end_offset = i;
 
             if( LayoutLine( p_filter, p_paragraph, i_line_start,
-                            i_end_offset, pp_line ) )
+                            i_end_offset, pp_line, b_grid ) )
                 goto error;
 
             pp_line = &( *pp_line )->p_next;
@@ -1207,7 +1221,7 @@ int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
                 FT_BBox *p_bbox, int *pi_max_face_height,
 
                 const uni_char_t *psz_text, const text_style_t **pp_styles,
-                uint32_t *pi_k_dates, int i_len )
+                uint32_t *pi_k_dates, int i_len, bool b_grid )
 {
     line_desc_t *p_first_line = 0;
     line_desc_t **pp_line = &p_first_line;
@@ -1273,7 +1287,7 @@ int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
             int i_max_width = ( int ) p_filter->fmt_out.video.i_visible_width
                               - 2 * p_filter->p_sys->p_style->i_font_size;
             if( LayoutParagraph( p_filter, p_paragraph,
-                                 i_max_width, pp_line ) )
+                                 i_max_width, pp_line, b_grid ) )
                 goto error;
 
             FreeParagraph( p_paragraph );
