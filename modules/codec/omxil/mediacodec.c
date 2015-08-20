@@ -59,6 +59,18 @@ struct csd
     size_t i_size;
 };
 
+/**
+ * Callback called when a new block is processed from DecodeCommon.
+ * It returns -1 in case of error, 0 if block should be dropped, 1 otherwise.
+ */
+typedef int (*dec_on_new_block_cb)(decoder_t *, block_t *);
+
+/**
+ * Callback called when DecodeCommon try to get an output buffer (pic or block).
+ * It returns -1 in case of error, or the number of output buffer returned.
+ */
+typedef int (*dec_get_output_cb)(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
+
 struct decoder_sys_t
 {
     mc_api *api;
@@ -79,6 +91,10 @@ struct decoder_sys_t
     bool error_state;
     bool b_new_block;
     int64_t i_preroll_end;
+
+    /* Specific Audio/Video callbacks */
+    dec_on_new_block_cb pf_on_new_block;
+    dec_get_output_cb   pf_get_output;
 
     union
     {
@@ -112,7 +128,12 @@ static int  OpenDecoderJni(vlc_object_t *);
 static int  OpenDecoderNdk(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
+static int Video_OnNewBlock(decoder_t *, block_t *);
+static int Video_GetOutput(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
 static picture_t *DecodeVideo(decoder_t *, block_t **);
+
+static int Audio_OnNewBlock(decoder_t *, block_t *);
+static int Audio_GetOutput(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
 static block_t *DecodeAudio(decoder_t *, block_t **);
 
 static void InvalidateAllPictures(decoder_t *);
@@ -545,6 +566,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
+        p_sys->pf_on_new_block = Video_OnNewBlock;
+        p_sys->pf_get_output = Video_GetOutput;
         p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
         p_sys->u.video.i_height = p_dec->fmt_in.video.i_height;
 
@@ -583,6 +606,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     }
     else
     {
+        p_sys->pf_on_new_block = Audio_OnNewBlock;
+        p_sys->pf_get_output = Audio_GetOutput;
         p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
 
         p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, 0);
@@ -1129,25 +1154,11 @@ static int DecodeFlush(decoder_t *p_dec)
 }
 
 /**
- * Callback called when a new block is processed from DecodeCommon.
- * It returns -1 in case of error, 0 if block should be dropped, 1 otherwise.
- */
-typedef int (*dec_on_new_block_cb)(decoder_t *, block_t *);
-
-/**
- * Callback called when DecodeCommon try to get an output buffer (pic or block).
- * It returns -1 in case of error, or the number of output buffer returned.
- */
-typedef int (*dec_get_output_cb)(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
-
-/**
  * DecodeCommon called from DecodeVideo or DecodeAudio.
  * It returns -1 in case of error, 0 otherwise. The output buffer is returned
  * in pp_out_pic for Video, and pp_out_block for Audio.
  */
 static int DecodeCommon(decoder_t *p_dec, block_t **pp_block,
-                        dec_on_new_block_cb pf_on_new_block,
-                        dec_get_output_cb pf_get_out,
                         picture_t **pp_out_pic, block_t **pp_out_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1168,7 +1179,7 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block,
         int i_ret;
 
         p_sys->b_new_block = false;
-        i_ret = pf_on_new_block(p_dec, p_block);
+        i_ret = p_sys->pf_on_new_block(p_dec, p_block);
         if (i_ret != 1)
         {
             if (i_ret == -1)
@@ -1189,8 +1200,8 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block,
 
         if (i_input_ret != -1 && p_sys->decoded && i_output_ret == 0)
         {
-            i_output_ret = pf_get_out(p_dec, pp_out_pic, pp_out_block,
-                                      &b_abort, timeout);
+            i_output_ret = p_sys->pf_get_output(p_dec, pp_out_pic, pp_out_block,
+                                                &b_abort, timeout);
 
             if (!p_sys->b_has_format && i_output_ret == 0 && i_input_ret == 0
              && ++i_attempts > 100)
@@ -1330,8 +1341,7 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
         p_sys->b_update_format = true;
     }
 
-    if (DecodeCommon(p_dec, pp_block, Video_OnNewBlock, Video_GetOutput,
-                     &p_out, NULL))
+    if (DecodeCommon(p_dec, pp_block, &p_out, NULL))
         return NULL;
     return p_out;
 }
@@ -1392,8 +1402,7 @@ static block_t *DecodeAudio(decoder_t *p_dec, block_t **pp_block)
 {
     block_t *p_out = NULL;
 
-    if (DecodeCommon(p_dec, pp_block, Audio_OnNewBlock,
-                     Audio_GetOutput, NULL, &p_out))
+    if (DecodeCommon(p_dec, pp_block, NULL, &p_out))
         return NULL;
     return p_out;
 }
