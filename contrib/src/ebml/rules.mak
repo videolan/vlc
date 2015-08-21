@@ -11,6 +11,7 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.bz2:
 
 libebml: libebml-$(EBML_VERSION).tar.bz2 .sum-ebml
 	$(UNPACK)
+	$(APPLY) $(SRC)/ebml/eof.patch
 	$(MOVE)
 
 # libebml requires exceptions

@@ -1,0 +1,15 @@
+--- libebml/src/EbmlElement.cpp 2015-08-21 12:58:03.738589700 +0200
++++ libebml/src/EbmlElement.cpp.eof     2015-08-21 12:55:18.972736500 +0200
+@@ -417,7 +417,10 @@
+         bFound = false;
+         break;
+       }
+-      ReadSize += DataStream.read(&PossibleIdNSize[SizeIdx++], 1);
++      if( DataStream.read( &PossibleIdNSize[SizeIdx++], 1 ) == 0 ) {
++          return NULL; // no more data ?
++      }
++      ReadSize++;
+       PossibleSizeLength++;
+     }
+
+
