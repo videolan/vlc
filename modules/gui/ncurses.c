@@ -303,10 +303,11 @@ static void ReadDir(intf_thread_t *intf)
         continue;
     }
 
-    qsort(sys->dir_entries, sys->n_dir_entries,
-           sizeof(struct dir_entry_t*), &comdir_entries);
-
     closedir(current_dir);
+
+    if (sys->n_dir_entries > 0)
+        qsort(sys->dir_entries, sys->n_dir_entries,
+              sizeof(struct dir_entry_t*), &comdir_entries);
 }
 
 /*****************************************************************************
