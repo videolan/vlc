@@ -412,7 +412,7 @@ static int InstallFile( addons_storage_t *p_this, const char *psz_downloadlink,
         return VLC_EGENERIC;
     }
 
-    while ( ( i_read = stream_Read( p_stream, &buffer, 1<<10 ) ) )
+    while ( ( i_read = stream_Read( p_stream, &buffer, 1<<10 ) ) > 0 )
     {
         if ( fwrite( &buffer, i_read, 1, p_destfile ) < 1 )
         {

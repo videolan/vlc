@@ -408,7 +408,7 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
 
     char buffer[1<<10];
     int i_read = 0;
-    while ( ( i_read = stream_Read( p_stream, &buffer, 1<<10 ) ) )
+    while ( ( i_read = stream_Read( p_stream, &buffer, 1<<10 ) ) > 0 )
     {
         if ( fwrite( &buffer, i_read, 1, p_destfile ) < 1 )
         {
