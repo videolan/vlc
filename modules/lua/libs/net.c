@@ -350,7 +350,7 @@ static int vlclua_net_poll( lua_State *L )
     }
 
     vlc_interrupt_t *oint = vlclua_set_interrupt( L );
-    int ret = 1, val;
+    int ret = 1, val = -1;
 
     do
     {
