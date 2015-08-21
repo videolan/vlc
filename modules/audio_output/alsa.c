@@ -330,7 +330,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
     char sep = '\0';
     if (spdif)
     {
-        const char *opt;
+        const char *opt = NULL;
 
         if (!strcmp (device, "default"))
             device = "iec958"; /* TODO: hdmi */
