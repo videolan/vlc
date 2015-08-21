@@ -550,10 +550,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
         p_sys->u.video.timestamp_fifo = timestamp_FifoNew(32);
         if (!p_sys->u.video.timestamp_fifo)
-        {
-            CloseDecoder(p_this);
-            return VLC_ENOMEM;
-        }
+            goto bailout;
 
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
             h264_get_profile_level(&p_dec->fmt_in,
@@ -562,10 +559,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime,
                                               p_sys->u.video.i_h264_profile);
         if (!p_sys->psz_name)
-        {
-            CloseDecoder(p_this);
-            return VLC_EGENERIC;
-        }
+            goto bailout;
 
         /* Check if we need late opening */
         switch (p_dec->fmt_in.i_codec)
@@ -593,10 +587,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
         p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, 0);
         if (!p_sys->psz_name)
-        {
-            CloseDecoder(p_this);
-            return VLC_EGENERIC;
-        }
+            goto bailout;
 
         /* Marvel ACodec assert if channel count is 0 */
         if (!strncmp(p_sys->psz_name, "OMX.Marvell",
@@ -623,7 +614,13 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         }
     }
 
-    return StartMediaCodec(p_dec);
+    if (StartMediaCodec(p_dec) == VLC_SUCCESS)
+        return VLC_SUCCESS;
+    else
+        msg_Err(p_dec, "StartMediaCodec failed");
+bailout:
+    CloseDecoder(p_this);
+    return VLC_EGENERIC;
 }
 
 static int OpenDecoderNdk(vlc_object_t *p_this)
