@@ -520,7 +520,7 @@ int tar_open( TAR **t, char *pathname, int oflags )
     (void)oflags;
 
     int fd = vlc_open( pathname, O_BINARY | O_RDONLY );
-    if( !fd )
+    if( fd == -1 )
     {
         fprintf( stderr, "Couldn't open %s\n", pathname );
         return -1;
@@ -766,7 +766,7 @@ int gzopen_frontend( const char *pathname, int oflags, int mode )
         return -1;
     }
     int fd = vlc_open( pathname, oflags );
-    if( !fd )
+    if( fd == -1 )
     {
         fprintf( stderr, "Couldn't open %s\n", pathname );
         return -1;
