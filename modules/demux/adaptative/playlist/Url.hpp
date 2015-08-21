@@ -51,6 +51,7 @@ namespace adaptative
                     private:
                         bool b_scheme;
                         bool b_dir;
+                        bool b_absolute;
                 };
 
                 Url();

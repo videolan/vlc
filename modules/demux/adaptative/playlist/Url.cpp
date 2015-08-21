@@ -72,6 +72,24 @@ Url & Url::prepend(const Url &url)
 
 Url & Url::append(const Url &url)
 {
+    if(!components.empty() && url.components.front().b_absolute)
+    {
+        if(components.front().b_scheme)
+        {
+            while(components.size() > 1)
+                components.pop_back();
+            std::string scheme(components.front().component);
+            std::size_t schemepos = scheme.find_first_of("://");
+            if(schemepos != std::string::npos)
+            {
+                std::size_t pathpos = scheme.find_first_of('/', schemepos + 3);
+                if(pathpos != std::string::npos)
+                    components.front().component = scheme.substr(0, pathpos);
+                /* otherwise should be domain only */
+            }
+        }
+    }
+
     if(!components.empty() && !components.back().b_dir)
         components.pop_back();
     components.insert(components.end(), url.components.begin(), url.components.end());
@@ -99,12 +117,12 @@ std::string Url::toString(size_t index, const BaseRepresentation *rep) const
 }
 
 Url::Component::Component(const std::string & str, const MediaSegmentTemplate *templ_)
- : component(str), templ(templ_), b_scheme(false), b_dir(false)
+ : component(str), templ(templ_), b_scheme(false), b_dir(false), b_absolute(false)
 {
     if(!component.empty())
     {
         b_dir = (component[component.length()-1]=='/');
-        b_scheme = !component.compare(0, 7, "http://") || !component.compare(0, 8, "https://");
+        b_scheme = (component.find_first_of("://") == (component.find_first_of('/') - 1));
+        b_absolute = (component[0] =='/');
     }
 }
-
