@@ -75,10 +75,10 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->i_subtitle < p_sys->i_subtitles )
-            {
                 *pi64 = p_sys->subtitle[p_sys->i_subtitle].i_start;
-                return VLC_SUCCESS;
-            }
+            else
+                *pi64 = p_sys->i_length;
+            return VLC_SUCCESS;
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
             p_sys->i_subtitle = 0;
