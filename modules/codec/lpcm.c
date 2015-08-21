@@ -813,7 +813,7 @@ static int AobHeader( unsigned *pi_rate,
 
     /* */
     /* max is 0x2, 0xf == unused */
-    g[0].i_bits = ( i_index_size_g1 != 0x0f ) ? 16 + 4 * i_index_size_g1 : 0;
+    g[0].i_bits = 16 + 4 * i_index_size_g1;
     g[1].i_bits = ( i_index_size_g2 != 0x0f ) ? 16 + 4 * i_index_size_g2 : 0;
 
     /* No info about interlacing of different sampling rate */
