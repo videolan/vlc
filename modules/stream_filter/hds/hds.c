@@ -831,6 +831,8 @@ static uint8_t* download_chunk( stream_t *s,
 
     int read = stream_Read( download_stream, data,
                             size );
+    if( read < 0 )
+        read = 0;
     chunk->data_len = read;
 
     if( read < size )
