@@ -331,7 +331,8 @@ error:
     free( psz_username );
     free( psz_remote_home );
     vlc_UrlClean( &url );
-    net_Close( p_sys->i_socket );
+    if( p_sys->i_socket >= 0 )
+        net_Close( p_sys->i_socket );
     free( p_sys );
     return VLC_EGENERIC;
 }
