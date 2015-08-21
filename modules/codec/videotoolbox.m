@@ -475,7 +475,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 #endif
     VTDictionarySetInt32(dpba,
                          kCVPixelBufferPixelFormatTypeKey,
-                         kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange);
+                         kCVPixelFormatType_420YpCbCr8BiPlanarFullRange);
     VTDictionarySetInt32(dpba,
                          kCVPixelBufferWidthKey,
                          i_video_width);
