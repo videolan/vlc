@@ -181,8 +181,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     const unsigned i_visible_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
     const int sigma = var_GetFloat( p_filter, FILTER_PREFIX "sigma" ) * (1 << 20);
 
-    if( !p_pic ) return NULL;
-
     p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
