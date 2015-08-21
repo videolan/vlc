@@ -95,11 +95,6 @@
 #   define SUPPORTS_FIXED_PIPELINE
 #endif
 
-static const vlc_fourcc_t gl_subpicture_chromas[] = {
-    VLC_CODEC_RGBA,
-    0
-};
-
 typedef struct {
     GLuint   texture;
     unsigned format;
@@ -1002,7 +997,7 @@ static const GLfloat identity[] = {
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
-static void orientationTransformMatrix(GLfloat matrix[static 16], video_orientation_t orientation) {
+void orientationTransformMatrix(GLfloat matrix[static 16], video_orientation_t orientation) {
 
     memcpy(matrix, identity, sizeof(identity));
 
