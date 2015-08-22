@@ -3034,10 +3034,13 @@ static void CloseFrag(vlc_object_t *p_this)
         if (mfra)
         {
             bo_t *mfro = box_full_new("mfro", 0, 0x0);
-            if (mfro && mfra->b)
+            if (mfro)
             {
-                box_fix(mfra, mfra->b->i_buffer);
-                bo_add_32be(mfro, mfra->b->i_buffer + MP4_MFRO_BOXSIZE);
+                if (mfra->b)
+                {
+                    box_fix(mfra, mfra->b->i_buffer);
+                    bo_add_32be(mfro, mfra->b->i_buffer + MP4_MFRO_BOXSIZE);
+                }
                 box_gather(mfra, mfro);
             }
             box_send(p_mux, mfra);
