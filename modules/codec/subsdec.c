@@ -946,7 +946,10 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                 if( !strcasecmp( psz_tagname, "br" ) )
                 {
                     if ( !AppendCharacter( p_segment, '\n' ) )
+                    {
+                        free( psz_tagname );
                         goto fail;
+                    }
                 }
                 else if( !strcasecmp( psz_tagname, "b" ) )
                 {
