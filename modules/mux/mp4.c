@@ -37,6 +37,7 @@
 
 #include <vlc_bits.h>
 
+#include <assert.h>
 #include <time.h>
 
 #include <vlc_iso_lang.h>
@@ -45,7 +46,6 @@
 #include "../demux/mpeg/mpeg_parser_helpers.h"
 #include "../demux/mp4/libmp4.h"
 
-#include "assert.h"
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -277,9 +277,8 @@ static int Open(vlc_object_t *p_this)
             box_fix(box, box->b->i_buffer);
             p_sys->i_pos += box->b->i_buffer;
             p_sys->i_mdat_pos = p_sys->i_pos;
-
-            box_send(p_mux, box);
         }
+        box_send(p_mux, box);
     }
 
     /* FIXME FIXME
@@ -394,7 +393,8 @@ static void Close(vlc_object_t *p_this)
 
     /* Write MOOV header */
     sout_AccessOutSeek(p_mux->p_access, i_moov_pos);
-    box_send(p_mux, moov);
+    if (moov != NULL)
+        box_send(p_mux, moov);
 
 cleanup:
     /* Clean-up */
@@ -2463,7 +2463,8 @@ static void box_gather (bo_t *box, bo_t *box2)
 
 static void box_send(sout_mux_t *p_mux,  bo_t *box)
 {
-    if(box && box->b)
+    assert(box != NULL);
+    if (box->b)
         sout_AccessOutWrite(p_mux->p_access, box->b);
     free(box);
 }
