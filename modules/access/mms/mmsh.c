@@ -638,6 +638,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
         if( psz == NULL )
         {
             msg_Err( p_access, "failed to read answer" );
+            free( psz_location );
             goto error;
         }
 
@@ -651,6 +652,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
         {
             msg_Err( p_access, "malformed header line: %s", psz );
             free( psz );
+            free( psz_location );
             goto error;
         }
         *p++ = '\0';
@@ -682,6 +684,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
         }
         else if( !strcasecmp( psz, "Location" ) )
         {
+            free( psz_location );
             psz_location = strdup( p );
         }
         else if( !strcasecmp( psz, "Content-Length" ) )
