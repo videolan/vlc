@@ -312,6 +312,7 @@ M3U8 * Parser::parse(const std::string &playlisturl)
         free(psz_line);
         return NULL;
     }
+    free(psz_line);
 
     M3U8 *playlist = new (std::nothrow) M3U8(p_stream);
     if(!playlist)
