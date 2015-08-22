@@ -1050,10 +1050,10 @@ static int LayoutLine( filter_t *p_filter,
 
         bool b_karaoke = p_paragraph->pi_karaoke_bar[ i_paragraph_index ] != 0;
         p_ch->i_color = b_karaoke ?
-                        ( uint32_t ) p_glyph_style->i_karaoke_background_color
-                      |              p_glyph_style->i_karaoke_background_alpha << 24
-                      : ( uint32_t ) p_glyph_style->i_font_color
-                      |              p_glyph_style->i_font_alpha << 24;
+                        (uint32_t) p_glyph_style->i_karaoke_background_color
+                      | (uint32_t) p_glyph_style->i_karaoke_background_alpha << 24
+                      : (uint32_t) p_glyph_style->i_font_color
+                      | (uint32_t) p_glyph_style->i_font_alpha << 24;
 
         p_ch->i_line_thickness = i_line_thickness;
         p_ch->i_line_offset = i_line_offset;
