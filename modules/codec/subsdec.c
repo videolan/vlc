@@ -638,6 +638,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 
     p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
     p_spu_sys->p_segments = ParseSubtitles( &p_spu_sys->align, psz_subtitle );
+    free( psz_subtitle );
 
     //FIXME: Remove the variable?
     //if( var_InheritBool( p_dec, "subsdec-formatted" ) )
