@@ -44,6 +44,9 @@
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
+#define SIGMA_MIN (0.01)
+#define SIGMA_MAX (4096.0)
+
 #define SIGMA_TEXT N_("Gaussian's std deviation")
 #define SIGMA_LONGTEXT N_( \
     "Gaussian's standard deviation. The blurring will take " \
@@ -61,8 +64,9 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_float( FILTER_PREFIX "sigma", 2., SIGMA_TEXT, SIGMA_LONGTEXT,
-               false )
+    add_float_with_range( FILTER_PREFIX "sigma", 2., SIGMA_MIN, SIGMA_MAX,
+                          SIGMA_TEXT, SIGMA_LONGTEXT,
+                          false )
 
     set_callbacks( Create, Destroy )
 vlc_module_end ()
@@ -159,7 +163,7 @@ static int Create( vlc_object_t *p_this )
         var_CreateGetFloat( p_filter, FILTER_PREFIX "sigma" );
     if( p_filter->p_sys->f_sigma <= 0. )
     {
-        msg_Err( p_filter, "sigma must be positive" );
+        msg_Err( p_filter, "sigma must be greater than zero" );
         return VLC_EGENERIC;
     }
     gaussianblur_InitDistribution( p_filter->p_sys );
