@@ -192,7 +192,7 @@ int FileOpen( vlc_object_t *p_this )
 
 #if O_NONBLOCK
     /* Force blocking mode back */
-    fcntl (fd, fcntl (fd, F_GETFL) & ~O_NONBLOCK);
+    fcntl (fd, F_SETFL, fcntl (fd, F_GETFL) & ~O_NONBLOCK);
 #endif
 
     /* Directories can be opened and read from, but only readdir() knows
