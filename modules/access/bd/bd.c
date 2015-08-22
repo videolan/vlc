@@ -1047,7 +1047,7 @@ static void LoadMpls( demux_t *p_demux, const char *psz_name, int i_id )
 
     block_t *p_block = LoadBlock( p_demux, psz_name );
     if( !p_block )
-        goto error;
+        return;
 
     /* */
     bd_mpls_t *p_mpls = malloc( sizeof(*p_mpls) );
@@ -1115,8 +1115,8 @@ static void LoadMpls( demux_t *p_demux, const char *psz_name, int i_id )
 
 error:
     msg_Err( p_demux, "Failed loading %s", psz_name );
-    if( p_block )
-        block_Release( p_block );
+    free( p_mpls );
+    block_Release( p_block );
 }
 
 /* */
