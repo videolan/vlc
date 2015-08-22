@@ -348,9 +348,6 @@ static const char *const ppsz_justification_text[] = {
 #define AUTODETECT_UTF8_TEXT N_("UTF-8 subtitle autodetection")
 #define AUTODETECT_UTF8_LONGTEXT N_("This enables automatic detection of " \
             "UTF-8 encoding within subtitle files.")
-#define FORMAT_TEXT N_("Formatted Subtitles")
-#define FORMAT_LONGTEXT N_("Some subtitle formats allow for text formatting. " \
- "VLC partly implements this, but you can choose to disable all formatting.")
 
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
@@ -371,8 +368,6 @@ vlc_module_begin ()
         change_string_list( ppsz_encodings, ppsz_encoding_names )
     add_bool( "subsdec-autodetect-utf8", true,
               AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, false )
-    add_bool( "subsdec-formatted", true, FORMAT_TEXT, FORMAT_LONGTEXT,
-                 false )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -638,10 +633,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 
     p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
     p_spu_sys->p_segments = ParseSubtitles( &p_spu_sys->align, psz_subtitle );
-    free( psz_subtitle );
 
-    //FIXME: Remove the variable?
-    //if( var_InheritBool( p_dec, "subsdec-formatted" ) )
+    free( psz_subtitle );
 
     return p_spu;
 }

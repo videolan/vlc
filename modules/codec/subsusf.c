@@ -41,6 +41,10 @@
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 
+#define FORMAT_TEXT N_("Formatted Subtitles")
+#define FORMAT_LONGTEXT N_("Some subtitle formats allow for text formatting. " \
+ "VLC partly implements this, but you can choose to disable all formatting.")
+
 vlc_module_begin ()
     set_capability( "decoder", 40 )
     set_shortname( N_("USFSubs"))
@@ -48,7 +52,8 @@ vlc_module_begin ()
     set_callbacks( OpenDecoder, CloseDecoder )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
-    /* We inherit subsdec-align and subsdec-formatted from subsdec.c */
+    add_bool( "subsdec-formatted", true, FORMAT_TEXT, FORMAT_LONGTEXT,
+                 false )
 vlc_module_end ()
 
 
