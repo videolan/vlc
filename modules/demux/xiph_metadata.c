@@ -306,27 +306,14 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         else if ( ppf_replay_gain && ppf_replay_peak && !strncmp(psz_comment, "REPLAYGAIN_", 11) )
         {
             char *p = strchr( psz_comment, '=' );
-            char *psz_val;
             if (!p) continue;
             if ( !strncasecmp(psz_comment, "REPLAYGAIN_TRACK_GAIN=", 22) )
             {
-                psz_val = malloc( strlen(p+1) + 1 );
-                if (!psz_val) continue;
-                if( sscanf( ++p, "%s dB", psz_val ) == 1 )
-                {
-                    (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_TRACK] = us_atof( psz_val );
-                    free( psz_val );
-                }
+                (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_TRACK] = us_atof( ++p );
             }
             else if ( !strncasecmp(psz_comment, "REPLAYGAIN_ALBUM_GAIN=", 22) )
             {
-                psz_val = malloc( strlen(p+1) + 1 );
-                if (!psz_val) continue;
-                if( sscanf( ++p, "%s dB", psz_val ) == 1 )
-                {
-                    (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( psz_val );
-                    free( psz_val );
-                }
+                (*ppf_replay_gain)[AUDIO_REPLAY_GAIN_ALBUM] = us_atof( ++p );
             }
             else if ( !strncasecmp(psz_comment, "REPLAYGAIN_ALBUM_PEAK=", 22) )
             {
