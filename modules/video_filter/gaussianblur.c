@@ -108,9 +108,8 @@ static void gaussianblur_InitDistribution( filter_sys_t *p_sys )
     double f_sigma = p_sys->f_sigma;
     int i_dim = (int)(3.*f_sigma);
     type_t *pt_distribution = xmalloc( (2*i_dim+1) * sizeof( type_t ) );
-    int x;
 
-    for( x = -i_dim; x <= i_dim; x++ )
+    for( int x = -i_dim; x <= i_dim; x++ )
     {
         const float f_distribution = sqrt( exp(-(x*x)/(f_sigma*f_sigma) ) / (2.*M_PI*f_sigma*f_sigma) );
 #ifdef DONT_USE_FLOATS
@@ -191,7 +190,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-    int i_plane;
     const int i_dim = p_sys->i_dim;
     type_t *pt_buffer;
     type_t *pt_scale;
@@ -218,23 +216,21 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const int i_visible_lines = p_pic->p[Y_PLANE].i_visible_lines;
         const int i_visible_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
         const int i_pitch = p_pic->p[Y_PLANE].i_pitch;
-        int i_col, i_line;
 
         p_sys->pt_scale = xmalloc( i_visible_lines * i_pitch * sizeof( type_t ) );
         pt_scale = p_sys->pt_scale;
 
-        for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
+        for( int i_line = 0 ; i_line < i_visible_lines ; i_line++ )
         {
-            for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
+            for( int i_col = 0; i_col < i_visible_pitch ; i_col++ )
             {
-                int x, y;
                 type_t t_value = 0;
 
-                for( y = __MAX( -i_dim, -i_line );
+                for( int y = __MAX( -i_dim, -i_line );
                      y <= __MIN( i_dim, i_visible_lines - i_line - 1 );
                      y++ )
                 {
-                    for( x = __MAX( -i_dim, -i_col );
+                    for( int x = __MAX( -i_dim, -i_col );
                          x <= __MIN( i_dim, i_visible_pitch - i_col + 1 );
                          x++ )
                     {
@@ -248,7 +244,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
     pt_scale = p_sys->pt_scale;
-    for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+    for( int i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
 
         uint8_t *p_in = p_pic->p[i_plane].p_pixels;
