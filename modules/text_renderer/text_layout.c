@@ -853,7 +853,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                     p_bitmaps->p_outline = 0;
             }
 
-            if( p_filter->p_sys->p_style->i_shadow_alpha > 0 )
+            if( p_filter->p_sys->p_style->i_shadow_alpha != STYLE_ALPHA_TRANSPARENT )
                 p_bitmaps->p_shadow = p_bitmaps->p_outline ?
                                       p_bitmaps->p_outline : p_bitmaps->p_glyph;
 

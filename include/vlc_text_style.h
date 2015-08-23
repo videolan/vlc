@@ -50,35 +50,28 @@ typedef struct
     int        i_font_size;       /**< The font size in pixels */
     int        i_font_color;      /**< The color of the text 0xRRGGBB
                                        (native endianness) */
-    uint8_t    i_font_alpha;      /**< The transparency of the text.
-                                       0x00 is fully opaque,
-                                       0xFF fully transparent */
+    uint8_t    i_font_alpha;      /**< The transparency of the text.*/
     int        i_spacing;         /**< The spaceing between glyphs in pixels */
 
     /* Outline */
     int        i_outline_color;   /**< The color of the outline 0xRRGGBB */
-    uint8_t    i_outline_alpha;   /**< The transparency of the outline.
-                                       0x00 is fully opaque,
-                                       0xFF fully transparent */
+    uint8_t    i_outline_alpha;   /**< The transparency of the outline */
     int        i_outline_width;   /**< The width of the outline in pixels */
 
     /* Shadow */
     int        i_shadow_color;    /**< The color of the shadow 0xRRGGBB */
-    uint8_t    i_shadow_alpha;    /**< The transparency of the shadow.
-                                        0x00 is fully opaque,
-                                        0xFF fully transparent */
+    uint8_t    i_shadow_alpha;    /**< The transparency of the shadow. */
     int        i_shadow_width;    /**< The width of the shadow in pixels */
 
     /* Background (and karaoke) */
     int        i_background_color;/**< The color of the background 0xRRGGBB */
-    uint8_t    i_background_alpha;/**< The transparency of the background.
-                                       0x00 is fully opaque,
-                                       0xFF fully transparent */
+    uint8_t    i_background_alpha;/**< The transparency of the background */
     int        i_karaoke_background_color;/**< Background color for karaoke 0xRRGGBB */
-    uint8_t    i_karaoke_background_alpha;/**< The transparency of the karaoke bg.
-                                       0x00 is fully opaque,
-                                       0xFF fully transparent */
+    uint8_t    i_karaoke_background_alpha;/**< The transparency of the karaoke bg */
 } text_style_t;
+
+#define STYLE_ALPHA_OPAQUE      0xFF
+#define STYLE_ALPHA_TRANSPARENT 0x00
 
 /* Features flags for \ref i_features */
 #define STYLE_NO_DEFAULTS               0x0
