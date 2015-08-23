@@ -922,6 +922,8 @@ static int LayoutLine( filter_t *p_filter,
 #endif
 
         line_character_t *p_ch = p_line->p_character + i_line_index;
+        p_ch->p_style = p_paragraph->pp_styles[ i_paragraph_index ];
+
         glyph_bitmaps_t *p_bitmaps =
                 p_paragraph->p_glyph_bitmaps + i_paragraph_index;
 
@@ -1004,8 +1006,8 @@ static int LayoutLine( filter_t *p_filter,
 
         int i_line_offset    = 0;
         int i_line_thickness = 0;
-        const text_style_t *p_glyph_style = p_paragraph->pp_styles[ i_paragraph_index ];
-        if( p_glyph_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
+
+        if( p_ch->p_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
         {
             i_line_offset =
                 abs( FT_FLOOR( FT_MulFix( p_face->underline_position,
@@ -1015,7 +1017,7 @@ static int LayoutLine( filter_t *p_filter,
                 abs( FT_CEIL( FT_MulFix( p_face->underline_thickness,
                                          p_face->size->metrics.y_scale ) ) );
 
-            if( p_glyph_style->i_style_flags & STYLE_STRIKEOUT )
+            if( p_ch->p_style->i_style_flags & STYLE_STRIKEOUT )
             {
                 /* Move the baseline to make it strikethrough instead of
                  * underline. That means that strikethrough takes precedence
@@ -1047,16 +1049,7 @@ static int LayoutLine( filter_t *p_filter,
         p_ch->p_glyph = ( FT_BitmapGlyph ) p_bitmaps->p_glyph;
         p_ch->p_outline = ( FT_BitmapGlyph ) p_bitmaps->p_outline;
         p_ch->p_shadow = ( FT_BitmapGlyph ) p_bitmaps->p_shadow;
-
-        bool b_karaoke = p_paragraph->pi_karaoke_bar[ i_paragraph_index ] != 0;
-        p_ch->i_color = b_karaoke ?
-                        (uint32_t) p_glyph_style->i_karaoke_background_color
-                      | (uint32_t) p_glyph_style->i_karaoke_background_alpha << 24
-                      : (uint32_t) p_glyph_style->i_font_color
-                      | (uint32_t) p_glyph_style->i_font_alpha << 24;
-
-        p_ch->i_background_color = ( uint32_t ) p_glyph_style->i_background_color
-                                 |              p_glyph_style->i_background_alpha << 24;
+        p_ch->b_in_karaoke = (p_paragraph->pi_karaoke_bar[ i_paragraph_index ] != 0);
 
         p_ch->i_line_thickness = i_line_thickness;
         p_ch->i_line_offset = i_line_offset;

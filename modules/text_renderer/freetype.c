@@ -393,8 +393,8 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
 
     /* Calculate text color components
      * Only use the first color */
-    int i_alpha = (p_line->p_character[0].i_color >> 24) & 0xff;
-    YUVFromRGB( p_line->p_character[0].i_color, &i_y, &i_u, &i_v );
+    const int i_alpha = p_line->p_character[0].p_style->i_font_alpha;
+    YUVFromRGB( p_line->p_character[0].p_style->i_font_color, &i_y, &i_u, &i_v );
 
     /* Build palette */
     fmt.p_palette->i_entries = 16;
@@ -717,7 +717,7 @@ static inline void RenderBackground( subpicture_region_t *p_region,
             line_start = 0;
 
         /* Setup color for the background */
-        uint32_t i_prev_color = p_line->p_character[p_line->i_first_visible_char_index].i_background_color;
+        const text_style_t *p_prev_style = p_line->p_character[p_line->i_first_visible_char_index].p_style;
 
         int i_char_index = p_line->i_first_visible_char_index;
         while( i_char_index <= p_line->i_last_visible_char_index )
@@ -725,7 +725,7 @@ static inline void RenderBackground( subpicture_region_t *p_region,
             /* find last char having the same style */
             int i_seg_end = i_char_index;
             while( i_seg_end < p_line->i_last_visible_char_index &&
-                   i_prev_color == p_line->p_character[i_seg_end].i_background_color )
+                   p_prev_style == p_line->p_character[i_seg_end].p_style )
             {
                 i_seg_end++;
             }
@@ -736,8 +736,12 @@ static inline void RenderBackground( subpicture_region_t *p_region,
                            i_align_left - p_bbox->xMin;
 
             uint8_t i_x, i_y, i_z;
-            ExtractComponents( p_line->p_character[i_char_index].i_background_color, &i_x, &i_y, &i_z );
-            const uint8_t i_alpha = (p_line->p_character[i_char_index].i_background_color >> 24) & 0xFF;
+            const line_character_t *p_char = &p_line->p_character[i_char_index];
+            ExtractComponents( p_char->b_in_karaoke ? p_char->p_style->i_karaoke_background_color :
+                                                      p_char->p_style->i_background_color,
+                               &i_x, &i_y, &i_z );
+            const uint8_t i_alpha = p_char->b_in_karaoke ? p_char->p_style->i_karaoke_background_alpha:
+                                                           p_char->p_style->i_background_alpha;
 
             /* Render the actual background */
             for( int dy = line_top; dy < line_bottom; dy++ )
@@ -748,7 +752,7 @@ static inline void RenderBackground( subpicture_region_t *p_region,
 
             line_start = line_end;
             i_char_index = i_seg_end + 1;
-            i_prev_color = p_line->p_character->i_background_color;
+            p_prev_style = p_line->p_character->p_style;
         }
 
     }
@@ -826,7 +830,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                 if( !p_glyph )
                     continue;
 
-                i_a = (ch->i_color >> 24) & 0xff;
+                i_a = ch->p_style->i_font_alpha;
                 uint32_t i_color;
                 switch (g) {
                 case 0:
@@ -838,7 +842,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                     i_color = p_sys->p_style->i_outline_color;
                     break;
                 default:
-                    i_color = ch->i_color;
+                    i_color = ch->p_style->i_font_color;
                     break;
                 }
                 ExtractComponents( i_color, &i_x, &i_y, &i_z );

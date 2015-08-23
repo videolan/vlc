@@ -32,10 +32,10 @@ typedef struct
     FT_BitmapGlyph p_glyph;
     FT_BitmapGlyph p_outline;
     FT_BitmapGlyph p_shadow;
-    uint32_t       i_color;             /* ARGB color */
-    uint32_t       i_background_color;  /* ARGB background color */
+    const text_style_t *p_style;
     int            i_line_offset;       /* underline/strikethrough offset */
     int            i_line_thickness;    /* underline/strikethrough thickness */
+    bool           b_in_karaoke;
 } line_character_t;
 
 typedef struct line_desc_t line_desc_t;
