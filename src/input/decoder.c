@@ -1053,7 +1053,6 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
                               int *pi_played_sum, int *pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    audio_output_t *p_aout = p_owner->p_aout;
 
     /* */
     if( p_audio->i_pts <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify audio_output/*
@@ -1092,6 +1091,8 @@ race:
 
     if( unlikely(p_owner->b_paused != b_paused) )
         goto race; /* race with input thread? retry... */
+
+    audio_output_t *p_aout = p_owner->p_aout;
     if( p_aout == NULL )
         b_reject = true;
 
