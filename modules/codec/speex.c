@@ -1061,7 +1061,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     if( unlikely( !p_aout_buf ) ) return NULL;
 
     unsigned char *p_buffer = p_aout_buf->p_buffer;
-    int i_samples = p_aout_buf->i_nb_samples;
+    unsigned i_samples = p_aout_buf->i_nb_samples;
     int i_samples_delay = p_sys->i_samples_delay;
 
     mtime_t i_pts = p_aout_buf->i_pts -
