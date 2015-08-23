@@ -335,13 +335,14 @@ static int  Open ( vlc_object_t *p_this )
 
     if( strcasecmp( p_demux->psz_access, "satip" ) == 0 )
     {
-        asprintf(&p_sys->p_sdp, "v=0\r\n"
-                "o=- 0 %s\r\n"
-                "s=SATIP:stream\r\n"
-                "i=SATIP RTP Stream\r\n"
-                "m=video 0 RTP/AVP 33\r\n"
-                "a=control:rtsp://%s\r\n\r\n",
-                p_sys->url.psz_host, p_sys->psz_path);
+        if( asprintf(&p_sys->p_sdp, "v=0\r\n"
+                     "o=- 0 %s\r\n"
+                     "s=SATIP:stream\r\n"
+                     "i=SATIP RTP Stream\r\n"
+                     "m=video 0 RTP/AVP 33\r\n"
+                     "a=control:rtsp://%s\r\n\r\n",
+                     p_sys->url.psz_host, p_sys->psz_path) < 0 )
+            abort();
     }
 
     if( p_demux->s != NULL )
