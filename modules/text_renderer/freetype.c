@@ -744,10 +744,13 @@ static inline void RenderBackground( subpicture_region_t *p_region,
                                                            p_char->p_style->i_background_alpha;
 
             /* Render the actual background */
-            for( int dy = line_top; dy < line_bottom; dy++ )
+            if( i_alpha != STYLE_ALPHA_TRANSPARENT )
             {
-                for( int dx = line_start; dx < line_end; dx++ )
-                    BlendPixel( p_picture, dx, dy, i_alpha, i_x, i_y, i_z, 0xff );
+                for( int dy = line_top; dy < line_bottom; dy++ )
+                {
+                    for( int dx = line_start; dx < line_end; dx++ )
+                        BlendPixel( p_picture, dx, dy, i_alpha, i_x, i_y, i_z, 0xff );
+                }
             }
 
             line_start = line_end;
@@ -831,8 +834,11 @@ static inline int RenderAXYZ( filter_t *p_filter,
                     continue;
 
                 i_a = ch->p_style->i_font_alpha;
+                if( i_a == STYLE_ALPHA_TRANSPARENT )
+                    continue;
+
                 uint32_t i_color;
-                switch (g) {
+                switch (g) {/* Apply font alpha ratio to shadow/outline alpha */
                 case 0:
                     i_a     = i_a * p_sys->p_style->i_shadow_alpha / 255;
                     i_color = p_sys->p_style->i_shadow_color;
