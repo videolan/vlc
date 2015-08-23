@@ -912,6 +912,7 @@
 			</array>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>tp</string>
 				<string>ts</string>
 				<string>m2ts</string>
 				<string>mts</string>
@@ -2218,6 +2219,7 @@
 				<array>
 					<string>m2p</string>
 					<string>ps</string>
+					<string>tp</string>
 					<string>ts</string>
 					<string>m2ts</string>
 					<string>mts</string>
