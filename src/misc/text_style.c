@@ -54,10 +54,10 @@ text_style_t *text_style_Create( int i_defaults )
     p_style->i_font_alpha = 0xff;
     p_style->i_outline_color = 0x000000;
     p_style->i_outline_alpha = 0xff;
-    p_style->i_shadow_color = 0x000000;
+    p_style->i_shadow_color = 0x808080;
     p_style->i_shadow_alpha = 0xff;
-    p_style->i_background_color = 0xffffff;
-    p_style->i_background_alpha = 0x80;
+    p_style->i_background_color = 0x000000;
+    p_style->i_background_alpha = 0xff;
     p_style->i_karaoke_background_color = 0xffffff;
     p_style->i_karaoke_background_alpha = 0xff;
     p_style->i_outline_width = 1;
