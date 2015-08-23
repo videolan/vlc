@@ -861,8 +861,8 @@ libvlc_media_get_tracks_info( libvlc_media_t *p_md, libvlc_media_track_info_t **
             break;
         case VIDEO_ES:
             p_mes->i_type = libvlc_track_video;
-            p_mes->u.video.i_height = p_es->video.i_height;
-            p_mes->u.video.i_width = p_es->video.i_width;
+            p_mes->u.video.i_height = p_es->video.i_visible_height;
+            p_mes->u.video.i_width = p_es->video.i_visible_width;
             break;
         case AUDIO_ES:
             p_mes->i_type = libvlc_track_audio;
@@ -937,8 +937,8 @@ libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
             break;
         case VIDEO_ES:
             p_mes->i_type = libvlc_track_video;
-            p_mes->video->i_height = p_es->video.i_height;
-            p_mes->video->i_width = p_es->video.i_width;
+            p_mes->video->i_height = p_es->video.i_visible_height;
+            p_mes->video->i_width = p_es->video.i_visible_width;
             p_mes->video->i_sar_num = p_es->video.i_sar_num;
             p_mes->video->i_sar_den = p_es->video.i_sar_den;
             p_mes->video->i_frame_rate_num = p_es->video.i_frame_rate;
