@@ -47,7 +47,7 @@ set_description(N_("Speech synthesis for Mac OS X"))
 set_category(CAT_VIDEO)
 set_subcategory(SUBCAT_VIDEO_SUBPIC)
 
-set_capability("text renderer", 50)
+set_capability("text renderer", 0)
 set_callbacks(Create, Destroy)
 vlc_module_end ()
 
