@@ -264,6 +264,11 @@ mtime_t vlc_pa_get_latency(vlc_object_t *obj, pa_context *ctx, pa_stream *s)
     const pa_sample_spec *ss = pa_stream_get_sample_spec(s);
     const pa_timing_info *ti = pa_stream_get_timing_info(s);
 
+    if (ti == NULL) {
+        msg_Dbg(obj, "no timing infos");
+        return VLC_TS_INVALID;
+    }
+
     if (ti->write_index_corrupt) {
         msg_Dbg(obj, "write index corrupt");
         return VLC_TS_INVALID;
