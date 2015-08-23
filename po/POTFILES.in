@@ -982,7 +982,6 @@ modules/lua/vlc.h
 modules/meta_engine/folder.c
 modules/meta_engine/taglib.cpp
 modules/misc/audioscrobbler.c
-modules/misc/dhparams.h
 modules/misc/gnutls.c
 modules/misc/inhibit/dbus.c
 modules/misc/inhibit/xdg.c

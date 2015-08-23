@@ -24,7 +24,7 @@ libfingerprinter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/misc
 libfingerprinter_plugin_la_LIBADD = $(LIBM) $(LIBPTHREAD)
 misc_LTLIBRARIES += libfingerprinter_plugin.la
 
-libgnutls_plugin_la_SOURCES = misc/gnutls.c misc/dhparams.h
+libgnutls_plugin_la_SOURCES = misc/gnutls.c
 libgnutls_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNUTLS_CFLAGS)
 libgnutls_plugin_la_LIBADD = $(GNUTLS_LIBS)
 if HAVE_WIN32

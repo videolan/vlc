@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gnutls.c
  *****************************************************************************
- * Copyright (C) 2004-2014 Rémi Denis-Courmont
+ * Copyright (C) 2004-2015 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -37,7 +37,6 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
-#include "dhparams.h"
 
 #if (GNUTLS_VERSION_NUMBER >= 0x030300)
 static int gnutls_Init (vlc_object_t *obj)
@@ -631,18 +630,17 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
     }
 
     /* FIXME:
+     * - regenerate these regularly
      * - support other cipher suites
      */
     val = gnutls_dh_params_init (&sys->dh_params);
     if (val >= 0)
     {
-        const gnutls_datum_t data = {
-            .data = (unsigned char *)dh_params,
-            .size = sizeof (dh_params) - 1,
-        };
+        gnutls_sec_param_t sec = GNUTLS_SEC_PARAM_MEDIUM;
+        unsigned bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, sec);
 
-        val = gnutls_dh_params_import_pkcs3 (sys->dh_params, &data,
-                                             GNUTLS_X509_FMT_PEM);
+        msg_Dbg (crd, "generating Diffie-Hellman %u-bits parameters...", bits);
+        val = gnutls_dh_params_generate2 (sys->dh_params, bits);
         if (val == 0)
             gnutls_certificate_set_dh_params (sys->x509_cred,
                                               sys->dh_params);
@@ -652,6 +650,8 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
         msg_Err (crd, "cannot initialize DHE cipher suites: %s",
                  gnutls_strerror (val));
     }
+
+    msg_Dbg (crd, "ciphers parameters loaded");
 
     crd->sys = sys;
     crd->open = gnutls_ServerSessionOpen;
