@@ -143,14 +143,15 @@ int RarAccessOpen(vlc_object_t *object)
 {
     access_t *access = (access_t*)object;
 
-    if (!strchr(access->psz_location, '|'))
+    const char *name = strchr(access->psz_location, '|');
+    if (name == NULL)
         return VLC_EGENERIC;
 
-    char *base = strdup(access->psz_location);
-    if (!base)
-        return VLC_EGENERIC;
-    char *name = strchr(base, '|');
-    *name++ = '\0';
+    char *base = strndup(access->psz_location, name - access->psz_location);
+    if (unlikely(base == NULL))
+        return VLC_ENOMEM;
+
+    name++;
     decode_URI(base);
 
     stream_t *s = stream_UrlNew(access, base);
