@@ -1055,6 +1055,9 @@ static int LayoutLine( filter_t *p_filter,
                       : (uint32_t) p_glyph_style->i_font_color
                       | (uint32_t) p_glyph_style->i_font_alpha << 24;
 
+        p_ch->i_background_color = ( uint32_t ) p_glyph_style->i_background_color
+                                 |              p_glyph_style->i_background_alpha << 24;
+
         p_ch->i_line_thickness = i_line_thickness;
         p_ch->i_line_offset = i_line_offset;
 

@@ -675,8 +675,6 @@ static inline void RenderBackground( subpicture_region_t *p_region,
     {
         int i_align_left = i_margin;
         int i_align_top = i_margin;
-        int line_start = 0;
-        int line_end = 0;
         unsigned line_top = 0;
         int line_bottom = 0;
         int max_height = 0;
@@ -703,36 +701,56 @@ static inline void RenderBackground( subpicture_region_t *p_region,
         if( p_line->i_first_visible_char_index < 0 )
             continue; /* only spaces */
 
-        /* Compute the background for the line (identify leading/trailing space) */
-        line_start = p_line->p_character[p_line->i_first_visible_char_index].p_glyph->left +
-                     i_align_left - p_bbox->xMin;
-
-        /* Fudge factor to make sure caption background edges are left aligned
-           despite variable font width */
-        if (line_start < 12)
-            line_start = 0;
-
-        /* Find right boundary for bounding box for background */
-        line_end = p_line->p_character[p_line->i_last_visible_char_index].p_glyph->left +
-                   p_line->p_character[p_line->i_last_visible_char_index].p_glyph->bitmap.width +
-                   i_align_left - p_bbox->xMin;
-
-        /* Setup color for the background */
-        uint8_t i_x, i_y, i_z;
-        ExtractComponents( 0x000000, &i_x, &i_y, &i_z );
-
         /* Compute the upper boundary for the background */
         line_top = __MAX(0, i_align_top - max_height  + p_bbox->yMax + p_line->i_base_line);
 
         /* Compute lower boundary for the background */
         line_bottom =  __MIN(line_top + p_line->i_height, p_region->fmt.i_visible_height);
 
-        /* Render the actual background */
-        for( int dy = line_top; dy < line_bottom; dy++ )
+        /* Compute the background for the line (identify leading/trailing space) */
+        int line_start = p_line->p_character[p_line->i_first_visible_char_index].p_glyph->left +
+                         i_align_left - p_bbox->xMin;
+
+        /* Fudge factor to make sure caption background edges are left aligned
+           despite variable font width */
+        if (line_start < 12)
+            line_start = 0;
+
+        /* Setup color for the background */
+        uint32_t i_prev_color = p_line->p_character[p_line->i_first_visible_char_index].i_background_color;
+
+        int i_char_index = p_line->i_first_visible_char_index;
+        while( i_char_index <= p_line->i_last_visible_char_index )
         {
-            for( int dx = line_start; dx < line_end; dx++ )
-                BlendPixel( p_picture, dx, dy, 0xff, i_x, i_y, i_z, 0xff );
+            /* find last char having the same style */
+            int i_seg_end = i_char_index;
+            while( i_seg_end < p_line->i_last_visible_char_index &&
+                   i_prev_color == p_line->p_character[i_seg_end].i_background_color )
+            {
+                i_seg_end++;
+            }
+
+            /* Find right boundary for bounding box for background */
+            int line_end = p_line->p_character[i_seg_end].p_glyph->left +
+                           p_line->p_character[i_seg_end].p_glyph->bitmap.width +
+                           i_align_left - p_bbox->xMin;
+
+            uint8_t i_x, i_y, i_z;
+            ExtractComponents( p_line->p_character[i_char_index].i_background_color, &i_x, &i_y, &i_z );
+            const uint8_t i_alpha = (p_line->p_character[i_char_index].i_background_color >> 24) & 0xFF;
+
+            /* Render the actual background */
+            for( int dy = line_top; dy < line_bottom; dy++ )
+            {
+                for( int dx = line_start; dx < line_end; dx++ )
+                    BlendPixel( p_picture, dx, dy, i_alpha, i_x, i_y, i_z, 0xff );
+            }
+
+            line_start = line_end;
+            i_char_index = i_seg_end + 1;
+            i_prev_color = p_line->p_character->i_background_color;
         }
+
     }
 }
 

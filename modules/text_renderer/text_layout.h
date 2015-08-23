@@ -33,6 +33,7 @@ typedef struct
     FT_BitmapGlyph p_outline;
     FT_BitmapGlyph p_shadow;
     uint32_t       i_color;             /* ARGB color */
+    uint32_t       i_background_color;  /* ARGB background color */
     int            i_line_offset;       /* underline/strikethrough offset */
     int            i_line_thickness;    /* underline/strikethrough thickness */
 } line_character_t;
