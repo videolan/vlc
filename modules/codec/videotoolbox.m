@@ -473,9 +473,17 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                          kCVPixelBufferOpenGLESCompatibilityKey,
                          kCFBooleanTrue);
 #endif
-    VTDictionarySetInt32(dpba,
-                         kCVPixelBufferPixelFormatTypeKey,
-                         kCVPixelFormatType_420YpCbCr8BiPlanarFullRange);
+
+    /* full range allows a broader range of colors but is H264 only */
+    if (p_sys->codec == kCMVideoCodecType_H264) {
+        VTDictionarySetInt32(dpba,
+                             kCVPixelBufferPixelFormatTypeKey,
+                             kCVPixelFormatType_420YpCbCr8BiPlanarFullRange);
+    } else {
+        VTDictionarySetInt32(dpba,
+                             kCVPixelBufferPixelFormatTypeKey,
+                             kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange);
+    }
     VTDictionarySetInt32(dpba,
                          kCVPixelBufferWidthKey,
                          i_video_width);
