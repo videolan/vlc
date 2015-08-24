@@ -27,6 +27,25 @@
 struct stat;
 struct iovec;
 
+#ifdef _WIN32
+# include <sys/stat.h>
+# ifndef stat
+#  define stat _stati64
+# endif
+# ifndef fstat
+#  define fstat _fstati64
+# endif
+# ifndef _MSC_VER
+#  undef lseek
+#  define lseek _lseeki64
+# endif
+#endif
+
+#ifdef __ANDROID__
+# define lseek lseek64
+#endif
+
+
 /**
  * \defgroup os Operating system
  * @{
@@ -244,18 +263,6 @@ static inline void vlc_rewinddir( DIR *dir )
 }
 # undef rewinddir
 # define rewinddir vlc_rewinddir
-
-# include <sys/stat.h>
-# ifndef stat
-#  define stat _stati64
-# endif
-# ifndef fstat
-#  define fstat _fstati64
-# endif
-# ifndef _MSC_VER
-#  undef lseek
-#  define lseek _lseeki64
-# endif
 #endif
 
 #ifdef __ANDROID__
