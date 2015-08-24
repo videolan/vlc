@@ -547,14 +547,11 @@ static ssize_t AStreamReadBlock( stream_t *s, void *p_read, size_t i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    uint8_t *p_data = p_read;
-    size_t i_data = 0;
-
     /* It means EOF */
     if( p_sys->block.p_current == NULL )
         return 0;
 
-    if( p_data == NULL )
+    if( p_read == NULL )
     {
         /* seek within this stream if possible, else use plain old read and discard */
         access_t *p_access = p_sys->p_access;
@@ -565,38 +562,30 @@ static ssize_t AStreamReadBlock( stream_t *s, void *p_read, size_t i_read )
             return AStreamSeekBlock( s, p_sys->i_pos + i_read ) ? 0 : i_read;
     }
 
-    while( i_data < i_read )
+    ssize_t i_current =
+        p_sys->block.p_current->i_buffer - p_sys->block.i_offset;
+    size_t i_copy = VLC_CLIP( (size_t)i_current, 0, i_read );
+
+    /* Copy data */
+    if( p_read )
+        memcpy( p_read,
+                &p_sys->block.p_current->p_buffer[p_sys->block.i_offset],
+                i_copy );
+
+    p_sys->block.i_offset += i_copy;
+    if( p_sys->block.i_offset >= p_sys->block.p_current->i_buffer )
     {
-        ssize_t i_current =
-            p_sys->block.p_current->i_buffer - p_sys->block.i_offset;
-        size_t i_copy = VLC_CLIP( (size_t)i_current, 0, i_read - i_data);
+        /* Current block is now empty, switch to next */
+        p_sys->block.i_offset = 0;
+        p_sys->block.p_current = p_sys->block.p_current->p_next;
 
-        /* Copy data */
-        if( p_data )
-        {
-            memcpy( p_data,
-                    &p_sys->block.p_current->p_buffer[p_sys->block.i_offset],
-                    i_copy );
-            p_data += i_copy;
-        }
-        i_data += i_copy;
-
-        p_sys->block.i_offset += i_copy;
-        if( p_sys->block.i_offset >= p_sys->block.p_current->i_buffer )
-        {
-            /* Current block is now empty, switch to next */
-            p_sys->block.i_offset = 0;
-            p_sys->block.p_current = p_sys->block.p_current->p_next;
-
-            /*Get a new block if needed */
-            if( !p_sys->block.p_current && AStreamRefillBlock( s ) )
-                break;
-            assert( p_sys->block.p_current );
-        }
+        /* Get a new block if needed */
+        if( p_sys->block.p_current == NULL )
+            AStreamRefillBlock( s );
     }
 
-    p_sys->i_pos += i_data;
-    return i_data;
+    p_sys->i_pos += i_copy;
+    return i_copy;
 }
 
 static int AStreamSeekBlock( stream_t *s, uint64_t i_pos )
@@ -965,9 +954,6 @@ static ssize_t AStreamReadNoSeekStream( stream_t *s, void *p_read,
     stream_sys_t *p_sys = s->p_sys;
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
 
-    uint8_t *p_data = (uint8_t *)p_read;
-    size_t i_data = 0;
-
     if( tk->i_start >= tk->i_end )
         return 0; /* EOF */
 
@@ -978,50 +964,40 @@ static ssize_t AStreamReadNoSeekStream( stream_t *s, void *p_read,
              tk->i_start, p_sys->stream.i_offset, tk->i_end );
 #endif
 
-    while( i_data < i_read )
-    {
-        unsigned i_off = (tk->i_start + p_sys->stream.i_offset) % STREAM_CACHE_TRACK_SIZE;
-        size_t i_current =
+    unsigned i_off = (tk->i_start + p_sys->stream.i_offset) % STREAM_CACHE_TRACK_SIZE;
+    size_t i_current =
             __MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset,
                    STREAM_CACHE_TRACK_SIZE - i_off );
-        ssize_t i_copy = __MIN( i_current, i_read - i_data );
+    ssize_t i_copy = __MIN( i_current, i_read );
 
-        if( i_copy <= 0 ) break; /* EOF */
+    if( i_copy <= 0 )
+        return 0; /* EOF (or i_read == 0) */
 
-        /* Copy data */
-        /* msg_Dbg( s, "AStreamReadStream: copy %d", i_copy ); */
-        if( p_data )
-        {
-            memcpy( p_data, &tk->p_buffer[i_off], i_copy );
-            p_data += i_copy;
-        }
-        i_data += i_copy;
-        p_sys->stream.i_offset += i_copy;
+    /* Copy data */
+    /* msg_Dbg( s, "AStreamReadStream: copy %d", i_copy ); */
+    if( p_read )
+        memcpy( p_read, &tk->p_buffer[i_off], i_copy );
+    p_sys->stream.i_offset += i_copy;
 
-        /* Update pos now */
-        p_sys->i_pos += i_copy;
+    /* Update pos now */
+    p_sys->i_pos += i_copy;
 
-        /* */
-        p_sys->stream.i_used += i_copy;
+    /* */
+    p_sys->stream.i_used += i_copy;
 
-        if( tk->i_end + i_data <= tk->i_start + p_sys->stream.i_offset + i_read )
-        {
-            const size_t i_read_requested = VLC_CLIP( i_read - i_data,
-                                                    STREAM_READ_ATONCE / 2,
-                                                    STREAM_READ_ATONCE * 10 );
+    if( tk->i_end + i_copy <= tk->i_start + p_sys->stream.i_offset + i_read )
+    {
+        const size_t i_read_requested = VLC_CLIP( i_read - i_copy,
+                                                  STREAM_READ_ATONCE / 2,
+                                                  STREAM_READ_ATONCE * 10 );
 
-            if( p_sys->stream.i_used < i_read_requested )
-                p_sys->stream.i_used = i_read_requested;
+        if( p_sys->stream.i_used < i_read_requested )
+            p_sys->stream.i_used = i_read_requested;
 
-            if( AStreamRefillStream( s ) )
-            {
-                /* EOF */
-                if( tk->i_start >= tk->i_end ) break;
-            }
-        }
+        AStreamRefillStream( s );
     }
 
-    return i_data;
+    return i_copy;
 }
 
 
