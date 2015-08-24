@@ -975,6 +975,9 @@ skip:
 
     *pp_block = NULL;
 
+    if (unlikely(!p_sys->b_started))
+        return NULL;
+
     NSUInteger outputFramesCount = [p_sys->outputFrames count];
 
     if (outputFramesCount > 5) {
