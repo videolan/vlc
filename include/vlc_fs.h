@@ -173,7 +173,7 @@ VLC_API DIR *vlc_opendir(const char *dirname) VLC_USED;
  * If there are no more entries in the directory, NULL is returned.
  * If an error occurs, errno is set and NULL is returned.
  */
-VLC_API char *vlc_readdir(DIR *dir) VLC_USED;
+VLC_API const char *vlc_readdir(DIR *dir) VLC_USED;
 
 VLC_API int vlc_loaddir( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
 VLC_API int vlc_scandir( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );

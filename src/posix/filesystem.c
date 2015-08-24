@@ -107,7 +107,7 @@ DIR *vlc_opendir (const char *dirname)
     return opendir (dirname);
 }
 
-char *vlc_readdir( DIR *dir )
+const char *vlc_readdir(DIR *dir)
 {
     struct dirent *ent = readdir (dir);
     return (ent != NULL) ? ent->d_name : NULL;

@@ -169,7 +169,7 @@ DIR *vlc_opendir (const char *dirname)
     return (void *)p_dir;
 }
 
-char *vlc_readdir (DIR *dir)
+const char *vlc_readdir (DIR *dir)
 {
     vlc_DIR *p_dir = (vlc_DIR *)dir;
 

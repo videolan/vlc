@@ -439,7 +439,8 @@ static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
     /* Parse the directory and try to load all files it contains. */
     for (;;)
     {
-        char *file = vlc_readdir (dh), *relpath = NULL, *abspath = NULL;
+        char *relpath = NULL, *abspath = NULL;
+        const char *file = vlc_readdir (dh);
         if (file == NULL)
             break;
 

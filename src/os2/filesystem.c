@@ -109,7 +109,7 @@ DIR *vlc_opendir (const char *dirname)
     return dir;
 }
 
-char *vlc_readdir( DIR *dir )
+const char *vlc_readdir(DIR *dir)
 {
     /* Beware that readdir_r() assumes <buf> is large enough to hold the result
      * dirent including the file name. A buffer overflow could occur otherwise.
