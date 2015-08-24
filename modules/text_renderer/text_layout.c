@@ -516,6 +516,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
     {
         run_desc_t *p_run = p_paragraph->p_runs + i;
         const text_style_t *p_style = p_run->p_style;
+        const int i_live_size = ConvertToLiveSize( p_filter, p_style );
 
         /*
          * When using HarfBuzz, this is where font faces are loaded.
@@ -525,11 +526,11 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
         FT_Face p_face = 0;
         if( !p_run->p_face )
         {
-            p_face = LoadFace( p_filter, p_style );
+            p_face = LoadFace( p_filter, p_style, i_live_size );
             if( !p_face )
             {
                 p_face = p_sys->p_face;
-                p_style = p_sys->p_style;
+                p_style = p_sys->p_default_style;
                 p_run->p_style = p_style;
             }
             p_run->p_face = p_face;
@@ -761,7 +762,8 @@ static int ZeroNsmAdvance( paragraph_t *p_paragraph )
  * have already been determined at this point, as well as the advance values.
  */
 static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
-                       bool b_use_glyph_indices, bool b_overwrite_advance )
+                       bool b_use_glyph_indices, bool b_overwrite_advance,
+                       int *pi_max_advance_x )
 {
     if( p_paragraph->i_size <= 0 || p_paragraph->i_runs_count <= 0 )
     {
@@ -772,20 +774,23 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
     }
 
     filter_sys_t *p_sys = p_filter->p_sys;
+    *pi_max_advance_x = 0;
 
     for( int i = 0; i < p_paragraph->i_runs_count; ++i )
     {
         run_desc_t *p_run = p_paragraph->p_runs + i;
         const text_style_t *p_style = p_run->p_style;
+        const int i_live_size = ConvertToLiveSize( p_filter, p_style );
 
         FT_Face p_face = 0;
         if( !p_run->p_face )
         {
-            p_face = LoadFace( p_filter, p_style );
+            p_face = LoadFace( p_filter, p_style, i_live_size );
             if( !p_face )
             {
+                /* Uses the default font and style */
                 p_face = p_sys->p_face;
-                p_style = p_sys->p_style;
+                p_style = p_sys->p_default_style;
                 p_run->p_style = p_style;
             }
             p_run->p_face = p_face;
@@ -798,7 +803,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
             double f_outline_thickness =
                 var_InheritInteger( p_filter, "freetype-outline-thickness" ) / 100.0;
             f_outline_thickness = VLC_CLIP( f_outline_thickness, 0.0, 0.5 );
-            int i_radius = ( p_style->i_font_size << 6 ) * f_outline_thickness;
+            int i_radius = ( i_live_size << 6 ) * f_outline_thickness;
             FT_Stroker_Set( p_sys->p_stroker,
                             i_radius,
                             FT_STROKER_LINECAP_ROUND,
@@ -853,7 +858,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                     p_bitmaps->p_outline = 0;
             }
 
-            if( p_filter->p_sys->p_style->i_shadow_alpha != STYLE_ALPHA_TRANSPARENT )
+            if( p_style->i_shadow_alpha != STYLE_ALPHA_TRANSPARENT )
                 p_bitmaps->p_shadow = p_bitmaps->p_outline ?
                                       p_bitmaps->p_outline : p_bitmaps->p_glyph;
 
@@ -863,6 +868,10 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                 p_bitmaps->i_y_advance = p_face->glyph->advance.y;
             }
         }
+
+        int i_max_run_advance_x = FT_FLOOR( FT_MulFix( p_face->max_advance_width, p_face->size->metrics.x_scale ) );
+        if( i_max_run_advance_x > *pi_max_advance_x )
+            *pi_max_advance_x = i_max_run_advance_x;
     }
     return VLC_SUCCESS;
 }
@@ -899,6 +908,7 @@ static int LayoutLine( filter_t *p_filter,
     FT_Vector pen = { .x = 0, .y = 0 };
     int i_line_index = 0;
 
+    int i_font_size = 0;
     int i_font_width = 0;
     int i_font_max_advance_y = 0;
     int i_ul_offset = 0;
@@ -940,8 +950,9 @@ static int LayoutLine( filter_t *p_filter,
             p_style = p_run->p_style;
             p_face = p_run->p_face;
 
+            i_font_size = ConvertToLiveSize( p_filter, p_style );
             i_font_width = p_style->i_style_flags & STYLE_HALFWIDTH ?
-                           p_style->i_font_size / 2 : p_style->i_font_size;
+                           i_font_size / 2 : i_font_size;
         }
 
         FT_Vector pen_new = {
@@ -950,7 +961,7 @@ static int LayoutLine( filter_t *p_filter,
         };
         FT_Vector pen_shadow = {
             .x = pen_new.x + p_sys->f_shadow_vector_x * ( i_font_width << 6 ),
-            .y = pen_new.y + p_sys->f_shadow_vector_y * ( p_style->i_font_size << 6 )
+            .y = pen_new.y + p_sys->f_shadow_vector_y * ( i_font_size << 6 )
         };
 
         if( p_bitmaps->p_shadow )
@@ -1240,6 +1251,7 @@ int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
     paragraph_t *p_paragraph = 0;
     int i_paragraph_start = 0;
     int i_max_height = 0;
+    int i_max_advance_x = 0;
 
     for( int i = 0; i <= i_len; ++i )
     {
@@ -1275,20 +1287,20 @@ int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
             if( ShapeParagraphHarfBuzz( p_filter, &p_paragraph ) )
                 goto error;
 
-            if( LoadGlyphs( p_filter, p_paragraph, true, false ) )
+            if( LoadGlyphs( p_filter, p_paragraph, true, false, &i_max_advance_x ) )
                 goto error;
 
 #elif defined HAVE_FRIBIDI
             if( ShapeParagraphFriBidi( p_filter, p_paragraph ) )
                 goto error;
-            if( LoadGlyphs( p_filter, p_paragraph, false, true ) )
+            if( LoadGlyphs( p_filter, p_paragraph, false, true, &i_max_advance_x ) )
                 goto error;
             if( RemoveZeroWidthCharacters( p_paragraph ) )
                 goto error;
             if( ZeroNsmAdvance( p_paragraph ) )
                 goto error;
 #else
-            if( LoadGlyphs( p_filter, p_paragraph, false, true ) )
+            if( LoadGlyphs( p_filter, p_paragraph, false, true, &i_max_advance_x ) )
                 goto error;
 #endif
 
@@ -1296,8 +1308,7 @@ int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
              * Set max line width to allow for outline and shadow glyphs,
              * and any extra width caused by visual reordering
              */
-            int i_max_width = ( int ) p_filter->fmt_out.video.i_visible_width
-                              - 2 * p_filter->p_sys->p_style->i_font_size;
+            int i_max_width = ( int ) p_filter->fmt_out.video.i_visible_width - i_max_advance_x;
             if( LayoutParagraph( p_filter, p_paragraph,
                                  i_max_width, pp_line, b_grid ) )
                 goto error;

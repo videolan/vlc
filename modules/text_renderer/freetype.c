@@ -309,54 +309,6 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
     return VLC_SUCCESS;
 }
 
-static int GetFontSize( filter_t *p_filter )
-{
-    filter_sys_t *p_sys = p_filter->p_sys;
-    int           i_size = 0;
-
-    if( p_sys->p_forced_style->i_font_size )
-    {
-        i_size = p_sys->p_forced_style->i_font_size;
-    }
-    else if( p_sys->p_forced_style->f_font_relsize )
-    {
-        i_size = (int) p_filter->fmt_out.video.i_height * p_sys->p_forced_style->f_font_relsize;
-    }
-    else if( p_sys->p_default_style->f_font_relsize )
-    {
-        i_size = (int) p_filter->fmt_out.video.i_height * p_sys->p_default_style->f_font_relsize;
-    }
-
-    if( i_size <= 0 )
-    {
-        msg_Warn( p_filter, "invalid fontsize, using %d", FREETYPE_DEFAULT_FONT_SIZE );
-        i_size = FREETYPE_DEFAULT_FONT_SIZE;
-    }
-    return i_size;
-}
-
-static int SetFontSize( filter_t *p_filter, int i_size )
-{
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    if( !i_size )
-    {
-        i_size = GetFontSize( p_filter );
-
-        msg_Dbg( p_filter, "using fontsize: %i", i_size );
-    }
-
-    p_sys->p_style->i_font_size = i_size;
-
-    if( FT_Set_Pixel_Sizes( p_sys->p_face, 0, i_size ) )
-    {
-        msg_Err( p_filter, "couldn't set font size to %d", i_size );
-        return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
-}
-
 /*****************************************************************************
  * RenderYUVP: place string in picture
  *****************************************************************************
@@ -774,8 +726,6 @@ static inline int RenderAXYZ( filter_t *p_filter,
                               void (*FillPicture)( picture_t *p_picture, int, int, int, int ),
                               void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
-
     /* Create a new subpicture region */
     const int i_text_width  = p_bbox->xMax - p_bbox->xMin;
     const int i_text_height = p_bbox->yMax - p_bbox->yMin;
@@ -844,12 +794,12 @@ static inline int RenderAXYZ( filter_t *p_filter,
                 uint32_t i_color;
                 switch (g) {/* Apply font alpha ratio to shadow/outline alpha */
                 case 0:
-                    i_a     = i_a * p_sys->p_style->i_shadow_alpha / 255;
-                    i_color = p_sys->p_style->i_shadow_color;
+                    i_a     = i_a * ch->p_style->i_shadow_alpha / 255;
+                    i_color = ch->p_style->i_shadow_color;
                     break;
                 case 1:
-                    i_a     = i_a * p_sys->p_style->i_outline_alpha / 255;
-                    i_color = p_sys->p_style->i_outline_color;
+                    i_a     = i_a * ch->p_style->i_outline_alpha / 255;
+                    i_color = ch->p_style->i_outline_color;
                     break;
                 default:
                     i_color = ch->p_style->i_font_color;
@@ -900,6 +850,8 @@ static void FillDefaultStyles( filter_t *p_filter )
     p_sys->p_default_style->i_shadow_alpha = VLC_CLIP( p_sys->p_default_style->i_shadow_alpha, 0, 255 );
     p_sys->p_default_style->i_shadow_color = var_InheritInteger( p_filter, "freetype-shadow-color" );
     p_sys->p_default_style->i_shadow_color = VLC_CLIP( p_sys->p_default_style->i_shadow_color, 0, 0xFFFFFF );
+
+    p_sys->p_default_style->i_font_size = 0;
 
     p_sys->p_forced_style->i_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
     p_sys->p_forced_style->f_font_relsize = var_InheritInteger( p_filter, "freetype-rel-fontsize" );
@@ -958,7 +910,7 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
         pp_styles = pp_styles_realloc;
 
         // We're actually writing to a read only object, something's wrong with the conception.
-        text_style_t *p_style = text_style_Duplicate( p_filter->p_sys->p_style );
+        text_style_t *p_style = text_style_Duplicate( p_filter->p_sys->p_default_style );
         if ( p_style == NULL )
         {
             free( pp_styles );
@@ -996,9 +948,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 {
     if( !p_region_in )
         return VLC_EGENERIC;
-
-    /* Reset the default fontsize in case screen metrics have changed */
-    p_filter->p_sys->p_style->i_font_size = GetFontSize( p_filter );
 
     const text_style_t **pp_styles = NULL;
     size_t i_text_length = 0;
@@ -1126,7 +1075,11 @@ static int Init_FT( vlc_object_t *p_this,
         goto error;
     }
 
-    if( SetFontSize( p_filter, (int) 0 ) != VLC_SUCCESS ) goto error;
+    if( FT_Set_Pixel_Sizes( p_sys->p_face, 0, STYLE_DEFAULT_FONT_SIZE ) )
+    {
+        msg_Err( p_filter, "couldn't set font size to %d", STYLE_DEFAULT_FONT_SIZE );
+        goto error;
+    }
 
     i_error = FT_Stroker_New( p_sys->p_library, &p_sys->p_stroker );
     if( i_error )
@@ -1165,8 +1118,6 @@ static int Create( vlc_object_t *p_this )
         free(p_sys);
         return VLC_ENOMEM;
     }
-
-    p_sys->p_style = NULL;
 
     /* empty style for style overriding cases */
     p_sys->p_forced_style = text_style_Create( STYLE_NO_DEFAULTS );
@@ -1230,16 +1181,6 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_select = Dummy_Select;
 #endif
 
-    /* Set default style to current (FIXME: is current really used/needed?) */
-    p_sys->p_style = text_style_Duplicate( p_sys->p_default_style );
-    if( !p_sys->p_style )
-    {
-        text_style_Delete( p_sys->p_default_style );
-        text_style_Delete( p_sys->p_forced_style );
-        free(p_sys);
-        return VLC_ENOMEM;
-    }
-
     /* */
     psz_fontfile = p_sys->pf_select( p_filter, p_sys->p_default_style->psz_fontname,
                                      false, false, p_sys->p_default_style->i_font_size, &fontindex );
@@ -1281,7 +1222,6 @@ static int Create( vlc_object_t *p_this )
 error:
     free( psz_fontfile );
     free( psz_monofontfile );
-    text_style_Delete( p_sys->p_style );
     text_style_Delete( p_sys->p_default_style );
     text_style_Delete( p_sys->p_forced_style );
     free( p_sys );
@@ -1329,7 +1269,6 @@ static void Destroy( vlc_object_t *p_this )
     }
 
     text_style_Delete( p_sys->p_default_style );
-    text_style_Delete( p_sys->p_style );
     text_style_Delete( p_sys->p_forced_style );
 
     Destroy_FT( p_this );
@@ -1383,15 +1322,29 @@ static FT_Face LoadEmbeddedFace( filter_sys_t *p_sys, const char *psz_fontname,
     return NULL;
 }
 
+int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style )
+{
+    int i_font_size = STYLE_DEFAULT_FONT_SIZE;
+    if( p_style->i_font_size )
+    {
+        i_font_size = p_style->i_font_size;
+    }
+    else if ( p_style->f_font_relsize )
+    {
+        i_font_size = (int) p_filter->fmt_out.video.i_height * p_style->f_font_relsize;
+    }
+    return i_font_size;
+}
+
 FT_Face LoadFace( filter_t *p_filter,
-                  const text_style_t *p_style )
+                  const text_style_t *p_style, int i_font_size )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     faces_cache_t *p_cache = &p_sys->faces_cache;
     for( int i = 0; i < p_cache->i_faces_count; ++i )
         if( FaceStyleEquals( &p_cache->p_styles[ i ], p_style )
-         && p_cache->p_styles[ i ].i_font_size == p_style->i_font_size
+         && p_cache->p_styles[ i ].i_font_size == i_font_size
          && !( ( p_cache->p_styles[ i ].i_style_flags ^ p_style->i_style_flags ) & STYLE_HALFWIDTH ) )
             return p_cache->p_faces[ i ];
 
@@ -1449,12 +1402,12 @@ FT_Face LoadFace( filter_t *p_filter,
     }
 
     int i_font_width = p_style->i_style_flags & STYLE_HALFWIDTH
-                     ? p_style->i_font_size / 2 : p_style->i_font_size;
+                     ? i_font_size / 2 : i_font_size;
 
-    if( FT_Set_Pixel_Sizes( p_face, i_font_width, p_style->i_font_size ) )
+    if( FT_Set_Pixel_Sizes( p_face, i_font_width, i_font_size ) )
     {
         msg_Err( p_filter,
-                 "Failed to set font size to %d", p_style->i_font_size );
+                 "Failed to set font size to %d", i_font_size );
         FT_Done_Face( p_face );
         return NULL;
     }
@@ -1484,7 +1437,7 @@ FT_Face LoadFace( filter_t *p_filter,
     }
 
     text_style_t *p_face_style = p_cache->p_styles + p_cache->i_faces_count;
-    p_face_style->i_font_size = p_style->i_font_size;
+    p_face_style->i_font_size = i_font_size;
     p_face_style->i_style_flags = p_style->i_style_flags;
     p_face_style->psz_fontname = strdup( psz_fontname );
     p_cache->p_faces[ p_cache->i_faces_count ] = p_face;

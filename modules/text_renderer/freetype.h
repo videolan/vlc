@@ -51,7 +51,6 @@ struct filter_sys_t
     FT_Stroker     p_stroker;   /* handle to path stroker object */
 
     text_style_t  *p_default_style;
-    text_style_t  *p_style;       /* Current Style */
     text_style_t  *p_forced_style;/* Renderer overridings */
 
     /* More styles... */
@@ -90,7 +89,8 @@ typedef uint32_t uni_char_t;
 #endif
 
 
-FT_Face LoadFace( filter_t *p_filter, const text_style_t *p_style );
+FT_Face LoadFace( filter_t *p_filter, const text_style_t *p_style, int );
+int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
 
 bool FaceStyleEquals( const text_style_t *p_style1,
                       const text_style_t *p_style2 );
