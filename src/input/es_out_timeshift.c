@@ -157,7 +157,9 @@ struct ts_storage_t
     ts_storage_t *p_next;
 
     /* */
+#ifdef _WIN32
     char    *psz_file;  /* Filename */
+#endif
     size_t  i_file_max; /* Max size in bytes */
     int64_t i_file_size;/* Current size in bytes */
     FILE    *p_filew;   /* FILE handle for data writing */
@@ -1097,7 +1099,8 @@ static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_
     if( unlikely(p_storage == NULL) )
         return NULL;
 
-    int fd = GetTmpFile( &p_storage->psz_file, psz_tmp_path );
+    char *psz_file;
+    int fd = GetTmpFile( &psz_file, psz_tmp_path );
     if( fd == -1 )
     {
         free( p_storage );
@@ -1108,18 +1111,24 @@ static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_
     if( p_storage->p_filew == NULL )
     {
         close( fd );
-        vlc_unlink( p_storage->psz_file );
+        vlc_unlink( psz_file );
         goto error;
     }
 
-    p_storage->p_filer = vlc_fopen( p_storage->psz_file, "rb" );
+    p_storage->p_filer = vlc_fopen( psz_file, "rb" );
     if( p_storage->p_filer == NULL )
     {
         fclose( p_storage->p_filew );
-        vlc_unlink( p_storage->psz_file );
+        vlc_unlink( psz_file );
         goto error;
     }
 
+#ifndef _WIN32
+    vlc_unlink( psz_file );
+    free( psz_file );
+#else
+    p_storage->psz_file = psz_file;
+#endif
     p_storage->p_next = NULL;
 
     /* */
@@ -1140,7 +1149,7 @@ static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_
     }
     return p_storage;
 error:
-    free( p_storage->psz_file );
+    free( psz_file );
     free( p_storage );
     return NULL;
 }
@@ -1159,8 +1168,10 @@ static void TsStorageDelete( ts_storage_t *p_storage )
 
     fclose( p_storage->p_filer );
     fclose( p_storage->p_filew );
+#ifdef _WIN32
     vlc_unlink( p_storage->psz_file );
     free( p_storage->psz_file );
+#endif
     free( p_storage );
 }
 
