@@ -735,21 +735,24 @@ static inline void RenderBackground( subpicture_region_t *p_region,
                            p_line->p_character[i_seg_end].p_glyph->bitmap.width +
                            i_align_left - p_bbox->xMin;
 
-            uint8_t i_x, i_y, i_z;
             const line_character_t *p_char = &p_line->p_character[i_char_index];
-            ExtractComponents( p_char->b_in_karaoke ? p_char->p_style->i_karaoke_background_color :
-                                                      p_char->p_style->i_background_color,
-                               &i_x, &i_y, &i_z );
-            const uint8_t i_alpha = p_char->b_in_karaoke ? p_char->p_style->i_karaoke_background_alpha:
-                                                           p_char->p_style->i_background_alpha;
-
-            /* Render the actual background */
-            if( i_alpha != STYLE_ALPHA_TRANSPARENT )
+            if( p_char->p_style->i_style_flags & STYLE_BACKGROUND )
             {
-                for( int dy = line_top; dy < line_bottom; dy++ )
+                uint8_t i_x, i_y, i_z;
+                ExtractComponents( p_char->b_in_karaoke ? p_char->p_style->i_karaoke_background_color :
+                                                          p_char->p_style->i_background_color,
+                                   &i_x, &i_y, &i_z );
+                const uint8_t i_alpha = p_char->b_in_karaoke ? p_char->p_style->i_karaoke_background_alpha:
+                                                               p_char->p_style->i_background_alpha;
+
+                /* Render the actual background */
+                if( i_alpha != STYLE_ALPHA_TRANSPARENT )
                 {
-                    for( int dx = line_start; dx < line_end; dx++ )
-                        BlendPixel( p_picture, dx, dy, i_alpha, i_x, i_y, i_z, 0xff );
+                    for( int dy = line_top; dy < line_bottom; dy++ )
+                    {
+                        for( int dx = line_start; dx < line_end; dx++ )
+                            BlendPixel( p_picture, dx, dy, i_alpha, i_x, i_y, i_z, 0xff );
+                    }
                 }
             }
 
@@ -796,8 +799,6 @@ static inline int RenderAXYZ( filter_t *p_filter,
     if (p_region->b_noregionbg) {
         /* Render the background just under the text */
         FillPicture( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00 );
-        RenderBackground(p_region, p_line_head, p_bbox, i_margin, p_picture, i_text_width,
-                         ExtractComponents, BlendPixel);
     } else {
         /* Render background under entire subpicture block */
         int i_background_color = var_InheritInteger( p_filter, "freetype-background-color" );
@@ -805,6 +806,9 @@ static inline int RenderAXYZ( filter_t *p_filter,
         ExtractComponents( i_background_color, &i_x, &i_y, &i_z );
         FillPicture( p_picture, i_a, i_x, i_y, i_z );
     }
+    /* Render text's background (from decoder) if any */
+    RenderBackground(p_region, p_line_head, p_bbox, i_margin, p_picture, i_text_width,
+                     ExtractComponents, BlendPixel);
 
     /* Render shadow then outline and then normal glyphs */
     for( int g = 0; g < 3; g++ )
