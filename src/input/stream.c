@@ -35,6 +35,7 @@
 #include <vlc_memory.h>
 #include <vlc_access.h>
 #include <vlc_charset.h>
+#include <vlc_interrupt.h>
 
 #include <libvlc.h>
 #include "stream.h"
@@ -302,6 +303,33 @@ error:
     return NULL;
 }
 
+static ssize_t stream_ReadRaw(stream_t *s, void *buf, size_t len)
+{
+    size_t copy = 0;
+    ssize_t ret = 0;
+
+    while (len > 0)
+    {
+        if (vlc_killed())
+        {
+            ret = -1;
+            break;
+        }
+
+        ret = s->pf_read(s, buf, len);
+        if (ret <= 0)
+            break;
+
+        assert((size_t)ret <= len);
+        if (buf != NULL)
+            buf = (unsigned char *)buf + ret;
+        len -= ret;
+        copy += ret;
+    }
+
+    return (copy > 0) ? (ssize_t)copy : ret;
+}
+
 /**
  * Reads data from a byte stream.
  *
@@ -321,14 +349,13 @@ ssize_t stream_Read(stream_t *s, void *buf, size_t len)
     block_t *peek = priv->peek;
     size_t copy = 0;
 
-    if (unlikely(len == 0))
-        return 0;
-
     if (peek != NULL)
     {
         copy = peek->i_buffer < len ? peek->i_buffer : len;
 
-        assert(copy > 0);
+        if (unlikely(len == 0))
+            return 0;
+
         if (buf != NULL)
             memcpy(buf, peek->p_buffer, copy);
 
@@ -347,7 +374,7 @@ ssize_t stream_Read(stream_t *s, void *buf, size_t len)
             return copy;
     }
 
-    ssize_t ret = s->pf_read(s, buf, len);
+    ssize_t ret = stream_ReadRaw(s, buf, len);
     return (ret >= 0) ? (ssize_t)(ret + copy)
                       : ((copy > 0) ? (ssize_t)copy : ret);
 }
@@ -387,7 +414,7 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
             return 0;
         }
 
-        ssize_t ret = s->pf_read(s, peek->p_buffer, len);
+        ssize_t ret = stream_ReadRaw(s, peek->p_buffer, len);
         if (ret < 0)
         {
             block_Release(peek);
@@ -412,7 +439,7 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
         }
         peek->i_buffer = avail;
 
-        ssize_t ret = s->pf_read(s, peek->p_buffer + avail, len - avail);
+        ssize_t ret = stream_ReadRaw(s, peek->p_buffer + avail, len - avail);
         *bufp = peek->p_buffer;
         if (ret >= 0)
             peek->i_buffer += ret;
