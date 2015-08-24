@@ -788,8 +788,6 @@ static inline int RenderAXYZ( filter_t *p_filter,
                     continue;
 
                 i_a = ch->p_style->i_font_alpha;
-                if( i_a == STYLE_ALPHA_TRANSPARENT )
-                    continue;
 
                 uint32_t i_color;
                 switch (g) {/* Apply font alpha ratio to shadow/outline alpha */
@@ -805,6 +803,14 @@ static inline int RenderAXYZ( filter_t *p_filter,
                     i_color = ch->p_style->i_font_color;
                     break;
                 }
+
+                /* Don't render if invisible or not wanted */
+                if( i_a == STYLE_ALPHA_TRANSPARENT ||
+                   (g == 0 && 0 == (ch->p_style->i_style_flags & STYLE_SHADOW) ) ||
+                   (g == 1 && 0 == (ch->p_style->i_style_flags & STYLE_OUTLINE) )
+                  )
+                    continue;
+
                 ExtractComponents( i_color, &i_x, &i_y, &i_z );
 
                 int i_glyph_y = i_align_top  - p_glyph->top  + p_bbox->yMax + p_line->i_base_line;
