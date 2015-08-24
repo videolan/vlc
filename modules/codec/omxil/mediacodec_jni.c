@@ -165,7 +165,7 @@ static inline bool check_exception(JNIEnv *env)
         return false;
 }
 #define CHECK_EXCEPTION() check_exception( env )
-#define GET_ENV() if (!(env = android_getEnv(api->p_obj, THREAD_NAME))) return VLC_EGENERIC;
+#define GET_ENV() if (!(env = android_getEnv(api->p_obj, THREAD_NAME))) return MC_API_ERROR;
 
 static inline int get_integer(JNIEnv *env, jobject obj, const char *psz_name)
 {
@@ -461,7 +461,7 @@ static int Stop(mc_api *api)
         p_sys->buffer_info = NULL;
     }
     msg_Dbg(api->p_obj, "MediaCodec via JNI closed");
-    return VLC_SUCCESS;
+    return 0;
 }
 
 /*****************************************************************************
@@ -472,7 +472,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv* env = NULL;
-    int i_ret = VLC_EGENERIC;
+    int i_ret = MC_API_ERROR;
     bool b_direct_rendering = false;
     jstring jmime = NULL;
     jstring jcodec_name = NULL;
@@ -600,7 +600,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
     p_sys->buffer_info = (*env)->NewGlobalRef(env, jbuffer_info);
 
     api->b_direct_rendering = b_direct_rendering;
-    i_ret = VLC_SUCCESS;
+    i_ret = 0;
     msg_Dbg(api->p_obj, "MediaCodec via JNI opened");
 
 error:
@@ -621,7 +621,7 @@ error:
     if (jbuffer_info)
         (*env)->DeleteLocalRef(env, jbuffer_info);
 
-    if (i_ret != VLC_SUCCESS)
+    if (i_ret != 0)
         Stop(api);
     return i_ret;
 }
@@ -640,48 +640,64 @@ static int Flush(mc_api *api)
     if (CHECK_EXCEPTION())
     {
         msg_Warn(api->p_obj, "Exception occurred in MediaCodec.flush");
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
     }
-    return VLC_SUCCESS;
+    return 0;
 }
 
 /*****************************************************************************
- * PutInput
+ * DequeueInput
  *****************************************************************************/
-static int PutInput(mc_api *api, const void *p_buf, size_t i_size,
-                    mtime_t i_ts, bool b_config, mtime_t i_timeout)
+static int DequeueInput(mc_api *api, mtime_t i_timeout)
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv *env;
-    int index;
+    int i_index;
+
+    GET_ENV();
+
+    i_index = (*env)->CallIntMethod(env, p_sys->codec,
+                                    jfields.dequeue_input_buffer, i_timeout);
+    if (CHECK_EXCEPTION())
+    {
+        msg_Err(api->p_obj, "Exception occurred in MediaCodec.dequeueInputBuffer");
+        return MC_API_ERROR;
+    }
+    if (i_index >= 0)
+        return i_index;
+    else
+        return MC_API_INFO_TRYAGAIN;
+
+}
+
+/*****************************************************************************
+ * QueueInput
+ *****************************************************************************/
+static int QueueInput(mc_api *api, int i_index, const void *p_buf,
+                      size_t i_size, mtime_t i_ts, bool b_config)
+{
+    mc_api_sys *p_sys = api->p_sys;
+    JNIEnv *env;
     uint8_t *p_mc_buf;
     jobject j_mc_buf;
     jsize j_mc_size;
     jint jflags = b_config ? BUFFER_FLAG_CODEC_CONFIG : 0;
 
-    GET_ENV();
+    assert(i_index >= 0);
 
-    index = (*env)->CallIntMethod(env, p_sys->codec,
-                                  jfields.dequeue_input_buffer, i_timeout);
-    if (CHECK_EXCEPTION())
-    {
-        msg_Err(api->p_obj, "Exception occurred in MediaCodec.dequeueInputBuffer");
-        return VLC_EGENERIC;
-    }
-    if (index < 0)
-        return 0;
+    GET_ENV();
 
     if (jfields.get_input_buffers)
         j_mc_buf = (*env)->GetObjectArrayElement(env, p_sys->input_buffers,
-                                                 index);
+                                                 i_index);
     else
     {
         j_mc_buf = (*env)->CallObjectMethod(env, p_sys->codec,
-                                            jfields.get_input_buffer, index);
+                                            jfields.get_input_buffer, i_index);
         if (CHECK_EXCEPTION())
         {
             msg_Err(api->p_obj, "Exception in MediaCodec.getInputBuffer");
-            return VLC_EGENERIC;
+            return MC_API_ERROR;
         }
     }
     j_mc_size = (*env)->GetDirectBufferCapacity(env, j_mc_buf);
@@ -690,28 +706,28 @@ static int PutInput(mc_api *api, const void *p_buf, size_t i_size,
     {
         msg_Err(api->p_obj, "Java buffer has invalid size");
         (*env)->DeleteLocalRef(env, j_mc_buf);
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
     }
     if ((size_t) j_mc_size > i_size)
         j_mc_size = i_size;
     memcpy(p_mc_buf, p_buf, j_mc_size);
 
     (*env)->CallVoidMethod(env, p_sys->codec, jfields.queue_input_buffer,
-                           index, 0, j_mc_size, i_ts, jflags);
+                           i_index, 0, j_mc_size, i_ts, jflags);
     (*env)->DeleteLocalRef(env, j_mc_buf);
     if (CHECK_EXCEPTION())
     {
         msg_Err(api->p_obj, "Exception in MediaCodec.queueInputBuffer");
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
     }
 
-    return 1;
+    return 0;
 }
 
 /*****************************************************************************
- * GetOutput
+ * DequeueOutput
  *****************************************************************************/
-static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
+static int DequeueOutput(mc_api *api, mtime_t i_timeout)
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv *env;
@@ -724,8 +740,27 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
     if (CHECK_EXCEPTION())
     {
         msg_Err(api->p_obj, "Exception in MediaCodec.dequeueOutputBuffer");
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
     }
+    if (i_index >= 0)
+        return i_index;
+    else if (i_index == INFO_OUTPUT_FORMAT_CHANGED)
+        return MC_API_INFO_OUTPUT_FORMAT_CHANGED;
+    else if (i_index == INFO_OUTPUT_BUFFERS_CHANGED)
+        return MC_API_INFO_OUTPUT_BUFFERS_CHANGED;
+    else
+        return MC_API_INFO_TRYAGAIN;
+}
+
+/*****************************************************************************
+ * GetOutput
+ *****************************************************************************/
+static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
+{
+    mc_api_sys *p_sys = api->p_sys;
+    JNIEnv *env;
+
+    GET_ENV();
 
     if (i_index >= 0)
     {
@@ -756,7 +791,7 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
                 if (CHECK_EXCEPTION())
                 {
                     msg_Err(api->p_obj, "Exception in MediaCodec.getOutputBuffer");
-                    return VLC_EGENERIC;
+                    return MC_API_ERROR;
                 }
             }
             //jsize buf_size = (*env)->GetDirectBufferCapacity(env, buf);
@@ -770,8 +805,7 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
             (*env)->DeleteLocalRef(env, buf);
         }
         return 1;
-    }
-    else if (i_index == INFO_OUTPUT_FORMAT_CHANGED)
+    } else if (i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED)
     {
         jobject format = NULL;
         jobject format_string = NULL;
@@ -783,7 +817,7 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
         if (CHECK_EXCEPTION())
         {
             msg_Err(api->p_obj, "Exception in MediaCodec.getOutputFormat");
-            return VLC_EGENERIC;
+            return MC_API_ERROR;
         }
 
         format_string = (*env)->CallObjectMethod(env, format, jfields.tostring);
@@ -817,7 +851,7 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
         (*env)->DeleteLocalRef(env, format);
         return 1;
     }
-    else if (i_index == INFO_OUTPUT_BUFFERS_CHANGED)
+    else if (i_index == MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
     {
         jobject joutput_buffers;
 
@@ -832,7 +866,7 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
         {
             msg_Err(api->p_obj, "Exception in MediaCodec.getOutputBuffer");
             p_sys->output_buffers = NULL;
-            return VLC_EGENERIC;
+            return MC_API_ERROR;
         }
         p_sys->output_buffers = (*env)->NewGlobalRef(env, joutput_buffers);
         (*env)->DeleteLocalRef(env, joutput_buffers);
@@ -848,6 +882,8 @@ static int ReleaseOutput(mc_api *api, int i_index, bool b_render)
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv *env;
 
+    assert(i_index >= 0);
+
     GET_ENV();
 
     (*env)->CallVoidMethod(env, p_sys->codec, jfields.release_output_buffer,
@@ -855,9 +891,9 @@ static int ReleaseOutput(mc_api *api, int i_index, bool b_render)
     if (CHECK_EXCEPTION())
     {
         msg_Err(api->p_obj, "Exception in MediaCodec.releaseOutputBuffer");
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
     }
-    return VLC_SUCCESS;
+    return 0;
 }
 
 /*****************************************************************************
@@ -878,22 +914,24 @@ int MediaCodecJni_Init(mc_api *api)
     GET_ENV();
 
     if (!InitJNIFields(api->p_obj, env))
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
 
     api->p_sys = calloc(1, sizeof(mc_api_sys));
     if (!api->p_sys)
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
 
     api->clean = Clean;
     api->start = Start;
     api->stop = Stop;
     api->flush = Flush;
-    api->put_in = PutInput;
+    api->dequeue_in = DequeueInput;
+    api->queue_in = QueueInput;
+    api->dequeue_out = DequeueOutput;
     api->get_out = GetOutput;
     api->release_out = ReleaseOutput;
 
     /* Allow interlaced picture only after API 21 */
     api->b_support_interlaced = jfields.get_input_buffer
                                 && jfields.get_output_buffer;
-    return VLC_SUCCESS;
+    return 0;
 }

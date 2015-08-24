@@ -262,6 +262,7 @@ struct mc_api_sys
 {
     AMediaCodec* p_codec;
     AMediaFormat* p_format;
+    AMediaCodecBufferInfo info;
 };
 
 /*****************************************************************************
@@ -290,7 +291,7 @@ static int Stop(mc_api *api)
     }
 
     msg_Dbg(api->p_obj, "MediaCodec via NDK closed");
-    return VLC_SUCCESS;
+    return 0;
 }
 
 /*****************************************************************************
@@ -300,7 +301,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
                  union mc_api_args *p_args)
 {
     mc_api_sys *p_sys = api->p_sys;
-    int i_ret = VLC_EGENERIC;
+    int i_ret = MC_API_ERROR;
     ANativeWindow *p_anw = NULL;
 
     p_sys->p_codec = syms.AMediaCodec.createCodecByName(psz_name);
@@ -348,11 +349,11 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
 
     api->b_started = true;
     api->b_direct_rendering = !!p_anw;
-    i_ret = VLC_SUCCESS;
+    i_ret = 0;
 
     msg_Dbg(api->p_obj, "MediaCodec via NDK opened");
 error:
-    if (i_ret != VLC_SUCCESS)
+    if (i_ret != 0)
         Stop(api);
     return i_ret;
 }
@@ -365,39 +366,48 @@ static int Flush(mc_api *api)
     mc_api_sys *p_sys = api->p_sys;
 
     if (syms.AMediaCodec.flush(p_sys->p_codec) == AMEDIA_OK)
-        return VLC_SUCCESS;
+        return 0;
     else
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
 }
 
 /*****************************************************************************
- * PutInput
+ * DequeueInput
  *****************************************************************************/
-static int PutInput(mc_api *api, const void *p_buf, size_t i_size,
-                    mtime_t i_ts, bool b_config, mtime_t i_timeout)
+static int DequeueInput(mc_api *api, mtime_t i_timeout)
 {
     mc_api_sys *p_sys = api->p_sys;
     ssize_t i_index;
+
+    i_index = syms.AMediaCodec.dequeueInputBuffer(p_sys->p_codec, i_timeout);
+    if (i_index >= 0)
+        return i_index;
+    else if (i_index == AMEDIACODEC_INFO_TRY_AGAIN_LATER)
+        return MC_API_INFO_TRYAGAIN;
+    else
+    {
+        msg_Err(api->p_obj, "AMediaCodec.dequeueInputBuffer failed");
+        return MC_API_ERROR;
+    }
+}
+
+/*****************************************************************************
+ * QueueInput
+ *****************************************************************************/
+static int QueueInput(mc_api *api, int i_index, const void *p_buf,
+                      size_t i_size, mtime_t i_ts, bool b_config)
+{
+    mc_api_sys *p_sys = api->p_sys;
     uint8_t *p_mc_buf;
     size_t i_mc_size;
     int i_flags = b_config ? AMEDIACODEC_FLAG_CODEC_CONFIG : 0;
 
-    i_index = syms.AMediaCodec.dequeueInputBuffer(p_sys->p_codec, i_timeout);
-    if (i_index < 0)
-    {
-        if (i_index == AMEDIACODEC_INFO_TRY_AGAIN_LATER)
-            return 0;
-        else
-        {
-            msg_Err(api->p_obj, "AMediaCodec.dequeueInputBuffer failed");
-            return VLC_EGENERIC;
-        }
-    }
+    assert(i_index >= 0);
 
     p_mc_buf = syms.AMediaCodec.getInputBuffer(p_sys->p_codec,
                                                i_index, &i_mc_size);
     if (!p_mc_buf)
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
 
     if (i_mc_size > i_size)
         i_mc_size = i_size;
@@ -405,11 +415,11 @@ static int PutInput(mc_api *api, const void *p_buf, size_t i_size,
 
     if (syms.AMediaCodec.queueInputBuffer(p_sys->p_codec, i_index, 0, i_mc_size,
                                           i_ts, i_flags) == AMEDIA_OK)
-        return 1;
+        return 0;
     else
     {
         msg_Err(api->p_obj, "AMediaCodec.queueInputBuffer failed");
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
     }
 }
 
@@ -421,22 +431,44 @@ static int32_t GetFormatInteger(AMediaFormat *p_format, const char *psz_name)
 }
 
 /*****************************************************************************
- * GetOutput
+ * DequeueOutput
  *****************************************************************************/
-static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
+static int DequeueOutput(mc_api *api, mtime_t i_timeout)
 {
     mc_api_sys *p_sys = api->p_sys;
-    AMediaCodecBufferInfo info;
     ssize_t i_index;
 
-    i_index = syms.AMediaCodec.dequeueOutputBuffer(p_sys->p_codec, &info,
+    i_index = syms.AMediaCodec.dequeueOutputBuffer(p_sys->p_codec, &p_sys->info,
                                                    i_timeout);
+
+    if (i_index >= 0)
+        return i_index;
+    else if (i_index == AMEDIACODEC_INFO_TRY_AGAIN_LATER)
+        return MC_API_INFO_TRYAGAIN;
+    else if (i_index == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED)
+        return MC_API_INFO_OUTPUT_BUFFERS_CHANGED;
+    else if (i_index == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED)
+        return MC_API_INFO_OUTPUT_FORMAT_CHANGED;
+    else
+    {
+        msg_Err(api->p_obj, "AMediaCodec.dequeueOutputBuffer failed");
+        return MC_API_ERROR;
+    }
+}
+
+/*****************************************************************************
+ * GetOutput
+ *****************************************************************************/
+static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
+{
+    mc_api_sys *p_sys = api->p_sys;
+
     if (i_index >= 0)
     {
         p_out->type = MC_OUT_TYPE_BUF;
         p_out->u.buf.i_index = i_index;
 
-        p_out->u.buf.i_ts = info.presentationTimeUs;
+        p_out->u.buf.i_ts = p_sys->info.presentationTimeUs;
 
         if (api->b_direct_rendering)
         {
@@ -452,14 +484,14 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
             if (!p_mc_buf)
             {
                 msg_Err(api->p_obj, "AMediaCodec.getOutputBuffer failed");
-                return VLC_EGENERIC;
+                return MC_API_ERROR;
             }
-            p_out->u.buf.p_ptr = p_mc_buf + info.offset;
-            p_out->u.buf.i_size = info.size;
+            p_out->u.buf.p_ptr = p_mc_buf + p_sys->info.offset;
+            p_out->u.buf.i_size = p_sys->info.size;
         }
         return 1;
     }
-    else if (i_index == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED)
+    else if (i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED)
     {
         AMediaFormat *format = syms.AMediaCodec.getOutputFormat(p_sys->p_codec);
 
@@ -484,16 +516,7 @@ static int GetOutput(mc_api *api, mc_api_out *p_out, mtime_t i_timeout)
         }
         return 1;
     }
-    else if (i_index == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED
-          || i_index == AMEDIACODEC_INFO_TRY_AGAIN_LATER)
-    {
-        return 0;
-    }
-    else
-    {
-        msg_Err(api->p_obj, "AMediaCodec.dequeueOutputBuffer failed");
-        return VLC_EGENERIC;
-    }
+    return 0;
 }
 
 /*****************************************************************************
@@ -503,11 +526,12 @@ static int ReleaseOutput(mc_api *api, int i_index, bool b_render)
 {
     mc_api_sys *p_sys = api->p_sys;
 
+    assert(i_index >= 0);
     if (syms.AMediaCodec.releaseOutputBuffer(p_sys->p_codec, i_index, b_render)
                                              == AMEDIA_OK)
-        return VLC_SUCCESS;
+        return 0;
     else
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
 }
 
 
@@ -525,20 +549,22 @@ static void Clean(mc_api *api)
 int MediaCodecNdk_Init(mc_api *api)
 {
     if (!InitSymbols(api))
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
 
     api->p_sys = calloc(1, sizeof(mc_api_sys));
     if (!api->p_sys)
-        return VLC_EGENERIC;
+        return MC_API_ERROR;
 
     api->clean = Clean;
     api->start = Start;
     api->stop = Stop;
     api->flush = Flush;
-    api->put_in = PutInput;
+    api->dequeue_in = DequeueInput;
+    api->queue_in = QueueInput;
+    api->dequeue_out = DequeueOutput;
     api->get_out = GetOutput;
     api->release_out = ReleaseOutput;
 
     api->b_support_interlaced = true;
-    return VLC_SUCCESS;
+    return 0;
 }

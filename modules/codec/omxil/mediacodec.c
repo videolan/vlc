@@ -757,10 +757,16 @@ static int PutInput(decoder_t *p_dec, block_t *p_block, mtime_t timeout)
             i_ts = p_block->i_dts;
     }
 
-    i_ret = p_sys->api->put_in(p_sys->api, p_buf, i_size, i_ts, b_config,
-                               timeout);
-    if (i_ret != 1)
-        return i_ret;
+    i_ret = p_sys->api->dequeue_in(p_sys->api, timeout);
+    if (i_ret == MC_API_INFO_TRYAGAIN)
+        return 0;
+    else if (i_ret < 0)
+        return -1;
+
+    i_ret = p_sys->api->queue_in(p_sys->api, i_ret, p_buf, i_size, i_ts,
+                                 b_config);
+    if (i_ret != 0)
+        return -1;
 
     if (p_sys->i_csd_send < p_sys->i_csd_count)
     {
@@ -786,7 +792,7 @@ static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
     decoder_sys_t *p_sys = p_dec->p_sys;
     mc_api_out out;
     picture_t *p_pic = NULL;
-    int i_ret;
+    int i_ret = 0, i_index;
 
     assert(pp_out_pic && !pp_out_block);
 
@@ -818,7 +824,15 @@ static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
         }
     }
 
-    i_ret = p_sys->api->get_out(p_sys->api, &out, i_timeout);
+    i_index = p_sys->api->dequeue_out(p_sys->api, i_timeout);
+    if (i_index >= 0 || i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED
+     || i_index == MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
+        i_ret = p_sys->api->get_out(p_sys->api, i_index, &out);
+    else if (i_index == MC_API_INFO_TRYAGAIN)
+        i_ret = 0;
+    else
+        i_ret = -1;
+
     if (i_ret != 1)
         goto end;
 
@@ -955,12 +969,21 @@ static int Audio_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     mc_api_out out;
-    int i_ret;
+    int i_ret, i_index;
     (void) p_abort;
 
     assert(!pp_out_pic && pp_out_block);
 
-    i_ret = p_sys->api->get_out(p_sys->api, &out, i_timeout);
+
+    i_index = p_sys->api->dequeue_out(p_sys->api, i_timeout);
+    if (i_index >= 0 || i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED
+     || i_index == MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
+        i_ret = p_sys->api->get_out(p_sys->api, i_index, &out);
+    else if (i_index == MC_API_INFO_TRYAGAIN)
+        i_ret = 0;
+    else
+        i_ret = -1;
+
     if (i_ret != 1)
         return i_ret;
 
