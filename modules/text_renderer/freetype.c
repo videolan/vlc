@@ -793,7 +793,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
     i_a = VLC_CLIP( i_a, 0, 255 );
     uint8_t i_x, i_y, i_z;
 
-    if (p_region->b_renderbg) {
+    if (p_region->b_noregionbg) {
         /* Render the background just under the text */
         FillPicture( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00 );
         RenderBackground(p_region, p_line_head, p_bbox, i_margin, p_picture, i_text_width,

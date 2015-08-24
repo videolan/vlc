@@ -65,7 +65,7 @@ struct subpicture_region_t
     int             i_alpha;                               /**< transparency */
 
     text_segment_t  *p_text;         /**< subtitle text, made of a list of segments */
-    bool            b_renderbg;      /**< render black background under text */
+    bool            b_noregionbg;    /**< render background under text only */
     bool            b_gridmode;      /** if the decoder sends row/cols based output */
 
     subpicture_region_t *p_next;                /**< next region in the list */

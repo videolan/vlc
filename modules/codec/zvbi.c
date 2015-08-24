@@ -444,7 +444,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         p_spu_sys->p_segments = text_segment_New( &p_text[offset] );
 
         p_spu_sys->align = i_align;
-        p_spu_sys->renderbg = b_opaque;
+        p_spu_sys->noregionbg = b_opaque;
 
 #ifdef ZVBI_DEBUG
         msg_Info( p_dec, "page %x-%x(%d)\n\"%s\"", p_page.pgno, p_page.subno, i_total, &p_text[offset] );

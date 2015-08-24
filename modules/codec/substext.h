@@ -11,7 +11,7 @@ struct subpicture_updater_sys_t {
     bool is_fixed;
     int  fixed_width;
     int  fixed_height;
-    bool renderbg;
+    bool noregionbg;
     bool gridmode;
 
     /* styling */
@@ -66,7 +66,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
     r->p_text = sys->p_segments;
     r->i_align  = sys->align;
-    r->b_renderbg = sys->renderbg;
+    r->b_noregionbg = sys->noregionbg;
     r->b_gridmode = sys->gridmode;
     if (!sys->is_fixed) {
         const float margin_ratio = 0.04;
