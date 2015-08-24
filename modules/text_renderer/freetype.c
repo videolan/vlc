@@ -1090,8 +1090,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
  *****************************************************************************/
 static int Init_FT( vlc_object_t *p_this,
                     const char *psz_fontfile,
-                    const int fontindex,
-                    const float f_outline_thickness)
+                    const int fontindex )
 {
     filter_t      *p_filter = (filter_t *)p_this;
     filter_sys_t  *p_sys = p_filter->p_sys;
@@ -1129,13 +1128,9 @@ static int Init_FT( vlc_object_t *p_this,
 
     if( SetFontSize( p_filter, (int) 0 ) != VLC_SUCCESS ) goto error;
 
-    p_sys->p_stroker = NULL;
-    if( f_outline_thickness > .001f )
-    {
-        i_error = FT_Stroker_New( p_sys->p_library, &p_sys->p_stroker );
-        if( i_error )
-            msg_Err( p_filter, "Failed to create stroker for outlining" );
-    }
+    i_error = FT_Stroker_New( p_sys->p_library, &p_sys->p_stroker );
+    if( i_error )
+        msg_Err( p_filter, "Failed to create stroker for outlining" );
 
     return VLC_SUCCESS;
 
@@ -1262,7 +1257,7 @@ static int Create( vlc_object_t *p_this )
     if( !psz_monofontfile )
         psz_monofontfile = File_Select( p_sys->p_default_style->psz_monofontname );
 
-    if( Init_FT( p_this, psz_fontfile, fontindex, f_outline_thickness ) != VLC_SUCCESS )
+    if( Init_FT( p_this, psz_fontfile, fontindex ) != VLC_SUCCESS )
         goto error;
 
     int i_faces_size = 20;

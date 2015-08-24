@@ -793,7 +793,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
         else
             p_face = p_run->p_face;
 
-        if( p_sys->p_stroker )
+        if( p_sys->p_stroker && (p_style->i_style_flags & STYLE_OUTLINE) )
         {
             double f_outline_thickness =
                 var_InheritInteger( p_filter, "freetype-outline-thickness" ) / 100.0;
@@ -845,7 +845,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                 continue;
             }
 
-            if( p_filter->p_sys->p_stroker )
+            if( p_filter->p_sys->p_stroker && (p_style->i_style_flags & STYLE_OUTLINE) )
             {
                 p_bitmaps->p_outline = p_bitmaps->p_glyph;
                 if( FT_Glyph_StrokeBorder( &p_bitmaps->p_outline,
