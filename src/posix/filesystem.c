@@ -42,6 +42,9 @@
 #endif
 #include <dirent.h>
 #include <sys/socket.h>
+#ifndef O_TMPFILE
+# define O_TMPFILE 0
+#endif
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
@@ -53,7 +56,7 @@ int vlc_open (const char *filename, int flags, ...)
     va_list ap;
 
     va_start (ap, flags);
-    if (flags & O_CREAT)
+    if (flags & (O_CREAT|O_TMPFILE))
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
@@ -73,7 +76,7 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
     va_list ap;
 
     va_start (ap, flags);
-    if (flags & O_CREAT)
+    if (flags & (O_CREAT|O_TMPFILE))
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
