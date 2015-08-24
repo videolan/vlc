@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <errno.h>
 #if defined (_WIN32)
 #  include <direct.h>
 #endif
@@ -281,8 +282,7 @@ static void CmdExecuteDel    ( es_out_t *, ts_cmd_t * );
 static int  CmdExecuteControl( es_out_t *, ts_cmd_t * );
 
 /* File helpers */
-static char *GetTmpPath( char *psz_path );
-static FILE *GetTmpFile( char **ppsz_file, const char *psz_path );
+static int GetTmpFile( char **ppsz_file, const char *psz_path );
 
 /*****************************************************************************
  * input_EsOutTimeshiftNew:
@@ -329,12 +329,52 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
         p_sys->i_tmp_size_max = 50*1024*1024;
     else
         p_sys->i_tmp_size_max = __MAX( i_tmp_size_max, 1*1024*1024 );
+    msg_Dbg( p_input, "using timeshift granularity of %d MiB",
+             (int)p_sys->i_tmp_size_max/(1024*1024) );
 
-    char *psz_tmp_path = var_CreateGetNonEmptyString( p_input, "input-timeshift-path" );
-    p_sys->psz_tmp_path = GetTmpPath( psz_tmp_path );
+    p_sys->psz_tmp_path = var_InheritString( p_input, "input-timeshift-path" );
+#if defined (_WIN32) && !VLC_WINSTORE_APP
+    if( p_sys->psz_tmp_path == NULL )
+    {
+        const DWORD count = GetTempPath( 0, NULL );
+        if( count > 0 )
+        {
+            TCHAR *path = malloc( (count + 1) * sizeof(TCHAR) );
+            if( path != NULL )
+            {
+                DWORD ret = GetTempPath( count + 1, path );
+                if( ret != 0 && ret <= count )
+                    p_sys->psz_tmp_path = FromT( path );
+                free( path );
+            }
+        }
+    }
+    if( p_sys->psz_tmp_path == NULL )
+    {
+        wchar_t *wpath = _wgetcwd( NULL, 0 );
+        if( wpath != NULL )
+        {
+            p_sys->psz_tmp_path = FromWide( wpath );
+            free( wpath );
+        }
+    }
+    if( p_sys->psz_tmp_path == NULL )
+        p_sys->psz_tmp_path = strdup( "C:" );
 
-    msg_Dbg( p_input, "using timeshift granularity of %d MiB, in path '%s'",
-             (int)p_sys->i_tmp_size_max/(1024*1024), p_sys->psz_tmp_path );
+    if( p_sys->psz_tmp_path != NULL )
+    {
+        size_t len = strlen( p_sys->psz_tmp_path );
+
+        while( len > 0 && p_sys->psz_tmp_path[len - 1] == DIR_SEP_CHAR )
+            len--;
+
+        p_sys->psz_tmp_path[len] = '\0';
+    }
+#endif
+    if( p_sys->psz_tmp_path != NULL )
+        msg_Dbg( p_input, "using timeshift path: %s", p_sys->psz_tmp_path );
+    else
+        msg_Dbg( p_input, "using default timeshift path" );
 
 #if 0
 #define S(t) msg_Err( p_input, "SIZEOF("#t")=%d", sizeof(t) )
@@ -1053,19 +1093,38 @@ static void *TsRun( void *p_data )
  *****************************************************************************/
 static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_max )
 {
-    ts_storage_t *p_storage = calloc( 1, sizeof(ts_storage_t) );
-    if( !p_storage )
+    ts_storage_t *p_storage = malloc( sizeof (*p_storage) );
+    if( unlikely(p_storage == NULL) )
         return NULL;
 
-    /* */
+    int fd = GetTmpFile( &p_storage->psz_file, psz_tmp_path );
+    if( fd == -1 )
+    {
+        free( p_storage );
+        return NULL;
+    }
+
+    p_storage->p_filew = fdopen( fd, "w+b" );
+    if( p_storage->p_filew == NULL )
+    {
+        close( fd );
+        vlc_unlink( p_storage->psz_file );
+        goto error;
+    }
+
+    p_storage->p_filer = vlc_fopen( p_storage->psz_file, "rb" );
+    if( p_storage->p_filer == NULL )
+    {
+        fclose( p_storage->p_filew );
+        vlc_unlink( p_storage->psz_file );
+        goto error;
+    }
+
     p_storage->p_next = NULL;
 
     /* */
     p_storage->i_file_max = i_tmp_size_max;
     p_storage->i_file_size = 0;
-    p_storage->p_filew = GetTmpFile( &p_storage->psz_file, psz_tmp_path );
-    if( p_storage->psz_file )
-        p_storage->p_filer = vlc_fopen( p_storage->psz_file, "rb" );
 
     /* */
     p_storage->i_cmd_w = 0;
@@ -1074,13 +1133,18 @@ static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_
     p_storage->p_cmd = malloc( p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) );
     //fprintf( stderr, "\nSTORAGE name=%s size=%d KiB\n", p_storage->psz_file, p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) /1024 );
 
-    if( !p_storage->p_cmd || !p_storage->p_filew || !p_storage->p_filer )
+    if( !p_storage->p_cmd )
     {
         TsStorageDelete( p_storage );
         return NULL;
     }
     return p_storage;
+error:
+    free( p_storage->psz_file );
+    free( p_storage );
+    return NULL;
 }
+
 static void TsStorageDelete( ts_storage_t *p_storage )
 {
     while( p_storage->i_cmd_r < p_storage->i_cmd_w )
@@ -1093,19 +1157,13 @@ static void TsStorageDelete( ts_storage_t *p_storage )
     }
     free( p_storage->p_cmd );
 
-    if( p_storage->p_filer )
-        fclose( p_storage->p_filer );
-    if( p_storage->p_filew )
-        fclose( p_storage->p_filew );
-
-    if( p_storage->psz_file )
-    {
-        vlc_unlink( p_storage->psz_file );
-        free( p_storage->psz_file );
-    }
-
+    fclose( p_storage->p_filer );
+    fclose( p_storage->p_filew );
+    vlc_unlink( p_storage->psz_file );
+    free( p_storage->psz_file );
     free( p_storage );
 }
+
 static void TsStoragePack( ts_storage_t *p_storage )
 {
     /* Try to release a bit of memory */
@@ -1533,84 +1591,29 @@ static void CmdCleanControl( ts_cmd_t *p_cmd )
     }
 }
 
-
-/*****************************************************************************
- * GetTmpFile/Path:
- *****************************************************************************/
-static char *GetTmpPath( char *psz_path )
+static int GetTmpFile( char **filename, const char *dirname )
 {
-    if( psz_path && *psz_path )
+    if( dirname != NULL
+     && asprintf( filename, "%s"DIR_SEP PACKAGE_NAME"-timeshift.XXXXXX",
+                  dirname ) >= 0 )
     {
-        /* Make sure that the path exists and is a directory */
-        struct stat s;
-        const int i_ret = vlc_stat( psz_path, &s );
+        vlc_mkdir( dirname, 0700 );
 
-        if( i_ret < 0 && !vlc_mkdir( psz_path, 0600 ) )
-            return psz_path;
-        else if( i_ret == 0 && ( s.st_mode & S_IFDIR ) )
-            return psz_path;
-    }
-    free( psz_path );
+        int fd = vlc_mkstemp( *filename );
+        if( fd != -1 )
+            return fd;
 
-    /* Create a suitable path */
-#if defined (_WIN32) && !VLC_WINSTORE_APP
-    const DWORD dwCount = GetTempPathW( 0, NULL );
-    wchar_t *psw_path = calloc( dwCount + 1, sizeof(wchar_t) );
-    if( psw_path )
-    {
-        if( GetTempPathW( dwCount + 1, psw_path ) <= 0 )
-        {
-            free( psw_path );
-
-            psw_path = _wgetcwd( NULL, 0 );
-        }
+        free( *filename );
     }
 
-    psz_path = NULL;
-    if( psw_path )
-    {
-        psz_path = FromWide( psw_path );
-        while( psz_path && *psz_path && psz_path[strlen( psz_path ) - 1] == '\\' )
-            psz_path[strlen( psz_path ) - 1] = '\0';
+    *filename = strdup( DIR_SEP"tmp"DIR_SEP PACKAGE_NAME"-timeshift.XXXXXX" );
+    if( unlikely(*filename == NULL) )
+        return -1;
 
-        free( psw_path );
-    }
+    int fd = vlc_mkstemp( *filename );
+    if( fd != -1 )
+        return fd;
 
-    if( !psz_path || *psz_path == '\0' )
-    {
-        free( psz_path );
-        return strdup( "C:" );
-    }
-#else
-    psz_path = strdup( DIR_SEP"tmp" );
-#endif
-
-    return psz_path;
+    free( *filename );
+    return -1;
 }
-
-static FILE *GetTmpFile( char **ppsz_file, const char *psz_path )
-{
-    char *psz_name;
-    int fd;
-    FILE *f;
-
-    /* */
-    *ppsz_file = NULL;
-    if( asprintf( &psz_name, "%s"DIR_SEP"vlc-timeshift.XXXXXX", psz_path ) < 0 )
-        return NULL;
-
-    /* */
-    fd = vlc_mkstemp( psz_name );
-    *ppsz_file = psz_name;
-
-    if( fd < 0 )
-        return NULL;
-
-    /* */
-    f = fdopen( fd, "w+b" );
-    if( !f )
-        close( fd );
-
-    return f;
-}
-
