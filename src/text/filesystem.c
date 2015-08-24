@@ -30,7 +30,6 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
-#include <vlc_rand.h>
 
 #include <assert.h>
 
@@ -192,6 +191,9 @@ int vlc_scandir( const char *dirname, char ***namelist,
     return val;
 }
 
+#if defined (_WIN32) || defined (__OS2__)
+# include <vlc_rand.h>
+
 int vlc_mkstemp( char *template )
 {
     static const char digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -231,3 +233,4 @@ int vlc_mkstemp( char *template )
     errno = EEXIST;
     return -1;
 }
+#endif

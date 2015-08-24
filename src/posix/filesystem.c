@@ -98,6 +98,20 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
     return fd;
 }
 
+int vlc_mkstemp (char *template)
+{
+    int fd;
+
+#ifdef HAVE_MKOSTEMP
+    fd = mkostemp (template, O_CLOEXEC);
+#else
+    fd = mkstemp (template);
+#endif
+    if (fd != -1)
+        fcntl (fd, F_SETFD, FD_CLOEXEC);
+    return fd;
+}
+
 int vlc_memfd (void)
 {
     int fd;
@@ -115,16 +129,9 @@ int vlc_memfd (void)
 
     char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
 
-#ifdef HAVE_MKOSTEMP
-    fd = mkostemp (bufpath, O_CLOEXEC);
-#else
-    fd = mkstemp (bufpath);
-#endif
+    fd = vlc_mkstemp (bufpath);
     if (fd != -1)
-    {
-        fcntl (fd, F_SETFD, FD_CLOEXEC);
         unlink (bufpath);
-    }
     return fd;
 }
 
