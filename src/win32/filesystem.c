@@ -104,6 +104,26 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
     return -1;
 }
 
+int vlc_memfd (void)
+{
+#if 0
+    int fd, err;
+
+    FILE *stream = tmpfile();
+    if (stream == NULL)
+        return -1;
+
+    fd = vlc_dup(fileno(stream));
+    err = errno;
+    fclose(stream);
+    errno = err;
+    return fd;
+#else /* Not currently used */
+    errno = ENOSYS;
+    return -1;
+#endif
+}
+
 int vlc_mkdir( const char *dirname, mode_t mode )
 {
     wchar_t *wpath = widen_path (dirname);

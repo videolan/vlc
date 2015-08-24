@@ -450,6 +450,7 @@ vlc_mkdir
 vlc_mkstemp
 vlc_open
 vlc_openat
+vlc_memfd
 vlc_opendir
 vlc_readdir
 vlc_scandir

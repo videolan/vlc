@@ -79,6 +79,12 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
     return -1;
 }
 
+int vlc_memfd (void)
+{
+    errno = ENOSYS;
+    return -1;
+}
+
 int vlc_mkdir (const char *dirname, mode_t mode)
 {
     char *locname = ToLocaleDup (dirname);

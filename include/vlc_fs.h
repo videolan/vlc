@@ -94,6 +94,19 @@ VLC_API int vlc_dup(int) VLC_USED;
 VLC_API int vlc_pipe(int [2]) VLC_USED;
 
 /**
+ * Creates an anonymous regular file descriptor, i.e. a descriptor for a
+ * temporary file.
+ *
+ * The file is initially empty. The storage space is automatically reclaimed
+ * when all file descriptors referencing it are closed.
+ *
+ * The new file descriptor has the close-on-exec flag preset.
+ *
+ * @return a file descriptor on success, -1 on error (see errno)
+ */
+VLC_API int vlc_memfd(void) VLC_USED;
+
+/**
  * Writes data to a file descriptor. Unlike write(), if EPIPE error occurs,
  * this function does not generate a SIGPIPE signal.
  * @note If the file descriptor is known to be neither a pipe/FIFO nor a

@@ -98,6 +98,35 @@ int vlc_openat (int dir, const char *filename, int flags, ...)
     return fd;
 }
 
+int vlc_memfd (void)
+{
+    int fd;
+#ifdef O_TMPFILE
+    fd = vlc_open ("/tmp", O_RDWR|O_TMPFILE, S_IRUSR|S_IWUSR);
+    if (fd != -1)
+        return fd;
+    /* ENOENT means either /tmp is missing (!) or the kernel does not support
+     * O_TMPFILE. EISDIR means /tmp exists but the kernel does not support
+     * O_TMPFILE. EOPNOTSUPP means the kernel supports O_TMPFILE but the /tmp
+     * filesystem does not. Do not fallback on other errors. */
+    if (errno != ENOENT && errno != EISDIR && errno != EOPNOTSUPP)
+        return -1;
+#endif
+
+    char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
+
+#ifdef HAVE_MKOSTEMP
+    fd = mkostemp (bufpath, O_CLOEXEC);
+#else
+    fd = mkstemp (bufpath);
+#endif
+    if (fd != -1)
+    {
+        fcntl (fd, F_SETFD, FD_CLOEXEC);
+        unlink (bufpath);
+    }
+    return fd;
+}
 
 int vlc_mkdir (const char *dirname, mode_t mode)
 {
