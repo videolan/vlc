@@ -110,12 +110,18 @@ typedef enum OverlayStatus {
 
 typedef struct bluray_overlay_t
 {
-    atomic_flag         released_once;
     vlc_mutex_t         lock;
     int                 i_channel;
     OverlayStatus       status;
     subpicture_region_t *p_regions;
     int                 width, height;
+
+    /* pointer to last subpicture updater.
+     * used to disconnect this overlay from vout when:
+     * - the overlay is closed
+     * - vout is changed and this overlay is sent to the new vout
+     */
+    struct subpicture_updater_sys_t *p_updater;
 } bluray_overlay_t;
 
 struct  demux_sys_t
@@ -161,8 +167,28 @@ struct  demux_sys_t
 
 struct subpicture_updater_sys_t
 {
-    bluray_overlay_t    *p_overlay;
+    vlc_mutex_t          lock;      // protect p_overlay pointer and ref_cnt
+    bluray_overlay_t    *p_overlay; // NULL if overlay has been closed
+    int                  ref_cnt;   // one reference in vout (subpicture_t), one in input (bluray_overlay_t)
 };
+
+/*
+ * cut the connection between vout and overlay.
+ * - called when vout is closed or overlay is closed.
+ * - frees subpicture_updater_sys_t when both sides have been closed.
+ */
+static void unref_subpicture_updater(subpicture_updater_sys_t *p_sys)
+{
+    vlc_mutex_lock(&p_sys->lock);
+    int refs = p_sys->ref_cnt--;
+    p_sys->p_overlay = NULL;
+    vlc_mutex_unlock(&p_sys->lock);
+
+    if (refs < 1) {
+        vlc_mutex_destroy(&p_sys->lock);
+        free(p_sys);
+    }
+}
 
 /* Get a 3 char code
  * FIXME: partiallyy duplicated from src/input/es_out.c
@@ -280,6 +306,26 @@ static void blurayReleaseVout(demux_t *p_demux)
     if (p_sys->p_vout != NULL) {
         var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
         var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
+
+        for (int i = 0; i < MAX_OVERLAY; i++) {
+            bluray_overlay_t *p_ov = p_sys->p_overlays[i];
+            if (p_ov) {
+                vlc_mutex_lock(&p_ov->lock);
+                if (p_ov->i_channel != -1) {
+                    msg_Err(p_demux, "blurayReleaseVout: subpicture channel exists\n");
+                    vout_FlushSubpictureChannel(p_sys->p_vout, p_ov->i_channel);
+                }
+                p_ov->i_channel = -1;
+                p_ov->status = ToDisplay;
+                vlc_mutex_unlock(&p_ov->lock);
+
+                if (p_ov->p_updater) {
+                    unref_subpicture_updater(p_ov->p_updater);
+                    p_ov->p_updater = NULL;
+                }
+            }
+        }
+
         vlc_object_release(p_sys->p_vout);
         p_sys->p_vout = NULL;
     }
@@ -668,6 +714,32 @@ static es_out_t *esOutNew(demux_t *p_demux)
 /*****************************************************************************
  * subpicture_updater_t functions:
  *****************************************************************************/
+
+static bluray_overlay_t *updater_lock_overlay(subpicture_updater_sys_t *p_upd_sys)
+{
+    /* this lock is held while vout accesses overlay. => overlay can't be closed. */
+    vlc_mutex_lock(&p_upd_sys->lock);
+
+    bluray_overlay_t *ov = p_upd_sys->p_overlay;
+    if (ov) {
+        /* this lock is held while vout accesses overlay. => overlay can't be modified. */
+        vlc_mutex_lock(&ov->lock);
+        return ov;
+    }
+
+    /* overlay has been closed */
+    vlc_mutex_unlock(&p_upd_sys->lock);
+    return NULL;
+}
+
+static void updater_unlock_overlay(subpicture_updater_sys_t *p_upd_sys)
+{
+    assert (p_upd_sys->p_overlay);
+
+    vlc_mutex_unlock(&p_upd_sys->p_overlay->lock);
+    vlc_mutex_unlock(&p_upd_sys->lock);
+}
+
 static int subpictureUpdaterValidate(subpicture_t *p_subpic,
                                       bool b_fmt_src, const video_format_t *p_fmt_src,
                                       bool b_fmt_dst, const video_format_t *p_fmt_dst,
@@ -680,11 +752,16 @@ static int subpictureUpdaterValidate(subpicture_t *p_subpic,
     VLC_UNUSED(i_ts);
 
     subpicture_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
-    bluray_overlay_t         *p_overlay = p_upd_sys->p_overlay;
+    bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
 
-    vlc_mutex_lock(&p_overlay->lock);
+    if (!p_overlay) {
+        return 1;
+    }
+
     int res = p_overlay->status == Outdated;
-    vlc_mutex_unlock(&p_overlay->lock);
+
+    updater_unlock_overlay(p_upd_sys);
+
     return res;
 }
 
@@ -697,17 +774,19 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
     VLC_UNUSED(p_fmt_dst);
     VLC_UNUSED(i_ts);
     subpicture_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
-    bluray_overlay_t         *p_overlay = p_upd_sys->p_overlay;
+    bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
+
+    if (!p_overlay) {
+        return;
+    }
 
     /*
      * When this function is called, all p_subpic regions are gone.
      * We need to duplicate our regions (stored internaly) to this subpic.
      */
-    vlc_mutex_lock(&p_overlay->lock);
-
     subpicture_region_t *p_src = p_overlay->p_regions;
     if (!p_src) {
-        vlc_mutex_unlock(&p_overlay->lock);
+        updater_unlock_overlay(p_upd_sys);
         return;
     }
 
@@ -722,16 +801,24 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
     if (*p_dst != NULL)
         (*p_dst)->p_next = NULL;
     p_overlay->status = Displayed;
-    vlc_mutex_unlock(&p_overlay->lock);
-}
 
-static void blurayCleanOverlayStruct(bluray_overlay_t *);
+    updater_unlock_overlay(p_upd_sys);
+}
 
 static void subpictureUpdaterDestroy(subpicture_t *p_subpic)
 {
-    blurayCleanOverlayStruct(p_subpic->updater.p_sys->p_overlay);
-    free(p_subpic->updater.p_sys);
- }
+    subpicture_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
+    bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
+
+    if (p_overlay) {
+        /* vout is closed (seek, new clip, ?). Overlay must be redrawn. */
+        p_overlay->status = ToDisplay;
+        p_overlay->i_channel = -1;
+        updater_unlock_overlay(p_upd_sys);
+    }
+
+    unref_subpicture_updater(p_upd_sys);
+}
 
 static subpicture_t *bluraySubpictureCreate(bluray_overlay_t *p_ov)
 {
@@ -759,6 +846,11 @@ static subpicture_t *bluraySubpictureCreate(bluray_overlay_t *p_ov)
     p_pic->i_original_picture_height = p_ov->height;
     p_pic->b_ephemer = true;
     p_pic->b_absolute = true;
+
+    vlc_mutex_init(&p_upd_sys->lock);
+    p_upd_sys->ref_cnt = 2;
+
+    p_ov->p_updater = p_upd_sys;
 
     return p_pic;
 }
@@ -799,30 +891,26 @@ static int sendKeyEvent(demux_sys_t *p_sys, unsigned int key)
  * libbluray overlay handling:
  *****************************************************************************/
 
-static void blurayCleanOverlayStruct(bluray_overlay_t *p_overlay)
-{
-    if (!atomic_flag_test_and_set(&p_overlay->released_once))
-        return;
-    /*
-     * This will be called when destroying the picture.
-     * Don't delete it again from here!
-     */
-    vlc_mutex_destroy(&p_overlay->lock);
-    subpicture_region_ChainDelete(p_overlay->p_regions);
-    free(p_overlay);
-}
-
 static void blurayCloseOverlay(demux_t *p_demux, int plane)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     bluray_overlay_t *ov = p_sys->p_overlays[plane];
 
     if (ov != NULL) {
+
+        /* drop overlay from vout */
+        if (ov->p_updater) {
+            unref_subpicture_updater(ov->p_updater);
+        }
+        /* no references to this overlay exist in vo anymore */
         if (p_sys->p_vout && ov->i_channel != -1) {
             vout_FlushSubpictureChannel(p_sys->p_vout, ov->i_channel);
         }
 
-        blurayCleanOverlayStruct(ov);
+        vlc_mutex_destroy(&ov->lock);
+        subpicture_region_ChainDelete(ov->p_regions);
+        free(ov);
+
         p_sys->p_overlays[plane] = NULL;
     }
 
@@ -1105,9 +1193,12 @@ static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
     demux_sys_t *p_sys = p_demux->p_sys;
 
     assert(p_ov != NULL);
- 
+    assert(p_ov->i_channel == -1);
+    assert(p_ov->p_updater == NULL);
+
     subpicture_t *p_pic = bluraySubpictureCreate(p_ov);
     if (!p_pic) {
+        msg_Err(p_demux, "bluraySubpictureCreate() failed");
         return;
     }
 
@@ -1685,6 +1776,18 @@ static int blurayDemux(demux_t *p_demux)
         if (display) {
             if (p_sys->p_vout == NULL)
                 p_sys->p_vout = input_GetVout(p_demux->p_input);
+            else {
+                /* track vout changes */
+                vout_thread_t *p_vout = input_GetVout(p_demux->p_input);
+                if (p_vout != p_sys->p_vout) {
+                    msg_Info(p_demux, "vout changed %p -> %p\n", p_sys->p_vout, p_vout);
+                    blurayReleaseVout(p_demux);
+                    p_sys->p_vout = p_vout;
+                } else {
+                    vlc_object_release(p_vout);
+                }
+            }
+            ;// also, should always release as soon as possible ? --> old one can be released ...
             if (p_sys->p_vout != NULL) {
                 var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
                 var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
