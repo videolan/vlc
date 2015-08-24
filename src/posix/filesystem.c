@@ -48,7 +48,6 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
-#include "libvlc.h" /* vlc_mkdir */
 
 int vlc_open (const char *filename, int flags, ...)
 {
