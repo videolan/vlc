@@ -858,6 +858,8 @@ static void FillDefaultStyles( filter_t *p_filter )
     p_sys->p_default_style->i_shadow_color = VLC_CLIP( p_sys->p_default_style->i_shadow_color, 0, 0xFFFFFF );
 
     p_sys->p_default_style->i_font_size = 0;
+    p_sys->p_default_style->i_style_flags |= STYLE_SHADOW;
+    p_sys->p_default_style->i_features |= STYLE_HAS_FLAGS;
 
     p_sys->p_forced_style->i_font_size = var_InheritInteger( p_filter, "freetype-fontsize" );
     p_sys->p_forced_style->f_font_relsize = var_InheritInteger( p_filter, "freetype-rel-fontsize" );
