@@ -445,7 +445,7 @@ std::list<Tag *> Parser::parseEntries(stream_t *stream)
                 }
                 else
                 {
-                    key = std::string(psz_line);
+                    key = std::string(psz_line + 1);
                 }
 
                 if(!key.empty())
