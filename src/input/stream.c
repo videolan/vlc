@@ -379,9 +379,11 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
         if (unlikely(peek == NULL))
             return VLC_ENOMEM;
 
+        *bufp = peek->p_buffer;
+
         if (unlikely(len == 0))
         {
-            *bufp = peek->p_buffer;
+            priv->peek = peek;
             return 0;
         }
 
@@ -392,7 +394,6 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
             return ret;
         }
 
-        *bufp = peek->p_buffer;
         peek->i_buffer = ret;
         priv->peek = peek;
         return ret;
