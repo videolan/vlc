@@ -30,7 +30,6 @@
 #include <string.h>
 
 #include <sys/types.h>
-#include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
 
@@ -41,6 +40,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
+#include <vlc_fs.h>
 
 #define MAX_PICTURES 4
 
@@ -107,14 +107,12 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     if (req > MAX_PICTURES)
         req = MAX_PICTURES;
 
-    char bufpath[] = "/tmp/"PACKAGE_NAME"XXXXXX";
-    int fd = mkostemp(bufpath, O_CLOEXEC);
+    int fd = vlc_memfd();
     if (fd == -1)
     {
         msg_Err(vd, "cannot create buffers: %s", vlc_strerror_c(errno));
         return NULL;
     }
-    unlink(bufpath);
 
     /* We need one extra line to cover for horizontal crop offset */
     unsigned stride = 4 * ((vd->fmt.i_width + 31) & ~31);
