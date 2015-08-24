@@ -21,7 +21,18 @@
 #ifndef VLC_FS_H
 #define VLC_FS_H 1
 
+#include <sys/types.h>
+#include <dirent.h>
+
+struct stat;
+struct iovec;
+
 /**
+ * \defgroup os Operating system
+ * @{
+ * \defgroup file File system
+ * @{
+ *
  * \file
  * The functions in this file help with using low-level Unix-style file
  * descriptors, BSD sockets and directories. In general, they retain the
@@ -38,24 +49,155 @@
  *  - vlc_accept() takes an extra boolean for nonblocking mode (compare with
  *    the flags parameter in POSIX.next accept4()).
  *  - Writing functions do not emit a SIGPIPE signal in case of broken pipe.
+ *
+ * \defgroup fd File descriptors
+ * @{
  */
 
-#include <sys/types.h>
-#include <dirent.h>
+/**
+ * Opens a system file handle.
+ *
+ * @param filename file path to open (with UTF-8 encoding)
+ * @param flags open() flags, see the C library open() documentation
+ * @return a file handle on success, -1 on error (see errno).
+ * @note Contrary to standard open(), this function returns a file handle
+ * with the close-on-exec flag preset.
+ */
+VLC_API int vlc_open(const char *filename, int flags, ...) VLC_USED;
 
-VLC_API int vlc_open( const char *filename, int flags, ... ) VLC_USED;
+/**
+ * Opens a system file handle relative to an existing directory handle.
+ *
+ * @param dir directory file descriptor
+ * @param filename file path to open (with UTF-8 encoding)
+ * @param flags open() flags, see the C library open() documentation
+ * @return a file handle on success, -1 on error (see errno).
+ * @note Contrary to standard open(), this function returns a file handle
+ * with the close-on-exec flag preset.
+ */
+VLC_API int vlc_openat(int fd, const char *filename, int flags, ...) VLC_USED;
+
+VLC_API int vlc_mkstemp( char * );
+
+/**
+ * Duplicates a file descriptor. The new file descriptor has the close-on-exec
+ * descriptor flag preset.
+ * @return a new file descriptor, -1 (see errno)
+ */
+VLC_API int vlc_dup(int) VLC_USED;
+
+/**
+ * Creates a pipe (see "man pipe" for further reference). The new file
+ * descriptors have the close-on-exec flag preset.
+ * @return 0 on success, -1 on error (see errno)
+ */
+VLC_API int vlc_pipe(int [2]) VLC_USED;
+
+/**
+ * Writes data to a file descriptor. Unlike write(), if EPIPE error occurs,
+ * this function does not generate a SIGPIPE signal.
+ * @note If the file descriptor is known to be neither a pipe/FIFO nor a
+ * connection-oriented socket, the normal write() should be used.
+ */
+VLC_API ssize_t vlc_write(int, const void *, size_t);
+
+/**
+ * Writes data from an iovec structure to a file descriptor. Unlike writev(),
+ * if EPIPE error occurs, this function does not generate a SIGPIPE signal.
+ */
+VLC_API ssize_t vlc_writev(int, const struct iovec *, int);
+
+/**
+ * @}
+ */
+
+/**
+ * Finds file/inode information - like stat().
+ * @note As far as possible, fstat() should be used instead.
+ *
+ * @param filename UTF-8 file path
+ */
+VLC_API int vlc_stat(const char *filename, struct stat *) VLC_USED;
+
+/**
+ * Finds file/inode information, as lstat().
+ * Consider using fstat() instead, if possible.
+ *
+ * @param filename UTF-8 file path
+ */
+VLC_API int vlc_lstat(const char *filename, struct stat *) VLC_USED;
+
+/**
+ * Removes a file.
+ *
+ * @param filename a UTF-8 string with the name of the file you want to delete.
+ * @return A 0 return value indicates success. A -1 return value indicates an
+ *        error, and an error code is stored in errno
+ */
+VLC_API int vlc_unlink(const char *filename);
+
+/**
+ * Moves a file atomically. This only works within a single file system.
+ *
+ * @param oldpath path to the file before the move
+ * @param newpath intended path to the file after the move
+ * @return A 0 return value indicates success. A -1 return value indicates an
+ *        error, and an error code is stored in errno
+ */
+VLC_API int vlc_rename(const char *oldpath, const char *newpath);
+
 VLC_API FILE * vlc_fopen( const char *filename, const char *mode ) VLC_USED;
-VLC_API int vlc_openat( int fd, const char *filename, int flags, ... ) VLC_USED;
 
-VLC_API DIR * vlc_opendir( const char *dirname ) VLC_USED;
-VLC_API char * vlc_readdir( DIR *dir ) VLC_USED;
+/**
+ * \defgroup dir Directories
+ * @{
+ */
+
+/**
+ * Opens a DIR pointer.
+ *
+ * @param dirname UTF-8 representation of the directory name
+ * @return a pointer to the DIR struct, or NULL in case of error.
+ * Release with standard closedir().
+ */
+VLC_API DIR *vlc_opendir(const char *dirname) VLC_USED;
+
+/**
+ * Reads the next file name from an open directory.
+ *
+ * @param dir directory handle as returned by vlc_opendir()
+ *            (must not be used by another thread concurrently)
+ *
+ * @return a UTF-8 string of the directory entry. The string is valid until
+ * the next call to vlc_readdir() or closedir() on the handle.
+ * If there are no more entries in the directory, NULL is returned.
+ * If an error occurs, errno is set and NULL is returned.
+ */
+VLC_API char *vlc_readdir(DIR *dir) VLC_USED;
+
 VLC_API int vlc_loaddir( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
 VLC_API int vlc_scandir( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) );
-VLC_API int vlc_mkdir( const char *filename, mode_t mode );
 
-VLC_API int vlc_unlink( const char *filename );
-VLC_API int vlc_rename( const char *oldpath, const char *newpath );
-VLC_API char *vlc_getcwd( void ) VLC_USED;
+/**
+ * Creates a directory.
+ *
+ * @param dirname a UTF-8 string with the name of the directory that you
+ *        want to create.
+ * @param mode directory permissions
+ * @return 0 on success, -1 on error (see errno).
+ */
+VLC_API int vlc_mkdir(const char *dirname, mode_t mode);
+
+/**
+ * Determines the current working directory.
+ *
+ * @return the current working directory (must be free()'d)
+ *         or NULL on error
+ */
+VLC_API char *vlc_getcwd(void) VLC_USED;
+
+/** @} */
+/** @} */
 
 #if defined( _WIN32 )
 typedef struct vlc_DIR
@@ -107,16 +249,4 @@ static inline void vlc_rewinddir( DIR *dir )
 # define lseek lseek64
 #endif
 
-struct stat;
-struct iovec;
-
-VLC_API int vlc_stat( const char *filename, struct stat *buf );
-VLC_API int vlc_lstat( const char *filename, struct stat *buf );
-
-VLC_API int vlc_mkstemp( char * );
-
-VLC_API int vlc_dup( int );
-VLC_API int vlc_pipe( int[2] );
-VLC_API ssize_t vlc_write( int, const void *, size_t );
-VLC_API ssize_t vlc_writev( int, const struct iovec *, int );
 #endif
