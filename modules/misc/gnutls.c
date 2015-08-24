@@ -53,6 +53,7 @@ static int gnutls_Init (vlc_object_t *obj)
 
 # define gnutls_Deinit() (void)0
 #else
+#define GNUTLS_SEC_PARAM_MEDIUM GNUTLS_SEC_PARAM_NORMAL
 static vlc_mutex_t gnutls_mutex = VLC_STATIC_MUTEX;
 
 /**
