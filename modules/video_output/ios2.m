@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ios2.m: iOS OpenGL ES 2 provider
  *****************************************************************************
- * Copyright (C) 2001-2014 VLC authors and VideoLAN
+ * Copyright (C) 2001-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont at videolan dot org>
@@ -167,9 +167,6 @@ vlc_module_end ()
     CVOpenGLESTextureCacheRef _videoTextureCache;
     CVOpenGLESTextureRef _lumaTexture;
     CVOpenGLESTextureRef _chromaTexture;
-
-    GLint _backingWidth;
-    GLint _backingHeight;
 
     const GLfloat *_preferredConversion;
 }
@@ -622,8 +619,6 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
     glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
 
     [_eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_backingWidth);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_backingHeight);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _renderBuffer);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -657,6 +652,7 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 
 - (void)layoutSubviews
 {
+    [self reshape];
     if (_zeroCopy) {
         /* we don't have a clean event for 0-copy, so destory and re-create right here */
         [self destroyBuffers];
