@@ -25,7 +25,6 @@
 # include "config.h"
 #endif
 
-#include "access.h"
 #include "demux.h"
 #include <libvlc.h>
 #include <vlc_codec.h>

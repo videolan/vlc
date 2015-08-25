@@ -41,7 +41,6 @@
 #include "event.h"
 #include "es_out.h"
 #include "es_out_timeshift.h"
-#include "access.h"
 #include "demux.h"
 #include "stream.h"
 #include "item.h"

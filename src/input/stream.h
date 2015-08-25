@@ -61,4 +61,7 @@ stream_t *stream_FilterAutoNew( stream_t *source ) VLC_USED;
  * source to another filter.
  */
 stream_t *stream_FilterChainNew( stream_t *p_source, const char *psz_chain );
+
+char *get_path(const char *location);
+
 #endif

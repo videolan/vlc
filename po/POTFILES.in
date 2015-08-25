@@ -77,7 +77,6 @@ src/darwin/error.c
 src/extras/libc.c
 src/extras/tdestroy.c
 src/input/access.c
-src/input/access.h
 src/input/clock.c
 src/input/clock.h
 src/input/control.c
