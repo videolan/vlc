@@ -5348,8 +5348,10 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                 /* p_pes points to a tmp pes */
                 if( !es_format_IsSimilar( &pespid->u.p_pes->es.fmt, &p_pes->es.fmt ) ||
                     pespid->u.p_pes->es.fmt.i_extra != p_pes->es.fmt.i_extra ||
-                    memcmp( pespid->u.p_pes->es.fmt.p_extra, p_pes->es.fmt.p_extra,
-                            p_pes->es.fmt.i_extra ) ||
+                    ( pespid->u.p_pes->es.fmt.i_extra > 0 &&
+                      memcmp( pespid->u.p_pes->es.fmt.p_extra,
+                              p_pes->es.fmt.p_extra,
+                              p_pes->es.fmt.i_extra ) ) ||
                     pespid->u.p_pes->extra_es.i_size != p_pes->extra_es.i_size ||
                     !!pespid->u.p_pes->es.fmt.psz_language != !!p_pes->es.fmt.psz_language ||
                     ( pespid->u.p_pes->es.fmt.psz_language && p_pes->es.fmt.psz_language &&
