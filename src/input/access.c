@@ -375,15 +375,26 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
 
     sys->block = NULL;
 
-    s->p_sys      = sys;
+    const char *cachename = NULL;
+
     if (sys->access->pf_block != NULL)
+    {
         s->pf_read = AStreamReadBlock;
+        cachename = "cache_block";
+    }
     else
+    if (sys->access->pf_read != NULL)
+    {
         s->pf_read = AStreamReadStream;
+        cachename = "cache_read";
+    }
     s->pf_readdir = AStreamReadDir;
     s->pf_control = AStreamControl;
     s->pf_destroy = AStreamDestroy;
+    s->p_sys      = sys;
 
+    if (cachename != NULL)
+        s = stream_FilterChainNew(s, cachename);
     return s;
 error:
     free(sys);
