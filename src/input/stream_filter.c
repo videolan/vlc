@@ -88,31 +88,26 @@ stream_t *stream_FilterAutoNew( stream_t *p_source )
     return p_source;
 }
 
+/* Add specified stream filter(s) */
 stream_t *stream_FilterChainNew( stream_t *p_source, const char *psz_chain )
 {
-    if( psz_chain == NULL )
+    /* Add user stream filter */
+    char *chain = strdup( psz_chain );
+    if( unlikely(chain == NULL) )
         return p_source;
 
-    /* Add user stream filter */
-    char *psz_tmp = strdup( psz_chain );
-    char *psz = psz_tmp;
-    while( psz && *psz )
+    char *buf;
+    for( const char *name = strtok_r( chain, ":", &buf );
+         name != NULL;
+         name = strtok_r( NULL, ":", &buf ) )
     {
-        stream_t *p_filter;
-        char *psz_end = strchr( psz, ':' );
-
-        if( psz_end )
-            *psz_end++ = '\0';
-
-        p_filter = stream_FilterNew( p_source, psz );
-        if( p_filter )
+        stream_t *p_filter = stream_FilterNew( p_source, name );
+        if( p_filter != NULL )
             p_source = p_filter;
         else
-            msg_Warn( p_source, "failed to insert stream filter %s", psz );
-
-        psz = psz_end;
+            msg_Warn( p_source, "cannot insert stream filter %s", name );
     }
-    free( psz_tmp );
+    free( chain );
 
     return p_source;
 }

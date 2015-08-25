@@ -2311,10 +2311,12 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Add stream filters */
         p_stream = stream_FilterAutoNew( p_stream );
 
-        char *psz_stream_filter = var_GetNonEmptyString( p_input,
-                                                         "stream-filter" );
-        p_stream = stream_FilterChainNew( p_stream, psz_stream_filter );
-        free( psz_stream_filter );
+        char *filters = var_GetNonEmptyString( p_input, "stream-filter" );
+        if( filters != NULL )
+        {
+            p_stream = stream_FilterChainNew( p_stream, filters );
+            free( filters );
+        }
 
         if( var_GetBool( p_input, "input-record-native" ) )
             p_stream = stream_FilterChainNew( p_stream, "record" );
