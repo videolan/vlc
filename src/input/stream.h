@@ -47,10 +47,17 @@ stream_t *stream_FilterNew( stream_t *p_source,
                             const char *psz_stream_filter );
 
 /**
+ * Automatically wraps a stream with any applicable stream filter.
+ * @return the (outermost/downstream) stream filter; if no filters were added,
+ * then the function return the source parameter.
+ * @note The function never returns NULL.
+ */
+stream_t *stream_FilterAutoNew( stream_t *source ) VLC_USED;
+
+/**
  * This function creates a chain of filters:
- * - first, automatic probed stream filters are inserted.
- * - then, optional user filters (configured by psz_chain) are inserted.
- * - finaly, an optional record filter is inserted if b_record is true.
+ * - optional user filters (configured by psz_chain) are inserted.
+ * - an optional record filter is inserted if b_record is true.
  *
  * You must release the returned value using stream_Delete unless it is used as a
  * source to another filter.

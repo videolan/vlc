@@ -73,21 +73,25 @@ stream_t *stream_FilterNew( stream_t *p_source,
     return s;
 }
 
+/* Add automatic stream filter */
+stream_t *stream_FilterAutoNew( stream_t *p_source )
+{
+    for( ;; )
+    {
+        stream_t *p_filter = stream_FilterNew( p_source, NULL );
+        if( p_filter == NULL )
+            break;
+
+        msg_Dbg( p_filter, "stream filter added to %p", p_source );
+        p_source = p_filter;
+    }
+    return p_source;
+}
+
 stream_t *stream_FilterChainNew( stream_t *p_source,
                                  const char *psz_chain,
                                  bool b_record )
 {
-    /* Add auto stream filter */
-    for( ;; )
-    {
-        stream_t *p_filter = stream_FilterNew( p_source, NULL );
-        if( !p_filter )
-            break;
-
-        msg_Dbg( p_filter, "Inserted a stream filter" );
-        p_source = p_filter;
-    }
-
     /* Add user stream filter */
     char *psz_tmp = psz_chain ? strdup( psz_chain ) : NULL;
     char *psz = psz_tmp;
