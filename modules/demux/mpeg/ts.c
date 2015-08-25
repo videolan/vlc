@@ -5354,7 +5354,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                               p_pes->es.fmt.i_extra ) ) ||
                     pespid->u.p_pes->extra_es.i_size != p_pes->extra_es.i_size ||
                     !!pespid->u.p_pes->es.fmt.psz_language != !!p_pes->es.fmt.psz_language ||
-                    ( pespid->u.p_pes->es.fmt.psz_language && p_pes->es.fmt.psz_language &&
+                    ( pespid->u.p_pes->es.fmt.psz_language != NULL &&
                       strcmp( pespid->u.p_pes->es.fmt.psz_language, p_pes->es.fmt.psz_language ) )
                   )
                 {
