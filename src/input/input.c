@@ -2313,9 +2313,11 @@ static int InputSourceInit( input_thread_t *p_input,
 
         char *psz_stream_filter = var_GetNonEmptyString( p_input,
                                                          "stream-filter" );
-        p_stream = stream_FilterChainNew( p_stream, psz_stream_filter,
-                               var_GetBool( p_input, "input-record-native" ) );
+        p_stream = stream_FilterChainNew( p_stream, psz_stream_filter );
         free( psz_stream_filter );
+
+        if( var_GetBool( p_input, "input-record-native" ) )
+            p_stream = stream_FilterChainNew( p_stream, "record" );
 
         if( !p_input->b_preparsing )
         {

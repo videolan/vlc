@@ -55,14 +55,11 @@ stream_t *stream_FilterNew( stream_t *p_source,
 stream_t *stream_FilterAutoNew( stream_t *source ) VLC_USED;
 
 /**
- * This function creates a chain of filters:
- * - optional user filters (configured by psz_chain) are inserted.
- * - an optional record filter is inserted if b_record is true.
+ * This function creates a chain of filters according to the colon-separated
+ * list.
  *
  * You must release the returned value using stream_Delete unless it is used as a
  * source to another filter.
  */
-stream_t *stream_FilterChainNew( stream_t *p_source,
-                                 const char *psz_chain,
-                                 bool b_record );
+stream_t *stream_FilterChainNew( stream_t *p_source, const char *psz_chain );
 #endif

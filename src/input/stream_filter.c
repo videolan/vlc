@@ -88,12 +88,13 @@ stream_t *stream_FilterAutoNew( stream_t *p_source )
     return p_source;
 }
 
-stream_t *stream_FilterChainNew( stream_t *p_source,
-                                 const char *psz_chain,
-                                 bool b_record )
+stream_t *stream_FilterChainNew( stream_t *p_source, const char *psz_chain )
 {
+    if( psz_chain == NULL )
+        return p_source;
+
     /* Add user stream filter */
-    char *psz_tmp = psz_chain ? strdup( psz_chain ) : NULL;
+    char *psz_tmp = strdup( psz_chain );
     char *psz = psz_tmp;
     while( psz && *psz )
     {
@@ -113,13 +114,6 @@ stream_t *stream_FilterChainNew( stream_t *p_source,
     }
     free( psz_tmp );
 
-    /* Add record filter if useful */
-    if( b_record )
-    {
-        stream_t *p_filter = stream_FilterNew( p_source, "record" );
-        if( p_filter )
-            p_source = p_filter;
-    }
     return p_source;
 }
 
