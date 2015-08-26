@@ -149,6 +149,18 @@ struct stream_sys_t
     block_t  *block;
 };
 
+static ssize_t AStreamNoRead(stream_t *s, void *buf, size_t len)
+{
+    (void) s; (void) buf; (void) len;
+    return -1;
+}
+
+static input_item_t *AStreamNoReadDir(stream_t *s)
+{
+    (void) s;
+    return NULL;
+}
+
 /* Block access */
 static ssize_t AStreamReadBlock(stream_t *s, void *buf, size_t len)
 {
@@ -232,8 +244,6 @@ static input_item_t *AStreamReadDir(stream_t *s)
 {
     stream_sys_t *sys = s->p_sys;
 
-    if (sys->access->pf_readdir == NULL)
-        return NULL;
     return sys->access->pf_readdir(sys->access);
 }
 
@@ -375,7 +385,7 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
 
     sys->block = NULL;
 
-    const char *cachename = NULL;
+    const char *cachename;
 
     if (sys->access->pf_block != NULL)
     {
@@ -388,7 +398,17 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
         s->pf_read = AStreamReadStream;
         cachename = "cache_read";
     }
-    s->pf_readdir = AStreamReadDir;
+    else
+    {
+        s->pf_read = AStreamNoRead;
+        cachename = NULL;
+    }
+
+    if (sys->access->pf_readdir != NULL)
+        s->pf_readdir = AStreamReadDir;
+    else
+        s->pf_readdir = AStreamNoReadDir;
+
     s->pf_control = AStreamControl;
     s->pf_destroy = AStreamDestroy;
     s->p_sys      = sys;
