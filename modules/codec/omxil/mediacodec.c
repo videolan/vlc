@@ -61,11 +61,13 @@ struct csd
     size_t i_size;
 };
 
+#define NEWBLOCK_FLAG_RESTART (0x01)
+#define NEWBLOCK_FLAG_FLUSH (0x02)
 /**
  * Callback called when a new block is processed from DecodeCommon.
  * It returns -1 in case of error, 0 if block should be dropped, 1 otherwise.
  */
-typedef int (*dec_on_new_block_cb)(decoder_t *, block_t *);
+typedef int (*dec_on_new_block_cb)(decoder_t *, block_t *, int *);
 
 /**
  * Callback called when decoder is flushing.
@@ -136,12 +138,12 @@ static int  OpenDecoderJni(vlc_object_t *);
 static int  OpenDecoderNdk(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
-static int Video_OnNewBlock(decoder_t *, block_t *);
+static int Video_OnNewBlock(decoder_t *, block_t *, int *);
 static int Video_GetOutput(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
 static void Video_OnFlush(decoder_t *);
 static picture_t *DecodeVideo(decoder_t *, block_t **);
 
-static int Audio_OnNewBlock(decoder_t *, block_t *);
+static int Audio_OnNewBlock(decoder_t *, block_t *, int *);
 static int Audio_GetOutput(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
 static void Audio_OnFlush(decoder_t *);
 static block_t *DecodeAudio(decoder_t *, block_t **);
@@ -1123,17 +1125,45 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block,
 
     if (b_new_block)
     {
-        int i_ret;
+        int i_ret, i_flags = 0;
 
         p_sys->b_new_block = false;
-        i_ret = p_sys->pf_on_new_block(p_dec, p_block);
+
+        if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
+        {
+            if (DecodeFlush(p_dec) != VLC_SUCCESS)
+                b_error = true;
+            goto endclean;
+        }
+
+        i_ret = p_sys->pf_on_new_block(p_dec, p_block, &i_flags);
         if (i_ret != 1)
         {
             if (i_ret == -1)
                 b_error = true;
             goto endclean;
         }
+        if (i_flags & NEWBLOCK_FLAG_FLUSH)
+        {
+            if (DecodeFlush(p_dec) != VLC_SUCCESS)
+            {
+                b_error = true;
+                goto endclean;
+            }
+        }
+
+        if (i_flags & NEWBLOCK_FLAG_RESTART)
+        {
+            StopMediaCodec(p_dec);
+            if (StartMediaCodec(p_dec) != VLC_SUCCESS)
+            {
+                b_error = true;
+                goto endclean;
+            }
+        }
     }
+    if (!p_sys->api->b_started)
+        goto endclean;
 
     do
     {
@@ -1242,45 +1272,34 @@ endclean:
     return b_error ? -1 : 0;
 }
 
-static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block)
+static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     bool b_csd_changed = false, b_size_changed = false;
-    bool b_delayed_start = false;
 
     if (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK
         && !p_sys->api->b_support_interlaced)
         return -1;
-
-    if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
-    {
-        if (DecodeFlush(p_dec) != VLC_SUCCESS)
-            return -1;
-        return 0;
-    }
 
     if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         H264ProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
     else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC)
         HEVCProcessBlock(p_dec, p_block, &b_csd_changed, &b_size_changed);
 
-    if (p_sys->api->b_started && b_csd_changed)
+    if (b_csd_changed)
     {
-        if (b_size_changed)
+        if (b_size_changed || !p_sys->api->b_started)
         {
-            msg_Err(p_dec, "SPS/PPS changed during playback and "
-                    "video size are different. Restart it !");
-            StopMediaCodec(p_dec);
+            if (p_sys->api->b_started)
+                msg_Err(p_dec, "SPS/PPS changed during playback and "
+                        "video size are different. Restart it !");
+            *p_flags |= NEWBLOCK_FLAG_RESTART;
         } else
         {
             msg_Err(p_dec, "SPS/PPS changed during playback. Flush it");
-            if (DecodeFlush(p_dec) != VLC_SUCCESS)
-                return -1;
+            *p_flags |= NEWBLOCK_FLAG_FLUSH;
         }
     }
-
-    if (b_csd_changed)
-        b_delayed_start = true;
 
     /* try delayed opening if there is a new extra data */
     if (!p_sys->api->b_started)
@@ -1289,18 +1308,15 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block)
         {
         case VLC_CODEC_VC1:
             if (p_dec->fmt_in.i_extra)
-                b_delayed_start = true;
+                *p_flags |= NEWBLOCK_FLAG_RESTART;
         default:
             break;
         }
-        if (b_delayed_start && StartMediaCodec(p_dec) != VLC_SUCCESS)
-            return -1;
-        if (!p_sys->api->b_started)
-            return 0;
     }
 
     timestamp_FifoPut(p_sys->u.video.timestamp_fifo,
                       p_block->i_pts ? VLC_TS_INVALID : p_block->i_dts);
+
     return 1;
 }
 
@@ -1338,16 +1354,9 @@ static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
     return p_out;
 }
 
-static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block)
+static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
-    {
-        if (DecodeFlush(p_dec) != VLC_SUCCESS)
-            return -1;
-        return 0;
-    }
 
     /* We've just started the stream, wait for the first PTS. */
     if (!date_Get(&p_sys->u.audio.i_end_date))
@@ -1360,31 +1369,23 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block)
     /* try delayed opening if there is a new extra data */
     if (!p_sys->api->b_started)
     {
-        bool b_delayed_start = false;
-
         switch (p_dec->fmt_in.i_codec)
         {
         case VLC_CODEC_VORBIS:
         case VLC_CODEC_MP4A:
             if (p_dec->fmt_in.i_extra)
-                b_delayed_start = true;
+                *p_flags |= NEWBLOCK_FLAG_RESTART;
         default:
             break;
         }
         if (!p_dec->p_sys->u.audio.i_channels && p_dec->fmt_in.audio.i_channels)
         {
             p_dec->p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
-            b_delayed_start = true;
+            *p_flags |= NEWBLOCK_FLAG_RESTART;
         }
 
-        if (b_delayed_start && !p_dec->p_sys->u.audio.i_channels
-         && p_sys->u.audio.b_need_channels)
-            b_delayed_start = false;
-
-        if (b_delayed_start && StartMediaCodec(p_dec) != VLC_SUCCESS)
-            return -1;
-        if (!p_sys->api->b_started)
-            return 0;
+        if (!p_dec->p_sys->u.audio.i_channels && p_sys->u.audio.b_need_channels)
+            *p_flags &= ~NEWBLOCK_FLAG_RESTART;
     }
     return 1;
 }
