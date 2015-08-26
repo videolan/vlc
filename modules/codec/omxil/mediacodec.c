@@ -210,6 +210,8 @@ static int CSDDup(decoder_t *p_dec, const struct csd *p_csd, size_t i_count)
         memcpy(p_sys->pp_csd[i]->p_buffer, p_csd[i].p_buf, p_csd[i].i_size);
         p_sys->i_csd_count++;
     }
+
+    p_sys->i_csd_send = 0;
     return VLC_SUCCESS;
 }
 
@@ -276,7 +278,6 @@ static int H264SetCSD(decoder_t *p_dec, void *p_buf, size_t i_size,
                 *p_size_changed = (sps.i_width != p_sys->u.video.i_width
                                 || sps.i_height != p_sys->u.video.i_height);
 
-            p_sys->i_csd_send = 0;
             p_sys->u.video.i_width = sps.i_width;
             p_sys->u.video.i_height = sps.i_height;
             return VLC_SUCCESS;
@@ -355,8 +356,6 @@ static int StartMediaCodec(decoder_t *p_dec)
             csd.i_size = p_dec->fmt_in.i_extra;
             CSDDup(p_dec, &csd, 1);
         }
-
-        p_sys->i_csd_send = 0;
     }
 
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
