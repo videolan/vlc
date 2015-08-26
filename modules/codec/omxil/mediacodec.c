@@ -78,7 +78,7 @@ typedef void (*dec_on_flush_cb)(decoder_t *);
  * Callback called when DecodeCommon try to get an output buffer (pic or block).
  * It returns -1 in case of error, or the number of output buffer returned.
  */
-typedef int (*dec_get_output_cb)(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
+typedef int (*dec_process_output_cb)(decoder_t *, mc_api_out *, picture_t **, block_t **);
 
 struct decoder_sys_t
 {
@@ -102,9 +102,9 @@ struct decoder_sys_t
     int64_t i_preroll_end;
 
     /* Specific Audio/Video callbacks */
-    dec_on_new_block_cb pf_on_new_block;
-    dec_get_output_cb   pf_get_output;
+    dec_on_new_block_cb     pf_on_new_block;
     dec_on_flush_cb         pf_on_flush;
+    dec_process_output_cb   pf_process_output;
 
     union
     {
@@ -139,13 +139,13 @@ static int  OpenDecoderNdk(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
 static int Video_OnNewBlock(decoder_t *, block_t *, int *);
-static int Video_GetOutput(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
 static void Video_OnFlush(decoder_t *);
+static int Video_ProcessOutput(decoder_t *, mc_api_out *, picture_t **, block_t **);
 static picture_t *DecodeVideo(decoder_t *, block_t **);
 
 static int Audio_OnNewBlock(decoder_t *, block_t *, int *);
-static int Audio_GetOutput(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
 static void Audio_OnFlush(decoder_t *);
+static int Audio_ProcessOutput(decoder_t *, mc_api_out *, picture_t **, block_t **);
 static block_t *DecodeAudio(decoder_t *, block_t **);
 
 static void InvalidateAllPictures(decoder_t *);
@@ -568,7 +568,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     {
         p_sys->pf_on_new_block = Video_OnNewBlock;
         p_sys->pf_on_flush = Video_OnFlush;
-        p_sys->pf_get_output = Video_GetOutput;
+        p_sys->pf_process_output = Video_ProcessOutput;
         p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
         p_sys->u.video.i_height = p_dec->fmt_in.video.i_height;
 
@@ -608,8 +608,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     else
     {
         p_sys->pf_on_new_block = Audio_OnNewBlock;
-        p_sys->pf_get_output = Audio_GetOutput;
         p_sys->pf_on_flush = Audio_OnFlush;
+        p_sys->pf_process_output = Audio_ProcessOutput;
         p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
 
         p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, 0);
@@ -761,59 +761,28 @@ static int InsertInflightPicture(decoder_t *p_dec, picture_t *p_pic,
     return 0;
 }
 
-static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
-                           block_t **pp_out_block, bool *p_abort,
-                           mtime_t i_timeout)
+static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
+                               picture_t **pp_out_pic, block_t **pp_out_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    mc_api_out out;
-    picture_t *p_pic = NULL;
-    int i_ret = 0, i_index;
 
     assert(pp_out_pic && !pp_out_block);
 
-    /* FIXME: A new picture shouldn't be created each time.  If
-     * decoder_NewPicture fails because the decoder is flushing/exiting,
-     * GetVideoOutput will either fail (or crash in function of devices), or
-     * never return an output buffer. Indeed, if the Decoder is flushing,
-     * MediaCodec can be stalled since the input is waiting for the output or
-     * vice-versa. Therefore, call decoder_NewPicture before GetVideoOutput as
-     * a safeguard. */
-
-    if (p_sys->b_has_format)
+    if (p_out->type == MC_OUT_TYPE_BUF)
     {
+        picture_t *p_pic = NULL;
+
         if (p_sys->b_update_format)
         {
             p_sys->b_update_format = false;
             if (decoder_UpdateVideoFormat(p_dec) != 0)
             {
                 msg_Err(p_dec, "decoder_UpdateVideoFormat failed");
+                p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
                 return -1;
             }
         }
-        p_pic = decoder_NewPicture(p_dec);
-        if (!p_pic) {
-            msg_Warn(p_dec, "NewPicture failed");
-            /* abort current Decode call */
-            *p_abort = true;
-            return 0;
-        }
-    }
 
-    i_index = p_sys->api->dequeue_out(p_sys->api, i_timeout);
-    if (i_index >= 0 || i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED
-     || i_index == MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
-        i_ret = p_sys->api->get_out(p_sys->api, i_index, &out);
-    else if (i_index == MC_API_INFO_TRYAGAIN)
-        i_ret = 0;
-    else
-        i_ret = -1;
-
-    if (i_ret != 1)
-        goto end;
-
-    if (out.type == MC_OUT_TYPE_BUF)
-    {
         /* If the oldest input block had no PTS, the timestamp of
          * the frame returned by MediaCodec might be wrong so we
          * overwrite it with the corresponding dts. Call FifoGet
@@ -823,18 +792,20 @@ static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
 
         if (!p_sys->b_has_format) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
-            i_ret = p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false);
-            goto end;
+            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
         }
 
-        if (out.u.buf.i_ts <= p_sys->i_preroll_end)
-        {
-            i_ret = p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false);
-            goto end;
+        if (p_out->u.buf.i_ts <= p_sys->i_preroll_end)
+            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
+
+        p_pic = decoder_NewPicture(p_dec);
+        if (!p_pic) {
+            msg_Warn(p_dec, "NewPicture failed");
+            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
         }
 
         if (forced_ts == VLC_TS_INVALID)
-            p_pic->date = out.u.buf.i_ts;
+            p_pic->date = p_out->u.buf.i_ts;
         else
             p_pic->date = forced_ts;
 
@@ -844,11 +815,11 @@ static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
             p_picsys->pf_lock_pic = NULL;
             p_picsys->pf_unlock_pic = UnlockPicture;
             p_picsys->priv.hw.p_dec = p_dec;
-            p_picsys->priv.hw.i_index = out.u.buf.i_index;
+            p_picsys->priv.hw.i_index = p_out->u.buf.i_index;
             p_picsys->priv.hw.b_valid = true;
 
             vlc_mutex_lock(get_android_opaque_mutex());
-            InsertInflightPicture(p_dec, p_pic, out.u.buf.i_index);
+            InsertInflightPicture(p_dec, p_pic, p_out->u.buf.i_index);
             vlc_mutex_unlock(get_android_opaque_mutex());
         } else {
             unsigned int chroma_div;
@@ -858,16 +829,21 @@ static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
                               NULL, NULL, &chroma_div);
             CopyOmxPicture(p_sys->u.video.i_pixel_format, p_pic,
                            p_sys->u.video.i_slice_height, p_sys->u.video.i_stride,
-                           (uint8_t *)out.u.buf.p_ptr, chroma_div,
+                           (uint8_t *)p_out->u.buf.p_ptr, chroma_div,
                            &p_sys->u.video.ascd);
 
-            if (p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false))
-                i_ret = -1;
+            if (p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false))
+            {
+                picture_Release(p_pic);
+                return -1;
+            }
         }
-        i_ret = 1;
+        assert(!(*pp_out_pic));
+        *pp_out_pic = p_pic;
+        return 1;
     } else {
-        assert(out.type == MC_OUT_TYPE_CONF);
-        p_sys->u.video.i_pixel_format = out.u.conf.video.pixel_format;
+        assert(p_out->type == MC_OUT_TYPE_CONF);
+        p_sys->u.video.i_pixel_format = p_out->u.conf.video.pixel_format;
         ArchitectureSpecificCopyHooksDestroy(p_sys->u.video.i_pixel_format,
                                              &p_sys->u.video.ascd);
 
@@ -879,56 +855,46 @@ static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
             if (!GetVlcChromaFormat(p_sys->u.video.i_pixel_format,
                                     &p_dec->fmt_out.i_codec, &name)) {
                 msg_Err(p_dec, "color-format not recognized");
-                i_ret = -1;
-                goto end;
+                return -1;
             }
         }
 
         msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
-                p_sys->u.video.i_pixel_format, name, out.u.conf.video.width, out.u.conf.video.height,
-                out.u.conf.video.stride, out.u.conf.video.slice_height,
-                out.u.conf.video.crop_left, out.u.conf.video.crop_top,
-                out.u.conf.video.crop_right, out.u.conf.video.crop_bottom);
+                p_sys->u.video.i_pixel_format, name, p_out->u.conf.video.width, p_out->u.conf.video.height,
+                p_out->u.conf.video.stride, p_out->u.conf.video.slice_height,
+                p_out->u.conf.video.crop_left, p_out->u.conf.video.crop_top,
+                p_out->u.conf.video.crop_right, p_out->u.conf.video.crop_bottom);
 
-        p_dec->fmt_out.video.i_width = out.u.conf.video.crop_right + 1 - out.u.conf.video.crop_left;
-        p_dec->fmt_out.video.i_height = out.u.conf.video.crop_bottom + 1 - out.u.conf.video.crop_top;
+        p_dec->fmt_out.video.i_width = p_out->u.conf.video.crop_right + 1 - p_out->u.conf.video.crop_left;
+        p_dec->fmt_out.video.i_height = p_out->u.conf.video.crop_bottom + 1 - p_out->u.conf.video.crop_top;
         if (p_dec->fmt_out.video.i_width <= 1
             || p_dec->fmt_out.video.i_height <= 1) {
-            p_dec->fmt_out.video.i_width = out.u.conf.video.width;
-            p_dec->fmt_out.video.i_height = out.u.conf.video.height;
+            p_dec->fmt_out.video.i_width = p_out->u.conf.video.width;
+            p_dec->fmt_out.video.i_height = p_out->u.conf.video.height;
         }
         p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
         p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
 
-        p_sys->u.video.i_stride = out.u.conf.video.stride;
-        p_sys->u.video.i_slice_height = out.u.conf.video.slice_height;
+        p_sys->u.video.i_stride = p_out->u.conf.video.stride;
+        p_sys->u.video.i_slice_height = p_out->u.conf.video.slice_height;
         if (p_sys->u.video.i_stride <= 0)
-            p_sys->u.video.i_stride = out.u.conf.video.width;
+            p_sys->u.video.i_stride = p_out->u.conf.video.width;
         if (p_sys->u.video.i_slice_height <= 0)
-            p_sys->u.video.i_slice_height = out.u.conf.video.height;
+            p_sys->u.video.i_slice_height = p_out->u.conf.video.height;
 
-        ArchitectureSpecificCopyHooks(p_dec, out.u.conf.video.pixel_format,
-                                      out.u.conf.video.slice_height,
+        ArchitectureSpecificCopyHooks(p_dec, p_out->u.conf.video.pixel_format,
+                                      p_out->u.conf.video.slice_height,
                                       p_sys->u.video.i_stride, &p_sys->u.video.ascd);
         if (p_sys->u.video.i_pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
-            p_sys->u.video.i_slice_height -= out.u.conf.video.crop_top/2;
+            p_sys->u.video.i_slice_height -= p_out->u.conf.video.crop_top/2;
         if (IgnoreOmxDecoderPadding(p_sys->psz_name)) {
             p_sys->u.video.i_slice_height = 0;
             p_sys->u.video.i_stride = p_dec->fmt_out.video.i_width;
         }
         p_sys->b_update_format = true;
         p_sys->b_has_format = true;
-        i_ret = 0;
+        return 0;
     }
-end:
-    if (p_pic)
-    {
-        if (i_ret == 1)
-            *pp_out_pic = p_pic;
-        else
-            picture_Release(p_pic);
-    }
-    return i_ret;
 }
 
 /* samples will be in the following order: FL FR FC LFE BL BR BC SL SR */
@@ -939,64 +905,47 @@ uint32_t pi_audio_order_src[] =
     AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
 };
 
-static int Audio_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
-                           block_t **pp_out_block, bool *p_abort,
-                           mtime_t i_timeout)
+static int Audio_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
+                               picture_t **pp_out_pic, block_t **pp_out_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    mc_api_out out;
-    int i_ret, i_index;
-    (void) p_abort;
 
     assert(!pp_out_pic && pp_out_block);
 
-
-    i_index = p_sys->api->dequeue_out(p_sys->api, i_timeout);
-    if (i_index >= 0 || i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED
-     || i_index == MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
-        i_ret = p_sys->api->get_out(p_sys->api, i_index, &out);
-    else if (i_index == MC_API_INFO_TRYAGAIN)
-        i_ret = 0;
-    else
-        i_ret = -1;
-
-    if (i_ret != 1)
-        return i_ret;
-
-    if (out.type == MC_OUT_TYPE_BUF)
+    if (p_out->type == MC_OUT_TYPE_BUF)
     {
         block_t *p_block = NULL;
         if (!p_sys->b_has_format) {
             msg_Warn(p_dec, "Buffers returned before output format is set, dropping frame");
-            return p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false);
+            return p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false);
         }
 
-        p_block = block_Alloc(out.u.buf.i_size);
+        p_block = block_Alloc(p_out->u.buf.i_size);
         if (!p_block)
             return -1;
-        p_block->i_nb_samples = out.u.buf.i_size
+        p_block->i_nb_samples = p_out->u.buf.i_size
                               / p_dec->fmt_out.audio.i_bytes_per_frame;
 
         if (p_sys->u.audio.b_extract)
         {
             aout_ChannelExtract(p_block->p_buffer,
                                 p_dec->fmt_out.audio.i_channels,
-                                out.u.buf.p_ptr, p_sys->u.audio.i_channels,
+                                p_out->u.buf.p_ptr, p_sys->u.audio.i_channels,
                                 p_block->i_nb_samples, p_sys->u.audio.pi_extraction,
                                 p_dec->fmt_out.audio.i_bitspersample);
         }
         else
-            memcpy(p_block->p_buffer, out.u.buf.p_ptr, out.u.buf.i_size);
+            memcpy(p_block->p_buffer, p_out->u.buf.p_ptr, p_out->u.buf.i_size);
 
-        if (out.u.buf.i_ts != 0 && out.u.buf.i_ts != date_Get(&p_sys->u.audio.i_end_date))
-            date_Set(&p_sys->u.audio.i_end_date, out.u.buf.i_ts);
+        if (p_out->u.buf.i_ts != 0 && p_out->u.buf.i_ts != date_Get(&p_sys->u.audio.i_end_date))
+            date_Set(&p_sys->u.audio.i_end_date, p_out->u.buf.i_ts);
 
         p_block->i_pts = date_Get(&p_sys->u.audio.i_end_date);
         p_block->i_length = date_Increment(&p_sys->u.audio.i_end_date,
                                            p_block->i_nb_samples)
                           - p_block->i_pts;
 
-        if (p_sys->api->release_out(p_sys->api, out.u.buf.i_index, false))
+        if (p_sys->api->release_out(p_sys->api, p_out->u.buf.i_index, false))
         {
             block_Release(p_block);
             return -1;
@@ -1007,29 +956,29 @@ static int Audio_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
         uint32_t i_layout_dst;
         int      i_channels_dst;
 
-        assert(out.type == MC_OUT_TYPE_CONF);
+        assert(p_out->type == MC_OUT_TYPE_CONF);
 
-        if (out.u.conf.audio.channel_count <= 0
-         || out.u.conf.audio.channel_count > 8
-         || out.u.conf.audio.sample_rate <= 0)
+        if (p_out->u.conf.audio.channel_count <= 0
+         || p_out->u.conf.audio.channel_count > 8
+         || p_out->u.conf.audio.sample_rate <= 0)
         {
             msg_Warn( p_dec, "invalid audio properties channels count %d, sample rate %d",
-                      out.u.conf.audio.channel_count,
-                      out.u.conf.audio.sample_rate);
+                      p_out->u.conf.audio.channel_count,
+                      p_out->u.conf.audio.sample_rate);
             return -1;
         }
 
         msg_Err(p_dec, "output: channel_count: %d, channel_mask: 0x%X, rate: %d",
-                out.u.conf.audio.channel_count, out.u.conf.audio.channel_mask,
-                out.u.conf.audio.sample_rate);
+                p_out->u.conf.audio.channel_count, p_out->u.conf.audio.channel_mask,
+                p_out->u.conf.audio.sample_rate);
 
         p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
         p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
 
-        p_dec->fmt_out.audio.i_rate = out.u.conf.audio.sample_rate;
-        date_Init(&p_sys->u.audio.i_end_date, out.u.conf.audio.sample_rate, 1 );
+        p_dec->fmt_out.audio.i_rate = p_out->u.conf.audio.sample_rate;
+        date_Init(&p_sys->u.audio.i_end_date, p_out->u.conf.audio.sample_rate, 1 );
 
-        p_sys->u.audio.i_channels = out.u.conf.audio.channel_count;
+        p_sys->u.audio.i_channels = p_out->u.conf.audio.channel_count;
         p_sys->u.audio.b_extract =
             aout_CheckChannelExtraction(p_sys->u.audio.pi_extraction,
                                         &i_layout_dst, &i_channels_dst,
@@ -1104,6 +1053,29 @@ static int DecodeFlush(decoder_t *p_dec)
     }
     p_sys->decoded = false;
     return VLC_SUCCESS;
+}
+
+static int GetAndProcessOutput(decoder_t *p_dec, picture_t **pp_out_pic,
+                               block_t **pp_out_block, mtime_t i_timeout)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    struct mc_api_out out;
+    int i_index, i_ret;
+
+    i_index = p_sys->api->dequeue_out(p_sys->api, i_timeout);
+    if (i_index >= 0 || i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED
+     || i_index == MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
+        i_ret = p_sys->api->get_out(p_sys->api, i_index, &out);
+    else if (i_index == MC_API_INFO_TRYAGAIN)
+        i_ret = 0;
+    else
+        i_ret = -1;
+
+    if (i_ret != 1)
+        return i_ret;
+
+    return p_sys->pf_process_output(p_dec, &out, pp_out_pic,
+                                    pp_out_block);
 }
 
 /**
@@ -1224,21 +1196,36 @@ static int DecodeCommon(decoder_t *p_dec, block_t **pp_block,
 
         if (i_input_ret != -1 && p_sys->decoded && i_output_ret == 0)
         {
-            i_output_ret = p_sys->pf_get_output(p_dec, pp_out_pic, pp_out_block,
-                                                &b_abort, timeout);
+            i_output_ret = GetAndProcessOutput(p_dec, pp_out_pic, pp_out_block,
+                                               timeout);
 
-            if (!p_sys->b_has_format && i_output_ret == 0 && i_input_ret == 0
-             && ++i_attempts > 100)
+            if (i_output_ret == 0 && i_input_ret == 0)
             {
-                /* No output and no format, thereforce mediacodec didn't
-                 * produce any output or events yet. Don't wait indefinitely
-                 * and abort after 2seconds (100 * 2 * 10ms) without any data.
-                 * Indeed, MediaCodec can fail without throwing any exception
-                 * or error returns... */
-                msg_Err(p_dec, "No output/input for %lld ms, abort",
-                                i_attempts * timeout);
-                b_error = true;
-                break;
+                if (++i_attempts == 20)
+                {
+                    /* HACK: When direct rendering is enabled, there is a
+                     * possible deadlock between the Decoder and the Vout. It
+                     * happens when the Vout is paused and when the Decoder is
+                     * flushing. In that case, the Vout won't release any
+                     * output buffers, therefore MediaCodec won't dequeue any
+                     * input buffers. To work around this issue, release all
+                     * output buffers if DecodeCommon is waiting more than 400
+                     * msec for a new input buffer. */ 
+                    msg_Warn(p_dec, "Decoder stuck: invalidate all buffers");
+                    InvalidateAllPictures(p_dec);
+                }
+                if (!p_sys->b_has_format && ++i_attempts > 100)
+                {
+                    /* No output and no format, thereforce mediacodec didn't
+                     * produce any output or events yet. Don't wait
+                     * indefinitely and abort after 2seconds (100 * 2 * 10ms)
+                     * without any data.  Indeed, MediaCodec can fail without
+                     * throwing any exception or error returns... */
+                    msg_Err(p_dec, "No output/input for %lld ms, abort",
+                                    i_attempts * timeout);
+                    b_error = true;
+                    break;
+                }
             }
         }
         timeout = 10 * 1000; // 10 ms
