@@ -68,6 +68,11 @@ struct csd
 typedef int (*dec_on_new_block_cb)(decoder_t *, block_t *);
 
 /**
+ * Callback called when decoder is flushing.
+ */
+typedef void (*dec_on_flush_cb)(decoder_t *);
+
+/**
  * Callback called when DecodeCommon try to get an output buffer (pic or block).
  * It returns -1 in case of error, or the number of output buffer returned.
  */
@@ -97,6 +102,7 @@ struct decoder_sys_t
     /* Specific Audio/Video callbacks */
     dec_on_new_block_cb pf_on_new_block;
     dec_get_output_cb   pf_get_output;
+    dec_on_flush_cb         pf_on_flush;
 
     union
     {
@@ -132,10 +138,12 @@ static void CloseDecoder(vlc_object_t *);
 
 static int Video_OnNewBlock(decoder_t *, block_t *);
 static int Video_GetOutput(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
+static void Video_OnFlush(decoder_t *);
 static picture_t *DecodeVideo(decoder_t *, block_t **);
 
 static int Audio_OnNewBlock(decoder_t *, block_t *);
 static int Audio_GetOutput(decoder_t *, picture_t **, block_t **, bool *, mtime_t);
+static void Audio_OnFlush(decoder_t *);
 static block_t *DecodeAudio(decoder_t *, block_t **);
 
 static void InvalidateAllPictures(decoder_t *);
@@ -557,6 +565,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     if (p_dec->fmt_in.i_cat == VIDEO_ES)
     {
         p_sys->pf_on_new_block = Video_OnNewBlock;
+        p_sys->pf_on_flush = Video_OnFlush;
         p_sys->pf_get_output = Video_GetOutput;
         p_sys->u.video.i_width = p_dec->fmt_in.video.i_width;
         p_sys->u.video.i_height = p_dec->fmt_in.video.i_height;
@@ -598,6 +607,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     {
         p_sys->pf_on_new_block = Audio_OnNewBlock;
         p_sys->pf_get_output = Audio_GetOutput;
+        p_sys->pf_on_flush = Audio_OnFlush;
         p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
 
         p_sys->psz_name = MediaCodec_GetName(VLC_OBJECT(p_dec), p_sys->mime, 0);
@@ -1078,6 +1088,8 @@ static int DecodeFlush(decoder_t *p_dec)
 
     if (p_sys->decoded || p_sys->i_csd_send > 0)
     {
+        p_sys->pf_on_flush(p_dec);
+
         p_sys->i_preroll_end = 0;
         if (p_sys->api->flush(p_sys->api) != VLC_SUCCESS)
             return VLC_EGENERIC;
@@ -1242,16 +1254,6 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block)
 
     if (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED))
     {
-        if (p_sys->decoded)
-        {
-            timestamp_FifoEmpty(p_sys->u.video.timestamp_fifo);
-            /* Invalidate all pictures that are currently in flight
-             * since flushing make all previous indices returned by
-             * MediaCodec invalid. */
-            if (p_sys->api->b_direct_rendering)
-                InvalidateAllPictures(p_dec);
-        }
-
         if (DecodeFlush(p_dec) != VLC_SUCCESS)
             return -1;
         return 0;
@@ -1302,6 +1304,18 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block)
     return 1;
 }
 
+static void Video_OnFlush(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    timestamp_FifoEmpty(p_sys->u.video.timestamp_fifo);
+    /* Invalidate all pictures that are currently in flight
+     * since flushing make all previous indices returned by
+     * MediaCodec invalid. */
+    if (p_sys->api->b_direct_rendering)
+        InvalidateAllPictures(p_dec);
+}
+
 static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -1332,7 +1346,6 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block)
     {
         if (DecodeFlush(p_dec) != VLC_SUCCESS)
             return -1;
-        date_Set(&p_sys->u.audio.i_end_date, VLC_TS_INVALID);
         return 0;
     }
 
@@ -1374,6 +1387,13 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block)
             return 0;
     }
     return 1;
+}
+
+static void Audio_OnFlush(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    date_Set(&p_sys->u.audio.i_end_date, VLC_TS_INVALID);
 }
 
 static block_t *DecodeAudio(decoder_t *p_dec, block_t **pp_block)
