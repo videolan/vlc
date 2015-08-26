@@ -730,7 +730,11 @@ static void InvalidateAllPictures(decoder_t *p_dec)
     for (unsigned int i = 0; i < p_sys->u.video.i_inflight_pictures; ++i) {
         picture_t *p_pic = p_sys->u.video.pp_inflight_pictures[i];
         if (p_pic) {
-            p_pic->p_sys->priv.hw.b_valid = false;
+            if (p_pic->p_sys->priv.hw.b_valid)
+            {
+                p_sys->api->release_out(p_sys->api, p_pic->p_sys->priv.hw.i_index, false);
+                p_pic->p_sys->priv.hw.b_valid = false;
+            }
             p_sys->u.video.pp_inflight_pictures[i] = NULL;
         }
     }
