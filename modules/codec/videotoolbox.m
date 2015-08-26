@@ -56,6 +56,8 @@ const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDe
 #if !TARGET_OS_IPHONE
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
 #endif
+#define VT_TEMPO_DEINTERLACE N_("Deinterlacing")
+#define VT_TEMPO_DEINTERLACE_LONG N_("If interlaced content is detected, temporal deinterlacing is enabled at the expense of a pipeline delay.")
 
 vlc_module_begin()
 set_category(CAT_INPUT)
@@ -64,6 +66,7 @@ set_description(N_("VideoToolbox video decoder"))
 set_capability("decoder",800)
 set_callbacks(OpenDecoder, CloseDecoder)
 
+add_bool("videotoolbox-temporal-deinterlacing", true, VT_TEMPO_DEINTERLACE, VT_TEMPO_DEINTERLACE_LONG, false)
 #if !TARGET_OS_IPHONE
 add_bool("videotoolbox-zero-copy", false, VT_ZERO_COPY, VT_ZERO_COPY, false)
 add_bool("videotoolbox-hw-decoder-only", false, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
@@ -104,6 +107,7 @@ struct decoder_sys_t
     NSMutableArray              *outputTimeStamps;
     NSMutableDictionary         *outputFrames;
     bool                        b_zero_copy;
+    bool                        b_enable_temporal_processing;
 };
 
 #pragma mark - start & stop
@@ -441,6 +445,17 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
                              kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder,
                              kCFBooleanTrue);
 #endif
+
+    p_sys->b_enable_temporal_processing = false;
+    if (var_InheritInteger(p_dec, "videotoolbox-temporal-deinterlacing")) {
+        if (p_block->i_flags & BLOCK_FLAG_TOP_FIELD_FIRST ||
+            p_block->i_flags & BLOCK_FLAG_BOTTOM_FIELD_FIRST) {
+            msg_Dbg(p_dec, "Interlaced content detected, inserting temporal deinterlacer");
+            CFDictionarySetValue(decoderConfiguration, kVTDecompressionPropertyKey_FieldMode, kVTDecompressionProperty_FieldMode_DeinterlaceFields);
+            CFDictionarySetValue(decoderConfiguration, kVTDecompressionPropertyKey_DeinterlaceMode, kVTDecompressionProperty_DeinterlaceMode_Temporal);
+            p_sys->b_enable_temporal_processing = true;
+        }
+    }
 
     /* create video format description */
     status = CMVideoFormatDescriptionCreate(kCFAllocatorDefault,
@@ -943,7 +958,10 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                                                 p_block->i_dts,
                                                 p_block->i_length);
             if (sampleBuffer) {
-                decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
+                if (likely(!p_sys->b_enable_temporal_processing))
+                    decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
+                else
+                    decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression | kVTDecodeFrame_EnableTemporalProcessing;
 
                 status = VTDecompressionSessionDecodeFrame(p_sys->session,
                                                            sampleBuffer,
