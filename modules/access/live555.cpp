@@ -314,7 +314,7 @@ static int  Open ( vlc_object_t *p_this )
     vlc_mutex_init(&p_sys->timeout_mutex);
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
-    vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
+    vlc_UrlParse( &p_sys->url, p_sys->psz_path, '?' );
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
     {
@@ -570,10 +570,12 @@ static int Connect( demux_t *p_demux )
         /* Create the URL by stripping away the username/password part */
         if( p_sys->url.i_port == 0 )
             p_sys->url.i_port = 554;
-        if( asprintf( &psz_url, "rtsp://%s:%d%s",
+        if( asprintf( &psz_url, "rtsp://%s:%d%s%s%s",
                       strempty( p_sys->url.psz_host ),
                       p_sys->url.i_port,
-                      strempty( p_sys->url.psz_path ) ) == -1 )
+                      strempty( p_sys->url.psz_path ),
+                      p_sys->url.psz_option ? "?" : "",
+                      strempty(p_sys->url.psz_option) ) == -1 )
             return VLC_ENOMEM;
 
         psz_user = strdup( strempty( p_sys->url.psz_username ) );
