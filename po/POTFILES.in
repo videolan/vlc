@@ -279,7 +279,6 @@ modules/access/vnc.c
 modules/access/wasapi.c
 modules/access/zip/zipstream.c
 modules/arm_neon/chroma_yuv.c
-modules/arm_neon/simple_channel_mixer.c
 modules/arm_neon/volume.c
 modules/arm_neon/yuv_rgb.c
 modules/audio_filter/audiobargraph_a.c

@@ -258,6 +258,12 @@ static void DoWork_6_1_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t
     }
 }
 
+#if defined (__arm__)
+#include "simple_neon.h"
+#define GET_WORK(in, out) GET_WORK_##in##_to_##out##_neon()
+#else
+#define GET_WORK(in, out) DoWork_##in##_to_##out
+#endif
 
 /*****************************************************************************
  * OpenFilter:
@@ -300,43 +306,43 @@ static int OpenFilter( vlc_object_t *p_this )
     if( output == AOUT_CHAN_CENTER )
     {
         if( b_input_7_x )
-            do_work = DoWork_7_x_to_1_0;
+            do_work = GET_WORK(7_x,1_0);
         else if( b_input_5_x )
-            do_work = DoWork_5_x_to_1_0;
+            do_work = GET_WORK(5_x,1_0);
         else if( b_input_4_center_rear )
-            do_work = DoWork_4_0_to_1_0;
+            do_work = GET_WORK(4_0,1_0);
         else if( b_input_3_x )
-            do_work = DoWork_3_x_to_1_0;
+            do_work = GET_WORK(3_x,1_0);
         else
-            do_work = DoWork_2_x_to_1_0;
+            do_work = GET_WORK(2_x,1_0);
     }
     else if( output == AOUT_CHANS_2_0 )
     {
         if( b_input_7_x )
-            do_work = DoWork_7_x_to_2_0;
+            do_work = GET_WORK(7_x,2_0);
         else if( b_input_6_1 )
-            do_work = DoWork_6_1_to_2_0;
+            do_work = GET_WORK(6_1,2_0);
         else if( b_input_5_x )
-            do_work = DoWork_5_x_to_2_0;
+            do_work = GET_WORK(5_x,2_0);
         else if( b_input_4_center_rear )
-            do_work = DoWork_4_0_to_2_0;
+            do_work = GET_WORK(4_0,2_0);
         else if( b_input_3_x )
-            do_work = DoWork_3_x_to_2_0;
+            do_work = GET_WORK(3_x,2_0);
     }
     else if( output == AOUT_CHANS_4_0 )
     {
         if( b_input_7_x )
-            do_work = DoWork_7_x_to_4_0;
+            do_work = GET_WORK(7_x,4_0);
         else if( b_input_5_x )
-            do_work = DoWork_5_x_to_4_0;
+            do_work = GET_WORK(5_x,4_0);
     }
     else if( (output & ~AOUT_CHAN_LFE) == AOUT_CHANS_5_0 ||
              (output & ~AOUT_CHAN_LFE) == AOUT_CHANS_5_0_MIDDLE )
     {
         if( b_input_7_x )
-            do_work = DoWork_7_x_to_5_x;
+            do_work = GET_WORK(7_x,5_x);
         else if( b_input_6_1 )
-            do_work = DoWork_6_1_to_5_x;
+            do_work = GET_WORK(6_1,5_x);
     }
 
     if( do_work == NULL )

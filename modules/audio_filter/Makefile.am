@@ -56,6 +56,9 @@ libtrivial_channel_mixer_plugin_la_SOURCES = \
 	audio_filter/channel_mixer/trivial.c
 libsimple_channel_mixer_plugin_la_SOURCES = \
 	audio_filter/channel_mixer/simple.c
+if HAVE_NEON
+libsimple_channel_mixer_plugin_la_SOURCES += arm_neon/simple_channel_mixer.S
+endif
 
 audio_filter_LTLIBRARIES += \
 	libdolby_surround_decoder_plugin.la \
