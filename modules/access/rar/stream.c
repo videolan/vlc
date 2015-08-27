@@ -61,6 +61,9 @@ int RarStreamOpen(vlc_object_t *object)
 {
     stream_t *s = (stream_t*)object;
 
+    if( s->psz_url == NULL )
+        return VLC_EGENERIC;
+
     if (RarProbe(s->p_source))
         return VLC_EGENERIC;
 
