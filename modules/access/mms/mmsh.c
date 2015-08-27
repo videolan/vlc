@@ -105,7 +105,7 @@ int MMSHOpen( access_t *p_access )
     if( psz_proxy )
     {
         p_sys->b_proxy = true;
-        vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
+        vlc_UrlParse( &p_sys->proxy, psz_proxy, '?' );
         free( psz_proxy );
     }
     else
@@ -114,7 +114,7 @@ int MMSHOpen( access_t *p_access )
         if( http_proxy )
         {
             p_sys->b_proxy = true;
-            vlc_UrlParse( &p_sys->proxy, http_proxy, 0 );
+            vlc_UrlParse( &p_sys->proxy, http_proxy, '?' );
         }
     }
 
@@ -136,7 +136,7 @@ int MMSHOpen( access_t *p_access )
     }
 
     /* open a tcp connection */
-    vlc_UrlParse( &p_sys->url, p_access->psz_location, 0 );
+    vlc_UrlParse( &p_sys->url, p_access->psz_location, '?' );
     if( ( p_sys->url.psz_host == NULL ) ||
         ( *p_sys->url.psz_host == '\0' ) )
     {
@@ -531,11 +531,13 @@ static int OpenConnection( access_t *p_access )
 
     if( p_sys->b_proxy )
     {
-        net_Printf( p_access, p_sys->fd, "GET http://%s:%d%s HTTP/1.0\r\n",
+        net_Printf( p_access, p_sys->fd, "GET http://%s:%d%s%s%s HTTP/1.0\r\n",
                     p_sys->url.psz_host, p_sys->url.i_port,
                     ( (p_sys->url.psz_path == NULL) ||
                       (*p_sys->url.psz_path == '\0') ) ?
-                         "/" : p_sys->url.psz_path );
+                         "/" : p_sys->url.psz_path,
+                    p_sys->url.psz_option ? "?" : "",
+                    p_sys->url.psz_option ? p_sys->url.psz_option : "" );
 
         /* Proxy Authentication */
         if( p_sys->proxy.psz_username && *p_sys->proxy.psz_username )
@@ -557,11 +559,13 @@ static int OpenConnection( access_t *p_access )
     }
     else
     {
-        net_Printf( p_access, p_sys->fd, "GET %s HTTP/1.0\r\n"
+        net_Printf( p_access, p_sys->fd, "GET %s%s%s HTTP/1.0\r\n"
                     "Host: %s:%d\r\n",
                     ( (p_sys->url.psz_path == NULL) ||
                       (*p_sys->url.psz_path == '\0') ) ?
                             "/" : p_sys->url.psz_path,
+                    p_sys->url.psz_option ? "?" : "",
+                    p_sys->url.psz_option ? p_sys->url.psz_option : "",
                     p_sys->url.psz_host, p_sys->url.i_port );
     }
     return VLC_SUCCESS;
