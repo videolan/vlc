@@ -92,7 +92,12 @@ static void test_url_parse(const char* in, const char* protocol, const char* use
                            const char* pass, const char* host, unsigned i_port,
                            const char* path, const char* option )
 {
-#define CHECK( a, b ) assert(((a == NULL) && (b == NULL)) || !strcmp((a), (b)))
+#define CHECK( a, b ) \
+    if (a == NULL) \
+        assert(b == NULL); \
+    else \
+        assert(b != NULL && !strcmp((a), (b)))
+
     vlc_url_t url;
     vlc_UrlParse( &url, in, '?' );
     CHECK( url.psz_protocol, protocol );
