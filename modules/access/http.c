@@ -287,7 +287,7 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
     p = psz = strdup( p_access->psz_location );
     while( (p = strchr( p, ' ' )) != NULL )
         *p = '+';
-    vlc_UrlParse( &p_sys->url, psz, '?' );
+    vlc_UrlParse( &p_sys->url, psz );
     free( psz );
 
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
@@ -372,7 +372,7 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
     if( psz != NULL )
     {
         p_sys->b_proxy = true;
-        vlc_UrlParse( &p_sys->proxy, psz, '?' );
+        vlc_UrlParse( &p_sys->proxy, psz );
         free( psz );
 
         psz = var_InheritString( p_access, "http-proxy-pwd" );

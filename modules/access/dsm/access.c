@@ -164,7 +164,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_session == NULL )
         goto error;
 
-    vlc_UrlParse( &p_sys->url, p_access->psz_location, 0 );
+    vlc_UrlParse( &p_sys->url, p_access->psz_location );
     get_credentials( p_access );
     if( get_address( p_access ) != VLC_SUCCESS )
         goto error;

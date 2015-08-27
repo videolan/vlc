@@ -256,7 +256,7 @@ static int Open( vlc_object_t *p_this )
     vlc_url_t url;
 
     psz_url = var_InheritString( p_vod, "rtsp-host" );
-    vlc_UrlParse( &url, psz_url, 0 );
+    vlc_UrlParse( &url, psz_url );
     free( psz_url );
 
     p_vod->p_sys = p_sys = malloc( sizeof( vod_sys_t ) );

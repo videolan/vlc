@@ -99,7 +99,7 @@ static void test_url_parse(const char* in, const char* protocol, const char* use
         assert(b != NULL && !strcmp((a), (b)))
 
     vlc_url_t url;
-    vlc_UrlParse( &url, in, '?' );
+    vlc_UrlParse( &url, in );
     CHECK( url.psz_protocol, protocol );
     CHECK( url.psz_username, user );
     CHECK( url.psz_password, pass );

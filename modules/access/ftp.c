@@ -578,7 +578,7 @@ static int parseURL( vlc_url_t *url, const char *path, enum tls_mode_e mode )
     while( *path == '/' )
         path++;
 
-    vlc_UrlParse( url, path, 0 );
+    vlc_UrlParse( url, path );
 
     if( url->psz_host == NULL || *url->psz_host == '\0' )
         return VLC_EGENERIC;

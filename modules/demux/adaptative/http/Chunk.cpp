@@ -54,7 +54,7 @@ Chunk::Chunk        (const std::string& url) :
         throw VLC_EGENERIC;
 
     vlc_url_t url_components;
-    vlc_UrlParse(&url_components, url.c_str(), '?');
+    vlc_UrlParse(&url_components, url.c_str());
 
     if(url_components.psz_path)
         path = url_components.psz_path;

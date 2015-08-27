@@ -339,7 +339,7 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
         int r;
         vlc_url_t url;
 
-        vlc_UrlParse( &url, psz_uri, 0 );
+        vlc_UrlParse( &url, psz_uri );
         if( url.psz_protocol )
         {
             if( url.i_port > 0 )

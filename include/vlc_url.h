@@ -50,6 +50,6 @@ VLC_API char * decode_URI( char *psz );
 VLC_API char * encode_URI_component( const char *psz ) VLC_MALLOC;
 VLC_API char * make_path( const char *url ) VLC_MALLOC;
 
-VLC_API void vlc_UrlParse (vlc_url_t *, const char *, unsigned char);
+VLC_API void vlc_UrlParse (vlc_url_t *, const char *);
 VLC_API void vlc_UrlClean (vlc_url_t *);
 #endif

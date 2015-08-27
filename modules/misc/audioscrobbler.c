@@ -644,7 +644,7 @@ static int Handshake(intf_thread_t *p_this)
         goto oom;
 
     /* parse the submission url */
-    vlc_UrlParse(&p_sys->p_submit_url, psz_url, 0);
+    vlc_UrlParse(&p_sys->p_submit_url, psz_url);
     free(psz_url);
 
     return VLC_SUCCESS;

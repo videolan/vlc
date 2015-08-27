@@ -105,7 +105,7 @@ int MMSHOpen( access_t *p_access )
     if( psz_proxy )
     {
         p_sys->b_proxy = true;
-        vlc_UrlParse( &p_sys->proxy, psz_proxy, '?' );
+        vlc_UrlParse( &p_sys->proxy, psz_proxy );
         free( psz_proxy );
     }
     else
@@ -114,7 +114,7 @@ int MMSHOpen( access_t *p_access )
         if( http_proxy )
         {
             p_sys->b_proxy = true;
-            vlc_UrlParse( &p_sys->proxy, http_proxy, '?' );
+            vlc_UrlParse( &p_sys->proxy, http_proxy );
         }
     }
 
@@ -136,7 +136,7 @@ int MMSHOpen( access_t *p_access )
     }
 
     /* open a tcp connection */
-    vlc_UrlParse( &p_sys->url, p_access->psz_location, '?' );
+    vlc_UrlParse( &p_sys->url, p_access->psz_location );
     if( ( p_sys->url.psz_host == NULL ) ||
         ( *p_sys->url.psz_host == '\0' ) )
     {

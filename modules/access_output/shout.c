@@ -184,7 +184,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    vlc_UrlParse( &url , p_access->psz_path, 0 );
+    vlc_UrlParse( &url , p_access->psz_path );
     if( url.i_port <= 0 )
         url.i_port = 8000;
 

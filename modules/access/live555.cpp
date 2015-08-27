@@ -314,7 +314,7 @@ static int  Open ( vlc_object_t *p_this )
     vlc_mutex_init(&p_sys->timeout_mutex);
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
-    vlc_UrlParse( &p_sys->url, p_sys->psz_path, '?' );
+    vlc_UrlParse( &p_sys->url, p_sys->psz_path );
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
     {

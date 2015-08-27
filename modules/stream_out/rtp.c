@@ -699,7 +699,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     vlc_url_t url;
 
-    vlc_UrlParse( &url, psz_url, 0 );
+    vlc_UrlParse( &url, psz_url );
     if( url.psz_protocol && !strcasecmp( url.psz_protocol, "http" ) )
     {
         if( p_sys->p_httpd_file )

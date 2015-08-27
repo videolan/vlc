@@ -127,7 +127,7 @@ int OpenVoD( vlc_object_t *p_this )
     else
     {
         vlc_url_t url;
-        vlc_UrlParse( &url, psz_url, 0 );
+        vlc_UrlParse( &url, psz_url );
         free( psz_url );
 
         if( url.psz_path == NULL )

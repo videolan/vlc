@@ -301,7 +301,7 @@ static int Activate( vlc_object_t *p_this )
     {
         vlc_url_t url;
 
-        vlc_UrlParse( &url, psz_host, 0 );
+        vlc_UrlParse( &url, psz_host );
 
         msg_Dbg( p_intf, "base: %s, port: %d", url.psz_host, url.i_port );
 

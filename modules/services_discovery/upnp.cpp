@@ -543,7 +543,7 @@ MediaServer::~MediaServer()
 input_item_t* MediaServer::newItem(const char *objectID, const char *title )
 {
     vlc_url_t url;
-    vlc_UrlParse( &url, url_.c_str(), '?' );
+    vlc_UrlParse( &url, url_.c_str() );
     char* psz_url;
 
     if (asprintf( &psz_url, "upnp://%s://%s:%u%s?ObjectID=%s", url.psz_protocol,
@@ -673,7 +673,7 @@ void MediaServer::fetchContents()
 {
     const char* objectID = "";
     vlc_url_t url;
-    vlc_UrlParse( &url, access_->psz_location, '?');
+    vlc_UrlParse( &url, access_->psz_location );
 
     if ( url.psz_option && !strncmp( url.psz_option, "ObjectID=", strlen( "ObjectID=" ) ) )
     {

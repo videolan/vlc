@@ -916,7 +916,7 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     unsigned port = var_InheritInteger(p_this, portvar);
 
     vlc_url_t url;
-    vlc_UrlParse(&url, hostname, 0);
+    vlc_UrlParse(&url, hostname);
     free(hostname);
     if (url.i_port != 0) {
         msg_Err(p_this, "Ignoring port %d (using %d)", url.i_port, port);

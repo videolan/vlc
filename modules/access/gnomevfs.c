@@ -136,7 +136,7 @@ static int Open( vlc_object_t *p_this )
         char *psz_escaped_path;
         char *psz_path_begin;
 
-        vlc_UrlParse( &url, psz_unescaped, 0 );
+        vlc_UrlParse( &url, psz_unescaped );
         psz_escaped_path = gnome_vfs_escape_path_string( url.psz_path );
 
         if( psz_escaped_path )

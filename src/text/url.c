@@ -350,13 +350,11 @@ static char *vlc_idna_to_ascii (const char *);
  * Splits an URL into parts.
  * \param url structure of URL parts [OUT]
  * \param str nul-terminated URL string to split
- * \param opt if non-zero, character separating paths from options,
- *            normally the question mark
  * \note Use vlc_UrlClean() to free associated resources
  * \bug Errors cannot be detected.
  * \return nothing
  */
-void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
+void vlc_UrlParse (vlc_url_t *restrict url, const char *str)
 {
     url->psz_protocol = NULL;
     url->psz_username = NULL;
@@ -396,14 +394,11 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
     }
 
     /* Query parameters */
-    if (opt != '\0')
+    char *query = strchr (cur, '?');
+    if (query != NULL)
     {
-        char *query = strchr (cur, opt);
-        if (query != NULL)
-        {
-            *(query++) = '\0';
-            url->psz_option = query;
-        }
+        *(query++) = '\0';
+        url->psz_option = query;
     }
 
     /* Path */

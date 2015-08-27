@@ -130,7 +130,7 @@ static int Open( vlc_object_t* p_this )
     p_sys->i_socket = -1;
 
     /* Parse the URL */
-    vlc_UrlParse( &url, p_access->psz_location, 0 );
+    vlc_UrlParse( &url, p_access->psz_location );
 
     /* Check for some parameters */
     if( EMPTY_STR( url.psz_host ) )

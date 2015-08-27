@@ -163,7 +163,7 @@ Net
 /!\ NB: this namespace is ONLY usable for interfaces and extensions.
 ---
 ----------------------------------------------------------------
-net.url_parse( url, [option delimiter] ): Parse URL. Returns a table with
+net.url_parse( url ): Parse URL. Returns a table with
   fields "protocol", "username", "password", "host", "port", path" and
   "option".
 net.listen_tcp( host, port ): Listen to TCP connections. This returns an
