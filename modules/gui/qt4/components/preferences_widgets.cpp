@@ -623,6 +623,8 @@ void ModuleListConfigControl::fillGrid( QGridLayout *l, int line )
 
 ModuleListConfigControl::~ModuleListConfigControl()
 {
+    foreach ( checkBoxListItem *it, modules )
+        free( it->psz_module );
     qDeleteAll( modules );
     modules.clear();
     delete groupBox;
