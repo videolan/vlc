@@ -287,7 +287,7 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
     p = psz = strdup( p_access->psz_location );
     while( (p = strchr( p, ' ' )) != NULL )
         *p = '+';
-    vlc_UrlParse( &p_sys->url, psz, 0 );
+    vlc_UrlParse( &p_sys->url, psz, '?' );
     free( psz );
 
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
@@ -372,7 +372,7 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
     if( psz != NULL )
     {
         p_sys->b_proxy = true;
-        vlc_UrlParse( &p_sys->proxy, psz, 0 );
+        vlc_UrlParse( &p_sys->proxy, psz, '?' );
         free( psz );
 
         psz = var_InheritString( p_access, "http-proxy-pwd" );
@@ -1121,12 +1121,16 @@ static int Request( access_t *p_access, uint64_t i_tell )
     if( !psz_path || !*psz_path )
         psz_path = "/";
     if( p_sys->b_proxy && p_sys->p_tls == NULL )
-        WriteHeaders( p_access, "GET http://%s:%d%s HTTP/1.%d\r\n",
+        WriteHeaders( p_access, "GET http://%s:%d%s%s%s HTTP/1.%d\r\n",
                       p_sys->url.psz_host, p_sys->url.i_port,
-                      psz_path, p_sys->i_version );
+                      psz_path, p_sys->url.psz_option ? "?" : "",
+                      p_sys->url.psz_option ? p_sys->url.psz_option : "",
+                      p_sys->i_version );
     else
-        WriteHeaders( p_access, "GET %s HTTP/1.%d\r\n",
-                      psz_path, p_sys->i_version );
+        WriteHeaders( p_access, "GET %s%s%s HTTP/1.%d\r\n",
+                      psz_path, p_sys->url.psz_option ? "?" : "",
+                      p_sys->url.psz_option ? p_sys->url.psz_option : "",
+                      p_sys->i_version );
     if( p_sys->url.i_port != (p_sys->p_tls ? 443 : 80) )
         WriteHeaders( p_access, "Host: %s:%d\r\n",
                       p_sys->url.psz_host, p_sys->url.i_port );
