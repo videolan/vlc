@@ -395,17 +395,23 @@ void vlc_UrlParse (vlc_url_t *restrict url, const char *str, unsigned char opt)
         cur = next;
     }
 
+    /* Query parameters */
+    if (opt != '\0')
+    {
+        char *query = strchr (cur, opt);
+        if (query != NULL)
+        {
+            *(query++) = '\0';
+            url->psz_option = query;
+        }
+    }
+
     /* Path */
     next = strchr (cur, '/');
     if (next != NULL)
     {
         *next = '\0'; /* temporary nul, reset to slash later */
         url->psz_path = next;
-        if (opt && (next = strchr (next + 1, opt)) != NULL)
-        {
-            *(next++) = '\0';
-            url->psz_option = next;
-        }
     }
     /*else
         url->psz_path = "/";*/
