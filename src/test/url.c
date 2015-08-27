@@ -171,6 +171,10 @@ int main (void)
     test ("file:///", "/");
     test ("file://localhost/home/john/music%2Eogg", "/home/john/music.ogg");
     test ("file://localhost/home/john/text#ref", "/home/john/text");
+    test ("file://localhost/home/john/text?name=value", "/home/john/text");
+    test ("file://localhost/home/john/text?name=value#ref", "/home/john/text");
+    test ("file://?name=value", NULL);
+    test ("file:///?name=value", "/");
     test ("fd://0foobar", NULL);
     test ("fd://0#ref", "/dev/stdin");
     test ("fd://1", "/dev/stdout");
