@@ -271,12 +271,9 @@ char *make_path (const char *url)
     size_t schemelen = ((end != NULL) ? end : path) - url;
     path += 3; /* skip "://" */
 
-    /* Remove HTML anchor if present */
-    end = strchr (path, '#');
-    if (end)
-        path = strndup (path, end - path);
-    else
-        path = strdup (path);
+    /* Remove request parameters and/or HTML anchor if present */
+    end = path + strcspn (path, "?#");
+    path = strndup (path, end - path);
     if (unlikely(path == NULL))
         return NULL; /* boom! */
 
