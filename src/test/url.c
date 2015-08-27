@@ -191,6 +191,10 @@ int main (void)
     test_url_parse("protocol://john:doe@1.2.3.4:567", "protocol", "john", "doe", "1.2.3.4", 567, NULL, NULL);
     test_url_parse("http://a.b/?opt=val", "http", NULL, NULL, "a.b", 0, "/", "opt=val");
     test_url_parse("p://u:p@host:123/a/b/c?o=v", "p", "u", "p", "host", 123, "/a/b/c", "o=v");
+    test_url_parse("p://?o=v", "p", NULL, NULL, "", 0, NULL, "o=v");
+    test_url_parse("p://h?o=v", "p", NULL, NULL, "h", 0, NULL, "o=v");
+    test_url_parse("p://h:123?o=v", "p", NULL, NULL, "h", 123, NULL, "o=v");
+    test_url_parse("p://u:p@h:123?o=v", "p", "u", "p", "h", 123, NULL, "o=v");
 
     return 0;
 }
