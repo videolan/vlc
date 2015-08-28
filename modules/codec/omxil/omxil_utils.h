@@ -209,8 +209,6 @@ void CopyOmxPicture( int i_color_format, picture_t *p_pic,
 
 void CopyVlcPicture( decoder_t *, OMX_BUFFERHEADERTYPE *, picture_t * );
 
-int IgnoreOmxDecoderPadding(const char *psz_name);
-
 /*****************************************************************************
  * Logging utility functions
  *****************************************************************************/
@@ -225,6 +223,16 @@ void PrintOmx(decoder_t *p_dec, OMX_HANDLETYPE omx_handle, OMX_U32 i_port);
  * Utility functions
  *****************************************************************************/
 bool OMXCodec_IsBlacklisted( const char *p_name, unsigned int i_name_len );
+
+enum {
+    OMXCODEC_NO_QUIRKS = 0,
+    OMXCODEC_QUIRKS_NEED_CSD = 0x1,
+    OMXCODEC_VIDEO_QUIRKS_NEED_SIZE = 0x2,
+    OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING = 0x4,
+    OMXCODEC_AUDIO_QUIRKS_NEED_CHANNELS = 0x8,
+};
+int OMXCodec_GetQuirks( int i_cat, vlc_fourcc_t i_codec,
+                        const char *p_name, unsigned int i_name_len );
 
 /*****************************************************************************
  * fourcc -> omx id mapping

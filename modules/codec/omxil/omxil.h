@@ -119,6 +119,7 @@ struct decoder_sys_t
     char psz_component[OMX_MAX_STRINGNAME_SIZE];
     char ppsz_components[MAX_COMPONENTS_LIST_SIZE][OMX_MAX_STRINGNAME_SIZE];
     unsigned int components;
+    int i_quirks;
 
     OmxEventQueue event_queue;
 

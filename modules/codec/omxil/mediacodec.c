@@ -100,6 +100,7 @@ struct decoder_sys_t
     bool error_state;
     bool b_new_block;
     int64_t i_preroll_end;
+    int     i_quirks;
 
     /* Specific Audio/Video callbacks */
     dec_on_new_block_cb     pf_on_new_block;
@@ -585,24 +586,17 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         if (!p_sys->psz_name)
             goto bailout;
 
-        /* Check if we need late opening */
-        switch (p_dec->fmt_in.i_codec)
+        p_sys->i_quirks = OMXCodec_GetQuirks( VIDEO_ES,
+                                              p_dec->fmt_in.i_codec,
+                                              p_sys->psz_name,
+                                              strlen(p_sys->psz_name) );
+
+        if ((p_sys->i_quirks & OMXCODEC_VIDEO_QUIRKS_NEED_SIZE)
+         && (!p_sys->u.video.i_width || !p_sys->u.video.i_height))
         {
-        case VLC_CODEC_H264:
-            if (!p_sys->u.video.i_width || !p_sys->u.video.i_height)
-            {
-                msg_Warn(p_dec, "waiting for sps/pps for codec %4.4s",
-                         (const char *)&p_dec->fmt_in.i_codec);
-                return VLC_SUCCESS;
-            }
-        case VLC_CODEC_VC1:
-            if (!p_dec->fmt_in.i_extra)
-            {
-                msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
-                         (const char *)&p_dec->fmt_in.i_codec);
-                return VLC_SUCCESS;
-            }
-            break;
+            msg_Warn(p_dec, "waiting for a valid video size for codec %4.4s",
+                     (const char *)&p_dec->fmt_in.i_codec);
+            return VLC_SUCCESS;
         }
     }
     else
@@ -616,29 +610,23 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         if (!p_sys->psz_name)
             goto bailout;
 
-        /* Marvel ACodec assert if channel count is 0 */
-        if (!strncmp(p_sys->psz_name, "OMX.Marvell",
-                     __MIN(strlen(p_sys->psz_name), strlen("OMX.Marvell"))))
-            p_sys->u.audio.b_need_channels = true;
-
-        /* Check if we need late opening */
-        switch (p_dec->fmt_in.i_codec)
-        {
-        case VLC_CODEC_VORBIS:
-        case VLC_CODEC_MP4A:
-            if (!p_dec->fmt_in.i_extra)
-            {
-                msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
-                         (const char *)&p_dec->fmt_in.i_codec);
-                return VLC_SUCCESS;
-            }
-            break;
-        }
-        if (!p_sys->u.audio.i_channels && p_sys->u.audio.b_need_channels)
+        p_sys->i_quirks = OMXCodec_GetQuirks( AUDIO_ES,
+                                              p_dec->fmt_in.i_codec,
+                                              p_sys->psz_name,
+                                              strlen(p_sys->psz_name) );
+        if ((p_sys->i_quirks & OMXCODEC_AUDIO_QUIRKS_NEED_CHANNELS)
+         && !p_sys->u.audio.i_channels)
         {
             msg_Warn(p_dec, "waiting for valid channel count");
             return VLC_SUCCESS;
         }
+    }
+    if ((p_sys->i_quirks & OMXCODEC_QUIRKS_NEED_CSD)
+     && !p_dec->fmt_in.i_extra)
+    {
+        msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
+                 (const char *)&p_dec->fmt_in.i_codec);
+        return VLC_SUCCESS;
     }
 
     if (StartMediaCodec(p_dec) == VLC_SUCCESS)
@@ -899,7 +887,8 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
                                       p_sys->u.video.i_stride, &p_sys->u.video.ascd);
         if (p_sys->u.video.i_pixel_format == OMX_TI_COLOR_FormatYUV420PackedSemiPlanar)
             p_sys->u.video.i_slice_height -= p_out->u.conf.video.crop_top/2;
-        if (IgnoreOmxDecoderPadding(p_sys->psz_name)) {
+        if ((p_sys->i_quirks & OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING))
+        {
             p_sys->u.video.i_slice_height = 0;
             p_sys->u.video.i_stride = p_dec->fmt_out.video.i_width;
         }
@@ -1304,17 +1293,19 @@ static int Video_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
         }
     }
 
-    /* try delayed opening if there is a new extra data */
     if (!p_sys->api->b_started)
     {
-        switch (p_dec->fmt_in.i_codec)
-        {
-        case VLC_CODEC_VC1:
-            if (p_dec->fmt_in.i_extra)
-                *p_flags |= NEWBLOCK_FLAG_RESTART;
-        default:
-            break;
-        }
+        *p_flags |= NEWBLOCK_FLAG_RESTART;
+
+        /* Don't start if we don't have any csd */
+        if ((p_sys->i_quirks & OMXCODEC_QUIRKS_NEED_CSD)
+         && !p_dec->fmt_in.i_extra && !p_sys->pp_csd)
+            *p_flags &= ~NEWBLOCK_FLAG_RESTART;
+
+        /* Don't start if we don't have a valid video size */
+        if ((p_sys->i_quirks & OMXCODEC_VIDEO_QUIRKS_NEED_SIZE)
+         && (!p_sys->u.video.i_width || !p_sys->u.video.i_height))
+            *p_flags &= ~NEWBLOCK_FLAG_RESTART;
     }
 
     timestamp_FifoPut(p_sys->u.video.timestamp_fifo,
@@ -1359,22 +1350,18 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t *p_block, int *p_flags)
     /* try delayed opening if there is a new extra data */
     if (!p_sys->api->b_started)
     {
-        switch (p_dec->fmt_in.i_codec)
-        {
-        case VLC_CODEC_VORBIS:
-        case VLC_CODEC_MP4A:
-            if (p_dec->fmt_in.i_extra)
-                *p_flags |= NEWBLOCK_FLAG_RESTART;
-        default:
-            break;
-        }
-        if (!p_dec->p_sys->u.audio.i_channels && p_dec->fmt_in.audio.i_channels)
-        {
-            p_dec->p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
-            *p_flags |= NEWBLOCK_FLAG_RESTART;
-        }
+        p_dec->p_sys->u.audio.i_channels = p_dec->fmt_in.audio.i_channels;
 
-        if (!p_dec->p_sys->u.audio.i_channels && p_sys->u.audio.b_need_channels)
+        *p_flags |= NEWBLOCK_FLAG_RESTART;
+
+        /* Don't start if we don't have any csd */
+        if ((p_sys->i_quirks & OMXCODEC_QUIRKS_NEED_CSD)
+         && !p_dec->fmt_in.i_extra)
+            *p_flags &= ~NEWBLOCK_FLAG_RESTART;
+
+        /* Don't start if we don't have a valid channels count */
+        if ((p_sys->i_quirks & OMXCODEC_AUDIO_QUIRKS_NEED_CHANNELS)
+         && !p_dec->p_sys->u.audio.i_channels)
             *p_flags &= ~NEWBLOCK_FLAG_RESTART;
     }
     return 1;

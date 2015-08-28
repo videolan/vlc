@@ -635,7 +635,7 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                     strlen("OMX.qcom.video.decoder")))
             def->format.video.eColorFormat = OMX_QCOM_COLOR_FormatYVU420SemiPlanar;
 
-        if (IgnoreOmxDecoderPadding(p_sys->psz_component)) {
+        if ((p_sys->i_quirks & OMXCODEC_VIDEO_QUIRKS_IGNORE_PADDING)) {
             def->format.video.nSliceHeight = 0;
             def->format.video.nStride = p_fmt->video.i_width;
         }
@@ -821,6 +821,7 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
     OMX_HANDLETYPE omx_handle;
     OMX_ERRORTYPE omx_error;
     unsigned int i;
+    int i_quirks;
     OMX_U8 psz_role[OMX_MAX_STRINGNAME_SIZE];
     OMX_PARAM_COMPONENTROLETYPE role;
     OMX_PARAM_PORTDEFINITIONTYPE definition;
@@ -835,6 +836,10 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
         return omx_error;
     }
     strncpy(p_sys->psz_component, psz_component, OMX_MAX_STRINGNAME_SIZE-1);
+    i_quirks = OMXCodec_GetQuirks(p_dec->fmt_in.i_cat,
+                                  p_sys->b_enc ? p_dec->fmt_out.i_codec : p_dec->fmt_in.i_codec,
+                                  p_sys->psz_component,
+                                  strlen(p_sys->psz_component));
 
     omx_error = OMX_ComponentRoleEnum(omx_handle, psz_role, 0);
     if(omx_error == OMX_ErrorNone)
@@ -976,6 +981,7 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
         }
     }
 
+    p_sys->i_quirks = i_quirks;
     *p_handle = omx_handle;
     return OMX_ErrorNone;
 
