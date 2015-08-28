@@ -50,6 +50,7 @@ ssize_t dvb_read (dvb_device_t *, void *, size_t);
 
 int dvb_add_pid (dvb_device_t *, uint16_t);
 void dvb_remove_pid (dvb_device_t *, uint16_t);
+bool dvb_get_pid_state (const dvb_device_t *, uint16_t);
 
 unsigned dvb_enum_systems (dvb_device_t *);
 float dvb_get_signal_strength (dvb_device_t *);

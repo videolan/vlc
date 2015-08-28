@@ -585,7 +585,14 @@ static int Control (access_t *access, int query, va_list args)
             break;
         }
 #endif
-        /*case ACCESS_GET_PRIVATE_ID_STATE: TODO? */
+        case ACCESS_GET_PRIVATE_ID_STATE:
+        {
+            unsigned pid = va_arg (args, int);
+            bool *on = va_arg (args, bool *);
+
+            *on = likely(pid <= 0x1FFF) ? dvb_get_pid_state(dev, pid) : false;
+            return VLC_SUCCESS;
+        }
 
         default:
             return VLC_EGENERIC;

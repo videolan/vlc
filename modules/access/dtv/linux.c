@@ -450,6 +450,18 @@ void dvb_remove_pid (dvb_device_t *d, uint16_t pid)
 #endif
 }
 
+bool dvb_get_pid_state (const dvb_device_t *d, uint16_t pid)
+{
+    if (d->budget)
+        return true;
+
+    for (size_t i = 0; i < MAX_PIDS; i++)
+        if (d->pids[i].pid == pid)
+            return true;
+
+    return false;
+}
+
 /** Finds a frontend of the correct type */
 static int dvb_open_frontend (dvb_device_t *d)
 {
