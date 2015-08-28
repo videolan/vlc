@@ -401,17 +401,7 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.audio.i_channel_count  = p_dec->p_sys->u.audio.i_channels;
     }
 
-    i_ret = p_sys->api->start(p_sys->api, p_sys->psz_name, p_sys->mime, &args);
-
-    if (i_ret == VLC_SUCCESS)
-    {
-        if (p_sys->api->b_direct_rendering)
-            p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
-        p_sys->b_update_format = true;
-        return VLC_SUCCESS;
-    }
-    else
-        return VLC_EGENERIC;
+    return p_sys->api->start(p_sys->api, p_sys->psz_name, p_sys->mime, &args);
 }
 
 /*****************************************************************************
@@ -875,7 +865,10 @@ static int Video_GetOutput(decoder_t *p_dec, picture_t **pp_out_pic,
                                              &p_sys->u.video.ascd);
 
         const char *name = "unknown";
-        if (!p_sys->api->b_direct_rendering) {
+        if (p_sys->api->b_direct_rendering)
+            p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
+        else
+        {
             if (!GetVlcChromaFormat(p_sys->u.video.i_pixel_format,
                                     &p_dec->fmt_out.i_codec, &name)) {
                 msg_Err(p_dec, "color-format not recognized");
