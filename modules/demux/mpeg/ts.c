@@ -807,7 +807,7 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
     /* VIDEO STREAM */
     else if( p_pes[3] >= 0xE0 && p_pes[3] <= 0xEF )
     {
-        if( !memcmp( p_data, "\x00\x00\x00", 4 ) )
+        if( !memcmp( p_data, "\x00\x00\x00\x01", 4 ) )
         {
             pid->probed.i_type = 0x1b;
             pid->probed.i_fourcc = VLC_CODEC_H264;
