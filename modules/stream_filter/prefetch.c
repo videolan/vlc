@@ -42,6 +42,9 @@
     ((void)(a), (void)(l), errno = EINVAL, -1)
 #define sysconf(a) 1
 #endif
+#if defined (_WIN32)
+#include <windows.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -431,8 +434,10 @@ static int Open(vlc_object_t *obj)
     if (sys->buffer_size < sys->read_size)
         sys->buffer_size = sys->read_size;
 
+#ifndef _WIN32
     /* Round up to a multiple of the page size */
     long page_size = sysconf(_SC_PAGESIZE);
+
     sys->buffer_size += page_size - 1;
     sys->buffer_size &= ~(page_size - 1);
 
@@ -455,6 +460,50 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
     close(fd);
+#else
+    SYSTEM_INFO info;
+    GetSystemInfo(&info);
+
+    sys->buffer_size += info.dwPageSize - 1;
+    sys->buffer_size &= ~(info.dwPageSize - 1);
+    sys->buffer = NULL;
+
+    HANDLE map = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
+                                   0, sys->buffer_size, NULL);
+    if (map == NULL)
+        goto error;
+
+    for (;;)
+    {
+        char *buffer = VirtualAlloc(NULL, 2 * sys->buffer_size, MEM_RESERVE,
+                                    PAGE_NOACCESS);
+        if (buffer == NULL)
+            break;
+
+        VirtualFree(buffer, 2 * sys->buffer_size, MEM_RELEASE);
+
+        char *a = MapViewOfFileEx(map, FILE_MAP_ALL_ACCESS, 0, 0,
+                                  sys->buffer_size, buffer);
+        char *b = MapViewOfFileEx(map, FILE_MAP_ALL_ACCESS, 0, 0,
+                                  sys->buffer_size, buffer + sys->buffer_size);
+
+        if (a == buffer && b == buffer + sys->buffer_size)
+        {
+            sys->buffer = buffer;
+            break;
+        }
+        if (b != NULL)
+            UnmapViewOfFile(b);
+        if (a != NULL)
+            UnmapViewOfFile(a);
+        if (a == NULL || b == NULL)
+            break; /* ENOMEM */
+    }
+
+    CloseHandle(map);
+    if (sys->buffer == NULL)
+        goto error;
+#endif /* _WIN32 */
 
     vlc_mutex_init(&sys->lock);
     vlc_cond_init(&sys->wait_data);
@@ -478,8 +527,16 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
+#ifndef _WIN32
     if (sys->buffer != MAP_FAILED)
         munmap(sys->buffer, 2 * sys->buffer_size);
+#else
+    if (sys->buffer != NULL)
+    {
+        UnmapViewOfFile(sys->buffer + sys->buffer_size);
+        UnmapViewOfFile(sys->buffer);
+    }
+#endif
     free(sys);
     return VLC_ENOMEM;
 }
@@ -499,7 +556,12 @@ static void Close (vlc_object_t *obj)
     vlc_cond_destroy(&sys->wait_data);
     vlc_mutex_destroy(&sys->lock);
 
+#ifndef _WIN32
     munmap(sys->buffer, 2 * sys->buffer_size);
+#else
+    UnmapViewOfFile(sys->buffer + sys->buffer_size);
+    UnmapViewOfFile(sys->buffer);
+#endif
     free(sys->content_type);
     free(sys);
 }
