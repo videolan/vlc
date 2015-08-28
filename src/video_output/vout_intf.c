@@ -293,6 +293,9 @@ void vout_IntfInit( vout_thread_t *p_vout )
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_vout, "sub-margin", SubMarginCallback, NULL );
 
+    var_Create( p_vout, "sub-text-scale",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-moved", VLC_VAR_COORDS );

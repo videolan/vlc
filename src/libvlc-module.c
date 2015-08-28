@@ -694,6 +694,9 @@ static const char *const ppsz_prefres[] = {
     "You can use this option to place the subtitles under the movie, " \
     "instead of over the movie. Try several positions.")
 
+#define SUB_TEXT_SCALE_TEXT N_("Subtitles text scaling factor")
+#define SUB_TEXT_SCALE_LONGTEXT N_("Set value to alter subtitles size where possible")
+
 #define SPU_TEXT N_("Enable sub-pictures")
 #define SPU_LONGTEXT N_( \
     "You can completely disable the sub-picture processing.")
@@ -1625,6 +1628,9 @@ vlc_module_begin ()
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, true )
     add_integer( "sub-margin", 0, SUB_MARGIN_TEXT,
                  SUB_MARGIN_LONGTEXT, true )
+    add_integer_with_range( "sub-text-scale", 100, 10, 500,
+               SUB_TEXT_SCALE_TEXT, SUB_TEXT_SCALE_LONGTEXT, false )
+        change_volatile  ()
     set_section( N_( "Overlays" ) , NULL )
     add_module_list( "sub-source", "sub source", NULL,
                      SUB_SOURCE_TEXT, SUB_SOURCE_LONGTEXT, false )
