@@ -840,6 +840,13 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
                                   p_sys->b_enc ? p_dec->fmt_out.i_codec : p_dec->fmt_in.i_codec,
                                   p_sys->psz_component,
                                   strlen(p_sys->psz_component));
+    if ((i_quirks & OMXCODEC_QUIRKS_NEED_CSD)
+      && !p_dec->fmt_in.i_extra)
+    {
+        /* TODO handle late configuration */
+        msg_Warn( p_dec, "codec need CSD" );
+        return OMX_ErrorUndefined;
+    }
 
     omx_error = OMX_ComponentRoleEnum(omx_handle, psz_role, 0);
     if(omx_error == OMX_ErrorNone)
