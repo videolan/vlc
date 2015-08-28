@@ -751,8 +751,8 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
         return;
 
     const uint8_t *p_data = &p_pes[i_payloadoffset];
-    /* AUDIO STREAM */
-    if(p_pes[3] >= 0xC0 && p_pes[3] <= 0xDF)
+    /* NON MPEG audio & subpictures STREAM */
+    if(p_pes[3] == 0xBD)
     {
         if( !memcmp( p_data, "\x7F\xFE\x80\x01", 4 ) )
         {
@@ -764,7 +764,11 @@ static void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart
             pid->probed.i_type = 0x06;
             pid->probed.i_fourcc = VLC_CODEC_EAC3;
         }
-        else if( p_data[0] == 0xFF && (p_data[1] & 0xE0) == 0xE0 )
+    }
+    /* MPEG AUDIO STREAM */
+    else if(p_pes[3] >= 0xC0 && p_pes[3] <= 0xDF)
+    {
+        if( p_data[0] == 0xFF && (p_data[1] & 0xE0) == 0xE0 )
         {
             switch(p_data[1] & 18)
             {
