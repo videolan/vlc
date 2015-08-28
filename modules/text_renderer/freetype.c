@@ -891,10 +891,11 @@ static void FreeStylesArray( text_style_t **pp_styles, size_t i_styles )
 }
 
 static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment, size_t *pi_string_length,
-                                            text_style_t ***ppp_styles, size_t *pi_styles )
+                                            text_style_t ***ppp_styles, size_t *pi_styles, bool b_grid )
 {
     text_style_t **pp_styles = NULL;
     uni_char_t *psz_uni = NULL;
+    const int i_scale = ( b_grid ) ? 100 : var_InheritInteger( p_filter, "sub-text-scale");
     size_t i_size = 0;
     size_t i_nb_char = 0;
     *pi_styles = 0;
@@ -950,6 +951,12 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
         /* Overwrite any default or value with forced ones */
         text_style_Merge( p_style, p_filter->p_sys->p_forced_style, true );
 
+        if( i_scale != 100 )
+        {
+            p_style->i_font_size = p_style->i_font_size * i_scale / 100;
+            p_style->f_font_relsize = p_style->f_font_relsize * i_scale / 100;
+        }
+
         // i_string_bytes is a number of bytes, while here we're going to assign pointer by pointer
         for ( size_t i = 0; i < i_string_bytes / sizeof( *psz_uni ); ++i )
             pp_styles[i_nb_char + i] = p_style;
@@ -977,7 +984,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     text_style_t **pp_styles = NULL;
     size_t i_text_length = 0;
     size_t i_styles = 0;
-    uni_char_t *psz_text = SegmentsToTextAndStyles( p_filter, p_region_in->p_text, &i_text_length, &pp_styles, &i_styles );
+    uni_char_t *psz_text = SegmentsToTextAndStyles( p_filter, p_region_in->p_text, &i_text_length,
+                                                    &pp_styles, &i_styles, p_region_in->b_gridmode );
     if( !psz_text || !pp_styles )
     {
         return VLC_EGENERIC;
@@ -1118,7 +1126,6 @@ error:
 
     return VLC_EGENERIC;
 }
-
 
 static int Create( vlc_object_t *p_this )
 {
