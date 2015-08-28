@@ -390,7 +390,20 @@ static int StartMediaCodec(decoder_t *p_dec)
         }
 
         if (!p_sys->u.video.p_awh && var_InheritBool(p_dec, CFG_PREFIX "dr"))
-            p_sys->u.video.p_awh = AWindowHandler_new(VLC_OBJECT(p_dec));
+        {
+            if ((p_sys->u.video.p_awh = AWindowHandler_new(VLC_OBJECT(p_dec))))
+            {
+                /* Direct rendering:
+                 * The surface must be released by the Vout before calling
+                 * start. Request a valid OPAQUE Vout to release any non-OPAQUE
+                 * Vout that will release the surface.
+                 */
+                p_dec->fmt_out.video.i_width = p_sys->u.video.i_width;
+                p_dec->fmt_out.video.i_height = p_sys->u.video.i_height;
+                p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
+                decoder_UpdateVideoFormat(p_dec);
+            }
+        }
         args.video.p_awh = p_sys->u.video.p_awh;
     }
     else
