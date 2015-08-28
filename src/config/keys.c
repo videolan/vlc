@@ -260,7 +260,7 @@ found:
 
 /*** VLC key map ***/
 
-#define MAXACTION 20
+#define MAXACTION 26
 struct action
 {
     char name[MAXACTION];
@@ -353,6 +353,9 @@ static const struct action actions[] =
     { "subsync-markaudio", ACTIONID_SUBSYNC_MARKAUDIO, },
     { "subsync-marksub", ACTIONID_SUBSYNC_MARKSUB, },
     { "subsync-reset", ACTIONID_SUBSYNC_RESET, },
+    { "subtitle-text-scale-down", ACTIONID_SUBTITLE_TEXT_SCALE_DOWN, },
+    { "subtitle-text-scale-normal", ACTIONID_SUBTITLE_TEXT_SCALE_NORMAL, },
+    { "subtitle-text-scale-up", ACTIONID_SUBTITLE_TEXT_SCALE_UP, },
     { "subtitle-toggle", ACTIONID_SUBTITLE_TOGGLE, },
     { "subtitle-track", ACTIONID_SUBTITLE_TRACK, },
     { "title-next", ACTIONID_TITLE_NEXT, },

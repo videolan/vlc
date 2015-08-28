@@ -1092,6 +1092,28 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             break;
         }
 
+        case ACTIONID_SUBTITLE_TEXT_SCALE_DOWN:
+        case ACTIONID_SUBTITLE_TEXT_SCALE_UP:
+        case ACTIONID_SUBTITLE_TEXT_SCALE_NORMAL:
+        {
+            if( p_vout )
+            {
+                int i_scale;
+                if( i_action == ACTIONID_SUBTITLE_TEXT_SCALE_NORMAL )
+                {
+                    i_scale = 100;
+                }
+                else
+                {
+                    i_scale = var_GetInteger( p_vout, "sub-text-scale" );
+                    i_scale += ((i_action == ACTIONID_SUBTITLE_TEXT_SCALE_UP) ? 1 : -1) * 25;
+                    i_scale = VLC_CLIP( i_scale, 10, 500 );
+                }
+                var_SetInteger( p_vout, "sub-text-scale", i_scale );
+                DisplayMessage( p_vout, _( "Subtitle text scale %d%%" ), i_scale );
+            }
+        }
+
         /* Input + video output */
         case ACTIONID_POSITION:
             if( p_vout && vout_OSDEpg( p_vout, input_GetItem( p_input ) ) )
