@@ -169,10 +169,14 @@ int OpenDemux( vlc_object_t *p_this )
         psz_url = strdup( p_demux->psz_file );
     else
     {
-        if( asprintf( &psz_url, "%s://%s", p_demux->psz_access, p_demux->psz_location ) == -1)
-            return VLC_ENOMEM;
+        if( asprintf( &psz_url, "%s://%s", p_demux->psz_access,
+                      p_demux->psz_location ) == -1)
+            psz_url = NULL;
     }
-    msg_Dbg( p_demux, "trying url: %s", psz_url );
+
+    if( psz_url != NULL )
+        msg_Dbg( p_demux, "trying url: %s", psz_url );
+
     /* Init Probe data */
     pd.filename = psz_url;
     if( ( pd.buf_size = stream_Peek( p_demux->s, (const uint8_t**)&pd.buf, 2048 + 213 ) ) <= 0 )
