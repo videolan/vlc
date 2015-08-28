@@ -626,6 +626,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     {
         msg_Warn(p_dec, "waiting for extra data for codec %4.4s",
                  (const char *)&p_dec->fmt_in.i_codec);
+        if (p_dec->fmt_in.i_codec == VLC_CODEC_MP4V)
+        {
+            msg_Warn(p_dec, "late opening with MPEG4 not handled"); /* TODO */
+            goto bailout;
+        }
         return VLC_SUCCESS;
     }
 
