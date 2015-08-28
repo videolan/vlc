@@ -1641,7 +1641,7 @@
       <property name="checked">
        <bool>false</bool>
       </property>
-      <layout class="QGridLayout" name="gridLayout">
+      <layout class="QGridLayout" name="gridLayout_0">
        <item row="0" column="0">
         <widget class="QLabel" name="label_9">
          <property name="text">
