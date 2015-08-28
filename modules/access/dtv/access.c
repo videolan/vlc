@@ -561,8 +561,8 @@ static int Control (access_t *access, int query, va_list args)
 
         case ACCESS_SET_PRIVATE_ID_STATE:
         {
-            unsigned pid = va_arg (args, unsigned);
-            bool add = va_arg (args, unsigned);
+            unsigned pid = va_arg (args, int);
+            bool add = va_arg (args, int);
 
             if (unlikely(pid > 0x1FFF))
                 return VLC_EGENERIC;
