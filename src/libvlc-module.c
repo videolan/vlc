@@ -1269,6 +1269,10 @@ static const char *const mouse_wheel_texts[] = {
 #define SUBDELAY_UP_KEY_LONGTEXT N_("Select the key to increase the subtitle delay.")
 #define SUBDELAY_DOWN_KEY_TEXT N_("Subtitle delay down")
 #define SUBDELAY_DOWN_KEY_LONGTEXT N_("Select the key to decrease the subtitle delay.")
+#define SUBTEXT_SCALE_KEY_TEXT     N_("Reset subtitles text scale")
+#define SUBTEXT_SCALEDOWN_KEY_TEXT N_("Scale up subtitles text")
+#define SUBTEXT_SCALEUP_KEY_TEXT   N_("Scale down subtitles text")
+#define SUBTEXT_SCALE_KEY_LONGTEXT N_("Select the key to change subtitles text scaling")
 #define SUBSYNC_MARKAUDIO_KEY_TEXT N_("Subtitle sync / bookmark audio timestamp")
 #define SUBSYNC_MARKAUDIO_KEY_LONGTEXT N_("Select the key to bookmark audio timestamp when syncing subtitles.")
 #define SUBSYNC_MARKSUB_KEY_TEXT N_("Subtitle sync / bookmark subtitle timestamp")
@@ -2144,6 +2148,9 @@ vlc_module_begin ()
 #   define KEY_SUBDELAY_DOWN      "h"
 #   define KEY_SUBPOS_DOWN        NULL
 #   define KEY_SUBPOS_UP          NULL
+#   define KEY_SUBTEXT_SCALEUP    "Command+Mouse Wheel Up"
+#   define KEY_SUBTEXT_SCALEDOWN  "Command+Mouse Wheel Down"
+#   define KEY_SUBTEXT_SCALE      "Command+0"
 #   define KEY_SUBSYNC_MARKAUDIO  "Shift+h"
 #   define KEY_SUBSYNC_MARKSUB    "Shift+j"
 #   define KEY_SUBSYNC_APPLY      "Shift+k"
@@ -2276,6 +2283,9 @@ vlc_module_begin ()
 #   define KEY_SUBDELAY_DOWN      "g"
 #   define KEY_SUBPOS_DOWN        NULL
 #   define KEY_SUBPOS_UP          NULL
+#   define KEY_SUBTEXT_SCALEUP    "Ctrl+Mouse Wheel Up"
+#   define KEY_SUBTEXT_SCALEDOWN  "Ctrl+Mouse Wheel Down"
+#   define KEY_SUBTEXT_SCALE      "Ctrl+0"
 #   define KEY_SUBSYNC_MARKAUDIO  "Shift+h"
 #   define KEY_SUBSYNC_MARKSUB    "Shift+j"
 #   define KEY_SUBSYNC_APPLY      "Shift+k"
@@ -2584,6 +2594,12 @@ vlc_module_begin ()
     add_key( "key-clear-playlist", KEY_PLAY_CLEAR,
              PLAY_CLEAR_KEY_TEXT, PLAY_CLEAR_KEY_LONGTEXT, true )
 
+    add_key( "key-subtitle-text-scale-normal", KEY_SUBTEXT_SCALE,
+             SUBTEXT_SCALE_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT, true )
+    add_key( "key-subtitle-text-scale-up", KEY_SUBTEXT_SCALEUP,
+             SUBTEXT_SCALEUP_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT, true )
+    add_key( "key-subtitle-text-scale-down", KEY_SUBTEXT_SCALEDOWN,
+             SUBTEXT_SCALEDOWN_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT, true )
 
     add_string( "bookmark1", NULL,
              BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, false )
