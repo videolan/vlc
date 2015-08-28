@@ -163,7 +163,23 @@ int OpenDemux( vlc_object_t *p_this )
     int64_t       i_start_time = -1;
     bool          b_can_seek;
     char         *psz_url;
+    const uint8_t *peek;
     int           error;
+
+    /* Init Probe data */
+    pd.buf_size = stream_Peek( p_demux->s, &peek, 2048 + 213 );
+    if( pd.buf_size <= 0 )
+    {
+        msg_Warn( p_demux, "cannot peek" );
+        return VLC_EGENERIC;
+    }
+
+    pd.buf = malloc( pd.buf_size + AVPROBE_PADDING_SIZE );
+    if( unlikely(pd.buf == NULL) )
+        return VLC_ENOMEM;
+
+    memcpy( pd.buf, peek, pd.buf_size );
+    memset( pd.buf + pd.buf_size, 0, AVPROBE_PADDING_SIZE );
 
     if( p_demux->psz_file )
         psz_url = strdup( p_demux->psz_file );
@@ -177,18 +193,13 @@ int OpenDemux( vlc_object_t *p_this )
     if( psz_url != NULL )
         msg_Dbg( p_demux, "trying url: %s", psz_url );
 
-    /* Init Probe data */
     pd.filename = psz_url;
-    if( ( pd.buf_size = stream_Peek( p_demux->s, (const uint8_t**)&pd.buf, 2048 + 213 ) ) <= 0 )
-    {
-        free( psz_url );
-        msg_Warn( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
+
     stream_Control( p_demux->s, STREAM_CAN_SEEK, &b_can_seek );
 
     vlc_init_avformat(p_this);
 
+    /* Guess format */
     char *psz_format = var_InheritString( p_this, "avformat-format" );
     if( psz_format )
     {
@@ -197,8 +208,12 @@ int OpenDemux( vlc_object_t *p_this )
         free( psz_format );
     }
 
-    /* Guess format */
-    if( !fmt && !( fmt = av_probe_input_format( &pd, 1 ) ) )
+    if( fmt == NULL )
+        fmt = av_probe_input_format( &pd, 1 );
+
+    free( pd.buf );
+
+    if( fmt == NULL )
     {
         msg_Dbg( p_demux, "couldn't guess format" );
         free( psz_url );
