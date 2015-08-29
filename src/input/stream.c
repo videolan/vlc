@@ -90,13 +90,14 @@ void stream_Delete(stream_t *s)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
 
-    if (priv->text.conv != (vlc_iconv_t)(-1))
-        vlc_iconv_close(priv->text.conv);
-    if (priv->peek != NULL)
-        block_Release(priv->peek);
-
     if (s->pf_destroy != NULL)
         s->pf_destroy(s);
+
+    if (priv->text.conv != (vlc_iconv_t)(-1))
+        vlc_iconv_close(priv->text.conv);
+
+    if (priv->peek != NULL)
+        block_Release(priv->peek);
 
     free(s->psz_url);
     vlc_object_release(s);
