@@ -977,7 +977,11 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
             subpic = NULL;
         }
         if (!sys->display.filtered)
+        {
+            if (subpic != NULL)
+                subpicture_Delete(subpic);
             return VLC_EGENERIC;
+        }
     }
 
     vout_chrono_Stop(&vout->p->render);
