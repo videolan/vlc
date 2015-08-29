@@ -273,7 +273,7 @@ static int extensionDialogCallback(vlc_object_t *p_this, const char *psz_variabl
         intf_thread_t *p_intf = VLCIntf;
         var_Create(p_intf, "dialog-extension", VLC_VAR_ADDRESS);
         var_AddCallback(p_intf, "dialog-extension", extensionDialogCallback, (__bridge void *)self);
-        dialog_Register(p_intf);
+        // dialog_Register(p_intf) is called by coredialog provider
     }
     return self;
 }

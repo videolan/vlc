@@ -51,7 +51,6 @@
     IBOutlet id o_prog_title_txt;
     IBOutlet id o_prog_win;
 }
-+ (VLCCoreDialogProvider *)sharedInstance;
 
 @property (atomic,readwrite) BOOL progressCancelled;
 

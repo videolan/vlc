@@ -154,7 +154,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     int items_at_launch;
 
     BOOL nib_about_loaded;      /* about nibfile */
-    BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
     BOOL b_active_videoplayback;
 
     NSWindowController *_mainWindowController;
@@ -215,7 +214,11 @@ static VLCMain *sharedInstance = nil;
         [VLCApplication sharedApplication].delegate = self;
 
         _input_manager = [[VLCInputManager alloc] initWithMain:self];
+
+        // first initalize extensions dialog provider, then core dialog
+        // provider which will register both at the core
         _extensionsManager = [[ExtensionsManager alloc] init];
+        _coredialogs = [[VLCCoreDialogProvider alloc] init];
 
         _mainmenu = [[VLCMainMenu alloc] init];
         _voutController = [[VLCVoutWindowController alloc] init];
@@ -600,11 +603,6 @@ static VLCMain *sharedInstance = nil;
 
 - (VLCCoreDialogProvider *)coreDialogProvider
 {
-    _coredialogs = [VLCCoreDialogProvider sharedInstance];
-    if (!nib_coredialogs_loaded) {
-        nib_coredialogs_loaded = [NSBundle loadNibNamed:@"CoreDialogs" owner: _coredialogs];
-    }
-
     return _coredialogs;
 }
 

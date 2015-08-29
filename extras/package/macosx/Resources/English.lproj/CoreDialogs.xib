@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">14B25</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
-		<string key="IBDocument.AppKitVersion">1343.16</string>
-		<string key="IBDocument.HIToolboxVersion">755.00</string>
+		<string key="IBDocument.SystemVersion">14F27</string>
+		<string key="IBDocument.InterfaceBuilderVersion">7706</string>
+		<string key="IBDocument.AppKitVersion">1348.17</string>
+		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6254</string>
+			<string key="NS.object.0">7706</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSButton</string>
@@ -31,7 +31,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="893187804">
 			<object class="NSCustomObject" id="802493260">
-				<string key="NSClassName">NSObject</string>
+				<string key="NSClassName">VLCCoreDialogProvider</string>
 			</object>
 			<object class="NSCustomObject" id="559966113">
 				<string key="NSClassName">FirstResponder</string>
@@ -61,6 +61,7 @@
 							<string key="NSFrame">{{94, 241}, {316, 17}}</string>
 							<reference key="NSSuperview" ref="784460927"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="895216305"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="576900989">
 								<int key="NSCellFlags">69206017</int>
@@ -100,6 +101,7 @@
 							<string key="NSFrame">{{94, 189}, {394, 44}}</string>
 							<reference key="NSSuperview" ref="784460927"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="463407669"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="683480755">
 								<int key="NSCellFlags">69206017</int>
@@ -123,6 +125,7 @@
 							<string key="NSFrame">{{97, 126}, {310, 22}}</string>
 							<reference key="NSSuperview" ref="784460927"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="377707840"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="577466516">
 								<int key="NSCellFlags">-1804599231</int>
@@ -160,6 +163,7 @@
 							<string key="NSFrame">{{94, 156}, {129, 14}}</string>
 							<reference key="NSSuperview" ref="784460927"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="763771318"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="979127236">
 								<int key="NSCellFlags">67108864</int>
@@ -179,6 +183,7 @@
 							<string key="NSFrame">{{97, 72}, {310, 22}}</string>
 							<reference key="NSSuperview" ref="784460927"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="648696081"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="113494320">
 								<int key="NSCellFlags">-1804599231</int>
@@ -199,6 +204,7 @@
 							<string key="NSFrame">{{94, 102}, {129, 14}}</string>
 							<reference key="NSSuperview" ref="784460927"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="50035503"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="381438595">
 								<int key="NSCellFlags">67108864</int>
@@ -218,6 +224,7 @@
 							<string key="NSFrame">{{383, 12}, {108, 32}}</string>
 							<reference key="NSSuperview" ref="784460927"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="357938558">
 								<int key="NSCellFlags">67108864</int>
@@ -241,6 +248,7 @@
 							<string key="NSFrame">{{275, 12}, {108, 32}}</string>
 							<reference key="NSSuperview" ref="784460927"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="353086939"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="71468088">
 								<int key="NSCellFlags">67108864</int>
@@ -272,6 +280,7 @@
 							<string key="NSFrame">{{20, 194}, {64, 64}}</string>
 							<reference key="NSSuperview" ref="784460927"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="848717079"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="1029161739">
 								<int key="NSCellFlags">134217728</int>
@@ -292,14 +301,12 @@
 					<string key="NSFrameSize">{505, 278}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="603904908"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1280, 777}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
-			</object>
-			<object class="NSCustomObject" id="493164665">
-				<string key="NSClassName">VLCCoreDialogProvider</string>
 			</object>
 			<object class="NSWindowTemplate" id="181099034">
 				<int key="NSWindowStyleMask">1</int>
@@ -316,7 +323,7 @@
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<string key="NSWindowContentMinSize">{213, 107}</string>
 				<object class="NSView" key="NSWindowView" id="755575325">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSTextField" id="787145765">
@@ -324,6 +331,8 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{89, 145}, {414, 17}}</string>
 							<reference key="NSSuperview" ref="755575325"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="565300589"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="310226383">
 								<int key="NSCellFlags">67108864</int>
@@ -342,6 +351,8 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{89, 95}, {414, 42}}</string>
 							<reference key="NSSuperview" ref="755575325"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="396289858"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="333125757">
 								<int key="NSCellFlags">67108864</int>
@@ -360,6 +371,8 @@
 							<int key="NSvFlags">1280</int>
 							<string key="NSFrame">{{90, 56}, {412, 20}}</string>
 							<reference key="NSSuperview" ref="755575325"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="663300827"/>
 							<int key="NSpiFlags">16396</int>
 							<double key="NSMaxValue">1000</double>
 						</object>
@@ -368,6 +381,8 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{398, 12}, {108, 32}}</string>
 							<reference key="NSSuperview" ref="755575325"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="842982813">
 								<int key="NSCellFlags">67108864</int>
@@ -398,6 +413,8 @@
 							</set>
 							<string key="NSFrame">{{20, 98}, {64, 64}}</string>
 							<reference key="NSSuperview" ref="755575325"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="787145765"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="958921464">
 								<int key="NSCellFlags">134217728</int>
@@ -413,8 +430,11 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{520, 182}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="489898872"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1280, 777}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -425,138 +445,130 @@
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_auth_win</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="404989243"/>
 					</object>
-					<int key="connectionID">290</int>
+					<int key="connectionID">330</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_auth_title_txt</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="848717079"/>
 					</object>
-					<int key="connectionID">291</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_auth_cancel_btn</string>
-						<reference key="source" ref="493164665"/>
-						<reference key="destination" ref="648696081"/>
-					</object>
-					<int key="connectionID">292</int>
+					<int key="connectionID">331</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_auth_description_txt</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="895216305"/>
 					</object>
-					<int key="connectionID">293</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_auth_login_fld</string>
-						<reference key="source" ref="493164665"/>
-						<reference key="destination" ref="763771318"/>
-					</object>
-					<int key="connectionID">294</int>
+					<int key="connectionID">332</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_auth_login_txt</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="463407669"/>
 					</object>
-					<int key="connectionID">295</int>
+					<int key="connectionID">333</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_auth_login_fld</string>
+						<reference key="source" ref="802493260"/>
+						<reference key="destination" ref="763771318"/>
+					</object>
+					<int key="connectionID">334</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_auth_pw_txt</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="377707840"/>
 					</object>
-					<int key="connectionID">296</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_auth_ok_btn</string>
-						<reference key="source" ref="493164665"/>
-						<reference key="destination" ref="353086939"/>
-					</object>
-					<int key="connectionID">297</int>
+					<int key="connectionID">335</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_auth_pw_fld</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="50035503"/>
 					</object>
-					<int key="connectionID">298</int>
+					<int key="connectionID">336</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">loginDialogAction:</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="648696081"/>
 					</object>
-					<int key="connectionID">299</int>
+					<int key="connectionID">338</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">loginDialogAction:</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="353086939"/>
 					</object>
-					<int key="connectionID">300</int>
+					<int key="connectionID">339</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_prog_title_txt</string>
-						<reference key="source" ref="493164665"/>
-						<reference key="destination" ref="787145765"/>
+						<string key="label">o_auth_ok_btn</string>
+						<reference key="source" ref="802493260"/>
+						<reference key="destination" ref="353086939"/>
 					</object>
-					<int key="connectionID">308</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_prog_bar</string>
-						<reference key="source" ref="493164665"/>
-						<reference key="destination" ref="396289858"/>
-					</object>
-					<int key="connectionID">309</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_prog_cancel_btn</string>
-						<reference key="source" ref="493164665"/>
-						<reference key="destination" ref="663300827"/>
-					</object>
-					<int key="connectionID">310</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">o_prog_description_txt</string>
-						<reference key="source" ref="493164665"/>
-						<reference key="destination" ref="565300589"/>
-					</object>
-					<int key="connectionID">311</int>
+					<int key="connectionID">340</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">o_prog_win</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="181099034"/>
 					</object>
-					<int key="connectionID">312</int>
+					<int key="connectionID">341</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_prog_title_txt</string>
+						<reference key="source" ref="802493260"/>
+						<reference key="destination" ref="787145765"/>
+					</object>
+					<int key="connectionID">342</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_prog_description_txt</string>
+						<reference key="source" ref="802493260"/>
+						<reference key="destination" ref="565300589"/>
+					</object>
+					<int key="connectionID">343</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_prog_bar</string>
+						<reference key="source" ref="802493260"/>
+						<reference key="destination" ref="396289858"/>
+					</object>
+					<int key="connectionID">344</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_prog_cancel_btn</string>
+						<reference key="source" ref="802493260"/>
+						<reference key="destination" ref="663300827"/>
+					</object>
+					<int key="connectionID">345</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">progDialogAction:</string>
-						<reference key="source" ref="493164665"/>
+						<reference key="source" ref="802493260"/>
 						<reference key="destination" ref="663300827"/>
 					</object>
-					<int key="connectionID">313</int>
+					<int key="connectionID">346</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -675,12 +687,6 @@
 							<reference ref="1029161739"/>
 						</array>
 						<reference key="parent" ref="784460927"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">289</int>
-						<reference key="object" ref="493164665"/>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">VLCCoreDialogProvider</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">301</int>
@@ -829,7 +835,6 @@
 				<string key="255.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="256.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="257.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="289.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="301.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="301.IBWindowTemplateEditedContentRect">{{412, 311}, {520, 182}}</string>
 				<string key="302.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -857,7 +862,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">329</int>
+			<int key="maxID">346</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
