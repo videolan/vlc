@@ -50,6 +50,7 @@
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
 #include <vlc_fs.h>
+#include <vlc_interrupt.h>
 
 struct stream_sys_t
 {
@@ -57,6 +58,7 @@ struct stream_sys_t
     vlc_cond_t   wait_data;
     vlc_cond_t   wait_space;
     vlc_thread_t thread;
+    vlc_interrupt_t *interrupt;
 
     bool         eof;
     bool         error;
@@ -142,6 +144,8 @@ static void *Thread(void *data)
     stream_t *stream = data;
     stream_sys_t *sys = stream->p_sys;
     bool paused = false;
+
+    vlc_interrupt_set(sys->interrupt);
 
     vlc_mutex_lock(&sys->lock);
     mutex_cleanup_push(&sys->lock);
@@ -283,12 +287,16 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     vlc_mutex_lock(&sys->lock);
     while ((copy = BufferLevel(stream, &eof)) == 0 && !eof)
     {
-        if (sys->error)
+        void *data[2];
+
+        if (sys->error || vlc_interrupt_forward_start(sys->interrupt, data))
         {
             vlc_mutex_unlock(&sys->lock);
             return -1;
         }
+
         vlc_cond_wait(&sys->wait_data, &sys->lock);
+        vlc_interrupt_forward_stop(data);
     }
 
     char *p = sys->buffer + (sys->stream_offset % sys->buffer_size);
@@ -505,6 +513,10 @@ static int Open(vlc_object_t *obj)
         goto error;
 #endif /* _WIN32 */
 
+    sys->interrupt = vlc_interrupt_create();
+    if (unlikely(sys->interrupt == NULL))
+        goto error;
+
     vlc_mutex_init(&sys->lock);
     vlc_cond_init(&sys->wait_data);
     vlc_cond_init(&sys->wait_space);
@@ -516,6 +528,7 @@ static int Open(vlc_object_t *obj)
         vlc_cond_destroy(&sys->wait_space);
         vlc_cond_destroy(&sys->wait_data);
         vlc_mutex_destroy(&sys->lock);
+        vlc_interrupt_destroy(sys->interrupt);
         goto error;
     }
 
@@ -552,6 +565,7 @@ static void Close (vlc_object_t *obj)
 
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
+    vlc_interrupt_destroy(sys->interrupt);
     vlc_cond_destroy(&sys->wait_space);
     vlc_cond_destroy(&sys->wait_data);
     vlc_mutex_destroy(&sys->lock);
