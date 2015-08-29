@@ -246,7 +246,7 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
     if( p_region->p_picture )
         picture_Release( p_region->p_picture );
 
-    // Don't release text_segment's, they are owned by the subpicture itself
+    text_segment_Delete( p_region->p_text );
     free( p_region->fmt.p_palette );
     free( p_region );
 }
