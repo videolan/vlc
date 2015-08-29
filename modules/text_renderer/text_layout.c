@@ -104,7 +104,7 @@ typedef struct paragraph_t
 {
     uni_char_t *p_code_points;            //Unicode code points
     int *pi_glyph_indices;                //Glyph index values within the run's font face
-    const text_style_t **pp_styles;
+    text_style_t **pp_styles;
     int *pi_run_ids;                      //The run to which each glyph belongs
     glyph_bitmaps_t *p_glyph_bitmaps;
     uint8_t *pi_karaoke_bar;
@@ -210,7 +210,7 @@ static void BBoxEnlarge( FT_BBox *p_max, const FT_BBox *p )
 static paragraph_t *NewParagraph( filter_t *p_filter,
                                   int i_size,
                                   const uni_char_t *p_code_points,
-                                  const text_style_t **pp_styles,
+                                  text_style_t **pp_styles,
                                   uint32_t *pi_k_dates,
                                   int i_runs_size )
 {
@@ -1243,7 +1243,7 @@ error:
 int LayoutText( filter_t *p_filter, line_desc_t **pp_lines,
                 FT_BBox *p_bbox, int *pi_max_face_height,
 
-                const uni_char_t *psz_text, const text_style_t **pp_styles,
+                const uni_char_t *psz_text, text_style_t **pp_styles,
                 uint32_t *pi_k_dates, int i_len, bool b_grid )
 {
     line_desc_t *p_first_line = 0;

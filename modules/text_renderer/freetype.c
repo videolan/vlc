@@ -876,12 +876,28 @@ static void FillDefaultStyles( filter_t *p_filter )
     text_style_Merge( p_sys->p_default_style, p_sys->p_forced_style, true );
 }
 
-static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment, size_t *pi_string_length, const text_style_t ***ppp_styles)
+static void FreeStylesArray( text_style_t **pp_styles, size_t i_styles )
 {
-    const text_style_t **pp_styles = NULL;
+    text_style_t *p_style = NULL;
+    for( size_t i = 0; i< i_styles; i++ )
+    {
+        if( p_style != pp_styles[i] )
+        {
+            p_style = pp_styles[i];
+            text_style_Delete( p_style );
+        }
+    }
+    free( pp_styles );
+}
+
+static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment, size_t *pi_string_length,
+                                            text_style_t ***ppp_styles, size_t *pi_styles )
+{
+    text_style_t **pp_styles = NULL;
     uni_char_t *psz_uni = NULL;
     size_t i_size = 0;
     size_t i_nb_char = 0;
+    *pi_styles = 0;
     for( const text_segment_t *s = p_segment; s != NULL; s = s->p_next )
     {
         if( !s->psz_text )
@@ -891,13 +907,13 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
         if( !psz_tmp )
         {
             free( psz_uni );
-            free( pp_styles );
+            FreeStylesArray( pp_styles, *pi_styles );
             return NULL;
         }
         uni_char_t *psz_realloc = realloc(psz_uni, i_size + i_string_bytes);
         if( unlikely( !psz_realloc ) )
         {
-            free( pp_styles );
+            FreeStylesArray( pp_styles, *pi_styles );
             free( psz_uni );
             free( psz_tmp );
             return NULL;
@@ -908,20 +924,21 @@ static uni_char_t* SegmentsToTextAndStyles( filter_t *p_filter, const text_segme
 
         // We want one text_style_t* per character. The amount of characters is the number of bytes divided by
         // the size of one glyph, in byte
-        const text_style_t **pp_styles_realloc = realloc( pp_styles, ( (i_size + i_string_bytes) / sizeof( *psz_uni ) * sizeof( *pp_styles ) ) );
+        const size_t i_newsize = (i_size + i_string_bytes) / sizeof( *psz_uni );
+        text_style_t **pp_styles_realloc = realloc( pp_styles, i_newsize * sizeof( *pp_styles ));
         if ( unlikely( !pp_styles_realloc ) )
         {
-            free( pp_styles );
+            FreeStylesArray( pp_styles, *pi_styles );
             free( psz_uni );
             return NULL;
         }
         pp_styles = pp_styles_realloc;
+        *pi_styles = i_newsize;
 
-        // We're actually writing to a read only object, something's wrong with the conception.
         text_style_t *p_style = text_style_Duplicate( p_filter->p_sys->p_default_style );
         if ( p_style == NULL )
         {
-            free( pp_styles );
+            FreeStylesArray( pp_styles, *pi_styles );
             free( psz_uni );
             return NULL;
         }
@@ -957,9 +974,10 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !p_region_in )
         return VLC_EGENERIC;
 
-    const text_style_t **pp_styles = NULL;
+    text_style_t **pp_styles = NULL;
     size_t i_text_length = 0;
-    uni_char_t *psz_text = SegmentsToTextAndStyles( p_filter, p_region_in->p_text, &i_text_length, &pp_styles );
+    size_t i_styles = 0;
+    uni_char_t *psz_text = SegmentsToTextAndStyles( p_filter, p_region_in->p_text, &i_text_length, &pp_styles, &i_styles );
     if( !psz_text || !pp_styles )
     {
         return VLC_EGENERIC;
@@ -1033,8 +1051,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     FreeLines( p_lines );
 
     free( psz_text );
-    // Let the styles themselves be freed by the text_segment's release
-    free( pp_styles );
+    FreeStylesArray( pp_styles, i_styles );
     free( pi_k_durations );
 
     return rv;
