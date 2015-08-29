@@ -60,9 +60,9 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
 PlaylistManager::~PlaylistManager   ()
 {
     delete conManager;
-    delete playlist;
     delete streamOutputFactory;
     unsetPeriod();
+    delete playlist;
 }
 
 void PlaylistManager::unsetPeriod()
