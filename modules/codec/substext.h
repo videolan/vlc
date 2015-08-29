@@ -112,6 +112,7 @@ static void SubpictureTextDestroy(subpicture_t *subpic)
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
 
     text_segment_ChainDelete( sys->p_segments );
+    text_style_Delete( sys->p_default_style );
     free(sys);
 }
 
