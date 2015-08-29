@@ -564,6 +564,7 @@ static void Close (vlc_object_t *obj)
     stream_sys_t *sys = stream->p_sys;
 
     vlc_cancel(sys->thread);
+    vlc_interrupt_kill(sys->interrupt);
     vlc_join(sys->thread, NULL);
     vlc_interrupt_destroy(sys->interrupt);
     vlc_cond_destroy(&sys->wait_space);
