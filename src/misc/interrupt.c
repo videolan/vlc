@@ -302,6 +302,41 @@ int vlc_mwait_i11e(mtime_t deadline)
     return ret;
 }
 
+static void vlc_interrupt_forward_wake(void *opaque)
+{
+    void **data = opaque;
+    vlc_interrupt_t *to = data[0];
+    vlc_interrupt_t *from = data[1];
+
+    (atomic_load(&from->killed) ? vlc_interrupt_kill
+                                : vlc_interrupt_raise)(to);
+}
+
+int vlc_interrupt_forward_start(vlc_interrupt_t *to, void *data[2])
+{
+    data[0] = data[1] = NULL;
+
+    vlc_interrupt_t *from = vlc_threadvar_get(vlc_interrupt_var);
+    if (from == NULL)
+        return 0;
+
+    assert(from != to);
+    data[0] = to;
+    data[1] = from;
+    return vlc_interrupt_prepare(from, vlc_interrupt_forward_wake, data);
+}
+
+int vlc_interrupt_forward_stop(void *const data[2])
+{
+    vlc_interrupt_t *from = data[1];
+    if (from == NULL)
+        return 0;
+
+    assert(from->callback == vlc_interrupt_forward_wake);
+    assert(from->data == data);
+    return vlc_interrupt_finish(from);
+}
+
 #ifndef _WIN32
 static void vlc_poll_i11e_wake(void *opaque)
 {

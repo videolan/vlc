@@ -189,5 +189,41 @@ VLC_API void vlc_interrupt_kill(vlc_interrupt_t *);
  */
 VLC_API bool vlc_killed(void) VLC_USED;
 
+/**
+ * Enables forwarding of interruption.
+ *
+ * If an interruption is raised through the context of the calling thread,
+ * it will be forwarded to the specified other context. This is used to cross
+ * thread boundaries.
+ *
+ * If the calling thread already has an interruption pending, this function
+ * dequeues the interrupt, return an error code and does not enable forwarding.
+ *
+ * If the calling thread has no interrupt context, this function does nothing
+ * and returns zero.
+ *
+ * @param to context to forward to
+ * @return 0 on success, or EINTR on error
+ */
+VLC_API int vlc_interrupt_forward_start(vlc_interrupt_t *to,
+                                        void *data[2]) VLC_USED;
+
+/**
+ * Undoes vlc_interrupt_forward_start().
+ *
+ * This function must be called after each succesful call to
+ * vlc_interrupt_forward_start() before any other interruptible call is made
+ * in the same thread.
+ *
+ * If an interruption was raised against the context of the calling thread
+ * (after the previous call to vlc_interrupt_forward_start()), it is dequeued.
+ *
+ * If the calling thread has no interrupt context, this function does nothing
+ * and returns zero.
+ *
+ * @return 0 if no interrupt was raised, EINTR if an interrupt was raised
+ */
+VLC_API int vlc_interrupt_forward_stop(void *const data[2]);
+
 /** @} @} */
 #endif
