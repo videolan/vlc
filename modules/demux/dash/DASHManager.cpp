@@ -133,7 +133,7 @@ bool DASHManager::updatePlaylist()
     /* Compute new MPD update time */
     mtime_t mininterval = 0;
     mtime_t maxinterval = 0;
-    playlist->getTimeLinesBoundaries(&mininterval, &maxinterval);
+    playlist->getPlaylistDurationsRange(&mininterval, &maxinterval);
 
     if(playlist->minUpdatePeriod.Get() > mininterval)
         mininterval = playlist->minUpdatePeriod.Get();

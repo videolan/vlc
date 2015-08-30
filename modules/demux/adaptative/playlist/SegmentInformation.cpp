@@ -244,15 +244,7 @@ mtime_t SegmentInformation::getPlaybackTimeBySegmentNumber(uint64_t number) cons
     return time;
 }
 
-void SegmentInformation::collectTimelines(std::vector<SegmentTimeline *> *timelines) const
-{
-    if(mediaSegmentTemplate && mediaSegmentTemplate->segmentTimeline.Get())
-        timelines->push_back(mediaSegmentTemplate->segmentTimeline.Get());
 
-    std::vector<SegmentInformation *>::const_iterator it;
-    for(it = childs.begin(); it != childs.end(); ++it)
-        (*it)->collectTimelines(timelines);
-}
 
 void SegmentInformation::getDurationsRange(mtime_t *min, mtime_t *max) const
 {
@@ -275,6 +267,18 @@ void SegmentInformation::getDurationsRange(mtime_t *min, mtime_t *max) const
 
     if(total > *max)
         *max = total;
+
+    if(mediaSegmentTemplate && mediaSegmentTemplate->segmentTimeline.Get())
+    {
+        const mtime_t duration = mediaSegmentTemplate->segmentTimeline.Get()->start() -
+                                 mediaSegmentTemplate->segmentTimeline.Get()->end();
+
+        if (!*min || duration < *min)
+            *min = duration;
+
+        if(duration > *max)
+            *max = duration;
+    }
 
     for(size_t i=0; i<childs.size(); i++)
         childs.at(i)->getDurationsRange(min, max);
