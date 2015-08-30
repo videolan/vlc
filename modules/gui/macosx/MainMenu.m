@@ -54,8 +54,6 @@
 
 @interface VLCMainMenu()
 {
-    BOOL b_nib_bookmarks_loaded;
-
     AboutWindowController *_aboutWindowController;
     HelpWindowController  *_helpWindowController;
     AddonsWindowController *_addonsController;

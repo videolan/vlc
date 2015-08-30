@@ -26,6 +26,8 @@
 #import "intf-prefs.h"
 #import "CoreInteraction.h"
 
+#include <unistd.h> /* execl() */
+
 @implementation VLCMain(OldPrefs)
 
 static NSString * kVLCPreferencesVersion = @"VLCPreferencesVersion";

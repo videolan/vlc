@@ -42,8 +42,6 @@
 #include <vlc_url.h>
 #include <vlc_variables.h>
 
-#include <unistd.h> /* execl() */
-
 #import "CompatibilityFixes.h"
 #import "InputManager.h"
 #import "MainMenu.h"
@@ -153,11 +151,9 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     BOOL launched;
     int items_at_launch;
 
-    BOOL nib_about_loaded;      /* about nibfile */
     BOOL b_active_videoplayback;
 
     NSWindowController *_mainWindowController;
-
     VLCMainMenu *_mainmenu;
     VLCPrefs *_prefs;
     VLCSimplePrefs *_sprefs;
