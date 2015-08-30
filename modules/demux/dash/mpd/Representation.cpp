@@ -103,7 +103,7 @@ std::string Representation::contextualize(size_t index, const std::string &compo
         if(pos != std::string::npos)
         {
             std::stringstream ss;
-            ss << (getScaledTimeBySegmentNumber(index, templ) * CLOCK_FREQ / templ->inheritTimescale());
+            ss << getScaledTimeBySegmentNumber(index, templ);
             ret.replace(pos, std::string("$Time$").length(), ss.str());
         }
 
