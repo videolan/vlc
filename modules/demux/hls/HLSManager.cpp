@@ -128,7 +128,7 @@ bool HLSManager::updatePlaylist()
     if(!playlist->isLive() || !playlist->minUpdatePeriod.Get())
         return true;
 
-    mtime_t now = time(NULL);
+    time_t now = time(NULL);
     if(nextPlaylistupdate && now < nextPlaylistupdate)
         return true;
 
@@ -150,7 +150,7 @@ bool HLSManager::updatePlaylist()
         if(!updatestream)
         {
             free(p_data);
-            nextPlaylistupdate = now + playlist->minUpdatePeriod.Get();
+            nextPlaylistupdate = now + playlist->minUpdatePeriod.Get() / CLOCK_FREQ;
             return false;
         }
 
@@ -159,7 +159,7 @@ bool HLSManager::updatePlaylist()
         if(!updatedplaylist)
         {
             stream_Delete(updatestream);
-            nextPlaylistupdate = now + playlist->minUpdatePeriod.Get();
+            nextPlaylistupdate = now + playlist->minUpdatePeriod.Get() / CLOCK_FREQ;
             return false;
         }
 
@@ -189,17 +189,19 @@ bool HLSManager::updatePlaylist()
         playlist->getPlaylistDurationsRange(&mininterval, &maxinterval);
     }
 
-    if(playlist->minUpdatePeriod.Get() * CLOCK_FREQ > mininterval)
-        mininterval = playlist->minUpdatePeriod.Get() * CLOCK_FREQ;
+    if(playlist->minUpdatePeriod.Get() > mininterval)
+        mininterval = playlist->minUpdatePeriod.Get();
+
+    if(mininterval < 5 * CLOCK_FREQ)
+        mininterval = 5 * CLOCK_FREQ;
 
     if(maxinterval < mininterval)
         maxinterval = mininterval;
 
-    nextPlaylistupdate = now + (mininterval + maxinterval) / (2 * CLOCK_FREQ);
+    nextPlaylistupdate = now + (mininterval + (maxinterval - mininterval) / 2) / CLOCK_FREQ;
 
-    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s "
-            "%" PRId64 " %" PRId64, nextPlaylistupdate - now, mininterval,
-            maxinterval);
+    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s (""%" PRId64 "..%" PRId64 ")",
+            nextPlaylistupdate - now, mininterval/ CLOCK_FREQ, maxinterval/ CLOCK_FREQ);
 
     return true;
 }

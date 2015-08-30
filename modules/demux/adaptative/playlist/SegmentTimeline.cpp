@@ -40,7 +40,7 @@ SegmentTimeline::~SegmentTimeline()
         delete *it;
 }
 
-void SegmentTimeline::addElement(mtime_t d, uint64_t r, mtime_t t)
+void SegmentTimeline::addElement(stime_t d, uint64_t r, stime_t t)
 {
     Element *element = new (std::nothrow) Element(d, r, t);
     if(element)
@@ -54,7 +54,7 @@ void SegmentTimeline::addElement(mtime_t d, uint64_t r, mtime_t t)
     }
 }
 
-uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(time_t scaled) const
+uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) const
 {
     uint64_t count = 0;
     std::list<Element *>::const_iterator it;
@@ -74,9 +74,9 @@ uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(time_t scaled) co
     return count;
 }
 
-mtime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) const
+stime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) const
 {
-    mtime_t totalscaledtime = 0;
+    stime_t totalscaledtime = 0;
 
     if(number < pruned)
         return 0;
@@ -120,12 +120,12 @@ size_t SegmentTimeline::maxElementNumber() const
 
 size_t SegmentTimeline::prune(mtime_t time)
 {
-    mtime_t scaled = time * inheritTimescale() / CLOCK_FREQ;
+    stime_t scaled = time * inheritTimescale() / CLOCK_FREQ;
     size_t prunednow = 0;
     while(elements.size())
     {
         Element *el = elements.front();
-        if(el->t + (el->d * (mtime_t)(el->r + 1)) < scaled)
+        if(el->t + (el->d * (stime_t)(el->r + 1)) < scaled)
         {
             prunednow += el->r + 1;
             delete el;
@@ -163,7 +163,7 @@ void SegmentTimeline::mergeWith(SegmentTimeline &other)
         }
         else if(el->t > last->t) /* Did not exist in previous list */
         {
-            if( el->t - last->t >= last->d * (mtime_t)(last->r + 1) )
+            if( el->t - last->t >= last->d * (stime_t)(last->r + 1) )
             {
                 elements.push_back(el);
                 last = el;
@@ -191,7 +191,7 @@ mtime_t SegmentTimeline::start() const
 {
     if(elements.empty())
         return 0;
-    return CLOCK_FREQ * elements.front()->t / inheritTimescale();
+    return elements.front()->t * CLOCK_FREQ / inheritTimescale();
 }
 
 mtime_t SegmentTimeline::end() const
@@ -199,11 +199,11 @@ mtime_t SegmentTimeline::end() const
     if(elements.empty())
         return 0;
     const Element *last = elements.back();
-    mtime_t scaled = last->t + last->d * (last->r + 1);
-    return CLOCK_FREQ * scaled / inheritTimescale();
+    stime_t scaled = last->t + last->d * (last->r + 1);
+    return scaled  * CLOCK_FREQ / inheritTimescale();
 }
 
-SegmentTimeline::Element::Element(mtime_t d_, uint64_t r_, mtime_t t_)
+SegmentTimeline::Element::Element(stime_t d_, uint64_t r_, stime_t t_)
 {
     d = d_;
     t = t_;

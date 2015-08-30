@@ -62,10 +62,10 @@ namespace adaptative
                 Property<time_t>                    playbackStart;
                 Property<time_t>                    availabilityEndTime;
                 Property<time_t>                    availabilityStartTime;
-                Property<time_t>                    minUpdatePeriod;
+                Property<mtime_t>                   minUpdatePeriod;
                 Property<mtime_t>                   maxSegmentDuration;
-                Property<time_t>                    minBufferTime;
-                Property<time_t>                    timeShiftBufferDepth;
+                Property<mtime_t>                   minBufferTime;
+                Property<mtime_t>                   timeShiftBufferDepth;
 
             protected:
                 stream_t                           *stream;

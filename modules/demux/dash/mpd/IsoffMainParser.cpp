@@ -101,12 +101,12 @@ void    IsoffMainParser::setMPDAttributes   ()
 
     it = attr.find("minBufferTime");
     if(it != attr.end())
-        this->mpd->minBufferTime.Set(IsoTime(it->second));
+        this->mpd->minBufferTime.Set(IsoTime(it->second) * CLOCK_FREQ);
 
     it = attr.find("minimumUpdatePeriod");
     if(it != attr.end())
     {
-        mtime_t minupdate = IsoTime(it->second);
+        mtime_t minupdate = IsoTime(it->second) * CLOCK_FREQ;
         if(minupdate > 0)
             mpd->minUpdatePeriod.Set(minupdate);
     }
@@ -125,7 +125,7 @@ void    IsoffMainParser::setMPDAttributes   ()
 
     it = attr.find("timeShiftBufferDepth");
         if(it != attr.end())
-            mpd->timeShiftBufferDepth.Set(IsoTime(it->second));
+            mpd->timeShiftBufferDepth.Set(IsoTime(it->second) * CLOCK_FREQ);
 }
 
 void IsoffMainParser::parsePeriods(Node *root)
@@ -140,9 +140,9 @@ void IsoffMainParser::parsePeriods(Node *root)
             continue;
         parseSegmentInformation(*it, period);
         if((*it)->hasAttribute("start"))
-            period->startTime.Set(IsoTime((*it)->getAttributeValue("start")));
+            period->startTime.Set(IsoTime((*it)->getAttributeValue("start")) * CLOCK_FREQ);
         if((*it)->hasAttribute("duration"))
-            period->duration.Set(IsoTime((*it)->getAttributeValue("duration")));
+            period->duration.Set(IsoTime((*it)->getAttributeValue("duration")) * CLOCK_FREQ);
         if((*it)->hasAttribute("id"))
             period->setId((*it)->getAttributeValue("id"));
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(*it, "BaseURL");
@@ -169,11 +169,11 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
     if(templateNode->hasAttribute("startNumber"))
         mediaTemplate->startNumber.Set(Integer<uint64_t>(templateNode->getAttributeValue("startNumber")));
 
-    if(templateNode->hasAttribute("duration"))
-        mediaTemplate->duration.Set(Integer<mtime_t>(templateNode->getAttributeValue("duration")));
-
     if(templateNode->hasAttribute("timescale"))
         mediaTemplate->timescale.Set(Integer<uint64_t>(templateNode->getAttributeValue("timescale")));
+
+    if(templateNode->hasAttribute("duration"))
+        mediaTemplate->duration.Set(Integer<stime_t>(templateNode->getAttributeValue("duration")));
 
     InitSegmentTemplate *initTemplate = NULL;
 
@@ -346,7 +346,7 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
             parseInitSegment(DOMHelper::getFirstChildElementByName(segListNode, "Initialization"), list, info);
 
             if(segListNode->hasAttribute("duration"))
-                list->duration.Set(Integer<uint64_t>(segListNode->getAttributeValue("duration")));
+                list->duration.Set(Integer<stime_t>(segListNode->getAttributeValue("duration")));
 
             if(segListNode->hasAttribute("timescale"))
                 list->timescale.Set(Integer<uint64_t>(segListNode->getAttributeValue("timescale")));
@@ -422,13 +422,13 @@ void IsoffMainParser::parseTimeline(Node *node, MediaSegmentTemplate *templ)
             const Node *s = *it;
             if(!s->hasAttribute("d")) /* Mandatory */
                 continue;
-            mtime_t d = Integer<mtime_t>(s->getAttributeValue("d"));
-            mtime_t r = 0; // never repeats by default
+            stime_t d = Integer<stime_t>(s->getAttributeValue("d"));
+            uint64_t r = 0; // never repeats by default
             if(s->hasAttribute("r"))
                 r = Integer<uint64_t>(s->getAttributeValue("r"));
             if(s->hasAttribute("t"))
             {
-                mtime_t t = Integer<mtime_t>(s->getAttributeValue("t"));
+                stime_t t = Integer<stime_t>(s->getAttributeValue("t"));
                 timeline->addElement(d, r, t);
             }
             else timeline->addElement(d, r);
@@ -470,7 +470,7 @@ IsoTime::IsoTime(const std::string &str)
     time = str_duration(str.c_str());
 }
 
-IsoTime::operator mtime_t () const
+IsoTime::operator time_t () const
 {
     return time;
 }
@@ -543,7 +543,7 @@ UTCTime::UTCTime(const std::string &str)
     }
 }
 
-UTCTime::operator mtime_t () const
+UTCTime::operator time_t () const
 {
     return time;
 }

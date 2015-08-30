@@ -65,8 +65,8 @@ Url SegmentInfoCommon::getUrlSegment() const
     return ret;
 }
 
-bool SegmentInfoCommon::getSegmentNumberByTime(const std::vector<ISegment *> &segments,
-                                                      mtime_t time, uint64_t *ret)
+bool SegmentInfoCommon::getSegmentNumberByScaledTime(const std::vector<ISegment *> &segments,
+                                                      stime_t time, uint64_t *ret)
 {
     if(segments.empty() || (segments.size() > 1 && segments[1]->startTime.Get() == 0) )
         return false;

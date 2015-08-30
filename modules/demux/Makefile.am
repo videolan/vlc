@@ -307,6 +307,7 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/Streams.cpp \
     demux/adaptative/Streams.hpp \
     demux/adaptative/StreamsType.hpp \
+    demux/adaptative/Time.hpp \
     demux/adaptative/tools/Helper.cpp \
     demux/adaptative/tools/Helper.h \
     demux/adaptative/tools/Properties.hpp \

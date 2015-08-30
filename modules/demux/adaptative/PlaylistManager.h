@@ -85,7 +85,7 @@ namespace adaptative
             AbstractStreamOutputFactory         *streamOutputFactory;
             demux_t                             *p_demux;
             std::vector<Stream *>                streams;
-            mtime_t                              nextPlaylistupdate;
+            time_t                               nextPlaylistupdate;
             mtime_t                              i_nzpcr;
             BasePeriod                          *currentPeriod;
     };

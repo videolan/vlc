@@ -118,7 +118,7 @@ int ISegment::compare(ISegment *other) const
 {
     if(duration.Get())
     {
-        int64_t diff = startTime.Get() - other->startTime.Get();
+        stime_t diff = startTime.Get() - other->startTime.Get();
         if(diff)
             return diff / diff;
     }

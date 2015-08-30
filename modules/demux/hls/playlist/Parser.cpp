@@ -186,8 +186,8 @@ void Parser::parseSegments(Representation *rep, const std::list<Tag *> &tagslist
 
     rep->timescale.Set(100);
 
-    int64_t totalduration = 0;
-    int64_t nzStartTime = 0;
+    stime_t totalduration = 0;
+    stime_t nzStartTime = 0;
     uint64_t sequenceNumber = 0;
     std::size_t prevbyterangeoffset = 0;
     const SingleValueTag *ctx_byterange = NULL;
@@ -298,9 +298,9 @@ void Parser::parseSegments(Representation *rep, const std::list<Tag *> &tagslist
     {
         rep->getPlaylist()->duration.Set(0);
     }
-    else if(totalduration > rep->getPlaylist()->duration.Get())
+    else if(totalduration * CLOCK_FREQ / rep->timescale.Get() > rep->getPlaylist()->duration.Get())
     {
-        rep->getPlaylist()->duration.Set(CLOCK_FREQ * totalduration / rep->timescale.Get());
+        rep->getPlaylist()->duration.Set(totalduration * CLOCK_FREQ / rep->timescale.Get());
     }
 }
 

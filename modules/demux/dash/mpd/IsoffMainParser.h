@@ -94,20 +94,20 @@ namespace dash
         {
             public:
                 IsoTime(const std::string&);
-                operator mtime_t() const;
+                operator time_t() const;
 
             private:
-                mtime_t time;
+                time_t time;
         };
 
         class UTCTime
         {
             public:
                 UTCTime(const std::string&);
-                operator mtime_t() const;
+                operator time_t() const;
 
             private:
-                mtime_t time;
+                time_t time;
         };
 
         template<typename T> class Integer

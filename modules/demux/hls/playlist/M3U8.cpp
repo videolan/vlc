@@ -34,7 +34,7 @@ using namespace hls::playlist;
 M3U8::M3U8 (stream_t *stream_) :
     AbstractPlaylist(stream_)
 {
-    minUpdatePeriod.Set( 5 );
+    minUpdatePeriod.Set( 5 * CLOCK_FREQ );
 }
 
 M3U8::~M3U8()

@@ -49,7 +49,7 @@ namespace adaptative
                 void                    addSegment(ISegment *seg);
                 void                    mergeWith(SegmentList *);
                 void                    pruneBySegmentNumber(uint64_t);
-                bool                    getSegmentNumberByTime(mtime_t, uint64_t *) const;
+                bool                    getSegmentNumberByScaledTime(stime_t, uint64_t *) const;
                 mtime_t                 getPlaybackTimeBySegmentNumber(uint64_t);
                 std::size_t             getOffset() const;
 

@@ -198,7 +198,9 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
     }
     else if ( segmentList && !segmentList->getSegments().empty() )
     {
-        return segmentList->getSegmentNumberByTime(time, ret);
+        const uint64_t timescale = segmentList->inheritTimescale();
+        time = time * timescale / CLOCK_FREQ;
+        return segmentList->getSegmentNumberByScaledTime(time, ret);
     }
     else if( segmentBase )
     {
@@ -206,7 +208,7 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
         time = time * timescale / CLOCK_FREQ;
         *ret = 0;
         const std::vector<ISegment *> list = segmentBase->subSegments();
-        return SegmentInfoCommon::getSegmentNumberByTime(list, time, ret);
+        return SegmentInfoCommon::getSegmentNumberByScaledTime(list, time, ret);
     }
 
     if(parent)
@@ -261,7 +263,7 @@ void SegmentInformation::getDurationsRange(mtime_t *min, mtime_t *max) const
     mtime_t total = 0;
     for(it = seglist.begin(); it != seglist.end(); ++it)
     {
-        const mtime_t duration = (*it)->duration.Get();
+        const mtime_t duration = (*it)->duration.Get() * CLOCK_FREQ / inheritTimescale();
         if(duration)
         {
             total += duration;
@@ -334,7 +336,7 @@ void SegmentInformation::setSegmentTemplate(MediaSegmentTemplate *templ)
 }
 
 static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
-                              size_t end, mtime_t time)
+                              size_t end, stime_t time)
 {
     std::vector<ISegment *>::iterator segIt;
     for(segIt = seglist.begin(); segIt < seglist.end(); ++segIt)
@@ -360,6 +362,7 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
     std::vector<SplitPoint>::const_iterator splitIt;
     size_t start = 0, end = 0;
     mtime_t time = 0;
+    const uint64_t i_timescale = inheritTimescale();
 
     for(splitIt = splitlist.begin(); splitIt < splitlist.end(); ++splitIt)
     {
@@ -369,7 +372,7 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
         if(splitIt == splitlist.begin() && split.offset == 0)
             continue;
         time = split.time;
-        insertIntoSegment(seglist, start, end, time);
+        insertIntoSegment(seglist, start, end, time * i_timescale / CLOCK_FREQ);
         end++;
     }
 
@@ -377,7 +380,7 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
     {
         start = end;
         end = 0;
-        insertIntoSegment(seglist, start, end, time);
+        insertIntoSegment(seglist, start, end, time * i_timescale / CLOCK_FREQ);
     }
 }
 

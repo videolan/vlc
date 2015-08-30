@@ -103,7 +103,7 @@ std::string Representation::contextualize(size_t index, const std::string &compo
         if(pos != std::string::npos)
         {
             std::stringstream ss;
-            ss << getScaledTimeBySegmentNumber(index, templ);
+            ss << (getScaledTimeBySegmentNumber(index, templ) * CLOCK_FREQ / templ->inheritTimescale());
             ret.replace(pos, std::string("$Time$").length(), ss.str());
         }
 
@@ -187,13 +187,13 @@ size_t Representation::getSegmentNumber(size_t index, const MediaSegmentTemplate
         }
         else if(templ->duration.Get())
         {
-            mtime_t playbackstart = getPlaylist()->playbackStart.Get();
-            mtime_t streamstart = getPlaylist()->availabilityStartTime.Get();
+            const mtime_t playbackstart = getPlaylist()->playbackStart.Get() * CLOCK_FREQ;
+            mtime_t streamstart = getPlaylist()->availabilityStartTime.Get() * CLOCK_FREQ;
             streamstart += getPeriodStart();
-            mtime_t duration = templ->duration.Get();
-            uint64_t timescale = templ->inheritTimescale();
+            const stime_t duration = templ->duration.Get();
+            const uint64_t timescale = templ->inheritTimescale();
             if(duration && timescale)
-                index += (playbackstart - streamstart) * timescale / duration;
+                index += (playbackstart - streamstart) * timescale * duration / CLOCK_FREQ;
         }
     }
     return index;

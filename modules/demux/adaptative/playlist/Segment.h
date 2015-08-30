@@ -31,6 +31,7 @@
 #include "ICanonicalUrl.hpp"
 #include "../http/Chunk.h"
 #include "../tools/Properties.hpp"
+#include "Time.hpp"
 
 namespace adaptative
 {
@@ -61,8 +62,8 @@ namespace adaptative
                 virtual bool                            contains        (size_t byte) const;
                 virtual int                             compare         (ISegment *) const;
                 int                                     getClassId      () const;
-                Property<mtime_t>       startTime;
-                Property<mtime_t>       duration;
+                Property<stime_t>       startTime;
+                Property<stime_t>       duration;
                 Property<unsigned>      chunksuse;
 
                 static const int CLASSID_ISEGMENT = 0;

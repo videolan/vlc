@@ -86,12 +86,10 @@ void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
     }
 }
 
-bool SegmentList::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
+bool SegmentList::getSegmentNumberByScaledTime(stime_t time, uint64_t *ret) const
 {
-    const uint64_t timescale = inheritTimescale();
-    time = time * timescale / CLOCK_FREQ;
     *ret = pruned;
-    return SegmentInfoCommon::getSegmentNumberByTime(segments, time, ret);
+    return SegmentInfoCommon::getSegmentNumberByScaledTime(segments, time, ret);
 }
 
 mtime_t SegmentList::getPlaybackTimeBySegmentNumber(uint64_t number)
@@ -99,8 +97,8 @@ mtime_t SegmentList::getPlaybackTimeBySegmentNumber(uint64_t number)
     if(number < pruned || segments.empty())
         return VLC_TS_INVALID;
 
-    uint64_t timescale = inheritTimescale();
-    mtime_t time = segments.at(0)->startTime.Get();
+    const uint64_t timescale = inheritTimescale();
+    stime_t time = segments.at(0)->startTime.Get();
 
     if(segments.at(0)->duration.Get())
     {
