@@ -53,11 +53,10 @@ static void deNoiseTemporal(
                     int W, int H, int sStride, int dStride,
                     int *Temporal)
 {
-    long X, Y;
     unsigned int PixelDst;
 
-    for (Y = 0; Y < H; Y++){
-        for (X = 0; X < W; X++){
+    for (long Y = 0; Y < H; Y++){
+        for (long X = 0; X < W; X++){
             PixelDst = LowPassMul(FrameAnt[X]<<8, Frame[X]<<16, Temporal);
             FrameAnt[X] = ((PixelDst+0x1000007F)>>8);
             FrameDest[X]= ((PixelDst+0x10007FFF)>>16);
@@ -75,7 +74,6 @@ static void deNoiseSpacial(
                     int W, int H, int sStride, int dStride,
                     int *Horizontal, int *Vertical)
 {
-    long X, Y;
     long sLineOffs = 0, dLineOffs = 0;
     unsigned int PixelAnt;
     unsigned int PixelDst;
@@ -85,12 +83,12 @@ static void deNoiseSpacial(
     FrameDest[0]= ((PixelDst+0x10007FFF)>>16);
 
     /* First line has no top neighbor, only left. */
-    for (X = 1; X < W; X++){
+    for (long X = 1; X < W; X++){
         PixelDst = LineAnt[X] = LowPassMul(PixelAnt, Frame[X]<<16, Horizontal);
         FrameDest[X]= ((PixelDst+0x10007FFF)>>16);
     }
 
-    for (Y = 1; Y < H; Y++){
+    for (long Y = 1; Y < H; Y++){
         unsigned int PixelAnt;
         sLineOffs += sStride, dLineOffs += dStride;
         /* First pixel on each line doesn't have previous pixel */
@@ -98,7 +96,7 @@ static void deNoiseSpacial(
         PixelDst = LineAnt[0] = LowPassMul(LineAnt[0], PixelAnt, Vertical);
         FrameDest[dLineOffs]= ((PixelDst+0x10007FFF)>>16);
 
-        for (X = 1; X < W; X++){
+        for (long X = 1; X < W; X++){
             unsigned int PixelDst;
             /* The rest are normal */
             PixelAnt = LowPassMul(PixelAnt, Frame[sLineOffs+X]<<16, Horizontal);
@@ -115,7 +113,6 @@ static void deNoise(unsigned char *Frame,        // mpi->planes[x]
                     int W, int H, int sStride, int dStride,
                     int *Horizontal, int *Vertical, int *Temporal)
 {
-    long X, Y;
     long sLineOffs = 0, dLineOffs = 0;
     unsigned int PixelAnt;
     unsigned int PixelDst;
@@ -123,10 +120,10 @@ static void deNoise(unsigned char *Frame,        // mpi->planes[x]
 
     if(!FrameAnt){
         (*FrameAntPtr)=FrameAnt=malloc(W*H*sizeof(unsigned short));
-        for (Y = 0; Y < H; Y++){
+        for (long Y = 0; Y < H; Y++){
             unsigned short* dst=&FrameAnt[Y*W];
             unsigned char* src=Frame+Y*sStride;
-            for (X = 0; X < W; X++) dst[X]=src[X]<<8;
+            for (long X = 0; X < W; X++) dst[X]=src[X]<<8;
         }
     }
 
@@ -149,14 +146,14 @@ static void deNoise(unsigned char *Frame,        // mpi->planes[x]
 
     /* First line has no top neighbor. Only left one for each pixel and
      * last frame */
-    for (X = 1; X < W; X++){
+    for (long X = 1; X < W; X++){
         LineAnt[X] = PixelAnt = LowPassMul(PixelAnt, Frame[X]<<16, Horizontal);
         PixelDst = LowPassMul(FrameAnt[X]<<8, PixelAnt, Temporal);
         FrameAnt[X] = ((PixelDst+0x1000007F)>>8);
         FrameDest[X]= ((PixelDst+0x10007FFF)>>16);
     }
 
-    for (Y = 1; Y < H; Y++){
+    for (long Y = 1; Y < H; Y++){
         unsigned int PixelAnt;
         unsigned short* LinePrev=&FrameAnt[Y*W];
         sLineOffs += sStride, dLineOffs += dStride;
@@ -167,7 +164,7 @@ static void deNoise(unsigned char *Frame,        // mpi->planes[x]
         LinePrev[0] = ((PixelDst+0x1000007F)>>8);
         FrameDest[dLineOffs]= ((PixelDst+0x10007FFF)>>16);
 
-        for (X = 1; X < W; X++){
+        for (long X = 1; X < W; X++){
             unsigned int PixelDst;
             /* The rest are normal */
             PixelAnt = LowPassMul(PixelAnt, Frame[sLineOffs+X]<<16, Horizontal);
@@ -184,12 +181,11 @@ static void deNoise(unsigned char *Frame,        // mpi->planes[x]
 
 static void PrecalcCoefs(int *Ct, double Dist25)
 {
-    int i;
     double Gamma, Simil, C;
 
     Gamma = log(0.25) / log(1.0 - Dist25/255.0 - 0.00001);
 
-    for (i = -255*16; i <= 255*16; i++)
+    for (int i = -255*16; i <= 255*16; i++)
     {
         Simil = 1.0 - abs(i) / (16*255.0);
         C = pow(Simil, Gamma) * 65536.0 * (double)i / 16.0;
