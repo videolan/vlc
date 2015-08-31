@@ -23,6 +23,7 @@
 #endif
 
 #include <assert.h>
+#include <stdint.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -159,7 +160,7 @@ static int Seek(access_t *access, uint64_t position)
         uint64_t size;
 
         if (access_GetSize(a, &size))
-            size = 0;
+            break;
         if (position - access->info.i_pos < size)
         {
             if (vlc_access_Seek(a, position - access->info.i_pos))
@@ -196,6 +197,8 @@ static int Control(access_t *access, int query, va_list args)
             *va_arg(args, bool *) = sys->can_control_pace;
             break;
         case ACCESS_GET_SIZE:
+            if (sys->size == UINT64_MAX)
+                return VLC_EGENERIC;
             *va_arg(args, uint64_t *) = sys->size;
             break;
         case ACCESS_GET_PTS_DELAY:
@@ -282,10 +285,15 @@ static int Open(vlc_object_t *obj)
             access_Control(a, ACCESS_CAN_PAUSE, &sys->can_pause);
         if (sys->can_control_pace)
             access_Control(a, ACCESS_CAN_CONTROL_PACE, &sys->can_control_pace);
+        if (sys->size != UINT64_MAX)
+        {
+            uint64_t size;
 
-        uint64_t size;
-        if (access_GetSize(a, &size) == 0)
-            sys->size += size;
+            if (access_GetSize(a, &size))
+                sys->size = UINT64_MAX;
+            else
+                sys->size += size;
+        }
 
         int64_t caching;
         access_Control(a, ACCESS_GET_PTS_DELAY, &caching);
