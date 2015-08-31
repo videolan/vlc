@@ -319,6 +319,10 @@ block_t *block_mmap_Alloc (void *addr, size_t length)
     if (addr == MAP_FAILED)
         return NULL;
 
+    long page_mask = sysconf(_SC_PAGESIZE) - 1;
+    size_t left = ((uintptr_t)addr) & page_mask;
+    size_t right = (-length) & page_mask;
+
     block_t *block = malloc (sizeof (*block));
     if (block == NULL)
     {
@@ -326,7 +330,9 @@ block_t *block_mmap_Alloc (void *addr, size_t length)
         return NULL;
     }
 
-    block_Init (block, addr, length);
+    block_Init (block, ((char *)addr) - left, left + length + right);
+    block->p_buffer = addr;
+    block->i_buffer = length;
     block->pf_release = block_mmap_Release;
     return block;
 }
