@@ -368,10 +368,9 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     int i_sin, i_cos;
     fetch_trigo( p_sys, &i_sin, &i_cos );
 
-    int i_col, i_line;
-    for( i_line = 0; i_line < i_visible_lines; i_line++ )
+    for( int i_line = 0; i_line < i_visible_lines; i_line++ )
     {
-        for( i_col = 0; i_col < i_visible_pitch; i_col++ )
+        for( int i_col = 0; i_col < i_visible_pitch; i_col++ )
         {
             int i_line_orig;
             int i_col_orig;
