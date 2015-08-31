@@ -236,27 +236,11 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
             *p_i64 = p_sys->i_pos;
             return VLC_SUCCESS;
 
-        case STREAM_SET_POSITION:
-        {
-            uint64_t i64 = va_arg( args, uint64_t );
-            if( i64 < p_sys->i_pos )
-                return VLC_EGENERIC;
-
-            uint64_t i_skip = i64 - p_sys->i_pos;
-            while( i_skip > 0 )
-            {
-                int i_read = DStreamRead( s, NULL, __MIN(i_skip, INT_MAX) );
-                if( i_read <= 0 )
-                    return VLC_EGENERIC;
-                i_skip -= i_read;
-            }
-            return VLC_SUCCESS;
-        }
-
         case STREAM_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY;
             return VLC_SUCCESS;
 
+        case STREAM_SET_POSITION:
         case STREAM_GET_TITLE_INFO:
         case STREAM_GET_TITLE:
         case STREAM_GET_SEEKPOINT:
