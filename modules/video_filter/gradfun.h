@@ -54,8 +54,7 @@ static const uint16_t __attribute__((aligned(16))) dither[8][8] = {
 static void filter_line_c(uint8_t *dst, uint8_t *src, uint16_t *dc,
                           int width, int thresh, const uint16_t *dithers)
 {
-    int x;
-    for (x=0; x<width; x++, dc+=x&1) {
+    for( int x = 0; x < width; x++, dc += x&1 ) {
         int pix = src[x]<<7;
         int delta = dc[0] - pix;
         int m = abs(delta) * thresh >> 16;
@@ -69,10 +68,10 @@ static void filter_line_c(uint8_t *dst, uint8_t *src, uint16_t *dc,
 static void blur_line_c(uint16_t *dc, uint16_t *buf, uint16_t *buf1,
                         uint8_t *src, int sstride, int width)
 {
-    int x, v, old;
-    for (x=0; x<width; x++) {
-        v = buf1[x] + src[2*x] + src[2*x+1] + src[2*x+sstride] + src[2*x+1+sstride];
-        old = buf[x];
+    for( int x = 0; x < width; x++ ) {
+        int v = buf1[x] + src[2*x] + src[2*x+1] + src[2*x+sstride] +
+                src[2*x+1+sstride];
+        int old = buf[x];
         buf[x] = v;
         dc[x] = v - old;
     }
