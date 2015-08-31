@@ -119,7 +119,6 @@ static void Destroy( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    int i_index;
     double f_angle;
     mtime_t new_date = mdate();
 
@@ -136,9 +135,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_filter->p_sys->last_date = new_date;
     f_angle = p_filter->p_sys->f_angle;
 
-    for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+    for( int i_index = 0; i_index < p_pic->i_planes; i_index++ )
     {
-        int i_line, i_first_line, i_num_lines, i_offset, i_pixel_pitch,
+        int i_first_line, i_num_lines, i_offset, i_pixel_pitch,
             i_visible_pixels;
         uint8_t black_pixel;
         uint8_t *p_in, *p_out;
@@ -163,7 +162,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         p_in = p_pic->p[i_index].p_pixels;
         p_out = p_outpic->p[i_index].p_pixels;
 
-        for( i_line = 0 ; i_line < i_first_line ; i_line++ )
+        for( int i_line = 0; i_line < i_first_line; i_line++ )
         {
             memcpy( p_out, p_in, p_pic->p[i_index].i_visible_pitch );
             p_in += p_pic->p[i_index].i_pitch;
@@ -171,7 +170,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         }
 
         /* Ok, we do 3 times the sin() calculation for each line. So what ? */
-        for( i_line = i_first_line ; i_line < i_num_lines ; i_line++ )
+        for( int i_line = i_first_line; i_line < i_num_lines; i_line++ )
         {
             /* Calculate today's offset, don't go above 1/20th of the screen */
             i_offset = (int)( (double)(i_visible_pixels)
