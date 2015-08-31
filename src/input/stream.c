@@ -29,6 +29,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_block.h>
@@ -539,27 +540,32 @@ int stream_Control( stream_t *s, int i_query, ... )
 }
 
 /**
- * Read "i_size" bytes and store them in a block_t.
- * It always read i_size bytes unless you are at the end of the stream
- * where it return what is available.
+ * Read data into a block.
+ *
+ * @param s stream to read data from
+ * @param size number of bytes to read
+ * @return a block of data, or NULL on error
+ @ note The block size may be shorter than requested if the end-of-stream was
+ * reached.
  */
-block_t *stream_Block( stream_t *s, int i_size )
+block_t *stream_Block( stream_t *s, size_t size )
 {
-    if( i_size <= 0 ) return NULL;
+    if( unlikely(size > SSIZE_MAX) )
+        return NULL;
 
-    /* emulate block read */
-    block_t *p_bk = block_Alloc( i_size );
-    if( p_bk )
+    block_t *block = block_Alloc( size );
+    if( unlikely(block == NULL) )
+        return NULL;
+
+    ssize_t val = stream_Read( s, block->p_buffer, size );
+    if( val <= 0 )
     {
-        int i_read = stream_Read( s, p_bk->p_buffer, i_size );
-        if( i_read > 0 )
-        {
-            p_bk->i_buffer = i_read;
-            return p_bk;
-        }
-        block_Release( p_bk );
+        block_Release( block );
+        return NULL;
     }
-    return NULL;
+
+    block->i_buffer = val;
+    return block;
 }
 
 /**

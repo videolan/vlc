@@ -114,7 +114,7 @@ VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t);
 VLC_API int stream_vaControl( stream_t *s, int i_query, va_list args );
 VLC_API void stream_Delete( stream_t *s );
 VLC_API int stream_Control( stream_t *s, int i_query, ... );
-VLC_API block_t * stream_Block( stream_t *s, int i_size );
+VLC_API block_t * stream_Block( stream_t *s, size_t );
 VLC_API char * stream_ReadLine( stream_t * );
 VLC_API input_item_t *stream_ReadDir( stream_t * );
 
