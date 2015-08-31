@@ -346,7 +346,7 @@ static int ControlAccess(access_t *access, int i_query, va_list args)
     case ACCESS_GET_SIZE: {
         uint64_t *s = va_arg(args, uint64_t *);
         *s = var_InheritInteger(access, "imem-size");
-        return VLC_SUCCESS;
+        return *s ? VLC_SUCCESS : VLC_EGENERIC;
     }
     case ACCESS_GET_PTS_DELAY: {
         int64_t *delay = va_arg(args, int64_t *);
