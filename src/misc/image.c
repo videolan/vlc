@@ -35,6 +35,7 @@
 #endif
 
 #include <errno.h>
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_codec.h>
@@ -228,7 +229,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     block_t *p_block;
     picture_t *p_pic;
     stream_t *p_stream = NULL;
-    int i_size;
+    uint64_t i_size;
 
     p_stream = stream_UrlNew( p_image->p_parent, psz_url );
 
@@ -239,19 +240,24 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
         return NULL;
     }
 
-    i_size = stream_Size( p_stream );
+    if( stream_GetSize( p_stream, &i_size ) || i_size > SSIZE_MAX )
+    {
+        msg_Dbg( p_image->p_parent, "could not read %s", psz_url );
+        goto error;
+    }
 
-    p_block = block_Alloc( i_size );
-
-    stream_Read( p_stream, p_block->p_buffer, i_size );
+    p_block = stream_Block( p_stream, i_size );
+    if( p_block == NULL )
+        goto error;
 
     if( !p_fmt_in->i_chroma )
     {
-        char *psz_mime = NULL;
-        stream_Control( p_stream, STREAM_GET_CONTENT_TYPE, &psz_mime );
-        if( psz_mime )
+        char *psz_mime = stream_ContentType( p_stream );
+        if( psz_mime != NULL )
+        {
             p_fmt_in->i_chroma = image_Mime2Fourcc( psz_mime );
-        free( psz_mime );
+            free( psz_mime );
+        }
     }
     stream_Delete( p_stream );
 
@@ -264,6 +270,9 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     p_pic = ImageRead( p_image, p_block, p_fmt_in, p_fmt_out );
 
     return p_pic;
+error:
+    stream_Delete( p_stream );
+    return NULL;
 }
 
 /**
