@@ -135,7 +135,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         p_out = p_outpic->p[i_index].p_pixels;
 
-        for( ; p_in < p_in_end ; )
+        while( p_in < p_in_end )
         {
             uint64_t *p_in64, *p_out64;
 
@@ -157,7 +157,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             p_out = (uint8_t*)p_out64;
             p_line_end += 64;
 
-            for( ; p_in < p_line_end ; )
+            while( p_in < p_line_end )
             {
                 *p_out++ = ~( *p_in++ );
             }
