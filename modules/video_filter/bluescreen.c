@@ -167,7 +167,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    int i,j;
     int i_lines = p_pic->p[ A_PLANE ].i_lines;
     int i_pitch = p_pic->p[ A_PLANE ].i_pitch;
     uint8_t *p_a = p_pic->p[ A_PLANE ].p_pixels;
@@ -196,7 +195,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     vmax = p_sys->i_v + p_sys->i_vt <= 0xff ? p_sys->i_v + p_sys->i_vt : 0xff;
     vlc_mutex_unlock( &p_sys->lock );
 
-    for( i = 0; i < i_lines*i_pitch; i++ )
+    for( int i = 0; i < i_lines*i_pitch; i++ )
     {
         if(    p_u[i] < umax && p_u[i] > umin
             && p_v[i] < vmax && p_v[i] > vmin )
@@ -210,11 +209,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
     /* Gaussian convolution to make it look cleaner */
     memset( p_a, 0, 2 * i_pitch );
-    for( i = 2; i < i_lines - 2; i++ )
+    for( int i = 2; i < i_lines - 2; i++ )
     {
         p_a[i*i_pitch] = 0x00;
         p_a[i*i_pitch+1] = 0x00;
-        for( j = 2; j < i_pitch - 2; j ++ )
+        for( int j = 2; j < i_pitch - 2; j++ )
         {
             p_a[i*i_pitch+j] = (uint8_t)((
               /* 2 rows up */
