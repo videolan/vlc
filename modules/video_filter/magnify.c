@@ -157,7 +157,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     int v_w, v_h;
     picture_t *p_converted;
     plane_t *p_oyp;
-    int i_plane;
 
     p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
@@ -180,7 +179,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         picture_t crop;
 
         crop = *p_pic;
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+        for( int i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
             const int o_yp = o_y * p_outpic->p[i_plane].i_lines / p_outpic->p[Y_PLANE].i_lines;
             const int o_xp = o_x * p_outpic->p[i_plane].i_pitch / p_outpic->p[Y_PLANE].i_pitch;
@@ -287,9 +286,8 @@ static void DrawZoomStatus( uint8_t *pb_dst, int i_pitch, int i_width, int i_hei
         " X X  X     X        X    X   X X   X X   X       X X   X X   X X X XL"
         "  X   XXXXX  XXXX   XXXXX  XXX   XXX  X   X   XXXX  X   X  XXX   X X L";
     const char *p_draw = b_visible ? p_hide : p_show;
-    int i, y, x;
 
-    for( i = 0, x = i_offset_x, y = i_offset_y; p_draw[i] != '\0'; i++ )
+    for( int i = 0, x = i_offset_x, y = i_offset_y; p_draw[i] != '\0'; i++ )
     {
         if( p_draw[i] == 'X' )
         {
@@ -311,8 +309,6 @@ static void DrawZoomStatus( uint8_t *pb_dst, int i_pitch, int i_width, int i_hei
 static void DrawRectangle( uint8_t *pb_dst, int i_pitch, int i_width, int i_height,
                            int x, int y, int i_w, int i_h )
 {
-    int dy;
-
     if( x + i_w > i_width || y + i_h > i_height )
         return;
 
@@ -320,7 +316,7 @@ static void DrawRectangle( uint8_t *pb_dst, int i_pitch, int i_width, int i_heig
     memset( &pb_dst[y * i_pitch + x], 0xff, i_w );
 
     /* left and right */
-    for( dy = 1; dy < i_h-1; dy++ )
+    for( int dy = 1; dy < i_h-1; dy++ )
     {
         pb_dst[(y+dy) * i_pitch + x +     0] = 0xff;
         pb_dst[(y+dy) * i_pitch + x + i_w-1] = 0xff;
