@@ -109,8 +109,8 @@ enum stream_query_e
     STREAM_GET_PRIVATE_BLOCK, /**< arg1= block_t **b, arg2=bool *eof */
 };
 
-VLC_API ssize_t stream_Read(stream_t *, void *, size_t);
-VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t);
+VLC_API ssize_t stream_Read(stream_t *, void *, size_t) VLC_USED;
+VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
 VLC_API int stream_vaControl( stream_t *s, int i_query, va_list args );
 VLC_API void stream_Delete( stream_t *s );
 VLC_API int stream_Control( stream_t *s, int i_query, ... );
