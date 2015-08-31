@@ -100,7 +100,6 @@ static void Destroy( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    int i_index;
     int i_planes;
 
     if( !p_pic ) return NULL;
@@ -126,7 +125,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         i_planes = p_pic->i_planes;
     }
 
-    for( i_index = 0 ; i_index < i_planes ; i_index++ )
+    for( int i_index = 0 ; i_index < i_planes ; i_index++ )
     {
         uint8_t *p_in, *p_in_end, *p_line_end, *p_out;
 
