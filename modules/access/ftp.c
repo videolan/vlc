@@ -31,6 +31,7 @@
 #endif
 
 #include <assert.h>
+#include <stdint.h>
 #include <errno.h>
 
 #include <vlc_common.h>
@@ -631,7 +632,7 @@ static int InOpen( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->data.fd = -1;
     p_sys->out = false;
-    p_sys->size = 0;
+    p_sys->size = UINT64_MAX;
     readTLSMode( p_sys, p_access->psz_access );
 
     if( parseURL( &p_sys->url, p_access->psz_location, p_sys->tlsmode ) )
@@ -939,6 +940,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *pb_bool = true;    /* FIXME */
             break;
         case ACCESS_GET_SIZE:
+            if( p_access->p_sys->size == UINT64_MAX )
+                return VLC_EGENERIC;
             *va_arg( args, uint64_t * ) = p_access->p_sys->size;
             break;
 
