@@ -337,6 +337,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( i_read < 0 )
     {
         msg_Err( p_access, "read failed (%s)", vlc_strerror_c(errno) );
+        p_access->info.b_eof = true;
         return -1;
     }
 
