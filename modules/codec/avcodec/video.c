@@ -1112,7 +1112,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     enum PixelFormat swfmt = avcodec_default_get_format(p_context, pi_fmt);
     bool can_hwaccel = false;
 
-    for( size_t i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
+    for( size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++ )
     {
         const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(pi_fmt[i]);
         if (dsc == NULL)
@@ -1130,7 +1130,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
 
     wait_mt(p_sys);
 
-    for( size_t i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
+    for( size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++ )
     {
         enum PixelFormat hwfmt = pi_fmt[i];
 
