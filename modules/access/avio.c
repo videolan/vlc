@@ -82,7 +82,7 @@ static int UrlInterruptCallback(void *access)
 struct access_sys_t
 {
     AVIOContext *context;
-    uint64_t size;
+    int64_t size;
 };
 
 struct sout_access_out_sys_t {
@@ -193,7 +193,6 @@ int OpenAvio(vlc_object_t *object)
     seekable = sys->context->seekable;
 #endif
     msg_Dbg(access, "%sseekable, size=%"PRIi64, seekable ? "" : "not ", size);
-    sys->size = size > 0 ? size : 0;
 
     /* */
     access_InitFields(access);
@@ -373,7 +372,7 @@ static int Seek(access_t *access, uint64_t position)
     if (ret < 0) {
         msg_Err(access, "Seek to %"PRIu64" failed: %s", position,
                 vlc_strerror_c(AVUNERROR(ret)));
-        if (sys->size == 0 || position != sys->size)
+        if (sys->size < 0 || position != sys->size)
             return VLC_EGENERIC;
     }
     access->info.i_pos = position;
@@ -437,6 +436,8 @@ static int Control(access_t *access, int query, va_list args)
         *b = true; /* FIXME */
         return VLC_SUCCESS;
     case ACCESS_GET_SIZE:
+        if (sys->size < 0)
+            return VLC_EGENERIC;
         *va_arg(args, uint64_t *) = sys->size;
         return VLC_SUCCESS;
     case ACCESS_GET_PTS_DELAY: {
