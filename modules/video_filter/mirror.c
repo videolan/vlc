@@ -186,7 +186,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     bool b_vertical_split, b_left_to_right;
-    int i_index;
 
     if( !p_pic ) return NULL;
 
@@ -202,7 +201,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+    for( int i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
         if ( b_vertical_split )
             VerticalMirror( p_pic, p_outpic, i_index, b_left_to_right );
