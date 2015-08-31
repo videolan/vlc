@@ -925,6 +925,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_GET_SIZE:
+            if( !p_sys->b_has_size )
+                return VLC_EGENERIC;
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = p_sys->size;
            break;
