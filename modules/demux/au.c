@@ -90,7 +90,7 @@ struct demux_sys_t
     int             i_frame_size;
     mtime_t         i_frame_length;
 
-    int             i_header_size;
+    uint32_t        i_header_size;
 };
 
 static int Demux( demux_t * );
