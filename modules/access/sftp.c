@@ -429,6 +429,8 @@ static int Control( access_t* p_access, int i_query, va_list args )
         break;
 
     case ACCESS_GET_SIZE:
+        if( p_access->pf_readdir != NULL )
+            return VLC_EGENERIC;
         *va_arg( args, uint64_t * ) = p_access->p_sys->filesize;
         break;
 
