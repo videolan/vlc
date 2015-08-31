@@ -244,7 +244,7 @@ static void lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
         }
     }
 
-    if (unlikely(sys->p_context->pix_fmt == PIX_FMT_PAL8))
+    if (unlikely(sys->p_context->pix_fmt == AV_PIX_FMT_PAL8))
     {
         if (pic->format.p_palette == NULL)
             pic->format.p_palette = calloc(1, sizeof (video_palette_t));
@@ -980,7 +980,7 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
     decoder_t *dec = (decoder_t *)ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
 
-    if (ctx->pix_fmt == PIX_FMT_PAL8)
+    if (ctx->pix_fmt == AV_PIX_FMT_PAL8)
         goto error;
 
     int width = frame->width;

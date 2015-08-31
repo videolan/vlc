@@ -132,7 +132,7 @@ static const struct
     {VLC_CODEC_GREY, PIX_FMT_GRAY8, 0, 0, 0},
 
      /* Paletized RGB */
-    {VLC_CODEC_RGBP, PIX_FMT_PAL8, 0, 0, 0},
+    {VLC_CODEC_RGBP, AV_PIX_FMT_PAL8, 0, 0, 0},
 
     {VLC_CODEC_GBR_PLANAR, AV_PIX_FMT_GBRP, 0, 0, 0 },
     {VLC_CODEC_GBR_PLANAR_9L, AV_PIX_FMT_GBRP9LE, 0, 0, 0 },
