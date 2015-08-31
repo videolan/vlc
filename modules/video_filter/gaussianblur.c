@@ -220,9 +220,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         p_sys->pt_scale = xmalloc( i_visible_lines * i_pitch * sizeof( type_t ) );
         pt_scale = p_sys->pt_scale;
 
-        for( int i_line = 0 ; i_line < i_visible_lines ; i_line++ )
+        for( int i_line = 0; i_line < i_visible_lines; i_line++ )
         {
-            for( int i_col = 0; i_col < i_visible_pitch ; i_col++ )
+            for( int i_col = 0; i_col < i_visible_pitch; i_col++ )
             {
                 type_t t_value = 0;
 
