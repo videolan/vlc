@@ -900,6 +900,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
              (int)i_tracks, (int)p_sectors[i_tracks] );
     p_vcddev->i_tracks = ++i_tracks;
     p_vcddev->p_sectors = p_sectors;
+    p_sectors = NULL;
     i_ret = 0;
 
 error:
