@@ -139,7 +139,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     picture_t *p_outpic;
 
     unsigned int w, h;
-    int x,y;
     uint8_t u,v;
 
     picture_t *p_converted;
@@ -162,7 +161,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     /* chrominance */
     u = p_filter->p_sys->u;
     v = p_filter->p_sys->v;
-    for( y = 0; y<p_outpic->p[U_PLANE].i_lines; y++)
+    for( int y = 0; y < p_outpic->p[U_PLANE].i_lines; y++ )
     {
         memset(
                 p_outpic->p[U_PLANE].p_pixels+y*p_outpic->p[U_PLANE].i_pitch,
@@ -195,8 +194,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( p_converted )
     {
 #define copyimage( plane, b ) \
-        for( y=0; y<p_converted->p[plane].i_visible_lines; y++) { \
-        for( x=0; x<p_converted->p[plane].i_visible_pitch; x++) { \
+        for( int y = 0; y<p_converted->p[plane].i_visible_lines; y++ ) { \
+        for( int x = 0; x<p_converted->p[plane].i_visible_pitch; x++ ) { \
             int nx, ny; \
             if( p_filter->p_sys->yinc == 1 ) \
                 ny= y; \
@@ -244,7 +243,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( p_filter->p_sys->y <= 0 )
         p_filter->p_sys->yinc = 1;
 
-    for( y = 0; y< 16; y++ )
+    for( int y = 0; y < 16; y++ )
     {
         if( p_filter->p_sys->v == 0 && p_filter->p_sys->u != 0 )
             p_filter->p_sys->u -= 1;
