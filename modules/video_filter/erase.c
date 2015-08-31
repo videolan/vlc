@@ -254,7 +254,6 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         uint8_t *p_mask = p_sys->p_mask->A_PIXELS;
         int i_x = p_sys->i_x, i_y = p_sys->i_y;
 
-        int x, y;
         int i_height = i_mask_visible_lines;
         int i_width  = i_mask_visible_pitch;
 
@@ -280,7 +279,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
 
         /* Horizontal linear interpolation of masked areas */
         uint8_t *p_outpix = p_outpic->p[i_plane].p_pixels + i_y*i_pitch + i_x;
-        for( y = 0; y < i_height;
+        for( int y = 0; y < i_height;
              y++, p_mask += i_mask_pitch, p_outpix += i_pitch )
         {
             uint8_t prev, next = 0;
@@ -310,7 +309,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
                 prev = 0xff;
             }
 
-            for( x = 0; x < i_width; x++ )
+            for( int x = 0; x < i_width; x++ )
             {
                 if( p_mask[i_plane?x<<1:x] > 127 )
                 {
@@ -386,11 +385,11 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         i_height = __MIN( i_visible_lines - i_y - 2, i_height );
         /* Make sure that we start at least 2 lines from the top (since our
          * bluring algorithm uses the 2 previous lines) */
-        y = __MAX(i_y,2);
+        int y = __MAX(i_y,2);
         p_outpix = p_outpic->p[i_plane].p_pixels + (i_y+y)*i_pitch + i_x;
         for( ; y < i_height; y++, p_mask += i_mask_pitch, p_outpix += i_pitch )
         {
-            for( x = 0; x < i_width; x++ )
+            for( int x = 0; x < i_width; x++ )
             {
                 if( p_mask[i_plane?x<<1:x] > 127 )
                 {
