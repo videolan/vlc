@@ -109,8 +109,39 @@ enum stream_query_e
     STREAM_GET_PRIVATE_BLOCK, /**< arg1= block_t **b, arg2=bool *eof */
 };
 
+/**
+ * Reads data from a byte stream.
+ *
+ * This function always waits for the requested number of bytes, unless a fatal
+ * error is encountered or the end-of-stream is reached first.
+ *
+ * If the buffer is NULL, data is skipped instead of read. This is effectively
+ * a relative forward seek, but it works even on non-seekable streams.
+ *
+ * \param buf start of buffer to read data into [OUT]
+ * \param len number of bytes to read
+ * \return the number of bytes read or a negative value on error.
+ */
 VLC_API ssize_t stream_Read(stream_t *, void *, size_t) VLC_USED;
+
+/**
+ * Peeks at data from a byte stream.
+ *
+ * This function buffers for the requested number of bytes, waiting if
+ * necessary. Then it stores a pointer to the buffer. Unlike stream_Read()
+ * or stream_Block(), this function does not modify the stream read offset.
+ *
+ * \note
+ * The buffer remains valid until the next read/peek or seek operation on the
+ * same stream. In case of error, the buffer address is undefined.
+ *
+ * \param bufp storage space for the buffer address [OUT]
+ * \param len number of bytes to peek
+ * \return the number of bytes actually available (shorter than requested if
+ * the end-of-stream is reached), or a negative value on error.
+ */
 VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
+
 VLC_API int stream_vaControl( stream_t *s, int i_query, va_list args );
 VLC_API void stream_Delete( stream_t *s );
 VLC_API int stream_Control( stream_t *s, int i_query, ... );

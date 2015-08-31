@@ -338,19 +338,6 @@ static ssize_t stream_ReadRaw(stream_t *s, void *buf, size_t len)
     return (copy > 0) ? (ssize_t)copy : ret;
 }
 
-/**
- * Reads data from a byte stream.
- *
- * This function always waits for the requested number of bytes, unless a fatal
- * error is encountered or the end-of-stream is reached first.
- *
- * If the buffer is NULL, data is skipped instead of read. This is effectively
- * a relative forward seek, but it works even on non-seekable streams.
- *
- * \param buf start of buffer to read data into [OUT]
- * \param len number of bytes to read
- * \return the number of bytes read or a negative value on error.
- */
 ssize_t stream_Read(stream_t *s, void *buf, size_t len)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
@@ -387,22 +374,6 @@ ssize_t stream_Read(stream_t *s, void *buf, size_t len)
                       : ((copy > 0) ? (ssize_t)copy : ret);
 }
 
-/**
- * Peeks at data from a byte stream.
- *
- * This function buffers for the requested number of bytes, waiting if
- * necessary. Then it stores a pointer to the buffer. Unlike stream_Read()
- * or stream_Block(), this function does not modify the stream read offset.
- *
- * \note
- * The buffer remains valid until the next read/peek or seek operation on the
- * same stream. In case of error, the buffer address is undefined.
- *
- * \param bufp storage space for the buffer address [OUT]
- * \param len number of bytes to peek
- * \return the number of bytes actually available (shorter than requested if
- * the end-of-stream is reached), or a negative value on error.
- */
 ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
