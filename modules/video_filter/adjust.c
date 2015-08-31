@@ -441,7 +441,6 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     double  f_gamma;
     int32_t i_cont, i_lum;
     int i_sat, i_sin, i_cos, i_x, i_y;
-    int i;
 
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -490,13 +489,13 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
         i_lum += 128 - i_cont / 2;
 
         /* Fill the gamma lookup table */
-        for( i = 0 ; i < 256 ; i++ )
+        for( int i = 0 ; i < 256 ; i++ )
         {
           pi_gamma[ i ] = clip_uint8_vlc( pow(i / 255.0, f_gamma) * 255.0);
         }
 
         /* Fill the luma lookup table */
-        for( i = 0 ; i < 256 ; i++ )
+        for( int i = 0 ; i < 256 ; i++ )
         {
             pi_luma[ i ] = pi_gamma[clip_uint8_vlc( i_lum + i_cont * i / 256)];
         }
@@ -507,7 +506,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
          * We get luma as threshold value: the higher it is, the darker is
          * the image. Should I reverse this?
          */
-        for( i = 0 ; i < 256 ; i++ )
+        for( int i = 0 ; i < 256 ; i++ )
         {
             pi_luma[ i ] = (i < i_lum) ? 0 : 255;
         }
