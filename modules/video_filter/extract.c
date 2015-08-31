@@ -257,13 +257,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
 static void mmult( double *res, double *a, double *b )
 {
-    int i, j, k;
-    for( i = 0; i < 3; i++ )
+    for( int i = 0; i < 3; i++ )
     {
-        for( j = 0; j < 3; j++ )
+        for( int j = 0; j < 3; j++ )
         {
             res[ i*3 + j ] = 0.;
-            for( k = 0; k < 3; k++ )
+            for( int k = 0; k < 3; k++ )
             {
                 res[ i*3 + j ] += a[ i*3 + k ] * b[ k*3 + j ];
             }
@@ -297,13 +296,12 @@ static void make_projection_matrix( filter_t *p_filter, int color, int *matrix )
           red*blue,   green*blue,  blue*blue };
     double result1[9];
     double result[9];
-    int i;
     msg_Dbg( p_filter, "red: %f", red );
     msg_Dbg( p_filter, "green: %f", green );
     msg_Dbg( p_filter, "blue: %f", blue );
     mmult( result1, rgb_matrix, right_matrix );
     mmult( result, left_matrix, result1 );
-    for( i = 0; i < 9; i++ )
+    for( int i = 0; i < 9; i++ )
     {
         matrix[i] = (int)result[i];
     }
