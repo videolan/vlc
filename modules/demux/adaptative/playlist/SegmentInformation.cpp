@@ -376,8 +376,7 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
         if(splitIt == splitlist.begin() && split.offset == 0)
             continue;
         time = split.time;
-        insertIntoSegment(seglist, start, end, time * i_timescale / CLOCK_FREQ);
-        end++;
+        insertIntoSegment(seglist, start, end - 1, time * i_timescale / CLOCK_FREQ);
     }
 
     if(start != 0)
