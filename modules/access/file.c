@@ -70,7 +70,6 @@ struct access_sys_t
     int fd;
 
     bool b_pace_control;
-    uint64_t size;
 };
 
 #if !defined (_WIN32) && !defined (__OS2__)
@@ -129,9 +128,8 @@ static bool IsRemote (const char *path)
 # define posix_fadvise(fd, off, len, adv)
 #endif
 
-static ssize_t FileRead (access_t *, uint8_t *, size_t);
+static ssize_t Read (access_t *, uint8_t *, size_t);
 static int FileSeek (access_t *, uint64_t);
-static ssize_t StreamRead (access_t *, uint8_t *, size_t);
 static int NoSeek (access_t *, uint64_t);
 static int FileControl (access_t *, int, va_list);
 
@@ -216,6 +214,7 @@ int FileOpen( vlc_object_t *p_this )
     if (unlikely(p_sys == NULL))
         goto error;
     access_InitFields (p_access);
+    p_access->pf_read = Read;
     p_access->pf_block = NULL;
     p_access->pf_control = FileControl;
     p_access->p_sys = p_sys;
@@ -223,10 +222,8 @@ int FileOpen( vlc_object_t *p_this )
 
     if (S_ISREG (st.st_mode) || S_ISBLK (st.st_mode))
     {
-        p_access->pf_read = FileRead;
         p_access->pf_seek = FileSeek;
         p_sys->b_pace_control = true;
-        p_sys->size = st.st_size;
 
         /* Demuxers will need the beginning of the file for probing. */
         posix_fadvise (fd, 0, 4096, POSIX_FADV_WILLNEED);
@@ -244,10 +241,8 @@ int FileOpen( vlc_object_t *p_this )
     }
     else
     {
-        p_access->pf_read = StreamRead;
         p_access->pf_seek = NoSeek;
         p_sys->b_pace_control = strcasecmp (p_access->psz_access, "stream");
-        p_sys->size = 0;
     }
 
     return VLC_SUCCESS;
@@ -277,44 +272,7 @@ void FileClose (vlc_object_t * p_this)
 }
 
 
-/**
- * Reads from a regular file.
- */
-static ssize_t FileRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
-{
-    ssize_t val = StreamRead (p_access, p_buffer, i_len);
-
-    access_sys_t *p_sys = p_access->p_sys;
-
-    if (p_access->info.i_pos >= p_sys->size)
-    {
-        struct stat st;
-
-        if (fstat (p_sys->fd, &st) == 0)
-           p_sys->size = st.st_size;
-    }
-
-    return val;
-}
-
-
-/*****************************************************************************
- * Seek: seek to a specific location in a file
- *****************************************************************************/
-static int FileSeek (access_t *p_access, uint64_t i_pos)
-{
-    p_access->info.i_pos = i_pos;
-    p_access->info.b_eof = false;
-
-    if (lseek (p_access->p_sys->fd, i_pos, SEEK_SET) == (off_t)-1)
-        return VLC_EGENERIC;
-    return VLC_SUCCESS;
-}
-
-/**
- * Reads from a non-seekable file.
- */
-static ssize_t StreamRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
+static ssize_t Read (access_t *p_access, uint8_t *p_buffer, size_t i_len)
 {
     access_sys_t *p_sys = p_access->p_sys;
     int fd = p_sys->fd;
@@ -339,6 +297,19 @@ static ssize_t StreamRead (access_t *p_access, uint8_t *p_buffer, size_t i_len)
     p_access->info.i_pos += val;
     p_access->info.b_eof = !val;
     return val;
+}
+
+/*****************************************************************************
+ * Seek: seek to a specific location in a file
+ *****************************************************************************/
+static int FileSeek (access_t *p_access, uint64_t i_pos)
+{
+    p_access->info.i_pos = i_pos;
+    p_access->info.b_eof = false;
+
+    if (lseek (p_access->p_sys->fd, i_pos, SEEK_SET) == (off_t)-1)
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static int NoSeek (access_t *p_access, uint64_t i_pos)
@@ -377,8 +348,7 @@ static int FileControl( access_t *p_access, int i_query, va_list args )
 
             if (fstat (p_sys->fd, &st))
                 return VLC_EGENERIC;
-            p_sys->size = st.st_size;
-            *va_arg( args, uint64_t * ) = p_sys->size;
+            *va_arg( args, uint64_t * ) = st.st_size;
             break;
         }
 
