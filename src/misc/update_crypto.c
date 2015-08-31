@@ -38,6 +38,7 @@
 
 #include <gcrypt.h>
 #include <assert.h>
+#include <limits.h>
 
 #include "vlc_common.h"
 #include <vlc_stream.h>
@@ -941,8 +942,8 @@ public_key_t *download_key( vlc_object_t *p_this,
     if( !p_stream )
         return NULL;
 
-    int64_t i_size = stream_Size( p_stream );
-    if( i_size < 0 )
+    uint64_t i_size;
+    if( stream_GetSize( p_stream, &i_size ) || i_size > INT_MAX )
     {
         stream_Delete( p_stream );
         return NULL;
@@ -1008,9 +1009,14 @@ int download_signature( vlc_object_t *p_this, signature_packet_t *p_sig,
     if( !p_stream )
         return VLC_ENOMEM;
 
-    int64_t i_size = stream_Size( p_stream );
+    uint64_t i_size;
+    if( stream_GetSize( p_stream, &i_size ) || i_size > INT_MAX )
+    {
+        stream_Delete( p_stream );
+        return NULL;
+    }
 
-    msg_Dbg( p_this, "Downloading signature (%"PRId64" bytes)", i_size );
+    msg_Dbg( p_this, "Downloading signature (%"PRIu64" bytes)", i_size );
     uint8_t *p_buf = (uint8_t*)malloc( i_size );
     if( !p_buf )
     {
