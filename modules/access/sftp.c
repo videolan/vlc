@@ -79,7 +79,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t* Block( access_t * );
+static ssize_t  Read( access_t *, void *, size_t );
 static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 
@@ -288,7 +288,7 @@ static int Open( vlc_object_t* p_this )
         p_sys->file = libssh2_sftp_open( p_sys->sftp_session, psz_path, LIBSSH2_FXF_READ, 0 );
         p_sys->filesize = attributes.filesize;
 
-        ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );
+        ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );
     }
     else
     {
@@ -357,41 +357,25 @@ static void Close( vlc_object_t* p_this )
 }
 
 
-static block_t* Block( access_t* p_access )
+static ssize_t Read( access_t *p_access, void *buf, size_t len )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
     if( p_access->info.b_eof )
         return NULL;
 
-    /* Allocate the buffer we need */
-    size_t i_len = __MIN( p_sys->i_read_size,
-                          p_sys->filesize - p_access->info.i_pos );
-    block_t* p_block = block_Alloc( i_len );
-    if( !p_block )
-        return NULL;
-
-    /* Read the specified size */
-    ssize_t i_ret = libssh2_sftp_read( p_access->p_sys->file, (char*)p_block->p_buffer, i_len );
-
-    if( i_ret < 0 )
-    {
-        block_Release( p_block );
-        msg_Err( p_access, "read failed" );
-        return NULL;
-    }
-    else if( i_ret == 0 )
+    ssize_t val = libssh2_sftp_read(  p_sys->file, buf, len );
+    if( val < 0 )
     {
         p_access->info.b_eof = true;
-        block_Release( p_block );
-        return NULL;
+        msg_Err( p_access, "read failed" );
+        return 0;
     }
-    else
-    {
-        p_block->i_buffer = i_ret;
-        p_access->info.i_pos += i_ret;
-        return p_block;
-    }
+    else if( val == 0 )
+        p_access->info.b_eof = true;
+
+    p_access->info.i_pos += val;
+    return val;
 }
 
 
