@@ -254,18 +254,16 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const int i_visible_pitch = p_pic->p[i_plane].i_visible_pitch;
         const int i_in_pitch = p_pic->p[i_plane].i_pitch;
 
-        int i_line, i_col;
         const int x_factor = p_pic->p[Y_PLANE].i_visible_pitch/i_visible_pitch-1;
         const int y_factor = p_pic->p[Y_PLANE].i_visible_lines/i_visible_lines-1;
 
-        for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
+        for( int i_line = 0; i_line < i_visible_lines; i_line++ )
         {
-            for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
+            for( int i_col = 0; i_col < i_visible_pitch; i_col++ )
             {
                 type_t t_value = 0;
-                int x;
                 const int c = i_line*i_in_pitch+i_col;
-                for( x = __MAX( -i_dim, -i_col*(x_factor+1) );
+                for( int x = __MAX( -i_dim, -i_col*(x_factor+1) );
                      x <= __MIN( i_dim, (i_visible_pitch - i_col)*(x_factor+1) + 1 );
                      x++ )
                 {
@@ -275,14 +273,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 pt_buffer[c] = t_value;
             }
         }
-        for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
+        for( int i_line = 0; i_line < i_visible_lines; i_line++ )
         {
-            for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
+            for( int i_col = 0; i_col < i_visible_pitch; i_col++ )
             {
                 type_t t_value = 0;
-                int y;
                 const int c = i_line*i_in_pitch+i_col;
-                for( y = __MAX( -i_dim, (-i_line)*(y_factor+1) );
+                for( int y = __MAX( -i_dim, (-i_line)*(y_factor+1) );
                      y <= __MIN( i_dim, (i_visible_lines - i_line)*(y_factor+1) - 1 );
                      y++ )
                 {
