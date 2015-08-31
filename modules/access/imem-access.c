@@ -22,6 +22,7 @@
 # include "config.h"
 #endif
 #include <assert.h>
+#include <stdint.h>
 
 #include <vlc_common.h>
 #include <vlc_access.h>
@@ -89,6 +90,8 @@ static int Control(access_t *access, int query, va_list args)
             break;
 
         case ACCESS_GET_SIZE:
+            if (sys->size == UINT64_MAX)
+                return VLC_EGENERIC;
             *va_arg(args, uint64_t *) = sys->size;
             break;
 
@@ -130,7 +133,7 @@ static int Open(vlc_object_t *object)
     sys->read_cb = var_InheritAddress(access, "imem-read");
     sys->seek_cb = var_InheritAddress(access, "imem-seek");
     sys->close_cb = var_InheritAddress(access, "imem-close");
-    sys->size = 0;
+    sys->size = UINT64_MAX;
 
     if (open_cb == NULL)
         open_cb = open_cb_default;

@@ -276,7 +276,7 @@ typedef enum libvlc_media_parse_flag_t
  *
  * \param opaque private pointer as passed to libvlc_media_new_callbacks()
  * \param datap storage space for a private data pointer [OUT]
- * \param sizep byte length of the bitstream or 0 if unknown [OUT]
+ * \param sizep byte length of the bitstream or UINT64_MAX if unknown [OUT]
  *
  * \note For convenience, *datap is initially NULL and *sizep is initially 0.
  *
