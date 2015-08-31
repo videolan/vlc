@@ -214,7 +214,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *p_outpic;
-    int i_plane;
     int i_width, i_height, i_xcrop, i_ycrop,
         i_outwidth, i_outheight, i_xpadd, i_ypadd;
 
@@ -230,7 +229,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+    for( int i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     /* p_pic and p_outpic have the same chroma/number of planes but that's
      * about it. */
     {
@@ -274,8 +273,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         memset( p_out, i_padd_color, i_ypadd * p_outplane->i_pitch );
         p_out += i_ypadd * p_outplane->i_pitch;
 
-        int i_line;
-        for( i_line = 0; i_line < i_height; i_line++ )
+        for( int i_line = 0; i_line < i_height; i_line++ )
         {
             uint8_t *p_in_next = p_in + p_plane->i_pitch;
             uint8_t *p_out_next = p_out + p_outplane->i_pitch;
