@@ -75,6 +75,10 @@ static inline void avcodec_free_context( AVCodecContext **ctx )
 
 #endif /* HAVE_LIBAVUTIL_AVUTIL_H */
 
+#if LIBAVUTIL_VERSION_MAJOR >= 55
+# define FF_API_AUDIOCONVERT 1
+#endif
+
 /* libavutil/pixfmt.h */
 #ifndef PixelFormat
 # define PixelFormat AVPixelFormat

@@ -36,12 +36,13 @@
 #include <vlc_codec.h>
 #include <vlc_avcodec.h>
 
+#include "avcodec.h"
+
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 
 #include <libavutil/audioconvert.h>
 
-#include "avcodec.h"
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
