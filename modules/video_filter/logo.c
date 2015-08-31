@@ -647,7 +647,6 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
 {
     char *psz_list; /* the list: <logo>[,[<delay>[,[<alpha>]]]][;...] */
     char *psz_original;
-    unsigned int i;
     logo_t *p_logo;         /* the parsing's result */
 
     p_logo_list->i_counter = 0;
@@ -659,7 +658,7 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
 
     /* Count the number logos == number of ';' + 1 */
     p_logo_list->i_count = 1;
-    for( i = 0; i < strlen( psz_list ); i++ )
+    for( unsigned i = 0; i < strlen( psz_list ); i++ )
     {
         if( psz_list[i] == ';' )
             p_logo_list->i_count++;
@@ -671,7 +670,7 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
         abort();
 
     /* Fill the data */
-    for( i = 0; i < p_logo_list->i_count; i++ )
+    for( unsigned i = 0; i < p_logo_list->i_count; i++ )
     {
         char *p_c  = strchr( psz_list, ';' );
         char *p_c2 = strchr( psz_list, ',' );
