@@ -107,6 +107,8 @@ static int Seek (access_t *access, uint64_t position)
 
 static int Control (access_t *access, int query, va_list args)
 {
+    access_sys_t *sys = access->p_sys;
+
     switch (query)
     {
         case ACCESS_CAN_SEEK:
@@ -118,6 +120,10 @@ static int Control (access_t *access, int query, va_list args)
             *b = true;
             return VLC_SUCCESS;
         }
+
+        case ACCESS_GET_SIZE:
+            *va_arg(args, uint64_t *) = sys->length;
+            return VLC_SUCCESS;
 
         case ACCESS_GET_PTS_DELAY:
         {
