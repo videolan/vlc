@@ -156,8 +156,10 @@ static int Seek(access_t *access, uint64_t position)
         if (!can_seek)
             break;
 
-        uint64_t size = access_GetSize(a);
+        uint64_t size;
 
+        if (access_GetSize(a, &size))
+            size = 0;
         if (position - access->info.i_pos < size)
         {
             if (vlc_access_Seek(a, position - access->info.i_pos))
@@ -281,7 +283,9 @@ static int Open(vlc_object_t *obj)
         if (sys->can_control_pace)
             access_Control(a, ACCESS_CAN_CONTROL_PACE, &sys->can_control_pace);
 
-        sys->size += access_GetSize(a);
+        uint64_t size;
+        if (access_GetSize(a, &size) == 0)
+            sys->size += size;
 
         int64_t caching;
         access_Control(a, ACCESS_GET_PTS_DELAY, &caching);

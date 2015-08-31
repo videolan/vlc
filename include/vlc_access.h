@@ -233,12 +233,9 @@ static inline int access_Control( access_t *p_access, int i_query, ... )
     return i_result;
 }
 
-static inline uint64_t access_GetSize( access_t *p_access )
+static inline int access_GetSize( access_t *p_access, uint64_t *size )
 {
-    uint64_t val;
-    if( access_Control( p_access, ACCESS_GET_SIZE, &val ) )
-        val = 0;
-    return val;
+    return access_Control( p_access, ACCESS_GET_SIZE, size );
 }
 
 static inline void access_InitFields( access_t *p_a )
