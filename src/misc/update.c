@@ -192,9 +192,8 @@ static bool GetUpdateFile( update_t *p_update )
         goto error;
     }
 
-    const int64_t i_read = stream_Size( p_stream );
-
-    if( i_read < 0 || i_read >= UINT16_MAX)
+    uint64_t i_read;
+    if( stream_GetSize( p_stream, &i_read ) || i_read >= UINT16_MAX )
     {
         msg_Err(p_update->p_libvlc, "Status file too large");
         goto error;
@@ -204,7 +203,7 @@ static bool GetUpdateFile( update_t *p_update )
     if( !psz_update_data )
         goto error;
 
-    if( stream_Read( p_stream, psz_update_data, i_read ) != i_read )
+    if( stream_Read( p_stream, psz_update_data, i_read ) != (ssize_t)i_read )
     {
         msg_Err( p_update->p_libvlc, "Couldn't download update file %s",
                 UPDATE_VLC_STATUS_URL );
