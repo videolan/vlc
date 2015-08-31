@@ -80,7 +80,7 @@
 static int  AccessDemuxOpen ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#if DVDREAD_VERSION >= 50300
+#if DVDREAD_VERSION >= 50300 && defined( HAVE_STREAM_CB_IN_DVDNAV_H )
 #define HAVE_DVDNAV_DEMUX
 static int  DemuxOpen ( vlc_object_t * );
 #endif
