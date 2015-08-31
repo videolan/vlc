@@ -133,12 +133,17 @@ static inline int64_t stream_Tell( stream_t *s )
 /**
  * Get the size of the stream.
  */
+VLC_USED static inline int stream_GetSize( stream_t *s, uint64_t *size )
+{
+    return stream_Control( s, STREAM_GET_SIZE, size );
+}
+
 static inline int64_t stream_Size( stream_t *s )
 {
     uint64_t i_pos;
 
-    if( stream_Control( s, STREAM_GET_SIZE, &i_pos ) )
-        i_pos = 0;
+    if( stream_GetSize( s, &i_pos ) )
+        return 0;
     if( i_pos >> 62 )
         return (int64_t)1 << 62;
     return i_pos;
