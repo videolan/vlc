@@ -346,7 +346,7 @@ static int FileControl( access_t *p_access, int i_query, va_list args )
         {
             struct stat st;
 
-            if (fstat (p_sys->fd, &st))
+            if (fstat (p_sys->fd, &st) || !S_ISREG(st.st_mode))
                 return VLC_EGENERIC;
             *va_arg( args, uint64_t * ) = st.st_size;
             break;
