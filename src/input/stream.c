@@ -470,19 +470,6 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
 
     switch (cmd)
     {
-        case STREAM_GET_POSITION:
-        {
-            uint64_t *ppos = va_arg(args, uint64_t *);
-
-            stream_ControlInternal(s, STREAM_GET_POSITION, ppos);
-            if (priv->peek != NULL)
-            {
-                assert(priv->peek->i_buffer <= *ppos);
-                *ppos -= priv->peek->i_buffer;
-            }
-            return VLC_SUCCESS;
-        }
-
         case STREAM_SET_POSITION:
         {
             uint64_t pos = va_arg(args, uint64_t);

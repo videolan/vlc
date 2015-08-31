@@ -485,10 +485,6 @@ static int AStreamControl(stream_t *s, int i_query, va_list args)
         case STREAM_GET_PRIVATE_ID_STATE:
             return stream_vaControl(s->p_source, i_query, args);
 
-        case STREAM_GET_POSITION:
-            *va_arg(args, uint64_t *) = sys->i_pos;
-            break;
-
         case STREAM_SET_POSITION:
         {
             uint64_t offset = va_arg(args, uint64_t);

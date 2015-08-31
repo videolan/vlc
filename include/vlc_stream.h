@@ -83,8 +83,7 @@ enum stream_query_e
     STREAM_CAN_CONTROL_PACE,    /**< arg1= bool *   res=cannot fail*/
     /* */
     STREAM_SET_POSITION,        /**< arg1= uint64_t       res=can fail  */
-    STREAM_GET_POSITION,        /**< arg1= uint64_t *     res=cannot fail*/
-    STREAM_GET_SIZE,            /**< arg1= uint64_t *     res=can fail */
+    STREAM_GET_SIZE=6,          /**< arg1= uint64_t *     res=can fail */
     STREAM_IS_DIRECTORY,        /**< arg1= bool *, arg2= bool *, arg3=bool *, res=cannot fail*/
 
     /* */

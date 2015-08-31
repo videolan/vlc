@@ -107,11 +107,6 @@ static int Control( stream_t *s, int i_query, va_list args )
             *va_arg( args, bool * ) = true;
             break;
 
-        case STREAM_GET_POSITION:
-            pi_64 = va_arg( args, uint64_t * );
-            *pi_64 = p_sys->i_pos;
-            break;
-
         case STREAM_SET_POSITION:
             i_64 = va_arg( args, uint64_t );
             i_64 = __MIN( i_64, s->p_sys->i_size );

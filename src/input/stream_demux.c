@@ -40,8 +40,6 @@ struct stream_sys_t
     block_fifo_t *p_fifo;
     block_t      *p_block;
 
-    uint64_t    i_pos;
-
     /* Demuxer */
     char        *psz_name;
     es_out_t    *out;
@@ -85,7 +83,6 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
         return NULL;
     }
 
-    p_sys->i_pos = 0;
     p_sys->out = out;
     p_sys->p_block = NULL;
     p_sys->psz_name = strdup( psz_demux );
@@ -208,7 +205,6 @@ static ssize_t DStreamRead( stream_t *s, void *buf, size_t len )
         sys->p_block = NULL;
     }
 
-    sys->i_pos += copy;
     return copy;
 }
 
@@ -229,11 +225,6 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
         case STREAM_CAN_PAUSE:
         case STREAM_CAN_CONTROL_PACE:
             *va_arg( args, bool * ) = false;
-            return VLC_SUCCESS;
-
-        case STREAM_GET_POSITION:
-            p_i64 = va_arg( args, uint64_t * );
-            *p_i64 = p_sys->i_pos;
             return VLC_SUCCESS;
 
         case STREAM_GET_PTS_DELAY:

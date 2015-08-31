@@ -874,9 +874,6 @@ static int Control( stream_t *s, int i_query, va_list args )
         case STREAM_CAN_CONTROL_PACE:
             *(va_arg( args, bool * )) = true;
             break;
-        case STREAM_GET_POSITION:
-            *(va_arg( args, uint64_t * )) = p_sys->playback.boffset;
-            break;
         case STREAM_SET_POSITION:
             {
                 uint64_t pos = (uint64_t)va_arg(args, uint64_t);

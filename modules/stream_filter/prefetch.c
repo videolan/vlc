@@ -338,9 +338,6 @@ static int Control(stream_t *stream, int query, va_list args)
             break;
         case STREAM_SET_POSITION:
             return Seek(stream, va_arg(args, uint64_t));
-        case STREAM_GET_POSITION:
-            *va_arg (args, uint64_t *) = sys->stream_offset;
-            break;
         case STREAM_IS_DIRECTORY:
             return VLC_EGENERIC;
         case STREAM_GET_SIZE:

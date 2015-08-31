@@ -86,8 +86,6 @@ struct stream_sys_t
     vlc_thread_t thread;
     pid_t        pid;
 
-    uint64_t     offset;
-
     int          read_fd;
     bool         can_pace;
     bool         can_pause;
@@ -194,7 +192,6 @@ static void *Thread (void *data)
 static ssize_t Read (stream_t *stream, void *buf, size_t buflen)
 {
     stream_sys_t *sys = stream->p_sys;
-    ssize_t ret = 0;
 
     if (buf == NULL) /* caller skips data, get big enough peek buffer */
     {
@@ -202,20 +199,15 @@ static ssize_t Read (stream_t *stream, void *buf, size_t buflen)
         if (unlikely(buf == NULL))
             return -1;
 
-        ret = Read(stream, buf, buflen);
+        ssize_t val = Read(stream, buf, buflen);
         free(buf);
-        return ret;
+        return val;
     }
 
     assert ((buf != NULL) || (buflen == 0));
 
     ssize_t val = vlc_read_i11e (sys->read_fd, buf, buflen);
-    if (val > 0)
-    {
-        sys->offset += val;
-        ret += val;
-    }
-    return ret;
+    return (val >= 0) ? val : 0;
 }
 
 /**
@@ -236,9 +228,6 @@ static int Control (stream_t *stream, int query, va_list args)
             break;
         case STREAM_CAN_CONTROL_PACE:
             *(va_arg (args, bool *)) = p_sys->can_pace;
-            break;
-        case STREAM_GET_POSITION:
-            *(va_arg (args, uint64_t *)) = p_sys->offset;
             break;
         case STREAM_GET_SIZE:
             *(va_arg (args, uint64_t *)) = 0;
@@ -281,7 +270,6 @@ static int Open (stream_t *stream, const char *path)
     vlc_mutex_init (&p_sys->lock);
     p_sys->paused = false;
     p_sys->pid = -1;
-    p_sys->offset = 0;
     stream_Control (stream->p_source, STREAM_CAN_PAUSE, &p_sys->can_pause);
     stream_Control (stream->p_source, STREAM_CAN_CONTROL_PACE,
                     &p_sys->can_pace);

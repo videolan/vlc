@@ -144,7 +144,6 @@ struct stream_sys_t
     size_t       flv_header_len;
     size_t       flv_header_bytes_sent;
     uint64_t     duration_seconds;
-    uint64_t     playback_offset;
 
     bool         live;
     bool         closed;
@@ -1847,9 +1846,7 @@ static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
     if ( header_unfinished( p_sys ) )
         return send_flv_header( stream, p_sys, buffer, i_read );
 
-    i_read = read_chunk_data( (vlc_object_t*)s, buffer, i_read, stream );
-    p_sys->playback_offset += i_read;
-    return i_read;
+    return read_chunk_data( (vlc_object_t*)s, buffer, i_read, stream );
 }
 
 static int Control( stream_t *s, int i_query, va_list args )
@@ -1870,9 +1867,6 @@ static int Control( stream_t *s, int i_query, va_list args )
             *va_arg (args, int64_t *) = INT64_C(1000) *
                 var_InheritInteger(s, "network-caching");
              break;
-        case STREAM_GET_POSITION:
-            *(va_arg (args, uint64_t *)) = s->p_sys->playback_offset;
-            break;
         case STREAM_GET_SIZE:
             *(va_arg (args, uint64_t *)) = get_stream_size(s);
             break;

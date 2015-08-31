@@ -290,13 +290,6 @@ static int Control( stream_t *s, int i_query, va_list args )
             }
         }
 
-        case STREAM_GET_POSITION:
-        {
-            uint64_t *pi_position = va_arg( args, uint64_t* );
-            *pi_position = p_sys->i_pos;
-            return VLC_SUCCESS;
-        }
-
         case STREAM_GET_SIZE:
         {
             uint64_t *pi_size = va_arg( args, uint64_t* );

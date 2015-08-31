@@ -311,19 +311,6 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
             break;
         }
 
-        case STREAM_GET_POSITION:
-        {
-            uint64_t *ppos =va_arg(args, uint64_t *);
-
-            *ppos = access->info.i_pos;
-            if (sys->block != NULL)
-            {
-                assert(sys->block->i_buffer <= *ppos);
-                *ppos -= sys->block->i_buffer;
-            }
-            break;
-        }
-
         case STREAM_SET_POSITION:
         {
             uint64_t pos = va_arg(args, uint64_t);

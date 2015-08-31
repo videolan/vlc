@@ -95,7 +95,6 @@ struct stream_sys_t
         block_t *p_list;
     } remain;
 
-    size_t i_pos;
     bool   b_unitsizeset;
 };
 
@@ -256,8 +255,6 @@ static ssize_t Read( stream_t *p_stream, void *p_buf, size_t i_toread )
     int i_read = DecoderRead( p_stream, p_buf, i_toread );
     if ( i_read < 0 )
         return -1;
-    else
-        p_sys->i_pos += i_read;
     return i_read;
 }
 
@@ -269,10 +266,7 @@ static int Seek( stream_t *p_stream, uint64_t i_pos )
 {
     int i_ret = stream_Seek( p_stream->p_source, i_pos );
     if ( i_ret == VLC_SUCCESS )
-    {
         RemainFlush( p_stream->p_sys );
-        p_stream->p_sys->i_pos = i_pos;
-    }
     return i_ret;
 }
 
@@ -283,9 +277,6 @@ static int Control( stream_t *p_stream, int i_query, va_list args )
 {
     switch( i_query )
     {
-    case STREAM_GET_POSITION:
-        *va_arg( args, uint64_t *) = p_stream->p_sys->i_pos;
-        return VLC_SUCCESS;
     case STREAM_SET_POSITION:
         return Seek( p_stream, va_arg( args, uint64_t ) );
     default:
@@ -362,8 +353,6 @@ static int Open( vlc_object_t *p_object )
         msg_Err( p_stream, "cannot create B25 instance" );
         goto error;
     }
-
-    p_sys->i_pos = stream_Tell( p_stream->p_source );
 
     p_stream->pf_read = Read;
     p_stream->pf_control = Control;
