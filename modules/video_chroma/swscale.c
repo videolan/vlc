@@ -36,6 +36,7 @@
 #include <vlc_cpu.h>
 
 #include <libswscale/swscale.h>
+#include <libswscale/version.h>
 
 #ifdef __APPLE__
 # include <TargetConditionals.h>
@@ -226,6 +227,7 @@ static int GetSwsCpuMask(void)
 {
     int i_sws_cpu = 0;
 
+#if LIBSWSCALE_VERSION_MAJOR < 4
 #if defined(__i386__) || defined(__x86_64__)
     if( vlc_CPU_MMX() )
         i_sws_cpu |= SWS_CPU_CAPS_MMX;
@@ -238,6 +240,7 @@ static int GetSwsCpuMask(void)
 #elif defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__)
     if( vlc_CPU_ALTIVEC() )
         i_sws_cpu |= SWS_CPU_CAPS_ALTIVEC;
+#endif
 #endif
 
     return i_sws_cpu;
