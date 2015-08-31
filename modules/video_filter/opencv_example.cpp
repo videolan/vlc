@@ -149,7 +149,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     IplImage** p_img = NULL;
     CvPoint pt1, pt2;
-    int i, scale = 1;
+    int scale = 1;
     filter_sys_t *p_sys = p_filter->p_sys;
  
     if ((!p_pic) )
@@ -189,7 +189,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         }
 
         //populate the video_filter_region_info_t struct
-        for( i = 0; i < (faces ? faces->total : 0); i++ )
+        for( int i = 0; i < (faces ? faces->total : 0); i++ )
         {
             CvRect *r = (CvRect*)cvGetSeqElem( faces, i );
             pt1.x = r->x*scale;
