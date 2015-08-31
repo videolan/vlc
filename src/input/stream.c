@@ -45,6 +45,7 @@ typedef struct stream_priv_t
 {
     stream_t stream;
     block_t *peek;
+    uint64_t offset;
 
     /* UTF-16 and UTF-32 file reading */
     struct {
@@ -75,6 +76,7 @@ stream_t *stream_CommonNew(vlc_object_t *parent)
     s->pf_destroy = NULL;
     s->p_input = NULL;
     priv->peek = NULL;
+    priv->offset = 0;
 
     /* UTF16 and UTF32 text file conversion */
     priv->text.conv = (vlc_iconv_t)(-1);
@@ -313,6 +315,7 @@ error:
 
 static ssize_t stream_ReadRaw(stream_t *s, void *buf, size_t len)
 {
+    stream_priv_t *priv = (stream_priv_t *)s;
     size_t copy = 0;
     ssize_t ret = 0;
 
@@ -333,6 +336,7 @@ static ssize_t stream_ReadRaw(stream_t *s, void *buf, size_t len)
             buf = (unsigned char *)buf + ret;
         len -= ret;
         copy += ret;
+        priv->offset += ret;
     }
 
     return (copy > 0) ? (ssize_t)copy : ret;
@@ -428,6 +432,20 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
     /* Nothing to do */
     *bufp = peek->p_buffer;
     return len;
+}
+
+uint64_t stream_Tell(const stream_t *s)
+{
+    const stream_priv_t *priv = (const stream_priv_t *)s;
+    uint64_t pos = priv->offset;
+
+    if (priv->peek != NULL)
+    {
+        assert(pos >= priv->peek->i_buffer);
+        pos -= priv->peek->i_buffer;
+    }
+
+    return pos;
 }
 
 static int stream_ControlInternal(stream_t *s, int cmd, ...)

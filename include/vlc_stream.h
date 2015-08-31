@@ -142,24 +142,19 @@ VLC_API ssize_t stream_Read(stream_t *, void *, size_t) VLC_USED;
  */
 VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
 
+/**
+ * Tells the current stream position.
+ *
+ * @return the byte offset from the beginning of the stream (cannot fail)
+ */
+VLC_API uint64_t stream_Tell(const stream_t *) VLC_USED;
+
 VLC_API int stream_vaControl( stream_t *s, int i_query, va_list args );
 VLC_API void stream_Delete( stream_t *s );
 VLC_API int stream_Control( stream_t *s, int i_query, ... );
 VLC_API block_t * stream_Block( stream_t *s, size_t );
 VLC_API char * stream_ReadLine( stream_t * );
 VLC_API input_item_t *stream_ReadDir( stream_t * );
-
-/**
- * Get the current position in a stream
- */
-static inline int64_t stream_Tell( stream_t *s )
-{
-    uint64_t i_pos;
-    stream_Control( s, STREAM_GET_POSITION, &i_pos );
-    if( i_pos >> 62 )
-        return (int64_t)1 << 62;
-    return i_pos;
-}
 
 /**
  * Get the size of the stream.
