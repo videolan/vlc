@@ -1314,16 +1314,15 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
 static void vnc_encrypt_bytes( unsigned char *bytes, char *passwd )
 {
     unsigned char key[8];
-    unsigned int i;
 
-    for (i = 0; i < 8; i++)
+    for( unsigned i = 0; i < 8; i++ )
         key[i] = i < strlen( passwd ) ? passwd[i] : '\0';
 
     gcry_cipher_hd_t ctx;
     gcry_cipher_open( &ctx, GCRY_CIPHER_DES, GCRY_CIPHER_MODE_ECB,0);
 
     /* reverse bits of the key */
-    for( i = 0 ; i < 8 ; i ++ )
+    for( unsigned i = 0 ; i < 8 ; i++ )
         key[i] =
             (key[i] >> 7) +
             (((key[i] >> 6) & 0x01 ) << 1 ) +
