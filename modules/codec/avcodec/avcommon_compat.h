@@ -75,6 +75,11 @@ static inline void avcodec_free_context( AVCodecContext **ctx )
 
 #endif /* HAVE_LIBAVUTIL_AVUTIL_H */
 
+/* libavutil/pixfmt.h */
+#ifndef PixelFormat
+# define PixelFormat AVPixelFormat
+#endif
+
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>
 
