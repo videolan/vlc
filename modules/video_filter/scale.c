@@ -87,7 +87,6 @@ static int OpenFilter( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_pic_dst;
-    int i_plane;
 
     if( !p_pic ) return NULL;
 
@@ -113,7 +112,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         p_filter->fmt_in.video.i_chroma != VLC_CODEC_ARGB &&
         p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGB32 )
     {
-        for( i_plane = 0; i_plane < p_pic_dst->i_planes; i_plane++ )
+        for( int i_plane = 0; i_plane < p_pic_dst->i_planes; i_plane++ )
         {
             const int i_src_pitch    = p_pic->p[i_plane].i_pitch;
             const int i_dst_pitch    = p_pic_dst->p[i_plane].i_pitch;
