@@ -209,11 +209,10 @@ static void PreparePlanar( filter_t *p_filter, picture_t *p_inpic )
         {
             const int d = abs( p_inpix_u[y*i_src_pitch_u+x] - p_oldpix_u[y*i_old_pitch_u+x] ) +
                           abs( p_inpix_v[y*i_src_pitch_v+x] - p_oldpix_v[y*i_old_pitch_v+x] );
-            int i, j;
 
-            for( j = 0; j < i_chroma_dy; j++ )
+            for( int j = 0; j < i_chroma_dy; j++ )
             {
-                for( i = 0; i < i_chroma_dx; i++ )
+                for( int i = 0; i < i_chroma_dx; i++ )
                     p_sys->p_buf2[i_chroma_dy*p_fmt->i_width*j + i_chroma_dx*i] = d;
             }
         }
@@ -335,14 +334,12 @@ static void GaussianConvolution( uint32_t *p_inpix, uint32_t *p_smooth,
                                  int i_src_pitch, int i_num_lines,
                                  int i_src_visible )
 {
-    int x,y;
-
     /* A bit overkill but ... simpler */
     memset( p_smooth, 0, sizeof(*p_smooth) * i_src_pitch * i_num_lines );
 
-    for( y = 2; y < i_num_lines - 2; y++ )
+    for( int y = 2; y < i_num_lines - 2; y++ )
     {
-        for( x = 2; x < i_src_visible - 2; x++ )
+        for( int x = 2; x < i_src_visible - 2; x++ )
         {
             p_smooth[y*i_src_visible+x] = (uint32_t)(
               /* 2 rows up */
@@ -390,7 +387,6 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
                        int *color_y_min, int *color_y_max )
 {
     int last = 1;
-    int i, j;
 
     /**
      * Apply some smoothing to remove noise
@@ -400,13 +396,14 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
     /**
      * Label the shapes and build the labels dependencies list
      */
-    for( j = 0; j < i_pitch; j++ )
+    for( int j = 0; j < i_pitch; j++ )
     {
         p_smooth[j] = 0;
         p_smooth[(i_lines-1)*i_pitch+j] = 0;
     }
-    for( i = 1; i < i_lines-1; i++ )
+    for( int i = 1; i < i_lines-1; i++ )
     {
+        int j;
         p_smooth[i*i_pitch] = 0;
         for( j = 1; j < i_pitch-1; j++ )
         {
@@ -454,7 +451,7 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
     /**
      * Initialise empty rectangle list
      */
-    for( i = 1; i < last; i++ )
+    for( int i = 1; i < last; i++ )
     {
         color_x_min[i] = -1;
         color_x_max[i] = -1;
@@ -465,7 +462,7 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
     /**
      * Compute rectangle coordinates
      */
-    for( i = 0; i < i_pitch * i_lines; i++ )
+    for( int i = 0; i < i_pitch * i_lines; i++ )
     {
         if( p_smooth[i] )
         {
@@ -496,11 +493,11 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
     /**
      * Merge overlaping rectangles
      */
-    for( i = 1; i < last; i++ )
+    for( int i = 1; i < last; i++ )
     {
         if( colors[i] != i ) continue;
         if( color_x_min[i] == -1 ) continue;
-        for( j = i+1; j < last; j++ )
+        for( int j = i+1; j < last; j++ )
         {
             if( colors[j] != j ) continue;
             if( color_x_min[j] == -1 ) continue;
@@ -523,9 +520,10 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
 static void Draw( filter_t *p_filter, uint8_t *p_pix, int i_pix_pitch, int i_pix_size )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    int i, j;
 
-    for( i = 1, j = 0; i < p_sys->i_colors; i++ )
+    int j = 0;
+
+    for( int i = 1; i < p_sys->i_colors; i++ )
     {
         int x, y;
 
