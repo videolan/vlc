@@ -137,6 +137,7 @@ struct block_t
  ****************************************************************************/
 VLC_API void block_Init( block_t *, void *, size_t );
 VLC_API block_t *block_Alloc( size_t ) VLC_USED VLC_MALLOC;
+block_t *block_TryRealloc(block_t *, ssize_t pre, size_t body) VLC_USED;
 VLC_API block_t *block_Realloc( block_t *, ssize_t i_pre, size_t i_body ) VLC_USED;
 
 static inline void block_CopyProperties( block_t *dst, block_t *src )

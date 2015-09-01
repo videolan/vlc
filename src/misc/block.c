@@ -145,52 +145,30 @@ block_t *block_Alloc (size_t size)
     return b;
 }
 
-block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
+block_t *block_TryRealloc (block_t *p_block, ssize_t i_prebody, size_t i_body)
 {
-    size_t requested = i_prebody + i_body;
-
     block_Check( p_block );
 
     /* Corner case: empty block requested */
     if( i_prebody <= 0 && i_body <= (size_t)(-i_prebody) )
-    {
-        block_Release( p_block );
-        return NULL;
-    }
+        i_prebody = i_body = 0;
 
     assert( p_block->p_start <= p_block->p_buffer );
     assert( p_block->p_start + p_block->i_size
                                     >= p_block->p_buffer + p_block->i_buffer );
-
-    /* Corner case: the current payload is discarded completely */
-    if( i_prebody <= 0 && p_block->i_buffer <= (size_t)-i_prebody )
-         p_block->i_buffer = 0; /* discard current payload */
-    if( p_block->i_buffer == 0 )
-    {
-        if( requested <= p_block->i_size )
-        {   /* Enough room: recycle buffer */
-            size_t extra = p_block->i_size - requested;
-
-            p_block->p_buffer = p_block->p_start + (extra / 2);
-            p_block->i_buffer = requested;
-            return p_block;
-        }
-        /* Not enough room: allocate a new buffer */
-        block_t *p_rea = block_Alloc( requested );
-        if( p_rea )
-            BlockMetaCopy( p_rea, p_block );
-        block_Release( p_block );
-        return p_rea;
-    }
 
     /* First, shrink payload */
 
     /* Pull payload start */
     if( i_prebody < 0 )
     {
-        assert( p_block->i_buffer >= (size_t)-i_prebody );
-        p_block->p_buffer -= i_prebody;
-        p_block->i_buffer += i_prebody;
+        if( p_block->i_buffer >= (size_t)-i_prebody )
+        {
+            p_block->p_buffer -= i_prebody;
+            p_block->i_buffer += i_prebody;
+        }
+        else /* Discard current payload entirely */
+            p_block->i_buffer = 0;
         i_body += i_prebody;
         i_prebody = 0;
     }
@@ -199,30 +177,47 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
     if( p_block->i_buffer > i_body )
         p_block->i_buffer = i_body;
 
+    size_t requested = i_prebody + i_body;
+
+    if( p_block->i_buffer == 0 )
+    {   /* Corner case: nothing to preserve */
+        if( requested <= p_block->i_size )
+        {   /* Enough room: recycle buffer */
+            size_t extra = p_block->i_size - requested;
+
+            p_block->p_buffer = p_block->p_start + (extra / 2);
+            p_block->i_buffer = requested;
+            return p_block;
+        }
+
+        /* Not enough room: allocate a new buffer */
+        block_t *p_rea = block_Alloc( requested );
+        if( p_rea == NULL )
+            return NULL;
+
+        BlockMetaCopy( p_rea, p_block );
+        block_Release( p_block );
+        return p_rea;
+    }
+
     uint8_t *p_start = p_block->p_start;
     uint8_t *p_end = p_start + p_block->i_size;
 
-    /* Second, reallocate the buffer if we lack space. This is done now to
-     * minimize the payload size for memory copy. */
+    /* Second, reallocate the buffer if we lack space. */
     assert( i_prebody >= 0 );
     if( (size_t)(p_block->p_buffer - p_start) < (size_t)i_prebody
      || (size_t)(p_end - p_block->p_buffer) < i_body )
     {
         block_t *p_rea = block_Alloc( requested );
-        if( p_rea )
-        {
-            BlockMetaCopy( p_rea, p_block );
-            p_rea->p_buffer += i_prebody;
-            p_rea->i_buffer -= i_prebody;
-            memcpy( p_rea->p_buffer, p_block->p_buffer, p_block->i_buffer );
-        }
-        block_Release( p_block );
         if( p_rea == NULL )
             return NULL;
-        p_block = p_rea;
-    }
 
-    /* NOTE: p_start and p_end are corrupted from this point */
+        memcpy( p_rea->p_buffer + i_prebody, p_block->p_buffer,
+                p_block->i_buffer );
+        BlockMetaCopy( p_rea, p_block );
+        block_Release( p_block );
+        return p_rea;
+    }
 
     /* Third, expand payload */
 
@@ -241,6 +236,13 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
     return p_block;
 }
 
+block_t *block_Realloc (block_t *block, ssize_t prebody, size_t body)
+{
+    block_t *rea = block_TryRealloc (block, prebody, body);
+    if (rea == NULL)
+        block_Release(block);
+    return rea;
+}
 
 static void block_heap_Release (block_t *block)
 {
