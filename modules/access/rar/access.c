@@ -40,6 +40,7 @@ struct access_sys_t {
     stream_t               *s;
     rar_file_t             *file;
     const rar_file_chunk_t *chunk;
+    uint64_t                position;
 };
 
 static int Seek(access_t *access, uint64_t position)
@@ -49,6 +50,7 @@ static int Seek(access_t *access, uint64_t position)
 
     if (position > file->real_size)
         position = file->real_size;
+    sys->position = position;
 
     /* Search the chunk */
     const rar_file_chunk_t *old_chunk = sys->chunk;
@@ -57,7 +59,6 @@ static int Seek(access_t *access, uint64_t position)
         if (position < sys->chunk->cummulated_size + sys->chunk->size)
             break;
     }
-    access->info.i_pos = position;
     access->info.b_eof = false;
 
     const uint64_t offset = sys->chunk->offset +
@@ -78,7 +79,7 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
     size_t total = 0;
     while (total < size) {
         const uint64_t chunk_end = sys->chunk->cummulated_size + sys->chunk->size;
-        int max = __MIN(__MIN((int64_t)(size - total), (int64_t)(chunk_end - access->info.i_pos)), INT_MAX);
+        int max = __MIN(__MIN((int64_t)(size - total), (int64_t)(chunk_end - sys->position)), INT_MAX);
         if (max <= 0)
             break;
 
@@ -89,9 +90,9 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
         total += r;
         if( data )
             data += r;
-        access->info.i_pos += r;
-        if (access->info.i_pos >= chunk_end &&
-            Seek(access, access->info.i_pos))
+        sys->position += r;
+        if (sys->position >= chunk_end &&
+            Seek(access, sys->position))
             break;
     }
     if (size > 0 && total <= 0)

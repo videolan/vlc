@@ -110,6 +110,7 @@ struct access_sys_t
 {
     /* file sizes of all parts */
     size_array_t file_sizes;
+    uint64_t offset;
     uint64_t size; /* total size */
 
     /* index and fd of current open file */
@@ -351,7 +352,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( i_ret > 0 )
     {
         /* success */
-        p_access->info.i_pos += i_ret;
+        p_sys->offset += i_ret;
         UpdateFileSize( p_access );
         FindSeekpoint( p_access );
         return i_ret;
@@ -392,7 +393,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     /* might happen if called by ACCESS_SET_SEEKPOINT */
     i_pos = __MIN( i_pos, p_sys->size );
 
-    p_access->info.i_pos = i_pos;
+    p_sys->offset = i_pos;
     p_access->info.b_eof = false;
 
     /* find correct chapter */
@@ -424,7 +425,7 @@ static void FindSeekpoint( access_t *p_access )
         return;
 
     int new_seekpoint = p_sys->cur_seekpoint;
-    if( p_access->info.i_pos < (uint64_t)p_sys->p_marks->
+    if( p_sys->offset < (uint64_t)p_sys->p_marks->
         seekpoint[p_sys->cur_seekpoint]->i_byte_offset )
     {
         /* i_pos moved backwards, start fresh */
@@ -433,7 +434,7 @@ static void FindSeekpoint( access_t *p_access )
 
     /* only need to check the following seekpoints */
     while( new_seekpoint + 1 < p_sys->p_marks->i_seekpoint &&
-        p_access->info.i_pos >= (uint64_t)p_sys->p_marks->
+        p_sys->offset >= (uint64_t)p_sys->p_marks->
         seekpoint[new_seekpoint + 1]->i_byte_offset )
     {
         new_seekpoint++;
@@ -579,7 +580,7 @@ static void UpdateFileSize( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     struct stat st;
 
-    if( p_sys->size >= p_access->info.i_pos )
+    if( p_sys->size >= p_sys->offset )
         return;
 
     /* TODO: not sure if this can happen or what to do in this case */

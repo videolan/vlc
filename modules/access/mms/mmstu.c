@@ -277,7 +277,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             else
             {
                 KeepAliveStop( p_access );
-                Seek( p_access, p_access->info.i_pos );
+                Seek( p_access, p_sys->i_position );
             }
             break;
 
@@ -299,11 +299,11 @@ static int Seek( access_t * p_access, uint64_t i_pos )
 
     if( i_pos < p_sys->i_header)
     {
-        if( p_access->info.i_pos < p_sys->i_header )
+        if( p_sys->i_position < p_sys->i_header )
         {
             /* no need to restart stream, it was already one
              * or no stream was yet read */
-            p_access->info.i_pos = i_pos;
+            p_sys->i_position = i_pos;
             return VLC_SUCCESS;
         }
         else
@@ -381,7 +381,7 @@ static int Seek( access_t * p_access, uint64_t i_pos )
     msg_Dbg( p_access, "Streaming restarted" );
 
     p_sys->i_media_used += i_offset;
-    p_access->info.i_pos = i_pos;
+    p_sys->i_position = i_pos;
     p_access->info.b_eof = false;
 
     return VLC_SUCCESS;
@@ -397,16 +397,16 @@ static block_t *Block( access_t *p_access )
     if( p_access->info.b_eof )
         return NULL;
 
-    if( p_access->info.i_pos < p_sys->i_header )
+    if( p_sys->i_position < p_sys->i_header )
     {
-        const size_t i_copy = p_sys->i_header - p_access->info.i_pos;
+        const size_t i_copy = p_sys->i_header - p_sys->i_position;
 
         block_t *p_block = block_Alloc( i_copy );
         if( !p_block )
             return NULL;
 
-        memcpy( p_block->p_buffer, &p_sys->p_header[p_access->info.i_pos], i_copy );
-        p_access->info.i_pos += i_copy;
+        memcpy( p_block->p_buffer, &p_sys->p_header[p_sys->i_position], i_copy );
+        p_sys->i_position += i_copy;
         return p_block;
     }
     else if( p_sys->p_media && p_sys->i_media_used < __MAX( p_sys->i_media, p_sys->i_packet_length ) )
@@ -429,7 +429,7 @@ static block_t *Block( access_t *p_access )
             memset( &p_block->p_buffer[i_copy], 0, i_padding );
 
         p_sys->i_media_used += i_copy + i_padding;
-        p_access->info.i_pos += i_copy + i_padding;
+        p_sys->i_position += i_copy + i_padding;
         return p_block;
     }
 
@@ -511,7 +511,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
     p_sys->i_media = 0;
     p_sys->i_media_used = 0;
 
-    p_access->info.i_pos = 0;
+    p_sys->i_position = 0;
     p_sys->i_buffer_tcp = 0;
     p_sys->i_buffer_udp = 0;
     p_sys->p_cmd = NULL;

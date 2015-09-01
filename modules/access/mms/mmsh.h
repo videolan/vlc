@@ -65,6 +65,7 @@ struct access_sys_t
     unsigned int    i_packet_length;
 
     uint64_t        i_start;
+    uint64_t        i_position;
 
     asf_header_t    asfh;
     guid_t          guid;

@@ -174,6 +174,7 @@ struct access_sys_t
     char       *psz_icy_title;
 
     uint64_t i_remaining;
+    uint64_t offset;
     uint64_t size;
 
     /* cookie jar borrowed from playlist, do not free */
@@ -270,8 +271,8 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
     p_sys->i_remaining = 0;
     p_sys->b_persist = false;
     p_sys->b_has_size = false;
+    p_sys->offset = 0;
     p_sys->size = 0;
-    p_access->info.i_pos  = 0;
     p_access->info.b_eof  = false;
 
     /* Only forward an store cookies if the corresponding option is activated */
@@ -658,7 +659,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_sys->b_has_size )
     {
         /* Remaining bytes in the file */
-        uint64_t remainder = p_sys->size - p_access->info.i_pos;
+        uint64_t remainder = p_sys->size - p_sys->offset;
         if( remainder < i_len )
             i_len = remainder;
 
@@ -669,10 +670,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( i_len == 0 )
         goto fatal;
 
-    if( p_sys->i_icy_meta > 0 && p_access->info.i_pos - p_sys->i_icy_offset > 0 )
+    if( p_sys->i_icy_meta > 0 && p_sys->offset - p_sys->i_icy_offset > 0 )
     {
         int64_t i_next = p_sys->i_icy_meta -
-                                    (p_access->info.i_pos - p_sys->i_icy_offset ) % p_sys->i_icy_meta;
+                                    (p_sys->offset - p_sys->i_icy_offset ) % p_sys->i_icy_meta;
 
         if( i_next == p_sys->i_icy_meta )
         {
@@ -705,7 +706,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         if( p_sys->b_reconnect )
         {
             msg_Dbg( p_access, "got disconnected, trying to reconnect" );
-            if( Connect( p_access, p_access->info.i_pos ) )
+            if( Connect( p_access, p_sys->offset ) )
             {
                 msg_Dbg( p_access, "reconnection failed" );
             }
@@ -728,10 +729,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     }
 
     assert( i_read >= 0 );
-    p_access->info.i_pos += i_read;
+    p_sys->offset += i_read;
     if( p_sys->b_has_size )
     {
-        assert( p_access->info.i_pos <= p_sys->size );
+        assert( p_sys->offset <= p_sys->size );
         assert( (unsigned)i_read <= p_sys->i_remaining );
         p_sys->i_remaining -= i_read;
     }
@@ -1015,8 +1016,8 @@ static int Connect( access_t *p_access, uint64_t i_tell )
     p_sys->i_remaining = 0;
     p_sys->b_persist = false;
     p_sys->b_has_size = false;
+    p_sys->offset = i_tell;
     p_sys->size = 0;
-    p_access->info.i_pos  = i_tell;
     p_access->info.b_eof  = false;
 
     /* Open connection */
@@ -1296,7 +1297,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
             uint64_t i_nsize = p_sys->size;
             sscanf(p,"bytes %"SCNu64"-%"SCNu64"/%"SCNu64,&i_ntell,&i_nend,&i_nsize);
             if(i_nend > i_ntell ) {
-                p_access->info.i_pos = i_ntell;
+                p_sys->offset = i_ntell;
                 p_sys->i_icy_offset  = i_ntell;
                 p_sys->i_remaining = i_nend+1-i_ntell;
                 uint64_t i_size = (i_nsize > i_nend) ? i_nsize : (i_nend + 1);

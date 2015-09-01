@@ -143,6 +143,7 @@ struct access_sys_t
 
     char       sz_epsv_ip[NI_MAXNUMERICHOST];
     bool       out;
+    uint64_t   offset;
     uint64_t   size;
 };
 #define GET_OUT_SYS( p_this ) \
@@ -632,6 +633,7 @@ static int InOpen( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->data.fd = -1;
     p_sys->out = false;
+    p_sys->offset = 0;
     p_sys->size = UINT64_MAX;
     readTLSMode( p_sys, p_access->psz_access );
 
@@ -797,12 +799,14 @@ static int _Seek( vlc_object_t *p_access, access_sys_t *p_sys, uint64_t i_pos )
 
 static int Seek( access_t *p_access, uint64_t i_pos )
 {
-    int val = _Seek( (vlc_object_t *)p_access, p_access->p_sys, i_pos );
+    access_sys_t *p_sys = p_access->p_sys;
+
+    int val = _Seek( (vlc_object_t *)p_access, p_sys, i_pos );
     if( val )
         return val;
 
     p_access->info.b_eof = false;
-    p_access->info.i_pos = i_pos;
+    p_sys->offset = i_pos;
 
     return VLC_SUCCESS;
 }
@@ -833,10 +837,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     else
         i_read = vlc_recv_i11e( p_sys->data.fd, p_buffer, i_len, 0 );
 
-    if( i_read == 0 )
+    if( i_read > 0 )
+        p_sys->offset += i_read;
+    else if( i_read == 0 )
         p_access->info.b_eof = true;
-    else if( i_read > 0 )
-        p_access->info.i_pos += i_read;
     else if( errno != EINTR && errno != EAGAIN )
     {
         msg_Err( p_access, "receive error: %s", vlc_strerror_c(errno) );
@@ -954,7 +958,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_PAUSE_STATE:
             pb_bool = (bool*)va_arg( args, bool* );
             if ( !pb_bool )
-              return Seek( p_access, p_access->info.i_pos );
+                 return Seek( p_access, p_access->p_sys->offset );
             break;
 
         default:

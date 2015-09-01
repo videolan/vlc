@@ -66,6 +66,7 @@ vlc_module_end ()
 struct access_sys_t
 {
     vcddev_t    *vcddev;                            /* vcd device descriptor */
+    uint64_t    offset;
 
     /* Title infos */
     int           i_titles;
@@ -141,6 +142,7 @@ static int Open( vlc_object_t *p_this )
     if( unlikely(!p_sys ))
         goto error;
     p_sys->vcddev = vcddev;
+    p_sys->offset = 0;
 
     /* We read the Table Of Content information */
     p_sys->i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
@@ -200,8 +202,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_current_title = i_title;
     p_sys->i_current_seekpoint = i_chapter;
-    p_access->info.i_pos       = (uint64_t)( p_sys->i_sector - p_sys->p_sectors[1+i_title] ) *
-                                 VCD_DATA_SIZE;
+    p_sys->offset = (uint64_t)(p_sys->i_sector - p_sys->p_sectors[1+i_title]) *
+                               VCD_DATA_SIZE;
 
     return VLC_SUCCESS;
 
@@ -284,9 +286,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
             if( i != p_sys->i_current_title )
             {
                 /* Update info */
+                p_sys->offset = 0;
                 p_sys->i_current_title = i;
                 p_sys->i_current_seekpoint = 0;
-                p_access->info.i_pos = 0;
 
                 /* Next sector to read */
                 p_sys->i_sector = p_sys->p_sectors[1+i];
@@ -307,8 +309,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 p_sys->i_sector = p_sys->p_sectors[1 + i_title] +
                     t->seekpoint[i]->i_byte_offset / VCD_DATA_SIZE;
 
-                p_access->info.i_pos = (uint64_t)(p_sys->i_sector -
-                    p_sys->p_sectors[1 + i_title]) *VCD_DATA_SIZE;
+                p_sys->offset = (uint64_t)(p_sys->i_sector -
+                    p_sys->p_sectors[1 + i_title]) * VCD_DATA_SIZE;
             }
             break;
         }
@@ -342,7 +344,7 @@ static block_t *Block( access_t *p_access )
 
         p_sys->i_current_title++;
         p_sys->i_current_seekpoint = 0;
-        p_access->info.i_pos = 0;
+        p_sys->offset = 0;
     }
 
     /* Don't read after the end of a title */
@@ -367,8 +369,8 @@ static block_t *Block( access_t *p_access )
         block_Release( p_block );
 
         /* Try to skip one sector (in case of bad sectors) */
+        p_sys->offset += VCD_DATA_SIZE;
         p_sys->i_sector++;
-        p_access->info.i_pos += VCD_DATA_SIZE;
         return NULL;
     }
 
@@ -380,7 +382,7 @@ static block_t *Block( access_t *p_access )
         if( t->i_seekpoint > 0 &&
             p_sys->i_current_seekpoint + 1 < t->i_seekpoint &&
             (int64_t) /* Unlikely to go over 8192 PetaB */
-                (p_access->info.i_pos + i_read * VCD_DATA_SIZE) >=
+                (p_sys->offset + i_read * VCD_DATA_SIZE) >=
             t->seekpoint[p_sys->i_current_seekpoint + 1]->i_byte_offset )
         {
             msg_Dbg( p_access, "seekpoint change" );
@@ -389,8 +391,8 @@ static block_t *Block( access_t *p_access )
     }
 
     /* Update a few values */
+    p_sys->offset += p_block->i_buffer;
     p_sys->i_sector += i_blocks;
-    p_access->info.i_pos += p_block->i_buffer;
 
     return p_block;
 }
@@ -405,7 +407,7 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     int i_seekpoint;
 
     /* Next sector to read */
-    p_access->info.i_pos = i_pos;
+    p_sys->offset = i_pos;
     p_sys->i_sector = i_pos / VCD_DATA_SIZE +
         p_sys->p_sectors[p_sys->i_current_title + 1];
 
