@@ -41,7 +41,6 @@ struct access_sys_t
 {
     /* zlib / unzip members */
     unzFile            zipFile;
-    zlib_filefunc_def *fileFunctions;
 
     /* file in zip information */
     char              *psz_fileInzip;
@@ -185,7 +184,6 @@ exit:
             unzClose( p_access->p_sys->zipFile );
         }
         free( p_sys->psz_fileInzip );
-        free( p_sys->fileFunctions );
         free( p_sys );
     }
 
@@ -209,7 +207,6 @@ void AccessClose( vlc_object_t *p_this )
         unzClose( file );
     }
     free( p_sys->psz_fileInzip );
-    free( p_sys->fileFunctions );
     free( p_sys );
 }
 
