@@ -445,6 +445,29 @@ uint64_t stream_Tell(const stream_t *s)
     return pos;
 }
 
+int stream_Seek(stream_t *s, uint64_t offset)
+{
+    stream_priv_t *priv = (stream_priv_t *)s;
+
+    if (s->pf_seek == NULL)
+        return VLC_EGENERIC;
+
+    int ret = s->pf_seek(s, offset);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    priv->offset = offset;
+
+    block_t *peek = priv->peek;
+    if (peek != NULL)
+    {
+        priv->peek = NULL;
+        block_Release(peek);
+    }
+
+    return ret;
+}
+
 static int stream_ControlInternal(stream_t *s, int cmd, ...)
 {
     va_list ap;
@@ -467,26 +490,6 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
 
     switch (cmd)
     {
-        case STREAM_SET_POSITION:
-        {
-            uint64_t pos = va_arg(args, uint64_t);
-
-            if (s->pf_seek == NULL)
-                return VLC_EGENERIC;
-
-            int ret = s->pf_seek(s, pos);
-            if (ret != VLC_SUCCESS)
-                return ret;
-
-            if (priv->peek != NULL)
-            {
-                block_Release(priv->peek);
-                priv->peek = NULL;
-            }
-            priv->offset = pos;
-            return VLC_SUCCESS;
-        }
-
         case STREAM_GET_PRIVATE_BLOCK:
         {
             block_t **b = va_arg(args, block_t **);

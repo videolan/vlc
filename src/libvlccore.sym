@@ -403,6 +403,7 @@ stream_MemoryNew
 stream_Peek
 stream_Read
 stream_ReadLine
+stream_Seek
 stream_Tell
 stream_UrlNew
 stream_vaControl

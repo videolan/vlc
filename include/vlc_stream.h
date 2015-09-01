@@ -82,7 +82,6 @@ enum stream_query_e
     STREAM_CAN_PAUSE,           /**< arg1= bool *   res=cannot fail*/
     STREAM_CAN_CONTROL_PACE,    /**< arg1= bool *   res=cannot fail*/
     /* */
-    STREAM_SET_POSITION,        /**< arg1= uint64_t       res=can fail  */
     STREAM_GET_SIZE=6,          /**< arg1= uint64_t *     res=can fail */
     STREAM_IS_DIRECTORY,        /**< arg1= bool *, arg2= bool *, arg3=bool *, res=cannot fail*/
 
@@ -148,6 +147,14 @@ VLC_API ssize_t stream_Peek(stream_t *, const uint8_t **, size_t) VLC_USED;
  */
 VLC_API uint64_t stream_Tell(const stream_t *) VLC_USED;
 
+/**
+ * Sets the current stream position.
+ *
+ * @param offset byte offset from the beginning of the stream
+ * @return zero on success, a negative value on error
+ */
+VLC_API int stream_Seek(stream_t *, uint64_t offset) VLC_USED;
+
 VLC_API int stream_vaControl( stream_t *s, int i_query, va_list args );
 VLC_API void stream_Delete( stream_t *s );
 VLC_API int stream_Control( stream_t *s, int i_query, ... );
@@ -172,11 +179,6 @@ static inline int64_t stream_Size( stream_t *s )
     if( i_pos >> 62 )
         return (int64_t)1 << 62;
     return i_pos;
-}
-
-static inline int stream_Seek( stream_t *s, uint64_t i_pos )
-{
-    return stream_Control( s, STREAM_SET_POSITION, i_pos );
 }
 
 /**
