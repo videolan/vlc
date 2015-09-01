@@ -1785,7 +1785,6 @@ vlc_module_begin ()
     add_obsolete_integer( "dv-caching" ) /* 2.0.0 */
     add_obsolete_integer( "dvb-caching" ) /* 2.0.0 */
     add_obsolete_integer( "eyetv-caching" ) /* 2.0.0 */
-    add_obsolete_integer( "gnomevfs-caching" ) /* 2.0.0 */
     add_obsolete_integer( "jack-input-caching" ) /* 2.0.0 */
     add_obsolete_integer( "linsys-hdsdi-caching" ) /* 2.0.0 */
     add_obsolete_integer( "linsys-sdi-caching" ) /* 2.0.0 */

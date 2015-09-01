@@ -162,7 +162,6 @@ $Id$
  * glwin32: a opengl provider using DirectX OpenGL
  * glx: GLX extension for OpenGL
  * gme: old console games music playback using Game Music Emu
- * gnomevfs: GnomeVFS access
  * gnutls: GNU TLS encryption/decryption module
  * goom: visualisation plugin based on goom
  * gradfun: Gradfun video effects filter

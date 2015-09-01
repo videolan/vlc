@@ -469,13 +469,6 @@ endif
 libaccess_concat_plugin_la_SOURCES = access/concat.c
 access_LTLIBRARIES += libaccess_concat_plugin.la
 
-libgnomevfs_plugin_la_SOURCES = access/gnomevfs.c
-libgnomevfs_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNOMEVFS_CFLAGS)
-libgnomevfs_plugin_la_LIBADD = $(GNOMEVFS_LIBS)
-libgnomevfs_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
-access_LTLIBRARIES += $(LTLIBgnomevfs)
-EXTRA_LTLIBRARIES += libgnomevfs_plugin.la
-
 libaccess_mtp_plugin_la_SOURCES = access/mtp.c
 libaccess_mtp_plugin_la_CFLAGS = $(AM_CFLAGS) $(MTP_CFLAGS)
 libaccess_mtp_plugin_la_LIBADD = $(MTP_LIBS)

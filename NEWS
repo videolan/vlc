@@ -166,6 +166,7 @@ Removed modules
  * Atmo video filter
  * QTCapture access module (use AVCapture instead)
  * httplive (use adaptive instead)
+ * Gnome-VFS access module (i.e. Gnome 2.x)
 
 
 Changes between 2.2.0 and 2.2.1:

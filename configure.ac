@@ -1779,11 +1779,6 @@ AM_CONDITIONAL(HAVE_DECKLINK, [ test "${have_decklink}" != "no" ])
 
 
 dnl
-dnl  gnomeVFS access module
-dnl
-PKG_ENABLE_MODULES_VLC([GNOMEVFS], [gnomevfs], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
-
-dnl
 dnl  VCDX modules
 dnl
 PKG_ENABLE_MODULES_VLC([VCDX], [vcdx], [libcdio >= 0.78.2 libiso9660 >= 0.72 libvcdinfo >= 0.7.22], [navigate VCD with libvcdinfo], [no])
