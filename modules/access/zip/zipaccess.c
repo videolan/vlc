@@ -31,6 +31,7 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
 #include "zip.h"
 #include <vlc_access.h>
 
@@ -41,15 +42,11 @@ struct access_sys_t
 {
     /* zlib / unzip members */
     unzFile            zipFile;
-
-    /* file in zip information */
-    char              *psz_fileInzip;
 };
 
 static int AccessControl( access_t *p_access, int i_query, va_list args );
 static ssize_t AccessRead( access_t *, uint8_t *, size_t );
 static int AccessSeek( access_t *, uint64_t );
-static int OpenFileInZip( access_t *p_access );
 static char *unescapeXml( const char *psz_text );
 
 /** **************************************************************************
@@ -102,6 +99,7 @@ int AccessOpen( vlc_object_t *p_this )
     int i_ret              = VLC_EGENERIC;
 
     char *psz_pathToZip = NULL, *psz_path = NULL, *psz_sep = NULL;
+    char *psz_fileInzip = NULL;
 
     if( !strstr( p_access->psz_location, ZIP_SEP ) )
     {
@@ -132,11 +130,12 @@ int AccessOpen( vlc_object_t *p_this )
             goto exit;
         }
     }
-    p_sys->psz_fileInzip = unescapeXml( psz_sep + ZIP_SEP_LEN );
-    if( unlikely( !p_sys->psz_fileInzip ) )
+
+    psz_fileInzip = unescapeXml( psz_sep + ZIP_SEP_LEN );
+    if( unlikely( psz_fileInzip == NULL ) )
     {
-        p_sys->psz_fileInzip = strdup( psz_sep + ZIP_SEP_LEN );
-        if( unlikely( !p_sys->psz_fileInzip ) )
+        psz_fileInzip = strdup( psz_sep + ZIP_SEP_LEN );
+        if( unlikely( psz_fileInzip == NULL ) )
         {
             i_ret = VLC_ENOMEM;
             goto exit;
@@ -155,17 +154,27 @@ int AccessOpen( vlc_object_t *p_this )
     func.opaque       = p_access;
 
     /* Open zip archive */
-    p_access->p_sys->zipFile = unzOpen2( psz_pathToZip, &func );
-    if( !p_access->p_sys->zipFile )
+    p_sys->zipFile = unzOpen2( psz_pathToZip, &func );
+    if( !p_sys->zipFile )
     {
         msg_Err( p_access, "not a valid zip archive: '%s'", psz_pathToZip );
-        i_ret = VLC_EGENERIC;
         goto exit;
     }
 
     /* Open file in zip */
-    if( ( i_ret = OpenFileInZip( p_access ) ) != VLC_SUCCESS )
+    if( unzLocateFile( p_sys->zipFile, psz_fileInzip, 0 ) != UNZ_OK )
+    {
+        msg_Err( p_access, "could not [re]locate file in zip: '%s'",
+                 psz_fileInzip );
         goto exit;
+    }
+
+    if( unzOpenCurrentFile( p_sys->zipFile ) != UNZ_OK )
+    {
+        msg_Err( p_access, "could not [re]open file in zip: '%s'",
+                 psz_fileInzip );
+        goto exit;
+    }
 
     /* Set callback */
     ACCESS_SET_CALLBACKS( AccessRead, NULL, AccessControl, AccessSeek );
@@ -178,15 +187,15 @@ int AccessOpen( vlc_object_t *p_this )
 exit:
     if( i_ret != VLC_SUCCESS )
     {
-        if( p_access->p_sys->zipFile )
+        if( p_sys->zipFile )
         {
             unzCloseCurrentFile( p_access->p_sys->zipFile );
             unzClose( p_access->p_sys->zipFile );
         }
-        free( p_sys->psz_fileInzip );
         free( p_sys );
     }
 
+    free( psz_fileInzip );
     free( psz_pathToZip );
     free( psz_path );
     return i_ret;
@@ -201,12 +210,8 @@ void AccessClose( vlc_object_t *p_this )
     access_sys_t *p_sys = p_access->p_sys;
     unzFile file = p_sys->zipFile;
 
-    if( file )
-    {
-        unzCloseCurrentFile( file );
-        unzClose( file );
-    }
-    free( p_sys->psz_fileInzip );
+    unzCloseCurrentFile( file );
+    unzClose( file );
     free( p_sys );
 }
 
@@ -266,14 +271,8 @@ static ssize_t AccessRead( access_t *p_access, uint8_t *p_buffer, size_t sz )
 {
     access_sys_t *p_sys = p_access->p_sys;
     unzFile file = p_sys->zipFile;
-    if( !file )
-    {
-        msg_Err( p_access, "archive not opened !" );
-        return VLC_EGENERIC;
-    }
 
-    int i_read = 0;
-    i_read = unzReadCurrentFile( file, p_buffer, sz );
+    int i_read = unzReadCurrentFile( file, p_buffer, sz );
 
     p_access->info.i_pos = unztell( file );
     return ( i_read >= 0 ? i_read : VLC_EGENERIC );
@@ -287,74 +286,13 @@ static int AccessSeek( access_t *p_access, uint64_t seek_len )
     access_sys_t *p_sys = p_access->p_sys;
     unzFile file = p_sys->zipFile;
 
-    if( !file )
-    {
-        msg_Err( p_access, "archive not opened !" );
-        return VLC_EGENERIC;
-    }
+    if( seek_len > ULONG_MAX )
+        return VLC_EGENERIC; /* TODO: update minizip to LFS */
 
-    /* Reopen file in zip if needed */
-    if( p_access->info.i_pos > seek_len )
-    {
-        OpenFileInZip( p_access );
-    }
-
-    /* Read seek_len data and drop it */
-    unsigned i_seek = 0;
-    int i_read = 1;
-    char *p_buffer = ( char* ) calloc( 1, ZIP_BUFFER_LEN );
-    if( unlikely( !p_buffer ) )
+    if( unzSetOffset( file, seek_len ) < 0 )
         return VLC_EGENERIC;
-    while( ( i_seek < seek_len ) && ( i_read > 0 ) )
-    {
-        i_read = ( seek_len - i_seek < ZIP_BUFFER_LEN )
-               ? ( seek_len - i_seek ) : ZIP_BUFFER_LEN;
-        i_read = unzReadCurrentFile( file, p_buffer, i_read );
-        if( i_read < 0 )
-        {
-            msg_Warn( p_access, "could not seek in file" );
-            free( p_buffer );
-            return VLC_EGENERIC;
-        }
-        else
-        {
-            i_seek += i_read;
-        }
-    }
-    free( p_buffer );
 
     p_access->info.i_pos = unztell( file );
-    return VLC_SUCCESS;
-}
-
-/** **************************************************************************
- * \brief Open file in zip
- *****************************************************************************/
-static int OpenFileInZip( access_t *p_access )
-{
-    access_sys_t *p_sys = p_access->p_sys;
-    unzFile file = p_sys->zipFile;
-    if( !p_sys->psz_fileInzip )
-    {
-        return VLC_EGENERIC;
-    }
-
-    p_access->info.i_pos = 0;
-
-    unzCloseCurrentFile( file ); /* returns UNZ_PARAMERROR if file not opened */
-    if( unzLocateFile( file, p_sys->psz_fileInzip, 0 ) != UNZ_OK )
-    {
-        msg_Err( p_access, "could not [re]locate file in zip: '%s'",
-                 p_sys->psz_fileInzip );
-        return VLC_EGENERIC;
-    }
-    if( unzOpenCurrentFile( file ) != UNZ_OK )
-    {
-        msg_Err( p_access, "could not [re]open file in zip: '%s'",
-                 p_sys->psz_fileInzip );
-        return VLC_EGENERIC;
-    }
-
     return VLC_SUCCESS;
 }
 
