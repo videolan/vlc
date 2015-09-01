@@ -210,7 +210,6 @@ static ssize_t DStreamRead( stream_t *s, void *buf, size_t len )
 
 static int DStreamControl( stream_t *s, int i_query, va_list args )
 {
-    stream_sys_t *p_sys = s->p_sys;
     uint64_t    *p_i64;
 
     switch( i_query )
