@@ -1003,7 +1003,7 @@ errmsg:
         }
     }
 
-    p_sys->frame = avcodec_alloc_frame();
+    p_sys->frame = av_frame_alloc();
     if( !p_sys->frame )
     {
         goto error;
@@ -1073,7 +1073,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     AVFrame *frame = NULL;
     if( likely(p_pict) ) {
         frame = p_sys->frame;
-        avcodec_get_frame_defaults( frame );
+        av_frame_unref( frame );
+
         for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
         {
             p_sys->frame->data[i_plane] = p_pict->p[i_plane].p_pixels;
@@ -1236,7 +1237,7 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, int
     //How much we need to copy from new packet
     const int leftover = leftover_samples * p_sys->p_context->channels * p_sys->i_sample_bytes;
 
-    avcodec_get_frame_defaults( p_sys->frame );
+    av_frame_unref( p_sys->frame );
     p_sys->frame->format     = p_sys->p_context->sample_fmt;
     p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
 
@@ -1358,7 +1359,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     while( ( p_aout_buf->i_nb_samples >= p_sys->i_frame_size ) ||
            ( p_sys->b_variable && p_aout_buf->i_nb_samples ) )
     {
-        avcodec_get_frame_defaults( p_sys->frame );
+        av_frame_unref( p_sys->frame );
+
         if( p_sys->b_variable )
             p_sys->frame->nb_samples = p_aout_buf->i_nb_samples;
         else
@@ -1421,7 +1423,7 @@ void CloseEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
-    avcodec_free_frame( &p_sys->frame );
+    av_frame_free( &p_sys->frame );
 
     vlc_avcodec_lock();
     avcodec_close( p_sys->p_context );
