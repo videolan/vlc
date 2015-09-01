@@ -201,18 +201,16 @@ void AccessClose( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
-    if( p_sys )
+    unzFile file = p_sys->zipFile;
+
+    if( file )
     {
-        unzFile file = p_sys->zipFile;
-        if( file )
-        {
-            unzCloseCurrentFile( file );
-            unzClose( file );
-        }
-        free( p_sys->psz_fileInzip );
-        free( p_sys->fileFunctions );
-        free( p_sys );
+        unzCloseCurrentFile( file );
+        unzClose( file );
     }
+    free( p_sys->psz_fileInzip );
+    free( p_sys->fileFunctions );
+    free( p_sys );
 }
 
 /** **************************************************************************
@@ -270,7 +268,6 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
 static ssize_t AccessRead( access_t *p_access, uint8_t *p_buffer, size_t sz )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    assert( p_sys );
     unzFile file = p_sys->zipFile;
     if( !file )
     {
@@ -291,7 +288,6 @@ static ssize_t AccessRead( access_t *p_access, uint8_t *p_buffer, size_t sz )
 static int AccessSeek( access_t *p_access, uint64_t seek_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    assert( p_sys );
     unzFile file = p_sys->zipFile;
 
     if( !file )
