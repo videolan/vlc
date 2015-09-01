@@ -772,6 +772,18 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
     {
         picture_t *p_pic = NULL;
 
+        /* Use the aspect ratio provided by the input (ie read from packetizer).
+         * Don't check the current value of the aspect ratio in fmt_out, since we
+         * want to allow changes in it to propagate. */
+        if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0
+         && (p_dec->fmt_out.video.i_sar_num != p_dec->fmt_in.video.i_sar_num ||
+             p_dec->fmt_out.video.i_sar_den != p_dec->fmt_in.video.i_sar_den))
+        {
+            p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
+            p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
+            p_sys->b_update_format = true;
+        }
+
         if (p_sys->b_update_format)
         {
             p_sys->b_update_format = false;
@@ -1325,20 +1337,7 @@ static void Video_OnFlush(decoder_t *p_dec)
 
 static picture_t *DecodeVideo(decoder_t *p_dec, block_t **pp_block)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_out = NULL;
-
-    /* Use the aspect ratio provided by the input (ie read from packetizer).
-     * Don't check the current value of the aspect ratio in fmt_out, since we
-     * want to allow changes in it to propagate. */
-    if (p_dec->fmt_in.video.i_sar_num != 0 && p_dec->fmt_in.video.i_sar_den != 0
-     && (p_dec->fmt_out.video.i_sar_num != p_dec->fmt_in.video.i_sar_num ||
-         p_dec->fmt_out.video.i_sar_den != p_dec->fmt_in.video.i_sar_den))
-    {
-        p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
-        p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
-        p_sys->b_update_format = true;
-    }
 
     if (DecodeCommon(p_dec, pp_block, &p_out, NULL))
         return NULL;
