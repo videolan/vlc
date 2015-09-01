@@ -174,8 +174,6 @@ static ssize_t DStreamRead( stream_t *s, void *buf, size_t len )
 
     if( !atomic_load( &sys->active ) )
         return -1;
-    if( s->b_error )
-        return -1;
     if( len == 0 )
         return 0;
 

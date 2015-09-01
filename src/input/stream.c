@@ -66,7 +66,6 @@ stream_t *stream_CommonNew(vlc_object_t *parent)
 
     stream_t *s = &priv->stream;
 
-    s->b_error = false;
     s->p_module = NULL;
     s->psz_url = NULL;
     s->p_source = NULL;

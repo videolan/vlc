@@ -46,7 +46,6 @@ extern "C" {
 struct stream_t
 {
     VLC_COMMON_MEMBERS
-    bool        b_error;
 
     /* Module properties for stream filter */
     module_t    *p_module;
