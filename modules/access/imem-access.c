@@ -48,10 +48,7 @@ static ssize_t Read(access_t *access, uint8_t *buf, size_t len)
         val = 0;
     }
 
-    if (val > 0) {
-        assert((size_t)val <= len);
-        access->info.i_pos += val;
-    } else
+    if (val <= 0)
         access->info.b_eof = true;
 
     return val;

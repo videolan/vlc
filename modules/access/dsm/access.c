@@ -495,7 +495,6 @@ static bool get_path( access_t *p_access )
 static int Seek( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int64_t      i_ret;
 
     if( i_pos >= INT64_MAX )
         return VLC_EGENERIC;
@@ -503,10 +502,9 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
     /* seek cannot fail in bdsm, but the subsequent read can */
-    i_ret = smb_fseek(p_sys->p_session, p_sys->i_fd, i_pos, SMB_SEEK_SET);
+    smb_fseek(p_sys->p_session, p_sys->i_fd, i_pos, SMB_SEEK_SET);
 
     p_access->info.b_eof = false;
-    p_access->info.i_pos = i_ret;
 
     return VLC_SUCCESS;
 }
@@ -529,7 +527,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     }
 
     if( i_read == 0 ) p_access->info.b_eof = true;
-    else if( i_read > 0 ) p_access->info.i_pos += i_read;
 
     return i_read;
 }

@@ -179,7 +179,6 @@ int AccessOpen( vlc_object_t *p_this )
     /* Set callback */
     ACCESS_SET_CALLBACKS( AccessRead, NULL, AccessControl, AccessSeek );
 
-    p_access->info.i_pos  = 0;
     p_access->info.b_eof  = false;
 
     i_ret = VLC_SUCCESS;
@@ -274,7 +273,6 @@ static ssize_t AccessRead( access_t *p_access, uint8_t *p_buffer, size_t sz )
 
     int i_read = unzReadCurrentFile( file, p_buffer, sz );
 
-    p_access->info.i_pos = unztell( file );
     return ( i_read >= 0 ? i_read : VLC_EGENERIC );
 }
 
@@ -292,7 +290,6 @@ static int AccessSeek( access_t *p_access, uint64_t seek_len )
     if( unzSetOffset( file, seek_len ) < 0 )
         return VLC_EGENERIC;
 
-    p_access->info.i_pos = unztell( file );
     return VLC_SUCCESS;
 }
 

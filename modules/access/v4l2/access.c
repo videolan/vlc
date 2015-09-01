@@ -246,7 +246,6 @@ static block_t *ReadBlock (access_t *access)
     }
 
     block->i_buffer = val;
-    access->info.i_pos += val;
     return block;
 }
 

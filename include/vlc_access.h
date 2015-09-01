@@ -148,14 +148,6 @@ static inline int vlc_access_Seek(access_t *access, uint64_t offset)
 }
 
 /**
- * Gets the read byte offset.
- */
-static inline uint64_t vlc_access_Tell(const access_t *access)
-{
-    return access->info.i_pos;
-}
-
-/**
  * Checks if end-of-stream is reached.
  */
 static inline bool vlc_access_Eof(const access_t *access)

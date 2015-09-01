@@ -318,7 +318,6 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     }
 
     p_access->info.b_eof = false;
-    p_access->info.i_pos = i_ret;
 
     return VLC_SUCCESS;
 }
@@ -342,7 +341,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     }
 
     if( i_read == 0 ) p_access->info.b_eof = true;
-    else if( i_read > 0 ) p_access->info.i_pos += i_read;
 
     return i_read;
 }

@@ -199,9 +199,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
                 return 0;
         }
     }
-    else if( i_ret > 0 )
-        p_access->info.i_pos += i_ret;
-    else
+    else if( i_ret == 0 )
         p_access->info.b_eof = true;
 
     return i_ret;
@@ -213,7 +211,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Seek( access_t *p_access, uint64_t i_pos )
 {
-    p_access->info.i_pos = i_pos;
     p_access->info.b_eof = false;
 
     if (lseek( p_access->p_sys->fd, i_pos, SEEK_SET ) == (off_t)-1)

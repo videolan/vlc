@@ -93,10 +93,7 @@ static ssize_t Read(access_t *access, uint8_t *buf, size_t len)
         return 0;
     }
 
-    ssize_t ret = vlc_access_Read(a, buf, len);
-    if (ret >= 0)
-        access->info.i_pos += ret;
-    return ret;
+    return vlc_access_Read(a, buf, len);
 }
 
 static block_t *Block(access_t *access)
@@ -121,10 +118,7 @@ static block_t *Block(access_t *access)
 
     ssize_t ret = vlc_access_Read(a, block->p_buffer, block->i_buffer);
     if (ret >= 0)
-    {
         block->i_buffer = ret;
-        access->info.i_pos += ret;
-    }
     else
     {
         block_Release(block);
@@ -144,9 +138,8 @@ static int Seek(access_t *access, uint64_t position)
     }
 
     sys->next = sys->first;
-    access->info.i_pos = 0;
 
-    for (;;)
+    for (uint64_t offset = 0;;)
     {
         access_t *a = GetAccess(access);
         if (a == NULL)
@@ -161,16 +154,14 @@ static int Seek(access_t *access, uint64_t position)
 
         if (access_GetSize(a, &size))
             break;
-        if (position - access->info.i_pos < size)
+        if (position - offset < size)
         {
-            if (vlc_access_Seek(a, position - access->info.i_pos))
+            if (vlc_access_Seek(a, position - offset))
                 break;
-
-            access->info.i_pos = position;
             return VLC_SUCCESS;
         }
 
-        access->info.i_pos += size;
+        offset += size;
         vlc_access_Delete(a);
         sys->access = NULL;
     }

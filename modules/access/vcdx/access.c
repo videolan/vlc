@@ -163,8 +163,6 @@ VCDReadBlock( access_t * p_access )
     {
         vcdplayer_read_status_t read_status = vcdplayer_read(p_access, p_buf);
 
-        p_access->info.i_pos += M2F2_SECTOR_SIZE;
-
         switch ( read_status ) {
         case READ_END:
             /* End reached. Return NULL to indicated this. */
@@ -172,15 +170,6 @@ VCDReadBlock( access_t * p_access )
                (demux?) doesn't try to keep reading. If everything works out
                right this shouldn't have to happen.
              */
-#if 0
-            if( p_access->info.i_pos != p_access->info.i_size ) {
-                msg_Warn( p_access,
-                    "At end but pos (%llu) is not size (%llu). Adjusting.",
-                    p_access->info.i_pos, p_access->info.i_size );
-                p_access->info.i_pos = p_access->info.i_size;
-            }
-#endif
-
             block_Release( p_block );
             return NULL;
 
@@ -247,7 +236,6 @@ VCDSeek( access_t * p_access, uint64_t i_pos )
         int i_seekpoint;
 
         /* Next sector to read */
-        p_access->info.i_pos = i_pos;
         p_vcdplayer->i_lsn = (i_pos / (uint64_t) M2F2_SECTOR_SIZE) +
                              p_vcdplayer->origin_lsn;
 
@@ -671,17 +659,12 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
                       "chapter", _("Entry"), "Setting entry/segment");
         p_vcdplayer->i_cur_title = i_track - 1;
         if (p_vcdplayer->b_track_length)
-        {
             p_vcdplayer->size = p_vcdplayer->p_title[i_track-1]->i_size;
-            p_access->info.i_pos  = (uint64_t) M2F2_SECTOR_SIZE *
-                     (vcdinfo_get_track_lsn(p_vcdplayer->vcd, i_track)-i_lsn);
-        } else {
+        else
             p_vcdplayer->size = M2F2_SECTOR_SIZE * (int64_t)
                  vcdinfo_get_entry_sect_count(p_vcdplayer->vcd,p_itemid->num);
-            p_access->info.i_pos = 0;
-        }
-        dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC), "size: %"PRIu64", pos: %"PRIu64,
-                   p_vcdplayer->size, p_access->info.i_pos );
+        dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC), "size: %"PRIu64,
+                   p_vcdplayer->size );
         p_vcdplayer->i_cur_chapter = p_itemid->num;
         break;
 
@@ -694,7 +677,6 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
         */
         p_vcdplayer->i_cur_title   = p_vcdplayer->i_titles - 1;
         p_vcdplayer->size          = 0; /* No seeking on stills, please. */
-        p_access->info.i_pos       = 0;
         p_vcdplayer->i_cur_chapter = p_vcdplayer->i_entries
                                    + p_vcdplayer->i_lids + p_itemid->num;
         break;
@@ -702,7 +684,6 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
     case VCDINFO_ITEM_TYPE_TRACK:
         p_vcdplayer->i_cur_title   = i_track - 1;
         p_vcdplayer->size          = p_vcdplayer->p_title[i_track - 1]->i_size;
-        p_access->info.i_pos       = 0;
         p_vcdplayer->i_cur_chapter = vcdinfo_track_get_entry(p_vcdplayer->vcd,
                                                              i_track);
         break;
@@ -847,7 +828,6 @@ VCDOpen ( vlc_object_t *p_this )
     p_access->pf_control       = VCDControl;
     p_access->pf_seek          = VCDSeek;
 
-    p_access->info.i_pos       = 0;
     p_access->info.b_eof       = false;
 
     p_vcdplayer = malloc( sizeof(vcdplayer_t) );

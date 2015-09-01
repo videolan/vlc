@@ -303,13 +303,11 @@ static block_t *Block( access_t *p_access )
 
         /* Try to skip one sector (in case of bad sectors) */
         p_sys->i_sector++;
-        p_access->info.i_pos += CDDA_DATA_SIZE;
         return NULL;
     }
 
     /* Update a few values */
     p_sys->i_sector += i_blocks;
-    p_access->info.i_pos += p_block->i_buffer;
 
     return p_block;
 }
@@ -324,7 +322,6 @@ static int Seek( access_t *p_access, uint64_t i_pos )
     /* Next sector to read */
     p_sys->i_sector = p_sys->i_first_sector + i_pos / CDDA_DATA_SIZE;
     assert( p_sys->i_sector >= 0 );
-    p_access->info.i_pos = i_pos;
 
     return VLC_SUCCESS;
 }

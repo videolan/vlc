@@ -306,9 +306,7 @@ void OutCloseAvio(vlc_object_t *object)
 static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 {
     int r = avio_read(access->p_sys->context, data, size);
-    if (r > 0)
-        access->info.i_pos += r;
-    else {
+    if (r <= 0) {
         access->info.b_eof = true;
         r = 0;
     }
@@ -375,7 +373,6 @@ static int Seek(access_t *access, uint64_t position)
         if (sys->size < 0 || position != sys->size)
             return VLC_EGENERIC;
     }
-    access->info.i_pos = position;
     access->info.b_eof = false;
     return VLC_SUCCESS;
 }

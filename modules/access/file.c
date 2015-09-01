@@ -294,7 +294,6 @@ static ssize_t Read (access_t *p_access, uint8_t *p_buffer, size_t i_len)
         val = 0;
     }
 
-    p_access->info.i_pos += val;
     p_access->info.b_eof = !val;
     return val;
 }
@@ -304,7 +303,6 @@ static ssize_t Read (access_t *p_access, uint8_t *p_buffer, size_t i_len)
  *****************************************************************************/
 static int FileSeek (access_t *p_access, uint64_t i_pos)
 {
-    p_access->info.i_pos = i_pos;
     p_access->info.b_eof = false;
 
     if (lseek (p_access->p_sys->fd, i_pos, SEEK_SET) == (off_t)-1)
