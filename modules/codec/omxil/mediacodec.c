@@ -401,7 +401,14 @@ static int StartMediaCodec(decoder_t *p_dec)
                 p_dec->fmt_out.video.i_width = p_sys->u.video.i_width;
                 p_dec->fmt_out.video.i_height = p_sys->u.video.i_height;
                 p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
-                decoder_UpdateVideoFormat(p_dec);
+                if (decoder_UpdateVideoFormat(p_dec) != 0)
+                {
+                    msg_Err(p_dec, "Opaque Vout request failed: "
+                                   "fallback to non opaque");
+
+                    AWindowHandler_destroy(p_sys->u.video.p_awh);
+                    p_sys->u.video.p_awh = NULL;
+                }
             }
         }
         args.video.p_awh = p_sys->u.video.p_awh;
