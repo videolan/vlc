@@ -185,11 +185,6 @@ static ssize_t DStreamRead( stream_t *s, void *buf, size_t len )
     if( block == NULL )
     {
         block = block_FifoGet( sys->p_fifo );
-        if( block == NULL )
-        {
-            s->b_error = true;
-            return -1;
-        }
         sys->p_block = block;
     }
 
