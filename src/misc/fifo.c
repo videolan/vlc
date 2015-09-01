@@ -294,7 +294,7 @@ void block_FifoPut(block_fifo_t *fifo, block_t *block)
  * Dequeue the first block from the FIFO. If necessary, wait until there is
  * one block in the queue. This function is (always) cancellation point.
  *
- * @return a valid block, or NULL if block_FifoWake() was called.
+ * @return a valid block
  */
 block_t *block_FifoGet(block_fifo_t *fifo)
 {
