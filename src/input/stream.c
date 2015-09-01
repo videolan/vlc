@@ -475,12 +475,16 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
             uint64_t pos = va_arg(args, uint64_t);
 
             int ret = stream_ControlInternal(s, STREAM_SET_POSITION, pos);
-            if (ret == VLC_SUCCESS && priv->peek != NULL)
+            if (ret != VLC_SUCCESS)
+                return ret;
+
+            if (priv->peek != NULL)
             {
                 block_Release(priv->peek);
                 priv->peek = NULL;
             }
-            return ret;
+            priv->offset = pos;
+            return VLC_SUCCESS;
         }
 
         case STREAM_GET_PRIVATE_BLOCK:
