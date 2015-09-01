@@ -413,13 +413,11 @@ ssize_t stream_Peek(stream_t *s, const uint8_t **restrict bufp, size_t len)
     {
         size_t avail = peek->i_buffer;
 
-        peek = block_Realloc(peek, 0, len);
-        priv->peek = peek;
+        peek = block_TryRealloc(peek, 0, len);
         if (unlikely(peek == NULL))
-        {
-            s->b_error = true; /* unrecoverable error */
             return VLC_ENOMEM;
-        }
+
+        priv->peek = peek;
         peek->i_buffer = avail;
 
         ssize_t ret = stream_ReadRaw(s, peek->p_buffer + avail, len - avail);
