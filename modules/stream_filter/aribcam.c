@@ -275,13 +275,7 @@ static int Seek( stream_t *p_stream, uint64_t i_pos )
  */
 static int Control( stream_t *p_stream, int i_query, va_list args )
 {
-    switch( i_query )
-    {
-    case STREAM_SET_POSITION:
-        return Seek( p_stream, va_arg( args, uint64_t ) );
-    default:
-        return stream_vaControl( p_stream->p_source, i_query, args );
-    }
+    return stream_vaControl( p_stream->p_source, i_query, args );
 }
 
 static int Open( vlc_object_t *p_object )
@@ -355,6 +349,7 @@ static int Open( vlc_object_t *p_object )
     }
 
     p_stream->pf_read = Read;
+    p_stream->pf_seek = Seek;
     p_stream->pf_control = Control;
 
     return VLC_SUCCESS;

@@ -73,6 +73,7 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
         return NULL;
     s->p_input = p_demux->p_input;
     s->pf_read   = DStreamRead;
+    s->pf_seek   = NULL;
     s->pf_control= DStreamControl;
     s->pf_destroy= DStreamDelete;
 
@@ -223,7 +224,6 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
             *va_arg( args, int64_t * ) = DEFAULT_PTS_DELAY;
             return VLC_SUCCESS;
 
-        case STREAM_SET_POSITION:
         case STREAM_GET_TITLE_INFO:
         case STREAM_GET_TITLE:
         case STREAM_GET_SEEKPOINT:

@@ -54,6 +54,7 @@ vlc_module_end()
  * Local prototypes
  ****************************************************************************/
 static ssize_t Read( stream_t *, void *p_read, size_t i_read );
+static int Seek( stream_t *s, uint64_t );
 static int Control( stream_t *, int i_query, va_list );
 
 typedef struct node node;
@@ -221,6 +222,7 @@ int StreamOpen( vlc_object_t *p_this )
     free(s->psz_url);
     s->psz_url = psz_tmp;
     s->pf_read = Read;
+    s->pf_seek = Seek;
     s->pf_control = Control;
     return VLC_SUCCESS;
 error:
@@ -269,6 +271,17 @@ static ssize_t Read( stream_t *s, void *p_read, size_t i_read )
     return i_len;
 }
 
+static int Seek( stream_t *s, uint64_t i_position )
+{
+    stream_sys_t *p_sys = s->p_sys;
+
+    if( i_position > p_sys->i_len )
+        i_position = p_sys->i_len;
+
+    p_sys->i_pos = i_position;
+    return VLC_SUCCESS;
+}
+
 /** *************************************************************************
  * Control
  ****************************************************************************/
@@ -278,18 +291,6 @@ static int Control( stream_t *s, int i_query, va_list args )
 
     switch( i_query )
     {
-        case STREAM_SET_POSITION:
-        {
-            uint64_t i_position = va_arg( args, uint64_t );
-            if( i_position >= p_sys->i_len )
-                return VLC_EGENERIC;
-            else
-            {
-                p_sys->i_pos = (size_t) i_position;
-                return VLC_SUCCESS;
-            }
-        }
-
         case STREAM_GET_SIZE:
         {
             uint64_t *pi_size = va_arg( args, uint64_t* );

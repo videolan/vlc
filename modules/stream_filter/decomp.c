@@ -263,9 +263,6 @@ static int Open (stream_t *stream, const char *path)
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
-    stream->pf_read = Read;
-    stream->pf_control = Control;
-
     vlc_cond_init (&p_sys->wait);
     vlc_mutex_init (&p_sys->lock);
     p_sys->paused = false;
@@ -339,15 +336,20 @@ static int Open (stream_t *stream, const char *path)
             close (comp[1]);
     }
 
-    if (ret == VLC_SUCCESS)
-        return VLC_SUCCESS;
+    if (ret != VLC_SUCCESS)
+    {
+        if (p_sys->pid != -1)
+            while (waitpid (p_sys->pid, &(int){ 0 }, 0) == -1);
+        vlc_mutex_destroy (&p_sys->lock);
+        vlc_cond_destroy (&p_sys->wait);
+        free (p_sys);
+        return ret;
+    }
 
-    if (p_sys->pid != -1)
-        while (waitpid (p_sys->pid, &(int){ 0 }, 0) == -1);
-    vlc_mutex_destroy (&p_sys->lock);
-    vlc_cond_destroy (&p_sys->wait);
-    free (p_sys);
-    return ret;
+    stream->pf_read = Read;
+    stream->pf_seek = NULL;
+    stream->pf_control = Control;
+    return VLC_SUCCESS;
 }
 
 

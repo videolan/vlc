@@ -471,7 +471,10 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
         {
             uint64_t pos = va_arg(args, uint64_t);
 
-            int ret = stream_ControlInternal(s, STREAM_SET_POSITION, pos);
+            if (s->pf_seek == NULL)
+                return VLC_EGENERIC;
+
+            int ret = s->pf_seek(s, pos);
             if (ret != VLC_SUCCESS)
                 return ret;
 

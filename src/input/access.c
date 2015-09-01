@@ -248,6 +248,19 @@ static input_item_t *AStreamReadDir(stream_t *s)
 }
 
 /* Common */
+static int AStreamSeek(stream_t *s, uint64_t offset)
+{
+    stream_sys_t *sys = s->p_sys;
+
+    if (sys->block != NULL)
+    {
+        block_Release(sys->block);
+        sys->block = NULL;
+    }
+
+    return vlc_access_Seek(sys->access, offset);
+}
+
 #define static_control_match(foo) \
     static_assert((unsigned) STREAM_##foo == ACCESS_##foo, "Mismatch")
 
@@ -309,18 +322,6 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
             if (b != NULL)
                 *b = access->info.b_dir_can_loop;
             break;
-        }
-
-        case STREAM_SET_POSITION:
-        {
-            uint64_t pos = va_arg(args, uint64_t);
-
-            if (sys->block != NULL)
-            {
-                block_Release(sys->block);
-                sys->block = NULL;
-            }
-            return vlc_access_Seek(sys->access, pos);
         }
 
         case STREAM_GET_PRIVATE_BLOCK:
@@ -396,6 +397,7 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     else
         s->pf_readdir = AStreamNoReadDir;
 
+    s->pf_seek    = AStreamSeek;
     s->pf_control = AStreamControl;
     s->pf_destroy = AStreamDestroy;
     s->p_sys      = sys;

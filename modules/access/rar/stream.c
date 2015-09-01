@@ -44,6 +44,11 @@ static ssize_t Read(stream_t *s, void *data, size_t size)
     return stream_Read(s->p_sys->payload, data, size);
 }
 
+static int Seek(stream_t *s, uint64_t offset)
+{
+    return stream_Seek(s->p_sys->payload, offset);
+}
+
 static int Control(stream_t *s, int query, va_list args)
 {
     switch (query) {
@@ -138,6 +143,7 @@ int RarStreamOpen(vlc_object_t *object)
     }
 
     s->pf_read = Read;
+    s->pf_seek = Seek;
     s->pf_control = Control;
 
     stream_sys_t *sys = s->p_sys = malloc(sizeof(*sys));

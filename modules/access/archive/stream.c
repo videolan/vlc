@@ -54,7 +54,6 @@ static int Control(stream_t *p_stream, int i_query, va_list args)
         case STREAM_CAN_SEEK:
         case STREAM_CAN_FASTSEEK:
         case STREAM_GET_SIZE:
-        case STREAM_SET_POSITION:
         case STREAM_SET_RECORD_STATE:
         case STREAM_GET_CONTENT_TYPE:
             return VLC_EGENERIC;
@@ -200,6 +199,7 @@ int StreamOpen(vlc_object_t *p_object)
     }
 
     p_stream->pf_read = NULL;
+    p_stream->pf_seek = NULL;
     p_stream->pf_control = Control;
     p_stream->pf_readdir = Browse;
 

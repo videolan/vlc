@@ -71,7 +71,6 @@ static int Control( stream_t *p_stream, int i_query, va_list args )
         }
         break;
     case STREAM_CAN_SEEK:
-    case STREAM_SET_POSITION:
         if( !p_sys->b_seek )
         {
             *((bool*)va_arg( args, bool* )) = false;
@@ -91,6 +90,14 @@ static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
     return stream_Read( s->p_source, buffer, i_read );
 }
 
+static int Seek( stream_t *s, uint64_t offset )
+{
+    stream_sys_t *p_sys = p_stream->p_sys;
+
+    assert( p_sys->b_seek );
+    return stream_Seek( s->p_source, offset );
+}
+
 static int Open( vlc_object_t *p_object )
 {
     stream_t *p_stream = (stream_t *) p_object;
@@ -103,6 +110,7 @@ static int Open( vlc_object_t *p_object )
     p_sys->b_fastseek = var_InheritBool( p_stream, "fastseek" );
 
     p_stream->pf_read = Read;
+    p_stream->pf_seek = p_sys->b_seek ? Seek : NULL;
     p_stream->pf_control = Control;
 
     return VLC_SUCCESS;

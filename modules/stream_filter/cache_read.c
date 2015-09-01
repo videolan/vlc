@@ -485,12 +485,6 @@ static int AStreamControl(stream_t *s, int i_query, va_list args)
         case STREAM_GET_PRIVATE_ID_STATE:
             return stream_vaControl(s->p_source, i_query, args);
 
-        case STREAM_SET_POSITION:
-        {
-            uint64_t offset = va_arg(args, uint64_t);
-            return AStreamSeekStream(s, offset);
-        }
-
         case STREAM_SET_TITLE:
         case STREAM_SET_SEEKPOINT:
         {
@@ -564,6 +558,7 @@ static int Open(vlc_object_t *obj)
     }
 
     s->pf_read = AStreamReadStream;
+    s->pf_seek = AStreamSeekStream;
     s->pf_control = AStreamControl;
     return VLC_SUCCESS;
 }

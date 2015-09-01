@@ -336,8 +336,6 @@ static int Control(stream_t *stream, int query, va_list args)
         case STREAM_CAN_CONTROL_PACE:
             *va_arg (args, bool *) = sys->can_pace;
             break;
-        case STREAM_SET_POSITION:
-            return Seek(stream, va_arg(args, uint64_t));
         case STREAM_IS_DIRECTORY:
             return VLC_EGENERIC;
         case STREAM_GET_SIZE:
@@ -407,6 +405,7 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     stream->pf_read = Read;
+    stream->pf_seek = Seek;
     stream->pf_control = Control;
 
     stream_Control(stream->p_source, STREAM_CAN_SEEK, &sys->can_seek);

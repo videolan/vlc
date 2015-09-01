@@ -60,6 +60,7 @@ vlc_module_begin()
 vlc_module_end()
 
 static ssize_t Read( stream_t *, void *, size_t );
+static int chunk_Seek( stream_t *, uint64_t );
 static int   Control( stream_t *, int , va_list );
 
 static bool isSmoothStreaming( stream_t *s )
@@ -535,6 +536,7 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     s->pf_read = Read;
+    s->pf_seek = chunk_Seek;
     s->pf_control = Control;
 
     if( vlc_clone( &p_sys->download.thread, sms_Thread, s, VLC_THREAD_PRIORITY_INPUT ) )
@@ -779,7 +781,7 @@ static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
 
 /* Normaly a stream_filter is not able to provide *time* seeking, since a
  * stream_filter operates on a byte stream. Thus, in order to circumvent this
- * limitation, I treat a STREAM_SET_POSITION request which value "pos" is less
+ * limitation, I treat a seek request which value "pos" is less
  * than FAKE_STREAM_SIZE as a *time* seek request, and more precisely a request
  * to jump at time position: pos / FAKE_STREAM_SIZE * total_video_duration.
  * For exemple, it pos == 500, it would be interpreted as a request to jump at
@@ -790,7 +792,7 @@ static ssize_t Read( stream_t *s, void *buffer, size_t i_read )
  * Of course this a bit hack-ish, but if Smooth Streaming doesn't die, its
  * implementation will be moved to a access_demux module, and this hack won't
  * be needed anymore (among others). */
-static int chunk_Seek( stream_t *s, const uint64_t pos )
+static int chunk_Seek( stream_t *s, uint64_t pos )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -874,15 +876,6 @@ static int Control( stream_t *s, int i_query, va_list args )
         case STREAM_CAN_CONTROL_PACE:
             *(va_arg( args, bool * )) = true;
             break;
-        case STREAM_SET_POSITION:
-            {
-                uint64_t pos = (uint64_t)va_arg(args, uint64_t);
-                int ret = chunk_Seek(s, pos);
-                if( ret == VLC_SUCCESS )
-                    break;
-                else
-                    return VLC_EGENERIC;
-            }
         case STREAM_GET_SIZE:
             *(va_arg( args, uint64_t * )) = FAKE_STREAM_SIZE;
             break;

@@ -1663,6 +1663,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     s->pf_read = Read;
+    s->pf_seek = NULL;
     s->pf_control = Control;
 
     if( vlc_clone( &p_sys->dl_thread, download_thread, s, VLC_THREAD_PRIORITY_INPUT ) )
