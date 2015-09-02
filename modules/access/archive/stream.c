@@ -39,7 +39,6 @@ static int Control(stream_t *p_stream, int i_query, va_list args)
     switch( i_query )
     {
         case STREAM_IS_DIRECTORY:
-            *va_arg( args, bool * ) = true;
             *va_arg( args, bool * ) = false;
             *va_arg( args, bool * ) = false;
             break;

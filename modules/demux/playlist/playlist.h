@@ -84,10 +84,9 @@ bool CheckContentType( stream_t * p_stream, const char * psz_ctype );
 
 #define CHECK_FILE() \
 do { \
-    bool b_is_dir, b_sorted, b_loop; \
+    bool b_sorted, b_loop; \
     if( stream_Control( ((demux_t *)p_this)->s, STREAM_IS_DIRECTORY, \
-                        &b_is_dir, &b_sorted, &b_loop ) == VLC_SUCCESS && \
-        b_is_dir ) \
+                        &b_sorted, &b_loop ) == VLC_SUCCESS ) \
         return VLC_EGENERIC; \
 } while(0)
 
