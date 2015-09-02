@@ -601,7 +601,9 @@ static void StopVideoToolbox(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (p_sys->b_started) {
+        CFRelease(p_sys->outputTimeStamps);
         p_sys->outputTimeStamps = nil;
+        CFRelease(p_sys->outputFrames);
         p_sys->outputFrames = nil;
 
         p_sys->b_started = false;
@@ -1055,6 +1057,7 @@ skip:
                          * otherwise we would leak it */
                         if (p_pic->p_sys->pixelBuffer != nil) {
                             CFRelease(p_pic->p_sys->pixelBuffer);
+                            p_pic->p_sys->pixelBuffer = nil;
                         }
 
                         p_pic->p_sys->pixelBuffer = CFBridgingRetain(imageBufferObject);
