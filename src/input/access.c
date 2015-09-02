@@ -297,25 +297,6 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
 
     switch (cmd)
     {
-        case STREAM_CAN_SEEK:
-        case STREAM_CAN_FASTSEEK:
-        case STREAM_CAN_PAUSE:
-        case STREAM_CAN_CONTROL_PACE:
-        case STREAM_GET_SIZE:
-        case STREAM_IS_DIRECTORY:
-        case STREAM_GET_PTS_DELAY:
-        case STREAM_GET_TITLE_INFO:
-        case STREAM_GET_TITLE:
-        case STREAM_GET_SEEKPOINT:
-        case STREAM_GET_META:
-        case STREAM_GET_CONTENT_TYPE:
-        case STREAM_GET_SIGNAL:
-        case STREAM_SET_PAUSE_STATE:
-        case STREAM_SET_PRIVATE_ID_STATE:
-        case STREAM_SET_PRIVATE_ID_CA:
-        case STREAM_GET_PRIVATE_ID_STATE:
-            return access_vaControl(access, cmd, args);
-
         case STREAM_SET_TITLE:
         case STREAM_SET_SEEKPOINT:
         {
@@ -345,7 +326,7 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
         }
 
         default:
-            return VLC_EGENERIC;
+            return access_vaControl(access, cmd, args);
     }
     return VLC_SUCCESS;
 }
