@@ -370,9 +370,11 @@ void Close (vlc_object_t *this)
 
     [sys->glESView release];
 
-    if (sys->picturePool)
-        picture_pool_Release(sys->picturePool);
-    sys->picturePool = NULL;
+    if (sys->zero_copy) {
+        if (sys->picturePool)
+            picture_pool_Release(sys->picturePool);
+        sys->picturePool = NULL;
+    }
 
     free(sys);
 }
