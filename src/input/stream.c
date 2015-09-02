@@ -44,6 +44,7 @@
 typedef struct stream_priv_t
 {
     stream_t stream;
+    void (*destroy)(stream_t *);
     block_t *peek;
     uint64_t offset;
 
@@ -58,7 +59,7 @@ typedef struct stream_priv_t
 /**
  * Allocates a VLC stream object
  */
-stream_t *stream_CommonNew(vlc_object_t *parent)
+stream_t *stream_CommonNew(vlc_object_t *parent, void (*destroy)(stream_t *))
 {
     stream_priv_t *priv = vlc_custom_create(parent, sizeof (*priv), "stream");
     if (unlikely(priv == NULL))
@@ -72,8 +73,9 @@ stream_t *stream_CommonNew(vlc_object_t *parent)
     s->pf_read = NULL;
     s->pf_readdir = NULL;
     s->pf_control = NULL;
-    s->pf_destroy = NULL;
     s->p_input = NULL;
+    assert(destroy != NULL);
+    priv->destroy = destroy;
     priv->peek = NULL;
     priv->offset = 0;
 
@@ -85,15 +87,9 @@ stream_t *stream_CommonNew(vlc_object_t *parent)
     return s;
 }
 
-/**
- * Destroy a stream
- */
-void stream_Delete(stream_t *s)
+void stream_CommonDelete(stream_t *s)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
-
-    if (s->pf_destroy != NULL)
-        s->pf_destroy(s);
 
     if (priv->text.conv != (vlc_iconv_t)(-1))
         vlc_iconv_close(priv->text.conv);
@@ -103,6 +99,17 @@ void stream_Delete(stream_t *s)
 
     free(s->psz_url);
     vlc_object_release(s);
+}
+
+/**
+ * Destroy a stream
+ */
+void stream_Delete(stream_t *s)
+{
+    stream_priv_t *priv = (stream_priv_t *)s;
+
+    priv->destroy(s);
+    stream_CommonDelete(s);
 }
 
 #undef stream_UrlNew

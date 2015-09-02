@@ -42,7 +42,7 @@ stream_t *stream_FilterNew( stream_t *p_source,
     stream_t *s;
     assert( p_source != NULL );
 
-    s = stream_CommonNew( p_source->p_parent );
+    s = stream_CommonNew( p_source->p_parent, StreamDelete );
     if( s == NULL )
         return NULL;
 
@@ -52,25 +52,19 @@ stream_t *stream_FilterNew( stream_t *p_source,
     {
         s->psz_url = strdup( p_source->psz_url );
         if( unlikely(s->psz_url == NULL) )
-        {
-            stream_Delete( s );
-            return NULL;
-        }
+            goto error;
     }
     s->p_source = p_source;
 
     /* */
     s->p_module = module_need( s, "stream_filter", psz_stream_filter, true );
-
-    if( !s->p_module )
-    {
-        stream_Delete( s );
-        return NULL;
-    }
-
-    s->pf_destroy = StreamDelete;
+    if( s->p_module == NULL )
+        goto error;
 
     return s;
+error:
+    stream_CommonDelete( s );
+    return NULL;
 }
 
 /* Add automatic stream filter */

@@ -61,9 +61,6 @@ struct stream_t
     int         (*pf_seek)(stream_t *, uint64_t);
     int         (*pf_control)( stream_t *, int i_query, va_list );
 
-    /* */
-    void     (*pf_destroy)( stream_t *);
-
     /* Private data for module */
     stream_sys_t *p_sys;
 

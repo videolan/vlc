@@ -29,7 +29,8 @@
 #include <vlc_stream.h>
 
 /* */
-stream_t *stream_CommonNew( vlc_object_t * );
+stream_t *stream_CommonNew( vlc_object_t *, void (*destroy)(stream_t *) );
+void stream_CommonDelete( stream_t *s );
 
 /**
  * This function creates a stream_t with an access_t back-end.

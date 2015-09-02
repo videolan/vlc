@@ -68,21 +68,17 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
     stream_t     *s;
     stream_sys_t *p_sys;
 
-    s = stream_CommonNew( p_obj );
+    s = stream_CommonNew( p_obj, DStreamDelete );
     if( s == NULL )
         return NULL;
     s->p_input = p_demux->p_input;
     s->pf_read   = DStreamRead;
     s->pf_seek   = NULL;
     s->pf_control= DStreamControl;
-    s->pf_destroy= DStreamDelete;
 
     s->p_sys = p_sys = malloc( sizeof( *p_sys) );
-    if( !s->p_sys )
-    {
-        stream_Delete( s );
-        return NULL;
-    }
+    if( unlikely(p_sys == NULL) )
+        goto error;
 
     p_sys->out = out;
     p_sys->p_block = NULL;
@@ -94,10 +90,8 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
     /* decoder fifo */
     if( ( p_sys->p_fifo = block_FifoNew() ) == NULL )
     {
-        stream_Delete( s );
         free( p_sys->psz_name );
-        free( p_sys );
-        return NULL;
+        goto error;
     }
 
     atomic_init( &p_sys->active, true );
@@ -107,13 +101,15 @@ stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *ou
     {
         vlc_mutex_destroy( &p_sys->lock );
         block_FifoRelease( p_sys->p_fifo );
-        stream_Delete( s );
         free( p_sys->psz_name );
-        free( p_sys );
-        return NULL;
+        goto error;
     }
 
     return s;
+error:
+    free( p_sys );
+    stream_CommonDelete( s );
+    return NULL;
 }
 
 void stream_DemuxSend( stream_t *s, block_t *p_block )

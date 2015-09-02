@@ -348,7 +348,7 @@ static void AStreamDestroy(stream_t *s)
 stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
                            const char *url)
 {
-    stream_t *s = stream_CommonNew(parent);
+    stream_t *s = stream_CommonNew(parent, AStreamDestroy);
     if (unlikely(s == NULL))
         return NULL;
 
@@ -391,7 +391,6 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
 
     s->pf_seek    = AStreamSeek;
     s->pf_control = AStreamControl;
-    s->pf_destroy = AStreamDestroy;
     s->p_sys      = sys;
 
     if (cachename != NULL)
@@ -399,6 +398,6 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
     return s;
 error:
     free(sys);
-    stream_Delete(s);
+    stream_CommonDelete(s);
     return NULL;
 }
