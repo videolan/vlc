@@ -34,6 +34,8 @@ namespace adaptative
             ~FakeESOutID();
             void setRealESID( es_out_id_t * );
             es_out_id_t * realESID();
+            void release();
+            void notifyData();
             bool isCompatible( const es_format_t * ) const;
 
         private:

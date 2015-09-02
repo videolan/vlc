@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "FakeESOutID.hpp"
+#include "FakeESOut.hpp"
 
 using namespace adaptative;
 
@@ -37,6 +38,16 @@ FakeESOutID::~FakeESOutID()
 void FakeESOutID::setRealESID( es_out_id_t *real_es_id )
 {
    p_real_es_id = real_es_id;
+}
+
+void FakeESOutID::notifyData()
+{
+    fakeesout->gc();
+}
+
+void FakeESOutID::release()
+{
+    fakeesout->recycle( this );
 }
 
 es_out_id_t * FakeESOutID::realESID()

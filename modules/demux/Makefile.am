@@ -300,6 +300,8 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/http/Sockets.cpp \
     demux/adaptative/plumbing/CommandsQueue.cpp \
     demux/adaptative/plumbing/CommandsQueue.hpp \
+    demux/adaptative/plumbing/FakeESOut.cpp \
+    demux/adaptative/plumbing/FakeESOut.hpp \
     demux/adaptative/plumbing/FakeESOutID.cpp \
     demux/adaptative/plumbing/FakeESOutID.hpp \
     demux/adaptative/plumbing/StreamOutput.cpp \

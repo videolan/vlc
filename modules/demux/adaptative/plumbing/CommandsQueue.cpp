@@ -73,6 +73,7 @@ void EsOutSendCommand::Execute( es_out_t *out )
     if( p_fakeid->realESID() &&
             es_out_Send( out, p_fakeid->realESID(), p_block ) == VLC_SUCCESS )
         p_block = NULL;
+    p_fakeid->notifyData();
 }
 
 mtime_t EsOutSendCommand::getTime() const
@@ -89,14 +90,9 @@ EsOutDelCommand::EsOutDelCommand( FakeESOutID *p_es ) :
     p_fakeid = p_es;
 }
 
-void EsOutDelCommand::Execute( es_out_t *out )
+void EsOutDelCommand::Execute( es_out_t * )
 {
-    if( likely(p_fakeid->realESID()) )
-    {
-        es_out_Del( out, p_fakeid->realESID() );
-        p_fakeid->setRealESID( NULL );
-        delete p_fakeid;
-    }
+    p_fakeid->release();
 }
 
 EsOutAddCommand::EsOutAddCommand( FakeESOutID *p_es, const es_format_t *p_fmt ) :
