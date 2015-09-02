@@ -78,9 +78,10 @@ struct access_t
     /* Module properties */
     module_t    *p_module;
 
-    /* Access name (empty if non forced) */
-    char        *psz_access;
-    char        *psz_location; /**< Location (URL with the scheme stripped) */
+
+    char        *psz_access; /**< Access name (empty if non forced) */
+    char        *psz_url; /**< Full URL or MRL */
+    const char  *psz_location; /**< Location (URL with the scheme stripped) */
     char        *psz_filepath; /**< Local file path (if applicable) */
 
     /* pf_read/pf_block/pf_readdir is used to read data.

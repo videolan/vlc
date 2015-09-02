@@ -66,11 +66,11 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
 
     access_t *access = vlc_custom_create(parent, sizeof (*access), "access");
     char *scheme = strndup(mrl, p - mrl);
-    char *location = strdup(p + 3);
+    char *url = strdup(mrl);
 
-    if (unlikely(access == NULL || scheme == NULL || location == NULL))
+    if (unlikely(access == NULL || scheme == NULL || url == NULL))
     {
-        free(location);
+        free(url);
         free(scheme);
         vlc_object_release(access);
         return NULL;
@@ -78,8 +78,9 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
 
     access->p_input = input;
     access->psz_access = scheme;
-    access->psz_location = location;
-    access->psz_filepath = get_path(location);
+    access->psz_url = url;
+    access->psz_location = url + (p + 3 - mrl);
+    access->psz_filepath = get_path(access->psz_location);
     access->pf_read    = NULL;
     access->pf_block   = NULL;
     access->pf_readdir = NULL;
@@ -89,13 +90,14 @@ static access_t *access_New(vlc_object_t *parent, input_thread_t *input,
     access_InitFields(access);
 
     msg_Dbg(access, "creating access '%s' location='%s', path='%s'", scheme,
-            location, access->psz_filepath ? access->psz_filepath : "(null)");
+            access->psz_location,
+            access->psz_filepath ? access->psz_filepath : "(null)");
 
     access->p_module = module_need(access, "access", scheme, true);
     if (access->p_module == NULL)
     {
         free(access->psz_filepath);
-        free(access->psz_location);
+        free(access->psz_url);
         free(access->psz_access);
         vlc_object_release(access);
         access = NULL;
@@ -113,9 +115,9 @@ void vlc_access_Delete(access_t *access)
 {
     module_unneed(access, access->p_module);
 
-    free(access->psz_access);
-    free(access->psz_location);
     free(access->psz_filepath);
+    free(access->psz_url);
+    free(access->psz_access);
     vlc_object_release(access);
 }
 
