@@ -311,12 +311,25 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
         case STREAM_GET_CONTENT_TYPE:
         case STREAM_GET_SIGNAL:
         case STREAM_SET_PAUSE_STATE:
-        case STREAM_SET_TITLE:
-        case STREAM_SET_SEEKPOINT:
         case STREAM_SET_PRIVATE_ID_STATE:
         case STREAM_SET_PRIVATE_ID_CA:
         case STREAM_GET_PRIVATE_ID_STATE:
             return access_vaControl(access, cmd, args);
+
+        case STREAM_SET_TITLE:
+        case STREAM_SET_SEEKPOINT:
+        {
+            int ret = access_vaControl(access, cmd, args);
+            if (ret != VLC_SUCCESS)
+                return ret;
+
+            if (sys->block != NULL)
+            {
+                block_Release(sys->block);
+                sys->block = NULL;
+            }
+            break;
+        }
 
         case STREAM_GET_PRIVATE_BLOCK:
         {
