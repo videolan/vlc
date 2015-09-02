@@ -90,6 +90,7 @@ static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 #ifndef _WIN32
 static input_item_t* DirRead( access_t * );
+static int DirControl( access_t *, int, va_list );
 #endif
 
 struct access_sys_t
@@ -253,8 +254,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 #else
         p_access->pf_readdir = DirRead;
-        p_access->pf_control = access_vaDirectoryControlHelper;
-        p_access->info.b_dir_can_loop = true;
+        p_access->pf_control = DirControl;
         i_smb = smbc_opendir( psz_uri );
         i_size = 0;
 #endif
@@ -394,6 +394,21 @@ static input_item_t* DirRead (access_t *p_access )
             return NULL;
     }
     return p_item;
+}
+
+static int DirControl( access_t *p_access, int i_query, va_list args )
+{
+    switch( i_query )
+    {
+    case ACCESS_IS_DIRECTORY:
+        *va_arg( args, bool * ) = false; /* is not sorted */
+        *va_arg( args, bool * ) = true; /* might loop */
+        break;
+    default:
+        return access_vaDirectoryControlHelper( p_access, i_query, args );
+    }
+
+    return VLC_SUCCESS;
 }
 #endif
 

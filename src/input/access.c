@@ -137,6 +137,10 @@ int access_vaDirectoryControlHelper( access_t *p_access, int i_query, va_list ar
         case ACCESS_GET_PTS_DELAY:
             *va_arg( args, int64_t * ) = 0;
             break;
+        case ACCESS_IS_DIRECTORY:
+            *va_arg( args, bool * ) = false;
+            *va_arg( args, bool * ) = false;
+            break;
         default:
             return VLC_EGENERIC;
      }
@@ -274,6 +278,7 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
     static_control_match(CAN_PAUSE);
     static_control_match(CAN_CONTROL_PACE);
     static_control_match(GET_SIZE);
+    static_control_match(IS_DIRECTORY);
     static_control_match(GET_PTS_DELAY);
     static_control_match(GET_TITLE_INFO);
     static_control_match(GET_TITLE);
@@ -295,6 +300,7 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
         case STREAM_CAN_PAUSE:
         case STREAM_CAN_CONTROL_PACE:
         case STREAM_GET_SIZE:
+        case STREAM_IS_DIRECTORY:
         case STREAM_GET_PTS_DELAY:
         case STREAM_GET_TITLE_INFO:
         case STREAM_GET_TITLE:
@@ -309,13 +315,6 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
         case STREAM_SET_PRIVATE_ID_CA:
         case STREAM_GET_PRIVATE_ID_STATE:
             return access_vaControl(access, cmd, args);
-
-        case STREAM_IS_DIRECTORY:
-            if (access->pf_readdir == NULL)
-                return VLC_EGENERIC;
-            *va_arg(args, bool *) = access->info.b_dir_sorted;
-            *va_arg(args, bool *) = access->info.b_dir_can_loop;
-            break;
 
         case STREAM_GET_PRIVATE_BLOCK:
         {

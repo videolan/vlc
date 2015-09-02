@@ -43,6 +43,7 @@ enum access_query_e
     ACCESS_CAN_PAUSE,       /* arg1= bool*    cannot fail */
     ACCESS_CAN_CONTROL_PACE,/* arg1= bool*    cannot fail */
     ACCESS_GET_SIZE=6,      /* arg1= uin64_t* */
+    ACCESS_IS_DIRECTORY,    /* arg1= bool *, arg2= bool *, res=can fail */
 
     /* */
     ACCESS_GET_PTS_DELAY = 0x101,/* arg1= int64_t*       cannot fail */
@@ -104,13 +105,6 @@ struct access_t
     struct
     {
         bool         b_eof;     /* idem */
-
-        bool         b_dir_sorted; /* Set it to true if items returned by
-                                    * pf_readdir are already sorted. */
-
-        bool         b_dir_can_loop;  /* Set it to true if the access can't know
-                                       * if children can loop into their parents.
-                                       * It's the case for most network accesses. */
     } info;
     access_sys_t *p_sys;
 

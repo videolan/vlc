@@ -84,6 +84,7 @@ static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 
 static input_item_t* DirRead( access_t *p_access );
+static int DirControl( access_t *, int, va_list );
 
 struct access_sys_t
 {
@@ -296,8 +297,7 @@ static int Open( vlc_object_t* p_this )
         p_sys->file = libssh2_sftp_opendir( p_sys->sftp_session, psz_path );
 
         p_access->pf_readdir = DirRead;
-        p_access->pf_control = access_vaDirectoryControlHelper;
-        p_access->info.b_dir_can_loop = true;
+        p_access->pf_control = DirControl;
 
         if( p_sys->file )
         {
@@ -514,4 +514,19 @@ static input_item_t* DirRead( access_t *p_access )
 
     free( psz_file );
     return p_item;
+}
+
+static int DirControl( access_t *p_access, int i_query, va_list args )
+{
+    switch( i_query )
+    {
+    case ACCESS_IS_DIRECTORY:
+        *va_arg( args, bool * ) = false; /* is not sorted */
+        *va_arg( args, bool * ) = true; /* might loop */
+        break;
+    default:
+        return access_vaDirectoryControlHelper( p_access, i_query, args );
+    }
+
+    return VLC_SUCCESS;
 }

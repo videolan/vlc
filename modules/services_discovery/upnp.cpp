@@ -813,6 +813,21 @@ static input_item_t* ReadDirectory( access_t *p_access )
     return p_access->p_sys->p_server->getNextItem();
 }
 
+static int ControlDirectory( access_t *p_access, int i_query, va_list args )
+{
+    switch( i_query )
+    {
+    case ACCESS_IS_DIRECTORY:
+        *va_arg( args, bool * ) = true; /* is sorted */
+        *va_arg( args, bool * ) = true; /* might loop */
+        break;
+    default:
+        return access_vaDirectoryControlHelper( p_access, i_query, args );
+    }
+
+    return VLC_SUCCESS;
+}
+
 static int Open( vlc_object_t *p_this )
 {
     access_t* p_access = (access_t*)p_this;
@@ -837,9 +852,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_access->pf_readdir = ReadDirectory;
-    p_access->pf_control = access_vaDirectoryControlHelper;
-    p_access->info.b_dir_sorted = true;
-    p_access->info.b_dir_can_loop = true;
+    p_access->pf_control = ControlDirectory;
 
     return VLC_SUCCESS;
 }
