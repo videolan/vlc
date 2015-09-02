@@ -103,7 +103,6 @@ struct access_t
     /* Access has to maintain them uptodate */
     struct
     {
-        uint64_t     i_pos;     /* idem */
         bool         b_eof;     /* idem */
 
         bool         b_dir_sorted; /* Set it to true if items returned by
@@ -232,7 +231,6 @@ static inline int access_GetSize( access_t *p_access, uint64_t *size )
 
 static inline void access_InitFields( access_t *p_a )
 {
-    p_a->info.i_pos = 0;
     p_a->info.b_eof = false;
 }
 
