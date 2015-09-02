@@ -650,10 +650,13 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     /* return our proper VLC internal state */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    if (p_sys->b_zero_copy)
+    if (p_sys->b_zero_copy) {
+        msg_Dbg(p_dec, "zero-copy rendering pipeline enabled");
         p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_OPAQUE;
-    else
+    } else {
+        msg_Dbg(p_dec, "copy rendering pipeline enabled");
         p_dec->fmt_out.i_codec = VLC_CODEC_I420;
+    }
 
     p_dec->b_need_packetized = true;
 
@@ -1045,9 +1048,17 @@ skip:
                                          CVPixelBufferGetWidthOfPlane(imageBuffer, 0),
                                          CVPixelBufferGetHeightOfPlane(imageBuffer, 0));
                 } else {
-                    p_pic->p_sys = malloc(sizeof(picture_sys_t));
-                    if (p_pic->p_sys)
+                    /* the structure is allocated by the vout's pool */
+                    if (p_pic->p_sys) {
+                        /* if we received a recycled picture from the pool
+                         * we need release the previous reference first,
+                         * otherwise we would leak it */
+                        if (p_pic->p_sys->pixelBuffer != nil) {
+                            CFRelease(p_pic->p_sys->pixelBuffer);
+                        }
+
                         p_pic->p_sys->pixelBuffer = CFBridgingRetain(imageBufferObject);
+                    }
                     /* will be freed by the vout */
                 }
 

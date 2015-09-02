@@ -127,17 +127,18 @@ static NSString *const vertexShaderString = @" \
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
-static picture_pool_t* PicturePool(vout_display_t *vd, unsigned requested_count);
-static void PictureRender(vout_display_t* vd, picture_t *pic, subpicture_t *subpicture);
-static void PictureDisplay(vout_display_t* vd, picture_t *pic, subpicture_t *subpicture);
-static int Control(vout_display_t* vd, int query, va_list ap);
+static picture_pool_t* PicturePool(vout_display_t *, unsigned);
+static void PictureRender(vout_display_t *, picture_t *, subpicture_t *);
+static void PictureDisplay(vout_display_t *, picture_t *, subpicture_t *);
+static int Control(vout_display_t*, int, va_list);
 
 static void *OurGetProcAddress(vlc_gl_t *, const char *);
 
-static int OpenglESClean(vlc_gl_t* gl);
-static void OpenglESSwap(vlc_gl_t* gl);
+static int OpenglESClean(vlc_gl_t *);
+static void OpenglESSwap(vlc_gl_t *);
 
 static picture_pool_t *ZeroCopyPicturePool(vout_display_t *, unsigned);
+static void DestroyZeroCopyPoolPicture(picture_t *);
 static void ZeroCopyDisplay(vout_display_t *, picture_t *, subpicture_t *);
 
 /**
@@ -369,6 +370,10 @@ void Close (vlc_object_t *this)
 
     [sys->glESView release];
 
+    if (sys->picturePool)
+        picture_pool_Release(sys->picturePool);
+    sys->picturePool = NULL;
+
     free(sys);
 }
 
@@ -504,9 +509,60 @@ static void OpenglESSwap(vlc_gl_t *gl)
 static picture_pool_t *ZeroCopyPicturePool(vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
-    if (!sys->picturePool)
-        sys->picturePool = picture_pool_NewFromFormat(&vd->fmt, requested_count);
+    if (sys->picturePool != NULL)
+        return sys->picturePool;
+
+    picture_t** pictures = calloc(requested_count, sizeof(*pictures));
+    if (!pictures)
+        goto bailout;
+
+    for (unsigned x = 0; x < requested_count; x++) {
+        picture_sys_t *picsys = calloc(1, sizeof(*picsys));
+        if (unlikely(!picsys)) {
+            goto bailout;
+        }
+
+        picture_resource_t picture_resource;
+        picture_resource.p_sys = picsys;
+        picture_resource.pf_destroy = DestroyZeroCopyPoolPicture;
+
+        picture_t *picture = picture_NewFromResource(&vd->fmt, &picture_resource);
+        if (unlikely(picture == NULL)) {
+            free(picsys);
+            goto bailout;
+        }
+
+        pictures[x] = picture;
+    }
+
+    picture_pool_configuration_t pool_config;
+    memset(&pool_config, 0, sizeof(pool_config));
+    pool_config.picture_count = requested_count;
+    pool_config.picture = pictures;
+
+    sys->picturePool = picture_pool_NewExtended(&pool_config);
+
+bailout:
+    if (sys->picturePool == NULL && pictures) {
+        for (unsigned x = 0; x < requested_count; x++)
+            DestroyZeroCopyPoolPicture(pictures[x]);
+        free(pictures);
+    }
+
     return sys->picturePool;
+}
+
+static void DestroyZeroCopyPoolPicture(picture_t *picture)
+{
+    picture_sys_t *p_sys = (picture_sys_t *)picture->p_sys;
+
+    if (p_sys->pixelBuffer != nil) {
+        CFRelease(p_sys->pixelBuffer);
+        p_sys->pixelBuffer = nil;
+    }
+
+    free(p_sys);
+    free(picture);
 }
 
 static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
@@ -520,9 +576,6 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
 
                 if (picsys->pixelBuffer != nil) {
                     [sys->glESView displayPixelBuffer: picsys->pixelBuffer];
-
-                    CFRelease(picsys->pixelBuffer);
-                    picsys->pixelBuffer = nil;
                 }
             }
         }
