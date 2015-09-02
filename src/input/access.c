@@ -311,18 +311,10 @@ static int AStreamControl(stream_t *s, int cmd, va_list args)
             return access_vaControl(access, cmd, args);
 
         case STREAM_IS_DIRECTORY:
-        {
-            bool *b;
-
             *va_arg(args, bool *) = access->pf_readdir != NULL;
-            b = va_arg(args, bool *);
-            if (b != NULL)
-                *b = access->info.b_dir_sorted;
-            b = va_arg(args, bool *);
-            if (b != NULL)
-                *b = access->info.b_dir_can_loop;
+            *va_arg(args, bool *) = access->info.b_dir_sorted;
+            *va_arg(args, bool *) = access->info.b_dir_can_loop;
             break;
-        }
 
         case STREAM_GET_PRIVATE_BLOCK:
         {

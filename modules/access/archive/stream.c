@@ -39,17 +39,10 @@ static int Control(stream_t *p_stream, int i_query, va_list args)
     switch( i_query )
     {
         case STREAM_IS_DIRECTORY:
-        {
-            bool *pb_canreaddir = va_arg( args, bool * );
-            bool *pb_dirsorted = va_arg( args, bool * );
-            bool *pb_dircanloop = va_arg( args, bool * );
-            *pb_canreaddir = true;
-            if (pb_dirsorted)
-                *pb_dirsorted = false;
-            if (pb_dircanloop)
-                pb_dircanloop = false;
+            *va_arg( args, bool * ) = true;
+            *va_arg( args, bool * ) = false;
+            *va_arg( args, bool * ) = false;
             break;
-        }
 
         case STREAM_CAN_SEEK:
         case STREAM_CAN_FASTSEEK:
