@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include "../adaptative/Streams.hpp"
+#include "../adaptative/plumbing/StreamOutput.hpp"
 
 namespace hls
 {

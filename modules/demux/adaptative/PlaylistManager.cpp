@@ -33,6 +33,7 @@
 #include "logic/AlwaysBestAdaptationLogic.h"
 #include "logic/RateBasedAdaptationLogic.h"
 #include "logic/AlwaysLowestAdaptationLogic.hpp"
+#include "plumbing/StreamOutput.hpp"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 

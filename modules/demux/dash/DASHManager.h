@@ -27,6 +27,7 @@
 
 #include "../adaptative/PlaylistManager.h"
 #include "../adaptative/logic/AbstractAdaptationLogic.h"
+#include "../adaptative/plumbing/StreamOutput.hpp"
 #include "mpd/MPD.h"
 
 namespace dash
