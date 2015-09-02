@@ -523,6 +523,23 @@ int stream_vaControl(stream_t *s, int cmd, va_list args)
 
     switch (cmd)
     {
+        case STREAM_SET_TITLE:
+        case STREAM_SET_SEEKPOINT:
+        {
+            int ret = s->pf_control(s, cmd, args);
+            if (ret != VLC_SUCCESS)
+                return ret;
+
+            priv->offset = 0;
+
+            if (priv->peek != NULL)
+            {
+                block_Release(priv->peek);
+                priv->peek = NULL;
+            }
+            return VLC_SUCCESS;
+        }
+
         case STREAM_GET_PRIVATE_BLOCK:
         {
             block_t **b = va_arg(args, block_t **);
