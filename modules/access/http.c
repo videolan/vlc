@@ -189,7 +189,7 @@ struct access_sys_t
 };
 
 /* */
-static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
+static int OpenRedirected( vlc_object_t *p_this, const char *psz_url,
                            unsigned i_redirect );
 
 /* */
@@ -216,18 +216,24 @@ static vlc_http_cookie_jar_t *GetCookieJar( vlc_object_t *p_this );
 static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
-    return OpenRedirected( p_this, p_access->psz_access, 5 );
+    char *psz_url;
+
+    if( asprintf( &psz_url, "%s://%s", p_access->psz_access,
+                  p_access->psz_location ) == -1 )
+        return VLC_ENOMEM;
+
+    int ret = OpenRedirected( p_this, psz_url, 5 );
+    free( psz_url );
+    return ret;
 }
 
 /**
  * Open the given url with limited redirects
  * @param p_this: the vlc object
- * @psz_access: the acces to use (http, https, ...) (this value must be used
- *              instead of p_access->psz_access)
  * @i_redirect: number of redirections remaining
  * @return vlc error codes
  */
-static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
+static int OpenRedirected( vlc_object_t *p_this, const char *psz_url,
                            unsigned i_redirect )
 {
     access_t     *p_access = (access_t*)p_this;
@@ -283,14 +289,14 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
 
     http_auth_Init( &p_sys->auth );
     http_auth_Init( &p_sys->proxy_auth );
-    vlc_UrlParse( &p_sys->url, p_access->psz_location );
+    vlc_UrlParse( &p_sys->url, psz_url );
 
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
         msg_Warn( p_access, "invalid host" );
         goto error;
     }
-    if( !strncmp( psz_access, "https", 5 ) )
+    if( !strcmp( p_sys->url.psz_protocol, "https" ) )
     {
         /* HTTP over SSL */
         p_sys->p_creds = vlc_tls_ClientCreate( p_this );
@@ -349,15 +355,8 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
     psz = var_InheritString( p_access, "http-proxy" );
     if( psz == NULL )
     {
-        char *url;
-
-        if (likely(asprintf(&url, "%s://%s", psz_access,
-                            p_access->psz_location) != -1))
-        {
-            msg_Dbg(p_access, "querying proxy for %s", url);
-            psz = vlc_getProxyUrl(url);
-            free(url);
-        }
+        msg_Dbg(p_access, "querying proxy for %s", psz_url);
+        psz = vlc_getProxyUrl(psz_url);
 
         if (psz != NULL)
             msg_Dbg(p_access, "proxy: %s", psz);
@@ -475,19 +474,13 @@ connect:
             goto error;
         }
 
-        const char *psz_protocol;
-        if( !strncmp( p_sys->psz_location, "http://", 7 ) )
-            psz_protocol = "http";
-        else if( !strncmp( p_sys->psz_location, "https://", 8 ) )
-            psz_protocol = "https";
-        else
+        if( strncmp( p_sys->psz_location, "http://", 7 )
+         && strncmp( p_sys->psz_location, "https://", 8 ) )
         {   /* Do not accept redirection outside of HTTP */
             msg_Err( p_access, "unsupported redirection ignored" );
             goto error;
         }
-        free( p_access->psz_location );
-        p_access->psz_location = strdup( p_sys->psz_location
-                                       + strlen( psz_protocol ) + 3 );
+
         /* Clean up current Open() run */
         vlc_UrlClean( &p_sys->url );
         http_auth_Reset( &p_sys->auth );
@@ -496,7 +489,6 @@ connect:
         http_auth_Reset( &p_sys->proxy_auth );
         free( p_sys->psz_mime );
         free( p_sys->psz_pragma );
-        free( p_sys->psz_location );
         free( p_sys->psz_user_agent );
         free( p_sys->psz_referrer );
 
@@ -505,10 +497,13 @@ connect:
 #ifdef HAVE_ZLIB_H
         inflateEnd( &p_sys->inflate.stream );
 #endif
+        char *psz_location = p_sys->psz_location;
         free( p_sys );
 
         /* Do new Open() run with new data */
-        return OpenRedirected( p_this, psz_protocol, i_redirect - 1 );
+        int ret = OpenRedirected( p_this, psz_location, i_redirect - 1 );
+        free( psz_location );
+        return ret;
     }
 
     if( p_sys->b_mms )
