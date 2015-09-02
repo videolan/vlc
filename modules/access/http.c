@@ -216,15 +216,8 @@ static vlc_http_cookie_jar_t *GetCookieJar( vlc_object_t *p_this );
 static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
-    char *psz_url;
 
-    if( asprintf( &psz_url, "%s://%s", p_access->psz_access,
-                  p_access->psz_location ) == -1 )
-        return VLC_ENOMEM;
-
-    int ret = OpenRedirected( p_this, psz_url, 5 );
-    free( psz_url );
-    return ret;
+    return OpenRedirected( p_this, p_access->psz_url, 5 );
 }
 
 /**
