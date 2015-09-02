@@ -449,6 +449,33 @@ int stream_Seek(stream_t *s, uint64_t offset)
 {
     stream_priv_t *priv = (stream_priv_t *)s;
 
+    block_t *peek = priv->peek;
+    if (peek != NULL)
+    {
+        if (priv->offset >= offset)
+        {
+            uint64_t fwd = priv->offset - offset;
+            if (fwd <= peek->i_buffer)
+            {   /* Seeking within the peek buffer */
+                peek->p_buffer += fwd;
+                peek->i_buffer -= fwd;
+
+                if (peek->i_buffer == 0)
+                {
+                    priv->peek = NULL;
+                    block_Release(peek);
+                }
+
+                return VLC_SUCCESS;
+            }
+        }
+    }
+    else
+    {
+        if (priv->offset == offset)
+            return VLC_SUCCESS; /* Nothing to do! */
+    }
+
     if (s->pf_seek == NULL)
         return VLC_EGENERIC;
 
@@ -458,7 +485,6 @@ int stream_Seek(stream_t *s, uint64_t offset)
 
     priv->offset = offset;
 
-    block_t *peek = priv->peek;
     if (peek != NULL)
     {
         priv->peek = NULL;
