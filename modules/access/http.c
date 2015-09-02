@@ -232,7 +232,7 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
-    char         *psz, *p;
+    char         *psz;
 
     /* Set up p_access */
     STANDARD_READ_ACCESS_INIT;
@@ -283,13 +283,7 @@ static int OpenRedirected( vlc_object_t *p_this, const char *psz_access,
 
     http_auth_Init( &p_sys->auth );
     http_auth_Init( &p_sys->proxy_auth );
-
-    /* Parse URI - remove spaces */
-    p = psz = strdup( p_access->psz_location );
-    while( (p = strchr( p, ' ' )) != NULL )
-        *p = '+';
-    vlc_UrlParse( &p_sys->url, psz );
-    free( psz );
+    vlc_UrlParse( &p_sys->url, p_access->psz_location );
 
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
