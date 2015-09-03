@@ -479,6 +479,7 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
     jobject jcodec = NULL;
     jobject jformat = NULL;
     jstring jrotation_string = NULL;
+    jstring jmaxinputsize_string = NULL;
     jobject jinput_buffers = NULL;
     jobject joutput_buffers = NULL;
     jobject jbuffer_info = NULL;
@@ -542,6 +543,10 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
                                                  p_args->audio.i_sample_rate,
                                                  p_args->audio.i_channel_count);
     }
+    /* No limits for input size */
+    jmaxinputsize_string = (*env)->NewStringUTF(env, "max-input-size");
+    (*env)->CallVoidMethod(env, jformat, jfields.set_integer,
+                           jmaxinputsize_string, 0);
 
     if (b_direct_rendering)
     {
@@ -614,6 +619,8 @@ error:
         (*env)->DeleteLocalRef(env, jformat);
     if (jrotation_string)
         (*env)->DeleteLocalRef(env, jrotation_string);
+    if (jmaxinputsize_string)
+        (*env)->DeleteLocalRef(env, jmaxinputsize_string);
     if (jinput_buffers)
         (*env)->DeleteLocalRef(env, jinput_buffers);
     if (joutput_buffers)

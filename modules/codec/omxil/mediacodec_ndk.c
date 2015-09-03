@@ -320,6 +320,8 @@ static int Start(mc_api *api, const char *psz_name, const char *psz_mime,
 
     syms.AMediaFormat.setInt32(p_sys->p_format, "encoder", 0);
     syms.AMediaFormat.setString(p_sys->p_format, "mime", psz_mime);
+    /* No limits for input size */
+    syms.AMediaFormat.setInt32(p_sys->p_format, "max-input-size", 0);
     if (api->b_video)
     {
         syms.AMediaFormat.setInt32(p_sys->p_format, "width", p_args->video.i_width);
