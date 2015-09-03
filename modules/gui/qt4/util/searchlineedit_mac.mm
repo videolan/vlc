@@ -41,23 +41,20 @@ SearchLineEdit::SearchLineEdit(QWidget *parent)
 {
     // Many Cocoa objects create temporary autorelease objects,
     // so create a pool to catch them.
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
+        // Create the NSSearchField, set it on the QCocoaViewContainer.
+        NSSearchField *search = [[NSSearchField alloc] init];
+        setCocoaView(search);
+        [[search cell] setPlaceholderString:@"Search..."];
 
-    // Create the NSSearchField, set it on the QCocoaViewContainer.
-    NSSearchField *search = [[NSSearchField alloc] init];
-    setCocoaView(search);
-    [[search cell] setPlaceholderString:@"Search..."];
+        // Use a Qt menu for the search field menu.
+        // NSMenu *nsMenu = searchMenu->macMenu(0);
+        // [[search cell] setSearchMenuTemplate:nsMenu];
 
-    // Use a Qt menu for the search field menu.
-    // NSMenu *nsMenu = searchMenu->macMenu(0);
-    // [[search cell] setSearchMenuTemplate:nsMenu];
-
-    // Release our reference, since our super class takes ownership and we
-    // don't need it anymore.
-    [search release];
-
-    // Clean up our pool as we no longer need it.
-    [pool release];
+        // Release our reference, since our super class takes ownership and we
+        // don't need it anymore.
+        [search release];
+    }
 }
 //![0]
 
