@@ -161,54 +161,58 @@ void CloseIntf(vlc_object_t *p_this)
  *****************************************************************************/
 static int DisplayError(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    dialog_fatal_t *dialog = value.p_address;
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
-    [sys->displayer performSelectorOnMainThread:@selector(displayError:) withObject:DictFromDialogFatal(dialog) waitUntilDone:NO];
-    [pool release];
-    return VLC_SUCCESS;
+    @autoreleasepool {
+        dialog_fatal_t *dialog = value.p_address;
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
+        [sys->displayer performSelectorOnMainThread:@selector(displayError:)
+                                         withObject:DictFromDialogFatal(dialog)
+                                      waitUntilDone:NO];
+        return VLC_SUCCESS;
+    }
 }
 
 static int DisplayCritical(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    dialog_fatal_t *dialog = value.p_address;
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
-    [sys->displayer performSelectorOnMainThread:@selector(displayCritical:) withObject:DictFromDialogFatal(dialog) waitUntilDone:NO];
-    [pool release];
-    return VLC_SUCCESS;
+    @autoreleasepool {
+        dialog_fatal_t *dialog = value.p_address;
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
+        [sys->displayer performSelectorOnMainThread:@selector(displayCritical:)
+                                         withObject:DictFromDialogFatal(dialog)
+                                      waitUntilDone:NO];
+        return VLC_SUCCESS;
+    }
 }
 
 static int DisplayQuestion(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    dialog_question_t *dialog = value.p_address;
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
-    dialog->answer = [[sys->displayer displayQuestion:DictFromDialogQuestion(dialog)] intValue];
-    [pool release];
-    return VLC_SUCCESS;
+    @autoreleasepool {
+        dialog_question_t *dialog = value.p_address;
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
+        dialog->answer = [[sys->displayer displayQuestion:DictFromDialogQuestion(dialog)] intValue];
+        return VLC_SUCCESS;
+    }
 }
 
 static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    dialog_login_t *dialog = value.p_address;
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
-    NSDictionary *dict = [sys->displayer displayLogin:DictFromDialogLogin(dialog)];
-    if (dict) {
-        NSString *username = [dict objectForKey:@"username"];
-        if (username != NULL && username.length > 0)
-            *dialog->username = strdup([username UTF8String]);
-        NSString *password = [dict objectForKey:@"password"];
-        if (password != NULL && password.length > 0)
-            *dialog->password = strdup([password UTF8String]);
+    @autoreleasepool {
+        dialog_login_t *dialog = value.p_address;
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
+        NSDictionary *dict = [sys->displayer displayLogin:DictFromDialogLogin(dialog)];
+        if (dict) {
+            NSString *username = [dict objectForKey:@"username"];
+            if (username != NULL && username.length > 0)
+                *dialog->username = strdup([username UTF8String]);
+            NSString *password = [dict objectForKey:@"password"];
+            if (password != NULL && password.length > 0)
+                *dialog->password = strdup([password UTF8String]);
+        }
+        return VLC_SUCCESS;
     }
-    [pool release];
-    return VLC_SUCCESS;
 }
 
 @implementation VLCDialogDisplayer
