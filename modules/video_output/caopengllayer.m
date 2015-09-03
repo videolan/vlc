@@ -114,95 +114,96 @@ static int Open (vlc_object_t *p_this)
     if (sys == NULL)
         return VLC_EGENERIC;
 
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
+        id container = var_CreateGetAddress(vd, "drawable-nsobject");
+        if (container)
+            vout_display_DeleteWindow(vd, NULL);
+        else {
+            sys->embed = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_NSOBJECT);
+            if (sys->embed)
+                container = sys->embed->handle.nsobject;
 
-    id container = var_CreateGetAddress(vd, "drawable-nsobject");
-    if (container)
-        vout_display_DeleteWindow(vd, NULL);
-    else {
-        sys->embed = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_NSOBJECT);
-        if (sys->embed)
-            container = sys->embed->handle.nsobject;
+            if (!container) {
+                msg_Err(vd, "No drawable-nsobject found!");
+                goto bailout;
+            }
+        }
 
-        if (!container) {
-            msg_Err(vd, "No drawable-nsobject found!");
+        /* store for later, released in Close() */
+        sys->container = [container retain];
+
+        [CATransaction begin];
+        sys->cgLayer = [[VLCCAOpenGLLayer alloc] init];
+        [sys->cgLayer setVoutDisplay:vd];
+
+        [sys->cgLayer performSelectorOnMainThread:@selector(display)
+                                       withObject:nil
+                                    waitUntilDone:YES];
+
+        if ([container respondsToSelector:@selector(addVoutLayer:)]) {
+            msg_Dbg(vd, "container implements implicit protocol");
+            [container addVoutLayer:sys->cgLayer];
+        } else if ([container respondsToSelector:@selector(addSublayer:)] ||
+                   [container isKindOfClass:[CALayer class]]) {
+            msg_Dbg(vd, "container doesn't implement implicit protocol, fallback mode used");
+            [container addSublayer:sys->cgLayer];
+        } else {
+            msg_Err(vd, "Provided NSObject container isn't compatible");
+            [sys->cgLayer release];
+            sys->cgLayer = nil;
+            [CATransaction commit];
             goto bailout;
         }
-    }
-
-    /* store for later, released in Close() */
-    sys->container = [container retain];
-
-    [CATransaction begin];
-    sys->cgLayer = [[VLCCAOpenGLLayer alloc] init];
-    [sys->cgLayer setVoutDisplay:vd];
-
-    [sys->cgLayer performSelectorOnMainThread:@selector(display) withObject:nil waitUntilDone:YES];
-
-    if ([container respondsToSelector:@selector(addVoutLayer:)]) {
-        msg_Dbg(vd, "container implements implicit protocol");
-        [container addVoutLayer:sys->cgLayer];
-    } else if ([container respondsToSelector:@selector(addSublayer:)] || [container isKindOfClass:[CALayer class]]) {
-        msg_Dbg(vd, "container doesn't implement implicit protocol, fallback mode used");
-        [container addSublayer:sys->cgLayer];
-    } else {
-        msg_Err(vd, "Provided NSObject container isn't compatible");
-        [sys->cgLayer release];
-        sys->cgLayer = nil;
         [CATransaction commit];
-        goto bailout;
+
+        if (!sys->cgLayer)
+            goto bailout;
+
+        if (!sys->glContext)
+            msg_Warn(vd, "we might not have an OpenGL context yet");
+
+        /* Initialize common OpenGL video display */
+        sys->gl.lock = OpenglLock;
+        sys->gl.unlock = OpenglUnlock;
+        sys->gl.swap = OpenglSwap;
+        sys->gl.getProcAddress = OurGetProcAddress;
+        sys->gl.sys = sys;
+
+        const vlc_fourcc_t *subpicture_chromas;
+        video_format_t fmt = vd->fmt;
+        sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl);
+        if (!sys->vgl) {
+            msg_Err(vd, "Error while initializing opengl display.");
+            sys->gl.sys = NULL;
+            goto bailout;
+        }
+
+        /* setup vout display */
+        vout_display_info_t info = vd->info;
+        info.subpicture_chromas = subpicture_chromas;
+        info.has_hide_mouse = true;
+        vd->info = info;
+
+        vd->pool    = Pool;
+        vd->prepare = PictureRender;
+        vd->display = PictureDisplay;
+        vd->control = Control;
+
+        /* setup initial state */
+        CGSize outputSize;
+        if ([container respondsToSelector:@selector(currentOutputSize)])
+            outputSize = [container currentOutputSize];
+        else
+            outputSize = [sys->container visibleRect].size;
+        vout_display_SendEventFullscreen(vd, false);
+        vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height);
+        
+        return VLC_SUCCESS;
+        
+    bailout:
+        Close(p_this);
+        return VLC_EGENERIC;
     }
-    [CATransaction commit];
-
-    if (!sys->cgLayer)
-        goto bailout;
-
-    if (!sys->glContext)
-        msg_Warn(vd, "we might not have an OpenGL context yet");
-
-    /* Initialize common OpenGL video display */
-    sys->gl.lock = OpenglLock;
-    sys->gl.unlock = OpenglUnlock;
-    sys->gl.swap = OpenglSwap;
-    sys->gl.getProcAddress = OurGetProcAddress;
-    sys->gl.sys = sys;
-
-    const vlc_fourcc_t *subpicture_chromas;
-    video_format_t fmt = vd->fmt;
-    sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl);
-    if (!sys->vgl) {
-        msg_Err(vd, "Error while initializing opengl display.");
-        sys->gl.sys = NULL;
-        goto bailout;
-    }
-
-    /* setup vout display */
-    vout_display_info_t info = vd->info;
-    info.subpicture_chromas = subpicture_chromas;
-    info.has_hide_mouse = true;
-    vd->info = info;
-
-    vd->pool    = Pool;
-    vd->prepare = PictureRender;
-    vd->display = PictureDisplay;
-    vd->control = Control;
-
-    /* setup initial state */
-    CGSize outputSize;
-    if ([container respondsToSelector:@selector(currentOutputSize)])
-        outputSize = [container currentOutputSize];
-    else
-        outputSize = [sys->container visibleRect].size;
-    vout_display_SendEventFullscreen(vd, false);
-    vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height);
-
-    [pool release];
-    return VLC_SUCCESS;
-
-bailout:
-    [pool release];
-    Close(p_this);
-    return VLC_EGENERIC;
 }
 
 static void Close (vlc_object_t *p_this)
