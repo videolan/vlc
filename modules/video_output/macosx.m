@@ -138,106 +138,108 @@ static int Open (vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = calloc (1, sizeof(*sys));
-    NSAutoreleasePool *nsPool = nil;
 
     if (!sys)
         return VLC_ENOMEM;
 
-    if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay))
-        msg_Err (this, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
+    @autoreleasepool {
+        if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay))
+            msg_Err (this, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
 
-    vd->sys = sys;
-    sys->pool = NULL;
-    sys->gl.sys = NULL;
-    sys->embed = NULL;
+        vd->sys = sys;
+        sys->pool = NULL;
+        sys->gl.sys = NULL;
+        sys->embed = NULL;
 
-    /* Get the drawable object */
-    id container = var_CreateGetAddress (vd, "drawable-nsobject");
-    if (container)
-        vout_display_DeleteWindow (vd, NULL);
-    else {
-        sys->embed = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_NSOBJECT);
-        if (sys->embed)
-            container = sys->embed->handle.nsobject;
+        /* Get the drawable object */
+        id container = var_CreateGetAddress (vd, "drawable-nsobject");
+        if (container)
+            vout_display_DeleteWindow (vd, NULL);
+        else {
+            sys->embed = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_NSOBJECT);
+            if (sys->embed)
+                container = sys->embed->handle.nsobject;
 
-        if (!container) {
-            msg_Err(vd, "No drawable-nsobject nor vout_window_t found, passing over.");
+            if (!container) {
+                msg_Err(vd, "No drawable-nsobject nor vout_window_t found, passing over.");
+                goto error;
+            }
+        }
+
+        /* This will be released in Close(), on
+         * main thread, after we are done using it. */
+        sys->container = [container retain];
+
+        /* Get our main view*/
+        [VLCOpenGLVideoView performSelectorOnMainThread:@selector(getNewView:)
+                                             withObject:[NSValue valueWithPointer:&sys->glView]
+                                          waitUntilDone:YES];
+        if (!sys->glView) {
+            msg_Err(vd, "Initialization of open gl view failed");
             goto error;
         }
+
+        [sys->glView setVoutDisplay:vd];
+
+        /* We don't wait, that means that we'll have to be careful about releasing
+         * container.
+         * That's why we'll release on main thread in Close(). */
+        if ([(id)container respondsToSelector:@selector(addVoutSubview:)])
+            [(id)container performSelectorOnMainThread:@selector(addVoutSubview:)
+                                            withObject:sys->glView
+                                         waitUntilDone:NO];
+        else if ([container isKindOfClass:[NSView class]]) {
+            NSView *parentView = container;
+            [parentView performSelectorOnMainThread:@selector(addSubview:)
+                                         withObject:sys->glView
+                                      waitUntilDone:NO];
+            [sys->glView performSelectorOnMainThread:@selector(setFrameToBoundsOfView:)
+                                          withObject:[NSValue valueWithPointer:parentView]
+                                       waitUntilDone:NO];
+        } else {
+            msg_Err(vd, "Invalid drawable-nsobject object. drawable-nsobject must either be an NSView or comply to the @protocol VLCOpenGLVideoViewEmbedding.");
+            goto error;
+        }
+
+        /* Initialize common OpenGL video display */
+        sys->gl.lock = OpenglLock;
+        sys->gl.unlock = OpenglUnlock;
+        sys->gl.swap = OpenglSwap;
+        sys->gl.getProcAddress = OurGetProcAddress;
+        sys->gl.sys = sys;
+        const vlc_fourcc_t *subpicture_chromas;
+
+        sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl);
+        if (!sys->vgl) {
+            msg_Err(vd, "Error while initializing opengl display.");
+            sys->gl.sys = NULL;
+            goto error;
+        }
+
+        /* */
+        vout_display_info_t info = vd->info;
+        info.has_pictures_invalid = false;
+        info.has_event_thread = true;
+        info.subpicture_chromas = subpicture_chromas;
+        info.has_hide_mouse = true;
+
+        /* Setup vout_display_t once everything is fine */
+        vd->info = info;
+        
+        vd->pool = Pool;
+        vd->prepare = PictureRender;
+        vd->display = PictureDisplay;
+        vd->control = Control;
+        
+        /* */
+        vout_display_SendEventDisplaySize (vd, vd->fmt.i_visible_width, vd->fmt.i_visible_height);
+        
+        return VLC_SUCCESS;
+        
+    error:
+        Close(this);
+        return VLC_EGENERIC;
     }
-
-    /* This will be released in Close(), on
-     * main thread, after we are done using it. */
-    sys->container = [container retain];
-
-    /* Get our main view*/
-    nsPool = [[NSAutoreleasePool alloc] init];
-
-    [VLCOpenGLVideoView performSelectorOnMainThread:@selector(getNewView:) withObject:[NSValue valueWithPointer:&sys->glView] waitUntilDone:YES];
-    if (!sys->glView) {
-        msg_Err(vd, "Initialization of open gl view failed");
-        goto error;
-    }
-
-    [sys->glView setVoutDisplay:vd];
-
-    /* We don't wait, that means that we'll have to be careful about releasing
-     * container.
-     * That's why we'll release on main thread in Close(). */
-    if ([(id)container respondsToSelector:@selector(addVoutSubview:)])
-        [(id)container performSelectorOnMainThread:@selector(addVoutSubview:) withObject:sys->glView waitUntilDone:NO];
-    else if ([container isKindOfClass:[NSView class]]) {
-        NSView *parentView = container;
-        [parentView performSelectorOnMainThread:@selector(addSubview:) withObject:sys->glView waitUntilDone:NO];
-        [sys->glView performSelectorOnMainThread:@selector(setFrameToBoundsOfView:) withObject:[NSValue valueWithPointer:parentView] waitUntilDone:NO];
-    } else {
-        msg_Err(vd, "Invalid drawable-nsobject object. drawable-nsobject must either be an NSView or comply to the @protocol VLCOpenGLVideoViewEmbedding.");
-        goto error;
-    }
-
-
-    [nsPool release];
-    nsPool = nil;
-
-    /* Initialize common OpenGL video display */
-    sys->gl.lock = OpenglLock;
-    sys->gl.unlock = OpenglUnlock;
-    sys->gl.swap = OpenglSwap;
-    sys->gl.getProcAddress = OurGetProcAddress;
-    sys->gl.sys = sys;
-    const vlc_fourcc_t *subpicture_chromas;
-
-    sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, &sys->gl);
-    if (!sys->vgl) {
-        msg_Err(vd, "Error while initializing opengl display.");
-        sys->gl.sys = NULL;
-        goto error;
-    }
-
-    /* */
-    vout_display_info_t info = vd->info;
-    info.has_pictures_invalid = false;
-    info.has_event_thread = true;
-    info.subpicture_chromas = subpicture_chromas;
-    info.has_hide_mouse = true;
-
-    /* Setup vout_display_t once everything is fine */
-    vd->info = info;
-
-    vd->pool = Pool;
-    vd->prepare = PictureRender;
-    vd->display = PictureDisplay;
-    vd->control = Control;
-
-    /* */
-    vout_display_SendEventDisplaySize (vd, vd->fmt.i_visible_width, vd->fmt.i_visible_height);
-
-    return VLC_SUCCESS;
-
-error:
-    [nsPool release];
-    Close(this);
-    return VLC_EGENERIC;
 }
 
 void Close (vlc_object_t *this)
@@ -245,25 +247,33 @@ void Close (vlc_object_t *this)
     vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
 
-    [sys->glView setVoutDisplay:nil];
+    @autoreleasepool {
+        [sys->glView setVoutDisplay:nil];
 
-    var_Destroy (vd, "drawable-nsobject");
-    if ([(id)sys->container respondsToSelector:@selector(removeVoutSubview:)])
+        var_Destroy (vd, "drawable-nsobject");
+        if ([(id)sys->container respondsToSelector:@selector(removeVoutSubview:)])
         /* This will retain sys->glView */
-        [(id)sys->container performSelectorOnMainThread:@selector(removeVoutSubview:) withObject:sys->glView waitUntilDone:NO];
+            [(id)sys->container performSelectorOnMainThread:@selector(removeVoutSubview:)
+                                                 withObject:sys->glView
+                                              waitUntilDone:NO];
 
-    /* release on main thread as explained in Open() */
-    [(id)sys->container performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
-    [sys->glView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
+        /* release on main thread as explained in Open() */
+        [(id)sys->container performSelectorOnMainThread:@selector(release)
+                                             withObject:nil
+                                          waitUntilDone:NO];
+        [sys->glView performSelectorOnMainThread:@selector(removeFromSuperview)
+                                      withObject:nil
+                                   waitUntilDone:NO];
 
-    if (sys->gl.sys != NULL)
-        vout_display_opengl_Delete (sys->vgl);
+        if (sys->gl.sys != NULL)
+            vout_display_opengl_Delete (sys->vgl);
 
-    [sys->glView release];
+        [sys->glView release];
 
-    if (sys->embed)
-        vout_display_DeleteWindow (vd, sys->embed);
-    free (sys);
+        if (sys->embed)
+            vout_display_DeleteWindow (vd, sys->embed);
+        free (sys);
+    }
 }
 
 /*****************************************************************************
@@ -311,75 +321,73 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     if (!sys->embed)
         return VLC_EGENERIC;
 
-    switch (query)
-    {
-        case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-        case VOUT_DISPLAY_CHANGE_ZOOM:
-        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+    @autoreleasepool {
+        switch (query)
         {
-            NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+            case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+            case VOUT_DISPLAY_CHANGE_ZOOM:
+            case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+            case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+            {
 
-            id o_window = [sys->glView window];
-            if (!o_window) {
-                [o_pool release];
-                return VLC_SUCCESS; // this is okay, since the event will occur again when we have a window
+                id o_window = [sys->glView window];
+                if (!o_window) {
+                    return VLC_SUCCESS; // this is okay, since the event will occur again when we have a window
+                }
+
+                NSSize windowMinSize = [o_window minSize];
+
+                const vout_display_cfg_t *cfg;
+                const video_format_t *source;
+
+                if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
+                    source = (const video_format_t *)va_arg (ap, const video_format_t *);
+                    cfg = vd->cfg;
+                } else {
+                    source = &vd->source;
+                    cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
+                }
+
+                /* we always use our current frame here, because we have some size constraints
+                 in the ui vout provider */
+                vout_display_cfg_t cfg_tmp = *cfg;
+                NSRect bounds;
+                /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
+                if (OSX_LION)
+                    bounds = [sys->glView convertRectToBacking:[sys->glView bounds]];
+                else
+                    bounds = [sys->glView bounds];
+                cfg_tmp.display.width = bounds.size.width;
+                cfg_tmp.display.height = bounds.size.height;
+
+                vout_display_place_t place;
+                vout_display_PlacePicture (&place, source, &cfg_tmp, false);
+                @synchronized (sys->glView) {
+                    sys->place = place;
+                }
+
+                /* For resize, we call glViewport in reshape and not here.
+                 This has the positive side effect that we avoid erratic sizing as we animate every resize. */
+                if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
+                    // x / y are top left corner, but we need the lower left one
+                    glViewport (place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
+
+                return VLC_SUCCESS;
             }
 
-            NSSize windowMinSize = [o_window minSize];
-
-            const vout_display_cfg_t *cfg;
-            const video_format_t *source;
-
-            if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-                source = (const video_format_t *)va_arg (ap, const video_format_t *);
-                cfg = vd->cfg;
-            } else {
-                source = &vd->source;
-                cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
+            case VOUT_DISPLAY_HIDE_MOUSE:
+            {
+                [NSCursor setHiddenUntilMouseMoves: YES];
+                return VLC_SUCCESS;
             }
-
-            /* we always use our current frame here, because we have some size constraints
-               in the ui vout provider */
-            vout_display_cfg_t cfg_tmp = *cfg;
-            NSRect bounds;
-            /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
-            if (OSX_LION)
-                bounds = [sys->glView convertRectToBacking:[sys->glView bounds]];
-            else
-                bounds = [sys->glView bounds];
-            cfg_tmp.display.width = bounds.size.width;
-            cfg_tmp.display.height = bounds.size.height;
-
-            vout_display_place_t place;
-            vout_display_PlacePicture (&place, source, &cfg_tmp, false);
-            @synchronized (sys->glView) {
-                sys->place = place;
-            }
-
-            /* For resize, we call glViewport in reshape and not here.
-               This has the positive side effect that we avoid erratic sizing as we animate every resize. */
-            if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                // x / y are top left corner, but we need the lower left one
-                glViewport (place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
-
-
-            [o_pool release];
-            return VLC_SUCCESS;
+                
+            case VOUT_DISPLAY_RESET_PICTURES:
+                vlc_assert_unreachable ();
+            default:
+                msg_Err (vd, "Unknown request in Mac OS X vout display");
+                return VLC_EGENERIC;
         }
-
-        case VOUT_DISPLAY_HIDE_MOUSE:
-        {
-            [NSCursor setHiddenUntilMouseMoves: YES];
-            return VLC_SUCCESS;
-        }
-
-        case VOUT_DISPLAY_RESET_PICTURES:
-            vlc_assert_unreachable ();
-        default:
-            msg_Err (vd, "Unknown request in Mac OS X vout display");
-            return VLC_EGENERIC;
     }
 }
 
