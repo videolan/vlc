@@ -64,7 +64,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     if (!r)
         return;
 
-    r->p_text = sys->p_segments;
+    r->p_text = text_segment_Copy( sys->p_segments );
     r->i_align  = sys->align;
     r->b_noregionbg = sys->noregionbg;
     r->b_gridmode = sys->gridmode;
