@@ -279,38 +279,37 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
 - (void)registerToGrowl
 {
-    o_applicationName = [[NSString alloc] initWithUTF8String: _( "VLC media player" )];
-    o_notificationType = [[NSString alloc] initWithUTF8String: _( "New input playing" )];
+    @autoreleasepool {
+        o_applicationName = [[NSString alloc] initWithUTF8String: _( "VLC media player" )];
+        o_notificationType = [[NSString alloc] initWithUTF8String: _( "New input playing" )];
 
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    NSArray *o_defaultAndAllNotifications = [NSArray arrayWithObject: o_notificationType];
+        NSArray *o_defaultAndAllNotifications = [NSArray arrayWithObject: o_notificationType];
+        o_registrationDictionary = [[NSMutableDictionary alloc] init];
+        [o_registrationDictionary setObject: o_defaultAndAllNotifications
+                                     forKey: GROWL_NOTIFICATIONS_ALL];
+        [o_registrationDictionary setObject: o_defaultAndAllNotifications
+                                     forKey: GROWL_NOTIFICATIONS_DEFAULT];
 
-    o_registrationDictionary = [[NSMutableDictionary alloc] init];
-    [o_registrationDictionary setObject: o_defaultAndAllNotifications
-                                 forKey: GROWL_NOTIFICATIONS_ALL];
-    [o_registrationDictionary setObject: o_defaultAndAllNotifications
-                                 forKey: GROWL_NOTIFICATIONS_DEFAULT];
-
-    [GrowlApplicationBridge setGrowlDelegate: self];
-    [o_pool drain];
+        [GrowlApplicationBridge setGrowlDelegate: self];
+    }
 }
 
 - (void)notifyWithDescription: (const char *)psz_desc artUrl: (const char *)psz_arturl
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    NSData *o_art = nil;
+    @autoreleasepool {
+        NSData *o_art = nil;
 
-    if( psz_arturl )
-        o_art = [NSData dataWithContentsOfFile: [NSString stringWithUTF8String: psz_arturl]];
+        if( psz_arturl )
+            o_art = [NSData dataWithContentsOfFile: [NSString stringWithUTF8String: psz_arturl]];
 
-    [GrowlApplicationBridge notifyWithTitle: [NSString stringWithUTF8String: _( "Now playing" )]
-                                description: [NSString stringWithUTF8String: psz_desc]
-                           notificationName: o_notificationType
-                                   iconData: o_art
-                                   priority: 0
-                                   isSticky: NO
-                               clickContext: nil];
-    [o_pool drain];
+        [GrowlApplicationBridge notifyWithTitle: [NSString stringWithUTF8String: _( "Now playing" )]
+                                    description: [NSString stringWithUTF8String: psz_desc]
+                               notificationName: o_notificationType
+                                       iconData: o_art
+                                       priority: 0
+                                       isSticky: NO
+                                   clickContext: nil];
+    }
 }
 
 /*****************************************************************************
