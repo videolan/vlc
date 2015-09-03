@@ -110,6 +110,7 @@ static int ThreadRead(stream_t *stream, size_t length)
     assert((size_t)val <= length);
     sys->buffer_length += val;
     assert(sys->buffer_length <= sys->buffer_size);
+    //msg_Dbg(stream, "buffer: %zu/%zu", sys->buffer_length, sys->buffer_size);
     return 0;
 }
 
@@ -136,6 +137,25 @@ static int ThreadSeek(stream_t *stream, uint64_t seek_offset)
     return 0;
 }
 
+static int ThreadControl(stream_t *stream, int query, ...)
+{
+    stream_sys_t *sys = stream->p_sys;
+    int canc = vlc_savecancel();
+
+    vlc_mutex_unlock(&sys->lock);
+
+    va_list ap;
+    int ret;
+
+    va_start(ap, query);
+    ret = stream_vaControl(stream->p_source, query, ap);
+    va_end(ap);
+
+    vlc_mutex_lock(&sys->lock);
+    vlc_restorecancel(canc);
+    return ret;
+}
+
 #define MAX_READ 65536
 #define SEEK_THRESHOLD MAX_READ
 
@@ -151,21 +171,18 @@ static void *Thread(void *data)
     mutex_cleanup_push(&sys->lock);
     for (;;)
     {
-        if (paused != sys->paused)
-        {   /* Update pause state */
-            int canc = vlc_savecancel();
-
-            paused = sys->paused;
-            vlc_mutex_unlock(&sys->lock);
-            stream_Control(stream->p_source, STREAM_SET_PAUSE_STATE, paused);
-            vlc_mutex_lock(&sys->lock);
-            vlc_restorecancel(canc);
-            continue;
-        }
-
         if (paused)
-        {   /* Wait for resumption */
-            vlc_cond_wait(&sys->wait_space, &sys->lock);
+        {
+            if (sys->paused)
+            {   /* Wait for resumption */
+                vlc_cond_wait(&sys->wait_space, &sys->lock);
+                continue;
+            }
+
+            /* Resume the underlying stream */
+            msg_Dbg(stream, "resuming");
+            ThreadControl(stream, STREAM_SET_PAUSE_STATE, false);
+            paused = false;
             continue;
         }
 
@@ -203,7 +220,17 @@ static void *Thread(void *data)
         if (unused == 0)
         {   /* Buffer is full */
             if (history == 0)
-            {   /* Wait for data to be read */
+            {
+                if (sys->paused)
+                {   /* Pause the stream once the buffer is full
+                     * (and assuming pause was actually requested) */
+                    msg_Dbg(stream, "pausing");
+                    ThreadControl(stream, STREAM_SET_PAUSE_STATE, true);
+                    paused = true;
+                    continue;
+                }
+
+                /* Wait for data to be read */
                 vlc_cond_wait(&sys->wait_space, &sys->lock);
                 continue;
             }
@@ -285,6 +312,13 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     }
 
     vlc_mutex_lock(&sys->lock);
+    if (sys->paused)
+    {
+        msg_Err(stream, "reading while paused (buggy demux?)");
+        sys->paused = false;
+        vlc_cond_signal(&sys->wait_space);
+    }
+
     while ((copy = BufferLevel(stream, &eof)) == 0 && !eof)
     {
         void *data[2];
