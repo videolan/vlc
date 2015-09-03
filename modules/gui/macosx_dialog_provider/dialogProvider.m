@@ -191,119 +191,127 @@ void CloseIntf(vlc_object_t *p_this)
  *****************************************************************************/
 static int DisplayError(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    dialog_fatal_t *dialog = value.p_address;
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
-    [sys->displayer performSelectorOnMainThread:@selector(displayError:) withObject:DictFromDialogFatal(dialog) waitUntilDone:NO];
-    [pool release];
-    return VLC_SUCCESS;
+    @autoreleasepool {
+        dialog_fatal_t *dialog = value.p_address;
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
+        [sys->displayer performSelectorOnMainThread:@selector(displayError:)
+                                         withObject:DictFromDialogFatal(dialog)
+                                      waitUntilDone:NO];
+        return VLC_SUCCESS;
+    }
 }
 
 static int DisplayCritical(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    dialog_fatal_t *dialog = value.p_address;
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
-    [sys->displayer performSelectorOnMainThread:@selector(displayCritical:) withObject:DictFromDialogFatal(dialog) waitUntilDone:NO];
-    [pool release];
-    return VLC_SUCCESS;
+    @autoreleasepool {
+        dialog_fatal_t *dialog = value.p_address;
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
+        [sys->displayer performSelectorOnMainThread:@selector(displayCritical:)
+                                         withObject:DictFromDialogFatal(dialog)
+                                      waitUntilDone:NO];
+        return VLC_SUCCESS;
+    }
 }
 
 static int DisplayQuestion(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    dialog_question_t *dialog = value.p_address;
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
-    dialog->answer = [[sys->displayer resultFromSelectorOnMainThread:@selector(displayQuestion:) withObject:DictFromDialogQuestion(dialog)] intValue];
-    [pool release];
-    return VLC_SUCCESS;
+    @autoreleasepool {
+        dialog_question_t *dialog = value.p_address;
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
+        dialog->answer = [[sys->displayer resultFromSelectorOnMainThread:@selector(displayQuestion:)
+                                                              withObject:DictFromDialogQuestion(dialog)] intValue];
+        return VLC_SUCCESS;
+    }
 }
 
 static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    dialog_login_t *dialog = value.p_address;
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
-    NSDictionary *dict = [sys->displayer resultFromSelectorOnMainThread:@selector(displayLogin:) withObject:DictFromDialogLogin(dialog)];
-    if (dict) {
-        *dialog->username = strdup([[dict objectForKey:@"username"] UTF8String]);
-        *dialog->password = strdup([[dict objectForKey:@"password"] UTF8String]);
+    @autoreleasepool {
+        dialog_login_t *dialog = value.p_address;
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
+        NSDictionary *dict = [sys->displayer resultFromSelectorOnMainThread:@selector(displayLogin:)
+                                                                 withObject:DictFromDialogLogin(dialog)];
+        if (dict) {
+            *dialog->username = strdup([[dict objectForKey:@"username"] UTF8String]);
+            *dialog->password = strdup([[dict objectForKey:@"password"] UTF8String]);
+        }
+        return VLC_SUCCESS;
     }
-    [pool release];
-    return VLC_SUCCESS;
 }
 
 static int DisplayProgressPanelAction(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    dialog_progress_bar_t *dialog = value.p_address;
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
+    @autoreleasepool {
+        dialog_progress_bar_t *dialog = value.p_address;
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
 
-    [sys->displayer performSelectorOnMainThread:@selector(displayProgressBar:) withObject:DictFromDialogProgressBar(dialog) waitUntilDone:YES];
+        [sys->displayer performSelectorOnMainThread:@selector(displayProgressBar:)
+                                         withObject:DictFromDialogProgressBar(dialog)
+                                      waitUntilDone:YES];
 
-    dialog->pf_update = updateProgressPanel;
-    dialog->pf_check = checkProgressPanel;
-    dialog->pf_destroy = destroyProgressPanel;
-    dialog->p_sys = p_intf->p_sys;
-
-    [pool release];
-    return VLC_SUCCESS;
+        dialog->pf_update = updateProgressPanel;
+        dialog->pf_check = checkProgressPanel;
+        dialog->pf_destroy = destroyProgressPanel;
+        dialog->p_sys = p_intf->p_sys;
+        
+        return VLC_SUCCESS;
+    }
 }
 
 static int DisplayExtension(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *sys = p_intf->p_sys;
-    extension_dialog_t *dialog = value.p_address;
+    @autoreleasepool {
+        intf_thread_t *p_intf = (intf_thread_t*) p_this;
+        intf_sys_t *sys = p_intf->p_sys;
+        extension_dialog_t *dialog = value.p_address;
 
-    // -updateExtensionDialog: Open its own runloop, so be sure to run on DefaultRunLoop.
-    [sys->displayer performSelectorOnMainThread:@selector(updateExtensionDialog:) withObject:[NSValue valueWithPointer:dialog] waitUntilDone:YES];
-    [pool release];
-    return VLC_SUCCESS;
+        // -updateExtensionDialog: Open its own runloop, so be sure to run on DefaultRunLoop.
+        [sys->displayer performSelectorOnMainThread:@selector(updateExtensionDialog:)
+                                         withObject:[NSValue valueWithPointer:dialog]
+                                      waitUntilDone:YES];
+        return VLC_SUCCESS;
+    }
 }
 
 
 void updateProgressPanel (void *priv, const char *text, float value)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    intf_sys_t *sys = (intf_sys_t *)priv;
+    @autoreleasepool {
+        intf_sys_t *sys = (intf_sys_t *)priv;
 
-    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                          @(value), @"value",
-                          text ? @(text) : nil, @"text",
-                          nil];
+        NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                              @(value), @"value",
+                              text ? @(text) : nil, @"text",
+                              nil];
 
-    [sys->displayer performSelectorOnMainThread:@selector(updateProgressPanel:) withObject:dict waitUntilDone:YES];
-
-    [pool release];
+        [sys->displayer performSelectorOnMainThread:@selector(updateProgressPanel:)
+                                         withObject:dict
+                                      waitUntilDone:YES];
+    }
 }
 
 void destroyProgressPanel (void *priv)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    intf_sys_t *sys = (intf_sys_t *)priv;
-
-    [sys->displayer performSelectorOnMainThread:@selector(destroyProgressPanel) withObject:nil waitUntilDone:YES];
-
-    [pool release];
+    @autoreleasepool {
+        intf_sys_t *sys = (intf_sys_t *)priv;
+        [sys->displayer performSelectorOnMainThread:@selector(destroyProgressPanel)
+                                         withObject:nil
+                                      waitUntilDone:YES];
+    }
 }
 
 bool checkProgressPanel (void *priv)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    intf_sys_t *sys = (intf_sys_t *)priv;
-    BOOL ret;
-
-    ret = [[sys->displayer resultFromSelectorOnMainThread:@selector(checkProgressPanel) withObject:nil] boolValue];
-
-    [pool release];
-    return ret;
+    @autoreleasepool {
+        intf_sys_t *sys = (intf_sys_t *)priv;
+        return [[sys->displayer resultFromSelectorOnMainThread:@selector(checkProgressPanel)
+                                                    withObject:nil] boolValue];
+    }
 }
 
 @interface VLCDialogDisplayer() <NSWindowDelegate>
