@@ -474,6 +474,7 @@ int stream_Seek(stream_t *s, uint64_t offset)
                     block_Release(peek);
                 }
 
+                assert(stream_Tell(s) == offset);
                 return VLC_SUCCESS;
             }
         }
@@ -481,7 +482,10 @@ int stream_Seek(stream_t *s, uint64_t offset)
     else
     {
         if (priv->offset == offset)
+        {
+            assert(stream_Tell(s) == offset);
             return VLC_SUCCESS; /* Nothing to do! */
+        }
     }
 
     if (s->pf_seek == NULL)
@@ -499,7 +503,8 @@ int stream_Seek(stream_t *s, uint64_t offset)
         block_Release(peek);
     }
 
-    return ret;
+    assert(stream_Tell(s) == offset);
+    return VLC_SUCCESS;
 }
 
 static int stream_ControlInternal(stream_t *s, int cmd, ...)
