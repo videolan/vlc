@@ -1416,6 +1416,8 @@ static void *DecoderThread( void *p_data )
         vlc_cond_signal( &p_owner->wait_acknowledge );
         vlc_mutex_unlock( &p_owner->lock );
         vlc_fifo_CleanupPush( p_owner->p_fifo );
+        /* Check if thread is cancelled before processing input blocks */
+        vlc_testcancel();
 
         vlc_cond_signal( &p_owner->wait_fifo );
 
