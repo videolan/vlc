@@ -219,7 +219,6 @@ static int Open(vlc_object_t *this)
         return VLC_EGENERIC;
 
     vout_display_sys_t *sys = calloc (1, sizeof(*sys));
-    NSAutoreleasePool *autoreleasePool = nil;
 
     if (!sys)
         return VLC_ENOMEM;
@@ -228,119 +227,116 @@ static int Open(vlc_object_t *this)
     sys->picturePool = NULL;
     sys->gl.sys = NULL;
 
-    autoreleasePool = [[NSAutoreleasePool alloc] init];
-
-    /* get the object we will draw into */
-    UIView* viewContainer = var_CreateGetAddress (vd, "drawable-nsobject");
-    if (unlikely(viewContainer == nil))
-        goto bailout;
-
-    if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)]))
-        goto bailout;
-
-    if (![viewContainer isKindOfClass:[UIView class]])
-        goto bailout;
-
-    /* This will be released in Close(), on
-     * main thread, after we are done using it. */
-    sys->viewContainer = [viewContainer retain];
-
-    if (vd->fmt.i_chroma == VLC_CODEC_CVPX_OPAQUE) {
-        msg_Dbg(vd, "will use zero-copy rendering");
-        sys->zero_copy = true;
-    }
-
-    /* setup the actual OpenGL ES view */
-    sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:[viewContainer bounds] zeroCopy:sys->zero_copy voutDisplay:vd];
-    sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
-    if (!sys->glESView)
-        goto bailout;
-
-    [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
-                                         withObject:sys->glESView
-                                      waitUntilDone:YES];
-
-    /* add tap gesture recognizer for DVD menus and stuff */
-    sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:sys->glESView
-                                                                 action:@selector(tapRecognized:)];
-    if (sys->viewContainer.window) {
-        if (sys->viewContainer.window.rootViewController) {
-            if (sys->viewContainer.window.rootViewController.view)
-                [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
-        }
-    }
-    sys->tapRecognizer.cancelsTouchesInView = NO;
-
-    const vlc_fourcc_t *subpicture_chromas;
-    video_format_t fmt = vd->fmt;
-    if (!sys->zero_copy) {
-        msg_Dbg(vd, "will use regular OpenGL rendering");
-        /* Initialize common OpenGL video display */
-        sys->gl.lock = OpenglESClean;
-        sys->gl.unlock = nil;
-        sys->gl.swap = OpenglESSwap;
-        sys->gl.getProcAddress = OurGetProcAddress;
-        sys->gl.sys = sys;
-
-        sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl);
-        if (!sys->vgl) {
-            sys->gl.sys = NULL;
+    @autoreleasepool {
+        /* get the object we will draw into */
+        UIView* viewContainer = var_CreateGetAddress (vd, "drawable-nsobject");
+        if (unlikely(viewContainer == nil))
             goto bailout;
+
+        if (unlikely(![viewContainer respondsToSelector:@selector(isKindOfClass:)]))
+            goto bailout;
+
+        if (![viewContainer isKindOfClass:[UIView class]])
+            goto bailout;
+
+        /* This will be released in Close(), on
+         * main thread, after we are done using it. */
+        sys->viewContainer = [viewContainer retain];
+
+        if (vd->fmt.i_chroma == VLC_CODEC_CVPX_OPAQUE) {
+            msg_Dbg(vd, "will use zero-copy rendering");
+            sys->zero_copy = true;
         }
-    } else {
-        subpicture_chromas = gl_subpicture_chromas;
+
+        /* setup the actual OpenGL ES view */
+        sys->glESView = [[VLCOpenGLES2VideoView alloc] initWithFrame:[viewContainer bounds] zeroCopy:sys->zero_copy voutDisplay:vd];
+        sys->glESView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+        if (!sys->glESView)
+            goto bailout;
+
+        [sys->viewContainer performSelectorOnMainThread:@selector(addSubview:)
+                                             withObject:sys->glESView
+                                          waitUntilDone:YES];
+
+        /* add tap gesture recognizer for DVD menus and stuff */
+        sys->tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:sys->glESView
+                                                                     action:@selector(tapRecognized:)];
+        if (sys->viewContainer.window) {
+            if (sys->viewContainer.window.rootViewController) {
+                if (sys->viewContainer.window.rootViewController.view)
+                    [sys->viewContainer.superview addGestureRecognizer:sys->tapRecognizer];
+            }
+        }
+        sys->tapRecognizer.cancelsTouchesInView = NO;
+
+        const vlc_fourcc_t *subpicture_chromas;
+        video_format_t fmt = vd->fmt;
+        if (!sys->zero_copy) {
+            msg_Dbg(vd, "will use regular OpenGL rendering");
+            /* Initialize common OpenGL video display */
+            sys->gl.lock = OpenglESClean;
+            sys->gl.unlock = nil;
+            sys->gl.swap = OpenglESSwap;
+            sys->gl.getProcAddress = OurGetProcAddress;
+            sys->gl.sys = sys;
+
+            sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas, &sys->gl);
+            if (!sys->vgl) {
+                sys->gl.sys = NULL;
+                goto bailout;
+            }
+        } else {
+            subpicture_chromas = gl_subpicture_chromas;
+        }
+
+        /* */
+        vout_display_info_t info = vd->info;
+        info.has_pictures_invalid = false;
+        info.has_event_thread = true;
+        info.subpicture_chromas = subpicture_chromas;
+        info.is_slow = !sys->zero_copy;
+        info.has_hide_mouse = false;
+
+        /* Setup vout_display_t once everything is fine */
+        vd->info = info;
+
+        if (sys->zero_copy) {
+            vd->pool = ZeroCopyPicturePool;
+            vd->prepare = NULL;
+            vd->display = ZeroCopyDisplay;
+        } else {
+            vd->pool = PicturePool;
+            vd->prepare = PictureRender;
+            vd->display = PictureDisplay;
+        }
+        vd->control = Control;
+        vd->manage = NULL;
+
+        /* forward our dimensions to the vout core */
+        CGFloat scaleFactor = sys->viewContainer.contentScaleFactor;
+        CGSize viewSize = sys->viewContainer.bounds.size;
+        vout_display_SendEventFullscreen(vd, false);
+        vout_display_SendEventDisplaySize(vd, viewSize.width * scaleFactor, viewSize.height * scaleFactor);
+
+        /* */
+        [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
+                                                 selector:@selector(applicationStateChanged:)
+                                                     name:UIApplicationWillResignActiveNotification
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
+                                                 selector:@selector(applicationStateChanged:)
+                                                     name:UIApplicationDidBecomeActiveNotification
+                                                   object:nil];
+        [sys->glESView performSelectorOnMainThread:@selector(reshape)
+                                        withObject:nil
+                                     waitUntilDone:YES];
+        return VLC_SUCCESS;
+        
+    bailout:
+        Close(this);
+        return VLC_EGENERIC;
     }
-
-    /* */
-    vout_display_info_t info = vd->info;
-    info.has_pictures_invalid = false;
-    info.has_event_thread = true;
-    info.subpicture_chromas = subpicture_chromas;
-    info.is_slow = !sys->zero_copy;
-    info.has_hide_mouse = false;
-
-    /* Setup vout_display_t once everything is fine */
-    vd->info = info;
-
-    if (sys->zero_copy) {
-        vd->pool = ZeroCopyPicturePool;
-        vd->prepare = NULL;
-        vd->display = ZeroCopyDisplay;
-    } else {
-        vd->pool = PicturePool;
-        vd->prepare = PictureRender;
-        vd->display = PictureDisplay;
-    }
-    vd->control = Control;
-    vd->manage = NULL;
-
-    /* forward our dimensions to the vout core */
-    CGFloat scaleFactor = sys->viewContainer.contentScaleFactor;
-    CGSize viewSize = sys->viewContainer.bounds.size;
-    vout_display_SendEventFullscreen(vd, false);
-    vout_display_SendEventDisplaySize(vd, viewSize.width * scaleFactor, viewSize.height * scaleFactor);
-
-    /* */
-    [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
-                                             selector:@selector(applicationStateChanged:)
-                                                 name:UIApplicationWillResignActiveNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:sys->glESView
-                                             selector:@selector(applicationStateChanged:)
-                                                 name:UIApplicationDidBecomeActiveNotification
-                                               object:nil];
-    [sys->glESView performSelectorOnMainThread:@selector(reshape)
-                                    withObject:nil
-                                 waitUntilDone:YES];
-
-    [autoreleasePool release];
-    return VLC_SUCCESS;
-
-bailout:
-    [autoreleasePool release];
-    Close(this);
-    return VLC_EGENERIC;
 }
 
 void Close (vlc_object_t *this)
@@ -348,35 +344,37 @@ void Close (vlc_object_t *this)
     vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->tapRecognizer) {
-        [sys->tapRecognizer.view removeGestureRecognizer:sys->tapRecognizer];
-        [sys->tapRecognizer release];
-    }
-
-    [sys->glESView setVoutDisplay:nil];
-
-    var_Destroy (vd, "drawable-nsobject");
-    [sys->viewContainer performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
-    [sys->glESView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
-
-    if (sys->gl.sys != NULL) {
-        @synchronized (sys->glESView) {
-            msg_Dbg(this, "deleting display");
-
-            if (likely([sys->glESView isAppActive]))
-                vout_display_opengl_Delete(sys->vgl);
+    @autoreleasepool {
+        if (sys->tapRecognizer) {
+            [sys->tapRecognizer.view removeGestureRecognizer:sys->tapRecognizer];
+            [sys->tapRecognizer release];
         }
+
+        [sys->glESView setVoutDisplay:nil];
+
+        var_Destroy (vd, "drawable-nsobject");
+        [sys->viewContainer performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
+        [sys->glESView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
+
+        if (sys->gl.sys != NULL) {
+            @synchronized (sys->glESView) {
+                msg_Dbg(this, "deleting display");
+
+                if (likely([sys->glESView isAppActive]))
+                    vout_display_opengl_Delete(sys->vgl);
+            }
+        }
+
+        [sys->glESView release];
+
+        if (sys->zero_copy) {
+            if (sys->picturePool)
+                picture_pool_Release(sys->picturePool);
+            sys->picturePool = NULL;
+        }
+        
+        free(sys);
     }
-
-    [sys->glESView release];
-
-    if (sys->zero_copy) {
-        if (sys->picturePool)
-            picture_pool_Release(sys->picturePool);
-        sys->picturePool = NULL;
-    }
-
-    free(sys);
 }
 
 /*****************************************************************************
@@ -400,44 +398,43 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             if (!vd->sys)
                 return VLC_EGENERIC;
 
-            NSAutoreleasePool * autoreleasePool = [[NSAutoreleasePool alloc] init];
+            @autoreleasepool {
+                const vout_display_cfg_t *cfg;
+                const video_format_t *source;
 
-            const vout_display_cfg_t *cfg;
-            const video_format_t *source;
+                if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT ||
+                    query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
+                    source = (const video_format_t *)va_arg(ap, const video_format_t *);
+                    cfg = vd->cfg;
+                } else {
+                    source = &vd->source;
+                    cfg = (const vout_display_cfg_t*)va_arg(ap, const vout_display_cfg_t *);
+                }
 
-            if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-                source = (const video_format_t *)va_arg(ap, const video_format_t *);
-                cfg = vd->cfg;
-            } else {
-                source = &vd->source;
-                cfg = (const vout_display_cfg_t*)va_arg(ap, const vout_display_cfg_t *);
+                /* we don't adapt anything here regardless of what the vout core
+                 * wants since we are not in a traditional desktop window */
+                if (!cfg)
+                    return VLC_EGENERIC;
+
+                vout_display_cfg_t cfg_tmp = *cfg;
+                CGSize viewSize;
+                viewSize = [sys->glESView bounds].size;
+
+                /* on HiDPI displays, the point bounds don't equal the actual pixels */
+                CGFloat scaleFactor = sys->glESView.contentScaleFactor;
+                cfg_tmp.display.width = viewSize.width * scaleFactor;
+                cfg_tmp.display.height = viewSize.height * scaleFactor;
+
+                vout_display_place_t place;
+                vout_display_PlacePicture(&place, source, &cfg_tmp, false);
+                @synchronized (sys->glESView) {
+                    sys->place = place;
+                }
+
+                // x / y are top left corner, but we need the lower left one
+                if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
+                    glViewport(place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
             }
-
-            /* we don't adapt anything here regardless of what the vout core
-             * wants since we are not in a traditional desktop window */
-            if (!cfg)
-                return VLC_EGENERIC;
-
-            vout_display_cfg_t cfg_tmp = *cfg;
-            CGSize viewSize;
-            viewSize = [sys->glESView bounds].size;
-
-            /* on HiDPI displays, the point bounds don't equal the actual pixels */
-            CGFloat scaleFactor = sys->glESView.contentScaleFactor;
-            cfg_tmp.display.width = viewSize.width * scaleFactor;
-            cfg_tmp.display.height = viewSize.height * scaleFactor;
-
-            vout_display_place_t place;
-            vout_display_PlacePicture(&place, source, &cfg_tmp, false);
-            @synchronized (sys->glESView) {
-                sys->place = place;
-            }
-
-            // x / y are top left corner, but we need the lower left one
-            if (query != VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
-                glViewport(place.x, cfg_tmp.display.height - (place.y + place.height), place.width, place.height);
-
-            [autoreleasePool release];
             return VLC_SUCCESS;
         }
 
