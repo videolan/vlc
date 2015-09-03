@@ -86,57 +86,57 @@ static int Control(access_t *, int, va_list);
 
 static void selectChannel(vlc_object_t *p_this, int theChannelNum)
 {
-    NSAppleScript *script;
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    switch(theChannelNum) {
-        case -2: // Composite
-            script = [[NSAppleScript alloc] initWithSource:
-                        @"tell application \"EyeTV\"\n"
-                         "  input_change input source composite video input\n"
-                         "  volume_change level 0\n"
-                         "  show player_window\n"
-                         "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
-                         "end tell"];
-            break;
-        case -1: // S-Video
-            script = [[NSAppleScript alloc] initWithSource:
-                        @"tell application \"EyeTV\"\n"
-                         "  input_change input source S video input\n"
-                         "  volume_change level 0\n"
-                         "  show player_window\n"
-                         "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
-                         "end tell"];
-            break;
-        case 0: // Last
-            script = [[NSAppleScript alloc] initWithSource:
-                        @"tell application \"EyeTV\"\n"
-                         "  volume_change level 0\n"
-                         "  show player_window\n"
-                         "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
-                         "end tell"];
-            break;
-        default:
-            if (theChannelNum > 0) {
-                NSString *channel_change = [NSString stringWithFormat:
-                    @"tell application \"EyeTV\"\n"
-                     "  channel_change channel number %d\n"
-                     "  volume_change level 0\n"
-                     "  show player_window\n"
-                     "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
-                     "end tell", theChannelNum];
-                script = [[NSAppleScript alloc] initWithSource:channel_change];
-            }
-            else
-                return;
+    @autoreleasepool {
+        NSAppleScript *script;
+        switch(theChannelNum) {
+            case -2: // Composite
+                script = [[NSAppleScript alloc] initWithSource:
+                          @"tell application \"EyeTV\"\n"
+                          "  input_change input source composite video input\n"
+                          "  volume_change level 0\n"
+                          "  show player_window\n"
+                          "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                          "end tell"];
+                break;
+            case -1: // S-Video
+                script = [[NSAppleScript alloc] initWithSource:
+                          @"tell application \"EyeTV\"\n"
+                          "  input_change input source S video input\n"
+                          "  volume_change level 0\n"
+                          "  show player_window\n"
+                          "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                          "end tell"];
+                break;
+            case 0: // Last
+                script = [[NSAppleScript alloc] initWithSource:
+                          @"tell application \"EyeTV\"\n"
+                          "  volume_change level 0\n"
+                          "  show player_window\n"
+                          "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                          "end tell"];
+                break;
+            default:
+                if (theChannelNum > 0) {
+                    NSString *channel_change = [NSString stringWithFormat:
+                                                @"tell application \"EyeTV\"\n"
+                                                "  channel_change channel number %d\n"
+                                                "  volume_change level 0\n"
+                                                "  show player_window\n"
+                                                "  tell application \"System Events\" to set visible of process \"EyeTV\" to false\n"
+                                                "end tell", theChannelNum];
+                    script = [[NSAppleScript alloc] initWithSource:channel_change];
+                }
+                else
+                    return;
+        }
+        NSDictionary *errorDict;
+        NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
+        if (nil == descriptor) {
+            NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
+            msg_Err(p_this, "EyeTV source change failed with error status '%s'", [errorString UTF8String]);
+        }
+        [script release];
     }
-    NSDictionary *errorDict;
-    NSAppleEventDescriptor *descriptor = [script executeAndReturnError:&errorDict];
-    if (nil == descriptor) {
-        NSString *errorString = [errorDict objectForKey:NSAppleScriptErrorMessage];
-        msg_Err(p_this, "EyeTV source change failed with error status '%s'", [errorString UTF8String]);
-    }
-    [script release];
-    [pool release];
 }
 
 /*****************************************************************************
