@@ -459,9 +459,10 @@ int stream_Seek(stream_t *s, uint64_t offset)
     block_t *peek = priv->peek;
     if (peek != NULL)
     {
-        if (priv->offset >= offset)
+        if ((priv->offset - peek->i_buffer) <= offset
+         && offset <= priv->offset)
         {
-            uint64_t fwd = priv->offset - offset;
+            size_t fwd = offset - (priv->offset - priv->peek->i_buffer);
             if (fwd <= peek->i_buffer)
             {   /* Seeking within the peek buffer */
                 peek->p_buffer += fwd;
