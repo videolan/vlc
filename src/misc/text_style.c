@@ -208,6 +208,8 @@ text_segment_t *text_segment_Copy( text_segment_t *p_src )
 
     while( p_src && p_src->p_next ) {
         text_segment_t *p_next = text_segment_New( p_src->psz_text );
+        if( p_next )
+            p_next->style = text_style_Duplicate( p_src->style );
         p_src = p_src->p_next;
 
         if( p_dst == NULL )
