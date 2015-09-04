@@ -298,6 +298,8 @@ libadaptative_plugin_la_SOURCES = \
     demux/adaptative/http/HTTPConnectionManager.h \
     demux/adaptative/http/Sockets.hpp \
     demux/adaptative/http/Sockets.cpp \
+    demux/adaptative/plumbing/FakeESOutID.cpp \
+    demux/adaptative/plumbing/FakeESOutID.hpp \
     demux/adaptative/plumbing/StreamOutput.cpp \
     demux/adaptative/plumbing/StreamOutput.hpp \
     demux/adaptative/PlaylistManager.cpp \
