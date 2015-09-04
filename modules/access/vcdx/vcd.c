@@ -107,11 +107,7 @@ vlc_module_begin ()
                  "Otherwise we play by tracks."),
               false )
 
-    add_bool( MODULE_STRING "-track-length", true,
-              N_("Use track length as maximum unit in seek?"),
-              N_("If set, the length of the seek bar is the track rather than "
-         "the length of an entry."),
-              false )
+    add_obsolete_bool( MODULE_STRING "-track-length" )
 
     add_bool( MODULE_STRING "-extended-info", false,
               N_("Show extended VCD info?"),

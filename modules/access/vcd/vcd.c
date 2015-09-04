@@ -161,16 +161,12 @@ static int Open( vlc_object_t *p_this )
     /* The first title isn't usable */
     p_sys->i_titles--;
 
-    /* Build title table */
     for( int i = 0; i < p_sys->i_titles; i++ )
     {
-        input_title_t *t = p_sys->title[i] = vlc_input_title_New();
+        p_sys->title[i] = vlc_input_title_New();
 
         msg_Dbg( p_access, "title[%d] start=%d", i, p_sys->p_sectors[1+i] );
         msg_Dbg( p_access, "title[%d] end=%d", i, p_sys->p_sectors[i+2] );
-
-        t->i_size = ( p_sys->p_sectors[i+2] - p_sys->p_sectors[i+1] ) *
-                    (int64_t)VCD_DATA_SIZE;
     }
 
     /* Map entry points into chapters */

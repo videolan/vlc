@@ -89,7 +89,6 @@ typedef struct input_title_t
     bool        b_menu;      /* Is it a menu or a normal entry */
 
     int64_t     i_length;   /* Length(microsecond) if known, else 0 */
-    int64_t     i_size;     /* Size (bytes) if known, else 0 */
 
     /* Title seekpoint */
     int         i_seekpoint;
@@ -105,7 +104,6 @@ static inline input_title_t *vlc_input_title_New(void)
     t->psz_name = NULL;
     t->b_menu = false;
     t->i_length = 0;
-    t->i_size   = 0;
     t->i_seekpoint = 0;
     t->seekpoint = NULL;
 
@@ -136,7 +134,6 @@ static inline input_title_t *vlc_input_title_Duplicate( const input_title_t *t )
     if( t->psz_name ) dup->psz_name = strdup( t->psz_name );
     dup->b_menu      = t->b_menu;
     dup->i_length    = t->i_length;
-    dup->i_size      = t->i_size;
     dup->i_seekpoint = t->i_seekpoint;
     if( t->i_seekpoint > 0 )
     {

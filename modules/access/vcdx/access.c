@@ -377,7 +377,6 @@ VCDSegments( access_t * p_access )
     t = p_vcdplayer->p_title[p_vcdplayer->i_titles] = vlc_input_title_New();
     p_vcdplayer->i_titles++;
 
-    t->i_size    = 0; /* Not sure Segments have a size associated */
     t->psz_name  = strdup(_("Segments"));
 
     /* We have one additional segment allocated so we can get the size
@@ -441,12 +440,7 @@ VCDTitles( access_t * p_access )
             char psz_track[80];
 
             snprintf( psz_track, sizeof(psz_track), "%s %02d", _("Track"), i );
-            t->i_size    = (int64_t) vcdinfo_get_track_size( p_vcdplayer->vcd,
-                                 i ) * M2F2_SECTOR_SIZE / CDIO_CD_FRAMESIZE ;
             t->psz_name  = strdup(psz_track);
-
-            dbg_print( INPUT_DBG_MRL, "track[%d] i_size: %"PRIi64, i, t->i_size );
-
             p_vcdplayer->i_titles++;
         }
 
@@ -462,7 +456,7 @@ VCDLIDs( access_t * p_access )
 {
     vcdplayer_t   *p_vcdplayer = (vcdplayer_t *) p_access->p_sys;
     input_title_t *t;
-    unsigned int   i_lid, i_title;
+    unsigned int   i_lid;
 
     p_vcdplayer->i_lids = vcdinfo_get_num_LIDs(p_vcdplayer->vcd);
     p_vcdplayer->i_lid  = VCDINFO_INVALID_ENTRY;
@@ -493,7 +487,6 @@ VCDLIDs( access_t * p_access )
     t->b_menu = true;
     t->psz_name = strdup( "LIDs" );
 
-    i_title = p_vcdplayer->i_tracks;
     for( i_lid =  1 ; i_lid <=  p_vcdplayer->i_lids ; i_lid++ )
     {
         char psz_lid[100];
@@ -658,13 +651,6 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
         VCDUpdateVar( p_access, p_itemid->num, VLC_VAR_SETVALUE,
                       "chapter", _("Entry"), "Setting entry/segment");
         p_vcdplayer->i_cur_title = i_track - 1;
-        if (p_vcdplayer->b_track_length)
-            p_vcdplayer->size = p_vcdplayer->p_title[i_track-1]->i_size;
-        else
-            p_vcdplayer->size = M2F2_SECTOR_SIZE * (int64_t)
-                 vcdinfo_get_entry_sect_count(p_vcdplayer->vcd,p_itemid->num);
-        dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC), "size: %"PRIu64,
-                   p_vcdplayer->size );
         p_vcdplayer->i_cur_chapter = p_itemid->num;
         break;
 
@@ -676,14 +662,12 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
            the entry seekpoints and (zeroed) lid seekpoints.
         */
         p_vcdplayer->i_cur_title   = p_vcdplayer->i_titles - 1;
-        p_vcdplayer->size          = 0; /* No seeking on stills, please. */
         p_vcdplayer->i_cur_chapter = p_vcdplayer->i_entries
                                    + p_vcdplayer->i_lids + p_itemid->num;
         break;
 
     case VCDINFO_ITEM_TYPE_TRACK:
         p_vcdplayer->i_cur_title   = i_track - 1;
-        p_vcdplayer->size          = p_vcdplayer->p_title[i_track - 1]->i_size;
         p_vcdplayer->i_cur_chapter = vcdinfo_track_get_entry(p_vcdplayer->vcd,
                                                              i_track);
         break;
@@ -837,7 +821,6 @@ VCDOpen ( vlc_object_t *p_this )
 
     p_vcdplayer->i_debug = var_InheritInteger( p_this, MODULE_STRING "-debug" );
     p_access->p_sys = (access_sys_t *) p_vcdplayer;
-    p_vcdplayer->size = 0;
 
     /* Set where to log errors messages from libcdio. */
     p_vcd_access = p_access;
@@ -858,8 +841,6 @@ VCDOpen ( vlc_object_t *p_this )
     p_vcdplayer->psz_source        = strdup(psz_source);
     p_vcdplayer->i_blocks_per_read = var_InheritInteger( p_this, MODULE_STRING
                                                     "-blocks-per-read" );
-    p_vcdplayer->b_track_length    = var_InheritInteger( p_this, MODULE_STRING
-                                                    "-track-length" );
     p_vcdplayer->in_still          = false;
     p_vcdplayer->play_item.type    = VCDINFO_ITEM_TYPE_NOTFOUND;
     p_vcdplayer->p_input           = p_access->p_input;
