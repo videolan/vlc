@@ -70,9 +70,13 @@ struct access_sys_t
 
     /* Title infos */
     int           i_titles;
-    input_title_t *title[99];            /* No more that 99 track in a vcd ? */
+    struct
+    {
+        uint64_t *seekpoints;
+        size_t    count;
+    } titles[99];                        /* No more that 99 track in a vcd ? */
     int         i_current_title;
-    int         i_current_seekpoint;
+    unsigned    i_current_seekpoint;
 
     int         i_sector;                                  /* Current Sector */
     int         *p_sectors;                                 /* Track sectors */
@@ -144,6 +148,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->vcddev = vcddev;
     p_sys->offset = 0;
 
+    for( size_t i = 0; i < ARRAY_SIZE(p_sys->titles); i++ )
+        p_sys->titles[i].seekpoints = NULL;
+
     /* We read the Table Of Content information */
     p_sys->i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
                                           p_sys->vcddev, &p_sys->p_sectors );
@@ -163,8 +170,6 @@ static int Open( vlc_object_t *p_this )
 
     for( int i = 0; i < p_sys->i_titles; i++ )
     {
-        p_sys->title[i] = vlc_input_title_New();
-
         msg_Dbg( p_access, "title[%d] start=%d", i, p_sys->p_sectors[1+i] );
         msg_Dbg( p_access, "title[%d] end=%d", i, p_sys->p_sectors[i+2] );
     }
@@ -178,15 +183,13 @@ static int Open( vlc_object_t *p_this )
     /* Starting title/chapter and sector */
     if( i_title >= p_sys->i_titles )
         i_title = 0;
-    if( i_chapter >= p_sys->title[i_title]->i_seekpoint )
+    if( (unsigned)i_chapter >= p_sys->titles[i_title].count )
         i_chapter = 0;
 
     p_sys->i_sector = p_sys->p_sectors[1+i_title];
     if( i_chapter > 0 )
-    {
-        p_sys->i_sector += ( p_sys->title[i_title]->seekpoint[i_chapter]->i_byte_offset /
-                           VCD_DATA_SIZE );
-    }
+        p_sys->i_sector += p_sys->titles[i_title].seekpoints[i_chapter]
+                           / VCD_DATA_SIZE;
 
     /* p_access */
     p_access->pf_read    = NULL;
@@ -216,6 +219,9 @@ static void Close( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t *)p_this;
     access_sys_t *p_sys = p_access->p_sys;
+
+    for( size_t i = 0; i < ARRAY_SIZE(p_sys->titles); i++ )
+        free( p_sys->titles[i].seekpoints );
 
     ioctl_Close( p_this, p_sys->vcddev );
     free( p_sys );
@@ -264,9 +270,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *va_arg( args, int* ) = p_sys->i_titles;
 
             /* Duplicate title infos */
-            *ppp_title = malloc( sizeof(input_title_t *) * p_sys->i_titles );
+            *ppp_title = xmalloc( sizeof(input_title_t *) * p_sys->i_titles );
             for( int i = 0; i < p_sys->i_titles; i++ )
-                (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->title[i] );
+                (*ppp_title)[i] = vlc_input_title_New();
             break;
 
         case ACCESS_GET_TITLE:
@@ -301,14 +307,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
         {
             int i = va_arg( args, int );
             unsigned i_title = p_sys->i_current_title;
-            input_title_t *t = p_sys->title[i_title];
 
-            if( t->i_seekpoint > 0 )
+            if( p_sys->titles[i_title].count > 0 )
             {
                 p_sys->i_current_seekpoint = i;
 
                 p_sys->i_sector = p_sys->p_sectors[1 + i_title] +
-                    t->seekpoint[i]->i_byte_offset / VCD_DATA_SIZE;
+                    p_sys->titles[i_title].seekpoints[i] / VCD_DATA_SIZE;
 
                 p_sys->offset = (uint64_t)(p_sys->i_sector -
                     p_sys->p_sectors[1 + i_title]) * VCD_DATA_SIZE;
@@ -378,13 +383,12 @@ static block_t *Block( access_t *p_access )
     /* Update seekpoints */
     for( int i_read = 0; i_read < i_blocks; i_read++ )
     {
-        input_title_t *t = p_sys->title[p_sys->i_current_title];
+        int i_title = p_sys->i_current_title;
 
-        if( t->i_seekpoint > 0 &&
-            p_sys->i_current_seekpoint + 1 < t->i_seekpoint &&
-            (int64_t) /* Unlikely to go over 8192 PetaB */
+        if( p_sys->titles[i_title].count > 0 &&
+            p_sys->i_current_seekpoint + 1 < p_sys->titles[i_title].count &&
                 (p_sys->offset + i_read * VCD_DATA_SIZE) >=
-            t->seekpoint[p_sys->i_current_seekpoint + 1]->i_byte_offset )
+            p_sys->titles[i_title].seekpoints[p_sys->i_current_seekpoint + 1] )
         {
             msg_Dbg( p_access, "seekpoint change" );
             p_sys->i_current_seekpoint++;
@@ -404,20 +408,19 @@ static block_t *Block( access_t *p_access )
 static int Seek( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    input_title_t *t = p_sys->title[p_sys->i_current_title];
-    int i_seekpoint;
+    int i_title = p_sys->i_current_title;
+    unsigned i_seekpoint;
 
     /* Next sector to read */
     p_sys->offset = i_pos;
-    p_sys->i_sector = i_pos / VCD_DATA_SIZE +
-        p_sys->p_sectors[p_sys->i_current_title + 1];
+    p_sys->i_sector = i_pos / VCD_DATA_SIZE + p_sys->p_sectors[i_title + 1];
 
     /* Update current seekpoint */
-    for( i_seekpoint = 0; i_seekpoint < t->i_seekpoint; i_seekpoint++ )
+    for( i_seekpoint = 0; i_seekpoint < p_sys->titles[i_title].count; i_seekpoint++ )
     {
-        if( i_seekpoint + 1 >= t->i_seekpoint ) break;
-        if( 0 < t->seekpoint[i_seekpoint + 1]->i_byte_offset &&
-            i_pos < (uint64_t)t->seekpoint[i_seekpoint + 1]->i_byte_offset ) break;
+        if( i_seekpoint + 1 >= p_sys->titles[i_title].count ) break;
+        if( 0 < p_sys->titles[i_title].seekpoints[i_seekpoint + 1] &&
+            i_pos < p_sys->titles[i_title].seekpoints[i_seekpoint + 1] ) break;
     }
 
     if( i_seekpoint != p_sys->i_current_seekpoint )
@@ -473,20 +476,17 @@ static int EntryPoints( access_t *p_access )
             (MSF_TO_LBA2( BCD_TO_BIN( entries.entry[i].msf.minute ),
                           BCD_TO_BIN( entries.entry[i].msf.second ),
                           BCD_TO_BIN( entries.entry[i].msf.frame  ) ));
-        seekpoint_t *s;
-
         if( i_title < 0 ) continue;   /* Should not occur */
         if( i_title >= p_sys->i_titles ) continue;
 
         msg_Dbg( p_access, "Entry[%d] title=%d sector=%d",
                  i, i_title, i_sector );
 
-        s = vlc_seekpoint_New();
-        s->i_byte_offset = (i_sector - p_sys->p_sectors[i_title+1]) *
-            VCD_DATA_SIZE;
-
-        TAB_APPEND( p_sys->title[i_title]->i_seekpoint,
-                    p_sys->title[i_title]->seekpoint, s );
+        p_sys->titles[i_title].seekpoints = xrealloc(
+            p_sys->titles[i_title].seekpoints,
+            sizeof( uint64_t ) * (p_sys->titles[i_title].count + 1) );
+        p_sys->titles[i_title].seekpoints[p_sys->titles[i_title].count++] =
+            (i_sector - p_sys->p_sectors[i_title+1]) * VCD_DATA_SIZE;
     }
 
     return VLC_SUCCESS;
