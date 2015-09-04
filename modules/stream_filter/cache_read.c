@@ -231,7 +231,7 @@ static void AStreamControlReset(stream_t *s)
 {
     stream_sys_t *sys = s->p_sys;
 
-    sys->i_pos = stream_Tell(s->p_source);
+    sys->i_pos = 0;
 
     /* Setup our tracks */
     sys->i_offset = 0;
@@ -511,7 +511,7 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     /* Common field */
-    sys->i_pos = stream_Tell(s->p_source);
+    sys->i_pos = 0;
 
     /* Stats */
     sys->stat.i_bytes = 0;
