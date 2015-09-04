@@ -244,9 +244,14 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_GET_SIZE:
+        {
+            int i = p_sys->i_current_title;
+
             *va_arg( args, uint64_t * ) =
-                p_sys->title[p_sys->i_current_title]->i_size;
+                (p_sys->p_sectors[i + 2] - p_sys->p_sectors[i + 1])
+                               * (uint64_t)VCD_DATA_SIZE;
             break;
+        }
 
         /* */
         case ACCESS_GET_PTS_DELAY:
