@@ -661,8 +661,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     else if( p_sys->b_copy )
         SwapUV( p_dst, p_src );
     else
+    {
+        /* Even if alpha is unused, swscale expects the pointer to be set */
+        const int n_planes = !p_sys->ctxA && (p_src->i_planes == 4 ||
+                             p_dst->i_planes == 4) ? 4 : 3;
         Convert( p_filter, p_sys->ctx, p_dst, p_src, p_fmti->i_visible_height,
-                 3, p_sys->b_swap_uvi, p_sys->b_swap_uvo );
+                 n_planes, p_sys->b_swap_uvi, p_sys->b_swap_uvo );
+    }
     if( p_sys->ctxA )
     {
         /* We extract the A plane to rescale it, and then we reinject it. */
