@@ -231,9 +231,7 @@ VCDSeek( access_t * p_access, uint64_t i_pos )
     if (!p_access || !p_access->p_sys) return VLC_EGENERIC;
     {
         vcdplayer_t         *p_vcdplayer = (vcdplayer_t *)p_vcd_access->p_sys;
-        const input_title_t *t = p_vcdplayer->p_title[p_vcdplayer->i_cur_title];
         unsigned int         i_entry = VCDINFO_INVALID_ENTRY;
-        int i_seekpoint;
 
         /* Next sector to read */
         p_vcdplayer->i_lsn = (i_pos / (uint64_t) M2F2_SECTOR_SIZE) +
@@ -276,11 +274,15 @@ VCDSeek( access_t * p_access, uint64_t i_pos )
                    (long unsigned int) p_vcdplayer->origin_lsn,
                    (long unsigned int) p_vcdplayer->i_lsn, i_pos,
                    i_entry );
- 
+#if 0
         /* Find seekpoint */
+        const input_title_t *t = p_vcdplayer->p_title[p_vcdplayer->i_cur_title];
+        int i_seekpoint;
+
         for( i_seekpoint = 0; i_seekpoint < t->i_seekpoint; i_seekpoint++ )
         {
             if( i_seekpoint + 1 >= t->i_seekpoint ) break;
+
             if( i_pos < t->seekpoint[i_seekpoint + 1]->i_byte_offset ) break;
         }
  
@@ -289,6 +291,7 @@ VCDSeek( access_t * p_access, uint64_t i_pos )
             dbg_print( (INPUT_DBG_SEEK), "seekpoint change %d",
                        i_seekpoint );
         p_vcdplayer->i_cur_chapter = i_seekpoint;
+#endif
     }
     p_access->info.b_eof = false;
     return VLC_SUCCESS;
@@ -340,13 +343,9 @@ VCDEntryPoints( access_t * p_access )
                                    vcdinfo_get_entry_lsn(p_vcdplayer->vcd, i);
     
             s->psz_name      = strdup(psz_entry);
-            s->i_byte_offset = (p_vcdplayer->p_entries[i]
-                             - vcdinfo_get_track_lsn(p_vcdplayer->vcd,i_track))
-                             * M2F2_SECTOR_SIZE;
     
-            dbg_print( INPUT_DBG_MRL, "%s, lsn %d,  byte_offset %"PRId64"",
-                       s->psz_name, p_vcdplayer->p_entries[i],
-                       s->i_byte_offset);
+            dbg_print( INPUT_DBG_MRL, "%s, lsn %d",
+                       s->psz_name, p_vcdplayer->p_entries[i]);
             TAB_APPEND( p_vcdplayer->p_title[i_track-1]->i_seekpoint,
                         p_vcdplayer->p_title[i_track-1]->seekpoint, s );
 
@@ -398,7 +397,6 @@ VCDSegments( access_t * p_access )
         snprintf( psz_segment, sizeof(psz_segment), "%s %02d", _("Segment"),
                   i );
 
-        s->i_byte_offset = 0; /* Not sure what this would mean here */
         s->psz_name  = strdup(psz_segment);
         TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
     }
@@ -494,8 +492,6 @@ VCDLIDs( access_t * p_access )
 
         snprintf( psz_lid, sizeof(psz_lid), "%s %02d", _("LID"), i_lid );
 
-        s->i_byte_offset = 0; /*  A lid doesn't have an offset
-                                  size associated with it */
         s->psz_name  = strdup(psz_lid);
         TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
     }

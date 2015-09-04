@@ -453,10 +453,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                      {
                          p_seekpoint->psz_name = strdup(psz_start + 5);
                      }
-                     else if( !strncmp( psz_start, "bytes=", 6 ) )
-                     {
-                         p_seekpoint->i_byte_offset = atoll(psz_start + 6);
-                     }
                      else if( !strncmp( psz_start, "time=", 5 ) )
                      {
                          p_seekpoint->i_time_offset = atoll(psz_start + 5) *
@@ -464,8 +460,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                      }
                      psz_start = psz_end + 1;
                 }
-                msg_Dbg( p_input, "adding bookmark: %s, bytes=%"PRId64", time=%"PRId64,
-                                  p_seekpoint->psz_name, p_seekpoint->i_byte_offset,
+                msg_Dbg( p_input, "adding bookmark: %s, time=%"PRId64,
+                                  p_seekpoint->psz_name,
                                   p_seekpoint->i_time_offset );
                 input_Control( p_input, INPUT_ADD_BOOKMARK, p_seekpoint );
                 vlc_seekpoint_Delete( p_seekpoint );
@@ -662,7 +658,6 @@ static void MainLoopStatistics( input_thread_t *p_input )
     /* update current bookmark */
     vlc_mutex_lock( &p_input->p->p_item->lock );
     p_input->p->bookmark.i_time_offset = i_time;
-    p_input->p->bookmark.i_byte_offset = -1;
     vlc_mutex_unlock( &p_input->p->p_item->lock );
 
     stats_ComputeInputStats( p_input, p_input->p->p_item->p_stats );

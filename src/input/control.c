@@ -586,7 +586,7 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     }
 
     /* Create the "bookmarks" option value */
-    const char *psz_format = "{name=%s,bytes=%"PRId64",time=%"PRId64"}";
+    const char *psz_format = "{name=%s,time=%"PRId64"}";
     int i_len = strlen( "bookmarks=" );
     for( int i = 0; i < p_input->p->i_bookmark; i++ )
     {
@@ -594,7 +594,6 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
 
         i_len += snprintf( NULL, 0, psz_format,
                            p_bookmark->psz_name,
-                           p_bookmark->i_byte_offset,
                            p_bookmark->i_time_offset/1000000 );
     }
 
@@ -612,7 +611,6 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
 
             psz_next += sprintf( psz_next, psz_format,
                                  p_bookmark->psz_name,
-                                 p_bookmark->i_byte_offset,
                                  p_bookmark->i_time_offset/1000000 );
 
             if( i < p_input->p->i_bookmark - 1)

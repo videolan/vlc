@@ -47,7 +47,6 @@
  *****************************************************************************/
 struct seekpoint_t
 {
-    int64_t i_byte_offset;
     int64_t i_time_offset;
     char    *psz_name;
 };
@@ -57,7 +56,6 @@ static inline seekpoint_t *vlc_seekpoint_New( void )
     seekpoint_t *point = (seekpoint_t*)malloc( sizeof( seekpoint_t ) );
     if( !point )
         return NULL;
-    point->i_byte_offset =
     point->i_time_offset = -1;
     point->psz_name = NULL;
     return point;
@@ -75,7 +73,6 @@ static inline seekpoint_t *vlc_seekpoint_Duplicate( const seekpoint_t *src )
     seekpoint_t *point = vlc_seekpoint_New();
     if( src->psz_name ) point->psz_name = strdup( src->psz_name );
     point->i_time_offset = src->i_time_offset;
-    point->i_byte_offset = src->i_byte_offset;
     return point;
 }
 
