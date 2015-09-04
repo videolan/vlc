@@ -561,7 +561,7 @@
 #define VLC_CODEC_MP3       VLC_FOURCC('m','p','3',' ')
 
 /**
- * It returns the codec associated to a fourcc within a ES category.
+ * It returns the codec associated to a fourcc within an ES category.
  *
  * If not found, it will return the given fourcc.
  * If found, it will always be one of the VLC_CODEC_ defined above.
@@ -571,10 +571,10 @@
 VLC_API vlc_fourcc_t vlc_fourcc_GetCodec( int i_cat, vlc_fourcc_t i_fourcc );
 
 /**
- * It returns the codec associated to a fourcc store in a zero terminated
+ * It returns the codec associated to a fourcc stored in a zero terminated
  * string.
  *
- * If the string is NULL or does not have exactly 4 charateres, it will
+ * If the string is NULL or does not have exactly 4 characters, it will
  * return 0, otherwise it behaves like vlc_fourcc_GetCodec.
  *
  * Provided for convenience.
@@ -582,11 +582,11 @@ VLC_API vlc_fourcc_t vlc_fourcc_GetCodec( int i_cat, vlc_fourcc_t i_fourcc );
 VLC_API vlc_fourcc_t vlc_fourcc_GetCodecFromString( int i_cat, const char * );
 
 /**
- * It convert the gives fourcc to an audio codec when possible.
+ * It converts the given fourcc to an audio codec when possible.
  *
- * The fourcc converted are aflt, araw/pcm , twos, sowt. When an incompatible i_bits
+ * The fourccs converted are aflt, araw/pcm , twos, sowt. When an incompatible i_bits
  * is detected, 0 is returned.
- * The other fourcc goes through vlc_fourcc_GetCodec and i_bits is not checked.
+ * The other fourccs go through vlc_fourcc_GetCodec and i_bits is not checked.
  */
 VLC_API vlc_fourcc_t vlc_fourcc_GetCodecAudio( vlc_fourcc_t i_fourcc, int i_bits );
 
@@ -644,7 +644,7 @@ typedef struct {
 } vlc_chroma_description_t;
 
 /**
- * It returns a vlc_chroma_description_t describing the request fourcc or NULL
+ * It returns a vlc_chroma_description_t describing the requested fourcc or NULL
  * if not found.
  */
 VLC_API const vlc_chroma_description_t * vlc_fourcc_GetChromaDescription( vlc_fourcc_t fourcc ) VLC_USED;
