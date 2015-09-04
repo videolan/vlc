@@ -1091,7 +1091,6 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
         if( t->i_seekpoint > 0 )
         {
             track_t i_track = p_vcdplayer->i_cur_title + 1;
-            lsn_t lsn;
 
             /* FIXME! For now we are assuming titles are only tracks and
                that track == title+1 and we the play item is entries (not
@@ -1102,18 +1101,15 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
             {
                 p_vcdplayer->play_item.num  = i;
                 p_vcdplayer->play_item.type = VCDINFO_ITEM_TYPE_ENTRY;
-                lsn = vcdinfo_get_entry_lsn(p_vcdplayer->vcd, i);
             } else if ( i < p_vcdplayer->i_entries + p_vcdplayer->i_lids )
             {
                 p_vcdplayer->play_item.num = i = i - p_vcdplayer->i_entries;
                 p_vcdplayer->play_item.type = VCDINFO_ITEM_TYPE_LID;
-                lsn = 0;
             } else
             {
                 p_vcdplayer->play_item.num  = i
                       = i - p_vcdplayer->i_entries - p_vcdplayer->i_lids;
                 p_vcdplayer->play_item.type = VCDINFO_ITEM_TYPE_SEGMENT;
-                lsn = vcdinfo_get_seg_lsn(p_vcdplayer->vcd, i);
             }
 
             VCDSetOrigin(p_access,vcdinfo_get_entry_lsn(p_vcdplayer->vcd,i),
