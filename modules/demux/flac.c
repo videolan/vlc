@@ -63,6 +63,12 @@ static int Control( demux_t *, int, va_list );
 
 static int  ReadMeta( demux_t *, uint8_t **pp_streaminfo, int *pi_streaminfo );
 
+typedef struct
+{
+    mtime_t  i_time_offset;
+    uint64_t i_byte_offset;
+} flac_seekpoint_t;
+
 struct demux_sys_t
 {
     bool  b_start;
@@ -80,7 +86,7 @@ struct demux_sys_t
 
     /* */
     int         i_seekpoint;
-    seekpoint_t **seekpoint;
+    flac_seekpoint_t **seekpoint;
 
     /* */
     int                i_attachments;
@@ -183,7 +189,7 @@ static void Close( vlc_object_t * p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     for( int i = 0; i < p_sys->i_seekpoint; i++ )
-        vlc_seekpoint_Delete(p_sys->seekpoint[i]);
+        free(p_sys->seekpoint[i]);
     TAB_CLEAN( p_sys->i_seekpoint, p_sys->seekpoint );
 
     for( int i = 0; i < p_sys->i_attachments; i++ )
@@ -250,20 +256,20 @@ static int Demux( demux_t *p_demux )
 static int64_t ControlGetLength( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    const int64_t i_size = stream_Size(p_demux->s) - p_sys->i_data_pos;
+    const uint64_t i_size = stream_Size(p_demux->s) - p_sys->i_data_pos;
     int64_t i_length = p_sys->i_length;
     int i;
 
     /* Try to fix length using seekpoint and current size for truncated file */
     for( i = p_sys->i_seekpoint-1; i >= 0; i-- )
     {
-        seekpoint_t *s = p_sys->seekpoint[i];
+        flac_seekpoint_t *s = p_sys->seekpoint[i];
         if( s->i_byte_offset <= i_size )
         {
             if( i+1 < p_sys->i_seekpoint )
             {
                 /* Broken file */
-                seekpoint_t *n = p_sys->seekpoint[i+1];
+                flac_seekpoint_t *n = p_sys->seekpoint[i+1];
                 assert( n->i_byte_offset != s->i_byte_offset); /* Should be ensured by ParseSeekTable */
                 i_length = s->i_time_offset + (n->i_time_offset-s->i_time_offset) * (i_size-s->i_byte_offset) / (n->i_byte_offset-s->i_byte_offset);
             }
@@ -312,7 +318,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
     {
         int64_t i_delta_offset;
         int64_t i_next_time;
-        int64_t i_next_offset;
+        uint64_t i_next_offset;
         uint32_t i_time_align = 1;
 
         if( i+1 < p_sys->i_seekpoint )
@@ -328,7 +334,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
 
         i_delta_offset = 0;
 
-        if ( INT64_MAX / i_delta_time < (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) )
+        if ( INT64_MAX / i_delta_time < (int64_t)(i_next_offset - p_sys->seekpoint[i]->i_byte_offset) )
             i_time_align = CLOCK_FREQ;
 
         if( i_next_time-p_sys->seekpoint[i]->i_time_offset > 0 )
@@ -445,7 +451,7 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
     *pp_streaminfo = NULL;
 
     /* Be sure we have seekpoint 0 */
-    seekpoint_t *s = vlc_seekpoint_New();
+    flac_seekpoint_t *s = xmalloc( sizeof (*s) );
     s->i_time_offset = 0;
     s->i_byte_offset = 0;
     TAB_APPEND( p_sys->i_seekpoint, p_sys->seekpoint, s );
@@ -541,7 +547,7 @@ static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
                             int i_sample_rate )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    seekpoint_t *s;
+    flac_seekpoint_t *s;
     int i;
 
     if( i_sample_rate <= 0 )
@@ -556,7 +562,7 @@ static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
         if( i_sample < 0 || i_sample >= INT64_MAX )
             continue;
 
-        s = vlc_seekpoint_New();
+        s = xmalloc( sizeof (*s) );
         s->i_time_offset = i_sample * CLOCK_FREQ / i_sample_rate;
         s->i_byte_offset = GetQWBE( &p_data[4+18*i+8] );
 
@@ -566,7 +572,7 @@ static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
             if( p_sys->seekpoint[j]->i_time_offset == s->i_time_offset ||
                 p_sys->seekpoint[j]->i_byte_offset == s->i_byte_offset )
             {
-                vlc_seekpoint_Delete( s );
+                free( s );
                 s = NULL;
                 break;
             }
