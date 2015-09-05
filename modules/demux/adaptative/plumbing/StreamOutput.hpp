@@ -29,6 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_es.h>
 #include "../StreamFormat.hpp"
+#include "FakeESOut.hpp"
 
 namespace adaptative
 {
@@ -42,7 +43,7 @@ namespace adaptative
         void setDescription(const std::string &);
         const StreamFormat & getStreamFormat() const;
         virtual void pushBlock(block_t *, bool) = 0;
-        virtual mtime_t getPCR() const;
+        virtual mtime_t getPCR() const = 0;
         virtual mtime_t getFirstDTS() const = 0;
         virtual int esCount() const = 0;
         virtual bool seekAble() const = 0;
@@ -55,7 +56,6 @@ namespace adaptative
 
     protected:
         demux_t  *realdemux;
-        mtime_t   pcr;
         std::string language;
         std::string description;
 
@@ -70,12 +70,16 @@ namespace adaptative
             virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &) const = 0;
     };
 
-    class BaseStreamOutput : public AbstractStreamOutput
+    class BaseStreamOutput : public AbstractStreamOutput,
+                             public ExtraFMTInfoInterface
     {
+        friend class BaseStreamOutputEsOutControlPCRCommand;
+
     public:
         BaseStreamOutput(demux_t *, const StreamFormat &, const std::string &);
         virtual ~BaseStreamOutput();
         virtual void pushBlock(block_t *, bool); /* reimpl */
+        virtual mtime_t getPCR() const; /* reimpl */
         virtual mtime_t getFirstDTS() const; /* reimpl */
         virtual int esCount() const; /* reimpl */
         virtual bool seekAble() const; /* reimpl */
@@ -87,44 +91,15 @@ namespace adaptative
         virtual bool isSelected() const; /* reimpl */
         void setTimestampOffset(mtime_t);
 
+        virtual void fillExtraFMTInfo( es_format_t * ) const;
+
     protected:
-        es_out_t *fakeesout; /* to intercept/proxy what is sent from demuxstream */
+        FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
         stream_t *demuxstream;
         bool      seekable;
         std::string name;
-        bool      restarting;
-        mtime_t   timestamps_offset;
-
-        virtual es_out_id_t *esOutAdd(const es_format_t *);
-        virtual int esOutSend(es_out_id_t *, block_t *);
-        virtual void esOutDel(es_out_id_t *);
-        virtual int esOutControl(int, va_list);
-        virtual void esOutDestroy();
 
     private:
-        /* static callbacks for demuxer */
-        static es_out_id_t *esOutAdd_Callback(es_out_t *, const es_format_t *);
-        static int esOutSend_Callback(es_out_t *, es_out_id_t *, block_t *);
-        static void esOutDel_Callback(es_out_t *, es_out_id_t *);
-        static int esOutControl_Callback(es_out_t *, int, va_list);
-        static void esOutDestroy_Callback(es_out_t *);
-
-        class Demuxed
-        {
-            friend class BaseStreamOutput;
-            Demuxed(es_out_id_t *, const es_format_t *);
-            ~Demuxed();
-            void drop();
-            es_out_id_t *es_id;
-            block_t  *p_queue;
-            block_t **pp_queue_last;
-            bool recycle;
-            es_format_t fmtcpy;
-        };
-        std::list<Demuxed *> queues;
-        bool b_drop;
-        vlc_mutex_t lock;
-        void sendToDecoderUnlocked(mtime_t);
         bool restart();
     };
 

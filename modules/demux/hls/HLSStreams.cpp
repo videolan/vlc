@@ -43,7 +43,7 @@ AbstractStreamOutput *HLSStreamOutputFactory::create(demux_t *demux, const Strea
 HLSPackedStreamOutput::HLSPackedStreamOutput(demux_t *demux, const StreamFormat &format, const std::string &name) :
     BaseStreamOutput(demux, format, name)
 {
-
+    b_timestamps_offset_set = false;
 }
 
 void HLSPackedStreamOutput::pushBlock(block_t *p_block, bool b_first)
@@ -52,12 +52,13 @@ void HLSPackedStreamOutput::pushBlock(block_t *p_block, bool b_first)
     {
         uint32_t size = GetDWBE(&p_block->p_buffer[6]) + 10;
         size = __MIN(p_block->i_buffer, size);
-        if(size >= 73 && timestamps_offset == VLC_TS_INVALID)
+        if(size >= 73 && !b_timestamps_offset_set)
         {
             if(!memcmp(&p_block->p_buffer[10], "PRIV", 4) &&
                !memcmp(&p_block->p_buffer[20], "com.apple.streaming.transportStreamTimestamp", 45))
             {
-                setTimestampOffset( GetQWBE(&p_block->p_buffer[65]) * 100 / 9 );
+                fakeesout->setTimestampOffset( GetQWBE(&p_block->p_buffer[65]) * 100 / 9 );
+                b_timestamps_offset_set = true;
             }
         }
 
@@ -73,5 +74,6 @@ void HLSPackedStreamOutput::setPosition(mtime_t nztime)
 {
     BaseStreamOutput::setPosition(nztime);
     /* Should be correct, has a restarted demux shouldn't have been fed with data yet */
-    setTimestampOffset(VLC_TS_INVALID - VLC_TS_0);
+    fakeesout->setTimestampOffset( VLC_TS_INVALID );
+    b_timestamps_offset_set = false;
 }
