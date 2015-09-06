@@ -20,6 +20,10 @@
 #ifndef FAKEESOUTID_HPP
 #define FAKEESOUTID_HPP
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <vlc_common.h>
 #include <vlc_es.h>
 
