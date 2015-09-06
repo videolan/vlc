@@ -54,7 +54,7 @@ bool HLSManager::isHTTPLiveStreaming(stream_t *s)
     if (size < 7 || memcmp(peek, "#EXTM3U", 7))
         return false;
 
-    size = stream_Peek(s, &peek, 512);
+    size = stream_Peek(s, &peek, 8192);
     if (size < 7)
         return false;
 
