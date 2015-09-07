@@ -135,6 +135,61 @@ struct decoder_owner_sys_t
 /* */
 #define DECODER_SPU_VOUT_WAIT_DURATION ((int)(0.200*CLOCK_FREQ))
 
+/**
+ * Load a decoder module
+ */
+static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
+                        const es_format_t *restrict p_fmt )
+{
+    p_dec->b_frame_drop_allowed = true;
+    p_dec->b_need_packetized = false;
+    p_dec->i_extra_picture_buffers = 0;
+
+    p_dec->pf_decode_audio = NULL;
+    p_dec->pf_decode_video = NULL;
+    p_dec->pf_decode_sub = NULL;
+    p_dec->pf_get_cc = NULL;
+    p_dec->pf_packetize = NULL;
+
+    es_format_Copy( &p_dec->fmt_in, p_fmt );
+    es_format_Init( &p_dec->fmt_out, UNKNOWN_ES, 0 );
+
+    /* Find a suitable decoder/packetizer module */
+    if( !b_packetizer )
+        p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
+    else
+        p_dec->p_module = module_need( p_dec, "packetizer", "$packetizer", false );
+
+    if( !p_dec->p_module )
+    {
+        es_format_Clean( &p_dec->fmt_in );
+        return -1;
+    }
+    else
+        return 0;
+}
+
+/**
+ * Unload a decoder module
+ */
+static void UnloadDecoder( decoder_t *p_dec )
+{
+    if( p_dec->p_module )
+    {
+        module_unneed( p_dec, p_dec->p_module );
+        p_dec->p_module = NULL;
+    }
+
+    if( p_dec->p_description )
+    {
+        vlc_meta_Delete( p_dec->p_description );
+        p_dec->p_description = NULL;
+    }
+
+    es_format_Clean( &p_dec->fmt_in );
+    es_format_Clean( &p_dec->fmt_out );
+}
+
 static void DecoderUpdateFormatLocked( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -1474,27 +1529,10 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
 {
     decoder_t *p_dec;
     decoder_owner_sys_t *p_owner;
-    es_format_t null_es_format;
 
     p_dec = vlc_custom_create( p_parent, sizeof( *p_dec ), "decoder" );
     if( p_dec == NULL )
         return NULL;
-
-    p_dec->b_frame_drop_allowed = true;
-    p_dec->pf_decode_audio = NULL;
-    p_dec->pf_decode_video = NULL;
-    p_dec->pf_decode_sub = NULL;
-    p_dec->pf_get_cc = NULL;
-    p_dec->pf_packetize = NULL;
-
-    /* Initialize the decoder */
-    p_dec->p_module = NULL;
-
-    memset( &null_es_format, 0, sizeof(es_format_t) );
-    es_format_Copy( &p_dec->fmt_in, fmt );
-    es_format_Copy( &p_dec->fmt_out, &null_es_format );
-
-    p_dec->p_description = NULL;
 
     /* Allocate our private structure for the decoder */
     p_dec->p_owner = p_owner = malloc( sizeof( decoder_owner_sys_t ) );
@@ -1560,10 +1598,8 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_get_display_rate = DecoderGetDisplayRate;
 
     /* Find a suitable decoder/packetizer module */
-    if( !b_packetizer )
-        p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
-    else
-        p_dec->p_module = module_need( p_dec, "packetizer", "$packetizer", false );
+    if( LoadDecoder( p_dec, b_packetizer, fmt ) )
+        return p_dec;
 
     /* Check if decoder requires already packetized data */
     if( !b_packetizer &&
@@ -1573,19 +1609,8 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
             vlc_custom_create( p_parent, sizeof( decoder_t ), "packetizer" );
         if( p_owner->p_packetizer )
         {
-            es_format_Copy( &p_owner->p_packetizer->fmt_in,
-                            &p_dec->fmt_in );
-
-            es_format_Copy( &p_owner->p_packetizer->fmt_out,
-                            &null_es_format );
-
-            p_owner->p_packetizer->p_module =
-                module_need( p_owner->p_packetizer,
-                             "packetizer", "$packetizer", false );
-
-            if( !p_owner->p_packetizer->p_module )
+            if( LoadDecoder( p_owner->p_packetizer, true, &p_dec->fmt_in ) )
             {
-                es_format_Clean( &p_owner->p_packetizer->fmt_in );
                 vlc_object_release( p_owner->p_packetizer );
                 p_owner->p_packetizer = NULL;
             }
@@ -1643,6 +1668,9 @@ static void DeleteDecoder( decoder_t * p_dec )
              (char*)&p_dec->fmt_in.i_codec,
              (unsigned)block_FifoCount( p_owner->p_fifo ) );
 
+    const bool b_flush_spu = p_dec->fmt_out.i_cat == SPU_ES;
+    UnloadDecoder( p_dec );
+
     /* Free all packets still in the decoder fifo. */
     block_FifoRelease( p_owner->p_fifo );
 
@@ -1677,7 +1705,7 @@ static void DeleteDecoder( decoder_t * p_dec )
 #endif
     es_format_Clean( &p_owner->fmt );
 
-    if( p_dec->fmt_out.i_cat == SPU_ES )
+    if( b_flush_spu )
     {
         vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
         if( p_vout )
@@ -1688,21 +1716,12 @@ static void DeleteDecoder( decoder_t * p_dec )
         }
     }
 
-    es_format_Clean( &p_dec->fmt_in );
-    es_format_Clean( &p_dec->fmt_out );
-    if( p_dec->p_description )
-        vlc_meta_Delete( p_dec->p_description );
     if( p_owner->p_description )
         vlc_meta_Delete( p_owner->p_description );
 
     if( p_owner->p_packetizer )
     {
-        module_unneed( p_owner->p_packetizer,
-                       p_owner->p_packetizer->p_module );
-        es_format_Clean( &p_owner->p_packetizer->fmt_in );
-        es_format_Clean( &p_owner->p_packetizer->fmt_out );
-        if( p_owner->p_packetizer->p_description )
-            vlc_meta_Delete( p_owner->p_packetizer->p_description );
+        UnloadDecoder( p_owner->p_packetizer );
         vlc_object_release( p_owner->p_packetizer );
     }
 
@@ -1776,7 +1795,6 @@ static decoder_t *decoder_New( vlc_object_t *p_parent, input_thread_t *p_input,
     if( vlc_clone( &p_dec->p_owner->thread, DecoderThread, p_dec, i_priority ) )
     {
         msg_Err( p_dec, "cannot spawn decoder thread" );
-        module_unneed( p_dec, p_dec->p_module );
         DeleteDecoder( p_dec );
         return NULL;
     }
@@ -1832,8 +1850,6 @@ void input_DecoderDelete( decoder_t *p_dec )
     vlc_mutex_unlock( &p_owner->lock );
 
     vlc_join( p_owner->thread, NULL );
-
-    module_unneed( p_dec, p_dec->p_module );
 
     /* */
     if( p_dec->p_owner->cc.b_supported )
