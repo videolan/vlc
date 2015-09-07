@@ -192,9 +192,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_buffer = p_sys->i_buffer_size = 0;
     p_sys->p_buffer = NULL;
 
-    /* Faad2 can't deal with truncated data (eg. from MPEG TS) */
-    p_dec->b_need_packetized = true;
-
     p_sys->b_sbr = p_sys->b_ps = false;
 
     p_dec->pf_decode_audio = DecodeBlock;

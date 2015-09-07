@@ -326,8 +326,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( avctx->level != FF_LEVEL_UNKNOWN)
         p_dec->fmt_in.i_level = avctx->level;
 
-    p_dec->b_need_packetized = true;
-
     return VLC_SUCCESS;
 }
 

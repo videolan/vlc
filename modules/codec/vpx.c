@@ -201,7 +201,6 @@ static int Open(vlc_object_t *p_this)
     dec->fmt_out.video.i_width = dec->fmt_in.video.i_width;
     dec->fmt_out.video.i_height = dec->fmt_in.video.i_height;
     dec->fmt_out.i_codec = VLC_CODEC_I420;
-    dec->b_need_packetized = true;
 
     return VLC_SUCCESS;
 }

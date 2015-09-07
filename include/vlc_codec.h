@@ -62,9 +62,6 @@ struct decoder_t
     /* Output format of decoder/packetizer */
     es_format_t         fmt_out;
 
-    /* Some decoders only accept packetized data (ie. not truncated) */
-    bool                b_need_packetized;
-
     /* Tell the decoder if it is allowed to drop frames */
     bool                b_frame_drop_allowed;
 

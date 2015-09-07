@@ -624,8 +624,6 @@ static int OpenDecoder( vlc_object_t *p_this )
             "set state failure", VLC_EGENERIC );
     p_sys->b_running = true;
 
-    /* Force packetized for now */
-    p_dec->b_need_packetized = true;
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;
 

@@ -662,8 +662,6 @@ static int OpenDecoder(vlc_object_t *p_this)
         p_dec->fmt_out.i_codec = VLC_CODEC_I420;
     }
 
-    p_dec->b_need_packetized = true;
-
     p_dec->pf_decode_video = DecodeBlock;
 
     msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'", (char *)&p_dec->fmt_in.i_codec);

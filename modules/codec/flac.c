@@ -359,9 +359,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Set callbacks */
     p_dec->pf_decode_audio = DecodeBlock;
 
-    /* */
-    p_dec->b_need_packetized = true;
-
     return VLC_SUCCESS;
 }
 

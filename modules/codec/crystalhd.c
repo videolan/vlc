@@ -348,7 +348,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec        = VLC_CODEC_YUYV;
     p_dec->fmt_out.video.i_width  = p_dec->fmt_in.video.i_width;
     p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
-    p_dec->b_need_packetized      = true;
 
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;

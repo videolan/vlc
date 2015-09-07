@@ -142,7 +142,6 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
                         const es_format_t *restrict p_fmt )
 {
     p_dec->b_frame_drop_allowed = true;
-    p_dec->b_need_packetized = false;
     p_dec->i_extra_picture_buffers = 0;
 
     p_dec->pf_decode_audio = NULL;
@@ -1597,25 +1596,26 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec->pf_get_display_date = DecoderGetDisplayDate;
     p_dec->pf_get_display_rate = DecoderGetDisplayRate;
 
-    /* Find a suitable decoder/packetizer module */
-    if( LoadDecoder( p_dec, b_packetizer, fmt ) )
-        return p_dec;
-
-    /* Check if decoder requires already packetized data */
-    if( !b_packetizer &&
-        p_dec->b_need_packetized && !p_dec->fmt_in.b_packetized )
+    /* Load a packetizer module if the input is not already packetized */
+    if( !b_packetizer && !fmt->b_packetized )
     {
         p_owner->p_packetizer =
             vlc_custom_create( p_parent, sizeof( decoder_t ), "packetizer" );
         if( p_owner->p_packetizer )
         {
-            if( LoadDecoder( p_owner->p_packetizer, true, &p_dec->fmt_in ) )
+            if( LoadDecoder( p_owner->p_packetizer, true, fmt ) )
             {
                 vlc_object_release( p_owner->p_packetizer );
                 p_owner->p_packetizer = NULL;
             }
+            else
+                fmt = &p_owner->p_packetizer->fmt_out;
         }
     }
+
+    /* Find a suitable decoder/packetizer module */
+    if( LoadDecoder( p_dec, b_packetizer, fmt ) )
+        return p_dec;
 
     /* Copy ourself the input replay gain */
     if( fmt->i_cat == AUDIO_ES )

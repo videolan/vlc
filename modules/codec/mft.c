@@ -1155,7 +1155,6 @@ int Open(vlc_object_t *p_this)
     }
 
     p_dec->fmt_out.i_cat = p_dec->fmt_in.i_cat;
-    p_dec->b_need_packetized = true;
 
     return VLC_SUCCESS;
 

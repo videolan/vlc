@@ -116,7 +116,6 @@ static int OpenDecoder(decoder_t *dec)
         goto out;
     }
     dec->p_sys = sys;
-    dec->b_need_packetized = true;
 
     sys->opaque = var_InheritBool(dec, MMAL_OPAQUE_NAME);
     bcm_host_init();

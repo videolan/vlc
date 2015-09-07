@@ -1248,8 +1248,6 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
 
     if(p_sys->b_error) goto error;
 
-    p_dec->b_need_packetized = true;
-
     if (!p_sys->b_use_pts)
         msg_Dbg( p_dec, "using dts timestamp mode for %s", p_sys->psz_component);
 
