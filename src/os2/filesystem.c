@@ -44,6 +44,7 @@
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
+#include <vlc_network.h>
 #include "libvlc.h" /* vlc_mkdir */
 
 int vlc_open (const char *filename, int flags, ...)
@@ -257,8 +258,11 @@ int vlc_dup (int oldfd)
 
 int vlc_pipe (int fds[2])
 {
-    if (pipe (fds))
+    if (socketpair (AF_LOCAL, SOCK_STREAM, 0, fds))
         return -1;
+
+    shutdown (fds[0], SHUT_WR);
+    shutdown (fds[1], SHUT_RD);
 
     setmode (fds[0], O_BINARY);
     setmode (fds[1], O_BINARY);
@@ -297,8 +301,6 @@ ssize_t vlc_writev(int fd, const struct iovec *iov, int count)
 
     return val;
 }
-
-#include <vlc_network.h>
 
 int vlc_socket (int pf, int type, int proto, bool nonblock)
 {
