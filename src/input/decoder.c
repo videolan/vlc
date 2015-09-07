@@ -1609,7 +1609,10 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
                 p_owner->p_packetizer = NULL;
             }
             else
+            {
+                p_owner->p_packetizer->fmt_out.b_packetized = true;
                 fmt = &p_owner->p_packetizer->fmt_out;
+            }
         }
     }
 
