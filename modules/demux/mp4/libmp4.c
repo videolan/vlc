@@ -150,11 +150,10 @@ int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
         /* XXX size of 0 means that the box extends to end of file */
     }
 
-    if( p_box->i_type == ATOM_uuid )
+    if( p_box->i_type == ATOM_uuid && i_read >= 16 )
     {
         /* get extented type on 16 bytes */
         GetUUID( &p_box->i_uuid, p_peek );
-        p_peek += 16; i_read -= 16;
     }
     else
     {
