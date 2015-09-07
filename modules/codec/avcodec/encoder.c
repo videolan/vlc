@@ -43,7 +43,7 @@
 #include <vlc_cpu.h>
 
 #include <libavcodec/avcodec.h>
-#include <libavutil/audioconvert.h>
+#include <libavutil/channel_layout.h>
 
 #include "avcodec.h"
 #include "avcommon.h"
