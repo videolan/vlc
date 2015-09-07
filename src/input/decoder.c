@@ -1052,24 +1052,20 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block, bool b_flus
         while( (p_packetized_block =
                 p_packetizer->pf_packetize( p_packetizer, p_block ? &p_block : NULL )) )
         {
-            if( p_packetizer->fmt_out.i_extra && !p_dec->fmt_in.i_extra )
+            if( !es_format_IsSimilar( &p_dec->fmt_in, &p_packetizer->fmt_out ) )
             {
-                es_format_Clean( &p_dec->fmt_in );
-                es_format_Copy( &p_dec->fmt_in, &p_packetizer->fmt_out );
-            }
+                msg_Dbg( p_dec, "restarting module due to input format change");
 
-            /* If the packetizer provides aspect ratio information, pass it
-             * to the decoder as a hint if the decoder itself can't provide
-             * it. Copy it regardless of the current value of the decoder input
-             * format aspect ratio, to properly propagate changes in aspect
-             * ratio. */
-            if( p_packetizer->fmt_out.video.i_sar_num > 0 &&
-                    p_packetizer->fmt_out.video.i_sar_den > 0)
-            {
-                p_dec->fmt_in.video.i_sar_num =
-                    p_packetizer->fmt_out.video.i_sar_num;
-                p_dec->fmt_in.video.i_sar_den=
-                    p_packetizer->fmt_out.video.i_sar_den;
+                /* Drain the decoder module */
+                DecoderDecodeVideo( p_dec, NULL );
+                /* Restart the decoder module */
+                UnloadDecoder( p_dec );
+                if( LoadDecoder( p_dec, false, &p_packetizer->fmt_out ) )
+                {
+                    p_dec->b_error = true;
+                    block_ChainRelease( p_packetized_block );
+                    return;
+                }
             }
 
             if( p_packetizer->pf_get_cc )
@@ -1232,10 +1228,20 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
         while( (p_packetized_block =
                 p_packetizer->pf_packetize( p_packetizer, p_block ? &p_block : NULL )) )
         {
-            if( p_packetizer->fmt_out.i_extra && !p_dec->fmt_in.i_extra )
+            if( !es_format_IsSimilar( &p_dec->fmt_in, &p_packetizer->fmt_out ) )
             {
-                es_format_Clean( &p_dec->fmt_in );
-                es_format_Copy( &p_dec->fmt_in, &p_packetizer->fmt_out );
+                msg_Dbg( p_dec, "restarting module due to input format change");
+
+                /* Drain the decoder module */
+                DecoderDecodeAudio( p_dec, NULL );
+                /* Restart the decoder module */
+                UnloadDecoder( p_dec );
+                if( LoadDecoder( p_dec, false, &p_packetizer->fmt_out ) )
+                {
+                    p_dec->b_error = true;
+                    block_ChainRelease( p_packetized_block );
+                    return;
+                }
             }
 
             while( p_packetized_block )
