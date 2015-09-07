@@ -298,8 +298,8 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
             goto error;
 
         HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(vd->sys->d3ddev,
-                                                          vd->fmt.i_visible_width,
-                                                          vd->fmt.i_visible_height,
+                                                          vd->fmt.i_width,
+                                                          vd->fmt.i_height,
                                                           MAKEFOURCC('N','V','1','2'),
                                                           D3DPOOL_DEFAULT,
                                                           &picsys->surface,
