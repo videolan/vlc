@@ -103,6 +103,7 @@ static void MP4_BoxAddChild( MP4_Box_t *p_parent, MP4_Box_t *p_childbox )
     else
             p_parent->p_last->p_next = p_childbox;
     p_parent->p_last = p_childbox;
+    p_childbox->p_father = p_parent;
 }
 
 /* Don't use stream_Seek directly */
