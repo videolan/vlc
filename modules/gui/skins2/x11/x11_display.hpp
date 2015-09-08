@@ -36,6 +36,8 @@
 #define XGC m_rDisplay.getGC()
 
 #define NET_WM_SUPPORTED          m_rDisplay.m_net_wm_supported
+#define NET_WM_WINDOW_TYPE        m_rDisplay.m_net_wm_window_type
+#define NET_WM_WINDOW_TYPE_NORMAL m_rDisplay.m_net_wm_window_type_normal
 #define NET_WM_STATE              m_rDisplay.m_net_wm_state
 #define NET_WM_STATE_FULLSCREEN   m_rDisplay.m_net_wm_state_fullscreen
 #define NET_WM_STATE_ABOVE        m_rDisplay.m_net_wm_state_above
@@ -85,6 +87,10 @@ public:
 
     /// EWMH spec
     Atom m_net_wm_supported;
+
+    Atom m_net_wm_window_type;
+    Atom m_net_wm_window_type_normal;
+
     Atom m_net_wm_state;
     Atom m_net_wm_state_above;
     Atom m_net_wm_state_fullscreen;

@@ -221,6 +221,19 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     XChangeProperty( XDISPLAY, m_wnd, NET_WM_PID, XA_CARDINAL, 32,
                      PropModeReplace, (unsigned char *)&pid, 1 );
 
+    if( NET_WM_WINDOW_TYPE != None )
+    {
+        if( type == GenericWindow::FullscreenWindow )
+        {
+            // Some Window Managers like Gnome3 limit fullscreen to the
+            // subarea outside the task bar if no window type is provided.
+            // For those WMs, setting type window to normal ensures a clean
+            // 100% fullscreen
+            XChangeProperty( XDISPLAY, m_wnd, NET_WM_WINDOW_TYPE,
+                         XA_ATOM, 32, PropModeReplace,
+                         (unsigned char *)&NET_WM_WINDOW_TYPE_NORMAL, 1 );
+        }
+    }
 }
 
 

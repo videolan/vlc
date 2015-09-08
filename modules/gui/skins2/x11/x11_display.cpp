@@ -330,6 +330,9 @@ void X11Display::testEWMH()
         msg_Dbg( getIntf(), "%s support: yes", value );\
 }
 
+    TEST_EWMH( m_net_wm_window_type, "_NET_WM_WINDOW_TYPE" )
+    TEST_EWMH( m_net_wm_window_type_normal, "_NET_WM_WINDOW_TYPE_NORMAL" )
+
     TEST_EWMH( m_net_wm_state, "_NET_WM_STATE" )
     TEST_EWMH( m_net_wm_state_fullscreen, "_NET_WM_STATE_FULLSCREEN" )
     TEST_EWMH( m_net_wm_stays_on_top, "_NET_WM_STATE_STAYS_ON_TOP" )
