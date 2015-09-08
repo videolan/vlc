@@ -71,6 +71,8 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date, bool b_relative )
  * Some prototypes.
  *****************************************************************************/
 static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father );
+static int MP4_Box_Read_Specific( stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father );
+static void MP4_Box_Clean_Specific( MP4_Box_t *p_box );
 
 static int MP4_Seek( stream_t *p_stream, uint64_t i_pos )
 {
@@ -3930,6 +3932,36 @@ static const struct
     { 0,              MP4_ReadBox_default,   0 }
 };
 
+static int MP4_Box_Read_Specific( stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
+{
+    int i_index;
+
+    for( i_index = 0; ; i_index++ )
+    {
+        if ( MP4_Box_Function[i_index].i_parent &&
+             p_father && p_father->i_type != MP4_Box_Function[i_index].i_parent )
+            continue;
+
+        if( ( MP4_Box_Function[i_index].i_type == p_box->i_type )||
+            ( MP4_Box_Function[i_index].i_type == 0 ) )
+        {
+            break;
+        }
+    }
+
+    if( !(MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box ) )
+    {
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static void MP4_Box_Clean_Specific( MP4_Box_t *p_box )
+{
+    if( p_box->pf_free )
+        p_box->pf_free( p_box );
+}
 
 /*****************************************************************************
  * MP4_ReadBox : parse the actual box and the children
@@ -3938,8 +3970,6 @@ static const struct
 static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
 {
     MP4_Box_t *p_box = calloc( 1, sizeof( MP4_Box_t ) ); /* Needed to ensure simple on error handler */
-    unsigned int i_index;
-
     if( p_box == NULL )
         return NULL;
 
@@ -3966,22 +3996,7 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
     }
     p_box->p_father = p_father;
 
-    /* Now search function to call */
-    for( i_index = 0; ; i_index++ )
-    {
-        if ( MP4_Box_Function[i_index].i_parent &&
-             p_box->p_father &&
-             p_box->p_father->i_type != MP4_Box_Function[i_index].i_parent )
-            continue;
-
-        if( ( MP4_Box_Function[i_index].i_type == p_box->i_type )||
-            ( MP4_Box_Function[i_index].i_type == 0 ) )
-        {
-            break;
-        }
-    }
-
-    if( !(MP4_Box_Function[i_index].MP4_ReadBox_function)( p_stream, p_box ) )
+    if( MP4_Box_Read_Specific( p_stream, p_box, p_father ) != VLC_SUCCESS )
     {
         uint64_t i_end = p_box->i_pos + p_box->i_size;
         MP4_BoxFree( p_stream, p_box );
@@ -4012,8 +4027,7 @@ void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
         p_child = p_next;
     }
 
-    if( p_box->pf_free )
-        p_box->pf_free( p_box );
+    MP4_Box_Clean_Specific( p_box );
 
     if( p_box->data.p_payload )
         free( p_box->data.p_payload );
