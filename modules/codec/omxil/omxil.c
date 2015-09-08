@@ -106,10 +106,10 @@ static void HwBuffer_SetCrop( decoder_t *p_dec, OmxPort *p_port,
 static void HwBuffer_ChangeState( decoder_t *p_dec, OmxPort *p_port,
                                   int i_index, int i_state );
 
-#define HWBUFFER_LOCK() vlc_mutex_lock( get_android_opaque_mutex() )
-#define HWBUFFER_UNLOCK() vlc_mutex_unlock( get_android_opaque_mutex() )
+#define HWBUFFER_LOCK(p_port) vlc_mutex_lock( &(p_port)->p_hwbuf->lock )
+#define HWBUFFER_UNLOCK(p_port) vlc_mutex_unlock( &(p_port)->p_hwbuf->lock )
 #define HWBUFFER_WAIT(p_port) vlc_cond_wait( &(p_port)->p_hwbuf->wait, \
-                                              get_android_opaque_mutex() )
+                                             &(p_port)->p_hwbuf->lock )
 #define HWBUFFER_BROADCAST(p_port) vlc_cond_broadcast( &(p_port)->p_hwbuf->wait )
 
 #else
@@ -127,8 +127,8 @@ static inline int HwBuffer_dummy( )
 #define HwBuffer_GetPic(p_dec, p_port, pp_pic) HwBuffer_dummy()
 #define HwBuffer_SetCrop(p_dec, p_port, p_rect) do { } while (0)
 
-#define HWBUFFER_LOCK() do { } while (0)
-#define HWBUFFER_UNLOCK() do { } while (0)
+#define HWBUFFER_LOCK(p_port) do { } while (0)
+#define HWBUFFER_UNLOCK(p_port) do { } while (0)
 #define HWBUFFER_WAIT(p_port) do { } while (0)
 #define HWBUFFER_BROADCAST(p_port) do { } while (0)
 #endif
@@ -2052,6 +2052,7 @@ static void HwBuffer_Init( decoder_t *p_dec, OmxPort *p_port )
     {
         goto error;
     }
+    vlc_mutex_init (&p_port->p_hwbuf->lock);
     vlc_cond_init (&p_port->p_hwbuf->wait);
 
     p_port->p_hwbuf->p_awh = AWindowHandler_new( VLC_OBJECT( p_dec ) );
@@ -2122,6 +2123,7 @@ static void HwBuffer_Destroy( decoder_t *p_dec, OmxPort *p_port )
         }
 
         vlc_cond_destroy( &p_port->p_hwbuf->wait );
+        vlc_mutex_destroy( &p_port->p_hwbuf->lock );
         free( p_port->p_hwbuf );
         p_port->p_hwbuf = NULL;
     }
@@ -2278,7 +2280,7 @@ static int HwBuffer_FreeBuffers( decoder_t *p_dec, OmxPort *p_port )
 {
     msg_Dbg( p_dec, "HwBuffer_FreeBuffers");
 
-    HWBUFFER_LOCK();
+    HWBUFFER_LOCK( p_port );
 
     p_port->p_hwbuf->b_run = false;
 
@@ -2297,7 +2299,7 @@ static int HwBuffer_FreeBuffers( decoder_t *p_dec, OmxPort *p_port )
     }
     HWBUFFER_BROADCAST( p_port );
 
-    HWBUFFER_UNLOCK();
+    HWBUFFER_UNLOCK( p_port );
 
     p_port->p_hwbuf->i_buffers = 0;
 
@@ -2321,7 +2323,7 @@ static int HwBuffer_Start( decoder_t *p_dec, OmxPort *p_port )
     OMX_BUFFERHEADERTYPE *p_header;
 
     msg_Dbg( p_dec, "HwBuffer_Start" );
-    HWBUFFER_LOCK();
+    HWBUFFER_LOCK( p_port );
 
     /* fill all owned buffers dequeued by HwBuffer_AllocatesBuffers */
     for(unsigned int i = 0; i < p_port->p_hwbuf->i_buffers; i++)
@@ -2334,7 +2336,7 @@ static int HwBuffer_Start( decoder_t *p_dec, OmxPort *p_port )
                                                p_header->pBuffer ) != 0 )
             {
                 msg_Err( p_dec, "lock failed" );
-                HWBUFFER_UNLOCK();
+                HWBUFFER_UNLOCK( p_port );
                 return -1;
             }
             OMX_DBG( "FillThisBuffer %p, %p", p_header, p_header->pBuffer );
@@ -2347,11 +2349,11 @@ static int HwBuffer_Start( decoder_t *p_dec, OmxPort *p_port )
                    DequeueThread, p_dec, VLC_THREAD_PRIORITY_LOW ) )
     {
         p_port->p_hwbuf->b_run = false;
-        HWBUFFER_UNLOCK();
+        HWBUFFER_UNLOCK( p_port );
         return -1;
     }
 
-    HWBUFFER_UNLOCK();
+    HWBUFFER_UNLOCK( p_port );
 
     return 0;
 }
@@ -2366,7 +2368,7 @@ static int HwBuffer_Stop( decoder_t *p_dec, OmxPort *p_port )
     VLC_UNUSED( p_dec );
 
     msg_Dbg( p_dec, "HwBuffer_Stop" );
-    HWBUFFER_LOCK();
+    HWBUFFER_LOCK( p_port );
 
     p_port->p_hwbuf->b_run = false;
 
@@ -2393,7 +2395,7 @@ static int HwBuffer_Stop( decoder_t *p_dec, OmxPort *p_port )
 
     HWBUFFER_BROADCAST( p_port );
 
-    HWBUFFER_UNLOCK();
+    HWBUFFER_UNLOCK( p_port );
 
     return 0;
 }
@@ -2458,9 +2460,7 @@ static int HwBuffer_GetPic( decoder_t *p_dec, OmxPort *p_port,
     p_picsys->priv.hw.i_index = i_index;
     p_picsys->priv.hw.b_valid = true;
 
-    HWBUFFER_LOCK();
     p_port->p_hwbuf->inflight_picture[i_index] = p_pic;
-    HWBUFFER_UNLOCK();
 
     *pp_pic = p_pic;
     OMX_FIFO_GET( &p_port->fifo, p_header );
@@ -2495,7 +2495,7 @@ static void *DequeueThread( void *data )
     OMX_BUFFERHEADERTYPE *p_header;
 
     msg_Dbg( p_dec, "DequeueThread running");
-    HWBUFFER_LOCK();
+    HWBUFFER_LOCK( p_port );
     while( p_port->p_hwbuf->b_run )
     {
         while( p_port->p_hwbuf->b_run &&
@@ -2504,7 +2504,7 @@ static void *DequeueThread( void *data )
 
         if( !p_port->p_hwbuf->b_run ) continue;
 
-        HWBUFFER_UNLOCK();
+        HWBUFFER_UNLOCK( p_port );
 
 
         /* The thread can be stuck here. It shouldn't happen since we make sure
@@ -2514,7 +2514,7 @@ static void *DequeueThread( void *data )
         if( err == 0 )
             err = p_port->p_hwbuf->anwpriv->lock( p_port->p_hwbuf->window_priv, p_handle );
 
-        HWBUFFER_LOCK();
+        HWBUFFER_LOCK( p_port );
 
         if( err != 0 ) {
             if( err != -EBUSY )
@@ -2550,7 +2550,7 @@ static void *DequeueThread( void *data )
 
         HWBUFFER_BROADCAST( p_port );
     }
-    HWBUFFER_UNLOCK();
+    HWBUFFER_UNLOCK( p_port );
 
     msg_Dbg( p_dec, "DequeueThread stopped");
     return NULL;
@@ -2567,9 +2567,9 @@ static void UnlockPicture( picture_t* p_pic, bool b_render )
     OmxPort *p_port = &p_sys->out;
     void *p_handle;
 
+    HWBUFFER_LOCK( p_port );
     if( !p_picsys->priv.hw.b_valid ) return;
 
-    HWBUFFER_LOCK();
 
     /* Picture might have been invalidated while waiting on the mutex. */
     if (!p_picsys->priv.hw.b_valid) {
@@ -2602,7 +2602,7 @@ end:
     p_picsys->priv.hw.b_valid = false;
     p_picsys->priv.hw.i_index = -1;
 
-    HWBUFFER_UNLOCK();
+    HWBUFFER_UNLOCK( p_port );
 }
 
 #endif // USE_IOMX
