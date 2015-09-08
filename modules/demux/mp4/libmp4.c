@@ -4185,13 +4185,29 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
     CreateUUID( &p_root->i_uuid, p_root->i_type );
 
     /* First get the moov */
-    const uint32_t stoplist[] = { ATOM_moov, 0 };
+    const uint32_t stoplist[] = { ATOM_moov, ATOM_mdat, 0 };
     i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, stoplist );
+
+    /* mdat appeared first */
+    if( i_result && !MP4_BoxGet( p_root, "moov" ) )
+    {
+        bool b_seekable;
+        if( stream_Control( p_stream, STREAM_CAN_SEEK, &b_seekable ) != VLC_SUCCESS || !b_seekable )
+        {
+            msg_Err( p_stream, "no moov before mdat and the stream is not seekable" );
+            goto error;
+        }
+
+        /* continue loading up to moov */
+        const uint32_t stoplist[] = { ATOM_moov, 0 };
+        i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, stoplist );
+    }
 
     if( !i_result )
         goto error;
+
     /* If there is a mvex box, it means fragmented MP4, and we're done */
-    else if( MP4_BoxCount( p_root, "moov/mvex" ) > 0 )
+    if( MP4_BoxCount( p_root, "moov/mvex" ) > 0 )
         return p_root;
 
     if( stream_Tell( p_stream ) + 8 < (uint64_t) stream_Size( p_stream ) )
