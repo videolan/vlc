@@ -1675,7 +1675,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t * );
  * XXX : all children have to be allocated by a malloc !! and
  *         p_box is freed
  *****************************************************************************/
-void MP4_BoxFree( stream_t *, MP4_Box_t *p_box );
+void MP4_BoxFree( MP4_Box_t *p_box );
 
 /*****************************************************************************
  * MP4_DumpBoxStructure: print the structure of the p_box

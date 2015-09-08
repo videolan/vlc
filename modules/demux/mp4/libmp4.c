@@ -234,7 +234,7 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
     if( MP4_Box_Read_Specific( p_stream, p_box, p_father ) != VLC_SUCCESS )
     {
         msg_Warn( p_stream, "Failed reading box %4.4s", (char*) &peekbox.i_type );
-        MP4_BoxFree( p_stream, p_box );
+        MP4_BoxFree( p_box );
         return NULL;
     }
 
@@ -4046,7 +4046,7 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
     if( MP4_Box_Read_Specific( p_stream, p_box, p_father ) != VLC_SUCCESS )
     {
         uint64_t i_end = p_box->i_pos + p_box->i_size;
-        MP4_BoxFree( p_stream, p_box );
+        MP4_BoxFree( p_box );
         MP4_Seek( p_stream, i_end ); /* Skip the failed box */
         return NULL;
     }
@@ -4058,7 +4058,7 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father )
  * MP4_FreeBox : free memory after read with MP4_ReadBox and all
  * the children
  *****************************************************************************/
-void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
+void MP4_BoxFree( MP4_Box_t *p_box )
 {
     MP4_Box_t    *p_child;
 
@@ -4070,7 +4070,7 @@ void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
         MP4_Box_t *p_next;
 
         p_next = p_child->p_next;
-        MP4_BoxFree( s, p_child );
+        MP4_BoxFree( p_child );
         p_child = p_next;
     }
 
@@ -4247,7 +4247,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
     return p_root;
 
 error:
-    free( p_root );
+    free( p_vroot );
     MP4_Seek( p_stream, 0 );
     return NULL;
 }

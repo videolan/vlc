@@ -35,7 +35,7 @@ AtomsReader::~AtomsReader()
     while(rootbox && rootbox->p_first)
     {
         MP4_Box_t *p_next = rootbox->p_first->p_next;
-        MP4_BoxFree( (stream_t *)object, rootbox->p_first );
+        MP4_BoxFree( rootbox->p_first );
         rootbox->p_first = p_next;
     }
     delete rootbox;

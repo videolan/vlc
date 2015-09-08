@@ -310,7 +310,7 @@ static int parse_chunk( stream_t *s, chunk_t *ck, sms_stream_t *sms )
     MP4_Box_t *p_box = root_box.p_first;
     while( p_box )
     {
-        MP4_BoxFree( ck_s, p_box );
+        MP4_BoxFree( p_box );
         p_box = p_box->p_next;
     }
     stream_Delete( ck_s );
