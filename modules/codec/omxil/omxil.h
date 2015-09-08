@@ -67,7 +67,7 @@ typedef struct HwBuffer
     bool            b_run;
     vlc_mutex_t     lock;
     vlc_cond_t      wait;
-    picture_t**     inflight_picture; /**< stores the inflight picture for each output buffer or NULL */
+    picture_sys_t** inflight_picture; /**< stores the inflight picture for each output buffer or NULL */
 
     unsigned int    i_buffers;
     void            **pp_handles;

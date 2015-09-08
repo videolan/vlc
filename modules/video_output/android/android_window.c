@@ -176,7 +176,26 @@ static int UpdateWindowSize(vout_display_sys_t *sys, video_format_t *p_fmt,
     return 0;
 }
 
-static picture_t *PictureAlloc(vout_display_sys_t *sys, video_format_t *fmt)
+static void AndroidOpaquePicture_DetachVout(picture_t *p_pic)
+{
+    picture_sys_t *p_picsys = p_pic->p_sys;
+
+    vlc_mutex_lock(&p_picsys->priv.hw.lock);
+    p_pic->p_sys->p_vd_sys = NULL;
+    /* Release p_picsys if references from VOUT and from decoder are NULL */
+    if (!p_picsys->p_vd_sys && !p_picsys->priv.hw.p_dec)
+    {
+        vlc_mutex_unlock(&p_picsys->priv.hw.lock);
+        vlc_mutex_destroy(&p_picsys->priv.hw.lock);
+        free(p_picsys);
+    }
+    else
+        vlc_mutex_unlock(&p_picsys->priv.hw.lock);
+    free(p_pic);
+}
+
+static picture_t *PictureAlloc(vout_display_sys_t *sys, video_format_t *fmt,
+                               bool b_opaque)
 {
     picture_t *p_pic;
     picture_resource_t rsc;
@@ -188,7 +207,14 @@ static picture_t *PictureAlloc(vout_display_sys_t *sys, video_format_t *fmt)
     p_picsys->p_vd_sys = sys;
 
     memset(&rsc, 0, sizeof(picture_resource_t));
-    rsc.p_sys = p_picsys,
+    rsc.p_sys = p_picsys;
+
+    if (b_opaque)
+    {
+        p_picsys->priv.hw.i_index = -1;
+        vlc_mutex_init(&p_picsys->priv.hw.lock);
+        rsc.pf_destroy = AndroidOpaquePicture_DetachVout;
+    }
 
     p_pic = picture_NewFromResource(fmt, &rsc);
     if (!p_pic)
@@ -506,7 +532,7 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
 
     if (!p_window->b_opaque) {
         int align_pixels;
-        picture_t *p_pic = PictureAlloc(sys, &p_window->fmt);
+        picture_t *p_pic = PictureAlloc(sys, &p_window->fmt, false);
 
         // For RGB (32 or 16) we need to align on 8 or 4 pixels, 16 pixels for YUV
         align_pixels = (16 / p_pic->p[0].i_pixel_pitch) - 1;
@@ -751,37 +777,30 @@ static void Close(vlc_object_t *p_this)
     free(sys);
 }
 
-static int DefaultLockPicture(picture_t *p_pic)
-{
-    picture_sys_t *p_picsys = p_pic->p_sys;
-    vout_display_sys_t *sys = p_picsys->p_vd_sys;
-
-    return AndroidWindow_LockPicture(sys, sys->p_window, p_pic);
-}
-
-static void DefaultUnlockPicture(picture_t *p_pic, bool b_render)
-{
-    picture_sys_t *p_picsys = p_pic->p_sys;
-    vout_display_sys_t *sys = p_picsys->p_vd_sys;
-
-    AndroidWindow_UnlockPicture(sys, sys->p_window, p_pic, b_render);
-}
-
 static void UnlockPicture(picture_t *p_pic, bool b_render)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
+    vout_display_sys_t *sys = p_picsys->p_vd_sys;
 
-    if (p_picsys->b_locked && p_picsys->pf_unlock_pic)
-        p_picsys->pf_unlock_pic(p_pic, b_render);
-    p_picsys->b_locked  = false;
+    if (p_picsys->b_locked)
+    {
+        if (sys->p_window->b_opaque)
+            AndroidOpaquePicture_Release(p_picsys, b_render);
+        else
+            AndroidWindow_UnlockPicture(sys, sys->p_window, p_pic, b_render);
+        p_picsys->b_locked  = false;
+    }
 }
 
 static int PoolLockPicture(picture_t *p_pic)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
+    vout_display_sys_t *sys = p_picsys->p_vd_sys;
 
-    if (p_picsys->pf_lock_pic && p_picsys->pf_lock_pic(p_pic) != 0)
+    if (!sys->p_window->b_opaque
+     && AndroidWindow_LockPicture(sys, sys->p_window, p_pic) != 0)
         return -1;
+
     p_picsys->b_locked = true;
     return 0;
 }
@@ -811,13 +830,10 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
 
     for (i = 0; i < requested_count; i++)
     {
-        picture_t *p_pic = PictureAlloc(sys, &sys->p_window->fmt);
+        picture_t *p_pic = PictureAlloc(sys, &sys->p_window->fmt,
+                                        sys->p_window->b_opaque);
         if (!p_pic)
             goto error;
-        if (!sys->p_window->b_opaque) {
-            p_pic->p_sys->pf_lock_pic = DefaultLockPicture;
-            p_pic->p_sys->pf_unlock_pic = DefaultUnlockPicture;
-        }
 
         pp_pics[i] = p_pic;
     }
@@ -990,7 +1006,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
         if (!sys->p_sub_pic
          && AndroidWindow_Setup(sys, sys->p_sub_window, 1) == 0)
-            sys->p_sub_pic = PictureAlloc(sys, &sys->p_sub_window->fmt);
+            sys->p_sub_pic = PictureAlloc(sys, &sys->p_sub_window->fmt, false);
         if (!sys->p_spu_blend && sys->p_sub_pic)
             sys->p_spu_blend = filter_NewBlend(VLC_OBJECT(vd),
                                                &sys->p_sub_pic->format);

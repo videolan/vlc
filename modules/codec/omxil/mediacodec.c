@@ -46,7 +46,6 @@
 #include <OMX_Core.h>
 #include <OMX_Component.h>
 #include "omxil_utils.h"
-#include "android_opaque.h"
 #include "../../video_output/android/android_window.h"
 
 /* JNI functions to get/set an Android Surface object. */
@@ -117,7 +116,7 @@ struct decoder_sys_t
             size_t i_h264_profile;
             ArchitectureSpecificCopyData ascd;
             /* stores the inflight picture for each output buffer or NULL */
-            picture_t** pp_inflight_pictures;
+            picture_sys_t** pp_inflight_pictures;
             unsigned int i_inflight_pictures;
             timestamp_fifo_t *timestamp_fifo;
         } video;
@@ -150,7 +149,7 @@ static int Audio_ProcessOutput(decoder_t *, mc_api_out *, picture_t **, block_t 
 static block_t *DecodeAudio(decoder_t *, block_t **);
 
 static void InvalidateAllPictures(decoder_t *);
-static int InsertInflightPicture(decoder_t *, picture_t *, unsigned int );
+static void RemoveInflightPictures(decoder_t *);
 
 /*****************************************************************************
  * Module descriptor
@@ -453,10 +452,10 @@ static void StopMediaCodec(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    /* Invalidate all pictures that are currently in flight in order
+    /* Remove all pictures that are currently in flight in order
      * to prevent the vout from using destroyed output buffers. */
     if (p_sys->api->b_direct_rendering)
-        InvalidateAllPictures(p_dec);
+        RemoveInflightPictures(p_dec);
 
     p_sys->api->stop(p_sys->api);
     if (p_dec->fmt_in.i_cat == VIDEO_ES && p_sys->u.video.p_awh)
@@ -576,6 +575,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         p_sys->u.video.timestamp_fifo = timestamp_FifoNew(32);
         if (!p_sys->u.video.timestamp_fifo)
             goto bailout;
+        TAB_INIT( p_sys->u.video.i_inflight_pictures,
+                  p_sys->u.video.pp_inflight_pictures );
 
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
             h264_get_profile_level(&p_dec->fmt_in,
@@ -673,7 +674,6 @@ static void CloseDecoder(vlc_object_t *p_this)
     {
         ArchitectureSpecificCopyHooksDestroy(p_sys->u.video.i_pixel_format,
                                              &p_sys->u.video.ascd);
-        free(p_sys->u.video.pp_inflight_pictures);
         if (p_sys->u.video.timestamp_fifo)
             timestamp_FifoRelease(p_sys->u.video.timestamp_fifo);
         if (p_sys->u.video.p_awh)
@@ -687,71 +687,46 @@ static void CloseDecoder(vlc_object_t *p_this)
 /*****************************************************************************
  * vout callbacks
  *****************************************************************************/
-static void UnlockPicture(picture_t* p_pic, bool b_render)
+static void ReleasePicture(decoder_t *p_dec, unsigned i_index, bool b_render)
 {
-    picture_sys_t *p_picsys = p_pic->p_sys;
-    decoder_t *p_dec = p_picsys->priv.hw.p_dec;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (!p_picsys->priv.hw.b_valid)
-        return;
-
-    vlc_mutex_lock(get_android_opaque_mutex());
-
-    /* Picture might have been invalidated while waiting on the mutex. */
-    if (!p_picsys->priv.hw.b_valid) {
-        vlc_mutex_unlock(get_android_opaque_mutex());
-        return;
-    }
-
-    uint32_t i_index = p_picsys->priv.hw.i_index;
-    InsertInflightPicture(p_dec, NULL, i_index);
-
-    /* Release the MediaCodec buffer. */
     p_sys->api->release_out(p_sys->api, i_index, b_render);
-    p_picsys->priv.hw.b_valid = false;
-
-    vlc_mutex_unlock(get_android_opaque_mutex());
 }
 
 static void InvalidateAllPictures(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    vlc_mutex_lock(get_android_opaque_mutex());
-
-    for (unsigned int i = 0; i < p_sys->u.video.i_inflight_pictures; ++i) {
-        picture_t *p_pic = p_sys->u.video.pp_inflight_pictures[i];
-        if (p_pic) {
-            if (p_pic->p_sys->priv.hw.b_valid)
-            {
-                p_sys->api->release_out(p_sys->api, p_pic->p_sys->priv.hw.i_index, false);
-                p_pic->p_sys->priv.hw.b_valid = false;
-            }
-            p_sys->u.video.pp_inflight_pictures[i] = NULL;
-        }
-    }
-    vlc_mutex_unlock(get_android_opaque_mutex());
+    for (unsigned int i = 0; i < p_sys->u.video.i_inflight_pictures; ++i)
+        AndroidOpaquePicture_Release(p_sys->u.video.pp_inflight_pictures[i],
+                                     false);
 }
 
-static int InsertInflightPicture(decoder_t *p_dec, picture_t *p_pic,
-                                 unsigned int i_index)
+static int InsertInflightPicture(decoder_t *p_dec, picture_sys_t *p_picsys)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (i_index >= p_sys->u.video.i_inflight_pictures) {
-        picture_t **pp_pics = realloc(p_sys->u.video.pp_inflight_pictures,
-                                      (i_index + 1) * sizeof (picture_t *));
-        if (!pp_pics)
-            return -1;
-        if (i_index - p_sys->u.video.i_inflight_pictures > 0)
-            memset(&pp_pics[p_sys->u.video.i_inflight_pictures], 0,
-                   (i_index - p_sys->u.video.i_inflight_pictures) * sizeof (picture_t *));
-        p_sys->u.video.pp_inflight_pictures = pp_pics;
-        p_sys->u.video.i_inflight_pictures = i_index + 1;
-    }
-    p_sys->u.video.pp_inflight_pictures[i_index] = p_pic;
+    if (!p_picsys->priv.hw.p_dec)
+    {
+        p_picsys->priv.hw.p_dec = p_dec;
+        p_picsys->priv.hw.pf_release = ReleasePicture;
+        TAB_APPEND_CAST((picture_sys_t **),
+                        p_sys->u.video.i_inflight_pictures,
+                        p_sys->u.video.pp_inflight_pictures,
+                        p_picsys);
+    } /* else already attached */
     return 0;
+}
+
+static void RemoveInflightPictures(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    for (unsigned int i = 0; i < p_sys->u.video.i_inflight_pictures; ++i)
+        AndroidOpaquePicture_DetachDecoder(p_sys->u.video.pp_inflight_pictures[i]);
+    TAB_CLEAN(p_sys->u.video.i_inflight_pictures,
+              p_sys->u.video.pp_inflight_pictures);
 }
 
 static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
@@ -816,16 +791,8 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 
         if (p_sys->api->b_direct_rendering)
         {
-            picture_sys_t *p_picsys = p_pic->p_sys;
-            p_picsys->pf_lock_pic = NULL;
-            p_picsys->pf_unlock_pic = UnlockPicture;
-            p_picsys->priv.hw.p_dec = p_dec;
-            p_picsys->priv.hw.i_index = p_out->u.buf.i_index;
-            p_picsys->priv.hw.b_valid = true;
-
-            vlc_mutex_lock(get_android_opaque_mutex());
-            InsertInflightPicture(p_dec, p_pic, p_out->u.buf.i_index);
-            vlc_mutex_unlock(get_android_opaque_mutex());
+            p_pic->p_sys->priv.hw.i_index = p_out->u.buf.i_index;
+            InsertInflightPicture(p_dec, p_pic->p_sys);
         } else {
             unsigned int chroma_div;
             GetVlcChromaSizes(p_dec->fmt_out.i_codec,
