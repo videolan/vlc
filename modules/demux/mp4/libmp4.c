@@ -4118,10 +4118,9 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
  *  The first box is a virtual box "root" and is the father for all first
  *  level boxes for the file, a sort of virtual contener
  *****************************************************************************/
-MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
+MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
 {
     MP4_Box_t *p_root;
-    stream_t *p_stream;
     int i_result;
 
     p_root = calloc( 1, sizeof( MP4_Box_t ) );
@@ -4130,10 +4129,12 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
 
     p_root->i_type = ATOM_root;
     p_root->i_shortsize = 1;
+    int64_t i_size = stream_Size( p_stream );
+    if( i_size > 0 )
+        p_root->i_size = i_size;
+
     /* could be a DASH stream for exemple, 0 means unknown or infinite size */
     CreateUUID( &p_root->i_uuid, p_root->i_type );
-
-    p_stream = s;
 
     /* First get the moov */
     i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, ATOM_moov );
@@ -4144,8 +4145,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
     else if( MP4_BoxCount( p_root, "moov/mvex" ) > 0 )
         return p_root;
 
-    p_root->i_size = stream_Size( s );
-    if( stream_Tell( s ) + 8 < stream_Size( s ) )
+    if( stream_Tell( p_stream ) + 8 < (uint64_t) stream_Size( p_stream ) )
     {
         /* Get the rest of the file */
         i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, 0 );
