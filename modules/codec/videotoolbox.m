@@ -448,12 +448,14 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
 
     p_sys->b_enable_temporal_processing = false;
     if (var_InheritInteger(p_dec, "videotoolbox-temporal-deinterlacing")) {
-        if (p_block->i_flags & BLOCK_FLAG_TOP_FIELD_FIRST ||
-            p_block->i_flags & BLOCK_FLAG_BOTTOM_FIELD_FIRST) {
-            msg_Dbg(p_dec, "Interlaced content detected, inserting temporal deinterlacer");
-            CFDictionarySetValue(decoderConfiguration, kVTDecompressionPropertyKey_FieldMode, kVTDecompressionProperty_FieldMode_DeinterlaceFields);
-            CFDictionarySetValue(decoderConfiguration, kVTDecompressionPropertyKey_DeinterlaceMode, kVTDecompressionProperty_DeinterlaceMode_Temporal);
-            p_sys->b_enable_temporal_processing = true;
+        if (p_block != NULL) {
+            if (p_block->i_flags & BLOCK_FLAG_TOP_FIELD_FIRST ||
+                p_block->i_flags & BLOCK_FLAG_BOTTOM_FIELD_FIRST) {
+                msg_Dbg(p_dec, "Interlaced content detected, inserting temporal deinterlacer");
+                CFDictionarySetValue(decoderConfiguration, kVTDecompressionPropertyKey_FieldMode, kVTDecompressionProperty_FieldMode_DeinterlaceFields);
+                CFDictionarySetValue(decoderConfiguration, kVTDecompressionPropertyKey_DeinterlaceMode, kVTDecompressionProperty_DeinterlaceMode_Temporal);
+                p_sys->b_enable_temporal_processing = true;
+            }
         }
     }
 
