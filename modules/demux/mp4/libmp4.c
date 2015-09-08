@@ -34,6 +34,7 @@
 #include "libmp4.h"
 #include "languages.h"
 #include <math.h>
+#include <assert.h>
 
 /* Some assumptions:
  * The input method HAS to be seekable
@@ -178,63 +179,93 @@ int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
 }
 
 /*****************************************************************************
- * MP4_NextBox : Go to the next box
+ * MP4_ReadBoxRestricted : Reads box from current position
  *****************************************************************************
- * if p_box == NULL, go to the next box in which we are( at the begining ).
+ * if p_box == NULL, box is invalid or failed, position undefined
+ * on success, position is past read box or EOF
  *****************************************************************************/
-static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
+static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father,
+                                         const uint32_t onlytypes[], const uint32_t nottypes[] )
 {
-    MP4_Box_t box;
+    MP4_Box_t peekbox = { 0 };
+    if ( !MP4_PeekBoxHeader( p_stream, &peekbox ) )
+        return NULL;
 
-    if( !p_box )
+    if( peekbox.i_size < 8 )
     {
-        if ( !MP4_PeekBoxHeader( p_stream, &box ) )
-            return 0;
-        p_box = &box;
+        msg_Warn( p_stream, "found an invalid sized %"PRIu64" box %4.4s",
+                  peekbox.i_size, (char *) &peekbox.i_type );
+        return NULL;
     }
 
-    if( !p_box->i_size )
+    for( size_t i=0; nottypes && nottypes[i]; i++ )
     {
-        return 2; /* Box with infinite size */
+        if( nottypes[i] == peekbox.i_type )
+            return NULL;
     }
 
-    if( p_box->p_father )
+    for( size_t i=0; onlytypes && onlytypes[i]; i++ )
     {
-        /* if father's size == 0, it means unknown or infinite size,
-         * and we skip the followong check */
-        if( p_box->p_father->i_size > 0 )
+        if( onlytypes[i] != peekbox.i_type )
+            return NULL;
+    }
+
+    /* if father's size == 0, it means unknown or infinite size,
+     * and we skip the followong check */
+    if( p_father && p_father->i_size > 0 )
+    {
+        const uint64_t i_box_next = peekbox.i_size + peekbox.i_pos;
+        const uint64_t i_father_next = p_father->i_size + p_father->i_pos;
+        /* check if it's within p-father */
+        if( i_box_next > i_father_next )
         {
-            const off_t i_box_end = p_box->i_size + p_box->i_pos;
-            const off_t i_father_end = p_box->p_father->i_size + p_box->p_father->i_pos;
-
-            /* check if it's within p-father */
-            if( i_box_end >= i_father_end )
-            {
-                if( i_box_end > i_father_end )
-                    msg_Dbg( p_stream, "out of bound child" );
-                return 0; /* out of bound */
-            }
+            msg_Warn( p_stream, "out of bound child %4.4s", (char*) &peekbox.i_type );
+            return NULL; /* out of bound */
         }
     }
-    if( MP4_Seek( p_stream, p_box->i_size + p_box->i_pos ) )
+
+    /* Everything seems OK */
+    MP4_Box_t *p_box = (MP4_Box_t *) malloc( sizeof(MP4_Box_t) );
+    if( !p_box )
+        return NULL;
+    *p_box = peekbox;
+
+    const uint64_t i_next = p_box->i_pos + p_box->i_size;
+    if( MP4_Box_Read_Specific( p_stream, p_box, p_father ) != VLC_SUCCESS )
     {
-        return 0;
+        msg_Warn( p_stream, "Failed reading box %4.4s", (char*) &peekbox.i_type );
+        MP4_BoxFree( p_stream, p_box );
+        return NULL;
     }
 
-    return 1;
+    /* Check is we consumed all data */
+    if( stream_Tell( p_stream ) < i_next )
+    {
+        MP4_Seek( p_stream, i_next - 1 ); /*  since past seek can fail when hitting EOF */
+        MP4_Seek( p_stream, i_next );
+    }
+
+    if( !p_box )
+        return NULL;
+
+    MP4_BoxAddChild( p_father, p_box );
+
+    return p_box;
+}
+
+static inline MP4_Box_t *MP4_ReadNextBox( stream_t *p_stream, MP4_Box_t *p_father )
+{
+    return MP4_ReadBoxRestricted( p_stream, p_father, NULL, NULL );
 }
 
 /*****************************************************************************
  * For all known box a loader is given,
- *  XXX: all common struct have to be already read by MP4_ReadBoxCommon
- *       after called one of theses functions, file position is unknown
- *       you need to call MP4_GotoBox to go where you want
+ * you have to be already read container header
+ * without container size, file position on exit is unknown
  *****************************************************************************/
 static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
-               MP4_Box_t *p_container, uint32_t i_last_child, bool b_indexed )
+               MP4_Box_t *p_container, const uint32_t stoplist[], bool b_indexed )
 {
-    MP4_Box_t *p_box;
-
     /* Size of root container is set to 0 when unknown, for exemple
      * with a DASH stream. In that case, we skip the following check */
     if( (p_container->i_size || p_container->p_father)
@@ -246,50 +277,64 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
         return 0;
     }
 
-    uint64_t i_end = p_container->i_pos + p_container->i_size;
-    int i_tell;
-
+    const uint64_t i_end = p_container->i_pos + p_container->i_size;
+    MP4_Box_t *p_box = NULL;
     do
     {
+        if ( p_container->i_size )
+        {
+            const uint64_t i_tell = stream_Tell( p_stream );
+            if( i_tell + ((b_indexed)?16:8) >= i_end )
+                break;
+        }
+
         uint32_t i_index = 0;
         if ( b_indexed )
         {
             uint8_t read[8];
             if ( stream_Read( p_stream, read, 8 ) < 8 )
-                return 0;
+                break;
             i_index = GetDWBE(&read[4]);
         }
-        if( ( p_box = MP4_ReadBox( p_stream, p_container ) ) == NULL )
-            break;
-        p_box->i_index = i_index;
 
-        /* chain this box with the father and the other at same level */
-        MP4_BoxAddChild( p_container, p_box );
-
-        i_tell = stream_Tell( p_stream );
-        if( p_container->i_size && i_tell >= 0 && (unsigned)i_tell == i_end )
-            break;
-
-        if( p_box->i_type == i_last_child )
+        if( (p_box = MP4_ReadNextBox( p_stream, p_container )) )
         {
-            MP4_NextBox( p_stream, p_box );
-            break;
+            p_box->i_index = i_index;
+            for(size_t i=0; stoplist && stoplist[i]; i++)
+            {
+                if( p_box->i_type == stoplist[i] )
+                    return 1;
+            }
         }
 
-    } while( MP4_NextBox( p_stream, p_box ) == 1 );
+        if ( p_container->i_size )
+        {
+            const uint64_t i_tell = stream_Tell( p_stream );
+            if( i_tell >= i_end )
+            {
+                assert( i_tell == i_end );
+                break;
+            }
+        }
 
-    i_tell = stream_Tell( p_stream );
-    if ( p_container->i_size && i_tell >= 0 && (unsigned)i_tell != i_end )
-        MP4_Seek( p_stream, i_end );
+    } while( p_box );
+
+    /* Always move to end of container */
+    if ( p_container->i_size )
+    {
+        const uint64_t i_tell = stream_Tell( p_stream );
+        if ( i_tell != i_end )
+            MP4_Seek( p_stream, i_end );
+    }
 
     return 1;
 }
 
 int MP4_ReadBoxContainerChildren( stream_t *p_stream, MP4_Box_t *p_container,
-                                  uint32_t i_last_child )
+                                  const uint32_t stoplist[] )
 {
     return MP4_ReadBoxContainerChildrenIndexed( p_stream, p_container,
-                                                i_last_child, false );
+                                                stoplist, false );
 }
 
 static void MP4_BoxOffsetUp( MP4_Box_t *p_box, uint64_t i_offset )
@@ -312,7 +357,7 @@ static int MP4_ReadBoxContainerRawInBox( stream_t *p_stream, MP4_Box_t *p_contai
     if( !p_substream )
         return 0;
     MP4_Box_t *p_last = p_container->p_last;
-    MP4_ReadBoxContainerChildren( p_substream, p_container, 0 );
+    MP4_ReadBoxContainerChildren( p_substream, p_container, NULL );
     stream_Delete( p_substream );
     /* do pos fixup */
     if( p_container )
@@ -337,7 +382,7 @@ static int MP4_ReadBoxContainer( stream_t *p_stream, MP4_Box_t *p_container )
     if ( MP4_Seek( p_stream, p_container->i_pos +
                       mp4_box_headersize( p_container ) ) )
         return 0;
-    return MP4_ReadBoxContainerChildren( p_stream, p_container, 0 );
+    return MP4_ReadBoxContainerChildren( p_stream, p_container, NULL );
 }
 
 static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
@@ -406,9 +451,9 @@ static int MP4_ReadBox_ilst( stream_t *p_stream, MP4_Box_t *p_box )
         msg_Warn( p_stream, "no handler for ilst atom" );
         return 0;
     case HANDLER_mdta:
-        return MP4_ReadBoxContainerChildrenIndexed( p_stream, p_box, 0, true );
+        return MP4_ReadBoxContainerChildrenIndexed( p_stream, p_box, NULL, true );
     case HANDLER_mdir:
-        return MP4_ReadBoxContainerChildren( p_stream, p_box, 0 );
+        return MP4_ReadBoxContainerChildren( p_stream, p_box, NULL );
     default:
         msg_Warn( p_stream, "Unknown ilst handler type '%4.4s'", (char*)&p_box->i_handler );
         return 0;
@@ -2147,7 +2192,7 @@ static int MP4_ReadBox_sample_mp4s( stream_t *p_stream, MP4_Box_t *p_box )
     if( i_read < 8 )
         MP4_READBOX_EXIT( 0 );
 
-    MP4_ReadBoxContainerChildren( p_stream, p_box, 0 );
+    MP4_ReadBoxContainerChildren( p_stream, p_box, NULL );
 
     if ( MP4_Seek( p_stream, p_box->i_pos + p_box->i_size ) )
         MP4_READBOX_EXIT( 0 );
@@ -3047,7 +3092,8 @@ static int MP4_ReadBox_Metadata( stream_t *p_stream, MP4_Box_t *p_box )
         return 0;
     if ( stream_Read( p_stream, NULL, 8 ) < 8 )
         return 0;
-    return MP4_ReadBoxContainerChildren( p_stream, p_box, ATOM_data );
+    const uint32_t stoplist[] = { ATOM_data, 0 };
+    return MP4_ReadBoxContainerChildren( p_stream, p_box, stoplist );
 }
 
 /* Chapter support */
@@ -3233,7 +3279,8 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
             return 0;
     }
 
-    if ( !MP4_ReadBoxContainerChildren( p_stream, p_box, ATOM_hdlr ) )
+    const uint32_t stoplist[] = { ATOM_hdlr, 0 };
+    if ( !MP4_ReadBoxContainerChildren( p_stream, p_box, stoplist ) )
         return 0;
 
     /* Mandatory */
@@ -3245,7 +3292,7 @@ static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
         return 0;
 
     /* then it behaves like a container */
-    return MP4_ReadBoxContainerChildren( p_stream, p_box, 0 );
+    return MP4_ReadBoxContainerChildren( p_stream, p_box, NULL );
 }
 
 static int MP4_ReadBox_iods( stream_t *p_stream, MP4_Box_t *p_box )
@@ -4100,7 +4147,8 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
     p_chunk->i_type = ATOM_root;
     p_chunk->i_shortsize = 1;
 
-    MP4_ReadBoxContainerChildren( s, p_chunk, ATOM_moof );
+    const uint32_t stoplist[] = { ATOM_moof, 0 };
+    MP4_ReadBoxContainerChildren( s, p_chunk, stoplist );
 
     p_tmp_box = p_chunk->p_first;
     while( p_tmp_box )
@@ -4137,7 +4185,8 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
     CreateUUID( &p_root->i_uuid, p_root->i_type );
 
     /* First get the moov */
-    i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, ATOM_moov );
+    const uint32_t stoplist[] = { ATOM_moov, 0 };
+    i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, stoplist );
 
     if( !i_result )
         goto error;
@@ -4148,7 +4197,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
     if( stream_Tell( p_stream ) + 8 < (uint64_t) stream_Size( p_stream ) )
     {
         /* Get the rest of the file */
-        i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, 0 );
+        i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, NULL );
 
         if( !i_result )
             goto error;

@@ -1709,7 +1709,7 @@ unsigned MP4_BoxCount( const MP4_Box_t *p_box, const char *psz_fmt, ... );
 /* Internal functions exposed for MKV demux */
 int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box );
 int MP4_ReadBoxContainerChildren( stream_t *p_stream, MP4_Box_t *p_container,
-                                  uint32_t i_last_child );
+                                  const uint32_t stoplist[] );
 int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box );
 void MP4_FreeBox_sample_vide( MP4_Box_t *p_box );
 

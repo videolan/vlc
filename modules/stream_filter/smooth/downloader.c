@@ -268,7 +268,7 @@ static int parse_chunk( stream_t *s, chunk_t *ck, sms_stream_t *sms )
     MP4_Box_t root_box = { 0 };
     root_box.i_type = ATOM_root;
     root_box.i_size = ck->size;
-    if ( MP4_ReadBoxContainerChildren( ck_s, &root_box, 0 ) != 1 )
+    if ( MP4_ReadBoxContainerChildren( ck_s, &root_box, NULL ) != 1 )
     {
         stream_Delete( ck_s );
         return VLC_EGENERIC;

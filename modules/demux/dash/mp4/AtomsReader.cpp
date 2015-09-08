@@ -58,7 +58,7 @@ bool AtomsReader::parseBlock(block_t *p_block, BaseRepresentation *rep)
         memset(rootbox, 0, sizeof(*rootbox));
         rootbox->i_type = ATOM_root;
         rootbox->i_size = p_block->i_buffer;
-        if ( MP4_ReadBoxContainerChildren( stream, rootbox, 0 ) == 1 )
+        if ( MP4_ReadBoxContainerChildren( stream, rootbox, NULL ) == 1 )
         {
 #ifndef NDEBUG
             MP4_BoxDumpStructure(stream, rootbox);

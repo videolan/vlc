@@ -4443,7 +4443,8 @@ static int ProbeIndex( demux_t *p_demux )
              stream_Seek( p_demux->s, i_stream_size - i_offset ) == VLC_SUCCESS )
         {
             msg_Dbg( p_demux, "reading mfra index at %"PRIu64, i_stream_size - i_offset );
-            MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, ATOM_mfra );
+            const uint32_t stoplist[] = { ATOM_mfra, 0 };
+            MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, stoplist );
         }
     }
 
@@ -4462,14 +4463,15 @@ static int ProbeFragments( demux_t *p_demux, bool b_force )
 
     if ( p_sys->b_fastseekable || b_force )
     {
-        MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, 0 ); /* Get the rest of the file */
+        MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, NULL ); /* Get the rest of the file */
         p_sys->b_fragments_probed = true;
     }
     else
     {
         /* We stop at first moof, which validates our fragmentation condition
          * and we'll find others while reading. */
-        MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, ATOM_moof );
+        const uint32_t stoplist[] = { ATOM_moof, 0 };
+        MP4_ReadBoxContainerChildren( p_demux->s, p_sys->p_root, stoplist );
     }
 
     if ( !p_sys->moovfragment.p_moox )
