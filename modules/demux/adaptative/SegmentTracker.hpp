@@ -59,7 +59,8 @@ namespace adaptative
 
         private:
             bool initializing;
-            bool indexed;
+            bool index_sent;
+            bool init_sent;
             uint64_t count;
             AbstractAdaptationLogic *logic;
             BaseAdaptationSet *adaptationSet;

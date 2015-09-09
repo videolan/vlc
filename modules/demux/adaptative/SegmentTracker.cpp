@@ -32,7 +32,8 @@ SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSe
 {
     count = 0;
     initializing = true;
-    indexed = false;
+    index_sent = false;
+    init_sent = false;
     prevRepresentation = NULL;
     setAdaptationLogic(logic_);
     adaptationSet = adaptSet;
@@ -62,6 +63,10 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
     if(!adaptationSet)
         return NULL;
 
+    /* Ensure we don't keep chaining init/index without data */
+    if( initializing && prevRepresentation )
+        switch_allowed = false;
+
     if( !switch_allowed ||
        (prevRepresentation && prevRepresentation->getSwitchPolicy() == SegmentInformation::SWITCH_UNAVAILABLE) )
         rep = prevRepresentation;
@@ -74,20 +79,21 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
     if(rep != prevRepresentation)
     {
         prevRepresentation = rep;
+        init_sent = false;
         initializing = true;
     }
 
-    if(initializing)
+    if(!init_sent)
     {
-        initializing = false;
+        init_sent = true;
         segment = rep->getSegment(BaseRepresentation::INFOTYPE_INIT);
         if(segment)
             return segment->toChunk(count, rep);
     }
 
-    if(!indexed)
+    if(!index_sent)
     {
-        indexed = true;
+        index_sent = true;
         segment = rep->getSegment(BaseRepresentation::INFOTYPE_INDEX);
         if(segment)
             return segment->toChunk(count, rep);
@@ -99,6 +105,8 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
         resetCounter();
         return NULL;
     }
+    /* stop initializing after 1st chunk */
+    initializing = false;
 
     SegmentChunk *chunk = segment->toChunk(count, rep);
     if(chunk)
@@ -116,7 +124,11 @@ bool SegmentTracker::setPosition(mtime_t time, bool restarted, bool tryonly)
         if(!tryonly)
         {
             if(restarted)
+            {
                 initializing = true;
+                index_sent = false;
+                init_sent = false;
+            }
             count = segcount;
         }
         return true;
