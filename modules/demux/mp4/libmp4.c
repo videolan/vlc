@@ -264,7 +264,8 @@ static inline MP4_Box_t *MP4_ReadNextBox( stream_t *p_stream, MP4_Box_t *p_fathe
  * without container size, file position on exit is unknown
  *****************************************************************************/
 static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
-               MP4_Box_t *p_container, const uint32_t stoplist[], bool b_indexed )
+               MP4_Box_t *p_container, const uint32_t stoplist[],
+               const uint32_t excludelist[], bool b_indexed )
 {
     /* Size of root container is set to 0 when unknown, for exemple
      * with a DASH stream. In that case, we skip the following check */
@@ -296,8 +297,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
                 break;
             i_index = GetDWBE(&read[4]);
         }
-
-        if( (p_box = MP4_ReadNextBox( p_stream, p_container )) )
+        if( (p_box = MP4_ReadBoxRestricted( p_stream, p_container, NULL, excludelist )) )
         {
             p_box->i_index = i_index;
             for(size_t i=0; stoplist && stoplist[i]; i++)
@@ -334,7 +334,7 @@ int MP4_ReadBoxContainerChildren( stream_t *p_stream, MP4_Box_t *p_container,
                                   const uint32_t stoplist[] )
 {
     return MP4_ReadBoxContainerChildrenIndexed( p_stream, p_container,
-                                                stoplist, false );
+                                                stoplist, NULL, false );
 }
 
 static void MP4_BoxOffsetUp( MP4_Box_t *p_box, uint64_t i_offset )
@@ -451,7 +451,7 @@ static int MP4_ReadBox_ilst( stream_t *p_stream, MP4_Box_t *p_box )
         msg_Warn( p_stream, "no handler for ilst atom" );
         return 0;
     case HANDLER_mdta:
-        return MP4_ReadBoxContainerChildrenIndexed( p_stream, p_box, NULL, true );
+        return MP4_ReadBoxContainerChildrenIndexed( p_stream, p_box, NULL, NULL, true );
     case HANDLER_mdir:
         return MP4_ReadBoxContainerChildren( p_stream, p_box, NULL );
     default:
@@ -4168,28 +4168,27 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
  *****************************************************************************/
 MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
 {
-    MP4_Box_t *p_root;
     int i_result;
 
-    p_root = calloc( 1, sizeof( MP4_Box_t ) );
-    if( p_root == NULL )
+    MP4_Box_t *p_vroot = calloc( 1, sizeof( MP4_Box_t ) );
+    if( p_vroot == NULL )
         return NULL;
 
-    p_root->i_type = ATOM_root;
-    p_root->i_shortsize = 1;
+    p_vroot->i_type = ATOM_root;
+    p_vroot->i_shortsize = 1;
     int64_t i_size = stream_Size( p_stream );
     if( i_size > 0 )
-        p_root->i_size = i_size;
+        p_vroot->i_size = i_size;
 
     /* could be a DASH stream for exemple, 0 means unknown or infinite size */
-    CreateUUID( &p_root->i_uuid, p_root->i_type );
+    CreateUUID( &p_vroot->i_uuid, p_vroot->i_type );
 
     /* First get the moov */
     const uint32_t stoplist[] = { ATOM_moov, ATOM_mdat, 0 };
-    i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, stoplist );
+    i_result = MP4_ReadBoxContainerChildren( p_stream, p_vroot, stoplist );
 
     /* mdat appeared first */
-    if( i_result && !MP4_BoxGet( p_root, "moov" ) )
+    if( i_result && !MP4_BoxGet( p_vroot, "moov" ) )
     {
         bool b_seekable;
         if( stream_Control( p_stream, STREAM_CAN_SEEK, &b_seekable ) != VLC_SUCCESS || !b_seekable )
@@ -4200,20 +4199,26 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
 
         /* continue loading up to moov */
         const uint32_t stoplist[] = { ATOM_moov, 0 };
-        i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, stoplist );
+        i_result = MP4_ReadBoxContainerChildren( p_stream, p_vroot, stoplist );
     }
 
     if( !i_result )
         goto error;
 
     /* If there is a mvex box, it means fragmented MP4, and we're done */
-    if( MP4_BoxCount( p_root, "moov/mvex" ) > 0 )
-        return p_root;
+    if( MP4_BoxCount( p_vroot, "moov/mvex" ) > 0 )
+    {
+        /* Read a bit more atoms as we might have an index between moov and moof */
+        const uint32_t stoplist[] = { ATOM_sidx, 0 };
+        const uint32_t excludelist[] = { ATOM_moof, ATOM_mdat, 0 };
+        MP4_ReadBoxContainerChildrenIndexed( p_stream, p_vroot, stoplist, excludelist, false );
+        return p_vroot;
+    }
 
     if( stream_Tell( p_stream ) + 8 < (uint64_t) stream_Size( p_stream ) )
     {
         /* Get the rest of the file */
-        i_result = MP4_ReadBoxContainerChildren( p_stream, p_root, NULL );
+        i_result = MP4_ReadBoxContainerChildren( p_stream, p_vroot, NULL );
 
         if( !i_result )
             goto error;
@@ -4224,10 +4229,10 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
 
     /* check if there is a cmov, if so replace
       compressed moov by  uncompressed one */
-    if( ( ( p_moov = MP4_BoxGet( p_root, "moov" ) ) &&
-          ( p_cmov = MP4_BoxGet( p_root, "moov/cmov" ) ) ) ||
-        ( ( p_moov = MP4_BoxGet( p_root, "foov" ) ) &&
-          ( p_cmov = MP4_BoxGet( p_root, "foov/cmov" ) ) ) )
+    if( ( ( p_moov = MP4_BoxGet( p_vroot, "moov" ) ) &&
+          ( p_cmov = MP4_BoxGet( p_vroot, "moov/cmov" ) ) ) ||
+        ( ( p_moov = MP4_BoxGet( p_vroot, "foov" ) ) &&
+          ( p_cmov = MP4_BoxGet( p_vroot, "foov/cmov" ) ) ) )
     {
         /* rename the compressed moov as a box to skip */
         p_moov->i_type = ATOM_skip;
@@ -4237,14 +4242,14 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
         p_cmov->data.p_cmov->p_moov = NULL;
 
         /* make p_root father of this new moov */
-        p_moov->p_father = p_root;
+        p_moov->p_father = p_vroot;
 
         /* insert this new moov box as first child of p_root */
-        p_moov->p_next = p_root->p_first;
-        p_root->p_first = p_moov;
+        p_moov->p_next = p_vroot->p_first;
+        p_vroot->p_first = p_moov;
     }
 
-    return p_root;
+    return p_vroot;
 
 error:
     MP4_BoxFree( p_vroot );
