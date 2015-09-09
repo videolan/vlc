@@ -93,13 +93,13 @@ else
 
     info "Signing frameworks"
     IDENTIFIER="com.binarymethod.BGHUDAppKit"
-    codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" VLC.app/Contents/Frameworks/BGHUDAppKit.framework/Versions/A
+    codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none VLC.app/Contents/Frameworks/BGHUDAppKit.framework/Versions/A
     IDENTIFIER="com.growl.growlframework"
-    codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" VLC.app/Contents/Frameworks/Growl.framework/Versions/A
+    codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none VLC.app/Contents/Frameworks/Growl.framework/Versions/A
     IDENTIFIER="org.andymatuschak.sparkle.Autoupdate"
-    codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app
+    codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app
     IDENTIFIER="org.andymatuschak.Sparkle"
-    codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A
+    codesign --force --verbose -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A
 
     info "Signing the framework headers"
     for i in `find VLC.app/Contents/Frameworks/* -type f -name "*.h" -exec echo {} \;`
@@ -107,7 +107,7 @@ else
         fbname=$(basename "$i")
         filename="${fbname%.*}"
 
-        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" $i
+        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" --timestamp=none $i
     done
 
     info "Signing the framework strings"
@@ -116,7 +116,7 @@ else
         fbname=$(basename "$i")
         filename="${fbname%.*}"
 
-        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" $i
+        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" --timestamp=none $i
     done
 
     info "Signing the framework plist files"
@@ -125,7 +125,7 @@ else
         fbname=$(basename "$i")
         filename="${fbname%.*}"
 
-        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" $i
+        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" --timestamp=none $i
     done
 
     info "Signing the framework nib files"
@@ -134,7 +134,7 @@ else
         fbname=$(basename "$i")
         filename="${fbname%.*}"
 
-        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" $i
+        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" --timestamp=none $i
     done
 
     info "Signing the headers"
@@ -143,7 +143,7 @@ else
         fbname=$(basename "$i")
         filename="${fbname%.*}"
 
-        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" $i
+        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" --timestamp=none $i
     done
 
     info "Signing the modules"
@@ -153,7 +153,7 @@ else
         fbname=$(basename "$i")
         filename="${fbname%.*}"
 
-        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" $i
+        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" --timestamp=none $i
     done
 
     info "Signing the libraries"
@@ -163,7 +163,7 @@ else
         fbname=$(basename "$i")
         filename="${fbname%.*}"
 
-        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" $i
+        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" --timestamp=none $i
     done
 
     info "Signing share"
@@ -173,12 +173,12 @@ else
         fbname=$(basename "$i")
         filename="${fbname%.*}"
 
-        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements,resource-rules --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" $i
+        codesign --force -s "$IDENTITY" --preserve-metadata=identifier,entitlements --requirements "$FIRSTPARTOF_REQUIREMENT$filename$SECONDPARTOF_REQUIREMENT" --timestamp=none $i
     done
 
     info "Signing the executable"
     IDENTIFIER="org.videolan.vlc"
-    codesign --force -s "$IDENTITY" --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" VLC.app/Contents/MacOS/VLC
+    codesign --force -s "$IDENTITY" --requirements "$FIRSTPARTOF_REQUIREMENT$IDENTIFIER$SECONDPARTOF_REQUIREMENT" --timestamp=none VLC.app/Contents/MacOS/VLC
 fi
 
 info "all items signed, validating..."
