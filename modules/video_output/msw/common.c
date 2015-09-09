@@ -452,7 +452,7 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
     /* fill in buffer info in first plane */
     picture->p->p_pixels = data;
     picture->p->i_pitch  = pitch;
-    picture->p->i_lines  = picture->format.i_visible_height;
+    picture->p->i_lines  = picture->format.i_height;
 
     /*  Fill chroma planes for biplanar YUV */
     if (picture->format.i_chroma == VLC_CODEC_NV12 ||
@@ -464,7 +464,7 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
 
             p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
             p->i_pitch  = pitch;
-            p->i_lines  = picture->format.i_visible_height;
+            p->i_lines  = picture->format.i_height;
         }
         /* The dx/d3d buffer is always allocated as NV12 */
         if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_NV12)) {
@@ -484,7 +484,7 @@ int CommonUpdatePicture(picture_t *picture, picture_t **fallback,
 
             p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
             p->i_pitch  = pitch / 2;
-            p->i_lines  = picture->format.i_visible_height / 2;
+            p->i_lines  = picture->format.i_height / 2;
         }
         /* The dx/d3d buffer is always allocated as YV12 */
         if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_YV12)) {

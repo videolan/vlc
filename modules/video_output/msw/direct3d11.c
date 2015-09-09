@@ -1488,8 +1488,8 @@ static int AllocQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
 
     D3D11_TEXTURE2D_DESC texDesc;
     memset(&texDesc, 0, sizeof(texDesc));
-    texDesc.Width = fmt->i_visible_width;
-    texDesc.Height = fmt->i_visible_height;
+    texDesc.Width = fmt->i_width;
+    texDesc.Height = fmt->i_height;
     texDesc.MipLevels = texDesc.ArraySize = 1;
     texDesc.Format = cfg->textureFormat;
     texDesc.SampleDesc.Count = 1;
