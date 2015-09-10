@@ -578,7 +578,6 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "drawable-hwnd", VLC_VAR_INTEGER);
 #endif
 #ifdef __APPLE__
-    var_Create (mp, "drawable-agl", VLC_VAR_INTEGER);
     var_Create (mp, "drawable-nsobject", VLC_VAR_ADDRESS);
 #endif
 #ifdef __ANDROID__
