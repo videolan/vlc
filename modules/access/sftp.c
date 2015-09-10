@@ -52,8 +52,6 @@ static void Close( vlc_object_t* );
 
 #define PORT_TEXT N_("SFTP port")
 #define PORT_LONGTEXT N_("SFTP port number to use on the server")
-#define MTU_TEXT N_("Read size")
-#define MTU_LONGTEXT N_("Size of the request for reading access")
 #define USER_TEXT N_("Username")
 #define USER_LONGTEXT N_("Username that will be used for the connection, " \
         "if no username is set in the URL.")
@@ -67,7 +65,6 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "sftp-readsize", 8192, MTU_TEXT, MTU_LONGTEXT, true )
     add_integer( "sftp-port", 22, PORT_TEXT, PORT_LONGTEXT, true )
     add_string( "sftp-user", NULL, USER_TEXT, USER_LONGTEXT, false )
     add_password( "sftp-pwd", NULL, PASS_TEXT, PASS_LONGTEXT, false )
@@ -93,7 +90,6 @@ struct access_sys_t
     LIBSSH2_SFTP* sftp_session;
     LIBSSH2_SFTP_HANDLE* file;
     uint64_t filesize;
-    size_t i_read_size;
 
     /* browser */
     char* psz_username_opt;
@@ -313,8 +309,6 @@ static int Open( vlc_object_t* p_this )
         msg_Err( p_access, "Unable to open the remote path %s", psz_path );
         goto error;
     }
-
-    p_sys->i_read_size = var_InheritInteger( p_access, "sftp-readsize" );
 
     free( psz_password );
     free( psz_username );
