@@ -114,7 +114,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     }
 
     /* Add missing default style, if any, to all segments */
-    for ( text_segment_t* p_segment = sys->p_segments; p_segment; p_segment = p_segment->p_next )
+    for ( text_segment_t* p_segment = r->p_text; p_segment; p_segment = p_segment->p_next )
     {
         /* Add decoder defaults */
         if( p_segment->style )
