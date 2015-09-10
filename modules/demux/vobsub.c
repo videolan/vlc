@@ -39,6 +39,7 @@
 #include "mpeg/pes.h"
 #include "mpeg/ps.h"
 #include "vobsub.h"
+#include "subtitle_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -122,17 +123,14 @@ static int Open ( vlc_object_t *p_this )
     demux_sys_t *p_sys;
     char *psz_vobname, *s;
     int i_len;
+    uint64_t i_read_offset = 0;
 
-    if( ( s = stream_ReadLine( p_demux->s ) ) != NULL )
+    if( ( s = peek_Readline( p_demux->s, &i_read_offset ) ) != NULL )
     {
         if( !strcasestr( s, "# VobSub index file" ) )
         {
             msg_Dbg( p_demux, "this doesn't seem to be a vobsub file" );
             free( s );
-            if( stream_Seek( p_demux->s, 0 ) )
-            {
-                msg_Warn( p_demux, "failed to rewind" );
-            }
             return VLC_EGENERIC;
         }
         free( s );

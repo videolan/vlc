@@ -56,7 +56,7 @@ demux_LTLIBRARIES += libaiff_plugin.la
 libmjpeg_plugin_la_SOURCES = demux/mjpeg.c demux/mxpeg_helper.h
 demux_LTLIBRARIES += libmjpeg_plugin.la
 
-libsubtitle_plugin_la_SOURCES = demux/subtitle.c
+libsubtitle_plugin_la_SOURCES = demux/subtitle.c demux/subtitle_helper.h
 libsubtitle_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libsubtitle_plugin.la
 
@@ -64,7 +64,8 @@ libty_plugin_la_SOURCES = demux/ty.c codec/cc.h
 demux_LTLIBRARIES += libty_plugin.la
 
 libvobsub_plugin_la_SOURCES = demux/vobsub.c demux/vobsub.h \
-                              demux/mpeg/ps.h demux/mpeg/pes.h
+                              demux/mpeg/ps.h demux/mpeg/pes.h \
+                              demux/subtitle_helper.h
 demux_LTLIBRARIES += libvobsub_plugin.la
 
 libvoc_plugin_la_SOURCES = demux/voc.c

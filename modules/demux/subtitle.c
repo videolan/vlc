@@ -38,9 +38,12 @@
 
 #include <ctype.h>
 #include <math.h>
+#include <assert.h>
 
 #include <vlc_demux.h>
 #include <vlc_charset.h>
+
+#include "subtitle_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -299,6 +302,11 @@ static int Open ( vlc_object_t *p_this )
     }
     free( psz_type );
 
+#ifndef NDEBUG
+    const uint64_t i_start_pos = stream_Tell( p_demux->s );
+#endif
+    uint64_t i_read_offset = 0;
+
     /* Detect Unicode while skipping the UTF-8 Byte Order Mark */
     bool unicode = false;
     const uint8_t *p_data;
@@ -306,7 +314,7 @@ static int Open ( vlc_object_t *p_this )
      && !memcmp( p_data, "\xEF\xBB\xBF", 3 ) )
     {
         unicode = true;
-        stream_Seek( p_demux->s, 3 ); /* skip BOM */
+        i_read_offset = 3; /* skip BOM */
         msg_Dbg( p_demux, "detected Unicode Byte Order Mark" );
     }
 
@@ -322,7 +330,7 @@ static int Open ( vlc_object_t *p_this )
             int i_dummy;
             char p_dummy;
 
-            if( ( s = stream_ReadLine( p_demux->s ) ) == NULL )
+            if( (s = peek_Readline( p_demux->s, &i_read_offset )) == NULL )
                 break;
 
             if( strcasestr( s, "<SAMI>" ) )
@@ -474,17 +482,15 @@ static int Open ( vlc_object_t *p_this )
         }
 
         free( s );
-
-        /* It will nearly always work even for non seekable stream thanks the
-         * caching system, and if it fails we lose just a few sub */
-        if( stream_Seek( p_demux->s, unicode ? 3 : 0 ) )
-            msg_Warn( p_demux, "failed to rewind" );
     }
 
     /* Quit on unknown subtitles */
     if( p_sys->i_type == SUB_TYPE_UNKNOWN )
     {
-        stream_Seek( p_demux->s, 0 );
+#ifndef NDEBUG
+        /* Ensure it will work with non seekable streams */
+        assert( i_start_pos == stream_Tell( p_demux->s ) );
+#endif
         msg_Warn( p_demux, "failed to recognize subtitle type" );
         free( p_sys );
         return VLC_EGENERIC;
@@ -502,6 +508,9 @@ static int Open ( vlc_object_t *p_this )
     }
 
     msg_Dbg( p_demux, "loading all subtitles..." );
+
+    if( unicode ) /* skip BOM */
+        stream_Seek( p_demux->s, 3 );
 
     /* Load the whole file */
     TextLoad( &p_sys->txt, p_demux->s );
