@@ -152,6 +152,8 @@ struct  demux_sys_t
     /* */
     vout_thread_t       *p_vout;
 
+    es_out_id_t         *p_dummy_video;
+
     /* TS stream */
     es_out_t            *p_out;
     vlc_array_t         es;
@@ -329,6 +331,68 @@ static void blurayReleaseVout(demux_t *p_demux)
         vlc_object_release(p_sys->p_vout);
         p_sys->p_vout = NULL;
     }
+}
+
+/*****************************************************************************
+ * BD-J background video
+ *****************************************************************************/
+
+static void startBackground(demux_t *p_demux)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if (p_sys->p_dummy_video) {
+        return;
+    }
+
+    msg_Info(p_demux, "Start background");
+
+    /* */
+    es_format_t fmt;
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_I420 );
+    video_format_Setup( &fmt.video, VLC_CODEC_I420,
+                        1920, 1080, 1920, 1080, 1, 1);
+    fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
+    fmt.i_id = 4115; /* 4113 = main video. 4114 = MVC. 4115 = unused. */
+    fmt.i_group = 1;
+
+    p_sys->p_dummy_video = es_out_Add(p_demux->out, &fmt);
+    es_format_Clean(&fmt);
+
+    if (!p_sys->p_dummy_video) {
+      msg_Err(p_demux, "Error adding background ES");
+      return;
+    }
+
+    block_t *p_block = block_Alloc(1920 * 1080 * 3 / 2);
+    if (!p_block) {
+        msg_Err(p_demux, "Error allocating block for background video");
+        return;
+    }
+
+    // XXX TODO: what would be correct timestamp ???
+    p_block->i_dts = p_block->i_pts = mdate() + CLOCK_FREQ/25;
+
+    uint8_t *p = p_block->p_buffer;
+    memset(p, 0, 1920 * 1080);
+    p += 1920*1080;
+    memset(p, 0x80, 1920 * 1080 / 4);
+
+    es_out_Send(p_demux->out, p_sys->p_dummy_video, p_block);
+}
+
+static void stopBackground(demux_t *p_demux)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if (!p_sys->p_dummy_video) {
+        return;
+    }
+
+    msg_Info(p_demux, "Stop background");
+
+    es_out_Del(p_demux->out, p_sys->p_dummy_video);
+    p_sys->p_dummy_video = NULL;
 }
 
 /*****************************************************************************
@@ -1734,6 +1798,22 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     }
 }
 
+static bool blurayIsBdjTitle(demux_t *p_demux)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    unsigned int i_title = p_demux->info.i_title;
+    const BLURAY_DISC_INFO *di = bd_get_disc_info(p_sys->bluray);
+
+    if (di && di->titles) {
+        if ((i_title <= di->num_titles && di->titles[i_title] && di->titles[i_title]->bdj) ||
+            (i_title == p_sys->i_title - 1 && di->first_play && di->first_play->bdj)) {
+          return true;
+        }
+    }
+
+    return false;
+}
+
 #define BD_TS_PACKET_SIZE (192)
 #define NB_TS_PACKETS (200)
 
@@ -1787,7 +1867,21 @@ static int blurayDemux(demux_t *p_demux)
                     vlc_object_release(p_vout);
                 }
             }
-            ;// also, should always release as soon as possible ? --> old one can be released ...
+
+            /* NOTE: we might want to enable background video always when there's no video stream playing.
+               Now, with some discs, there are perioids (even seconds) during which the video window
+               disappears and just playlist is shown.
+               (sometimes BD-J runs slowly ...)
+            */
+            if (!p_sys->p_vout && !p_sys->p_dummy_video && p_sys->b_menu &&
+                !p_sys->p_pl_info && nread == 0 &&
+                blurayIsBdjTitle(p_demux)) {
+
+                /* Looks like there's no video stream playing.
+                   Emit blank frame so that BD-J overlay can be drawn. */
+                startBackground(p_demux);
+            }
+
             if (p_sys->p_vout != NULL) {
                 var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
                 var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
@@ -1806,6 +1900,8 @@ static int blurayDemux(demux_t *p_demux)
     }
 
     p_block->i_buffer = nread;
+
+    stopBackground(p_demux);
 
     stream_DemuxSend(p_sys->p_parser, p_block);
 
