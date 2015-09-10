@@ -141,6 +141,7 @@ libVLC:
    This allows to attach media events between create and start.
  * Add libvlc_media_get_codec_description to get a human readable description of a codec
  * Add libvlc_MediaListEndReached Event to get notified when a media list reached the end
+ * Add libvlc_media_list_player_get_media_player to get the media player instance of a list player
  * Add libvlc_media_parse_with_options that uses a flag to specify parse options
  * Add libvlc_audio_output_device_get to get the currently selected audio output device
    identifier (if there is one available)

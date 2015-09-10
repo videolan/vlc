@@ -103,6 +103,16 @@ LIBVLC_API void
                                      libvlc_media_player_t * p_mi );
 
 /**
+ * Get media player of the media_list_player instance.
+ *
+ * \param p_mlp media list player instance
+ * \return media player instance
+ * \note the caller is responsible for releasing the returned instance
+ */
+LIBVLC_API libvlc_media_player_t *
+    libvlc_media_list_player_get_media_player(libvlc_media_list_player_t * p_mlp);
+
+/**
  * Set the media list associated with the player
  *
  * \param p_mlp media list player instance

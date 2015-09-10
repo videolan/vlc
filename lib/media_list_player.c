@@ -1,10 +1,12 @@
 /*****************************************************************************
  * media_list_player.c: libvlc new API media_list player functions
  *****************************************************************************
- * Copyright (C) 2007 VLC authors and VideoLAN
+ * Copyright (C) 2007-2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
+ *          Niles Bindel <zaggal69 # gmail.com>
+ *          Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -598,6 +600,15 @@ void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_ml
     unlock(p_mlp);
 
     libvlc_media_player_release(p_oldmi);
+}
+
+/**************************************************************************
+ *        get_media_player (Public)
+ **************************************************************************/
+libvlc_media_player_t * libvlc_media_list_player_get_media_player(libvlc_media_list_player_t * p_mlp)
+{
+    libvlc_media_player_retain(p_mlp->p_mi);
+    return p_mlp->p_mi;
 }
 
 /**************************************************************************
