@@ -472,7 +472,7 @@ static int StartVideoToolbox(decoder_t *p_dec, block_t *p_block)
         return VLC_EGENERIC;
     }
 
-    p_sys->b_zero_copy = var_InheritInteger(p_dec, "videotoolbox-zero-copy");
+    p_sys->b_zero_copy = var_InheritBool(p_dec, "videotoolbox-zero-copy");
 
     /* destination pixel buffer attributes */
     CFMutableDictionaryRef dpba = CFDictionaryCreateMutable(kCFAllocatorDefault,
