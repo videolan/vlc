@@ -207,15 +207,21 @@ text_segment_t *text_segment_Copy( text_segment_t *p_src )
     text_segment_t *p_dst = NULL, *p_dst0 = NULL;
 
     while( p_src ) {
-        text_segment_t *p_next = text_segment_New( p_src->psz_text );
-        if( p_next )
-            p_next->style = text_style_Duplicate( p_src->style );
-        p_src = p_src->p_next;
+        text_segment_t *p_new = text_segment_New( p_src->psz_text );
+        if( p_new )
+            p_new->style = text_style_Duplicate( p_src->style );
 
         if( p_dst == NULL )
-            p_dst = p_dst0 = p_next;
+        {
+            p_dst = p_dst0 = p_new;
+        }
         else
-            p_dst->p_next = p_next;
+        {
+            p_dst->p_next = p_new;
+            p_dst = p_dst->p_next;
+        }
+
+        p_src = p_src->p_next;
     }
 
     return p_dst0;
