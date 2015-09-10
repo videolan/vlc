@@ -1,7 +1,7 @@
 /*****************************************************************************
  * audiounit_ios.c: AudioUnit output plugin for iOS
  *****************************************************************************
- * Copyright (C) 2012 - 2013 VLC authors and VideoLAN
+ * Copyright (C) 2012 - 2015 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -37,6 +37,8 @@
 #import <mach/mach_time.h>
 
 #import "TPCircularBuffer.h"
+
+#import <TargetConditionals.h>
 
 #pragma mark -
 #pragma mark private declarations
@@ -255,6 +257,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     /* setup circular buffer */
     TPCircularBufferInit(&p_sys->circular_buffer, AUDIO_BUFFER_SIZE_IN_SECONDS * fmt->i_rate * fmt->i_bytes_per_frame);
 
+#if !TARGET_OS_TV
     /* start audio session so playback continues if mute switch is on */
     AudioSessionInitialize (NULL,
                             kCFRunLoopCommonModes,
@@ -265,6 +268,7 @@ static int StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
     AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
     AudioSessionSetActive(true);
+#endif
 
     /* AU init */
     status = AudioUnitInitialize(p_sys->au_unit);
@@ -285,7 +289,9 @@ static void Stop(audio_output_t *p_aout)
     struct aout_sys_t   *p_sys = p_aout->sys;
     OSStatus status;
 
+#if !TARGET_OS_TV
     AudioSessionSetActive(false);
+#endif
 
     if (p_sys->au_unit) {
         status = AudioOutputUnitStop(p_sys->au_unit);
@@ -342,11 +348,15 @@ static void Pause (audio_output_t *p_aout, bool pause, mtime_t date)
      * show a playing state despite we are paused, same for lock screen */
     if (pause) {
         AudioOutputUnitStop(p_sys->au_unit);
+#if !TARGET_OS_TV
         AudioSessionSetActive(false);
+#endif
     } else {
+#if !TARGET_OS_TV
         UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
         AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(sessionCategory),&sessionCategory);
         AudioSessionSetActive(true);
+#endif
         AudioOutputUnitStart(p_sys->au_unit);
     }
 }
