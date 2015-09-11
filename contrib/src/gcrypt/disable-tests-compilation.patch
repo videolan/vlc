@@ -1,0 +1,14 @@
+diff -ru libgcrypt-fixed/Makefile.am libgcrypt/Makefile.am
+--- libgcrypt-fixed/Makefile.am	2015-09-11 16:39:35.000000000 +0200
++++ libgcrypt/Makefile.am	2015-09-11 16:39:58.000000000 +0200
+@@ -25,8 +25,8 @@
+ # (A suitable gitlog-to-changelog script can be found in GnuPG master.)
+ GITLOG_TO_CHANGELOG=gitlog-to-changelog
+ 
+-DIST_SUBDIRS = m4 compat mpi cipher random src tests
+-SUBDIRS =         compat mpi cipher random src tests
++DIST_SUBDIRS = m4 compat mpi cipher random src
++SUBDIRS =         compat mpi cipher random src
+ 
+ EXTRA_DIST = autogen.sh autogen.rc README.GIT LICENSES      	           \
+              ChangeLog-2011 build-aux/ChangeLog-2011 \
