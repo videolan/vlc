@@ -32,6 +32,7 @@
 #include "../adaptative/playlist/SegmentBase.h"
 #include "../adaptative/playlist/SegmentList.h"
 #include "../adaptative/playlist/SegmentTimeline.h"
+#include "../adaptative/playlist/SegmentInformation.hpp"
 #include "MPD.h"
 #include "Representation.h"
 #include "Period.h"
@@ -298,7 +299,16 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
             }
         }
 
-        parseSegmentInformation(repNode, currentRepresentation);
+        size_t i_total = parseSegmentInformation(repNode, currentRepresentation);
+        /* Empty Representation with just baseurl (ex: subtitles) */
+        if(i_total == 0 &&
+           (currentRepresentation->baseUrl.Get() && !currentRepresentation->baseUrl.Get()->empty()) &&
+            adaptationSet->getSegment(SegmentInformation::INFOTYPE_MEDIA, 0) == NULL)
+        {
+            SegmentBase *base = new (std::nothrow) SegmentBase(currentRepresentation);
+            if(base)
+                currentRepresentation->setSegmentBase(base);
+        }
 
         adaptationSet->addRepresentation(currentRepresentation);
     }
