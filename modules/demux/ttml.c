@@ -32,6 +32,7 @@
 #include <vlc_strings.h>
 #include <vlc_memory.h>
 #include <vlc_es_out.h>
+#include <vlc_fixups.h>
 
 static int Open( vlc_object_t* p_this );
 static void Close( demux_t* p_demux );
@@ -451,12 +452,18 @@ static int Open( vlc_object_t* p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
+
+    uint8_t *p_peek;
+    ssize_t i_peek = stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 128 );
+    if( i_peek < 32 || memcmp( p_peek, "<?xml", 5 ) ||
+        !strnstr( (const char *) p_peek, "<tt ", i_peek ) )
+        return VLC_EGENERIC;
+
     p_demux->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if ( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    uint8_t *p_peek;
-    ssize_t i_peek = stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 2048 );
+    i_peek = stream_Peek( p_demux->s, (const uint8_t **) &p_peek, 2048 );
 
     if( unlikely( i_peek <= 0 ) )
     {
