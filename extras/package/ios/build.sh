@@ -9,6 +9,10 @@ SDK_MIN=7.0
 SIXTYFOURBIT_SDK_MIN=7.0
 ARCH=armv7
 SCARY=yes
+TVOS=no
+OSSTYLE=iPhone
+OSVERSIONMINCFLAG=miphoneos-version-min
+OSVERSIONMINLDFLAG=ios_version_min
 
 CORE_COUNT=`sysctl -n machdep.cpu.core_count`
 let MAKE_JOBS=$CORE_COUNT+1
@@ -24,6 +28,7 @@ OPTIONS
    -a <arch>     Specify which arch to use (current: ${ARCH})
    -d            Enable debug
    -v            Enable verbose command-line output
+   -t            Build for tvOS
    -w            Build a limited stack of non-scary libraries only
 EOF
 }
@@ -45,7 +50,7 @@ info()
     echo "[${blue}info${normal}] $1"
 }
 
-while getopts "hvwdsk:a:" OPTION
+while getopts "hvwdstk:a:" OPTION
 do
      case $OPTION in
          h)
@@ -69,6 +74,13 @@ do
              ;;
          a)
              ARCH=$OPTARG
+             ;;
+         t)
+             TVOS=yes
+             SDK_VERSION=`xcrun --sdk appletvos --show-sdk-version`
+             OSVERSIONMINCFLAG=mtvos-version-min
+             OSVERSIONMINLDFLAG=tvos_version_min
+             SIXTYFOURBIT_SDK_MIN=9.0
              ;;
          ?)
              usage
@@ -106,6 +118,12 @@ else
     OPTIM="-O3 -g"
 fi
 
+if [ "$TVOS" = "yes" ]; then
+	OSSTYLE=AppleTV
+	export BUILDFORTVOS="yes"
+fi
+export BUILDFORIOS="yes"
+
 info "Using ${ARCH} with SDK version ${SDK_VERSION}"
 
 THIS_SCRIPT_PATH=`pwd`/$0
@@ -116,8 +134,8 @@ spopd
 
 if test -z "$SDKROOT"
 then
-    SDKROOT=`xcode-select -print-path`/Platforms/iPhone${PLATFORM}.platform/Developer/SDKs/iPhone${PLATFORM}${SDK_VERSION}.sdk
-    echo "SDKROOT not specified, assuming $SDKROOT"
+	SDKROOT=`xcode-select -print-path`/Platforms/${OSSTYLE}${PLATFORM}.platform/Developer/SDKs/${OSSTYLE}${PLATFORM}${SDK_VERSION}.sdk
+	echo "SDKROOT not specified, assuming $SDKROOT"
 fi
 
 if [ ! -d "${SDKROOT}" ]
@@ -126,9 +144,8 @@ then
     exit 1
 fi
 
-BUILDDIR="${VLCROOT}/build-ios-${PLATFORM}/${ACTUAL_ARCH}"
-
-PREFIX="${VLCROOT}/install-ios-${PLATFORM}/${ACTUAL_ARCH}"
+BUILDDIR="${VLCROOT}/build-ios-${OSSTYLE}${PLATFORM}/${ACTUAL_ARCH}"
+PREFIX="${VLCROOT}/install-ios-${OSSTYLE}${PLATFORM}/${ACTUAL_ARCH}"
 
 export PATH="${VLCROOT}/extras/tools/build/bin:${VLCROOT}/contrib/${TARGET}/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin"
 
@@ -138,7 +155,7 @@ spushd "${VLCROOT}/extras/tools"
 make && make .gas
 spopd
 
-info "Building contrib for iOS in '${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}'"
+info "Building contrib for iOS in '${VLCROOT}/contrib/${OSSTYLE}${PLATFORM}-${ARCH}'"
 
 # The contrib will read the following
 export AR="xcrun ar"
@@ -152,17 +169,18 @@ export STRIP="xcrun strip"
 
 export PLATFORM=$PLATFORM
 export SDK_VERSION=$SDK_VERSION
+export VLCSDKROOT=$SDKROOT
 
 export CFLAGS="-isysroot ${SDKROOT} -arch ${ACTUAL_ARCH} ${OPTIM}"
 
 if [ "$PLATFORM" = "OS" ]; then
 if [ "$ARCH" != "aarch64" ]; then
-export CFLAGS="${CFLAGS} -mcpu=cortex-a8 -miphoneos-version-min=${SDK_MIN}"
+export CFLAGS="${CFLAGS} -mcpu=cortex-a8 -${OSVERSIONMINCFLAG}=${SDK_MIN}"
 else
-export CFLAGS="${CFLAGS} -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
+export CFLAGS="${CFLAGS} -${OSVERSIONMINCFLAG}=${SIXTYFOURBIT_SDK_MIN}"
 fi
 else
-export CFLAGS="${CFLAGS} -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
+export CFLAGS="${CFLAGS} -${OSVERSIONMINCFLAG}=${SIXTYFOURBIT_SDK_MIN}"
 fi
 
 export CXXFLAGS="${CFLAGS}"
@@ -171,33 +189,31 @@ export CPPFLAGS="${CFLAGS}"
 export CPP="xcrun cc -E"
 export CXXCPP="xcrun c++ -E"
 
-export BUILDFORIOS="yes"
-
 if [ "$PLATFORM" = "Simulator" ]; then
     # Use the new ABI on simulator, else we can't build
     export OBJCFLAGS="-fobjc-abi-version=2 -fobjc-legacy-dispatch ${OBJCFLAGS}"
 fi
 
-export LDFLAGS="-L${SDKROOT}/usr/lib -arch ${ACTUAL_ARCH} -isysroot ${SDKROOT}"
+export LDFLAGS="-isysroot ${SDKROOT} -L${SDKROOT}/usr/lib -arch ${ACTUAL_ARCH}"
 
 if [ "$PLATFORM" = "OS" ]; then
     EXTRA_CFLAGS="-arch ${ACTUAL_ARCH}"
     EXTRA_LDFLAGS="-arch ${ACTUAL_ARCH}"
 if [ "$ARCH" != "aarch64" ]; then
     EXTRA_CFLAGS+=" -mcpu=cortex-a8"
-    EXTRA_CFLAGS+=" -miphoneos-version-min=${SDK_MIN}"
-    EXTRA_LDFLAGS+=" -Wl,-ios_version_min,${SDK_MIN}"
-    export LDFLAGS="${LDFLAGS} -Wl,-ios_version_min,${SDK_MIN}"
+    EXTRA_CFLAGS+=" -${OSVERSIONMINCFLAG}=${SDK_MIN}"
+    EXTRA_LDFLAGS+=" -Wl,-${OSVERSIONMINLDFLAG},${SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -Wl,-${OSVERSIONMINLDFLAG},${SDK_MIN}"
 else
-    EXTRA_CFLAGS+=" -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
-    EXTRA_LDFLAGS+=" -Wl,-ios_version_min,${SIXTYFOURBIT_SDK_MIN}"
-    export LDFLAGS="${LDFLAGS} -Wl,-ios_version_min,${SIXTYFOURBIT_SDK_MIN}"
+    EXTRA_CFLAGS+=" -${OSVERSIONMINCFLAG}=${SIXTYFOURBIT_SDK_MIN}"
+    EXTRA_LDFLAGS+=" -Wl,-${OSVERSIONMINLDFLAG},${SIXTYFOURBIT_SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -Wl,-${OSVERSIONMINLDFLAG},${SIXTYFOURBIT_SDK_MIN}"
 fi
 else
     EXTRA_CFLAGS="-arch ${ARCH}"
-    EXTRA_CFLAGS+=" -miphoneos-version-min=${SIXTYFOURBIT_SDK_MIN}"
-    EXTRA_LDFLAGS=" -Wl,-ios_version_min,${SIXTYFOURBIT_SDK_MIN}"
-    export LDFLAGS="${LDFLAGS} -Wl-ios_version_min,${SIXTYFOURBIT_SDK_MIN}"
+    EXTRA_CFLAGS+=" -${OSVERSIONMINCFLAG}=${SIXTYFOURBIT_SDK_MIN}"
+    EXTRA_LDFLAGS=" -Wl,-${OSVERSIONMINLDFLAG},${SIXTYFOURBIT_SDK_MIN}"
+    export LDFLAGS="${LDFLAGS} -v -Wl,-${OSVERSIONMINLDFLAG},${SIXTYFOURBIT_SDK_MIN}"
 fi
 
 
@@ -206,8 +222,8 @@ info "LD FLAGS SELECTED = '${LDFLAGS}'"
 spushd ${VLCROOT}/contrib
 
 echo ${VLCROOT}
-mkdir -p "${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}"
-cd "${VLCROOT}/contrib/iPhone${PLATFORM}-${ARCH}"
+mkdir -p "${VLCROOT}/contrib/${OSSTYLE}${PLATFORM}-${ARCH}"
+cd "${VLCROOT}/contrib/${OSSTYLE}${PLATFORM}-${ARCH}"
 
 if [ "$PLATFORM" = "OS" ]; then
     export AS="gas-preprocessor.pl ${CC}"
@@ -220,7 +236,13 @@ else
     export ASCPP="xcrun as"
 fi
 
-../bootstrap --build=x86_64-apple-darwin11 --host=${TARGET} --prefix=${VLCROOT}/contrib/${TARGET}-${ARCH} --disable-gpl \
+if [ "$TVOS" = "yes" ]; then
+	TVOSOPTIONS="--disable-libarchive --disable-gcrypt --disable-ssh2 --disable-gnutls"
+else
+	TVOSOPTIONS=""
+fi
+
+../bootstrap --build=x86_64-apple-darwin11 --host=${TARGET} --prefix=${VLCROOT}/contrib/${OSSTYLE}-${TARGET}-${ARCH} --disable-gpl \
     --disable-disc --disable-sout \
     --disable-sdl \
     --disable-SDL_image \
@@ -255,12 +277,14 @@ fi
     --disable-aribb25 \
     --enable-vpx \
     --enable-libdsm \
+    ${TVOSOPTIONS} \
     --enable-taglib > ${out}
 
 echo "EXTRA_CFLAGS += ${EXTRA_CFLAGS}" >> config.mak
 echo "EXTRA_LDFLAGS += ${EXTRA_LDFLAGS}" >> config.mak
-make fetch
-make -j$MAKE_JOBS > ${out}
+# make fetch
+make V=1
+# make -j$MAKE_JOBS > ${out}
 spopd
 
 info "Bootstraping vlc"
@@ -303,7 +327,7 @@ if [ "${VLCROOT}/configure" -nt config.log -o \
 ${VLCROOT}/configure \
     --prefix="${PREFIX}" \
     --host="${TARGET}" \
-    --with-contrib="${VLCROOT}/contrib/${TARGET}-${ARCH}" \
+    --with-contrib="${VLCROOT}/contrib/${OSSTYLE}-${TARGET}-${ARCH}" \
     --enable-static \
     ${DEBUGFLAG} \
     ${SCARYFLAG} \
