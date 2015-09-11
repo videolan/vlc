@@ -67,8 +67,7 @@ void IsoffMainParser::setMPDBaseUrl(Node *root)
     for(size_t i = 0; i < baseUrls.size(); i++)
         mpd->addBaseUrl(baseUrls.at(i)->getText());
 
-    if(baseUrls.empty())
-        mpd->addBaseUrl(Helper::getDirectoryPath(playlisturl).append("/"));
+    mpd->setPlaylistUrl( Helper::getDirectoryPath(playlisturl).append("/") );
 }
 
 MPD* IsoffMainParser::getMPD()

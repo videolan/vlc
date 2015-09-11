@@ -45,6 +45,7 @@ namespace adaptative
 
                 void    addPeriod               (BasePeriod *period);
                 void    addBaseUrl              (const std::string &);
+                void    setPlaylistUrl          (const std::string &);
 
                 virtual Url         getUrlSegment() const; /* impl */
                 vlc_object_t *      getVLCObject()  const;
@@ -70,6 +71,7 @@ namespace adaptative
                 stream_t                           *stream;
                 std::vector<BasePeriod *>           periods;
                 std::vector<std::string>            baseUrls;
+                std::string                         playlistUrl;
                 std::string                         type;
         };
     }

@@ -60,6 +60,12 @@ void AbstractPlaylist::addBaseUrl(const std::string &url)
 {
     baseUrls.push_back(url);
 }
+
+void AbstractPlaylist::setPlaylistUrl(const std::string &url)
+{
+    playlistUrl = url;
+}
+
 void AbstractPlaylist::addPeriod(BasePeriod *period)
 {
     periods.push_back(period);
@@ -72,14 +78,15 @@ void AbstractPlaylist::setType(const std::string &type_)
 
 Url AbstractPlaylist::getUrlSegment() const
 {
+    Url ret;
+
     if (!baseUrls.empty())
-        return Url(baseUrls.front());
-    else
-    {
-        std::stringstream ss;
-        ss << Helper::getDirectoryPath(stream->psz_url) << "/";
-        return Url(ss.str());
-    }
+        ret = Url(baseUrls.front());
+
+    if( !ret.hasScheme() && !playlistUrl.empty() )
+        ret.prepend( Url(playlistUrl) );
+
+    return ret;
 }
 
 vlc_object_t * AbstractPlaylist::getVLCObject() const

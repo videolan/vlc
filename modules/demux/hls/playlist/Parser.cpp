@@ -319,11 +319,7 @@ M3U8 * Parser::parse(const std::string &playlisturl)
         return NULL;
 
     if(!playlisturl.empty())
-    {
-        size_t pos = playlisturl.find_last_of('/');
-        if(pos != std::string::npos)
-            playlist->addBaseUrl(playlisturl.substr(0, pos + 1));
-    }
+        playlist->setPlaylistUrl( Helper::getDirectoryPath(playlisturl).append("/") );
 
     BasePeriod *period = new (std::nothrow) BasePeriod( playlist );
     if(!period)
