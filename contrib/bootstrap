@@ -158,20 +158,25 @@ add_make_enabled()
 
 check_ios_sdk()
 {
-   if test -z "$SDKROOT"
-   then
-      SDKROOT=`xcode-select -print-path`/Platforms/iPhone${PLATFORM}.platform/Developer/SDKs/iPhone${PLATFORM}${SDK_VERSION}.sdk
-      echo "SDKROOT not specified, assuming $SDKROOT"
-   else
-      SDKROOT="$SDKROOT"
-      fi
+    if test "$VLCSDKROOT"
+    then
+	    SDKROOT="$VLCSDKROOT"
+    else
+		if test -z "$SDKROOT"
+		then
+		   SDKROOT=`xcode-select -print-path`/Platforms/iPhone${PLATFORM}.platform/Developer/SDKs/iPhone${PLATFORM}${SDK_VERSION}.sdk
+		   echo "SDKROOT not specified, assuming $SDKROOT"
+		else
+		   SDKROOT="$SDKROOT"
+		fi
+    fi
 
-   if [ ! -d "${SDKROOT}" ]
-   then
-      echo "*** ${SDKROOT} does not exist, please install required SDK, or set SDKROOT manually. ***"
-      exit 1
-   fi
-   add_make "IOS_SDK=${SDKROOT}"
+    if [ ! -d "${SDKROOT}" ]
+    then
+       echo "*** ${SDKROOT} does not exist, please install required SDK, or set SDKROOT manually. ***"
+       exit 1
+    fi
+    add_make "IOS_SDK=${SDKROOT}"
 }
 
 check_macosx_sdk()
@@ -262,6 +267,10 @@ case "${OS}" in
 				add_make_enabled "HAVE_NEON" "HAVE_ARMV7A"
 				;;
 			esac;
+		fi
+		if test "$BUILDFORTVOS"
+		then
+			add_make_enabled "HAVE_TVOS"
 		fi
 		;;
 	*bsd*)
