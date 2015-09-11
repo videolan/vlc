@@ -237,7 +237,7 @@ else
 fi
 
 if [ "$TVOS" = "yes" ]; then
-	TVOSOPTIONS="--disable-libarchive --disable-gcrypt --disable-ssh2 --disable-gnutls"
+	TVOSOPTIONS="--disable-libarchive"
 else
 	TVOSOPTIONS=""
 fi
