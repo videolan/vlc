@@ -267,8 +267,11 @@ static void Close(vlc_object_t *object)
     if (sys->cleanup)
         sys->cleanup(sys->opaque);
 
-    picture_pool_Enum(sys->pool, Unlock, sys);
-    picture_pool_Release(sys->pool);
+    if (sys->pool)
+    {
+        picture_pool_Enum(sys->pool, Unlock, sys);
+        picture_pool_Release(sys->pool);
+    }
     free(sys);
 }
 
