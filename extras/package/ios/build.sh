@@ -394,7 +394,7 @@ make install > ${out}
 
 find ${PREFIX}/lib/vlc/plugins -name *.a -type f -exec cp '{}' ${PREFIX}/lib/vlc/plugins \;
 rm -rf "${PREFIX}/contribs"
-cp -R "${VLCROOT}/contrib/${TARGET}-${ARCH}" "${PREFIX}/contribs"
+cp -R "${VLCROOT}/contrib/${OSSTYLE}-${TARGET}-${ARCH}" "${PREFIX}/contribs"
 
 info "Removing unneeded modules"
 blacklist="
