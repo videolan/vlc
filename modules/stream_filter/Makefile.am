@@ -11,7 +11,9 @@ stream_filter_LTLIBRARIES += libcache_block_plugin.la
 libdecomp_plugin_la_SOURCES = stream_filter/decomp.c
 libdecomp_plugin_la_LIBADD = $(LIBPTHREAD)
 if !HAVE_WIN32
+if !HAVE_TVOS
 stream_filter_LTLIBRARIES += libdecomp_plugin.la
+endif
 endif
 
 libprefetch_plugin_la_SOURCES = stream_filter/prefetch.c
