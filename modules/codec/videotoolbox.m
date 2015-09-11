@@ -1027,8 +1027,11 @@ skip:
                 }
                 return (NSComparisonResult)NSOrderedSame;
             }];
-            timeStamp = [p_sys->outputTimeStamps firstObject];
-            [p_sys->outputTimeStamps removeObjectAtIndex:0];
+            NSArray *timeStamps = p_sys->outputTimeStamps;
+            timeStamp = [timeStamps firstObject];
+            if (timeStamps.count>0) {
+                [timeStamps removeObjectAtIndex:0];
+            }
         }
 
         @synchronized(p_sys->outputFrames) {
