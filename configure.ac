@@ -100,6 +100,7 @@ dnl
 HAVE_WIN64="0"
 HAVE_IOS="0"
 HAVE_OSX="0"
+HAVE_TVOS="0"
 
 case "${host_os}" in
   "")
@@ -169,6 +170,16 @@ case "${host_os}" in
              #endif],
              [HAVE_IOS="1"],
              [HAVE_OSX="1"])
+
+    AC_EGREP_CPP(yes,
+            [#import <TargetConditionals.h>
+             #if TARGET_OS_TV
+             yes
+             #endif],
+             [HAVE_TVOS="1"
+             HAVE_IOS="0"
+             HAVE_OSX="0"
+             ],)
 
     dnl Allow binaries created on Lion to run on earlier releases
     AC_EGREP_CPP(yes,
@@ -289,8 +300,9 @@ AM_CONDITIONAL(HAVE_LINUX,   test "${SYS}" = "linux")
 AM_CONDITIONAL(HAVE_OS2,     test "${SYS}" = "os2")
 AM_CONDITIONAL(HAVE_WIN32,   test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WIN64,   test "${HAVE_WIN64}" = "1")
-AM_CONDITIONAL(HAVE_IOS,   test "${HAVE_IOS}" = "1")
-AM_CONDITIONAL(HAVE_OSX,   test "${HAVE_OSX}" = "1")
+AM_CONDITIONAL(HAVE_IOS,     test "${HAVE_IOS}" = "1")
+AM_CONDITIONAL(HAVE_OSX,     test "${HAVE_OSX}" = "1")
+AM_CONDITIONAL(HAVE_TVOS,    test "${HAVE_TVOS}" = "1")
 
 dnl
 dnl Sadly autoconf does not think about testing foo.exe when ask to test
