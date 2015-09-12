@@ -132,7 +132,7 @@ bool Stream::operator ==(const Stream &stream) const
 
 SegmentChunk * Stream::getChunk()
 {
-    if (currentChunk == NULL && output)
+    if (currentChunk == NULL && output && !eof)
     {
         if(esCount() && !isSelected())
         {
