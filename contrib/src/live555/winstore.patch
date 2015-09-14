@@ -1,0 +1,30 @@
+--- a/liveMedia/include/InputFile.hh      2015-06-24 16:32:45.000000000 +0200
++++ b/liveMedia/include/InputFile.hh   2015-08-04 10:12:13.791494000 +0200
+@@ -50,6 +50,7 @@
+
+ void CloseInputFile(FILE* fid);
+
++#undef GetFileSize
+ u_int64_t GetFileSize(char const* fileName, FILE* fid);
+     // 0 means zero-length, unbounded, or unknown
+
+
+--- a/BasicUsageEnvironment/BasicUsageEnvironment0.cpp    2015-06-24 16:32:45.000000000 +0200
++++ b/BasicUsageEnvironment/BasicUsageEnvironment0.cpp 2015-08-04 10:22:41.067003200 +0200
+@@ -68,6 +68,7 @@
+
+   if (err == 0) err = getErrno();
+ #if defined(__WIN32__) || defined(_WIN32) || defined(_WIN32_WCE)
++#ifndef _UNICODE
+   char errMsg[RESULT_MSG_BUFFER_MAX] = "\0";
+   if (0 != FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, errMsg, sizeof(errMsg)/sizeof(errMsg[0]), NULL)) {
+     // Remove all trailing '\r', '\n' and '.'
+@@ -77,6 +78,7 @@
+   } else
+     snprintf(errMsg, sizeof(errMsg)/sizeof(errMsg[0]), "error %d", err);
+   appendToResultMsg(errMsg);
++#endif
+ #else
+   appendToResultMsg(strerror(err));
+ #endif
+
