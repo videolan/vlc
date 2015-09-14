@@ -612,7 +612,16 @@ static void ZeroCopyDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *su
     layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
     layer.opaque = YES;
 
-    _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    /* a client app may have already created a rendering context,
+     * so re-use it if it is valid */
+    EAGLContext *existingContext = [EAGLContext currentContext];
+    if (existingContext) {
+        if ([existingContext API] == kEAGLRenderingAPIOpenGLES2)
+             _eaglContext = [EAGLContext currentContext];
+    }
+
+    if (!_eaglContext)
+        _eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     if (unlikely(!_eaglContext))
         return nil;
     if (unlikely(![EAGLContext setCurrentContext:_eaglContext]))
