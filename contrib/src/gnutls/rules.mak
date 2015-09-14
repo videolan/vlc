@@ -47,6 +47,8 @@ GNUTLS_CONF := \
 	--disable-guile \
 	--disable-nls \
 	--without-libintl-prefix \
+	--disable-doc \
+	--disable-tests \
 	$(HOSTCONF)
 
 DEPS_gnutls = nettle $(DEPS_nettle)
