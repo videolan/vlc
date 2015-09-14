@@ -80,6 +80,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
     {
         prevRepresentation = rep;
         init_sent = false;
+        index_sent = false;
         initializing = true;
     }
 
