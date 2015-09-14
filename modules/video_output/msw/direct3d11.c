@@ -460,7 +460,6 @@ static int Open(vlc_object_t *object)
     info.is_slow              = fmt.i_chroma != VLC_CODEC_D3D11_OPAQUE;
     info.has_double_click     = true;
     info.has_hide_mouse       = false;
-    info.has_pictures_invalid = true;
     info.has_event_thread     = true;
     info.has_pictures_invalid = fmt.i_chroma != VLC_CODEC_D3D11_OPAQUE;
 
