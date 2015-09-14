@@ -66,6 +66,7 @@ typedef struct
     ID3D11ShaderResourceView  *d3dresViewY;
     ID3D11ShaderResourceView  *d3dresViewUV;
     ID3D11PixelShader         *d3dpixelShader;
+    D3D11_VIEWPORT            cropViewport;
 } d3d_quad_t;
 #endif
 
