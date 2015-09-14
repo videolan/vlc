@@ -144,6 +144,10 @@ int strverscmp (const char *, const char *);
 size_t strnlen (const char *, size_t);
 #endif
 
+#ifndef HAVE_STRNSTR
+char * strnstr (const char *, const char *, size_t);
+#endif
+
 #ifndef HAVE_STRNDUP
 char *strndup (const char *, size_t);
 #endif
