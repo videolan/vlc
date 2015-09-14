@@ -534,15 +534,14 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-    unsigned surface_count;
-    for (surface_count = 0; surface_count < pool_size; surface_count++) {
+    for (picture_count = 0; picture_count < pool_size; picture_count++) {
         picture_sys_t *picsys = calloc(1, sizeof(*picsys));
         if (unlikely(picsys == NULL))
             goto error;
 
         hr = ID3D11Device_CreateTexture2D( vd->sys->d3ddevice, &texDesc, NULL, &picsys->texture );
         if (FAILED(hr)) {
-            msg_Err(vd, "CreateTexture2D %d failed. (hr=0x%0lx)", pool_size, hr);
+            msg_Err(vd, "CreateTexture2D %d failed on picture %d of the pool. (hr=0x%0lx)", pool_size, picture_count, hr);
             goto error;
         }
 
@@ -556,10 +555,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
         picture_t *picture = picture_NewFromResource(&vd->fmt, &resource);
         if (unlikely(picture == NULL)) {
             free(picsys);
+            msg_Err( vd, "Failed to create picture %d in the pool.", picture_count );
             goto error;
         }
 
-        pictures[surface_count] = picture;
+        pictures[picture_count] = picture;
         /* each picture_t holds a ref to the context and release it on Destroy */
         ID3D11DeviceContext_AddRef(picsys->context);
     }
@@ -578,6 +578,13 @@ error:
         for (unsigned i=0;i<picture_count; ++i)
             DestroyDisplayPoolPicture(pictures[i]);
         free(pictures);
+
+        /* create an empty pool to avoid crashing */
+        picture_pool_configuration_t pool_cfg;
+        memset( &pool_cfg, 0, sizeof( pool_cfg ) );
+        pool_cfg.picture_count = 0;
+
+        vd->sys->pool = picture_pool_NewExtended( &pool_cfg );
     }
 #endif
     return vd->sys->pool;
