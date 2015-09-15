@@ -57,6 +57,26 @@ bool Representation::isLive() const
     return b_live;
 }
 
+void Representation::setPlaylistUrl(const std::string &uri)
+{
+    playlistUrl = Url(uri);
+}
+
+Url Representation::getPlaylistUrl() const
+{
+    if(playlistUrl.hasScheme())
+    {
+        return playlistUrl;
+    }
+    else
+    {
+        Url ret = getParentUrlSegment();
+        if(!playlistUrl.empty())
+            ret.append(playlistUrl);
+        return ret;
+    }
+}
+
 void Representation::localMergeWithPlaylist(M3U8 *updated, mtime_t prunebarrier)
 {
     BasePeriod *period = updated->getFirstPeriod();

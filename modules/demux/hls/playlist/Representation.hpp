@@ -35,20 +35,22 @@ namespace hls
 
         class Representation : public BaseRepresentation
         {
-            friend class Parser;
+            friend class M3U8Parser;
 
             public:
                 Representation( BaseAdaptationSet * );
                 virtual ~Representation ();
                 virtual StreamFormat getStreamFormat() const; /* reimpl */
 
+                void setPlaylistUrl(const std::string &);
+                Url getPlaylistUrl() const;
                 void localMergeWithPlaylist(M3U8 *, mtime_t);
                 bool isLive() const;
                 virtual void mergeWith(SegmentInformation *, mtime_t); /* reimpl */
 
             private:
                 bool b_live;
-                Property<std::string> playlistUrl;
+                Url playlistUrl;
                 Property<std::string> audio;
                 Property<std::string> video;
                 Property<std::string> subtitles;

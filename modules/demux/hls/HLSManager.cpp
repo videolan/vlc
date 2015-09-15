@@ -154,8 +154,8 @@ bool HLSManager::updatePlaylist()
             return false;
         }
 
-        Parser parser(updatestream);
-        updatedplaylist = parser.parse(url);
+        M3U8Parser parser;
+        updatedplaylist = parser.parse(updatestream, url);
         if(!updatedplaylist)
         {
             stream_Delete(updatestream);

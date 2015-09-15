@@ -42,12 +42,11 @@ using namespace adaptative;
 using namespace adaptative::playlist;
 using namespace hls::playlist;
 
-Parser::Parser(stream_t *stream)
+M3U8Parser::M3U8Parser()
 {
-    p_stream = stream;
 }
 
-Parser::~Parser   ()
+M3U8Parser::~M3U8Parser   ()
 {
 }
 
@@ -71,52 +70,7 @@ static void releaseTagsList(std::list<Tag *> &list)
     list.clear();
 }
 
-void Parser::parseAdaptationSet(BasePeriod *period, const AttributesTag *)
-{
-    BaseAdaptationSet *adaptSet = new (std::nothrow) BaseAdaptationSet(period);
-    if(adaptSet)
-    {
-        period->addAdaptationSet(adaptSet);
-    }
-}
-
-void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag)
-{
-    if(!tag->getAttributeByName("URI"))
-        return;
-
-    Url url;
-    if(tag->getType() == AttributesTag::EXTXMEDIA)
-    {
-        url = Url(tag->getAttributeByName("URI")->quotedString());
-    }
-    else
-    {
-        url = Url(tag->getAttributeByName("URI")->value);
-    }
-
-    if(!url.hasScheme())
-        url = url.prepend(adaptSet->getUrlSegment());
-
-    void *p_data;
-    const size_t i_data = Retrieve::HTTP((vlc_object_t*)p_stream, url.toString(), &p_data);
-    if(p_data)
-    {
-        stream_t *substream = stream_MemoryNew((vlc_object_t *)p_stream, (uint8_t *)p_data, i_data, false);
-        if(substream)
-        {
-            std::list<Tag *> tagslist = parseEntries(substream);
-            stream_Delete(substream);
-
-            parseRepresentation(adaptSet, tag, tagslist);
-
-            releaseTagsList(tagslist);
-        }
-    }
-}
-
-void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag,
-                                 const std::list<Tag *> &tagslist)
+Representation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag)
 {
     const Attribute *uriAttr = tag->getAttributeByName("URI");
     const Attribute *bwAttr = tag->getAttributeByName("BANDWIDTH");
@@ -137,9 +91,14 @@ void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTa
             {
                 uri = uriAttr->value;
             }
-            size_t pos = uri.find_last_of('/');
-            if(pos != std::string::npos)
-                rep->baseUrl.Set(new Url(uri.substr(0, pos+1)));
+            rep->setID(uri);
+            rep->setPlaylistUrl(uri);
+            if(uri.find('/') != std::string::npos)
+            {
+                uri = Helper::getDirectoryPath(uri);
+                if(!uri.empty())
+                    rep->baseUrl.Set(new Url(uri.append("/")));
+            }
         }
 
         if(bwAttr)
@@ -172,14 +131,45 @@ void Parser::parseRepresentation(BaseAdaptationSet *adaptSet, const AttributesTa
                 rep->setHeight(res.second);
             }
         }
+    }
 
-        parseSegments(rep, tagslist);
+    return rep;
+}
 
+void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptationSet *adaptSet,
+                                             const AttributesTag *tag,
+                                             const std::list<Tag *> &tagslist)
+{
+    Representation *rep  = createRepresentation(adaptSet, tag);
+    if(rep)
+    {
+        parseSegments(p_obj, rep, tagslist);
         adaptSet->addRepresentation(rep);
     }
 }
 
-void Parser::parseSegments(Representation *rep, const std::list<Tag *> &tagslist)
+bool M3U8Parser::loadSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representation *rep)
+{
+    void *p_data;
+    const size_t i_data = Retrieve::HTTP(p_obj, rep->getPlaylistUrl().toString(), &p_data);
+    if(p_data)
+    {
+        stream_t *substream = stream_MemoryNew(p_obj, (uint8_t *)p_data, i_data, false);
+        if(substream)
+        {
+            std::list<Tag *> tagslist = parseEntries(substream);
+            stream_Delete(substream);
+
+            parseSegments(p_obj, rep, tagslist);
+
+            releaseTagsList(tagslist);
+            return true;
+        }
+    }
+    return false;
+}
+
+void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const std::list<Tag *> &tagslist)
 {
     SegmentList *segmentList = new (std::nothrow) SegmentList(rep);
     rep->setSegmentList(segmentList);
@@ -276,8 +266,7 @@ void Parser::parseSegments(Representation *rep, const std::list<Tag *> &tagslist
                     encryption.method = SegmentEncryption::AES_128;
                     encryption.key.clear();
                     uint8_t *p_data;
-                    const uint64_t read = Retrieve::HTTP(VLC_OBJECT(p_stream),
-                                                         keytag->getAttributeByName("URI")->quotedString(),
+                    const uint64_t read = Retrieve::HTTP(p_obj, keytag->getAttributeByName("URI")->quotedString(),
                                                          (void **) &p_data);
                     if(p_data)
                     {
@@ -321,7 +310,7 @@ void Parser::parseSegments(Representation *rep, const std::list<Tag *> &tagslist
     }
 }
 
-M3U8 * Parser::parse(const std::string &playlisturl)
+M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
 {
     char *psz_line = stream_ReadLine(p_stream);
     if(!psz_line || strcmp(psz_line, "#EXTM3U"))
@@ -375,7 +364,12 @@ M3U8 * Parser::parse(const std::string &playlisturl)
                     if(groupsmap.find(tag->getAttributeByName("URI")->value) == groupsmap.end())
                     {
                         /* not a group, belong to default adaptation set */
-                        parseRepresentation(adaptSet, tag);
+                        Representation *rep  = createRepresentation(adaptSet, tag);
+                        if(rep)
+                        {
+                            adaptSet->addRepresentation(rep);
+                            loadSegmentsFromPlaylistURI(VLC_OBJECT(p_stream), rep);
+                        }
                     }
                 }
             }
@@ -393,7 +387,12 @@ M3U8 * Parser::parse(const std::string &playlisturl)
             if(altAdaptSet)
             {
                 std::pair<std::string, AttributesTag *> pair = *groupsit;
-                parseRepresentation(altAdaptSet, pair.second);
+                Representation *rep  = createRepresentation(altAdaptSet, pair.second);
+                if(rep)
+                {
+                    altAdaptSet->addRepresentation(rep);
+                    loadSegmentsFromPlaylistURI(VLC_OBJECT(p_stream), rep);
+                }
 
                 if(pair.second->getAttributeByName("NAME"))
                    altAdaptSet->description.Set(pair.second->getAttributeByName("NAME")->quotedString());
@@ -416,14 +415,15 @@ M3U8 * Parser::parse(const std::string &playlisturl)
         }
 
     }
-    else
+    else /* Non master playlist (opened directly subplaylist or HLS v1) */
     {
         BaseAdaptationSet *adaptSet = new (std::nothrow) BaseAdaptationSet(period);
         if(adaptSet)
         {
             period->addAdaptationSet(adaptSet);
             AttributesTag *tag = new AttributesTag(AttributesTag::EXTXSTREAMINF, "");
-            parseRepresentation(adaptSet, tag, tagslist);
+            tag->addAttribute(new Attribute("URI", playlisturl));
+            createAndFillRepresentation(VLC_OBJECT(p_stream), adaptSet, tag, tagslist);
             delete tag;
         }
     }
@@ -436,7 +436,7 @@ M3U8 * Parser::parse(const std::string &playlisturl)
     return playlist;
 }
 
-std::list<Tag *> Parser::parseEntries(stream_t *stream)
+std::list<Tag *> M3U8Parser::parseEntries(stream_t *stream)
 {
     std::list<Tag *> entrieslist;
     Tag *lastTag = NULL;

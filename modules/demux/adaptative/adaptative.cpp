@@ -143,8 +143,8 @@ static int Open(vlc_object_t *p_obj)
     }
     else if(HLSManager::isHTTPLiveStreaming(p_demux->s))
     {
-        Parser parser(p_demux->s);
-        M3U8 *p_playlist = parser.parse(playlisturl);
+        M3U8Parser parser;
+        M3U8 *p_playlist = parser.parse(p_demux->s, playlisturl);
         if(!p_playlist)
         {
             msg_Err( p_demux, "Could not parse MPD" );

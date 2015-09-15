@@ -53,23 +53,21 @@ namespace hls
         class Tag;
         class Representation;
 
-        class Parser
+        class M3U8Parser
         {
             public:
-                Parser             (stream_t *p_stream);
-                virtual ~Parser    ();
+                M3U8Parser             ();
+                virtual ~M3U8Parser    ();
 
-                M3U8 *             parse  (const std::string &);
+                M3U8 *             parse  (stream_t *p_stream, const std::string &);
+                bool loadSegmentsFromPlaylistURI(vlc_object_t *, Representation *);
 
             private:
-                void parseAdaptationSet(BasePeriod *, const AttributesTag *);
-                void parseRepresentation(BaseAdaptationSet *, const AttributesTag *);
-                void parseRepresentation(BaseAdaptationSet *, const AttributesTag *,
-                                         const std::list<Tag *>&);
-                void parseSegments(Representation *, const std::list<Tag *>&);
+                Representation * createRepresentation(BaseAdaptationSet *, const AttributesTag *);
+                void createAndFillRepresentation(vlc_object_t *, BaseAdaptationSet *,
+                                                 const AttributesTag *, const std::list<Tag *>&);
+                void parseSegments(vlc_object_t *, Representation *, const std::list<Tag *>&);
                 std::list<Tag *> parseEntries(stream_t *);
-
-                stream_t        *p_stream;
         };
     }
 }
