@@ -34,7 +34,7 @@
 
 #include "SegmentTemplate.h"
 #include "BasePeriod.h"
-#include "ID.hpp"
+#include "Inheritables.hpp"
 
 using namespace adaptative;
 using namespace adaptative::playlist;

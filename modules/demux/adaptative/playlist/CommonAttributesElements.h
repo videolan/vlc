@@ -26,7 +26,6 @@
 
 #include <list>
 #include <string>
-#include "ID.hpp"
 
 namespace adaptative
 {
@@ -45,14 +44,12 @@ namespace adaptative
                 void                            setHeight( int height );
                 const std::list<std::string>&   getLang() const;
                 void                            addLang( const std::string &lang );
-                const ID &                      getID() const;
 
             protected:
                 std::string                         mimeType;
                 int                                 width;
                 int                                 height;
                 std::list<std::string>              lang;
-                ID                                  id;
         };
     }
 }

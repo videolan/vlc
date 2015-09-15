@@ -23,6 +23,7 @@
 #include "../tools/Properties.hpp"
 #include <string>
 #include <stdint.h>
+#include "ID.hpp"
 
 namespace adaptative
 {
@@ -50,19 +51,14 @@ namespace adaptative
                 TimescaleAble *parentTimescale;
         };
 
-        template<class T> class UniqueNess
+        class Unique
         {
             public:
-                UniqueNess(){}
-                ~UniqueNess() {}
-                void setId(const std::string &id_) {id = id_;}
-                const std::string & getId() const {return id;}
-                bool sameAs(const T &other) const
-                {
-                    return (!id.empty() && id == other.id);
-                }
-            private:
-                std::string id;
+                const ID & getID() const;
+                void       setID(const ID &);
+
+            protected:
+                ID id;
         };
     }
 }

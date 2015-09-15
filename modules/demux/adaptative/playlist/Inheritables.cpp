@@ -57,3 +57,12 @@ uint64_t TimescaleAble::inheritTimescale() const
         return 1;
 }
 
+const ID & Unique::getID() const
+{
+    return id;
+}
+
+void Unique::setID(const ID &id_)
+{
+    id = id_;
+}

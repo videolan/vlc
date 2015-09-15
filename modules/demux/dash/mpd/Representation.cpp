@@ -152,11 +152,7 @@ std::string Representation::contextualize(size_t index, const std::string &compo
 
     pos = ret.find("$RepresentationID$");
     if(pos != std::string::npos)
-    {
-        std::stringstream ss;
-        ss << getId();
-        ret.replace(pos, std::string("$RepresentationID$").length(), ss.str());
-    }
+        ret.replace(pos, std::string("$RepresentationID$").length(), id.str());
 
     return ret;
 }

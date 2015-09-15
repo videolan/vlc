@@ -41,8 +41,7 @@ namespace dash
         using namespace adaptative::playlist;
 
         class Representation : public BaseRepresentation,
-                               public DASHCommonAttributesElements,
-                               public UniqueNess<Representation>
+                               public DASHCommonAttributesElements
         {
             public:
                 Representation( AdaptationSet * );

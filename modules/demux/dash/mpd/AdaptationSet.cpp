@@ -66,17 +66,4 @@ void AdaptationSet::setSubsegmentAlignmentFlag(bool alignment)
     subsegmentAlignmentFlag = alignment;
 }
 
-const Representation *AdaptationSet::getRepresentationById(const std::string &id) const
-{
-    std::vector<BaseRepresentation*>::const_iterator it = representations.begin();
-    std::vector<BaseRepresentation*>::const_iterator end = representations.end();
 
-    while ( it != end )
-    {
-        Representation *rep = dynamic_cast<Representation *>(*it);
-        if ( rep->getId() == id )
-            return rep;
-        ++it;
-    }
-    return NULL;
-}

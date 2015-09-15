@@ -31,16 +31,13 @@ namespace adaptative
         class ID
         {
             public:
-                ID();
-                ID(int64_t);
-                virtual ~ID();
-                virtual bool operator==(const ID &) const;
-                virtual std::string str() const;
-                virtual int64_t toInt() const;
+                ID(const std::string &);
+                ID(uint64_t = 0);
+                bool operator==(const ID &) const;
+                std::string str() const;
 
-            protected:
-                int64_t id;
-                static int64_t nextid;
+            private:
+                std::string id;
         };
 
     }

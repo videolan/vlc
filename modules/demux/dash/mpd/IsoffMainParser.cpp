@@ -132,19 +132,18 @@ void IsoffMainParser::parsePeriods(Node *root)
 {
     std::vector<Node *> periods = DOMHelper::getElementByTagName(root, "Period", false);
     std::vector<Node *>::const_iterator it;
+    uint64_t nextid = 0;
 
     for(it = periods.begin(); it != periods.end(); ++it)
     {
         Period *period = new (std::nothrow) Period(mpd);
         if (!period)
             continue;
-        parseSegmentInformation(*it, period);
+        parseSegmentInformation(*it, period, &nextid);
         if((*it)->hasAttribute("start"))
             period->startTime.Set(IsoTime((*it)->getAttributeValue("start")) * CLOCK_FREQ);
         if((*it)->hasAttribute("duration"))
             period->duration.Set(IsoTime((*it)->getAttributeValue("duration")) * CLOCK_FREQ);
-        if((*it)->hasAttribute("id"))
-            period->setId((*it)->getAttributeValue("id"));
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(*it, "BaseURL");
         if(!baseUrls.empty())
             period->baseUrl.Set( new Url( baseUrls.front()->getText() ) );
@@ -194,7 +193,7 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
     return total;
 }
 
-size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *info)
+size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *info, uint64_t *nextid)
 {
     size_t total = 0;
     total += parseSegmentBase(DOMHelper::getFirstChildElementByName(node, "SegmentBase"), info);
@@ -213,6 +212,12 @@ size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *
     }
     if(node->hasAttribute("timescale"))
         info->timescale.Set(Integer<uint64_t>(node->getAttributeValue("timescale")));
+
+    if(node->hasAttribute("id"))
+        info->setID(node->getAttributeValue("id"));
+    else
+        info->setID(ID((*nextid)++));
+
     return total;
 }
 
@@ -220,6 +225,7 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
 {
     std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", false);
     std::vector<Node *>::const_iterator it;
+    uint64_t nextid = 0;
 
     for(it = adaptationSets.begin(); it != adaptationSets.end(); ++it)
     {
@@ -251,7 +257,7 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
                 adaptationSet->description.Set(role->getAttributeValue("value"));
         }
 
-        parseSegmentInformation( *it, adaptationSet );
+        parseSegmentInformation(*it, adaptationSet, &nextid);
 
         setRepresentations((*it), adaptationSet);
         period->addAdaptationSet(adaptationSet);
@@ -260,6 +266,7 @@ void    IsoffMainParser::setAdaptationSets  (Node *periodNode, Period *period)
 void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, AdaptationSet *adaptationSet)
 {
     std::vector<Node *> representations = DOMHelper::getElementByTagName(adaptationSetNode, "Representation", false);
+    uint64_t nextid = 0;
 
     for(size_t i = 0; i < representations.size(); i++)
     {
@@ -271,7 +278,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
             currentRepresentation->baseUrl.Set(new Url(baseUrls.front()->getText()));
 
         if(repNode->hasAttribute("id"))
-            currentRepresentation->setId(repNode->getAttributeValue("id"));
+            currentRepresentation->setID(ID(repNode->getAttributeValue("id")));
 
         if(repNode->hasAttribute("width"))
             currentRepresentation->setWidth(atoi(repNode->getAttributeValue("width").c_str()));
@@ -299,7 +306,7 @@ void    IsoffMainParser::setRepresentations (Node *adaptationSetNode, Adaptation
             }
         }
 
-        size_t i_total = parseSegmentInformation(repNode, currentRepresentation);
+        size_t i_total = parseSegmentInformation(repNode, currentRepresentation, &nextid);
         /* Empty Representation with just baseurl (ex: subtitles) */
         if(i_total == 0 &&
            (currentRepresentation->baseUrl.Get() && !currentRepresentation->baseUrl.Get()->empty()) &&

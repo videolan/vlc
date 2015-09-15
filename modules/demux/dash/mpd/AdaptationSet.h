@@ -51,7 +51,6 @@ namespace dash
                 virtual StreamFormat            getStreamFormat() const; /* reimpl */
                 bool                            getSubsegmentAlignmentFlag() const;
                 void                            setSubsegmentAlignmentFlag( bool alignment );
-                const Representation*           getRepresentationById   ( const std::string &id ) const;
 
             private:
                 bool                            subsegmentAlignmentFlag;

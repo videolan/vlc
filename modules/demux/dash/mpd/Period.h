@@ -35,8 +35,7 @@ namespace dash
         using namespace adaptative;
         using namespace adaptative::playlist;
 
-        class Period : public BasePeriod,
-                       public UniqueNess<Period>
+        class Period : public BasePeriod
         {
             public:
                 Period(MPD *);

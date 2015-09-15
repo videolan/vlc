@@ -44,7 +44,8 @@ namespace adaptative
         /* common segment elements for period/adaptset/rep 5.3.9.1,
          * with properties inheritance */
         class SegmentInformation : public ICanonicalUrl,
-                                   public TimescaleAble
+                                   public TimescaleAble,
+                                   public Unique
         {
             public:
                 SegmentInformation( SegmentInformation * = 0 );

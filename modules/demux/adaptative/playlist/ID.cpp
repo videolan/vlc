@@ -22,36 +22,25 @@
 
 using namespace adaptative::playlist;
 
-int64_t ID::nextid = 0;
-
-ID::ID()
+ID::ID(const std::string &id_)
 {
-    id = nextid++;
+    id = id_;
 }
 
-ID::ID(int64_t i_id)
+ID::ID(uint64_t id_)
 {
-    id = i_id;
-}
-
-ID::~ID()
-{
-
+    std::stringstream ss;
+    ss << "default_id#" << id_;
+    id = ss.str();
 }
 
 bool ID::operator==(const ID &other) const
 {
-    return id == other.id;
+    return (!id.empty() && id == other.id);
 }
 
 std::string ID::str() const
 {
-    std::stringstream ss;
-    ss << id;
-    return ss.str();
-}
-
-int64_t ID::toInt() const
-{
     return id;
 }
+
