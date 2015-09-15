@@ -84,6 +84,7 @@ namespace adaptative
                 void getDurationsRange(mtime_t *, mtime_t *) const;
                 virtual void mergeWith(SegmentInformation *, mtime_t);
                 virtual void pruneBySegmentNumber(uint64_t);
+                virtual void runLocalUpdates();
 
             protected:
                 std::size_t getAllSegments(std::vector<ISegment *> &) const;

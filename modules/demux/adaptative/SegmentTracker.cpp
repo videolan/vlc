@@ -84,6 +84,9 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
         initializing = true;
     }
 
+    /* Ensure content is loaded */
+    rep->runLocalUpdates();
+
     if(!init_sent)
     {
         init_sent = true;

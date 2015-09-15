@@ -308,6 +308,11 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
         childs.at(i)->pruneBySegmentNumber(num);
 }
 
+void SegmentInformation::runLocalUpdates()
+{
+
+}
+
 SegmentInformation::SwitchPolicy SegmentInformation::getSwitchPolicy() const
 {
     if(switchpolicy == SWITCH_UNKNOWN)
