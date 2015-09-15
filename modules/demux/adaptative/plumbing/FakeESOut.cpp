@@ -55,7 +55,7 @@ FakeESOut::~FakeESOut()
     recycleAll();
     gc();
 
-    free( fakeesout );
+    delete fakeesout;
 
     vlc_mutex_destroy( &lock );
 }
