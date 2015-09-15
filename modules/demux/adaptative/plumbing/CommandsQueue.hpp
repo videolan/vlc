@@ -48,7 +48,14 @@ namespace adaptative
             int type;
     };
 
-    class EsOutSendCommand : public AbstractCommand
+    class AbstractFakeEsCommand : public AbstractCommand
+    {
+        protected:
+            AbstractFakeEsCommand( int, FakeESOutID * );
+            FakeESOutID *p_fakeid;
+    };
+
+    class EsOutSendCommand : public AbstractFakeEsCommand
     {
         friend class CommandsFactory;
         public:
@@ -58,11 +65,10 @@ namespace adaptative
 
         protected:
             EsOutSendCommand( FakeESOutID *, block_t * );
-            FakeESOutID *p_fakeid;
             block_t *p_block;
     };
 
-    class EsOutDelCommand : public AbstractCommand
+    class EsOutDelCommand : public AbstractFakeEsCommand
     {
         friend class CommandsFactory;
         public:
@@ -70,10 +76,9 @@ namespace adaptative
 
         protected:
             EsOutDelCommand( FakeESOutID * );
-            FakeESOutID *p_fakeid;
     };
 
-    class EsOutAddCommand : public EsOutDelCommand
+    class EsOutAddCommand : public AbstractFakeEsCommand
     {
         friend class CommandsFactory;
         public:

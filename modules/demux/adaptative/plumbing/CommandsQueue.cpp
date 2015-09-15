@@ -53,10 +53,15 @@ int AbstractCommand::getType() const
     return type;
 }
 
-EsOutSendCommand::EsOutSendCommand( FakeESOutID *p_es, block_t *p_block_ ) :
-    AbstractCommand( ES_OUT_PRIVATE_COMMAND_SEND )
+AbstractFakeEsCommand::AbstractFakeEsCommand( int type, FakeESOutID *p_es ) :
+    AbstractCommand( type )
 {
     p_fakeid = p_es;
+}
+
+EsOutSendCommand::EsOutSendCommand( FakeESOutID *p_es, block_t *p_block_ ) :
+    AbstractFakeEsCommand( ES_OUT_PRIVATE_COMMAND_SEND, p_es )
+{
     p_block = p_block_;
 }
 
@@ -85,9 +90,8 @@ mtime_t EsOutSendCommand::getTime() const
 }
 
 EsOutDelCommand::EsOutDelCommand( FakeESOutID *p_es ) :
-    AbstractCommand( ES_OUT_PRIVATE_COMMAND_DEL )
+    AbstractFakeEsCommand( ES_OUT_PRIVATE_COMMAND_DEL, p_es )
 {
-    p_fakeid = p_es;
 }
 
 void EsOutDelCommand::Execute( es_out_t * )
@@ -96,11 +100,10 @@ void EsOutDelCommand::Execute( es_out_t * )
 }
 
 EsOutAddCommand::EsOutAddCommand( FakeESOutID *p_es, const es_format_t *p_fmt ) :
-    EsOutDelCommand( p_es )
+    AbstractFakeEsCommand( ES_OUT_PRIVATE_COMMAND_ADD, p_es )
 {
     es_format_Copy( &fmt, p_fmt );
     fmt.i_group = 0; /* Always ignore group for adaptative */
-    type = ES_OUT_PRIVATE_COMMAND_ADD;
 }
 
 EsOutAddCommand::~EsOutAddCommand()
