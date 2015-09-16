@@ -90,6 +90,7 @@ namespace adaptative
                 std::size_t getAllSegments(std::vector<ISegment *> &) const;
                 std::size_t getSegments(SegmentInfoType, std::vector<ISegment *>&, std::size_t * = NULL) const;
                 std::vector<SegmentInformation *> childs;
+                SegmentInformation * getChildByID( const ID & );
                 SegmentInformation *parent;
                 SwitchPolicy switchpolicy;
 

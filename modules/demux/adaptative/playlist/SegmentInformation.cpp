@@ -284,6 +284,17 @@ void SegmentInformation::getDurationsRange(mtime_t *min, mtime_t *max) const
         childs.at(i)->getDurationsRange(min, max);
 }
 
+SegmentInformation * SegmentInformation::getChildByID(const ID &id)
+{
+    std::vector<SegmentInformation *>::const_iterator it;
+    for(it=childs.begin(); it!=childs.end(); ++it)
+    {
+        if( (*it)->getID() == id )
+            return *it;
+    }
+    return NULL;
+}
+
 void SegmentInformation::mergeWith(SegmentInformation *updated, mtime_t prunetime)
 {
     /* Support Segment List for now */
@@ -293,10 +304,15 @@ void SegmentInformation::mergeWith(SegmentInformation *updated, mtime_t prunetim
     if(mediaSegmentTemplate && updated->mediaSegmentTemplate)
         mediaSegmentTemplate->mergeWith(updated->mediaSegmentTemplate, prunetime);
 
-    for(size_t i=0; i<childs.size() && i<updated->childs.size(); i++)
+    std::vector<SegmentInformation *>::const_iterator it;
+    for(it=childs.begin(); it!=childs.end(); ++it)
     {
-        childs.at(i)->mergeWith(updated->childs.at(i), prunetime);
+        SegmentInformation *child = *it;
+        SegmentInformation *updatedChild = updated->getChildByID(child->getID());
+        if(updatedChild)
+            child->mergeWith(updatedChild, prunetime);
     }
+    /* FIXME: handle difference */
 }
 
 void SegmentInformation::pruneBySegmentNumber(uint64_t num)
