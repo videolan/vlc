@@ -28,6 +28,8 @@
 #include <vlc_common.h>
 #include <vlc_text_style.h>
 
+#include <ctype.h>
+
 /* */
 text_style_t *text_style_New( void )
 {
@@ -227,3 +229,46 @@ text_segment_t *text_segment_Copy( text_segment_t *p_src )
     return p_dst0;
 }
 
+unsigned int vlc_html_color( const char *psz_value, bool* ok )
+{
+    unsigned int color = 0;
+    char* psz_end;
+
+    if ( ok != NULL )
+        *ok = false;
+
+    if( *psz_value == '#' )
+    {
+        color = strtol( psz_value + 1, &psz_end, 16 );
+        if ( ok != NULL && ( *psz_end == 0 || isspace( *psz_end ) ) )
+            *ok = true;
+    }
+    else
+    {
+        uint32_t i_value = strtol( psz_value, &psz_end, 16 );
+        if( *psz_end == 0 || isspace( *psz_end ) )
+        {
+            color = i_value;
+            // Assume RRGGBB has an alpha component of 0xFF
+            if ( psz_end - psz_value <= 6 )
+                color |= 0xFF000000;
+            if ( ok != NULL )
+                *ok = true;
+        }
+        else
+        {
+            for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
+            {
+                if( !strcasecmp( psz_value, p_html_colors[i].psz_name ) )
+                {
+                    // Assume opaque color since the table doesn't specify an alpha
+                    color = p_html_colors[i].i_value | 0xFF000000;
+                    if ( ok != NULL )
+                        *ok = true;
+                    break;
+                }
+            }
+        }
+    }
+    return color;
+}

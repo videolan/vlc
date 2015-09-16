@@ -543,6 +543,7 @@ vlc_getaddrinfo
 vlc_getnameinfo
 vlc_getProxyUrl
 vlc_gettext
+vlc_html_color
 vlc_ngettext
 vlc_iconv
 vlc_iconv_close
