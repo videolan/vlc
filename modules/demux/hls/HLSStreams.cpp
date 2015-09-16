@@ -32,10 +32,13 @@ AbstractStreamOutput *HLSStreamOutputFactory::create(demux_t *demux, const Strea
             return new HLSPackedStreamOutput(demux, format, "any");
             break;
 
-        default:
         case HLSStreamFormat::UNKNOWN:
         case HLSStreamFormat::MPEG2TS:
             return new BaseStreamOutput(demux, format, "ts");
+
+        case HLSStreamFormat::UNSUPPORTED:
+        default:
+            break;
     }
     return NULL;
 }

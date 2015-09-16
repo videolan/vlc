@@ -44,6 +44,8 @@ namespace hls
                         return StreamFormat(HLSStreamFormat::PACKEDAAC);
                     else if (tail == "mp2t")
                         return StreamFormat(HLSStreamFormat::MPEG2TS);
+                    else if (tail == "binary")
+                        return StreamFormat(HLSStreamFormat::UNSUPPORTED);
                 }
                 return StreamFormat();
             }

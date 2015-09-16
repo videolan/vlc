@@ -397,6 +397,13 @@ M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
                 if(pair.second->getAttributeByName("NAME"))
                    altAdaptSet->description.Set(pair.second->getAttributeByName("NAME")->quotedString());
 
+                /* Subtitles unsupported for now */
+                if(pair.second->getAttributeByName("TYPE")->value != "AUDIO" &&
+                   pair.second->getAttributeByName("TYPE")->value != "VIDEO")
+                {
+                    rep->setMimeType("application/binary");
+                }
+
                 if(pair.second->getAttributeByName("LANGUAGE"))
                 {
                     std::string lang = pair.second->getAttributeByName("LANGUAGE")->quotedString();
