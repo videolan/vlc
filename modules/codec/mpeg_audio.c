@@ -62,7 +62,6 @@ struct decoder_sys_t
      * Common properties
      */
     date_t          end_date;
-    unsigned int    i_current_layer;
 
     mtime_t i_pts;
 
