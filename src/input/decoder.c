@@ -187,6 +187,7 @@ static void UnloadDecoder( decoder_t *p_dec )
 
     es_format_Clean( &p_dec->fmt_in );
     es_format_Clean( &p_dec->fmt_out );
+    p_dec->b_error = false;
 }
 
 static void DecoderUpdateFormatLocked( decoder_t *p_dec )
