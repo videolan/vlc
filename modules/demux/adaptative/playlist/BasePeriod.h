@@ -43,6 +43,7 @@ namespace adaptative
 
                 const std::vector<BaseAdaptationSet *>& getAdaptationSets   () const;
                 const std::vector<BaseAdaptationSet *>  getAdaptationSets   (StreamType) const;
+                BaseAdaptationSet *                 getAdaptationSetByID(const ID &);
                 BaseAdaptationSet *                 getAdaptationSet    (StreamType) const;
                 void                                addAdaptationSet    (BaseAdaptationSet *AdaptationSet);
                 void                                debug               (vlc_object_t *,int = 0) const;

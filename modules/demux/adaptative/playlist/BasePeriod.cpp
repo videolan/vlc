@@ -82,6 +82,17 @@ void BasePeriod::addAdaptationSet(BaseAdaptationSet *adaptationSet)
     }
 }
 
+BaseAdaptationSet *BasePeriod::getAdaptationSetByID(const ID &id)
+{
+    std::vector<BaseAdaptationSet*>::const_iterator it;
+    for(it = adaptationSets.begin(); it!= adaptationSets.end(); ++it)
+    {
+        if( (*it)->getID() == id )
+            return *it;
+    }
+    return NULL;
+}
+
 BaseAdaptationSet * BasePeriod::getAdaptationSet(adaptative::StreamType type) const
 {
     std::vector<BaseAdaptationSet *>::const_iterator it;
