@@ -31,6 +31,7 @@
 #include <vlc_xml.h>
 #include <vlc_strings.h>
 #include <vlc_memory.h>
+#include <vlc_es_out.h>
 
 static int Open( vlc_object_t* p_this );
 static void Close( demux_t* p_demux );
@@ -55,13 +56,17 @@ typedef struct
 
 struct demux_sys_t
 {
-    xml_reader_t* p_reader;
-    subtitle_t* subtitle;
-    es_out_id_t* p_es;
-    int64_t i_length;
-    int64_t i_next_demux_time;
-    int i_subtitle;
-    int i_subtitles;
+    xml_t*          p_xml;
+    xml_reader_t*   p_reader;
+    subtitle_t*     subtitle;
+    es_out_id_t*    p_es;
+    int64_t         i_length;
+    int64_t         i_next_demux_time;
+    int             i_subtitle;
+    int             i_subtitles;
+    char*           psz_head;
+    size_t          i_head_len;
+    bool            b_has_head;
 };
 
 static int Control( demux_t* p_demux, int i_query, va_list args )
@@ -152,6 +157,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
 static int Convert_time( int64_t *timing_value, const char *s )
 {
     int h1, m1, s1, d1 = 0;
+    //char *sec = "";
 
     if ( sscanf( s, "%d:%d:%d,%d",
                  &h1, &m1, &s1, &d1 ) == 4 ||
@@ -171,32 +177,73 @@ static int Convert_time( int64_t *timing_value, const char *s )
     return VLC_EGENERIC;
 }
 
-
-
-static int ReadSubtitles( demux_sys_t* p_sys )
+static char* Append( char* psz_old, const char* psz_format, ... )
 {
+    va_list ap;
+    char* psz_new;
+    va_start (ap, psz_format);
+    int ret = vasprintf( &psz_new, psz_format, ap );
+    va_end (ap);
+    if ( ret < 0 )
+    {
+        free( psz_old );
+        return NULL;
+    }
+    char* psz_concat;
+    ret = asprintf( &psz_concat, "%s%s", psz_old, psz_new );
+    free( psz_old );
+    free( psz_new );
+    if ( ret < 0 )
+        return NULL;
+    return psz_concat;
+}
+
+static int ReadTTML( demux_t* p_demux )
+{
+    demux_sys_t* p_sys = p_demux->p_sys;
     const char* psz_name;
     int i_max_sub = 0;
     int i_type;
+    
     do
     {
         i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
 
-        if ( i_type == XML_READER_STARTELEM && !strcasecmp( psz_name, "p" ) )
+        if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_name, "head" ) || !strcasecmp( psz_name, "tt:head" ) ) )
         {
+            p_sys->b_has_head = true;
+        }
+        else if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_name, "p" ) || !strcasecmp( psz_name, "tt:p" ) ) ) 
+        {
+            char* psz_text = NULL;
             char* psz_begin = NULL;
             char* psz_end = NULL;
+            
+            if( asprintf ( &psz_text, "<%s", psz_name ) < 0 )
+                return VLC_ENOMEM;
+            const char* psz_attr_value = NULL;
+            const char* psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
 
-            while ( !psz_begin || !psz_end )
+            while ( psz_attr_name && psz_attr_value )
             {
-                const char* psz_attr_value = NULL;
-                const char* psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
-                if ( !psz_attr_name || !psz_attr_value )
-                    break;
                 if ( !strcasecmp( psz_attr_name, "begin" ) )
                     psz_begin = strdup( psz_attr_value );
                 else if ( !strcasecmp( psz_attr_name, "end" ) )
                     psz_end = strdup( psz_attr_value );
+                else if ( !strcasecmp( psz_attr_name, psz_attr_name ) )
+                {
+                    psz_text = Append( psz_text, " %s = \"%s\"", psz_attr_name, psz_attr_value );
+                    if ( unlikely( psz_text == NULL ) )
+                        return VLC_ENOMEM;
+                }
+                psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
+            }
+            psz_text = Append( psz_text, ">" );
+            if ( unlikely( psz_text == NULL ) )
+            {
+                free( psz_begin );
+                free( psz_end );
+                return VLC_ENOMEM;
             }
 
             if ( psz_begin && psz_end )
@@ -208,46 +255,86 @@ static int ReadSubtitles( demux_sys_t* p_sys )
                             sizeof( *p_sys->subtitle ) * i_max_sub );
                     if ( unlikely( p_sys->subtitle == NULL ) )
                     {
+                        free( psz_text );
                         free( psz_begin );
                         free( psz_end );
                         return VLC_ENOMEM;
                     }
                 }
-                const char* psz_text = NULL;
                 subtitle_t *p_subtitle = &p_sys->subtitle[p_sys->i_subtitles];
-
+                
                 Convert_time( &p_subtitle->i_start, psz_begin );
                 Convert_time( &p_subtitle->i_stop, psz_end );
+                free( psz_begin );
+                free( psz_end );
 
-                i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_text );
-                if ( i_type == XML_READER_TEXT && psz_text != NULL )
+                i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
+
+                while ( i_type != XML_READER_ENDELEM || ( strcmp( psz_name, "p" ) && strcmp( psz_name, "tt:p" ) ) )
                 {
-                    if( *psz_text != 0 )
+                    if ( i_type == XML_READER_TEXT && psz_name != NULL )
                     {
-                        p_subtitle->psz_text = strdup( psz_text );
-                        if ( likely( p_subtitle->psz_text != NULL ) )
+                        psz_text = Append( psz_text, "%s", psz_name );
+                        if ( unlikely( psz_text == NULL ) )
+                            return VLC_ENOMEM;
+                    }
+                    else if ( i_type == XML_READER_STARTELEM )
+                    {
+                        psz_text = Append( psz_text, " <%s", psz_name );
+                        if ( unlikely( psz_text == NULL ) )
+                            return VLC_ENOMEM;
+                        psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
+                        while ( psz_attr_name && psz_attr_value )
+                        {   
+                            psz_text = Append( psz_text, " %s=\"%s\"", psz_attr_name, psz_attr_value );
+                            if ( unlikely( psz_text == NULL ) )
+                                return VLC_ENOMEM;
+                            psz_attr_name = xml_ReaderNextAttr( p_sys->p_reader, &psz_attr_value );
+                        }
+                        if ( !strcasecmp( psz_name, "tt:br" ) || !strcasecmp( psz_name, "br" ) )
                         {
-                            resolve_xml_special_chars( p_subtitle->psz_text );
-                            p_sys->i_subtitles++;
+                            psz_text = Append( psz_text, "/>" );
+                            if ( unlikely( psz_text == NULL ) )
+                                return VLC_ENOMEM;
+                        }
+                        else 
+                        {
+                            psz_text = Append( psz_text, ">" );
+                            if ( unlikely( psz_text == NULL ) )
+                                return VLC_ENOMEM;
                         }
                     }
+                    else if ( i_type == XML_READER_ENDELEM )
+                    {
+                        psz_text = Append( psz_text, " </%s>", psz_name );
+                        if ( unlikely( psz_text == NULL ) )
+                            return VLC_ENOMEM;
+                    }
+                    i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
                 }
+                psz_text = Append( psz_text, "</p>" );
+                if ( unlikely( psz_text == NULL ) )
+                    return VLC_ENOMEM;
+                p_subtitle->psz_text = psz_text;
+                p_sys->i_subtitles++;
             }
-            free( psz_begin );
-            free( psz_end );
+            else
+            {
+                free( psz_text );
+                free( psz_begin );
+                free( psz_end );
+            }
         }
-    } while ( i_type != XML_READER_ENDELEM || strcasecmp( psz_name, "tt" ) );
-
+    } while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_name, "tt" ) && strcasecmp( psz_name, "tt:tt" ) ) );
     return VLC_SUCCESS;
 }
 
 static int Demux( demux_t* p_demux )
 {
     demux_sys_t* p_sys = p_demux->p_sys;
-
     if( p_sys->i_subtitle >= p_sys->i_subtitles )
         return 0;
-
+    
     while ( p_sys->i_subtitle < p_sys->i_subtitles &&
             p_sys->subtitle[p_sys->i_subtitle].i_start < p_sys->i_next_demux_time )
     {
@@ -273,16 +360,109 @@ static int Demux( demux_t* p_demux )
     return 1;
 }
 
+static void ParseHead( demux_t* p_demux )
+{
+    demux_sys_t* p_sys = p_demux->p_sys;
+    char buff[1025];
+    char* psz_head = NULL;
+    size_t i_head_len = 0; // head tags size, in bytes
+    size_t i_size; // allocated buffer size
+    size_t i_read;
+
+    // Rewind since the XML parser will have consumed the entire file.
+    stream_Seek( p_demux->s, 0 );
+
+    while ( ( i_read = stream_Read( p_demux->s, (void*)buff, 1024 ) ) > 0 )
+    {
+        ssize_t i_offset = -1;
+        // Ensure we can use strstr
+        buff[i_read] = 0;
+
+        if ( psz_head == NULL )
+        {
+            // Seek to the opening <head> tag if we haven't seen it already
+            const char* psz_head_begin = strstr( buff, "<head>" );
+            if ( psz_head_begin == NULL )
+                psz_head_begin = strstr( buff, "<tt:head>" );
+            if ( psz_head_begin == NULL )
+                continue;
+            i_head_len = i_read - ( psz_head_begin - buff );
+            i_size = i_head_len;
+            psz_head = malloc( i_size * sizeof( *psz_head ) );
+            if ( unlikely( psz_head == NULL ) )
+                return;
+            memcpy( psz_head, psz_head_begin, i_head_len );
+            // Avoid copying the head tag again once we search for the end tag.
+            i_offset = psz_head_begin - buff;
+        }
+        if ( psz_head != NULL )
+        {
+            size_t i_end_tag_len = strlen( "</head>" );
+            // Or copy until the end of the head tag once we've seen the opening one
+            const char* psz_end_head = strstr( buff, "</head>" );
+            if ( psz_end_head == NULL )
+            {
+                psz_end_head = strstr( buff, "</tt:head>" );
+                i_end_tag_len = strlen( "</tt:head>" );
+            }
+            // Check if we need to extend the buffer first
+            size_t i_to_copy = i_read;
+            if ( psz_end_head != NULL )
+                i_to_copy = psz_end_head - buff + i_end_tag_len;
+            if ( i_size < i_head_len + i_to_copy )
+            {
+                i_size = __MAX(i_size * 2, i_head_len + i_to_copy);
+                psz_head = realloc_or_free( psz_head, i_size );
+                if ( unlikely( psz_head == NULL ) )
+                    return;
+            }
+
+            if ( psz_end_head == NULL )
+            {
+                // If we already copied the begin tag, we don't need to append this again.
+                if ( i_offset != -1 )
+                    continue;
+                // Otherwise, simply append the entire buffer
+                memcpy( psz_head + i_head_len, buff, i_to_copy );
+                i_head_len += i_to_copy;
+            }
+            else
+            {
+                if ( i_offset == -1 )
+                {
+                    memcpy( psz_head + i_head_len, buff, i_to_copy );
+                    i_head_len += i_to_copy;
+                }
+                else
+                {
+                    // If the buffer we originally copied already contains the end tag, no need to copy again
+                    // Though if we already have the </head> in our buffer, we need to adjust the total size
+                    i_head_len = psz_end_head - buff + i_end_tag_len + i_offset;
+                }
+                p_sys->psz_head = psz_head;
+                p_sys->i_head_len = i_head_len;
+                break;
+            }
+        }
+    }
+}
+
 static int Open( vlc_object_t* p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-
     p_demux->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if ( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_sys->p_reader = xml_ReaderCreate( p_this, p_demux->s );
+    p_sys->p_xml = xml_Create( p_demux );
+    if ( !p_sys->p_xml )
+    {
+        Close( p_demux );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->p_reader = xml_ReaderCreate( p_sys->p_xml, p_demux->s );
     if ( !p_sys->p_reader )
     {
         Close( p_demux );
@@ -291,22 +471,36 @@ static int Open( vlc_object_t* p_this )
 
     const char* psz_name;
     int i_type = xml_ReaderNextNode( p_sys->p_reader, &psz_name );
-    if ( i_type != XML_READER_STARTELEM || strcmp( psz_name, "tt" ) )
+    if ( i_type != XML_READER_STARTELEM || ( strcmp( psz_name, "tt" ) && strcmp( psz_name, "tt:tt" ) ) )
     {
         Close( p_demux );
         return VLC_EGENERIC;
     }
+    if ( ReadTTML( p_demux ) != VLC_SUCCESS )
+    {
+        Close( p_demux );
+        return VLC_EGENERIC;
+    }
+    if ( p_sys->b_has_head )
+        ParseHead( p_demux );
+
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 
     es_format_t fmt;
     es_format_Init( &fmt, SPU_ES, VLC_CODEC_TTML );
+    if ( p_sys->i_head_len > 0 )
+    {
+        fmt.p_extra = p_sys->psz_head;
+        fmt.i_extra = p_sys->i_head_len;
+    }
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     es_format_Clean( &fmt );
 
-    if ( ReadSubtitles( p_sys ) != VLC_SUCCESS )
-        return VLC_EGENERIC;
-    p_sys->i_length = p_sys->subtitle[ p_sys->i_subtitles - 1 ].i_stop;
+    if ( p_sys->i_subtitles > 0 )
+        p_sys->i_length = p_sys->subtitle[ p_sys->i_subtitles - 1 ].i_stop;
+    else
+        p_sys->i_length = 0;
 
     return VLC_SUCCESS;
 }
@@ -318,12 +512,12 @@ static void Close( demux_t* p_demux )
         es_out_Del( p_demux->out, p_sys->p_es );
     if ( p_sys->p_reader )
         xml_ReaderDelete( p_sys->p_reader );
+    if ( p_sys->p_xml )
+        xml_Delete( p_sys->p_xml );
     for ( int i = 0; i < p_sys->i_subtitles; ++i )
     {
         free( p_sys->subtitle[i].psz_text );
     }
     free( p_sys->subtitle );
     free( p_sys );
-
-    stream_Seek( p_demux->s, 0 );
 }

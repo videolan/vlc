@@ -20,6 +20,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -28,17 +29,196 @@
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_codec.h>
+#include <vlc_xml.h>
+#include <vlc_stream.h>
+#include <vlc_text_style.h>
 
 #include "substext.h"
 
+#include <ctype.h>
+
 #define ALIGN_TEXT N_("Subtitle justification")
 #define ALIGN_LONGTEXT N_("Set the justification of subtitles")
+
+static const struct {
+    const char *psz_name;
+    uint32_t   i_value;
+} p_html_colors[] = {
+    { "Aqua",    0x00FFFF },
+    { "Black",   0x000000 },
+    { "Blue",    0x0000FF },
+    { "Fuchsia", 0xFF00FF },
+    { "Gray",    0x808080 },
+    { "Green",   0x008000 },
+    { "Lime",    0x00FF00 },
+    { "Maroon",  0x800000 },
+    { "Navy",    0x000080 },
+    { "Olive",   0x808000 },
+    { "Purple",  0x800080 },
+    { "Red",     0xFF0000 },
+    { "Silver",  0xC0C0C0 },
+    { "Teal",    0x008080 },
+    { "White",   0xFFFFFF },
+    { "Yellow",  0xFFFF00 },
+    { "AliceBlue", 0xF0F8FF },
+    { "AntiqueWhite", 0xFAEBD7 },
+    { "Aqua", 0x00FFFF },
+    { "Aquamarine", 0x7FFFD4 },
+    { "Azure", 0xF0FFFF },
+    { "Beige", 0xF5F5DC },
+    { "Bisque", 0xFFE4C4 },
+    { "Black", 0x000000 },
+    { "BlanchedAlmond", 0xFFEBCD },
+    { "Blue", 0x0000FF },
+    { "BlueViolet", 0x8A2BE2 },
+    { "Brown", 0xA52A2A },
+    { "BurlyWood", 0xDEB887 },
+    { "CadetBlue", 0x5F9EA0 },
+    { "Chartreuse", 0x7FFF00 },
+    { "Chocolate", 0xD2691E },
+    { "Coral", 0xFF7F50 },
+    { "CornflowerBlue", 0x6495ED },
+    { "Cornsilk", 0xFFF8DC },
+    { "Crimson", 0xDC143C },
+    { "Cyan", 0x00FFFF },
+    { "DarkBlue", 0x00008B },
+    { "DarkCyan", 0x008B8B },
+    { "DarkGoldenRod", 0xB8860B },
+    { "DarkGray", 0xA9A9A9 },
+    { "DarkGrey", 0xA9A9A9 },
+    { "DarkGreen", 0x006400 },
+    { "DarkKhaki", 0xBDB76B },
+    { "DarkMagenta", 0x8B008B },
+    { "DarkOliveGreen", 0x556B2F },
+    { "Darkorange", 0xFF8C00 },
+    { "DarkOrchid", 0x9932CC },
+    { "DarkRed", 0x8B0000 },
+    { "DarkSalmon", 0xE9967A },
+    { "DarkSeaGreen", 0x8FBC8F },
+    { "DarkSlateBlue", 0x483D8B },
+    { "DarkSlateGray", 0x2F4F4F },
+    { "DarkSlateGrey", 0x2F4F4F },
+    { "DarkTurquoise", 0x00CED1 },
+    { "DarkViolet", 0x9400D3 },
+    { "DeepPink", 0xFF1493 },
+    { "DeepSkyBlue", 0x00BFFF },
+    { "DimGray", 0x696969 },
+    { "DimGrey", 0x696969 },
+    { "DodgerBlue", 0x1E90FF },
+    { "FireBrick", 0xB22222 },
+    { "FloralWhite", 0xFFFAF0 },
+    { "ForestGreen", 0x228B22 },
+    { "Fuchsia", 0xFF00FF },
+    { "Gainsboro", 0xDCDCDC },
+    { "GhostWhite", 0xF8F8FF },
+    { "Gold", 0xFFD700 },
+    { "GoldenRod", 0xDAA520 },
+    { "Gray", 0x808080 },
+    { "Grey", 0x808080 },
+    { "Green", 0x008000 },
+    { "GreenYellow", 0xADFF2F },
+    { "HoneyDew", 0xF0FFF0 },
+    { "HotPink", 0xFF69B4 },
+    { "IndianRed", 0xCD5C5C },
+    { "Indigo", 0x4B0082 },
+    { "Ivory", 0xFFFFF0 },
+    { "Khaki", 0xF0E68C },
+    { "Lavender", 0xE6E6FA },
+    { "LavenderBlush", 0xFFF0F5 },
+    { "LawnGreen", 0x7CFC00 },
+    { "LemonChiffon", 0xFFFACD },
+    { "LightBlue", 0xADD8E6 },
+    { "LightCoral", 0xF08080 },
+    { "LightCyan", 0xE0FFFF },
+    { "LightGoldenRodYellow", 0xFAFAD2 },
+    { "LightGray", 0xD3D3D3 },
+    { "LightGrey", 0xD3D3D3 },
+    { "LightGreen", 0x90EE90 },
+    { "LightPink", 0xFFB6C1 },
+    { "LightSalmon", 0xFFA07A },
+    { "LightSeaGreen", 0x20B2AA },
+    { "LightSkyBlue", 0x87CEFA },
+    { "LightSlateGray", 0x778899 },
+    { "LightSlateGrey", 0x778899 },
+    { "LightSteelBlue", 0xB0C4DE },
+    { "LightYellow", 0xFFFFE0 },
+    { "Lime", 0x00FF00 },
+    { "LimeGreen", 0x32CD32 },
+    { "Linen", 0xFAF0E6 },
+    { "Magenta", 0xFF00FF },
+    { "Maroon", 0x800000 },
+    { "MediumAquaMarine", 0x66CDAA },
+    { "MediumBlue", 0x0000CD },
+    { "MediumOrchid", 0xBA55D3 },
+    { "MediumPurple", 0x9370D8 },
+    { "MediumSeaGreen", 0x3CB371 },
+    { "MediumSlateBlue", 0x7B68EE },
+    { "MediumSpringGreen", 0x00FA9A },
+    { "MediumTurquoise", 0x48D1CC },
+    { "MediumVioletRed", 0xC71585 },
+    { "MidnightBlue", 0x191970 },
+    { "MintCream", 0xF5FFFA },
+    { "MistyRose", 0xFFE4E1 },
+    { "Moccasin", 0xFFE4B5 },
+    { "NavajoWhite", 0xFFDEAD },
+    { "Navy", 0x000080 },
+    { "OldLace", 0xFDF5E6 },
+    { "Olive", 0x808000 },
+    { "OliveDrab", 0x6B8E23 },
+    { "Orange", 0xFFA500 },
+    { "OrangeRed", 0xFF4500 },
+    { "Orchid", 0xDA70D6 },
+    { "PaleGoldenRod", 0xEEE8AA },
+    { "PaleGreen", 0x98FB98 },
+    { "PaleTurquoise", 0xAFEEEE },
+    { "PaleVioletRed", 0xD87093 },
+    { "PapayaWhip", 0xFFEFD5 },
+    { "PeachPuff", 0xFFDAB9 },
+    { "Peru", 0xCD853F },
+    { "Pink", 0xFFC0CB },
+    { "Plum", 0xDDA0DD },
+    { "PowderBlue", 0xB0E0E6 },
+    { "Purple", 0x800080 },
+    { "Red", 0xFF0000 },
+    { "RosyBrown", 0xBC8F8F },
+    { "RoyalBlue", 0x4169E1 },
+    { "SaddleBrown", 0x8B4513 },
+    { "Salmon", 0xFA8072 },
+    { "SandyBrown", 0xF4A460 },
+    { "SeaGreen", 0x2E8B57 },
+    { "SeaShell", 0xFFF5EE },
+    { "Sienna", 0xA0522D },
+    { "Silver", 0xC0C0C0 },
+    { "SkyBlue", 0x87CEEB },
+    { "SlateBlue", 0x6A5ACD },
+    { "SlateGray", 0x708090 },
+    { "SlateGrey", 0x708090 },
+    { "Snow", 0xFFFAFA },
+    { "SpringGreen", 0x00FF7F },
+    { "SteelBlue", 0x4682B4 },
+    { "Tan", 0xD2B48C },
+    { "Teal", 0x008080 },
+    { "Thistle", 0xD8BFD8 },
+    { "Tomato", 0xFF6347 },
+    { "Turquoise", 0x40E0D0 },
+    { "Violet", 0xEE82EE },
+    { "Wheat", 0xF5DEB3 },
+    { "White", 0xFFFFFF },
+    { "WhiteSmoke", 0xF5F5F5 },
+    { "Yellow", 0xFFFF00 },
+    { "YellowGreen", 0x9ACD32 },
+
+    { NULL, 0 }
+};
+
 
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
 static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
+
+static text_segment_t *ParseTTMLSubtitles( decoder_t *, subpicture_updater_sys_t *, char * );
 
 vlc_module_begin ()
     set_capability( "decoder", 10 )
@@ -50,15 +230,478 @@ vlc_module_begin ()
     add_integer( "ttml-align", 0, ALIGN_TEXT, ALIGN_LONGTEXT, false )
 vlc_module_end ();
 
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 
+typedef struct
+{
+    char*           psz_styleid;
+    text_style_t*   font_style;
+    int             i_align;
+    int             i_margin_h;
+    int             i_margin_v;
+    int             i_margin_percent_h;
+    int             i_margin_percent_v;
+}  ttml_style_t;
+
 struct decoder_sys_t
 {
-    int i_align;
+    int                     i_align;
+    ttml_style_t**          pp_styles;
+    size_t                  i_styles;
 };
+
+static ttml_style_t *FindTextStyle( decoder_t *p_dec, const char *psz_style )
+{
+    decoder_sys_t  *p_sys = p_dec->p_sys;    
+
+    for( size_t i = 0; i < p_sys->i_styles; i++ )
+    {
+        if( !strcmp( p_sys->pp_styles[i]->psz_styleid, psz_style ) )
+        {
+            return p_sys->pp_styles[i];
+        }
+    }
+    return NULL;
+}
+
+typedef struct style_stack style_stack_t;
+struct  style_stack
+{
+    ttml_style_t* p_style;
+    style_stack_t* p_next;
+};
+
+static bool PushStyle( style_stack_t **pp_stack, ttml_style_t* p_style )
+{
+    style_stack_t* p_entry = malloc( sizeof( *p_entry) );
+    if ( unlikely( p_entry == NULL ) )
+        return false;
+    p_entry->p_style = p_style;
+    p_entry->p_next = *pp_stack;
+    *pp_stack = p_entry;
+    return true;
+}
+
+static void PopStyle( style_stack_t** pp_stack )
+{
+    if ( *pp_stack == NULL )
+        return;
+    style_stack_t* p_next = (*pp_stack)->p_next;
+    free( *pp_stack );
+    *pp_stack = p_next;
+}
+
+static void ClearStack( style_stack_t* p_stack )
+{
+    while ( p_stack != NULL )
+    {
+        style_stack_t* p_next = p_stack->p_next;
+        free( p_stack );
+        p_stack = p_next;
+    }
+}
+
+static text_style_t* CurrentStyle( style_stack_t* p_stack )
+{
+    if ( p_stack == NULL )
+        return text_style_Create( STYLE_NO_DEFAULTS );
+    return text_style_Duplicate( p_stack->p_style->font_style );
+}
+
+static int GetColor( const char *psz_value, bool* ok )
+{
+    unsigned int color = 0xFFFFFF;
+    char* psz_end;
+
+    if ( ok != NULL )
+        *ok = false;
+
+    if( *psz_value == '#' )
+    {
+        color = strtol( psz_value + 1, &psz_end, 16 );
+        if ( ok != NULL && ( *psz_end == '\0' || *psz_end == ' ' )  )
+            *ok = true;
+    }
+    else
+    {
+        uint32_t i_value = strtol( psz_value, &psz_end, 16 );
+        if( *psz_end == '\0' || *psz_end == ' ' )
+        {
+            color = i_value;
+            if ( ok != NULL )
+                *ok = true;
+        }
+        else
+        {
+            for( int i = 0; p_html_colors[i].psz_name != NULL; i++ )
+            {
+                if( !strncasecmp( psz_value, p_html_colors[i].psz_name, strlen(p_html_colors[i].psz_name) ) )
+                {
+                    // Assume opaque text since no alpha is specified.
+                    color = p_html_colors[i].i_value | 0xFF000000;
+                    if ( ok != NULL )
+                        *ok = true;
+                }
+            }
+        }
+    }
+    return color;
+}
+
+static void ParseTTMLStyle( decoder_t *p_dec, xml_reader_t* p_reader )
+{
+    decoder_sys_t* p_sys = p_dec->p_sys;
+    ttml_style_t *p_ttml_style = NULL;
+    ttml_style_t *p_base_style = NULL;
+
+    p_ttml_style = calloc( 1, sizeof(ttml_style_t) );
+
+    if ( unlikely( !p_ttml_style ) )
+        return ;
+    p_ttml_style->font_style = text_style_Create( STYLE_NO_DEFAULTS );
+    if( unlikely( !p_ttml_style->font_style ) )
+    {
+        free( p_ttml_style );
+        return ;
+    }
+
+    const char *attr, *val;
+
+    while( (attr = xml_ReaderNextAttr( p_reader, &val ) ) )
+    {
+        if ( !strcasecmp( attr, "style" ) )
+        {
+            for( size_t i = 0; i < p_sys->i_styles; i++ )
+            {
+                if( !strcasecmp( p_sys->pp_styles[i]->psz_styleid, val ) )
+                {
+                    p_base_style = p_sys->pp_styles[i];
+                    break;
+                }
+            }
+        }
+        else if ( !strcasecmp( "xml:id", attr ) )
+        {
+            free( p_ttml_style->psz_styleid );
+            p_ttml_style->psz_styleid = strdup( val );
+        }
+        else if ( !strcasecmp ( "tts:fontFamily", attr ) )
+        {
+            free( p_ttml_style->font_style->psz_fontname );
+            p_ttml_style->font_style->psz_fontname = strdup( val );
+        }
+        else if ( !strcasecmp( "tts:fontSize", attr ) )
+        {
+            p_ttml_style->font_style->i_font_size  = atoi( val );
+        }
+        else if ( !strcasecmp( "tts:color", attr ) )
+        {
+            unsigned int i_color = GetColor( val, NULL );
+            p_ttml_style->font_style->i_font_color = (i_color & 0xffffff);
+            p_ttml_style->font_style->i_font_alpha = (i_color & 0xFF000000) >> 24;
+            p_ttml_style->font_style->i_features |= STYLE_HAS_FONT_COLOR | STYLE_HAS_FONT_ALPHA;
+        }
+        else if ( !strcasecmp( "tts:backgroundColor", attr ) )
+        {
+            unsigned int i_color = GetColor( val, NULL );
+            p_ttml_style->font_style->i_background_color = i_color & 0xFFFFFF;
+            p_ttml_style->font_style->i_background_alpha = (i_color & 0xFF000000) >> 24;
+            p_ttml_style->font_style->i_features |= STYLE_HAS_BACKGROUND_COLOR
+                                                      | STYLE_HAS_BACKGROUND_ALPHA;
+        }
+        else if ( !strcasecmp( "tts:textAlign", attr ) )
+        {
+            if ( !strcasecmp ( "left", val ) )
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+            else if ( !strcasecmp ( "right", val ) )
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+            else if ( !strcasecmp ( "center", val ) )
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM;
+            else if ( !strcasecmp ( "start", val ) )
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
+            else if ( !strcasecmp ( "end", val ) )
+                p_ttml_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+        }
+        else if ( !strcasecmp( "tts:fontStyle", attr ) )
+        {
+            if ( !strcasecmp ( "italic", val ) || !strcasecmp ( "oblique", val ) )
+                p_ttml_style->font_style->i_style_flags |= STYLE_ITALIC;
+            else
+                p_ttml_style->font_style->i_style_flags &= ~STYLE_ITALIC;
+            p_ttml_style->font_style->i_features |= STYLE_HAS_FLAGS;
+        }
+        else if ( !strcasecmp ( "tts:fontWeight", attr ) )
+        {
+            if ( !strcasecmp ( "bold", val ) )
+                p_ttml_style->font_style->i_style_flags |= STYLE_BOLD;
+            else
+                p_ttml_style->font_style->i_style_flags &= ~STYLE_BOLD;
+            p_ttml_style->font_style->i_features |= STYLE_HAS_FLAGS;
+        }
+        else if ( !strcasecmp ( "tts:textDecoration", attr ) )
+        {
+            if ( !strcasecmp ( "underline", val ) )
+                p_ttml_style->font_style->i_style_flags |= STYLE_UNDERLINE;
+            else if ( !strcasecmp ( "noUnderline", val ) )
+                p_ttml_style->font_style->i_style_flags &= ~STYLE_UNDERLINE;
+            if ( !strcasecmp ( "lineThrough", val ) )
+                p_ttml_style->font_style->i_style_flags |= STYLE_STRIKEOUT;
+            else if ( !strcasecmp ( "noLineThrough", val ) )
+                p_ttml_style->font_style->i_style_flags &= ~STYLE_STRIKEOUT;
+            p_ttml_style->font_style->i_features |= STYLE_HAS_FLAGS;
+        }
+        else if ( !strcasecmp ( "tts:origin", attr ) )
+        {
+            const char *psz_token = val;
+            while ( isspace( *psz_token ) )
+                psz_token++;
+
+            const char *psz_separator = strchr( psz_token, ' ' );
+            if ( psz_separator == NULL )
+            {
+                msg_Warn( p_dec, "Invalid origin attribute: \"%s\"", val );
+                continue;
+            }
+            const char *psz_percent_sign = strchr( psz_token, '%' );
+
+            if( psz_percent_sign != NULL && psz_percent_sign < psz_separator )
+            {
+                p_ttml_style->i_margin_h = 0;
+                p_ttml_style->i_margin_percent_h = atoi( psz_token );
+            }
+            else
+            {
+                p_ttml_style->i_margin_h = atoi( psz_token );
+                p_ttml_style->i_margin_percent_h = 0;
+            }
+            while ( isspace( *psz_separator ) )
+                psz_separator++;
+            psz_token = psz_separator;
+            psz_percent_sign = strchr( psz_token, '%' );
+            if( psz_percent_sign != NULL )
+            {
+                p_ttml_style->i_margin_v = 0;
+                p_ttml_style->i_margin_percent_v = atoi( val );
+            }
+            else
+            {
+                p_ttml_style->i_margin_v = atoi( val );
+                p_ttml_style->i_margin_percent_v = 0;
+            }
+        }
+        else if ( !strcasecmp( "tts:textOutline", attr ) )
+        {
+            char *value = strdup( val );
+            char* psz_saveptr = NULL;
+            char* token = strtok_r( value, " ", &psz_saveptr );
+            // <color>? <length> <length>?
+            bool b_ok = false;
+            unsigned int color = GetColor( token, &b_ok );
+            if ( b_ok )
+            {
+                p_ttml_style->font_style->i_outline_color = color & 0xFFFFFF;
+                p_ttml_style->font_style->i_outline_alpha = (color & 0xFF000000) >> 24;
+                token = strtok_r( NULL, " ", &psz_saveptr );
+            }
+            char* psz_end = NULL;
+            int i_outline_width = strtol( token, &psz_end, 10 );
+            if ( psz_end != token )
+            {
+                // Assume unit is pixel, and ignore border radius
+                p_ttml_style->font_style->i_outline_width = i_outline_width;
+            }
+            free( value );
+        }
+    }
+    if ( p_base_style != NULL )
+    {
+        text_style_Merge( p_ttml_style->font_style, p_base_style->font_style, false );
+    }
+    if ( p_ttml_style->psz_styleid == NULL )
+    {
+        free( p_ttml_style );
+        free( p_ttml_style->font_style->psz_fontname );
+        return ;
+    }
+
+    TAB_APPEND( p_sys->i_styles, p_sys->pp_styles, p_ttml_style );
+    return ;
+}
+
+static void ParseTTMLStyles( decoder_t* p_dec )
+{
+    stream_t* p_stream = stream_MemoryNew( p_dec, (uint8_t*)p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra, true );
+    if( unlikely( p_stream == NULL ) )
+        return ;
+
+    xml_reader_t* p_reader = xml_ReaderCreate( p_dec, p_stream );
+    if( unlikely( p_reader == NULL ) )
+    {
+        stream_Delete( p_stream );
+        return ;
+    }
+    const char* psz_name;
+    int i_type = xml_ReaderNextNode( p_reader, &psz_name );
+
+    if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( psz_name, "head" ) || !strcasecmp( psz_name, "tt:head" ) ) )
+    {
+        do
+        {
+            i_type = xml_ReaderNextNode( p_reader, &psz_name );
+            if ( i_type == XML_READER_STARTELEM && ( !strcasecmp( "styling", psz_name ) ||
+                                                     !strcasecmp( "tt:styling", psz_name ) ) )
+            {
+                i_type = xml_ReaderNextNode( p_reader, &psz_name );
+                while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_name, "styling" ) && strcasecmp( psz_name, "tt:styling" ) ) )
+                {
+                    ParseTTMLStyle( p_dec, p_reader );
+                    i_type = xml_ReaderNextNode( p_reader, &psz_name );
+                }
+            }
+        } while ( i_type != XML_READER_ENDELEM || ( strcasecmp( psz_name, "head" ) && strcasecmp( psz_name, "tt:head" ) ) );
+    }
+    xml_ReaderDelete( p_reader );
+    stream_Delete( p_stream );
+}
+
+static text_segment_t *ParseTTMLSubtitles( decoder_t *p_dec, subpicture_updater_sys_t *p_update_sys, char *psz_subtitle )
+{
+    stream_t*       p_sub = NULL;
+    xml_reader_t*   p_xml_reader = NULL;
+    text_segment_t* p_first_segment = NULL;
+    text_segment_t* p_current_segment = NULL;
+    style_stack_t*  p_style_stack = NULL;
+
+    p_sub = stream_MemoryNew( p_dec, (uint8_t*)psz_subtitle, strlen( psz_subtitle ), true );
+    if( unlikely( p_sub == NULL ) )
+        return NULL;
+
+    p_xml_reader = xml_ReaderCreate( p_dec, p_sub );
+    if( unlikely( p_xml_reader == NULL ) )
+    {
+        stream_Delete( p_sub );
+        return NULL;
+    }
+
+    const char *node;
+    int i_type;
+
+    i_type = xml_ReaderNextNode( p_xml_reader, &node );
+    while ( i_type != XML_READER_NONE && i_type > 0 )
+    {
+        if( i_type == XML_READER_STARTELEM && ( !strcasecmp( node, "p" ) || !strcasecmp( node, "tt:p" ) ) )
+        {
+            text_segment_t* p_segment = text_segment_New( NULL );
+            if ( unlikely( p_segment == NULL ) )
+                goto fail;
+            const char* psz_attr_name;
+            const char* psz_attr_value;
+            while ( ( psz_attr_name = xml_ReaderNextAttr( p_xml_reader, &psz_attr_value ) ) != NULL )
+            {
+                if ( !strcasecmp( psz_attr_name, "style" ) )
+                {
+                    ttml_style_t* p_style = FindTextStyle( p_dec, psz_attr_value );
+                    if ( p_style == NULL )
+                    {
+                        msg_Warn( p_dec, "Style \"%s\" not found", psz_attr_value );
+                        break;
+                    }
+                    if( p_style->i_margin_h )
+                        p_update_sys->x = p_style->i_margin_h;
+                    else
+                        p_update_sys->x = p_style->i_margin_percent_h;
+
+                    if( p_style->i_margin_v )
+                        p_update_sys->y = p_style->i_margin_v;
+                    else
+                        p_update_sys->y = p_style->i_margin_percent_v;
+                    p_update_sys->align = p_style->i_align;
+
+                    if ( PushStyle( &p_style_stack, p_style ) == false )
+                    {
+                        goto fail;
+                    }
+                    p_segment->style = CurrentStyle( p_style_stack );
+                    break;
+                }
+            }
+            if ( p_segment->style == NULL )
+                p_segment->style = text_style_Create( STYLE_NO_DEFAULTS );
+            if ( p_first_segment == NULL )
+            {
+                p_first_segment = p_segment;
+                p_current_segment = p_segment;
+            }
+            else
+            {
+                p_current_segment->p_next = p_segment;
+                p_current_segment = p_segment;
+            }
+        }
+        else if ( i_type == XML_READER_ENDELEM && ( !strcasecmp( node, "p" ) || !strcasecmp( node, "tt:p" ) ) )
+        {
+            PopStyle( &p_style_stack );
+            p_current_segment = NULL;
+        }
+        else if ( i_type == XML_READER_STARTELEM && !strcasecmp( node, "br" ) )
+        {
+            if ( p_current_segment != NULL && p_current_segment->psz_text != NULL )
+            {
+                char* psz_text = NULL;
+                if ( asprintf( &psz_text, "%s\n", p_current_segment->psz_text ) != -1 )
+                {
+                    free( p_current_segment->psz_text );
+                    p_current_segment->psz_text = psz_text;
+                }
+            }
+        }
+        else if ( i_type == XML_READER_TEXT )
+        {
+            if ( p_current_segment == NULL )
+            {
+                p_current_segment = text_segment_New( node );
+                p_current_segment->style = CurrentStyle( p_style_stack );
+                if ( p_first_segment == NULL )
+                    p_first_segment = p_current_segment;
+                else
+                    p_first_segment->p_next = p_current_segment;
+            }
+            else if ( p_current_segment->psz_text == NULL )
+            {
+                p_current_segment->psz_text = strdup( node );
+                resolve_xml_special_chars( p_current_segment->psz_text );
+            }
+            else
+            {
+                size_t i_previous_len = strlen( p_current_segment->psz_text );
+                char* psz_text = NULL;
+                if ( asprintf( &psz_text, "%s%s", p_current_segment->psz_text, node ) != -1 )
+                {
+                    free( p_current_segment->psz_text );
+                    p_current_segment->psz_text = psz_text;
+                    // Don't process text multiple time, just check for the appended section
+                    resolve_xml_special_chars( p_current_segment->psz_text + i_previous_len );
+                }
+            }
+        }
+        i_type = xml_ReaderNextNode( p_xml_reader, &node );
+    }
+
+    ClearStack( p_style_stack );
+    xml_ReaderDelete( p_xml_reader );
+    stream_Delete( p_sub );
+
+    return p_first_segment;
+
+fail:
+    text_segment_ChainDelete( p_first_segment );
+    ClearStack( p_style_stack );
+    xml_ReaderDelete( p_xml_reader );
+    stream_Delete( p_sub );
+    return NULL;
+}
 
 static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 {
@@ -99,14 +742,17 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     p_spu->i_stop     = p_block->i_pts + p_block->i_length;
     p_spu->b_ephemer  = (p_block->i_length == 0);
     p_spu->b_absolute = false;
+
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
     p_spu_sys->align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-    p_spu_sys->p_segments = text_segment_New( psz_subtitle );
+    p_spu_sys->p_segments = ParseTTMLSubtitles( p_dec, p_spu_sys, psz_subtitle );
     free( psz_subtitle );
 
     return p_spu;
 }
+
+
 
 /****************************************************************************
  * DecodeBlock: the whole thing
@@ -134,20 +780,20 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
 
     if ( p_dec->fmt_in.i_codec != VLC_CODEC_TTML )
-    {
         return VLC_EGENERIC;
-    }
 
     /* Allocate the memory needed to store the decoder's structure */
     p_dec->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( unlikely( p_sys == NULL ) )
-    {
         return VLC_ENOMEM;
-    }
+
+    if ( p_dec->fmt_in.p_extra != NULL && p_dec->fmt_in.i_extra > 0 )
+        ParseTTMLStyles( p_dec );
 
     p_dec->pf_decode_sub = DecodeBlock;
     p_dec->fmt_out.i_cat = SPU_ES;
     p_sys->i_align = var_InheritInteger( p_dec, "ttml-align" );
+
     return VLC_SUCCESS;
 }
 
@@ -156,10 +802,16 @@ static int OpenDecoder( vlc_object_t *p_this )
  *****************************************************************************/
 static void CloseDecoder( vlc_object_t *p_this )
 {
-    /* Cleanup here */
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    for ( size_t i = 0; i < p_sys->i_styles; ++i )
+    {
+        free( p_sys->pp_styles[i]->psz_styleid );
+        text_style_Delete( p_sys->pp_styles[i]->font_style );
+        free( p_sys->pp_styles[i] );
+    }
+    TAB_CLEAN( p_sys->i_styles, p_sys->pp_styles );
+
     free( p_sys );
 }
-
