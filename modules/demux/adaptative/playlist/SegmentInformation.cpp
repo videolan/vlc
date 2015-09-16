@@ -326,16 +326,31 @@ mtime_t SegmentInformation::getPeriodStart() const
 
 void SegmentInformation::setSegmentList(SegmentList *list)
 {
-    segmentList = list;
+    if(segmentList)
+    {
+        segmentList->mergeWith(list);
+        delete list;
+    }
+    else
+    {
+        segmentList = list;
+    }
 }
 
 void SegmentInformation::setSegmentBase(SegmentBase *base)
 {
+    if(segmentBase)
+        delete segmentBase;
     segmentBase = base;
 }
 
 void SegmentInformation::setSegmentTemplate(MediaSegmentTemplate *templ)
 {
+    if(mediaSegmentTemplate)
+    {
+        mediaSegmentTemplate->mergeWith(templ, 0);
+        delete templ;
+    }
     mediaSegmentTemplate = templ;
 }
 
