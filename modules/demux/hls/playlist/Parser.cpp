@@ -192,6 +192,7 @@ void Parser::parseSegments(Representation *rep, const std::list<Tag *> &tagslist
     std::size_t prevbyterangeoffset = 0;
     const SingleValueTag *ctx_byterange = NULL;
     SegmentEncryption encryption;
+    const ValuesListTag *ctx_extinf = NULL;
 
     std::list<Tag *>::const_iterator it;
     for(it = tagslist.begin(); it != tagslist.end(); ++it)
@@ -206,22 +207,38 @@ void Parser::parseSegments(Representation *rep, const std::list<Tag *> &tagslist
             }
             break;
 
-            case URITag::EXTINF:
+            case ValuesListTag::EXTINF:
             {
-                const URITag *uritag = static_cast<const URITag *>(tag);
+                ctx_extinf = static_cast<const ValuesListTag *>(tag);
+            }
+            break;
+
+            case SingleValueTag::URI:
+            {
+                const SingleValueTag *uritag = static_cast<const SingleValueTag *>(tag);
+                if(uritag->getValue().value.empty())
+                {
+                    ctx_extinf = NULL;
+                    ctx_byterange = NULL;
+                    break;
+                }
+
                 HLSSegment *segment = new (std::nothrow) HLSSegment(rep, sequenceNumber++);
                 if(!segment)
                     break;
 
-                if(uritag->getAttributeByName("URI"))
-                    segment->setSourceUrl(uritag->getAttributeByName("URI")->value);
+                segment->setSourceUrl(uritag->getValue().value);
 
-                if(uritag->getAttributeByName("DURATION"))
+                if(ctx_extinf)
                 {
-                    segment->duration.Set(uritag->getAttributeByName("DURATION")->floatingPoint() * rep->timescale.Get());
-                    segment->startTime.Set(nzStartTime);
-                    nzStartTime += segment->duration.Get();
-                    totalduration += segment->duration.Get();
+                    if(ctx_extinf->getAttributeByName("DURATION"))
+                    {
+                        segment->duration.Set(ctx_extinf->getAttributeByName("DURATION")->floatingPoint() * rep->timescale.Get());
+                        segment->startTime.Set(nzStartTime);
+                        nzStartTime += segment->duration.Get();
+                        totalduration += segment->duration.Get();
+                    }
+                    ctx_extinf = NULL;
                 }
 
                 segmentList->addSegment(segment);
@@ -453,14 +470,22 @@ std::list<Tag *> Parser::parseEntries(stream_t *stream)
                 }
             }
         }
-        else if(*psz_line && lastTag)
+        else if(*psz_line)
         {
-            AttributesTag *attrTag = dynamic_cast<AttributesTag *>(lastTag);
-            if(attrTag)
+            /* URI */
+            if(lastTag && lastTag->getType() == AttributesTag::EXTXSTREAMINF)
             {
+                AttributesTag *streaminftag = static_cast<AttributesTag *>(lastTag);
+                /* master playlist uri, merge as attribute */
                 Attribute *uriAttr = new (std::nothrow) Attribute("URI", std::string(psz_line));
                 if(uriAttr)
-                    attrTag->addAttribute(uriAttr);
+                    streaminftag->addAttribute(uriAttr);
+            }
+            else /* playlist tag, will take modifiers */
+            {
+                Tag *tag = TagFactory::createTagByName("", std::string(psz_line));
+                if(tag)
+                    entrieslist.push_back(tag);
             }
             lastTag = NULL;
         }

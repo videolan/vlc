@@ -75,7 +75,8 @@ namespace hls
             public:
                 enum
                 {
-                    EXTXVERSION = 10,
+                    URI = 10,
+                    EXTXVERSION,
                     EXTXBYTERANGE,
                     EXTXPROGRAMDATETIME,
                     EXTXTARGETDURATION,
@@ -110,15 +111,15 @@ namespace hls
                 std::list<Attribute *> attributes;
         };
 
-        class URITag : public AttributesTag
+        class ValuesListTag : public AttributesTag
         {
             public:
                 enum
                 {
                     EXTINF = 30
                 };
-                URITag(const std::string &);
-                virtual ~URITag();
+                ValuesListTag(int, const std::string &);
+                virtual ~ValuesListTag();
 
             protected:
                 virtual void parseAttributes(const std::string &);

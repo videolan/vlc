@@ -245,16 +245,16 @@ void AttributesTag::parseAttributes(const std::string &field)
 }
 
 
-URITag::URITag(const std::string &v) : AttributesTag(URITag::EXTINF, v)
+ValuesListTag::ValuesListTag(int type, const std::string &v) : AttributesTag(type, v)
 {
     parseAttributes(v);
 }
 
-URITag::~URITag()
+ValuesListTag::~ValuesListTag()
 {
 }
 
-void URITag::parseAttributes(const std::string &field)
+void ValuesListTag::parseAttributes(const std::string &field)
 {
     std::size_t pos = field.find(',');
     if(pos != std::string::npos)
@@ -289,7 +289,8 @@ Tag * TagFactory::createTagByName(const std::string &name, const std::string &va
         {"EXT-X-I-FRAMES-ONLY",             Tag::EXTXIFRAMESONLY},
         {"EXT-X-MEDIA",                     AttributesTag::EXTXMEDIA},
         {"EXT-X-STREAM-INF",                AttributesTag::EXTXSTREAMINF},
-        {"EXTINF",                          URITag::EXTINF},
+        {"EXTINF",                          ValuesListTag::EXTINF},
+        {"",                                SingleValueTag::URI},
         {NULL,                              0},
     };
 
@@ -306,6 +307,7 @@ Tag * TagFactory::createTagByName(const std::string &name, const std::string &va
         case Tag::EXTXIFRAMESONLY:
             return new (std::nothrow) Tag(exttagmapping[i].i);
 
+        case SingleValueTag::URI:
         case SingleValueTag::EXTXVERSION:
         case SingleValueTag::EXTXBYTERANGE:
         case SingleValueTag::EXTXPROGRAMDATETIME:
@@ -315,14 +317,14 @@ Tag * TagFactory::createTagByName(const std::string &name, const std::string &va
         case SingleValueTag::EXTXPLAYLISTTYPE:
             return new (std::nothrow) SingleValueTag(exttagmapping[i].i, value);
 
+        case ValuesListTag::EXTINF:
+            return new (std::nothrow) ValuesListTag(exttagmapping[i].i, value);
+
         case AttributesTag::EXTXKEY:
         case AttributesTag::EXTXMAP:
         case AttributesTag::EXTXMEDIA:
         case AttributesTag::EXTXSTREAMINF:
             return new (std::nothrow) AttributesTag(exttagmapping[i].i, value);
-
-        case URITag::EXTINF:
-            return new URITag(value);
         }
 
     }
