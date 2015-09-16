@@ -225,8 +225,10 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 
         block_BytestreamPush( &p_sys->bytestream, p_block );
-    } else
+    } else if (p_sys->i_frame_size)
         p_sys->i_state = STATE_SEND_DATA; /* return all the data we have left */
+    else
+        return NULL;
 
     while( 1 )
     {
