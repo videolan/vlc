@@ -43,17 +43,9 @@ AdaptationSet::~AdaptationSet()
 StreamFormat AdaptationSet::getStreamFormat() const
 {
     if(!getMimeType().empty())
-    {
         return DASHStreamFormat::mimeToFormat(getMimeType());
-    }
-    else if (!representations.empty())
-    {
-        return representations.front()->getStreamFormat();
-    }
     else
-    {
-        return StreamFormat();
-    }
+        return BaseAdaptationSet::getStreamFormat();
 }
 
 bool AdaptationSet::getSubsegmentAlignmentFlag() const

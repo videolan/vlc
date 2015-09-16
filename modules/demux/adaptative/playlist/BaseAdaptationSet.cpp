@@ -54,7 +54,10 @@ BaseAdaptationSet::~BaseAdaptationSet   ()
 
 StreamFormat BaseAdaptationSet::getStreamFormat() const
 {
-    return StreamFormat();
+    if (!representations.empty())
+        return representations.front()->getStreamFormat();
+    else
+        return StreamFormat();
 }
 
 std::vector<BaseRepresentation*>& BaseAdaptationSet::getRepresentations()
