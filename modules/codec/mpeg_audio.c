@@ -140,12 +140,19 @@ static int Open( vlc_object_t *p_this )
     /* Misc init */
 #ifdef HAVE_MPGA_FILTER
     p_sys->b_packetizer = true;
+#else
+    p_sys->b_packetizer = false;
 #endif
     p_sys->i_state = STATE_NOSYNC;
     date_Set( &p_sys->end_date, 0 );
     block_BytestreamInit( &p_sys->bytestream );
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_discontinuity = false;
+    p_sys->i_frame_size = 0;
+
+    p_sys->i_channels_conf = p_sys->i_channels = p_sys->i_rate =
+    p_sys->i_max_frame_size = p_sys->i_frame_length = p_sys->i_layer =
+    p_sys->i_bit_rate = 0;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
