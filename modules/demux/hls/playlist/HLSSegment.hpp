@@ -63,7 +63,6 @@ namespace hls
                 virtual void onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *); /* reimpl */
                 void checkFormat(block_t *, SegmentChunk *, BaseRepresentation *);
 
-                uint64_t sequence;
                 SegmentEncryption encryption;
 #ifdef HAVE_GCRYPT
                 gcry_cipher_hd_t ctx;

@@ -55,6 +55,8 @@ namespace adaptative
                  */
                 virtual SegmentChunk*                   toChunk         (size_t, BaseRepresentation * = NULL);
                 virtual void                            setByteRange    (size_t start, size_t end);
+                virtual void                            setSequenceNumber(uint64_t);
+                virtual uint64_t                        getSequenceNumber() const;
                 virtual size_t                          getOffset       () const;
                 virtual std::vector<ISegment*>          subSegments     () = 0;
                 virtual void                            addSubSegment   (SubSegment *) = 0;
@@ -75,6 +77,9 @@ namespace adaptative
                 size_t                  endByte;
                 std::string             debugName;
                 int                     classId;
+                uint64_t                sequence;
+                static const int        SEQUENCE_INVALID;
+                static const int        SEQUENCE_FIRST;
 
                 virtual SegmentChunk * getChunk(const std::string &);
         };

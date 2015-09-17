@@ -34,6 +34,9 @@
 using namespace adaptative::http;
 using namespace adaptative::playlist;
 
+const int ISegment::SEQUENCE_INVALID = 0;
+const int ISegment::SEQUENCE_FIRST   = 1;
+
 ISegment::ISegment(const ICanonicalUrl *parent):
     ICanonicalUrl( parent ),
     startByte  (0),
@@ -44,6 +47,7 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     startTime.Set(0);
     duration.Set(0);
     chunksuse.Set(0);
+    sequence = SEQUENCE_INVALID;
 }
 
 ISegment::~ISegment()
@@ -90,6 +94,16 @@ void ISegment::setByteRange(size_t start, size_t end)
 {
     startByte = start;
     endByte   = end;
+}
+
+void ISegment::setSequenceNumber(uint64_t seq)
+{
+    sequence = SEQUENCE_FIRST + seq;
+}
+
+uint64_t ISegment::getSequenceNumber() const
+{
+    return sequence;
 }
 
 size_t ISegment::getOffset() const

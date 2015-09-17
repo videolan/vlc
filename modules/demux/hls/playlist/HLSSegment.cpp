@@ -38,7 +38,7 @@ SegmentEncryption::SegmentEncryption()
 HLSSegment::HLSSegment( ICanonicalUrl *parent, uint64_t seq ) :
     Segment( parent )
 {
-    sequence = seq;
+    setSequenceNumber(seq);
 #ifdef HAVE_GCRYPT
     ctx = NULL;
 #endif
@@ -85,10 +85,10 @@ void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRe
             {
                 encryption.iv.clear();
                 encryption.iv.resize(16);
-                encryption.iv[15] = sequence & 0xff;
-                encryption.iv[14] = (sequence >> 8)& 0xff;
-                encryption.iv[13] = (sequence >> 16)& 0xff;
-                encryption.iv[12] = (sequence >> 24)& 0xff;
+                encryption.iv[15] = (getSequenceNumber() - Segment::SEQUENCE_FIRST) & 0xff;
+                encryption.iv[14] = ((getSequenceNumber() - Segment::SEQUENCE_FIRST) >> 8)& 0xff;
+                encryption.iv[13] = ((getSequenceNumber() - Segment::SEQUENCE_FIRST) >> 16)& 0xff;
+                encryption.iv[12] = ((getSequenceNumber() - Segment::SEQUENCE_FIRST) >> 24)& 0xff;
             }
 
             if( gcry_cipher_open(&ctx, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_CBC, 0) ||
@@ -148,7 +148,7 @@ void HLSSegment::debug(vlc_object_t *obj, int indent) const
 {
     std::stringstream ss;
     ss << std::string(indent, ' ') << debugName <<
-    " #" << sequence <<
+    " #" << (getSequenceNumber() - Segment::SEQUENCE_FIRST) <<
     " url=" << getUrlSegment().toString();
     if(startByte!=endByte)
         ss << " @" << startByte << ".." << endByte;
@@ -160,9 +160,9 @@ int HLSSegment::compare(ISegment *segment) const
     HLSSegment *hlssegment = dynamic_cast<HLSSegment *>(segment);
     if(hlssegment)
     {
-        if (sequence > hlssegment->sequence)
+        if (getSequenceNumber() > hlssegment->getSequenceNumber())
             return 1;
-        else if(sequence < hlssegment->sequence)
+        else if(getSequenceNumber() < hlssegment->getSequenceNumber())
             return -1;
         else
             return 0;
