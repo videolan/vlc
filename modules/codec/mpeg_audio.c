@@ -140,8 +140,6 @@ static int Open( vlc_object_t *p_this )
     /* Misc init */
 #ifdef HAVE_MPGA_FILTER
     p_sys->b_packetizer = true;
-#else
-    p_sys->b_packetizer = false;
 #endif
     p_sys->i_state = STATE_NOSYNC;
     date_Set( &p_sys->end_date, 0 );
