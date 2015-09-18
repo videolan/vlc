@@ -174,17 +174,16 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block )
         return NULL;
 
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    if( (*pp_block)->i_flags&(BLOCK_FLAG_CORRUPTED) )
     {
-        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
-        {
-            p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty( &p_sys->bytestream );
-        }
+        p_sys->i_state = STATE_NOSYNC;
+        block_BytestreamEmpty( &p_sys->bytestream );
         date_Set( &p_sys->end_date, 0 );
         block_Release( *pp_block );
         return NULL;
     }
+    if( (*pp_block)->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        date_Set( &p_sys->end_date, 0 );
 
     if( !date_Get( &p_sys->end_date ) && (*pp_block)->i_pts <= VLC_TS_INVALID )
     {

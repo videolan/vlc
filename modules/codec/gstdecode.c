@@ -679,8 +679,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->b_prerolled = false;
         }
 
-        block_Release( p_block );
-        goto done;
+        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        {
+            block_Release( p_block );
+            goto done;
+        }
     }
 
     if( likely( p_block->i_buffer ) )
