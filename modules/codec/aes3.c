@@ -310,6 +310,15 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
     p_block = *pp_block;
     *pp_block = NULL; /* So the packet doesn't get re-sent */
 
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        date_Set( &p_sys->end_date, 0 );
+
     /* Date management */
     if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
@@ -371,4 +380,3 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
     *pi_bits = i_bits;
     return p_block;
 }
-

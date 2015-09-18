@@ -173,6 +173,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
     p_block = *pp_block;
 
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+
     arib_parser_t *p_parser = arib_get_parser( p_sys->p_arib_instance );
     arib_decoder_t *p_decoder = arib_get_decoder( p_sys->p_arib_instance );
     if ( p_parser && p_decoder )

@@ -127,6 +127,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( !pp_block || !*pp_block ) return NULL;
     p_block = *pp_block;
+    *pp_block = NULL;
 
     if( stream != NULL
      && p_block->i_buffer > 0

@@ -112,7 +112,8 @@ static subpicture_t *Decode(decoder_t *dec, block_t **block)
 
     subpicture_t *sub = NULL;
 
-    block_t *b = *block; *block = NULL;
+    block_t *b = *block;
+    *block = NULL;
     if (b->i_flags & (BLOCK_FLAG_CORRUPTED))
         goto exit;
     if (b->i_buffer < 128)

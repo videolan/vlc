@@ -780,6 +780,7 @@ static void *DecodeSync(decoder_t *p_dec, block_t **pp_block)
     if (p_block->i_flags & (BLOCK_FLAG_CORRUPTED))
     {
         block_Release(p_block);
+        *pp_block = NULL;
         return NULL;
     }
 
@@ -802,6 +803,7 @@ error:
     msg_Err(p_dec, "Error in DecodeSync()");
     if (p_block)
         block_Release(p_block);
+    *pp_block = NULL;
     return NULL;
 }
 
@@ -842,6 +844,7 @@ static void *DecodeAsync(decoder_t *p_dec, block_t **pp_block)
     if (p_block->i_flags & (BLOCK_FLAG_CORRUPTED))
     {
         block_Release(p_block);
+        *pp_block = NULL;
         return NULL;
     }
 
@@ -896,6 +899,7 @@ static void *DecodeAsync(decoder_t *p_dec, block_t **pp_block)
 error:
     msg_Err(p_dec, "Error in DecodeAsync()");
     block_Release(p_block);
+    *pp_block = NULL;
     return NULL;
 }
 

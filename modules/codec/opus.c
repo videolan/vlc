@@ -367,9 +367,22 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block = *pp_block;
+    *pp_block = NULL; /* To avoid being fed the same packet again */
+
+    if( !p_block )
+        return NULL;
+
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
+
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        date_Set( &p_sys->end_date, 0 );
 
     /* Date management */
-    if( p_block && p_block->i_pts > VLC_TS_INVALID &&
+    if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
@@ -378,14 +391,9 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     if( !date_Get( &p_sys->end_date ) )
     {
         /* We've just started the stream, wait for the first PTS. */
-        if( p_block ) block_Release( p_block );
+        block_Release( p_block );
         return NULL;
     }
-
-    *pp_block = NULL; /* To avoid being fed the same packet again */
-
-    if( !p_block )
-        return NULL;
 
     block_t *p_aout_buffer = DecodePacket( p_dec, p_oggpacket,
                                            p_block->i_nb_samples,

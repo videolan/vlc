@@ -62,13 +62,13 @@ static block_t *Decode(decoder_t *dec, block_t **block_ptr)
         return NULL;
 
     block_t *block = *block_ptr;
-    if (block->i_flags & BLOCK_FLAG_CORRUPTED) {
+    if (block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
         date_Set(&sys->end_date, 0);
-        block_Release(block);
-        return NULL;
-    }
-    if (block->i_flags & BLOCK_FLAG_DISCONTINUITY) {
-        date_Set(&sys->end_date, 0);
+        if (block->i_flags & BLOCK_FLAG_CORRUPTED) {
+            block_Release(block);
+            *block_ptr = NULL;
+            return NULL;
+        }
     }
 
     if (block->i_pts > VLC_TS_INVALID &&

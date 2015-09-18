@@ -402,9 +402,19 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
 
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
+    {
+        p_sys->i_pts = VLC_TS_INVALID;
+        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        {
+            block_Release( p_block );
+            return NULL;
+        }
+    }
+
     /* configure for SD res in case DDS is not present */
     /* a change of PTS is a good indication we must get a new DDS */
-    if (p_sys->i_pts != p_block->i_pts)
+    if( p_sys->i_pts != p_block->i_pts )
         default_dds_init( p_dec );
 
     p_sys->i_pts = p_block->i_pts;

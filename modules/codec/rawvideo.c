@@ -143,6 +143,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     block_t *p_block = *pp_block;
 
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        date_Set( &p_sys->pts, p_block->i_dts );
+
     if( p_block->i_pts <= VLC_TS_INVALID && p_block->i_dts <= VLC_TS_INVALID &&
         !date_Get( &p_sys->pts ) )
     {

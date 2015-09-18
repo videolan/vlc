@@ -307,13 +307,14 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
 
     p_block = *pp_block;
-    if( p_block->i_flags & (BLOCK_FLAG_CORRUPTED) )
+    *pp_block = NULL;
+
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         p_sys->i_max_stop = VLC_TS_INVALID;
         block_Release( p_block );
         return NULL;
     }
-    *pp_block = NULL;
 
     if( p_block->i_buffer == 0 || p_block->p_buffer[0] == '\0' )
     {

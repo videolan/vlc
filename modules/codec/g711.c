@@ -219,8 +219,18 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( pp_block == NULL )
         return NULL;
     block_t *p_block = *pp_block;
+    *pp_block = NULL;
     if( p_block == NULL )
         return NULL;
+
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+    {
+        block_Release( p_block);
+        return NULL;
+    }
+
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        date_Set( &p_sys->end_date, 0 );
 
     if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )

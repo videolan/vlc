@@ -314,6 +314,12 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     *pp_block = NULL;
 
+    if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        goto skip;
+
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        date_Set( &p_sys->end_date, 0 );
+
     if( p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
