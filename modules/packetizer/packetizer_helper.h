@@ -101,16 +101,15 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
     if( unlikely( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) )
     {
         const bool b_broken = ( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED ) != 0;
+        p_pack->i_state = STATE_NOSYNC;
+        block_BytestreamEmpty( &p_pack->bytestream );
+        p_pack->i_offset = 0;
+        p_pack->pf_reset( p_pack->p_private, b_broken );
         if( b_broken )
         {
-            p_pack->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty( &p_pack->bytestream );
-            p_pack->i_offset = 0;
+            block_Release( *pp_block );
+            return NULL;
         }
-        p_pack->pf_reset( p_pack->p_private, b_broken );
-
-        block_Release( *pp_block );
-        return NULL;
     }
 
     block_BytestreamPush( &p_pack->bytestream, *pp_block );

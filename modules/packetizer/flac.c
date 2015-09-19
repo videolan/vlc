@@ -519,12 +519,12 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         in = *pp_block;
 
         if (in->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+            p_sys->i_state = STATE_NOSYNC;
+            block_BytestreamEmpty(&p_sys->bytestream);
             if (in->i_flags&BLOCK_FLAG_CORRUPTED) {
-                p_sys->i_state = STATE_NOSYNC;
-                block_BytestreamEmpty(&p_sys->bytestream);
+                block_Release(*pp_block);
+                return NULL;
             }
-            block_Release(*pp_block);
-            return NULL;
         }
     }
 

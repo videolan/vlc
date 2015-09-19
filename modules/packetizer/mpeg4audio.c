@@ -299,10 +299,12 @@ static block_t *PacketizeRawBlock(decoder_t *p_dec, block_t **pp_block)
     if (!pp_block || !*pp_block)
         return NULL;
 
-    if ((*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+    if ((*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED)) {
         date_Set(&p_sys->end_date, 0);
-        block_Release(*pp_block);
-        return NULL;
+        if ((*pp_block)->i_flags&(BLOCK_FLAG_CORRUPTED)) {
+            block_Release(*pp_block);
+            return NULL;
+        }
     }
 
     p_block = *pp_block;
@@ -942,14 +944,14 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
     if (!pp_block || !*pp_block)
         return NULL;
 
-    if ((*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
-        if ((*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED) {
-            p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty(&p_sys->bytestream);
+    if ((*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) {
+        p_sys->i_state = STATE_NOSYNC;
+        block_BytestreamEmpty(&p_sys->bytestream);
+        date_Set(&p_sys->end_date, VLC_TS_INVALID);
+        if ((*pp_block)->i_flags & BLOCK_FLAG_CORRUPTED) {
+            block_Release(*pp_block);
+            return NULL;
         }
-        date_Set(&p_sys->end_date, 0);
-        block_Release(*pp_block);
-        return NULL;
     }
 
     if (!date_Get(&p_sys->end_date) && (*pp_block)->i_pts <= VLC_TS_INVALID) {
