@@ -51,7 +51,8 @@
  *   optimised for preheader/postdatas increase)
  ****************************************************************************/
 
-/** The content doesn't follow the last block, or is probably broken */
+/** The content doesn't follow the last block and indicates a timeline change
+ *  without data loss or corruption */
 #define BLOCK_FLAG_DISCONTINUITY 0x0001
 /** Intra frame */
 #define BLOCK_FLAG_TYPE_I        0x0002
