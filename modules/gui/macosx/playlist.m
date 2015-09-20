@@ -109,7 +109,7 @@
 {
     NSFont *fontToUse;
     CGFloat rowHeight;
-    if (config_GetInt(VLCIntf, "macosx-large-text")) {
+    if (var_InheritBool(VLCIntf, "macosx-large-text")) {
         fontToUse = [NSFont systemFontOfSize:13.];
         rowHeight = 21.;
     } else {
@@ -658,7 +658,7 @@
     playlist_t *p_playlist = pl_Get(p_intf);
 
     NSFont *fontToUse;
-    if (config_GetInt(VLCIntf, "macosx-large-text"))
+    if (var_InheritBool(VLCIntf, "macosx-large-text"))
         fontToUse = [NSFont systemFontOfSize:13.];
     else
         fontToUse = [NSFont systemFontOfSize:11.];
