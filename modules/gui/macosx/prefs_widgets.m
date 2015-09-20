@@ -387,7 +387,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 @interface VLCConfigControl()
 {
-    char            *psz_name;
+    const char *psz_name;
 }
 @end
 
@@ -419,11 +419,6 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     NSRect frame = [self frame];
     frame.origin.y = i_yPos;
     [self setFrame:frame];
-}
-
-- (void)dealloc
-{
-    free(psz_name);
 }
 
 + (int)calcVerticalMargin:(int)i_curItem lastItem:(int)i_lastItem
