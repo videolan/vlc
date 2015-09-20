@@ -3222,7 +3222,7 @@ static bool GatherData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             {
                 msg_Warn( p_demux, "discontinuity indicator (pid=%d) ",
                             pid->i_pid );
-                /* pid->es->p_data->i_flags |= BLOCK_FLAG_DISCONTINUITY; */
+                pid->u.p_pes->p_data->i_flags |= BLOCK_FLAG_DISCONTINUITY;
             }
 #if 0
             if( p[5]&0x40 )
