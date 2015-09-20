@@ -522,8 +522,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 avcodec_flush_buffers( p_context );
             wait_mt( p_sys );
 
-            block_Release( p_block );
-            return NULL;
+            if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+            {
+                block_Release( p_block );
+                return NULL;
+            }
         }
 
         if( p_block->i_flags & BLOCK_FLAG_PREROLL )
