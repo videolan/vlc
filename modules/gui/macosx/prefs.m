@@ -68,6 +68,18 @@
 
 /* /!\ Warning: Unreadable code :/ */
 
+@interface VLCFlippedView : NSView
+@end
+
+@implementation VLCFlippedView
+
+- (BOOL)isFlipped
+{
+    return YES;
+}
+
+@end
+
 @interface VLCTreeItem : NSObject
 {
     NSString *_name;
@@ -302,7 +314,7 @@
 
     [self.prefsViewController setTitle: [self name]];
     s_vrc = [[prefsView contentView] bounds]; s_vrc.size.height -= 4;
-    view = [[NSView alloc] initWithFrame: s_vrc];
+    view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
     [view setAutoresizingMask: NSViewWidthSizable | NSViewMinYMargin | NSViewMaxYMargin];
 
     if (!_subviews) {
