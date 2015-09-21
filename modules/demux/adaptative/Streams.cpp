@@ -313,3 +313,9 @@ void Stream::prune()
 {
     segmentTracker->pruneFromCurrent();
 }
+
+void Stream::runUpdates()
+{
+    if(!isDisabled())
+        segmentTracker->updateSelected();
+}

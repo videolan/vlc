@@ -60,7 +60,7 @@ namespace hls
                 virtual ~M3U8Parser    ();
 
                 M3U8 *             parse  (stream_t *p_stream, const std::string &);
-                bool loadSegmentsFromPlaylistURI(vlc_object_t *, Representation *);
+                bool appendSegmentsFromPlaylistURI(vlc_object_t *, Representation *);
 
             private:
                 Representation * createRepresentation(BaseAdaptationSet *, const AttributesTag *);

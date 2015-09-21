@@ -328,7 +328,7 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
         childs.at(i)->pruneBySegmentNumber(num);
 }
 
-void SegmentInformation::runLocalUpdates()
+void SegmentInformation::runLocalUpdates(mtime_t, uint64_t)
 {
 
 }

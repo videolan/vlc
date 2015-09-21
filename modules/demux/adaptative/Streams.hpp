@@ -83,6 +83,7 @@ namespace adaptative
         bool setPosition(mtime_t, bool);
         mtime_t getPosition() const;
         void prune();
+        void runUpdates();
 
     private:
         SegmentChunk *getChunk();

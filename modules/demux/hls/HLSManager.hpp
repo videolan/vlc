@@ -36,7 +36,6 @@ namespace hls
                         logic::AbstractAdaptationLogic::LogicType type );
             virtual ~HLSManager();
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType);
-            virtual bool updatePlaylist();
 
             static bool isHTTPLiveStreaming(stream_t *);
     };

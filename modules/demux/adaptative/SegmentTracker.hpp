@@ -56,6 +56,7 @@ namespace adaptative
             bool setPosition(mtime_t, bool, bool);
             mtime_t getSegmentStart() const;
             void pruneFromCurrent();
+            void updateSelected();
 
         private:
             bool initializing;

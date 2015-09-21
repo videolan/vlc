@@ -71,6 +71,11 @@ void BaseRepresentation::addCodec(const std::string &codec)
     codecs.push_back(codec);
 }
 
+bool BaseRepresentation::needsUpdate() const
+{
+    return false;
+}
+
 void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
 {
     std::string text(indent, ' ');

@@ -85,8 +85,9 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
         initializing = true;
     }
 
-    /* Ensure content is loaded */
-    rep->runLocalUpdates();
+    /* Ensure ephemere content is updated/loaded */
+    if(rep->needsUpdate())
+        updateSelected();
 
     /* If we're starting, set the first segment number to download */
     if(!sequence_set)
@@ -167,4 +168,10 @@ void SegmentTracker::pruneFromCurrent()
     AbstractPlaylist *playlist = adaptationSet->getPlaylist();
     if(playlist->isLive() && sequence_set)
         playlist->pruneBySegmentNumber(count);
+}
+
+void SegmentTracker::updateSelected()
+{
+    if(prevRepresentation)
+        prevRepresentation->runLocalUpdates(getSegmentStart(), count);
 }

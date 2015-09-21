@@ -148,7 +148,7 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
     }
 }
 
-bool M3U8Parser::loadSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representation *rep)
+bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representation *rep)
 {
     void *p_data;
     const size_t i_data = Retrieve::HTTP(p_obj, rep->getPlaylistUrl().toString(), &p_data);
@@ -172,9 +172,9 @@ bool M3U8Parser::loadSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representation
 void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const std::list<Tag *> &tagslist)
 {
     SegmentList *segmentList = new (std::nothrow) SegmentList(rep);
-    rep->setSegmentList(segmentList);
 
     rep->timescale.Set(100);
+    rep->b_loaded = true;
 
     stime_t totalduration = 0;
     stime_t nzStartTime = 0;
@@ -308,8 +308,9 @@ void M3U8Parser::parseSegments(vlc_object_t *p_obj, Representation *rep, const s
     {
         rep->getPlaylist()->duration.Set(totalduration * CLOCK_FREQ / rep->timescale.Get());
     }
-}
 
+    rep->setSegmentList(segmentList);
+}
 M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
 {
     char *psz_line = stream_ReadLine(p_stream);
@@ -368,7 +369,6 @@ M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
                         if(rep)
                         {
                             adaptSet->addRepresentation(rep);
-                            loadSegmentsFromPlaylistURI(VLC_OBJECT(p_stream), rep);
                         }
                     }
                 }
@@ -391,7 +391,6 @@ M3U8 * M3U8Parser::parse(stream_t *p_stream, const std::string &playlisturl)
                 if(rep)
                 {
                     altAdaptSet->addRepresentation(rep);
-                    loadSegmentsFromPlaylistURI(VLC_OBJECT(p_stream), rep);
                 }
 
                 if(pair.second->getAttributeByName("NAME"))

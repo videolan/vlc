@@ -269,6 +269,10 @@ bool PlaylistManager::seekAble() const
 
 bool PlaylistManager::updatePlaylist()
 {
+    std::vector<Stream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
+        (*it)->runUpdates();
+
     return true;
 }
 
@@ -313,8 +317,7 @@ int PlaylistManager::doDemux(int64_t increment)
         break;
     }
 
-    if( !updatePlaylist() )
-        msg_Warn(p_demux, "Can't update MPD");
+    updatePlaylist();
 
     return VLC_DEMUXER_SUCCESS;
 }

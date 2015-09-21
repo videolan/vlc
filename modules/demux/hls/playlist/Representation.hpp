@@ -44,12 +44,16 @@ namespace hls
 
                 void setPlaylistUrl(const std::string &);
                 Url getPlaylistUrl() const;
-                void localMergeWithPlaylist(M3U8 *, mtime_t);
                 bool isLive() const;
-                virtual void mergeWith(SegmentInformation *, mtime_t); /* reimpl */
+                virtual bool needsUpdate() const;  /* reimpl */
+                virtual void debug(vlc_object_t *, int) const;  /* reimpl */
+                virtual void runLocalUpdates(mtime_t, uint64_t); /* reimpl */
+                virtual void getDurationsRange(mtime_t *, mtime_t *) const; /* reimpl */
 
             private:
                 bool b_live;
+                bool b_loaded;
+                mtime_t nextPlaylistupdate;
                 Url playlistUrl;
                 Property<std::string> audio;
                 Property<std::string> video;

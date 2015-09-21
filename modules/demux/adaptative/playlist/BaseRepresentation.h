@@ -58,8 +58,9 @@ namespace adaptative
                 void                setBandwidth            ( uint64_t bandwidth );
                 const std::list<std::string> & getCodecs    () const;
                 void                addCodec                (const std::string &);
+                virtual bool        needsUpdate()           const;
 
-                void                debug                   (vlc_object_t *,int = 0) const;
+                virtual void        debug                   (vlc_object_t *,int = 0) const;
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,
