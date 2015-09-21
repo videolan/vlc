@@ -40,9 +40,9 @@ SegmentTimeline::~SegmentTimeline()
         delete *it;
 }
 
-void SegmentTimeline::addElement(stime_t d, uint64_t r, stime_t t)
+void SegmentTimeline::addElement(uint64_t number, stime_t d, uint64_t r, stime_t t)
 {
-    Element *element = new (std::nothrow) Element(d, r, t);
+    Element *element = new (std::nothrow) Element(number, d, r, t);
     if(element)
     {
         if(!elements.empty() && !t)
@@ -203,8 +203,9 @@ mtime_t SegmentTimeline::end() const
     return scaled  * CLOCK_FREQ / inheritTimescale();
 }
 
-SegmentTimeline::Element::Element(stime_t d_, uint64_t r_, stime_t t_)
+SegmentTimeline::Element::Element(uint64_t number_, stime_t d_, uint64_t r_, stime_t t_)
 {
+    number = number_;
     d = d_;
     t = t_;
     r = r_;

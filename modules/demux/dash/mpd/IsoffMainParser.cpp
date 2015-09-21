@@ -428,6 +428,10 @@ void IsoffMainParser::parseTimeline(Node *node, MediaSegmentTemplate *templ)
     if(!node)
         return;
 
+    uint64_t number = 0;
+    if(node->hasAttribute("startNumber"))
+        number = Integer<uint64_t>(node->getAttributeValue("startNumber"));
+
     SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(templ);
     if(timeline)
     {
@@ -442,12 +446,15 @@ void IsoffMainParser::parseTimeline(Node *node, MediaSegmentTemplate *templ)
             uint64_t r = 0; // never repeats by default
             if(s->hasAttribute("r"))
                 r = Integer<uint64_t>(s->getAttributeValue("r"));
+
             if(s->hasAttribute("t"))
             {
                 stime_t t = Integer<stime_t>(s->getAttributeValue("t"));
-                timeline->addElement(d, r, t);
+                timeline->addElement(number, d, r, t);
             }
-            else timeline->addElement(d, r);
+            else timeline->addElement(number, d, r);
+
+            number += (1 + r);
 
             templ->segmentTimeline.Set(timeline);
         }

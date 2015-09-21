@@ -43,7 +43,7 @@ namespace adaptative
             public:
                 SegmentTimeline(TimescaleAble * = NULL);
                 virtual ~SegmentTimeline();
-                void addElement(stime_t d, uint64_t r = 0, stime_t t = 0);
+                void addElement(uint64_t, stime_t d, uint64_t r = 0, stime_t t = 0);
                 uint64_t getElementNumberByScaledPlaybackTime(stime_t) const;
                 stime_t getScaledPlaybackTimeByElementNumber(uint64_t) const;
                 size_t maxElementNumber() const;
@@ -59,10 +59,11 @@ namespace adaptative
                 class Element
                 {
                     public:
-                        Element(stime_t, uint64_t, stime_t);
+                        Element(uint64_t, stime_t, uint64_t, stime_t);
                         stime_t  t;
                         stime_t  d;
                         uint64_t r;
+                        uint64_t number;
                 };
         };
     }
