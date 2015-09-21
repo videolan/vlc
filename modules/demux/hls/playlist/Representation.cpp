@@ -60,6 +60,11 @@ bool Representation::isLive() const
     return b_live;
 }
 
+bool Representation::initialized() const
+{
+    return b_loaded;
+}
+
 void Representation::setPlaylistUrl(const std::string &uri)
 {
     playlistUrl = Url(uri);

@@ -56,7 +56,7 @@ bool M3U8::isLive() const
             for(itr = adaptSet->getRepresentations().begin(); itr != adaptSet->getRepresentations().end(); ++itr)
             {
                 const Representation *rep = dynamic_cast<const Representation *>(*itr);
-                if(rep->isLive())
+                if(rep->initialized() && rep->isLive())
                     return true;
             }
         }

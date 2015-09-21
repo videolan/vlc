@@ -45,6 +45,7 @@ namespace hls
                 void setPlaylistUrl(const std::string &);
                 Url getPlaylistUrl() const;
                 bool isLive() const;
+                bool initialized() const;
                 virtual bool needsUpdate() const;  /* reimpl */
                 virtual void debug(vlc_object_t *, int) const;  /* reimpl */
                 virtual void runLocalUpdates(mtime_t, uint64_t); /* reimpl */
