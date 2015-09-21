@@ -31,6 +31,8 @@
 #include "../adaptative/playlist/SegmentList.h"
 #include "../HLSStreamFormat.hpp"
 
+#include <ctime>
+
 using namespace hls;
 using namespace hls::playlist;
 
