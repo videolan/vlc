@@ -431,7 +431,8 @@ static subpicture_t *Subtitle( decoder_t *p_dec, text_segment_t *p_segments, mti
     if( p_dec->p_sys->b_opaque )
         p_spu_sys->p_default_style->i_style_flags |= STYLE_BACKGROUND;
     p_spu_sys->p_default_style->i_font_color = rgi_eia608_colors[EIA608_COLOR_DEFAULT];
-    p_spu_sys->p_default_style->f_font_relsize = 100 / EIA608_SCREEN_ROWS * 3/4;
+    /* FCC defined "safe area" for EIA-608 captions is 80% of the height of the display */
+    p_spu_sys->p_default_style->f_font_relsize = 100 * 8 / 10 / EIA608_SCREEN_ROWS;
     p_spu_sys->p_default_style->i_features |= (STYLE_HAS_FONT_COLOR | STYLE_HAS_FLAGS);
 
     return p_spu;
