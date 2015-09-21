@@ -30,7 +30,6 @@ using namespace adaptative::playlist;
 SegmentTimeline::SegmentTimeline(TimescaleAble *parent)
     :TimescaleAble(parent)
 {
-    pruned = 0;
 }
 
 SegmentTimeline::~SegmentTimeline()
@@ -56,7 +55,7 @@ void SegmentTimeline::addElement(uint64_t number, stime_t d, uint64_t r, stime_t
 
 uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) const
 {
-    uint64_t count = 0;
+    uint64_t prevnumber = 0;
     std::list<Element *>::const_iterator it;
     for(it = elements.begin(); it != elements.end(); ++it)
     {
@@ -64,58 +63,48 @@ uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) c
         for(uint64_t repeat = 1 + el->r; repeat; repeat--)
         {
             if(el->d >= scaled)
-                return count;
+                return prevnumber;
 
             scaled -= el->d;
-            count++;
+            prevnumber++;
         }
+
+        /* might have been discontinuity */
+        prevnumber = el->number;
     }
-    count += pruned;
-    return count;
+
+    return prevnumber;
 }
 
 stime_t SegmentTimeline::getScaledPlaybackTimeByElementNumber(uint64_t number) const
 {
     stime_t totalscaledtime = 0;
 
-    if(number < pruned)
-        return 0;
-
-    number -= pruned;
-
     std::list<Element *>::const_iterator it;
     for(it = elements.begin(); it != elements.end(); ++it)
     {
         const Element *el = *it;
 
-        if(number == 0)
+        if(number >= el->number)
         {
-            totalscaledtime = el->t;
-            break;
-        }
-        else if(number <= el->r)
-        {
+            if(number <= el->number + el->r)
+            {
+                return el->t + (number * el->d);
+            }
             totalscaledtime = el->t + (number * el->d);
-            break;
-        }
-        else
-        {
-            number -= el->r + 1;
         }
     }
 
     return totalscaledtime;
 }
 
-size_t SegmentTimeline::maxElementNumber() const
+uint64_t SegmentTimeline::maxElementNumber() const
 {
-    size_t count = 0;
+    if(elements.empty())
+        return 0;
 
-    std::list<Element *>::const_iterator it;
-    for(it = elements.begin(); it != elements.end(); ++it)
-        count += (*it)->r + 1;
-
-    return pruned + count - 1;
+    const Element *e = elements.back();
+    return e->number + e->r;
 }
 
 size_t SegmentTimeline::prune(mtime_t time)
@@ -135,7 +124,6 @@ size_t SegmentTimeline::prune(mtime_t time)
             break;
     }
 
-    pruned += prunednow;
     return prunednow;
 }
 

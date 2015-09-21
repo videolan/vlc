@@ -31,7 +31,6 @@ using namespace adaptative::playlist;
 SegmentList::SegmentList( SegmentInformation *parent ):
     SegmentInfoCommon( parent ), TimescaleAble( parent )
 {
-    pruned = 0;
 }
 SegmentList::~SegmentList()
 {
@@ -43,6 +42,24 @@ SegmentList::~SegmentList()
 const std::vector<ISegment*>& SegmentList::getSegments() const
 {
     return segments;
+}
+
+ISegment * SegmentList::getSegmentByNumber(uint64_t number)
+{
+    std::vector<ISegment *>::const_iterator it = segments.begin();
+    for(it = segments.begin(); it != segments.end(); ++it)
+    {
+        ISegment *seg = *it;
+        if(seg->getSequenceNumber() == number)
+        {
+            return seg;
+        }
+        else if (seg->getSequenceNumber() > number)
+        {
+            break;
+        }
+    }
+    return NULL;
 }
 
 void SegmentList::addSegment(ISegment *seg)
@@ -68,54 +85,64 @@ void SegmentList::mergeWith(SegmentList *updated)
 
 void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
 {
-    if(tobelownum < pruned)
-        return;
-
-    uint64_t current = pruned;
     std::vector<ISegment *>::iterator it = segments.begin();
-    while(it != segments.end() && current < tobelownum)
+    while(it != segments.end())
     {
         ISegment *seg = *it;
+
+        if(seg->getSequenceNumber() >= tobelownum)
+            break;
+
         if(seg->chunksuse.Get()) /* can't prune from here, still in use */
             break;
+
         delete *it;
         it = segments.erase(it);
-
-        current++;
-        pruned++;
     }
 }
 
 bool SegmentList::getSegmentNumberByScaledTime(stime_t time, uint64_t *ret) const
 {
-    *ret = pruned;
-    return SegmentInfoCommon::getSegmentNumberByScaledTime(segments, time, ret);
+    std::vector<ISegment *> allsubsegments;
+    std::vector<ISegment *>::const_iterator it;
+    for(it=segments.begin(); it!=segments.end(); ++it)
+    {
+        std::vector<ISegment *> list = (*it)->subSegments();
+        allsubsegments.insert( allsubsegments.end(), list.begin(), list.end() );
+    }
+
+    return SegmentInfoCommon::getSegmentNumberByScaledTime(allsubsegments, time, ret);
 }
 
 mtime_t SegmentList::getPlaybackTimeBySegmentNumber(uint64_t number)
 {
-    if(number < pruned || segments.empty())
+    if(segments.empty())
         return VLC_TS_INVALID;
 
     const uint64_t timescale = inheritTimescale();
-    stime_t time = segments.at(0)->startTime.Get();
+    const ISegment *first = segments.front();
+    if(first->getSequenceNumber() > number)
+        return VLC_TS_INVALID;
 
-    if(segments.at(0)->duration.Get())
+    stime_t time = first->startTime.Get();
+    std::vector<ISegment *>::iterator it = segments.begin();
+    for(it = segments.begin(); it != segments.end(); ++it)
     {
-        number -= pruned;
-
-        for(size_t i=0; i<number && i<segments.size(); i++)
-            time += segments.at(i)->duration.Get();
-    }
-    else
-    {
-        time = number * duration.Get();
+        const ISegment *seg = *it;
+        /* Assuming there won't be any discontinuity in sequence */
+        if(seg->getSequenceNumber() == number)
+        {
+            break;
+        }
+        else if(seg->duration.Get())
+        {
+            time += seg->duration.Get();
+        }
+        else
+        {
+            time += duration.Get();
+        }
     }
 
     return VLC_TS_0 + CLOCK_FREQ * time / timescale;
-}
-
-std::size_t SegmentList::getOffset() const
-{
-    return pruned;
 }

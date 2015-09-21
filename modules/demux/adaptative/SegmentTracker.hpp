@@ -61,6 +61,7 @@ namespace adaptative
             bool initializing;
             bool index_sent;
             bool init_sent;
+            bool sequence_set;
             uint64_t count;
             AbstractAdaptationLogic *logic;
             BaseAdaptationSet *adaptationSet;

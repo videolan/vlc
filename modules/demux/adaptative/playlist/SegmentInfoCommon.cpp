@@ -71,6 +71,8 @@ bool SegmentInfoCommon::getSegmentNumberByScaledTime(const std::vector<ISegment 
     if(segments.empty() || (segments.size() > 1 && segments[1]->startTime.Get() == 0) )
         return false;
 
+    *ret = 0;
+
     std::vector<ISegment *>::const_iterator it = segments.begin();
     while(it != segments.end())
     {
@@ -83,10 +85,9 @@ bool SegmentInfoCommon::getSegmentNumberByScaledTime(const std::vector<ISegment 
                 break;
         }
 
-        (*ret)++;
+        *ret = seg->getSequenceNumber();
         it++;
     }
 
-    (*ret)--;
     return true;
 }

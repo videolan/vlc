@@ -46,7 +46,7 @@ namespace adaptative
                 void addElement(uint64_t, stime_t d, uint64_t r = 0, stime_t t = 0);
                 uint64_t getElementNumberByScaledPlaybackTime(stime_t) const;
                 stime_t getScaledPlaybackTimeByElementNumber(uint64_t) const;
-                size_t maxElementNumber() const;
+                uint64_t maxElementNumber() const;
                 size_t prune(mtime_t);
                 void mergeWith(SegmentTimeline &);
                 mtime_t start() const;
@@ -54,7 +54,6 @@ namespace adaptative
 
             private:
                 std::list<Element *> elements;
-                size_t pruned;
 
                 class Element
                 {

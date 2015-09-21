@@ -395,6 +395,8 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
                     nzStartTime += list->duration.Get();
                 }
 
+                seg->setSequenceNumber(total);
+
                 list->addSegment(seg);
                 total++;
             }

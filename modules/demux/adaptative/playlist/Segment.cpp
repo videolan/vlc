@@ -114,7 +114,8 @@ size_t ISegment::getOffset() const
 void ISegment::debug(vlc_object_t *obj, int indent) const
 {
     std::stringstream ss;
-    ss << std::string(indent, ' ') << debugName << " url=" << getUrlSegment().toString();
+    ss << std::string(indent, ' ') << debugName << " #" << getSequenceNumber();
+    ss << " url=" << getUrlSegment().toString();
     if(startByte!=endByte)
         ss << " @" << startByte << ".." << endByte;
     msg_Dbg(obj, "%s", ss.str().c_str());
@@ -162,6 +163,13 @@ Segment::Segment(ICanonicalUrl *parent) :
 
 void Segment::addSubSegment(SubSegment *subsegment)
 {
+    if(!subsegments.empty())
+    {
+        /* Use our own sequence number, and since it it now
+           uneffective, also for next subsegments numbering */
+        subsegment->setSequenceNumber(getSequenceNumber());
+        setSequenceNumber(getSequenceNumber());
+    }
     subsegments.push_back(subsegment);
 }
 

@@ -46,16 +46,15 @@ namespace adaptative
                 virtual ~SegmentList    ();
 
                 const std::vector<ISegment *>&   getSegments() const;
+                ISegment *              getSegmentByNumber(uint64_t);
                 void                    addSegment(ISegment *seg);
                 void                    mergeWith(SegmentList *);
                 void                    pruneBySegmentNumber(uint64_t);
                 bool                    getSegmentNumberByScaledTime(stime_t, uint64_t *) const;
                 mtime_t                 getPlaybackTimeBySegmentNumber(uint64_t);
-                std::size_t             getOffset() const;
 
             private:
                 std::vector<ISegment *>  segments;
-                std::size_t pruned;
         };
     }
 }

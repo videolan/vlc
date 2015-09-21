@@ -68,10 +68,8 @@ AbstractPlaylist * SegmentInformation::getPlaylist() const
         return NULL;
 }
 
-std::size_t SegmentInformation::getSegments(SegmentInfoType type, std::vector<ISegment *> &retSegments,
-                                            std::size_t *offset) const
+std::size_t SegmentInformation::getSegments(SegmentInfoType type, std::vector<ISegment *> &retSegments) const
 {
-    std::size_t off = 0;
     switch (type)
     {
         case INFOTYPE_INIT:
@@ -107,7 +105,6 @@ std::size_t SegmentInformation::getSegments(SegmentInfoType type, std::vector<IS
                     std::vector<ISegment *> list = (*it)->subSegments();
                     retSegments.insert( retSegments.end(), list.begin(), list.end() );
                 }
-                off = segmentList->getOffset();
             }
             else if( segmentBase )
             {
@@ -137,12 +134,10 @@ std::size_t SegmentInformation::getSegments(SegmentInfoType type, std::vector<IS
 
     if( retSegments.empty() && parent )
     {
-        return parent->getSegments( type, retSegments, offset );
+        return parent->getSegments( type, retSegments );
     }
     else
     {
-        if( offset )
-            *offset = off;
         return retSegments.size();
     }
 }
@@ -160,11 +155,8 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
 
 ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) const
 {
-    ISegment *segment = NULL;
-
     std::vector<ISegment *> retSegments;
-    std::size_t offset = 0;
-    const size_t size = getSegments( type, retSegments, &offset );
+    const size_t size = getSegments( type, retSegments );
     if( size )
     {
         /* check if that's a template (fixme: find a better way) */
@@ -175,13 +167,24 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
                templ->segmentTimeline.Get()->maxElementNumber() > pos)
                 return templ;
         }
-        else if( pos < size + offset && pos >= offset )
+        else
         {
-            segment = retSegments[pos - offset];
+            std::vector<ISegment *>::const_iterator it;
+            for(it = retSegments.begin(); it != retSegments.end(); ++it)
+            {
+                ISegment *seg = *it;
+                if(seg->getSequenceNumber() >= pos)
+                {
+                    if(seg->getSequenceNumber() == pos)
+                        return seg;
+                    else
+                        return NULL;
+                }
+            }
         }
     }
 
-    return segment;
+    return NULL;
 }
 
 bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
@@ -190,9 +193,10 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
     {
         const uint64_t timescale = mediaSegmentTemplate->inheritTimescale();
         const mtime_t duration = mediaSegmentTemplate->duration.Get();
+        *ret = mediaSegmentTemplate->startNumber.Get();
         if(duration)
         {
-            *ret = time / (CLOCK_FREQ * duration / timescale);
+            *ret += time / (CLOCK_FREQ * duration / timescale);
             return true;
         }
     }

@@ -71,8 +71,8 @@ namespace dash
                 TrickModeType                       *trickModeType;
 
                 /* for contextualize() */
-                mtime_t getScaledTimeBySegmentNumber(size_t, const MediaSegmentTemplate *) const;
-                size_t getSegmentNumber(size_t, const MediaSegmentTemplate *) const;
+                mtime_t getScaledTimeBySegmentNumber(uint64_t, const MediaSegmentTemplate *) const;
+                uint64_t getLiveTemplateNumberOffset(uint64_t, const MediaSegmentTemplate *) const;
         };
     }
 }
