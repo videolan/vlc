@@ -140,6 +140,7 @@ void FakeESOut::gc()
         return;
 
     vlc_mutex_lock( &lock );
+    es_out_Control( real_es_out, ES_OUT_RESET_PCR );
     std::list<FakeESOutID *>::iterator it;
     for( it=recycle_candidates.begin(); it!=recycle_candidates.end(); ++it )
     {
