@@ -153,6 +153,45 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
     return retSegments.size();
 }
 
+/* Returns wanted segment, or next in sequence if not found */
+ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_pos,
+                                              uint64_t *pi_newpos, bool *pb_gap) const
+{
+    *pb_gap = false;
+    *pi_newpos = i_pos;
+    if( type != INFOTYPE_MEDIA )
+        return NULL;
+
+    std::vector<ISegment *> retSegments;
+    const size_t size = getSegments( type, retSegments );
+    if( size )
+    {
+        std::vector<ISegment *>::const_iterator it;
+        for(it = retSegments.begin(); it != retSegments.end(); ++it)
+        {
+            ISegment *seg = *it;
+            if(seg->isTemplate()) /* we don't care about seq number */
+            {
+                /* Check if we don't exceed timeline */
+                MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate*>(retSegments[0]);
+                if(templ && templ->segmentTimeline.Get() &&
+                   templ->segmentTimeline.Get()->maxElementNumber() < i_pos)
+                    return NULL;
+                *pi_newpos = std::max(seg->getSequenceNumber(), i_pos);
+                return seg;
+            }
+            else if(seg->getSequenceNumber() >= i_pos)
+            {
+                *pi_newpos = seg->getSequenceNumber();
+                *pb_gap = (*pi_newpos != i_pos);
+                return seg;
+            }
+        }
+    }
+
+    return NULL;
+}
+
 ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) const
 {
     std::vector<ISegment *> retSegments;

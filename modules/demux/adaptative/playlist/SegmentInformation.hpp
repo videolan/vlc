@@ -79,6 +79,7 @@ namespace adaptative
                 static const int InfoTypeCount = INFOTYPE_INDEX + 1;
 
                 ISegment * getSegment(SegmentInfoType, uint64_t = 0) const;
+                ISegment * getNextSegment(SegmentInfoType, uint64_t, uint64_t *, bool *) const;
                 bool getSegmentNumberByTime(mtime_t, uint64_t *) const;
                 mtime_t getPlaybackTimeBySegmentNumber(uint64_t) const;
                 virtual void getDurationsRange(mtime_t *, mtime_t *) const;
