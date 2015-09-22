@@ -133,26 +133,29 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
     return chunk;
 }
 
-bool SegmentTracker::setPosition(mtime_t time, bool restarted, bool tryonly)
+bool SegmentTracker::setPositionByTime(mtime_t time, bool restarted, bool tryonly)
 {
     uint64_t segnumber;
     if(prevRepresentation &&
        prevRepresentation->getSegmentNumberByTime(time, &segnumber))
     {
         if(!tryonly)
-        {
-            if(restarted)
-            {
-                initializing = true;
-                index_sent = false;
-                init_sent = false;
-            }
-            count = segnumber;
-            sequence_set = true;
-        }
+            setPositionByNumber(segnumber, restarted);
         return true;
     }
     return false;
+}
+
+void SegmentTracker::setPositionByNumber(uint64_t segnumber, bool restarted)
+{
+    if(restarted)
+    {
+        initializing = true;
+        index_sent = false;
+        init_sent = false;
+    }
+    count = segnumber;
+    sequence_set = true;
 }
 
 mtime_t SegmentTracker::getSegmentStart() const

@@ -287,7 +287,7 @@ bool Stream::setPosition(mtime_t time, bool tryonly)
     if(!output)
         return false;
 
-    bool ret = segmentTracker->setPosition(time, output->reinitsOnSeek(), tryonly);
+    bool ret = segmentTracker->setPositionByTime(time, output->reinitsOnSeek(), tryonly);
     if(!tryonly && ret)
     {
         output->setPosition(time);
