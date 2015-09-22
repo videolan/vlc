@@ -26,6 +26,7 @@
 
 #include "StreamsType.hpp"
 #include <vlc_common.h>
+#include <list>
 
 namespace adaptative
 {
@@ -39,10 +40,21 @@ namespace adaptative
         class BaseAdaptationSet;
         class BaseRepresentation;
         class SegmentChunk;
+        class ISegment;
     }
 
     using namespace playlist;
     using namespace logic;
+
+    class SegmentTrackerListenerInterface
+    {
+        public:
+            enum notifications
+            {
+                NOTIFICATION_DISCONTINUITY = 0
+            };
+            virtual void trackerNotification(notifications, ISegment *) = 0;
+    };
 
     class SegmentTracker
     {
@@ -53,12 +65,15 @@ namespace adaptative
             void setAdaptationLogic(AbstractAdaptationLogic *);
             void resetCounter();
             SegmentChunk* getNextChunk(bool);
-            bool setPosition(mtime_t, bool, bool);
+            bool setPositionByTime(mtime_t, bool, bool);
+            void setPositionByNumber(uint64_t, bool);
             mtime_t getSegmentStart() const;
+            void registerListener(SegmentTrackerListenerInterface *);
             void pruneFromCurrent();
             void updateSelected();
 
         private:
+            void notify(SegmentTrackerListenerInterface::notifications, ISegment *);
             bool initializing;
             bool index_sent;
             bool init_sent;
@@ -67,6 +82,7 @@ namespace adaptative
             AbstractAdaptationLogic *logic;
             BaseAdaptationSet *adaptationSet;
             BaseRepresentation *prevRepresentation;
+            std::list<SegmentTrackerListenerInterface *> listeners;
     };
 }
 

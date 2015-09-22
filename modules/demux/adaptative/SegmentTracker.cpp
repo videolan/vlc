@@ -166,6 +166,11 @@ mtime_t SegmentTracker::getSegmentStart() const
         return 0;
 }
 
+void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)
+{
+    listeners.push_back(listener);
+}
+
 void SegmentTracker::pruneFromCurrent()
 {
     AbstractPlaylist *playlist = adaptationSet->getPlaylist();
@@ -177,4 +182,11 @@ void SegmentTracker::updateSelected()
 {
     if(prevRepresentation)
         prevRepresentation->runLocalUpdates(getSegmentStart(), count);
+}
+
+void SegmentTracker::notify(SegmentTrackerListenerInterface::notifications type, ISegment *segment)
+{
+    std::list<SegmentTrackerListenerInterface *>::const_iterator it;
+    for(it=listeners.begin();it != listeners.end(); ++it)
+        (*it)->trackerNotification(type, segment);
 }
