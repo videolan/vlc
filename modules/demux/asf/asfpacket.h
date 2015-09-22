@@ -33,6 +33,7 @@ typedef struct
     block_t *p_frame; /* used to gather complete frame */
     asf_object_stream_properties_t *p_sp;
     asf_object_extended_stream_properties_t *p_esp;
+    int i_cat;
 } asf_track_info_t;
 
 typedef struct asf_packet_sys_s asf_packet_sys_t;

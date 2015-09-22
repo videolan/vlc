@@ -2819,6 +2819,8 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
             return;
     }
 
+    p_track->asfinfo.i_cat = p_track->fmt.i_cat;
+
     const MP4_Box_t *p_elst;
     p_track->i_elst = 0;
     p_track->i_elst_time = 0;

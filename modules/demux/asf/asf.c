@@ -844,6 +844,7 @@ static int DemuxInit( demux_t *p_demux )
         tk->p_es = NULL;
         tk->info.p_esp = NULL;
         tk->info.p_frame = NULL;
+        tk->info.i_cat = UNKNOWN_ES;
         tk->queue.p_first = NULL;
         tk->queue.pp_last = &tk->queue.p_first;
 
@@ -1054,7 +1055,7 @@ static int DemuxInit( demux_t *p_demux )
             es_format_Init( &fmt, UNKNOWN_ES, 0 );
         }
 
-        tk->i_cat = fmt.i_cat;
+        tk->i_cat = tk->info.i_cat = fmt.i_cat;
         if( fmt.i_cat != UNKNOWN_ES )
         {
             if( p_esp && p_languages &&

@@ -95,7 +95,7 @@ static uint32_t SkipBytes( stream_t *s, uint32_t i_bytes )
 static int DemuxSubPayload( asf_packet_sys_t *p_packetsys,
                             uint8_t i_stream_number, block_t **pp_frame,
                             uint32_t i_sub_payload_data_length, mtime_t i_pts, mtime_t i_dts,
-                            uint32_t i_media_object_offset, bool b_keyframe )
+                            uint32_t i_media_object_offset, bool b_keyframe, bool b_ignore_pts )
 {
     /* FIXME I don't use i_media_object_number, sould I ? */
     if( *pp_frame && i_media_object_offset == 0 )
@@ -109,7 +109,7 @@ static int DemuxSubPayload( asf_packet_sys_t *p_packetsys,
         return -1;
     }
 
-    p_frag->i_pts = VLC_TS_0 + i_pts;
+    p_frag->i_pts = (b_ignore_pts) ? VLC_TS_INVALID : VLC_TS_0 + i_pts;
     p_frag->i_dts = VLC_TS_0 + i_dts;
     if ( b_keyframe )
         p_frag->i_flags |= BLOCK_FLAG_TYPE_I;
@@ -226,6 +226,8 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     if ( !p_tkinfo )
         goto skip;
 
+    bool b_ignore_pts = (p_tkinfo->i_cat == VIDEO_ES); /* ignore PTS delta with video when not set by mux */
+
     /* Non compressed */
     if( i_replicated_data_length > 7 ) // should be at least 8 bytes
     {
@@ -252,6 +254,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         /* i_media_object_offset is presentation time */
         /* Next byte is Presentation Time Delta */
         i_pts_delta = pkt->p_peek[pkt->i_skip];
+        b_ignore_pts = false;
         i_base_pts = (mtime_t)i_media_object_offset;
         i_base_pts -= *p_packetsys->pi_preroll;
         pkt->i_skip++;
@@ -332,7 +335,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         if ( i_sub_payload_data_length &&
              DemuxSubPayload( p_packetsys, i_stream_number, &p_tkinfo->p_frame,
                               i_sub_payload_data_length, i_payload_pts, i_payload_dts,
-                              i_media_object_offset, b_packet_keyframe ) < 0)
+                              i_media_object_offset, b_packet_keyframe, b_ignore_pts ) < 0)
             return -1;
 
         if ( pkt->left > pkt->i_skip + i_sub_payload_data_length )
