@@ -30,6 +30,7 @@
 #include <vlc_es.h>
 #include "../StreamFormat.hpp"
 #include "FakeESOut.hpp"
+#include "Demuxer.hpp"
 
 namespace adaptative
 {
@@ -97,7 +98,7 @@ namespace adaptative
 
     protected:
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
-        stream_t *demuxstream;
+        AbstractDemuxer *demuxer;
         bool      seekable;
         std::string name;
 

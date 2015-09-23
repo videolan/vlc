@@ -54,7 +54,7 @@ BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, c
 {
     this->name = name;
     seekable = true;
-    demuxstream = NULL;
+    demuxer = NULL;
 
     CommandsFactory *factory = new CommandsFactory();
 
@@ -77,15 +77,14 @@ BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, c
     }
     fakeesout->setExtraInfoProvider( this );
 
-    demuxstream = stream_DemuxNew(realdemux, name.c_str(), fakeesout->getEsOut());
-    if(!demuxstream)
+    demuxer = new StreamDemux(realdemux, name, fakeesout->getEsOut());
+    if(!demuxer)
         throw VLC_EGENERIC;
 }
 
 BaseStreamOutput::~BaseStreamOutput()
 {
-    if (demuxstream)
-        stream_Delete(demuxstream);
+    delete demuxer;
 
     if(fakeesout)
         delete fakeesout;
@@ -106,15 +105,15 @@ int BaseStreamOutput::esCount() const
     return fakeesout->esCount();
 }
 
-void BaseStreamOutput::pushBlock(block_t *block, bool)
+void BaseStreamOutput::pushBlock(block_t *block, bool b)
 {
-    stream_DemuxSend(demuxstream, block);
+    static_cast<void>(demuxer->feed(block, b));
 }
 
 bool BaseStreamOutput::seekAble() const
 {
     bool b_canswitch = switchAllowed();
-    return (demuxstream && seekable && b_canswitch);
+    return (demuxer && seekable && b_canswitch);
 }
 
 void BaseStreamOutput::setPosition(mtime_t nztime)
@@ -132,16 +131,12 @@ void BaseStreamOutput::setPosition(mtime_t nztime)
 
 bool BaseStreamOutput::restart()
 {
-    stream_Delete(demuxstream);
-    demuxstream = stream_DemuxNew(realdemux, name.c_str(), fakeesout->getEsOut());
-    if(!demuxstream)
-        return false;
-    return true;
+    return demuxer->restart();
 }
 
 bool BaseStreamOutput::reinitsOnSeek() const
 {
-    return true;
+    return demuxer->reinitsOnSeek();
 }
 
 bool BaseStreamOutput::switchAllowed() const
