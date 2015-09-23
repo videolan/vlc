@@ -51,6 +51,11 @@ StreamDemux::StreamDemux(demux_t *p_realdemux_, const std::string &name_, es_out
     name = name_;
     p_realdemux = p_realdemux_;
 
+    if(name == "mp4")
+    {
+        b_startsfromzero = true;
+    }
+
     restart();
 
     if(!demuxstream)

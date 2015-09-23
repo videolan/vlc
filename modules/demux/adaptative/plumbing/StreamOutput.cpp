@@ -121,6 +121,10 @@ void BaseStreamOutput::setPosition(mtime_t nztime)
         restart();
         fakeesout->commandsqueue.Abort( true );
         fakeesout->recycleAll();
+        /* Check if we need to set an offset as the demuxer
+         * will start from zero from seek point */
+        if(demuxer->alwaysStartsFromZero())
+            fakeesout->setTimestampOffset(nztime);
     }
 
     es_out_Control(realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
