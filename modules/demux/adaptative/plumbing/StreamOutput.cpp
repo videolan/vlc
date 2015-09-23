@@ -53,7 +53,6 @@ BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, c
     AbstractStreamOutput(demux, format)
 {
     this->name = name;
-    seekable = true;
     demuxer = NULL;
 
     CommandsFactory *factory = new CommandsFactory();
@@ -112,8 +111,7 @@ void BaseStreamOutput::pushBlock(block_t *block, bool b)
 
 bool BaseStreamOutput::seekAble() const
 {
-    bool b_canswitch = switchAllowed();
-    return (demuxer && seekable && b_canswitch);
+    return (demuxer && switchAllowed());
 }
 
 void BaseStreamOutput::setPosition(mtime_t nztime)

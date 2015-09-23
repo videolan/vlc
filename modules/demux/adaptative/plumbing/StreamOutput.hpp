@@ -99,7 +99,6 @@ namespace adaptative
     protected:
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
         AbstractDemuxer *demuxer;
-        bool      seekable;
         std::string name;
 
     private:
