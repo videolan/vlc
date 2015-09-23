@@ -159,11 +159,10 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
     const size_t size = getSegments( type, retSegments );
     if( size )
     {
-        /* check if that's a template (fixme: find a better way) */
-        MediaSegmentTemplate *templ;
-        if( size == 1 && (templ = dynamic_cast<MediaSegmentTemplate*>(retSegments[0])) )
+        if(size == 1 && retSegments[0]->isTemplate())
         {
-            if(templ->segmentTimeline.Get() == NULL ||
+            MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate*>(retSegments[0]);
+            if(!templ || templ->segmentTimeline.Get() == NULL ||
                templ->segmentTimeline.Get()->maxElementNumber() > pos)
                 return templ;
         }

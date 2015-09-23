@@ -43,6 +43,7 @@ MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
     classId = Segment::CLASSID_SEGMENT;
     startNumber.Set( 1 );
     initialisationSegment.Set( NULL );
+    templated = true;
 }
 
 void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, mtime_t prunebarrier)

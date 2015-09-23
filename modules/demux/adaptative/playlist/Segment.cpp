@@ -48,6 +48,7 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     duration.Set(0);
     chunksuse.Set(0);
     sequence = SEQUENCE_INVALID;
+    templated = false;
 }
 
 ISegment::~ISegment()
@@ -88,6 +89,11 @@ SegmentChunk* ISegment::toChunk(size_t index, BaseRepresentation *ctxrep)
     chunk->setRepresentation(ctxrep);
 
     return chunk;
+}
+
+bool ISegment::isTemplate() const
+{
+    return templated;
 }
 
 void ISegment::setByteRange(size_t start, size_t end)
