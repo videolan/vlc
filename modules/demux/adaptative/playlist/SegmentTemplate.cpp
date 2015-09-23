@@ -56,6 +56,11 @@ void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, mtime_t prun
     }
 }
 
+uint64_t MediaSegmentTemplate::getSequenceNumber() const
+{
+    return startNumber.Get();
+}
+
 void MediaSegmentTemplate::setSourceUrl(const std::string &url)
 {
     sourceUrl = Url(Url::Component(url, this));
