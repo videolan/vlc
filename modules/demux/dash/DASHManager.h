@@ -37,7 +37,7 @@ namespace dash
     class DASHStreamOutputFactory : public AbstractStreamOutputFactory
     {
         public:
-            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &) const;
+            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &, AbstractStreamOutput * = NULL) const;
     };
 
     class DASHManager : public PlaylistManager

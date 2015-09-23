@@ -48,7 +48,8 @@ AbstractStreamOutput::~AbstractStreamOutput()
 {
 }
 
-BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, const std::string &name) :
+BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, const std::string &name,
+                                   AbstractStreamOutput *recycled) :
     AbstractStreamOutput(demux, format)
 {
     this->name = name;
@@ -57,7 +58,18 @@ BaseStreamOutput::BaseStreamOutput(demux_t *demux, const StreamFormat &format, c
 
     CommandsFactory *factory = new CommandsFactory();
 
-    fakeesout = new (std::nothrow) FakeESOut( realdemux->out, factory );
+    /* Try to recycle compatible output if any */
+    BaseStreamOutput *my_recycled = dynamic_cast<BaseStreamOutput *>(recycled);
+    if(my_recycled)
+    {
+        fakeesout = my_recycled->fakeesout;
+        my_recycled->fakeesout = NULL;
+    }
+    else
+    {
+        fakeesout = new (std::nothrow) FakeESOut( realdemux->out, factory );
+    }
+
     if (!fakeesout)
     {
         delete factory;
@@ -75,7 +87,8 @@ BaseStreamOutput::~BaseStreamOutput()
     if (demuxstream)
         stream_Delete(demuxstream);
 
-    delete fakeesout;
+    if(fakeesout)
+        delete fakeesout;
 }
 
 mtime_t BaseStreamOutput::getPCR() const
@@ -163,4 +176,3 @@ void BaseStreamOutput::fillExtraFMTInfo( es_format_t *p_fmt ) const
     if(!p_fmt->psz_description && !description.empty())
         p_fmt->psz_description = strdup(description.c_str());
 }
-

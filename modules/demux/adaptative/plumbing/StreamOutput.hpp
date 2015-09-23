@@ -67,7 +67,8 @@ namespace adaptative
     {
         public:
             virtual ~AbstractStreamOutputFactory() {}
-            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &) const = 0;
+            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &,
+                                                 AbstractStreamOutput * = NULL ) const = 0;
     };
 
     class BaseStreamOutput : public AbstractStreamOutput,
@@ -76,7 +77,8 @@ namespace adaptative
         friend class BaseStreamOutputEsOutControlPCRCommand;
 
     public:
-        BaseStreamOutput(demux_t *, const StreamFormat &, const std::string &);
+        BaseStreamOutput(demux_t *, const StreamFormat &, const std::string &,
+                         AbstractStreamOutput * = NULL);
         virtual ~BaseStreamOutput();
         virtual void pushBlock(block_t *, bool); /* reimpl */
         virtual mtime_t getPCR() const; /* reimpl */

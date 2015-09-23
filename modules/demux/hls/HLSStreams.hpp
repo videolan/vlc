@@ -33,13 +33,15 @@ namespace hls
     class HLSStreamOutputFactory : public AbstractStreamOutputFactory
     {
         public:
-            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &) const;
+            virtual AbstractStreamOutput *create(demux_t*, const StreamFormat &,
+                                                 AbstractStreamOutput * = NULL) const;
     };
 
     class HLSPackedStreamOutput : public BaseStreamOutput
     {
         public:
-            HLSPackedStreamOutput(demux_t *, const StreamFormat &, const std::string &);
+            HLSPackedStreamOutput(demux_t *, const StreamFormat &, const std::string &,
+                                  AbstractStreamOutput * = NULL);
             virtual void pushBlock(block_t *, bool); /* reimpl */
             virtual void setPosition(mtime_t); /* reimpl */
 

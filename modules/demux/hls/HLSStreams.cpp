@@ -23,28 +23,34 @@
 
 using namespace hls;
 
-AbstractStreamOutput *HLSStreamOutputFactory::create(demux_t *demux, const StreamFormat &format) const
+AbstractStreamOutput *HLSStreamOutputFactory::create(demux_t *demux, const StreamFormat &format,
+                                                     AbstractStreamOutput *recycled) const
 {
+    AbstractStreamOutput *ret = NULL;
     unsigned fmt = format;
     switch(fmt)
     {
         case HLSStreamFormat::PACKEDAAC:
-            return new HLSPackedStreamOutput(demux, format, "any");
+            ret = new HLSPackedStreamOutput(demux, format, "any", recycled);
             break;
 
         case HLSStreamFormat::UNKNOWN:
         case HLSStreamFormat::MPEG2TS:
-            return new BaseStreamOutput(demux, format, "ts");
+            ret = new BaseStreamOutput(demux, format, "ts", recycled);
 
         case HLSStreamFormat::UNSUPPORTED:
         default:
             break;
     }
-    return NULL;
+
+    delete recycled;
+
+    return ret;
 }
 
-HLSPackedStreamOutput::HLSPackedStreamOutput(demux_t *demux, const StreamFormat &format, const std::string &name) :
-    BaseStreamOutput(demux, format, name)
+HLSPackedStreamOutput::HLSPackedStreamOutput(demux_t *demux, const StreamFormat &format, const std::string &name,
+                                             AbstractStreamOutput *recycled) :
+    BaseStreamOutput(demux, format, name, recycled)
 {
     b_timestamps_offset_set = false;
 }

@@ -48,18 +48,25 @@ using namespace dash::mpd;
 using namespace adaptative::logic;
 
 
-AbstractStreamOutput *DASHStreamOutputFactory::create(demux_t *demux, const StreamFormat &format) const
+AbstractStreamOutput *DASHStreamOutputFactory::create(demux_t *demux, const StreamFormat &format,
+                                                      AbstractStreamOutput *recycled) const
 {
+    AbstractStreamOutput *ret = NULL;
     unsigned fmt = format;
     switch(fmt)
     {
         case DASHStreamFormat::MP4:
-            return new BaseStreamOutput(demux, format, "mp4");
+            ret = new BaseStreamOutput(demux, format, "mp4", recycled);
+            break;
 
         case DASHStreamFormat::MPEG2TS:
-            return new BaseStreamOutput(demux, format, "ts");
+            ret = new BaseStreamOutput(demux, format, "ts", recycled);
+            break;
     }
-    return NULL;
+
+    delete recycled;
+
+    return ret;
 }
 
 DASHManager::DASHManager(demux_t *demux_, MPD *mpd,
