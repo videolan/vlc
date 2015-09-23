@@ -34,7 +34,6 @@ SegmentTracker::SegmentTracker(AbstractAdaptationLogic *logic_, BaseAdaptationSe
     initializing = true;
     index_sent = false;
     init_sent = false;
-    sequence_set = false;
     prevRepresentation = NULL;
     setAdaptationLogic(logic_);
     adaptationSet = adaptSet;
@@ -52,7 +51,6 @@ void SegmentTracker::setAdaptationLogic(AbstractAdaptationLogic *logic_)
 
 void SegmentTracker::resetCounter()
 {
-    sequence_set = false;
     prevRepresentation = NULL;
 }
 
@@ -89,18 +87,6 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
     if(rep->needsUpdate())
         updateSelected();
 
-    /* If we're starting, set the first segment number to download */
-    if(!sequence_set)
-    {
-        if(! rep->getSegmentNumberByTime( VLC_TS_INVALID, &count ) )
-        {
-            msg_Warn( rep->getPlaylist()->getVLCObject(),
-                      "Can't get first segment number for representation %s", rep->getID().str().c_str() );
-            count = 0;
-        }
-        sequence_set = true;
-    }
-
     if(!init_sent)
     {
         init_sent = true;
@@ -117,12 +103,20 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed)
             return segment->toChunk(count, rep);
     }
 
-    segment = rep->getSegment(BaseRepresentation::INFOTYPE_MEDIA, count);
+    bool b_gap = false;
+    segment = rep->getNextSegment(BaseRepresentation::INFOTYPE_MEDIA, count, &count, &b_gap);
+    if(b_gap && count)
+    {
+        notify(SegmentTrackerListenerInterface::notifications::NOTIFICATION_DISCONTINUITY,
+               segment);
+    }
+
     if(!segment)
     {
         resetCounter();
         return NULL;
     }
+
     /* stop initializing after 1st chunk */
     initializing = false;
 
@@ -155,12 +149,11 @@ void SegmentTracker::setPositionByNumber(uint64_t segnumber, bool restarted)
         init_sent = false;
     }
     count = segnumber;
-    sequence_set = true;
 }
 
 mtime_t SegmentTracker::getSegmentStart() const
 {
-    if(prevRepresentation && sequence_set)
+    if(prevRepresentation)
         return prevRepresentation->getPlaybackTimeBySegmentNumber(count);
     else
         return 0;
@@ -174,7 +167,7 @@ void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)
 void SegmentTracker::pruneFromCurrent()
 {
     AbstractPlaylist *playlist = adaptationSet->getPlaylist();
-    if(playlist->isLive() && sequence_set)
+    if(playlist->isLive())
         playlist->pruneBySegmentNumber(count);
 }
 
