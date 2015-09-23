@@ -441,8 +441,14 @@ static int Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         msg_Warn(p_aout, "Cannot get device latency [%4.4s]",
                  (char *)&err);
     }
-    msg_Dbg(p_aout, "Current device has a latency of %u frames", p_sys->i_device_latency);
+    float f_latency_in_sec = (float)p_sys->i_device_latency / (float)fmt->i_rate;
+    msg_Dbg(p_aout, "Current device has a latency of %u frames (%f sec)", p_sys->i_device_latency, f_latency_in_sec);
 
+    // Ignore long Airplay latency as this is not correctly working yet
+    if (f_latency_in_sec > 0.5f) {
+        msg_Info(p_aout, "Ignore high latency as it causes problems currently.");
+        p_sys->i_device_latency = 0;
+    }
 
     bool b_success = false;
 
