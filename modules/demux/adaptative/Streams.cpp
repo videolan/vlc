@@ -80,9 +80,9 @@ void Stream::updateFormat(StreamFormat &newformat)
     if( format == newformat && output )
         return;
 
-    delete output;
+    output = streamOutputFactory->create(p_demux, newformat, output);
+
     format = newformat;
-    output = streamOutputFactory->create(p_demux, format);
     if(!output)
         throw VLC_EGENERIC;
     output->setLanguage(language);
