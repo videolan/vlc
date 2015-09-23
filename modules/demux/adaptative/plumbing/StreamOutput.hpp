@@ -100,9 +100,6 @@ namespace adaptative
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
         AbstractDemuxer *demuxer;
         std::string name;
-
-    private:
-        bool restart();
     };
 
 }

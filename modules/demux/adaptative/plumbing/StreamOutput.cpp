@@ -118,7 +118,7 @@ void BaseStreamOutput::setPosition(mtime_t nztime)
 {
     if(reinitsOnSeek())
     {
-        restart();
+        demuxer->restart();
         fakeesout->commandsqueue.Abort( true );
         fakeesout->recycleAll();
         /* Check if we need to set an offset as the demuxer
@@ -129,11 +129,6 @@ void BaseStreamOutput::setPosition(mtime_t nztime)
 
     es_out_Control(realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                    VLC_TS_0 + nztime);
-}
-
-bool BaseStreamOutput::restart()
-{
-    return demuxer->restart();
 }
 
 bool BaseStreamOutput::reinitsOnSeek() const
