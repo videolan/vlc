@@ -46,6 +46,11 @@ ifeq ($(ANDROID_ABI), x86_64)
 GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
 endif
 endif
+ifdef HAVE_TIZEN
+ifeq ($(TIZEN_ABI), x86)
+GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
+endif
+endif
 
 .gcrypt: libgcrypt
 	$(RECONF)
