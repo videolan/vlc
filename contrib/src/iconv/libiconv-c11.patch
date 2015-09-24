@@ -1,0 +1,19 @@
+--- iconv/srclib/stdio.in.h.orig	2015-09-24 17:57:58.668232325 +0200
++++ iconv/srclib/stdio.in.h	2015-09-24 17:56:16.941881263 +0200
+@@ -679,6 +679,8 @@
+ # endif
+ #endif
+ 
++#if !defined __USE_ISOC11 \
++    || (defined __cplusplus && __cplusplus <= 201103L)
+ #if @GNULIB_GETS@
+ # if @REPLACE_STDIO_READ_FUNCS@ && @GNULIB_STDIO_H_NONBLOCKING@
+ #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+@@ -697,6 +699,7 @@
+    always declared, since it is required by C89.  */
+ _GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
+ #endif
++#endif
+ 
+ 
+ #if @GNULIB_OBSTACK_PRINTF@ || @GNULIB_OBSTACK_PRINTF_POSIX@
