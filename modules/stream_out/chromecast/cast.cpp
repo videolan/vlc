@@ -623,7 +623,7 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
         }
         else
         {
-            msg_Err(p_stream, "Heartbeat command not supported");
+            msg_Err(p_stream, "Heartbeat command not supported: %s", type.c_str());
             i_ret = -1;
         }
 
@@ -732,6 +732,12 @@ static int processMessage(sout_stream_t *p_stream, const castchannel::CastMessag
             vlc_mutex_lock(&p_sys->lock);
             p_sys->i_status = CHROMECAST_CONNECTION_DEAD;
             vlc_mutex_unlock(&p_sys->lock);
+        }
+        else
+        {
+            msg_Err(p_stream, "Connection command not supported: %s",
+                    type.c_str());
+            i_ret = -1;
         }
     }
     else
