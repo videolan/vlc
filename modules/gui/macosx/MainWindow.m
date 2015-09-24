@@ -48,6 +48,11 @@
 
 @interface VLCMainWindow() <PXSourceListDataSource, PXSourceListDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate>
 {
+    BOOL videoPlaybackEnabled;
+    BOOL dropzoneActive;
+    BOOL splitViewRemoved;
+    BOOL minimizedView;
+
     BOOL b_video_playback_enabled;
     BOOL b_dropzone_active;
     BOOL b_splitview_removed;
@@ -133,73 +138,95 @@ static const float f_min_window_height = 307.;
 
 - (void)awakeFromNib
 {
-    // sets lion fullscreen behaviour
     [super awakeFromNib];
 
-    BOOL b_splitviewShouldBeHidden = NO;
+    /*
+     * General setup
+     */
 
-    [self setRestorable: NO];
+    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+    BOOL splitViewShouldBeHidden = NO;
+
+    [self setDelegate:self];
+    [self setRestorable:NO];
+    [self useOptimizedDrawing:YES];
+    [self setExcludedFromWindowsMenu:YES];
+    [self setAcceptsMouseMovedEvents:YES];
     [self setFrameAutosaveName:@"mainwindow"];
 
-    /* setup the styled interface */
     _nativeFullscreenMode = var_InheritBool(VLCIntf, "macosx-nativefullscreenmode");
-    [self useOptimizedDrawing: YES];
+    b_dropzone_active = YES;
 
-    [[o_search_fld cell] setPlaceholderString: _NS("Search")];
-    [[o_search_fld cell] accessibilitySetOverrideValue:_NS("Enter a term to search the playlist. Results will be selected in the table.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [o_search_fld setToolTip: _NS("Search in Playlist")];
-
+    // Playlist setup
     VLCPlaylist *playlist = [[VLCMain sharedInstance] playlist];
-    playlist.outlineView = o_outline_view;
-    playlist.playlistHeaderView = [o_outline_view headerView];
+    [playlist setOutlineView:(VLCPlaylistView *)_outlineView];
+    [playlist setPlaylistHeaderView:_outlineView.headerView];
 
-    [o_dropzone_btn setTitle: _NS("Open media...")];
-    [[o_dropzone_btn cell] accessibilitySetOverrideValue:_NS("Click to open an advanced dialog to select the media to play. You can also drop files here to play.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [o_dropzone_lbl setStringValue: _NS("Drop media here")];
-    [o_dropzone_img setImage: imageFromRes(@"dropzone")];
+    // (Re)load sidebar for the first time and select first item
+    [self reloadSidebar];
+    [_sidebarView selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
 
-    [o_podcast_add_btn setTitle: _NS("Subscribe")];
-    [o_podcast_remove_btn setTitle: _NS("Unsubscribe")];
-    [o_podcast_subscribe_title_lbl setStringValue: _NS("Subscribe to a podcast")];
-    [o_podcast_subscribe_subtitle_lbl setStringValue: _NS("Enter URL of the podcast to subscribe to:")];
-    [o_podcast_subscribe_cancel_btn setTitle: _NS("Cancel")];
-    [o_podcast_subscribe_ok_btn setTitle: _NS("Subscribe")];
-    [o_podcast_unsubscribe_title_lbl setStringValue: _NS("Unsubscribe from a podcast")];
-    [o_podcast_unsubscribe_subtitle_lbl setStringValue: _NS("Select the podcast you would like to unsubscribe from:")];
-    [o_podcast_unsubscribe_ok_btn setTitle: _NS("Unsubscribe")];
-    [o_podcast_unsubscribe_cancel_btn setTitle: _NS("Cancel")];
+    // Setup view frame sizes
+    [_dropzoneView setFrame:_playlistScrollView.frame];
+    [_splitViewLeft setFrame:_sidebarView.frame];
+
+    /*
+     * Set up translatable strings for the UI elements
+     */
+
+    // Window title
+    [self setTitle:_NS("VLC media player")];
+
+    // Search Field
+    [_searchField setToolTip:_NS("Search in Playlist")];
+    [_searchField.cell setPlaceholderString:_NS("Search")];
+    [_searchField.cell accessibilitySetOverrideValue:_NS("Enter a term to search the playlist. Results will be selected in the table.")
+                                        forAttribute:NSAccessibilityDescriptionAttribute];
+
+    // Dropzone
+    [_dropzoneLabel setStringValue:_NS("Drop media here")];
+    [_dropzoneImageView setImage:imageFromRes(@"dropzone")];
+    [_dropzoneButton setTitle:_NS("Open media...")];
+    [_dropzoneButton.cell accessibilitySetOverrideValue:_NS("Click to open an advanced dialog to select the media to play. You can also drop files here to play.")
+                                           forAttribute:NSAccessibilityDescriptionAttribute];
+
+    // Podcast view
+    [_podcastAddButton setTitle:_NS("Subscribe")];
+    [_podcastRemoveButton setTitle:_NS("Unsubscribe")];
+
+    // Podcast subscribe window
+    [_podcastSubscribeTitle setStringValue:_NS("Subscribe to a podcast")];
+    [_podcastSubscribeSubtitle setStringValue:_NS("Enter URL of the podcast to subscribe to:")];
+    [_podcastSubscribeOkButton setTitle:_NS("Subscribe")];
+    [_podcastSubscribeCancelButton setTitle:_NS("Cancel")];
+
+    // Podcast unsubscribe window
+    [_podcastUnsubscirbeTitle setStringValue:_NS("Unsubscribe from a podcast")];
+    [_podcastUnsubscribeSubtitle setStringValue:_NS("Select the podcast you would like to unsubscribe from:")];
+    [_podcastUnsubscribeOkButton setTitle:_NS("Unsubscribe")];
+    [_podcastUnsubscribeCancelButton setTitle:_NS("Cancel")];
 
     /* interface builder action */
     CGFloat f_threshold_height = f_min_video_height + [self.controlsBar height];
     if (self.darkInterface)
         f_threshold_height += [self.titlebarView frame].size.height;
     if ([[self contentView] frame].size.height < f_threshold_height)
-        b_splitviewShouldBeHidden = YES;
+        splitViewShouldBeHidden = YES;
 
-    [self setDelegate: self];
-    [self setExcludedFromWindowsMenu: YES];
-    [self setAcceptsMouseMovedEvents: YES];
     // Set that here as IB seems to be buggy
     if (self.darkInterface)
         [self setContentMinSize:NSMakeSize(604., f_min_window_height + [self.titlebarView frame].size.height)];
     else
         [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
 
-    [self setTitle: _NS("VLC media player")];
-
-    b_dropzone_active = YES;
-    [o_dropzone_view setFrame: [o_playlist_table frame]];
-    [o_left_split_view setFrame: [o_sidebar_view frame]];
-
     /* the default small size of the search field is slightly different on Lion, let's work-around that */
     NSRect frame;
-    frame = [o_search_fld frame];
+    frame = [_searchField frame];
     frame.origin.y = frame.origin.y + 2.0;
     frame.size.height = frame.size.height - 1.0;
-    [o_search_fld setFrame: frame];
-
-    /* reload the sidebar */
-    [self reloadSidebar];
+    [_searchField setFrame:frame];
 
     _fspanel = [[VLCFSPanel alloc] initWithContentRect:NSMakeRect(110.,267.,549.,87.)
                                              styleMask:NSTexturedBackgroundWindowMask
@@ -207,11 +234,10 @@ static const float f_min_window_height = 307.;
                                                  defer:YES];
 
     /* make sure we display the desired default appearance when VLC launches for the first time */
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if (![defaults objectForKey:@"VLCFirstRun"]) {
         [defaults setObject:[NSDate date] forKey:@"VLCFirstRun"];
 
-        [o_sidebar_view expandItem:nil expandChildren:YES];
+        [_sidebarView expandItem:nil expandChildren:YES];
         [_fspanel center];
 
         NSAlert *albumArtAlert = [NSAlert alertWithMessageText:_NS("Check for album art and metadata?") defaultButton:_NS("Enable Metadata Retrieval") alternateButton:_NS("No, Thanks") otherButton:nil informativeTextWithFormat:@"%@",_NS("VLC can check online for album art and metadata to enrich your playback experience, e.g. by providing track information when playing Audio CDs. To provide this functionality, VLC will send information about your contents to trusted services in an anonymized form.")];
@@ -219,10 +245,6 @@ static const float f_min_window_height = 307.;
         config_PutInt(VLCIntf, "metadata-network-access", returnValue == NSAlertDefaultReturn);
     }
 
-    // select playlist item by default
-    [o_sidebar_view selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
-
-    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
     if (self.darkInterface) {
         [defaultCenter addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidResizeNotification object: nil];
         [defaultCenter addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidMoveNotification object: nil];
@@ -238,34 +260,34 @@ static const float f_min_window_height = 307.;
 
         [self.titlebarView setFrame: NSMakeRect(0, winrect.size.height - f_titleBarHeight,
                                               winrect.size.width, f_titleBarHeight)];
-        [[self contentView] addSubview: self.titlebarView positioned: NSWindowAbove relativeTo: o_split_view];
+        [[self contentView] addSubview: self.titlebarView positioned: NSWindowAbove relativeTo: _splitView];
 
         if (winrect.size.height > 100) {
             [self setFrame: winrect display:YES animate:YES];
             self.previousSavedFrame = winrect;
         }
 
-        winrect = [o_split_view frame];
+        winrect = _splitView.frame;
         winrect.size.height = winrect.size.height - f_titleBarHeight;
-        [o_split_view setFrame: winrect];
+        [_splitView setFrame: winrect];
         [self.videoView setFrame: winrect];
 
-        o_color_backdrop = [[VLCColorView alloc] initWithFrame: [o_split_view frame]];
-        [[self contentView] addSubview: o_color_backdrop positioned: NSWindowBelow relativeTo: o_split_view];
+        o_color_backdrop = [[VLCColorView alloc] initWithFrame:_splitView.frame];
+        [[self contentView] addSubview:o_color_backdrop positioned:NSWindowBelow relativeTo:_splitView];
         [o_color_backdrop setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
     } else {
-        [self.videoView setFrame: [o_split_view frame]];
-        [o_playlist_table setBorderType: NSNoBorder];
-        [o_sidebar_scrollview setBorderType: NSNoBorder];
+        [self.videoView setFrame:_splitView.frame];
+        [_playlistScrollView setBorderType:NSNoBorder];
+        [_sidebarScrollView setBorderType:NSNoBorder];
     }
 
     [defaultCenter addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
     [defaultCenter addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
     [defaultCenter addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
-    [defaultCenter addObserver: self selector: @selector(mainSplitViewDidResizeSubviews:) name: NSSplitViewDidResizeSubviewsNotification object:o_split_view];
+    [defaultCenter addObserver: self selector: @selector(mainSplitViewDidResizeSubviews:) name: NSSplitViewDidResizeSubviewsNotification object:_splitView];
 
-    if (b_splitviewShouldBeHidden) {
-        [self hideSplitView: YES];
+    if (splitViewShouldBeHidden) {
+        [self hideSplitView:YES];
         f_lastSplitViewHeight = 300;
     }
 
@@ -382,49 +404,47 @@ static const float f_min_window_height = 307.;
     if ([internetItem hasChildren])
         [o_sidebaritems addObject: internetItem];
 
-    [o_sidebar_view reloadData];
-    [o_sidebar_view setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
-    [o_sidebar_view registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
+    [_sidebarView reloadData];
+    [_sidebarView setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
+    [_sidebarView registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
 
-    [o_sidebar_view setAutosaveName:@"mainwindow-sidebar"];
-    [(PXSourceList *)o_sidebar_view setDataSource:self];
-    [o_sidebar_view setDelegate:self];
-    [o_sidebar_view setAutosaveExpandedItems:YES];
+    [_sidebarView setAutosaveName:@"mainwindow-sidebar"];
+    [_sidebarView setDataSource:self];
+    [_sidebarView setDelegate:self];
+    [_sidebarView setAutosaveExpandedItems:YES];
 
-    [o_sidebar_view expandItem: libraryItem expandChildren: YES];
+    [_sidebarView expandItem:libraryItem expandChildren:YES];
 
     if (isAReload) {
-        NSUInteger i_sidebaritem_count = [o_sidebaritems count];
-        for (NSUInteger x = 0; x < i_sidebaritem_count; x++)
-            [o_sidebar_view expandItem: [o_sidebaritems objectAtIndex:x] expandChildren: YES];
+        [_sidebarView expandItem:nil expandChildren:YES];
     }
 }
 
 - (void)resizePlaylistAfterCollapse
 {
     // no animation here since we might be in the middle of another resize animation
-    NSRect rightSplitRect = [o_right_split_view frame];
+    NSRect rightSplitRect = [_splitViewRight frame];
 
     NSRect plrect;
     plrect.size.height = rightSplitRect.size.height - 20.0; // actual pl top bar height, which differs from its frame
     plrect.size.width = rightSplitRect.size.width;
     plrect.origin.x = plrect.origin.y = 0.;
 
-    NSRect dropzoneboxRect = [o_dropzone_box frame];
+    NSRect dropzoneboxRect = _dropzoneBox.frame;
     dropzoneboxRect.origin.x = (plrect.size.width - dropzoneboxRect.size.width) / 2;
     dropzoneboxRect.origin.y = (plrect.size.height - dropzoneboxRect.size.height) / 2;
 
-    [o_dropzone_view setFrame: plrect];
-    [o_dropzone_box setFrame: dropzoneboxRect];
+    [_dropzoneView setFrame:plrect];
+    [_dropzoneBox setFrame:dropzoneboxRect];
 
     if (b_podcastView_displayed) {
-        plrect.size.height -= [o_podcast_view frame].size.height;
-        plrect.origin.y = [o_podcast_view frame].size.height;
+        plrect.size.height -= [_podcastView frame].size.height;
+        plrect.origin.y = [_podcastView frame].size.height;
     }
-    [o_playlist_table setFrame: plrect];
+    [_playlistScrollView setFrame:plrect];
 
-    [o_dropzone_view setNeedsDisplay: YES];
-    [o_playlist_table setNeedsDisplay: YES];
+    [_dropzoneView setNeedsDisplay:YES];
+    [_playlistScrollView setNeedsDisplay:YES];
 }
 
 - (void)makeSplitViewVisible
@@ -441,17 +461,17 @@ static const float f_min_window_height = 307.;
         new_frame.origin.y = old_frame.origin.y + old_frame.size.height - newHeight;
         new_frame.size.height = newHeight;
 
-        [[self animator] setFrame: new_frame display: YES animate: YES];
+        [[self animator] setFrame:new_frame display:YES animate:YES];
     }
 
-    [self.videoView setHidden: YES];
-    [o_split_view setHidden: NO];
+    [self.videoView setHidden:YES];
+    [_splitView setHidden:NO];
     if (self.nativeFullscreenMode && [self fullscreen]) {
-        [[self.controlsBar bottomBarView] setHidden: NO];
+        [[self.controlsBar bottomBarView] setHidden:NO];
         [self.fspanel setNonActive:nil];
     }
 
-    [self makeFirstResponder: o_playlist_table];
+    [self makeFirstResponder:_playlistScrollView];
 }
 
 - (void)makeSplitViewHidden
@@ -461,10 +481,10 @@ static const float f_min_window_height = 307.;
     else
         [self setContentMinSize: NSMakeSize(604., f_min_video_height)];
 
-    [o_split_view setHidden: YES];
-    [self.videoView setHidden: NO];
+    [_splitView setHidden:YES];
+    [self.videoView setHidden:NO];
     if (self.nativeFullscreenMode && [self fullscreen]) {
-        [[self.controlsBar bottomBarView] setHidden: YES];
+        [[self.controlsBar bottomBarView] setHidden:YES];
         [self.fspanel setActive:nil];
     }
 
@@ -528,8 +548,8 @@ static const float f_min_window_height = 307.;
             else
                 [self makeSplitViewVisible];
         } else {
-            [o_split_view setHidden: NO];
-            [o_playlist_table setHidden: NO];
+            [_splitView setHidden: NO];
+            [_playlistScrollView setHidden: NO];
             [self.videoView setHidden: YES];
         }
     }
@@ -547,14 +567,13 @@ static const float f_min_window_height = 307.;
 
 - (void)windowResizedOrMoved:(NSNotification *)notification
 {
-    [self saveFrameUsingName: [self frameAutosaveName]];
+    [self saveFrameUsingName:[self frameAutosaveName]];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    config_PutInt(VLCIntf, "macosx-show-sidebar", ![o_split_view isSubviewCollapsed:o_left_split_view]);
-
-    [self saveFrameUsingName: [self frameAutosaveName]];
+    config_PutInt(VLCIntf, "macosx-show-sidebar", ![_splitView isSubviewCollapsed:_splitViewLeft]);
+    [self saveFrameUsingName:[self frameAutosaveName]];
 }
 
 
@@ -586,29 +605,29 @@ static const float f_min_window_height = 307.;
 - (void)showDropZone
 {
     b_dropzone_active = YES;
-    [o_right_split_view addSubview: o_dropzone_view positioned:NSWindowAbove relativeTo:o_playlist_table];
-    [o_dropzone_view setFrame: [o_playlist_table frame]];
-    [o_playlist_table setHidden:YES];
+    [_splitViewRight addSubview:_dropzoneView positioned:NSWindowAbove relativeTo:_playlistScrollView];
+    [_dropzoneView setFrame:_playlistScrollView.frame];
+    [_playlistScrollView setHidden:YES];
 }
 
 - (void)hideDropZone
 {
     b_dropzone_active = NO;
-    [o_dropzone_view removeFromSuperview];
-    [o_playlist_table setHidden: NO];
+    [_dropzoneView removeFromSuperview];
+    [_playlistScrollView setHidden:NO];
 }
 
-- (void)hideSplitView:(BOOL)b_with_resize
+- (void)hideSplitView:(BOOL)resize
 {
     // cancel pending pl resizes, in case of fast toggle between both modes
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resizePlaylistAfterCollapse) object:nil];
 
-    if (b_with_resize) {
+    if (resize) {
         NSRect winrect = [self frame];
-        f_lastSplitViewHeight = [o_split_view frame].size.height;
+        f_lastSplitViewHeight = [_splitView frame].size.height;
         winrect.size.height = winrect.size.height - f_lastSplitViewHeight;
         winrect.origin.y = winrect.origin.y + f_lastSplitViewHeight;
-        [self setFrame: winrect display: YES animate: YES];
+        [self setFrame:winrect display:YES animate:YES];
     }
 
     if (self.darkInterface) {
@@ -622,7 +641,7 @@ static const float f_min_window_height = 307.;
     b_splitview_removed = YES;
 }
 
-- (void)showSplitView:(BOOL)b_with_resize
+- (void)showSplitView:(BOOL)resize
 {
     [self updateWindow];
     if (self.darkInterface)
@@ -631,12 +650,12 @@ static const float f_min_window_height = 307.;
         [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
     [self setContentMaxSize: NSMakeSize(FLT_MAX, FLT_MAX)];
 
-    if (b_with_resize) {
+    if (resize) {
         NSRect winrect;
         winrect = [self frame];
         winrect.size.height = winrect.size.height + f_lastSplitViewHeight;
         winrect.origin.y = winrect.origin.y - f_lastSplitViewHeight;
-        [self setFrame: winrect display: YES animate: YES];
+        [self setFrame:winrect display:YES animate:YES];
     }
 
     // cancel pending pl resizes, in case of fast toggle between both modes
@@ -660,7 +679,7 @@ static const float f_min_window_height = 307.;
 
 - (void)updateName
 {
-    input_thread_t * p_input;
+    input_thread_t *p_input;
     p_input = pl_CurrentInput(VLCIntf);
     if (p_input) {
         NSString *aString = @"";
@@ -727,8 +746,8 @@ static const float f_min_window_height = 307.;
 
     bool b_seekable = false;
 
-    playlist_t * p_playlist = pl_Get(VLCIntf);
-    input_thread_t * p_input = playlist_CurrentInput(p_playlist);
+    playlist_t *p_playlist = pl_Get(VLCIntf);
+    input_thread_t *p_input = playlist_CurrentInput(p_playlist);
     if (p_input) {
         /* seekable streams */
         b_seekable = var_GetBool(p_input, "can-seek");
@@ -747,7 +766,7 @@ static const float f_min_window_height = 307.;
     else
         [self showDropZone];
     PL_UNLOCK;
-    [o_sidebar_view setNeedsDisplay:YES];
+    [_sidebarView setNeedsDisplay:YES];
 
     [self _updatePlaylistTitle];
 }
@@ -775,7 +794,7 @@ static const float f_min_window_height = 307.;
 - (void)updateVolumeSlider
 {
     [(VLCMainWindowControlsBar *)[self controlsBar] updateVolumeSlider];
-    [self.fspanel setVolumeLevel: [[VLCCoreInteraction sharedInstance] volume]];
+    [self.fspanel setVolumeLevel:[[VLCCoreInteraction sharedInstance] volume]];
 }
 
 #pragma mark -
@@ -813,7 +832,7 @@ static const float f_min_window_height = 307.;
             [self.controlsBar setFullscreenState:YES];
         }
 
-        [self makeFirstResponder: o_playlist_table];
+        [self makeFirstResponder: _playlistScrollView];
         [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
 
         // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
@@ -842,7 +861,7 @@ static const float f_min_window_height = 307.;
         NSRect frame = [[self contentView] frame];
         frame.origin.y += [self.controlsBar height];
         frame.size.height -= [self.controlsBar height];
-        [o_split_view setFrame:frame];
+        [_splitView setFrame:frame];
     }
 }
 
@@ -852,9 +871,9 @@ static const float f_min_window_height = 307.;
 
     // update split view frame after readding title bar
     if (self.darkInterface) {
-        NSRect frame = [o_split_view frame];
+        NSRect frame = [_splitView frame];
         frame.size.height -= [self.titlebarView frame].size.height;
-        [o_split_view setFrame:frame];
+        [_splitView setFrame:frame];
     }
 }
 #pragma mark -
@@ -893,30 +912,28 @@ static const float f_min_window_height = 307.;
 
 - (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
 {
-    return ([subview isEqual:o_left_split_view]);
+    return ([subview isEqual:_splitViewLeft]);
 }
 
 - (BOOL)splitView:(NSSplitView *)splitView shouldAdjustSizeOfSubview:(NSView *)subview
 {
-    if ([subview isEqual:o_left_split_view])
-        return NO;
-    return YES;
+    return (![subview isEqual:_splitViewLeft]);
 }
 
 - (void)mainSplitViewDidResizeSubviews:(id)object
 {
-    f_lastLeftSplitViewWidth = [o_left_split_view frame].size.width;
-    config_PutInt(VLCIntf, "macosx-show-sidebar", ![o_split_view isSubviewCollapsed:o_left_split_view]);
+    f_lastLeftSplitViewWidth = [_splitViewLeft frame].size.width;
+    config_PutInt(VLCIntf, "macosx-show-sidebar", ![_splitView isSubviewCollapsed:_splitViewLeft]);
     [[[VLCMain sharedInstance] mainMenu] updateSidebarMenuItem];
 }
 
 - (void)toggleLeftSubSplitView
 {
-    [o_split_view adjustSubviews];
-    if ([o_split_view isSubviewCollapsed:o_left_split_view])
-        [o_split_view setPosition:f_lastLeftSplitViewWidth ofDividerAtIndex:0];
+    [_splitView adjustSubviews];
+    if ([_splitView isSubviewCollapsed:_splitViewLeft])
+        [_splitView setPosition:f_lastLeftSplitViewWidth ofDividerAtIndex:0];
     else
-        [o_split_view setPosition:[o_split_view minPossiblePositionOfDividerAtIndex:0] ofDividerAtIndex:0];
+        [_splitView setPosition:[_splitView minPossiblePositionOfDividerAtIndex:0] ofDividerAtIndex:0];
     [[[VLCMain sharedInstance] mainMenu] updateSidebarMenuItem];
 }
 
@@ -929,9 +946,9 @@ static const float f_min_window_height = 307.;
 
     PL_LOCK;
     if (root == ROOT_TYPE_PLAYLIST)
-        [o_chosen_category_lbl setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_local_category]]];
+        [_categoryLabel setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_local_category]]];
     else if (root == ROOT_TYPE_MEDIALIBRARY)
-        [o_chosen_category_lbl setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_ml_category]]];
+        [_categoryLabel setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_ml_category]]];
 
     PL_UNLOCK;
 }
@@ -961,7 +978,7 @@ static const float f_min_window_height = 307.;
 
 - (IBAction)searchItem:(id)sender
 {
-    [[[[VLCMain sharedInstance] playlist] model] searchUpdate:[o_search_fld stringValue]];
+    [[[[VLCMain sharedInstance] playlist] model] searchUpdate:[_searchField stringValue]];
 }
 
 #pragma mark -
@@ -1099,8 +1116,8 @@ static const float f_min_window_height = 307.;
 {
     playlist_t * p_playlist = pl_Get(VLCIntf);
 
-    NSIndexSet *selectedIndexes = [o_sidebar_view selectedRowIndexes];
-    id item = [o_sidebar_view itemAtRow:[selectedIndexes firstIndex]];
+    NSIndexSet *selectedIndexes = [_sidebarView selectedRowIndexes];
+    id item = [_sidebarView itemAtRow:[selectedIndexes firstIndex]];
 
     //Set the label text to represent the new selection
     if ([item sdtype] > -1 && [[item identifier] length] > 0) {
@@ -1109,7 +1126,7 @@ static const float f_min_window_height = 307.;
             playlist_ServicesDiscoveryAdd(p_playlist, [[item identifier] UTF8String]);
     }
 
-    [o_chosen_category_lbl setStringValue:[item title]];
+    [_categoryLabel setStringValue:[item title]];
 
     if ([[item identifier] isEqualToString:@"playlist"]) {
         PL_LOCK;
@@ -1245,20 +1262,20 @@ static const float f_min_window_height = 307.;
 
 - (IBAction)addPodcast:(id)sender
 {
-    [NSApp beginSheet:o_podcast_subscribe_window modalForWindow:self modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [NSApp beginSheet:_podcastSubscribeWindow modalForWindow:self modalDelegate:self didEndSelector:NULL contextInfo:nil];
 }
 
 - (IBAction)addPodcastWindowAction:(id)sender
 {
-    [o_podcast_subscribe_window orderOut:sender];
-    [NSApp endSheet: o_podcast_subscribe_window];
+    [_podcastSubscribeWindow orderOut:sender];
+    [NSApp endSheet:_podcastSubscribeWindow];
 
-    if (sender == o_podcast_subscribe_ok_btn && [[o_podcast_subscribe_url_fld stringValue] length] > 0) {
-        NSMutableString * podcastConf = [[NSMutableString alloc] init];
+    if (sender == _podcastSubscribeOkButton && [[_podcastSubscribeUrlField stringValue] length] > 0) {
+        NSMutableString *podcastConf = [[NSMutableString alloc] init];
         if (config_GetPsz(VLCIntf, "podcast-urls") != NULL)
             [podcastConf appendFormat:@"%s|", config_GetPsz(VLCIntf, "podcast-urls")];
 
-        [podcastConf appendString: [o_podcast_subscribe_url_fld stringValue]];
+        [podcastConf appendString: [_podcastSubscribeUrlField stringValue]];
         config_PutPsz(VLCIntf, "podcast-urls", [podcastConf UTF8String]);
         var_SetString(pl_Get(VLCIntf), "podcast-urls", [podcastConf UTF8String]);
     }
@@ -1268,24 +1285,24 @@ static const float f_min_window_height = 307.;
 {
     char *psz_urls = var_InheritString(pl_Get(VLCIntf), "podcast-urls");
     if (psz_urls != NULL) {
-        [o_podcast_unsubscribe_pop removeAllItems];
-        [o_podcast_unsubscribe_pop addItemsWithTitles:[toNSStr(psz_urls) componentsSeparatedByString:@"|"]];
-        [NSApp beginSheet:o_podcast_unsubscribe_window modalForWindow:self modalDelegate:self didEndSelector:NULL contextInfo:nil];
+        [_podcastUnsubscribePopUpButton removeAllItems];
+        [_podcastUnsubscribePopUpButton addItemsWithTitles:[toNSStr(psz_urls) componentsSeparatedByString:@"|"]];
+        [NSApp beginSheet:_podcastUnsubscribeWindow modalForWindow:self modalDelegate:self didEndSelector:NULL contextInfo:nil];
     }
     free(psz_urls);
 }
 
 - (IBAction)removePodcastWindowAction:(id)sender
 {
-    [o_podcast_unsubscribe_window orderOut:sender];
-    [NSApp endSheet: o_podcast_unsubscribe_window];
+    [_podcastUnsubscribeWindow orderOut:sender];
+    [NSApp endSheet:_podcastUnsubscribeWindow];
 
-    if (sender == o_podcast_unsubscribe_ok_btn) {
+    if (sender == _podcastUnsubscribeOkButton) {
         playlist_t * p_playlist = pl_Get(VLCIntf);
         char *psz_urls = var_InheritString(p_playlist, "podcast-urls");
 
         NSMutableArray * urls = [[NSMutableArray alloc] initWithArray:[toNSStr(config_GetPsz(VLCIntf, "podcast-urls")) componentsSeparatedByString:@"|"]];
-        [urls removeObjectAtIndex: [o_podcast_unsubscribe_pop indexOfSelectedItem]];
+        [urls removeObjectAtIndex: [_podcastUnsubscribePopUpButton indexOfSelectedItem]];
         const char *psz_new_urls = [[urls componentsJoinedByString:@"|"] UTF8String];
         var_SetString(pl_Get(VLCIntf), "podcast-urls", psz_new_urls);
         config_PutPsz(VLCIntf, "podcast-urls", psz_new_urls);
@@ -1301,34 +1318,34 @@ static const float f_min_window_height = 307.;
 
 - (void)showPodcastControls
 {
-    NSRect podcastViewDimensions = [o_podcast_view frame];
-    NSRect rightSplitRect = [o_right_split_view frame];
-    NSRect playlistTableRect = [o_playlist_table frame];
+    NSRect podcastViewDimensions = [_podcastView frame];
+    NSRect rightSplitRect = [_splitViewRight frame];
+    NSRect playlistTableRect = [_playlistScrollView frame];
 
     podcastViewDimensions.size.width = rightSplitRect.size.width;
     podcastViewDimensions.origin.x = podcastViewDimensions.origin.y = .0;
-    [o_podcast_view setFrame:podcastViewDimensions];
+    [_podcastView setFrame:podcastViewDimensions];
 
     playlistTableRect.origin.y = playlistTableRect.origin.y + podcastViewDimensions.size.height;
     playlistTableRect.size.height = playlistTableRect.size.height - podcastViewDimensions.size.height;
-    [o_playlist_table setFrame:playlistTableRect];
-    [o_playlist_table setNeedsDisplay:YES];
+    [_playlistScrollView setFrame:playlistTableRect];
+    [_playlistScrollView setNeedsDisplay:YES];
 
-    [o_right_split_view addSubview: o_podcast_view positioned: NSWindowAbove relativeTo: o_right_split_view];
+    [_splitViewRight addSubview:_podcastView positioned:NSWindowAbove relativeTo:_splitViewRight];
     b_podcastView_displayed = YES;
 }
 
 - (void)hidePodcastControls
 {
     if (b_podcastView_displayed) {
-        NSRect podcastViewDimensions = [o_podcast_view frame];
-        NSRect playlistTableRect = [o_playlist_table frame];
+        NSRect podcastViewDimensions = [_podcastView frame];
+        NSRect playlistTableRect = [_playlistScrollView frame];
 
         playlistTableRect.origin.y = playlistTableRect.origin.y - podcastViewDimensions.size.height;
         playlistTableRect.size.height = playlistTableRect.size.height + podcastViewDimensions.size.height;
 
-        [o_podcast_view removeFromSuperviewWithoutNeedingDisplay];
-        [o_playlist_table setFrame: playlistTableRect];
+        [_podcastView removeFromSuperviewWithoutNeedingDisplay];
+        [_playlistScrollView setFrame:playlistTableRect];
         b_podcastView_displayed = NO;
     }
 }

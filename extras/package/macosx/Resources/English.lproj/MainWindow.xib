@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F25a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSWindowController">
@@ -371,36 +371,36 @@
                 </subviews>
             </view>
             <connections>
+                <outlet property="categoryLabel" destination="5610" id="28H-0K-uf4"/>
                 <outlet property="controlsBar" destination="5339" id="5624"/>
-                <outlet property="o_chosen_category_lbl" destination="5610" id="5616"/>
-                <outlet property="o_dropzone_box" destination="4739" id="5007"/>
-                <outlet property="o_dropzone_btn" destination="4729" id="4735"/>
-                <outlet property="o_dropzone_img" destination="4725" id="5620"/>
-                <outlet property="o_dropzone_lbl" destination="4727" id="4734"/>
-                <outlet property="o_dropzone_view" destination="4722" id="4733"/>
-                <outlet property="o_left_split_view" destination="4681" id="4752"/>
-                <outlet property="o_outline_view" destination="4376" id="S1z-yM-tJQ"/>
-                <outlet property="o_playlist_table" destination="4372" id="4664"/>
-                <outlet property="o_podcast_add_btn" destination="5263" id="5292"/>
-                <outlet property="o_podcast_remove_btn" destination="5302" id="5412"/>
-                <outlet property="o_podcast_subscribe_cancel_btn" destination="5268" id="5293"/>
-                <outlet property="o_podcast_subscribe_ok_btn" destination="5269" id="5294"/>
-                <outlet property="o_podcast_subscribe_subtitle_lbl" destination="5274" id="5295"/>
-                <outlet property="o_podcast_subscribe_title_lbl" destination="5275" id="5296"/>
-                <outlet property="o_podcast_subscribe_url_fld" destination="5289" id="5297"/>
-                <outlet property="o_podcast_subscribe_window" destination="5265" id="5298"/>
-                <outlet property="o_podcast_unsubscribe_cancel_btn" destination="5307" id="5325"/>
-                <outlet property="o_podcast_unsubscribe_ok_btn" destination="5308" id="5326"/>
-                <outlet property="o_podcast_unsubscribe_pop" destination="5319" id="5327"/>
-                <outlet property="o_podcast_unsubscribe_subtitle_lbl" destination="5310" id="5328"/>
-                <outlet property="o_podcast_unsubscribe_title_lbl" destination="5311" id="5329"/>
-                <outlet property="o_podcast_unsubscribe_window" destination="5305" id="5330"/>
-                <outlet property="o_podcast_view" destination="5260" id="5291"/>
-                <outlet property="o_right_split_view" destination="4682" id="4738"/>
-                <outlet property="o_search_fld" destination="5614" id="5617"/>
-                <outlet property="o_sidebar_scrollview" destination="4713" id="4925"/>
-                <outlet property="o_sidebar_view" destination="4714" id="4721"/>
-                <outlet property="o_split_view" destination="4680" id="4691"/>
+                <outlet property="dropzoneBox" destination="4739" id="3sx-Uq-aFL"/>
+                <outlet property="dropzoneButton" destination="4729" id="uUO-5x-qmU"/>
+                <outlet property="dropzoneImageView" destination="4725" id="Ck9-vp-aDM"/>
+                <outlet property="dropzoneLabel" destination="4727" id="HkS-xv-7B6"/>
+                <outlet property="dropzoneView" destination="4722" id="a41-TD-aJs"/>
+                <outlet property="outlineView" destination="4376" id="92d-4j-4PK"/>
+                <outlet property="playlistScrollView" destination="4372" id="QDP-7m-wKJ"/>
+                <outlet property="podcastAddButton" destination="5263" id="Rg8-kX-6dU"/>
+                <outlet property="podcastRemoveButton" destination="5302" id="T6b-Y8-Usc"/>
+                <outlet property="podcastSubscribeCancelButton" destination="5268" id="nSd-2J-TCb"/>
+                <outlet property="podcastSubscribeOkButton" destination="5269" id="vHf-fh-21u"/>
+                <outlet property="podcastSubscribeSubtitle" destination="5274" id="wLI-Bk-rB1"/>
+                <outlet property="podcastSubscribeTitle" destination="5275" id="foW-M7-zvQ"/>
+                <outlet property="podcastSubscribeUrlField" destination="5289" id="atN-De-g9Y"/>
+                <outlet property="podcastSubscribeWindow" destination="5265" id="dbr-XL-jEV"/>
+                <outlet property="podcastUnsubscirbeTitle" destination="5311" id="XeP-LX-gv4"/>
+                <outlet property="podcastUnsubscribeCancelButton" destination="5307" id="5ns-Wt-16P"/>
+                <outlet property="podcastUnsubscribeOkButton" destination="5308" id="n0p-PI-HLp"/>
+                <outlet property="podcastUnsubscribePopUpButton" destination="5319" id="dnR-ci-Uv7"/>
+                <outlet property="podcastUnsubscribeSubtitle" destination="5310" id="oMV-ik-riY"/>
+                <outlet property="podcastUnsubscribeWindow" destination="5305" id="9yb-CN-b5O"/>
+                <outlet property="podcastView" destination="5260" id="gOv-Pi-fkF"/>
+                <outlet property="searchField" destination="5614" id="Qkl-Wo-cAe"/>
+                <outlet property="sidebarScrollView" destination="4713" id="7Th-UT-wuq"/>
+                <outlet property="sidebarView" destination="4714" id="Hsb-LW-VTd"/>
+                <outlet property="splitView" destination="4680" id="30m-4q-XzK"/>
+                <outlet property="splitViewLeft" destination="4681" id="ryK-3z-wuu"/>
+                <outlet property="splitViewRight" destination="4682" id="REX-fd-CCP"/>
                 <outlet property="titlebarView" destination="4850" id="5625"/>
                 <outlet property="videoView" destination="4665" id="5622"/>
             </connections>
@@ -557,7 +557,7 @@
                 </configuration>
             </ciFilter>
         </customView>
-        <customView id="5260" userLabel="podcast">
+        <customView id="5260" userLabel="Podcast">
             <rect key="frame" x="0.0" y="0.0" width="403" height="19"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
             <subviews>
