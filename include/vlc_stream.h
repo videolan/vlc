@@ -160,6 +160,11 @@ VLC_API char * stream_ReadLine( stream_t * );
 VLC_API input_item_t *stream_ReadDir( stream_t * );
 
 /**
+ * Low level custom stream creation.
+ */
+VLC_API stream_t *stream_CustomNew(vlc_object_t *, void (*)(stream_t *));
+
+/**
  * Get the size of the stream.
  */
 VLC_USED static inline int stream_GetSize( stream_t *s, uint64_t *size )

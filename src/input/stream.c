@@ -57,6 +57,14 @@ typedef struct stream_priv_t
 } stream_priv_t;
 
 /**
+ * Allocates a custom VLC stream object
+ */
+stream_t *stream_CustomNew(vlc_object_t *parent, void (*destroy)(stream_t *))
+{
+    return stream_CommonNew(parent, destroy);
+}
+
+/**
  * Allocates a VLC stream object
  */
 stream_t *stream_CommonNew(vlc_object_t *parent, void (*destroy)(stream_t *))
@@ -73,6 +81,7 @@ stream_t *stream_CommonNew(vlc_object_t *parent, void (*destroy)(stream_t *))
     s->pf_read = NULL;
     s->pf_readdir = NULL;
     s->pf_control = NULL;
+    s->p_sys = NULL;
     s->p_input = NULL;
     assert(destroy != NULL);
     priv->destroy = destroy;
