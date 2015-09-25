@@ -72,15 +72,28 @@ static const char *demux_FromContentType(const char *mime)
     return (type != NULL) ? type->demux : "any";
 }
 
-#undef demux_New
 /*****************************************************************************
  * demux_New:
  *  if s is NULL then load a access_demux
  *****************************************************************************/
-demux_t *demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
-                    const char *psz_access, const char *psz_demux,
-                    const char *psz_location,
-                    stream_t *s, es_out_t *out, bool b_quick )
+demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
+                    const char *psz_location, stream_t *s, es_out_t *out )
+{
+    return demux_NewAdvanced( p_obj, NULL,
+                              (s == NULL) ? psz_name : "",
+                              (s != NULL) ? psz_name : "",
+                              psz_location, s, out, false );
+}
+
+/*****************************************************************************
+ * demux_NewAdvanced:
+ *  if s is NULL then load a access_demux
+ *****************************************************************************/
+#undef demux_NewAdvanced
+demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
+                            const char *psz_access, const char *psz_demux,
+                            const char *psz_location,
+                            stream_t *s, es_out_t *out, bool b_quick )
 {
     demux_t *p_demux = vlc_custom_create( p_obj, sizeof( *p_demux ), "demux" );
     if( unlikely(p_demux == NULL) )

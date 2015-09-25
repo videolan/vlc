@@ -2169,8 +2169,8 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* Try access_demux first */
-        in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,
-                                 psz_path, NULL, p_input->p->p_es_out, false );
+        in->p_demux = demux_NewAdvanced( p_input, p_input, psz_access, psz_demux,
+                                         psz_path, NULL, p_input->p->p_es_out, false );
     }
     else
     {
@@ -2341,9 +2341,9 @@ static int InputSourceInit( input_thread_t *p_input,
         if( psz_path == NULL )
             psz_path = "";
 
-        in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,
-                                 psz_path, p_stream, p_input->p->p_es_out,
-                                 p_input->b_preparsing );
+        in->p_demux = demux_NewAdvanced( p_input, p_input, psz_access, psz_demux,
+                                         psz_path, p_stream, p_input->p->p_es_out,
+                                         p_input->b_preparsing );
 
         if( in->p_demux == NULL )
         {

@@ -183,7 +183,47 @@ enum demux_query_e
     DEMUX_NAV_RIGHT,           /* res=can fail */
 };
 
-VLC_API int demux_vaControlHelper( stream_t *, int64_t i_start, int64_t i_end, int64_t i_bitrate, int i_align, int i_query, va_list args );
+/*************************************************************************
+ * Main Demux
+ *************************************************************************/
+
+/* stream_t *s could be null and then it mean a access+demux in one */
+VLC_API demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
+                            const char *psz_path, stream_t *s, es_out_t *out );
+
+VLC_API void demux_Delete( demux_t * );
+
+
+VLC_API int demux_vaControlHelper( stream_t *, int64_t i_start, int64_t i_end,
+                                   int64_t i_bitrate, int i_align, int i_query, va_list args );
+
+VLC_USED static inline int demux_Demux( demux_t *p_demux )
+{
+    if( !p_demux->pf_demux )
+        return 1;
+
+    return p_demux->pf_demux( p_demux );
+}
+
+static inline int demux_vaControl( demux_t *p_demux, int i_query, va_list args )
+{
+    return p_demux->pf_control( p_demux, i_query, args );
+}
+
+static inline int demux_Control( demux_t *p_demux, int i_query, ... )
+{
+    va_list args;
+    int     i_result;
+
+    va_start( args, i_query );
+    i_result = demux_vaControl( p_demux, i_query, args );
+    va_end( args );
+    return i_result;
+}
+
+/*************************************************************************
+ * Miscellaneous helpers for demuxers
+ *************************************************************************/
 
 static inline void demux_UpdateTitleFromStream( demux_t *demux )
 {
@@ -204,10 +244,6 @@ static inline void demux_UpdateTitleFromStream( demux_t *demux )
         demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
     }
 }
-
-/*************************************************************************
- * Miscellaneous helpers for demuxers
- *************************************************************************/
 
 VLC_USED
 static inline bool demux_IsPathExtension( demux_t *p_demux, const char *psz_extension )
