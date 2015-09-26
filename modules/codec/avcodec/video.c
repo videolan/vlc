@@ -1160,10 +1160,6 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         if (va->description != NULL)
             msg_Info(p_dec, "Using %s for hardware decoding", va->description);
 
-        /* FIXME this will disable direct rendering
-         * even if a new pixel format is renegotiated
-         */
-        p_sys->b_direct_rendering = false;
         p_sys->p_va = va;
         p_context->draw_horiz_band = NULL;
         return pi_fmt[i];
