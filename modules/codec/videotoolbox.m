@@ -603,9 +603,11 @@ static void StopVideoToolbox(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if (p_sys->b_started) {
-        CFRelease(p_sys->outputTimeStamps);
+        if (p_sys->outputTimeStamps != nil)
+            CFRelease(p_sys->outputTimeStamps);
         p_sys->outputTimeStamps = nil;
-        CFRelease(p_sys->outputFrames);
+        if (p_sys->outputFrames != nil)
+            CFRelease(p_sys->outputFrames);
         p_sys->outputFrames = nil;
 
         p_sys->b_started = false;
@@ -865,8 +867,9 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
     } else
         msg_Warn(p_dec, "cm block buffer creation failure %i", status);
 
-    if (block_buf)
+    if (block_buf != nil)
         CFRelease(block_buf);
+    block_buf = nil;
 
     return sample_buf;
 }
@@ -962,7 +965,7 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                                                 p_block->i_pts,
                                                 p_block->i_dts,
                                                 p_block->i_length);
-            if (sampleBuffer) {
+            if (likely(sampleBuffer)) {
                 if (likely(!p_sys->b_enable_temporal_processing))
                     decoderFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
                 else
@@ -984,7 +987,9 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                     } else if (status == -8969 || status == -12909) {
                         msg_Err(p_dec, "decoder failure: bad data");
                         StopVideoToolbox(p_dec);
-                        CFRelease(sampleBuffer);
+                        if (likely(sampleBuffer != nil))
+                            CFRelease(sampleBuffer);
+                        sampleBuffer = nil;
                         block_Release(p_block);
                         *pp_block = NULL;
                         return NULL;
@@ -995,7 +1000,9 @@ static picture_t *DecodeBlock(decoder_t *p_dec, block_t **pp_block)
                         msg_Dbg(p_dec, "decoding frame failed (%i)", status);
                 }
 
-                CFRelease(sampleBuffer);
+                if (likely(sampleBuffer != nil))
+                    CFRelease(sampleBuffer);
+                sampleBuffer = nil;
             }
         }
 
@@ -1027,9 +1034,9 @@ skip:
                 }
                 return (NSComparisonResult)NSOrderedSame;
             }];
-            NSArray *timeStamps = p_sys->outputTimeStamps;
+            NSMutableArray *timeStamps = p_sys->outputTimeStamps;
             timeStamp = [timeStamps firstObject];
-            if (timeStamps.count>0) {
+            if (timeStamps.count > 0) {
                 [timeStamps removeObjectAtIndex:0];
             }
         }
@@ -1112,12 +1119,14 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         return;
     }
 
-    if (imageBuffer == NULL)
+    if (imageBuffer == nil)
         return;
 
     if (infoFlags & kVTDecodeInfo_FrameDropped) {
         msg_Dbg(p_dec, "decoder dropped frame");
-        CFRelease(imageBuffer);
+        if (imageBuffer != nil)
+            CFRelease(imageBuffer);
+        imageBuffer = nil;
         return;
     }
 
