@@ -398,8 +398,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->b_direct_rendering = true;
     }
 
-    /* libavcodec doesn't properly release old pictures when frames are skipped */
-    //if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = false;
     if( p_sys->b_direct_rendering )
     {
         msg_Dbg( p_dec, "trying to use direct rendering" );
