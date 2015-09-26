@@ -323,12 +323,13 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
     {
         void *data[2];
 
-        if (sys->error || vlc_interrupt_forward_start(sys->interrupt, data))
+        if (sys->error)
         {
             vlc_mutex_unlock(&sys->lock);
             return -1;
         }
 
+        vlc_interrupt_forward_start(sys->interrupt, data);
         vlc_cond_wait(&sys->wait_data, &sys->lock);
         vlc_interrupt_forward_stop(data);
     }

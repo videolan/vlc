@@ -154,33 +154,23 @@ vlc_interrupt_t *vlc_interrupt_set(vlc_interrupt_t *newctx)
  * Prepares to enter interruptible wait.
  * @param cb callback to interrupt the wait (i.e. wake up the thread)
  * @param data opaque data pointer for the callback
- * @return 0 on success or EINTR if an interruption is already pending
  * @note Any <b>succesful</b> call <b>must</b> be paired with a call to
  * vlc_interrupt_finish().
  */
-static int vlc_interrupt_prepare(vlc_interrupt_t *ctx,
-                                 void (*cb)(void *), void *data)
+static void vlc_interrupt_prepare(vlc_interrupt_t *ctx,
+                                  void (*cb)(void *), void *data)
 {
-    int ret = 0;
-
     assert(ctx != NULL);
     assert(ctx == vlc_threadvar_get(vlc_interrupt_var));
 
     vlc_mutex_lock(&ctx->lock);
     assert(ctx->callback == NULL);
-    if (ctx->interrupted)
-    {
-        ret = EINTR;
-        ctx->interrupted = false;
-    }
-    else
-    {
-        ret = 0;
-        ctx->callback = cb;
-        ctx->data = data;
-    }
+    ctx->callback = cb;
+    ctx->data = data;
+
+    if (unlikely(ctx->interrupted))
+        cb(data);
     vlc_mutex_unlock(&ctx->lock);
-    return ret;
 }
 
 /**
@@ -244,12 +234,7 @@ int vlc_sem_wait_i11e(vlc_sem_t *sem)
     if (ctx == NULL)
         return vlc_sem_wait(sem), 0;
 
-    int ret = vlc_interrupt_prepare(ctx, vlc_interrupt_sem, sem);
-    if (ret)
-    {
-        vlc_testcancel();
-        return ret;
-    }
+    vlc_interrupt_prepare(ctx, vlc_interrupt_sem, sem);
 
     vlc_cleanup_push(vlc_interrupt_cleanup, ctx);
     vlc_sem_wait(sem);
@@ -282,13 +267,7 @@ int vlc_mwait_i11e(mtime_t deadline)
     vlc_cond_t wait;
     vlc_cond_init(&wait);
 
-    int ret = vlc_interrupt_prepare(ctx, vlc_mwait_i11e_wake, &wait);
-    if (ret)
-    {
-        vlc_cond_destroy(&wait);
-        vlc_testcancel();
-        return ret;
-    }
+    vlc_interrupt_prepare(ctx, vlc_mwait_i11e_wake, &wait);
 
     vlc_mutex_lock(&ctx->lock);
     vlc_cleanup_push(vlc_mwait_i11e_cleanup, ctx);
@@ -297,7 +276,7 @@ int vlc_mwait_i11e(mtime_t deadline)
     vlc_cleanup_pop();
     vlc_mutex_unlock(&ctx->lock);
 
-    ret = vlc_interrupt_finish(ctx);
+    int ret = vlc_interrupt_finish(ctx);
     vlc_cond_destroy(&wait);
     return ret;
 }
@@ -312,18 +291,18 @@ static void vlc_interrupt_forward_wake(void *opaque)
                                 : vlc_interrupt_raise)(to);
 }
 
-int vlc_interrupt_forward_start(vlc_interrupt_t *to, void *data[2])
+void vlc_interrupt_forward_start(vlc_interrupt_t *to, void *data[2])
 {
     data[0] = data[1] = NULL;
 
     vlc_interrupt_t *from = vlc_threadvar_get(vlc_interrupt_var);
     if (from == NULL)
-        return 0;
+        return;
 
     assert(from != to);
     data[0] = to;
     data[1] = from;
-    return vlc_interrupt_prepare(from, vlc_interrupt_forward_wake, data);
+    vlc_interrupt_prepare(from, vlc_interrupt_forward_wake, data);
 }
 
 int vlc_interrupt_forward_stop(void *const data[2])
@@ -392,12 +371,7 @@ static int vlc_poll_i11e_inner(struct pollfd *restrict fds, unsigned nfds,
     ufd[nfds].fd = fd[0];
     ufd[nfds].events = POLLIN;
 
-    if (vlc_interrupt_prepare(ctx, vlc_poll_i11e_wake, fd))
-    {
-        vlc_testcancel();
-        errno = EINTR;
-        goto out;
-    }
+    vlc_interrupt_prepare(ctx, vlc_poll_i11e_wake, fd);
 
     vlc_cleanup_push(vlc_poll_i11e_cleanup, ctx);
     ret = poll(ufd, nfds + 1, timeout);
@@ -419,7 +393,7 @@ static int vlc_poll_i11e_inner(struct pollfd *restrict fds, unsigned nfds,
         errno = EINTR;
         ret = -1;
     }
-out:
+
     canc = vlc_savecancel();
     if (fd[1] != fd[0])
         close(fd[1]);
@@ -642,11 +616,7 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
         return -1;
     }
 
-    if (vlc_interrupt_prepare(ctx, vlc_poll_i11e_wake, th))
-    {
-        errno = EINTR;
-        goto out;
-    }
+    vlc_interrupt_prepare(ctx, vlc_poll_i11e_wake, th);
 
     vlc_cleanup_push(vlc_poll_i11e_cleanup, th);
     ret = vlc_poll(fds, nfds, timeout);
@@ -657,7 +627,7 @@ int vlc_poll_i11e(struct pollfd *fds, unsigned nfds, int timeout)
         errno = EINTR;
         ret = -1;
     }
-out:
+
     CloseHandle(th);
     return ret;
 }
