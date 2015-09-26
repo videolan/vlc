@@ -398,16 +398,9 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->b_direct_rendering = true;
     }
 
-    if( p_sys->b_direct_rendering )
-    {
-        msg_Dbg( p_dec, "trying to use direct rendering" );
-        p_context->flags |= CODEC_FLAG_EMU_EDGE;
-    }
-    else
-    {
-        msg_Dbg( p_dec, "direct rendering is disabled" );
-    }
-
+#if !LIBAVCODEC_VERSION_CHECK(55, 32, 1, 48, 102)
+    p_context->flags |= CODEC_FLAG_EMU_EDGE;
+#endif
     p_context->get_format = ffmpeg_GetFormat;
     /* Always use our get_buffer wrapper so we can calculate the
      * PTS correctly */
