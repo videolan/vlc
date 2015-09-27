@@ -252,7 +252,7 @@ static const directx_va_mode_t *FindDxvaMode(const GUID *guid)
 }
 
 /* */
-int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx, vlc_fourcc_t *chroma)
+int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx)
 {
     int surface_alignment = 16;
     int surface_count = 4;
@@ -265,7 +265,6 @@ int directx_va_Setup(vlc_va_t *va, directx_sys_t *dx_sys, AVCodecContext *avctx,
     DestroyVideoDecoder(va, dx_sys);
 
     avctx->hwaccel_context = NULL;
-    *chroma = 0;
     if (avctx->coded_width <= 0 || avctx->coded_height <= 0)
         return VLC_EGENERIC;
 
