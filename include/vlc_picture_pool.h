@@ -121,6 +121,17 @@ VLC_API void picture_pool_Release( picture_pool_t * );
 VLC_API picture_t * picture_pool_Get( picture_pool_t * ) VLC_USED;
 
 /**
+ * Obtains a picture from a pool.
+ *
+ * The picture must be released with picture_Release().
+ *
+ * @return a picture or NULL on memory error
+ *
+ * @note This function is thread-safe.
+ */
+VLC_API picture_t *picture_pool_Wait(picture_pool_t *) VLC_USED;
+
+/**
  * Enumerates all pictures in a pool, both free and allocated.
  *
  * @param cb callback to invoke once for each picture

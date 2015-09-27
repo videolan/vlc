@@ -72,6 +72,14 @@ static void test(bool zombie)
     for (unsigned i = 0; i < PICTURES; i++)
         picture_Release(pics[i]);
 
+    for (unsigned i = 0; i < PICTURES; i++) {
+        pics[i] = picture_pool_Wait(pool);
+        assert(pics[i] != NULL);
+    }
+
+    for (unsigned i = 0; i < PICTURES; i++)
+        picture_Release(pics[i]);
+
     reserve = picture_pool_Reserve(pool, PICTURES / 2);
     assert(reserve != NULL);
 

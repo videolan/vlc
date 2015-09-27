@@ -36,6 +36,7 @@
 #include <vlc_block.h>
 #include <vlc_modules.h>
 #include <vlc_filter.h>
+#include <vlc_picture_pool.h>
 
 #include <libvlc.h>
 

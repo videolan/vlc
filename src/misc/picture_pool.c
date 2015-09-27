@@ -40,6 +40,7 @@ struct picture_pool_t {
     int       (*pic_lock)(picture_t *);
     void      (*pic_unlock)(picture_t *);
     vlc_mutex_t lock;
+    vlc_cond_t  wait;
 
     unsigned long long available;
     atomic_ushort      refs;
@@ -52,6 +53,7 @@ static void picture_pool_Destroy(picture_pool_t *pool)
     if (atomic_fetch_sub(&pool->refs, 1) != 1)
         return;
 
+    vlc_cond_destroy(&pool->wait);
     vlc_mutex_destroy(&pool->lock);
     vlc_free(pool);
 }
@@ -80,6 +82,7 @@ static void picture_pool_ReleasePicture(picture_t *clone)
     vlc_mutex_lock(&pool->lock);
     assert(!(pool->available & (1ULL << offset)));
     pool->available |= 1ULL << offset;
+    vlc_cond_signal(&pool->wait);
     vlc_mutex_unlock(&pool->lock);
 
     picture_pool_Destroy(pool);
@@ -122,6 +125,7 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     pool->pic_lock   = cfg->lock;
     pool->pic_unlock = cfg->unlock;
     vlc_mutex_init(&pool->lock);
+    vlc_cond_init(&pool->wait);
     pool->available = (1ULL << cfg->picture_count) - 1;
     atomic_init(&pool->refs,  1);
     pool->picture_count = cfg->picture_count;
@@ -223,6 +227,39 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
 
     vlc_mutex_unlock(&pool->lock);
     return NULL;
+}
+
+picture_t *picture_pool_Wait(picture_pool_t *pool)
+{
+    unsigned i;
+
+    vlc_mutex_lock(&pool->lock);
+    assert(pool->refs > 0);
+
+    while (pool->available == 0)
+        vlc_cond_wait(&pool->wait, &pool->lock);
+
+    i = ffsll(pool->available);
+    assert(i > 0);
+    pool->available &= ~(1ULL << (i - 1));
+    vlc_mutex_unlock(&pool->lock);
+
+    picture_t *picture = pool->picture[i - 1];
+
+    if (pool->pic_lock != NULL && pool->pic_lock(picture) != 0) {
+        vlc_mutex_lock(&pool->lock);
+        pool->available |= 1ULL << (i - 1);
+        vlc_cond_signal(&pool->wait);
+        vlc_mutex_unlock(&pool->lock);
+        return NULL;
+    }
+
+    picture_t *clone = picture_pool_ClonePicture(pool, i - 1);
+    if (clone != NULL) {
+        assert(clone->p_next == NULL);
+        atomic_fetch_add(&pool->refs, 1);
+    }
+    return clone;
 }
 
 unsigned picture_pool_Reset(picture_pool_t *pool)
